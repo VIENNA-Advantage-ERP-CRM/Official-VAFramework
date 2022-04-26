@@ -32,8 +32,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BaseLibrary">
+      <HintPath>..\ViennaAdvantageWeb\Dll\BaseLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="CoreLibrary">
+      <HintPath>..\ViennaAdvantageWeb\Dll\CoreLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="ModelLibrary">
+      <HintPath>..\ViennaAdvantageWeb\Dll\ModelLibrary.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -66,6 +75,12 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="VAWorkflow">
+      <HintPath>..\ViennaAdvantageWeb\Dll\VAWorkflow.dll</HintPath>
+    </Reference>
+    <Reference Include="XModel">
+      <HintPath>..\ViennaAdvantageWeb\Dll\XModel.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\AttachmentHelper.cs" />
