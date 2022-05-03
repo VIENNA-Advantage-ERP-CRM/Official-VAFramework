@@ -1762,10 +1762,10 @@
     VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {        
         if (this.singleRow || this.isCardRow) {
 
-            if (this.isCardRow && !this.isNewClick) {
+            //if (this.isCardRow && !this.isNewClick) {
 
-                this.gTab.getTableModel().setCurrentPage(1);
-            }
+            //    this.gTab.getTableModel().setCurrentPage(1);
+            //}
 
             this.singleRow = false;
             this.isCardRow = false;
@@ -1792,14 +1792,14 @@
                     this.vHeaderPanel.sizeChangedListner.onSizeChanged();
             }
 
-            this.gTab.getTableModel().resetCard();
-            if (!this.isNewClick && !avoidRequery) {
-                this.aPanel.clearSearchBox();
-                this.refreshFilterPanelData();
-                var query = new VIS.Query();
-                this.getMTab().setQuery(query);
-                this.query(0, 0, null);
-            }
+            //this.gTab.getTableModel().resetCard();
+            //if (!this.isNewClick && !avoidRequery) {
+            //    this.aPanel.clearSearchBox();
+            //    this.refreshFilterPanelData();
+            //    var query = new VIS.Query();
+            //    this.getMTab().setQuery(query);
+            //    this.query(0, 0, null);
+            //}
             this.isNewClick = false;
 
         }

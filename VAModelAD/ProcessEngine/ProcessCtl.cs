@@ -892,6 +892,12 @@ namespace VAdvantage.ProcessEngine
                     _pi.SetIsReportFormat(true);
                     _pi.SetPrintAllPages(false);
                     re = VAdvanatge.Report.ReportEngine.GetReportEngine(_ctx, pi, _trx, "VARCOMSvc", "ViennaAdvantage.Classes.ReportFromatWrapper");
+                    if (re == null)
+                    {
+                        //Report Format linked with process not exist in DB Or Some issue with report format.
+                        _pi.SetSummary(Msg.GetMsg(ctx, "ReportNotExist"));
+                        return _pi.ToList();
+                    }
                     Unlock();
 
                     // "#REPORT_PAGE_SIZE"
