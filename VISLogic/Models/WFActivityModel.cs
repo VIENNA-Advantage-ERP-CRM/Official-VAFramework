@@ -47,7 +47,7 @@ namespace VIS.Models
             if (AD_Window_ID > 0 || (!string.IsNullOrEmpty(searchText) && searchText.Length > 0))
             {
                 sql = @"SELECT DISTINCT tabl.AD_table_ID,Tab.AD_Tab_ID FROM AD_Window Wind Join AD_Tab Tab 
-                    ON Wind.AD_Window_Id=Tab.AD_Window_Id JOIN  AD_Table Tabl On Tab.AD_Table_Id=Tabl.AD_Table_Id 
+                    ON (Wind.AD_Window_Id=Tab.AD_Window_Id) JOIN  AD_Table Tabl On (Tab.AD_Table_Id=Tabl.AD_Table_Id) 
                     WHERE Tab.IsActive    ='Y'";
 
                 sql += " AND wind.AD_Window_ID=" + AD_Window_ID + " AND tab.AD_table_ID IN (Select Distinct AD_Table_ID FROM AD_WF_Activity where AD_Window_ID=" + AD_Window_ID + ") ORDER BY Tab.AD_Tab_ID Asc";
@@ -259,9 +259,9 @@ OR
                     //if (AD_Window_ID > 0 || (!string.IsNullOrEmpty(searchText) && searchText.Length > 0))
                     //if (whereClause.Length > 7)
                     //{
-                    sql = @"SELECT COUNT(*) FROM (";
+                    //sql = @"SELECT COUNT(*) FROM (";
                     //}
-                    sql += @"SELECT a.*
+                    sql += @"SELECT COUNT(a.AD_WF_Activity_ID)
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'
                             AND a.WFState      ='OS'
@@ -325,7 +325,7 @@ OR
                     if (whereClause.Length > 7)
                     {
                         // Applied Role access on workflow Activities
-                        sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "a", true, true) + @" )  MyTable ";
+                        sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "a", true, true); // + @" )  MyTable ";
 
                         sql += fromClause;
                         sql += whereClause;
@@ -339,7 +339,7 @@ OR
                     else
                     {
                         // Applied Role access on workflow Activities
-                        sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "a", true, true) + "  ) MyTable";
+                        sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "a", true, true); // + "  ) MyTable";
                     }
 
                     info.count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
@@ -794,14 +794,14 @@ OR
                                     parentOrg_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT Parent_Org_Id FROM ad_OrgInfo WHERE AD_Org_ID = " + activity.GetResponsibleOrg_ID()));
                                     superVisiorID = (new MOrgInfo(ctx, parentOrg_ID, null).GetSupervisor_ID());
                                     if (superVisiorID > 0)
-                                        setRespOrg = true;                                        
+                                        setRespOrg = true;
                                 }
                                 else
                                     superVisiorID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT Supervisor_ID FROM AD_User WHERE IsActive='Y' AND AD_User_ID=" + activity.GetAD_User_ID()));
                                 //chkUserTxt = CheckUser(superVisiorID);
                                 //if (chkUserTxt != "")
                                 //    return chkUserTxt;
-                                if(setRespOrg)
+                                if (setRespOrg)
                                     activity.SetResponsibleOrg_ID(parentOrg_ID);
                                 if (superVisiorID == 0)//Approve
                                 {
@@ -1030,10 +1030,10 @@ OR
                         AD_Window_Trl.Name || ' (' || AD_WF_Node.Name || ')' As Name,AD_WF_Node.AD_WF_Node_ID
                         FROM AD_Wf_Activity AD_Wf_Activity
                         INNER JOIN AD_Window AD_Window
-                        ON AD_Wf_Activity.AD_Window_Id = AD_Window.AD_Window_Id
+                        ON (AD_Wf_Activity.AD_Window_Id = AD_Window.AD_Window_Id)
                         INNER JOIN AD_window_Trl AD_window_Trl
-                        ON AD_window_Trl.AD_Window_ID=AD_window.AD_window_ID
-                        INNER JOIN AD_WF_Node AD_WF_Node ON AD_WF_Node.AD_WF_Node_ID=AD_Wf_Activity.AD_WF_Node_ID
+                        ON (AD_window_Trl.AD_Window_ID=AD_window.AD_window_ID)
+                        INNER JOIN AD_WF_Node AD_WF_Node ON (AD_WF_Node.AD_WF_Node_ID=AD_Wf_Activity.AD_WF_Node_ID)
                         WHERE AD_Window.IsActive     ='Y'
                         AND AD_Wf_Activity.Processed = 'N'
                         AND AD_Wf_Activity.WFState   ='OS' AND AD_Language='" + Env.GetAD_Language(ctx) + "'";
