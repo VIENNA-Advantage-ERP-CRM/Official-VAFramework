@@ -988,7 +988,7 @@ namespace VAModelAD.Model
                 for (int i = 0; i < mAttach._lines.Count; i++)
                 {
 
-                    filePath = System.IO.Path.Combine(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath, "TempDownload");
+                    filePath = System.IO.Path.Combine(GlobalVariable.PhysicalPath, "TempDownload");
                     filePath = System.IO.Path.Combine(filePath, mAttach.GetFile(mAttach._lines[i].Line_ID));
                     if (filePath.IndexOf("ERROR") > -1)
                     {

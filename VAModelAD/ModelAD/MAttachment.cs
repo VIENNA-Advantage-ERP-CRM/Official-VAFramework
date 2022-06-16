@@ -1210,7 +1210,7 @@ namespace VAdvantage.Model
             {
                 return serverLocation;
             }
-            return System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
+            return GlobalVariable.PhysicalPath; ;
         }
 
         /// <summary>
@@ -1693,7 +1693,7 @@ namespace VAdvantage.Model
         /// <returns>Returns attachment path</returns>
         private static string GetAttachmentPath()
         {
-            return GetServerLocation() == System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath ?
+            return GetServerLocation() == GlobalVariable.PhysicalPath ?
                         GlobalVariable.AttachmentPath : Path.Combine(GetServerLocation(), "Attachments");
         }
 
