@@ -75,6 +75,9 @@ namespace VAdvantage.Controller
 
         public string FieldValueStyle = "";
 
+        public bool IsAlwaysExecute = false;
+
+
     }
 
     public class HeaderPanelGrid
