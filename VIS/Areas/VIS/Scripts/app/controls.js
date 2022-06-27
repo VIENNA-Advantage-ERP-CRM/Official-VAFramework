@@ -6472,6 +6472,11 @@
         }
 
 
+        this.frmat = null;
+        if (mField && VIS.DisplayType.IsNumeric(mField.getDisplayType())) {
+            this.frmat = VIS.DisplayType.GetNumberFormat(mField.getDisplayType());
+        }
+
         if (colSql.contains('@')) {
             this.needtoParse = true;
         }
