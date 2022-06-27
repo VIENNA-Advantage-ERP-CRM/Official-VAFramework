@@ -2674,6 +2674,7 @@
         pi.setAD_User_ID(ctx.getAD_User_ID());
         pi.setAD_Client_ID(ctx.getAD_Client_ID());
         pi.setAD_Window_ID((aPanel.$parentWindow === undefined ? 0 : aPanel.$parentWindow.AD_Window_ID));// vinay bhatt window id
+        pi.setUseCrystalReportViewer(ctx.getIsUseCrystalReportViewer());
         pi.setIsBatch(batch);
         pi.setIsBackground(isbackground);
         //start process

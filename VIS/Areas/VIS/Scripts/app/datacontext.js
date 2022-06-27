@@ -331,25 +331,25 @@
         };
 
         //DataSet String
-        function getDataSetJString(data, async, callback) {
-            var result = null;
+        //function getDataSetJString(data, async, callback) {
+        //    var result = null;
            
-            $.ajax({
-                url: dataSetUrl,
-                type: "POST",
-                datatype: "json",
-                contentType: "application/json; charset=utf-8",
-                async: async,
-                data: JSON.stringify(data)
-            }).done(function (json) {
-                result = json;
-                if (callback) {
-                    callback(json);
-                }
-                //return result;
-            });
-            return result;
-        };
+        //    $.ajax({
+        //        url: dataSetUrl,
+        //        type: "POST",
+        //        datatype: "json",
+        //        contentType: "application/json; charset=utf-8",
+        //        async: async,
+        //        data: JSON.stringify(data)
+        //    }).done(function (json) {
+        //        result = json;
+        //        if (callback) {
+        //            callback(json);
+        //        }
+        //        //return result;
+        //    });
+        //    return result;
+        //};
 
 
 
@@ -357,43 +357,43 @@
 
         /* Execute Non Query */
 
-        function executeQuery(data, async, callback) {
-            var result = null;
+        //function executeQuery(data, async, callback) {
+        //    var result = null;
             
-            $.ajax({
-                url: nonQueryUrl + 'y',
-                type: "POST",
-                datatype: "json",
-                contentType: "application/json; charset=utf-8",
-                async: async,
-                data: JSON.stringify(data)
-            }).done(function (json) {
-                result = json;
-                if (callback) {
-                    callback(json);
-                }
-            });
-            return result;
-        };
+        //    $.ajax({
+        //        url: nonQueryUrl + 'y',
+        //        type: "POST",
+        //        datatype: "json",
+        //        contentType: "application/json; charset=utf-8",
+        //        async: async,
+        //        data: JSON.stringify(data)
+        //    }).done(function (json) {
+        //        result = json;
+        //        if (callback) {
+        //            callback(json);
+        //        }
+        //    });
+        //    return result;
+        //};
 
-        function executeQueries(data, async, callback) {
-            var result = null;
+        //function executeQueries(data, async, callback) {
+        //    var result = null;
          
-            $.ajax({
-                url: nonQueryUrl + 'ies',
-                type: "POST",
-                datatype: "json",
-                contentType: "application/json; charset=utf-8",
-                async: async,
-                data: JSON.stringify(data)
-            }).done(function (json) {
-                result = json;
-                if (callback) {
-                    callback(json);
-                }
-            });
-            return result;
-        };
+        //    $.ajax({
+        //        url: nonQueryUrl + 'ies',
+        //        type: "POST",
+        //        datatype: "json",
+        //        contentType: "application/json; charset=utf-8",
+        //        async: async,
+        //        data: JSON.stringify(data)
+        //    }).done(function (json) {
+        //        result = json;
+        //        if (callback) {
+        //            callback(json);
+        //        }
+        //    });
+        //    return result;
+        //};
 
         function getJSONData(actionUrl, data, callback) {
             var asyc = callback ? true : false;
@@ -550,7 +550,7 @@
             getWindowRecord: getWindowRecord,
             updateInsertLocks: updateInsertLocks,
 
-            getDataSetJString: getDataSetJString,
+            //getDataSetJString: getDataSetJString,
             getFormDataString: getFormDataJString,
 
             getProcessDataString: getProcessInfoJString,
@@ -560,8 +560,8 @@
 
             updateClientCtx: updateClientCtx,
 
-            executeQueries: executeQueries,
-            executeQuery: executeQuery,
+            //executeQueries: executeQueries,
+            //executeQuery: executeQuery,
             getJSONRecord: getJSONRecord,
             getJSONData: getJSONData,
             subscribeUnsubscribeRecords: subscribeUnsubscribeRecords,

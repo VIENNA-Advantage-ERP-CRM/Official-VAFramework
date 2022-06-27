@@ -196,18 +196,17 @@ namespace VAdvantage.Model
             //
             sb.Append("]");
             return sb.ToString();
-        }	//	toString
+        }   //	toString
 
 
-        public const int MONDAY = 2;
+        public const int MONDAY = 1;
 
-        public const int SUNDAY = 1;
-        public const int THURSDAY = 5;
-        public const int TUESDAY = 3;
-        public const int WEDNESDAY = 4;
-        public const int SATURDAY = 7;
-        public const int FRIDAY = 6;
-
+        public const int SUNDAY = 0;
+        public const int THURSDAY = 4;
+        public const int TUESDAY = 2;
+        public const int WEDNESDAY = 3;
+        public const int SATURDAY = 6;
+        public const int FRIDAY = 5;
 
         /// <summary>
         /// Is it OK to Run process On IP of this box
@@ -332,11 +331,62 @@ namespace VAdvantage.Model
 
                 bool increment = true;
                 int ct = 0;
-                while ((ct < 8) && !(validDays.Contains(((int)calNext.DayOfWeek) + 1)))
+                if (X_R_RequestProcessor.FREQUENCYTYPE_Day.Equals(frequencyType))
                 {
-                    calNext = calNext.AddDays(1);
-                    ct++;
-                    increment = false;
+                    while ((ct < 8) && (!(validDays.Contains(((int)calNext.AddDays(((ct > 0) ? 0 : frequency)).DayOfWeek)))))
+                    {
+                        //Add frequency to today and check next date is checked or not.
+                        // if yes then set that day as next date otherwise add 1 day to new date and check if checked or not.
+                        // check next date
+
+                        //{
+                        //Add frequency +1
+                        //Example:-- today is wednesday and frequency is 3. so saturday should be next day.
+                        // But saturday is not checked, so add frequency +1 to set next date sunday and check that one.
+                        calNext = calNext.AddDays(((ct > 0) ? 1 : frequency));
+                        //calNext = calNext.AddHours(-calNext.Hour).AddMinutes(-calNext.Minute).AddSeconds(-calNext.Second);
+                        calNext = calNext.Subtract(new TimeSpan(calNext.Hour, 0, 0));
+                        calNext = calNext.AddHours(hour);
+
+                        calNext = calNext.Subtract(new TimeSpan(0, calNext.Minute, 0));
+                        calNext = calNext.AddMinutes(minute);
+                        ct++;
+                        increment = false;
+                        //}
+                        //else
+                        //{
+                        //    // if nextday is checked, then set that day as next run time
+                        //    calNext = calNext.AddDays(((ct > 0) ? 1 : frequency));
+                        //    if (ct > 0)
+                        //    {
+                        //        calNext = calNext.AddHours(-calNext.Hour).AddMinutes(-calNext.Minute).AddSeconds(-calNext.Second);
+                        //    }
+                        //    increment = false;
+                        //    break;
+                        //}
+                    }
+                }
+                else if (X_R_RequestProcessor.FREQUENCYTYPE_Hour.Equals(frequencyType))
+                {
+                    //calNext = calNext.AddHours(frequency);
+                    while ((ct < 8) && !(validDays.Contains(((int)calNext.AddHours(frequency).DayOfWeek))))
+                    {
+                        calNext = calNext.AddHours(frequency).AddDays(1);
+                        calNext = calNext.AddHours(-calNext.Hour).AddMinutes(-calNext.Minute).AddSeconds(-calNext.Second);
+                        ct++;
+                        increment = false;
+                    }
+                }
+                else if (X_R_RequestProcessor.FREQUENCYTYPE_Minute.Equals(frequencyType))
+                {
+                    //calNext = calNext.AddMinutes(frequency);
+                    while ((ct < 8) && !(validDays.Contains(((int)calNext.AddMinutes(frequency).DayOfWeek))))
+                    {
+                        calNext = calNext.AddMinutes(frequency).AddDays(1);
+                        calNext = calNext.AddHours(-calNext.Hour).AddMinutes(-calNext.Minute).AddSeconds(-calNext.Second);
+                        ct++;
+                        increment = false;
+                    }
                 }
 
 
@@ -353,21 +403,20 @@ namespace VAdvantage.Model
                     calNext = calNext.Subtract(new TimeSpan(0, calNext.Minute, 0));
                     calNext = calNext.AddMinutes(minute);
                     if (increment)
-                    {
                         calNext = calNext.AddDays(frequency);
-                    }
+
                 }	//	Day
 
                 /*****	HOUR	******/
                 else if (X_R_RequestProcessor.FREQUENCYTYPE_Hour.Equals(frequencyType))
                 {
-                    //calNext.set(java.util.Calendar.MINUTE, minute);
-                    //calNext.add(java.util.Calendar.HOUR_OF_DAY, frequency);
 
-                    calNext = calNext.Subtract(new TimeSpan(0, calNext.Minute, 0));
-                    calNext = calNext.AddMinutes(minute);
                     if (increment)
+                    {
+                        //calNext = calNext.Subtract(new TimeSpan(0, calNext.Minute, 0));
+                        //calNext = calNext.AddMinutes(minute);
                         calNext = calNext.AddHours(frequency);
+                    }
                 }	//	Hour
 
                 /*****	MINUTE	******/
