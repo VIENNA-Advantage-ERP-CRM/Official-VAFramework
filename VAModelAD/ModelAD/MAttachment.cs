@@ -1974,16 +1974,16 @@ namespace VAdvantage.Model
 
                         if (!string.IsNullOrEmpty(containerUri))
                         {
-                            string downloadFullPath = Path.Combine(Path.Combine(filePath, "TempDownload", folder), filename);
+                            string downloadFullPath = Path.Combine(Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
 
                             string res = AzureBlobStorage.DownloadFile(GetCtx(), containerUri, downloadFullPath, filename);
 
                             if (res == null)
                             {
                                 //Decrypt File
-                                SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                                SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
                                 //Delete file from temp folder
-                                System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, filename));
+                                System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
                             }
                             else
                             {
