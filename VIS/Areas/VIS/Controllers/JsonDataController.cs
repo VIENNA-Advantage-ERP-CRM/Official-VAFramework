@@ -812,6 +812,7 @@ namespace VIS.Controllers
             int AD_Reference_Value_ID, bool isParent, string validationCode)
         {
             Ctx _ctx = new Ctx(ctx);
+            validationCode = SecureEngineBridge.DecryptByClientKey(validationCode, _ctx.GetSecureKey());
             //Ctx _ctx = null;//(ctx) as Ctx;
             Lookup res = LookupHelper.GetLookup(_ctx, windowNo, column_ID, AD_Reference_ID, columnName,
                 AD_Reference_Value_ID, isParent, validationCode);
