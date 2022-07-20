@@ -2529,7 +2529,6 @@
                             AD_Window_ID: self.lookup.AD_Window_ID,
                             AD_Tab_ID: self.lookup.AD_Tab_ID,
                             AD_Field_ID: self.lookup.AD_Field_ID,
-                            Term: term,
                             Validation: JSON.stringify(validation)
                         },
                         success: function (data) {

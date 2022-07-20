@@ -624,7 +624,7 @@
                 if (ctxInfo.length == 0 && (token.startsWith("#") || token.startsWith("$")))
                     ctxInfo = ctx.getContext(token);	// get global context
 
-                resultData[token] = ctxInfo;
+                resultData.push({ 'Key': token, 'Value': ctxInfo });
 
                 if (ctxInfo.length == 0) {
                     //_log.config("No Context Win=" + WindowNo + " for: " + token);
@@ -909,6 +909,7 @@
             getWindowNo: getWindowNo,
             getCtx: getCtx,
             parseContext: parseContext,
+            parseContext2: parseContext2,
             getWINDOW_PAGE_SIZE: getWINDOW_PAGE_SIZE,
             setWINDOW_PAGE_SIZE: setWINDOW_PAGE_SIZE,
             setScreenHeight: setScreenHeight,
