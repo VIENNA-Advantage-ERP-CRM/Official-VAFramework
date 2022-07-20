@@ -60,7 +60,7 @@ namespace VIS.Controllers
         {
             Ctx ctx = Session["ctx"] as Ctx;
             FormModel model = new FormModel(ctx);
-            return Json(JsonConvert.SerializeObject(model.GetZoomTargets(targetTableName, curWindow_ID, targetWhereClause)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(model.GetZoomTargets(ctx,targetTableName, curWindow_ID, targetWhereClause)), JsonRequestBehavior.AllowGet);
         }
         #endregion
 

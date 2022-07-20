@@ -149,8 +149,119 @@ namespace VIS.Controllers
         }
 
 
+        public JsonResult GetTableID(string treeId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetTableId(treeId)), JsonRequestBehavior.AllowGet);
+        }
 
+        public JsonResult GetTableName(string table_id)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetTableName(table_id)), JsonRequestBehavior.AllowGet);
+        }
 
+        public JsonResult GetTreeType(string treeId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetTreeType(treeId)), JsonRequestBehavior.AllowGet);
+        }
 
+        public JsonResult GetRecordCount(string tableName, string tableTreeName, string treeID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetRecordCount(tableName, tableTreeName, treeID)), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetNodeIds(string tableTreeName, string treeID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetNodeIds( tableTreeName, treeID)), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetChildIDs(string treeId, string tbname, string delNodId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetChildIDs(treeId, tbname, delNodId)), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetNodeIdsOfParent(string tbname, string parent_id, string treeId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetNodeIdsOfParent(tbname, parent_id, treeId)), JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult GetRestrictionCount(string tableTreeName, string treeId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetRestrictionCount(tableTreeName, treeId)), JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult IsRecordExists( string treeId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.IsRecordExists(treeId)), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetWindowMenuIds()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetWindowMenuIds()), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetWindowFormIds(string tableTreeName, string treeId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetFormMenuIds()), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetNameByIds(string ids)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetNameByIds(ids)), JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult GetSeqNo(string tblName, string treeId, string nodeId)
+        { 
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetSeqNo( tblName, treeId, nodeId)), JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult UpdateSeqNo(string tblName, string seqNo, string treeId,string nodeId,bool bySeqNo,bool isParent)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.UpdateSeqNo( tblName,  seqNo,  treeId,nodeId,bySeqNo,isParent)), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetParentId(string tblName, string nodeId, string treeId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetParentId(tblName, nodeId, treeId)), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult UpdateSeqNoParentId(string tblName, string pid, string seqNo,string nodeId, string treeId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.UpdateSeqNoParentId(tblName, pid, seqNo, treeId,nodeId )), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetWindowtId()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetWindowtId()), JsonRequestBehavior.AllowGet);
+        }
     }
 }

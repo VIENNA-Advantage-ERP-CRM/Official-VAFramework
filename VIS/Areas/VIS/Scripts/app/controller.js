@@ -948,26 +948,7 @@
         if (tableName.startsWith("C_Order") || tableName.startsWith("C_Invoice")) {
             var Record_ID;
             var isOrder = tableName.startsWith("C_Order");
-            //
-            //var sql = new StringBuilder("SELECT COUNT(*) AS Lines,c.ISO_Code,o.TotalLines,o.GrandTotal,"
-            //		+ "CURRENCYBASEWITHCONVERSIONTYPE(o.GrandTotal,o.C_Currency_ID,o.DateAcct, o.AD_Client_ID,o.AD_Org_ID, o.C_CONVERSIONTYPE_ID) AS ConvAmt ");
-            //if (isOrder) {
-            //    Record_ID = ctx.getContextAsInt(windowNo, "C_Order_ID");
-            //    sql.append("FROM C_Order o"
-            //			+ " INNER JOIN C_Currency c ON (o.C_Currency_ID=c.C_Currency_ID)"
-            //			+ " INNER JOIN C_OrderLine l ON (o.C_Order_ID=l.C_Order_ID) "
-            //			+ "WHERE o.C_Order_ID=" + Record_ID + "");
-            //}
-            //else {
-            //    Record_ID = ctx.getContextAsInt(windowNo, "C_Invoice_ID");
-            //    sql.append("FROM C_Invoice o"
-            //			+ " INNER JOIN C_Currency c ON (o.C_Currency_ID=c.C_Currency_ID)"
-            //			+ " INNER JOIN C_InvoiceLine l ON (o.C_Invoice_ID=l.C_Invoice_ID) "
-            //			+ "WHERE o.C_Invoice_ID=" + Record_ID + "");
-            //}
-            //sql.append("GROUP BY o.C_Currency_ID, c.ISO_Code, o.TotalLines, o.GrandTotal, o.DateAcct, o.AD_Client_ID, o.AD_Org_ID,o.C_CONVERSIONTYPE_ID");
-
-            //log.fine(tableName + " - " + Record_ID);
+            
             var mf = null;
             var mfMC = null;
             try {
@@ -1119,21 +1100,7 @@
         return this.vo.WhereClause;
     };
 
-    /*
-     * Set where condition from outside 
-     * @param {any} conition
-     */
-    //GridTab.prototype.setOuterWhereClause = function (conition) {
-    //    this.outerWhereCondition = conition;
-    //}
-
-    /*
-     *Reset outside condition
-     */
-    // GridTab.prototype.resetCard = function () {
-    //    //this.setOuterWhereClause("");
-    //    //this.getTableModel().setOuterOrderClause("");           
-    //};
+    
 
     GridTab.prototype.getSearchQuery = function (val) {
         var query = null;
@@ -1511,13 +1478,7 @@
             return query.getWhereClause();
         }
 
-        //	Find Refernce Column e.g. BillTo_ID -> C_BPartner_Location_ID
-        //var sql = "SELECT cc.ColumnName "
-        //	+ "FROM AD_Column c"
-        //	+ " INNER JOIN AD_Ref_Table r ON (c.AD_Reference_Value_ID=r.AD_Reference_ID)"
-        //	+ " INNER JOIN AD_Column cc ON (r.Column_Key_ID=cc.AD_Column_ID) "
-        //	+ "WHERE c.AD_Reference_ID IN (18,30)" 	//	Table/Search
-        //	+ " AND c.ColumnName='" + colName + "'";
+      
         var sql = "VIS_104";
         var param = [];
         param[0] = new VIS.DB.SqlParam("@colName", colName);
@@ -1554,12 +1515,7 @@
         var tabKeyColumn = this.getKeyColumnName();
         //	Column=SalesRep_ID, Key=AD_User_ID, Query=SalesRep_ID=101
 
-        //sql = "SELECT t.TableName "
-        //    + "FROM AD_Column c"
-        //    + " INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID) "
-        //    + "WHERE c.ColumnName='" + colName + "' AND IsKey='Y'"		//	#1 Link Column
-        //    + " AND EXISTS (SELECT * FROM AD_Column cc"
-        //    + " WHERE cc.AD_Table_ID=t.AD_Table_ID AND cc.ColumnName='" + tabKeyColumn + "')";	//	#2 Tab Key Column
+        
 
         sql = "VIS_105";
         var param = [];
@@ -1584,8 +1540,7 @@
 
         //	Special Reference Handling
         if (tabKeyColumn.equals("AD_Reference_ID")) {
-            //	Column=AccessLevel, Key=AD_Reference_ID, Query=AccessLevel='6'
-            //sql = "SELECT AD_Reference_ID FROM AD_Column WHERE ColumnName='" + colName + "'";
+           
 
             sql = "VIS_106";
             var param = [];
@@ -1603,18 +1558,7 @@
                 + ", Query=" + query);
             return query.getWhereClause();
         }
-        //else if(tableName.equals("M_WorkOrderComponent") && tabKeyColumn.equals("M_WorkOrder_ID")){
-        //Object[][] results = QueryUtil.executeQuery((Trx)null, "SELECT M_WorkOrderOperation_ID FROM M_WorkOrderComponent WHERE "+query.getWhereClause(),new Object[]{});
-        //int M_WorkOrderOperation_ID = 0;
-        //if(results != null && results.length>0 && results[0].length>0)
-        //    if(results[0][0] instanceof BigDecimal)
-        //        M_WorkOrderOperation_ID = ((BigDecimal)results[0][0]).intValue();
-        //    else if(results[0][0] instanceof Integer)
-        //        M_WorkOrderOperation_ID = (Integer)results[0][0];
-        //query.setTableName("xx");
-        //String result = "EXISTS (SELECT * FROM M_WorkOrderOperation xx WHERE xx.M_WorkOrderOperation_ID="+M_WorkOrderOperation_ID+" AND xx.M_WorkOrder_ID=M_WorkOrder.M_WorkOrder_ID)";
-        //return result;
-        //}
+       
 
         query.setTableName("xx");
         var result = "EXISTS (SELECT * FROM "

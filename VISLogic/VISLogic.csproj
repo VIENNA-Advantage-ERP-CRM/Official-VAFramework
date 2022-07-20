@@ -106,6 +106,7 @@
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AmountDivisionModel.cs" />
+    <Compile Include="Models\ArchiveViewerModel.cs" />
     <Compile Include="Models\ASearchModel.cs" />
     <Compile Include="Models\AttachmentHistoryModel.cs" />
     <Compile Include="Models\AttachmentModel.cs" />

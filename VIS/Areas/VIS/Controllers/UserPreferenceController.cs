@@ -278,7 +278,32 @@ namespace VIS.Controllers
              return Json(JsonConvert.SerializeObject(objUPModel.GetLoginData(sql)), JsonRequestBehavior.AllowGet);
          }
 
-         public JsonResult GetDefaultLogin(int AD_User_ID)
+        public JsonResult GetUserRoles(string sql)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+
+            UserPreferenceModel objUPModel = new UserPreferenceModel();
+            return Json(JsonConvert.SerializeObject(objUPModel.GetUserRoles(ctx.GetAD_User_ID().ToString())), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetOrgData(string roleId,string clientId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+
+            UserPreferenceModel objUPModel = new UserPreferenceModel();
+            return Json(JsonConvert.SerializeObject(objUPModel.GetOrgData(roleId,clientId, ctx.GetAD_User_ID().ToString())), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetWarehouseData(string orgId)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+
+            UserPreferenceModel objUPModel = new UserPreferenceModel();
+            return Json(JsonConvert.SerializeObject(objUPModel.GetWareHouseData(orgId)), JsonRequestBehavior.AllowGet);
+        }
+
+
+        public JsonResult GetDefaultLogin(int AD_User_ID)
          {
 
              UserPreferenceModel objUPModel = new UserPreferenceModel();

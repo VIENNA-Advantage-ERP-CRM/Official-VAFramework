@@ -22,11 +22,12 @@
         var msql = "";
         var msqlNonZero = "";
         //	From Clause						
-        var msqlFrom = "M_ProductAttributes patr LEFT JOIN M_Storage s ON (patr.M_AttributeSetInstance_ID = s.M_AttributeSetInstance_ID AND patr.M_Product_ID = s.M_Product_ID)"
-            + " LEFT JOIN M_Locator l ON (s.M_Locator_ID=l.M_Locator_ID)"
-            + " LEFT JOIN M_Warehouse w ON (l.M_Warehouse_ID=w.M_Warehouse_ID)"
-            + " INNER JOIN M_Product p ON (patr.M_Product_ID=p.M_Product_ID)"
-            + " INNER JOIN M_AttributeSetInstance asi ON (patr.M_AttributeSetInstance_ID=asi.M_AttributeSetInstance_ID)";
+        var msqlFrom = "";
+        //"M_ProductAttributes patr LEFT JOIN M_Storage s ON (patr.M_AttributeSetInstance_ID = s.M_AttributeSetInstance_ID AND patr.M_Product_ID = s.M_Product_ID)"
+        //    + " LEFT JOIN M_Locator l ON (s.M_Locator_ID=l.M_Locator_ID)"
+        //    + " LEFT JOIN M_Warehouse w ON (l.M_Warehouse_ID=w.M_Warehouse_ID)"
+        //    + " INNER JOIN M_Product p ON (patr.M_Product_ID=p.M_Product_ID)"
+        //    + " INNER JOIN M_AttributeSetInstance asi ON (patr.M_AttributeSetInstance_ID=asi.M_AttributeSetInstance_ID)";
 
         var msqlWhere = " patr.M_Product_ID=@M_Product_ID AND patr.M_AttributeSetInstance_ID != 0";
         msqlNonZero = " AND s.QtyOnHand>0";            // (s.QtyOnHand<>0 OR s.QtyReserved<>0 OR s.QtyOrdered<>0)";
@@ -63,11 +64,6 @@
                 var shelfLifeMinPct = 0;
                 var shelfLifeMinDays = 0;
 
-                //var sql = "SELECT bp.ShelfLifeMinPct, bpp.ShelfLifeMinPct, bpp.ShelfLifeMinDays "
-                //    + "FROM C_BPartner bp "
-                //    + " LEFT OUTER JOIN C_BPartner_Product bpp"
-                //    + " ON (bp.C_BPartner_ID=bpp.C_BPartner_ID AND bpp.M_Product_ID=" + mProductID + ") "
-                //    + "WHERE bp.C_BPartner_ID=" + C_BPartner_ID;
 
                 var dr = null;
                 try {
@@ -80,18 +76,7 @@
                         }
                         shelfLifeMinDays = dr["ShelfLifeMinDays"];
                     }
-                    //dr = VIS.DB.executeReader(sql, null);
-                    //if (dr.read()) {
-                    //    shelfLifeMinPct = dr.getInt(0);		//	BP
-                    //    var pct = dr.getInt(1);				//	BP_P
-                    //    if (pct > 0)	//	overwrite
-                    //    {
-                    //        shelfLifeMinDays = pct;
-                    //    }
-                    //    shelfLifeMinDays = dr.getInt(2);
-                    //}
-                    //dr.close();
-                    //dr = null;
+                   
                 }
                 catch (e) {
                     //if (dr != null) {
@@ -111,7 +96,11 @@
                 }
             }	//	BPartner != 0
 
-            msql = prepareTable(msqlFrom, msqlWhere, false, "patr") + " ORDER BY asi.GuaranteeDate, QtyOnHand DESC";	//	oldest, smallest first
+            msql = msqlWhere;// prepareTable(msqlFrom, msqlWhere, false, "patr") + " ORDER BY asi.GuaranteeDate, QtyOnHand DESC";	//	oldest, smallest first
+            if (mWarehouseID != 0) {
+                msql = msql.concat(" AND NVL(l.M_Warehouse_ID,0) IN (0," + mWarehouseID + ")");
+            }
+            mssql += " ORDER BY asi.GuaranteeDate, QtyOnHand DESC";	//	oldest, smallest first"
             //refresh();
             topdiv.append(chkShowAll);
             bottomdiv.append(btnCancel).append(btnOk);
@@ -127,29 +116,23 @@
         }
 
         function prepareTable(from, where, multiSelection, tableName) {
-            var sql = "SELECT DISTINCT patr.M_AttributeSetInstance_ID, asi.Description, asi.Lot, asi.SerNo, asi.GuaranteeDate, asi.Value AS AttrCode, l.Value, NVL(s.M_Locator_ID,0) AS M_Locator_ID," +
-                " NVL(s.QtyOnHand,0) AS QtyOnHand, NVL(s.QtyReserved,0) AS QtyReserved, NVL(s.QtyOrdered,0) AS QtyOrdered," +
-                " (daysBetween(TRUNC(asi.GuaranteeDate,'DD'), TRUNC(SysDate,'DD'))-p.GuaranteeDaysMin) as ShelfLifeDays," +
-                " daysBetween(TRUNC(asi.GuaranteeDate,'DD'), TRUNC(SysDate,'DD')) as GoodForDays, CASE WHEN p.GuaranteeDays > 0 THEN " +
-                " ROUND(daysBetween(TRUNC(asi.GuaranteeDate,'DD'),TRUNC(SysDate,'DD'))/p.GuaranteeDays*100,12) ELSE 0 END as ShelfLifeRemainingPct";
-
-            sql = sql.concat(" FROM ").concat(from);
-            sql = sql.concat(" WHERE ").concat(where);
+            var sql = "";
+           
 
             //if (mLocatorID != 0) {
             //    sql = sql.concat(" AND s.M_Locator_ID = " + mLocatorID);
             //}
-            if (mWarehouseID != 0) {
-                sql = sql.concat(" AND NVL(l.M_Warehouse_ID,0) IN (0," + mWarehouseID + ")");
-            }
+            //if (mWarehouseID != 0) {
+            //    sql = sql.concat(" AND NVL(l.M_Warehouse_ID,0) IN (0," + mWarehouseID + ")");
+            //}
 
-            if (from.length == 0) {
-                return sql.toString();
-            }
+            //if (from.length == 0) {
+            //    return sql.toString();
+            //}
             //
-            $self.log.finest(finalSQL);
-            var finalSQL = VIS.MRole.getDefault().addAccessSQL(sql, tableName, VIS.MRole.SQL_FULLYQUALIFIED, VIS.MRole.SQL_RO);
-            return finalSQL
+           // $self.log.finest(finalSQL);
+           // var finalSQL = VIS.MRole.getDefault().addAccessSQL(sql, tableName, VIS.MRole.SQL_FULLYQUALIFIED, VIS.MRole.SQL_RO);
+            //return finalSQL
         }
 
         function refresh() {
@@ -197,29 +180,7 @@
                     }
                 }
 
-                //var param = [];
-                //param[0] = new VIS.DB.SqlParam("@M_Product_ID", mProductID);
-                //var dr = VIS.DB.executeReader(sql, param);
-                //var count = 1;
-                //while (dr.read()) {
-                //    var line = {};
-                //    line['M_AttributeSetInstance_ID'] = dr.getInt("M_AttributeSetInstance_ID");
-                //    line['Description'] = dr.getString("Description");
-                //    line['Lot'] = dr.getString("Lot");
-                //    line['SerNo'] = dr.getString("SerNo");
-                //    line['GuaranteeDate'] = dr.getString("GuaranteeDate");
-                //    line['Value'] = dr.getString("Value");
-                //    line['QtyReserved'] = dr.getString("QtyReserved");
-                //    line['QtyOrdered'] = dr.getString("QtyOrdered");
-                //    line['QtyOnHand'] = dr.getString("QtyOnHand");
-                //    line['GoodForDays'] = dr.getString("GoodForDays");
-                //    line['ShelfLifeDays'] = dr.getString("ShelfLifeDays");
-                //    line['ShelfLifeRemainingPct'] = dr.getString("ShelfLifeRemainingPct");
-                //    line['M_Locator_ID'] = dr.getString("M_Locator_ID");
-                //    line['recid'] = count;
-                //    count++;
-                //    data.push(line);
-                //}
+               
                 enableButtons();
             }
             catch (e) {

@@ -864,12 +864,7 @@
 
                         $($txtSearch[2]).css("transform", "rotate(180deg)");
 
-                        //                        var sqlUserSearch = "SELECT  CASE WHEN length(AD_Userquery.Name)>25 THEN substr(AD_Userquery.name ,0,25)||'...' ELSE AD_Userquery.Name END AS Name,AD_Userquery.Name as title, AD_UserQuery.Code, AD_UserQuery.AD_UserQuery_ID, AD_UserQuery.AD_User_ID, AD_UserQuery.AD_Tab_ID, "
-                        //+ " case  WHEN AD_UserQuery.AD_UserQuery_ID IN (Select AD_UserQuery_ID FROM AD_DefaultUserQuery WHERE AD_DefaultUserQuery.AD_Tab_ID=" + self.curTab.getAD_Tab_ID() + " AND AD_DefaultUserQuery.AD_User_ID=" + self.ctx.getAD_User_ID() + "  )  "
-                        //+ "then (Select AD_DefaultUserQuery_ID FROM AD_DefaultUserQuery  WHERE AD_DefaultUserQuery.AD_Tab_ID=" + self.curTab.getAD_Tab_ID() + " AND AD_DefaultUserQuery.AD_User_ID=" + self.ctx.getAD_User_ID() + "  )   ELSE null End as AD_DefaultUserQuery_ID"
-                        //       + " FROM AD_UserQuery AD_UserQuery WHERE AD_UserQuery.AD_Client_ID       =" + self.ctx.getAD_Client_ID() + " AND AD_UserQuery.IsActive             ='Y' "
-                        //       + " AND (AD_UserQuery.AD_Tab_ID           =" + self.curTab.getAD_Tab_ID() + " OR AD_UserQuery.AD_Table_ID           =" + self.curTab.getAD_Table_ID() + ")"
-                        //       + " ORDER BY Upper(AD_UserQuery.NAME), AD_UserQuery.AD_UserQuery_ID";
+                       
 
                         var sqlUserSearch = "VIS_114";
 
@@ -905,11 +900,7 @@
                             }
                             else {
 
-                                //          var sqlUserSearch = "SELECT count(*) "
-                                //+ " FROM AD_UserQuery AD_UserQuery LEFT OUTER JOIN AD_DefaultUserQuery AD_DefaultUserQuery ON AD_DefaultUserQuery.AD_UserQuery_ID=AD_UserQuery.AD_UserQuery_ID WHERE"
-                                //                   + " AD_UserQuery.AD_Client_ID=" + self.ctx.getAD_Client_ID() + " AND AD_UserQuery.IsActive='Y'"
-                                //                   + " AND (AD_UserQuery.AD_Tab_ID=" + self.curTab.getAD_Tab_ID() + " OR AD_UserQuery.AD_Table_ID=" + self.curTab.getAD_Table_ID() + ")";
-                                //          sqlUserSearch += " ORDER BY AD_UserQuery.AD_UserQuery_ID";
+                              
 
 
                                 var sqlUserSearch = "VIS_115";
@@ -2008,12 +1999,7 @@
         };
 
         this.refreshSavedASearchList = function (showData, text) {
-            //            var sqlUserSearch = "SELECT  CASE WHEN length(AD_Userquery.Name)>25 THEN substr(AD_Userquery.name ,0,25)||'...' ELSE AD_Userquery.Name END  AS Name,AD_Userquery.Name as title, AD_UserQuery.Code, AD_UserQuery.AD_UserQuery_ID, AD_UserQuery.AD_User_ID, AD_UserQuery.AD_Tab_ID, "
-            //+ " case  WHEN AD_UserQuery.AD_UserQuery_ID IN (Select AD_UserQuery_ID FROM AD_DefaultUserQuery WHERE AD_DefaultUserQuery.AD_Tab_ID=" + self.curTab.getAD_Tab_ID() + " AND AD_DefaultUserQuery.AD_User_ID=" + self.ctx.getAD_User_ID() + "  )  "
-            //+ "then (Select AD_DefaultUserQuery_ID FROM AD_DefaultUserQuery  WHERE AD_DefaultUserQuery.AD_Tab_ID=" + self.curTab.getAD_Tab_ID() + " AND AD_DefaultUserQuery.AD_User_ID=" + self.ctx.getAD_User_ID() + "   )   ELSE null End as AD_DefaultUserQuery_ID"
-            //       + " FROM AD_UserQuery AD_UserQuery WHERE AD_UserQuery.AD_Client_ID       =" + self.ctx.getAD_Client_ID() + " AND AD_UserQuery.IsActive             ='Y' "
-            //       + " AND (AD_UserQuery.AD_Tab_ID           =" + self.curTab.getAD_Tab_ID() + " OR AD_UserQuery.AD_Table_ID           =" + self.curTab.getAD_Table_ID() + ")"
-            //                   + " ORDER BY Upper(AD_UserQuery.NAME), AD_UserQuery.AD_UserQuery_ID";
+            
 
             var sqlUserSearch = "VIS_116";
 
@@ -3826,12 +3812,6 @@
 
         var $selfpanel = this;
 
-        //       var sqlUserSearch = "SELECT  CASE WHEN length(AD_Userquery.Name)>25 THEN substr(AD_Userquery.name ,0,25)||'...' ELSE AD_Userquery.Name END  AS Name,AD_Userquery.Name as title, AD_UserQuery.Code, AD_UserQuery.AD_UserQuery_ID, AD_UserQuery.AD_User_ID, AD_UserQuery.AD_Tab_ID, "
-        //+ " case  WHEN AD_UserQuery.AD_UserQuery_ID IN (Select AD_UserQuery_ID FROM AD_DefaultUserQuery WHERE AD_DefaultUserQuery.AD_Tab_ID=" + this.curTab.getAD_Tab_ID() + "  AND AD_DefaultUserQuery.AD_User_ID=" + this.ctx.getAD_User_ID() + "  )  "
-        //+ "then (Select AD_DefaultUserQuery_ID FROM AD_DefaultUserQuery  WHERE AD_DefaultUserQuery.AD_Tab_ID=" + this.curTab.getAD_Tab_ID() + "  AND AD_DefaultUserQuery.AD_User_ID=" + this.ctx.getAD_User_ID() + "  )   ELSE null End as AD_DefaultUserQuery_ID"
-        //       + " FROM AD_UserQuery AD_UserQuery WHERE AD_UserQuery.AD_Client_ID       =" + this.ctx.getAD_Client_ID() + " AND AD_UserQuery.IsActive             ='Y' "
-        //       + " AND (AD_UserQuery.AD_Tab_ID           =" + this.curTab.getAD_Tab_ID() + " OR AD_UserQuery.AD_Table_ID           =" + this.curTab.getAD_Table_ID() + ")"
-        //       + " ORDER BY UPPER(AD_UserQuery.NAME), AD_UserQuery.AD_UserQuery_ID";
 
 
 
@@ -6956,9 +6936,7 @@
                 if (AD_Table_ID == 0)
                     return 0;
 
-                //var dr = executeReader("SELECT AD_Tree_ID, Name FROM AD_Tree "
-                //    + "WHERE AD_Client_ID=" + AD_Client_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND IsActive='Y' AND IsAllNodes='Y' "
-                //    + "ORDER BY IsDefault DESC, AD_Tree_ID");
+              
 
                 var sql = "VIS_121";
                 var param = [];
@@ -8187,15 +8165,6 @@
 
 
 
-        //var sql = "SELECT t.TableName, c.AD_Column_ID, c.ColumnName, e.Name,"	//	1..4
-        //    + "c.IsParent, c.IsKey, c.IsIdentifier, c.IsTranslated "				//	4..8
-        //    + "FROM AD_Table t, AD_Column c, AD_Element e "
-        //    + "WHERE t.AD_Table_ID=" + AD_Table_ID						//	#1
-        //    + " AND t.AD_Table_ID=c.AD_Table_ID"
-        //    + " AND (c.AD_Column_ID=" + AD_ColumnSortOrder_ID + " OR AD_Column_ID=" + AD_ColumnSortYesNo_ID 	//	#2..3
-        //    + " OR c.IsParent='Y' OR c.IsKey='Y' OR c.IsIdentifier='Y')"
-        //    + " AND c.AD_Element_ID=e.AD_Element_ID";
-
 
         var sql = "VIS_122";
         var param = [];
@@ -8204,15 +8173,7 @@
         param[2] = new VIS.DB.SqlParam("@AD_ColumnSortYesNo_ID", AD_ColumnSortYesNo_ID);
 
         if (trl) {
-            //sql = "SELECT t.TableName, c.AD_Column_ID, c.ColumnName, et.Name,"	//	1..4
-            //    + "c.IsParent, c.IsKey, c.IsIdentifier, c.IsTranslated "		//	4..8
-            //    + "FROM AD_Table t, AD_Column c, AD_Element_Trl et "
-            //    + "WHERE t.AD_Table_ID=" + AD_Table_ID						//	#1
-            //    + " AND t.AD_Table_ID=c.AD_Table_ID"
-            //    + " AND (c.AD_Column_ID=" + AD_ColumnSortOrder_ID + " OR AD_Column_ID=" + AD_ColumnSortYesNo_ID	//	#2..3
-            //    + "	OR c.IsParent='Y' OR c.IsKey='Y' OR c.IsIdentifier='Y')"
-            //    + " AND c.AD_Element_ID=et.AD_Element_ID"
-            //    + " AND et.AD_Language='" + VIS.Env.getAD_Language(VIS.Env.getCtx()) + "'";                   //	#4
+           
 
             sql = "VIS_123";
             param = [];
@@ -8386,21 +8347,7 @@
 
             values.push($(li).data("value"));
             noYes.push("N");
-            //var value = $(li).data("value");
-            //sql = "";
-            //sql += "UPDATE " + tableName
-            //    + " SET " + columnSortName + "=0";
-            //if (columnYesNoName != null)
-            //    sql += "," + columnYesNoName + "='N'";
-
-            //sql += ", Updated=SYS_EXTRACT_UTC(SYSTIMESTAMP)";
-
-            //sql += " WHERE " + keyColumnName + "=" + value;
-
-            //queries.push(sql);
-
-
-
+           
 
         });
 
@@ -8410,20 +8357,7 @@
             values.push($(li).data("value"));
             noYes.push("Y");
 
-            //var value = $(li).data("value");
-            //sql = "";
-            //sql += "UPDATE " + tableName
-            //    + " SET " + columnSortName + "=" + (i + 1) + "0";	//	10 steps
-            //if (columnYesNoName != null)
-            //    sql += "," + columnYesNoName + "='Y'";
-
-            //sql += ", Updated=SYS_EXTRACT_UTC(SYSTIMESTAMP)";
-
-            //sql += " WHERE " + keyColumnName + "=" + value;
-
-
-
-            //queries.push(sql);
+           
         });
 
 

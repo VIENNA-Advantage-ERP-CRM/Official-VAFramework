@@ -228,13 +228,10 @@
 
         var loadRoles = function () {
 
-            //var sqlRole = VIS.MRole.getDefault().addAccessSQL("SELECT AD_Role_ID, Name FROM AD_Role ORDER BY 2", "AD_Role", VIS.MRole.SQL_NOTQUALIFIED,VIS.MRole.SQL_RW);
-            //var dr = VIS.DB.executeReader(sqlRole, null, null);
+           
             var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "RecordAccess/GetRoles", null, null);
             var options = '<option Value="-1"></option>';
-            //while (dr.read()) {
-            //    options += ('<option value="' + dr.getInt(0) + '">' + dr.getString(1) + '</option>');
-            //}
+           
             if (dr != null) {
                 for (i in dr)
                     options += ('<option value="' + dr[i].AD_Role_ID + '">' + dr[i].Name + '</option>');
@@ -246,24 +243,14 @@
 
         };
         var loadRecords = function () {
-            //var sql = "SELECT AD_ROLE_ID,ISACTIVE,ISDEPENDENTENTITIES,ISEXCLUDE,ISREADONLY FROM AD_Record_Access WHERE AD_Table_ID=" + _AD_Table_ID + " AND Record_ID=" + _Record_ID + " AND AD_Client_ID=" + VIS.Env.getCtx().getAD_Client_ID();
+           
             if (recordAccessData == null) {
                 recordAccessData = [];
             }
-            //var dr = VIS.DB.executeReader(sql, null, null);
+           
 
             var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "RecordAccess/GetRecordAccess", { "Table_ID": _AD_Table_ID, "Record_ID": _Record_ID }, null);
             var item = null;
-            //while (dr.read()) {
-            //    item = {};
-            //    item.AD_ROLE_ID = dr.getInt(0);
-            //    item.ISACTIVE = dr.getString(1);
-            //    item.ISDEPENDENTENTITIES = dr.getString(2);
-            //    item.ISEXCLUDE = dr.getString(3);
-            //    item.ISREADONLY = dr.getString(4);
-            //    recordAccessData.push(item);
-
-            //}
 
             if (dr != null) {
                 for (var i in dr) {

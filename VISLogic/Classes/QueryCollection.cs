@@ -555,7 +555,18 @@ namespace VIS.Classes
             queryList.VIS_151 = "select AD_Process_ID from AD_Process where name='VARPT_RemittancePrint'";
 
             queryList.VIS_152 = " SELECT AD_Process_ID from C_BankAccountDoc WHERE C_BankAccount_ID=@BankAcct_ID AND rownum=1";
+
+            queryList.VIS_153 = " SELECT DISTINCT p.AD_Process_ID, p.Name FROM AD_Process p INNER JOIN AD_Process_Access pa ON (p.AD_Process_ID=pa.AD_Process_ID) "
+                    + "WHERE pa.AD_Role_ID= @param1 AND p.IsReport='Y' AND p.IsActive='Y' AND pa.IsActive='Y' ORDER BY 2";
+
+            queryList.VIS_154 = " SELECT DISTINCT t.AD_Table_ID, t.Name FROM AD_Table t INNER JOIN AD_Tab tab ON (tab.AD_Table_ID=t.AD_Table_ID)"
+                + " INNER JOIN AD_Window_Access wa ON (tab.AD_Window_ID=wa.AD_Window_ID) "
+                + " WHERE wa.AD_Role_ID= @param1"
+                + " AND t.IsActive='Y' AND tab.IsActive='Y' "
+                + " ORDER BY 2";
+
         }
+
 
         public static string GetQuery(string code, Ctx ctx)
         {

@@ -1,6 +1,16 @@
 ﻿; (function (VIS, $) {
     VIS.Apps = VIS.Apps || {};
-    VIS.Apps.AForms = VIS.Apps.AForms || {}
+    VIS.Apps.AForms = VIS.Apps.AForms || {};
+
+    
+
+
+    var baseUrl = VIS.Application.contextUrl;
+    var dataSetUrl = baseUrl + "JsonData/JDataSetWithCode";
+   
+
+  
+
 
     function ArchiveViewer() {
         this.log = VIS.Logging.VLogger.getVLogger("VIS.ArchiveViewer");
@@ -472,13 +482,18 @@
             var AD_Role_ID = VIS.context.getAD_Role_ID();
             var defaultItem = true;
             //	Processes
-            var sql = "SELECT DISTINCT p.AD_Process_ID, p.Name "
-                    + "FROM AD_Process p INNER JOIN AD_Process_Access pa ON (p.AD_Process_ID=pa.AD_Process_ID) "
-                    + "WHERE pa.AD_Role_ID=" + AD_Role_ID
-                    + " AND p.IsReport='Y' AND p.IsActive='Y' AND pa.IsActive='Y' "
-                    + "ORDER BY 2";
+            //var sql = "SELECT DISTINCT p.AD_Process_ID, p.Name "
+            //        + "FROM AD_Process p INNER JOIN AD_Process_Access pa ON (p.AD_Process_ID=pa.AD_Process_ID) "
+            //        + "WHERE pa.AD_Role_ID=" + AD_Role_ID
+            //        + " AND p.IsReport='Y' AND p.IsActive='Y' AND pa.IsActive='Y' "
+            //        + "ORDER BY 2";
 
-            var dr = VIS.DB.executeReader(sql.toString(), null);
+            var sqlCode = "VIS_153";
+            var param = [];
+            param[0] = new VIS.DB.SqlParam("@param1", AD_Role_ID);
+            var dataIn = { sql: sqlCode, param: params };
+            var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/JDataSetWithCode", dataIn);
+            var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//    
             var key, value;
             while (dr.read()) {
                 key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
@@ -493,15 +508,12 @@
             defaultItem = true;
             cmbProcess.getControl().prop('selectedIndex', 0);
 
-            //	Tables
-            sql = "SELECT DISTINCT t.AD_Table_ID, t.Name "
-                + "FROM AD_Table t INNER JOIN AD_Tab tab ON (tab.AD_Table_ID=t.AD_Table_ID)"
-                + " INNER JOIN AD_Window_Access wa ON (tab.AD_Window_ID=wa.AD_Window_ID) "
-                + "WHERE wa.AD_Role_ID=" + AD_Role_ID
-                + " AND t.IsActive='Y' AND tab.IsActive='Y' "
-                + "ORDER BY 2";
-
-            dr = VIS.DB.executeReader(sql.toString(), null);
+            var sqlCode = "VIS_154";
+            var param = [];
+            param[0] = new VIS.DB.SqlParam("@param1", AD_Role_ID);
+            var dataIn = { sql: sqlCode, param: params };
+            var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/JDataSetWithCode", dataIn);
+            var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//
 
             while (dr.read()) {
                 key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
@@ -517,15 +529,11 @@
             cmbTableQ.getControl().prop('selectedIndex', 0);
 
             //	Internal Users
-            sql = "SELECT AD_User_ID, Name "
-                + "FROM AD_User u WHERE EXISTS "
-                    + "(SELECT * FROM AD_User_Roles ur WHERE u.AD_User_ID=ur.AD_User_ID) "
-                + "ORDER BY 2";
+            
 
-            sql = VIS.MRole.getDefault().addAccessSQL(sql,		//	Own First
-                "AD_User", VIS.MRole.SQL_NOTQUALIFIED, VIS.MRole.SQL_RW);
+            var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ArchiveViewer/GetUserList", {});
 
-            dr = VIS.DB.executeReader(sql.toString(), null);
+           var  dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//    
             while (dr.read()) {
                 key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
                 value =VIS.Utility.encodeText( dr.getString(1));
@@ -712,13 +720,13 @@
 
             var whereClause = sql;
 
-            var sqlMain = "SELECT AD_ARCHIVE_ID,AD_CLIENT_ID,AD_ORG_ID,AD_PROCESS_ID,AD_TABLE_ID,C_BPARTNER_ID,CREATED,CREATEDBY,DESCRIPTION,HELP," +
-            " ISACTIVE,ISREPORT,NAME,RECORD_ID,UPDATED,UPDATEDBY,EXPORT_ID FROM AD_Archive WHERE AD_Client_ID=" + VIS.Env.getCtx().getAD_Client_ID();
-            if (whereClause != null && whereClause.length > 0)
-                sqlMain += whereClause;
-            sqlMain += " ORDER BY Created desc";
+            //var sqlMain = "SELECT AD_ARCHIVE_ID,AD_CLIENT_ID,AD_ORG_ID,AD_PROCESS_ID,AD_TABLE_ID,C_BPARTNER_ID,CREATED,CREATEDBY,DESCRIPTION,HELP," +
+            //" ISACTIVE,ISREPORT,NAME,RECORD_ID,UPDATED,UPDATEDBY,EXPORT_ID FROM AD_Archive WHERE AD_Client_ID=" + VIS.Env.getCtx().getAD_Client_ID();
+            //if (whereClause != null && whereClause.length > 0)
+            //    sqlMain += whereClause;
+            //sqlMain += " ORDER BY Created desc";
 
-            getData(sqlMain);
+            getData(whereClause);
         }
 
         function isSame(s1, s2) {
@@ -859,9 +867,11 @@
 
         function getCreatedByName(createdby) {
             var name = "";
-            var sql = "SELECT Name FROM AD_User WHERE AD_User_ID=" + createdby;
+           
             try {
-                var dr = VIS.DB.executeReader(sql.toString(), null, null);
+                var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ArchiveViewer/GetUserName", { "userId": createdby });
+                var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//
+               
                 if (dr.read()) {
                     name = dr.getString('Name');
                 }
@@ -873,10 +883,11 @@
             return name;
         }
 
-        function getData(sql) {
+        function getData(whereClause) {
             var data = [];
             try {
-                var dr = VIS.DB.executeReader(sql.toString(), null, null);
+                var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ArchiveViewer/GetArchieveData", { "whereClause": whereClause });
+                var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//
                 var count = 1;
                 while (dr.read()) {
 

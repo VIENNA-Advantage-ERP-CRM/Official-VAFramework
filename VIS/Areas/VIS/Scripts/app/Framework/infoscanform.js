@@ -48,8 +48,7 @@
         var selectedItems = [];
 
         var ismobile = /ipad|iphone|ipod/i.test(navigator.userAgent.toLowerCase());
-        //var sql = "SELECT AD_Window_ID FROM AD_Tab WHERE AD_Tab_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "AD_Tab_ID"));
-        //window_ID = VIS.Utility.Util.getValueOfInt(VIS.DB.executeScalar(sql, null, null));
+       
         var AD_tab_ID = VIS.context.getWindowTabContext(windowNo, 0, "AD_Tab_ID");
         window_ID = VIS.dataContext.getJSONRecord("InfoProduct/GetWindowID", AD_tab_ID.toString());
 
@@ -398,8 +397,7 @@
                 query += " AND VAICNT_InventoryCount_ID = -1";
             }
 
-            sql = "SELECT VAICNT_ScanName,VAICNT_ReferenceNo,DateTrx,VAICNT_InventoryCount_ID FROM VAICNT_InventoryCount WHERE IsActive='Y' AND AD_Client_ID = "
-                + VIS.Utility.Util.getValueOfInt(VIS.context.getAD_Client_ID()) + query;
+           var  sql =  query;
             
             var _sql = VIS.secureEngine.encrypt(sql);
             if (!pNo) {
@@ -526,24 +524,9 @@
                         countID += selectedItems[item] + ",";
                     }
                     countID = countID.substr(0, countID.length - 1);
-                    //_query = "SELECT cl.M_Product_ID,prd.Name,prd.Value,cl.VAICNT_Quantity,cl.M_AttributeSetInstance_ID,cl.C_UOM_ID,uom.Name as UOM,ic.VAICNT_ReferenceNo,cl.VAICNT_InventoryCountLine_ID,"
-                    //    + " ats.Description FROM VAICNT_InventoryCount ic INNER JOIN VAICNT_InventoryCountLine cl ON ic.VAICNT_InventoryCount_ID = cl.VAICNT_InventoryCount_ID"
-                    //    + " INNER JOIN M_Product prd ON cl.M_Product_ID = prd.M_Product_ID INNER JOIN C_UOM uom ON cl.C_UOM_ID = uom.C_UOM_ID LEFT JOIN M_AttributeSetInstance ats"
-                    //    + " ON cl.M_AttributeSetInstance_ID = ats.M_AttributeSetInstance_ID WHERE ic.VAICNT_InventoryCount_ID IN (" + countID + ") ORDER BY cl.Line";
+                    
 
-                    //}
-                    //else {
-                    //_query = "select cnt.M_Product_ID,p.Value,cnt.vaicnt_quantity,cnt.vaicnt_attributeno,ats.Islot,ats.IsSerNo,ats.IsGuaranteeDate,case when (ats.IsGuaranteeDate = 'Y') then"
-                    //+ " sysdate+p.GuaranteeDays end as ExpiryDate,cnt.VAICNT_ReferenceNo,NVL(cnt.M_AttributeSetInstance_ID,0) as M_AttributeSetInstance_ID FROM (SELECT CASE WHEN (cl.upc = mr.upc) THEN mr.M_product_ID"
-                    //+ " ELSE CASE WHEN (cl.upc = prd.upc) THEN prd.M_Product_ID ELSE CASE WHEN (cl.upc = patr.upc) THEN patr.M_Product_ID END END END AS M_Product_ID,patr.M_AttributeSetInstance_ID,cl.vaicnt_quantity,"
-                    //+ " cl.vaicnt_attributeno,ic.VAICNT_ReferenceNo FROM VAICNT_InventoryCount ic INNER JOIN VAICNT_InventoryCountLine cl ON (ic.VAICNT_InventoryCount_ID = cl.VAICNT_InventoryCount_ID)"
-                    //+ " LEFT JOIN M_manufacturer mr ON cl.upc = mr.upc LEFT JOIN M_product prd ON cl.upc = prd.upc LEFT JOIN M_ProductAttributes patr ON cl.upc = patr.upc WHERE ic.IsActive = 'Y'"
-                    //+ " AND cl.IsActive = 'Y' AND (cl.upc = mr.upc OR cl.upc = prd.upc OR cl.upc = patr.upc) AND ic.ad_client_id = " + VIS.context.getAD_Client_ID() +
-                    //" AND ic.VAICNT_InventoryCount_ID = " + countID + " ) cnt INNER JOIN M_Product p on cnt.M_Product_ID=p.M_Product_ID LEFT JOIN M_AttributeSet ats on p.M_attributeset_id=ats.M_attributeset_id"
-                    //+ " WHERE p.ad_client_id = " + VIS.context.getAD_Client_ID();
-                    //}
-
-                    //var drProd = VIS.DB.executeReader(_query, null, null);
+                   
                     var drProd = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "InfoProduct/GetCartData", { "invCount_ID": countID, "WindowID": window_ID }, null);
                     if (self.onClose)
                         self.onClose(drProd, chkDelCart.prop("checked"), countID);

@@ -291,7 +291,7 @@ namespace VIS.Models
         /// <param name="curWindow_ID">Window from where zoom is invoked</param>
         /// <param name="targetWhereClause">Where Clause in the format "Record_ID=value"</param>
         /// <returns>Record list</returns>
-        public List<KeyNamePair> GetZoomTargets(String targetTableName, int curWindow_ID, String targetWhereClause)
+        public List<KeyNamePair> GetZoomTargets(Ctx ctx, String targetTableName, int curWindow_ID, String targetWhereClause)
         {
             #region variables
             //The Option List					
@@ -303,7 +303,7 @@ namespace VIS.Models
             string zoom_WindowName = "";
             string whereClause = "";
             bool windowFound = false;
-            Ctx ctx = Env.GetContext();
+            //Ctx ctx = Env.GetContext();
             #endregion
 
             // Find windows where the first tab is based on the table
@@ -372,7 +372,7 @@ namespace VIS.Models
                 sql1 = "SELECT count(*) FROM " + targetTableName + " WHERE " + targetWhereClause;
                 if (whereClause != null && whereClause.Length != 0)
                 {
-                    sql1 += " AND " + Evaluator.ReplaceVariables(whereClause, Env.GetContext(), null);
+                    sql1 += " AND " + Evaluator.ReplaceVariables(whereClause, ctx, null);
                 }
             }
             else if (windowList.Count > 1)

@@ -101,8 +101,9 @@ namespace VIS.Controllers
 
         // Added by Bharat on 12 June 2017
         public int GetPrefrenceID(string sql)
-        {            
-            int prefID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+        {
+            var sqlA = "SELECT AD_Preference_ID FROM AD_Preference WHERE "+ sql;
+            int prefID = Util.GetValueOfInt(DB.ExecuteScalar(sqlA));
             return prefID;
         }
     }

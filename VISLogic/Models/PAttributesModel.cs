@@ -1931,7 +1931,22 @@ namespace VIS.Models
         // Added by Bharat on 01 June 2017
         public List<Dictionary<string, object>> GetAttributeData(string sql, int product_ID, Ctx ctx)
         {
-            List<Dictionary<string, object>> retAttr = null;
+            string sqlSelect = "SELECT DISTINCT patr.M_AttributeSetInstance_ID, asi.Description, asi.Lot, asi.SerNo, asi.GuaranteeDate, asi.Value AS AttrCode, l.Value, NVL(s.M_Locator_ID,0) AS M_Locator_ID," +
+                " NVL(s.QtyOnHand,0) AS QtyOnHand, NVL(s.QtyReserved,0) AS QtyReserved, NVL(s.QtyOrdered,0) AS QtyOrdered," +
+                " (daysBetween(TRUNC(asi.GuaranteeDate,'DD'), TRUNC(SysDate,'DD'))-p.GuaranteeDaysMin) as ShelfLifeDays," +
+                " daysBetween(TRUNC(asi.GuaranteeDate,'DD'), TRUNC(SysDate,'DD')) as GoodForDays, CASE WHEN p.GuaranteeDays > 0 THEN " +
+                " ROUND(daysBetween(TRUNC(asi.GuaranteeDate,'DD'),TRUNC(SysDate,'DD'))/p.GuaranteeDays*100,12) ELSE 0 END as ShelfLifeRemainingPct";
+
+            string msqlFrom = "M_ProductAttributes patr LEFT JOIN M_Storage s ON (patr.M_AttributeSetInstance_ID = s.M_AttributeSetInstance_ID AND patr.M_Product_ID = s.M_Product_ID)"
+          + " LEFT JOIN M_Locator l ON (s.M_Locator_ID=l.M_Locator_ID)"
+          + " LEFT JOIN M_Warehouse w ON (l.M_Warehouse_ID=w.M_Warehouse_ID)"
+          + " INNER JOIN M_Product p ON (patr.M_Product_ID=p.M_Product_ID)"
+          + " INNER JOIN M_AttributeSetInstance asi ON (patr.M_AttributeSetInstance_ID=asi.M_AttributeSetInstance_ID)";
+
+            sql = sqlSelect + " FROM " + msqlFrom + " WHERE " + sql;
+            sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "patr", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+
+            List <Dictionary<string, object>> retAttr = null;
             SqlParameter[] param = new SqlParameter[1];
             param[0] = new SqlParameter("@M_Product_ID", product_ID);
             DataSet ds = DB.ExecuteDataset(sql, param, null);

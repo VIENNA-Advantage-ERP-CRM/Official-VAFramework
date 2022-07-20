@@ -1307,13 +1307,13 @@
 
 
         /**
-	 * 	Get the Zoom Into Target for a table.
-	 *  
-	 *  @param targetTableName for Target Table for zoom
-	 *  @param curWindow_ID Window from where zoom is invoked
-	 * 	@param targetWhereClause Where Clause in the format "Record_ID=<value>"
-	 *  @param isSOTrx Sales contex of window from where zoom is invoked
-	 */
+     * 	Get the Zoom Into Target for a table.
+     *  
+     *  @param targetTableName for Target Table for zoom
+     *  @param curWindow_ID Window from where zoom is invoked
+     * 	@param targetWhereClause Where Clause in the format "Record_ID=<value>"
+     *  @param isSOTrx Sales contex of window from where zoom is invoked
+     */
         getZoomAD_Window_ID: function (targetTableName, curWindow_ID, targetWhereClause, isSOTrx) {
 
             var zoomWindow_ID = 0;
@@ -1460,11 +1460,11 @@
         },
 
         /**
-	 *  Parse String and add columnNames to the list.
-	 *  String should be of the format ColumnName=<Value> AND ColumnName2=<Value2>
-	 *  @param list list to be added to
-	 *  @param parseString string to parse for variables
-	 */
+     *  Parse String and add columnNames to the list.
+     *  String should be of the format ColumnName=<Value> AND ColumnName2=<Value2>
+     *  @param list list to be added to
+     *  @param parseString string to parse for variables
+     */
         parseColumns: function (list, parseString) {
             if (parseString == null || parseString.length == 0)
                 return;
@@ -1613,7 +1613,6 @@
                     else if (windowName.equals("Production Resource")) {
                         ProductionResourceWindowID = windowID;
                     }
-
                 }
             }
             catch (e) {
@@ -1625,194 +1624,21 @@
                 dr = null;
             }
 
-            //var costWindow = MWindow.get(Env.getCtx(), 344);
-            //var cost = new KeyNamePair(costWindow.getAD_Window_ID(),costWindow.getName());
-            ///var WcCost = new KeyNamePair(WorkCenterCostWindowID,WorkCenterCostWindowName);
 
-            /** End Hard Code for product and work center window */
 
-            // Find windows where the first tab is based on the table
-            //var sql = "SELECT DISTINCT w.AD_Window_ID, w.Name, tt.WhereClause, t.TableName, " +
-            //        "wp.AD_Window_ID, wp.Name, ws.AD_Window_ID, ws.Name "
-            //    + "FROM AD_Table t "
-            //    + "INNER JOIN AD_Tab tt ON (tt.AD_Table_ID = t.AD_Table_ID) ";
-            //var baseLanguage = VIS.Env.isBaseLanguage(VIS.Env.getCtx(), "AD_Window");
-            //if (baseLanguage) {
-            //    sql += "INNER JOIN AD_Window w ON (tt.AD_Window_ID=w.AD_Window_ID)";
-            //    sql += " LEFT OUTER JOIN AD_Window ws ON (t.AD_Window_ID=ws.AD_Window_ID)"
-            //        + " LEFT OUTER JOIN AD_Window wp ON (t.PO_Window_ID=wp.AD_Window_ID)";
-            //}
-            //else {
-            //    sql += "INNER JOIN AD_Window_Trl w ON (tt.AD_Window_ID=w.AD_Window_ID AND w.AD_Language=@para1)";
-            //    sql += " LEFT OUTER JOIN AD_Window_Trl ws ON (t.AD_Window_ID=ws.AD_Window_ID AND ws.AD_Language=@para2)"
-            //        + " LEFT OUTER JOIN AD_Window_Trl wp ON (t.PO_Window_ID=wp.AD_Window_ID AND wp.AD_Language=@para3)";
-            //}
-            //sql += "WHERE t.TableName = @para4"
-            //    + " AND w.AD_Window_ID <> @para5 AND w.isActive='Y'"
-            //    + " AND tt.SeqNo=10"
-            //    + " AND (wp.AD_Window_ID IS NOT NULL "
-            //            + "OR EXISTS (SELECT 1 FROM AD_Tab tt2 WHERE tt2.AD_Window_ID = ws.AD_Window_ID AND tt2.AD_Table_ID=t.AD_Table_ID AND tt2.SeqNo=10))"
-            //    + " ORDER BY 2";
-
-            try {
-                //var params = [];
-                //index = 1;
-                //if (!baseLanguage) {
-                //    params.push(new VIS.SqlParam("@para1", VIS.Env.getAD_Language(VIS.Env.getCtx())));
-                //    params.push(new VIS.SqlParam("@para2", VIS.Env.getAD_Language(VIS.Env.getCtx())));
-                //    params.push(new VIS.SqlParam("@para3", VIS.Env.getAD_Language(VIS.Env.getCtx())));
-                //}
-
-                //params.push(new VIS.DB.SqlParam("@para4", targetTableName));
-                //params.push(new VIS.DB.SqlParam("@para5", curWindow_ID));
-
-                //dr = executeReader(sql, params);
-
-                var dr = null;
-                $.ajax({
-                    type: 'Get',
-                    async: false,
-                    url: VIS.Application.contextUrl + "Form/GetZoomTargetClass",
-                    data: { targetTableName: targetTableName, curWindow_ID: curWindow_ID },
-                    success: function (data) {
-                        dr = new VIS.DB.DataReader().toJson(data)
-                    },
-                });
-
-                while (dr.read()) {
-                    windowFound = true;
-                    zoom_Window_ID = dr.getInt(6);
-                    zoom_WindowName = dr.getString(7);
-                    PO_Window_ID = dr.getInt(4);
-                    whereClause = dr.getString(2);
-
-                    // Multiple window support only for Order, Invoice, Shipment/Receipt which have PO windows
-                    if (PO_Window_ID == 0)
-                        break;
-                    windowList.push({ "AD_Window_ID": dr.getInt(0), "windowName": dr.getString(1), "whereClause": whereClause });
+            $.ajax({
+                type: 'Get',
+                async: false,
+                url: VIS.Application.contextUrl + "Form/GetZoomTarget",
+                data: { targetTableName: targetTableName, curWindow_ID: curWindowID, "targetWhereClause": targetWhereClause },
+                success: function (data) {
+                    zoomList = JSON.parse(data);
                 }
-            }
-            catch (e) {
-                this.log.log(VIS.Logging.Level.SEVERE, sql, e);
-            }
-            finally {
-                if (dr != null)
-                    dr.dispose();
-            }
+            });
 
-            var sql1 = "";
-
-            if (!windowFound || (windowList.length <= 1 && zoom_Window_ID == 0))
-                return zoomList;
-
-            //If there is a single window for the table, no parsing is necessary
-            if (windowList.length <= 1) {
-
-                //Check if record exists in target table
-                sql1 = "SELECT count(*) FROM " + targetTableName + " WHERE "
-                    + targetWhereClause;
-                if (whereClause != null && whereClause.length != 0)
-                    sql1 += " AND " + VIS.Evaluator.replaceVariables(whereClause, VIS.Env.getCtx(), null);
-
-            }
-            else if (windowList.length > 1) {
-                // Get the columns used in the whereClause
-                for (var i = 0; i < windowList.length; i++)
-                    this.parseColumns(columns, windowList[i].whereClause);
-
-                // Get the distinct values of the columns from the table if record exists
-                sql1 = "SELECT DISTINCT ";
-                for (i = 0; i < columns.length; i++) {
-                    if (i != 0)
-                        sql1 += ",";
-                    sql1 += columns[i];
-                }
-
-                if (columns.length == 0)
-                    sql1 += "count(*) ";
-                sql1 += " FROM " + targetTableName + " WHERE "
-                    + targetWhereClause;
-            }
-
-
-            this.log.fine(sql1);
-
-            var columnValues = [];
-            try {
-
-
-                var dr = null;
-                $.ajax({
-                    type: 'Get',
-                    async: false,
-                    url: VIS.Application.contextUrl + "Form/GetZoomWhereClause",
-                    data: { sql: VIS.secureEngine.encrypt(sql1) },
-                    success: function (data) {
-                        dr = new VIS.DB.DataReader().toJson(data)
-                    },
-                });
-
-
-                //  dr = executeReader(sql1, null, null, true);
-
-
-
-                while (dr.read()) {
-                    if (columns.length > 0) {
-                        columnValues.length = 0;
-                        for (var j = 0; j < columns.length; j++) {
-                            var columnName = columns[j];
-                            var columnValue = "";
-
-                            if (typeof (dr.get(columnName)) !== "string")
-                                columnValue = dr.get(columnName).toString();
-                            else
-                                columnValue = "'" + dr.get(columnName).toString() + "'";
-
-                            this.log.fine(columnName + " = " + columnValue);
-                            columnValues.push({ "Value": columnValue, "Name": columnName });
-                        }
-
-                        // Find matching windows
-                        for (j = 0; j < windowList.length; j++) {
-                            //log.fine("Window : "+windowList.get(i).windowName + " WhereClause : " + windowList.get(i).whereClause);
-                            if (this.evaluateWhereClause(columnValues, windowList[j].whereClause)) {
-                                //log.fine("MatchFound : "+windowList.get(i).windowName );
-                                var pp = { "Key": windowList[j].AD_Window_ID, "Value": windowList[j].windowName };
-                                zoomList.push(pp);
-                                // Use first window found. Ideally there should be just one matching
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        var rowCount = dr.getInt(0);
-                        if (rowCount != 0) {
-                            var pp = { "Key": zoom_Window_ID, "Value": zoom_WindowName };
-                            zoomList.push(pp);
-                        }
-                    }
-                }
-            }
-            catch (e) {
-                this.log.log(VIS.Logging.Level.SEVERE, sql1, e);
-            }
-            finally {
-                if (dr != null)
-                    dr.dispose();
-            }
-
-            // Add the windows for Product Production resource and work center.
-            //if(curWindow_ID == 140)  // Product window
-            // zoomList.add(cost);
-            //if(curWindow_ID == WorkCenterWindowID) // Work Center Window
-            //  zoomList.add(WcCost);
-            //if(curWindow_ID == ProductionResourceWindowID) // Production Resource
-            //  zoomList.add(cost);		
             return zoomList;
         }
     };
-
 
     /** Cache */
 

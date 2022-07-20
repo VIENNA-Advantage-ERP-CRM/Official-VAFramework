@@ -733,8 +733,7 @@
 
             var pvID = 0;
             for (var i = 0; i < bpID.length; i++) {
-                //var sql = "Select AD_User_ID,email from ad_user where isEmail='Y' AND c_bpartner_ID=" + bpID[i];
-                //var ds = VIS.DB.executeDataSet(sql);
+                
                 var ds = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Email/GetUser", { "BPartner_ID": bpID[i] }, null);
                 var isBroken = false;
                 var htm = '';

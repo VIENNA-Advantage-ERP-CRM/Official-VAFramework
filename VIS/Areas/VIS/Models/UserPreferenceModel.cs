@@ -433,8 +433,109 @@ namespace VIS.Models
 
 
         //**********Added By Lakhwinder************
-        public List<LoginData> GetLoginData(string sql)
+        public List<LoginData> GetLoginData(string roleID)
         {
+            string sql = "SELECT c.Name,r.AD_Client_ID FROM AD_Role r INNER JOIN AD_Client c ON (c.AD_Client_ID=r.AD_Client_ID) WHERE r.AD_Role_ID= " + roleID;
+            try
+            {
+                List<LoginData> ld = null;
+                DataSet ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    ld = new List<LoginData>();
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        ld.Add(new LoginData() { Name = VAdvantage.Utility.Util.GetValueOfString(ds.Tables[0].Rows[i][0]), RecKey = VAdvantage.Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i][1]) });
+                    }
+
+                }
+                return ld;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<LoginData> GetUserRoles(string userId)
+        {
+            var sql = "SELECT  r.Name,r.AD_Role_ID" +
+              //" u.ConnectionProfile, u.Password "+	//	4,5
+              " FROM AD_User u" +
+              " INNER JOIN AD_User_Roles ur ON (u.AD_User_ID=ur.AD_User_ID AND ur.IsActive='Y')" +
+              " INNER JOIN AD_Role r ON (ur.AD_Role_ID=r.AD_Role_ID AND r.IsActive='Y') " +
+              //.Append("WHERE COALESCE(u.LDAPUser,u.Name)=@username")		//	#1
+              " WHERE " +//(COALESCE(u.LDAPUser,u.Name)=@username OR COALESCE(u.LDAPUser,u.Value)=@username)"+
+              " u.AD_User_ID=" + userId + " AND u.IsActive='Y' " +
+              " AND u.IsLoginUser='Y' " +
+              " AND EXISTS (SELECT * FROM AD_Client c WHERE u.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')" +
+              " AND EXISTS (SELECT * FROM AD_Client c WHERE r.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')" +
+              " ORDER BY r.Name";
+
+            try
+            {
+                List<LoginData> ld = null;
+                DataSet ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    ld = new List<LoginData>();
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        ld.Add(new LoginData() { Name = VAdvantage.Utility.Util.GetValueOfString(ds.Tables[0].Rows[i][0]), RecKey = VAdvantage.Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i][1]) });
+                    }
+
+                }
+                return ld;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<LoginData> GetOrgData(string roleId,string clientId,string userId)
+        {
+          string sql =  "SELECT o.Name,o.AD_Org_ID "	//	1..3
+                + "FROM AD_Role r, AD_Client c"
+                + " INNER JOIN AD_Org o ON (c.AD_Client_ID=o.AD_Client_ID OR o.AD_Org_ID=0) "
+                + "WHERE r.AD_Role_ID='" + roleId + "'" 	//	#1
+                + " AND c.AD_Client_ID='" + clientId + "'"	//	#2
+                + " AND o.IsActive='Y' AND o.IsSummary='N'  AND o.IsCostCenter='N' AND o.IsProfitCenter='N' "
+                + " AND (r.IsAccessAllOrgs='Y' "
+                    + "OR (r.IsUseUserOrgAccess='N' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_Role_OrgAccess ra "
+                        + "WHERE ra.AD_Role_ID=r.AD_Role_ID AND ra.IsActive='Y')) "
+                    + "OR (r.IsUseUserOrgAccess='Y' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_User_OrgAccess ua "
+                        + "WHERE ua.AD_User_ID='" + userId + "' AND ua.IsActive='Y'))"		//	#3
+                    + ") "
+                + "ORDER BY o.Name";
+
+            try
+            {
+                List<LoginData> ld = null;
+                DataSet ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    ld = new List<LoginData>();
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        ld.Add(new LoginData() { Name = VAdvantage.Utility.Util.GetValueOfString(ds.Tables[0].Rows[i][0]), RecKey = VAdvantage.Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i][1]) });
+                    }
+
+                }
+                return ld;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        
+            public List<LoginData> GetWareHouseData(string orgId)
+        {
+            var sql = "SELECT Name,M_Warehouse_ID  FROM M_Warehouse "
+               + "WHERE AD_Org_ID=" + orgId + " AND IsActive='Y' "
+               + "ORDER BY Name";
+
             try
             {
                 List<LoginData> ld = null;

@@ -263,7 +263,10 @@ namespace VIS.Models
 
         public InfoCartData GetCart(string sql, int pageNo, bool isCart, int windowID, int WarehouseID, int WarehouseToID, int LocatorID, int LocatorToID, VAdvantage.Utility.Ctx ctx)
         {
-            InfoCartData _iData = new InfoCartData();
+            sql = "SELECT VAICNT_ScanName,VAICNT_ReferenceNo,DateTrx,VAICNT_InventoryCount_ID FROM VAICNT_InventoryCount WHERE IsActive = 'Y' AND AD_Client_ID = "
+                  + ctx.GetAD_Client_ID() + sql;
+
+              InfoCartData _iData = new InfoCartData();
             try
             {
                 if (!isCart && windowID == 170)

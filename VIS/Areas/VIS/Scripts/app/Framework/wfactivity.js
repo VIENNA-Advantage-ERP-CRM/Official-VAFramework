@@ -618,17 +618,7 @@
                 var para = $("<pre>");
                 if (data[item].DocumentNameValue == undefined || data[item].DocumentNameValue == '') {
 
-                    // Get Workflow Activity details from selected Text Template
-
-                    //var summary = VIS.Utility.encodeText(data[item].Summary).split("●");
-                    //if (summary != null && summary.length > 0) {
-                    //    for (var k = 0; k < summary.length; k++) {
-                    //        para.append(summary[k]);
-                    //        if (k < summary.length - 1) {
-                    //            para.append("<br>");
-                    //        }
-                    //    }
-                    //}
+                    
                     para.append(VIS.Utility.encodeText(data[item].Summary));
                 }
                 else {
@@ -718,18 +708,13 @@
                     }
                 }
             }
-            else {// If uncheck checkbox, then remove item from array
+            else {
                 selectedItems = jQuery.grep(selectedItems, function (value) {
                     return value != ite;
                 });
                 if (selectedItems.length == 1 && !uncheckall) {
                     var chks = divScroll.find('.wfActivity-selectchk');
-                    //$.each($("input[class='wfActivity-selectchk']:checked"), function () {
-                    //    //favorite.push($(this).val());
-                    //    $(this).trigger("click");
-                    //    return;
-                    //});
-
+                   
 
                     for (var h = 0; h < chks.length; h++) {
                         if ($(chks[h]).prop('checked') == true) {
@@ -969,17 +954,7 @@
                 p2.append(VIS.Msg.getMsg('Summary'));
                 p2.append($("<br>"));
 
-                // Get Workflow Activity details from selected Text Template
-
-                //var summary = VIS.Utility.encodeText(fulldata[index].Summary).split("●");
-                //if (summary != null && summary.length > 0) {
-                //    for (var k = 0; k < summary.length; k++) {
-                //        p2.append(summary[k]);
-                //        if (k < summary.length - 1) {
-                //            p2.append("<br>");
-                //        }
-                //    }
-                //}
+                
 
                 p2.append(VIS.Utility.encodeText(fulldata[index].Summary));
                 li1.append(p2);
@@ -1249,32 +1224,9 @@
             VIS.AEnv.wfzoom(fulldata[index].AD_Table_ID, fulldata[index].Record_ID, fulldata[index].AD_WF_Activity_ID);
             //
 
-            /*
-            //alert(index);
-            //data[index].Record_ID;
- 
-            var sql = "SELECT TableName, AD_Window_ID, PO_Window_ID FROM AD_Table WHERE AD_Table_ID=" + fulldata[index].AD_Table_ID;
- 
- 
-            //var sql = "select ad_window_id from ad_window where name='Mail Configuration'";// Upper( name)=Upper('user' )
-            var ad_window_Id = -1;
-            var tableName = '';
-            try {
-                var dr = VIS.DB.executeDataReader(sql);
-                if (dr.read()) {
-                    ad_window_Id = dr.getInt(1);
-                    tableName = dr.get(0);
-                }
-                dr.dispose();
-            }
-            catch (e) {
-                this.log.log(VIS.Logging.Level.SEVERE, sql, e);
-            }
- 
-            var zoomQuery = new VIS.Query();
-            zoomQuery.addRestriction(tableName + "_ID", VIS.Query.prototype.EQUAL, fulldata[index].Record_ID);
-            VIS.viewManager.startWindow(ad_window_Id, zoomQuery);
-            */
+           
+           
+
         };
 
         var approveIt = function (index, aOK) {

@@ -623,6 +623,18 @@ namespace VIS.Models
         // Added by Bharat on 06 June 2017
         public List<Dictionary<string, object>> GetReference(string qry)
         {
+            if (Env.IsBaseLanguage(ctx, "AD_Ref_List"))
+                qry = "SELECT Value, Name, Description FROM AD_Ref_List "
+                    + "WHERE AD_Reference_ID=135 ORDER BY Name";
+            else
+                qry = "SELECT l.Value, t.Name, t.Description "
+                    + "FROM AD_Ref_List l, AD_Ref_List_Trl t "
+                    + "WHERE l.AD_Ref_List_ID=t.AD_Ref_List_ID"
+                    + " AND t.AD_Language='" + Env.GetAD_Language(ctx) + "'"
+                    + " AND l.AD_Reference_ID=135 ORDER BY t.Name";
+
+
+
             List<Dictionary<string, object>> retDic = null;
             DataSet ds = DB.ExecuteDataset(qry);
             if (ds != null && ds.Tables[0].Rows.Count > 0)

@@ -174,13 +174,9 @@
 
             //end
             //load warehouse combo
-            //var sql = "SELECT M_Warehouse_ID, Name FROM M_Warehouse";
-            //if (onlyWarehouseId != 0) {
-            //    sql += " WHERE M_Warehouse_ID=" + onlyWarehouseId;
-            //}
+            
 
-            //var finalSql = VIS.MRole.addAccessSQL(sql, "M_Warehouse", VIS.MRole.SQL_NOTQUALIFIED, VIS.MRole.SQL_RO) + " ORDER BY 2";
-            //var ds = VIS.DB.executeDataSet(finalSql);
+            
 
             var ds = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Locator/GetWarehouse", { "Warehouse_ID": onlyWarehouseId }, null);
 
@@ -411,20 +407,7 @@
             //locatorId = cmbLocator.find('option:selected').val();
             var separator = "";
             var warehouseValue = "";
-            //var sql = "SELECT  w.name,l.x,l.y,l.z,l.value, w.M_Warehouse_ID,w.Value wValue,w.separator from m_warehouse w" +
-            //      " inner join M_Locator l on w.m_warehouse_id=l.M_Warehouse_ID and l.m_locator_id=" + locatorId;
-
-            //var dsw = VIS.DB.executeDataSet(sql);
-            //if (dsw.tables[0].rows.length > 0) {
-            //    txtWarehouseInfo.val(dsw.tables[0].getRow(0).getCell("name"));
-            //    txtX.val(dsw.tables[0].getRow(0).getCell("x"));
-            //    txtY.val(dsw.tables[0].getRow(0).getCell("y"));
-            //    txtZ.val(dsw.tables[0].getRow(0).getCell("z"));
-            //    txtValue.val(dsw.tables[0].getRow(0).getCell("value"));
-            //    warehouseId = dsw.tables[0].getRow(0).getCell("M_Warehouse_ID");
-            //    warehouseValue = dsw.tables[0].getRow(0).getCell("wValue");
-            //    separator = dsw.tables[0].getRow(0).getCell("separator");
-            //}
+            
             var dsw = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Locator/GetWarehouseData", { "Locator_ID": locatorId }, null);
             // Done by Bharat on 24 Jan 2019
             // JID_1084: When there is no locator in warehouse system is not allowing to create the locator from the locator control

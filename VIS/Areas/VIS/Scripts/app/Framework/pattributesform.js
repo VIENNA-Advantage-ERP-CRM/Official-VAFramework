@@ -47,8 +47,7 @@
         windowNoParent = pwindowNo;
         mLocatorId = M_Locator_ID;
         if (windowNoParent != -1) {
-            //winQry = "SELECT AD_Window_ID FROM AD_Tab WHERE AD_Tab_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNoParent, 0, "AD_Tab_ID"));
-            //window_ID = VIS.Utility.Util.getValueOfInt(VIS.DB.executeScalar(winQry, null, null));
+           
 
             // Added by Bharat on 01 May 2017 to remove client side queries
             var AD_tab_ID = VIS.context.getWindowTabContext(windowNoParent, 0, "AD_Tab_ID");
@@ -250,8 +249,7 @@
             else if (chkNewEdit.prop("checked")) {
                 var text = txtLotString.val();
                 flag = false;
-                //var sql = "select count(*) from ad_column where columnname = 'UniqueLot' and ad_table_id = (select ad_table_id from ad_table where tablename = 'M_AttributeSet')";
-                //var count = VIS.DB.executeScalar(sql);
+                
                 var count = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "PAttributes/CheckUniqueLot", null, null);
                 if (count > 0) {
                     var check = checkAttrib(text);
@@ -370,25 +368,13 @@
             }
             var title = "";
 
-            //	Get Text
-            //var sql = "SELECT p.Name, w.Name FROM M_Product p, M_Warehouse w "
-            //    + "WHERE p.M_Product_ID=" + mProductId + " AND w.M_Warehouse_ID=" + M_Warehouse_ID;
-
-            //var dr = null;
+           
             try {
-                //dr = VIS.DB.executeReader(sql, null);
-                //if (dr.read()) {
-                //    title = dr.getString(0) + " - " + dr.getString(1);
-                //}
-                //dr.close();
-                //dr = null;
+               
                 title = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "PAttributes/GetTitle", { "Warehouse_ID": M_Warehouse_ID, "Product_ID": mProductId }, null);
             }
             catch (e) {
-                //if (dr != null) {
-                //    dr.close();
-                //}
-                //this.log.Log(Level.SEVERE, sql, e);
+                
                 console.log(e);
             }
 
@@ -597,63 +583,9 @@
                 if (checkProd > 0) {
                     check = true;
                 }
-
-                //sql = "SELECT COUNT(*) FROM M_Storage s INNER JOIN M_Locator l ON (l.M_Locator_ID = s.M_Locator_ID) "
-                //       + " inner join M_warehouse w ON (w.M_warehouse_ID = l.M_Warehouse_ID) WHERE AD_Client_ID = " + VIS.context.getAD_Client_ID();
-
-                //var sqlWhere = "";
-                //var AD_Org_ID = VIS.Env.getCtx().getContextAsInt(windowNoParent, "AD_Org_ID");
-
-                //var sqlChk = "SELECT IsOrganization, IsProduct, IsWarehouse FROM M_AttributeSet aSet INNER JOIN M_Product mp on mp.M_AttributeSet_ID = aset.M_AttributeSet_ID"
-                //    + " WHERE mp.M_Product_ID = " + mProductId;
-
-                //dr = VIS.DB.executeReader(sqlChk, null);
-                //if (dr.read()) {
-                //    if (dr.getString(0).toUpper() == "Y") {
-                //        sqlWhere = sqlWhere.concat(" OR s.AD_Org_ID = " + AD_Org_ID);
-                //    }
-                //    if (dr.getString(1).toUpper() == "Y") {
-                //        sqlWhere = sqlWhere.concat(" OR s.M_Product_ID = " + mProductId);
-                //    }
-                //    if (dr.getString(2).toUpper() == "Y") {
-                //        var M_Warehouse_ID = 0;
-                //        var sqlMovement = "SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + VIS.Env.getCtx().getContext(windowNoParent, "BaseTable_ID");
-                //        var innerdr = VIS.DB.executeReader(sqlMovement, null);
-                //        if (innerdr.read()) {
-                //            if (innerdr.getString(0).toUpper() == "M_MOVEMENT") {
-                //                var sqlWarehouse = "SELECT wh.M_Warehouse_ID FROM M_Warehouse wh INNER JOIN M_Locator l ON (wh.M_Warehouse_ID = l.M_Warehouse_ID) "
-                //        + " WHERE l.M_Locator_ID = " + VIS.Env.getCtx().getContext(windowNoParent, "M_LocatorTo_ID");
-                //                M_Warehouse_ID = VIS.DB.executeScalar(sqlWarehouse, null);
-                //            }
-                //            innerdr.close();
-                //            innerdr = null;
-                //        }
-                //        else {
-                //            M_Warehouse_ID = VIS.Env.getCtx().getContextAsInt(windowNoParent, "M_Warehouse_ID");
-                //        }
-
-                //        sqlWhere = sqlWhere.concat(" OR w.M_Warehouse_ID = " + M_Warehouse_ID);
-                //    }
-                //    if (sqlWhere.length > 0) {
-                //        sqlWhere = sqlWhere.Remove(0, 3);
-                //        sql = sql + " AND (" + sqlWhere.toString();
-                //        sql = sql + ") AND s.M_AttributeSetInstance_ID IN (SELECT M_AttributeSetInstance_ID FROM M_AttributeSetInstance WHERE Lot = '" + lotString + "')";
-                //    }
-                //}
-                //dr.close();
-                //dr = null;
-
-                //var checkProd = VIS.DB.executeScalar(sql);
-                //if (checkProd > 0) {
-                //    check = true;
-                //}
-
             }
             catch (e) {
-                //if (dr != null) {
-                //    dr.close();
-                //}
-                //$self.log.log(Level.SEVERE, sql, e);
+               
                 console.log(e);
             }
             return check;
@@ -746,12 +678,6 @@
                 Okbtn.on("click", function () {
                     setBusy(true);
                     saveCheckedEdit();
-
-                    //if (!saveCheckedEdit()) {
-                    //} else
-                    //    $root.dialog('close');
-
-                    //setBusy(false);
                 });
             }
 

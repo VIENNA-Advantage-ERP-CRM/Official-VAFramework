@@ -896,14 +896,10 @@
 
             $btnEmailConfig.on("click", function () {
                 //get windowId for User Window
-                //var sql = "select ad_window_id from ad_window where name='Mail Configuration'";// Upper( name)=Upper('user' )
+                
                 var ad_window_Id = 0;
                 try {
-                    //var dr = VIS.DB.executeDataReader(sql);
-                    //if (dr.read()) {
-                    //    ad_window_Id = dr.getInt(0);
-                    //}
-                    //dr.dispose();
+                   
                     // Added by Bharat on 12 June 2017 to remove client side queries
                     ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "Mail Configuration" }, null); // spelling corrected by vinay bhatt on 18 oct 2018
                     if (ad_window_Id > 0) {
@@ -920,14 +916,10 @@
 
             $btnSubstitute.on("click", function () {
                 //get windowId for User Window
-                //var sql = "select ad_window_id from ad_window where name='User Substitute'";// Upper( name)=Upper('user' )
+               
                 var ad_window_Id = 0;
                 try {
-                    //var dr = VIS.DB.executeDataReader(sql);
-                    //if (dr.read()) {
-                    //    ad_window_Id = dr.getInt(0);
-                    //}
-                    //dr.dispose();
+                   
                     // Added by Bharat on 12 June 2017 to remove client side queries
                     ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "User Substitute" }, null); // spelling corrected by vinay bhatt on 18 oct 2018
                     if (ad_window_Id > 0) {
@@ -1580,22 +1572,11 @@
             });
         };
         var loadRoles = function () {
-            var sql = "SELECT  r.Name,r.AD_Role_ID" +
-               //" u.ConnectionProfile, u.Password "+	//	4,5
-               " FROM AD_User u" +
-               " INNER JOIN AD_User_Roles ur ON (u.AD_User_ID=ur.AD_User_ID AND ur.IsActive='Y')" +
-               " INNER JOIN AD_Role r ON (ur.AD_Role_ID=r.AD_Role_ID AND r.IsActive='Y') " +
-                //.Append("WHERE COALESCE(u.LDAPUser,u.Name)=@username")		//	#1
-               " WHERE " +//(COALESCE(u.LDAPUser,u.Name)=@username OR COALESCE(u.LDAPUser,u.Value)=@username)"+
-               " u.AD_User_ID=" + VIS.context.getAD_User_ID() + " AND u.IsActive='Y' " +
-               " AND u.IsLoginUser='Y' " +
-               " AND EXISTS (SELECT * FROM AD_Client c WHERE u.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')" +
-               " AND EXISTS (SELECT * FROM AD_Client c WHERE r.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')" +
-               " ORDER BY r.Name";
+            var sql = "";
 
 
             $.ajax({
-                url: VIS.Application.contextUrl + "UserPreference/GetLoginData",
+                url: VIS.Application.contextUrl + "UserPreference/GetUserRoles",
                 dataType: "json",
                 data: { sql: sql },
                 success: function (data) {
@@ -1622,7 +1603,7 @@
                 return;
 
             }
-            var sql = "SELECT c.Name,r.AD_Client_ID FROM AD_Role r INNER JOIN AD_Client c ON (c.AD_Client_ID=r.AD_Client_ID) WHERE r.AD_Role_ID=" + roleID;
+            var sql =  roleID;
             roleID = null;
 
             $.ajax({
@@ -1655,26 +1636,14 @@
                 return;
 
             }
-            var sql = "SELECT o.Name,o.AD_Org_ID "	//	1..3
-                + "FROM AD_Role r, AD_Client c"
-                + " INNER JOIN AD_Org o ON (c.AD_Client_ID=o.AD_Client_ID OR o.AD_Org_ID=0) "
-                + "WHERE r.AD_Role_ID='" + AD_Role_ID + "'" 	//	#1
-                + " AND c.AD_Client_ID='" + AD_Client_ID + "'"	//	#2
-                + " AND o.IsActive='Y' AND o.IsSummary='N'  AND o.IsCostCenter='N' AND o.IsProfitCenter='N' "
-                + " AND (r.IsAccessAllOrgs='Y' "
-                    + "OR (r.IsUseUserOrgAccess='N' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_Role_OrgAccess ra "
-                        + "WHERE ra.AD_Role_ID=r.AD_Role_ID AND ra.IsActive='Y')) "
-                    + "OR (r.IsUseUserOrgAccess='Y' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_User_OrgAccess ua "
-                        + "WHERE ua.AD_User_ID='" + VIS.context.getAD_User_ID() + "' AND ua.IsActive='Y'))"		//	#3
-                    + ") "
-                + "ORDER BY o.Name";
+            var sql = "";
 
             AD_Role_ID = null;
             AD_Client_ID = null;
             $.ajax({
-                url: VIS.Application.contextUrl + "UserPreference/GetLoginData",
+                url: VIS.Application.contextUrl + "UserPreference/GetOrgData",
                 dataType: "json",
-                data: { sql: sql },
+                data: { "roleId":AD_Role_ID,"clientId" : AD_Client_ID },
                 success: function (data) {
                     var dic = JSON.parse(data);
                     var cmbOrgContent = "";
@@ -1700,16 +1669,14 @@
                 return;
 
             }
-            var sql = "SELECT Name,M_Warehouse_ID  FROM M_Warehouse "
-                + "WHERE AD_Org_ID=" + AD_Org_ID + " AND IsActive='Y' "
-                + "ORDER BY Name";
+           
 
             AD_Org_ID = null;
 
             $.ajax({
-                url: VIS.Application.contextUrl + "UserPreference/GetLoginData",
+                url: VIS.Application.contextUrl + "UserPreference/GetWarehouseData",
                 dataType: "json",
-                data: { sql: sql },
+                data: { "orgId": AD_Org_ID },
                 success: function (data) {
                     var dic = JSON.parse(data);
                     var cmbWHContent = "";
