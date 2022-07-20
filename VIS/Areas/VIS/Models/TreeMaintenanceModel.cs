@@ -2053,7 +2053,7 @@ namespace VIS.Models
            "(SELECT tnp.node_id  FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
                "(SELECT tnp.node_id  FROM " + tbname + " tnp   WHERE tnp.parent_id IN" +
                    "(SELECT tnp.node_id  FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
-           "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + treeID + " AND tnp.parent_id = " + delNodId + "    ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + "  ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + " ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + " ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + "  ";
+           "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + treeID + " AND tnp.parent_id = " + delNodId + "    ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + "  ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + " ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + " ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + "  ";
             List<int> lst = new List<int>();
             
             DataSet ds = DB.ExecuteDataset(childsId);
