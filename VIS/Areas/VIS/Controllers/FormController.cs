@@ -308,6 +308,15 @@ namespace VIS.Controllers
             return Content(model.SetFieldsSorting(valuess, NoYe, tableName, keyColumnName, columnSortName, columnYesNoName, oldValue));
         }
 
+        [HttpPost]
+        public ActionResult LoadSortData(string AD_Table_ID, string AD_ColumnSortOrder_ID, string AD_ColumnSortYesNo_ID,
+            string AD_Language, string ID,bool isTrl)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            FormModel model = new FormModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.LoadSortData(AD_Table_ID, AD_ColumnSortOrder_ID, AD_ColumnSortYesNo_ID, AD_Language, ID, isTrl)), JsonRequestBehavior.AllowGet);
+        }
+
         #endregion
 
         #region
@@ -343,5 +352,7 @@ namespace VIS.Controllers
             return Json(new { result = "Error" }, JsonRequestBehavior.AllowGet);
         }
         #endregion
+
+
     }
 }

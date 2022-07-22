@@ -1519,8 +1519,13 @@
 
         this.parentColumnName = null;
 
-        this.aPanel = null;
+        this.AD_Table_ID = AD_Table_ID;
+        this.AD_ColumnSortOrder_ID = AD_ColumnSortOrder_ID;
+        this.AD_ColumnSortYesNo_ID = AD_ColumnSortYesNo_ID;
 
+
+
+        this.aPanel = null;
 
         this.log = VIS.Logging.VLogger.getVLogger("VSortTab");
 
@@ -1733,9 +1738,7 @@
             this.seletedTab = null;
             $tblRoot.remove();
             $tblRoot = null;
-            //$tabControl.remove();
-            //$tabControl = null;
-
+          
             self = null;
 
             this.winNumber = null;
@@ -1769,18 +1772,6 @@
 
         var trl = !VIS.Env.isBaseLanguage(VIS.Env.getCtx(), "");
 
-
-
-        //var sql = "SELECT t.TableName, c.AD_Column_ID, c.ColumnName, e.Name,"	//	1..4
-        //    + "c.IsParent, c.IsKey, c.IsIdentifier, c.IsTranslated "				//	4..8
-        //    + "FROM AD_Table t, AD_Column c, AD_Element e "
-        //    + "WHERE t.AD_Table_ID=" + AD_Table_ID						//	#1
-        //    + " AND t.AD_Table_ID=c.AD_Table_ID"
-        //    + " AND (c.AD_Column_ID=" + AD_ColumnSortOrder_ID + " OR AD_Column_ID=" + AD_ColumnSortYesNo_ID 	//	#2..3
-        //    + " OR c.IsParent='Y' OR c.IsKey='Y' OR c.IsIdentifier='Y')"
-        //    + " AND c.AD_Element_ID=e.AD_Element_ID";
-
-
         var sql = "VIS_122";
         var param = [];
         param[0] = new VIS.DB.SqlParam("@AD_Table_ID", AD_Table_ID);
@@ -1788,16 +1779,7 @@
         param[2] = new VIS.DB.SqlParam("@AD_ColumnSortYesNo_ID", AD_ColumnSortYesNo_ID);
 
         if (trl) {
-            //sql = "SELECT t.TableName, c.AD_Column_ID, c.ColumnName, et.Name,"	//	1..4
-            //    + "c.IsParent, c.IsKey, c.IsIdentifier, c.IsTranslated "		//	4..8
-            //    + "FROM AD_Table t, AD_Column c, AD_Element_Trl et "
-            //    + "WHERE t.AD_Table_ID=" + AD_Table_ID						//	#1
-            //    + " AND t.AD_Table_ID=c.AD_Table_ID"
-            //    + " AND (c.AD_Column_ID=" + AD_ColumnSortOrder_ID + " OR AD_Column_ID=" + AD_ColumnSortYesNo_ID	//	#2..3
-            //    + "	OR c.IsParent='Y' OR c.IsKey='Y' OR c.IsIdentifier='Y')"
-            //    + " AND c.AD_Element_ID=et.AD_Element_ID"
-            //    + " AND et.AD_Language='" + VIS.Env.getAD_Language(VIS.Env.getCtx()) + "'";                   //	#4
-
+            
             sql = "VIS_123";
             param = [];
             param[0] = new VIS.DB.SqlParam("@AD_Table_ID", AD_Table_ID);
@@ -1869,42 +1851,14 @@
         //lstNo.Items.Clear();
         //lstYes.Items.Clear();
 
-        var sql = "";
-
-        sql += "SELECT t." + this.keyColumnName;				//	1
-        if (this.identifierTranslated) {
-            sql += ",tt.";
-        }
-        else {
-            sql += ",t."
-        }
-        sql += this.identifierColumnName						//	2
-            + ",t." + this.columnSortName;				//	3
-        if (this.columnYesNoName != null)
-            sql += ",t." + this.columnYesNoName;			//	4
-        //	Tables
-        sql += " FROM " + this.tableName + " t";
-        if (this.identifierTranslated)
-            sql += ", " + this.tableName + "_Trl tt";
-        //	Where
-        sql += " WHERE t." + this.parentColumnName + "=@ID";
-        if (this.identifierTranslated)
-            sql += " AND t." + this.keyColumnName + "=tt." + this.keyColumnName
-                + " AND tt.AD_Language='" + VIS.context.getAD_Language() + "'";
-        //	Order
-        sql += " ORDER BY ";
-        if (this.columnYesNoName != null)
-            sql += "4 DESC,";		//	t.IsDisplayed DESC
-        sql += "3,2";				//	t.SeqNo, tt.Name 
         var ID = VIS.Env.getCtx().getWindowContext(this.winNumber, this.parentColumnName);
 
-        //log.Config(sql.ToString() + " - ID=" + ID);
-
-        //BackgroundWorker bgw = new BackgroundWorker();
-
-
-
-        var dr = executeDReader(sql, [new VIS.DB.SqlParam("@ID", ID)]);
+        var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Form/LoadSortData",
+            {
+                "AD_Table_ID": this.AD_Table_ID, "AD_ColumnSortOrder_ID": this.AD_ColumnSortOrder_ID, "AD_ColumnSortYesNo_ID": this.AD_ColumnSortYesNo_ID,
+                "AD_Language": VIS.Env.getAD_Language(VIS.Env.getCtx()), "ID": ID, "isTrl": !VIS.Env.isBaseLanguage(VIS.Env.getCtx(), "")}, null); // spelling corrected by vinay bhatt on 18 oct 2018
+        
+        var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//   executeDReader(sql, [new VIS.DB.SqlParam("@ID", ID)]);
         var yesHtml = "";
         var noHtml = "";
         var listOldValues = [];

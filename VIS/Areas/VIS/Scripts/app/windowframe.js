@@ -7921,7 +7921,9 @@
         this.parentColumnName = null;
 
         this.aPanel = null;
-
+        this.AD_Table_ID = AD_Table_ID;
+        this.AD_ColumnSortOrder_ID = AD_ColumnSortOrder_ID;
+        this.AD_ColumnSortYesNo_ID = AD_ColumnSortYesNo_ID;
 
         this.log = VIS.Logging.VLogger.getVLogger("VSortTab");
 
@@ -8248,40 +8250,17 @@
 
         var sql = "";
 
-        sql += "SELECT t." + this.keyColumnName;				//	1
-        if (this.identifierTranslated) {
-            sql += ",tt.";
-        }
-        else {
-            sql += ",t."
-        }
-        sql += this.identifierColumnName						//	2
-            + ",t." + this.columnSortName;				//	3
-        if (this.columnYesNoName != null)
-            sql += ",t." + this.columnYesNoName;			//	4
-        //	Tables
-        sql += " FROM " + this.tableName + " t";
-        if (this.identifierTranslated)
-            sql += ", " + this.tableName + "_Trl tt";
-        //	Where
-        sql += " WHERE t." + this.parentColumnName + "=@ID";
-        if (this.identifierTranslated)
-            sql += " AND t." + this.keyColumnName + "=tt." + this.keyColumnName
-                + " AND tt.AD_Language='" + VIS.context.getAD_Language() + "'";
-        //	Order
-        sql += " ORDER BY ";
-        if (this.columnYesNoName != null)
-            sql += "4 DESC,";		//	t.IsDisplayed DESC
-        sql += "3,2";				//	t.SeqNo, tt.Name 
+      
         var ID = VIS.Env.getCtx().getWindowContext(this.winNumber, this.parentColumnName);
 
-        //log.Config(sql.ToString() + " - ID=" + ID);
+        var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Form/LoadSortData",
+            {
+                "AD_Table_ID": this.AD_Table_ID, "AD_ColumnSortOrder_ID": this.AD_ColumnSortOrder_ID, "AD_ColumnSortYesNo_ID": this.AD_ColumnSortYesNo_ID,
+                "AD_Language": VIS.Env.getAD_Language(VIS.Env.getCtx()), "ID": ID, "isTrl": !VIS.Env.isBaseLanguage(VIS.Env.getCtx(), "")
+            }, null);
 
-        //BackgroundWorker bgw = new BackgroundWorker();
+        var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//   executeDReader(sql, [new VIS.DB.SqlParam("@ID", ID)]);
 
-
-
-        var dr = executeDReader(sql, [new VIS.DB.SqlParam("@ID", ID)]);
         var yesHtml = "";
         var noHtml = "";
         var listOldValues = [];

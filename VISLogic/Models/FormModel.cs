@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -10,6 +11,7 @@ using VAdvantage.Controller;
 using VAdvantage.DataBase;
 using VAdvantage.Model;
 using VAdvantage.Utility;
+using VIS.Classes;
 using VIS.DataContracts;
 using VIS.Helpers;
 
@@ -460,6 +462,115 @@ namespace VIS.Models
             return zoomList;
         }
 
+        public List<JTable> LoadSortData(string aD_Table_ID, string aD_ColumnSortOrder_ID, string aD_ColumnSortYesNo_ID,
+            string aD_Language, string iD,bool isTrl)
+        {
+            string tableName = null;
+            string columnSortName = null;
+            string columnYesNoName = null;
+            string keyColumnName = null;
+            string identifierColumnName = null;
+            bool  identifierTranslated = false;
+
+            string  parentColumnName = null;
+
+            List<JTable> jTable = new List<JTable>();
+            List<SqlParameter> param = new List<SqlParameter>();
+            param.Add(new SqlParameter("@AD_Table_ID", aD_Table_ID));
+            param.Add(new SqlParameter("@AD_ColumnSortOrder_ID", aD_ColumnSortOrder_ID));
+            param.Add(new SqlParameter("@AD_ColumnSortYesNo_ID", aD_ColumnSortYesNo_ID));
+
+            string qry = "VIS_122";
+            if (isTrl)
+            {
+                qry = "VIS_123";
+                param.Add(new SqlParameter("@AD_Language", aD_Language));
+            }
+
+            qry = QueryCollection.GetQuery(qry,_ctx);
+
+            DataSet ds = DB.ExecuteDataset(qry,param.ToArray());
+            if (ds != null)
+            {
+
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                        tableName = dr[0].ToString();
+                        //	Sort Column
+                        if (aD_ColumnSortOrder_ID == dr[1].ToString())
+                        {
+                            //log.Fine("Sort=" + dr.GetString(0) + "." + dr.GetString(2));
+                            columnSortName = dr[2].ToString();
+                            
+                        }
+                        //	Optional YesNo
+                        else if (aD_ColumnSortYesNo_ID == dr[1].ToString())
+                        {
+                            //log.Fine("YesNo=" + dr.GetString(0) + "." + dr.GetString(2));
+                            columnYesNoName = dr[2].ToString();
+                        }
+                        //	Parent2
+                        else if (dr[4].ToString() == "Y")
+                        {
+                            //log.Fine("Parent=" + dr.GetString(0) + "." + dr.GetString(2));
+                            parentColumnName = dr[2].ToString();
+                        }
+                        //	KeyColumn
+                        else if (dr[5].ToString() == "Y")
+                        {
+                            //log.Fine("Key=" + dr.GetString(0) + "." + dr.GetString(2));
+                            keyColumnName = dr[2].ToString();
+                        }
+                        //	Identifier
+                        else if (dr[6].ToString() == "Y")
+                        {
+                            //log.Fine("Identifier=" + dr.GetString(0) + "." + dr.GetString(2));
+                            identifierColumnName = dr[2].ToString();
+                            if (isTrl)
+                                identifierTranslated = "Y" == dr[7].ToString();
+                        }
+                        else
+                        {
+                            //log.Fine("??NotUsed??=" + dr.GetString(0) + "." + dr.GetString(2));
+                        }
+                    }
+                var sql = "";
+
+                sql += "SELECT t." + keyColumnName;                //	1
+                if (identifierTranslated)
+                {
+                    sql += ",tt.";
+                }
+                else
+                {
+                    sql += ",t.";
+                }
+                sql += identifierColumnName                        //	2
+                    + ",t." + columnSortName;              //	3
+                if (columnYesNoName != null)
+                    sql += ",t." + columnYesNoName;            //	4
+                                                                    //	Tables
+                sql += " FROM " + tableName + " t";
+                if (identifierTranslated)
+                    sql += ", " + tableName + "_Trl tt";
+                //	Where
+                sql += " WHERE t." + parentColumnName + "="+iD;
+                if (identifierTranslated)
+                    sql += " AND t." + keyColumnName + "=tt." + keyColumnName
+                        + " AND tt.AD_Language='" + aD_Language + "'";
+                //	Order
+                sql += " ORDER BY ";
+                if (columnYesNoName != null)
+                    sql += "4 DESC,";       //	t.IsDisplayed DESC
+                sql += "3,2";				//	t.SeqNo, tt.Name 
+
+                SqlHelper sqlHelper = new SqlHelper();
+                SqlParamsIn sqlIn = new SqlParamsIn();
+                sqlIn.sql = sql;
+                jTable = sqlHelper.ExecuteJDataSet(sqlIn);
+            }
+            return jTable;
+        }
 
         public int GetWorkflowWindowID(int AD_Table_ID)
         {

@@ -2934,10 +2934,7 @@
             $mData.on("scroll", GetChildDataOfTreeNode);
 
 
-            //$treeNodeSearch
-            //$chktreeNode =
-            //$lblNodetext =
-            //$searchDiv.append($cmbSearch).append($treeNodeSearch).append($btnSearch);
+           
 
             window.setTimeout(function () {
                // $cmbSearch.width($searchDiv.width() - ($treeNodeSearch.width() + 40 + $btnSearch.width()));
@@ -2961,29 +2958,7 @@
 
 
             $chkAllCheckOrNot.on("click", NodeItemSecOrDesec);
-            // $checkSearchOrNot.on("click", IsSearchOrNot);
-
-
-            //nodeItemDelwithdrag.mouseover(function (e) {
-            //   // nodeItemDelwithdrag.addClass("selectchangecolor");
-            //    window.setTimeout(function () {
-            //        nodeItemDelwithdrag.animate({
-            //            backgroundColor: "#ff0000",
-            //        }, 200);
-            //    }, 100);
-            //});
-            //nodeItemDelwithdrag.mouseleave(function () {
-            //    // nodeItemDelwithdrag.removeClass("selectchangecolor");
-            //    window.setTimeout(function () {
-            //        nodeItemDelwithdrag.css("background-color", "#FFC0CB");
-            //    }, 100);
-            //    //nodeItemDelwithdrag.animate({
-            //    //    backgroundColor: "#FFC0CB",
-            //    //});
-            //});
-
-            // $mData.height($secoundDiv.height() - $lblMh4.height() + 10);
-
+           
 
             $treeExpandColapse.on("click", TreeExpandCollapse);
             $treeCollapseColapse.on("click", TreeCollapse);
@@ -3021,36 +2996,31 @@
         var bindornot = "true";
         var convertmenuArray = null;
         var msgShowforbindingWindow = null;
+
         function CreateRestrictionforDelete() {
             menuArray = [];
             var table_id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableID", { "treeId": $treeID }, null); // spelling corrected by vinay bhatt on 18 oct 2018
             var tablename = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableName", { "table_id": table_id }, null);
-            
 
             bindornot = "true";
 
             if (tablename == "AD_Menu") {
-
                 bindornot = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/IsRecordExist", { "treeId": $treeID }, null);
             }
 
-            //if(bindornot == false)
-            //{
             var getIdes = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetWindowMenuIds", {  }, null);
             var formID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetFormMenuIds", {}, null);
 
-
             if (formID != null && formID.length > 0) {
                 for (var i = 0; i < formID.length; i++) {
-                    menuArray.push(formID[i]]);
+                    menuArray.push(formID[i]);
                 }
             }
-            // }
+           
             convertmenuArray = menuArray;
             menuArray = menuArray.toString();
 
             var getnamebyID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetNameByIds", { "ids": menuArray}, null);
-
             var messagess = "";
             if (getnamebyID != null && getnamebyID.length > 0) {
                 for (var m = 0; m < getnamebyID.length; m++) {
@@ -3058,14 +3028,9 @@
                     messagess += ",";
                 }
             }
-
-
             msgShowforbindingWindow = messagess + " " + VIS.Msg.getMsg("MenuBinded");
-
-
             $bsyDivforbottom[0].style.visibility = "hidden";
         };
-
 
         function UpdateRollCheckSeq(idforupdate) {
             TreeTableName();
