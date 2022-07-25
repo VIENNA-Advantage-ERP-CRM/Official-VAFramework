@@ -2239,7 +2239,7 @@ namespace VIS.Helpers
         /// <param name="encryptedColnames">lsit encrypted column of window</param>
         /// <param name="ctx">context</param>
         /// <returns>Json cutom equalvalent to dataset</returns>
-        public object GetWindowRecords(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
+        public WindowRecordOut GetWindowRecords(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
         {
             WindowRecordOut retVal = new WindowRecordOut();
 
@@ -2558,7 +2558,7 @@ namespace VIS.Helpers
         /// <param name="encryptedColnames">lsit encrypted column of window</param>
         /// <param name="ctx">context</param>
         /// <returns>Json cutom equalvalent to dataset</returns>
-        public  object GetWindowRecordsForTreeNode(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, int treeID, int treeNodeID, List<string> obscureFields)
+        public WindowRecordOut GetWindowRecordsForTreeNode(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, int treeID, int treeNodeID, List<string> obscureFields)
         {
             List<JTable> outO = new List<JTable>();
             JTable obj = null;
@@ -2678,7 +2678,10 @@ namespace VIS.Helpers
                 outO.Add(obj);
 
             }
-            return outO;
+
+            WindowRecordOut w = new WindowRecordOut();
+            w.Tables = outO;
+            return w;
         }
 
         StringBuilder parentIDs = new StringBuilder();

@@ -126,6 +126,8 @@ namespace VIS.DataContracts
         public List<JTable> Tables { get; set; }
         public Dictionary<string, Dictionary<object, string>> LookupDirect  { get;set; }
         public CardViewData CardViewTpl { get; set; }
+
+        public int RecordCount = 0;
     }
 
     public class RecordInfoIn

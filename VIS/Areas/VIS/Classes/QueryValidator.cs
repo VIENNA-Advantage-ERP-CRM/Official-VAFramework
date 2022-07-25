@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace VIS.Classes
@@ -21,9 +22,10 @@ namespace VIS.Classes
 
             sql = sql.ToUpper();
 
+
             foreach (string key in Keyword)
             {
-                if (sql.IndexOf(key) > -1)
+                if (Regex.IsMatch(sql, "\\b" + key + "\\b"))
                     return false;
             }
 
