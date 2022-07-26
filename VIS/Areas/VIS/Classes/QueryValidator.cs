@@ -10,7 +10,7 @@ namespace VIS.Classes
     {
         private static List<string> Keyword = new List<string>()
             {
-            "DROP","DELETE","V$SESSION","V$INSTANCE","UNION","SESSION","UPDATE","INSERT","TRUNCATE","--","/*",
+            "DROP","DELETE","V$SESSION","V$INSTANCE","UNION","SESSION","UPDATE","INSERT","TRUNCATE","--",//,"/*",
             "ALL_TABLES","ALL_TAB_COLUMNS","DATABASE","SYSDBA"
             };
 

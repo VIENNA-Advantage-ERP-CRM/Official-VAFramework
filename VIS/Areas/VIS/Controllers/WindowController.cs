@@ -52,7 +52,7 @@ namespace VIS.Areas.VIS.Controllers
             {
                 if (sql.Length > 8)
                     sql.Append(",");
-                selectSQL = GetColumnSQL(true, field.ColumnName, field.AD_Reference_ID);
+                selectSQL = GetColumnSQL(true, field);
 
                 if (selectSQL.IndexOf("@") == -1)
                 {
@@ -71,7 +71,7 @@ namespace VIS.Areas.VIS.Controllers
                 if (field.lookupInfo != null && field.AD_Reference_ID != DisplayType.Account)
                 {
                     var lInfo = field.lookupInfo;
-                    if (string.IsNullOrEmpty(lInfo.displayColSubQ) && gt.TableName.ToLower() != lInfo.tableName.ToLower())
+                    if (!string.IsNullOrEmpty(lInfo.displayColSubQ) && gt.TableName.ToLower() != lInfo.tableName.ToLower())
                     {
 
 
@@ -83,14 +83,14 @@ namespace VIS.Areas.VIS.Controllers
                         var qryDirect = lInfo.queryDirect.Substring(lInfo.queryDirect.LastIndexOf(" FROM " + lInfo.tableName + " "));
 
                         if (!field.IsVirtualColumn)
-                            qryDirect = qryDirect.Replace("@key", gt.TableName + '.' + field.ColumnSQL);
+                            qryDirect = qryDirect.Replace("@key", gt.TableName + '.' + GetColumnSQL(false, field));
                         else
-                            qryDirect = qryDirect.Replace("@key", GetColumnSQL(false, field.ColumnName, field.AD_Reference_ID));
+                            qryDirect = qryDirect.Replace("@key", GetColumnSQL(false, field));
 
 
                         selectDirect.Append("( SELECT (").Append(lInfo.displayColSubQ).Append(") ").Append(qryDirect)
-                            .Append(" ) AS ").Append(GetColumnSQL(false, field.ColumnName, field.AD_Reference_ID) + "_T")
-                            .Append(',').Append(GetColumnSQL(true, field.ColumnName, field.AD_Reference_ID));
+                            .Append(" ) AS ").Append(GetColumnSQL(false, field) + "_T")
+                            .Append(',').Append(GetColumnSQL(true, field));
                     }
                     else if (field.lookupInfo != null && field.AD_Reference_ID == DisplayType.Account)
                     {
@@ -100,9 +100,9 @@ namespace VIS.Areas.VIS.Controllers
                             selectDirect.Append(",");
 
                         selectDirect.Append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
-                            .Append(gt.TableName + "." + GetColumnSQL(false, field.ColumnName, field.AD_Reference_ID)).Append(" ) AS ")
-                            .Append(GetColumnSQL(false, field.ColumnName, field.AD_Reference_ID) + "_T")
-                            .Append(',').Append(GetColumnSQL(true, field.ColumnName, field.AD_Reference_ID));
+                            .Append(gt.TableName + "." + GetColumnSQL(false, field)).Append(" ) AS ")
+                            .Append(GetColumnSQL(false, field) + "_T")
+                            .Append(',').Append(GetColumnSQL(true, field));
 
                     }
                 }
@@ -252,33 +252,36 @@ namespace VIS.Areas.VIS.Controllers
 
 
         [NonAction]
-        public string GetColumnSQL(bool withAS, string column, int displayType)
+        public string GetColumnSQL(bool withAS,GridFieldVO field)
         {
             //(case o.ISACTIVE when 'Y' then 'True' else 'False' end) as Active,
-            if (column != null && column.Length > 0)
+            string columnSQL = field.ColumnSQL;
+            string columnName = field.ColumnName;
+            int displayType = field.AD_Reference_ID;
+            if (columnSQL != null && columnSQL.Length > 0)
             {
                 if (withAS)
                 {
                     if (displayType == DisplayType.YesNo)
                     {
-                        return " (case " + column + " when 'Y' then 'True' else 'False' end) " + " AS " + column;
+                        return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) " + " AS " + columnName;
                     }
-                    return column + " AS " + column;
+                    return columnSQL + " AS " + columnName;
                 }
                 else
                 {
                     if (displayType == DisplayType.YesNo)
                     {
-                        return " (case " + column + " when 'Y' then 'True' else 'False' end) ";
+                        return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) ";
                     }
-                    return column;
+                    return columnSQL;
                 }
             }
             if (displayType == DisplayType.YesNo)
             {
-                return " (case " + column + " when 'Y' then 'True' else 'False' end) AS " + column;
+                return " (case " + columnName + " when 'Y' then 'True' else 'False' end) AS " + columnName;
             }
-            return column;
+            return columnName;
 
         }
 

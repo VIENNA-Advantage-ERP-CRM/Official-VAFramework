@@ -3855,12 +3855,13 @@
             success: function (jString) {
                 var retObj = JSON.parse(jString);
                 if (retObj.RecordCount > 0) {
-
-                    that.fillData(retObj);
+                    that.rowCount = retObj.RecordCount;
                     that.isOpen = true;
                     //
                     that.changed = false;
                     that.rowChanged = -1;
+                    that.fillData(retObj);
+                   
                 }
                 else {
                     //console.log("clear");
