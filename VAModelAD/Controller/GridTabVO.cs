@@ -165,6 +165,12 @@ namespace VAdvantage.Controller
 
         public int DefaultCardID = 0;
 
+        public string SelectSQL
+        {
+            get;
+            set;
+        }
+
         public List<GridFieldVO> GetFields()
         {
             return fields;
@@ -937,6 +943,8 @@ namespace VAdvantage.Controller
             clone.AD_ColumnSortYesNo_ID = AD_ColumnSortYesNo_ID;
             //  Derived
             clone.onlyCurrentDays = 0;
+            clone.SelectSQL = SelectSQL;
+
 
 
             //Tab Panles

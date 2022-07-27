@@ -25,13 +25,13 @@ namespace VIS.Areas.VIS.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetWindowData(Ctx ctxp, int AD_Window_ID, int WindowNo, int AD_Tab_ID, string whereClause, int AD_tree_ID, int Node_ID, bool summaryOnly,
+        public JsonResult GetWindowRecords(Ctx ctxp, int AD_Window_ID, int WindowNo, int AD_Tab_ID, string whereClause, int AD_tree_ID, int Node_ID, bool summaryOnly,
             int CardID, List<string> encryptedfields, int AD_Table_ID, List<string> obscureFields, int MaxRows, int CurrentPage, int PageSize,
             bool doPaging)
         {
 
             Ctx ctx = new Ctx(ctxp);
-
+            whereClause = SecureEngineBridge.DecryptByClientKey(whereClause, ctx.GetSecureKey());
             if (!QueryValidator.IsValid(whereClause))
                 return null;
 
@@ -60,7 +60,7 @@ namespace VIS.Areas.VIS.Controllers
                 }
                 else
                 {
-                    sql.Append(Env.ParseContext(ctx, WindowNo, sql.ToString(), false));
+                    sql.Append(Env.ParseContext(ctx, WindowNo, selectSQL, false));
                 }
 
                 if (field.AD_Reference_ID == DisplayType.Image)
@@ -125,6 +125,11 @@ namespace VIS.Areas.VIS.Controllers
 
 
             SQL_Select = sql.ToString();
+
+            GridWindowVO orignialVo = AEnv.GetMWindowOriginalVO(ctx, WindowNo, AD_Window_ID, 0);
+
+            orignialVo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().SelectSQL = SQL_Select;
+
             SQL_Count = "SELECT COUNT(*) FROM " + gt.TableName;
 
             var m_SQL_Where = new StringBuilder("");
@@ -226,7 +231,7 @@ namespace VIS.Areas.VIS.Controllers
             sqlIn.sqlDirect = SQL_Direct;
             sqlIn.pageSize = PageSize;
             sqlIn.page = CurrentPage;
-            WindowRecordOut resultData = null;
+            WindowRecordOut resultData = new WindowRecordOut();
 
             if (rCount > 0)
             {
@@ -252,7 +257,7 @@ namespace VIS.Areas.VIS.Controllers
 
 
         [NonAction]
-        public string GetColumnSQL(bool withAS,GridFieldVO field)
+        public string GetColumnSQL(bool withAS, GridFieldVO field)
         {
             //(case o.ISACTIVE when 'Y' then 'True' else 'False' end) as Active,
             string columnSQL = field.ColumnSQL;
@@ -283,6 +288,34 @@ namespace VIS.Areas.VIS.Controllers
             }
             return columnName;
 
+        }
+
+        [HttpPost]
+        public JsonResult GetWindowRecord(Ctx ctxp, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
+        {
+            Ctx ctx = new Ctx(ctxp);
+            object data = null;
+            if (!string.IsNullOrEmpty(WhereClause))
+            {
+                WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctx.GetSecureKey());
+                if (!QueryValidator.IsValid(WhereClause))
+                    return null;
+            }
+            else
+                WhereClause = "1=2";
+
+            GridWindowVO vo = AEnv.GetMWindowOriginalVO(ctx, WindowNo, AD_Window_ID, 0);
+            string SelectSQL = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().SelectSQL;
+            if (!string.IsNullOrEmpty(SelectSQL))
+            {
+                SelectSQL += " WHERE " + WhereClause;
+
+                using (var w = new WindowHelper())
+                {
+                    data = w.GetWindowRecord(SelectSQL, Encryptedfields, ctx, ObscureFields);
+                }
+            }
+            return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
         }
 
     }

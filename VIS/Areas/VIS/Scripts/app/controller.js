@@ -3642,7 +3642,7 @@
                 select.append(selectSql);	//	ColumnName or Virtual Column
             }
             else {
-                select.append(VIS.Env.parseContext(this.ctx, gt._windowNo, selectSql, false));
+                select.append(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
             }
 
             if (field.getDisplayType() == VIS.DisplayType.Image) {
@@ -3832,14 +3832,14 @@
 
 
         $.ajax({
-            url: baseUrl + "Window/GetWindowData",
+            url: baseUrl + "Window/GetWindowRecords",
             type: 'post',
             data: {
                 'ctxp': VIS.context.getWindowCtx(that.gTable._windowNo),
                 AD_Window_ID: that.gridFields[0].getAD_Window_ID(),
                 WindowNo: that.gTable._windowNo,
                 AD_Tab_ID: that.AD_Tab_ID,
-                WhereClause: that.gTable._whereClause,
+                WhereClause: VIS.secureEngine.encrypt(that.gTable._whereClause),
                 AD_tree_ID: that.treeID,
                 Node_ID: that.treeNode_ID,
                 SummaryOnly: that.ShowSummaryNodes,
@@ -3861,7 +3861,7 @@
                     that.changed = false;
                     that.rowChanged = -1;
                     that.fillData(retObj);
-                   
+
                 }
                 else {
                     //console.log("clear");
@@ -3887,7 +3887,7 @@
             }
 
         });
-     
+
         return true;
     };
 
@@ -3937,7 +3937,7 @@
         }
         else {
             try {
-               
+
                 var lookupDirect = null;
                 var cardViewData = null;
                 if (retObj) {
@@ -4590,20 +4590,44 @@
         var where = this.getWhereClause(rData);
         if (where == null || where.length == 0)
             where = "1=2";
-        var sql = this.SQL_Select + " WHERE " + where;
+        //var sql = this.SQL_Select + " WHERE " + where;
 
         var rowDataDB = null;
         var dr = null;
         try {
 
-            sql = VIS.secureEngine.encrypt(sql);
-            dr = VIS.dataContext.getWindowRecord(sql, this.createGridFieldArr(this.gridFields, true), this.createObsecureFields(this.gridFields));
+            //sql = VIS.secureEngine.encrypt(sql);
+            //dr = VIS.dataContext.getWindowRecord(sql, this.createGridFieldArr(this.gridFields, true), this.createObsecureFields(this.gridFields));
+            $.ajax({
+                url: baseUrl + "Window/GetWindowRecord",
+                async: false,
+                type:'post',
+                data: {
+                    'ctxp': VIS.context.getWindowCtx(this.gTable._windowNo),
+                    AD_Window_ID: this.gridFields[0].getAD_Window_ID(),
+                    AD_Tab_ID: this.AD_Tab_ID,
+                    WindowNo: this.gTable._windowNo,
+                    WhereClause: VIS.secureEngine.encrypt(where),
+                    Encryptedfields: this.createGridFieldArr(this.gridFields, true),
+                    ObscureFields: this.createObsecureFields(this.gridFields),
+                },
+                success: function (jData) {
+                    dr = new VIS.DB.DataReader().toJson(jData);
+                },
+                error: function () { }
+            });
+
+
+
+
+
             //	only one row
             if (dr.read())
                 rowDataDB = this.readData(dr);
             rowDataDB.recid = rData.recid; //set record ID 
         }
         catch (e) {
+            console.log(e);
             sql = VIS.secureEngine.decrypt(sql);
             this.log.log(Level.SEVERE, sql, e);
             this.fireDataStatusEEvent("RefreshError", sql, true);
