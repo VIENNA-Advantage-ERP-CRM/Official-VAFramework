@@ -165,29 +165,29 @@ namespace VIS.Controllers
         /// <param name="windowNo">window number</param>
         /// <param name="AD_Window_ID">window Id</param>
         /// <returns>grid window json result</returns>
-        public JsonResult GetWindowRecords(List<string> fields, SqlParamsIn sqlIn, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
-        {
-            object data = null;
-            if (Session["ctx"] == null)
-            {
+        //public JsonResult GetWindowRecords(List<string> fields, SqlParamsIn sqlIn, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
+        //{
+        //    object data = null;
+        //    if (Session["ctx"] == null)
+        //    {
 
-            }
-            else
-            {
-                using (var w = new WindowHelper())
-                {
-                    Ctx ctx = Session["ctx"] as Ctx;
-                    sqlIn.sql = SecureEngineBridge.DecryptByClientKey(sqlIn.sql, ctx.GetSecureKey());
-                    sqlIn.sqlDirect = SecureEngineBridge.DecryptByClientKey(sqlIn.sqlDirect, ctx.GetSecureKey());
-                    sqlCount = SecureEngineBridge.DecryptByClientKey(sqlCount, ctx.GetSecureKey());
-                    sqlIn.sql = Server.HtmlDecode(sqlIn.sql);
-                    sqlIn.sqlDirect = Server.HtmlDecode(sqlIn.sqlDirect);
-                    data = w.GetWindowRecords(sqlIn, fields, ctx, rowCount, sqlCount, AD_Table_ID, obscureFields);
+        //    }
+        //    else
+        //    {
+        //        using (var w = new WindowHelper())
+        //        {
+        //            Ctx ctx = Session["ctx"] as Ctx;
+        //            sqlIn.sql = SecureEngineBridge.DecryptByClientKey(sqlIn.sql, ctx.GetSecureKey());
+        //            sqlIn.sqlDirect = SecureEngineBridge.DecryptByClientKey(sqlIn.sqlDirect, ctx.GetSecureKey());
+        //            sqlCount = SecureEngineBridge.DecryptByClientKey(sqlCount, ctx.GetSecureKey());
+        //            sqlIn.sql = Server.HtmlDecode(sqlIn.sql);
+        //            sqlIn.sqlDirect = Server.HtmlDecode(sqlIn.sqlDirect);
+        //            data = w.GetWindowRecords(sqlIn, fields, ctx, rowCount, sqlCount, AD_Table_ID, obscureFields);
 
-                }
-            }
-            return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
-        }
+        //        }
+        //    }
+        //    return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
+        //}
 
         /// <summary>
         /// Get Total card record count 

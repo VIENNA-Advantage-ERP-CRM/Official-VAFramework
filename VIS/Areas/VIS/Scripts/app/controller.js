@@ -3622,6 +3622,7 @@
     GridTable.prototype.createSelectSql = function () {
 
         var gt = this.gTable;
+        this.columns = [];
 
         if (this.gridFields.length == 0 || gt._tableName == null || gt._tableName.equals(""))
             return "";
@@ -3639,11 +3640,16 @@
             var field = this.gridFields[i];
             selectSql = field.getColumnSQL(true);
             if (selectSql.indexOf("@") == -1) {
-                select.append(selectSql);	//	ColumnName or Virtual Column
+                // select.append(selectSql);	//	ColumnName or Virtual Column
+                this.columns.push(selectSql);
             }
             else {
-                select.append(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
+               // select.append(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
+                this.columns.push(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
             }
+
+            
+
 
             if (field.getDisplayType() == VIS.DisplayType.Image) {
                 imgColName.push(selectSql);
@@ -3651,49 +3657,52 @@
                 // select.append(", (SELECT ImageURL from AD_Image img where img.AD_Image_ID=" + gt._tableName+"."+ selectSql+") as imgUrlColumn");
             }
 
-            if (field.getLookup() != null && field.getLookup() instanceof VIS.MLookup) {
-                var lInfo = field.getLookup().info;
-                if (lInfo.displayColSubQ && lInfo.displayColSubQ != "" && gt._tableName.toLowerCase() != lInfo.tableName.toLowerCase()) {
+            //if (field.getLookup() != null && field.getLookup() instanceof VIS.MLookup) {
+            //    var lInfo = field.getLookup().info;
+            //    if (lInfo.displayColSubQ && lInfo.displayColSubQ != "" && gt._tableName.toLowerCase() != lInfo.tableName.toLowerCase()) {
 
 
-                    if (selectDirect == null)
-                        selectDirect = new StringBuilder("SELECT ");
-                    else
-                        selectDirect.append(",");
+            //        if (selectDirect == null)
+            //            selectDirect = new StringBuilder("SELECT ");
+            //        else
+            //            selectDirect.append(",");
 
-                    var qryDirect = lInfo.queryDirect.substring(lInfo.queryDirect.lastIndexOf(' FROM ' + lInfo.tableName + ' '));
+            //        var qryDirect = lInfo.queryDirect.substring(lInfo.queryDirect.lastIndexOf(' FROM ' + lInfo.tableName + ' '));
 
-                    if (!field.getIsVirtualColumn())
-                        qryDirect = qryDirect.replace('@key', gt._tableName + '.' + field.getColumnSQL());
-                    else
-                        qryDirect = qryDirect.replace('@key', field.getColumnSQL(false));
+            //        if (!field.getIsVirtualColumn())
+            //            qryDirect = qryDirect.replace('@key', gt._tableName + '.' + field.getColumnSQL());
+            //        else
+            //            qryDirect = qryDirect.replace('@key', field.getColumnSQL(false));
 
 
-                    selectDirect.append("( SELECT (").append(lInfo.displayColSubQ).append(') ').append(qryDirect)
-                        .append(" ) AS ").append(field.getColumnSQL() + '_T')
-                        .append(',').append(field.getColumnSQL(true));
-                }
-            }
+            //        selectDirect.append("( SELECT (").append(lInfo.displayColSubQ).append(') ').append(qryDirect)
+            //            .append(" ) AS ").append(field.getColumnSQL() + '_T')
+            //            .append(',').append(field.getColumnSQL(true));
+            //    }
+            //}
 
-            else if (field.getLookup() != null && field.getLookup() instanceof VIS.MAccountLookup) {
-                if (selectDirect == null)
-                    selectDirect = new StringBuilder("SELECT ");
-                else
-                    selectDirect.append(",");
+            //else if (field.getLookup() != null && field.getLookup() instanceof VIS.MAccountLookup) {
+            //    if (selectDirect == null)
+            //        selectDirect = new StringBuilder("SELECT ");
+            //    else
+            //        selectDirect.append(",");
 
-                selectDirect.append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
-                    .append(gt._tableName + '.' + field.getColumnSQL()).append(" ) AS ").append(field.getColumnSQL() + '_T')
-                    .append(',').append(field.getColumnSQL(true));
+            //    selectDirect.append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
+            //        .append(gt._tableName + '.' + field.getColumnSQL()).append(" ) AS ").append(field.getColumnSQL() + '_T')
+            //        .append(',').append(field.getColumnSQL(true));
 
-            }
+            //}
         }
 
         selectSql = null;
 
         var randomNo = Math.random();
         if (hasImage) {
-            for (var im = 0; im < imgColName.length; im++)
-                select.append(", (SELECT ImageURL||'?random=" + randomNo + "' from AD_Image img where img.AD_Image_ID=CAST(" + gt._tableName + "." + imgColName[im] + " AS INTEGER)) as imgUrlColumn" + imgColName[im]);
+            for (var im = 0; im < imgColName.length; im++) {
+                //select.append(", (SELECT ImageURL||'?random=" + randomNo + "' from AD_Image img where img.AD_Image_ID=CAST(" + gt._tableName + "." + imgColName[im] + " AS INTEGER)) as imgUrlColumn" + imgColName[im]);
+
+                this.columns.push(", (SELECT ImageURL||'?random=" + randomNo + "' from AD_Image img where img.AD_Image_ID=CAST(" + gt._tableName + "." + imgColName[im] + " AS INTEGER)) as imgUrlColumn" + imgColName[im]);
+            }
         }
 
         //
@@ -3725,6 +3734,7 @@
                 this.log.Severe("Invalid NULL - " + _tableName + "=" + _whereClause);
             }
         }
+        this.whereClause = m_SQL_Where;
 
         this.SQL = this.SQL_Select + m_SQL_Where.toString();
         this.SQL_Count += m_SQL_Where.toString();
@@ -3780,53 +3790,71 @@
             this.dataRefreshAll();
             return true;
         }
-        //	create _SQL and m_countSQL
-        //this.createSelectSql();
-        //if (this.SQL == null || this.SQL.equals("")) {
-        //    //log.Log(Level.SEVERE, "No SQL");
-        //    return false;
-        //}
+        //create _SQL and m_countSQL
+        this.createSelectSql();
+        if (this.SQL == null || this.SQL.equals("") || !this.columns || this.columns.length==0) {
+            //log.Log(Level.SEVERE, "No SQL");
+            return false;
+        }
 
         this.rowCount = 0;
 
         var rCount = 0;
 
-        this.rowCount = rCount;
-
-        this.pazeSize = VIS.Env.getWINDOW_PAGE_SIZE();
-
-
-        //if (this.maxRows > 0 && this.rowCount > this.maxRows) {
-        //    /************************ Set Max Rows ***********************************/
-        //    // m_pstmt.setMaxRows(maxRows);
-        //    this.pazeSize = this.maxRows;
-        //    //info.Append(" - MaxRows=").Append(_maxRows);
-        //    this.rowChanged = this.maxRows;
+        //if (this.treeNode_ID > 0) {
+        //    $.ajax({
+        //        url: VIS.Application.contextUrl + "jsonData/GetRecordCountForTreeNode",
+        //        data: { sqlIn: this.gTable._whereClause, AD_Table_ID: this.AD_Table_ID, treeID: this.treeID, treeNodeID: this.treeNode_ID, windowNo: this.gTable._windowNo, summaryOnly: this.ShowSummaryNodes },
+        //        type: 'POST',
+        //        async: false,
+        //        success: function (resultt) {
+        //            rCount = JSON.parse(resultt);
+        //        },
+        //        error: function (e) { }
+        //    });
         //}
-
-        //else if (!this.dopaging || (this.pazeSize > this.rowCount)) {
-        //    this.pazeSize = this.rowCount;
-        //}
-
-        ///* Multi Delete may Decrease pages */
-        //if (this.dopaging) {
-        //    if ((this.rowCount + this.pazeSize) <= (this.currentPage * this.pazeSize)) {
-        //        --this.currentPage;
+        //else {
+        //    if (this.card_ID > 0) {
+        //        $.ajax({
+        //            url: VIS.Application.contextUrl + "jsonData/GetRecordCountWithCard",
+        //            data: { sql: VIS.secureEngine.encrypt(this.SQL_Count), cardID: this.card_ID },
+        //            type: 'POST',
+        //            async: false,
+        //            success: function (resultt) {
+        //                rCount = JSON.parse(resultt);
+        //            },
+        //            error: function (e) { }
+        //        });
+        //    } else {
+        //        rCount = executeDScalar(this.SQL_Count, null);
         //    }
+
         //}
 
+
+        //$.ajax({
+        //    url: VIS.Application.contextUrl + "jsonData/GetRecordCountForTreeNode",
+        //    data: { sqlIn: this.gTable._whereClause, AD_Table_ID: this.AD_Table_ID, treeID: this.treeID, treeNodeID: this.treeNode_ID, windowNo: this.gTable._windowNo, summaryOnly: this.ShowSummaryNodes },
+        //    type: 'POST',
+        //    async: false,
+        //    success: function (resultt) {
+        //        rCount = JSON.parse(resultt);
+        //    },
+        //    error: function (e) { }
+        //});
+
+        this.rowCount = rCount;
 
         this.bufferList.length = 0;
         var that = this;
 
-
-        //prepare josn 
-
-
-        //this.SQL_Count = VIS.secureEngine.encrypt(this.SQL_Count);
+        //this.pazeSize = VIS.Env.getWINDOW_PAGE_SIZE();
 
         var gFieldsIn = this.createGridFieldArr(this.gridFields, true);
-        //var dataIn = { sql: this.SQL, page: this.dopaging ? this.currentPage : 0, pageSize: this.dopaging ? this.pazeSize : 0, treeID: 0, treeNode_ID: 0, card_ID: this.card_ID, ad_Tab_ID: this.AD_Tab_ID, tableName: this.gTable._tableName };
+        var dataIn = {
+            page: this.dopaging ? this.currentPage : 0, pageSize: this.dopaging ? this.pazeSize : 0,
+            treeID: this.treeID, treeNode_ID: this.treeNode_ID, card_ID: this.card_ID, ad_Tab_ID: this.AD_Tab_ID, tableName: this.gTable._tableName
+        };
 
         var obscureFields = this.createObsecureFields(this.gridFields);
 
@@ -3835,22 +3863,20 @@
             url: baseUrl + "Window/GetWindowRecords",
             type: 'post',
             data: {
-                'ctxp': VIS.context.getWindowCtx(that.gTable._windowNo),
+                // 'ctxp': VIS.context.getWindowCtx(that.gTable._windowNo),
+                Columns: this.columns,
+                TableName: this.gTable._tableName,
+                WhereClause: VIS.secureEngine.encrypt(this.whereClause),
+                ObscureFields: obscureFields,
+                sqlIn: dataIn,
                 AD_Window_ID: that.gridFields[0].getAD_Window_ID(),
                 WindowNo: that.gTable._windowNo,
                 AD_Tab_ID: that.AD_Tab_ID,
-                WhereClause: VIS.secureEngine.encrypt(that.gTable._whereClause),
-                AD_tree_ID: that.treeID,
-                Node_ID: that.treeNode_ID,
                 SummaryOnly: that.ShowSummaryNodes,
-                CardID: that.card_ID,
                 Encryptedfields: gFieldsIn,
                 AD_Table_ID: that.AD_Table_ID,
-                ObscureFields: obscureFields,
                 MaxRows: that.maxRows,
-                CurrentPage: that.currentPage,
-                PageSize: that.pazeSize,
-                doPaging: that.dopaging
+                DoPaging: that.dopaging
             },
             success: function (jString) {
                 var retObj = JSON.parse(jString);
@@ -3888,7 +3914,83 @@
 
         });
 
+        
         return true;
+
+
+        //this.bufferList.length = 0;
+        //var that = this;
+
+
+        ////prepare josn 
+
+
+        ////this.SQL_Count = VIS.secureEngine.encrypt(this.SQL_Count);
+
+        //var gFieldsIn = this.createGridFieldArr(this.gridFields, true);
+        ////var dataIn = { sql: this.SQL, page: this.dopaging ? this.currentPage : 0, pageSize: this.dopaging ? this.pazeSize : 0, treeID: 0, treeNode_ID: 0, card_ID: this.card_ID, ad_Tab_ID: this.AD_Tab_ID, tableName: this.gTable._tableName };
+
+        //var obscureFields = this.createObsecureFields(this.gridFields);
+
+
+        //$.ajax({
+        //    url: baseUrl + "Window/GetWindowRecords",
+        //    type: 'post',
+        //    data: {
+        //        'ctxp': VIS.context.getWindowCtx(that.gTable._windowNo),
+        //        AD_Window_ID: that.gridFields[0].getAD_Window_ID(),
+        //        WindowNo: that.gTable._windowNo,
+        //        AD_Tab_ID: that.AD_Tab_ID,
+        //        WhereClause: VIS.secureEngine.encrypt(that.gTable._whereClause),
+        //        AD_tree_ID: that.treeID,
+        //        Node_ID: that.treeNode_ID,
+        //        SummaryOnly: that.ShowSummaryNodes,
+        //        CardID: that.card_ID,
+        //        Encryptedfields: gFieldsIn,
+        //        AD_Table_ID: that.AD_Table_ID,
+        //        ObscureFields: obscureFields,
+        //        MaxRows: that.maxRows,
+        //        CurrentPage: that.currentPage,
+        //        PageSize: that.pazeSize,
+        //        doPaging: that.dopaging
+        //    },
+        //    success: function (jString) {
+        //        var retObj = JSON.parse(jString);
+        //        if (retObj.RecordCount > 0) {
+        //            that.rowCount = retObj.RecordCount;
+        //            that.isOpen = true;
+        //            //
+        //            that.changed = false;
+        //            that.rowChanged = -1;
+        //            that.fillData(retObj);
+
+        //        }
+        //        else {
+        //            //console.log("clear");
+        //            if (that.bufferList != null) { that.bufferList.length = 0; };
+        //            if (that.mSortList != null) {
+        //                that.mSortList = null;
+        //            }
+        //            that.currentPage = 1;
+
+        //            that.isOpen = true;
+        //            //
+        //            that.changed = false;
+        //            that.rowChanged = -1;
+
+        //            //call Query Complete
+        //            window.setTimeout(function (t) {
+        //                that.fireQueryCompleted(true);//Inform GridController   
+        //            }, 300, that);
+        //        }
+        //    },
+        //    error: function () {
+
+        //    }
+
+        //});
+
+        //return true;
     };
 
     GridTable.prototype.fillData = function (retObj) {
@@ -4601,7 +4703,7 @@
             $.ajax({
                 url: baseUrl + "Window/GetWindowRecord",
                 async: false,
-                type:'post',
+                type: 'post',
                 data: {
                     'ctxp': VIS.context.getWindowCtx(this.gTable._windowNo),
                     AD_Window_ID: this.gridFields[0].getAD_Window_ID(),
