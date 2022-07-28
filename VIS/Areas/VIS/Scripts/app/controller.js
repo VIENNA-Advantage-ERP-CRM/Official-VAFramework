@@ -4705,7 +4705,8 @@
                 async: false,
                 type: 'post',
                 data: {
-                    'ctxp': VIS.context.getWindowCtx(this.gTable._windowNo),
+                    Columns: this.columns,
+                    TableName: this.gTable._tableName,
                     AD_Window_ID: this.gridFields[0].getAD_Window_ID(),
                     AD_Tab_ID: this.AD_Tab_ID,
                     WindowNo: this.gTable._windowNo,

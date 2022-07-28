@@ -290,33 +290,56 @@ namespace VIS.Areas.VIS.Controllers
 
         }
 
-        //[HttpPost]
-        //public JsonResult GetWindowRecord(Ctx ctxp, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
-        //{
-        //    Ctx ctx = new Ctx(ctxp);
-        //    object data = null;
-        //    if (!string.IsNullOrEmpty(WhereClause))
-        //    {
-        //        WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctx.GetSecureKey());
-        //        if (!QueryValidator.IsValid(WhereClause))
-        //            return null;
-        //    }
-        //    else
-        //        WhereClause = "1=2";
+        [HttpPost]
+        public JsonResult GetWindowRecord(List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
+        {
+            object data = null;
+            Ctx ctx = Session["ctx"] as Ctx;
+            if (!string.IsNullOrEmpty(WhereClause))
+            {
+                WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctx.GetSecureKey());
+                if (!QueryValidator.IsValid(WhereClause))
+                    return null;
+            }
+            else
+                WhereClause = "1=2";
 
-        //    GridWindowVO vo = AEnv.GetMWindowOriginalVO(ctx, WindowNo, AD_Window_ID, 0);
-        //    string SelectSQL = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().SelectSQL;
-        //    if (!string.IsNullOrEmpty(SelectSQL))
-        //    {
-        //        SelectSQL += " WHERE " + WhereClause;
+            GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
 
-        //        using (var w = new WindowHelper())
-        //        {
-        //            data = w.GetWindowRecord(SelectSQL, Encryptedfields, ctx, ObscureFields);
-        //        }
-        //    }
-        //    return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
-        //}
+            GridTabVO gt = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
+            List<GridFieldVO> lstFields = gt.GetFields();
+
+            if (gt.TableName != TableName)
+                return null;
+
+            for (int i = 0; i < Columns.Count; i++)
+            {
+                GridFieldVO gField = lstFields.Where(a => a.ColumnName == Columns[i]).FirstOrDefault();
+
+                if (gField == null)
+                {
+                    gField = lstFields.Where(a => a.ColumnSQL + " AS " + a.ColumnName == Columns[i]).FirstOrDefault();
+                }
+
+                if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
+                    && Columns[i] != "Created" && Columns[i] != "CreatedBy")
+                {
+                    return null;
+                }
+            }
+
+            string SelectSQL  = "SELECT " + String.Join(",", Columns) + " FROM " + TableName;
+            if (!string.IsNullOrEmpty(SelectSQL))
+            {
+                SelectSQL += " WHERE " + WhereClause;
+
+                using (var w = new WindowHelper())
+                {
+                    data = w.GetWindowRecord(SelectSQL, Encryptedfields, ctx, ObscureFields);
+                }
+            }
+            return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
+        }
 
 
         [HttpPost]
