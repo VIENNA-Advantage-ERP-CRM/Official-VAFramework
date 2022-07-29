@@ -788,6 +788,7 @@
     <Compile Include="Areas\VIS\Controllers\VImageFormController.cs" />
     <Compile Include="Areas\VIS\Controllers\VSetupController.cs" />
     <Compile Include="Areas\VIS\Controllers\WFActivityController.cs" />
+    <Compile Include="Areas\VIS\Controllers\WindowController.cs" />
     <Compile Include="Areas\VIS\Filters\AjaxAuthorizeAttribute.cs" />
     <Compile Include="Areas\VIS\Filters\AjaxSessionFilterAttribute.cs" />
     <Compile Include="Areas\VIS\Filters\AjaxValidateAntiForgeryTokenAttribute.cs" />

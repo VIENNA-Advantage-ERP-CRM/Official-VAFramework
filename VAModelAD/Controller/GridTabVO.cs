@@ -949,13 +949,16 @@ namespace VAdvantage.Controller
 
             //Tab Panles
             clone.panels = new List<GridTabPanelVO>();
-            for (int i = 0; i < panels.Count; i++)
+            if (panels != null)
             {
-                GridTabPanelVO tpo = panels[i];
-                GridTabPanelVO clonetp = tpo.Clone(myCtx, windowNo);
-                if (clonetp == null)
-                    return null;
-                clone.panels.Add(clonetp);
+                for (int i = 0; i < panels.Count; i++)
+                {
+                    GridTabPanelVO tpo = panels[i];
+                    GridTabPanelVO clonetp = tpo.Clone(myCtx, windowNo);
+                    if (clonetp == null)
+                        return null;
+                    clone.panels.Add(clonetp);
+                }
             }
             if (clone.panels != null && clone.panels.Count > 0)
             {
