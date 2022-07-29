@@ -291,10 +291,10 @@ namespace VIS.Areas.VIS.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetWindowRecord(List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
+        public JsonResult GetWindowRecord(Ctx ctxp, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
         {
             object data = null;
-            Ctx ctx = Session["ctx"] as Ctx;
+            Ctx ctx = new Ctx(ctxp);
             if (!string.IsNullOrEmpty(WhereClause))
             {
                 WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctx.GetSecureKey());
@@ -316,9 +316,18 @@ namespace VIS.Areas.VIS.Controllers
             {
                 GridFieldVO gField = lstFields.Where(a => a.ColumnName == Columns[i]).FirstOrDefault();
 
-                if (gField == null)
+                if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
                 {
-                    gField = lstFields.Where(a => a.ColumnSQL + " AS " + a.ColumnName == Columns[i]).FirstOrDefault();
+                    string selectSQL = GetColumnSQL(true, gField);
+
+                    if (selectSQL.IndexOf("@") == -1)
+                    {
+                        Columns[i] = selectSQL;   //	ColumnName or Virtual Column
+                    }
+                    else
+                    {
+                        Columns[i] = Env.ParseContext(ctx, WindowNo, selectSQL, false);
+                    }
                 }
 
                 if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
@@ -328,7 +337,19 @@ namespace VIS.Areas.VIS.Controllers
                 }
             }
 
-            string SelectSQL  = "SELECT " + String.Join(",", Columns) + " FROM " + TableName;
+            List<GridFieldVO> imgColList = lstFields.Where(a => a.AD_Reference_ID == DisplayType.Image).ToList();
+
+
+
+            if (imgColList != null && imgColList.Count > 0)
+            {
+                for (int j = 0; j < imgColList.Count; j++)
+                {
+                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                }
+            }
+
+            string SelectSQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName;
             if (!string.IsNullOrEmpty(SelectSQL))
             {
                 SelectSQL += " WHERE " + WhereClause;
@@ -343,7 +364,7 @@ namespace VIS.Areas.VIS.Controllers
 
 
         [HttpPost]
-        public JsonResult GetWindowRecords(List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
+        public JsonResult GetWindowRecords(Ctx ctx, List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
             int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging)
         {
             WindowRecordOut resultData = new WindowRecordOut();
@@ -354,14 +375,12 @@ namespace VIS.Areas.VIS.Controllers
             }
             else
             {
-
-                Ctx ctx = Session["ctx"] as Ctx;
-
-                WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctx.GetSecureKey());
+                Ctx ctxp = new Ctx(ctx);
+                WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctxp.GetSecureKey());
                 if (!QueryValidator.IsValid(WhereClause))
                     return null;
 
-                GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+                GridWindowVO vo = AEnv.GetMWindowVO(ctxp, WindowNo, AD_Window_ID, 0);
 
                 GridTabVO gt = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
                 List<GridFieldVO> lstFields = gt.GetFields();
@@ -373,10 +392,24 @@ namespace VIS.Areas.VIS.Controllers
                 {
                     GridFieldVO gField = lstFields.Where(a => a.ColumnName == Columns[i]).FirstOrDefault();
 
-                    if (gField == null)
+                    if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
                     {
-                        gField = lstFields.Where(a => a.ColumnSQL +" AS "+ a.ColumnName == Columns[i]).FirstOrDefault();
+                        string selectSQL = GetColumnSQL(true, gField);
+
+                        if (selectSQL.IndexOf("@") == -1)
+                        {
+                            Columns[i] = selectSQL;   //	ColumnName or Virtual Column
+                        }
+                        else
+                        {
+                            Columns[i] = Env.ParseContext(ctxp, WindowNo, selectSQL, false);
+                        }
                     }
+
+                    //if (gField == null)
+                    //{
+                    //    gField = lstFields.Where(a => a.ColumnSQL + " AS " + a.ColumnName == Columns[i]).FirstOrDefault();
+                    //}
 
                     if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
                         && Columns[i] != "Created" && Columns[i] != "CreatedBy")
@@ -384,7 +417,23 @@ namespace VIS.Areas.VIS.Controllers
                         return null;
                     }
                 }
-                if (!WhereClause.Trim().ToUpper().StartsWith("WHERE"))
+
+                List<GridFieldVO> imgColList = lstFields.Where(a => a.AD_Reference_ID == DisplayType.Image).ToList();
+
+
+
+                if (imgColList != null && imgColList.Count > 0)
+                {
+                    for (int j = 0; j < imgColList.Count; j++)
+                    {
+                        Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    }
+                }
+
+                //, (SELECT ImageURL||'?random=0.5205978521522949' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumnAD_Image_ID
+
+
+                if (!string.IsNullOrEmpty(WhereClause) && !WhereClause.Trim().ToUpper().StartsWith("WHERE"))
                 {
                     WhereClause = " WHERE " + WhereClause;
                 }
@@ -392,14 +441,14 @@ namespace VIS.Areas.VIS.Controllers
                 string SQL_Count = "SELECT COUNT(*) FROM " + TableName + " " + WhereClause;
                 string SQL_Direct = "";
 
-                SQL_Count = MRole.GetDefault(ctx).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                SQL_Count = MRole.GetDefault(ctxp).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
 
                 int rCount = 0;
                 if (sqlIn.tree_id > 0)
                 {
                     using (var w = new WindowHelper())
                     {
-                        rCount = w.GetRecordCountForTreeNode(WhereClause, ctx, gt.AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, WindowNo, summaryOnly);
+                        rCount = w.GetRecordCountForTreeNode(WhereClause, ctxp, gt.AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, WindowNo, summaryOnly);
                     }
                 }
                 else
@@ -421,7 +470,7 @@ namespace VIS.Areas.VIS.Controllers
                 {
                     /************************ Set Max Rows ***********************************/
                     // m_pstmt.setMaxRows(maxRows);
-                   sqlIn.pageSize = MaxRows;
+                    sqlIn.pageSize = MaxRows;
                     //info.Append(" - MaxRows=").Append(_maxRows);
                     //rowChanged = MaxRows;
                 }
@@ -513,14 +562,14 @@ namespace VIS.Areas.VIS.Controllers
                     {
                         using (var w = new WindowHelper())
                         {
-                            resultData = w.GetWindowRecordsForTreeNode(sqlIn, Fields, ctx, rCount, SQL_Count, AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, ObscureFields);
+                            resultData = w.GetWindowRecordsForTreeNode(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, ObscureFields);
                         }
                     }
                     else
                     {
                         using (var w = new WindowHelper())
                         {
-                            resultData = w.GetWindowRecords(sqlIn, Fields, ctx, rCount, SQL_Count, AD_Table_ID, ObscureFields);
+                            resultData = w.GetWindowRecords(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, ObscureFields);
                         }
                     }
                 }

@@ -313,7 +313,7 @@ namespace VIS.Controllers
                     using (var w = new WindowHelper())
                     {
                         Ctx ctx = Session["ctx"] as Ctx;
-                        gridTable.SelectSQL = SecureEngineBridge.DecryptByClientKey(gridTable.SelectSQL, ctx.GetSecureKey());
+                        //gridTable.SelectSQL = SecureEngineBridge.DecryptByClientKey(gridTable.SelectSQL, ctx.GetSecureKey());
 
                         gOut = w.InsertOrUpdateRecord(gridTable, Session["ctx"] as Ctx);
                     }

@@ -3638,24 +3638,24 @@
                 select.append(", ");
             }
             var field = this.gridFields[i];
-            selectSql = field.getColumnSQL(true);
-            if (selectSql.indexOf("@") == -1) {
+            //selectSql = field.getColumnSQL(true);
+            //if (selectSql.indexOf("@") == -1) {
                 // select.append(selectSql);	//	ColumnName or Virtual Column
-                this.columns.push(selectSql);
-            }
-            else {
-               // select.append(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
-                this.columns.push(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
-            }
+            this.columns.push(field.getColumnName());
+            //}
+            //else {
+            //   // select.append(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
+            //    this.columns.push(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
+            //}
 
             
 
 
-            if (field.getDisplayType() == VIS.DisplayType.Image) {
-                imgColName.push(selectSql);
-                hasImage = true;
-                // select.append(", (SELECT ImageURL from AD_Image img where img.AD_Image_ID=" + gt._tableName+"."+ selectSql+") as imgUrlColumn");
-            }
+            //if (field.getDisplayType() == VIS.DisplayType.Image) {
+            //    imgColName.push(selectSql);
+            //    hasImage = true;
+            //    // select.append(", (SELECT ImageURL from AD_Image img where img.AD_Image_ID=" + gt._tableName+"."+ selectSql+") as imgUrlColumn");
+            //}
 
             //if (field.getLookup() != null && field.getLookup() instanceof VIS.MLookup) {
             //    var lInfo = field.getLookup().info;
@@ -3696,14 +3696,14 @@
 
         selectSql = null;
 
-        var randomNo = Math.random();
-        if (hasImage) {
-            for (var im = 0; im < imgColName.length; im++) {
-                //select.append(", (SELECT ImageURL||'?random=" + randomNo + "' from AD_Image img where img.AD_Image_ID=CAST(" + gt._tableName + "." + imgColName[im] + " AS INTEGER)) as imgUrlColumn" + imgColName[im]);
+        //var randomNo = Math.random();
+        //if (hasImage) {
+        //    for (var im = 0; im < imgColName.length; im++) {
+        //        //select.append(", (SELECT ImageURL||'?random=" + randomNo + "' from AD_Image img where img.AD_Image_ID=CAST(" + gt._tableName + "." + imgColName[im] + " AS INTEGER)) as imgUrlColumn" + imgColName[im]);
 
-                this.columns.push(", (SELECT ImageURL||'?random=" + randomNo + "' from AD_Image img where img.AD_Image_ID=CAST(" + gt._tableName + "." + imgColName[im] + " AS INTEGER)) as imgUrlColumn" + imgColName[im]);
-            }
-        }
+        //        this.columns.push(", (SELECT ImageURL||'?random=" + randomNo + "' from AD_Image img where img.AD_Image_ID=CAST(" + gt._tableName + "." + imgColName[im] + " AS INTEGER)) as imgUrlColumn" + imgColName[im]);
+        //    }
+        //}
 
         //
         select.append(" FROM ").append(gt._tableName);
@@ -3711,13 +3711,10 @@
 
         this.SQL_Select = select.toString();
         this.SQL_Count = "SELECT COUNT(*) FROM " + gt._tableName;
+
         //
 
         var m_SQL_Where = new StringBuilder("");
-
-
-
-
 
         //	WHERE
         var _whereClause = gt._whereClause;
@@ -3863,7 +3860,7 @@
             url: baseUrl + "Window/GetWindowRecords",
             type: 'post',
             data: {
-                // 'ctxp': VIS.context.getWindowCtx(that.gTable._windowNo),
+                'ctx': VIS.context.getWindowCtx(that.gTable._windowNo),
                 Columns: this.columns,
                 TableName: this.gTable._tableName,
                 WhereClause: VIS.secureEngine.encrypt(this.whereClause),
@@ -4422,10 +4419,12 @@
             Fields: gFields,
             AD_Client_ID: AD_Client_ID,
             AD_Org_ID: AD_Org_ID,
-            SelectSQL: VIS.secureEngine.encrypt(this.SQL_Select),
+            Columns: this.columns,
             AD_WIndow_ID: m_fields[0].getAD_Window_ID(), // vinay bhatt window id
             MaintainVersions: false,
-            UnqFields: this.gFieldUnique
+            UnqFields: this.gFieldUnique,
+            Ctx: VIS.context.getWindowCtx(this.gTable._windowNo),
+            WindowNo: this.gTable._windowNo
             //ImmediateSave: true,
             //ValidFrom: new Date().toISOString(),
         };
@@ -4705,6 +4704,7 @@
                 async: false,
                 type: 'post',
                 data: {
+                    ctxp: VIS.context.getWindowCtx(this.gTable._windowNo),
                     Columns: this.columns,
                     TableName: this.gTable._tableName,
                     AD_Window_ID: this.gridFields[0].getAD_Window_ID(),
@@ -6037,7 +6037,7 @@
             //if (this.getObscureType().length > 0) {
 
             //}
-            return this.vo.ColumnName;
+            return this.vo.ColumnSQL;
         }
     };
 
