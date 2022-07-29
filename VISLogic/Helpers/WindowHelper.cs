@@ -837,7 +837,7 @@ namespace VIS.Helpers
             var m_fields = inn.Fields;
             int AD_Table_ID = inn.AD_Table_ID;
             string whereClause = inn.WhereClause;
-            string SQL_Select = inn.SelectSQL;
+            List<String> lstColumns = inn.Columns;
             bool inserting = inn.Inserting;
             bool compareDB = inn.CompareDB;
             List<String> UnqFields = inn.UnqFields;
@@ -1225,7 +1225,37 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
-            String refreshSQL = SQL_Select + " WHERE " + whereC;
+            for (int i = 0; i < lstColumns.Count; i++)
+            {
+                WindowField gField = m_fields.Where(a => a.ColumnName == lstColumns[i]).FirstOrDefault();
+                if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
+                {
+                    string selectSQL = GetColumnSQL(false, gField);
+
+                    if (selectSQL.IndexOf("@") == -1)
+                    {
+                        lstColumns[i] = selectSQL;   //	ColumnName or Virtual Column
+                    }
+                    else
+                    {
+                        lstColumns[i] = Env.ParseContext(ctx, inn.WindowNo, selectSQL, false);
+                    }
+                }
+            }
+
+            List<WindowField> imgColList = m_fields.Where(a => a.DisplayType == DisplayType.Image).ToList();
+
+            if (imgColList != null && imgColList.Count > 0)
+            {
+                for (int j = 0; j < imgColList.Count; j++)
+                {
+                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                }
+            }
+
+            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+
+            String refreshSQL = SQL_Select + " FROM "+inn.TableName+ " WHERE " + whereC;
 
             IDataReader dr = null;
             outt.RowData = rowData;
@@ -1317,6 +1347,39 @@ namespace VIS.Helpers
             }
             if (!inn.MaintainVersions)
                 outt.Status = GridTable.SAVE_OK;
+        }
+
+        public string GetColumnSQL(bool withAS, WindowField field)
+        {
+            //(case o.ISACTIVE when 'Y' then 'True' else 'False' end) as Active,
+            string columnSQL = field.ColumnSQL;
+            string columnName = field.ColumnName;
+            int displayType = field.DisplayType;
+            if (columnSQL != null && columnSQL.Length > 0)
+            {
+                if (withAS)
+                {
+                    if (displayType == DisplayType.YesNo)
+                    {
+                        return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) " + " AS " + columnName;
+                    }
+                    return columnSQL + " AS " + columnName;
+                }
+                else
+                {
+                    if (displayType == DisplayType.YesNo)
+                    {
+                        return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) ";
+                    }
+                    return columnSQL;
+                }
+            }
+            if (displayType == DisplayType.YesNo)
+            {
+                return " (case " + columnName + " when 'Y' then 'True' else 'False' end) AS " + columnName;
+            }
+            return columnName;
+
         }
 
         /// <summary>
@@ -1901,7 +1964,7 @@ namespace VIS.Helpers
                                 rowData[colLower] = value;
                             }
                         }
-                       
+
                         //	String
                         else
                             rowData[colLower] = dr[j].ToString();//string
@@ -2204,20 +2267,23 @@ namespace VIS.Helpers
         /// <param name="sql"></param>
         /// <param name="cardID"></param>
         /// <returns></returns>
-        public int GetRecordCountWithCard(string sql, int cardID) {
-            string cardCondition =Util.GetValueOfString(DB.ExecuteScalar("SELECT excludedGroup FROM AD_CARDVIEW WHERE AD_CARDVIEW_ID=" + cardID));
-            if (!string.IsNullOrEmpty(cardCondition)) {
-                string[] textSplit = cardCondition.Split(',');                
+        public int GetRecordCountWithCard(string sql, int cardID)
+        {
+            string cardCondition = Util.GetValueOfString(DB.ExecuteScalar("SELECT excludedGroup FROM AD_CARDVIEW WHERE AD_CARDVIEW_ID=" + cardID));
+            if (!string.IsNullOrEmpty(cardCondition))
+            {
+                string[] textSplit = cardCondition.Split(',');
                 if (textSplit.Length > 0)
                 {
                     string whereCondition = "";
-                    for (int i = 0; i < textSplit.Length; i++) {
+                    for (int i = 0; i < textSplit.Length; i++)
+                    {
                         whereCondition += "'" + textSplit[i] + "'";
                         if (i != (textSplit.Length - 1))
                         {
                             whereCondition += ",";
                         }
-                     }
+                    }
                     if (sql.LastIndexOf("ORDER") != -1)
                     {
                         sql = sql.Substring(0, sql.LastIndexOf("ORDER"));
@@ -2250,7 +2316,7 @@ namespace VIS.Helpers
             JTable obj = null;
             if (sqlIn.card_ID > 0)
             {
-                string SQL = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf(" FROM "+ sqlIn.tableName));
+                string SQL = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf(" FROM " + sqlIn.tableName));
                 SQL = SQL.Substring(0, SQL.LastIndexOf("ORDER"));
                 retVal.CardViewTpl = WindowHelper.GetCardViewDetail(0, sqlIn.ad_Tab_ID, ctx, sqlIn.card_ID, SQL);
                 if (retVal.CardViewTpl.DisableWindowPageSize)
@@ -2279,20 +2345,20 @@ namespace VIS.Helpers
                         }
                         condition = whereCondition + " AND (" + retVal.CardViewTpl.FieldGroupName + " NOT IN (" + ExcludedGroup + ") OR " + retVal.CardViewTpl.FieldGroupName + " IS NULL )";
                     }
-                        
+
                 }
                 else
                 {
                     condition = whereCondition;
                 }
-                
+
                 if (!string.IsNullOrEmpty(retVal.CardViewTpl.OrderByClause))
                 {
                     condition = condition + " ORDER BY " + retVal.CardViewTpl.OrderByClause;
                 }
                 else
                 {
-                    condition = condition + " "+ orderBY;
+                    condition = condition + " " + orderBY;
                 }
                 if (!string.IsNullOrEmpty(condition))
                 {
@@ -3045,9 +3111,9 @@ namespace VIS.Helpers
         /// clean up
         /// </summary>
 
-        public static CardViewData GetCardViewDetail(int AD_Window_ID, int AD_Tab_ID, Ctx ctx, int AD_CardView_ID,string SQL)
+        public static CardViewData GetCardViewDetail(int AD_Window_ID, int AD_Tab_ID, Ctx ctx, int AD_CardView_ID, string SQL)
         {
-            
+
             VAdvantage.Common.Common cFun = new VAdvantage.Common.Common();
             CardViewData cv = cFun.GetCardViewDetails(ctx.GetAD_User_ID(), AD_Tab_ID, AD_CardView_ID, ctx, SQL);
             return cv;
@@ -3122,11 +3188,11 @@ namespace VIS.Helpers
         {
             List<CardsInfo> cards = new List<CardsInfo>();
             // Get Login user's default card and other cards of  current tab
-          DataSet  ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(@" SELECT AD_CardView.ad_cardview_id, AD_CardView.name,AD_DefaultCardView.ad_cardview_id as dcard,AD_CardView.CreatedBy FROM AD_CardView AD_CardView
+            DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(@" SELECT AD_CardView.ad_cardview_id, AD_CardView.name,AD_DefaultCardView.ad_cardview_id as dcard,AD_CardView.CreatedBy FROM AD_CardView AD_CardView
    LEFT OUTER JOIN AD_DefaultCardView AD_DefaultCardView ON (  AD_CardView.ad_cardview_id=AD_DefaultCardView.ad_cardview_id AND AD_DefaultCardView.IsActive='Y' AND AD_DefaultCardView.AD_User_ID=" + ctx.GetAD_User_ID() + @")
                         WHERE  AD_CardView.AD_Tab_ID=" + AD_Tab_ID + @" AND AD_CardView.IsActive = 'Y'   AND ( AD_CardView.ad_user_id IS NULL
-                                                          OR AD_CardView.ad_user_id = " + ctx.GetAD_User_ID()+ @") " +
-                        "ORDER BY lower(AD_CardView.name) ASC", "AD_CardView", true, false));
+                                                          OR AD_CardView.ad_user_id = " + ctx.GetAD_User_ID() + @") " +
+                          "ORDER BY lower(AD_CardView.name) ASC", "AD_CardView", true, false));
 
             if (ds == null || ds.Tables[0].Rows.Count == 0)
             {
@@ -3157,7 +3223,7 @@ namespace VIS.Helpers
         }
 
 
-    
+
         public void Dispose()
         {
             _createSqlColumn.Clear();
@@ -3307,7 +3373,7 @@ namespace VIS.Helpers
 
 
         }
-       
+
         /// <summary>
         /// Method to get parent tab records ID.
         /// </summary>
