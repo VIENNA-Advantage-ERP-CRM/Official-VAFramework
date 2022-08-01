@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -6,8 +7,12 @@ using System.Linq;
 using System.Web;
 using System.Web.Hosting;
 using VAdvantage.Classes;
+using VAdvantage.Controller;
 using VAdvantage.Model;
+using VAdvantage.SqlExec.MSSql;
 using VAdvantage.Utility;
+using VIS.DataContracts;
+using VIS.Models;
 
 namespace VIS.Classes
 {
@@ -23,10 +28,116 @@ namespace VIS.Classes
 
         }
 
-        public static string [] GetKeyColumns(int AD_Table_ID,Ctx ctx)
+        public static string[] GetKeyColumns(int AD_Table_ID, Ctx ctx)
         {
             //return new MTable(ctx, AD_Table_ID, null).GetKeyColumns();
             return MTable.Get(ctx, AD_Table_ID).GetKeyColumns();
+        }
+
+        public Object GetLookupData(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, int PageSize)
+        {
+            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID);
+            string lookupQuery = lInfo.query;
+            string validation = lInfo.validationCode;
+            if (!string.IsNullOrEmpty(validation))
+            {
+                if (!string.IsNullOrEmpty(Values))
+                {
+                    List<LookUpData> data = JsonConvert.DeserializeObject<List<LookUpData>>(Values);
+
+                    if (data != null && data.Count > 0)
+                    {
+                        for (int i = 0; i < data.Count; i++)
+                        {
+                            validation = validation.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
+                        }
+                    }
+                }
+
+                var posFrom = lookupQuery.LastIndexOf(" FROM ");
+                var hasWhere = lookupQuery.IndexOf(" WHERE ", posFrom) != -1;
+                //
+                var posOrder = lookupQuery.LastIndexOf(" ORDER BY ");
+                if (posOrder != -1)
+                    lookupQuery = lookupQuery.Substring(0, posOrder) + (hasWhere ? " AND " : " WHERE ") + validation + lookupQuery.Substring(posOrder);
+                else
+                    lookupQuery += (hasWhere ? " AND " : " WHERE ") + validation;
+            }
+
+            VIS.Helpers.SqlHelper h = new VIS.Helpers.SqlHelper();
+            SqlParamsIn sqlIn = new SqlParamsIn()
+            {
+                sql = lookupQuery,
+            };
+
+            if (PageSize > 0)
+                sqlIn.pageSize = PageSize;
+
+            object result = h.ExecuteJDataSet(sqlIn);
+            return result;
+        }
+
+
+        public Object GetLookupAll(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, int PageSize)
+        {
+            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID);
+            string lookupQuery = lInfo.queryAll;
+            string validation = lInfo.validationCode;
+
+            VIS.Helpers.SqlHelper h = new VIS.Helpers.SqlHelper();
+            SqlParamsIn sqlIn = new SqlParamsIn()
+            {
+                sql = lookupQuery,
+            };
+
+            if (PageSize > 0)
+                sqlIn.pageSize = PageSize;
+
+            object result = h.ExecuteJDataSet(sqlIn);
+            return result;
+        }
+
+        public Object GetLookupDirect(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key, bool IsNumber)
+        {
+            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID);
+            string lookupQuery = lInfo.queryDirect;
+            List<SqlParams> listParam = new List<SqlParams>();
+            string key = "";
+            if (Key != null)
+                key = ((string[])Key)[0];
+
+
+            SqlParams parm = new SqlParams();
+
+            parm.name = "@key";
+            if (IsNumber)
+            {
+                parm.value = Convert.ToInt32(key);
+            }
+            else
+            {
+                parm.value = Convert.ToString(key);
+            }
+            listParam.Add(parm);
+
+            VIS.Helpers.SqlHelper h = new VIS.Helpers.SqlHelper();
+            SqlParamsIn sqlIn = new SqlParamsIn()
+            {
+                sql = lookupQuery,
+                param = listParam
+            };
+
+            object result = h.ExecuteJDataSet(sqlIn);
+            return result;
+        }
+
+        private VLookUpInfo GetLookupInfo(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID)
+        {
+            GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+
+            VLookUpInfo lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+
+            return lInfo;
         }
     }
 

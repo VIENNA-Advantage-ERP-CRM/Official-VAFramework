@@ -29,7 +29,10 @@ namespace VIS.Classes
                     return false;
             }
 
-            return true;
+            if (sql.IndexOf("/*") > -1 || sql.IndexOf("//")>-1)
+                return false;
+
+                return true;
         }
 
     }

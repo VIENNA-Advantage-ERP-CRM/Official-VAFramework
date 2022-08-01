@@ -91,6 +91,7 @@
     <Compile Include="Classes\ContactsInfo.cs" />
     <Compile Include="Classes\LoginProcess.cs" />
     <Compile Include="Classes\QueryCollection.cs" />
+    <Compile Include="Classes\QueryValidator.cs" />
     <Compile Include="Classes\SecureEngineBridge.cs" />
     <Compile Include="DataContracts\FormData.cs" />
     <Compile Include="DataContracts\InfoSchema.cs" />

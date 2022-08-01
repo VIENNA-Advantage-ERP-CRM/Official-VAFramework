@@ -742,7 +742,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
-    <Compile Include="Areas\VIS\Classes\QueryValidator.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountController.cs" />
     <Compile Include="Areas\VIS\Controllers\AmountDivisionController.cs" />
     <Compile Include="Areas\VIS\Controllers\ArchiveViewerController.cs" />
