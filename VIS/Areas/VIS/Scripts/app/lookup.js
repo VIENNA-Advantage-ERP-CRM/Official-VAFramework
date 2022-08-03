@@ -308,7 +308,7 @@
 
 
     //1.  MLookup wrapper class for lookup json Object 
-    function MLookup(lookupInfo, lookup, AD_Window_ID, AD_Field_ID, AD_Tab_ID) {
+    function MLookup(lookupInfo, lookup, AD_Window_ID, AD_Field_ID, AD_Tab_ID, lookupData) {
         Lookup.call(this, lookupInfo, lookup);
         /** Save getDirect last return value */
         this.lookupDirect = {};
@@ -317,6 +317,7 @@
         this.AD_Window_ID = AD_Window_ID;
         this.AD_Field_ID = AD_Field_ID;
         this.AD_Tab_ID = AD_Tab_ID;
+        this.lookupData = lookupData;
         this.loading = false;
 
         this.nextRead = 0;
@@ -668,13 +669,15 @@
             $.ajax({
                 url: VIS.Application.contextUrl + "Lookup/GetLookupDirect",
                 async: false,
+                type: 'post',
                 data: {
                     WindowNo: self.getWindowNo(),
                     AD_Window_ID: self.AD_Window_ID,
                     AD_Tab_ID: self.AD_Tab_ID,
                     AD_Field_ID: self.AD_Field_ID,
                     Key: key,
-                    IsNumber: isNumber
+                    IsNumber: isNumber,
+                    LookupData: JSON.stringify(self.lookupData)
                 },
                 success: function (data) {
                     var dr = new VIS.DB.DataReader().toJson(data);
@@ -684,35 +687,35 @@
 
                         var isActive = dr.getString(3).equals("Y");
                         if (!isActive) {
-                            name = this.INACTIVE_S + name + this.INACTIVE_E;
-                            this.hasInactive = true;
+                            name = self.INACTIVE_S + name + self.INACTIVE_E;
+                            self.hasInactive = true;
                         }
 
                         if (isNumber) {
                             var keyValue = dr.getInt(0);
                             var p = { Key: keyValue, Name: VIS.Utility.encodeText(name) };
                             if (saveInCache) // save if
-                                this.lookup[" " + keyValue] = p;
+                                self.lookup[" " + keyValue] = p;
                             directValue = p;
                         } else {
                             var value = dr.getString(1);
                             var p1 = { Key: value, Name: VIS.Utility.encodeText(name) };
                             if (saveInCache) // save if
-                                this.lookup[" " + value] = p1;
+                                self.lookup[" " + value] = p1;
                             directValue = p1;
                         }
                         if (dr.read()) {
-                            this.log.log(VIS.Logging.Level.SEVERE, this.info.keyColumn
+                            self.log.log(VIS.Logging.Level.SEVERE, self.info.keyColumn
                                 + ": Not unique (first returned) for " + key);
                         }
 
                     } else {
-                        this.directNullKey = key;
+                        self.directNullKey = key;
                         directValue = null;
                     }
                 },
                 error: function (er) {
-                    this.log.log(VIS.Logging.Level.SEVERE, er);
+                    self.log.log(VIS.Logging.Level.SEVERE, er);
                 }
             });
 
@@ -2139,7 +2142,7 @@
             //    + "&isParent=" + isParent + "&validationCode="+validationCode;
 
             var lookup = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetLookup", d);
-            var df = new VIS.MLookup(lookup._vInfo, lookup);
+            var df = new VIS.MLookup(lookup._vInfo, lookup, 0, 0, 0, d);
             return df;
         },
         getMLookUp: function (ctx, windowNo, Column_ID, AD_Reference_ID) {

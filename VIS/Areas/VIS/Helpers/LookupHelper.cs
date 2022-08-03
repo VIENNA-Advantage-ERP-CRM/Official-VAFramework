@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -97,10 +99,28 @@ namespace VIS.Classes
             return result;
         }
 
-        public Object GetLookupDirect(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key, bool IsNumber)
+        public Object GetLookupDirect(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key, bool IsNumber, string LookupData)
         {
-            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID);
-            string lookupQuery = lInfo.queryDirect;
+            VLookUpInfo lInfo = null;
+            string lookupQuery = "";
+            if (AD_Window_ID > 0)
+            {
+                lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID);
+                lookupQuery = lInfo.queryDirect;
+            }
+            else
+            {
+                dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(LookupData, new ExpandoObjectConverter());
+                Ctx _ctx = new Ctx(json.ctx);
+                string validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+                //Ctx _ctx = null;//(ctx) as Ctx;
+                MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID),Convert.ToString(json.columnName),
+                    Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
+                lookupQuery = res._vInfo.queryDirect;
+            }
+
+
+
             List<SqlParams> listParam = new List<SqlParams>();
             string key = "";
             if (Key != null)

@@ -43,11 +43,12 @@ namespace VIS.Areas.VIS.Controllers
         }
 
 
-        public async Task<ActionResult> GetLookupDirect(int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key, bool IsNumber)
+        [HttpPost]
+        public async Task<ActionResult> GetLookupDirect(int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key, bool IsNumber,string LookupData)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             LookupHelper lHelper = new LookupHelper();
-            object result = await System.Threading.Tasks.Task.Run(() => lHelper.GetLookupDirect(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, Key, IsNumber));
+            object result = await System.Threading.Tasks.Task.Run(() => lHelper.GetLookupDirect(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, Key, IsNumber,LookupData));
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
 

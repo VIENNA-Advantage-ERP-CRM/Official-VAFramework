@@ -624,17 +624,18 @@
                 if (ctxInfo.length == 0 && (token.startsWith("#") || token.startsWith("$")))
                     ctxInfo = ctx.getContext(token);	// get global context
 
-                resultData.push({ 'Key': token, 'Value': ctxInfo });
+                
 
                 if (ctxInfo.length == 0) {
                     //_log.config("No Context Win=" + WindowNo + " for: " + token);
                     if (!ignoreUnparsable)
                         return "";
-
+                    resultData.push({ 'Key': token, 'Value': null });
                     outStr += ' NULL ';
                     //						//	token not found
                 }
                 else {
+                    resultData.push({ 'Key': token, 'Value': ctxInfo });
                     outStr += ctxInfo;				// replace context with Context
                 }
 

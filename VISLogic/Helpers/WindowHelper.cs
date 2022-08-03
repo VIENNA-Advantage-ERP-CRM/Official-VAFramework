@@ -3425,10 +3425,9 @@ namespace VIS.Helpers
         }
 
 
-        public object GetWindowRecord(Ctx ctxp, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
+        public object GetWindowRecord(Ctx ctx, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
         {
             object data = null;
-            Ctx ctx = new Ctx(ctxp);
             if (!string.IsNullOrEmpty(WhereClause))
             {
                 WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctx.GetSecureKey());
@@ -3496,12 +3495,11 @@ namespace VIS.Helpers
             return data;
         }
 
-        public object GetWindowRecords(Ctx ctx, List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
+        public object GetWindowRecords(Ctx ctxp, List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
        int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging)
         {
             WindowRecordOut resultData = new WindowRecordOut();
 
-            Ctx ctxp = new Ctx(ctx);
             WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctxp.GetSecureKey());
             if (!QueryValidator.IsValid(WhereClause))
                 return null;

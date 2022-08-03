@@ -170,7 +170,7 @@ namespace VIS.Models
             // while (s.IndexOf("=") != -1)
             string[] varibles = s.Split(' ');
 
-            for(int o=0;o< varibles.Length;o++)
+            for (int o = 0; o < varibles.Length; o++)
             {
                 s = varibles[o];
                 if (s.IndexOf("=") == -1)
@@ -198,9 +198,9 @@ namespace VIS.Models
                         break;
                     }
                 }
-               
+
                 beginIndex = 0;
-                
+
 
                 beginIndex = s.IndexOf('=') + 1;
                 endIndex = s.Length - beginIndex;
@@ -435,7 +435,7 @@ namespace VIS.Models
                                 // Use first window found. Ideally there should be just one matching
 
                                 //this break is remove by karan on 18 jan 2021, to show a record which can exist in more than one window.
-                               //break;
+                                //break;
                             }
                         }
                     }
@@ -463,16 +463,16 @@ namespace VIS.Models
         }
 
         public List<JTable> LoadSortData(string aD_Table_ID, string aD_ColumnSortOrder_ID, string aD_ColumnSortYesNo_ID,
-            string aD_Language, string iD,bool isTrl)
+            string aD_Language, string iD, bool isTrl)
         {
             string tableName = null;
             string columnSortName = null;
             string columnYesNoName = null;
             string keyColumnName = null;
             string identifierColumnName = null;
-            bool  identifierTranslated = false;
+            bool identifierTranslated = false;
 
-            string  parentColumnName = null;
+            string parentColumnName = null;
 
             List<JTable> jTable = new List<JTable>();
             List<SqlParameter> param = new List<SqlParameter>();
@@ -487,53 +487,53 @@ namespace VIS.Models
                 param.Add(new SqlParameter("@AD_Language", aD_Language));
             }
 
-            qry = QueryCollection.GetQuery(qry,_ctx);
+            qry = QueryCollection.GetQuery(qry, _ctx);
 
-            DataSet ds = DB.ExecuteDataset(qry,param.ToArray());
+            DataSet ds = DB.ExecuteDataset(qry, param.ToArray());
             if (ds != null)
             {
 
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                        tableName = dr[0].ToString();
-                        //	Sort Column
-                        if (aD_ColumnSortOrder_ID == dr[1].ToString())
-                        {
-                            //log.Fine("Sort=" + dr.GetString(0) + "." + dr.GetString(2));
-                            columnSortName = dr[2].ToString();
-                            
-                        }
-                        //	Optional YesNo
-                        else if (aD_ColumnSortYesNo_ID == dr[1].ToString())
-                        {
-                            //log.Fine("YesNo=" + dr.GetString(0) + "." + dr.GetString(2));
-                            columnYesNoName = dr[2].ToString();
-                        }
-                        //	Parent2
-                        else if (dr[4].ToString() == "Y")
-                        {
-                            //log.Fine("Parent=" + dr.GetString(0) + "." + dr.GetString(2));
-                            parentColumnName = dr[2].ToString();
-                        }
-                        //	KeyColumn
-                        else if (dr[5].ToString() == "Y")
-                        {
-                            //log.Fine("Key=" + dr.GetString(0) + "." + dr.GetString(2));
-                            keyColumnName = dr[2].ToString();
-                        }
-                        //	Identifier
-                        else if (dr[6].ToString() == "Y")
-                        {
-                            //log.Fine("Identifier=" + dr.GetString(0) + "." + dr.GetString(2));
-                            identifierColumnName = dr[2].ToString();
-                            if (isTrl)
-                                identifierTranslated = "Y" == dr[7].ToString();
-                        }
-                        else
-                        {
-                            //log.Fine("??NotUsed??=" + dr.GetString(0) + "." + dr.GetString(2));
-                        }
+                    tableName = dr[0].ToString();
+                    //	Sort Column
+                    if (aD_ColumnSortOrder_ID == dr[1].ToString())
+                    {
+                        //log.Fine("Sort=" + dr.GetString(0) + "." + dr.GetString(2));
+                        columnSortName = dr[2].ToString();
+
                     }
+                    //	Optional YesNo
+                    else if (aD_ColumnSortYesNo_ID == dr[1].ToString())
+                    {
+                        //log.Fine("YesNo=" + dr.GetString(0) + "." + dr.GetString(2));
+                        columnYesNoName = dr[2].ToString();
+                    }
+                    //	Parent2
+                    else if (dr[4].ToString() == "Y")
+                    {
+                        //log.Fine("Parent=" + dr.GetString(0) + "." + dr.GetString(2));
+                        parentColumnName = dr[2].ToString();
+                    }
+                    //	KeyColumn
+                    else if (dr[5].ToString() == "Y")
+                    {
+                        //log.Fine("Key=" + dr.GetString(0) + "." + dr.GetString(2));
+                        keyColumnName = dr[2].ToString();
+                    }
+                    //	Identifier
+                    else if (dr[6].ToString() == "Y")
+                    {
+                        //log.Fine("Identifier=" + dr.GetString(0) + "." + dr.GetString(2));
+                        identifierColumnName = dr[2].ToString();
+                        if (isTrl)
+                            identifierTranslated = "Y" == dr[7].ToString();
+                    }
+                    else
+                    {
+                        //log.Fine("??NotUsed??=" + dr.GetString(0) + "." + dr.GetString(2));
+                    }
+                }
                 var sql = "";
 
                 sql += "SELECT t." + keyColumnName;                //	1
@@ -549,12 +549,12 @@ namespace VIS.Models
                     + ",t." + columnSortName;              //	3
                 if (columnYesNoName != null)
                     sql += ",t." + columnYesNoName;            //	4
-                                                                    //	Tables
+                                                               //	Tables
                 sql += " FROM " + tableName + " t";
                 if (identifierTranslated)
                     sql += ", " + tableName + "_Trl tt";
                 //	Where
-                sql += " WHERE t." + parentColumnName + "="+iD;
+                sql += " WHERE t." + parentColumnName + "=" + iD;
                 if (identifierTranslated)
                     sql += " AND t." + keyColumnName + "=tt." + keyColumnName
                         + " AND tt.AD_Language='" + aD_Language + "'";
@@ -1842,7 +1842,10 @@ namespace VIS.Models
                         {
                             for (int i = 0; i < data.Count; i++)
                             {
-                                colSQL = colSQL.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
+                                if (data[i].Value != null)
+                                    colSQL = colSQL.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
+                                else
+                                    colSQL = colSQL.Replace("@" + data[i].Key + "@", Convert.ToString("NULL"));
                             }
                         }
                     }
