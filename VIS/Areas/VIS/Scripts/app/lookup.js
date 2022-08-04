@@ -676,8 +676,7 @@
                     AD_Tab_ID: self.AD_Tab_ID,
                     AD_Field_ID: self.AD_Field_ID,
                     Key: key,
-                    IsNumber: isNumber,
-                    LookupData: JSON.stringify(self.lookupData)
+                    IsNumber: isNumber
                 },
                 success: function (data) {
                     var dr = new VIS.DB.DataReader().toJson(data);
@@ -828,6 +827,7 @@
                 Key: key,
                 IsNumber: isNumber
             },
+            type:'post',
             success: function (data) {
                 var dr = new VIS.DB.DataReader().toJson(data);
 

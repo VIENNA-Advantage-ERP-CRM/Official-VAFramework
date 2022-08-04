@@ -152,12 +152,12 @@ namespace VIS.Controllers
         /// <returns></returns>
         ///  Mandeep Singh(VIS0028) 13-sep-2021
         public ActionResult GetAccessSqlAutoComplete(string columnName, string text, int windowNo,
-              int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Validation)
+              int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Validation, string LookupData)
         {
             Ctx ctx = Session["ctx"] as Ctx;
-            FormModel model = new FormModel(ctx);
+            LookupHelper model = new LookupHelper();
             return Json(JsonConvert.SerializeObject(model.GetAccessSqlAutoComplete(ctx, columnName, text, windowNo,
-                AD_Window_ID, AD_Tab_ID, AD_Field_ID, Validation)), JsonRequestBehavior.AllowGet);
+                AD_Window_ID, AD_Tab_ID, AD_Field_ID, Validation, LookupData)), JsonRequestBehavior.AllowGet);
         }
 
 

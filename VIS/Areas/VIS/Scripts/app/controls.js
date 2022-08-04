@@ -2521,6 +2521,18 @@
                     //term = term.toUpper();
                     //term = "%" + term + "%";
                     validation = VIS.Env.parseContext2(VIS.context, self.lookup.windowNo, self.lookup.tabNo, self.lookup.info.validationCode, false, true);
+
+                    var d = {
+                        'ctx': VIS.context.getWindowCtx(self.lookup.windowNo),
+                        'windowNo': self.lookup.windowNo,
+                        'column_ID': self.mField.getAD_Column_ID(),
+                        'AD_Reference_ID': self.mField.getDisplayType(),
+                        'columnName': self.mField.getColumnName(),
+                        'AD_Reference_Value_ID': self.mField.getAD_Reference_Value_ID(),
+                        'isParent': self.lookup.info.isParent,
+                        'validationCode': VIS.secureEngine.encrypt(self.lookup.info.validationCode)
+                    };
+
                     $.ajax({
                         type: 'Post',
                         url: VIS.Application.contextUrl + "Form/GetAccessSqlAutoComplete",
@@ -2529,7 +2541,8 @@
                             AD_Window_ID: self.lookup.AD_Window_ID,
                             AD_Tab_ID: self.lookup.AD_Tab_ID,
                             AD_Field_ID: self.lookup.AD_Field_ID,
-                            Validation: JSON.stringify(validation)
+                            Validation: JSON.stringify(validation),
+                            LookupData: JSON.stringify(d)
                         },
                         success: function (data) {
                             var res = [];
