@@ -756,7 +756,7 @@
 
                     var oks = $('<a style="float:right" href="javascript:void(0)" ><i title="' + VIS.Msg.getMsg("SaveSmsLog") + '" class="vis vis-save"></i></a>');
 
-                    $maincheGrid.append(oks); _SmsRefresh
+                    $maincheGrid.append(oks);
 
                     var che = new VIS.ChildDialog();
                     che.setTitle(VIS.Msg.getMsg("Information"));

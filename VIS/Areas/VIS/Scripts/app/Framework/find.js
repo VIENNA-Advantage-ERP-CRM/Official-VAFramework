@@ -1302,7 +1302,7 @@
                 VIS.MRole.SQL_NOTQUALIFIED, VIS.MRole.SQL_RO);
             // finalSQL = VIS.Env.parseContext(VIS.context, windowNo, finalSQL, false);
 
-            VIS.context.setContext(windowNo, TABNO, "FindSQL", finalSQL);
+           // VIS.context.setContext(windowNo, TABNO, "FindSQL", finalSQL);
 
             //  Execute Query
             total = 999999;

@@ -56,7 +56,7 @@
 
             try {
               
-                var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "DocAction/GetReference", { "RefQry": _sql }, null);
+                var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "DocAction/GetReference", { "RefQry": sql }, null);
                 if (dr != null) {
                     for (var i in dr) {
                         var value = dr[i]["Value"];

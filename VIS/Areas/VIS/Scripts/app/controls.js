@@ -2525,10 +2525,10 @@
                     var d = {
                         'ctx': VIS.context.getWindowCtx(self.lookup.windowNo),
                         'windowNo': self.lookup.windowNo,
-                        'column_ID': self.mField.getAD_Column_ID(),
-                        'AD_Reference_ID': self.mField.getDisplayType(),
-                        'columnName': self.mField.getColumnName(),
-                        'AD_Reference_Value_ID': self.mField.getAD_Reference_Value_ID(),
+                        'column_ID': self.lookup.info.column_ID,
+                        'AD_Reference_ID': displayType,
+                        'columnName': columnName,
+                        'AD_Reference_Value_ID': self.lookup.info.AD_Reference_Value_ID,
                         'isParent': self.lookup.info.isParent,
                         'validationCode': VIS.secureEngine.encrypt(self.lookup.info.validationCode)
                     };

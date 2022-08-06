@@ -4,26 +4,26 @@
     var Level = VIS.Logging.Level;
 
     var baseUrl = VIS.Application.contextUrl;
-    //var dataSetUrl = baseUrl + "JsonData/JDataSetWithCode";
+    var dataSetUrl = baseUrl + "JsonData/JDataSetWithCode";
     //var dSetUrl = baseUrl + "Form/JDataSet";
     //var nonQueryUrl = baseUrl + "JsonData/ExecuteNonQuer";
 
-    //var executeReader = function (sql, param, callback) {
-    //    var async = callback ? true : false;
+    var executeReader = function (sql, param, callback) {
+        var async = callback ? true : false;
 
-    //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
-    //    if (param) {
-    //        dataIn.param = param;
-    //    }
-    //    var dr = null;
-    //    getDataSetJString(dataIn, async, function (jString) {
-    //        dr = new VIS.DB.DataReader().toJson(jString);
-    //        if (callback) {
-    //            callback(dr);
-    //        }
-    //    });
-    //    return dr;
-    //};
+        var dataIn = { sql: sql, page: 1, pageSize: 0 };
+        if (param) {
+            dataIn.param = param;
+        }
+        var dr = null;
+        getDataSetJString(dataIn, async, function (jString) {
+            dr = new VIS.DB.DataReader().toJson(jString);
+            if (callback) {
+                callback(dr);
+            }
+        });
+        return dr;
+    };
 
     ////executeDataSet
     //var executeDataSet = function (sql, param, callback) {
@@ -108,26 +108,26 @@
 
 
 
-    ////DataSet String
-    //function getDataSetJString(data, async, callback) {
-    //    var result = null;
-    //    //data.sql = VIS.secureEngine.encrypt(data.sql);
-    //    $.ajax({
-    //        url: dataSetUrl,
-    //        type: "POST",
-    //        datatype: "json",
-    //        contentType: "application/json; charset=utf-8",
-    //        async: async,
-    //        data: JSON.stringify(data)
-    //    }).done(function (json) {
-    //        result = json;
-    //        if (callback) {
-    //            callback(json);
-    //        }
-    //        //return result;
-    //    });
-    //    return result;
-    //};
+    //DataSet String
+    function getDataSetJString(data, async, callback) {
+        var result = null;
+        //data.sql = VIS.secureEngine.encrypt(data.sql);
+        $.ajax({
+            url: dataSetUrl,
+            type: "POST",
+            datatype: "json",
+            contentType: "application/json; charset=utf-8",
+            async: async,
+            data: JSON.stringify(data)
+        }).done(function (json) {
+            result = json;
+            if (callback) {
+                callback(json);
+            }
+            //return result;
+        });
+        return result;
+    };
 
     ////DataSet String
     //function getDSetJString(data, async, callback) {
