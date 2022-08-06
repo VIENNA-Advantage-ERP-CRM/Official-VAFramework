@@ -3183,6 +3183,7 @@
                 });
 
             }
+
             // Get info window from field if exist.
             else if (self.getField() != null & infoWinID == 0) {
                 infoWinID = self.getField().getAD_InfoWindow_ID();

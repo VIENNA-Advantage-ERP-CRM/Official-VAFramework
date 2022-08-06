@@ -38,9 +38,10 @@ namespace VIS.Classes
             return MTable.Get(ctx, AD_Table_ID).GetKeyColumns();
         }
 
-        public Object GetLookupData(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, int PageSize)
+        public Object GetLookupData(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, 
+            int PageSize, string LookupData)
         {
-            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID);
+            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
             string lookupQuery = lInfo.query;
             string validation = lInfo.validationCode;
             if (!string.IsNullOrEmpty(validation))
@@ -84,9 +85,10 @@ namespace VIS.Classes
         }
 
 
-        public Object GetLookupAll(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, int PageSize)
+        public Object GetLookupAll(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values,
+            int PageSize,string LookupData)
         {
-            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID);
+            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID,LookupData);
             string lookupQuery = lInfo.queryAll;
             string validation = lInfo.validationCode;
 
@@ -103,25 +105,14 @@ namespace VIS.Classes
             return result;
         }
 
-        public Object GetLookupDirect(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key, bool IsNumber, string LookupData)
+        public Object GetLookupDirect(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key,
+            bool IsNumber, string LookupData)
         {
             VLookUpInfo lInfo = null;
             string lookupQuery = "";
-            if (AD_Window_ID > 0)
-            {
-                lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID);
+                lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
                 lookupQuery = lInfo.queryDirect;
-            }
-            else
-            {
-                dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(LookupData, new ExpandoObjectConverter());
-                Ctx _ctx = new Ctx(json.ctx);
-                string validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
-                //Ctx _ctx = null;//(ctx) as Ctx;
-                MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
-                    Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
-                lookupQuery = res._vInfo.queryDirect;
-            }
+            
 
 
 
@@ -155,12 +146,28 @@ namespace VIS.Classes
             return result;
         }
 
-        private VLookUpInfo GetLookupInfo(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID)
+        private VLookUpInfo GetLookupInfo(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID,string LookupData)
         {
-            GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+            VLookUpInfo lInfo = null;
+            if (AD_Window_ID > 0)
+            {
+                GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
 
-            VLookUpInfo lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+                lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+            }
+            else
+            {
+                dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(LookupData, new ExpandoObjectConverter());
+                Ctx _ctx = new Ctx(json.ctx);
+                string validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+                if (!QueryValidator.IsValid(validationCode))
+                    return null;
 
+                //Ctx _ctx = null;//(ctx) as Ctx;
+                MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
+                    Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
+                lInfo = res._vInfo;
+            }
             return lInfo;
         }
 
@@ -221,6 +228,7 @@ namespace VIS.Classes
 
                 validation = " AND " + lInfo.validationCode;
             }
+            validation = Env.ParseContext(ctx, WindowNo, validation, false);
             if (validation != null && validation.Length > 0)
             {
                 if (posOrder != -1)

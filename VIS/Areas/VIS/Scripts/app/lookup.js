@@ -320,6 +320,23 @@
         this.lookupData = lookupData;
         this.loading = false;
 
+        if (!this.lookupData) {
+            var keyCol = lookupInfo.keyColumn;
+            if (keyCol && keyCol.indexOf(".") > -1) {
+                keyCol = keyCol.substring(keyCol.indexOf(".")+1);
+            }
+            this.lookupData = {
+                'ctx': VIS.context.getWindowCtx(lookupInfo.windowNo),
+                'windowNo': lookupInfo.windowNo,
+                'column_ID': lookupInfo.column_ID,
+                'AD_Reference_ID': lookup._displayType,
+                'columnName': keyCol,
+                'AD_Reference_Value_ID': lookupInfo.AD_Reference_Value_ID,
+                'isParent': lookupInfo.isParent,
+                'validationCode': VIS.secureEngine.encrypt(lookupInfo.validationCode)
+            };
+        }
+
         this.nextRead = 0;
         this.cLookup = false;
         this.lookupDirectAll = {};
@@ -676,7 +693,8 @@
                     AD_Tab_ID: self.AD_Tab_ID,
                     AD_Field_ID: self.AD_Field_ID,
                     Key: key,
-                    IsNumber: isNumber
+                    IsNumber: isNumber,
+                    LookupData: JSON.stringify(self.lookupData)
                 },
                 success: function (data) {
                     var dr = new VIS.DB.DataReader().toJson(data);
@@ -819,13 +837,15 @@
 
         $.ajax({
             url: VIS.Application.contextUrl + "Lookup/GetLookupDirect",
+            type:'post',
             data: {
                 WindowNo: self.getWindowNo(),
                 AD_Window_ID: self.AD_Window_ID,
                 AD_Tab_ID: self.AD_Tab_ID,
                 AD_Field_ID: self.AD_Field_ID,
                 Key: key,
-                IsNumber: isNumber
+                IsNumber: isNumber,
+                LookupData: JSON.stringify(self.lookupData)
             },
             type:'post',
             success: function (data) {
@@ -932,6 +952,7 @@
         $.ajax({
             url: VIS.Application.contextUrl + "Lookup/GetLookupData",
             async: async,
+            type:'post',
             data: {
                 WindowNo: self.getWindowNo(),
                 AD_Window_ID: self.AD_Window_ID,
@@ -939,6 +960,7 @@
                 AD_Field_ID: self.AD_Field_ID,
                 Values: JSON.stringify(validation),
                 PageSize: pageSize,
+                LookupData: JSON.stringify(self.lookupData)
             },
             success: function (data) {
                 var dr = new VIS.DB.DataReader().toJson(data);
@@ -997,12 +1019,14 @@
 
         $.ajax({
             url: VIS.Application.contextUrl + "Lookup/GetLookupAll",
+            type:'post',
             data: {
                 WindowNo: self.getWindowNo(),
                 AD_Window_ID: self.AD_Window_ID,
                 AD_Tab_ID: self.AD_Tab_ID,
                 AD_Field_ID: self.AD_Field_ID,
                 PageSize: 100,
+                LookupData: JSON.stringify(self.lookupData)
             },
             success: function (data) {
                 var isNumber = self.info.keyColumn.endsWith("_ID");

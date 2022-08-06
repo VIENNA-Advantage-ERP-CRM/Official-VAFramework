@@ -3774,7 +3774,7 @@
 
         //
         ////log.fine(_SQL_Count);
-        this.ctx.setWindowTabContext(gt._windowNo, gt._tabNo, "SQL", this.SQL);
+        //this.ctx.setWindowTabContext(gt._windowNo, gt._tabNo, "SQL", this.SQL);
         return this.SQL;
     };	//	createSelectSql
 
