@@ -263,7 +263,7 @@ namespace VIS.Classes
             }
 
             // string lastPart = sql.Substring(sql.IndexOf("FROM"), sql.Length);
-            string lastPart = sql.Substring(sql.IndexOf("FROM"));
+            string lastPart = sql.Substring(sql.IndexOf("FROM "+ lInfo.tableName));
             sql = "SELECT " + keyColumn + " AS ID,NULL," + displayColumn + " AS finalValue " + lastPart;
 
             text = text.ToUpper();
