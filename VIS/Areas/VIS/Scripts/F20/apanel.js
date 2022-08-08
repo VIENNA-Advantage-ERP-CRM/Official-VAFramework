@@ -138,7 +138,7 @@
         this.isAutoCompleteOpen = false;
         this.instructionPop = {};
         this.instructionPop[this.ACTION_NAME_NEW] = false;
-
+        this.fromCardDialogBtn = false;
         function initComponenet() {
 
             var clone = document.importNode(tmpAPanel, true);
@@ -2492,7 +2492,10 @@
             //		null);
             return;
         }
-
+        else if (columnName.equals("OpenCardDialog")) {
+            aPanel.fromCardDialogBtn = true;
+            aPanel.cmd_cardDialog();
+        }
         if (vButton.AD_Process_ID > 0) {
 
             var ret = this.checkAndCallProcess(vButton, table_ID, record_ID, ctx, self);

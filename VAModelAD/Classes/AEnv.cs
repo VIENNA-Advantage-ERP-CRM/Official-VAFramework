@@ -86,6 +86,49 @@ namespace VAdvantage.Classes
             return mWindowVO;
         }   //  getWindow
 
+        /// <summary>
+        /// Get Window Model object from cache for skip role access
+        /// By Mandeep 02-June-2022 As Discussed with Mukesh Sir
+        /// </summary>
+        /// <param name="WindowNo">window Number </param>
+        /// <param name="AD_Window_ID">window id </param>
+        /// <param name="AD_Menu_ID"> menu id </param>
+        /// <returns>return windowVo if found</returns>
+        public static GridWindowVO GetMWindowVOSkipRole(Ctx ctx, int windowNo, int AD_Window_ID, int AD_Menu_ID)
+        {
+            log.Config("Window=" + windowNo + ", AD_Window_ID=" + AD_Window_ID);
+            GridWindowVO mWindowVO = null;
+            string format = string.Format("{0}{1}{2}{3}{4}", AD_Window_ID, ctx.GetAD_Client_ID(), ctx.GetAD_Role_ID(), ctx.GetAD_Org_ID(), ctx.GetAD_Language());          //JID_1238: Addedd language to reset cache
+            if (AD_Window_ID != 0)// && Ini.IsCacheWindow())	//	try cache always
+            {
+
+                mWindowVO = s_windows[format];
+                if (mWindowVO != null)
+                {
+                    mWindowVO = mWindowVO.Clone(ctx, windowNo);
+                    log.Info("Cached=" + mWindowVO);
+                }
+            }
+
+            //  Create Window Model on Client
+            if (mWindowVO == null)
+            {
+                log.Config("create local");
+                mWindowVO = GridWindowVO.CreateWithSkipRole(ctx, windowNo, AD_Window_ID, AD_Menu_ID);
+                if (mWindowVO != null)
+                    s_windows[format] = mWindowVO;
+            }	//	from Client
+            if (mWindowVO == null)
+                return null;
+
+            //  Check (remote) context
+            //Utility.Ctx ctx = Utility.Env.GetContext();
+            if (!mWindowVO.GetCtx().Equals(ctx))
+            {
+            }
+            return mWindowVO;
+        }   //  getWindow
+
         public static bool CheckServerConnection(string hostNameOrAddress = null)
         {
             bool pingStatus = false;

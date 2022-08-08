@@ -53,6 +53,7 @@ namespace VIS
                 "~/Areas/VIS/Scripts/app/controller.js",
                 "~/Areas/VIS/Scripts/app/formframe.js",
                 "~/Areas/VIS/Scripts/app/processframe.js",
+                "~/Areas/VIS/Scripts/app/ajaxlogin.js",
                 "~/Areas/VIS/Scripts/processengine/processctl.js",
                 "~/Areas/VIS/Scripts/processengine/processinfo.js",
                 "~/Areas/VIS/Scripts/processengine/processparameter.js",
@@ -98,7 +99,6 @@ namespace VIS
                 "~/Areas/VIS/Scripts/app/Framework/find.js",
                 "~/Areas/VIS/Scripts/app/azoomacross.js",
                 "~/Areas/VIS/Scripts/app/Framework/sms.js",
-
                  "~/Areas/VIS/Scripts/app/arequest.js",
                  "~/Areas/VIS/Scripts/app/Framework/vsetup.js",
                    "~/Areas/VIS/Scripts/home/favourite.js",
@@ -306,6 +306,7 @@ namespace VIS
      "~/Areas/VIS/Scripts/app/grouprights/createrole.js",
      "~/Areas/VIS/Scripts/app/Framework/markmodule.js",
      "~/Areas/VIS/Scripts/app/Framework/cardviewdialog.js",
+     "~/Areas/VIS/Scripts/app/Framework/cardTemplateMaster.js",
      "~/Areas/VIS/Scripts/app/Framework/visimportfiles.js",
      "~/Areas/VIS/Scripts/app/Framework/parameterdialog.js",
      "~/Areas/VIS/Scripts/app/processwrapper.js",

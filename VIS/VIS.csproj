@@ -513,6 +513,7 @@
     <Content Include="Areas\VIS\Images\home\zoom-ico2.png" />
     <Content Include="Areas\VIS\Images\html.png" />
     <Content Include="Areas\VIS\Images\i.png" />
+    <Content Include="Areas\VIS\Images\icon.png" />
     <Content Include="Areas\VIS\Images\icons.png" />
     <Content Include="Areas\VIS\Images\Ignore22.png" />
     <Content Include="Areas\VIS\Images\image.png" />
@@ -638,6 +639,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentHistory.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\bpartner.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\cardTemplateMaster.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\cardviewdialog.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\contactInfo.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\chat.js" />
@@ -749,6 +751,7 @@
     <Compile Include="Areas\VIS\Controllers\BPartnerController.cs" />
     <Compile Include="Areas\VIS\Controllers\CallOut\CalloutColumnController.cs" />
     <Compile Include="Areas\VIS\Controllers\CardViewController.cs" />
+    <Compile Include="Areas\VIS\Controllers\CardViewWizardController.cs" />
     <Compile Include="Areas\VIS\Controllers\Chat\ChatController.cs" />
     <Compile Include="Areas\VIS\Controllers\DocActionController.cs" />
     <Compile Include="Areas\VIS\Controllers\EmailController.cs" />
@@ -818,6 +821,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\VIS\Views\BiPanel\GetHTMLReport.cshtml" />
+    <Content Include="Areas\VIS\Views\CardViewWizard\CardTemplateMaster.cshtml" />
+    <Content Include="Areas\VIS\Views\CardViewWizard\HtmlControls.cshtml" />
+    <Content Include="Areas\VIS\Views\CardViewWizard\Index.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
     <Content Include="Areas\VIS\WebPages\CrystalReprotViewer.aspx" />

@@ -113,6 +113,52 @@ namespace VIS.Controllers
         }
 
         /// <summary>
+        /// skip Role for card dialog -- As discussed with Mukesh sir
+        /// By Mandeep
+        /// </summary>
+        /// <param name="windowNo"></param>
+        /// <param name="AD_Window_ID"></param>
+        /// <returns></returns>
+        public JsonResult GetGridWindowSkipRole(int windowNo, int AD_Window_ID)
+        {
+            GridWindow wVo = null;
+            string retJSON = "";
+            string retError = null;
+            string windowCtx = "";
+
+            if (Session["ctx"] != null)
+            {
+                Ctx lctx = Session["ctx"] as Ctx;
+                Ctx ctx = new Ctx(lctx.GetMap());
+                GridWindowVO vo = AEnv.GetMWindowVOSkipRole(ctx, windowNo, AD_Window_ID, 0);
+                if (vo != null)
+                {
+                    try
+                    {
+                        wVo = new GridWindow(vo);
+                        retJSON = JsonConvert.SerializeObject(wVo, Formatting.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        retError = ex.Message;
+                    }
+                }
+                else
+                {
+                    retError = "AccessTableNoView";
+                }
+                windowCtx = JsonConvert.SerializeObject(ctx.GetMap(windowNo));
+            }
+            else
+            {
+                retError = "SessionExpired";
+            }
+            return Json(new { result = retJSON, error = retError, wCtx = windowCtx }, JsonRequestBehavior.AllowGet);
+        }
+
+
+
+        /// <summary>
         /// retrun Grid window Model json object against window Id
         /// </summary>
         /// <param name="windowNo">window number</param>

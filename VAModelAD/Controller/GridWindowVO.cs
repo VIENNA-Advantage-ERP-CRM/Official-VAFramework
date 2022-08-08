@@ -348,7 +348,7 @@ namespace VAdvantage.Controller
                             vo.IsArchive = !("N".Equals(dr[31].ToString()));
                             vo.IsAttachmail = !("N".Equals(dr[32].ToString()));
                             vo.IsRoleCenterView = !("N".Equals(dr[33].ToString()));
-                            vo.FontName= dr[34].ToString();
+                            vo.FontName = dr[34].ToString();
                             vo.ImageUrl = dr[35].ToString();
                             if (vo.ImageUrl != "" && vo.ImageUrl.Contains("/"))
                             {
@@ -395,6 +395,201 @@ namespace VAdvantage.Controller
 
             //  Create Tabs
             CreateTabs(vo, AD_UserDef_Win_ID);
+            if (vo.Tabs == null || vo.Tabs.Count == 0)
+                return null;
+
+            return vo;
+        }   //  create
+
+        /// <summary>
+        ///Create Window Value Object with skip role
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="WindowNo"></param>
+        /// <param name="AD_Window_ID"></param>
+        /// <param name="AD_Menu_ID"></param>
+        /// <returns></returns>
+        public static GridWindowVO CreateWithSkipRole(Ctx ctx, int windowNo, int AD_Window_ID, int AD_Menu_ID)
+        {
+            VLogger.Get().Config("#" + windowNo
+                + " - AD_Window_ID=" + AD_Window_ID + "; AD_Menu_ID=" + AD_Menu_ID);
+            GridWindowVO vo = new GridWindowVO(ctx, windowNo);
+            vo.AD_Window_ID = AD_Window_ID;
+            IDataReader dr = null;
+            //  Get Window_ID if required	- (used by HTML UI)
+            if (vo.AD_Window_ID == 0 && AD_Menu_ID != 0)
+            {
+                String sql0 = "SELECT AD_Window_ID, IsSOTrx, IsReadOnly FROM AD_Menu "
+                    + "WHERE AD_Menu_ID=" + AD_Menu_ID.ToString() + " AND Action='W'";
+                try
+                {
+                    dr = DataBase.DB.ExecuteReader(sql0, null);
+                    if (dr.Read())
+                    {
+                        vo.AD_Window_ID = Utility.Util.GetValueOfInt(dr[0]);
+                        String IsSOTrx = dr[1].ToString();
+                        ctx.SetContext(windowNo, "IsSOTrx", (IsSOTrx != "" && IsSOTrx.Equals("Y")));
+                        //
+                        String IsReadOnly = dr[2].ToString();
+                        if (IsReadOnly != "" && IsReadOnly.Equals("Y"))
+                            vo.IsReadWrite = "Y";
+                        else
+                            vo.IsReadWrite = "N";
+                    }
+                    dr.Close();
+                    dr = null;
+
+                }
+                catch (System.Exception e)
+                {
+                    if (dr != null)
+                    {
+                        dr.Close();
+                        dr = null;
+                    }
+                    VLogger.Get().Log(Level.SEVERE, "Menu", e);
+                    return null;
+                }
+                VLogger.Get().Config("AD_Window_ID=" + vo.AD_Window_ID);
+            }
+
+            //  --  Get Window
+
+            int AD_Role_ID = vo.ctx.GetAD_Role_ID();
+
+            StringBuilder sql01 = new StringBuilder("SELECT Name,Description,Help,WindowType, "
+             + "AD_Color_ID,AD_Image_ID, IsReadWrite, WinHeight,WinWidth, "
+             + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
+             + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
+             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView ");
+
+            if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
+            {
+                sql01.Append("FROM AD_Window_v WHERE AD_Window_ID=" + vo.AD_Window_ID.ToString());
+                //sql01.Append(" AND AD_Role_ID=" + AD_Role_ID);
+            }
+
+
+            else
+            {
+                sql01.Append("FROM AD_Window_vt w WHERE AD_Window_ID=" + vo.AD_Window_ID.ToString());
+                //sql01.Append(" AND AD_Role_ID=" + AD_Role_ID);
+                sql01.Append(" AND AD_Language='")
+                .Append(Utility.Env.GetAD_Language(vo.ctx)).Append("'");
+            }
+
+
+
+
+            int AD_UserDef_Win_ID = 0;
+            //IDataReader dr = null;
+            try
+            {
+
+                dr = DataBase.DB.ExecuteReader(sql01.ToString(), null);
+
+                // 	get data
+
+                if (dr.Read())
+                {
+                    vo.Name = dr[0].ToString();
+                    vo.Description = dr[1].ToString();
+                    if (vo.Description == null)
+                        vo.Description = "";
+                    vo.Help = dr[2].ToString();
+                    if (vo.Help == null)
+                        vo.Help = "";
+                    vo.WindowType = dr[3].ToString();
+                    //
+                    vo.AD_Color_ID = Utility.Util.GetValueOfInt(dr[4]);
+                    vo.AD_Image_ID = Utility.Util.GetValueOfInt(dr[5]);
+                    vo.IsReadWrite = dr[6].ToString();
+                    //
+                    vo.WinHeight = Utility.Util.GetValueOfInt(dr[7]);
+                    vo.WinWidth = Utility.Util.GetValueOfInt(dr[8]);
+                    //
+                    vo.IsSOTrx = "Y".Equals(dr[9].ToString());
+                    AD_UserDef_Win_ID = Utility.Util.GetValueOfInt(dr[10]);
+
+                    if (dr.FieldCount > 11)
+                    {
+                        vo.IsAppointment = "Y".Equals(dr[11].ToString());
+                        vo.IsTask = "Y".Equals(dr[12].ToString());
+                        vo.IsEmail = "Y".Equals(dr[13].ToString());
+                        vo.IsLetter = "Y".Equals(dr[14].ToString());
+                        vo.IsSms = "Y".Equals(dr[15].ToString());
+                        if (dr.FieldCount > 16)
+                        {
+                            vo.IsFaxEmail = "Y".Equals(dr[16].ToString());
+                            vo.DisplayName = dr[17].ToString();
+                        }
+                        if (dr.FieldCount > 18)
+                        {
+                            vo.IsChat = !("N".Equals(dr[18].ToString()));
+                            vo.IsAttachment = !("N".Equals(dr[19].ToString()));
+                            vo.IsHistory = !("N".Equals(dr[20].ToString()));
+                            vo.IsCheckRequest = !("N".Equals(dr[21].ToString()));
+
+                            vo.IsCopyReocrd = !("N".Equals(dr[22].ToString()));
+                            vo.IsSubscribedRecord = !("N".Equals(dr[23].ToString()));
+                            vo.IsZoomAcross = !("N".Equals(dr[24].ToString()));
+                            vo.IsCreatedDocument = !("N".Equals(dr[25].ToString()));
+                            vo.IsUploadedDocument = !("N".Equals(dr[26].ToString()));
+                            vo.IsViewDocument = !("N".Equals(dr[27].ToString()));
+                            vo.IsAttachDocumentFrom = !("N".Equals(dr[28].ToString()));
+
+                            vo.IsImportMap = !("N".Equals(dr[29].ToString()));
+                            vo.IsMarkToExport = !("N".Equals(dr[30].ToString()));
+                            vo.IsArchive = !("N".Equals(dr[31].ToString()));
+                            vo.IsAttachmail = !("N".Equals(dr[32].ToString()));
+                            vo.IsRoleCenterView = !("N".Equals(dr[33].ToString()));
+                            vo.FontName = dr[34].ToString();
+                            vo.ImageUrl = dr[35].ToString();
+                            if (vo.ImageUrl != "" && vo.ImageUrl.Contains("/"))
+                            {
+                                vo.ImageUrl = vo.ImageUrl.Substring(vo.ImageUrl.LastIndexOf("/") + 1);
+                            }
+                            vo.IsCompositeView = dr[36].ToString() == "Y";
+                        }
+                    }
+                }
+                else
+                    vo = null;
+                dr.Close();
+                dr = null;
+            }
+            catch (System.Exception ex)
+            {
+                if (dr != null)
+                {
+                    dr.Close();
+                    dr = null;
+                }
+                VLogger.Get().Log(Level.SEVERE, sql01.ToString(), ex);
+                return null;
+            }
+            if (dr != null)
+            {
+                dr.Close();
+                dr = null;
+            }
+            //	Not found
+            if (vo == null)
+            {
+                VLogger.Get().Log(Level.SEVERE, "No Window - AD_Window_ID=" + AD_Window_ID
+                    + ", AD_Role_ID=" + AD_Role_ID + " - " + sql01);
+                VLogger.Get().SaveError("AccessTableNoView", "(Not found)");
+                return null;
+            }
+            //	Read Write
+            if (vo.IsReadWrite == null)
+            {
+                VLogger.Get().SaveError("AccessTableNoView", "(found)");
+                return null;
+            }
+
+            //  Create Tabs
+            CreateTabsWithSkipRole(vo, AD_UserDef_Win_ID);
             if (vo.Tabs == null || vo.Tabs.Count == 0)
                 return null;
 
@@ -761,6 +956,75 @@ namespace VAdvantage.Controller
                     if (mWindowVO.WindowType.Equals(WINDOWTYPE_TRX))
                         onlyCurrentDays = 1;
                     GridTabVO mTabVO = GridTabVO.Create(mWindowVO, TabNo, dr,
+                        mWindowVO.WindowType.Equals(WINDOWTYPE_QUERY),  //  isRO
+                        onlyCurrentDays, AD_UserDef_Win_ID);
+                    if (mTabVO == null && firstTab)
+                        break;		//	don't continue if first tab is null
+                    if (mTabVO != null)
+                    {
+                        if (!mTabVO.IsReadOnly && "N".Equals(mWindowVO.IsReadWrite))
+                            mTabVO.IsReadOnly = true;
+                        mWindowVO.Tabs.Add(mTabVO);
+                        TabNo++;        //  must be same as mWindow.getTab(x)
+                        firstTab = false;
+                    }
+                }
+                dr.Close();
+                dr = null;
+                param = null;
+            }
+            catch (System.Data.Common.DbException e)
+            {
+                if (dr != null)
+                {
+                    dr.Close();
+                    dr = null;
+                }
+                VLogger.Get().Log(Level.SEVERE, "createTabs", e);
+                return false;
+            }
+
+            //  No Tabs
+            if (TabNo == 0 || mWindowVO.Tabs.Count == 0)
+            {
+                VLogger.Get().Log(Level.SEVERE, "No Tabs - AD_Window_ID="
+                    + mWindowVO.AD_Window_ID + " - " + sql);
+                return false;
+            }
+
+            //	Put base table of window in ctx (for VDocAction)
+            mWindowVO.ctx.SetContext(mWindowVO.windowNo, "BaseTable_ID", mWindowVO.AD_Table_ID);
+            return true;
+        }
+        /// <summary>
+        /// Create Window Tabs
+        /// </summary>
+        /// <param name="mWindowVO"></param>
+        /// <param name="AD_UserDef_Win_ID"></param>
+        /// <returns></returns>
+        private static bool CreateTabsWithSkipRole(GridWindowVO mWindowVO, int AD_UserDef_Win_ID)
+        {
+            mWindowVO.Tabs = new List<GridTabVO>();
+
+            String sql = GridTabVO.GetSQL(mWindowVO.ctx, AD_UserDef_Win_ID);
+            int TabNo = 0;
+            IDataReader dr = null;
+            try
+            {
+                //	create statement
+                System.Data.SqlClient.SqlParameter[] param = new System.Data.SqlClient.SqlParameter[1];
+                param[0] = new System.Data.SqlClient.SqlParameter("@windowID", mWindowVO.AD_Window_ID);
+                dr = DataBase.DB.ExecuteReader(sql, param);
+                bool firstTab = true;
+                while (dr.Read())
+                {
+                    if (mWindowVO.AD_Table_ID == 0)
+                        mWindowVO.AD_Table_ID = Utility.Util.GetValueOfInt(dr["AD_Table_ID"]);
+                    //  Create TabVO
+                    int onlyCurrentDays = 0;
+                    if (mWindowVO.WindowType.Equals(WINDOWTYPE_TRX))
+                        onlyCurrentDays = 1;
+                    GridTabVO mTabVO = GridTabVO.CreateTabWithSkipRole(mWindowVO, TabNo, dr,
                         mWindowVO.WindowType.Equals(WINDOWTYPE_QUERY),  //  isRO
                         onlyCurrentDays, AD_UserDef_Win_ID);
                     if (mTabVO == null && firstTab)
