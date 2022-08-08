@@ -217,7 +217,7 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(model.GetWindowMenuIds()), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetWindowFormIds(string tableTreeName, string treeId)
+        public JsonResult GetFormMenuIds()
         {
             Ctx ctx = Session["ctx"] as Ctx;
             TreeMaintenanceModel model = new TreeMaintenanceModel(ctx);

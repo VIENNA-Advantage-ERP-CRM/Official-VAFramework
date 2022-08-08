@@ -491,7 +491,7 @@
             var sqlCode = "VIS_153";
             var param = [];
             param[0] = new VIS.DB.SqlParam("@param1", AD_Role_ID);
-            var dataIn = { sql: sqlCode, param: params };
+            var dataIn = { sql: sqlCode, param: param };
             var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/JDataSetWithCode", dataIn);
             var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//    
             var key, value;
@@ -511,7 +511,7 @@
             var sqlCode = "VIS_154";
             var param = [];
             param[0] = new VIS.DB.SqlParam("@param1", AD_Role_ID);
-            var dataIn = { sql: sqlCode, param: params };
+            var dataIn = { sql: sqlCode, param: param };
             var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/JDataSetWithCode", dataIn);
             var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//
 

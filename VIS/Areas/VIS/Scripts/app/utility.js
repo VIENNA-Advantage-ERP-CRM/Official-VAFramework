@@ -2,6 +2,8 @@
 
 ; (function (VIS, $) {
 
+
+
     VIS.Events = function () {
 
         var onTouchStartOrClick = "click";
@@ -954,45 +956,45 @@
 
         var baseUrl = VIS.Application.contextUrl;
         var dataSetUrl = baseUrl + "JsonData/JDataSetWithCode";
-        var nonQueryUrl = baseUrl + "JsonData/ExecuteNonQuer";
+        
 
-        //var executeReader = function (sql, param, callback) {
-        //    var async = callback ? true : false;
+        var executeReader = function (sql, param, callback) {
+            var async = callback ? true : false;
 
-        //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
-        //    if (param) {
-        //        dataIn.param = param;
-        //    }
-        //    var dr = null;
-        //    getDataSetJString(dataIn, async, function (jString) {
-        //        dr = new VIS.DB.DataReader().toJson(jString);
-        //        if (callback) {
-        //            callback(dr);
-        //        }
-        //    });
-        //    return dr;
-        //};
+            var dataIn = { sql: sql, page: 1, pageSize: 0 };
+            if (param) {
+                dataIn.param = param;
+            }
+            var dr = null;
+            getDataSetJString(dataIn, async, function (jString) {
+                dr = new VIS.DB.DataReader().toJson(jString);
+                if (callback) {
+                    callback(dr);
+                }
+            });
+            return dr;
+        };
 
         ////DataSet String
-        //function getDataSetJString(data, async, callback) {
-        //    var result = null;
-        //    //data.sql = VIS.secureEngine.encrypt(data.sql);
-        //    $.ajax({
-        //        url: dataSetUrl,
-        //        type: "POST",
-        //        datatype: "json",
-        //        contentType: "application/json; charset=utf-8",
-        //        async: async,
-        //        data: JSON.stringify(data)
-        //    }).done(function (json) {
-        //        result = json;
-        //        if (callback) {
-        //            callback(json);
-        //        }
-        //        //return result;
-        //    });
-        //    return result;
-        //};
+        function getDataSetJString(data, async, callback) {
+            var result = null;
+            //data.sql = VIS.secureEngine.encrypt(data.sql);
+            $.ajax({
+                url: dataSetUrl,
+                type: "POST",
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                async: async,
+                data: JSON.stringify(data)
+            }).done(function (json) {
+                result = json;
+                if (callback) {
+                    callback(json);
+                }
+                //return result;
+            });
+            return result;
+        };
 
 
         function getGridWindow(windowNo, AD_Window_ID, callback) {
@@ -1674,197 +1676,6 @@
             out.clear();
             return text;
         },
-
-        //executeDataSet: function (sql, param, callback) {
-        //    var async = callback ? true : false;
-
-        //    if (traceConsole(arguments)) {
-        //        return null;
-        //    }
-
-        //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
-        //    if (param) {
-        //        dataIn.param = param;
-        //    }
-
-        //    var dataSet = null;
-
-        //    VIS.dataContext.getDataSetJString(dataIn, async, function (jString) {
-        //        dataSet = new VIS.DB.DataSet().toJson(jString);
-        //        if (async) {
-        //            callback(dataSet);
-        //        }
-        //    });
-        //    return dataSet;
-        //},
-
-        //executeDataSet: function (sql, param, callback) {
-        //    var async = callback ? true : false;
-
-        //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
-        //    if (param) {
-        //        dataIn.param = param;
-        //    }
-
-        //    var dataSet = null;
-
-        //    validateAndExecute(arguments, dataIn, async, function (jString) {
-        //        dataSet = new VIS.DB.DataSet().toJson(jString);
-        //        if (async) {
-        //            callback(dataSet);
-        //        }
-        //    });
-
-        //    return dataSet;
-        //},
-
-        //executeDataReader: function (sql, param, callback) {
-        //    var async = callback ? true : false;
-
-        //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
-        //    if (param) {
-        //        dataIn.param = param;
-        //    }
-        //    var dr = null;
-
-
-        //    validateAndExecute(arguments, dataIn, async, function (jString) {
-        //        dr = new VIS.DB.DataReader().toJson(jString);
-        //        if (async) {
-        //            callback(dr);
-        //        }
-        //    });
-        //    return dr;
-        //},
-
-        //executeReader: function (sql, param, callback) {
-        //    var async = callback ? true : false;
-
-        //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
-        //    if (param) {
-        //        dataIn.param = param;
-        //    }
-        //    var dr = null;
-
-        //    validateAndExecute(arguments, dataIn, async, function (jString) {
-        //        dr = new VIS.DB.DataReader().toJson(jString);
-        //        if (async) {
-        //            callback(dr);
-        //        }
-        //    });
-
-        //    return dr;
-        //},
-
-        //executeDataReaderPaging: function (sql, page, pageSize, param, callback) {
-        //    var async = callback ? true : false;
-
-        //    var dataIn = { sql: sql, page: page, pageSize: pageSize };
-        //    if (param) {
-        //        dataIn.param = param;
-        //    }
-        //    var dr = null;
-
-        //    validateAndExecute(arguments, dataIn, async, function (jString) {
-        //        dr = new VIS.DB.DataReader().toJson(jString);
-        //        if (async) {
-        //            callback(dr);
-        //        }
-        //    });
-
-        //    return dr;
-        //},
-
-        //executeDataSetPaging: function (sql, page, pageSize, param, callback) {
-        //    var async = callback ? true : false;
-
-        //    var dataIn = { sql: sql, page: page, pageSize: pageSize };
-        //    if (param) {
-        //        dataIn.param = param;
-        //    }
-
-        //    var dataSet = null;
-
-        //    validateAndExecute(arguments, dataIn, async, function (jString) {
-        //        dataSet = new VIS.DB.DataSet().toJson(jString);
-        //        if (async) {
-        //            callback(dataSet);
-        //        }
-        //    });
-
-        //    return dataSet;
-        //},
-
-        //executeScalar: function (sql, params, callback) {
-        //    var async = callback ? true : false;
-        //    var dataIn = { sql: sql, page: 1, pageSize: 0 }
-
-        //    var value = null;
-
-
-        //    validateAndExecute(arguments, dataIn, async, function (jString) {
-        //        var dataSet = new VIS.DB.DataSet().toJson(jString);
-        //        if (dataSet.getTable(0).getRows().length > 0) {
-        //            value = dataSet.getTable(0).getRow(0).getCell(0);
-
-        //        }
-        //        else { value = null; }
-        //        dataSet.dispose();
-        //        dataSet = null;
-        //        if (async) {
-        //            callback(value);
-        //        }
-        //    });
-
-        //    return value;
-        //},
-
-        //executeQuery: function (sql, param, callback) {
-
-        //    var async = callback ? true : false;
-        //    var ret = null;
-        //    var dataIn = { sql: sql };
-        //    if (param) {
-
-        //        dataIn.param = param;
-        //    }
-
-
-        //    validateAndExecuteQuery(arguments, dataIn, async, function (jString) {
-        //        ret = JSON.parse(jString);
-        //        if (async) {
-        //            callback(ret);
-        //        }
-        //    });
-
-        //    return ret;
-        //},
-
-        /* Execute Multiple Non Queries 
-          * @param sqls   - array of string sql
-          * @param params - array of sqlParams array
-          * @param callback - callback function execute on complete
-          * @return array of result per query (1 0 or -1)
-        */
-        //executeQueries: function (sqls, params, callback) {
-        //    var async = callback ? true : false;
-        //    var ret = null;
-        //    var dataIn = { sql: sqls.join("/"), param: params };
-        //    //if (param) {
-        //    //    dataIn.param = params;
-        //    //}
-
-        //    validateAndExecuteQueries(arguments, dataIn, async, function (jString) {
-        //        ret = JSON.parse(jString);
-        //        if (async) {
-        //            callback(ret);
-        //        }
-        //    });
-
-        //    return ret;
-        //},
-
-
 
 
     };
