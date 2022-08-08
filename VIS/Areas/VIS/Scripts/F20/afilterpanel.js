@@ -945,7 +945,7 @@
             var validationCode = "";
             var lookupTableName = "";
 
-            if (field.getLookup()) {
+            if (field.getLookup() && field.getLookup().info) {
                 keyCol = field.getLookup().info.keyColumn;
                 displayCol = field.getLookup().info.displayColSubQ;
                 validationCode = VIS.Env.parseContext(VIS.Env.getCtx(), this.winNo, this.curTab.getTabNo(), field.getLookup().info.validationCode, false);

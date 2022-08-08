@@ -4472,7 +4472,7 @@
             else {
                 // applied check for checking future versions
                 // if found any records then ask for confirmation to proceed
-                var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Common/CheckVersions", { RowData: gridTableIn });
+                var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "json/CheckVersions", { RowData: gridTableIn });
                 if (res.result) {
                     VIS.ADialog.confirm("FoundVersions", true, "", "Confirm", function (result) {
                         if (result) {
