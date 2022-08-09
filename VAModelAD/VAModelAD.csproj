@@ -203,10 +203,13 @@
     <Compile Include="ModelAD\MForm.cs" />
     <Compile Include="ModelAD\MFormAccess.cs" />
     <Compile Include="ModelAD\MGmailConfiguration.cs" />
+    <Compile Include="ModelAD\MGridLayout.cs" />
+    <Compile Include="ModelAD\MGridLayoutItems.cs" />
     <Compile Include="ModelAD\MGroupForm.cs" />
     <Compile Include="ModelAD\MGroupProcess.cs" />
     <Compile Include="ModelAD\MGroupWindow.cs" />
     <Compile Include="ModelAD\MGroupWorkflow.cs" />
+    <Compile Include="ModelAD\MHeaderLayout.cs" />
     <Compile Include="ModelAD\MImage.cs" />
     <Compile Include="ModelAD\MImpFormat.cs" />
     <Compile Include="ModelAD\MImpFormatRow.cs" />

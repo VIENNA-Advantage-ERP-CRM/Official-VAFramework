@@ -140,6 +140,7 @@ namespace VAdvantage.Controller
             GridWindowVO vo = new GridWindowVO(ctx, windowNo);
             vo.AD_Window_ID = AD_Window_ID;
             IDataReader dr = null;
+            
             //  Get Window_ID if required	- (used by HTML UI)
             if (vo.AD_Window_ID == 0 && AD_Menu_ID != 0)
             {
@@ -181,6 +182,8 @@ namespace VAdvantage.Controller
 
             int AD_Role_ID = vo.ctx.GetAD_Role_ID();
 
+            bool skipRole = ctx.GetContext("skipRole")=="Y";
+
             StringBuilder sql01 = new StringBuilder("SELECT Name,Description,Help,WindowType, "
              + "AD_Color_ID,AD_Image_ID, IsReadWrite, WinHeight,WinWidth, "
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
@@ -190,14 +193,20 @@ namespace VAdvantage.Controller
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
                 sql01.Append("FROM AD_Window_v WHERE AD_Window_ID=" + vo.AD_Window_ID.ToString());
-                sql01.Append(" AND AD_Role_ID=" + AD_Role_ID);
+                if (!skipRole)
+                {
+                    sql01.Append(" AND AD_Role_ID=" + AD_Role_ID);
+                }
             }
 
 
             else
             {
                 sql01.Append("FROM AD_Window_vt w WHERE AD_Window_ID=" + vo.AD_Window_ID.ToString());
-                sql01.Append(" AND AD_Role_ID=" + AD_Role_ID);
+                if (!skipRole)
+                {
+                    sql01.Append(" AND AD_Role_ID=" + AD_Role_ID);
+                }
                 sql01.Append(" AND AD_Language='")
                 .Append(Utility.Env.GetAD_Language(vo.ctx)).Append("'");
             }
@@ -348,7 +357,7 @@ namespace VAdvantage.Controller
                             vo.IsArchive = !("N".Equals(dr[31].ToString()));
                             vo.IsAttachmail = !("N".Equals(dr[32].ToString()));
                             vo.IsRoleCenterView = !("N".Equals(dr[33].ToString()));
-                            vo.FontName= dr[34].ToString();
+                            vo.FontName = dr[34].ToString();
                             vo.ImageUrl = dr[35].ToString();
                             if (vo.ImageUrl != "" && vo.ImageUrl.Contains("/"))
                             {
@@ -401,7 +410,7 @@ namespace VAdvantage.Controller
             return vo;
         }   //  create
 
-
+       
         /// <summary>
         ///Create Window Value Object
         /// </summary>
@@ -740,8 +749,7 @@ namespace VAdvantage.Controller
         /// <returns></returns>
         private static bool CreateTabs(GridWindowVO mWindowVO, int AD_UserDef_Win_ID)
         {
-            mWindowVO.Tabs = new List<GridTabVO>();
-
+            mWindowVO.Tabs = new List<GridTabVO>();           
             String sql = GridTabVO.GetSQL(mWindowVO.ctx, AD_UserDef_Win_ID);
             int TabNo = 0;
             IDataReader dr = null;
@@ -801,7 +809,7 @@ namespace VAdvantage.Controller
             mWindowVO.ctx.SetContext(mWindowVO.windowNo, "BaseTable_ID", mWindowVO.AD_Table_ID);
             return true;
         }
-
+     
         /**
          *  Set Context including contained elements
          *  @param newCtx context

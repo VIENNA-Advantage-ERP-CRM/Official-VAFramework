@@ -14,7 +14,6 @@ using System.Data;
 using VAdvantage.Logging;
 using VAdvantage.Utility;
 using VAdvantage.Classes;
-using VAdvantage.Common;
 
 namespace VAdvantage.Controller
 {
@@ -352,6 +351,7 @@ namespace VAdvantage.Controller
             bool showAcct = "Y".Equals(vo.ctx.GetContext("#ShowAcct")) || DataBase.GlobalVariable.IsVisualEditor;
             bool showAdvanced = "Y".Equals(vo.ctx.GetContext("#ShowAdvanced")) || DataBase.GlobalVariable.IsVisualEditor;
             //	VLogger.get().warning("ShowTrl=" + showTrl + ", showAcct=" + showAcct);
+            bool skipRole = vo.ctx.GetContext("skipRole") == "Y";
             try
             {
                 vo.AD_Tab_ID = Utility.Util.GetValueOfInt(dr["AD_Tab_ID"]);
@@ -397,7 +397,7 @@ namespace VAdvantage.Controller
 
                 //	Access Level
                 vo.AccessLevel = Utility.Util.GetValueOfString(dr["AccessLevel"]);
-                if (!role.CanView(vo.ctx, vo.AccessLevel) && !DataBase.GlobalVariable.IsVisualEditor)	//	No Access
+                if (!skipRole && !role.CanView(vo.ctx, vo.AccessLevel) && !DataBase.GlobalVariable.IsVisualEditor)	//	No Access
                 {
                     VLogger.Get().Fine("No Role Access - AD_Tab_ID=" + vo.AD_Tab_ID + " " + vo.Name);
                     return false;
@@ -407,7 +407,7 @@ namespace VAdvantage.Controller
                 //	Table Access
                 vo.AD_Table_ID = Utility.Util.GetValueOfInt(dr["AD_Table_ID"]);
                 vo.ctx.SetContext(vo.windowNo, vo.tabNo, "AD_Table_ID", vo.AD_Table_ID.ToString());
-                if (!role.IsTableAccess(vo.AD_Table_ID, true) && !DataBase.GlobalVariable.IsVisualEditor)
+                if (!skipRole && !role.IsTableAccess(vo.AD_Table_ID, true) && !DataBase.GlobalVariable.IsVisualEditor)
                 {
                     VLogger.Get().Config("No Table Access - AD_Tab_ID="
                         + vo.AD_Tab_ID + " " + vo.Name);
@@ -662,7 +662,7 @@ namespace VAdvantage.Controller
         private static void CreateCardPanels(GridTabVO mTabVO, Ctx ctx)
         {
             VAdvantage.Common.Common cFun = new VAdvantage.Common.Common();
-            CardViewData card = cFun.GetCardViewDetails(ctx.GetAD_User_ID(), mTabVO.AD_Tab_ID, 0, ctx );
+            CardViewData card = cFun.GetCardViewDetails(ctx.GetAD_User_ID(), mTabVO.AD_Tab_ID, 0, ctx);
             if (card != null)
             {
                 //mTabVO.Cards.Add(card);
@@ -972,7 +972,7 @@ namespace VAdvantage.Controller
 
             clone.IsMaintainVersions = IsMaintainVersions;
             clone.TabLayout = TabLayout;
-           // clone.DefaultCardID = DefaultCardID;
+            // clone.DefaultCardID = DefaultCardID;
             clone.NewRecordView = NewRecordView;
 
             clone.fields = new List<GridFieldVO>();
