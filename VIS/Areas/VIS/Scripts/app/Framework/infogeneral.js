@@ -553,7 +553,7 @@
                     SelectedIDs: selectedIDs,
                     Requery: requery,
                     SrchCtrl: JSON.stringify(srhCtrls),
-                    ValidationCode: validationCode
+                    ValidationCode: VIS.secureEngine.encrypt(validationCode)
                 },
                 error: function () {
                     alert(VIS.Msg.getMsg('ErrorWhileGettingData'));

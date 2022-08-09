@@ -2,6 +2,7 @@
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using VAdvantage.Utility;
+using VIS.Classes;
 using VIS.Filters;
 using VIS.Models;
 
@@ -48,11 +49,17 @@ namespace VIS.Controllers
             bool Requery, string SrchCtrl, string ValidationCode)
         {
             VIS.Models.InfoGeneralModel model = new Models.InfoGeneralModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            ValidationCode = SecureEngineBridge.DecryptByClientKey(ValidationCode, ctx.GetSecureKey());
+            if (QueryValidator.IsValid(ValidationCode))
+            {
 
-            List<InfoSearchCol> srchCtrls = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrl);
-            //model.GetSchema(Ad_InfoWindow_ID);
-            return Json(JsonConvert.SerializeObject(model.GetData(TableName, AD_Table_ID, PageNo, Session["ctx"] as Ctx, KeyCol,
-                SelectedIDs, Requery, srchCtrls, ValidationCode)), JsonRequestBehavior.AllowGet);
+                List<InfoSearchCol> srchCtrls = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrl);
+                //model.GetSchema(Ad_InfoWindow_ID);
+                return Json(JsonConvert.SerializeObject(model.GetData(TableName, AD_Table_ID, PageNo, ctx, KeyCol,
+                    SelectedIDs, Requery, srchCtrls, ValidationCode)), JsonRequestBehavior.AllowGet);
+            }
+            return Json(null);
         }
 
     }

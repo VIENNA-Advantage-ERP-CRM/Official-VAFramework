@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using VAdvantage.Utility;
+using VIS.Classes;
 using VIS.Filters;
 using VIS.Models;
 
@@ -38,12 +39,17 @@ namespace VIS.Controllers
         {
             InfoWindowModel model = new InfoWindowModel();
             Ctx ctx = Session["ctx"] as Ctx;
-            //Info inf = JsonConvert.DeserializeObject<Info>(Infos);
-            Info inf = model.GetSchema(InfoID, ctx);
-            List<InfoSearchCol> SrchCtrl = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrls);
-            //model.GetSchema(Ad_InfoWindow_ID);
-            return Json(JsonConvert.SerializeObject(model.GetData(tableName, pageNo, ctx,
-                SelectedIDs, Requery, inf, ValidationCode, SrchCtrl)), JsonRequestBehavior.AllowGet);
+            ValidationCode = SecureEngineBridge.DecryptByClientKey(ValidationCode, ctx.GetSecureKey());
+            if (QueryValidator.IsValid(ValidationCode))
+            {
+                //Info inf = JsonConvert.DeserializeObject<Info>(Infos);
+                Info inf = model.GetSchema(InfoID, ctx);
+                List<InfoSearchCol> SrchCtrl = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrls);
+                //model.GetSchema(Ad_InfoWindow_ID);
+                return Json(JsonConvert.SerializeObject(model.GetData(tableName, pageNo, ctx,
+                    SelectedIDs, Requery, inf, ValidationCode, SrchCtrl)), JsonRequestBehavior.AllowGet);
+            }
+            return Json(null);
         }
 
         // Added by Mohit to get info window id on the basis of search key passed.

@@ -975,7 +975,7 @@
                     SelectedIDs: selectedIDs,
                     Requery: requery,
                     InfoID: _AD_InfoWindow_ID,
-                    ValidationCode: validationCode,
+                    ValidationCode: VIS.secureEngine.encrypt(validationCode),
                     SrchCtrls: JSON.stringify(srhCtrls)
                 },
                 error: function () {

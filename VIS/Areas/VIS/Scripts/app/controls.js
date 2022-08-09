@@ -3078,7 +3078,7 @@
                 //	//log.finest("ZoomQuery=" + (_lookup.getZoomQuery()==null ? "" : _lookup.getZoomQuery().getWhereClause())
                 //		+ ", Validation=" + _lookup.getValidation());
                 if (WhereClause.indexOf('@') != -1) {
-                    var validated = VIS.Env.parseContext2(ctx, _Lookup.getWindowNo(), _Lookup.getTabNo(), WhereClause, false, true);
+                    var validated = VIS.Env.parseContext(ctx, _Lookup.getWindowNo(), _Lookup.getTabNo(), WhereClause, false, true);
                     if (validated.length == 0) {
                         ////log.severe(_columnName + " - Cannot Parse=" + whereClause);
                     }

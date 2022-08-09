@@ -316,7 +316,9 @@ namespace VIS.Areas.VIS.Controllers
                 data = w.GetWindowRecords(ctxp, Columns, TableName, WhereClause, Fields, sqlIn, AD_Window_ID,
              AD_Tab_ID, WindowNo, AD_Table_ID, ObscureFields, summaryOnly, MaxRows, DoPaging);
             }
-            return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
+            var jsonResult =  Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
         }
 
     }

@@ -2175,7 +2175,7 @@
                     ForMobile: ismobile,
                     Requery: requery,
                     SrchCtrl: JSON.stringify(srhCtrls),
-                    Validation: validation,
+                    Validation: VIS.secureEngine.encrypt(validation),
                     Window_ID: window_ID
                 },
                 error: function () {

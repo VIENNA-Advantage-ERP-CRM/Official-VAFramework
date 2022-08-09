@@ -32,10 +32,16 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             VIS.Models.InfoProductModel model = new Models.InfoProductModel();
 
-            List<InfoSearchCol> srchCtrl = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrl);
+            Validation = SecureEngineBridge.DecryptByClientKey(Validation, ctx.GetSecureKey());
+            if (QueryValidator.IsValid(Validation))
+            {
 
-            return Json(JsonConvert.SerializeObject(model.GetData(TableName, PageNo, ForMobile, ctx,
-                Requery, srchCtrl, Validation, Window_ID)), JsonRequestBehavior.AllowGet);
+                List<InfoSearchCol> srchCtrl = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrl);
+
+                return Json(JsonConvert.SerializeObject(model.GetData(TableName, PageNo, ForMobile, ctx,
+                    Requery, srchCtrl, Validation, Window_ID)), JsonRequestBehavior.AllowGet);
+            }
+            return Json(null);
         }
 
         public JsonResult GetCart(int pageNo, bool isCart, int windowID, int WarehouseID, int WarehouseToID, int LocatorID,
