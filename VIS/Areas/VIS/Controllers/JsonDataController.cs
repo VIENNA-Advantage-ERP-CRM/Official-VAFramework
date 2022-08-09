@@ -130,7 +130,8 @@ namespace VIS.Controllers
             {
                 Ctx lctx = Session["ctx"] as Ctx;
                 Ctx ctx = new Ctx(lctx.GetMap());
-                GridWindowVO vo = AEnv.GetMWindowVOSkipRole(ctx, windowNo, AD_Window_ID, 0);
+                ctx.SetContext("skipRole", true);
+                GridWindowVO vo = AEnv.GetMWindowVO(ctx, windowNo, AD_Window_ID, 0);
                 if (vo != null)
                 {
                     try

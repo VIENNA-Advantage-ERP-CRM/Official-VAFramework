@@ -242,67 +242,6 @@ namespace VAdvantage.Controller
             return vo;
         }	//	create
 
-        /// <summary>
-        /// *	Create MTab VO Without Role Access
-        /// </summary>
-        /// <param name="wVO">Window VO Object</param>
-        /// <param name="TabNo">Tab Number</param>
-        /// <param name="dr">Datarow</param>
-        /// <param name="isRO">Is Read Only</param>
-        /// <param name="onlyCurrentDays">only current day</param>
-        /// <param name="AD_UserDef_Win_ID">window id</param>
-        /// <returns>this object</returns>
-        public static GridTabVO CreateTabWithSkipRole(GridWindowVO wVO, int TabNo, IDataReader dr,
-            bool isRO, int onlyCurrentDays, int AD_UserDef_Win_ID)
-        {
-            VLogger.Get().Config("#" + TabNo);
-
-            GridTabVO vo = new GridTabVO(wVO.GetCtx(), wVO.windowNo);
-            vo.AD_Window_ID = wVO.AD_Window_ID;
-            vo.tabNo = TabNo;
-            //
-            if (!LoadTabDetailsWithSkipRole(vo, dr))
-                return null;
-
-            if (isRO)
-            {
-                VLogger.Get().Fine("Tab is ReadOnly");
-                vo.IsReadOnly = true;
-            }
-            vo.onlyCurrentDays = onlyCurrentDays;
-
-            //  Create Fields
-            if (vo.IsSortTab)
-            {
-                vo.fields = new List<GridFieldVO>();	//	dummy
-            }
-            else
-            {
-                CreateFields(vo, AD_UserDef_Win_ID);
-                if (vo.fields == null || vo.fields.Count == 0)
-                {
-                    VLogger.Get().Log(Level.SEVERE, vo.Name + ": No Fields");
-                    return null;
-                }
-
-                if (vo.IsHeaderPanel)
-                {
-                    CreateHeaderPanel(vo);
-                }
-
-                CreateTabPanels(vo);
-
-                CreateCardPanels(vo, wVO.GetCtx());
-
-                if (vo.panels != null && vo.panels.Count > 0)
-                {
-                    vo.HasPanels = true;
-                    wVO.hasPanel = true;
-                }
-            }
-            return vo;
-        }	//	create
-
 
         /// <summary>
         /// *	Create MTab VO
@@ -412,6 +351,7 @@ namespace VAdvantage.Controller
             bool showAcct = "Y".Equals(vo.ctx.GetContext("#ShowAcct")) || DataBase.GlobalVariable.IsVisualEditor;
             bool showAdvanced = "Y".Equals(vo.ctx.GetContext("#ShowAdvanced")) || DataBase.GlobalVariable.IsVisualEditor;
             //	VLogger.get().warning("ShowTrl=" + showTrl + ", showAcct=" + showAcct);
+            bool skipRole = vo.ctx.GetContext("skipRole") == "Y";
             try
             {
                 vo.AD_Tab_ID = Utility.Util.GetValueOfInt(dr["AD_Tab_ID"]);
@@ -457,7 +397,7 @@ namespace VAdvantage.Controller
 
                 //	Access Level
                 vo.AccessLevel = Utility.Util.GetValueOfString(dr["AccessLevel"]);
-                if (!role.CanView(vo.ctx, vo.AccessLevel) && !DataBase.GlobalVariable.IsVisualEditor)	//	No Access
+                if (!skipRole && !role.CanView(vo.ctx, vo.AccessLevel) && !DataBase.GlobalVariable.IsVisualEditor)	//	No Access
                 {
                     VLogger.Get().Fine("No Role Access - AD_Tab_ID=" + vo.AD_Tab_ID + " " + vo.Name);
                     return false;
@@ -467,215 +407,12 @@ namespace VAdvantage.Controller
                 //	Table Access
                 vo.AD_Table_ID = Utility.Util.GetValueOfInt(dr["AD_Table_ID"]);
                 vo.ctx.SetContext(vo.windowNo, vo.tabNo, "AD_Table_ID", vo.AD_Table_ID.ToString());
-                if (!role.IsTableAccess(vo.AD_Table_ID, true) && !DataBase.GlobalVariable.IsVisualEditor)
+                if (!skipRole && !role.IsTableAccess(vo.AD_Table_ID, true) && !DataBase.GlobalVariable.IsVisualEditor)
                 {
                     VLogger.Get().Config("No Table Access - AD_Tab_ID="
                         + vo.AD_Tab_ID + " " + vo.Name);
                     return false;
                 }
-
-                if (role.IsTableReadOnly(vo.AD_Table_ID) && !DataBase.GlobalVariable.IsVisualEditor)
-                {
-                    vo.IsReadOnly = true;
-                }
-
-                if (Utility.Util.GetValueOfString(dr["IsReadOnly"]).Equals("Y"))
-                    vo.IsReadOnly = true;
-                vo.ReadOnlyLogic = Utility.Util.GetValueOfString(dr["ReadOnlyLogic"]);
-                if (Utility.Util.GetValueOfString(dr["IsInsertRecord"]).Equals("N"))
-                    vo.IsInsertRecord = false;
-
-                //
-                vo.Description = Utility.Util.GetValueOfString(dr["Description"]);
-                if (vo.Description == null)
-                    vo.Description = "";
-                vo.Help = Utility.Util.GetValueOfString(dr["Help"]);
-                if (vo.Help == null)
-                    vo.Help = "";
-
-                if (Utility.Util.GetValueOfString(dr["IsSingleRow"]).Equals("Y"))
-                    vo.IsSingleRow = true;
-                if (Utility.Util.GetValueOfString(dr["HasTree"]).Equals("Y"))
-                    vo.HasTree = true;
-
-                if (Utility.Util.GetValueOfString(dr["ShowSummaryLevelNodes"]).Equals("Y"))
-                    vo.ShowSummaryLevel = true;
-
-
-                vo.AD_Table_ID = Utility.Util.GetValueOfInt(dr["AD_Table_ID"]);
-                vo.TableName = Utility.Util.GetValueOfString(dr["TableName"]);
-                if (Utility.Util.GetValueOfString(dr["IsView"]).Equals("Y"))
-                    vo.IsView = true;
-                vo.AD_Column_ID = Utility.Util.GetValueOfInt(dr["AD_Column_ID"]);   //  Primary Parent Column
-
-                if (Utility.Util.GetValueOfString(dr["IsSecurityEnabled"]).Equals("Y"))
-                    vo.IsSecurityEnabled = true;
-                if (Utility.Util.GetValueOfString(dr["IsDeleteable"]).Equals("Y"))
-                    vo.IsDeleteable = true;
-                if (Utility.Util.GetValueOfString(dr["IsHighVolume"]).Equals("Y"))
-                    vo.IsHighVolume = true;
-
-                vo.CommitWarning = Utility.Util.GetValueOfString(dr["CommitWarning"]);
-                if (vo.CommitWarning == null)
-                    vo.CommitWarning = "";
-                vo.WhereClause = Utility.Util.GetValueOfString(dr["WhereClause"]);
-                if (vo.WhereClause == null)
-                    vo.WhereClause = "";
-
-                vo.OrderByClause = Utility.Util.GetValueOfString(dr["OrderByClause"]);
-                if (vo.OrderByClause == null)
-                    vo.OrderByClause = "";
-
-                vo.AD_Process_ID = Utility.Util.GetValueOfInt(dr["AD_Process_ID"]);
-                //if (dr.wasNull())
-                //    vo.AD_Process_ID = 0;
-                vo.AD_Image_ID = Utility.Util.GetValueOfInt(dr["AD_Image_ID"]);
-                //if (dr.wasNull())
-                //    vo.AD_Image_ID = 0;
-                vo.Included_Tab_ID = Utility.Util.GetValueOfInt(dr["Included_Tab_ID"]);
-                //if (dr.wasNull())
-                //    vo.Included_Tab_ID = 0;
-                //
-                vo.TabLevel = Utility.Util.GetValueOfInt(dr["TabLevel"]);
-                vo.ctx.SetContext(vo.windowNo, vo.tabNo, "TabLevel", vo.TabLevel.ToString());
-                //if (dr.wasNull())
-                //    vo.TabLevel = 0;
-                //
-                vo.IsSortTab = Utility.Util.GetValueOfString(dr["IsSortTab"]).Equals("Y");
-                if (vo.IsSortTab)
-                {
-                    vo.AD_ColumnSortOrder_ID = Utility.Util.GetValueOfInt(dr["AD_ColumnSortOrder_ID"]);
-                    vo.AD_ColumnSortYesNo_ID = Utility.Util.GetValueOfInt(dr["AD_ColumnSortYesNo_ID"]);
-                }
-                //
-                //	Replication Type - set R/O if Reference
-                try
-                {
-                    //int index = dr.fin .findColumn("ReplicationType");
-                    vo.ReplicationType = Utility.Util.GetValueOfString(dr["ReplicationType"]);
-                    if ("R".Equals(vo.ReplicationType))
-                        vo.IsReadOnly = true;
-                }
-                catch
-                {
-                }
-
-                /***************Worked For Header Panel By Karan*****************/
-                vo.IsHeaderPanel = dr["Isheaderpanel"].Equals("Y");
-
-                /***************Worked For Header Panel By Mandeep * ****************/
-                vo.HPanelNotShowInMultiRow = dr["HPanelNotShowInMultiRow"].Equals("Y");
-
-                vo.AD_HeaderLayout_ID = Util.GetValueOfInt(dr["AD_HeaderLayout_ID"]);
-
-                vo.HeaderAlignment = Utility.Util.GetValueOfString(dr["HeaderAlignment"]);
-
-                vo.TabPanelAlignment = Utility.Util.GetValueOfString(dr["TabPanelAlignment"]);
-
-                vo.HeaderHeight = Utility.Util.GetValueOfDecimal(dr["Height"]);
-
-                vo.HeaderWidth = Utility.Util.GetValueOfDecimal(dr["Width"]);
-
-                vo.HeaderPadding = Utility.Util.GetValueOfString(dr["Padding"]);
-
-                vo.HeaderBackColor = Utility.Util.GetValueOfString(dr["HeaderBackgroundColor"]);
-
-                /***************** End Header panel work ***************/
-
-                // set property for Maintain version on approval
-                vo.MaintainVerOnApproval = Utility.Util.GetValueOfString(dr["MaintainVerOnApproval"]).Equals("Y");
-
-                vo.IsMaintainVersions = Utility.Util.GetValueOfString(dr["IsMaintainVersions"]).Equals("Y");
-
-                vo.TabLayout = Utility.Util.GetValueOfString(dr["TabLayout"]);
-
-                vo.NewRecordView = Util.GetValueOfString(dr["NewRecordView"]);
-            }
-            catch (System.Exception ex)
-            {
-                VLogger.Get().Log(Level.SEVERE, "", ex);
-                return false;
-            }
-            return true;
-        }
-
-
-        /// <summary>
-        /// Load Tab Details from dr into vo Without Role access
-        /// </summary>
-        /// <param name="vo">GridTabVO object</param>
-        /// <param name="dr">Datarow</param>
-        /// <returns>true if successful</returns>
-        private static bool LoadTabDetailsWithSkipRole(GridTabVO vo, IDataReader dr)
-        {
-            MRole role = MRole.GetDefault(vo.ctx, false);
-            bool showTrl = "Y".Equals(vo.ctx.GetContext("#ShowTrl")) || DataBase.GlobalVariable.IsVisualEditor;
-            bool showAcct = "Y".Equals(vo.ctx.GetContext("#ShowAcct")) || DataBase.GlobalVariable.IsVisualEditor;
-            bool showAdvanced = "Y".Equals(vo.ctx.GetContext("#ShowAdvanced")) || DataBase.GlobalVariable.IsVisualEditor;
-            //	VLogger.get().warning("ShowTrl=" + showTrl + ", showAcct=" + showAcct);
-            try
-            {
-                vo.AD_Tab_ID = Utility.Util.GetValueOfInt(dr["AD_Tab_ID"]);
-                vo.Referenced_Tab_ID = Utility.Util.GetValueOfInt(dr["Referenced_Tab_ID"]);
-                vo.ctx.SetContext(vo.windowNo, vo.tabNo, "AD_Tab_ID", vo.AD_Tab_ID.ToString());
-                vo.Name = Utility.Util.GetValueOfString(dr["Name"]);
-                vo.ctx.SetContext(vo.windowNo, vo.tabNo, "Name", vo.Name);
-
-                //	Translation Tab	**
-                if (Utility.Util.GetValueOfString(dr["IsTranslationTab"]).Equals("Y"))
-                {
-                    //	Document Translation
-                    vo.TableName = Utility.Util.GetValueOfString(dr["TableName"]);
-                    if (!Env.IsBaseTranslation(vo.TableName)	//	C_UOM, ...
-                        && !Common.Common.IsMultiLingualDocument(vo.ctx))
-                        showTrl = false;
-                    if (!showTrl)
-                    {
-                        VLogger.Get().Config("TrlTab Not displayed - AD_Tab_ID="
-                            + vo.AD_Tab_ID + "=" + vo.Name + ", Table=" + vo.TableName
-                            + ", BaseTrl=" + Env.IsBaseTranslation(vo.TableName)
-                            + ", MultiLingual=" + Common.Common.IsMultiLingualDocument(vo.ctx));
-                        return false;
-                    }
-                }
-                //	Advanced Tab	**
-                if (!showAdvanced && Utility.Util.GetValueOfString(dr["IsAdvancedTab"]).Equals("Y"))
-                {
-                    VLogger.Get().Config("AdvancedTab Not displayed - AD_Tab_ID="
-                        + vo.AD_Tab_ID + " " + vo.Name);
-                    return false;
-                }
-                //	Accounting Info Tab	**
-                if (!showAcct && Utility.Util.GetValueOfString(dr["IsInfoTab"]).Equals("Y"))
-                {
-                    VLogger.Get().Fine("AcctTab Not displayed - AD_Tab_ID="
-                        + vo.AD_Tab_ID + " " + vo.Name);
-                    return false;
-                }
-
-                //	DisplayLogic
-                vo.DisplayLogic = Utility.Util.GetValueOfString(dr["DisplayLogic"]);
-
-                //	Access Level
-                vo.AccessLevel = Utility.Util.GetValueOfString(dr["AccessLevel"]);
-                //if (!role.CanView(vo.ctx, vo.AccessLevel) && !DataBase.GlobalVariable.IsVisualEditor)	//	No Access
-                //{
-                //    VLogger.Get().Fine("No Role Access - AD_Tab_ID=" + vo.AD_Tab_ID + " " + vo.Name);
-                //    return false;
-                //}	
-                //	Used by MField.getDefault
-                vo.ctx.SetContext(vo.windowNo, vo.tabNo, "AccessLevel", vo.AccessLevel);
-
-                //	Table Access
-                vo.AD_Table_ID = Utility.Util.GetValueOfInt(dr["AD_Table_ID"]);
-                vo.ctx.SetContext(vo.windowNo, vo.tabNo, "AD_Table_ID", vo.AD_Table_ID.ToString());
-
-                //if (!role.IsTableAccess(vo.AD_Table_ID, true) && !DataBase.GlobalVariable.IsVisualEditor)
-                //{
-                //    VLogger.Get().Config("No Table Access - AD_Tab_ID="
-                //        + vo.AD_Tab_ID + " " + vo.Name);
-                //    return false;
-                //}
 
                 if (role.IsTableReadOnly(vo.AD_Table_ID) && !DataBase.GlobalVariable.IsVisualEditor)
                 {

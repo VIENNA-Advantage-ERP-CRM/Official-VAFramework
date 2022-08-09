@@ -1,6 +1,6 @@
 ﻿; (function (VIS, $) {
 
-    function cvd(aPanel) {
+    function cvd(aPanel, fromCardDialogBtn) {
         var self = this;
         var gc = aPanel.curGC;
         var mTab = gc.getMTab();
@@ -147,6 +147,8 @@
                 ad_Tab_ID: mTab.getAD_Tab_ID()
             }
 
+            /** Load First Time Template
+             */
             $.ajax({
                 type: "POST",
                 url: url,
@@ -167,6 +169,10 @@
 
         }
 
+        /**
+         * Busy Indigater
+         * @param {any} isBusy
+         */
         function IsBusy(isBusy) {
             if (isBusy && isBusyRoot != null) {
                 isBusyRoot.css({ "display": "block" });
@@ -803,6 +809,9 @@
                     .indexOf(m[3].toUpperCase()) >= 0;
             };
 
+            /**
+             * check anything chnage in Viewblock and add scroll acording to height
+             */
             DivViewBlock.find('.vis-viewBlock').on('DOMSubtreeModified', function () {
                 var iH = DivViewBlock.height();
                 var cH = DivViewBlock.find('.canvas').height();
@@ -818,6 +827,7 @@
 
         }
 
+        // change status of linked field
         function markfilledField() {
             DivCardField.find('.linked').removeClass('linked vis-succes-clr');
             DivCardField.find('.fieldLbl:not(:first)').prop("draggable", true);
@@ -837,6 +847,7 @@
 
         }
 
+        // sort field in ascending order
         function Ascending_sort(a, b) {
             return ($(b).attr('title').toUpperCase()) <
                 ($(a).attr('title').toUpperCase()) ? 1 : -1;
@@ -885,7 +896,7 @@
         }
 
         // #endregion
-
+        // load UI From partial view
         function CardViewUI(temResult) {
             root.load(VIS.Application.contextUrl + 'CardViewWizard/Index/?windowno=' + WindowNo, function (event) {
                 /*step 1*/
@@ -998,8 +1009,9 @@
                         $(this).addClass('vis-active-template');
                     });
                     DivCradStep1.show();
-
+                    //get all cards
                     GetCards();
+                    //get template category
                     getTemplateCategory();
                     FillFields(true, false);
                     FillGroupFields();
@@ -1285,6 +1297,7 @@
                 }
             });
 
+            //change sequence of sections
             DivGridSec.find('.vis-sectionAdd').sortable({
                 disabled: false,
                 update: function (event, ui) {
@@ -2057,7 +2070,7 @@
                     ch.close();
                     isEdit = false;
                     isNewRecord = false;
-                    if (gc.isCardRow && !aPanel.fromCardDialogBtn)
+                    if (gc.isCardRow && !fromCardDialogBtn)
                         //cardView.requeryData();
                         cardView.getCardViewData(mTab, AD_CardView_ID);
                 }
@@ -2129,7 +2142,7 @@
                     if (closeDialog) {
                         isNewRecord = false;
                         isEdit = false;
-                        if (gc.isCardRow && !aPanel.fromCardDialogBtn)
+                        if (gc.isCardRow && !fromCardDialogBtn)
                             cardView.getCardViewData(mTab, AD_CardView_ID);
                         ch.close();
                     }
@@ -4525,6 +4538,9 @@
 
         }
 
+
+        /**Scale Template for fit to Block
+         * */
         function scaleTemplate() {
             DivTemplate.find('.vis-cardSingleViewTemplate').each(function () {
                 var pH = $(this).height();
@@ -4546,7 +4562,10 @@
         }
         // #endregion
 
-        if (aPanel.fromCardDialogBtn) {
+        /*
+         * Get Fields without role          
+         */
+        if (fromCardDialogBtn) {
             url = VIS.Application.contextUrl + 'JsonData/GetGridWindowSkipRole';
             var obj = {
                 windowNo: WindowNo,
@@ -4610,6 +4629,8 @@
             return root;
         };
 
+        /** Show card Dialog
+         * */
         this.show = function () {
             var w = $(window).width() - 150;
             var h = $(window).height() - 10;
@@ -4628,10 +4649,12 @@
 
         function cancel() {
             ch.close();
-            aPanel.fromCardDialogBtn = false;
+            //aPanel.fromCardDialogBtn = false;
             return true;
         };
 
+        /** Change Template
+         * */
         function templatechanges() {
             var Chtml = DivViewBlock.find('.vis-viewBlock').html();
             if (cur_history_index < history.length - 1) {
@@ -4653,6 +4676,10 @@
             btnUndo.removeAttr("disabled");
         }
 
+        /**
+         * Add or Delete row and column from viewblock
+         * @param {any} e
+         */
         function ViewBlockAddDelRowCol(e) {
 
             DivCradStep2.find('.vis-v-rowcol').show();

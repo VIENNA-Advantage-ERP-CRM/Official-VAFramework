@@ -138,7 +138,6 @@
         this.isAutoCompleteOpen = false;
         this.instructionPop = {};
         this.instructionPop[this.ACTION_NAME_NEW] = false;
-        this.fromCardDialogBtn = false;
         function initComponenet() {
 
             var clone = document.importNode(tmpAPanel, true);
@@ -2493,8 +2492,7 @@
             return;
         }
         else if (columnName.equals("OpenCardDialog")) {
-            aPanel.fromCardDialogBtn = true;
-            aPanel.cmd_cardDialog();
+            aPanel.cmd_cardDialog(true);
         }
         if (vButton.AD_Process_ID > 0) {
 
@@ -3519,9 +3517,9 @@
         var help = new VIS.Apps.help(this.gridWindow);
     };
 
-    APanel.prototype.cmd_cardDialog = function () {
+    APanel.prototype.cmd_cardDialog = function (fromCardDialogBtn) {
 
-        var card = new VIS.CVDialog(this);
+        var card = new VIS.CVDialog(this, fromCardDialogBtn);
         card.show();
     };
 
