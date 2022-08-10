@@ -1162,7 +1162,7 @@ namespace VIS.Controllers
                 if (tableName.Equals("AD_Ref_List"))
                 {
                     //sql = "SELECT " + keyCol + ", " + displayCol + " || '('|| count(" + keyCol + ") || ')' FROM " + tableName + " WHERE IsActive='Y'";
-                    sql = "SELECT " + pColumnName + ", (Select Name from AD_REf_List where Value= " + pColumnName + " AND AD_Reference_ID=" + json.AD_Referencevalue_ID + ")  as name ,count(" + pColumnName + ")"
+                    sql = "SELECT " + pColumnName + ", (Select Name from AD_REf_List where Value= " + pColumnName + " AND AD_Reference_ID=" + json.AD_Reference_Value_ID + ")  as name ,count(" + pColumnName + ")"
                         + " FROM " + pTableName;// + " WHERE " + pTableName + ".IsActive='Y'";
                     sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(validationCode))
