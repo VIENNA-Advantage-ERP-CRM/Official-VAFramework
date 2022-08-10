@@ -886,8 +886,8 @@
         function getData(whereClause) {
             var data = [];
             try {
-                var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ArchiveViewer/GetArchieveData", { "whereClause": whereClause });
-                var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//
+                var ret = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ArchiveViewer/GetArchieveData", { "whereClause": whereClause });
+                var dr = new VIS.DB.DataReader().toJson(JSON.stringify(ret));//
                 var count = 1;
                 while (dr.read()) {
 
