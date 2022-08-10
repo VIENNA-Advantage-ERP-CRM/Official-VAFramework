@@ -74,6 +74,7 @@ namespace VAdvantage.Controller
         public bool HideFieldText = false;
 
         public string FieldValueStyle = "";
+        public string FieldLabelStyle = "";
 
         public bool IsAlwaysExecute = false;
 
