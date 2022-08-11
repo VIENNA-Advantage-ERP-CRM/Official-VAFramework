@@ -63,7 +63,7 @@
         var paramString = this._tblName + "," + true + "," + this.sqlWhere;
 
         // get data for current table for existing versions saved in Version table
-        var dr = VIS.dataContext.getJSONRecord("json/GetIDTextData", paramString);
+        var dr = VIS.dataContext.getJSONRecord("JsonData/GetIDTextData", paramString);
 
         // check if records can be deleted from Version table
         var del = VIS.dataContext.getJSONRecord("Common/CheckTableDeletable", this._tblName + "_Ver");

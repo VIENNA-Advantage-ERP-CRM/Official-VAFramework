@@ -1002,17 +1002,16 @@
             //    , tableName: lookupTableName, AD_Referencevalue_ID: field.getAD_Reference_Value_ID(), pTableName: this.curTab.getTableName(),
             //    pColumnName: field.getColumnName(), whereClause: whereClause,
             //};
-            var lookup = field.getLookup();
             var lookupData = {
-                'ctx': VIS.context.getWindowCtx(lookup.windowNo),
-                'windowNo': lookup.windowNo,
-                'column_ID': lookup.info.column_ID,
+                'ctx': VIS.context.getWindowCtx(this.winNo),
+                'windowNo': this.winNo,
+                'column_ID': field.getAD_Column_ID(),
                 'AD_Reference_ID': field.getDisplayType(),
                 'columnName': field.getColumnName(),
-                'AD_Reference_Value_ID': lookup.info.AD_Reference_Value_ID,
-                'validationCode': VIS.secureEngine.encrypt(lookup.info.validationCode),
+                'AD_Reference_Value_ID': field.getAD_Reference_Value_ID(),
+                'validationCode': VIS.secureEngine.encrypt(validationCode),
                 whereClause: VIS.secureEngine.encrypt(whereClause),
-                'isParent': lookup.info.isParent,
+                'isParent':false,
                 'pTableName': this.curTab.getTableName()
             }; 
 

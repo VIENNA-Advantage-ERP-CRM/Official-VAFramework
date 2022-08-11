@@ -1228,7 +1228,7 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(retRes), JsonRequestBehavior.AllowGet);
         }
 
-
+        [HttpPost]
         public JsonResult CheckVersions(SaveRecordIn RowData)
         {
             bool hasRecords = false;
@@ -1246,6 +1246,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="fields"></param>
         /// <returns></returns>
+        [HttpPost]
         public JsonResult GetIDTextData(string fields)
         {
             if (Session["Ctx"] != null)
