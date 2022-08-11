@@ -1917,7 +1917,7 @@
          * @param {any} command
          * @param {any} styleValue
          */
-        function applyCommand(command, styleValue) {
+        function applycommand(command, styleValue) {
             DivViewBlock.css({
                 'width': DivCradStep2.find('.vis-cardViewTemplateHead')[0].offsetWidth,
                 'overflow': 'auto'
