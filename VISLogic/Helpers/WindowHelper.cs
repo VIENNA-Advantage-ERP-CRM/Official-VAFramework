@@ -3677,7 +3677,7 @@ namespace VIS.Helpers
 
 
 
-            sqlIn.sql = SQL.ToString();
+            sqlIn.sql = MRole.GetDefault(ctxp).AddAccessSQL(SQL.ToString(), TableName, true, false);
             sqlIn.sqlDirect = SQL_Direct;
 
             if (rCount > 0)

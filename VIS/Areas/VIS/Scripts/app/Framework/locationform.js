@@ -137,13 +137,17 @@
                             name_startsWith: request.term
                         },
                         success: function (data) {
-                            response($.map(data.result, function (item) {
-                                return {
-                                    label: item.Name,
-                                    value: item.Name,
-                                    id: item.Key
-                                }
-                            }));
+                            if (data.result == 'ok')
+                                response(null);
+                            else {
+                                response($.map(data.result, function (item) {
+                                    return {
+                                        label: item.Name,
+                                        value: item.Name,
+                                        id: item.Key
+                                    }
+                                }));
+                            }
                         }
                     });
                 },
