@@ -45,7 +45,7 @@
 
 
         getDataSetJString(dataIn, async, function (jString) {
-            dataSet = new VIS.DB.DataSet().toJson(jString);
+           var dataSet = new VIS.DB.DataSet().toJson(jString);
             var dataSet = new VIS.DB.DataSet().toJson(jString);
             if (dataSet.getTable(0).getRows().length > 0) {
                 value = dataSet.getTable(0).getRow(0).getCell(0);
@@ -60,6 +60,24 @@
         });
 
         return value;
+    };
+
+    var executeReader = function (sql, params, callback) {
+        var async = callback ? true : false;
+        var dataIn = { sql: sql, page: 1, pageSize: 0 }
+        if (params) {
+            dataIn.param = params;
+        }
+
+        var dataReader = null;
+
+        getDataSetJString(dataIn, async, function (jString) {
+            dataReader = new VIS.DB.DataReader().toJson(jString);
+            if (async) {
+                callback(dataReader);
+            }
+        });
+        return dataReader;
     };
 
     var baseUrl = VIS.Application.contextUrl;

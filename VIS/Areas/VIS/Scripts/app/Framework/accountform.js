@@ -110,7 +110,6 @@
             return ret;
         };
 
-
         var executeDReader = function (sql, param, callback) {
             var async = callback ? true : false;
 

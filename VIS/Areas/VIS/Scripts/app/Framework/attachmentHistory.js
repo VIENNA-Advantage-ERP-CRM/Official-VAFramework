@@ -140,38 +140,7 @@
         function loadRecordDataCount(searchText) {
             $bsyDiv[0].style.visibility = "visible";
 
-            //var strAppCount = "SELECT count(*) FROM " +
-            //         "(( SELECT ai.AppointmentsInfo_ID AS ID, ai.record_ID, ai.created,'" + VIS.Msg.getMsg("Appointment") + "' AS TYPE, subject  FROM AppointmentsInfo ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_Id =" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strAppCount += " AND upper(ai.Subject)  like upper('%" + searchText + "%')";
-            //}
-            //strAppCount += " AND ai.IsTask='N' And ai.Ad_Table_Id = " + _AD_Table_ID + " And ai.AD_User_ID = " + ctx.getAD_User_ID() + ")   UNION" +
-
-            //     "( SELECT ai.AppointmentsInfo_ID AS ID, ai.record_ID, ai.created,'" + VIS.Msg.getMsg("Task") + "' AS TYPE, subject  FROM AppointmentsInfo ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_Id =" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strAppCount += " AND upper(ai.Subject)  like upper('%" + searchText + "%')";
-            //}
-            //strAppCount += " AND ai.IsTask='Y' And ai.Ad_Table_Id = " + _AD_Table_ID + " And ai.AD_User_ID = " + ctx.getAD_User_ID() + ")   UNION" +
-
-
-            //" SELECT MAILATTACHMENT1_ID AS ID, record_ID,created,'" + VIS.Msg.getMsg("SentMail") + "' AS TYPE, TITLE AS Subject FROM mailattachment1 WHERE record_id=" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strAppCount += " AND ((upper(ai.title)  like upper('%" + searchText + "%')) OR (upper(ai.mailaddressfrom) like upper('%" + searchText + "%')) OR (upper(mailaddress) like upper('%" + searchText + "%')) OR (upper(mailaddressbcc) like upper('%" + searchText + "%')) OR (upper(mailaddresscc) like upper('%" + searchText + "%')))";
-            //}
-            //strAppCount += " And attachmenttype='M' And ad_table_id=" + _AD_Table_ID + " UNION" +
-            //" SELECT MAILATTACHMENT1_ID AS ID, record_ID,created,'" + VIS.Msg.getMsg("InboxMail") + "' AS TYPE, TITLE AS Subject FROM mailattachment1 WHERE record_id=" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strAppCount += " AND ((upper(ai.title)  like upper('%" + searchText + "%')) OR (upper(ai.mailaddressfrom) like upper('%" + searchText + "%')) OR (upper(mailaddress) like upper('%" + searchText + "%')) OR (upper(mailaddressbcc) like upper('%" + searchText + "%')) OR (upper(mailaddresscc) like upper('%" + searchText + "%')))";
-            //}
-            //strAppCount += " And attachmenttype='I' And ad_table_id=" + _AD_Table_ID + " UNION" +
-            //" SELECT MAILATTACHMENT1_ID AS ID, record_ID,created,'" + VIS.Msg.getMsg("Letter") + "' AS TYPE, TITLE AS Subject FROM mailattachment1  WHERE record_id=" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strAppCount += " AND upper(ai.title)  like upper('%" + searchText + "%')";
-            //}
-            //strAppCount += " And attachmenttype='L' And ad_table_id=" + _AD_Table_ID + ") ORDER BY created DESC";
-            ////historyCount = VIS.DB.executeScalar(strAppCount);
-            //var _sql = VIS.secureEngine.encrypt(strAppCount);
-            //historyCount = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AttachmentHistory/GetRecordDataCount", { "DataCountQry": _sql }, null);
+           
 
             $.ajax({
                 url: VIS.Application.contextUrl + "AttachmentHistory/LoadRecordDataCount",
@@ -203,46 +172,7 @@
 
         /* Loads info for showing in attached history of current record */
         function loadRecordData(searchText) {
-            //var strApp = "SELECT * FROM " +
-            //        "(( SELECT ai.AppointmentsInfo_ID AS ID, ai.record_ID, ai.created,'" + VIS.Msg.getMsg("Appointment") + "' AS TYPE,ai.Subject,au.name  FROM AppointmentsInfo ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_Id =" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strApp += " AND upper(ai.Subject)  like upper('%" + searchText + "%')";
-            //}
-            //strApp += " AND ai.IsTask='N' And ai.Ad_Table_Id = " + _AD_Table_ID + " And ai.AD_User_ID = " + ctx.getAD_User_ID() + ")   UNION" +
-
-
-            //    "( SELECT ai.AppointmentsInfo_ID AS ID, ai.record_ID, ai.created,'" + VIS.Msg.getMsg("Task") + "' AS TYPE,ai.Subject,au.name  FROM AppointmentsInfo ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_Id =" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strApp += " AND upper(ai.Subject)  like upper('%" + searchText + "%')";
-            //}
-            //strApp += " AND ai.IsTask='Y' And ai.Ad_Table_Id = " + _AD_Table_ID + " And ai.AD_User_ID = " + ctx.getAD_User_ID() + ")   UNION" +
-
-
-
-            //" SELECT ai.MAILATTACHMENT1_ID AS ID, ai.record_ID,ai.created,'" + VIS.Msg.getMsg("SentMail") + "' AS TYPE, ai.TITLE AS Subject,au.name  FROM mailattachment1 ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_id=" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strApp += " AND ((upper(ai.title)  like upper('%" + searchText + "%')) OR (upper(ai.mailaddressfrom) like upper('%" + searchText + "%')) OR (upper(mailaddress) like upper('%" + searchText + "%')) OR (upper(mailaddressbcc) like upper('%" + searchText + "%')) OR (upper(mailaddresscc) like upper('%" + searchText + "%')))";
-            //}
-            //strApp += " And ai.attachmenttype='M' And ai.ad_table_id=" + _AD_Table_ID + " UNION" +
-            //" SELECT ai.MAILATTACHMENT1_ID AS ID, ai.record_ID,ai.created,'" + VIS.Msg.getMsg("InboxMail") + "' AS TYPE, ai.TITLE AS Subject,au.name  FROM mailattachment1 ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_id=" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strApp += " AND ((upper(ai.title)  like upper('%" + searchText + "%')) OR (upper(ai.mailaddressfrom) like upper('%" + searchText + "%')) OR (upper(mailaddress) like upper('%" + searchText + "%')) OR (upper(mailaddressbcc) like upper('%" + searchText + "%')) OR (upper(mailaddresscc) like upper('%" + searchText + "%')))";
-            //}
-            //strApp += " And ai.attachmenttype='I' And ai.ad_table_id=" + _AD_Table_ID + " UNION" +
-            //" SELECT ai.MAILATTACHMENT1_ID AS ID, ai.record_ID,ai.created,'" + VIS.Msg.getMsg("Letter") + "' AS TYPE, ai.TITLE AS Subject,au.name  FROM mailattachment1 ai JOIN AD_User au on au.AD_User_ID=ai.createdby WHERE ai.record_id=" + _Record_ID;
-            //if (searchText != "undefined" && searchText != null && searchText != "") {
-            //    strApp += " AND upper(ai.title)  like upper('%" + searchText + "%')";
-            //}
-            //strApp += " And ai.attachmenttype='L' And ai.ad_table_id=" + _AD_Table_ID + ") ORDER BY created DESC";
-            ////var ds = VIS.DB.executeDataSetPaging(strApp, historyPageNo, PAGESIZE);
-            ////if (ds != null && ds.getTables().length > 0) {
-            ////    createInbox(ds);
-            ////}
-            //var _sql = VIS.secureEngine.encrypt(strApp);
-            //ds = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AttachmentHistory/GetRecordData", { "DataQry": _sql }, null);
-            //if (ds != null) {
-            //    createInbox(ds);
-            //}
+            
 
             $.ajax({
                 url: VIS.Application.contextUrl + "AttachmentHistory/LoadRecordData",
@@ -1593,89 +1523,12 @@
 
         /**/
         function showAppointmentInfo(ID) {
-            var strApp = "SELECT AI.AppointmentsInfo_ID, AI.Subject,AI.Location,AI.Description,AI.AD_Table_ID, AI.Record_ID, " +
-             " ( " +
-             " CASE Label " +
-             "   WHEN 1   " +
-             "  THEN  '" + VIS.Msg.getMsg("Important", true) + "' " +
-             "   WHEN 2 " +
-             "   THEN '" + VIS.Msg.getMsg("Business", true) + "' " +
-             "   WHEN 3 " +
-             "   THEN   '" + VIS.Msg.getMsg("Personal", true) + "' " +
-             "   WHEN 4 " +
-             "   THEN '" + VIS.Msg.getMsg("Vacation", true) + "' " +
-             "   WHEN 5 " +
-             "   THEN '" + VIS.Msg.getMsg("MustAttend", true) + "' " +
-             "   WHEN 6 " +
-             "   THEN '" + VIS.Msg.getMsg("TravelRequired", true) + "' " +
-             "   WHEN 7 " +
-             "   THEN '" + VIS.Msg.getMsg("NeedsPreparation", true) + "' " +
-             "   WHEN 8 " +
-             "   THEN '" + VIS.Msg.getMsg("BirthDay", true) + "' " +
-             "   WHEN 9 " +
-             "   THEN '" + VIS.Msg.getMsg("Anniversary", true) + "' " +
-             "   WHEN 10 " +
-             "   Then '" + VIS.Msg.getMsg("PhoneCall", true) + "' " +
-             "   ELSE '" + VIS.Msg.getMsg("None", true) + "' " +
-             " END ) AS label , " +
-             " AI.StartDate , AI.EndDate, " +
-             " ( " +
-             " CASE AI.AllDay " +
-             "   WHEN 'Y' " +
-              "       THEN '" + VIS.Msg.getMsg("Yes", true) + "' " +
-             "       ELSE '" + VIS.Msg.getMsg("No", true) + "' " +
-             " END) AS Allday , " +
-             " ( " +
-             " CASE AI.Status " +
-             "   WHEN 1 " +
-             "   THEN '" + VIS.Msg.getMsg("Tentative", true) + "'  " +
-             "   WHEN 2 " +
-             "   THEN '" + VIS.Msg.getMsg("Busy", true) + "' " +
-             "   WHEN 3 " +
-             "   THEN '" + VIS.Msg.getMsg("OutOfOffice", true) + "' " +
-             "   Else " +
-             "    '" + VIS.Msg.getMsg("Free", true) + "' " +
-             "    End) as Status, " +
-             "     AI.ReminderInfo , nvl( ai.attendeeinfo,ai.Ad_User_ID) as attendeeinfo,  AI.RecurrenceInfo , " +
-             "     (  " +
-             "     CASE AI.IsPrivate " +
-             "       WHEN 'Y' " +
-             "       THEN '" + VIS.Msg.getMsg("Yes") + "' " +
-             "       ELSE '" + VIS.Msg.getMsg("No") + "' " +
-             "     END) AS IsPrivate,AI.comments ,ac.Name as caname" +
-             "   FROM AppointmentsInfo ai LEFT OUTER JOIN appointmentcategory AC " +
-            " ON AI.appointmentcategory_id=ac.appointmentcategory_id WHERE AI.AppointmentsInfo_ID=" + ID;
+           
 
-            //VIS.DB.executeDataSet(strApp, null, function (ds) {
-            //    if (ds != null && ds.getTables().length > 0) {
-            var _sql = VIS.secureEngine.encrypt(strApp);
-            var ds = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AttachmentHistory/GetAppointmentData", { "AppQry": _sql }, null);
+            var ds = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AttachmentHistory/GetAppointmentData", { "AppQry": ID }, null);
             if (ds != null) {
                 var zoomID = 0;
 
-                //if ($inboxDiv.is(':visible')) {
-                //    zoomID = 0;
-                //}
-                //else {
-                //    zoomID = ds.tables[0].rows[0].cells["ad_table_id"] + "-" + ds.tables[0].rows[0].cells["record_id"];
-                //}
-                //strApp = "";
-                //var attInfo = ds.tables[0].rows[0].cells["attendeeinfo"];
-                //if (attInfo != null && attInfo != undefined) {
-                //    strApp = " SELECT name FROM AD_User WHERE AD_User_ID IN (" + attInfo.replace(/;/g, ',') + ")";
-                //    var names = VIS.DB.executeDataSet(strApp);
-                //    if (names != null && names.getTables().length > 0) {
-                //        strApp = "";
-                //        if (names.tables[0].rows.length > 0) {
-                //            for (var k = 0; k < names.tables[0].rows.length; k++) {
-                //                strApp += names.tables[0].rows[k].cells["name"] + ", ";
-                //            }
-                //            strApp = strApp.substring(0, strApp.length - 2);
-                //        }
-                //    }
-                //}
-                //createRightPanelforAppointment(ID, ds.tables[0].rows[0].cells["location"], ds.tables[0].rows[0].cells["description"], ds.tables[0].rows[0].cells["label"], ds.tables[0].rows[0].cells["startdate"]
-                //    , ds.tables[0].rows[0].cells["enddate"], ds.tables[0].rows[0].cells["allday"], "", ds.tables[0].rows[0].cells["comments"], zoomID, ds.tables[0].rows[0].cells["subject"], ds.tables[0].rows[0].cells["caname"], "", ds.tables[0].rows[0].cells["appointmentsinfo_id"], strApp);
 
                 if ($inboxDiv.is(':visible')) {
                     zoomID = 0;
@@ -1686,8 +1539,7 @@
                 strApp = "";
                 var attInfo = ds["AttendeeInfo"];
                 if (attInfo != null && attInfo != "") {
-                    //strApp = " SELECT Name FROM AD_User WHERE AD_User_ID IN (" + attInfo.replace(/;/g, ',') + ")";
-                    //_sql = VIS.secureEngine.encrypt(strApp);
+                   
                     names = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AttachmentHistory/GetUser", { "UserQry": attInfo }, null);
                     if (names != null && names.length > 0) {
                         strApp = "";

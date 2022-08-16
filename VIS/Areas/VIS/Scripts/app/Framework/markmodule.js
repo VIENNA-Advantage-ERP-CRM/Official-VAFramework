@@ -71,15 +71,9 @@
 
             lstModules = [];
             var module = null;
-            //var dr = VIS.DB.executeReader("SELECT AD_ModuleInfo_ID, Name FROM AD_Moduleinfo WHERE isActive='Y' ORDER BY Upper(Name) ");
+            
             var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "MarkModule/LoadModules", null, null);
-            //while (dr.read()) {
-            //    module = {};
-            //    module.AD_ModuleInfo_ID = dr.getInt(0);
-            //    module.Name = dr.getString(1);
-            //    lstModules.push(module);
-            //}
-            //dr = null;
+           
 
             if (dr != null) {
                 for (var i in dr) {
@@ -90,10 +84,7 @@
                 }
             }
             if (_recordID.length == 1) {
-                //dr = VIS.DB.executeReader("select AD_moduleinfo_id  from ad_exportdata e  where e.record_id=" + _recordID[0] + " and e.ad_table_id=" + _tableID);
-                //while (dr.read()) {
-                //    lstExistingRec.push(dr.getInt(0));
-                //}
+                
                 var data = {                    
                     RecordID: _recordID[0],
                     TableID: _tableID,                   

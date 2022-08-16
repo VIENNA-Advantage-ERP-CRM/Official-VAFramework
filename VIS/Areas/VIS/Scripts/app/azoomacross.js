@@ -86,17 +86,7 @@
         var getZoomTargets = function () {
            
 
-            //var sql = "SELECT DISTINCT t.AD_Table_ID, t.TableName "
-            //    + "FROM AD_Table t "
-            //    + "WHERE EXISTS (SELECT 1 FROM AD_Tab tt "
-            //        + "WHERE tt.AD_Table_ID = t.AD_Table_ID AND tt.SeqNo=10) "
-            //    + " AND t.AD_Table_ID IN "
-            //        + "(SELECT AD_Table_ID FROM AD_Column "
-            //        + "WHERE ColumnName='" + tableName + "_ID') "
-            //    + "AND TableName NOT LIKE 'I%'"
-            //    + "AND TableName NOT LIKE '" + tableName + "' "
-            //    + "ORDER BY 1";
-            //var dr = executeReader(sql, null);
+           
 
             var dr = null;
             $.ajax({

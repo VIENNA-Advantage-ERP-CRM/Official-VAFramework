@@ -853,12 +853,14 @@
         for (var c = 0; c < curTabfieldlist.length; c++) {
             // get field
             var fieldorg = curTabfieldlist[c];
-            var field = jQuery.extend(true, {}, fieldorg);
-            if (VIS.DisplayType.IsLookup(fieldorg.getDisplayType()) || VIS.DisplayType.ID == fieldorg.getDisplayType()) {
-                field.lookup = jQuery.extend(true, {}, fieldorg.lookup);
-                if (field.lookup.initialize)
-                    field.lookup.initialize();
-            }
+            var field = Object.assign(Object.create(Object.getPrototypeOf(fieldorg)), fieldorg);
+            ///var field = jQuery.extend(true, {}, fieldorg);
+            //if (VIS.DisplayType.IsLookup(fieldorg.getDisplayType()) || VIS.DisplayType.ID == fieldorg.getDisplayType()) {
+            //    //field.lookup = jQuery.extend(true, {}, fieldorg.lookup);
+            //    field.lookup = new VIS.MLookupFactory.getMLookUp(VIS.context, this.winNo, field.getAD_Column_ID(), fieldorg.getDisplayType());
+            //    if (field.lookup.initialize)
+            //        field.lookup.initialize();
+            //}
 
 
 
@@ -945,7 +947,7 @@
             var validationCode = "";
             var lookupTableName = "";
 
-            if (field.getLookup()) {
+            if (field.getLookup() && field.getLookup().info) {
                 keyCol = field.getLookup().info.keyColumn;
                 displayCol = field.getLookup().info.displayColSubQ;
                 validationCode = VIS.Env.parseContext(VIS.Env.getCtx(), this.winNo, this.curTab.getTabNo(), field.getLookup().info.validationCode, false);
@@ -980,29 +982,44 @@
                     whereClause += " " + dynFilter;
             }
 
-            //Remove query which will fetch image.. Only display test in Filter option.
-            if (displayCol.indexOf("||'^^'|| NVL((SELECT NVL(ImageURL,'')") > 0
-                && displayCol.indexOf("thing.png^^') ||' '||") > 0) {
-                var displayCol1 = displayCol.substr(0, displayCol.indexOf("||'^^'|| NVL((SELECT NVL(Imag"));
-                displayCol = displayCol.substr(displayCol.indexOf("othing.png^^') ||' '||") + 22);
-                displayCol = displayCol1 + "||'_'||" + displayCol;
-            }
-            if (displayCol.indexOf("||'^^'|| NVL((SELECT NVL(ImageURL,'')") > 0) {
-                displayCol = displayCol.replace(displayCol.substr(displayCol.indexOf("||'^^'|| NVL((SELECT NVL(Imag"), displayCol.indexOf("Images/nothing.png^^')") + 21), '');
-            }
-            else if (displayCol.indexOf("nothing.png") > -1) {
-                displayCol = displayCol.replace(displayCol.substr(displayCol.indexOf("NVL((SELECT NVL(ImageURL,'')"), displayCol.indexOf("thing.png^^') ||' '||") + 21), '')
-            }
+            ////Remove query which will fetch image.. Only display test in Filter option.
+            //if (displayCol.indexOf("||'^^'|| NVL((SELECT NVL(ImageURL,'')") > 0
+            //    && displayCol.indexOf("thing.png^^') ||' '||") > 0) {
+            //    var displayCol1 = displayCol.substr(0, displayCol.indexOf("||'^^'|| NVL((SELECT NVL(Imag"));
+            //    displayCol = displayCol.substr(displayCol.indexOf("othing.png^^') ||' '||") + 22);
+            //    displayCol = displayCol1 + "||'_'||" + displayCol;
+            //}
+            //if (displayCol.indexOf("||'^^'|| NVL((SELECT NVL(ImageURL,'')") > 0) {
+            //    displayCol = displayCol.replace(displayCol.substr(displayCol.indexOf("||'^^'|| NVL((SELECT NVL(Imag"), displayCol.indexOf("Images/nothing.png^^')") + 21), '');
+            //}
+            //else if (displayCol.indexOf("nothing.png") > -1) {
+            //    displayCol = displayCol.replace(displayCol.substr(displayCol.indexOf("NVL((SELECT NVL(ImageURL,'')"), displayCol.indexOf("thing.png^^') ||' '||") + 21), '')
+            //}
 
 
-            var data = {
-                keyCol: keyCol, displayCol: displayCol, validationCode: validationCode
-                , tableName: lookupTableName, AD_Referencevalue_ID: field.getAD_Reference_Value_ID(), pTableName: this.curTab.getTableName(),
-                pColumnName: field.getColumnName(), whereClause: whereClause,
-            };
+            //var data = {
+            //    keyCol: keyCol, displayCol: displayCol, validationCode: validationCode
+            //    , tableName: lookupTableName, AD_Referencevalue_ID: field.getAD_Reference_Value_ID(), pTableName: this.curTab.getTableName(),
+            //    pColumnName: field.getColumnName(), whereClause: whereClause,
+            //};
+            var lookupData = {
+                'ctx': VIS.context.getWindowCtx(this.winNo),
+                'windowNo': this.winNo,
+                'column_ID': field.getAD_Column_ID(),
+                'AD_Reference_ID': field.getDisplayType(),
+                'columnName': field.getColumnName(),
+                'AD_Reference_Value_ID': field.getAD_Reference_Value_ID(),
+                'validationCode': VIS.secureEngine.encrypt(validationCode),
+                whereClause: VIS.secureEngine.encrypt(whereClause),
+                'isParent':false,
+                'pTableName': this.curTab.getTableName()
+            }; 
+
+           // lookupData = JSON.stringify(lookupData);
+
             var tht = this;
 
-            filterContext.getFilters(data).then(function (data) {
+            filterContext.getFilters(lookupData).then(function (data) {
 
                 var key = data["keyCol"];
                 data = data["list"];
@@ -1313,7 +1330,7 @@
 
     var filterContext = {
 
-        getFilters: function (data) {
+        getFilters: function (ldata) {
 
             return new Promise(function (resolve, reject) {
                 var result = null;
@@ -1321,9 +1338,7 @@
                 $.ajax({
                     url: VIS.Application.contextUrl + "JsonData/GetRecordForFilter",
                     type: "POST",
-                    datatype: "json",
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify(data)
+                    data: { 'data': JSON.stringify(ldata) }
                 }).done(function (json) {
                     result = json;
                     result = JSON.parse(result);

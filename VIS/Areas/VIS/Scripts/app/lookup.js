@@ -5,8 +5,8 @@
 
     var baseUrl = VIS.Application.contextUrl;
     var dataSetUrl = baseUrl + "JsonData/JDataSetWithCode";
-    var dSetUrl = baseUrl + "Form/JDataSet";
-    var nonQueryUrl = baseUrl + "JsonData/ExecuteNonQuer";
+    //var dSetUrl = baseUrl + "Form/JDataSet";
+    //var nonQueryUrl = baseUrl + "JsonData/ExecuteNonQuer";
 
     var executeReader = function (sql, param, callback) {
         var async = callback ? true : false;
@@ -25,86 +25,86 @@
         return dr;
     };
 
-    //executeDataSet
-    var executeDataSet = function (sql, param, callback) {
-        var async = callback ? true : false;
+    ////executeDataSet
+    //var executeDataSet = function (sql, param, callback) {
+    //    var async = callback ? true : false;
 
-        var dataIn = { sql: sql, page: 1, pageSize: 0 };
-        if (param) {
-            dataIn.param = param;
-        }
+    //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
+    //    if (param) {
+    //        dataIn.param = param;
+    //    }
 
-        var dataSet = null;
+    //    var dataSet = null;
 
-        getDataSetJString(dataIn, async, function (jString) {
-            dataSet = new VIS.DB.DataSet().toJson(jString);
-            if (callback) {
-                callback(dataSet);
-            }
-        });
+    //    getDataSetJString(dataIn, async, function (jString) {
+    //        dataSet = new VIS.DB.DataSet().toJson(jString);
+    //        if (callback) {
+    //            callback(dataSet);
+    //        }
+    //    });
 
-        return dataSet;
-    };
+    //    return dataSet;
+    //};
 
-    var executeDSet = function (sql, param, callback) {
-        var async = callback ? true : false;
+    //var executeDSet = function (sql, param, callback) {
+    //    var async = callback ? true : false;
 
-        var dataIn = { sql: sql, page: 1, pageSize: 0 };
-        if (param) {
-            dataIn.param = param;
-        }
-        //dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
-        var dataSet = null;
+    //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
+    //    if (param) {
+    //        dataIn.param = param;
+    //    }
+    //    //dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
+    //    var dataSet = null;
 
-        getDSetJString(dataIn, async, function (jString) {
-            dataSet = new VIS.DB.DataSet().toJson(jString);
-            if (callback) {
-                callback(dataSet);
-            }
-        });
+    //    getDSetJString(dataIn, async, function (jString) {
+    //        dataSet = new VIS.DB.DataSet().toJson(jString);
+    //        if (callback) {
+    //            callback(dataSet);
+    //        }
+    //    });
 
-        return dataSet;
-    };
+    //    return dataSet;
+    //};
 
-    var executeDReader = function (sql, param, callback) {
-        var async = callback ? true : false;
+    //var executeDReader = function (sql, param, callback) {
+    //    var async = callback ? true : false;
 
-        var dataIn = { sql: sql, page: 1, pageSize: 0 };
-        if (param) {
-            dataIn.param = param;
-        }
-        //dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
-        var dr = null;
-        getDSetJString(dataIn, async, function (jString) {
-            dr = new VIS.DB.DataReader().toJson(jString);
-            if (callback) {
-                callback(dr);
-            }
-        });
-        return dr;
-    };
+    //    var dataIn = { sql: sql, page: 1, pageSize: 0 };
+    //    if (param) {
+    //        dataIn.param = param;
+    //    }
+    //    //dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
+    //    var dr = null;
+    //    getDSetJString(dataIn, async, function (jString) {
+    //        dr = new VIS.DB.DataReader().toJson(jString);
+    //        if (callback) {
+    //            callback(dr);
+    //        }
+    //    });
+    //    return dr;
+    //};
 
 
-    var executeDataReaderPaging = function (sql, page, pageSize, param, callback) {
-        var async = callback ? true : false;
+    //var executeDataReaderPaging = function (sql, page, pageSize, param, callback) {
+    //    var async = callback ? true : false;
 
-        var dataIn = { sql: sql, page: page, pageSize: pageSize };
-        if (param) {
-            dataIn.param = param;
-        }
-        //dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
+    //    var dataIn = { sql: sql, page: page, pageSize: pageSize };
+    //    if (param) {
+    //        dataIn.param = param;
+    //    }
+    //    //dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
 
-        var dr = null;
+    //    var dr = null;
 
-        getDSetJString(dataIn, async, function (jString) {
-            dr = new VIS.DB.DataReader().toJson(jString);
-            if (callback) {
-                callback(dr);
-            }
-        });
+    //    getDSetJString(dataIn, async, function (jString) {
+    //        dr = new VIS.DB.DataReader().toJson(jString);
+    //        if (callback) {
+    //            callback(dr);
+    //        }
+    //    });
 
-        return dr;
-    };
+    //    return dr;
+    //};
 
 
 
@@ -129,26 +129,26 @@
         return result;
     };
 
-    //DataSet String
-    function getDSetJString(data, async, callback) {
-        var result = null;
-        data.sql = VIS.secureEngine.encrypt(data.sql);
-        $.ajax({
-            url: dSetUrl,
-            type: "POST",
-            datatype: "json",
-            contentType: "application/json; charset=utf-8",
-            async: async,
-            data: JSON.stringify(data)
-        }).done(function (json) {
-            result = json;
-            if (callback) {
-                callback(json);
-            }
-            //return result;
-        });
-        return result;
-    };
+    ////DataSet String
+    //function getDSetJString(data, async, callback) {
+    //    var result = null;
+    //    data.sql = VIS.secureEngine.encrypt(data.sql);
+    //    $.ajax({
+    //        url: dSetUrl,
+    //        type: "POST",
+    //        datatype: "json",
+    //        contentType: "application/json; charset=utf-8",
+    //        async: async,
+    //        data: JSON.stringify(data)
+    //    }).done(function (json) {
+    //        result = json;
+    //        if (callback) {
+    //            callback(json);
+    //        }
+    //        //return result;
+    //    });
+    //    return result;
+    //};
 
 
     function Lookup(lookupInfo, lookup, ctx, windowNo, displayType) {
@@ -308,14 +308,34 @@
 
 
     //1.  MLookup wrapper class for lookup json Object 
-    function MLookup(lookupInfo, lookup) {
+    function MLookup(lookupInfo, lookup, AD_Window_ID, AD_Field_ID, AD_Tab_ID, lookupData) {
         Lookup.call(this, lookupInfo, lookup);
         /** Save getDirect last return value */
         this.lookupDirect = {};
         /** Save last unsuccessful */
         this.directNullKey;
-
+        this.AD_Window_ID = AD_Window_ID;
+        this.AD_Field_ID = AD_Field_ID;
+        this.AD_Tab_ID = AD_Tab_ID;
+        this.lookupData = lookupData;
         this.loading = false;
+
+        if (!this.lookupData) {
+            var keyCol = lookupInfo.keyColumn;
+            if (keyCol && keyCol.indexOf(".") > -1) {
+                keyCol = keyCol.substring(keyCol.indexOf(".")+1);
+            }
+            this.lookupData = {
+                'ctx': VIS.context.getWindowCtx(lookupInfo.windowNo),
+                'windowNo': lookupInfo.windowNo,
+                'column_ID': lookupInfo.column_ID,
+                'AD_Reference_ID': lookup._displayType,
+                'columnName': keyCol,
+                'AD_Reference_Value_ID': lookupInfo.AD_Reference_Value_ID,
+                'isParent': lookupInfo.isParent,
+                'validationCode': VIS.secureEngine.encrypt(lookupInfo.validationCode)
+            };
+        }
 
         this.nextRead = 0;
         this.cLookup = false;
@@ -652,48 +672,70 @@
 
         try {
             // SELECT Key, Value, Name FROM ...
-            var query = this.info.queryDirect;
-            var param = [];
-            if (isNumber) {
-                param.push(new DB.SqlParam("@key", parseInt(key)));
-            }
-            else {
-                param.push(new DB.SqlParam("@key", key.toString()));
-            }
-            var dr = executeDReader(query, param);
+            //var query = this.info.queryDirect;
+            //var param = [];
+            ////if (isNumber) {
+            //    param.push(new DB.SqlParam("@key", parseInt(key)));
+            //}
+            //else {
+            //    param.push(new DB.SqlParam("@key", key.toString()));
+            //}
 
-            if (dr.read()) {
-                var name = dr.getString(2);
+            //var dr = executeDReader(query, param);
+            var self = this;
+            $.ajax({
+                url: VIS.Application.contextUrl + "Lookup/GetLookupDirect",
+                async: false,
+                type: 'post',
+                data: {
+                    WindowNo: self.getWindowNo(),
+                    AD_Window_ID: self.AD_Window_ID,
+                    AD_Tab_ID: self.AD_Tab_ID,
+                    AD_Field_ID: self.AD_Field_ID,
+                    Key: key,
+                    IsNumber: isNumber,
+                    LookupData: JSON.stringify(self.lookupData)
+                },
+                success: function (data) {
+                    var dr = new VIS.DB.DataReader().toJson(data);
 
-                var isActive = dr.getString(3).equals("Y");
-                if (!isActive) {
-                    name = this.INACTIVE_S + name + this.INACTIVE_E;
-                    this.hasInactive = true;
+                    if (dr.read()) {
+                        var name = dr.getString(2);
+
+                        var isActive = dr.getString(3).equals("Y");
+                        if (!isActive) {
+                            name = self.INACTIVE_S + name + self.INACTIVE_E;
+                            self.hasInactive = true;
+                        }
+
+                        if (isNumber) {
+                            var keyValue = dr.getInt(0);
+                            var p = { Key: keyValue, Name: VIS.Utility.encodeText(name) };
+                            if (saveInCache) // save if
+                                self.lookup[" " + keyValue] = p;
+                            directValue = p;
+                        } else {
+                            var value = dr.getString(1);
+                            var p1 = { Key: value, Name: VIS.Utility.encodeText(name) };
+                            if (saveInCache) // save if
+                                self.lookup[" " + value] = p1;
+                            directValue = p1;
+                        }
+                        if (dr.read()) {
+                            self.log.log(VIS.Logging.Level.SEVERE, self.info.keyColumn
+                                + ": Not unique (first returned) for " + key);
+                        }
+
+                    } else {
+                        self.directNullKey = key;
+                        directValue = null;
+                    }
+                },
+                error: function (er) {
+                    self.log.log(VIS.Logging.Level.SEVERE, er);
                 }
+            });
 
-                if (isNumber) {
-                    var keyValue = dr.getInt(0);
-                    var p = { Key: keyValue, Name: VIS.Utility.encodeText(name) };
-                    if (saveInCache) // save if
-                        this.lookup[" " + keyValue] = p;
-                    directValue = p;
-                } else {
-                    var value = dr.getString(1);
-                    var p1 = { Key: value, Name: VIS.Utility.encodeText(name) };
-                    if (saveInCache) // save if
-                        this.lookup[" " + value] = p1;
-                    directValue = p1;
-                }
-                if (dr.read()) {
-                    this.log.log(VIS.Logging.Level.SEVERE, this.info.keyColumn
-                        + ": Not unique (first returned) for " + key
-                        + " SQL=" + query);
-                }
-
-            } else {
-                this.directNullKey = key;
-                directValue = null;
-            }
 
             //if (CLogMgt.isLevelFinest())
             //    log.finest(m_info.KeyColumn + ": " + directValue + " - "
@@ -704,12 +746,12 @@
                 + this.info.queryDirect + "; Key=" + key, e);
             directValue = null;
         }
-        finally {
-            if (dr != null)
-                dr.dispose();
-            dr = null;
-        }
-        // Cache Local if not added to R/W cache
+        //finally {
+        //    if (dr != null)
+        //        dr.dispose();
+        //    dr = null;
+        //}
+        //// Cache Local if not added to R/W cache
         if (cacheLocal && !saveInCache && (directValue != null)) {
             if (this.lookupDirect == null)
                 this.lookupDirect = {};
@@ -781,19 +823,33 @@
 
         // SELECT Key, Value, Name FROM ...
         var query = this.info.queryDirect;
-        var param = [];
-        if (isNumber) {
-            param.push(new DB.SqlParam("@key", parseInt(key)));
-        }
-        else {
-            param.push(new DB.SqlParam("@key", key.toString()));
-        }
+        //var param = [];
+        //if (isNumber) {
+        //    param.push(new DB.SqlParam("@key", parseInt(key)));
+        //}
+        //else {
+        //    param.push(new DB.SqlParam("@key", key.toString()));
+        //}
 
-        var directAllQuery = this.info.queryDirect;//.replace("@key", key.toString());
+        //var directAllQuery = this.info.queryDirect;//.replace("@key", key.toString());
 
         var self = this;
-        executeDReader(directAllQuery, param, function (dr) {
-            try {
+
+        $.ajax({
+            url: VIS.Application.contextUrl + "Lookup/GetLookupDirect",
+            type:'post',
+            data: {
+                WindowNo: self.getWindowNo(),
+                AD_Window_ID: self.AD_Window_ID,
+                AD_Tab_ID: self.AD_Tab_ID,
+                AD_Field_ID: self.AD_Field_ID,
+                Key: key,
+                IsNumber: isNumber,
+                LookupData: JSON.stringify(self.lookupData)
+            },
+            type:'post',
+            success: function (data) {
+                var dr = new VIS.DB.DataReader().toJson(data);
 
                 if (dr.read()) {
                     var name = dr.getString(2);
@@ -810,38 +866,46 @@
                 else {
                     self.directNullKey = key;
                 }
+            },
+            error: function () {
             }
-            catch (e) {
-                console.log(e);
-            }
-            self = null;
         });
+
+        //executeDReader(directAllQuery, param, function (dr) {
+        //    try {
+
+        //    }
+        //    catch (e) {
+        //        console.log(e);
+        //    }
+        //    self = null;
+        //});
     };
 
     MLookup.prototype.load = function (async, checkCache) {
 
         var sql = this.info.query;
         var params = [];
-
+        var validation = "";
         // not validated
         if (!this.info.isValidated) {
-            var validation = VIS.Env.parseContext(VIS.context, this.getWindowNo(), this.getTabNo(), this.info.validationCode, false, true);
-            if (validation.length == 0 && this.info.validationCode.length > 0) {
-                this.log.fine(this.info.keyColumn + ": Loader NOT Validated: " + this.info.validationCode);
-                //console.log(this.info.keyColumn + ": Loader NOT Validated: " + this.info.validationCode);
-                return;
-            }
-            else {
-                var posFrom = sql.lastIndexOf(" FROM ");
-                var hasWhere = sql.indexOf(" WHERE ", posFrom) != -1;
-                //
-                var posOrder = sql.lastIndexOf(" ORDER BY ");
-                if (posOrder != -1)
-                    sql = sql.substring(0, posOrder) + (hasWhere ? " AND " : " WHERE ") + validation + sql.substring(posOrder);
-                else
-                    sql += (hasWhere ? " AND " : " WHERE ") + validation;
-                this.log.fine(this.info.keyColumn + ": Validation=" + validation);
-            }
+            validation = VIS.Env.parseContext2(VIS.context, this.getWindowNo(), this.getTabNo(), this.info.validationCode, false, true);
+            //if (validation.length == 0 && this.info.validationCode.length > 0) {
+            //    this.log.fine(this.info.keyColumn + ": Loader NOT Validated: " + this.info.validationCode);
+            //    //console.log(this.info.keyColumn + ": Loader NOT Validated: " + this.info.validationCode);
+            //    return;
+            //}
+            //else {
+            //    var posFrom = sql.lastIndexOf(" FROM ");
+            //    var hasWhere = sql.indexOf(" WHERE ", posFrom) != -1;
+            //    //
+            //    var posOrder = sql.lastIndexOf(" ORDER BY ");
+            //    if (posOrder != -1)
+            //        sql = sql.substring(0, posOrder) + (hasWhere ? " AND " : " WHERE ") + validation + sql.substring(posOrder);
+            //    else
+            //        sql += (hasWhere ? " AND " : " WHERE ") + validation;
+            //    this.log.fine(this.info.keyColumn + ": Validation=" + validation);
+            //}
         }
 
         var isNumber = this.info.keyColumn.toUpperCase().endsWith("_ID");
@@ -857,39 +921,80 @@
             }
         }
 
+        //var validationValues = "";
+
+        //if (validation && Object.keys(validation).length > 0) {
+        //    validationValues = JSON.parse(validation);
+        //}
+        var pageSize = 1000;
+        var self = this;
         if (async) {
 
-            var self = this;
+
             self.loading = true;
-            executeDataReaderPaging(sql, 1, 1000, null, function (dr) {
+
+            //executeDataReaderPaging(sql, 1, 1000, null, function (dr) {
+            //    self.readData(dr, isNumber);
+            //    if (checkCache) {
+
+            //        VIS.MLookupCache.loadEnd(self.info, self);
+            //    }
+            //    self.loading = false;;
+            //    self = null;
+            //});
+            //return 0;
+        }
+        else {
+            async = false;
+            pageSize = 0;
+        }
+
+        $.ajax({
+            url: VIS.Application.contextUrl + "Lookup/GetLookupData",
+            async: async,
+            type:'post',
+            data: {
+                WindowNo: self.getWindowNo(),
+                AD_Window_ID: self.AD_Window_ID,
+                AD_Tab_ID: self.AD_Tab_ID,
+                AD_Field_ID: self.AD_Field_ID,
+                Values: JSON.stringify(validation),
+                PageSize: pageSize,
+                LookupData: JSON.stringify(self.lookupData)
+            },
+            success: function (data) {
+                var dr = new VIS.DB.DataReader().toJson(data);
                 self.readData(dr, isNumber);
                 if (checkCache) {
 
                     VIS.MLookupCache.loadEnd(self.info, self);
                 }
-                self.loading = false;;
+                self.loading = false;
                 self = null;
-            });
-            return 0;
-        }
-
-        try {
-            dr = executeDReader(sql, null);
-            this.readData(dr, isNumber);
-            if (checkCache) {
-
-                VIS.MLookupCache.loadEnd(this.info, this);
+            },
+            error: function (e) {
+                self.log.log(VIS.Logging.Level.SEVERE, self.info.keyColumn + ": Loader - " + sql, e);
             }
-        }
-        catch (e) {
-            this.log.log(VIS.Logging.Level.SEVERE, this.info.keyColumn + ": Loader - " + sql, e);
-        }
-        finally {
-            if (dr != null) {
-                dr.dispose();
-                dr = null;
-            }
-        }
+
+        });
+
+        //try {
+        //    dr = executeDReader(sql, null);
+        //    this.readData(dr, isNumber);
+        //    if (checkCache) {
+
+        //        VIS.MLookupCache.loadEnd(this.info, this);
+        //    }
+        //}
+        //catch (e) {
+        //    this.log.log(VIS.Logging.Level.SEVERE, this.info.keyColumn + ": Loader - " + sql, e);
+        //}
+        //finally {
+        //    if (dr != null) {
+        //        dr.dispose();
+        //        dr = null;
+        //    }
+        //}
 
         return 0;
     }; // run
@@ -911,9 +1016,22 @@
         }
 
         var self = this;
-        executeDataReaderPaging(directAllQuery, 1, 100, null, function (dr) {
-            try {
+
+        $.ajax({
+            url: VIS.Application.contextUrl + "Lookup/GetLookupAll",
+            type:'post',
+            data: {
+                WindowNo: self.getWindowNo(),
+                AD_Window_ID: self.AD_Window_ID,
+                AD_Tab_ID: self.AD_Tab_ID,
+                AD_Field_ID: self.AD_Field_ID,
+                PageSize: 100,
+                LookupData: JSON.stringify(self.lookupData)
+            },
+            success: function (data) {
                 var isNumber = self.info.keyColumn.endsWith("_ID");
+
+                var dr = new VIS.DB.DataReader().toJson(data);
 
                 while (dr.read()) {
 
@@ -927,14 +1045,41 @@
                         self.lookupDirectAll[" " + value] = { Key: value, Name: VIS.Utility.encodeText(name) };
                     }
                 }
+
+                VIS.MLookupCache.loadEnd(self.info, self);
+                self.loading = false;
+                self = null;
+
+            },
+            error: function (er) {
+
             }
-            catch (e) {
-                console.log(e);
-            }
-            VIS.MLookupCache.loadEnd(self.info, self);
-            self.loading = false;
-            self = null;
         });
+
+        //executeDataReaderPaging(directAllQuery, 1, 100, null, function (dr) {
+        //    try {
+        //        var isNumber = self.info.keyColumn.endsWith("_ID");
+
+        //        while (dr.read()) {
+
+        //            var name = dr.getString(2);
+        //            if (isNumber) {
+        //                var keyValue = dr.getInt(0);
+        //                self.lookupDirectAll[" " + keyValue] = { Key: keyValue, Name: VIS.Utility.encodeText(name) };
+        //            }
+        //            else {
+        //                var value = dr.getString(1);
+        //                self.lookupDirectAll[" " + value] = { Key: value, Name: VIS.Utility.encodeText(name) };
+        //            }
+        //        }
+        //    }
+        //    catch (e) {
+        //        console.log(e);
+        //    }
+        //    VIS.MLookupCache.loadEnd(self.info, self);
+        //    self.loading = false;
+        //    self = null;
+        //});
         this.loading = true;
     };
 
@@ -969,7 +1114,7 @@
             }
 
             if (dr.tables[0].columns.length > 4) {
-               /// p["ico"] = dr.getString(4);
+                /// p["ico"] = dr.getString(4);
                 var iconInfo = dr.getString(4);
                 if (iconInfo && iconInfo.length > 0) {
                     var ico = iconInfo.split('|');
@@ -1345,7 +1490,7 @@
         // Change By Lokesh Chauhan 6 Aug 2015
         // Display Identifiers in Locator Reference instead of Value
         //var colName = "Value";
-        var colName = "Value, LocatorCombination, M_Warehouse_ID, (SELECT Name FROM M_Warehouse WHERE M_Warehouse_ID = M_Locator.M_Warehouse_ID) AS Warehouse";
+        var colName = "1";
         try {
             // Commented by Bharat on 24 Jan 2019
             // JID_1024: "Show locator name in dropdown with Warehouse Name_LocatorSearchkey(locatorName)
@@ -2001,6 +2146,9 @@
             //    throw new IllegalArgumentException("MLookup.create - no LookupInfo");
             //return lookup;
             //  var ctxstr = JSON.stringify(ctx);
+            if (validationCode && validationCode.length > 0) {
+                validationCode = VIS.secureEngine.encrypt(validationCode);
+            }
 
             var d = {
                 'ctx': ctx.getWindowCtx(windowNo),
@@ -2018,7 +2166,7 @@
             //    + "&isParent=" + isParent + "&validationCode="+validationCode;
 
             var lookup = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetLookup", d);
-            var df = new VIS.MLookup(lookup._vInfo, lookup);
+            var df = new VIS.MLookup(lookup._vInfo, lookup, 0, 0, 0, d);
             return df;
         },
         getMLookUp: function (ctx, windowNo, Column_ID, AD_Reference_ID) {
@@ -2075,64 +2223,64 @@
 
         },
 
-        getLookup_TableDirEmbed: function (language, columnName, baseTable, baseColumn) {
-            var tableName = columnName.substring(0, columnName.length - 3);
-            //	get display column name (first identifier column)
-            var sql = "VIS_98";
-            var list = [];
-            var param = [];
-            param[0] = new VIS.DB.SqlParam("@tableName", tableName);
+        //getLookup_TableDirEmbed: function (language, columnName, baseTable, baseColumn) {
+        //    var tableName = columnName.substring(0, columnName.length - 3);
+        //    //	get display column name (first identifier column)
+        //    var sql = "VIS_98";
+        //    var list = [];
+        //    var param = [];
+        //    param[0] = new VIS.DB.SqlParam("@tableName", tableName);
 
-            try {
-                var dr = executeReader(sql, param);
-                while (dr.read()) {
-                    list.push({ 'ColumnName': dr.getString(0), 'IsTranslated': dr.getString(1), 'DisplayType': dr.getInt(2), 'AD_Reference_Value_ID': dr.getInt(3) });
-                }
-                dr.close();
-                dr = null;
-            }
-            catch (e) {
-                return "";
-            }
-            //  Do we have columns ?
-            if (list.length == 0) {
-                return "";
-            }
+        //    try {
+        //        var dr = executeReader(sql, param);
+        //        while (dr.read()) {
+        //            list.push({ 'ColumnName': dr.getString(0), 'IsTranslated': dr.getString(1), 'DisplayType': dr.getInt(2), 'AD_Reference_Value_ID': dr.getInt(3) });
+        //        }
+        //        dr.close();
+        //        dr = null;
+        //    }
+        //    catch (e) {
+        //        return "";
+        //    }
+        //    //  Do we have columns ?
+        //    if (list.length == 0) {
+        //        return "";
+        //    }
 
-            var embedSQL = "SELECT ";
+        //    var embedSQL = "SELECT ";
 
-            for (var i = 0; i < list.length; i++) {
-                if (i > 0) {
-                    embedSQL = embedSQL.concat("||' - '||");
-                }
-                var ldc = list[i];
+        //    for (var i = 0; i < list.length; i++) {
+        //        if (i > 0) {
+        //            embedSQL = embedSQL.concat("||' - '||");
+        //        }
+        //        var ldc = list[i];
 
-                //  date, number
-                if (VIS.DisplayType.IsDate(ldc.DisplayType) || VIS.DisplayType.IsNumeric(ldc.DisplayType)) {
-                    embedSQL = embedSQL.concat(VIS.DB.to_char(tableName + "." + ldc.ColumnName, ldc.DisplayType, VIS.Env.getAD_Language(VIS.Env.getCtx())));
-                }
-                //  TableDir
-                else if ((ldc.DisplayType == VIS.DisplayType.TableDir || ldc.DisplayType == VIS.DisplayType.Search) && ldc.ColumnName.endsWith("_ID")) {
-                    alert("TableDir");
-                    //var embeddedSQL = GetLookup_TableDirEmbed(language, ldc.ColumnName, tableName);
-                    //embedSQL = embedSQL.concat("(").concat(embeddedSQL).concat(")");
-                }
-                //  String
-                else {
-                    //jz EDB || problem
-                    //if (DatabaseType.IsPostgre)
-                    //    embedSQL.concat("COALESCE(TO_CHAR(").concat(tableName).concat(".").Append(ldc.ColumnName).concat("),'')");
-                    //else
-                    embedSQL = embedSQL.concat(tableName).concat(".").concat(ldc.ColumnName);
-                }
-            }
+        //        //  date, number
+        //        if (VIS.DisplayType.IsDate(ldc.DisplayType) || VIS.DisplayType.IsNumeric(ldc.DisplayType)) {
+        //            embedSQL = embedSQL.concat(VIS.DB.to_char(tableName + "." + ldc.ColumnName, ldc.DisplayType, VIS.Env.getAD_Language(VIS.Env.getCtx())));
+        //        }
+        //        //  TableDir
+        //        else if ((ldc.DisplayType == VIS.DisplayType.TableDir || ldc.DisplayType == VIS.DisplayType.Search) && ldc.ColumnName.endsWith("_ID")) {
+        //            alert("TableDir");
+        //            //var embeddedSQL = GetLookup_TableDirEmbed(language, ldc.ColumnName, tableName);
+        //            //embedSQL = embedSQL.concat("(").concat(embeddedSQL).concat(")");
+        //        }
+        //        //  String
+        //        else {
+        //            //jz EDB || problem
+        //            //if (DatabaseType.IsPostgre)
+        //            //    embedSQL.concat("COALESCE(TO_CHAR(").concat(tableName).concat(".").Append(ldc.ColumnName).concat("),'')");
+        //            //else
+        //            embedSQL = embedSQL.concat(tableName).concat(".").concat(ldc.ColumnName);
+        //        }
+        //    }
 
-            embedSQL = embedSQL.concat(" FROM ").concat(tableName);
-            embedSQL = embedSQL.concat(" WHERE ").concat(baseTable).concat(".").concat(baseColumn);
-            embedSQL = embedSQL.concat("=").concat(tableName).concat(".").concat(columnName);
-            //
-            return embedSQL.toString();
-        }
+        //    embedSQL = embedSQL.concat(" FROM ").concat(tableName);
+        //    embedSQL = embedSQL.concat(" WHERE ").concat(baseTable).concat(".").concat(baseColumn);
+        //    embedSQL = embedSQL.concat("=").concat(tableName).concat(".").concat(columnName);
+        //    //
+        //    return embedSQL.toString();
+        //}
     }
 
 

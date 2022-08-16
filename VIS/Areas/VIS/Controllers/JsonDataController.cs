@@ -24,6 +24,8 @@ using System.Web.Script.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using VISLogic.Models;
+using System.Dynamic;
+using Newtonsoft.Json.Converters;
 
 namespace VIS.Controllers
 {
@@ -165,29 +167,29 @@ namespace VIS.Controllers
         /// <param name="windowNo">window number</param>
         /// <param name="AD_Window_ID">window Id</param>
         /// <returns>grid window json result</returns>
-        public JsonResult GetWindowRecords(List<string> fields, SqlParamsIn sqlIn, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
-        {
-            object data = null;
-            if (Session["ctx"] == null)
-            {
+        //public JsonResult GetWindowRecords(List<string> fields, SqlParamsIn sqlIn, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
+        //{
+        //    object data = null;
+        //    if (Session["ctx"] == null)
+        //    {
 
-            }
-            else
-            {
-                using (var w = new WindowHelper())
-                {
-                    Ctx ctx = Session["ctx"] as Ctx;
-                    sqlIn.sql = SecureEngineBridge.DecryptByClientKey(sqlIn.sql, ctx.GetSecureKey());
-                    sqlIn.sqlDirect = SecureEngineBridge.DecryptByClientKey(sqlIn.sqlDirect, ctx.GetSecureKey());
-                    sqlCount = SecureEngineBridge.DecryptByClientKey(sqlCount, ctx.GetSecureKey());
-                    sqlIn.sql = Server.HtmlDecode(sqlIn.sql);
-                    sqlIn.sqlDirect = Server.HtmlDecode(sqlIn.sqlDirect);
-                    data = w.GetWindowRecords(sqlIn, fields, ctx, rowCount, sqlCount, AD_Table_ID, obscureFields);
+        //    }
+        //    else
+        //    {
+        //        using (var w = new WindowHelper())
+        //        {
+        //            Ctx ctx = Session["ctx"] as Ctx;
+        //            sqlIn.sql = SecureEngineBridge.DecryptByClientKey(sqlIn.sql, ctx.GetSecureKey());
+        //            sqlIn.sqlDirect = SecureEngineBridge.DecryptByClientKey(sqlIn.sqlDirect, ctx.GetSecureKey());
+        //            sqlCount = SecureEngineBridge.DecryptByClientKey(sqlCount, ctx.GetSecureKey());
+        //            sqlIn.sql = Server.HtmlDecode(sqlIn.sql);
+        //            sqlIn.sqlDirect = Server.HtmlDecode(sqlIn.sqlDirect);
+        //            data = w.GetWindowRecords(sqlIn, fields, ctx, rowCount, sqlCount, AD_Table_ID, obscureFields);
 
-                }
-            }
-            return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
-        }
+        //        }
+        //    }
+        //    return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
+        //}
 
         /// <summary>
         /// Get Total card record count 
@@ -313,7 +315,7 @@ namespace VIS.Controllers
                     using (var w = new WindowHelper())
                     {
                         Ctx ctx = Session["ctx"] as Ctx;
-                        gridTable.SelectSQL = SecureEngineBridge.DecryptByClientKey(gridTable.SelectSQL, ctx.GetSecureKey());
+                        //gridTable.SelectSQL = SecureEngineBridge.DecryptByClientKey(gridTable.SelectSQL, ctx.GetSecureKey());
 
                         gOut = w.InsertOrUpdateRecord(gridTable, Session["ctx"] as Ctx);
                     }
@@ -812,6 +814,7 @@ namespace VIS.Controllers
             int AD_Reference_Value_ID, bool isParent, string validationCode)
         {
             Ctx _ctx = new Ctx(ctx);
+            validationCode = SecureEngineBridge.DecryptByClientKey(validationCode, _ctx.GetSecureKey());
             //Ctx _ctx = null;//(ctx) as Ctx;
             Lookup res = LookupHelper.GetLookup(_ctx, windowNo, column_ID, AD_Reference_ID, columnName,
                 AD_Reference_Value_ID, isParent, validationCode);
@@ -1087,15 +1090,63 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(obj.GetZoomParentRecord(SelectColumn, SelectTable, WhereColumn, WhereValue)), JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetRecordForFilter(string keyCol, string displayCol, string validationCode, string tableName,
-            string AD_Referencevalue_ID, string pTableName, string pColumnName, string whereClause)
+        [HttpPost]
+        public ActionResult GetRecordForFilter(string data)
         {
-            Ctx ctx = Session["ctx"] as Ctx;
+
+            VLookUpInfo lInfo = null;
+            string lookupQuery = "";
+
+
+            dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(data, new ExpandoObjectConverter());
+            Ctx _ctx = new Ctx(json.ctx);
+            string validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+            if (!QueryValidator.IsValid(validationCode))
+                return null;
+
+            string whereClause= SecureEngineBridge.DecryptByClientKey(json.whereClause, _ctx.GetSecureKey());
+            if (!QueryValidator.IsValid(whereClause))
+                return null;
+
+            //Ctx _ctx = null;//(ctx) as Ctx;
+            MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
+                Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
+            lInfo = res._vInfo;
+
+
+            string pTableName = json.pTableName;
+            string pColumnName = res.GetColumnName();
+            string keyCol = lInfo.keyColumn;
+            if (pColumnName.IndexOf(".") > -1)
+            {
+                pColumnName = pColumnName.Substring(pColumnName.IndexOf(".")+1);
+            }
+            string displayCol = lInfo.displayColSubQ;
+            string tableName = lInfo.tableName;
+            //Remove query which will fetch image.. Only display test in Filter option.
+            if (displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(ImageURL,'')") > 0
+                && displayCol.IndexOf("thing.png^^') ||' '||") > 0)
+            {
+                var displayCol1 = displayCol.Substring(0, displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(Imag"));
+                displayCol = displayCol.Substring(displayCol.IndexOf("othing.png^^') ||' '||") + 22);
+                displayCol = displayCol1 + "||'_'||" + displayCol;
+            }
+            if (displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(ImageURL,'')") > 0)
+            {
+                displayCol = displayCol.Replace(displayCol.Substring(displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(Imag"), displayCol.IndexOf("Images/nothing.png^^')") + 21), "");
+            }
+            else if (displayCol.IndexOf("nothing.png") > -1)
+            {
+                displayCol = displayCol.Replace(displayCol.Substring(displayCol.IndexOf("NVL((SELECT NVL(ImageURL,'')"), displayCol.IndexOf("thing.png^^') ||' '||") + 21), "");
+            }
+
+
+
             string sql = null;
             if (keyCol == "")
             {
                 sql = "SELECT " + pColumnName + "," + pColumnName + " as Name, count(" + pColumnName + ") FROM " + pTableName;
-                sql = "SELECT * FROM (" + MRole.GetDefault(ctx).AddAccessSQL(sql, pTableName, true, false);
+                sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, pTableName, true, false);
                 if (!string.IsNullOrEmpty(validationCode))
                     sql += " AND " + validationCode;
                 if (!string.IsNullOrEmpty(whereClause))
@@ -1111,9 +1162,9 @@ namespace VIS.Controllers
                 if (tableName.Equals("AD_Ref_List"))
                 {
                     //sql = "SELECT " + keyCol + ", " + displayCol + " || '('|| count(" + keyCol + ") || ')' FROM " + tableName + " WHERE IsActive='Y'";
-                    sql = "SELECT " + pColumnName + ", (Select Name from AD_REf_List where Value= " + pColumnName + " AND AD_Reference_ID=" + AD_Referencevalue_ID + ")  as name ,count(" + pColumnName + ")"
+                    sql = "SELECT " + pColumnName + ", (Select Name from AD_REf_List where Value= " + pColumnName + " AND AD_Reference_ID=" + json.AD_Reference_Value_ID + ")  as name ,count(" + pColumnName + ")"
                         + " FROM " + pTableName;// + " WHERE " + pTableName + ".IsActive='Y'";
-                    sql = "SELECT * FROM (" + MRole.GetDefault(ctx).AddAccessSQL(sql, pTableName, true, false);
+                    sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(validationCode))
                         sql += " AND " + validationCode;
                     if (!string.IsNullOrEmpty(whereClause))
@@ -1126,7 +1177,7 @@ namespace VIS.Controllers
                     sql = "SELECT " + keyCol + ", " + displayCol + " , count(" + keyCol + ")  FROM " + pTableName + " " + pTableName + " JOIN " + tableName + " " + tableName
                         + " ON " + tableName + "." + tableName + "_ID =" + pTableName + "." + pColumnName
                         + " ";// WHERE " + pTableName + ".IsActive='Y'";
-                    sql = "SELECT * FROM (" + MRole.GetDefault(ctx).AddAccessSQL(sql, tableName, true, false);
+                    sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, tableName, true, false);
                     if (!string.IsNullOrEmpty(validationCode))
                         sql += " AND " + validationCode;
                     if (!string.IsNullOrEmpty(whereClause))
@@ -1177,7 +1228,7 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(retRes), JsonRequestBehavior.AllowGet);
         }
 
-
+        [HttpPost]
         public JsonResult CheckVersions(SaveRecordIn RowData)
         {
             bool hasRecords = false;
@@ -1195,6 +1246,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="fields"></param>
         /// <returns></returns>
+        [HttpPost]
         public JsonResult GetIDTextData(string fields)
         {
             if (Session["Ctx"] != null)

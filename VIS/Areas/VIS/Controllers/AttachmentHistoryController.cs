@@ -161,8 +161,8 @@ namespace VIS.Controllers
         {
             Ctx ct = Session["ctx"] as Ctx;
             AttachmentHistoryModel his = new AttachmentHistoryModel();
-            AppQry = SecureEngineBridge.DecryptByClientKey(AppQry, ct.GetSecureKey());
-            return Json(JsonConvert.SerializeObject(his.GetAppointmentData(AppQry)), JsonRequestBehavior.AllowGet);
+            //AppQry = SecureEngineBridge.DecryptByClientKey(AppQry, ct.GetSecureKey());
+            return Json(JsonConvert.SerializeObject(his.GetAppointmentData(ct,AppQry)), JsonRequestBehavior.AllowGet);
         }
 
         // Added by Bharat on 07 June 2017

@@ -86,7 +86,20 @@ namespace VAdvantage.Classes
             return mWindowVO;
         }   //  getWindow
 
-        public static bool CheckServerConnection(string hostNameOrAddress = null)
+        public static GridWindowVO GetMWindowOriginalVO(Ctx ctx, int windowNo, int AD_Window_ID, int AD_Menu_ID)
+        {
+            log.Config("Window=" + windowNo + ", AD_Window_ID=" + AD_Window_ID);
+            GridWindowVO mWindowVO = null;
+            string format = string.Format("{0}{1}{2}{3}{4}", AD_Window_ID, ctx.GetAD_Client_ID(), ctx.GetAD_Role_ID(), ctx.GetAD_Org_ID(), ctx.GetAD_Language());          //JID_1238: Addedd language to reset cache
+            if (AD_Window_ID != 0)// && Ini.IsCacheWindow())	//	try cache always
+            {
+
+                mWindowVO = s_windows[format];
+            }
+            return mWindowVO;
+        }
+
+                    public static bool CheckServerConnection(string hostNameOrAddress = null)
         {
             bool pingStatus = false;
 

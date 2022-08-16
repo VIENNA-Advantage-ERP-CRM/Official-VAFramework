@@ -1689,10 +1689,66 @@ ON au.AD_User_ID=ai.createdby JOIN AD_Table adt ON adt.AD_Table_ID   =ai.AD_Tabl
         }
 
         // Added by Bharat on 07 June 2017
-        public Dictionary<string, object> GetAppointmentData(string sql)
+        public Dictionary<string, object> GetAppointmentData(Ctx ctx,string Id)
         {
+
+
+            var strApp = "SELECT AI.AppointmentsInfo_ID, AI.Subject,AI.Location,AI.Description,AI.AD_Table_ID, AI.Record_ID, " +
+             " ( " +
+             " CASE Label " +
+             "   WHEN 1   " +
+             "  THEN  '" + Msg.GetMsg(ctx,"Important", true) + "' " +
+             "   WHEN 2 " +
+             "   THEN '" + Msg.GetMsg(ctx, "Business", true) + "' " +
+             "   WHEN 3 " +
+             "   THEN   '" + Msg.GetMsg(ctx, "Personal", true) + "' " +
+             "   WHEN 4 " +
+             "   THEN '" + Msg.GetMsg(ctx, "Vacation", true) + "' " +
+             "   WHEN 5 " +
+             "   THEN '" + Msg.GetMsg(ctx, "MustAttend", true) + "' " +
+             "   WHEN 6 " +
+             "   THEN '" + Msg.GetMsg(ctx, "TravelRequired", true) + "' " +
+             "   WHEN 7 " +
+             "   THEN '" + Msg.GetMsg(ctx, "NeedsPreparation", true) + "' " +
+             "   WHEN 8 " +
+             "   THEN '" + Msg.GetMsg(ctx, "BirthDay", true) + "' " +
+             "   WHEN 9 " +
+             "   THEN '" + Msg.GetMsg(ctx, "Anniversary", true) + "' " +
+             "   WHEN 10 " +
+             "   Then '" + Msg.GetMsg(ctx, "PhoneCall", true) + "' " +
+             "   ELSE '" + Msg.GetMsg(ctx, "None", true) + "' " +
+             " END ) AS label , " +
+             " AI.StartDate , AI.EndDate, " +
+             " ( " +
+             " CASE AI.AllDay " +
+             "   WHEN 'Y' " +
+              "       THEN '" + Msg.GetMsg(ctx, "Yes", true) + "' " +
+             "       ELSE '" + Msg.GetMsg(ctx, "No", true) + "' " +
+             " END) AS Allday , " +
+             " ( " +
+             " CASE AI.Status " +
+             "   WHEN 1 " +
+             "   THEN '" + Msg.GetMsg(ctx, "Tentative", true) + "'  " +
+             "   WHEN 2 " +
+             "   THEN '" + Msg.GetMsg(ctx, "Busy", true) + "' " +
+             "   WHEN 3 " +
+             "   THEN '" + Msg.GetMsg(ctx, "OutOfOffice", true) + "' " +
+             "   Else " +
+             "    '" + Msg.GetMsg(ctx, "Free", true) + "' " +
+             "    End) as Status, " +
+             "     AI.ReminderInfo , nvl( ai.attendeeinfo,ai.Ad_User_ID) as attendeeinfo,  AI.RecurrenceInfo , " +
+             "     (  " +
+             "     CASE AI.IsPrivate " +
+             "       WHEN 'Y' " +
+             "       THEN '" + Msg.GetMsg(ctx, "Yes") + "' " +
+             "       ELSE '" + Msg.GetMsg(ctx, "No") + "' " +
+             "     END) AS IsPrivate,AI.comments ,ac.Name as caname" +
+             "   FROM AppointmentsInfo ai LEFT OUTER JOIN appointmentcategory AC " +
+            " ON AI.appointmentcategory_id=ac.appointmentcategory_id WHERE AI.AppointmentsInfo_ID=" + Id;
+
+
             Dictionary<string, object> obj = null;
-            DataSet ds = DB.ExecuteDataset(sql);
+            DataSet ds = DB.ExecuteDataset(strApp);
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 obj = new Dictionary<string, object>();

@@ -165,6 +165,12 @@ namespace VAdvantage.Controller
 
         public int DefaultCardID = 0;
 
+        public string SelectSQL
+        {
+            get;
+            set;
+        }
+
         public List<GridFieldVO> GetFields()
         {
             return fields;
@@ -937,17 +943,22 @@ namespace VAdvantage.Controller
             clone.AD_ColumnSortYesNo_ID = AD_ColumnSortYesNo_ID;
             //  Derived
             clone.onlyCurrentDays = 0;
+            clone.SelectSQL = SelectSQL;
+
 
 
             //Tab Panles
             clone.panels = new List<GridTabPanelVO>();
-            for (int i = 0; i < panels.Count; i++)
+            if (panels != null)
             {
-                GridTabPanelVO tpo = panels[i];
-                GridTabPanelVO clonetp = tpo.Clone(myCtx, windowNo);
-                if (clonetp == null)
-                    return null;
-                clone.panels.Add(clonetp);
+                for (int i = 0; i < panels.Count; i++)
+                {
+                    GridTabPanelVO tpo = panels[i];
+                    GridTabPanelVO clonetp = tpo.Clone(myCtx, windowNo);
+                    if (clonetp == null)
+                        return null;
+                    clone.panels.Add(clonetp);
+                }
             }
             if (clone.panels != null && clone.panels.Count > 0)
             {

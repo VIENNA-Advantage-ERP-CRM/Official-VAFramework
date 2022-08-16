@@ -9,6 +9,9 @@ using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 using ViennaAdvantage.Model;
+using VIS.DataContracts;
+using VIS.Helpers;
+
 namespace VIS.Models
 {
     public class AmountDivisionModel
@@ -57,6 +60,81 @@ namespace VIS.Models
             refList = null;
             return list;
         }
+
+        public int CheckDuplicate(string dTypeVal, string dAmtId, string acctSchemaId, string dLineId, string dNameVal, string cbPartId)
+        {
+            var sql = "select nvl(cline.c_dimamtline_id,0) as DimLineID from c_dimamt cd inner join c_dimamtaccttype cact on cd.c_dimamt_id=cact.c_dimamt_id " +
+                    " inner join c_dimamtline cline on cd.c_Dimamt_id=cline.c_dimamt_id and cact.c_dimamtaccttype_id=cline.c_dimamtaccttype_id " +
+                    " where cd.c_dimamt_id=" + dAmtId + " and cact.elementtype='" + dTypeVal + "' and cact.c_acctschema_id in(" + acctSchemaId + ") ";
+            if (Util.GetValueOfInt(dLineId) > 0)
+            {
+                sql += " and cline.c_dimamtline_id not in (" + dLineId + ") ";
+            }
+            if (DimensionTypeVal == "AC")
+            {
+                sql += " and C_ElementValue_ID=" + dTypeVal + " AND NVL(C_BPartner_ID,0)=" + cbPartId;
+            }//Account
+            else if (dTypeVal == "AY") { sql += " and C_Activity_ID =" + dTypeVal; }//Activity
+            else if (dTypeVal == "BP") { sql += " and C_BPartner_ID=" + dTypeVal; }//BPartner
+            else if (dTypeVal == "LF" || dTypeVal == "LT") { sql += " and C_Location_ID=" + dTypeVal; }//Location From//Location To
+            else if (dTypeVal == "MC") { sql += " and C_Campaign_ID=" + dTypeVal; }//Campaign
+            else if (dTypeVal == "OO" || dTypeVal == "OT") { sql += " and Org_ID=" + dTypeVal; }//Organization//Org Trx
+            else if (dTypeVal == "PJ") { sql += " and C_Project_ID=" + dTypeVal; }//Project
+            else if (dTypeVal == "PR") { sql += " and M_Product_ID=" + dTypeVal; }//Product
+            else if (dTypeVal == "SA") { }//Sub Account
+            else if (dTypeVal == "SR") { sql += " and C_SalesRegion_ID=" + dTypeVal; }//Sales Region
+            else if (dTypeVal == "U1" || dTypeVal == "U2")
+            {
+                sql += " and C_ElementValue_ID=" + dTypeVal;
+                if (Util.GetValueOfInt(cbPartId) > 0)
+                {
+                    sql += " AND NVL(C_BPartner_ID,0)=" + cbPartId;
+                }
+            }//User List 1//User List 2
+            else if (dTypeVal == "X1" || dTypeVal == "X2" || dTypeVal == "X3" || dTypeVal == "X4" || dTypeVal == "X5" || dTypeVal == "X6" ||
+                dTypeVal == "X7" || dTypeVal == "X8" || dTypeVal == "X9") { sql += " and AD_Column_ID=" + dTypeVal; }//User Element 1 to User Element 9
+
+            return Util.GetValueOfInt(DB.ExecuteScalar(sql));
+        }
+
+        public List<JTable> GetElementTypes(Ctx ctx, string  acctSchemaId,List<string> allAcctIds)
+        {
+            string sql = "";
+            List<JTable> ret = new List<JTable>();
+            if (Util.GetValueOfInt(acctSchemaId) == 0)
+            {
+                if (allAcctIds != null)
+                {
+                    for (var i = 0; i < allAcctIds.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            sql = "SELECT Distinct ElementType, Name FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + allAcctIds[i] + " AND ElementType NOT IN('SA','X1','X2','X3','X4','X5','X6','X7','X8','X9') ";
+                        }
+                        else
+                        {
+                            sql += " AND ElementType IN(SELECT ElementType FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + allAcctIds[i] + " AND ElementType NOT IN('SA','X1','X2','X3','X4','X5','X6','X7','X8','X9')) ";
+                        }
+                    }
+                    sql += " ORDER BY ElementType";
+                }
+            }
+            else
+            {
+                sql = "SELECT Distinct ElementType, Name FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + acctSchemaId + " AND ElementType<>'SA' ORDER BY ElementType";
+            }
+            if (sql != "")
+            {
+                sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "C_AcctSchema_Element", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RW);
+
+                SqlHelper helper = new SqlHelper();
+                SqlParamsIn paramIn = new SqlParamsIn();
+                paramIn.sql = sql;
+                ret = helper.ExecuteJDataSet(paramIn);
+            }
+            return ret;
+        }
+
         public class ListAccountingSchema
         {
             public int Key { get; set; }
@@ -372,186 +450,93 @@ namespace VIS.Models
             }
             return LineAmountID;
         }
-        //public int InsertDimensionAmount(int[] acctSchema, string[] elementType, decimal amount, List<AmountDivisionModel> dimensionLine, Ctx ctx, int DimAmtId)
-        //{
-        //    bool checkTran = true;
-        //    int DimAcctTypeId = 0;
-        //    int RecordID = -1;
-        //    string Sql = "";
-        //    Trx trx = Trx.Get("trxDim" + DateTime.Now.Millisecond);
-        //    try
-        //    {
-        //        dimensionLine = splitAllAccountSchema(acctSchema, dimensionLine);
-        //        X_C_DimAmt objDimAmt = new X_C_DimAmt(ctx, DimAmtId, trx);
-        //        objDimAmt.SetAmount(amount);
-        //        if (!objDimAmt.Save(trx))
-        //        {
-        //            checkTran = false;
-        //            RecordID = -1;
-        //            return RecordID;
-        //        }
-        //        RecordID = objDimAmt.GetC_DimAmt_ID();
-        //        List<AmountDivisionModel> oldDimensionLine = GetDimensionLine(DimAmtId);
 
-        //        //Check For Value in oldDimensionLine List against DimensionType and Accounting Schema...............
-        //        foreach (AmountDivisionModel obj in oldDimensionLine)
-        //        {
-        //            var abc = dimensionLine.Where(x => x.DimensionTypeVal == obj.DimensionTypeVal && x.AcctSchema == obj.AcctSchema);
-        //            if (abc == null)
-        //            {
-        //                //if Value does not exist in dimension Line than delete from C_DimamtAcctType Table against DimensionType and AccountSchema
-        //                //and corresponding Dimension Line Will be deleted.................(cascade).
-        //                Sql = "delete from c_dimamtaccttype where c_dimamt_id=" + DimAmtId + " and elementtype='" + obj.DimensionTypeVal + "' and c_acctschema_id=" + obj.AcctSchema;
-        //                DB.ExecuteQuery(Sql, null, trx);
-        //                oldDimensionLine.RemoveAll(x => x.DimensionTypeVal == obj.DimensionTypeVal && x.AcctSchema == obj.AcctSchema);
-        //            }
-        //        }
-        //        //string sql1 = "delete from c_dimamtline where c_dimamt_id=" + objDimAmt.GetC_DimAmt_ID();
-        //        //DB.ExecuteQuery(sql1, null, trx);
-        //        for (int i = 0; i < acctSchema.Length; i++)
-        //        {
-        //            if (DimAmtId != 0)
-        //            {
-        //                //if User Change Dimension Type Value from Accounting Schema Element against Accounting Schema............
-        //                //When user update Record against that Value than delete old Value From C_DimAmtAcctType............
-        //                Sql = "select nvl(c_dimamtaccttype_ID,0) from c_dimamtaccttype where c_dimamt_id=" + objDimAmt.GetC_DimAmt_ID() + " and c_acctschema_ID=" + acctSchema[i] + "";
-        //                DimAcctTypeId = Convert.ToInt32(DB.ExecuteScalar(Sql));
-        //                Sql = "select elementType from c_dimamtaccttype where c_dimamtAcctType_id=" + DimAcctTypeId;
-        //                string oldElement = Convert.ToString(DB.ExecuteScalar(Sql));
-        //                if (oldElement != elementType[i])
-        //                {
-        //                    Sql = "delete from c_dimamtaccttype where c_dimamtAcctType_id=" + DimAcctTypeId;
-        //                    DB.ExecuteQuery(Sql, null, trx);
-        //                    DimAcctTypeId = 0;
-        //                }
-        //            }
+        public List<JTable> GetDimMaxAmount(string dAmtId)
+        {
+            //             " main where rownum=1";
+           
+                var sql = " SELECT distinct ct.totaldimlineamout as amount,ac.name FROM c_dimamtaccttype ct " +
+                    " INNER JOIN c_dimamtline cl on ct.c_dimamt_id=cl.c_dimamt_id and ct.c_dimamtaccttype_id=cl.c_dimamtaccttype_id " +
+                    " INNER JOIN c_acctschema ac on ac.c_acctschema_id=ct.c_acctschema_id " +
+                    "  WHERE ct.totaldimlineamout in (SELECT max(totaldimlineamout) FROM c_Dimamtaccttype " +
+                    "   WHERE c_dimamt_id=" + dAmtId + ") AND ct.c_dimamt_id=" + dAmtId + "";
+           
 
-        //            X_C_DimAmtAcctType objDimAcctType = new X_C_DimAmtAcctType(ctx, DimAcctTypeId, trx);
-        //            objDimAcctType.SetC_DimAmt_ID(objDimAmt.GetC_DimAmt_ID());
-        //            objDimAcctType.SetC_AcctSchema_ID(acctSchema[i]);
-        //            objDimAcctType.SetElementType(elementType[i]);
-        //            if (DimAcctTypeId == 0)
-        //            {
-        //                if (!objDimAcctType.Save(trx))
-        //                {
-        //                    checkTran = false;
-        //                    RecordID = -1;
-        //                    return RecordID;
-        //                }
-        //            }
-        //            List<AmountDivisionModel> accountDimensionLine = dimensionLine.FindAll(x => x.AcctSchema == acctSchema[i]);//Find Value against Accounting Schema in New List..........
-        //            List<AmountDivisionModel> oldAccountDimensionLine = oldDimensionLine.FindAll(x => x.AcctSchema == acctSchema[i]);//Find Value against Accounting Schema in Old List...............
+            SqlHelper helper = new SqlHelper();
+            SqlParamsIn paramIn = new SqlParamsIn();
+            paramIn.sql = sql;
+            var ret = helper.ExecuteJDataSet(paramIn);
+            return ret;
+        }
 
-        //            foreach (AmountDivisionModel mod in accountDimensionLine)
-        //            {
-        //                List<AmountDivisionModel> oldTempDim = new List<AmountDivisionModel>();
-        //                //Find New List Value in old List............
-        //                //if All Value Matches than Do Nothing..........
-        //                //if Amount Changes in New List than update against that Line ID.....
-        //                if (oldAccountDimensionLine.Count > 0)
-        //                {
-        //                    oldTempDim = oldAccountDimensionLine.FindAll(x => x.DimensionNameVal == mod.DimensionNameVal && x.DimensionTypeVal == mod.DimensionTypeVal && x.DiemensionValueAmount == mod.DiemensionValueAmount);
-        //                }
-        //                if (oldTempDim.Count == 0)
-        //                {
-        //                    int dimAmtLineId = 0;
-        //                    oldTempDim = oldAccountDimensionLine.FindAll(x => x.DimensionNameVal == mod.DimensionNameVal && x.DimensionTypeVal == mod.DimensionTypeVal);
-        //                    if (oldTempDim != null)
-        //                    {
-        //                        Sql = "select c_dimamtline_id from c_dimamtline cl inner join c_dimamtacctType ct on cl.c_dimamt_id=ct.c_dimamt_id and ct.c_dimamtaccttype_id = cl.c_dimamtaccttype_id " +
-        //                               " where cl.c_dimamt_id=" + objDimAmt.GetC_DimAmt_ID() + " and cl.c_dimamtacctType_Id=" + DimAcctTypeId;
-        //                        if (mod.DimensionTypeVal == "AC")
-        //                        {
-        //                            Sql += " and cl.c_elementvalue_id=" + mod.DimensionNameVal;
-        //                        }//Account
-        //                        else if (mod.DimensionTypeVal == "AY") { Sql += " and cl.c_activity_id=" + mod.DimensionNameVal; }//Activity
-        //                        else if (mod.DimensionTypeVal == "BP") { Sql += " and cl.c_BPartner_ID=" + mod.DimensionNameVal; }//BPartner
-        //                        else if (mod.DimensionTypeVal == "LF" || mod.DimensionTypeVal == "LT") { Sql += " and cl.c_location_ID=" + mod.DimensionNameVal; }//Location From//Location To
-        //                        else if (mod.DimensionTypeVal == "MC") { Sql += " and cl.c_Campaign_ID=" + mod.DimensionNameVal; }//Campaign
-        //                        else if (mod.DimensionTypeVal == "OO" || mod.DimensionTypeVal == "OT") { Sql += " and cl.Org_ID=" + mod.DimensionNameVal; }//Organization//Org Trx
-        //                        else if (mod.DimensionTypeVal == "PJ") { Sql += " and cl.c_Project_id=" + mod.DimensionNameVal; }//Project
-        //                        else if (mod.DimensionTypeVal == "PR") { Sql += " and cl.M_Product_Id=" + mod.DimensionNameVal; }//Product
-        //                        else if (mod.DimensionTypeVal == "SR") { Sql += " and cl.c_SalesRegion_Id=" + mod.DimensionNameVal; }//Sales Region
-        //                        else if (mod.DimensionTypeVal == "U1" || mod.DimensionTypeVal == "U2")
-        //                        {
-        //                            Sql += " and cl.c_elementvalue_id=" + mod.DimensionNameVal;
-        //                        }//User List 1//User List 2
-        //                        else if (mod.DimensionTypeVal == "X1" || mod.DimensionTypeVal == "X2" || mod.DimensionTypeVal == "X3" || mod.DimensionTypeVal == "X4" || mod.DimensionTypeVal == "X5" || mod.DimensionTypeVal == "X6" ||
-        //                                 mod.DimensionTypeVal == "X7" || mod.DimensionTypeVal == "X8" || mod.DimensionTypeVal == "X9") { Sql += " and cl.AD_Column_ID=" + mod.DimensionNameVal; }//User Element 1 to User Element 9
+        public string GetDimAmount(string dAmtId)
+        {
+            string sql = "SELECT amount FROM c_dimAmt WHERE c_dimamt_id = " + dAmtId;
+            return Util.GetValueOfString(DB.ExecuteScalar(sql));
+        }
 
-        //                        dimAmtLineId = Convert.ToInt32(DB.ExecuteScalar(Sql));
-        //                    }
-        //                    else
-        //                    {
-        //                        dimAmtLineId = 0;
-        //                    }
-        //                    X_C_DimAmtLine objDimAmtLine = new X_C_DimAmtLine(ctx, dimAmtLineId, trx);
-        //                    objDimAmtLine.SetC_DimAmt_ID(objDimAmt.GetC_DimAmt_ID());
-        //                    objDimAmtLine.SetC_DimAmtAcctType_ID(objDimAcctType.GetC_DimAmtAcctType_ID());
-        //                    objDimAmtLine.SetAmount(mod.DiemensionValueAmount);
-        //                    if (elementType[i] == "AC")
-        //                    {
-        //                        objDimAmtLine.SetC_Element_ID(mod.ElementID);
-        //                        objDimAmtLine.SetC_ElementValue_ID(mod.DimensionNameVal);
-        //                    }//Account
-        //                    else if (elementType[i] == "AY") { objDimAmtLine.SetC_Activity_ID(mod.DimensionNameVal); }//Activity
-        //                    else if (elementType[i] == "BP") { objDimAmtLine.SetC_BPartner_ID(mod.DimensionNameVal); }//BPartner
-        //                    else if (elementType[i] == "LF" || elementType[i] == "LT") { objDimAmtLine.SetC_Location_ID(mod.DimensionNameVal); }//Location From//Location To
-        //                    else if (elementType[i] == "MC") { objDimAmtLine.SetC_Campaign_ID(mod.DimensionNameVal); }//Campaign
-        //                    else if (elementType[i] == "OO" || elementType[i] == "OT") { objDimAmtLine.SetOrg_ID(mod.DimensionNameVal); }//Organization//Org Trx
-        //                    else if (elementType[i] == "PJ") { objDimAmtLine.SetC_Project_ID(mod.DimensionNameVal); }//Project
-        //                    else if (elementType[i] == "PR") { objDimAmtLine.SetM_Product_ID(mod.DimensionNameVal); }//Product
-        //                    else if (elementType[i] == "SA") { }//Sub Account
-        //                    else if (elementType[i] == "SR") { objDimAmtLine.SetC_SalesRegion_ID(mod.DimensionNameVal); }//Sales Region
-        //                    else if (elementType[i] == "U1" || elementType[i] == "U2")
-        //                    {
-        //                        objDimAmtLine.SetC_Element_ID(mod.ElementID);
-        //                        objDimAmtLine.SetC_ElementValue_ID(mod.DimensionNameVal);
-        //                    }//User List 1//User List 2
-        //                    else if (elementType[i] == "X1" || elementType[i] == "X2" || elementType[i] == "X3" || elementType[i] == "X4" || elementType[i] == "X5" || elementType[i] == "X6" ||
-        //                             elementType[i] == "X7" || elementType[i] == "X8" || elementType[i] == "X9") { objDimAmtLine.SetAD_Column_ID(mod.DimensionNameVal); }//User Element 1 to User Element 9
-        //                    if (!objDimAmtLine.Save(trx))
-        //                    {
-        //                        checkTran = false;
-        //                        RecordID = -1;
-        //                        //return RecordID;
-        //                        break;
-        //                    }
-        //                    //Remove Value From old List After that value is passed or Updated............
-        //                    oldAccountDimensionLine.Remove(oldAccountDimensionLine.Find(a => a.AcctSchema == mod.AcctSchema && a.DimensionTypeVal == mod.DimensionTypeVal && a.DimensionNameVal == mod.DimensionNameVal));
-        //                }
-        //                else
-        //                {
-        //                    oldAccountDimensionLine.Remove(oldAccountDimensionLine.Find(a => a.AcctSchema == mod.AcctSchema && a.DimensionTypeVal == mod.DimensionTypeVal && a.DimensionNameVal == mod.DimensionNameVal));
-        //                }
-        //            }
-        //            foreach (AmountDivisionModel oldMod in oldAccountDimensionLine)
-        //            {
-        //                //Delete Remaing Value Which are in old List and from C_dimAmtLine Table....................
-        //                Sql = "delete from c_dimamtline where c_dimamtline_id=" + oldMod.AmtLineID;
-        //                DB.ExecuteQuery(Sql, null, trx);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        checkTran = false;
-        //        RecordID = -1;
-        //    }
-        //    finally
-        //    {
-        //        if (!checkTran)
-        //        {
-        //            trx.Rollback();
-        //            log.Warning("Some error occured while saving Dimension");
-        //        }
-        //        else
-        //        {
-        //            trx.Commit();
-        //        }
-        //    }
-        //    return RecordID;
-        //}
+        public List<JTable> GetUserElement(Ctx ctx, string aid, string eType)
+        {
+            var sql = "SELECT adt.ad_column_id,adt.columnname,adtab.TableName FROM c_acctschema_element ac INNER JOIN ad_column ad ON (ac.ad_column_id=ad.ad_column_id) " +
+                " INNNER JOIN ad_column adt ON (ad.ad_table_ID=adt.ad_table_ID AND adt.isactive='Y') " +
+                "  INNER JOIN ad_table adtab ON (adtab.ad_table_id=ad.ad_table_ID) " +
+                " WHERE ac.c_acctschema_id=" + aid + " AND ac.elementtype='" + eType + "' AND adt.isidentifier='Y' order by adt.ad_column_ID";
+
+            DataSet ds = DB.ExecuteDataset(sql);
+            var tblName = "";
+            var colName = "";
+
+            if (ds != null)
+            {
+                foreach( DataRow dr in ds.Tables[0].Rows)
+                {
+                    tblName = dr[2].ToString();
+                    if (colName == "")
+                    {
+                        colName += dr[1].ToString();//
+                    }
+                    else
+                    {
+                        colName += " ||'_'|| " + dr[1].ToString();
+                    }
+                }
+            }
+
+            var sqlS = "SELECT " + tblName + "_ID ,(" + colName + ") as Name FROM " + tblName + " WHERE isactive='Y' ORDER BY " + colName;   // Order by Identifier
+            sqlS = MRole.GetDefault(ctx).AddAccessSQL(sqlS, tblName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RW);
+
+            SqlHelper helper = new SqlHelper();
+            SqlParamsIn paramIn = new SqlParamsIn();
+            paramIn.sql = sqlS;
+            var ret = helper.ExecuteJDataSet(paramIn);
+
+            return ret;
+        }
+
+        public string  SetDAcctType(List<string> allAcctSchemaID, string did)
+        {
+            // no model class
+            for (var j = 0; j < allAcctSchemaID.Count; j++)
+            {
+                DB.ExecuteQuery("delete from c_dimamtaccttype where c_acctschema_id=" + allAcctSchemaID[j] + " and c_dimamt_id=" + did + "");
+            }
+            return "OK";
+        }
+
+        public int GetAcctSchemaByClientId(int clientId)
+        {
+          return Util.GetValueOfInt(DB.ExecuteScalar("SELECT c_acctschema1_id FROM ad_clientinfo WHERE ad_client_ID=" + clientId+ ""));
+        }
+
+        public int GetAcctSchemaByActId(string dAcctId)
+        {
+            if (Util.GetValueOfInt(dAcctId) > 0)
+            {
+                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT cd.c_acctschema_id FROM c_dimamtaccttype cd INNER JOIN c_dimamtline cl ON (cd.c_dimamtaccttype_id=cl.c_dimamtaccttype_id) WHERE cd.c_dimamt_id=" + dAcctId + ""));
+            }
+            return 0;
+        }
+
         public List<AmountDivisionModel> GetDimensionLine(Ctx ctx, int[] accountingSchema, int dimensionID, int DimensionLineID = 0, int pageNo = 0, int pSize = 0)
         {
             int tempRecid = pSize * (pageNo - 1);
@@ -755,6 +740,17 @@ namespace VIS.Models
 
             }
             return objAmtdimModel;
+        }
+
+        public string SetDimLine(string dLineId, string dimensionLineID, string acctId, string dAmtId)
+        {
+            DB.ExecuteQuery("DELETE FROM c_dimamtline WHERE c_dimamtline_id IN(" + dLineId + ")");
+            var sql = "SELECT NVL((SUM(cd.amount)),0) AS Amount FROM c_dimamtline cd INNER JOIN c_dimamtaccttype ct ON cd.c_dimamt_id=ct.c_dimamt_id " +
+                " AND cd.c_dimamtaccttype_id=ct.c_dimamtaccttype_id " +
+                " WHERE cd.c_dimamt_id=" + dAmtId + " AND ct.c_acctSchema_id=" + acctId + "";
+            var amount = Util.GetValueOfString(DB.ExecuteScalar(sql));
+            DB.ExecuteQuery("UPDATE c_dimamtaccttype SET totaldimlineamout=" + amount + " WHERE c_dimamt_id=" + dAmtId + " and c_acctSchema_id=" + acctId + "");
+            return "OK";
         }
 
         /// <summary>

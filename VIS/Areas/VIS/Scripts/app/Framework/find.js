@@ -33,10 +33,7 @@
         getData: function (ctx, AD_Tab_ID, AD_Table_ID, valueColumnName) {
             var AD_Client_ID = ctx.getAD_Client_ID();
             var dr = null;
-            //var sql = "SELECT Name," + valueColumnName + ", AD_UserQuery_ID FROM AD_UserQuery WHERE"
-            //    + " AD_Client_ID=" + AD_Client_ID + " AND IsActive='Y'"
-            //    + " AND (AD_Tab_ID=" + AD_Tab_ID + " OR AD_Table_ID=" + AD_Table_ID + ")"
-            //    + " ORDER BY Upper(Name), AD_UserQuery_ID";
+            
             try {
                 //dr = VIS.DB.executeDataReader(sql, null, null);
                 dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ASearch/GetData", { "ColumnName": valueColumnName, "Tab_ID": AD_Tab_ID, "Table_ID": AD_Table_ID }, null);
@@ -54,9 +51,7 @@
         getQueryLines: function (AD_UserQuery_ID) {
             var dr = null;
             var lines = [];
-            //var sql = "SELECT KEYNAME,KEYVALUE,OPERATOR AS OPERATORNAME,VALUE1NAME," +
-            //    "VALUE1VALUE,VALUE2NAME,VALUE2VALUE,AD_USERQUERYLINE_ID FROM AD_UserQueryLine WHERE AD_UserQuery_ID=" +
-            //    AD_UserQuery_ID + " ORDER BY SeqNo";
+           
             try {
                 //dr = VIS.DB.executeDataReader(sql, null, null);
 
@@ -1276,8 +1271,9 @@
         /* get total number of record */
         function getNoOfRecords(query, alertZeroRecords) {
             // make query
-            var sql = "SELECT COUNT(*) FROM ";
-            sql += tableName;
+            var sqlSelect = "SELECT COUNT(*) FROM ";
+           // sqlSelect += tableName;
+            var sql = tableName;
             var hasWhere = false;
             // add where clause if already exists
             if (whereExtended != null && whereExtended.length > 0) {
@@ -1302,11 +1298,11 @@
                 sql += VIS.Env.parseContext(VIS.context, windowNo, query.getWhereClause(true), false);
             }
             //	Add Access
-            var finalSQL = VIS.MRole.getDefault().addAccessSQL(sql.toString(), tableName,
+            var finalSQL = VIS.MRole.getDefault().addAccessSQL(sqlSelect + sql.toString(), tableName,
                 VIS.MRole.SQL_NOTQUALIFIED, VIS.MRole.SQL_RO);
             // finalSQL = VIS.Env.parseContext(VIS.context, windowNo, finalSQL, false);
 
-            VIS.context.setContext(windowNo, TABNO, "FindSQL", finalSQL);
+           // VIS.context.setContext(windowNo, TABNO, "FindSQL", finalSQL);
 
             //  Execute Query
             total = 999999;
@@ -1329,7 +1325,7 @@
 
                 //total = VIS.DB.executeScalar(finalSQL, null);
 
-                var _sql = VIS.secureEngine.encrypt(finalSQL);
+                var _sql = VIS.secureEngine.encrypt(sql);
                 total = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ASearch/GetNoOfRecrds", { "RecQuery": _sql }, null);
             }
             catch (ex) {

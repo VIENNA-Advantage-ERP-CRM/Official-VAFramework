@@ -189,12 +189,7 @@
                 var nd = $(childs[i]);
 
                 oldParentIDs.push(nd.data("value"));
-                //StringBuilder sql = new StringBuilder("UPDATE ");
-                //sql = "UPDATE ";
-                //sql += tableName + " SET Parent_ID=" + oldId + ", SeqNo=" + i + ", Updated=SysDate" +
-                //                  " WHERE AD_Tree_ID=" + AD_Tree_ID + " AND Node_ID=" + nd.data("value");
-                ////log.Fine(sql.ToString());
-                //queries.push(sql);
+               
             }
 
 
@@ -205,12 +200,6 @@
                     var nd = $(childs[i]);
                     newParentIDs.push(nd.data("value"));
 
-                    //sql = "UPDATE ";
-                    //sql += tableName + " SET Parent_ID=" + newId +
-                    //", SeqNo=" + i + ", Updated=SysDate" +
-                    // " WHERE AD_Tree_ID=" + AD_Tree_ID +
-                    //  " AND Node_ID=" + nd.data("value");
-                    //queries.push(sql);
                 }
             }
 
@@ -235,33 +224,7 @@
                 }
             });
 
-            //for (var i = 0; i < childs.length; i++) {
-            //    var nd = $(childs[i]);
-            //    //StringBuilder sql = new StringBuilder("UPDATE ");
-            //    sql = "UPDATE ";
-            //    sql += tableName + " SET Parent_ID=" + oldId + ", SeqNo=" + i + ", Updated=SysDate" +
-            //                      " WHERE AD_Tree_ID=" + AD_Tree_ID + " AND Node_ID=" + nd.data("value");
-            //    //log.Fine(sql.ToString());
-            //    queries.push(sql);
-            //}
-            //if (oldId != newId) {
-            //    childs = newParent.children();
-            //    i = 0;
-            //    for (i = 0; i < childs.length; i++) {
-            //        var nd = $(childs[i]);
-            //        sql = "UPDATE ";
-            //        sql += tableName + " SET Parent_ID=" + newId +
-            //        ", SeqNo=" + i + ", Updated=SysDate" +
-            //         " WHERE AD_Tree_ID=" + AD_Tree_ID +
-            //          " AND Node_ID=" + nd.data("value");
-            //        queries.push(sql);
-            //    }
-            //}
-            //console.log(queries);
-            //executeQueries(queries, null, function (ret) {
-            //    console.log(ret);
-            //    rootNode
-            //});
+            
         }
 
         function createArray() {

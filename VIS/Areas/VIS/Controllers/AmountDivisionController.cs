@@ -10,7 +10,9 @@ using Newtonsoft.Json;
 using VAdvantage.DataBase;
 using VAdvantage.Model;
 using VAdvantage.Utility;
+using VIS.DataContracts;
 using VIS.Filters;
+using VIS.Helpers;
 using VIS.Models;
 
 namespace VIS.Controllers
@@ -29,24 +31,27 @@ namespace VIS.Controllers
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [HttpPost]
-        public JsonResult GetDiminsionType()
+        public JsonResult GetDiminsionType(string acctSchemaId,List<string> allAcctIds)
         {
-
-            return Json(JsonConvert.SerializeObject(model.GetDimensionType(Session["ctx"] as Ctx)), JsonRequestBehavior.AllowGet);
+            Ctx ctx = Session["ctx"] as Ctx;
+            var dtypes = model.GetDimensionType(ctx);
+            //var eTypes = model.GetElementTypes(ctx,acctSchemaId, allAcctIds);
+            return Json(new { dataType = JsonConvert.SerializeObject(dtypes) },
+            JsonRequestBehavior.AllowGet);
         }
-        //[AjaxAuthorizeAttribute]
-        //[AjaxSessionFilterAttribute]
-        //[HttpPost]
-        //[ValidateInput(false)]
-        //public JsonResult InsertDimensionAmount(string acctSchema,string elementType, decimal amount, string dimensionLine, int DimAmtId)
-        //{
-        //    List<AmountDivisionModel> dim = JsonConvert.DeserializeObject<List<AmountDivisionModel>>(dimensionLine);
-        //    int[] accountSchema = JsonConvert.DeserializeObject<int[]>(acctSchema);
-        //    var temp = accountSchema.Distinct().ToArray();
-        //    accountSchema = temp;
-        //    string[] dimensionElement = JsonConvert.DeserializeObject<string[]>(elementType);
-        //    return Json(JsonConvert.SerializeObject(model.InsertDimensionAmount(accountSchema, dimensionElement, amount, dim, Session["ctx"] as Ctx, DimAmtId)), JsonRequestBehavior.AllowGet);
-        //}
+
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult GetElementType(string acctSchemaId, List<string> allAcctIds)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            //var dtypes = model.GetDimensionType(ctx);
+            var eTypes = model.GetElementTypes(ctx, acctSchemaId, allAcctIds);
+            return Json(new { eleType = JsonConvert.SerializeObject(eTypes) },
+            JsonRequestBehavior.AllowGet);
+        }
+
 
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
@@ -55,6 +60,16 @@ namespace VIS.Controllers
         {
             int[] accountSchema = JsonConvert.DeserializeObject<int[]>(accountingSchema);
             return Json(JsonConvert.SerializeObject(model.GetDimensionLine(Session["ctx"] as Ctx, accountSchema, dimensionID, DimensionLineID, pageNo, pSize)), JsonRequestBehavior.AllowGet);
+        }
+
+
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult CheckDuplicate(string dTypeVal,string dAmtId, string acctSchemaId , string dLineId, string dNameVal, string cbPartId)
+        {
+            
+            return Json(JsonConvert.SerializeObject(model.CheckDuplicate( dTypeVal,  dAmtId,  acctSchemaId, dLineId, dNameVal,  cbPartId)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -84,8 +99,10 @@ namespace VIS.Controllers
         [HttpPost]
         public JsonResult GetAccountingSchema(int OrgID)
         {
+            Ctx ctx = Session["ctx"] as Ctx;
 
-            return Json(JsonConvert.SerializeObject(model.GetAccountingSchema(Session["ctx"] as Ctx, OrgID)), JsonRequestBehavior.AllowGet);
+            return Json(new { acctData = JsonConvert.SerializeObject(model.GetAccountingSchema(ctx, OrgID)),
+                                dAcctId = model.GetAcctSchemaByClientId(ctx.GetAD_Client_ID())}, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -524,5 +541,37 @@ namespace VIS.Controllers
             }
             return Json(retJSON, JsonRequestBehavior.AllowGet);
         }
+
+        public JsonResult SetDAcctType(List<string> allAcctSchemaID, string did)
+        {
+           return Json(model.SetDAcctType(allAcctSchemaID,did), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetUserElement(string aid, string eType)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+           return Json(JsonConvert.SerializeObject(model.GetUserElement(ctx, aid,eType)), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult SetDimLine(string dLineId, string dimensionLineID, string acctId,
+						string dAmtId)
+        {
+            return Json(model.SetDimLine(dLineId,dimensionLineID,acctId,dAmtId), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetDimMaxAmount(string dAmtId)
+        {
+            return Json(JsonConvert.SerializeObject(model.GetDimMaxAmount(dAmtId)), JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult GetDimAmount(string dAmtId)
+        {
+            return Json(JsonConvert.SerializeObject(model.GetDimAmount(dAmtId)), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetAcctSchemaByActId(string dAmtId)
+        {
+            return Json(JsonConvert.SerializeObject(model.GetAcctSchemaByActId(dAmtId)), JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

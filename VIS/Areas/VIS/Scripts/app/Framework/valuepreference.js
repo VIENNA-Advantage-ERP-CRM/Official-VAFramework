@@ -291,7 +291,7 @@
 
     ValuePreference.prototype.getADPreferenceID = function () {
         // make sql query to get preference id
-        var sql = "SELECT AD_Preference_ID FROM AD_Preference WHERE ";
+        var sql = "";// 
         var valuetem = this.tenantchk ? this.AD_Client_ID : 0;
         //	Client
         sql += "AD_Client_ID=" + valuetem;
@@ -317,8 +317,9 @@
 
         var preferenceId = 0;
 
-       
-        var ds = VIS.DB.executeDataSet(sql.toString());
+        var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ValuePreference/GetPrefrenceID", { "sql": sql }, null); // spelling corrected by vinay bhatt on 18 oct 2018
+        
+        var ds = new VIS.DB.DataSet().toJson(JSON.stringify(data)); 
 
         if (ds != null && ds.tables[0].rows.length > 0) {
             // get id

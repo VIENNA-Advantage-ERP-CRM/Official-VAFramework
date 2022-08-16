@@ -113,6 +113,7 @@ namespace VAdvantage.Controller
         public string FontName = "";
         public string ImageUrl = "";
         public bool IsCompositeView = true;
+       
 
 
         public List<GridTabVO> GetTabs()

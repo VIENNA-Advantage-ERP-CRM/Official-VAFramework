@@ -23,6 +23,7 @@ using System.Web.Optimization;
 using VAdvantage.Login;
 using VAdvantage.Logging;
 using System.Data;
+using System.Threading;
 
 namespace VIS.Controllers
 {
@@ -42,7 +43,8 @@ namespace VIS.Controllers
         /// 
         HomeHelper objHomeHelp = null;
 
-        private static readonly object _lock = new object();
+        private static bool isBundleAdded = false;
+        private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 
 
@@ -283,15 +285,21 @@ namespace VIS.Controllers
                     ViewBag.ClientList = ClientList;
                     ViewBag.OrgList = OrgList;
                     ViewBag.WarehouseList = WareHouseList;
-                    lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
-                    {
-                        //Cretae new Sessin
-                        MSession sessionNew = MSession.Get(ctx, true, GetVisitorIPAddress(true));
-                        ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
-                        sessionData.UserId = ctx.GetAD_User_ID();
-                        sessionData.Name = ctx.GetAD_User_Name();
-                        ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
 
+                  
+                    // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
+                    //{
+                    //Cretae new Sessin
+                    MSession sessionNew = MSession.Get(ctx, true, GetVisitorIPAddress(true));
+                    ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
+                    sessionData.UserId = ctx.GetAD_User_ID();
+                    sessionData.Name = ctx.GetAD_User_Name();
+                    ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
+
+                    _lockSlim.EnterReadLock();
+
+                    if (!isBundleAdded)
+                    {
                         var lst = VAdvantage.ModuleBundles.GetStyleBundles(); //Get All Style Bundle
                         foreach (var b in lst)
                         {
@@ -320,30 +328,34 @@ namespace VIS.Controllers
                                 BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
                             }
                         }
+                        isBundleAdded = true;
+                    }
 
-                        ViewBag.LibSuffix = "";
-                        ViewBag.FrameSuffix = "_v1";
-                        int libFound = 0;
-                        foreach (Bundle b in BundleTable.Bundles)
+                    _lockSlim.ExitReadLock();
+
+                    ViewBag.LibSuffix = "";
+                    ViewBag.FrameSuffix = "_v1";
+                    int libFound = 0;
+                    foreach (Bundle b in BundleTable.Bundles)
+                    {
+                        if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
                         {
-                            if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
-                            {
-                                ViewBag.LibSuffix = Util.GetValueOfInt(ctx.GetContext("#FRONTEND_LIB_VERSION")) > 2
-                                                      ? "_v3" : "_v2";
-                                libFound++;
-                            }
-
-                            if (b.Path.Contains("VIS") && b.Path.Contains("_v"))
-                            {
-                                ViewBag.FrameSuffix = Util.GetValueOfInt(ctx.GetContext("#FRAMEWORK_VERSION")) > 1
-                                                      ? "_v2" : "_v1";
-                                libFound++;
-                            }
-                            if (libFound >= 2)
-                            {
-                                break;
-                            }
+                            ViewBag.LibSuffix = Util.GetValueOfInt(ctx.GetContext("#FRONTEND_LIB_VERSION")) > 2
+                                                  ? "_v3" : "_v2";
+                            libFound++;
                         }
+
+                        if (b.Path.Contains("VIS") && b.Path.Contains("_v"))
+                        {
+                            ViewBag.FrameSuffix = Util.GetValueOfInt(ctx.GetContext("#FRAMEWORK_VERSION")) > 1
+                                                  ? "_v2" : "_v1";
+                            libFound++;
+                        }
+                        if (libFound >= 2)
+                        {
+                            break;
+                        }
+                        //}
                         //check system setting// set to skipped lib
 
 

@@ -744,6 +744,7 @@
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountController.cs" />
     <Compile Include="Areas\VIS\Controllers\AmountDivisionController.cs" />
+    <Compile Include="Areas\VIS\Controllers\ArchiveViewerController.cs" />
     <Compile Include="Areas\VIS\Controllers\ASearchController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentHistoryController.cs" />
@@ -769,6 +770,7 @@
     <Compile Include="Areas\VIS\Controllers\LocationController.cs" />
     <Compile Include="Areas\VIS\Controllers\LocatorController.cs" />
     <Compile Include="Areas\VIS\Controllers\LoginController.cs" />
+    <Compile Include="Areas\VIS\Controllers\LookupController.cs" />
     <Compile Include="Areas\VIS\Controllers\MarkModuleController.cs" />
     <Compile Include="Areas\VIS\Controllers\PAttributesController.cs" />
     <Compile Include="Areas\VIS\Controllers\RecordAccessController.cs" />
@@ -785,6 +787,7 @@
     <Compile Include="Areas\VIS\Controllers\VImageFormController.cs" />
     <Compile Include="Areas\VIS\Controllers\VSetupController.cs" />
     <Compile Include="Areas\VIS\Controllers\WFActivityController.cs" />
+    <Compile Include="Areas\VIS\Controllers\WindowController.cs" />
     <Compile Include="Areas\VIS\Filters\AjaxAuthorizeAttribute.cs" />
     <Compile Include="Areas\VIS\Filters\AjaxSessionFilterAttribute.cs" />
     <Compile Include="Areas\VIS\Filters\AjaxValidateAntiForgeryTokenAttribute.cs" />
@@ -852,6 +855,7 @@
   <ItemGroup>
     <Folder Include="Areas\VIS\Scripts\app\processengine\" />
     <Folder Include="Areas\VIS\Views\AmountDivision\" />
+    <Folder Include="Areas\VIS\Views\ArchiveViewer\" />
     <Folder Include="Areas\VIS\Views\Channel\" />
     <Folder Include="Areas\VIS\Views\GenerateXModel\" />
     <Folder Include="Areas\VIS\Views\GmailContacts\" />
