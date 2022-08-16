@@ -142,6 +142,14 @@
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.8\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="VARCOM, Version=1.0.20.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\VARCOM.dll</HintPath>
+    </Reference>
+    <Reference Include="VARCOMSvc, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\VARCOMSvc.dll</HintPath>
+    </Reference>
     <Reference Include="ViennaBase">
       <HintPath>Dll\ViennaBase.dll</HintPath>
     </Reference>
