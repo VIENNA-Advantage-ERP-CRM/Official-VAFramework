@@ -47,40 +47,16 @@
         init();
 
         function readReference() {
-            var sql;
-            if (VIS.Env.isBaseLanguage(ctx, "AD_Ref_List"))//    GlobalVariable.IsBaseLanguage())//   Env.isBaseLanguage(ctx, "AD_Ref_List"))
-                sql = "SELECT Value, Name, Description FROM AD_Ref_List "
-                    + "WHERE AD_Reference_ID=135 ORDER BY Name";
-            else
-                sql = "SELECT l.Value, t.Name, t.Description "
-                    + "FROM AD_Ref_List l, AD_Ref_List_Trl t "
-                    + "WHERE l.AD_Ref_List_ID=t.AD_Ref_List_ID"
-                    + " AND t.AD_Language='" + VIS.Env.getAD_Language(ctx) + "'"
-                    + " AND l.AD_Reference_ID=135 ORDER BY t.Name";
+            var sql="VIS";
+           
 
             var valueLst = [];
             var nameLst = [];
             var descriptionLst = [];
 
-            //  IDataReader dr = null;
             try {
-                //var dr = VIS.DB.executeReader(sql, null);
-                //while (dr.read()) {
-                //    var value = dr.get(0);
-                //    var name = dr.get(1);
-                //    var description = dr.get(2);
-                //    if (description == null || description == 'undefined') {
-                //        description = "";
-                //    }
-                //    //
-                //    valueLst.push(value);
-                //    nameLst.push(name);
-                //    descriptionLst.push(description);
-                //}
-                //dr.Close();
-                //dr.dispose();
-                var _sql = VIS.secureEngine.encrypt(sql);
-                var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "DocAction/GetReference", { "RefQry": _sql }, null);
+              
+                var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "DocAction/GetReference", { "RefQry": sql }, null);
                 if (dr != null) {
                     for (var i in dr) {
                         var value = dr[i]["Value"];
@@ -97,16 +73,11 @@
                 }
             }
             catch (e) {
-                //if (dr != null) {
-                //    dr.close();
-                //}
-                //this.log.log(VIS.Logging.Level.SEVERE, sql, e);
+               
                 console.log(e);
             }
             finally {
-                //if (dr != null) {
-                //    dr.close();
-                //}
+                
             }
 
             //	convert to arrays

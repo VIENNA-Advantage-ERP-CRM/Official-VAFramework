@@ -837,7 +837,7 @@ namespace VIS.Helpers
             var m_fields = inn.Fields;
             int AD_Table_ID = inn.AD_Table_ID;
             string whereClause = inn.WhereClause;
-            string SQL_Select = inn.SelectSQL;
+            List<String> lstColumns = inn.Columns;
             bool inserting = inn.Inserting;
             bool compareDB = inn.CompareDB;
             List<String> UnqFields = inn.UnqFields;
@@ -1225,7 +1225,37 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
-            String refreshSQL = SQL_Select + " WHERE " + whereC;
+            for (int i = 0; i < lstColumns.Count; i++)
+            {
+                WindowField gField = m_fields.Where(a => a.ColumnName == lstColumns[i]).FirstOrDefault();
+                if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
+                {
+                    string selectSQL = GetColumnSQL(false, gField);
+
+                    if (selectSQL.IndexOf("@") == -1)
+                    {
+                        lstColumns[i] = selectSQL;   //	ColumnName or Virtual Column
+                    }
+                    else
+                    {
+                        lstColumns[i] = Env.ParseContext(ctx, inn.WindowNo, selectSQL, false);
+                    }
+                }
+            }
+
+            List<WindowField> imgColList = m_fields.Where(a => a.DisplayType == DisplayType.Image).ToList();
+
+            if (imgColList != null && imgColList.Count > 0)
+            {
+                for (int j = 0; j < imgColList.Count; j++)
+                {
+                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST("+ inn.TableName + ".AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                }
+            }
+
+            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+
+            String refreshSQL = SQL_Select + " FROM " + inn.TableName + " WHERE " + whereC;
 
             IDataReader dr = null;
             outt.RowData = rowData;
@@ -1317,6 +1347,72 @@ namespace VIS.Helpers
             }
             if (!inn.MaintainVersions)
                 outt.Status = GridTable.SAVE_OK;
+        }
+
+        public string GetColumnSQL(bool withAS, WindowField field)
+        {
+            //(case o.ISACTIVE when 'Y' then 'True' else 'False' end) as Active,
+            string columnSQL = field.ColumnSQL;
+            string columnName = field.ColumnName;
+            int displayType = field.DisplayType;
+            if (columnSQL != null && columnSQL.Length > 0)
+            {
+                if (withAS)
+                {
+                    if (displayType == DisplayType.YesNo)
+                    {
+                        return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) " + " AS " + columnName;
+                    }
+                    return columnSQL + " AS " + columnName;
+                }
+                else
+                {
+                    if (displayType == DisplayType.YesNo)
+                    {
+                        return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) ";
+                    }
+                    return columnSQL;
+                }
+            }
+            if (displayType == DisplayType.YesNo)
+            {
+                return " (case " + columnName + " when 'Y' then 'True' else 'False' end) AS " + columnName;
+            }
+            return columnName;
+
+        }
+
+        public string GetColumnSQL(bool withAS, GridFieldVO field)
+        {
+            //(case o.ISACTIVE when 'Y' then 'True' else 'False' end) as Active,
+            string columnSQL = field.ColumnSQL;
+            string columnName = field.ColumnName;
+            int displayType = field.displayType;
+            if (columnSQL != null && columnSQL.Length > 0)
+            {
+                if (withAS)
+                {
+                    if (displayType == DisplayType.YesNo)
+                    {
+                        return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) " + " AS " + columnName;
+                    }
+                    return columnSQL + " AS " + columnName;
+                }
+                else
+                {
+                    if (displayType == DisplayType.YesNo)
+                    {
+                        return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) ";
+                    }
+                    return columnSQL;
+                }
+            }
+            if (displayType == DisplayType.YesNo)
+            {
+                return " (case " + columnName + " when 'Y' then 'True' else 'False' end) AS " + columnName;
+            }
+            return columnName;
+
         }
 
         /// <summary>
@@ -1901,7 +1997,7 @@ namespace VIS.Helpers
                                 rowData[colLower] = value;
                             }
                         }
-                       
+
                         //	String
                         else
                             rowData[colLower] = dr[j].ToString();//string
@@ -2204,20 +2300,23 @@ namespace VIS.Helpers
         /// <param name="sql"></param>
         /// <param name="cardID"></param>
         /// <returns></returns>
-        public int GetRecordCountWithCard(string sql, int cardID) {
-            string cardCondition =Util.GetValueOfString(DB.ExecuteScalar("SELECT excludedGroup FROM AD_CARDVIEW WHERE AD_CARDVIEW_ID=" + cardID));
-            if (!string.IsNullOrEmpty(cardCondition)) {
-                string[] textSplit = cardCondition.Split(',');                
+        public int GetRecordCountWithCard(string sql, int cardID)
+        {
+            string cardCondition = Util.GetValueOfString(DB.ExecuteScalar("SELECT excludedGroup FROM AD_CARDVIEW WHERE AD_CARDVIEW_ID=" + cardID));
+            if (!string.IsNullOrEmpty(cardCondition))
+            {
+                string[] textSplit = cardCondition.Split(',');
                 if (textSplit.Length > 0)
                 {
                     string whereCondition = "";
-                    for (int i = 0; i < textSplit.Length; i++) {
+                    for (int i = 0; i < textSplit.Length; i++)
+                    {
                         whereCondition += "'" + textSplit[i] + "'";
                         if (i != (textSplit.Length - 1))
                         {
                             whereCondition += ",";
                         }
-                     }
+                    }
                     if (sql.LastIndexOf("ORDER") != -1)
                     {
                         sql = sql.Substring(0, sql.LastIndexOf("ORDER"));
@@ -2239,7 +2338,7 @@ namespace VIS.Helpers
         /// <param name="encryptedColnames">lsit encrypted column of window</param>
         /// <param name="ctx">context</param>
         /// <returns>Json cutom equalvalent to dataset</returns>
-        public object GetWindowRecords(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
+        public WindowRecordOut GetWindowRecords(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, List<string> obscureFields)
         {
             WindowRecordOut retVal = new WindowRecordOut();
 
@@ -2250,7 +2349,7 @@ namespace VIS.Helpers
             JTable obj = null;
             if (sqlIn.card_ID > 0)
             {
-                string SQL = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf(" FROM "+ sqlIn.tableName));
+                string SQL = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf(" FROM " + sqlIn.tableName));
                 SQL = SQL.Substring(0, SQL.LastIndexOf("ORDER"));
                 retVal.CardViewTpl = WindowHelper.GetCardViewDetail(0, sqlIn.ad_Tab_ID, ctx, sqlIn.card_ID, SQL);
                 if (retVal.CardViewTpl.DisableWindowPageSize)
@@ -2279,20 +2378,20 @@ namespace VIS.Helpers
                         }
                         condition = whereCondition + " AND (" + retVal.CardViewTpl.FieldGroupName + " NOT IN (" + ExcludedGroup + ") OR " + retVal.CardViewTpl.FieldGroupName + " IS NULL )";
                     }
-                        
+
                 }
                 else
                 {
                     condition = whereCondition;
                 }
-                
+
                 if (!string.IsNullOrEmpty(retVal.CardViewTpl.OrderByClause))
                 {
                     condition = condition + " ORDER BY " + retVal.CardViewTpl.OrderByClause;
                 }
                 else
                 {
-                    condition = condition + " "+ orderBY;
+                    condition = condition + " " + orderBY;
                 }
                 if (!string.IsNullOrEmpty(condition))
                 {
@@ -2558,7 +2657,7 @@ namespace VIS.Helpers
         /// <param name="encryptedColnames">lsit encrypted column of window</param>
         /// <param name="ctx">context</param>
         /// <returns>Json cutom equalvalent to dataset</returns>
-        public  object GetWindowRecordsForTreeNode(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, int treeID, int treeNodeID, List<string> obscureFields)
+        public WindowRecordOut GetWindowRecordsForTreeNode(SqlParamsIn sqlIn, List<string> encryptedColNames, Ctx ctx, int rowCount, string sqlCount, int AD_Table_ID, int treeID, int treeNodeID, List<string> obscureFields)
         {
             List<JTable> outO = new List<JTable>();
             JTable obj = null;
@@ -2678,7 +2777,10 @@ namespace VIS.Helpers
                 outO.Add(obj);
 
             }
-            return outO;
+
+            WindowRecordOut w = new WindowRecordOut();
+            w.Tables = outO;
+            return w;
         }
 
         StringBuilder parentIDs = new StringBuilder();
@@ -3042,9 +3144,9 @@ namespace VIS.Helpers
         /// clean up
         /// </summary>
 
-        public static CardViewData GetCardViewDetail(int AD_Window_ID, int AD_Tab_ID, Ctx ctx, int AD_CardView_ID,string SQL)
+        public static CardViewData GetCardViewDetail(int AD_Window_ID, int AD_Tab_ID, Ctx ctx, int AD_CardView_ID, string SQL)
         {
-            
+
             VAdvantage.Common.Common cFun = new VAdvantage.Common.Common();
             CardViewData cv = cFun.GetCardViewDetails(ctx.GetAD_User_ID(), AD_Tab_ID, AD_CardView_ID, ctx, SQL);
             return cv;
@@ -3119,11 +3221,11 @@ namespace VIS.Helpers
         {
             List<CardsInfo> cards = new List<CardsInfo>();
             // Get Login user's default card and other cards of  current tab
-          DataSet  ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(@" SELECT AD_CardView.ad_cardview_id, AD_CardView.name,AD_DefaultCardView.ad_cardview_id as dcard,AD_CardView.CreatedBy FROM AD_CardView AD_CardView
+            DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(@" SELECT AD_CardView.ad_cardview_id, AD_CardView.name,AD_DefaultCardView.ad_cardview_id as dcard,AD_CardView.CreatedBy FROM AD_CardView AD_CardView
    LEFT OUTER JOIN AD_DefaultCardView AD_DefaultCardView ON (  AD_CardView.ad_cardview_id=AD_DefaultCardView.ad_cardview_id AND AD_DefaultCardView.IsActive='Y' AND AD_DefaultCardView.AD_User_ID=" + ctx.GetAD_User_ID() + @")
                         WHERE  AD_CardView.AD_Tab_ID=" + AD_Tab_ID + @" AND AD_CardView.IsActive = 'Y'   AND ( AD_CardView.ad_user_id IS NULL
-                                                          OR AD_CardView.ad_user_id = " + ctx.GetAD_User_ID()+ @") " +
-                        "ORDER BY lower(AD_CardView.name) ASC", "AD_CardView", true, false));
+                                                          OR AD_CardView.ad_user_id = " + ctx.GetAD_User_ID() + @") " +
+                          "ORDER BY lower(AD_CardView.name) ASC", "AD_CardView", true, false));
 
             if (ds == null || ds.Tables[0].Rows.Count == 0)
             {
@@ -3154,7 +3256,7 @@ namespace VIS.Helpers
         }
 
 
-    
+
         public void Dispose()
         {
             _createSqlColumn.Clear();
@@ -3304,7 +3406,7 @@ namespace VIS.Helpers
 
 
         }
-       
+
         /// <summary>
         /// Method to get parent tab records ID.
         /// </summary>
@@ -3321,5 +3423,284 @@ namespace VIS.Helpers
             recordID = Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
             return recordID;
         }
+
+
+        public object GetWindowRecord(Ctx ctx, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
+        {
+            object data = null;
+            if (!string.IsNullOrEmpty(WhereClause))
+            {
+                WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctx.GetSecureKey());
+                if (!QueryValidator.IsValid(WhereClause))
+                    return null;
+            }
+            else
+                WhereClause = "1=2";
+
+            GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+
+            GridTabVO gt = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
+            List<GridFieldVO> lstFields = gt.GetFields();
+
+            if (gt.TableName != TableName)
+                return null;
+
+            for (int i = 0; i < Columns.Count; i++)
+            {
+                GridFieldVO gField = lstFields.Where(a => a.ColumnName == Columns[i]).FirstOrDefault();
+
+                if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
+                {
+                    string selectSQL = GetColumnSQL(true, gField);
+
+                    if (selectSQL.IndexOf("@") == -1)
+                    {
+                        Columns[i] = selectSQL;   //	ColumnName or Virtual Column
+                    }
+                    else
+                    {
+                        Columns[i] = Env.ParseContext(ctx, WindowNo, selectSQL, false);
+                    }
+                }
+
+                if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
+                    && Columns[i] != "Created" && Columns[i] != "CreatedBy")
+                {
+                    return null;
+                }
+            }
+
+            List<GridFieldVO> imgColList = lstFields.Where(a => a.AD_Reference_ID == DisplayType.Image).ToList();
+
+
+
+            if (imgColList != null && imgColList.Count > 0)
+            {
+                for (int j = 0; j < imgColList.Count; j++)
+                {
+                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                }
+            }
+
+            string SelectSQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName;
+            if (!string.IsNullOrEmpty(SelectSQL))
+            {
+                SelectSQL += " WHERE " + WhereClause;
+
+                using (var w = new WindowHelper())
+                {
+                    data = w.GetWindowRecord(SelectSQL, Encryptedfields, ctx, ObscureFields);
+                }
+            }
+            return data;
+        }
+
+        public object GetWindowRecords(Ctx ctxp, List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
+       int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging)
+        {
+            WindowRecordOut resultData = new WindowRecordOut();
+
+            WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctxp.GetSecureKey());
+            if (!QueryValidator.IsValid(WhereClause))
+                return null;
+
+            GridWindowVO vo = AEnv.GetMWindowVO(ctxp, WindowNo, AD_Window_ID, 0);
+
+            GridTabVO gt = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
+            List<GridFieldVO> lstFields = gt.GetFields();
+
+            if (gt.TableName != TableName)
+                return null;
+
+            for (int i = 0; i < Columns.Count; i++)
+            {
+                GridFieldVO gField = lstFields.Where(a => a.ColumnName == Columns[i]).FirstOrDefault();
+
+                if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
+                {
+                    string selectSQL = GetColumnSQL(true, gField);
+
+                    if (selectSQL.IndexOf("@") == -1)
+                    {
+                        Columns[i] = selectSQL;   //	ColumnName or Virtual Column
+                    }
+                    else
+                    {
+                        Columns[i] = Env.ParseContext(ctxp, WindowNo, selectSQL, false);
+                    }
+                }
+
+                //if (gField == null)
+                //{
+                //    gField = lstFields.Where(a => a.ColumnSQL + " AS " + a.ColumnName == Columns[i]).FirstOrDefault();
+                //}
+
+                if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
+                    && Columns[i] != "Created" && Columns[i] != "CreatedBy")
+                {
+                    return null;
+                }
+            }
+
+            List<GridFieldVO> imgColList = lstFields.Where(a => a.AD_Reference_ID == DisplayType.Image).ToList();
+
+
+
+            if (imgColList != null && imgColList.Count > 0)
+            {
+                for (int j = 0; j < imgColList.Count; j++)
+                {
+                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                }
+            }
+
+            //, (SELECT ImageURL||'?random=0.5205978521522949' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumnAD_Image_ID
+
+
+            if (!string.IsNullOrEmpty(WhereClause) && !WhereClause.Trim().ToUpper().StartsWith("WHERE"))
+            {
+                WhereClause = " WHERE " + WhereClause;
+            }
+
+            string SQL_Count = "SELECT COUNT(*) FROM " + TableName + " " + WhereClause;
+            string SQL_Direct = "";
+
+            SQL_Count = MRole.GetDefault(ctxp).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+
+            int rCount = 0;
+            if (sqlIn.tree_id > 0)
+            {
+                using (var w = new WindowHelper())
+                {
+                    rCount = w.GetRecordCountForTreeNode(WhereClause, ctxp, gt.AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, WindowNo, summaryOnly);
+                }
+            }
+            else
+            {
+                if (sqlIn.card_ID > 0)
+                {
+                    using (var w = new WindowHelper())
+                    {
+                        rCount = w.GetRecordCountWithCard(SQL_Count, sqlIn.card_ID);
+                    }
+                }
+                else
+                {
+                    rCount = Convert.ToInt32(DB.ExecuteScalar(SQL_Count));
+                }
+            }
+
+            if (MaxRows > 0 && rCount > MaxRows)
+            {
+                /************************ Set Max Rows ***********************************/
+                // m_pstmt.setMaxRows(maxRows);
+                sqlIn.pageSize = MaxRows;
+                //info.Append(" - MaxRows=").Append(_maxRows);
+                //rowChanged = MaxRows;
+            }
+
+            else if (!DoPaging || (sqlIn.pageSize > rCount))
+            {
+                sqlIn.pageSize = rCount;
+            }
+
+            /* Multi Delete may Decrease pages */
+            if (DoPaging)
+            {
+                if ((rCount + sqlIn.pageSize) <= (sqlIn.page * sqlIn.pageSize))
+                {
+                    --sqlIn.page;
+                }
+            }
+
+
+            string SQL = "";
+            StringBuilder selectDirect = null;
+
+            for (int i = 0; i < lstFields.Count; i++)
+            {
+                if (lstFields[i].lookupInfo != null && lstFields[i].AD_Reference_ID != DisplayType.Account)
+                {
+                    var lInfo = lstFields[i].lookupInfo;
+                    if (!string.IsNullOrEmpty(lInfo.displayColSubQ) && gt.TableName.ToLower() != lInfo.tableName.ToLower())
+                    {
+
+
+                        if (selectDirect == null)
+                            selectDirect = new StringBuilder("SELECT ");
+                        else
+                            selectDirect.Append(",");
+
+                        var qryDirect = lInfo.queryDirect.Substring(lInfo.queryDirect.LastIndexOf(" FROM " + lInfo.tableName + " "));
+
+                        if (!lstFields[i].IsVirtualColumn)
+                            qryDirect = qryDirect.Replace("@key", gt.TableName + '.' + GetColumnSQL(false, lstFields[i]));
+                        else
+                            qryDirect = qryDirect.Replace("@key", GetColumnSQL(false, lstFields[i]));
+
+
+                        selectDirect.Append("( SELECT (").Append(lInfo.displayColSubQ).Append(") ").Append(qryDirect)
+                            .Append(" ) AS ").Append(GetColumnSQL(false, lstFields[i]) + "_T")
+                            .Append(',').Append(GetColumnSQL(true, lstFields[i]));
+                    }
+                    else if (lstFields[i].lookupInfo != null && lstFields[i].AD_Reference_ID == DisplayType.Account)
+                    {
+                        if (selectDirect == null)
+                            selectDirect = new StringBuilder("SELECT ");
+                        else
+                            selectDirect.Append(",");
+
+                        selectDirect.Append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
+                            .Append(gt.TableName + "." + GetColumnSQL(false, lstFields[i])).Append(" ) AS ")
+                            .Append(GetColumnSQL(false, lstFields[i]) + "_T")
+                            .Append(',').Append(GetColumnSQL(true, lstFields[i]));
+
+                    }
+                }
+            }
+
+
+            if (selectDirect != null)
+                SQL_Direct = selectDirect.ToString() + ' ' + SQL_Count.Substring(SQL_Count.IndexOf(" COUNT(*) FROM") + 9);
+            else
+                SQL_Direct = "";
+
+
+
+            SQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName + WhereClause;
+
+            if (!String.IsNullOrEmpty(gt.OrderByClause))
+            {
+                SQL += " ORDER BY " + gt.OrderByClause;
+                SQL_Direct += " ORDER BY " + gt.OrderByClause;
+            }
+
+
+
+            sqlIn.sql = MRole.GetDefault(ctxp).AddAccessSQL(SQL.ToString(), TableName, true, false);
+            sqlIn.sqlDirect = SQL_Direct;
+
+            if (rCount > 0)
+            {
+                if (sqlIn.tree_id > 0)
+                {
+                    using (var w = new WindowHelper())
+                    {
+                        resultData = w.GetWindowRecordsForTreeNode(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, ObscureFields);
+                    }
+                }
+                else
+                {
+                    using (var w = new WindowHelper())
+                    {
+                        resultData = w.GetWindowRecords(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, ObscureFields);
+                    }
+                }
+            }
+            resultData.RecordCount = rCount;
+
+            return resultData;
+        }
+
     }
 }

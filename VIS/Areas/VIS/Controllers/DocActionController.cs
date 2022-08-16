@@ -41,7 +41,7 @@ namespace VIS.Controllers
         {
             Ctx ctx = Session["ctx"] as Ctx;
             DocActionModel model = new DocActionModel(ctx);
-            RefQry = SecureEngineBridge.DecryptByClientKey(RefQry, ctx.GetSecureKey());
+            //RefQry = SecureEngineBridge.DecryptByClientKey(RefQry, ctx.GetSecureKey());
             return Json(JsonConvert.SerializeObject(model.GetReference(RefQry)), JsonRequestBehavior.AllowGet); ;
         }
     }

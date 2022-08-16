@@ -44,6 +44,9 @@
     <Reference Include="ModelLibrary">
       <HintPath>..\ViennaAdvantageWeb\Dll\ModelLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -88,6 +91,7 @@
     <Compile Include="Classes\ContactsInfo.cs" />
     <Compile Include="Classes\LoginProcess.cs" />
     <Compile Include="Classes\QueryCollection.cs" />
+    <Compile Include="Classes\QueryValidator.cs" />
     <Compile Include="Classes\SecureEngineBridge.cs" />
     <Compile Include="DataContracts\FormData.cs" />
     <Compile Include="DataContracts\InfoSchema.cs" />
@@ -106,6 +110,7 @@
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AmountDivisionModel.cs" />
+    <Compile Include="Models\ArchiveViewerModel.cs" />
     <Compile Include="Models\ASearchModel.cs" />
     <Compile Include="Models\AttachmentHistoryModel.cs" />
     <Compile Include="Models\AttachmentModel.cs" />

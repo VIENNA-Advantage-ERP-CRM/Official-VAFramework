@@ -299,9 +299,14 @@
 								}
 								else {
 									busyDiv("visible");
-									for (var j = 0; j < allAcctSchemaID.length; j++) {
-										VIS.DB.executeQuery("delete from c_dimamtaccttype where c_acctschema_id=" + allAcctSchemaID[j] + " and c_dimamt_id=" + C_DimAmt_ID + "");
+									//for (var j = 0; j < allAcctSchemaID.length; j++) {
+
+									//	VIS.DB.executeQuery("delete from c_dimamtaccttype where c_acctschema_id=" + allAcctSchemaID[j] + " and c_dimamt_id=" + C_DimAmt_ID + "");
+									//}
+									if (allAcctSchemaID.length) {
+										VIS.dataContext.getJSONRecord("AmountDivision/SetDAcctType", { "allAcctSchemaID": allAcctSchemaID, "did": C_DimAmt_ID });
 									}
+
 									getMaxDimensionAmount();
 
 									//loadData(getDimensionLine(allAcctSchemaID));
@@ -457,8 +462,11 @@
 								else { divAmount.css("width", "33.3%"); }
 								btnAdd.empty().append(VIS.Msg.getMsg("Add"));
 
-								for (var j = 0; j < arrAcctSchemaID.length; j++) {
-									VIS.DB.executeQuery("delete from c_dimamtaccttype where c_acctschema_id=" + arrAcctSchemaID[j] + " and c_dimamt_id=" + C_DimAmt_ID + "");
+								//for (var j = 0; j < arrAcctSchemaID.length; j++) {
+								//	VIS.DB.executeQuery("delete from c_dimamtaccttype where c_acctschema_id=" + arrAcctSchemaID[j] + " and c_dimamt_id=" + C_DimAmt_ID + "");
+								//}
+								if (allAcctSchemaID.length) {
+									VIS.dataContext.getJSONRecord("AmountDivision/SetDAcctType", { "allAcctSchemaID": allAcctSchemaID, "did": C_DimAmt_ID });
 								}
 								getDimensionLine(arrAcctSchemaID, null, function (temp) {
 
@@ -1111,17 +1119,13 @@
 			var tempacctAmt = "";
 			lblMaxAmount.empty();
 			lblMaxAmount.append("");
-			//var sql = "select * from (select Max(ct.totaldimlineamout) as amount,ac.name from c_dimamtaccttype ct " +
-			//           " inner join c_dimamtline cl on ct.c_dimamt_id=cl.c_dimamt_id and ct.c_dimamtaccttype_id=cl.c_dimamtaccttype_id" +
-			//           " inner join c_acctschema ac on ac.c_acctschema_id=ct.c_acctschema_id " +
-			//            " group by ac.name,ct.c_dimamt_id having ct.c_dimamt_id=" + C_DimAmt_ID + " order by Amount desc ) " +
-			//             " main where rownum=1";
-			var sql = " select distinct ct.totaldimlineamout as amount,ac.name from c_dimamtaccttype ct " +
-				" inner join c_dimamtline cl on ct.c_dimamt_id=cl.c_dimamt_id and ct.c_dimamtaccttype_id=cl.c_dimamtaccttype_id " +
-				" inner join c_acctschema ac on ac.c_acctschema_id=ct.c_acctschema_id " +
-				"  where ct.totaldimlineamout in (Select max(totaldimlineamout) from c_Dimamtaccttype " +
-				"   where c_dimamt_id=" + C_DimAmt_ID + ") and ct.c_dimamt_id=" + C_DimAmt_ID + "";
-			var maxDimension = VIS.DB.executeReader(sql);
+			
+			var maxData = VIS.dataContext.getJSONRecord("AmountDivision/GetDimMaxAmount", {
+				"dAmtId": C_DimAmt_ID
+			});
+
+			maxDimension = new VIS.DB.DataReader().toJson(JSON.stringify(maxData));
+			//var maxDimension = VIS.DB.executeReader(sql);
 			while (maxDimension.read()) {
 				if (maxDimension.getInt(0) != null) {
 					divMaxAmount.css("display", "block");
@@ -1153,8 +1157,10 @@
 				}, 200);
 			}
 			if (C_DimAmt_ID != 0) {
-				var maxAmount = VIS.DB.executeScalar("select amount from c_dimAmt where c_dimamt_id=" + C_DimAmt_ID + "");
-
+				//var maxAmount = VIS.DB.executeScalar("select amount from c_dimAmt where c_dimamt_id=" + C_DimAmt_ID + "");
+				var maxAmount = VIS.dataContext.getJSONRecord("AmountDivision/GetDimAmount", {
+					"dAmtId": C_DimAmt_ID
+				});
 				// handle the cases of negative amount.
 				if (Math.abs(parseFloat(defaultVal)) > 0) {
 					txtTotalAmount.setValue(defaultVal);
@@ -1771,31 +1777,42 @@
 				arrAcctSchemaID[0] = AccountSchemaVal;
 			}
 			if (checkValUpdate) {
-				var sql = "select nvl(cline.c_dimamtline_id,0) as DimLineID from c_dimamt cd inner join c_dimamtaccttype cact on cd.c_dimamt_id=cact.c_dimamt_id " +
-					" inner join c_dimamtline cline on cd.c_Dimamt_id=cline.c_dimamt_id and cact.c_dimamtaccttype_id=cline.c_dimamtaccttype_id " +
-					" where cd.c_dimamt_id=" + C_DimAmt_ID + " and cact.elementtype='" + DimensionTypeVal + "' and cact.c_acctschema_id in(" + arrAcctSchemaID.toString() + ") and cline.c_dimamtline_id not in (" + DimensionLineID + ") ";
-				if (DimensionTypeVal == "AC") {
-					sql += " and C_ElementValue_ID=" + DimensionNameVal + " AND NVL(C_BPartner_ID,0)=" + C_BPartner_ID;
-				}//Account
-				else if (DimensionTypeVal == "AY") { sql += " and C_Activity_ID =" + DimensionNameVal }//Activity
-				else if (DimensionTypeVal == "BP") { sql += " and C_BPartner_ID=" + DimensionNameVal }//BPartner
-				else if (DimensionTypeVal == "LF" || DimensionTypeVal == "LT") { sql += " and C_Location_ID=" + DimensionNameVal }//Location From//Location To
-				else if (DimensionTypeVal == "MC") { sql += " and C_Campaign_ID=" + DimensionNameVal }//Campaign
-				else if (DimensionTypeVal == "OO" || DimensionTypeVal == "OT") { sql += " and Org_ID=" + DimensionNameVal }//Organization//Org Trx
-				else if (DimensionTypeVal == "PJ") { sql += " and C_Project_ID=" + DimensionNameVal }//Project
-				else if (DimensionTypeVal == "PR") { sql += " and M_Product_ID=" + DimensionNameVal }//Product
-				else if (DimensionTypeVal == "SA") { }//Sub Account
-				else if (DimensionTypeVal == "SR") { sql += " and C_SalesRegion_ID=" + DimensionNameVal }//Sales Region
-				else if (DimensionTypeVal == "U1" || DimensionTypeVal == "U2") {
-					sql += " and C_ElementValue_ID=" + DimensionNameVal;
-					if (C_BPartner_ID > 0) {
-						sql += " AND NVL(C_BPartner_ID,0)=" + C_BPartner_ID;
-					}
-				}//User List 1//User List 2
-				else if (DimensionTypeVal == "X1" || DimensionTypeVal == "X2" || DimensionTypeVal == "X3" || DimensionTypeVal == "X4" || DimensionTypeVal == "X5" || DimensionTypeVal == "X6" ||
-					DimensionTypeVal == "X7" || DimensionTypeVal == "X8" || DimensionTypeVal == "X9") { sql += " and AD_Column_ID=" + DimensionNameVal }//User Element 1 to User Element 9
-				chkDuplicate = VIS.DB.executeScalar(sql);
-				if (chkDuplicate == null) {
+
+				var paramStr = {};
+				paramStr.dTypeVal = DimensionTypeVal;
+				paramStr.dAmtId = C_DimAmt_ID;
+				paramStr.acctSchemaId = arrAcctSchemaID.toString();
+				paramStr.dLineId = DimensionLineID;
+				paramStr.dNameVal = DimensionNameVal;
+				paramStr.cbPartId = C_BPartner_ID;
+
+				var chkDuplicate = VIS.dataContext.getJSONRecord("AmountDivision/CheckDuplicate", paramStr);
+
+				//var sql = "select nvl(cline.c_dimamtline_id,0) as DimLineID from c_dimamt cd inner join c_dimamtaccttype cact on cd.c_dimamt_id=cact.c_dimamt_id " +
+				//	" inner join c_dimamtline cline on cd.c_Dimamt_id=cline.c_dimamt_id and cact.c_dimamtaccttype_id=cline.c_dimamtaccttype_id " +
+				//	" where cd.c_dimamt_id=" + C_DimAmt_ID + " and cact.elementtype='" + DimensionTypeVal + "' and cact.c_acctschema_id in(" + arrAcctSchemaID.toString() + ") and cline.c_dimamtline_id not in (" + DimensionLineID + ") ";
+				//if (DimensionTypeVal == "AC") {
+				//	sql += " and C_ElementValue_ID=" + DimensionNameVal + " AND NVL(C_BPartner_ID,0)=" + C_BPartner_ID;
+				//}//Account
+				//else if (DimensionTypeVal == "AY") { sql += " and C_Activity_ID =" + DimensionNameVal }//Activity
+				//else if (DimensionTypeVal == "BP") { sql += " and C_BPartner_ID=" + DimensionNameVal }//BPartner
+				//else if (DimensionTypeVal == "LF" || DimensionTypeVal == "LT") { sql += " and C_Location_ID=" + DimensionNameVal }//Location From//Location To
+				//else if (DimensionTypeVal == "MC") { sql += " and C_Campaign_ID=" + DimensionNameVal }//Campaign
+				//else if (DimensionTypeVal == "OO" || DimensionTypeVal == "OT") { sql += " and Org_ID=" + DimensionNameVal }//Organization//Org Trx
+				//else if (DimensionTypeVal == "PJ") { sql += " and C_Project_ID=" + DimensionNameVal }//Project
+				//else if (DimensionTypeVal == "PR") { sql += " and M_Product_ID=" + DimensionNameVal }//Product
+				//else if (DimensionTypeVal == "SA") { }//Sub Account
+				//else if (DimensionTypeVal == "SR") { sql += " and C_SalesRegion_ID=" + DimensionNameVal }//Sales Region
+				//else if (DimensionTypeVal == "U1" || DimensionTypeVal == "U2") {
+				//	sql += " and C_ElementValue_ID=" + DimensionNameVal;
+				//	if (C_BPartner_ID > 0) {
+				//		sql += " AND NVL(C_BPartner_ID,0)=" + C_BPartner_ID;
+				//	}
+				//}//User List 1//User List 2
+				//else if (DimensionTypeVal == "X1" || DimensionTypeVal == "X2" || DimensionTypeVal == "X3" || DimensionTypeVal == "X4" || DimensionTypeVal == "X5" || DimensionTypeVal == "X6" ||
+				//	DimensionTypeVal == "X7" || DimensionTypeVal == "X8" || DimensionTypeVal == "X9") { sql += " and AD_Column_ID=" + DimensionNameVal }//User Element 1 to User Element 9
+				//chkDuplicate = VIS.DB.executeScalar(sql);
+				if (chkDuplicate == null || chkDuplicate <1 ) {
 					var paramStr = DimensionLineID.toString();
 					var tempLineAmount = VIS.dataContext.getJSONRecord("AmountDivision/GetTempDimLineAmount", paramStr);
 					//var tempLineAmount = VIS.DB.executeScalar("select amount from c_dimamtline where c_dimamtline_id in (" + DimensionLineID + ") and rownum=1");
@@ -1807,8 +1824,6 @@
 						});
 					}
 					else { VIS.ADialog.warn("LineTotalNotGrater"); modalTxtAmount.setValue(0); modalTxtAmount.getControl().focus(); afterSave(); }
-
-
 				}
 				else {
 					VIS.ADialog.warn("NameExists");
@@ -1816,41 +1831,45 @@
 					busyDiv("hidden");
 					return false;
 				}
-
-
-
 			}
 			else {
 				//This Function Work When Inserting Dimension Value in Array......................  // handle the cases of negative amount.
 				if (Math.abs(parseFloat(txtTotal.getValue()) + parseFloat(Amount)) <= Math.abs(parseFloat(txtTotalAmount.getValue()))) {//Dimension Line Sum Must Equal to Total Amout..............
 
-					var sql = "select nvl(cline.c_dimamtline_id,0) as DimLineID from c_dimamt cd inner join c_dimamtaccttype cact on cd.c_dimamt_id=cact.c_dimamt_id " +
-						" inner join c_dimamtline cline on cd.c_Dimamt_id=cline.c_dimamt_id and cact.c_dimamtaccttype_id=cline.c_dimamtaccttype_id " +
-						" where cd.c_dimamt_id=" + C_DimAmt_ID + " and cact.elementtype='" + DimensionTypeVal + "' and cact.c_acctschema_id in(" + arrAcctSchemaID.toString() + ")";
-					if (DimensionTypeVal == "AC") {
-						sql += " and C_ElementValue_ID=" + DimensionNameVal + " AND C_BPartner_ID=" + C_BPartner_ID;
-					}//Account
-					else if (DimensionTypeVal == "AY") { sql += " and C_Activity_ID =" + DimensionNameVal }//Activity
-					else if (DimensionTypeVal == "BP") { sql += " and C_BPartner_ID=" + DimensionNameVal }//BPartner
-					else if (DimensionTypeVal == "LF" || DimensionTypeVal == "LT") { sql += " and C_Location_ID=" + DimensionNameVal }//Location From//Location To
-					else if (DimensionTypeVal == "MC") { sql += " and C_Campaign_ID=" + DimensionNameVal }//Campaign
-					else if (DimensionTypeVal == "OO" || DimensionTypeVal == "OT") { sql += " and Org_ID=" + DimensionNameVal }//Organization//Org Trx
-					else if (DimensionTypeVal == "PJ") { sql += " and C_Project_ID=" + DimensionNameVal }//Project
-					else if (DimensionTypeVal == "PR") { sql += " and M_Product_ID=" + DimensionNameVal }//Product
-					else if (DimensionTypeVal == "SA") { }//Sub Account
-					else if (DimensionTypeVal == "SR") { sql += " and C_SalesRegion_ID=" + DimensionNameVal }//Sales Region
-					else if (DimensionTypeVal == "U1" || DimensionTypeVal == "U2") {
-						sql += " and C_ElementValue_ID=" + DimensionNameVal;
-						if (C_BPartner_ID > 0) {
-							sql += " AND C_BPartner_ID=" + C_BPartner_ID;
-						}
-					}//User List 1//User List 2
-					else if (DimensionTypeVal == "X1" || DimensionTypeVal == "X2" || DimensionTypeVal == "X3" || DimensionTypeVal == "X4" || DimensionTypeVal == "X5" || DimensionTypeVal == "X6" ||
-						DimensionTypeVal == "X7" || DimensionTypeVal == "X8" || DimensionTypeVal == "X9") { sql += " and AD_Column_ID=" + DimensionNameVal }//User Element 1 to User Element 9
+					//var sql = "select nvl(cline.c_dimamtline_id,0) as DimLineID from c_dimamt cd inner join c_dimamtaccttype cact on cd.c_dimamt_id=cact.c_dimamt_id " +
+					//	" inner join c_dimamtline cline on cd.c_Dimamt_id=cline.c_dimamt_id and cact.c_dimamtaccttype_id=cline.c_dimamtaccttype_id " +
+					//	" where cd.c_dimamt_id=" + C_DimAmt_ID + " and cact.elementtype='" + DimensionTypeVal + "' and cact.c_acctschema_id in(" + arrAcctSchemaID.toString() + ")";
+					//if (DimensionTypeVal == "AC") {
+					//	sql += " and C_ElementValue_ID=" + DimensionNameVal + " AND C_BPartner_ID=" + C_BPartner_ID;
+					//}//Account
+					//else if (DimensionTypeVal == "AY") { sql += " and C_Activity_ID =" + DimensionNameVal }//Activity
+					//else if (DimensionTypeVal == "BP") { sql += " and C_BPartner_ID=" + DimensionNameVal }//BPartner
+					//else if (DimensionTypeVal == "LF" || DimensionTypeVal == "LT") { sql += " and C_Location_ID=" + DimensionNameVal }//Location From//Location To
+					//else if (DimensionTypeVal == "MC") { sql += " and C_Campaign_ID=" + DimensionNameVal }//Campaign
+					//else if (DimensionTypeVal == "OO" || DimensionTypeVal == "OT") { sql += " and Org_ID=" + DimensionNameVal }//Organization//Org Trx
+					//else if (DimensionTypeVal == "PJ") { sql += " and C_Project_ID=" + DimensionNameVal }//Project
+					//else if (DimensionTypeVal == "PR") { sql += " and M_Product_ID=" + DimensionNameVal }//Product
+					//else if (DimensionTypeVal == "SA") { }//Sub Account
+					//else if (DimensionTypeVal == "SR") { sql += " and C_SalesRegion_ID=" + DimensionNameVal }//Sales Region
+					//else if (DimensionTypeVal == "U1" || DimensionTypeVal == "U2") {
+					//	sql += " and C_ElementValue_ID=" + DimensionNameVal;
+					//	if (C_BPartner_ID > 0) {
+					//		sql += " AND C_BPartner_ID=" + C_BPartner_ID;
+					//	}
+					//}//User List 1//User List 2
+					//else if (DimensionTypeVal == "X1" || DimensionTypeVal == "X2" || DimensionTypeVal == "X3" || DimensionTypeVal == "X4" || DimensionTypeVal == "X5" || DimensionTypeVal == "X6" ||
+					//	DimensionTypeVal == "X7" || DimensionTypeVal == "X8" || DimensionTypeVal == "X9") { sql += " and AD_Column_ID=" + DimensionNameVal }//User Element 1 to User Element 9
+					var paramStr = {};
+					paramStr.dTypeVal = DimensionTypeVal;
+					paramStr.dAmtId = C_DimAmt_ID;
+					paramStr.acctSchemaId = arrAcctSchemaID.toString();
+					paramStr.dLineId = "0";
+					paramStr.dNameVal = DimensionNameVal;
+					paramStr.cbPartId = C_BPartner_ID;
 
-					chkDuplicate = VIS.DB.executeScalar(sql);
+					chkDuplicate = VIS.dataContext.getJSONRecord("AmountDivision/CheckDuplicate", paramStr);
 
-					if (chkDuplicate == null) {
+					if (chkDuplicate == null|| chkDuplicate <1) {
 						insertDimensionAmountLine(C_DimAmt_ID, txtTotalAmount.getValue(), Amount, arrAcctSchemaID, DimensionType, DimensionTypeVal, DimensionName, DimensionNameVal, ElementID, 0, C_BPartner_ID, BpartnerName, 0, function () {
 							afterSave();
 						});
@@ -1862,15 +1881,11 @@
 						busyDiv("hidden");
 						return false;
 					}
-
 				}
 				else { VIS.ADialog.warn("LineTotalNotGrater"); txtAmount.setValue(0); txtAmount.getControl().focus(); recid = recid - 1; afterSave(); }
 			}
-
-
-
-
 		};
+
 		function afterSave() {
 			txtAmount.setValue(0);
 			checkValUpdate = false;
@@ -1953,9 +1968,9 @@
 				},
 				success: function (data) {
 					var Sql = "";
-					var DefaultValue = VIS.DB.executeScalar("select c_acctschema1_id from ad_clientinfo where ad_client_ID=" + VIS.Env.getCtx().getAD_Client_ID() + "");
+					var DefaultValue = data.dAcctId; //VIS.DB.executeScalar("select c_acctschema1_id from ad_clientinfo where ad_client_ID=" + VIS.Env.getCtx().getAD_Client_ID() + "");
 					var defaultCheck = false;
-					var res = JSON.parse(data);
+					var res = JSON.parse(data.acctData);
 					if (res.Error) {
 						VIS.ADialog.error(res.Error);
 						busyDiv("hidden");
@@ -1975,13 +1990,11 @@
 					}
 
 					if (defaultCheck) {
-
-						var dr = VIS.DB.executeScalar("select cd.c_acctschema_id from c_dimamtaccttype cd inner join c_dimamtline cl on cd.c_dimamtaccttype_id=cl.c_dimamtaccttype_id where cd.c_dimamt_id=" + C_DimAmt_ID + "");
-						if (dr == "" || dr == null) {
+						var dr = VIS.dataContext.getJSONRecord("AmountDivision/GetAcctSchemaByActId", { "dAmtId": C_DimAmt_ID});
+						if (dr == "" || dr == null || dr < 1) {
 							cmbAcctSchema.val(DefaultValue);
 							getDiminsionType(DefaultValue);
 						}
-
 					}
 
 					if (callback) {
@@ -2142,24 +2155,25 @@
 		var getUserElement = function () {
 			cmbUserElement = $("<select>");
 			modalCmbUserElement = $("<select>");
-			var sql = "select adt.ad_column_id,adt.columnname,adtab.TableName from c_acctschema_element ac inner join ad_column ad on ac.ad_column_id=ad.ad_column_id " +
-				" inner join ad_column adt on ad.ad_table_ID=adt.ad_table_ID and adt.isactive='Y' " +
-				"  inner join ad_table adtab on adtab.ad_table_id=ad.ad_table_ID " +
-				" where ac.c_acctschema_id=" + arrAcctSchemaID[0] + " and ac.elementtype='" + cmbDimensionType.find("option:selected").val() + "' and adt.isidentifier='Y' order by adt.ad_column_ID";
-			var dr = VIS.DB.executeReader(sql);
-			var tblName = "";
-			var colName = "";
-			while (dr.read()) {
-				tblName = dr.getString(2);
-				if (colName == "") {
-					colName += dr.getString(1);
-
-				}
-				else {
-
-					colName += " ||'_'|| " + dr.getString(1);
-				}
-			}
+			//var sql = "select adt.ad_column_id,adt.columnname,adtab.TableName from c_acctschema_element ac inner join ad_column ad on ac.ad_column_id=ad.ad_column_id " +
+			//	" inner join ad_column adt on ad.ad_table_ID=adt.ad_table_ID and adt.isactive='Y' " +
+			//	"  inner join ad_table adtab on adtab.ad_table_id=ad.ad_table_ID " +
+			//	" where ac.c_acctschema_id=" + arrAcctSchemaID[0] + " and ac.elementtype='" + cmbDimensionType.find("option:selected").val() + "' and adt.isidentifier='Y' order by adt.ad_column_ID";
+			//var dr = VIS.DB.executeReader(sql);
+			
+			var data = VIS.dataContext.getJSONRecord("AmountDivision/GetUserElement", { "aid": arrAcctSchemaID[0], "eType": cmbDimensionType.find("option:selected").val() });
+			var drTbl = new VIS.DB.DataReader().toJson(JSON.stringify(data));
+			//var tblName = "";
+			//var colName = "";
+			//while (dr.read()) {
+			//	tblName = dr.getString(2);
+			//	if (colName == "") {
+			//		colName += dr.getString(1);
+			//	}
+			//	else {
+			//		colName += " ||'_'|| " + dr.getString(1);
+			//	}
+			//}
 			generateControl.css({ "width": "33.3%" });
 			modalGenerateControl.css({ "width": "33.3%" });
 			divAmount.css("width", "33.3%");
@@ -2168,15 +2182,15 @@
 			lblUserElement = $("<label>");
 			cmbUserElement.empty().append('<option value=-1></option>');
 			modalCmbUserElement.empty().append('<option value=-1></option>');
-			if (tblName != "") {
-				var sql = "SELECT " + tblName + "_ID ,(" + colName + ") as Name FROM " + tblName + " WHERE isactive='Y' ORDER BY " + colName;   // Order by Identifier
-				sql = VIS.MRole.addAccessSQL(sql, tblName, VIS.MRole.SQL_FULLYQUALIFIED, VIS.MRole.SQL_RW);
-				var drTbl = VIS.DB.executeReader(sql);
+			//if (tblName != "") {
+			//	var sql = "SELECT " + tblName + "_ID ,(" + colName + ") as Name FROM " + tblName + " WHERE isactive='Y' ORDER BY " + colName;   // Order by Identifier
+			//	sql = VIS.MRole.addAccessSQL(sql, tblName, VIS.MRole.SQL_FULLYQUALIFIED, VIS.MRole.SQL_RW);
+				//var drTbl = VIS.DB.executeReader(sql);
 				while (drTbl.read()) {
 					cmbUserElement.append('<option value=' + drTbl.getInt(0) + '>' + drTbl.getString(1) + '</option>');
 					modalCmbUserElement.append('<option value=' + drTbl.getInt(0) + '>' + drTbl.getString(1) + '</option>');
 				}
-			}
+			//}
 			//var lookup = VIS.MLookupFactory.get(VIS.Env.getCtx(), windowNo, 0, VIS.DisplayType.TableDir, "AD_Column_ID", 0, false, "AD_Column.IsKey='Y' AND AD_Column.IsActive='Y'");
 			//var cmb = new VIS.Controls.VComboBox("AD_Column_ID", false, false, true, lookup, 50);
 			//cmbUserElement = cmb.getControl();
@@ -2509,7 +2523,7 @@
 			$.ajax({
 				url: VIS.Application.contextUrl + "AmountDivision/GetDiminsionType",
 				dataType: "json",
-				data: "{}",
+				data: JSON.stringify({ "acctSchemaId": acctSchemaID, "allAcctIds": allAcctSchemaID}),// "{}",
 				type: "POST",
 				error: function () {
 					alert(VIS.Msg.getMsg('ErrorWhileGettingData'));
@@ -2518,29 +2532,31 @@
 				},
 				success: function (data) {
 					var Sql = "";
-					var res = JSON.parse(data);
+					var res = JSON.parse(data.dataType);
 					if (res.Error) {
 						VIS.ADialog.error(res.Error);
 						busyDiv("hidden");
 						return;
 					}
-					if (acctSchemaID == 0) {
-						for (var i = 0; i < allAcctSchemaID.length; i++) {
-							if (i == 0) {
-								Sql = "SELECT Distinct ElementType, Name FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + allAcctSchemaID[i] + " AND ElementType NOT IN('SA','X1','X2','X3','X4','X5','X6','X7','X8','X9') ";
-							}
-							else {
-								Sql += " AND ElementType IN(SELECT ElementType FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + allAcctSchemaID[i] + " AND ElementType NOT IN('SA','X1','X2','X3','X4','X5','X6','X7','X8','X9')) ";
-							}
-						}
-						Sql += " ORDER BY ElementType";
+					//if (acctSchemaID == 0) {
+					//	for (var i = 0; i < allAcctSchemaID.length; i++) {
+					//		if (i == 0) {
+					//			Sql = "SELECT Distinct ElementType, Name FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + allAcctSchemaID[i] + " AND ElementType NOT IN('SA','X1','X2','X3','X4','X5','X6','X7','X8','X9') ";
+					//		}
+					//		else {
+					//			Sql += " AND ElementType IN(SELECT ElementType FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + allAcctSchemaID[i] + " AND ElementType NOT IN('SA','X1','X2','X3','X4','X5','X6','X7','X8','X9')) ";
+					//		}
+					//	}
+					//	Sql += " ORDER BY ElementType";
 
-					}
-					else {
-						Sql = "SELECT Distinct ElementType, Name FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + acctSchemaID + " AND ElementType<>'SA' ORDER BY ElementType";
-					}
-					Sql = VIS.MRole.addAccessSQL(Sql, "C_AcctSchema_Element", VIS.MRole.SQL_FULLYQUALIFIED, VIS.MRole.SQL_RW);
-					var dr = VIS.DB.executeReader(Sql);
+					//}
+					//else {
+					//	Sql = "SELECT Distinct ElementType, Name FROM C_AcctSchema_Element WHERE  c_acctschema_id =" + acctSchemaID + " AND ElementType<>'SA' ORDER BY ElementType";
+					//}
+					//Sql = VIS.MRole.addAccessSQL(Sql, "C_AcctSchema_Element", VIS.MRole.SQL_FULLYQUALIFIED, VIS.MRole.SQL_RW);
+					//var dr = VIS.DB.executeReader(Sql);
+					var data  =VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AmountDivision/GetElementType", { "acctSchemaId": acctSchemaID, "allAcctIds": allAcctSchemaID }, null);
+					var dr = new VIS.DB.DataReader().toJson(data.eleType);
 					cmbDimensionType.empty().append('<option selected="selected" value="0">Please select</option>');
 					while (dr.read()) {
 						for (var i = 0; i < res.length; i++) {
@@ -2656,12 +2672,19 @@
 			VIS.ADialog.confirm("DeleteConfirm", true, "", "Confirm", function (result) {
 				if (result) {
 					busyDiv("visible");
-					VIS.DB.executeQuery("delete from c_dimamtline where c_dimamtline_id in(" + dimensionLineID + ")");
-					var sql = "select nvl((sum(cd.amount)),0) as Amount from c_dimamtline cd inner join c_dimamtaccttype ct on cd.c_dimamt_id=ct.c_dimamt_id " +
-						" and cd.c_dimamtaccttype_id=ct.c_dimamtaccttype_id " +
-						" where cd.c_dimamt_id=" + C_DimAmt_ID + " and ct.c_acctSchema_id=" + arrAcctSchemaID[0] + "";
-					var amount = VIS.DB.executeScalar(sql);
-					VIS.DB.executeQuery("update c_dimamtaccttype set totaldimlineamout=" + amount + " where c_dimamt_id=" + C_DimAmt_ID + " and c_acctSchema_id=" + arrAcctSchemaID[0] + "");
+
+					VIS.dataContext.getJSONRecord("AmountDivision/SetDimLine", {
+						"dLineId": dimensionLineID, "acctId": arrAcctSchemaID[0],
+						"dAmtId": C_DimAmt_ID
+					});
+
+
+					//VIS.DB.executeQuery("delete from c_dimamtline where c_dimamtline_id in(" + dimensionLineID + ")");
+					//var sql = "select nvl((sum(cd.amount)),0) as Amount from c_dimamtline cd inner join c_dimamtaccttype ct on cd.c_dimamt_id=ct.c_dimamt_id " +
+					//	" and cd.c_dimamtaccttype_id=ct.c_dimamtaccttype_id " +
+					//	" where cd.c_dimamt_id=" + C_DimAmt_ID + " and ct.c_acctSchema_id=" + arrAcctSchemaID[0] + "";
+					//var amount = VIS.DB.executeScalar(sql);
+					//VIS.DB.executeQuery("update c_dimamtaccttype set totaldimlineamout=" + amount + " where c_dimamt_id=" + C_DimAmt_ID + " and c_acctSchema_id=" + arrAcctSchemaID[0] + "");
 					w2ui[LineGridName].select(gridRecordID);
 					console.log("selected Rows : " + w2ui[LineGridName].getSelection().length);
 					w2ui[LineGridName].delete(true);

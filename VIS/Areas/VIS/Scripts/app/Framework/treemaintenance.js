@@ -68,92 +68,7 @@
         var mouseEnter = false;
 
 
-        //executeDataSet
-        var executeDataSet = function (sql, param, callback) {
-            var async = callback ? true : false;
-
-            var dataIn = { sql: sql, page: 1, pageSize: 0 };
-            if (param) {
-                dataIn.param = param;
-            }
-
-            var dataSet = null;
-
-            getDataSetJString(dataIn, async, function (jString) {
-                dataSet = new VIS.DB.DataSet().toJson(jString);
-                if (callback) {
-                    callback(dataSet);
-                }
-            });
-
-            return dataSet;
-        };
-
-        var executeScalar = function (sql, params, callback) {
-            var async = callback ? true : false;
-            var dataIn = { sql: sql, page: 1, pageSize: 0 }
-
-            var value = null;
-
-            getDataSetJString(dataIn, async, function (jString) {
-                dataSet = new VIS.DB.DataSet().toJson(jString);
-                var dataSet = new VIS.DB.DataSet().toJson(jString);
-                if (dataSet.getTable(0).getRows().length > 0) {
-                    value = dataSet.getTable(0).getRow(0).getCell(0);
-                }
-                else { value = null; }
-                dataSet.dispose();
-                dataSet = null;
-                if (async) {
-                    callback(value);
-                }
-            });
-
-            return value;
-        };
-
-        var executeQuery = function (sqls, params, callback) {
-            var async = callback ? true : false;
-            var ret = null;
-            var dataIn = { sql: sqls, param: params };
-
-           // dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
-            $.ajax({
-                url: nonQueryUrl + 'y',
-                type: "POST",
-                datatype: "json",
-                contentType: "application/json; charset=utf-8",
-                async: async,
-                data: JSON.stringify(dataIn)
-            }).done(function (json) {
-                ret = json;
-                if (callback) {
-                    callback(json);
-                }
-            });
-
-            return ret;
-        };
-
-        function getDataSetJString(data, async, callback) {
-            var result = null;
-           // data.sql = VIS.secureEngine.encrypt(data.sql);
-            $.ajax({
-                url: dataSetUrl,
-                type: "POST",
-                datatype: "json",
-                contentType: "application/json; charset=utf-8",
-                async: async,
-                data: JSON.stringify(data)
-            }).done(function (json) {
-                result = json;
-                if (callback) {
-                    callback(json);
-                }
-                //return result;
-            });
-            return result;
-        };
+       
         
         var $lTopLeftDiv = $('<div class="VIS-TM-data-head" style="padding-top: 8px;">')
         var $lTopRightDiv = $('<div class="VIS-TM-data">');
@@ -476,29 +391,15 @@
         };
 
         function GetCountOnTreeChanges() {
-            var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            table_id = executeDataSet(table_id, null, null);
-            if (table_id.tables[0].rows.length > 0) {
-                table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-            }
 
-            var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-            tablename = executeDataSet(tablename, null, null);
-            if (tablename.tables[0].rows.length > 0) {
-                tablename = tablename.tables[0].rows[0].cells["tablename"];
-            }
 
+            var table_id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableID", { "treeId": $treeID }, null); // spelling corrected by vinay bhatt on 18 oct 2018
+            
+            var tablename = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableName", { "table_id": table_id }, null);
 
             TreeTableName();
-            //  var sqlQry = "SELECT Count(*) as Count FROM " + tableTreeName + " WHERE isactive ='Y' AND AD_Tree_ID=" + $treeID;
-
-            var sqlQry = "SELECT Count(*) as Count FROM " + tablename + " WHERE IsActive='Y' AND " + tablename + "_ID  IN (SELECT Node_ID FROM " + tableTreeName + " where AD_Tree_ID=" + $treeID + ")";
-
-            sqlQry = VIS.MRole.addAccessSQL(sqlQry, tablename, true, false);
-
-            sqlQry = executeDataSet(sqlQry, null, null);
-            sqlQry = sqlQry.tables[0].rows[0].cells["count"];
-            if (sqlQry > 0) {
+            var count = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetRecordCount", { "tablename": tablename, "tableTreeName": tableTreeName, "treeId": $treeID }, null);
+            if (count > 0) {
                 chkCountForrestriction = true;
             }
             else {
@@ -507,12 +408,12 @@
 
             if (bindornot == "false") {
                 if (sqlQry == convertmenuArray.length) {
-                    var sqlQryss = "SELECT node_id  FROM " + tableTreeName + " WHERE isactive ='Y' AND AD_Tree_ID=" + $treeID;
-                    sqlQryss = executeDataSet(sqlQryss, null, null);
-                    if (sqlQryss != null) {
+                    var ids = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetNodeIds", {"tableTreeName": tableTreeName, "treeId": $treeID }, null);
+                   
+                    if (ids != null) {
                         var node_Idss = null;
-                        for (var t = 0; t < sqlQryss.tables[0].rows.length; t++) {
-                            node_Idss = sqlQryss.tables[0].rows[t].cells["node_id"];
+                        for (var t = 0; t < ids.length; t++) {
+                            node_Idss = ids[t];
 
                             if ($.inArray(node_Idss, convertmenuArray) < 0) {
                                 chkCountForrestriction = true;
@@ -558,11 +459,6 @@
                     var result = JSON.parse(data);
                     if (result) {
                         LoadTreeData(result);
-
-
-
-
-
                         window.setTimeout(function () {
                             window.setTimeout(function () {
                                 if ($cmbSelectTree.val() == "") {
@@ -592,79 +488,9 @@
             });
         };
 
-        //function DailogForTreeMoreRecorde() {
-        //    $bsyDiv[0].style.visibility = "hidden";           
-        //    var createTab = new VIS.ChildDialog();
-        //    //  createTab.setHeight(150);
-        //    // createTab.setWidth(350);
-        //    createTab.setEnableResize(false);
-        //    createTab.setTitle(VIS.Msg.getMsg('VIS_TM_WantToUnlinked'));
-        //    createTab.setModal(true);
-        //    createTab.setContent(dailogContainer);
-        //    createTab.show();
-        //    createTab.onClose = function () {
-
-        //    };
-        //    createTab.onOkClick = function (e) {
-
-        //    };
-        //    createTab.onCancelClick = function () {
-
-        //    };
-        //};
-
 
         function AskForMoreRecorde() {
-            //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            //tree = VIS.DB.executeDataSet(tree, null, null);
-            //treeType = tree.tables[0].rows[0].cells["treetype"];
-            //var tbname = "";
-            //var tablename = "";
-            //if (treeType == "PR") {
-            //    tbname = "ad_treenodepr"
-            //}
-            //else if (treeType == "BP") {
-            //    tbname = "ad_treenodebp"
-            //}
-            //else if (treeType == "MM") {
-            //    tbname = "ad_treenodemm"
-            //}
-            //else {
-            //    tbname = "ad_treenode"
-            //}
-
-            //var sqlQry = "SELECT Count(*) as Count FROM " + tbname + " WHERE isactive ='Y' AND AD_Tree_ID=" + $treeID;
-            //sqlQry = VIS.DB.executeDataSet(sqlQry, null, null);
-            //sqlQry = sqlQry.tables[0].rows[0].cells["count"];
-
-            //if (sqlQry > 5000)
-            //{
-            //    VIS.ADialog.confirm("itwilltaketime.Wanttocontinue.", true, "", "Confirm", function (result)
-            //    {
-            //        if (!result) {
-            //            $bsyDivTree[0].style.visibility = "hidden";
-            //            $chkSummaryLevel.prop("checked", "true");
-            //            return;
-            //        }
-            //        else {
-            //            $treeNodeSearch.css("display", "none");
-            //            $cmbSearch.css("border-right", "none");
-            //            $isSummary = false;
-            //            $secoundDiv.css("display", "none");
-            //            $treeBackDiv.css("border-bottom", "0px");
-            //            $treeBackDiv.css("height", "100%");
-            //            topTreeDiv.css("height", "100%");
-            //            $treeBackDiv.resizable('destroy')
-            //            topTreeDiv.removeClass("VIS-TM-resizediv");
-            //            if (selectedNode != null) {
-            //                TreeDataOnCmbChange($cmbSelectedType, $treeID, $cmbIsallnodes, $isSummary);
-            //            }
-
-            //        }
-            //    });
-            //}
-            //  else
-            //  {
+           
             $treeNodeSearch.css("display", "none");
             //$cmbSearch.css("border-right", "none");
             $isSummary = false;
@@ -677,10 +503,7 @@
             if (selectedNode != null) {
                 TreeDataOnCmbChange($cmbSelectedType, $treeID, $cmbIsallnodes, $isSummary);
             }
-            // }
         };
-
-
 
         var searchflag = true;
         var clickontreenode = true;
@@ -689,59 +512,11 @@
             //$bsyDiv[0].style.visibility = "visible";
             $bsyDivTree[0].style.visibility = "visible";
 
-            //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            //tree = VIS.DB.executeDataSet(tree, null, null);
-            //treeType = tree.tables[0].rows[0].cells["treetype"];
-            //var tbname = "";
-            //var tablename = "";
-            //if (treeType == "PR") {
-            //    tbname = "ad_treenodepr"
-            //}
-            //else if (treeType == "BP") {
-            //    tbname = "ad_treenodebp"
-            //}
-            //else if (treeType == "MM") {
-            //    tbname = "ad_treenodemm"
-            //}
-            //else {
-            //    tbname = "ad_treenode"
-            //}
-
-            //var sqlQry = "SELECT Count(*) as Count FROM " + tbname + " WHERE AD_Tree_ID=" + $treeID;
-            //sqlQry = VIS.DB.executeDataSet(sqlQry, null, null);
-            //sqlQry = sqlQry.tables[0].rows[0].cells["count"];
-
-            //if (sqlQry > 20000) {
-            //    // $recodeCount.css("display", "inherit");
-            //}
-            //else {
-            //    // $recodeCount.css("display", "none");
-            //}
-
             treeCmbDisable.css("display", "inherit");
             if ($leftTreeKeno && $leftTreeKeno.data("kendoTreeView") != undefined) {
                 $leftTreeKeno.data("kendoTreeView").destroy();
                 $leftTreeKeno.empty();
             }
-
-            //var ds = new kendo.data.HierarchicalDataSource({
-            //    data: result.settree,
-            //    schema: {
-            //        model: {
-            //            hasChildren: function (e) {
-            //                if (e.IsSummary && e.items != null) {
-
-            //                    return true;
-            //                }
-            //                else {
-
-            //                    return false;
-            //                }
-            //            },
-            //            children: "items"
-            //        }
-            //    }
-            //});
 
             $leftTreeKeno = $leftTreeDiv.kendoTreeView({
                 autoScroll: true,
@@ -833,11 +608,7 @@
                             "</div>"
             });
 
-            // $leftTreeKeno.data("kendoTreeView").expand(".k-item");
             DropMenu();
-            //OnHoverTree();
-            //$bsyDiv[0].style.visibility = "visible";
-            //$bsyDivTree[0].style.visibility = "hidden";
 
             $leftTreeKeno.find(".k-plus").on("click", function () {
                 if ($(this).hasClass("k-minus")) {
@@ -854,9 +625,6 @@
 
             });
 
-
-            // $leftTreeDiv.items().each(function (i, el)
-            // {
             $leftTreeKeno.find(".k-in").on("dblclick", function (event) {
 
                 if ($($leftTreeDiv.find(".k-state-selected").parent().find("span")[0]).hasClass("k-minus")) {
@@ -870,11 +638,7 @@
                 }
 
             });
-            //});
 
-            //window.setTimeout(function () {
-            //    $leftTreeKeno.find(".k-in").css("min-width", "120px");
-            //}, 100);
             window.setTimeout(function () {
                 treeCmbDisable.css("display", "none");
             }, 200);
@@ -892,9 +656,6 @@
 
             }
 
-
-
-
             if ($cmbSearch.val() != "") {
                 SearchNodeInTree(chksearchvalues);
             }
@@ -909,11 +670,6 @@
             CreateRestrictionforDelete();
         };
 
-
-
-
-
-
         var gatDenideImg = null;
 
         var draggingItemsss = null;
@@ -923,73 +679,8 @@
 
         function onDrag(e) {
             chksearchvalues = e;
-            //var eleTop = $(e.sourceNode).offset().top;
-
-            //var eleTop = e.pageY - (topTreeDiv.offset().top);
-            //var treeScrollTop = $leftTreeDiv.scrollTop();
-
-            ////////if (!treeTop) {
-            ////////    treeTop = $leftTreeDiv.offset().top;
-            ////////}
-            ////////else {
-            ////////    treeTop = treeTop - 50;
-            ////////}
-            //////////$leftTreeDiv.animate({
-            //////////    scrollTop: (treeScrollTop + eleTop) - treeTop
-            //////////});
-
-            ////////var $ulllTree = $leftTreeDiv.find('[role="tree"]');
-            ////////$leftTreeDiv.css('top', treeTop + 'px');
-
-            // topTreeDiv.scrollTop((treeScrollTop + eleTop) - treeTop);
-
-
-
-            //topTreeDiv.scrollTop(treeTop);
-
-
-            //var y = e.pageY - (topTreeDiv.offset().top + d);
-            //topTreeDiv.scrollTop(y);
-
-
-
-            //var targetDataItem = $leftTreeDiv.dataItem(e.dropTarget);
-            //if (targetDataItem != null || targetDataItem != undefined) {
-            //    if (targetDataItem.text == "Root" && e.statusClass == "insert-top") {
-            //        e.setStatusClass("k-denied");
-            //    }
-            //    //  $("#status").html(e.statusClass + "  "+targetDataItem.text );
-            //}
-            //var y = e.pageY - $leftTreeDiv.offset().top;
-            //$leftTreeDiv.scrollTop(y);
-
-
-            // $leftTreeDiv.css("overflow", "visible");
-
-
-            //var eleTop = $(e.sourceNode).offset().top;
-            //var treeScrollTop = topTreeDiv.scrollTop();
-            //var treeTop = topTreeDiv.offset().top;
-            //topTreeDiv.animate({
-            //    scrollTop: (treeScrollTop + eleTop) - treeTop
-            //});
-
-
-
-
-            //$mData.css("overflow", "hidden");
-            //$rightDataDiv.css("overflow", "hidden");
-            //$ulBackDiv.css("overflow", "hidden");
-
-
-
-
-            //vis-tm-bottomdivdisable 
-
-
+            
             $secoundDiv.addClass("vis-tm-bottomdivdisable");
-
-
 
             bottomdivdisable.css("display", "inherit");
 
@@ -1023,12 +714,6 @@
                 e.setStatusClass("k-denied");
             }
 
-            //if ($(e.dropTarget).find(".treechild").attr("data-issummary") == "false") {
-            //    e.setStatusClass("k-denied");
-            //}
-
-
-
             if ($(e.dropTarget).hasClass("k-top")) {
                 if ($(e.dropTarget).find(".treechild").attr("data-issummary") == "false") {
                     e.setStatusClass("k-denied");
@@ -1051,15 +736,9 @@
             }
 
 
-            //if ($(e.dropTarget).parent().attr("data-issummary") == "false") {
-            //    e.setStatusClass("k-denied");
-            //}
-
             if ($(e.dropTarget).attr("aria-expanded") == "true" || $(e.dropTarget).attr("aria-expanded") == "false") {
                 e.setStatusClass("k-denied");
             }
-
-
 
             if ($(e.dropTarget).hasClass("selectchangecolor")) {
                 gatDenideImg.css("display", "none");
@@ -1075,20 +754,13 @@
                 //gatDenideImg.parent().removeClass("glyphicon glyphicon-trash");
 
                 gatDenideImg.parent().find(".vis-tm-unlinkimgss").css("display", "none")
-
-
-
             }
 
 
             if ($(e.dropTarget).hasClass("glyphicon glyphicon-trash")) {
                 gatDenideImg.css("display", "none");
-                //                gatDenideImg.parent().addClass("glyphicon glyphicon-trash");
-
                 gatDenideImg.parent().prepend(appenddivforImg);
             }
-
-
 
             $downImg = this.dragging._draggable.hint.find("span").hasClass("k-insert-bottom");
             if ($downImg) {
@@ -1105,38 +777,12 @@
                 e.setStatusClass("k-denied");
             }
 
-
-            //$deleteImage.mouseover(function (e) {
-            //    gatDenideImg.css("display", "none");
-            //    gatDenideImg.parent().addClass("glyphicon glyphicon-trash");
-            //});
-            //$deleteImage.mouseleave(function () {
-            //    gatDenideImg.css("display", "inherit");
-            //    gatDenideImg.parent().removeClass("glyphicon glyphicon-trash");
-            //});
-
-            //if ($($leftTreeDiv).find(".k-state-focused").find(".treechild").attr("data-issummary") == "false") {
-            //    e.setStatusClass("k-denied");
-            //}
-
-
-            //var y = e.pageY - topTreeDiv.offset().top;
-
-
-            //var y = e.pageY - (topTreeDiv.offset().top + d);
-            //topTreeDiv.scrollTop(y);
-
         };
 
 
         var trenodeselectedId = 0;
         function onDrop(e) {
 
-
-            //if (!e.valid) {
-            //    e.preventDefault();
-            //    return;
-            //}
             trenodeselectedId = 0;
             trenodeselectedId = $leftTreeDiv.find(".k-state-selected").find(".treechild").attr("data-nodeid");
 
@@ -1309,10 +955,7 @@
                 }
             }
 
-
-            var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            tree = executeDataSet(tree, null, null);
-            treeType = tree.tables[0].rows[0].cells["treetype"];
+            treeType = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTreeType", { "treeId": $treeID }, null); 
 
 
             if (treeType == "PR") {
@@ -1395,63 +1038,23 @@
                     if (ulss.length > 0) {
                         var sequence = 0;
 
-                        var getseqqry = "SELECT seqno FROM " + tbname + "  WHERE AD_Tree_ID=" + $treeID + " AND node_id=" + cNode.find(".treechild").attr("data-nodeid");
-                        var dsss = executeDataSet(getseqqry, null, null);
-
-                        if (dsss.tables[0].rows.length > 0) {
-                            sequence = dsss.tables[0].rows[0].cells["seqno"];
-                        }
-
+                        sequence = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetSeqNo", { "treeId": $treeID, "tblName": tbname, "nodeId": cNode.find(".treechild").attr("data-nodeid")}, null); 
 
                         if (droppossitions == "after") {
                             sequence = sequence + 1;
                         }
 
 
-
-
-
-                        var increaseSqe = "update " + tbname + " set seqno=seqno+1,Updated=Sysdate,parent_ID=0 where seqno >=" + sequence +
-                                         " AND (parent_id=0 or parent_id is null)  AND AD_Tree_ID=" + $treeID;
-                        executeQuery(increaseSqe, null, null);
-
-
-
-
-
-
-
+                        sequence = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence,"bySeqNo":true }, null); 
 
                         var setmoveSeq = $(soursenodes).find(".treechild").attr("data-nodeid");
                         if (getparentornot > 0) {
-                            var movedSetSeq = "update " + tbname + " set seqno=" + sequence + ",parent_id=0  where node_id=" + setmoveSeq +
-                                           "   AND AD_Tree_ID=" + $treeID;
-                            executeQuery(movedSetSeq, null, null);
+                            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence, "nodeId": setmoveSeq, "bySeqNo": false,"isParant":true }, null); 
                         }
                         else {
-                            var movedSetSeq = "update " + tbname + " set seqno=" + sequence + " where node_id=" + setmoveSeq +
-                                           " AND (parent_id=0 or parent_id is null) AND AD_Tree_ID=" + $treeID;
-                            executeQuery(movedSetSeq, null, null);
+                            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence, "nodeId": setmoveSeq, "bySeqNo": false, "isParant": false }, null); 
                         }
 
-
-
-
-
-                        //var nodeidfromcnode = cNode.find(".treechild").attr("data-nodeid");
-                        //var movednodeid = $(soursenodes).find(".treechild").attr("data-nodeid");
-                        //var updatesqn = "UPDATE " + tbname + "  SET Updated=Sysdate, seqNo=" + seqnoafterdrop + " WHERE node_id=" + movednodeid + " AND AD_Tree_ID=" + $treeID;
-
-                        //VIS.DB.executeQuery(updatesqn, null, null);
-
-
-                        //for (var l = 0; l < ulss.length; l++)
-                        //{
-                        //    var sql = "UPDATE ";
-                        //    sql += tbname + " SET Parent_ID=0, SeqNo=" + l + ", Updated=SysDate" +
-                        //                    " WHERE AD_Tree_ID=" + $treeID + " AND Node_ID=" + $(ulss[l]).find(".treechild").attr("data-nodeid");
-                        //    VIS.DB.executeQuery(sql, null, null);
-                        //}
                     }
                     $bsyDiv[0].style.visibility = "hidden";
                 }, 600);
@@ -1523,13 +1126,9 @@
                                 // var nd = $leftTreeKeno.find("div").find("div[data-nodeid='" + pid + "']").parent().parent().parent().find("li")[i];
 
                                 var nd = $(childs[i]).find(".treechild").attr("data-nodeid");
-
-                                var sql = "UPDATE ";
-                                sql += tbname + " SET Parent_ID=" + pid + ", SeqNo=" + i + ", Updated=SysDate" +
-                                                " WHERE AD_Tree_ID=" + $treeID + " AND Node_ID=" + nd;
-
-
-                                executeQuery(sql, null, null);
+                                
+                                VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNoParentId",
+                                    { "treeId": $treeID, "tblName": tbname, "seqNo": i, "nodeId": nd, "pid": pid }, null); 
                             }
 
                         }
@@ -1542,12 +1141,11 @@
 
                                 var nd = $(childs[i]).find(".treechild").attr("data-nodeid");
 
-                                var sql = "UPDATE ";
-                                sql += tbname + " SET Parent_ID=" + pid + ", SeqNo=" + i + ", Updated=SysDate" +
-                                                " WHERE AD_Tree_ID=" + $treeID + " AND Node_ID=" + nd;
 
+                                VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNoParentId",
+                                    { "treeId": $treeID, "tblName": tbname, "seqNo": i, "nodeId": nd, "pid": pid }, null); 
 
-                                executeQuery(sql, null, null);
+                                
                             }
 
                         }
@@ -1562,72 +1160,6 @@
                 }              
             }, 300);
 
-
-            //else
-            //{
-            //    window.setTimeout(function ()
-            //    {
-            //        for (var i = 0; i < childs.length; i++)
-            //        {
-            //            var nd = $leftTreeKeno.find("div").find("div[data-nodeid='" + pid + "']").parent().parent().parent().find("li")[i];
-
-            //            var sql = "UPDATE ";
-            //            sql += tbname + " SET Parent_ID=" + pid + ", SeqNo=" + i + ", Updated=SysDate" +
-            //                            " WHERE AD_Tree_ID=" + $treeID + " AND Node_ID=" + $(nd).find(".treechild").attr("data-nodeid");
-
-            //            VIS.DB.executeQuery(sql, null, null);
-            //        }
-            //    }, 600);
-            //}
-
-
-
-
-
-            //var childID = $(e.sourceNode).find(".treechild").attr("data-nodeid");
-            //var parentID = $($(e.sourceNode).find(".treechild").parent().parent().parent().parent().parent()).find("li").find(".k-state-hover").find("div").attr("data-nodeid");
-            //var childs = $($(e.sourceNode).find(".treechild").parent().parent().parent().parent().parent()).find("li");
-            //var getParentIDisZero = $(movingNode.parent().parent().find(".treechild")[0]).attr("data-nodeid");
-            //var pid = $(movingNode.parent().parent().find(".treechild")[0]).attr("data-nodeid");
-            //var getIsSummaryr = $($(e.sourceNode).find(".treechild").parent().parent().parent().parent().parent()).find("li").find(".k-state-hover").find("div").attr("data-issummary");
-
-            //window.setTimeout(function () {
-            //    if (getIsSummaryr == "true") { }
-            //    {
-            //        var nd = $leftTreeKeno.find("div").find("div[data-nodeid='" + pid + "']").parent().parent().parent().find("li")[i];
-
-            //        var sql = "UPDATE ";
-            //        sql += tbname + " SET Parent_ID=" + pid + ", SeqNo=" + i + ", Updated=SysDate" +
-            //                        " WHERE AD_Tree_ID=" + $treeID + " AND Node_ID=" + $(nd).find(".treechild").attr("data-nodeid");
-
-            //        VIS.DB.executeQuery(sql, null, null);
-            //    }
-
-
-            //    for (var i = 0; i < childs.length; i++) {
-            //        var nd = $leftTreeKeno.find("div").find("div[data-nodeid='" + pid + "']").parent().parent().parent().find("li")[i];
-
-            //        var sql = "UPDATE ";
-            //        sql += tbname + " SET Parent_ID=" + parentID + ", SeqNo=" + i + ", Updated=SysDate" +
-            //                        " WHERE AD_Tree_ID=" + $treeID + " AND Node_ID=" + $(nd).find(".treechild").attr("data-nodeid");
-
-            //        VIS.DB.executeQuery(sql, null, null);
-            //    }
-            //}, 600);
-
-            ////var oldParent = movingNode.parent().parent().find(".treechild")[0];
-
-
-            // var movingElementID = $(e.sourceNode).find(".treechild").attr("data-nodeid");
-            // var onDropID= $($(e.sourceNode).find(".treechild").parent().parent().parent().parent().parent()).find("li").find(".k-state-hover").find("div").attr("data-nodeid");
-            // var ndValue = $($(e.sourceNode).find(".treechild").parent().parent().parent().parent().parent()).find("li");
-
-
-
-
-            // $bsyDiv[0].style.visibility = "hidden";
-
-           
 
         };
 
@@ -1863,7 +1395,6 @@
             $mData.height(leftMianDataDiv.height() - ($treeBackDiv.height() + 20 + $mTopHeader.height()));
         };
 
-
         function GetIsLIOrNot() {
             if ($ulMid.find("li").length > 0) {
                 isulMidData = true;
@@ -1940,10 +1471,10 @@
                     if (nodeItemDelwithdrag.hasClass("selectchangecolor")) {
                         $bsyDiv[0].style.visibility = "visible";
                         TreeTableName();
-                        var findchilds = "Select node_id from " + tableTreeName + " where parent_id=" + GetPIDforItems + " AND isactive='Y' and ad_tree_id=" + $treeID + "";
-                        var child = executeDataSet(findchilds, null, null);
+                        var child = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetNodeIdsOfParent", { "tbname": tableTreeName, "parent_id": GetPIDforItems, "treeId": $treeID }, null); 
+                       
 
-                        if (child != null && child.tables[0].rows.length == 0) {
+                        if (child != null && child.length == 0) {
                             var selectedItemArray = [];
                             if ($ulMid.find("input:checked").length == 0) {
                                 selectedItemArray.push(GetPIDforItems);
@@ -1978,7 +1509,6 @@
 
             });
         };
-
 
         function DailogForItemDelete() {
             $bsyDiv[0].style.visibility = "hidden";
@@ -2020,7 +1550,6 @@
             };
         };
 
-
         function UpdateBottomItemSeqe(getParentID, $treeID) {
 
             $bsyDivforbottom[0].style.visibility = "visible";
@@ -2033,11 +1562,6 @@
                 var id = $($ulMid.find("li li")[l]).attr("data-id");
                 ItemsID.push(id);
 
-                //var sql = "UPDATE ";
-                //sql += tbnameofTree + " SET SeqNo=" + l + ", Updated=SysDate" +
-                //                " WHERE AD_Tree_ID=" + $treeID + " AND Parent_ID=" + getParentID + "   AND Node_ID=" + $($ulMid.find("li li")[l]).attr("id");
-
-                //VIS.DB.executeQuery(sql, null, null);
             }
             ItemsIDTostring = ItemsID.toString();
             $.ajax({
@@ -2058,21 +1582,14 @@
 
         var tbnameofTree = null;
         function getTreeTableName() {
-            var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            table_id = executeDataSet(table_id, null, null);
-            if (table_id.tables[0].rows.length > 0) {
-                table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-            }
+            
+            var table_id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableID", { "treeId": $treeID }, null); // spelling corrected by vinay bhatt on 18 oct 2018
 
-            var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-            tablename = executeDataSet(tablename, null, null);
-            if (tablename.tables[0].rows.length > 0) {
-                tablename = tablename.tables[0].rows[0].cells["tablename"];
-            }
+           
 
-            var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            tree = executeDataSet(tree, null, null);
-            treeType = tree.tables[0].rows[0].cells["treetype"];
+           
+            var tree = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTreeType", { "treeId": $treeID }, null); 
+            
 
 
             if (treeType == "PR") {
@@ -2198,23 +1715,11 @@
                     if (nodeItemDelwithdrag.hasClass("selectchangecolor")) {
                         $bsyDiv[0].style.visibility = "visible";
                         TreeTableName();
-                        var findchilds = "Select node_id from " + tableTreeName + " where parent_id=" + GetPIDforItems + " AND isactive='Y' and ad_tree_id=" + $treeID + "";
-                        var child = executeDataSet(findchilds, null, null);
+                        var child = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetNodeIdsOfParent", { "tbname": tbname, "parent_id": GetPIDforItems, "treeId": $treeID }, null); 
 
-                        if (child != null && child.tables[0].rows.length == 0) {
+                        if (child != null && child.length == 0) {
                             var selectedItemArray = [];
-                            //if ($ulMid.find("input:checked").length == 0) {
-                            //    selectedItemArray.push(GetPIDforItems);
-                            //}
-
-                            //for (var i = 0; i < $ulMid.find("input:checked").length; i++) {
-                            //    //var getID = $($ulMid.find("input:checked")[i]).parent().find("li").attr("id");
-                            //    var getID = $($ulMid.find("input:checked")[i]).parent().find("li").attr("data-id");
-                            //    selectedItemArray.push(getID);
-                            //}
-
-                            //bottomchildselectedID = selectedItemArray;
-                            //selectedItemArray = selectedItemArray.toString();
+                            
                             if (dragMenuNodeIDArray.length > 0) {
                                 if (bindornot == "false") {
                                     var ides = [];
@@ -2650,15 +2155,6 @@
 
         function DropMenu(e) {
 
-            // if (dragMenuNodeIDArray.length > 1)
-            // {
-            // $leftTreeDiv.find(".k-in").parent().parent().droppable({
-            //                $leftTreeDiv.droppable({
-            // $leftTreeDiv.find(".k-in").droppable({treechild
-            //$leftTreeDiv.find(".k-in").droppable({
-
-            //$treeBackDiv.droppable({
-
             leftMianDataDiv.droppable({
 
                 drop: function (event, ui) {
@@ -2722,107 +2218,7 @@
 
                     var getAllChildNodeID = [];
                     if (issummary == "true") {
-                        //var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                        //table_id = VIS.DB.executeDataSet(table_id, null, null);
-                        //if (table_id.tables[0].rows.length > 0) {
-                        //    table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-                        //}
-
-                        //var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-                        //tablename = VIS.DB.executeDataSet(tablename, null, null);
-                        //if (tablename.tables[0].rows.length > 0) {
-                        //    tablename = tablename.tables[0].rows[0].cells["tablename"];
-                        //}
-
-                        //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                        //tree = VIS.DB.executeDataSet(tree, null, null);
-                        //treeType = tree.tables[0].rows[0].cells["treetype"];
-                        //var tbname = "";
-
-                        //if (treeType == "PR") {
-                        //    tbname = "ad_treenodepr"
-                        //}
-                        //else if (treeType == "BP") {
-                        //    tbname = "ad_treenodebp"
-                        //}
-                        //else if (treeType == "MM") {
-                        //    tbname = "ad_treenodemm"
-                        //}
-                        //else {
-                        //    tbname = "ad_treenode"
-                        //}
-                        //var sqlqryval = null;
-
-                        //TreeTableName();
-
-                        //var sqlqry = "SELECT " + tableTreeName + ".node_id AS node_id FROM " + tablename + " mp" +
-                        //             " INNER JOIN " + tableTreeName + " " + tableTreeName + " ON mp." + tablename + "_ID=" + tableTreeName + ".node_id" +
-                        //             "  WHERE " + tableTreeName + ".ad_tree_id=" + $treeID + " AND " + tableTreeName + ".parent_id=" + SummaryID;
-
-                        //sqlqryval = VIS.DB.executeDataSet(sqlqry, null, null);
-
-
-                        ////var sqlGetParent = "SELECT parent_id FROM " + tableTreeName + " WHERE node_id=" + SummaryID + " AND ad_tree_id=" + $treeID;
-                        //var sqlGetParent = "SELECT parent_id FROM " + tableTreeName + " WHERE node_id=" + SummaryID + " AND ad_tree_id=" + $treeID;
-
-                        //var sqlExecute = VIS.DB.executeDataSet(sqlGetParent, null, null);
-                        //if (sqlExecute.tables[0].rows.length > 0)
-                        //{
-                        //    sqlExecuteParentID = sqlExecute.tables[0].rows[0].cells["parent_id"];                            
-                        //    if (sqlExecuteParentID == dragMenuNodeIDArray[0])
-                        //    {
-                        //        $bsyDiv[0].style.visibility = "hidden";
-                        //        return;
-                        //    }
-                        //}
-
-                        //if (SummaryID == dragMenuNodeIDArray[0])
-                        //{
-                        //    $bsyDiv[0].style.visibility = "hidden";
-                        //    return;
-                        //}
-
-
-
-                        //for (var i = 0; i < sqlqryval.tables[0].rows.length; i++)
-                        //{
-                        //    sqlqryNodeID = sqlqryval.tables[0].rows[i].cells["node_id"];
-                        //    getAllChildNodeID.push(sqlqryNodeID);
-                        //}
-                        //var indexget = null;
-                        // for (var i = 0; i < dragMenuNodeIDArray.length; i++)
-                        // {
-                        //if (getAllChildNodeID != 0)
-                        //{
-                        //    for (var j = 0; j < getAllChildNodeID.length; j++)
-                        //    {
-                        //        var index = dragMenuNodeIDArray.indexOf(getAllChildNodeID[j].toString());
-
-                        //        if (index > -1)
-                        //        {
-                        //            position = $.inArray(getAllChildNodeID[j].toString(), dragMenuNodeIDArray);
-                        //            if (~position) dragMenuNodeIDArray.splice(position, 1);
-
-                        //            ExistItem.splice(position, 1);
-                        //        }
-                        //    }
-                        //}
-
-                        //if (dragMenuNodeIDArray[i] == SummaryID)
-                        //{
-                        //    var index = dragMenuNodeIDArray.indexOf(SummaryID);
-
-                        //    if (index > -1)
-                        //    {
-                        //        position = $.inArray(SummaryID, dragMenuNodeIDArray);
-                        //        if (~position) dragMenuNodeIDArray.splice(position, 1);
-
-                        //        ExistItem.splice(position, 1);
-
-                        //    }
-                        //}
-                        // }
-
+                       
 
                         if (middivDragFlag == false && $dropableItem.parent().hasClass("k-state-selected")) {
                             checkValidation = false;
@@ -2861,47 +2257,6 @@
                 }
             });
 
-            //if (validationValue == true) {
-            //    window.setTimeout(function () {
-
-            //        if ($cmbSearch.val() != "") {
-            //            SearchNodeInTree(e);
-            //        }
-            //    }, 300);
-            //}
-
-
-            // }
-            //else {
-            //    $leftTreeDiv.find(".k-in").droppable({
-            //        drop: function (event, ui) {
-            //            var issummary, SummaryID, nodid;
-            //            if ($leftTreeDiv.find("span").hasClass("k-state-hover")) {
-            //                $getLifromTree = $($leftTreeDiv.find("li").find("span")).parent().find(".k-state-hover").parent().parent();
-            //            }
-            //            else if ($leftTreeDiv.find("span").hasClass("k-state-selected")) {
-            //                $getLifromTree = $($leftTreeDiv.find("li").find("span")).parent().find(".k-state-selected").parent().parent();
-            //            }
-            //            //                        if (($(this).find(".k-state-selected").length != 1))
-            //            if ($leftTreeDiv.find("span").hasClass("k-state-hover")) {
-            //                var hover = $leftTreeKeno.find(".k-state-hover").find(".treechild");
-            //                issummary = hover.attr("data-issummary");
-            //                SummaryID = hover.attr("data-nodeid");
-            //                nodid = hover.attr("data-parentid");
-            //            }
-            //            else {
-            //                var selected = $leftTreeDiv.find(".k-state-selected").find(".treechild");
-            //                SummaryID = selected.attr("data-nodeid");
-            //                issummary = selected.attr("data-issummary");
-            //                nodid = selected.attr("data-parentid");
-            //            }
-
-            //            if (issummary == "true") {
-            //                SaveDataOnDrop(SummaryID, nodid, dragMenuNodeIDArray, $checkMorRdragable);
-            //            }
-            //        }
-            //    });
-            //}
         };
 
         var selectClass = true;
@@ -3172,25 +2527,7 @@
                             }
 
 
-                            //if (getNodeIDForIcon.find("span").attr("class") == "null") {
-                            //    getNodeIDForIcon.find("span").addClass("glyphicon glyphicon-link");
-                            //}
-
-                            //var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                            //table_id = VIS.DB.executeDataSet(table_id, null, null);
-                            //if (table_id.tables[0].rows.length > 0) {
-                            //    table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-                            //}
-
-                            //var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-                            //tablename = VIS.DB.executeDataSet(tablename, null, null);
-                            //if (tablename.tables[0].rows.length > 0) {
-                            //    tablename = tablename.tables[0].rows[0].cells["tablename"];
-                            //}
-
-
-                            //var imgSource = $($($ulRight.find("li"))).find("li[id='" + $(getIDFromContainer.find(".vis-tm-textli")[k]).attr("id") + "']").parent().parent().find("img").attr("src");
-                            //var changeImgSource = $($($ulRight.find("li"))).find("li[id='" + $(getIDFromContainer.find(".vis-tm-textli")[k]).attr("id") + "']").parent().parent().find("img");
+                           
 
                             var imgSource = $($($ulRight.find("li"))).find("li[data-id='" + $(getIDFromContainer.find(".vis-tm-textli")[k]).attr("data-id") + "']").parent().parent().find("img").attr("src");
                             var changeImgSource = $($($ulRight.find("li"))).find("li[data-id='" + $(getIDFromContainer.find(".vis-tm-textli")[k]).attr("data-id") + "']").parent().parent().find("img");
@@ -3348,30 +2685,6 @@
                                 moveDraggedItemToFirstPalce($drpableItemLis);
                             }
                         }
-
-
-
-                        //if (tableTreeName == null)
-                        //{
-                        //    TreeTableName();
-                        //}
-
-
-                        //var childElements = $dropableItem.parent().parent().parent().children('ul').find('li');
-                        //var queries = [];
-                        //if (childElements.length > 0) {
-                        //    for (var v = 0; v < childElements.length; v++) {
-                        //        var cEle = childElements[v];
-                        //        var nodeIDD= cEle.find(".treechild").attr("data-nodeid");
-                        //     var   sql = "UPDATE ";
-                        //     sql += tableTreeName + " SET Parent_ID=" + $dropableItem.attr("data-nodeid") + ", SeqNo=" + v + ", Updated=SysDate" +
-                        //                          " WHERE AD_Tree_ID=" + $treeID + " AND Node_ID=" + nodeIDD;
-                        //        queries.push(sql);
-                        //    }
-                        //}
-
-                        //console.log(queries);
-                        //VIS.DB.executeQueries(queries)
 
 
                         menuselectedcolor.removeClass("vis-tm-menuselectedcolor");
@@ -3539,72 +2852,7 @@
             $chkSummaryLevel.on("click", IsSummaryLevelCheck)
             $ulBackDiv.on("scroll", GetAllMenuData);
 
-
-            //var ismobile = /ipad|iphone|ipod/i.test(navigator.userAgent.toLowerCase());
-            //if (ismobile)
-            //{
-
-            //    $ulRight.bind('touchstart', function (event)
-            //    {
-            //        if (event.preventDefault) event.preventDefault();
-            //        $ulRight.find("li").css("-webkit-touch-callout", "none");
-            //        DragMenu();
-            //    });
-
-
-            //    $ulRight.bind('touchend', function (event)
-            //    {
-            //        if (event.preventDefault) event.preventDefault();
-            //        $ulRight.find("li").css("-webkit-touch-callout", "none");
-            //        $($ulRight.find("li")).draggable("destroy");
-            //    });
-
-
-            //    //$ulRight.bind('taphold', function (event) {
-            //    //    if (event.stopPropagation) event.stopPropagation();
-            //    //    if (event.preventDefault) event.preventDefault();
-            //    //    $ulRight.find("li").css("-webkit-touch-callout", "none");
-            //    //    DragMenu();
-            //    //});
-            //}
-
-
-
-
-            // var ismobile = /ipad|iphone|ipod/i.test(navigator.userAgent.toLowerCase());
-            // if (ismobile)
-            // {
-            //     $ulRight.find("li").on("taphold", function (e)
-            //     {
-            //         // e.stopPropagation();                     
-            //         e.preventDefault();
-            //         alert("hello");
-            //        var pressTimer
-
-            //        $ulRight.find("span").mouseup(function (e) 
-            //        {
-            //            clearTimeout(pressTimer)
-            //            alert("mouseup");
-            //            return false;
-            //        }).mousedown(function ()
-            //        {
-            //            pressTimer = window.setTimeout(function (e)
-            //            {
-            //                e.preventDefault();
-            //                alert("timer");
-            //                alert("ok");
-
-            //            }, 1000)
-            //            return false;
-            //        });
-            //    });
-            //};
-
-
-
-
-
-
+         
             $ulRight.on("click", GetNodePath);
             $ulMid.on("click", MidSelectDesign);
             $cmbSearch.on("keyup", SearchNodeInTree);
@@ -3686,10 +2934,7 @@
             $mData.on("scroll", GetChildDataOfTreeNode);
 
 
-            //$treeNodeSearch
-            //$chktreeNode =
-            //$lblNodetext =
-            //$searchDiv.append($cmbSearch).append($treeNodeSearch).append($btnSearch);
+           
 
             window.setTimeout(function () {
                // $cmbSearch.width($searchDiv.width() - ($treeNodeSearch.width() + 40 + $btnSearch.width()));
@@ -3713,29 +2958,7 @@
 
 
             $chkAllCheckOrNot.on("click", NodeItemSecOrDesec);
-            // $checkSearchOrNot.on("click", IsSearchOrNot);
-
-
-            //nodeItemDelwithdrag.mouseover(function (e) {
-            //   // nodeItemDelwithdrag.addClass("selectchangecolor");
-            //    window.setTimeout(function () {
-            //        nodeItemDelwithdrag.animate({
-            //            backgroundColor: "#ff0000",
-            //        }, 200);
-            //    }, 100);
-            //});
-            //nodeItemDelwithdrag.mouseleave(function () {
-            //    // nodeItemDelwithdrag.removeClass("selectchangecolor");
-            //    window.setTimeout(function () {
-            //        nodeItemDelwithdrag.css("background-color", "#FFC0CB");
-            //    }, 100);
-            //    //nodeItemDelwithdrag.animate({
-            //    //    backgroundColor: "#FFC0CB",
-            //    //});
-            //});
-
-            // $mData.height($secoundDiv.height() - $lblMh4.height() + 10);
-
+           
 
             $treeExpandColapse.on("click", TreeExpandCollapse);
             $treeCollapseColapse.on("click", TreeCollapse);
@@ -3773,99 +2996,49 @@
         var bindornot = "true";
         var convertmenuArray = null;
         var msgShowforbindingWindow = null;
+
         function CreateRestrictionforDelete() {
             menuArray = [];
-            var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            table_id = executeDataSet(table_id, null, null);
-            if (table_id.tables[0].rows.length > 0) {
-                table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-            }
-
-            var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-            tablename = executeDataSet(tablename, null, null);
-            if (tablename.tables[0].rows.length > 0) {
-                tablename = tablename.tables[0].rows[0].cells["tablename"];
-            }
+            var table_id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableID", { "treeId": $treeID }, null); // spelling corrected by vinay bhatt on 18 oct 2018
+            var tablename = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableName", { "table_id": table_id }, null);
 
             bindornot = "true";
 
             if (tablename == "AD_Menu") {
-                var rolCheck = "SELECT count(*) FROM AD_Role WHERE ad_tree_menu_id=" + $treeID;
-                var checkCount = executeScalar(rolCheck);
-                if (checkCount > 0) {
-                    bindornot = "false";
-                }
-                else {
-                    var tenantCheck = "SELECT count(*) FROM AD_ClientInfo WHERE ad_tree_menu_id=" + $treeID;
-                    var checktenant = executeScalar(tenantCheck);
-                    if (checktenant > 0) {
-                        bindornot = "false";
-                    }
-                }
+                bindornot = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/IsRecordExist", { "treeId": $treeID }, null);
             }
 
-            //if(bindornot == false)
-            //{
-            var getIdes = "SELECT ad_menu_id FROM AD_Menu WHERE ad_window_id IN (SELECT ad_window_id FROM ad_window WHERE name IN ('Role','Tenant','Tree'))";
+            var getIdes = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetWindowMenuIds", {  }, null);
+            var formID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetFormMenuIds", {}, null);
 
-            var formID = "SELECT ad_menu_id FROM AD_Menu WHERE ad_form_id IN (SELECT ad_form_id FROM ad_form WHERE name IN ('Tree Maintenance'))";
-
-
-
-
-            var ds1 = executeDataSet(formID, null, null);
-
-            if (ds1 != null && ds1.tables[0].rows.length > 0) {
-                for (var i = 0; i < ds1.tables[0].rows.length; i++) {
-                    menuArray.push(ds1.tables[0].rows[i].cells["ad_menu_id"]);
+            if (formID != null && formID.length > 0) {
+                for (var i = 0; i < formID.length; i++) {
+                    menuArray.push(formID[i]);
                 }
             }
-
-
-
-            var ds = executeDataSet(getIdes, null, null);
-
-            if (ds != null && ds.tables[0].rows.length > 0) {
-                for (var i = 0; i < ds.tables[0].rows.length; i++) {
-                    menuArray.push(ds.tables[0].rows[i].cells["ad_menu_id"]);
-                }
-            }
-            // }
+           
             convertmenuArray = menuArray;
             menuArray = menuArray.toString();
 
-            var getnamebyID = "SELECT name FROM ad_menu WHERE ad_menu_id IN(" + menuArray + ") ORDER BY upper(name)";
-            var dss = executeDataSet(getnamebyID, null, null);
-
+            var getnamebyID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetNameByIds", { "ids": menuArray}, null);
             var messagess = "";
-            if (dss != null && dss.tables[0].rows.length > 0) {
-                for (var m = 0; m < dss.tables[0].rows.length; m++) {
-                    messagess += dss.tables[0].rows[m].cells["name"];
+            if (getnamebyID != null && getnamebyID.length > 0) {
+                for (var m = 0; m < getnamebyID.length; m++) {
+                    messagess += getnamebyID[m];
                     messagess += ",";
                 }
             }
-
-
             msgShowforbindingWindow = messagess + " " + VIS.Msg.getMsg("MenuBinded");
-
-
             $bsyDivforbottom[0].style.visibility = "hidden";
         };
 
-
         function UpdateRollCheckSeq(idforupdate) {
             TreeTableName();
-
-            var maxSeq = "SELECT MAX(seqno) FROM " + tableTreeName + " WHERE AD_Tree_ID=" + $treeID;
-            var seq = executeScalar(maxSeq);
+            var seq = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetSeqNo", { "treeId": $treeID, "tblName": tableTreeName, "nodeId": "-1" }, null); 
             seq += 1;
-            var increaseSqe = "update " + tableTreeName + " set seqno=" + seq + ",Updated=Sysdate,parent_ID=0 WHERE AD_Tree_ID=" + $treeID + " AND node_id=" + idforupdate;
-
-            executeQuery(increaseSqe, null, null);
-
-
+            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tableTreeName, "seqNo": seq, "nodeId": idforupdate, "bySeqNo": false, "isParant": true }, null); 
+            
         };
-
 
         function StopDefaultW2overlay(e) {
             //  e.stopPropagation();
@@ -3893,7 +3066,6 @@
                 });
             }
         };
-
 
         function RemoveLinkedItemFromTree() {
             $bsyDiv[0].style.visibility = "visible";
@@ -3933,7 +3105,6 @@
             });
         };
 
-
         var $outerP = null;
         function OpenW2overlay() {
             if ($cmbSelectTree.val() != "") {
@@ -3953,19 +3124,7 @@
                 $(this).w2overlay($outerDiv);
 
 
-                //TreeTableName();
-                //var sqlQry = "SELECT Count(*) as Count FROM " + tableTreeName + " WHERE AD_Tree_ID=" + $treeID;
-                //sqlQry = VIS.DB.executeDataSet(sqlQry, null, null);
-                //sqlQry = sqlQry.tables[0].rows[0].cells["count"];
-
-                //if (sqlQry == 0) {
-                //    imgSpan.addClass("vis-tm-delete");
-                //}
-                //else
-                //{
-                //    imgSpan.removeClass("vis-tm-delete");
-                //}
-
+                
                 if (chkCountForrestriction == true) {
                     imgSpan.removeClass("vis-tm-delete");
                 }
@@ -3976,71 +3135,6 @@
                 $outerP.on("click", RemoeveLinkedNode);
             }
         };
-
-
-
-
-
-        //function touchHandler(event) {
-        //    var self = this;
-        //    var touches = event.changedTouches,
-        //        first = touches[0],
-        //        type = "";
-
-        //    switch (event.type) {
-        //        case "touchstart":
-        //            type = "mousedown";
-        //            window.startY = event.pageY;
-        //            break;
-        //        case "touchmove":
-        //            type = "mousemove";
-        //            break;
-        //        case "touchend":
-        //            type = "mouseup";
-        //            break;
-        //        default:
-        //            return;
-        //    }
-        //    var simulatedEvent = document.createEvent("MouseEvent");
-        //    simulatedEvent.initMouseEvent(type, true, true, window, 1, first.screenX, first.screenY, first.clientX, first.clientY, false, false, false, false, 0 /*left*/, null);
-
-        //    first.target.dispatchEvent(simulatedEvent);
-
-        //    var scrollables = [];
-        //    var clickedInScrollArea = false;
-        //    // check if any of the parents has is-scollable class
-        //    var parentEls = jQuery(event.target).parents().map(function () {
-        //        try {
-        //            if (jQuery(this).hasClass('scrolldrag')) {
-        //                clickedInScrollArea = true;
-        //                // get vertical direction of touch event
-        //                var direction = (window.startY < first.clientY) ? 'down' : 'up';
-        //                // calculate stuff... :o)
-        //                if (((jQuery(this).scrollTop() <= 0) && (direction === 'down')) || ((jQuery(this).height() <= jQuery(this).scrollTop()) && (direction === 'up'))) {
-
-        //                } else {
-        //                    scrollables.push(this);
-        //                }
-        //            }
-        //        } catch (e) { }
-        //    });
-        //    // if not, prevent default to prevent bouncing
-        //    if ((scrollables.length === 0) && (type === 'mousemove')) {
-        //        event.preventDefault();
-        //    }
-
-        //}
-
-        //function initTouchHandler(e) {
-        //    document.addEventListener("touchstart", touchHandler, true);
-        //    document.addEventListener("touchmove", touchHandler, true);
-        //    document.addEventListener("touchend", touchHandler, true);
-        //    document.addEventListener("touchcancel", touchHandler, true);
-
-        //}
-
-
-
 
         function HasScrollarOrNot(e) {
             if ($leftTreeDiv.find("span").hasClass("k-state-selected")) {
@@ -4067,17 +3161,13 @@
             }
         };
 
-
-
         function AllSelectChkRightSide() {
             $chkAllRightPannel.prop("checked", false);
         };
 
-
         function CreateNewTree() {
-            var sql = "SELECT AD_Window_ID FROM AD_Window WHERE Name='Tree'";
-            var n_win = executeScalar(sql);
-
+           
+            var n_win = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetWindowtId", {  }, null); // spelling corrected by vinay bhatt on 18 oct 2018
             var zoomQuery = new VIS.Query();
             zoomQuery.addRestriction("AD_Tree_ID", VIS.Query.prototype.EQUAL, $treeID);
             VIS.viewManager.startWindow(n_win, zoomQuery);
@@ -4100,7 +3190,6 @@
 
 
         };
-
 
         function EmptySearchText(e) {
 
@@ -4129,7 +3218,6 @@
 
 
         };
-
 
         function SelectAllRightPanel(e) {
 
@@ -4551,41 +3639,7 @@
                     $ulSeq.find("input").prop("checked", false);
                     $ulSeq.find(".vis-tm-menuselectedcolor").find("input").prop("checked", true);
 
-                    //  overflowHidden.css("overflow", "auto")
-
-
-
-                    //UpdateBottomItemSeqe(getParentID, $treeID);
-
-                    //if (nodeItemDelwithdrag.hasClass("selectchangecolor"))
-                    //{
-                    //    $bsyDiv[0].style.visibility = "visible";
-                    //    TreeTableName();
-                    //    var findchilds = "Select node_id from " + tableTreeName + " where parent_id=" + GetPIDforItems + " AND isactive='Y' and ad_tree_id=" + $treeID + "";
-                    //    var child = VIS.DB.executeDataSet(findchilds, null, null);
-
-                    //    if (child != null && child.tables[0].rows.length == 0) {
-                    //        var selectedItemArray = [];
-                    //        if ($ulMid.find("input:checked").length == 0) {
-                    //            selectedItemArray.push(GetPIDforItems);
-                    //        }
-
-                    //        for (var i = 0; i < $ulMid.find("input:checked").length; i++) {
-                    //            //var getID = $($ulMid.find("input:checked")[i]).parent().find("li").attr("id");
-                    //            var getID = $($ulMid.find("input:checked")[i]).parent().find("li").attr("data-id");
-                    //            selectedItemArray.push(getID);
-                    //        }
-
-                    //        bottomchildselectedID = selectedItemArray;
-                    //        selectedItemArray = selectedItemArray.toString();
-                    //        DeleteNodeFromBottom($treeID, selectedItemArray);
-                    //        nodeItemDelwithdrag.removeClass("VIS-TM-ondragdrop");
-                    //        nodeItemDelwithdrag.css("display", "none");
-                    //    }
-                    //}
-                    //  else {
-
-                    //}
+                   
                 }
             });
         };
@@ -4614,8 +3668,6 @@
             }
         };
 
-
-
         function TreeExpandCollapse() {
             if ($cmbSelectTree.val() != "") {
                 $bsyDivTree[0].style.visibility = "visible";
@@ -4628,22 +3680,7 @@
                     $bsyDivTree[0].style.visibility = "hidden";
                 }, 150);
 
-                //if (expandCollapse == false)
-                //{
-                //    expandCollapse = true;
-                //    $bsyDivTree[0].style.visibility = "visible";
-                //    // for (var p = 0; p < 30; p++)
-                //    //  {
-                //    $leftTreeKeno.data("kendoTreeView").expand(".k-item");
-                //    //   }
-                //    $bsyDivTree[0].style.visibility = "hidden";
-                //}
-                //else {
-                //    $bsyDivTree[0].style.visibility = "visible";
-                //    expandCollapse = false;
-                //    $leftTreeKeno.data("kendoTreeView").collapse(".k-item");
-                //    $bsyDivTree[0].style.visibility = "hidden";
-                //}
+               
             }
         };
 
@@ -4708,8 +3745,6 @@
             }
         };
 
-
-
         var selectedItemArray = [];
         function DeleteBottomDivData() {
             selectedItemArray = [];
@@ -4746,26 +3781,7 @@
 
                             selectedItemArray = selectedItemArray.toString();
 
-                            //if (bindornot == "false")
-                            //{   
-                            //var someFlag = true;
-                            //for (var i = 0; i < selectedItemss.length; i++)
-                            //{
-                            //    if ($.inArray(selectedItemss[i], convertmenuArray) < 0)
-                            //    {
-                            //        DeleteNodeFromBottom($treeID, selectedItemArray);
-                            //        break;
-                            //    }
-                            //    else
-                            //    {
-                            //        VIS.ADialog.info("NeverDelete");
-                            //        $bsyDiv[0].style.visibility = "hidden";
-                            //        break;
-                            //    }
-
-                            //}
-                            // }
-                            // else {
+                            
                             if (selectedItemArray.length > 0) {
                                 DeleteNodeFromBottom($treeID, selectedItemArray);
                             }
@@ -4781,26 +3797,6 @@
                         }, 200);
                     }
                 });
-
-
-                //var msg = "" + VIS.Msg.getMsg("DeleteIt") + "";
-                //var r = VIS.ADialog.ask(msg);
-                //if (r == true)
-                //{
-                //    $bsyDiv[0].style.visibility = "visible";
-                //    // var selectedItem = $ulMid.find("input:selected");
-
-                //    for (var i = 0; i < $ulMid.find("input:checked").length; i++) {
-                //        var getID = $($ulMid.find("input:checked")[i]).parent().find("li").attr("id");
-                //        selectedItemArray.push(getID);
-                //    }
-
-                //    bottomchildselectedID = selectedItemArray;
-
-                //    selectedItemArray = selectedItemArray.toString();
-
-                //    DeleteNodeFromBottom($treeID, selectedItemArray);
-                //}
             }
 
             $bsyDiv[0].style.visibility = "hidden";
@@ -4809,14 +3805,11 @@
         function DeleteNodeFromBottom($treeID, selectedItemArray) {
             $bsyDiv[0].style.visibility = "visible";
 
-            var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            table_id = executeDataSet(table_id, null, null);
-            if (table_id.tables[0].rows.length > 0) {
-                table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-            }
-            var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            tree = executeDataSet(tree, null, null);
-            treeType = tree.tables[0].rows[0].cells["treetype"];
+           
+            var table_id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableID", { "treeId": $treeID }, null); // spelling corrected by vinay bhatt on 18 oct 2018
+
+             treeType = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTreeType", { "treeId": $treeID }, null); 
+            
             var tbname = "";
             if (treeType == "PR") {
                 tbname = "AD_TreeNodePR"
@@ -5184,7 +4177,6 @@
 
         };
 
-
         function AllSelectChkValue() {
             if ($ulMid.find("input").length == 0) {
                 $chkAllCheckOrNot.prop("disabled", true);
@@ -5276,16 +4268,13 @@
 
         };
 
-
         function DailogForDelete(e) {
             chksearchvalues = e;
             TreeTableName();
 
+            var child = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetNodeIdsOfParent", { "tbname": tableTreeName, "parent_id": $dragTreeDataNodeID, "treeId": $treeID }, null); 
 
-            var findchilds = "Select node_id from " + tableTreeName + " where parent_id=" + $dragTreeDataNodeID + " AND isactive='Y' and ad_tree_id=" + $treeID + "";
-            var child = executeDataSet(findchilds, null, null);
-
-            if (child != null && child.tables[0].rows.length == 0) {
+            if (child != null && child.length == 0) {
                 $chkValueFromDailog = true;
 
                 $deleteArea.removeClass("VIS-TM-ondragdrop");
@@ -5365,7 +4354,6 @@
             //};
         };
 
-
         var flagDelete = true;
         var gettbnameForAppentintree = null;
         function DeleteNodeFromTree($treeID, delNodId, getMovingdiv, $chkValueFromDailog) {
@@ -5379,20 +4367,12 @@
                 flagDelete = false;
                 $bsyDiv[0].style.visibility = "visible";
 
-                var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                table_id = executeDataSet(table_id, null, null);
-                if (table_id.tables[0].rows.length > 0) {
-                    table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-                }
-
-                var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-                tablename = executeDataSet(tablename, null, null);
-                if (tablename.tables[0].rows.length > 0) {
-                    tablename = tablename.tables[0].rows[0].cells["tablename"];
-                }
-                var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                tree = executeDataSet(tree, null, null);
-                treeType = tree.tables[0].rows[0].cells["treetype"];
+                
+                var table_id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTableID", { "treeId": $treeID }, null); // spelling corrected by vinay bhatt on 18 oct 2018
+                
+                
+                 treeType = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTreeType", { "treeId": $treeID }, null); 
+                
                 var tbname = "";
                 // var tablename = "";
                 if (treeType == "PR") {
@@ -5412,41 +4392,7 @@
                 GetAllChildesIDs(tbname, selectedItemArray, $treeID)
 
 
-                //if ($chkValueFromDailog == true)
-                //{
-                //    GetChildCounts(delNodId);
-                //    if ($getchildCount == false)
-                //    {
-                //        FindChildsID(tbname, delNodId, $treeID);                     
-                //    }                   
-                //}
-
-                //var sqlqry = "SELECT " + tbname + ".node_id AS node_id, mp.name as name,mp.issummary as summary  FROM " + tablename + " mp" +
-                //             " INNER JOIN " + tbname + " " + tbname + " ON mp." + tablename + "_ID=" + tbname + ".node_id" +
-                //             "  WHERE " + tbname + ".ad_tree_id=" + $treeID + " AND " + tbname + ".parent_id=" + delNodId;
-
-                //sqlqry = VIS.DB.executeDataSet(sqlqry, null, null);
-
-
-                //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                //tree = VIS.DB.executeDataSet(tree, null, null);
-                //treeType = tree.tables[0].rows[0].cells["treetype"];
-                //var tbname = "";
-                //var tablename = "";
-                //if (treeType == "PR") {
-                //    tbname = "ad_treenodepr"
-                //}
-                //else if (treeType == "BP") {
-                //    tbname = "ad_treenodebp"
-                //}
-                //else if (treeType == "MM") {
-                //    tbname = "ad_treenodemm"
-                //}
-                //else {
-                //    tbname = "ad_treenode"
-                //}
-                var getfirstParent = "select parent_ID  from " + tbname + " WHERE NODE_ID=" + delNodId + " AND AD_Tree_ID=" + $treeID + " AND IsActive='Y'";
-                getfirstParent = executeDataSet(getfirstParent, null, null);
+                var getfirstParent = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetParentId", { "treeId": $treeID,"nodeId":delNodeId,"tblName":tbname }, null); 
 
                 $.ajax({
                     url: VIS.Application.contextUrl + "TreeMaintenance/DeleteNodeFromTree",
@@ -5500,25 +4446,7 @@
                             }
 
 
-                            //if ($chkValueFromDailog == true)
-                            //{
-                            //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                            //tree = VIS.DB.executeDataSet(tree, null, null);
-                            //treeType = tree.tables[0].rows[0].cells["treetype"];
-                            //var tbname = "";
-                            //var tablename = "";
-                            //if (treeType == "PR") {
-                            //    tbname = "ad_treenodepr"
-                            //}
-                            //else if (treeType == "BP") {
-                            //    tbname = "ad_treenodebp"
-                            //}
-                            //else if (treeType == "MM") {
-                            //    tbname = "ad_treenodemm"
-                            //}
-                            //else {
-                            //    tbname = "ad_treenode"
-                            //}
+                            
 
                             gettbnameForAppentintree = tbname;
                             if ($chkValueFromDailog == true) {
@@ -5529,53 +4457,11 @@
 
                                     GetIDsOnRolBindTree();
 
-                                    //var draggingArrayss = [];
-                                    //for (var w = 0; w < draggingItemsss.find(".treechild").length; w++)
-                                    //{
-                                    //    var idss = $(draggingItemsss.find(".treechild")[w]).attr("data-nodeid");
-                                    //    draggingArrayss.push(parseInt(idss));
-                                    //}
-
-                                    //for (var s = 0; s < getIDforwithlongQuery.length; s++)
-                                    //{
-                                    //    if ($.inArray(parseInt(getIDforwithlongQuery[s]), convertmenuArray) >= 0)
-                                    //    {
-                                    //        var id = parseInt(getIDforwithlongQuery[s]);
-                                    //        UpdateRollCheckSeq(id)
-                                    //        var getrestrictIDss = $($($leftTreeDiv.find(".treechild")[0]).parent().parent().parent().find("ul")[0]);
-                                    //        var matchResult = $leftTreeDiv.find("div").find("div[data-nodeid='" + id + "']").parent().parent().parent();
-                                    //        $leftTreeDiv.find("div").find("div[data-nodeid='" + id + "']").parent().parent().parent().remove();
-                                    //        getrestrictIDss.append(matchResult);
-                                    //    }
-                                    //}
+                                   
                                 }
 
                                 $leftTreeDiv.data("kendoTreeView").remove(draggingItemsss);
 
-
-
-
-
-                                //childlevel
-                                //sqlqry
-
-
-                                //if ($getchildCount == true) {
-                                //    pageNo = 1;
-                                //    $ulRight.empty();
-                                //    searchRightext = $cmbRightSearch.val();
-                                //    $demandsMenu = $rightMenuDemand.val();
-                                //    LoadMenuData($treeID, $cmbSelectedType, searchRightext, $demandsMenu);
-                                //    $bsyDiv[0].style.visibility = "hidden";
-                                //    return;
-                                //}
-
-
-
-
-                                //for (var i = 0; i < childlevel.tables[0].rows.length; i++) {
-                                //    //childlevel.tables[0].rows[i].cells["node_id"]
-                                //    sqlqryNodeID = childlevel.tables[0].rows[i].cells["node_id"];
 
 
                                 for (var i = 0; i < getIDFromChildLevel.length; i++) {
@@ -5677,7 +4563,7 @@
                                 //$leftTreeDiv.find("div").find("div[data-nodeid='" + delNodId + "']").parent().parent().parent().remove();
                                 //   $leftTreeDiv.find("div").find("div[data-nodeid='" + delNodId + "']").parent().parent().parent();
 
-                                var id = getfirstParent.tables[0].rows[0].cells["parent_id"];
+                                var id = getfirstParent;
                                 $dropableItem = $leftTreeDiv.find("div").find("div[data-nodeid='" + id + "']");
 
                                 //    var x = $($leftTreeDiv.find("div").find("div[data-nodeid='" + delNodId + "']").parent().parent().parent().find("ul")[0]);
@@ -5757,7 +4643,6 @@
             }
         };
 
-
         function GetIDsOnRolBindTree() {
             var draggingArrayss = [];
             for (var w = 0; w < getIDforwithlongQuery.length; w++) {
@@ -5798,9 +4683,6 @@
 
         };
 
-
-
-
         //and tnp.isactive='Y' and tnp.ad_tree_id=0
         //long query
         var getIDforwithlongQuery = "";
@@ -5828,8 +4710,6 @@
             });
         };
 
-
-
         var getIDFromChildLevel = [];
         function FindChildsID(tbname, delNodId, $treeID) {
             //$.ajax({
@@ -5845,39 +4725,18 @@
             //});
 
 
-            var childsId = "SELECT tnp.node_id FROM " + tbname + " tnp WHERE  tnp.isactive='Y' AND tnp.ad_tree_id= " + $treeID + "  AND tnp.parent_id = " + delNodId +
+            childlevel = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetChildIDs",
+                { "treeId": $treeID, "tbname": tbname, "delNodId": delNodId}, null); // spelling corrected by vinay bhatt on 18 oct 2018
 
-            " UNION " +
-            "SELECT tnp.node_id FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
-              "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + $treeID + " AND tnp.parent_id = " + delNodId + "  )" + " AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID +
 
-            " UNION " +
-            "SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.parent_id IN" +
-              "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.parent_id IN" +
-                "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + $treeID + " AND tnp.parent_id = " + delNodId + " )  AND tnp.isactive='Y'  AND tnp.ad_tree_id=" + $treeID + "   )  AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + " " +
+            
 
-            " UNION " +
-            "SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.parent_id IN" +
-            "(SELECT tnp.node_id  FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
-                "(SELECT tnp.node_id FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
-            "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + $treeID + " AND tnp.parent_id = " + delNodId + "   ) AND tnp.isactive='Y'  AND tnp.ad_tree_id=" + $treeID + "   )  AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + " )" + "AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + "  AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + "    " +
-
-            " UNION " +
-            "SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.parent_id IN" +
-            "(SELECT tnp.node_id  FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
-                "(SELECT tnp.node_id  FROM " + tbname + " tnp   WHERE tnp.parent_id IN" +
-                    "(SELECT tnp.node_id  FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
-            "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + $treeID + " AND tnp.parent_id = " + delNodId + "    ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + "  ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + " ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + " ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + $treeID + "  ";
-
-            childlevel = executeDataSet(childsId, null, null);
-
-            for (var i = 0; i < childlevel.tables[0].rows.length; i++) {
-                var selectedItem = childlevel.tables[0].rows[i].cells["node_id"];
+            for (var i = 0; i < childlevel.length; i++) {
+                var selectedItem = childlevel[i];
 
                 getIDFromChildLevel.push(selectedItem);
             }
         };
-
 
         function RightPanelSearch() {
             if ($cmbSelectTree.val() != "") {
@@ -5915,8 +4774,6 @@
                 }
             }
         };
-
-
 
         function CmbRefresh(e) {
             if ($cmbSelectTree.val() != "") {
@@ -6472,51 +5329,6 @@
             var timeoutLongTouch;
             var $mydiv = $ulRight;
 
-            //// Listen to mousedown event
-            //$mydiv.on('mousedown.LongTouch', function () {
-            //    timeoutLongTouch = setTimeout(function () {
-            //        $mydiv.trigger('contextmenu');
-            //    }, 1000);
-            //})
-            //// Listen to mouseup event
-            //.on('mouseup.LongTouch', function () {
-            //    // Prevent long touch 
-            //    clearTimeout(timeoutLongTouch);
-            //});
-
-
-
-            //var ismobile = /ipad|iphone|ipod/i.test(navigator.userAgent.toLowerCase());
-            //if (ismobile) {
-            //    $ulRight.find("li").on("taphold", function (e) {
-            //        // e.stopPropagation();                     
-            //        e.preventDefault();
-            //        alert("hello");
-            //        var pressTimer
-
-            //        $ulRight.find("span").mouseup(function (e) {
-            //            clearTimeout(pressTimer)
-            //            alert("mouseup");
-            //            return false;
-            //        }).mousedown(function () {
-            //            pressTimer = window.setTimeout(function (e) {
-            //                e.preventDefault();
-            //                alert("timer");
-            //                alert("ok");
-
-            //            }, 1000)
-            //            return false;
-            //        });
-            //    });
-            //};
-
-
-
-
-
-
-
-
 
 
 
@@ -6826,11 +5638,10 @@
                                         }
                                         else {
                                             TreeTableName();
-                                            var findparent = "Select parent_id from " + tableTreeName + " where node_id=" + e.target.id + " AND isactive='Y' and ad_tree_id=" + $treeID + "";
-                                            var parent = executeDataSet(findparent, null, null);
-
-                                            if (parent != null && parent.tables[0].rows.length > 0) {
-                                                var parent_id = parent.tables[0].rows[0].cells["parent_id"];
+                                            var parent = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetParentId", { "treeId": $treeID, "nodeId": e.target.id, "tblName": tableTreeName }, null); 
+                                            
+                                            if (parent != null && parent > 0) {
+                                                var parent_id = parent;
 
                                                 if (parent_id == null) {
                                                     parent_id = 0;
@@ -6972,15 +5783,11 @@
             $bsyDiv[0].style.visibility = "visible";
 
 
-            var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            table_id = executeDataSet(table_id, null, null);
-            if (table_id.tables[0].rows.length > 0) {
-                table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-            }
-
-            var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            tree = executeDataSet(tree, null, null);
-            treeType = tree.tables[0].rows[0].cells["treetype"];
+            
+            
+           
+            treeType = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetTreeType", { "treeId": $treeID }, null); 
+            
             var tbname = "";
             if (treeType == "PR") {
                 tbname = "AD_TreeNodePR"
@@ -6995,10 +5802,11 @@
                 tbname = "AD_TreeNode"
             }
 
-            var findchild = "Select node_id from " + tbname + " where parent_id=" + selectedItemArray + " AND isactive='Y' and ad_tree_id=" + $treeID + "";
-            var child = executeDataSet(findchild, null, null);
+            
+            
+            var child = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetNodeIdsOfParent", { "tbname": tbname, "parent_id": selectedItemArray, "treeId": $treeID}, null); 
 
-            if (child != null && child.tables[0].rows.length > 0) {
+            if (child != null && child.length> 0) {
                 VIS.ADialog.confirm("ChildAlsoWillbeRemove", true, "", "Confirm", function (result) {
                     if (!result) {
                         $bsyDiv[0].style.visibility = "hidden";
@@ -7101,52 +5909,6 @@
                                     ////////$ulMid.find("li").find("li[id='" + selectedItemArray + "']").parent().remove();
                                     $ulMid.find("li").find("li[data-id='" + selectedItemArray + "']").parent().remove();
 
-
-                                    //var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                                    //table_id = VIS.DB.executeDataSet(table_id, null, null);
-                                    //if (table_id.tables[0].rows.length > 0) {
-                                    //    table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-                                    //}
-
-                                    ////var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-                                    ////tablename = VIS.DB.executeDataSet(tablename, null, null);
-                                    ////if (tablename.tables[0].rows.length > 0) {
-                                    ////    tablename = tablename.tables[0].rows[0].cells["tablename"];
-                                    ////}
-                                    //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                                    //tree = VIS.DB.executeDataSet(tree, null, null);
-                                    //treeType = tree.tables[0].rows[0].cells["treetype"];
-                                    //var tbname = "";
-                                    //// var tablename = "";
-                                    //if (treeType == "PR") {
-                                    //    tbname = "ad_treenodepr"
-                                    //}
-                                    //else if (treeType == "BP") {
-                                    //    tbname = "ad_treenodebp"
-                                    //}
-                                    //else if (treeType == "MM") {
-                                    //    tbname = "ad_treenodemm"
-                                    //}
-                                    //else {
-                                    //    tbname = "ad_treenode"
-                                    //}
-                                    // if ($chkValueFromDailog == true) {
-
-                                    // }
-
-                                    //if ($getchildCount == true) {
-                                    //    pageNo = 1;
-                                    //    $ulRight.empty();
-                                    //    searchRightext = $cmbRightSearch.val();
-                                    //    $demandsMenu = $rightMenuDemand.val();
-                                    //    LoadMenuData($treeID, $cmbSelectedType, searchRightext, $demandsMenu);
-                                    //    $bsyDiv[0].style.visibility = "hidden";
-                                    //    return;
-                                    //}
-
-
-                                    //for (var i = 0; i < childlevel.tables[0].rows.length; i++) {
-                                    //    var selectedItem = childlevel.tables[0].rows[i].cells["node_id"];
 
 
                                     for (var i = 0; i < getIDFromChildLevel.length; i++) {
@@ -7301,47 +6063,7 @@
                             $ulMid.find("li").find("li[data-id='" + selectedItemArray + "']").parent().remove();
 
 
-                            //var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                            //table_id = VIS.DB.executeDataSet(table_id, null, null);
-                            //if (table_id.tables[0].rows.length > 0) {
-                            //    table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-                            //}
-
-                            ////var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-                            ////tablename = VIS.DB.executeDataSet(tablename, null, null);
-                            ////if (tablename.tables[0].rows.length > 0) {
-                            ////    tablename = tablename.tables[0].rows[0].cells["tablename"];
-                            ////}
-                            //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-                            //tree = VIS.DB.executeDataSet(tree, null, null);
-                            //treeType = tree.tables[0].rows[0].cells["treetype"];
-                            //var tbname = "";
-                            //// var tablename = "";
-                            //if (treeType == "PR") {
-                            //    tbname = "ad_treenodepr"
-                            //}
-                            //else if (treeType == "BP") {
-                            //    tbname = "ad_treenodebp"
-                            //}
-                            //else if (treeType == "MM") {
-                            //    tbname = "ad_treenodemm"
-                            //}
-                            //else {
-                            //    tbname = "ad_treenode"
-                            //}
-                            // if ($chkValueFromDailog == true) {
-
-                            // }
-
-                            //if ($getchildCount == true) {
-                            //    pageNo = 1;
-                            //    LoadMenuData($treeID, $cmbSelectedType, searchRightext, $demandsMenu);
-                            //    $bsyDiv[0].style.visibility = "hidden";
-                            //    return;
-                            //}
-
-                            //for (var i = 0; i < childlevel.tables[0].rows.length; i++) {
-                            //    var selectedItem = childlevel.tables[0].rows[i].cells["node_id"];
+                           
 
 
                             for (var i = 0; i < getIDFromChildLevel.length; i++) {
@@ -7423,132 +6145,19 @@
                 });
             }
 
-
-
-
-            //$.ajax({
-            //    url: VIS.Application.contextUrl + "TreeMaintenance/DeleteNodeFromBottom",
-            //    type: 'Post',
-            //    data: { nodeid: selectedItemArray, treeID: $treeID },
-            //    success: function (data) {
-            //        var res = JSON.parse(data);
-            //        if (res == "")
-            //        {
-
-            //            var getLi = $ulRight.find("li").find("li[id='" + selectedItemArray + "']").parent().parent();
-            //            getLi.find("input").prop("disabled", false);
-            //            getLi.find("img").removeClass("vis-tm-opacity");
-            //            getLi.find(".vis-tm-textli").removeClass("vis-tm-opacity");
-            //            getLi.find("span").removeClass("VIS-Tm-glyphiconglyphicon-link");
-
-            //            $leftTreeDiv.data("kendoTreeView").remove($leftTreeDiv.find("div").find("div[data-nodeid='" + selectedItemArray + "']").parent().parent().parent());
-
-            //          //  $leftTreeDiv.data("kendoTreeView").element.find("li:has(li a.sfSel)");
-
-
-            //            //$leftTreeDiv.data("kendoTreeView").remove($leftTreeDiv.find("div").find("div[data-nodeid='" + selectedItemArray + "']").parent().parent().parent().remove());
-
-            //           // $leftTreeDiv.data('kendoTreeView').dataSource.read();
-
-            //           // $leftTreeDiv.find("div").find("div[data-nodeid='" + selectedItemArray + "']").parent().parent().parent().remove();
-            //            $ulMid.find("li").find("li[id='" + selectedItemArray + "']").parent().remove();
-
-
-
-            //            //var table_id = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            //            //table_id = VIS.DB.executeDataSet(table_id, null, null);
-            //            //if (table_id.tables[0].rows.length > 0) {
-            //            //    table_id = table_id.tables[0].rows[0].cells["ad_table_id"];
-            //            //}
-
-            //            ////var tablename = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
-            //            ////tablename = VIS.DB.executeDataSet(tablename, null, null);
-            //            ////if (tablename.tables[0].rows.length > 0) {
-            //            ////    tablename = tablename.tables[0].rows[0].cells["tablename"];
-            //            ////}
-            //            //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            //            //tree = VIS.DB.executeDataSet(tree, null, null);
-            //            //treeType = tree.tables[0].rows[0].cells["treetype"];
-            //            //var tbname = "";
-            //            //// var tablename = "";
-            //            //if (treeType == "PR") {
-            //            //    tbname = "ad_treenodepr"
-            //            //}
-            //            //else if (treeType == "BP") {
-            //            //    tbname = "ad_treenodebp"
-            //            //}
-            //            //else if (treeType == "MM") {
-            //            //    tbname = "ad_treenodemm"
-            //            //}
-            //            //else {
-            //            //    tbname = "ad_treenode"
-            //            //}
-            //           // if ($chkValueFromDailog == true) {
-
-            //           // }
-
-
-            //           // for (var i = 0; i < childlevel.tables[0].rows.length; i++)
-            //           // {
-            //                var sqlqryNodeID = childlevel.tables[0].rows[i].cells["node_id"];
-            //                var imgSource = $ulRight.find("li").find("li[id='" + selectedItemArray + "']").parent().parent().find("img").attr("src");
-            //                var changeImgSource = $ulRight.find("li").find("li[id='" + selectedItemArray + "']").parent().parent().find("img");
-            //                var setLinkedImage;
-            //                var src = imgSource;
-            //                if (src != null)
-            //                {
-            //                    src = src.substring(src.lastIndexOf("/") + 1);
-            //                    if (src == "nonSummary.png") {
-            //                        setLinkedImage = VIS.Application.contextUrl + "Areas/VIS/Images/mWindow.png";
-            //                    }
-            //                    else if (src == "summary.png") {
-            //                        setLinkedImage = VIS.Application.contextUrl + "Areas/VIS/Images/folder.png";
-            //                    }
-
-            //                    changeImgSource.attr("src", setLinkedImage);
-            //                }
-            //           // }
-
-            //        }
-
-            //        $bsyDiv[0].style.visibility = "hidden";
-            //    },
-            //    error: function (e) {
-            //        console.log(e);
-            //        $bsyDiv[0].style.visibility = "hidden";
-            //    },
-            //});
         };
 
         var ChkSummayOnTreeChange = null;
 
         function GetCountForRestriction() {
-            //var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
-            //tree = VIS.DB.executeDataSet(tree, null, null);
-            //treeType = tree.tables[0].rows[0].cells["treetype"];
-            //var tbname = "";
-            //var tablename = "";
-            //if (treeType == "PR") {
-            //    tbname = "ad_treenodepr"
-            //}
-            //else if (treeType == "BP") {
-            //    tbname = "ad_treenodebp"
-            //}
-            //else if (treeType == "MM") {
-            //    tbname = "ad_treenodemm"
-            //}
-            //else {
-            //    tbname = "ad_treenode"
-            //}
-
-
-
+          
             TreeTableName();
 
 
-            var sqlQry = "SELECT Count(*) as Count FROM " + tableTreeName + " WHERE isactive ='Y' AND AD_Tree_ID=" + $treeID;
-            sqlQry = executeDataSet(sqlQry, null, null);
-            sqlQry = sqlQry.tables[0].rows[0].cells["count"];
+            var sqlQry = "";
+            
+            sqlQry = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetRestrictionCount", { "treeId": $treeID, "tableTreeName": tableTreeName }, null); 
+            
 
             if (sqlQry > 5000) {
                 $chkSummaryLevel.prop("checked", true);

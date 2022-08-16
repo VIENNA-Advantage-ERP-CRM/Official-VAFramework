@@ -520,8 +520,8 @@
                 var fileData = "data:text/csv;base64," + window.btoa(text);
                 $(this).attr("href", fileData).attr("download", "file-" + d + ".txt");
 
-                divLog.dialog('close');
-                divLog = null;
+                //divLog.dialog('close');
+               // divLog = null;
             });
             divRight.append(btnSave);
 

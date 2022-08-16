@@ -137,13 +137,17 @@
                             name_startsWith: request.term
                         },
                         success: function (data) {
-                            response($.map(data.result, function (item) {
-                                return {
-                                    label: item.Name,
-                                    value: item.Name,
-                                    id: item.Key
-                                }
-                            }));
+                            if (data.result == 'ok')
+                                response(null);
+                            else {
+                                response($.map(data.result, function (item) {
+                                    return {
+                                        label: item.Name,
+                                        value: item.Name,
+                                        id: item.Key
+                                    }
+                                }));
+                            }
                         }
                     });
                 },
@@ -184,13 +188,17 @@
                             countryId: contryId
                         },
                         success: function (data) {
-                            response($.map(data.result, function (item) {
-                                return {
-                                    label: item.Name,
-                                    value: item.Name,
-                                    id: item.Key
-                                }
-                            }));
+                            if (data.result == 'ok')
+                                response(null);
+                            else {
+                                response($.map(data.result, function (item) {
+                                    return {
+                                        label: item.Name,
+                                        value: item.Name,
+                                        id: item.Key
+                                    }
+                                }));
+                            }
                         }
                     });
                 },
@@ -221,6 +229,9 @@
                             name_startsWith: request.term
                         },
                         success: function (data) {
+                            if (data.result == 'ok')
+                                response(null);
+                            else { 
                             response($.map(data.result, function (item) {
                                 return {
                                     label: item.ADDRESS,
@@ -239,9 +250,10 @@
                                 }
                             }));
                         }
+                    }
                     });
-                },
-                minLength: 1,
+        },
+            minLength: 1,
                 select: function (event, ui) {
                     country.val(ui.item.COUNTRYNAME);
                     add1.val(ui.item.ADDRESS1);
@@ -257,180 +269,180 @@
                     cityId = 0;
                     contryId = ui.item.C_COUNTRY_ID;
                 },
-                open: function () {
-                    $root.find(this).removeClass("ui-corner-all").addClass("ui-corner-top");
-                },
-                close: function () {
-                    $root.find(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+        open: function () {
+            $root.find(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+        },
+        close: function () {
+            $root.find(this).removeClass("ui-corner-top").addClass("ui-corner-all");
 
-                }
-            });
+        }
+    });
 
 
-            Okbtn.on("click", function () {
-                setBusy(true);
-                if (Number(contryId) <= 0) {
-                    VIS.ADialog.warn("SelectCountry", true, null);
-                    setBusy(false);
-                    return;
-                }
+    Okbtn.on("click", function () {
+        setBusy(true);
+        if (Number(contryId) <= 0) {
+            VIS.ADialog.warn("SelectCountry", true, null);
+            setBusy(false);
+            return;
+        }
 
-                // Set C_Location_ID as 0, 
-                // if maintain Version is marked on column and there is any change in value on Location Control
-                if (maintainVer && change)
-                    $C_Location_ID = 0;
-
-                var objValue = {
-                    countryName: country.val(),
-                    addvalue1: add1.val(),
-                    addvalue2: add2.val(),
-                    addvalue3: add3.val(),
-                    addvalue4: add4.val(),
-                    cityValue: city.val(),
-                    stateValue: state.val(),
-                    zipValue: zip.val(),
-                    clocationId: $C_Location_ID,
-                    countryId: contryId,
-                    stateId: stateId,
-                    cityId: cityId
-                };
-
-                var callbackValue = saveLocation(objValue);
-            });
-
-            cancelbtn.on("click", function () {
-                $root.dialog('close');
-            });
-
-            $root.find(".VIS-Location-toggler").click(function (e) {
-                e.preventDefault();
-                var ctrl = $root.find('.cat' + $root.find(this).attr('data-prod-cat'));
-                if (ctrl && ctrl.length > 0) {
-                        ctrl.toggle();
-                }
-                else {
-                    $root.find('.cat' + $root.find(this).attr('data-prod-close')).hide()
-                }
-                // $('img.expand').toggleClass('collapse');
-            });
-
-            country.bind('change', function (e) {
-                change = true;
-            });
-            add1.bind('change', function (e) {
-                change = true;
-            });
-            add2.bind('change', function (e) {
-                change = true;
-            });
-            add3.bind('change', function (e) {
-                change = true;
-            });
-            add4.bind('change', function (e) {
-                change = true;
-            });
-
-            city.bind('change', function (e) {
-                change = true;
-            });
-            state.bind('change', function (e) {
-                change = true;
-            });
-            zip.bind('change', function (e) {
-                change = true;
-            });
-
-            //Save data in the database
-            function saveLocation(data, callback) {
-                var result = null;
-                $.ajax({
-                    url: VIS.Application.contextUrl + "Location/SaveLocation",
-                    type: "POST",
-                    datatype: "json",
-                    contentType: "application/json; charset=utf-8",
-                    async: false,
-                    data: JSON.stringify({ pref: data })
-                }).done(function (json) {
-                    result = json;
-                    $C_Location_ID = result.locationid;
-                    stringAddress = result.locaddress;
-                    this.location = $C_Location_ID;
-                    setBusy(false);
-                    if ($self.onClose)
-                        $self.onClose($C_Location_ID, change);
-                    $root.dialog('close');
-                    change = null;
-                })
-            };
-        };
-
-        function setBusy(isBusy) {
-            $busyDiv.css("display", isBusy ? 'block' : 'none');
-        };
-
-        this.showDialog = function () {
-            $root.append($busyDiv);
-            $root.dialog({
-                modal: true,
-                resizable: false,
-                title: VIS.Msg.getMsg("Location"),
-                closeText: VIS.Msg.getMsg("close"),
-                // height: 440,
-                width: 620,
-                position: { at: "center top", of: window },
-                close: function () {
-                    $self.dispose();
-                    $self = null;
-                    $root.dialog("destroy");
-                    $root = null;
-                }
-            });
-        };
-
-        this.disposeComponent = function () {
-            $self = null;
-            if (Okbtn)
-                Okbtn.off("click");
-            if (cancelbtn)
-                cancelbtn.off("click");
-
+        // Set C_Location_ID as 0, 
+        // if maintain Version is marked on column and there is any change in value on Location Control
+        if (maintainVer && change)
             $C_Location_ID = 0;
-            searchlst = null;
-            country = null;
-            add1 = null;
-            add2 = null;
-            add3 = null;
-            add4 = null;
 
-            city = null;
-            state = null;
-            zip = null;
-
-            contryId = null;
-            stateId = null;
-            cityId = null;
-
-            Okbtn = null;
-            cancelbtn = null;
-            customAddList = null;
-
-            stringAddress = null;
-
-
-
-            this.disposeComponent = null;
+        var objValue = {
+            countryName: country.val(),
+            addvalue1: add1.val(),
+            addvalue2: add2.val(),
+            addvalue3: add3.val(),
+            addvalue4: add4.val(),
+            cityValue: city.val(),
+            stateValue: state.val(),
+            zipValue: zip.val(),
+            clocationId: $C_Location_ID,
+            countryId: contryId,
+            stateId: stateId,
+            cityId: cityId
         };
+
+        var callbackValue = saveLocation(objValue);
+    });
+
+    cancelbtn.on("click", function () {
+        $root.dialog('close');
+    });
+
+    $root.find(".VIS-Location-toggler").click(function (e) {
+        e.preventDefault();
+        var ctrl = $root.find('.cat' + $root.find(this).attr('data-prod-cat'));
+        if (ctrl && ctrl.length > 0) {
+            ctrl.toggle();
+        }
+        else {
+            $root.find('.cat' + $root.find(this).attr('data-prod-close')).hide()
+        }
+        // $('img.expand').toggleClass('collapse');
+    });
+
+    country.bind('change', function (e) {
+        change = true;
+    });
+    add1.bind('change', function (e) {
+        change = true;
+    });
+    add2.bind('change', function (e) {
+        change = true;
+    });
+    add3.bind('change', function (e) {
+        change = true;
+    });
+    add4.bind('change', function (e) {
+        change = true;
+    });
+
+    city.bind('change', function (e) {
+        change = true;
+    });
+    state.bind('change', function (e) {
+        change = true;
+    });
+    zip.bind('change', function (e) {
+        change = true;
+    });
+
+    //Save data in the database
+    function saveLocation(data, callback) {
+        var result = null;
+        $.ajax({
+            url: VIS.Application.contextUrl + "Location/SaveLocation",
+            type: "POST",
+            datatype: "json",
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            data: JSON.stringify({ pref: data })
+        }).done(function (json) {
+            result = json;
+            $C_Location_ID = result.locationid;
+            stringAddress = result.locaddress;
+            this.location = $C_Location_ID;
+            setBusy(false);
+            if ($self.onClose)
+                $self.onClose($C_Location_ID, change);
+            $root.dialog('close');
+            change = null;
+        })
+    };
+};
+
+function setBusy(isBusy) {
+    $busyDiv.css("display", isBusy ? 'block' : 'none');
+};
+
+this.showDialog = function () {
+    $root.append($busyDiv);
+    $root.dialog({
+        modal: true,
+        resizable: false,
+        title: VIS.Msg.getMsg("Location"),
+        closeText: VIS.Msg.getMsg("close"),
+        // height: 440,
+        width: 620,
+        position: { at: "center top", of: window },
+        close: function () {
+            $self.dispose();
+            $self = null;
+            $root.dialog("destroy");
+            $root = null;
+        }
+    });
+};
+
+this.disposeComponent = function () {
+    $self = null;
+    if (Okbtn)
+        Okbtn.off("click");
+    if (cancelbtn)
+        cancelbtn.off("click");
+
+    $C_Location_ID = 0;
+    searchlst = null;
+    country = null;
+    add1 = null;
+    add2 = null;
+    add3 = null;
+    add4 = null;
+
+    city = null;
+    state = null;
+    zip = null;
+
+    contryId = null;
+    stateId = null;
+    cityId = null;
+
+    Okbtn = null;
+    cancelbtn = null;
+    customAddList = null;
+
+    stringAddress = null;
+
+
+
+    this.disposeComponent = null;
+};
     };
 
-    //dispose call
-    LocationForm.prototype.dispose = function () {
+//dispose call
+LocationForm.prototype.dispose = function () {
 
-        /*CleanUp Code */
-        //dispose this component
-        this.disposeComponent();
-    };
+    /*CleanUp Code */
+    //dispose this component
+    this.disposeComponent();
+};
 
-    //Load form into VIS
-    VIS.LocationForm = LocationForm;
+//Load form into VIS
+VIS.LocationForm = LocationForm;
 
-})(VIS, jQuery);
+}) (VIS, jQuery);

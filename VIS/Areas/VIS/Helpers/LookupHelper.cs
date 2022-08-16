@@ -1,13 +1,22 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
 using VAdvantage.Classes;
+using VAdvantage.Controller;
+using VAdvantage.DataBase;
 using VAdvantage.Model;
+using VAdvantage.SqlExec.MSSql;
 using VAdvantage.Utility;
+using VIS.DataContracts;
+using VIS.Models;
 
 namespace VIS.Classes
 {
@@ -17,13 +26,335 @@ namespace VIS.Classes
                  String columnName, int AD_Reference_Value_ID,
                 bool IsParent, String ValidationCode)
         {
-            return VLookUpFactory.Get(ctx, windowNo, Column_ID, AD_Reference_ID, columnName, AD_Reference_Value_ID, IsParent, ValidationCode);
+            if (QueryValidator.IsValid(ValidationCode))
+                return VLookUpFactory.Get(ctx, windowNo, Column_ID, AD_Reference_ID, columnName, AD_Reference_Value_ID, IsParent, ValidationCode);
+            return null;
+
         }
 
-        public static string [] GetKeyColumns(int AD_Table_ID,Ctx ctx)
+        public static string[] GetKeyColumns(int AD_Table_ID, Ctx ctx)
         {
             //return new MTable(ctx, AD_Table_ID, null).GetKeyColumns();
             return MTable.Get(ctx, AD_Table_ID).GetKeyColumns();
+        }
+
+        public Object GetLookupData(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, 
+            int PageSize, string LookupData)
+        {
+            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
+            string lookupQuery = lInfo.query;
+            string validation = lInfo.validationCode;
+            if (!string.IsNullOrEmpty(validation))
+            {
+                if (!string.IsNullOrEmpty(Values))
+                {
+                    List<LookUpData> data = JsonConvert.DeserializeObject<List<LookUpData>>(Values);
+
+                    if (data != null && data.Count > 0)
+                    {
+                        for (int i = 0; i < data.Count; i++)
+                        {
+                            validation = validation.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
+                        }
+                    }
+                }
+
+                validation = Env.ParseContext(ctx, WindowNo, validation, false);
+
+                var posFrom = lookupQuery.LastIndexOf(" FROM ");
+                var hasWhere = lookupQuery.IndexOf(" WHERE ", posFrom) != -1;
+                //
+                var posOrder = lookupQuery.LastIndexOf(" ORDER BY ");
+                if (posOrder != -1)
+                    lookupQuery = lookupQuery.Substring(0, posOrder) + (hasWhere ? " AND " : " WHERE ") + validation + lookupQuery.Substring(posOrder);
+                else
+                    lookupQuery += (hasWhere ? " AND " : " WHERE ") + validation;
+            }
+
+            VIS.Helpers.SqlHelper h = new VIS.Helpers.SqlHelper();
+            SqlParamsIn sqlIn = new SqlParamsIn()
+            {
+                sql = lookupQuery,
+            };
+
+            if (PageSize > 0)
+                sqlIn.pageSize = PageSize;
+
+            object result = h.ExecuteJDataSet(sqlIn);
+            return result;
+        }
+
+
+        public Object GetLookupAll(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values,
+            int PageSize,string LookupData)
+        {
+            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID,LookupData);
+            string lookupQuery = lInfo.queryAll;
+            string validation = lInfo.validationCode;
+
+            VIS.Helpers.SqlHelper h = new VIS.Helpers.SqlHelper();
+            SqlParamsIn sqlIn = new SqlParamsIn()
+            {
+                sql = lookupQuery,
+            };
+
+            if (PageSize > 0)
+                sqlIn.pageSize = PageSize;
+
+            object result = h.ExecuteJDataSet(sqlIn);
+            return result;
+        }
+
+        public Object GetLookupDirect(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key,
+            bool IsNumber, string LookupData)
+        {
+            VLookUpInfo lInfo = null;
+            string lookupQuery = "";
+                lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
+                lookupQuery = lInfo.queryDirect;
+            
+
+
+
+            List<SqlParams> listParam = new List<SqlParams>();
+            string key = "";
+            if (Key != null)
+                key = ((string[])Key)[0];
+
+
+            SqlParams parm = new SqlParams();
+
+            parm.name = "@key";
+            if (IsNumber)
+            {
+                parm.value = Convert.ToInt32(key);
+            }
+            else
+            {
+                parm.value = Convert.ToString(key);
+            }
+            listParam.Add(parm);
+
+            VIS.Helpers.SqlHelper h = new VIS.Helpers.SqlHelper();
+            SqlParamsIn sqlIn = new SqlParamsIn()
+            {
+                sql = lookupQuery,
+                param = listParam
+            };
+
+            object result = h.ExecuteJDataSet(sqlIn);
+            return result;
+        }
+
+        private VLookUpInfo GetLookupInfo(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID,string LookupData)
+        {
+            VLookUpInfo lInfo = null;
+            if (AD_Window_ID > 0)
+            {
+                GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+
+                lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+            }
+            else
+            {
+                dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(LookupData, new ExpandoObjectConverter());
+                Ctx _ctx = new Ctx(json.ctx);
+                string validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+                if (!QueryValidator.IsValid(validationCode))
+                    return null;
+
+                //Ctx _ctx = null;//(ctx) as Ctx;
+                MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
+                    Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
+                lInfo = res._vInfo;
+            }
+            return lInfo;
+        }
+
+        public DataSet GetAccessSqlAutoComplete(Ctx ctx, string _columnName, string text, int WindowNo,
+             int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string values, string LookupData)
+        {
+            VLookUpInfo lInfo = null;
+            if (AD_Window_ID > 0)
+            {
+                GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+
+                lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault()
+                   .GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+            }
+            else
+            {
+                dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(LookupData, new ExpandoObjectConverter());
+                Ctx _ctx = new Ctx(json.ctx);
+                string validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+                if (!QueryValidator.IsValid(validationCode))
+                    return null;
+
+                //Ctx _ctx = null;//(ctx) as Ctx;
+                MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
+                    Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
+                lInfo = res._vInfo;
+            }
+            string sql = lInfo.query;
+
+
+            var keyColumn = lInfo.keyColumn;
+            var displayColumn = lInfo.displayColSubQ;
+        //    sql = sql.Replace(displayColumn, "");
+
+            var posFrom = sql.IndexOf(" FROM ");
+            var hasWhere = sql.IndexOf(" WHERE ", posFrom) != -1;
+            var posOrder = sql.LastIndexOf(" ORDER BY ");
+            var validation = lInfo.validationCode;
+            if (!lInfo.isValidated)
+            {
+                //validation = VIS.Env.parseContext(VIS.context, self.lookup.windowNo, self.lookup.tabNo, self.lookup.info.validationCode, false, true);
+                //if (validation.length == 0 && self.lookup.info.validationCode.length > 0)
+                //{
+                //    return;
+                //}
+                if (!string.IsNullOrEmpty(values))
+                {
+                    List<LookUpData> data = JsonConvert.DeserializeObject<List<LookUpData>>(values);
+
+                    if (data != null && data.Count > 0)
+                    {
+                        for (int i = 0; i < data.Count; i++)
+                        {
+                            lInfo.validationCode = lInfo.validationCode.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
+                        }
+                    }
+                }
+
+                validation = " AND " + lInfo.validationCode;
+            }
+            validation = Env.ParseContext(ctx, WindowNo, validation, false);
+            if (validation != null && validation.Length > 0)
+            {
+                if (posOrder != -1)
+                {
+                    var orderByIdx = validation.ToUpper().LastIndexOf(" ORDER BY ");
+                    if (orderByIdx == -1)
+                    {
+                        validation = validation + sql.Substring(posOrder);
+                    }
+                    sql = sql.Substring(0, posOrder) + (hasWhere ? " AND " : " WHERE ") + lInfo.tableName + ".isActive='Y' ";
+                    if (validation.Trim().StartsWith("AND"))
+                    {
+                        sql = sql + validation;
+                    }
+                    else
+                    {
+                        sql = sql + " AND " + validation;
+                    }
+                }
+                else
+                {
+                    sql += (hasWhere ? " AND " : " WHERE ") + lInfo.tableName + ".isActive='Y'";
+                    if (validation.Trim().StartsWith("AND"))
+                    {
+                        sql = sql + validation;
+                    }
+                    else
+                    {
+                        sql = sql + " AND " + validation;
+                    }
+                }
+            }
+
+            // string lastPart = sql.Substring(sql.IndexOf("FROM"), sql.Length);
+            string lastPart = sql.Substring(sql.IndexOf("FROM "+ lInfo.tableName));
+            sql = "SELECT " + keyColumn + " AS ID,NULL," + displayColumn + " AS finalValue " + lastPart;
+
+            text = text.ToUpper();
+            text = "%" + text + "%";
+
+
+
+            int idx = sql.IndexOf("finalValue");
+            lastPart = "";
+            if (idx != -1)
+            {
+                lastPart = sql.Substring(idx, sql.Length - idx);
+                int newIndex = lastPart.IndexOf("WHERE");
+                newIndex = newIndex + 5;
+                lastPart = lastPart.Substring(newIndex, lastPart.Length - newIndex);
+                sql = sql.Replace(lastPart, "");
+
+            }
+            bool isColumnMatch = false;
+            if (_columnName.Equals("M_Product_ID"))
+            {
+                isColumnMatch = true;
+                sql += " (UPPER(M_Product.Value) LIKE " + DB.TO_STRING(text) +
+                    " OR UPPER(M_Product.Name) LIKE " + DB.TO_STRING(text) + ")";
+                sql += " AND ";
+            }
+            else if (_columnName.Equals("C_BPartner_ID"))
+            {
+                isColumnMatch = true;
+                sql += " (UPPER(Value) LIKE ";
+                sql += DB.TO_STRING(text) + " OR UPPER(Name) LIKE " + DB.TO_STRING(text) + ")";
+                sql += " AND ";
+            }
+            else if (_columnName.Equals("C_Order_ID"))
+            {
+                isColumnMatch = true;
+                sql += " UPPER(DocumentNo) LIKE ";
+                sql += DB.TO_STRING(text);
+                sql += " AND ";
+            }
+            else if (_columnName.Equals("C_Invoice_ID"))
+            {
+                isColumnMatch = true;
+                sql += " UPPER(DocumentNo) LIKE ";
+                sql += DB.TO_STRING(text);
+                sql += " AND ";
+            }
+            else if (_columnName.Equals("M_InOut_ID"))
+            {
+                isColumnMatch = true;
+                sql += " UPPER(DocumentNo) LIKE ";
+                sql += DB.TO_STRING(text);
+                sql += " AND ";
+            }
+            else if (_columnName.Equals("C_Payment_ID"))
+            {
+                isColumnMatch = true;
+                sql += " UPPER(DocumentNo) LIKE ";
+                sql += DB.TO_STRING(text);
+                sql += " AND ";
+            }
+            else if (_columnName.Equals("GL_JournalBatch_ID"))
+            {
+                isColumnMatch = true;
+                sql += " UPPER(DocumentNo) LIKE ";
+                sql += DB.TO_STRING(text);
+                sql += " AND ";
+            }
+            else if (_columnName.Equals("SalesRep_ID"))
+            {
+                isColumnMatch = true;
+                sql += " UPPER(Name) LIKE ";
+                sql += DB.TO_STRING(text);
+                sql += " AND ";
+            }
+            if (isColumnMatch)
+            {
+                sql += lastPart;
+            }
+            else
+            {
+                sql += lastPart;
+                sql = DBFunctionCollection.convertToSubQuery(sql, "*") + "WHERE UPPER(finalvalue) LIKE " + DB.TO_STRING(text);
+            }
+            DataSet ds = VIS.DBase.DB.ExecuteDatasetPaging(sql, 1, 1000);
+            if (ds != null)
+            {
+                ds.Tables[0].TableName = "Table";
+            }
+            return ds;
+
         }
     }
 

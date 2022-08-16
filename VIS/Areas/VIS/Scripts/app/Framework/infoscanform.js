@@ -78,11 +78,11 @@
             //    btnsec = $("<div style='display: inline-block;width:99%;height:auto;margin-top: 2px;'>");
             //}
             //else {
-                searchTab = $("<div class='vis-info-l-s-wrap vis-pad-0 vis-leftsidebarouterwrap'>");
-                searchSec = $("<div class='vis-info-l-s-content'>");
-                searchTab.append(searchSec);
-                datasec = $("<div class='vis-info-datasec'>");
-                btnsec = $("<div class='vis-info-btnsec vis-just-cont-end'>");
+            searchTab = $("<div class='vis-info-l-s-wrap vis-pad-0 vis-leftsidebarouterwrap'>");
+            searchSec = $("<div class='vis-info-l-s-content'>");
+            searchTab.append(searchSec);
+            datasec = $("<div class='vis-info-datasec'>");
+            btnsec = $("<div class='vis-info-btnsec vis-just-cont-end'>");
             //}
 
             subroot.append(searchTab);
@@ -131,112 +131,112 @@
             //}
             //else {
 
-                tr = $("<tr>");
-                tableSArea.append(tr);
-                var td = $("<td>");
-                var Leftformfieldwrp = $('<div class="input-group vis-input-wrap">');
-                var Leftformfieldctrlwrp = $('<div class="vis-control-wrap">');
-                label = $("<label class='VIS_Pref_Label_Font'>").append(lblNametxt);
-                tr.append(td);
-                td.append(Leftformfieldwrp);
-                Leftformfieldwrp.append(Leftformfieldctrlwrp);
+            tr = $("<tr>");
+            tableSArea.append(tr);
+            var td = $("<td>");
+            var Leftformfieldwrp = $('<div class="input-group vis-input-wrap">');
+            var Leftformfieldctrlwrp = $('<div class="vis-control-wrap">');
+            label = $("<label class='VIS_Pref_Label_Font'>").append(lblNametxt);
+            tr.append(td);
+            td.append(Leftformfieldwrp);
+            Leftformfieldwrp.append(Leftformfieldctrlwrp);
 
-                //tr = $("<tr>");
-                //tableSArea.append(tr);
-                var srchCtrl = {
-                };
+            //tr = $("<tr>");
+            //tableSArea.append(tr);
+            var srchCtrl = {
+            };
 
-                ctrl = new VIS.Controls.VTextBox("Name", false, false, true, 50, 100, null, null, false);// getControl(schema[item].AD_Reference_ID, schema[item].ColumnName, schema[item].Name, schema[item].AD_Reference_Value_ID, schema[item].lookup);
-                srchCtrl.Ctrl = ctrl;
-                srchCtrl.AD_Reference_ID = 10;
-                srchCtrl.ColumnName = "Name";
-                var tdctrl = $("<td>");
-                //tr.append(tdctrl);
-                Leftformfieldctrlwrp.append(ctrl.getControl().attr('data-placeholder', '').attr('placeholder', ' '));
-                Leftformfieldctrlwrp.append(label);
-                srchCtrls.push(srchCtrl);
+            ctrl = new VIS.Controls.VTextBox("Name", false, false, true, 50, 100, null, null, false);// getControl(schema[item].AD_Reference_ID, schema[item].ColumnName, schema[item].Name, schema[item].AD_Reference_Value_ID, schema[item].lookup);
+            srchCtrl.Ctrl = ctrl;
+            srchCtrl.AD_Reference_ID = 10;
+            srchCtrl.ColumnName = "Name";
+            var tdctrl = $("<td>");
+            //tr.append(tdctrl);
+            Leftformfieldctrlwrp.append(ctrl.getControl().attr('data-placeholder', '').attr('placeholder', ' '));
+            Leftformfieldctrlwrp.append(label);
+            srchCtrls.push(srchCtrl);
 
-                tr = $("<tr>");
-                tableSArea.append(tr);
-                var td = $("<td>");
-                var Leftformfieldwrp = $('<div class="input-group vis-input-wrap">');
-                var Leftformfieldctrlwrp = $('<div class="vis-control-wrap">');
-                label = $("<label class='VIS_Pref_Label_Font'>").append(lblReftxt);
-                tr.append(td);
-                td.append(Leftformfieldwrp);
-                Leftformfieldwrp.append(Leftformfieldctrlwrp);
+            tr = $("<tr>");
+            tableSArea.append(tr);
+            var td = $("<td>");
+            var Leftformfieldwrp = $('<div class="input-group vis-input-wrap">');
+            var Leftformfieldctrlwrp = $('<div class="vis-control-wrap">');
+            label = $("<label class='VIS_Pref_Label_Font'>").append(lblReftxt);
+            tr.append(td);
+            td.append(Leftformfieldwrp);
+            Leftformfieldwrp.append(Leftformfieldctrlwrp);
 
-                //tr = $("<tr>");
-                //tableSArea.append(tr);
-                var srchCtrl = {
-                };
+            //tr = $("<tr>");
+            //tableSArea.append(tr);
+            var srchCtrl = {
+            };
 
-                ctrl = new VIS.Controls.VTextBox("Reference", false, false, true, 50, 100, null, null, false);// getControl(schema[item].AD_Reference_ID, schema[item].ColumnName, schema[item].Name, schema[item].AD_Reference_Value_ID, schema[item].lookup);
-                srchCtrl.Ctrl = ctrl;
-                srchCtrl.AD_Reference_ID = 10;
-                srchCtrl.ColumnName = "Reference";
-                var tdctrl = $("<td>");
-                //tr.append(tdctrl);
-                Leftformfieldctrlwrp.append(ctrl.getControl().attr('data-placeholder', '').attr('placeholder', ' '));
-                Leftformfieldctrlwrp.append(label);
-                srchCtrls.push(srchCtrl);
+            ctrl = new VIS.Controls.VTextBox("Reference", false, false, true, 50, 100, null, null, false);// getControl(schema[item].AD_Reference_ID, schema[item].ColumnName, schema[item].Name, schema[item].AD_Reference_Value_ID, schema[item].lookup);
+            srchCtrl.Ctrl = ctrl;
+            srchCtrl.AD_Reference_ID = 10;
+            srchCtrl.ColumnName = "Reference";
+            var tdctrl = $("<td>");
+            //tr.append(tdctrl);
+            Leftformfieldctrlwrp.append(ctrl.getControl().attr('data-placeholder', '').attr('placeholder', ' '));
+            Leftformfieldctrlwrp.append(label);
+            srchCtrls.push(srchCtrl);
 
-                tr = $("<tr>");
-                tableSArea.append(tr);
-                var td = $("<td>");
-                var Leftformfieldwrp = $('<div class="input-group vis-input-wrap">');
-                var Leftformfieldctrlwrp = $('<div class="vis-control-wrap">');
-                label = $("<label class='VIS_Pref_Label_Font'>").append(lblFromDate);
-                tr.append(td);
-                td.append(Leftformfieldwrp);
-                Leftformfieldwrp.append(Leftformfieldctrlwrp);
+            tr = $("<tr>");
+            tableSArea.append(tr);
+            var td = $("<td>");
+            var Leftformfieldwrp = $('<div class="input-group vis-input-wrap">');
+            var Leftformfieldctrlwrp = $('<div class="vis-control-wrap">');
+            label = $("<label class='VIS_Pref_Label_Font'>").append(lblFromDate);
+            tr.append(td);
+            td.append(Leftformfieldwrp);
+            Leftformfieldwrp.append(Leftformfieldctrlwrp);
 
-                //tr = $("<tr>");
-                //tableSArea.append(tr);
-                var srchCtrl = {
-                };
+            //tr = $("<tr>");
+            //tableSArea.append(tr);
+            var srchCtrl = {
+            };
 
-                ctrl = new VIS.Controls.VDate("TrxFromDate", false, false, true, VIS.DisplayType.Date, VIS.Msg.translate("FromDate"));
-                srchCtrl.Ctrl = ctrl;
-                srchCtrl.AD_Reference_ID = 10;
-                srchCtrl.ColumnName = "TrxFromDate";
-                var tdctrl = $("<td>");
-                //tr.append(tdctrl);
-                Leftformfieldctrlwrp.append(ctrl.getControl().attr('data-placeholder', '').attr('placeholder', ' '));
-                Leftformfieldctrlwrp.append(label);
-                //tdctrl.append(ctrl.getControl().addClass("vis-allocation-date"));
-                srchCtrls.push(srchCtrl);
+            ctrl = new VIS.Controls.VDate("TrxFromDate", false, false, true, VIS.DisplayType.Date, VIS.Msg.translate("FromDate"));
+            srchCtrl.Ctrl = ctrl;
+            srchCtrl.AD_Reference_ID = 10;
+            srchCtrl.ColumnName = "TrxFromDate";
+            var tdctrl = $("<td>");
+            //tr.append(tdctrl);
+            Leftformfieldctrlwrp.append(ctrl.getControl().attr('data-placeholder', '').attr('placeholder', ' '));
+            Leftformfieldctrlwrp.append(label);
+            //tdctrl.append(ctrl.getControl().addClass("vis-allocation-date"));
+            srchCtrls.push(srchCtrl);
 
-                tr = $("<tr>");
-                tableSArea.append(tr);
-                var td = $("<td>");
-                var Leftformfieldwrp = $('<div class="input-group vis-input-wrap">');
-                var Leftformfieldctrlwrp = $('<div class="vis-control-wrap">');
-                label = $("<label class='VIS_Pref_Label_Font'>").append(lblToDate);
-                tr.append(td);
-                td.append(Leftformfieldwrp);
-                Leftformfieldwrp.append(Leftformfieldctrlwrp);
+            tr = $("<tr>");
+            tableSArea.append(tr);
+            var td = $("<td>");
+            var Leftformfieldwrp = $('<div class="input-group vis-input-wrap">');
+            var Leftformfieldctrlwrp = $('<div class="vis-control-wrap">');
+            label = $("<label class='VIS_Pref_Label_Font'>").append(lblToDate);
+            tr.append(td);
+            td.append(Leftformfieldwrp);
+            Leftformfieldwrp.append(Leftformfieldctrlwrp);
 
-                //tr = $("<tr>");
-                //tableSArea.append(tr);
-                var srchCtrl = {
-                };
+            //tr = $("<tr>");
+            //tableSArea.append(tr);
+            var srchCtrl = {
+            };
 
-                ctrl = new VIS.Controls.VDate("TrxToDate", false, false, true, VIS.DisplayType.Date, VIS.Msg.translate("ToDate"));
-                srchCtrl.Ctrl = ctrl;
-                srchCtrl.AD_Reference_ID = 10;
-                srchCtrl.ColumnName = "TrxToDate";
-                var tdctrl = $("<td>");
-                //tr.append(tdctrl);
-                Leftformfieldctrlwrp.append(ctrl.getControl().attr('data-placeholder', '').attr('placeholder', ' '));
-                Leftformfieldctrlwrp.append(label);
-                srchCtrls.push(srchCtrl);
+            ctrl = new VIS.Controls.VDate("TrxToDate", false, false, true, VIS.DisplayType.Date, VIS.Msg.translate("ToDate"));
+            srchCtrl.Ctrl = ctrl;
+            srchCtrl.AD_Reference_ID = 10;
+            srchCtrl.ColumnName = "TrxToDate";
+            var tdctrl = $("<td>");
+            //tr.append(tdctrl);
+            Leftformfieldctrlwrp.append(ctrl.getControl().attr('data-placeholder', '').attr('placeholder', ' '));
+            Leftformfieldctrlwrp.append(label);
+            srchCtrls.push(srchCtrl);
 
-                searchSec.append(tableSArea);
+            searchSec.append(tableSArea);
 
-                btnCancel = $("<button class='VIS_Pref_btn-2'>").append(canceltxt);
-                btnOK = $("<button class='VIS_Pref_btn-2'>").append(Oktxt);
-                btnSearch = $("<button class='VIS_Pref_btn-2'>").append(searchtxt);
+            btnCancel = $("<button class='VIS_Pref_btn-2'>").append(canceltxt);
+            btnOK = $("<button class='VIS_Pref_btn-2'>").append(Oktxt);
+            btnSearch = $("<button class='VIS_Pref_btn-2'>").append(searchtxt);
             //}
 
             divbtnRight.append(btnCancel);
@@ -258,10 +258,10 @@
             //    searchTab.append(divbtnsec);
             //}
             //else {
-                divbtnRight.append(btnCancel);
-                divbtnRight.append(btnOK);
-                divbtnsec.append(btnSearch);
-                searchTab.append(divbtnsec);
+            divbtnRight.append(btnCancel);
+            divbtnRight.append(btnOK);
+            divbtnsec.append(btnSearch);
+            searchTab.append(divbtnsec);
             //}
 
             // divbtnLeft.append(btnRequery);
@@ -323,14 +323,15 @@
                     }
                 }
             }
-            var query = "";
+            // var query = "";
             var whereClause = "";
-            
+
             var M_Locator_ID = 0;
             var M_LocatorTo_ID = 0;
 
             var M_Warehouse_ID = 0;
             var M_WarehouseTo_ID = 0;
+            var C_BPartner_ID = 0;
 
             if (requery == true) {
                 //var name = "";
@@ -343,74 +344,89 @@
                 for (var i = 0; i < srchCtrls.length; i++) {
                     srchValue = srchCtrls[i].Ctrl.getValue();
                     if (srchValue == null || srchValue.length == 0 || srchValue == 0) {
+                        srchCtrls[i]["Value"] = "";
                         continue;
                     }
+                    srchCtrls[i]["Value"] = srchValue;
+                    srchCtrls[i]["CtrlColumnName"] = srchCtrls[i].Ctrl.colName;
 
-                    if (srchCtrls[i].Ctrl.colName == "Name") {
-                        query += " AND upper(VAICNT_ScanName) LIKE '%" + srchValue.toUpperCase() + "%' ";
-                    }
+                    //if (srchCtrls[i].Ctrl.colName == "Name") {
+                    //    query += " AND upper(VAICNT_ScanName) LIKE '%" + srchValue.toUpperCase() + "%' ";
+                    //}
 
-                    else if (srchCtrls[i].Ctrl.colName == "Reference") {
-                        query += " AND upper(VAICNT_ReferenceNo) LIKE '%" + srchValue.toUpperCase() + "%' ";
-                    }
+                    //else if (srchCtrls[i].Ctrl.colName == "Reference") {
+                    //    query += " AND upper(VAICNT_ReferenceNo) LIKE '%" + srchValue.toUpperCase() + "%' ";
+                    //}
 
-                    else if (srchCtrls[i].Ctrl.colName == "TrxFromDate") {
-                        var date = VIS.DB.to_date(srchValue, true);
-                        query += " AND DateTrx >= " + date;
-                    }
+                    //else if (srchCtrls[i].Ctrl.colName == "TrxFromDate") {
+                    //    var date = VIS.DB.to_date(srchValue, true);
+                    //    query += " AND DateTrx >= " + date;
+                    //}
 
-                    else if (srchCtrls[i].Ctrl.colName == "TrxToDate") {
-                        var date = VIS.DB.to_date(srchValue, true);
-                        query += " AND DateTrx <= " + date;
-                    }
+                    //else if (srchCtrls[i].Ctrl.colName == "TrxToDate") {
+                    //    var date = VIS.DB.to_date(srchValue, true);
+                    //    query += " AND DateTrx <= " + date;
+                    //}
                 }
-                if (showCart) {
-                    query += " AND VAICNT_TransactionType = 'OT' ";
+                //if (showCart) {
+                //    query += " AND VAICNT_TransactionType = 'OT' ";
+                //}
+                /* else {*/
+                if (window_ID == 184) {   // JID_1026: System is not checking the document status of Order and requisition while loading cart on M_inout and internal use move line respectively
+                    //query += " AND VAICNT_TransactionType = 'MR' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE C_BPartner_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID")) + " AND DocStatus IN ('CO', 'CL'))";
+                    C_BPartner_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID"));
                 }
-                else {
-                    if (window_ID == 184) {   // JID_1026: System is not checking the document status of Order and requisition while loading cart on M_inout and internal use move line respectively
-                        query += " AND VAICNT_TransactionType = 'MR' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE C_BPartner_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID")) + " AND DocStatus IN ('CO', 'CL'))";
-                    }
-                    else if (window_ID == 319 || window_ID == 170) {
-                        query += " AND VAICNT_TransactionType = 'IM' ";
-                        // extra parameters only for these windows
-                        M_Locator_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Locator_ID", true))
-                        M_LocatorTo_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_LocatorTo_ID", true));
-                        M_Warehouse_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "DTD001_MWarehouseSource_ID", true));
-                        M_WarehouseTo_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true));
-                    }
-                    else if (window_ID == 168) {
-                        query += " AND VAICNT_TransactionType = 'PI' ";
-                        M_Warehouse_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true));
-                    }
-                    else if (window_ID == 169) {
-                        query += " AND VAICNT_TransactionType = 'SH' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE  C_BPartner_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID")) + " AND DocStatus IN ('CO'))";
-                    }
-                    else if (window_ID == 341) {
-                        query += " AND VAICNT_TransactionType = 'IU' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE IsActive = 'Y' AND M_Warehouse_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true)) + " AND DocStatus IN ('CO'))";
-                    }
-                    else {
-                        query += " AND VAICNT_TransactionType = 'OT' ";
-                    }
+                else if (window_ID == 319 || window_ID == 170) {
+                    // query += " AND VAICNT_TransactionType = 'IM' ";
+                    // extra parameters only for these windows
+                    M_Locator_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Locator_ID", true))
+                    M_LocatorTo_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_LocatorTo_ID", true));
+                    M_Warehouse_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "DTD001_MWarehouseSource_ID", true));
+                    M_WarehouseTo_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true));
                 }
+                else if (window_ID == 168) {
+                    //query += " AND VAICNT_TransactionType = 'PI' ";
+                    M_Warehouse_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true));
+                }
+                else if (window_ID == 169) {
+                    //query += " AND VAICNT_TransactionType = 'SH' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE  C_BPartner_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID")) + " AND DocStatus IN ('CO'))";
+                    C_BPartner_ID = VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID");
+                }
+                else if (window_ID == 341) {
+                    //query += " AND VAICNT_TransactionType = 'IU' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE IsActive = 'Y' AND M_Warehouse_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true)) + " AND DocStatus IN ('CO'))";
+                    M_Warehouse_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true));
+                }
+                //else {
+                //   // query += " AND VAICNT_TransactionType = 'OT' ";
+                //}
+                // }
             }
-            else {
-                query += " AND VAICNT_InventoryCount_ID = -1";
-            }
+            //else {
+            //    query += " AND VAICNT_InventoryCount_ID = -1";
+            //}
 
-            sql = "SELECT VAICNT_ScanName,VAICNT_ReferenceNo,DateTrx,VAICNT_InventoryCount_ID FROM VAICNT_InventoryCount WHERE IsActive='Y' AND AD_Client_ID = "
-                + VIS.Utility.Util.getValueOfInt(VIS.context.getAD_Client_ID()) + query;
-            
-            var _sql = VIS.secureEngine.encrypt(sql);
+            //sql = "SELECT VAICNT_ScanName,VAICNT_ReferenceNo,DateTrx,VAICNT_InventoryCount_ID FROM VAICNT_InventoryCount WHERE IsActive='Y' AND AD_Client_ID = "
+            //    + VIS.Utility.Util.getValueOfInt(VIS.context.getAD_Client_ID()) + query;
+
+            //var _sql = VIS.secureEngine.encrypt(sql);
             if (!pNo) {
                 pNo = 1;
+            }
+
+            var srhCtrls = [];
+            if (srchCtrls && Object.keys(srchCtrls).length > 0) {
+                for (var x = 0; x < Object.keys(srchCtrls).length; x++) {
+                    var vals = {};
+                    vals.CtrlColumnName = srchCtrls[x].CtrlColumnName;
+                    vals.Value = srchCtrls[x].Value;
+                    srhCtrls.push(vals);
+                }
             }
 
             $.ajax({
                 url: VIS.Application.contextUrl + "InfoProduct/GetCart",
                 dataType: "json",
                 data: {
-                    sql: _sql,
                     pageNo: pNo,
                     isCart: showCart,
                     windowID: window_ID,
@@ -418,6 +434,9 @@
                     WarehouseToID: M_WarehouseTo_ID,
                     LocatorID: M_Locator_ID,
                     LocatorToID: M_LocatorTo_ID,
+                    BPartnerID: C_BPartner_ID,
+                    srchCtrl: JSON.stringify(srhCtrls),
+                    requery: requery
                 },
                 error: function () {
                     alert(VIS.Msg.getMsg('ErrorWhileGettingData'));

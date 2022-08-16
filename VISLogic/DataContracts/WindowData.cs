@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using VAdvantage.Classes;
+using VAdvantage.Utility;
 
 /// <summary>
 /// window Data Contract To pass between Client -Server
@@ -29,7 +30,9 @@ namespace VIS.DataContracts
         public string TableName { get; set; }
 
         public string WhereClause { get; set; }
-        public String SelectSQL { get; set; }
+        public List<string> Columns { get; set; }
+
+        public Ctx Ctx { get; set; } 
 
         public Dictionary<String, Object> RowData { get; set; }
         public Dictionary<String, Object> OldRowData { get; set; }
@@ -51,6 +54,10 @@ namespace VIS.DataContracts
         public int VerRecID { get; set; }
 
         public List<string> UnqFields { get; set; }
+
+        public int WindowNo { get; set; }
+
+        public string SelectSQL { get; set; }
     }
 
     public class WindowField
@@ -126,6 +133,8 @@ namespace VIS.DataContracts
         public List<JTable> Tables { get; set; }
         public Dictionary<string, Dictionary<object, string>> LookupDirect  { get;set; }
         public CardViewData CardViewTpl { get; set; }
+
+        public int RecordCount = 0;
     }
 
     public class RecordInfoIn

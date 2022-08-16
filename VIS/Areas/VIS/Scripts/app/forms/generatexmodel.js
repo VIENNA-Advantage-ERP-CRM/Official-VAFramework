@@ -144,18 +144,7 @@
             });
         }
 
-        //function getTable() {
-        //    try {
-        //        var strQuery = "select Name, AD_TABLE_ID,TableName from AD_TABLE order by name";
-        //        var dr = VIS.DB.executeReader(strQuery, null, null);
-        //        while (dr.read()) {
-        //            cmbAllTable.append("<option value='" + dr.getString(1) + "'>" + dr.getString(0) + '</option>');
-        //        }
-        //        dr.close();
-        //    }
-        //    catch (e) {
-        //    }
-        //}
+        
 
 
         // Get Table Name

@@ -319,6 +319,8 @@ namespace VIS.Models
             return obj;
         }
 
+       
+
         public Tree BindTree(Ctx _ctx, string treeType, int AD_Tree_ID, string isAllNodes, bool isSummary)
         {
             objVTree = new MTree(_ctx, AD_Tree_ID, true, false, null, isSummary);
@@ -1983,7 +1985,228 @@ namespace VIS.Models
             return "";
         }
 
+        public int GetTableId(string treeId)
+        {
+            string sql = "SELECT ad_table_id FROM ad_tree WHERE ad_tree_id=" + treeId;
+            int tblId = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            return tblId;
+        }
 
+        public string GetTableName(string table_id)
+        {
+            string sql = "SELECT tablename FROM ad_table WHERE ad_table_id=" + table_id;
+            string tblName = Util.GetValueOfString (DB.ExecuteScalar(sql));
+            return tblName;
+        }//var tree = " SELECT treetype FROM ad_tree WHERE ad_tree_id=" + $treeID;
+
+        public string GetTreeType(string treeId)
+        {
+            string sql = "SELECT treetype FROM ad_tree WHERE ad_tree_id=" + treeId;
+            string  treeType = Util.GetValueOfString(DB.ExecuteScalar(sql));
+            return treeType;
+        }
+
+        public int GetRecordCount(string tableName,string tableTreeName,string treeID)
+        {
+            string sql = "SELECT Count(*) as Count FROM " + tableName + " WHERE IsActive='Y' AND " + tableName + "_ID  IN (SELECT Node_ID FROM " + tableTreeName + " where AD_Tree_ID=" + treeID + ")";
+            sql = MRole.GetDefault(_ctx).AddAccessSQL(sql, tableName, true, false);
+            int tblName = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            return tblName;
+        }
+        
+        public List<int> GetNodeIds(string tableTreeName, string treeID)
+        {
+            List<int> lst = new List<int>();
+            string sql = "SELECT node_id  FROM " + tableTreeName + " WHERE isactive ='Y' AND AD_Tree_ID=" + treeID;
+            DataSet ds  = DB.ExecuteDataset(sql);
+            if (ds != null && ds.Tables[0] != null)
+            {
+                foreach(DataRow dr in ds.Tables[0].Rows)
+                {
+                    lst.Add(Util.GetValueOfInt(dr["node_id"]));
+                }
+            }
+            return lst;
+        }
+
+        public List<int> GetChildIDs(string treeID, string tbname, string delNodId)
+        {
+            var childsId = "SELECT tnp.node_id FROM " + tbname + " tnp WHERE  tnp.isactive='Y' AND tnp.ad_tree_id= " + treeID + "  AND tnp.parent_id = " + delNodId +
+
+           " UNION " +
+           "SELECT tnp.node_id FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
+             "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + treeID + " AND tnp.parent_id = " + delNodId + "  )" + " AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID +
+
+           " UNION " +
+           "SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.parent_id IN" +
+             "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.parent_id IN" +
+               "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + treeID + " AND tnp.parent_id = " + delNodId + " )  AND tnp.isactive='Y'  AND tnp.ad_tree_id=" + treeID + "   )  AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + " " +
+
+           " UNION " +
+           "SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.parent_id IN" +
+           "(SELECT tnp.node_id  FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
+               "(SELECT tnp.node_id FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
+           "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + treeID + " AND tnp.parent_id = " + delNodId + "   ) AND tnp.isactive='Y'  AND tnp.ad_tree_id=" + treeID + "   )  AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + " )" + "AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + "  AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + "    " +
+
+           " UNION " +
+           "SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.parent_id IN" +
+           "(SELECT tnp.node_id  FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
+               "(SELECT tnp.node_id  FROM " + tbname + " tnp   WHERE tnp.parent_id IN" +
+                   "(SELECT tnp.node_id  FROM " + tbname + " tnp  WHERE tnp.parent_id IN" +
+           "(SELECT tnp.node_id FROM " + tbname + " tnp WHERE tnp.isactive='Y' AND tnp.ad_tree_id= " + treeID + " AND tnp.parent_id = " + delNodId + "    ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + "  ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + " ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + " ) AND tnp.isactive='Y'  AND tnp.ad_tree_id= " + treeID + "  ";
+            List<int> lst = new List<int>();
+            
+            DataSet ds = DB.ExecuteDataset(childsId);
+            if (ds != null && ds.Tables[0] != null)
+            {
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    lst.Add(Util.GetValueOfInt(dr["node_id"]));
+                }
+            }
+            return lst;
+        }
+
+        public List<int> GetNodeIdsOfParent(string tbname, string parent_id, string treeId)
+        {
+            List<int> lst = new List<int>();
+            string sql = "SELECT node_id FROM " + tbname + " WHERE parent_id=" + parent_id + " AND IsActive='Y' AND ad_tree_id=" + treeId + "";
+            DataSet ds = DB.ExecuteDataset(sql);
+            if (ds != null && ds.Tables[0] != null)
+            {
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    lst.Add(Util.GetValueOfInt(dr["node_id"]));
+                }
+            }
+            return lst;
+        }
+
+        public int GetRestrictionCount(string tableTreeName, string treeID)
+        {
+            string sql = "SELECT Count(*) as Count FROM " + tableTreeName + " WHERE isactive ='Y' AND AD_Tree_ID=" + treeID;
+           // sql = MRole.GetDefault(_ctx).AddAccessSQL(sql, tableName, true, false);
+            int tblName = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            return tblName;
+        }
+
+        public bool IsRecordExists(string treeId)
+        {
+            var rolCheck = "SELECT count(*) FROM AD_Role WHERE ad_tree_menu_id=" + treeId;
+            var checkCount = Convert.ToInt32(DB.ExecuteScalar(rolCheck));
+            if (checkCount > 0)
+            {
+                return false;
+            }
+            else
+            {
+                var tenantCheck = "SELECT COUNT(*) FROM AD_ClientInfo WHERE ad_tree_menu_id=" + treeId;
+                var checktenant = Convert.ToInt32(DB.ExecuteScalar(tenantCheck));
+                if (checktenant > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public List<int> GetWindowMenuIds()
+        {
+            List<int> ids = new List<int>();
+           DataSet ds = DB.ExecuteDataset("SELECT ad_menu_id FROM AD_Menu WHERE ad_window_id IN(SELECT ad_window_id FROM ad_window WHERE name IN('Role', 'Tenant', 'Tree'))");
+            if (ds != null)
+            {
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    ids.Add(Util.GetValueOfInt(dr[0]));
+                }
+            }
+            return ids;
+        }
+
+        public List<int> GetFormMenuIds()
+        {
+            List<int> ids = new List<int>();
+            DataSet ds = DB.ExecuteDataset("SELECT ad_menu_id FROM AD_Menu WHERE ad_form_id IN (SELECT ad_form_id FROM ad_form WHERE name IN ('Tree Maintenance'))");
+            if (ds != null)
+            {
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    ids.Add(Util.GetValueOfInt(dr[0]));
+                }
+            }
+            return ids;
+        }
+
+        public List<string> GetNameByIds(string mids)
+        {
+            List<string> ids = new List<string>();
+            DataSet ds = DB.ExecuteDataset("SELECT name FROM ad_menu WHERE ad_menu_id IN(" + mids + ") ORDER BY upper(name)");
+            if (ds != null)
+            {
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    ids.Add(Util.GetValueOfString(dr[0]));
+                }
+            }
+            return ids;
+        }
+
+        public int GetSeqNo(string tblName, string treeId, string nodeId)
+        {
+            int seqNo = 0;
+            if (nodeId != "-1")
+            {
+                seqNo = Util.GetValueOfInt(DB.ExecuteScalar("SELECT seqno FROM " + tblName + "  WHERE AD_Tree_ID=" + treeId + " AND node_id=" + nodeId));
+            }
+            else
+            {
+                seqNo =  Util.GetValueOfInt(DB.ExecuteScalar("SELECT MAX(seqno) FROM " + tblName + " WHERE AD_Tree_ID=" + treeId));
+            }
+            return seqNo;
+        }
+        public int UpdateSeqNo(string tblName, string seqNo, string treeId,string nodeId,bool bySeqNo,bool isParent)
+        {
+            var increaseSqe = "";
+            if (bySeqNo)
+            {
+                increaseSqe = "update " + tblName + " set seqno=seqno+1,Updated=Sysdate,parent_ID=0 where seqno >=" + seqNo +
+                                            " AND (parent_id=0 or parent_id is null)  AND AD_Tree_ID=" + treeId;
+            }
+            else
+            {
+                if (isParent)
+                {
+                    increaseSqe = "update " + tblName + " set seqno=" + seqNo + ",parent_id=0,Updated=Sysdate  where node_id=" + nodeId +
+                                               "   AND AD_Tree_ID=" + treeId;
+                }
+                else
+                {
+                    increaseSqe = "update " + tblName + " set seqno=" + seqNo + " where node_id=" + nodeId +
+                                           " AND (parent_id=0 or parent_id is null) AND AD_Tree_ID=" + treeId;
+                }
+            }
+            return DB.ExecuteQuery(increaseSqe);
+        }
+
+        public int GetParentId(string tblName, string treeId, string nodeId)
+        {
+                return Util.GetValueOfInt(DB.ExecuteScalar("select parent_ID  from " + tblName + " WHERE NODE_ID=" + nodeId + " AND AD_Tree_ID=" + treeId + " AND IsActive='Y'"));
+        }
+
+        public int UpdateSeqNoParentId(string tblName, string pid, string seqNo, string treeId, string nodeId)
+        {
+
+            var sql = "UPDATE ";
+            sql += tblName + " SET Parent_ID=" + pid + ", SeqNo=" + seqNo + ", Updated=SysDate" +
+                            " WHERE AD_Tree_ID=" + treeId + " AND Node_ID=" + nodeId;
+            return DB.ExecuteQuery(sql);
+        }
+
+        public int GetWindowtId()
+        {
+            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Window_ID FROM AD_Window WHERE Name='Tree'"));
+        }
 
     }
 
