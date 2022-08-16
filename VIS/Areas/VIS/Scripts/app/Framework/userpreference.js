@@ -1638,8 +1638,7 @@
             }
             var sql = "";
 
-            AD_Role_ID = null;
-            AD_Client_ID = null;
+         
             $.ajax({
                 url: VIS.Application.contextUrl + "UserPreference/GetOrgData",
                 dataType: "json",
@@ -1655,6 +1654,8 @@
                     cmbOrgContent = null;
                     dic = null;
                     sql = null;
+                    AD_Role_ID = null;
+                    AD_Client_ID = null;
                     loadWH();
                 }
             });
@@ -1671,7 +1672,7 @@
             }
            
 
-            AD_Org_ID = null;
+           
 
             $.ajax({
                 url: VIS.Application.contextUrl + "UserPreference/GetWarehouseData",
@@ -1688,6 +1689,7 @@
                     cmbWHContent = null;
                     dic = null;
                     sql = null;
+                    AD_Org_ID = null;
                 }
             });
 
