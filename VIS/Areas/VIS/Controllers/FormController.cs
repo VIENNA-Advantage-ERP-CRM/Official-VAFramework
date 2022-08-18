@@ -320,7 +320,7 @@ namespace VIS.Controllers
         #endregion
 
         #region
-
+        [Obsolete("Use AccountForm controller's GetValidCombination")]
         [HttpPost]
         public JsonResult GetValidCombination(dynamic accountSchemaElements, dynamic Elements, dynamic aseList, string value, string sb)
         {
