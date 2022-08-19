@@ -100,7 +100,7 @@
             if (mWarehouseID != 0) {
                 msql = msql.concat(" AND NVL(l.M_Warehouse_ID,0) IN (0," + mWarehouseID + ")");
             }
-            mssql += " ORDER BY asi.GuaranteeDate, QtyOnHand DESC";	//	oldest, smallest first"
+            msql += " ORDER BY asi.GuaranteeDate, QtyOnHand DESC";	//	oldest, smallest first"
             //refresh();
             topdiv.append(chkShowAll);
             bottomdiv.append(btnCancel).append(btnOk);

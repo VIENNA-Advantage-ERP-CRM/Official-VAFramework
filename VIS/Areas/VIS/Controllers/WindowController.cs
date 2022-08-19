@@ -306,14 +306,14 @@ namespace VIS.Areas.VIS.Controllers
 
 
         [HttpPost]
-        public JsonResult GetWindowRecords(Ctx ctx, List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
+        public JsonResult GetWindowRecords(Ctx ctx, List<string> Columns, string TableName, string WhereClause, List<string> Encryptedfields, SqlParamsIn sqlIn, int AD_Window_ID,
             int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging)
         {
             object data = null;
             Ctx ctxp = new Ctx(ctx);
             using (var w = new WindowHelper())
             {
-                data = w.GetWindowRecords(ctxp, Columns, TableName, WhereClause, Fields, sqlIn, AD_Window_ID,
+                data = w.GetWindowRecords(ctxp, Columns, TableName, WhereClause, Encryptedfields, sqlIn, AD_Window_ID,
              AD_Tab_ID, WindowNo, AD_Table_ID, ObscureFields, summaryOnly, MaxRows, DoPaging);
             }
             var jsonResult =  Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
