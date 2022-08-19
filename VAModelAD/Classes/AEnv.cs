@@ -63,7 +63,7 @@ namespace VAdvantage.Classes
                 if (mWindowVO != null)
                 {
                     mWindowVO = mWindowVO.Clone(ctx,windowNo);
-                    log.Info("Cached=" + mWindowVO);
+                    //log.Info("Cached=" + mWindowVO);
                 }
             }
 

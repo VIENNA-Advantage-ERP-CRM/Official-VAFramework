@@ -114,7 +114,12 @@ namespace VAdvantage.Classes
             VLookUpInfo info = GetLookUpInfo(lookup, Column_ID,
                 Env.GetLanguage(ctx), columnName, AD_Reference_Value_ID, IsParent, ValidationCode);
             if (info == null)
-                throw new ArgumentException("MLookup.create - no LookupInfo");
+            {
+                s_log.Severe($"Lookup Not Created. ColumnName: {columnName}, ColumnID: { Column_ID}, ValidationCode: {ValidationCode}, ReferenceID: {AD_Reference_ID}");
+
+                //throw new ArgumentException("MLookup.create - no LookupInfo");
+                return null;
+            }
             return lookup.Initialize(info);
         }
 

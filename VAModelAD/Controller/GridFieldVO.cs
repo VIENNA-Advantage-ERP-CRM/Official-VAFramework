@@ -800,7 +800,7 @@ namespace VAdvantage.Controller
                 }
                 else
                 {
-                    if (displayType != DisplayType.List)
+                    //if (displayType != DisplayType.List)
                         displayType = DisplayType.ID;
                 }
             }
