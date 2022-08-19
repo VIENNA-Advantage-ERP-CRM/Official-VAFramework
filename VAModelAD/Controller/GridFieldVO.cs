@@ -140,7 +140,7 @@ namespace VAdvantage.Controller
                     else if (columnName.Equals("FIELDLENGTH"))
                     {
                         vo.FieldLength = Utility.Util.GetValueOfInt(dr[i]);
-                       var overWriteLength= Utility.Util.GetValueOfInt(dr["OVERWRITEFIELDLENGTH"]);
+                        var overWriteLength = Utility.Util.GetValueOfInt(dr["OVERWRITEFIELDLENGTH"]);
                         if (overWriteLength > 0)
                             vo.FieldLength = overWriteLength;
                     }
@@ -800,7 +800,8 @@ namespace VAdvantage.Controller
                 }
                 else
                 {
-                    displayType = DisplayType.ID;
+                    //if (displayType != DisplayType.List)
+                        displayType = DisplayType.ID;
                 }
             }
 

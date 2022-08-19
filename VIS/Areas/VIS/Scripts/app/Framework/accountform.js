@@ -1360,7 +1360,7 @@
                 //}
 
                 $.ajax({
-                    url: VIS.Application.contextUrl + "Form/GetValidCombination",
+                    url: VIS.Application.contextUrl + "AccountForm/GetValidCombination",
                     dataType: "json",
                     type: "POST",
                     async: false,

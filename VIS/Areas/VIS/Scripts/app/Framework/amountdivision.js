@@ -2523,7 +2523,8 @@
 			$.ajax({
 				url: VIS.Application.contextUrl + "AmountDivision/GetDiminsionType",
 				dataType: "json",
-				data: JSON.stringify({ "acctSchemaId": acctSchemaID, "allAcctIds": allAcctSchemaID}),// "{}",
+				//data: JSON.stringify({ "acctSchemaId": acctSchemaID, "allAcctIds": allAcctSchemaID}),// "{}",
+				data: "{}",
 				type: "POST",
 				error: function () {
 					alert(VIS.Msg.getMsg('ErrorWhileGettingData'));
@@ -2532,7 +2533,7 @@
 				},
 				success: function (data) {
 					var Sql = "";
-					var res = JSON.parse(data.dataType);
+					var res = JSON.parse(data);
 					if (res.Error) {
 						VIS.ADialog.error(res.Error);
 						busyDiv("hidden");

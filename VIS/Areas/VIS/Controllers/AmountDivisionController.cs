@@ -31,14 +31,14 @@ namespace VIS.Controllers
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [HttpPost]
-        public JsonResult GetDiminsionType(string acctSchemaId,List<string> allAcctIds)
+        public JsonResult GetDiminsionType()
         {
             Ctx ctx = Session["ctx"] as Ctx;
             var dtypes = model.GetDimensionType(ctx);
             //var eTypes = model.GetElementTypes(ctx,acctSchemaId, allAcctIds);
-            return Json(new { dataType = JsonConvert.SerializeObject(dtypes) },
-            JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(dtypes),JsonRequestBehavior.AllowGet);
         }
+
 
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]

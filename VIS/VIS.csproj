@@ -655,6 +655,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\infoscanform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\infowindow.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\ini.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\jquery-touch.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\locationform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\locatorform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\markmodule.js" />
@@ -743,6 +744,7 @@
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountController.cs" />
+    <Compile Include="Areas\VIS\Controllers\AccountFormController.cs" />
     <Compile Include="Areas\VIS\Controllers\AmountDivisionController.cs" />
     <Compile Include="Areas\VIS\Controllers\ArchiveViewerController.cs" />
     <Compile Include="Areas\VIS\Controllers\ASearchController.cs" />
@@ -772,6 +774,7 @@
     <Compile Include="Areas\VIS\Controllers\LoginController.cs" />
     <Compile Include="Areas\VIS\Controllers\LookupController.cs" />
     <Compile Include="Areas\VIS\Controllers\MarkModuleController.cs" />
+    <Compile Include="Areas\VIS\Controllers\MessageController.cs" />
     <Compile Include="Areas\VIS\Controllers\PAttributesController.cs" />
     <Compile Include="Areas\VIS\Controllers\RecordAccessController.cs" />
     <Compile Include="Areas\VIS\Controllers\ResourceController.cs" />

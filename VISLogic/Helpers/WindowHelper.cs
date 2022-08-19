@@ -1249,7 +1249,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST("+ inn.TableName + ".AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + inn.TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
                 }
             }
 
@@ -3611,6 +3611,10 @@ namespace VIS.Helpers
                 {
                     --sqlIn.page;
                 }
+            }
+            else {
+                sqlIn.pageSize = 0;
+                sqlIn.page = 0;
             }
 
 

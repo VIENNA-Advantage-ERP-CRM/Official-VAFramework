@@ -99,8 +99,8 @@
                     var crt;
                     var label;
                     var fieldorg = this.selectionfields[i];
-                    if (!fieldorg.getIsDisplayed())
-                        continue;
+                    //if (!fieldorg.getIsDisplayed())
+                    //    continue;
 
                     var field = {};
                     if (VIS.DisplayType.IsLookup(fieldorg.getDisplayType()) || VIS.DisplayType.ID == fieldorg.getDisplayType()) {
