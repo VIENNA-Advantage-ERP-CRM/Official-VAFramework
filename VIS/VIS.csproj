@@ -774,6 +774,7 @@
     <Compile Include="Areas\VIS\Controllers\LoginController.cs" />
     <Compile Include="Areas\VIS\Controllers\LookupController.cs" />
     <Compile Include="Areas\VIS\Controllers\MarkModuleController.cs" />
+    <Compile Include="Areas\VIS\Controllers\MessageController.cs" />
     <Compile Include="Areas\VIS\Controllers\PAttributesController.cs" />
     <Compile Include="Areas\VIS\Controllers\RecordAccessController.cs" />
     <Compile Include="Areas\VIS\Controllers\ResourceController.cs" />
