@@ -66,7 +66,6 @@ namespace VIS
                 "~/Areas/VIS/Scripts/app/secure-engine.js",
                 "~/Areas/VIS/Scripts/app/Framework/userpreference.js",
                 "~/Areas/VIS/Scripts/app/Framework/vimageform.js",
-                "~/Areas/VIS/Scripts/app/Framework/help.js",
                 "~/Areas/VIS/Scripts/app/Framework/ini.js",
                 "~/Areas/VIS/Scripts/app/Framework/locationform.js",
                 "~/Areas/VIS/Scripts/app/Framework/locatorform.js",
