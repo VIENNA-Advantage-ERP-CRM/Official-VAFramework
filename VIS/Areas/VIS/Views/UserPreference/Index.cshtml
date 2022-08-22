@@ -38,7 +38,7 @@
             <div class="VIS_Pref_pass-line">
                 <h4 class="VIS-Lavel-float">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang,"VIS_NewPassword")<span class="text-danger">*</span></h4>
                 <input id="@("txtNewPws_" + ViewBag.WindowNumber)" maxlength="60" class="VIS_Pref_pass" placeholder="@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_NewPassword")" type="password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
-                    name="pwd1" onchange="form.pwd2.pattern = this.value;">
+                    name="pwd1">
                 <div class="VIS_Pref_clear-both"></div>
             </div>
             <div class="VIS_Pref_pass-line">

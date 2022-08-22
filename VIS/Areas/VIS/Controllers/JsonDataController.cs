@@ -1111,6 +1111,9 @@ namespace VIS.Controllers
             //Ctx _ctx = null;//(ctx) as Ctx;
             MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
                 Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
+
+            if (res == null)
+                return null;
             lInfo = res._vInfo;
 
 

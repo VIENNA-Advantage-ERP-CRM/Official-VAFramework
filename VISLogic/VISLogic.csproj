@@ -108,6 +108,7 @@
     <Compile Include="Helpers\ShortcutHelper.cs" />
     <Compile Include="Helpers\SqlHelper.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
+    <Compile Include="Models\AccountFormModel.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AmountDivisionModel.cs" />
     <Compile Include="Models\ArchiveViewerModel.cs" />

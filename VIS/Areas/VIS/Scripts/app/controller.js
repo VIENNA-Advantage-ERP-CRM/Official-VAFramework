@@ -3880,6 +3880,10 @@
                 if (retObj.RecordCount > 0) {
                     that.rowCount = retObj.RecordCount;
                     that.isOpen = true;
+                    if (!that.dopaging || (that.pazeSize > that.rowCount)) {
+                        that.pazeSize = that.rowCount;
+                    }
+
                     //
                     that.changed = false;
                     that.rowChanged = -1;
