@@ -572,10 +572,10 @@
     };
 
     /**
-	 *  Lock User Interface
-	 *  Called from the process before processing
-	 *  @param pi process info
-	 */
+     *  Lock User Interface
+     *  Called from the process before processing
+     *  @param pi process info
+     */
 
 
 
@@ -585,10 +585,10 @@
     };
 
     /**
-	 *  Unlock User Interface.
-	 *  Called from the complete when processing is done
-	 *  @param pi process info
-	 */
+     *  Unlock User Interface.
+     *  Called from the complete when processing is done
+     *  @param pi process info
+     */
     AProcess.prototype.unlockUI = function (pi) {
         if (pi.logs && pi.logs.length > 0) {
             pi.logs = null;
@@ -619,17 +619,17 @@
     };
 
     /**
-	 *  Is the UI locked (Internal method)
-	 *  @return true, if UI is locked
-	 */
+     *  Is the UI locked (Internal method)
+     *  @return true, if UI is locked
+     */
     AProcess.prototype.getIsUILocked = function () {
         return this.isLocked;
     };
 
     /**
-	 *  clean up
-	 *  @return true, if UI is locked
-	 */
+     *  clean up
+     *  @return true, if UI is locked
+     */
     AProcess.prototype.dispose = function () {
         if (this.disposed)
             return;
@@ -764,799 +764,89 @@
 
 
 
-        function createControls(panel, repObj) {
+
+
+        function getExeProcessParameter(fileType) {
+            pctl.pi.setFileType(fileType);
             //Set Action Origin and Origin name
             pctl.pi.setActionOrigin(self.ActionOrigin);
             var orginName = VIS.context.getWindowContext(self.windowNo, "WindowName");
             if (!orginName)
                 orginName = "Menu";
             pctl.pi.setOriginName(orginName);
-            var AD_Table_ID = pctl.pi.get_AD_PrintFormat_Table_ID();
+            var data = { processInfo: pctl.pi.toJson(), parameterList: pctl.paraList }
+            return data;
+        };
 
-            canExport = VIS.MRole.getDefault().getIsCanExport(AD_Table_ID);
-            var checkName = [];
-            var count = -1;
-            otherPf = [];
-            var dr = null;
-            $.ajax({
-                type: 'Get',
-                async: false,
-                url: VIS.Application.contextUrl + "Form/GetPrintFormatDetails",
-                data: { AD_Table_ID: AD_Table_ID },
-                success: function (data) {
-                    dr = new VIS.DB.DataReader().toJson(data);
+        function executeProcess(params, callBack) {
+            VIS.dataContext.executeProcess(params, function (jsonStr) {
+                if (jsonStr.error != null) {
+                    pctl.pi.setSummary(jsonStr.error, true);
+                    pctl.unlock();
+                    pctl = null;
+                    return;
+                }
+                var json = JSON.parse(jsonStr.result);
+                if (json.IsError) {
+                    pctl.pi.setSummary(json.Message, true);
+                    pctl.unlock();
+                    pctl = null;
+                    return;
+                }
+                //return json;
+                callBack(json);
 
-                    try {
-                        while (dr.read()) {
-                            count = parseInt(count) + 1;
-                            var name = dr.getString(1);
-                            if (checkName.indexOf(name) > -1) {
-                                name = name + "_" + (parseInt(count) + 1);
-                            }
-                            var item = {};
-                            item.ID = VIS.Utility.Util.getValueOfInt(dr.get(0));
-                            item.Name = name;
-                            item.IsDefault = dr.getString(3);
-                            checkName.push(dr.getString(1));
-                            otherPf.push(item);
-                        }
-                        dr.close();
-                    }
-                    catch (e) { dr.close(); }
-                    dr = null;
-                },
             });
+        };
+        function manageRepTable(json, panel) {
+            try {
+                if (json.HTML) {
+                    panel.getRightInnerDiv().html(json.HTML);
 
-            applyIconCss();
-            //Create Custom Report ToolBar
-            overlay = $('<div>');
-            $cmbPages = $('<select class="vis-selectcsview-page">');
-            $menu = $("<ul class='vis-apanel-rb-ul'>");
-            if (self.cssForAll) {
-                btnSaveCsvAll = $("<li><a  title='" + VIS.Msg.getMsg("SaveAllRecordCsv") + "' class='vis vis-csv-all'></a></li>");
-                btnsavepdfall = $("<li><a  title='" + VIS.Msg.getMsg("SaveAllPagePdf") + "' class='vis vis-pdf-all'></a></li>");
-            }
-            else {
-                btnSaveCsvAll = $("<li><a  title='" + VIS.Msg.getMsg("SaveAllRecordCsv") + "' class='vis vis-csv-all'></a></li>");
-                btnsavepdfall = $("<li><a  title='" + VIS.Msg.getMsg("SaveAllPagePdf") + "' class='vis vis-pdf-all'></a></li>");
-            }
-            // toolbar = $("<div class='vis-report-header'>").append($('<h3 class="vis-report-tittle" style="float:left;padding-top: 10px;">').append(setTitle));
-            toolbar = $("<div class='vis-report-header vis-ad-print-process'>");
-
-            toolbar.append($('<div class="vis-ad-w-p-t-name vis-ad-process-header"><h5>' + self.parent.getName() + '</h5></div >'));
-
-            //if (self.toolbarColor) {
-            //    toolbar.css('background-color', self.toolbarColor);
-            //}
-
-
-
-            // btnClose = $('<a href="javascript:void(0)" class="vis-mainMenuIcons vis-icon-menuclose" style="float:right">');
-            btnClose = $('<div class="vis-icon-menuclose"><i class="vis vis-cross"></i></div >');
-            actionContainer = $('<div class="vis-report-top-icons">');
-            ulAction = $('<ul  class="vis-reporticonsulprint">');
-            btnRF = $("<li><a class='" + self.visRepformatIcons + "'></a></li>");
-
-            $menu.append($('<li data-id="-1">').append(VIS.Msg.getMsg('NewReport')));
-            overlay.append($menu);
-            ulAction.append(btnRF);
-
-            if (canExport) {
-                btnSaveCsv = $("<li><a title='" + VIS.Msg.getMsg("SaveCSVPage") + "' class='vis vis-save-csv'></a></li>");
-                ulAction.append(btnSaveCsv);
-            }
-
-            if (pctl.pi.getSupportPaging() && canExport) {
-                ulAction.append(btnSaveCsvAll);
-                for (var d = 1; d < pctl.pi.getTotalPages() + 1; d++) {
-                    $cmbPages.append($('<option value=' + d + '>' + d + '</option>'));
-                }
-                actionContainer.append($cmbPages);
-            }
-
-            if (canExport) {
-                btnSavePdf = $("<li><a title='" + VIS.Msg.getMsg("SavePDFDocumentPage") + "' class='vis vis-save-pdf'></a></li>");
-                ulAction.append(btnSavePdf);
-            }
-
-            if (pctl.pi.getSupportPaging() && canExport) {
-                ulAction.append(btnsavepdfall);
-            }
-            else {
-                btnSaveCsv.find('a').attr("title", VIS.Msg.getMsg("SaveCSV"));
-                btnSavePdf.find('a').attr("title", VIS.Msg.getMsg("SavePdf"));
-            }
-
-            if (VIS.context.ctx["#BULK_REPORT_DOWNLOAD"] == 'Y') {
-                btnSaveCsvAll.css('display', '');
-                btnsavepdfall.css('display', '');
-            }
-            else {
-                btnSaveCsvAll.css('display', 'none');
-                btnsavepdfall.css('display', 'none');
-            }
-
-            btnArchive = $("<li><a title='" + VIS.Msg.getMsg("Archive") + "'  class='vis vis-archive'></a></li>");
-            ulAction.append(btnArchive);
-            btnRequery = $("<li><a title='" + VIS.Msg.getMsg("Requery") + "'  class='vis vis-refresh'></a></li>");
-            ulAction.append(btnRequery);
-
-            btnCustomize = $("<li><a style='cursor:pointer;' class='vis vis-customize'></a></li>");
-            ulAction.append(btnCustomize);
-            btnPrint = $("<li><a style='cursor:pointer;' class='vis vis-print'></a></li>");
-            ulAction.append(btnPrint);
-
-            if (!repObj.HTML) {
-                btnPrint.css('display', 'none');
-                btnCustomize.css('display', 'none');
-                btnRF.css('display', 'none');
-            }
-            actionContainer.append(ulAction);
-            toolbar.append(actionContainer);
-            if (!self.hideclose) {
-                toolbar.append(btnClose);
-            }
-
-
-            if (self.splitUI) {
-                self.reportToolbar.removeClass('vis-processtoolpadd');
-                self.reportToolbar.empty().append(toolbar);
-                self.reportContainer.empty().append(panel.getRoot());
-                if (self.extrnalForm) {
-                    self.getContentTable().empty().append(self.reportContainer);
-                }
-            }
-            else {
-                self.parent.getContentGrid().append(toolbar).append(panel.getRoot());
-                panel.getRoot().css('width', $(window).width());
-            }
-        }
-
-        function handleEvents(panel, repObj) {
-            var cFrame = self.parent;
-            var ismobile = /ipad|iphone|ipod|mobile|android|blackberry|webos|windows phone/i.test(navigator.userAgent.toLowerCase());
-            btnClose.off("click");
-            btnRequery.off("click");
-            btnCustomize.off("click");
-            btnPrint.off('click');
-            btnRF.off('click');
-            $menu.off('click');
-            btnArchive.off('click');
-            btnClose.on('click', function () {
-                if (panel) {
-                    panel.dispose();
-                    panel = null;
-                }
-                if (cFrame) {
-                    cFrame.dispose();
-                    cFrame = null;
-                }
-                if (pctl.pi)
-                    pctl.pi.dispose();
-                pctl.pi = null;
-                ulAction.empty();
-
-                btnClose.off("click");
-                btnRequery.off("click");
-                btnCustomize.off("click");
-                btnPrint.off('click');
-                btnRF.off('click');
-                $menu.off('click');
-                btnClose = null;
-                actionContainer = null;
-                ulAction = null;
-                btnArchive = null;
-                btnRequery = null;
-
-                btnCustomize = null;
-                btnPrint = null;
-                btnSaveCsv = null;
-                btnSavePdf = null;
-                handleEvents = null;
-            });
-
-            function getExeProcessParameter(fileType) {
-                pctl.pi.setFileType(fileType);
-                //Set Action Origin and Origin name
-                pctl.pi.setActionOrigin(self.ActionOrigin);
-                var orginName = VIS.context.getWindowContext(self.windowNo, "WindowName");
-                if (!orginName)
-                    orginName = "Menu";
-                pctl.pi.setOriginName(orginName);
-                var data = { processInfo: pctl.pi.toJson(), parameterList: pctl.paraList }
-                return data;
-            };
-
-            function getExecuteReportforCsvPara(pageNo, PageSize) {
-                var orginName = pctl.pi.getOriginName();
-                if (!orginName)
-                    orginName = "Menu";
-                var data = {
-                    AD_Process_ID: pctl.pi.getAD_Process_ID(),
-                    Name: pctl.pi.getTitle(),
-                    AD_PInstance_ID: pctl.pi.getAD_PInstance_ID(),
-                    AD_Table_ID: pctl.pi.getTable_ID(),
-                    Record_ID: pctl.pi.getRecord_ID(),
-                    pageNumber: pageNo,
-                    page_Size: PageSize,
-                    saveAll: false,
-                    //Set Action Origin and Origin name
-                    ActionOrigin: pctl.pi.getActionOrigin(),
-                    OriginName: orginName
-                }
-                return data;
-            };
-
-            function getGenerateReportPara(queryInfo, code, isCreateNew, nodeID, treeID, showSummary) {
-                var data = {
-                    processInfo: pctl.pi.toJson(),
-                    queryInfo: JSON.stringify(queryInfo),
-                    code: code,
-                    isCreateNew: isCreateNew,
-                    treeID: treeID,
-                    node_ID: nodeID,
-                    IsSummary: showSummary
-                }
-                return data;
-            };
-
-            function getExecuteReportComposerData(AD_Process_ID, Name, AD_PInstance_ID, AD_Table_ID, Record_ID, pageNumber, page_Size, printAllPages) {
-                var orginName = pctl.pi.getOriginName();
-                if (!orginName)
-                    orginName = "Menu";
-                var data = {
-                    AD_Process_ID: AD_Process_ID,
-                    Name: Name,
-                    AD_PInstance_ID: AD_PInstance_ID,
-                    AD_Table_ID: AD_Table_ID,
-                    Record_ID: Record_ID,
-                    pageNumber: pageNumber,
-                    page_Size: page_Size,
-                    printAllPages: printAllPages,
-                    //Set Action Origin and Origin name
-                    ActionOrigin: pctl.pi.getActionOrigin(),
-                    OriginName: orginName
-
-                }
-
-                return data;
-            };
-
-            function executeProcess(params, callBack) {
-                VIS.dataContext.executeProcess(params, function (jsonStr) {
-                    if (jsonStr.error != null) {
-                        pctl.pi.setSummary(jsonStr.error, true);
-                        pctl.unlock();
-                        pctl = null;
-                        return;
-                    }
-                    var json = JSON.parse(jsonStr.result);
-                    if (json.IsError) {
-                        pctl.pi.setSummary(json.Message, true);
-                        pctl.unlock();
-                        pctl = null;
-                        return;
-                    }
-                    //return json;
-                    callBack(json);
-
-                });
-            };
-
-            function manageRepTable(json, panel) {
-                try {
-                    if (json.HTML) {
-                        panel.getRightInnerDiv().html(json.HTML);
-
-                        var tables = document.getElementsByClassName('vis-reptabledetect');
-                        if (tables.length > 0) {
-                            var tableWidth = 0;
-                            var tmp = 0;
-                            for (var i = 0, j = tables.length; i < j; i++) {
-                                tmp = $(tables[i]).width();
-                                if (tmp > tableWidth) tableWidth = tmp;
-                            }
-                            panel.getRightDiv().width($(window).width() - 10);
-                            panel.getRightDiv().css('min-width', $(window).width() + 'px');
-                            panel.getRightInnerDiv().width(tableWidth + 50);
+                    var tables = document.getElementsByClassName('vis-reptabledetect');
+                    if (tables.length > 0) {
+                        var tableWidth = 0;
+                        var tmp = 0;
+                        for (var i = 0, j = tables.length; i < j; i++) {
+                            tmp = $(tables[i]).width();
+                            if (tmp > tableWidth) tableWidth = tmp;
                         }
-                        panel.getRightInnerDiv().width(tableWidth);
+                        panel.getRightDiv().width($(window).width() - 10);
+                        panel.getRightDiv().css('min-width', $(window).width() + 'px');
+                        panel.getRightInnerDiv().width(tableWidth + 50);
                     }
-                    else if (json.ReportFilePath) {
-                        var $object = $("<iframe style = 'width:100%;height:99.4%;' pluginspage='http://www.adobe.com/products/acrobat/readstep2.html'>");
-                        $object.attr("src", VIS.Application.contextUrl + json.ReportFilePath);
-                        panel.getRightDiv().empty().append($object);
-                        self.reportPath = json.ReportFilePath;
-                    }
+                    panel.getRightInnerDiv().width(tableWidth);
                 }
-                catch (e) { }
-                panel.setBusy(false);
-            };
-
-            function loadedReportRendering(d, panel, pNoI, tp, bulkdownload) {
-                if (d.HTML && d.HTML.length > 0) { //report
-                    manageRepTable(d, panel);
+                else if (json.ReportFilePath) {
+                    var $object = $("<iframe style = 'width:100%;height:99.4%;' pluginspage='http://www.adobe.com/products/acrobat/readstep2.html'>");
+                    $object.attr("src", VIS.Application.contextUrl + json.ReportFilePath);
+                    panel.getRightDiv().empty().append($object);
+                    self.reportPath = json.ReportFilePath;
                 }
-                else {
-                    if (tp == 0) {
-                        window.open(VIS.Application.contextUrl + d.ReportFilePath);
-                        panel.setBusy(false);
-                    }
-                    else {
-                        bulkDownloadUI(tp, d.ReportFilePath, bulkdownload, d);
-                    }
-                }
-            };
+            }
+            catch (e) { }
+            panel.setBusy(false);
+        };
 
-            function bulkDownloadUI(totalPages, reportUrl, bulkdownload, d) {
-                bulkdownload.setBulkBusy(false);
-                $("#forreportdownload").addClass('hide');
-                formlinks += '<input type="checkbox" data-num="' + d + '"  data-url="' + VIS.Application.contextUrl + reportUrl + '" checked />';
-                pNoI += 1;
-                updateCreateBar(((pNoI / totalPages) * 100));
-                if (pNoI == totalPages) {
-                    setTimeout(function () {
-                        updateCreateBar(100);
-                        showCreateMessage(VIS.Msg.getMsg("Generated"));
-                        $('<form>', {
-                            'id': 'download_form',
-                            'html': formlinks,
-                            'action': '#',
-                            'Class': 'hide'
-                        }).appendTo(document.body).submit();
-                    }, 1000);
-                }
-            };
+        function loadReportData() {
+            panel.setBusy(true);
 
-            function loadDynamicReport(reportType, pageNo) {
-                var data = { processInfo: pctl.pi.toJson() };
-                $.ajax({
-                    url: VIS.Application.contextUrl + pctl.pi.dynamicAction,
-                    type: "Post",
-                    data: data,
-                    success: function (result) {
-                        var data = JSON.parse(result);
-
-                        if (ismobile || reportType != pctl.REPORT_TYPE_PDF) {
-                            window.open(VIS.Application.contextUrl + data);
-                        }
-                        else {
-                            var $object = $("<iframe style = 'width:100%;height:99.4%;' pluginspage='http://www.adobe.com/products/acrobat/readstep2.html'>");
-                            $object.attr("src", VIS.Application.contextUrl + data);
-                            panel.getRightDiv().empty().append($object);
-                            self.reportPath = data.ReportFilePath;
-                        }
-                        panel.setBusy(false);
-                        return data.ReportFilePath;
-                    }
-                });
-            };
-
-
-            function loadDynamicReportAll(d, bulkdownload, totalPages) {
-                pctl.pi.setPageNo(d);
-                var data = { processInfo: pctl.pi.toJson() };
-                $.ajax({
-                    url: VIS.Application.contextUrl + pctl.pi.dynamicAction,
-                    type: "Post",
-                    data: data,
-                    success: function (result) {
-                        result = JSON.parse(result);
-                        bulkDownloadUI(totalPages, result, bulkdownload, d);
-
-                        panel.setBusy(false);
-                    }
-                });
-            };
-
-
-            btnRequery.on('click', function () {
-                panel.setBusy(true);
-                panel.getRightInnerDiv().html("");
-                panel.getRightInnerDiv().width(0);
+            window.setTimeout(function () {
 
                 if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
-                    loadDynamicReport(pctl.REPORT_TYPE_PDF, $cmbPages.val());
+                    loadDynamicReport(pctl.REPORT_TYPE_PDF, pctl.pi.getPageNo());
                 }
                 else {
-                    loadReportData();
-                }
-            });
-            btnCustomize.on('click', function () {
-                var zoomQuery = new VIS.Query();
-                zoomQuery.addRestriction("AD_PrintFormat_ID", VIS.Query.prototype.EQUAL, pctl.pi.AD_PrintFormat_ID);
-                VIS.viewManager.startWindow(240, zoomQuery);
-            });
-            btnPrint.on('click', function () {
-                if (panel.getIsHtmlReport()) {
-                    var mywindow = window.open();
-                    mywindow.document.write('<html><head>');
-                    mywindow.document.write('</head><body >');
-                    mywindow.document.write(panel.getHtml());
-                    mywindow.document.write('</body></html>');
-                    mywindow.print();
-                    mywindow.close();
-                }
-            });
-            if (canExport) {
-                btnSaveCsv.on('click', function () {
-                    pctl.pi.setFileType("C");
-                    if (pctl.pi.getPageNo() == 1) {
-                        panel.setBusy(true);
-                        executeProcess(getExeProcessParameter(pctl.REPORT_TYPE_CSV), function (json) {
-                            window.open(VIS.Application.contextUrl + json.ReportFilePath);
-                            panel.setBusy(false);
-                        });
-                    }
-                    else {
-                        panel.setBusy(true);
-
-                        window.setTimeout(function () {
-
-                            if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
-                                loadDynamicReport(pctl.REPORT_TYPE_CSV, pctl.pi.getPageNo());
-                            }
-                            else {
-
-                                if (pctl.pi.GetAD_ReportView_ID() > 0) {
-                                    getCsv($cmbPages.val(), 0, null);
-                                }
-                                else if (pctl.pi.getIsJasperReport()) {
-                                    getJasperReport("C", pctl.pi.getPageNo());
-                                }
-                                else {
-                                    pageNo = $cmbPages.val();
-                                    var data = getExecuteReportforCsvPara(pageNo, pctl.pi.getPageSize());
-                                    $.ajax({
-                                        url: VIS.Application.contextUrl + "ReportCom/ExecuteReportforCsv",
-                                        type: "Post",
-                                        data: data,
-                                        success: function (result) {
-                                            var data = JSON.parse(result);
-                                            window.open(VIS.Application.contextUrl + "TempDownload/" + data);
-                                            panel.setBusy(false);
-                                        }
-                                    });
-                                }
-                            }
-                        }, 100);
-                    }
-                });
-
-
-                btnSavePdf.on('click', function () {
-                    ////var getCurrentThis = $(this);
-                    pctl.pi.setFileType(pctl.REPORT_TYPE_PDF);
-                    if (pctl.pi.getPageNo() == 1) {
-                        panel.setBusy(true);
-
-                        executeProcess(getExeProcessParameter(pctl.REPORT_TYPE_PDF), function (json) {
-                            manageRepTable(json, panel);
-                        });
-                    }
-                    else {
-                        loadReportData();
-
-                    }
-                });
-
-                function loadReportData() {
-                    panel.setBusy(true);
-
-                    window.setTimeout(function () {
-
-                        if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
-                            loadDynamicReport(pctl.REPORT_TYPE_PDF, pctl.pi.getPageNo());
-                        }
-                        else {
-                            if (pctl.pi.GetAD_ReportView_ID() > 0) {
-                                getReportData(pctl.pi.getPageNo(), 0, null);
-                            }
-                            else if (pctl.pi.getIsJasperReport()) {
-                                getJasperReport(pctl.REPORT_TYPE_PDF, pctl.pi.getPageNo());
-                            }
-                            else if (pctl.pi.getIsReportFormat()) {
-                                // pageNo = $cmbPages.val();
-
-                                var data = getExecuteReportComposerData(pctl.pi.getAD_Process_ID(), pctl.pi.getTitle(), pctl.pi.getAD_PInstance_ID(), pctl.pi.getTable_ID(), pctl.pi.getRecord_ID(), pctl.pi.getPageNo(), pctl.pi.getPageSize(), false);
-
-
-                                $.ajax({
-                                    url: VIS.Application.contextUrl + "ReportCom/ExecuteReport",
-                                    type: "Post",
-                                    data: data,
-                                    success: function (result) {
-                                        var data = JSON.parse(result);
-                                        if (ismobile) {
-                                            window.open(VIS.Application.contextUrl + data);
-                                        }
-                                        else {
-                                            var $object = $("<iframe style = 'width:100%;height:99.4%;' pluginspage='http://www.adobe.com/products/acrobat/readstep2.html'>");
-                                            $object.attr("src", VIS.Application.contextUrl + data);
-                                            panel.getRightDiv().empty().append($object);
-                                        }
-                                        self.reportPath = data;
-                                        //  window.open(VIS.Application.contextUrl + data);
-                                        panel.setBusy(false);
-                                    }
-                                });
-                            }
-                            else {
-                                executeProcess(getExeProcessParameter(pctl.REPORT_TYPE_PDF), function (json) {
-                                    manageRepTable(json, panel);
-                                });
-                            }
-                        }
-                    }, 200);
-                };
-
-                $cmbPages.on("change", function () {
-                    pageNo = $cmbPages.val();
-
                     if (pctl.pi.GetAD_ReportView_ID() > 0) {
-                        panel.setBusy(true);
-                        var queryInfo = [];
-                        pctl.pi.setPageNo(pageNo);
-
-                        var rquery = new VIS.Query(pctl.pi.getPrintFormatTableName());
-
-                        if (pctl.pi.getPrintFormatTableName()) {
-                            queryInfo.push(rquery.getTableName());
-                            queryInfo.push(rquery.getWhereClause(true));
-                        }
-
-                        var paramData = getGenerateReportPara(queryInfo, "", false, 0, 0, false);
-
-                        $.ajax({
-                            url: VIS.Application.contextUrl + "JsonData/GenerateReport/",
-                            dataType: "json",
-                            type: 'POST',
-                            data: paramData,
-                            success: function (jsonStr) {
-
-                                var json = jQuery.parseJSON(jsonStr);
-                                if (json.IsError) {
-                                    pctl.pi.setSummary(json.Message, true);
-                                    pctl.unlock();
-                                    pctl = null;
-                                    return;
-                                }
-
-                                manageRepTable(json.repInfo, panel);
-                                self.reportPath = json.repInfo.ReportFilePath;
-                            }
-                        });
+                        getReportData(pctl.pi.getPageNo(), 0, null);
                     }
-                    else {
-                        pctl.pi.setPageNo(pageNo);
+                    else if (pctl.pi.getIsJasperReport()) {
+                        getJasperReport(pctl.REPORT_TYPE_PDF, pctl.pi.getPageNo());
                     }
+                    else if (pctl.pi.getIsReportFormat()) {
+                        // pageNo = $cmbPages.val();
 
-                });
-                function getJasperReport(rptExportType, rptPageNo) {
-                    pctl.pi.setFileType(rptExportType);
-                    var data = { processInfo: pctl.pi.toJson() };
-
-                    $.ajax({
-                        url: VIS.Application.contextUrl + "JasperReport/ExecuteReport",
-                        type: "Post",
-                        data: data,
-                        success: function (result) {
-                            var data = JSON.parse(result);
-                            if (ismobile) {
-                                window.open(VIS.Application.contextUrl + data);
-                            }
-                            else {
-                                if (rptExportType == pctl.REPORT_TYPE_PDF) {
-                                    var $object = $("<iframe style = 'width:100%;height:99.4%;' pluginspage='http://www.adobe.com/products/acrobat/readstep2.html'>");
-                                    $object.attr("src", VIS.Application.contextUrl + data);
-                                    panel.getRightDiv().empty().append($object);
-                                }
-                                else {
-                                    window.open(VIS.Application.contextUrl + data);
-
-                                }
-                                self.reportPath = data;
-                            }
-                            panel.setBusy(false);
-                        }
-                    });
-                };
-
-                function getJasperReportAll(d, totalPages, bulkdownload) {
-                    var reportUrl = "";
-                    pctl.pi.setPageNo(d);
-                    var data = { processInfo: pctl.pi.toJson() };
-
-                    $.ajax({
-                        url: VIS.Application.contextUrl + "JasperReport/ExecuteReport",
-                        type: "Post",
-                        data: data,
-                        success: function (result) {
-                            result = JSON.parse(result);
-                            bulkDownloadUI(totalPages, result, bulkdownload, d);
-
-                            panel.setBusy(false);
-                        }
-                    });
-                };
-
-
-
-
-
-                btnSaveCsvAll.on("click", function () {
-                    panel.setBusy(true);
-                    pNoI = 0;
-                    formlinks = '';
-                    pctl.pi.setFileType("C");
-                    window.setTimeout(function () {
-                        var formlinks = '';
-                        var bulkdownload = new VIS.BulkDownload(self.windowNo, 'CSV');
-                        bulkdownload.onClose = function () { };
-                        bulkdownload.show();
-                        if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
-                            for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
-                                loadDynamicReportAll(d, bulkdownload, pctl.pi.getTotalPages());
-                            }
-                        }
-                        else {
-                            if (pctl.pi.GetAD_ReportView_ID() > 0) {
-                                for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
-                                    getCsv(d, pctl.pi.getTotalPages(), bulkdownload);
-                                }
-                            }
-                            else if (pctl.pi.getIsJasperReport()) {
-                                for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
-                                    getJasperReportAll(d, pctl.pi.getTotalPages(), bulkdownload);
-                                }
-                            }
-                            else {
-                                for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
-                                    getAllCSV(d, bulkdownload, pctl.pi.getTotalPages());
-                                }
-                            }
-                        }
-                        pctl.pi.setPageNo($cmbPages.val());
-                    }, 100);
-                });
-
-                function getAllCSV(d, bulkdownload, totalPages) {
-                    var reportUrl = "";
-                    if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
-                        reportUrl = loadDynamicReport(pctl.REPORT_TYPE_CSV, d);
-                    }
-                    else {
-                        var data = getExecuteReportforCsvPara(d, pctl.pi.getPageSize());
-                        $.ajax({
-                            url: VIS.Application.contextUrl + "ReportCom/ExecuteReportforCsv",
-                            type: "Post",
-                            data: data,
-                            success: function (result) {
-                                var reportUrl = JSON.parse(result);
-
-                                reportUrl = "TempDownload/" + reportUrl;
-                                bulkDownloadUI(totalPages, reportUrl, bulkdownload, d);
-
-                                panel.setBusy(false);
-                            }
-                        });
-                    }
-
-                };
-
-                var getReportData = function (pNoI, tP, bulkdownload) {
-
-                    var queryInfo = [];
-                    var query = new VIS.Query(pctl.pi.getPrintFormatTableName());
-                    queryInfo.push(query.getTableName());
-                    queryInfo.push(query.getWhereClause(true));
-
-                    var paramData = getGenerateReportPara(queryInfo, "", false, 0, 0, false);
-
-                    $.ajax({
-                        url: VIS.Application.contextUrl + "JsonData/GenerateReport/",
-                        dataType: "json",
-                        data: paramData,
-                        type: 'POST',
-                        success: function (data) {
-                            if (data == null) {
-                                VIS.ADialog.error('ERRORGettingRepData');
-                            }
-                            var dres = jQuery.parseJSON(data);
-                            var d = dres.repInfo;
-                            if (d.ErrorText) {
-                                VIS.ADialog.error(d.ErrorText);
-                                panel.setBusy(true);
-                                return;
-                            }
-
-                            loadedReportRendering(d, panel, pNoI, tP, bulkdownload);
-
-                            panel.setBusy(false);
-                            self.reportPath = d.ReportFilePath;
-                        }
-                    });
-                };
-
-                var getCsv = function (pNoI, tP, bulkdownload) {
-                    var queryInfo = [];
-                    var query = new VIS.Query(pctl.pi.getPrintFormatTableName());
-                    queryInfo.push(query.getTableName());
-                    queryInfo.push(query.getWhereClause(true));
-
-                    var paramData = getGenerateReportPara(queryInfo, "", false, 0, 0, false);
-
-
-                    $.ajax({
-                        url: VIS.Application.contextUrl + "JsonData/GenerateReport/",
-                        dataType: "json",
-                        data: paramData,
-                        type: 'POST',
-                        success: function (data) {
-                            if (data == null) {
-                                VIS.ADialog.error('ERRORGettingRepData');
-                            }
-                            var dres = jQuery.parseJSON(data);
-                            var d = dres.repInfo;
-                            if (d.ErrorText) {
-                                VIS.ADialog.error(d.ErrorText);
-                                setBusy(false);
-                                return;
-                            }
-
-                            loadedReportRendering(d, panel, pNoI, tP, bulkdownload);
-                            self.reportPath = d.ReportFilePath;
-                            panel.setBusy(false);
-                        }
-                    });
-                };
-                btnsavepdfall.on("click", function () {
-                    panel.setBusy(true);
-                    pNoI = 0;
-                    formlinks = '';
-                    pctl.pi.setFileType(pctl.REPORT_TYPE_PDF);
-                    window.setTimeout(function () {
-
-                        var formlinks = '';
-                        var bulkdownload = new VIS.BulkDownload(self.windowNo, 'PDF');
-                        bulkdownload.onClose = function () { };
-                        bulkdownload.show();
-
-                        if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
-                            for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
-                                loadDynamicReportAll(d, bulkdownload, pctl.pi.getTotalPages());
-                            }
-                        }
-                        else {
-                            if (pctl.pi.GetAD_ReportView_ID() > 0) {
-
-                                for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
-                                    getReportData(d, pctl.pi.getTotalPages(), bulkdownload);
-                                }
-
-                            }
-                            else if (pctl.pi.getIsJasperReport()) {
-                                for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
-                                    getJasperReportAll(d, pctl.pi.getTotalPages(), bulkdownload);
-                                }
-                            }
-                            else {
-                                for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
-                                    savePDFAll(d, bulkdownload, pctl.pi.getTotalPages());
-                                }
-                            }
-                        }
-                        pctl.pi.setPageNo($cmbPages.val());
-                    }, 100);
-                });
-                var pNoI = 0;
-                function savePDFAll(d, bulkdownload, totalPages) {
-                    var reportUrl = "";
-                    if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
-                        reportUrl = loadDynamicReportAll(pctl.REPORT_TYPE_CSV, d);
-                    }
-                    else {
-                        var data = getExecuteReportComposerData(pctl.pi.getAD_Process_ID(), pctl.pi.getTitle(), pctl.pi.getAD_PInstance_ID(), pctl.pi.getTable_ID(), pctl.pi.getRecord_ID(), d, pctl.pi.getPageSize(), false);
+                        var data = getExecuteReportComposerData(pctl.pi.getAD_Process_ID(), pctl.pi.getTitle(), pctl.pi.getAD_PInstance_ID(), pctl.pi.getTable_ID(), pctl.pi.getRecord_ID(), pctl.pi.getPageNo(), pctl.pi.getPageSize(), false);
 
 
                         $.ajax({
@@ -1564,143 +854,28 @@
                             type: "Post",
                             data: data,
                             success: function (result) {
-                                var reportUrl = JSON.parse(result);
-                                bulkDownloadUI(totalPages, reportUrl, bulkdownload, d);
-                                self.reportPath = reportUrl;
+                                var data = JSON.parse(result);
+                                if (ismobile) {
+                                    window.open(VIS.Application.contextUrl + data);
+                                }
+                                else {
+                                    var $object = $("<iframe style = 'width:100%;height:99.4%;' pluginspage='http://www.adobe.com/products/acrobat/readstep2.html'>");
+                                    $object.attr("src", VIS.Application.contextUrl + data);
+                                    panel.getRightDiv().empty().append($object);
+                                }
+                                self.reportPath = data;
+                                //  window.open(VIS.Application.contextUrl + data);
                                 panel.setBusy(false);
                             }
                         });
                     }
-
-                };
-
-                var download = function () {
-                    for (var i = 0; i < arguments.length; i++) {
-                        var iframe = $('<iframe style="visibility: collapse;"></iframe>');
-                        $('body').append(iframe);
-                        var content = iframe[0].contentDocument;
-                        var form = '<form action="' + arguments[i] + '" method="GET"></form>';
-                        content.write(form);
-                        $('form', content).submit();
-                        setTimeout((function (iframe) {
-                            return function () {
-                                iframe.remove();
-                            }
-                        })(iframe), 2000);
+                    else {
+                        executeProcess(getExeProcessParameter(pctl.REPORT_TYPE_PDF), function (json) {
+                            manageRepTable(json, panel);
+                        });
                     }
                 }
-                var formlinks = '';
-                function updateCreateBar(percent) {
-                    var currpercent = $('#reportcreate').find(".progress-bar").width() * 100 / $('#reportcreate').width();
-                    if (isNaN(currpercent)) currpercent = 0;
-                    if (currpercent <= percent) {
-                        $("#reportcreate").removeClass("hide")
-                            .find(".progress-bar")
-                            .attr("aria-valuenow", percent)
-                            .css({
-                                width: percent + "%"
-                            }).text(percent.toFixed(0) + "%");;
-                    }
-                }
-                function resetCreateMessage() {
-                    $("#reportcreateresult")
-                        .removeClass()
-                        .text("");
-                }
-                function showCreateMessage(text) {
-                    resetCreateMessage();
-                    $("#reportcreateresult")
-                        .addClass("alert alert-success")
-                        .text(text);
-                    $("#forreportdownload").removeClass('hide');
-                }
-                function showCreateError(text) {
-                    resetCreateMessage();
-                    $("#reportcreateresult")
-                        .addClass("alert alert-danger")
-                        .text(text);
-                }
-            }
-            btnRF.on('click', function () {
-                $menu.empty();
-                for (var i = 0; i < otherPf.length; i++) {
-                    var className = otherPf[i].IsDefault == "Y" ? "vis-mainfavitem" : "vis-mainnonfavitem";
-                    var ulItem = $('<li><a data-isdefbtn="no" data-id="' + otherPf[i].ID + '">' + otherPf[i].Name + '</a></li>');
-                    $menu.append(ulItem);
-                }
-                $menu.append($('<li><a data-id="-1">' + VIS.Msg.getMsg('NewReport') + '</a>'));
-                $(this).w2overlay(overlay.clone(true), { css: { height: '300px' } });
-            });
-            $menu.on('click', "LI", function (e) {
-
-                panel.setBusy(true);
-
-                var btn = $(e.target);
-                var id = btn.data("id");
-                if (btn.data("isdefbtn") == "yes") {
-
-                    var sqlQry = "VIS_76";
-                    var param = [];
-                    param[0] = new VIS.DB.SqlParam("@tableID", pctl.pi.Ad_Table_ID);
-                    param[1] = new VIS.DB.SqlParam("@tabID", curTab.getAD_Tab_ID());
-                    executeQuery(sql, param);
-
-                    var sqlQry = "VIS_77";
-                    var param = [];
-                    param[0] = new VIS.DB.SqlParam("@printForamt", id);
-                    executeQuery(sql, param);
-
-
-                    for (var i = 0; i < otherPf.length; i++) {
-                        if (otherPf[i].ID == id) {
-                            otherPf[i].IsDefault = "Y";
-                        }
-                        else {
-                            otherPf[i].IsDefault = "N";
-                        }
-                    }
-                    return;
-                }
-                AD_PrintFormat_ID = id;
-                var isCreateNew = false;
-                if (id == -1) {
-                    id = pctl.pi.get_AD_PrintFormat_Table_ID;
-                    isCreateNew = true;
-                }
-                var queryInfo = [];
-                var query = new VIS.Query(pctl.pi.getPrintFormatTableName());
-                queryInfo.push(query.getTableName());
-                queryInfo.push(query.getWhereClause(true));
-
-                var paramData = getGenerateReportPara(queryInfo, query.getCode(0), false0, 0, false);
-
-
-                $.ajax({
-                    url: VIS.Application.contextUrl + "JsonData/GenerateReport/",
-                    dataType: "json",
-                    data: paramData,
-                    type: 'POST',
-                    success: function (jsonStr) {
-
-                        var json = jQuery.parseJSON(jsonStr);
-                        if (json.IsError) {
-                            pctl.pi.setSummary(json.Message, true);
-                            pctl.unlock();
-                            pctl = null;
-                            return;
-                        }
-                        manageRepTable(json.repInfo, panel);
-
-                        self.reportPath = json.repInfo.ReportFilePath;
-                    }
-                });
-
-            });
-            btnArchive.on('click', function () {
-                self.archiveDocument(panel, pctl);
-
-            });
-
+            }, 200);
         };
 
         function applyIconCss() {
@@ -1761,8 +936,841 @@
             }
         }
 
-        createControls(panel, repObj);
-        handleEvents(panel, repObj);
+        //function createControls(panel, repObj) {
+        //Set Action Origin and Origin name
+        pctl.pi.setActionOrigin(self.ActionOrigin);
+        var orginName = VIS.context.getWindowContext(self.windowNo, "WindowName");
+        if (!orginName)
+            orginName = "Menu";
+        pctl.pi.setOriginName(orginName);
+        var AD_Table_ID = pctl.pi.get_AD_PrintFormat_Table_ID();
+
+        canExport = VIS.MRole.getDefault().getIsCanExport(AD_Table_ID);
+        var checkName = [];
+        var count = -1;
+        otherPf = [];
+        var dr = null;
+        $.ajax({
+            type: 'Get',
+            async: false,
+            url: VIS.Application.contextUrl + "Form/GetPrintFormatDetails",
+            data: { AD_Table_ID: AD_Table_ID },
+            success: function (data) {
+                dr = new VIS.DB.DataReader().toJson(data);
+
+                try {
+                    while (dr.read()) {
+                        count = parseInt(count) + 1;
+                        var name = dr.getString(1);
+                        if (checkName.indexOf(name) > -1) {
+                            name = name + "_" + (parseInt(count) + 1);
+                        }
+                        var item = {};
+                        item.ID = VIS.Utility.Util.getValueOfInt(dr.get(0));
+                        item.Name = name;
+                        item.IsDefault = dr.getString(3);
+                        checkName.push(dr.getString(1));
+                        otherPf.push(item);
+                    }
+                    dr.close();
+                }
+                catch (e) { dr.close(); }
+                dr = null;
+            },
+        });
+
+        applyIconCss();
+        //Create Custom Report ToolBar
+        overlay = $('<div>');
+        $cmbPages = $('<select class="vis-selectcsview-page">');
+        $menu = $("<ul class='vis-apanel-rb-ul'>");
+        if (self.cssForAll) {
+            btnSaveCsvAll = $("<li><a  title='" + VIS.Msg.getMsg("SaveAllRecordCsv") + "' class='vis vis-csv-all'></a></li>");
+            btnsavepdfall = $("<li><a  title='" + VIS.Msg.getMsg("SaveAllPagePdf") + "' class='vis vis-pdf-all'></a></li>");
+        }
+        else {
+            btnSaveCsvAll = $("<li><a  title='" + VIS.Msg.getMsg("SaveAllRecordCsv") + "' class='vis vis-csv-all'></a></li>");
+            btnsavepdfall = $("<li><a  title='" + VIS.Msg.getMsg("SaveAllPagePdf") + "' class='vis vis-pdf-all'></a></li>");
+        }
+        // toolbar = $("<div class='vis-report-header'>").append($('<h3 class="vis-report-tittle" style="float:left;padding-top: 10px;">').append(setTitle));
+        toolbar = $("<div class='vis-report-header vis-ad-print-process'>");
+
+        toolbar.append($('<div class="vis-ad-w-p-t-name vis-ad-process-header"><h5>' + self.parent.getName() + '</h5></div >'));
+
+        //if (self.toolbarColor) {
+        //    toolbar.css('background-color', self.toolbarColor);
+        //}
+
+
+
+        // btnClose = $('<a href="javascript:void(0)" class="vis-mainMenuIcons vis-icon-menuclose" style="float:right">');
+        btnClose = $('<div class="vis-icon-menuclose"><i class="vis vis-cross"></i></div >');
+        actionContainer = $('<div class="vis-report-top-icons">');
+        ulAction = $('<ul  class="vis-reporticonsulprint">');
+        btnRF = $("<li><a class='" + self.visRepformatIcons + "'></a></li>");
+
+        $menu.append($('<li data-id="-1">').append(VIS.Msg.getMsg('NewReport')));
+        overlay.append($menu);
+        ulAction.append(btnRF);
+
+        if (canExport) {
+            btnSaveCsv = $("<li><a title='" + VIS.Msg.getMsg("SaveCSVPage") + "' class='vis vis-save-csv'></a></li>");
+            ulAction.append(btnSaveCsv);
+        }
+
+        if (pctl.pi.getSupportPaging() && canExport) {
+            ulAction.append(btnSaveCsvAll);
+            for (var d = 1; d < pctl.pi.getTotalPages() + 1; d++) {
+                $cmbPages.append($('<option value=' + d + '>' + d + '</option>'));
+            }
+            actionContainer.append($cmbPages);
+        }
+
+        if (canExport) {
+            btnSavePdf = $("<li><a title='" + VIS.Msg.getMsg("SavePDFDocumentPage") + "' class='vis vis-save-pdf'></a></li>");
+            ulAction.append(btnSavePdf);
+        }
+
+        if (pctl.pi.getSupportPaging() && canExport) {
+            ulAction.append(btnsavepdfall);
+        }
+        else {
+            btnSaveCsv.find('a').attr("title", VIS.Msg.getMsg("SaveCSV"));
+            btnSavePdf.find('a').attr("title", VIS.Msg.getMsg("SavePdf"));
+        }
+
+        if (VIS.context.ctx["#BULK_REPORT_DOWNLOAD"] == 'Y') {
+            btnSaveCsvAll.css('display', '');
+            btnsavepdfall.css('display', '');
+        }
+        else {
+            btnSaveCsvAll.css('display', 'none');
+            btnsavepdfall.css('display', 'none');
+        }
+
+        btnArchive = $("<li><a title='" + VIS.Msg.getMsg("Archive") + "'  class='vis vis-archive'></a></li>");
+        ulAction.append(btnArchive);
+        btnRequery = $("<li><a title='" + VIS.Msg.getMsg("Requery") + "'  class='vis vis-refresh'></a></li>");
+        ulAction.append(btnRequery);
+
+        btnCustomize = $("<li><a style='cursor:pointer;' class='vis vis-customize'></a></li>");
+        ulAction.append(btnCustomize);
+        btnPrint = $("<li><a style='cursor:pointer;' class='vis vis-print'></a></li>");
+        ulAction.append(btnPrint);
+
+        if (!repObj.HTML) {
+            btnPrint.css('display', 'none');
+            btnCustomize.css('display', 'none');
+            btnRF.css('display', 'none');
+        }
+        actionContainer.append(ulAction);
+        toolbar.append(actionContainer);
+        if (!self.hideclose) {
+            toolbar.append(btnClose);
+        }
+
+
+        if (self.splitUI) {
+            self.reportToolbar.removeClass('vis-processtoolpadd');
+            self.reportToolbar.empty().append(toolbar);
+            self.reportContainer.empty().append(panel.getRoot());
+            if (self.extrnalForm) {
+                self.getContentTable().empty().append(self.reportContainer);
+            }
+        }
+        else {
+            self.parent.getContentGrid().append(toolbar).append(panel.getRoot());
+            panel.getRoot().css('width', $(window).width());
+        }
+
+        var cFrame = self.parent;
+        var ismobile = /ipad|iphone|ipod|mobile|android|blackberry|webos|windows phone/i.test(navigator.userAgent.toLowerCase());
+        btnClose.off("click");
+        btnRequery.off("click");
+        btnCustomize.off("click");
+        btnPrint.off('click');
+        btnRF.off('click');
+        $menu.off('click');
+        btnArchive.off('click');
+        btnClose.on('click', function () {
+            if (panel) {
+                panel.dispose();
+                panel = null;
+            }
+            if (cFrame) {
+                cFrame.dispose();
+                cFrame = null;
+            }
+            if (pctl.pi)
+                pctl.pi.dispose();
+            pctl.pi = null;
+            ulAction.empty();
+
+            btnClose.off("click");
+            btnRequery.off("click");
+            btnCustomize.off("click");
+            btnPrint.off('click');
+            btnRF.off('click');
+            $menu.off('click');
+            btnClose = null;
+            actionContainer = null;
+            ulAction = null;
+            btnArchive = null;
+            btnRequery = null;
+
+            btnCustomize = null;
+            btnPrint = null;
+            btnSaveCsv = null;
+            btnSavePdf = null;
+            handleEvents = null;
+        });
+
+
+
+        function getExecuteReportforCsvPara(pageNo, PageSize) {
+            var orginName = pctl.pi.getOriginName();
+            if (!orginName)
+                orginName = "Menu";
+            var data = {
+                AD_Process_ID: pctl.pi.getAD_Process_ID(),
+                Name: pctl.pi.getTitle(),
+                AD_PInstance_ID: pctl.pi.getAD_PInstance_ID(),
+                AD_Table_ID: pctl.pi.getTable_ID(),
+                Record_ID: pctl.pi.getRecord_ID(),
+                pageNumber: pageNo,
+                page_Size: PageSize,
+                saveAll: false,
+                //Set Action Origin and Origin name
+                ActionOrigin: pctl.pi.getActionOrigin(),
+                OriginName: orginName
+            }
+            return data;
+        };
+
+        function getGenerateReportPara(queryInfo, code, isCreateNew, nodeID, treeID, showSummary) {
+            var data = {
+                processInfo: pctl.pi.toJson(),
+                queryInfo: JSON.stringify(queryInfo),
+                code: code,
+                isCreateNew: isCreateNew,
+                treeID: treeID,
+                node_ID: nodeID,
+                IsSummary: showSummary
+            }
+            return data;
+        };
+
+        function getExecuteReportComposerData(AD_Process_ID, Name, AD_PInstance_ID, AD_Table_ID, Record_ID, pageNumber, page_Size, printAllPages) {
+            var orginName = pctl.pi.getOriginName();
+            if (!orginName)
+                orginName = "Menu";
+            var data = {
+                AD_Process_ID: AD_Process_ID,
+                Name: Name,
+                AD_PInstance_ID: AD_PInstance_ID,
+                AD_Table_ID: AD_Table_ID,
+                Record_ID: Record_ID,
+                pageNumber: pageNumber,
+                page_Size: page_Size,
+                printAllPages: printAllPages,
+                //Set Action Origin and Origin name
+                ActionOrigin: pctl.pi.getActionOrigin(),
+                OriginName: orginName
+
+            }
+
+            return data;
+        };
+
+
+
+
+
+        function loadedReportRendering(d, panel, pNoI, tp, bulkdownload) {
+            if (d.HTML && d.HTML.length > 0) { //report
+                manageRepTable(d, panel);
+            }
+            else {
+                if (tp == 0) {
+                    window.open(VIS.Application.contextUrl + d.ReportFilePath);
+                    panel.setBusy(false);
+                }
+                else {
+                    bulkDownloadUI(tp, d.ReportFilePath, bulkdownload, d);
+                }
+            }
+        };
+
+        function bulkDownloadUI(totalPages, reportUrl, bulkdownload, d) {
+            bulkdownload.setBulkBusy(false);
+            $("#forreportdownload").addClass('hide');
+            formlinks += '<input type="checkbox" data-num="' + d + '"  data-url="' + VIS.Application.contextUrl + reportUrl + '" checked />';
+            pNoI += 1;
+            updateCreateBar(((pNoI / totalPages) * 100));
+            if (pNoI == totalPages) {
+                setTimeout(function () {
+                    updateCreateBar(100);
+                    showCreateMessage(VIS.Msg.getMsg("Generated"));
+                    $('<form>', {
+                        'id': 'download_form',
+                        'html': formlinks,
+                        'action': '#',
+                        'Class': 'hide'
+                    }).appendTo(document.body).submit();
+                }, 1000);
+            }
+        };
+
+        function updateCreateBar(percent) {
+            var currpercent = $('#reportcreate').find(".progress-bar").width() * 100 / $('#reportcreate').width();
+            if (isNaN(currpercent)) currpercent = 0;
+            if (currpercent <= percent) {
+                $("#reportcreate").removeClass("hide")
+                    .find(".progress-bar")
+                    .attr("aria-valuenow", percent)
+                    .css({
+                        width: percent + "%"
+                    }).text(percent.toFixed(0) + "%");;
+            }
+        }
+        function resetCreateMessage() {
+            $("#reportcreateresult")
+                .removeClass()
+                .text("");
+        }
+        function showCreateMessage(text) {
+            resetCreateMessage();
+            $("#reportcreateresult")
+                .addClass("alert alert-success")
+                .text(text);
+            $("#forreportdownload").removeClass('hide');
+        }
+        function showCreateError(text) {
+            resetCreateMessage();
+            $("#reportcreateresult")
+                .addClass("alert alert-danger")
+                .text(text);
+        }
+
+        function loadDynamicReport(reportType, pageNo) {
+            var data = { processInfo: pctl.pi.toJson() };
+            $.ajax({
+                url: VIS.Application.contextUrl + pctl.pi.dynamicAction,
+                type: "Post",
+                data: data,
+                success: function (result) {
+                    var data = JSON.parse(result);
+
+                    if (ismobile || reportType != pctl.REPORT_TYPE_PDF) {
+                        window.open(VIS.Application.contextUrl + data);
+                    }
+                    else {
+                        var $object = $("<iframe style = 'width:100%;height:99.4%;' pluginspage='http://www.adobe.com/products/acrobat/readstep2.html'>");
+                        $object.attr("src", VIS.Application.contextUrl + data);
+                        panel.getRightDiv().empty().append($object);
+                        self.reportPath = data.ReportFilePath;
+                    }
+                    panel.setBusy(false);
+                    return data.ReportFilePath;
+                }
+            });
+        };
+
+
+        function loadDynamicReportAll(d, bulkdownload, totalPages) {
+            pctl.pi.setPageNo(d);
+            var data = { processInfo: pctl.pi.toJson() };
+            $.ajax({
+                url: VIS.Application.contextUrl + pctl.pi.dynamicAction,
+                type: "Post",
+                data: data,
+                success: function (result) {
+                    result = JSON.parse(result);
+                    bulkDownloadUI(totalPages, result, bulkdownload, d);
+
+                    panel.setBusy(false);
+                }
+            });
+        };
+
+
+        btnRequery.on('click', function () {
+            panel.setBusy(true);
+            panel.getRightInnerDiv().html("");
+            panel.getRightInnerDiv().width(0);
+
+            if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
+                loadDynamicReport(pctl.REPORT_TYPE_PDF, $cmbPages.val());
+            }
+            else {
+                loadReportData();
+            }
+        });
+        btnCustomize.on('click', function () {
+            var zoomQuery = new VIS.Query();
+            zoomQuery.addRestriction("AD_PrintFormat_ID", VIS.Query.prototype.EQUAL, pctl.pi.AD_PrintFormat_ID);
+            VIS.viewManager.startWindow(240, zoomQuery);
+        });
+        btnPrint.on('click', function () {
+            if (panel.getIsHtmlReport()) {
+                var mywindow = window.open();
+                mywindow.document.write('<html><head>');
+                mywindow.document.write('</head><body >');
+                mywindow.document.write(panel.getHtml());
+                mywindow.document.write('</body></html>');
+                mywindow.print();
+                mywindow.close();
+            }
+        });
+        btnRF.on('click', function () {
+            $menu.empty();
+            for (var i = 0; i < otherPf.length; i++) {
+                var className = otherPf[i].IsDefault == "Y" ? "vis-mainfavitem" : "vis-mainnonfavitem";
+                var ulItem = $('<li><a data-isdefbtn="no" data-id="' + otherPf[i].ID + '">' + otherPf[i].Name + '</a></li>');
+                $menu.append(ulItem);
+            }
+            $menu.append($('<li><a data-id="-1">' + VIS.Msg.getMsg('NewReport') + '</a>'));
+            $(this).w2overlay(overlay.clone(true), { css: { height: '300px' } });
+        });
+        $menu.on('click', "LI", function (e) {
+
+            panel.setBusy(true);
+
+            var btn = $(e.target);
+            var id = btn.data("id");
+            if (btn.data("isdefbtn") == "yes") {
+
+                var sqlQry = "VIS_76";
+                var param = [];
+                param[0] = new VIS.DB.SqlParam("@tableID", pctl.pi.Ad_Table_ID);
+                param[1] = new VIS.DB.SqlParam("@tabID", curTab.getAD_Tab_ID());
+                executeQuery(sql, param);
+
+                var sqlQry = "VIS_77";
+                var param = [];
+                param[0] = new VIS.DB.SqlParam("@printForamt", id);
+                executeQuery(sql, param);
+
+
+                for (var i = 0; i < otherPf.length; i++) {
+                    if (otherPf[i].ID == id) {
+                        otherPf[i].IsDefault = "Y";
+                    }
+                    else {
+                        otherPf[i].IsDefault = "N";
+                    }
+                }
+                return;
+            }
+            AD_PrintFormat_ID = id;
+            var isCreateNew = false;
+            if (id == -1) {
+                id = pctl.pi.get_AD_PrintFormat_Table_ID;
+                isCreateNew = true;
+            }
+            var queryInfo = [];
+            var query = new VIS.Query(pctl.pi.getPrintFormatTableName());
+            queryInfo.push(query.getTableName());
+            queryInfo.push(query.getWhereClause(true));
+
+            var paramData = getGenerateReportPara(queryInfo, query.getCode(0), false0, 0, false);
+
+
+            $.ajax({
+                url: VIS.Application.contextUrl + "JsonData/GenerateReport/",
+                dataType: "json",
+                data: paramData,
+                type: 'POST',
+                success: function (jsonStr) {
+
+                    var json = jQuery.parseJSON(jsonStr);
+                    if (json.IsError) {
+                        pctl.pi.setSummary(json.Message, true);
+                        pctl.unlock();
+                        pctl = null;
+                        return;
+                    }
+                    manageRepTable(json.repInfo, panel);
+
+                    self.reportPath = json.repInfo.ReportFilePath;
+                }
+            });
+
+        });
+        btnArchive.on('click', function () {
+            self.archiveDocument(panel, pctl);
+
+        });
+        if (canExport) {
+            btnSaveCsv.on('click', function () {
+                pctl.pi.setFileType("C");
+                if (pctl.pi.getPageNo() == 1) {
+                    panel.setBusy(true);
+                    executeProcess(getExeProcessParameter(pctl.REPORT_TYPE_CSV), function (json) {
+                        window.open(VIS.Application.contextUrl + json.ReportFilePath);
+                        panel.setBusy(false);
+                    });
+                }
+                else {
+                    panel.setBusy(true);
+
+                    window.setTimeout(function () {
+
+                        if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
+                            loadDynamicReport(pctl.REPORT_TYPE_CSV, pctl.pi.getPageNo());
+                        }
+                        else {
+
+                            if (pctl.pi.GetAD_ReportView_ID() > 0) {
+                                getCsv($cmbPages.val(), 0, null);
+                            }
+                            else if (pctl.pi.getIsJasperReport()) {
+                                getJasperReport("C", pctl.pi.getPageNo());
+                            }
+                            else {
+                                pageNo = $cmbPages.val();
+                                var data = getExecuteReportforCsvPara(pageNo, pctl.pi.getPageSize());
+                                $.ajax({
+                                    url: VIS.Application.contextUrl + "ReportCom/ExecuteReportforCsv",
+                                    type: "Post",
+                                    data: data,
+                                    success: function (result) {
+                                        var data = JSON.parse(result);
+                                        window.open(VIS.Application.contextUrl + "TempDownload/" + data);
+                                        panel.setBusy(false);
+                                    }
+                                });
+                            }
+                        }
+                    }, 100);
+                }
+            });
+
+
+            btnSavePdf.on('click', function () {
+                ////var getCurrentThis = $(this);
+                pctl.pi.setFileType(pctl.REPORT_TYPE_PDF);
+                if (pctl.pi.getPageNo() == 1) {
+                    panel.setBusy(true);
+
+                    executeProcess(getExeProcessParameter(pctl.REPORT_TYPE_PDF), function (json) {
+                        manageRepTable(json, panel);
+                    });
+                }
+                else {
+                    loadReportData();
+
+                }
+            });
+
+
+
+            $cmbPages.on("change", function () {
+                pageNo = $cmbPages.val();
+
+                if (pctl.pi.GetAD_ReportView_ID() > 0) {
+                    panel.setBusy(true);
+                    var queryInfo = [];
+                    pctl.pi.setPageNo(pageNo);
+
+                    var rquery = new VIS.Query(pctl.pi.getPrintFormatTableName());
+
+                    if (pctl.pi.getPrintFormatTableName()) {
+                        queryInfo.push(rquery.getTableName());
+                        queryInfo.push(rquery.getWhereClause(true));
+                    }
+
+                    var paramData = getGenerateReportPara(queryInfo, "", false, 0, 0, false);
+
+                    $.ajax({
+                        url: VIS.Application.contextUrl + "JsonData/GenerateReport/",
+                        dataType: "json",
+                        type: 'POST',
+                        data: paramData,
+                        success: function (jsonStr) {
+
+                            var json = jQuery.parseJSON(jsonStr);
+                            if (json.IsError) {
+                                pctl.pi.setSummary(json.Message, true);
+                                pctl.unlock();
+                                pctl = null;
+                                return;
+                            }
+
+                            manageRepTable(json.repInfo, panel);
+                            self.reportPath = json.repInfo.ReportFilePath;
+                        }
+                    });
+                }
+                else {
+                    pctl.pi.setPageNo(pageNo);
+                }
+
+            });
+            function getJasperReport(rptExportType, rptPageNo) {
+                pctl.pi.setFileType(rptExportType);
+                var data = { processInfo: pctl.pi.toJson() };
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "JasperReport/ExecuteReport",
+                    type: "Post",
+                    data: data,
+                    success: function (result) {
+                        var data = JSON.parse(result);
+                        if (ismobile) {
+                            window.open(VIS.Application.contextUrl + data);
+                        }
+                        else {
+                            if (rptExportType == pctl.REPORT_TYPE_PDF) {
+                                var $object = $("<iframe style = 'width:100%;height:99.4%;' pluginspage='http://www.adobe.com/products/acrobat/readstep2.html'>");
+                                $object.attr("src", VIS.Application.contextUrl + data);
+                                panel.getRightDiv().empty().append($object);
+                            }
+                            else {
+                                window.open(VIS.Application.contextUrl + data);
+
+                            }
+                            self.reportPath = data;
+                        }
+                        panel.setBusy(false);
+                    }
+                });
+            };
+
+            function getJasperReportAll(d, totalPages, bulkdownload) {
+                var reportUrl = "";
+                pctl.pi.setPageNo(d);
+                var data = { processInfo: pctl.pi.toJson() };
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "JasperReport/ExecuteReport",
+                    type: "Post",
+                    data: data,
+                    success: function (result) {
+                        result = JSON.parse(result);
+                        bulkDownloadUI(totalPages, result, bulkdownload, d);
+
+                        panel.setBusy(false);
+                    }
+                });
+            };
+
+
+
+
+
+            btnSaveCsvAll.on("click", function () {
+                panel.setBusy(true);
+                pNoI = 0;
+                formlinks = '';
+                pctl.pi.setFileType("C");
+                window.setTimeout(function () {
+                    var formlinks = '';
+                    var bulkdownload = new VIS.BulkDownload(self.windowNo, 'CSV');
+                    bulkdownload.onClose = function () { };
+                    bulkdownload.show();
+                    if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
+                        for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
+                            loadDynamicReportAll(d, bulkdownload, pctl.pi.getTotalPages());
+                        }
+                    }
+                    else {
+                        if (pctl.pi.GetAD_ReportView_ID() > 0) {
+                            for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
+                                getCsv(d, pctl.pi.getTotalPages(), bulkdownload);
+                            }
+                        }
+                        else if (pctl.pi.getIsJasperReport()) {
+                            for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
+                                getJasperReportAll(d, pctl.pi.getTotalPages(), bulkdownload);
+                            }
+                        }
+                        else {
+                            for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
+                                getAllCSV(d, bulkdownload, pctl.pi.getTotalPages());
+                            }
+                        }
+                    }
+                    pctl.pi.setPageNo($cmbPages.val());
+                }, 100);
+            });
+
+            function getAllCSV(d, bulkdownload, totalPages) {
+                var reportUrl = "";
+                if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
+                    reportUrl = loadDynamicReport(pctl.REPORT_TYPE_CSV, d);
+                }
+                else {
+                    var data = getExecuteReportforCsvPara(d, pctl.pi.getPageSize());
+                    $.ajax({
+                        url: VIS.Application.contextUrl + "ReportCom/ExecuteReportforCsv",
+                        type: "Post",
+                        data: data,
+                        success: function (result) {
+                            var reportUrl = JSON.parse(result);
+
+                            reportUrl = "TempDownload/" + reportUrl;
+                            bulkDownloadUI(totalPages, reportUrl, bulkdownload, d);
+
+                            panel.setBusy(false);
+                        }
+                    });
+                }
+
+            };
+
+            var getReportData = function (pNoI, tP, bulkdownload) {
+
+                var queryInfo = [];
+                var query = new VIS.Query(pctl.pi.getPrintFormatTableName());
+                queryInfo.push(query.getTableName());
+                queryInfo.push(query.getWhereClause(true));
+
+                var paramData = getGenerateReportPara(queryInfo, "", false, 0, 0, false);
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "JsonData/GenerateReport/",
+                    dataType: "json",
+                    data: paramData,
+                    type: 'POST',
+                    success: function (data) {
+                        if (data == null) {
+                            VIS.ADialog.error('ERRORGettingRepData');
+                        }
+                        var dres = jQuery.parseJSON(data);
+                        var d = dres.repInfo;
+                        if (d.ErrorText) {
+                            VIS.ADialog.error(d.ErrorText);
+                            panel.setBusy(true);
+                            return;
+                        }
+
+                        loadedReportRendering(d, panel, pNoI, tP, bulkdownload);
+
+                        panel.setBusy(false);
+                        self.reportPath = d.ReportFilePath;
+                    }
+                });
+            };
+
+            var getCsv = function (pNoI, tP, bulkdownload) {
+                var queryInfo = [];
+                var query = new VIS.Query(pctl.pi.getPrintFormatTableName());
+                queryInfo.push(query.getTableName());
+                queryInfo.push(query.getWhereClause(true));
+
+                var paramData = getGenerateReportPara(queryInfo, "", false, 0, 0, false);
+
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "JsonData/GenerateReport/",
+                    dataType: "json",
+                    data: paramData,
+                    type: 'POST',
+                    success: function (data) {
+                        if (data == null) {
+                            VIS.ADialog.error('ERRORGettingRepData');
+                        }
+                        var dres = jQuery.parseJSON(data);
+                        var d = dres.repInfo;
+                        if (d.ErrorText) {
+                            VIS.ADialog.error(d.ErrorText);
+                            setBusy(false);
+                            return;
+                        }
+
+                        loadedReportRendering(d, panel, pNoI, tP, bulkdownload);
+                        self.reportPath = d.ReportFilePath;
+                        panel.setBusy(false);
+                    }
+                });
+            };
+            btnsavepdfall.on("click", function () {
+                panel.setBusy(true);
+                pNoI = 0;
+                formlinks = '';
+                pctl.pi.setFileType(pctl.REPORT_TYPE_PDF);
+                window.setTimeout(function () {
+
+                    var formlinks = '';
+                    var bulkdownload = new VIS.BulkDownload(self.windowNo, 'PDF');
+                    bulkdownload.onClose = function () { };
+                    bulkdownload.show();
+
+                    if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
+                        for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
+                            loadDynamicReportAll(d, bulkdownload, pctl.pi.getTotalPages());
+                        }
+                    }
+                    else {
+                        if (pctl.pi.GetAD_ReportView_ID() > 0) {
+
+                            for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
+                                getReportData(d, pctl.pi.getTotalPages(), bulkdownload);
+                            }
+
+                        }
+                        else if (pctl.pi.getIsJasperReport()) {
+                            for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
+                                getJasperReportAll(d, pctl.pi.getTotalPages(), bulkdownload);
+                            }
+                        }
+                        else {
+                            for (var d = 1; d <= pctl.pi.getTotalPages(); d++) {
+                                savePDFAll(d, bulkdownload, pctl.pi.getTotalPages());
+                            }
+                        }
+                    }
+                    pctl.pi.setPageNo($cmbPages.val());
+                }, 100);
+            });
+            var pNoI = 0;
+            function savePDFAll(d, bulkdownload, totalPages) {
+                var reportUrl = "";
+                if (pctl.pi.dynamicAction && pctl.pi.dynamicAction.length > 0) {
+                    reportUrl = loadDynamicReportAll(pctl.REPORT_TYPE_CSV, d);
+                }
+                else {
+                    var data = getExecuteReportComposerData(pctl.pi.getAD_Process_ID(), pctl.pi.getTitle(), pctl.pi.getAD_PInstance_ID(), pctl.pi.getTable_ID(), pctl.pi.getRecord_ID(), d, pctl.pi.getPageSize(), false);
+
+
+                    $.ajax({
+                        url: VIS.Application.contextUrl + "ReportCom/ExecuteReport",
+                        type: "Post",
+                        data: data,
+                        success: function (result) {
+                            var reportUrl = JSON.parse(result);
+                            bulkDownloadUI(totalPages, reportUrl, bulkdownload, d);
+                            self.reportPath = reportUrl;
+                            panel.setBusy(false);
+                        }
+                    });
+                }
+
+            };
+
+            var download = function () {
+                for (var i = 0; i < arguments.length; i++) {
+                    var iframe = $('<iframe style="visibility: collapse;"></iframe>');
+                    $('body').append(iframe);
+                    var content = iframe[0].contentDocument;
+                    var form = '<form action="' + arguments[i] + '" method="GET"></form>';
+                    content.write(form);
+                    $('form', content).submit();
+                    setTimeout((function (iframe) {
+                        return function () {
+                            iframe.remove();
+                        }
+                    })(iframe), 2000);
+                }
+            }
+            var formlinks = '';
+
+        }
+
+
+
+        // handleEvents(panel, repObj);
     }
 
     AProcess.prototype.showReport = function (panel, repObj, pCtl, isCrystalReport) {
