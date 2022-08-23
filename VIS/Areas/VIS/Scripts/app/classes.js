@@ -1624,13 +1624,15 @@
                 dr = null;
             }
 
-
+            if (targetWhereClause != '' && !targetWhereClause) {
+                targetWhereClause = VIS.secureEngine.encrypt(targetWhereClause);
+            }
 
             $.ajax({
-                type: 'Get',
+                //type: 'Get',
                 async: false,
-                url: VIS.Application.contextUrl + "Form/GetZoomTarget",
-                data: { targetTableName: targetTableName, curWindow_ID: curWindowID, "targetWhereClause": targetWhereClause },
+                url: VIS.Application.contextUrl + "Form/GetZoomWindow",
+                data: { targetTableName: targetTableName, curWindow_ID: curWindow_ID, "targetWhereClause": targetWhereClause },
                 success: function (data) {
                     zoomList = JSON.parse(data);
                 }
