@@ -733,7 +733,8 @@
 
             var pvID = 0;
             for (var i = 0; i < bpID.length; i++) {
-                
+                //var sql = "Select AD_User_ID,email from ad_user where isEmail='Y' AND c_bpartner_ID=" + bpID[i];
+                //var ds = VIS.DB.executeDataSet(sql);
                 var ds = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Email/GetUser", { "BPartner_ID": bpID[i] }, null);
                 var isBroken = false;
                 var htm = '';
@@ -1168,10 +1169,10 @@
                             }
 
 
+                            if (lstLatestFiles && lstLatestFiles.length > 0) {
 
-
-
-                            UploadFiles();
+                                UploadFiles();
+                            }
                         });
                     }
 
@@ -1231,8 +1232,9 @@
             }
         };
 
+        var invalidExtensions = [];
         var AppendFile = function (sender) {
-
+            invalidExtensions = [];
             for (var i = 0; i < sender.files.length; i++) {
                 file = sender.files[i];
                 if (file == undefined) {
@@ -1241,6 +1243,16 @@
                 if (file.size == 0) {
                     continue;
                 }
+
+                var allowedExtensions = VIS.context.getContext("#ALLOWED_FILE_EXTENSION");
+
+                if (allowedExtensions && allowedExtensions.length > 0) {
+                    if (allowedExtensions.split(',').indexOf('.' + file.name.split('.').pop()) == -1) {
+                        invalidExtensions.push(file.name);
+                        continue;
+                    }
+                }
+
 
                 for (var itm in lstLatestFiles) {
                     if (file.name == lstLatestFiles[itm].name) {
@@ -1398,6 +1410,23 @@
                     }
                 }
 
+            }
+
+
+            if (invalidExtensions && invalidExtensions.length > 0) {
+                var FileNames = '';
+                for (var item in invalidExtensions) {
+                    FileNames += invalidExtensions[item].toString() + ', ';
+                }
+
+                var resString = '';
+                if (invalidExtensions.length == 1) {
+                    resString += 'FileInvalidExtension';
+                }
+                else {
+                    resString += 'FilesInvalidExtension';
+                }
+                VIS.ADialog.warn(resString, true, FileNames);
             }
         };
 
@@ -1614,25 +1643,55 @@
             var fd = new FormData();
             fd.append("file", lstLatestFiles[currentFile].slice(currentFileChunkNo * chunkSize, currentFileChunkNo * chunkSize + Number(chunkSize)));
             xhr.open("POST", VIS.Application.contextUrl + "Email/SaveAttachmentinTemp?filename=" + lstLatestFiles[currentFile].name + "&folderKey=" + folder, false);
+
+            xhr.onload = function () {
+                if (xhr.readyState === xhr.DONE) {
+                    if (xhr.status === 200) {
+                        if (xhr.responseText && xhr.responseText.indexOf("ERROR") > -1) {
+                            var response = xhr.responseText;
+                            response = response.replace("ERROR: ", "");
+                            for (var itm in lstLatestFiles) {
+                                if ((String(response).indexOf(lstLatestFiles[itm].name)) > -1) {
+                                    lstLatestFiles.splice(itm, 1);
+                                }
+                            }
+                            VIS.ADialog.warn("FilesInvalidExtension", true, xhr.responseText);
+
+                            // FilesInvalidExtension
+
+                            showProgress(false);
+                            IsBusy(false);
+                            return;
+                        }
+                        var response = xhr.responseText;
+                        response = response.replace("ERROR: ", "");
+                        currentchunk++;
+                        currentFileChunkNo++;
+                        var totalFileChunk = parseInt(lstLatestFiles[currentFile].size / chunkSize);
+                        if (lstLatestFiles[currentFile].size % chunkSize > 0) {
+                            totalFileChunk++;
+                        }
+
+                        if (currentFileChunkNo == totalFileChunk) {
+                            currentFile++;
+                            currentFileChunkNo = 0;
+                        }
+
+                        if (currentchunk <= totalChunks) {
+                            setProgressValue(parseInt((currentchunk / totalChunks) * 100));
+                        }
+                        window.setTimeout(function () {
+                            TransferFile();
+                        }, 2);
+                    }
+                }
+            }
+
+
+
+
             xhr.send(fd);
-            currentchunk++;
-            currentFileChunkNo++;
-            var totalFileChunk = parseInt(lstLatestFiles[currentFile].size / chunkSize);
-            if (lstLatestFiles[currentFile].size % chunkSize > 0) {
-                totalFileChunk++;
-            }
 
-            if (currentFileChunkNo == totalFileChunk) {
-                currentFile++;
-                currentFileChunkNo = 0;
-            }
-
-            if (currentchunk <= totalChunks) {
-                setProgressValue(parseInt((currentchunk / totalChunks) * 100));
-            }
-            window.setTimeout(function () {
-                TransferFile();
-            }, 2);
 
         };
 

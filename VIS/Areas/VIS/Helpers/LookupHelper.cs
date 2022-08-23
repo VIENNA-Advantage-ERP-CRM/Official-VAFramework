@@ -159,7 +159,13 @@ namespace VIS.Classes
             {
                 dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(LookupData, new ExpandoObjectConverter());
                 Ctx _ctx = new Ctx(json.ctx);
-                string validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+                string validationCode = "";
+                if (((IDictionary<String, object>)json).ContainsKey("validationCode"))
+                {
+                    validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+                }
+
+                  
                 if (!QueryValidator.IsValid(validationCode))
                     return null;
 

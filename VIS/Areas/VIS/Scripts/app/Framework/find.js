@@ -33,7 +33,7 @@
         getData: function (ctx, AD_Tab_ID, AD_Table_ID, valueColumnName) {
             var AD_Client_ID = ctx.getAD_Client_ID();
             var dr = null;
-            
+
             try {
                 //dr = VIS.DB.executeDataReader(sql, null, null);
                 dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ASearch/GetData", { "ColumnName": valueColumnName, "Tab_ID": AD_Tab_ID, "Table_ID": AD_Table_ID }, null);
@@ -51,7 +51,7 @@
         getQueryLines: function (AD_UserQuery_ID) {
             var dr = null;
             var lines = [];
-           
+
             try {
                 //dr = VIS.DB.executeDataReader(sql, null, null);
 
@@ -128,6 +128,9 @@
 
         insertOrUpdate: function (value, name, where, AD_Tab_ID, AD_Table_ID, dsAdvanceData, getID) {
             var no = -1;
+            if (where)
+                where = VIS.secureEngine.encrypt(where);
+
             $.ajax({
                 url: VIS.Application.contextUrl + 'ASearch/InsertOrUpdateQuery',
                 type: "POST",
@@ -1272,7 +1275,7 @@
         function getNoOfRecords(query, alertZeroRecords) {
             // make query
             var sqlSelect = "SELECT COUNT(*) FROM ";
-           // sqlSelect += tableName;
+            // sqlSelect += tableName;
             var sql = tableName;
             var hasWhere = false;
             // add where clause if already exists
@@ -1302,7 +1305,7 @@
                 VIS.MRole.SQL_NOTQUALIFIED, VIS.MRole.SQL_RO);
             // finalSQL = VIS.Env.parseContext(VIS.context, windowNo, finalSQL, false);
 
-           // VIS.context.setContext(windowNo, TABNO, "FindSQL", finalSQL);
+            // VIS.context.setContext(windowNo, TABNO, "FindSQL", finalSQL);
 
             //  Execute Query
             total = 999999;
@@ -1624,7 +1627,7 @@
 
                             //var Where = "UPPER( " + columnName + ") BETWEEN UPPER('" + parsedValue + "') AND UPPER('" + parsedValue2 + "')";
 
-                            var Where = createDirectSql(parsedValue, parsedValue2, columnName, optr, true,true);
+                            var Where = createDirectSql(parsedValue, parsedValue2, columnName, optr, true, true);
 
                             where = VIS.Env.parseContext(VIS.context, windowNo, Where, false);
                             _query.addRestriction(Where);
@@ -1632,7 +1635,7 @@
                         else {
                             //var Where = columnName + optr + value;
 
-                            var Where = createDirectSql(parsedValue, parsedValue2, columnName, optr, true,true);
+                            var Where = createDirectSql(parsedValue, parsedValue2, columnName, optr, true, true);
                             where = VIS.Env.parseContext(VIS.context, windowNo, Where, false);
                             _query.addRestriction(Where);
                         }
@@ -1688,7 +1691,7 @@
 
 
                             if (field.getDisplayType() == VIS.DisplayType.AmtDimension) {
-                                var Where = createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false,false);
+                                var Where = createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false, false);
                                 where = VIS.Env.parseContext(VIS.context, windowNo, Where, false);
                                 _query.addRestriction(Where);
                             }
@@ -1725,7 +1728,7 @@
                             }
                             else {
                                 if (field.getDisplayType() == VIS.DisplayType.AmtDimension) {
-                                    var Where = createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false,false);
+                                    var Where = createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false, false);
                                     where = VIS.Env.parseContext(VIS.context, windowNo, Where, false);
                                     _query.addRestriction(Where);
                                 }
