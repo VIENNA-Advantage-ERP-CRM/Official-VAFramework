@@ -106,7 +106,11 @@
                     if (VIS.DisplayType.IsLookup(fieldorg.getDisplayType()) || VIS.DisplayType.ID == fieldorg.getDisplayType()) {
                         field = jQuery.extend(true, {}, fieldorg);
                         field.lookup = jQuery.extend(true, {}, fieldorg.lookup);
-                        field.lookup.initialize();
+                        if (field.lookup && field.lookup.initialize) {
+                            field.lookup.initialize();
+                        }
+                        else
+                            continue;
                     }
                     else {
                         field = fieldorg;
@@ -899,8 +903,14 @@
             if (field.getIsKey())
                 header += (" (ID)");
 
-            if (field.getIsSelectionColumn())
+            if ((VIS.DisplayType.IsLookup(field.getDisplayType()) || VIS.DisplayType.ID == field.getDisplayType()) && !field.lookup) {
+                ;
+            }
+
+            else if (field.getIsSelectionColumn()) {
                 this.selectionfields.push(field);
+
+            }
             else
                 sortedFields.push({ 'value': columnName, 'text': header });
             // html += '<option value="' + columnName + '">' + header + '</option>';

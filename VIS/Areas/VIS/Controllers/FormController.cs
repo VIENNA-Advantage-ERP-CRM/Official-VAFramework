@@ -62,6 +62,19 @@ namespace VIS.Controllers
             FormModel model = new FormModel(ctx);
             return Json(JsonConvert.SerializeObject(model.GetZoomTargets(ctx,targetTableName, curWindow_ID, targetWhereClause)), JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult GetZoomWindow(string targetTableName, int curWindow_ID, string targetWhereClause)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            FormModel model = new FormModel(ctx);
+            targetWhereClause = SecureEngineBridge.DecryptByClientKey(targetWhereClause, ctx.GetSecureKey());
+            if (!QueryValidator.IsValid(targetWhereClause))
+            {
+                return Json(null);
+            }
+            return Json(JsonConvert.SerializeObject(model.GetZoomTargets(ctx, targetTableName, curWindow_ID, targetWhereClause)), JsonRequestBehavior.AllowGet);
+        }
+
         #endregion
 
         #region processFrame.js
