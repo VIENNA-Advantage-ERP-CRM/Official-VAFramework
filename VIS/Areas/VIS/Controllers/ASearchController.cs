@@ -50,12 +50,20 @@ namespace VIS.Controllers
         public ActionResult InsertOrUpdateQuery(int id, string name, string where, int tabid, int tid, List<QueryModel> qLines)
         {
             int no = -1;
+            Ctx ctx = Session["ctx"] as VAdvantage.Utility.Ctx;
+
+            if (!string.IsNullOrEmpty(where))
+            {
+                where = SecureEngineBridge.DecryptByClientKey(where, ctx.GetSecureKey());
+                if (!QueryValidator.IsValid(where))
+                    return null;
+            }
 
 
             if (id == 0)
             {
                 string sql = "SELECT Count(*) FROM AD_UserQuery WHERE AD_Table_ID=" + tid + " AND AD_Tab_ID=" + tabid + " AND Upper(Name)='" + name.ToUpper() + "'";
-                int count = Convert.ToInt32(DB.ExecuteScalar(MRole.GetDefault(Session["ctx"] as VAdvantage.Utility.Ctx).AddAccessSQL(sql, "AD_UserQuery", true, false)));
+                int count = Convert.ToInt32(DB.ExecuteScalar(MRole.GetDefault(ctx).AddAccessSQL(sql, "AD_UserQuery", true, false)));
                 if (count > 0)
                 {
                     return Json(-5);
@@ -64,7 +72,7 @@ namespace VIS.Controllers
             }
 
 
-            var uq = new VAdvantage.Model.MUserQuery(Session["ctx"] as VAdvantage.Utility.Ctx, id, null);
+            var uq = new VAdvantage.Model.MUserQuery(ctx, id, null);
             //set query name
             if (name != null && name.Length > 0)
                 uq.SetName(name);
@@ -135,6 +143,9 @@ namespace VIS.Controllers
         {
             Ctx ctx = Session["ctx"] as Ctx;
             RecQuery = SecureEngineBridge.DecryptByClientKey(RecQuery, ctx.GetSecureKey());
+            if (!QueryValidator.IsValid(RecQuery))
+                return null;
+
             ASearchModel mod = new ASearchModel();
             return Json(JsonConvert.SerializeObject(mod.GetNoOfRecrds(RecQuery, ctx)), JsonRequestBehavior.AllowGet);
         }
