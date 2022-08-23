@@ -625,7 +625,7 @@
 
                         $history.on("click", function (e) {
                             // UserTableID, Record_ID, BP_ID, 0, "keyColumnName"
-                            var atHistory = new VIS.AttachmentHistory($slideruserTableID.val(), $slideruserID.text(), $sliderBpID.text(), 0, "AD_User_ID");
+                            var atHistory = new VIS.AttachmentHistory($slideruserTableID.text(), $slideruserID.text(), $sliderBpID.text(), 0, "AD_User_ID");
                             atHistory.show();
                         });
 
