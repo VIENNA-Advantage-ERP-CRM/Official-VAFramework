@@ -78,9 +78,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="VAWorkflow">
-      <HintPath>..\ViennaAdvantageWeb\Dll\VAWorkflow.dll</HintPath>
-    </Reference>
     <Reference Include="XModel">
       <HintPath>..\ViennaAdvantageWeb\Dll\XModel.dll</HintPath>
     </Reference>
@@ -154,6 +151,10 @@
     <ProjectReference Include="..\VAModelAD\VAModelAD.csproj">
       <Project>{ef955712-f147-4a6a-8d11-8fecc5fe3942}</Project>
       <Name>VAModelAD</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VAWorkflow\VAWorkflow.csproj">
+      <Project>{e7e3c709-33bf-4526-9bd3-64fc5b3092dd}</Project>
+      <Name>VAWorkflow</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
