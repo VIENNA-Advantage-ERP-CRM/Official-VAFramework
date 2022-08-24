@@ -1369,6 +1369,9 @@ namespace VIS.Helpers
                 {
                     if (displayType == DisplayType.YesNo)
                     {
+                        if (columnSQL.IndexOf(" AS " + columnName) > -1)
+                            columnSQL = columnSQL.Substring(0, columnSQL.IndexOf(" AS " + columnName));
+
                         return " (case " + columnSQL + " when 'Y' then 'True' else 'False' end) ";
                     }
                     return columnSQL;

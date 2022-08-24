@@ -131,7 +131,7 @@
 
             $root.load(VIS.Application.contextUrl + 'UserPreference/Index/?windowno=' + windowNo + '&adUserId=' + VIS.context.getAD_User_ID(), function (event) {
 
-              
+
 
                 $self.init($root);
                 var divget = $root.find("#content_" + windowNo);
@@ -253,7 +253,7 @@
             $cmdOrg.on("change", function () { loadWH() });
             $cmdWareHouse = root.find("#cmbWareHouse_" + windowNo);
 
-            $btnTheme = root.find("#btnTheme_"+windowNo)
+            $btnTheme = root.find("#btnTheme_" + windowNo)
 
             defaultLogin = {};
             loadDefault();
@@ -378,7 +378,7 @@
 
             drpTheme = root.find("#vis_pref_theme" + windowNo);
             ulTheme = drpTheme.find('ul');
-                
+
             var vlblPageSize = root.find("#vlblPageSize_" + windowNo);
             vlblPageSize.text(VIS.Msg.getMsg("Pagesize"));
 
@@ -428,12 +428,12 @@
             //Load Trace level.
             if ($tracecmb != null) {
                 var levelsValue = [VIS.Logging.Level.OFF.getIntValue(), VIS.Logging.Level.SEVERE.getIntValue(), VIS.Logging.Level.WARNING.getIntValue(),
-                    VIS.Logging.Level.INFO.getIntValue(), VIS.Logging.Level.CONFIG.getIntValue(), VIS.Logging.Level.FINE.getIntValue(),
-                    VIS.Logging.Level.FINER.getIntValue(), VIS.Logging.Level.FINEST.getIntValue(), VIS.Logging.Level.ALL.getIntValue()];
+                VIS.Logging.Level.INFO.getIntValue(), VIS.Logging.Level.CONFIG.getIntValue(), VIS.Logging.Level.FINE.getIntValue(),
+                VIS.Logging.Level.FINER.getIntValue(), VIS.Logging.Level.FINEST.getIntValue(), VIS.Logging.Level.ALL.getIntValue()];
 
                 var levelsName = [VIS.Logging.Level.OFF.getName(), VIS.Logging.Level.SEVERE.getName(), VIS.Logging.Level.WARNING.getName(),
-                    VIS.Logging.Level.INFO.getName(), VIS.Logging.Level.CONFIG.getName(), VIS.Logging.Level.FINE.getName(),
-                    VIS.Logging.Level.FINER.getName(), VIS.Logging.Level.FINEST.getName(), VIS.Logging.Level.ALL.getName()];
+                VIS.Logging.Level.INFO.getName(), VIS.Logging.Level.CONFIG.getName(), VIS.Logging.Level.FINE.getName(),
+                VIS.Logging.Level.FINER.getName(), VIS.Logging.Level.FINEST.getName(), VIS.Logging.Level.ALL.getName()];
 
                 var selectedIndex = 0;
                 for (var i = 0; i < levelsValue.length; i++) {
@@ -579,19 +579,19 @@
 
             //Theme changed Event
 
-           // drpTheme.on()
+            // drpTheme.on()
             drpTheme.on("click", "div.vis-theme-rec", function (e) {
                 var $tgt = $(e.currentTarget);
                 var clr = $tgt.data("color");
                 var id = Number($tgt.data("id"));
 
-                                if (VIS.themeMgr)
+                if (VIS.themeMgr)
                     VIS.themeMgr.applyTheme(clr);
                 //save theme 
                 VIS.dataContext.postJSONData(VIS.Application.contextUrl + 'Theme/SaveForUser', { id: id, uid: VIS.context.getAD_User_ID() }, function (e) {
 
                 });
-                
+
             });
 
             $btnTheme.on("click", function () {
@@ -783,7 +783,7 @@
                 }
 
 
-                                $.ajax({
+                $.ajax({
                     type: "POST",
                     async: false,
                     url: VIS.Application.contextUrl + "UserPreference/SaveChangePassword",
@@ -896,10 +896,10 @@
 
             $btnEmailConfig.on("click", function () {
                 //get windowId for User Window
-                
+
                 var ad_window_Id = 0;
                 try {
-                   
+
                     // Added by Bharat on 12 June 2017 to remove client side queries
                     ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "Mail Configuration" }, null); // spelling corrected by vinay bhatt on 18 oct 2018
                     if (ad_window_Id > 0) {
@@ -916,10 +916,10 @@
 
             $btnSubstitute.on("click", function () {
                 //get windowId for User Window
-               
+
                 var ad_window_Id = 0;
                 try {
-                   
+
                     // Added by Bharat on 12 June 2017 to remove client side queries
                     ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "User Substitute" }, null); // spelling corrected by vinay bhatt on 18 oct 2018
                     if (ad_window_Id > 0) {
@@ -1009,7 +1009,7 @@
 
             $btnSyncGmailContacts.on("click", function () {
 
-                if ($txtGmailUsername.val() == "" || $txtGmailUsername.val().length == 0 || $txtGmailPassword.val() == "" || $txtGmailPassword.val().length == 0) {
+                if (!$txtGmailUsername.val() || $txtGmailUsername.val() == "" || $txtGmailUsername.val().length == 0 || !$txtGmailPassword.val() || $txtGmailPassword.val() == "" || $txtGmailPassword.val().length == 0) {
                     return;
                 }
                 $lblContactSettingMessage.css("color", "gray");
@@ -1021,7 +1021,7 @@
             });
 
             function setBusy(isBusy) {
-                if (isBusy) 
+                if (isBusy)
                     $busyDiv[0].style.visibility = 'visible';
                 else
                     $busyDiv[0].style.visibility = 'hidden';
@@ -1107,7 +1107,7 @@
                         html.push(data.SColor);
                         html.push('|');
                         html.push(data.OnSColor);
-                        html.push('" data-id="' + data.Id+'" >');
+                        html.push('" data-id="' + data.Id + '" >');
                         html.push('<span class="vis-theme-color" style="background-color:rgba(' + data.PColor + ',1)"></span>');
                         html.push('<span class="vis-theme-color" style="background-color:rgba(' + data.OnPColor + ',1)"></span>');
                         html.push('<span class="vis-theme-color" style="background-color:rgba(' + data.SColor + ',1)"></span>');
@@ -1603,7 +1603,7 @@
                 return;
 
             }
-            var sql =  roleID;
+            var sql = roleID;
             roleID = null;
 
             $.ajax({
@@ -1638,11 +1638,11 @@
             }
             var sql = "";
 
-         
+
             $.ajax({
                 url: VIS.Application.contextUrl + "UserPreference/GetOrgData",
                 dataType: "json",
-                data: { "roleId":AD_Role_ID,"clientId" : AD_Client_ID },
+                data: { "roleId": AD_Role_ID, "clientId": AD_Client_ID },
                 success: function (data) {
                     var dic = JSON.parse(data);
                     var cmbOrgContent = "";
@@ -1670,9 +1670,9 @@
                 return;
 
             }
-           
 
-           
+
+
 
             $.ajax({
                 url: VIS.Application.contextUrl + "UserPreference/GetWarehouseData",
