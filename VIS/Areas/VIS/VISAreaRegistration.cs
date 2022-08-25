@@ -118,6 +118,8 @@ namespace VIS
             //    "~/Areas/VIS/Scripts/app/grouprights/createrole.js",
             //    "~/Areas/VIS/Scripts/app/Framework/markmodule.js",
             //    "~/Areas/VIS/Scripts/app/Framework/cardviewdialog.js",
+            //    "~/Areas/VIS/Scripts/app/Framework/cardTemplateMaster.js",
+
             //    "~/Areas/VIS/Scripts/app/Framework/visimportfiles.js",
             //    "~/Areas/VIS/Scripts/app/Framework/parameterdialog.js",
             //    "~/Areas/VIS/Scripts/app/processwrapper.js",
