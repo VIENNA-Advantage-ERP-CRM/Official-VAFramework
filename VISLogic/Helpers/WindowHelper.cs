@@ -36,6 +36,7 @@ namespace VIS.Helpers
         private List<String> _createSqlValue = new List<String>();
         private List<string> _defaultTblCols = new List<string> { "created", "updated", "createdby", "updatedby", "export_id" };
         List<PO_LOB> _lobInfo = null;
+        private VLogger log = VLogger.GetVLogger(typeof(WindowHelper).FullName);
         string key;
 
         //format record info
@@ -2416,7 +2417,10 @@ namespace VIS.Helpers
 
             DataSet ds = new SqlHelper().ExecuteDataSet(sqlIn);
             if (ds == null)
+            {
+                log.Severe(sqlIn.sql);
                 return null;
+            }
 
             bool checkEncrypted = encryptedColNames != null && encryptedColNames.Count > 0;
 
