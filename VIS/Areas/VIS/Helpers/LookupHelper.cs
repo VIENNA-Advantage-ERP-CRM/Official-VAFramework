@@ -54,6 +54,10 @@ namespace VIS.Classes
                     {
                         for (int i = 0; i < data.Count; i++)
                         {
+
+                            if(data[i].Value==null || data[i].Value.ToLower()=="null" || data[i].Value=="")
+                                validation = validation.Replace("@" + data[i].Key + "@", "NULL");
+                            else
                             validation = validation.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
                         }
                     }
