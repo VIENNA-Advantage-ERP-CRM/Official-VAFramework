@@ -3240,7 +3240,7 @@
                 //query = "SELECT AD_Window_ID FROM AD_Window WHERE Name = '" + VIS.context.getContext(self.lookup.windowNo, "WindowName") + "'";
                 query = "VIS_88";
                 var param = [];
-                param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", VIS.context.getContext(self.lookup.windowNo, "0|AD_Tab_ID", true));
+                param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", VIS.context.getContextAsInt(self.lookup.windowNo, "0|AD_Tab_ID", true));
 
                 window_ID = executeScalar(query, param);
                 if (_keyColumnName.equals("M_Product_ID") && window_ID) {
