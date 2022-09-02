@@ -857,14 +857,18 @@
         for (var c = 0; c < curTabfieldlist.length; c++) {
             // get field
             var fieldorg = curTabfieldlist[c];
-            var field = Object.assign(Object.create(Object.getPrototypeOf(fieldorg)), fieldorg);
-            ///var field = jQuery.extend(true, {}, fieldorg);
-            //if (VIS.DisplayType.IsLookup(fieldorg.getDisplayType()) || VIS.DisplayType.ID == fieldorg.getDisplayType()) {
-            //    //field.lookup = jQuery.extend(true, {}, fieldorg.lookup);
-            //    field.lookup = new VIS.MLookupFactory.getMLookUp(VIS.context, this.winNo, field.getAD_Column_ID(), fieldorg.getDisplayType());
-            //    if (field.lookup.initialize)
-            //        field.lookup.initialize();
-            //}
+           // var field = Object.assign(Object.create(Object.getPrototypeOf(fieldorg)), fieldorg);
+
+            //let field = JSON.parse(JSON.stringify(fieldorg));
+
+            //Object.setPrototypeOf(field, Object.getPrototypeOf(fieldorg));
+
+            var field = jQuery.extend(true, {}, fieldorg);
+            if (fieldorg.lookup && (VIS.DisplayType.IsLookup(fieldorg.getDisplayType()) || VIS.DisplayType.ID == fieldorg.getDisplayType())) {
+                field.lookup = jQuery.extend(true, {}, fieldorg.lookup);
+                if (field.lookup.initialize)
+                    field.lookup.initialize();
+            }
 
 
 
