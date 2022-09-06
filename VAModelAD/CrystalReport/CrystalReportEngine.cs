@@ -319,8 +319,18 @@ namespace VAdvantage.CrystalReport
                                         }
                                         else
                                         {
-                                            sb.Append("Upper(").Append(paramName).Append(")").Append(" = Upper(")
-                                                .Append(GlobalVariable.TO_STRING(paramValue.ToString()) + ")");
+                                            int outVal = 0;
+                                            if (int.TryParse(Convert.ToString(paramValue), out outVal))
+                                            {
+                                                sb.Append(paramName).Append(" = ")
+                                              .Append(paramValue.ToString());
+                                            }
+                                            else
+                                            {
+                                                sb.Append("Upper(").Append(paramName).Append(")").Append(" = Upper(")
+                                                  .Append(GlobalVariable.TO_STRING(paramValue.ToString()) + ")");
+                                            }
+
                                         }
 
                                         if (paramValue is DateTime || paramValueTo is DateTime)
@@ -1189,8 +1199,17 @@ namespace VAdvantage.CrystalReport
                                         }
                                         else
                                         {
-                                            sb.Append("Upper(").Append(paramName).Append(")").Append(" = Upper(")
-                                                .Append(GlobalVariable.TO_STRING(paramValue.ToString()) + ")");
+                                            int outVal = 0;
+                                            if (int.TryParse(Convert.ToString(paramValue), out outVal))
+                                            {
+                                                sb.Append(paramName).Append(" = ")
+                                              .Append(paramValue.ToString());
+                                            }
+                                            else
+                                            {
+                                                sb.Append("Upper(").Append(paramName).Append(")").Append(" = Upper(")
+                                                    .Append(GlobalVariable.TO_STRING(paramValue.ToString()) + ")");
+                                            }
                                         }
 
                                         if (paramValue is DateTime || paramValueTo is DateTime)
