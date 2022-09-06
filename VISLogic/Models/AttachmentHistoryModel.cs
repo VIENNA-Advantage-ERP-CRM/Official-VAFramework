@@ -96,7 +96,7 @@ and record_id = " + _Record_ID;
                 }
             }
 
-            strAppCount += ")" + (VAdvantage.DataBase.DB.IsPostgreSQL() ? " as foo" : "") + " ORDER BY created DESC";
+            strAppCount += ")" + (VAdvantage.DataBase.DB.IsPostgreSQL() ? " as foo" : "");
             return Util.GetValueOfInt(DB.ExecuteScalar(strAppCount, null, null));
 
         }
