@@ -3485,7 +3485,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
                 }
             }
 
@@ -3557,7 +3557,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST("+ TableName + ".AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST("+ TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
                 }
             }
 
