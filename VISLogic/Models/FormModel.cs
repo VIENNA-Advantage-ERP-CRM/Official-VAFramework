@@ -478,9 +478,9 @@ namespace VIS.Models
 
             List<JTable> jTable = new List<JTable>();
             List<SqlParameter> param = new List<SqlParameter>();
-            param.Add(new SqlParameter("@AD_Table_ID", aD_Table_ID));
-            param.Add(new SqlParameter("@AD_ColumnSortOrder_ID", aD_ColumnSortOrder_ID));
-            param.Add(new SqlParameter("@AD_ColumnSortYesNo_ID", aD_ColumnSortYesNo_ID));
+            param.Add(new SqlParameter("@AD_Table_ID", Util.GetValueOfInt( aD_Table_ID)));
+            param.Add(new SqlParameter("@AD_ColumnSortOrder_ID", Util.GetValueOfInt(aD_ColumnSortOrder_ID)));
+            param.Add(new SqlParameter("@AD_ColumnSortYesNo_ID", Util.GetValueOfInt(aD_ColumnSortYesNo_ID)));
 
             string qry = "VIS_122";
             if (isTrl)

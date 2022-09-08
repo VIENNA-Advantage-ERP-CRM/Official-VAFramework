@@ -1624,7 +1624,7 @@
                 dr = null;
             }
 
-            if (targetWhereClause != '' && !targetWhereClause) {
+            if (targetWhereClause != '' && targetWhereClause) {
                 targetWhereClause = VIS.secureEngine.encrypt(targetWhereClause);
             }
 
