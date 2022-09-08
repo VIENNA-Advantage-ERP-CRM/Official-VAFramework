@@ -991,10 +991,10 @@
             var sqlUserSearch = "VIS_116";
             var param = [];
             param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", self.curTab.getAD_Tab_ID());
-            param[1] = new VIS.DB.SqlParam("@AD_User_ID", self.ctx.getAD_User_ID());
+            param[1] = new VIS.DB.SqlParam("@AD_User_ID", parseInt(self.ctx.getAD_User_ID()));
             param[2] = new VIS.DB.SqlParam("@AD_Tab_ID1", self.curTab.getAD_Tab_ID());
-            param[3] = new VIS.DB.SqlParam("@AD_User_ID1", self.ctx.getAD_User_ID());
-            param[4] = new VIS.DB.SqlParam("@AD_Client_ID", self.ctx.getAD_Client_ID());
+            param[3] = new VIS.DB.SqlParam("@AD_User_ID1", parseInt(self.ctx.getAD_User_ID()));
+            param[4] = new VIS.DB.SqlParam("@AD_Client_ID", parseInt(self.ctx.getAD_Client_ID()));
             param[5] = new VIS.DB.SqlParam("@AD_Tab_ID2", self.curTab.getAD_Tab_ID());
             param[6] = new VIS.DB.SqlParam("@AD_Table_ID", self.curTab.getAD_Table_ID());
 
@@ -1567,7 +1567,7 @@
             //}	//	query on first tab
             //ZoomChildTab
             if (isCheckCurrentTab) {
-                if (i === 0 && (query == null || (query.list != null && query.list.length == 0) || (query.list[0].code==-10))) {
+                if (i === 0 && (query == null || (query.list != null && query.list.length == 0) || (query.list[0].code == -10))) {
                     this.curTab = gTab;
                     this.firstTabId = id;
                     setCurrent = true;
@@ -1627,7 +1627,7 @@
                     this.curGC = gc;
                     setCurrent = false;
                 }
-               
+
 
 
                 // Set first tab as current tab in case not marked aby tab as current tab.
@@ -1638,13 +1638,13 @@
                     //if (query != null) {
                     //    gTab.setQuery(query);
                     //}
-                //}
+                    //}
 
 
-                ////Set Title of Tab
-                //if (i === 0) {
-                //    this.curGC = gc;
-                //    this.firstTabId = id;
+                    ////Set Title of Tab
+                    //if (i === 0) {
+                    //    this.curGC = gc;
+                    //    this.firstTabId = id;
 
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
@@ -1983,7 +1983,7 @@
             }
             //    tis.setLastView("Multi");
             //else 
-           
+
             tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
             tis.aCard.setPressed(false);
             tis.curGC.switchRowPresentation();
@@ -2955,7 +2955,7 @@
             //PopulateSerachCombo(false);
             /*	Refresh only current row when tab is current(parent)*/
             if (!this.curTab.getIsZoomAction() && this.curTab.getTabLevel() > 0) {
-            //if (!gc.isZoomAction && this.curTab.getTabLevel() > 0) {
+                //if (!gc.isZoomAction && this.curTab.getTabLevel() > 0) {
                 var queryy = new VIS.Query();
                 this.curTab.query = queryy;
                 keepFilters = false;
@@ -3104,10 +3104,10 @@
 
         var param = [];
         param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", this.curTab.getAD_Tab_ID());
-        param[1] = new VIS.DB.SqlParam("@AD_User_ID", this.ctx.getAD_User_ID());
+        param[1] = new VIS.DB.SqlParam("@AD_User_ID", parseInt(this.ctx.getAD_User_ID()));
         param[2] = new VIS.DB.SqlParam("@AD_Tab_ID1", this.curTab.getAD_Tab_ID());
-        param[3] = new VIS.DB.SqlParam("@AD_User_ID1", this.ctx.getAD_User_ID());
-        param[4] = new VIS.DB.SqlParam("@AD_Client_ID", this.ctx.getAD_Client_ID());
+        param[3] = new VIS.DB.SqlParam("@AD_User_ID1", parseInt(this.ctx.getAD_User_ID()));
+        param[4] = new VIS.DB.SqlParam("@AD_Client_ID", parseInt(this.ctx.getAD_Client_ID()));
         param[5] = new VIS.DB.SqlParam("@AD_Tab_ID2", this.curTab.getAD_Tab_ID());
         param[6] = new VIS.DB.SqlParam("@AD_Table_ID", this.curTab.getAD_Table_ID());
 

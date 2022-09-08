@@ -726,7 +726,8 @@ namespace VAdvantage.Common
 
             POInfo _poInfo = POInfo.GetPOInfo(po.GetCtx(), po.Get_Table_ID());
 
-            MColumn column = (new MTable(po.GetCtx(), po.Get_Table_ID(), null)).GetColumn(variable);
+            //  MColumn column = (new MTable(po.GetCtx(), po.Get_Table_ID(), null)).GetColumn(variable);
+            MColumn column = (MTable.Get(po.GetCtx(),po.Get_Table_ID())).GetColumn(variable);
             if (column.GetAD_Reference_ID() == DisplayType.Location)
             {
                 StringBuilder sb = new StringBuilder();
@@ -794,6 +795,7 @@ namespace VAdvantage.Common
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
                     value = ds.Tables[0].Rows[0][2]; //Name Value
+                    value = RemoveImageIdentifer(value);
                 }
             }
 
@@ -811,6 +813,23 @@ namespace VAdvantage.Common
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
             return value.ToString();
+        }
+
+
+        public static string RemoveImageIdentifer(object value)
+        {
+            string val = Convert.ToString(value);
+            if (val.IndexOf("^^") == -1)
+                return val;
+
+            val = val.Replace("^^" + val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") + 3), "");
+            if (val.IndexOf("Images/") > -1)
+            {
+                val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") + 3), "");
+            }
+
+            return val;
+
         }
 
         /// <summary>

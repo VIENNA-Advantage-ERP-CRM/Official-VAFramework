@@ -34,7 +34,9 @@ namespace VIS.Areas.VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             LookupHelper lHelper = new LookupHelper();
             object result = await System.Threading.Tasks.Task.Run(() => lHelper.GetLookupData(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, Values, PageSize, LookupData));
-            return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+            var jsonResult= Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult;
         }
 
         [HttpPost]
