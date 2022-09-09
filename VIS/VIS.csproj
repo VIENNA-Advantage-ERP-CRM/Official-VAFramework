@@ -534,6 +534,8 @@
     <Content Include="Areas\VIS\Images\login\folder-open.png" />
     <Content Include="Areas\VIS\Images\login\folder.png" />
     <Content Include="Areas\VIS\Images\login\form-bg.png" />
+    <Content Include="Areas\VIS\Images\login\gear-left.png" />
+    <Content Include="Areas\VIS\Images\login\gear-right.png" />
     <Content Include="Areas\VIS\Images\login\html5_login.JPG" />
     <Content Include="Areas\VIS\Images\login\html5_login.PNG" />
     <Content Include="Areas\VIS\Images\login\lang-ico.png" />
@@ -550,6 +552,7 @@
     <Content Include="Areas\VIS\Images\login\org.png" />
     <Content Include="Areas\VIS\Images\login\pass-ico.png" />
     <Content Include="Areas\VIS\Images\login\role.png" />
+    <Content Include="Areas\VIS\Images\login\under-maintaince.png" />
     <Content Include="Areas\VIS\Images\login\user-ico.png" />
     <Content Include="Areas\VIS\Images\login\warehouse.png" />
     <Content Include="Areas\VIS\Images\logo.jpg" />
@@ -831,6 +834,7 @@
     <Content Include="Areas\VIS\Views\CardViewWizard\HtmlControls.cshtml" />
     <Content Include="Areas\VIS\Views\CardViewWizard\Index.cshtml" />
     <Content Include="Areas\VIS\Views\AccountForm\Index.cshtml" />
+    <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
     <Content Include="Areas\VIS\WebPages\CrystalReprotViewer.aspx" />

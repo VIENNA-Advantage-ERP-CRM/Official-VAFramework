@@ -69,6 +69,17 @@ namespace VIS.Controllers
         /// <returns></returns>
         public ActionResult Index(FormCollection form)
         {
+
+
+            if (LoginHelper.IsSiteUnderMaintenance())
+            {
+                if (User.Identity.IsAuthenticated)
+                {
+                    return new AccountController().SignOff(Session["ctx"] as Ctx);
+                }
+                return View("Maintenance"); 
+            }
+
             if (Request.QueryString.Count > 0)
             {
                 // string user = Request.QueryString["U"];
@@ -168,7 +179,7 @@ namespace VIS.Controllers
 
                     if (string.IsNullOrEmpty(ctx.GetContext("##AD_User_Value")))
                     {
-                        return new AccountController().LogOff();
+                        return new AccountController().SignOff(ctx);
 
                     }
 
@@ -177,6 +188,13 @@ namespace VIS.Controllers
                         ctx.SetSecureKey(key);
                     }
                     Session["ctx"] = ctx;
+
+
+                    //Check For 
+
+
+
+
 
                     //get login Language object on server
                     var loginLang = ctx.GetAD_Language();
