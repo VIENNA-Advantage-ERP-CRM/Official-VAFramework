@@ -3485,7 +3485,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
                 }
             }
 
@@ -3549,7 +3549,7 @@ namespace VIS.Helpers
                 }
             }
 
-            List<GridFieldVO> imgColList = lstFields.Where(a => a.AD_Reference_ID == DisplayType.Image).ToList();
+            List<GridFieldVO> imgColList = lstFields.Where(a => a.displayType == DisplayType.Image).ToList();
 
 
 
@@ -3557,7 +3557,7 @@ namespace VIS.Helpers
             {
                 for (int j = 0; j < imgColList.Count; j++)
                 {
-                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(AD_User.AD_Image_ID AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    Columns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
                 }
             }
 
@@ -3619,7 +3619,8 @@ namespace VIS.Helpers
                     --sqlIn.page;
                 }
             }
-            else {
+            else
+            {
                 sqlIn.pageSize = 0;
                 sqlIn.page = 0;
             }
@@ -3644,15 +3645,18 @@ namespace VIS.Helpers
 
                         var qryDirect = lInfo.queryDirect.Substring(lInfo.queryDirect.LastIndexOf(" FROM " + lInfo.tableName + " "));
 
-                        if (!lstFields[i].IsVirtualColumn)
+                        if (!lstFields[i].IsVirtualColumn && string.IsNullOrEmpty(lstFields[i].ColumnSQL))
                             qryDirect = qryDirect.Replace("@key", gt.TableName + '.' + GetColumnSQL(false, lstFields[i]));
                         else
                             qryDirect = qryDirect.Replace("@key", GetColumnSQL(false, lstFields[i]));
 
 
-                        selectDirect.Append("( SELECT (").Append(lInfo.displayColSubQ).Append(") ").Append(qryDirect)
-                            .Append(" ) AS ").Append(GetColumnSQL(false, lstFields[i]) + "_T")
-                            .Append(',').Append(GetColumnSQL(true, lstFields[i]));
+                        selectDirect.Append("( SELECT (").Append(lInfo.displayColSubQ).Append(") ").Append(qryDirect);
+                        if (string.IsNullOrEmpty(lstFields[i].ColumnSQL))
+                            selectDirect.Append(" ) AS ").Append(GetColumnSQL(false, lstFields[i]) + "_T");
+                        else
+                            selectDirect.Append(" ) AS ").Append(lstFields[i].ColumnName + "_T");
+                        selectDirect.Append(',').Append(GetColumnSQL(true, lstFields[i]));
                     }
                     else if (lstFields[i].lookupInfo != null && lstFields[i].AD_Reference_ID == DisplayType.Account)
                     {

@@ -165,7 +165,7 @@
                 //	Serach for option and add it
                 var added = false;
                 for (var j = 0; j < _values.length && !added; j++)
-                    if (result.Options[i].equals(_values[j])) {
+                    if (result.Options[i] && result.Options[i].equals(_values[j])) {
                         //actionCombo.addItem(_names[j]);
                         $cmbAction.append('<option >' + _names[j] + '</option>');
                         added = true;

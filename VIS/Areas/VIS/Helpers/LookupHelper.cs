@@ -38,13 +38,13 @@ namespace VIS.Classes
             return MTable.Get(ctx, AD_Table_ID).GetKeyColumns();
         }
 
-        public Object GetLookupData(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, 
+        public Object GetLookupData(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values,
             int PageSize, string LookupData)
         {
             VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
             string lookupQuery = lInfo.query;
             string validation = lInfo.validationCode;
-            if (!string.IsNullOrEmpty(validation))
+            if (!string.IsNullOrEmpty(validation) && lInfo.isValidated == false)
             {
                 if (!string.IsNullOrEmpty(Values))
                 {
@@ -55,10 +55,10 @@ namespace VIS.Classes
                         for (int i = 0; i < data.Count; i++)
                         {
 
-                            if(data[i].Value==null || data[i].Value.ToLower()=="null" || data[i].Value=="")
+                            if (data[i].Value == null || data[i].Value.ToLower() == "null" || data[i].Value == "")
                                 validation = validation.Replace("@" + data[i].Key + "@", "NULL");
                             else
-                            validation = validation.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
+                                validation = validation.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
                         }
                     }
                 }
@@ -90,9 +90,9 @@ namespace VIS.Classes
 
 
         public Object GetLookupAll(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values,
-            int PageSize,string LookupData)
+            int PageSize, string LookupData)
         {
-            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID,LookupData);
+            VLookUpInfo lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
             string lookupQuery = lInfo.queryAll;
             string validation = lInfo.validationCode;
 
@@ -114,9 +114,9 @@ namespace VIS.Classes
         {
             VLookUpInfo lInfo = null;
             string lookupQuery = "";
-                lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
-                lookupQuery = lInfo.queryDirect;
-            
+            lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
+            lookupQuery = lInfo.queryDirect;
+
 
 
 
@@ -150,13 +150,12 @@ namespace VIS.Classes
             return result;
         }
 
-        private VLookUpInfo GetLookupInfo(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID,string LookupData)
+        private VLookUpInfo GetLookupInfo(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string LookupData)
         {
             VLookUpInfo lInfo = null;
             if (AD_Window_ID > 0)
             {
                 GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
-
                 lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
             }
             else
@@ -169,7 +168,7 @@ namespace VIS.Classes
                     validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
                 }
 
-                  
+
                 if (!QueryValidator.IsValid(validationCode))
                     return null;
 
@@ -210,7 +209,7 @@ namespace VIS.Classes
 
             var keyColumn = lInfo.keyColumn;
             var displayColumn = lInfo.displayColSubQ;
-        //    sql = sql.Replace(displayColumn, "");
+            //    sql = sql.Replace(displayColumn, "");
 
             var posFrom = sql.IndexOf(" FROM ");
             var hasWhere = sql.IndexOf(" WHERE ", posFrom) != -1;
@@ -273,7 +272,7 @@ namespace VIS.Classes
             }
 
             // string lastPart = sql.Substring(sql.IndexOf("FROM"), sql.Length);
-            string lastPart = sql.Substring(sql.IndexOf("FROM "+ lInfo.tableName));
+            string lastPart = sql.Substring(sql.IndexOf("FROM " + lInfo.tableName));
             sql = "SELECT " + keyColumn + " AS ID,NULL," + displayColumn + " AS finalValue " + lastPart;
 
             text = text.ToUpper();

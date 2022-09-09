@@ -323,7 +323,7 @@
         if (!this.lookupData) {
             var keyCol = lookupInfo.keyColumn;
             if (keyCol && keyCol.indexOf(".") > -1) {
-                keyCol = keyCol.substring(keyCol.indexOf(".")+1);
+                keyCol = keyCol.substring(keyCol.indexOf(".") + 1);
             }
             this.lookupData = {
                 'ctx': VIS.context.getWindowCtx(lookupInfo.windowNo),
@@ -837,7 +837,7 @@
 
         $.ajax({
             url: VIS.Application.contextUrl + "Lookup/GetLookupDirect",
-            type:'post',
+            type: 'post',
             data: {
                 WindowNo: self.getWindowNo(),
                 AD_Window_ID: self.AD_Window_ID,
@@ -847,7 +847,7 @@
                 IsNumber: isNumber,
                 LookupData: JSON.stringify(self.lookupData)
             },
-            type:'post',
+            type: 'post',
             success: function (data) {
                 var dr = new VIS.DB.DataReader().toJson(data);
 
@@ -952,7 +952,7 @@
         $.ajax({
             url: VIS.Application.contextUrl + "Lookup/GetLookupData",
             async: async,
-            type:'post',
+            type: 'post',
             data: {
                 WindowNo: self.getWindowNo(),
                 AD_Window_ID: self.AD_Window_ID,
@@ -1019,7 +1019,7 @@
 
         $.ajax({
             url: VIS.Application.contextUrl + "Lookup/GetLookupAll",
-            type:'post',
+            type: 'post',
             data: {
                 WindowNo: self.getWindowNo(),
                 AD_Window_ID: self.AD_Window_ID,
@@ -2150,6 +2150,9 @@
                 validationCode = VIS.secureEngine.encrypt(validationCode);
             }
 
+            if (column_ID)
+                column_ID = VIS.Utility.Util.getValueOfInt(column_ID);
+
             var d = {
                 'ctx': ctx.getWindowCtx(windowNo),
                 'windowNo': windowNo,
@@ -2174,6 +2177,10 @@
             var AD_Reference_Value_ID = 0;
             var isParent = false;
             var validationCode = "";
+
+            if (Column_ID)
+                Column_ID = VIS.Utility.Util.getValueOfInt(Column_ID);
+
             //
             var sql = "VIS_97";
             var dr = null;
@@ -2210,6 +2217,9 @@
             //return lookup.initialize(info);
         },
         GetLookUpInfo: function (ctx, windowNum, AD_Reference_ID, column_ID, columnName, AD_Reference_Value_ID, isParent, validationCode) {
+
+            if (column_ID)
+                column_ID = VIS.Utility.Util.getValueOfInt(column_ID);
 
             var data = {
                 WindowNum: windowNum,
