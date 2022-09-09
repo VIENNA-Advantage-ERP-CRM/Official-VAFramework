@@ -366,8 +366,8 @@
                         self = null;
                         return;
                     }
-                    var jsonData = $.parseJSON(json.result); // widow json
-                    VIS.context.setContextOfWindow($.parseJSON(json.wCtx), windowNo);// set window context
+                    var jsonData = JSON.parse(json.result); // widow json
+                    VIS.context.setContextOfWindow(JSON.parse(json.wCtx), windowNo);// set window context
                     var GridWindow = new VIS.GridWindow(jsonData);
                     if (GridWindow == null) {
                         return;

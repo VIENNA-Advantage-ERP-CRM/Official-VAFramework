@@ -12,11 +12,15 @@ using VAdvantage.DataBase;
 using VAdvantage.Utility;
 using VIS.Classes;
 using VIS.DataContracts;
+using VIS.Filters;
 using VIS.Helpers;
 using VIS.Models;
 
 namespace VIS.Areas.VIS.Controllers
 {
+    [AjaxAuthorizeAttribute] // redirect to login page if reques`t is not Authorized
+    [AjaxSessionFilterAttribute] // redirect to Login/Home page if session expire
+    [AjaxValidateAntiForgeryToken] // validate antiforgery token 
     public class LookupController : Controller
     {
         // GET: VIS/Lookup
