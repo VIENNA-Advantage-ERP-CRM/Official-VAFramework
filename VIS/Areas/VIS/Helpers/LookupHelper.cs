@@ -116,6 +116,7 @@ namespace VIS.Classes
         {
             object result = null;
             string lookupQuery = "";
+            string key = "";
             try
             {
                 VLookUpInfo lInfo = null;
@@ -127,7 +128,6 @@ namespace VIS.Classes
 
 
                 List<SqlParams> listParam = new List<SqlParams>();
-                string key = "";
                 if (Key != null)
                     key = ((string[])Key)[0];
 
@@ -156,7 +156,7 @@ namespace VIS.Classes
             }
             catch (Exception ex)
             {
-                log.SaveError("Lookup Direct Query Issue: SQL:" + lookupQuery + " VALUE : " + Key, ex.Message);
+                log.SaveError("Lookup Direct Query Issue: SQL:" + lookupQuery + " VALUE : " + key, ex.Message);
             }
             return result;
         }
