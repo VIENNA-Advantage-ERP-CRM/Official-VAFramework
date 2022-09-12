@@ -12,6 +12,7 @@ using System.Web.Hosting;
 using VAdvantage.Classes;
 using VAdvantage.Controller;
 using VAdvantage.DataBase;
+using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.SqlExec.MSSql;
 using VAdvantage.Utility;
@@ -22,6 +23,7 @@ namespace VIS.Classes
 {
     public class LookupHelper
     {
+        private VLogger log = VLogger.GetVLogger(typeof(LookupHelper).FullName);
         public static Lookup GetLookup(Ctx ctx, int windowNo, int Column_ID, int AD_Reference_ID,
                  String columnName, int AD_Reference_Value_ID,
                 bool IsParent, String ValidationCode)
@@ -112,41 +114,50 @@ namespace VIS.Classes
         public Object GetLookupDirect(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, object Key,
             bool IsNumber, string LookupData)
         {
-            VLookUpInfo lInfo = null;
+            object result = null;
             string lookupQuery = "";
-            lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
-            lookupQuery = lInfo.queryDirect;
-
-
-
-
-            List<SqlParams> listParam = new List<SqlParams>();
-            string key = "";
-            if (Key != null)
-                key = ((string[])Key)[0];
-
-
-            SqlParams parm = new SqlParams();
-
-            parm.name = "@key";
-            if (IsNumber)
+            try
             {
-                parm.value = Convert.ToInt32(key);
+                VLookUpInfo lInfo = null;
+
+                lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
+                lookupQuery = lInfo.queryDirect;
+
+
+
+
+                List<SqlParams> listParam = new List<SqlParams>();
+                string key = "";
+                if (Key != null)
+                    key = ((string[])Key)[0];
+
+
+                SqlParams parm = new SqlParams();
+
+                parm.name = "@key";
+                if (IsNumber)
+                {
+                    parm.value = Convert.ToInt32(key);
+                }
+                else
+                {
+                    parm.value = Convert.ToString(key);
+                }
+                listParam.Add(parm);
+
+                VIS.Helpers.SqlHelper h = new VIS.Helpers.SqlHelper();
+                SqlParamsIn sqlIn = new SqlParamsIn()
+                {
+                    sql = lookupQuery,
+                    param = listParam
+                };
+
+                result = h.ExecuteJDataSet(sqlIn);
             }
-            else
+            catch (Exception ex)
             {
-                parm.value = Convert.ToString(key);
+                log.SaveError("Lookup Direct Query Issue: SQL:" + lookupQuery + " VALUE : " + Key, ex.Message);
             }
-            listParam.Add(parm);
-
-            VIS.Helpers.SqlHelper h = new VIS.Helpers.SqlHelper();
-            SqlParamsIn sqlIn = new SqlParamsIn()
-            {
-                sql = lookupQuery,
-                param = listParam
-            };
-
-            object result = h.ExecuteJDataSet(sqlIn);
             return result;
         }
 
@@ -272,7 +283,7 @@ namespace VIS.Classes
             }
 
             // string lastPart = sql.Substring(sql.IndexOf("FROM"), sql.Length);
-            string lastPart = sql.Substring(sql.IndexOf("FROM " + lInfo.tableName));
+            string lastPart = sql.Substring(sql.LastIndexOf("FROM " + lInfo.tableName + " "));
             sql = "SELECT " + keyColumn + " AS ID,NULL," + displayColumn + " AS finalValue " + lastPart;
 
             text = text.ToUpper();
