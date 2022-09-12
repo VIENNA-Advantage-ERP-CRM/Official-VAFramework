@@ -363,21 +363,32 @@ namespace VIS.Controllers
         public ActionResult LogOff()
         {
             //WebSecurity.Logout();
+            Ctx ctx = null;
             try
             {
-                Ctx ctx = Session["ctx"] as Ctx;
+                if (Session != null)
+                {
+                    ctx = Session["ctx"] as Ctx;
+                }
                 //VAdvantage.Logging.VLogMgt.Shutdown(ctx);
                 // MSession s = MSession.Get(ctx);
                 // s.Logout();
-                if(ctx !=null)
-                VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx);
+               
             }
             catch
             {
 
             }
+            return SignOff(ctx);
 
+        }
 
+        public ActionResult SignOff(Ctx ctx)
+        {
+            
+           if (ctx != null)
+             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx);
+            
             FormsAuthentication.SignOut();
             //if (Session != null)
             //    Session.Abandon();
