@@ -241,12 +241,12 @@ namespace VIS.Classes
                     {
                         for (int i = 0; i < data.Count; i++)
                         {
-                            lInfo.validationCode = lInfo.validationCode.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
+                            validation = validation.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
                         }
                     }
                 }
 
-                validation = " AND " + lInfo.validationCode;
+                validation = " AND " + validation;
             }
             validation = Env.ParseContext(ctx, WindowNo, validation, false);
             if (validation != null && validation.Length > 0)
@@ -283,7 +283,10 @@ namespace VIS.Classes
             }
 
             // string lastPart = sql.Substring(sql.IndexOf("FROM"), sql.Length);
-            string lastPart = sql.Substring(sql.LastIndexOf("FROM " + lInfo.tableName + " "));
+            //", C_Invoice .IsActive FROM00  C_Invoice "
+
+            string lastPart = sql.Substring(sql.IndexOf($",{lInfo.tableName}.IsActive FROM {lInfo.tableName } "));
+            lastPart = lastPart.Substring(lastPart.IndexOf("FROM"));
             sql = "SELECT " + keyColumn + " AS ID,NULL," + displayColumn + " AS finalValue " + lastPart;
 
             text = text.ToUpper();
