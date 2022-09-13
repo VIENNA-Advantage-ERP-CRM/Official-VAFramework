@@ -4309,25 +4309,41 @@
                                 DivStyleSec1.find("[data-command='" + a + "'][type='color']").val(rgb2hex(v));
                             }
                             else if (a.indexOf('border') != -1 && a.indexOf('radius') == -1) {
-                                var rgb = v.split('rgb');
-                                if (rgb.length > 1) {
-                                    v = v.replace('rgb' + rgb[1], rgb2hex('rgb' + rgb[1]));
-                                }
-                                v = v.split(' ');
-                                var bdrDiv = DivStyleSec1.find("[data-command='" + a + "']").closest('.vis-prop-pan-cont');
-                                if (v.length == 1) {
-                                    DivStyleSec1.find("[data-command='" + a + "']").val(v[0]);
-                                } else if (v.length == 2) {
-                                    DivStyleSec1.find("[data-command='" + a + "']").val(v[0]);
-                                    bdrDiv.find("select").val(v[1]);
-                                } else if (v.length == 3) {
-                                    DivStyleSec1.find("[data-command='" + a + "']").val(v[0]);
-                                    bdrDiv.find("select").val(v[1]);
-                                    bdrDiv.find("[type='color']").val(v[2]);
-                                    bdrDiv.find(".vis-back-color03").css('background-color', v[2]);
+                                var brd = htm[0].style;
+                                if (brd.border == "") {
+                                    if (brd.borderLeftWidth != "") {
+                                        DivStyleSec1.find("[data-command='borderLeft']").val(brd.borderLeftWidth);
+                                        DivStyleSec1.find("[data-command='borderLeftStyle']").val(brd.borderLeftStyle);
+                                        DivStyleSec1.find("[data-command='borderLeftColor']").val(rgb2hex(brd.borderLeftColor));
+                                        DivStyleSec1.find("[data-command='borderLeftColor']").parent().css('background-color', brd.borderLeftColor)
+                                    }
+                                    if (brd.borderRightWidth != "") {
+                                        DivStyleSec1.find("[data-command='borderRight']").val(brd.borderRightWidth);
+                                        DivStyleSec1.find("[data-command='borderRightStyle']").val(brd.borderRightStyle);
+                                        DivStyleSec1.find("[data-command='borderRightColor']").val(rgb2hex(brd.borderRightColor));
+                                        DivStyleSec1.find("[data-command='borderRightColor']").parent().css('background-color', brd.borderRightColor)
+                                    }
+                                    if (brd.borderTopWidth != "") {
+                                        DivStyleSec1.find("[data-command='borderTop']").val(brd.borderTopWidth);
+                                        DivStyleSec1.find("[data-command='borderTopStyle']").val(brd.borderTopStyle);
+                                        DivStyleSec1.find("[data-command='borderTopColor']").val(rgb2hex(brd.borderTopColor));
+                                        DivStyleSec1.find("[data-command='borderTopColor']").parent().css('background-color', brd.borderTopColor)
+                                    }
+                                    if (brd.borderBottomWidth != "") {
+                                        DivStyleSec1.find("[data-command='borderBottom']").val(brd.borderBottomWidth);
+                                        DivStyleSec1.find("[data-command='borderBottomStyle']").val(brd.borderBottomStyle);
+                                        DivStyleSec1.find("[data-command='borderBottomColor']").val(rgb2hex(brd.borderBottomColor));
+                                        DivStyleSec1.find("[data-command='borderBottomColor']").parent().css('background-color', brd.borderBottomColor)
+                                    }
+                                } else {
+                                    var rgb = v.split('rgb');
+                                    if (rgb.length > 1) {
+                                        v = v.replace('rgb' + rgb[1], rgb2hex('rgb' + rgb[1]));
+                                    }
+                                    DivStyleSec1.find("[data-command='" + a + "']").val(v);
                                 }
 
-                                if (style[0].indexOf('-width') != -1) {
+                                if (brd.border == "" && (brd.borderTopWidth != "" || brd.borderRightWidth != "" || brd.borderTopWidth != "" || brd.borderBottomWidth != "")) {
                                     chkAllBorder.prop('checked', false);
                                     DivStyleSec1.find('.allBorder').addClass('displayNone');
                                     DivStyleSec1.find('.singleBorder').removeClass('displayNone');
