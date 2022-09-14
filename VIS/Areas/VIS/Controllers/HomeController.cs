@@ -71,14 +71,14 @@ namespace VIS.Controllers
         {
 
 
-            if (LoginHelper.IsSiteUnderMaintenance())
-            {
-                if (User.Identity.IsAuthenticated)
-                {
-                    return new AccountController().SignOff(Session["ctx"] as Ctx);
-                }
-                return View("Maintenance"); 
-            }
+            //if (LoginHelper.IsSiteUnderMaintenance())
+            //{
+            //    if (User.Identity.IsAuthenticated)
+            //    {
+            //        return new AccountController().SignOff(Session["ctx"] as Ctx);
+            //    }
+            //    return View("Maintenance"); 
+            //}
 
             if (Request.QueryString.Count > 0)
             {
@@ -181,6 +181,17 @@ namespace VIS.Controllers
                     {
                         return new AccountController().SignOff(ctx);
 
+                    }
+
+
+                    //if not system admin
+                    if (LoginHelper.IsSiteUnderMaintenance() && ctx.GetAD_Role_ID() !=0)
+                    {
+                       // if (User.Identity.IsAuthenticated)
+                        //{
+                          //  return new AccountController().SignOff(ctx);
+                        //}
+                        return View("Maintenance");
                     }
 
                     if (key != "")
