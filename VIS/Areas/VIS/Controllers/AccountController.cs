@@ -13,6 +13,7 @@ using VAdvantage.Utility;
 using System.ComponentModel;
 using System.Threading;
 using Newtonsoft.Json;
+using VAdvantage.Logging;
 
 namespace VIS.Controllers
 {
@@ -385,10 +386,8 @@ namespace VIS.Controllers
 
         public ActionResult SignOff(Ctx ctx)
         {
-            
            if (ctx != null)
              VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx);
-            
             FormsAuthentication.SignOut();
             //if (Session != null)
             //    Session.Abandon();
