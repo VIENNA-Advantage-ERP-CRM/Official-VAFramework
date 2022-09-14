@@ -3725,8 +3725,14 @@
                 m_SQL_Where.append(_whereClause);
             }
             else    //  replace variables
-                m_SQL_Where.append(VIS.Env.parseContext(this.ctx, gt._windowNo, _whereClause, false));
-            //
+            {
+                var wClause = VIS.Env.parseContext(this.ctx, gt._windowNo, _whereClause, false);
+                if ((!wClause || wClause.length == 0) && _whereClause.length>0)
+                    m_SQL_Where.append( "11=12" );
+                else
+                    m_SQL_Where.append(wClause);
+            }
+                //
             if (_whereClause.toUpperCase().indexOf("=NULL") > 0) {
                 this.log.Severe("Invalid NULL - " + _tableName + "=" + _whereClause);
             }
