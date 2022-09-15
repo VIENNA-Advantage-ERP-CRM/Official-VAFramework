@@ -570,7 +570,7 @@ namespace VIS.Models
         public List<dynamic> GetTemplateDesign(Ctx ctx, int ad_Window_ID, int ad_Tab_ID)
         {
             //string design = "";
-            string sqlQuery = "SELECT AD_HEADERLAYOUT.*,CASE WHEN to_date(updated)=to_date(CURRENT_DATE) THEN 1 ELSE 0 END AS lastUpdated  FROM AD_HEADERLAYOUT WHERE ISACTIVE='Y' AND ISHEADERVIEW='N' AND (IsSystemTemplate='Y' OR AD_HeaderLayout_ID IN (SELECT AD_HeaderLayout_ID  FROM AD_CardView WHERE AD_CardView.AD_Window_id=" + ad_Window_ID + " AND AD_CardView.AD_Tab_id=" + ad_Tab_ID + " AND (AD_CardView.AD_User_ID IS NULL OR AD_CardView.AD_User_ID  =" + ctx.GetAD_User_ID() + ")))";
+            string sqlQuery = "SELECT AD_HEADERLAYOUT.*,CASE WHEN Cast(updated AS DATE) =Cast(SYSDATE AS DATE) THEN 1 ELSE 0 END AS lastUpdated  FROM AD_HEADERLAYOUT WHERE ISACTIVE='Y' AND ISHEADERVIEW='N' AND (IsSystemTemplate='Y' OR AD_HeaderLayout_ID IN (SELECT AD_HeaderLayout_ID  FROM AD_CardView WHERE AD_CardView.AD_Window_id=" + ad_Window_ID + " AND AD_CardView.AD_Tab_id=" + ad_Tab_ID + " AND (AD_CardView.AD_User_ID IS NULL OR AD_CardView.AD_User_ID  =" + ctx.GetAD_User_ID() + ")))";
             sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery, "AD_HEADERLAYOUT", true, false);
             DataSet ds = DB.ExecuteDataset(sqlQuery);
             return ReturnTemplateDesign(ctx, ds, false); ;
@@ -586,7 +586,7 @@ namespace VIS.Models
         public List<dynamic> GetSystemTemplateDesign(Ctx ctx)
         {
             //string design = "";
-            string sqlQuery = "SELECT AD_HEADERLAYOUT.*,CASE when to_date(updated)=to_date(CURRENT_DATE) THEN 1 ELSE 0 END AS lastUpdated FROM AD_HEADERLAYOUT WHERE ISACTIVE='Y' AND ISHEADERVIEW='N' AND IsSystemTemplate='Y'";
+            string sqlQuery = "SELECT AD_HEADERLAYOUT.*,CASE when Cast(updated AS DATE) =Cast(SYSDATE AS DATE) THEN 1 ELSE 0 END AS lastUpdated FROM AD_HEADERLAYOUT WHERE ISACTIVE='Y' AND ISHEADERVIEW='N' AND IsSystemTemplate='Y'";
             sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery, "AD_HEADERLAYOUT", true, false);
             DataSet ds = DB.ExecuteDataset(sqlQuery);
             return ReturnTemplateDesign(ctx, ds, true);

@@ -74,18 +74,18 @@ namespace VIS.Models
             {
                 sql += " and C_ElementValue_ID=" + dTypeVal + " AND NVL(C_BPartner_ID,0)=" + cbPartId;
             }//Account
-            else if (dTypeVal == "AY") { sql += " and C_Activity_ID =" + dTypeVal; }//Activity
-            else if (dTypeVal == "BP") { sql += " and C_BPartner_ID=" + dTypeVal; }//BPartner
-            else if (dTypeVal == "LF" || dTypeVal == "LT") { sql += " and C_Location_ID=" + dTypeVal; }//Location From//Location To
-            else if (dTypeVal == "MC") { sql += " and C_Campaign_ID=" + dTypeVal; }//Campaign
-            else if (dTypeVal == "OO" || dTypeVal == "OT") { sql += " and Org_ID=" + dTypeVal; }//Organization//Org Trx
-            else if (dTypeVal == "PJ") { sql += " and C_Project_ID=" + dTypeVal; }//Project
-            else if (dTypeVal == "PR") { sql += " and M_Product_ID=" + dTypeVal; }//Product
+            else if (dTypeVal == "AY") { sql += " and C_Activity_ID =" + dNameVal; }//Activity
+            else if (dTypeVal == "BP") { sql += " and C_BPartner_ID=" + dNameVal; }//BPartner
+            else if (dTypeVal == "LF" || dTypeVal == "LT") { sql += " and C_Location_ID=" + dNameVal; }//Location From//Location To
+            else if (dTypeVal == "MC") { sql += " and C_Campaign_ID=" + dNameVal; }//Campaign
+            else if (dTypeVal == "OO" || dTypeVal == "OT") { sql += " and Org_ID=" + dNameVal; }//Organization//Org Trx
+            else if (dTypeVal == "PJ") { sql += " and C_Project_ID=" + dNameVal; }//Project
+            else if (dTypeVal == "PR") { sql += " and M_Product_ID=" + dNameVal; }//Product
             else if (dTypeVal == "SA") { }//Sub Account
-            else if (dTypeVal == "SR") { sql += " and C_SalesRegion_ID=" + dTypeVal; }//Sales Region
+            else if (dTypeVal == "SR") { sql += " and C_SalesRegion_ID=" + dNameVal; }//Sales Region
             else if (dTypeVal == "U1" || dTypeVal == "U2")
             {
-                sql += " and C_ElementValue_ID=" + dTypeVal;
+                sql += " and C_ElementValue_ID=" + dNameVal;
                 if (Util.GetValueOfInt(cbPartId) > 0)
                 {
                     sql += " AND NVL(C_BPartner_ID,0)=" + cbPartId;
