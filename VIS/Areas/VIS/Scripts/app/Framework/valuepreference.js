@@ -70,38 +70,38 @@
         */
         function createDesign($self) {
             var html = '<div class="vis-valpreferencedatawrp" id="fisrt_' + $self.windowNum + '">' +
-                '<div class="input-group vis-input-wrap" style="flex: 1;">' + 
+                '<div class="input-group vis-input-wrap" style="flex: 1;">' +
                 '<div class="vis-control-wrap">' +
-    '<input class="VIS_Pref_pass vis-gc-vpanel-table-readOnly" data-placeholder="" placeholder=" " style="margin-bottom: 0;" type="text" readonly="true" id="vtxtAttribute_' + $self.windowNum + '" />' +
-    '<label class=" VIS_Pref_Label_Font" id="vlblAttributeText_' + $self.windowNum + '">test</label>' +
-     '</div>' +
-     '</div>' +
-    '<label class="VIS_Pref_Label_Font" id="vlblAttribute_' + $self.windowNum + '">test</label>' +
-'</div><div class="vis-valpreferencedatawrp" id="second_' + $self.windowNum + '">' +
+                '<input class="VIS_Pref_pass vis-gc-vpanel-table-readOnly" data-placeholder="" placeholder=" " style="margin-bottom: 0;" type="text" readonly="true" id="vtxtAttribute_' + $self.windowNum + '" />' +
+                '<label class=" VIS_Pref_Label_Font" id="vlblAttributeText_' + $self.windowNum + '">test</label>' +
+                '</div>' +
+                '</div>' +
+                '<label class="VIS_Pref_Label_Font" id="vlblAttribute_' + $self.windowNum + '">test</label>' +
+                '</div><div class="vis-valpreferencedatawrp" id="second_' + $self.windowNum + '">' +
 
                 '<div class="input-group vis-input-wrap" style="flex: 1;">' +
                 '<div class="vis-control-wrap">' +
-    '<input class="VIS_Pref_pass vis-gc-vpanel-table-readOnly" data-placeholder="" placeholder=" " style="margin-bottom: 0;" type="text" readonly="true" id="vtxtSearchKey_' + $self.windowNum + '" />' +
-    '<label class="VIS_Pref_Label_Font" id="vlblValueText_' + $self.windowNum + '">test</label>' +
+                '<input class="VIS_Pref_pass vis-gc-vpanel-table-readOnly" data-placeholder="" placeholder=" " style="margin-bottom: 0;" type="text" readonly="true" id="vtxtSearchKey_' + $self.windowNum + '" />' +
+                '<label class="VIS_Pref_Label_Font" id="vlblValueText_' + $self.windowNum + '">test</label>' +
                 '</div>' +
                 '</div>' +
                 '<label class="VIS_Pref_Label_Font" id="vlblValue_' + $self.windowNum + '">test</label>' +
-        '</div>' +
-     '</div>' +
+                '</div>' +
+                '</div>' +
                 '</div><div style="width: 100%; float: left">    ' +
                 //'<label style="float: left; width:15%;text-align:left" class=" VIS_Pref_Label_Font" id="vlblLevelText_' + $self.windowNum + '">test</label>' +
-    '<div> <div class="VIS_Pref_col-50"><input  type="checkbox" id="vchkTenant_' + $self.windowNum + '" ><label class="VIS_Pref_Label_Font">test</label>' +
-        '</div>   <div class="VIS_Pref_col-50"> <input  type="checkbox" id="vchkOrg_' + $self.windowNum + '" /><label class="VIS_Pref_Label_Font">test</label>' +
-        '</div> <div class="VIS_Pref_col-50">' +
-            '<input  type="checkbox" id="vchkUser_' + $self.windowNum + '" /><label class="VIS_Pref_Label_Font">test</label>' +
-        '</div>  <div class="VIS_Pref_col-50"> <input  type="checkbox" id="vchkWindow_' + $self.windowNum + '" /><label class="VIS_Pref_Label_Font">test</label>' +
-        '</div> </div><div id="divMsg_' + $self.windowNum + '" style="width: 100%; float: left; margin-bottom: 5px; margin-top: 5px; text-align: left">' +
-    '<label class="VIS_Pref_Label_Font" id="vlblMsg_' + $self.windowNum + '">test</label>' +
-'</div><div style="height: 10%; width: 100%; float: left"> <button type="button" id="btnDelete_' + $self.windowNum + '"  class="VIS_Pref_btn-2"  style="float: left" value="Ok" role="button" aria-disabled="false">' +
-        '<i class="vis vis-delete"></i>' +
-    '</button> <input id= "btnCancel_' + $self.windowNum + '" class="VIS_Pref_btn-2" style="float:right" type="button" value="Cancel" />' +
-    '<input id="btnOK_' + $self.windowNum + '"  class="VIS_Pref_btn-2" style="float:right; margin-right:10px" type="button" value="Ok" />' +
-    '</div>';
+                '<div> <div class="VIS_Pref_col-50"><input  type="checkbox" id="vchkTenant_' + $self.windowNum + '" ><label class="VIS_Pref_Label_Font">test</label>' +
+                '</div>   <div class="VIS_Pref_col-50"> <input  type="checkbox" id="vchkOrg_' + $self.windowNum + '" /><label class="VIS_Pref_Label_Font">test</label>' +
+                '</div> <div class="VIS_Pref_col-50">' +
+                '<input  type="checkbox" id="vchkUser_' + $self.windowNum + '" /><label class="VIS_Pref_Label_Font">test</label>' +
+                '</div>  <div class="VIS_Pref_col-50"> <input  type="checkbox" id="vchkWindow_' + $self.windowNum + '" /><label class="VIS_Pref_Label_Font">test</label>' +
+                '</div> </div><div id="divMsg_' + $self.windowNum + '" style="width: 100%; float: left; margin-bottom: 5px; margin-top: 5px; text-align: left">' +
+                '<label class="VIS_Pref_Label_Font" id="vlblMsg_' + $self.windowNum + '">test</label>' +
+                '</div><div style="height: 10%; width: 100%; float: left"> <button type="button" id="btnDelete_' + $self.windowNum + '"  class="VIS_Pref_btn-2"  style="float: left" value="Ok" role="button" aria-disabled="false">' +
+                '<i class="vis vis-delete"></i>' +
+                '</button> <input id= "btnCancel_' + $self.windowNum + '" class="VIS_Pref_btn-2" style="float:right" type="button" value="Cancel" />' +
+                '<input id="btnOK_' + $self.windowNum + '"  class="VIS_Pref_btn-2" style="float:right; margin-right:10px" type="button" value="Ok" />' +
+                '</div>';
 
             $root.append(html);
         };
@@ -110,10 +110,10 @@
             //$root.load(VIS.Application.contextUrl + 'ValuePreference/Index/?windowno=' + this.windowNum, function (event) {
 
             createDesign($self);
-                $root.append($busyDiv);
-                setBusy(true);
-                $self.init($root);
-                setBusy(false);
+            $root.append($busyDiv);
+            setBusy(true);
+            $self.init($root);
+            setBusy(false);
             //});
         };
 
@@ -213,7 +213,7 @@
             $root.append($busyDiv);
             setBusy(true);
             setTimeout(
-            this.load(), 5);
+                this.load(), 5);
             $root.dialog({
                 modal: true,
                 title: VIS.Msg.getMsg("ValuePreference"),
@@ -317,9 +317,11 @@
 
         var preferenceId = 0;
 
+        sql = VIS.secureEngine.encrypt(sql);
+
         var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ValuePreference/GetPrefrenceID", { "sql": sql }, null); // spelling corrected by vinay bhatt on 18 oct 2018
-        
-        var ds = new VIS.DB.DataSet().toJson(JSON.stringify(data)); 
+
+        var ds = new VIS.DB.DataSet().toJson(JSON.stringify(data));
 
         if (ds != null && ds.tables[0].rows.length > 0) {
             // get id
@@ -372,7 +374,7 @@
                 return false;
             }
         }
-            //	No Variables (SQL)
+        //	No Variables (SQL)
         else if (this.aValue.toString().indexOf("@") != -1) {
             ////ShowMessage.Warn("ValuePreferenceNotInserted", true, "", null);
             return false;
@@ -389,7 +391,7 @@
 
         var AD_Preference_ID = this.getADPreferenceID();
 
-       
+
         $.ajax({
             url: VIS.Application.contextUrl + "ValuePreference/Save",
             dataType: "json",

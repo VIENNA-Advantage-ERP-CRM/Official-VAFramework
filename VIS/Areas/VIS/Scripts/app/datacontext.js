@@ -45,7 +45,7 @@
         };
 
 
-        function getCardViewInfo(AD_Window_ID, AD_Tab_ID,AD_CardView_ID,sql, callback) {
+        function getCardViewInfo(AD_Window_ID, AD_Tab_ID, AD_CardView_ID, sql, callback) {
             var data = { AD_Window_ID: AD_Window_ID, AD_Tab_ID: AD_Tab_ID, AD_CardView_ID: AD_CardView_ID, SQL: sql };
             $.ajax({
                 url: cardViewUrl,
@@ -199,7 +199,7 @@
                 datatype: "json",
                 contentType: "application/json; charset=utf-8",
                 async: false,
-                data: JSON.stringify({ sql: sql, fields: fields,obscureFields: obscureFields })
+                data: JSON.stringify({ sql: sql, fields: fields, obscureFields: obscureFields })
             }).done(function (jString) {
                 if (jString)
                     result = new VIS.DB.DataReader().toJson(jString);
@@ -232,13 +232,22 @@
             if (actionUrl.indexOf(VIS.Application.contextUrl) == -1)
                 actionUrl = VIS.Application.contextUrl + actionUrl;
 
+            var inputData = fields;
+
+            if (typeof fields === 'object' && fields !== null && !Array.isArray(fields)) {
+
+            }
+            else {
+                inputData = { fields: fields };
+            }
+
             $.ajax({
                 url: actionUrl,
                 type: "POST",
                 datatype: "json",
                 contentType: "application/json; charset=utf-8",
                 async: false,
-                data: JSON.stringify({ fields: fields })
+                data: JSON.stringify(inputData)
             }).done(function (jString) {
                 if (jString)
                     result = JSON.parse(jString);
@@ -319,7 +328,7 @@
                 type: "POST",
                 datatype: "json",
                 contentType: "application/json; charset=utf-8",
-                async:asyn,
+                async: asyn,
                 data: JSON.stringify(data)
             }).done(function (json) {
                 jRet = json;
@@ -333,7 +342,7 @@
         //DataSet String
         //function getDataSetJString(data, async, callback) {
         //    var result = null;
-           
+
         //    $.ajax({
         //        url: dataSetUrl,
         //        type: "POST",
@@ -359,7 +368,7 @@
 
         //function executeQuery(data, async, callback) {
         //    var result = null;
-            
+
         //    $.ajax({
         //        url: nonQueryUrl + 'y',
         //        type: "POST",
@@ -378,7 +387,7 @@
 
         //function executeQueries(data, async, callback) {
         //    var result = null;
-         
+
         //    $.ajax({
         //        url: nonQueryUrl + 'ies',
         //        type: "POST",
@@ -555,7 +564,7 @@
 
             getProcessDataString: getProcessInfoJString,
             process: process,
-            processAsyncFalse:processAsyncFalse,
+            processAsyncFalse: processAsyncFalse,
             executeProcess: executeProcess,
 
             updateClientCtx: updateClientCtx,
