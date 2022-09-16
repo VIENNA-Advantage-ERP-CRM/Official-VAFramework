@@ -1363,11 +1363,15 @@ namespace VAdvantage.Model
                         //}
 
                         retValue = new VTreeNode(Node_ID, seqNo,
-                                name, description, Parent_ID, isSummary,
-                                actionColor, onBar);
-                        retValue.Image = Utility.Util.GetValueOfString(dr["Image"]);
+                                    name, description, Parent_ID, isSummary,
+                                    actionColor, onBar);
+                        if (GetTreeType().Equals(TREETYPE_Menu))
+                        {
 
-                        retValue.IsSetting = Utility.Util.GetValueOfString(dr["IsSetting"]) == "Y";
+                            retValue.Image = Utility.Util.GetValueOfString(dr["Image"]);
+
+                            retValue.IsSetting = Utility.Util.GetValueOfString(dr["IsSetting"]) == "Y";
+                        }
 
                     }
                     break;

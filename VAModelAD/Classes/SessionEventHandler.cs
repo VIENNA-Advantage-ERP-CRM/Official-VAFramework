@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 
@@ -21,9 +22,9 @@ namespace VAdvantage.Classes
                 }
                 ModelLibrary.PushNotif.SessionManager.Get().RemoveSession(ctx.GetAD_Session_ID());
               }
-            catch
+            catch(Exception ex)
             {
-
+                VLogger.Get().SaveWarning("SessionEventHandler ", ex.Message);
             }
         }
     }

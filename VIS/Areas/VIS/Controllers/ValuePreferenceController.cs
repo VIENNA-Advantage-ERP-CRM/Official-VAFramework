@@ -53,12 +53,12 @@ namespace VIS.Controllers
         }
 
         // Added by Bharat on 12 June 2017
-        public JsonResult GetPrefrenceID(string PrefQry)
+        public JsonResult GetPrefrenceID(string sql)
         {
             Ctx ct = Session["ctx"] as Ctx;
             ValuePreferenceModel model = new ValuePreferenceModel();
-            PrefQry = SecureEngineBridge.DecryptByClientKey(PrefQry, ct.GetSecureKey());
-            return Json(JsonConvert.SerializeObject(model.GetPrefrenceID(PrefQry)), JsonRequestBehavior.AllowGet);
+            sql = SecureEngineBridge.DecryptByClientKey(sql, ct.GetSecureKey());
+            return Json(JsonConvert.SerializeObject(model.GetPrefrenceID(sql)), JsonRequestBehavior.AllowGet);
         }
     }
 }

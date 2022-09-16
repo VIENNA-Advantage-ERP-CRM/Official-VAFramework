@@ -2514,6 +2514,11 @@ namespace VIS.Helpers
                         }
                     }
                 }
+                else
+                {
+                    log.SaveError("Lookup Direct Query Issue:", sqlIn.sqlDirect);
+                    lookupDirect = null;
+                }
             }
 
             retVal.Tables = outO;

@@ -556,7 +556,7 @@ namespace VIS.Controllers
         public JsonResult SetDimLine(string dLineId, string dimensionLineID, string acctId,
 						string dAmtId)
         {
-            return Json(model.SetDimLine(dLineId,dimensionLineID,acctId,dAmtId), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(model.SetDimLine(dLineId,dimensionLineID,acctId,dAmtId)), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetDimMaxAmount(string dAmtId)

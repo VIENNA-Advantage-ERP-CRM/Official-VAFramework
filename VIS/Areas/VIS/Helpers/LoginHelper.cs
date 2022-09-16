@@ -880,5 +880,26 @@ namespace VIS.Helpers
             }
             VAdvantage.PushNotif.PushNotification.SendNotificationToUser(ADUserID, 0, 0, "", TokenNo, "OTP");
         }
+
+
+
+        /// <summary>
+        /// Check for Is Module installtion is in progress or not
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsSiteUnderMaintenance()
+        {
+            bool isUnderMaintenance = false;
+            try
+            {
+                isUnderMaintenance = VAdvantage.Utility.Util.GetValueOfString(DB.ExecuteScalar("SELECT LOWER(Value) " +
+                    "FROM Market_InstallStatus WHERE LOWER(Name)= 'mod_ins_progress'")) == "y";
+            }
+            catch
+            {
+                //blank
+            }
+            return isUnderMaintenance;
+        }
     }
 }

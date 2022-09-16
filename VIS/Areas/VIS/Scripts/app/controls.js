@@ -3090,7 +3090,7 @@
             }
             catch (eee) {
             }
-            return "";
+            return WhereClause;
         };
 
         //	ReadWrite
