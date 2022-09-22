@@ -181,7 +181,7 @@ VIS.context.clearTabContext = function (windowNo, tabNo) {
 
 
 VIS.context.getAD_User_ID = function () {
-    return VIS.context.getContext("##AD_User_ID");
+    return VIS.context.getContextAsInt("##AD_User_ID");
 };
 
 VIS.context.getAD_User_Name = function () {
@@ -197,7 +197,7 @@ VIS.context.getAD_Role_Name = function () {
 };
 
 VIS.context.getAD_Client_ID = function () {
-    return VIS.context.getContext("#AD_Client_ID");
+    return VIS.context.getContextAsInt("#AD_Client_ID");
 };
 
 VIS.context.getAD_Client_Name = function () {
@@ -205,7 +205,7 @@ VIS.context.getAD_Client_Name = function () {
 };
 
 VIS.context.getAD_Org_ID = function () {
-    return VIS.context.getContext("#AD_Org_ID");
+    return VIS.context.getContextAsInt("#AD_Org_ID");
 };
 
 VIS.context.getAD_Language = function () {

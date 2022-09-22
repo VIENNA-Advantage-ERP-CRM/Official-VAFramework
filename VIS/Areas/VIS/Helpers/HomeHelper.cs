@@ -30,7 +30,7 @@ namespace VIS.Helpers
                 #region Request Count
                 //To Get Request count
                 strQuery = " SELECT  count(R_Request.r_request_id) FROM R_Request  inner join  r_requesttype rt on (R_Request.r_requesttype_id=rt.r_requesttype_ID)";
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 strQuery += " AND ( R_Request.SalesRep_ID =" + ctx.GetAD_User_ID() + " OR R_Request.AD_Role_ID =" + ctx.GetAD_Role_ID() + ")"
                  + " AND R_Request.Processed ='N'"
                 + " AND (R_Request.R_Status_ID IS NULL OR R_Request.R_Status_ID IN (SELECT R_Status_ID FROM R_Status WHERE IsClosed='N'))";
@@ -46,7 +46,7 @@ namespace VIS.Helpers
 
                 # region Notice Count
                 //To get Notice Count
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL("SELECT count(AD_Note_ID) FROM AD_Note "
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL("SELECT count(AD_Note_ID) FROM AD_Note "
                     , "AD_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 strQuery += " AND AD_User_ID IN (" + ctx.GetAD_User_ID() + ")"
                   + " AND Processed='N'";
@@ -179,7 +179,7 @@ namespace VIS.Helpers
 
                 #region Notes
                 //To get The Notes count
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL("SELECT COUNT(wsp_note_id) As NCount FROM WSP_Note", "WSP_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO) + " AND AD_USER_ID=" + ctx.GetAD_User_ID() + " Order BY Created DESC";
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL("SELECT COUNT(wsp_note_id) As NCount FROM WSP_Note", "WSP_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO) + " AND AD_USER_ID=" + ctx.GetAD_User_ID() ;
                 dsData = new DataSet();
                 dsData = DB.ExecuteDataset(strQuery);
                 int nNotes = 0;
@@ -193,10 +193,11 @@ namespace VIS.Helpers
 
                 #region Appointments Count
 
-                strQuery = "SELECT AppointmentsInfo.Appointmentsinfo_id AS ID,AppointmentsInfo.AD_Client_ID,AppointmentsInfo.AD_Org_ID"
+                string sql1 = "SELECT AppointmentsInfo.Appointmentsinfo_id AS ID,AppointmentsInfo.AD_Client_ID,AppointmentsInfo.AD_Org_ID"
                           //+ "  FROM AppointmentsInfo JOIN AD_User ON AD_User.AD_User_ID =AppointmentsInfo.CreatedBy WHERE AppointmentsInfo.IsRead='N' AND AppointmentsInfo.istask ='N' AND  AppointmentsInfo.CreatedBy  !=" + ctx.GetAD_User_ID() + " AND AppointmentsInfo.AD_User_ID  = " + ctx.GetAD_User_ID() + ""
-                          + " FROM AppointmentsInfo AppointmentsInfo INNER JOIN AD_User AD_User ON (AD_User.AD_User_ID =AppointmentsInfo.CreatedBy) WHERE AppointmentsInfo.IsRead='N' AND AppointmentsInfo.istask ='N' AND AppointmentsInfo.AD_User_ID  = " + ctx.GetAD_User_ID() + ""
-                         + " UNION (SELECT AppointmentsInfo.Appointmentsinfo_id AS ID, AppointmentsInfo.AD_Client_ID,AppointmentsInfo.AD_Org_ID FROM AppointmentsInfo AppointmentsInfo"
+                          + " FROM AppointmentsInfo AppointmentsInfo INNER JOIN AD_User AD_User ON (AD_User.AD_User_ID =AppointmentsInfo.CreatedBy) WHERE AppointmentsInfo.IsRead='N' AND AppointmentsInfo.istask ='N' AND AppointmentsInfo.AD_User_ID  = " + ctx.GetAD_User_ID() + "";
+                        //+ " UNION (";
+                  strQuery =  " SELECT AppointmentsInfo.Appointmentsinfo_id AS ID, AppointmentsInfo.AD_Client_ID,AppointmentsInfo.AD_Org_ID FROM AppointmentsInfo AppointmentsInfo"
                          + " INNER JOIN AD_User AD_User ON (AD_User.AD_User_ID = AppointmentsInfo.CreatedBy)  WHERE (AppointmentsInfo.IsRead ='Y' AND AppointmentsInfo.AD_User_ID = " + ctx.GetAD_User_ID() + " ) AND AppointmentsInfo.istask ='N' AND AppointmentsInfo.startDate BETWEEN to_date('";
                 //DateTime.Now.ToShortDateString()
                 strQuery += DateTime.Now.AddDays(-1).ToString("M/dd/yy");
@@ -205,9 +206,10 @@ namespace VIS.Helpers
                 strQuery += DateTime.Now.AddDays(7).ToString("M/dd/yy");
                 //DateTime.UtcNow.AddDays(1).ToShortDateString() 
                 strQuery += " 23.59','mm/dd/yy HH24:MI') "
-                          + "  OR  to_date('" + DateTime.Now.ToString("M/dd/yy") + "','mm/dd/yy')  BETWEEN  AppointmentsInfo.startDate  AND AppointmentsInfo.endDate  AND  AppointmentsInfo.CreatedBy  !=" + ctx.GetAD_User_ID() + " AND AppointmentsInfo.AD_User_ID  = " + ctx.GetAD_User_ID() + ")";
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL(strQuery, "AppointmentsInfo", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                          + "  OR  to_date('" + DateTime.Now.ToString("M/dd/yy") + "','mm/dd/yy')  BETWEEN  AppointmentsInfo.startDate  AND AppointmentsInfo.endDate  AND  AppointmentsInfo.CreatedBy  !=" + ctx.GetAD_User_ID() + " AND AppointmentsInfo.AD_User_ID  = " + ctx.GetAD_User_ID() + "";
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "AppointmentsInfo", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
 
+                strQuery = sql1 + " UNION " + strQuery;
 
                 strQuery = "SELECT COUNT( AppointmentsInfo.ID) FROM (" + strQuery + ") AppointmentsInfo";
                 dsData = new DataSet();
@@ -227,7 +229,7 @@ namespace VIS.Helpers
                 #region Task Assign By me count
 
                 strQuery = " SELECT COUNT(AppointmentsInfo.Appointmentsinfo_id)   FROM AppointmentsInfo ";
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL(strQuery, "AppointmentsInfo", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "AppointmentsInfo", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 strQuery += "  AND  AppointmentsInfo.IsRead='N' AND AppointmentsInfo.istask ='Y'  AND AppointmentsInfo.isClosed ='N'  AND  AppointmentsInfo.CreatedBy =" + ctx.GetAD_User_ID() + "  AND  AppointmentsInfo.AD_User_ID !=" + ctx.GetAD_User_ID() + "";
 
                 dsData = new DataSet();
@@ -244,7 +246,7 @@ namespace VIS.Helpers
 
 
                 strQuery = " SELECT COUNT(AppointmentsInfo.Appointmentsinfo_id)   FROM AppointmentsInfo ";
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL(strQuery, "AppointmentsInfo", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "AppointmentsInfo", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 strQuery += "  AND   AppointmentsInfo.IsRead='N' AND AppointmentsInfo.istask ='Y' AND AppointmentsInfo.isClosed ='N'  AND AppointmentsInfo.AD_User_ID =" + ctx.GetAD_User_ID() + " ";
 
                 dsData = new DataSet();
@@ -846,7 +848,7 @@ namespace VIS.Helpers
             try
             {
                 //To get Notice Count
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL("SELECT count(AD_Note_ID) FROM AD_Note "
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL("SELECT count(AD_Note_ID) FROM AD_Note "
                     , "AD_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 strQuery += " AND AD_User_ID IN (" + ctx.GetAD_User_ID() + ")"
                   + " AND Processed='N'";
@@ -897,7 +899,7 @@ namespace VIS.Helpers
                             FROM AD_Note
                             INNER JOIN AD_Message
                             ON (AD_Message.AD_Message_ID=AD_Note.AD_Message_ID)";
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL(strQuery, "AD_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "AD_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
 
                 strQuery += "  AND AD_Note.AD_User_ID IN (0," + ctx.GetAD_User_ID() + ")"
                 + " AND AD_Note.Processed='N' ORDER BY AD_Note.Created DESC";
@@ -1005,7 +1007,7 @@ namespace VIS.Helpers
                         INNER JOIN AD_reference adr
                         ON (adr.AD_Reference_ID=adl.AD_Reference_ID) ";
 
-                strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 strQuery += "  AND adr.Name='_PriorityRule'  AND ( R_Request.SalesRep_ID =" + ctx.GetAD_User_ID() + " OR R_Request.AD_Role_ID =" + ctx.GetAD_Role_ID() + ")"
                  + " AND R_Request.Processed ='N'"
                 + " AND (R_Request.R_Status_ID IS NULL OR R_Request.R_Status_ID IN (SELECT R_Status_ID FROM R_Status WHERE IsClosed='N'))";
@@ -1098,7 +1100,7 @@ namespace VIS.Helpers
 
 
 
-            strQuery = MRole.Get(ctx, ctx.GetAD_Role_ID()).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+            strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
             strQuery += "  AND adr.Name='_PriorityRule' AND ( R_Request.SalesRep_ID =" + ctx.GetAD_User_ID() + " OR R_Request.AD_Role_ID =" + ctx.GetAD_Role_ID() + ")"
             + " AND R_Request.Processed ='N'  AND (R_Request.R_Status_ID IS NULL OR R_Request.R_Status_ID IN (SELECT R_Status_ID FROM R_Status WHERE IsClosed='N')) ORDER By R_Request.Updated, R_Request.Priority ";
             // change to sort Requests based on updated date and time

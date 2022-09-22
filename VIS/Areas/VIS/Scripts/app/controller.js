@@ -2393,8 +2393,8 @@
         var sql = "VIS_108";
 
         var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_User_ID", AD_User_ID.toString());
-        param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.vo.AD_Table_ID.toString());
+        param[0] = new VIS.DB.SqlParam("@AD_User_ID", AD_User_ID);
+        param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.vo.AD_Table_ID);
 
         var dr = null;
         try {
