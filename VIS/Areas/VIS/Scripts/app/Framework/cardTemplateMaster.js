@@ -683,7 +683,7 @@
             //View Block click action going here
              
             viewBlock.mousedown(function (e) {
-               
+                setTimeout(function () {
                 if (e.target.tagName == 'SQL' || $(e.target).hasClass('fieldGroup') || $(e.target).hasClass('vis-addRemoveRowCol')) {
                     return;
                 }
@@ -841,10 +841,14 @@
                 if ($(e.target).hasClass('vis-viewBlock')) {
                     divTopNavigator.find('[command="fieldName"]').text('Main container').show();
                 }
+            }, 30);
                 //$(e.target).not('.ui-resizable-handle').addClass("vis-active-block");
                 //$(this).resizable();
             }).mouseup(function (e) {
-               fill($(e.target));
+                setTimeout(function () {
+                    mdown = false;
+                    fill($(e.target));
+                }, 30);
             });
 
             // style input change command
@@ -2162,14 +2166,17 @@
          * @param {any} rgb
          */
         function rgb2hex(rgb) {
-            if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
+            try {
+                if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
 
-            rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-            function hex(x) {
-                return ("0" + parseInt(x).toString(16)).slice(-2);
+                rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+                function hex(x) {
+                    return ("0" + parseInt(x).toString(16)).slice(-2);
+                }
+                return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+            } catch (error) {
+                return rgb;
             }
-            return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
-
         }
 
         /**
