@@ -136,6 +136,7 @@
         var force = 0;
         var newCopyCard = null;
         var isTemplateLoaded = false;
+        var BtnRefreshTemplate = null;
 
         function init() {
             root = $('<div style="height:100%"><div class="vis-apanel-busy vis-cardviewmainbusy" style="display:block"></div></div>');
@@ -833,6 +834,10 @@
 
             });
 
+            BtnRefreshTemplate.click(function () {
+                getSystemTemplateDesign();
+            });
+
             /* End Step 1*/
 
         }
@@ -993,6 +998,7 @@
                 btnVdelrow = root.find('#btnVdelrow_' + WindowNo);
                 btnVdelCol = root.find('#btnVdelCol_' + WindowNo);
                 cmbTemplateCategory = root.find('#CmbTemplateCategory_' + WindowNo);
+                BtnRefreshTemplate = root.find('#BtnRefreshTemplate_' + WindowNo);
 
                 activeSection = DivViewBlock.find('.section1');
 
@@ -4017,8 +4023,9 @@
                     for (var i = 0; i < result.length; i++) {
                         DivTemplate.find('.vis-cardTemplateContainer').append($(result[i].template));
                     }
-                    //scaleTemplate();
-                    IsBusy(false);
+                    DivTemplate.find('.vis-deleteTemplate').remove();
+                    scaleTemplate();
+                    //IsBusy(false);
                     setTimeout(function () {
                         scaleTemplate();
                         IsBusy(false);
@@ -4027,6 +4034,7 @@
                         } else {
                             DivTemplate.find('.vis-noTemplateIcon').hide();
                         }
+                       
                     }, 1000);
 
                 }, error: function (errorThrown) {
