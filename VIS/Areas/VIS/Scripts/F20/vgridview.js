@@ -627,6 +627,7 @@
 
                         var customStyle = oColumns[colIndex].gridField.getGridImageStyle();
                         var winNo = oColumns[colIndex].gridField.getWindowNo();
+                        oColumns[colIndex]['customClass'] = '';
                         var customClass;
                         if (customStyle) {
                             customClass = oColumns[colIndex]['customClass'];
