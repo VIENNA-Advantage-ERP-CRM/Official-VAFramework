@@ -3851,8 +3851,8 @@
         this.bufferList.length = 0;
         var that = this;
 
-        //this.pazeSize = VIS.Env.getWINDOW_PAGE_SIZE();
-        this.pazeSize = 50;
+        this.pazeSize = Number(VIS.Env.getWINDOW_PAGE_SIZE());
+        //this.pazeSize = 50;
         var gFieldsIn = this.createGridFieldArr(this.gridFields, true);
         var dataIn = {
             page: this.dopaging ? this.currentPage : 0, pageSize: this.dopaging ? this.pazeSize : 0,
