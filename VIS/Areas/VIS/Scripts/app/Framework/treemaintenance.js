@@ -3005,7 +3005,7 @@
             bindornot = "true";
 
             if (tablename == "AD_Menu") {
-                bindornot = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/IsRecordExist", { "treeId": $treeID }, null);
+                bindornot = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/IsRecordExists", { "treeId": $treeID }, null);
             }
 
             var getIdes = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/GetWindowMenuIds", {  }, null);
