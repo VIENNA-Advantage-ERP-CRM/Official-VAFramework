@@ -20,7 +20,7 @@ namespace VIS.Areas.VIS.Controllers
 {
     [AjaxAuthorizeAttribute] // redirect to login page if reques`t is not Authorized
     [AjaxSessionFilterAttribute] // redirect to Login/Home page if session expire
-    [AjaxValidateAntiForgeryToken] // validate antiforgery token 
+    [AjaxValidateAntiForgeryToken] // validate antiforgery token    
     public class LookupController : Controller
     {
         // GET: VIS/Lookup
@@ -29,15 +29,26 @@ namespace VIS.Areas.VIS.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<ActionResult> GetLookupData(int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, int PageSize, string LookupData)
+        public ActionResult GetLookupData(int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, int PageSize, string LookupData)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             LookupHelper lHelper = new LookupHelper();
-            object result = await System.Threading.Tasks.Task.Run(() => lHelper.GetLookupData(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, Values, PageSize, LookupData));
+            object result =  lHelper.GetLookupData(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, Values, PageSize, LookupData);
             var jsonResult= Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
+
+        //[HttpPost]
+        //public async Task<ActionResult> GetLookupData(int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, int PageSize, string LookupData)
+        //{
+        //    Ctx ctx = Session["ctx"] as Ctx;
+        //    LookupHelper lHelper = new LookupHelper();
+        //    object result = await System.Threading.Tasks.Task.Run(() => lHelper.GetLookupData(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, Values, PageSize, LookupData));
+        //    var jsonResult = Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+        //    jsonResult.MaxJsonLength = int.MaxValue;
+        //    return jsonResult;
+        //}
 
         [HttpPost]
         public async Task<ActionResult> GetLookupAll(int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string Values, int PageSize, string LookupData)
