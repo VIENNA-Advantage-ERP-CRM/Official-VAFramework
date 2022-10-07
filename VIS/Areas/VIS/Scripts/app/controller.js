@@ -5792,7 +5792,7 @@
         //  Fields always enabled (are usually not updateable)
 
         if (_vo.ColumnName.equals("Posted")
-            || (_vo.ColumnName.equals("Record_ID") && _vo.displayType == VIS.DisplayType.Button))	//  Zoom
+            || (_vo.ColumnName.equals("Record_ID") && (_vo.displayType == VIS.DisplayType.Button || this.getOrginalDisplayType() == VIS.DisplayType.Button)))	//  Zoom
             return true;
 
         var hasMRDisplayLogic = isMR && !(this.vo.DisplayLogic == null || this.vo.DisplayLogic.equals(""))
