@@ -135,6 +135,8 @@
         var cur_history_index = 0;
         var force = 0;
         var newCopyCard = null;
+        var isTemplateLoaded = false;
+        var BtnRefreshTemplate = null;
 
         function init() {
             root = $('<div style="height:100%"><div class="vis-apanel-busy vis-cardviewmainbusy" style="display:block"></div></div>');
@@ -243,6 +245,10 @@
 
                 btnTemplateBack.text(VIS.Msg.getMsg("Back"));
                 btnLayoutSetting.text(VIS.Msg.getMsg("NextLayout"));
+                if (!isTemplateLoaded) {
+                    getSystemTemplateDesign();
+                }
+
                 btnCardCustomization.click();
             });
 
@@ -341,7 +347,12 @@
                 DivCardFieldSec.hide();
                 DivStyleSec1.hide();
                 DivCradStep2.find('.vis-two-sec-two').hide();
-                scaleTemplate();
+                if (!isTemplateLoaded) {
+                    getSystemTemplateDesign();
+                } else {
+                    scaleTemplate();
+                }
+                
                 isChangeTemplate = true;
                 cmbTemplateCategory.val('');
                 DivTemplate.find('[issystemtemplate="Y"]').removeClass('displayNone');
@@ -823,6 +834,10 @@
 
             });
 
+            BtnRefreshTemplate.click(function () {
+                getSystemTemplateDesign();
+            });
+
             /* End Step 1*/
 
         }
@@ -983,6 +998,7 @@
                 btnVdelrow = root.find('#btnVdelrow_' + WindowNo);
                 btnVdelCol = root.find('#btnVdelCol_' + WindowNo);
                 cmbTemplateCategory = root.find('#CmbTemplateCategory_' + WindowNo);
+                BtnRefreshTemplate = root.find('#BtnRefreshTemplate_' + WindowNo);
 
                 activeSection = DivViewBlock.find('.section1');
 
@@ -1059,9 +1075,9 @@
                     }
                     IsBusy(false);
 
-                }, 2000);
+                }, 1000);
 
-                //getTemplateDesign();
+                
 
             });
 
@@ -2976,7 +2992,7 @@
             var viewBlock = DivViewBlock.find('.canvas *');
 
             viewBlock.mousedown(function (e) {
-
+                setTimeout(function () {
                 if (e.target.tagName == 'SQL' || $(e.target).hasClass('fieldGroup')) {
                     return;
                 }
@@ -3102,11 +3118,15 @@
                 if ($(e.target).hasClass('vis-viewBlock')) {
                     divTopNavigator.find('[command="fieldName"]').text('Main container').show();
                 }
-
+            }, 30);
                 //$(e.target).not('.ui-resizable-handle').addClass("vis-active-block");
                 //$(this).resizable();
             }).mouseup(function (e) {
-                fill($(e.target));
+                setTimeout(function () {
+                    mdown = false;
+                    fill($(e.target));
+                }, 30);
+                
             });
 
             DivStyleSec1.find('[data-command]').on('change', function (e) {
@@ -3944,7 +3964,7 @@
 
         function getTemplateDesign() {
             var url = VIS.Application.contextUrl + "CardView/getTemplateDesign";
-            DivTemplate.find('.vis-cardSingleViewTemplate:not(:first)').remove();
+            DivTemplate.find('.vis-cardSingleViewTemplate[issystemtemplate="N"]').remove();
             var obj = {
                 ad_Window_ID: mTab.getAD_Window_ID(),
                 ad_Tab_ID: mTab.getAD_Tab_ID()
@@ -3962,6 +3982,50 @@
                     }
                     //scaleTemplate();
                     IsBusy(false);
+                    //setTimeout(function () {
+                    //    scaleTemplate();
+                    //    IsBusy(false);
+                    //    if (DivTemplate.find('.vis-cardSingleViewTemplate:not(:hidden)').length == 1) {
+                    //        DivTemplate.find('.vis-noTemplateIcon').show();
+                    //    } else {
+                    //        DivTemplate.find('.vis-noTemplateIcon').hide();
+                    //    }
+                    //}, 1000);
+
+                }, error: function (errorThrown) {
+                    alert(errorThrown.statusText);
+                    IsBusy(false);
+                }, complete: function () {
+                    DivTemplate.find('.vis-cardSingleViewTemplate').click(function () {
+                        DivTemplate.find('.vis-cardSingleViewTemplate').removeClass('vis-active-template');
+                        $(this).addClass('vis-active-template');
+                    });
+                }
+            });
+        }
+
+        function getSystemTemplateDesign() {
+            IsBusy(true);
+            var url = VIS.Application.contextUrl + "CardView/GetSystemTemplateDesign";
+            DivTemplate.find('.vis-cardSingleViewTemplate[issystemtemplate="Y"]:not(:first)').remove();
+            var obj = {
+               
+            }
+            $.ajax({
+                type: "POST",
+                url: url,
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(obj),
+                success: function (data) {
+                    isTemplateLoaded = true;
+                    var result = JSON.parse(data);
+                    for (var i = 0; i < result.length; i++) {
+                        DivTemplate.find('.vis-cardTemplateContainer').append($(result[i].template));
+                    }
+                    DivTemplate.find('.vis-deleteTemplate').remove();
+                    scaleTemplate();
+                    //IsBusy(false);
                     setTimeout(function () {
                         scaleTemplate();
                         IsBusy(false);
@@ -3970,6 +4034,7 @@
                         } else {
                             DivTemplate.find('.vis-noTemplateIcon').hide();
                         }
+                       
                     }, 1000);
 
                 }, error: function (errorThrown) {
@@ -4372,14 +4437,17 @@
         }
 
         function rgb2hex(rgb) {
-            if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
+            try {
+                if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
 
-            rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-            function hex(x) {
-                return ("0" + parseInt(x).toString(16)).slice(-2);
+                rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+                function hex(x) {
+                    return ("0" + parseInt(x).toString(16)).slice(-2);
+                }
+                return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+            } catch(error) {
+                return rgb;
             }
-            return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
-
         }
 
         function unlinkField(fieldName, itm) {

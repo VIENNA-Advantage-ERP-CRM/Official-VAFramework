@@ -51,6 +51,7 @@
                     </svg>
 
                 </div>
+                <div class="d-flex align-items-center justify-content-center" style="position:absolute;bottom:-25px"><b>@GetText("NewTemplate")</b></div>
             </div>
             <div class="vis-noTemplateIcon">
                 <img src="~/Areas/VIS/Images/icon.png" alt="Alternate Text" />
@@ -94,7 +95,7 @@
                         </div>
                     </div>
                 </div>
-                <span id="@("spnLastSaved_" + ViewBag.WindowNumber)"></span>
+                <span class="mt-auto" id="@("spnLastSaved_" + ViewBag.WindowNumber)"></span>
             </div>
             <i class="fa fa fa-pencil-square-o fa-1" id="@("btnEditIcon_" + ViewBag.WindowNumber)" style="display:none;position:absolute;z-index:2;cursor:pointer"></i>
             <div class="vis-topNavigator" style="display:none">

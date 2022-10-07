@@ -83,8 +83,11 @@ namespace VIS.Classes
                 sql = lookupQuery,
             };
 
-            if (PageSize > 0)
+            if (PageSize > 0) {
                 sqlIn.pageSize = PageSize;
+                sqlIn.page = 1;
+            }
+            
 
             object result = h.ExecuteJDataSet(sqlIn);
             return result;
@@ -105,7 +108,10 @@ namespace VIS.Classes
             };
 
             if (PageSize > 0)
+            {
                 sqlIn.pageSize = PageSize;
+                sqlIn.page = 1;
+            }
 
             object result = h.ExecuteJDataSet(sqlIn);
             return result;

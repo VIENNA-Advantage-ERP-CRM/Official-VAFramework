@@ -2393,8 +2393,8 @@
         var sql = "VIS_108";
 
         var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_User_ID", AD_User_ID.toString());
-        param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.vo.AD_Table_ID.toString());
+        param[0] = new VIS.DB.SqlParam("@AD_User_ID", AD_User_ID);
+        param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.vo.AD_Table_ID);
 
         var dr = null;
         try {
@@ -3851,8 +3851,8 @@
         this.bufferList.length = 0;
         var that = this;
 
-        //this.pazeSize = VIS.Env.getWINDOW_PAGE_SIZE();
-        this.pazeSize = 50;
+        this.pazeSize = Number(VIS.Env.getWINDOW_PAGE_SIZE());
+        //this.pazeSize = 50;
         var gFieldsIn = this.createGridFieldArr(this.gridFields, true);
         var dataIn = {
             page: this.dopaging ? this.currentPage : 0, pageSize: this.dopaging ? this.pazeSize : 0,
@@ -5792,7 +5792,7 @@
         //  Fields always enabled (are usually not updateable)
 
         if (_vo.ColumnName.equals("Posted")
-            || (_vo.ColumnName.equals("Record_ID") && _vo.displayType == VIS.DisplayType.Button))	//  Zoom
+            || (_vo.ColumnName.equals("Record_ID") && (_vo.displayType == VIS.DisplayType.Button || this.getOrginalDisplayType() == VIS.DisplayType.Button)))	//  Zoom
             return true;
 
         var hasMRDisplayLogic = isMR && !(this.vo.DisplayLogic == null || this.vo.DisplayLogic.equals(""))
