@@ -145,6 +145,7 @@ namespace VIS
 
                    "~/Areas/VIS/Scripts/tabpanels/verinfo.js",
                     "~/Areas/VIS/Scripts/tabpanels/HistoryDetailsTabPanel.js",
+                    "~/Areas/VIS/Scripts/tabpanels/surveyPanel.js",
                   "~/Areas/VIS/Scripts/TestPanel.js",
                  "~/Areas/VIS/Scripts/app/forms/form.js");
 
@@ -192,7 +193,8 @@ namespace VIS
                  "~/Areas/VIS/Content/ProductContainer.css",
                 "~/Areas/VIS/Content/GlJournalDimension.css",
                 "~/Areas/VIS/Content/BudgetControl.css",
-                "~/Areas/VIS/Content/HistoryTabPanel.css"
+                "~/Areas/VIS/Content/HistoryTabPanel.css",
+                "~/Areas/VIS/Content/SurveyTabPanel.css"
                );
 
 

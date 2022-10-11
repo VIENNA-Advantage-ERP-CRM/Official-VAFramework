@@ -1,0 +1,641 @@
+﻿VIS = window.VIS || {};
+(function () {
+
+    function surveyPanel() {
+        this.record_ID = 0;
+        this.windowNo = 0;
+        this.curTab = null;
+        this.selectedRow = null;
+        this.panelWidth;
+        this.extraInfo = null;
+        var self = this;
+        var $root;
+        var questionSection = null;
+        var responseSection = null;
+        var _AD_Window_ID = 0;
+        var _AD_Tab_ID = 0;
+        var iFrame;
+        var IsMandatoryAll = false;      
+        var pageSize = 0;
+        var Limit = 0;
+        var AD_SurveyAssignment_ID = 0;
+        var AD_SurveyResponse_ID = 0;
+        var ResponseCount = 0;
+        var userResponse = {};
+        var userResIdx = 0;
+        var isSelfShow = true;
+        var surveyTab = null;
+        var $clickHere = ('<a href="javascript:;">click here</a>');
+       
+        this.init = function () {
+            $root = $('<div></div>');
+
+            var tab = $('<div class="vis-surveyTab">'
+                + '<div class="vis-tabPrimary">'
+                + '<ul class="nav vis-primarySection nav-tabs mb-1" id="surveyTab_' + self.windowNo+'" role="tablist">'
+                + '<li class="nav-item vis-firstResLink  text-center ">'
+                + '  <a'
+                + '    class="nav-link active quesTab"'
+                + '    id="home-tab"'
+                + '    data-toggle="tab"'
+                + '    href="#quesSec_' + self.windowNo+'"'
+                + '    >Questions</a>'
+                + '</li>'
+                + '<li class="nav-item text-center" >'
+                + '  <a style="diaplay:none"'
+                + '    class="nav-link respTab"'
+                + '    id="profile-tab"'
+                + '    data-toggle="tab"'
+                + '    href="#resp_' + self.windowNo +'"'
+                + '    >Responses <span class="badge badge-light responseCount">0</span></a>'
+                + '</li>'
+                + '</ul>'
+                + '<div class="tab-content">'
+                + '<div class="tab-pane fade show active" style="width:100%;" id="quesSec_' + self.windowNo + '">'  
+                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:57vh" id="quesMessage_' + self.windowNo +'"></div>'
+                + '<div style="height:57vh;overflow-y:auto !important;" id="ques_' + self.windowNo +'"></div>'
+                + '</div>'
+                + '<div class="tab-pane fade mt-2" style="height:57vh;width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
+                + '<div class="d-flex align-items-center justify-content-between mr-2 ml-2">'
+                + '<div class="d-flex align-items-center mr-1">' 
+                +'<span class="d-inline-block mr-1">Select User</span>'
+                + '<select class="w-100"></select>'
+                + '</div> '
+                + '<div class="align-items-center d-flex"> '
+                + '<span class="mr-1 ">Response:</span>'
+                + '<span class="align-items-center d-flex">'
+                + '<button class="vis-cusPagination prev">'
+                + '<i class="fa fa-chevron-circle-left mr-1" aria-hidden="true"></i>'
+                + '</button>'
+                + '<span class="resStatus vis-surveyPagination">0/0</span class="d-flex align-items-center">'
+                + '<button class="vis-cusPagination next">'
+                + '<i class="fa fa-chevron-circle-right ml-1" aria-hidden="true"></i>'
+                + '</button>'
+                + '</span>'
+                + '</div>' 
+                + '</div> '
+                +'<div class="mr-2 mt-2 text-right"  style="font-size: 12px;font-style: italic;" >Submitted: <span class="submittedDate"></span></div>'
+                + '<div class="response"></div>'
+                + '</div > '
+                + '</div>'
+                + '</div>'
+                + '</div>'
+            );
+            $root.append(tab);
+            surveyTab = $root.find('#surveyTab_' + self.windowNo);
+            questionSection = $root.find('#ques_' + self.windowNo);
+            responseSection = $root.find('#resp_' + self.windowNo);
+           // panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
+        };
+
+        this.update = function (Record_ID) {
+            questionSection.empty();
+            responseSection.find('.response').empty();
+            IsMandatoryAll = false;
+            pageSize = 0;
+            panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
+        }
+            
+        var panelDetails = function (AD_window_ID, AD_Tab_ID, root) {
+            _AD_Window_ID = AD_window_ID;
+            _AD_Tab_ID = AD_Tab_ID;
+            $.ajax({
+                url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetSurveyAssignments",
+                //async: false,
+                data: { AD_window_ID: AD_window_ID, AD_Tab_ID: AD_Tab_ID, AD_Table_ID: self.curTab.getAD_Table_ID(), AD_Record_ID: self.curTab.getRecord_ID()},
+                success: function (data) {
+                    var res = [];
+                    res = JSON.parse(data);
+                    if (res != null && res.length > 0) {
+                        IsMandatoryAll = res[0].IsMandatory;
+                        pageSize = res[0].QuestionsPerPage;
+                        isSelfShow = res[0].IsSelfshow;
+                        Limit = res[0].Limit;
+                        ResponseCount = res[0].ResponseCount;
+                        AD_SurveyAssignment_ID = res[0].SurveyAssignment_ID;
+                        AD_SurveyResponse_ID = res[0].SurveyResponse_ID;
+                        loadSurveyUI(res[0].Survey_ID, res[0].SurveyType, root);                        
+                    };
+                },
+                error: function (e) {
+                }
+            });
+        };
+
+        this.getRoot = function () {
+            return $root;
+        };
+
+        this.disposeComponent = function () {
+            if (iFrame)
+                iFrame.remove();
+            $root.remove();
+            iFrame = null;
+            $root = null;
+        };
+
+        /**
+         * Load Survey UI
+         * @param {any} AD_Survey_ID
+         * @param {any} SurveyType
+         * @param {any} $root
+         */
+        function loadSurveyUI(AD_Survey_ID, SurveyType, root) {
+            $.ajax({
+                url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetSurveyItems",
+                //async: false,
+                data: { AD_Survey_ID: AD_Survey_ID },
+                success: function (data) {
+                    var res = [];
+                    res = JSON.parse(data);
+                    if (res != null) {
+                        loadSurveyDesign(res, SurveyType, root, AD_Survey_ID);
+                        findControls();
+                    };
+                },
+                error: function (e) {
+                }
+            });
+        };
+
+        /**
+         * Create survey Question Answer
+         * @param {any} SurveyData
+         * @param {any} SurveyType
+         * @param {any} $root
+         */
+        function loadSurveyDesign(SurveyData, SurveyType, root, AD_Survey_ID) {
+            var $dsgn;
+            var dsg = '<div class="VIS_SI_Main' + self.windowNo + '" style="width:100%; height:calc(100% - 38px);">' +
+                '<div class="vis-tp-mainContainer"> ' +
+                '<ol class="list-unstyled vis-tp-orderListWrap"> ';
+            if (SurveyType == "CL") //if survey type is Checklist.
+            {
+
+                if (SurveyData.length > 0) {
+                    for (var i = 0; i < SurveyData.length; i++) {
+                        dsg += '<li class="VIS_SI_' + SurveyData[i].Item.AD_SurveyItem_ID + ' align-items-center d-flex mb-3 pb-3 vis-tp-listItem">' +
+                            '<h6 class="mr-2 mb-0">' + (i + 1) + '.</h6><input class="VIS_Answ_' + self.windowNo + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" type= "checkbox" ><p class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-qtype="' + SurveyType + '" data-mandatory="' + SurveyData[i].Item.IsMandatory + '">' + SurveyData[i].Item.Question;
+
+                        if (IsMandatoryAll || SurveyData[i].Item.IsMandatory == 'Y') {
+                            dsg += '<sub style="color:red;font-size: 100%;bottom: unset;">*</sub>';
+                        }
+                        dsg += '</p>' +
+                            '</li>';
+                    }
+                }
+                dsg += '</ol>';
+
+                //$dsgn = $(dsg);
+            }
+            else // if survey type is Questionnarie.
+            {
+                if (SurveyData.length > 0) {
+                    for (var i = 0; i < SurveyData.length; i++) {
+                        if (SurveyData[i].Item.AnswerType == "CB") { //if answer type check box
+                            dsg += '<li class="mb-3"> ' +
+                                '<h6 data-qtype="' + SurveyData[i].Item.AnswerType + '" data-mandatory="' + SurveyData[i].Item.IsMandatory + '" class= "VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + ' mb-3 vis-tp-qus ml"> ' + (i + 1) + '. ' + SurveyData[i].Item.Question;
+                            if (IsMandatoryAll || SurveyData[i].Item.IsMandatory == 'Y') {
+                                dsg += '<sub style="color:red;font-size: 100%;bottom: unset;">*</sub>';
+                            }
+                            dsg += '</h6 > ' +
+                                '<div class="vis-tp-listWrap"> ';
+                            for (var j = 0; j < SurveyData[i].Values.length; j++) {
+                                dsg += ' <div class="VIS_SI_' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' align-items-center d-flex mb-3 vis-tp-listItem"> ' +
+                                    ' <input class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '"';
+                                if (SurveyData[i].Item.AnswerSelection == 'SL') {
+                                    dsg += ' class="group_' + SurveyData[i].Item.AD_SurveyItem_ID + '" ';
+                                }
+                                dsg += ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue=' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' value="' + SurveyData[i].Values[j].Answer + '" type="checkbox">' +
+                                    ' <p>' + SurveyData[i].Values[j].Answer + '</p>' +
+                                    ' </div>';
+                            }
+                            dsg += '</div> ' +
+                                '</li > ';
+                        }
+                        else if (SurveyData[i].Item.AnswerType == "OP") { // if answer type optional 
+                            dsg += '<li class="mb-3"> ' +
+                                '<h6 data-qtype=' + SurveyData[i].Item.AnswerType + ' data-mandatory="' + SurveyData[i].Item.IsMandatory + '" class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + ' mb-3 vis-tp-qus">' + (i + 1) + '. ' + SurveyData[i].Item.Question;
+                            if (IsMandatoryAll || SurveyData[i].Item.IsMandatory == 'Y') {
+                                dsg += '<sub style="color:red;font-size: 100%;bottom: unset;">*</sub>';
+                            }
+                            dsg += '</h6 > ' +
+                                '<div class="vis-tp-listWrap"> ';
+                            for (var j = 0; j < SurveyData[i].Values.length; j++) {
+                                dsg += '<div  class=" VIS_SI_' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' align-items-center d-flex mb-3 vis-tp-listItem"> ' +
+                                    '<input type="radio" name=VIS_' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-id=VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID +
+                                    ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue=' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' class = "VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + '" value="' + SurveyData[i].Values[j].Answer + '" > <p>' + SurveyData[i].Values[j].Answer + '</p>' +
+                                    '</div>';
+                            }
+                            dsg += '</div>' +
+                                '</li > ';
+                        }
+                        else if (SurveyData[i].Item.AnswerType == "TX") {// if answer type textbox
+                            dsg += '<li class="mb-3"> ' +
+                                '<h6 data-qtype=' + SurveyData[i].Item.AnswerType + ' data-mandatory="' + SurveyData[i].Item.IsMandatory + '" class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + ' mb-3 vis-tp-qus ml">' + (i + 1) + '. ' + SurveyData[i].Item.Question;
+                            if (IsMandatoryAll || SurveyData[i].Item.IsMandatory == 'Y') {
+                                dsg += '<sub style="color:red;font-size: 100%;bottom: unset;">*</sub>';
+                            }
+                            dsg += '</h6 > ' +
+                                '<textarea class="VIS_Answ_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-id=VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + '  cols="30" rows="10" placeholder="Enter your text here"></textarea> ' +
+                                '<small class="mb-3">Max 200 letters</small> ' +
+                                '</li > ';
+                        }
+                    }
+                }
+
+                dsg += '</ol > ';
+                // $dsgn = $(dsg);
+            }
+            dsg += '</div >' +
+                '</div > ';
+
+            $dsgn = $(dsg);
+            responseSection.find('.response').append($dsgn.clone(true).removeAttr('style'));
+            responseSection.find('input,textarea').attr('disabled', 'disabled');
+            if (Limit > 0 && ResponseCount >= Limit) {
+                questionSection.hide();               
+                $root.find("#quesMessage_" + self.windowNo).html('You already submitted your response.');                
+                $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+            } else {
+                questionSection.append($dsgn);
+                var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
+                var btns = '<div class="vis-survey">';
+                var totalQues = main.find('[class^=VIS_Quest_]').length;
+
+                //show pagging button according to page size and question length.
+                if (pageSize > 0 && totalQues > pageSize) {
+                    btns += '<div class="float-left"><a class="prev btn mr-2"><i class="fa fa-chevron-left" aria-hidden="true"></i> Prev</a></div>';
+                }
+
+                btns += '<div class="vis-tp-btnWrap float-right"> ' +
+                    '<a class="next btn">Next <i class="fa fa-chevron-right" aria-hidden="true"></i></a>' +
+                    '<a href="#" id="VIS_SI_BtnSubmit_' + self.windowNo + '" class="btn" >Submit</a> ' +
+                    '</div >';
+
+                btns += '<div>';
+                questionSection.append(btns);
+
+                //paging setup
+                if (pageSize > 0 && totalQues > pageSize) {
+                    questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
+                } else if (ResponseCount > 0) {
+                    questionSection.hide();
+                    $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">You already submitted your response. if you want to submit again ' + $clickHere+'</span>');
+                    $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+
+                    $root.find("#quesMessage_" + self.windowNo + " a").click(function () {
+                        questionSection.show();
+                        $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
+                    });
+                }
+            }
+
+           
+            //if (!isSelfShow) {
+               // responseSection.hide();
+            //} 
+
+            loadAccessData(AD_Survey_ID);
+           
+        };
+
+        function loadAccessData(AD_Survey_ID) {
+            userResponse = {};
+            userResIdx = 0;
+            $.ajax({
+                url: VIS.Application.contextUrl + "VIS/SurveyPanel/CheckResponseAccess",
+                //async: false,
+                data: {
+                    AD_Survey_ID: AD_Survey_ID,
+                    AD_SurveyAssignment_ID: AD_SurveyAssignment_ID,
+                    AD_User_ID: VIS.context.getAD_User_ID(),
+                    AD_Role_ID: VIS.context.getAD_Role_ID(),
+                    Record_ID: self.record_ID,
+                    AD_window_ID: _AD_Window_ID,
+                    AD_Table_ID: self.curTab.getAD_Table_ID(),
+                    IsSelfShow: isSelfShow
+                },
+                success: function (data) {
+                    var res = [];
+                    res = JSON.parse(data);
+                    if (res != null && res.length > 0) {
+                        var count = 0;
+                        //responseSection.show();
+                        surveyTab.find('.respTab').show();
+                        surveyTab.find('.quesTab').show();
+                        surveyTab.find('.responseCount').text(res.length);
+                        for (var i = 0; i < res.length; i++) {
+                            if (!userResponse['U' + res[i].User_ID]) {
+                                userResponse['U' + res[i].User_ID] = [];
+                            }
+
+                            userResponse['U' + res[i].User_ID].push({ id: res[i].AD_SurveyResponse_ID, Created: new Date(res[i].Created).toLocaleString() });
+
+
+                            if (responseSection.find('select option[value="' + res[i].User_ID + '"]').length > 0) {
+
+                            } else {
+                                if (res[i].Name == 'Self' && count == 0) {
+                                    count++;
+                                    responseSection.find('select').append('<option selected value="' + res[i].User_ID + '">' + res[i].Name + '</option>');
+                                } else {
+                                    responseSection.find('select').append('<option value="' + res[i].User_ID + '" >' + res[i].Name + '</option>');
+                                }
+                            }
+                        }
+                    } else {
+                        surveyTab.find('.respTab').hide();
+                        surveyTab.find('.quesTab').hide();
+                        return;
+                    }
+                    var uID = VIS.context.getAD_User_ID();
+
+                    AD_SurveyResponse_ID = userResponse['U' + uID][0].id;
+                    if (userResponse['U' + uID].length == 1) {
+                        responseSection.find('.next').attr('disabled', 'disabled');
+                        responseSection.find('.prev').attr('disabled','disabled');
+                    } else {
+                        responseSection.find('.prev').attr('disabled','disabled');
+                    }
+
+                    responseSection.find('.resStatus').text((1) + '/' + userResponse['U' + uID].length);
+                    responseSection.find('.submittedDate').text(userResponse['U' + uID][0].Created)
+                    if (Limit > 0 && userResponse['U' + uID].length >= Limit) {
+                        questionSection.hide();
+                        $root.find("#quesMessage_" + self.windowNo).html('You already submitted your response.');
+                        $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+                    }else if (userResponse['U' + uID].length>0) {                       
+                            questionSection.hide();
+                            $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">You already submitted your response. if you want to submit again ' + $clickHere + '</span>');
+                            $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+
+                            $root.find("#quesMessage_" + self.windowNo+" a").click(function () {
+                                questionSection.show();
+                                $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
+                            });                       
+                    }
+
+                    if (count > 0) {
+                        loadSurveyResponse(uID);
+                    }
+                },
+                error: function (e) {
+                }
+            });
+
+        }
+
+        function loadSurveyResponse(userID) {
+            responseSection.find('input').prop('checked', false);
+            responseSection.find('textarea').val('');
+            $.ajax({
+                url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetResponseList",
+                //async: false,
+                data: {
+                    AD_window_ID: _AD_Window_ID,
+                    AD_Table_ID: self.curTab.getAD_Table_ID(),
+                    Record_ID: self.record_ID,
+                    AD_User_ID: userID,
+                    AD_SurveyResponse_ID: AD_SurveyResponse_ID
+                },
+                success: function (data) {
+                    var res = [];
+                    res = JSON.parse(data);
+                    if (res != null && res.length > 0) {
+                        //responseSection.show();
+                        for (var i = 0; i < res.length; i++) {
+                            if (res[i].AnswerType == 'TX') {
+                                responseSection.find('[data-surveyitem="' + res[i].AD_SurveyItem_ID + '"][data-surveyvalue="' + res[i].AD_SurveyValue_ID + '"]').val(res[i].Answer);
+                            } else {
+                                responseSection.find('[data-surveyitem="' + res[i].AD_SurveyItem_ID + '"][data-surveyvalue="' + res[i].AD_SurveyValue_ID + '"]').prop("checked", true);
+                            }
+                        }
+                    };
+                },
+                error: function (e) {
+                }
+            });
+        }
+
+        //control setup
+        function findControls() {           
+            $mainDiv = questionSection.find('.VIS_SI_Main' + self.windowNo);
+            $btnSubmit = questionSection.find('#VIS_SI_BtnSubmit_' + self.windowNo);
+            eventHandling(); 
+            showHideSubmit();
+        };
+
+        //Submit button show hide on the behalf of pagging
+        function showHideSubmit() {
+           
+            if (questionSection.find('.vis-tp-orderListWrap li:last').is(':hidden')) {
+                $btnSubmit.hide();
+                questionSection.find('.next').show();
+            } else {
+                $btnSubmit.show();
+                questionSection.find('.next').hide();
+            }
+
+            //if first item  is hidden
+            if (questionSection.find('.vis-tp-orderListWrap li:first').is(':hidden')) {
+                questionSection.find('.prev').show();
+            } else {
+                questionSection.find('.prev').hide();
+            }
+        }
+
+        function eventHandling() {
+            // Save response
+            $btnSubmit.on("click", function (e) {
+                var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
+                var asnwers = main.find('[class^=VIS_Answ_]'); //get all answer start VIS_Quest_
+                var questions = main.find('[class^=VIS_Quest_]'); // get all question start VIS_Quest_
+                var Final_Data = {};
+                Final_Data.Questions = [];
+                var AD_Survey_ID = 0;
+                for (var i = 0; i < questions.length; i++) {
+                    var required = true;
+                    var lisItem = questionSection.find('[data-id="' + questions[i].classList[0] + '"]');
+                    AD_Survey_ID= lisItem[0].dataset.survey;
+                    if (questions[i].dataset.qtype == 'CB' || questions[i].dataset.qtype == 'OP' || questions[i].dataset.qtype == 'CL') {
+                        if (lisItem.length > 0) {
+                            for (var j = 0; j < lisItem.length; j++) {
+                                if ($(lisItem[j]).is(":checked")) {
+                                    required = false;
+                                    Final_Data.Questions.push({
+                                        "Question": questions[i].textContent,
+                                        "Answer": $(lisItem[j]).val(),
+                                        "AD_SurveyItem_ID": lisItem[j].dataset.surveyitem,
+                                        "AD_SurveyValue_ID": lisItem[j].dataset.surveyvalue
+                                    });
+                                }
+                            }
+                            if ((IsMandatoryAll || questions[i].dataset.mandatory=='Y') && required) {                                
+                                VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
+                                return;
+                            }
+                        }
+                    }
+                    else if (questions[i].dataset.qtype == 'TX') {
+                        if ($(lisItem[0]).val().length > 0) {
+                            required = false;
+                        };
+                        Final_Data.Questions.push({
+                            "Question": questions[i].textContent,
+                            "Answer": $(lisItem[0]).val(),                           
+                            "AD_SurveyItem_ID": lisItem[0].dataset.surveyitem,
+                            "AD_SurveyValue_ID": lisItem[0].dataset.surveyvalue                           
+                        });
+
+                        if ((IsMandatoryAll || questions[i].dataset.mandatory == 'Y') && required) {
+                            VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
+                            return;
+                        }
+                    }
+                }
+                
+                $.ajax({
+                    type: "POST",
+                    url: VIS.Application.contextUrl + "VIS/SurveyPanel/SaveSurveyResponse",
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({
+                        "surveyResponseValue": Final_Data.Questions,
+                        "AD_Window_ID": _AD_Window_ID,
+                        "AD_Survey_ID": AD_Survey_ID,
+                        "AD_Tab_ID": _AD_Tab_ID,
+                        "Record_ID": self.record_ID,
+                        "AD_Table_ID": self.curTab.getAD_Table_ID()
+                    }),
+                    success: function (data) {
+                        questionSection.find('input').prop('checked', false);
+                        questionSection.find('textarea').val('');
+                        toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
+                        loadAccessData(AD_Survey_ID);
+                    },
+                    error: function (e) {
+                    }
+                });
+            });
+
+            questionSection.find('input[type="checkbox"]').click(function () {
+                if ($(this).attr('class')) {
+                    singleChkBoxSelection(this, $(this).attr('class'));
+                }
+
+            });
+
+            //Next Page
+            questionSection.find('.next').click(function () {
+                var last = questionSection.find('.vis-tp-orderListWrap').children('li:visible:last');
+                last.nextAll(':lt(' + pageSize + ')').removeClass('hideQuestion');
+                last.next().prevAll().addClass('hideQuestion');
+                showHideSubmit();
+            });
+            // Previous Page
+            questionSection.find('.prev').click(function () {
+                var first = questionSection.find('.vis-tp-orderListWrap').children('li:visible:first');
+                first.prevAll(':lt(' + pageSize + ')').removeClass('hideQuestion');
+                first.prev().nextAll().addClass('hideQuestion');
+                showHideSubmit();
+            });
+
+            responseSection.find('select').change(function () {
+                userResIdx = 0;              
+                var userID = responseSection.find('select option:selected').val();
+                AD_SurveyResponse_ID = userResponse['U' + userID][0].id;
+                responseSection.find('.submittedDate').text(userResponse['U' + userID][0].Created);
+                responseSection.find('.resStatus').text((userResIdx + 1) + '/' + userResponse['U' + userID].length);
+                if (userResponse['U' + userID].length == 1) {
+                    responseSection.find('.next').attr('disabled', 'disabled');
+                    responseSection.find('.prev').attr('disabled', 'disabled');
+                } else {
+                    responseSection.find('.next').removeAttr('disabled');
+                    responseSection.find('.prev').attr('disabled', 'disabled');
+                }
+                loadSurveyResponse(userID);
+            });
+
+            responseSection.find('.next').click(function () {
+                userResIdx++;
+                var userID = responseSection.find('select option:selected').val();
+                AD_SurveyResponse_ID = userResponse['U' + userID][userResIdx].id;
+                responseSection.find('.submittedDate').text(userResponse['U' + userID][userResIdx].Created);
+                if (userResIdx >=userResponse['U' + userID].length - 1){
+                    $(this).attr('disabled','disabled');
+                }
+                responseSection.find('.prev').removeAttr('disabled');
+                responseSection.find('.resStatus').text((userResIdx + 1) + '/' + userResponse['U' + userID].length);
+                loadSurveyResponse(userID);
+            });
+
+            responseSection.find('.prev').click(function () {
+                userResIdx--;
+                var userID = responseSection.find('select option:selected').val();
+                AD_SurveyResponse_ID = userResponse['U' + userID][userResIdx].id;
+                responseSection.find('.submittedDate').text(userResponse['U' + userID][userResIdx].Created);
+                if (userResIdx == 0) {
+                    $(this).attr('disabled', 'disabled');
+                }
+                responseSection.find('.next').removeAttr('disabled');
+                responseSection.find('.resStatus').text((userResIdx + 1) + '/' + userResponse['U' + userID].length);
+                loadSurveyResponse(userID);
+            });
+
+            
+        };
+
+        //Single selection of checkbox
+        function singleChkBoxSelection(which, theClass) {
+            var checkbox = questionSection[0].getElementsByClassName(theClass);
+            for (var i = 0; i < checkbox.length; i++) {
+                if (checkbox[i] == which) {
+
+                } else {
+                    checkbox[i].checked = false;
+                }
+            }
+        }
+    };
+
+    /**
+    *	Invoked when user click on panel icon
+    */
+    surveyPanel.prototype.startPanel = function (windowNo, curTab, extraInfo) {
+        this.windowNo = windowNo;
+        this.curTab = curTab;
+        this.extraInfo = extraInfo;
+        this.init();
+    };
+
+    /**
+         *	This function will execute when user navigate  or refresh a record
+         */
+    surveyPanel.prototype.refreshPanelData = function (recordID, selectedRow) {
+        
+        this.record_ID = recordID;
+        this.selectedRow = selectedRow;
+        this.update();
+    };
+
+    /**
+     *	Fired When Size of panel Changed
+     */
+    surveyPanel.prototype.sizeChanged = function (width) {
+        this.panelWidth = width;
+    };
+
+    /**
+     *	Dispose Component
+     */
+    surveyPanel.prototype.dispose = function () {
+        this.disposeComponent();
+    };
+
+    /*
+        * Fully qualified class name
+        */
+    VIS.SurveyPanel = surveyPanel;
+
+})();
