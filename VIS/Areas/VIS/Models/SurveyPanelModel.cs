@@ -12,7 +12,16 @@ using VAdvantage.Utility;
 namespace VIS.Models
 {
     public class SurveyPanelModel
-    {        
+    {   
+        /// <summary>
+        /// Get Survey Assignment
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Window_ID"></param>
+        /// <param name="AD_Tab_ID"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="AD_Record_ID"></param>
+        /// <returns></returns>
         public List<SurveyAssignmentsDetails> GetSurveyAssignments(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int AD_Table_ID,int AD_Record_ID)
         {
             SurveyAssignmentsDetails lst = new SurveyAssignmentsDetails();
@@ -53,7 +62,7 @@ namespace VIS.Models
                         IsMandatory = Util.GetValueOfBool(Util.GetValueOfString(dt["ismandatory"]).Equals("Y")),
                         SurveyName = Util.GetValueOfString(dt["name"]),
                         QuestionsPerPage = Util.GetValueOfInt(dt["QuestionsPerPage"]),
-                        IsDocActionActive = checkDocActionColumn(AD_Tab_ID),
+                        IsDocActionActive = CheckDocActionColumn(AD_Tab_ID),
                         ShowEverytime= Util.GetValueOfBool(Util.GetValueOfString(dt["AD_ShowEverytime"]).Equals("Y")),
                         IsSelfshow = Util.GetValueOfBool(Util.GetValueOfString(dt["isSelfshow"]).Equals("Y")),
                         Limit = Util.GetValueOfInt(dt["Limit"]),
@@ -65,7 +74,12 @@ namespace VIS.Models
             return LsDetails;
         }
 
-        public bool checkDocActionColumn(int AD_Tab_ID)
+        /// <summary>
+        /// Check Doc Action Column
+        /// </summary>
+        /// <param name="AD_Tab_ID"></param>
+        /// <returns></returns>
+        public bool CheckDocActionColumn(int AD_Tab_ID)
         {
             bool IsDocActionExists = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(*) FROM AD_Field f 
             INNER JOIN AD_Column c ON f.AD_Column_ID = c.AD_Column_ID WHERE f.AD_Tab_ID = " + AD_Tab_ID + @" AND 
@@ -230,6 +244,11 @@ namespace VIS.Models
             }
         }
 
+        /// <summary>
+        /// Check Doc Action Exist In Table
+        /// </summary>
+        /// <param name="AD_Table_ID"></param>
+        /// <returns></returns>
         public bool CheckDocActionInTable(int AD_Table_ID)
         {
             string sql = "SELECT Count(AD_Column_ID) FROM AD_Column WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID + " AND AD_Reference_Value_ID= " + 135;
