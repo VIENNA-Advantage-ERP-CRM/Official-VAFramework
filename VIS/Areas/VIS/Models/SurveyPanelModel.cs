@@ -302,6 +302,19 @@ namespace VIS.Models
             return LsResponse;
         }
 
+        /// <summary>
+        /// Check Response access
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Survey_ID"></param>
+        /// <param name="AD_SurveyAssignment_ID"></param>
+        /// <param name="AD_User_ID"></param>
+        /// <param name="AD_Role_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <param name="AD_Window_ID"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="IsSelfShow"></param>
+        /// <returns></returns>
         public List<UserList> CheckResponseAccess(Ctx ctx,int AD_Survey_ID, int AD_SurveyAssignment_ID, int AD_User_ID, int AD_Role_ID, int Record_ID,int AD_Window_ID,int AD_Table_ID,bool IsSelfShow) {
             string sql = @"SELECT COUNT(AD_ResponseAccess_ID) FROM AD_ResponseAccess  
                             WHERE AD_SurveyAssignment_ID="+ AD_SurveyAssignment_ID + " AND ISActive='Y' AND ((ad_role_id="+ AD_Role_ID + ") OR (ad_user_id="+ AD_User_ID + "))";
