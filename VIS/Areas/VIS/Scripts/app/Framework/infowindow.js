@@ -1177,7 +1177,8 @@
                 columns: grdCols,
                 records: grdRows,
                 multiSelect: multiSelection,
-                onUnselect: onUnSelectRow
+                onUnselect: onUnSelectRow,
+                onSelect: onSelectRow
                 //resize: function ()
                 //{
                 //    alert("hi");
@@ -1190,9 +1191,13 @@
                     for (item in w2ui[grdname].records) {
                         if (w2ui[grdname].records[item][keyCol] == multiValues[itm]) {
                             w2ui[grdname].select(parseInt(item) + 1);
+                            toggleOkBtn(false);
                         }
                     }
                 }
+            }
+            else {
+                toggleOkBtn(true);
             }
 
 
@@ -1201,8 +1206,24 @@
             bsyDiv[0].style.visibility = "hidden";
         };
 
+
+        function toggleOkBtn(disable) {
+            if (disable) {
+                btnOK.prop('disabled', 'true').css({ "cursor": "default", "opacity": ".5" });
+            }
+            else {
+                btnOK.prop('disabled', '').css({ "cursor": "pointer", "opacity": "1" });
+            }
+        };
+
+        function onSelectRow(e) {
+            toggleOkBtn(false);
+        };
+
+
         function onUnSelectRow(e) {
             if (!multiSelection) {
+                toggleOkBtn(true);
                 return;
             }
 
@@ -1220,6 +1241,11 @@
                     }
                 }
             }
+
+            window.setTimeout(function () {
+                if (multiValues.length == 0 && w2ui[e.target].getSelection().length == 0)
+                    toggleOkBtn(true);
+            }, 50);
         };
 
         var disposeDataSec = function () {

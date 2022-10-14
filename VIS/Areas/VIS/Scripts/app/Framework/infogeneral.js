@@ -99,7 +99,7 @@
             //}
             //else {
             btnCancel = $("<button class='VIS_Pref_btn-2'>").append(canceltxt);
-            btnOK = $("<button class='VIS_Pref_btn-2'>").append(Oktxt);
+            btnOK = $("<button disabled='true' style='cursor:default;opacity:.5' class='VIS_Pref_btn-2'>").append(Oktxt);
             //}
 
             divbtnRight.append(btnCancel);
@@ -723,7 +723,8 @@
                 columns: grdCols,
                 records: grdRows,
                 multiSelect: multiSelection,
-                onUnselect: onUnSelectRow
+                onUnselect: onUnSelectRow,
+                onSelect: onSelectRow
             });
 
             if (multiSelection) {
@@ -732,17 +733,26 @@
                     for (item in w2ui[grdname].records) {
                         if (w2ui[grdname].records[item][keyCol] == multiValues[itm]) {
                             w2ui[grdname].select(parseInt(item) + 1);
+                            toggleOkBtn(false);
                         }
                     }
                 }
+            }
+            else {
+                toggleOkBtn(true);
             }
             // $("#w2ui-even").css("height", "40px");
             bsyDiv[0].style.visibility = "hidden";
 
         };
 
+        function onSelectRow(e) {
+            toggleOkBtn(false);
+        };
+
         function onUnSelectRow(e) {
             if (!multiSelection) {
+                toggleOkBtn(true);
                 return;
             }
             //var unselectedVal = w2ui[e.target].records[e.index][keyCol];
@@ -764,6 +774,12 @@
                 }
             }
 
+            window.setTimeout(function () {
+                if (multiValues.length == 0 && w2ui[e.target].getSelection().length == 0)
+                    toggleOkBtn(true);
+            }, 50);
+            
+
         };
 
         var disposeDataSec = function () {
@@ -772,6 +788,15 @@
             }
             dGrid = null;
 
+        };
+
+        function toggleOkBtn(disable) {
+            if (disable) {
+                btnOK.prop('disabled', 'true').css({ "cursor": "default", "opacity": ".5" });
+            }
+            else {
+                btnOK.prop('disabled', '').css({ "cursor": "pointer", "opacity": "1" });
+            }
         };
 
         this.getSelectedValues = function () {

@@ -7,13 +7,14 @@ using VAdvantage.Model;
 using System.Web.Hosting;
 using System.Text;
 using System.IO;
+using VAdvantage.Logging;
 
 namespace VIS.Models
 {
     # region Count of Home Page
     public class HomeModels
     {
-
+        private VLogger log = VLogger.GetVLogger(typeof(HomeModels).FullName);
         public int FollowUpCnt { get; set; }
         public int AppointmentCnt { get; set; }
         public int ToDoCnt { get; set; }
@@ -71,6 +72,28 @@ namespace VIS.Models
 
 
             return mimg.GetAD_Image_ID();
+        }
+
+        public bool DeleteUserImage(Ctx ctx)
+        {
+            MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+            int imgID = user.GetAD_Image_ID();
+            user.SetAD_Image_ID(0);
+            if (!user.Save())
+            {
+                ValueNamePair pp = VAdvantage.Logging.VLogger.RetrieveError();
+                log.SaveError("Error Removing User Image", pp.GetValue() + " " + pp.GetName());
+                return false;
+            }
+
+            MImage img = new MImage(ctx, imgID, null);
+            if (!img.Delete(true))
+            {
+                ValueNamePair pp = VAdvantage.Logging.VLogger.RetrieveError();
+                log.SaveError("Error Removing Image", pp.GetValue() + " " + pp.GetName());
+                return false;
+            }
+            return true;
         }
 
 
