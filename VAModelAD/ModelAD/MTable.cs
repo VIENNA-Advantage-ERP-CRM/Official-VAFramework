@@ -512,7 +512,7 @@ namespace VAdvantage.Model
                     {
                         if (!isNew && Record_ID == 0)
                             po.Load(trxName);
-                        if (po.Get_ID() != Record_ID && Record_ID > 0)
+                        if (po.Get_ID() != Record_ID && (Record_ID > 0 || Record_ID == -1))
                         {
                             po = null;
                         }
@@ -523,7 +523,7 @@ namespace VAdvantage.Model
                     }
                 }
             }
-            if (po == null)
+            if (po == null && Record_ID != -1) // For Langugae window
             {
                 log.Log(Level.INFO, "Using GenericPO for " + tableName);
                 po = new GenericPO(tableName, ctx, Record_ID, trxName);

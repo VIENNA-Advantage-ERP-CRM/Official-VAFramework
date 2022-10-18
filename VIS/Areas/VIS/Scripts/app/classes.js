@@ -1414,30 +1414,33 @@
                 if (ind != -1)
                     ParentTable = targetTableName.substring(0, ind);
                 if (ParentTable != null) {
-                    var sql3 = "VIS_79";
+                    //var sql3 = "VIS_79";
 
-                    var param = [];
-                    param[0] = new VIS.DB.SqlParam("@ParentTable", ParentTable);
-                    param[1] = new VIS.DB.SqlParam("@targetTableName", targetTableName);
-                    param[2] = new VIS.DB.SqlParam("@targetWhereClause", targetWhereClause);
-                    param[3] = new VIS.DB.SqlParam("@ParentTable1", ParentTable);
-                    param[4] = new VIS.DB.SqlParam("@ParentTable2", ParentTable);
+                    //var param = [];
+                    //param[0] = new VIS.DB.SqlParam("@ParentTable", ParentTable);
+                    //param[1] = new VIS.DB.SqlParam("@targetTableName", targetTableName);
+                    //param[2] = new VIS.DB.SqlParam("@targetWhereClause", targetWhereClause);
+                    //param[3] = new VIS.DB.SqlParam("@andcondition", "p." + ParentTable + "_ID = c." + ParentTable+"_ID");
+                   // param[4] = new VIS.DB.SqlParam("@ParentTable2", ParentTable+"_ID");
 
+                    isSOTrx = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Form/GetZoomIsSOTrx", {
+                        "parentTable": ParentTable, "targetTableName": targetTableName,
+                        "targetWhereClause": VIS.secureEngine.encrypt(targetWhereClause)
+                    });
+                    
+                       // dr = executeReader(sql3, param);                                                       
 
-                    try {
-                        dr = executeReader(sql3, param);
-
-                        if (dr.read())
-                            isSOTrx = dr.getString(0).equals("Y");
-                    }
-                    catch (e) {
-                        this.log(VIS.Logging.Level.SEVERE, sql3.toString(), e);
-                    }
-                    finally {
-                        if (dr != null)
-                            dr.dispose();
-                        dr = null;
-                    }
+                        //if (dr.read())
+                           // isSOTrx = dr.getString(0).equals("Y");
+                    //}
+                    //catch (e) {
+                    //    this.log(VIS.Logging.Level.SEVERE, sql3.toString(), e);
+                    //}
+                    //finally {
+                    //    if (dr != null)
+                    //        dr.dispose();
+                    //    dr = null;
+                    //}
                 }
             }
 

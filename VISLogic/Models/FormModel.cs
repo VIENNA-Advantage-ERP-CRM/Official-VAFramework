@@ -107,6 +107,16 @@ namespace VIS.Models
 
         }
 
+        public bool GetZoomIsSOTrx(Ctx ctx, string parentTable, string targetTableName, string targetWhereClause)
+        {
+            string qry = "SELECT p.IsSOTrx FROM " + parentTable + " p, " + targetTableName + " c WHERE " + targetWhereClause
+                            + " AND p." + parentTable + "_ID = c." + parentTable + "_ID";
+            object ret = DB.ExecuteScalar(qry);
+            if (ret != null)
+                return Util.GetValueOfString(ret) == "Y";
+            return true;
+        }
+
         /// <summary>
         /// Parse String and add columnNames to the list.
         /// String should be of the format ColumnName=<Value> AND ColumnName2=<Value2>

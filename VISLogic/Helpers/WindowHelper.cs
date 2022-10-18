@@ -138,7 +138,10 @@ namespace VIS.Helpers
                 //    select.Append(Utility.Envs.ParseContext(_ctx, _windowNo, field.GetColumnSQL(true), false));
                 //    continue;
                 //}
-                select.Append(field.ColumnSQL);	//	ColumnName or Virtual Column
+                if (field.ColumnSQL != null)
+                    select.Append(field.ColumnSQL); //	ColumnName or Virtual Column
+                else
+                    select.Append(field.ColumnName);	//	ColumnName or Virtual Column
             }
 
             select.Append(" FROM ").Append(tableName);
@@ -1127,6 +1130,37 @@ namespace VIS.Helpers
 
             int Ver_Window_ID = 0;
             PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, out Ver_Window_ID);
+
+            for (int i = 0; i < lstColumns.Count; i++)
+            {
+                WindowField gField = m_fields.Where(a => a.ColumnName == lstColumns[i]).FirstOrDefault();
+                if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
+                {
+                    string selectSQL = GetColumnSQL(false, gField);
+
+                    if (selectSQL.IndexOf("@") == -1)
+                    {
+                        lstColumns[i] = selectSQL;   //	ColumnName or Virtual Column
+                    }
+                    else
+                    {
+                        lstColumns[i] = Env.ParseContext(ctx, inn.WindowNo, selectSQL, false);
+                    }
+                }
+            }
+
+            List<WindowField> imgColList = m_fields.Where(a => a.DisplayType == DisplayType.Image).ToList();
+
+            if (imgColList != null && imgColList.Count > 0)
+            {
+                for (int j = 0; j < imgColList.Count; j++)
+                {
+                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + inn.TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                }
+            }
+
+            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+            inn.SelectSQL = SQL_Select + " FROM " + inn.TableName;
             //	No Persistent Object
             if (po == null)
             {
@@ -1226,35 +1260,9 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
-            for (int i = 0; i < lstColumns.Count; i++)
-            {
-                WindowField gField = m_fields.Where(a => a.ColumnName == lstColumns[i]).FirstOrDefault();
-                if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
-                {
-                    string selectSQL = GetColumnSQL(false, gField);
+            
 
-                    if (selectSQL.IndexOf("@") == -1)
-                    {
-                        lstColumns[i] = selectSQL;   //	ColumnName or Virtual Column
-                    }
-                    else
-                    {
-                        lstColumns[i] = Env.ParseContext(ctx, inn.WindowNo, selectSQL, false);
-                    }
-                }
-            }
-
-            List<WindowField> imgColList = m_fields.Where(a => a.DisplayType == DisplayType.Image).ToList();
-
-            if (imgColList != null && imgColList.Count > 0)
-            {
-                for (int j = 0; j < imgColList.Count; j++)
-                {
-                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + inn.TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
-                }
-            }
-
-            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+            //string SQL_Select = "SELECT " + String.Join(",", lstColumns);
 
             String refreshSQL = SQL_Select + " FROM " + inn.TableName + " WHERE " + whereC;
 
