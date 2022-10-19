@@ -107,6 +107,14 @@ namespace VIS.Models
 
         }
 
+        /// <summary>
+        /// Get isSotrx setting for zoom record
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <param name="parentTable">parent table name</param>
+        /// <param name="targetTableName">target table name</param>
+        /// <param name="targetWhereClause">where condition</param>
+        /// <returns></returns>
         public bool GetZoomIsSOTrx(Ctx ctx, string parentTable, string targetTableName, string targetWhereClause)
         {
             string qry = "SELECT p.IsSOTrx FROM " + parentTable + " p, " + targetTableName + " c WHERE " + targetWhereClause
