@@ -6666,6 +6666,12 @@
             return null;
         //	see also MTable.readData
         try {
+
+            /*return null if default value exist in validation code. TUV Points*/
+            if (!this.vo.IsReadOnly && (this.vo.ValidationCode != "" && this.vo.ValidationCode.indexOf(value) != -1)) {
+                return null;
+            }
+
             //	IDs & Integer & CreatedBy/UpdatedBy
             if (this.vo.ColumnName.endsWith("atedBy")
                 || this.vo.ColumnName.toUpperCase().endsWith("_ID")) {
