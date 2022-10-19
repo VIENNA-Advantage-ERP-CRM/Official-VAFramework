@@ -260,7 +260,7 @@ namespace VIS.Classes
 
             queryList.VIS_78 = "SELECT DISTINCT AD_Window_ID, PO_Window_ID FROM AD_Table t WHERE TableName = @targetTableName";
 
-            queryList.VIS_79 = " SELECT p.IsSOTrx FROM @ParentTable p, @targetTableName c  WHERE @targetWhereClause AND p.@ParentTable1_ID = c.@ParentTable2_ID";
+            queryList.VIS_79 = " SELECT p.IsSOTrx FROM @ParentTable p, @targetTableName c  WHERE @targetWhereClause AND @andcondition";// p.@ParentTable1 = c.@ParentTable2";
 
 
             queryList.VIS_80 = "SELECT AD_Window_ID, Name FROM AD_Window WHERE Name LIKE 'Work Center%' OR NAME LIKE 'Production Resource'";
