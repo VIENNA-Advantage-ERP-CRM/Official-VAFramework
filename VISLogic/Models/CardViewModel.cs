@@ -6,6 +6,7 @@ using VAdvantage.DataBase;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.Classes;
+using VIS.Helpers;
 
 namespace VIS.Models
 {
@@ -999,6 +1000,137 @@ namespace VIS.Models
             }
             return tempCat;
         }
+
+        /// <summary>
+        /// Get Exported Data
+        /// </summary>
+        /// <param name="_recordID"></param>
+        /// <param name="_tableID"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<int> GetCardExportData(Ctx ctx, string _strRecordID)
+        {
+            int _tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_GridLayoutItems'"));
+
+            string qry = @"SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems  WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID in (" + _strRecordID + "))";
+            DataSet ds = DB.ExecuteDataset(qry);
+            int _recordID = 0;
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                _recordID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["AD_GridLayoutItems_ID"]);
+            }
+            List<int> recID = null;
+            if (_recordID > 0)
+            {
+                
+                string sql = "SELECT AD_ModuleInfo_ID FROM AD_ExportData e WHERE e.Record_ID=" + _recordID + " AND e.AD_Table_ID = " + _tableID;
+                ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    recID = new List<int>();
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        int id = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ModuleInfo_ID"]);
+                        recID.Add(id);
+                    }
+                }
+            }
+            return recID;
+        }
+
+        /// <summary>
+        /// Card template Export
+        /// </summary>
+        /// <param name="moduleId"></param>
+        /// <param name="_strRecordID"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public string SaveCardExportData(int[] moduleId, string _strRecordID, Ctx ctx)
+        {
+
+            int tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_GridLayoutItems'"));
+
+            string qry = @"SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems  WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID in (" + _strRecordID + "))";
+            DataSet ds = DB.ExecuteDataset(qry);
+            List<int> lst = new List<int>();
+            string strRecordID = "";
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    strRecordID += Util.GetValueOfString(ds.Tables[0].Rows[i]["AD_GridLayoutItems_ID"]);
+                    if (ds.Tables[0].Rows.Count != (i + 1))
+                    {
+                        strRecordID += ",";
+                    }
+                    lst.Add(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_GridLayoutItems_ID"]));
+                }
+            }
+            int[] arr = lst.ToArray();
+
+            MarkModuleHelper model = new MarkModuleHelper();
+
+            return model.SaveExportData(moduleId, arr, tableID, strRecordID, ctx);
+        }
+
+        /// <summary>
+        /// Get Exported Template IDs
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<string> GetExportTemplateIDs(Ctx ctx)
+        {
+            List<string> recID = null;
+            int _tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_GridLayoutItems'"));
+           string sql = @"SELECT DISTINCT AD_HeaderLayout.AD_HeaderLayout_ID,(SELECT distinct ad_moduleinfo_id FROM ad_exportdata WHERE ad_table_id=" + _tableID + @") AS moduleinfo_id FROM AD_HeaderLayout INNER JOIN AD_GridLayout 
+                           ON AD_HeaderLayout.AD_HeaderLayout_ID=AD_GridLayout.AD_HeaderLayout_ID
+                           INNER JOIN AD_GridLayoutItems ON AD_GridLayout.AD_GridLayout_ID=AD_GridLayoutItems.AD_GridLayout_ID
+                           WHERE AD_GridLayoutItems.AD_GridLayoutItems_ID IN (SELECT record_id FROM ad_exportdata WHERE ad_table_id=" + _tableID + ")";
+
+            DataSet ds = DB.ExecuteDataset(sql);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                recID = new List<string>();
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    string id = Util.GetValueOfString(ds.Tables[0].Rows[i]["AD_HeaderLayout_ID"])+"|"+ Util.GetValueOfString(ds.Tables[0].Rows[i]["moduleinfo_id"]);
+                    recID.Add(id);
+                }
+            }
+            return recID;
+        }
+
+        /// <summary>
+        /// Remove Exported Template
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="templateID"></param>
+        /// <returns></returns>
+        public int RemoveExportTemplate(Ctx ctx, int templateID)
+        {
+            int a = 0;
+            int _tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_GridLayoutItems'"));
+            string qry = @"SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems  WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID in (" + templateID + "))";
+            DataSet ds = DB.ExecuteDataset(qry);
+            string strRecordID = "";
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    strRecordID += Util.GetValueOfString(ds.Tables[0].Rows[i]["AD_GridLayoutItems_ID"]);
+                    if (ds.Tables[0].Rows.Count != (i + 1))
+                    {
+                        strRecordID += ",";
+                    }
+
+                }
+                string sql = "delete from ad_exportdata where record_id in (" + strRecordID + ") " +
+                                  "and ad_table_id=" + _tableID;
+                a = DB.ExecuteQuery(sql, null, null);
+            }
+            return a;
+        }
+
     }
 
     public class CardViewPropeties

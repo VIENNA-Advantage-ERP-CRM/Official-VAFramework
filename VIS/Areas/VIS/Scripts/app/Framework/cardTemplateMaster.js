@@ -55,9 +55,11 @@
         var force = 0;
         var cmbTemplateCategory = null;
         var cmbViwBlockTemplateCategory = null;
+        var btnImport = null;
         var gridObj = {
         };
 
+        var chMI = null;
         var isUndoRedo = false;
         var history = [];
         var s_history = true;
@@ -437,17 +439,35 @@
 
                 btnVdelrow = root.find('#btnVdelrow_' + WindowNo);
                 btnVdelCol = root.find('#btnVdelCol_' + WindowNo);
+                btnImport = root.find('#BtnImport_' + WindowNo);
                 btnRefreshTemplate = root.find('#BtnRefreshTemplate_' + WindowNo);
                 cmbTemplateCategory = root.find('#CmbTemplateCategory_' + WindowNo);
                 cmbViwBlockTemplateCategory = root.find('#CmbViwBlockTemplateCategory_' + WindowNo);
                 DivStyleSec1.find('.nav-tabs li:last').hide();
-                btnTemplateBack.hide();
-                events();
+                btnTemplateBack.hide();                
                 getTemplateDesign();
                 getTemplateCategory();
+               
+                events();
+                
             });
         }
 
+        function importcheckBoxEvent() {
+            root.find('.chkMark').change(function () {
+                if (root.find('.chkMark:checked').length > 0) {
+                    btnImport.show();
+                } else {
+                    btnImport.hide();
+                }
+
+                if (root.find('.chkMark:checked').length > 1) {
+                    btnLayoutSetting.hide();
+                } else {
+                    btnLayoutSetting.show();
+                }
+            });
+        }
 
         function events() {
             $('body').mouseup(function (e) {
@@ -535,14 +555,34 @@
                 saveTemplate(e);
             });
 
+            btnImport.click(function () {
+                markmoduleImport();
+            });
+
+            
+
             btnRefreshTemplate.click(function () {
                 cmbTemplateCategory.val('');
                 getTemplateDesign();
+                
             });
 
-            DivTemplate.find('.vis-cardSingleViewTemplate').click(function () {
-                DivTemplate.find('.vis-cardSingleViewTemplate').removeClass('vis-active-template');
-                $(this).addClass('vis-active-template');
+            DivTemplate.find('.vis-cardSingleViewTemplate').click(function (e) {
+                if ($(e.target).hasClass('chkMark')) {
+                    return;
+                } else {
+                    if ($(e.target).index() == 0) {
+                        btnImport.hide();
+                    } else {
+                        btnImport.show();
+                    }
+                    DivTemplate.find('.vis-cardSingleViewTemplate').removeClass('vis-active-template');
+                    $(this).addClass('vis-active-template');
+                    DivTemplate.find('.chkMark').prop('checked', false);
+                    $(this).find('.chkMark').prop('checked', true);
+                }
+
+                root.find('.chkMark').change();
             });
 
 
@@ -2219,16 +2259,36 @@
                     alert(errorThrown.statusText);
                     IsBusy(false);
                 }, complete: function () {
-                    DivTemplate.find('.vis-cardSingleViewTemplate').click(function () {
-                        DivTemplate.find('.vis-cardSingleViewTemplate').removeClass('vis-active-template');
-                        $(this).addClass('vis-active-template');
+                    DivTemplate.find('.vis-cardSingleViewTemplate').click(function (e) {
+                        if ($(e.target).hasClass('chkMark')) {
+                            return;
+                        } else {
+                            if ($(e.target).index() == 0) {
+                                btnImport.hide();
+                            } else {
+                                btnImport.show();
+                            }
+
+                            DivTemplate.find('.vis-cardSingleViewTemplate').removeClass('vis-active-template');
+                            $(this).addClass('vis-active-template');
+                            DivTemplate.find('.chkMark').prop('checked', false);
+                            $(this).find('.chkMark').prop('checked', true);
+                        }
+                        root.find('.chkMark').change();
                     });
 
                     DivTemplate.find('.vis-deleteTemplate').click(function () {
                         deleteTemplate(Number($(this).next().attr('templateID')), $(this));
                     });
 
-                    scaleTemplate();                   
+                    scaleTemplate();
+                    $.each(root.find('[issystemtemplate="Y"]:not(:first)'), function () {
+                        var chkdiv = '<div style="position: absolute;left: 5px;top: 5px;z-index:9"><input type="checkbox" value="' + $(this).find('.mainTemplate').attr('templateid') + '" class="pull-right vis-styledCheckbox chkMark" style="width:20px;height:20px;position: absolute;" ><label></label></div>'
+                        $(this).append(chkdiv);
+                    });
+
+                    checkModuleExported();
+                    importcheckBoxEvent();
                 }
             });
         }
@@ -2452,6 +2512,17 @@
                     isSystemTemplate = 'Y';         
                     toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
                     IsBusy(false);
+
+                    var importtemp = root.find('.mainTemplate[templateid="' + result + '"] ').closest('.vis-cardSingleViewTemplate').find('.vis-removeExport');
+                    if (importtemp.length > 0) {
+                        var splitID = importtemp.data('id').split('|');
+                        var data = {
+                            moduleId: splitID[1],
+                            _strRecordID: splitID[0]
+                        };
+                        var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "CardView/SaveCardExportData", data);
+
+                    }
                     getTemplateDesign();
                     
 
@@ -2463,7 +2534,32 @@
 
         }
 
+        function checkModuleExported() {
+            root.find('.vis-removeExport').remove();
+            var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "CardView/GetExportTemplateIDs", null, null);
+            if (dr != null) {
+                for (var i in dr) {
+                    root.find('.mainTemplate[templateid="' + dr[i].split('|')[0] + '"]').closest('.vis-cardSingleViewTemplate').prepend('<i data-id="' + dr[i] + '" class="vis vis-cross vis-removeExport" title="Remove export" style="position: absolute;right:25px;top: 8px;font-size: 1rem;cursor: pointer;"></i>');
+                }
 
+                root.find('.vis-removeExport').click(function () {
+                    var $this = $(this);
+                    var tempID = $this.data('id').split('|')[0];
+                    VIS.ADialog.confirm("SureWantToRemove", true, "", VIS.Msg.getMsg("Confirm"), function (result) {
+                        if (result) {
+                            var obj = {
+                                templateID: tempID
+                            }
+
+                            var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "CardView/RemoveExportTemplate", obj, null);
+                            if (dr != null && dr > 0) {
+                                $this.remove();
+                            }
+                        }
+                    });
+                });
+            }
+        }
 
         this.getRoot = function () {
             return root;
@@ -2688,6 +2784,163 @@
             }
         }
 
+        function markmoduleImport() {
+            rootMI = $("<div>");
+            var bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+            bsyDiv[0].style.visibility = "visible";
+            rootMI.append(bsyDiv);
+
+            var contentDiv = $("<div>");
+            var divMlist = $("<div class='vis-markmodulemainwrap'>");
+            contentDiv.append(divMlist);
+            var divButtons = $('<div>');
+            contentDiv.append(divButtons);
+            var canceltxt = VIS.Msg.getMsg("Cancel");
+            var Oktxt = VIS.Msg.getMsg("Ok");
+            var btnCancel = $("<button class='VIS_Pref_btn-2' style='margin-top: 5px;margin-bottom: -10px;'>").append(canceltxt);
+            var btnOk = $("<button class='VIS_Pref_btn-2' style='margin-top: 5px;margin-bottom: -10px;margin-right:5px'>").append(Oktxt);
+
+            divButtons.append(btnCancel);
+            divButtons.append(btnOk);
+
+            rootMI.append(contentDiv);
+            var table = $('<table>');
+
+            chMI = new VIS.ChildDialog();
+            chMI.setTitle(VIS.Msg.getMsg("Module"));
+            chMI.setWidth('30%');
+            
+            //ch.setHeight(h);
+            chMI.setContent(rootMI);
+            chMI.onOkClick = function (e) {
+               
+            };
+            chMI.onCancelClick = cancel;
+            chMI.onClose = cancel;
+            chMI.show();
+            chMI.hideButtons();
+
+            lstModules = [];
+            var module = null;
+            var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "MarkModule/LoadModules", null, null);
+            if (dr != null) {
+                for (var i in dr) {
+                    module = {};
+                    module.AD_ModuleInfo_ID = dr[i]["AD_ModuleInfo_ID"];
+                    module.Name = dr[i]["Name"];
+                    lstModules.push(module);
+                }
+            }
+
+            var strTempID = "";
+            $.each(root.find('.chkMark:checked'), function () {
+                strTempID += this.value + ',';
+            });
+            strTempID = strTempID.replace(/,(\s+)?$/, '');
+            var lstExistingRec = [];
+            if (strTempID.length> 0) {
+                var data = {
+                    _strRecordID: strTempID,
+                };
+                var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "CardView/GetCardExportData", data, null);
+                if (dr != null) {
+                    for (var i in dr) {
+                        lstExistingRec.push(dr[i]);
+                    }
+                }
+            }
+
+            var tr = null;
+            var td = null;
+            var lbl = null;
+            var chkbox = null;
+            var lstCtrl = [];
+            if (lstExistingRec.length == 0) {
+
+                for (var i = 0; i < lstModules.length; i++) {
+
+                    tr = $('<tr>');
+                    td = $('<td>');
+                    lbl = $('<label class="vis-gc-vpanel-table-label-checkbox" style="display: inline-block; opacity: 1;">');
+                    chkbox = $("<input type='checkbox'>");
+                    lbl.append(chkbox);
+                    lbl.append(lstModules[i].Name);
+                    td.append(lbl);
+                    tr.append(td);
+                    table.append(tr);
+                    var ctrlItem = {};
+                    ctrlItem.Ctrl = chkbox;
+                    ctrlItem.AD_ModuleInfo_ID = lstModules[i].AD_ModuleInfo_ID;
+                    lstCtrl.push(ctrlItem);
+                    //htmlstr += "<tr><td><label class='vis-gc-vpanel-table-label-checkbox' style='display: inline-block; opacity: 1;'><input type='checkbox'>" + lstModules[i].Name + "</label></td></tr>";
+                }
+
+            }
+            else {
+
+                //for (var i = 0; i < lstExistingRec.length; i++) {
+                for (var j = 0; j < lstModules.length; j++) {
+
+                    tr = $('<tr>');
+                    td = $('<td>');
+                    lbl = $('<label class="vis-gc-vpanel-table-label-checkbox" style="display: inline-block; opacity: 1;">');
+                    if (lstExistingRec.indexOf(lstModules[j].AD_ModuleInfo_ID) > -1) {
+                        chkbox = $("<input type='checkbox' checked>");
+                        // htmlstr += "<tr><td><label class='vis-gc-vpanel-table-label-checkbox' style='display: inline-block; opacity: 1;'><input type='checkbox' checked>" + lstModules[j].Name + "</label></td></tr>";
+                    }
+                    else {
+                        chkbox = $("<input type='checkbox'>");
+                        // htmlstr += "<tr><td><label class='vis-gc-vpanel-table-label-checkbox' style='display: inline-block; opacity: 1;'><input type='checkbox'>" + lstModules[j].Name + "</label></td></tr>";
+                    }
+                    lbl.append(chkbox);
+                    lbl.append(lstModules[j].Name);
+                    td.append(lbl);
+                    tr.append(td);
+                    table.append(tr);
+                    var ctrlItem = {};
+                    ctrlItem.Ctrl = chkbox;
+                    ctrlItem.AD_ModuleInfo_ID = lstModules[j].AD_ModuleInfo_ID;
+                    lstCtrl.push(ctrlItem);
+                    //}
+                }
+
+            }
+            divMlist.append(table);
+            bsyDiv[0].style.visibility = "hidden";
+            btnOk.on("click", function () {               
+
+                bsyDiv[0].style.visibility = "visible";
+                var lstselectedID = [];
+                // var selectedID = '';
+                for (var i = 0; i < lstCtrl.length; i++) {
+                    var chkbox = lstCtrl[i].Ctrl;
+                    if (chkbox.prop('checked')) {
+                        lstselectedID.push(lstCtrl[i].AD_ModuleInfo_ID);
+                        // selectedID += lstCtrl[i].AD_ModuleInfo_ID + ',';
+                    }
+                }
+
+                var data = {
+                    moduleId: lstselectedID,
+                    //_recordID: _recordID,
+                    //_tableID: _tableID,
+                    _strRecordID: strTempID
+                };
+                var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "CardView/SaveCardExportData", data);
+                if (res.result != "OK") {
+                    alert(res.result);
+                } else {
+                    cancel();
+                    toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+                    checkModuleExported();
+                }
+                bsyDiv[0].style.visibility = "hidden";
+            });
+            btnCancel.on("click", function () {
+                cancel();
+            });
+        }
+
         this.show = function (istext, isEdit) {
             var mainDiv = $('<div>');
             var input = $('<input type="file" name="" maxlength="50" style="height: 45px;padding: 10px" class="" accept="image/*" placeholder=" " data-placeholder="">');
@@ -2753,7 +3006,7 @@
         }
 
         function cancel() {
-            ch.close();
+            chMI.close();
             return true;
         };
 

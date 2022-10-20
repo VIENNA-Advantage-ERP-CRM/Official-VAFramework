@@ -3562,6 +3562,62 @@ field, fieldvalue {
         color: rgba(var(--v-c-primary), 1);
     }
 
+.vis-styledCheckbox {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.visstyledCheckbox + label {
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+}
+
+.vis-styledCheckbox + label:before {
+    content: "";
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: text-top;
+    width: 19px;
+    height: 19px;
+    background: transparent;
+    border: 1px solid rgba(var(--v-c-on-secondary), 0.3);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.vis-styledCheckbox:hover + label:before {
+    background: unset;
+}
+
+.vis-styledCheckbox:checked + label:before {
+    background: rgba(var(--v-c-primary), 1);
+}
+
+.vis-styledCheckbox:disabled + label {
+    color: #b8b8b8;
+    cursor: auto;
+}
+
+.vis-styledCheckbox:disabled disabled + label:before {
+    box-shadow: none;
+    background: #ddd;
+}
+
+.vis-styledCheckbox:checked + label:after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    background: white;
+    width: 2px;
+    height: 2px;
+    box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 white;
+    transform: rotate(45deg);
+}
+
+
 /* modify Ends */
 /*Media query*/
 @media screen and (max-width: 1500px) and (min-width: 1360px) {

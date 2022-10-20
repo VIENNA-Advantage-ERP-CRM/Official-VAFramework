@@ -226,5 +226,56 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(objCardViewModel.GetTemplateCategory(ctx)));
         }
 
+        /// <summary>
+        /// Get Card Export Data
+        /// </summary>
+        /// <param name="RecordID"></param>
+        /// <param name="TableID"></param>
+        /// <returns></returns>
+        public JsonResult GetCardExportData(string _strRecordID)
+        {
+            Ctx ct = Session["ctx"] as Ctx;
+            CardViewModel model = new CardViewModel();
+            return Json(JsonConvert.SerializeObject(model.GetCardExportData(ct, _strRecordID)), JsonRequestBehavior.AllowGet);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult GetExportTemplateIDs()
+        {
+            Ctx ct = Session["ctx"] as Ctx;
+            CardViewModel model = new CardViewModel();
+            return Json(JsonConvert.SerializeObject(model.GetExportTemplateIDs(ct)), JsonRequestBehavior.AllowGet);
+        } 
+        
+        public JsonResult RemoveExportTemplate(int templateID)
+        {
+            Ctx ct = Session["ctx"] as Ctx;
+            CardViewModel model = new CardViewModel();
+            return Json(JsonConvert.SerializeObject(model.RemoveExportTemplate(ct,templateID)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="moduleId"></param>
+        /// <param name="_strRecordID"></param>
+        /// <returns></returns>
+        public JsonResult SaveCardExportData(int[] moduleId, string _strRecordID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            if (ctx != null)
+            {
+                CardViewModel model = new CardViewModel();
+                return Json(new { result = model.SaveCardExportData(moduleId, _strRecordID, ctx) }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { result = "SessionExpired" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
     }
 }
