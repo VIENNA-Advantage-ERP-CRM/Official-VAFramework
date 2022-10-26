@@ -23,26 +23,30 @@
                     var dd = event.target.response;
                     var res = JSON.parse(dd);
                     var a = JSON.parse(res);
+                    $('.vis-userAvatar-Container').find('i').remove();
+                    $('.vis-userAvatar-Container').append('<img id="imgUsrImage" alt="User avatar" class="vis-userAvatar-Large"></img>');
                     $("#imgUsrImage").attr('src', "data:image/jpg;base64," + a);
                 }, false);
             }
         });
 
         $('#vis-file-input-remove').on("click", function () {
-            VIS.ADialog.confirm("ConfirmDeleteImage", true, "", "Confirm", function (result) {
-                if (result) {
-                    $.ajax({
-                        url: VIS.Application.contextUrl + "Home/DeleteUserImage",
-                        success: function (data) {
-                            $('.vis-userAvatar-Container').find('img').remove();
-                            $('.vis-userAvatar-Container').append('<i id="imgUsrImage" class="vis-userAvatar-Large vis vis-user"></i>');
-                            $('.vis-app-user-img-wrap').remove('img');
-                        },
-                        error: function (err) {
-                        }
-                    });
-                }
-            });
+            if ($('.vis-userAvatar-Container').find('img').length > 0) {
+                VIS.ADialog.confirm("ConfirmDeleteImage", true, "", "Confirm", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: VIS.Application.contextUrl + "Home/DeleteUserImage",
+                            success: function (data) {
+                                $('.vis-userAvatar-Container').find('img').remove();
+                                $('.vis-userAvatar-Container').append('<i id="imgUsrImage" class="vis-userAvatar-Large vis vis-user"></i>');
+                                $('.vis-app-user-img-wrap').remove('img');
+                            },
+                            error: function (err) {
+                            }
+                        });
+                    }
+                });
+            }
         });
         function saveStatus() {
             $txtChangeStatus = $("#vis-textStatus");

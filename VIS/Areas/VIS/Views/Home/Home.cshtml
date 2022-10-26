@@ -48,10 +48,10 @@
                         <div class="vis-avater-inner-class">
                             <div class="text-center vis-change-picture-wrap">
                                 <label for="vis-file-input" class="vis-file-label">
-                                    <span class="vis-change-picture-ico vis vis-pencil"></span>
+                                    <span class="vis-change-picture-ico vis vis-pencil" ></span>
                                 </label>
-                                <input id="vis-file-input" title=" " class="vis-change-pic-input" type="file" accept="image/*">
-                            </div><div><span  id="vis-file-input-remove" class="vis-change-picture-ico vis vis-delete"></span></div>
+                                <input id="vis-file-input" title="@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ChangeImage")" class="vis-change-pic-input" type="file" accept="image/*">
+                            </div><div><span  id="vis-file-input-remove"  title="@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "DeleteImage")" class="vis-change-picture-ico vis vis-delete"></span></div>
                         </div>
                         @if (Model.UsrImage != null)
                         {
