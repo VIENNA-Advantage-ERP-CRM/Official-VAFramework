@@ -55,7 +55,7 @@
         var force = 0;
         var cmbTemplateCategory = null;
         var cmbViwBlockTemplateCategory = null;
-        var btnImport = null;
+        var btnExport = null;
         var gridObj = {
         };
 
@@ -439,7 +439,7 @@
 
                 btnVdelrow = root.find('#btnVdelrow_' + WindowNo);
                 btnVdelCol = root.find('#btnVdelCol_' + WindowNo);
-                btnImport = root.find('#BtnImport_' + WindowNo);
+                btnExport = root.find('#BtnExport_' + WindowNo);
                 btnRefreshTemplate = root.find('#BtnRefreshTemplate_' + WindowNo);
                 cmbTemplateCategory = root.find('#CmbTemplateCategory_' + WindowNo);
                 cmbViwBlockTemplateCategory = root.find('#CmbViwBlockTemplateCategory_' + WindowNo);
@@ -456,9 +456,9 @@
         function importcheckBoxEvent() {
             root.find('.chkMark').change(function () {
                 if (root.find('.chkMark:checked').length > 0) {
-                    btnImport.show();
+                    btnExport.show();
                 } else {
-                    btnImport.hide();
+                    btnExport.hide();
                 }
 
                 if (root.find('.chkMark:checked').length > 1) {
@@ -555,7 +555,7 @@
                 saveTemplate(e);
             });
 
-            btnImport.click(function () {
+            btnExport.click(function () {
                 markmoduleImport();
             });
 
@@ -572,9 +572,9 @@
                     return;
                 } else {
                     if ($(e.target).index() == 0) {
-                        btnImport.hide();
+                        btnExport.hide();
                     } else {
-                        btnImport.show();
+                        btnExport.show();
                     }
                     DivTemplate.find('.vis-cardSingleViewTemplate').removeClass('vis-active-template');
                     $(this).addClass('vis-active-template');
@@ -2264,9 +2264,9 @@
                             return;
                         } else {
                             if ($(e.target).index() == 0) {
-                                btnImport.hide();
+                                btnExport.hide();
                             } else {
-                                btnImport.show();
+                                btnExport.show();
                             }
 
                             DivTemplate.find('.vis-cardSingleViewTemplate').removeClass('vis-active-template');
