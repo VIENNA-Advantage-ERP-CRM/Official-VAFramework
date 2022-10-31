@@ -23,7 +23,8 @@
                     var dd = event.target.response;
                     var res = JSON.parse(dd);
                     var a = JSON.parse(res);
-                    $('.vis-userAvatar-Container').find('i').remove();
+                    $('.vis-userAvatar-Container').find('i').remove().find('img').remove();
+                    $('.vis-userAvatar-Container').find('img').remove();
                     $('.vis-userAvatar-Container').append('<img id="imgUsrImage" alt="User avatar" class="vis-userAvatar-Large"></img>');
                     $("#imgUsrImage").attr('src', "data:image/jpg;base64," + a);
                 }, false);

@@ -1185,7 +1185,7 @@
                 //}
             });
 
-            if (multiSelection) {
+            if (multiSelection && multiValues && multiValues.length > 0) {
 
                 for (itm in multiValues) {
                     for (item in w2ui[grdname].records) {
