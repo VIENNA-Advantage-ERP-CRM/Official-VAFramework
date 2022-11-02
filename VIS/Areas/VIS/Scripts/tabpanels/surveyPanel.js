@@ -25,7 +25,7 @@
         var userResIdx = 0;
         var isSelfShow = true;
         var surveyTab = null;
-        var $clickHere = ('<a href="javascript:;">click here</a>');
+        var $clickHere = ('<a href="javascript:;">' + VIS.Msg.getMsg("VIS_ClickHere")+'</a>');
        
         this.init = function () {
             $root = $('<div></div>');
@@ -39,7 +39,7 @@
                 + '    id="home-tab"'
                 + '    data-toggle="tab"'
                 + '    href="#quesSec_' + self.windowNo+'"'
-                + '    >Questions</a>'
+                + '    >' + VIS.Msg.getMsg("VIS_Questions")+'</a>'
                 + '</li>'
                 + '<li class="nav-item text-center" >'
                 + '  <a style="diaplay:none"'
@@ -47,7 +47,7 @@
                 + '    id="profile-tab"'
                 + '    data-toggle="tab"'
                 + '    href="#resp_' + self.windowNo +'"'
-                + '    >Responses <span class="badge badge-light responseCount">0</span></a>'
+                + '    >' + VIS.Msg.getMsg("Response") +'<span class="badge badge-light responseCount ml-1">0</span></a>'
                 + '</li>'
                 + '</ul>'
                 + '<div class="tab-content">'
@@ -58,11 +58,11 @@
                 + '<div class="tab-pane fade mt-2" style="height:57vh;width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
                 + '<div class="d-flex align-items-center justify-content-between mr-2 ml-2">'
                 + '<div class="d-flex align-items-center mr-1">' 
-                +'<span class="d-inline-block mr-1">Select User</span>'
+                + '<span class="d-inline-block mr-1">' + VIS.Msg.getMsg("SelectUser")+'</span>'
                 + '<select class="w-100"></select>'
                 + '</div> '
                 + '<div class="align-items-center d-flex"> '
-                + '<span class="mr-1 ">Response:</span>'
+                + '<span class="mr-1 ">' + VIS.Msg.getMsg("Response") +':</span>'
                 + '<span class="align-items-center d-flex">'
                 + '<button class="vis-cusPagination prev">'
                 + '<i class="fa fa-chevron-circle-left mr-1" aria-hidden="true"></i>'
@@ -74,7 +74,7 @@
                 + '</span>'
                 + '</div>' 
                 + '</div> '
-                +'<div class="mr-2 mt-2 text-right"  style="font-size: 12px;font-style: italic;" >Submitted: <span class="submittedDate"></span></div>'
+                + '<div class="mr-2 mt-2 text-right"  style="font-size: 12px;font-style: italic;" >' + VIS.Msg.getMsg("VIS_Submitted") + ': <span class="submittedDate"></span></div>'
                 + '<div class="response"></div>'
                 + '</div > '
                 + '</div>'
@@ -255,7 +255,7 @@
             responseSection.find('input,textarea').attr('disabled', 'disabled');
             if (Limit > 0 && ResponseCount >= Limit) {
                 questionSection.hide();               
-                $root.find("#quesMessage_" + self.windowNo).html('You already submitted your response.');                
+                $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_AlreadySubmittedResponse"));                
                 $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
             } else {
                 questionSection.append($dsgn);
@@ -265,12 +265,12 @@
 
                 //show pagging button according to page size and question length.
                 if (pageSize > 0 && totalQues > pageSize) {
-                    btns += '<div class="float-left"><a class="prev btn mr-2"><i class="fa fa-chevron-left" aria-hidden="true"></i> Prev</a></div>';
+                    btns += '<div class="float-left"><a class="prev btn mr-2"><i class="fa fa-chevron-left" aria-hidden="true"></i> ' + VIS.Msg.getMsg('VIS_Prev') + '</a></div>';
                 }
 
                 btns += '<div class="vis-tp-btnWrap float-right"> ' +
-                    '<a class="next btn">Next <i class="fa fa-chevron-right" aria-hidden="true"></i></a>' +
-                    '<a href="#" id="VIS_SI_BtnSubmit_' + self.windowNo + '" class="btn" >Submit</a> ' +
+                    '<a class="next btn">' + VIS.Msg.getMsg('VIS_Next') + ' <i class="fa fa-chevron-right" aria-hidden="true"></i></a>' +
+                    '<a href="#" id="VIS_SI_BtnSubmit_' + self.windowNo + '" class="btn" >' + VIS.Msg.getMsg("VIS_Submit") +'</a> ' +
                     '</div >';
 
                 btns += '<div>';
@@ -281,12 +281,15 @@
                     questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
                 } else if (ResponseCount > 0) {
                     questionSection.hide();
-                    $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">You already submitted your response. if you want to submit again ' + $clickHere+'</span>');
+                    $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere+'</span>');
                     $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
 
                     $root.find("#quesMessage_" + self.windowNo + " a").click(function () {
                         questionSection.show();
                         $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
+                        questionSection.find('.vis-tp-orderListWrap li').removeClass('hideQuestion');
+                        questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
+                        showHideSubmit();
                     });
                 }
             }
@@ -363,16 +366,18 @@
                     responseSection.find('.submittedDate').text(userResponse['U' + uID][0].Created)
                     if (Limit > 0 && userResponse['U' + uID].length >= Limit) {
                         questionSection.hide();
-                        $root.find("#quesMessage_" + self.windowNo).html('You already submitted your response.');
+                        $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_AlreadySubmittedResponse"));
                         $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
                     }else if (userResponse['U' + uID].length>0) {                       
-                            questionSection.hide();
-                            $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">You already submitted your response. if you want to submit again ' + $clickHere + '</span>');
+                        questionSection.hide();
+                        $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere + '</span>');
                             $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
-
                             $root.find("#quesMessage_" + self.windowNo+" a").click(function () {
                                 questionSection.show();
                                 $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
+                                questionSection.find('.vis-tp-orderListWrap li').removeClass('hideQuestion');
+                                questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
+                                showHideSubmit();
                             });                       
                     }
 
