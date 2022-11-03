@@ -223,7 +223,6 @@ namespace VAdvantage.Model
             string imageName = imageUrl.Substring(imageUrl.LastIndexOf('/') + 1);
             System.Threading.Tasks.Task.Run(() =>
             {
-                log.SaveError("ImageTimeStart", DateTime.Now.Second.ToString());
                 DeleteThumbnail("0", "0", imageName);
                 DeleteThumbnail("16", "16", imageName);
                 DeleteThumbnail("32", "32", imageName);
@@ -232,7 +231,6 @@ namespace VAdvantage.Model
                 DeleteThumbnail("320", "185", imageName);
                 DeleteThumbnail("320", "240", imageName);
                 DeleteThumbnail("500", "375", imageName);
-                log.SaveError("ImageTimeEnd", DateTime.Now.Second.ToString());
             });
            
             return success;

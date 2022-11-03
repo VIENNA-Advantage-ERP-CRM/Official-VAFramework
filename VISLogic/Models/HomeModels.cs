@@ -86,11 +86,9 @@ namespace VIS.Models
             //    log.SaveError("Error Removing User Image", pp.GetValue() + " " + pp.GetName());
             //    return false;
             //}
-            log.SaveError("ImageDeleteStart=", DateTime.Now.Second.ToString());
             object imgID = DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_User WHERE AD_User_ID=" + ctx.GetAD_User_ID());
             if (imgID != null && imgID != DBNull.Value && Convert.ToInt32(imgID) > 0)
             {
-                log.SaveError("imageFoundStart=", DateTime.Now.Second.ToString());
 
                 DB.ExecuteQuery("DELETE FROM AD_Image WHERE AD_Image_ID=" + Convert.ToInt32(imgID));
                 //MImage img = new MImage(ctx, Convert.ToInt32(imgID), null);
@@ -103,7 +101,6 @@ namespace VIS.Models
                 //}
                 //log.SaveError("ImageDeleteUpdateStart=", DateTime.Now.Second.ToString());
                 DB.ExecuteQuery("UPDATE AD_User Set AD_Image_ID=null WHERE AD_User_ID="+ctx.GetAD_User_ID());
-                log.SaveError("ImageDeleteEnd=", DateTime.Now.Second.ToString());
             }
             return true;
         }
