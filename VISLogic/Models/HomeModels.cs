@@ -8,6 +8,7 @@ using System.Web.Hosting;
 using System.Text;
 using System.IO;
 using VAdvantage.Logging;
+using CoreLibrary.DataBase;
 
 namespace VIS.Models
 {
@@ -76,22 +77,33 @@ namespace VIS.Models
 
         public bool DeleteUserImage(Ctx ctx)
         {
-            MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
-            int imgID = user.GetAD_Image_ID();
-            user.SetAD_Image_ID(0);
-            if (!user.Save())
+            //MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+            //int imgID = user.GetAD_Image_ID();
+            //user.SetAD_Image_ID(0);
+            //if (!user.Save())
+            //{
+            //    ValueNamePair pp = VAdvantage.Logging.VLogger.RetrieveError();
+            //    log.SaveError("Error Removing User Image", pp.GetValue() + " " + pp.GetName());
+            //    return false;
+            //}
+            log.SaveError("ImageDeleteStart=", DateTime.Now.Second.ToString());
+            object imgID = DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_User WHERE AD_User_ID=" + ctx.GetAD_User_ID());
+            if (imgID != null && imgID != DBNull.Value && Convert.ToInt32(imgID) > 0)
             {
-                ValueNamePair pp = VAdvantage.Logging.VLogger.RetrieveError();
-                log.SaveError("Error Removing User Image", pp.GetValue() + " " + pp.GetName());
-                return false;
-            }
+                log.SaveError("imageFoundStart=", DateTime.Now.Second.ToString());
 
-            MImage img = new MImage(ctx, imgID, null);
-            if (!img.Delete(true))
-            {
-                ValueNamePair pp = VAdvantage.Logging.VLogger.RetrieveError();
-                log.SaveError("Error Removing Image", pp.GetValue() + " " + pp.GetName());
-                return false;
+                DB.ExecuteQuery("DELETE FROM AD_Image WHERE AD_Image_ID=" + Convert.ToInt32(imgID));
+                //MImage img = new MImage(ctx, Convert.ToInt32(imgID), null);
+                //log.SaveError("ImageDeleteStart2=", DateTime.Now.Second.ToString());
+                //if (!img.Delete(true))
+                //{
+                //    ValueNamePair pp = VAdvantage.Logging.VLogger.RetrieveError();
+                //    log.SaveError("Error Removing Image", pp.GetValue() + " " + pp.GetName());
+                //    return false;
+                //}
+                //log.SaveError("ImageDeleteUpdateStart=", DateTime.Now.Second.ToString());
+                DB.ExecuteQuery("UPDATE AD_User Set AD_Image_ID=null WHERE AD_User_ID="+ctx.GetAD_User_ID());
+                log.SaveError("ImageDeleteEnd=", DateTime.Now.Second.ToString());
             }
             return true;
         }
