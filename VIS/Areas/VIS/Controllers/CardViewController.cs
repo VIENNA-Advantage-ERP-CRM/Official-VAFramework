@@ -18,6 +18,12 @@ namespace VIS.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Get Card view 
+        /// </summary>
+        /// <param name="ad_Window_ID"></param>
+        /// <param name="ad_Tab_ID"></param>
+        /// <returns></returns>
         public JsonResult GetCardView(int ad_Window_ID, int ad_Tab_ID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
@@ -49,7 +55,11 @@ namespace VIS.Controllers
             return jsonResult;
         }
 
-
+        /// <summary>
+        /// Get Card view Columns
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <returns></returns>
         public JsonResult GetCardViewColumns(int ad_CardView_ID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
@@ -70,6 +80,15 @@ namespace VIS.Controllers
             return jsonResult;
         }
 
+        /// <summary>
+        /// Save Card view Columns
+        /// </summary>
+        /// <param name="lstCardView"></param>
+        /// <param name="lstCardViewColumns"></param>
+        /// <param name="lstCardViewCondition"></param>
+        /// <param name="excludeGrp"></param>
+        /// <param name="orderByClause"></param>
+        /// <returns></returns>
         [HttpPost]
         public JsonResult SaveCardViewColumns(List<CardViewPropeties> lstCardView, List<CardViewPropeties> lstCardViewColumns/*, List<RolePropeties> LstRoleID*/, List<CardViewConditionPropeties> lstCardViewCondition, string excludeGrp, string orderByClause)
         {
@@ -114,6 +133,11 @@ namespace VIS.Controllers
 
 
         }
+        /// <summary>
+        /// Delete Card view 
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <returns></returns>
         [HttpPost]
         public JsonResult DeleteCardViewRecord(int ad_CardView_ID)
         {
@@ -138,6 +162,12 @@ namespace VIS.Controllers
             return jsonResult;
         }
 
+        /// <summary>
+        /// Set Default Card
+        /// </summary>
+        /// <param name="AD_Tab_ID"></param>
+        /// <param name="cardView"></param>
+        /// <returns></returns>
         public JsonResult SetDefaultView(int AD_Tab_ID, int cardView)
         {
             Ctx ctx = Session["ctx"] as Ctx;
@@ -162,6 +192,13 @@ namespace VIS.Controllers
             CardViewModel objCardViewModel = new CardViewModel();
             return objCardViewModel.UpdateCardByDragDrop(ctx, grpValue, recordID, columnName, tableName, dataType);
         }
+
+        /// <summary>
+        /// Get Column ID and Window ID
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
         public JsonResult GetColumnIDWindowID(string tableName, string columnName)
         {
             CardViewModel objCardViewModel = new CardViewModel();
@@ -240,7 +277,7 @@ namespace VIS.Controllers
         }
         
         /// <summary>
-        /// 
+        /// Get Exported Template IDs
         /// </summary>
         /// <returns></returns>
         public JsonResult GetExportTemplateIDs()
@@ -250,6 +287,11 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(model.GetExportTemplateIDs(ct)), JsonRequestBehavior.AllowGet);
         } 
         
+        /// <summary>
+        /// Remove Exported Template
+        /// </summary>
+        /// <param name="templateID"></param>
+        /// <returns></returns>
         public JsonResult RemoveExportTemplate(int templateID)
         {
             Ctx ct = Session["ctx"] as Ctx;
@@ -258,7 +300,7 @@ namespace VIS.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Card template Export
         /// </summary>
         /// <param name="moduleId"></param>
         /// <param name="_strRecordID"></param>

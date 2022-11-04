@@ -12,6 +12,13 @@ namespace VIS.Models
 {
     public class CardViewModel
     {
+        /// <summary>
+        /// Get Card View
+        /// </summary>
+        /// <param name="ad_Window_ID"></param>
+        /// <param name="ad_Tab_ID"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<CardViewPropeties> GetCardView(int ad_Window_ID, int ad_Tab_ID, Ctx ctx)
         {
             List<CardViewPropeties> lstCardView = null;
@@ -69,6 +76,12 @@ namespace VIS.Models
             }
             return lstCardView;
         }
+        /// <summary>
+        /// Get Card view Role
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<RolePropeties> GetCardViewRole(int ad_CardView_ID, Ctx ctx)
         {
             List<RolePropeties> lstCardViewRole = null;
@@ -92,6 +105,13 @@ namespace VIS.Models
             }
             return lstCardViewRole;
         }
+
+        /// <summary>
+        /// Card View Condition
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<CardViewConditionPropeties> GetCardViewCondition(int ad_CardView_ID, Ctx ctx)
         {
             List<CardViewConditionPropeties> lstCardViewRole = null;
@@ -116,6 +136,12 @@ namespace VIS.Models
             }
             return lstCardViewRole;
         }
+
+        /// <summary>
+        /// Get All User
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<UserPropeties> GetAllUsers(Ctx ctx)
         {
             List<UserPropeties> lstUser = null;
@@ -137,6 +163,11 @@ namespace VIS.Models
             }
             return lstUser;
         }
+       /// <summary>
+       /// Get All Roles
+       /// </summary>
+       /// <param name="ctx"></param>
+       /// <returns></returns>
         public List<RolePropeties> GetAllRoles(Ctx ctx)
         {
             List<RolePropeties> lstRole = null;
@@ -162,6 +193,13 @@ namespace VIS.Models
             }
             return lstRole;
         }
+
+        /// <summary>
+        /// Get Card view Column
+        /// </summary>
+        /// <param name="ad_cardview_id"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<CardViewPropeties> GetCardViewColumns(int ad_cardview_id, Ctx ctx)
         {
             int uid = 0;
@@ -212,6 +250,23 @@ namespace VIS.Models
             }
             return lstCardViewColumns;
         }
+        /// <summary>
+        /// Save Card View Record
+        /// </summary>
+        /// <param name="cardViewName"></param>
+        /// <param name="ad_Window_ID"></param>
+        /// <param name="ad_Tab_ID"></param>
+        /// <param name="ad_User_ID"></param>
+        /// <param name="ad_Field_ID"></param>
+        /// <param name="ctx"></param>
+        /// <param name="cardViewID"></param>
+        /// <param name="lstCVCondition"></param>
+        /// <param name="AD_HeaderLayout_ID"></param>
+        /// <param name="isPublic"></param>
+        /// <param name="groupSequence"></param>
+        /// <param name="excludeGrp"></param>
+        /// <param name="orderByClause"></param>
+        /// <returns></returns>
         public int SaveCardViewRecord(string cardViewName, int ad_Window_ID, int ad_Tab_ID, int ad_User_ID, int ad_Field_ID, Ctx ctx, int cardViewID/*, List<RolePropeties> lstRoleId*/, List<CardViewConditionPropeties> lstCVCondition, int AD_HeaderLayout_ID, bool isPublic, string groupSequence, string excludeGrp, string orderByClause)
         {
             string conditionValue = string.Empty;
@@ -303,6 +358,13 @@ namespace VIS.Models
             }
             return objCardView.Get_ID();
         }
+     
+        /// <summary>
+      /// Set Default card view
+      /// </summary>
+      /// <param name="ctx"></param>
+      /// <param name="cardViewID"></param>
+      /// <param name="AD_Tab_ID"></param>
         public void SetDefaultCardView(Ctx ctx, int cardViewID, int AD_Tab_ID)
         {
             string sql = "SELECT AD_DefaultCardView_ID FROM AD_DefaultCardView WHERE AD_Tab_ID=" + AD_Tab_ID + " AND AD_User_ID=" + ctx.GetAD_User_ID();
@@ -321,6 +383,14 @@ namespace VIS.Models
             cardView.Save();
         }
 
+        /// <summary>
+        /// Save Card view Columns
+        /// </summary>
+        /// <param name="ad_cardview_id"></param>
+        /// <param name="ad_Field_ID"></param>
+        /// <param name="sqNo"></param>
+        /// <param name="ctx"></param>
+        /// <param name="sort"></param>
         public void SaveCardViewColumns(int ad_cardview_id, int ad_Field_ID, int sqNo, Ctx ctx, int sort)
         {
 
@@ -334,6 +404,11 @@ namespace VIS.Models
             }
         }
 
+        /// <summary>
+        /// Delete Card view
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
         public void DeleteCardView(int ad_CardView_ID, Ctx ctx)
         {
             int headerID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT ad_headerlayout_id FROM ad_cardview WHERE ad_cardview_id=" + ad_CardView_ID, null, null));
@@ -349,6 +424,12 @@ namespace VIS.Models
 
             }
         }
+
+        /// <summary>
+        /// Delete All card view columns
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
         public void DeleteAllCardViewColumns(int ad_CardView_ID, Ctx ctx)
         {
             string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
@@ -358,6 +439,12 @@ namespace VIS.Models
 
             }
         }
+
+        /// <summary>
+        /// Delete All Cardview Role
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
         public void DeleteAllCardViewRole(int ad_CardView_ID, Ctx ctx)
         {
             string sqlQuery = "DELETE FROM AD_CARDVIEW_ROLE WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
@@ -367,6 +454,11 @@ namespace VIS.Models
 
             }
         }
+        /// <summary>
+        /// Delete All CardViewCondition
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
         public void DeleteAllCardViewCondition(int ad_CardView_ID, Ctx ctx)
         {
             string sqlQuery = "DELETE FROM AD_CARDVIEW_CONDITION WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
@@ -391,6 +483,11 @@ namespace VIS.Models
             }
         }
 
+        /// <summary>
+        /// Delete Cardview Columns
+        /// </summary>
+        /// <param name="ad_CardViewColumn_ID"></param>
+        /// <param name="ctx"></param>
         public void DeleteCardViewColumns(int ad_CardViewColumn_ID, Ctx ctx)
         {
             string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE AD_CARDVIEW_COLUMN_ID=" + ad_CardViewColumn_ID;
@@ -400,6 +497,14 @@ namespace VIS.Models
 
             }
         }
+        /// <summary>
+        /// Update card view column Position
+        /// </summary>
+        /// <param name="ad_CardViewColumn_ID"></param>
+        /// <param name="seqNo"></param>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="isUp"></param>
+        /// <param name="ctx"></param>
         public void UpdateCardViewColumnPosition(int ad_CardViewColumn_ID, int seqNo, int ad_CardView_ID, bool isUp, Ctx ctx)
         {
             int seqNo1 = 0;
@@ -439,6 +544,12 @@ namespace VIS.Models
             {
             }
         }
+
+        /// <summary>
+        /// Delete Card view Records
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
         public void DeleteCardViewRecord(int ad_CardView_ID, Ctx ctx)
         {
             DeleteCardView(ad_CardView_ID, ctx);
@@ -447,7 +558,12 @@ namespace VIS.Models
             DeleteDefaultCardView(ad_CardView_ID, ctx);
         }
 
-
+        /// <summary>
+        /// Set Default view
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Tab_ID"></param>
+        /// <param name="cardView"></param>
         public void SetDefaultView(Ctx ctx, int AD_Tab_ID, int cardView)
         {
 
@@ -548,6 +664,13 @@ namespace VIS.Models
             //int result = DB.ExecuteQuery(sqlQuery);
             return result;
         }
+
+        /// <summary>
+        /// Get Column and window ID
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
         public string GetColumnIDWindowID(string tableName, string columnName)
         {
 
@@ -592,6 +715,14 @@ namespace VIS.Models
             DataSet ds = DB.ExecuteDataset(sqlQuery);
             return ReturnTemplateDesign(ctx, ds, true);
         }
+
+        /// <summary>
+        /// Return Template Design
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="ds"></param>
+        /// <param name="fromSystemTemplate"></param>
+        /// <returns></returns>
 
         public List<dynamic> ReturnTemplateDesign(Ctx ctx, DataSet ds, bool fromSystemTemplate)
         {

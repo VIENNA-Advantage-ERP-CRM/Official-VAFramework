@@ -453,6 +453,8 @@
             });
         }
 
+        /** Click event for Import Checkbox
+         * */
         function importcheckBoxEvent() {
             root.find('.chkMark').change(function () {
                 if (root.find('.chkMark:checked').length > 0) {
@@ -469,6 +471,8 @@
             });
         }
 
+        /** All click events handle here
+         * */
         function events() {
             $('body').mouseup(function (e) {
                 mdown = false;
@@ -2535,6 +2539,8 @@
 
         }
 
+        /** check is Module Exported or not
+         * */
         function checkModuleExported() {
             root.find('.vis-removeExport').remove();
             var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "CardView/GetExportTemplateIDs", null, null);
@@ -2785,6 +2791,8 @@
             }
         }
 
+        /** Open popup for import card template
+         * */
         function markmoduleImport() {
             rootMI = $("<div>");
             var bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
