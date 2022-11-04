@@ -1265,7 +1265,7 @@ namespace VIS.Helpers
 
             
 
-            //string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
 
             String refreshSQL = SQL_Select + " FROM " + inn.TableName + " WHERE " + whereC;
 
