@@ -1199,9 +1199,9 @@
                     var controls = {};
                     $divLabel = $('<div class="vis-w-p-header-Label-f"></div>');
                     var parseStr = headerItem.ColSql;
-                    if (parseStr.contains('@')) {
-                        parseStr = parseSQL(headerItem.ColSql, record);
-                    }
+                    //if (parseStr.contains('@')) {
+                    //    parseStr = parseSQL(headerItem.ColSql, record);
+                    //}
                     iControl = new VIS.Controls.VKeyText(parseStr, this.windowNo,
                         this.windowNo + "_" + headerSeqNo, false, null, headerItem.AD_GridLayoutItems_ID);
 
@@ -1213,7 +1213,7 @@
                     var objctrls = { "control": controls, "field": null };
 
                     $divLabel.append(iControl.getControl());
-                    iControl.setValue();
+                    iControl.setValue(null, false, record);
                     fieldValueStyle = headerItem.FieldValueStyle;
                     if (fieldValueStyle)
                         $divLabel.attr('style', fieldValueStyle);
