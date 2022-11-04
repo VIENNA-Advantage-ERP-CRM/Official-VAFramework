@@ -2245,7 +2245,8 @@
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(obj),
                 success: function (data) {
-                    var result = JSON.parse(data);
+                    var result=JSON.parse(data);                   
+                    
                     for (var i = 0; i < result.length; i++) {
                         DivTemplate.find('.vis-cardTemplateContainer').append($(result[i].template));
                     }  
@@ -2283,7 +2284,7 @@
 
                     scaleTemplate();
                     $.each(root.find('[issystemtemplate="Y"]:not(:first)'), function () {
-                        var chkdiv = '<div style="position: absolute;left: 5px;top: 5px;z-index:9"><input type="checkbox" value="' + $(this).find('.mainTemplate').attr('templateid') + '" class="pull-right vis-styledCheckbox chkMark" style="width:20px;height:20px;position: absolute;" ><label></label></div>'
+                        var chkdiv = '<div style="position: absolute;left: 5px;top: 5px;z-index:9"><input type="checkbox" value="' + $(this).find('.mainTemplate').attr('templateid') + '" class="pull-right vis-styledCheckbox m-0 chkMark" style="width:20px;height:20px;position: absolute;" ><label></label></div>'
                         $(this).append(chkdiv);
                     });
 
@@ -2539,7 +2540,7 @@
             var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "CardView/GetExportTemplateIDs", null, null);
             if (dr != null) {
                 for (var i in dr) {
-                    root.find('.mainTemplate[templateid="' + dr[i].split('|')[0] + '"]').closest('.vis-cardSingleViewTemplate').prepend('<i data-id="' + dr[i] + '" class="vis vis-cross vis-removeExport" title="Remove export" style="position: absolute;right:25px;top: 8px;font-size: 1rem;cursor: pointer;"></i>');
+                    root.find('.mainTemplate[templateid="' + dr[i].split('|')[0] + '"]').closest('.vis-cardSingleViewTemplate').prepend('<i data-id="' + dr[i] + '" class="vis vis-remove-export-data vis-removeExport" title="Remove export" style=""></i>');
                 }
 
                 root.find('.vis-removeExport').click(function () {

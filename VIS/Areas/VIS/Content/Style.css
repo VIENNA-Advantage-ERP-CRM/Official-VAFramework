@@ -3300,6 +3300,10 @@ field, fieldvalue {
     position: absolute;
 }
 
+.vis-app-aform-root .vis-cardSingleViewTemplate:hover {
+    opacity: 0.8;
+}
+
 .vis-deleteTemplate {
     position: absolute;
     z-index: 9;
@@ -3307,17 +3311,40 @@ field, fieldvalue {
     top: 5px;
     font-size: 1.2rem;
     cursor: pointer;
+    display: none;
+    
 }
 
-.vis-addBlankTemplateBtn {
-    padding: 5px 8px;
-    top: 80px;
-    position: absolute;
-    left: 95px;
-    border: 1px solid rgba(var(--v-c-primary),1);
-    color: rgba(var(--v-c-primary),1);
-    border-radius: 5px;
+.vis-app-aform-root .vis-cardSingleViewTemplate:hover .vis-deleteTemplate {
+    display: block;
+    opacity: 1 !important;
+    color: #000 !important;
 }
+
+.vis-removeExport {
+    position: absolute;
+    right: 25px;
+    top: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: none;
+}
+
+.vis-app-aform-root .vis-cardSingleViewTemplate:hover .vis-removeExport {
+    display: block;
+    opacity: 1 !important;
+    color: #000 !important;
+}
+
+    .vis-addBlankTemplateBtn {
+        padding: 5px 8px;
+        top: 80px;
+        position: absolute;
+        left: 95px;
+        border: 1px solid rgba(var(--v-c-primary),1);
+        color: rgba(var(--v-c-primary),1);
+        border-radius: 5px;
+    }
 
 .vis-undo {
     padding: 5px 8px;
@@ -3672,5 +3699,6 @@ field, fieldvalue {
         width: 200px;
     }
 }
+
 
 
