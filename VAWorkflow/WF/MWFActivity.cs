@@ -4130,7 +4130,12 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             }
             else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_Role))
             {
-                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID=" + resp.GetAD_Role_ID() + " AND IsActive='Y'"));
+                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID=" + resp.GetAD_Role_ID() + " AND IsActive='Y' ORDER BY AD_User_ID"));
+            }
+            else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_MultiRoles))
+            {
+                string _roles = Util.GetValueOfString(DB.ExecuteScalar("SELECT Ref_Roles FROM AD_WF_Responsible WHERE AD_WF_Responsible_ID = " + AD_WF_Responsible_ID));
+                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID IN (" + _roles + ") AND IsActive='Y' ORDER BY AD_Role_ID, AD_User_ID"));
             }
             // Handled code for new Responsible type being added
             else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_SQL))

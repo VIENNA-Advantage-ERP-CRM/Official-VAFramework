@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using VAdvantage.Classes;
+using VAdvantage.Common;
 using VAdvantage.DataBase;
 using VAdvantage.Logging;
 using VAdvantage.Model;
@@ -168,8 +169,19 @@ OR
                                 AND (validfrom  <=sysdate)
                                 AND (sysdate    <=validto )
                                 ))
-                              AND r.responsibletype !='H' AND r.responsibletype !='C'
-                              )) ";
+                             AND r.responsibletype NOT IN ('H','C', 'M')
+                              )
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              INNER JOIN AD_Role ro
+                              ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND r.IsActive = 'Y'
+                              AND (CASE WHEN INSTR(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                              AND r.responsibletype ='M'
+                              )
+                        ) ";
 
             // if (AD_Window_ID > 0 || (!string.IsNullOrEmpty(searchText) && searchText.Length > 0))
             if (whereClause.Length > 7)
@@ -320,8 +332,19 @@ OR
                                 AND (validfrom  <=sysdate)
                                 AND (sysdate    <=validto )
                                 ))
-                              AND r.responsibletype !='H' AND r.responsibletype !='C'
-                              ) )";
+                              AND r.responsibletype NOT IN ('H','C', 'M')
+                              ) 
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              INNER JOIN AD_Role ro
+                              ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND r.IsActive = 'Y'
+                              AND (CASE WHEN instr(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                              AND r.responsibletype ='M'
+                              )
+                            )";
                     if (whereClause.Length > 7)
                     {
                         // Applied Role access on workflow Activities
@@ -738,6 +761,17 @@ OR
                         int dt = column.GetAD_Reference_ID();
                         String value = null;
                         value = answer != null ? answer.ToString() : null;
+
+                        // check survey required
+                        if (node.IsSurveyResponseRequired())
+                        {
+                            // check any survey response exist
+                            if (!CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetRecord_ID()))
+                            {
+                                return "SurveyChecklistRequired";
+                            }
+                        }
+
                         //if (dt == DisplayType.YesNo || dt == DisplayType.List || dt == DisplayType.TableDir)
                         if (!node.IsMultiApproval() &&
                             (dt == DisplayType.YesNo || dt == DisplayType.List || dt == DisplayType.TableDir))
@@ -1112,6 +1146,33 @@ OR
                 }
             }
             return list;
+        }
+
+        public bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
+        {
+
+            string sql = "SELECT AD_ShowEverytime FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID + " AND ad_window_id= " + AD_Window_ID;
+
+            string ShowEverytime = Util.GetValueOfString(DB.ExecuteScalar(sql));
+            if (ShowEverytime == "N")
+            {
+                bool isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID);
+                if (!isvalidate)
+                {
+                    return true;
+                }
+            }
+
+            sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_window_id=" + AD_Window_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+            int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            if (count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 

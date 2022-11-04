@@ -449,7 +449,7 @@
             //else {
             divbtnsec = $("<div class='vis-info-ls-btnswrap'>");
             btnCancel = $("<button class='VIS_Pref_btn-2'>").append(canceltxt);
-            btnOK = $("<button class='VIS_Pref_btn-2'>").append(Oktxt);
+            btnOK = $("<button disabled='true' style='cursor:default;opacity:.5' class='VIS_Pref_btn-2'>").append(Oktxt);
             btnAddCart = $("<button class='VIS_Pref_btn-2'>").append($("<i class='fa fa-cart-plus'></i>"));
             btnShowSaved = $("<button class='VIS_Pref_btn-2' disabled>").append($("<i class='fa fa-list-ul'></i>"));
             btnScanFile = $("<button class='VIS_Pref_btn-2'>").append($("<i class='vis vis-scanner'>"));
@@ -738,6 +738,15 @@
             //dr.close();
             GetPriceList(M_PriceList_ID);
         }
+
+        function toggleOkBtn(disable) {
+            if (disable) {
+                btnOK.prop('disabled', 'true').css({ "cursor": "default", "opacity": ".5" });
+            }
+            else {
+                btnOK.prop('disabled', '').css({ "cursor": "pointer", "opacity": "1" });
+            }
+        };
 
         // function to check comma or dot from given value and return new value
         function checkcommaordot(event, val) {
@@ -1284,7 +1293,7 @@
                 recordHeight: 40,
                 show: {
 
-                    toolbar: true,  // indicates if toolbar is v isible
+                    toolbar: false,  // indicates if toolbar is v isible
                     columnHeaders: true,   // indicates if columns is visible
                     lineNumbers: false,  // indicates if line numbers column is visible
                     selectColumn: true,  // indicates if select column is visible
@@ -1417,13 +1426,32 @@
                         //};
                         VIS.Env.getCtx().setContext(WindowNo, "M_Product_ID", VIS.Utility.Util.getValueOfInt(savedProduct[event.recid - 1].M_Product_ID1));
                     }
-                }
+                },
+                onSelect: onSelectRow,
+                onUnselect: onUnSelectRow
             });
             //for (var k = 0; k < dGrid.records.length; k++) {
             //    $("#grid_" + grdname + "_rec_" + dGrid.records[k].recid).find("input[type=text]").val(savedProduct[k].AttributeName);
             //}
             bsyDiv[0].style.visibility = "hidden";
         };
+
+        function onSelectRow(e) {
+            toggleOkBtn(false);
+        };
+
+        function onUnSelectRow(e) {
+            if (!multiSelection) {
+                toggleOkBtn(true);
+                return;
+            }
+
+            window.setTimeout(function () {
+                if (w2ui[e.target].getSelection().length == 0)
+                    toggleOkBtn(true);
+            }, 50);
+        };
+
 
         // Bind data into Saved Product Grid
         function BindDataSavedProduct() {
@@ -1997,9 +2025,16 @@
                 for (item in selection) {
                     if (multiValues.indexOf(w2ui[grdname].get(selection[item])[keyCol]) == -1) {
                         multiValues.push(w2ui[grdname].get(selection[item]));
+                        toggleOkBtn(false);
                     }
                 }
             }
+            else {
+                toggleOkBtn(true);
+            }
+
+            if (requery)
+                toggleOkBtn(true);
             disposeDataSec();
             //var sql = "SELECT ";
             //var sqlWhere = "";
@@ -2327,6 +2362,11 @@
                 row['recid'] = j + 1;
                 grdRows[j] = row;
             }
+
+            if (!multiSelection && (multiValues.length > 0 || w2ui[grdname].getSelection().length > 0)) {
+                toggleOkBtn(true);
+            }
+
             grdname = 'gridPrdInfodata' + Math.random();
             grdname = grdname.replace('.', '');
             w2utils.encodeTags(grdRows);
@@ -2335,7 +2375,7 @@
                 recordHeight: 40,
                 show: {
 
-                    toolbar: true,  // indicates if toolbar is v isible
+                    toolbar: false,  // indicates if toolbar is v isible
                     columnHeaders: true,   // indicates if columns is visible
                     lineNumbers: false,  // indicates if line numbers column is visible
                     selectColumn: true,  // indicates if select column is visible
@@ -2475,7 +2515,9 @@
                     else {
                         multiValues.push(w2ui[grdname].records[event.index]);
                     }
-                }
+                },
+                onSelect: onSelectRow,
+                onUnselect: onUnSelectRow
             });
             w2ui[grdname].hideColumn('M_PRODUCT_ID');
             w2ui[grdname].hideColumn('C_UOM_ID');

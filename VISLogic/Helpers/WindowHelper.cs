@@ -1263,35 +1263,9 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
-            for (int i = 0; i < lstColumns.Count; i++)
-            {
-                WindowField gField = m_fields.Where(a => a.ColumnName == lstColumns[i]).FirstOrDefault();
-                if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
-                {
-                    string selectSQL = GetColumnSQL(false, gField);
+            
 
-                    if (selectSQL.IndexOf("@") == -1)
-                    {
-                        lstColumns[i] = selectSQL;   //	ColumnName or Virtual Column
-                    }
-                    else
-                    {
-                        lstColumns[i] = Env.ParseContext(ctx, inn.WindowNo, selectSQL, false);
-                    }
-                }
-            }
-
-            List<WindowField> imgColList = m_fields.Where(a => a.DisplayType == DisplayType.Image).ToList();
-
-            if (imgColList != null && imgColList.Count > 0)
-            {
-                for (int j = 0; j < imgColList.Count; j++)
-                {
-                    lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + inn.TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
-                }
-            }
-
-            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+            //string SQL_Select = "SELECT " + String.Join(",", lstColumns);
 
             String refreshSQL = SQL_Select + " FROM " + inn.TableName + " WHERE " + whereC;
 

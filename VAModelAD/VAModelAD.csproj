@@ -250,6 +250,9 @@
     <Compile Include="ModelAD\MSequence.cs" />
     <Compile Include="ModelAD\MSeries.cs" />
     <Compile Include="ModelAD\MSeriesFilter.cs" />
+    <Compile Include="ModelAD\MSurvey.cs" />
+    <Compile Include="ModelAD\MSurveyResponse.cs" />
+    <Compile Include="ModelAD\MSurveyResponseLine.cs" />
     <Compile Include="ModelAD\MSysConfig.cs" />
     <Compile Include="ModelAD\MSystem.cs" />
     <Compile Include="ModelAD\MTab.cs" />
