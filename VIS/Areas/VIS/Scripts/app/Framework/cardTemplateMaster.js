@@ -2792,7 +2792,7 @@
         }
 
         /** Open popup for import card template
-         * */
+         * */        
         function markmoduleImport() {
             rootMI = $("<div>");
             var bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
@@ -2830,13 +2830,13 @@
             chMI.hideButtons();
 
             lstModules = [];
-            var module = null;
             var dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "MarkModule/LoadModules", null, null);
             if (dr != null) {
                 for (var i in dr) {
-                    module = {};
-                    module.AD_ModuleInfo_ID = dr[i]["AD_ModuleInfo_ID"];
-                    module.Name = dr[i]["Name"];
+                    var module = {
+                        AD_ModuleInfo_ID: dr[i]["AD_ModuleInfo_ID"],
+                        Name: dr[i]["Name"]
+                    };
                     lstModules.push(module);
                 }
             }
