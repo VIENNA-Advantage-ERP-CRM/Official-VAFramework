@@ -185,11 +185,11 @@ namespace VIS.Controllers
 
 
                     //if not system admin
-                    if (LoginHelper.IsSiteUnderMaintenance() && ctx.GetAD_Role_ID() !=0)
+                    if (LoginHelper.IsSiteUnderMaintenance() && ctx.GetAD_Role_ID() != 0)
                     {
-                       // if (User.Identity.IsAuthenticated)
+                        // if (User.Identity.IsAuthenticated)
                         //{
-                          //  return new AccountController().SignOff(ctx);
+                        //  return new AccountController().SignOff(ctx);
                         //}
                         return View("Maintenance");
                     }
@@ -315,7 +315,7 @@ namespace VIS.Controllers
                     ViewBag.OrgList = OrgList;
                     ViewBag.WarehouseList = WareHouseList;
 
-                  
+
                     // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
                     //{
                     //Cretae new Sessin
@@ -758,6 +758,16 @@ namespace VIS.Controllers
                 return Json(JsonConvert.SerializeObject(null), JsonRequestBehavior.AllowGet);
             }
 
+        }
+
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        public JsonResult DeleteUserImage()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels objHomeModel = new HomeModels();
+            bool result = objHomeModel.DeleteUserImage(ctx);
+            return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
 
         public byte[] ConvertStringToByteArray(string byteArray)

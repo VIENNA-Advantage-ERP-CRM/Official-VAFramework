@@ -148,13 +148,18 @@ ul.vis-userLinks-ListMenu li, ul.vis-userLinks-ListMenu li  *{
 .vis-userAvatar-Container {
     background: rgba(var(--v-c-secondary), 1);
     margin: 20px auto 8px;
-    padding: 10px;
+    /*padding: 10px;*/
     width: 164px;
-    line-height: 111px;
-    /* height: 120px; */
+    /*line-height: 111px;*/
+    height: 120px;
     text-align: center !important;
     color: rgba(var(--v-c-primary), 1);
     font-size: 3rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
     .vis-userAvatar-Container .vis-userAvatar-Large {
@@ -2825,13 +2830,16 @@ p.vis-maintain-customer-p span {
 
 .vis-file-label {
     cursor: pointer;
-    color: rgba(var(--v-c-on-secondary), .8);
+    /*color: rgba(var(--v-c-on-secondary), .8);*/
     font-weight: normal;
+    margin-bottom:0;
 }
 
 #vis-file-input {
     opacity: 0;
 }
+
+
 
 .vis-change-picture-ico {
     /*background: url('../Images/home/upload-ico.png');
@@ -2841,6 +2849,7 @@ p.vis-maintain-customer-p span {
     float: left;
     margin-top: 3px;*/
     margin-right: 3px;
+    cursor:pointer;
 }
 /*Profile pic end*/
 
@@ -3091,8 +3100,10 @@ p.vis-maintain-customer-p span {
 }
 
 .vis-change-picture-wrap {
-    float: left;
-    width: 100%;
+    /*  float: left;
+    width: 100%;*/
+    position: relative;
+    overflow: hidden;
 }
 /* new Changes */
 
@@ -3191,4 +3202,35 @@ ul.vis-userLinks-ListMenu li a i {
     border-radius: 0;
     margin-left: -1px;
     border: 1px solid rgba(var(--v-c-on-secondary), .2);
+}
+
+.vis-avater-inner-class {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    overflow: hidden;
+    height: 30px;
+}
+
+.vis-change-picture-wrap input {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.text-center.vis-change-picture-wrap {
+}
+
+.vis-avater-inner-class > div {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: rgba(var(--v-c-on-secondary), .6);
+    margin-left: 1px;
 }

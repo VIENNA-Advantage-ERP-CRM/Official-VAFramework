@@ -221,14 +221,18 @@ namespace VAdvantage.Model
             //string[,] thumbnails = new string[,] { { "0", "0" }, { "16", "16" }, { "32", "32" }, { "46", "46" }, { "140", "120" }, { "320", "185" }, { "320", "240" } };
             string imageUrl = GetImageURL();
             string imageName = imageUrl.Substring(imageUrl.LastIndexOf('/') + 1);
-            DeleteThumbnail("0", "0", imageName);
-            DeleteThumbnail("16", "16", imageName);
-            DeleteThumbnail("32", "32", imageName);
-            DeleteThumbnail("46", "46", imageName);
-            DeleteThumbnail("140", "120", imageName);
-            DeleteThumbnail("320", "185", imageName);
-            DeleteThumbnail("320", "240", imageName);
-            DeleteThumbnail("500", "375", imageName);
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                DeleteThumbnail("0", "0", imageName);
+                DeleteThumbnail("16", "16", imageName);
+                DeleteThumbnail("32", "32", imageName);
+                DeleteThumbnail("46", "46", imageName);
+                DeleteThumbnail("140", "120", imageName);
+                DeleteThumbnail("320", "185", imageName);
+                DeleteThumbnail("320", "240", imageName);
+                DeleteThumbnail("500", "375", imageName);
+            });
+           
             return success;
         }
 
