@@ -299,6 +299,9 @@
         return this.vo.IsAttachDocumentFrom;
     };
 
+    GridWindow.prototype.getIsGenerateAttachmentCode = function () {
+        return this.vo.IsGenerateAttachmentCode;
+    };
 
 
     GridWindow.prototype.getIsFaxEmail = function () {

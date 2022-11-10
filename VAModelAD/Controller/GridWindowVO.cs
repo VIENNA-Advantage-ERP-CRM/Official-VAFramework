@@ -113,6 +113,7 @@ namespace VAdvantage.Controller
         public string FontName = "";
         public string ImageUrl = "";
         public bool IsCompositeView = true;
+        public bool IsGenerateAttachmentCode = true;
        
 
 
@@ -189,7 +190,7 @@ namespace VAdvantage.Controller
              + "AD_Color_ID,AD_Image_ID, IsReadWrite, WinHeight,WinWidth, "
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
-             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView ");
+             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
@@ -365,6 +366,7 @@ namespace VAdvantage.Controller
                                 vo.ImageUrl = vo.ImageUrl.Substring(vo.ImageUrl.LastIndexOf("/") + 1);
                             }
                             vo.IsCompositeView = dr[36].ToString() == "Y";
+                            vo.IsGenerateAttachmentCode = !("N".Equals(dr[37].ToString()));
                         }
                     }
                 }
@@ -879,6 +881,7 @@ namespace VAdvantage.Controller
                 clone.FontName = FontName;
                 clone.ImageUrl = ImageUrl;
                 clone.IsCompositeView = IsCompositeView;
+                clone.IsGenerateAttachmentCode = IsGenerateAttachmentCode;
 
                 //
                 clone.hasPanel = hasPanel;
