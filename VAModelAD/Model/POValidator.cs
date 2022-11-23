@@ -191,7 +191,7 @@ namespace VAModelAD.Model
                                             && po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
                 {
                     X_AD_ExportData obj = new X_AD_ExportData(po.GetCtx(), 0, null);
-                    if (po.GetPLength() > 1)
+                    if (po.GetKeyLength() > 1)
                         obj.SetRecord_ID(DB.GetNextID(po.GetAD_Client_ID(), po.GetTableName(), po.Get_Trx()));
                     else
                         obj.SetRecord_ID(po.Get_ID());
