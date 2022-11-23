@@ -16,6 +16,10 @@ namespace VAModelAD.Model
     public class POValidator : POAction
     {
 
+        //VIS323 For Create record for ExportData 
+        private static List<string> _ExportCheckTabelNames = new List<string>() { "AD_ChangeLog", "AD_ExportData", "AD_Session",
+                                                                                  "AD_QueryLog", "AD_WindowLog","AD_PInstance_Para",
+                                                                                  "AD_PInstance" };
         private void RegisterPORecordList()
         {
             PORecord.AddParent(X_C_Order.Table_ID, X_C_Order.Table_Name);
@@ -174,6 +178,31 @@ namespace VAModelAD.Model
 
         public bool AfterSave(bool newRecord, bool success, PO po)
         {
+            //VIS323 Insert Record in ExportData for marking on Save records.
+            if (Env.IsModuleInstalled("VA093_") && newRecord && success)
+            {
+                string[] ModulInfo = po.GetCtx().Get("#ENABLE_DATA_MARKING_ON_SAVE").Split('@');
+                if (ModulInfo.Length == 1)
+                {
+                    ModulInfo = new string[] { ModulInfo[0], "VA093_" };
+                }
+                if (ModulInfo[0].Equals("Y") && Env.IsModuleInstalled(ModulInfo[1])
+                                            && !_ExportCheckTabelNames.Contains(po.GetTableName())
+                                            && po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
+                {
+                    X_AD_ExportData obj = new X_AD_ExportData(po.GetCtx(), 0, null);
+                    if (po.GetPLength() > 1)
+                        obj.SetRecord_ID(DB.GetNextID(po.GetAD_Client_ID(), po.GetTableName(), po.Get_Trx()));
+                    else
+                        obj.SetRecord_ID(po.Get_ID());
+                    obj.SetAD_Table_ID(po.Get_Table_ID());
+                    obj.SetAD_ModuleInfo_ID(MModuleInfo.Get(ModulInfo[1]));
+                    if (!obj.Save())
+                    {
+                        return false;
+                    }
+                }
+            }
             if (success && newRecord)
                 InsertTreeNode(po);
 
