@@ -10,6 +10,8 @@ namespace VAdvantage.Model
 {
     public class MModuleInfo : X_AD_ModuleInfo
     {
+        //VIS323 Dictionary for AD_ModuleInfo details
+        private static Dictionary<string, int> _Modules = new Dictionary<string, int>();
         public MModuleInfo(Ctx ctx, DataRow dr, Trx trxName)
             : base(ctx, dr, trxName)
         {
@@ -20,6 +22,19 @@ namespace VAdvantage.Model
         {
         }
 
+        /* 	    
+       *	@param  AD_Module prefix
+       *	@return AD_ModuleInfo_ID
+       *///VIS323 For check AD_ModuleInfo_ID in dictionary if not then Add into dictionary
+        public static int Get(string prefix)
+        {
+            if (_Modules.ContainsKey(prefix))
+                return _Modules[prefix];
+            string sql = "SELECT AD_ModuleInfo_ID FROM AD_ModuleInfo WHERE Prefix='" + prefix + "'";
+            int res = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            _Modules.Add(prefix, res);
+            return res;
+        }
         protected override bool BeforeSave(bool newRecord)
         {
             string prefix = "", sql = "";
