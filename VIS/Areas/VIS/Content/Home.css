@@ -170,10 +170,14 @@ ul.vis-userLinks-ListMenu li, ul.vis-userLinks-ListMenu li * {
         display: block;*/
     }
 
-.vis-userDetails {
-    text-align: center;
-    font-size: 18px;
-}
+    .vis-userAvatar-Container:hover .vis-avater-inner-class {
+        display: flex;
+    }
+
+    .vis-userDetails {
+        text-align: center;
+        font-size: 18px;
+    }
 
 /* Welcome screen tab menu */
 
@@ -3239,6 +3243,7 @@ ul.vis-userLinks-ListMenu li a i {
     font-size: 14px;
     overflow: hidden;
     height: 30px;
+    display:none;
 }
 
 .vis-userAvatar-Container:hover .vis-avater-inner-class {
@@ -3261,6 +3266,6 @@ ul.vis-userLinks-ListMenu li a i {
     align-items: center;
     justify-content: center;
     color: #fff;
-    background: rgba(var(--v-c-on-secondary), .6);
+    background: rgba(var(--v-c-on-secondary), .4);
     margin-left: 1px;
 }
