@@ -74,9 +74,14 @@
 
                         var colValue = getFieldValue(mField, iControl);
 
+                        if (iControl instanceof VIS.Controls.VButton) {
+                            if (!colValue && colValue.indexOf("{") > -1)
+                                colValue = mField.getValue();
+                        }
+
                         if (!this.isChild) {
                             if (iControl instanceof VIS.Controls.VButton) {
-                                colValue = mField.getValue();
+                                //colValue = mField.getValue();
                                 setValue(colValue, iControl, mField);
                             }
 
@@ -144,7 +149,7 @@
                             }
                         }
                         else {
-                            if (iControl instanceof VIS.Controls.VKeyText) {
+                            if (iControl instanceof VIS.Controls.VKeyText || iControl instanceof VIS.Controls.VButton){
                                 setValue(colValue, iControl, mField);
                             }
                         }
@@ -508,6 +513,9 @@
          */
         var getFieldValue = function (mField) {
             var colValue = mField.getValue();
+            if ($self.pRowData) {
+                colValue = $self.pRowData[mField.getColumnName().toLower()];
+            }
 
             //if (!mField.getIsDisplayed())
             //    return "";
@@ -537,6 +545,7 @@
                         str = VIS.secureEngine.decrypt(str);
                     colValue = str.equals("true");	//	Boolean
                 }
+               
 
                 //	LOB 
                 else
@@ -908,6 +917,10 @@
      * */
     HeaderPanel.prototype.navigate = function (isChild) {
         this.isChild = isChild;
+        this.pRowData = null;
+        if (this.isChild) {
+            this.pRowData = this.curTab.getTableModel().getRowFromDB(this.curTab.getCurrentRow());
+        }
         this.setHeaderItems();
         this.isChild = false;
     };
