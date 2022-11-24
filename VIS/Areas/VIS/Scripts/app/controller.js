@@ -4764,6 +4764,86 @@
         return rowDataDB;
     };
 
+/*
+  *	 get current row record
+  *  @param row current row index
+  *  @return row Object
+  */
+
+    GridTable.prototype.getRowFromDB = function (row) {
+        if (row < 0 || this.getRowCount() == 0 || this.inserting)
+            return null;
+
+        var rData = this.getRow(row);
+       
+
+        //	Create SQL
+        var where = this.getWhereClause(rData);
+        if (where == null || where.length == 0)
+            where = "1=2";
+        //var sql = this.SQL_Select + " WHERE " + where;
+
+        var rowDataDB = null;
+        var dr = null;
+        try {
+
+            //sql = VIS.secureEngine.encrypt(sql);
+            //dr = VIS.dataContext.getWindowRecord(sql, this.createGridFieldArr(this.gridFields, true), this.createObsecureFields(this.gridFields));
+            $.ajax({
+                url: baseUrl + "Window/GetWindowRecord",
+                async: false,
+                type: 'post',
+                data: {
+                    ctxp: VIS.context.getWindowCtx(this.gTable._windowNo),
+                    Columns: this.columns,
+                    TableName: this.gTable._tableName,
+                    AD_Window_ID: this.gridFields[0].getAD_Window_ID(),
+                    AD_Tab_ID: this.AD_Tab_ID,
+                    WindowNo: this.gTable._windowNo,
+                    WhereClause: VIS.secureEngine.encrypt(where),
+                    Encryptedfields: this.createGridFieldArr(this.gridFields, true),
+                    ObscureFields: this.createObsecureFields(this.gridFields),
+                },
+                success: function (jData) {
+                    dr = new VIS.DB.DataReader().toJson(jData);
+                },
+                error: function () { }
+            });
+
+
+
+
+
+            //	only one row
+            if (dr.read())
+                rowDataDB = this.readData(dr);
+            rowDataDB.recid = rData.recid; //set record ID 
+        }
+        catch (e) {
+            console.log(e);
+            sql = VIS.secureEngine.decrypt(sql);
+            this.log.log(Level.SEVERE, sql, e);
+           // this.fireDataStatusEEvent("RefreshError", sql, true);
+            return null;
+        }
+        finally {
+            if (dr != null) {
+                dr.dispose();
+            }
+        }
+
+
+
+        //this.rowData = null;
+        //this.changed = false;
+        //this.rowChanged = -1;
+       // this.inserting = false;
+        //fireTableRowsUpdated(row, row);
+        //this.fireTableModelChanged(VIS.VTable.prototype.ROW_REFRESH, rowDataDB);
+        //this.fireDataStatusIEvent("Refreshed", "");
+        return rowDataDB;
+    };
+
     /*
      *	New Record after current Row
      *  @param currentRow row
