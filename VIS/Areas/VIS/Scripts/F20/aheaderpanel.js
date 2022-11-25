@@ -75,7 +75,7 @@
                         var colValue = getFieldValue(mField, iControl);
 
                         if (iControl instanceof VIS.Controls.VButton) {
-                            if (!colValue && colValue.indexOf("{") > -1)
+                            if (!colValue || colValue.indexOf("{") > -1)
                                 colValue = mField.getValue();
                         }
 
@@ -919,10 +919,17 @@
         this.isChild = isChild;
         this.pRowData = null;
         if (this.isChild) {
-            this.pRowData = this.curTab.getTableModel().getRowFromDB(this.curTab.getCurrentRow());
+            var self = this;
+            this.curTab.getTableModel().getRowFromDB(this.curTab.getCurrentRow(), function (data) {
+                self.pRowData = data;
+                self.setHeaderItems();
+                self.isChild = false;
+            });
         }
-        this.setHeaderItems();
-        this.isChild = false;
+        else {
+            this.setHeaderItems();
+            this.isChild = false;
+        }
     };
 
     /**

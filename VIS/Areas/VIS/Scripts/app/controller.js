@@ -4770,7 +4770,7 @@
   *  @return row Object
   */
 
-    GridTable.prototype.getRowFromDB = function (row) {
+    GridTable.prototype.getRowFromDB = function (row,callback) {
         if (row < 0 || this.getRowCount() == 0 || this.inserting)
             return null;
 
@@ -4785,13 +4785,19 @@
 
         var rowDataDB = null;
         var dr = null;
+        var isAsync = callback ? true : false;
+        var self = null;
+        if (callback) {
+            self = this;
+        }
+
         try {
 
             //sql = VIS.secureEngine.encrypt(sql);
             //dr = VIS.dataContext.getWindowRecord(sql, this.createGridFieldArr(this.gridFields, true), this.createObsecureFields(this.gridFields));
             $.ajax({
                 url: baseUrl + "Window/GetWindowRecord",
-                async: false,
+                async: isAsync,
                 type: 'post',
                 data: {
                     ctxp: VIS.context.getWindowCtx(this.gTable._windowNo),
@@ -4806,18 +4812,22 @@
                 },
                 success: function (jData) {
                     dr = new VIS.DB.DataReader().toJson(jData);
+                    if (callback) {
+                        if (dr.read())
+                            rowDataDB = self.readData(dr);
+                        rowDataDB.recid = rData.recid; //set record ID 
+                        callback(rowDataDB);
+                    }
                 },
                 error: function () { }
             });
 
-
-
-
-
-            //	only one row
-            if (dr.read())
-                rowDataDB = this.readData(dr);
-            rowDataDB.recid = rData.recid; //set record ID 
+            if (!callback) {
+                //	only one row
+                if (dr.read())
+                    rowDataDB = this.readData(dr);
+                rowDataDB.recid = rData.recid; //set record ID 
+            }
         }
         catch (e) {
             console.log(e);
@@ -4831,16 +4841,6 @@
                 dr.dispose();
             }
         }
-
-
-
-        //this.rowData = null;
-        //this.changed = false;
-        //this.rowChanged = -1;
-       // this.inserting = false;
-        //fireTableRowsUpdated(row, row);
-        //this.fireTableModelChanged(VIS.VTable.prototype.ROW_REFRESH, rowDataDB);
-        //this.fireDataStatusIEvent("Refreshed", "");
         return rowDataDB;
     };
 
