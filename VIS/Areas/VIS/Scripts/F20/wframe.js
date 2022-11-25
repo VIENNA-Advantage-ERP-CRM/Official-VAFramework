@@ -803,7 +803,8 @@
             var li = $("<li>");
             var d = $("<div></div>");
             var fired = true;
-            li.on(VIS.Events.onClick, function (e) {
+           // li.on(VIS.Events.onClick, function (e) {
+            li.on("mousedown touchstrat", function (e) {
                 e.stopPropagation();
                 if (fired && that.onAction && that.isEnabled) {
                     if (that.toggle) {
@@ -850,7 +851,8 @@
             var li = $("<li>");
             var d = $("<div></div>");
             var fired = true;
-            li.on(VIS.Events.onClick, function (e) {
+           // li.on(VIS.Events.onClick, function (e) {
+            li.on("mousedown touchstart", function (e) {
                 e.stopPropagation();
                 if (fired && that.onAction && that.isEnabled) {
                     if (that.toggle) {
