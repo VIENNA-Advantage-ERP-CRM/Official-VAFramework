@@ -175,7 +175,7 @@
                 if (SurveyData.length > 0) {
                     for (var i = 0; i < SurveyData.length; i++) {
                         dsg += '<li class="VIS_SI_' + SurveyData[i].Item.AD_SurveyItem_ID + ' align-items-center d-flex mb-3 pb-3 vis-tp-listItem">' +
-                            '<h6 class="mr-2 mb-0">' + (i + 1) + '.</h6><input class="VIS_Answ_' + self.windowNo + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" type= "checkbox" ><p class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-qtype="' + SurveyType + '" data-mandatory="' + SurveyData[i].Item.IsMandatory + '">' + SurveyData[i].Item.Question;
+                            '<h6 class="mr-2 mb-0">' + (i + 1) + '.</h6><input class="VIS_Answ_' + self.windowNo + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' type= "checkbox" ><p class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-qtype="' + SurveyType + '" data-mandatory="' + SurveyData[i].Item.IsMandatory + '">' + SurveyData[i].Item.Question;
 
                         if (IsMandatoryAll || SurveyData[i].Item.IsMandatory == 'Y') {
                             dsg += '<sub style="color:red;font-size: 100%;bottom: unset;">*</sub>';
@@ -206,7 +206,7 @@
                                 if (SurveyData[i].Item.AnswerSelection == 'SL') {
                                     dsg += ' class="group_' + SurveyData[i].Item.AD_SurveyItem_ID + '" ';
                                 }
-                                dsg += ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue=' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' value="' + SurveyData[i].Values[j].Answer + '" type="checkbox">' +
+                                dsg += ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue=' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' value="' + SurveyData[i].Values[j].Answer + '" type="checkbox">' +
                                     ' <p>' + SurveyData[i].Values[j].Answer + '</p>' +
                                     ' </div>';
                             }
@@ -526,6 +526,9 @@
 
             questionSection.find('input[type="checkbox"]').click(function () {
                 if ($(this).attr('class')) {
+                    if ($(this).next().attr('data-qtype') && $(this).next().attr('data-qtype') == 'CL') {
+                        return;
+                    }
                     singleChkBoxSelection(this, $(this).attr('class'));
                 }
 

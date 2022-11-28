@@ -308,7 +308,7 @@ namespace VIS.Models
                             ELSE SRL.AD_SurveyValue_ID
                             END AS Answer,
                             SRL.AD_SurveyValue_ID,SRL.AD_SurveyItem_ID,SI.AnswerType FROM AD_SurveyResponse SR
-            INNER JOIN AD_SurveyResponseLine  SRL ON SR.AD_SurveyResponse_ID=SRL.AD_SurveyResponse_ID
+            INNER JOIN AD_SurveyResponseLine SRL ON SR.AD_SurveyResponse_ID=SRL.AD_SurveyResponse_ID
             INNER JOIN AD_SurveyItem SI ON SI.AD_SurveyItem_ID=SRL.AD_SurveyItem_ID
             WHERE SR.AD_SurveyResponse_ID="+ AD_SurveyResponse_ID + " AND SR.ad_window_id=" + AD_Window_ID + " AND SR.AD_Table_ID=" + AD_Table_ID + " AND SR.Record_ID=" + AD_Record_ID + " AND SR.ad_user_id=" + AD_User_ID;
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "SR", true, false), null);
