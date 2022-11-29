@@ -130,6 +130,7 @@
     <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\LocatorModel.cs" />
     <Compile Include="Models\RecordAccessModel.cs" />
+    <Compile Include="Models\RecordShared.cs" />
     <Compile Include="Models\ShortcutModel.cs" />
     <Compile Include="Models\SmsModel.cs" />
     <Compile Include="Models\Subscribe\SubscribeModel.cs" />

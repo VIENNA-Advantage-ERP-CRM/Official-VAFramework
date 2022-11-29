@@ -469,6 +469,11 @@
                 this.aHistory.setTextDirection("r");
                 $ulactionbar.append(this.aHistory.getListItmIT());
             }
+            if (mWindow.getIsRecordShared()) {
+                this.aRecordShared = this.addActions("RSD", null, false, false, false, onAction); //1
+                this.aRecordShared.setTextDirection("r");
+                $ulactionbar.append(this.aRecordShared.getListItmIT());
+            }
             if (mWindow.getIsCheckRequest()) {
                 this.aRequest = this.addActions("CRT", null, true, false, false, onAction);
                 this.aRequest.setTextDirection("r");
@@ -1253,12 +1258,16 @@
                 if (this.aImportMap) {
                     this.aImportMap.dispose();
                 }
+                if (this.aRecordShared) {
+                    this.aRecordShared.dispose();
+                }
 
                 this.aRefresh = this.aDelete = this.aNew = this.aPrevious = this.aFirst = this.aLast = this.aNext = null;
                 this.aChat = this.aPageUp = this.aPageFirst = this.aPageLast = this.aPageDown = null;
                 this.aHelp = this.aSubscribe = this.aAttachment = null, this.toolbarCreated = null;
                 this.aZoomAcross = this.aRequest = this.aMark = this.aWorkflow = this.aHistory = null;
                 this.aAppointment = null; this.aRecAccess = this.aImportMap = this.aCard = this.aCardDialog = this.aShowSummaryLevel = null;
+                this.aRecordShared = null;
             }
 
             this.statusBar.dispose();
@@ -2119,6 +2128,9 @@
         else if (tis.isPersonalLock && tis.aRecAccess.getAction() === action) {
             tis.cmd_recAccess();
         }
+        else if (tis.aRecordShared && tis.aRecordShared.getAction() === action) {
+            tis.cmd_RecordShared();
+        }
 
         //	Tools
         else if (tis.aWorkflow != null && action === (tis.aWorkflow.getAction())) {
@@ -2563,6 +2575,9 @@
                     break;
                 case 'IMP':
                     aPanel.cmd_ImportMap();
+                    break;
+                case 'RSD':
+                    aPanel.cmd_RecordShared();
                     break;
                 default: actionVADMSDocument(aPanel, vButton.value)
             }
@@ -3308,6 +3323,9 @@
             if (this.aHistory) {
                 this.aHistory.setEnabled(false);
             }
+            if (this.aRecordShared) {               
+                this.aRecordShared.setEnabled(false);
+            }
             if (this.aEmail) {
                 this.aEmail.setEnabled(false);
             }
@@ -3384,6 +3402,14 @@
             }
             if (this.aHistory) {
                 this.aHistory.setEnabled(true);
+            }
+            if (this.aRecordShared) {
+                if (VIS.context.getContextAsInt(this.curWindowNo, 'AD_Org_ID') == 0) {
+                    this.aRecordShared.setEnabled(false);
+                } else {
+                    this.aRecordShared.setEnabled(true);
+                }
+               
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(true);
@@ -4108,6 +4134,11 @@
 
         atHistory.show();
     };
+
+    APanel.prototype.cmd_RecordShared = function () {
+        var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curWindowNo);
+        atRecordShared.show();
+    }
 
     APanel.prototype.clearSearchText = function () {
         if (this.curGC) {
