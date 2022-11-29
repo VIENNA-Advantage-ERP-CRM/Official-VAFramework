@@ -670,6 +670,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\pattributeinstance.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\pattributesform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\recordaccessdialog.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\recordShared.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\sms.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\treemaintenance.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\UploadAmountDimension.js" />
@@ -783,6 +784,7 @@
     <Compile Include="Areas\VIS\Controllers\MessageController.cs" />
     <Compile Include="Areas\VIS\Controllers\PAttributesController.cs" />
     <Compile Include="Areas\VIS\Controllers\RecordAccessController.cs" />
+    <Compile Include="Areas\VIS\Controllers\RecordSharedController.cs" />
     <Compile Include="Areas\VIS\Controllers\ResourceController.cs" />
     <Compile Include="Areas\VIS\Controllers\SmsController.cs" />
     <Compile Include="Areas\VIS\Controllers\Subscribe\SubscribeController.cs" />
