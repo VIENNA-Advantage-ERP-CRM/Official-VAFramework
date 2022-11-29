@@ -670,6 +670,25 @@ html[dir="rtl"] .vis-img-ctrl-icon {
 html[dir="rtl"] .w2ui-grid .w2ui-toolbar-search .w2ui-search-all {
     padding: 3px 10px 3px 18px;
 }
+
+html[dir="rtl"] .w2ui-grid .w2ui-grid-body div.w2ui-col-header > div.w2ui-sort-up {
+    margin-right: -7px;
+    float: left;
+}
+
+html[dir="rtl"] .w2ui-grid .w2ui-grid-body div.w2ui-col-header > div.w2ui-sort-down {
+    margin-right: -7px;
+    float: left;
+}
+
+html[dir="rtl"] .w2ui-grid .w2ui-grid-body div.w2ui-col-header {
+    padding-left: 10px !important;
+}
+
+html [dir="rtl"] .vis-pull-left, html[dir="rtl"] .pull-left, html[dir="rtl"] .vis-alert-img {
+    float: right !important;
+}
+
 html[dir="rtl"] .w2ui-overlay .w2ui-col-on-off table td:first-child {
     padding: 4px 6px 4px 0;
 }

@@ -77,6 +77,7 @@ namespace VIS
                 "~/Areas/VIS/Scripts/app/Framework/archiveviewer.js",
                 "~/Areas/VIS/Scripts/app/child-dialog.js",
                 "~/Areas/VIS/Scripts/app/Framework/chat.js",
+                "~/Areas/VIS/Scripts/app/Framework/recordShared.js",
                 "~/Areas/VIS/Scripts/app/Framework/infomenu.js",
                 "~/Areas/VIS/Scripts/app/Framework/infowindow.js",
                 "~/Areas/VIS/Scripts/app/Framework/amountdivision.js",
