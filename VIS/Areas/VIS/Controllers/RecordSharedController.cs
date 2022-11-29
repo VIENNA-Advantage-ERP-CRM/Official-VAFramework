@@ -1,17 +1,9 @@
-﻿/********************************************************
- * Module Name    : Vienna Advantage Framework
- * Purpose        : Show Shared records indo
- * Class Used     : RecordShared.js, recordShared.cs,
- * Created By     : VIS0228
- * Date           : 09-Nov-2022
-**********************************************************/
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using VAdvantage.Common;
 using VAdvantage.Utility;
 using VISLogic.Models;
 
@@ -55,30 +47,11 @@ namespace VIS.Areas.VIS.Controllers
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public JsonResult SaveRecord(int AD_Table_ID, int record_ID, int Tab_ID, int Window_ID, int WindowNo, List<Records> list, int Parent_ID, int ParentTable_ID)
+        public JsonResult SaveRecord(int AD_Table_ID, int record_ID, List<Records> list)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             RecordShared model = new RecordShared();
-            int error = 0;
-            return Json(JsonConvert.SerializeObject(model.SaveRecord(AD_Table_ID, record_ID, Tab_ID, Window_ID, WindowNo, list, ctx, null, Parent_ID, ParentTable_ID, ref error)), JsonRequestBehavior.AllowGet);
-        }
-
-        /// <summary>
-        /// Not Used
-        /// </summary>
-        /// <returns></returns>
-        public JsonResult GetSharedRecords()
-        {
-            Ctx ctx = Session["ctx"] as Ctx;
-            RecordShared model = new RecordShared();
-            return Json(JsonConvert.SerializeObject(model.GetSharedRecords(ctx)), JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetSharedRecordAccess(int AD_Table_ID, int Record_ID)
-        {
-            Ctx ctx = Session["ctx"] as Ctx;
-            RecordShared model = new RecordShared();
-            return Json(JsonConvert.SerializeObject(model.GetSharedRecordAccess(ctx,AD_Table_ID, Record_ID)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(model.SaveRecord(AD_Table_ID, record_ID, list, ctx)), JsonRequestBehavior.AllowGet);
         }
 
     }

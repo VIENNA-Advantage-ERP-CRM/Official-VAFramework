@@ -1,11 +1,4 @@
-﻿/********************************************************
- * Module Name    : Vienna Advantage Framework
- * Purpose        : This class is used for record share with other organization
- * Class Used     :
- * Created By     : VIS0228
- * Date           :  09-Nov-2022
-**********************************************************/
-; (function (VIS, $) {
+﻿; (function (VIS, $) {
 
     /**
      * Record Shared
@@ -13,17 +6,11 @@
      * @param {any} table_id
      * @param {any} windowNo
      */
-    function RecordShared(record_id, table_id, tab_id, window_id, windowNo, parentID, parentTableID) {
+    function RecordShared(record_id, table_id, windowNo) {
         this.onClose = null;
         var ch = null;
         var self = this;
         var orginalArr = [];
-        var sharedIDs = [];
-        if (parentID == '999999') {
-            parentID = 0;
-        }
-
-        var canEdit = true;
 
         /**Main Root */
         var root = $('<div class="vis-actionWindowWrapper">'
@@ -85,7 +72,7 @@
             + '</div>'
             + '<div>'
             + '<button class="vis-actionBtn mr-1" id="btnCancel_' + windowNo + '">' + VIS.Msg.getMsg('Cancel') + '</button>'
-            + '<button class="vis-actionBtn mr-2" disabled="" style="cursor:default;opacity:.5" id="btnOk_' + windowNo + '">' + VIS.Msg.getMsg('OK') + '</button>'
+            + '<button class="vis-actionBtn mr-2" id="btnOk_' + windowNo + '">' + VIS.Msg.getMsg('OK') + '</button>'
             + '</div>'
             + '</div>'
             + '</div>'
@@ -160,7 +147,6 @@
 
         /**
          * Prepare UI according to data
-         * At Top . SHOW ORGNIZATION with which record is shared
          * @param {any} list
          */
         function prepareList(list) {
@@ -179,12 +165,7 @@
                 row += '</td>'
                     + '<td width="40px">';
                 if (list[i].AD_OrgShared_ID) {
-                    row += '<input type="checkbox" checked class="chkOrgID" data-shareid="' + list[i].AD_OrgShared_ID+'" value="' + list[i].ID + '">';
-                    sharedIDs.push(list[i].AD_OrgShared_ID);
-                    if (list[i].CanEdit) {
-                        toogleOkBtn(true);
-                    }
-                    canEdit = list[i].CanEdit;
+                    row += '<input type="checkbox" checked class="chkOrgID" value="' + list[i].ID + '">';
                 } else {
                     row += '<input type="checkbox" class="chkOrgID" value="' + list[i].ID + '">';
                 }
@@ -194,39 +175,14 @@
                     + '<td width="120px" class="text-center">' + list[i].isLegalEntity + '</td>'
                     + '<td width="120px" class="text-center">';
                 if (list[i].isReadonly) {
-                    if (list[i].OrgID != VIS.context.getAD_Org_ID()) {
-                        row += '<input type="checkbox" name="" id="" readonly disabled class="chkIsReadOnly" checked />';
-                    }
-                    else {
-                        row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked />';
-                    }
+                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked />';
                 } else {
-                    if (list[i].OrgID>0 && list[i].OrgID != VIS.context.getAD_Org_ID()) {
-                        row += '<input type="checkbox" name="" readonly disabled id="" class="chkIsReadOnly" />';
-                    }
-                    else {
-                        row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
-                    }
+                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
                 }
                 row += '</td>'
                     + '</tr>';
             }
             root.find('.tbList').append(row);
-            root.find('.tbList .chkOrgID').on("click", function (e) {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
-                var checkedOrgs = root.find('.tbList .chkOrgID:checked');
-                if (checkedOrgs && checkedOrgs.length > 0) {
-                    toogleOkBtn(true);
-                }
-                else {
-                    if (sharedIDs && sharedIDs.length == 0)
-                        toogleOkBtn(false);
-                }
-            });
-
         };
 
         /**
@@ -242,17 +198,7 @@
             }
         };
 
-        function toogleOkBtn(enable) {
-            if (enable) {
-                btnOk.css("opacity", "1").prop("disabled", "");
-            }
-            else {
-                btnOk.css("opacity", "0.5").prop("disabled", "true");
-            }
-        };
-
         function events() {
-
 
             txtSummaryOrg.keyup(function () {
                 filterData();
@@ -266,48 +212,29 @@
                 filterData();
             });
 
-            chkAll.change(function (e) {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
+            chkAll.change(function () {
                 var isFalse = false;
                 if (this.checked) {
                     isFalse = true;
-                    toogleOkBtn(true);
-                }
-                else {
-                    toogleOkBtn(false);
                 }
                 root.find('.tbList .chkOrgID').each(function () {
-                    
                     this.checked = isFalse;
                 });
             });
 
             btnOk.click(function () {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
                 msg.text("");
                 IsBusy(true);
                 var saveObj = {
                     AD_Table_ID: table_id,
                     record_ID: record_id,
-                    Tab_ID: tab_id,
-                    Window_ID: window_id,
-                    WindowNo: windowNo,
-                    list: [],
-                    Parent_ID: parentID,
-                    ParentTable_ID: parentTableID
+                    list: []
                 }
 
                 root.find('.tbList .chkOrgID:checked').each(function () {
                     saveObj.list.push({
                         AD_OrgShared_ID: Number(this.value),
                         isReadonly: $(this).closest('tr').find('.chkIsReadOnly').is(':checked'),
-                        shareID: $(this).data('shareid')
 
                     });
 
@@ -322,10 +249,6 @@
                             msg.text(VIS.Msg.getMsg('Saved'));
                             getOrganization();
                             root.find('.tbList').scrollTop(0);
-                            txtSearchKey.val('');
-                            txtSummaryOrg.val('');
-                            ddlLegalEntities.val('A');
-                            ch.close();
                         } else {
                             msg.text(VIS.Msg.getMsg('RecordsNotSaved'));
                         }
@@ -372,7 +295,6 @@
             ch.onClose = function () {
 
                 if (self.onClose) {
-                    self.onClose();
                     self.dispose();
                 }
             };
