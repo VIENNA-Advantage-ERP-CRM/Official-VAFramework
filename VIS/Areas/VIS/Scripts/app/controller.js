@@ -265,6 +265,11 @@
         return this.vo.IsHistory;
     };
 
+    GridWindow.prototype.getIsRecordShared = function () {
+        return this.vo.IsRecordShared;
+    };
+
+
     GridWindow.prototype.getIsCheckRequest = function () {
         return this.vo.IsCheckRequest;
     };
