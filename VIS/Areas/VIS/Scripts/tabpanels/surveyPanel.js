@@ -26,9 +26,14 @@
         var isSelfShow = true;
         var surveyTab = null;
         var $clickHere = ('<a href="javascript:;">' + VIS.Msg.getMsg("VIS_ClickHere")+'</a>');
-       
+        var bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+        var setBusy = function (isBusy) {
+            bsyDiv.css("display", isBusy ? 'block' : 'none');
+        };
+
         this.init = function () {
-            $root = $('<div></div>');
+            setBusy(false);
+            $root = $('<div></div>').append(bsyDiv);
 
             var tab = $('<div class="vis-surveyTab">'
                 + '<div class="vis-tabPrimary">'
@@ -85,7 +90,7 @@
             surveyTab = $root.find('#surveyTab_' + self.windowNo);
             questionSection = $root.find('#ques_' + self.windowNo);
             responseSection = $root.find('#resp_' + self.windowNo);
-           // panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
+            // panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
         };
 
         this.update = function (Record_ID) {
@@ -175,7 +180,7 @@
                 if (SurveyData.length > 0) {
                     for (var i = 0; i < SurveyData.length; i++) {
                         dsg += '<li class="VIS_SI_' + SurveyData[i].Item.AD_SurveyItem_ID + ' align-items-center d-flex mb-3 pb-3 vis-tp-listItem">' +
-                            '<h6 class="mr-2 mb-0">' + (i + 1) + '.</h6><input class="VIS_Answ_' + self.windowNo + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' type= "checkbox" ><p class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-qtype="' + SurveyType + '" data-mandatory="' + SurveyData[i].Item.IsMandatory + '">' + SurveyData[i].Item.Question;
+                            '<h6 class="mr-2 mb-0" style="min-width:15px;text-algin:right">' + (i + 1) + '.</h6><input class="VIS_Answ_' + self.windowNo + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' type= "checkbox" ><p class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-qtype="' + SurveyType + '" data-mandatory="' + SurveyData[i].Item.IsMandatory + '">' + SurveyData[i].Item.Question;
 
                         if (IsMandatoryAll || SurveyData[i].Item.IsMandatory == 'Y') {
                             dsg += '<sub style="color:red;font-size: 100%;bottom: unset;">*</sub>';
@@ -238,7 +243,7 @@
                             }
                             dsg += '</h6 > ' +
                                 '<textarea class="VIS_Answ_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-id=VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + '  cols="30" rows="10" placeholder="Enter your text here"></textarea> ' +
-                                '<small class="mb-3">Max 200 letters</small> ' +
+                                /*'<small class="mb-3">Max 200 letters</small> ' +*/
                                 '</li > ';
                         }
                     }
@@ -355,11 +360,12 @@
                     var uID = VIS.context.getAD_User_ID();
 
                     AD_SurveyResponse_ID = userResponse['U' + uID][0].id;
-                    if (userResponse['U' + uID].length == 1) {
-                        responseSection.find('.next').attr('disabled', 'disabled');
+                    if (userResponse['U' + uID].length > 1) {
+                        responseSection.find('.next').removeAttr('disabled');
                         responseSection.find('.prev').attr('disabled','disabled');
                     } else {
                         responseSection.find('.prev').attr('disabled','disabled');
+                        responseSection.find('.next').attr('disabled','disabled');
                     }
 
                     responseSection.find('.resStatus').text((1) + '/' + userResponse['U' + uID].length);
@@ -453,6 +459,7 @@
         function eventHandling() {
             // Save response
             $btnSubmit.on("click", function (e) {
+                setBusy(true);
                 var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
                 var asnwers = main.find('[class^=VIS_Answ_]'); //get all answer start VIS_Quest_
                 var questions = main.find('[class^=VIS_Quest_]'); // get all question start VIS_Quest_
@@ -518,8 +525,10 @@
                         questionSection.find('textarea').val('');
                         toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
                         loadAccessData(AD_Survey_ID);
+                        setBusy(false);
                     },
                     error: function (e) {
+                        setBusy(false);
                     }
                 });
             });

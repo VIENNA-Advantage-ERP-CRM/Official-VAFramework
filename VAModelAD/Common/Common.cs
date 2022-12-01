@@ -1387,7 +1387,7 @@ namespace VAdvantage.Common
                             ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID
                             FROM  AD_Column                           
                             INNER JOIN ad_surveyshowcondition ON AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID
-                            WHERE ad_surveyshowcondition.AD_SurveyAssignment_ID="+ AD_SurveyAssignment_ID + " AND AD_Column.AD_Table_ID=" + AD_Table_ID + @"
+                            WHERE ad_surveyshowcondition.isActive='Y' AND  ad_surveyshowcondition.AD_SurveyAssignment_ID=" + AD_SurveyAssignment_ID + " AND AD_Column.AD_Table_ID=" + AD_Table_ID + @"
                             ORDER BY ad_surveyshowcondition.seqno";
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
 
@@ -1466,7 +1466,18 @@ namespace VAdvantage.Common
                         WhereCondition += value;
                         if (Util.GetValueOfString(dt["operation"]) == "AB")
                         {
-                            WhereCondition += " AND " + columnName + " <" + Util.GetValueOfString(dt["Value2"]);
+                            WhereCondition += " AND " + columnName + " <";
+                            if (type == "Int32"){
+                                WhereCondition += Util.GetValueOfInt(dt["Value2"]);
+                            }else if(type == "Decimal")
+                            {
+                                WhereCondition += Util.GetValueOfDecimal(dt["Value2"]);
+                            }
+                            else
+                            {
+                                WhereCondition += Util.GetValueOfString(dt["Value2"]);
+                            }
+                            
                         }
                     }
                     else if (type == "String")

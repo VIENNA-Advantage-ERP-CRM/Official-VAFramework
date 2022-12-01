@@ -29,12 +29,12 @@ namespace VIS.Models
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
                                                   sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
                                                   s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limit,0) AS Limit,RS.isSelfshow,
-                                                  (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID+ " AND AD_Table_ID="+ AD_Table_ID + " AND Record_ID="+ AD_Record_ID + @") AS responseCount,
-                                                  (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID
+                                                  (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID+ " AND AD_Table_ID="+ AD_Table_ID + " AND Record_ID="+ AD_Record_ID + @") AS responseCount,
+                                                  (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID
                                                   FROM ad_surveyassignment sa INNER JOIN AD_Survey s ON 
                                                   s.ad_survey_ID= sa.ad_survey_id 
                                                   LEFT JOIN AD_ResponseSetting RS ON (RS.ad_surveyassignment_ID=sa.ad_surveyassignment_ID)
-                                                  WHERE sa.IsActive='Y' AND sa.ad_tab_id=" + AD_Tab_ID + " AND sa.ad_window_id= " + AD_Window_ID+ " ORDER BY s.name");
+                                                  WHERE sa.IsActive='Y' AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql.ToString(), "sa", true, false), null);
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {                

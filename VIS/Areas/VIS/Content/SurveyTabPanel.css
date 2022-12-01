@@ -68,15 +68,11 @@
     .vis-tp-listItem input[type="radio"]:checked:before {
         position: absolute;
         content: '';
-        width: 80%;
-        height: 80%;
+        width: 12px;
+        height: 12px;
         background: rgba(var(--v-c-primary), 1);
         border-radius: 50%;
         margin: auto;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
     }
 
 .vis-tp-orderListWrap textarea {
