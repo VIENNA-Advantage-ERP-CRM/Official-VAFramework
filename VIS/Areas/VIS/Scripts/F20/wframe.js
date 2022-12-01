@@ -804,8 +804,16 @@
             var d = $("<div></div>");
             var fired = true;
            // li.on(VIS.Events.onClick, function (e) {
-            li.on("mousedown touchstrat", function (e) {
+            li.on("mouseup", function (e) {
                 e.stopPropagation();
+            });
+
+            li.on("click", function (e) {
+                e.stopPropagation();
+            });
+
+            li.on("mousedown touchstrat", function (e) {
+                //e.stopPropagation();
                 if (fired && that.onAction && that.isEnabled) {
                     if (that.toggle) {
                         that.setPressed(!that.pressed);
@@ -852,8 +860,16 @@
             var d = $("<div></div>");
             var fired = true;
            // li.on(VIS.Events.onClick, function (e) {
-            li.on("mousedown touchstart", function (e) {
+            li.on("mouseup", function (e) {
                 e.stopPropagation();
+            });
+
+            li.on("click", function (e) {
+                e.stopPropagation();
+            });
+
+            li.on("mousedown touchstart", function (e) {
+                //e.stopPropagation();
                 if (fired && that.onAction && that.isEnabled) {
                     if (that.toggle) {
                         that.setPressed(!that.pressed);
