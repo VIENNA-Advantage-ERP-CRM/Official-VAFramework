@@ -1,6 +1,7 @@
 ﻿using BaseLibrary.Engine;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +17,8 @@ namespace VAModelAD.Model
     public class POValidator : POAction
     {
 
-        //VIS323 For Create record for ExportData 
-        private static List<string> _ExportCheckTabelNames = new List<string>() { "AD_ChangeLog", "AD_ExportData", "AD_Session",
-                                                                                  "AD_QueryLog", "AD_WindowLog","AD_PInstance_Para",
-                                                                                  "AD_PInstance" };
+        //VIS323 Create record for ExportData 
+        private static List<string> _ExportCheckTableNames =null;
         private void RegisterPORecordList()
         {
             PORecord.AddParent(X_C_Order.Table_ID, X_C_Order.Table_Name);
@@ -181,13 +180,14 @@ namespace VAModelAD.Model
             //VIS323 Insert Record in ExportData for marking on Save records.
             if (Env.IsModuleInstalled("VA093_") && newRecord && success)
             {
+                _ExportCheckTableNames = GetExportTableNames();
                 string[] ModulInfo = po.GetCtx().Get("#ENABLE_DATA_MARKING_ON_SAVE").Split('@');
                 if (ModulInfo.Length == 1)
                 {
                     ModulInfo = new string[] { ModulInfo[0], "VA093_" };
                 }
                 if (ModulInfo[0].Equals("Y") && Env.IsModuleInstalled(ModulInfo[1])
-                                            && !_ExportCheckTabelNames.Contains(po.GetTableName())
+                                            && !_ExportCheckTableNames.Contains(po.GetTableName())
                                             && po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
                 {
                     X_AD_ExportData obj = new X_AD_ExportData(po.GetCtx(), 0, null);
@@ -471,6 +471,28 @@ namespace VAModelAD.Model
         public dynamic CreateAttachment(Ctx ctx, int aD_Table_ID, int id, Trx trx)
         {
             return new MAttachment(ctx, aD_Table_ID, id, trx);
+        }
+        /// <summary>
+        ///VIS323 This Function used to get list of Except tables
+        /// </summary>
+        /// <returns>list of Tables</returns>
+        private static List<string> GetExportTableNames()
+        {
+            if (_ExportCheckTableNames == null)
+            {
+                _ExportCheckTableNames = new List<string>();
+                string sql = @"SELECT Name FROM AD_ref_list WHERE AD_Reference_ID=(SELECT AD_Reference_ID FROM AD_Reference
+                             WHERE Name='VA093_MarkingExcTables') AND IsActive='Y'";
+                DataSet ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        _ExportCheckTableNames.Add(Util.GetValueOfString(ds.Tables[0].Rows[i]["Name"]));
+                    }
+                }
+            }
+            return _ExportCheckTableNames;
         }
     }
 }
