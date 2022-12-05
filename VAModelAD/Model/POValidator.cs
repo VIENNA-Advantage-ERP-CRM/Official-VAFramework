@@ -481,7 +481,7 @@ namespace VAModelAD.Model
             if (_ExportCheckTableNames == null)
             {
                 _ExportCheckTableNames = new List<string>();
-                string sql = @"SELECT Name FROM AD_ref_list WHERE AD_Reference_ID=(SELECT AD_Reference_ID FROM AD_Reference
+                string sql = @"SELECT Name FROM AD_Ref_List WHERE AD_Reference_ID=(SELECT AD_Reference_ID FROM AD_Reference
                              WHERE Name='VA093_MarkingExcTables') AND IsActive='Y'";
                 DataSet ds = DB.ExecuteDataset(sql);
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
