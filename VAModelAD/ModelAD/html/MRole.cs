@@ -2250,8 +2250,7 @@ namespace VAdvantage.Model
                     sql.Append("COALESCE(" + (tableName == null ? "" : tableName + ".") + "AD_Org_ID,0) IN(").Append(sb.ToString()).Append(")");
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
-                    //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
-                    if (!string.IsNullOrEmpty(tableName))
+                    if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
                     {
                         // Get Shared record with organisation.
                         GetShareRecord(ref sql, tableName);
@@ -2259,7 +2258,7 @@ namespace VAdvantage.Model
                     sb = new StringBuilder();
                 }
             }
-
+            
             return "(" + sql.ToString() + ")";
         } // getOrgWhereValue
 
