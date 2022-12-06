@@ -1463,7 +1463,19 @@ namespace VAdvantage.Common
 
                     if (type == "Int32" || type == "Decimal" || type == "Boolean")
                     {
-                        WhereCondition += value;
+                        if (type == "Int32")
+                        {
+                            WhereCondition += Util.GetValueOfInt(value);
+                        }
+                        else if (type == "Decimal")
+                        {
+                            WhereCondition += Util.GetValueOfDecimal(value);
+                        }
+                        else
+                        {
+                            WhereCondition +="'"+ Util.GetValueOfString(value)+"'";
+                        }
+                        
                         if (Util.GetValueOfString(dt["operation"]) == "AB")
                         {
                             WhereCondition += " AND " + columnName + " <";

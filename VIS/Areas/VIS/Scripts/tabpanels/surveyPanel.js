@@ -502,6 +502,7 @@
 
                         if ((IsMandatoryAll || questions[i].dataset.mandatory == 'Y') && required) {
                             VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
+                            setBusy(false);
                             return;
                         }
                     }
