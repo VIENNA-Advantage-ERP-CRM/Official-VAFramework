@@ -249,6 +249,9 @@
                             msg.text(VIS.Msg.getMsg('Saved'));
                             getOrganization();
                             root.find('.tbList').scrollTop(0);
+                            txtSearchKey.val('');
+                            txtSummaryOrg.val('');
+                            ddlLegalEntities.val('A');
                         } else {
                             msg.text(VIS.Msg.getMsg('RecordsNotSaved'));
                         }
