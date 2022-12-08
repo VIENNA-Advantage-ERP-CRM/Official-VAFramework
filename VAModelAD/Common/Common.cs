@@ -1453,7 +1453,7 @@ namespace VAdvantage.Common
                     else
                     {
                         string andOR = " AND ";
-                        if (Util.GetValueOfString(dt["operation"]) == "O")
+                        if (Util.GetValueOfString(dt["andor"]) == "O")
                         {
                             andOR = " OR ";
                         }
@@ -1512,7 +1512,7 @@ namespace VAdvantage.Common
 
                 string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID=" + AD_Table_ID));
 
-                sql = "SELECT COUNT(" + tableName + "_ID) FROM " + tableName + " WHERE " + tableName + "_ID=" + AD_Record_ID + " AND " + WhereCondition;
+                sql = "SELECT COUNT(" + tableName + "_ID) FROM " + tableName + " WHERE " + tableName + "_ID=" + AD_Record_ID + " AND (" + WhereCondition+")";
                 int count = Util.GetValueOfInt(DB.ExecuteScalar(MRole.GetDefault(ctx).AddAccessSQL(sql, tableName, true, false)));
                 if (count > 0)
                 {
