@@ -418,7 +418,7 @@
                         }),
                         success: function (data) {
                             if (data == 'false') {
-                                VIS.ADialog.error("FillMandatory", true, "CheckList");
+                                VIS.ADialog.error("CheckListRequired");
                                 return false;
                             } else {
                                 tabObj.setValue("DocAction", docAction);

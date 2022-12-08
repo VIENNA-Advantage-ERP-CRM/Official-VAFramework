@@ -57,10 +57,10 @@
                 + '</ul>'
                 + '<div class="tab-content">'
                 + '<div class="tab-pane fade show active" style="width:100%;" id="quesSec_' + self.windowNo + '">'  
-                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:57vh" id="quesMessage_' + self.windowNo +'"></div>'
-                + '<div style="height:57vh;overflow-y:auto !important;" id="ques_' + self.windowNo +'"></div>'
+                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:59vh" id="quesMessage_' + self.windowNo +'"></div>'
+                + '<div style="height:59vh;overflow-y:auto !important;" id="ques_' + self.windowNo +'"></div>'
                 + '</div>'
-                + '<div class="tab-pane fade mt-2" style="height:57vh;width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
+                + '<div class="tab-pane fade mt-2" style="height:59vh;width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
                 + '<div class="d-flex align-items-center justify-content-between mr-2 ml-2">'
                 + '<div class="d-flex align-items-center mr-1">' 
                 + '<span class="d-inline-block mr-1">' + VIS.Msg.getMsg("SelectUser")+'</span>'
@@ -95,6 +95,7 @@
 
         this.update = function (Record_ID) {
             questionSection.empty();
+            $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
             responseSection.find('.response').empty();
             IsMandatoryAll = false;
             pageSize = 0;
@@ -104,11 +105,13 @@
         var panelDetails = function (AD_window_ID, AD_Tab_ID, root) {
             _AD_Window_ID = AD_window_ID;
             _AD_Tab_ID = AD_Tab_ID;
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetSurveyAssignments",
                 //async: false,
                 data: { AD_window_ID: AD_window_ID, AD_Tab_ID: AD_Tab_ID, AD_Table_ID: self.curTab.getAD_Table_ID(), AD_Record_ID: self.curTab.getRecord_ID()},
                 success: function (data) {
+                    setBusy(false);
                     var res = [];
                     res = JSON.parse(data);
                     if (res != null && res.length > 0) {
@@ -123,6 +126,7 @@
                     };
                 },
                 error: function (e) {
+                    setBusy(false);
                 }
             });
         };
@@ -146,11 +150,13 @@
          * @param {any} $root
          */
         function loadSurveyUI(AD_Survey_ID, SurveyType, root) {
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetSurveyItems",
                 //async: false,
                 data: { AD_Survey_ID: AD_Survey_ID },
                 success: function (data) {
+                    setBusy(false);
                     var res = [];
                     res = JSON.parse(data);
                     if (res != null) {
@@ -159,6 +165,7 @@
                     };
                 },
                 error: function (e) {
+                    setBusy(false);
                 }
             });
         };
@@ -311,6 +318,7 @@
         function loadAccessData(AD_Survey_ID) {
             userResponse = {};
             userResIdx = 0;
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/CheckResponseAccess",
                 //async: false,
@@ -325,8 +333,10 @@
                     IsSelfShow: isSelfShow
                 },
                 success: function (data) {
+                    setBusy(false);
                     var res = [];
                     res = JSON.parse(data);
+                    questionSection.css('height', '59vh');
                     if (res != null && res.length > 0) {
                         var count = 0;
                         //responseSection.show();
@@ -353,6 +363,7 @@
                             }
                         }
                     } else {
+                        questionSection.css('height', '64vh');
                         surveyTab.find('.respTab').hide();
                         surveyTab.find('.quesTab').hide();
                         return;
@@ -392,6 +403,7 @@
                     }
                 },
                 error: function (e) {
+                    setBusy(false);
                 }
             });
 
@@ -400,6 +412,7 @@
         function loadSurveyResponse(userID) {
             responseSection.find('input').prop('checked', false);
             responseSection.find('textarea').val('');
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetResponseList",
                 //async: false,
@@ -423,8 +436,10 @@
                             }
                         }
                     };
+                    setBusy(false);
                 },
                 error: function (e) {
+                    setBusy(false);
                 }
             });
         }
@@ -485,6 +500,7 @@
                             }
                             if ((IsMandatoryAll || questions[i].dataset.mandatory=='Y') && required) {                                
                                 VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
+                                setBusy(false);
                                 return;
                             }
                         }
@@ -525,7 +541,8 @@
                         questionSection.find('input').prop('checked', false);
                         questionSection.find('textarea').val('');
                         toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
-                        loadAccessData(AD_Survey_ID);
+                        //loadAccessData(AD_Survey_ID);
+                        self.update();
                         setBusy(false);
                     },
                     error: function (e) {
