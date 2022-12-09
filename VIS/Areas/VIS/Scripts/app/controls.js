@@ -6773,5 +6773,6 @@
     VIS.Controls.VProductContainer = VProductContainer;
     VIS.Controls.VKeyText = VKeyText;
     VIS.Controls.VProgressBar = VProgressBar;
+    VIS.Controls.VSpan = VSpan;
     /* END */
 }(jQuery, VIS));
