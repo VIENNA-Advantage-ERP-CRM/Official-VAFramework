@@ -404,10 +404,12 @@
                 }
 
                 if (isSurveyPanel) {
+                    var result = false;
                     $.ajax({
                         type: "POST",
                         url: VIS.Application.contextUrl + "VIS/SurveyPanel/CheckDocActionCheckListResponse",
                         dataType: "json",
+                        async: false,  
                         contentType: 'application/json; charset=utf-8',
                         data: JSON.stringify({
                             "AD_Window_ID": windowID,
@@ -419,15 +421,17 @@
                         success: function (data) {
                             if (data == 'false') {
                                 VIS.ADialog.error("CheckListRequired");
-                                return false;
+                                result= false;
                             } else {
                                 tabObj.setValue("DocAction", docAction);
-                                return true;
+                                result= true;
                             }
                         },
                         error: function (e) {
                         }
                     });
+
+                    return result;
                 } else {
                     tabObj.setValue("DocAction", docAction);
                     return true;
