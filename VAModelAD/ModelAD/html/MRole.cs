@@ -37,6 +37,7 @@ namespace VAdvantage.Model
         private Dictionary<int, bool> _dcProcess_access = null;
         private Dictionary<string, string> _dcTask_access = null;
         private Dictionary<string, string> _dcWorkflow_access = null;
+        private MRecordAccess[] _sharedRecordAccess = null;
 
         //	Default Role 
         private static MRole _defaultRole = null;
@@ -647,7 +648,7 @@ namespace VAdvantage.Model
             {
                 UpdateAccessRecords();
             }
-                // if user change setting of Check Document Action Access on Role window
+            // if user change setting of Check Document Action Access on Role window
             else if (Is_ValueChanged("CheckDocActionAccess"))
             {
                 AddDocActionAccess();
@@ -719,7 +720,7 @@ namespace VAdvantage.Model
                 + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
                 + "SELECT w.AD_Workflow_ID, " + roleClientOrgUser
                 + "FROM AD_Workflow w "
-                + "WHERE AccessLevel IN ";           
+                + "WHERE AccessLevel IN ";
 
 
             /**
@@ -788,7 +789,7 @@ namespace VAdvantage.Model
                 + " -  @AD_Form_ID@ #" + form
                 + " -  @AD_Workflow_ID@ #" + wf
                 + daAccess;
-                
+
         }
 
         /// <summary>
@@ -840,7 +841,7 @@ namespace VAdvantage.Model
 
         /// <summary>
         /// Check Process Access against role
-         /// </summary>
+        /// </summary>
         /// <param name="AD_Process_ID"></param>
         /// <returns></returns>
         public bool? GetProcessAccess(int AD_Process_ID)
@@ -1414,6 +1415,7 @@ namespace VAdvantage.Model
             LoadTableInfo(reload);
             LoadColumnAccess(reload);
             LoadRecordAccess(reload);
+            LoadSharedRecord(reload);
             if (reload)
             {
                 _dcTask_access = null;
@@ -1648,6 +1650,11 @@ namespace VAdvantage.Model
         public MRecordAccess[] GetRecordDependentAccess()
         {
             return _recordDependentAccess;
+        }
+
+        public MRecordAccess[] GetSharedRecordAccess()
+        {
+            return _sharedRecordAccess;
         }
 
         /// <summary>
@@ -2243,7 +2250,7 @@ namespace VAdvantage.Model
                     sql.Append("COALESCE(" + (tableName == null ? "" : tableName + ".") + "AD_Org_ID,0) IN(").Append(sb.ToString()).Append(")");
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
-                    if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
+                    //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
                     {
                         // Get Shared record with organisation.
                         GetShareRecord(ref sql, tableName);
@@ -2251,7 +2258,7 @@ namespace VAdvantage.Model
                     sb = new StringBuilder();
                 }
             }
-            
+
             return "(" + sql.ToString() + ")";
         } // getOrgWhereValue
 
@@ -2425,7 +2432,7 @@ namespace VAdvantage.Model
         /// <param name="isIncludeNull"></param>
         /// <returns></returns>
         private string GetDependentAccess(string whereColumnName,
-                    List<int> includes, List<int> excludes,bool isIncludeNull)
+                    List<int> includes, List<int> excludes, bool isIncludeNull)
         {
             if (includes.Count == 0 && excludes.Count == 0)
                 return "";
@@ -2463,7 +2470,7 @@ namespace VAdvantage.Model
                 where.Append(")");
             }
             if (isIncludeNull)
-                where.Append(" OR ").Append(whereColumnName).Append(" IS NULL ").Append( " ) ");
+                where.Append(" OR ").Append(whereColumnName).Append(" IS NULL ").Append(" ) ");
             log.Finest(where.ToString());
             return where.ToString();
         }	//	getDependent
@@ -2729,25 +2736,52 @@ namespace VAdvantage.Model
         }
 
         // Get Shared record with organisation
-        public void GetShareRecord(ref StringBuilder sql,string tableName)
+        public void GetShareRecord(ref StringBuilder sql, string tableName)
         {
             string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(tableName);
             //int recordID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
             DataSet ds = DB.ExecuteDataset(qry);
-            if (ds != null && ds.Tables.Count>0 && ds.Tables[0].Rows.Count>0)            
-            {   
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
                 sql.Append(" OR (");
                 string inCondition = "";
-                for(var i=0; i< ds.Tables[0].Rows.Count; i++)
+                for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
+                    if (i == 999)
+                    {
+                        break;
+                    }
                     inCondition += Util.GetValueOfString(ds.Tables[0].Rows[i]["record_Id"]);
-                    if (i!= (ds.Tables[0].Rows.Count - 1))
+                    if (i != (ds.Tables[0].Rows.Count - 1))
                     {
                         inCondition += ",";
                     }
                 }
                 sql.Append(tableName + "_ID IN (" + inCondition + "))");
+
             }
+        }
+
+        public void LoadSharedRecord(bool reload)
+        {
+            if (!(reload || _sharedRecordAccess == null))
+                return;
+            List<MRecordAccess> sharedRecordAccess = new List<MRecordAccess>();
+            string qry = "SELECT record_Id,IsReadOnly,AD_Table_ID FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID();
+            //int recordID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
+            DataSet ds = DB.ExecuteDataset(qry);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    MRecordAccess rec = new MRecordAccess(GetCtx(), ds.Tables[0].Rows[i], Get_Trx());
+                    rec.SetRecord_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["record_Id"]));
+                    rec.SetIsReadOnly(Util.GetValueOfString(ds.Tables[0].Rows[i]["IsReadOnly"]) == "Y" ? true : false);
+                    rec.SetAD_Table_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]));
+                    sharedRecordAccess.Add(rec);
+                }
+            }
+            _sharedRecordAccess = sharedRecordAccess.ToArray();
         }
 
         public override String ToString()
@@ -2759,7 +2793,7 @@ namespace VAdvantage.Model
                 .Append(",").Append(GetOrgWhere(false))
                 .Append("]");
             return sb.ToString();
-        }	//	ToString
+        }   //	ToString
 
 
 
@@ -2792,7 +2826,7 @@ namespace VAdvantage.Model
                 sb.Append(_recordAccess[i].ToStringX(ctx)).Append(Utility.Env.NL);
             return sb.ToString();
 
-        }	//	toStringX
+        }   //	toStringX
 
 
         /// <summary>
@@ -2861,14 +2895,14 @@ namespace VAdvantage.Model
 
 
         /**
-	 * Checks the access rights of the given role/client for the given document actions.
-	 * @param clientId
-	 * @param docTypeId
-	 * @param options
-	 * @param maxIndex
-	 * @return number of valid actions in the String[] options
-	 * @see metas-2009_0021_AP1_G94
-	 */
+     * Checks the access rights of the given role/client for the given document actions.
+     * @param clientId
+     * @param docTypeId
+     * @param options
+     * @param maxIndex
+     * @return number of valid actions in the String[] options
+     * @see metas-2009_0021_AP1_G94
+     */
         public string[] checkActionAccess(int clientId, int docTypeId, String[] options, ref int maxIndex)
         {
             if (maxIndex <= 0)
@@ -2885,7 +2919,7 @@ namespace VAdvantage.Model
             //}
 
             // Check applied based on the Doc Action Access Checkbox to display options in the Doc Action Dialog
-            if(!IsCheckDocActionAccess())
+            if (!IsCheckDocActionAccess())
             {
                 return options;
             }
@@ -2944,13 +2978,13 @@ namespace VAdvantage.Model
 
 
         /**
-	 * Get Role Where Clause.
-	 * It will look something like myalias.AD_Role_ID IN (?, ?, ?).
-	 * @param roleColumnSQL role columnname or role column SQL (e.g. myalias.AD_Role_ID) 
-	 * @param params a list where the method will put SQL parameters.
-	 * 				If null, this method will generate a not parametrized query 
-	 * @return role SQL where clause
-	 */
+     * Get Role Where Clause.
+     * It will look something like myalias.AD_Role_ID IN (?, ?, ?).
+     * @param roleColumnSQL role columnname or role column SQL (e.g. myalias.AD_Role_ID) 
+     * @param params a list where the method will put SQL parameters.
+     * 				If null, this method will generate a not parametrized query 
+     * @return role SQL where clause
+     */
         public String GetIncludedRolesWhereClause(String roleColumnSQL, List<Object> param)
         {
             StringBuilder whereClause = new StringBuilder();
@@ -2983,10 +3017,10 @@ namespace VAdvantage.Model
 
         private List<MRole> m_includedRoles = null;
         /**
-	 * 
-	 * @return unmodifiable list of included roles
-	 * @see metas-2009_0021_AP1_G94
-	 */
+     * 
+     * @return unmodifiable list of included roles
+     * @see metas-2009_0021_AP1_G94
+     */
         public List<MRole> GetIncludedRoles(Boolean recursive)
         {
             if (!recursive)
@@ -3056,7 +3090,7 @@ namespace VAdvantage.Model
                         && comp.AD_Org_ID == AD_Org_ID;
                 }
                 return false;
-            }	//	equals
+            }   //	equals
 
 
             public override String ToString()
@@ -3075,7 +3109,7 @@ namespace VAdvantage.Model
                 if (readOnly)
                     sb.Append(" r/o");
                 return sb.ToString();
-            }	//	ToString
+            }   //	ToString
 
             public override int GetHashCode()
             {
@@ -3083,7 +3117,7 @@ namespace VAdvantage.Model
             }
 
 
-        }	//	OrgAccess
+        }   //	OrgAccess
     }
 
     /********************************************************************/
