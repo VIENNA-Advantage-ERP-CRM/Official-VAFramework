@@ -99,6 +99,8 @@
             responseSection.find('.response').empty();
             IsMandatoryAll = false;
             pageSize = 0;
+            userResIdx = 0;
+            Limit = 0;
             panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
         }
             
@@ -291,7 +293,9 @@
                 //paging setup
                 if (pageSize > 0 && totalQues > pageSize) {
                     questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
-                } else if (ResponseCount > 0) {
+                }
+
+                if (ResponseCount > 0) {
                     questionSection.hide();
                     $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere+'</span>');
                     $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
@@ -370,6 +374,11 @@
                     }
                     var uID = VIS.context.getAD_User_ID();
 
+                    if (!userResponse['U' + uID]) {
+                        responseSection.find('select option:selected').change();
+                        return;
+                    } 
+
                     AD_SurveyResponse_ID = userResponse['U' + uID][0].id;
                     if (userResponse['U' + uID].length > 1) {
                         responseSection.find('.next').removeAttr('disabled');
@@ -385,7 +394,9 @@
                         questionSection.hide();
                         $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_AlreadySubmittedResponse"));
                         $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
-                    }else if (userResponse['U' + uID].length>0) {                       
+                    }
+
+                    if (userResponse['U' + uID].length > 0) {                       
                         questionSection.hide();
                         $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere + '</span>');
                             $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
@@ -398,9 +409,7 @@
                             });                       
                     }
 
-                    if (count > 0) {
-                        loadSurveyResponse(uID);
-                    }
+                    loadSurveyResponse(uID);                   
                 },
                 error: function (e) {
                     setBusy(false);
@@ -473,7 +482,9 @@
 
         function eventHandling() {
             // Save response
-            $btnSubmit.on("click", function (e) {
+            
+
+            $btnSubmit.off().on("click", function (e) {
                 setBusy(true);
                 var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
                 var asnwers = main.find('[class^=VIS_Answ_]'); //get all answer start VIS_Quest_
@@ -551,7 +562,7 @@
                 });
             });
 
-            questionSection.find('input[type="checkbox"]').click(function () {
+            questionSection.find('input[type="checkbox"]').off().click(function () {
                 if ($(this).attr('class')) {
                     if ($(this).next().attr('data-qtype') && $(this).next().attr('data-qtype') == 'CL') {
                         return;
@@ -562,21 +573,21 @@
             });
 
             //Next Page
-            questionSection.find('.next').click(function () {
+            questionSection.find('.next').off().click(function () {
                 var last = questionSection.find('.vis-tp-orderListWrap').children('li:visible:last');
                 last.nextAll(':lt(' + pageSize + ')').removeClass('hideQuestion');
                 last.next().prevAll().addClass('hideQuestion');
                 showHideSubmit();
             });
             // Previous Page
-            questionSection.find('.prev').click(function () {
+            questionSection.find('.prev').off().click(function () {
                 var first = questionSection.find('.vis-tp-orderListWrap').children('li:visible:first');
                 first.prevAll(':lt(' + pageSize + ')').removeClass('hideQuestion');
                 first.prev().nextAll().addClass('hideQuestion');
                 showHideSubmit();
             });
 
-            responseSection.find('select').change(function () {
+            responseSection.find('select').off().change(function () {
                 userResIdx = 0;              
                 var userID = responseSection.find('select option:selected').val();
                 AD_SurveyResponse_ID = userResponse['U' + userID][0].id;
@@ -592,7 +603,7 @@
                 loadSurveyResponse(userID);
             });
 
-            responseSection.find('.next').click(function () {
+            responseSection.find('.next').off().click(function () {
                 userResIdx++;
                 var userID = responseSection.find('select option:selected').val();
                 AD_SurveyResponse_ID = userResponse['U' + userID][userResIdx].id;
@@ -605,7 +616,7 @@
                 loadSurveyResponse(userID);
             });
 
-            responseSection.find('.prev').click(function () {
+            responseSection.find('.prev').off().click(function () {
                 userResIdx--;
                 var userID = responseSection.find('select option:selected').val();
                 AD_SurveyResponse_ID = userResponse['U' + userID][userResIdx].id;
