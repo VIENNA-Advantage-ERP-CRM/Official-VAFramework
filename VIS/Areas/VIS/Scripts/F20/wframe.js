@@ -803,17 +803,22 @@
             var li = $("<li>");
             var d = $("<div></div>");
             var fired = true;
-           // li.on(VIS.Events.onClick, function (e) {
-            li.on("mouseup", function (e) {
-                e.stopPropagation();
-            });
+            var mouseDown = false;
+            if (this.action == "Save") {
+               // Handle case if user direct click on save button 
+                li.on("mousedown touchstrat", function (e) {
 
-            li.on("click", function (e) {
-                e.stopPropagation();
-            });
+                    mouseDown = true;
+                    window.setTimeout(function (md) {
+                        if (mouseDown)
+                            li.trigger('click');
+                    }, 1000);
+                });
+            }
 
-            li.on("mousedown touchstrat", function (e) {
-                //e.stopPropagation();
+            li.on(VIS.Events.onClick, function (e) {
+                mouseDown = false;
+                e.stopPropagation();
                 if (fired && that.onAction && that.isEnabled) {
                     if (that.toggle) {
                         that.setPressed(!that.pressed);
@@ -856,34 +861,30 @@
         this.getListItmIT = function (listId) {
             if (this.$li)
                 return this.$li;
+          
+
+
             var li = $("<li>");
             var d = $("<div></div>");
             var fired = true;
-           // li.on(VIS.Events.onClick, function (e) {
-            li.on("mouseup", function (e) {
-                e.stopPropagation();
-            });
+            //Handle special case for Save action 
+                li.on(VIS.Events.onClick, function (e) {
 
-            li.on("click", function (e) {
-                e.stopPropagation();
-            });
+                    e.stopPropagation();
+                    if (fired && that.onAction && that.isEnabled) {
+                        if (that.toggle) {
+                            that.setPressed(!that.pressed);
+                        }
+                        fired = false;
+                        d.css('background-color', 'red')
+                        setTimeout(function () {
+                            d.css('background-color', 'transparent');
+                            that.onAction(that.action);
+                            fired = true;
+                        }, 10);
 
-            li.on("mousedown touchstart", function (e) {
-                //e.stopPropagation();
-                if (fired && that.onAction && that.isEnabled) {
-                    if (that.toggle) {
-                        that.setPressed(!that.pressed);
                     }
-                    fired = false;
-                    d.css('background-color', 'red')
-                    setTimeout(function () {
-                        d.css('background-color', 'transparent');
-                        that.onAction(that.action);
-                        fired = true;
-                    }, 10);
-
-                }
-            });
+                });
 
 
             if (this.textOnly) {
