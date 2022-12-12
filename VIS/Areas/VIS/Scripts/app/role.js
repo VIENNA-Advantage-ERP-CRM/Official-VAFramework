@@ -44,6 +44,10 @@ VIS.MRole.canUpdate = function (AD_Client_ID, AD_Org_ID, AD_Table_ID, Record_ID,
     if (retValue && Record_ID != 0)
         retValue = this.getIsRecordAccess(AD_Table_ID, Record_ID, false);
 
+
+    if (retValue && Record_ID != 0)
+        retValue = this.getIsSharedRecordAccess(AD_Table_ID, Record_ID);
+
     if (!retValue && createError) {
         VIS.MRole.log.warning("AccessTableNoUpdate => AD_Client_ID="
             + AD_Client_ID + ", AD_Org_ID=" + AD_Org_ID
@@ -372,6 +376,27 @@ VIS.MRole.getIsRecordAccess = function (AD_Table_ID, Record_ID, ro) {
     } // for all Table Access
     return negativeList;
 };// isRecordAccess
+
+VIS.MRole.getIsSharedRecordAccess = function (AD_Table_ID, Record_ID) {
+    var m_recordAccess = this.vo.sharedRecordAccess;
+    var ra = null;
+    for (var i = 0; i < m_recordAccess.length; i++) {
+        ra = m_recordAccess[i];
+
+        if (ra.AD_Table_ID != AD_Table_ID)
+            continue;
+
+        if (ra.Record_ID == Record_ID) {
+            m_recordAccess = null;
+            //if (!ro)
+                return !ra.IsReadOnly;
+            //else
+            //    // ro
+            //    return true;
+        }
+    }
+    return true;
+};
 
 VIS.MRole.getClientWhere = function (rw) {
     // All Orgs - use Client of Role
@@ -999,6 +1024,10 @@ VIS.MRole.getIsDisplayOrg = function () {
 
 VIS.MRole.getIsPersonalLock = function () {
     return this.vo.IsPersonalLock;
+};
+
+VIS.MRole.getIsShowSharedRecord = function () {
+    return this.vo.ShowSharedRecords;
 };
 
 VIS.MRole.getMaxQueryRecords = function () {

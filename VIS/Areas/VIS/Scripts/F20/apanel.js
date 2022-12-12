@@ -112,6 +112,7 @@
         this.errorDisplayed = false;
 
         this.isPersonalLock = VIS.MRole.getIsPersonalLock();
+        this.isShowSharedRecord = VIS.MRole.getIsShowSharedRecord();
         this.log = VIS.Logging.VLogger.getVLogger("APanel");
 
         this.isSummaryVisible = false;
@@ -469,11 +470,6 @@
                 this.aHistory.setTextDirection("r");
                 $ulactionbar.append(this.aHistory.getListItmIT());
             }
-            if (mWindow.getIsRecordShared()) {
-                this.aRecordShared = this.addActions("RSD", null, false, false, false, onAction); //1
-                this.aRecordShared.setTextDirection("r");
-                $ulactionbar.append(this.aRecordShared.getListItmIT());
-            }
             if (mWindow.getIsCheckRequest()) {
                 this.aRequest = this.addActions("CRT", null, true, false, false, onAction);
                 this.aRequest.setTextDirection("r");
@@ -525,7 +521,7 @@
                 }
                 //Added by Anil Kumar as Discussed with Vinay Bhatt
                 if (mWindow.getIsGenerateAttachmentCode()) {
-                    this.aGenerateAttachmentCode = this.addActions("GAC", null, false, false, false, onAction ); //1
+                    this.aGenerateAttachmentCode = this.addActions("GAC", null, false, false, false, onAction); //1
                     this.aGenerateAttachmentCode.setTextDirection("r");
                     $ulactionbar.append(this.aGenerateAttachmentCode.getListItmIT());
                 }
@@ -562,6 +558,12 @@
                 this.aRecAccess = this.addActions("RecordAccess", null, true, false, false, onAction, true);
                 this.aRecAccess.setTextDirection("r");
                 $ulactionbar.append(this.aRecAccess.getListItmIT());
+            }
+
+            if (this.isShowSharedRecord) {
+                this.aSharedRecord = this.addActions(this.ACTION_NAME_SHAREDREC, null, true, false, false, onAction, true);
+                this.aSharedRecord.setTextDirection("r");
+                $ulactionbar.append(this.aSharedRecord.getListItmIT());
             }
 
             this.aPreference = this.addActions("Preference", null, false, false, true, onAction); //2
@@ -1258,16 +1260,12 @@
                 if (this.aImportMap) {
                     this.aImportMap.dispose();
                 }
-                if (this.aRecordShared) {
-                    this.aRecordShared.dispose();
-                }
 
                 this.aRefresh = this.aDelete = this.aNew = this.aPrevious = this.aFirst = this.aLast = this.aNext = null;
                 this.aChat = this.aPageUp = this.aPageFirst = this.aPageLast = this.aPageDown = null;
                 this.aHelp = this.aSubscribe = this.aAttachment = null, this.toolbarCreated = null;
                 this.aZoomAcross = this.aRequest = this.aMark = this.aWorkflow = this.aHistory = null;
                 this.aAppointment = null; this.aRecAccess = this.aImportMap = this.aCard = this.aCardDialog = this.aShowSummaryLevel = null;
-                this.aRecordShared = null;
             }
 
             this.statusBar.dispose();
@@ -1323,6 +1321,7 @@
     APanel.prototype.ACTION_NAME_CHAT = "CHT";
     APanel.prototype.ACTION_NAME_APPOINTMENT = "Appointment";
     APanel.prototype.ACTION_NAME_ARCHIVE = "Archive";
+    APanel.prototype.ACTION_NAME_SHAREDREC = "RSD";
 
     APanel.prototype.keyDown = function (evt) {
         if (evt.altKey && this.curGC) {
@@ -2128,7 +2127,7 @@
         else if (tis.isPersonalLock && tis.aRecAccess.getAction() === action) {
             tis.cmd_recAccess();
         }
-        else if (tis.aRecordShared && tis.aRecordShared.getAction() === action) {
+        else if (tis.isShowSharedRecord && tis.aSharedRecord.getAction() === action) {
             tis.cmd_RecordShared();
         }
 
@@ -3305,6 +3304,11 @@
             this.aRecAccess.setEnabled(true);
         }
 
+        if (this.isShowSharedRecord) {
+            this.aSharedRecord.setEnabled(true);
+            this.aSharedRecord.setPressed(this.curTab.getIsLocked());
+        }
+
 
         if (this.curTab.getRecord_ID() == -1) {
             //this.aMulti.setEnabled(false);
@@ -3322,9 +3326,6 @@
             //}
             if (this.aHistory) {
                 this.aHistory.setEnabled(false);
-            }
-            if (this.aRecordShared) {               
-                this.aRecordShared.setEnabled(false);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(false);
@@ -3402,14 +3403,6 @@
             }
             if (this.aHistory) {
                 this.aHistory.setEnabled(true);
-            }
-            if (this.aRecordShared) {
-                if (VIS.context.getContextAsInt(this.curWindowNo, 'AD_Org_ID') == 0) {
-                    this.aRecordShared.setEnabled(false);
-                } else {
-                    this.aRecordShared.setEnabled(true);
-                }
-               
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(true);
@@ -4381,6 +4374,18 @@
         this.curTab.loadAttachments();			//	reload
         locked = this.curTab.getIsLocked();
         this.aLock.setPressed(locked);
+    };
+
+    APanel.prototype.cmd_sharedRec = function () {
+        if (!this.isShowSharedRecord) {
+            return;
+        }
+        var record_ID = this.curTab.getRecord_ID();
+        if (record_ID == -1 || record_ID < 0)	//	No Key
+        {
+            return;
+        }
+        alert("ha ha ha")
     };
 
     APanel.prototype.cmd_recAccess = function () {
