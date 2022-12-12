@@ -45,6 +45,9 @@ VIS.MRole.canUpdate = function (AD_Client_ID, AD_Org_ID, AD_Table_ID, Record_ID,
         retValue = this.getIsRecordAccess(AD_Table_ID, Record_ID, false);
 
 
+    if (retValue && Record_ID != 0)
+        retValue = this.getIsSharedRecordAccess(AD_Table_ID, Record_ID);
+
     if (!retValue && createError) {
         VIS.MRole.log.warning("AccessTableNoUpdate => AD_Client_ID="
             + AD_Client_ID + ", AD_Org_ID=" + AD_Org_ID

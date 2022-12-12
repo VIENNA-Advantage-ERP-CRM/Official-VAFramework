@@ -2250,7 +2250,7 @@ namespace VAdvantage.Model
                     sql.Append("COALESCE(" + (tableName == null ? "" : tableName + ".") + "AD_Org_ID,0) IN(").Append(sb.ToString()).Append(")");
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
-                    if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
+                    //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
                     {
                         // Get Shared record with organisation.
                         GetShareRecord(ref sql, tableName);
@@ -2258,7 +2258,7 @@ namespace VAdvantage.Model
                     sb = new StringBuilder();
                 }
             }
-            
+
             return "(" + sql.ToString() + ")";
         } // getOrgWhereValue
 
@@ -2770,6 +2770,29 @@ namespace VAdvantage.Model
                 return;
             }
 
+            string qry = "SELECT record_Id,IsReadOnly,AD_Table_ID FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID();
+            //int recordID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
+            DataSet ds = DB.ExecuteDataset(qry);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    MRecordAccess rec = new MRecordAccess(GetCtx(), ds.Tables[0].Rows[i], Get_Trx());
+                    rec.SetRecord_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["record_Id"]));
+                    rec.SetIsReadOnly(Util.GetValueOfString(ds.Tables[0].Rows[i]["IsReadOnly"]) == "Y" ? true : false);
+                    rec.SetAD_Table_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]));
+                    sharedRecordAccess.Add(rec);
+                }
+                sql.Append(tableName + "_ID IN (" + inCondition + "))");
+
+            }
+        }
+
+        public void LoadSharedRecord(bool reload)
+        {
+            if (!(reload || _sharedRecordAccess == null))
+                return;
+            List<MRecordAccess> sharedRecordAccess = new List<MRecordAccess>();
             string qry = "SELECT record_Id,IsReadOnly,AD_Table_ID FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID();
             //int recordID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
             DataSet ds = DB.ExecuteDataset(qry);
