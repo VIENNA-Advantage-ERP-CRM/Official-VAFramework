@@ -496,7 +496,7 @@ namespace VIS.Models
 
             List<JTable> jTable = new List<JTable>();
             List<SqlParameter> param = new List<SqlParameter>();
-            param.Add(new SqlParameter("@AD_Table_ID", Util.GetValueOfInt( aD_Table_ID)));
+            param.Add(new SqlParameter("@AD_Table_ID", Util.GetValueOfInt(aD_Table_ID)));
             param.Add(new SqlParameter("@AD_ColumnSortOrder_ID", Util.GetValueOfInt(aD_ColumnSortOrder_ID)));
             param.Add(new SqlParameter("@AD_ColumnSortYesNo_ID", Util.GetValueOfInt(aD_ColumnSortYesNo_ID)));
 
@@ -1028,7 +1028,7 @@ namespace VIS.Models
         /// <param name="sql"></param>
         /// <returns>DataSet</returns>
         /// Mandeep Singh(VIS0028) 13-sep-2021
-       
+
 
 
         public List<JTable> GetWareProWiseLocator(Ctx ctx, string colName, int orgId, int warehouseId, int productId, bool onlyIsSOTrx)
@@ -1269,6 +1269,11 @@ namespace VIS.Models
             if (ServerValues.IsViewDocument)
             {
                 sqlArray.Add("SELECT vadms_windowdoclink_id, record_id FROM VADMS_WindowDocLink wdl JOIN vadms_document doc ON (wdl.VADMS_Document_ID  =doc.VADMS_Document_ID) WHERE doc.vadms_docstatus!='DD' AND AD_Table_ID =" + ServerValues.AD_Table_ID);
+            }
+
+            if (MRole.GetDefault(_ctx).IsShowSharedRecords())
+            {
+                sqlArray.Add("SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + _ctx.GetAD_Org_ID() + " AND AD_Table_ID=" + ServerValues.AD_Table_ID);
             }
 
             string sql = string.Join("~", sqlArray);

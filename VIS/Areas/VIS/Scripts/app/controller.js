@@ -2649,6 +2649,21 @@
         return this.hasKey(this.viewDocument, key);//return chatId
     };
 
+    GridTab.prototype.hasShared = function () {
+
+        if (this.isDataLoading)
+            return false;
+        if (this.sharedRecords == null)
+            this.loadShared();//call load chat function
+        if (this.sharedRecords == null)
+            return false;
+        //get chat id
+        var key = this.getRecord_ID();//ridTable.GetKeyID(CurrentRow);
+
+
+        return this.hasKey(this.sharedRecords, key);//return chatId
+    };
+
     /// <summary>
     /// Returns true, if current row has a Subscribe
     /// </summary>
@@ -2666,6 +2681,32 @@
         //get chat id
         var key = this.getRecord_ID();//ridTable.GetKeyID(CurrentRow);
         return this.hasKey(this._subscribe, key);//return subscribeId
+    };
+
+    GridTab.prototype.loadShared = function () {
+        if (VIS.MRole.getIsShowSharedRecord() == true) {
+            var sqlQry = "VIS_155";
+            var param = [];
+            param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
+            param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
+
+            var dr = null;
+            try {
+                this.sharedRecords = [];
+
+                dr = executeReader(sqlQry, param);
+                var key;
+                while (dr.read()) {
+                    key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
+                    this.sharedRecords.push({ ID: key});
+                }
+
+                dr = null;
+
+            }
+            catch (ex) {
+            }
+        }
     };
 
     //Lakhwinder
@@ -2774,7 +2815,7 @@
         this._lock = this.gTab._pAccess;
         this._subscribe = this.gTab._subscribe;
         this.viewDocument = this.gTab._documents;
-
+        this.sharedRecords = this.gTab._sharedRec;
         //var tableIndex = {};
         //var ServerValues = {};
         //ServerValues.IsExportData = false;

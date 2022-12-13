@@ -565,6 +565,9 @@ namespace VIS.Classes
                 + " AND t.IsActive='Y' AND tab.IsActive='Y' "
                 + " ORDER BY 2";
 
+
+            queryList.VIS_155 = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Org_ID = @Org_ID AND AD_Table_ID = @AD_Table_ID";
+
         }
 
 
