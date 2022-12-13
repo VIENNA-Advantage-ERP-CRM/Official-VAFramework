@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using VAdvantage.Utility;
 using VAdvantage.DataBase;
 using VAdvantage.ModelAD;
+using VAdvantage.Model;
 
 namespace VISLogic.Models
 {
@@ -25,7 +26,10 @@ namespace VISLogic.Models
         public List<Organization> GetOrganization(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
             List<Organization> lstOrg = null;
-            string sqlQuery = @"SELECT AD_Org_ID, value,Name,IsLegalEntity,LegalEntityOrg FROM AD_ORg WHERE ISACTIVE='Y' AND AD_ORg_ID Not In (SELECT AD_OrgShared_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + ") ORDER BY Name";
+            string sqlQuery = @"SELECT AD_Org_ID, value,Name,IsLegalEntity,LegalEntityOrg FROM AD_ORg WHERE ISACTIVE='Y' AND AD_ORg_ID NOT IN (SELECT AD_OrgShared_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + ") ORDER BY Name";
+
+            sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery,"AD_Org",true,false);
+
             DataSet ds = DB.ExecuteDataset(sqlQuery);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
@@ -56,9 +60,12 @@ namespace VISLogic.Models
         public List<Records> GetSharedRecord(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
             List<Records> lstOrg = null;
-            string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_ORg.AD_Org_ID, AD_ORg.value,AD_ORg.Name,AD_ORg.IsLegalEntity,AD_ORg.LegalEntityOrg,ad_sharerecordorg.isreadonly,AD_ORg.isSummary FROM AD_ORg 
-                                LEFT JOIN AD_ShareRecordOrg ON AD_ORg.AD_Org_ID=ad_sharerecordorg.ad_orgshared_id  AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + @"
-                                WHERE AD_ORg.ISACTIVE='Y' ORDER BY ad_sharerecordorg.created,AD_ORg.Name";
+            string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary FROM AD_Org AD_Org
+                                LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID + @"
+                                WHERE AD_Org.ISACTIVE='Y' ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
+
+            sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery, "AD_Org", true, false);
+
             DataSet ds = DB.ExecuteDataset(sqlQuery);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
