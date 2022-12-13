@@ -67,6 +67,8 @@ namespace VAdvantage.Model
         //export
         public List<AttachmentList> _exports = null;
 
+        public List<AttachmentList> _sharedRec = null;
+
         // current row
         private int _currentRow = 0;
 
@@ -78,7 +80,7 @@ namespace VAdvantage.Model
 
         private bool hasPanels = false;
 
-        
+
 
 
         /**	Logger			*/
@@ -2067,6 +2069,23 @@ namespace VAdvantage.Model
                         key = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]);
                         value = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i]["VADMS_WindowDocLink_ID"]);
                         _documents.Add(new AttachmentList() { ID = key, value = value });
+                    }
+
+                }
+            }
+
+            if (MRole.GetDefault(_vo.GetCtx()).IsShowSharedRecords())
+            {
+                sql = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Org_ID = " + _vo.GetCtx().GetAD_Org_ID() + " AND AD_Table_ID = " + _vo.AD_Table_ID;
+                ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    _sharedRec = new List<AttachmentList>();
+                    int key;
+                    for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        key = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]);
+                        _sharedRec.Add(new AttachmentList() { ID = key});
                     }
 
                 }

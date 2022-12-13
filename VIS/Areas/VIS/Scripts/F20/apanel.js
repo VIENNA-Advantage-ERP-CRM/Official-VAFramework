@@ -3314,7 +3314,7 @@
 
         if (this.isShowSharedRecord) {
             this.aSharedRecord.setEnabled(true);
-            this.aSharedRecord.setPressed(this.curTab.getIsLocked());
+            this.aSharedRecord.setPressed(this.curTab.hasShared());
         }
 
 
@@ -4137,7 +4137,14 @@
     };
 
     APanel.prototype.cmd_RecordShared = function () {
+
+        var self = this;
         var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curWindowNo);
+        atRecordShared.onClose = function () {
+            self.curTab.loadShared();
+            self.aSharedRecord.setPressed(self.curTab.hasShared());
+            self = null;
+        }
         atRecordShared.show();
     }
 
@@ -4384,18 +4391,7 @@
         this.aLock.setPressed(locked);
     };
 
-    APanel.prototype.cmd_sharedRec = function () {
-        if (!this.isShowSharedRecord) {
-            return;
-        }
-        var record_ID = this.curTab.getRecord_ID();
-        if (record_ID == -1 || record_ID < 0)	//	No Key
-        {
-            return;
-        }
-        alert("ha ha ha")
-    };
-
+ 
     APanel.prototype.cmd_recAccess = function () {
         var recAccessDialog = new VIS.RecordAccessDialog();
         recAccessDialog.Load(this.curTab.getAD_Table_ID(), this.curTab.getRecord_ID());

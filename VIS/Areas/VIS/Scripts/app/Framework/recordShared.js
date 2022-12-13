@@ -298,6 +298,7 @@
             ch.onClose = function () {
 
                 if (self.onClose) {
+                    self.onClose();
                     self.dispose();
                 }
             };
