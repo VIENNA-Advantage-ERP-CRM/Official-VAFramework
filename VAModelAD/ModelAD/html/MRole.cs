@@ -2251,6 +2251,7 @@ namespace VAdvantage.Model
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
                     //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
+                    if (IsShowSharedRecords())
                     {
                         // Get Shared record with organisation.
                         GetShareRecord(ref sql, tableName);
@@ -2790,9 +2791,13 @@ namespace VAdvantage.Model
 
         public void LoadSharedRecord(bool reload)
         {
-            if (!(reload || _sharedRecordAccess == null))
-                return;
             List<MRecordAccess> sharedRecordAccess = new List<MRecordAccess>();
+            if (!(reload || _sharedRecordAccess == null || IsShowSharedRecords()))
+            {
+                _sharedRecordAccess = sharedRecordAccess.ToArray();
+                return;
+            }
+
             string qry = "SELECT record_Id,IsReadOnly,AD_Table_ID FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID();
             //int recordID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
             DataSet ds = DB.ExecuteDataset(qry);

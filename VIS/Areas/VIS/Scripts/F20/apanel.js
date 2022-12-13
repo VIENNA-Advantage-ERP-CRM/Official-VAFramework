@@ -4425,18 +4425,7 @@
         this.aLock.setPressed(locked);
     };
 
-    APanel.prototype.cmd_sharedRec = function () {
-        if (!this.isShowSharedRecord) {
-            return;
-        }
-        var record_ID = this.curTab.getRecord_ID();
-        if (record_ID == -1 || record_ID < 0)	//	No Key
-        {
-            return;
-        }
-        alert("ha ha ha")
-    };
-
+ 
     APanel.prototype.cmd_recAccess = function () {
         var recAccessDialog = new VIS.RecordAccessDialog();
         recAccessDialog.Load(this.curTab.getAD_Table_ID(), this.curTab.getRecord_ID());
