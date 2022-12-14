@@ -49,6 +49,7 @@ namespace VAdvantage.Process
 
         String[] _ExceptionTables = new String[] { "AD_Role", "AD_User" };   //Stores tables which are not be included
 
+        List<string> _TableNameRecId = new List<string>();//VIS323:Stores _TableName and Recordid pair for check duplicate data
         // lock for simultaneous process
         private object _lock = new object();
 
@@ -448,6 +449,17 @@ namespace VAdvantage.Process
 
                                 for (int cols = 0; cols <= columns.Length - 1; cols++)
                                 {
+                                    //VIS323 Case for Column if it's Not active and VirtualColumn
+                                    if (!columns[cols].IsActive() || columns[cols].IsVirtualColumn())
+                                    {
+                                        continue;
+                                    }
+                                    //VIS323 Special Case for avoid duplicate records at the time of export
+                                    if (_TableNameRecId.Contains(currentTable.GetTableName() + "," + tmpDS.Tables[0].Rows[0][columns[cols].GetColumnName()].ToString()))
+                                    {
+                                        continue;
+                                    }
+                                    _TableNameRecId.Add(currentTable.GetTableName() + "," + tmpDS.Tables[0].Rows[0][columns[cols].GetColumnName()].ToString());
                                     string colName = columns[cols].GetColumnName();
                                     int refVID = columns[cols].GetAD_Reference_Value_ID();
                                     int refID = columns[cols].GetAD_Reference_ID();
@@ -637,10 +649,19 @@ namespace VAdvantage.Process
 
         string[] GetParentColumns(int _TableID)
         {
+            MTable objMTable = new MTable(GetCtx(), _TableID, null);
+            PO _po = MTable.GetPO(GetCtx(), objMTable.GetTableName(), 0, null);
             //string _Sql = "select columnname from AD_field_V where ad_table_id=" + _TableID + " and isparent='Y' order by isdisplayed desc, seqno";
             //string _Sql = "SELECT * FROM AD_Column WHERE AD_Table_ID=" + _TableID + " ORDER BY ColumnName";
             //return DB.ExecuteDataset(_Sql);
             string[] keyColumns = new MTable(GetCtx(), _TableID, null).GetKeyColumns();
+            //VIS323 Check for ID reference with no keyColumn
+            if (keyColumns.Length > 1 && _po.Get_ColumnIndex(objMTable.GetTableName() + "_ID") >= 0)
+            {
+                string[] pkColumn = new string[1];
+                pkColumn[0] = MTable.GetTableName(GetCtx(), _TableID) + "_ID";
+                return pkColumn;
+            }
             return keyColumns;
         }
 

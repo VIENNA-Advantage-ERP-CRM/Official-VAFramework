@@ -238,6 +238,7 @@ namespace VAdvantage.Model
                 return 0;
             }
 
+
             StringBuilder cols = new StringBuilder();
             //maintain list of display columns
             StringBuilder displayColumns = new StringBuilder();
@@ -247,6 +248,10 @@ namespace VAdvantage.Model
 
                 if (lstTableHasDisplayCol.Contains(baseTable.ToUpper()) && columns[i].ToString().ToUpper().Equals("NAME"))
                 {
+
+                    //Handle Case where User is not Inserted DisplayName for AD_Form, AD_Window and AD_ShortcutWindow Tables
+                    DB.ExecuteQuery("UPDATE " + baseTable + " SET DisplayName = Name WHERE DisplayName IS NULL");
+
                     // In case of Name we need to get value from DisplayName.
                     displayColumns.Append(",").Append("DisplayName");
                 }
