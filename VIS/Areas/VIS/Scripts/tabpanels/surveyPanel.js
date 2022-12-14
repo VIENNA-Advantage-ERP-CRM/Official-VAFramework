@@ -391,14 +391,16 @@
                     }
 
                     responseSection.find('.resStatus').text((1) + '/' + userResponse['U' + uID].length);
-                    responseSection.find('.submittedDate').text(userResponse['U' + uID][0].Created)
+                    responseSection.find('.submittedDate').text(userResponse['U' + uID][0].Created);
+                    var notLimitExpaire = true;
                     if (Limit > 0 && userResponse['U' + uID].length >= Limit) {
                         questionSection.hide();
                         $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_AlreadySubmittedResponse"));
                         $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+                        notLimitExpaire = false;
                     }
 
-                    if (userResponse['U' + uID].length > 0) {                       
+                    if (notLimitExpaire && userResponse['U' + uID].length > 0) {
                         questionSection.hide();
                         $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere + '</span>');
                             $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
