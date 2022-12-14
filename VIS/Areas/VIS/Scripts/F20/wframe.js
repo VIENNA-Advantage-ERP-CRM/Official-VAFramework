@@ -395,6 +395,7 @@
 
         VIS.AEnv.getGridWindow(windowNo, AD_Window_ID, function (json) {
             if (json.error != null) {
+                self.hasError = true;
                 VIS.ADialog.error(json.error);    //log error
                 self.dispose();
                 self = null;
