@@ -216,9 +216,11 @@
                                 '<div class="vis-tp-listWrap"> ';
                             for (var j = 0; j < SurveyData[i].Values.length; j++) {
                                 dsg += ' <div class="VIS_SI_' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' align-items-center d-flex mb-3 vis-tp-listItem"> ' +
-                                    ' <input class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '"';
+                                    ' <input  data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '"';
                                 if (SurveyData[i].Item.AnswerSelection == 'SL') {
-                                    dsg += ' class="group_' + SurveyData[i].Item.AD_SurveyItem_ID + '" ';
+                                    dsg += ' class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' group_' + SurveyData[i].Item.AD_SurveyItem_ID + '" ';
+                                } else {
+                                    dsg += 'class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + '"';
                                 }
                                 dsg += ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue=' + SurveyData[i].Values[j].AD_SurveyValue_ID + '  data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' value="' + SurveyData[i].Values[j].Answer + '" type="checkbox">' +
                                     ' <p>' + SurveyData[i].Values[j].Answer + '</p>' +
@@ -562,14 +564,11 @@
                 });
             });
 
-            questionSection.find('input[type="checkbox"]').off().click(function () {
-                if ($(this).attr('class')) {
+            questionSection.find('[class*=group_]').off().click(function () {               
                     if ($(this).next().attr('data-qtype') && $(this).next().attr('data-qtype') == 'CL') {
                         return;
-                    }
-                    singleChkBoxSelection(this, $(this).attr('class'));
                 }
-
+                singleChkBoxSelection(this, 'group_' + $(this).data('surveyitem'));
             });
 
             //Next Page
