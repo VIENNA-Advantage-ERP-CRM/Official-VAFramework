@@ -1285,8 +1285,8 @@
 
                                     }
                                     else {
-
-                                        alert(VIS.Msg.getMsg(info.result));
+                                        VIS.ADialog.error(info.result);
+                                        //alert(VIS.Msg.getMsg(info.result));
                                         aOK.data('clicked', 'N');
                                         $("#divfeedbsy")[0].style.visibility = "hidden";
                                     }
@@ -1295,8 +1295,8 @@
                         }
                     }
                     catch (e) {
-
-                        alert('FillManadatory');
+                        VIS.ADialog.error("FillMandatory", true, "");
+                        //alert('FillManadatory');
                         aOK.data('clicked', 'N');
                         $("#divfeedbsy")[0].style.visibility = "hidden";
                     }
