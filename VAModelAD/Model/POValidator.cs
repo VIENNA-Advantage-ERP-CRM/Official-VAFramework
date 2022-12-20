@@ -18,7 +18,9 @@ namespace VAModelAD.Model
     {
 
         //VIS323 Create record for ExportData 
-        private static List<string> _ExportCheckTableNames =null;
+        private static List<string> _ExportCheckTableNames = new List<string>() { "AD_ChangeLog", "AD_ExportData", "AD_Session",
+                                                                                  "AD_QueryLog", "AD_WindowLog","AD_PInstance_Para",
+                                                                                  "AD_PInstance" };
         private void RegisterPORecordList()
         {
             PORecord.AddParent(X_C_Order.Table_ID, X_C_Order.Table_Name);
@@ -478,18 +480,15 @@ namespace VAModelAD.Model
         /// <returns>list of Tables</returns>
         private static List<string> GetExportTableNames()
         {
-            if (_ExportCheckTableNames == null)
-            {
-                _ExportCheckTableNames = new List<string>();
-                string sql = @"SELECT Name FROM AD_Ref_List WHERE AD_Reference_ID=(SELECT AD_Reference_ID FROM AD_Reference
+            string sql = @"SELECT Name FROM AD_Ref_List WHERE AD_Reference_ID=(SELECT AD_Reference_ID FROM AD_Reference
                              WHERE Name='VA093_MarkingExcTables') AND IsActive='Y'";
-                DataSet ds = DB.ExecuteDataset(sql);
-                if (ds != null && ds.Tables[0].Rows.Count > 0)
+            DataSet ds = DB.ExecuteDataset(sql);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                    {
+                    if (!_ExportCheckTableNames.Contains(Util.GetValueOfString(ds.Tables[0].Rows[i]["Name"])))
                         _ExportCheckTableNames.Add(Util.GetValueOfString(ds.Tables[0].Rows[i]["Name"]));
-                    }
                 }
             }
             return _ExportCheckTableNames;
