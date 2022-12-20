@@ -1587,7 +1587,7 @@
                     //if (i === 0)
                     //    this.curTab = gTab;
                     if (query != null && query.list != null && query.list.length > 0) {
-                        if (gTab.getKeyColumnName().toUpperCase() == query.list[0].columnName.toUpperCase()) {
+                        if (query.list[0].columnName && gTab.getKeyColumnName().toUpperCase() == query.list[0].columnName.toUpperCase()) {
                             this.firstTabId = id;
                             gTab.setQuery(query);
                             this.curTab = gTab;
