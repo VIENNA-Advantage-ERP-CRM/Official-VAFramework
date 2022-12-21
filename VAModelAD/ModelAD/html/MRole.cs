@@ -2763,6 +2763,11 @@ namespace VAdvantage.Model
             }
         }
 
+
+        /// <summary>
+        /// Get List of records which are shared with login organization
+        /// </summary>
+        /// <param name="reload"></param>
         public void LoadSharedRecord(bool reload)
         {
             List<MRecordAccess> sharedRecordAccess = new List<MRecordAccess>();
