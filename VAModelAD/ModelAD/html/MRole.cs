@@ -2251,7 +2251,6 @@ namespace VAdvantage.Model
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
                     //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
-                    if (IsShowSharedRecords())
                     {
                         // Get Shared record with organisation.
                         GetShareRecord(ref sql, tableName);
