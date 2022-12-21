@@ -147,6 +147,7 @@
 
         /**
          * Prepare UI according to data
+         * At Top . SHOW ORGNIZATION with which record is shared
          * @param {any} list
          */
         function prepareList(list) {

@@ -2649,12 +2649,16 @@
         return this.hasKey(this.viewDocument, key);//return chatId
     };
 
+
+    /**
+     * Check if currect record is shared with other organization or not
+     * */
     GridTab.prototype.hasShared = function () {
 
         if (this.isDataLoading)
             return false;
         if (this.sharedRecords == null)
-            this.loadShared();//call load chat function
+            this.loadShared();//call load shared record function
         if (this.sharedRecords == null)
             return false;
         //get chat id
