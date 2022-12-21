@@ -1,4 +1,11 @@
-﻿; (function (VIS, $) {
+﻿/********************************************************
+ * Module Name    : Vienna Advantage Framework
+ * Purpose        : This class is used for record share with other organization
+ * Class Used     :
+ * Created By     : VIS0228
+ * Date           :  09-Nov-2022
+**********************************************************/
+; (function (VIS, $) {
 
     /**
      * Record Shared
