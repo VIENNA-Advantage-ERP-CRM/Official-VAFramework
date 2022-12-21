@@ -1,4 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿/********************************************************
+ * Module Name    : Vienna Advantage Framework
+ * Purpose        : Show Shared records indo
+ * Class Used     : RecordShared.js, recordShared.cs,
+ * Created By     : VIS0228
+ * Date           : 09-Nov-2022
+**********************************************************/
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;

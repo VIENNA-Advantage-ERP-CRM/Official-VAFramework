@@ -1,4 +1,11 @@
-﻿using System;
+﻿/********************************************************
+ * Module Name    : Vienna Advantage Framework
+ * Purpose        : This class is used for record share with other organization
+ * Class Used     : 
+ * Created By     : VIS0228
+ * Date           :  09-Nov-2022
+**********************************************************/
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,8 +19,8 @@ using VAdvantage.Model;
 namespace VISLogic.Models
 {
     /// <summary>
-    /// This class is used for record share with other organization
-    /// VIS0228 09-Nov-2022
+    /// 
+    /// 
     /// </summary>
     public class RecordShared
     {
