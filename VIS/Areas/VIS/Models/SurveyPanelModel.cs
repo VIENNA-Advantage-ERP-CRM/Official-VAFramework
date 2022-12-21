@@ -29,12 +29,12 @@ namespace VIS.Models
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
                                                   sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
                                                   s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limit,0) AS Limit,RS.isSelfshow,
-                                                  (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID+ " AND AD_Table_ID="+ AD_Table_ID + " AND Record_ID="+ AD_Record_ID + @") AS responseCount,
-                                                  (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID
+                                                  (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID+ " AND AD_Table_ID="+ AD_Table_ID + " AND Record_ID="+ AD_Record_ID + @") AS responseCount,
+                                                  (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID
                                                   FROM ad_surveyassignment sa INNER JOIN AD_Survey s ON 
                                                   s.ad_survey_ID= sa.ad_survey_id 
-                                                  LEFT JOIN AD_ResponseSetting RS ON (RS.ad_surveyassignment_ID=sa.ad_surveyassignment_ID)
-                                                  WHERE sa.IsActive='Y' AND sa.ad_tab_id=" + AD_Tab_ID + " AND sa.ad_window_id= " + AD_Window_ID+ " ORDER BY s.name");
+                                                  LEFT JOIN AD_ResponseSetting RS ON (RS.ad_surveyassignment_ID=sa.ad_surveyassignment_ID) AND RS.IsActive='Y'
+                                                  WHERE sa.IsActive='Y' AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql.ToString(), "sa", true, false), null);
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {                
@@ -208,13 +208,13 @@ namespace VIS.Models
         public bool CheckDocActionCheckListResponse(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int Record_ID, string DocAction, int AD_Table_ID)
         {
 
-            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_tab_id=" + AD_Tab_ID + " AND ad_window_id= " + AD_Window_ID;
+            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Table_ID=" + AD_Table_ID;
             if (DocAction != "RE")
             {
                 sql += " AND docaction='" + DocAction + "'";
             }
-            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
-            bool result = false;
+            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
+            bool result = true;
             //prepare where condition for filter
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {
@@ -243,7 +243,7 @@ namespace VIS.Models
                     {
                         if (DocAction != "RE")
                         {
-                            sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_window_id=" + AD_Window_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                            sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
                             int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
                             if (count > 0)
                             {
@@ -256,7 +256,7 @@ namespace VIS.Models
                         }
                         else
                         {
-                            sql = "UPDATE AD_SurveyResponse SET IsActive='N'  WHERE ad_window_id=" + AD_Window_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                            sql = "UPDATE AD_SurveyResponse SET IsActive='N'  WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
                             DB.ExecuteQuery(sql);
                             result = true;
                         }

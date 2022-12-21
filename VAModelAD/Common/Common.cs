@@ -1387,7 +1387,7 @@ namespace VAdvantage.Common
                             ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID
                             FROM  AD_Column                           
                             INNER JOIN ad_surveyshowcondition ON AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID
-                            WHERE ad_surveyshowcondition.AD_SurveyAssignment_ID="+ AD_SurveyAssignment_ID + " AND AD_Column.AD_Table_ID=" + AD_Table_ID + @"
+                            WHERE ad_surveyshowcondition.isActive='Y' AND  ad_surveyshowcondition.AD_SurveyAssignment_ID=" + AD_SurveyAssignment_ID + " AND AD_Column.AD_Table_ID=" + AD_Table_ID + @"
                             ORDER BY ad_surveyshowcondition.seqno";
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
 
@@ -1453,7 +1453,7 @@ namespace VAdvantage.Common
                     else
                     {
                         string andOR = " AND ";
-                        if (Util.GetValueOfString(dt["operation"]) == "O")
+                        if (Util.GetValueOfString(dt["andor"]) == "O")
                         {
                             andOR = " OR ";
                         }
@@ -1463,10 +1463,33 @@ namespace VAdvantage.Common
 
                     if (type == "Int32" || type == "Decimal" || type == "Boolean")
                     {
-                        WhereCondition += value;
+                        if (type == "Int32")
+                        {
+                            WhereCondition += Util.GetValueOfInt(value);
+                        }
+                        else if (type == "Decimal")
+                        {
+                            WhereCondition += Util.GetValueOfDecimal(value);
+                        }
+                        else
+                        {
+                            WhereCondition +="'"+ Util.GetValueOfString(value)+"'";
+                        }
+                        
                         if (Util.GetValueOfString(dt["operation"]) == "AB")
                         {
-                            WhereCondition += " AND " + columnName + " <" + Util.GetValueOfString(dt["Value2"]);
+                            WhereCondition += " AND " + columnName + " <";
+                            if (type == "Int32"){
+                                WhereCondition += Util.GetValueOfInt(dt["Value2"]);
+                            }else if(type == "Decimal")
+                            {
+                                WhereCondition += Util.GetValueOfDecimal(dt["Value2"]);
+                            }
+                            else
+                            {
+                                WhereCondition += Util.GetValueOfString(dt["Value2"]);
+                            }
+                            
                         }
                     }
                     else if (type == "String")
@@ -1489,7 +1512,7 @@ namespace VAdvantage.Common
 
                 string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID=" + AD_Table_ID));
 
-                sql = "SELECT COUNT(" + tableName + "_ID) FROM " + tableName + " WHERE " + tableName + "_ID=" + AD_Record_ID + " AND " + WhereCondition;
+                sql = "SELECT COUNT(" + tableName + "_ID) FROM " + tableName + " WHERE " + tableName + "_ID=" + AD_Record_ID + " AND (" + WhereCondition+")";
                 int count = Util.GetValueOfInt(DB.ExecuteScalar(MRole.GetDefault(ctx).AddAccessSQL(sql, tableName, true, false)));
                 if (count > 0)
                 {
@@ -1513,33 +1536,50 @@ namespace VAdvantage.Common
         /// <param name="Record_ID"></param>
         /// <param name="AD_Table_ID"></param>
         /// <returns></returns>
-        //public bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
-        //{
+        public static bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
+        {
 
-        //    string sql = "SELECT AD_ShowEverytime FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID + " AND ad_window_id= " + AD_Window_ID;
+            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
-        //    string ShowEverytime = Util.GetValueOfString(DB.ExecuteScalar(sql));
-        //    if (ShowEverytime == "N")
-        //    {
-        //        bool isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID);
-        //        if (!isvalidate)
-        //        {
-        //            return true;
-        //        }
-        //    }
+            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
+            bool result = false;
 
-        //    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_window_id=" + AD_Window_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-        //    int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
-        //    if (count > 0)
-        //    {
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //}
+            if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow dt in _dsDetails.Tables[0].Rows)
+                {
+                    bool isvalidate = false;
+                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    {
+                        isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
+                        if (isvalidate)
+                        {
+                            isvalidate = true;
+                        }
+                    }
 
+                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N" && !isvalidate)
+                    {
+                        continue;
+                    }
+                    int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
+                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                    int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+                    if (count > 0)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+
+                    break;
+                }
+            }
+
+            return result;
+        }
     }
 
 }

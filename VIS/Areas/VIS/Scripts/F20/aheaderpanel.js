@@ -79,7 +79,7 @@
                                 colValue = mField.getValue();
                         }
 
-                        if (!this.isChild) {
+                       // if (!this.isChild) {
                             if (iControl instanceof VIS.Controls.VButton) {
                                 //colValue = mField.getValue();
                                 setValue(colValue, iControl, mField);
@@ -147,12 +147,12 @@
                             else {
                                 setValue(colValue, iControl, mField);
                             }
-                        }
-                        else {
-                            if (iControl instanceof VIS.Controls.VKeyText || iControl instanceof VIS.Controls.VButton){
-                                setValue(colValue, iControl, mField);
-                            }
-                        }
+                       // }
+                        //else {
+                       //    if (iControl instanceof VIS.Controls.VSpan || iControl instanceof VIS.Controls.VKeyText || iControl instanceof VIS.Controls.VButton){
+                        //        setValue(colValue, iControl, mField);
+                        //    }
+                        //}
                     }
                 }
             }

@@ -395,6 +395,7 @@
 
         VIS.AEnv.getGridWindow(windowNo, AD_Window_ID, function (json) {
             if (json.error != null) {
+                self.hasError = true;
                 VIS.ADialog.error(json.error);    //log error
                 self.dispose();
                 self = null;
@@ -803,8 +804,21 @@
             var li = $("<li>");
             var d = $("<div></div>");
             var fired = true;
-           // li.on(VIS.Events.onClick, function (e) {
-            li.on("mousedown touchstrat", function (e) {
+            var mouseDown = false;
+            if (this.action == "Save") {
+               // Handle case if user direct click on save button 
+                li.on("mousedown touchstrat", function (e) {
+
+                    mouseDown = true;
+                    window.setTimeout(function (md) {
+                        if (mouseDown)
+                            li.trigger('click');
+                    }, 1000);
+                });
+            }
+
+            li.on(VIS.Events.onClick, function (e) {
+                mouseDown = false;
                 e.stopPropagation();
                 if (fired && that.onAction && that.isEnabled) {
                     if (that.toggle) {
@@ -848,26 +862,30 @@
         this.getListItmIT = function (listId) {
             if (this.$li)
                 return this.$li;
+          
+
+
             var li = $("<li>");
             var d = $("<div></div>");
             var fired = true;
-           // li.on(VIS.Events.onClick, function (e) {
-            li.on("mousedown touchstart", function (e) {
-                e.stopPropagation();
-                if (fired && that.onAction && that.isEnabled) {
-                    if (that.toggle) {
-                        that.setPressed(!that.pressed);
-                    }
-                    fired = false;
-                    d.css('background-color', 'red')
-                    setTimeout(function () {
-                        d.css('background-color', 'transparent');
-                        that.onAction(that.action);
-                        fired = true;
-                    }, 10);
+            //Handle special case for Save action 
+                li.on(VIS.Events.onClick, function (e) {
 
-                }
-            });
+                    e.stopPropagation();
+                    if (fired && that.onAction && that.isEnabled) {
+                        if (that.toggle) {
+                            that.setPressed(!that.pressed);
+                        }
+                        fired = false;
+                        d.css('background-color', 'red')
+                        setTimeout(function () {
+                            d.css('background-color', 'transparent');
+                            that.onAction(that.action);
+                            fired = true;
+                        }, 10);
+
+                    }
+                });
 
 
             if (this.textOnly) {
