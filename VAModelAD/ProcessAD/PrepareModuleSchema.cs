@@ -578,9 +578,13 @@ namespace VAdvantage.Process
             string name;
             if (HasModulePrefix("Name", "AD_Window", "AD_WINDOW_ID =" + sAD_Window_ID, out name))
             {
+                int ad_image_ID = Util.GetValueOfInt(DataBase.DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_Window WHERE AD_Window_ID =" + sAD_Window_ID));
+                if (ad_image_ID > 0)
+                {
+                    CheckImage(ad_image_ID);
+                }
                 InsertIntoDBSchema(X_AD_Window.Table_ID, sAD_Window_ID, X_AD_Window.Table_Name, name, "AD_WINDOW_ID =" + sAD_Window_ID);
             }
-
 
             if (sAD_ModuleWindow_ID > 0)
             {
@@ -627,21 +631,23 @@ namespace VAdvantage.Process
 
                     if (sTable.GetAD_Window_ID() > 0 && sAD_Window_ID != sTable.GetAD_Window_ID())
                     {
-                        string name2;
-                        if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetAD_Window_ID(), out name2))
-                        {
-                            InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetAD_Window_ID(), X_AD_Window.Table_Name, name2, "AD_Window_ID =" + sTable.GetAD_Window_ID());
-                        }
+                        //string name2;
+                        //if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetAD_Window_ID(), out name2))
+                        //{
+                            GetWindow(sTable.GetAD_Window_ID(),0);
+                            //InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetAD_Window_ID(), X_AD_Window.Table_Name, name2, "AD_Window_ID =" + sTable.GetAD_Window_ID());
+                        //}
                     }
 
                     if (sTable.GetPO_Window_ID() > 0 && sAD_Window_ID != sTable.GetPO_Window_ID())
                     {
 
-                        string name3;
-                        if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetPO_Window_ID(), out name3))
-                        {
-                            InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetPO_Window_ID(), X_AD_Window.Table_Name, name3, "AD_Window_ID =" + sTable.GetPO_Window_ID());
-                        }
+                        //string name3;
+                        //if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetPO_Window_ID(), out name3))
+                        //{
+                        GetWindow(sTable.GetPO_Window_ID(), 0);
+                        // InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetPO_Window_ID(), X_AD_Window.Table_Name, name3, "AD_Window_ID =" + sTable.GetPO_Window_ID());
+                        //}
                     }
 
                     if (sTable.GetReferenced_Table_ID() > 0 && sTable.GetAD_Table_ID() != sTable.GetReferenced_Table_ID())
@@ -858,10 +864,11 @@ namespace VAdvantage.Process
 
             if (sField.GetZoomWindow_ID() > 0)
             {
-                if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sField.GetZoomWindow_ID(), out name))
-                {
-                    InsertIntoDBSchema(X_AD_Window.Table_ID, sField.GetZoomWindow_ID(), X_AD_Window.Table_Name, name, " AD_Window_ID = " + sField.GetZoomWindow_ID());
-                }
+                GetWindow(sField.GetZoomWindow_ID(),0);
+                //if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sField.GetZoomWindow_ID(), out name))
+                //{
+                //    InsertIntoDBSchema(X_AD_Window.Table_ID, sField.GetZoomWindow_ID(), X_AD_Window.Table_Name, name, " AD_Window_ID = " + sField.GetZoomWindow_ID());
+                //}
             }
             if (sField.GetAD_InfoWindow_ID() > 0)
             {
@@ -944,21 +951,22 @@ namespace VAdvantage.Process
 
                 if (sTable.GetAD_Window_ID() > 0)
                 {
-                    string name2;
-                    if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetAD_Window_ID(), out name2))
-                    {
-                        InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetAD_Window_ID(), X_AD_Window.Table_Name, name2, "AD_Window_ID =" + sTable.GetAD_Window_ID());
-                    }
+                    GetWindow(sTable.GetAD_Window_ID(), 0);
+                    //string name2;
+                    //if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetAD_Window_ID(), out name2))
+                    //{
+                    //    InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetAD_Window_ID(), X_AD_Window.Table_Name, name2, "AD_Window_ID =" + sTable.GetAD_Window_ID());
+                    //}
                 }
 
                 if (sTable.GetPO_Window_ID() > 0)
                 {
-
-                    string name3;
-                    if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetPO_Window_ID(), out name3))
-                    {
-                        InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetPO_Window_ID(), X_AD_Window.Table_Name, name3, "AD_Window_ID =" + sTable.GetPO_Window_ID());
-                    }
+                    GetWindow(sTable.GetPO_Window_ID(), 0);
+                    //string name3;
+                    //if (HasModulePrefix("Name", "AD_Window", "AD_Window_ID = " + sTable.GetPO_Window_ID(), out name3))
+                    //{
+                    //    InsertIntoDBSchema(X_AD_Window.Table_ID, sTable.GetPO_Window_ID(), X_AD_Window.Table_Name, name3, "AD_Window_ID =" + sTable.GetPO_Window_ID());
+                    //}
                 }
 
                 if (sTable.GetReferenced_Table_ID() > 0)

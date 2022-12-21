@@ -26,9 +26,14 @@
         var isSelfShow = true;
         var surveyTab = null;
         var $clickHere = ('<a href="javascript:;">' + VIS.Msg.getMsg("VIS_ClickHere")+'</a>');
-       
+        var bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+        var setBusy = function (isBusy) {
+            bsyDiv.css("display", isBusy ? 'block' : 'none');
+        };
+
         this.init = function () {
-            $root = $('<div></div>');
+            setBusy(false);
+            $root = $('<div></div>').append(bsyDiv);
 
             var tab = $('<div class="vis-surveyTab">'
                 + '<div class="vis-tabPrimary">'
@@ -52,10 +57,10 @@
                 + '</ul>'
                 + '<div class="tab-content">'
                 + '<div class="tab-pane fade show active" style="width:100%;" id="quesSec_' + self.windowNo + '">'  
-                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:57vh" id="quesMessage_' + self.windowNo +'"></div>'
-                + '<div style="height:57vh;overflow-y:auto !important;" id="ques_' + self.windowNo +'"></div>'
+                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:59vh" id="quesMessage_' + self.windowNo +'"></div>'
+                + '<div style="height:59vh;overflow-y:auto !important;" id="ques_' + self.windowNo +'"></div>'
                 + '</div>'
-                + '<div class="tab-pane fade mt-2" style="height:57vh;width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
+                + '<div class="tab-pane fade mt-2" style="height:59vh;width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
                 + '<div class="d-flex align-items-center justify-content-between mr-2 ml-2">'
                 + '<div class="d-flex align-items-center mr-1">' 
                 + '<span class="d-inline-block mr-1">' + VIS.Msg.getMsg("SelectUser")+'</span>'
@@ -85,25 +90,30 @@
             surveyTab = $root.find('#surveyTab_' + self.windowNo);
             questionSection = $root.find('#ques_' + self.windowNo);
             responseSection = $root.find('#resp_' + self.windowNo);
-           // panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
+            // panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
         };
 
         this.update = function (Record_ID) {
             questionSection.empty();
+            $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
             responseSection.find('.response').empty();
             IsMandatoryAll = false;
             pageSize = 0;
+            userResIdx = 0;
+            Limit = 0;
             panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
         }
             
         var panelDetails = function (AD_window_ID, AD_Tab_ID, root) {
             _AD_Window_ID = AD_window_ID;
             _AD_Tab_ID = AD_Tab_ID;
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetSurveyAssignments",
                 //async: false,
                 data: { AD_window_ID: AD_window_ID, AD_Tab_ID: AD_Tab_ID, AD_Table_ID: self.curTab.getAD_Table_ID(), AD_Record_ID: self.curTab.getRecord_ID()},
                 success: function (data) {
+                    setBusy(false);
                     var res = [];
                     res = JSON.parse(data);
                     if (res != null && res.length > 0) {
@@ -118,6 +128,7 @@
                     };
                 },
                 error: function (e) {
+                    setBusy(false);
                 }
             });
         };
@@ -141,11 +152,13 @@
          * @param {any} $root
          */
         function loadSurveyUI(AD_Survey_ID, SurveyType, root) {
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetSurveyItems",
                 //async: false,
                 data: { AD_Survey_ID: AD_Survey_ID },
                 success: function (data) {
+                    setBusy(false);
                     var res = [];
                     res = JSON.parse(data);
                     if (res != null) {
@@ -154,6 +167,7 @@
                     };
                 },
                 error: function (e) {
+                    setBusy(false);
                 }
             });
         };
@@ -175,7 +189,7 @@
                 if (SurveyData.length > 0) {
                     for (var i = 0; i < SurveyData.length; i++) {
                         dsg += '<li class="VIS_SI_' + SurveyData[i].Item.AD_SurveyItem_ID + ' align-items-center d-flex mb-3 pb-3 vis-tp-listItem">' +
-                            '<h6 class="mr-2 mb-0">' + (i + 1) + '.</h6><input class="VIS_Answ_' + self.windowNo + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' type= "checkbox" ><p class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-qtype="' + SurveyType + '" data-mandatory="' + SurveyData[i].Item.IsMandatory + '">' + SurveyData[i].Item.Question;
+                            '<h6 class="mr-2 mb-0" style="min-width:15px;text-algin:right">' + (i + 1) + '.</h6><input class="VIS_Answ_' + self.windowNo + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' type= "checkbox" ><p class="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-qtype="' + SurveyType + '" data-mandatory="' + SurveyData[i].Item.IsMandatory + '">' + SurveyData[i].Item.Question;
 
                         if (IsMandatoryAll || SurveyData[i].Item.IsMandatory == 'Y') {
                             dsg += '<sub style="color:red;font-size: 100%;bottom: unset;">*</sub>';
@@ -202,11 +216,13 @@
                                 '<div class="vis-tp-listWrap"> ';
                             for (var j = 0; j < SurveyData[i].Values.length; j++) {
                                 dsg += ' <div class="VIS_SI_' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' align-items-center d-flex mb-3 vis-tp-listItem"> ' +
-                                    ' <input class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + '" data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '"';
+                                    ' <input  data-id="VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + '"';
                                 if (SurveyData[i].Item.AnswerSelection == 'SL') {
-                                    dsg += ' class="group_' + SurveyData[i].Item.AD_SurveyItem_ID + '" ';
+                                    dsg += ' class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' group_' + SurveyData[i].Item.AD_SurveyItem_ID + '" ';
+                                } else {
+                                    dsg += ' class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + '"';
                                 }
-                                dsg += ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue=' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' value="' + SurveyData[i].Values[j].Answer + '" type="checkbox">' +
+                                dsg += ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue=' + SurveyData[i].Values[j].AD_SurveyValue_ID + '  data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' value="' + SurveyData[i].Values[j].Answer + '" type="checkbox">' +
                                     ' <p>' + SurveyData[i].Values[j].Answer + '</p>' +
                                     ' </div>';
                             }
@@ -238,7 +254,7 @@
                             }
                             dsg += '</h6 > ' +
                                 '<textarea class="VIS_Answ_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-id=VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + '  cols="30" rows="10" placeholder="Enter your text here"></textarea> ' +
-                                '<small class="mb-3">Max 200 letters</small> ' +
+                                /*'<small class="mb-3">Max 200 letters</small> ' +*/
                                 '</li > ';
                         }
                     }
@@ -279,7 +295,9 @@
                 //paging setup
                 if (pageSize > 0 && totalQues > pageSize) {
                     questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
-                } else if (ResponseCount > 0) {
+                }
+
+                if (ResponseCount > 0) {
                     questionSection.hide();
                     $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere+'</span>');
                     $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
@@ -306,6 +324,7 @@
         function loadAccessData(AD_Survey_ID) {
             userResponse = {};
             userResIdx = 0;
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/CheckResponseAccess",
                 //async: false,
@@ -320,8 +339,10 @@
                     IsSelfShow: isSelfShow
                 },
                 success: function (data) {
+                    setBusy(false);
                     var res = [];
                     res = JSON.parse(data);
+                    questionSection.css('height', '59vh');
                     if (res != null && res.length > 0) {
                         var count = 0;
                         //responseSection.show();
@@ -348,27 +369,38 @@
                             }
                         }
                     } else {
+                        questionSection.css('height', '64vh');
                         surveyTab.find('.respTab').hide();
                         surveyTab.find('.quesTab').hide();
                         return;
                     }
                     var uID = VIS.context.getAD_User_ID();
 
+                    if (!userResponse['U' + uID]) {
+                        responseSection.find('select option:selected').change();
+                        return;
+                    } 
+
                     AD_SurveyResponse_ID = userResponse['U' + uID][0].id;
-                    if (userResponse['U' + uID].length == 1) {
-                        responseSection.find('.next').attr('disabled', 'disabled');
+                    if (userResponse['U' + uID].length > 1) {
+                        responseSection.find('.next').removeAttr('disabled');
                         responseSection.find('.prev').attr('disabled','disabled');
                     } else {
                         responseSection.find('.prev').attr('disabled','disabled');
+                        responseSection.find('.next').attr('disabled','disabled');
                     }
 
                     responseSection.find('.resStatus').text((1) + '/' + userResponse['U' + uID].length);
-                    responseSection.find('.submittedDate').text(userResponse['U' + uID][0].Created)
+                    responseSection.find('.submittedDate').text(userResponse['U' + uID][0].Created);
+                    var notLimitExpaire = true;
                     if (Limit > 0 && userResponse['U' + uID].length >= Limit) {
                         questionSection.hide();
                         $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_AlreadySubmittedResponse"));
                         $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
-                    }else if (userResponse['U' + uID].length>0) {                       
+                        notLimitExpaire = false;
+                    }
+
+                    if (notLimitExpaire && userResponse['U' + uID].length > 0) {
                         questionSection.hide();
                         $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere + '</span>');
                             $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
@@ -381,11 +413,10 @@
                             });                       
                     }
 
-                    if (count > 0) {
-                        loadSurveyResponse(uID);
-                    }
+                    loadSurveyResponse(uID);                   
                 },
                 error: function (e) {
+                    setBusy(false);
                 }
             });
 
@@ -394,6 +425,7 @@
         function loadSurveyResponse(userID) {
             responseSection.find('input').prop('checked', false);
             responseSection.find('textarea').val('');
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetResponseList",
                 //async: false,
@@ -417,8 +449,10 @@
                             }
                         }
                     };
+                    setBusy(false);
                 },
                 error: function (e) {
+                    setBusy(false);
                 }
             });
         }
@@ -452,7 +486,10 @@
 
         function eventHandling() {
             // Save response
-            $btnSubmit.on("click", function (e) {
+            
+
+            $btnSubmit.off().on("click", function (e) {
+                setBusy(true);
                 var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
                 var asnwers = main.find('[class^=VIS_Answ_]'); //get all answer start VIS_Quest_
                 var questions = main.find('[class^=VIS_Quest_]'); // get all question start VIS_Quest_
@@ -478,6 +515,7 @@
                             }
                             if ((IsMandatoryAll || questions[i].dataset.mandatory=='Y') && required) {                                
                                 VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
+                                setBusy(false);
                                 return;
                             }
                         }
@@ -495,6 +533,7 @@
 
                         if ((IsMandatoryAll || questions[i].dataset.mandatory == 'Y') && required) {
                             VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
+                            setBusy(false);
                             return;
                         }
                     }
@@ -517,39 +556,39 @@
                         questionSection.find('input').prop('checked', false);
                         questionSection.find('textarea').val('');
                         toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
-                        loadAccessData(AD_Survey_ID);
+                        //loadAccessData(AD_Survey_ID);
+                        self.update();
+                        setBusy(false);
                     },
                     error: function (e) {
+                        setBusy(false);
                     }
                 });
             });
 
-            questionSection.find('input[type="checkbox"]').click(function () {
-                if ($(this).attr('class')) {
-                    if ($(this).next().attr('data-qtype') && $(this).next().attr('data-qtype') == 'CL') {
-                        return;
-                    }
-                    singleChkBoxSelection(this, $(this).attr('class'));
+            questionSection.find('[class*=group_]').off().click(function () {
+                if ($(this).next().attr('data-qtype') && $(this).next().attr('data-qtype') == 'CL') {
+                    return;
                 }
-
+                singleChkBoxSelection(this, 'group_' + $(this).data('surveyitem'));
             });
 
             //Next Page
-            questionSection.find('.next').click(function () {
+            questionSection.find('.next').off().click(function () {
                 var last = questionSection.find('.vis-tp-orderListWrap').children('li:visible:last');
                 last.nextAll(':lt(' + pageSize + ')').removeClass('hideQuestion');
                 last.next().prevAll().addClass('hideQuestion');
                 showHideSubmit();
             });
             // Previous Page
-            questionSection.find('.prev').click(function () {
+            questionSection.find('.prev').off().click(function () {
                 var first = questionSection.find('.vis-tp-orderListWrap').children('li:visible:first');
                 first.prevAll(':lt(' + pageSize + ')').removeClass('hideQuestion');
                 first.prev().nextAll().addClass('hideQuestion');
                 showHideSubmit();
             });
 
-            responseSection.find('select').change(function () {
+            responseSection.find('select').off().change(function () {
                 userResIdx = 0;              
                 var userID = responseSection.find('select option:selected').val();
                 AD_SurveyResponse_ID = userResponse['U' + userID][0].id;
@@ -565,7 +604,7 @@
                 loadSurveyResponse(userID);
             });
 
-            responseSection.find('.next').click(function () {
+            responseSection.find('.next').off().click(function () {
                 userResIdx++;
                 var userID = responseSection.find('select option:selected').val();
                 AD_SurveyResponse_ID = userResponse['U' + userID][userResIdx].id;
@@ -578,7 +617,7 @@
                 loadSurveyResponse(userID);
             });
 
-            responseSection.find('.prev').click(function () {
+            responseSection.find('.prev').off().click(function () {
                 userResIdx--;
                 var userID = responseSection.find('select option:selected').val();
                 AD_SurveyResponse_ID = userResponse['U' + userID][userResIdx].id;

@@ -155,7 +155,7 @@
             }
 
             var windw = showWindow(id); //form cache
-            if (windw) {
+            if (windw && !windw.hasError) {
                 windw.refreshData();
                 windw.show($mainConatiner, addShortcut);
                 registerView(windw);
