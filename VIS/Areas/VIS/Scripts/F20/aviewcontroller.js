@@ -1476,9 +1476,7 @@
         if (this.vHeaderPanel) {
             this.vHeaderPanel.navigate();
         }
-        else if (this.aPanel.vHeaderPanel) {
-            this.aPanel.vHeaderPanel.navigate(true);
-        }
+       
 
         if (recid == -1) {
             this.cancelSel = true;
@@ -1694,6 +1692,9 @@
         var col = e.getChangedColumn();
         if (this.vHeaderPanel) {
             this.vHeaderPanel.navigate();
+        }
+        else if (this.aPanel.vHeaderPanel) {
+            this.aPanel.vHeaderPanel.navigate(true);
         }
         if (!e.getIsChanged() || col < 0)
             return;

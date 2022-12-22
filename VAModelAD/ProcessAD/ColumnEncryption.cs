@@ -160,20 +160,32 @@ namespace VAdvantage.Process
                 }
             }
 
+            MTable table = new MTable(GetCtx(), column.GetAD_Table_ID(), Get_Trx());
+            string tableName = table.GetTableName();
+            string[] keyColumns = table.GetKeyColumns();
+            string keyCols = "";
 
             if (p_IsEncrypted == column.IsEncrypted() && !error)      // Done By Karan on 10-nov-2016, to encrypt/decrypt passwords according to settings.
             {
-                //object colID = DB.ExecuteScalar("SELECT AD_Column_ID FROM AD_Column WHERE AD_Table_ID =(SELECT AD_Table_ID From AD_Table WHERE TableName='AD_User') AND ColumnName='Password'", null, Get_Trx());
+                DataSet ds = null;
+                if (table.HasPKColumn())
+                {
+                    ds = DB.ExecuteDataset("SELECT " + column.GetColumnName() + "," + tableName
+                                                                    + "_ID FROM " + tableName, null, Get_Trx());
+                }
+                else
+                {
 
+                    if (keyColumns != null && keyColumns.Length > 0)
+                    {
+                        foreach (string col in keyColumns)
+                        {
+                            keyCols += " , " + col;
+                        }
+                    }
+                    ds = DB.ExecuteDataset($"SELECT {column.GetColumnName()}{keyCols} FROM {tableName}", null, Get_Trx());
+                }
 
-
-                // if (colID != null && colID != DBNull.Value && Convert.ToInt32(colID) == column.GetAD_Column_ID())
-                //{
-
-                string tableName = MTable.GetTableName(GetCtx(), column.GetAD_Table_ID());
-
-                DataSet ds = DB.ExecuteDataset("SELECT " + column.GetColumnName() + "," + tableName
-                                                                + "_ID FROM " + tableName, null, Get_Trx());
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
                     if (p_IsEncrypted)
@@ -183,29 +195,33 @@ namespace VAdvantage.Process
                             if (ds.Tables[0].Rows[i][column.GetColumnName()] != null && ds.Tables[0].Rows[i][column.GetColumnName()] != DBNull.Value
                                 && !SecureEngine.IsEncrypted(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()))
                             {
-                                //MUser user = new MUser(GetCtx(), Util.GetValueOfInt(ds.Tables[0].Rows[i][MTable.GetTableName(GetCtx(), column.GetAD_Table_ID()) + "_ID"]), Get_Trx());
-                                //user.SetPassword(SecureEngine.Encrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()));
 
                                 int encLength = SecureEngine.Encrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()).Length;
 
                                 if (encLength <= column.GetFieldLength())
                                 {
-                                    //PO tab = MTable.GetPO(GetCtx(), tableName,
-                                    //    Util.GetValueOfInt(ds.Tables[0].Rows[i][tableName + "_ID"]), Get_Trx());
 
-                                    //tab.Set_Value(column.GetColumnName(), (SecureEngine.Encrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString())));
-                                    //if (!tab.Save(Get_Trx()))
-                                    //{
-                                    //    Rollback();
-                                    //    return "Encryption=" + false;
-                                    //}
                                     string p_NewPassword = SecureEngine.Encrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString());
                                     String sql = "UPDATE " + tableName + " SET Updated=SYSDATE, UpdatedBy=" + GetAD_User_ID();
                                     if (!string.IsNullOrEmpty(p_NewPassword))
                                     {
                                         sql += ", " + column.GetColumnName() + "=" + GlobalVariable.TO_STRING(p_NewPassword);
                                     }
-                                    sql += " WHERE " + tableName + "_ID=" + Util.GetValueOfInt(ds.Tables[0].Rows[i][tableName + "_ID"]);
+
+                                    if (table.HasPKColumn())
+                                        sql += " WHERE " + tableName + "_ID=" + Util.GetValueOfInt(ds.Tables[0].Rows[i][tableName + "_ID"]);
+                                    else
+                                    {
+                                        sql += " WHERE ";
+                                        keyCols = "";
+                                        foreach (string col in keyColumns)
+                                        {
+                                            if (keyCols.Length > 1)
+                                                keyCols += " AND ";
+                                            keyCols += col + " = " + ds.Tables[0].Rows[i][col];
+                                        }
+                                        sql += keyCols;
+                                    }
                                     int iRes = DB.ExecuteQuery(sql, null, Get_Trx());
                                     if (iRes <= 0)
                                     {
@@ -228,17 +244,7 @@ namespace VAdvantage.Process
                             if (ds.Tables[0].Rows[i][column.GetColumnName()] != null && ds.Tables[0].Rows[i][column.GetColumnName()] != DBNull.Value
                                 && SecureEngine.IsEncrypted(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()))
                             {
-                                // MUser user = new MUser(GetCtx(), Util.GetValueOfInt(ds.Tables[0].Rows[i][MTable.GetTableName(GetCtx(), column.GetAD_Table_ID())+"_ID"]), Get_Trx());
 
-                                //PO tab = MTable.GetPO(GetCtx(), tableName,
-                                //   Util.GetValueOfInt(ds.Tables[0].Rows[i][tableName + "_ID"]), Get_Trx());
-
-                                //tab.Set_Value(column.GetColumnName(), (SecureEngine.Decrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString())));
-                                //if (!tab.Save(Get_Trx()))
-                                //{
-                                //    Rollback();
-                                //    return "Encryption=" + false;
-                                //}
 
                                 string p_NewPassword = SecureEngine.Decrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString());
                                 String sql = "UPDATE " + tableName + "  SET Updated=SYSDATE, UpdatedBy=" + GetAD_User_ID();
@@ -246,7 +252,20 @@ namespace VAdvantage.Process
                                 {
                                     sql += ", " + column.GetColumnName() + "=" + GlobalVariable.TO_STRING(p_NewPassword);
                                 }
-                                sql += " WHERE " + tableName + "_ID  =" + Util.GetValueOfInt(ds.Tables[0].Rows[i][tableName + "_ID"]);
+                                if (table.HasPKColumn())
+                                    sql += " WHERE " + tableName + "_ID=" + Util.GetValueOfInt(ds.Tables[0].Rows[i][tableName + "_ID"]);
+                                else
+                                {
+                                    sql += " WHERE ";
+                                    keyCols = "";
+                                    foreach (string col in keyColumns)
+                                    {
+                                        if (keyCols.Length > 1)
+                                            keyCols += " AND ";
+                                        keyCols += col + " = " + ds.Tables[0].Rows[i][col];
+                                    }
+                                    sql += keyCols;
+                                }
                                 int iRes = DB.ExecuteQuery(sql, null, Get_Trx());
                                 if (iRes <= 0)
                                 {

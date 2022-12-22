@@ -6491,12 +6491,22 @@
 
     VIS.Utility.inheritPrototype(VKeyText, IControl); //Inherit
 
-    VKeyText.prototype.setValue = function (newValue, isHTML) {
+    VKeyText.prototype.setValue = function (newValue, isHTML,records) {
         var validation = null;
         var validationData = [];
+       
         if (this.needtoParse) {
-            validationData = VIS.Env.parseContext2(VIS.context, this.windowNo, 0, this.colSql, false, true);
-            validation = VIS.Env.parseContext(VIS.context, this.windowNo, 0, this.colSql, false, true);
+            if (records && !$.isEmptyObject(records)) { // parse sql query with records 
+                validationData = VIS.Env.parseSQLFromRecords(this.colSql, records);
+                for (var i = 0; i < validationData.length > 0; i++) {
+                    this.colSql = this.colSql.replace('@'+validationData[i].Key+'@', validationData[i].Value);
+                }
+                validation = this.colSql;
+            } else {
+                validationData = VIS.Env.parseContext2(VIS.context, this.windowNo, 0, this.colSql, false, true);
+                validation = VIS.Env.parseContext(VIS.context, this.windowNo, 0, this.colSql, false, true);
+            }
+            
         }
         else {
             validation = this.colSql;
@@ -6579,6 +6589,7 @@
         }
     };
 
+    
 
     // VProgressBar
 
@@ -6762,5 +6773,6 @@
     VIS.Controls.VProductContainer = VProductContainer;
     VIS.Controls.VKeyText = VKeyText;
     VIS.Controls.VProgressBar = VProgressBar;
+    VIS.Controls.VSpan = VSpan;
     /* END */
 }(jQuery, VIS));

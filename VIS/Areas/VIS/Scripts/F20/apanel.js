@@ -518,6 +518,12 @@
                     this.aAttachFrom.setTextDirection("r");
                     $ulactionbar.append(this.aAttachFrom.getListItmIT());
                 }
+                //Added by Anil Kumar as Discussed with Vinay Bhatt
+                if (mWindow.getIsGenerateAttachmentCode()) {
+                    this.aGenerateAttachmentCode = this.addActions("GAC", null, false, false, false, onAction ); //1
+                    this.aGenerateAttachmentCode.setTextDirection("r");
+                    $ulactionbar.append(this.aGenerateAttachmentCode.getListItmIT());
+                }
             }
             if (mWindow.getIsMarkToExport()) {
                 this.aMarkToExport = this.addActions("MTE", null, false, false, false, onAction, true); //1
@@ -1581,7 +1587,7 @@
                     //if (i === 0)
                     //    this.curTab = gTab;
                     if (query != null && query.list != null && query.list.length > 0) {
-                        if (gTab.getKeyColumnName().toUpperCase() == query.list[0].columnName.toUpperCase()) {
+                        if (query.list[0].columnName && gTab.getKeyColumnName().toUpperCase() == query.list[0].columnName.toUpperCase()) {
                             this.firstTabId = id;
                             gTab.setQuery(query);
                             this.curTab = gTab;
@@ -2140,6 +2146,9 @@
             actionVADMSDocument(tis, action);
         }
         else if (tis.aAttachFrom && tis.aAttachFrom.getAction() === action) {
+            actionVADMSDocument(tis, action);
+        }
+        else if (tis.aGenerateAttachmentCode && tis.aGenerateAttachmentCode.getAction() === action) {
             actionVADMSDocument(tis, action);
         }
         else if (tis.aMarkToExport && tis.aMarkToExport.getAction() === action) {
@@ -2768,6 +2777,11 @@
             }
             else if (action == 'UDT') {
                 window.VADMS.uploaddocument(0, aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.$parentWindow.name, aPanel.curTab.getName());
+            }
+            else if (action == 'GAC') {
+                var wtrid = aPanel.curTab.getAD_Window_ID() + "," + aPanel.curTab.getAD_Table_ID() + "," + aPanel.curTab.getRecord_ID() + "," + aPanel.$parentWindow.name + "," + aPanel.curTab.getName();
+                VIS.context.setContext("VADMS_WinTableRecID", wtrid);
+                VIS.ADialog.info('VADMS_CodeSetIntoContext', true, "");
             }
         } else {
             VIS.ADialog.error('PleaseInstallDMSModule', true, "");

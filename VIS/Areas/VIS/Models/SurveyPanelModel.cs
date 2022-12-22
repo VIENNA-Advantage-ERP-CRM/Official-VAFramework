@@ -29,24 +29,30 @@ namespace VIS.Models
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
                                                   sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
                                                   s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limit,0) AS Limit,RS.isSelfshow,
-                                                  (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID+ " AND AD_Table_ID="+ AD_Table_ID + " AND Record_ID="+ AD_Record_ID + @") AS responseCount,
-                                                  (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID
+                                                  (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID+ " AND AD_Table_ID="+ AD_Table_ID + " AND Record_ID="+ AD_Record_ID + @") AS responseCount,
+                                                  (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID
                                                   FROM ad_surveyassignment sa INNER JOIN AD_Survey s ON 
                                                   s.ad_survey_ID= sa.ad_survey_id 
                                                   LEFT JOIN AD_ResponseSetting RS ON (RS.ad_surveyassignment_ID=sa.ad_surveyassignment_ID)
-                                                  WHERE sa.IsActive='Y' AND sa.ad_tab_id=" + AD_Tab_ID + " AND sa.ad_window_id= " + AD_Window_ID+ " ORDER BY s.name");
+                                                  WHERE sa.IsActive='Y' AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql.ToString(), "sa", true, false), null);
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {                
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
-                {                    
+                {
+                    bool isvalidate = false;
                     if (Util.GetValueOfString(dt["AD_ShowEverytime"])=="N")
                     {
-                        bool isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID);
-                        if (!isvalidate)
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
+                        if (isvalidate)
                         {
-                            break;
+                            isvalidate = true;
                         }
+                    }
+
+                    if(Util.GetValueOfString(dt["AD_ShowEverytime"])=="N" && !isvalidate)
+                    {
+                        continue;
                     }
                   
                     LsDetails.Add(new SurveyAssignmentsDetails
@@ -68,7 +74,8 @@ namespace VIS.Models
                         Limit = Util.GetValueOfInt(dt["Limit"]),
                         ResponseCount = Util.GetValueOfInt(dt["responseCount"]),
                         SurveyResponse_ID=Util.GetValueOfInt(dt["SurveyResponse_ID"])
-                    }); 
+                    });
+                    break;
                 }
             }
             return LsDetails;
@@ -198,50 +205,70 @@ namespace VIS.Models
         /// <param name="Record_ID"></param>
         /// <param name="DocAction"></param>
         /// <returns></returns>
-        public bool CheckDocActionCheckListResponse(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int Record_ID,string DocAction,int AD_Table_ID) {
+        public bool CheckDocActionCheckListResponse(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int Record_ID, string DocAction, int AD_Table_ID)
+        {
 
-            string sql = "SELECT AD_ShowEverytime FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_tab_id=" + AD_Tab_ID + " AND ad_window_id= " + AD_Window_ID;
-
-            string ShowEverytime = Util.GetValueOfString(DB.ExecuteScalar(sql));
-            if (ShowEverytime=="N")
+            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Table_ID=" + AD_Table_ID;
+            if (DocAction != "RE")
             {
-                bool isvalidate = Common.checkConditions(ctx, AD_Window_ID,  AD_Table_ID, Record_ID);
-                if (!isvalidate) {
-                    return true;
-                }
-            }
-
-            sql = "SELECT AD_Survey_ID FROM AD_SurveyAssignment WHERE ad_window_id=" + AD_Window_ID + " AND AD_TAb_ID=" + AD_Tab_ID;
-            if (DocAction != "RE") {
                 sql += " AND docaction='" + DocAction + "'";
             }
-            int AD_Survey_ID =Util.GetValueOfInt(DB.ExecuteScalar(sql));
-            if (AD_Survey_ID > 0)
+            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
+            bool result = true;
+            //prepare where condition for filter
+            if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {
-                if (DocAction != "RE")
+                foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
-                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_window_id=" + AD_Window_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
-                    if (count > 0)
+                    bool isvalidate = false;
+                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
                     {
-                        return true;
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
+                        if (isvalidate)
+                        {
+                            isvalidate = true;
+                        }
+                    }
+
+                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N" && !isvalidate)
+                    {
+                        continue;
+                    }
+
+                    // sql = "SELECT AD_Survey_ID FROM AD_SurveyAssignment WHERE ad_window_id=" + AD_Window_ID + " AND AD_TAb_ID=" + AD_Tab_ID;
+
+
+                    int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
+                    if (AD_Survey_ID > 0)
+                    {
+                        if (DocAction != "RE")
+                        {
+                            sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                            int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+                            if (count > 0)
+                            {
+                                result = true;
+                            }
+                            else
+                            {
+                                result = false;
+                            }
+                        }
+                        else
+                        {
+                            sql = "UPDATE AD_SurveyResponse SET IsActive='N'  WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                            DB.ExecuteQuery(sql);
+                            result = true;
+                        }
                     }
                     else
                     {
-                        return false;
+                        result = true;
                     }
-                }
-                else
-                {
-                    sql = "UPDATE AD_SurveyResponse SET IsActive='N'  WHERE ad_window_id=" + AD_Window_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    DB.ExecuteQuery(sql);
-                    return true;
+
                 }
             }
-            else
-            {
-                return true;
-            }
+            return result;
         }
 
         /// <summary>
@@ -281,7 +308,7 @@ namespace VIS.Models
                             ELSE SRL.AD_SurveyValue_ID
                             END AS Answer,
                             SRL.AD_SurveyValue_ID,SRL.AD_SurveyItem_ID,SI.AnswerType FROM AD_SurveyResponse SR
-            INNER JOIN AD_SurveyResponseLine  SRL ON SR.AD_SurveyResponse_ID=SRL.AD_SurveyResponse_ID
+            INNER JOIN AD_SurveyResponseLine SRL ON SR.AD_SurveyResponse_ID=SRL.AD_SurveyResponse_ID
             INNER JOIN AD_SurveyItem SI ON SI.AD_SurveyItem_ID=SRL.AD_SurveyItem_ID
             WHERE SR.AD_SurveyResponse_ID="+ AD_SurveyResponse_ID + " AND SR.ad_window_id=" + AD_Window_ID + " AND SR.AD_Table_ID=" + AD_Table_ID + " AND SR.Record_ID=" + AD_Record_ID + " AND SR.ad_user_id=" + AD_User_ID;
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "SR", true, false), null);

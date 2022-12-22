@@ -739,8 +739,39 @@ namespace VIS.Helpers
                     }
                 }
                 LobSave(whereClause);
-                StringBuilder refreshSQL = new StringBuilder(gTableIn.SelectSQL)
-                    .Append(" WHERE ").Append(whereClause);
+                List<string> lstColumns = gTableIn.Columns;
+                for (int i = 0; i < lstColumns.Count; i++)
+                {
+                    WindowField gField = m_fields.Where(a => a.ColumnName == lstColumns[i]).FirstOrDefault();
+                    if (gField != null && !string.IsNullOrEmpty(gField.ColumnSQL))
+                    {
+                        string selectSQL = GetColumnSQL(false, gField);
+
+                        if (selectSQL.IndexOf("@") == -1)
+                        {
+                            lstColumns[i] = selectSQL;   //	ColumnName or Virtual Column
+                        }
+                        else
+                        {
+                            lstColumns[i] = Env.ParseContext(ctx, gTableIn.WindowNo, selectSQL, false);
+                        }
+                    }
+                }
+
+                List<WindowField> imgColList = m_fields.Where(a => a.DisplayType == DisplayType.Image).ToList();
+
+                if (imgColList != null && imgColList.Count > 0)
+                {
+                    for (int j = 0; j < imgColList.Count; j++)
+                    {
+                        lstColumns.Add("(SELECT ImageURL||'?" + DateTime.Now.Ticks + "' from AD_Image img where img.AD_Image_ID=CAST(" + gTableIn.TableName + "." + imgColList[j].ColumnName + " AS INTEGER)) as imgUrlColumn" + imgColList[j].ColumnName);
+                    }
+                }
+
+                string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+
+                StringBuilder refreshSQL = new StringBuilder(SQL_Select)
+                    .Append(" FROM "+gTableIn.TableName).Append(" WHERE ").Append(whereClause);
                 drRef = DB.ExecuteReader(refreshSQL.ToString());
 
                 if (((System.Data.Common.DbDataReader)drRef).HasRows)

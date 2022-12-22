@@ -16,7 +16,7 @@ using VAdvantage.Utility;
 using VIS.Classes;
 using VIS.DataContracts;
 using VIS.Helpers;
-
+using VAdvantage.Logging;
 namespace VIS.Models
 {
     public class FormModel
@@ -25,6 +25,7 @@ namespace VIS.Models
 
         private const int WINDOW_INFO = 1113;
         private const int TAB_INFO = 1113;
+        private static VLogger log = VLogger.GetVLogger(typeof(FormModel).FullName);
         public FormModel(Ctx ctx)
         {
             _ctx = ctx;
@@ -1684,28 +1685,37 @@ namespace VIS.Models
 
         public string GetKeyText(List<LookUpData> data, int AD_HeaderItem_ID)
         {
-            if (AD_HeaderItem_ID > 0)
+            try
             {
-                string colSQL = Util.GetValueOfString(DB.ExecuteScalar("SELECT ColumnSql FROM AD_Gridlayoutitems WHERE AD_Gridlayoutitems_ID=" + AD_HeaderItem_ID));
-                if (!string.IsNullOrEmpty(colSQL))
+                if (AD_HeaderItem_ID > 0)
                 {
-                    if (data != null)
+                    string colSQL = Util.GetValueOfString(DB.ExecuteScalar("SELECT ColumnSql FROM AD_Gridlayoutitems WHERE AD_Gridlayoutitems_ID=" + AD_HeaderItem_ID));
+                    if (!string.IsNullOrEmpty(colSQL))
                     {
-                        if (data != null && data.Count > 0)
+                        if (data != null)
                         {
-                            for (int i = 0; i < data.Count; i++)
+                            if (data != null && data.Count > 0)
                             {
-                                if (data[i].Value != null)
-                                    colSQL = colSQL.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
-                                else
-                                    colSQL = colSQL.Replace("@" + data[i].Key + "@", Convert.ToString("NULL"));
+                                for (int i = 0; i < data.Count; i++)
+                                {
+                                    if (data[i].Value != null)
+                                        colSQL = colSQL.Replace("@" + data[i].Key + "@", Convert.ToString(data[i].Value));
+                                    else
+                                        colSQL = colSQL.Replace("@" + data[i].Key + "@", Convert.ToString("NULL"));
+                                }
                             }
                         }
+                        return Convert.ToString(DB.ExecuteScalar(colSQL));
                     }
-                    return Convert.ToString(DB.ExecuteScalar(colSQL));
                 }
+                return "";
             }
-            return "";
+            catch (Exception ex)
+            {
+                log.Warning("Error in FormModel: Catch Exception :" + ex.Message);
+                return "";
+            }
+
         }
     }
 
