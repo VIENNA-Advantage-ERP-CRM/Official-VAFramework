@@ -33,14 +33,14 @@ namespace VIS.Models
                             INNER JOIN C_Currency_Trl CL
                             ON (C.C_Currency_ID=CL.C_Currency_ID
                             AND CL.ad_language ='" + ctx.GetAD_Language() + "') ORDER BY 1";
-               // sqlCo = "SELECT C_Country_ID, Name FROM C_Country WHERE IsSummary='N' ORDER BY 1";
-                sqlCo=@"SELECT C.C_Country_ID, CL.Name
+                // sqlCo = "SELECT C_Country_ID, Name FROM C_Country WHERE IsSummary='N' ORDER BY 1";
+                sqlCo = @"SELECT C.C_Country_ID, CL.Name
                             FROM C_Country C
                             INNER JOIN C_Country_Trl CL
                             ON (C.C_Country_ID=CL.C_Country_ID
                             AND CL.ad_language ='" + ctx.GetAD_Language() + "') ORDER BY 1";
                 sqlRe = "SELECT C_Region_ID, Name FROM C_Region ORDER BY C_Country_ID, Name";
-                
+
             }
             InitialData ini = new InitialData();
             DataSet ds = DBase.DB.ExecuteDataset(sqlCu);
@@ -91,10 +91,23 @@ namespace VIS.Models
             TenantInfo tInfo = new TenantInfo();
             FileStream m_file = null;
 
+            string markingStatus = "";
+
             try
             {
+                if (Env.IsModuleInstalled("VA093_"))
+                {
+                    markingStatus = Util.GetValueOfString(DBase.DB.ExecuteScalar("SELECT Value FROM AD_SysConfig WHERE UPPER(Name) = UPPER('ENABLE_DATA_MARKING_ON_SAVE')", null, null));
+                    int count = Util.GetValueOfInt(DBase.DB.ExecuteQuery("UPDATE AD_SysConfig SET Value = 'N' WHERE UPPER(Name) = UPPER('ENABLE_DATA_MARKING_ON_SAVE')", null, null));
+                    if (count < 0 && tInfo.Log == null)
+                    {
+                        tInfo.Log = "Update error for Auto Data Marking";
+                        return tInfo;// retVal;
+                    }
+                }
+
                 tInfo.TenantName = clientName;
-               
+
                 //Functinality moved to FRPT
                 //if (string.IsNullOrEmpty(fileName))
                 //{
@@ -177,9 +190,9 @@ namespace VIS.Models
 
                 if (tInfo.Log == null)
                 {
-                    tInfo.Log =  retVal;
+                    tInfo.Log = retVal;
                 }
-               
+
                 //try
                 //{
                 //    if (m_file != null)
@@ -199,7 +212,17 @@ namespace VIS.Models
                 tInfo.Log = ex.Message;
 
             }
-
+            finally
+            {
+                if (markingStatus != "")
+                {
+                    int count = Util.GetValueOfInt(DBase.DB.ExecuteQuery("UPDATE AD_SysConfig SET Value = '" + markingStatus + "' WHERE UPPER(Name) = UPPER('ENABLE_DATA_MARKING_ON_SAVE')", null, null));
+                    if (count < 0 && tInfo.Log == null)
+                    {
+                        tInfo.Log = "Update error for Auto Data Marking";
+                    }
+                }
+            }
             return tInfo;// retVal;
 
 
@@ -296,13 +319,11 @@ namespace VIS.Models
             set;
         }
 
-
         public string AdminUser
         {
             get;
             set;
         }
-
 
         public string AdminUserPwd
         {
@@ -310,13 +331,11 @@ namespace VIS.Models
             set;
         }
 
-
         public string OrgUser
         {
             get;
             set;
         }
-
 
         public string OrgUserPwd
         {
