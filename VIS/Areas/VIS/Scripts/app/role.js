@@ -1001,6 +1001,11 @@ VIS.MRole.getIsPersonalLock = function () {
     return this.vo.IsPersonalLock;
 };
 
+VIS.MRole.getIsAutoDataMarking = function()
+{
+    return this.vo.IsAutoDataMarking;
+};
+
 VIS.MRole.getMaxQueryRecords = function () {
     return this.vo.MaxQueryRecords;//TODO
 };

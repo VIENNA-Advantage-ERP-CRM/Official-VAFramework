@@ -49,6 +49,7 @@ namespace VIS.Helpers
             r.IsShowAcct = role.IsShowAcct();
             r.IsDisableMenu = role.IsDisableMenu();
             r.HomePage = role.GetHomePage_ID();
+            r.IsAutoDataMarking = role.IsAutoDataMarking();
 
             /* Prepare Pre Setting of Table*/
 
@@ -100,6 +101,7 @@ namespace VIS.Helpers
         public bool IsShowAcct;
         public bool IsDisableMenu;
         public int HomePage;
+        public bool IsAutoDataMarking;
 
         public Dictionary<int, TableData> tableData = null;
 
