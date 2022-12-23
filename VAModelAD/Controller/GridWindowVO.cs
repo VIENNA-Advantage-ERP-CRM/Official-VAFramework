@@ -114,7 +114,7 @@ namespace VAdvantage.Controller
         public string ImageUrl = "";
         public bool IsCompositeView = true;
         public bool IsGenerateAttachmentCode = true;
-       
+
 
 
         public List<GridTabVO> GetTabs()
@@ -142,7 +142,7 @@ namespace VAdvantage.Controller
             GridWindowVO vo = new GridWindowVO(ctx, windowNo);
             vo.AD_Window_ID = AD_Window_ID;
             IDataReader dr = null;
-            
+
             //  Get Window_ID if required	- (used by HTML UI)
             if (vo.AD_Window_ID == 0 && AD_Menu_ID != 0)
             {
@@ -184,13 +184,13 @@ namespace VAdvantage.Controller
 
             int AD_Role_ID = vo.ctx.GetAD_Role_ID();
 
-            bool skipRole = ctx.GetContext("skipRole")=="Y";
+            bool skipRole = ctx.GetContext("skipRole") == "Y";
 
             StringBuilder sql01 = new StringBuilder("SELECT Name,Description,Help,WindowType, "
              + "AD_Color_ID,AD_Image_ID, IsReadWrite, WinHeight,WinWidth, "
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
-             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode ");
+             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
@@ -366,7 +366,6 @@ namespace VAdvantage.Controller
                                 vo.ImageUrl = vo.ImageUrl.Substring(vo.ImageUrl.LastIndexOf("/") + 1);
                             }
                             vo.IsCompositeView = dr[36].ToString() == "Y";
-                            vo.IsGenerateAttachmentCode = !("N".Equals(dr[37].ToString()));
                         }
                     }
                 }
@@ -399,9 +398,10 @@ namespace VAdvantage.Controller
                 return null;
             }
             //	Read Write
-            if (vo.IsReadWrite == null)
+            if (vo.IsReadWrite == null
+                || (vo.WindowType != VAdvantage.Model.X_AD_Window.WINDOWTYPE_Maintain && Model.MRole.GetDefault(ctx).IsAutoDataMarking()))
             {
-                VLogger.Get().SaveError("AccessTableNoView", "(found)");
+                VLogger.Get().SaveError("RoleCanViewMasterScreens", "");
                 return null;
             }
 
@@ -413,7 +413,7 @@ namespace VAdvantage.Controller
             return vo;
         }   //  create
 
-       
+
         /// <summary>
         ///Create Window Value Object
         /// </summary>
@@ -752,7 +752,7 @@ namespace VAdvantage.Controller
         /// <returns></returns>
         private static bool CreateTabs(GridWindowVO mWindowVO, int AD_UserDef_Win_ID)
         {
-            mWindowVO.Tabs = new List<GridTabVO>();           
+            mWindowVO.Tabs = new List<GridTabVO>();
             String sql = GridTabVO.GetSQL(mWindowVO.ctx, AD_UserDef_Win_ID);
             int TabNo = 0;
             IDataReader dr = null;
@@ -812,7 +812,7 @@ namespace VAdvantage.Controller
             mWindowVO.ctx.SetContext(mWindowVO.windowNo, "BaseTable_ID", mWindowVO.AD_Table_ID);
             return true;
         }
-     
+
         /**
          *  Set Context including contained elements
          *  @param newCtx context

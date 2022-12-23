@@ -611,6 +611,11 @@ namespace VAdvantage.Model
                 return false;
             }
             //	}
+            if (Is_ValueChanged("IsAutoDataMarking") && IsAutoDataMarking() && !Env.IsModuleInstalled("VA093"))
+            {
+                log.SaveWarning("VA093NotInstalledForAutoData", "");
+                return false;
+            }
 
             // JID_1585: Set "Use User Org Access" check to false in case of "Access All Orgs" check is true.
             if (IsAccessAllOrgs())
@@ -647,7 +652,7 @@ namespace VAdvantage.Model
             {
                 UpdateAccessRecords();
             }
-                // if user change setting of Check Document Action Access on Role window
+            // if user change setting of Check Document Action Access on Role window
             else if (Is_ValueChanged("CheckDocActionAccess"))
             {
                 AddDocActionAccess();
@@ -719,7 +724,7 @@ namespace VAdvantage.Model
                 + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
                 + "SELECT w.AD_Workflow_ID, " + roleClientOrgUser
                 + "FROM AD_Workflow w "
-                + "WHERE AccessLevel IN ";           
+                + "WHERE AccessLevel IN ";
 
 
             /**
@@ -788,7 +793,7 @@ namespace VAdvantage.Model
                 + " -  @AD_Form_ID@ #" + form
                 + " -  @AD_Workflow_ID@ #" + wf
                 + daAccess;
-                
+
         }
 
         /// <summary>
@@ -840,7 +845,7 @@ namespace VAdvantage.Model
 
         /// <summary>
         /// Check Process Access against role
-         /// </summary>
+        /// </summary>
         /// <param name="AD_Process_ID"></param>
         /// <returns></returns>
         public bool? GetProcessAccess(int AD_Process_ID)
@@ -2418,7 +2423,7 @@ namespace VAdvantage.Model
         /// <param name="isIncludeNull"></param>
         /// <returns></returns>
         private string GetDependentAccess(string whereColumnName,
-                    List<int> includes, List<int> excludes,bool isIncludeNull)
+                    List<int> includes, List<int> excludes, bool isIncludeNull)
         {
             if (includes.Count == 0 && excludes.Count == 0)
                 return "";
@@ -2456,7 +2461,7 @@ namespace VAdvantage.Model
                 where.Append(")");
             }
             if (isIncludeNull)
-                where.Append(" OR ").Append(whereColumnName).Append(" IS NULL ").Append( " ) ");
+                where.Append(" OR ").Append(whereColumnName).Append(" IS NULL ").Append(" ) ");
             log.Finest(where.ToString());
             return where.ToString();
         }	//	getDependent
@@ -2858,7 +2863,7 @@ namespace VAdvantage.Model
             //}
 
             // Check applied based on the Doc Action Access Checkbox to display options in the Doc Action Dialog
-            if(!IsCheckDocActionAccess())
+            if (!IsCheckDocActionAccess())
             {
                 return options;
             }
