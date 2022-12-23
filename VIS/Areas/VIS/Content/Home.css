@@ -469,8 +469,9 @@ html[dir="rtl"] .vis-welcomeScreenTabMenu li {
     overflow-y: auto;
 }
 
-.vis-workflowActivityContainer #workflowActivityData {
+.vis-workflowActivityContainer .divWorkflowActivity {
     overflow-y: auto;
+    padding-right: 5px;
 }
 
 

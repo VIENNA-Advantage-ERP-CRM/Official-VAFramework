@@ -3,7 +3,7 @@
 
     function surveyPanel() {
         this.record_ID = 0;
-        this.windowNo = 0;
+        this.windowNo = 99999;
         this.curTab = null;
         this.selectedRow = null;
         this.panelWidth;
@@ -14,6 +14,8 @@
         var responseSection = null;
         var _AD_Window_ID = 0;
         var _AD_Tab_ID = 0;
+        var _AD_Table_ID = 0;
+        var _AD_WF_Activity_ID = 0;
         var iFrame;
         var IsMandatoryAll = false;      
         var pageSize = 0;
@@ -94,24 +96,31 @@
         };
 
         this.update = function (Record_ID) {
+           
+            self.panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, this.curTab.getAD_Table_ID(), Record_ID, $root,0);
+        }
+            
+        this.panelDetails = function (AD_window_ID, AD_Tab_ID, AD_Table_ID, Record_ID, $root, AD_WF_Activity_ID) {
+            self.record_ID = Record_ID;
+            _AD_Window_ID = AD_window_ID;
+            _AD_Tab_ID = AD_Tab_ID;
+            _AD_Table_ID = AD_Table_ID;
+            _AD_WF_Activity_ID = AD_WF_Activity_ID;
             questionSection.empty();
+
             $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
             responseSection.find('.response').empty();
             IsMandatoryAll = false;
             pageSize = 0;
             userResIdx = 0;
             Limit = 0;
-            panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, $root);
-        }
-            
-        var panelDetails = function (AD_window_ID, AD_Tab_ID, root) {
-            _AD_Window_ID = AD_window_ID;
-            _AD_Tab_ID = AD_Tab_ID;
+
+
             setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetSurveyAssignments",
                 //async: false,
-                data: { AD_window_ID: AD_window_ID, AD_Tab_ID: AD_Tab_ID, AD_Table_ID: self.curTab.getAD_Table_ID(), AD_Record_ID: self.curTab.getRecord_ID()},
+                data: { AD_window_ID: AD_window_ID, AD_Tab_ID: AD_Tab_ID, AD_Table_ID: AD_Table_ID, AD_Record_ID: self.record_ID, AD_WF_Activity_ID: _AD_WF_Activity_ID},
                 success: function (data) {
                     setBusy(false);
                     var res = [];
@@ -124,7 +133,7 @@
                         ResponseCount = res[0].ResponseCount;
                         AD_SurveyAssignment_ID = res[0].SurveyAssignment_ID;
                         AD_SurveyResponse_ID = res[0].SurveyResponse_ID;
-                        loadSurveyUI(res[0].Survey_ID, res[0].SurveyType, root);                        
+                        loadSurveyUI(res[0].Survey_ID, res[0].SurveyType, $root);                        
                     };
                 },
                 error: function (e) {
@@ -267,8 +276,10 @@
                 '</div > ';
 
             $dsgn = $(dsg);
-            responseSection.find('.response').append($dsgn.clone(true).removeAttr('style'));
-            responseSection.find('input,textarea').attr('disabled', 'disabled');
+            if (_AD_WF_Activity_ID == 0) {
+                responseSection.find('.response').append($dsgn.clone(true).removeAttr('style'));
+                responseSection.find('input,textarea').attr('disabled', 'disabled');
+            }
             if (Limit > 0 && ResponseCount >= Limit) {
                 questionSection.hide();               
                 $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_AlreadySubmittedResponse"));                
@@ -316,8 +327,19 @@
             //if (!isSelfShow) {
                // responseSection.hide();
             //} 
-
-            loadAccessData(AD_Survey_ID);
+            if (_AD_WF_Activity_ID == 0) {
+                loadAccessData(AD_Survey_ID);
+            } else {
+                if (_AD_WF_Activity_ID == 0) {
+                    questionSection.css('height', '64vh');
+                } else {
+                    questionSection.css('height', '74vh');
+                }
+                surveyTab.find('.respTab').hide();
+                surveyTab.find('.quesTab').hide();
+                return;
+            }
+           
            
         };
 
@@ -335,7 +357,7 @@
                     AD_Role_ID: VIS.context.getAD_Role_ID(),
                     Record_ID: self.record_ID,
                     AD_window_ID: _AD_Window_ID,
-                    AD_Table_ID: self.curTab.getAD_Table_ID(),
+                    AD_Table_ID: _AD_Table_ID,
                     IsSelfShow: isSelfShow
                 },
                 success: function (data) {
@@ -369,7 +391,11 @@
                             }
                         }
                     } else {
-                        questionSection.css('height', '64vh');
+                        if (_AD_WF_Activity_ID == 0) {
+                            questionSection.css('height', '64vh');
+                        } else {
+                            questionSection.css('height', '74vh');
+                        }
                         surveyTab.find('.respTab').hide();
                         surveyTab.find('.quesTab').hide();
                         return;
@@ -411,9 +437,8 @@
                                 questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
                                 showHideSubmit();
                             });                       
-                    }
-
-                    loadSurveyResponse(uID);                   
+                    }                   
+                                 
                 },
                 error: function (e) {
                     setBusy(false);
@@ -431,7 +456,7 @@
                 //async: false,
                 data: {
                     AD_window_ID: _AD_Window_ID,
-                    AD_Table_ID: self.curTab.getAD_Table_ID(),
+                    AD_Table_ID: _AD_Table_ID,
                     Record_ID: self.record_ID,
                     AD_User_ID: userID,
                     AD_SurveyResponse_ID: AD_SurveyResponse_ID
@@ -550,15 +575,21 @@
                         "AD_Survey_ID": AD_Survey_ID,
                         "AD_Tab_ID": _AD_Tab_ID,
                         "Record_ID": self.record_ID,
-                        "AD_Table_ID": self.curTab.getAD_Table_ID()
+                        "AD_Table_ID": _AD_Table_ID,
+                        "AD_WF_Activity_ID": _AD_WF_Activity_ID
                     }),
                     success: function (data) {
                         questionSection.find('input').prop('checked', false);
                         questionSection.find('textarea').val('');
                         toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
-                        //loadAccessData(AD_Survey_ID);
-                        self.update();
+                        //loadAccessData(AD_Survey_ID);                        
+                        if (_AD_WF_Activity_ID == 0) {
+                            self.update(self.record_ID);
+                        } else {
+                            self.panelDetails(_AD_Window_ID, _AD_Tab_ID, _AD_Table_ID, self.record_ID, $root, _AD_WF_Activity_ID);
+                        }
                         setBusy(false);
+                        
                     },
                     error: function (e) {
                         setBusy(false);
@@ -663,7 +694,7 @@
         
         this.record_ID = recordID;
         this.selectedRow = selectedRow;
-        this.update();
+        this.update(recordID);
     };
 
     /**

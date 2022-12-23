@@ -1536,7 +1536,7 @@ namespace VAdvantage.Common
         /// <param name="Record_ID"></param>
         /// <param name="AD_Table_ID"></param>
         /// <returns></returns>
-        public static bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
+        public static bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID, int AD_WF_Activity_ID)
         {
 
             string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
@@ -1563,7 +1563,12 @@ namespace VAdvantage.Common
                         continue;
                     }
                     int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
-                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+
+                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                    if(AD_WF_Activity_ID > 0)
+                    {
+                        sql += " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID;
+                    }
                     int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
                     if (count > 0)
                     {

@@ -17,11 +17,11 @@ namespace VIS.Controllers
         /// Getting Survey Details
         /// </summary>
         /// <returns>Survey Details Records</returns>
-        public JsonResult GetSurveyAssignments(string AD_window_ID, string AD_Tab_ID, int AD_Table_ID, int AD_Record_ID)
+        public JsonResult GetSurveyAssignments(string AD_window_ID, string AD_Tab_ID, int AD_Table_ID, int AD_Record_ID, int AD_WF_Activity_ID)
         {
             SurveyPanelModel obj = new SurveyPanelModel();
             Ctx ctx = Session["ctx"] as Ctx;
-            return Json(JsonConvert.SerializeObject(obj.GetSurveyAssignments(ctx, Util.GetValueOfInt(AD_window_ID), Util.GetValueOfInt(AD_Tab_ID),AD_Table_ID,AD_Record_ID)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(obj.GetSurveyAssignments(ctx, Util.GetValueOfInt(AD_window_ID), Util.GetValueOfInt(AD_Tab_ID),AD_Table_ID,AD_Record_ID, AD_WF_Activity_ID)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -40,11 +40,11 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="surveyResponseValue"></param>
         /// <returns></returns>
-        public JsonResult SaveSurveyResponse(List<SurveyResponseValue> surveyResponseValue, int AD_Window_ID, int AD_Survey_ID, int Record_ID, int AD_Table_ID)
+        public JsonResult SaveSurveyResponse(List<SurveyResponseValue> surveyResponseValue, int AD_Window_ID, int AD_Survey_ID, int Record_ID, int AD_Table_ID, int AD_WF_Activity_ID)
         {
             SurveyPanelModel obj = new SurveyPanelModel();
             Ctx ctx = Session["ctx"] as Ctx;
-            int result = obj.SaveSurveyResponse(ctx, surveyResponseValue, AD_Window_ID, AD_Survey_ID, Record_ID, AD_Table_ID);
+            int result = obj.SaveSurveyResponse(ctx, surveyResponseValue, AD_Window_ID, AD_Survey_ID, Record_ID, AD_Table_ID, AD_WF_Activity_ID);
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
 
