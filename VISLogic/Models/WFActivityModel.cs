@@ -615,6 +615,7 @@ OR
                 MWFNode node = new MWFNode(ctx, nodeID, null);
                 info.NodeAction = node.GetAction();
                 info.NodeName = node.GetName();
+                info.IsSurveyResponseRequired = node.IsSurveyResponseRequired();
                 if (MWFNode.ACTION_UserChoice.Equals(node.GetAction()))
                 {
                     MColumn col = node.GetColumn();
@@ -766,7 +767,7 @@ OR
                         if (node.IsSurveyResponseRequired())
                         {
                             // check any survey response exist
-                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID()))
+                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID(),Util.GetValueOfInt(activityID)))
                             {
                                 return "CheckListRequired";
                             }
@@ -1387,6 +1388,11 @@ OR
             get;
             set;
         }
+        public bool IsSurveyResponseRequired
+        {
+            get;
+            set;
+        }
 
     }
 
@@ -1396,7 +1402,7 @@ OR
         {
             get;
             set;
-        }
+        } 
         public List<NodeHistory> History
         {
             get;

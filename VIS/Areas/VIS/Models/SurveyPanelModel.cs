@@ -22,16 +22,24 @@ namespace VIS.Models
         /// <param name="AD_Table_ID"></param>
         /// <param name="AD_Record_ID"></param>
         /// <returns></returns>
-        public List<SurveyAssignmentsDetails> GetSurveyAssignments(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int AD_Table_ID,int AD_Record_ID)
+        public List<SurveyAssignmentsDetails> GetSurveyAssignments(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int AD_Table_ID,int AD_Record_ID, int AD_WF_Activity_ID)
         {
             SurveyAssignmentsDetails lst = new SurveyAssignmentsDetails();
             List<SurveyAssignmentsDetails> LsDetails = new List<SurveyAssignmentsDetails>();
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
                                                   sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
-                                                  s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limit,0) AS Limit,RS.isSelfshow,
-                                                  (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID+ " AND AD_Table_ID="+ AD_Table_ID + " AND Record_ID="+ AD_Record_ID + @") AS responseCount,
-                                                  (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID
-                                                  FROM ad_surveyassignment sa INNER JOIN AD_Survey s ON 
+                                                  s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limit,0) AS Limit,RS.isSelfshow,");
+            if (AD_WF_Activity_ID == 0)
+            {
+                sql.Append(@" (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @") AS responseCount,");
+            }
+            else
+            {
+                sql.Append(@" (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @") AS responseCount,");
+            }
+
+            sql.Append(@" (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID");
+            sql.Append(@" FROM ad_surveyassignment sa INNER JOIN AD_Survey s ON 
                                                   s.ad_survey_ID= sa.ad_survey_id 
                                                   LEFT JOIN AD_ResponseSetting RS ON (RS.ad_surveyassignment_ID=sa.ad_surveyassignment_ID) AND RS.IsActive='Y'
                                                   WHERE sa.IsActive='Y' AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
@@ -168,7 +176,7 @@ namespace VIS.Models
         /// Save Survey Response Value
         /// </summary>
         /// <param name="surveyResponseValue"></param>
-        public int SaveSurveyResponse(Ctx ctx, List<SurveyResponseValue> surveyResponseValue, int AD_Window_ID, int AD_Survey_ID, int Record_ID, int AD_Table_ID)
+        public int SaveSurveyResponse(Ctx ctx, List<SurveyResponseValue> surveyResponseValue, int AD_Window_ID, int AD_Survey_ID, int Record_ID, int AD_Table_ID, int AD_WF_Activity_ID)
         {
             MSurveyResponse SR = new MSurveyResponse(ctx, 0, null);
             SR.SetAD_Window_ID(AD_Window_ID);
@@ -176,6 +184,7 @@ namespace VIS.Models
             SR.SetRecord_ID(Record_ID);
             SR.SetAD_Table_ID(AD_Table_ID);
             SR.SetAD_User_ID(ctx.GetAD_User_ID());
+            SR.Set_ValueNoCheck("AD_WF_Activity_ID", AD_WF_Activity_ID);
             if (SR.Save())
             {
                 for (var i = 0; i < surveyResponseValue.Count; i++)
