@@ -2251,6 +2251,7 @@ namespace VAdvantage.Model
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
                     //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
+                    if (!string.IsNullOrEmpty(tableName))
                     {
                         // Get Shared record with organisation.
                         GetShareRecord(ref sql, tableName);
@@ -2739,25 +2740,24 @@ namespace VAdvantage.Model
         public void GetShareRecord(ref StringBuilder sql, string tableName)
         {
             string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(tableName);
-            //int recordID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
             DataSet ds = DB.ExecuteDataset(qry);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
-                sql.Append(" OR (");
-                string inCondition = "";
-                for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
-                {
-                    if (i == 999)
-                    {
-                        break;
-                    }
-                    inCondition += Util.GetValueOfString(ds.Tables[0].Rows[i]["record_Id"]);
-                    if (i != (ds.Tables[0].Rows.Count - 1))
-                    {
-                        inCondition += ",";
-                    }
-                }
-                sql.Append(tableName + "_ID IN (" + inCondition + "))");
+                    sql.Append(" OR (");
+                //    string inCondition = "";
+                //    for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
+                //    {
+                //        if (i == 999)
+                //        {
+                //            break;
+                //        }
+                //        inCondition += Util.GetValueOfString(ds.Tables[0].Rows[i]["record_Id"]);
+                //        if (i != (ds.Tables[0].Rows.Count - 1))
+                //        {
+                //            inCondition += ",";
+                //        }
+                //    }
+                    sql.Append(tableName + "_ID IN (" + qry + "))");
 
             }
         }
