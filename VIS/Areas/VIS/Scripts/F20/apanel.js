@@ -4173,7 +4173,8 @@
 
         }
 
-        var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo, this.curTab.linkValue, parentTableID);
+        var self = this;
+        var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo);
         atRecordShared.onClose = function () {
             self.curTab.loadShared();
             self.aSharedRecord.setPressed(self.curTab.hasShared());
