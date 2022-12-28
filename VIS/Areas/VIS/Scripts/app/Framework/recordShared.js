@@ -13,7 +13,7 @@
      * @param {any} table_id
      * @param {any} windowNo
      */
-    function RecordShared(record_id, table_id, windowNo) {
+    function RecordShared(record_id, table_id, tab_id,window_id, windowNo) {
         this.onClose = null;
         var ch = null;
         var self = this;
@@ -79,7 +79,7 @@
             + '</div>'
             + '<div>'
             + '<button class="vis-actionBtn mr-1" id="btnCancel_' + windowNo + '">' + VIS.Msg.getMsg('Cancel') + '</button>'
-            + '<button class="vis-actionBtn mr-2" id="btnOk_' + windowNo + '">' + VIS.Msg.getMsg('OK') + '</button>'
+            + '<button class="vis-actionBtn mr-2" disabled="" style="cursor:default;opacity:.5" id="btnOk_' + windowNo + '">' + VIS.Msg.getMsg('OK') + '</button>'
             + '</div>'
             + '</div>'
             + '</div>'
@@ -174,6 +174,7 @@
                     + '<td width="40px">';
                 if (list[i].AD_OrgShared_ID) {
                     row += '<input type="checkbox" checked class="chkOrgID" value="' + list[i].ID + '">';
+                    toogleOkBtn(true);
                 } else {
                     row += '<input type="checkbox" class="chkOrgID" value="' + list[i].ID + '">';
                 }
@@ -191,6 +192,16 @@
                     + '</tr>';
             }
             root.find('.tbList').append(row);
+            root.find('.tbList .chkOrgID').on("click", function () {
+                var checkedOrgs = root.find('.tbList .chkOrgID:checked');
+                if (checkedOrgs && checkedOrgs.length > 0) {
+                    toogleOkBtn(true);
+                }
+                else {
+                    toogleOkBtn(false);
+                }
+            });
+
         };
 
         /**
@@ -206,8 +217,18 @@
             }
         };
 
+        function toogleOkBtn(enable) {
+            if (enable) {
+                btnOk.css("opacity", "1").prop("disabled", "");
+            }
+            else {
+                btnOk.css("opacity", "0.5").prop("disabled", "true");
+            }
+        };
+
         function events() {
 
+           
             txtSummaryOrg.keyup(function () {
                 filterData();
             });
@@ -224,6 +245,10 @@
                 var isFalse = false;
                 if (this.checked) {
                     isFalse = true;
+                    toogleOkBtn(true);
+                }
+                else {
+                    toogleOkBtn(false);
                 }
                 root.find('.tbList .chkOrgID').each(function () {
                     this.checked = isFalse;
@@ -236,6 +261,9 @@
                 var saveObj = {
                     AD_Table_ID: table_id,
                     record_ID: record_id,
+                    Tab_ID: tab_id,
+                    Window_ID: window_id,
+                    WindowNo: windowNo,
                     list: []
                 }
 
@@ -260,6 +288,7 @@
                             txtSearchKey.val('');
                             txtSummaryOrg.val('');
                             ddlLegalEntities.val('A');
+                            ch.close();
                         } else {
                             msg.text(VIS.Msg.getMsg('RecordsNotSaved'));
                         }
