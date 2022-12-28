@@ -15,6 +15,8 @@ using VAdvantage.Utility;
 using VAdvantage.DataBase;
 using VAdvantage.ModelAD;
 using VAdvantage.Model;
+using VAdvantage.Controller;
+using VAdvantage.Classes;
 
 namespace VISLogic.Models
 {
@@ -35,7 +37,7 @@ namespace VISLogic.Models
             List<Organization> lstOrg = null;
             string sqlQuery = @"SELECT AD_Org_ID, value,Name,IsLegalEntity,LegalEntityOrg FROM AD_ORg WHERE ISACTIVE='Y' AND AD_ORg_ID NOT IN (SELECT AD_OrgShared_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + ") ORDER BY Name";
 
-            sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery,"AD_Org",true,false);
+            sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery, "AD_Org", true, false);
 
             DataSet ds = DB.ExecuteDataset(sqlQuery);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
@@ -102,14 +104,17 @@ namespace VISLogic.Models
         /// <param name="records"></param>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public string SaveRecord(int AD_Table_ID, int record_ID, List<Records> records, Ctx ctx)
+        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1)
         {
             string msg = "OK";
             Trx trx = null;
             bool error = false;
             try
             {
-                trx = Trx.GetTrx("ShareRecord" + DateTime.Now.Ticks);
+                if (trx1 == null)
+                    trx = Trx.GetTrx("ShareRecord" + DateTime.Now.Ticks);
+                else
+                    trx = trx1;
                 string query = "DELETE FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + record_ID;
                 DB.ExecuteQuery(query, null, trx);
                 if (records != null)
@@ -125,7 +130,57 @@ namespace VISLogic.Models
                         {
                             error = true;
                             break;
+                        }
 
+                        GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, Window_ID, 0);
+
+                        GridTabVO gt = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
+
+                        List<GridTabVO> gTabs = vo.GetTabs().Where(a => a.TabLevel > gt.TabLevel).ToList();
+
+
+                        if (gTabs != null && gTabs.Count > 0)
+                        {
+                            foreach (var tab in gTabs)
+                            {
+                                MTable table = MTable.Get(ctx, tab.AD_Table_ID);
+
+                                //int linkCol = tab.AD_Column_ID;
+                                //string lCol = "";
+                               // List<MColumn> cols = table.GetColumns(false).Where(a => a.IsParent() == true).ToList();
+                                DataSet ds = null;
+
+                                //if (linkCol > 0)
+                                //{
+                                //    lCol = MColumn.GetColumnName(ctx, tab.AD_Column_ID);
+                                //    PO pObj = MTable.GetPO(ctx, table.GetTableName(), record_ID, trx);
+                                //    //select C_Order_ID FROM C_orderTax where C_Order_ID=11123123
+                                //    ds = DB.ExecuteDataset($"SELECT  {lCol} FROM {table.GetTableName()} WHERE {lCol}={ pObj.Get_ValueAsInt(lCol)}");
+                                //}
+                                //else
+                                //{
+                                    //if (cols != null && cols.Count > 0)
+                                    //{
+                                    //    if (cols.Count == 1 && gt.TableName + "_ID" == cols[0].GetColumnName())
+                                    //    {
+                                            ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID FROM {table.GetTableName()} WHERE {gt.TableName}_ID = {record_ID}");
+                                        //}
+                                    //    else
+                                    //    {
+                                    //        PO pObj = MTable.GetPO(ctx, table.GetTableName(), record_ID, trx);
+                                    //        ds = DB.ExecuteDataset($"SELECT  {table.GetKeyColumns()[0]} FROM {table.GetTableName()} WHERE {cols[0].GetColumnName()} = {pObj.Get_ValueAsInt(cols[0].GetColumnName())} AND {cols[1].GetColumnName()} = {pObj.Get_ValueAsInt(cols[1].GetColumnName())}");
+                                    //    }
+                                    //}
+                                //}
+
+                                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                                {
+                                    for (int j = 0; j < ds.Tables[0].Rows.Count; j++)
+                                    {
+                                        SaveRecord(table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx);
+                                    }
+                                }
+                            }
                         }
 
                     }
@@ -146,10 +201,16 @@ namespace VISLogic.Models
                 }
                 else
                 {
-                    msg = "OK";
-                    trx.Commit();
+                    if (trx1 == null)
+                    {
+                        msg = "OK";
+                        trx.Commit();
+                    }
                 }
-                trx.Close();
+                if (trx1 == null)
+                {
+                    trx.Close();
+                }
             }
             return msg;
         }
