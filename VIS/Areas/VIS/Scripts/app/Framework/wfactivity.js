@@ -969,11 +969,12 @@
             // var li2 = $("<li>");
             // if  any checkbox is checked, then don't show summary in middle panel.
             if (selectedItems.length <= 1) {
-                var p2 = $("<pre>");
+                var p2 = $("<pre class='mb-2'>");
                 p2.css('margin-top', '10px');
                 p2.css('margin-bottom', '0px');
                 p2.css('font-size', '14px');
                 p2.css('font-family', 'NoirPro-Regular');
+                p2.css('color', 'inherit');
                 p2.append(VIS.Msg.getMsg('Summary'));
                 p2.append($("<br>"));
 
@@ -986,7 +987,7 @@
 
             divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            var hDesc = $("<h4>");
+            var hDesc = $("<p class='mb-0'>");
             hDesc.append(VIS.Msg.getMsg('Description'));
             divWorkflowActivity.append(hDesc);
             var pDesc = $("<p>");
@@ -995,7 +996,7 @@
 
             divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            var hHelp = $("<h4>");
+            var hHelp = $("<p class='mb-0'>");
             //hHelp.append($("<span class='vis-workflowActivityIcons vis-icon-help'>"))
             hHelp.append(VIS.Msg.getMsg('Help'));
             divWorkflowActivity.append(hHelp);
@@ -1017,8 +1018,6 @@
                 var ctrl = getControl(info, wfActivityID);
                 detailCtrl.AnswerCtrl = ctrl;
                 if (ctrl != null) {
-
-
                     if (ctrl.getBtnCount() > 0) {
                         var divFwd = $("<div class='vis-wforwardwrap'>");
                         divFwd.append(ctrl.getControl());
@@ -1241,9 +1240,8 @@
             }
             //  $("#divfeedbsy")[0].style.visibility = "hidden";
             $busyIndicator.hide();
-            btnCheckList.off().click(function () {
-                divWorkflowActivity.toggle('slow');
-                divWorkflowChecklist.toggle('slow');
+            btnCheckList.off().click(function () {              
+
                 divWorkflowChecklist.html('');
                 if ($(this).text() != "Back") {
                     $(this).text(VIS.Msg.getMsg('Back'));
@@ -1257,7 +1255,16 @@
                 } else {
                     divDetail.find(".vis-workflowActivityDetails-Heading h3").text(VIS.Msg.getMsg('Detail'));
                     $(this).text(VIS.Msg.getMsg('CheckList'));                   
-                }               
+                }   
+
+                divWorkflowActivity.toggle(700);
+
+                if (divWorkflowChecklist.is(":hidden")) {
+                    divWorkflowChecklist.show();
+                } else {
+                    divWorkflowChecklist.hide();
+                }
+                
 
             });
         };

@@ -1395,7 +1395,7 @@ namespace VAdvantage.Common
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {
                 string WhereCondition = "";
-
+                int idx = 0;
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     string type = "";
@@ -1446,8 +1446,9 @@ namespace VAdvantage.Common
                         oprtr = ">";
                     }
 
-                    if (Util.GetValueOfInt(dt["seqno"]) == 10)
+                    if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
                     {
+                        idx++;
                         WhereCondition += columnName + " " + oprtr;
                     }
                     else
@@ -1542,7 +1543,7 @@ namespace VAdvantage.Common
             string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
-            bool result = false;
+            bool result = true;
 
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {
