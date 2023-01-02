@@ -49,7 +49,7 @@
                 + '    >' + VIS.Msg.getMsg("VIS_Questions")+'</a>'
                 + '</li>'
                 + '<li class="nav-item text-center" >'
-                + '  <a style="diaplay:none"'
+                + '  <a style="display:none"'
                 + '    class="nav-link respTab"'
                 + '    id="profile-tab"'
                 + '    data-toggle="tab"'
@@ -107,7 +107,7 @@
             _AD_Table_ID = AD_Table_ID;
             _AD_WF_Activity_ID = AD_WF_Activity_ID;
             questionSection.empty();
-
+            $root.find('.vis-surveyTab .vis-primarySection').show();
             $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
             responseSection.find('.response').empty();
             IsMandatoryAll = false;
@@ -133,8 +133,14 @@
                         ResponseCount = res[0].ResponseCount;
                         AD_SurveyAssignment_ID = res[0].SurveyAssignment_ID;
                         AD_SurveyResponse_ID = res[0].SurveyResponse_ID;
-                        loadSurveyUI(res[0].Survey_ID, res[0].SurveyType, $root);                        
-                    };
+                        loadSurveyUI(res[0].Survey_ID, res[0].SurveyType, $root);
+                    } else {
+                        if (_AD_WF_Activity_ID > 0) {
+                            $root.find('.vis-surveyTab .vis-primarySection').hide();
+                            $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_NoCheckListFound"));
+                            $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+                        }
+                    }
                 },
                 error: function (e) {
                     setBusy(false);
