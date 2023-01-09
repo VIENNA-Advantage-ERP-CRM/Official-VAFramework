@@ -443,7 +443,11 @@
                                 questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
                                 showHideSubmit();
                             });                       
-                    }                   
+                    }   
+
+                    if (_AD_WF_Activity_ID == 0) {
+                        loadSurveyResponse(uID);
+                    }
                                  
                 },
                 error: function (e) {
