@@ -143,6 +143,7 @@ OR
                               (SELECT *
                               FROM AD_WF_Responsible r
                               WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND a.AD_User_ID = " + AD_User_ID + @" AND r.ResponsibleType = 'H'
                               AND (r.AD_User_ID           =" + AD_User_ID + @" 
                               OR a.AD_User_ID            IN
                                 (SELECT AD_User_ID
@@ -307,6 +308,7 @@ OR
                               (SELECT *
                               FROM AD_WF_Responsible r
                               WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND a.AD_User_ID = " + ctx.GetAD_User_ID() + @" AND r.ResponsibleType = 'H'
                               AND (r.AD_User_ID           =" + ctx.GetAD_User_ID() + @"
                               OR a.AD_User_ID            IN
                                 (SELECT AD_User_ID
