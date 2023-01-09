@@ -3344,7 +3344,7 @@
 
                     $ctrl.closest('td').nextAll().children('input,select,textarea,button').focus();
                     // change by mohit to refresh the grid if resfresh ui status sent true from info window.
-                    if (InfoWindow.constructor.name == "infoProduct" && InfoWindow.getRefreshStatus()) {
+                    if (InfoWindow.getRefreshStatus && InfoWindow.getRefreshStatus()) {
                         self.fireRefreshUI();
                     }
                     return;
