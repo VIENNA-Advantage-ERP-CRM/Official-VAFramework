@@ -611,7 +611,7 @@ namespace VAdvantage.Model
                 return false;
             }
             //	}
-            if (Is_ValueChanged("IsAutoDataMarking") && IsAutoDataMarking() && !Env.IsModuleInstalled("VA093"))
+            if (Is_ValueChanged("IsAutoDataMarking") && IsAutoDataMarking() && !Env.IsModuleInstalled("VA093_"))
             {
                 log.SaveWarning("VA093NotInstalledForAutoData", "");
                 return false;
