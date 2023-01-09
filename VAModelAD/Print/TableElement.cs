@@ -13,6 +13,7 @@ using VAdvantage.Logging;
 using System.Drawing;
 using System.Drawing.Printing;
 using PdfSharp.Drawing;
+using PdfUnicodeGlyphsResharper;
 
 namespace VAdvantage.Print
 {
@@ -1630,8 +1631,8 @@ namespace VAdvantage.Print
                                             }
                                             else
                                                 paint.Color = XColor.FromArgb(GetColor(row, col));
-
-                                            g2D.DrawString(iter.GetText(), drwFont, paint, penX, penY );
+                                            string arabicConversion = iter.GetText().FontGlyphsToPfd();
+                                            g2D.DrawString(arabicConversion, drwFont, paint, penX, penY );
                                         }
                                         else
                                             layout.Draw(g2D, (double)penX, (double)penY);										//	-> text

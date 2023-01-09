@@ -1438,7 +1438,7 @@ namespace VAdvantage.Common
                     }
                     else if (oprtr == "~~")
                     {
-                        oprtr = " BETWEEN ";
+                        oprtr = " LIKE ";
                         value = "%" + value + "%";
                     }
                     else if (oprtr == "AB")

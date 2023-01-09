@@ -298,6 +298,7 @@
     <Compile Include="Model\POValidator.cs" />
     <Compile Include="Print\AmtInWords_AR.cs" />
     <Compile Include="Print\AmtInWords_EN.cs" />
+    <Compile Include="Print\PdfExtention.cs" />
     <Compile Include="Print\AReport.cs" />
     <Compile Include="Print\BarcodeElement.cs" />
     <Compile Include="Print\BarcodeGenerator.cs" />
