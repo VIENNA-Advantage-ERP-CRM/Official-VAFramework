@@ -258,6 +258,8 @@ namespace VIS.Helpers
 
 
                         bool deleteRecord = false;
+                        int roleId = VAdvantage.Utility.Util.GetValueOfInt(drLogin[0]);
+                        deleteRecord = !usersRoles.Contains(roleId);
 
                         //Delete Login Setting 
                         if (deleteRecord)

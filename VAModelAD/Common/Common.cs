@@ -1428,6 +1428,14 @@ namespace VAdvantage.Common
                     {
                         oprtr = "=";
                     }
+                    else if (oprtr == "!=")
+                    {
+                        oprtr = "!=";
+                    } 
+                    else if (oprtr == "<=")
+                    {
+                        oprtr = "<=";
+                    } 
                     else if (oprtr == "<<")
                     {
                         oprtr = "<";
@@ -1435,6 +1443,10 @@ namespace VAdvantage.Common
                     else if (oprtr == ">>")
                     {
                         oprtr = ">";
+                    } 
+                    else if (oprtr == ">=")
+                    {
+                        oprtr = ">=";
                     }
                     else if (oprtr == "~~")
                     {
