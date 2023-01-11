@@ -272,6 +272,10 @@ namespace VIS.Classes
             if (aliasSubStr.IndexOf(".") > -1)
             {
                 aliasName = aliasSubStr.Substring(0, aliasSubStr.IndexOf("."));
+                if(aliasName.IndexOf(" AND ") > -1)
+                {
+                    aliasName = aliasName.Replace(" AND ", "");
+                }
             }
              
 
