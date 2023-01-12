@@ -204,6 +204,7 @@ namespace VAModelAD.Model
                         return false;
                     }
                 }
+
             }
             if (success && newRecord)
                 InsertTreeNode(po);
@@ -285,6 +286,13 @@ namespace VAModelAD.Model
                         }
                     }
                 }
+            }
+
+            // && !_ExportCheckTableNames.Contains(po.GetTableName()
+            if (MRole.GetDefault(p_ctx).IsShowSharedRecords())
+            {
+                ShareRecordManager com = new ShareRecordManager();
+                com.ShareChild(p_ctx, po);
             }
             return success;
         }

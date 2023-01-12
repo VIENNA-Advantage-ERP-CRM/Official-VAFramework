@@ -714,6 +714,11 @@ namespace VAdvantage.Model
 
             //	Table, TableDir, ...
             String FKTableName = GetFKColumnName();
+
+            if (string.IsNullOrEmpty(FKTableName))
+                return null;
+
+
             if (FKTableName.EndsWith("_ID"))
                 FKTableName = FKTableName.Substring(0, FKTableName.Length - 3);
 
