@@ -3786,7 +3786,17 @@ field, fieldvalue {
 
 .vis-gridSingletable {
     border: 1px solid rgba(var(--v-c-on-secondary), 0.1);
-    height: 63.5vh;
+    height: 100%;
+}
+
+.vis-actionWindowWrapper {
+    height: 100%;
+}
+
+
+
+.vis-actionWishlistTable {
+    height: 100%;
 }
 
 .vis-headerTableWraper {
@@ -3918,7 +3928,7 @@ table.fixed-header thead tr {
     }
 
 .vis-gridtable {
-    /*height: 165px;*/
+    height: calc(100% - 70px);
 }
 
     .vis-gridtable tbody {
@@ -3996,6 +4006,7 @@ table.fixed-header thead tr {
     /*display:grid;
     grid-template-columns:repeat(2, 1fr);
     grid-gap:1.2rem;*/
+    height: calc(100% - 50px);
 }
 
 .hiddenRow {

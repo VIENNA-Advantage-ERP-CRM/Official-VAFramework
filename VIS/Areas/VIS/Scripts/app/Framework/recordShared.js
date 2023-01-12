@@ -13,11 +13,12 @@
      * @param {any} table_id
      * @param {any} windowNo
      */
-    function RecordShared(record_id, table_id, tab_id,window_id, windowNo) {
+    function RecordShared(record_id, table_id, tab_id, window_id, windowNo, linkColumnName) {
         this.onClose = null;
         var ch = null;
         var self = this;
         var orginalArr = [];
+        var sharedIDs = [];
 
         /**Main Root */
         var root = $('<div class="vis-actionWindowWrapper">'
@@ -174,6 +175,7 @@
                     + '<td width="40px">';
                 if (list[i].AD_OrgShared_ID) {
                     row += '<input type="checkbox" checked class="chkOrgID" value="' + list[i].ID + '">';
+                    sharedIDs.push(list[i].AD_OrgShared_ID);
                     toogleOkBtn(true);
                 } else {
                     row += '<input type="checkbox" class="chkOrgID" value="' + list[i].ID + '">';
@@ -198,7 +200,8 @@
                     toogleOkBtn(true);
                 }
                 else {
-                    toogleOkBtn(false);
+                    if (sharedIDs && sharedIDs.length == 0)
+                        toogleOkBtn(false);
                 }
             });
 
@@ -228,7 +231,7 @@
 
         function events() {
 
-           
+
             txtSummaryOrg.keyup(function () {
                 filterData();
             });
@@ -264,7 +267,8 @@
                     Tab_ID: tab_id,
                     Window_ID: window_id,
                     WindowNo: windowNo,
-                    list: []
+                    list: [],
+                    LinkColumn: linkColumnName
                 }
 
                 root.find('.tbList .chkOrgID:checked').each(function () {

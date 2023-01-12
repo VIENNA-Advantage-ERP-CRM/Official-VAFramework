@@ -561,7 +561,7 @@
                 $ulactionbar.append(this.aRecAccess.getListItmIT());
             }
 
-            if (this.isShowSharedRecord) {
+            if (this.isShowSharedRecord && mWindow.getWindowType()=='M') {
                 this.aSharedRecord = this.addActions(this.ACTION_NAME_SHAREDREC, null, true, false, false, onAction, true);
                 this.aSharedRecord.setTextDirection("r");
                 $ulactionbar.append(this.aSharedRecord.getListItmIT());
@@ -3312,7 +3312,7 @@
             this.aRecAccess.setEnabled(true);
         }
 
-        if (this.isShowSharedRecord) {
+        if (this.isShowSharedRecord && this.aSharedRecord) {
             this.aSharedRecord.setEnabled(true);
             this.aSharedRecord.setPressed(this.curTab.hasShared());
         }
@@ -4391,7 +4391,7 @@
         this.aLock.setPressed(locked);
     };
 
- 
+
     APanel.prototype.cmd_recAccess = function () {
         var recAccessDialog = new VIS.RecordAccessDialog();
         recAccessDialog.Load(this.curTab.getAD_Table_ID(), this.curTab.getRecord_ID());

@@ -269,6 +269,11 @@
         return this.vo.IsRecordShared;
     };
 
+    GridWindow.prototype.getWindowType = function () {
+        return this.vo.WindowType;
+    };
+    
+
 
     GridWindow.prototype.getIsCheckRequest = function () {
         return this.vo.IsCheckRequest;
@@ -2673,6 +2678,7 @@
         return this.hasKey(this.sharedRecords, key);//return chatId
     };
 
+  
     /// <summary>
     /// Returns true, if current row has a Subscribe
     /// </summary>
@@ -2707,7 +2713,7 @@
                 var key;
                 while (dr.read()) {
                     key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                    this.sharedRecords.push({ ID: key});
+                    this.sharedRecords.push({ ID: key });
                 }
 
                 dr = null;
@@ -2717,6 +2723,30 @@
             }
         }
     };
+
+    //GridTab.prototype.loadSharedWithCurrent = function () {
+    //    var sqlQry = "VIS_156";
+    //    var param = [];
+    //    param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
+    //    param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
+
+    //    var dr = null;
+    //    try {
+    //        this.sharedRecordsWithLoginOrg = [];
+
+    //        dr = executeReader(sqlQry, param);
+    //        var key;
+    //        while (dr.read()) {
+    //            key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
+    //            this.sharedRecordsWithLoginOrg.push({ ID: key });
+    //        }
+
+    //        dr = null;
+
+    //    }
+    //    catch (ex) {
+    //    }
+    //};
 
     //Lakhwinder
     GridTab.prototype.loadAttachments = function () {
@@ -2825,6 +2855,7 @@
         this._subscribe = this.gTab._subscribe;
         this.viewDocument = this.gTab._documents;
         this.sharedRecords = this.gTab._sharedRec;
+        //this.sharedRecordsWithLoginOrg = this.gTab._sharedWithLoginRec;
         //var tableIndex = {};
         //var ServerValues = {};
         //ServerValues.IsExportData = false;
@@ -3699,7 +3730,7 @@
             var field = this.gridFields[i];
             //selectSql = field.getColumnSQL(true);
             //if (selectSql.indexOf("@") == -1) {
-                // select.append(selectSql);	//	ColumnName or Virtual Column
+            // select.append(selectSql);	//	ColumnName or Virtual Column
             this.columns.push(field.getColumnName());
             //}
             //else {
@@ -3707,7 +3738,7 @@
             //    this.columns.push(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
             //}
 
-            
+
 
 
             //if (field.getDisplayType() == VIS.DisplayType.Image) {
@@ -3786,12 +3817,12 @@
             else    //  replace variables
             {
                 var wClause = VIS.Env.parseContext(this.ctx, gt._windowNo, _whereClause, false);
-                if ((!wClause || wClause.length == 0) && _whereClause.length>0)
-                    m_SQL_Where.append( "11=12" );
+                if ((!wClause || wClause.length == 0) && _whereClause.length > 0)
+                    m_SQL_Where.append("11=12");
                 else
                     m_SQL_Where.append(wClause);
             }
-                //
+            //
             if (_whereClause.toUpperCase().indexOf("=NULL") > 0) {
                 this.log.Severe("Invalid NULL - " + _tableName + "=" + _whereClause);
             }
@@ -3854,7 +3885,7 @@
         }
         //create _SQL and m_countSQL
         this.createSelectSql();
-        if (this.SQL == null || this.SQL.equals("") || !this.columns || this.columns.length==0) {
+        if (this.SQL == null || this.SQL.equals("") || !this.columns || this.columns.length == 0) {
             //log.Log(Level.SEVERE, "No SQL");
             return false;
         }
@@ -3980,7 +4011,7 @@
 
         });
 
-        
+
         return true;
 
 
@@ -4827,18 +4858,18 @@
         return rowDataDB;
     };
 
-/*
-  *	 get current row record
-  *  @param row current row index
-  *  @return row Object
-  */
+    /*
+      *	 get current row record
+      *  @param row current row index
+      *  @return row Object
+      */
 
-    GridTable.prototype.getRowFromDB = function (row,callback) {
+    GridTable.prototype.getRowFromDB = function (row, callback) {
         if (row < 0 || this.getRowCount() == 0 || this.inserting)
             return null;
 
         var rData = this.getRow(row);
-       
+
 
         //	Create SQL
         var where = this.getWhereClause(rData);
@@ -4896,7 +4927,7 @@
             console.log(e);
             sql = VIS.secureEngine.decrypt(sql);
             this.log.log(Level.SEVERE, sql, e);
-           // this.fireDataStatusEEvent("RefreshError", sql, true);
+            // this.fireDataStatusEEvent("RefreshError", sql, true);
             return null;
         }
         finally {
