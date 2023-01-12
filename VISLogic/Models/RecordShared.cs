@@ -128,19 +128,7 @@ namespace VISLogic.Models
         /// <returns></returns>
         public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID, int ParentTable_ID, ref int error, int ParentID = 0)
         {
-
-            GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, Window_ID, 0);
-
-            GridTabVO gt = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
-
-            return SaveRecords(vo.GetTabs(), AD_Table_ID, record_ID, AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx1, WindowParent_ID, ParentTable_ID, ref error, ParentID);
-
-        }
-
-        int curRecID = 0;
-        public string SaveRecords(List<GridTabVO> tabs, int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID, int ParentTable_ID, ref int error, int ParentID = 0)
-        {
-            string msg = " OK ";
+            string msg = "OK";
             Trx trx = null;
             //error = 0;
             int oldParentID = 0;
@@ -209,7 +197,11 @@ namespace VISLogic.Models
                             statussChanged = true;
                         SRO.SetIsReadOnly(records[i].isReadonly);
                         SRO.SetRecord_ID(record_ID);
+                        if (!string.IsNullOrEmpty(LinkColumn))
+                        {
+                            SRO.Set_ValueNoCheck("LinkColumnName", LinkColumn);
 
+                        }
                         if (ParentID > 0)
                         {
                             SRO.Set_ValueNoCheck("Parent_ID", ParentID);

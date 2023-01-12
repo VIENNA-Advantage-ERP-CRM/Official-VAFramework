@@ -2757,7 +2757,7 @@
                 var key;
                 while (dr.read()) {
                     key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                    this.sharedRecords.push({ ID: key});
+                    this.sharedRecords.push({ ID: key });
                 }
 
                 dr = null;

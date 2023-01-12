@@ -3750,6 +3750,274 @@ field, fieldvalue {
         color: rgba(var(--v-c-primary), 1);
     }
 
+
+
+/*Record Share*/
+
+
+.vis-actionFeilds {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+}
+
+.vis-actionBtn {
+    padding: 10px 12px;
+    background: rgba(var(--v-c-primary), 1);
+    color: rgba(var(--v-c-on-primary), 1) !important;
+    font-size: 14px;
+    border: 0px;
+    float: right;
+    border-radius: .25rem;
+    font-weight: 200;
+    /* font-family: helvetica; */
+    cursor: pointer;
+    margin-bottom: 0px !important;
+    /* text-align: center; */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 40px;
+}
+
+.vis-tableHeaderWishlist {
+    background-color: rgba(var(--v-c-on-secondary), 0.1);
+}
+
+.vis-gridSingletable {
+    border: 1px solid rgba(var(--v-c-on-secondary), 0.1);
+    height: 100%;
+}
+
+.vis-actionWindowWrapper {
+    height: 100%;
+}
+
+
+
+.vis-actionWishlistTable {
+    height: 100%;
+}
+
+.vis-headerTableWraper {
+    overflow-y: auto;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-right: 5px;
+}
+
+.vis-custTable {
+    width: 100%;
+}
+
+.vis-cusTableHeader th {
+    padding: 0.3rem;
+    border-top: 1px solid rgba(var(--v-c-secondary), 1);
+    border-bottom: 1px solid rgba(var(--v-c-on-secondary), 0.1) !important;
+    font-size: 0.85rem;
+    min-width: 1.5rem;
+    border-right: 1px solid rgba(var(--v-c-secondary), 1);
+    text-align: center;
+}
+
+    .vis-cusTableHeader th:last-child {
+        border-right: none;
+    }
+
+.vis-tableHeadingTtl {
+    font-weight: 600;
+}
+
+.vis-cusTableBodySection td {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.85rem;
+    min-width: 1.5rem;
+    text-align: center;
+}
+
+.vis-cusTableBodySection tr {
+    border-bottom: 1px solid rgba(var(--v-c-on-secondary), 0.1) !important;
+}
+
+    .vis-cusTableBodySection tr:first-child {
+        border-bottom: none;
+    }
+
+.vis-removeLine i {
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.table-fixed {
+    background-color: #fbfbfb;
+    width: 100%;
+}
+
+    .table-fixed tbody {
+        height: 200px;
+        overflow-y: auto;
+        width: 100%;
+    }
+
+    .table-fixed thead,
+    .table-fixed tbody,
+    .table-fixed tr,
+    .table-fixed td,
+    .table-fixed th {
+        display: block;
+    }
+
+        .table-fixed tbody td {
+            float: left;
+        }
+
+        .table-fixed thead tr th {
+            background-color: #159bd0;
+            border-color: #0881b1;
+            float: left;
+            color: #fff;
+        }
+
+.read_article {
+    text-align: center;
+}
+
+/*wrapper element so column padding doesn't affect fixed header background*/
+.scroll-window-wrapper {
+    position: relative;
+}
+/* element containing the table */
+.scroll-window {
+    height: 20rem;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+    .scroll-window table {
+        margin-bottom: 0;
+    }
+    /*fixed header background*/
+    .scroll-window:before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 2.5rem;
+        display: table;
+        z-index: 10;
+        background: rgba(170, 170, 170, 0.8);
+    }
+
+/*the actual fixed header*/
+table.fixed-header th div {
+    position: absolute;
+    margin-top: -0.5rem;
+    z-index: 11;
+    color: #333;
+}
+
+table.fixed-header thead tr {
+    height: 2.5rem;
+}
+
+.user-list {
+    width: 100%;
+}
+
+    .user-list td.text-right {
+        width: 16rem;
+    }
+
+.vis-gridtable {
+    height: calc(100% - 70px);
+}
+
+    .vis-gridtable tbody {
+        display: block;
+        height: 90%;
+        overflow-y: auto;
+        border-bottom: 1px solid rgba(var(--v-c-on-secondary), 0.1);
+    }
+
+.vis-gridTableBodySecondary tbody {
+    display: block;
+    max-height: 80px;
+    overflow-y: auto;
+}
+
+.vis-gridTableHeader th,
+.vis-gridTableHeader td {
+    margin: 0px;
+    padding: 8px;
+    border-right: 1px solid rgba(var(--v-c-on-secondary), 0.2);
+    border-top: 2px solid rgba(var(--v-c-on-secondary), 0.2);
+    border-bottom: 2px solid rgba(var(--v-c-on-secondary), 0.2);
+    color: rgba(0, 0, 0, 0.70);
+    background: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    /*text-align: center;*/
+}
+
+    .vis-gridTableHeader th:last-child {
+        border-right: unset !important;
+    }
+
+.vis-gridTableBody tr {
+    margin: 0px;
+    padding: 8px;
+    border-bottom: 1px solid rgba(var(--v-c-on-secondary), 0.1);
+    color: rgba(0, 0, 0, 0.70);
+    background: #fff;
+    font-size: 14px;
+    /*text-align: center;*/
+}
+
+.vis-gridTableBody td {
+    padding: 8px;
+    /*text-align: center;*/
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vis-gridtable thead,
+.vis-gridtable tbody tr {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.vis-gridtable thead {
+    position: relative;
+    background-color: rgba(var(--v-c-secondary), 0.5);
+}
+
+.vis-hiddenRow {
+    padding: 0 !important;
+    background: rgba(var(--v-c-secondary), 1);
+}
+
+.iconDelete {
+    cursor: pointer;
+}
+
+.vis-tableSection {
+    /*display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    grid-gap:1.2rem;*/
+    height: calc(100% - 50px);
+}
+
+.hiddenRow {
+}
+
+.vis-recordSharedbusy {
+    width: 100%;
+    height: 100%;
+    left: 0;
+}
+
 .vis-styledCheckbox {
     position: absolute;
     opacity: 0;
