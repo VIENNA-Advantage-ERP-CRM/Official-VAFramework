@@ -611,7 +611,38 @@ namespace VAdvantage.Model
             retValue = list.ToArray();
             return retValue;
         }   //	getKeyColumns
-            //	getKeyColumns
+
+        public String[] GetParentColumns()
+        {
+            List<String> list = new List<String>();
+            GetColumns(false);
+            for (int i = 0; i < m_columns.Length; i++)
+            {
+                MColumn column = m_columns[i];
+                if (column.IsParent())
+                    list.Add(column.GetColumnName());
+            }
+            String[] retValue;
+            retValue = list.ToArray();
+            return retValue;
+        }   //	
+            //	
+        public int[] GetParentColumnIDs()
+        {
+            List<int> list = new List<int>();
+            GetColumns(false);
+            for (int i = 0; i < m_columns.Length; i++)
+            {
+                MColumn column = m_columns[i];
+                if (column.IsParent())
+                    list.Add(column.GetAD_Column_ID());
+            }
+            int[] retValue;
+            retValue = list.ToArray();
+            return retValue;
+        }   //	getKeyColumns
+
+        //	getKeyColumns
 
 
 
