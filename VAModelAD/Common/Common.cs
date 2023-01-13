@@ -1461,7 +1461,18 @@ namespace VAdvantage.Common
                     if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
                     {
                         idx++;
-                        WhereCondition += columnName + " " + oprtr;
+                        if (type == "Int32" || type == "Decimal")
+                        {
+                            WhereCondition +="NVL("+columnName + ",0) " + oprtr;
+                        }
+                        else if (type == "DateTime")
+                        {
+                            WhereCondition += "CAST(" + columnName + " AS DATE) " + oprtr;
+                        }
+                        else
+                        {
+                            WhereCondition += "NVL(" + columnName + ",'') " + oprtr;
+                        }
                     }
                     else
                     {
@@ -1471,7 +1482,18 @@ namespace VAdvantage.Common
                             andOR = " OR ";
                         }
                         WhereCondition += andOR;
-                        WhereCondition += columnName + " " + oprtr;
+                        if (type == "Int32" || type == "Decimal")
+                        {
+                            WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
+                        }
+                        else if (type == "DateTime")
+                        {
+                            WhereCondition += "CAST(" + columnName + " AS Date) " + oprtr;
+                        }
+                        else
+                        {
+                            WhereCondition += "NVL(" + columnName + ",'') " + oprtr;
+                        }
                     }
 
                     if (type == "Int32" || type == "Decimal" || type == "Boolean")
@@ -1515,10 +1537,10 @@ namespace VAdvantage.Common
                     }
                     else if (type == "DateTime")
                     {
-                        WhereCondition += "TO_DATE(" + value + ")";
+                        WhereCondition += "CAST('" + value + "' AS DATE)";
                         if (Util.GetValueOfString(dt["operation"]) == "AB")
                         {
-                            WhereCondition += " AND " + columnName + " < TO_DATE(" + Util.GetValueOfString(dt["Value2"]) + ")";
+                            WhereCondition += " AND COST( " + columnName + " AS DATE) < CAST('" + Util.GetValueOfString(dt["Value2"]) + "' AS DATE)";
                         }
                     }
                 }
