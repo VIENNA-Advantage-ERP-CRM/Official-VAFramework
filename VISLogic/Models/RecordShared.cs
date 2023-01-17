@@ -126,7 +126,7 @@ namespace VISLogic.Models
         /// <param name="WindowParent_ID"> ParentID of current record fetched from window</param>
         /// <param name="ParentID">It is AD_RecordSharedOrg_ID</param>
         /// <returns></returns>
-        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID, int ParentTable_ID, ref int error, int ParentID = 0)
+        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, string LinkColumn, ref int error, int ParentID = 0)
         {
             string msg = "OK";
             Trx trx = null;
@@ -135,6 +135,8 @@ namespace VISLogic.Models
             string query = "";
             try
             {
+
+
                 if (trx1 == null)
                     trx = Trx.GetTrx("ShareRecord" + DateTime.Now.Ticks);
                 else
