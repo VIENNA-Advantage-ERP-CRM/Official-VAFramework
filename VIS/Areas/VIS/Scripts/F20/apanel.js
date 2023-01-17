@@ -3394,6 +3394,10 @@
                 this.aRecAccess.setEnabled(false);
             }
 
+            if (this.aSharedRecord) {
+                this.aSharedRecord.setEnabled(false);
+            }
+
             //if (this.aCall) {
             //    this.aCall.setEnabled(false);
             //}
