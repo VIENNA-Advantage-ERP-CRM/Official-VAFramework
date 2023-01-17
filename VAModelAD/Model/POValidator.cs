@@ -288,8 +288,8 @@ namespace VAModelAD.Model
                 }
             }
 
-            // && !_ExportCheckTableNames.Contains(po.GetTableName()
-            if (MRole.GetDefault(p_ctx).IsShowSharedRecords())
+            // MRole.GetDefault(p_ctx).IsShowSharedRecords()
+            if (!_ExportCheckTableNames.Contains(po.GetTableName()))
             {
                 ShareRecordManager com = new ShareRecordManager();
                 com.ShareChild(p_ctx, po);

@@ -106,15 +106,17 @@ namespace VISLogic.Models
         /// <param name="records"></param>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1,string LinkColumn, int ParentID = 0)
+        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, string LinkColumn, ref int error, int ParentID = 0)
         {
             string msg = "OK";
             Trx trx = null;
-            bool error = false;
+            //error = 0;
             int oldParentID = 0;
             string query = "";
             try
             {
+
+
                 if (trx1 == null)
                     trx = Trx.GetTrx("ShareRecord" + DateTime.Now.Ticks);
                 else
@@ -152,7 +154,7 @@ namespace VISLogic.Models
                         }
                         if (!SRO.Save())
                         {
-                            error = true;
+                            error = 1;
                             break;
                         }
                         if (ParentID == 0)
@@ -177,7 +179,7 @@ namespace VISLogic.Models
                             foreach (var tab in gTabs)
                             {
                                 MTable table = MTable.Get(ctx, tab.AD_Table_ID);
-                               // VAdvantage.Common.ShareRecordManager.AddParentChild(tab.AD_Table_ID, AD_Table_ID);
+                                // VAdvantage.Common.ShareRecordManager.AddParentChild(tab.AD_Table_ID, AD_Table_ID);
 
                                 int linkCol = tab.AD_Column_ID;
                                 string lCol = "";
@@ -208,17 +210,20 @@ namespace VISLogic.Models
                                         else
                                         {
                                             PO pObj = MTable.GetPO(ctx, table.GetTableName(), record_ID, trx);
-                                            for (int m = 0; m < cols.Count; m++)
+                                            if (pObj != null)
                                             {
-                                                MTable fkTable = MColumn.Get(ctx, cols[m].GetAD_Column_ID()).GetFKTable();
-                                                string fkColumnName = MColumn.Get(ctx, cols[m].GetAD_Column_ID()).GetFKColumnName();
-
-                                                int count = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT Count(*) FROM AD_ShareRecordOrg WHERE AD_Table_ID={fkTable.GetAD_Table_ID()} AND Record_ID={pObj.Get_ValueAsInt(fkColumnName)}"));
-                                                if (count > 0)
+                                                for (int m = 0; m < cols.Count; m++)
                                                 {
-                                                    ds = DB.ExecuteDataset($"SELECT  {table.GetKeyColumns()[0]} FROM {table.GetTableName()} WHERE {cols[m].GetColumnName()} = {pObj.Get_ValueAsInt(cols[m].GetColumnName())} ");
-                                                    if (ds != null && ds.Tables[0].Rows.Count > 0)
-                                                        break;
+                                                    MTable fkTable = MColumn.Get(ctx, cols[m].GetAD_Column_ID()).GetFKTable();
+                                                    string fkColumnName = MColumn.Get(ctx, cols[m].GetAD_Column_ID()).GetFKColumnName();
+
+                                                    int count = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT Count(*) FROM AD_ShareRecordOrg WHERE AD_Table_ID={fkTable.GetAD_Table_ID()} AND Record_ID={pObj.Get_ValueAsInt(fkColumnName)}"));
+                                                    if (count > 0)
+                                                    {
+                                                        ds = DB.ExecuteDataset($"SELECT  {table.GetKeyColumns()[0]} FROM {table.GetTableName()} WHERE {cols[m].GetColumnName()} = {pObj.Get_ValueAsInt(cols[m].GetColumnName())} ");
+                                                        if (ds != null && ds.Tables[0].Rows.Count > 0)
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -235,7 +240,7 @@ namespace VISLogic.Models
                                         sOrg.Readonly = records[i].isReadonly;
 
                                         VAdvantage.Common.ShareRecordManager.AddRecordToTable(tab.AD_Table_ID, sOrg);
-                                        SaveRecord(table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx, "",ParentID);
+                                        SaveRecord(table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx, "", ref error, ParentID);
                                     }
                                 }
                             }
@@ -247,12 +252,12 @@ namespace VISLogic.Models
             }
             catch (Exception e)
             {
-                error = true;
+                error = 1;
                 msg = e.Message;
             }
             finally
             {
-                if (error)
+                if (error == 1)
                 {
                     msg = "Fail";
                     if (trx1 == null)

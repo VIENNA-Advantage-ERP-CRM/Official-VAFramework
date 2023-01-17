@@ -837,6 +837,12 @@
         return this.gridTable.getKeyID(this.currentRow);
     };   //  getRecord_ID
 
+    //getDummyRecordID
+    GridTab.prototype.getDummyRecordID = function () {
+        return this.gridTable.getDummyRecordID(this.currentRow);
+
+
+    };   //  getRecord_ID
     /**
      *  Get Key ID of row
      *  @param  row row number
@@ -2668,7 +2674,8 @@
             return false;
         //get chat id
         var key = this.getRecord_ID();//ridTable.GetKeyID(CurrentRow);
-
+        if (key == -1)
+            key = this.getDummyRecordID();
 
         return this.hasKey(this.sharedRecords, key);//return chatId
     };
@@ -3502,6 +3509,19 @@
         }
         return -1;
     };	//	getKeyID
+
+    GridTable.prototype.getDummyRecordID = function (row) {
+        try {
+            var ii = this.getValueAt(row, this._tableName + "_ID");
+            if (ii == null || isNaN(ii))
+                return -1;
+            return ii;
+        }
+        catch (e) {
+            return -1;
+        }
+        return -1;
+    }
 
     GridTable.prototype.setKeyColumnName = function (keyName) {
         this.keyColumnName = keyName;
