@@ -80,7 +80,7 @@ namespace VISLogic.Models
 
             string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary, AD_ShareRecordOrg.AD_Org_ID AS OrgID FROM AD_Org AD_Org
                                 LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID + @"
-                                WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + ctx.GetAD_Org_ID() + ")  ";
+                                WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0,"+ctx.GetAD_Org_ID()+")  ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
 
 
             if (po.GetAD_Org_ID() != ctx.GetAD_Org_ID())
