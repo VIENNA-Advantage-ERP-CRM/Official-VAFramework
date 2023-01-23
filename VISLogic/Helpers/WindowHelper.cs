@@ -3768,6 +3768,26 @@ namespace VIS.Helpers
 
             SQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName + WhereClause;
 
+            if (ctxp.GetAD_Org_ID() > 0)
+            {
+                if (string.IsNullOrEmpty(WhereClause))
+                {
+                    SQL += " WHERE ";
+                }
+                else
+                {
+                    SQL += " AND ";
+                }
+
+                SQL += @" " + TableName + @"_ID NOT IN
+                (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID != " + ctxp.GetAD_Org_ID() +
+                " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0))";
+
+            }
+//            select C_BPartner_ID FROM C_BPartner where C_BPartner_ID NOT IN
+//(SELECT record_id FROM AD_ShareRecordOrg WHERE AD_Table_ID = 291 AND AD_OrgShared_ID != 12 AND
+//  record_ID IN(SELECT C_BPartner_ID FROM C_BPartner WHERE AD_Org_ID = 0))
+
             if (!String.IsNullOrEmpty(gt.OrderByClause))
             {
                 SQL += " ORDER BY " + gt.OrderByClause;
