@@ -1451,7 +1451,7 @@ namespace VAdvantage.Common
                     else if (oprtr == "~~")
                     {
                         oprtr = " LIKE ";
-                        value = "%" + value + "%";
+                        value = "'%" + value + "%'";
                     }
                     else if (oprtr == "AB")
                     {
@@ -1471,7 +1471,7 @@ namespace VAdvantage.Common
                         }
                         else
                         {
-                            WhereCondition += "NVL(" + columnName + ",'') " + oprtr;
+                            WhereCondition += "NVL(" + columnName + ",' ') " + oprtr;
                         }
                     }
                     else
@@ -1492,7 +1492,7 @@ namespace VAdvantage.Common
                         }
                         else
                         {
-                            WhereCondition += "NVL(" + columnName + ",'') " + oprtr;
+                            WhereCondition += "NVL(" + columnName + ",' ') " + oprtr;
                         }
                     }
 
@@ -1522,7 +1522,7 @@ namespace VAdvantage.Common
                             }
                             else
                             {
-                                WhereCondition += Util.GetValueOfString(dt["Value2"]);
+                                WhereCondition +="'"+ Util.GetValueOfString(dt["Value2"])+"'";
                             }
                             
                         }
