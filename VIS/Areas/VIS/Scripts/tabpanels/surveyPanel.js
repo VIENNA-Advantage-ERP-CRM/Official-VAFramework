@@ -678,7 +678,7 @@
             
         };
 
-        //Single selection of checkbox
+        //Single selection of checkbox.
         function singleChkBoxSelection(which, theClass) {
             var checkbox = questionSection[0].getElementsByClassName(theClass);
             for (var i = 0; i < checkbox.length; i++) {
