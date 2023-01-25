@@ -1,0 +1,66 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="C_TaxCategory" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="C_TaxCategory" msprop:SqlHash="-2143945150" msprop:BaseTable.0="C_TAXCATEGORY">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:BaseColumn="AD_CLIENT_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:BaseColumn="AD_ORG_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="C_TAXCATEGORY_ID" msprop:BaseColumn="C_TAXCATEGORY_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="COMMODITYCODE" msprop:BaseColumn="COMMODITYCODE" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="CREATED" msprop:BaseColumn="CREATED" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:BaseColumn="CREATEDBY" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:BaseColumn="DESCRIPTION" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:BaseColumn="ISACTIVE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDEFAULT" msprop:BaseColumn="ISDEFAULT" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:BaseColumn="NAME" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:BaseColumn="UPDATED" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:BaseColumn="UPDATEDBY" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:BaseColumn="EXPORT_ID" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="C_TAX_ID" msprop:BaseColumn="C_TAX_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="VATAX_GENERATELINES" msprop:BaseColumn="VATAX_GENERATELINES" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="VATAX_LOCATION" msprop:BaseColumn="VATAX_LOCATION" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="VATAX_PREFERENCE1" msprop:BaseColumn="VATAX_PREFERENCE1" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="VATAX_PREFERENCE2" msprop:BaseColumn="VATAX_PREFERENCE2" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="VATAX_PREFERENCE3" msprop:BaseColumn="VATAX_PREFERENCE3" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <C_TaxCategory>
+    <AD_CLIENT_ID>11</AD_CLIENT_ID>
+    <AD_ORG_ID>11</AD_ORG_ID>
+    <C_TAXCATEGORY_ID>1000351</C_TAXCATEGORY_ID>
+    <CREATED>2022-11-29T12:43:12+00:00</CREATED>
+    <CREATEDBY>101</CREATEDBY>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>GST 28 %</NAME>
+    <UPDATED>2022-11-29T12:43:12+00:00</UPDATED>
+    <UPDATEDBY>101</UPDATEDBY>
+    <EXPORT_ID>VA093_1000017</EXPORT_ID>
+    <C_TAX_ID>1000010</C_TAX_ID>
+    <VATAX_GENERATELINES>N</VATAX_GENERATELINES>
+  </C_TaxCategory>
+  <C_TaxCategory>
+    <AD_CLIENT_ID>11</AD_CLIENT_ID>
+    <AD_ORG_ID>11</AD_ORG_ID>
+    <C_TAXCATEGORY_ID>1000004</C_TAXCATEGORY_ID>
+    <CREATED>2012-03-01T12:05:02+00:00</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Value Added Tax</DESCRIPTION>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>N</ISDEFAULT>
+    <NAME>VAT</NAME>
+    <UPDATED>2012-11-23T06:47:28+00:00</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <EXPORT_ID>VIS_1000004</EXPORT_ID>
+    <C_TAX_ID>1000010</C_TAX_ID>
+  </C_TaxCategory>
+</NewDataSet>

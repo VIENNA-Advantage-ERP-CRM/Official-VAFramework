@@ -1,0 +1,77 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="C_Tax" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="C_Tax" msprop:SqlHash="1725739700" msprop:BaseTable.0="C_TAX">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:BaseColumn="AD_CLIENT_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:BaseColumn="AD_ORG_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="C_COUNTRY_ID" msprop:BaseColumn="C_COUNTRY_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="C_REGION_ID" msprop:BaseColumn="C_REGION_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="C_TAXCATEGORY_ID" msprop:BaseColumn="C_TAXCATEGORY_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="C_TAX_ID" msprop:BaseColumn="C_TAX_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATED" msprop:BaseColumn="CREATED" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:BaseColumn="CREATEDBY" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:BaseColumn="DESCRIPTION" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:BaseColumn="ISACTIVE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDEFAULT" msprop:BaseColumn="ISDEFAULT" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISDOCUMENTLEVEL" msprop:BaseColumn="ISDOCUMENTLEVEL" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSALESTAX" msprop:BaseColumn="ISSALESTAX" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISSUMMARY" msprop:BaseColumn="ISSUMMARY" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISTAXEXEMPT" msprop:BaseColumn="ISTAXEXEMPT" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:BaseColumn="NAME" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="PARENT_TAX_ID" msprop:BaseColumn="PARENT_TAX_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="RATE" msprop:BaseColumn="RATE" msprop:OraDbType="107" type="xs:decimal" minOccurs="0" />
+                <xs:element name="REQUIRESTAXCERTIFICATE" msprop:BaseColumn="REQUIRESTAXCERTIFICATE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="SOPOTYPE" msprop:BaseColumn="SOPOTYPE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="TAXINDICATOR" msprop:BaseColumn="TAXINDICATOR" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="TO_COUNTRY_ID" msprop:BaseColumn="TO_COUNTRY_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="TO_REGION_ID" msprop:BaseColumn="TO_REGION_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:BaseColumn="UPDATED" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:BaseColumn="UPDATEDBY" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="VALIDFROM" msprop:BaseColumn="VALIDFROM" msprop:OraDbType="106" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:BaseColumn="EXPORT_ID" msprop:OraDbType="119" type="xs:string" minOccurs="0" />
+                <xs:element name="ISINCOMETAX" msprop:BaseColumn="ISINCOMETAX" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="ISINCLUDEINCOST" msprop:BaseColumn="ISINCLUDEINCOST" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="SURCHARGETYPE" msprop:BaseColumn="SURCHARGETYPE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="SURCHARGE_TAX_ID" msprop:BaseColumn="SURCHARGE_TAX_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+                <xs:element name="ISSURCHARGE" msprop:BaseColumn="ISSURCHARGE" msprop:OraDbType="104" type="xs:string" minOccurs="0" />
+                <xs:element name="C_TAXEXEMPTREASON_ID" msprop:BaseColumn="C_TAXEXEMPTREASON_ID" msprop:OraDbType="113" type="xs:long" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <C_Tax>
+    <AD_CLIENT_ID>11</AD_CLIENT_ID>
+    <AD_ORG_ID>11</AD_ORG_ID>
+    <C_COUNTRY_ID>100</C_COUNTRY_ID>
+    <C_TAXCATEGORY_ID>1000004</C_TAXCATEGORY_ID>
+    <C_TAX_ID>1000010</C_TAX_ID>
+    <CREATED>2012-11-23T10:39:50+00:00</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>VAT 4%</DESCRIPTION>
+    <ISACTIVE>Y</ISACTIVE>
+    <ISDEFAULT>N</ISDEFAULT>
+    <ISDOCUMENTLEVEL>N</ISDOCUMENTLEVEL>
+    <ISSALESTAX>Y</ISSALESTAX>
+    <ISSUMMARY>N</ISSUMMARY>
+    <ISTAXEXEMPT>N</ISTAXEXEMPT>
+    <NAME>VAT @ 4%</NAME>
+    <RATE>4</RATE>
+    <REQUIRESTAXCERTIFICATE>N</REQUIRESTAXCERTIFICATE>
+    <SOPOTYPE>S</SOPOTYPE>
+    <UPDATED>2012-11-23T10:41:32+00:00</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDFROM>2002-01-01T00:00:00+00:00</VALIDFROM>
+    <EXPORT_ID>VIS_1000010</EXPORT_ID>
+    <ISINCOMETAX>N</ISINCOMETAX>
+    <ISINCLUDEINCOST>N</ISINCLUDEINCOST>
+    <ISSURCHARGE>N</ISSURCHARGE>
+  </C_Tax>
+</NewDataSet>

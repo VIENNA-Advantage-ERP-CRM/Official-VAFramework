@@ -1,0 +1,71 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="ExportTableSequence" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="ExportTableSequence">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RowNum" type="xs:string" minOccurs="0" />
+                <xs:element name="TableName" type="xs:string" minOccurs="0" />
+                <xs:element name="Record_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="AD_ColOne_ID" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <ExportTableSequence>
+    <RowNum>0</RowNum>
+    <TableName>C_TaxCategory</TableName>
+    <Record_ID>1000351</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>1</RowNum>
+    <TableName>C_Tax</TableName>
+    <Record_ID>1000010</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>2</RowNum>
+    <TableName>C_Country</TableName>
+    <Record_ID>100</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>3</RowNum>
+    <TableName>AD_Reference</TableName>
+    <Record_ID>106</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>4</RowNum>
+    <TableName>AD_Language</TableName>
+    <Record_ID>192</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>5</RowNum>
+    <TableName>C_TaxCategory</TableName>
+    <Record_ID>1000004</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>6</RowNum>
+    <TableName>AD_Ref_List</TableName>
+    <Record_ID>568</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>7</RowNum>
+    <TableName>AD_Ref_List</TableName>
+    <Record_ID>570</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>8</RowNum>
+    <TableName>AD_Ref_List</TableName>
+    <Record_ID>569</Record_ID>
+  </ExportTableSequence>
+  <ExportTableSequence>
+    <RowNum>9</RowNum>
+    <TableName>AD_Reference</TableName>
+    <Record_ID>287</Record_ID>
+  </ExportTableSequence>
+</NewDataSet>
