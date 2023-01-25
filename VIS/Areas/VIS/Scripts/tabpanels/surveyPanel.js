@@ -235,7 +235,9 @@
                                 if (SurveyData[i].Item.AnswerSelection == 'SL') {
                                     dsg += ' class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + ' group_' + SurveyData[i].Item.AD_SurveyItem_ID + '" ';
                                 } else {
+
                                     dsg += ' class="VIS_Answ_' + SurveyData[i].Values[j].AD_SurveyValue_ID + '"';
+
                                 }
                                 dsg += ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue=' + SurveyData[i].Values[j].AD_SurveyValue_ID + '  data-survey=' + SurveyData[i].Item.AD_Survey_ID + ' value="' + SurveyData[i].Values[j].Answer + '" type="checkbox">' +
                                     ' <p>' + SurveyData[i].Values[j].Answer + '</p>' +
@@ -607,9 +609,11 @@
                 });
             });
 
+
             questionSection.find('[class*=group_]').off().click(function () {
                 if ($(this).next().attr('data-qtype') && $(this).next().attr('data-qtype') == 'CL') {
                     return;
+
                 }
                 singleChkBoxSelection(this, 'group_' + $(this).data('surveyitem'));
             });
