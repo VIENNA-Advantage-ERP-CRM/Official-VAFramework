@@ -1,4 +1,4 @@
-﻿VIS = window.VIS || {};
+VIS = window.VIS || {};
 (function () {
 
     function surveyPanel() {

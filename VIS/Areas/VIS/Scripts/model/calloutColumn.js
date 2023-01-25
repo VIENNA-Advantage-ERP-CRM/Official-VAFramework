@@ -37,6 +37,36 @@
 
     };
 
+    calloutColumn.prototype.checkColumnLength = function (ctx, windowNo, mTab, mField, value, oldValue) {
+        if (this.isCalloutActive() || value == null || value == 0) {
+            return;
+        }
+
+        this.setCalloutActive(true);
+        if (value.length > 43) {
+            mField.setValue('');
+            VIS.ADialog.error('VIS_CheckColumnLength');
+        }
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
+    calloutColumn.prototype.checkTableLength = function (ctx, windowNo, mTab, mField, value, oldValue) {
+        if (this.isCalloutActive() || value == null || value == 0) {
+            return;
+        }
+
+        this.setCalloutActive(true);
+        if (value.length > 40) {
+            mField.setValue('');
+            VIS.ADialog.error('VIS_CheckTableLength');
+        }
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
     VIS.calloutColumn = calloutColumn;
 
     //*********** Callout check DocAction in table  Start ****
@@ -61,6 +91,6 @@
         return "";
     }
     VIS.CalloutCheckDocAction = CalloutCheckDocAction;
-     //**************Callout check DocAction in table End*************
+    //**************Callout check DocAction in table End*************
 
 })(VIS, jQuery);
