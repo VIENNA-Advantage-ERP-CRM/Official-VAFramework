@@ -2363,7 +2363,7 @@
                 grdRows[j] = row;
             }
 
-            if (!multiSelection && (multiValues.length > 0 || w2ui[grdname].getSelection().length > 0)) {
+            if (!multiSelection && (multiValues.length > 0 || (w2ui[grdname] && w2ui[grdname].getSelection().length > 0))) {
                 toggleOkBtn(true);
             }
 

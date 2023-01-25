@@ -520,7 +520,7 @@
                 }
                 //Added by Anil Kumar as Discussed with Vinay Bhatt
                 if (mWindow.getIsGenerateAttachmentCode()) {
-                    this.aGenerateAttachmentCode = this.addActions("GAC", null, false, false, false, onAction ); //1
+                    this.aGenerateAttachmentCode = this.addActions("CAC", null, false, false, false, onAction ); //1
                     this.aGenerateAttachmentCode.setTextDirection("r");
                     $ulactionbar.append(this.aGenerateAttachmentCode.getListItmIT());
                 }
@@ -1587,7 +1587,7 @@
                     //if (i === 0)
                     //    this.curTab = gTab;
                     if (query != null && query.list != null && query.list.length > 0) {
-                        if (gTab.getKeyColumnName().toUpperCase() == query.list[0].columnName.toUpperCase()) {
+                        if (query.list[0].columnName && gTab.getKeyColumnName().toUpperCase() == query.list[0].columnName.toUpperCase()) {
                             this.firstTabId = id;
                             gTab.setQuery(query);
                             this.curTab = gTab;
@@ -2778,8 +2778,8 @@
             else if (action == 'UDT') {
                 window.VADMS.uploaddocument(0, aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.$parentWindow.name, aPanel.curTab.getName());
             }
-            else if (action == 'GAC') {
-                var wtrid = aPanel.curTab.getAD_Window_ID() + "," + aPanel.curTab.getAD_Table_ID() + "," + aPanel.curTab.getRecord_ID() + "," + aPanel.$parentWindow.name + "," + aPanel.curTab.getName();
+            else if (action == 'CAC') {
+                var wtrid = aPanel.curTab.getAD_Window_ID() + "|" + aPanel.curTab.getAD_Table_ID() + "|" + aPanel.curTab.getRecord_ID() + "|" + aPanel.$parentWindow.name + "|" + aPanel.curTab.getName();
                 VIS.context.setContext("VADMS_WinTableRecID", wtrid);
                 VIS.ADialog.info('VADMS_CodeSetIntoContext', true, "");
             }

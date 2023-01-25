@@ -41,6 +41,17 @@
         // Right Panel
         var workflowActivity = $('#workflowActivity');
 
+        var btnCheckList = null;
+        var divWorkflowActivity = null;
+        var divWorkflowChecklist = null;
+
+        var bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+        var setBusy = function (isBusy) {
+            bsyDiv.css("display", isBusy ? 'block' : 'none');
+        };
+
+        setBusy(false);
+
         /**
          *  Create Search design
          */
@@ -850,9 +861,13 @@
             var hHeader = $("<h3>");
             hHeader.append(VIS.Msg.getMsg('Detail'));
             divHeader.append(hHeader);
+            
             // if  any checkbox is checked, then don't show History in middle panel.
             if (selectedItems.length <= 1) {
-
+                btnCheckList = $("<a href='javascript:void(0)' class='vis-btn-zoom mr-1' style='padding-left: 10px;padding-right: 10px;padding-top: 2px;padding-bottom: 2px;' data-id='" + index + "'>"+VIS.Msg.getMsg('CheckList')+"</a>");
+                if (info.IsSurveyResponseRequired) {
+                    divHeader.append(btnCheckList);
+                }
                 //info.ColName == 'VADMS_IsSigned'
                 if (info.ColName == 'VADMS_SignStatus') {
 
@@ -890,7 +905,7 @@
                         }
                     }, 'json').fail(function (jqXHR, exception) {
                         VIS.ADialog.error(exception);
-                    });
+                    });                    
 
                     // Dms Zoom
                     var aZoomDMS = $("<a href='javascript:void(0)' class='vis-btn-zoom' style='margin-left:10px;' data-id='" +
@@ -929,9 +944,17 @@
             }
 
             divHeader.append($("<div class='clearfix'>"));
+            var height = ($('#workflowActivityData').height()-50)+'px';
+            divWorkflowActivity = $("<div class='divWorkflowActivity' style='height:" + height+"'>");
+            divWorkflowChecklist = $("<div class='divWorkflowChecklist' style='display:none'></div>");
+            divDetail.append(divWorkflowActivity);
+            divDetail.append(divWorkflowChecklist);
+
+            //divDetail = divDetail.find('.divWorkflowActivity');
+            divWorkflowActivity.append(bsyDiv);
 
             var ul = $("<ul class='vis-IIColumnContent'>");
-            divDetail.append(ul);
+            divWorkflowActivity.append(ul);
 
             var li1 = $("<li>");
             li1.css('width', '100%');
@@ -946,11 +969,12 @@
             // var li2 = $("<li>");
             // if  any checkbox is checked, then don't show summary in middle panel.
             if (selectedItems.length <= 1) {
-                var p2 = $("<pre>");
+                var p2 = $("<pre class='mb-2'>");
                 p2.css('margin-top', '10px');
                 p2.css('margin-bottom', '0px');
                 p2.css('font-size', '14px');
                 p2.css('font-family', 'NoirPro-Regular');
+                p2.css('color', 'inherit');
                 p2.append(VIS.Msg.getMsg('Summary'));
                 p2.append($("<br>"));
 
@@ -961,27 +985,27 @@
             }
             //ul.append(li2);
 
-            divDetail.append($("<div class='clearfix'>"));
+            divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            var hDesc = $("<h4>");
+            var hDesc = $("<p class='mb-0'>");
             hDesc.append(VIS.Msg.getMsg('Description'));
-            divDetail.append(hDesc);
+            divWorkflowActivity.append(hDesc);
             var pDesc = $("<p>");
             pDesc.append(VIS.Utility.encodeText(fulldata[index].Description));
-            divDetail.append(pDesc);
+            divWorkflowActivity.append(pDesc);
 
-            divDetail.append($("<div class='clearfix'>"));
+            divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            var hHelp = $("<h4>");
+            var hHelp = $("<p class='mb-0'>");
             //hHelp.append($("<span class='vis-workflowActivityIcons vis-icon-help'>"))
             hHelp.append(VIS.Msg.getMsg('Help'));
-            divDetail.append(hHelp);
+            divWorkflowActivity.append(hHelp);
             var pHelp = $("<p>");
             pHelp.append(VIS.Utility.encodeText(fulldata[index].Help));
-            divDetail.append(pHelp);
+            divWorkflowActivity.append(pHelp);
 
-            divDetail.append($("<h3>").append(VIS.Msg.getMsg('Action')));
-            divDetail.append($("<div class='clearfix'>"));
+            divWorkflowActivity.append($("<h3>").append(VIS.Msg.getMsg('Action')));
+            divWorkflowActivity.append($("<div class='clearfix'>"));
 
             var ulA = $("<ul class='vis-IIColumnContent'>");
 
@@ -994,8 +1018,6 @@
                 var ctrl = getControl(info, wfActivityID);
                 detailCtrl.AnswerCtrl = ctrl;
                 if (ctrl != null) {
-
-
                     if (ctrl.getBtnCount() > 0) {
                         var divFwd = $("<div class='vis-wforwardwrap'>");
                         divFwd.append(ctrl.getControl());
@@ -1076,8 +1098,9 @@
                         return;
                     }
 
+                    setBusy(true);
                     $.post(VIS.Application.contextUrl + 'VADMS/Document/SignatureUsingWorkflow', signData, function (res) {
-
+                        setBusy(false);
                         if (res && res != 'null' && res.result == 'success') {
 
                             $("#divfeedbsy")[0].style.visibility = "hidden";
@@ -1097,6 +1120,7 @@
                         }
 
                     }, 'json').fail(function (jqXHR, exception) {
+                        setBusy(false);
                         aOk.data('clicked', 'N');
                         VIS.ADialog.error(exception);
                     });
@@ -1110,11 +1134,11 @@
             });
             ulA.append(liDoit);
 
-            divDetail.append(ulA);
-            divDetail.append($("<div class='clearfix'>"));
+            divWorkflowActivity.append(ulA);
+            divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            divDetail.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Message')));
-            divDetail.append($("<div class='clearfix'>"));
+            divWorkflowActivity.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Message')));
+            divWorkflowActivity.append($("<div class='clearfix'>"));
 
             var divMsg = $("<div class='vis-sendMessage'>");
             var msg = $("<input type='text' placeholder='" + VIS.Msg.getMsg('TypeMessage') + "....'>");
@@ -1123,7 +1147,7 @@
             divMsg.append($("<button class='vis vis-sms'></button>"));
             divMsg.append($("<div class='clearfix'>"));
 
-            divDetail.append(divMsg);
+            divWorkflowActivity.append(divMsg);
 
 
 
@@ -1132,11 +1156,11 @@
             // if  any checkbox is checked, then don't show History in middle panel.
             if (selectedItems.length <= 1) {
 
-                divDetail.append($("<h3>").append(VIS.Msg.getMsg('History')));
-                divDetail.append($("<div class='clearfix'>"));
+                divWorkflowActivity.append($("<h3>").append(VIS.Msg.getMsg('History')));
+                divWorkflowActivity.append($("<div class='clearfix'>"));
 
                 var divHistory = $("<div class='vis-history-wrap'>");
-                divDetail.append(divHistory);
+                divWorkflowActivity.append(divHistory);
 
                 if (info.Node != null) {
                     var divHistoryNode = $("<div style='margin-top:15px;margin-bottom:15px'>");
@@ -1216,6 +1240,33 @@
             }
             //  $("#divfeedbsy")[0].style.visibility = "hidden";
             $busyIndicator.hide();
+            btnCheckList.off().click(function () {              
+
+                divWorkflowChecklist.html('');
+                if ($(this).text() != "Back") {
+                    $(this).text(VIS.Msg.getMsg('Back'));
+                    divDetail.find(".vis-workflowActivityDetails-Heading h3").text(VIS.Msg.getMsg('CheckList'));
+                    var sPanel = new VIS.SurveyPanel();
+                    sPanel.init();
+                    var rt = sPanel.getRoot();
+                    divWorkflowChecklist.html('');
+                    sPanel.panelDetails(0, 0, fulldata[index].AD_Table_ID, fulldata[index].Record_ID, rt, fulldata[index].AD_WF_Activity_ID);
+                    divWorkflowChecklist.append(rt);
+                } else {
+                    divDetail.find(".vis-workflowActivityDetails-Heading h3").text(VIS.Msg.getMsg('Detail'));
+                    $(this).text(VIS.Msg.getMsg('CheckList'));                   
+                }   
+
+                divWorkflowActivity.toggle(700);
+
+                if (divWorkflowChecklist.is(":hidden")) {
+                    divWorkflowChecklist.show();
+                } else {
+                    divWorkflowChecklist.hide();
+                }
+                
+
+            });
         };
 
         var zoom = function (index) {
@@ -1263,10 +1314,10 @@
 
                             // set window ID of activity
                             windowID = fulldata[index].AD_Window_ID;
-
+                            setBusy(true);
                             VIS.dataContext.getJSONData(VIS.Application.contextUrl + "WFActivity/ApproveIt",
                                 { "activityID": activitIDs, "nodeID": fulldata[index].AD_Node_ID, "txtMsg": msg, "fwd": fwdTo, "answer": answer, "AD_Window_ID": windowID }, function apprvoIt(info) {
-
+                                    setBusy(false);
                                     if (info.result == '') {
                                         //refresh
                                         //alert("Done");
@@ -1285,8 +1336,8 @@
 
                                     }
                                     else {
-
-                                        alert(VIS.Msg.getMsg(info.result));
+                                        VIS.ADialog.error(info.result);
+                                        //alert(VIS.Msg.getMsg(info.result));
                                         aOK.data('clicked', 'N');
                                         $("#divfeedbsy")[0].style.visibility = "hidden";
                                     }
@@ -1295,8 +1346,9 @@
                         }
                     }
                     catch (e) {
-
-                        alert('FillManadatory');
+                        setBusy(false);
+                        VIS.ADialog.error("FillMandatory", true, "");
+                        //alert('FillManadatory');
                         aOK.data('clicked', 'N');
                         $("#divfeedbsy")[0].style.visibility = "hidden";
                     }

@@ -1395,7 +1395,7 @@ namespace VAdvantage.Common
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {
                 string WhereCondition = "";
-
+                int idx = 0;
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     string type = "";
@@ -1428,6 +1428,14 @@ namespace VAdvantage.Common
                     {
                         oprtr = "=";
                     }
+                    else if (oprtr == "!=")
+                    {
+                        oprtr = "!=";
+                    } 
+                    else if (oprtr == "<=")
+                    {
+                        oprtr = "<=";
+                    } 
                     else if (oprtr == "<<")
                     {
                         oprtr = "<";
@@ -1435,20 +1443,36 @@ namespace VAdvantage.Common
                     else if (oprtr == ">>")
                     {
                         oprtr = ">";
+                    } 
+                    else if (oprtr == ">=")
+                    {
+                        oprtr = ">=";
                     }
                     else if (oprtr == "~~")
                     {
-                        oprtr = " BETWEEN ";
-                        value = "%" + value + "%";
+                        oprtr = " LIKE ";
+                        value = "'%" + value + "%'";
                     }
                     else if (oprtr == "AB")
                     {
                         oprtr = ">";
                     }
 
-                    if (Util.GetValueOfInt(dt["seqno"]) == 10)
+                    if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
                     {
-                        WhereCondition += columnName + " " + oprtr;
+                        idx++;
+                        if (type == "Int32" || type == "Decimal")
+                        {
+                            WhereCondition +="NVL("+columnName + ",0) " + oprtr;
+                        }
+                        else if (type == "DateTime")
+                        {
+                            WhereCondition += "CAST(" + columnName + " AS DATE) " + oprtr;
+                        }
+                        else
+                        {
+                            WhereCondition += "NVL(" + columnName + ",' ') " + oprtr;
+                        }
                     }
                     else
                     {
@@ -1458,7 +1482,18 @@ namespace VAdvantage.Common
                             andOR = " OR ";
                         }
                         WhereCondition += andOR;
-                        WhereCondition += columnName + " " + oprtr;
+                        if (type == "Int32" || type == "Decimal")
+                        {
+                            WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
+                        }
+                        else if (type == "DateTime")
+                        {
+                            WhereCondition += "CAST(" + columnName + " AS Date) " + oprtr;
+                        }
+                        else
+                        {
+                            WhereCondition += "NVL(" + columnName + ",' ') " + oprtr;
+                        }
                     }
 
                     if (type == "Int32" || type == "Decimal" || type == "Boolean")
@@ -1487,7 +1522,7 @@ namespace VAdvantage.Common
                             }
                             else
                             {
-                                WhereCondition += Util.GetValueOfString(dt["Value2"]);
+                                WhereCondition +="'"+ Util.GetValueOfString(dt["Value2"])+"'";
                             }
                             
                         }
@@ -1502,10 +1537,10 @@ namespace VAdvantage.Common
                     }
                     else if (type == "DateTime")
                     {
-                        WhereCondition += "TO_DATE(" + value + ")";
+                        WhereCondition += "CAST('" + value + "' AS DATE)";
                         if (Util.GetValueOfString(dt["operation"]) == "AB")
                         {
-                            WhereCondition += " AND " + columnName + " < TO_DATE(" + Util.GetValueOfString(dt["Value2"]) + ")";
+                            WhereCondition += " AND COST( " + columnName + " AS DATE) < CAST('" + Util.GetValueOfString(dt["Value2"]) + "' AS DATE)";
                         }
                     }
                 }
@@ -1536,33 +1571,55 @@ namespace VAdvantage.Common
         /// <param name="Record_ID"></param>
         /// <param name="AD_Table_ID"></param>
         /// <returns></returns>
-        //public bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
-        //{
+        public static bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID, int AD_WF_Activity_ID)
+        {
 
-        //    string sql = "SELECT AD_ShowEverytime FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID + " AND ad_window_id= " + AD_Window_ID;
+            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
-        //    string ShowEverytime = Util.GetValueOfString(DB.ExecuteScalar(sql));
-        //    if (ShowEverytime == "N")
-        //    {
-        //        bool isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID);
-        //        if (!isvalidate)
-        //        {
-        //            return true;
-        //        }
-        //    }
+            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
+            bool result = true;
 
-        //    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_window_id=" + AD_Window_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-        //    int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
-        //    if (count > 0)
-        //    {
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //}
+            if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow dt in _dsDetails.Tables[0].Rows)
+                {
+                    bool isvalidate = false;
+                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    {
+                        isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
+                        if (isvalidate)
+                        {
+                            isvalidate = true;
+                        }
+                    }
 
+                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N" && !isvalidate)
+                    {
+                        continue;
+                    }
+                    int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
+
+                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                    if(AD_WF_Activity_ID > 0)
+                    {
+                        sql += " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID;
+                    }
+                    int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+                    if (count > 0)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+
+                    break;
+                }
+            }
+
+            return result;
+        }
     }
 
 }
