@@ -241,6 +241,7 @@ namespace VAdvantage.Process
                                 colVer.SetIsMaintainVersions(false);
                                 colVer.SetIsMandatory(false);
                                 colVer.SetIsMandatoryUI(false);
+                                colVer.SetIsUnique(false);
                                 if (!colVer.Save())
                                 {
                                     ValueNamePair vnp = VLogger.RetrieveError();
