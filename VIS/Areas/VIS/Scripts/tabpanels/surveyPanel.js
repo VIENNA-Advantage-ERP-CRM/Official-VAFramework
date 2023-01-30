@@ -42,7 +42,7 @@ VIS = window.VIS || {};
                 + '<ul class="nav vis-primarySection nav-tabs mb-1" id="surveyTab_' + self.windowNo+'" role="tablist">'
                 + '<li class="nav-item vis-firstResLink  text-center ">'
                 + '  <a'
-                + '    class="nav-link active quesTab"'
+                + '    class="nav-link active quesTab text-center"'
                 + '    id="home-tab"'
                 + '    data-toggle="tab"'
                 + '    href="#quesSec_' + self.windowNo+'"'
@@ -50,11 +50,11 @@ VIS = window.VIS || {};
                 + '</li>'
                 + '<li class="nav-item text-center" >'
                 + '  <a style="display:none"'
-                + '    class="nav-link respTab"'
+                + '    class="nav-link respTab text-center"'
                 + '    id="profile-tab"'
                 + '    data-toggle="tab"'
                 + '    href="#resp_' + self.windowNo +'"'
-                + '    >' + VIS.Msg.getMsg("Response") +'<span class="badge badge-light responseCount ml-1">0</span></a>'
+                + '    >' + VIS.Msg.getMsg("Response") + '<span class="badge badge-light responseCount' + (VIS.Application.isRTL ? " mr-1" : " ml-1")+'">0</span></a>'
                 + '</li>'
                 + '</ul>'
                 + '<div class="tab-content">'
@@ -64,24 +64,24 @@ VIS = window.VIS || {};
                 + '</div>'
                 + '<div class="tab-pane fade mt-2" style="height:59vh;width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
                 + '<div class="d-flex align-items-center justify-content-between mr-2 ml-2">'
-                + '<div class="d-flex align-items-center mr-1">' 
-                + '<span class="d-inline-block mr-1">' + VIS.Msg.getMsg("SelectUser")+'</span>'
+                + '<div class="d-flex align-items-center ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") +'">' 
+                + '<span class="d-inline-block ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") +'">' + VIS.Msg.getMsg("SelectUser")+'</span>'
                 + '<select class="w-100"></select>'
                 + '</div> '
                 + '<div class="align-items-center d-flex"> '
-                + '<span class="mr-1 ">' + VIS.Msg.getMsg("Response") +':</span>'
+                + '<span class="' + (VIS.Application.isRTL ? "ml-1" : "mr-1") +' ">' + VIS.Msg.getMsg("Response") +':</span>'
                 + '<span class="align-items-center d-flex">'
                 + '<button class="vis-cusPagination prev">'
-                + '<i class="fa fa-chevron-circle-left mr-1" aria-hidden="true"></i>'
+                + '<i class="fa fa-chevron-circle-' + (VIS.Application.isRTL ? "right ml-1" : "left mr-1") +' " aria-hidden="true"></i>'
                 + '</button>'
                 + '<span class="resStatus vis-surveyPagination">0/0</span class="d-flex align-items-center">'
                 + '<button class="vis-cusPagination next">'
-                + '<i class="fa fa-chevron-circle-right ml-1" aria-hidden="true"></i>'
+                + '<i class="fa fa-chevron-circle-' + (VIS.Application.isRTL ? "left mr-1" : "right ml-1") +'" aria-hidden="true"></i>'
                 + '</button>'
                 + '</span>'
                 + '</div>' 
                 + '</div> '
-                + '<div class="mr-2 mt-2 text-right"  style="font-size: 12px;font-style: italic;" >' + VIS.Msg.getMsg("VIS_Submitted") + ': <span class="submittedDate"></span></div>'
+                + '<div class="' + (VIS.Application.isRTL ? "text-left ml-2" : "text-right mr-2") +' mt-2"  style="font-size: 12px;font-style: italic;" >' + VIS.Msg.getMsg("VIS_Submitted") + ': <span class="submittedDate"></span></div>'
                 + '<div class="response"></div>'
                 + '</div > '
                 + '</div>'
@@ -298,11 +298,11 @@ VIS = window.VIS || {};
 
                 //show pagging button according to page size and question length.
                 if (pageSize > 0 && totalQues > pageSize) {
-                    btns += '<div class="float-left"><a class="prev btn mr-2"><i class="fa fa-chevron-left" aria-hidden="true"></i> ' + VIS.Msg.getMsg('VIS_Prev') + '</a></div>';
+                    btns += '<div class="' + (VIS.Application.isRTL ? " float-right" : " float-left") + '"><a class="prev btn mr-2"><i class="fa fa-chevron-' + (VIS.Application.isRTL ? "right" : "left") +'" aria-hidden="true"></i> ' + VIS.Msg.getMsg('VIS_Prev') + '</a></div>';
                 }
 
-                btns += '<div class="vis-tp-btnWrap float-right"> ' +
-                    '<a class="next btn">' + VIS.Msg.getMsg('VIS_Next') + ' <i class="fa fa-chevron-right" aria-hidden="true"></i></a>' +
+                btns += '<div class="vis-tp-btnWrap' + (VIS.Application.isRTL ? " float-left" :" float-right")+'"> ' +
+                    '<a class="next btn">' + VIS.Msg.getMsg('VIS_Next') + ' <i class="fa fa-chevron-' + (VIS.Application.isRTL ? "left" : "right") +'" aria-hidden="true"></i></a>' +
                     '<a href="#" id="VIS_SI_BtnSubmit_' + self.windowNo + '" class="btn" >' + VIS.Msg.getMsg("VIS_Submit") +'</a> ' +
                     '</div >';
 
