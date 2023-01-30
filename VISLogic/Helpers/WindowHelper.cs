@@ -998,8 +998,9 @@ namespace VIS.Helpers
             //        return;
             //    }
             //};
-
-
+            // VIS0008 Create PO object for original screen from where record is being saved
+            int Ver_Window_ID = 0;
+            PO OrigPO = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, false, out Ver_Window_ID);
 
             // check if Maintain versions property is true / else skip
             if (inn.MaintainVersions)
@@ -1159,7 +1160,7 @@ namespace VIS.Helpers
                 }
             }
 
-            int Ver_Window_ID = 0;
+            Ver_Window_ID = 0;
             PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, out Ver_Window_ID);
 
             for (int i = 0; i < lstColumns.Count; i++)
@@ -1206,6 +1207,8 @@ namespace VIS.Helpers
             bool hasSingleKey = true;
             if (inn.MaintainVersions)
             {
+                /// VIS0008 copy orginal PO to the po object of Version
+                OrigPO.CopyTo(po);
                 MTable tblParent = new MTable(ctx, AD_Table_ID, trx);
                 hasSingleKey = tblParent.IsSingleKey();
                 po.SetMasterDetails(versionInfo);
