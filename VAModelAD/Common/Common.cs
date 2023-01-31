@@ -822,10 +822,10 @@ namespace VAdvantage.Common
             if (val.IndexOf("^^") == -1)
                 return val;
 
-            val = val.Replace("^^" + val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") + 3), "");
+            val = val.Replace("^^" + val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
             if (val.IndexOf("Images/") > -1)
             {
-                val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") + 3), "");
+                val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
             }
 
             return val;

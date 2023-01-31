@@ -799,9 +799,12 @@ namespace VAdvantage.WF
             {
                 log.Log(Level.WARNING, "" + GetNode(), e);
                 /****	Trx Rollback	****/
-                _trx.Rollback();
-                _trx.Close();
-                _trx = null;
+                if (_trx != null)
+                {
+                    _trx.Rollback();
+                    _trx.Close();
+                    _trx = null;
+                }
                 //
                 if (e.Message != null)
                 {
