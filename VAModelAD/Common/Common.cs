@@ -1451,7 +1451,14 @@ namespace VAdvantage.Common
                     else if (oprtr == "~~")
                     {
                         oprtr = " LIKE ";
-                        value = "'%" + value + "%'";
+                        if (type == "Int32" || type == "Decimal")
+                        {
+                            value = "'%" + value + "%'";
+                        }
+                        else
+                        {
+                            value = "%" + value + "%";
+                        }
                     }
                     else if (oprtr == "AB")
                     {
