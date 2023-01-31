@@ -20180,7 +20180,7 @@ VIS-tp-commentData {
 
 .vis-surveyPagination {
     width: 2.1rem;
-    text-align: center;
+    text-align: center !important;
 }
 
 .responseCount {
@@ -25783,6 +25783,20 @@ html[dir="rtl"] .vis-cv-card-edit {
 html[dir="rtl"] .vis-cv-rd {
     margin-right: 5px;
     margin-left: unset;
+}
+
+html[dir="rtl"] .vis-tp-listItem p {
+    margin: 0 0.7rem 0;
+}
+
+html[dir="rtl"] .vis-tabPrimary .nav {
+    padding-left: unset !important;
+    padding-right: 0 !important;
+}
+
+html[dir="rtl"] .vis-tp-listWrap {
+    margin-left: unset;
+    margin-right: 1rem;
 }
 /*rtl css End here*/
 

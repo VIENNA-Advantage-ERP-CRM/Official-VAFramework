@@ -1451,14 +1451,7 @@ namespace VAdvantage.Common
                     else if (oprtr == "~~")
                     {
                         oprtr = " LIKE ";
-                        if (type == "Int32" || type == "Decimal")
-                        {
-                            value = "'%" + value + "%'";
-                        }
-                        else
-                        {
-                            value = "%" + value + "%";
-                        }
+                        value = "%" + value + "%";
                     }
                     else if (oprtr == "AB")
                     {
@@ -1505,17 +1498,24 @@ namespace VAdvantage.Common
 
                     if (type == "Int32" || type == "Decimal" || type == "Boolean")
                     {
-                        if (type == "Int32")
+                        if (Util.GetValueOfString(dt["operation"]) == "~~")
                         {
-                            WhereCondition += Util.GetValueOfInt(value);
-                        }
-                        else if (type == "Decimal")
-                        {
-                            WhereCondition += Util.GetValueOfDecimal(value);
+                            WhereCondition += "'" + Util.GetValueOfString(value) + "'";
                         }
                         else
                         {
-                            WhereCondition +="'"+ Util.GetValueOfString(value)+"'";
+                            if (type == "Int32")
+                            {
+                                WhereCondition += Util.GetValueOfInt(value);
+                            }
+                            else if (type == "Decimal")
+                            {
+                                WhereCondition += Util.GetValueOfDecimal(value);
+                            }
+                            else
+                            {
+                                WhereCondition += "'" + Util.GetValueOfString(value) + "'";
+                            }
                         }
                         
                         if (Util.GetValueOfString(dt["operation"]) == "AB")
