@@ -602,7 +602,7 @@ namespace VAdvantage.Model
             }
 
             // VIS0008 Change for 2FA
-            if (!newRecord && Is_ValueChanged("TwoFAMethod") 
+            if (!newRecord && Is_ValueChanged("TwoFAMethod")
                 && (Util.GetValueOfString(Get_ValueOld("TwoFAMethod")) == X_AD_User.TWOFAMETHOD_GoogleAuthenticator))
             {
                 SetTokenKey2FA("");
@@ -641,6 +641,15 @@ namespace VAdvantage.Model
         protected override bool AfterSave(bool newRecord, bool success)
         {
             log.Info("Aftersave start" + Util.GetValueOfString(GetCtx().GetContext("VerifyVersionRecord")));
+
+            if (!newRecord && success && Is_ValueChanged("Password"))
+            {
+                // VIS0008 Send Disconnect request to connected users on mobile app
+                // if user change password directly from screen
+                PushNotif.PushNotification.SendNotificationToUser(GetAD_User_ID(), 0, 0,
+                    Msg.GetMsg(GetCtx(), "VA074_DisconnectDevices"),
+                    Msg.GetMsg(GetCtx(), "VA074_DisconnectDevices"), "DIS");
+            }
 
             if (Util.GetValueOfString(GetCtx().GetContext("VerifyVersionRecord")) == "Y")
             {

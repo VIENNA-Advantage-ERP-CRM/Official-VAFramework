@@ -196,8 +196,8 @@
                 else {
                     pheader = $('<p>' + VIS.Msg.getMsg("EMail") + ' (' + _curGC.aPanel.$parentWindow.getName() + ')' + ' </p>');
                 }
-                //$btncloseChart.append(pheader);
-
+                //$btncloseChart.append(pheader); 
+                
             }
             else {
                 $btncloseChart = $('<a href="javascript:void(0)"  class="vis-icon-menuclose"><i class="vis vis-cross"></i></a>');
@@ -392,7 +392,6 @@
                 //$root.find('.vis-form-data-sub').css({ 'width': '100%', 'padding-right': '42px' });
                 //$root.find('.vis-form-data-sub').width($root.find('.vis-Email-leftWrap').width() - 60);
                 $root.find('.vis-form-data-sub').width($root.width() - 85);
-
             }
             else {
                 if (isEmail) {
@@ -442,6 +441,15 @@
             }
 
             isViewLoaded = true;
+
+            // Hide Send Print Format as attachment in case of letter --VIS0228
+            if (isEmail == true) {
+                $chkBSendPFasAtt.show();
+                $chkBSendPFasAtt.next().show();
+            } else {
+                $chkBSendPFasAtt.hide();
+                $chkBSendPFasAtt.next().hide();
+            }
         };
 
 

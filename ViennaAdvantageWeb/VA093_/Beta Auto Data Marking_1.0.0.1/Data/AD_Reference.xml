@@ -1,0 +1,64 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <xs:schema id="NewDataSet" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+    <xs:element name="NewDataSet" msdata:IsDataSet="true" msdata:MainDataTable="AD_Reference" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="AD_Reference" msprop:SqlHash="294409340" msprop:BaseTable.0="AD_REFERENCE">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AD_CLIENT_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_CLIENT_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_ORG_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_ORG_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="AD_REFERENCE_ID" msprop:OraDbType="113" msprop:BaseColumn="AD_REFERENCE_ID" type="xs:long" minOccurs="0" />
+                <xs:element name="CREATED" msprop:OraDbType="106" msprop:BaseColumn="CREATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="CREATEDBY" msprop:OraDbType="113" msprop:BaseColumn="CREATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="DESCRIPTION" msprop:OraDbType="119" msprop:BaseColumn="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="ENTITYTYPE" msprop:OraDbType="126" msprop:BaseColumn="ENTITYTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="HELP" msprop:OraDbType="119" msprop:BaseColumn="HELP" type="xs:string" minOccurs="0" />
+                <xs:element name="ISACTIVE" msprop:OraDbType="104" msprop:BaseColumn="ISACTIVE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAME" msprop:OraDbType="119" msprop:BaseColumn="NAME" type="xs:string" minOccurs="0" />
+                <xs:element name="UPDATED" msprop:OraDbType="106" msprop:BaseColumn="UPDATED" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="UPDATEDBY" msprop:OraDbType="113" msprop:BaseColumn="UPDATEDBY" type="xs:long" minOccurs="0" />
+                <xs:element name="VFORMAT" msprop:OraDbType="119" msprop:BaseColumn="VFORMAT" type="xs:string" minOccurs="0" />
+                <xs:element name="VALIDATIONTYPE" msprop:OraDbType="104" msprop:BaseColumn="VALIDATIONTYPE" type="xs:string" minOccurs="0" />
+                <xs:element name="EXPORT_ID" msprop:OraDbType="119" msprop:BaseColumn="EXPORT_ID" type="xs:string" minOccurs="0" />
+                <xs:element name="LISTDISPLAYOPTION" msprop:OraDbType="104" msprop:BaseColumn="LISTDISPLAYOPTION" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>106</AD_REFERENCE_ID>
+    <CREATED>2000-01-02T13:30:00+00:00</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <DESCRIPTION>Language selection</DESCRIPTION>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>AD_Language</NAME>
+    <UPDATED>2022-08-10T00:00:00+00:00</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>T</VALIDATIONTYPE>
+    <EXPORT_ID>VIS_106</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+  <AD_Reference>
+    <AD_CLIENT_ID>0</AD_CLIENT_ID>
+    <AD_ORG_ID>0</AD_ORG_ID>
+    <AD_REFERENCE_ID>287</AD_REFERENCE_ID>
+    <CREATED>2003-08-20T11:51:10+00:00</CREATED>
+    <CREATEDBY>100</CREATEDBY>
+    <ENTITYTYPE>D</ENTITYTYPE>
+    <ISACTIVE>Y</ISACTIVE>
+    <NAME>C_Tax SPPOType</NAME>
+    <UPDATED>2020-05-12T00:00:00+00:00</UPDATED>
+    <UPDATEDBY>100</UPDATEDBY>
+    <VALIDATIONTYPE>L</VALIDATIONTYPE>
+    <EXPORT_ID>VIS_287</EXPORT_ID>
+    <LISTDISPLAYOPTION>T</LISTDISPLAYOPTION>
+  </AD_Reference>
+</NewDataSet>

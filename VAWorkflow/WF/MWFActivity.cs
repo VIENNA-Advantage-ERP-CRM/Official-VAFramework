@@ -799,9 +799,12 @@ namespace VAdvantage.WF
             {
                 log.Log(Level.WARNING, "" + GetNode(), e);
                 /****	Trx Rollback	****/
-                _trx.Rollback();
-                _trx.Close();
-                _trx = null;
+                if (_trx != null)
+                {
+                    _trx.Rollback();
+                    _trx.Close();
+                    _trx = null;
+                }
                 //
                 if (e.Message != null)
                 {
@@ -1162,6 +1165,14 @@ namespace VAdvantage.WF
                             SetAD_User_ID(nextAD_User_ID);
                         }
 
+                        if(autoApproval && _node.IsSurveyResponseRequired())
+                        {
+                            if (!VAdvantage.Common.Common.CheckSurveyResponseExist(GetCtx(), AD_Window_ID, _process.GetRecord_ID(), _process.GetAD_Table_ID(), GetAD_WF_Activity_ID()))
+                            {
+                                _process.SetProcessMsg(Msg.GetMsg(GetCtx(), "CheckListRequired"));
+                                return false;
+                            }
+                        }
                         //Lakhwinder
                         //if (GetAD_User_ID() == 0)
                         //{

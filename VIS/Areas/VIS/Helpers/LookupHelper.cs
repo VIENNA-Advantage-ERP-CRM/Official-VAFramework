@@ -255,6 +255,31 @@ namespace VIS.Classes
                 validation = " AND " + validation;
             }
             validation = Env.ParseContext(ctx, WindowNo, validation, false);
+            
+            string aliasSubStr = "";
+            string aliasName = "";
+            int aIdx = validation.IndexOf("(");
+            if (aIdx > -1)
+            {
+                aliasSubStr = validation.Substring(0,aIdx);
+
+            }
+            else
+            {
+                aliasSubStr = validation;
+            }
+
+            if (aliasSubStr.IndexOf(".") > -1)
+            {
+                aliasName = aliasSubStr.Substring(0, aliasSubStr.IndexOf("."));
+                if(aliasName.IndexOf(" AND ") > -1)
+                {
+                    aliasName = aliasName.Replace(" AND ", "");
+                }
+            }
+             
+
+
             if (validation != null && validation.Length > 0)
             {
                 if (posOrder != -1)
@@ -368,6 +393,7 @@ namespace VIS.Classes
                 sql += DB.TO_STRING(text);
                 sql += " AND ";
             }
+
             if (isColumnMatch)
             {
                 sql += lastPart;
@@ -377,6 +403,13 @@ namespace VIS.Classes
                 sql += lastPart;
                 sql = DBFunctionCollection.convertToSubQuery(sql, "*") + "WHERE UPPER(finalvalue) LIKE " + DB.TO_STRING(text);
             }
+
+            if (aliasName != "")
+            {
+                sql = sql.Replace(lInfo.tableName + ".", aliasName + ".");
+                sql = sql.Replace("FROM " + lInfo.tableName, "FROM " + lInfo.tableName + " " + aliasName);
+            }
+
             DataSet ds = VIS.DBase.DB.ExecuteDatasetPaging(sql, 1, 1000);
             if (ds != null)
             {

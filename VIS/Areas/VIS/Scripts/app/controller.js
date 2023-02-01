@@ -1177,8 +1177,9 @@
             return recid;
 
 
-        ////  inform VTable/..    -> rowChanged
-        //m_propertyChangeSupport.firePropertyChange(PROPERTY, oldCurrentRow, m_currentRow);
+        if (this.mDataStatusEvent != null && this.mDataStatusEvent.getTotalRows() != this.gridTable.rowCount) {
+            this.mDataStatusEvent = null;
+        }
 
         //  inform APanel/..    -> dataStatus with row updated
         if (this.mDataStatusEvent == null) {

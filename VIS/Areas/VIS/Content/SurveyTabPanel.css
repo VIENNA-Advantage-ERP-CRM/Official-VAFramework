@@ -58,7 +58,7 @@
 
 .vis-tp-qus {
     font-size: .875rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .vis-tp-listItem input[type="radio"] {
@@ -199,7 +199,7 @@
 
 .vis-surveyPagination {
     width: 2.1rem;
-    text-align: center;
+    text-align: center !important;
 }
 
 .responseCount {
