@@ -1778,6 +1778,10 @@
                 this.vHeaderPanel.sizeChangedListner.onSizeChanged();
         }
         this.dynamicDisplay(-1);
+        if (this.aPanel.getTabSuffix() == 'b') {
+            this.aPanel.getLayout().removeClass('vis-ad-w-p-center-view-height');
+            this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "unset");
+        } 
     };
 
     VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {        
@@ -1787,6 +1791,10 @@
 
             //    this.gTab.getTableModel().setCurrentPage(1);
             //}
+            if (this.aPanel.getTabSuffix() == 'b') {
+                this.aPanel.getLayout().addClass('vis-ad-w-p-center-view-height');
+                this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "absolute");
+            }
 
             this.singleRow = false;
             this.isCardRow = false;
@@ -1822,7 +1830,7 @@
             //    this.query(0, 0, null);
             //}
             this.isNewClick = false;
-
+           
         }
 
     };
