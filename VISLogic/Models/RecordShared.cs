@@ -17,6 +17,7 @@ using VAdvantage.ModelAD;
 using VAdvantage.Model;
 using VAdvantage.Controller;
 using VAdvantage.Classes;
+using VIS.Helpers;
 
 namespace VISLogic.Models
 {
@@ -73,7 +74,7 @@ namespace VISLogic.Models
             List<Records> lstOrg = null;
             string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary FROM AD_Org AD_Org
                                 LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID + @"
-                                WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0,"+ctx.GetAD_Org_ID()+")  ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
+                                WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + ctx.GetAD_Org_ID() + ")  ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
 
             sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery, "AD_Org", true, false);
 
@@ -281,6 +282,20 @@ namespace VISLogic.Models
             return msg;
         }
 
+        public List<RecordAccess> GetSharedRecords(Ctx ctx)
+        {
+            List<RecordAccess> sharedRecordAccess = new List<RecordAccess>();
+            MRole role = MRole.GetDefault(ctx);
+            role.LoadSharedRecord(true);
+            sharedRecordAccess = RecordAccess.Get(role.GetSharedRecordAccess());
+            return sharedRecordAccess;
+        }
+
+        public bool GetSharedRecordAccess(Ctx ctx,int AD_Table_ID, int Record_ID)
+        {
+            string sql = "SELECT  IsReadOnly FROM AD_ShareRecordOrg WHERE IsActive = 'Y' AND AD_Table_ID="+AD_Table_ID+" AND Record_ID="+Record_ID+" AND AD_OrgShared_ID = " + ctx.GetAD_Org_ID();
+            return Util.GetValueOfString(DB.ExecuteScalar(sql)) == "Y";
+        }
 
     }
     /// <summary>
