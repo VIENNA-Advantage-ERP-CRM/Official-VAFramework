@@ -45,9 +45,6 @@ VIS.MRole.canUpdate = function (AD_Client_ID, AD_Org_ID, AD_Table_ID, Record_ID,
         retValue = this.getIsRecordAccess(AD_Table_ID, Record_ID, false);
 
 
-    if (retValue && Record_ID != 0)
-        retValue = this.getIsSharedRecordAccess(AD_Table_ID, Record_ID);
-
     if (!retValue && createError) {
         VIS.MRole.log.warning("AccessTableNoUpdate => AD_Client_ID="
             + AD_Client_ID + ", AD_Org_ID=" + AD_Org_ID
@@ -380,6 +377,7 @@ VIS.MRole.getIsRecordAccess = function (AD_Table_ID, Record_ID, ro) {
 VIS.MRole.getIsSharedRecordAccess = function (AD_Table_ID, Record_ID) {
     var m_recordAccess = this.vo.sharedRecordAccess;
     var ra = null;
+    var valueExist = false;
     for (var i = 0; i < m_recordAccess.length; i++) {
         ra = m_recordAccess[i];
 
@@ -388,13 +386,39 @@ VIS.MRole.getIsSharedRecordAccess = function (AD_Table_ID, Record_ID) {
 
         if (ra.Record_ID == Record_ID) {
             m_recordAccess = null;
-            //if (!ro)
-                return !ra.IsReadOnly;
-            //else
-            //    // ro
-            //    return true;
+            valueExist = true;
+            return !ra.IsReadOnly;
         }
     }
+
+    //if (!valueExist) {
+    //    var that = this;
+    //    $.ajax({
+    //        async: false,
+    //        url: VIS.Application.contextUrl + "RecordShared/GetSharedRecords",
+    //        success: function (data) {
+    //            data = JSON.parse(data);
+    //            that.vo.sharedRecordAccess = data;
+
+    //            m_recordAccess = that.vo.sharedRecordAccess;
+    //            var ra = null;
+    //            for (var i = 0; i < m_recordAccess.length; i++) {
+    //                ra = m_recordAccess[i];
+
+    //                if (ra.AD_Table_ID != AD_Table_ID)
+    //                    continue;
+
+    //                if (ra.Record_ID == Record_ID) {
+    //                    m_recordAccess = null;
+    //                    return !ra.IsReadOnly;
+    //                }
+    //            }
+    //        },
+    //        error: function (err) {
+    //            console.log(err);
+    //        }
+    //    });
+    //}
     return true;
 };
 

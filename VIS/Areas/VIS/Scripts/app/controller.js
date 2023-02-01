@@ -2005,8 +2005,35 @@
         if (this.gridTable.dataSave(newRow, false)) {
             recid = this.setCurrentRow(newRow, fireEvents)
         }
+
+        this.IsSharedAccess();
+
         return recid;
     }; //navigate
+
+    GridTab.prototype.IsSharedAccess = function () {
+        var tableID = this.getAD_Table_ID();
+        var recordID = this.getRecord_ID();
+        var that = this;
+        $.ajax({
+            async: false,
+            url: VIS.Application.contextUrl + "RecordShared/GetSharedRecordAccess",
+            data: {
+                AD_Table_ID: tableID,
+                Record_ID: recordID
+            },
+            success: function (data) {
+                data = JSON.parse(data);
+                if (data == true)
+                    that.IsSharedReadOnly = true;
+                else
+                    that.IsSharedReadOnly = false;
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    };
 
     GridTab.prototype.verifyRow = function (targetRow) {
 
@@ -6037,6 +6064,9 @@
                 keyColumn += "_ID";			//	AD_Language_ID
             var Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, keyColumn);
             if (Record_ID == "")
+                Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, this.gridTab.getTableName() + "_ID"); 
+
+            if (Record_ID == "")
                 Record_ID = 0;
 
             var AD_Table_ID = _vo.AD_Table_ID;
@@ -6047,6 +6077,9 @@
                 || !VIS.MRole.getWindowAccess(AD_Window_ID))
                 return false;
             if (!VIS.MRole.getIsColumnAccess(AD_Table_ID, this.vo.AD_Column_ID, false))
+                return false;
+
+            if (this.gridTab.IsSharedReadOnly)
                 return false;
         }
 
