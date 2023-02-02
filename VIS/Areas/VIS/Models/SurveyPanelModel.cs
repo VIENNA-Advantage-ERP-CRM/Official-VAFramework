@@ -28,7 +28,7 @@ namespace VIS.Models
             List<SurveyAssignmentsDetails> LsDetails = new List<SurveyAssignmentsDetails>();
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
                                                   sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
-                                                  s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limit,0) AS Limit,RS.isSelfshow,");
+                                                  s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limits,0) AS Limit,RS.isSelfshow,");
             if (AD_WF_Activity_ID == 0)
             {
                 sql.Append(@" (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @") AS responseCount,");
