@@ -3739,9 +3739,12 @@ namespace VIS.Helpers
                     SQL += " AND ";
                 }
 
-                SQL += @" " + TableName + @"_ID NOT IN
+                SQL += @" (" + TableName + @"_ID NOT IN
                 (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID != " + ctxp.GetAD_Org_ID() +
-                " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0))";
+                " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)) OR " +
+                 TableName + @"_ID IN
+                (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID = " + ctxp.GetAD_Org_ID() +
+                " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)))";
 
             }
 //            select C_BPartner_ID FROM C_BPartner where C_BPartner_ID NOT IN

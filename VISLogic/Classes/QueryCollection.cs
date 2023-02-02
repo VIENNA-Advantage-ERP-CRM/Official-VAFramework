@@ -566,7 +566,7 @@ namespace VIS.Classes
                 + " ORDER BY 2";
 
 
-            queryList.VIS_155 = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Org_ID = @Org_ID AND AD_Table_ID = @AD_Table_ID";
+            queryList.VIS_155 = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Table_ID = @AD_Table_ID";
 
         }
 

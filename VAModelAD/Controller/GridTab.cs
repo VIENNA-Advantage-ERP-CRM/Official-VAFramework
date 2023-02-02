@@ -2078,7 +2078,7 @@ namespace VAdvantage.Model
 
             if (MRole.GetDefault(_vo.GetCtx()).IsShowSharedRecords())
             {
-                sql = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Org_ID = " + _vo.GetCtx().GetAD_Org_ID() + " AND AD_Table_ID = " + _vo.AD_Table_ID;
+                sql = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Table_ID = " + _vo.AD_Table_ID;
                 ds = DB.ExecuteDataset(sql);
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
