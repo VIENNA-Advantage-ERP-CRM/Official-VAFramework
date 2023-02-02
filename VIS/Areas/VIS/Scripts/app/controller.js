@@ -2736,8 +2736,8 @@
         if (VIS.MRole.getIsShowSharedRecord() == true) {
             var sqlQry = "VIS_155";
             var param = [];
-            param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
-            param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
+           // param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
+            param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
 
             var dr = null;
             try {
