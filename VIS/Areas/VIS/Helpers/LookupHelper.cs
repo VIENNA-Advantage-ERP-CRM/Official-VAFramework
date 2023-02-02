@@ -228,9 +228,7 @@ namespace VIS.Classes
             var displayColumn = lInfo.displayColSubQ;
             //    sql = sql.Replace(displayColumn, "");
 
-            var posFrom = sql.IndexOf(" FROM ");
-            var hasWhere = sql.IndexOf(" WHERE ", posFrom) != -1;
-            var posOrder = sql.LastIndexOf(" ORDER BY ");
+           
             var validation = lInfo.validationCode;
             if (!lInfo.isValidated)
             {
@@ -277,8 +275,16 @@ namespace VIS.Classes
                     aliasName = aliasName.Replace(" AND ", "");
                 }
             }
-             
 
+            if (aliasName != "")
+            {
+                sql = sql.Replace(lInfo.tableName + ".", aliasName + ".");
+                sql = sql.Replace("FROM " + lInfo.tableName, "FROM " + lInfo.tableName + " " + aliasName);
+            }
+
+            var posFrom = sql.IndexOf(" FROM ");
+            var hasWhere = sql.IndexOf(" WHERE ", posFrom) != -1;
+            var posOrder = sql.LastIndexOf(" ORDER BY ");
 
             if (validation != null && validation.Length > 0)
             {
@@ -404,11 +410,7 @@ namespace VIS.Classes
                 sql = DBFunctionCollection.convertToSubQuery(sql, "*") + "WHERE UPPER(finalvalue) LIKE " + DB.TO_STRING(text);
             }
 
-            if (aliasName != "")
-            {
-                sql = sql.Replace(lInfo.tableName + ".", aliasName + ".");
-                sql = sql.Replace("FROM " + lInfo.tableName + " ", "FROM " + lInfo.tableName + " " + aliasName + " ");
-            }
+           
 
             DataSet ds = VIS.DBase.DB.ExecuteDatasetPaging(sql, 1, 1000);
             if (ds != null)
