@@ -384,9 +384,9 @@ namespace VISLogic.Models
             return sharedRecordAccess;
         }
 
-        public bool GetSharedRecordAccess(Ctx ctx,int AD_Table_ID, int Record_ID)
+        public bool GetSharedRecordAccess(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
-            string sql = "SELECT  IsReadOnly FROM AD_ShareRecordOrg WHERE IsActive = 'Y' AND AD_Table_ID="+AD_Table_ID+" AND Record_ID="+Record_ID+" AND AD_OrgShared_ID = " + ctx.GetAD_Org_ID();
+            string sql = "SELECT  IsReadOnly FROM AD_ShareRecordOrg WHERE IsActive = 'Y' AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + " AND AD_OrgShared_ID = " + ctx.GetAD_Org_ID();
             return Util.GetValueOfString(DB.ExecuteScalar(sql)) == "Y";
         }
 
