@@ -821,11 +821,25 @@ namespace VAdvantage.Common
             string val = Convert.ToString(value);
             if (val.IndexOf("^^") == -1)
                 return val;
-
-            val = val.Replace("^^" + val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
-            if (val.IndexOf("Images/") > -1)
+            try
             {
-                val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
+                if (val.IndexOf("Images/") == 0)
+                {
+                    val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") + 3), "");
+                }
+                else
+                {
+                    val = val.Replace("^^" + val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
+                    if (val.IndexOf("Images/") > -1)
+                    {
+                        val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                VLogger.Get().SaveError("Error parsing Image Identifier", ex.Message);
+                val = Convert.ToString(value);
             }
 
             return val;
