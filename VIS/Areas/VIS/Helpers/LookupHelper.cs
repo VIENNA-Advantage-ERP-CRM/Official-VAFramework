@@ -230,6 +230,8 @@ namespace VIS.Classes
 
            
             var validation = lInfo.validationCode;
+            validation = validation.Trim();
+
             if (!lInfo.isValidated)
             {
                 //validation = VIS.Env.parseContext(VIS.context, self.lookup.windowNo, self.lookup.tabNo, self.lookup.info.validationCode, false, true);
@@ -274,6 +276,8 @@ namespace VIS.Classes
                 {
                     aliasName = aliasName.Replace(" AND ", "");
                 }
+
+                aliasName = aliasName.Trim();
             }
 
             if (aliasName != "")
