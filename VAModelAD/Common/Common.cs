@@ -727,7 +727,7 @@ namespace VAdvantage.Common
             POInfo _poInfo = POInfo.GetPOInfo(po.GetCtx(), po.Get_Table_ID());
 
             //  MColumn column = (new MTable(po.GetCtx(), po.Get_Table_ID(), null)).GetColumn(variable);
-            MColumn column = (MTable.Get(po.GetCtx(),po.Get_Table_ID())).GetColumn(variable);
+            MColumn column = (MTable.Get(po.GetCtx(), po.Get_Table_ID())).GetColumn(variable);
             if (column.GetAD_Reference_ID() == DisplayType.Location)
             {
                 StringBuilder sb = new StringBuilder();
@@ -821,13 +821,26 @@ namespace VAdvantage.Common
             string val = Convert.ToString(value);
             if (val.IndexOf("^^") == -1)
                 return val;
-
-            val = val.Replace("^^" + val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
-            if (val.IndexOf("Images/") > -1)
+            try
             {
-                val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
+                if (val.IndexOf("Images/") == 0)
+                {
+                    val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") + 3), "");
+                }
+                else
+                {
+                    val = val.Replace("^^" + val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
+                    if (val.IndexOf("Images/") > -1)
+                    {
+                        val = val.Replace(val.Substring(val.IndexOf("Images/"), val.LastIndexOf("^^") - val.IndexOf("^^")), "");
+                    }
+                }
             }
-
+            catch (Exception ex)
+            {
+                VLogger.Get().SaveError("Error parsing Image Identifier", ex.Message);
+                val = Convert.ToString(value);
+            }
             return val;
 
         }
@@ -1379,7 +1392,7 @@ namespace VAdvantage.Common
         /// <param name="AD_Table_ID"></param>
         /// <param name="AD_Record_ID"></param>
         /// <returns></returns>
-        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID)
+        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID, int AD_SurveyAssignment_ID)
         {
             bool isExist = false;
             string sql = @"SELECT AD_Column.AD_column_ID,
@@ -1431,11 +1444,11 @@ namespace VAdvantage.Common
                     else if (oprtr == "!=")
                     {
                         oprtr = "!=";
-                    } 
+                    }
                     else if (oprtr == "<=")
                     {
                         oprtr = "<=";
-                    } 
+                    }
                     else if (oprtr == "<<")
                     {
                         oprtr = "<";
@@ -1443,7 +1456,7 @@ namespace VAdvantage.Common
                     else if (oprtr == ">>")
                     {
                         oprtr = ">";
-                    } 
+                    }
                     else if (oprtr == ">=")
                     {
                         oprtr = ">=";
@@ -1463,7 +1476,7 @@ namespace VAdvantage.Common
                         idx++;
                         if (type == "Int32" || type == "Decimal")
                         {
-                            WhereCondition +="NVL("+columnName + ",0) " + oprtr;
+                            WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                         }
                         else if (type == "DateTime")
                         {
@@ -1517,21 +1530,23 @@ namespace VAdvantage.Common
                                 WhereCondition += "'" + Util.GetValueOfString(value) + "'";
                             }
                         }
-                        
+
                         if (Util.GetValueOfString(dt["operation"]) == "AB")
                         {
                             WhereCondition += " AND " + columnName + " <";
-                            if (type == "Int32"){
+                            if (type == "Int32")
+                            {
                                 WhereCondition += Util.GetValueOfInt(dt["Value2"]);
-                            }else if(type == "Decimal")
+                            }
+                            else if (type == "Decimal")
                             {
                                 WhereCondition += Util.GetValueOfDecimal(dt["Value2"]);
                             }
                             else
                             {
-                                WhereCondition +="'"+ Util.GetValueOfString(dt["Value2"])+"'";
+                                WhereCondition += "'" + Util.GetValueOfString(dt["Value2"]) + "'";
                             }
-                            
+
                         }
                     }
                     else if (type == "String")
@@ -1554,7 +1569,7 @@ namespace VAdvantage.Common
 
                 string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID=" + AD_Table_ID));
 
-                sql = "SELECT COUNT(" + tableName + "_ID) FROM " + tableName + " WHERE " + tableName + "_ID=" + AD_Record_ID + " AND (" + WhereCondition+")";
+                sql = "SELECT COUNT(" + tableName + "_ID) FROM " + tableName + " WHERE " + tableName + "_ID=" + AD_Record_ID + " AND (" + WhereCondition + ")";
                 int count = Util.GetValueOfInt(DB.ExecuteScalar(MRole.GetDefault(ctx).AddAccessSQL(sql, tableName, true, false)));
                 if (count > 0)
                 {
@@ -1607,7 +1622,7 @@ namespace VAdvantage.Common
                     int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
 
                     sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    if(AD_WF_Activity_ID > 0)
+                    if (AD_WF_Activity_ID > 0)
                     {
                         sql += " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID;
                     }
