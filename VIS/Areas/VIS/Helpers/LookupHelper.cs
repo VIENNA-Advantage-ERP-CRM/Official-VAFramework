@@ -283,7 +283,7 @@ namespace VIS.Classes
             if (aliasName != "")
             {
                 sql = sql.Replace(lInfo.tableName + ".", aliasName + ".");
-                sql = sql.Replace("FROM " + lInfo.tableName, "FROM " + lInfo.tableName + " " + aliasName);
+                sql = sql.Replace("FROM " + lInfo.tableName+ " ", "FROM " + lInfo.tableName + " " + aliasName+" ");
             }
 
             var posFrom = sql.IndexOf(" FROM ");
