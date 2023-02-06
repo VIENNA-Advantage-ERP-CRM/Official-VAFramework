@@ -302,7 +302,7 @@ namespace VAdvantage.Print
 
         private void Layout()
         {
-            finalHtml = new StringBuilder("<div class='vis-attach-main-wrap' style='background: white;'>");
+            finalHtml = new StringBuilder("<div class='vis-attach-main-wrap'>");
             //	Header/Footer
             m_headerFooter = new HeaderFooter(m_printCtx);
             //m_pdfheaderFooter = new PdfHeaderFooter(m_printCtx);
@@ -1223,7 +1223,7 @@ namespace VAdvantage.Print
         string footerHtml = null;
         //string contentHtml = null;
         string paraListHtml = null;
-        string newPageHtml = "<div style='position:relative;border-style:outset;padding: 10px;padding-top: 20px;overflow:auto;bottom:6px'>";
+        string newPageHtml = "<div style='position:relative;padding: 10px;padding-top: 20px;overflow:auto;bottom:6px'>";
         string endPageHtml = "</div>";
         private void CreateStandardHeaderFooter()
         {

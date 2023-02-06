@@ -30,7 +30,7 @@
         var toggleGen = false;
         var toggleside = false;
 
-        var $root = $("<div class='vis-forms-container' style='width: 100%; height: 100%; background-color: white;'>");
+        var $root = $("<div class='vis-forms-container' style='width: 100%; height: 100%;'>");
         var $busyDiv = $('<div class="vis-busyindicatorouterwrap" style="visibility: hidden"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
 
         var arrListColumns = [];

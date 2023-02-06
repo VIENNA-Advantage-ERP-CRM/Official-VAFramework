@@ -1300,7 +1300,7 @@ html[dir="rtl"] .vis-apanel-bar-fixpart a {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: white;
+    /*background-color: white;*/
 }
 
 .vis-sms-chcklist-label {
@@ -5689,4 +5689,10 @@ a.VIS_Pref_btn-2, a.VIS_Pref_btn-2:hover {
 .vis-cardviewsortContainer {
     float: left;
     width: 100%;
+}
+.vis-sms-black {
+    color: #000;
+}
+.vis-sms-red {
+    color: #ed0000
 }

@@ -16,7 +16,11 @@
     left: -32px;
     min-width: 140px;
 }
-.vis-attach-main-wrap{ width:100%;}
+.vis-attach-main-wrap{ 
+    width:100%;
+    background: #fff;
+
+}
 .vis-header-wrap h3 {
     margin: 0;
     font-size: 22px;

@@ -174,10 +174,10 @@ ul.vis-userLinks-ListMenu li, ul.vis-userLinks-ListMenu li  *{
         display: flex;
     }
 
-    .vis-userDetails {
-        text-align: center;
-        font-size: 18px;
-    }
+.vis-userDetails {
+    text-align: center;
+    font-size: 18px;
+}
 
 /* Welcome screen tab menu */
 

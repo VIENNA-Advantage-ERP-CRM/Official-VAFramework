@@ -1,0 +1,321 @@
+﻿:root {
+    --v-c-secondary: 69, 73, 76 !important;
+    /*--v-c-on-secondary: 189,193,198 !important;*/
+    --v-c-on-secondary: 220, 223, 227 !important;
+    /*--v-c-on-secondary: 241, 241, 241 !important;*/
+    --v-c-bg-color: 60, 64, 67;
+    --v-c-th-secondary: 69, 73, 76 !important;
+    --v-c-th-on-secondary: 220, 223, 227 !important;
+    --v-c-common: 60, 64, 67;
+}
+
+body,
+#vis_mainMenu,
+.vis-removeFilter,
+.ui-widget-content,
+.vis-ad-w-p-vc,
+.vis-ad-w-p-s-plst li:not(:first-child),
+.vis-ad-w-p-a-m-lst span,
+.ui-dialog .ui-dialog-content,
+.vis-cv-main,
+.vis-cv-header p,
+.vis-cv-cardlist,
+.vis-fp-outerwrp,
+.vis-thed-tablewrap,
+.vis-window-instruc-overlay-new-li,
+.vis-forms-container .k-editor .k-content,
+.vis-nav-AllItems-Header,
+.vis-report-a-r-container,
+.vis-attach-main-wrap {
+    background: rgb(var(--v-c-bg-color));
+}
+input:not([type=button]),
+select,
+select option,
+textarea,
+.vis-ad-w,
+.w2ui-grid .w2ui-grid-body .w2ui-grid-records table tr.w2ui-odd,
+.w2ui-grid .w2ui-grid-body .w2ui-grid-records table tr.w2ui-even,
+.vis-cv-groupHeader,
+.vis-fp-custcolumns .card,
+.vis-theme-drp-wrp .dropdown-menu,
+.vis-two-sec-one,
+.vis-email-rootDiv,
+.vis-Email-ContentWrap,
+.vis-forms-container .k-content,
+.vis-forms-container .k-editable-area,
+.vis-forms-container .k-panel > li.k-item,
+.vis-forms-container .k-panelbar > li.k-item, .k-tiles {
+    background-color: rgb(var(--v-c-bg-color));
+}
+.vis-welcomeScreenContainer,
+.ui-widget input:not([type="checkbox"]):not([type="radio"]), 
+.ui-widget select, 
+.ui-widget textarea {
+    background: transparent;
+}
+.vis-welcomeScreenTabMenu li {
+    border-right: 1px solid rgb(var(--v-c-bg-color));
+}
+.vis-navSearchWrap,
+.vis-navSearchWrap input:not([type=button]),
+.w2ui-overlay,
+.vis-attachhistory-table-wrap,
+.vis-attachhistory-right-wrap,
+.VIS_Pref_err-btn,
+.vis-email-leftDiv,
+.vis-sms-leftDiv,
+.vis-report-table-head {
+    background-color: rgba(var(--v-c-secondary), 1);
+}
+.vis-theme-rec {
+    background-color: rgba(var(--v-c-on-secondary), .1);
+}
+.vis-forms-container .k-block,
+.vis-forms-container .k-button,
+.vis-forms-container .k-draghandle,
+.vis-forms-container .k-grid-header,
+.vis-forms-container .k-grouping-header,
+.vis-forms-container .k-header,
+.vis-forms-container .k-pager-wrap,
+.vis-forms-container .k-toolbar,
+.vis-forms-container .k-treemap-tile,
+.vis-forms-container html .km-pane-wrapper .k-header,
+.vis-forms-container .k-autocomplete.k-state-default,
+.vis-forms-container .k-dropdown-wrap.k-state-default,
+.vis-forms-container .k-numeric-wrap.k-state-default,
+.vis-forms-container .k-picker-wrap.k-state-default {
+    background-color: rgba(var(--v-c-on-secondary), .01);
+    background-image: none;
+}
+.vis-forms-container .k-block,
+.vis-forms-container .k-button,
+.vis-forms-container .k-draghandle,
+.vis-forms-container .k-grid-header,
+.vis-forms-container .k-grouping-header,
+.vis-forms-container .k-header,
+.vis-forms-container .k-pager-wrap,
+.vis-forms-container .k-toolbar,
+.vis-forms-container .k-treemap-tile,
+.vis-forms-container html .km-pane-wrapper .k-header,
+.vis-forms-container .k-autocomplete,
+.vis-forms-container .k-block,
+.vis-forms-container .k-button-group .k-tool,
+.vis-forms-container .k-calendar th,
+.vis-forms-container .k-colorpicker .k-i-arrow-s,
+.vis-forms-container .k-content,
+.vis-forms-container .k-dropdown-wrap,
+.vis-forms-container .k-dropzone-active,
+.vis-forms-container .k-editable-area,
+.vis-forms-container .k-filter-row > th,
+.vis-forms-container .k-footer-template td,
+.vis-forms-container .k-grid td,
+.vis-forms-container .k-grid td.k-state-selected,
+.vis-forms-container .k-grid-content-locked,
+.vis-forms-container .k-grid-footer,
+.vis-forms-container .k-grid-footer-locked,
+.vis-forms-container .k-grid-footer-wrap,
+.vis-forms-container .k-grid-header,
+.vis-forms-container .k-grid-header-locked,
+.vis-forms-container .k-grid-header-wrap,
+.vis-forms-container .k-group,
+.vis-forms-container .k-group-footer td,
+.vis-forms-container .k-grouping-header, 
+.vis-forms-container .k-grouping-header .k-group-indicator, 
+.vis-forms-container .k-header, 
+.vis-forms-container .k-input, 
+.vis-forms-container .k-pager-refresh, 
+.vis-forms-container .k-pager-wrap, 
+.vis-forms-container .k-pager-wrap .k-link, 
+.vis-forms-container .k-panel > .k-item > .k-link, 
+.vis-forms-container .k-panelbar .k-content, 
+.vis-forms-container .k-panelbar .k-panel, 
+.vis-forms-container .k-panelbar > .k-item > .k-link, 
+.vis-forms-container .k-separator, 
+.vis-forms-container .k-slider-track, 
+.vis-forms-container .k-splitbar, 
+.vis-forms-container .k-state-default, 
+.vis-forms-container .k-state-default .k-select, 
+.vis-forms-container .k-state-disabled, 
+.vis-forms-container .k-textbox, 
+.vis-forms-container .k-textbox > input, 
+.vis-forms-container .k-tiles, 
+.vis-forms-container .k-toolbar, 
+.vis-forms-container .k-tooltip, 
+.vis-forms-container .k-treemap-tile, 
+.vis-forms-container .k-upload-files, 
+.vis-forms-container .k-widget,
+.vis-forms-container .k-autocomplete.k-state-default, 
+.vis-forms-container .k-dropdown-wrap.k-state-default, 
+.vis-forms-container .k-numeric-wrap.k-state-default, 
+.vis-forms-container .k-picker-wrap.k-state-default {
+    border-color: rgba(var(--v-c-on-secondary), .2);
+}
+
+.vis-removeFilter {
+    border-color: rgb(var(--v-c-bg-color));
+}
+.form-control:focus,
+.vis-ad-w-p-tb-rc-a-list li,
+.vis-ad-w-p-inc-tab-a-list li,
+.vis-forms-container .k-dropdown .k-input,
+.vis-forms-container .k-dropdown .k-state-focused .k-input, .k-menu .k-popup,
+.vis-forms-container .k-dropdown .k-state-hover .k-input,
+.vis-forms-container .k-grid-header .k-header > .k-link,
+.vis-forms-container .k-header,
+.vis-forms-container .k-treemap-title,
+.vis-group-user-profile > label,
+.vis-report-table-row > td,
+.vis-report-table-head > th,
+.vis-sms-black {
+    color: rgb(var(--v-c-on-secondary));
+}
+.vis-apanel-rb-ul li,
+.w2ui-grid .w2ui-grid-body table td {
+    border-bottom: 1px solid rgba(var(--v-c-on-secondary), .1);
+}
+.w2ui-overlay:before {
+    border-top: 1px solid rgba(var(--v-c-on-secondary), .1);
+}
+.w2ui-overlay:before,
+.w2ui-col-header {
+    border-right: 1px solid rgba(var(--v-c-on-secondary), .1);
+}
+.w2ui-overlay {
+    box-shadow: 0 2px 10px rgba(var(--v-c-bg-color), 1);
+}
+.w2ui-overlay,
+.vis-activityContainer,
+.vis-ad-w-p-s-plst li:not(:first-child),
+.vis-theme-drp-wrp .dropdown-menu {
+    border: 1px solid rgba(var(--v-c-on-secondary), .1);
+}
+.vis-apanel-rb-ul li:first-child {
+    border-top-left-radius: 0.2rem;
+    border-top-right-radius: 0.2rem;
+}
+.vis-apanel-rb-ul li:last-child {
+    border-bottom-left-radius: 0.2rem;
+    border-bottom-right-radius: 0.2rem;
+}
+.vis-welcomeScreenTabMenu li a:hover:before {
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid rgba(var(--v-c-secondary), 1);
+    background: none;
+}
+.vis-advancedSearchInput > label, .vis-advancedSearchHorigontal > label {
+    background: linear-gradient(rgb(var(--v-c-bg-color)) 51%, transparent 50%);
+}
+select.vis-ev-col-readonly ~ label,
+input.vis-ev-col-readonly:not(:placeholder-shown) ~ label,
+.vis-input-wrap input:focus ~ label, 
+.vis-input-wrap input:not(:placeholder-shown) ~ label, 
+.vis-input-wrap textarea:not(:placeholder-shown) ~ label, 
+.vis-input-wrap select:focus ~ label, 
+.vis-input-wrap textarea:focus ~ label, 
+.vis-input-wrap select ~ label {
+    background: linear-gradient(rgb(var(--v-c-bg-color)) 50%, transparent 50%);
+}
+.vis-prefthemeconfigbtn,
+.vis-control-wrap > button {
+    background: rgba(var(--v-c-primary), .2);
+}
+.w2ui-grid .w2ui-grid-body .w2ui-grid-records table tr.w2ui-odd.w2ui-empty-record:hover {
+    background: rgba(var(--v-c-primary), .06);
+}
+.vis-forms-container .k-bold {
+    background-position: -264px 0;
+}
+.vis-forms-container .k-italic {
+    background-position: -264px -24px;
+}
+.vis-forms-container .k-underline {
+    background-position: -264px -48px;
+}
+.vis-forms-container .k-strikethrough {
+    background-position: -264px -72px;
+}
+.vis-forms-container .k-justifyLeft {
+    background-position: -264px -144px;
+}
+.vis-forms-container .k-justifyCenter {
+    background-position: -264px -168px;
+}
+.vis-forms-container .k-justifyRight {
+    background-position: -264px -192px;
+}
+.vis-forms-container .k-justifyFull {
+    background-position: -264px -216px;
+}
+.vis-forms-container .k-insertUnorderedList {
+    background-position: -264px -264px;
+}
+.vis-forms-container .k-insertOrderedList {
+    background-position: -264px -288px;
+}
+.vis-forms-container .k-outdent {
+    background-position: -312px 0;
+}
+.vis-forms-container .k-indent {
+    background-position: -312px -24px;
+}
+.vis-forms-container .k-createLink {
+    background-position: -312px -48px;
+}
+.vis-forms-container .k-insertImage {
+    background-position: -312px -96px;
+}
+.vis-forms-container .k-insertFile {
+    background-position: -312px -216px;
+}
+.vis-forms-container .k-subscript {
+    background-position: -312px -144px;
+}
+.vis-forms-container .k-superscript {
+    background-position: -312px -168px;
+}
+.vis-forms-container .k-createTable {
+    background-position: -216px 0;
+}
+.vis-forms-container .k-viewHtml {
+    background-position: -312px -121px;
+}
+.vis-forms-container .k-cleanFormatting {
+    background-position: -312px -192px;
+}
+.vis-forms-container .k-foreColor {
+    background-position: -264px -96px !important;
+}
+.vis-forms-container .k-backColor {
+    background-position: -264px -120px !important;
+}
+.vis-forms-container .k-i-arrow-s {
+    width: 0;
+    height: 0;
+    background-image: none;
+    border-left: 4px solid transparent !important;
+    border-right: 4px solid transparent !important;
+    border-top: 5px solid rgba(var(--v-c-on-secondary), 1) !important;
+}
+.vis-forms-container .k-block,
+.vis-forms-container .k-content,
+.vis-forms-container .k-dropdown .k-input,
+.vis-forms-container .k-popup,
+.vis-forms-container .k-toolbar, .k-widget {
+    color: inherit;             
+}
+.vis-sms-rytWrap {
+    border-left: 1px solid rgba(var(--v-c-on-secondary), .1);
+}
+.vis-gc-vpanel-table-readOnly {
+    background-color: rgba(var(--v-c-on-secondary),.04) !important;
+}
+.vis-report-gray {
+    background: rgba(var(--v-c-on-secondary), .1);
+}
+.vis-sms-red {
+    color: #d95252;
+}

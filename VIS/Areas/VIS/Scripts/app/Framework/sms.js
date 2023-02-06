@@ -445,24 +445,35 @@
             if (parseInt($actualtextPara.text()) > parseInt($maxtextPara.text())) {
                 $operator.text(">");
                 //if text length grator then the set length turn text into red
-                setColor("#ED0000");
+                setColor("vis-sms-red");
             }
             else if (parseInt($actualtextPara.text()) == parseInt($maxtextPara.text())) {
                 $operator.text("=");
                 //else black
-                setColor("#000000");
+                setColor("vis-sms-black");
             }
             else {
                 $operator.text("<");
                 //else black
-                setColor("#000000");
+                setColor("vis-sms-black");
             }
         };
 
         function setColor(color) {
-            $operator.css('color', color);//forecolor of text
-            $actualtextPara.css('color', color);//label control color
-            $maxtextPara.css('color', color);//fore color
+            if ($operator.hasClass('vis-sms-black')) {
+                $operator.removeClass('vis-sms-black');//forecolor of text
+                $actualtextPara.removeClass('vis-sms-black');//label control color
+                $maxtextPara.removeClass('vis-sms-black');//fore color
+            }
+            else {
+                $operator.removeClass('vis-sms-red');//forecolor of text
+                $actualtextPara.removeClass('vis-sms-red');//label control color
+                $maxtextPara.removeClass('vis-sms-red');//fore color
+            }
+
+            $operator.addClass(color);//forecolor of text
+            $actualtextPara.addClass(color);//label control color
+            $maxtextPara.addClass(color);//fore color
         };
 
         function listofSelectedItems1(html, i) {
