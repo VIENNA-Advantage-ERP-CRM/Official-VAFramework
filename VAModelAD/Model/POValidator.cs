@@ -310,16 +310,25 @@ namespace VAModelAD.Model
 
         public bool SaveExportData(PO po)
         {
+            bool saveMarkData = true;
             X_AD_ExportData obj = new X_AD_ExportData(po.GetCtx(), 0, null);
             if (po.GetKeyLength() > 1)
-                obj.SetRecord_ID(DB.GetNextID(po.GetAD_Client_ID(), po.GetTableName(), po.Get_Trx()));
+            {
+                if (po.Get_ColumnIndex(po.Get_TableName() + "_ID") >= 0)
+                    obj.SetRecord_ID(Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID")));
+                else
+                    saveMarkData = false;
+            }
             else
                 obj.SetRecord_ID(po.Get_ID());
-            obj.SetAD_Table_ID(po.Get_Table_ID());
-            obj.SetAD_ModuleInfo_ID(MModuleInfo.Get("VA093_"));
-            if (!obj.Save())
+            if (saveMarkData)
             {
-                return false;
+                obj.SetAD_Table_ID(po.Get_Table_ID());
+                obj.SetAD_ModuleInfo_ID(MModuleInfo.Get("VA093_"));
+                if (!obj.Save())
+                {
+                    return false;
+                }
             }
             _alreadyExpData.Add(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
             return true;
