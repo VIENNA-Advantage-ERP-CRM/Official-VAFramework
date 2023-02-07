@@ -1521,7 +1521,7 @@
                 else if (datatab === "workflow") {
                     $spanWelcomeTabtopHdr.show();
                     $ulHomeTabMenu.off("click");
-                    WelcomeTabDatacontainers.css("overflow-y", "auto");
+                    //WelcomeTabDatacontainers.css("overflow-y", "auto");
                     WelcomeTabDatacontainers.css({ "text-align": "auto" });
                     activeTabType = WorkflowType;
                     isTabscroll = false;

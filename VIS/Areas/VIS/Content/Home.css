@@ -39,7 +39,6 @@
     top: 41px;
     bottom: 0px;
     width: 100%;
-    overflow: hidden;
 }
 
 /*.vis-verticalScroller-End
@@ -504,8 +503,8 @@ html[dir="rtl"] .vis-welcomeScreenTabMenu li {
 /*end default Scroll design*/
 
 .vis-workflowActivityContainer {
-    background: #f7f4f4;
-    border: 1px solid #eeeeee;
+    background: rgba(var(--v-c-secondary), 1);
+    border: 1px solid rgba(var(--v-c-on-secondary), .2);
     color: rgba(var(--v-c-on-secondary), 1);
     height: 100%;
     position: relative;
@@ -712,6 +711,7 @@ html[dir="rtl"] ul.vis-IIColumnContent li {
         color: rgba(var(--v-c-on-secondary), 1);
         outline: none;
         font-size: 1rem;
+        background: rgba(var(--v-c-on-secondary), .07);
     }
 
     .vis-sendMessage input[type=button] {
@@ -872,7 +872,7 @@ html[dir="rtl"] ul.vis-IIColumnContent li {
     /*left: 7px;*/
     width: 100%;
     padding: 0 7px;
-    /*overflow: hidden;*/
+    overflow: hidden;
 }
 
 .vis-welcomeScreenFeeds > .row {
@@ -2992,7 +2992,7 @@ p.vis-maintain-customer-p span {
 
 .wfactivity-homepage-parentdiv {
     width: 100%;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid rgba(var(--v-c-on-secondary), .2);
     float: left;
     padding-top: 5px;
 }

@@ -26,7 +26,8 @@ body,
 .vis-forms-container .k-editor .k-content,
 .vis-nav-AllItems-Header,
 .vis-report-a-r-container,
-.vis-attach-main-wrap {
+.vis-attach-main-wrap,
+.vis-workflowActivityDetails {
     background: rgb(var(--v-c-bg-color));
 }
 input:not([type=button]),
