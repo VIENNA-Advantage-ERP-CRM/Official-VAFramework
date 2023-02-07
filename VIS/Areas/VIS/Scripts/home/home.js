@@ -1341,12 +1341,12 @@
                             var divtitle_ = "";
                             var title_ = data[s].Description;
                             if (title_.length <= 100) {
-                                divtitle_ = "<pre><strong style='color:#666666' data-vishomercrd='title' id='" + data[s].AD_Note_ID + "'>" + VIS.Utility.encodeText(data[s].Title) + "</strong></pre>";
+                                divtitle_ = "<pre><strong class='vis-noticeText' data-vishomercrd='title' id='" + data[s].AD_Note_ID + "'>" + VIS.Utility.encodeText(data[s].Title) + "</strong></pre>";
                             }
                             else {
                                 divtitle_ = "<pre>"
-                                    + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "'  style='color:#666666;' >" + VIS.Utility.encodeText(data[s].Title) + "...</strong>"
-                                    + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "' style='display:none; color:#666666;'>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
+                                    + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "' class='vis-noticeText' >" + VIS.Utility.encodeText(data[s].Title) + "...</strong>"
+                                    + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "' style='display:none;' class='vis-noticeText'>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
                                     + "<span id='snoticemore_" + data[s].AD_Note_ID + "' data-vishomercrd='more' style='color:rgba(var(--v-c-primary), 1); float:right;height:20px'>" + VIS.Msg.getMsg("more") + "</span>"
                                     + "<span id='snoticeless_" + data[s].AD_Note_ID + "' data-vishomercrd='less' style='display:none; color:rgba(var(--v-c-primary), 1); float:right;height:20pxvis-feedTitleBar'>" + VIS.Msg.getMsg("less") + "</span>"
                                     + "</pre>";

@@ -3240,3 +3240,6 @@ ul.vis-userLinks-ListMenu li a i {
     background: rgba(var(--v-c-on-secondary), .4);
     margin-left: 1px;
 }
+.vis-noticeText {
+    color: rgba(var(--v-c-on-secondary), 1) !important;
+}
