@@ -1562,6 +1562,20 @@ namespace VIS.Helpers
 
                     Object dbValue = po.Get_Value(poIndex);
 
+                    /// VIS0008 handled case for "Processing checkbox" created as button
+                    if (columnName.ToLower() == "processing" && dbValue.GetType() != value.GetType() && field.DisplayType != DisplayType.YesNo)
+                    {
+                        if (Util.GetValueOfString(value) == "Y")
+                            value = true;
+                        else if (Util.GetValueOfString(value) == "N")
+                            value = false;
+
+                        if (Util.GetValueOfString(oldValue) == "Y")
+                            oldValue = true;
+                        else if (Util.GetValueOfString(oldValue) == "N")
+                            oldValue = false;
+                    }
+
                     if (inserting
                         || !compareDB
                         //	Original == DB
