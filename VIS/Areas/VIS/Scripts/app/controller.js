@@ -2006,11 +2006,16 @@
             recid = this.setCurrentRow(newRow, fireEvents)
         }
 
+        //Check readolny status of record(if shared)
         this.IsSharedAccess();
 
         return recid;
     }; //navigate
 
+    /**
+     * get shared record is readonly or not and set status on tab level.
+     * 
+     * */
     GridTab.prototype.IsSharedAccess = function () {
         var tableID = this.getAD_Table_ID();
         var recordID = this.getRecord_ID();
@@ -2732,6 +2737,11 @@
         return this.hasKey(this._subscribe, key);//return subscribeId
     };
 
+    /**
+     * Prepare list of shared records of current table
+     * this list is used to set icon of shared record icon on action panel
+     * 
+     * */
     GridTab.prototype.loadShared = function () {
         if (VIS.MRole.getIsShowSharedRecord() == true) {
             var sqlQry = "VIS_155";
