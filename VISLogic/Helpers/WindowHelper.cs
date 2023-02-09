@@ -1825,6 +1825,19 @@ namespace VIS.Helpers
 
                     Object dbValue = po.Get_Value(poIndex);
 
+                    /// VIS0008 handled case for "Processing checkbox" created as button
+                    if (columnName.ToLower() == "processing" && dbValue.GetType() != value.GetType() && field.DisplayType != DisplayType.YesNo)
+                    {
+                        if (Util.GetValueOfString(value) == "Y")
+                            value = true;
+                        else if (Util.GetValueOfString(value) == "N")
+                            value = false; if (Util.GetValueOfString(oldValue) == "Y")
+                            oldValue = true;
+                        else if (Util.GetValueOfString(oldValue) == "N")
+                            oldValue = false;
+                    }
+
+
                     if (inserting
                         || !compareDB
                         //	Original == DB
@@ -3768,6 +3781,8 @@ namespace VIS.Helpers
 
             SQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName + WhereClause;
 
+            //If Login org is not * , then fetch records of * org which are shared with current org and ignore records of * which are shared 
+            // with other orgs and not with current org
             if (ctxp.GetAD_Org_ID() > 0)
             {
                 if (string.IsNullOrEmpty(WhereClause))
@@ -3787,9 +3802,6 @@ namespace VIS.Helpers
                 " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)))";
 
             }
-//            select C_BPartner_ID FROM C_BPartner where C_BPartner_ID NOT IN
-//(SELECT record_id FROM AD_ShareRecordOrg WHERE AD_Table_ID = 291 AND AD_OrgShared_ID != 12 AND
-//  record_ID IN(SELECT C_BPartner_ID FROM C_BPartner WHERE AD_Org_ID = 0))
 
             if (!String.IsNullOrEmpty(gt.OrderByClause))
             {
