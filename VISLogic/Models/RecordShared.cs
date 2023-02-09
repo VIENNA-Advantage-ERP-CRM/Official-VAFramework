@@ -384,6 +384,14 @@ namespace VISLogic.Models
             return sharedRecordAccess;
         }
 
+
+        /// <summary>
+        /// Check if current record is readonly or not
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
         public bool GetSharedRecordAccess(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
             string sql = "SELECT  IsReadOnly FROM AD_ShareRecordOrg WHERE IsActive = 'Y' AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + " AND AD_OrgShared_ID = " + ctx.GetAD_Org_ID();
