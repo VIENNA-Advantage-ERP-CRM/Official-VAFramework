@@ -123,6 +123,8 @@ namespace VISLogic.Models
                 else
                     trx = trx1;
 
+
+                //Delete child and current record from shared record table before saving
                 if (ParentID == 0)
                 {
                     query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + record_ID;
@@ -137,6 +139,7 @@ namespace VISLogic.Models
 
                 if (records != null)
                 {
+                    //Share current record with selected orgs
                     for (int i = 0; i < records.Count; i++)
                     {
                         MShareRecordOrg SRO = new MShareRecordOrg(ctx, 0, trx);
@@ -291,6 +294,14 @@ namespace VISLogic.Models
             return sharedRecordAccess;
         }
 
+
+        /// <summary>
+        /// Check if current record is readonly or not
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
         public bool GetSharedRecordAccess(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
             string sql = "SELECT  IsReadOnly FROM AD_ShareRecordOrg WHERE IsActive = 'Y' AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + " AND AD_OrgShared_ID = " + ctx.GetAD_Org_ID();

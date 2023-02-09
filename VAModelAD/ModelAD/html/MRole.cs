@@ -2736,28 +2736,23 @@ namespace VAdvantage.Model
             return canExport;
         }
 
-        // Get Shared record with organisation
+
+        /// <summary>
+        /// Get Shared record with organisation
+        /// Append Subquery to fetch record IDs of current table which are shared with login org
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="tableName"></param>
         public void GetShareRecord(ref StringBuilder sql, string tableName)
         {
             string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(tableName);
             DataSet ds = DB.ExecuteDataset(qry);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
-                    sql.Append(" OR (");
-                //    string inCondition = "";
-                //    for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
-                //    {
-                //        if (i == 999)
-                //        {
-                //            break;
-                //        }
-                //        inCondition += Util.GetValueOfString(ds.Tables[0].Rows[i]["record_Id"]);
-                //        if (i != (ds.Tables[0].Rows.Count - 1))
-                //        {
-                //            inCondition += ",";
-                //        }
-                //    }
-                    sql.Append(tableName + "_ID IN (" + qry + "))");
+                sql.Append(" OR (");
+
+                //select * from C_Order where (AD_Client_ID=11 AD AD_Org_ID =0 OR C_Order_ID IN (qry)
+                sql.Append(tableName + "_ID IN (" + qry + "))");
 
             }
         }

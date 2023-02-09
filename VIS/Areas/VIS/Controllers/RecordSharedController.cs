@@ -62,6 +62,10 @@ namespace VIS.Areas.VIS.Controllers
             return Json(JsonConvert.SerializeObject(model.SaveRecord(AD_Table_ID, record_ID, Tab_ID, Window_ID, WindowNo, list, ctx, null, LinkColumn,ref error)), JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Not Used
+        /// </summary>
+        /// <returns></returns>
         public JsonResult GetSharedRecords()
         {
             Ctx ctx = Session["ctx"] as Ctx;
