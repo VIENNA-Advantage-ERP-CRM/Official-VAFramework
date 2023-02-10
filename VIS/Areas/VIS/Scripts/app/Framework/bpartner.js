@@ -928,7 +928,7 @@
             //$bpartnerroot.find(".vis-FirstDivImgCotrol").append("<DIV class='vis-FirstDivCotrolChild' >  <div style='float: left;width:320px;height:150px;line-height: 236px;background: none repeat scroll 0% 0% #EEE;padding:0px;text-align:center' ><img id='imgBPartner_" + windowNo + "' /></div>  <div style='float: left;width:100%;height:20%;padding:2px' >   <button  id='VISBPartenrImg_" + windowNo + "' class='VIS-open-icon'></button>" +
             //                "<input type='file' id='VISFileDialog_" + windowNo + "' accept='image/*' style='display:none'></div></DIV>");
 
-            $bpartnerroot.find(".vis-FirstDivImgCotrol").append("<DIV class='vis-FirstDivCotrolChild' >  <div style='float: left;width:100%;height:242px;line-height:236px;background: none repeat scroll 0% 0% #EEE;padding:0px;text-align:center;margin-top:20px' ><img id='imgBPartner_" + windowNo + "' /></div> ");
+            $bpartnerroot.find(".vis-FirstDivImgCotrol").append("<DIV class='vis-FirstDivCotrolChild' >  <div style='float: left;width:100%;height:242px;line-height:236px;background: none repeat scroll 0% 0% rgba(var(--v-c-secondary), 1);padding:0px;text-align:center;margin-top:20px' ><img id='imgBPartner_" + windowNo + "' /></div> ");
 
             $bpartnerroot.find(".vis-SecondDivCotrol").append("<DIV class='vis-SecondDivCotrolChild'> <div class='vis-all-lable'>" + VIS.Msg.getMsg("Phone") + "  </div> <div class='vis-all-control'><input id='txtPhone_" + windowNo + "' style='height: 25px;width:100%' type='text'></div></DIV>");
             $bpartnerroot.find(".vis-SecondDivCotrol").append("<DIV class='vis-SecondDivCotrolChild'> <div class='vis-all-lable'>" + VIS.Msg.getMsg("Mobile") + "  </div> <div class='vis-all-control'><input id='txtMobile_" + windowNo + "' style='height: 25px;width:100%' type='text'></div></DIV>");
@@ -1115,7 +1115,7 @@
         };
 
         function Splliter(width, text, marginleft) {
-            var splliter = "<DIV class='vis-BPsplitter' style='width:" + width + "'><span style='background-color: white; position: relative;top: -0.8em;margin-left: " + marginleft + "px;'> " + text + " </span></DIV>";
+            var splliter = "<DIV class='vis-BPsplitter' style='width:" + width + "'><span style='background-color: rgba(var(--v-c-common), 1); position: relative;top: -0.8em;margin-left: " + marginleft + "px;'> " + text + " </span></DIV>";
             return splliter;
         };
 

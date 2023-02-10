@@ -12,7 +12,6 @@
 body * {
     color: rgba(var(--v-c-on-secondary), 1) !important;
 }
-
 body,
 #vis_mainMenu,
 .vis-removeFilter,
@@ -36,7 +35,6 @@ table.k-editor,
 .k-editor .k-editable-area {
     background: rgb(var(--v-c-bg-color));
 }
-
 input:not([type=button]),
 select,
 select option,
@@ -56,22 +54,18 @@ textarea,
 .vis-forms-container .k-panelbar > li.k-item, .k-tiles {
     background-color: rgb(var(--v-c-bg-color));
 }
-
 .wsp-task-form .form-control {
     background-color: rgb(var(--v-c-bg-color)) !important;
 }
-
 .vis-welcomeScreenContainer,
-.ui-widget input:not([type="checkbox"]):not([type="radio"]),
+.ui-widget input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
 .ui-widget select,
 .ui-widget textarea {
     background: transparent;
 }
-
 .vis-welcomeScreenTabMenu li {
     border-right: 1px solid rgb(var(--v-c-bg-color));
 }
-
 .vis-navSearchWrap,
 .vis-navSearchWrap input:not([type=button]),
 .w2ui-overlay,
@@ -84,11 +78,9 @@ textarea,
 .vis-workflowActivityContainer {
     background-color: rgba(var(--v-c-secondary), 1);
 }
-
 .vis-theme-rec {
     background-color: rgba(var(--v-c-on-secondary), .1);
 }
-
 .vis-forms-container .k-block,
 .vis-forms-container .k-button,
 .vis-forms-container .k-draghandle,
@@ -106,71 +98,70 @@ textarea,
     background-color: rgba(var(--v-c-on-secondary), .01);
     background-image: none;
 }
-
-    .vis-forms-container .k-block,
-    .vis-forms-container .k-button,
-    .vis-forms-container .k-draghandle,
-    .vis-forms-container .k-grid-header,
-    .vis-forms-container .k-grouping-header,
-    .vis-forms-container .k-header,
-    .vis-forms-container .k-pager-wrap,
-    .vis-forms-container .k-toolbar,
-    .vis-forms-container .k-treemap-tile,
-    .vis-forms-container html .km-pane-wrapper .k-header,
-    .vis-forms-container .k-autocomplete,
-    .vis-forms-container .k-block,
-    .vis-forms-container .k-button-group .k-tool,
-    .vis-forms-container .k-calendar th,
-    .vis-forms-container .k-colorpicker .k-i-arrow-s,
-    .vis-forms-container .k-content,
-    .vis-forms-container .k-dropdown-wrap,
-    .vis-forms-container .k-dropzone-active,
-    .vis-forms-container .k-editable-area,
-    .vis-forms-container .k-filter-row > th,
-    .vis-forms-container .k-footer-template td,
-    .vis-forms-container .k-grid td,
-    .vis-forms-container .k-grid td.k-state-selected,
-    .vis-forms-container .k-grid-content-locked,
-    .vis-forms-container .k-grid-footer,
-    .vis-forms-container .k-grid-footer-locked,
-    .vis-forms-container .k-grid-footer-wrap,
-    .vis-forms-container .k-grid-header,
-    .vis-forms-container .k-grid-header-locked,
-    .vis-forms-container .k-grid-header-wrap,
-    .vis-forms-container .k-group,
-    .vis-forms-container .k-group-footer td,
-    .vis-forms-container .k-grouping-header,
-    .vis-forms-container .k-grouping-header .k-group-indicator,
-    .vis-forms-container .k-header,
-    .vis-forms-container .k-input,
-    .vis-forms-container .k-pager-refresh,
-    .vis-forms-container .k-pager-wrap,
-    .vis-forms-container .k-pager-wrap .k-link,
-    .vis-forms-container .k-panel > .k-item > .k-link,
-    .vis-forms-container .k-panelbar .k-content,
-    .vis-forms-container .k-panelbar .k-panel,
-    .vis-forms-container .k-panelbar > .k-item > .k-link,
-    .vis-forms-container .k-separator,
-    .vis-forms-container .k-slider-track,
-    .vis-forms-container .k-splitbar,
-    .vis-forms-container .k-state-default,
-    .vis-forms-container .k-state-default .k-select,
-    .vis-forms-container .k-state-disabled,
-    .vis-forms-container .k-textbox,
-    .vis-forms-container .k-textbox > input,
-    .vis-forms-container .k-tiles,
-    .vis-forms-container .k-toolbar,
-    .vis-forms-container .k-tooltip,
-    .vis-forms-container .k-treemap-tile,
-    .vis-forms-container .k-upload-files,
-    .vis-forms-container .k-widget,
-    .vis-forms-container .k-autocomplete.k-state-default,
-    .vis-forms-container .k-dropdown-wrap.k-state-default,
-    .vis-forms-container .k-numeric-wrap.k-state-default,
-    .vis-forms-container .k-picker-wrap.k-state-default,
-    .vis-workflowActivityContainer {
-        border-color: rgba(var(--v-c-on-secondary), .2);
-    }
+.vis-forms-container .k-block,
+.vis-forms-container .k-button,
+.vis-forms-container .k-draghandle,
+.vis-forms-container .k-grid-header,
+.vis-forms-container .k-grouping-header,
+.vis-forms-container .k-header,
+.vis-forms-container .k-pager-wrap,
+.vis-forms-container .k-toolbar,
+.vis-forms-container .k-treemap-tile,
+.vis-forms-container html .km-pane-wrapper .k-header,
+.vis-forms-container .k-autocomplete,
+.vis-forms-container .k-block,
+.vis-forms-container .k-button-group .k-tool,
+.vis-forms-container .k-calendar th,
+.vis-forms-container .k-colorpicker .k-i-arrow-s,
+.vis-forms-container .k-content,
+.vis-forms-container .k-dropdown-wrap,
+.vis-forms-container .k-dropzone-active,
+.vis-forms-container .k-editable-area,
+.vis-forms-container .k-filter-row > th,
+.vis-forms-container .k-footer-template td,
+.vis-forms-container .k-grid td,
+.vis-forms-container .k-grid td.k-state-selected,
+.vis-forms-container .k-grid-content-locked,
+.vis-forms-container .k-grid-footer,
+.vis-forms-container .k-grid-footer-locked,
+.vis-forms-container .k-grid-footer-wrap,
+.vis-forms-container .k-grid-header,
+.vis-forms-container .k-grid-header-locked,
+.vis-forms-container .k-grid-header-wrap,
+.vis-forms-container .k-group,
+.vis-forms-container .k-group-footer td,
+.vis-forms-container .k-grouping-header, 
+.vis-forms-container .k-grouping-header .k-group-indicator, 
+.vis-forms-container .k-header, 
+.vis-forms-container .k-input, 
+.vis-forms-container .k-pager-refresh, 
+.vis-forms-container .k-pager-wrap, 
+.vis-forms-container .k-pager-wrap .k-link, 
+.vis-forms-container .k-panel > .k-item > .k-link, 
+.vis-forms-container .k-panelbar .k-content, 
+.vis-forms-container .k-panelbar .k-panel, 
+.vis-forms-container .k-panelbar > .k-item > .k-link, 
+.vis-forms-container .k-separator, 
+.vis-forms-container .k-slider-track, 
+.vis-forms-container .k-splitbar, 
+.vis-forms-container .k-state-default, 
+.vis-forms-container .k-state-default .k-select, 
+.vis-forms-container .k-state-disabled, 
+.vis-forms-container .k-textbox, 
+.vis-forms-container .k-textbox > input, 
+.vis-forms-container .k-tiles, 
+.vis-forms-container .k-toolbar, 
+.vis-forms-container .k-tooltip, 
+.vis-forms-container .k-treemap-tile, 
+.vis-forms-container .k-upload-files, 
+.vis-forms-container .k-widget,
+.vis-forms-container .k-autocomplete.k-state-default, 
+.vis-forms-container .k-dropdown-wrap.k-state-default, 
+.vis-forms-container .k-numeric-wrap.k-state-default, 
+.vis-forms-container .k-picker-wrap.k-state-default,
+.vis-workflowActivityContainer {
+    border-color: rgba(var(--v-c-on-secondary), .2);
+}
 
 .vis-removeFilter {
     border-color: rgb(var(--v-c-bg-color));
@@ -191,42 +182,34 @@ textarea,
 .vis-sms-black {
     color: rgb(var(--v-c-on-secondary));
 }
-
 .vis-apanel-rb-ul li,
 .w2ui-grid .w2ui-grid-body table td {
     border-bottom: 1px solid rgba(var(--v-c-on-secondary), .1);
 }
-
 .w2ui-overlay:before {
     border-top: 1px solid rgba(var(--v-c-on-secondary), .1);
 }
-
 .w2ui-overlay:before,
 .w2ui-col-header {
     border-right: 1px solid rgba(var(--v-c-on-secondary), .1);
 }
-
 .w2ui-overlay {
     box-shadow: 0 2px 10px rgba(var(--v-c-bg-color), 1);
 }
-
 .w2ui-overlay,
 .vis-activityContainer,
 .vis-ad-w-p-s-plst li:not(:first-child),
 .vis-theme-drp-wrp .dropdown-menu {
     border: 1px solid rgba(var(--v-c-on-secondary), .1);
 }
-
 .vis-apanel-rb-ul li:first-child {
     border-top-left-radius: 0.2rem;
     border-top-right-radius: 0.2rem;
 }
-
 .vis-apanel-rb-ul li:last-child {
     border-bottom-left-radius: 0.2rem;
     border-bottom-right-radius: 0.2rem;
 }
-
 .vis-welcomeScreenTabMenu li a:hover:before {
     width: 0;
     height: 0;
@@ -235,124 +218,96 @@ textarea,
     border-bottom: 8px solid rgba(var(--v-c-secondary), 1);
     background: none;
 }
-
 .vis-advancedSearchInput > label, .vis-advancedSearchHorigontal > label {
     background: linear-gradient(rgb(var(--v-c-bg-color)) 51%, transparent 50%);
 }
-
 select.vis-ev-col-readonly ~ label,
 input.vis-ev-col-readonly:not(:placeholder-shown) ~ label,
-.vis-input-wrap input:focus ~ label,
-.vis-input-wrap input:not(:placeholder-shown) ~ label,
-.vis-input-wrap textarea:not(:placeholder-shown) ~ label,
-.vis-input-wrap select:focus ~ label,
-.vis-input-wrap textarea:focus ~ label,
+.vis-input-wrap input:focus ~ label, 
+.vis-input-wrap input:not(:placeholder-shown) ~ label, 
+.vis-input-wrap textarea:not(:placeholder-shown) ~ label, 
+.vis-input-wrap select:focus ~ label, 
+.vis-input-wrap textarea:focus ~ label, 
 .vis-input-wrap select ~ label {
     background: linear-gradient(rgb(var(--v-c-bg-color)) 50%, transparent 50%);
 }
-
 .vis-prefthemeconfigbtn,
 .vis-control-wrap > button {
     background: rgba(var(--v-c-primary), .2);
 }
-
 .w2ui-grid .w2ui-grid-body .w2ui-grid-records table tr.w2ui-odd.w2ui-empty-record:hover {
     background: rgba(var(--v-c-primary), .06);
 }
-
 .k-bold {
     background-position: -264px 0 !important;
 }
-
 .k-italic {
     background-position: -264px -24px !important;
 }
-
 .k-underline {
     background-position: -264px -48px !important;
 }
-
 .k-strikethrough {
     background-position: -264px -72px !important;
 }
-
 .k-justifyLeft {
     background-position: -264px -144px !important;
 }
-
 .k-justifyCenter {
     background-position: -264px -168px !important;
 }
-
 .k-justifyRight {
     background-position: -264px -192px !important;
 }
-
 .k-justifyFull {
     background-position: -264px -216px !important;
 }
-
 .k-insertUnorderedList {
     background-position: -264px -264px !important;
 }
-
 .k-insertOrderedList {
     background-position: -264px -288px !important;
 }
-
 .k-outdent {
     background-position: -312px 0 !important;
 }
-
 .k-indent {
     background-position: -312px -24px !important;
 }
-
 .k-createLink {
     background-position: -312px -48px !important;
 }
-
 .k-insertImage {
     background-position: -312px -96px !important;
 }
-
 .k-insertFile {
     background-position: -312px -216px !important;
 }
-
 .k-subscript {
     background-position: -312px -144px !important;
 }
-
 .k-superscript {
     background-position: -312px -168px !important;
 }
-
 .k-createTable {
     background-position: -216px 0 !important;
 }
-
 .k-viewHtml {
     background-position: -312px -121px !important;
 }
-
 .k-cleanFormatting {
     background-position: -312px -192px !important;
 }
-
 .k-foreColor {
     background-position: -264px -96px !important;
 }
-
 .k-backColor {
     background-position: -264px -120px !important;
 }
-
 .k-i-pdf,
 .k-state-hover > * > .k-i-pdf {
     background-position: -316px -244px !important;
 }
-
 .k-i-arrow-s,
 .k-i-arrow-w,
 .k-i-arrow-e {
@@ -360,25 +315,21 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label,
     height: 0 !important;
     background-image: none;
 }
-
 .k-i-arrow-s {
     border-left: 4px solid transparent !important;
     border-right: 4px solid transparent !important;
     border-top: 5px solid rgba(var(--v-c-on-secondary), 1) !important;
 }
-
 .k-i-arrow-w {
     border-top: 4px solid transparent !important;
     border-bottom: 4px solid transparent !important;
     border-right: 5px solid rgba(var(--v-c-on-secondary), 1) !important;
 }
-
 .k-i-arrow-e {
     border-top: 4px solid transparent !important;
     border-bottom: 4px solid transparent !important;
     border-left: 5px solid rgba(var(--v-c-on-secondary), 1) !important;
 }
-
 .vis-forms-container .k-block,
 .vis-forms-container .k-content,
 .vis-forms-container .k-dropdown .k-input,
@@ -386,23 +337,18 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label,
 .vis-forms-container .k-toolbar, .k-widget {
     color: inherit;
 }
-
 .vis-sms-rytWrap {
     border-left: 1px solid rgba(var(--v-c-on-secondary), .1);
 }
-
 .vis-gc-vpanel-table-readOnly {
     background-color: rgba(var(--v-c-on-secondary),.04) !important;
 }
-
 .vis-report-gray {
     background: rgba(var(--v-c-on-secondary), .1);
 }
-
 .vis-sms-red {
     color: #d95252;
 }
-
 .k-button-group .k-tool,
 .k-editor .k-editable-area,
 .k-autocomplete.k-state-default,
@@ -436,7 +382,6 @@ table.k-editor,
 .k-scheduler-header th, .k-scheduler-header-wrap, .k-scheduler-table td, .k-scheduler-times, .k-scheduler-times th, .k-scheduler-times tr {
     border-color: rgba(var(--v-c-on-secondary), .2) !important;
 }
-
 .k-editor .k-content,
 .k-block, .k-widget,
 .k-content, .k-editable-area,
@@ -447,7 +392,6 @@ table.k-editor,
 .k-scheduler-datecolumn, .k-scheduler-groupcolumn {
     background: rgb(var(--v-c-bg-color)) !important;
 }
-
 .k-autocomplete.k-state-default,
 .k-dropdown-wrap.k-state-default,
 .k-numeric-wrap.k-state-default,
@@ -468,21 +412,12 @@ table.k-editor,
 .k-textbox,
 .k-toolbar,
 .km-pane-wrapper > .km-pane > .km-view > .km-content,
-.k-button.k-state-focused, .k-button.k-state-hover, .k-button:focus, .k-button:hover, .k-draghandle:hover, .k-other-month.k-state-hover .k-link, .k-pager-wrap .k-link:hover, .k-state-hover, .k-state-hover:hover, .k-textbox:hover, div.k-filebrowser-dropzone em,
-.k-i-calendar {
+.k-button.k-state-focused, .k-button.k-state-hover, .k-button:focus, .k-button:hover, .k-draghandle:hover, .k-other-month.k-state-hover .k-link, .k-pager-wrap .k-link:hover, .k-state-hover, .k-state-hover:hover, .k-textbox:hover, div.k-filebrowser-dropzone em {
     background-image: none !important;
 }
-
-    .k-calendar th,
-    .k-button.k-state-hover, .k-button:hover,
-    .k-nonwork-hour {
-        background: rgba(var(--v-c-secondary), 1) !important;
-    }
-
-.k-i-calendar {
-    font-family: 'vis-fonts' !important;
+.k-calendar th,
+.k-button.k-state-hover, .k-button:hover,
+.k-nonwork-hour,
+.vadb-header-menu {
+    background: rgba(var(--v-c-secondary), 1) !important;
 }
-
-    .k-i-calendar:before {
-        content: "\e905";
-    }
