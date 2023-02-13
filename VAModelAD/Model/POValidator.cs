@@ -204,11 +204,23 @@ namespace VAModelAD.Model
                     //}
                     //if (MRole.GetDefault(po.GetCtx()).IsAutoDataMarking() && Env.IsModuleInstalled(ModulInfo[1])
                     #endregion Commented Code
-                    if (po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0
-                        && !_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + po.Get_ID()))
+
+                    if (po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
                     {
-                        if (!SaveExportData(po))
-                            return false;
+                        int expRecord_ID = 0;
+                        if (po.GetKeyLength() > 1)
+                        {
+                            if (po.Get_ColumnIndex(po.Get_TableName() + "_ID") >= 0)
+                                expRecord_ID = Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID"));
+                        }
+                        else
+                            expRecord_ID = po.Get_ID();
+
+                        if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
+                        {
+                            if (!SaveExportData(po))
+                                return false;
+                        }
                     }
                 }
             }
