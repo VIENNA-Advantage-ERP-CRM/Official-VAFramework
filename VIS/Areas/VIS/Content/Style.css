@@ -16,10 +16,9 @@
     left: -32px;
     min-width: 140px;
 }
-.vis-attach-main-wrap{ 
-    width:100%;
-    background: #fff;
-
+.vis-attach-main-wrap {
+    width: 100%;
+    background: rgba(var(--v-c-common), 1);
 }
 .vis-header-wrap h3 {
     margin: 0;
@@ -1333,7 +1332,7 @@ center {
 }
 
 .vis-cr-left {
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     width: 300px;
     margin-right: 5px;
     display: flex;
@@ -1343,7 +1342,7 @@ center {
 }
 
 .vis-cr-right {
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -1351,7 +1350,7 @@ center {
 
 .vis-lft-sgl {
     border-radius: 5px;
-    background-color: #eeeeee;
+    background-color: rgba(var(--v-c-secondary), 1);
     cursor: pointer;
 }
 
@@ -1533,7 +1532,7 @@ center {
     }
 
 .vis-bag-lgt-grey {
-    background-color: #eeeeee;
+    background-color: rgba(var(--v-c-secondary), 1);
     border-radius: 4px;
 }
 
@@ -1636,14 +1635,14 @@ center {
 }
 
 .vis-template-section {
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
 }
 
 .vis-border-status {
     width: 15px;
     height: 15px;
     border-radius: 2px;
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     border: 1px solid rgba(var(--v-c-on-secondary), 0.3);
 }
 
@@ -1683,7 +1682,7 @@ center {
 }
 
 .vis-rt-side-icon-active {
-    background: #eeeeee;
+    background: rgba(var(--v-c-secondary), 1);
     padding: 4px;
     border-radius: 2px;
 }
@@ -2210,7 +2209,7 @@ center {
 
 .vis-grey-disp {
     width: 100%;
-    background-color: #eeeeee;
+    background-color: rgba(var(--v-c-secondary), 1);
     padding: 8px;
     border-radius: 5px;
     height: 40px;
@@ -2418,7 +2417,7 @@ center {
 
 .vis-cardViewTemplateHead {
     border: 1px solid rgba(var(--v-c-on-secondary), 0.5);
-    background: #fff;
+    background: rgba(var(--v-c-common), 1);
     margin-bottom: 10px;
 }
 
@@ -2489,36 +2488,36 @@ center {
   background-color: #f7f7f7;
 } only card one */
 .vis-bg-light-level-one {
-    background-color: #f7f7f7;
+    background-color: rgba(var(--v-c-secondary), 1);
 }
 
 .vis-bg-eee {
-    background-color: #eee;
+    background-color: rgba(var(--v-c-secondary), 1);
 }
 
 .vis-bg-light-level-two {
-    background-color: #eee;
+    background-color: rgba(var(--v-c-secondary), 1);
 }
 /* .vis-bg-fff {
   background-color: #fff;
 } */
 .vis-bg-white {
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
 }
 /* .vis-bg-f8f8f8 {
   background-color: #f8f8f8;
 } */
 .vis-bg-light-level-three {
-    background-color: #f8f8f8;
+    background-color: rgba(var(--v-c-secondary), 1);
 }
 
 .vis-bg-light-level-four {
-    background-color: #efefef;
+    background-color: rgba(var(--v-c-secondary), 1);
     border-radius: 3px;
 }
 
 .vis-bg-light-level-five {
-    background-color: #f7f7f7;
+    background-color: rgba(var(--v-c-secondary), 1);
     border-radius: 3px;
 }
 
@@ -2843,7 +2842,7 @@ border-top-left-radius:4px !important;
 
 .vis-grey-disp-gridCont {
     width: 100%;
-    background-color: #eeeeee;
+    background-color: rgba(var(--v-c-secondary), 1);
     padding: 5px;
     border-radius: 3px !important;
     height: 30px;
@@ -2912,7 +2911,7 @@ border-top-left-radius:4px !important;
 }
 
 .vis-viewBlock {
-    background: #fff;
+    background: rgba(var(--v-c-common), 1);
     min-width: 250px;
     min-height: 90px;
 }
@@ -2995,7 +2994,7 @@ border-top-left-radius:4px !important;
     font-weight: 500;
     justify-content: space-between !important;
     display: flex;
-    background-color: #eeeeee;
+    background-color: rgba(var(--v-c-secondary), 1);
     border-radius: 4px;
     padding: 0.5rem !important;
     margin-bottom: 0.5rem !important;
@@ -3151,7 +3150,7 @@ border-top-left-radius:4px !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #eee;
+    background: rgba(var(--v-c-secondary), 1);
 }
 
 field, fieldvalue {
@@ -3254,7 +3253,7 @@ field, fieldvalue {
     .vis-headerDropdownrgh .dropdown-item:focus,
     .vis-headerDropdownrgh .dropdown-item:hover {
         color: rgba(var(--v-c-on-secondary), 1);
-        background-color: #fff;
+        background-color: rgba(var(--v-c-common), 1);
     }
 
 .vis-headerDropdownrgh .dropdown-menu {
@@ -3265,7 +3264,7 @@ field, fieldvalue {
     width: 323px;
     height: 200px;
     border: 1px solid rgba(var(--v-c-on-secondary), 0.3);
-    background-color: #f1f1f1;
+    background-color: rgba(var(--v-c-secondary), 1);
     position: relative;
     padding: 5px;
     margin-bottom: 25px;
@@ -3360,14 +3359,13 @@ field, fieldvalue {
     border-radius: 5px;
 }
 
-    .vis-undo[disabled=disabled], .vis-undo:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
+.vis-undo[disabled=disabled], .vis-undo:disabled,
 .vis-redo[disabled=disabled], .vis-redo:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+.vis-undo:not([disabled]), .vis-redo:not([disabled]) {
+    background: transparent;
 }
 
 .vis-redo {
@@ -3442,7 +3440,7 @@ field, fieldvalue {
 .addImgBtnV {
     padding: 5px 15px;
     border: none;
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     border: 1px solid #999;
     color: #555;
     font-weight: 600;
@@ -3452,7 +3450,7 @@ field, fieldvalue {
 .addImgBtnH {
     padding: 2px 15px;
     border: none;
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     border: 1px solid #999;
     color: #555;
     font-weight: 600;
