@@ -2,7 +2,22 @@
     //****************************************************//
     //**             VTable                            **//
     //**************************************************//
+
+    var telePhoneFormatter = null;
+
+
     function VTable() {
+
+
+    /*int Default */
+        if (!telePhoneFormatter) {
+            telePhoneFormatter = new VIS.Controls.VTelePhone("Mobile", false, false, true, 20, 20, "", null, false);
+            var divRoot = $('<div>').append(telePhoneFormatter.getControl());
+            telePhoneFormatter.init();
+            divRoot.hide();
+            $('body').append(divRoot);
+        }
+
 
         this.grid = null;
         this.id = null;
@@ -34,7 +49,7 @@
             size: '25px'
         };
 
-        function toggleToSingleView(evt) {
+        function onGridCellClick(evt) {
             try {
                 if (self.grid.columns[evt.column].columnName == self.hyperLinkCell) {
                     self.grid.select(Number(evt.recid));
@@ -51,6 +66,38 @@
                         self.aPanel.actionPerformedCallback(self.aPanel, "Multi");
                         self.aPanel.setLastView("Multi");
                     }
+                }
+                else if (self.grid.columns[evt.column].gridField.getDisplayType() == VIS.DisplayType.TelePhone) {
+
+                    self.grid.select(Number(evt.recid));
+
+                    if (window.VA048) {
+
+                        var row = self.grid.get(evt.recid);
+                        var val = row[self.grid.columns[evt.column].columnName.toLowerCase()];
+
+                        // var val = self.getValue();
+                        if (!val)
+                            return;
+
+
+                        var numberinfo = {};
+                        numberinfo["tonumbers"] = val;
+                        numberinfo["username"] = "";
+                        numberinfo["userimg"] = "";
+                        numberinfo["isconference"] = false;
+                        numberinfo["reftableid"] = -1;
+                        numberinfo["refrecordid"] = -1;
+                        numberinfo["windowno"] = 0;
+                        numberinfo["windowid"] = 0;
+                        numberinfo["tableid"] = 0;
+                        numberinfo["recordid"] = 0;
+                        numberinfo["withrecording"] = false;
+                        numberinfo["withcall"] = true;
+                        VA048.Apps.GetCallingInstance(true, numberinfo, false);
+                    }
+                    else
+                        VIS.Dialog.info("Communication Module is not found)");
                 }
             } catch (err) {
 
@@ -96,7 +143,7 @@
             singleClickTimer = setTimeout(function () {
                 if (clickCount === 1) {
                     clickCount = 0;
-                    toggleToSingleView(evt);
+                    onGridCellClick(evt);
                 } else if (clickCount === 2) {
                     clearTimeout(singleClickTimer);
                     clickCount = 0;
@@ -451,6 +498,10 @@
                     this.hyperLinkCell = columnName;
                     oColumn.style = 'text-decoration:underline; color:rgba(var(--v-c-primary), 1) !important; cursor:pointer';
                 }
+            }
+            else if (mField.getDisplayType() == VIS.DisplayType.TelePhone) {
+                if (oColumn.hidden == false)
+                oColumn.style = 'text-decoration:underline; color:rgba(var(--v-c-primary), 1) !important; cursor:pointer';
             }
 
             if (displayType == VIS.DisplayType.Amount) {
@@ -963,6 +1014,51 @@
                 }
             }
 
+            else if (VIS.DisplayType.TelePhone == displayType)
+            {
+                oColumn.sortable = true;
+
+                oColumn.render = function (record, index, colIndex) {
+                    
+                    var f = oColumns[colIndex].field;
+                    var val = record[f];
+                    if (record.changes && typeof record.changes[f] != 'undefined') {
+                        val = record.changes[f];
+                    }
+
+                    if (val) {
+
+                        if (val.indexOf('+') < 0) {
+                           telePhoneFormatter.iti.setCountry(geoplugin_countryCode());
+                        }
+
+                        telePhoneFormatter.setValue(val);
+
+                        var sel = telePhoneFormatter.iti.getSelectedCountryData();
+
+                        var fVal = telePhoneFormatter.getDisplay();
+                        if (fVal == '') { //lazy init
+                            if (val.indexOf('+') < 0) {
+                                val = '+' + sel.dialCode + val;
+                            }
+                            fVal = val;
+                        }
+
+                        ////ctrl.iti.setNumber(val);
+                        var code = sel.iso2;
+
+                        var htm = '<div style="display:flex">'
+                                    +'<div class="iti__selected-flag">'
+                                    + '<div class="iti__flag iti__' + code + '"></div>'
+                                    + '<div/>'
+                                     +'<div>' + fVal + '</div>'
+                                 +'</div>';
+                        return htm;
+                    }
+                    return "";
+                }
+            }
+
             else { //all text Type Columns
 
                 oColumn.sortable = true;
@@ -998,6 +1094,7 @@
 
             var iControl = VIS.VControlFactory.getControl(mTab, mField, false, false, false);
             iControl.setReadOnly(false);
+           
 
             if (!oColumn.editable) {
                 oColumn.editable = { type: 'custom', ctrl: iControl };

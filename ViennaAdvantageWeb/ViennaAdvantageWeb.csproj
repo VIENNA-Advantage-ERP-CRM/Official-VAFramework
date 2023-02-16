@@ -145,6 +145,12 @@
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.8\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="VA048">
+      <HintPath>Dll\VA048.dll</HintPath>
+    </Reference>
+    <Reference Include="VA048Svc">
+      <HintPath>Dll\VA048Svc.dll</HintPath>
+    </Reference>
     <Reference Include="ViennaBase">
       <HintPath>Dll\ViennaBase.dll</HintPath>
     </Reference>
@@ -252,7 +258,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>3971</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/VAdvantageHtml481</IISUrl>
+          <IISUrl>http://localhost/VAdvantageHtml4x8</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
           <IISAppRootUrl>http://localhost/VAdvantageHtml481</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

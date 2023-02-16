@@ -132,6 +132,7 @@
         YesNo: 20, Location: 21, Number: 22, Binary: 23, Time: 24, Account: 25, RowID: 26, Color: 27, Button: 28, Quantity: 29,
         Search: 30, Locator: 31, Image: 32, Assignment: 33, Memo: 34, PAttribute: 35, TextLong: 36, CostPrice: 37, FilePath: 38,
         FileName: 39, URL: 40, PrinterName: 42, Label: 44, MultiKey: 45, GAttribute: 46, AmtDimension: 47, ProductContainer: 48, ProgressBar: 49,
+        TelePhone:50,
 
         IsString: function (displayType) {
             return VIS.DisplayType.String == displayType;
@@ -140,7 +141,8 @@
             if (displayType == VIS.DisplayType.String || displayType == VIS.DisplayType.Text
                 || displayType == VIS.DisplayType.TextLong || displayType == VIS.DisplayType.Memo
                 || displayType == VIS.DisplayType.FilePath || displayType == VIS.DisplayType.FileName
-                || displayType == VIS.DisplayType.URL || displayType == VIS.DisplayType.PrinterName)
+                || displayType == VIS.DisplayType.URL || displayType == VIS.DisplayType.PrinterName
+                || displayType == VIS.DisplayType.TelePhone )
                 return true;
             return false;
         },
@@ -258,6 +260,13 @@
                 btn.setField(mField);
                 btn.setReferenceKey(mField.getAD_Reference_Value_ID());
                 ctrl = btn;
+            }
+
+            if (displayType == VIS.DisplayType.TelePhone) {
+                var txt = new VTelePhone(columnName, isMandatory, isReadOnly, isUpdateable, mField.getDisplayLength(), mField.getFieldLength(),
+                    mField.getVFormat(), mField.getObscureType(), mField.getIsEncryptedField());
+                txt.setField(mField);
+                ctrl = txt;
             }
 
             else if (displayType == VIS.DisplayType.String) {
@@ -879,6 +888,15 @@
         if (this.actionListner) {
             this.actionListner.actionPerformed(evt);
         }
+    };
+
+    //Lazy initlization
+    IControl.prototype.init = function () {
+        ;
+    };
+
+    IControl.prototype.detach = function () {
+        this.ctrl.detach();
     };
 
     /**
@@ -6750,6 +6768,253 @@
     //2.implement formate in setValue Globalize.format(newValue, "n0");
     //3.Change event part formated value Globalize.parseInt(newVal.toString());
 
+
+    /**************************************************************************
+    *	visual control for system displaytype text or string
+    *	Detail Constructor
+    *  @param columnName column name
+    *  @param mandatory mandatory
+    *  @param isReadOnly read only
+    *  @param isUpdateable updateable
+    *  @param displayLength display length
+    *  @param fieldLength field length
+    *  @param VFormat format
+    *  @param ObscureType obscure type
+    ***************************************************************************/
+
+    function VTelePhone(columnName, isMandatory, isReadOnly, isUpdateable, displayLength, fieldLength, vFormat, obscureType, isPwdField) {
+
+        var displayType = VIS.DisplayType.TelePhone;
+        this.obscureType = obscureType;
+        var src = "fa fa-credit-card";
+        //Init Control
+        
+        var $ctrl = $('<input>', { type: 'tel', name: columnName, maxlength: fieldLength });
+        var $btnSearch = $('<button class="input-group-text"><i class="' + src + '" /></button>');
+       // if (!isReadOnly)
+         //   $ctrl.append($btnSearch);
+        var telCtrl = $ctrl;
+        //Call base class
+        IControl.call(this, $ctrl, displayType, isReadOnly, columnName, isMandatory);
+
+        if (isReadOnly || !isUpdateable ) {
+            this.setReadOnly(true);
+        }
+        else {
+            this.setReadOnly(false);
+        }
+
+        this.getBtn = function (index) {
+            if (index == 0 ) {
+                //this.setReadOnly(true);
+                return $btnSearch;
+            }
+        };
+
+        this.getBtnCount = function () {
+
+            if (!this.editingGrid)
+                return 1;
+            return 0;
+        };
+
+        var self = this; //self pointer
+
+        /* Event */
+        $ctrl.on("change", function (e) {
+            e.stopPropagation();
+           //var newVal = $ctrl.val();
+            var newVal = self.iti ? self.iti.getNumber():self.ctrl.val();
+            this.value = newVal;
+            if (newVal !== self.oldValue) {
+                var evt = { newValue: newVal, propertyName: self.getName() };
+                self.fireValueChanged(evt);
+                evt = null;
+            }
+            if (obscureType) {
+                self.setReadOnly(true);
+            }
+        });
+
+        $ctrl.on("countrychange", function (e, countryData) {
+            if (!self.settingVal) {
+               //self.iti.setNumber('');
+                //$ctrl.val('');
+                //var res = $ctrl.attr('placeholder').replace(/[0-9]/g, 0);
+                //$ctrl.unmask();
+               // $ctrl.mask(res);
+            }
+        });
+
+        $ctrl.on("blur", function (e){
+           // $ctrl.unmask();
+        });
+
+        /* Event */
+        //$ctrl.on("blur", function (e) {
+        //    // e.stopPropagation();
+        //    var newValue = $ctrl.val();
+
+        //    if (self.obscureType && newValue != "" && self.oldValue == newValue) {
+        //        self.ctrl.val(VIS.Env.getObscureValue(self.obscureType, newValue));
+        //        self.setReadOnly(true);
+        //    }
+        //});
+
+        $btnSearch.on("click", function () {
+            if (self.mField.getIsEditable(true) && !self.editingGrid) {
+                //self.setReadOnly(false, true, true);
+               // $ctrl.val(self.mField.getValue());
+               // $ctrl.focus();
+                if (window.VA048) {
+
+                    var val = self.getValue();
+                    if (!val)
+                        return;
+
+                    var numberinfo = {};
+                    numberinfo["tonumbers"] = val;
+                    numberinfo["username"] = "";
+                    numberinfo["userimg"] = "";
+                    numberinfo["isconference"] = false;
+                    numberinfo["reftableid"] = -1;
+                    numberinfo["refrecordid"] = -1;
+                    numberinfo["windowno"] = 0;
+                    numberinfo["windowid"] = 0;
+                    numberinfo["tableid"] = 0;
+                    numberinfo["recordid"] = 0;
+                    numberinfo["withrecording"] = false;
+                    numberinfo["withcall"] = true;
+                    VA048.Apps.GetCallingInstance(true, numberinfo, false);
+                } else
+                    VIS.Dialog.info("Communication Module is not found)");
+
+                //alert('val');
+            }
+        });
+
+        this.disposeComponent = function () {
+            $ctrl.off("change"); //u bind event
+            $ctrl = null;
+            if(self.iti)
+            self.iti.destroy();
+            self = null;
+        }
+
+
+
+
+    };
+
+    VIS.Utility.inheritPrototype(VTelePhone, IControl);//Inherit from IControl
+
+    VTelePhone.prototype.setReadOnly = function (readOnly, forceWritable) {
+        if (!readOnly && this.obscureType && !forceWritable && (!this.mField.getIsInserting() || this.ctrl.val() != "")) {
+            readOnly = true;
+        }
+
+        this.isReadOnly = readOnly;
+        this.ctrl.prop('disabled', readOnly ? true : false);
+        this.setBackground(false);
+    };
+
+    /** 
+     *  set value 
+     *  @param new value to set
+     */
+    VTelePhone.prototype.setValue = function (newValue) {
+        
+        if (this.oldValue != newValue) {
+
+            //console.log(newValue);
+
+            //if (this.obscureType && (!this.mField.getIsInserting() || this.ctrl.val() != "")) {
+            //    this.ctrl.val(VIS.Env.getObscureValue(this.obscureType, newValue));
+            //    this.setReadOnly(true);
+            //}
+            //else {
+                this.settingVal=true;
+                //else
+                //his.ctrl.val(newValue);
+                if (!newValue) {
+                    this.iti ? this.iti.setNumber('') : this.ctrl.val('');
+                    this.iti ? this.iti.setCountry(geoplugin_countryCode()):'';
+                } else {
+                    this.iti ? this.iti.setNumber(newValue) : this.ctrl.val(newValue);
+                    //var res = this.ctrl.attr('placeholder').replace(/[0-9]/g, 0);
+                    //this.ctrl.mask(res);
+                }
+                this.settingVal = false;
+            //}
+            
+            this.oldValue = newValue;
+            //this.setBackground("white");
+        }
+    };
+
+    /** 
+     *  get display text of control
+     *  @return text of control
+     */
+    VTelePhone.prototype.getDisplay = function () {
+        return this.getValue();
+    };
+    VTelePhone.prototype.getValue = function () {
+        return this.iti ? this.iti.getNumber() : this.ctrl.val();//ctrl.val();
+    };
+
+    VTelePhone.prototype.init = function () {
+
+        this.iti = window.intlTelInput(this.ctrl[0], {
+            initialCountry: "auto",
+            separateDialCode: true,
+            autoPlaceholder: "aggressive",
+            //initialCountry: "in",
+            formatOnDisplay: true,
+           // allowDropdown: false,
+            //customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+            //    return  selectedCountryPlaceholder;
+            //},
+            geoIpLookup: function (success, failure) {
+               // $.get("https://ipinfo.io", function () { }, "jsonp").always(function (resp) {
+                 //   var countryCode = (resp && resp.country) ? resp.country : "us";
+                success(geoplugin_countryCode());
+               // });
+            },
+            utilsScript: baseUrl + "Areas/VIS/Scripts/TelInput/utils.js?1638200991544"
+        });
+
+    };
+
+    VTelePhone.prototype.getControl = function (parent) {
+       if (parent) {
+           if (!this.isMasked) {
+               this.ctrl.mask("Z0000000000000000", {
+
+                   translation: {
+                       '0': { pattern: /\d/ },
+                       '9': { pattern: /\d/, optional: true },
+                       'Z': { pattern: /[+]/, optional:true}
+                   }
+
+               });
+               this.isMasked = true;
+           }
+           return this.ctrl;
+            //return this.ctrl;
+        }
+        return this.ctrl;
+    };
+
+    VTelePhone.prototype.detach = function () {
+        
+        this.prnt.detach();
+    };
+
+    //END VTelephone
+
+
+
     /* NameSpace */
     VIS.Controls.IControl = IControl;
     VIS.Controls.VTextBox = VTextBox;
@@ -6774,5 +7039,6 @@
     VIS.Controls.VKeyText = VKeyText;
     VIS.Controls.VProgressBar = VProgressBar;
     VIS.Controls.VSpan = VSpan;
+    VIS.Controls.VTelePhone = VTelePhone;
     /* END */
 }(jQuery, VIS));
