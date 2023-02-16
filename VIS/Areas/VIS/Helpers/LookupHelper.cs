@@ -230,7 +230,10 @@ namespace VIS.Classes
 
            
             var validation = lInfo.validationCode;
-            validation = validation.Trim();
+            if (!string.IsNullOrEmpty(validation))
+            {
+                validation = validation.Trim();
+            }
 
             if (!lInfo.isValidated)
             {
