@@ -195,6 +195,8 @@
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
     <Content Include="Areas\VIS\Content\Home.css" />
     <Content Include="Areas\VIS\Content\Images\logo.png" />
+    <Content Include="Areas\VIS\Content\img\flags%402x.png" />
+    <Content Include="Areas\VIS\Content\img\flags.png" />
     <Content Include="Areas\VIS\Content\Login.css" />
     <Content Include="Areas\VIS\Content\notify.mp3" />
     <Content Include="Areas\VIS\Content\notify.wav" />
@@ -205,6 +207,8 @@
     <Content Include="Areas\VIS\Content\Site.css" />
     <Content Include="Areas\VIS\Content\Style.css" />
     <Content Include="Areas\VIS\Content\SurveyTabPanel.css" />
+    <Content Include="Areas\VIS\Content\TelInput\intlTelInput.css" />
+    <Content Include="Areas\VIS\Content\TelInput\intlTelInput.min.css" />
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
     <Content Include="Areas\VIS\Content\VIS.all.min.css" />
     <Content Include="Areas\VIS\Content\VISAD.css" />
@@ -740,6 +744,16 @@
     <Content Include="Areas\VIS\Scripts\tabpanels\HistoryDetailsTabPanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\surveyPanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\verinfo.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\data.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\data.min.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\input-format.min.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\intlTelInput-jquery.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\intlTelInput-jquery.min.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\intlTelInput.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\intlTelInput.min.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\jquery.mask.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\jquery.mask.min.js" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\utils.js" />
     <Content Include="Areas\VIS\Scripts\TestPanel.js" />
     <Content Include="Areas\VIS\Scripts\VIS.all.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS1_0.min.js" />
@@ -839,6 +853,7 @@
     <Content Include="Areas\VIS\Views\CardViewWizard\Index.cshtml" />
     <Content Include="Areas\VIS\Views\AccountForm\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
+    <Content Include="Areas\VIS\Scripts\tel_Input\input-format.min.js.map" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
     <Content Include="Areas\VIS\WebPages\CrystalReprotViewer.aspx" />
