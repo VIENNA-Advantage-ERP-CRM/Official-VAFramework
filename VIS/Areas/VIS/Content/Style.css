@@ -220,16 +220,16 @@
     padding-left: 10px;
 }
 .vis-attach-fileBottom-Text{ width:100%; margin-bottom:10px; float:left;}
-.vis-attach-file-text > p, vis-attach-file-text > a{
-	color:#666;
-	font-size:13px;
-	font-weight:500;
-	margin:0;	
+.vis-attach-file-text > p, vis-attach-file-text > a {
+    color: rgba(var(--v-c-on-secondary), 1);
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
 }
-.vis-attach-BottomLeft > p{
-	color:#999;
-	font-size:12px;
-	margin-top:5px;	
+.vis-attach-BottomLeft > p {
+    color: rgba(var(--v-c-on-secondary), 1);
+    font-size: 12px;
+    margin-top: 5px;
 }
 .vis-attach-BottomRight{
 	float:right;

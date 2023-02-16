@@ -283,7 +283,7 @@ div.VIS_Pref_slide-show.pp {
     border: 1px solid #AAAAAA !important;
     padding: 10px !important;
     border-radius: 5px !important;
-    background: white;
+    background: rgba(var(--v-c-common), 1);
     margin-top: 1px;
 }
 
@@ -399,7 +399,7 @@ div.VIS_Pref_slide-show.pp {
 }
 
 .VIS_Pref_row {
-    background: white;
+    background: rgba(var(--v-c-common), 1);
     border-top: 1px solid #ECECEC;
     border-right: 1px solid #ECECEC;
     border-left: 1px solid #ECECEC;
@@ -908,7 +908,7 @@ input:required:valid {
     }*/
 
 .VIS-VImage-testContent-wrap {
-    border: 1px solid #e8e8e8;
+    border: 1px solid rgba(var(--v-c-on-secondary), .2);
     /*width: 100%;
         height: 80%;*/
     height: 300px;

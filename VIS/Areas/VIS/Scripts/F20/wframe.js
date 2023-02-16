@@ -1297,11 +1297,11 @@
 
         function initComponent() {
             $main = $("<div class='vis-apanel-bar'>");
-            $rPart = $("<div class='vis-apanel-bar-fixpart' style='background-color:white'>");
+            $rPart = $("<div class='vis-apanel-bar-fixpart' style='background-color:rgba(var(--v-c-common), 1)'>");
             $lPart = $("<div class='vis-apanel-bar-varpart vis-apanel-bar-pdetail'>");
 
             $divlbMain = $('<div class="vis-apanel-lb-main">');
-            $divlbNav = $("<div class='vis-apanel-lb-oflow' style='border-left: 1px solid white;'>").hide();
+            $divlbNav = $("<div class='vis-apanel-lb-oflow' style='border-left: 1px solid rgba(var(--v-c-common), 1);'>").hide();
             $divlbNav.html("<a data-dir='u' href='javascript:void(0)'><img style='margin-left:10px' data-dir='u' src='" + VIS.Application.contextUrl + "Areas/VIS/Images/base/arrow-top.png' ></a><a data-dir='d' href='javascript:void(0)' ><img style='margin-left:10px' data-dir='d' src='" + VIS.Application.contextUrl + "Areas/VIS/Images/base/arrow-bottom.png' /></a>");
 
             $lPart.append($divlbMain).append($divlbNav);

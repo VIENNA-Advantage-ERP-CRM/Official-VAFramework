@@ -10,7 +10,7 @@
 }
 
 body * {
-    color: rgba(var(--v-c-on-secondary), 1) !important;
+    /*color: rgba(var(--v-c-on-secondary), 1);*/
 }
 body,
 #vis_mainMenu,
@@ -59,7 +59,6 @@ textarea,
 
 .vis-welcomeScreenContainer,
 .ui-widget input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
-.ui-widget select,
 .ui-widget textarea {
     background: transparent;
 }
@@ -75,7 +74,8 @@ textarea,
 .vis-email-leftDiv,
 .vis-sms-leftDiv,
 .vis-report-table-head,
-.vis-workflowActivityContainer {
+.vis-workflowActivityContainer,
+.VIS_Pref_close-btn {
     background-color: rgba(var(--v-c-secondary), 1);
 }
 .vis-theme-rec {
@@ -178,7 +178,11 @@ html .km-pane-wrapper .k-header,
 .vis-group-user-profile > label,
 .vis-report-table-row > td,
 .vis-report-table-head > th,
-.vis-sms-black {
+.vis-sms-black,
+.vis-app-hdr-l-menu,
+.vis-app-hdr-r-logout,
+.VIS_Pref_close-btn,
+.vis-attach-file-top a i {
     color: rgb(var(--v-c-on-secondary));
 }
 .vis-apanel-rb-ul li,
@@ -232,7 +236,7 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label,
 }
 .vis-prefthemeconfigbtn,
 .vis-control-wrap > button {
-    background: rgba(var(--v-c-primary), .2);
+    /*background: rgba(var(--v-c-primary), .2);*/
 }
 .w2ui-grid .w2ui-grid-body .w2ui-grid-records table tr.w2ui-odd.w2ui-empty-record:hover {
     background: rgba(var(--v-c-primary), .06);
@@ -371,7 +375,9 @@ table.k-editor,
 .k-dropdown .k-input,
 .k-state-default>.k-select,
 .k-popup.k-list-container,
-.bg-white {
+.bg-white,
+.k-active-filter, .k-state-active, .k-state-active:hover, .k-tabstrip .k-state-active,
+.k-input, .k-multiselect-wrap, .k-textbox>input, input.k-textbox, input.k-textbox:hover, textarea.k-textbox, textarea.k-textbox:hover {
     background: rgb(var(--v-c-bg-color)) !important;
 }
 .k-autocomplete.k-state-default,
@@ -404,7 +410,7 @@ table.k-editor,
 .k-alt, .k-pivot-layout>tbody>tr:first-child>td:first-child, .k-resource.k-alt, .k-separator,
 .vis-file-close-ico,
 .k-calendar th, .k-dropzone-hovered, .k-footer-template td, .k-grid-footer, .k-group, .k-group-footer td, .k-grouping-header, .k-pager-wrap, .k-toolbar, .k-widget .k-status, .k-widget.k-popup,
-{
+.k-calendar th, .k-dropzone-hovered, .k-footer-template td, .k-grid-footer, .k-group, .k-group-footer td, .k-grouping-header, .k-pager-wrap, .k-toolbar, .k-widget .k-status, .k-widget.k-popup {
     background: rgba(var(--v-c-secondary), 1) !important;
 }
 .k-dropdown-wrap.k-state-default {
@@ -448,9 +454,23 @@ table.k-editor,
 .mainTemplate svg rect {
     fill: rgba(var(--v-c-secondary), 1) !important;
 }
-.vis-primary-btn-one {
+.vis-primary-btn-one,
+.k-alt, .k-pivot-layout > tbody > tr:first-child > td:first-child, .k-resource.k-alt, .k-separator {
     background: rgba(var(--v-c-on-secondary), .2)
 }
 .vis-ev-col input[readonly] {
     background-color: rgba(var(--v-c-on-secondary), .04) !important;
+}
+.k-grid tr:hover {
+    background-image: none,linear-gradient(to bottom,rgba(0,0,0,.3) 0,rgba(0,0,0,0) 100%);
+    background-color: rgba(var(--v-c-on-secondary), .2);
+}
+.vis-process-left-sidebar .VIS_Pref_btn-2.vis-process-ok-btn {
+    background-color: rgba(var(--v-c-primary), 1);
+}
+.k-grid tr:hover {
+    background-color: rgba(var(--v-c-on-secondary), .2);
+    background-image: none,-webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,.3)),to(rgba(0,0,0,0)));
+    background-image: none,-webkit-linear-gradient(top,rgba(0,0,0,.3) 0,rgba(0,0,0,0) 100%);
+    background-image: none,linear-gradient(to bottom,rgba(0,0,0,.3) 0,rgba(0,0,0,0) 100%);
 }

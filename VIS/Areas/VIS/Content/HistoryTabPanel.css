@@ -217,7 +217,7 @@
 }
 
 .VIS-tp-detailsPanel {
-    background-color: white;
+    background-color: rgba(var(--v-c-common), 1);
     border-top-style: ridge;
     padding: 2px 5px;
     border-radius: 1rem;
@@ -309,7 +309,7 @@ VIS-tp-commentData {
 }
 
 .VIS-tp-commentsPanel {
-    background-color: white;
+    background-color: rgba(var(--v-c-common), 1);
     border-top-style: ridge;
     padding: 5px 10px;
     /*border-radius: 1rem;*/

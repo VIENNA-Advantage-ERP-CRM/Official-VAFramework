@@ -8,7 +8,7 @@
         this.log = VIS.Logging.VLogger.getVLogger("GenerateXModel");
 
         var $self = this;
-        var $root = $("<div style='width: 100%; height: 100%; background-color: white;'>");
+        var $root = $("<div style='width: 100%; height: 100%; background-color: rgba(var(--v-c-common), 1);'>");
         //var $busyDiv = $("<div class='vis-apanel-busy' style='width:98%;height:98%;position:absolute'>");
         var $busyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
         var okBtn = null;

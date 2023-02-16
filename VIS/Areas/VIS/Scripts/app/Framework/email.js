@@ -1817,8 +1817,8 @@
             var $preDiv = $('<div></div>');
             $preDiv.append(finalhtmls);
 
-            $($preDiv.find('table')).css({ "width": '100%', "border": "1px solid Black" });
-            $($preDiv.find('td')).css({ "border": "1px solid Black" });
+            $($preDiv.find('table')).css({ "width": '100%', "border": "1px solid rgba(var(--v-c-on-secondary), .3)" });
+            $($preDiv.find('td')).css({ "border": "1px solid rgba(var(--v-c-on-secondary), .3" });
 
             var chp = new VIS.ChildDialog();
             chp.setHeight(420);
