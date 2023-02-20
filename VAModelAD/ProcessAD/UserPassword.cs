@@ -131,6 +131,10 @@ namespace VAdvantage.Process
             int iRes = DB.ExecuteQuery(sql, null, Get_Trx());
             if (iRes > 0)
             {
+                // VIS0008 Send Disconnect request to connected users on mobile app
+                PushNotif.PushNotification.SendNotificationToUser(p_AD_User_ID, 0, 0,
+                    Msg.GetMsg(GetCtx(), "VA074_DisconnectDevices"),
+                    Msg.GetMsg(GetCtx(), "VA074_DisconnectDevices"), "DIS");
                 return "@OK@";
             }
             else

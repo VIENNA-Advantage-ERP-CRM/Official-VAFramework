@@ -234,7 +234,10 @@ namespace VAdvantage.Process
                             Object val = false;
                             if (poSource.Get_Value(sbColName.ToString()) != null)
                                 val = poSource.Get_Value(sbColName.ToString());
-                            poDest.Set_Value(sbColName.ToString(), val);
+                            if (Util.GetValueOfString(val).ToLower() == "true" || Util.GetValueOfString(val).ToLower() == "false")
+                                poDest.Set_ValueNoCheck(sbColName.ToString(), val);
+                            else
+                                poDest.Set_Value(sbColName.ToString(), val);
                         }
                         else
                             poDest.Set_ValueNoCheck(sbColName.ToString(), poSource.Get_Value(sbColName.ToString()));

@@ -143,6 +143,7 @@ OR
                               (SELECT *
                               FROM AD_WF_Responsible r
                               WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND a.AD_User_ID = " + AD_User_ID + @" AND r.ResponsibleType = 'H'
                               AND (r.AD_User_ID           =" + AD_User_ID + @" 
                               OR a.AD_User_ID            IN
                                 (SELECT AD_User_ID
@@ -307,6 +308,7 @@ OR
                               (SELECT *
                               FROM AD_WF_Responsible r
                               WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND a.AD_User_ID = " + ctx.GetAD_User_ID() + @" AND r.ResponsibleType = 'H'
                               AND (r.AD_User_ID           =" + ctx.GetAD_User_ID() + @"
                               OR a.AD_User_ID            IN
                                 (SELECT AD_User_ID
@@ -615,6 +617,7 @@ OR
                 MWFNode node = new MWFNode(ctx, nodeID, null);
                 info.NodeAction = node.GetAction();
                 info.NodeName = node.GetName();
+                info.IsSurveyResponseRequired = node.IsSurveyResponseRequired();
                 if (MWFNode.ACTION_UserChoice.Equals(node.GetAction()))
                 {
                     MColumn col = node.GetColumn();
@@ -766,9 +769,9 @@ OR
                         if (node.IsSurveyResponseRequired())
                         {
                             // check any survey response exist
-                            if (!CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetRecord_ID()))
+                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID(),Util.GetValueOfInt(activityID)))
                             {
-                                return "SurveyChecklistRequired";
+                                return "CheckListRequired";
                             }
                         }
 
@@ -1151,9 +1154,9 @@ OR
         public bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
         {
 
-            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID + " AND ad_window_id= " + AD_Window_ID;
+            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
-            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
+            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
             bool result = false;
 
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
@@ -1175,7 +1178,7 @@ OR
                         continue;
                     }
                     int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
-                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_window_id=" + AD_Window_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
                     int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
                     if (count > 0)
                     {
@@ -1185,6 +1188,8 @@ OR
                     {
                         result = false;
                     }
+
+                    break;
                 }
             }
 
@@ -1385,6 +1390,11 @@ OR
             get;
             set;
         }
+        public bool IsSurveyResponseRequired
+        {
+            get;
+            set;
+        }
 
     }
 
@@ -1394,7 +1404,7 @@ OR
         {
             get;
             set;
-        }
+        } 
         public List<NodeHistory> History
         {
             get;

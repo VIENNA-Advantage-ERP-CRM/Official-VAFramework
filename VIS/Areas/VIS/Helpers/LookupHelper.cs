@@ -228,10 +228,13 @@ namespace VIS.Classes
             var displayColumn = lInfo.displayColSubQ;
             //    sql = sql.Replace(displayColumn, "");
 
-            var posFrom = sql.IndexOf(" FROM ");
-            var hasWhere = sql.IndexOf(" WHERE ", posFrom) != -1;
-            var posOrder = sql.LastIndexOf(" ORDER BY ");
+           
             var validation = lInfo.validationCode;
+            if (!string.IsNullOrEmpty(validation))
+            {
+                validation = validation.Trim();
+            }
+
             if (!lInfo.isValidated)
             {
                 //validation = VIS.Env.parseContext(VIS.context, self.lookup.windowNo, self.lookup.tabNo, self.lookup.info.validationCode, false, true);
@@ -255,6 +258,41 @@ namespace VIS.Classes
                 validation = " AND " + validation;
             }
             validation = Env.ParseContext(ctx, WindowNo, validation, false);
+            
+            string aliasSubStr = "";
+            string aliasName = "";
+            int aIdx = validation.IndexOf("(");
+            if (aIdx > -1)
+            {
+                aliasSubStr = validation.Substring(0,aIdx);
+
+            }
+            else
+            {
+                aliasSubStr = validation;
+            }
+
+            if (aliasSubStr.IndexOf(".") > -1)
+            {
+                aliasName = aliasSubStr.Substring(0, aliasSubStr.IndexOf("."));
+                if(aliasName.IndexOf(" AND ") > -1)
+                {
+                    aliasName = aliasName.Replace(" AND ", "");
+                }
+
+                aliasName = aliasName.Trim();
+            }
+
+            if (aliasName != "")
+            {
+                sql = sql.Replace(lInfo.tableName + ".", aliasName + ".");
+                sql = sql.Replace("FROM " + lInfo.tableName+ " ", "FROM " + lInfo.tableName + " " + aliasName+" ");
+            }
+
+            var posFrom = sql.IndexOf(" FROM ");
+            var hasWhere = sql.IndexOf(" WHERE ", posFrom) != -1;
+            var posOrder = sql.LastIndexOf(" ORDER BY ");
+
             if (validation != null && validation.Length > 0)
             {
                 if (posOrder != -1)
@@ -368,6 +406,7 @@ namespace VIS.Classes
                 sql += DB.TO_STRING(text);
                 sql += " AND ";
             }
+
             if (isColumnMatch)
             {
                 sql += lastPart;
@@ -377,6 +416,9 @@ namespace VIS.Classes
                 sql += lastPart;
                 sql = DBFunctionCollection.convertToSubQuery(sql, "*") + "WHERE UPPER(finalvalue) LIKE " + DB.TO_STRING(text);
             }
+
+           
+
             DataSet ds = VIS.DBase.DB.ExecuteDatasetPaging(sql, 1, 1000);
             if (ds != null)
             {
