@@ -35,6 +35,25 @@ namespace VAdvantage.Model
         {
         }
 
+        protected override bool AfterSave(bool newRecord, bool success)
+        {
+            if (newRecord)
+            {
+                MTabPanel tp = new MTabPanel(GetCtx(), 0, null);
+                tp.SetName("Survey Panel"+GetAD_SurveyAssignment_ID());
+                tp.SetClassname("VIS.SurveyPanel");
+                tp.SetAD_Tab_ID(GetAD_Tab_ID());
+                tp.SetSeqNo(10);
+                if (!tp.Save()) {
+                    log.SaveError("Error", Msg.GetMsg(GetCtx(), "TabPanelNotSaved"));
+                    return false;
+                }
+
+            }
+            return true;
+        }
+
+
         /// <summary>
         /// Before Save Logic
         /// </summary>
