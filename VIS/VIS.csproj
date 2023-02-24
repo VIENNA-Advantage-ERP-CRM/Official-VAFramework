@@ -195,8 +195,6 @@
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
     <Content Include="Areas\VIS\Content\Home.css" />
     <Content Include="Areas\VIS\Content\Images\logo.png" />
-    <Content Include="Areas\VIS\Content\img\flags%402x.png" />
-    <Content Include="Areas\VIS\Content\img\flags.png" />
     <Content Include="Areas\VIS\Content\Login.css" />
     <Content Include="Areas\VIS\Content\notify.mp3" />
     <Content Include="Areas\VIS\Content\notify.wav" />
