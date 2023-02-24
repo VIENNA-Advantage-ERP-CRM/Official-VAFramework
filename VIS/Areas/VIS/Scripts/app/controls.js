@@ -79,52 +79,7 @@
         return result;
     };
 
-    //var executeScalarEn = function (sql, params, callback) {
-    //    var async = callback ? true : false;
-    //    var dataIn = { sql: sql, page: 1, pageSize: 0 }
-    //    dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
-    //    if (params) {
-    //        dataIn.param = params;
-    //    }
-    //    var value = null;
-
-
-    //    getDataSetJStringEn(dataIn, async, function (jString) {
-    //        dataSet = new VIS.DB.DataSet().toJson(jString);
-    //        var dataSet = new VIS.DB.DataSet().toJson(jString);
-    //        if (dataSet.getTable(0).getRows().length > 0) {
-    //            value = dataSet.getTable(0).getRow(0).getCell(0);
-    //        }
-    //        else { value = null; }
-    //        dataSet.dispose();
-    //        dataSet = null;
-    //        if (async) {
-    //            callback(value);
-    //        }
-    //    });
-
-    //    return value;
-    //};
-
-    //function getDataSetJStringEn(data, async, callback) {
-    //    var result = null;
-    //    //data.sql = VIS.secureEngine.encrypt(data.sql);
-    //    $.ajax({
-    //        url: dSetUrl,
-    //        type: "POST",
-    //        datatype: "json",
-    //        contentType: "application/json; charset=utf-8",
-    //        async: async,
-    //        data: JSON.stringify(data)
-    //    }).done(function (json) {
-    //        result = json;
-    //        if (callback) {
-    //            callback(json);
-    //        }
-    //        //return result;
-    //    });
-    //    return result;
-    //};
+    
 
 
     VIS.DisplayType = {
@@ -531,6 +486,7 @@
             }
             else {
                 var $ctrl = new VSpan(mField.getHelp(), columnName, false, true);
+                $ctrl.setField(mField);
                 if (VIS.DisplayType.IsNumeric(displayType)) {
                     $ctrl.format = VIS.DisplayType.GetNumberFormat(displayType);
                 }
@@ -1158,9 +1114,14 @@
 
         if (this.oldValue != newValue) {
             this.oldValue = newValue;
-            this.ctrl.text(newValue);
-            if (isHTML) {
-                this.ctrl.html(newValue);
+            if (this.mField.getDisplayType() == VIS.DisplayType.TelePhone && newValue && newValue != "- -") {
+                this.ctrl.html(VIS.VTelePhoneInstance.getHtml(newValue));
+            }
+            else {
+                this.ctrl.text(newValue);
+                if (isHTML) {
+                    this.ctrl.html(newValue);
+                }
             }
         }
     };
@@ -6786,7 +6747,7 @@
 
         var displayType = VIS.DisplayType.TelePhone;
         this.obscureType = obscureType;
-        var src = "fa fa-credit-card";
+        var src = "fa fa-phone";
         //Init Control
         
         var $ctrl = $('<input>', { type: 'tel', name: columnName, maxlength: fieldLength });
@@ -7006,13 +6967,22 @@
         return this.ctrl;
     };
 
+    VTelePhone.prototype.setCountry = function () {
+        if(this.iti)
+           this.iti.setCountry(geoplugin_countryCode());
+    };
+
+    VTelePhone.prototype.getSelectedCountryData = function () {
+        if(this.iti)
+            return this.iti.getSelectedCountryData();
+        return { 'dialCode': '+91', 'iso2': 'en' };
+    }
+
     VTelePhone.prototype.detach = function () {
         
         this.prnt.detach();
     };
-
     //END VTelephone
-
 
 
     /* NameSpace */
@@ -7040,5 +7010,70 @@
     VIS.Controls.VProgressBar = VProgressBar;
     VIS.Controls.VSpan = VSpan;
     VIS.Controls.VTelePhone = VTelePhone;
-    /* END */
+/* END */
+
+
+
+    /**
+    * global instance for telephone control 
+    * used by grid, header and card view to show formatted value
+    * */
+    VIS.VTelePhoneInstance = (function () {
+
+        var telePhoneFormatter = null;
+
+        function init() {
+            if (!telePhoneFormatter) {
+                /*int Default */
+                var tel = new VIS.Controls.VTelePhone("Mobile", false, false, true, 20, 20, "", null, false);
+                var divRoot = $('<div>').append(tel.getControl());
+                tel.init();
+                divRoot.hide();
+                $('body').append(divRoot);
+                telePhoneFormatter = tel;
+            }
+        };
+
+        function getFormatedHtml(val) {
+            init();
+            if (!val)
+                return '';
+
+            if (val.indexOf('+') < 0) {
+                
+                telePhoneFormatter.setCountry(geoplugin_countryCode());
+            }
+
+            telePhoneFormatter.setValue(val);
+
+            var sel = telePhoneFormatter.iti.getSelectedCountryData();
+
+            var fVal = telePhoneFormatter.getDisplay();
+            if (fVal == '') { //lazy init
+                if (val.indexOf('+') < 0) {
+                    val = '+' + sel.dialCode + val;
+                }
+                fVal = val;
+            }
+
+            ////ctrl.iti.setNumber(val);
+            var code = sel.iso2;
+
+            var htm = '<div style="display:flex">'
+                + '<div class="iti__selected-flag">'
+                + '<div class="iti__flag iti__' + code + '"></div>'
+                + '<div/>'
+                + '<div style="margin: 0 6px;cursor:pointer">' + fVal + '</div>'
+                + '</div>';
+            return htm;
+        };
+
+        return {
+            getHtml: getFormatedHtml
+        }
+    })();
+
+
+
+
 }(jQuery, VIS));

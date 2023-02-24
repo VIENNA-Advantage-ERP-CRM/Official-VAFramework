@@ -26,7 +26,6 @@ namespace VIS
             
             StyleBundle style = new StyleBundle("~/Areas/VIS/Content/VISstyle");
             //StyleBundle styleRTL = new StyleBundle("~/Areas/VIS/Content/VISstyleRTL");
-            StyleBundle style_t = new StyleBundle("~/Areas/VIS/Content/VISstyle_t");
 
             ScriptBundle modScript = new ScriptBundle("~/Areas/VIS/Scripts/VISjs");
 
@@ -151,14 +150,8 @@ namespace VIS
                     "~/Areas/VIS/Scripts/tabpanels/HistoryDetailsTabPanel.js",
                     "~/Areas/VIS/Scripts/tabpanels/surveyPanel.js",
                   "~/Areas/VIS/Scripts/TestPanel.js",
-                 "~/Areas/VIS/Scripts/app/forms/form.js",
-
-                "~/Areas/VIS/Scripts/tel_Input/data.js",
-                
-                "~/Areas/VIS/Scripts/tel_Input/intlTelInput.js"
-                ,
-                "~/Areas/VIS/Scripts/tel_Input/jquery.mask.js"
-               // "~/Areas/VIS/Scripts/tel_Input/input-format.min.js"
+                 "~/Areas/VIS/Scripts/app/forms/form.js"
+               
                  );
 
 
@@ -220,7 +213,6 @@ namespace VIS
 
 
             style.Include("~/Areas/VIS/Content/VIS.all.min.css");
-            style_t.Include("~/Areas/VIS/Content/TelInput/intlTelInput.css");
 
             //modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js");
             //modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
@@ -233,11 +225,9 @@ namespace VIS
             VAdvantage.ModuleBundles.RegisterScriptBundle(modScript, "VIS", -1);
             VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v1, "VIS1_0", -2);
             VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v2, "VIS2_0", -3);
-           // VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_t, "VISit", 4);
 
 
             VAdvantage.ModuleBundles.RegisterStyleBundle(style, "VIS", -1);
-            VAdvantage.ModuleBundles.RegisterStyleBundle(style_t, "VIS_S", -2);
             ////VAdvantage.ModuleBundles.RegisterRTLStyleBundle(styleRTL, "VIS", -1);
 
         }

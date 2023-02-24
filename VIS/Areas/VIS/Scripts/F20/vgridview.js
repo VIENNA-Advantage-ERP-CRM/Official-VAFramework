@@ -3,20 +3,14 @@
     //**             VTable                            **//
     //**************************************************//
 
-    var telePhoneFormatter = null;
+    
 
 
     function VTable() {
 
 
     /*int Default */
-        if (!telePhoneFormatter) {
-            telePhoneFormatter = new VIS.Controls.VTelePhone("Mobile", false, false, true, 20, 20, "", null, false);
-            var divRoot = $('<div>').append(telePhoneFormatter.getControl());
-            telePhoneFormatter.init();
-            divRoot.hide();
-            $('body').append(divRoot);
-        }
+        
 
 
         this.grid = null;
@@ -501,7 +495,7 @@
             }
             else if (mField.getDisplayType() == VIS.DisplayType.TelePhone) {
                 if (oColumn.hidden == false)
-                oColumn.style = 'text-decoration:underline; color:rgba(var(--v-c-primary), 1) !important; cursor:pointer';
+                oColumn.style = 'text-decoration:underline; color:rgba(var(--v-c-primary), 1) !important; ';
             }
 
             if (displayType == VIS.DisplayType.Amount) {
@@ -1028,32 +1022,34 @@
 
                     if (val) {
 
-                        if (val.indexOf('+') < 0) {
-                           telePhoneFormatter.iti.setCountry(geoplugin_countryCode());
-                        }
+                        return VIS.VTelePhoneInstance.getHtml(val);
 
-                        telePhoneFormatter.setValue(val);
+                        //if (val.indexOf('+') < 0) {
+                        //   telePhoneFormatter.iti.setCountry(geoplugin_countryCode());
+                        //}
 
-                        var sel = telePhoneFormatter.iti.getSelectedCountryData();
+                        //telePhoneFormatter.setValue(val);
 
-                        var fVal = telePhoneFormatter.getDisplay();
-                        if (fVal == '') { //lazy init
-                            if (val.indexOf('+') < 0) {
-                                val = '+' + sel.dialCode + val;
-                            }
-                            fVal = val;
-                        }
+                        //var sel = telePhoneFormatter.iti.getSelectedCountryData();
 
-                        ////ctrl.iti.setNumber(val);
-                        var code = sel.iso2;
+                        //var fVal = telePhoneFormatter.getDisplay();
+                        //if (fVal == '') { //lazy init
+                        //    if (val.indexOf('+') < 0) {
+                        //        val = '+' + sel.dialCode + val;
+                        //    }
+                        //    fVal = val;
+                        //}
 
-                        var htm = '<div style="display:flex">'
-                                    +'<div class="iti__selected-flag">'
-                                    + '<div class="iti__flag iti__' + code + '"></div>'
-                                    + '<div/>'
-                                     +'<div>' + fVal + '</div>'
-                                 +'</div>';
-                        return htm;
+                        //////ctrl.iti.setNumber(val);
+                        //var code = sel.iso2;
+
+                        //var htm = '<div style="display:flex">'
+                        //            +'<div class="iti__selected-flag">'
+                        //            + '<div class="iti__flag iti__' + code + '"></div>'
+                        //            + '<div/>'
+                        //             +'<div style="margin: 0 7px;cursor:pointer">' + fVal + '</div>'
+                        //         +'</div>';
+                        //return htm;
                     }
                     return "";
                 }
