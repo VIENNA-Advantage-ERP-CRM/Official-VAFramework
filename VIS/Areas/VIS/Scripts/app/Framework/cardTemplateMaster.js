@@ -531,7 +531,7 @@
                     DivGridSec.find('.addGridRow').click();
                 }
                 if (AD_HeaderLayout_ID == 0) {
-                    DivViewBlock.find('.vis-viewBlock').css('backgroundColor', '#fff');                    
+                    DivViewBlock.find('.vis-viewBlock').css('backgroundColor', 'rgba(var(--v-c-common), 1)');
                 }
                 btnEditIcon.hide();
                 isUndoRedo = false;

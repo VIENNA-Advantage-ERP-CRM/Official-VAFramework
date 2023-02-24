@@ -994,11 +994,10 @@ html,body { color:black;
     
 }
 */
-.vis-main-container
-{
+.vis-main-container {
     clear: both;
     height: 100%;
-    background: url("../Images/logo.jpg") no-repeat;
+    background: url("../Images/logo-blue.png") no-repeat;
     background-position: bottom right;
 }
 

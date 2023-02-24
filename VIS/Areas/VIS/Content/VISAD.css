@@ -4182,7 +4182,7 @@ html[dir="rtl"] .VIS-AMTD-ModalformBtns a {
 }
 /*END Amount Division Control*/
 .vis-selected-li-print {
-    background-color: #CCDADE;
+    background-color: rgba(var(--v-c-primary), .1);
 }
 
 

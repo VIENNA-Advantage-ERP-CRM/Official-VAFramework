@@ -3442,7 +3442,7 @@ field, fieldvalue {
     border: none;
     background-color: rgba(var(--v-c-common), 1);
     border: 1px solid #999;
-    color: #555;
+    color: rgba(var(--v-c-on-secondary), 1);
     font-weight: 600;
     border-radius: 2px;
 }
@@ -3451,8 +3451,8 @@ field, fieldvalue {
     padding: 2px 15px;
     border: none;
     background-color: rgba(var(--v-c-common), 1);
-    border: 1px solid #999;
-    color: #555;
+    border: 1px solid rgba(var(--v-c-on-secondary), .2);
+    color: rgba(var(--v-c-on-secondary), 1);
     font-weight: 600;
     border-radius: 2px;
 }

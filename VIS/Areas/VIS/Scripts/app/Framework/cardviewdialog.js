@@ -298,7 +298,7 @@
                 }
 
                 if (AD_HeaderLayout_ID == 0 && !isCopy) {
-                    DivViewBlock.find('.vis-viewBlock').css('backgroundColor', '#fff');
+                    DivViewBlock.find('.vis-viewBlock').css('backgroundColor', 'rgba(var(--v-c-common), 1)');
                 }
 
 
@@ -1899,7 +1899,7 @@
                     }
                 }
             } else {
-                cvTable.append("<tr style='height:100%'><td colspan='5' style='background-color: #f1f1f173;'><div class='align-items-center d-flex justify-content-center'><i class='fa fa-database mr-1 fa-2x' aria-hidden='true'></i>" + VIS.Msg.getMsg("NoResult") + "</div></td></tr>");
+                cvTable.append("<tr style='height:100%'><td colspan='5' style='background-color: rgba(var(--v-c-on-secondary), .03);'><div class='align-items-center d-flex justify-content-center'><i class='fa fa-database mr-1 fa-2x' aria-hidden='true'></i>" + VIS.Msg.getMsg("NoResult") + "</div></td></tr>");
             }
         };
 

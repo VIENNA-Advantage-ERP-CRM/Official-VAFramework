@@ -12,6 +12,10 @@
 body * {
     /*color: rgba(var(--v-c-on-secondary), 1);*/
 }
+input[type="date"],
+input[type="time"] {
+    color-scheme: dark;
+}
 body,
 #vis_mainMenu,
 .vis-removeFilter,
@@ -58,9 +62,9 @@ textarea,
 }
 
 .vis-welcomeScreenContainer,
-.ui-widget input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+.ui-widget input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button "]):not(.VIS_Pref_btn-2),
 .ui-widget textarea {
-    background: transparent;
+    background-color: transparent;
 }
 .vis-welcomeScreenTabMenu li {
     border-right: 1px solid rgb(var(--v-c-bg-color));
@@ -99,7 +103,6 @@ html .km-pane-wrapper .k-header,
     background-image: none;
 }
 .k-block,
-.k-button,
 .k-draghandle,
 .k-grid-header,
 .k-grouping-header,
@@ -145,8 +148,6 @@ html .km-pane-wrapper .k-header,
 .k-state-default, 
 .k-state-default .k-select, 
 .k-state-disabled, 
-.k-textbox, 
-.k-textbox > input, 
 .k-tiles, 
 .k-toolbar, 
 .k-tooltip, 
@@ -158,7 +159,8 @@ html .km-pane-wrapper .k-header,
 .k-numeric-wrap.k-state-default, 
 .k-picker-wrap.k-state-default,
 .vis-workflowActivityContainer,
-.form-control{
+.form-control,
+.popover {
     border-color: rgba(var(--v-c-on-secondary), .2);
 }
 
@@ -311,6 +313,24 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label,
 .k-state-hover > * > .k-i-pdf {
     background-position: -316px -244px !important;
 }
+.k-addRowAbove {
+    background-position: -216px -72px !important;
+}
+.k-addRowBelow {
+    background-position: -216px -96px !important;
+}
+.k-addColumnLeft {
+    background-position: -216px -24px !important;
+}
+.k-addColumnRight {
+    background-position: -216px -48px !important;
+}
+.k-deleteRow {
+    background-position: -216px -120px !important;
+}
+.k-deleteColumn {
+    background-position: -216px -144px !important;
+}
 
 .k-block,
 .k-content,
@@ -361,7 +381,8 @@ table.k-editor,
 .k-grid-footer-locked, .k-grid-footer-wrap, .k-grid-header, .k-grid-header-locked, .k-grid-header-wrap, .k-group, .k-group-footer td, .k-grouping-header, .k-grouping-header .k-group-indicator, .k-header, .k-input, .k-pager-refresh, .k-pager-wrap, .k-pager-wrap .k-link, .k-panel > .k-item > .k-link, .k-panelbar .k-content, .k-panelbar .k-panel, .k-panelbar > .k-item > .k-link, .k-separator, .k-slider-track, .k-splitbar, .k-state-default, .k-state-default .k-select, .k-state-disabled, .k-textbox, .k-textbox > input, .k-tiles, .k-toolbar, .k-tooltip, .k-treemap-tile, .k-upload-files, .k-widget,
 .k-button,
 .k-scheduler-header th, .k-scheduler-header-wrap, .k-scheduler-table td, .k-scheduler-times, .k-scheduler-times th, .k-scheduler-times tr,
-.vis-zero-right-border {
+.vis-zero-right-border,
+.k-checkbox-label:before {
     border-color: rgba(var(--v-c-on-secondary), .2) !important;
 }
 .k-editor .k-content,
@@ -377,15 +398,15 @@ table.k-editor,
 .k-popup.k-list-container,
 .bg-white,
 .k-active-filter, .k-state-active, .k-state-active:hover, .k-tabstrip .k-state-active,
-.k-input, .k-multiselect-wrap, .k-textbox>input, input.k-textbox, input.k-textbox:hover, textarea.k-textbox, textarea.k-textbox:hover {
-    background: rgb(var(--v-c-bg-color)) !important;
+.k-input, .k-multiselect-wrap, .k-textbox>input, input.k-textbox, input.k-textbox:hover, textarea.k-textbox, textarea.k-textbox:hover,
+.k-checkbox-label:before {
+    background-color: rgb(var(--v-c-bg-color)) !important;
 }
 .k-autocomplete.k-state-default,
 .k-dropdown-wrap.k-state-default,
 .k-numeric-wrap.k-state-default,
 .k-picker-wrap.k-state-default,
-.k-autocomplete,
-.k-button, .k-draghandle,
+.k-autocomplete, .k-draghandle,
 .k-dropdown-wrap,
 .k-grid-header,
 .k-grouping-header,
@@ -397,14 +418,12 @@ table.k-editor,
 .k-progressbar,
 .k-state-highlight,
 .k-tabstrip-items .k-item,
-.k-textbox,
 .k-toolbar,
-.km-pane-wrapper > .km-pane > .km-view > .km-content,
-.k-button.k-state-focused, .k-button.k-state-hover, .k-button:focus, .k-button:hover, .k-draghandle:hover, .k-other-month.k-state-hover .k-link, .k-pager-wrap .k-link:hover, .k-state-hover, .k-state-hover:hover, .k-textbox:hover, div.k-filebrowser-dropzone em {
+.km-pane-wrapper > .km-pane > .km-view > .km-content, .k-draghandle:hover, .k-other-month.k-state-hover .k-link, .k-pager-wrap .k-link:hover, div.k-filebrowser-dropzone em {
     background: none !important;
 }
 .k-calendar th,
-.k-button.k-state-hover, .k-button:hover,
+.k-button.k-state-hover,
 .k-nonwork-hour,
 .vadb-header-menu,
 .k-alt, .k-pivot-layout>tbody>tr:first-child>td:first-child, .k-resource.k-alt, .k-separator,
@@ -417,7 +436,7 @@ table.k-editor,
     background: none !important;
 }
 .k-delete, .k-group-delete, .k-i-close {
-    background: url(../Images/cross.svg) no-repeat !important;
+    background: url(../Images/cross.svg) no-repeat center !important;
 }
 .k-i-calendar {
     background: url(../Images/appointment.svg) no-repeat !important;
@@ -458,6 +477,10 @@ table.k-editor,
 .k-alt, .k-pivot-layout > tbody > tr:first-child > td:first-child, .k-resource.k-alt, .k-separator {
     background: rgba(var(--v-c-on-secondary), .2)
 }
+.k-picker-wrap.k-state-hover,
+.k-state-default.k-state-hover > .k-select {
+    background: rgba(var(--v-c-on-secondary), .2) !important;
+}
 .vis-ev-col input[readonly] {
     background-color: rgba(var(--v-c-on-secondary), .04) !important;
 }
@@ -465,12 +488,46 @@ table.k-editor,
     background-image: none,linear-gradient(to bottom,rgba(0,0,0,.3) 0,rgba(0,0,0,0) 100%);
     background-color: rgba(var(--v-c-on-secondary), .2);
 }
-.vis-process-left-sidebar .VIS_Pref_btn-2.vis-process-ok-btn {
+.vis-process-left-sidebar .VIS_Pref_btn-2.vis-process-ok-btn,
+.vis-excelimportbtn a {
     background-color: rgba(var(--v-c-primary), 1);
 }
 .k-grid tr:hover {
-    background-color: rgba(var(--v-c-on-secondary), .2);
-    background-image: none,-webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,.3)),to(rgba(0,0,0,0)));
-    background-image: none,-webkit-linear-gradient(top,rgba(0,0,0,.3) 0,rgba(0,0,0,0) 100%);
-    background-image: none,linear-gradient(to bottom,rgba(0,0,0,.3) 0,rgba(0,0,0,0) 100%);
+    background-color: rgba(var(--v-c-on-secondary), .2) !important;
+    background-image: none,-webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,.3)),to(rgba(0,0,0,0))) !important;
+    background-image: none,-webkit-linear-gradient(top,rgba(0,0,0,.3) 0,rgba(0,0,0,0) 100%) !important;
+    background-image: none,linear-gradient(to bottom,rgba(0,0,0,.3) 0,rgba(0,0,0,0) 100%) !important;
+}
+.k-block, .k-content, .k-dropdown .k-input, .k-popup, .k-toolbar, .k-widget,
+.k-input, .k-multiselect-wrap, .k-textbox > input, input.k-textbox, input.k-textbox:hover, textarea.k-textbox, textarea.k-textbox:hover,
+.k-header,
+.k-calendar .k-link.k-nav-fast,
+.k-calendar .k-link,
+.k-link:link, .k-link:visited, .k-nav-current.k-state-hover .k-link,
+.k-scheduler-layout,
+.k-scheduler-datecolumn, .k-scheduler-groupcolumn,
+.k-item span,
+.k-grouping-header,
+.k-grid-footer td, .k-group-footer td, .k-grouping-row td {
+    color: rgb(var(--v-c-on-secondary)) !important;
+}
+.k-other-month .k-link {
+    color: rgba(var(--v-c-on-secondary), .5) !important;
+}
+.popover {
+    background-color: rgba(var(--v-c-common), 1);
+}
+.bs-popover-right .arrow::after {
+    border-right-color: rgba(var(--v-c-common), 1);
+}
+.bs-popover-right .arrow::before {
+    border-right-color: rgba(var(--v-c-on-secondary), .2);
+}
+.k-button {
+    background-image: none !important;
+    background-color: rgba(var(--v-c-on-secondary), .1) !important;
+    color: rgba(var(--v-c-on-secondary), 1) !important
+}
+.k-primary:hover, .k-button:hover {
+    background-color: rgba(var(--v-c-primary), 1) !important;
 }

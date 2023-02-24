@@ -128,7 +128,7 @@
 
 
 .vis-tabPrimary .nav-tabs .nav-item .nav-link.active {
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     color: rgba(var(--v-c-on-secondary), 1);
     border-radius: 0;
 }
@@ -138,14 +138,14 @@
     background: rgba(var(--v-c-secondary), 1)
 }
 
-        .vis-tabPrimary .nav-tabs .nav-link.active {
-            color: rgba(var(--v-c-primary), 1);
-            font-weight: 600;
-            background-color: #fff;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-        }
+    .vis-tabPrimary .nav-tabs .nav-link.active {
+        color: rgba(var(--v-c-primary), 1);
+        font-weight: 600;
+        background-color: rgba(var(--v-c-common), 1);
+        border-top: none;
+        border-left: none;
+        border-right: none;
+    }
 
         .vis-tabPrimary .nav-tabs .nav-link:focus,
         .vis-tabPrimary .nav-tabs .nav-link:hover {
@@ -161,7 +161,7 @@
 
 .vis-respSection .nav-tabs .nav-link {
     color: rgba(var(--v-c-on-secondary), 1);
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
 }
 
     .vis-respSection .nav-tabs .nav-link.active {
@@ -181,20 +181,20 @@
 }
 
 .vis-cusPagination {
-    border:none;
+    border: none;
     font-weight: bold;
     color: rgba(var(--v-c-primary), 1);
-    background:#fff;
+    background: rgba(var(--v-c-common), 1);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    padding:0;
+    padding: 0;
 }
     .vis-cusPagination:disabled {
         background-color: rgba(var(--v-c-secondary), 0.5);
         color: rgba(var(--v-c-secondary), 1);
-        background: #fff;
+        background: rgba(var(--v-c-common), 1);
     }
 
 .vis-surveyPagination {
