@@ -91,7 +91,7 @@
                         VA048.Apps.GetCallingInstance(true, numberinfo, false);
                     }
                     else
-                        VIS.Dialog.info("Communication Module is not found)");
+                        VIS.ADialog.info("Communication Module is not installed)");
                 }
             } catch (err) {
 

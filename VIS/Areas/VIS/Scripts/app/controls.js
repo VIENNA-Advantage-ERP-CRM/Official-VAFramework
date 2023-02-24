@@ -6848,7 +6848,7 @@
                     numberinfo["withcall"] = true;
                     VA048.Apps.GetCallingInstance(true, numberinfo, false);
                 } else
-                    VIS.Dialog.info("Communication Module is not found)");
+                    VIS.ADialog.info("Communication Module is not installed)");
 
                 //alert('val');
             }
@@ -6899,7 +6899,7 @@
                 //his.ctrl.val(newValue);
                 if (!newValue) {
                     this.iti ? this.iti.setNumber('') : this.ctrl.val('');
-                    this.iti ? this.iti.setCountry(geoplugin_countryCode()):'';
+                    this.setCountry();
                 } else {
                     this.iti ? this.iti.setNumber(newValue) : this.ctrl.val(newValue);
                     //var res = this.ctrl.attr('placeholder').replace(/[0-9]/g, 0);
@@ -6939,10 +6939,13 @@
             geoIpLookup: function (success, failure) {
                // $.get("https://ipinfo.io", function () { }, "jsonp").always(function (resp) {
                  //   var countryCode = (resp && resp.country) ? resp.country : "us";
-                success(geoplugin_countryCode());
+                if (window.geoplugin_countryCode)
+                    success(geoplugin_countryCode());
+                else
+                    success("IN");
                // });
             },
-            utilsScript: baseUrl + "Areas/VIS/Scripts/TelInput/utils.js?1638200991544"
+            utilsScript: baseUrl + "Areas/ViennaBase/Scripts/tel_Input/utils.js?1638200991544"
         });
 
     };
@@ -6968,8 +6971,12 @@
     };
 
     VTelePhone.prototype.setCountry = function () {
-        if(this.iti)
-           this.iti.setCountry(geoplugin_countryCode());
+        if (this.iti) {
+            if (window.geoplugin_countryCode)
+                this.iti.setCountry(geoplugin_countryCode());
+            else
+                this.iti.setCountry('IN');
+        }
     };
 
     VTelePhone.prototype.getSelectedCountryData = function () {
@@ -7040,10 +7047,8 @@
                 return '';
 
             if (val.indexOf('+') < 0) {
-                
-                telePhoneFormatter.setCountry(geoplugin_countryCode());
+                    telePhoneFormatter.setCountry();
             }
-
             telePhoneFormatter.setValue(val);
 
             var sel = telePhoneFormatter.iti.getSelectedCountryData();
