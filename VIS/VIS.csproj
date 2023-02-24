@@ -207,8 +207,6 @@
     <Content Include="Areas\VIS\Content\Site.css" />
     <Content Include="Areas\VIS\Content\Style.css" />
     <Content Include="Areas\VIS\Content\SurveyTabPanel.css" />
-    <Content Include="Areas\VIS\Content\TelInput\intlTelInput.css" />
-    <Content Include="Areas\VIS\Content\TelInput\intlTelInput.min.css" />
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
     <Content Include="Areas\VIS\Content\VIS.all.min.css" />
     <Content Include="Areas\VIS\Content\VISAD.css" />
