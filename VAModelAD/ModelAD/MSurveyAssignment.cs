@@ -61,7 +61,7 @@ namespace VAdvantage.Model
         /// <returns></returns>
         protected override bool BeforeSave(bool newRecord)
         {
-            string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='Y' AND isActive='Y'";
+            string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='Y' AND isActive='Y'";
             if (!newRecord)
             {
                 sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
@@ -76,7 +76,7 @@ namespace VAdvantage.Model
             }
             else if (IsAD_ShowEverytime() == true)
             {
-                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND isActive='Y'";
+                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND isActive='Y'";
                 if (!newRecord)
                 {
                     sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
@@ -94,7 +94,7 @@ namespace VAdvantage.Model
             }
             else if (IsAD_ShowEverytime() == false)
             {
-                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND AD_Survey_ID=" + GetAD_Survey_ID() + " AND isActive='Y'";
+                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND AD_Survey_ID=" + GetAD_Survey_ID() + " AND isActive='Y'";
                 if (!newRecord)
                 {
                     sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();

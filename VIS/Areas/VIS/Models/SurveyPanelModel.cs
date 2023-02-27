@@ -50,7 +50,7 @@ namespace VIS.Models
             sql.Append(@" FROM ad_surveyassignment sa INNER JOIN AD_Survey s ON 
                                                   s.ad_survey_ID= sa.ad_survey_id 
                                                   LEFT JOIN AD_ResponseSetting RS ON (RS.ad_surveyassignment_ID=sa.ad_surveyassignment_ID) AND RS.IsActive='Y'
-                                                  WHERE sa.IsActive='Y' AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
+                                                  WHERE sa.IsActive='Y' AND sa.AD_Window_ID="+ AD_Window_ID + " AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql.ToString(), "sa", true, false), null);
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {                
@@ -230,7 +230,7 @@ namespace VIS.Models
                 return false;
             }
 
-            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Table_ID=" + AD_Table_ID;
+            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
             if (DocAction != "RE")
             {
                 sql += " AND docaction='" + DocAction + "'";
