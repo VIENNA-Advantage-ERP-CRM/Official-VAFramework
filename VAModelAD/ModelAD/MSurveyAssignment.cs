@@ -40,7 +40,7 @@ namespace VAdvantage.Model
             if (newRecord)
             {
                 MTabPanel tp = new MTabPanel(GetCtx(), 0, null);
-                tp.SetName("Survey Panel"+GetAD_SurveyAssignment_ID());
+                tp.SetName("Survey Panel");
                 tp.SetClassname("VIS.SurveyPanel");
                 tp.SetAD_Tab_ID(GetAD_Tab_ID());
                 tp.SetSeqNo(10);
@@ -65,6 +65,8 @@ namespace VAdvantage.Model
             if (!newRecord)
             {
                 sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
+
+               DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
             }
             int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             if (count > 0)

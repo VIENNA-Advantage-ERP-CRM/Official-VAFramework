@@ -1167,7 +1167,7 @@ namespace VAdvantage.WF
 
                         if(autoApproval && _node.IsSurveyResponseRequired())
                         {
-                            if (!VAdvantage.Common.Common.CheckSurveyResponseExist(GetCtx(), AD_Window_ID, _process.GetRecord_ID(), _process.GetAD_Table_ID(), GetAD_WF_Activity_ID()))
+                            if (!VAdvantage.Common.Common.CheckSurveyResponseExist(GetCtx(), GetAD_Window_ID(), _process.GetRecord_ID(), _process.GetAD_Table_ID(), GetAD_WF_Activity_ID(), autoApproval))
                             {
                                 _process.SetProcessMsg(Msg.GetMsg(GetCtx(), "CheckListRequired"));
                                 return false;

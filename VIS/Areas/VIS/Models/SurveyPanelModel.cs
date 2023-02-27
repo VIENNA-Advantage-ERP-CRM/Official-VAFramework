@@ -24,8 +24,16 @@ namespace VIS.Models
         /// <returns></returns>
         public List<SurveyAssignmentsDetails> GetSurveyAssignments(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int AD_Table_ID,int AD_Record_ID, int AD_WF_Activity_ID)
         {
+            
+
             SurveyAssignmentsDetails lst = new SurveyAssignmentsDetails();
             List<SurveyAssignmentsDetails> LsDetails = new List<SurveyAssignmentsDetails>();
+
+            if (AD_Window_ID == 0)
+            {
+                return LsDetails;
+            }
+
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
                                                   sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
                                                   s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limits,0) AS Limit,RS.isSelfshow,");
@@ -49,16 +57,17 @@ namespace VIS.Models
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"])=="N")
-                    {
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
-                        if (isvalidate)
-                        {
-                            isvalidate = true;
-                        }
-                    }
+                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"])=="N")
+                    //{
 
-                    if(Util.GetValueOfString(dt["AD_ShowEverytime"])=="N" && !isvalidate)
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    //    if (isvalidate)
+                    //    {
+                    //        isvalidate = true;
+                    //    }
+                    //}
+
+                    if(!isvalidate)
                     {
                         continue;
                     }
@@ -216,6 +225,10 @@ namespace VIS.Models
         /// <returns></returns>
         public bool CheckDocActionCheckListResponse(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int Record_ID, string DocAction, int AD_Table_ID)
         {
+            if (AD_Window_ID == 0)
+            {
+                return false;
+            }
 
             string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Table_ID=" + AD_Table_ID;
             if (DocAction != "RE")
@@ -230,16 +243,16 @@ namespace VIS.Models
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
-                    {
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
-                        if (isvalidate)
-                        {
-                            isvalidate = true;
-                        }
-                    }
+                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    //{
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    //    if (isvalidate)
+                    //    {
+                    //        isvalidate = true;
+                    //    }
+                    //}
 
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N" && !isvalidate)
+                    if (!isvalidate)
                     {
                         continue;
                     }

@@ -1056,7 +1056,7 @@
             liAInput.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Forward')));
 
             //Get User Lookup
-            var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, null);
+            var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, "AD_User_ID.IsActive='Y'");
             var txtb = new VIS.Controls.VTextBoxButton("AD_User_ID", false, false, true, VIS.DisplayType.Search, lookup);
             detailCtrl.FwdCtrl = txtb;
             txtb.getBtn();
