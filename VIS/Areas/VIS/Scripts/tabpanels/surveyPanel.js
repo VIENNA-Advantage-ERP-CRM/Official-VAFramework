@@ -517,6 +517,7 @@ VIS = window.VIS || {};
             } else {
                 questionSection.find('.prev').hide();
             }
+            questionSection.find('.vis-tp-orderListWrap').scrollTop(0);
         }
 
         function eventHandling() {

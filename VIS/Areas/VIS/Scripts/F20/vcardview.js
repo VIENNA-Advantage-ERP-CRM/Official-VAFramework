@@ -7,7 +7,7 @@
         var divbody = $('<div class=vis-cv-rd-body>');
         root.append(divTopArrow).append(divbody).append(divDownArrow);
 
-        this.addItem = function (name) {
+        this.addItem = function (name) {            
             var $spn = $('<span class="vis-cv-rd-body-item">');
             $spn.text(name);
             divbody.append($spn);
@@ -909,6 +909,7 @@
             }
 
             function emptyCardSetup() {
+                $this.VCardRightPanel.reset();
                 $this.getRoot().removeClass('emptyGroup').removeAttr('style');
                 root.find('.cardEmpty').remove();
                 var excludeGrp = $this.ExcludedGroup;

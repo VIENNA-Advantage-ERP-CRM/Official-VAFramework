@@ -696,7 +696,11 @@
         }
 
         if (editor != null && customStyle != "") {
-            editor.getControl().attr('style', customStyle);
+            if (mField.getDisplayType() == VIS.DisplayType.ProgressBar) {
+                editor.setHtmlStyle(customStyle);
+            } else {
+                editor.getControl().attr('style', customStyle);
+            }
         }
 
         var ctrlP = $("<div class='vis-control-wrap'>");
