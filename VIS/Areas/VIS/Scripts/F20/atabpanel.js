@@ -168,10 +168,10 @@
             if (type) {
                 var panel = new type();
                 panel.startPanel(windowNo, this.gTab, extrainfo);
-                if (this.gTab.getRecord_ID() > -1) {
+                this.curTabPanel = panel;
+                if (this.gTab.getRecord_ID() > -1 || this.gTab.getCurrentRow() > -1) {
                     panel.refreshPanelData(this.gTab.getRecord_ID(), this.gTab.getTableModel().getRow(this.gTab.getCurrentRow()));
                 }
-                this.curTabPanel = panel;
             }
         }
     };

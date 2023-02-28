@@ -758,7 +758,7 @@
     IControl.prototype.setBackground = function (e) {
 
         if (this.colName.startsWith("lbl") || this.displayType == VIS.DisplayType.Label ||
-            this.displayType == VIS.DisplayType.YesNo || this.displayType == VIS.DisplayType.Button || this.displayType == VIS.DisplayType.ProgressBar)
+            this.displayType == VIS.DisplayType.YesNo || this.displayType == VIS.DisplayType.Button)
             return;
 
 
@@ -6721,6 +6721,38 @@
         this.ctrl.find('output').attr('contenteditable', readOnly ? false : true);
         this.setBackground(false);
     };
+
+    VProgressBar.prototype.setHtmlStyle = function (style) {
+        if (style && this.dynStyle != style) {
+
+            if (style.contains(':')) {
+                if (!this.dynStyle) this.oldStyle = this.ctrl.find('input').attr('style');
+                this.ctrl.find('input').removeAttr(style).attr('style', style);
+                this.ctrl.find('output').removeAttr(style).attr('style', style);
+            }
+            else {
+                this.ctrl.find('input').addClass(style);
+                this.ctrl.find('output').addClass(style);
+            }
+            this.dynStyle = style;
+        }
+        else if (!style && this.dynStyle) {
+            if (this.dynStyle.contains(':')) {
+                this.ctrl.find('input').removeAttr('style');
+                this.ctrl.find('output').removeAttr('style');
+                if (this.oldStyle) {
+                    this.ctrl.find('input').attr('style', this.oldStyle);
+                    this.ctrl.find('output').attr('style', this.oldStyle);
+                };
+            }
+            else {
+                this.ctrl.find('input').removeClass(this.dynStyle);
+                this.ctrl.find('output').removeClass(this.dynStyle);
+            }
+            this.oldStyle = null;
+            this.dynStyle = null;
+        }
+    }
     //VProgressBar.prototype.setOutputPosition = function () {
     //    var offset = 30;
     //    if (this.editingGrid) {
