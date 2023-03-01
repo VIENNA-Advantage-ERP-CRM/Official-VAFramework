@@ -675,12 +675,46 @@ ul.vis-IIColumnContent {
 }
 
     ul.vis-IIColumnContent li {
-        float: left;
-        width: 50%;
+        /*float: left;*/
+        width: 100%;
     }
 
 html[dir="rtl"] ul.vis-IIColumnContent li {
-    float: right;
+    /*float: right;*/
+}
+
+.vis-home-wf-answerWrap {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.vis-home-wf-answerInput {
+    width: 70%;
+    margin-bottom:0px !important;
+}
+
+.vis-home-wf-answerBtn {
+    width: 30%;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+.vis-home-wf-forwardWrap {
+    display: flex;
+}
+
+.vis-home-wf-forwardInput {
+    width: 70%;
+    margin-top: 10px;
+}
+
+.vis-home-wf-forwardBtn {
+    width: 30%;
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    padding-bottom: 11px;
 }
 
 .historyImage {
