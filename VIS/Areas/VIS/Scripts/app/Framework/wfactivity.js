@@ -1056,7 +1056,7 @@
             liAInput.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Forward')));
 
             //Get User Lookup
-            var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, null);
+            var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, "AD_User_ID.IsActive='Y'");
             var txtb = new VIS.Controls.VTextBoxButton("AD_User_ID", false, false, true, VIS.DisplayType.Search, lookup);
             detailCtrl.FwdCtrl = txtb;
             txtb.getBtn();
@@ -1250,7 +1250,7 @@
                     sPanel.init();
                     var rt = sPanel.getRoot();
                     divWorkflowChecklist.html('');
-                    sPanel.panelDetails(0, 0, fulldata[index].AD_Table_ID, fulldata[index].Record_ID, rt, fulldata[index].AD_WF_Activity_ID);
+                    sPanel.panelDetails(fulldata[index].AD_Window_ID, 0, fulldata[index].AD_Table_ID, fulldata[index].Record_ID, rt, fulldata[index].AD_WF_Activity_ID);
                     divWorkflowChecklist.append(rt);
                 } else {
                     divDetail.find(".vis-workflowActivityDetails-Heading h3").text(VIS.Msg.getMsg('Detail'));

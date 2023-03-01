@@ -698,6 +698,8 @@ namespace VAdvantage.Common
                 {
                     outStr.Append(ParseVariable(token, po));		// replace context
                 }
+
+                outStr.Append(ParseVariable(token, po));
                 inStr = inStr.Substring(j + 1);
                 // from second @
                 i = inStr.IndexOf("@");
@@ -706,7 +708,6 @@ namespace VAdvantage.Common
             outStr.Append(inStr);           					//	add remainder
             return outStr.ToString();
         }
-
 
         /// <summary>
         /// Parse Variable
@@ -727,7 +728,7 @@ namespace VAdvantage.Common
             POInfo _poInfo = POInfo.GetPOInfo(po.GetCtx(), po.Get_Table_ID());
 
             //  MColumn column = (new MTable(po.GetCtx(), po.Get_Table_ID(), null)).GetColumn(variable);
-            MColumn column = (MTable.Get(po.GetCtx(),po.Get_Table_ID())).GetColumn(variable);
+            MColumn column = (MTable.Get(po.GetCtx(), po.Get_Table_ID())).GetColumn(variable);
             if (column.GetAD_Reference_ID() == DisplayType.Location)
             {
                 StringBuilder sb = new StringBuilder();
@@ -815,6 +816,177 @@ namespace VAdvantage.Common
             return value.ToString();
         }
 
+        /// <summary>
+        /// Parse Context By PO
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="po"></param>
+        /// <returns></returns>
+        public static string ParseContextByPO(String text, PO po)
+        {
+            if (po == null || text.IndexOf("@") == -1)
+                return text;
+
+            String inStr = text;
+            String token;
+            StringBuilder outStr = new StringBuilder();
+
+            int i = inStr.IndexOf("@");
+            while (i != -1)
+            {
+                outStr.Append(inStr.Substring(0, i));			// up to @
+                inStr = inStr.Substring(i + 1); ///from first @
+
+                int j = inStr.IndexOf("@");						// next @
+                if (j < 0)										// no second tag
+                {
+                    inStr = "@" + inStr;
+                    break;
+                }
+
+                token = inStr.Substring(0, j);
+                //if (token == "Tenant")
+                //{
+                //    int id = po.GetAD_Client_ID();
+                //    outStr.Append(DB.ExecuteScalar("Select Name FROM AD_Client WHERE AD_Client_ID=" + id));
+                //}
+                //else if (token == "Org")
+                //{
+                //    int id = po.GetAD_Org_ID();
+                //    outStr.Append(DB.ExecuteScalar("Select Name FROM AD_ORG WHERE AD_ORG_ID=" + id));
+                //}
+                //else if (token == "BPName")
+                //{
+                //    if (po.Get_TableName() == "C_BPartner")
+                //    {
+                //        outStr.Append(ParseContextVariable("Name", po));
+                //    }
+                //    else
+                //    {
+                //        outStr.Append("@" + token + "@");
+                //    }
+                //}
+                //else
+                //{
+                //    outStr.Append(ParseContextVariable(token, po));		// replace context
+                //}
+
+                outStr.Append(ParseContextVariable(token, po));
+                inStr = inStr.Substring(j + 1);
+                // from second @
+                i = inStr.IndexOf("@");
+            }
+
+            outStr.Append(inStr);           					//	add remainder
+            return outStr.ToString();
+        }
+
+        /// <summary>
+        /// Parse Context Variable
+        /// </summary>
+        /// <param name="variable"></param>
+        /// <param name="po"></param>
+        /// <returns></returns>
+        private static string ParseContextVariable(String variable, PO po)
+        {
+            int index = po.Get_ColumnIndex(variable);
+            if (index == -1)
+                return "@" + variable + "@";	//	keep for next
+            //
+            Object value = po.Get_Value(index);
+            if (value == null)
+                return "";
+
+            POInfo _poInfo = POInfo.GetPOInfo(po.GetCtx(), po.Get_Table_ID());
+
+            //  MColumn column = (new MTable(po.GetCtx(), po.Get_Table_ID(), null)).GetColumn(variable);
+            MColumn column = (MTable.Get(po.GetCtx(), po.Get_Table_ID())).GetColumn(variable);
+            if (column.GetAD_Reference_ID() == DisplayType.Location)
+            {
+                StringBuilder sb = new StringBuilder();
+                DataSet ds = DB.ExecuteDataset(@"SELECT l.address1,
+                                                          l.address2,
+                                                          l.address3,
+                                                          l.address4,
+                                                          l.city,
+                                                          CASE
+                                                            WHEN l.C_City_ID IS NOT NULL
+                                                            THEN
+                                                              ( SELECT NAME FROM C_City ct WHERE ct.C_City_ID=l.C_City_ID
+                                                              )
+                                                            ELSE NULL
+                                                          END CityName,
+                                                          (SELECT NAME FROM C_Country c WHERE c.C_Country_ID=l.C_Country_ID
+                                                          ) AS CountryName
+                                                        FROM C_Location l WHERE l.C_Location_ID=" + value);
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    if (ds.Tables[0].Rows[0]["address1"] != null && ds.Tables[0].Rows[0]["address1"] != DBNull.Value)
+                    {
+                        sb.Append(ds.Tables[0].Rows[0]["address1"]).Append(",");
+                    }
+                    if (ds.Tables[0].Rows[0]["address2"] != null && ds.Tables[0].Rows[0]["address2"] != DBNull.Value)
+                    {
+                        sb.Append(ds.Tables[0].Rows[0]["address2"]).Append(",");
+                    }
+                    if (ds.Tables[0].Rows[0]["address3"] != null && ds.Tables[0].Rows[0]["address3"] != DBNull.Value)
+                    {
+                        sb.Append(ds.Tables[0].Rows[0]["address3"]).Append(",");
+                    }
+                    if (ds.Tables[0].Rows[0]["address4"] != null && ds.Tables[0].Rows[0]["address4"] != DBNull.Value)
+                    {
+                        sb.Append(ds.Tables[0].Rows[0]["address4"]).Append(",");
+                    }
+                    if (ds.Tables[0].Rows[0]["city"] != null && ds.Tables[0].Rows[0]["city"] != DBNull.Value)
+                    {
+                        sb.Append(ds.Tables[0].Rows[0]["city"]).Append(",");
+                    }
+                    if (ds.Tables[0].Rows[0]["CityName"] != null && ds.Tables[0].Rows[0]["CityName"] != DBNull.Value)
+                    {
+                        sb.Append(ds.Tables[0].Rows[0]["CityName"]).Append(",");
+                    }
+                    if (ds.Tables[0].Rows[0]["CountryName"] != null && ds.Tables[0].Rows[0]["CountryName"] != DBNull.Value)
+                    {
+                        sb.Append(ds.Tables[0].Rows[0]["CountryName"]).Append(",");
+                    }
+                    return sb.ToString().TrimEnd(',');
+
+                }
+                else
+                {
+                    return "";
+                }
+
+            }
+
+            //Get lookup display column name for ID 
+            //if (_poInfo != null && _poInfo.getAD_Table_ID() == po.Get_Table_ID() && _poInfo.IsColumnLookup(index) && value != null)
+            //{
+            //    VLookUpInfo lookup = Common.GetColumnLookupInfo(po.GetCtx(), _poInfo.GetColumnInfo(index)); //create lookup info for column
+            //    DataSet ds = DB.ExecuteDataset(lookup.queryDirect.Replace("@key", DB.TO_STRING(value.ToString())), null); //Get Name from data
+
+            //    if (ds != null && ds.Tables[0].Rows.Count > 0)
+            //    {
+            //        value = ds.Tables[0].Rows[0][2]; //Name Value
+            //        value = RemoveImageIdentifer(value);
+            //    }
+            //}
+
+
+
+            if (column.GetAD_Reference_ID() == DisplayType.Date)
+            {
+                //return Util.GetValueOfDateTime(value).Value.Date.ToShortDateString();
+                return DisplayType.GetDateFormat(column.GetAD_Reference_ID()).Format(value, po.GetCtx().GetContext("#ClientLanguage"), SimpleDateFormat.DATESHORT);
+            }
+
+            // Show Amount according to browser culture
+            if (column.GetAD_Reference_ID() == DisplayType.Amount || column.GetAD_Reference_ID() == DisplayType.CostPrice)
+            {
+                return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
+            }
+            return value.ToString();
+        }
 
         public static string RemoveImageIdentifer(object value)
         {
@@ -1389,186 +1561,219 @@ namespace VAdvantage.Common
         /// </summary>
         /// <param name="ctx"></param>
         /// <param name="AD_Window_ID"></param>
-        /// <param name="AD_Tab_ID"></param>
         /// <param name="AD_Table_ID"></param>
         /// <param name="AD_Record_ID"></param>
+        /// <param name="AD_SurveyAssignment_ID"></param>
+        /// <param name="ShowEverytime"></param>
         /// <returns></returns>
-        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID)
+        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID, int AD_SurveyAssignment_ID, string ShowEverytime)
         {
-            bool isExist = false;
-            string sql = @"SELECT AD_Column.AD_column_ID,
+            bool isExist = true;
+
+            string sqlWhere = "SELECT WhereClause FROM AD_TAB WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
+            sqlWhere = Util.GetValueOfString(DB.ExecuteScalar(sqlWhere));
+
+            MTable table = MTable.Get(ctx, AD_Table_ID);
+            PO _po = table.GetPO(ctx, AD_Record_ID, null);
+            sqlWhere = ParseContextByPO(sqlWhere, _po);
+
+            string WhereCondition = "";
+
+            if (ShowEverytime == "N")
+            {
+                string sql = @"SELECT AD_Column.AD_column_ID,
                             ad_surveyshowcondition.seqno,AD_Column.ColumnName,ad_surveyshowcondition.operation,ad_surveyshowcondition.ad_equalto,ad_surveyshowcondition.Value2,
                             ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID
                             FROM  AD_Column                           
                             INNER JOIN ad_surveyshowcondition ON AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID
                             WHERE ad_surveyshowcondition.isActive='Y' AND  ad_surveyshowcondition.AD_SurveyAssignment_ID=" + AD_SurveyAssignment_ID + " AND AD_Column.AD_Table_ID=" + AD_Table_ID + @"
                             ORDER BY ad_surveyshowcondition.seqno";
-            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
+                DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
+                //prepare where condition for filter
+                if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
+                {                    
+                    int idx = 0;
+                    foreach (DataRow dt in _dsDetails.Tables[0].Rows)
+                    {
+                        string type = "";
+                        string value = Util.GetValueOfString(dt["ad_equalto"]);
+                        string columnName = Util.GetValueOfString(dt["ColumnName"]);
+                        int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
 
-            //prepare where condition for filter
-            if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
-            {
-                string WhereCondition = "";
-                int idx = 0;
-                foreach (DataRow dt in _dsDetails.Tables[0].Rows)
-                {
-                    string type = "";
-                    string value = Util.GetValueOfString(dt["ad_equalto"]);
-                    string columnName = Util.GetValueOfString(dt["ColumnName"]);
-                    int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
-
-                    //Checking data type of column
-                    if (columnName.Equals("AD_Language") || columnName.Equals("EntityType") || columnName.Equals("DocBaseType"))
-                    {
-                        type = typeof(System.String).Name;
-                    }
-                    else if (columnName.Equals("Posted") || columnName.Equals("Processed") || columnName.Equals("Processing"))
-                    {
-                        type = typeof(System.Boolean).Name;
-                    }
-                    else if (columnName.Equals("Record_ID"))
-                    {
-
-                        type = typeof(System.Int32).Name;
-                    }
-                    else
-                    {
-                        type = VAdvantage.Classes.DisplayType.GetClass(displayType, true).Name;
-                    }
-
-                    //Rearange operater
-                    string oprtr = Util.GetValueOfString(dt["operation"]);
-                    if (oprtr == "==")
-                    {
-                        oprtr = "=";
-                    }
-                    else if (oprtr == "!=")
-                    {
-                        oprtr = "!=";
-                    } 
-                    else if (oprtr == "<=")
-                    {
-                        oprtr = "<=";
-                    } 
-                    else if (oprtr == "<<")
-                    {
-                        oprtr = "<";
-                    }
-                    else if (oprtr == ">>")
-                    {
-                        oprtr = ">";
-                    } 
-                    else if (oprtr == ">=")
-                    {
-                        oprtr = ">=";
-                    }
-                    else if (oprtr == "~~")
-                    {
-                        oprtr = " LIKE ";
-                        value = "%" + value + "%";
-                    }
-                    else if (oprtr == "AB")
-                    {
-                        oprtr = ">";
-                    }
-
-                    if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
-                    {
-                        idx++;
-                        if (type == "Int32" || type == "Decimal")
+                        //Checking data type of column
+                        if (columnName.Equals("AD_Language") || columnName.Equals("EntityType") || columnName.Equals("DocBaseType"))
                         {
-                            WhereCondition +="NVL("+columnName + ",0) " + oprtr;
+                            type = typeof(System.String).Name;
                         }
-                        else if (type == "DateTime")
+                        else if (columnName.Equals("Posted") || columnName.Equals("Processed") || columnName.Equals("Processing"))
                         {
-                            WhereCondition += "CAST(" + columnName + " AS DATE) " + oprtr;
+                            type = typeof(System.Boolean).Name;
+                        }
+                        else if (columnName.Equals("Record_ID"))
+                        {
+
+                            type = typeof(System.Int32).Name;
                         }
                         else
                         {
-                            WhereCondition += "NVL(" + columnName + ",' ') " + oprtr;
+                            type = VAdvantage.Classes.DisplayType.GetClass(displayType, true).Name;
                         }
-                    }
-                    else
-                    {
-                        string andOR = " AND ";
-                        if (Util.GetValueOfString(dt["andor"]) == "O")
-                        {
-                            andOR = " OR ";
-                        }
-                        WhereCondition += andOR;
-                        if (type == "Int32" || type == "Decimal")
-                        {
-                            WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
-                        }
-                        else if (type == "DateTime")
-                        {
-                            WhereCondition += "CAST(" + columnName + " AS Date) " + oprtr;
-                        }
-                        else
-                        {
-                            WhereCondition += "NVL(" + columnName + ",' ') " + oprtr;
-                        }
-                    }
 
-                    if (type == "Int32" || type == "Decimal" || type == "Boolean")
-                    {
-                        if (Util.GetValueOfString(dt["operation"]) == "~~")
+                        //Rearange operater
+                        string oprtr = Util.GetValueOfString(dt["operation"]);
+                        if (oprtr == "==")
                         {
-                            WhereCondition += "'" + Util.GetValueOfString(value) + "'";
+                            oprtr = "=";
                         }
-                        else
+                        else if (oprtr == "!=")
                         {
-                            if (type == "Int32")
+                            oprtr = "!=";
+                        }
+                        else if (oprtr == "<=")
+                        {
+                            oprtr = "<=";
+                        }
+                        else if (oprtr == "<<")
+                        {
+                            oprtr = "<";
+                        }
+                        else if (oprtr == ">>")
+                        {
+                            oprtr = ">";
+                        }
+                        else if (oprtr == ">=")
+                        {
+                            oprtr = ">=";
+                        }
+                        else if (oprtr == "~~")
+                        {
+                            oprtr = " LIKE ";
+                            value = "%" + value + "%";
+                        }
+                        else if (oprtr == "AB")
+                        {
+                            oprtr = ">";
+                        }
+
+                        if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
+                        {
+                            idx++;
+                            if (type == "Int32" || type == "Decimal")
                             {
-                                WhereCondition += Util.GetValueOfInt(value);
+                                WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                             }
-                            else if (type == "Decimal")
+                            else if (type == "DateTime")
                             {
-                                WhereCondition += Util.GetValueOfDecimal(value);
+                                WhereCondition += "CAST(" + columnName + " AS DATE) " + oprtr;
                             }
                             else
+                            {
+                                WhereCondition += "NVL(" + columnName + ",' ') " + oprtr;
+                            }
+                        }
+                        else
+                        {
+                            string andOR = " AND ";
+                            if (Util.GetValueOfString(dt["andor"]) == "O")
+                            {
+                                andOR = " OR ";
+                            }
+                            WhereCondition += andOR;
+                            if (type == "Int32" || type == "Decimal")
+                            {
+                                WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
+                            }
+                            else if (type == "DateTime")
+                            {
+                                WhereCondition += "CAST(" + columnName + " AS Date) " + oprtr;
+                            }
+                            else
+                            {
+                                WhereCondition += "NVL(" + columnName + ",' ') " + oprtr;
+                            }
+                        }
+
+                        if (type == "Int32" || type == "Decimal" || type == "Boolean")
+                        {
+                            if (Util.GetValueOfString(dt["operation"]) == "~~")
                             {
                                 WhereCondition += "'" + Util.GetValueOfString(value) + "'";
                             }
-                        }
-                        
-                        if (Util.GetValueOfString(dt["operation"]) == "AB")
-                        {
-                            WhereCondition += " AND " + columnName + " <";
-                            if (type == "Int32"){
-                                WhereCondition += Util.GetValueOfInt(dt["Value2"]);
-                            }else if(type == "Decimal")
-                            {
-                                WhereCondition += Util.GetValueOfDecimal(dt["Value2"]);
-                            }
                             else
                             {
-                                WhereCondition +="'"+ Util.GetValueOfString(dt["Value2"])+"'";
+                                if (type == "Int32")
+                                {
+                                    WhereCondition += Util.GetValueOfInt(value);
+                                }
+                                else if (type == "Decimal")
+                                {
+                                    WhereCondition += Util.GetValueOfDecimal(value);
+                                }
+                                else
+                                {
+                                    WhereCondition += "'" + Util.GetValueOfString(value) + "'";
+                                }
                             }
-                            
-                        }
-                    }
-                    else if (type == "String")
-                    {
-                        WhereCondition += "'" + value + "'";
-                        if (Util.GetValueOfString(dt["operation"]) == "AB")
-                        {
-                            WhereCondition += " AND " + columnName + " <'" + Util.GetValueOfString(dt["Value2"]) + "'";
-                        }
-                    }
-                    else if (type == "DateTime")
-                    {
-                        WhereCondition += "CAST('" + value + "' AS DATE)";
-                        if (Util.GetValueOfString(dt["operation"]) == "AB")
-                        {
-                            WhereCondition += " AND COST( " + columnName + " AS DATE) < CAST('" + Util.GetValueOfString(dt["Value2"]) + "' AS DATE)";
-                        }
-                    }
-                }
 
+                            if (Util.GetValueOfString(dt["operation"]) == "AB")
+                            {
+                                WhereCondition += " AND " + columnName + " <";
+                                if (type == "Int32")
+                                {
+                                    WhereCondition += Util.GetValueOfInt(dt["Value2"]);
+                                }
+                                else if (type == "Decimal")
+                                {
+                                    WhereCondition += Util.GetValueOfDecimal(dt["Value2"]);
+                                }
+                                else
+                                {
+                                    WhereCondition += "'" + Util.GetValueOfString(dt["Value2"]) + "'";
+                                }
+
+                            }
+                        }
+                        else if (type == "String")
+                        {
+                            WhereCondition += "'" + value + "'";
+                            if (Util.GetValueOfString(dt["operation"]) == "AB")
+                            {
+                                WhereCondition += " AND " + columnName + " <'" + Util.GetValueOfString(dt["Value2"]) + "'";
+                            }
+                        }
+                        else if (type == "DateTime")
+                        {
+                            WhereCondition += "CAST('" + value + "' AS DATE)";
+                            if (Util.GetValueOfString(dt["operation"]) == "AB")
+                            {
+                                WhereCondition += " AND COST( " + columnName + " AS DATE) < CAST('" + Util.GetValueOfString(dt["Value2"]) + "' AS DATE)";
+                            }
+                        }
+                    }
+                   
+                }
+            }
+
+            if (!string.IsNullOrEmpty(sqlWhere)|| !string.IsNullOrEmpty(WhereCondition))
+            {
                 string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID=" + AD_Table_ID));
 
-                sql = "SELECT COUNT(" + tableName + "_ID) FROM " + tableName + " WHERE " + tableName + "_ID=" + AD_Record_ID + " AND (" + WhereCondition+")";
+                string sql = "SELECT COUNT(" + tableName + "_ID) FROM " + tableName + " WHERE " + tableName + "_ID=" + AD_Record_ID;
+
+                if (string.IsNullOrEmpty(sqlWhere) && !string.IsNullOrEmpty(WhereCondition))
+                {
+                    sql += " AND (" + WhereCondition + ")";
+                }
+                else if (!string.IsNullOrEmpty(sqlWhere) && string.IsNullOrEmpty(WhereCondition))
+                {
+                    sql += " AND (" + sqlWhere + ")";
+                }
+                else if (!string.IsNullOrEmpty(sqlWhere) && !string.IsNullOrEmpty(WhereCondition))
+                {
+                    sql += " AND (" + sqlWhere + ")";
+                    sql += " AND (" + WhereCondition + ")";
+                }
+
                 int count = Util.GetValueOfInt(DB.ExecuteScalar(MRole.GetDefault(ctx).AddAccessSQL(sql, tableName, true, false)));
                 if (count > 0)
                 {
@@ -1579,8 +1784,8 @@ namespace VAdvantage.Common
                     isExist = false;
                 }
             }
-            return isExist;
 
+            return isExist;
 
         }
 
@@ -1592,8 +1797,12 @@ namespace VAdvantage.Common
         /// <param name="Record_ID"></param>
         /// <param name="AD_Table_ID"></param>
         /// <returns></returns>
-        public static bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID, int AD_WF_Activity_ID)
+        public static bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID, int AD_WF_Activity_ID, bool autoApproval)
         {
+            if (AD_Window_ID == 0)
+            {
+                return true;
+            }
 
             string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
@@ -1605,23 +1814,23 @@ namespace VAdvantage.Common
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
-                    {
-                        isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
-                        if (isvalidate)
-                        {
-                            isvalidate = true;
-                        }
-                    }
+                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    //{
+                        isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                        //if (isvalidate)
+                        //{
+                        //    isvalidate = true;
+                        //}
+                    //}
 
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N" && !isvalidate)
+                    if (!isvalidate)
                     {
                         continue;
                     }
                     int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
 
                     sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    if(AD_WF_Activity_ID > 0)
+                    if(!autoApproval && AD_WF_Activity_ID > 0)
                     {
                         sql += " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID;
                     }

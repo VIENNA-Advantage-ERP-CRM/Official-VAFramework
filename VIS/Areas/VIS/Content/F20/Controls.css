@@ -569,7 +569,7 @@ input[type="radio"]:not(:checked){
     padding-left: 5px;
     padding-right: 5px;
     right: 0;
-    transform: translateX(-1%);
+    transform: translateX(2%);
     width: 50px;
     overflow: hidden;
     white-space: nowrap;
