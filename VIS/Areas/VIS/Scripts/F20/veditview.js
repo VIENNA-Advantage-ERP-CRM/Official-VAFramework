@@ -753,6 +753,7 @@
         //Init Control
         if (mField.getDisplayType() == VIS.DisplayType.TelePhone) {
             editor.init();
+            ctrlP.css("z-index", "auto");
         }
     }
 

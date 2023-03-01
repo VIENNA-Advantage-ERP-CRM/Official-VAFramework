@@ -30,8 +30,17 @@
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-.vis-control-wrap .iti{
-    width:100%;
+/*telephone*/
+.vis-control-wrap .iti {
+    width: 100%;
+}
+
+.vis-control-wrap .iti__country {
+    padding: 5px 10px !important;
+}
+
+.vis-control-wrap .iti__selected-flag {
+    padding: 6px 8px !important;
 }
 
 .vis-ev-col input:not([type=button]):not([type="checkbox"]):not([type="radio"]),
