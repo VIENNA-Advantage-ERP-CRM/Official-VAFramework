@@ -7,6 +7,7 @@
     --v-c-th-secondary: 69, 73, 76 !important;
     --v-c-th-on-secondary: 220, 223, 227 !important;
     --v-c-common: 60, 64, 67;
+    --v-c-dark: 255, 255, 255;
 }
 
 body * {
@@ -382,7 +383,16 @@ table.k-editor,
 .k-button,
 .k-scheduler-header th, .k-scheduler-header-wrap, .k-scheduler-table td, .k-scheduler-times, .k-scheduler-times th, .k-scheduler-times tr,
 .vis-zero-right-border,
-.k-checkbox-label:before {
+.k-checkbox-label:before,
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active,
+.border-left,
+.border-right,
+.border-top,
+.border-bottom,
+.k-file,
+.card,
+.dxheViewArea {
     border-color: rgba(var(--v-c-on-secondary), .2) !important;
 }
 .k-editor .k-content,
@@ -399,7 +409,14 @@ table.k-editor,
 .bg-white,
 .k-active-filter, .k-state-active, .k-state-active:hover, .k-tabstrip .k-state-active,
 .k-input, .k-multiselect-wrap, .k-textbox>input, input.k-textbox, input.k-textbox:hover, textarea.k-textbox, textarea.k-textbox:hover,
-.k-checkbox-label:before {
+.k-checkbox-label:before,
+.dropdown-menu,
+.k-file,
+.card,
+.dxrControl .dxr-tabContent,
+.dxheControl .dxheHtmlViewArea, 
+.dxheDesignViewArea, 
+.dxhePreviewArea {
     background-color: rgb(var(--v-c-bg-color)) !important;
 }
 .k-autocomplete.k-state-default,
@@ -429,7 +446,9 @@ table.k-editor,
 .k-alt, .k-pivot-layout>tbody>tr:first-child>td:first-child, .k-resource.k-alt, .k-separator,
 .vis-file-close-ico,
 .k-calendar th, .k-dropzone-hovered, .k-footer-template td, .k-grid-footer, .k-group, .k-group-footer td, .k-grouping-header, .k-pager-wrap, .k-toolbar, .k-widget .k-status, .k-widget.k-popup,
-.k-calendar th, .k-dropzone-hovered, .k-footer-template td, .k-grid-footer, .k-group, .k-group-footer td, .k-grouping-header, .k-pager-wrap, .k-toolbar, .k-widget .k-status, .k-widget.k-popup {
+.k-calendar th, .k-dropzone-hovered, .k-footer-template td, .k-grid-footer, .k-group, .k-group-footer td, .k-grouping-header, .k-pager-wrap, .k-toolbar, .k-widget .k-status, .k-widget.k-popup,
+.dropdown-item:focus, .dropdown-item:hover,
+.dxheControl .dxrControl{
     background: rgba(var(--v-c-secondary), 1) !important;
 }
 .k-dropdown-wrap.k-state-default {
@@ -508,7 +527,8 @@ table.k-editor,
 .k-scheduler-datecolumn, .k-scheduler-groupcolumn,
 .k-item span,
 .k-grouping-header,
-.k-grid-footer td, .k-group-footer td, .k-grouping-row td {
+.k-grid-footer td, .k-group-footer td, .k-grouping-row td,
+.dxrControl, .dxrControl a {
     color: rgb(var(--v-c-on-secondary)) !important;
 }
 .k-other-month .k-link {
@@ -530,4 +550,9 @@ table.k-editor,
 }
 .k-primary:hover, .k-button:hover {
     background-color: rgba(var(--v-c-primary), 1) !important;
+}
+a.text-dark:focus, 
+a.text-dark:hover,
+.text-dark {
+    color: rgba(var(--v-c-dark), 1) !important;
 }

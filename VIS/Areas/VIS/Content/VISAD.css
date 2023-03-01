@@ -1027,7 +1027,8 @@
 }
 
 .vis-gc-vpanel-table-mandatory {
-    background-color: lightpink !important;
+    /*background-color: lightpink !important;*/
+    border-color: rgb(236,63,63) !important;
 }
 
 .vis-gc-vpanel-table-error {
