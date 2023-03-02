@@ -691,7 +691,7 @@ html[dir="rtl"] ul.vis-IIColumnContent li {
 
 .vis-home-wf-answerWrap {
     display: flex;
-    border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
+    /*border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);*/
     margin-top: 0.75rem;
 }
 

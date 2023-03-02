@@ -380,12 +380,13 @@
                     return;
                 },
                 success: function (dyndata) {
+                    var reslt = JSON.parse(dyndata.result);
                     $txtSearch.val('');
                     window.setTimeout(function () {
                         VIS.HomeMgr.BindMenuClick();
                         var active = VIS.HomeMgr.getActiveTab();
                         if (active.activeTabType == 3) {
-                            if (dyndata.result == null || dyndata.result.LstInfo == null) {
+                            if (reslt == null || reslt.LstInfo == null) {
                                 $busyIndicator.hide();
                                 $divActivity.empty();
                                 $divActivity.append(0);
@@ -401,7 +402,7 @@
                                 container.append(str);
                                 return;
                             }
-                            data = dyndata.result.LstInfo;
+                            data = reslt.LstInfo;
                             divScroll.empty();
                             // container.children('.vis-activityContainer').not(':first').remove();
 
@@ -413,10 +414,10 @@
 
                             }
                             $divActivity.empty();
-                            $divActivity.append(dyndata.result.count);
+                            $divActivity.append(reslt.count);
                             $divActivity.show();
                             $alertTxtTypeCount.empty();
-                            $alertTxtTypeCount.append(dyndata.result.count);
+                            $alertTxtTypeCount.append(reslt.count);
 
                             LoadRecords(0);
                             VIS.HomeMgr.adjustDivSize();
@@ -476,12 +477,13 @@
                     scrollWF = true;
                 },
                 success: function (dyndata) {
+                    var reslt = JSON.parse(dyndata.result);
                     $txtSearch.val('');
                     VIS.HomeMgr.BindMenuClick();
                     var active = VIS.HomeMgr.getActiveTab();
                     if (active.activeTabType == 3) {
-                        if (dyndata.result) {
-                            data = dyndata.result.LstInfo;
+                        if (reslt) {
+                            data = reslt.LstInfo;
                         }
                         else {
                             data = null;
@@ -496,7 +498,7 @@
                             divScroll.empty();
                             if (dyndata.result) {
                                 container.find('#pnorecFound').remove();
-                                $divActivity.append(dyndata.result.count);
+                                $divActivity.append(reslt.count);
                             }
                             else {
                                 $alertTxtTypeCount.empty();
@@ -1207,7 +1209,7 @@
                     detailCtrl.FwdCtrl.getBtn(1).prop('disabled', '');
                     aOkF.css('display', 'none');
                     aOkA.css('display', 'none');
-                    msg.prop('disabled', '');
+                   // msg.prop('disabled', '');
                 }
                 else {
                     detailCtrl.FwdCtrl.getControl().prop('disabled', true);
@@ -1215,7 +1217,7 @@
                     detailCtrl.FwdCtrl.getBtn(1).prop('disabled', true);
                     aOkF.css('display', 'none');
                     aOkA.css('display', '');
-                    msg.prop('disabled', true);
+                   // msg.prop('disabled', true);
                 }
             };
 

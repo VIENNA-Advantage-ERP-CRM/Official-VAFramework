@@ -249,7 +249,17 @@ OR
                     itm.TxtMsg = Util.GetValueOfString(dr["TextMsg"]);
                     itm.WfState = Util.GetValueOfString(dr["WfState"]);
                     itm.EndWaitTime = Util.GetValueOfDateTime(dr["EndWaitTime"]);
-                    itm.Created = Util.GetValueOfString(dr["Created"]);
+                    //itm.Created = Util.GetValueOfString(dr["Created"]);
+                    DateTime _createdDate = new DateTime();
+                    if (dr["Created"].ToString() != null && dr["Created"].ToString() != "")
+                    {
+                        _createdDate = Convert.ToDateTime(dr["Created"].ToString());
+                        DateTime _format = DateTime.SpecifyKind(new DateTime(_createdDate.Year, _createdDate.Month, _createdDate.Day, _createdDate.Hour, _createdDate.Minute, _createdDate.Second), DateTimeKind.Utc);
+                        _createdDate = _format;
+                        itm.Created = _format;
+                    }
+                    else
+                        itm.Created = System.DateTime.Now;
                     MWFActivity act = new MWFActivity(ctx, itm.AD_WF_Activity_ID, null);
                     itm.NodeName = act.GetNodeName();
                     itm.Summary = act.GetSummary();
@@ -1299,7 +1309,7 @@ OR
             get;
             set;
         }
-        public string Created
+        public DateTime Created
         {
             get;
             set;
