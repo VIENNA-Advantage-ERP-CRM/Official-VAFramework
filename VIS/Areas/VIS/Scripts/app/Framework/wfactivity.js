@@ -1007,14 +1007,14 @@
             divWorkflowActivity.append($("<h3>").append(VIS.Msg.getMsg('Action')));
             divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            var ulA = $("<ul class='vis-IIColumnContent'>");
+            var ulA = $("<ul class='vis-IIColumnContent vis-home-wf-ul'>");
 
             var liAInput = $("<li>");
             ulA.append(liAInput);
             var divAInpt = $('<div class="vis-home-wf-answerWrap">');
             liAInput.append(divAInpt);
 
-            var divAP = $('<div class="vis-home-wf-answerInput vis-input-wrap">');
+            var divAP = $('<div class="input-group vis-home-wf-answerInput vis-input-wrap">');
             divAInpt.append(divAP);
            // divAP.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
             //Get Answer Control
@@ -1026,9 +1026,10 @@
                     if (ctrl.getBtnCount() > 0) {
                         var divFwd = $("<div class='vis-wforwardwrap vis-control-wrap'>");
                         divFwd.append(ctrl.getControl());
-                        divFwd.append(ctrl.getBtn(0));
+                        var divFwdBtn = $("<div class='input-group-append'>");
+                        divFwdBtn.append(ctrl.getBtn(0));
                         divFwd.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
-                        divAP.append(divFwd);
+                        divAP.append(divFwd).append(divFwdBtn);
 
                     }
                     else {
@@ -1073,10 +1074,11 @@
             var divFInpt = $('<div class="vis-home-wf-forwardWrap">');
             liFInput.append(divFInpt);
 
-            var divF = $('<div class="vis-home-wf-forwardInput vis-input-wrap">');
+            var divF = $('<div class="input-group mb-0 vis-home-wf-forwardInput vis-input-wrap">');
             divFInpt.append(divF);
-            // liAInput.append($("<p style='margin-bottom: 0;text-align:center'>").append(VIS.Msg.getMsg('OR')));
-            //divF.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Forward')));
+
+            var divF1 = $('<div class="d-flex">');
+            divFInpt.append(divF1);
 
             //Get User Lookup
             var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, null);
@@ -1087,32 +1089,24 @@
             if (txtb.getBtnCount() == 2) {
                 var divFwd = $("<div class='vis-wforwardwrap vis-control-wrap'>");
                 divFwd.append(txtb.getControl());
-                divFwd.append(txtb.getBtn(0));
-                divFwd.append(txtb.getBtn(1));
+
+                var divFwdBtn = $("<div class='input-group-append'>");
+                divFwdBtn.append(txtb.getBtn(0));
+                divFwdBtn.append(txtb.getBtn(1));
+
                 divFwd.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Forward')));
-                divF.append(divFwd);
+                divF.append(divFwd).append(divFwdBtn);
 
             };
+
+            var divM = $('<div class="input-group vis-home-wf-forwardInput vis-input-wrap">');
+            divF1.append(divM);
 
             var aOkF = $("<a href='javascript:void(0)' style='display:none' id='vis-home-wf-forOK' class='vis-btn vis-btn-done vis-icon-doneButton vis-workflowActivityIcons' data-clicked='N' data-id='" + index + "'>");
             //aOk.css("data-id",index);
             aOkF.append($("<span class='vis-btn-ico vis-btn-done-bg vis-btn-done-border'>"));
             aOkF.append(VIS.Msg.getMsg('Done'));
-            divFInpt.append($('<div class="vis-home-wf-forwardBtn">').append(aOkF));
-
-
-
-
-
-
-            //Add Vtextbox button for User Selection
-
-
-
-
-            // var liDoitF = $("<li>");
-
-            //ulA.append(liDoit);
+            divF1.append($('<div class="vis-home-wf-forwardBtn">').append(aOkF));
 
             divWorkflowActivity.append(ulA);
             divWorkflowActivity.append($("<div class='clearfix'>"));
@@ -1120,14 +1114,16 @@
             divWorkflowActivity.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Message')));
             divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            var divMsg = $("<div class='vis-sendMessage'>");
+            
+
+            var divMsg = $("<div class='vis-control-wrap'>");
             var msg = $("<textarea style='width:100%;resize:none;' placeholder='"  + VIS.Msg.getMsg('TypeMessage') + "....'>");
             detailCtrl.MsgCtrl = msg;
             divMsg.append(msg);
            // divMsg.append($("<button class='vis vis-sms'></button>"));
             divMsg.append($("<div class='clearfix'>"));
 
-            divF.append(divMsg);
+            divM.append(divMsg);
 
             aOkF.on(VIS.Events.onTouchStartOrClick, function () { okClick(aOkF) });
             aOkA.on(VIS.Events.onTouchStartOrClick, function () { okClick(aOkA) });

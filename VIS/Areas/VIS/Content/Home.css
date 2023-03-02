@@ -607,7 +607,7 @@ html[dir="rtl"] .vis-workflowActivityTitleBar-buttons {
         height: 26px;
         float: left;
         text-indent: -999999px;
-        margin-top: 11px;
+        /*margin-top: 11px;*/
         float: right;
         /*background:url(../Images/home/done-ico.png) no-repeat;*/
     }
@@ -677,7 +677,13 @@ ul.vis-IIColumnContent {
     ul.vis-IIColumnContent li {
         /*float: left;*/
         width: 100%;
+        
     }
+
+.vis-home-wf-ul li {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+}
 
 html[dir="rtl"] ul.vis-IIColumnContent li {
     /*float: right;*/
@@ -685,37 +691,41 @@ html[dir="rtl"] ul.vis-IIColumnContent li {
 
 .vis-home-wf-answerWrap {
     display: flex;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
+    margin-top: 0.75rem;
 }
 
 .vis-home-wf-answerInput {
-    width: 70%;
-    margin-bottom:0px !important;
+    width: 75%;
+    /*margin-bottom:10px !important;*/
 }
 
 .vis-home-wf-answerBtn {
-    width: 30%;
+    width: 25%;
     display: flex;
     justify-content: end;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 .vis-home-wf-forwardWrap {
-    display: flex;
+    /*display: flex;*/
 }
 
 .vis-home-wf-forwardInput {
-    width: 70%;
-    margin-top: 10px;
+    width: 75%;
+    margin-top: 15px;
 }
 
 .vis-home-wf-forwardBtn {
-    width: 30%;
+    width: 25%;
     display: flex;
     justify-content: end;
     align-items: end;
-    padding-bottom: 11px;
+    padding-bottom: 17px;
 }
+
+
 
 .historyImage {
     margin: 0px auto;
@@ -3252,15 +3262,15 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 .vis-wforwardwrap {
-    display: flex;
-    margin-bottom: 10px;
+    /*display: flex;
+    margin-bottom: 10px;*/
 }
 
     .vis-wforwardwrap input {
-        flex: 1;
+        /*flex: 1;
         border-radius: 0;
         border: 1px solid rgba(var(--v-c-on-secondary), .2);
-        outline: none;
+        outline: none;*/
     }
 
     .vis-wforwardwrap button {
