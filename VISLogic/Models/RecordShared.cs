@@ -171,6 +171,41 @@ namespace VISLogic.Models
                             VAdvantage.Common.ShareRecordManager.AddRecordToTable(AD_Table_ID, Org);
                         }
 
+
+                        string tableName = MTable.GetTableName(ctx, AD_Table_ID);
+
+                        int versionTableID = MTable.Get_Table_ID(tableName + "_Ver");
+
+                        if (versionTableID > 0)
+                        {
+                            DataSet dsVer = DB.ExecuteDataset($"SELECT {tableName}_Ver_ID FROM {tableName}_Ver WHERE {tableName}_ID={record_ID}");
+                            if (dsVer != null && dsVer.Tables[0].Rows.Count > 0)
+                            {
+                                for (int v = 0; v < dsVer.Tables[0].Rows.Count; v++)
+                                {
+                                    MShareRecordOrg SROV = new MShareRecordOrg(ctx, 0, trx);
+                                    SROV.SetAD_Table_ID(versionTableID);
+                                    SROV.Set_ValueNoCheck("AD_OrgShared_ID", records[i].AD_OrgShared_ID);
+                                    SROV.SetIsReadOnly(records[i].isReadonly);
+                                    SROV.SetRecord_ID(Util.GetValueOfInt(dsVer.Tables[0].Rows[i][0]));
+                                    if (ParentID > 0)
+                                    {
+                                        SROV.Set_ValueNoCheck("Parent_ID", ParentID);
+                                    }
+                                    if (!SROV.Save())
+                                    {
+                                        error = 1;
+                                        break;
+                                    }
+                                    VAdvantage.Common.ShareOrg OrgV = new VAdvantage.Common.ShareOrg();
+                                    OrgV.RecordID = Util.GetValueOfInt(dsVer.Tables[0].Rows[i][0]);
+                                    OrgV.OrgID = records[i].AD_OrgShared_ID;
+                                    OrgV.Readonly = records[i].isReadonly;
+                                    VAdvantage.Common.ShareRecordManager.AddRecordToTable(versionTableID, OrgV);
+                                }
+                            }
+                        }
+
                         GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, Window_ID, 0);
 
                         GridTabVO gt = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
