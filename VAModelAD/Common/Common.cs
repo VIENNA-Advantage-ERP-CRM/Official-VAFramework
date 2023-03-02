@@ -699,7 +699,6 @@ namespace VAdvantage.Common
                     outStr.Append(ParseVariable(token, po));		// replace context
                 }
 
-                outStr.Append(ParseVariable(token, po));
                 inStr = inStr.Substring(j + 1);
                 // from second @
                 i = inStr.IndexOf("@");
@@ -807,12 +806,22 @@ namespace VAdvantage.Common
                 //return Util.GetValueOfDateTime(value).Value.Date.ToShortDateString();
                 return DisplayType.GetDateFormat(column.GetAD_Reference_ID()).Format(value, po.GetCtx().GetContext("#ClientLanguage"), SimpleDateFormat.DATESHORT);
             }
+            else if (column.GetAD_Reference_ID() == DisplayType.Time)
+            {
+                return Util.GetValueOfDateTime(value).Value.ToLocalTime().ToShortTimeString();
+            }
 
             // Show Amount according to browser culture
             if (column.GetAD_Reference_ID() == DisplayType.Amount || column.GetAD_Reference_ID() == DisplayType.CostPrice)
             {
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
+
+            
+           
+
+
+
             return value.ToString();
         }
 
