@@ -140,6 +140,7 @@
     <Compile Include="Classes\WindowCtx.cs" />
     <Compile Include="Classes\ZoomTarget.cs" />
     <Compile Include="Common\Common.cs" />
+    <Compile Include="Common\ShareRecordManager.cs" />
     <Compile Include="Controller\FieldVObj.cs" />
     <Compile Include="Controller\GridField.cs" />
     <Compile Include="Controller\GridFieldVO.cs" />
