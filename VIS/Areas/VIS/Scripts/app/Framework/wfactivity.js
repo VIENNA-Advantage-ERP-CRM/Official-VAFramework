@@ -629,7 +629,7 @@
                 var para = $("<pre>");
                 if (data[item].DocumentNameValue == undefined || data[item].DocumentNameValue == '') {
 
-                    
+
                     para.append(VIS.Utility.encodeText(data[item].Summary));
                 }
                 else {
@@ -652,7 +652,7 @@
 
 
                 var pdate = $("<div class='vis-feedDateTime'>");
-                pdate.append($("<br>")).append(Globalize.format(new Date(data[item].Created), 'd'));
+                pdate.append($("<br>")).append(Globalize.format(new Date(data[item].Created), "F", Globalize.cultureSelector));
                 divContent.append(pdate);
 
                 divOuter.append(divContent);
@@ -725,7 +725,7 @@
                 });
                 if (selectedItems.length == 1 && !uncheckall) {
                     var chks = divScroll.find('.wfActivity-selectchk');
-                   
+
 
                     for (var h = 0; h < chks.length; h++) {
                         if ($(chks[h]).prop('checked') == true) {
@@ -861,10 +861,10 @@
             var hHeader = $("<h3>");
             hHeader.append(VIS.Msg.getMsg('Detail'));
             divHeader.append(hHeader);
-            
+
             // if  any checkbox is checked, then don't show History in middle panel.
             if (selectedItems.length <= 1) {
-                btnCheckList = $("<a href='javascript:void(0)' class='vis-btn-zoom mr-1' style='padding-left: 10px;padding-right: 10px;padding-top: 2px;padding-bottom: 2px;' data-id='" + index + "'>"+VIS.Msg.getMsg('CheckList')+"</a>");
+                btnCheckList = $("<a href='javascript:void(0)' class='vis-btn-zoom mr-1' style='padding-left: 10px;padding-right: 10px;padding-top: 2px;padding-bottom: 2px;' data-id='" + index + "'>" + VIS.Msg.getMsg('CheckList') + "</a>");
                 if (info.IsSurveyResponseRequired) {
                     divHeader.append(btnCheckList);
                 }
@@ -905,7 +905,7 @@
                         }
                     }, 'json').fail(function (jqXHR, exception) {
                         VIS.ADialog.error(exception);
-                    });                    
+                    });
 
                     // Dms Zoom
                     var aZoomDMS = $("<a href='javascript:void(0)' class='vis-btn-zoom' style='margin-left:10px;' data-id='" +
@@ -944,8 +944,8 @@
             }
 
             divHeader.append($("<div class='clearfix'>"));
-            var height = ($('#workflowActivityData').height()-50)+'px';
-            divWorkflowActivity = $("<div class='divWorkflowActivity' style='height:" + height+"'>");
+            var height = ($('#workflowActivityData').height() - 50) + 'px';
+            divWorkflowActivity = $("<div class='divWorkflowActivity' style='height:" + height + "'>");
             divWorkflowChecklist = $("<div class='divWorkflowChecklist' style='display:none'></div>");
             divDetail.append(divWorkflowActivity);
             divDetail.append(divWorkflowChecklist);
@@ -978,7 +978,7 @@
                 p2.append(VIS.Msg.getMsg('Summary'));
                 p2.append($("<br>"));
 
-                
+
 
                 p2.append(VIS.Utility.encodeText(fulldata[index].Summary));
                 li1.append(p2);
@@ -1007,11 +1007,16 @@
             divWorkflowActivity.append($("<h3>").append(VIS.Msg.getMsg('Action')));
             divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            var ulA = $("<ul class='vis-IIColumnContent'>");
+            var ulA = $("<ul class='vis-IIColumnContent vis-home-wf-ul'>");
 
             var liAInput = $("<li>");
             ulA.append(liAInput);
-            liAInput.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
+            var divAInpt = $('<div class="vis-home-wf-answerWrap">');
+            liAInput.append(divAInpt);
+
+            var divAP = $('<div class="input-group vis-home-wf-answerInput vis-input-wrap">');
+            divAInpt.append(divAP);
+           // divAP.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
             //Get Answer Control
 
             if (info.NodeAction == 'C') {
@@ -1019,14 +1024,16 @@
                 detailCtrl.AnswerCtrl = ctrl;
                 if (ctrl != null) {
                     if (ctrl.getBtnCount() > 0) {
-                        var divFwd = $("<div class='vis-wforwardwrap'>");
+                        var divFwd = $("<div class='vis-wforwardwrap vis-control-wrap'>");
                         divFwd.append(ctrl.getControl());
-                        divFwd.append(ctrl.getBtn(0));
-                        liAInput.append(divFwd);
+                        var divFwdBtn = $("<div class='input-group-append'>");
+                        divFwdBtn.append(ctrl.getBtn(0));
+                        divFwd.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
+                        divAP.append(divFwd).append(divFwdBtn);
 
                     }
                     else {
-                        liAInput.append(ctrl.getControl());
+                        divAP.append(ctrl.getControl());
                     }
                     detailCtrl.AnswerCtrl = ctrl;
                 }
@@ -1035,7 +1042,7 @@
             else if (info.NodeAction == 'W') {
                 var ansBtn = $('<button style="margin-bottom:10px;margin-top: 0px;width: 100%;" class="VIS_Pref_pass-btn" data-id="' + index + '" data-window="' + info.AD_Window_ID + '" data-col="' + info.KeyCol + '">').append(info.NodeName);
                 detailCtrl.AnswerCtrl = ansBtn;
-                liAInput.append(ansBtn);
+                divAP.append(ansBtn);
                 ansBtn.on('click', function () {
 
                     ansBtnClick($(this).data("id"), $(this).data("window"), $(this).data("col"));
@@ -1045,7 +1052,7 @@
             else if (info.NodeAction == 'X') {
                 var ansBtn = $('<button style="margin-bottom:10px;margin-top: 0px;width: 100%;" class="VIS_Pref_pass-btn" data-id="' + index + '" data-form="' + info.AD_Form_ID + '" data-col="' + info.KeyCol + '">').append(info.NodeName);
                 detailCtrl.AnswerCtrl = ansBtn;
-                liAInput.append(ansBtn);
+                divAP.append(ansBtn);
                 ansBtn.on('click', function () {
                     VIS.viewManager.startForm($(this).data("form"));
                 });
@@ -1053,7 +1060,25 @@
             }
 
 
-            liAInput.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Forward')));
+            var aOkA = $("<a href='javascript:void(0)'  style='display:none' id='vis-home-wf-ansOK' class='vis-btn vis-btn-done vis-icon-doneButton vis-workflowActivityIcons' data-clicked='N' data-id='" + index + "'>");
+            //aOk.css("data-id",index);
+            aOkA.append($("<span class='vis-btn-ico vis-btn-done-bg vis-btn-done-border'>"));
+            aOkA.append(VIS.Msg.getMsg('Done'));
+            divAInpt.append($('<div class="vis-home-wf-answerBtn">').append(aOkA));
+
+
+
+
+            var liFInput = $("<li>");
+            ulA.append(liFInput);
+            var divFInpt = $('<div class="vis-home-wf-forwardWrap">');
+            liFInput.append(divFInpt);
+
+            var divF = $('<div class="input-group mb-0 vis-home-wf-forwardInput vis-input-wrap">');
+            divFInpt.append(divF);
+
+            var divF1 = $('<div class="d-flex">');
+            divFInpt.append(divF1);
 
             //Get User Lookup
             var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, null);
@@ -1062,22 +1087,49 @@
             txtb.getBtn();
 
             if (txtb.getBtnCount() == 2) {
-                var divFwd = $("<div class='vis-wforwardwrap'>");
+                var divFwd = $("<div class='vis-wforwardwrap vis-control-wrap'>");
                 divFwd.append(txtb.getControl());
-                divFwd.append(txtb.getBtn(0));
-                liAInput.append(divFwd);
 
-            }
+                var divFwdBtn = $("<div class='input-group-append'>");
+                divFwdBtn.append(txtb.getBtn(0));
+                divFwdBtn.append(txtb.getBtn(1));
 
-            //Add Vtextbox button for User Selection
+                divFwd.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Forward')));
+                divF.append(divFwd).append(divFwdBtn);
 
-            var liDoit = $("<li>");
-            var aOk = $("<a href='javascript:void(0)' class='vis-btn vis-btn-done vis-icon-doneButton vis-workflowActivityIcons' data-clicked='N' data-id='" + index + "'>");
+            };
+
+            var divM = $('<div class="input-group vis-home-wf-forwardInput vis-input-wrap">');
+            divF1.append(divM);
+
+            var aOkF = $("<a href='javascript:void(0)' style='display:none' id='vis-home-wf-forOK' class='vis-btn vis-btn-done vis-icon-doneButton vis-workflowActivityIcons' data-clicked='N' data-id='" + index + "'>");
             //aOk.css("data-id",index);
-            aOk.append($("<span class='vis-btn-ico vis-btn-done-bg vis-btn-done-border'>"));
-            aOk.append(VIS.Msg.getMsg('Done'));
-            liDoit.append(aOk);
-            aOk.on(VIS.Events.onTouchStartOrClick, function (e) {
+            aOkF.append($("<span class='vis-btn-ico vis-btn-done-bg vis-btn-done-border'>"));
+            aOkF.append(VIS.Msg.getMsg('Done'));
+            divF1.append($('<div class="vis-home-wf-forwardBtn">').append(aOkF));
+
+            divWorkflowActivity.append(ulA);
+            divWorkflowActivity.append($("<div class='clearfix'>"));
+
+            divWorkflowActivity.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Message')));
+            divWorkflowActivity.append($("<div class='clearfix'>"));
+
+            
+
+            var divMsg = $("<div class='vis-control-wrap'>");
+            var msg = $("<textarea style='width:100%;resize:none;' placeholder='"  + VIS.Msg.getMsg('TypeMessage') + "....'>");
+            detailCtrl.MsgCtrl = msg;
+            divMsg.append(msg);
+           // divMsg.append($("<button class='vis vis-sms'></button>"));
+            divMsg.append($("<div class='clearfix'>"));
+
+            divM.append(divMsg);
+
+            aOkF.on(VIS.Events.onTouchStartOrClick, function () { okClick(aOkF) });
+            aOkA.on(VIS.Events.onTouchStartOrClick, function () { okClick(aOkA) });
+
+
+            function okClick(aOk) {
                 if (aOk.data('clicked') == 'Y') {
                     return;
                 }
@@ -1126,28 +1178,46 @@
                     });
                 }
                 else {
-                    var id = $(this).data("id");
+                    var id = $(aOk).data("id");
                     approveIt(id, aOk);
                 }
 
 
-            });
-            ulA.append(liDoit);
+            };
 
-            divWorkflowActivity.append(ulA);
-            divWorkflowActivity.append($("<div class='clearfix'>"));
+            detailCtrl.FwdCtrl.fireValueChanged = function () {
+                if (detailCtrl.FwdCtrl.getValue() > 0) {
+                    detailCtrl.AnswerCtrl.getControl().prop('disabled', true);
+                    detailCtrl.AnswerCtrl.getBtn(0).prop('disabled', true);
+                    aOkF.css('display', '');
+                    aOkA.css('display', 'none');
+                }
+                else {
+                    detailCtrl.AnswerCtrl.getControl().prop('disabled', '');
+                    detailCtrl.AnswerCtrl.getBtn(0).prop('disabled', '');
+                    aOkF.css('display', 'none');
+                    aOkA.css('display', 'none');
+                }
+            };
 
-            divWorkflowActivity.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Message')));
-            divWorkflowActivity.append($("<div class='clearfix'>"));
-
-            var divMsg = $("<div class='vis-sendMessage'>");
-            var msg = $("<input type='text' placeholder='" + VIS.Msg.getMsg('TypeMessage') + "....'>");
-            detailCtrl.MsgCtrl = msg;
-            divMsg.append(msg);
-            divMsg.append($("<button class='vis vis-sms'></button>"));
-            divMsg.append($("<div class='clearfix'>"));
-
-            divWorkflowActivity.append(divMsg);
+            detailCtrl.AnswerCtrl.fireValueChanged = function () {
+                if (detailCtrl.AnswerCtrl.getValue() == '' || detailCtrl.AnswerCtrl.getValue() == null) {
+                    detailCtrl.FwdCtrl.getControl().prop('disabled', '');
+                    detailCtrl.FwdCtrl.getBtn(0).prop('disabled', '');
+                    detailCtrl.FwdCtrl.getBtn(1).prop('disabled', '');
+                    aOkF.css('display', 'none');
+                    aOkA.css('display', 'none');
+                    msg.prop('disabled', '');
+                }
+                else {
+                    detailCtrl.FwdCtrl.getControl().prop('disabled', true);
+                    detailCtrl.FwdCtrl.getBtn(0).prop('disabled', true);
+                    detailCtrl.FwdCtrl.getBtn(1).prop('disabled', true);
+                    aOkF.css('display', 'none');
+                    aOkA.css('display', '');
+                    msg.prop('disabled', true);
+                }
+            };
 
 
 
@@ -1240,7 +1310,7 @@
             }
             //  $("#divfeedbsy")[0].style.visibility = "hidden";
             $busyIndicator.hide();
-            btnCheckList.off().click(function () {              
+            btnCheckList.off().click(function () {
 
                 divWorkflowChecklist.html('');
                 if ($(this).text() != "Back") {
@@ -1254,8 +1324,8 @@
                     divWorkflowChecklist.append(rt);
                 } else {
                     divDetail.find(".vis-workflowActivityDetails-Heading h3").text(VIS.Msg.getMsg('Detail'));
-                    $(this).text(VIS.Msg.getMsg('CheckList'));                   
-                }   
+                    $(this).text(VIS.Msg.getMsg('CheckList'));
+                }
 
                 divWorkflowActivity.toggle(700);
 
@@ -1264,7 +1334,7 @@
                 } else {
                     divWorkflowChecklist.hide();
                 }
-                
+
 
             });
         };
@@ -1275,8 +1345,8 @@
             VIS.AEnv.wfzoom(fulldata[index].AD_Table_ID, fulldata[index].Record_ID, fulldata[index].AD_WF_Activity_ID);
             //
 
-           
-           
+
+
 
         };
 
