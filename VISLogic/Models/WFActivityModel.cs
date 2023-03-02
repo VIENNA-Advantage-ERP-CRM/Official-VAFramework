@@ -249,7 +249,17 @@ OR
                     itm.TxtMsg = Util.GetValueOfString(dr["TextMsg"]);
                     itm.WfState = Util.GetValueOfString(dr["WfState"]);
                     itm.EndWaitTime = Util.GetValueOfDateTime(dr["EndWaitTime"]);
-                    itm.Created = Util.GetValueOfString(dr["Created"]);
+                    //itm.Created = Util.GetValueOfString(dr["Created"]);
+                    DateTime _createdDate = new DateTime();
+                    if (dr["Created"].ToString() != null && dr["Created"].ToString() != "")
+                    {
+                        _createdDate = Convert.ToDateTime(dr["Created"].ToString());
+                        DateTime _format = DateTime.SpecifyKind(new DateTime(_createdDate.Year, _createdDate.Month, _createdDate.Day, _createdDate.Hour, _createdDate.Minute, _createdDate.Second), DateTimeKind.Utc);
+                        _createdDate = _format;
+                        itm.Created = _format;
+                    }
+                    else
+                        itm.Created = System.DateTime.Now;
                     MWFActivity act = new MWFActivity(ctx, itm.AD_WF_Activity_ID, null);
                     itm.NodeName = act.GetNodeName();
                     itm.Summary = act.GetSummary();
@@ -769,7 +779,7 @@ OR
                         if (node.IsSurveyResponseRequired())
                         {
                             // check any survey response exist
-                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID(),Util.GetValueOfInt(activityID),false))
+                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID(), Util.GetValueOfInt(activityID)))
                             {
                                 return "CheckListRequired";
                             }
@@ -1153,10 +1163,6 @@ OR
 
         public bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
         {
-            if (AD_Window_ID == 0)
-            {
-                return false;
-            }
 
             string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
@@ -1168,16 +1174,16 @@ OR
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
-                    //{
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
-                    //    if (isvalidate)
-                    //    {
-                    //        isvalidate = true;
-                    //    }
-                    //}
+                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    {
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
+                        if (isvalidate)
+                        {
+                            isvalidate = true;
+                        }
+                    }
 
-                    if (!isvalidate)
+                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N" && !isvalidate)
                     {
                         continue;
                     }
@@ -1303,7 +1309,7 @@ OR
             get;
             set;
         }
-        public string Created
+        public DateTime Created
         {
             get;
             set;
@@ -1408,7 +1414,7 @@ OR
         {
             get;
             set;
-        } 
+        }
         public List<NodeHistory> History
         {
             get;
