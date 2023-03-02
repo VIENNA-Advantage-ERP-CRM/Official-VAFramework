@@ -187,7 +187,7 @@ namespace VISLogic.Models
                                     SROV.SetAD_Table_ID(versionTableID);
                                     SROV.Set_ValueNoCheck("AD_OrgShared_ID", records[i].AD_OrgShared_ID);
                                     SROV.SetIsReadOnly(records[i].isReadonly);
-                                    SROV.SetRecord_ID(Util.GetValueOfInt(dsVer.Tables[0].Rows[i][0]));
+                                    SROV.SetRecord_ID(Util.GetValueOfInt(dsVer.Tables[0].Rows[v][0]));
                                     if (ParentID > 0)
                                     {
                                         SROV.Set_ValueNoCheck("Parent_ID", ParentID);
@@ -198,7 +198,7 @@ namespace VISLogic.Models
                                         break;
                                     }
                                     VAdvantage.Common.ShareOrg OrgV = new VAdvantage.Common.ShareOrg();
-                                    OrgV.RecordID = Util.GetValueOfInt(dsVer.Tables[0].Rows[i][0]);
+                                    OrgV.RecordID = Util.GetValueOfInt(dsVer.Tables[0].Rows[v][0]);
                                     OrgV.OrgID = records[i].AD_OrgShared_ID;
                                     OrgV.Readonly = records[i].isReadonly;
                                     VAdvantage.Common.ShareRecordManager.AddRecordToTable(versionTableID, OrgV);
