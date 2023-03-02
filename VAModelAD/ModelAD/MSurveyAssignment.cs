@@ -37,8 +37,8 @@ namespace VAdvantage.Model
 
         protected override bool AfterSave(bool newRecord, bool success)
         {
-            if (newRecord)
-            {
+            //if (newRecord)
+            //{
                 MTabPanel tp = new MTabPanel(GetCtx(), 0, null);
                 tp.SetName("Survey Panel");
                 tp.SetClassname("VIS.SurveyPanel");
@@ -49,7 +49,7 @@ namespace VAdvantage.Model
                     return false;
                 }
 
-            }
+           //}
             return true;
         }
 
