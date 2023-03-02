@@ -627,6 +627,10 @@ a.VIS_Pref_tooltip:hover span {
     color: rgba(var(--v-c-on-secondary), 1);
     border: 1px solid rgba(var(--v-c-secondary), 1);
     background: rgba(var(--v-c-secondary), 1);
+    right: 40px;
+    bottom: 20px;
+    z-index: 9;
+    word-break: break-word;
 }
 
     /*CSS3 extras*/

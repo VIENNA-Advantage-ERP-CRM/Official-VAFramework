@@ -25,7 +25,9 @@ namespace VIS.Controllers
         {
             WFActivityModel model = new WFActivityModel();
             Ctx ctx = Session["ctx"] as Ctx;
-            return Json(new { result = model.GetActivities(ctx, ctx.GetAD_User_ID(), ctx.GetAD_Client_ID(), pageNo, pageSize, refresh, searchText, AD_Window_ID, dateFrom, dateTo, AD_Node_ID) }, JsonRequestBehavior.AllowGet);
+            var res = model.GetActivities(ctx, ctx.GetAD_User_ID(), ctx.GetAD_Client_ID(), pageNo, pageSize, refresh, searchText, AD_Window_ID, dateFrom, dateTo, AD_Node_ID);
+            return Json(new { result = JsonConvert.SerializeObject(res) }, JsonRequestBehavior.AllowGet);
+            //return Json(new { result = model.GetActivities(ctx, ctx.GetAD_User_ID(), ctx.GetAD_Client_ID(), pageNo, pageSize, refresh, searchText, AD_Window_ID, dateFrom, dateTo, AD_Node_ID) }, JsonRequestBehavior.AllowGet);
         }
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
