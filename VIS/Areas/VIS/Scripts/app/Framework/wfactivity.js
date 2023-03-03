@@ -1322,7 +1322,7 @@
                     sPanel.init();
                     var rt = sPanel.getRoot();
                     divWorkflowChecklist.html('');
-                    sPanel.panelDetails(0, 0, fulldata[index].AD_Table_ID, fulldata[index].Record_ID, rt, fulldata[index].AD_WF_Activity_ID);
+                    sPanel.panelDetails(fulldata[index].AD_Window_ID, 0, fulldata[index].AD_Table_ID, fulldata[index].Record_ID, rt, fulldata[index].AD_WF_Activity_ID);
                     divWorkflowChecklist.append(rt);
                 } else {
                     divDetail.find(".vis-workflowActivityDetails-Heading h3").text(VIS.Msg.getMsg('Detail'));
