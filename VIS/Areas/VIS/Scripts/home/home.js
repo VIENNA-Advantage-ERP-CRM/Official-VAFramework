@@ -716,9 +716,9 @@
                         }
                     }
                 });/* End  bind click event of Main data container of Tab Menu */
-                
+
                 var welcomeTabScroll = true;
-                
+
                 /* Start Bind Scroll of main data contianer of tab menu */
                 WelcomeTabDatacontainers.bind('scroll', function () {
                     //var thisscroll = this;
@@ -730,64 +730,64 @@
                             welcomeTabScroll = true;
                         }, 100);
                         isTabscroll = true;
-                            isTabDataRef = false;
-                            if (activeTabType == WorkflowType) {
-                                tabdataLastPage = parseInt($("#divfActivity").html());
-                                tabdatacntpage = tabdataPage * tabdataPageSize;
-                                if (tabdatacntpage <= tabdataLastPage && activity != null) {
-                                    tabdataPage += 1;
-                                    activity.AppendRecord(tabdataPage, tabdataPageSize);
-                                }
-                                else {
-                                    return;
-                                }
-                            }
-                            else if (activeTabType == NoticeType) {
-                                tabdataLastPage = parseInt($divNoticeCount.text());
-                                tabdatacntpage = tabdataPage * tabdataPageSize;
+                        isTabDataRef = false;
+                        if (activeTabType == WorkflowType) {
+                            tabdataLastPage = parseInt($("#divfActivity").html());
+                            tabdatacntpage = tabdataPage * tabdataPageSize;
+                            if (tabdatacntpage <= tabdataLastPage && activity != null) {
                                 tabdataPage += 1;
-                                if (tabdatacntpage <= tabdataLastPage) {
-                                    LoadHomeNotice();
-                                }
-                                else {
-                                    return;
-                                }
+                                activity.AppendRecord(tabdataPage, tabdataPageSize);
                             }
-                            else if (activeTabType == RequestType) {
-                                tabdataLastPage = parseInt($divRequestCount.text());
-                                tabdatacntpage = tabdataPage * tabdataPageSize;
-                                tabdataPage += 1;
-                                if (tabdatacntpage <= tabdataLastPage) {
-                                    LoadHomeRequest();
-                                }
-                                else {
-                                    return;
-                                }
+                            else {
+                                return;
                             }
-                            else if (activeTabType == AppointmentsType && window.WSP) {
-                                tabdataLastPage = parseInt($divAptCount.text());
-                                tabdatacntpage = tabdataPage * tabdataPageSize;
-                                tabdataPage += 1;
-                                if (tabdatacntpage <= tabdataLastPage) {
-                                    WSP.wspHomeMgr.doScrollWSPHome(AppointmentsType, tabdataPage, tabdataPageSize);
-                                }
-                                else {
-                                    return;
-                                }
-                            }
-                            else if (activeTabType == NotesType && window.WSP) {
-                                tabdataLastPage = parseInt($divNotesCount.text());
-                                tabdatacntpage = tabdataPage * tabdataPageSize;
-                                if (tabdatacntpage <= tabdataLastPage) {
-                                    tabdataPage += 1;
-                                    WSP.wspHomeMgr.doScrollWSPHome(NotesType, tabdataPage, tabdataPageSize);
-                                }
-                                else {
-                                    return;
-                                }
-                            }
-
                         }
+                        else if (activeTabType == NoticeType) {
+                            tabdataLastPage = parseInt($divNoticeCount.text());
+                            tabdatacntpage = tabdataPage * tabdataPageSize;
+                            tabdataPage += 1;
+                            if (tabdatacntpage <= tabdataLastPage) {
+                                LoadHomeNotice();
+                            }
+                            else {
+                                return;
+                            }
+                        }
+                        else if (activeTabType == RequestType) {
+                            tabdataLastPage = parseInt($divRequestCount.text());
+                            tabdatacntpage = tabdataPage * tabdataPageSize;
+                            tabdataPage += 1;
+                            if (tabdatacntpage <= tabdataLastPage) {
+                                LoadHomeRequest();
+                            }
+                            else {
+                                return;
+                            }
+                        }
+                        else if (activeTabType == AppointmentsType && window.WSP) {
+                            tabdataLastPage = parseInt($divAptCount.text());
+                            tabdatacntpage = tabdataPage * tabdataPageSize;
+                            tabdataPage += 1;
+                            if (tabdatacntpage <= tabdataLastPage) {
+                                WSP.wspHomeMgr.doScrollWSPHome(AppointmentsType, tabdataPage, tabdataPageSize);
+                            }
+                            else {
+                                return;
+                            }
+                        }
+                        else if (activeTabType == NotesType && window.WSP) {
+                            tabdataLastPage = parseInt($divNotesCount.text());
+                            tabdatacntpage = tabdataPage * tabdataPageSize;
+                            if (tabdatacntpage <= tabdataLastPage) {
+                                tabdataPage += 1;
+                                WSP.wspHomeMgr.doScrollWSPHome(NotesType, tabdataPage, tabdataPageSize);
+                            }
+                            else {
+                                return;
+                            }
+                        }
+
+                    }
                     //}, 200));
                 });
                 /* End Bind Scroll of main data contianer of tab menu    */
@@ -1564,7 +1564,7 @@
                     $('.vis-welcomeScreenTab-notificationBubbles').removeClass('vis-feedsAlert').addClass('blank');
                     $('.vis-welcomeScreen-Data').hide('slow');
                     $('.vis-welcomeScreenFeeds').fadeIn('fast');
-                   
+
                     $sAlrtTxtType.html(VIS.Msg.getMsg("Notice"));
                     $welcomeNewRecord.hide();
                     $wfSearchShow.hide();
@@ -1637,7 +1637,7 @@
                     $sAlrtTxtType.html(VIS.Msg.getMsg("TaskAssignByMe"));
                     $spanWelcomeTabtopHdr.removeClass().addClass("vis-welcomeScreenContentTittle-icon vis vis-taskassigned");//$spanWelcomeTabtopHdr.css("background-position", "0px -340px");
                     WelcomeTabDatacontainers.css({ "text-align": "", "margin-top": "" });
-                     activeTabType = TaskAssignByme;
+                    activeTabType = TaskAssignByme;
                     if (isWsp) {
                         WelcomeTabDatacontainers.css({ "text-align": "auto" });
                         $spanWelcomeTabtopHdr.show();
@@ -1854,7 +1854,6 @@
     VIS.HomeMgr = HomeMgr();
 
 })(VIS, jQuery);
-
 
 
 
