@@ -155,6 +155,12 @@ namespace VAdvantage.Common
                                     {
 
                                     }
+                                    VAdvantage.Common.ShareOrg sOrg = new VAdvantage.Common.ShareOrg();
+                                    sOrg.RecordID = Util.GetValueOfInt(po.Get_ID());
+                                    sOrg.OrgID = sharedRec[k].OrgID;
+                                    sOrg.Readonly = sharedRec[k].Readonly;
+
+                                    VAdvantage.Common.ShareRecordManager.AddRecordToTable(po.Get_Table_ID(), sOrg);
                                 }
                             }
                         }
