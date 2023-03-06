@@ -298,7 +298,7 @@ namespace VISLogic.Models
 
                         GridTabVO gt = tabs.Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
 
-                        List<GridTabVO> gTabs = tabs.Where(a => a.TabLevel == gt.TabLevel + 1).ToList();
+                        List<GridTabVO> gTabs = vo.GetTabs().Where(a => a.TabLevel == gt.TabLevel + 1).ToList();
 
 
                         if (gTabs != null && gTabs.Count > 0)
