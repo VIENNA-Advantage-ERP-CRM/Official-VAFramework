@@ -592,6 +592,11 @@ namespace VIS.Models
                     MTab[] tabs = windo.GetTabs(false, null);
                     foreach (var tab in tabs)
                     {
+                        if (tab.GetAD_Process_ID() > 0)
+                        {
+                            AccessToWindowProcess(AD_Role_ID, tab.GetAD_Process_ID().ToString(), grantAccess, _winRole.IsReadWrite, new List<int>() {tab.GetAD_Process_ID() });
+                        }
+
                         int AD_Table_ID = tab.GetAD_Table_ID();
                         MColumn[] columns = MTable.Get(ctx, tab.GetAD_Table_ID()).GetColumns(false);
                         List<MColumn> buttons = columns.Where(a => a.GetAD_Reference_ID() == DisplayType.Button).ToList();
@@ -626,21 +631,22 @@ namespace VIS.Models
                             if (grouppIDs.Count > 0)
                             {
                                 grouppIDs.Sort();
-                                Dictionary<int, bool> roleProcessIDsDictinary = new Dictionary<int, bool>();
-                                sql = "SELECT AD_Process_ID,IsReadWrite FROM AD_Process_Access WHERE AD_Role_ID=" + AD_Role_ID + " AND AD_Process_ID IN(" + pID.ToString() + ")";
-                                ds = DB.ExecuteDataset(sql);
-                                if (ds != null && ds.Tables[0].Rows.Count > 0)
-                                {
-                                    for (int w = 0; w < ds.Tables[0].Rows.Count; w++)
-                                    {
-                                        roleProcessIDsDictinary[Convert.ToInt32(ds.Tables[0].Rows[w]["AD_Process_ID"])] = ds.Tables[0].Rows[w]["IsReadWrite"].ToString() == "Y" ? true : false;
-                                    }
-                                }
 
-                                for (int p = 0; p < grouppIDs.Count; p++)
-                                {
-                                    GrantRevokProcessAcess(grouppIDs[p], AD_Role_ID, grantAccess, roleProcessIDsDictinary, _winRole.IsReadWrite);
-                                }
+                                //sql = "SELECT AD_Process_ID,IsReadWrite FROM AD_Process_Access WHERE AD_Role_ID=" + AD_Role_ID + " AND AD_Process_ID IN(" + pID.ToString() + ")";
+                                //ds = DB.ExecuteDataset(sql);
+                                //if (ds != null && ds.Tables[0].Rows.Count > 0)
+                                //{
+                                //    for (int w = 0; w < ds.Tables[0].Rows.Count; w++)
+                                //    {
+                                //        roleProcessIDsDictinary[Convert.ToInt32(ds.Tables[0].Rows[w]["AD_Process_ID"])] = ds.Tables[0].Rows[w]["IsReadWrite"].ToString() == "Y" ? true : false;
+                                //    }
+                                //}
+
+                                //for (int p = 0; p < grouppIDs.Count; p++)
+                                //{
+                                //    GrantRevokProcessAcess(grouppIDs[p], AD_Role_ID, grantAccess, roleProcessIDsDictinary, _winRole.IsReadWrite);
+                                //}
+                                AccessToWindowProcess(AD_Role_ID, pID.ToString(), grantAccess, _winRole.IsReadWrite, grouppIDs);
                             }
 
                             if (groupfIDs.Count > 0)
@@ -667,6 +673,25 @@ namespace VIS.Models
 
                     }
                 }
+            }
+        }
+
+        private void AccessToWindowProcess(int AD_Role_ID, string pID, bool grantAccess, bool readWrite, List<int> grouppIDs)
+        {
+            Dictionary<int, bool> roleProcessIDsDictinary = new Dictionary<int, bool>();
+            string sql = "SELECT AD_Process_ID,IsReadWrite FROM AD_Process_Access WHERE AD_Role_ID=" + AD_Role_ID + " AND AD_Process_ID IN(" + pID.ToString() + ")";
+            DataSet ds = DB.ExecuteDataset(sql);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int w = 0; w < ds.Tables[0].Rows.Count; w++)
+                {
+                    roleProcessIDsDictinary[Convert.ToInt32(ds.Tables[0].Rows[w]["AD_Process_ID"])] = ds.Tables[0].Rows[w]["IsReadWrite"].ToString() == "Y" ? true : false;
+                }
+            }
+
+            for (int p = 0; p < grouppIDs.Count; p++)
+            {
+                GrantRevokProcessAcess(grouppIDs[p], AD_Role_ID, grantAccess, roleProcessIDsDictinary, readWrite);
             }
         }
 
