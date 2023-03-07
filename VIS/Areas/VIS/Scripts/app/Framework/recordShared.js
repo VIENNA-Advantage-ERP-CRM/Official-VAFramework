@@ -13,12 +13,15 @@
      * @param {any} table_id
      * @param {any} windowNo
      */
-    function RecordShared(record_id, table_id, tab_id, window_id, windowNo, linkColumnName) {
+    function RecordShared(record_id, table_id, tab_id, window_id, windowNo, parentID, parentTableID) {
         this.onClose = null;
         var ch = null;
         var self = this;
         var orginalArr = [];
         var sharedIDs = [];
+        if (parentID == '999999') {
+            parentID == 0;
+        }
 
         /**Main Root */
         var root = $('<div class="vis-actionWindowWrapper">'
@@ -268,7 +271,8 @@
                     Window_ID: window_id,
                     WindowNo: windowNo,
                     list: [],
-                    LinkColumn: linkColumnName
+                    Parent_ID: parentID,
+                    ParentTable_ID: parentTableID
                 }
 
                 root.find('.tbList .chkOrgID:checked').each(function () {
