@@ -1578,7 +1578,7 @@ namespace VAdvantage.Common
         public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID, int AD_SurveyAssignment_ID, string ShowEverytime)
         {
             bool isExist = true;
-
+            bool isConditionGiven = true;
             string sqlWhere = "SELECT WhereClause FROM AD_TAB WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
             sqlWhere = Util.GetValueOfString(DB.ExecuteScalar(sqlWhere));
 
@@ -1759,9 +1759,14 @@ namespace VAdvantage.Common
                             }
                         }
                     }
-                   
+
+                }
+                else
+                {
+                    isConditionGiven = false;
                 }
             }
+          
 
             if (!string.IsNullOrEmpty(sqlWhere)|| !string.IsNullOrEmpty(WhereCondition))
             {
@@ -1784,7 +1789,7 @@ namespace VAdvantage.Common
                 }
 
                 int count = Util.GetValueOfInt(DB.ExecuteScalar(MRole.GetDefault(ctx).AddAccessSQL(sql, tableName, true, false)));
-                if (count > 0)
+                if (isConditionGiven && count > 0)
                 {
                     isExist = true;
                 }
@@ -1793,6 +1798,11 @@ namespace VAdvantage.Common
                     isExist = false;
                 }
             }
+            else if(ShowEverytime == "N")
+            {
+                isExist = false;
+            }
+            
 
             return isExist;
 

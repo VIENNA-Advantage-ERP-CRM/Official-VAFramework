@@ -61,12 +61,16 @@ namespace VAdvantage.Model
         /// <returns></returns>
         protected override bool BeforeSave(bool newRecord)
         {
+            if (GetAD_SurveyAssignment_ID() > 0)
+            {
+                DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
+            }
+
             string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='Y' AND isActive='Y'";
+
             if (!newRecord)
             {
                 sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
-
-               DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
             }
             int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             if (count > 0)
