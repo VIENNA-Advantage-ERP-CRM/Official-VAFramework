@@ -5690,3 +5690,6 @@ a.VIS_Pref_btn-2, a.VIS_Pref_btn-2:hover {
 .vis-sms-red {
     color: #ed0000
 }
+.k-state-hover.k-state-selected:hover {
+    color: #fff !important;
+}
