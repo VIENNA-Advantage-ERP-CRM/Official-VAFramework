@@ -54,12 +54,12 @@ namespace VIS.Areas.VIS.Controllers
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public JsonResult SaveRecord(int AD_Table_ID, int record_ID, int Tab_ID, int Window_ID, int WindowNo, List<Records> list, string LinkColumn)
+        public JsonResult SaveRecord(int AD_Table_ID, int record_ID, int Tab_ID, int Window_ID, int WindowNo, List<Records> list, int Parent_ID, int ParentTable_ID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             RecordShared model = new RecordShared();
             int error = 0;
-            return Json(JsonConvert.SerializeObject(model.SaveRecord(AD_Table_ID, record_ID, Tab_ID, Window_ID, WindowNo, list, ctx, null, LinkColumn,ref error)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(model.SaveRecord(AD_Table_ID, record_ID, Tab_ID, Window_ID, WindowNo, list, ctx, null, Parent_ID, ParentTable_ID, ref error)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>

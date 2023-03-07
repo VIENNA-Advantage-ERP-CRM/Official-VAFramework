@@ -126,7 +126,7 @@ namespace VISLogic.Models
         /// <param name="WindowParent_ID"> ParentID of current record fetched from window</param>
         /// <param name="ParentID">It is AD_RecordSharedOrg_ID</param>
         /// <returns></returns>
-        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, string LinkColumn, ref int error, int ParentID = 0)
+        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID,int ParentTable_ID, ref int error, int ParentID = 0)
         {
             string msg = "OK";
             Trx trx = null;
@@ -199,11 +199,7 @@ namespace VISLogic.Models
                             statussChanged = true;
                         SRO.SetIsReadOnly(records[i].isReadonly);
                         SRO.SetRecord_ID(record_ID);
-                        if (!string.IsNullOrEmpty(LinkColumn))
-                        {
-                            SRO.Set_ValueNoCheck("LinkColumnName", LinkColumn);
-
-                        }
+                       
                         if (ParentID > 0)
                         {
                             SRO.Set_ValueNoCheck("Parent_ID", ParentID);
@@ -259,6 +255,7 @@ namespace VISLogic.Models
                             }
                         }
 
+                        ParentID = SRO.GetAD_ShareRecordOrg_ID();
 
                         string tableName = MTable.GetTableName(ctx, AD_Table_ID);
 
@@ -408,6 +405,24 @@ namespace VISLogic.Models
                 }
             }
             return msg;
+        }
+
+
+        private void DeleteSharedChild(int parent_ID, Trx trx)
+        {
+            string sql = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE Parent_ID=" + parent_ID;
+            DataSet ds = DB.ExecuteDataset(sql, null, trx);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx);
+                }
+            }
+
+
+            sql = "DELETE FROM AD_ShareRecordOrg WHERE AD_ShareRecordOrg_ID=" + parent_ID;
+            int deletedRecords = DB.ExecuteQuery(sql, null, trx);
         }
 
         public List<RecordAccess> GetSharedRecords(Ctx ctx)
