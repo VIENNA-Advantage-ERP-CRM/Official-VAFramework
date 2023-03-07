@@ -106,8 +106,10 @@ namespace VISLogic.Models
         /// </summary>
         /// <param name="records"></param>
         /// <param name="ctx"></param>
+        /// <param name="WindowParent_ID"> ParentID of current record fetched from window</param>
+        /// <param name="ParentID">It is AD_RecordSharedOrg_ID</param>
         /// <returns></returns>
-        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, string LinkColumn, ref int error, int ParentID = 0)
+        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID,int ParentTable_ID, ref int error, int ParentID = 0)
         {
             string msg = "OK";
             Trx trx = null;
@@ -129,12 +131,21 @@ namespace VISLogic.Models
                 {
                     query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + record_ID;
                     oldParentID = Util.GetValueOfInt(DB.ExecuteScalar(query));
-                    query = "DELETE FROM AD_ShareRecordOrg WHERE Parent_ID=" + oldParentID;
-                    DB.ExecuteQuery(query, null, trx);
+                    DeleteSharedChild(oldParentID, trx);
+                    //query = "DELETE FROM AD_ShareRecordOrg WHERE Parent_ID=" + oldParentID;
+                    //int deletedRecords = DB.ExecuteQuery(query, null, trx);
 
                 }
                 query = "DELETE FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + record_ID;
                 DB.ExecuteQuery(query, null, trx);
+
+                //this is case, when user unshare a child, then again try to share that child. IN this case, child record must be set under parent record again, so that once 
+                //parent get unshared, it should get unshared too.
+                if (ParentID == 0 && WindowParent_ID > 0)
+                {
+                    query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + ParentTable_ID + " AND Record_ID=" + WindowParent_ID;
+                    ParentID = Util.GetValueOfInt(DB.ExecuteScalar(query));
+                }
 
 
                 if (records != null)
@@ -147,11 +158,7 @@ namespace VISLogic.Models
                         SRO.Set_ValueNoCheck("AD_OrgShared_ID", records[i].AD_OrgShared_ID);
                         SRO.SetIsReadOnly(records[i].isReadonly);
                         SRO.SetRecord_ID(record_ID);
-                        if (!string.IsNullOrEmpty(LinkColumn))
-                        {
-                            SRO.Set_ValueNoCheck("LinkColumnName", LinkColumn);
-
-                        }
+                       
                         if (ParentID > 0)
                         {
                             SRO.Set_ValueNoCheck("Parent_ID", ParentID);
@@ -163,7 +170,7 @@ namespace VISLogic.Models
                         }
                         if (ParentID == 0)
                         {
-                            ParentID = SRO.GetAD_ShareRecordOrg_ID();
+
                             VAdvantage.Common.ShareOrg Org = new VAdvantage.Common.ShareOrg();
                             Org.RecordID = record_ID;
                             Org.OrgID = records[i].AD_OrgShared_ID;
@@ -171,6 +178,7 @@ namespace VISLogic.Models
                             VAdvantage.Common.ShareRecordManager.AddRecordToTable(AD_Table_ID, Org);
                         }
 
+                        ParentID = SRO.GetAD_ShareRecordOrg_ID();
 
                         string tableName = MTable.GetTableName(ctx, AD_Table_ID);
 
@@ -279,7 +287,7 @@ namespace VISLogic.Models
                                         sOrg.Readonly = records[i].isReadonly;
 
                                         VAdvantage.Common.ShareRecordManager.AddRecordToTable(tab.AD_Table_ID, sOrg);
-                                        SaveRecord(table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx, "", ref error, ParentID);
+                                        SaveRecord(table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx,0,0, ref error, ParentID);
                                     }
                                 }
                             }
@@ -318,6 +326,24 @@ namespace VISLogic.Models
                 }
             }
             return msg;
+        }
+
+
+        private void DeleteSharedChild(int parent_ID, Trx trx)
+        {
+            string sql = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE Parent_ID=" + parent_ID;
+            DataSet ds = DB.ExecuteDataset(sql, null, trx);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx);
+                }
+            }
+
+
+            sql = "DELETE FROM AD_ShareRecordOrg WHERE AD_ShareRecordOrg_ID=" + parent_ID;
+            int deletedRecords = DB.ExecuteQuery(sql, null, trx);
         }
 
         public List<RecordAccess> GetSharedRecords(Ctx ctx)
