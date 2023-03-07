@@ -872,6 +872,13 @@ namespace VAdvantage.Process
             }
             if (sField.GetAD_InfoWindow_ID() > 0)
             {
+                //Insert Table ID
+                int sTableId = GetID("AD_InfoWindow", "AD_Table_ID", "AD_InfoWindow_ID = " + sField.GetAD_InfoWindow_ID());
+                if (sTableId > 0)
+                {
+                    GetTable(sTableId);
+                }
+
                 if (HasModulePrefix("Name", "AD_InfoWindow", "AD_InfoWindow_ID = " + sField.GetAD_InfoWindow_ID(), out name))
                 {
                     InsertIntoDBSchema(X_AD_InfoWindow.Table_ID, sField.GetAD_InfoWindow_ID(), X_AD_InfoWindow.Table_Name, name, " AD_InfoWindow_ID = " + sField.GetAD_InfoWindow_ID());

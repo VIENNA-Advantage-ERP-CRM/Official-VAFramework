@@ -454,12 +454,7 @@ namespace VAdvantage.Process
                                     {
                                         continue;
                                     }
-                                    //VIS323 Special Case for avoid duplicate records at the time of export
-                                    if (_TableNameRecId.Contains(currentTable.GetTableName() + "," + tmpDS.Tables[0].Rows[0][columns[cols].GetColumnName()].ToString()))
-                                    {
-                                        continue;
-                                    }
-                                    _TableNameRecId.Add(currentTable.GetTableName() + "," + tmpDS.Tables[0].Rows[0][columns[cols].GetColumnName()].ToString());
+                                   
                                     string colName = columns[cols].GetColumnName();
                                     int refVID = columns[cols].GetAD_Reference_Value_ID();
                                     int refID = columns[cols].GetAD_Reference_ID();
