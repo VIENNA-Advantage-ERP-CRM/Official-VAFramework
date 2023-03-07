@@ -561,7 +561,7 @@
                 $ulactionbar.append(this.aRecAccess.getListItmIT());
             }
 
-            if (this.isShowSharedRecord && mWindow.getWindowType()=='M') {
+            if (this.isShowSharedRecord && mWindow.getWindowType() == 'M') {
                 this.aSharedRecord = this.addActions(this.ACTION_NAME_SHAREDREC, null, true, false, false, onAction, true);
                 this.aSharedRecord.setTextDirection("r");
                 $ulactionbar.append(this.aSharedRecord.getListItmIT());
@@ -4143,7 +4143,11 @@
     APanel.prototype.cmd_RecordShared = function () {
 
         var self = this;
-        var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo);
+        var parentTableID = 0;
+        if (this.curTab.getParentTab())
+            parentTableID = this.curTab.getParentTab().getAD_Table_ID();
+
+        var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo, this.curTab.linkValue, parentTableID);
         atRecordShared.onClose = function () {
             self.curTab.loadShared();
             self.aSharedRecord.setPressed(self.curTab.hasShared());
