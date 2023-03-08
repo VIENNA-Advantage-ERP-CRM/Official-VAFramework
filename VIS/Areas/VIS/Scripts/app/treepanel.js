@@ -552,6 +552,7 @@
             //rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
             if (this.onDemandTree) {
                 var selNode = root.find("*.vis-css-treewindow-selected");
+               
                 if (selNode && isSummary) {
                     var ul = $(selNode.parent()).find('ul');
                     if (ul && ul.length > 0) {
@@ -563,8 +564,21 @@
                 }
             }
             else {
-                var rn = this.getRootNode();
-                rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                var selNode = root.find("*.vis-css-treewindow-selected");
+                var isSum = selNode.parent("li").data("summary") == "Y";
+                if (selNode && isSum) {
+                    var ul = $(selNode.parent()).find('ul');
+                    if (ul && ul.length > 0) {
+                        $(ul[0]).append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                    }
+                    else {
+                        $(selNode.parent()).append($('<ul>').append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo)));
+                    }
+                }
+                else {
+                    var rn = this.getRootNode();
+                    rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                }
             }
 
         }

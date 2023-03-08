@@ -1557,6 +1557,7 @@
 
         if (this.m_tree != null) {
             this.gTab.SetSelectedNode(this.m_tree.currentNode);
+            this.gTab.setTreeID(this.treeID);
         }
 
 

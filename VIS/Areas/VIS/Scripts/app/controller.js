@@ -4445,6 +4445,8 @@
 
         if (this.selectedTreeNode > 0) {
             gridTableIn['SelectedTreeNodeID'] = this.selectedTreeNode;
+            gridTableIn['TreeID'] = this.treeID;
+            gridTableIn['ParentNodeID'] = this.selectedTreeNode;
         }
 
         if (this.treeNode_ID > 0) {
