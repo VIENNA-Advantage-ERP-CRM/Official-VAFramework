@@ -635,10 +635,15 @@
 
         else {
             str += 'data-summary="N"> ' +
-            ' <img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/login/' + this.getIcon(imageIndicator) + '"> ' +
-             ' <a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '"> ' +
-             name + '</a><span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
-             '</span></span></li>';
+                '<a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '">' +
+                '<span ' + this.getClassIcon(imageIndicator) + '></span>' + name + '</a > ' +
+                '<span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
+                '</span></span></li>';
+            //str += 'data-summary="N"> ' +
+            //' <img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/login/' + this.getIcon(imageIndicator) + '"> ' +
+            // ' <a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '"> ' +
+            // name + '</a><span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
+            // '</span></span></li>';
         }
 
         return $(str);
@@ -664,6 +669,31 @@
                 return "mDocAction.png";
             default:
                 return "mWindow.png";
+        }
+    };
+
+    TreePanel.prototype.getClassIcon = function (initial) {
+        switch (initial) {
+            case "W":
+                return "class = 'fa fa-window-maximize'";
+            case "R":
+                return "class = 'vis vis-report'";
+            case "P":
+                return "class = 'fa fa-cog'";
+            case "T":
+                return "class = 'fa fa-cog'";
+            case "F":
+                return "class = 'fa fa-clone'";
+            case "B":
+                return "class = 'fa fa-clone'";
+            case "X":
+                return "class = 'fa fa-list-alt'";
+            case "V":
+                return "class = 'fa fa-clone'";
+            case "D":
+                return "class = 'fa fa-clone'";
+            default:
+                return "class = 'fa fa-clone'";
         }
     };
 
