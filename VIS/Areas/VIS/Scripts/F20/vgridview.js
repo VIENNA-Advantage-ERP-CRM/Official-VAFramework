@@ -91,7 +91,7 @@
                         VA048.Apps.GetCallingInstance(true, numberinfo, false);
                     }
                     else
-                        VIS.ADialog.info("Communication Module is not installed)");
+                        VIS.ADialog.info("ComModuleNotInstalled");
                 }
             } catch (err) {
 
@@ -1022,7 +1022,7 @@
 
                     if (val) {
 
-                        return VIS.VTelePhoneInstance.getHtml(val);
+                        return VIS.VTelePhoneInstance.getHtml(val,true);
 
                         //if (val.indexOf('+') < 0) {
                         //   telePhoneFormatter.iti.setCountry(geoplugin_countryCode());
