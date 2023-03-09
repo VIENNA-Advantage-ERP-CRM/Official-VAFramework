@@ -63,7 +63,8 @@ namespace VAdvantage.Model
         {
             if (GetAD_SurveyAssignment_ID() > 0)
             {
-                DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
+                //DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
+                DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Client_ID=" + GetAD_Client_ID() + " AND AD_ORG_ID=" + GetAD_Org_ID() + "  AND AD_Tab_ID IN (" + GetAD_Tab_ID() + ")");
             }
 
             string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='Y' AND isActive='Y'";
@@ -118,6 +119,16 @@ namespace VAdvantage.Model
             {
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Before Delete Logic
+        /// </summary>
+        /// <returns></returns>
+        protected override bool BeforeDelete()
+        {
+            DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
+            return true;
         }
     }
 }
