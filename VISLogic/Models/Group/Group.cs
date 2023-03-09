@@ -676,6 +676,14 @@ namespace VIS.Models
             }
         }
 
+        /// <summary>
+        /// Fetch information from Process Access for Role and Given process and Invoke GrantRevokProcessAcess
+        /// </summary>
+        /// <param name="AD_Role_ID"></param>
+        /// <param name="pID"></param>
+        /// <param name="grantAccess"></param>
+        /// <param name="readWrite"></param>
+        /// <param name="grouppIDs"></param>
         private void AccessToWindowProcess(int AD_Role_ID, string pID, bool grantAccess, bool readWrite, List<int> grouppIDs)
         {
             Dictionary<int, bool> roleProcessIDsDictinary = new Dictionary<int, bool>();
@@ -695,6 +703,15 @@ namespace VIS.Models
             }
         }
 
+
+        /// <summary>
+        /// Fetch information from Process Access for Role and Given Workflow and Invoke GrantRevokWorkflowAcess
+        /// </summary>
+        /// <param name="AD_Role_ID"></param>
+        /// <param name="pID"></param>
+        /// <param name="grantAccess"></param>
+        /// <param name="readWrite"></param>
+        /// <param name="grouppIDs"></param>
         private void AccessToWorkflowProcess(int AD_Role_ID, string pID, bool grantAccess, bool readWrite, List<int> grouppIDs)
         {
             Dictionary<int, bool> roleProcessIDsDictinary = new Dictionary<int, bool>();
@@ -765,6 +782,14 @@ namespace VIS.Models
             }
         }
 
+        /// <summary>
+        /// Get Form info and set access (Readonly Or ReadWrite) for that Form and role
+        /// </summary>
+        /// <param name="AD_Form_ID"></param>
+        /// <param name="AD_Role_ID"></param>
+        /// <param name="grantAccess"></param>
+        /// <param name="roleFormIDsDictinary"></param>
+        /// <param name="formGroupAccess"></param>
         private void GrantRevokeFormAccess(int AD_Form_ID, int AD_Role_ID, bool grantAccess, Dictionary<int, bool> roleFormIDsDictinary, bool formGroupAccess)
         {
             MForm wind = new MForm(ctx, AD_Form_ID, null);
@@ -851,6 +876,15 @@ namespace VIS.Models
             }
         }
 
+
+        /// <summary>
+        /// Get Process info and set access (Readonly Or ReadWrite) for that process and role
+        /// </summary>
+        /// <param name="AD_Process_ID"></param>
+        /// <param name="AD_Role_ID"></param>
+        /// <param name="grantAccess"></param>
+        /// <param name="roleWindowIDsDictinary"></param>
+        /// <param name="ProcessGroupAccess"></param>
         private void GrantRevokProcessAcess(int AD_Process_ID, int AD_Role_ID, bool grantAccess, Dictionary<int, bool> roleWindowIDsDictinary, bool ProcessGroupAccess)
         {
             MProcess wind = new MProcess(ctx, AD_Process_ID, null);
@@ -885,13 +919,21 @@ namespace VIS.Models
                 wAccess.Save();
             }
 
+            // If workflow linked iwth Process then provide access
             if (wind.GetAD_Workflow_ID() > 0)
             {
                 AccessToWorkflowProcess(AD_Role_ID, wind.GetAD_Workflow_ID().ToString(), grantAccess, ProcessGroupAccess, new List<int> { wind.GetAD_Workflow_ID() });
             }
         }
 
-
+        /// <summary>
+        /// Get Workflow info and set access (Readonly Or ReadWrite) for that Workflow and role
+        /// </summary>
+        /// <param name="AD_Workflows_ID"></param>
+        /// <param name="AD_Role_ID"></param>
+        /// <param name="grantAccess"></param>
+        /// <param name="roleWindowIDsDictinary"></param>
+        /// <param name="ProcessGroupAccess"></param>
         private void GrantRevokWorkflowAcess(int AD_Workflows_ID, int AD_Role_ID, bool grantAccess, Dictionary<int, bool> roleWindowIDsDictinary, bool ProcessGroupAccess)
         {
             MWorkflow wind = new MWorkflow(ctx, AD_Workflows_ID, null);
@@ -899,6 +941,7 @@ namespace VIS.Models
             string sql = "";
             if (roleWindowIDsDictinary.ContainsKey(AD_Workflows_ID))
             {
+
                 if (roleWindowIDsDictinary[AD_Workflows_ID] != grantAccess || roleWindowIDsDictinary[AD_Workflows_ID] != ProcessGroupAccess)
                 {
                     //wAccess.SetIsReadWrite(grantAccess);
