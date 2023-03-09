@@ -313,6 +313,18 @@ namespace VIS.Models
         }
 
         /// <summary>
+        /// Check Doc Action Exist In Table
+        /// </summary>
+        /// <param name="AD_Table_ID"></param>
+        /// <returns></returns>
+        public int CalloutGetTableIDByTab(int AD_Tab_ID)
+        {
+            string sql = "SELECT AD_Table_ID FROM AD_Tab WHERE IsActive='Y' AND ad_tab_id=" + AD_Tab_ID;
+            int AD_Table_ID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            return AD_Table_ID;
+        }
+
+        /// <summary>
         /// Get Response list
         /// </summary>
         /// <param name="ctx"></param>
