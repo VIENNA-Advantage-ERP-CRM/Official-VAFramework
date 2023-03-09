@@ -205,7 +205,7 @@
 
 
             $.ajax({
-                type: 'Get',
+                type: 'post',
                 async: true,
                 url: VIS.Application.contextUrl + "Form/UpdateTree",
                 data: {
