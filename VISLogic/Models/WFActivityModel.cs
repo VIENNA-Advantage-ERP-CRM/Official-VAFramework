@@ -1068,8 +1068,19 @@ OR
                                     AND (validfrom  <=sysdate)
                                     AND (sysdate    <=validto )
                                     ))
-                                  And R.Responsibletype !='H'
-                                  ))";
+                                  AND r.ResponsibleType NOT IN ('H','C', 'M')
+                                  )
+                                OR EXISTS
+                                  (SELECT *
+                                  FROM AD_WF_Responsible r
+                                  INNER JOIN AD_Role ro
+                                  ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                                  WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                                  AND r.IsActive = 'Y'
+                                  AND (CASE WHEN INSTR(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                                  AND r.responsibletype ='M'
+                                  )
+                              )";
             }
             else
             {
@@ -1139,8 +1150,19 @@ OR
                                     AND (validfrom  <=sysdate)
                                     AND (sysdate    <=validto )
                                     ))
-                                  And R.Responsibletype !='H'
-                                  ))";
+                                  AND r.ResponsibleType NOT IN ('H','C', 'M')
+                                  )
+                                OR EXISTS
+                                  (SELECT *
+                                  FROM AD_WF_Responsible r
+                                  INNER JOIN AD_Role ro
+                                  ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                                  WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                                  AND r.IsActive = 'Y'
+                                  AND (CASE WHEN INSTR(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                                  AND r.responsibletype ='M'
+                                  )
+                                )";
             }
 
 
