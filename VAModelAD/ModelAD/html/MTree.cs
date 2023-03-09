@@ -852,7 +852,7 @@ namespace VAdvantage.Model
                 if (columnNameX == null)
                     throw new ArgumentException("Unknown TreeType=" + GetTreeType());
                 sqlNode.Append("SELECT " + columnNameX + ".").Append(columnNameX)
-                    .Append("_ID," + columnNameX + ".Name," + columnNameX + ".Description," + columnNameX + ".IsSummary,").Append(color)
+                    .Append("_ID," + columnNameX + ".Name," + columnNameX + ".Description," + columnNameX + ".IsSummary,").Append("'D'")
                     .Append(" FROM ").Append(fromClause);
                 if (!m_editable)
                 {
