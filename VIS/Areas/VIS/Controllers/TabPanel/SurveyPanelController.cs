@@ -68,6 +68,12 @@ namespace VIS.Controllers
             SurveyPanelModel obj = new SurveyPanelModel();
             Ctx ctx = Session["ctx"] as Ctx;
             return Json(JsonConvert.SerializeObject(obj.CheckDocActionInTable(fields)), JsonRequestBehavior.AllowGet);
+        } 
+        public JsonResult CalloutGetTableIDByTab(int fields)
+        {
+            SurveyPanelModel obj = new SurveyPanelModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(obj.CalloutGetTableIDByTab(fields)), JsonRequestBehavior.AllowGet);
         }
         
         /// <summary>
