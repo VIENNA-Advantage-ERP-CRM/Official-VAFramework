@@ -5,7 +5,7 @@
         this.frame;
         this.windowNo;
         var $self = this;
-        var $root = $('<div class="vis-forms-container" style="padding:3px 0 7px;background-color:white;height:100%"/>');
+        var $root = $('<div class="vis-forms-container" style="padding:3px 0 7px;background-color:rgba(var(--v-c-common), 1);height:100%"/>');
 
         var $leftTreeKeno;
         //var $isSummary = false;

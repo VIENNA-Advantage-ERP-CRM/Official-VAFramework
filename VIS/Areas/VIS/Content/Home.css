@@ -736,7 +736,7 @@ html[dir="rtl"] ul.vis-IIColumnContent li {
 }
 
 .vis-pending_wrap {
-    background: url('../Images/home/1.jpg');
+    background: url('../Images/home/1.svg');
     width: 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -775,9 +775,9 @@ html[dir="rtl"] ul.vis-IIColumnContent li {
     }
 
 .vis-approved_wrap {
-    background: url("../Images/home/2.jpg") no-repeat scroll center center rgba(0, 0, 0, 0);
+    background: url("../Images/home/2.svg") no-repeat center;
     height: auto;
-    min-height: 22px;
+    min-height: 23px;
     overflow: hidden;
     width: 100%;
 }

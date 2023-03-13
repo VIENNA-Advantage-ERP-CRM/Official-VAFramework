@@ -30,7 +30,7 @@ textarea, select, button
 select {
     /*background: url(../Images/select.png) no-repeat 97% 50%;*/
     min-width: 30px;
-    background-color: white;
+    background-color: rgba(var(--v-c-common), 1);
     padding-right: 25px;
     padding-left: 10px;
     border: 1px solid rgba(var(--v-c-on-secondary), .2);
@@ -1011,13 +1011,12 @@ html[dir="rtl"] .vis-main-container
     overflow: auto;
 }
 
-.vis-footer
-{
+.vis-footer {
     position: fixed;
     bottom: 0;
     width: 100%;
     border-top: 1px solid #ADADAD;
-    background-color: white;
+    background-color: rgba(var(--v-c-common), 1);
     height: 23px;
 }
 
@@ -1067,12 +1066,11 @@ html[dir="rtl"] .vis-taskbar-right
     /*padding-top: 1px;*/
 }
 
-    .vis-taskbar li
-    {
+    .vis-taskbar li {
         text-align: center;
         cursor: pointer;
         display: inline-block;
-        background-color: white;
+        background-color: rgba(var(--v-c-common), 1);
         margin: 0;
         margin-right: 4px;
         margin-left: 3px;

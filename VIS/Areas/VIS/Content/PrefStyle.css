@@ -1180,7 +1180,7 @@ html[dir="rtl"] .input-group-addon {
     .VIS_Pref_slide-show {
         width: 42%;
         overflow: hidden;
-        background: url('../img/arr.png') no-repeat right #FFFFFF;
+        background: url('../img/arr.png') no-repeat right rgba(var(--v-c-common), 1);
         border: #E8E8E8 1px solid;
         -webkit-border-radius: 3px;
         border-radius: 3px;

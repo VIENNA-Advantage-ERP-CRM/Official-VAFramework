@@ -303,7 +303,7 @@
     position: absolute;
     max-width: 100%;
     padding-top: 10px;
-    background-color: white;
+    background-color: rgba(var(--v-c-common), 1);
     height: 50px;
     overflow: hidden;
     width: 100%;
@@ -378,7 +378,7 @@
 .vis-apanel-sorttab {
     height: 100%;
     width: 100%;
-    background-color: white;
+    background-color: rgba(var(--v-c-common), 1);
 }
 
     .vis-apanel-sorttab td {
@@ -484,7 +484,7 @@
 .vis-apanel-lb-oflow {
     height: 40px;
     /*padding-top:4px;*/
-    border-top: 1px solid white;
+    border-top: 1px solid rgba(var(--v-c-common), 1);
     /*background-color: #444343;*/
     /*position:absolute;
     bottom:40px;*/
@@ -866,7 +866,7 @@
     height: 100%;
     width: 100%;
     margin: 0 auto;
-    background-color: white;
+    background-color: rgba(var(--v-c-common), 1);
     /*display:inline-block;*/
 }
 

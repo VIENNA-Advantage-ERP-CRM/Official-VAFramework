@@ -11,7 +11,7 @@
         this.frame;
         this.windowNo;
         var $self = this;
-        var $root = $("<div style='height:100%;background-color:white;' class='vis-forms-container' >");
+        var $root = $("<div style='height:100%;background-color:rgba(var(--v-c-common), 1);' class='vis-forms-container' >");
         var $bsyDiv = $("<div class='vis-busyindicatorouterwrap'><div class='vis-busyindicatorinnerwrap'><i class='vis-busyindicatordiv'></i></div></div>");
 
         /**Create Main View Variable **/

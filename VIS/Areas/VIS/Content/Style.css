@@ -604,8 +604,8 @@ ul.VIS-TM-root-node li a:hover{ text-decoration: none;}
 
     
 }
-.VIS-TM-ondragdropTopDiv{
-    background-color:white;
+.VIS-TM-ondragdropTopDiv {
+    background-color: rgba(var(--v-c-common), 1);
 }
 
 .vis-tm-treeCmbDisable 
@@ -978,7 +978,9 @@ ul.VIS-TM-root-node li a:hover{ text-decoration: none;}
 }
 
 .vis-tm-liw2overlay {
-    background-color:white;border:white;border-bottom:2px #EBEBEB solid;
+    background-color: rgba(var(--v-c-common), 1);
+    border: rgba(var(--v-c-common), 1);
+    border-bottom: 2px #EBEBEB solid;
 }
 
 .vis-tm-r-list-w,
@@ -1211,7 +1213,7 @@ center {
 
 @media print {
     .vis-attach-main-wrap {
-        background-color: white;
+        background-color: rgba(var(--v-c-common), 1);
         height: 100%;
         width: 100%;
         position: fixed;
@@ -3639,10 +3641,10 @@ field, fieldvalue {
     position: absolute;
     left: 4px;
     top: 8px;
-    background: white;
+    background: rgba(var(--v-c-common), 1);
     width: 2px;
     height: 2px;
-    box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 white;
+    box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 rgba(var(--v-c-common), 1);
     transform: rotate(45deg);
 }
 

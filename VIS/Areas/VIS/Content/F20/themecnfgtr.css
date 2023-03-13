@@ -350,8 +350,8 @@ ul.vis-thed-hdr-r {
     padding-right: 2px;
 }
 .vis-thed-tablewrap {
-	background: #fff;
-	overflow: hidden;
+    background: rgba(var(--v-c-common), 1);
+    overflow: hidden;
 }
 .vis-thed-tablewrap table {
     width: 100%;

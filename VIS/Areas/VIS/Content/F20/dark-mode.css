@@ -346,7 +346,8 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label,
 .vis-gc-vpanel-table-readOnly {
     background-color: rgba(var(--v-c-on-secondary),.04) !important;
 }
-.vis-report-gray {
+.vis-report-gray,
+.vis-prefthemeconfigbtn {
     background: rgba(var(--v-c-on-secondary), .1);
 }
 .vis-sms-red {

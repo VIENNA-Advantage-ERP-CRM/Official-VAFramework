@@ -11,7 +11,7 @@
         this.frame;
         this.windowNo;
         var $self = this;
-        var $root = $("<div style='height:100%;background-color:white;' >");
+        var $root = $("<div style='height:100%;background-color:rgba(var(--v-c-common), 1);' >");
         //var $bsyDiv = $("<div class='vis-apanel-busy' style='height:100%;position:relative;z-index: 2'>");
         var $bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
 
@@ -55,7 +55,7 @@
         };
 
         function createMainView() {
-            $mainpageContent = $('<div class="Page-content" style="height:100%;background-color:white;">');
+            $mainpageContent = $('<div class="Page-content" style="height:100%;background-color:rgba(var(--v-c-common), 1);">');
 
             /**created 1st Div **/
             $formLeftWrap = $(' <div class="formLeft" style="background-color: rgb(241, 241, 241);display: inline-block; float: left;width:23%;height:87.8%;overflow:auto;padding-left: 7px;">');
