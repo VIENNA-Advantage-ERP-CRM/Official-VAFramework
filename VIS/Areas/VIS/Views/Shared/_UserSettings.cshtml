@@ -48,6 +48,7 @@
         <p id="vis_cloud_daysleft"></p>
     </div>
     <ul class="vis-app-hdr-r">
+        <li class="vis-themeModeChange"><i class="vis vis-sun"></i></li>
         <li id="vis_userDate"><i class="fa fa-calendar"></i><span>@DateTime.Now.ToString("D", new System.Globalization.CultureInfo(ViewBag.culture.ToString().Replace("_", "-")))</span> </li>
         <li id="vis_theme" style="display:none">
             <div class="dropdown">
@@ -96,31 +97,31 @@
 
             @*<select id="vis_cmbtheme"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option> </select>  </li>*@
             @*
-                <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
+            <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
         </li>
         <li id="vis_userDisplayName" class="vis-app-hdr-r-user">
             <a id="vis_userName">@ViewBag.DisplayName</a>
             @*
-        <div class="vis-div-userAvatar">*@
+            <div class="vis-div-userAvatar">*@
             @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
             {
-            ViewBag.UserPic="";
+                ViewBag.UserPic = "";
             }
             <div class="vis-app-user-img-wrap">
                 <i class="fa fa-user"></i>
                 <img src="@ViewBag.UserPic" alt="profile image">
             </div><!-- user-img-wrap -->
             @*else
-        {
-        <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
-        }
-        }
-        else
-        {
-        <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
-        }*@
+            {
+            <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
+            }
+            }
+            else
+            {
+            <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
+            }*@
             @*
-        </div>*@
+            </div>*@
 
 
         </li>
