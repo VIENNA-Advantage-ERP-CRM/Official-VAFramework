@@ -496,7 +496,7 @@
                             fulldata = [];
                             $divActivity.empty();
                             divScroll.empty();
-                            if (dyndata.result) {
+                            if (reslt) {
                                 container.find('#pnorecFound').remove();
                                 $divActivity.append(reslt.count);
                             }

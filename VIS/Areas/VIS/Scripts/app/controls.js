@@ -7114,9 +7114,9 @@
                 + '<div/>'
                 + '<div style="margin: 0 6px;';
             if (showPointer) {
-                htm += 'cursor: pointer;"';
+                htm += 'cursor: pointer;';
             }
-                    htm+= '> ' + fVal + '</div > '
+                    htm+= '"> ' + fVal + '</div > '
                 + '</div>';
             return htm;
         };
