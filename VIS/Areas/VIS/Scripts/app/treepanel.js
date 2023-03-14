@@ -692,6 +692,8 @@
                 return "class = 'fa fa-clone'";
             case "D":
                 return "class = 'fa fa-clone'";
+            case "O":
+                return "class = 'fa fa-circle'";
             default:
                 return "class = 'fa fa-clone'";
         }
