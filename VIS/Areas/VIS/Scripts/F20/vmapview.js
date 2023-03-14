@@ -56,7 +56,7 @@
 
             markers.push(marker);
 
-            
+
 
 
 
@@ -244,9 +244,9 @@
             var html = '';
             var f = self.mapFields;
             if (f.length > 1) {
-
+                html += '<option data-index="-1" value="-1"> </option>';
                 for (var i = 0; i < f.length; i++) {
-                    html += '<option value=' + f[i].getColumnName() + ' >' + f[i].getHeader() + '</option>';
+                    html += '<option data-index=' + i + ' value=' + f[i].getColumnName() + ' >' + f[i].getHeader() + '</option>';
                 }
                 cmbLoc.html(html);
                 cmbLoc[0].selectedIndex = 0;
@@ -279,8 +279,13 @@
         function bindEvent() {
             cmbLoc.on("change", function (e) {
                 self.setBusy(true);
-                self.curIndex = this.selectedIndex;
-                self.setMapData(self.mapcols[self.curIndex]);
+                //self.curIndex = this.selectedIndex;
+                self.curIndex= $(e.target).find('option:selected').data('index');
+                //self.curIndex =
+                if (self.curIndex == -1)
+                    self.setMapData(self.mapcols);
+                else
+                    self.setMapData(self.mapcols[self.curIndex]);
             });
         };
 
@@ -299,7 +304,7 @@
 
         };
 
-        this.setMapData = function (lstLatLng) {
+        this.setMapData = function (LatLng) {
             if (!isMapAvail)
                 return;
 
@@ -311,27 +316,48 @@
 
             google.maps.event.trigger(map, 'resize');
             // window.setTimeout(function () {
-            var len = lstLatLng.length;
-            for (var i = 0; i < len; i++) {
-                if (!lstLatLng[i].Latitude || !lstLatLng[i].Longitude)
-                    continue;
-                var ll = null;
-                try {
+            // var len = lstLatLng.length;
 
-                    ll = new google.maps.LatLng(Number(lstLatLng[i].Latitude), Number(lstLatLng[i].Longitude));
-                     addMarkerWithTimeout(ll, lstLatLng[i].msg, 1 * 100);
+            if (self.curIndex == -1) {
+                var len = Object.keys(LatLng).length;
+                for (var i = 0; i < len; i++) {
+                    var lstLatLng = LatLng[i];
 
-                   //addMarker(ll, lstLatLng[i].msg);
-                    bounds.extend(ll);
-                    map.fitBounds(bounds);
+                    if (!lstLatLng || lstLatLng.length == 0)
+                        continue;
+
+                    for (var j = 0; j < lstLatLng.length; j++) {
+                        try {
+                            self.setLatLong(lstLatLng[j].Latitude, lstLatLng[j].Longitude, lstLatLng[j].msg);
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                    }
                 }
-                catch (e) {
-                    console.log(e);
-                }
+            }
+            else {
+                if (LatLng.length > 0)
+                    for (var i = 0; i < LatLng.length; i++) {
+                        self.setLatLong(LatLng[i].Latitude, LatLng[i].Longitude, LatLng[i].msg);
+                    }
             }
             map.fitBounds(bounds);
             self.setBusy(false);
             //}, 10);
+        };
+
+        this.setLatLong = function (Latitude, Longitude, msg) {
+            if (!Latitude || !Longitude)
+                return;
+
+            var ll = null;
+
+            ll = new google.maps.LatLng(Number(Latitude), Number(Longitude));
+            addMarkerWithTimeout(ll, msg, 1 * 100);
+
+            bounds.extend(ll);
+            map.fitBounds(bounds);
         };
 
         this.dc = function () {
@@ -340,7 +366,7 @@
 
             this.cols = this.gc = this.aPanel = this.mapcols = null;
             this.mapFields = null;
-            this.curIndex = 0;
+            this.curIndex = -1;
 
             this.getRoot = null;
             this.dc = null;
@@ -365,7 +391,7 @@
         this.gc = GC;
         this.aPanel = aPanel;
         this.mapcols = {};
-        this.curIndex = 0;
+        this.curIndex = -1;
 
         mapContainer.append(this.getRoot());
     };
@@ -394,7 +420,13 @@
             }
             this.mapcols[i] = locIds;
         }
-        this.setMapData(this.mapcols[this.curIndex]);
+
+        if (this.curIndex == -1)
+            this.setMapData(this.mapcols);
+        else
+            this.setMapData(this.mapcols[this.curIndex]);
+
+
     };
 
     VMapView.prototype.dispose = function () {
@@ -403,11 +435,11 @@
 
     //VMapView.prototype.CreateMap = function () {
     //  // this.map = new google.maps.Map(mapDiv[0], mapProp);
-        
+
     //};
 
 
     VIS.VMapView = VMapView;
-   // window.initMAPAutocomplete = VIS.VMapView.prototype.CreateMap();
+    // window.initMAPAutocomplete = VIS.VMapView.prototype.CreateMap();
 
 }(VIS, jQuery));
