@@ -483,6 +483,7 @@
                         iControl.refreshImage(colValue);
                     }
                 }
+              
 
                 else if (iControl.format) {
                     colValue = iControl.format.GetFormatAmount(iControl.format.GetFormatedValue(colValue), "init", VIS.Env.isDecimalPoint());

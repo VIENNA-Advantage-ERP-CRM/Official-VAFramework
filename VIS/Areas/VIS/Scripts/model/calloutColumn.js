@@ -93,4 +93,31 @@
     VIS.CalloutCheckDocAction = CalloutCheckDocAction;
     //**************Callout check DocAction in table End*************
 
+    //*********** Callout check DocAction in table  Start ****
+    function CalloutGetTableID() {
+        VIS.CalloutEngine.call(this, "VIS.CalloutGetTableID");//must call
+    };
+    VIS.Utility.inheritPrototype(CalloutGetTableID, VIS.CalloutEngine); //inherit prototype
+
+    CalloutGetTableID.prototype.CalloutGetTableIDByTab = function (ctx, windowNo, mTab, mField, value, oldValue) {
+        if (this.isCalloutActive() || value == null || value.toString() == "") {
+            return "";
+        }
+        this.setCalloutActive(true);
+        var TableID = VIS.dataContext.getJSONRecord("VIS/SurveyPanel/CalloutGetTableIDByTab", Util.getValueOfInt(value));
+        mTab.setValue("AD_Table_ID", TableID);
+
+        var isExist = VIS.dataContext.getJSONRecord("VIS/SurveyPanel/CheckDocActionInTable", Util.getValueOfInt(TableID));
+        if (isExist) {
+            mTab.setValue("IsDocAction", 'Y');
+        } else {
+            mTab.setValue("IsDocAction", 'N');
+        }
+
+        this.setCalloutActive(false);
+        return "";
+    }
+    VIS.CalloutGetTableID = CalloutGetTableID;
+    //**************Callout check DocAction in table End*************
+
 })(VIS, jQuery);

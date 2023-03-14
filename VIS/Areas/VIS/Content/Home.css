@@ -174,10 +174,10 @@ ul.vis-userLinks-ListMenu li, ul.vis-userLinks-ListMenu li * {
         display: flex;
     }
 
-    .vis-userDetails {
-        text-align: center;
-        font-size: 18px;
-    }
+.vis-userDetails {
+    text-align: center;
+    font-size: 18px;
+}
 
 /* Welcome screen tab menu */
 
@@ -677,7 +677,6 @@ ul.vis-IIColumnContent {
     ul.vis-IIColumnContent li {
         /*float: left;*/
         width: 100%;
-        
     }
 
 .vis-home-wf-ul li {
@@ -3288,7 +3287,11 @@ ul.vis-userLinks-ListMenu li a i {
     font-size: 14px;
     overflow: hidden;
     height: 30px;
-    display:none;
+    display: none;
+}
+
+.vis-userAvatar-Container:hover .vis-avater-inner-class {
+    display: flex;
 }
 
 .vis-userAvatar-Container:hover .vis-avater-inner-class {

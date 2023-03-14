@@ -21,7 +21,7 @@ namespace VIS.Controllers
         }
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
-        public JsonResult GetActivities(int pageNo, int pageSize, bool refresh, string searchText, int AD_Window_ID, DateTime? dateFrom, DateTime? dateTo,int AD_Node_ID)
+        public JsonResult GetActivities(int pageNo, int pageSize, bool refresh, string searchText, int AD_Window_ID, DateTime? dateFrom, DateTime? dateTo, int AD_Node_ID)
         {
             WFActivityModel model = new WFActivityModel();
             Ctx ctx = Session["ctx"] as Ctx;

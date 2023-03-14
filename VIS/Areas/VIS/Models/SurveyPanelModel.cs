@@ -24,8 +24,16 @@ namespace VIS.Models
         /// <returns></returns>
         public List<SurveyAssignmentsDetails> GetSurveyAssignments(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int AD_Table_ID,int AD_Record_ID, int AD_WF_Activity_ID)
         {
+            
+
             SurveyAssignmentsDetails lst = new SurveyAssignmentsDetails();
             List<SurveyAssignmentsDetails> LsDetails = new List<SurveyAssignmentsDetails>();
+
+            if (AD_Window_ID == 0)
+            {
+                return LsDetails;
+            }
+
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
                                                   sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
                                                   s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limits,0) AS Limit,RS.isSelfshow,");
@@ -42,23 +50,24 @@ namespace VIS.Models
             sql.Append(@" FROM ad_surveyassignment sa INNER JOIN AD_Survey s ON 
                                                   s.ad_survey_ID= sa.ad_survey_id 
                                                   LEFT JOIN AD_ResponseSetting RS ON (RS.ad_surveyassignment_ID=sa.ad_surveyassignment_ID) AND RS.IsActive='Y'
-                                                  WHERE sa.IsActive='Y' AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
+                                                  WHERE sa.IsActive='Y' AND sa.AD_Window_ID="+ AD_Window_ID + " AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql.ToString(), "sa", true, false), null);
             if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
             {                
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"])=="N")
-                    {
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
-                        if (isvalidate)
-                        {
-                            isvalidate = true;
-                        }
-                    }
+                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"])=="N")
+                    //{
 
-                    if(Util.GetValueOfString(dt["AD_ShowEverytime"])=="N" && !isvalidate)
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    //    if (isvalidate)
+                    //    {
+                    //        isvalidate = true;
+                    //    }
+                    //}
+
+                    if(!isvalidate)
                     {
                         continue;
                     }
@@ -216,8 +225,12 @@ namespace VIS.Models
         /// <returns></returns>
         public bool CheckDocActionCheckListResponse(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int Record_ID, string DocAction, int AD_Table_ID)
         {
+            if (AD_Window_ID == 0)
+            {
+                return false;
+            }
 
-            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Table_ID=" + AD_Table_ID;
+            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
             if (DocAction != "RE")
             {
                 sql += " AND docaction='" + DocAction + "'";
@@ -230,16 +243,16 @@ namespace VIS.Models
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
-                    {
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
-                        if (isvalidate)
-                        {
-                            isvalidate = true;
-                        }
-                    }
+                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    //{
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    //    if (isvalidate)
+                    //    {
+                    //        isvalidate = true;
+                    //    }
+                    //}
 
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N" && !isvalidate)
+                    if (!isvalidate)
                     {
                         continue;
                     }
@@ -297,6 +310,18 @@ namespace VIS.Models
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Check Doc Action Exist In Table
+        /// </summary>
+        /// <param name="AD_Table_ID"></param>
+        /// <returns></returns>
+        public int CalloutGetTableIDByTab(int AD_Tab_ID)
+        {
+            string sql = "SELECT AD_Table_ID FROM AD_Tab WHERE IsActive='Y' AND ad_tab_id=" + AD_Tab_ID;
+            int AD_Table_ID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            return AD_Table_ID;
         }
 
         /// <summary>

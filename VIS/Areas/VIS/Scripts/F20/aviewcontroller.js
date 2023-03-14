@@ -1379,7 +1379,7 @@
         //  Set initial record
         if (this.gTab.getTableModel().getTotalRowCount() == 0 || this.gTab.getTableModel().getTotalRowCount() == null) {
             //	Automatically create New Record, if none & tab not RO
-            if (!this.gTab.getIsReadOnly() && this.gTab.getIsZoomAction() == true &&
+            if (!this.gTab.getIsReadOnly() &&
                 (this.gTab.getIsZoomAction() == true || VIS.context.getIsAutoNew(this.windowNo)
                     || this.gTab.getIsQueryNewRecord()) && parentValid) {
                 if (this.gTab.getIsInsertRecord() && !this.skipInserting) {
@@ -1778,6 +1778,10 @@
                 this.vHeaderPanel.sizeChangedListner.onSizeChanged();
         }
         this.dynamicDisplay(-1);
+        if (this.aPanel.getTabSuffix() == 'b') {
+            this.aPanel.getLayout().removeClass('vis-ad-w-p-center-view-height');
+            this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "unset");
+        } 
     };
 
     VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {        
@@ -1787,6 +1791,10 @@
 
             //    this.gTab.getTableModel().setCurrentPage(1);
             //}
+            if (this.aPanel.getTabSuffix() == 'b') {
+                this.aPanel.getLayout().addClass('vis-ad-w-p-center-view-height');
+                this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "absolute");
+            }
 
             this.singleRow = false;
             this.isCardRow = false;
@@ -1822,7 +1830,7 @@
             //    this.query(0, 0, null);
             //}
             this.isNewClick = false;
-
+           
         }
 
     };

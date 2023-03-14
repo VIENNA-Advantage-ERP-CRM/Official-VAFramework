@@ -88,6 +88,7 @@
      */
     function APanel() {
         //This variable public to Instance
+        var clsSuffix;
         this.$parentWindow;
         this.ctx = VIS.Env.getCtx();
         this.curGC;
@@ -139,7 +140,7 @@
         this.instructionPop = {};
         this.instructionPop[this.ACTION_NAME_NEW] = false;
         function initComponenet() {
-
+            
             var clone = document.importNode(tmpAPanel, true);
             $root = $(clone.querySelector(".vis-ad-w-p"));
             $busyDiv = $root.find(".vis-ad-w-p-busy"); // busy indicator
@@ -669,7 +670,7 @@
                 //    cls2 = "vis-ad-w-p-actionpanel-b";
                 //}
 
-                var clsSuffix = this.curTab.getIsTPBottomAligned() ? 'b' : 'r';
+                clsSuffix = this.curTab.getIsTPBottomAligned() ? 'b' : 'r';
                 var clsSuffixOld = this.curTab.getIsTPBottomAligned() ? 'r' : 'b';
 
                 if (!$tabPanel.hasClass(cls2 + clsSuffix)) {
@@ -682,7 +683,7 @@
                 }
                 if (this.curGC)
                     $tabPanel.append(this.curGC.getTabPanel());
-                $tabPanel.css({ "display": "grid" });
+                $tabPanel.css({ "display": "grid" });                
             }
             else {
                 $tabPanel.css({ "display": "none" });
@@ -792,6 +793,10 @@
             $fltrPanel.show();
             this.refresh();
         };
+
+        this.getTabSuffix = function () {
+            return clsSuffix;
+        }
 
         $btnFilter.on("click", function (e) {
             self.startFilterPanel();
