@@ -1648,6 +1648,9 @@
         var summary = IsSummary == true || IsSummary == "Y";
         var imageIndicator = this.gTab.getValue("Action");  //  Menu - Action
         //
+        if (this.gTab.gridTable.columns.indexOf("Action") == -1 && !imageIndicator && !summary)
+            imageIndicator = "O";
+
         this.m_tree.nodeChanged(save, keyID, name, description,
             summary, imageIndicator);
     };  //  rowChanged

@@ -43,20 +43,20 @@
                 this.info.open(map, this);//(map, this);  
             });
 
-            google.maps.event.addListener(marker, 'dragend', function (e) {
+            //google.maps.event.addListener(marker, 'dragend', function (e) {
 
-                geocoder.geocode({
-                    latLng: marker.getPosition()
-                }, function (responses) {
-                    if (responses && responses.length > 0) {
-                        // updateMarkerAddress(responses[0].formatted_address);
-                        console.log(responses[0].formatted_address);
-                        var address = getAddressObject(responses[0].address_components);
-                        console.log(address);
-                        updateLocationInDB(address, marker.lid, marker.ColName);
-                    }
-                });
-            });
+            //    geocoder.geocode({
+            //        latLng: marker.getPosition()
+            //    }, function (responses) {
+            //        if (responses && responses.length > 0) {
+            //            // updateMarkerAddress(responses[0].formatted_address);
+            //            console.log(responses[0].formatted_address);
+            //            var address = getAddressObject(responses[0].address_components);
+            //            console.log(address);
+            //            updateLocationInDB(address, marker.lid, marker.ColName);
+            //        }
+            //    });
+            //});
 
             markers.push(marker);
 
@@ -187,6 +187,19 @@
                     map = this.mapp;
                 map = new google.maps.Map(mapDiv[0], mapProp);
 
+                // Create the search box and link it to the UI element.
+               // const input = document.getElementById("pac-input");
+
+                //map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchText);
+                //// Bias the SearchBox results towards current map's viewport.
+
+                //const searchBox = new google.maps.places.SearchBox(searchText);
+
+                //map.addListener("bounds_changed", () => {
+                //    searchBox.setBounds(map.getBounds());
+                //});
+
+
                 //const searchBox = new google.maps.places.SearchBox(searchText);
 
                 //map.controls[google.maps.ControlPosition.TOP_RIGHT].push(searchText);
@@ -271,7 +284,7 @@
 
         function initialize() {
 
-            mapDiv = $('<div class="vis-mv-map">');
+            mapDiv = $('<div id="map" class="vis-mv-map">');
             busyDiv = $('<div class="vis-apanel-busy vis-full-height">').hide();
             cmbDiv = $('<div class="vis-mv-header"> <select class="vis-mv-select vis-pull-right" /> </div>');
             cmbLoc = cmbDiv.find(".vis-mv-select");
