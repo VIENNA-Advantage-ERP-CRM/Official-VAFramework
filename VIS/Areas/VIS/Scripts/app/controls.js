@@ -4255,8 +4255,9 @@
         };
 
         $btnMap.on(VIS.Events.onClick, function (e) {
-            var url = "http://local.google.com/maps?q=" + self.getDisplay();
-            window.open(url);
+            //var url = "http://local.google.com/maps?q=" + self.getDisplay();
+            //window.open(url);
+            self.getField().gridTab.mDataListenerList[0].switchMapRow();
             e.stopPropagation();
         });
 

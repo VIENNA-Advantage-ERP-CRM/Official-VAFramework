@@ -350,7 +350,7 @@
             else {
                 if (LatLng.length > 0)
                     for (var i = 0; i < LatLng.length; i++) {
-                        self.setLatLong(LatLng[i].Latitude, LatLng[i].Longitude, LatLng[i].msg, lstLatLng[i].lid, lstLatLng[i].ColName);
+                        self.setLatLong(LatLng[i].Latitude, LatLng[i].Longitude, LatLng[i].msg, LatLng[i].lid, LatLng[i].ColName);
                     }
             }
             map.fitBounds(bounds);
