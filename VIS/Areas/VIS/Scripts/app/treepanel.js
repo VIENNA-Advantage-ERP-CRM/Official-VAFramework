@@ -636,7 +636,7 @@
         else {
             str += 'data-summary="N"> ' +
                 '<a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '">' +
-                '<span ' + this.getClassIcon(imageIndicator) + '></span>' + name + '</a > ' +
+                '<span style="font-size:11px;margin-right:5px"' + this.getClassIcon(imageIndicator) + '></span>' + name + '</a > ' +
                 '<span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
                 '</span></span></li>';
             //str += 'data-summary="N"> ' +

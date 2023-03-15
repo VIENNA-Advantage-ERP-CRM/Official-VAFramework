@@ -558,7 +558,7 @@ namespace VIS.Helpers
                 h += "<li  data-value='" + id + "' data-summary='N'>" +
                     "<a href='javascript:void(0)' data-value='" + id + "' data-action='" + action + "' data-actionid =" + aid + "> ";
 
-                h += "<span " + GetSpanClass(img);
+                h += "<span style='font-size:11px;margin-right:5px'" + GetSpanClass(img);
 
                 if (_ctx.GetIsRightToLeft())
                 {
