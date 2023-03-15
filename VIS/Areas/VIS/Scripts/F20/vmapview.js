@@ -20,17 +20,21 @@
 
 
 
-        function addMarker(location, msg) {
+        function addMarker(location, msg, lid, colName) {
             var marker = new google.maps.Marker({
                 position: location,
                 animation: google.maps.Animation.DROP,
                 map: map,
                 title: msg,
-                draggable: true
+                draggable: true,
+                
             });
             marker.info = new google.maps.InfoWindow({
                 content: msg
             });
+
+            marker.lid = lid;
+            marker.ColName = colName;
 
             marker.info.open(map, marker);//(map, this);  
 
@@ -49,7 +53,7 @@
                         console.log(responses[0].formatted_address);
                         var address = getAddressObject(responses[0].address_components);
                         console.log(address);
-                        updateLocationInDB(address);
+                        updateLocationInDB(address, marker.lid, marker.ColName);
                     }
                 });
             });
@@ -64,15 +68,22 @@
         };
 
 
-        function updateLocationInDB(address) {
+        function updateLocationInDB(address, lid, colName) {
             //this.mapFields[0].getValue()
             //var that = this;
             $.ajax({
                 url: VIS.Application.contextUrl + "Location/UpdateLocation",
-                data: { Address: address, C_Location_ID: self.mapFields[self.curIndex].getValue() },
+                data: { Address: address, C_Location_ID: lid },
                 success: function (result) {
-                    self.mapFields[self.curIndex].lookup.refreshLocation(self.mapFields[self.curIndex].value);
-                    self.gc.refreshUI();
+                    var field = jQuery.grep(self.mapFields, function (item, i) {
+                        if (item.getColumnName() == colName)
+                            return item;
+                    }); 
+
+                    if (field) {
+                        field[0].lookup.refreshLocation(lid);
+                        self.gc.refreshUI();
+                    }
                 },
                 error: function (e) {
                     console.log(e)
@@ -131,9 +142,9 @@
         };
 
 
-        function addMarkerWithTimeout(location, msg, timeout) {
+        function addMarkerWithTimeout(location, msg, timeout, lid, colName) {
             window.setTimeout(function () {
-                addMarker(location, msg);
+                addMarker(location, msg, lid, colName);
             }
                 , timeout);
         };
@@ -328,7 +339,7 @@
 
                     for (var j = 0; j < lstLatLng.length; j++) {
                         try {
-                            self.setLatLong(lstLatLng[j].Latitude, lstLatLng[j].Longitude, lstLatLng[j].msg);
+                            self.setLatLong(lstLatLng[j].Latitude, lstLatLng[j].Longitude, lstLatLng[j].msg, lstLatLng[j].lid, lstLatLng[j].ColName);
                         }
                         catch (e) {
                             console.log(e);
@@ -339,7 +350,7 @@
             else {
                 if (LatLng.length > 0)
                     for (var i = 0; i < LatLng.length; i++) {
-                        self.setLatLong(LatLng[i].Latitude, LatLng[i].Longitude, LatLng[i].msg);
+                        self.setLatLong(LatLng[i].Latitude, LatLng[i].Longitude, LatLng[i].msg, lstLatLng[i].lid, lstLatLng[i].ColName);
                     }
             }
             map.fitBounds(bounds);
@@ -347,14 +358,14 @@
             //}, 10);
         };
 
-        this.setLatLong = function (Latitude, Longitude, msg) {
+        this.setLatLong = function (Latitude, Longitude, msg,lid, colName) {
             if (!Latitude || !Longitude)
                 return;
 
             var ll = null;
 
             ll = new google.maps.LatLng(Number(Latitude), Number(Longitude));
-            addMarkerWithTimeout(ll, msg, 1 * 100);
+            addMarkerWithTimeout(ll, msg, 1 * 100, lid, colName);
 
             bounds.extend(ll);
             map.fitBounds(bounds);
@@ -414,6 +425,8 @@
                     var ll = l.getLatLng(lid);
                     if (ll) {
                         ll.msg = l.getDisplay(lid);
+                        ll.lid = lid;
+                        ll.ColName = colName;
                         locIds.push(ll);
                     }
                 }
