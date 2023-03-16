@@ -71,7 +71,7 @@
                         var val = row[self.grid.columns[evt.column].columnName.toLowerCase()];
 
                         // var val = self.getValue();
-                        if (!val)
+                        if (!val || val == "")
                             return;
 
 

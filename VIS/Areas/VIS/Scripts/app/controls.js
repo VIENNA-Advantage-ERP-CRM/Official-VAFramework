@@ -6868,14 +6868,15 @@
         //});
 
         $btnSearch.on("click", function () {
-            if (self.mField.getIsEditable(true) && !self.editingGrid) {
+            //if (self.mField.getIsEditable(true) && !self.editingGrid) {
+                if (!self.editingGrid) {
                 //self.setReadOnly(false, true, true);
                // $ctrl.val(self.mField.getValue());
                // $ctrl.focus();
                 if (window.VA048) {
 
                     var val = self.getValue();
-                    if (!val)
+                    if (!val || val=="")
                         return;
 
                     var numberinfo = {};
