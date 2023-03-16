@@ -411,7 +411,7 @@ namespace VIS.Models
 
             if(!isSelfExist && IsSelfShow)
             {
-                sql = @"SELECT sr.AD_SurveyResponse_ID, sr.ad_user_id,'Self'  name,sr.created
+                sql = @"SELECT sr.AD_SurveyResponse_ID, sr.ad_user_id,'Self' AS name,sr.created
                         FROM ad_surveyresponse sr  WHERE sr.ad_user_id = " + AD_User_ID + " AND Record_ID=" + Record_ID + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID+@" ORDER BY sr.Created";
 
                 DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "SR", true, false), null);
