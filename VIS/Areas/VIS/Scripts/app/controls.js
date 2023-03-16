@@ -6579,13 +6579,7 @@
 
         $ctrl.append($oputput).append($rangeCtrl);
 
-        IControl.call(this, $ctrl, controlDisplayType, isReadOnly, columnName, isMandatory);
-        if (isReadOnly || !isUpdateable) {
-            this.setReadOnly(true);
-        }
-        else {
-            this.setReadOnly(false);
-        }
+        IControl.call(this, $ctrl, controlDisplayType, isReadOnly, columnName, isMandatory);        
         this.rangeCtrl = $rangeCtrl;
         this.oputput = $oputput;
         $oputput.text(0);
@@ -6604,6 +6598,13 @@
         this.getRange = function () {
             return $rangeCtrl.val();
         };
+
+        if (isReadOnly || !isUpdateable) {
+            this.setReadOnly(true);
+        }
+        else {
+            this.setReadOnly(false);
+        }
 
         var self = this; //self pointer
 

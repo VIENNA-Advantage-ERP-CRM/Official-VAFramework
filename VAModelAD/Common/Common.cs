@@ -1561,7 +1561,7 @@ namespace VAdvantage.Common
         /// <param name="AD_SurveyAssignment_ID"></param>
         /// <param name="ShowEverytime"></param>
         /// <returns></returns>
-        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID)
+        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID, string ShowEverytime)
         {
             bool isExist = true;
             bool isConditionGiven = true;
