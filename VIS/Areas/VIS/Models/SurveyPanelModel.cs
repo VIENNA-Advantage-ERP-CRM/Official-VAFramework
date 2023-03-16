@@ -194,7 +194,7 @@ namespace VIS.Models
             SR.SetAD_Table_ID(AD_Table_ID);
             SR.SetAD_User_ID(ctx.GetAD_User_ID());
             SR.Set_ValueNoCheck("AD_WF_Activity_ID", AD_WF_Activity_ID);
-            if (SR.Save())
+            if (SR.Save() && surveyResponseValue!=null)
             {
                 for (var i = 0; i < surveyResponseValue.Count; i++)
                 {
