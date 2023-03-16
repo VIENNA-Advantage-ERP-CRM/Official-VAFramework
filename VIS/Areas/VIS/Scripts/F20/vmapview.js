@@ -14,6 +14,7 @@
         var cmbDiv = null;
         var searchText = $('<Input id="pac-input" class="controls" type="text" placeholder="Search Box"/>');
         var self = this;
+        this.locationID = '';
 
         var isMapAvail = window.google && google.maps ? true : false;
         var geocoder = new google.maps.Geocoder();
@@ -27,7 +28,7 @@
                 map: map,
                 title: msg,
                 draggable: true,
-                
+
             });
             marker.info = new google.maps.InfoWindow({
                 content: msg
@@ -78,7 +79,7 @@
                     var field = jQuery.grep(self.mapFields, function (item, i) {
                         if (item.getColumnName() == colName)
                             return item;
-                    }); 
+                    });
 
                     if (field) {
                         field[0].lookup.refreshLocation(lid);
@@ -188,7 +189,7 @@
                 map = new google.maps.Map(mapDiv[0], mapProp);
 
                 // Create the search box and link it to the UI element.
-               // const input = document.getElementById("pac-input");
+                // const input = document.getElementById("pac-input");
 
                 //map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchText);
                 //// Bias the SearchBox results towards current map's viewport.
@@ -304,7 +305,7 @@
             cmbLoc.on("change", function (e) {
                 self.setBusy(true);
                 //self.curIndex = this.selectedIndex;
-                self.curIndex= $(e.target).find('option:selected').data('index');
+                self.curIndex = $(e.target).find('option:selected').data('index');
                 //self.curIndex =
                 if (self.curIndex == -1)
                     self.setMapData(self.mapcols);
@@ -344,15 +345,17 @@
 
             if (self.curIndex == -1) {
                 var len = Object.keys(LatLng).length;
+                var keys = Object.keys(LatLng);
                 for (var i = 0; i < len; i++) {
-                    var lstLatLng = LatLng[i];
+                    var lstLatLng = LatLng[keys[i]];
 
                     if (!lstLatLng || lstLatLng.length == 0)
                         continue;
 
                     for (var j = 0; j < lstLatLng.length; j++) {
                         try {
-                            self.setLatLong(lstLatLng[j].Latitude, lstLatLng[j].Longitude, lstLatLng[j].msg, lstLatLng[j].lid, lstLatLng[j].ColName);
+                            if ((self.locationID && self.locationID == lstLatLng[j].lid) || !self.locationID)
+                                self.setLatLong(lstLatLng[j].Latitude, lstLatLng[j].Longitude, lstLatLng[j].msg, lstLatLng[j].lid, lstLatLng[j].ColName);
                         }
                         catch (e) {
                             console.log(e);
@@ -371,7 +374,7 @@
             //}, 10);
         };
 
-        this.setLatLong = function (Latitude, Longitude, msg,lid, colName) {
+        this.setLatLong = function (Latitude, Longitude, msg, lid, colName) {
             if (!Latitude || !Longitude)
                 return;
 
@@ -420,8 +423,9 @@
         mapContainer.append(this.getRoot());
     };
 
-    VMapView.prototype.refreshUI = function (width) {
+    VMapView.prototype.refreshUI = function (width, locID) {
 
+        this.locationID = locID;
         var records = this.gc.getSelectedRows();
         var len = records.length;
         if (records.length < 1 || this.cols.length < 1)
@@ -431,6 +435,9 @@
         for (var i = 0; i < this.cols.length; i++) {
             var colName = this.cols[i];
             var l = this.mapFields[i].getLookup();
+            if (this.locationID && this.locationID != this.mapFields[i].getValue())
+                continue;
+
             var locIds = [];
             for (var j = 0; j < len; j++) {
                 var lid = records[j][colName.toLowerCase()];

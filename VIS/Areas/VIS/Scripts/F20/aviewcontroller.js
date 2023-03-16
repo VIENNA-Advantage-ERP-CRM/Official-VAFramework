@@ -1889,7 +1889,7 @@
         }
     };
 
-    VIS.GridController.prototype.switchMapRow = function () {
+    VIS.GridController.prototype.switchMapRow = function (locationID) {
         if (!this.isMapRow) {
 
             this.singleRow = true;
@@ -1910,7 +1910,7 @@
             else p1.css({ "float": '' });
 
             p1.show();
-            this.vMapView.refreshUI(this.getVMapPanel().width());
+            this.vMapView.refreshUI(this.getVMapPanel().width(), locationID);
             p1 = null;
             //this.vTable.resize();
         }
