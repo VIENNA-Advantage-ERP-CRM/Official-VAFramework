@@ -384,8 +384,17 @@ namespace VIS.Models
             List<UserList> UList = new List<UserList>();
             bool isSelfExist = false;
             if (Count > 0) {
-                sql = @"SELECT sr.AD_SurveyResponse_ID, u.ad_user_id,CASE u.ad_user_id WHEN "+ AD_User_ID + @" THEN CAST( 'Self' AS Nvarchar2(60)) ELSE u.name END  name,sr.created
-                        FROM ad_user u INNER JOIN ad_surveyresponse sr ON u.ad_user_id = sr.ad_user_id WHERE Record_ID=" + Record_ID + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID+ @" ORDER BY sr.Created";
+                sql = "SELECT sr.AD_SurveyResponse_ID, u.ad_user_id,CASE u.ad_user_id WHEN " + AD_User_ID;
+                if (DB.IsPostgreSQL())
+                {
+                    sql += " THEN 'Self' ELSE u.name END AS name,";
+                }
+                else
+                {
+                    sql += " THEN CAST( 'Self' AS Nvarchar2(60)) ELSE u.name END  name,";
+                }
+
+                sql += " sr.created FROM ad_user u INNER JOIN ad_surveyresponse sr ON u.ad_user_id = sr.ad_user_id WHERE Record_ID=" + Record_ID + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + @" ORDER BY sr.Created";
 
                 DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "SR", true, false), null);
                 if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
