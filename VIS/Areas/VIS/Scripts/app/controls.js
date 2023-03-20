@@ -6584,12 +6584,7 @@
         $ctrl.append($oputput).append($rangeCtrl);
 
         IControl.call(this, $ctrl, controlDisplayType, isReadOnly, columnName, isMandatory);
-        if (isReadOnly || !isUpdateable) {
-            this.setReadOnly(true);
-        }
-        else {
-            this.setReadOnly(false);
-        }
+        
         this.rangeCtrl = $rangeCtrl;
         this.oputput = $oputput;
         $oputput.text(0);
@@ -6608,6 +6603,13 @@
         this.getRange = function () {
             return $rangeCtrl.val();
         };
+
+        if (isReadOnly || !isUpdateable) {
+            this.setReadOnly(true);
+        }
+        else {
+            this.setReadOnly(false);
+        }
 
         var self = this; //self pointer
 
@@ -6833,6 +6835,18 @@
             }
         });
 
+
+        $ctrl.on("keypress", function (evt) {
+            // Only ASCII character in that range allowed
+            var ASCIICode = (evt.which) ? evt.which : evt.keyCode
+            if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)) {
+                if (ASCIICode == 43 && this.value.indexOf('+') <0)
+                    return true; //+ sign only
+                return false;
+            }
+            return true;
+        });
+
         $ctrl.on("countrychange", function (e, countryData) {
             if (!self.settingVal) {
                //self.iti.setNumber('');
@@ -6884,7 +6898,7 @@
                     numberinfo["withcall"] = true;
                     VA048.Apps.GetCallingInstance(true, numberinfo, false);
                 } else
-                    VIS.ADialog.info("Communication Module is not installed)");
+                    VIS.ADialog.info("ComModuleNotInstalled");
 
                 //alert('val');
             }
@@ -7077,7 +7091,7 @@
             }
         };
 
-        function getFormatedHtml(val) {
+        function getFormatedHtml(val,showPointer) {
             init();
             if (!val)
                 return '';
@@ -7104,7 +7118,11 @@
                 + '<div class="iti__selected-flag">'
                 + '<div class="iti__flag iti__' + code + '"></div>'
                 + '<div/>'
-                + '<div style="margin: 0 6px;cursor:pointer">' + fVal + '</div>'
+                + '<div style="margin: 0 6px;';
+            if (showPointer) {
+                htm += 'cursor: pointer;';
+            }
+                    htm+= '"> ' + fVal + '</div > '
                 + '</div>';
             return htm;
         };

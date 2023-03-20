@@ -699,7 +699,6 @@ namespace VAdvantage.Common
                     outStr.Append(ParseVariable(token, po));		// replace context
                 }
 
-                outStr.Append(ParseVariable(token, po));
                 inStr = inStr.Substring(j + 1);
                 // from second @
                 i = inStr.IndexOf("@");
@@ -807,12 +806,22 @@ namespace VAdvantage.Common
                 //return Util.GetValueOfDateTime(value).Value.Date.ToShortDateString();
                 return DisplayType.GetDateFormat(column.GetAD_Reference_ID()).Format(value, po.GetCtx().GetContext("#ClientLanguage"), SimpleDateFormat.DATESHORT);
             }
+            else if (column.GetAD_Reference_ID() == DisplayType.Time)
+            {
+                return Util.GetValueOfDateTime(value).Value.ToLocalTime().ToShortTimeString();
+            }
 
             // Show Amount according to browser culture
             if (column.GetAD_Reference_ID() == DisplayType.Amount || column.GetAD_Reference_ID() == DisplayType.CostPrice)
             {
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
+
+            
+           
+
+
+
             return value.ToString();
         }
 
@@ -1454,7 +1463,7 @@ namespace VAdvantage.Common
 
                     if (!string.IsNullOrEmpty(columnName))
                     {
-                        sql = "SELECT " + columnName + ", COUNT(NVL(" + columnName + ",0)) AS GroupCount " + SQLWhereCond + " GROUP BY " + columnName;
+                        sql = "SELECT " + columnName + ", COUNT(NVL(" + columnName + ",'0')) AS GroupCount " + SQLWhereCond + " GROUP BY " + columnName;
 
                         dr = DB.ExecuteReader(sql);
                         while (dr.Read())
@@ -1569,7 +1578,7 @@ namespace VAdvantage.Common
         public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID, int AD_SurveyAssignment_ID, string ShowEverytime)
         {
             bool isExist = true;
-
+            bool isConditionGiven = true;
             string sqlWhere = "SELECT WhereClause FROM AD_TAB WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
             sqlWhere = Util.GetValueOfString(DB.ExecuteScalar(sqlWhere));
 
@@ -1750,9 +1759,14 @@ namespace VAdvantage.Common
                             }
                         }
                     }
-                   
+
+                }
+                else
+                {
+                    isConditionGiven = false;
                 }
             }
+          
 
             if (!string.IsNullOrEmpty(sqlWhere)|| !string.IsNullOrEmpty(WhereCondition))
             {
@@ -1775,7 +1789,7 @@ namespace VAdvantage.Common
                 }
 
                 int count = Util.GetValueOfInt(DB.ExecuteScalar(MRole.GetDefault(ctx).AddAccessSQL(sql, tableName, true, false)));
-                if (count > 0)
+                if (isConditionGiven && count > 0)
                 {
                     isExist = true;
                 }
@@ -1784,6 +1798,11 @@ namespace VAdvantage.Common
                     isExist = false;
                 }
             }
+            else if(ShowEverytime == "N")
+            {
+                isExist = false;
+            }
+            
 
             return isExist;
 

@@ -249,7 +249,17 @@ OR
                     itm.TxtMsg = Util.GetValueOfString(dr["TextMsg"]);
                     itm.WfState = Util.GetValueOfString(dr["WfState"]);
                     itm.EndWaitTime = Util.GetValueOfDateTime(dr["EndWaitTime"]);
-                    itm.Created = Util.GetValueOfString(dr["Created"]);
+                    //itm.Created = Util.GetValueOfString(dr["Created"]);
+                    DateTime _createdDate = new DateTime();
+                    if (dr["Created"].ToString() != null && dr["Created"].ToString() != "")
+                    {
+                        _createdDate = Convert.ToDateTime(dr["Created"].ToString());
+                        DateTime _format = DateTime.SpecifyKind(new DateTime(_createdDate.Year, _createdDate.Month, _createdDate.Day, _createdDate.Hour, _createdDate.Minute, _createdDate.Second), DateTimeKind.Utc);
+                        _createdDate = _format;
+                        itm.Created = _format;
+                    }
+                    else
+                        itm.Created = System.DateTime.Now;
                     MWFActivity act = new MWFActivity(ctx, itm.AD_WF_Activity_ID, null);
                     itm.NodeName = act.GetNodeName();
                     itm.Summary = act.GetSummary();
@@ -1058,8 +1068,19 @@ OR
                                     AND (validfrom  <=sysdate)
                                     AND (sysdate    <=validto )
                                     ))
-                                  And R.Responsibletype !='H'
-                                  ))";
+                                  AND r.ResponsibleType NOT IN ('H','C', 'M')
+                                  )
+                                OR EXISTS
+                                  (SELECT *
+                                  FROM AD_WF_Responsible r
+                                  INNER JOIN AD_Role ro
+                                  ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                                  WHERE AD_WF_Activity.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                                  AND r.IsActive = 'Y'
+                                  AND (CASE WHEN INSTR(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                                  AND r.responsibletype ='M'
+                                  )
+                              )";
             }
             else
             {
@@ -1129,8 +1150,19 @@ OR
                                     AND (validfrom  <=sysdate)
                                     AND (sysdate    <=validto )
                                     ))
-                                  And R.Responsibletype !='H'
-                                  ))";
+                                  AND r.ResponsibleType NOT IN ('H','C', 'M')
+                                  )
+                                OR EXISTS
+                                  (SELECT *
+                                  FROM AD_WF_Responsible r
+                                  INNER JOIN AD_Role ro
+                                  ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                                  WHERE AD_WF_Activity.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                                  AND r.IsActive = 'Y'
+                                  AND (CASE WHEN INSTR(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                                  AND r.responsibletype ='M'
+                                  )
+                                )";
             }
 
 
@@ -1303,7 +1335,7 @@ OR
             get;
             set;
         }
-        public string Created
+        public DateTime Created
         {
             get;
             set;
