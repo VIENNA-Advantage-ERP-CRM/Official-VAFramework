@@ -691,6 +691,7 @@
                         }
                         var d;
                         if (l) {
+                            // In case of multisearch, show all names separated by commas in gridview.
                             if (l.displayType == VIS.DisplayType.MultiKey)
                             {
                                 if (val) {

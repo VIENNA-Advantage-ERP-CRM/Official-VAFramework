@@ -4257,7 +4257,10 @@
         $btnMap.on(VIS.Events.onClick, function (e) {
             //var url = "http://local.google.com/maps?q=" + self.getDisplay();
             //window.open(url);
-            self.getField().gridTab.mDataListenerList[0].switchMapRow(self.value);
+            // On click map icon from control, switch to map view and show that location.
+            if (self.getField().gridTab && self.getField().gridTab.mDataListenerList) {
+                self.getField().gridTab.mDataListenerList[0].switchMapRow(self.value);
+            }
             e.stopPropagation();
         });
 

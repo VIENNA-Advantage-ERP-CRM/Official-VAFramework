@@ -566,6 +566,7 @@
             else {
                 var selNode = root.find("*.vis-css-treewindow-selected");
                 var isSum = selNode.parent("li").data("summary") == "Y";
+                //if selected node is summary level node, then insert new item of tree in that node.
                 if (selNode && isSum) {
                     var ul = $(selNode.parent()).find('ul');
                     if (ul && ul.length > 0) {

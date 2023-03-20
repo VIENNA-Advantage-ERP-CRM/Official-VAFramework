@@ -68,7 +68,12 @@
 
         };
 
-
+        /**
+         * Not Used for now
+         * @param {any} address
+         * @param {any} lid
+         * @param {any} colName
+         */
         function updateLocationInDB(address, lid, colName) {
             //this.mapFields[0].getValue()
             //var that = this;
@@ -92,6 +97,12 @@
             });
         }
 
+    /**
+    * Not Used for now
+    * @param {any} address
+    * @param {any} lid
+    * @param {any} colName
+    */
         function getAddressObject(address_components) {
             var ShouldBeComponent = {
                 home: ["premise", "street_number"],
@@ -306,7 +317,8 @@
                 self.setBusy(true);
                 //self.curIndex = this.selectedIndex;
                 self.curIndex = $(e.target).find('option:selected').data('index');
-                //self.curIndex =
+
+                //If no address field selected in map view , then sow all locations, otherwise selected field's location
                 if (self.curIndex == -1)
                     self.setMapData(self.mapcols);
                 else
@@ -343,7 +355,8 @@
             // window.setTimeout(function () {
             // var len = lstLatLng.length;
 
-            if (self.curIndex == -1) {
+
+            if (self.curIndex == -1) {// Show all address of selected records
                 var len = Object.keys(LatLng).length;
                 var keys = Object.keys(LatLng);
                 for (var i = 0; i < len; i++) {
@@ -363,7 +376,7 @@
                     }
                 }
             }
-            else {
+            else { //Show current field's location in map
                 if (LatLng.length > 0)
                     for (var i = 0; i < LatLng.length; i++) {
                         self.setLatLong(LatLng[i].Latitude, LatLng[i].Longitude, LatLng[i].msg, LatLng[i].lid, LatLng[i].ColName);
