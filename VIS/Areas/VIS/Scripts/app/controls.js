@@ -4255,8 +4255,12 @@
         };
 
         $btnMap.on(VIS.Events.onClick, function (e) {
-            var url = "http://local.google.com/maps?q=" + self.getDisplay();
-            window.open(url);
+            //var url = "http://local.google.com/maps?q=" + self.getDisplay();
+            //window.open(url);
+            // On click map icon from control, switch to map view and show that location.
+            if (self.getField().gridTab && self.getField().gridTab.mDataListenerList) {
+                self.getField().gridTab.mDataListenerList[0].switchMapRow(self.value);
+            }
             e.stopPropagation();
         });
 
@@ -6579,7 +6583,9 @@
 
         $ctrl.append($oputput).append($rangeCtrl);
 
+
         IControl.call(this, $ctrl, controlDisplayType, isReadOnly, columnName, isMandatory);        
+
         this.rangeCtrl = $rangeCtrl;
         this.oputput = $oputput;
         $oputput.text(0);

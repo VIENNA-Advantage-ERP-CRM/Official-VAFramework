@@ -1449,7 +1449,7 @@ namespace VAdvantage.Common
 
                     if (!string.IsNullOrEmpty(columnName))
                     {
-                        sql = "SELECT " + columnName + ", COUNT(NVL(" + columnName + ",0)) AS GroupCount " + SQLWhereCond + " GROUP BY " + columnName;
+                        sql = "SELECT " + columnName + ", COUNT(NVL(" + columnName + ",'0')) AS GroupCount " + SQLWhereCond + " GROUP BY " + columnName;
 
                         dr = DB.ExecuteReader(sql);
                         while (dr.Read())
