@@ -205,7 +205,7 @@
 
 
             $.ajax({
-                type: 'Get',
+                type: 'post',
                 async: true,
                 url: VIS.Application.contextUrl + "Form/UpdateTree",
                 data: {
@@ -552,6 +552,7 @@
             //rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
             if (this.onDemandTree) {
                 var selNode = root.find("*.vis-css-treewindow-selected");
+               
                 if (selNode && isSummary) {
                     var ul = $(selNode.parent()).find('ul');
                     if (ul && ul.length > 0) {
@@ -563,8 +564,22 @@
                 }
             }
             else {
-                var rn = this.getRootNode();
-                rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                var selNode = root.find("*.vis-css-treewindow-selected");
+                var isSum = selNode.parent("li").data("summary") == "Y";
+                //if selected node is summary level node, then insert new item of tree in that node.
+                if (selNode && isSum) {
+                    var ul = $(selNode.parent()).find('ul');
+                    if (ul && ul.length > 0) {
+                        $(ul[0]).append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                    }
+                    else {
+                        $(selNode.parent()).append($('<ul>').append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo)));
+                    }
+                }
+                else {
+                    var rn = this.getRootNode();
+                    rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                }
             }
 
         }
@@ -621,10 +636,15 @@
 
         else {
             str += 'data-summary="N"> ' +
-            ' <img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/login/' + this.getIcon(imageIndicator) + '"> ' +
-             ' <a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '"> ' +
-             name + '</a><span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
-             '</span></span></li>';
+                '<a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '">' +
+                '<span style="font-size:11px;margin-right:5px"' + this.getClassIcon(imageIndicator) + '></span>' + name + '</a > ' +
+                '<span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
+                '</span></span></li>';
+            //str += 'data-summary="N"> ' +
+            //' <img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/login/' + this.getIcon(imageIndicator) + '"> ' +
+            // ' <a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '"> ' +
+            // name + '</a><span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
+            // '</span></span></li>';
         }
 
         return $(str);
@@ -650,6 +670,33 @@
                 return "mDocAction.png";
             default:
                 return "mWindow.png";
+        }
+    };
+
+    TreePanel.prototype.getClassIcon = function (initial) {
+        switch (initial) {
+            case "W":
+                return "class = 'fa fa-window-maximize'";
+            case "R":
+                return "class = 'vis vis-report'";
+            case "P":
+                return "class = 'fa fa-cog'";
+            case "T":
+                return "class = 'fa fa-cog'";
+            case "F":
+                return "class = 'fa fa-clone'";
+            case "B":
+                return "class = 'fa fa-clone'";
+            case "X":
+                return "class = 'fa fa-list-alt'";
+            case "V":
+                return "class = 'fa fa-clone'";
+            case "D":
+                return "class = 'fa fa-clone'";
+            case "O":
+                return "class = 'fa fa-circle'";
+            default:
+                return "class = 'fa fa-clone'";
         }
     };
 

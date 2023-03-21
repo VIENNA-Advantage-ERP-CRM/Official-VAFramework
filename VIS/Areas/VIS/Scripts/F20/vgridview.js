@@ -691,7 +691,33 @@
                         }
                         var d;
                         if (l) {
-                            d = l.getDisplay(val, true, true);
+                            // In case of multisearch, show all names separated by commas in gridview.
+                            if (l.displayType == VIS.DisplayType.MultiKey)
+                            {
+                                if (val) {
+                                    var arr = val.toString().split(',');
+                                    var sb = "";
+
+                                    for (var i = 0, j = arr.length; i < j; i++) {
+                                        var valu = arr[i];
+                                        if (!isNaN(valu)) {
+                                            valu = Number(valu);
+                                        }
+                                        if (sb.length == 0) {
+                                            sb += l.getDisplay(valu);
+                                            continue;
+                                        }
+                                        sb += ", " + l.getDisplay(valu);
+                                    }
+                                    d = sb;
+                                }
+                                else {
+                                    d = l.getDisplay(val, true, true);
+                                }
+                            }
+                                else {
+                                d = l.getDisplay(val, true, true);
+                            }
                             //if (d.startsWith("<"))
                             //  d = l.getDisplay(nd, false);
                             //d = w2utils.encodeTags(d);

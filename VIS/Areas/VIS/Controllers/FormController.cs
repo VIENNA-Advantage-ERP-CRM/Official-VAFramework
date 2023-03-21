@@ -251,6 +251,7 @@ namespace VIS.Controllers
         #endregion
 
         #region TreePanel
+        [HttpPost]
         public ContentResult UpdateTree(string oldParentChildren, string newParentChildren, int oldId, int newId, int AD_Tree_ID, string tableName)
         {
             Ctx ctx = Session["ctx"] as Ctx;
