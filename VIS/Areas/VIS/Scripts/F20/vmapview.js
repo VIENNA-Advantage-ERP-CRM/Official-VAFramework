@@ -326,6 +326,12 @@
             });
         };
 
+        this.ResetCombo = function () {
+            cmbLoc.val(-1);
+            this.curIndex = -1;
+        }
+
+
         this.setBusy = function (busy) {
             if (busy)
                 busyDiv.show();
@@ -466,6 +472,8 @@
             }
             this.mapcols[i] = locIds;
         }
+
+        this.ResetCombo();
 
         if (this.curIndex == -1)
             this.setMapData(this.mapcols);

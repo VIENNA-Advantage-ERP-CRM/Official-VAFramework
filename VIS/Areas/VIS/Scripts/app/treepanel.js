@@ -21,6 +21,7 @@
         this.onDemandTree = onDemandTrees;
         this.currentNode = 0;
         this.searchNode = false;
+        this.isSummaryNode = false;
         this.gc = gc;
         var self = this;
 
@@ -241,6 +242,11 @@
             });
         };
 
+        this.updateArray = function (val, id) {
+            treeValues.push(id);
+            treeText.push(val);
+        };
+
         //Privilzed function
         this.getRoot = function () {
             return $root;
@@ -265,7 +271,26 @@
                             $(node.find('label')[0]).addClass("vis-css-treewindow-selected");
                         }
                     }
-                    self.selectionChangeListner.nodeSelectionChanged({ newValue: o.data("value"), propertyName: "" });
+                    else {
+                        var selNode = $root.find("*.vis-css-treewindow-selected");
+                        if (selNode.length > 0)
+                            selNode.removeClass("vis-css-treewindow-selected");
+                        var node = $($(event.target).parent());
+                        if (node.find(">label").length > 0) {
+                            node.find(">label").addClass("vis-css-treewindow-selected");
+                        }
+                        else {
+                            node.find(">a").addClass("vis-css-treewindow-selected");
+                            $(node.find('label')[0]).addClass("vis-css-treewindow-selected");
+                        }
+                    }
+                    if (o.data("summary") == 'Y')
+                        self.isSummaryNode = true;
+                    else
+                        self.isSummaryNode = false;
+
+                    self.currentNode = o.data("value");
+                    self.selectionChangeListner.nodeSelectionChanged({ newValue: o.data("value"), propertyName: "", isSummaryNode: self.isSummaryNode });
                 }
                 event.stopPropagation();
             }
@@ -473,6 +498,9 @@
         var root = this.getRoot();
 
         var node = root.find("li[data-value='" + nodeID + "']");
+
+        this.isSummaryNode = node.data("summary") == "Y";
+
         if (node != null && node.length > 0) {
             var selNode = root.find("*.vis-css-treewindow-selected");
             if (selNode.length > 0)
@@ -575,10 +603,14 @@
                     else {
                         $(selNode.parent()).append($('<ul>').append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo)));
                     }
+                    this.updateArray(name, keyID);
                 }
                 else {
                     var rn = this.getRootNode();
-                    rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                    var nod = this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo);
+                    rn.append(nod);
+                    nod[0].scrollIntoView();
+                    this.updateArray(name, keyID);
                 }
             }
 

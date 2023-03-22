@@ -1217,6 +1217,9 @@
         //  We Have a TreeNode
         var nodeID = value;
         this.treeNodeID = nodeID;
+        //this.selectedTreeNode = nodeID;
+        this.gTab.SetSelectedNode(nodeID);
+        this.gTab.SetIsSummaryNode(e.isSummaryNode);
         if (this.onDemandTree) {
 
             if (this.aPanel && this.aPanel.setBusy) {
@@ -1455,11 +1458,11 @@
         //  nothing to do
         //console.log(!force);
         //  new position
-        var recid = this.gTab.navigate(tRow, true, force);
+        //var recid = this.gTab.navigate(tRow, true, force);
 
         if (!force && tRow == this.gTab.getCurrentRow()) {
-            if (this.m_tree != null)
-                this.navigateTreeNode(tRow);
+            //if (this.m_tree != null)
+            //    this.navigateTreeNode(tRow);
             return this.gTab.getCurrentRow();
         }
 
@@ -1502,8 +1505,11 @@
     VIS.GridController.prototype.navigateTreeNode = function (tRow) {
         //treeselectin
         //	TreeNavigation - Synchronize 	-- select node in tree
-        if (this.m_tree != null)
+        if (this.m_tree != null) {
             this.m_tree.setSelectedNode(this.gTab.getRecord_ID());	//	ignores new (-1)
+
+            this.gTab.SetIsSummaryNode(this.m_tree.isSummaryNode);
+        }
 
         this.vTable.scrollInView(tRow);
 
