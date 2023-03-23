@@ -380,9 +380,45 @@ table.k-editor,
 .k-grid td.k-state-selected,
 .k-grid-content-locked,
 .k-grid-footer,
-.k-grid-footer-locked, .k-grid-footer-wrap, .k-grid-header, .k-grid-header-locked, .k-grid-header-wrap, .k-group, .k-group-footer td, .k-grouping-header, .k-grouping-header .k-group-indicator, .k-header, .k-input, .k-pager-refresh, .k-pager-wrap, .k-pager-wrap .k-link, .k-panel > .k-item > .k-link, .k-panelbar .k-content, .k-panelbar .k-panel, .k-panelbar > .k-item > .k-link, .k-separator, .k-slider-track, .k-splitbar, .k-state-default, .k-state-default .k-select, .k-state-disabled, .k-textbox, .k-textbox > input, .k-tiles, .k-toolbar, .k-tooltip, .k-treemap-tile, .k-upload-files, .k-widget,
+.k-grid-footer-locked, 
+.k-grid-footer-wrap, 
+.k-grid-header, 
+.k-grid-header-locked, 
+.k-grid-header-wrap, 
+.k-group, 
+.k-group-footer td, 
+.k-grouping-header, 
+.k-grouping-header .k-group-indicator, 
+.k-header, 
+.k-input, 
+.k-pager-refresh, 
+.k-pager-wrap, 
+.k-pager-wrap .k-link, 
+.k-panel > .k-item > .k-link, 
+.k-panelbar .k-content, 
+.k-panelbar .k-panel, 
+.k-panelbar > .k-item > .k-link, 
+.k-separator, 
+.k-slider-track, 
+.k-splitbar, 
+.k-state-default, 
+.k-state-default .k-select, 
+.k-state-disabled, 
+.k-textbox, 
+.k-textbox > input, 
+.k-tiles, 
+.k-toolbar, 
+.k-tooltip, 
+.k-treemap-tile, 
+.k-upload-files, 
+.k-widget,
 .k-button,
-.k-scheduler-header th, .k-scheduler-header-wrap, .k-scheduler-table td, .k-scheduler-times, .k-scheduler-times th, .k-scheduler-times tr,
+.k-scheduler-header th, 
+.k-scheduler-header-wrap, 
+.k-scheduler-table td, 
+.k-scheduler-times, 
+.k-scheduler-times th, 
+.k-scheduler-times tr,
 .vis-zero-right-border,
 .k-checkbox-label:before,
 .nav-tabs .nav-item.show .nav-link,
@@ -402,14 +438,25 @@ table.k-editor,
 .k-panel > li.k-item,
 .k-panelbar > li.k-item, .k-tiles,
 .k-calendar .k-footer .k-nav-today,
-.k-scheduler-table .k-today, .k-today > .k-scheduler-datecolumn, .k-today > .k-scheduler-groupcolumn,
+.k-scheduler-table .k-today, 
+.k-today > .k-scheduler-datecolumn, .k-today > .k-scheduler-groupcolumn,
 .k-scheduler-datecolumn, .k-scheduler-groupcolumn,
 .k-dropdown .k-input,
 .k-state-default>.k-select,
 .k-popup.k-list-container,
 .bg-white,
-.k-active-filter, .k-state-active, .k-state-active:hover, .k-tabstrip .k-state-active,
-.k-input, .k-multiselect-wrap, .k-textbox>input, input.k-textbox, input.k-textbox:hover, textarea.k-textbox, textarea.k-textbox:hover,
+.k-active-filter, 
+.k-state-active, 
+.k-state-active:hover, 
+.k-tabstrip 
+.k-state-active,
+.k-input, 
+.k-multiselect-wrap, 
+.k-textbox>input, 
+input.k-textbox, 
+input.k-textbox:hover, 
+textarea.k-textbox, 
+textarea.k-textbox:hover,
 .k-checkbox-label:before,
 .dropdown-menu,
 .k-file,
@@ -449,7 +496,8 @@ table.k-editor,
 .k-calendar th, .k-dropzone-hovered, .k-footer-template td, .k-grid-footer, .k-group, .k-group-footer td, .k-grouping-header, .k-pager-wrap, .k-toolbar, .k-widget .k-status, .k-widget.k-popup,
 .k-calendar th, .k-dropzone-hovered, .k-footer-template td, .k-grid-footer, .k-group, .k-group-footer td, .k-grouping-header, .k-pager-wrap, .k-toolbar, .k-widget .k-status, .k-widget.k-popup,
 .dropdown-item:focus, .dropdown-item:hover,
-.dxheControl .dxrControl{
+.dxheControl .dxrControl,
+.address-close-icon {
     background: rgba(var(--v-c-secondary), 1) !important;
 }
 .k-dropdown-wrap.k-state-default {
@@ -466,7 +514,9 @@ table.k-editor,
 }
 .k-i-arrow-s,
 .k-i-arrow-w,
-.k-i-arrow-e {
+.k-i-arrow-e,
+.k-minus,
+.k-plus {
     width: 0 !important;
     height: 0 !important;
     background-image: none !important;
@@ -489,6 +539,15 @@ table.k-editor,
     border-top: 4px solid transparent !important;
     border-bottom: 4px solid transparent !important;
     border-left: 5px solid rgba(var(--v-c-on-secondary), 1) !important;
+}
+.k-plus,
+.k-minus {
+    border-top: 5px solid transparent !important;
+    border-bottom: 5px solid transparent !important;
+    border-left: 5px solid rgba(var(--v-c-on-secondary), 1) !important;
+}
+.k-minus {
+    transform: rotate(45deg);
 }
 .mainTemplate svg rect {
     fill: rgba(var(--v-c-secondary), 1) !important;
@@ -529,7 +588,8 @@ table.k-editor,
 .k-item span,
 .k-grouping-header,
 .k-grid-footer td, .k-group-footer td, .k-grouping-row td,
-.dxrControl, .dxrControl a {
+.dxrControl, .dxrControl a,
+.address-close-icon {
     color: rgb(var(--v-c-on-secondary)) !important;
 }
 .k-other-month .k-link {

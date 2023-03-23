@@ -2449,7 +2449,7 @@ findImg {
     float: left;
     /*position: absolute;*/
     height: 100%;
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
 }
 /*added new gl grid*/
 .vis-allocation-payment-grid, .vis-allocation-cashLine-grid, .vis-allocation-invoice-grid, .vis-allocation-gl-grid {
@@ -2613,7 +2613,7 @@ findImg {
     width: 100%;
     /* height: 11px; */
     text-align: right;
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     font-weight: bold;
     /* color: darkgray; */
     font-size: 12px;
@@ -2642,9 +2642,9 @@ findImg {
         text-align: center !important;
         width: 100%;
         z-index: 0;
-        background: #fff;
-        font-weight:600;
-        height:18px;
+        background: rgba(var(--v-c-common), 1);
+        font-weight: 600;
+        height: 18px;
         /*line-height:11px;*/
     }
 
@@ -2656,7 +2656,7 @@ findImg {
     display: flex;
     width: 100%;    
     overflow: auto;
-    background: #fff;
+    background: rgba(var(--v-c-common), 1);
 }
 
 .vis-cv-cg, .vis-cv-cg-grp {
@@ -3064,7 +3064,7 @@ ul.vis-cardviewcolumnfield li {
     visibility: visible;
     transform: rotate( 360deg);
 
-    background: #fff;
+    background: rgba(var(--v-c-common), 1);
     display: flex;
     height: 14px;
 }
@@ -3655,7 +3655,7 @@ html[dir="rtl"] .vis-cvd-editbtn {
         font-size: 14px;
         line-height: 1.42857143;
         color: #555;
-        background-color: #fff;
+        background-color: rgba(var(--v-c-common), 1);
         background-image: none;
         border: 1px solid #ccc;
         border-radius: 4px;
@@ -3901,7 +3901,7 @@ html[dir="rtl"] .vis-cvd-editbtn {
     font-size: 14px;
     line-height: 1.42857143;
     color: #555;
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -4283,7 +4283,7 @@ tr.vis-processpara-table-SplitUI {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: #fff;
+    background: rgba(var(--v-c-common), 1);
 }
 
 .vis-window-tab-panels {
@@ -5315,7 +5315,7 @@ a.VIS_Pref_btn-2, a.VIS_Pref_btn-2:hover {
     .vis-leftsidebarouterwrap .panel-body .vis-input-wrap select:focus ~ label,
     .vis-leftsidebarouterwrap .panel-body .vis-input-wrap input:focus ~ label,
     .vis-leftsidebarouterwrap .panel-body .vis-input-wrap input:not(:placeholder-shown) ~ label {
-        background: linear-gradient(#fff 50%, transparent 50%);
+        background: linear-gradient(rgba(var(--v-c-common), 1) 50%, transparent 50%);
     }
 
 .vis-leftsidebarouterwrap .vis-input-wrap .input-group-text {
@@ -5553,7 +5553,7 @@ a.VIS_Pref_btn-2, a.VIS_Pref_btn-2:hover {
     white-space: nowrap;
     margin-top: 17px;
     display: flex;
-    background-color: #fff
+    background-color: rgba(var(--v-c-common), 1)
 }
 
 
