@@ -131,9 +131,8 @@ namespace VISLogic.Models
                 {
                     query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + record_ID;
                     oldParentID = Util.GetValueOfInt(DB.ExecuteScalar(query));
-                    DeleteSharedChild(oldParentID, trx);
-                    //query = "DELETE FROM AD_ShareRecordOrg WHERE Parent_ID=" + oldParentID;
-                    //int deletedRecords = DB.ExecuteQuery(query, null, trx);
+                    VAdvantage.Common.ShareRecordManager mange = new VAdvantage.Common.ShareRecordManager();
+                    mange.DeleteSharedChild(oldParentID, trx);
 
                 }
                 query = "DELETE FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + record_ID;
@@ -329,22 +328,7 @@ namespace VISLogic.Models
         }
 
 
-        private void DeleteSharedChild(int parent_ID, Trx trx)
-        {
-            string sql = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE Parent_ID=" + parent_ID;
-            DataSet ds = DB.ExecuteDataset(sql, null, trx);
-            if (ds != null && ds.Tables[0].Rows.Count > 0)
-            {
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                {
-                    DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx);
-                }
-            }
-
-
-            sql = "DELETE FROM AD_ShareRecordOrg WHERE AD_ShareRecordOrg_ID=" + parent_ID;
-            int deletedRecords = DB.ExecuteQuery(sql, null, trx);
-        }
+       
 
         public List<RecordAccess> GetSharedRecords(Ctx ctx)
         {
