@@ -284,6 +284,23 @@ namespace VAdvantage.Common
             }
         }
 
+        public void DeleteSharedChild(int parent_ID, Trx trx)
+        {
+            string sql = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE Parent_ID=" + parent_ID;
+            DataSet ds = DB.ExecuteDataset(sql, null, trx);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx);
+                }
+            }
+
+
+            sql = "DELETE FROM AD_ShareRecordOrg WHERE AD_ShareRecordOrg_ID=" + parent_ID;
+            int deletedRecords = DB.ExecuteQuery(sql, null, trx);
+        }
+
 
         public static void AddRecordToTable(int table, ShareOrg record, bool force = false)
         {
