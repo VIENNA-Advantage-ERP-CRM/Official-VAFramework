@@ -2701,11 +2701,11 @@
     /**
      * Check if currect record is shared with other organization or not
      * */
-    GridTab.prototype.hasShared = function () {
+    GridTab.prototype.hasShared = function (reload) {
 
         if (this.isDataLoading)
             return false;
-        if (this.sharedRecords == null)
+        if (this.sharedRecords == null || reload==true)
             this.loadShared();//call load shared record function
         if (this.sharedRecords == null)
             return false;
