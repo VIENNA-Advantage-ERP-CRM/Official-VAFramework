@@ -3124,6 +3124,14 @@
             this.aMap.hide();
         }
         this.setLastView(""); //clear view history
+
+        var selff = this;
+        if (this.isShowSharedRecord && this.aSharedRecord) {
+            window.setTimeout(function () {
+                selff.aSharedRecord.setEnabled(true);
+                selff.aSharedRecord.setPressed(selff.curTab.hasShared(true));
+            }, 200);
+        }
     };
 
     APanel.prototype.setDefaultSearch = function (gc) {
