@@ -4144,8 +4144,15 @@
 
         var self = this;
         var parentTableID = 0;
-        if (this.curTab.getParentTab())
+        if (this.curTab.getParentTab()) {
             parentTableID = this.curTab.getParentTab().getAD_Table_ID();
+            if (!this.curTab.getParentTab().hasShared()) {
+                VIS.ADialog.info("ShareParentFirst", true, "", "");
+                this.aSharedRecord.setPressed(false);
+                return;;
+            }
+
+        }
 
         var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo, this.curTab.linkValue, parentTableID);
         atRecordShared.onClose = function () {
