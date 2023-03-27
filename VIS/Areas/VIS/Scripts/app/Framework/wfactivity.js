@@ -496,7 +496,7 @@
                             fulldata = [];
                             $divActivity.empty();
                             divScroll.empty();
-                            if (dyndata.result) {
+                            if (reslt) {
                                 container.find('#pnorecFound').remove();
                                 $divActivity.append(reslt.count);
                             }
@@ -1018,7 +1018,7 @@
 
             var divAP = $('<div class="input-group vis-home-wf-answerInput vis-input-wrap">');
             divAInpt.append(divAP);
-           // divAP.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
+            // divAP.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
             //Get Answer Control
 
             if (info.NodeAction == 'C') {
@@ -1116,13 +1116,13 @@
             divWorkflowActivity.append($("<p style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Message')));
             divWorkflowActivity.append($("<div class='clearfix'>"));
 
-            
+
 
             var divMsg = $("<div class='vis-control-wrap'>");
-            var msg = $("<textarea style='width:100%;resize:none;' placeholder='"  + VIS.Msg.getMsg('TypeMessage') + "....'>");
+            var msg = $("<textarea style='width:100%;resize:none;' placeholder='" + VIS.Msg.getMsg('TypeMessage') + "....'>");
             detailCtrl.MsgCtrl = msg;
             divMsg.append(msg);
-           // divMsg.append($("<button class='vis vis-sms'></button>"));
+            // divMsg.append($("<button class='vis vis-sms'></button>"));
             divMsg.append($("<div class='clearfix'>"));
 
             divM.append(divMsg);
@@ -1209,7 +1209,7 @@
                     detailCtrl.FwdCtrl.getBtn(1).prop('disabled', '');
                     aOkF.css('display', 'none');
                     aOkA.css('display', 'none');
-                   // msg.prop('disabled', '');
+                    // msg.prop('disabled', '');
                 }
                 else {
                     detailCtrl.FwdCtrl.getControl().prop('disabled', true);
@@ -1217,7 +1217,7 @@
                     detailCtrl.FwdCtrl.getBtn(1).prop('disabled', true);
                     aOkF.css('display', 'none');
                     aOkA.css('display', '');
-                   // msg.prop('disabled', true);
+                    // msg.prop('disabled', true);
                 }
             };
 
@@ -1322,7 +1322,7 @@
                     sPanel.init();
                     var rt = sPanel.getRoot();
                     divWorkflowChecklist.html('');
-                    sPanel.panelDetails(0, 0, fulldata[index].AD_Table_ID, fulldata[index].Record_ID, rt, fulldata[index].AD_WF_Activity_ID);
+                    sPanel.panelDetails(fulldata[index].AD_Window_ID, 0, fulldata[index].AD_Table_ID, fulldata[index].Record_ID, rt, fulldata[index].AD_WF_Activity_ID);
                     divWorkflowChecklist.append(rt);
                 } else {
                     divDetail.find(".vis-workflowActivityDetails-Heading h3").text(VIS.Msg.getMsg('Detail'));

@@ -343,6 +343,7 @@ namespace VAdvantage.Model
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
                     value = ds.Tables[0].Rows[0][2]; //Name Value
+                    value = Common.Common.RemoveImageIdentifer(value);
                 }
             }
 

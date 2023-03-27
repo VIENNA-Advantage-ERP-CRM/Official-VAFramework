@@ -779,7 +779,7 @@ OR
                         if (node.IsSurveyResponseRequired())
                         {
                             // check any survey response exist
-                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID(),Util.GetValueOfInt(activityID)))
+                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID(),Util.GetValueOfInt(activityID),false))
                             {
                                 return "CheckListRequired";
                             }
@@ -1068,8 +1068,19 @@ OR
                                     AND (validfrom  <=sysdate)
                                     AND (sysdate    <=validto )
                                     ))
-                                  And R.Responsibletype !='H'
-                                  ))";
+                                  AND r.ResponsibleType NOT IN ('H','C', 'M')
+                                  )
+                                OR EXISTS
+                                  (SELECT *
+                                  FROM AD_WF_Responsible r
+                                  INNER JOIN AD_Role ro
+                                  ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                                  WHERE AD_WF_Activity.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                                  AND r.IsActive = 'Y'
+                                  AND (CASE WHEN INSTR(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                                  AND r.responsibletype ='M'
+                                  )
+                              )";
             }
             else
             {
@@ -1139,8 +1150,19 @@ OR
                                     AND (validfrom  <=sysdate)
                                     AND (sysdate    <=validto )
                                     ))
-                                  And R.Responsibletype !='H'
-                                  ))";
+                                  AND r.ResponsibleType NOT IN ('H','C', 'M')
+                                  )
+                                OR EXISTS
+                                  (SELECT *
+                                  FROM AD_WF_Responsible r
+                                  INNER JOIN AD_Role ro
+                                  ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                                  WHERE AD_WF_Activity.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                                  AND r.IsActive = 'Y'
+                                  AND (CASE WHEN INSTR(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                                  AND r.responsibletype ='M'
+                                  )
+                                )";
             }
 
 
@@ -1163,6 +1185,10 @@ OR
 
         public bool CheckSurveyResponseExist(Ctx ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
         {
+            if (AD_Window_ID == 0)
+            {
+                return false;
+            }
 
             string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
@@ -1174,16 +1200,16 @@ OR
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
-                    {
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]));
-                        if (isvalidate)
-                        {
-                            isvalidate = true;
-                        }
-                    }
+                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    //{
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    //    if (isvalidate)
+                    //    {
+                    //        isvalidate = true;
+                    //    }
+                    //}
 
-                    if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N" && !isvalidate)
+                    if (!isvalidate)
                     {
                         continue;
                     }

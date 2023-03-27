@@ -228,7 +228,7 @@ namespace VIS.Classes
             var displayColumn = lInfo.displayColSubQ;
             //    sql = sql.Replace(displayColumn, "");
 
-           
+            
             var validation = lInfo.validationCode;
             if (!string.IsNullOrEmpty(validation))
             {
@@ -279,14 +279,13 @@ namespace VIS.Classes
                 {
                     aliasName = aliasName.Replace(" AND ", "");
                 }
-
                 aliasName = aliasName.Trim();
             }
 
             if (aliasName != "")
             {
                 sql = sql.Replace(lInfo.tableName + ".", aliasName + ".");
-                sql = sql.Replace("FROM " + lInfo.tableName+ " ", "FROM " + lInfo.tableName + " " + aliasName+" ");
+                sql = sql.Replace("FROM " + lInfo.tableName + " ", "FROM " + lInfo.tableName + " " + aliasName + " ");
             }
 
             var posFrom = sql.IndexOf(" FROM ");

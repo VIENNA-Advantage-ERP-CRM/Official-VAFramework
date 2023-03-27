@@ -696,7 +696,11 @@
         }
 
         if (editor != null && customStyle != "") {
-            editor.getControl().attr('style', customStyle);
+            if (mField.getDisplayType() == VIS.DisplayType.ProgressBar) {
+                editor.setHtmlStyle(customStyle);
+            } else {
+                editor.getControl().attr('style', customStyle);
+            }
         }
 
         var ctrlP = $("<div class='vis-control-wrap'>");
@@ -705,7 +709,7 @@
             editor.getControl()[0].tagName == 'TEXTAREA' || editor.getControl()[0].className == 'vis-progressCtrlWrap') && editor.getControl()[0].type != 'checkbox') {
             //editor.getControl().addClass("custom-select");
             ctrlP.append(editor.getControl().attr("placeholder", " ").attr("data-placeholder", ""));
-            if (label != null) {
+            if (label != null && mField.getDisplayType() != VIS.DisplayType.TelePhone) {
                 ctrlP.append(label.getControl());
             }
         }
@@ -718,7 +722,7 @@
 
 
 
-        if (mField.getDisplayType() != VIS.DisplayType.Label && !mField.getIsLink()) { // exclude Label display type
+        if (mField.getDisplayType() != VIS.DisplayType.Label && !mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.TelePhone ) { // exclude Label display type
             ctrlP.append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
                 "<i class='vis vis-info' aria-hidden='true'></i></span'>");
         }
@@ -749,6 +753,12 @@
             }
         }
         parent.append(ctrl);
+
+        //Init Control
+        if (mField.getDisplayType() == VIS.DisplayType.TelePhone) {
+            editor.init();
+            ctrlP.css("z-index", "auto");
+        }
     }
 
 }(VIS, jQuery));
