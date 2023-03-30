@@ -189,9 +189,19 @@
                     + '<td width="120px" class="text-center">' + list[i].isLegalEntity + '</td>'
                     + '<td width="120px" class="text-center">';
                 if (list[i].isReadonly) {
-                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked />';
+                    if (list[i].OrgID != VIS.context.getAD_Org_ID()) {
+                        row += '<input type="checkbox" name="" id="" readonly disabled class="chkIsReadOnly" checked />';
+                    }
+                    else {
+                        row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked />';
+                    }
                 } else {
-                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
+                    if (list[i].OrgID != VIS.context.getAD_Org_ID()) {
+                        row += '<input type="checkbox" name="" readonly disabled id="" class="chkIsReadOnly" />';
+                    }
+                    else {
+                        row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
+                    }
                 }
                 row += '</td>'
                     + '</tr>';
