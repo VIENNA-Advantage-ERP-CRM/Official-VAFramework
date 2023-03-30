@@ -72,7 +72,7 @@ namespace VISLogic.Models
         public List<Records> GetSharedRecord(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
             List<Records> lstOrg = null;
-            string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary FROM AD_Org AD_Org
+            string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary, AD_ShareRecordOrg.AD_Org_ID AS OrgID FROM AD_Org AD_Org
                                 LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID + @"
                                 WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + ctx.GetAD_Org_ID() + ")  ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
 
@@ -93,7 +93,8 @@ namespace VISLogic.Models
                         legalEntityOrg = Util.GetValueOfInt(ds.Tables[0].Rows[i]["LegalEntityOrg"]),
                         isReadonly = Util.GetValueOfString(ds.Tables[0].Rows[i]["isreadonly"]).Equals("Y"),
                         isSummary = Util.GetValueOfString(ds.Tables[0].Rows[i]["isSummary"]).Equals("Y"),
-                        AD_OrgShared_ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ShareRecordOrg_ID"])
+                        AD_OrgShared_ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ShareRecordOrg_ID"]),
+                        OrgID= Util.GetValueOfInt(ds.Tables[0].Rows[i]["OrgID"])
                     };
                     lstOrg.Add(Org);
                 }
@@ -389,5 +390,6 @@ namespace VISLogic.Models
         public bool isReadonly { get; set; }
         public bool isSummary { get; set; }
         public int record_ID { get; set; }
+        public int OrgID { get; set; }
     }
 }
