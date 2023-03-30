@@ -230,6 +230,21 @@ namespace VAdvantage.Common
 
         }
 
+        public static bool CheckRecordInTable(int table, ShareOrg record)
+        {
+            if (tableRecordHirarerichy[table] == null)
+                return false;
+
+            ShareOrg org = tableRecordHirarerichy[table].Find(a => a.RecordID == record.RecordID && a.OrgID == record.OrgID);
+            if (org == null)
+                return false;
+
+            return true;
+
+        }
+
+
+
     }
 
     public class ShareOrg
