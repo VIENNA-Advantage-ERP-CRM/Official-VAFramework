@@ -1049,33 +1049,25 @@
                     if (val) {
 
                         return VIS.VTelePhoneInstance.getHtml(val,true);
+                    }
+                    return "";
+                }
+            }
 
-                        //if (val.indexOf('+') < 0) {
-                        //   telePhoneFormatter.iti.setCountry(geoplugin_countryCode());
-                        //}
+            else if (VIS.DisplayType.Color == displayType) {
+                oColumn.sortable = true;
 
-                        //telePhoneFormatter.setValue(val);
+                oColumn.render = function (record, index, colIndex) {
 
-                        //var sel = telePhoneFormatter.iti.getSelectedCountryData();
+                    var f = oColumns[colIndex].field;
+                    var val = record[f];
+                    if (record.changes && typeof record.changes[f] != 'undefined') {
+                        val = record.changes[f];
+                    }
 
-                        //var fVal = telePhoneFormatter.getDisplay();
-                        //if (fVal == '') { //lazy init
-                        //    if (val.indexOf('+') < 0) {
-                        //        val = '+' + sel.dialCode + val;
-                        //    }
-                        //    fVal = val;
-                        //}
+                    if (val) {
 
-                        //////ctrl.iti.setNumber(val);
-                        //var code = sel.iso2;
-
-                        //var htm = '<div style="display:flex">'
-                        //            +'<div class="iti__selected-flag">'
-                        //            + '<div class="iti__flag iti__' + code + '"></div>'
-                        //            + '<div/>'
-                        //             +'<div style="margin: 0 7px;cursor:pointer">' + fVal + '</div>'
-                        //         +'</div>';
-                        //return htm;
+                        return '<div style="background-color:' + val + ';" ></div>';
                     }
                     return "";
                 }
