@@ -126,17 +126,26 @@ namespace VISLogic.Models
         /// <param name="WindowParent_ID"> ParentID of current record fetched from window</param>
         /// <param name="ParentID">It is AD_RecordSharedOrg_ID</param>
         /// <returns></returns>
-        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID,int ParentTable_ID, ref int error, int ParentID = 0)
+        public string SaveRecord(int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID, int ParentTable_ID, ref int error, int ParentID = 0)
         {
-            string msg = "OK";
+
+            GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, Window_ID, 0);
+
+            GridTabVO gt = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
+
+            return SaveRecords(vo.GetTabs(), AD_Table_ID, record_ID, AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx1, WindowParent_ID, ParentTable_ID, ref error, ParentID);
+
+        }
+
+        public string SaveRecords(List<GridTabVO> tabs, int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID, int ParentTable_ID, ref int error, int ParentID = 0)
+        {
+            string msg = " OK ";
             Trx trx = null;
             //error = 0;
             int oldParentID = 0;
             string query = "";
             try
             {
-
-
                 if (trx1 == null)
                     trx = Trx.GetTrx("ShareRecord" + DateTime.Now.Ticks);
                 else
@@ -199,7 +208,7 @@ namespace VISLogic.Models
                             statussChanged = true;
                         SRO.SetIsReadOnly(records[i].isReadonly);
                         SRO.SetRecord_ID(record_ID);
-                       
+
                         if (ParentID > 0)
                         {
                             SRO.Set_ValueNoCheck("Parent_ID", ParentID);
@@ -291,11 +300,11 @@ namespace VISLogic.Models
                             }
                         }
 
-                        GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, Window_ID, 0);
+                        //GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, Window_ID, 0);
 
                         GridTabVO gt = tabs.Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
 
-                        List<GridTabVO> gTabs = vo.GetTabs().Where(a => a.TabLevel == gt.TabLevel + 1).ToList();
+                        List<GridTabVO> gTabs = tabs.Where(a => a.TabLevel == gt.TabLevel + 1).ToList();
 
 
                         if (gTabs != null && gTabs.Count > 0)
@@ -408,7 +417,7 @@ namespace VISLogic.Models
         }
 
 
-       
+
 
         public List<RecordAccess> GetSharedRecords(Ctx ctx)
         {

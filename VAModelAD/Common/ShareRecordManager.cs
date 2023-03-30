@@ -346,16 +346,21 @@ namespace VAdvantage.Common
 
     }
 
-    public class Records : Organization
-    {
-        public int AD_OrgShared_ID { get; set; }
-        public int AD_Table_ID { get; set; }
-        public bool isReadonly { get; set; }
-        public bool isSummary { get; set; }
-        public int record_ID { get; set; }
-        public int OrgID { get; set; }
-        public int shareID { get; set; }
-        public bool CanEdit { get; set; }
+        public static bool CheckRecordInTable(int table, ShareOrg record)
+        {
+            if (tableRecordHirarerichy[table] == null)
+                return false;
+
+            ShareOrg org = tableRecordHirarerichy[table].Find(a => a.RecordID == record.RecordID && a.OrgID == record.OrgID);
+            if (org == null)
+                return false;
+
+            return true;
+
+        }
+
+
+
     }
 
     public class ShareOrg
