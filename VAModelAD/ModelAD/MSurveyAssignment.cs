@@ -63,6 +63,20 @@ namespace VAdvantage.Model
         {
             if (GetAD_SurveyAssignment_ID() > 0)
             {
+                int tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
+                if(tableID!= GetAD_Table_ID() && !IsAD_ShowEverytime())
+                {
+                    int isExistCondition = Util.GetValueOfInt(DB.ExecuteScalar("SELECT Count(AD_SurveyShowCondition_ID) FROM AD_SurveyShowCondition WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
+                    if (isExistCondition > 0)
+                    {
+                        log.SaveError("Error", Msg.GetMsg(GetCtx(), "FirstDeleteConditionForUpdate"));
+                        return false;
+                    }
+                }
+                else if(IsAD_ShowEverytime()) {
+                    DB.ExecuteQuery("DELETE FROM AD_SurveyShowCondition WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID());
+                }
+
                 DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");  
             }
             DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Client_ID=" + GetAD_Client_ID() + " AND AD_ORG_ID=" + GetAD_Org_ID() + "  AND AD_Tab_ID IN (" + GetAD_Tab_ID() + ")");

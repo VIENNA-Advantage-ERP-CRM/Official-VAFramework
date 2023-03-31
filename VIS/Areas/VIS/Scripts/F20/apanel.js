@@ -1321,7 +1321,7 @@
     APanel.prototype.ACTION_NAME_ARCHIVE = "Archive";
 
     APanel.prototype.keyDown = function (evt) {
-        if (evt.altKey && this.curGC) {
+        if (!evt.ctrlKey && evt.altKey && this.curGC) {
             var en = this.aNew.getIsEnabled();
             switch (evt.keyCode) {
                 case 78:      //N for ADD
@@ -1439,6 +1439,9 @@
             this.actionPerformed(this.aHelp.getAction());
             evt.preventDefault();
             evt.stopPropagation();
+        } else {
+            if (this.vTabbedPane && this.vTabbedPane.keyDown)
+                this.vTabbedPane.keyDown(evt);
         }
     }
 
