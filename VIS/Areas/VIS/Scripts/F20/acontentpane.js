@@ -173,16 +173,16 @@
 
             var pnl = this.aTabbedPane.getAPanel();
             //1. toolbar action
-            this.aRefresh = pnl.addActions(pnl.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh");
-            this.aDelete = pnl.addActions(pnl.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete");
-            this.aNew = pnl.addActions(pnl.ACTION_NAME_NEW, null, true, true, false, onAction, null, "Shct_New");
-            this.aIgnore = pnl.addActions("Ignore", null, true, true, false, onAction, null, "Shct_Ignore");
-            this.aSave = pnl.addActions("Save", null, true, true, false, onAction, null, "Shct_Save");
+            this.aRefresh = pnl.addActions(pnl.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_CV_Refresh");
+            this.aDelete = pnl.addActions(pnl.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_CV_Delete");
+            this.aNew = pnl.addActions(pnl.ACTION_NAME_NEW, null, true, true, false, onAction, null, "Shct_CV_New");
+            this.aIgnore = pnl.addActions("Ignore", null, true, true, false, onAction, null, "Shct_CV_Ignore");
+            this.aSave = pnl.addActions("Save", null, true, true, false, onAction, null, "Shct_CV_Save");
             //this.aFind = pnl.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             //this.aInfo = pnl.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             //this.aReport = pnl.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
             //this.aPrint = pnl.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
-            this.aMulti = pnl.addActions("Multi", null, false, true, true, onAction, true, "Shct_MultiRow");
+            this.aMulti = pnl.addActions("Multi", null, false, true, true, onAction, true, "Shct_CV_MultiRow");
 
             $ulToolbar.append(this.aIgnore.getListItm());
             $ulToolbar.append(this.aNew.getListItm());
@@ -752,6 +752,40 @@
     ContentPane.prototype.actionButton = function (btn) {
         this.aTabbedPane.getAPanel().actionButton(btn,this);
     };
+
+    // Added By Mandeep --30-Mar-2023
+    ContentPane.prototype.keyDown = function (evt) {
+        if (evt.altKey && evt.ctrlKey && this.curGC) {
+            var en = this.aNew.getIsEnabled();
+            switch (evt.keyCode) {
+                case 78:      //N for ADD
+                    if (en)
+                        this.actionPerformed(this.aNew.getAction());
+                    break;
+                case 68:      // D for Delete
+                    if (en)
+                        this.actionPerformed(this.aDelete.getAction());
+                    break;
+                case 81:      // Q for Refresh
+                    if (en)
+                        this.actionPerformed(this.aRefresh.getAction());
+                    break;
+                case 83:      //S for save                   
+                    this.actionPerformed(this.aSave.getAction());
+                    break;
+                case 84:      // Arrow Down for next record
+                    this.actionPerformed(this.aMulti.getAction());
+                    break;
+                case 90:      // Z for undo
+                    if (!en)
+                        this.actionPerformed(this.aIgnore.getAction());
+                    break;
+
+            }
+            evt.preventDefault();
+            evt.stopPropagation();
+        }
+    }
 
     /**
      * evaluate other tab logics

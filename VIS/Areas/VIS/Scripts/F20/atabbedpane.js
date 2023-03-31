@@ -284,7 +284,11 @@ VIS.VTabbedPane.prototype.evaluate = function (e) {
         return;
     };
 
-    
+    VIS.VTabbedPane.prototype.keyDown = function (evt) {
+        if (this.contentPane.keyDown)
+            this.contentPane.keyDown(evt);
+        return this;
+    };
         
 /**
  *  Dispose all contained VTabbedPanes and GridControllers
