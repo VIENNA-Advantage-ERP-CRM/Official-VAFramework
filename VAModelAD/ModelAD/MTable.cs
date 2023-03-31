@@ -636,6 +636,12 @@ namespace VAdvantage.Model
                             return false;
                     }
                 }
+                else if (GetTableName().ToLower().EndsWith("_ver"))
+                {
+                    log.SaveError("CanNotCreateVersionTbl", Utility.Msg.GetElement(GetCtx(), "CanNotCreateVersionTbl"));
+                    return false;
+
+                }
             }
             return true;
         }

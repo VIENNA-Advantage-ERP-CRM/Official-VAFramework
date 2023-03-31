@@ -1440,7 +1440,7 @@
             evt.preventDefault();
             evt.stopPropagation();
         } else {
-            if (this.vTabbedPane.keyDown)
+            if (this.vTabbedPane && this.vTabbedPane.keyDown)
                 this.vTabbedPane.keyDown(evt);
         }
     }
