@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using VAdvantage.Common;
 using VAdvantage.Utility;
 using VISLogic.Models;
 
