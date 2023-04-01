@@ -322,10 +322,9 @@ namespace VAModelAD.Model
                 {
                     string query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + po.Get_Table_ID() + " AND Record_ID=" + recordID;
                 DataSet ds = DB.ExecuteDataset(query);
-                VAdvantage.Common.ShareRecordManager mange = new VAdvantage.Common.ShareRecordManager();
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
-                    mange.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]),null);
+                        VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]),null,null);
                 }
                 });
             }
