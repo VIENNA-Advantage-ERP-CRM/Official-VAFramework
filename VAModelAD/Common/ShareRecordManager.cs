@@ -183,7 +183,7 @@ namespace VAdvantage.Common
                         MShareRecordOrg SROV = new MShareRecordOrg(po.GetCtx(), 0, po.Get_Trx());
                         SROV.SetAD_Table_ID(po.Get_Table_ID());
                         SROV.Set_ValueNoCheck("AD_OrgShared_ID", dsV.Tables[0].Rows[v]["AD_OrgShared_ID"]);
-                        SROV.SetIsReadOnly(dsV.Tables[0].Rows[v]["isReadonly"]=="Y");
+                        SROV.SetIsReadOnly(dsV.Tables[0].Rows[v]["isReadonly"] == "Y");
                         SROV.SetRecord_ID(po.Get_ID());
                         if (!SROV.Save())
                         {
@@ -201,21 +201,53 @@ namespace VAdvantage.Common
             }
         }
 
-        public void DeleteSharedChild(int parent_ID, Trx trx)
+        public static void DeleteSharedChild(int parent_ID, Trx trx, List<int> orgs)
         {
-            string sql = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE Parent_ID=" + parent_ID;
+            string sql = "SELECT AD_ShareRecordOrg_ID,ad_orgshared_id, Record_ID,AD_Table_ID FROM AD_ShareRecordOrg WHERE Parent_ID=" + parent_ID;
             DataSet ds = DB.ExecuteDataset(sql, null, trx);
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                if (orgs != null)
                 {
-                    DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx);
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        if (orgs.IndexOf(Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"])) == -1)
+                        {
+                            DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx, orgs);
+
+                            DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx, orgs);
+
+                        DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
+                    }
                 }
             }
 
 
             sql = "DELETE FROM AD_ShareRecordOrg WHERE AD_ShareRecordOrg_ID=" + parent_ID;
             int deletedRecords = DB.ExecuteQuery(sql, null, trx);
+        }
+
+
+
+
+        public static void DeleteRecordFromTable(int table, int record, int OrgID)
+        {
+            if (tableRecordHirarerichy.ContainsKey(table) &&
+                               tableRecordHirarerichy[table].Find(a => a.RecordID == record && a.OrgID == OrgID) != null)
+            {
+                int removaed = tableRecordHirarerichy[table]
+                       .RemoveAll(a => a.RecordID == record
+                       && a.OrgID == OrgID);
+            }
+
         }
 
 
@@ -245,6 +277,27 @@ namespace VAdvantage.Common
 
 
 
+    }
+
+    public class Organization
+    {
+        public int ID { get; set; }
+        public string value { get; set; }
+        public string name { get; set; }
+        public string isLegalEntity { get; set; }
+        public int legalEntityOrg { get; set; }
+
+    }
+
+    public class Records : Organization
+    {
+        public int AD_OrgShared_ID { get; set; }
+        public int AD_Table_ID { get; set; }
+        public bool isReadonly { get; set; }
+        public bool isSummary { get; set; }
+        public int record_ID { get; set; }
+        public int OrgID { get; set; }
+        public int shareID { get; set; }
     }
 
     public class ShareOrg

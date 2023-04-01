@@ -20,7 +20,7 @@
         var orginalArr = [];
         var sharedIDs = [];
         if (parentID == '999999') {
-            parentID == 0;
+            parentID = 0;
         }
 
         /**Main Root */
@@ -177,7 +177,7 @@
                 row += '</td>'
                     + '<td width="40px">';
                 if (list[i].AD_OrgShared_ID) {
-                    row += '<input type="checkbox" checked class="chkOrgID" value="' + list[i].ID + '">';
+                    row += '<input type="checkbox" checked class="chkOrgID" data-shareid="' + list[i].AD_OrgShared_ID+'" value="' + list[i].ID + '">';
                     sharedIDs.push(list[i].AD_OrgShared_ID);
                     toogleOkBtn(true);
                 } else {
@@ -196,7 +196,7 @@
                         row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked />';
                     }
                 } else {
-                    if (list[i].OrgID != VIS.context.getAD_Org_ID()) {
+                    if (list[i].OrgID>0 && list[i].OrgID != VIS.context.getAD_Org_ID()) {
                         row += '<input type="checkbox" name="" readonly disabled id="" class="chkIsReadOnly" />';
                     }
                     else {
@@ -289,6 +289,7 @@
                     saveObj.list.push({
                         AD_OrgShared_ID: Number(this.value),
                         isReadonly: $(this).closest('tr').find('.chkIsReadOnly').is(':checked'),
+                        shareID: $(this).data('shareid')
 
                     });
 
