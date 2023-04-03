@@ -290,7 +290,7 @@ namespace VAdvantage.Common
             DataSet ds = DB.ExecuteDataset(sql, null, trx);
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
-                if (orgs != null)
+                if (orgs != null && orgs.Count > 0)
                 {
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
@@ -298,7 +298,7 @@ namespace VAdvantage.Common
                         {
                             DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx, orgs);
 
-                            DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
+                            DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
                         }
                     }
                 }
@@ -308,7 +308,7 @@ namespace VAdvantage.Common
                     {
                         DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx, orgs);
 
-                        DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
+                        DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
                     }
                 }
             }
@@ -334,7 +334,7 @@ namespace VAdvantage.Common
         }
 
 
-        public static void AddRecordToTable(int table, ShareOrg record)
+        public static void AddRecordToTable(int table, ShareOrg record, bool force = false)
         {
             if (force)
             {
@@ -350,33 +350,6 @@ namespace VAdvantage.Common
 
 
         }
-
-        public static bool CheckRecordInTable(int table, ShareOrg record)
-        {
-            if (tableRecordHirarerichy[table] == null)
-                return false;
-
-            ShareOrg org = tableRecordHirarerichy[table].Find(a => a.RecordID == record.RecordID && a.OrgID == record.OrgID);
-            if (org == null)
-                return false;
-
-            return true;
-
-        }
-
-
-
-    }
-
-    public class Organization
-    {
-        public int ID { get; set; }
-        public string value { get; set; }
-        public string name { get; set; }
-        public string isLegalEntity { get; set; }
-        public int legalEntityOrg { get; set; }
-
-    }
 
         public static bool CheckRecordInTable(int table, ShareOrg record)
         {

@@ -157,12 +157,19 @@ namespace VISLogic.Models
                 {
                     query = "SELECT AD_ShareRecordOrg_ID,ad_orgshared_id FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + record_ID;
                     DataSet ds = DB.ExecuteDataset(query);
-                    List<int> oIDs = records.AsEnumerable().Select(r => r.AD_OrgShared_ID).ToList();
+                    List<int> oIDs = new List<int>();
+                    if (records != null && records.Count > 0)
+                    {
+                        oIDs = records.AsEnumerable().Select(r => r.AD_OrgShared_ID).ToList();
+                    }
 
                     for (int d = 0; d < ds.Tables[0].Rows.Count; d++)
                     {
-                        if (Util.GetValueOfInt(ds.Tables[0].Rows[d]["ad_orgshared_id"])!=ctx.GetAD_Org_ID() && oIDs.IndexOf(Util.GetValueOfInt(ds.Tables[0].Rows[d]["ad_orgshared_id"])) == -1)
+                        if (Util.GetValueOfInt(ds.Tables[0].Rows[d]["ad_orgshared_id"]) != ctx.GetAD_Org_ID() && oIDs.IndexOf(Util.GetValueOfInt(ds.Tables[0].Rows[d]["ad_orgshared_id"])) == -1)
+                        {
                             VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[d]["AD_ShareRecordOrg_ID"]), trx, oIDs);
+                            VAdvantage.Common.ShareRecordManager.DeleteRecordFromTable(AD_Table_ID, record_ID, Util.GetValueOfInt(ds.Tables[0].Rows[d]["ad_orgshared_id"]));
+                        }
                     }
 
                 }
@@ -221,7 +228,7 @@ namespace VISLogic.Models
                         VAdvantage.Common.ShareRecordManager.AddRecordToTable(AD_Table_ID, Org, statussChanged);
                         //}
 
-                      int newParentID = SRO.GetAD_ShareRecordOrg_ID();
+                        int newParentID = SRO.GetAD_ShareRecordOrg_ID();
 
                         string tableName = MTable.GetTableName(ctx, AD_Table_ID);
 
