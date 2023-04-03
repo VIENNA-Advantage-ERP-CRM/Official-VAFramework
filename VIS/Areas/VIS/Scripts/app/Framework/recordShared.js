@@ -23,6 +23,8 @@
             parentID = 0;
         }
 
+        var canEdit = true;
+
         /**Main Root */
         var root = $('<div class="vis-actionWindowWrapper">'
             + '<div class="vis-apanel-busy vis-recordSharedbusy" style="display:none"></div>'
@@ -182,6 +184,7 @@
                     if (list[i].CanEdit) {
                         toogleOkBtn(true);
                     }
+                    canEdit = list[i].CanEdit;
                 } else {
                     row += '<input type="checkbox" class="chkOrgID" value="' + list[i].ID + '">';
                 }
@@ -209,7 +212,11 @@
                     + '</tr>';
             }
             root.find('.tbList').append(row);
-            root.find('.tbList .chkOrgID').on("click", function () {
+            root.find('.tbList .chkOrgID').on("click", function (e) {
+                if (!canEdit) {
+                    e.preventDefault();
+                    return;
+                }
                 var checkedOrgs = root.find('.tbList .chkOrgID:checked');
                 if (checkedOrgs && checkedOrgs.length > 0) {
                     toogleOkBtn(true);
@@ -259,7 +266,11 @@
                 filterData();
             });
 
-            chkAll.change(function () {
+            chkAll.change(function (e) {
+                if (!canEdit) {
+                    e.preventDefault();
+                    return;
+                }
                 var isFalse = false;
                 if (this.checked) {
                     isFalse = true;
@@ -269,11 +280,16 @@
                     toogleOkBtn(false);
                 }
                 root.find('.tbList .chkOrgID').each(function () {
+                    
                     this.checked = isFalse;
                 });
             });
 
             btnOk.click(function () {
+                if (!canEdit) {
+                    e.preventDefault();
+                    return;
+                }
                 msg.text("");
                 IsBusy(true);
                 var saveObj = {
