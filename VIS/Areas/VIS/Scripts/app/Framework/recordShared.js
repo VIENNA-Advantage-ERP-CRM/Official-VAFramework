@@ -179,7 +179,9 @@
                 if (list[i].AD_OrgShared_ID) {
                     row += '<input type="checkbox" checked class="chkOrgID" data-shareid="' + list[i].AD_OrgShared_ID+'" value="' + list[i].ID + '">';
                     sharedIDs.push(list[i].AD_OrgShared_ID);
-                    toogleOkBtn(true);
+                    if (list[i].CanEdit) {
+                        toogleOkBtn(true);
+                    }
                 } else {
                     row += '<input type="checkbox" class="chkOrgID" value="' + list[i].ID + '">';
                 }
