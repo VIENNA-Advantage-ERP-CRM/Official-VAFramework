@@ -307,6 +307,7 @@ namespace VAdvantage.Common
         public int record_ID { get; set; }
         public int OrgID { get; set; }
         public int shareID { get; set; }
+        public bool CanEdit { get; set; }
     }
 
     public class ShareOrg
