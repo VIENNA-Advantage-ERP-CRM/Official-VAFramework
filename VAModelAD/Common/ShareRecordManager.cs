@@ -146,11 +146,14 @@ namespace VAdvantage.Common
                             {//If shared record's ID == Current record being saved's Parent ID, then share current record.
                                 if (sharedRec[k].RecordID == parentID)
                                 {
+                                    int parentOrg_ID = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID={tablID} AND Record_ID={parentID} AND AD_OrgShared_ID={sharedRec[k].OrgID}"));
+
                                     VAdvantage.ModelAD.MShareRecordOrg SRO = new VAdvantage.ModelAD.MShareRecordOrg(p_ctx, 0, po.Get_Trx());
                                     SRO.SetAD_Table_ID(po.Get_Table_ID());
                                     SRO.Set_ValueNoCheck("AD_OrgShared_ID", sharedRec[k].OrgID);
                                     SRO.SetIsReadOnly(sharedRec[k].Readonly);
                                     SRO.SetRecord_ID(po.Get_ID());
+                                    SRO.Set_ValueNoCheck("Parent_ID", parentOrg_ID);
                                     if (SRO.Save())
                                     {
 
@@ -207,7 +210,7 @@ namespace VAdvantage.Common
             DataSet ds = DB.ExecuteDataset(sql, null, trx);
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
-                if (orgs != null)
+                if (orgs != null && orgs.Count > 0)
                 {
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
@@ -215,7 +218,7 @@ namespace VAdvantage.Common
                         {
                             DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx, orgs);
 
-                            DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
+                            DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
                         }
                     }
                 }
@@ -225,7 +228,7 @@ namespace VAdvantage.Common
                     {
                         DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), trx, orgs);
 
-                        DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
+                        DeleteRecordFromTable(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["ad_orgshared_id"]));
                     }
                 }
             }
@@ -251,14 +254,20 @@ namespace VAdvantage.Common
         }
 
 
-        public static void AddRecordToTable(int table, ShareOrg record)
+        public static void AddRecordToTable(int table, ShareOrg record, bool force = false)
         {
+            if (force)
+            {
+                DeleteRecordFromTable(table, record.RecordID, record.OrgID);
+            }
+
             if (tableRecordHirarerichy[table] == null)
                 tableRecordHirarerichy[table] = new List<VAdvantage.Common.ShareOrg>();
 
             ShareOrg org = tableRecordHirarerichy[table].Find(a => a.RecordID == record.RecordID && a.OrgID == record.OrgID);
             if (org == null)
                 tableRecordHirarerichy[table].Add(record);
+
 
         }
 
