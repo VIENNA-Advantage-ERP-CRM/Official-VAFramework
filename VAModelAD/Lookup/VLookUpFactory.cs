@@ -598,12 +598,28 @@ namespace VAdvantage.Classes
                 {
                     embedSQL.Append("NVL(" + DataBase.DB.TO_CHAR(tableName + "." + ldc.ColumnName, ldc.DisplayType, language.GetAD_Language()) + ",'')");
                 }
+                else if (ldc.DisplayType == DisplayType.Search && ldc.AD_Ref_Val_ID > 0)
+                {
+                    string embeddedSQL = GetLookup_TableEmbed(language, ldc.ColumnName, tableName, ldc.AD_Ref_Val_ID);
+                    embedSQL.Append("NVL((").Append(embeddedSQL).Append("),'')");
+                }
                 //  TableDir
                 else if ((ldc.DisplayType == DisplayType.TableDir || ldc.DisplayType == DisplayType.Search)
                   && ldc.ColumnName.EndsWith("_ID"))
                 {
                     String embeddedSQL = GetLookup_TableDirEmbed(language, ldc.ColumnName, tableName);
                     embedSQL.Append("NVL((").Append(embeddedSQL).Append("),'')");
+                }
+                else if (ldc.DisplayType == DisplayType.Table && ldc.AD_Ref_Val_ID != 0)
+                {
+                    string embeddedSQL = GetLookup_TableEmbed(language, ldc.ColumnName, tableName, ldc.AD_Ref_Val_ID);
+                    embedSQL.Append("NVL((").Append(embeddedSQL).Append("),'')");
+                }
+
+                //  number
+                else if (DisplayType.IsNumeric(ldc.DisplayType) || DisplayType.IsID(ldc.DisplayType))
+                {
+                    embedSQL.Append(DataBase.DB.TO_CHAR(tableName + "." + ldc.ColumnName, ldc.DisplayType, language.GetAD_Language()));                   
                 }
                 //  String
                 else
@@ -612,7 +628,13 @@ namespace VAdvantage.Classes
                     //if (DatabaseType.IsPostgre)
                     //    embedSQL.Append("COALESCE(TO_CHAR(").Append(tableName).Append(".").Append(ldc.ColumnName).Append("),'')");
                     //else
-                    embedSQL.Append("NVL(").Append(tableName).Append(".").Append(ldc.ColumnName).Append(",'')");
+                    if (DatabaseType.IsPostgre)
+                        embedSQL.Append("NVL(").Append(tableName).Append(".").Append(ldc.ColumnName).Append(",'')");
+                    else if (DatabaseType.IsMSSql)
+                        embedSQL.Append("COALESCE(CONVERT(VARCHAR,").Append(tableName).Append(".").Append(ldc.ColumnName).Append("),'')");
+                    else
+                        embedSQL.Append(tableName).Append(".").Append(ldc.ColumnName);
+
                 }
             }
 
