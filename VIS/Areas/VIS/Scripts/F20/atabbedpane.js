@@ -285,7 +285,7 @@ VIS.VTabbedPane.prototype.evaluate = function (e) {
     };
 
     VIS.VTabbedPane.prototype.keyDown = function (evt) {
-        if (this.contentPane.keyDown)
+        if (this.contentPane && this.contentPane.keyDown)
             this.contentPane.keyDown(evt);
         return this;
     };

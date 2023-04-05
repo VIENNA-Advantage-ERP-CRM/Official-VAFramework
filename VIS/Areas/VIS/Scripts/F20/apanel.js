@@ -2957,7 +2957,7 @@
 
         curEle.setVisible(false);
         curEle.getRoot().detach();
-        this.getLayout().append(tabEle.getRoot());
+        this.getLayout().prepend(tabEle.getRoot());
         tabEle.setVisible(true);
 
         this.vTabbedPane.setSelectedTab(action); //set Seleted tab
