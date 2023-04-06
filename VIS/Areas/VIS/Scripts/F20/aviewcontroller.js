@@ -599,12 +599,28 @@
 
         if (mTab.getIsTreeTab()) {
             //, Name
-            var sql = "VIS_120";
 
+            // VIS0008 Changes done to pick Tree for Product and Business Partner from Organization Info
+            var sql = "";
             var param = [];
-            param[0] = new VIS.DB.SqlParam("@AD_Client_ID", VIS.Env.getCtx().getAD_Client_ID());
-            param[1] = new VIS.DB.SqlParam("@AD_Table_ID", mTab.getAD_Table_ID());
-            AD_Tree_ID = executeScalar(sql, param);
+            var _tbl_ID = mTab.getAD_Table_ID();
+            // Fixed for BPartner and Product tables
+            if (_tbl_ID == 208 || _tbl_ID == 291) {
+                if (_tbl_ID == 208)
+                    sql = "VIS_155";
+                else
+                    sql = "VIS_156";
+                param[0] = new VIS.DB.SqlParam("@AD_Org_ID", VIS.Env.getCtx().getAD_Org_ID());
+                AD_Tree_ID = executeScalar(sql, param);
+                param = [];
+            }
+
+            if (AD_Tree_ID == 0) {
+                sql = "VIS_120";
+                param[0] = new VIS.DB.SqlParam("@AD_Client_ID", VIS.Env.getCtx().getAD_Client_ID());
+                param[1] = new VIS.DB.SqlParam("@AD_Table_ID", _tbl_ID);
+                AD_Tree_ID = executeScalar(sql, param);
+            }
 
             //if (AD_Tree_ID > 0) {
             //    this.m_tree = new VIS.TreePanel(curWindowNo, false, true);
