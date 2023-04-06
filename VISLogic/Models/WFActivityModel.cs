@@ -939,7 +939,8 @@ OR
             try
             {
                 // Passed AD_Window_ID to process to set windowID at all levels of current activity
-                _activity.SetUserChoice(AD_User_ID, value, dt, textMsg, AD_Window_ID);
+                if (!_activity.SetUserChoice(AD_User_ID, value, dt, textMsg, AD_Window_ID))
+                    return _activity.GetTextMsg();
                 return "OK";
             }
             catch (Exception ex)
