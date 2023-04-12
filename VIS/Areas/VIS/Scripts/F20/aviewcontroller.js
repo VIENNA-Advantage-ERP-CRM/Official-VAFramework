@@ -611,7 +611,7 @@
                 else
                     sql = "VIS_156";
                 param[0] = new VIS.DB.SqlParam("@AD_Org_ID", VIS.Env.getCtx().getAD_Org_ID());
-                AD_Tree_ID = executeScalar(sql, param);
+                AD_Tree_ID = VIS.Utility.Util.getValueOfInt(executeScalar(sql, param));
                 param = [];
             }
 

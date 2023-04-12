@@ -2535,15 +2535,19 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             //	Approval
             if (GetNode().IsUserApproval() && (GetPO().GetType() == typeof(DocAction) || GetPO().GetType().GetInterface("DocAction") == typeof(DocAction)))
             {
+                bool sendNANotif = false;
                 DocAction doc = (DocAction)_po;
                 try
                 {
                     //	Not pproved
                     if (!"Y".Equals(value))
                     {
-                        newState = StateEngine.STATE_ABORTED;
                         if (!(doc.ProcessIt(DocActionVariables.ACTION_REJECT)))
+                        {
                             SetTextMsg("Cannot Reject - Document Status: " + doc.GetDocStatus());
+                            newState = StateEngine.STATE_ABORTED;
+                        }
+                        sendNANotif = true;
                     }
                     else
                     {
@@ -2593,7 +2597,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                     log.Log(Level.WARNING, "", e);
                 }
                 //	Send Approval Notification
-                if (newState.Equals(StateEngine.STATE_ABORTED))
+                if (newState.Equals(StateEngine.STATE_ABORTED) || sendNANotif)
                 {
                     MClient client = MClient.Get(GetCtx(), doc.GetAD_Client_ID());
                     client.SendEMail(doc.GetDoc_User_ID(),
