@@ -2569,6 +2569,11 @@
                         }, 500);
                     } else {
                         self.setValue(item.id, true, true);
+                        if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
+                            setTimeout(function () {
+                                self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, item.id);
+                            }, 500);
+                        }
                     }
                 }
             });
