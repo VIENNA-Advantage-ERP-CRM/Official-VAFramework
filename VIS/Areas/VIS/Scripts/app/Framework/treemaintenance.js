@@ -1045,14 +1045,14 @@
                         }
 
 
-                        sequence = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence,"bySeqNo":true }, null); 
+                        VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence, "bySeqNo": true, "isParent": false }, null); 
 
                         var setmoveSeq = $(soursenodes).find(".treechild").attr("data-nodeid");
                         if (getparentornot > 0) {
-                            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence, "nodeId": setmoveSeq, "bySeqNo": false,"isParant":true }, null); 
+                            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence, "nodeId": setmoveSeq, "bySeqNo": false,"isParent":true }, null); 
                         }
                         else {
-                            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence, "nodeId": setmoveSeq, "bySeqNo": false, "isParant": false }, null); 
+                            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "TreeMaintenance/UpdateSeqNo", { "treeId": $treeID, "tblName": tbname, "seqNo": sequence, "nodeId": setmoveSeq, "bySeqNo": false, "isParent": false }, null); 
                         }
 
                     }

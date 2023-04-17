@@ -1663,7 +1663,7 @@
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
                         this.vHeaderPanel = gc.vHeaderPanel; // set in parent class , so it is accessible in all GC
-                        if (gTab.isHPanelNotShowInMultiRow && !gTab.getIsSingleRow()) {
+                        if (gTab.isHPanelNotShowInMultiRow && !goSingleRow) {
                             gc.vHeaderPanel.hidePanel();
                             if (gc.vHeaderPanel.sizeChangedListner && gc.vHeaderPanel.sizeChangedListner.onSizeChanged)
                                 gc.vHeaderPanel.sizeChangedListner.onSizeChanged();
