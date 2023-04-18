@@ -522,7 +522,9 @@
                 }
                 //Added by Anil Kumar as Discussed with Vinay Bhatt
                 if (mWindow.getIsGenerateAttachmentCode()) {
-                    this.aGenerateAttachmentCode = this.addActions("CAC", null, false, false, false, onAction ); //1
+
+                    this.aGenerateAttachmentCode = this.addActions("CAC", null, false, false, false, onAction); //1
+
                     this.aGenerateAttachmentCode.setTextDirection("r");
                     $ulactionbar.append(this.aGenerateAttachmentCode.getListItmIT());
                 }
