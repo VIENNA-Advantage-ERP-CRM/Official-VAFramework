@@ -3132,12 +3132,12 @@
         this.setLastView(""); //clear view history
 
         var selff = this;
-        if (this.isShowSharedRecord && this.aSharedRecord) {
-            window.setTimeout(function () {
-                selff.aSharedRecord.setEnabled(true);
-                selff.aSharedRecord.setPressed(selff.curTab.hasShared(true));
-            }, 200);
-        }
+        //if (this.isShowSharedRecord && this.aSharedRecord) {
+        //    window.setTimeout(function () {
+        //        selff.aSharedRecord.setEnabled(true);
+        //        selff.aSharedRecord.setPressed(selff.curTab.hasShared(true));
+        //    }, 200);
+        //}
     };
 
     APanel.prototype.setDefaultSearch = function (gc) {
@@ -3536,8 +3536,7 @@
             this.curWinTab.notifyDataChanged();
         }
 
-
-
+      
         /******End Header Panel******/
 
 
@@ -3654,11 +3653,17 @@
         this.curGC.dataNew(copy);
     };// New
 
-    APanel.prototype.cmd_delete = function () {
+    APanel.prototype.cmd_delete = function () {  
+
         if (this.curTab.getIsReadOnly())
             return;
         //var keyID = this.curTab.getRecord_ID();
         //prevent deletion if client access for Read Write does not exist for this Role.
+
+        if (this.curTab.IsSharedReadOnly) {
+            VIS.ADialog.error("CannotDelete", true, "");
+            return;
+        }
 
         var ids = this.curGC.canDeleteRecords()
 
@@ -4151,7 +4156,10 @@
     };
 
     APanel.prototype.cmd_RecordShared = function () {
-
+        if (this.curTab.getRecord_ID() < 1) {
+            this.aSharedRecord.setEnabled(false);
+            return;
+        }
         var self = this;
         var parentTableID = 0;
         if (this.curTab.getParentTab()) {
