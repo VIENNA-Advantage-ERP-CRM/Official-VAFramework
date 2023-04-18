@@ -2744,7 +2744,7 @@
      * */
     GridTab.prototype.loadShared = function () {
         if (VIS.MRole.getIsShowSharedRecord() == true) {
-            var sqlQry = "VIS_155";
+            var sqlQry = "VIS_157";
             var param = [];
            // param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
             param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
@@ -2757,7 +2757,7 @@
                 var key;
                 while (dr.read()) {
                     key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                    this.sharedRecords.push({ ID: key });
+                    this.sharedRecords.push({ ID: key});
                 }
 
                 dr = null;
