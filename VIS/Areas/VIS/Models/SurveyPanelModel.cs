@@ -194,7 +194,7 @@ namespace VIS.Models
             SR.SetAD_Table_ID(AD_Table_ID);
             SR.SetAD_User_ID(ctx.GetAD_User_ID());
             SR.Set_ValueNoCheck("AD_WF_Activity_ID", AD_WF_Activity_ID);
-            if (SR.Save() && surveyResponseValue!=null)
+            if (SR.Save() && surveyResponseValue !=null)
             {
                 for (var i = 0; i < surveyResponseValue.Count; i++)
                 {
@@ -420,7 +420,9 @@ namespace VIS.Models
 
             if(!isSelfExist && IsSelfShow)
             {
-                sql = @"SELECT sr.AD_SurveyResponse_ID, sr.ad_user_id,'Self' As name,sr.created
+
+                sql = @"SELECT sr.AD_SurveyResponse_ID, sr.ad_user_id,'Self' AS name,sr.created
+
                         FROM ad_surveyresponse sr  WHERE sr.ad_user_id = " + AD_User_ID + " AND Record_ID=" + Record_ID + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID+@" ORDER BY sr.Created";
 
                 DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "SR", true, false), null);

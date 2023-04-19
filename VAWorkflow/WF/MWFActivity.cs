@@ -1141,6 +1141,7 @@ namespace VAdvantage.WF
             {
                 log.Fine("UserChoice:AD_Column_ID=" + _node.GetAD_Column_ID());
                 //	Approval
+                bool isAutoApproveSingleUser = false;
                 if (_node.IsUserApproval() && (GetPO().GetType() == typeof(DocAction) || GetPO().GetType().GetInterface("DocAction") == typeof(DocAction)))
                 {
                     DocAction doc = (DocAction)_po;
@@ -1190,11 +1191,26 @@ namespace VAdvantage.WF
                         //}
 
                         // Change to fetch user from responsible
-                        int userID = GetUserFromWFResponsible(_node.GetAD_WF_Responsible_ID(), GetPO());
+                        int userID = GetUserFromWFResponsible(_node.GetAD_WF_Responsible_ID(), GetPO(), out isAutoApproveSingleUser);
                         if (!autoApproval && userID != 0)
                         {
                             CheckUser(userID);
                             SetAD_User_ID(userID);
+                        }
+                    }
+
+                    if (isAutoApproveSingleUser)
+                    {
+                        if (doc.ProcessIt(DocActionVariables.ACTION_APPROVE) && doc.Save())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            log.SaveError("", "Error in saving or approving record");
+                            // VIS264 - Send push notification
+                            PushNotification.SendNotificationToUser(GetAD_User_ID(), GetAD_Window_ID(), GetRecord_ID(), Msg.GetMsg(GetCtx(), "VIS_Workflows"), GetNodeName() + " : " + Msg.GetMsg(GetCtx(), "ReceivedFor") + " " + GetWindowName() + GetDocumentNo(), "W");
+                            return false;
                         }
                     }
 
@@ -1255,7 +1271,7 @@ namespace VAdvantage.WF
                                 eve.Save();
                                 return true;
                             }
-                            nextAD_User_ID = GetUserFromWFResponsible(AD_WF_Responsible_ID, GetPO());
+                            nextAD_User_ID = GetUserFromWFResponsible(AD_WF_Responsible_ID, GetPO(), out isAutoApproveSingleUser);
                             CheckUser(nextAD_User_ID);
                             if (nextAD_User_ID == 0)
                             {
@@ -1275,7 +1291,16 @@ namespace VAdvantage.WF
 
                             // VIS264 - Send push notification                            
                             PushNotification.SendNotificationToUser(nextAD_User_ID, GetAD_Window_ID(), GetRecord_ID(), Msg.GetMsg(GetCtx(), "VIS_Workflows"), _node.GetName() + " : " + Msg.GetMsg(GetCtx(), "ReceivedFor") + " " + GetWindowName() + GetDocumentNo(), "W");
-
+                            /// VIS0008 Changed done to handle if only one user in Approving Role
+                            if (isAutoApproveSingleUser && _node.GetAD_Column_ID() > 0 && !resp.IsOrganization())
+                            {
+                                if (MColumn.Get(GetCtx(), _node.GetAD_Column_ID()).GetAD_Reference_ID() == DisplayType.YesNo)
+                                {
+                                    _po.Set_ValueOfColumn(GetNode().GetAD_Column_ID(), true);
+                                    _po.Save();
+                                    return true;
+                                }
+                            }
                             return false;
                         }
                         else
@@ -1346,11 +1371,11 @@ namespace VAdvantage.WF
 
                     if (_node.GetAD_WF_Responsible_ID() > 0)
                     {
-                        userID = (GetUserFromWFResponsible(_node.GetAD_WF_Responsible_ID(), GetPO()));
+                        userID = (GetUserFromWFResponsible(_node.GetAD_WF_Responsible_ID(), GetPO(), out isAutoApproveSingleUser));
                     }
                     else if (_node.GetWorkflow().GetAD_WF_Responsible_ID() > 0)
                     {
-                        userID = (GetUserFromWFResponsible(_node.GetWorkflow().GetAD_WF_Responsible_ID(), GetPO()));
+                        userID = (GetUserFromWFResponsible(_node.GetWorkflow().GetAD_WF_Responsible_ID(), GetPO(), out isAutoApproveSingleUser));
                     }
                     else
                     {
@@ -1363,6 +1388,17 @@ namespace VAdvantage.WF
 
                     // VIS264 - Send push notification
                     PushNotification.SendNotificationToUser(GetAD_User_ID(), GetAD_Window_ID(), GetRecord_ID(), Msg.GetMsg(GetCtx(), "VIS_Workflows"), GetNodeName() + " : " + Msg.GetMsg(GetCtx(), "ReceivedFor") + " " + GetWindowName() + GetDocumentNo(), "W");
+
+                    /// VIS0008 Changed done to handle if only one user in Approving Role
+                    if (isAutoApproveSingleUser && _node.GetAD_Column_ID() > 0)
+                    {
+                        if (MColumn.Get(GetCtx(), _node.GetAD_Column_ID()).GetAD_Reference_ID() == DisplayType.YesNo)
+                        {
+                            _po.Set_ValueOfColumn(GetNode().GetAD_Column_ID(), true);
+                            _po.Save();
+                            return true;
+                        }
+                    }
                 }
                 //For Genral Attribute
                 //else if (new MColumn(GetCtx(),_node.GetAD_Column_ID(),Get_TrxName()).GetColumnName().ToUpper().Equals("C_GENATTRIBUTESETINSTANCE_ID"))
@@ -2459,10 +2495,15 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             {
                 this.AD_Window_ID = AD_Window_ID;
             }
+            // VIS0008 Changes for Workflow cases self approval
             //	Check if user approves own document when a role is responsible
-            if (GetNode().IsUserApproval() && (GetPO().GetType() == typeof(DocAction) || GetPO().GetType().GetInterface("DocAction") == typeof(DocAction)))
+            //if (GetNode().IsUserApproval() && (GetPO().GetType() == typeof(DocAction) || GetPO().GetType().GetInterface("DocAction") == typeof(DocAction)))
+            //{
+            GetPO();
+            // Check applied if the approver is the user who created the document
+            if (_po != null && AD_User_ID == _po.GetCreatedBy())
             {
-                DocAction doc = (DocAction)_po;
+                //DocAction doc = (DocAction)_po;
                 MUser user = new MUser(GetCtx(), AD_User_ID, null);
                 MRole[] roles = user.GetRoles(_po.GetAD_Org_ID());
                 bool canApproveOwnDoc = false;
@@ -2476,7 +2517,8 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 }
                 if (!canApproveOwnDoc)
                 {
-                    String info = user.GetName() + " cannot approve own document " + doc;
+                    //String info = user.GetName() + " cannot approve own document " + doc;
+                    String info = user.GetName() + " cannot approve own document ";
                     AddTextMsg(info);
                     log.Fine(info);
                     return false;		//	ignore
@@ -2493,15 +2535,19 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             //	Approval
             if (GetNode().IsUserApproval() && (GetPO().GetType() == typeof(DocAction) || GetPO().GetType().GetInterface("DocAction") == typeof(DocAction)))
             {
+                bool sendNANotif = false;
                 DocAction doc = (DocAction)_po;
                 try
                 {
                     //	Not pproved
                     if (!"Y".Equals(value))
                     {
-                        newState = StateEngine.STATE_ABORTED;
                         if (!(doc.ProcessIt(DocActionVariables.ACTION_REJECT)))
+                        {
                             SetTextMsg("Cannot Reject - Document Status: " + doc.GetDocStatus());
+                            newState = StateEngine.STATE_ABORTED;
+                        }
+                        sendNANotif = true;
                     }
                     else
                     {
@@ -2551,7 +2597,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                     log.Log(Level.WARNING, "", e);
                 }
                 //	Send Approval Notification
-                if (newState.Equals(StateEngine.STATE_ABORTED))
+                if (newState.Equals(StateEngine.STATE_ABORTED) || sendNANotif)
                 {
                     MClient client = MClient.Get(GetCtx(), doc.GetAD_Client_ID());
                     client.SendEMail(doc.GetDoc_User_ID(),
@@ -4128,8 +4174,9 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             }
             return recipientRoles;
         }
-        private int GetUserFromWFResponsible(int AD_WF_Responsible_ID, PO po)
+        private int GetUserFromWFResponsible(int AD_WF_Responsible_ID, PO po, out bool isAutoApproverUser)
         {
+            isAutoApproverUser = false;
             MWFResponsible resp = new MWFResponsible(GetCtx(), AD_WF_Responsible_ID, Get_TrxName());
             if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_Human))
             {
@@ -4141,11 +4188,63 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             }
             else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_Role))
             {
-                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID=" + resp.GetAD_Role_ID() + " AND IsActive='Y' ORDER BY AD_User_ID"));
+                DataSet dsUserCount = DB.ExecuteDataset("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID=" + resp.GetAD_Role_ID() + " AND IsActive='Y' ORDER BY AD_User_ID");
+                if (dsUserCount != null && dsUserCount.Tables[0].Rows.Count > 0)
+                {
+                    bool isAutoApp = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsAutoApproveOwnDoc FROM AD_Role WHERE AD_Role_ID = " + resp.GetAD_Role_ID())) == "Y";
+                    int UserID = Util.GetValueOfInt(dsUserCount.Tables[0].Rows[0]["AD_User_ID"]);
+                    if ((dsUserCount.Tables[0].Rows.Count == 1) && (UserID == po.GetCreatedBy()) && isAutoApp)
+                    {
+                        isAutoApproverUser = true;
+                    }
+                    return UserID;
+                }
+                return GetCtx().GetAD_User_ID();
+                //return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID=" + resp.GetAD_Role_ID() + " AND IsActive='Y' ORDER BY AD_User_ID"));
             }
             else if (resp.GetResponsibleType().Equals(MWFResponsible.RESPONSIBLETYPE_MultiRoles))
             {
                 string _roles = Util.GetValueOfString(DB.ExecuteScalar("SELECT Ref_Roles FROM AD_WF_Responsible WHERE AD_WF_Responsible_ID = " + AD_WF_Responsible_ID));
+                if (!string.IsNullOrEmpty(_roles))
+                {
+                    // Split roles IDs selected in multiRole
+                    string[] roleIDs = _roles.Split(',');
+                    int UserID = -1;
+                    // Traverse through all the roles
+                    for (int i = 0; i < roleIDs.Length; i++)
+                    {
+                        DataSet dsUserCount = DB.ExecuteDataset("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID=" + roleIDs[i] + " AND IsActive='Y' ORDER BY AD_User_ID");
+                        if (dsUserCount != null && dsUserCount.Tables[0].Rows.Count > 0)
+                        {
+                            // if there are more than one users in role then break and mark autoapprove as false and don't check other roles
+                            if (dsUserCount.Tables[0].Rows.Count > 1)
+                            {
+                                isAutoApproverUser = false;
+                                break;
+                            }
+                            bool isAutoApp = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsAutoApproveOwnDoc FROM AD_Role WHERE AD_Role_ID = " + roleIDs[i])) == "Y";
+                            // if Auto Approve is marked as false at role level, mark autoapprove as false and don't check other roles
+                            if (!isAutoApp)
+                            {
+                                isAutoApproverUser = false;
+                                break;
+                            }
+                            UserID = Util.GetValueOfInt(dsUserCount.Tables[0].Rows[0]["AD_User_ID"]);
+                            // if user in this role is not the same user who created the document
+                            // mark autoapprove as false and don't check other roles else mark true and check other roles as well
+                            if (UserID == po.GetCreatedBy())
+                            {
+                                isAutoApproverUser = true;
+                                continue;
+                            }
+                            else
+                            {
+                                isAutoApproverUser = false;
+                                break;
+                            }
+                        }
+                    }
+                }
                 return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM AD_User_Roles WHERE AD_Role_ID IN (" + _roles + ") AND IsActive='Y' ORDER BY AD_Role_ID, AD_User_ID"));
             }
             // Handled code for new Responsible type being added

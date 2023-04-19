@@ -21,6 +21,7 @@
         this.onDemandTree = onDemandTrees;
         this.currentNode = 0;
         this.searchNode = false;
+        this.isSummaryNode = false;
         this.gc = gc;
         var self = this;
 
@@ -205,7 +206,7 @@
 
 
             $.ajax({
-                type: 'Get',
+                type: 'post',
                 async: true,
                 url: VIS.Application.contextUrl + "Form/UpdateTree",
                 data: {
@@ -241,6 +242,11 @@
             });
         };
 
+        this.updateArray = function (val, id) {
+            treeValues.push(id);
+            treeText.push(val);
+        };
+
         //Privilzed function
         this.getRoot = function () {
             return $root;
@@ -265,7 +271,26 @@
                             $(node.find('label')[0]).addClass("vis-css-treewindow-selected");
                         }
                     }
-                    self.selectionChangeListner.nodeSelectionChanged({ newValue: o.data("value"), propertyName: "" });
+                    else {
+                        var selNode = $root.find("*.vis-css-treewindow-selected");
+                        if (selNode.length > 0)
+                            selNode.removeClass("vis-css-treewindow-selected");
+                        var node = $($(event.target).parent());
+                        if (node.find(">label").length > 0) {
+                            node.find(">label").addClass("vis-css-treewindow-selected");
+                        }
+                        else {
+                            node.find(">a").addClass("vis-css-treewindow-selected");
+                            $(node.find('label')[0]).addClass("vis-css-treewindow-selected");
+                        }
+                    }
+                    if (o.data("summary") == 'Y')
+                        self.isSummaryNode = true;
+                    else
+                        self.isSummaryNode = false;
+
+                    self.currentNode = o.data("value");
+                    self.selectionChangeListner.nodeSelectionChanged({ newValue: o.data("value"), propertyName: "", isSummaryNode: self.isSummaryNode });
                 }
                 event.stopPropagation();
             }
@@ -473,6 +498,9 @@
         var root = this.getRoot();
 
         var node = root.find("li[data-value='" + nodeID + "']");
+
+        this.isSummaryNode = node.data("summary") == "Y";
+
         if (node != null && node.length > 0) {
             var selNode = root.find("*.vis-css-treewindow-selected");
             if (selNode.length > 0)
@@ -552,6 +580,7 @@
             //rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
             if (this.onDemandTree) {
                 var selNode = root.find("*.vis-css-treewindow-selected");
+               
                 if (selNode && isSummary) {
                     var ul = $(selNode.parent()).find('ul');
                     if (ul && ul.length > 0) {
@@ -563,8 +592,26 @@
                 }
             }
             else {
-                var rn = this.getRootNode();
-                rn.append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                var selNode = root.find("*.vis-css-treewindow-selected");
+                var isSum = selNode.parent("li").data("summary") == "Y";
+                //if selected node is summary level node, then insert new item of tree in that node.
+                if (selNode && isSum) {
+                    var ul = $(selNode.parent()).find('ul');
+                    if (ul && ul.length > 0) {
+                        $(ul[0]).append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo));
+                    }
+                    else {
+                        $(selNode.parent()).append($('<ul>').append(this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo)));
+                    }
+                    this.updateArray(name, keyID);
+                }
+                else {
+                    var rn = this.getRootNode();
+                    var nod = this.getNode(keyID, name, description, isSummary, imageIndicator, this.windowNo);
+                    rn.append(nod);
+                    nod[0].scrollIntoView();
+                    this.updateArray(name, keyID);
+                }
             }
 
         }
@@ -621,10 +668,15 @@
 
         else {
             str += 'data-summary="N"> ' +
-            ' <img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/login/' + this.getIcon(imageIndicator) + '"> ' +
-             ' <a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '"> ' +
-             name + '</a><span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
-             '</span></span></li>';
+                '<a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '">' +
+                '<span style="font-size:11px;margin-right:5px"' + this.getClassIcon(imageIndicator) + '></span>' + name + '</a > ' +
+                '<span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
+                '</span></span></li>';
+            //str += 'data-summary="N"> ' +
+            //' <img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/login/' + this.getIcon(imageIndicator) + '"> ' +
+            // ' <a href="javascript:void(0)" data-value="' + keyID + '" data-action="' + imageIndicator + '" data-actionid="' + keyID + '"> ' +
+            // name + '</a><span class="vis-treewindow-span"><span class="vis-css-treewindow-arrow-up"> ' +
+            // '</span></span></li>';
         }
 
         return $(str);
@@ -650,6 +702,33 @@
                 return "mDocAction.png";
             default:
                 return "mWindow.png";
+        }
+    };
+
+    TreePanel.prototype.getClassIcon = function (initial) {
+        switch (initial) {
+            case "W":
+                return "class = 'fa fa-window-maximize'";
+            case "R":
+                return "class = 'vis vis-report'";
+            case "P":
+                return "class = 'fa fa-cog'";
+            case "T":
+                return "class = 'fa fa-cog'";
+            case "F":
+                return "class = 'fa fa-clone'";
+            case "B":
+                return "class = 'fa fa-clone'";
+            case "X":
+                return "class = 'fa fa-list-alt'";
+            case "V":
+                return "class = 'fa fa-clone'";
+            case "D":
+                return "class = 'fa fa-clone'";
+            case "O":
+                return "class = 'fa fa-circle'";
+            default:
+                return "class = 'fa fa-clone'";
         }
     };
 

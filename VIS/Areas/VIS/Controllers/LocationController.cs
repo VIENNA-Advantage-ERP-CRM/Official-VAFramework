@@ -61,6 +61,19 @@ namespace VIS.Controllers
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult UpdateLocation(Dictionary<string, string> Address, int C_Location_ID)
+        {
+            if (Session["Ctx"] != null)
+            {
+                var ctx = Session["ctx"] as Ctx;
+                LocationModel obj = new LocationModel();
+
+             MLocation loc=  obj.UpdateLocation(ctx, Address,C_Location_ID);
+                return Json(new { locationid = loc.Get_ID(), locaddress = loc.ToString() }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
+        }
+
         /// <summary>
         /// Fill countries by name
         /// </summary>

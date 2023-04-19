@@ -1891,6 +1891,10 @@
         this.gridTable.selectedTreeNode = selectedNode;
     };
 
+    GridTab.prototype.SetIsSummaryNode = function (isSummary) {
+        this.gridTable.isSummaryyNode = isSummary;
+    }
+
     GridTab.prototype.dataSave = function (manualCmd) {
         try {
             //check if current tab and its parents have changed.
@@ -3040,6 +3044,7 @@
         this.treeID = 0;
         this.selectedTreeNode = 0;
         this.ShowSummaryNodes = false;
+        this.isSummaryyNode = false;
         this.isZoomAction = false;
         /* Paging */
         this.currentPage;
@@ -4445,6 +4450,10 @@
 
         if (this.selectedTreeNode > 0) {
             gridTableIn['SelectedTreeNodeID'] = this.selectedTreeNode;
+            if (this.isSummaryyNode) {
+                gridTableIn['TreeID'] = this.treeID;
+                gridTableIn['ParentNodeID'] = this.selectedTreeNode;
+            }
         }
 
         if (this.treeNode_ID > 0) {

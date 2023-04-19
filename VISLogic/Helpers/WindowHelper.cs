@@ -1263,6 +1263,23 @@ namespace VIS.Helpers
                 {
                     msg += Msg.GetMsg(ctx, "MaintainVersionError");
                 }
+
+                if (info.IndexOf("VISDBERRORCOLUMN:") > -1)
+                {
+                    string finalColumn = "";
+                    string[] errorCol = info.Replace("VISDBERRORCOLUMN: ", "").Split(',');
+                    var fldList = m_fields.Where(a => errorCol.Contains(a.ColumnName.ToUpper())).ToList();
+                    for(int i=0; i< fldList.Count(); i++)
+                    {
+                        finalColumn += fldList[i].Name;
+                        if (fldList.Count() != (i+1))
+                        {
+                            finalColumn += " and ";
+                        }
+                    }
+                    info = finalColumn;
+                }
+
                 outt.IsError = true;
                 outt.FireEEvent = true;
                 outt.EventParam = new EventParamOut() { Msg = msg, Info = info, IsError = true };

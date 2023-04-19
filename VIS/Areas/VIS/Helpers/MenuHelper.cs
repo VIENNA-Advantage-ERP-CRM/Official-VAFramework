@@ -558,7 +558,7 @@ namespace VIS.Helpers
                 h += "<li  data-value='" + id + "' data-summary='N'>" +
                     "<a href='javascript:void(0)' data-value='" + id + "' data-action='" + action + "' data-actionid =" + aid + "> ";
 
-                h += "<span " + GetSpanClass(img);
+                h += "<span style='font-size:11px;margin-right:5px'" + GetSpanClass(img);
 
                 if (_ctx.GetIsRightToLeft())
                 {
@@ -661,6 +661,8 @@ namespace VIS.Helpers
                     return "class = 'fa fa-clone'";
                 case "D":
                     return "class = 'fa fa-clone'";
+                case "O":
+                    return "class = 'fa fa-circle'";
                 default:
                     return "class = 'fa fa-clone'";
             }

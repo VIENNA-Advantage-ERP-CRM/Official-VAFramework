@@ -565,6 +565,9 @@ namespace VIS.Classes
                 + " AND t.IsActive='Y' AND tab.IsActive='Y' "
                 + " ORDER BY 2";
 
+            queryList.VIS_155 = "SELECT AD_Tree_Product_ID FROM AD_OrgInfo WHERE AD_Org_ID=@AD_Org_ID";
+
+            queryList.VIS_156 = "SELECT AD_Tree_BPartner_ID FROM AD_OrgInfo WHERE AD_Org_ID=@AD_Org_ID";
         }
 
 
