@@ -682,13 +682,14 @@ namespace VAdvantage.WF
                         nodes[i].SetIsActive(IsActive());
                         changed = true;
                     }
-                    if (nodes[i].IsCentrallyMaintained())
-                    {
-                        nodes[i].SetName(GetName());
-                        nodes[i].SetDescription(GetDescription());
-                        nodes[i].SetHelp(GetHelp());
-                        changed = true;
-                    }
+                    // Commented to not overwrite node names from workflow header
+                    //if (nodes[i].IsCentrallyMaintained())
+                    //{
+                    //    nodes[i].SetName(GetName());
+                    //    nodes[i].SetDescription(GetDescription());
+                    //    nodes[i].SetHelp(GetHelp());
+                    //    changed = true;
+                    //}
                     if (changed)
                         nodes[i].Save();
                 }
