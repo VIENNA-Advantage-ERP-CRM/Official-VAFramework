@@ -2194,7 +2194,7 @@ center {
 
     .vis-padding-slider::-webkit-slider-thumb {
         -webkit-appearance: none !important;
-        background-color: #fff !important;
+        background-color: rgba(var(--v-c-common), 1) !important;
         width: 20px !important;
         height: 20px !important;
         border-radius: 50% !important;
@@ -2230,11 +2230,11 @@ center {
 
     .vis-slider-fontsz-ran-input::-webkit-slider-thumb {
         -webkit-appearance: none !important;
-        background-color: #fff !important;
+        background-color: rgba(var(--v-c-common), 1) !important;
         width: 18px !important;
         height: 18px !important;
         border-radius: 50% !important;
-        border: 2px solid #848484 !important;
+        border: 2px solid rgba(var(--v-c-on-secondary), 1) !important;
     }
 
 .vis-borderBottomH {
@@ -2412,7 +2412,7 @@ center {
         width: 5px;
         height: 22px;
         border-radius: 10px;
-        background: #e5e5e5;
+        background: rgba(var(--v-c-on-secondary), 0.2);
         position: relative;
         pointer-events: auto;
     }

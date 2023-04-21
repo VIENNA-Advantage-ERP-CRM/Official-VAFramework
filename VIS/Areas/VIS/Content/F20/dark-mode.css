@@ -557,7 +557,8 @@ textarea.k-textbox:hover,
     background: rgba(var(--v-c-on-secondary), .2)
 }
 .k-picker-wrap.k-state-hover,
-.k-state-default.k-state-hover > .k-select {
+.k-state-default.k-state-hover > .k-select
+ {
     background: rgba(var(--v-c-on-secondary), .2) !important;
 }
 .vis-ev-col input[readonly] {
@@ -616,4 +617,69 @@ a.text-dark:focus,
 a.text-dark:hover,
 .text-dark {
     color: rgba(var(--v-c-dark), 1) !important;
+}
+
+/* WSP CSS START */
+.wsp-task-form .form-control {
+    background-color: rgb(var(--v-c-bg-color)) !important;
+}
+
+.wsp-profile_big_img {
+    background: rgba(var(--v-c-secondary), 1) !important;
+}
+
+.wsp-dots,
+.wsp-dots > a {
+    background: rgba(var(--v-c-on-secondary), .2) !important;
+}
+
+.wsp-sear {
+    background: rgba(var(--v-c-secondary), .6);
+}   
+
+.wsp-cnt-topsearchwrp input {
+    background: rgba(var(--v-c-secondary), .4);
+}
+/* WSP CSS END */
+
+/* DMS CSS START */
+.vadms-emailReceiverFilter .nav-link {
+    background: rgba(var(--v-c-on-secondary), .2) !important;
+}
+
+.vadms-dropIcon:hover {
+    background-color: rgba(var(--v-c-on-secondary), .1);
+}
+
+.vadms-showmessage {
+    color: rgba(var(--v-c-common), 1);
+}
+/* DMS CSS END */
+
+/* FRPT and payment form CSS START */
+input.frpt-dbbutton,
+.frpt-dbbutton,
+.frpt-frf-top-right > .frpt-fr-addRepline-icon,
+.frpt-filter-dialog .frpt-acc-btns span,
+ul.VA009-tabs > li,
+ul.VA009-right-tabs > li,
+.VA009-cross-btn,
+.VDIU-DefaultBtn {
+    background-color: rgba(var(--v-c-on-secondary), .3) !important;
+}
+/* FRPT and payment form CSS END */
+
+/*DTD*/
+.DTD001-clf-popup .w2ui-toolbar table.w2ui-button.checked {
+    border: 1px solid rgba(var(--v-c-on-secondary), .2);
+    background-color: rgba(var(--v-c-common), 1);
+}
+.w2ui-overlay .w2ui-col-on-off table tr:hover {
+    background-color: rgba(var(--v-c-primary), .2);
+}
+/*DTD form CSS END*/
+
+.w2ui-toolbar table.w2ui-button .w2ui-tb-caption,
+.w2ui-toolbar table.w2ui-button.over .w2ui-tb-caption {
+    color: rgba(var(--v-c-on-secondary), 1);
 }
