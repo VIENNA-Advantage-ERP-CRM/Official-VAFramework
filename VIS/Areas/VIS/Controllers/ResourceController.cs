@@ -205,7 +205,7 @@ namespace VIS.Controllers
             _ctx.SetContext("DMS_Form_ID", AD_Form_ID);
         }
 
-        internal string GetThemeInfo(Ctx _ctx)
+        public string GetThemeInfo(Ctx _ctx)
         {
             string thms = "";
 
