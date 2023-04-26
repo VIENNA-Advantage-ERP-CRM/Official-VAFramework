@@ -369,7 +369,7 @@
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
             this.aPrint = this.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
-
+            this.aBatchUpdate = this.addActions("BatchUpdate", null, true, false, false, onAction, null, "Shct_New");
             //Ndw Back button
             this.aBack = this.addActions("Back", null, true, true, false, onAction, null, "Shct_Back");
             $ulToobar.append(this.aBack.getListItm());
@@ -380,6 +380,7 @@
             $ulToobar.append(this.aRefresh.getListItm());
             $ulToobar.append(this.aReport.getListItm());
             $ulToobar.append(this.aPrint.getListItm());
+            $ulToobar.append(this.aBatchUpdate.getListItm());
 
 
 
@@ -2064,6 +2065,9 @@
         else if (tis.aFind.getAction() === action) {
             tis.cmd_finddialog();
         }
+        else if (tis.aBatchUpdate.getAction() === action) {
+            tis.cmd_batchUpdatedialog();
+        }
         else if (tis.aChat && tis.aChat.getAction() === action) {
             tis.cmd_chat();
         }
@@ -3045,6 +3049,7 @@
             this.aNew.setEnabled(false);
             this.aDelete.setEnabled(false);
             this.aFind.setEnabled(false);
+            this.aBatchUpdate.setEnabled(false);
             this.aRefresh.setEnabled(false);
             this.aNext.setEnabled(false);
             this.aLast.setEnabled(false);
@@ -3067,6 +3072,7 @@
             this.aCard.setEnabled(true);
             this.aCardDialog.setEnabled(true);
             this.aFind.setEnabled(true);
+            this.aBatchUpdate.setEnabled(true);
             this.aRefresh.setEnabled(true);
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);
@@ -4179,6 +4185,18 @@
             self = null;
         };
         find.show();
+
+    };
+
+    APanel.prototype.cmd_batchUpdatedialog = function () {
+
+        var bUpdate = new VIS.BatchUpdate(this.curWindowNo, this.curTab, 0);
+        var self = this;
+        var savedSearchName = "";
+        bUpdate.onClose = function () {
+          
+        };
+        bUpdate.show();
 
     };
 

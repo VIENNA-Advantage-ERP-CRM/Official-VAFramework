@@ -95,6 +95,7 @@ namespace VIS
                 "~/Areas/VIS/Scripts/app/forms/generatexmodel.js",
 
                 "~/Areas/VIS/Scripts/app/Framework/find.js",
+                "~/Areas/VIS/Scripts/app/Framework/batchUpdate.js",
                 "~/Areas/VIS/Scripts/app/azoomacross.js",
                 "~/Areas/VIS/Scripts/app/Framework/sms.js",
                  "~/Areas/VIS/Scripts/app/arequest.js",

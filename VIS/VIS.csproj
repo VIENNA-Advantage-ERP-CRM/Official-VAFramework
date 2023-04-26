@@ -643,6 +643,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\archiveviewer.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentHistory.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\batchUpdate.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\bpartner.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\cardTemplateMaster.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\cardviewdialog.js" />
