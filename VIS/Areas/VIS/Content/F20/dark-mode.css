@@ -546,6 +546,7 @@ textarea.k-textbox:hover,
     border-bottom: 5px solid transparent !important;
     border-left: 5px solid rgba(var(--v-c-on-secondary), 1) !important;
 }
+
 .k-minus {
     transform: rotate(45deg);
 }
@@ -553,11 +554,23 @@ textarea.k-textbox:hover,
     fill: rgba(var(--v-c-secondary), 1) !important;
 }
 .vis-primary-btn-one,
-.k-alt, .k-pivot-layout > tbody > tr:first-child > td:first-child, .k-resource.k-alt, .k-separator {
+.k-alt,
+.k-pivot-layout > tbody > tr:first-child > td:first-child,
+.k-resource.k-alt,
+.k-separator {
     background: rgba(var(--v-c-on-secondary), .2)
 }
 .k-picker-wrap.k-state-hover,
-.k-state-default.k-state-hover > .k-select
+.k-state-default.k-state-hover > .k-select,
+ul.VA005-tabs > li:not(.VA005-selectedTab),
+ul.VA011-tabs > li:not(.VA011-selectedTab),
+.VA011-clsDIV i,
+.VA015-clsDIV i,
+.VA016-btnicon:not(.VA016-btnwarehouse),
+.VA016-left-tabs a:not(.tab-active),
+.str-btn-left,
+.VA016-grayBtn,
+.VA016-blueBtn
  {
     background: rgba(var(--v-c-on-secondary), .2) !important;
 }
@@ -590,14 +603,17 @@ textarea.k-textbox:hover,
 .k-grouping-header,
 .k-grid-footer td, .k-group-footer td, .k-grouping-row td,
 .dxrControl, .dxrControl a,
-.address-close-icon {
+.address-close-icon,
+.ui-widget-content {
     color: rgb(var(--v-c-on-secondary)) !important;
 }
 .k-other-month .k-link {
     color: rgba(var(--v-c-on-secondary), .5) !important;
 }
-.popover {
-    background-color: rgba(var(--v-c-common), 1);
+.popover,
+.VA015-Info-left,
+.VA015-Info-right {
+    background-color: rgba(var(--v-c-common), 1) !important;
 }
 .bs-popover-right .arrow::after {
     border-right-color: rgba(var(--v-c-common), 1);
@@ -670,7 +686,8 @@ ul.VA009-right-tabs > li,
 /* FRPT and payment form CSS END */
 
 /*DTD*/
-.DTD001-clf-popup .w2ui-toolbar table.w2ui-button.checked {
+.DTD001-clf-popup .w2ui-toolbar table.w2ui-button.checked,
+.w2ui-toolbar table.w2ui-button.checked {
     border: 1px solid rgba(var(--v-c-on-secondary), .2);
     background-color: rgba(var(--v-c-common), 1);
 }
@@ -682,4 +699,10 @@ ul.VA009-right-tabs > li,
 .w2ui-toolbar table.w2ui-button .w2ui-tb-caption,
 .w2ui-toolbar table.w2ui-button.over .w2ui-tb-caption {
     color: rgba(var(--v-c-on-secondary), 1);
+}
+a.VA003-edit-icon,
+a.VA003-toggle-icon,
+a.VA003-info-icon,
+ul.VA003-topRight-icons > li > a {
+    background-color: rgba(var(--v-c-on-secondary), .2) !important;
 }
