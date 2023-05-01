@@ -703,6 +703,12 @@ ul.VA009-right-tabs > li,
 a.VA003-edit-icon,
 a.VA003-toggle-icon,
 a.VA003-info-icon,
-ul.VA003-topRight-icons > li > a {
+ul.VA003-topRight-icons > li > a,
+.vaicnt-scan-no .calculator .left:hover,
+.vaicnt-notDisableBtn,
+.vaicnt-inventory-btn {
     background-color: rgba(var(--v-c-on-secondary), .2) !important;
+}
+.vaicnt-scan-no .calculator .left {
+    background-color: rgba(var(--v-c-on-secondary), .5) !important;
 }
