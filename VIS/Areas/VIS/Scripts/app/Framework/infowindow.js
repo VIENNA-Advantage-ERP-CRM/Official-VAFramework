@@ -1029,6 +1029,7 @@
                 oColumn.caption = schema[item].Name;
                 oColumn.field = dynData[item].ColumnName.toUpperCase();
                 oColumn.columnName = dynData[item].ColumnName.toUpperCase();
+                oColumn.origColName = dynData[item].ColumnName;
                 oColumn.sortable = true;
                 oColumn.hidden = !schema[item].IsDisplayed;
                 oColumn.size = '100px';
@@ -1266,6 +1267,10 @@
             for (item in selection) {
                 if (multiValues.indexOf(w2ui[grdname].get(selection[item])[keyCol]) == -1) {
                     multiValues.push(w2ui[grdname].get(selection[item])[keyCol]);
+                }
+                var columns = w2ui[grdname].columns;
+                for (col in columns) { //Set All Col Value in Context 
+                    VIS.Env.getCtx().setContext(windowNo, VIS.EnvConstants.TAB_INFO, columns[col].origColName, w2ui[grdname].get(selection[item])[columns[col].columnName]);
                 }
             }
 
