@@ -295,7 +295,8 @@ namespace VAdvantage.Print
                     {
                         if (ColumnSQL.Length > 0)
                         {
-                            //log.warning(ColumnName + " - virtual column not allowed with this Display type");
+                           
+                            log.Warning(ColumnName + " - virtual column not allowed with this Display type");
                             continue;
                         }
                         //  Creates Embedded SQL in the form
@@ -325,6 +326,7 @@ namespace VAdvantage.Print
                     {
                         if (ColumnSQL.Length > 0)
                         {
+                            log.Warning(ColumnName + " - virtual column not allowed with this Display type");
                             continue;
                         }
                         TableReference tr = GetTableReference(AD_Reference_Value_ID);
@@ -375,7 +377,7 @@ namespace VAdvantage.Print
                     {
                         if (ColumnSQL.Length > 0)
                         {
-                            //log.warning(ColumnName + " - virtual column not allowed with this Display type");
+                            log.Warning(ColumnName + " - virtual column not allowed with this Display type");
                             continue;
                         }
                         if (Env.IsBaseLanguage(_language, "AD_Ref_List"))
@@ -433,7 +435,7 @@ namespace VAdvantage.Print
                     {
                         if (ColumnSQL.Length > 0)
                         {
-                            //log.warning(ColumnName + " - virtual column not allowed with this Display type");
+                            log.Warning(ColumnName + " - virtual column not allowed with this Display type");
                             continue;
                         }
                         //	TableName, DisplayColumn

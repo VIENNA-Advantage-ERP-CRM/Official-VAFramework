@@ -97,7 +97,7 @@
                 || displayType == VIS.DisplayType.TextLong || displayType == VIS.DisplayType.Memo
                 || displayType == VIS.DisplayType.FilePath || displayType == VIS.DisplayType.FileName
                 || displayType == VIS.DisplayType.URL || displayType == VIS.DisplayType.PrinterName
-                || displayType == VIS.DisplayType.TelePhone )
+                || displayType == VIS.DisplayType.TelePhone || displayType == VIS.DisplayType.Color)
                 return true;
             return false;
         },
@@ -124,7 +124,7 @@
             if (displayType == VIS.DisplayType.ID || displayType == VIS.DisplayType.Table || displayType == VIS.DisplayType.TableDir
                 || displayType == VIS.DisplayType.Search || displayType == VIS.DisplayType.Location || displayType == VIS.DisplayType.Locator
                 || displayType == VIS.DisplayType.Account || displayType == VIS.DisplayType.Assignment || displayType == VIS.DisplayType.PAttribute
-                || displayType == VIS.DisplayType.Image || displayType == VIS.DisplayType.Color || displayType == VIS.DisplayType.AmtDimension || displayType == VIS.DisplayType.ProductContainer)
+                || displayType == VIS.DisplayType.Image ||  displayType == VIS.DisplayType.AmtDimension || displayType == VIS.DisplayType.ProductContainer)
                 return true;
             return false;
         },
@@ -217,8 +217,15 @@
                 ctrl = btn;
             }
 
-            if (displayType == VIS.DisplayType.TelePhone) {
+            else if (displayType == VIS.DisplayType.TelePhone) {
                 var txt = new VTelePhone(columnName, isMandatory, isReadOnly, isUpdateable, mField.getDisplayLength(), mField.getFieldLength(),
+                    mField.getVFormat(), mField.getObscureType(), mField.getIsEncryptedField());
+                txt.setField(mField);
+                ctrl = txt;
+            }
+
+            else if (displayType == VIS.DisplayType.Color) {
+                var txt = new VColor(columnName, isMandatory, isReadOnly, isUpdateable, mField.getDisplayLength(), mField.getFieldLength(),
                     mField.getVFormat(), mField.getObscureType(), mField.getIsEncryptedField());
                 txt.setField(mField);
                 ctrl = txt;
@@ -2562,6 +2569,11 @@
                         }, 500);
                     } else {
                         self.setValue(item.id, true, true);
+                        if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
+                            setTimeout(function () {
+                                self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, item.id);
+                            }, 500);
+                        }
                     }
                 }
             });
@@ -4255,8 +4267,12 @@
         };
 
         $btnMap.on(VIS.Events.onClick, function (e) {
-            var url = "http://local.google.com/maps?q=" + self.getDisplay();
-            window.open(url);
+            //var url = "http://local.google.com/maps?q=" + self.getDisplay();
+            //window.open(url);
+            // On click map icon from control, switch to map view and show that location.
+            if (self.getField().gridTab && self.getField().gridTab.mDataListenerList) {
+                self.getField().gridTab.mDataListenerList[0].switchMapRow(self.value);
+            }
             e.stopPropagation();
         });
 
@@ -6579,7 +6595,9 @@
 
         $ctrl.append($oputput).append($rangeCtrl);
 
+
         IControl.call(this, $ctrl, controlDisplayType, isReadOnly, columnName, isMandatory);        
+
         this.rangeCtrl = $rangeCtrl;
         this.oputput = $oputput;
         $oputput.text(0);
@@ -7037,6 +7055,89 @@
     };
     //END VTelephone
 
+    //start color
+    function VColor(columnName, isMandatory, isReadOnly, isUpdateable, displayLength, fieldLength, vFormat, obscureType, isPwdField) {
+
+        var displayType = VIS.DisplayType.Color;
+        this.obscureType = obscureType;
+        var src = "fa fa-phone";
+        //Init Control
+
+        var $ctrl = $('<input>', { type: 'color', name: columnName, maxlength: fieldLength });
+        var $btnSearch = $('<button class="input-group-text"><i class="' + src + '" /></button>');
+        // if (!isReadOnly)
+        //   $ctrl.append($btnSearch);
+        var telCtrl = $ctrl;
+        //Call base class
+        IControl.call(this, $ctrl, displayType, isReadOnly, columnName, isMandatory);
+
+        if (isReadOnly || !isUpdateable) {
+            this.setReadOnly(true);
+        }
+        else {
+            this.setReadOnly(false);
+        }
+
+        this.getBtn = function (index) {
+            if (index == 0) {
+                //this.setReadOnly(true);
+                return $btnSearch;
+            }
+        };
+
+        this.getBtnCount = function () {
+
+            //if (!this.editingGrid)
+            //    return 1;
+            return 0;
+        };
+
+        var self = this; //self pointer
+
+        /* Event */
+        $ctrl.on("change", function (e) {
+            e.stopPropagation();
+            //var newVal = $ctrl.val();
+            var newVal =  self.ctrl.val();
+            this.value = newVal;
+            if (newVal !== self.oldValue) {
+                var evt = { newValue: newVal, propertyName: self.getName() };
+                self.fireValueChanged(evt);
+                evt = null;
+            }
+            if (obscureType) {
+                self.setReadOnly(true);
+            }
+        });
+
+        $ctrl.on("blur", function (e) {
+            // $ctrl.unmask();
+        });
+
+
+        $btnSearch.on("click", function () {
+            
+        });
+
+        this.disposeComponent = function () {
+            $ctrl.off("change"); //u bind event
+            $ctrl = null;
+            self = null;
+        }
+
+    };
+
+    VIS.Utility.inheritPrototype(VColor, IControl);//Inherit from IControl
+
+    VColor.prototype.setValue = function (newValue) {
+        if (this.oldValue != newValue) {
+            this.ctrl.val(newValue);
+            this.oldValue = newValue;
+        }
+    };
+    
+    //end color 
+
 
     /* NameSpace */
     VIS.Controls.IControl = IControl;
@@ -7063,6 +7164,7 @@
     VIS.Controls.VProgressBar = VProgressBar;
     VIS.Controls.VSpan = VSpan;
     VIS.Controls.VTelePhone = VTelePhone;
+    VIS.Controls.VColor = VColor;
 /* END */
 
 

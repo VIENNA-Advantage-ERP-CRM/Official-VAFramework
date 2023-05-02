@@ -47,12 +47,12 @@ namespace VIS.Models
         /// </summary>
         /// <param name="locationId"></param>
         /// <returns></returns>
-        public LocationModel GetAddressfromDataBase(string locationId,Ctx ctx)
+        public LocationModel GetAddressfromDataBase(string locationId, Ctx ctx)
         {
-            LocationModel obj = new LocationModel();            
-            string sql="";
+            LocationModel obj = new LocationModel();
+            string sql = "";
 
-                // Check applied by mohit - asked by mukesh sir - to check if login langauge is base language - then pick non translated data.
+            // Check applied by mohit - asked by mukesh sir - to check if login langauge is base language - then pick non translated data.
             if (Env.IsBaseLanguage(ctx, ""))
             {
                 sql = "SELECT L.ADDRESS1,L.ADDRESS2,L.ADDRESS3,L.ADDRESS4,L.CITY,L.REGIONNAME ,L.POSTAL,L.POSTAL_ADD,CN.NAME AS COUNTRY,L.AD_CLIENT_ID,L.AD_ORG_ID,L.C_CITY_ID," +
@@ -181,12 +181,99 @@ namespace VIS.Models
             return _location;
         }
 
+        public MLocation UpdateLocation(Ctx ctx, Dictionary<string, string> Address, int C_Location_ID)
+        {
+
+            /*
+             city
+: 
+"Sahibzada Ajit Singh Nagar"
+country
+: 
+"India"
+home
+: 
+"332"
+postal_code
+: 
+"140308"
+region
+: 
+"Punjab"
+street
+: 
+"Industrial Area , Industrial Area Mohali Phase 9"
+
+             */
+
+            MLocation loc = new MLocation(ctx, C_Location_ID, null);
+
+
+            //MRegion.Get()
+
+            if (!string.IsNullOrEmpty(Address["home"]) && !string.IsNullOrEmpty(Address["street"]))
+            {
+                loc.SetAddress1(Address["home"] + ", " + Address["street"]);
+            }
+            else if (!string.IsNullOrEmpty(Address["home"]))
+            {
+                loc.SetAddress1(Address["home"]);
+            }
+            else if (!string.IsNullOrEmpty(Address["street"]))
+            {
+                loc.SetAddress1(Address["street"]);
+            }
+            loc.SetPostal(Address["postal_code"]);
+
+            if (Address["region"] != null && Address["region"] != "")
+            {
+                string SQL = "SELECT C_REGION_ID FROM C_Region WHERE Upper(Name)='" + Address["region"].ToUpper() + "'";
+                object reginID = DB.ExecuteScalar(SQL);
+                if (reginID != null && reginID != DBNull.Value)
+                {
+                    loc.SetC_Region_ID(Util.GetValueOfInt(reginID));
+                }
+                else
+                {
+                    loc.SetRegionName(Address["region"]);
+                }
+            }
+
+            if (Address["city"] != null && Address["city"] != "")
+            {
+                string SQL = "SELECT C_City_ID FROM C_City WHERE Upper(Name)='" + Address["city"].ToUpper() + "'";
+                object cityID = DB.ExecuteScalar(SQL);
+                if (cityID != null && cityID != DBNull.Value)
+                {
+                    loc.SetC_City_ID(Util.GetValueOfInt(cityID));
+                }
+                else
+                {
+                    loc.SetCity(Address["city"]);
+                }
+            }
+
+
+            if (Address["country"] != null && Address["country"] != "")
+            {
+                string SQL = "SELECT C_Country_ID FROM C_Country WHERE Upper(Name)='" + Address["country"].ToUpper() + "'";
+                object countryID = DB.ExecuteScalar(SQL);
+                if (countryID != null && countryID != DBNull.Value)
+                {
+                    loc.SetC_Country_ID(Util.GetValueOfInt(countryID));
+                }
+            }
+            loc.Save();
+            return loc;
+
+        }
+
         /// <summary>
         /// Country search
         /// </summary>
         /// <param name="name_startsWith"></param>
         /// <returns></returns>
-        public List<KeyNamePair> GetCountryByText(string name_startsWith,Ctx ctx)
+        public List<KeyNamePair> GetCountryByText(string name_startsWith, Ctx ctx)
         {
             List<KeyNamePair> obj = new List<KeyNamePair>();
             string sqlquery = "";
@@ -244,7 +331,7 @@ namespace VIS.Models
         /// <returns></returns>
         public List<LocationAddress> GetAddressesSearch(Ctx ctx, string name_startsWith)
         {
-            List<LocationAddress> obj = new List<LocationAddress>();            
+            List<LocationAddress> obj = new List<LocationAddress>();
             string sqlquery = "";
             #region Commentedny Mohit
             //if (Env.IsBaseLanguage(ctx, ""))
@@ -360,7 +447,7 @@ namespace VIS.Models
             return locData;
         }
         // Change By Mohit - To get country from login langauge on location form.
-        public DefaultCountry GetCountryName(string AD_language,Ctx ctx)
+        public DefaultCountry GetCountryName(string AD_language, Ctx ctx)
         {
             DefaultCountry obj = new DefaultCountry();
             DataSet _ds = null;

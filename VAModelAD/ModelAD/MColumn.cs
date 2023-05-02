@@ -578,6 +578,16 @@ namespace VAdvantage.Model
         /// <returns></returns>
         protected override bool BeforeSave(bool newRecord)
         {
+            if (IsMaintainVersions())
+            {
+                string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + GetAD_Table_ID(), null, Get_Trx()));
+                if (tableName.ToLower().EndsWith("_ver"))
+                {
+                    log.SaveError("CanNotCreateVersionTbl", Utility.Msg.GetElement(GetCtx(), "CanNotCreateVersionTbl"));
+                    return false;
+                }
+            }
+
             if (!CheckVersions(false))
                 return false;
 

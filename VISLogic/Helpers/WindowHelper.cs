@@ -1214,10 +1214,11 @@ namespace VIS.Helpers
                 OrigPO.CopyTo(po);
                 MTable tblParent = new MTable(ctx, AD_Table_ID, trx);
                 hasSingleKey = tblParent.IsSingleKey();
-                po.SetMasterDetails(versionInfo);
                 po.SetAD_Window_ID(Ver_Window_ID);
                 if (!SetFields(ctx, po, m_fields, inn, outt, Record_ID, hasDocValWF, true, hasSingleKey, versionInfo.IsLatestVersion))
                     return;
+                versionInfo.ImmediateSave = inn.ImmediateSave;
+                po.SetMasterDetails(versionInfo);
             }
             else
                 if (!SetFields(ctx, po, m_fields, inn, outt, Record_ID, hasDocValWF, false, hasSingleKey, false))
@@ -1263,6 +1264,23 @@ namespace VIS.Helpers
                 {
                     msg += Msg.GetMsg(ctx, "MaintainVersionError");
                 }
+
+                if (info.IndexOf("VISDBERRORCOLUMN:") > -1)
+                {
+                    string finalColumn = "";
+                    string[] errorCol = info.Replace("VISDBERRORCOLUMN: ", "").Split(',');
+                    var fldList = m_fields.Where(a => errorCol.Contains(a.ColumnName.ToUpper())).ToList();
+                    for(int i=0; i< fldList.Count(); i++)
+                    {
+                        finalColumn += fldList[i].Name;
+                        if (fldList.Count() != (i+1))
+                        {
+                            finalColumn += " and ";
+                        }
+                    }
+                    info = finalColumn;
+                }
+
                 outt.IsError = true;
                 outt.FireEEvent = true;
                 outt.EventParam = new EventParamOut() { Msg = msg, Info = info, IsError = true };
@@ -1859,13 +1877,13 @@ namespace VIS.Helpers
             if (VersionRecord)
             {
                 if (inn.ValidFrom != null)
-                    po.Set_Value("VersionValidFrom", inn.ValidFrom.Value);
+                    po.Set_Value("VersionValidFrom", inn.ValidFrom.Value.ToUniversalTime());
 
                 po.Set_Value("IsVersionApproved", true);
                 if (inn.ImmediateSave)
                 {
                     po.Set_Value("ProcessedVersion", true);
-                    po.Set_Value("VersionValidFrom", System.DateTime.Now);
+                    po.Set_Value("VersionValidFrom", System.DateTime.Now.ToUniversalTime());
                 }
                 // Only increase record version if Version do not exist for same date
                 if (po.Get_ID() <= 0)
@@ -1934,6 +1952,8 @@ namespace VIS.Helpers
                         inn.ImmediateSave = true;
                     else if (IsBackDateVersion(inn.ValidFrom.Value) && isLatestVersion)
                     {
+                        if (!HasDocValWF)
+                            inn.ImmediateSave = true;
                         po.Set_Value("ProcessedVersion", true);
                     }
                 }

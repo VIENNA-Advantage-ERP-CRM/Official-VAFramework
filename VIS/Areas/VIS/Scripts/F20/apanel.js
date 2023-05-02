@@ -1321,7 +1321,7 @@
     APanel.prototype.ACTION_NAME_ARCHIVE = "Archive";
 
     APanel.prototype.keyDown = function (evt) {
-        if (evt.altKey && this.curGC) {
+        if (!evt.ctrlKey && evt.altKey && this.curGC) {
             var en = this.aNew.getIsEnabled();
             switch (evt.keyCode) {
                 case 78:      //N for ADD
@@ -1439,6 +1439,9 @@
             this.actionPerformed(this.aHelp.getAction());
             evt.preventDefault();
             evt.stopPropagation();
+        } else {
+            if (this.vTabbedPane && this.vTabbedPane.keyDown)
+                this.vTabbedPane.keyDown(evt);
         }
     }
 
@@ -1660,7 +1663,7 @@
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
                         this.vHeaderPanel = gc.vHeaderPanel; // set in parent class , so it is accessible in all GC
-                        if (gTab.isHPanelNotShowInMultiRow && !gTab.getIsSingleRow()) {
+                        if (gTab.isHPanelNotShowInMultiRow && gTab.getTabLayout() != "Y") {
                             gc.vHeaderPanel.hidePanel();
                             if (gc.vHeaderPanel.sizeChangedListner && gc.vHeaderPanel.sizeChangedListner.onSizeChanged)
                                 gc.vHeaderPanel.sizeChangedListner.onSizeChanged();
@@ -2954,7 +2957,7 @@
 
         curEle.setVisible(false);
         curEle.getRoot().detach();
-        this.getLayout().append(tabEle.getRoot());
+        this.getLayout().prepend(tabEle.getRoot());
         tabEle.setVisible(true);
 
         this.vTabbedPane.setSelectedTab(action); //set Seleted tab

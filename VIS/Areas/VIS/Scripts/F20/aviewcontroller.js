@@ -45,7 +45,7 @@
 
 
         getDataSetJString(dataIn, async, function (jString) {
-           var dataSet = new VIS.DB.DataSet().toJson(jString);
+            var dataSet = new VIS.DB.DataSet().toJson(jString);
             var dataSet = new VIS.DB.DataSet().toJson(jString);
             if (dataSet.getTable(0).getRows().length > 0) {
                 value = dataSet.getTable(0).getRow(0).getCell(0);
@@ -599,12 +599,28 @@
 
         if (mTab.getIsTreeTab()) {
             //, Name
-            var sql = "VIS_120";
 
+            // VIS0008 Changes done to pick Tree for Product and Business Partner from Organization Info
+            var sql = "";
             var param = [];
-            param[0] = new VIS.DB.SqlParam("@AD_Client_ID", VIS.Env.getCtx().getAD_Client_ID());
-            param[1] = new VIS.DB.SqlParam("@AD_Table_ID", mTab.getAD_Table_ID());
-            AD_Tree_ID = executeScalar(sql, param);
+            var _tbl_ID = mTab.getAD_Table_ID();
+            // Fixed for BPartner and Product tables
+            if (_tbl_ID == 208 || _tbl_ID == 291) {
+                if (_tbl_ID == 208)
+                    sql = "VIS_155";
+                else
+                    sql = "VIS_156";
+                param[0] = new VIS.DB.SqlParam("@AD_Org_ID", VIS.Env.getCtx().getAD_Org_ID());
+                AD_Tree_ID = VIS.Utility.Util.getValueOfInt(executeScalar(sql, param));
+                param = [];
+            }
+
+            if (AD_Tree_ID == 0) {
+                sql = "VIS_120";
+                param[0] = new VIS.DB.SqlParam("@AD_Client_ID", VIS.Env.getCtx().getAD_Client_ID());
+                param[1] = new VIS.DB.SqlParam("@AD_Table_ID", _tbl_ID);
+                AD_Tree_ID = executeScalar(sql, param);
+            }
 
             //if (AD_Tree_ID > 0) {
             //    this.m_tree = new VIS.TreePanel(curWindowNo, false, true);
@@ -688,7 +704,7 @@
         else if (defaultTabLayout == TABLAYOUT_SingleRowLayout)
             this.switchSingleRow(true);
         else if (defaultTabLayout == TABLAYOUT_CardViewLayout) {
-            this.isCardRow = false;           
+            this.isCardRow = false;
             this.switchCardRow(true);
         }
 
@@ -1217,6 +1233,9 @@
         //  We Have a TreeNode
         var nodeID = value;
         this.treeNodeID = nodeID;
+        //this.selectedTreeNode = nodeID;
+        this.gTab.SetSelectedNode(nodeID);
+        this.gTab.SetIsSummaryNode(e.isSummaryNode);
         if (this.onDemandTree) {
 
             if (this.aPanel && this.aPanel.setBusy) {
@@ -1454,8 +1473,14 @@
 
         //  nothing to do
         //console.log(!force);
-        if (!force && tRow == this.gTab.getCurrentRow())
+        //  new position
+        //var recid = this.gTab.navigate(tRow, true, force);
+
+        if (!force && tRow == this.gTab.getCurrentRow()) {
+            //if (this.m_tree != null)
+            //    this.navigateTreeNode(tRow);
             return this.gTab.getCurrentRow();
+        }
 
         //  new position
         var recid = this.gTab.navigate(tRow, true, force);
@@ -1476,7 +1501,7 @@
         if (this.vHeaderPanel) {
             this.vHeaderPanel.navigate();
         }
-       
+
 
         if (recid == -1) {
             this.cancelSel = true;
@@ -1487,8 +1512,20 @@
         }
         //treeselectin
         //	TreeNavigation - Synchronize 	-- select node in tree
-        if (this.m_tree != null)
+        this.navigateTreeNode(tRow);
+
+
+        return this.gTab.getCurrentRow();
+    };
+
+    VIS.GridController.prototype.navigateTreeNode = function (tRow) {
+        //treeselectin
+        //	TreeNavigation - Synchronize 	-- select node in tree
+        if (this.m_tree != null) {
             this.m_tree.setSelectedNode(this.gTab.getRecord_ID());	//	ignores new (-1)
+
+            this.gTab.SetIsSummaryNode(this.m_tree.isSummaryNode);
+        }
 
         this.vTable.scrollInView(tRow);
 
@@ -1514,8 +1551,6 @@
             });
         }
 
-
-        return this.gTab.getCurrentRow();
     };
 
     VIS.GridController.prototype.navigatePageExact = function (newPage) {
@@ -1557,6 +1592,7 @@
 
         if (this.m_tree != null) {
             this.gTab.SetSelectedNode(this.m_tree.currentNode);
+            this.gTab.setTreeID(this.treeID);
         }
 
 
@@ -1647,6 +1683,9 @@
         var summary = IsSummary == true || IsSummary == "Y";
         var imageIndicator = this.gTab.getValue("Action");  //  Menu - Action
         //
+        if (this.gTab.gridTable.columns.indexOf("Action") == -1 && !imageIndicator && !summary)
+            imageIndicator = "O";
+
         this.m_tree.nodeChanged(save, keyID, name, description,
             summary, imageIndicator);
     };  //  rowChanged
@@ -1781,10 +1820,10 @@
         if (this.aPanel.getTabSuffix() == 'b') {
             this.aPanel.getLayout().removeClass('vis-ad-w-p-center-view-height');
             this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "unset");
-        } 
+        }
     };
 
-    VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {        
+    VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {
         if (this.singleRow || this.isCardRow) {
 
             //if (this.isCardRow && !this.isNewClick) {
@@ -1830,7 +1869,7 @@
             //    this.query(0, 0, null);
             //}
             this.isNewClick = false;
-           
+
         }
 
     };
@@ -1865,14 +1904,14 @@
                 this.getMTab().setQuery(query);
                 this.query(this.gTab.getOnlyCurrentDays(), 0, false);
             }
-                //this.vCardView.requeryData();
-            
-            
+            //this.vCardView.requeryData();
+
+
             p1 = null;
         }
     };
 
-    VIS.GridController.prototype.switchMapRow = function () {
+    VIS.GridController.prototype.switchMapRow = function (locationID) {
         if (!this.isMapRow) {
 
             this.singleRow = true;
@@ -1893,7 +1932,7 @@
             else p1.css({ "float": '' });
 
             p1.show();
-            this.vMapView.refreshUI(this.getVMapPanel().width());
+            this.vMapView.refreshUI(this.getVMapPanel().width(), locationID);
             p1 = null;
             //this.vTable.resize();
         }
