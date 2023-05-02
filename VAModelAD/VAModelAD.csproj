@@ -36,7 +36,7 @@
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="BaseLibrary">
-      <HintPath>..\ViennaAdvantageWeb\Dll\BaseLibrary.dll</HintPath>
+      <HintPath>..\..\VABaseFiles\BaseLibrary\bin\Debug\BaseLibrary.dll</HintPath>
     </Reference>
     <Reference Include="CoreLibrary">
       <HintPath>..\ViennaAdvantageWeb\Dll\CoreLibrary.dll</HintPath>
