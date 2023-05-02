@@ -3639,7 +3639,9 @@
             }
             curGC.refreshTabPanelData(curTab.getRecord_ID());
             this.curTab.loadShared();
-            this.aSharedRecord.setPressed(this.curTab.hasShared());
+            if (this.aSharedRecord) {
+                this.aSharedRecord.setPressed(this.curTab.hasShared());
+            }
             return retValue;
         }
 
