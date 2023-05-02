@@ -286,7 +286,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
     z-index: 999;
     top: 42px;
     left: 0px;
-    bottom: 0px;
+    /*bottom: 0px;*/
     min-width: 320px;
     box-shadow: 2px 2px 12px 0px rgba(0, 0, 0, 0.15);
     border-radius: .3rem;
@@ -574,17 +574,17 @@ html[dir="rtl"] .vis-mainMenuIcons.vis-icon-menuclose
 
 .vis-sidebarMenuWrapper {
     width: 100%;
-    height: calc(100vh - 130px);
+    height: calc(100vh - 225px);
     position: relative;
 }
 
 .vis-mbilemenu-search {
-    padding: .3rem .2rem .3rem .625rem;
+    padding: .3rem .5rem;
     border-bottom: 1px solid rgba(var(--v-c-on-secondary), .05);
 }
 
 .vis-mbilemenu-search-icon {
-    color: rgba(var(--v-c-primary), 1) !important;
+    /*color: rgba(var(--v-c-primary), 1) !important;*/
     border-radius: 0;
     /* color: red; */
     font-size: 1rem;
