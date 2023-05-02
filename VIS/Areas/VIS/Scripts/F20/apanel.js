@@ -369,7 +369,7 @@
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
             this.aPrint = this.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
-            this.aBatchUpdate = this.addActions("BatchUpdate", null, true, false, false, onAction, null, "Shct_New");
+            this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_New");
             //Ndw Back button
             this.aBack = this.addActions("Back", null, true, true, false, onAction, null, "Shct_Back");
             $ulToobar.append(this.aBack.getListItm());
@@ -593,6 +593,8 @@
                 //else
                 //    $ulRightBar2.parent().addclass('show')
             };
+
+
 
             /* Set Tool Bar */
 
@@ -3078,7 +3080,11 @@
             //aChat.setEnabled(true);
         }
 
-
+        if (this.curTab.getIsMaintainVersions() || this.curTab.getIsChangeLog() || VIS.MRole.getIsChangeLog()) {
+            this.aBatchUpdate.$li.hide();
+        } else {
+            this.aBatchUpdate.$li.show();
+        }
 
 
 
@@ -3121,6 +3127,14 @@
         else {
             this.aMap.hide();
         }
+
+
+        if (this.curTab.getIsMaintainVersions() || this.curTab.getIsChangeLog() || VIS.MRole.getIsChangeLog()) {
+            this.aBatchUpdate.$li.hide();
+        } else {
+            this.aBatchUpdate.$li.show();
+        }
+
         this.setLastView(""); //clear view history
     };
 
@@ -4188,8 +4202,7 @@
 
     };
 
-    APanel.prototype.cmd_batchUpdatedialog = function () {
-
+    APanel.prototype.cmd_batchUpdatedialog = function () {       
         var bUpdate = new VIS.BatchUpdate(this.curWindowNo, this.curTab, 0);
         var self = this;
         var savedSearchName = "";

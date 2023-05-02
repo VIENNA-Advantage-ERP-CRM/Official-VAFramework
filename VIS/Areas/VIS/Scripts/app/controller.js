@@ -1131,7 +1131,13 @@
         return this.parents;
     };
 
+    GridTab.prototype.getIsMaintainVersions = function () {
+        return this.vo.IsMaintainVersions
+    };
 
+    GridTab.prototype.getIsChangeLog = function () {
+        return this.vo.IsChangeLog
+    };
 
     GridTab.prototype.clearSelectedRow = function () {
         var size = this.gridTable.getFields().length;
@@ -7124,6 +7130,7 @@
     GridField.prototype.getIsUnique = function () {
         return this.vo.IsUnique;
     };
+
     GridField.prototype.getIsSwitch = function () {
         return this.vo.IsSwitch;
     };

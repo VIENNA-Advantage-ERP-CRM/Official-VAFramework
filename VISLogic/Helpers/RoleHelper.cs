@@ -53,7 +53,7 @@ namespace VIS.Helpers
             /* Prepare Pre Setting of Table*/
 
             r.tableData = TableData.Get();
-
+            r.IsChangeLog = role.IsChangeLog();
 
             return r;
         }
@@ -100,6 +100,7 @@ namespace VIS.Helpers
         public bool IsShowAcct;
         public bool IsDisableMenu;
         public int HomePage;
+        public bool IsChangeLog;
 
         public Dictionary<int, TableData> tableData = null;
 

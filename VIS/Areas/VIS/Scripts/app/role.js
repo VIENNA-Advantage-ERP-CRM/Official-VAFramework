@@ -1029,6 +1029,10 @@ VIS.MRole.getHomePage = function () {
     return this.vo.HomePage;
 };
 
+VIS.MRole.getIsChangeLog = function () {
+    return this.vo.IsChangeLog;
+};
+
 
 VIS.MRole.toStringX = function (ctx) {
     var sb = new StringBuilder();
