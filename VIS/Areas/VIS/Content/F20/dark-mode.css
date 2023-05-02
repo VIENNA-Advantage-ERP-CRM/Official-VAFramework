@@ -604,7 +604,8 @@ ul.VA011-tabs > li:not(.VA011-selectedTab),
 .k-grid-footer td, .k-group-footer td, .k-grouping-row td,
 .dxrControl, .dxrControl a,
 .address-close-icon,
-.ui-widget-content {
+.ui-widget-content,
+.vis-pLocatorBtn {
     color: rgb(var(--v-c-on-secondary)) !important;
 }
 .k-other-month .k-link {

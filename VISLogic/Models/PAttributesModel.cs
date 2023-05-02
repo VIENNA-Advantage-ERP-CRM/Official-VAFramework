@@ -143,7 +143,7 @@ namespace VIS.Models
                 obj.tableStucture += "<td>";
                 obj.tableStucture += "<div class='input-group vis-input-wrap'>";
                 obj.tableStucture += "<div class='vis-control-wrap'>";
-                obj.tableStucture += "<button type='button' id='btnSelect_" + windowNo + "' role='button' aria-disabled='false'>"
+                obj.tableStucture += "<button type='button' id='btnSelect_" + windowNo + "' role='button' aria-disabled='false' class='vis-pLocatorBtn'>"
                     + "<i class='vis vis-locator' style='padding: 0 6px'></i><span>"
                     + VAdvantage.Utility.Util.CleanMnemonic(Msg.GetMsg(ctx, "SelectExisting")) + "</span></button></div></div>";
                 obj.tableStucture += "</td>";
