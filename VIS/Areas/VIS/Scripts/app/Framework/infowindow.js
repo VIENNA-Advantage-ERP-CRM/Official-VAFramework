@@ -1270,7 +1270,7 @@
                 }
                 var columns = w2ui[grdname].columns;
                 for (col in columns) { //Set All Col Value in Context 
-                    VIS.Env.getCtx().setContext(windowNo, VIS.EnvConstants.TAB_INFO, columns[col].origColName, w2ui[grdname].get(selection[item])[columns[col].columnName]);
+                    VIS.Env.getCtx().setContext(windowNo, VIS.EnvConstants.TAB_INFO, columns[col].columnName, w2ui[grdname].get(selection[item])[columns[col].columnName]);
                 }
             }
 
