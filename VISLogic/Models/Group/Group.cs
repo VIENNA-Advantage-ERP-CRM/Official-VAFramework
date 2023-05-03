@@ -12,7 +12,6 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Web;
-using VAdvantage.Classes;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 using VAdvantage.WF;
@@ -585,149 +584,7 @@ namespace VIS.Models
                         wAccess.SetIsReadWrite(_winRole.IsReadWrite); //update read write access from the groups right window 
                         bool savenew = wAccess.Save();
                     }
-
-
-                    //Provide access to process and forms of window
-                    MWindow windo = new MWindow(ctx, groupWindowIDs[i], null);
-                    MTab[] tabs = windo.GetTabs(false, null);
-                    foreach (var tab in tabs)
-                    {
-                        if (tab.GetAD_Process_ID() > 0)
-                        {
-                            AccessToWindowProcess(AD_Role_ID, tab.GetAD_Process_ID().ToString(), grantAccess, _winRole.IsReadWrite, new List<int>() { tab.GetAD_Process_ID() });
-                        }
-
-                        int AD_Table_ID = tab.GetAD_Table_ID();
-                        MColumn[] columns = MTable.Get(ctx, tab.GetAD_Table_ID()).GetColumns(false);
-                        List<MColumn> buttons = columns.Where(a => a.GetAD_Reference_ID() == DisplayType.Button).ToList();
-                        StringBuilder pID = new StringBuilder();
-                        List<int> grouppIDs = new List<int>();
-
-                        StringBuilder fID = new StringBuilder();
-                        List<int> groupfIDs = new List<int>();
-                        if (buttons != null && buttons.Count > 0)
-                        {
-                            for (int b = 0; b < buttons.Count; b++)
-                            {
-                                if (buttons[b].GetAD_Process_ID() > 0)
-                                {
-                                    if (pID.Length > 0)
-                                    {
-                                        pID.Append(",");
-                                    }
-                                    pID.Append(buttons[b].GetAD_Process_ID());
-                                    grouppIDs.Add(buttons[b].GetAD_Process_ID());
-                                }
-                                if (buttons[b].GetAD_Form_ID() > 0)
-                                {
-                                    if (fID.Length > 0)
-                                    {
-                                        fID.Append(",");
-                                    }
-                                    fID.Append(buttons[b].GetAD_Form_ID());
-                                    groupfIDs.Add(buttons[b].GetAD_Form_ID());
-                                }
-                            }
-                            if (grouppIDs.Count > 0)
-                            {
-                                grouppIDs.Sort();
-
-                                //sql = "SELECT AD_Process_ID,IsReadWrite FROM AD_Process_Access WHERE AD_Role_ID=" + AD_Role_ID + " AND AD_Process_ID IN(" + pID.ToString() + ")";
-                                //ds = DB.ExecuteDataset(sql);
-                                //if (ds != null && ds.Tables[0].Rows.Count > 0)
-                                //{
-                                //    for (int w = 0; w < ds.Tables[0].Rows.Count; w++)
-                                //    {
-                                //        roleProcessIDsDictinary[Convert.ToInt32(ds.Tables[0].Rows[w]["AD_Process_ID"])] = ds.Tables[0].Rows[w]["IsReadWrite"].ToString() == "Y" ? true : false;
-                                //    }
-                                //}
-
-                                //for (int p = 0; p < grouppIDs.Count; p++)
-                                //{
-                                //    GrantRevokProcessAcess(grouppIDs[p], AD_Role_ID, grantAccess, roleProcessIDsDictinary, _winRole.IsReadWrite);
-                                //}
-                                AccessToWindowProcess(AD_Role_ID, pID.ToString(), grantAccess, _winRole.IsReadWrite, grouppIDs);
-                            }
-
-                            if (groupfIDs.Count > 0)
-                            {
-                                groupfIDs.Sort();
-                                Dictionary<int, bool> roleFormIDsDictinary = new Dictionary<int, bool>();
-                                sql = "SELECT AD_Form_ID,IsReadWrite FROM AD_Form_Access WHERE AD_Role_ID=" + AD_Role_ID + " AND AD_Form_ID IN(" + fID.ToString() + ")";
-                                ds = DB.ExecuteDataset(sql);
-                                if (ds != null && ds.Tables[0].Rows.Count > 0)
-                                {
-                                    for (int f = 0; f < ds.Tables[0].Rows.Count; f++)
-                                    {
-                                        roleFormIDsDictinary[Convert.ToInt32(ds.Tables[0].Rows[f]["AD_Form_ID"])] = ds.Tables[0].Rows[f]["IsReadWrite"].ToString() == "Y" ? true : false;
-                                    }
-                                }
-
-                                for (int x = 0; x < groupfIDs.Count; x++)
-                                {
-                                    GrantRevokeFormAccess(groupfIDs[x], AD_Role_ID, grantAccess, roleFormIDsDictinary, _winRole.IsReadWrite);
-                                }
-                            }
-                        }
-
-
-                    }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Fetch information from Process Access for Role and Given process and Invoke GrantRevokProcessAcess
-        /// </summary>
-        /// <param name="AD_Role_ID"></param>
-        /// <param name="pID"></param>
-        /// <param name="grantAccess"></param>
-        /// <param name="readWrite"></param>
-        /// <param name="grouppIDs"></param>
-        private void AccessToWindowProcess(int AD_Role_ID, string pID, bool grantAccess, bool readWrite, List<int> grouppIDs)
-        {
-            Dictionary<int, bool> roleProcessIDsDictinary = new Dictionary<int, bool>();
-            string sql = "SELECT AD_Process_ID,IsReadWrite FROM AD_Process_Access WHERE AD_Role_ID=" + AD_Role_ID + " AND AD_Process_ID IN(" + pID.ToString() + ")";
-            DataSet ds = DB.ExecuteDataset(sql);
-            if (ds != null && ds.Tables[0].Rows.Count > 0)
-            {
-                for (int w = 0; w < ds.Tables[0].Rows.Count; w++)
-                {
-                    roleProcessIDsDictinary[Convert.ToInt32(ds.Tables[0].Rows[w]["AD_Process_ID"])] = ds.Tables[0].Rows[w]["IsReadWrite"].ToString() == "Y" ? true : false;
-                }
-            }
-
-            for (int p = 0; p < grouppIDs.Count; p++)
-            {
-                GrantRevokProcessAcess(grouppIDs[p], AD_Role_ID, grantAccess, roleProcessIDsDictinary, readWrite);
-            }
-        }
-
-
-        /// <summary>
-        /// Fetch information from Process Access for Role and Given Workflow and Invoke GrantRevokWorkflowAcess
-        /// </summary>
-        /// <param name="AD_Role_ID"></param>
-        /// <param name="pID"></param>
-        /// <param name="grantAccess"></param>
-        /// <param name="readWrite"></param>
-        /// <param name="grouppIDs"></param>
-        private void AccessToWorkflowProcess(int AD_Role_ID, string pID, bool grantAccess, bool readWrite, List<int> grouppIDs)
-        {
-            Dictionary<int, bool> roleProcessIDsDictinary = new Dictionary<int, bool>();
-            string sql = "SELECT AD_Workflow_ID,IsReadWrite FROM AD_workflow_Access WHERE AD_Role_ID=" + AD_Role_ID + " AND AD_Workflow_ID IN(" + pID.ToString() + ")";
-            DataSet ds = DB.ExecuteDataset(sql);
-            if (ds != null && ds.Tables[0].Rows.Count > 0)
-            {
-                for (int w = 0; w < ds.Tables[0].Rows.Count; w++)
-                {
-                    roleProcessIDsDictinary[Convert.ToInt32(ds.Tables[0].Rows[w]["AD_Workflow_ID"])] = ds.Tables[0].Rows[w]["IsReadWrite"].ToString() == "Y" ? true : false;
-                }
-            }
-
-            for (int p = 0; p < grouppIDs.Count; p++)
-            {
-                GrantRevokWorkflowAcess(grouppIDs[p], AD_Role_ID, grantAccess, roleProcessIDsDictinary, readWrite);
             }
         }
 
@@ -739,11 +596,10 @@ namespace VIS.Models
         /// <param name="grantAccess"></param>
         private void ProvideFormAccessToRole(int AD_Group_ID, int AD_Role_ID, bool grantAccess)
         {
-            string sql = "SELECT AD_Form_ID, IsReadWrite from AD_Group_Form WHERE IsActive='Y' AND AD_GroupInfo_ID=" + AD_Group_ID;
+            string sql = "SELECT AD_Form_ID from AD_Group_Form WHERE IsActive='Y' AND AD_GroupInfo_ID=" + AD_Group_ID;
             DataSet ds = DB.ExecuteDataset(sql);
             List<int> groupWindowIDs = new List<int>();
             Dictionary<int, bool> roleWindowIDsDictinary = new Dictionary<int, bool>();
-            Dictionary<int, WindowRole> FormGroupAccess = new Dictionary<int, WindowRole>();
             StringBuilder winIDs = new StringBuilder();
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
@@ -757,9 +613,6 @@ namespace VIS.Models
                         }
                         winIDs.Append(ds.Tables[0].Rows[i]["AD_Form_ID"].ToString());
                         groupWindowIDs.Add(Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Form_ID"]));
-                        WindowRole _role = new WindowRole();
-                        _role.IsReadWrite = ds.Tables[0].Rows[i]["isReadWrite"] == "Y";
-                        FormGroupAccess[Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Form_ID"])] = _role;
                     }
                 }
 
@@ -777,51 +630,36 @@ namespace VIS.Models
 
                 for (int i = 0; i < groupWindowIDs.Count(); i++)
                 {
-                    GrantRevokeFormAccess(groupWindowIDs[i], AD_Role_ID, grantAccess, roleWindowIDsDictinary, FormGroupAccess[groupWindowIDs[i]].IsReadWrite);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Get Form info and set access (Readonly Or ReadWrite) for that Form and role
-        /// </summary>
-        /// <param name="AD_Form_ID"></param>
-        /// <param name="AD_Role_ID"></param>
-        /// <param name="grantAccess"></param>
-        /// <param name="roleFormIDsDictinary"></param>
-        /// <param name="formGroupAccess"></param>
-        private void GrantRevokeFormAccess(int AD_Form_ID, int AD_Role_ID, bool grantAccess, Dictionary<int, bool> roleFormIDsDictinary, bool formGroupAccess)
-        {
-            MForm wind = new MForm(ctx, AD_Form_ID, null);
-            MFormAccess wAccess = new MFormAccess(wind, AD_Role_ID);
-            string sql = "";
-            if (roleFormIDsDictinary.ContainsKey(AD_Form_ID))
-            {
-                if (roleFormIDsDictinary[AD_Form_ID] != grantAccess || roleFormIDsDictinary[AD_Form_ID] != formGroupAccess)
-                {
-                    //wAccess.SetIsReadWrite(grantAccess);
-                    //wAccess.Save();
-                    string rw = formGroupAccess ? "Y" : "N";
-                    if (grantAccess)
+                    MForm wind = new MForm(ctx, groupWindowIDs[i], null);
+                    MFormAccess wAccess = new MFormAccess(wind, AD_Role_ID);
+                    if (roleWindowIDsDictinary.ContainsKey(groupWindowIDs[i]))
                     {
-                        sql = "UPDATE AD_Form_Access Set IsReadWrite='" + rw + "',IsActive='Y' WHERE AD_Form_ID=" + AD_Form_ID + " AND AD_Role_ID=" + AD_Role_ID;
+                        if (roleWindowIDsDictinary[groupWindowIDs[i]] != grantAccess)
+                        {
+                            //wAccess.SetIsReadWrite(grantAccess);
+                            //wAccess.Save();
+                            if (grantAccess)
+                            {
+                                sql = "UPDATE AD_Form_Access Set IsReadWrite='Y',IsActive='Y' WHERE AD_Form_ID=" + groupWindowIDs[i] + " AND AD_Role_ID=" + AD_Role_ID;
+                            }
+                            else
+                            {
+                                sql = "UPDATE AD_Form_Access Set IsReadWrite='N',IsActive='N' WHERE AD_Form_ID=" + groupWindowIDs[i] + " AND AD_Role_ID=" + AD_Role_ID;
+                            }
+                            DB.ExecuteQuery(sql, null, null);
+                        }
                     }
                     else
                     {
-                        sql = "UPDATE AD_Form_Access Set IsReadWrite='N',IsActive='N' WHERE AD_Form_ID=" + AD_Form_ID + " AND AD_Role_ID=" + AD_Role_ID;
-                    }
-                    DB.ExecuteQuery(sql, null, null);
-                }
-            }
-            else
-            {
 
-                wAccess.SetAD_Client_ID(ctx.GetAD_Client_ID());
-                wAccess.SetAD_Org_ID(ctx.GetAD_Org_ID());
-                wAccess.SetAD_Role_ID(AD_Role_ID);
-                wAccess.SetAD_Form_ID(AD_Form_ID);
-                wAccess.SetIsReadWrite(grantAccess);
-                wAccess.Save();
+                        wAccess.SetAD_Client_ID(ctx.GetAD_Client_ID());
+                        wAccess.SetAD_Org_ID(ctx.GetAD_Org_ID());
+                        wAccess.SetAD_Role_ID(AD_Role_ID);
+                        wAccess.SetAD_Form_ID(groupWindowIDs[i]);
+                        wAccess.SetIsReadWrite(grantAccess);
+                        wAccess.Save();
+                    }
+                }
             }
         }
 
@@ -833,11 +671,10 @@ namespace VIS.Models
         /// <param name="grantAccess"></param>
         private void ProvideProcessAccessToRole(int AD_Group_ID, int AD_Role_ID, bool grantAccess)
         {
-            string sql = "SELECT AD_Process_ID, isReadWrite from AD_Group_Process WHERE IsActive='Y' AND AD_GroupInfo_ID=" + AD_Group_ID;
+            string sql = "SELECT AD_Process_ID from AD_Group_Process WHERE IsActive='Y' AND AD_GroupInfo_ID=" + AD_Group_ID;
             DataSet ds = DB.ExecuteDataset(sql);
             List<int> groupWindowIDs = new List<int>();
             Dictionary<int, bool> roleWindowIDsDictinary = new Dictionary<int, bool>();
-            Dictionary<int, WindowRole> ProcessGroupAccess = new Dictionary<int, WindowRole>();
             StringBuilder winIDs = new StringBuilder();
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
@@ -851,9 +688,6 @@ namespace VIS.Models
                         }
                         winIDs.Append(ds.Tables[0].Rows[i]["AD_Process_ID"].ToString());
                         groupWindowIDs.Add(Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Process_ID"]));
-                        WindowRole _role = new WindowRole();
-                        _role.IsReadWrite = ds.Tables[0].Rows[i]["isReadWrite"] == "Y";
-                        ProcessGroupAccess[Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Process_ID"])] = _role;
                     }
                 }
 
@@ -871,102 +705,36 @@ namespace VIS.Models
 
                 for (int i = 0; i < groupWindowIDs.Count(); i++)
                 {
-                    GrantRevokProcessAcess(groupWindowIDs[i], AD_Role_ID, grantAccess, roleWindowIDsDictinary, ProcessGroupAccess[groupWindowIDs[i]].IsReadWrite);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Get Process info and set access (Readonly Or ReadWrite) for that process and role
-        /// </summary>
-        /// <param name="AD_Process_ID"></param>
-        /// <param name="AD_Role_ID"></param>
-        /// <param name="grantAccess"></param>
-        /// <param name="roleWindowIDsDictinary"></param>
-        /// <param name="ProcessGroupAccess"></param>
-        private void GrantRevokProcessAcess(int AD_Process_ID, int AD_Role_ID, bool grantAccess, Dictionary<int, bool> roleWindowIDsDictinary, bool ProcessGroupAccess)
-        {
-            MProcess wind = new MProcess(ctx, AD_Process_ID, null);
-            MProcessAccess wAccess = new MProcessAccess(wind, AD_Role_ID);
-            string sql = "";
-            if (roleWindowIDsDictinary.ContainsKey(AD_Process_ID))
-            {
-                if (roleWindowIDsDictinary[AD_Process_ID] != grantAccess || roleWindowIDsDictinary[AD_Process_ID] != ProcessGroupAccess)
-                {
-                    //wAccess.SetIsReadWrite(grantAccess);
-                    //wAccess.Save();
-                    string rw = ProcessGroupAccess ? "Y" : "N";
-                    if (grantAccess)
+                    MProcess wind = new MProcess(ctx, groupWindowIDs[i], null);
+                    MProcessAccess wAccess = new MProcessAccess(wind, AD_Role_ID);
+                    if (roleWindowIDsDictinary.ContainsKey(groupWindowIDs[i]))
                     {
-                        sql = "UPDATE AD_Process_Access Set IsReadWrite='" + rw + "',IsActive='Y' WHERE AD_Process_ID=" + AD_Process_ID + " AND AD_Role_ID=" + AD_Role_ID;
+                        if (roleWindowIDsDictinary[groupWindowIDs[i]] != grantAccess)
+                        {
+                            //wAccess.SetIsReadWrite(grantAccess);
+                            //wAccess.Save();
+                            if (grantAccess)
+                            {
+                                sql = "UPDATE AD_Process_Access Set IsReadWrite='Y',IsActive='Y' WHERE AD_Process_ID=" + groupWindowIDs[i] + " AND AD_Role_ID=" + AD_Role_ID;
+                            }
+                            else
+                            {
+                                sql = "UPDATE AD_Process_Access Set IsReadWrite='N',IsActive='N' WHERE AD_Process_ID=" + groupWindowIDs[i] + " AND AD_Role_ID=" + AD_Role_ID;
+                            }
+                            DB.ExecuteQuery(sql, null, null);
+                        }
                     }
                     else
                     {
-                        sql = "UPDATE AD_Process_Access Set IsReadWrite='N',IsActive='N' WHERE AD_Process_ID=" + AD_Process_ID + " AND AD_Role_ID=" + AD_Role_ID;
+
+                        wAccess.SetAD_Client_ID(ctx.GetAD_Client_ID());
+                        wAccess.SetAD_Org_ID(ctx.GetAD_Org_ID());
+                        wAccess.SetAD_Role_ID(AD_Role_ID);
+                        wAccess.SetAD_Process_ID(groupWindowIDs[i]);
+                        wAccess.SetIsReadWrite(grantAccess);
+                        wAccess.Save();
                     }
-                    DB.ExecuteQuery(sql, null, null);
                 }
-            }
-            else
-            {
-
-                wAccess.SetAD_Client_ID(ctx.GetAD_Client_ID());
-                wAccess.SetAD_Org_ID(ctx.GetAD_Org_ID());
-                wAccess.SetAD_Role_ID(AD_Role_ID);
-                wAccess.SetAD_Process_ID(AD_Process_ID);
-                wAccess.SetIsReadWrite(grantAccess);
-                wAccess.Save();
-            }
-
-            // If workflow linked iwth Process then provide access
-            if (wind.GetAD_Workflow_ID() > 0)
-            {
-                AccessToWorkflowProcess(AD_Role_ID, wind.GetAD_Workflow_ID().ToString(), grantAccess, ProcessGroupAccess, new List<int> { wind.GetAD_Workflow_ID() });
-            }
-        }
-
-        /// <summary>
-        /// Get Workflow info and set access (Readonly Or ReadWrite) for that Workflow and role
-        /// </summary>
-        /// <param name="AD_Workflows_ID"></param>
-        /// <param name="AD_Role_ID"></param>
-        /// <param name="grantAccess"></param>
-        /// <param name="roleWindowIDsDictinary"></param>
-        /// <param name="ProcessGroupAccess"></param>
-        private void GrantRevokWorkflowAcess(int AD_Workflows_ID, int AD_Role_ID, bool grantAccess, Dictionary<int, bool> roleWindowIDsDictinary, bool ProcessGroupAccess)
-        {
-            MWorkflow wind = new MWorkflow(ctx, AD_Workflows_ID, null);
-            MWorkflowAccess wAccess = new MWorkflowAccess(wind, AD_Role_ID);
-            string sql = "";
-            if (roleWindowIDsDictinary.ContainsKey(AD_Workflows_ID))
-            {
-
-                if (roleWindowIDsDictinary[AD_Workflows_ID] != grantAccess || roleWindowIDsDictinary[AD_Workflows_ID] != ProcessGroupAccess)
-                {
-                    //wAccess.SetIsReadWrite(grantAccess);
-                    //wAccess.Save();
-                    string rw = ProcessGroupAccess ? "Y" : "N";
-                    if (grantAccess)
-                    {
-                        sql = "UPDATE AD_Workflow_Access Set IsReadWrite='" + rw + "',IsActive='Y' WHERE AD_Workflow_ID=" + AD_Workflows_ID + " AND AD_Role_ID=" + AD_Role_ID;
-                    }
-                    else
-                    {
-                        sql = "UPDATE AD_Workflow_Access Set IsReadWrite='N',IsActive='N' WHERE AD_Workflow_ID=" + AD_Workflows_ID + " AND AD_Role_ID=" + AD_Role_ID;
-                    }
-                    DB.ExecuteQuery(sql, null, null);
-                }
-            }
-            else
-            {
-
-                wAccess.SetAD_Client_ID(ctx.GetAD_Client_ID());
-                wAccess.SetAD_Org_ID(ctx.GetAD_Org_ID());
-                wAccess.SetAD_Role_ID(AD_Role_ID);
-                wAccess.SetAD_Workflow_ID(AD_Workflows_ID);
-                wAccess.SetIsReadWrite(grantAccess);
-                wAccess.Save();
             }
         }
 
@@ -978,11 +746,10 @@ namespace VIS.Models
         /// <param name="grantAccess"></param>
         private void ProvideWorkflowAccessToRole(int AD_Group_ID, int AD_Role_ID, bool grantAccess)
         {
-            string sql = "SELECT AD_Workflow_ID, isReadWrite from AD_Group_Workflow WHERE IsActive='Y' AND AD_GroupInfo_ID=" + AD_Group_ID;
+            string sql = "SELECT AD_Workflow_ID from AD_Group_Workflow WHERE IsActive='Y' AND AD_GroupInfo_ID=" + AD_Group_ID;
             DataSet ds = DB.ExecuteDataset(sql);
             List<int> groupWindowIDs = new List<int>();
             Dictionary<int, bool> roleWindowIDsDictinary = new Dictionary<int, bool>();
-            Dictionary<int, WindowRole> workflowGroupAccess = new Dictionary<int, WindowRole>();
             StringBuilder winIDs = new StringBuilder();
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
@@ -996,9 +763,6 @@ namespace VIS.Models
                         }
                         winIDs.Append(ds.Tables[0].Rows[i]["AD_Workflow_ID"].ToString());
                         groupWindowIDs.Add(Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Workflow_ID"]));
-                        WindowRole _role = new WindowRole();
-                        _role.IsReadWrite = ds.Tables[0].Rows[i]["isReadWrite"] == "Y";
-                        workflowGroupAccess[Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Process_ID"])] = _role;
                     }
                 }
 
@@ -1016,7 +780,35 @@ namespace VIS.Models
 
                 for (int i = 0; i < groupWindowIDs.Count(); i++)
                 {
-                    GrantRevokWorkflowAcess(groupWindowIDs[i], AD_Role_ID, grantAccess, roleWindowIDsDictinary, workflowGroupAccess[groupWindowIDs[i]].IsReadWrite);
+                    MWorkflow wind = new MWorkflow(ctx, groupWindowIDs[i], null);
+                    MWorkflowAccess wAccess = new MWorkflowAccess(wind, AD_Role_ID);
+                    if (roleWindowIDsDictinary.ContainsKey(groupWindowIDs[i]))
+                    {
+                        if (roleWindowIDsDictinary[groupWindowIDs[i]] != grantAccess)
+                        {
+                            //wAccess.SetIsReadWrite(grantAccess);
+                            //wAccess.Save();
+                            if (grantAccess)
+                            {
+                                sql = "UPDATE AD_Workflow_Access Set IsReadWrite='Y',IsActive='Y' WHERE AD_Workflow_ID=" + groupWindowIDs[i] + " AND AD_Role_ID=" + AD_Role_ID;
+                            }
+                            else
+                            {
+                                sql = "UPDATE AD_Workflow_Access Set IsReadWrite='N',IsActive='N' WHERE AD_Workflow_ID=" + groupWindowIDs[i] + " AND AD_Role_ID=" + AD_Role_ID;
+                            }
+                            DB.ExecuteQuery(sql, null, null);
+                        }
+                    }
+                    else
+                    {
+
+                        wAccess.SetAD_Client_ID(ctx.GetAD_Client_ID());
+                        wAccess.SetAD_Org_ID(ctx.GetAD_Org_ID());
+                        wAccess.SetAD_Role_ID(AD_Role_ID);
+                        wAccess.SetAD_Workflow_ID(groupWindowIDs[i]);
+                        wAccess.SetIsReadWrite(grantAccess);
+                        wAccess.Save();
+                    }
                 }
             }
         }
