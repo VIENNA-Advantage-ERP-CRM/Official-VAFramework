@@ -82,6 +82,9 @@ VIS.context.getWindowTabContext = function (windowNo, tabNo, context) {
     if (this.m_map[windowNo]) {
         value = this.m_map[windowNo][windowNo + "|" + tabNo + "|" + context];
     }
+    if (VIS.EnvConstants.TAB_INFO == tabNo)
+        return value != null ? value : "";
+
     //m_map.TryGetValue(windowNo + "|" + tabNo + "|" + context,out value);
     if (!value || value == "")
         return VIS.context.getWindowContext(windowNo, context, false);
