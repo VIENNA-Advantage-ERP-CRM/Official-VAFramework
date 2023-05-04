@@ -8,6 +8,7 @@
     --v-c-th-on-secondary: 220, 223, 227 !important;
     --v-c-common: 60, 64, 67;
     --v-c-dark: 255, 255, 255;
+    --v-c-primary: 66, 133, 244 !important;
 }
 
 body * {
@@ -712,4 +713,7 @@ ul.VA003-topRight-icons > li > a,
 }
 .vaicnt-scan-no .calculator .left {
     background-color: rgba(var(--v-c-on-secondary), .5) !important;
+}
+.vis-welcomeScreenTabMenu li.vis-activeTab a:hover:before {
+    border-bottom: 8px solid rgba(var(--v-c-primary), 1);
 }
