@@ -1586,13 +1586,12 @@ namespace VIS.Helpers
                         if (Util.GetValueOfString(value) == "Y")
                             value = true;
                         else if (Util.GetValueOfString(value) == "N")
-                            value = false;
-
-                        if (Util.GetValueOfString(oldValue) == "Y")
+                            value = false; if (Util.GetValueOfString(oldValue) == "Y")
                             oldValue = true;
                         else if (Util.GetValueOfString(oldValue) == "N")
                             oldValue = false;
                     }
+
 
                     if (inserting
                         || !compareDB
