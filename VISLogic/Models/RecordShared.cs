@@ -80,16 +80,7 @@ namespace VISLogic.Models
 
             string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary, AD_ShareRecordOrg.AD_Org_ID AS OrgID FROM AD_Org AD_Org
                                 LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID + @"
-                                WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + ctx.GetAD_Org_ID() + ")  ";
-
-
-            if (po.GetAD_Org_ID() != ctx.GetAD_Org_ID())
-            {
-                sqlQuery += " AND AD_ShareRecordOrg_ID IS NOT NULL ";
-                canEdit = false;
-            }
-
-            sqlQuery+= " ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
+                                WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + ctx.GetAD_Org_ID() + ")  ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
 
 
             if (po.GetAD_Org_ID() != ctx.GetAD_Org_ID())
@@ -146,7 +137,6 @@ namespace VISLogic.Models
 
         }
 
-        int curRecID = 0;
         public string SaveRecords(List<GridTabVO> tabs, int AD_Table_ID, int record_ID, int AD_Tab_ID, int Window_ID, int WindowNo, List<Records> records, Ctx ctx, Trx trx1, int WindowParent_ID, int ParentTable_ID, ref int error, int ParentID = 0)
         {
             string msg = " OK ";
@@ -274,6 +264,42 @@ namespace VISLogic.Models
                             }
                         }
 
+                        ParentID = SRO.GetAD_ShareRecordOrg_ID();
+
+                        string tableName = MTable.GetTableName(ctx, AD_Table_ID);
+
+                        int versionTableID = MTable.Get_Table_ID(tableName + "_Ver");
+
+                        if (versionTableID > 0)
+                        {
+                            DataSet dsVer = DB.ExecuteDataset($"SELECT {tableName}_Ver_ID FROM {tableName}_Ver WHERE {tableName}_ID={record_ID}");
+                            if (dsVer != null && dsVer.Tables[0].Rows.Count > 0)
+                            {
+                                for (int v = 0; v < dsVer.Tables[0].Rows.Count; v++)
+                                {
+                                    MShareRecordOrg SROV = new MShareRecordOrg(ctx, 0, trx);
+                                    SROV.SetAD_Table_ID(versionTableID);
+                                    SROV.Set_ValueNoCheck("AD_OrgShared_ID", records[i].AD_OrgShared_ID);
+                                    SROV.SetIsReadOnly(records[i].isReadonly);
+                                    SROV.SetRecord_ID(Util.GetValueOfInt(dsVer.Tables[0].Rows[v][0]));
+                                    if (ParentID > 0)
+                                    {
+                                        SROV.Set_ValueNoCheck("Parent_ID", ParentID);
+                                    }
+                                    if (!SROV.Save())
+                                    {
+                                        error = 1;
+                                        break;
+                                    }
+                                    VAdvantage.Common.ShareOrg OrgV = new VAdvantage.Common.ShareOrg();
+                                    OrgV.RecordID = Util.GetValueOfInt(dsVer.Tables[0].Rows[v][0]);
+                                    OrgV.OrgID = records[i].AD_OrgShared_ID;
+                                    OrgV.Readonly = records[i].isReadonly;
+                                    VAdvantage.Common.ShareRecordManager.AddRecordToTable(versionTableID, OrgV);
+                                }
+                            }
+                        }
+
                         //GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, Window_ID, 0);
 
                         GridTabVO gt = tabs.Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
@@ -345,11 +371,9 @@ namespace VISLogic.Models
                                         sOrg.RecordID = Util.GetValueOfInt(ds.Tables[0].Rows[j][0]);
                                         sOrg.OrgID = records[i].AD_OrgShared_ID;
                                         sOrg.Readonly = records[i].isReadonly;
-                                        if (statussChanged || !VAdvantage.Common.ShareRecordManager.CheckRecordInTable(tab.AD_Table_ID, sOrg))
-                                        {
-                                            VAdvantage.Common.ShareRecordManager.AddRecordToTable(tab.AD_Table_ID, sOrg);
-                                            SaveRecords(tabs, table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx, 0, 0, ref error, newParentID);
-                                        }
+
+                                        VAdvantage.Common.ShareRecordManager.AddRecordToTable(tab.AD_Table_ID, sOrg);
+                                        SaveRecord(table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx,0,0, ref error, ParentID);
                                     }
                                 }
                             }
@@ -390,6 +414,31 @@ namespace VISLogic.Models
             return msg;
         }
 
+
+
+
+        public List<RecordAccess> GetSharedRecords(Ctx ctx)
+        {
+            List<RecordAccess> sharedRecordAccess = new List<RecordAccess>();
+            MRole role = MRole.GetDefault(ctx);
+            role.LoadSharedRecord(true);
+            sharedRecordAccess = RecordAccess.Get(role.GetSharedRecordAccess());
+            return sharedRecordAccess;
+        }
+
+
+        /// <summary>
+        /// Check if current record is readonly or not
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
+        public bool GetSharedRecordAccess(Ctx ctx, int AD_Table_ID, int Record_ID)
+        {
+            string sql = "SELECT  IsReadOnly FROM AD_ShareRecordOrg WHERE IsActive = 'Y' AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + " AND AD_OrgShared_ID = " + ctx.GetAD_Org_ID();
+            return Util.GetValueOfString(DB.ExecuteScalar(sql)) == "Y";
+        }
 
 
 
