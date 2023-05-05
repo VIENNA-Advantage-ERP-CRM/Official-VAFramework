@@ -1852,6 +1852,8 @@
             this.setCurrentRow(this.currentRow, false);    //  re-load data
             if (this.currentRow < 0)
                 this.currentRow = 0;
+
+            this.IsSharedAccess();
             this.gridTable.fireDataStatusIEvent("Ignored", "");
         }
 
@@ -1969,6 +1971,7 @@
             // getField(i).validateValue();
             this.getField(i).setError(false);
         }
+        this.IsSharedAccess();
         this.gridTable.setDisableNotification(false);
         this.gridTable.fireDataStatusIEvent(copy ? "UpdateCopied" : "Insertdata", "");
         return retValue;

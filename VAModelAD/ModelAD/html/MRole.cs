@@ -2784,38 +2784,6 @@ namespace VAdvantage.Model
                     rec.SetAD_Table_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]));
                     sharedRecordAccess.Add(rec);
                 }
-                sql.Append(tableName + "_ID IN (" + inCondition + "))");
-
-            }
-        }
-
-
-        /// <summary>
-        /// Get List of records which are shared with login organization
-        /// </summary>
-        /// <param name="reload"></param>
-        public void LoadSharedRecord(bool reload)
-        {
-            List<MRecordAccess> sharedRecordAccess = new List<MRecordAccess>();
-            if (!(reload || _sharedRecordAccess == null || IsShowSharedRecords()))
-            {
-                _sharedRecordAccess = sharedRecordAccess.ToArray();
-                return;
-            }
-
-            string qry = "SELECT record_Id,IsReadOnly,AD_Table_ID FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID();
-            //int recordID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
-            DataSet ds = DB.ExecuteDataset(qry);
-            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-            {
-                for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
-                {
-                    MRecordAccess rec = new MRecordAccess(GetCtx(), ds.Tables[0].Rows[i], Get_Trx());
-                    rec.SetRecord_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["record_Id"]));
-                    rec.SetIsReadOnly(Util.GetValueOfString(ds.Tables[0].Rows[i]["IsReadOnly"]) == "Y" ? true : false);
-                    rec.SetAD_Table_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]));
-                    sharedRecordAccess.Add(rec);
-                }
             }
             _sharedRecordAccess = sharedRecordAccess.ToArray();
         }
