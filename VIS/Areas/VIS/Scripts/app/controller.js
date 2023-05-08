@@ -2022,6 +2022,11 @@
     GridTab.prototype.IsSharedAccess = function () {
         var tableID = this.getAD_Table_ID();
         var recordID = this.getRecord_ID();
+
+        if (recordID < 0 && this.getRecords().length && this.currentRow>-1 && this.getTableName()) {
+            recordID = this.getRecords()[this.currentRow][this.getTableName().toLower() + "_id"];
+        }
+
         var that = this;
         $.ajax({
             async: false,
