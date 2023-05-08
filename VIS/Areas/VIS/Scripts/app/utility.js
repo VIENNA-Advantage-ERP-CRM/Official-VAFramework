@@ -50,7 +50,8 @@
         update: "update",
         remove: "delete",
         contact: "contact",
-        addnewrec: "AddNewRecord"
+        addnewrec: "AddNewRecord",
+        addproduct:"AddProduct"
     };
 
     VIS.EnvConstants =
@@ -1073,7 +1074,7 @@
 
         function getGridWindowFromServer(curWindowNo, ID) {
 
-
+           
         };
 
         function getZoomButton(disabled) {
@@ -1082,7 +1083,7 @@
         }
 
         function getContextPopup(options, fieldName) {
-
+            
             var ulPopup = $("<ul class='vis-apanel-rb-ul'>");
             if (typeof options[VIS.Actions.zoom] !== "undefined") {
                 ulPopup.append($("<li data-action='" + VIS.Actions.zoom + "' style='opacity:" + (options[VIS.Actions.zoom] ? .7 : 1) +
@@ -1098,6 +1099,8 @@
                 ulPopup.append($("<li data-action='" + VIS.Actions.refresh + "'><i data-action='" + VIS.Actions.refresh + "' class='fa fa-refresh'></i><span data-action='" + VIS.Actions.refresh + "'>" + VIS.Msg.getMsg("Requery") + "</span></li>"));
             if (options[VIS.Actions.add])
                 ulPopup.append($("<li data-action='" + VIS.Actions.add + "'><i data-action='" + VIS.Actions.add + "' class='vis vis-addbp'></i><span data-action='" + VIS.Actions.add + "'>" + VIS.Msg.getMsg("Add") + "</span></li>"));
+            if (options[VIS.Actions.addproduct])
+                ulPopup.append($("<li data-action='" + VIS.Actions.addproduct + "'><i data-action='" + VIS.Actions.addproduct + "' class='fa fa-plus'></i><span data-action='" + VIS.Actions.addproduct + "'>" + VIS.Msg.getMsg("AddProduct") + "</span></li>"));
             if (options[VIS.Actions.update])
                 ulPopup.append($("<li data-action='" + VIS.Actions.update + "'><i data-action='" + VIS.Actions.update + "' class='vis vis-updatebp'></i><span data-action='" + VIS.Actions.update + "'>" + VIS.Msg.getMsg("Update") + "</span></li>"));
             if (options[VIS.Actions.remove])

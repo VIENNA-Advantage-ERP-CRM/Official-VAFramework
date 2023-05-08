@@ -2417,7 +2417,14 @@
             if (columnName === "C_BPartner_ID") {
                 options[VIS.Actions.addnewrec] = false;
                 options[VIS.Actions.add] = true;
+                options[VIS.Actions.update] = true
+            }
+
+            if (columnName === "M_Product_ID") {
+                options[VIS.Actions.addnewrec] = false;
+                options[VIS.Actions.add] = true;
                 options[VIS.Actions.update] = true;
+                options[VIS.Actions.addproduct] = true;
             }
 
             if ((this.lookup &&
@@ -3525,6 +3532,11 @@
                     //  var contactInfo = new VIS.ContactInfo(101, 1);
                     // contactInfo.show();
                     //}
+                }
+                else if (action == VIS.Actions.addproduct) {
+                    var val = self.getValue();
+                    VIS.AddUpdateMProduct(self.mField.getWindowNo(), 0, VIS.Msg.getMsg("Product"), null, 0, 0);
+                   
                 }
                 else if (action == VIS.Actions.update) {
                     var val = self.getValue();
@@ -6229,6 +6241,9 @@
                 else if (action == VIS.Actions.zoom) {// Zoom
                     zoomAction();
                 }
+                //else if (action == VIS.Actions.addproduct) {// Zoom
+                //    zoomAction();
+                //}
                 else if (action == VIS.Actions.remove) { // Clear
                     if (self.isReadOnly)
                         return;
