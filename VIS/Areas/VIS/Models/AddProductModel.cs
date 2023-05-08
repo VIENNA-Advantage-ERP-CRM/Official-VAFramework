@@ -2,7 +2,6 @@
 using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
-
 namespace VIS.Models
 {
     /*******************************************************
@@ -60,18 +59,14 @@ namespace VIS.Models
                     {
                         _log.Log(Level.SEVERE, "Product Not Saved", vnp.GetName());
                     }
-                    return Msg.GetMsg(ctx, "VISProductNotSave");
-
+                    return vnp.GetName();
                 }
-                return Msg.GetMsg(ctx, "VISProductSave");
+                return "OK";
             }
             catch (Exception ex)
             {
-                return ex.Message;
+             return ex.Message;
             }
-
         }
     }
-
-
 }

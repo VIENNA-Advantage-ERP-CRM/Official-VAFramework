@@ -57,7 +57,7 @@
             + '<div class= "VIS_Pref_dd p-0"><div class="input-group vis-input-wrap vis-ev-full-h" id="Description_' + self.windowNo + '"></div></div>'
             + '</div>');
         root.append('<div class="vis-ctrfrm-btnwrp">'
-            + '<input id="cancelBtn_' + self.windowNo + '" class= "VIS_Pref_btn-2" type = "button" value = "' + VIS.Msg.getMsg("Cancel") + '">'
+            + '<input id="cancelBtn_' + self.windowNo + '" class= "VIS_Pref_btn-2" type = "button" value = "' + VIS.Msg.getMsg("close") + '">'
             + '<input id="okBtn_' + self.windowNo + '" class="VIS_Pref_btn-2" type="button" value="' + VIS.Msg.getMsg("OK") + '">'
             + '<div class="vis-ad-w-p-s-main pull-left"><div class="vis-ad-w-p-s-infoline"></div><div class="vis-ad-w-p-s-msg" style="align-items:flex-end;" id="lblBottomMsg_' + self.windowNo + '"></div></div>'
             + '</div>');
@@ -194,7 +194,7 @@
                 AddRemoveMandatory(txtPType);
             };
             txtTaxCategory.fireValueChanged = function () {
-                AddRemoveMandatory(txtTaxCategory);
+                AddRemoveMandatory(txtTaxCategory);           
             };
         }
 
@@ -221,7 +221,7 @@
             else {
                 addMProductDialog.setWidth(670);
             }
-            addMProductDialog.setTitle(VIS.Msg.getMsg("ProductName"));
+            addMProductDialog.setTitle(VIS.Msg.getMsg("AddProduct"));
             addMProductDialog.setEnableResize(true);
             addMProductDialog.setModal(true);
             addMProductDialog.show();
@@ -286,8 +286,14 @@
                 type: "POST",
                 data: obj,
                 success: function (result) {
-                    lblBottomMsg.text(result);
-                    clear();
+                    if (result == "OK") {
+                        lblBottomMsg.text(VIS.Msg.getMsg("VISProductSave"));
+                        clear();
+                    }
+                    else {
+                        setBusy(false);
+                        lblBottomMsg.text(result);
+                    }
                 },
                 error: function (error) {
                     lblBottomMsg.text(error);
@@ -299,8 +305,8 @@
 
         function clear() {
             setBusy(false);
-            txtSearchKey.setValue("");
-            txtName.setValue("");
+            txtSearchKey.setValue("") || txtSearchKey.setValue(null);
+            txtName.setValue("") || txtName.setValue(null);
             txtUOM.setValue("");
             txtUPC.setValue("");
             txtPType.setValue("");
@@ -311,43 +317,13 @@
             txtPurchased.setValue(false);
             txtSold.setValue(false);
             txtStocked.setValue(false);
-            
-            if (txtSearchKey.getValue() != null && txtSearchKey.getValue() != "") {
-                txtSearchKey.getControl().removeClass("vis-ev-col-mandatory");
-            }
-            else {
+           
                 txtSearchKey.getControl().addClass("vis-ev-col-mandatory");
-            }
-            if (txtName.getValue() != null && txtName.getValue() != "") {
-                txtName.getControl().removeClass("vis-ev-col-mandatory");
-            }
-            else {
-                txtName.getControl().addClass("vis-ev-col-mandatory");
-            }
-            if (txtUOM.getValue() != null && txtUOM.getValue() != "") {
-                txtUOM.getControl().removeClass("vis-ev-col-mandatory");
-            }
-            else {
-                txtUOM.getControl().addClass("vis-ev-col-mandatory");
-            }
-            if (txtPType.getValue() != null && txtPType.getValue() != "") {
-                txtPType.getControl().removeClass("vis-ev-col-mandatory");
-            }
-            else {
-                txtPType.getControl().addClass("vis-ev-col-mandatory");
-            }
-            if (txtPCategory.getValue() != null && txtPCategory.getValue() != "") {
-                txtPCategory.getControl().removeClass("vis-ev-col-mandatory");
-            }
-            else {
-                txtPCategory.getControl().addClass("vis-ev-col-mandatory");
-            }
-            if (txtTaxCategory.getValue() != null && txtTaxCategory.getValue() != "") {
-                txtTaxCategory.getControl().removeClass("vis-ev-col-mandatory");
-            }
-            else {
-                txtTaxCategory.getControl().addClass("vis-ev-col-mandatory");
-            }
+                txtName.getControl().addClass("vis-ev-col-mandatory");          
+                txtUOM.getControl().addClass("vis-ev-col-mandatory");          
+                txtPType.getControl().addClass("vis-ev-col-mandatory");         
+                txtPCategory.getControl().addClass("vis-ev-col-mandatory");          
+                txtTaxCategory.getControl().addClass("vis-ev-col-mandatory");          
         };
 
         //*************Clean Up ******************//
