@@ -369,7 +369,7 @@
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
             this.aPrint = this.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
-            this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_New");
+            this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
             //Ndw Back button
             this.aBack = this.addActions("Back", null, true, true, false, onAction, null, "Shct_Back");
             $ulToobar.append(this.aBack.getListItm());
@@ -3080,10 +3080,14 @@
             //aChat.setEnabled(true);
         }
 
-        if (this.curTab.getIsMaintainVersions() || this.curTab.getIsChangeLog() || VIS.MRole.getIsChangeLog()) {
-            this.aBatchUpdate.$li.hide();
+        if (this.ctx.getAD_User_ID() == 100) {
+            if (this.curTab.getIsMaintainVersions() || this.curTab.getIsChangeLog() || VIS.MRole.getIsChangeLog()) {
+                this.aBatchUpdate.$li.hide();
+            } else {
+                this.aBatchUpdate.$li.show();
+            }
         } else {
-            this.aBatchUpdate.$li.show();
+            this.aBatchUpdate.$li.hide();
         }
 
 
@@ -3128,11 +3132,14 @@
             this.aMap.hide();
         }
 
-
-        if (this.curTab.getIsMaintainVersions() || this.curTab.getIsChangeLog() || VIS.MRole.getIsChangeLog()) {
-            this.aBatchUpdate.$li.hide();
+        if (this.ctx.getAD_User_ID() == 100) {
+            if (this.curTab.getIsMaintainVersions() || this.curTab.getIsChangeLog() || VIS.MRole.getIsChangeLog()) {
+                this.aBatchUpdate.$li.hide();
+            } else {
+                this.aBatchUpdate.$li.show();
+            }
         } else {
-            this.aBatchUpdate.$li.show();
+            this.aBatchUpdate.$li.hide();
         }
 
         this.setLastView(""); //clear view history
