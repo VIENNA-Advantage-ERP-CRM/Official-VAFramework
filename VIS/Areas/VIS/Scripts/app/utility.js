@@ -51,7 +51,7 @@
         remove: "delete",
         contact: "contact",
         addnewrec: "AddNewRecord",
-        addproduct:"AddProduct"
+        addproduct: "AddProduct"  //Added by Ruby as discuss with Mandeep Sir/Mukesh Arora Sir --01 May 2023
     };
 
     VIS.EnvConstants =

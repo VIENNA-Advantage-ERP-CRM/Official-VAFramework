@@ -16,6 +16,7 @@ namespace VIS.Models
         VLogger _log = VLogger.GetVLogger(typeof(AddProductModel).FullName);
         /// <summary>
         /// Save new product.
+        /// Ruby Devi 5 May 2023.
         /// </summary>
         /// <param name="ctx">Context</param>
         /// <param name="searchKey">Search key</param>
@@ -65,7 +66,7 @@ namespace VIS.Models
             }
             catch (Exception ex)
             {
-             return ex.Message;
+                return ex.Message;
             }
         }
     }

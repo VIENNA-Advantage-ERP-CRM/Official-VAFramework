@@ -2420,11 +2420,11 @@
                 options[VIS.Actions.update] = true
             }
 
-            if (columnName === "M_Product_ID") {
+            if (columnName === "M_Product_ID") { 
                 options[VIS.Actions.addnewrec] = false;
-                options[VIS.Actions.add] = true;
+                options[VIS.Actions.add] = false; //false by Ruby as discuss with Mandeep Sir/Mukesh Arora Sir --02 May 2023
                 options[VIS.Actions.update] = true;
-                options[VIS.Actions.addproduct] = true;
+                options[VIS.Actions.addproduct] = true; //Added by Ruby as discuss with Mandeep Sir/Mukesh Arora Sir --02 May 2023
             }
 
             if ((this.lookup &&
