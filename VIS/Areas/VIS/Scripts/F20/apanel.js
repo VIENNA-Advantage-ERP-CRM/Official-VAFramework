@@ -2810,6 +2810,7 @@
         }
 
     }
+   
     /**
      *	tab change
      *  @param action tab item's id
@@ -4169,6 +4170,29 @@
             this.aSharedRecord.setEnabled(false);
             return;
         }
+
+        var isAccess = 'Y';
+        $.ajax({
+            url: VIS.Application.contextUrl + "JsonData/CheckAccessForAction",
+            dataType: "json",
+            async: false,
+            data: {
+                columnName: 'ShowSharedRecords',
+                roleID: VIS.context.getAD_Role_ID()
+            },
+            error: function (e) {
+                //VIS.ADialog.info(VIS.Msg.getMsg('ERRORGettingPostingServer'));
+            },
+            success: function (result) {
+                isAccess = JSON.parse(result);
+            }
+        });
+
+        if (isAccess != 'Y') {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return false;
+        }       
+
         var self = this;
         var parentTableID = 0;
         if (this.curTab.getParentTab()) {
@@ -4193,7 +4217,7 @@
 
         }
 
-        var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo, this.curTab.linkValue, parentTableID);
+        var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo, this.curTab.linkValue, parentTableID, this.curTab);
         atRecordShared.onClose = function () {
             self.curTab.loadShared();
             self.aSharedRecord.setPressed(self.curTab.hasShared());
@@ -4439,6 +4463,30 @@
         {
             return;
         }
+
+        var isAccess = 'Y';
+        $.ajax({
+            url: VIS.Application.contextUrl + "JsonData/CheckAccessForAction",
+            dataType: "json",
+            async: false,
+            data: {
+                columnName: 'IsPersonalLock',
+                roleID: VIS.context.getAD_Role_ID()
+            },
+            error: function (e) {
+                //VIS.ADialog.info(VIS.Msg.getMsg('ERRORGettingPostingServer'));
+            },
+            success: function (result) {
+                isAccess = JSON.parse(result);
+            }
+        });
+
+        if (isAccess != 'Y') {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return false;
+        } 
+
+
         this.curTab.locks(VIS.context, record_ID, this.aLock.getIsPressed());
         this.curTab.loadAttachments();			//	reload
         locked = this.curTab.getIsLocked();
@@ -4447,6 +4495,30 @@
 
 
     APanel.prototype.cmd_recAccess = function () {
+
+
+        var isAccess = 'Y';
+        $.ajax({
+            url: VIS.Application.contextUrl + "JsonData/CheckAccessForAction",
+            dataType: "json",
+            async: false,
+            data: {
+                columnName: 'IsPersonalAccess',
+                roleID: VIS.context.getAD_Role_ID()
+            },
+            error: function (e) {
+                //VIS.ADialog.info(VIS.Msg.getMsg('ERRORGettingPostingServer'));
+            },
+            success: function (result) {
+                isAccess = JSON.parse(result);
+            }
+        });
+
+        if (isAccess != 'Y') {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return false;
+        } 
+
         var recAccessDialog = new VIS.RecordAccessDialog();
         recAccessDialog.Load(this.curTab.getAD_Table_ID(), this.curTab.getRecord_ID());
 

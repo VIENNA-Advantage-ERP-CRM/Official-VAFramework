@@ -2023,7 +2023,7 @@
         var tableID = this.getAD_Table_ID();
         var recordID = this.getRecord_ID();
 
-        if (recordID < 0 && this.getRecords().length && this.currentRow>-1 && this.getTableName()) {
+        if (recordID < 0 && this.getRecords().length && this.currentRow > -1 && this.getTableName() && this.getRecords()[this.currentRow]) {
             recordID = this.getRecords()[this.currentRow][this.getTableName().toLower() + "_id"];
         }
 

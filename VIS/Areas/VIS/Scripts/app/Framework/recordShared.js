@@ -13,14 +13,43 @@
      * @param {any} table_id
      * @param {any} windowNo
      */
-    function RecordShared(record_id, table_id, tab_id, window_id, windowNo, parentID, parentTableID) {
+    function RecordShared(record_id, table_id, tab_id, window_id, windowNo, parentID, parentTableID, curTab) {
         this.onClose = null;
         var ch = null;
         var self = this;
         var orginalArr = [];
         var sharedIDs = [];
+        var mField = [];
+        if (curTab && curTab.getFields()) {
+            mField = curTab.getFields();
+        }
         if (parentID == '999999') {
             parentID = 0;
+        }
+
+        var headingText = "";
+
+        if (mField.length > 0) {
+            var isIdentifier = $.grep(mField, function (a) {
+                return a.getIsIdentifier() == true;
+            });
+
+            if (isIdentifier.length > 0) {
+                for (var a = 0; a < isIdentifier.length; a++) {
+                    headingText += curTab.getValue(isIdentifier[a].getColumnName())
+                    if ((a + 1) != isIdentifier.length) {
+                        headingText += "_";
+                    }
+                }
+            } else if (curTab.getValue('Value') && curTab.getValue('Value').length > 0) {
+                headingText = curTab.getValue('Value');
+            } else if (curTab.getValue('Name') && curTab.getValue('Name').length > 0) {
+                headingText = curTab.getValue('Name');
+            } else {
+                headingText = record_id;
+            }
+        } else {
+            headingText = record_id;
         }
 
         var canEdit = true;
@@ -52,8 +81,8 @@
             + '<div class="vis-actionFeild">'
             + '<div class="input-group vis-input-wrap vis-cusmg">'
             + '<div class="vis-control-wrap">'
-            + '<input type="text" id="txtSearchKey_' + windowNo + '" maxlength="40" class="" placeholder="' + VIS.Msg.getMsg('SearchKeyValue') + '" data-placeholder="' + VIS.Msg.getMsg('SearchKeyValue') + '">'
-            + '<label>' + VIS.Msg.getMsg('SearchKeyValue') + '</label>'
+            + '<input type="text" id="txtSearchKey_' + windowNo + '" maxlength="40" class="" placeholder="' + VIS.Msg.getMsg('SearchKeyValue') + '/' + VIS.Msg.getMsg('Name') +  '" data-placeholder="' + VIS.Msg.getMsg('SearchKeyValue') + '">'
+            + '<label>' + VIS.Msg.getMsg('SearchKeyValue') + '/' + VIS.Msg.getMsg('Name') + '</label>'
             + '</div>'
             + '</div>'
             + '</div>'
@@ -121,7 +150,7 @@
             if (txtSummaryOrg.val() == '') {
                 var fData = $.grep(orginalArr, function (element, index) {
                     if (ddlLegalEntities.find('option:selected').val() == 'A') {
-                        return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
+                        return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 || element.name.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
                     } else if (ddlLegalEntities.find('option:selected').val() != 'A' && txtSearchKey.val() != '') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
                     } else {
@@ -130,7 +159,12 @@
                 });
 
                 fData.sort(function (a, b) {
-                    return (a.AD_OrgShared_ID < b.AD_OrgShared_ID ? 1 : -1) || (a.name < b.name ? 1 : -1);
+                    if (a.AD_OrgShared_ID > 0) {
+                        return (a.AD_OrgShared_ID < b.AD_OrgShared_ID ? 1 : -1)
+                    }
+                    //else {
+                    //    return (a.name < b.name ? 1 : -1);
+                    //}
                 });
 
                 prepareList(fData);
@@ -151,7 +185,12 @@
                 });
 
                 filterData.sort(function (a, b) {
-                    return (a.AD_OrgShared_ID < b.AD_OrgShared_ID ? 1 : -1) || (a.name < b.name ? 1 : -1);
+                    if (a.AD_OrgShared_ID > 0) {
+                        return (a.AD_OrgShared_ID < b.AD_OrgShared_ID ? 1 : -1)
+                    }
+                    //else {
+                    //    return (a.name < b.name ? -1 : -1);
+                    //}
                 });
 
                 prepareList(filterData);
@@ -194,19 +233,21 @@
                     + '<td width="120px" class="text-center">' + list[i].isLegalEntity + '</td>'
                     + '<td width="120px" class="text-center">';
                 if (list[i].isReadonly) {
-                    if (list[i].OrgID != VIS.context.getAD_Org_ID()) {
-                        row += '<input type="checkbox" name="" id="" readonly disabled class="chkIsReadOnly" checked />';
-                    }
-                    else {
-                        row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked />';
-                    }
+                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked/>';
+                    //if (list[i].OrgID != VIS.context.getAD_Org_ID()) {
+                    //    row += '<input type="checkbox" name="" id="" readonly disabled class="chkIsReadOnly" checked />';
+                    //}
+                    //else {
+                    //    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked />';
+                    //}
                 } else {
-                    if (list[i].OrgID>0 && list[i].OrgID != VIS.context.getAD_Org_ID()) {
-                        row += '<input type="checkbox" name="" readonly disabled id="" class="chkIsReadOnly" />';
-                    }
-                    else {
-                        row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
-                    }
+                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
+                    //if (list[i].OrgID>0 && list[i].OrgID != VIS.context.getAD_Org_ID()) {
+                    //    row += '<input type="checkbox" name="" readonly disabled id="" class="chkIsReadOnly" />';
+                    //}
+                    //else {
+                    //    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
+                    //}
                 }
                 row += '</td>'
                     + '</tr>';
@@ -361,9 +402,8 @@
         this.show = function () {
             ch = new VIS.ChildDialog();
             ch.setContent(root);
-            ch.setHeight(660);
             ch.setWidth("75%");
-            ch.setTitle(VIS.Msg.getMsg("RecordShared"));
+            ch.setTitle(VIS.Msg.getMsg("RecordShared") + " (" + headingText+")");
             ch.setModal(true);
             //Ok Button Click
             //  ch.onOkClick =

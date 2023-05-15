@@ -1376,6 +1376,16 @@ namespace VIS.Controllers
         }
         #endregion
 
+        /// <summary>
+        /// Check role acess for Personal Lock, Personal Access And Shared Records
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="roleID"></param>
+        /// <returns></returns>
+        public JsonResult CheckAccessForAction(string columnName,int roleID) {
+            CommonModel cm = new CommonModel();
+            return Json(JsonConvert.SerializeObject(cm.CheckAccessForAction(columnName, roleID)), JsonRequestBehavior.AllowGet); 
+        }
     }
 
     public class FilterDataContract

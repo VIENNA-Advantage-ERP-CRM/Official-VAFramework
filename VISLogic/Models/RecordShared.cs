@@ -79,16 +79,16 @@ namespace VISLogic.Models
 
 
             string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary, AD_ShareRecordOrg.AD_Org_ID AS OrgID FROM AD_Org AD_Org
-                                LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID + @"
-                                WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + ctx.GetAD_Org_ID() + ")  ";
+                                LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID;
 
+           int count=Util.GetValueOfInt(DB.ExecuteScalar("SELECT count(AD_Org_ID) FROM AD_Role_OrgAccess WHERE ISACTIVE='Y' AND AD_role_ID=" + ctx.GetAD_Role_ID() + " AND AD_Org_ID IN ("+ po.GetAD_Org_ID()+")"));
 
-            if (po.GetAD_Org_ID() != ctx.GetAD_Org_ID())
+            if (count==0)
             {
                 sqlQuery += " AND AD_ShareRecordOrg_ID IS NOT NULL ";
                 canEdit = false;
             }
-
+            sqlQuery += " WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + po.GetAD_Org_ID() + ")  ";
             sqlQuery += " ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
 
             sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery, "AD_Org", true, false);
