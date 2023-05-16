@@ -62,7 +62,7 @@
             + '<div class="input-group vis-input-wrap vis-cusmg">'
             + '<div class="vis-control-wrap">'
             + '<input type="text"  id="txtSummaryOrg_' + windowNo + '" maxlength="40" class="" placeholder="' + VIS.Msg.getMsg('SummaryOrg') + '" data-placeholder="' + VIS.Msg.getMsg('SummaryOrg') + '">'
-            + '<label>' + VIS.Msg.getMsg('SgummaryOrg') + '</label>'
+            + '<label>' + VIS.Msg.getMsg('SummaryOrg') + '</label>'
             + '</div>'
             + '</div>'
             + '</div>'
@@ -81,7 +81,7 @@
             + '<div class="vis-actionFeild">'
             + '<div class="input-group vis-input-wrap vis-cusmg">'
             + '<div class="vis-control-wrap">'
-            + '<input type="text" id="txtSearchKey_' + windowNo + '" maxlength="40" class="" placeholder="' + VIS.Msg.getMsg('SearchKeyValue') + '/' + VIS.Msg.getMsg('Name') +  '" data-placeholder="' + VIS.Msg.getMsg('SearchKeyValue') + '">'
+            + '<input type="text" id="txtSearchKey_' + windowNo + '" maxlength="40" class="" placeholder="' + VIS.Msg.getMsg('SearchKeyValue') + '/' + VIS.Msg.getMsg('Name') + '" data-placeholder="' + VIS.Msg.getMsg('SearchKeyValue') + '">'
             + '<label>' + VIS.Msg.getMsg('SearchKeyValue') + '/' + VIS.Msg.getMsg('Name') + '</label>'
             + '</div>'
             + '</div>'
@@ -218,7 +218,7 @@
                 row += '</td>'
                     + '<td width="40px">';
                 if (list[i].AD_OrgShared_ID) {
-                    row += '<input type="checkbox" checked class="chkOrgID" data-shareid="' + list[i].AD_OrgShared_ID+'" value="' + list[i].ID + '">';
+                    row += '<input type="checkbox" checked class="chkOrgID" data-shareid="' + list[i].AD_OrgShared_ID + '" value="' + list[i].ID + '">';
                     sharedIDs.push(list[i].AD_OrgShared_ID);
                     if (list[i].CanEdit) {
                         toogleOkBtn(true);
@@ -321,7 +321,7 @@
                     toogleOkBtn(false);
                 }
                 root.find('.tbList .chkOrgID').each(function () {
-                    
+
                     this.checked = isFalse;
                 });
             });
@@ -403,7 +403,7 @@
             ch = new VIS.ChildDialog();
             ch.setContent(root);
             ch.setWidth("75%");
-            ch.setTitle(VIS.Msg.getMsg("RecordShared") + " (" + headingText+")");
+            ch.setTitle(VIS.Msg.getMsg("RecordShared") + " (" + headingText + ")");
             ch.setModal(true);
             //Ok Button Click
             //  ch.onOkClick =
@@ -419,7 +419,7 @@
             ch.show();
             ch.hidebuttons();
         };
-
+        
     }
 
     VIS.RecordShared = RecordShared;

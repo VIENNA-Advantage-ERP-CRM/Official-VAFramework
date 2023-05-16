@@ -3322,8 +3322,12 @@
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
-            this.aSharedRecord.setEnabled(true);
-            this.aSharedRecord.setPressed(this.curTab.hasShared());
+            if (this.curTab.getValue('AD_Org_ID') > 0) {
+                this.aSharedRecord.setEnabled(true);
+                this.aSharedRecord.setPressed(this.curTab.hasShared());
+            } else {
+                this.aSharedRecord.setEnabled(false);
+            }
         }
 
 
