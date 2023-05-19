@@ -80,12 +80,17 @@ namespace VAdvantage.Model
         /// <returns>MColumn</returns>
         public static MColumn Get(Ctx ctx, int AD_Column_ID)
         {
+            return Get(ctx, AD_Column_ID, null);
+        }
+
+        public static MColumn Get(Ctx ctx, int AD_Column_ID,Trx trx)
+        {
             int key = AD_Column_ID;
             MColumn retValue = null;
             retValue = s_cache[key];
             if (retValue != null)
                 return retValue;
-            retValue = new MColumn(ctx, AD_Column_ID, null);
+            retValue = new MColumn(ctx, AD_Column_ID, trx);
             if (retValue.Get_ID() != 0)
                 s_cache.Add(key, retValue);
             return retValue;
@@ -99,7 +104,12 @@ namespace VAdvantage.Model
         /// <returns>Column Name or null</returns>
         public static string GetColumnName(Ctx ctx, int AD_Column_ID)
         {
-            MColumn col = MColumn.Get(ctx, AD_Column_ID);
+            return GetColumnName(ctx, AD_Column_ID, null);
+        }
+
+        public static string GetColumnName(Ctx ctx, int AD_Column_ID,Trx trx)
+        {
+            MColumn col = MColumn.Get(ctx, AD_Column_ID,trx);
             if (col.Get_ID() == 0)
                 return null;
             return col.GetColumnName();
