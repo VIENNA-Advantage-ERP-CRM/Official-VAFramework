@@ -38,8 +38,9 @@
     <Reference Include="BaseLibrary">
       <HintPath>..\ViennaAdvantageWeb\Dll\BaseLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="CoreLibrary">
-      <HintPath>..\ViennaAdvantageWeb\Dll\CoreLibrary.dll</HintPath>
+    <Reference Include="CoreLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\VABaseFiles\CoreLibrary\bin\Debug\CoreLibrary.dll</HintPath>
     </Reference>
     <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -197,6 +198,7 @@
     <Compile Include="ModelAD\MColor.cs" />
     <Compile Include="ModelAD\MColumn.cs" />
     <Compile Include="ModelAD\MColumnAccess.cs" />
+    <Compile Include="ModelAD\MIndexColumn.cs" />
     <Compile Include="ModelAD\MExportToClient.cs" />
     <Compile Include="ModelAD\MField.cs" />
     <Compile Include="ModelAD\MFieldGroup.cs" />
@@ -259,6 +261,7 @@
     <Compile Include="ModelAD\MSystem.cs" />
     <Compile Include="ModelAD\MTab.cs" />
     <Compile Include="ModelAD\MTable.cs" />
+    <Compile Include="ModelAD\MTableIndex.cs" />
     <Compile Include="ModelAD\MTabPanel.cs" />
     <Compile Include="ModelAD\MTask.cs" />
     <Compile Include="ModelAD\MTest.cs" />
@@ -291,6 +294,8 @@
     <Compile Include="ModelAD\TranslationTable.cs" />
     <Compile Include="ModelAD\ViennaProcessorLog.cs" />
     <Compile Include="ModelAD\ViennatProcessor.cs" />
+    <Compile Include="ModelAD\X_AD_IndexColumn.cs" />
+    <Compile Include="ModelAD\X_AD_TableIndex.cs" />
     <Compile Include="Model\Callout.cs" />
     <Compile Include="Model\CalloutEngine.cs" />
     <Compile Include="Model\MClient.cs" />
@@ -359,6 +364,7 @@
     <Compile Include="ProcessAD\SystemValidate.cs" />
     <Compile Include="ProcessAD\TabCreateFields.cs" />
     <Compile Include="ProcessAD\TableCreateColumns.cs" />
+    <Compile Include="ProcessAD\TableIndexValidate.cs" />
     <Compile Include="ProcessAD\TransactionXRef.cs" />
     <Compile Include="ProcessAD\TranslationDocSync.cs" />
     <Compile Include="ProcessAD\TranslationExportModule.cs" />
