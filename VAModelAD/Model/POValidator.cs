@@ -183,8 +183,10 @@ namespace VAModelAD.Model
 
         public bool AfterSave(bool newRecord, bool success, PO po)
         {
+            MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
             //VIS323 Insert Record in ExportData for marking on Save records.
-            if (Env.IsModuleInstalled("VA093_") && success && MRole.GetDefault(po.GetCtx()).IsAutoDataMarking())
+            if (Env.IsModuleInstalled("VA093_") && success && MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
+                && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
             {
                 if (!_exportTableAccessed)
                 {

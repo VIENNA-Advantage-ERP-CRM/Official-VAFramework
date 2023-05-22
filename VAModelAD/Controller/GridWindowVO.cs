@@ -398,10 +398,11 @@ namespace VAdvantage.Controller
                 return null;
             }
             //	Read Write
-            if (vo.IsReadWrite == null
-                || (vo.WindowType != VAdvantage.Model.X_AD_Window.WINDOWTYPE_Maintain && Model.MRole.GetDefault(ctx).IsAutoDataMarking()))
+            if (vo.IsReadWrite == null)
+            // Commented VIS0007    || (vo.WindowType != VAdvantage.Model.X_AD_Window.WINDOWTYPE_Maintain && Model.MRole.GetDefault(ctx).IsAutoDataMarking()))
             {
-                VLogger.Get().SaveError("RoleCanViewMasterScreens", "");
+                VLogger.Get().SaveError("AccessTableNoView", "(found)");
+                // Commented VIS0007 VLogger.Get().SaveError("RoleCanViewMasterScreens", "");
                 return null;
             }
 
