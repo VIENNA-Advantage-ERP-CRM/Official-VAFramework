@@ -4072,6 +4072,19 @@ table.fixed-header thead tr {
     margin-bottom: 10px !important;
 }
 
+.vis-orglbl {
+    padding: 7px 10px 7px 10px;
+    color: white;
+    background-color: rgba(var(--v-c-primary), 1);
+    /* float: left; */
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+
+
 /* modify Ends */
 /*Media query*/
 @media screen and (max-width: 1500px) and (min-width: 1360px) {

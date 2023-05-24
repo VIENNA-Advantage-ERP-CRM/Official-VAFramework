@@ -407,9 +407,59 @@ namespace VISLogic.Models
             return Util.GetValueOfString(DB.ExecuteScalar(sql)) == "Y";
         }
 
+        /// <summary>
+        /// Get Organisation Structure
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<OrgProperty> GetOrgStructure(Ctx ctx)
+        {
+            string sql = @" SELECT AD_Tree.AD_Tree_ID FROM AD_Tree 
+               WHERE AD_Tree.AD_Client_ID=" + ctx.GetAD_Client_ID() + @" AND AD_Tree.AD_Table_ID=(SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_Org') AND AD_Tree.IsActive='Y' AND AD_Tree.IsAllNodes='Y' 
+              ORDER BY AD_Tree.isdefault desc, AD_Tree.AD_Tree_ID ASC";
+
+            int treeID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+
+            sql = @"SELECT Node_ID,AD_Org.Name,Parent_ID,Issummary,(SELECT NAME FROM AD_Org WHERE AD_org_ID=Parent_ID) AS ParentName FROM AD_treeNode 
+              INNER JOIN AD_Org ON AD_treeNode.Node_ID=AD_Org.AD_Org_ID
+              WHERE AD_Tree_ID=" + treeID;
+
+            DataSet ds = DB.ExecuteDataset(sql);
+            List<OrgProperty> lstOrg = null;
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                lstOrg = new List<OrgProperty>();
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    OrgProperty Org = new OrgProperty()
+                    {
+                        ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["Node_ID"]),
+                        ParentID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["Parent_ID"]),
+                        Name = Util.GetValueOfString(ds.Tables[0].Rows[i]["Name"]),
+                        Issummary=Util.GetValueOfString(ds.Tables[0].Rows[i]["Issummary"]),
+                        ParentName = Util.GetValueOfString(ds.Tables[0].Rows[i]["ParentName"]),
+                    };
+                    lstOrg.Add(Org);
+                }
+            }
+            return lstOrg;
+        } 
+
     }
+
+
     /// <summary>
     /// Organization Property
     /// /// VIS0228 09-Nov-2022
     /// </summary>
+    /// 
+    public class OrgProperty
+    {
+        public int ID { get; set; }
+        public int ParentID { get; set; }
+        public string Name { get; set; }
+        public string Issummary { get; set; }
+        public string ParentName { get; set; }
+    }
+
 }

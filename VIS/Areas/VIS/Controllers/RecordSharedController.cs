@@ -79,6 +79,13 @@ namespace VIS.Areas.VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             RecordShared model = new RecordShared();
             return Json(JsonConvert.SerializeObject(model.GetSharedRecordAccess(ctx,AD_Table_ID, Record_ID)), JsonRequestBehavior.AllowGet);
+        } 
+        
+        public JsonResult GetOrgStructure()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            RecordShared model = new RecordShared();
+            return Json(JsonConvert.SerializeObject(model.GetOrgStructure(ctx)), JsonRequestBehavior.AllowGet);
         }
 
     }

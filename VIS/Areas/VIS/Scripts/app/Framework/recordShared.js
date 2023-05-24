@@ -27,6 +27,8 @@
             parentID = 0;
         }
 
+        var res = [];
+
         var headingText = "";
 
         if (mField.length > 0) {
@@ -61,9 +63,10 @@
             + '<div class="vis-actionFeild">'
             + '<div class="input-group vis-input-wrap vis-cusmg">'
             + '<div class="vis-control-wrap">'
-            + '<input type="text"  id="txtSummaryOrg_' + windowNo + '" maxlength="40" class="" placeholder="' + VIS.Msg.getMsg('SummaryOrg') + '" data-placeholder="' + VIS.Msg.getMsg('SummaryOrg') + '">'
+            + '<input type="text"  id="txtSummaryOrg_' + windowNo + '" maxlength="40" class=""  placeholder="' + VIS.Msg.getMsg('SummaryOrg') + '" data-placeholder="' + VIS.Msg.getMsg('SummaryOrg') + '">'
             + '<label>' + VIS.Msg.getMsg('SummaryOrg') + '</label>'
             + '</div>'
+            + '<div class="input-group-append"><button id="btnShowSummaryOrg_' + windowNo + '" tabindex="-1" class="input-group-text"><i tabindex="-1" class="fa fa-search"></i></button></div>'
             + '</div>'
             + '</div>'
             + '<div class="vis-actionFeild">'
@@ -123,6 +126,7 @@
             + '</div>');
 
         var txtSummaryOrg = root.find("#txtSummaryOrg_" + windowNo);
+        var btnShowSummaryOrg = root.find("#btnShowSummaryOrg_" + windowNo);
         var ddlLegalEntities = root.find("#ddlLegalEntities_" + windowNo);
         var txtSearchKey = root.find("#txtSearchKey_" + windowNo);
         var btnOk = root.find("#btnOk_" + windowNo);
@@ -130,6 +134,19 @@
         var msg = root.find("#lblMsg_" + windowNo);
         var chkAll = root.find("#chkAll_" + windowNo);
         var isBusyRoot = root.find(".vis-recordSharedbusy");
+
+        $.ajax({
+            type: 'post',
+            url: VIS.Application.contextUrl + "RecordShared/GetOrgStructure",
+            data: {},
+            success: function (data) {
+                res = JSON.parse(data);
+                IsBusy(false);
+            }, error: function (data) {
+                IsBusy(false);
+            }
+        });
+
 
         /**Get All organization */
         function getOrganization() {
@@ -149,7 +166,9 @@
         function filterData() {
             if (txtSummaryOrg.val() == '') {
                 var fData = $.grep(orginalArr, function (element, index) {
-                    if (ddlLegalEntities.find('option:selected').val() == 'A') {
+                    if (element.AD_OrgShared_ID > 0) {
+                        return element;
+                    }else if (ddlLegalEntities.find('option:selected').val() == 'A') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 || element.name.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
                     } else if (ddlLegalEntities.find('option:selected').val() != 'A' && txtSearchKey.val() != '') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
@@ -169,13 +188,28 @@
 
                 prepareList(fData);
             } else {
+                
+                //var fData = $.grep(orginalArr, function (element, index) {
+                //    return (element.name.toLowerCase().indexOf(txtSummaryOrg.val().toLowerCase()) != -1 && element.isSummary == true)
+                //});
 
-                var fData = $.grep(orginalArr, function (element, index) {
-                    return (element.name.toLowerCase().indexOf(txtSummaryOrg.val().toLowerCase()) != -1 && element.isSummary == true)
-                });
+                var fData = [];
+                for (var i = 0; i < orginalArr.length; i++) {
+                    for (var j = 0; j < res.length; j++) {
+                        if (orginalArr[i].ID === res[j].ID && (res[j].ParentID == txtSummaryOrg.attr('data-id') || res[j].ParentName.toLowerCase().indexOf(txtSummaryOrg.val().toLowerCase())!=-1) && orginalArr[i].AD_OrgShared_ID == 0) {
+                            fData.push(orginalArr[i]);
+                        } 
+                    }
+                    if (orginalArr[i].AD_OrgShared_ID > 0) {
+                        fData.push(orginalArr[i]);
+                    }
+                }
+
 
                 var filterData = $.grep(fData, function (element, index) {
-                    if (ddlLegalEntities.find('option:selected').val() == 'A') {
+                    if (element.AD_OrgShared_ID > 0) {
+                        return element;
+                    } else if (ddlLegalEntities.find('option:selected').val() == 'A') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
                     } else if (ddlLegalEntities.find('option:selected').val() != 'A' && txtSearchKey.val() != '') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
@@ -294,8 +328,14 @@
 
         function events() {
 
+            btnShowSummaryOrg.click(function () {
+                self.showOrgStructure();
+            })
 
             txtSummaryOrg.keyup(function () {
+                if (txtSummaryOrg.val().length == 0) {
+                    txtSummaryOrg.removeAttr('data-id');
+                }
                 filterData();
             });
 
@@ -318,7 +358,7 @@
                     toogleOkBtn(true);
                 }
                 else {
-                    toogleOkBtn(false);
+                    toogleOkBtn(true);
                 }
                 root.find('.tbList .chkOrgID').each(function () {
 
@@ -418,8 +458,105 @@
             };
             ch.show();
             ch.hidebuttons();
+            
         };
-        
+
+        this.showOrgStructure = function () {
+            txtSummaryOrg.val('');
+            txtSummaryOrg.removeAttr('data-id');
+            var cdos = new VIS.ChildDialog();            
+            var html =$('<div id="left" >'
+                + '    <ul id="menu-group-1" class="nav menu">'
+                + '        <li class="item-1 deeper parent">'
+                + '            <a class="" href="#">'
+                + '                <span data-toggle="collapse" data-parent="#menu-group-1" href="#sub-item-1" class="sign"><i class="fa fa-folder-o" onclick="$(this).toggleClass(\'fa-folder-o fa-folder-open-o\')"></i></span>'
+                + '                <span class="vis-orglbl">' + VIS.Msg.getMsg("SummaryOrg")+'</span>'
+                + '            </a>'              
+                + '        </li>'
+                + '    </ul>'
+                + '</div>');
+
+            function buildHierarchy(data, parentID) {
+                var tree = [];
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].ParentID === parentID && data[i].Issummary=='Y') {
+                        var node = {
+                            "ID": data[i].ID,
+                            "Name": data[i].Name,
+                            "Children": buildHierarchy(data, data[i].ID)
+                        };
+                        tree.push(node);
+                    }
+                }
+                return tree;
+            }
+
+            var countr = 1;
+
+            function generateNestedList(data, parentElement) {
+                var ul = $("<ul class='small collapse' style='list-style-type: none;' id='sub-item-" + countr+"'></ul>");
+                countr++;
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    var li = $("<li class='deeper parent'></li>");
+
+                    var plus = '<span data-toggle="collapse" data-parent="#menu-group-1" style="margin-left:-14px" href="#sub-item-' + countr +'" class="mr-1 sign"><i class="fa fa-plus" onclick="$(this).toggleClass(\'fa-plus fa-minus\')"></i></span>'
+                    var spanName = $("<span  class='vis-orglbl' data-id="+item.ID+"></span>").text(item.Name);
+                    var anchr = $('<a class="" href="#"></a>');
+                    if (item.Children.length > 0) {
+                        anchr.append(plus);
+                    }                 
+                    anchr.append(spanName);
+                    li.append(anchr);
+
+                    if (item.Children.length > 0) {
+                        generateNestedList(item.Children, li);
+                    }
+
+                    ul.append(li);
+                }
+
+                parentElement.append(ul);
+            };
+
+           
+
+            var result = buildHierarchy(res, 0);
+            generateNestedList(result, html.find('.item-1'));
+            cdos.setContent(html);
+
+            html.on('click', '.vis-orglbl', function () {
+                if ($(this).attr('data-id')) {
+                    var dID = Number($(this).attr('data-id'));
+                    //var fltr = $.grep(res, function (a) {
+                    //    return a.ParentID == dID ;
+                    //})
+                    txtSummaryOrg.val($(this).text()).attr("data-id", dID);
+
+                    //var filteredArray = orginalArr.filter(function (array_el) {
+                    //    return fltr.filter(function (anotherOne_el) {
+                    //        return anotherOne_el.ID == array_el.ID;
+                    //    }).length == 0
+                    //});
+
+                   
+
+
+                    filterData();
+                    cdos.close();
+                }
+            })
+          
+
+            cdos.setHeight(500);
+            cdos.setWidth(450);
+            
+
+            cdos.setTitle(VIS.Msg.getMsg("SummaryOrg"));
+            cdos.setModal(true);
+            cdos.show();
+            cdos.hidebuttons();
+        }
     }
 
     VIS.RecordShared = RecordShared;
