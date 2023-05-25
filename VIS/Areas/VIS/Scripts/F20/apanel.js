@@ -3322,7 +3322,7 @@
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
-            if (this.curTab.getValue('AD_Org_ID') > 0) {
+            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org') {
                 this.aSharedRecord.setEnabled(true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {
@@ -4172,6 +4172,11 @@
     APanel.prototype.cmd_RecordShared = function () {
         if (this.curTab.getRecord_ID() < 1) {
             this.aSharedRecord.setEnabled(false);
+            return;
+        }
+
+        if (this.curGC.getSelectedRows().length > 1) {
+            VIS.ADialog.info('ShareOneRecordOnly');
             return;
         }
 

@@ -166,9 +166,7 @@
         function filterData() {
             if (txtSummaryOrg.val() == '') {
                 var fData = $.grep(orginalArr, function (element, index) {
-                    if (element.AD_OrgShared_ID > 0) {
-                        return element;
-                    }else if (ddlLegalEntities.find('option:selected').val() == 'A') {
+                   if (ddlLegalEntities.find('option:selected').val() == 'A') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 || element.name.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
                     } else if (ddlLegalEntities.find('option:selected').val() != 'A' && txtSearchKey.val() != '') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
@@ -177,39 +175,24 @@
                     }
                 });
 
-                fData.sort(function (a, b) {
-                    if (a.AD_OrgShared_ID > 0) {
-                        return (a.AD_OrgShared_ID < b.AD_OrgShared_ID ? 1 : -1)
-                    }
-                    //else {
-                    //    return (a.name < b.name ? 1 : -1);
-                    //}
-                });
-
-                prepareList(fData);
-            } else {
+                root.find('.tbList tr').hide();
+                for (var e = 0; e < fData.length; e++) {                   
+                    root.find('.tbList .chkOrgID[value="' + fData[e].ID + '"]').closest('tr').show();
+                };
                 
-                //var fData = $.grep(orginalArr, function (element, index) {
-                //    return (element.name.toLowerCase().indexOf(txtSummaryOrg.val().toLowerCase()) != -1 && element.isSummary == true)
-                //});
-
+            } else {               
                 var fData = [];
                 for (var i = 0; i < orginalArr.length; i++) {
                     for (var j = 0; j < res.length; j++) {
-                        if (orginalArr[i].ID === res[j].ID && (res[j].ParentID == txtSummaryOrg.attr('data-id') || res[j].ParentName.toLowerCase().indexOf(txtSummaryOrg.val().toLowerCase())!=-1) && orginalArr[i].AD_OrgShared_ID == 0) {
+                        if (orginalArr[i].ID === res[j].ID && (res[j].ParentID == txtSummaryOrg.attr('data-id') || res[j].ParentName.toLowerCase().indexOf(txtSummaryOrg.val().toLowerCase())!=-1)) {
                             fData.push(orginalArr[i]);
                         } 
-                    }
-                    if (orginalArr[i].AD_OrgShared_ID > 0) {
-                        fData.push(orginalArr[i]);
-                    }
+                    }                   
                 }
 
 
                 var filterData = $.grep(fData, function (element, index) {
-                    if (element.AD_OrgShared_ID > 0) {
-                        return element;
-                    } else if (ddlLegalEntities.find('option:selected').val() == 'A') {
+                    if (ddlLegalEntities.find('option:selected').val() == 'A') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
                     } else if (ddlLegalEntities.find('option:selected').val() != 'A' && txtSearchKey.val() != '') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
@@ -218,16 +201,10 @@
                     }
                 });
 
-                filterData.sort(function (a, b) {
-                    if (a.AD_OrgShared_ID > 0) {
-                        return (a.AD_OrgShared_ID < b.AD_OrgShared_ID ? 1 : -1)
-                    }
-                    //else {
-                    //    return (a.name < b.name ? -1 : -1);
-                    //}
-                });
-
-                prepareList(filterData);
+                root.find('.tbList tr').hide();
+                for (var e = 0; e < filterData.length; e++) {
+                    root.find('.tbList .chkOrgID[value="' + filterData[e].ID + '"]').closest('tr').show();
+                };
             };
         }
 
@@ -243,6 +220,10 @@
             }
             var row = '';
             for (var i = 0; i < list.length; i++) {
+                if (list[i].isSummary == true) {
+                    continue;
+                }
+                   
                 if (list[i].AD_OrgShared_ID) {
                     row += '<tr class="vis-rowSuccess">';
                 } else {
@@ -267,21 +248,9 @@
                     + '<td width="120px" class="text-center">' + list[i].isLegalEntity + '</td>'
                     + '<td width="120px" class="text-center">';
                 if (list[i].isReadonly) {
-                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked/>';
-                    //if (list[i].OrgID != VIS.context.getAD_Org_ID()) {
-                    //    row += '<input type="checkbox" name="" id="" readonly disabled class="chkIsReadOnly" checked />';
-                    //}
-                    //else {
-                    //    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked />';
-                    //}
+                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked/>';                   
                 } else {
-                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
-                    //if (list[i].OrgID>0 && list[i].OrgID != VIS.context.getAD_Org_ID()) {
-                    //    row += '<input type="checkbox" name="" readonly disabled id="" class="chkIsReadOnly" />';
-                    //}
-                    //else {
-                    //    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
-                    //}
+                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';                   
                 }
                 row += '</td>'
                     + '</tr>';
@@ -333,9 +302,7 @@
             })
 
             txtSummaryOrg.keyup(function () {
-                if (txtSummaryOrg.val().length == 0) {
-                    txtSummaryOrg.removeAttr('data-id');
-                }
+                txtSummaryOrg.removeAttr('data-id');
                 filterData();
             });
 
@@ -528,29 +495,14 @@
             html.on('click', '.vis-orglbl', function () {
                 if ($(this).attr('data-id')) {
                     var dID = Number($(this).attr('data-id'));
-                    //var fltr = $.grep(res, function (a) {
-                    //    return a.ParentID == dID ;
-                    //})
                     txtSummaryOrg.val($(this).text()).attr("data-id", dID);
-
-                    //var filteredArray = orginalArr.filter(function (array_el) {
-                    //    return fltr.filter(function (anotherOne_el) {
-                    //        return anotherOne_el.ID == array_el.ID;
-                    //    }).length == 0
-                    //});
-
-                   
-
-
                     filterData();
                     cdos.close();
                 }
-            })
-          
+            });
 
             cdos.setHeight(500);
-            cdos.setWidth(450);
-            
+            cdos.setWidth(450);            
 
             cdos.setTitle(VIS.Msg.getMsg("SummaryOrg"));
             cdos.setModal(true);

@@ -4081,6 +4081,7 @@ table.fixed-header thead tr {
     display: inline-flex;
     align-items: center;
     margin-bottom: 5px;
+    min-width:50px;
 }
 
 
