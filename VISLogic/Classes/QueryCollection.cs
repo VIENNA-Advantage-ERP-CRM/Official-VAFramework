@@ -563,11 +563,13 @@ namespace VIS.Classes
                 + " INNER JOIN AD_Window_Access wa ON (tab.AD_Window_ID=wa.AD_Window_ID) "
                 + " WHERE wa.AD_Role_ID= @param1"
                 + " AND t.IsActive='Y' AND tab.IsActive='Y' "
-                + " ORDER BY 2";
+                + " ORDER BY 2";           
 
             queryList.VIS_155 = "SELECT AD_Tree_Product_ID FROM AD_OrgInfo WHERE AD_Org_ID=@AD_Org_ID";
 
             queryList.VIS_156 = "SELECT AD_Tree_BPartner_ID FROM AD_OrgInfo WHERE AD_Org_ID=@AD_Org_ID";
+
+            queryList.VIS_157 = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Table_ID = @AD_Table_ID";
         }
 
 

@@ -44,12 +44,12 @@ namespace VIS.Helpers
             r.columnAccess = ColumnAccess.Get(role.GetColumnAccess());
             r.recordAccess = RecordAccess.Get(role.GetRecordAccess());
             r.recordDependentAccess = RecordAccess.Get(role.GetRecordDependentAccess());
-
+            r.sharedRecordAccess = RecordAccess.Get(role.GetSharedRecordAccess());
             r.MaxQueryRecords = role.GetMaxQueryRecords();
             r.IsShowAcct = role.IsShowAcct();
             r.IsDisableMenu = role.IsDisableMenu();
             r.HomePage = role.GetHomePage_ID();
-
+            r.ShowSharedRecords = role.IsShowSharedRecords();
             /* Prepare Pre Setting of Table*/
 
             r.tableData = TableData.Get();
@@ -73,6 +73,9 @@ namespace VIS.Helpers
         public Dictionary<int, bool> windowAccess = null;
         public Dictionary<int, bool> formAccess = null;
         public Dictionary<int, bool> processAccess = null;
+
+        //To store record shared by other Orgs
+        public List<RecordAccess> sharedRecordAccess = null;
 
         /*Properties*/
         public bool IsAccessAllOrgs;
@@ -100,6 +103,7 @@ namespace VIS.Helpers
         public bool IsShowAcct;
         public bool IsDisableMenu;
         public int HomePage;
+        public bool ShowSharedRecords;
 
         public Dictionary<int, TableData> tableData = null;
 

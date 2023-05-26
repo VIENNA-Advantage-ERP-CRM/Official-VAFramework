@@ -265,6 +265,16 @@
         return this.vo.IsHistory;
     };
 
+    GridWindow.prototype.getIsRecordShared = function () {
+        return this.vo.IsRecordShared;
+    };
+
+    GridWindow.prototype.getWindowType = function () {
+        return this.vo.WindowType;
+    };
+    
+
+
     GridWindow.prototype.getIsCheckRequest = function () {
         return this.vo.IsCheckRequest;
     };
@@ -827,6 +837,12 @@
         return this.gridTable.getKeyID(this.currentRow);
     };   //  getRecord_ID
 
+    //getDummyRecordID
+    GridTab.prototype.getDummyRecordID = function () {
+        return this.gridTable.getDummyRecordID(this.currentRow);
+
+
+    };   //  getRecord_ID
     /**
      *  Get Key ID of row
      *  @param  row row number
@@ -1836,6 +1852,8 @@
             this.setCurrentRow(this.currentRow, false);    //  re-load data
             if (this.currentRow < 0)
                 this.currentRow = 0;
+
+            this.IsSharedAccess();
             this.gridTable.fireDataStatusIEvent("Ignored", "");
         }
 
@@ -1953,6 +1971,7 @@
             // getField(i).validateValue();
             this.getField(i).setError(false);
         }
+        this.IsSharedAccess();
         this.gridTable.setDisableNotification(false);
         this.gridTable.fireDataStatusIEvent(copy ? "UpdateCopied" : "Insertdata", "");
         return retValue;
@@ -1989,8 +2008,45 @@
         if (this.gridTable.dataSave(newRow, false)) {
             recid = this.setCurrentRow(newRow, fireEvents)
         }
+
+        //Check readolny status of record(if shared)
+        this.IsSharedAccess();
+
         return recid;
     }; //navigate
+
+    /**
+     * get shared record is readonly or not and set status on tab level.
+     * 
+     * */
+    GridTab.prototype.IsSharedAccess = function () {
+        var tableID = this.getAD_Table_ID();
+        var recordID = this.getRecord_ID();
+
+        if (recordID < 0 && this.getRecords().length && this.currentRow > -1 && this.getTableName() && this.getRecords()[this.currentRow]) {
+            recordID = this.getRecords()[this.currentRow][this.getTableName().toLower() + "_id"];
+        }
+
+        var that = this;
+        $.ajax({
+            async: false,
+            url: VIS.Application.contextUrl + "RecordShared/GetSharedRecordAccess",
+            data: {
+                AD_Table_ID: tableID,
+                Record_ID: recordID
+            },
+            success: function (data) {
+                data = JSON.parse(data);
+                if (data == true)
+                    that.IsSharedReadOnly = true;
+                else
+                    that.IsSharedReadOnly = false;
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    };
 
     GridTab.prototype.verifyRow = function (targetRow) {
 
@@ -2649,6 +2705,27 @@
         return this.hasKey(this.viewDocument, key);//return chatId
     };
 
+
+    /**
+     * Check if currect record is shared with other organization or not
+     * */
+    GridTab.prototype.hasShared = function (reload) {
+
+        if (this.isDataLoading)
+            return false;
+        if (this.sharedRecords == null || reload==true)
+            this.loadShared();//call load shared record function
+        if (this.sharedRecords == null)
+            return false;
+        //get chat id
+        var key = this.getRecord_ID();//ridTable.GetKeyID(CurrentRow);
+        if (key == -1)
+            key = this.getDummyRecordID();
+
+        return this.hasKey(this.sharedRecords, key);//return chatId
+    };
+
+  
     /// <summary>
     /// Returns true, if current row has a Subscribe
     /// </summary>
@@ -2667,6 +2744,61 @@
         var key = this.getRecord_ID();//ridTable.GetKeyID(CurrentRow);
         return this.hasKey(this._subscribe, key);//return subscribeId
     };
+
+    /**
+     * Prepare list of shared records of current table
+     * this list is used to set icon of shared record icon on action panel
+     * 
+     * */
+    GridTab.prototype.loadShared = function () {
+        if (VIS.MRole.getIsShowSharedRecord() == true) {
+            var sqlQry = "VIS_157";
+            var param = [];
+           // param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
+            param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
+
+            var dr = null;
+            try {
+                this.sharedRecords = [];
+
+                dr = executeReader(sqlQry, param);
+                var key;
+                while (dr.read()) {
+                    key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
+                    this.sharedRecords.push({ ID: key});
+                }
+
+                dr = null;
+
+            }
+            catch (ex) {
+            }
+        }
+    };
+
+    //GridTab.prototype.loadSharedWithCurrent = function () {
+    //    var sqlQry = "VIS_156";
+    //    var param = [];
+    //    param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
+    //    param[1] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
+
+    //    var dr = null;
+    //    try {
+    //        this.sharedRecordsWithLoginOrg = [];
+
+    //        dr = executeReader(sqlQry, param);
+    //        var key;
+    //        while (dr.read()) {
+    //            key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
+    //            this.sharedRecordsWithLoginOrg.push({ ID: key });
+    //        }
+
+    //        dr = null;
+
+    //    }
+    //    catch (ex) {
+    //    }
+    //};
 
     //Lakhwinder
     GridTab.prototype.loadAttachments = function () {
@@ -2774,7 +2906,8 @@
         this._lock = this.gTab._pAccess;
         this._subscribe = this.gTab._subscribe;
         this.viewDocument = this.gTab._documents;
-
+        this.sharedRecords = this.gTab._sharedRec;
+        //this.sharedRecordsWithLoginOrg = this.gTab._sharedWithLoginRec;
         //var tableIndex = {};
         //var ServerValues = {};
         //ServerValues.IsExportData = false;
@@ -3428,6 +3561,19 @@
         return -1;
     };	//	getKeyID
 
+    GridTable.prototype.getDummyRecordID = function (row) {
+        try {
+            var ii = this.getValueAt(row, this._tableName + "_ID");
+            if (ii == null || isNaN(ii))
+                return -1;
+            return ii;
+        }
+        catch (e) {
+            return -1;
+        }
+        return -1;
+    }
+
     GridTable.prototype.setKeyColumnName = function (keyName) {
         this.keyColumnName = keyName;
     };
@@ -3649,7 +3795,7 @@
             var field = this.gridFields[i];
             //selectSql = field.getColumnSQL(true);
             //if (selectSql.indexOf("@") == -1) {
-                // select.append(selectSql);	//	ColumnName or Virtual Column
+            // select.append(selectSql);	//	ColumnName or Virtual Column
             this.columns.push(field.getColumnName());
             //}
             //else {
@@ -3657,7 +3803,7 @@
             //    this.columns.push(VIS.Env.parseContext(this.ctx, gt._windowNo, selecgetSql, false));
             //}
 
-            
+
 
 
             //if (field.getDisplayType() == VIS.DisplayType.Image) {
@@ -3736,12 +3882,12 @@
             else    //  replace variables
             {
                 var wClause = VIS.Env.parseContext(this.ctx, gt._windowNo, _whereClause, false);
-                if ((!wClause || wClause.length == 0) && _whereClause.length>0)
-                    m_SQL_Where.append( "11=12" );
+                if ((!wClause || wClause.length == 0) && _whereClause.length > 0)
+                    m_SQL_Where.append("11=12");
                 else
                     m_SQL_Where.append(wClause);
             }
-                //
+            //
             if (_whereClause.toUpperCase().indexOf("=NULL") > 0) {
                 this.log.Severe("Invalid NULL - " + _tableName + "=" + _whereClause);
             }
@@ -3804,7 +3950,7 @@
         }
         //create _SQL and m_countSQL
         this.createSelectSql();
-        if (this.SQL == null || this.SQL.equals("") || !this.columns || this.columns.length==0) {
+        if (this.SQL == null || this.SQL.equals("") || !this.columns || this.columns.length == 0) {
             //log.Log(Level.SEVERE, "No SQL");
             return false;
         }
@@ -3930,7 +4076,7 @@
 
         });
 
-        
+
         return true;
 
 
@@ -4777,18 +4923,18 @@
         return rowDataDB;
     };
 
-/*
-  *	 get current row record
-  *  @param row current row index
-  *  @return row Object
-  */
+    /*
+      *	 get current row record
+      *  @param row current row index
+      *  @return row Object
+      */
 
-    GridTable.prototype.getRowFromDB = function (row,callback) {
+    GridTable.prototype.getRowFromDB = function (row, callback) {
         if (row < 0 || this.getRowCount() == 0 || this.inserting)
             return null;
 
         var rData = this.getRow(row);
-       
+
 
         //	Create SQL
         var where = this.getWhereClause(rData);
@@ -4846,7 +4992,7 @@
             console.log(e);
             sql = VIS.secureEngine.decrypt(sql);
             this.log.log(Level.SEVERE, sql, e);
-           // this.fireDataStatusEEvent("RefreshError", sql, true);
+            // this.fireDataStatusEEvent("RefreshError", sql, true);
             return null;
         }
         finally {
@@ -5936,6 +6082,9 @@
                 keyColumn += "_ID";			//	AD_Language_ID
             var Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, keyColumn);
             if (Record_ID == "")
+                Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, this.gridTab.getTableName() + "_ID"); 
+
+            if (Record_ID == "")
                 Record_ID = 0;
 
             var AD_Table_ID = _vo.AD_Table_ID;
@@ -5946,6 +6095,9 @@
                 || !VIS.MRole.getWindowAccess(AD_Window_ID))
                 return false;
             if (!VIS.MRole.getIsColumnAccess(AD_Table_ID, this.vo.AD_Column_ID, false))
+                return false;
+
+            if (this.gridTab.IsSharedReadOnly)
                 return false;
         }
 

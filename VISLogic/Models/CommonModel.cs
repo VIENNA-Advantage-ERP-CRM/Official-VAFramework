@@ -313,5 +313,16 @@ namespace VISLogic.Models
             }
             return retObj;
         }
+
+        /// <summary>
+        /// Check role acess for Personal Lock, Personal Access And Shared Records
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="roleID"></param>
+        /// <returns></returns>
+        public string CheckAccessForAction(string columnName, int roleID)
+        {
+            return Util.GetValueOfString(DB.ExecuteScalar("SELECT " + columnName + " FROM AD_ROLE WHERE AD_role_ID=" + roleID));
+        }
     }
 }

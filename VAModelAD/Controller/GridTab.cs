@@ -67,6 +67,10 @@ namespace VAdvantage.Model
         //export
         public List<AttachmentList> _exports = null;
 
+        public List<AttachmentList> _sharedRec = null;
+
+        public List<AttachmentList> _sharedWithLoginRec = null;
+
         // current row
         private int _currentRow = 0;
 
@@ -78,7 +82,7 @@ namespace VAdvantage.Model
 
         private bool hasPanels = false;
 
-        
+
 
 
         /**	Logger			*/
@@ -2071,6 +2075,40 @@ namespace VAdvantage.Model
 
                 }
             }
+
+            if (MRole.GetDefault(_vo.GetCtx()).IsShowSharedRecords())
+            {
+                sql = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Table_ID = " + _vo.AD_Table_ID;
+                ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    _sharedRec = new List<AttachmentList>();
+                    int key;
+                    for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        key = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]);
+                        _sharedRec.Add(new AttachmentList() { ID = key});
+                    }
+
+                }
+            }
+
+            sql = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_ShareRecordOrg_ID = " + _vo.GetCtx().GetAD_Org_ID() + " AND AD_Table_ID = " + _vo.AD_Table_ID;
+            ds = DB.ExecuteDataset(sql);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                _sharedWithLoginRec = new List<AttachmentList>();
+                int key;
+                for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    key = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i]["Record_ID"]);
+                    _sharedWithLoginRec.Add(new AttachmentList() { ID = key });
+                }
+
+            }
+
+
+
         }
 
 
