@@ -12,6 +12,7 @@
      * @param {any} record_id
      * @param {any} table_id
      * @param {any} windowNo
+    *  @param {any} parentID
      */
     function RecordShared(record_id, table_id, tab_id, window_id, windowNo, parentID, parentTableID, curTab) {
         this.onClose = null;
