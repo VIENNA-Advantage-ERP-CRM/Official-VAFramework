@@ -86,7 +86,7 @@
                 + '<th>' + VIS.Msg.translate(VIS.Env.getCtx(), "Action") + '</th>'
                 + '</tr>'
                 + '</thead>'
-                + '<tbody></tbody></table>'
+                + '<div><tbody></tbody></div></table>'
                 + '</div>'
 
                 + '<div class="vis-advanedSearch-InputsWrap vis-advs-inputwraps vis-pull-left">'
@@ -139,7 +139,7 @@
                 + '<th>' + VIS.Msg.translate(VIS.Env.getCtx(), "Action") + '</th>'
                 + '</tr>'
                 + '</thead>'
-                + '<tbody ></tbody></table>'
+                + '<div><tbody></tbody></div></table>'
                 + '</div>'
 
                 + '<div class="vis-advancedSearchContentArea-button">'
@@ -160,7 +160,7 @@
 
             //dStyle = isRTL ? "margin-right:15px" : "margin-left:15px";
 
-            html += '<h4>' + VIS.Msg.getMsg("VHistory") + '</h4>'
+            html += '<h4>' + VIS.Msg.getMsg("Org") + '</h4>'
 
 
                 + '</div>'

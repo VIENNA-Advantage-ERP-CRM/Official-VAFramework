@@ -757,6 +757,7 @@
     <Compile Include="Areas\VIS\Controllers\ASearchController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentHistoryController.cs" />
+    <Compile Include="Areas\VIS\Controllers\BatchUpdateController.cs" />
     <Compile Include="Areas\VIS\Controllers\Bitmap.cs" />
     <Compile Include="Areas\VIS\Controllers\BPartnerController.cs" />
     <Compile Include="Areas\VIS\Controllers\CallOut\CalloutColumnController.cs" />
@@ -808,6 +809,7 @@
     <Compile Include="Areas\VIS\Helpers\LookupHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\MenuHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\ProcessHelper.cs" />
+    <Compile Include="Areas\VIS\Models\BatchUpdateModel.cs" />
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />
     <Compile Include="Areas\VIS\Models\EmailModel.cs" />
     <Compile Include="Areas\VIS\Models\GmailContactsSettings.cs" />

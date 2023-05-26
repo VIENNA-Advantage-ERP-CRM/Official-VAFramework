@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Web;
 using VAdvantage.DataBase;
 using VAdvantage.Model;
+using VAdvantage.ModelAD;
 using VAdvantage.Utility;
 
 namespace VIS.Models
@@ -83,7 +84,7 @@ namespace VIS.Models
                 hasWhere = true;
             }
 
-            if (updateList.whereCondition.Count > 0)
+            if (updateList.whereCondition !=null && updateList.whereCondition.Count > 0)
             {
                 if (hasWhere)
                 {
@@ -99,15 +100,15 @@ namespace VIS.Models
                     {
                         sql += updateList.whereCondition[j].andOr + " ";
                     }
+
                     if (updateList.whereCondition[j].opValue.Trim() == "BETWEEN")
                     {
-
+                        sql += updateList.whereCondition[j].column + " BETWEEN '" + updateList.whereCondition[j].qryval + "' AND '" + updateList.whereCondition[j].qryval2 + "' ";
                     }
                     else
                     {
                         sql += updateList.whereCondition[j].column + " " + updateList.whereCondition[j].opValue + " '" + updateList.whereCondition[j].qryval + "' ";
                     }
-
                 }
 
                 sql += ")";
@@ -115,7 +116,14 @@ namespace VIS.Models
 
             if (updateList.orgList.Count > 0)
             {
-                sql += "AND AD_ORG_ID IN (";
+                if (sql.IndexOf("WHERE") == -1) {
+                    sql += " WHERE AD_ORG_ID IN (";
+                }
+                else
+                {
+                    sql += " AND AD_ORG_ID IN (";
+                }
+                
                 for (int k = 0; k < updateList.orgList.Count; k++)
                 {
                     sql += updateList.orgList[k].orgID;
@@ -129,6 +137,14 @@ namespace VIS.Models
 
 
             int count = Util.GetValueOfInt(DB.ExecuteQuery(sql));
+
+            MDirectQueryLog DQL = new MDirectQueryLog(ctx, 0, null);
+            DQL.SetSqlQuery(sql);
+            DQL.SetRecordCount(count);
+            DQL.SetAD_Role_ID(ctx.GetAD_Role_ID());
+            DQL.SetAD_Table_ID(updateList.AD_Table_ID);
+            DQL.SetAD_Session_ID(ctx.GetAD_Session_ID());
+            DQL.Save();
 
             return Util.GetValueOfString(count) + " Records Updated";
         }
