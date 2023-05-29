@@ -197,15 +197,16 @@ namespace VIS.Controllers
         /// <param name="sql"></param>
         /// <param name="cardID"></param>
         /// <returns></returns>
-        public int GetRecordCountWithCard(string sql, int cardID) {
+        public int GetRecordCountWithCard(string sql, int cardID)
+        {
             int count = 0;
             using (var w = new WindowHelper())
             {
                 Ctx ctx = Session["ctx"] as Ctx;
                 sql = SecureEngineBridge.DecryptByClientKey(sql, ctx.GetSecureKey());
-                count= w.GetRecordCountWithCard(sql, cardID);
+                count = w.GetRecordCountWithCard(sql, cardID);
             }
-                return count;
+            return count;
         }
 
         protected override JsonResult Json(object data, string contentType, System.Text.Encoding contentEncoding, JsonRequestBehavior behavior)
@@ -1043,9 +1044,9 @@ namespace VIS.Controllers
 
         //Card View
 
-        public JsonResult GetCardViewDetail(int AD_Window_ID, int AD_Tab_ID,int AD_CardView_ID,string SQL)
+        public JsonResult GetCardViewDetail(int AD_Window_ID, int AD_Tab_ID, int AD_CardView_ID, string SQL)
         {
-            return Json(JsonConvert.SerializeObject(WindowHelper.GetCardViewDetail(AD_Window_ID, AD_Tab_ID, Session["ctx"] as Ctx, AD_CardView_ID,SQL)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(WindowHelper.GetCardViewDetail(AD_Window_ID, AD_Tab_ID, Session["ctx"] as Ctx, AD_CardView_ID, SQL)), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult InsertUpdateDefaultSearch(int AD_Tab_ID, int AD_Table_ID, int AD_User_ID, int? AD_UserQuery_ID)
@@ -1104,7 +1105,7 @@ namespace VIS.Controllers
             if (!QueryValidator.IsValid(validationCode))
                 return null;
 
-            string whereClause= SecureEngineBridge.DecryptByClientKey(json.whereClause, _ctx.GetSecureKey());
+            string whereClause = SecureEngineBridge.DecryptByClientKey(json.whereClause, _ctx.GetSecureKey());
             if (!QueryValidator.IsValid(whereClause))
                 return null;
 
@@ -1122,7 +1123,7 @@ namespace VIS.Controllers
             string keyCol = lInfo.keyColumn;
             if (pColumnName.IndexOf(".") > -1)
             {
-                pColumnName = pColumnName.Substring(pColumnName.IndexOf(".")+1);
+                pColumnName = pColumnName.Substring(pColumnName.IndexOf(".") + 1);
             }
             string displayCol = lInfo.displayColSubQ;
             string tableName = lInfo.tableName;
@@ -1270,7 +1271,7 @@ namespace VIS.Controllers
                 CommonModel objCommonModel = new CommonModel();
                 POInfo inf = POInfo.GetPOInfo(ctx, AD_Table_ID);
                 // Get SQL Query from PO Info for selected table
-                string sqlCol = objCommonModel.GetSQLQuery(ctx,AD_Table_ID,inf.GetPoInfoColumns());
+                string sqlCol = objCommonModel.GetSQLQuery(ctx, AD_Table_ID, inf.GetPoInfoColumns());
 
                 // Append where Clause, passed in the parameter
                 string whClause = Util.GetValueOfString(paramValue[2]);
@@ -1279,7 +1280,7 @@ namespace VIS.Controllers
 
                 // Apply Role check
                 if (sqlCol.Trim() != "")
-                    sqlCol = MRole.GetDefault(ctx).AddAccessSQL(sqlCol, TableName, MRole.SQL_NOTQUALIFIED, MRole.SQL_RO);
+                    sqlCol = MRole.GetDefault(ctx).AddAccessSQL(sqlCol, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
 
                 // if SQL is being generated for Version table
                 if (Util.GetValueOfBool(paramValue[1]))
@@ -1290,7 +1291,7 @@ namespace VIS.Controllers
                     }
                     sqlCol += " ORDER BY " + TableName + ".VERSIONVALIDFROM DESC, " + TableName + ".RecordVersion DESC";
                 }
-               
+
                 retJSON = JsonConvert.SerializeObject(objCommonModel.GetIDTextData(ctx, sqlCol));
                 return Json(retJSON, JsonRequestBehavior.AllowGet);
             }
@@ -1310,7 +1311,7 @@ namespace VIS.Controllers
 
 
         #region Toaster notification
-       [Obsolete]
+        [Obsolete]
         [NonAction]
         public static void AddMessageForToastr(string key, string value)
         {
@@ -1360,12 +1361,12 @@ namespace VIS.Controllers
                 var newDic = ModelLibrary.PushNotif.SSEManager.Get().GetMessages(ctx.GetAD_Session_ID());
                 if (newDic != null && newDic.Count() > 0)
                 {
-                   /// for (int i = 0; i < newDic.Count();)
-                   // {
+                    /// for (int i = 0; i < newDic.Count();)
+                    // {
                     //    KeyValuePair<string, string> keyVal = newDic.ElementAt(i);
                     //    toastrMessage.Remove(keyVal.Key);
-                        serializedObject = ser.Serialize(newDic);
-                        return Content(string.Format("data: {0}\n\n", serializedObject), "text/event-stream");
+                    serializedObject = ser.Serialize(newDic);
+                    return Content(string.Format("data: {0}\n\n", serializedObject), "text/event-stream");
                     //}
                 }
             }
@@ -1375,6 +1376,16 @@ namespace VIS.Controllers
         }
         #endregion
 
+        /// <summary>
+        /// Check role acess for Personal Lock, Personal Access And Shared Records
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="roleID"></param>
+        /// <returns></returns>
+        public JsonResult CheckAccessForAction(string columnName,int roleID) {
+            CommonModel cm = new CommonModel();
+            return Json(JsonConvert.SerializeObject(cm.CheckAccessForAction(columnName, roleID)), JsonRequestBehavior.AllowGet); 
+        }
     }
 
     public class FilterDataContract

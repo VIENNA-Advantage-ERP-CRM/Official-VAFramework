@@ -113,6 +113,7 @@
         this.errorDisplayed = false;
 
         this.isPersonalLock = VIS.MRole.getIsPersonalLock();
+        this.isShowSharedRecord = VIS.MRole.getIsShowSharedRecord();
         this.log = VIS.Logging.VLogger.getVLogger("APanel");
 
         this.isSummaryVisible = false;
@@ -558,6 +559,12 @@
                 this.aRecAccess = this.addActions("RecordAccess", null, true, false, false, onAction, true);
                 this.aRecAccess.setTextDirection("r");
                 $ulactionbar.append(this.aRecAccess.getListItmIT());
+            }
+
+            if (this.isShowSharedRecord && mWindow.getWindowType() == 'M') {
+                this.aSharedRecord = this.addActions(this.ACTION_NAME_SHAREDREC, null, true, false, false, onAction, true);
+                this.aSharedRecord.setTextDirection("r");
+                $ulactionbar.append(this.aSharedRecord.getListItmIT());
             }
 
             this.aPreference = this.addActions("Preference", null, false, false, true, onAction); //2
@@ -1319,6 +1326,7 @@
     APanel.prototype.ACTION_NAME_CHAT = "CHT";
     APanel.prototype.ACTION_NAME_APPOINTMENT = "Appointment";
     APanel.prototype.ACTION_NAME_ARCHIVE = "Archive";
+    APanel.prototype.ACTION_NAME_SHAREDREC = "RSD";
 
     APanel.prototype.keyDown = function (evt) {
         if (!evt.ctrlKey && evt.altKey && this.curGC) {
@@ -2127,6 +2135,9 @@
         else if (tis.isPersonalLock && tis.aRecAccess.getAction() === action) {
             tis.cmd_recAccess();
         }
+        else if (tis.isShowSharedRecord && tis.aSharedRecord.getAction() === action) {
+            tis.cmd_RecordShared();
+        }
 
         //	Tools
         else if (tis.aWorkflow != null && action === (tis.aWorkflow.getAction())) {
@@ -2572,6 +2583,9 @@
                 case 'IMP':
                     aPanel.cmd_ImportMap();
                     break;
+                case 'RSD':
+                    aPanel.cmd_RecordShared();
+                    break;
                 default: actionVADMSDocument(aPanel, vButton.value)
             }
 
@@ -2796,6 +2810,7 @@
         }
 
     }
+   
     /**
      *	tab change
      *  @param action tab item's id
@@ -3116,6 +3131,14 @@
             this.aMap.hide();
         }
         this.setLastView(""); //clear view history
+
+        var selff = this;
+        //if (this.isShowSharedRecord && this.aSharedRecord) {
+        //    window.setTimeout(function () {
+        //        selff.aSharedRecord.setEnabled(true);
+        //        selff.aSharedRecord.setPressed(selff.curTab.hasShared(true));
+        //    }, 200);
+        //}
     };
 
     APanel.prototype.setDefaultSearch = function (gc) {
@@ -3298,6 +3321,16 @@
             this.aRecAccess.setEnabled(true);
         }
 
+        if (this.isShowSharedRecord && this.aSharedRecord) {
+            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org') {
+                this.aSharedRecord.setEnabled(true);
+                this.aSharedRecord.setPressed(this.curTab.hasShared());
+            } else {
+                this.aSharedRecord.setEnabled(false);
+            }
+        }
+
+
 
         if (this.curTab.getRecord_ID() == -1) {
             //this.aMulti.setEnabled(false);
@@ -3373,6 +3406,10 @@
             }
             if (this.aRecAccess) {
                 this.aRecAccess.setEnabled(false);
+            }
+
+            if (this.aSharedRecord) {
+                this.aSharedRecord.setEnabled(false);
             }
 
             //if (this.aCall) {
@@ -3505,8 +3542,7 @@
             this.curWinTab.notifyDataChanged();
         }
 
-
-
+      
         /******End Header Panel******/
 
 
@@ -3607,6 +3643,10 @@
                 callback(retValue);
             }
             curGC.refreshTabPanelData(curTab.getRecord_ID());
+            this.curTab.loadShared();
+            if (this.aSharedRecord) {
+                this.aSharedRecord.setPressed(this.curTab.hasShared());
+            }
             return retValue;
         }
 
@@ -3617,15 +3657,27 @@
             //log.warning("Insert Record disabled for Tab");
             return;
         }
+
+        if (this.curTab.getParentTab() && this.curTab.getParentTab().IsSharedReadOnly) {
+            VIS.ADialog.error("AccessCannotInsert", true, "");
+            return;
+        }
+
         this.curGC.setNewRecordLayout();
         this.curGC.dataNew(copy);
     };// New
 
-    APanel.prototype.cmd_delete = function () {
+    APanel.prototype.cmd_delete = function () {  
+
         if (this.curTab.getIsReadOnly())
             return;
         //var keyID = this.curTab.getRecord_ID();
         //prevent deletion if client access for Read Write does not exist for this Role.
+
+        if (this.curTab.IsSharedReadOnly) {
+            VIS.ADialog.error("CannotDelete", true, "");
+            return;
+        }
 
         var ids = this.curGC.canDeleteRecords()
 
@@ -4117,6 +4169,72 @@
         atHistory.show();
     };
 
+    APanel.prototype.cmd_RecordShared = function () {
+        if (this.curTab.getRecord_ID() < 1) {
+            this.aSharedRecord.setEnabled(false);
+            return;
+        }
+
+        if (this.curGC.getSelectedRows().length > 1) {
+            VIS.ADialog.info('ShareOneRecordOnly');
+            return;
+        }
+
+        var isAccess = 'Y';
+        $.ajax({
+            url: VIS.Application.contextUrl + "JsonData/CheckAccessForAction",
+            dataType: "json",
+            async: false,
+            data: {
+                columnName: 'ShowSharedRecords',
+                roleID: VIS.context.getAD_Role_ID()
+            },
+            error: function (e) {
+                //VIS.ADialog.info(VIS.Msg.getMsg('ERRORGettingPostingServer'));
+            },
+            success: function (result) {
+                isAccess = JSON.parse(result);
+            }
+        });
+
+        if (isAccess != 'Y') {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return false;
+        }       
+
+        var self = this;
+        var parentTableID = 0;
+        if (this.curTab.getParentTab()) {
+            parentTableID = this.curTab.getParentTab().getAD_Table_ID();
+            if (!this.curTab.getParentTab().hasShared()) {
+                VIS.ADialog.info("ShareParentFirst", true, "", "");
+                this.aSharedRecord.setPressed(false);
+                return;;
+            }
+
+        }
+
+        var self = this;
+        var parentTableID = 0;
+        if (this.curTab.getParentTab()) {
+            parentTableID = this.curTab.getParentTab().getAD_Table_ID();
+            if (!this.curTab.getParentTab().hasShared()) {
+                VIS.ADialog.info("ShareParentFirst", true, "", "");
+                this.aSharedRecord.setPressed(false);
+                return;;
+            }
+
+        }
+
+        var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo, this.curTab.linkValue, parentTableID, this.curTab);
+        atRecordShared.onClose = function () {
+            self.curTab.loadShared();
+            self.aSharedRecord.setPressed(self.curTab.hasShared());
+            self = null;
+        }
+        atRecordShared.show();
+    }
+
     APanel.prototype.clearSearchText = function () {
         if (this.curGC) {
             this.curGC.searchCode = "";
@@ -4354,13 +4472,62 @@
         {
             return;
         }
+
+        var isAccess = 'Y';
+        $.ajax({
+            url: VIS.Application.contextUrl + "JsonData/CheckAccessForAction",
+            dataType: "json",
+            async: false,
+            data: {
+                columnName: 'IsPersonalLock',
+                roleID: VIS.context.getAD_Role_ID()
+            },
+            error: function (e) {
+                //VIS.ADialog.info(VIS.Msg.getMsg('ERRORGettingPostingServer'));
+            },
+            success: function (result) {
+                isAccess = JSON.parse(result);
+            }
+        });
+
+        if (isAccess != 'Y') {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return false;
+        } 
+
+
         this.curTab.locks(VIS.context, record_ID, this.aLock.getIsPressed());
         this.curTab.loadAttachments();			//	reload
         locked = this.curTab.getIsLocked();
         this.aLock.setPressed(locked);
     };
 
+
     APanel.prototype.cmd_recAccess = function () {
+
+
+        var isAccess = 'Y';
+        $.ajax({
+            url: VIS.Application.contextUrl + "JsonData/CheckAccessForAction",
+            dataType: "json",
+            async: false,
+            data: {
+                columnName: 'IsPersonalAccess',
+                roleID: VIS.context.getAD_Role_ID()
+            },
+            error: function (e) {
+                //VIS.ADialog.info(VIS.Msg.getMsg('ERRORGettingPostingServer'));
+            },
+            success: function (result) {
+                isAccess = JSON.parse(result);
+            }
+        });
+
+        if (isAccess != 'Y') {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return false;
+        } 
+
         var recAccessDialog = new VIS.RecordAccessDialog();
         recAccessDialog.Load(this.curTab.getAD_Table_ID(), this.curTab.getRecord_ID());
 
