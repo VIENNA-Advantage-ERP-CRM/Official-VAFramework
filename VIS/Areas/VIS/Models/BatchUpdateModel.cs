@@ -11,8 +11,18 @@ using VAdvantage.Utility;
 
 namespace VIS.Models
 {
+    /// <summary>
+    ///Direct Update 
+    ///VIS0228 30- Apr-2023
+    /// </summary>
     public class BatchUpdateModel
     {
+        /// <summary>
+        /// Excute Direct Update
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="updateList"></param>
+        /// <returns></returns>
         public string ExcuteBatchUpdate(Ctx ctx, UpdateList updateList)
         {
             string tableName = MTable.GetTableName(ctx, updateList.AD_Table_ID);
@@ -28,7 +38,7 @@ namespace VIS.Models
                 mClassName = "M" + tableName.Split('_')[1];
             }
 
-
+            // Get all Assembles
             Assembly[] foo = AppDomain.CurrentDomain.GetAssemblies();
             bool classExists = false;
             foreach (Assembly a in foo)
@@ -138,6 +148,7 @@ namespace VIS.Models
 
             int count = Util.GetValueOfInt(DB.ExecuteQuery(sql));
 
+            // Maintain Query log
             MDirectQueryLog DQL = new MDirectQueryLog(ctx, 0, null);
             DQL.SetSqlQuery(sql);
             DQL.SetRecordCount(count);

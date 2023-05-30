@@ -690,6 +690,10 @@
                 });
             });
 
+            if (objSetValue.length == 0) {
+                return;
+            }
+
             var objWhere = [];
             tblWhereCondition.find('tbody tr').each(function () {
                 objWhere.push({
