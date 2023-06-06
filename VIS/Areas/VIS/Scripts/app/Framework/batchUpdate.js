@@ -12,7 +12,7 @@
         var control1, control2, ulListStaticHtml = "";;
 
 
-        var $root = $("<div  class='vis-forms-container' style='height:100%'>");
+        var $root = $("<div  class='vis-forms-container'>");
         var $busy = null;
 
         var $self = this;
@@ -143,19 +143,12 @@
                 + '</div>'
 
                 + '<div class="vis-advancedSearchContentArea-button">'
-                + '<div class="vis-advcedfooterBtn">'
-                + '<div id="divMessage_' + windowNo + '"></div>'
-                + '<div class="vis-pull-right">'
-                + '<button id="btnOk_' + windowNo + '" class="ui-button ui-corner-all ui-widget" >' + VIS.Msg.getMsg("Apply") + '</button>'
-                + '  <button id="btnCancel_' + windowNo + '" class="ui-button ui-corner-all ui-widget"  style="margin: 0 10px;">' + VIS.Msg.getMsg("close") + '</button>'
-
-                + '</div>'
-                + '</div>'
+               
                 + '</div>'
                 + '</div>';
 
 
-            html += '<div class="vis-advancedSearch-RecentRecords">'
+            html += '<div class="vis-UpdateOrg-section">'
                 + '  <div class="vis-RecentRecords-Heading">';
 
             //dStyle = isRTL ? "margin-right:15px" : "margin-left:15px";
@@ -164,16 +157,25 @@
 
 
                 + '</div>'
-                + '<div class="vis-RecentRecords-listWrap">'
+                + '<div class="vis-UpdateOrg-listWrap">'
                 + '<ul >';
 
             $("#vis_home_org option").each(function () {
                 html += '<li><input type="checkbox" value="' + $(this).val() + '" checked/>' + $(this).text() + '</li>';
             })
 
-            html+= '</ul></div>'
+            html += '</ul></div>'
+                + '</div>'
+                
+                + '<div class="vis-advcedfooterBtn">'
+                + '<div id="divMessage_' + windowNo + '"></div>'
+                + '<div class="vis-pull-right">'
+                + '<button id="btnOk_' + windowNo + '" class="ui-button ui-corner-all ui-widget " >' + VIS.Msg.getMsg("Apply") + '</button>'
+                + '  <button id="btnCancel_' + windowNo + '" class="ui-button ui-corner-all ui-widget mr-0"  style="margin: 0 10px;">' + VIS.Msg.getMsg("close") + '</button>'
+
+                + '</div>'
+                + '</div>'
                 + '</div>';
-            + '</div>';
 
             $root.append(html);
             initUI();
@@ -748,7 +750,7 @@
         this.show = function () {
             ch = new VIS.ChildDialog();
 
-            ch.setHeight(700);
+            ch.setHeight(690);
             ch.setWidth(900);
             ch.setTitle(VIS.Msg.getMsg("BatchUpdate"));
             ch.setModal(true);
