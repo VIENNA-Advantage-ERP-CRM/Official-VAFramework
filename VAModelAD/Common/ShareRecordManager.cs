@@ -152,7 +152,7 @@ namespace VAdvantage.Common
                                     SRO.SetAD_Table_ID(po.Get_Table_ID());
                                     SRO.Set_ValueNoCheck("AD_OrgShared_ID", sharedRec[k].OrgID);
                                     SRO.SetIsReadOnly(sharedRec[k].Readonly);
-                                    SRO.SetRecord_ID(po.Get_ID());
+                                    SRO.SetRecord_ID(Util.GetValueOfInt(po.Get_Value(po.GetTableName() + "_ID")));
                                     SRO.Set_ValueNoCheck("Parent_ID", parentOrg_ID);
                                     if (SRO.Save())
                                     {
