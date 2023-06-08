@@ -167,6 +167,35 @@ VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
         this.oldTabIndex = -1;
     };
 
+
+    VIS.VTabbedPane.prototype.getNextTabId = function (tabSeq) {
+        if (!tabSeq)
+            tabSeq = 10;
+        var step =  Math.ceil(tabSeq/ 10) -1;
+        var curIndex = this.oldTabIndex;
+
+        curIndex = step;
+        var id = null;
+
+        if (curIndex >= 0 && curIndex  < this.ItemsIds.length - 1 && curIndex != this.oldTabIndex) {
+            id = this.ItemsIds[curIndex];
+        }
+        else
+            id = this.ItemsIds[this.oldTabIndex];
+        return id;
+    };
+
+    VIS.VTabbedPane.prototype.getPreviousTabId = function () {
+
+        var id = null;
+        if (this.oldTabIndex > 0) {
+            id = this.ItemsIds[this.oldTabIndex - 1];
+        }
+        else
+            id = this.ItemsIds[this.oldTabIndex];
+        return id;
+    };
+
 /**
  *  current selected tab element either GridController or VSortTab
  */

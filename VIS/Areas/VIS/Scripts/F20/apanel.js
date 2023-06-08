@@ -2241,7 +2241,6 @@
 
     };
 
-
     APanel.prototype.actionButtonCallBack = function (vButton, startWOasking, batch, dateScheduledStart, columnName, ctx, self) {
         var table_ID = self.curTab.getAD_Table_ID();
         //	Record_ID
@@ -2251,6 +2250,7 @@
         var curGC = self.curGC;
         var aPanel = this;
         var curWindowNo = this.curWindowNo;
+        var mField = vButton.getField();
 
         //	Record_ID - Language Handling
         if (record_ID == -1 && curTab.getKeyColumnName().equals("AD_Language"))
@@ -2511,6 +2511,13 @@
         else if (columnName.equals("OpenCardDialog")) {
             aPanel.cmd_cardDialog(true);
         }
+        /*Special handling
+          Move to next tab */
+        else if (mField.getIsAction()) {
+            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()));
+            return;
+        }
+
         if (vButton.AD_Process_ID > 0) {
 
             var ret = this.checkAndCallProcess(vButton, table_ID, record_ID, ctx, self);
@@ -2796,6 +2803,7 @@
         }
 
     }
+
     /**
      *	tab change
      *  @param action tab item's id
@@ -2898,6 +2906,7 @@
                                 if (!isAPanelTab)
                                     selfPanel.curGC = gc;
 
+                               
                                 selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st);
                             });
                         }
@@ -2923,6 +2932,7 @@
                 this.curTabIndex = tpIndex;
                 if (!isAPanelTab)
                     this.curGC = gc;
+                
             }
 
         }
@@ -2933,26 +2943,7 @@
         return true;
     };
 
-    //APanel.prototype.tabActionPerformedCallback2 = function (curEle, oldGC) {
-    //    curEle = this.curGC;
-    //    oldGC = this.curGC;
-    //    this.curGC = null;
-    //}
-
-    //APanel.prototype.tabActionPerformedCallback3 = function (curEle, isAPanelTab, gc, tpIndex) {
-    //    if (this.curST != null) {
-    //        this.curST.saveData();
-    //        this.curST.unRegisterAPanel();
-    //        curEle = this.curST;
-    //        this.curST = null;
-    //    }
-
-    //    this.curTabIndex = tpIndex;
-    //    if (!isAPanelTab)
-    //        this.curGC = gc;
-    //}
-
-    APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st) {
+    APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st ) {
 
 
         curEle.setVisible(false);
@@ -3116,6 +3107,10 @@
             this.aMap.hide();
         }
         this.setLastView(""); //clear view history
+    };
+
+    APanel.prototype.onQueryCompleted = function () {
+
     };
 
     APanel.prototype.setDefaultSearch = function (gc) {

@@ -779,10 +779,19 @@
         return false;
     };	//
 
+    GridTab.prototype.getIsAutoNewRecord = function () {
+        return this.vo.IsAutoNewRecord === true;
+    };
+
     GridTab.prototype.getIsInsertRecord = function () {
         if (this.getIsReadOnly())
             return false;
-        return this.vo.IsInsertRecord;
+        var limitReached = false;
+        if (this.vo.RecordLimit > 0) {
+            limitReached = this.gTable.getTotalRowCount() >= this.vo.RecordLimit;
+        }
+
+        return this.vo.IsInsertRecord && !limitReached;
     };
 
     GridTab.prototype.getIncluded_Tab_ID = function () {
@@ -7126,6 +7135,12 @@
     };
     GridField.prototype.getIsSwitch = function () {
         return this.vo.IsSwitch;
+    };
+    GridField.prototype.getIsAction = function () {
+        return this.vo.IsAction;
+    };
+    GridField.prototype.getTabSeqNo = function () {
+        return this.vo.TabSeqNo;
     };
 
     /**

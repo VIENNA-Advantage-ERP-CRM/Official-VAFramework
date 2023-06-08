@@ -275,6 +275,10 @@ namespace VAdvantage.Controller
         public string StyleLogic = "";
         public string GridImageStyle = null;
 
+        public bool IsAction = false; /* is Tab Change action button */
+
+        public int TabSeqNo = 0; /* Seq of tab */
+
 
 
         /// <summary>
