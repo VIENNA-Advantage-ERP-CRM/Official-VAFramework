@@ -3135,6 +3135,10 @@
 
     };
 
+    APanel.prototype.onQueryCompleted = function () {
+
+    };
+
     APanel.prototype.setDefaultSearch = function (gc) {
 
         var $selfpanel = this;
