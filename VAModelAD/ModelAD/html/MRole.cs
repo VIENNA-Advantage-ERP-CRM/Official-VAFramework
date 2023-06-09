@@ -20,6 +20,7 @@ using VAdvantage.Utility;
 using VAdvantage.Logging;
 using System.Runtime.CompilerServices;
 using VAModelAD.Model;
+using VAdvantage.ModelAD;
 
 namespace VAdvantage.Model
 {
@@ -37,7 +38,7 @@ namespace VAdvantage.Model
         private Dictionary<int, bool> _dcProcess_access = null;
         private Dictionary<string, string> _dcTask_access = null;
         private Dictionary<string, string> _dcWorkflow_access = null;
-        private MRecordAccess[] _sharedRecordAccess = null;
+        //private MShareRecordOrg[] _sharedRecordAccess = null;
 
         //	Default Role 
         private static MRole _defaultRole = null;
@@ -1461,7 +1462,7 @@ namespace VAdvantage.Model
             LoadTableInfo(reload);
             LoadColumnAccess(reload);
             LoadRecordAccess(reload);
-            LoadSharedRecord(reload);
+            //LoadSharedRecord(reload);
             if (reload)
             {
                 _dcTask_access = null;
@@ -1698,10 +1699,10 @@ namespace VAdvantage.Model
             return _recordDependentAccess;
         }
 
-        public MRecordAccess[] GetSharedRecordAccess()
-        {
-            return _sharedRecordAccess;
-        }
+        //public MShareRecordOrg[] GetSharedRecordAccess()
+        //{
+        //    return _sharedRecordAccess;
+        //}
 
         /// <summary>
         /// Load Org Access
@@ -2798,7 +2799,7 @@ namespace VAdvantage.Model
                 sql.Append(" OR (");
 
                 //select * from C_Order where (AD_Client_ID=11 AD AD_Org_ID =0 OR C_Order_ID IN (qry)
-                sql.Append(tableName + "_ID IN (" + qry + "))");
+                sql.Append(tableName+"."+tableName + "_ID IN (" + qry + "))");
 
             }
         }
@@ -2808,31 +2809,57 @@ namespace VAdvantage.Model
         /// Get List of records which are shared with login organization
         /// </summary>
         /// <param name="reload"></param>
-        public void LoadSharedRecord(bool reload)
-        {
-            List<MRecordAccess> sharedRecordAccess = new List<MRecordAccess>();
-            if (!(reload || _sharedRecordAccess == null || IsShowSharedRecords()))
-            {
-                _sharedRecordAccess = sharedRecordAccess.ToArray();
-                return;
-            }
+        //public void LoadSharedRecord(bool reload)
+        //{
+        //    List<MShareRecordOrg> sharedRecordAccess = new List<MShareRecordOrg>();
+            
+        //    if (!(reload || _sharedRecordAccess == null || IsShowSharedRecords()))
+        //    {
+        //        _sharedRecordAccess = sharedRecordAccess.ToArray();
+        //        return;
+        //    }
 
-            string qry = "SELECT record_Id,IsReadOnly,AD_Table_ID FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID();
-            //int recordID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
-            DataSet ds = DB.ExecuteDataset(qry);
-            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-            {
-                for (var i = 0; i < ds.Tables[0].Rows.Count; i++)
-                {
-                    MRecordAccess rec = new MRecordAccess(GetCtx(), ds.Tables[0].Rows[i], Get_Trx());
-                    rec.SetRecord_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["record_Id"]));
-                    rec.SetIsReadOnly(Util.GetValueOfString(ds.Tables[0].Rows[i]["IsReadOnly"]) == "Y" ? true : false);
-                    rec.SetAD_Table_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Table_ID"]));
-                    sharedRecordAccess.Add(rec);
-                }
-            }
-            _sharedRecordAccess = sharedRecordAccess.ToArray();
-        }
+        //    _sharedRecordAccess = sharedRecordAccess.ToArray();
+        //    return;
+
+        //    string sql = "SELECT * FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID(); 
+        //    List<MShareRecordOrg> list = new List<MShareRecordOrg>();          
+
+        //    DataTable dt = null;
+        //    IDataReader dr = null;
+        //    try
+        //    {
+        //        dr = DataBase.DB.ExecuteReader(sql, null, Get_TrxName());
+        //        dt = new DataTable();
+        //        dt.Load(dr);
+        //        dr.Close();
+        //        foreach (DataRow rs in dt.Rows)
+        //        {
+        //            MShareRecordOrg ra = new MShareRecordOrg(GetCtx(), rs, Get_TrxName());
+        //            list.Add(ra);                    
+        //        }
+
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        if (dr != null)
+        //        {
+        //            dr.Close();
+        //        }
+        //        log.Log(Level.SEVERE, sql, e);
+        //    }
+        //    finally
+        //    {
+        //        dt = null;
+        //        if (dr != null)
+        //        {
+        //            dr.Close();
+        //        }
+        //    }
+        //    _sharedRecordAccess = list.ToArray();
+            
+        //}
 
         public override String ToString()
         {

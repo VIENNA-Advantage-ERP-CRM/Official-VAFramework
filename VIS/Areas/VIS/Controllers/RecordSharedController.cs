@@ -67,12 +67,12 @@ namespace VIS.Areas.VIS.Controllers
         /// Not Used
         /// </summary>
         /// <returns></returns>
-        public JsonResult GetSharedRecords()
-        {
-            Ctx ctx = Session["ctx"] as Ctx;
-            RecordShared model = new RecordShared();
-            return Json(JsonConvert.SerializeObject(model.GetSharedRecords(ctx)), JsonRequestBehavior.AllowGet);
-        }
+        //public JsonResult GetSharedRecords()
+        //{
+        //    Ctx ctx = Session["ctx"] as Ctx;
+        //    RecordShared model = new RecordShared();
+        //    return Json(JsonConvert.SerializeObject(model.GetSharedRecords(ctx)), JsonRequestBehavior.AllowGet);
+        //}
 
         public JsonResult GetSharedRecordAccess(int AD_Table_ID, int Record_ID)
         {
