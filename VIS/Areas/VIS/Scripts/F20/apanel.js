@@ -3537,7 +3537,7 @@
 
         if (this.curWinTab == this.vTabbedPane) {
             this.curWinTab.evaluate(null);
-            this.curWinTab.notifyDataChanged();
+            this.curWinTab.notifyDataChanged(e);
         }
 
       
