@@ -165,6 +165,10 @@ namespace VAdvantage.Controller
 
         public int DefaultCardID = 0;
 
+        public int RecordLimit = 0;
+
+        public bool? IsAutoNewRecord = null;
+
         public string SelectSQL
         {
             get;
@@ -536,6 +540,14 @@ namespace VAdvantage.Controller
                 vo.TabLayout = Utility.Util.GetValueOfString(dr["TabLayout"]);
 
                 vo.NewRecordView = Util.GetValueOfString(dr["NewRecordView"]);
+
+                vo.RecordLimit = Util.GetValueOfInt(dr["RecordLimit"]);
+
+                string isAuto = dr["IsAutoNewRecord"].ToString();
+                if (isAuto == "Y")
+                    vo.IsAutoNewRecord = true;
+                else if (isAuto == "N")
+                    vo.IsAutoNewRecord = false;
             }
             catch (System.Exception ex)
             {
@@ -985,6 +997,9 @@ namespace VAdvantage.Controller
             clone.TabLayout = TabLayout;
             // clone.DefaultCardID = DefaultCardID;
             clone.NewRecordView = NewRecordView;
+
+            clone.IsAutoNewRecord = IsAutoNewRecord;
+            clone.RecordLimit = RecordLimit;
 
             clone.fields = new List<GridFieldVO>();
             for (int i = 0; i < fields.Count; i++)
