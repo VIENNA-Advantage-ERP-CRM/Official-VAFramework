@@ -384,14 +384,14 @@ namespace VISLogic.Models
 
 
 
-        public List<RecordAccess> GetSharedRecords(Ctx ctx)
-        {
-            List<RecordAccess> sharedRecordAccess = new List<RecordAccess>();
-            MRole role = MRole.GetDefault(ctx);
-            role.LoadSharedRecord(true);
-            sharedRecordAccess = RecordAccess.Get(role.GetSharedRecordAccess());
-            return sharedRecordAccess;
-        }
+        //public List<ShareRecordAccess> GetSharedRecords(Ctx ctx)
+        //{
+        //    List<ShareRecordAccess> sharedRecordAccess = new List<RecordAccess>();
+        //    MRole role = MRole.GetDefault(ctx);
+        //    role.LoadSharedRecord(true);
+        //    sharedRecordAccess = ShareRecordAccess.Get(role.GetSharedRecordAccess());
+        //    return sharedRecordAccess;
+        //}
 
 
         /// <summary>

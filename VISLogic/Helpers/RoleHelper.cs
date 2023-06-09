@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using VAdvantage.Model;
+using VAdvantage.ModelAD;
 
 namespace VIS.Helpers
 {
@@ -44,7 +45,7 @@ namespace VIS.Helpers
             r.columnAccess = ColumnAccess.Get(role.GetColumnAccess());
             r.recordAccess = RecordAccess.Get(role.GetRecordAccess());
             r.recordDependentAccess = RecordAccess.Get(role.GetRecordDependentAccess());
-            r.sharedRecordAccess = RecordAccess.Get(role.GetSharedRecordAccess());
+            //r.sharedRecordAccess = ShareRecordAccess.Get(role.GetSharedRecordAccess());
             r.MaxQueryRecords = role.GetMaxQueryRecords();
             r.IsShowAcct = role.IsShowAcct();
             r.IsDisableMenu = role.IsDisableMenu();
@@ -75,7 +76,7 @@ namespace VIS.Helpers
         public Dictionary<int, bool> processAccess = null;
 
         //To store record shared by other Orgs
-        public List<RecordAccess> sharedRecordAccess = null;
+        //public List<ShareRecordAccess> sharedRecordAccess = null;
 
         /*Properties*/
         public bool IsAccessAllOrgs;
@@ -233,4 +234,25 @@ namespace VIS.Helpers
         }
 
     }
+
+    //public class ShareRecordAccess
+    //{
+    //    public int AD_Table_ID;
+    //    public int Record_ID;
+    //    public bool IsReadOnly;
+    //    public static List<ShareRecordAccess> Get(MShareRecordOrg[] recAccess)
+    //    {
+    //        List<ShareRecordAccess> rl = new List<ShareRecordAccess>();
+    //        ShareRecordAccess ra = null;
+    //        foreach (MShareRecordOrg r in recAccess)
+    //        {
+    //            ra = new ShareRecordAccess();
+    //            ra.IsReadOnly = r.IsReadOnly();
+    //            ra.AD_Table_ID = r.GetAD_Table_ID();
+    //            ra.Record_ID = r.GetRecord_ID();
+    //            rl.Add(ra);
+    //        }
+    //        return rl;
+    //    }
+    //}
 }
