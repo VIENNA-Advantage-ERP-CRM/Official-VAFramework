@@ -321,11 +321,11 @@ namespace VAModelAD.Model
                 System.Threading.Tasks.Task.Run(() =>
                 {
                     string query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + po.Get_Table_ID() + " AND Record_ID=" + recordID;
-                DataSet ds = DB.ExecuteDataset(query);
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                {
-                        VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]),null,null);
-                }
+                    DataSet ds = DB.ExecuteDataset(query);
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), null, null);
+                    }
                 });
             }
             return success;
@@ -355,7 +355,12 @@ namespace VAModelAD.Model
 
         public int GetNextID(int AD_Client_ID, string TableName, Trx trx)
         {
-            return MSequence.GetNextID(AD_Client_ID, TableName, trx);
+            return MSequence.GetNextID(AD_Client_ID, TableName, trx, 0);
+        }
+
+        public int GetNextID(int AD_Client_ID, string TableName, Trx trx, int IncrementNo)
+        {
+            return MSequence.GetNextID(AD_Client_ID, TableName, trx, IncrementNo);
         }
 
         public string GetDocumentNo(PO po)
