@@ -169,15 +169,17 @@ VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
 
 
     VIS.VTabbedPane.prototype.getNextTabId = function (tabSeq) {
-        if (!tabSeq)
-            tabSeq = 10;
-        var step =  Math.ceil(tabSeq/ 10) -1;
+        if (!tabSeq || tabSeq<0)
+            tabSeq = 0;
+        if (tabSeq >= this.ItemsIds.length)
+            tabSeq = this.ItemsIds.length - 1;
+        
         var curIndex = this.oldTabIndex;
 
-        curIndex = step;
+        curIndex = tabSeq;
         var id = null;
 
-        if (curIndex >= 0 && curIndex  < this.ItemsIds.length - 1 && curIndex != this.oldTabIndex) {
+        if (curIndex != this.oldTabIndex) {
             id = this.ItemsIds[curIndex];
         }
         else
