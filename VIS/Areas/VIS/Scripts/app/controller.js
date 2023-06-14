@@ -798,7 +798,7 @@
             return false;
         var limitReached = false;
         if (this.vo.RecordLimit > 0) {
-            limitReached = this.gTable.getTotalRowCount() >= this.vo.RecordLimit;
+            limitReached = this.gridTable.getTotalRowCount() >= this.vo.RecordLimit;
         }
 
         return this.vo.IsInsertRecord && !limitReached;
