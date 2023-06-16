@@ -78,7 +78,7 @@ namespace VISLogic.Models
             bool canEdit = true;
 
 
-            string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary, AD_ShareRecordOrg.AD_Org_ID AS OrgID FROM AD_Org AD_Org
+            string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary, AD_ShareRecordOrg.AD_Org_ID AS OrgID,IsChildShare FROM AD_Org AD_Org
                                 LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID;
 
            int count=Util.GetValueOfInt(DB.ExecuteScalar("SELECT count(AD_Org_ID) FROM AD_Role_OrgAccess WHERE ISACTIVE='Y' AND AD_role_ID=" + ctx.GetAD_Role_ID() + " AND AD_Org_ID IN ("+ po.GetAD_Org_ID()+")"));
@@ -108,6 +108,7 @@ namespace VISLogic.Models
                         legalEntityOrg = Util.GetValueOfInt(ds.Tables[0].Rows[i]["LegalEntityOrg"]),
                         isReadonly = Util.GetValueOfString(ds.Tables[0].Rows[i]["isreadonly"]).Equals("Y"),
                         isSummary = Util.GetValueOfString(ds.Tables[0].Rows[i]["isSummary"]).Equals("Y"),
+                        ChildShare = Util.GetValueOfString(ds.Tables[0].Rows[i]["IsChildShare"]).Equals("Y"),
                         AD_OrgShared_ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ShareRecordOrg_ID"]),
                         OrgID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["OrgID"]),
                         CanEdit = canEdit
@@ -204,6 +205,7 @@ namespace VISLogic.Models
                         MShareRecordOrg SRO = new MShareRecordOrg(ctx, ID, trx);
                         SRO.SetAD_Table_ID(AD_Table_ID);
                         SRO.Set_ValueNoCheck("AD_OrgShared_ID", records[i].AD_OrgShared_ID);
+                        SRO.Set_ValueNoCheck("IsChildShare", records[i].ChildShare);
 
                         if (ID != 0 && SRO.IsReadOnly() != records[i].isReadonly)
                             statussChanged = true;
@@ -226,6 +228,7 @@ namespace VISLogic.Models
                         Org.RecordID = record_ID;
                         Org.OrgID = records[i].AD_OrgShared_ID;
                         Org.Readonly = records[i].isReadonly;
+                        Org.ChildShare = records[i].ChildShare;
                         VAdvantage.Common.ShareRecordManager.AddRecordToTable(AD_Table_ID, Org, statussChanged);
                         //}
 
@@ -245,6 +248,7 @@ namespace VISLogic.Models
                                     MShareRecordOrg SROV = new MShareRecordOrg(ctx, 0, trx);
                                     SROV.SetAD_Table_ID(versionTableID);
                                     SROV.Set_ValueNoCheck("AD_OrgShared_ID", records[i].AD_OrgShared_ID);
+                                    SROV.Set_ValueNoCheck("IsChildShare", records[i].ChildShare);
                                     SROV.SetIsReadOnly(records[i].isReadonly);
                                     SROV.SetRecord_ID(Util.GetValueOfInt(dsVer.Tables[0].Rows[v][0]));
                                     if (newParentID > 0)
@@ -259,6 +263,7 @@ namespace VISLogic.Models
                                     VAdvantage.Common.ShareOrg OrgV = new VAdvantage.Common.ShareOrg();
                                     OrgV.RecordID = Util.GetValueOfInt(dsVer.Tables[0].Rows[v][0]);
                                     OrgV.OrgID = records[i].AD_OrgShared_ID;
+                                    OrgV.ChildShare = records[i].ChildShare;
                                     OrgV.Readonly = records[i].isReadonly;
                                     VAdvantage.Common.ShareRecordManager.AddRecordToTable(versionTableID, OrgV);
                                 }
@@ -266,80 +271,83 @@ namespace VISLogic.Models
                         }
 
                         //GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, Window_ID, 0);
-
-                        GridTabVO gt = tabs.Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
-
-                        List<GridTabVO> gTabs = tabs.Where(a => a.TabLevel == gt.TabLevel + 1).ToList();
-
-
-                        if (gTabs != null && gTabs.Count > 0)
+                        if (records[i].ChildShare)
                         {
-                            foreach (var tab in gTabs)
+                            GridTabVO gt = tabs.Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
+
+                            List<GridTabVO> gTabs = tabs.Where(a => a.TabLevel == gt.TabLevel + 1).ToList();
+
+
+                            if (gTabs != null && gTabs.Count > 0)
                             {
-                                MTable table = MTable.Get(ctx, tab.AD_Table_ID);
-                                // VAdvantage.Common.ShareRecordManager.AddParentChild(tab.AD_Table_ID, AD_Table_ID);
-
-                                int linkCol = tab.AD_Column_ID;
-                                string lCol = "";
-                                List<MColumn> cols = table.GetColumns(false).Where(a => a.IsParent() == true).ToList();
-                                DataSet ds = null;
-
-                                if (linkCol > 0)
+                                foreach (var tab in gTabs)
                                 {
-                                    //C_Order_ID
-                                    lCol = MColumn.GetColumnName(ctx, tab.AD_Column_ID);
-                                    PO pObj = MTable.GetPO(ctx, gt.TableName, record_ID, trx);
-                                    if (pObj == null)
-                                        continue;
-                                    //select C_Order_ID FROM C_orderTax where C_Order_ID=11123123
-                                    ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID FROM {table.GetTableName()} WHERE {lCol}={ pObj.Get_ValueAsInt(lCol)}");
-                                }
-                                else
-                                {
-                                    if (cols != null && cols.Count > 0)
+                                    MTable table = MTable.Get(ctx, tab.AD_Table_ID);
+                                    // VAdvantage.Common.ShareRecordManager.AddParentChild(tab.AD_Table_ID, AD_Table_ID);
+
+                                    int linkCol = tab.AD_Column_ID;
+                                    string lCol = "";
+                                    List<MColumn> cols = table.GetColumns(false).Where(a => a.IsParent() == true).ToList();
+                                    DataSet ds = null;
+
+                                    if (linkCol > 0)
                                     {
-                                        if (cols.Count == 1 && gt.TableName + "_ID" == cols[0].GetColumnName())
+                                        //C_Order_ID
+                                        lCol = MColumn.GetColumnName(ctx, tab.AD_Column_ID);
+                                        PO pObj = MTable.GetPO(ctx, gt.TableName, record_ID, trx);
+                                        if (pObj == null)
+                                            continue;
+                                        //select C_Order_ID FROM C_orderTax where C_Order_ID=11123123
+                                        ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID FROM {table.GetTableName()} WHERE {lCol}={ pObj.Get_ValueAsInt(lCol)}");
+                                    }
+                                    else
+                                    {
+                                        if (cols != null && cols.Count > 0)
                                         {
-
-                                            //// This one is for key Column
-                                            // Select C_orderline-ID from C_OrderLine where C_Order_ID=112212312;
-                                            ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID FROM {table.GetTableName()} WHERE {gt.TableName}_ID = {record_ID}");
-                                        }
-                                        else
-                                        {
-                                            PO pObj = MTable.GetPO(ctx, table.GetTableName(), record_ID, trx);
-                                            if (pObj != null)
+                                            if (cols.Count == 1 && gt.TableName + "_ID" == cols[0].GetColumnName())
                                             {
-                                                for (int m = 0; m < cols.Count; m++)
-                                                {
-                                                    MTable fkTable = MColumn.Get(ctx, cols[m].GetAD_Column_ID()).GetFKTable();
-                                                    string fkColumnName = MColumn.Get(ctx, cols[m].GetAD_Column_ID()).GetFKColumnName();
 
-                                                    int count = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT Count(*) FROM AD_ShareRecordOrg WHERE AD_Table_ID={fkTable.GetAD_Table_ID()} AND Record_ID={pObj.Get_ValueAsInt(fkColumnName)}"));
-                                                    if (count > 0)
+                                                //// This one is for key Column
+                                                // Select C_orderline-ID from C_OrderLine where C_Order_ID=112212312;
+                                                ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID FROM {table.GetTableName()} WHERE {gt.TableName}_ID = {record_ID}");
+                                            }
+                                            else
+                                            {
+                                                PO pObj = MTable.GetPO(ctx, table.GetTableName(), record_ID, trx);
+                                                if (pObj != null)
+                                                {
+                                                    for (int m = 0; m < cols.Count; m++)
                                                     {
-                                                        ds = DB.ExecuteDataset($"SELECT  {table.GetKeyColumns()[0]} FROM {table.GetTableName()} WHERE {cols[m].GetColumnName()} = {pObj.Get_ValueAsInt(cols[m].GetColumnName())} ");
-                                                        if (ds != null && ds.Tables[0].Rows.Count > 0)
-                                                            break;
+                                                        MTable fkTable = MColumn.Get(ctx, cols[m].GetAD_Column_ID()).GetFKTable();
+                                                        string fkColumnName = MColumn.Get(ctx, cols[m].GetAD_Column_ID()).GetFKColumnName();
+
+                                                        int count = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT Count(*) FROM AD_ShareRecordOrg WHERE AD_Table_ID={fkTable.GetAD_Table_ID()} AND Record_ID={pObj.Get_ValueAsInt(fkColumnName)}"));
+                                                        if (count > 0)
+                                                        {
+                                                            ds = DB.ExecuteDataset($"SELECT  {table.GetKeyColumns()[0]} FROM {table.GetTableName()} WHERE {cols[m].GetColumnName()} = {pObj.Get_ValueAsInt(cols[m].GetColumnName())} ");
+                                                            if (ds != null && ds.Tables[0].Rows.Count > 0)
+                                                                break;
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
 
-                                if (ds != null && ds.Tables[0].Rows.Count > 0)
-                                {
-                                    for (int j = 0; j < ds.Tables[0].Rows.Count; j++)
+                                    if (ds != null && ds.Tables[0].Rows.Count > 0)
                                     {
-                                        VAdvantage.Common.ShareOrg sOrg = new VAdvantage.Common.ShareOrg();
-                                        sOrg.RecordID = Util.GetValueOfInt(ds.Tables[0].Rows[j][0]);
-                                        sOrg.OrgID = records[i].AD_OrgShared_ID;
-                                        sOrg.Readonly = records[i].isReadonly;
-                                        if (statussChanged || !VAdvantage.Common.ShareRecordManager.CheckRecordInTable(tab.AD_Table_ID, sOrg))
+                                        for (int j = 0; j < ds.Tables[0].Rows.Count; j++)
                                         {
-                                            VAdvantage.Common.ShareRecordManager.AddRecordToTable(tab.AD_Table_ID, sOrg);
-                                            SaveRecords(tabs, table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx, 0, 0, ref error, newParentID);
+                                            VAdvantage.Common.ShareOrg sOrg = new VAdvantage.Common.ShareOrg();
+                                            sOrg.RecordID = Util.GetValueOfInt(ds.Tables[0].Rows[j][0]);
+                                            sOrg.OrgID = records[i].AD_OrgShared_ID;
+                                            sOrg.ChildShare = records[i].ChildShare;
+                                            sOrg.Readonly = records[i].isReadonly;
+                                            if (statussChanged || !VAdvantage.Common.ShareRecordManager.CheckRecordInTable(tab.AD_Table_ID, sOrg))
+                                            {
+                                                VAdvantage.Common.ShareRecordManager.AddRecordToTable(tab.AD_Table_ID, sOrg);
+                                                SaveRecords(tabs, table.GetAD_Table_ID(), Util.GetValueOfInt(ds.Tables[0].Rows[j][0]), tab.AD_Tab_ID, Window_ID, WindowNo, records, ctx, trx, 0, 0, ref error, newParentID);
+                                            }
                                         }
                                     }
                                 }

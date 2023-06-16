@@ -107,6 +107,7 @@
             + '<th>' + VIS.Msg.getMsg('Org') + '</th>'
             + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('LegalEntities') + '</th>'
             + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('ReadOnly') + '</th>'
+            + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('ChildShare') + '</th>'
             + '</tr>'
             + '</thead>'
             + '<tbody class="vis-gridTableBody tbList">'
@@ -254,6 +255,12 @@
                     row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';                   
                 }
                 row += '</td>'
+                if (list[i].ChildShare) {
+                    row += '<td width="120px" class="text-center"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
+                } else {
+                    row += '<td width="120px" class="text-center"><input type="checkbox" name="" id="" class="chkIsChildShare" /> </td>'
+                }
+               
                     + '</tr>';
             }
             root.find('.tbList').append(row);
@@ -356,7 +363,8 @@
                     saveObj.list.push({
                         AD_OrgShared_ID: Number(this.value),
                         isReadonly: $(this).closest('tr').find('.chkIsReadOnly').is(':checked'),
-                        shareID: $(this).data('shareid')
+                        shareID: $(this).data('shareid'),
+                        ChildShare: $(this).closest('tr').find('.chkIsChildShare').is(':checked')   
 
                     });
 
@@ -509,6 +517,14 @@
             cdos.setModal(true);
             cdos.show();
             cdos.hidebuttons();
+        }
+
+        if (curTab && curTab.getTabLevel() > 0) {
+            root.find('.vis-tableSection input').prop("disabled", "true");
+            btnOk.prop("disabled", "true");
+        } else {
+            root.find('.vis-tableSection input').prop("disabled", "");
+            btnOk.prop("disabled", "");
         }
     }
 

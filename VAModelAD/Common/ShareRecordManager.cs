@@ -100,13 +100,14 @@ namespace VAdvantage.Common
             }
 
             //Get all records which are shared and create diction which contains tableID and list of records of that table
-            DataSet ds = DB.ExecuteDataset("SELECT Distinct AD_Table_ID, Record_ID, AD_ORGSHARED_ID, IsReadOnly FROM AD_ShareRecordOrg ORDER BY AD_Table_ID");
+            DataSet ds = DB.ExecuteDataset("SELECT Distinct AD_Table_ID, Record_ID, AD_ORGSHARED_ID, IsReadOnly,IsChildShare FROM AD_ShareRecordOrg ORDER BY AD_Table_ID");
             for (int a = 0; a < ds.Tables[0].Rows.Count; a++)
             {
                 ShareOrg org = new ShareOrg();
                 org.OrgID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_OrgShared_ID"]);
                 org.RecordID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["Record_ID"]);
                 org.Readonly = ds.Tables[0].Rows[a]["IsReadOnly"] == "Y" ? true : false;
+                org.ChildShare = ds.Tables[0].Rows[a]["IsChildShare"] == "Y" ? true : false;
 
                 if (tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] == null)
                     tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] = new List<ShareOrg>();
@@ -144,13 +145,14 @@ namespace VAdvantage.Common
                         {
                             for (int k = 0; k < sharedRec.Count; k++)
                             {//If shared record's ID == Current record being saved's Parent ID, then share current record.
-                                if (sharedRec[k].RecordID == parentID)
+                                if (sharedRec[k].RecordID == parentID && sharedRec[k].ChildShare)
                                 {
                                     int parentOrg_ID = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID={tablID} AND Record_ID={parentID} AND AD_OrgShared_ID={sharedRec[k].OrgID}"));
 
                                     VAdvantage.ModelAD.MShareRecordOrg SRO = new VAdvantage.ModelAD.MShareRecordOrg(p_ctx, 0, po.Get_Trx());
                                     SRO.SetAD_Table_ID(po.Get_Table_ID());
                                     SRO.Set_ValueNoCheck("AD_OrgShared_ID", sharedRec[k].OrgID);
+                                    SRO.Set_ValueNoCheck("IsChildShare", sharedRec[k].ChildShare);
                                     SRO.SetIsReadOnly(sharedRec[k].Readonly);
                                     SRO.SetRecord_ID(Util.GetValueOfInt(po.Get_Value(po.GetTableName() + "_ID")));
                                     SRO.Set_ValueNoCheck("Parent_ID", parentOrg_ID);
@@ -178,7 +180,7 @@ namespace VAdvantage.Common
 
                 int parentRecID = po.Get_ValueAsInt(parentTable + "_ID");
 
-                DataSet dsV = DB.ExecuteDataset($"SELECT AD_OrgShared_ID,isReadonly FROM AD_ShareRecordOrg WHERE Record_ID={parentRecID} AND AD_Table_ID={parentTableID}");
+                DataSet dsV = DB.ExecuteDataset($"SELECT AD_OrgShared_ID,isReadonly,IsChildShare FROM AD_ShareRecordOrg WHERE Record_ID={parentRecID} AND AD_Table_ID={parentTableID}");
                 if (dsV != null && dsV.Tables[0].Rows.Count > 0)
                 {
                     for (int v = 0; v < dsV.Tables[0].Rows.Count; v++)
@@ -186,6 +188,7 @@ namespace VAdvantage.Common
                         MShareRecordOrg SROV = new MShareRecordOrg(po.GetCtx(), 0, po.Get_Trx());
                         SROV.SetAD_Table_ID(po.Get_Table_ID());
                         SROV.Set_ValueNoCheck("AD_OrgShared_ID", dsV.Tables[0].Rows[v]["AD_OrgShared_ID"]);
+                        SROV.Set_ValueNoCheck("IsChildShare", dsV.Tables[0].Rows[v]["IsChildShare"]);
                         SROV.SetIsReadOnly(dsV.Tables[0].Rows[v]["isReadonly"] == "Y");
                         SROV.SetRecord_ID(po.Get_ID());
                         if (!SROV.Save())
@@ -195,6 +198,7 @@ namespace VAdvantage.Common
                         VAdvantage.Common.ShareOrg OrgV = new VAdvantage.Common.ShareOrg();
                         OrgV.RecordID = Util.GetValueOfInt(po.Get_ID());
                         OrgV.OrgID = Util.GetValueOfInt(dsV.Tables[0].Rows[v]["AD_OrgShared_ID"]);
+                        OrgV.ChildShare = dsV.Tables[0].Rows[v]["IsChildShare"] == "Y";
                         OrgV.Readonly = dsV.Tables[0].Rows[v]["isReadonly"] == "Y";
                         VAdvantage.Common.ShareRecordManager.AddRecordToTable(po.Get_Table_ID(), OrgV);
                     }
@@ -308,6 +312,7 @@ namespace VAdvantage.Common
         public int OrgID { get; set; }
         public int shareID { get; set; }
         public bool CanEdit { get; set; }
+        public bool ChildShare { get; set; }
     }
 
     public class ShareOrg
@@ -315,5 +320,6 @@ namespace VAdvantage.Common
         public int RecordID { get; set; }
         public int OrgID { get; set; }
         public bool Readonly { get; set; }
+        public bool ChildShare { get; set; }
     }
 }
