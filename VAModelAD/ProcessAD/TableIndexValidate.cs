@@ -99,6 +99,8 @@ namespace VAdvantage.Process
 				int rvalue = DB.ExecuteQuery(sql, null, trxName);
 				if (pi != null)
 					pi.AddLog(0, null, new Decimal(rvalue), sql);
+				if(rvalue <0)
+					return Msg.GetMsg(ctx, "CreatedIndexFailed");
 				return Msg.GetMsg(ctx, "CreatedIndexSuccess");
 			}
 			else
