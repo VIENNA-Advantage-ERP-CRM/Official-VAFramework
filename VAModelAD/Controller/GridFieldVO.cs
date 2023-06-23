@@ -407,7 +407,14 @@ namespace VAdvantage.Controller
                     {
                         vo.IsSwitch = "Y".Equals(dr[i].ToString());
                     }
-
+                    else if (columnName.Equals("IsAction", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.IsAction = "Y".Equals(dr[i].ToString());
+                    }
+                    else if (columnName.Equals("TabSeqNo", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.TabSeqNo = Util.GetValueOfInt(dr[i].ToString());
+                    }
                 }
                 if (vo.Header == null)
                     vo.Header = vo.ColumnName;
@@ -913,6 +920,8 @@ namespace VAdvantage.Controller
             clone.IsSwitch = IsSwitch;
             clone.IsIdentifier = IsIdentifier;
             clone.GridImageStyle = GridImageStyle;
+            clone.IsAction = IsAction;
+            clone.TabSeqNo = TabSeqNo;
             return clone;
         }
 

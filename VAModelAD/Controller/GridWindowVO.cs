@@ -95,6 +95,7 @@ namespace VAdvantage.Controller
         public bool IsChat = true;
         public bool IsAttachment = true;
         public bool IsHistory = true;
+        public bool IsRecordShared = true;
         public bool IsCheckRequest = true;
         public bool IsWorkFlow = true;
         public bool IsCopyReocrd = true;
@@ -190,7 +191,7 @@ namespace VAdvantage.Controller
              + "AD_Color_ID,AD_Image_ID, IsReadWrite, WinHeight,WinWidth, "
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
-             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode ");
+             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
@@ -367,6 +368,7 @@ namespace VAdvantage.Controller
                             }
                             vo.IsCompositeView = dr[36].ToString() == "Y";
                             vo.IsGenerateAttachmentCode = !("N".Equals(dr[37].ToString()));
+                            vo.IsRecordShared = dr[38].ToString() == "Y";
                         }
                     }
                 }
@@ -863,6 +865,7 @@ namespace VAdvantage.Controller
                 clone.IsChat = IsChat;
                 clone.IsAttachment = IsAttachment;
                 clone.IsHistory = IsHistory;
+                clone.IsRecordShared = IsRecordShared;
                 clone.IsCheckRequest = IsCheckRequest;
 
                 clone.IsCopyReocrd = IsCopyReocrd;

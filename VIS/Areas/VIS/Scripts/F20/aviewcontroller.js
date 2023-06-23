@@ -1281,6 +1281,8 @@
         this.skipInserting = ignore;
     };
 
+   
+
     VIS.GridController.prototype.query = function (onlyCurrentDays, maxRows, created, nodeID, treeID, tableID) {
         if (this.aPanel && this.aPanel.setBusy) {
             this.aPanel.setBusy(true);
@@ -1374,9 +1376,11 @@
 
         if (this.aPanel) {
             this.aPanel.setBusy(this.isCardRow);
+            //this.aPanel.onQueryCompleted();
         }
 
         this.skipInserting = false; // reset 
+       
         this.dynamicDisplay(-1);
         //if (this.aPanel.$parentWindow.onLoad) {  //Change/Update for:Zoom from workflow on home page
         //    this.aPanel.$parentWindow.onLoad();
@@ -1400,7 +1404,7 @@
             //	Automatically create New Record, if none & tab not RO
             if (!this.gTab.getIsReadOnly() &&
                 (this.gTab.getIsZoomAction() == true || VIS.context.getIsAutoNew(this.windowNo)
-                    || this.gTab.getIsQueryNewRecord()) && parentValid) {
+                || this.gTab.getIsQueryNewRecord() || this.gTab.getIsAutoNewRecord()) && parentValid) {
                 if (this.gTab.getIsInsertRecord() && !this.skipInserting) {
 
                     //When user clicks on new record from combo or search button, then switch view 

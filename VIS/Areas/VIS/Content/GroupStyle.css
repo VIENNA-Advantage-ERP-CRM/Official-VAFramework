@@ -355,7 +355,11 @@ input.vis-group-search-icon {
     padding-right: 5px;
 }
 
-.vis-group-user-wrap:hover, .vis-group-selected-op {
+.vis-group-user-wrap:hover {
+    background-color: rgba(var(--v-c-secondary), .5);
+}
+
+.vis-group-selected-op {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
 .vis-group-user-wrap:hover .vis-group-user-text > span, .vis-group-user-wrap:hover .vis-group-user-right > p, .vis-group-user-wrap:hover .vis-group-user-text > p, .vis-group-user-wrap:hover .vis-group-user-profile > label {

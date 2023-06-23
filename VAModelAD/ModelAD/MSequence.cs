@@ -106,6 +106,11 @@ namespace VAdvantage.Model
 
         public static int GetNextID(int AD_Client_ID, String TableName, Trx txtName)
         {
+            return GetNextID(AD_Client_ID, TableName, txtName, 0);
+        }
+
+        public static int GetNextID(int AD_Client_ID, String TableName, Trx txtName, int IncrementNo)
+        {
             // if SYSTEM_NATIVE_SEQUENCE is Y in System Config, then fetch Next ID from DB sequence
             if (MSysConfig.IsNativeSequence(false))
             {
@@ -114,13 +119,13 @@ namespace VAdvantage.Model
             }
 
             if (DatabaseType.IsMSSql)
-                return GetNextIDMSSql(AD_Client_ID, TableName);
+                return GetNextIDMSSql(AD_Client_ID, TableName, IncrementNo);
             else if (DatabaseType.IsMySql)
-                return GetNextIDMySql(AD_Client_ID, TableName);
+                return GetNextIDMySql(AD_Client_ID, TableName, IncrementNo);
             else if (DatabaseType.IsOracle)
-                return GetNextIDOracle(AD_Client_ID, TableName, txtName);
+                return GetNextIDOracle(AD_Client_ID, TableName, txtName, IncrementNo);
             else if (DatabaseType.IsPostgre)
-                return GetNextIDPostgre(AD_Client_ID, TableName, txtName);
+                return GetNextIDPostgre(AD_Client_ID, TableName, txtName, IncrementNo);
             else
                 return -1;
         }
@@ -128,7 +133,7 @@ namespace VAdvantage.Model
         private static readonly object _idlock = new object();
 
         //[MethodImpl(MethodImplOptions.Synchronized)]
-        public static int GetNextIDOracle(int AD_Client_ID, String TableName, Trx trxName)
+        public static int GetNextIDOracle(int AD_Client_ID, String TableName, Trx trxName, int IncrementNo)
         {
             lock (_idlock)
             {
@@ -167,7 +172,12 @@ namespace VAdvantage.Model
 
                         for (int irow = 0; irow <= ds.Tables[0].Rows.Count - 1; irow++)
                         {
-                            int incrementNo = int.Parse(ds.Tables[0].Rows[0]["IncrementNo"].ToString());
+                            int incrementNo = IncrementNo;
+                            if (IncrementNo == 0)
+                            {
+                                incrementNo = int.Parse(ds.Tables[0].Rows[0]["IncrementNo"].ToString());
+                            }
+
                             if (viennaSys)
                             {
                                 retValue = int.Parse(ds.Tables[0].Rows[0]["CurrentNextSys"].ToString());
@@ -292,7 +302,7 @@ namespace VAdvantage.Model
             return retValue;
         }
 
-        public static int GetNextIDPostgre(int AD_Client_ID, String TableName, Trx trxName)
+        public static int GetNextIDPostgre(int AD_Client_ID, String TableName, Trx trxName, int IncrementNo)
         {
             if (TableName == null || TableName.Length == 0)
                 throw new ArgumentException("TableName missing");
@@ -335,7 +345,11 @@ namespace VAdvantage.Model
 
                     for (int irow = 0; irow <= ds.Tables[0].Rows.Count - 1; irow++)
                     {
-                        int incrementNo = int.Parse(ds.Tables[0].Rows[0]["IncrementNo"].ToString());
+                        int incrementNo = IncrementNo;
+                        if (IncrementNo == 0)
+                        {
+                            incrementNo = int.Parse(ds.Tables[0].Rows[0]["IncrementNo"].ToString());
+                        }
                         if (viennaSys)
                         {
                             retValue = int.Parse(ds.Tables[0].Rows[0]["CurrentNextSys"].ToString());
@@ -382,8 +396,7 @@ namespace VAdvantage.Model
             return retValue;
         }
 
-
-        public static int GetNextIDMySql(int AD_Client_ID, String TableName)
+        public static int GetNextIDMySql(int AD_Client_ID, String TableName, int IncrementNo)
         {
             if (TableName == null || TableName.Length == 0)
                 throw new ArgumentException("TableName missing");
@@ -414,7 +427,11 @@ namespace VAdvantage.Model
                     {
                         //	int AD_Sequence_ID = dr.getInt(4);
                         //
-                        int incrementNo = int.Parse(ds.Tables[0].Rows[0]["IncrementNo"].ToString());
+                        int incrementNo = IncrementNo;
+                        if (IncrementNo == 0)
+                        {
+                            incrementNo = int.Parse(ds.Tables[0].Rows[0]["IncrementNo"].ToString());
+                        }
                         if (viennaSys)
                         {
                             retValue = int.Parse(ds.Tables[0].Rows[0]["CurrentNextSys"].ToString());
@@ -438,7 +455,7 @@ namespace VAdvantage.Model
             return retValue;
         }
 
-        public static int GetNextIDMSSql(int AD_Client_ID, String TableName)
+        public static int GetNextIDMSSql(int AD_Client_ID, String TableName, int IncrementNo)
         {
             if (TableName == null || TableName.Length == 0)
                 throw new ArgumentException("TableName missing");
@@ -470,7 +487,12 @@ namespace VAdvantage.Model
                     {
                         //	int AD_Sequence_ID = dr.getInt(4);
                         //
-                        int incrementNo = int.Parse(ds.Tables[0].Rows[0]["IncrementNo"].ToString());
+                        int incrementNo = IncrementNo;
+                        if (IncrementNo == 0)
+                        {
+                            incrementNo = int.Parse(ds.Tables[0].Rows[0]["IncrementNo"].ToString());
+                        }
+
                         if (viennaSys)
                         {
                             retValue = int.Parse(ds.Tables[0].Rows[0]["CurrentNextSys"].ToString());
