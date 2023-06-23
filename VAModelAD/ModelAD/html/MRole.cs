@@ -746,7 +746,7 @@ namespace VAdvantage.Model
             {
                 //Get current record count and increment in sequence no.
                 string qry = "SELECT Count(w.AD_Window_ID) FROM AD_Window w INNER JOIN AD_Tab t ON (w.AD_Window_ID=t.AD_Window_ID) INNER JOIN AD_Table tt ON (t.AD_Table_ID=tt.AD_Table_ID)"
-                    + "WHERE t.SeqNo=(SELECT MIN(SeqNo) FROM AD_Tab xt "	// only check first tab
+                    + "WHERE t.name=(SELECT MIN(name) FROM AD_Tab xt "	// only check first tab
                     + "WHERE xt.AD_Window_ID=w.AD_Window_ID)"
                 + "AND tt.AccessLevel IN " + roleAccessLevelWin;
 
@@ -754,17 +754,17 @@ namespace VAdvantage.Model
                 count = DB.GetNextID(GetCtx(), "AD_Window_Access", null, count) - 1;
                 ADWindowAccessID = "(ROW_NUMBER() OVER (ORDER BY w.AD_Window_ID) + " + count + ")";
 
-                qry= "SELECT COUNT(AD_Process_ID) FROM AD_Process WHERE AccessLevel IN " + roleAccessLevelWin;
+                qry= "SELECT COUNT(AD_Process_ID) FROM AD_Process WHERE AccessLevel IN " + roleAccessLevel;
                 count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
                 count = DB.GetNextID(GetCtx(), "AD_Process_Access", null, count) - 1;
                 ADProcessAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Process_ID) + " + count + ")";
 
-                qry = "SELECT COUNT(AD_Form_ID) FROM AD_Form WHERE AccessLevel IN " + roleAccessLevelWin;
+                qry = "SELECT COUNT(AD_Form_ID) FROM AD_Form WHERE AccessLevel IN " + roleAccessLevel;
                 count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
                 count = DB.GetNextID(GetCtx(), "AD_Form_Access", null, count) - 1;
                 ADFormAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Form_ID) + " + count + ")";
 
-                qry = "SELECT COUNT(AD_Workflow_ID) FROM AD_Workflow WHERE AccessLevel IN " + roleAccessLevelWin;
+                qry = "SELECT COUNT(AD_Workflow_ID) FROM AD_Workflow WHERE AccessLevel IN " + roleAccessLevel;
                 count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
                 count = DB.GetNextID(GetCtx(), "AD_Workflow_Access", null, count) - 1;
                 ADWorkflowAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Workflow_ID) + " + count + ")";
@@ -782,7 +782,7 @@ namespace VAdvantage.Model
                 + "FROM AD_Window w"
                 + " INNER JOIN AD_Tab t ON (w.AD_Window_ID=t.AD_Window_ID)"
                 + " INNER JOIN AD_Table tt ON (t.AD_Table_ID=tt.AD_Table_ID) "
-                + "WHERE t.SeqNo=(SELECT MIN(SeqNo) FROM AD_Tab xt "	// only check first tab
+                + "WHERE t.name=(SELECT MIN(name) FROM AD_Tab xt "	// only check first tab
                     + "WHERE xt.AD_Window_ID=w.AD_Window_ID)"
                 + "AND tt.AccessLevel IN ";
 
