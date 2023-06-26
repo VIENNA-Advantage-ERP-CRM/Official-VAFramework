@@ -291,8 +291,7 @@ namespace VAModelAD.Model
             // MRole.GetDefault(p_ctx).IsShowSharedRecords()
             if (!_ExportCheckTableNames.Contains(po.GetTableName()))
             {
-                ShareRecordManager com = new ShareRecordManager();
-                com.ShareChild(p_ctx, po);
+                ShareRecordManager.Get(p_ctx).ShareChild(p_ctx, po);
             }
             return success;
         }
