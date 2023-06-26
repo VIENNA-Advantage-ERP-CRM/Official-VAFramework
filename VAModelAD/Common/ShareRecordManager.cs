@@ -16,28 +16,88 @@ namespace VAdvantage.Common
     {
         //Dictionry of  table and respective link column OR Parent Link Column
         public static CCache<int, List<int>> tableColumnHirarichy = new CCache<int, List<int>>("RecordSharedTableHirarichy", 30, 60);
-
+        public static CCache<int,int > encludedTableHirarichy = new CCache<int, int>("RecordSharedTableHirarichy", 30, 60);
         public static CCache<int, List<ShareOrg>> tableRecordHirarerichy = new CCache<int, List<ShareOrg>>("RecordSharedTableRecordHirarichy", 30, 60);
 
         //Dictionry of link column and reference table ID
         public static CCache<int, int> columnsTableHirarerichy = new CCache<int, int>("columnsTableHirarerichy", 30, 60);
+        private static ShareRecordManager _ShareRecordManager = null;
+        public static bool isLoading = false;
+
+
+        private void DoWork(Ctx ctx)
+        {
+            isLoading = true;
+            try {
+                System.Threading.Tasks.Task.Run(() => FillData(ctx));
+            }
+            catch { isLoading = false; };
+
+            
+            DataSet ds = DB.ExecuteDataset("SELECT Distinct AD_Table_ID, Record_ID, AD_ORGSHARED_ID, IsReadOnly,IsChildShare FROM AD_ShareRecordOrg ORDER BY AD_Table_ID");
+            for (int a = 0; a < ds.Tables[0].Rows.Count; a++)
+            {
+                ShareOrg org = new ShareOrg();
+                org.OrgID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_OrgShared_ID"]);
+                org.RecordID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["Record_ID"]);
+                org.Readonly = ds.Tables[0].Rows[a]["IsReadOnly"].ToString() == "Y" ? true : false;
+                org.ChildShare = ds.Tables[0].Rows[a]["IsChildShare"].ToString() == "Y" ? true : false;
+
+                if (tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] == null)
+                    tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] = new List<ShareOrg>();
+                //Dictionary of tableID and list of records of that table which are shared
+                tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])].Add(org);
+            }
+
+            encludedTableHirarichy.Reset();
+
+            string qry = "SELECT distinct t.AD_Table_ID FROM AD_Table t INNER JOIN AD_Tab tab ON t.AD_Table_ID=tab.AD_Table_ID WHERE tab.AD_Window_ID IN (SELECT AD_WIndow_ID FROM AD_Window WHERE  IsActive='Y' AND WindowType ='M') AND tab.IsActive='Y' AND IsView='N'";
+             ds = DB.ExecuteDataset(qry);
+            for (int j = 0; j < ds.Tables[0].Rows.Count; j++)
+            {
+                encludedTableHirarichy[Convert.ToInt32(ds.Tables[0].Rows[j]["AD_Table_ID"])] = 0;
+            }
+
+        }
+        private ShareRecordManager(Ctx ctx)
+        {
+            DoWork(ctx);
+            //Get all records which are shared and create diction which contains tableID and list of records of that table
+           
+            //FillData(ctx);
+        }
+
+        public static ShareRecordManager Get(Ctx ctx)
+        {
+            if(_ShareRecordManager == null)
+            {
+                _ShareRecordManager = new ShareRecordManager(ctx);
+            }
+            else
+            {
+                if(tableColumnHirarichy.Count ==0 && !isLoading)
+                {
+                    _ShareRecordManager.DoWork(ctx);
+                }
+            }
+               
+            return _ShareRecordManager;
+        }
 
         /// <summary>
         /// Prepare lists for shared tables, list of records of table and list of tables of FK columns
         /// </summary>
         /// <param name="ctx"></param>
-        public void FillData(Ctx ctx)
+        protected void FillData(Ctx ctx)
         {
-            if (tableRecordHirarerichy.Count > 0)
-                return;
             //Fetch list of maintain windows
-            DataSet dsWindow = DB.ExecuteDataset("SELECT AD_Window_ID FROM AD_Window WHERE IsActive='Y' AND WindowType='M' ORDER BY AD_Window_ID ASC");
-            for (int a = 0; a < dsWindow.Tables[0].Rows.Count; a++)
-            {
-                DataRow dr = dsWindow.Tables[0].Rows[a];
+           // DataSet dsWindow = DB.ExecuteDataset("SELECT AD_Window_ID FROM AD_Window WHERE IsActive='Y' AND WindowType='M' ORDER BY AD_Window_ID ASC");
+            //for (int a = 0; a < dsWindow.Tables[0].Rows.Count; a++)
+            //{
+             //   DataRow dr = dsWindow.Tables[0].Rows[a];
 
                 //Fetch tabs of current window
-                DataSet dsTabs = DB.ExecuteDataset("SELECT tab.AD_Table_ID, tbl.TableName, tab.TabLevel, tab.AD_Column_ID FROM AD_Tab tab JOIN AD_Table tbl on tab.AD_table_ID=tbl.AD_Table_ID WHERE tab.AD_window_ID=" + dr["AD_Window_ID"] + " AND tab.IsActive='Y' AND IsView='N'");
+                DataSet dsTabs = DB.ExecuteDataset("SELECT tab.AD_Window_ID, tab.AD_Table_ID, tbl.TableName, tab.TabLevel, tab.AD_Column_ID FROM AD_Tab tab JOIN AD_Table tbl on tab.AD_table_ID=tbl.AD_Table_ID WHERE tab.AD_window_ID IN (SELECT AD_Window_ID FROM AD_Window WHERE IsActive = 'Y' AND WindowType = 'M') AND tab.IsActive='Y' AND IsView='N'");
                 if (dsTabs != null && dsTabs.Tables[0].Rows.Count > 0)
                 {
                     for (int i = 0; i < dsTabs.Tables[0].Rows.Count; i++)
@@ -46,7 +106,7 @@ namespace VAdvantage.Common
                         int tabLevel = Util.GetValueOfInt(tab["TabLevel"]);
 
                         //Fetch child tabs
-                        DataRow[] childTabs = dsTabs.Tables[0].Select("TabLevel>" + tabLevel);//OrdetLine, Ordertax
+                        DataRow[] childTabs = dsTabs.Tables[0].Select("TabLevel>" + tabLevel+"  AND AD_Window_ID="+ Util.GetValueOfInt(tab["AD_Window_ID"]));//OrdetLine, Ordertax
                         if (childTabs != null && childTabs.Length > 0)
                         {
                             for (int j = 0; j < childTabs.Length; j++)
@@ -97,29 +157,82 @@ namespace VAdvantage.Common
                     }
                 }
 
+            //}
+            isLoading = false;
+        }
+
+        private void FillData(Ctx ctx, PO po)
+        {
+            if (tableColumnHirarichy.ContainsKey(po.Get_Table_ID()) || !encludedTableHirarichy.ContainsKey(po.Get_Table_ID()))
+            {
+                return;
             }
 
-            //Get all records which are shared and create diction which contains tableID and list of records of that table
-            DataSet ds = DB.ExecuteDataset("SELECT Distinct AD_Table_ID, Record_ID, AD_ORGSHARED_ID, IsReadOnly,IsChildShare FROM AD_ShareRecordOrg ORDER BY AD_Table_ID");
-            for (int a = 0; a < ds.Tables[0].Rows.Count; a++)
+            DataSet dsTabs = DB.ExecuteDataset("SELECT tab.AD_Window_ID, tab.AD_Table_ID, tbl.TableName, tab.TabLevel, tab.AD_Column_ID FROM AD_Tab tab JOIN AD_Table tbl on tab.AD_table_ID=tbl.AD_Table_ID WHERE tab.AD_window_ID IN (SELECT AD_Window_ID FROM AD_Window WHERE IsActive = 'Y' AND WindowType = 'M') AND tab.IsActive='Y' AND IsView='N' AND tab.AD_table_ID="+po.Get_Table_ID());
+            if (dsTabs != null && dsTabs.Tables[0].Rows.Count > 0)
             {
-                ShareOrg org = new ShareOrg();
-                org.OrgID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_OrgShared_ID"]);
-                org.RecordID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["Record_ID"]);
-                org.Readonly = ds.Tables[0].Rows[a]["IsReadOnly"] == "Y" ? true : false;
-                org.ChildShare = ds.Tables[0].Rows[a]["IsChildShare"] == "Y" ? true : false;
+                for (int i = 0; i < dsTabs.Tables[0].Rows.Count; i++)
+                {
+                    DataRow tab = dsTabs.Tables[0].Rows[i];//C_Order
+                    int tabLevel = Util.GetValueOfInt(tab["TabLevel"]);
 
-                if (tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] == null)
-                    tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] = new List<ShareOrg>();
-                //Dictionary of tableID and list of records of that table which are shared
-                tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])].Add(org);
+                    //Fetch child tabs
+                    DataRow[] childTabs = dsTabs.Tables[0].Select("TabLevel>" + tabLevel + "  AND AD_Window_ID=" + Util.GetValueOfInt(tab["AD_Window_ID"]));//OrdetLine, Ordertax
+                    if (childTabs != null && childTabs.Length > 0)
+                    {
+                        for (int j = 0; j < childTabs.Length; j++)
+                        {
+
+                            if (tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])] == null)
+                                tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])] = new List<int>();
+
+                            //get link column of child tab
+                            int linkColumn = Util.GetValueOfInt(childTabs[j]["AD_Column_ID"]);
+                            MTable linktable = MColumn.Get(ctx, linkColumn).GetFKTable();
+                            if (linktable != null)
+                            {
+                                int parentTableID = linktable.GetAD_Table_ID();
+
+                                //Dictionry of link column and reference table
+                                columnsTableHirarerichy[Convert.ToInt32(childTabs[j]["AD_Column_ID"])] = parentTableID;
+
+                                //Dictionry of  table and respective link column
+                                if (!tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Contains(linkColumn))
+                                    tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Add(linkColumn);
+                            }
+
+                            //C_Order_ID
+                            //C_Order_ID, C_Tax_ID
+                            //Get Parent Link Columns
+                            int[] pColumns = MTable.Get(ctx, childTabs[j]["TableName"].ToString()).GetParentColumnIDs();
+                            if (pColumns != null && pColumns.Length > 0)
+                            {
+                                for (int k = 0; k < pColumns.Length; k++)
+                                {
+                                    MTable table = MColumn.Get(ctx, pColumns[k]).GetFKTable();
+                                    if (table != null)
+                                    {
+                                        int parentTableID = table.GetAD_Table_ID();
+
+                                        //Dictionry of  table and respective link column
+                                        if (!tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Contains(pColumns[k]))
+                                            tableColumnHirarichy[Convert.ToInt32(childTabs[j]["AD_Table_ID"])].Add(pColumns[k]);
+
+                                        //Dictionry of link column and reference table
+                                        columnsTableHirarerichy[pColumns[k]] = parentTableID;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
         public void ShareChild(Ctx p_ctx, PO po)
         {
 
-            FillData(p_ctx);
+            FillData(p_ctx,po);
 
             //Get list of parent link cols of current Table
             List<int> parentColumnIDs = tableColumnHirarichy[po.Get_Table_ID()];
@@ -241,9 +354,6 @@ namespace VAdvantage.Common
             sql = "DELETE FROM AD_ShareRecordOrg WHERE AD_ShareRecordOrg_ID=" + parent_ID;
             int deletedRecords = DB.ExecuteQuery(sql, null, trx);
         }
-
-
-
 
         public static void DeleteRecordFromTable(int table, int record, int OrgID)
         {
