@@ -566,6 +566,10 @@
                 this.aSharedRecord.setTextDirection("r");
                 $ulactionbar.append(this.aSharedRecord.getListItmIT());
             }
+            else {
+                this.isShowSharedRecord = false;
+            }
+
 
             this.aPreference = this.addActions("Preference", null, false, false, true, onAction); //2
             /////5 Right bar
