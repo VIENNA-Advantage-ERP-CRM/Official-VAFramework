@@ -17,6 +17,7 @@
         this.id = null;
         this.$container = null;
         this.aPanel = null;
+        this.gc = null;
         this.rendered = false;
 
         this.onSelect = null;
@@ -405,6 +406,7 @@
 
         this.id = name;
         this.aPanel = aPanel;
+        this.gc = gc;
         this.$container = $container;
         this.mTab = mTab;
         this.AD_Table_ID = this.mTab.getAD_Table_ID();
@@ -1409,8 +1411,8 @@
             if (id) {
                 this.select(id); //Select Row
             }
-            if (action === VIS.VTable.prototype.ROW_ADD && !this.aPanel.curGC.getIsCardRow() && !this.aPanel.curGC.getIsSingleRow()
-                && !this.aPanel.curGC.getIsMapRow()) {
+            if (action === VIS.VTable.prototype.ROW_ADD && !this.gc.getIsCardRow() && !this.gc.getIsSingleRow()
+                && !this.gc.getIsMapRow()) {
                 this.setDefaultFocus();
             }
         }
