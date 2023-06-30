@@ -3659,10 +3659,10 @@
             return;
         }
 
-        if (this.curTab.getParentTab() && this.curTab.getParentTab().IsSharedReadOnly) {
-            VIS.ADialog.error("AccessCannotInsert", true, "");
-            return;
-        }
+        //if (this.curTab.getParentTab() && this.curTab.getParentTab().IsSharedReadOnly) {
+        //    VIS.ADialog.error("AccessCannotInsert", true, "");
+        //    return;
+        //}
 
         this.curGC.setNewRecordLayout();
         this.curGC.dataNew(copy);
