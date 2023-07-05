@@ -2029,6 +2029,8 @@
      * 
      * */
     GridTab.prototype.IsSharedAccess = function () {
+        this.IsSharedReadOnly = false;
+        return;
         var tableID = this.getAD_Table_ID();
         var recordID = this.getRecord_ID();
 

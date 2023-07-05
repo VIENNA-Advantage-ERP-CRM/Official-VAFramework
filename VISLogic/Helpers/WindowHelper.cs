@@ -3782,25 +3782,25 @@ namespace VIS.Helpers
 
             //If Login org is not * , then fetch records of * org which are shared with current org and ignore records of * which are shared 
             // with other orgs and not with current org
-            if (ctxp.GetAD_Org_ID() > 0)
-            {
-                if (string.IsNullOrEmpty(WhereClause))
-                {
-                    SQL += " WHERE ";
-                }
-                else
-                {
-                    SQL += " AND ";
-                }
+            //if (ctxp.GetAD_Org_ID() > 0)
+            //{
+            //    if (string.IsNullOrEmpty(WhereClause))
+            //    {
+            //        SQL += " WHERE ";
+            //    }
+            //    else
+            //    {
+            //        SQL += " AND ";
+            //    }
 
-                SQL += @" (" + TableName + @"_ID NOT IN
-                (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID != " + ctxp.GetAD_Org_ID() +
-                " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)) OR " +
-                 TableName + @"_ID IN
-                (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID = " + ctxp.GetAD_Org_ID() +
-                " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)))";
+            //    SQL += @" (" + TableName + @"_ID NOT IN
+            //    (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID != " + ctxp.GetAD_Org_ID() +
+            //    " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)) OR " +
+            //     TableName + @"_ID IN
+            //    (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID = " + ctxp.GetAD_Org_ID() +
+            //    " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)))";
 
-            }
+            //}
 
             if (!String.IsNullOrEmpty(gt.OrderByClause))
             {

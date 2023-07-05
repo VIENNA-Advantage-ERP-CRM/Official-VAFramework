@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using VAdvantage.DataBase;
 using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
@@ -55,12 +57,36 @@ namespace VIS.Models
                 obj.SetIsActive(true);
                 if (!obj.Save())
                 {
-                    ValueNamePair vnp = VLogger.RetrieveError();
-                    if (vnp != null && vnp.GetName() != null)
                     {
-                        _log.Log(Level.SEVERE, "Product Not Saved", vnp.GetName());
+                        ValueNamePair vnp = VLogger.RetrieveError();
+                        if (vnp != null && vnp.GetName() != null)
+                        {
+                            string info = vnp.GetName();
+                            if (info.IndexOf("VISDBERRORCOLUMN:") > -1)
+                            {
+                                string[] errorCol = info.Replace("VISDBERRORCOLUMN: ", "").Split(',');
+                                DataTable dt = DB.ExecuteDataset("SELECT columnName,Name FROM  AD_Column WHERE AD_Table_ID=" + obj.Get_Table_ID()).Tables[0];
+                                string finalColumn = "";
+                                for (int i = 0; i < errorCol.Length; i++)
+                                {
+                                    for (int j = 0; j < dt.Rows.Count; j++)
+                                    {
+                                        if (errorCol[i].ToUpper() == Util.GetValueOfString(dt.Rows[j]["columnName"]).ToUpper())
+                                        {
+                                            finalColumn += Util.GetValueOfString(dt.Rows[j]["Name"]);
+                                            if ((i + 1) < errorCol.Length)
+                                            {
+                                                finalColumn += " and ";
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                                return Msg.GetMsg(ctx, "VISSaveErrorNotUnique") + "" + finalColumn;
+                            }
+                            return info;
+                        }
                     }
-                    return vnp.GetName();
                 }
                 return "OK";
             }
