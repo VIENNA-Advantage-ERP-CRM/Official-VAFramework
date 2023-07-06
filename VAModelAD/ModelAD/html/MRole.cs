@@ -840,7 +840,6 @@ namespace VAdvantage.Model
                 + "WHERE AccessLevel IN ";
 
 
-
             //
             String whereDel = " WHERE AD_Role_ID=" + GetAD_Role_ID();
             //

@@ -570,6 +570,7 @@
                 this.isShowSharedRecord = false;
             }
 
+
             this.aPreference = this.addActions("Preference", null, false, false, true, onAction); //2
             /////5 Right bar
             if (VIS.MRole.getDefault().getIsShowPreference()) {
