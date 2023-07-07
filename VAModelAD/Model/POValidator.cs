@@ -1,4 +1,4 @@
-﻿using BaseLibrary.Engine;
+﻿﻿using BaseLibrary.Engine;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -204,6 +204,7 @@ namespace VAModelAD.Model
                         return false;
                     }
                 }
+
             }
             if (success && newRecord)
                 InsertTreeNode(po);
@@ -286,6 +287,12 @@ namespace VAModelAD.Model
                     }
                 }
             }
+
+            // MRole.GetDefault(p_ctx).IsShowSharedRecords()
+            if (!_ExportCheckTableNames.Contains(po.GetTableName()))
+            {
+                //ShareRecordManager.Get(p_ctx).ShareChild(p_ctx, po);
+            }
             return success;
         }
 
@@ -303,6 +310,22 @@ namespace VAModelAD.Model
             if (po.Get_Table_ID() == X_AD_Attachment.Table_ID)
             {
                 MAttachment.DeleteFileData(po.Get_Table_ID().ToString() + "_" + po.Get_ID().ToString());
+            }
+
+            if (!_ExportCheckTableNames.Contains(po.GetTableName()) && success)
+            {
+                int recordID = po.Get_ID();
+                if (recordID == 0)
+                    recordID = po.Get_IDOld();
+                //System.Threading.Tasks.Task.Run(() =>
+                //{
+                //    string query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + po.Get_Table_ID() + " AND Record_ID=" + recordID;
+                //    DataSet ds = DB.ExecuteDataset(query);
+                //    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                //    {
+                //        VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), null, null);
+                //    }
+                //});
             }
             return success;
         }
@@ -331,7 +354,12 @@ namespace VAModelAD.Model
 
         public int GetNextID(int AD_Client_ID, string TableName, Trx trx)
         {
-            return MSequence.GetNextID(AD_Client_ID, TableName, trx);
+            return MSequence.GetNextID(AD_Client_ID, TableName, trx, 0);
+        }
+
+        public int GetNextID(int AD_Client_ID, string TableName, Trx trx, int IncrementNo)
+        {
+            return MSequence.GetNextID(AD_Client_ID, TableName, trx, IncrementNo);
         }
 
         public string GetDocumentNo(PO po)

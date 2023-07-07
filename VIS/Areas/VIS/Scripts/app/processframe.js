@@ -1405,6 +1405,7 @@
             btnSaveCsv.on('click', function () {
                 pctl.pi.setFileType("C");
                 if (pctl.pi.getPageNo() == 1) {
+                    pctl.pi.setAD_PInstance_ID(0);
                     panel.setBusy(true);
                     executeProcess(getExeProcessParameter(pctl.REPORT_TYPE_CSV), function (json) {
                         window.open(VIS.Application.contextUrl + json.ReportFilePath);
