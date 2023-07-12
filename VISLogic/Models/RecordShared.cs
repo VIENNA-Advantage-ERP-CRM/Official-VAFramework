@@ -70,30 +70,54 @@ namespace VISLogic.Models
         /// <param name="AD_Table_ID"></param>
         /// <param name="Record_ID"></param>
         /// <returns></returns>
-        public List<Records> GetSharedRecord(Ctx ctx, int AD_Table_ID, int Record_ID)
+        public List<Records> GetSharedRecord(Ctx ctx, int AD_Table_ID, int Record_ID, int parentTableID, int parentRecord_ID, int parentOrg)
         {
             List<Records> lstOrg = null;
 
             PO po = MTable.GetPO(ctx, MTable.GetTableName(ctx, AD_Table_ID), Record_ID, null);
             bool canEdit = true;
+            string sqlQuery = ""; 
 
+            if (parentTableID > 0 && parentOrg>0)
+            {
 
-            string sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary, AD_ShareRecordOrg.AD_Org_ID AS OrgID,IsChildShare FROM AD_Org AD_Org
+                sqlQuery = @"SELECT LSORG.ad_sharerecordorg_id, ad_org.ad_org_id, ad_org.value, ad_org.name, ad_org.islegalentity, ad_org.legalentityorg, LSORG.isreadonly, ad_org.issummary, LSORG.ad_org_id AS orgid, LSORG.ischildshare, ad_sharerecordorg.ad_sharerecordorg_Id AS parent_id 
+                FROM ad_sharerecordorg  ad_sharerecordorg INNER JOIN  ad_org  ad_org ON (ad_org.ad_org_id = ad_sharerecordorg.ad_orgshared_id)
+                LEFT JOIN  ad_sharerecordorg LSORG ON (ad_org.ad_org_id = LSORG.ad_orgshared_id AND LSORG.ad_table_id = " + AD_Table_ID + @" AND LSORG.record_id = " + Record_ID + @")";
+                sqlQuery += " WHERE ad_sharerecordorg.ad_table_id = " + parentTableID + @" AND ad_sharerecordorg.record_id = " + parentRecord_ID;
+                sqlQuery += " ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
+                int count = Util.GetValueOfInt(DB.ExecuteScalar("SELECT count(AD_Org_ID) FROM AD_Role_OrgAccess WHERE ISACTIVE='Y' AND AD_role_ID=" + ctx.GetAD_Role_ID() + " AND AD_Org_ID IN (" + po.GetAD_Org_ID() + ")"));
+                if (count == 0)
+                {
+                    canEdit = false;
+                }
+
+            }
+            else
+            {
+                sqlQuery = @"SELECT AD_ShareRecordOrg_ID, AD_Org.AD_Org_ID, AD_Org.value,AD_Org.Name,AD_Org.IsLegalEntity,AD_Org.LegalEntityOrg,AD_ShareRecordOrg.isreadonly,AD_Org.isSummary, AD_ShareRecordOrg.AD_Org_ID AS OrgID,IsChildShare,parent_id FROM AD_Org AD_Org
                                 LEFT JOIN AD_ShareRecordOrg AD_ShareRecordOrg ON AD_Org.AD_Org_ID=AD_ShareRecordOrg.ad_orgshared_id AND AD_ShareRecordOrg.AD_Table_ID=" + AD_Table_ID + " AND AD_ShareRecordOrg.Record_ID=" + Record_ID;
 
-           int count=Util.GetValueOfInt(DB.ExecuteScalar("SELECT count(AD_Org_ID) FROM AD_Role_OrgAccess WHERE ISACTIVE='Y' AND AD_role_ID=" + ctx.GetAD_Role_ID() + " AND AD_Org_ID IN ("+ po.GetAD_Org_ID()+")"));
+                int count = Util.GetValueOfInt(DB.ExecuteScalar("SELECT count(AD_Org_ID) FROM AD_Role_OrgAccess WHERE ISACTIVE='Y' AND AD_role_ID=" + ctx.GetAD_Role_ID() + " AND AD_Org_ID IN (" + po.GetAD_Org_ID() + ")"));
 
-            if (count==0)
-            {
-                sqlQuery += " AND AD_ShareRecordOrg_ID IS NOT NULL ";
-                canEdit = false;
+                if (count == 0)
+                {
+                    sqlQuery += " AND AD_ShareRecordOrg_ID IS NOT NULL ";
+                    canEdit = false;
+                }
+                sqlQuery += " WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + po.GetAD_Org_ID() + ")  ";
+                if (parentTableID > 0 && parentOrg != 0)
+                {
+                    sqlQuery += " AND AD_ShareRecordOrg_ID>0 ";
+                }
+                sqlQuery += " ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
+               
             }
-            sqlQuery += " WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + po.GetAD_Org_ID() + ")  ";
-            sqlQuery += " ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
 
             sqlQuery = MRole.GetDefault(ctx).AddAccessSQL(sqlQuery, "AD_Org", true, false);
-
             DataSet ds = DB.ExecuteDataset(sqlQuery);
+
+            
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 lstOrg = new List<Records>();
@@ -111,7 +135,8 @@ namespace VISLogic.Models
                         ChildShare = Util.GetValueOfString(ds.Tables[0].Rows[i]["IsChildShare"]).Equals("Y"),
                         AD_OrgShared_ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ShareRecordOrg_ID"]),
                         OrgID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["OrgID"]),
-                        CanEdit = canEdit
+                        CanEdit = canEdit,
+                        parentID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["parent_id"])
                     };
                     lstOrg.Add(Org);
                 }
@@ -192,9 +217,15 @@ namespace VISLogic.Models
                     //Share current record with selected orgs
                     for (int i = 0; i < records.Count; i++)
                     {
+                        
 
                         if (ParentID == 0)
                             curRecID = records[i].AD_OrgShared_ID;
+
+                        if (WindowParent_ID > 0)
+                        {
+                            curRecID = records[i].AD_OrgShared_ID;
+                        }
 
                         if (curRecID != records[i].AD_OrgShared_ID)
                             continue;
@@ -279,6 +310,8 @@ namespace VISLogic.Models
 
                         GridTabVO gt = tabs.Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault();
 
+                        PO prntObj = MTable.GetPO(ctx, tableName, record_ID, trx);
+                        int parentOrgID =Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_ORG_ID FROM " + tableName + " WHERE " + tableName + "_ID =" + record_ID));
                         List<GridTabVO> gTabs = tabs.Where(a => a.TabLevel == gt.TabLevel + 1).ToList();
 
 
@@ -302,7 +335,7 @@ namespace VISLogic.Models
                                     if (pObj == null)
                                         continue;
                                     //select C_Order_ID FROM C_orderTax where C_Order_ID=11123123
-                                    ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID FROM {table.GetTableName()} WHERE {lCol}={ pObj.Get_ValueAsInt(lCol)}");
+                                    ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID,AD_Org_ID FROM {table.GetTableName()} WHERE {lCol}={ pObj.Get_ValueAsInt(lCol)}");
                                 }
                                 else
                                 {
@@ -313,7 +346,7 @@ namespace VISLogic.Models
 
                                             //// This one is for key Column
                                             // Select C_orderline-ID from C_OrderLine where C_Order_ID=112212312;
-                                            ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID FROM {table.GetTableName()} WHERE {gt.TableName}_ID = {record_ID}");
+                                            ds = DB.ExecuteDataset($"SELECT  {table.GetTableName()}_ID,AD_Org_ID FROM {table.GetTableName()} WHERE {gt.TableName}_ID = {record_ID}");
                                         }
                                         else
                                         {
@@ -328,7 +361,7 @@ namespace VISLogic.Models
                                                     int count = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT Count(*) FROM AD_ShareRecordOrg WHERE AD_Table_ID={fkTable.GetAD_Table_ID()} AND Record_ID={pObj.Get_ValueAsInt(fkColumnName)}"));
                                                     if (count > 0)
                                                     {
-                                                        ds = DB.ExecuteDataset($"SELECT  {table.GetKeyColumns()[0]} FROM {table.GetTableName()} WHERE {cols[m].GetColumnName()} = {pObj.Get_ValueAsInt(cols[m].GetColumnName())} ");
+                                                        ds = DB.ExecuteDataset($"SELECT  {table.GetKeyColumns()[0]}, AD_Org_ID FROM {table.GetTableName()} WHERE {cols[m].GetColumnName()} = {pObj.Get_ValueAsInt(cols[m].GetColumnName())} ");
                                                         if (ds != null && ds.Tables[0].Rows.Count > 0)
                                                             break;
                                                     }
@@ -349,6 +382,10 @@ namespace VISLogic.Models
                                         sOrg.Readonly = records[i].isReadonly;
                                         if (records[i].ChildShare)
                                         {
+                                            if(Util.GetValueOfInt(ds.Tables[0].Rows[j][1]) != parentOrgID)
+                                            {
+                                                continue;
+                                            }
 
                                             if (statussChanged || !VAdvantage.Common.ShareRecordManager.CheckRecordInTable(tab.AD_Table_ID, sOrg))
                                             {

@@ -32,10 +32,24 @@ VIS = window.VIS || {};
         var setBusy = function (isBusy) {
             bsyDiv.css("display", isBusy ? 'block' : 'none');
         };
-
+        var h = null;
+        var ht = null;
         this.init = function () {
             setBusy(false);
             $root = $('<div></div>').append(bsyDiv);
+            h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
+            if (!h || h < 0) {
+                h = $('.divWorkflowActivity').height() - 19;
+            } 
+
+            if (!h) {
+                h = 100 + '%';
+                ht = 100 + '%';
+            } else {
+                ht = (h - 38) + 'px';
+                h = h + 'px';
+                
+            }
 
             var tab = $('<div class="vis-surveyTab">'
                 + '<div class="vis-tabPrimary">'
@@ -59,10 +73,10 @@ VIS = window.VIS || {};
                 + '</ul>'
                 + '<div class="tab-content">'
                 + '<div class="tab-pane fade show active" style="width:100%;" id="quesSec_' + self.windowNo + '">'  
-                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:59vh" id="quesMessage_' + self.windowNo +'"></div>'
-                + '<div style="height:59vh;overflow-y:auto !important;" id="ques_' + self.windowNo +'"></div>'
+                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:' + (ht)+'" id="quesMessage_' + self.windowNo +'"></div>'
+                + '<div style="height:' + (ht)+';overflow-y:auto !important;" id="ques_' + self.windowNo +'"></div>'
                 + '</div>'
-                + '<div class="tab-pane fade mt-2" style="height:59vh;width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
+                + '<div class="tab-pane fade mt-2" style="height:'+(ht)+';width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
                 + '<div class="d-flex align-items-center justify-content-between mr-2 ml-2">'
                 + '<div class="d-flex align-items-center ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") +'">' 
                 + '<span class="d-inline-block ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") +'">' + VIS.Msg.getMsg("SelectUser")+'</span>'
@@ -88,6 +102,7 @@ VIS = window.VIS || {};
                 + '</div>'
                 + '</div>'
             );
+
             $root.append(tab);
             surveyTab = $root.find('#surveyTab_' + self.windowNo);
             questionSection = $root.find('#ques_' + self.windowNo);
@@ -336,8 +351,8 @@ VIS = window.VIS || {};
             if (_AD_WF_Activity_ID == 0) {
                 loadAccessData(AD_Survey_ID);
             } else {
-                if (_AD_WF_Activity_ID == 0) {
-                    questionSection.css('height', '64vh');
+                if (_AD_WF_Activity_ID == 0) {                   
+                    questionSection.css('height', h);
                 } else {
                     questionSection.css('height', '74vh');
                 }
@@ -370,12 +385,21 @@ VIS = window.VIS || {};
                     setBusy(false);
                     var res = [];
                     res = JSON.parse(data);
-                    questionSection.css('height', '59vh');
+                    
+                   
                     if (res != null && res.length > 0) {
                         var count = 0;
                         //responseSection.show();
                         surveyTab.find('.respTab').show();
                         surveyTab.find('.quesTab').show();
+
+                        if (isSelfShow) {
+                            questionSection.css('height', (ht));
+                        } else {
+                            questionSection.css('height', h);
+                        }
+
+
                         surveyTab.find('.responseCount').text(res.length);
                         for (var i = 0; i < res.length; i++) {
                             if (!userResponse['U' + res[i].User_ID]) {
@@ -398,7 +422,7 @@ VIS = window.VIS || {};
                         }
                     } else {
                         if (_AD_WF_Activity_ID == 0) {
-                            questionSection.css('height', '64vh');
+                            questionSection.css('height', h);
                         } else {
                             questionSection.css('height', '74vh');
                         }
