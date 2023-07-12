@@ -152,10 +152,21 @@
 
         /**Get All organization */
         function getOrganization() {
-            IsBusy(true);
+            IsBusy(true);   
+            parentTableID = 0;
+            parentRecord_ID = 0;
+            if (curTab && curTab.getTabLevel() > 0) {
+                parentTableID = curTab.getParentTab().getAD_Table_ID();
+                parentRecord_ID = curTab.getParentTab().getRecord_ID();
+                parentOrg = curTab.getParentTab().getValue('AD_Org_ID');
+            }
+
             var obj = {
                 AD_Table_ID: table_id,
-                Record_ID: record_id
+                Record_ID: record_id,
+                parentTableID: parentTableID,
+                parentRecord_ID: parentRecord_ID,
+                parentOrg: parentOrg
             }
 
             var arr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "RecordShared/GetSharedRecord", obj, null);
@@ -224,7 +235,7 @@
             for (var i = 0; i < list.length; i++) {
                 if (list[i].isSummary == true) {
                     continue;
-                }
+                }                
                    
                 if (list[i].AD_OrgShared_ID) {
                     row += '<tr class="vis-rowSuccess">';
@@ -235,14 +246,14 @@
                 row += '</td>'
                     + '<td width="40px">';
                 if (list[i].AD_OrgShared_ID) {
-                    row += '<input type="checkbox" checked class="chkOrgID" data-shareid="' + list[i].AD_OrgShared_ID + '" value="' + list[i].ID + '">';
+                    row += '<input type="checkbox" checked class="chkOrgID" parentid="' + list[i].parentID+'" data-shareid="' + list[i].AD_OrgShared_ID + '" value="' + list[i].ID + '">';
                     sharedIDs.push(list[i].AD_OrgShared_ID);
                     if (list[i].CanEdit) {
                         toogleOkBtn(true);
                     }
                     canEdit = list[i].CanEdit;
                 } else {
-                    row += '<input type="checkbox" class="chkOrgID" value="' + list[i].ID + '">';
+                    row += '<input type="checkbox" class="chkOrgID" parentid="' + list[i].parentID +'" value="' + list[i].ID + '">';
                 }
                 row += '</td>'
                     + '<td title="' + list[i].value + '">' + list[i].value + '</td>'
@@ -364,8 +375,8 @@
                         AD_OrgShared_ID: Number(this.value),
                         isReadonly: $(this).closest('tr').find('.chkIsReadOnly').is(':checked'),
                         shareID: $(this).data('shareid'),
-                        ChildShare: $(this).closest('tr').find('.chkIsChildShare').is(':checked')   
-
+                        ChildShare: $(this).closest('tr').find('.chkIsChildShare').is(':checked'),
+                        parentID: $(this).attr('parentid')
                     });
 
                 });
@@ -519,13 +530,13 @@
             cdos.hidebuttons();
         }
 
-        if (curTab && curTab.getTabLevel() > 0) {
-            root.find('.vis-tableSection input').prop("disabled", "true");
-            btnOk.prop("disabled", "true");
-        } else {
-            root.find('.vis-tableSection input').prop("disabled", "");
-            btnOk.prop("disabled", "");
-        }
+        //if (curTab && curTab.getTabLevel() > 0) {
+        //    root.find('.vis-tableSection input').prop("disabled", "true");
+        //    btnOk.prop("disabled", "true");
+        //} else {
+        //    root.find('.vis-tableSection input').prop("disabled", "");
+        //    btnOk.prop("disabled", "");
+        //}
     }
 
     VIS.RecordShared = RecordShared;

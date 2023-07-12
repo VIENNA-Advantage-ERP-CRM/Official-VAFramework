@@ -262,6 +262,16 @@ namespace VAdvantage.Common
                                 {
                                     int parentOrg_ID = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID={tablID} AND Record_ID={parentID} AND AD_OrgShared_ID={sharedRec[k].OrgID}"));
 
+                                    if (parentOrg_ID > 0)
+                                    {
+                                        DataTable dt = DB.ExecuteDataset("SELECT AD_Table_ID,Record_ID FROM AD_ShareRecordOrg WHERE AD_ShareRecordOrg_ID=" + parentOrg_ID).Tables[0];
+                                        string tableName = MTable.GetTableName(p_ctx,Util.GetValueOfInt(dt.Rows[0]["AD_Table_ID"]));
+                                        int parentOrgID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_ORG_ID FROM " + tableName + " WHERE " + tableName + "_ID =" + Util.GetValueOfInt(dt.Rows[0]["Record_ID"])));
+                                        if(parentOrgID != Util.GetValueOfInt(po.Get_Value("AD_Org_ID")))
+                                        {
+                                            continue;
+                                        }
+                                    }
                                     VAdvantage.ModelAD.MShareRecordOrg SRO = new VAdvantage.ModelAD.MShareRecordOrg(p_ctx, 0, po.Get_Trx());
                                     SRO.SetAD_Table_ID(po.Get_Table_ID());
                                     SRO.Set_ValueNoCheck("AD_OrgShared_ID", sharedRec[k].OrgID);
@@ -385,6 +395,12 @@ namespace VAdvantage.Common
 
         }
 
+        /// <summary>
+        /// Check Record in table
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="record"></param>
+        /// <returns></returns>
         public static bool CheckRecordInTable(int table, ShareOrg record)
         {
             if (tableRecordHirarerichy[table] == null)
@@ -398,7 +414,15 @@ namespace VAdvantage.Common
 
         }
 
-
+        /// <summary>
+        ///  Get Record Form Table
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public List<int> GetRecordFromTable(int table) {
+            List<int> parentColumnIDs = tableColumnHirarichy[table];
+            return parentColumnIDs;
+        }
 
     }
 
@@ -423,6 +447,7 @@ namespace VAdvantage.Common
         public int shareID { get; set; }
         public bool CanEdit { get; set; }
         public bool ChildShare { get; set; }
+        public int parentID { get; set; }
     }
 
     public class ShareOrg
