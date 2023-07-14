@@ -155,6 +155,7 @@
             IsBusy(true);   
             parentTableID = 0;
             parentRecord_ID = 0;
+            parentOrg = 0;
             if (curTab && curTab.getTabLevel() > 0) {
                 parentTableID = curTab.getParentTab().getAD_Table_ID();
                 parentRecord_ID = curTab.getParentTab().getRecord_ID();
