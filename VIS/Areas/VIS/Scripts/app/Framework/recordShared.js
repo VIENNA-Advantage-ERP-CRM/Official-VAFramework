@@ -107,7 +107,7 @@
             + '<th>' + VIS.Msg.getMsg('Org') + '</th>'
             + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('LegalEntities') + '</th>'
             + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('ReadOnly') + '</th>'
-            + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('ChildShare') + '</th>'
+            + '<th width="120px" class="text-center" style="dispaly:none">' + VIS.Msg.getMsg('ChildShare') + '</th>'
             + '</tr>'
             + '</thead>'
             + '<tbody class="vis-gridTableBody tbList">'
@@ -268,9 +268,9 @@
                 }
                 row += '</td>'
                 if (list[i].ChildShare) {
-                    row += '<td width="120px" class="text-center"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
+                    row += '<td width="120px" class="text-center" style="dispaly:none"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
                 } else {
-                    row += '<td width="120px" class="text-center"><input type="checkbox" name="" id="" class="chkIsChildShare" /> </td>'
+                    row += '<td width="120px" class="text-center" style="dispaly:none"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
                 }
                
                     + '</tr>';
