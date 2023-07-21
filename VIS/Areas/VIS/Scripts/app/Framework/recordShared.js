@@ -107,7 +107,7 @@
             + '<th>' + VIS.Msg.getMsg('Org') + '</th>'
             + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('LegalEntities') + '</th>'
             + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('ReadOnly') + '</th>'
-            + '<th width="120px" class="text-center" style="dispaly:none">' + VIS.Msg.getMsg('ChildShare') + '</th>'
+            + '<th width="120px" class="text-center" style="display:none">' + VIS.Msg.getMsg('ChildShare') + '</th>'
             + '</tr>'
             + '</thead>'
             + '<tbody class="vis-gridTableBody tbList">'
@@ -268,19 +268,19 @@
                 }
                 row += '</td>'
                 if (list[i].ChildShare) {
-                    row += '<td width="120px" class="text-center" style="dispaly:none"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
+                    row += '<td width="120px" class="text-center" style="display:none"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
                 } else {
-                    row += '<td width="120px" class="text-center" style="dispaly:none"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
+                    row += '<td width="120px" class="text-center" style="display:none"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
                 }
                
                     + '</tr>';
             }
             root.find('.tbList').append(row);
             root.find('.tbList .chkOrgID').on("click", function (e) {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
+                //if (!canEdit) {
+                //    e.preventDefault();
+                //    return;
+                //}
                 var checkedOrgs = root.find('.tbList .chkOrgID:checked');
                 if (checkedOrgs && checkedOrgs.length > 0) {
                     toogleOkBtn(true);
@@ -335,10 +335,10 @@
             });
 
             chkAll.change(function (e) {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
+                //if (!canEdit) {
+                //    e.preventDefault();
+                //    return;
+                //}
                 var isFalse = false;
                 if (this.checked) {
                     isFalse = true;
@@ -354,10 +354,10 @@
             });
 
             btnOk.click(function () {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
+                //if (!canEdit) {
+                //    e.preventDefault();
+                //    return;
+                //}
                 msg.text("");
                 IsBusy(true);
                 var saveObj = {
