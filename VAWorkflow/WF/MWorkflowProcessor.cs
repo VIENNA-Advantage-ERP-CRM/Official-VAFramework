@@ -65,7 +65,7 @@ namespace VAdvantage.WF
                 for (int i = 0; i < pstmt.Tables[0].Rows.Count; i++)
                 {
                     DataRow dr = pstmt.Tables[0].Rows[i];
-                    list.Add(new MWorkflowProcessor(ctx, dr, null));
+                    list.Add(new MWorkflowProcessor(new Ctx(), dr, null));
                 }
                 pstmt = null;
             }
@@ -114,7 +114,7 @@ namespace VAdvantage.WF
                         }
                         else if (!string.IsNullOrEmpty(scheduleIP) && machineIP.Equals(scheduleIP))
                         {
-                            list.Add(new MWorkflowProcessor(ctx, dr, null));
+                            list.Add(new MWorkflowProcessor(new Ctx(), dr, null));
                         }
                     }
                 }

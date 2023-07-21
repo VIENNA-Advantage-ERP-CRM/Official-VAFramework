@@ -285,7 +285,7 @@ namespace VAdvantage.Utility
             }
             else
                 if (message != null && message.Length > 0)
-                    SetMessageText(message);
+                SetMessageText(message);
             _valid = IsValid(true);
         }
 
@@ -658,7 +658,7 @@ namespace VAdvantage.Utility
                 _valid = false;
                 return _valid;
             }
-           if (_cc == null)
+            if (_cc == null)
                 _cc = new List<MailAddress>();
             _cc.Add(ia);
             return _valid;
@@ -1232,6 +1232,10 @@ namespace VAdvantage.Utility
 
             return null;
         }
+        public void SetCtx(Ctx ctx)
+        {
+            _ctx = ctx;
+        }
 
         /// <summary>
         /// To Send Mail
@@ -1242,7 +1246,7 @@ namespace VAdvantage.Utility
 
             log.Log(Level.INFO, "Start Executing send Mail function");
 
-            string configMessage= IsConfigurationExist(_ctx);
+            string configMessage = IsConfigurationExist(_ctx);
             if (configMessage != "OK")
             {
                 return configMessage;
@@ -1604,7 +1608,7 @@ namespace VAdvantage.Utility
 
             if (!SetFrom(fromEMail, fromName))
                 return;
-            log.Log(Level.WARNING,"Step 2");
+            log.Log(Level.WARNING, "Step 2");
             if (IsSmtpAuthorization)
             {
                 CreateAuthenticator(username, password);
@@ -1623,11 +1627,13 @@ namespace VAdvantage.Utility
             string username = userConfig.GetSmtpUsername();
             string password = userConfig.GetSmtpPassword();
             string host = userConfig.GetSmtpHost();
+            bool isSmtpAuthorization = false;
             if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(host) || IsSendFromClient)
             {
                 X_AD_Client client = new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
                 host = client.GetSmtpHost();
                 int smtpport = client.GetSmtpPort();
+                isSmtpAuthorization = client.IsSmtpAuthorization();
                 if (!IsSendFromClient)
                 {
                     MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
@@ -1645,6 +1651,8 @@ namespace VAdvantage.Utility
             {
                 return "ConfigurationIncompleteOrNotFound";
             }
+            if (isSmtpAuthorization)
+                CreateAuthenticator(username, password);
             return "OK";
         }
 
