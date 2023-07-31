@@ -359,15 +359,15 @@ namespace VAModelAD.Model
                 int recordID = po.Get_ID();
                 if (recordID == 0)
                     recordID = po.Get_IDOld();
-                //System.Threading.Tasks.Task.Run(() =>
-                //{
-                //    string query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + po.Get_Table_ID() + " AND Record_ID=" + recordID;
-                //    DataSet ds = DB.ExecuteDataset(query);
-                //    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                //    {
-                //        VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), null, null);
-                //    }
-                //});
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    string query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + po.Get_Table_ID() + " AND Record_ID=" + recordID;
+                    DataSet ds = DB.ExecuteDataset(query);
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), null, null);
+                    }
+                });
             }
             return success;
         }

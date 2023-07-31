@@ -3659,6 +3659,13 @@
     };//Save
 
     APanel.prototype.cmd_new = function (copy) { //Create New Record
+
+        //If the record is shared, then copying the record is not allowed.
+        if (this.curTab.isCurrentRecordShare && copy) {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return;
+        }
+
         if (!this.curTab.getIsInsertRecord()) {
             //log.warning("Insert Record disabled for Tab");
             return;

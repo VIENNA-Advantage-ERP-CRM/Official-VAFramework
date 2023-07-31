@@ -471,10 +471,19 @@ namespace VISLogic.Models
         /// <param name="AD_Table_ID"></param>
         /// <param name="Record_ID"></param>
         /// <returns></returns>
-        public bool GetSharedRecordAccess(Ctx ctx, int AD_Table_ID, int Record_ID)
+        public string GetSharedRecordAccess(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
-            string sql = "SELECT  IsReadOnly FROM AD_ShareRecordOrg WHERE IsActive = 'Y' AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + " AND AD_OrgShared_ID = " + ctx.GetAD_Org_ID();
-            return Util.GetValueOfString(DB.ExecuteScalar(sql)) == "Y";
+            string sql = "SELECT  IsReadOnly,AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE IsActive = 'Y' AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID + " AND AD_OrgShared_ID = " + ctx.GetAD_Org_ID();
+            DataSet ds = DB.ExecuteDataset(sql);
+            if(ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                return Util.GetValueOfString(Util.GetValueOfString(ds.Tables[0].Rows[0][0]) == "Y") + "_" + Util.GetValueOfString(ds.Tables[0].Rows[0][1]);
+            }
+            else
+            {
+                return "false_N";
+            }
+            
         }
 
         /// <summary>
