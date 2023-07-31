@@ -85,7 +85,8 @@ namespace VISLogic.Models
                 FROM ad_sharerecordorg  ad_sharerecordorg INNER JOIN  ad_org  ad_org ON (ad_org.ad_org_id = ad_sharerecordorg.ad_orgshared_id)
                 LEFT JOIN  ad_sharerecordorg LSORG ON (ad_org.ad_org_id = LSORG.ad_orgshared_id AND LSORG.ad_table_id = " + AD_Table_ID + @" AND LSORG.record_id = " + Record_ID + @")";
                 sqlQuery += " WHERE ad_sharerecordorg.ad_table_id = " + parentTableID + @" AND ad_sharerecordorg.record_id = " + parentRecord_ID + " AND AD_Org.AD_Org_ID NOT IN (0," + po.GetAD_Org_ID() + ") ";
-                sqlQuery += " ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
+                sqlQuery += " ORDER BY AD_ShareRecordOrg.ad_sharerecordorg_id desc,AD_Org.Name";
+
                 int count = Util.GetValueOfInt(DB.ExecuteScalar("SELECT count(AD_Org_ID) FROM AD_Role_OrgAccess WHERE ISACTIVE='Y' AND AD_role_ID=" + ctx.GetAD_Role_ID() + " AND AD_Org_ID IN (" + po.GetAD_Org_ID() + ")"));
                 if (count == 0)
                 {

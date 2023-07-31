@@ -119,7 +119,7 @@
             + '</div>'
             + '<div>'
             + '<button class="vis-actionBtn mr-1" id="btnCancel_' + windowNo + '">' + VIS.Msg.getMsg('Cancel') + '</button>'
-            + '<button class="vis-actionBtn mr-2" disabled="" style="cursor:default;opacity:.5" id="btnOk_' + windowNo + '">' + VIS.Msg.getMsg('OK') + '</button>'
+            + '<button class="vis-actionBtn mr-2"  style="cursor:default;" id="btnOk_' + windowNo + '">' + VIS.Msg.getMsg('OK') + '</button>'
             + '</div>'
             + '</div>'
             + '</div>'
@@ -287,7 +287,7 @@
                 }
                 else {
                     if (sharedIDs && sharedIDs.length == 0)
-                        toogleOkBtn(false);
+                        toogleOkBtn(true);
                 }
             });
 
