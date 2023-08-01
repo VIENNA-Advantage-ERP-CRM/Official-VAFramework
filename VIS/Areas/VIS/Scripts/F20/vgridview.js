@@ -727,12 +727,26 @@
 
                         var strDiv = "";
                         if (l && VIS.DisplayType.List == l.displayType) {
+
+                            var hue = Math.floor(Math.random() * (360 - 0)) + 0;
+                            var v = 60; //Math.floor(Math.random() * 16) + 75;
+                            var pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
+
                             var lType = l.getLovIconType(val, true);
 
                             var listIcon = l.getLOVIconElement(val, true);
                             var highlightChar = '';
                             if (!listIcon) {
-                                highlightChar = d.substring(0, 1);
+                                //highlightChar = d.substring(0, 1);
+
+                                if (highlightChar.length == 0)
+                                    var txt = d.trim().split(' ');
+                                    highlightChar = txt[0].substring(0, 1).toUpper();
+                                if (txt.length > 1) {
+                                    highlightChar += txt[txt.length - 1].substring(0, 1).toUpper();
+                                } else {
+                                    highlightChar = txt[0].substring(0, 2).toUpper();
+                                }
                             }
                             // If both , then show text and image
                             if (lType == "B") {
@@ -742,7 +756,7 @@
                                     strDiv += "<div class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'> " + listIcon + "</div> ";
                                 }
                                 else {
-                                    strDiv += "<div class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
+                                    strDiv += "<div style='background-color:" + pastel +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
                                 }
                                 strDiv += "<span> " + d + "</span ><div>";
                             }
@@ -757,7 +771,7 @@
                                     strDiv += "<div class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'> " + listIcon + "</div> ";
                                 }
                                 else {
-                                    strDiv += "<div class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
+                                    strDiv += "<div style='background-color:" + pastel +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
                                 }
                                 strDiv += "<div>";
                             }
