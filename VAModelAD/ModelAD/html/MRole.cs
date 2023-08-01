@@ -2015,11 +2015,13 @@ namespace VAdvantage.Model
 
             //	Use First Table
             string tableName = "";
+            string mainTableName = "";
             if (ti.Length > 0 &&
                 (ti[0].GetTableName().Equals(TableNameIn)
                 || ti[0].GetSynonym().Equals(TableNameIn)))
             {
                 tableName = ti[0].GetSynonym();
+                mainTableName = ti[0].GetTableName();
                 if (tableName.Length == 0)
                     tableName = ti[0].GetTableName();
             }
@@ -2047,9 +2049,9 @@ namespace VAdvantage.Model
             {
                 retSQL.Append(" AND ");
                 if (fullyQualified && !Util.IsEmpty(tableName))
-                    retSQL.Append(GetOrgWhere(tableName, rw));
+                    retSQL.Append(GetOrgWhere(tableName, rw, mainTableName));
                 else
-                    retSQL.Append(GetOrgWhere(null, rw));
+                    retSQL.Append(GetOrgWhere(null, rw, mainTableName));
             }
 
             if (IsUseBPRestrictions())
@@ -2279,7 +2281,7 @@ namespace VAdvantage.Model
 	 *            read write
 	 * @return "AD_Org_ID=0" or "AD_Org_ID IN(0,1)" or null (if access all org)
 	 */
-        public String GetOrgWhere(String tableName, bool rw)
+        public String GetOrgWhere(String tableName, bool rw,string mainTableName)
         {
             if (IsAccessAllOrgs())
                 return null;
@@ -2329,10 +2331,10 @@ namespace VAdvantage.Model
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
                     //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
-                    if (!string.IsNullOrEmpty(tableName))
+                    if (!string.IsNullOrEmpty(mainTableName))
                     {
                         // Get Shared record with organisation.
-                        GetShareRecord(ref sql, tableName);
+                        GetShareRecord(ref sql, tableName, mainTableName);
                     }
                     sb = new StringBuilder();
                 }
@@ -2821,16 +2823,16 @@ namespace VAdvantage.Model
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="tableName"></param>
-        public void GetShareRecord(ref StringBuilder sql, string tableName)
+        public void GetShareRecord(ref StringBuilder sql, string tableName, string mainTableName)
         {
-            string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(tableName);
+            string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(mainTableName);
             DataSet ds = DB.ExecuteDataset(qry);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 sql.Append(" OR (");
 
                 //select * from C_Order where (AD_Client_ID=11 AD AD_Org_ID =0 OR C_Order_ID IN (qry)
-                sql.Append(tableName+"."+tableName + "_ID IN (" + qry + "))");
+                sql.Append(tableName+"."+ mainTableName + "_ID IN (" + qry + "))");
 
             }
         }

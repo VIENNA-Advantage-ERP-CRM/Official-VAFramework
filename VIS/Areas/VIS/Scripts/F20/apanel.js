@@ -3328,7 +3328,7 @@
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
-            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org') {
+            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org' && this.curTab.getTableName().toLowerCase() !='m_warehouse') {
                 this.aSharedRecord.setEnabled(true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {
@@ -3659,6 +3659,13 @@
     };//Save
 
     APanel.prototype.cmd_new = function (copy) { //Create New Record
+
+        //If the record is shared, then copying the record is not allowed.
+        if (this.curTab.isCurrentRecordShare && copy) {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return;
+        }
+
         if (!this.curTab.getIsInsertRecord()) {
             //log.warning("Insert Record disabled for Tab");
             return;

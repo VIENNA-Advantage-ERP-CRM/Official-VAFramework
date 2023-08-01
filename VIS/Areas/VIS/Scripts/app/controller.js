@@ -2046,16 +2046,22 @@
             },
             success: function (data) {
                 data = JSON.parse(data);
-                if (data == true)
+                data = data.split('_');
+
+                if (data[0].toLowerCase() == 'true') {
                     that.IsSharedReadOnly = true;
-                else
+                }
+                else {
                     that.IsSharedReadOnly = false;
+                }
+
+                that.isCurrentRecordShare = data[1] == 'N' ? false : true;
             },
             error: function (err) {
                 console.log(err);
             }
         });
-    };
+    };    
 
     GridTab.prototype.verifyRow = function (targetRow) {
 
