@@ -3328,7 +3328,7 @@
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
-            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org') {
+            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org' && this.curTab.getTableName().toLowerCase() !='m_warehouse') {
                 this.aSharedRecord.setEnabled(true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {

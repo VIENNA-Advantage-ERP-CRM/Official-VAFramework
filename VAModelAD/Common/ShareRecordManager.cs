@@ -331,6 +331,23 @@ namespace VAdvantage.Common
             }
         }
 
+        /// <summary>
+        /// Delete After Deleteing Record from Window
+        /// </summary>
+        /// <param name="po"></param>
+        /// <param name="recordID"></param>
+        public static void DeleteRecordFromWindow(PO po,int recordID) {
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                string query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + po.Get_Table_ID() + " AND Record_ID=" + recordID;
+                DataSet ds = DB.ExecuteDataset(query);
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), null, null);
+                }
+            });
+        }
+
         public static void DeleteSharedChild(int parent_ID, Trx trx, List<int> orgs)
         {
             string sql = "SELECT AD_ShareRecordOrg_ID,ad_orgshared_id, Record_ID,AD_Table_ID FROM AD_ShareRecordOrg WHERE Parent_ID=" + parent_ID;
