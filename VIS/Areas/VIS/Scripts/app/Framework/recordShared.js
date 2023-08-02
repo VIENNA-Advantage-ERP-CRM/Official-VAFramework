@@ -220,6 +220,12 @@
                     root.find('.tbList .chkOrgID[value="' + filterData[e].ID + '"]').closest('tr').show();
                 };
             };
+
+            if (txtSearchKey.val() !='' && txtSummaryOrg.val() != '' || ddlLegalEntities.find('option:selected').val() != 'A') {
+                chkAll.attr("disabled", "disabled");
+            } else {
+                chkAll.removeAttr("disabled");
+            }
         }
 
         /**
@@ -281,6 +287,7 @@
                 //    e.preventDefault();
                 //    return;
                 //}
+
                 var checkedOrgs = root.find('.tbList .chkOrgID:checked');
                 if (checkedOrgs && checkedOrgs.length > 0) {
                     toogleOkBtn(true);
