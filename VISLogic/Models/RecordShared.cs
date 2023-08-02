@@ -342,7 +342,8 @@ namespace VISLogic.Models
                                 {
                                     if (cols != null && cols.Count > 0)
                                     {
-                                        if (cols.Count == 1 && gt.TableName + "_ID" == cols[0].GetColumnName())
+                                        int id = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Column_ID FROM AD_Column WHERE ColumnName='" + table.GetTableName() + "_ID' AND AD_Table_ID=" + table.GetAD_Table_ID()));
+                                        if (cols.Count == 1 && (gt.TableName + "_ID" == cols[0].GetColumnName()) || id > 0)
                                         {
 
                                             //// This one is for key Column
