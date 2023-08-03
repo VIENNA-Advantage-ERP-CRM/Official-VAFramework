@@ -4188,6 +4188,11 @@
             return;
         }
 
+        if (this.curTab.isCurrentRecordShare) {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return;
+        }
+
         if (this.curGC.getSelectedRows().length > 1) {
             VIS.ADialog.info('ShareOneRecordOnly');
             return;

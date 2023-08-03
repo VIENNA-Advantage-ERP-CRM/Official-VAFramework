@@ -221,7 +221,7 @@
                 };
             };
 
-            if (txtSearchKey.val() !='' && txtSummaryOrg.val() != '' || ddlLegalEntities.find('option:selected').val() != 'A') {
+            if (txtSearchKey.val() !='' || txtSummaryOrg.val() != '' || ddlLegalEntities.find('option:selected').val() != 'A') {
                 chkAll.attr("disabled", "disabled");
             } else {
                 chkAll.removeAttr("disabled");
