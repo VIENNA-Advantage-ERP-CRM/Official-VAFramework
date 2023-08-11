@@ -106,12 +106,12 @@ namespace VISLogic.Models
                     sqlQuery += " AND AD_ShareRecordOrg_ID IS NOT NULL ";
                     canEdit = false;
                 }
-                sqlQuery += " WHERE AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + po.GetAD_Org_ID() + ")  ";
+                sqlQuery += " WHERE AD_Org.IsCostCenter='N' AND AD_Org.IsProfitCenter='N' AND AD_Org.ISACTIVE='Y' AND AD_Org.AD_Org_ID NOT IN (0," + po.GetAD_Org_ID() + ")  ";
                 if (parentTableID > 0 && parentOrg != 0)
                 {
                     sqlQuery += " AND AD_ShareRecordOrg_ID>0 ";
                 }
-                sqlQuery += " ORDER BY AD_ShareRecordOrg.created,AD_Org.Name";
+                sqlQuery += " ORDER BY AD_ShareRecordOrg_ID,TRIM(UPPER(AD_Org.Name))";
                
             }
 
