@@ -7180,6 +7180,7 @@
     VIS.Controls.VSpan = VSpan;
     VIS.Controls.VTelePhone = VTelePhone;
     VIS.Controls.VColor = VColor;
+    VIS.Controls.VURL = VURL;
 /* END */
 
 

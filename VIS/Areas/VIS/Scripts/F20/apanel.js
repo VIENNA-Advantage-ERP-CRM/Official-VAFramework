@@ -133,6 +133,7 @@
         var $btnClose = null;
         var $spnTitle = null;
         var $spanSetting = null;
+        this.excludeFromShare = ['ad_org', 'm_warehouse','ad_ShareRecordOrg'];
         /***END Tab panel**/
 
         var tabItems = [], tabLIObj = {};
@@ -3328,7 +3329,7 @@
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
-            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org' && this.curTab.getTableName().toLowerCase() !='m_warehouse') {
+            if (this.curTab.getValue('AD_Org_ID') > 0 && this.excludeFromShare.indexOf(this.curTab.getTableName().toLowerCase()) == -1) {
                 this.aSharedRecord.setEnabled(true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {

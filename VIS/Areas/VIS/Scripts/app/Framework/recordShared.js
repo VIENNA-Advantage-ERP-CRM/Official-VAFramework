@@ -224,8 +224,8 @@
 
             if (txtSearchKey.val() != '' || txtSummaryOrg.val() != '' || ddlLegalEntities.find('option:selected').val() != 'A') {
                 //chkAll.attr("disabled", "disabled");
-                var l = root.find('.tbList tr .chkOrgID:visible').length;
-                var chkln = root.find('.tbList tr .chkOrgID:visible(:checked)').length;
+                var l = root.find('.tbList tr:visible .chkOrgID').length;
+                var chkln = root.find('.tbList tr:visible .chkOrgID:checked').length;
                 if (l > 0 && l == chkln) {
                     chkAll.attr("checked", "checked").prop("checked", "checked");
                 } else {
@@ -233,7 +233,7 @@
                 }
             } else {
                 // chkAll.removeAttr("disabled");
-                var l = root.find('.tbList tr .chkOrgID').length;
+                var l = root.find('.tbList tr:visible .chkOrgID').length;
                 var chkln = root.find('.tbList tr .chkOrgID:checked').length;
                 if (l > 0 && l == chkln) {
                     chkAll.attr("checked", "checked").prop("checked", "checked");;
