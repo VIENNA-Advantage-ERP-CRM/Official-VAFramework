@@ -267,7 +267,7 @@ namespace VAdvantage.Common
                         {
                             for (int k = 0; k < sharedRec.Count; k++)
                             {//If shared record's ID == Current record being saved's Parent ID, then share current record.
-                                if (sharedRec[k].RecordID == parentID && sharedRec[k].ChildShare)
+                                if (sharedRec[k].RecordID == parentID)
                                 {
                                     int parentOrg_ID = Util.GetValueOfInt(DB.ExecuteScalar($"SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID={tablID} AND Record_ID={parentID} AND AD_OrgShared_ID={sharedRec[k].OrgID}"));
 

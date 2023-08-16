@@ -133,7 +133,7 @@
         var $btnClose = null;
         var $spnTitle = null;
         var $spanSetting = null;
-        this.excludeFromShare = ['ad_org', 'm_warehouse','ad_ShareRecordOrg'];
+        this.excludeFromShare = ['ad_org', 'm_warehouse','ad_sharerecordorg'];
         /***END Tab panel**/
 
         var tabItems = [], tabLIObj = {};

@@ -382,7 +382,7 @@ namespace VISLogic.Models
                                         sOrg.OrgID = records[i].AD_OrgShared_ID;
                                         sOrg.ChildShare = records[i].ChildShare;
                                         sOrg.Readonly = records[i].isReadonly;
-                                        if (records[i].ChildShare)
+                                        if (true)//records[i].ChildShare
                                         {
                                             if(Util.GetValueOfInt(ds.Tables[0].Rows[j][1]) != parentOrgID)
                                             {
@@ -502,7 +502,7 @@ namespace VISLogic.Models
             int treeID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
 
             sql = @"SELECT Node_ID,AD_Org.Name,Parent_ID,Issummary,(SELECT NAME FROM AD_Org WHERE AD_org_ID=Parent_ID) AS ParentName FROM AD_treeNode 
-              INNER JOIN AD_Org ON AD_treeNode.Node_ID=AD_Org.AD_Org_ID
+              INNER JOIN AD_Org ON AD_treeNode.Node_ID=AD_Org.AD_Org_ID AND AD_Org.IsCostCenter='N' AND AD_Org.IsProfitCenter='N' 
               WHERE AD_Tree_ID=" + treeID;
 
             DataSet ds = DB.ExecuteDataset(sql);
