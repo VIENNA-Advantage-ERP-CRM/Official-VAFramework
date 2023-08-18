@@ -6093,7 +6093,7 @@
             if (!keyColumn.toUpperCase().endsWith("_ID"))
                 keyColumn += "_ID";			//	AD_Language_ID
             var Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, keyColumn);
-            if (Record_ID == "")
+            if (Record_ID == "" && this.gridTab)
                 Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, this.gridTab.getTableName() + "_ID"); 
 
             if (Record_ID == "")
@@ -6109,7 +6109,7 @@
             if (!VIS.MRole.getIsColumnAccess(AD_Table_ID, this.vo.AD_Column_ID, false))
                 return false;
 
-            if (this.gridTab.IsSharedReadOnly)
+            if (this.gridTab && this.gridTab.IsSharedReadOnly)
                 return false;
         }
 

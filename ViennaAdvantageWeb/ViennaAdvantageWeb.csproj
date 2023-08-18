@@ -53,7 +53,7 @@
     </Reference>
     <Reference Include="BaseLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\VABaseFiles\BaseLibrary\bin\Debug\BaseLibrary.dll</HintPath>
+      <HintPath>..\..\VIS_\ViennaAdvantageWeb\Dll\BaseLibrary.dll</HintPath>
     </Reference>
     <Reference Include="CoreLibrary">
       <HintPath>Dll\CoreLibrary.dll</HintPath>
