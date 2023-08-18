@@ -871,6 +871,7 @@ namespace VAdvantage.Controller
             clone.Description = Description;
             clone.Help = Help;
             clone.ReadOnlyLogic = ReadOnlyLogic;
+            clone.mandatoryLogic = mandatoryLogic;
             clone.ObscureType = ObscureType;
             clone.IsDefaultFocus = IsDefaultFocus;
             //	Lookup

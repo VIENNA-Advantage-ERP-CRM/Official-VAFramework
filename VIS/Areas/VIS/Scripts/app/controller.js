@@ -2028,7 +2028,15 @@
      * get shared record is readonly or not and set status on tab level.
      * 
      * */
-    GridTab.prototype.IsSharedAccess = function () {
+    GridTab.prototype.IsSharedAccess = function () {       
+
+        // Handle new record Case
+        if (this.gridTable.getIsInserting()) {
+            this.IsSharedReadOnly = false;
+            this.isCurrentRecordShare = false
+            return;
+        }
+
         var tableID = this.getAD_Table_ID();
         var recordID = this.getRecord_ID();
 
@@ -6575,8 +6583,14 @@
                     //console.log(vo.ColumnName + " <==>" + variable +"==>"+ n);
                     return n;
                 }
-                else if (variable.indexOf('@') != -1)			//	it is a variable
+                else if (variable.indexOf('@') != -1) {			//	it is a variable
                     defStr = ctx.getWindowContext(vo.windowNo, variable.replaceAll('@', ' ').trim());
+
+                    // Check Role have Org Access. 
+                    if (vo.ColumnName == 'AD_Org_ID' && !VIS.MRole.getIsOrgAccess(Number(defStr), false)) {
+                        defStr = variable;
+                    }
+                }
                 else if (variable.startsWith("'") && variable.endsWith("'"))	//	it is a 'String'
                 {
                     if (variable.length - 2 > 0)
