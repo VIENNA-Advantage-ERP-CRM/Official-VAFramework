@@ -105,9 +105,14 @@
         this.ctx.setWindowContext(windowNo, "WindowName", json.DisplayName);
 
         try {
-
-            //className = "VIS.Apps.TestForm";
-            var type = VIS.Utility.getFunctionByName(className, window);
+            var type = "";
+            if (true) {
+                type = VIS.Utility.getFunctionByName('VIS.Apps.ReactTemplate', window);
+                additionalInfo = className;
+            } else {
+                type = VIS.Utility.getFunctionByName(className, window);
+            }
+            //className = "VIS.Apps.TestForm";            
             var o = new type(windowNo);
             o.init(windowNo, this, additionalInfo);
             this.mPanel = o;

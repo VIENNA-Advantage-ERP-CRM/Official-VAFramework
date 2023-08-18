@@ -2033,7 +2033,7 @@
         // Handle new record Case
         if (this.gridTable.getIsInserting()) {
             this.IsSharedReadOnly = false;
-            this.isCurrentRecordShare = false
+            this.isCurrentRecordShare = false;
             return;
         }
 

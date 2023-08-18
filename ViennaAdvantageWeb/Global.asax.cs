@@ -17,9 +17,9 @@ namespace ViennaAdvantageWeb
     {
         protected void Application_Start()
         {
+            ReactConfig.Configure();
             AreaRegistration.RegisterAllAreas();
-            WebApiConfig.Register(GlobalConfiguration.Configuration); 
-
+            WebApiConfig.Register(GlobalConfiguration.Configuration);
             RouteConfig.RegisterRoutes(RouteTable.Routes); 
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
