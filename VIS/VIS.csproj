@@ -874,6 +874,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\VIS\Scripts\app\processengine\" />
+    <Folder Include="Areas\VIS\Scripts\react\Css\" />
     <Folder Include="Areas\VIS\Views\AmountDivision\" />
     <Folder Include="Areas\VIS\Views\ArchiveViewer\" />
     <Folder Include="Areas\VIS\Views\Channel\" />
@@ -932,6 +933,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\VIS\Scripts\react\Component\TestComponent.jsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Areas\VIS\Scripts\react\Component\Grid.jsx" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
