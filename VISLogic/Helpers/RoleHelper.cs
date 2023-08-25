@@ -54,7 +54,7 @@ namespace VIS.Helpers
             /* Prepare Pre Setting of Table*/
 
             r.tableData = TableData.Get();
-
+           // r.IsChangeLog = role.IsChangeLog();
 
             return r;
         }

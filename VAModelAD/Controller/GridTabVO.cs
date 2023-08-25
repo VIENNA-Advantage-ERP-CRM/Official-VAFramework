@@ -152,6 +152,7 @@ namespace VAdvantage.Controller
 
         // Maintain versions on table level // for Master data Versioning
         public bool IsMaintainVersions = false;
+        public bool IsChangeLog = false;
 
         /** Tab Layout		*/
         public string TabLayout = "N";
@@ -534,6 +535,8 @@ namespace VAdvantage.Controller
 
                 // set property for Maintain version on approval
                 vo.MaintainVerOnApproval = Utility.Util.GetValueOfString(dr["MaintainVerOnApproval"]).Equals("Y");
+
+                vo.IsChangeLog = Utility.Util.GetValueOfString(dr["IsChangeLog"]).Equals("Y");
 
                 vo.IsMaintainVersions = Utility.Util.GetValueOfString(dr["IsMaintainVersions"]).Equals("Y");
 
@@ -994,6 +997,7 @@ namespace VAdvantage.Controller
             clone.MaintainVerOnApproval = MaintainVerOnApproval;
 
             clone.IsMaintainVersions = IsMaintainVersions;
+            clone.IsChangeLog = IsChangeLog;
             clone.TabLayout = TabLayout;
             // clone.DefaultCardID = DefaultCardID;
             clone.NewRecordView = NewRecordView;

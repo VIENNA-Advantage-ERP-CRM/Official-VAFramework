@@ -1156,7 +1156,13 @@
         return this.parents;
     };
 
+    GridTab.prototype.getIsMaintainVersions = function () {
+        return this.vo.IsMaintainVersions
+    };
 
+    GridTab.prototype.getIsChangeLog = function () {
+        return this.vo.IsChangeLog
+    };
 
     GridTab.prototype.clearSelectedRow = function () {
         var size = this.gridTable.getFields().length;
@@ -5018,6 +5024,10 @@
         return rowDataDB;
     };
 
+   /* GridTable.prototype.getMultipleRecordId = function (selIndices, currentRow) {
+        return [1, 2];
+    }*/
+
     /*
      *	New Record after current Row
      *  @param currentRow row
@@ -5269,6 +5279,37 @@
             }
         }
         return true;
+    };
+
+    GridTable.prototype.getMultipleRecordIds = function (selIndices, currentRow) {
+
+        var localthis = this;
+        var recIds = [];
+        var singleKeyWhere = [];
+        var multiKeyWhere = [];
+        var AD_Table_ID = localthis.AD_Table_ID;
+        var rowData = null;
+
+        var hasKeyColumn = localthis.gTable._indexKeyColumn != -1;
+        var hasProcessedColumn = localthis.gTable._indexProcessedColumn > 0 && !localthis.gTable._tableName.startsWith("I_");
+        var hasProcessedRecord = [];
+
+
+        for (var sel = 0; sel < selIndices.length; sel++) {
+
+            rowData = localthis.mSortList[selIndices[sel]];
+
+            recIds.push(rowData.recid);
+            if (hasKeyColumn) {
+                singleKeyWhere.push(rowData[localthis.keyColumnName.toLowerCase()]);
+            }
+            else {
+                singleKeyWhere.push(localthis.getWhereClause(rowData));
+            }
+        }
+        return singleKeyWhere;
+        //this.fireDataStatusIEvent("updated", "");
+
     };
 
     GridTable.prototype.dataDeleteAsync = function (selIndices, currentRow) {

@@ -7294,6 +7294,13 @@
         return retIndices;
     };
 
+  /*  VIS.GridController.prototype.canUpdateRecords = function () {
+        var selIndices = this.vTable.getSelection(true);
+        var records = this.vTable.getGrid().records;
+       
+        return records;
+    };
+*/
     VIS.GridController.prototype.dataDelete = function () {
         var retValue = this.gTab.dataDelete(this.vTable.getSelection(true));
         this.refreshTabPanelData(this.gTab.getRecord_ID());

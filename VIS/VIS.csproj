@@ -59,17 +59,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\CrystalDecisions.CrystalReports.Engine.dll</HintPath>
     </Reference>
-    <Reference Include="CrystalDecisions.ReportSource, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\CrystalDecisions.ReportSource.dll</HintPath>
-    </Reference>
     <Reference Include="CrystalDecisions.Web, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\CrystalDecisions.Web.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetOpenAuth, Version=4.0.0.11165, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\DotNetOpenAuth.dll</HintPath>
+    <Reference Include="DotNetOpenAuth">
+      <HintPath>DLL\DotNetOpenAuth.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis, Version=1.2.4640.29187, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -77,44 +72,43 @@
     </Reference>
     <Reference Include="Google.Apis.Authentication.OAuth2, Version=1.2.4640.29180, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\Google.Apis.Authentication.OAuth2.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Google.Apis.Authentication.OAuth2.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis.Calendar.v3, Version=1.2.4640.29145, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\Google.Apis.Calendar.v3.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Google.Apis.Calendar.v3.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis.Tasks.v1">
-      <HintPath>..\ViennaAdvantageWeb\Dll\Google.Apis.Tasks.v1.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Google.Apis.Tasks.v1.dll</HintPath>
     </Reference>
     <Reference Include="Google.Authenticator">
-      <HintPath>..\ViennaAdvantageWeb\Dll\Google.Authenticator.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Google.Authenticator.dll</HintPath>
     </Reference>
-    <Reference Include="Google.GData.Client, Version=2.1.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\Google.GData.Client.dll</HintPath>
+    <Reference Include="Google.GData.Client">
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Google.GData.Client.dll</HintPath>
     </Reference>
     <Reference Include="Google.GData.Contacts, Version=2.1.0.0, Culture=neutral, PublicKeyToken=7e065189dd4b982f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\Google.GData.Contacts.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Google.GData.Contacts.dll</HintPath>
     </Reference>
     <Reference Include="Google.GData.Extensions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=0b4c5df2ebf20876, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\Google.GData.Extensions.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Google.GData.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Google.GData.YouTube, Version=2.1.0.0, Culture=neutral, PublicKeyToken=af04a32718ae8833, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\Google.GData.YouTube.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Google.GData.YouTube.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip">
-      <HintPath>..\ViennaAdvantageWeb\Dll\Ionic.Zip.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\Ionic.Zip.dll</HintPath>
     </Reference>
     <Reference Include="itextsharp">
-      <HintPath>..\ViennaAdvantageWeb\Dll\itextsharp.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="ModelLibrary, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\VAStandard\Official-VAStandard-ERP-CRM\ModelLibrary\bin\Debug\ModelLibrary.dll</HintPath>
+      <HintPath>..\..\..\..\VA093_AutoDataMarking\ViennaAdvantageWeb\DLL\ModelLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -167,7 +161,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WebGrease, Version=1.5.2.14234, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+      <HintPath>..\..\..\..\Official-VABaseFiles\ViennaAdvantageWeb\bin\WebGrease.dll</HintPath>
     </Reference>
     <Reference Include="XModel">
       <HintPath>..\ViennaAdvantageWeb\Dll\XModel.dll</HintPath>
@@ -644,6 +638,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\archiveviewer.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentHistory.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\batchUpdate.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\bpartner.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\cardTemplateMaster.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\cardviewdialog.js" />
@@ -759,6 +754,7 @@
     <Compile Include="Areas\VIS\Controllers\ASearchController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentHistoryController.cs" />
+    <Compile Include="Areas\VIS\Controllers\BatchUpdateController.cs" />
     <Compile Include="Areas\VIS\Controllers\Bitmap.cs" />
     <Compile Include="Areas\VIS\Controllers\BPartnerController.cs" />
     <Compile Include="Areas\VIS\Controllers\CallOut\CalloutColumnController.cs" />
@@ -812,6 +808,7 @@
     <Compile Include="Areas\VIS\Helpers\MenuHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\ProcessHelper.cs" />
     <Compile Include="Areas\VIS\Models\AddProductModel.cs" />
+    <Compile Include="Areas\VIS\Models\BatchUpdateModel.cs" />
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />
     <Compile Include="Areas\VIS\Models\EmailModel.cs" />
     <Compile Include="Areas\VIS\Models\GmailContactsSettings.cs" />
@@ -874,6 +871,7 @@
     <Folder Include="Areas\VIS\Scripts\app\processengine\" />
     <Folder Include="Areas\VIS\Views\AmountDivision\" />
     <Folder Include="Areas\VIS\Views\ArchiveViewer\" />
+    <Folder Include="Areas\VIS\Views\BatchUpdate\" />
     <Folder Include="Areas\VIS\Views\Channel\" />
     <Folder Include="Areas\VIS\Views\GenerateXModel\" />
     <Folder Include="Areas\VIS\Views\GmailContacts\" />
