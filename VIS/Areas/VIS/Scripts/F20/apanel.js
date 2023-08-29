@@ -133,6 +133,7 @@
         var $btnClose = null;
         var $spnTitle = null;
         var $spanSetting = null;
+        this.excludeFromShare = ['ad_org', 'm_warehouse','ad_sharerecordorg'];
         /***END Tab panel**/
 
         var tabItems = [], tabLIObj = {};
@@ -694,7 +695,11 @@
                 }
                 if (this.curGC)
                     $tabPanel.append(this.curGC.getTabPanel());
-                $tabPanel.css({ "display": "grid" });                
+                $tabPanel.css({ "display": "grid" });  
+                if (this.curGC.getIsSingleRow() && clsSuffix == 'b') {
+                    this.getLayout().removeClass('vis-ad-w-p-center-view-height');
+                    this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
+                }
             }
             else {
                 $tabPanel.css({ "display": "none" });
@@ -3324,7 +3329,7 @@
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
-            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org') {
+            if (this.curTab.getValue('AD_Org_ID') > 0 && this.excludeFromShare.indexOf(this.curTab.getTableName().toLowerCase()) == -1) {
                 this.aSharedRecord.setEnabled(true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {
@@ -3655,6 +3660,13 @@
     };//Save
 
     APanel.prototype.cmd_new = function (copy) { //Create New Record
+
+        //If the record is shared, then copying the record is not allowed.
+        if (this.curTab.isCurrentRecordShare && copy) {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return;
+        }
+
         if (!this.curTab.getIsInsertRecord()) {
             //log.warning("Insert Record disabled for Tab");
             return;
@@ -4177,6 +4189,11 @@
             return;
         }
 
+        if (this.curTab.isCurrentRecordShare) {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return;
+        }
+
         if (this.curGC.getSelectedRows().length > 1) {
             VIS.ADialog.info('ShareOneRecordOnly');
             return;
@@ -4208,7 +4225,7 @@
         var parentTableID = 0;
         if (this.curTab.getParentTab()) {
             parentTableID = this.curTab.getParentTab().getAD_Table_ID();
-            if (!this.curTab.getParentTab().hasShared()) {
+            if (!this.curTab.getParentTab().hasShared() && this.curTab.getParentTab().getValue('AD_Org_ID')!=0) {
                 VIS.ADialog.info("ShareParentFirst", true, "", "");
                 this.aSharedRecord.setPressed(false);
                 return;;
@@ -4216,17 +4233,6 @@
 
         }
 
-        var self = this;
-        var parentTableID = 0;
-        if (this.curTab.getParentTab()) {
-            parentTableID = this.curTab.getParentTab().getAD_Table_ID();
-            if (!this.curTab.getParentTab().hasShared()) {
-                VIS.ADialog.info("ShareParentFirst", true, "", "");
-                this.aSharedRecord.setPressed(false);
-                return;;
-            }
-
-        }
 
         var atRecordShared = new VIS.RecordShared(this.curTab.getRecord_ID(), this.curTab.getAD_Table_ID(), this.curTab.getAD_Tab_ID(), this.curTab.getAD_Window_ID(), this.curWindowNo, this.curTab.linkValue, parentTableID, this.curTab);
         atRecordShared.onClose = function () {

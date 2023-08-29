@@ -37,17 +37,19 @@ namespace VIS.Areas.VIS.Controllers
         }
 
         /// <summary>
-        ///  Get Shared Record
+        /// Get Shared Record
         /// </summary>
         /// <param name="AD_Table_ID"></param>
         /// <param name="Record_ID"></param>
+        /// <param name="parentTableID"></param>
+        /// <param name="parentRecord_ID"></param>
+        /// <param name="parentOrg"></param>
         /// <returns></returns>
-
-        public JsonResult GetSharedRecord(int AD_Table_ID, int Record_ID)
+        public JsonResult GetSharedRecord(int AD_Table_ID, int Record_ID, int parentTableID, int parentRecord_ID, int parentOrg)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             RecordShared model = new RecordShared();
-            return Json(JsonConvert.SerializeObject(model.GetSharedRecord(ctx, AD_Table_ID, Record_ID)), JsonRequestBehavior.AllowGet); ;
+            return Json(JsonConvert.SerializeObject(model.GetSharedRecord(ctx, AD_Table_ID, Record_ID, parentTableID, parentRecord_ID, parentOrg)), JsonRequestBehavior.AllowGet); ;
         }
 
         /// <summary>

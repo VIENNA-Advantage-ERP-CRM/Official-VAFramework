@@ -21,6 +21,11 @@ namespace VAModelAD.Model
         private static List<string> _ExportCheckTableNames = new List<string>() { "AD_ChangeLog", "AD_ExportData", "AD_Session",
                                                                                   "AD_QueryLog", "AD_WindowLog","AD_PInstance_Para",
                                                                                   "AD_PInstance" };
+
+        private static bool _exportTableAccessed = false;
+        private static List<string> _alreadyExpData = new List<string>();
+        private static bool _exportDataChecked = false;
+
         private void RegisterPORecordList()
         {
             PORecord.AddParent(X_C_Order.Table_ID, X_C_Order.Table_Name);
@@ -179,33 +184,70 @@ namespace VAModelAD.Model
 
         public bool AfterSave(bool newRecord, bool success, PO po)
         {
+
+            MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
             //VIS323 Insert Record in ExportData for marking on Save records.
-            if (Env.IsModuleInstalled("VA093_") && newRecord && success)
+
+            if (Env.IsModuleInstalled("VA093_") && success && MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
+                && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
+
             {
-                _ExportCheckTableNames = GetExportTableNames();
-                string[] ModulInfo = po.GetCtx().Get("#ENABLE_DATA_MARKING_ON_SAVE").Split('@');
-                if (ModulInfo.Length == 1)
+                if (!_exportTableAccessed)
                 {
-                    ModulInfo = new string[] { ModulInfo[0], "VA093_" };
+                    _ExportCheckTableNames = GetExportTableNames();
                 }
-                if (ModulInfo[0].Equals("Y") && Env.IsModuleInstalled(ModulInfo[1])
-                                            && !_ExportCheckTableNames.Contains(po.GetTableName())
-                                            && po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
+
+                if (!_ExportCheckTableNames.Contains(po.GetTableName()))
                 {
-                    X_AD_ExportData obj = new X_AD_ExportData(po.GetCtx(), 0, null);
-                    if (po.GetKeyLength() > 1)
-                        obj.SetRecord_ID(DB.GetNextID(po.GetAD_Client_ID(), po.GetTableName(), po.Get_Trx()));
-                    else
-                        obj.SetRecord_ID(po.Get_ID());
-                    obj.SetAD_Table_ID(po.Get_Table_ID());
-                    obj.SetAD_ModuleInfo_ID(MModuleInfo.Get(ModulInfo[1]));
-                    if (!obj.Save())
+                    if (!_exportDataChecked)
                     {
-                        return false;
+                        GetExportedData();
                     }
+                    #region Commented Code
+
+                    //string[] ModulInfo = po.GetCtx().Get("#ENABLE_DATA_MARKING_ON_SAVE").Split('@');
+
+                    //if (ModulInfo.Length == 1)
+
+                    //{
+
+                    //    ModulInfo = new string[] { ModulInfo[0], "VA093_" };
+
+                    //}
+
+                    //if (MRole.GetDefault(po.GetCtx()).IsAutoDataMarking() && Env.IsModuleInstalled(ModulInfo[1])
+
+                    #endregion Commented Code
+                    if (po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
+                    {
+                        int expRecord_ID = 0;
+                        if (po.GetKeyLength() > 1)
+                        {
+                            if (po.Get_ColumnIndex(po.Get_TableName() + "_ID") >= 0)
+                                expRecord_ID = Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID"));
+                        }
+                        else
+
+                            expRecord_ID = po.Get_ID();
+
+
+
+                        if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
+
+                        {
+
+                            if (!SaveExportData(po))
+
+                                return false;
+
+                        }
+
+                    }
+
                 }
 
             }
+
             if (success && newRecord)
                 InsertTreeNode(po);
 
@@ -291,7 +333,7 @@ namespace VAModelAD.Model
             // MRole.GetDefault(p_ctx).IsShowSharedRecords()
             if (!_ExportCheckTableNames.Contains(po.GetTableName()))
             {
-                //ShareRecordManager.Get(p_ctx).ShareChild(p_ctx, po);
+                ShareRecordManager.Get(p_ctx).ShareChild(p_ctx, po);
             }
             return success;
         }
@@ -317,15 +359,7 @@ namespace VAModelAD.Model
                 int recordID = po.Get_ID();
                 if (recordID == 0)
                     recordID = po.Get_IDOld();
-                //System.Threading.Tasks.Task.Run(() =>
-                //{
-                //    string query = "SELECT AD_ShareRecordOrg_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID=" + po.Get_Table_ID() + " AND Record_ID=" + recordID;
-                //    DataSet ds = DB.ExecuteDataset(query);
-                //    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                //    {
-                //        VAdvantage.Common.ShareRecordManager.DeleteSharedChild(Util.GetValueOfInt(ds.Tables[0].Rows[i][0]), null, null);
-                //    }
-                //});
+                VAdvantage.Common.ShareRecordManager.DeleteRecordFromWindow(po, recordID);
             }
             return success;
         }
@@ -508,6 +542,7 @@ namespace VAModelAD.Model
         /// <returns>list of Tables</returns>
         private static List<string> GetExportTableNames()
         {
+            _exportTableAccessed = true;
             string sql = @"SELECT Name FROM AD_Ref_List WHERE AD_Reference_ID=(SELECT AD_Reference_ID FROM AD_Reference
                              WHERE Name='VA093_MarkingExcTables') AND IsActive='Y'";
             DataSet ds = DB.ExecuteDataset(sql);
@@ -520,6 +555,52 @@ namespace VAModelAD.Model
                 }
             }
             return _ExportCheckTableNames;
+        }
+
+        /// <summary>
+        /// Get Exported Data
+        /// </summary>
+        private void GetExportedData()
+        {
+            DataSet dsExpData = DB.ExecuteDataset(@"SELECT AD_ModuleInfo_ID || '_' || AD_Table_ID || '_' || Record_ID FROM AD_ExportData WHERE AD_ModuleInfo_ID =" + MModuleInfo.Get("VA093_"));
+            if (dsExpData != null && dsExpData.Tables != null && dsExpData.Tables[0].Rows.Count > 0)
+            {
+                _alreadyExpData = dsExpData.Tables[0].AsEnumerable()
+                            .Select(r => r.Field<string>(0))
+                            .ToList();
+            }
+            _exportDataChecked = true;
+        }
+
+        /// <summary>
+        /// Save Export Data
+        /// </summary>
+        /// <param name="po"></param>
+        /// <returns></returns>
+        public bool SaveExportData(PO po)
+        {
+            bool saveMarkData = true;
+            X_AD_ExportData obj = new X_AD_ExportData(po.GetCtx(), 0, null);
+            if (po.GetKeyLength() > 1)
+            {
+                if (po.Get_ColumnIndex(po.Get_TableName() + "_ID") >= 0)
+                    obj.SetRecord_ID(Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID")));
+                else
+                    saveMarkData = false;
+            }
+            else
+                obj.SetRecord_ID(po.Get_ID());
+            if (saveMarkData)
+            {
+                obj.SetAD_Table_ID(po.Get_Table_ID());
+                obj.SetAD_ModuleInfo_ID(MModuleInfo.Get("VA093_"));
+                if (!obj.Save())
+                {
+                    return false;
+                }
+            }
+            _alreadyExpData.Add(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
+            return true;
         }
     }
 }

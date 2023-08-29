@@ -107,7 +107,7 @@
             + '<th>' + VIS.Msg.getMsg('Org') + '</th>'
             + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('LegalEntities') + '</th>'
             + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('ReadOnly') + '</th>'
-            + '<th width="120px" class="text-center">' + VIS.Msg.getMsg('ChildShare') + '</th>'
+            + '<th width="120px" class="text-center" style="display:none">' + VIS.Msg.getMsg('ChildShare') + '</th>'
             + '</tr>'
             + '</thead>'
             + '<tbody class="vis-gridTableBody tbList">'
@@ -119,7 +119,7 @@
             + '</div>'
             + '<div>'
             + '<button class="vis-actionBtn mr-1" id="btnCancel_' + windowNo + '">' + VIS.Msg.getMsg('Cancel') + '</button>'
-            + '<button class="vis-actionBtn mr-2" disabled="" style="cursor:default;opacity:.5" id="btnOk_' + windowNo + '">' + VIS.Msg.getMsg('OK') + '</button>'
+            + '<button class="vis-actionBtn mr-2"  style="cursor:default;" id="btnOk_' + windowNo + '">' + VIS.Msg.getMsg('OK') + '</button>'
             + '</div>'
             + '</div>'
             + '</div>'
@@ -153,9 +153,21 @@
         /**Get All organization */
         function getOrganization() {
             IsBusy(true);
+            parentTableID = 0;
+            parentRecord_ID = 0;
+            parentOrg = 0;
+            if (curTab && curTab.getTabLevel() > 0) {
+                parentTableID = curTab.getParentTab().getAD_Table_ID();
+                parentRecord_ID = curTab.getParentTab().getRecord_ID();
+                parentOrg = curTab.getParentTab().getValue('AD_Org_ID');
+            }
+
             var obj = {
                 AD_Table_ID: table_id,
-                Record_ID: record_id
+                Record_ID: record_id,
+                parentTableID: parentTableID,
+                parentRecord_ID: parentRecord_ID,
+                parentOrg: parentOrg
             }
 
             var arr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "RecordShared/GetSharedRecord", obj, null);
@@ -166,38 +178,39 @@
 
         /**Filter Data */
         function filterData() {
+            chkAll.removeAttr("checked");
             if (txtSummaryOrg.val() == '') {
                 var fData = $.grep(orginalArr, function (element, index) {
-                   if (ddlLegalEntities.find('option:selected').val() == 'A') {
+                    if (ddlLegalEntities.find('option:selected').val() == 'A') {
                         return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 || element.name.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
                     } else if (ddlLegalEntities.find('option:selected').val() != 'A' && txtSearchKey.val() != '') {
-                        return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
+                        return (element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 || element.name.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1) && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
                     } else {
                         return element.isLegalEntity == ddlLegalEntities.find('option:selected').val();
                     }
                 });
 
                 root.find('.tbList tr').hide();
-                for (var e = 0; e < fData.length; e++) {                   
+                for (var e = 0; e < fData.length; e++) {
                     root.find('.tbList .chkOrgID[value="' + fData[e].ID + '"]').closest('tr').show();
                 };
-                
-            } else {               
+
+            } else {
                 var fData = [];
                 for (var i = 0; i < orginalArr.length; i++) {
                     for (var j = 0; j < res.length; j++) {
-                        if (orginalArr[i].ID === res[j].ID && (res[j].ParentID == txtSummaryOrg.attr('data-id') || res[j].ParentName.toLowerCase().indexOf(txtSummaryOrg.val().toLowerCase())!=-1)) {
+                        if (orginalArr[i].ID === res[j].ID && (res[j].ParentID == txtSummaryOrg.attr('data-id') || res[j].ParentName.toLowerCase().indexOf(txtSummaryOrg.val().toLowerCase()) != -1)) {
                             fData.push(orginalArr[i]);
-                        } 
-                    }                   
+                        }
+                    }
                 }
 
 
                 var filterData = $.grep(fData, function (element, index) {
                     if (ddlLegalEntities.find('option:selected').val() == 'A') {
-                        return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
+                        return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 || element.name.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1;
                     } else if (ddlLegalEntities.find('option:selected').val() != 'A' && txtSearchKey.val() != '') {
-                        return element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
+                        return (element.value.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1 || element.name.toLowerCase().indexOf(txtSearchKey.val().toLowerCase()) != -1) && element.isLegalEntity == ddlLegalEntities.find('option:selected').val()
                     } else {
                         return element.isLegalEntity == ddlLegalEntities.find('option:selected').val();
                     }
@@ -208,6 +221,26 @@
                     root.find('.tbList .chkOrgID[value="' + filterData[e].ID + '"]').closest('tr').show();
                 };
             };
+
+            if (txtSearchKey.val() != '' || txtSummaryOrg.val() != '' || ddlLegalEntities.find('option:selected').val() != 'A') {
+                //chkAll.attr("disabled", "disabled");
+                var l = root.find('.tbList tr:visible .chkOrgID').length;
+                var chkln = root.find('.tbList tr:visible .chkOrgID:checked').length;
+                if (l > 0 && l == chkln) {
+                    chkAll.attr("checked", "checked").prop("checked", "checked");
+                } else {
+                    chkAll.removeAttr("checked");
+                }
+            } else {
+                // chkAll.removeAttr("disabled");
+                var l = root.find('.tbList tr:visible .chkOrgID').length;
+                var chkln = root.find('.tbList tr .chkOrgID:checked').length;
+                if (l > 0 && l == chkln) {
+                    chkAll.attr("checked", "checked").prop("checked", "checked");;
+                } else {
+                    chkAll.removeAttr("checked");
+                }
+            }
         }
 
         /**
@@ -225,7 +258,7 @@
                 if (list[i].isSummary == true) {
                     continue;
                 }
-                   
+
                 if (list[i].AD_OrgShared_ID) {
                     row += '<tr class="vis-rowSuccess">';
                 } else {
@@ -235,14 +268,14 @@
                 row += '</td>'
                     + '<td width="40px">';
                 if (list[i].AD_OrgShared_ID) {
-                    row += '<input type="checkbox" checked class="chkOrgID" data-shareid="' + list[i].AD_OrgShared_ID + '" value="' + list[i].ID + '">';
+                    row += '<input type="checkbox" checked class="chkOrgID" parentid="' + list[i].parentID + '" data-shareid="' + list[i].AD_OrgShared_ID + '" value="' + list[i].ID + '">';
                     sharedIDs.push(list[i].AD_OrgShared_ID);
                     if (list[i].CanEdit) {
                         toogleOkBtn(true);
                     }
                     canEdit = list[i].CanEdit;
                 } else {
-                    row += '<input type="checkbox" class="chkOrgID" value="' + list[i].ID + '">';
+                    row += '<input type="checkbox" class="chkOrgID" parentid="' + list[i].parentID + '" value="' + list[i].ID + '">';
                 }
                 row += '</td>'
                     + '<td title="' + list[i].value + '">' + list[i].value + '</td>'
@@ -250,32 +283,41 @@
                     + '<td width="120px" class="text-center">' + list[i].isLegalEntity + '</td>'
                     + '<td width="120px" class="text-center">';
                 if (list[i].isReadonly) {
-                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked/>';                   
+                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" checked/>';
                 } else {
-                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';                   
+                    row += '<input type="checkbox" name="" id="" class="chkIsReadOnly" />';
                 }
                 row += '</td>'
                 if (list[i].ChildShare) {
-                    row += '<td width="120px" class="text-center"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
+                    row += '<td width="120px" class="text-center" style="display:none"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
                 } else {
-                    row += '<td width="120px" class="text-center"><input type="checkbox" name="" id="" class="chkIsChildShare" /> </td>'
+                    row += '<td width="120px" class="text-center" style="display:none"><input type="checkbox" name="" id="" checked class="chkIsChildShare" /> </td>'
                 }
-               
-                    + '</tr>';
+
+                + '</tr>';
             }
             root.find('.tbList').append(row);
             root.find('.tbList .chkOrgID').on("click", function (e) {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
+                //if (!canEdit) {
+                //    e.preventDefault();
+                //    return;
+                //}
+
                 var checkedOrgs = root.find('.tbList .chkOrgID:checked');
                 if (checkedOrgs && checkedOrgs.length > 0) {
                     toogleOkBtn(true);
                 }
                 else {
                     if (sharedIDs && sharedIDs.length == 0)
-                        toogleOkBtn(false);
+                        toogleOkBtn(true);
+                }
+
+                var l = root.find('.tbList tr .chkOrgID').length;
+                var chkln = root.find('.tbList tr .chkOrgID:checked').length;
+                if (l == chkln) {
+                    chkAll.attr("checked", "checked").prop("checked", "checked");
+                } else {
+                    chkAll.removeAttr("checked");
                 }
             });
 
@@ -323,10 +365,10 @@
             });
 
             chkAll.change(function (e) {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
+                //if (!canEdit) {
+                //    e.preventDefault();
+                //    return;
+                //}
                 var isFalse = false;
                 if (this.checked) {
                     isFalse = true;
@@ -335,17 +377,19 @@
                 else {
                     toogleOkBtn(true);
                 }
-                root.find('.tbList .chkOrgID').each(function () {
 
-                    this.checked = isFalse;
+                root.find('.tbList .chkOrgID').each(function () {
+                    if ($(this).is(':visible')) {
+                        this.checked = isFalse;
+                    }
                 });
             });
 
             btnOk.click(function () {
-                if (!canEdit) {
-                    e.preventDefault();
-                    return;
-                }
+                //if (!canEdit) {
+                //    e.preventDefault();
+                //    return;
+                //}
                 msg.text("");
                 IsBusy(true);
                 var saveObj = {
@@ -364,8 +408,8 @@
                         AD_OrgShared_ID: Number(this.value),
                         isReadonly: $(this).closest('tr').find('.chkIsReadOnly').is(':checked'),
                         shareID: $(this).data('shareid'),
-                        ChildShare: $(this).closest('tr').find('.chkIsChildShare').is(':checked')   
-
+                        ChildShare: $(this).closest('tr').find('.chkIsChildShare').is(':checked'),
+                        parentID: $(this).attr('parentid')
                     });
 
                 });
@@ -434,20 +478,20 @@
             };
             ch.show();
             ch.hidebuttons();
-            
+
         };
 
         this.showOrgStructure = function () {
             txtSummaryOrg.val('');
             txtSummaryOrg.removeAttr('data-id');
-            var cdos = new VIS.ChildDialog();            
-            var html =$('<div id="left" >'
+            var cdos = new VIS.ChildDialog();
+            var html = $('<div id="left" >'
                 + '    <ul id="menu-group-1" class="nav menu">'
                 + '        <li class="item-1 deeper parent">'
                 + '            <a class="" href="#">'
                 + '                <span data-toggle="collapse" data-parent="#menu-group-1" href="#sub-item-1" class="sign"><i class="fa fa-folder-o" onclick="$(this).toggleClass(\'fa-folder-o fa-folder-open-o\')"></i></span>'
-                + '                <span class="vis-orglbl">' + VIS.Msg.getMsg("SummaryOrg")+'</span>'
-                + '            </a>'              
+                + '                <span class="vis-orglbl">' + VIS.Msg.getMsg("SummaryOrg") + '</span>'
+                + '            </a>'
                 + '        </li>'
                 + '    </ul>'
                 + '</div>');
@@ -455,7 +499,7 @@
             function buildHierarchy(data, parentID) {
                 var tree = [];
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].ParentID === parentID && data[i].Issummary=='Y') {
+                    if (data[i].ParentID === parentID && data[i].Issummary == 'Y') {
                         var node = {
                             "ID": data[i].ID,
                             "Name": data[i].Name,
@@ -470,18 +514,18 @@
             var countr = 1;
 
             function generateNestedList(data, parentElement) {
-                var ul = $("<ul class='small collapse' style='list-style-type: none;' id='sub-item-" + countr+"'></ul>");
+                var ul = $("<ul class='small collapse' style='list-style-type: none;' id='sub-item-" + countr + "'></ul>");
                 countr++;
                 for (var i = 0; i < data.length; i++) {
                     var item = data[i];
                     var li = $("<li class='deeper parent'></li>");
 
-                    var plus = '<span data-toggle="collapse" data-parent="#menu-group-1" style="margin-left:-14px" href="#sub-item-' + countr +'" class="mr-1 sign"><i class="fa fa-plus" onclick="$(this).toggleClass(\'fa-plus fa-minus\')"></i></span>'
-                    var spanName = $("<span  class='vis-orglbl' data-id="+item.ID+"></span>").text(item.Name);
+                    var plus = '<span data-toggle="collapse" data-parent="#menu-group-1" style="margin-left:-14px" href="#sub-item-' + countr + '" class="mr-1 sign"><i class="fa fa-plus" onclick="$(this).toggleClass(\'fa-plus fa-minus\')"></i></span>'
+                    var spanName = $("<span  class='vis-orglbl' data-id=" + item.ID + "></span>").text(item.Name);
                     var anchr = $('<a class="" href="#"></a>');
                     if (item.Children.length > 0) {
                         anchr.append(plus);
-                    }                 
+                    }
                     anchr.append(spanName);
                     li.append(anchr);
 
@@ -495,7 +539,7 @@
                 parentElement.append(ul);
             };
 
-           
+
 
             var result = buildHierarchy(res, 0);
             generateNestedList(result, html.find('.item-1'));
@@ -511,7 +555,7 @@
             });
 
             cdos.setHeight(500);
-            cdos.setWidth(450);            
+            cdos.setWidth(450);
 
             cdos.setTitle(VIS.Msg.getMsg("SummaryOrg"));
             cdos.setModal(true);
@@ -519,13 +563,13 @@
             cdos.hidebuttons();
         }
 
-        if (curTab && curTab.getTabLevel() > 0) {
-            root.find('.vis-tableSection input').prop("disabled", "true");
-            btnOk.prop("disabled", "true");
-        } else {
-            root.find('.vis-tableSection input').prop("disabled", "");
-            btnOk.prop("disabled", "");
-        }
+        //if (curTab && curTab.getTabLevel() > 0) {
+        //    root.find('.vis-tableSection input').prop("disabled", "true");
+        //    btnOk.prop("disabled", "true");
+        //} else {
+        //    root.find('.vis-tableSection input').prop("disabled", "");
+        //    btnOk.prop("disabled", "");
+        //}
     }
 
     VIS.RecordShared = RecordShared;

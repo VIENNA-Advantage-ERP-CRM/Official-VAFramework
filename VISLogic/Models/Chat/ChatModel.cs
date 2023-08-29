@@ -80,13 +80,21 @@ namespace VIS.Models
         {
             //set current window
             _windowNo = windowNo;
-            //set current window
-            //from design
-            //  SetBusy(true);
-            // double width = this.Width;
-            // LayoutRootChat.Background = new SolidColorBrush(DataBase.GlobalVariable.WINDOW_BACK_COLOR);
-            // EventHander();
+           
             //	when chatId is zero
+
+
+            #region check chat exist
+            //Date : 18 Jul 2023
+            //Developer :Lakhwinder 
+            //There is a preventive check to improve performance to load only 10000 chats while loading window
+            //Sometime Chat exists but ID comes 0 , so here check once again that chat exist for this record
+            if (CM_Chat_ID == 0)
+            {
+                CM_Chat_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT CM_Chat_ID FROM CM_Chat WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID, null, trxName));
+            }
+            #endregion
+
             if (CM_Chat_ID == 0)
             {
                 //set chat from MChat class first time
@@ -98,9 +106,8 @@ namespace VIS.Models
             }
             subsribedChat = new ChatInfo();
             subsribedChat = GetHistory(MChat.CONFIDENTIALTYPE_Internal, _chat, page, pageSize,ct);
-            //ctx = ct;
-            //Call Load Chat function 
-            // Deployment.Current.Dispatcher.BeginInvoke(() => ShowText(subsribedChat));
+            
+            
         }
         #endregion
 
@@ -219,6 +226,7 @@ namespace VIS.Models
                 }
                 subscribedChat.Add(new LatestSubscribedRecordChat()
                 {
+
                     //UserImg = img,
                     UserName = strName.ToString(),
                     ChatData = entry.GetCharacterData(),
@@ -230,8 +238,8 @@ namespace VIS.Models
             }
 
 
-
-
+            //retrive chatid 
+            cinfo.chatId = _chat.GetCM_Chat_ID();
             cinfo.subChat = subscribedChat;
             cinfo.userimages = imgIds;
             return cinfo;
@@ -345,6 +353,7 @@ namespace VIS.Models
 
     public class ChatInfo
     {
+        public int chatId { get; set; }
         public List<UserImages> userimages { get; set; }
         public List<LatestSubscribedRecordChat> subChat { get; set; }
     }

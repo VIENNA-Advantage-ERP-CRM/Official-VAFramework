@@ -180,6 +180,12 @@ select.vis-ev-col-mandatory {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
+.vis-ev-col .vis-input-wrap .vis-control-wrap input:focus, 
+.vis-ev-col .vis-input-wrap .vis-control-wrap select:focus, 
+.vis-ev-col .vis-input-wrap .vis-control-wrap textarea:focus {
+    border: 1px solid rgba(var(--v-c-primary), 1);
+}
+
 .vis-input-wrap *[data-hasBtn] {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
@@ -256,13 +262,16 @@ select.vis-ev-col-mandatory {
     height: 35px;
 }
 
-
+.input-group-prepend .input-group-text {
+    cursor: default;
+}
 .input-group-text i {
     color: rgba(var(--v-c-on-secondary), 1);
 }
 
 .input-group-prepend .input-group-text i {
-    color: rgba(var(--v-c-primary), 1);
+    color: rgba(var(--v-c-primary), 1);    
+    cursor: default;
 }
 
 .input-group-text img {

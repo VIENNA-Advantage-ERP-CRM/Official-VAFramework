@@ -101,6 +101,8 @@
             VIS.dataContext.getChatRecords(prop, function (result) {
 
                 var data = JSON.parse(result);
+                //set retrieved chatid in local var
+                self.prop.ChatID = data.chatId;
                 var htmll = "";
                 for (var chat in data.subChat) {
 
