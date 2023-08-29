@@ -778,6 +778,8 @@ namespace VAdvantage.Controller
                 Callout = "";
             if (ReadOnlyLogic == null)
                 ReadOnlyLogic = "";
+            if (mandatoryLogic == null)
+                mandatoryLogic = "";
             if (StyleLogic == null)
                 StyleLogic = "";
 

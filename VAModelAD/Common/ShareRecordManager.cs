@@ -281,12 +281,21 @@ namespace VAdvantage.Common
                                             continue;
                                         }
                                     }
+
+                                    int rid = Util.GetValueOfInt(po.Get_Value(po.GetTableName() + "_ID"));
+                                    int isExist = Util.GetValueOfInt(DB.ExecuteScalar("SELECT ad_sharerecordorg_id FROM ad_sharerecordorg WHERE record_id=" + rid + " AND ad_table_id=" + po.Get_Table_ID() + " AND AD_ORGSHARED_ID=" + sharedRec[k].OrgID));
+
+                                    if (isExist > 0)
+                                    {
+                                        continue;
+                                    }
+
                                     VAdvantage.ModelAD.MShareRecordOrg SRO = new VAdvantage.ModelAD.MShareRecordOrg(p_ctx, 0, po.Get_Trx());
                                     SRO.SetAD_Table_ID(po.Get_Table_ID());
                                     SRO.Set_ValueNoCheck("AD_OrgShared_ID", sharedRec[k].OrgID);
                                     SRO.Set_ValueNoCheck("IsChildShare", sharedRec[k].ChildShare);
                                     SRO.SetIsReadOnly(sharedRec[k].Readonly);
-                                    SRO.SetRecord_ID(Util.GetValueOfInt(po.Get_Value(po.GetTableName() + "_ID")));
+                                    SRO.SetRecord_ID(rid);
                                     SRO.Set_ValueNoCheck("Parent_ID", parentOrg_ID);
                                     if (SRO.Save())
                                     {
