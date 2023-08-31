@@ -1456,6 +1456,35 @@
             this.actionPerformed(this.aHelp.getAction());
             evt.preventDefault();
             evt.stopPropagation();
+        } else if (evt.altKey && evt.keyCode == 33) {
+            if (evt.ctrlKey) {
+                if (this.aPageFirst.isEnabled) {
+                    //this.actionPerformed(this.aPageFirst.getAction());
+                    this.ShortcutNavigation(this.aPageFirst.getAction());
+                }
+
+            }
+            else {
+                if (this.aPageUp.isEnabled) // move to previous Page
+                    //this.actionPerformed(this.aPageUp.getAction());
+                    this.ShortcutNavigation(this.aPageUp.getAction());
+
+            }
+
+        } else if (evt.altKey && evt.keyCode == 34) {
+
+            if (evt.ctrlKey) {
+                if (this.aPageLast.isEnabled) { // move to Last Page
+                    //this.actionPerformed(this.aPageLast.getAction());
+                    this.ShortcutNavigation(this.aPageLast.getAction());
+                }
+            }
+            else {
+                if (this.aPageDown.isEnabled) { // move to Next Page
+                    //this.actionPerformed(this.aPageDown.getAction());
+                    this.ShortcutNavigation(this.aPageDown.getAction());
+                }
+            }
         } else {
             if (this.vTabbedPane && this.vTabbedPane.keyDown)
                 this.vTabbedPane.keyDown(evt);
@@ -3567,7 +3596,7 @@
     //Cmd_Actions
 
     APanel.prototype.cmd_refresh = function () {
-        this.cmd_save(false);
+        //this.cmd_save(false); // Comment As discused with Harwinder Sir
         this.curGC.dataRefreshAll();
     };//Refresh
 
@@ -3602,7 +3631,34 @@
             return;
         }
 
-        return this.cmd_save2(manual, this.curTab, this.curGC, this, callback);
+        // Check survey panel Exist
+        var isSurveyPanel = false;
+        if (this.curTab.getHasPanel()) {
+            var panels = this.curTab.getTabPanels();
+            for (var i = 0; i < panels.length; i++) {
+                if (panels[i].getClassName() == 'VIS.SurveyPanel') {
+                    isSurveyPanel = true;
+                    i = panels.length;
+                }
+            }
+
+        }
+        var $this = this;
+
+        // Check valid condition for checklist
+        if (isSurveyPanel) {
+            this.curGC.IsCheckListRequire(function (isCheckListRequire) {
+                if (!isCheckListRequire) {
+                    VIS.ADialog.error("CheckListRequired");
+                    return false;
+                }
+                return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
+            });
+        } else {
+            return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
+        }
+
+        
 
     };
 
@@ -3649,7 +3705,9 @@
             if (callback) {
                 callback(retValue);
             }
-            curGC.refreshTabPanelData(curTab.getRecord_ID());
+            if (curTab.getRecord_ID() > 0) {
+                curGC.refreshTabPanelData(curTab.getRecord_ID());
+            }
             this.curTab.loadShared();
             if (this.aSharedRecord) {
                 this.aSharedRecord.setPressed(this.curTab.hasShared());

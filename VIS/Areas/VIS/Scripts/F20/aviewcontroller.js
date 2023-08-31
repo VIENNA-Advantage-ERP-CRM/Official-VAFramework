@@ -506,6 +506,66 @@
         }
     };
 
+    VIS.GridController.prototype.getSurveyCondition = function (record_ID) {
+        if (this.vTabPanel && this.vTabPanel.curTabPanel.getSurveyCondition) {//&& $(this.vTabPanel.getRoot()).is(':visible'))
+            return this.vTabPanel.curTabPanel.getSurveyCondition();
+        }
+    };
+
+    /// Check Checklist required
+    VIS.GridController.prototype.IsCheckListRequire = function (callback) {
+        var tableID = this.gTab.getAD_Table_ID();
+        var recordID = this.gTab.getRecord_ID();
+        var windowID = this.gTab.getAD_Window_ID();
+        var cIdx = this.gTab.currentRow;
+        var rowData = this.gTab;//.gridTable.getRow(cIdx);
+        var isCheckListFill = false;
+        if (this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
+            isCheckListFill = this.vTabPanel.curTabPanel.isCheckListFill;
+        }
+           
+        $.ajax({
+            async: false,
+            url: VIS.Application.contextUrl + "SurveyPanel/IsCheckListRequire",
+            data: {
+                AD_Window_ID: windowID,
+                AD_Table_ID: tableID,
+                Record_ID: recordID
+            },
+            success: function (data) {
+                data = JSON.parse(data);
+                data = data[0];
+
+                if (data.ResponseCount > 0) {
+                    callback(true);
+                }
+                else if (data.Condition != "") {
+                    var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
+                    if (isValidate && isCheckListFill) {
+                        callback(true);
+                    } else if (!isValidate) {
+                        callback(true);
+                    } else {
+                        callback(false);
+                    }
+
+                    
+                } else {
+                    callback(true);
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+
+    }
+
+    VIS.GridController.prototype.SaveSurvey = function (recordID) {
+        return this.vTabPanel.curTabPanel.SaveData(recordID);
+    }
+
+
     VIS.GridController.prototype.refreshFilterPanelData = function () {
         if (this.aFilterPanel) {//&& $(this.vTabPanel.getRoot()).is(':visible')) 
             this.aFilterPanel.refreshFilterOptions("", true);

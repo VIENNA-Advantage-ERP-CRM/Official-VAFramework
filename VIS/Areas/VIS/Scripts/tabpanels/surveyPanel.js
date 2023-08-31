@@ -8,6 +8,7 @@ VIS = window.VIS || {};
         this.selectedRow = null;
         this.panelWidth;
         this.extraInfo = null;
+        this.isCheckListFill = false;
         var self = this;
         var $root;
         var questionSection = null;
@@ -111,11 +112,14 @@ VIS = window.VIS || {};
         };
 
         this.update = function (Record_ID) {
-           
+            if (self.isCheckListFill) {
+                self.SaveData(Record_ID);
+            }
             self.panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, this.curTab.getAD_Table_ID(), Record_ID, $root,0);
         }
             
         this.panelDetails = function (AD_window_ID, AD_Tab_ID, AD_Table_ID, Record_ID, $root, AD_WF_Activity_ID) {
+            self.isCheckListFill = false;
             self.record_ID = Record_ID;
             _AD_Window_ID = AD_window_ID;
             _AD_Tab_ID = AD_Tab_ID;
@@ -166,6 +170,101 @@ VIS = window.VIS || {};
         this.getRoot = function () {
             return $root;
         };
+
+        this.SaveData = function (recordID) {
+            setBusy(true);
+            var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
+            var asnwers = main.find('[class^=VIS_Answ_]'); //get all answer start VIS_Quest_
+            var questions = main.find('[class^=VIS_Quest_]'); // get all question start VIS_Quest_
+            var Final_Data = {};
+            Final_Data.Questions = [];
+            var AD_Survey_ID = 0;
+            for (var i = 0; i < questions.length; i++) {
+                var required = true;
+                var lisItem = questionSection.find('[data-id="' + questions[i].classList[0] + '"]');
+                AD_Survey_ID = lisItem[0].dataset.survey;
+                if (questions[i].dataset.qtype == 'CB' || questions[i].dataset.qtype == 'OP' || questions[i].dataset.qtype == 'CL') {
+                    if (lisItem.length > 0) {
+                        for (var j = 0; j < lisItem.length; j++) {
+                            if ($(lisItem[j]).is(":checked")) {
+                                required = false;
+                                Final_Data.Questions.push({
+                                    "Question": questions[i].textContent,
+                                    "Answer": $(lisItem[j]).val(),
+                                    "AD_SurveyItem_ID": lisItem[j].dataset.surveyitem,
+                                    "AD_SurveyValue_ID": lisItem[j].dataset.surveyvalue
+                                });
+                            }
+                        }
+                        if ((IsMandatoryAll || questions[i].dataset.mandatory == 'Y') && required) {
+                            VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
+                            setBusy(false);
+                            return;
+                        }
+                    }
+                }
+                else if (questions[i].dataset.qtype == 'TX') {
+                    if ($(lisItem[0]).val().length > 0) {
+                        required = false;
+                    };
+                    Final_Data.Questions.push({
+                        "Question": questions[i].textContent,
+                        "Answer": $(lisItem[0]).val(),
+                        "AD_SurveyItem_ID": lisItem[0].dataset.surveyitem,
+                        "AD_SurveyValue_ID": lisItem[0].dataset.surveyvalue
+                    });
+
+                    if ((IsMandatoryAll || questions[i].dataset.mandatory == 'Y') && required) {
+                        VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
+                        setBusy(false);
+                        return;
+                    }
+                }
+            }
+
+            if (_AD_WF_Activity_ID == 0 && recordID <= 0 && Final_Data.Questions.length > 0) {
+                self.isCheckListFill = true;
+                toastr.success(VIS.Msg.getMsg("CheckWillAutoSaveAfterNewRecordSave"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
+                setBusy(false);
+                return;
+            } else {
+                self.isCheckListFill = false;
+            }
+
+
+            $.ajax({
+                type: "POST",
+                url: VIS.Application.contextUrl + "VIS/SurveyPanel/SaveSurveyResponse",
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    "surveyResponseValue": Final_Data.Questions,
+                    "AD_Window_ID": _AD_Window_ID,
+                    "AD_Survey_ID": AD_Survey_ID,
+                    "AD_Tab_ID": _AD_Tab_ID,
+                    "Record_ID": recordID,
+                    "AD_Table_ID": _AD_Table_ID,
+                    "AD_WF_Activity_ID": _AD_WF_Activity_ID
+                }),
+                success: function (data) {
+                    questionSection.find('input').prop('checked', false);
+                    questionSection.find('textarea').val('');
+                    toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
+                    self.isCheckListFill = false;
+                    //loadAccessData(AD_Survey_ID);                        
+                    if (_AD_WF_Activity_ID == 0) {
+                        self.update(self.record_ID);
+                    } else {
+                        self.panelDetails(_AD_Window_ID, _AD_Tab_ID, _AD_Table_ID, self.record_ID, $root, _AD_WF_Activity_ID);
+                    }
+                    setBusy(false);
+
+                },
+                error: function (e) {
+                    setBusy(false);
+                }
+            });
+        }       
 
         this.disposeComponent = function () {
             if (iFrame)
@@ -549,87 +648,7 @@ VIS = window.VIS || {};
             
 
             $btnSubmit.off().on("click", function (e) {
-                setBusy(true);
-                var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
-                var asnwers = main.find('[class^=VIS_Answ_]'); //get all answer start VIS_Quest_
-                var questions = main.find('[class^=VIS_Quest_]'); // get all question start VIS_Quest_
-                var Final_Data = {};
-                Final_Data.Questions = [];
-                var AD_Survey_ID = 0;
-                for (var i = 0; i < questions.length; i++) {
-                    var required = true;
-                    var lisItem = questionSection.find('[data-id="' + questions[i].classList[0] + '"]');
-                    AD_Survey_ID= lisItem[0].dataset.survey;
-                    if (questions[i].dataset.qtype == 'CB' || questions[i].dataset.qtype == 'OP' || questions[i].dataset.qtype == 'CL') {
-                        if (lisItem.length > 0) {
-                            for (var j = 0; j < lisItem.length; j++) {
-                                if ($(lisItem[j]).is(":checked")) {
-                                    required = false;
-                                    Final_Data.Questions.push({
-                                        "Question": questions[i].textContent,
-                                        "Answer": $(lisItem[j]).val(),
-                                        "AD_SurveyItem_ID": lisItem[j].dataset.surveyitem,
-                                        "AD_SurveyValue_ID": lisItem[j].dataset.surveyvalue
-                                    });
-                                }
-                            }
-                            if ((IsMandatoryAll || questions[i].dataset.mandatory=='Y') && required) {                                
-                                VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
-                                setBusy(false);
-                                return;
-                            }
-                        }
-                    }
-                    else if (questions[i].dataset.qtype == 'TX') {
-                        if ($(lisItem[0]).val().length > 0) {
-                            required = false;
-                        };
-                        Final_Data.Questions.push({
-                            "Question": questions[i].textContent,
-                            "Answer": $(lisItem[0]).val(),                           
-                            "AD_SurveyItem_ID": lisItem[0].dataset.surveyitem,
-                            "AD_SurveyValue_ID": lisItem[0].dataset.surveyvalue                           
-                        });
-
-                        if ((IsMandatoryAll || questions[i].dataset.mandatory == 'Y') && required) {
-                            VIS.ADialog.error("FillMandatory", true, "Ques-" + (i + 1));
-                            setBusy(false);
-                            return;
-                        }
-                    }
-                }
-                
-                $.ajax({
-                    type: "POST",
-                    url: VIS.Application.contextUrl + "VIS/SurveyPanel/SaveSurveyResponse",
-                    dataType: "json",
-                    contentType: 'application/json; charset=utf-8',
-                    data: JSON.stringify({
-                        "surveyResponseValue": Final_Data.Questions,
-                        "AD_Window_ID": _AD_Window_ID,
-                        "AD_Survey_ID": AD_Survey_ID,
-                        "AD_Tab_ID": _AD_Tab_ID,
-                        "Record_ID": self.record_ID,
-                        "AD_Table_ID": _AD_Table_ID,
-                        "AD_WF_Activity_ID": _AD_WF_Activity_ID
-                    }),
-                    success: function (data) {
-                        questionSection.find('input').prop('checked', false);
-                        questionSection.find('textarea').val('');
-                        toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
-                        //loadAccessData(AD_Survey_ID);                        
-                        if (_AD_WF_Activity_ID == 0) {
-                            self.update(self.record_ID);
-                        } else {
-                            self.panelDetails(_AD_Window_ID, _AD_Tab_ID, _AD_Table_ID, self.record_ID, $root, _AD_WF_Activity_ID);
-                        }
-                        setBusy(false);
-                        
-                    },
-                    error: function (e) {
-                        setBusy(false);
-                    }
-                });
+                self.SaveData(self.record_ID);
             });
 
             questionSection.find('[class*=group_]').off().click(function () {
