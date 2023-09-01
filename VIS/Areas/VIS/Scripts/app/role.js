@@ -1013,6 +1013,8 @@ VIS.MRole.getProcessAccess = function (AD_Process_ID) {
 VIS.MRole.getIsClientAccess = function (AD_Client_ID, rw) {
     if (AD_Client_ID == 0 && !rw) // can always read System
         return true;
+    if (this.vo.IsAccessAllOrgs)
+        return true;
     // Positive List
     var m_orgAccess = this.vo.orgAccess;
     for (var i = 0; i < m_orgAccess.length; i++) {

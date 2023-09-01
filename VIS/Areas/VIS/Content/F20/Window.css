@@ -1742,7 +1742,7 @@ li.vis-page-item-select {
 }
 
 .vis-ad-w-p-actionpanel-r .vis-ad-w-p-ap-tp-outerwrap {
-    height: auto !important;
+    height: calc(100% - 1px) !important;
 }
 
 .vis-ad-w-p-actionpanel-b .vis-ad-w-p-ap-tp-outerwrap {
@@ -2214,9 +2214,9 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
     .vis-grid-row-td-icon span {
         /* font-weight: bold; */
-        font-size: 24px;
-        /* color: rgba(var(--v-c-primary)); */
-        line-height: 16px;
+        font-size: 14px;
+        color: #fff;
+        line-height: 14px;
         display: contents;
     }
 .vis-grid-row-td-icon i {

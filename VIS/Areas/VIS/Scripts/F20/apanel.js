@@ -133,6 +133,7 @@
         var $btnClose = null;
         var $spnTitle = null;
         var $spanSetting = null;
+        this.excludeFromShare = ['ad_org', 'm_warehouse','ad_sharerecordorg'];
         /***END Tab panel**/
 
         var tabItems = [], tabLIObj = {};
@@ -3328,7 +3329,7 @@
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
-            if (this.curTab.getValue('AD_Org_ID') > 0 && this.curTab.getTableName().toLowerCase() != 'ad_org') {
+            if (this.curTab.getValue('AD_Org_ID') > 0 && this.excludeFromShare.indexOf(this.curTab.getTableName().toLowerCase()) == -1) {
                 this.aSharedRecord.setEnabled(true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {
@@ -3659,6 +3660,13 @@
     };//Save
 
     APanel.prototype.cmd_new = function (copy) { //Create New Record
+
+        //If the record is shared, then copying the record is not allowed.
+        if (this.curTab.isCurrentRecordShare && copy) {
+            VIS.ADialog.info('ActionNotAllowedHere');
+            return;
+        }
+
         if (!this.curTab.getIsInsertRecord()) {
             //log.warning("Insert Record disabled for Tab");
             return;
@@ -4178,6 +4186,11 @@
     APanel.prototype.cmd_RecordShared = function () {
         if (this.curTab.getRecord_ID() < 1) {
             this.aSharedRecord.setEnabled(false);
+            return;
+        }
+
+        if (this.curTab.isCurrentRecordShare) {
+            VIS.ADialog.info('ActionNotAllowedHere');
             return;
         }
 

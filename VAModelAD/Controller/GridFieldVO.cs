@@ -778,6 +778,8 @@ namespace VAdvantage.Controller
                 Callout = "";
             if (ReadOnlyLogic == null)
                 ReadOnlyLogic = "";
+            if (mandatoryLogic == null)
+                mandatoryLogic = "";
             if (StyleLogic == null)
                 StyleLogic = "";
 
@@ -871,6 +873,7 @@ namespace VAdvantage.Controller
             clone.Description = Description;
             clone.Help = Help;
             clone.ReadOnlyLogic = ReadOnlyLogic;
+            clone.mandatoryLogic = mandatoryLogic;
             clone.ObscureType = ObscureType;
             clone.IsDefaultFocus = IsDefaultFocus;
             //	Lookup

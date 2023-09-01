@@ -2028,9 +2028,15 @@
      * get shared record is readonly or not and set status on tab level.
      * 
      * */
-    GridTab.prototype.IsSharedAccess = function () {
-        this.IsSharedReadOnly = false;
-        return;
+    GridTab.prototype.IsSharedAccess = function () {       
+
+        // Handle new record Case
+        if (this.gridTable.getIsInserting()) {
+            this.IsSharedReadOnly = false;
+            this.isCurrentRecordShare = false
+            return;
+        }
+
         var tableID = this.getAD_Table_ID();
         var recordID = this.getRecord_ID();
 
@@ -2048,16 +2054,22 @@
             },
             success: function (data) {
                 data = JSON.parse(data);
-                if (data == true)
+                data = data.split('_');
+
+                if (data[0].toLowerCase() == 'true') {
                     that.IsSharedReadOnly = true;
-                else
+                }
+                else {
                     that.IsSharedReadOnly = false;
+                }
+
+                that.isCurrentRecordShare = data[1] == 'N' ? false : true;
             },
             error: function (err) {
                 console.log(err);
             }
         });
-    };
+    };    
 
     GridTab.prototype.verifyRow = function (targetRow) {
 
@@ -6092,7 +6104,7 @@
             if (!keyColumn.toUpperCase().endsWith("_ID"))
                 keyColumn += "_ID";			//	AD_Language_ID
             var Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, keyColumn);
-            if (Record_ID == "")
+            if (Record_ID == "" && this.gridTab)
                 Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, this.gridTab.getTableName() + "_ID"); 
 
             if (Record_ID == "")
@@ -6108,7 +6120,7 @@
             if (!VIS.MRole.getIsColumnAccess(AD_Table_ID, this.vo.AD_Column_ID, false))
                 return false;
 
-            if (this.gridTab.IsSharedReadOnly)
+            if (this.gridTab && this.gridTab.IsSharedReadOnly)
                 return false;
         }
 
@@ -6571,8 +6583,14 @@
                     //console.log(vo.ColumnName + " <==>" + variable +"==>"+ n);
                     return n;
                 }
-                else if (variable.indexOf('@') != -1)			//	it is a variable
+                else if (variable.indexOf('@') != -1) {			//	it is a variable
                     defStr = ctx.getWindowContext(vo.windowNo, variable.replaceAll('@', ' ').trim());
+
+                    // Check Role have Org Access. 
+                    if (vo.ColumnName == 'AD_Org_ID' && !VIS.MRole.getIsOrgAccess(Number(defStr), false)) {
+                        defStr = variable;
+                    }
+                }
                 else if (variable.startsWith("'") && variable.endsWith("'"))	//	it is a 'String'
                 {
                     if (variable.length - 2 > 0)

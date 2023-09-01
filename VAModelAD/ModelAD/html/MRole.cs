@@ -729,115 +729,115 @@ namespace VAdvantage.Model
             }
 
 
-            //string ADWindowAccessID = "";
-            //string ADProcessAccessID = "";
-            //string ADFormAccessID = "";
-            //string ADWorkflowAccessID = "";
+            string ADWindowAccessID = "";
+            string ADProcessAccessID = "";
+            string ADFormAccessID = "";
+            string ADWorkflowAccessID = "";
 
-            //if (MSysConfig.IsNativeSequence(false))
-            //{
-            //    //Get Next sequence No
-            //    ADWindowAccessID = DB.IsOracle()?"AD_Window_Access_seq.nextval": "nextval('AD_Window_Access_seq')";
-            //    ADProcessAccessID = DB.IsOracle() ? "AD_Process_Access_seq.nextval" : "nextval('AD_Process_Access_seq')";
-            //    ADFormAccessID = DB.IsOracle() ? "AD_Form_Access_seq.nextval" : "nextval('AD_Form_Access_seq')";
-            //    ADWorkflowAccessID = DB.IsOracle() ? "AD_Workflow_Access_seq.nextval" : "nextval('AD_Workflow_Access_seq')";
-            //}
-            //else
-            //{
-            //    //Get current record count and increment in sequence no.
-            //    string qry = "SELECT Count(w.AD_Window_ID) FROM AD_Window w INNER JOIN AD_Tab t ON (w.AD_Window_ID=t.AD_Window_ID) INNER JOIN AD_Table tt ON (t.AD_Table_ID=tt.AD_Table_ID)"
-            //        + "WHERE t.name=(SELECT MIN(name) FROM AD_Tab xt "	// only check first tab
-            //        + "WHERE xt.AD_Window_ID=w.AD_Window_ID)"
-            //    + "AND tt.AccessLevel IN " + roleAccessLevelWin;
+            if (MSysConfig.IsNativeSequence(false))
+            {
+                //Get Next sequence No
+                ADWindowAccessID = DB.IsOracle() ? "AD_Window_Access_seq.nextval" : "nextval('AD_Window_Access_seq')";
+                ADProcessAccessID = DB.IsOracle() ? "AD_Process_Access_seq.nextval" : "nextval('AD_Process_Access_seq')";
+                ADFormAccessID = DB.IsOracle() ? "AD_Form_Access_seq.nextval" : "nextval('AD_Form_Access_seq')";
+                ADWorkflowAccessID = DB.IsOracle() ? "AD_Workflow_Access_seq.nextval" : "nextval('AD_Workflow_Access_seq')";
+            }
+            else
+            {
+                //Get current record count and increment in sequence no.
+                string qry = "SELECT Count(w.AD_Window_ID) FROM AD_Window w INNER JOIN AD_Tab t ON (w.AD_Window_ID=t.AD_Window_ID) INNER JOIN AD_Table tt ON (t.AD_Table_ID=tt.AD_Table_ID)"
+                    + "WHERE t.name=(SELECT MIN(name) FROM AD_Tab xt "	// only check first tab
+                    + "WHERE xt.AD_Window_ID=w.AD_Window_ID)"
+                + "AND tt.AccessLevel IN " + roleAccessLevelWin;
 
-            //    int count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
-            //    count = DB.GetNextID(GetCtx(), "AD_Window_Access", null, count) - 1;
-            //    ADWindowAccessID = "(ROW_NUMBER() OVER (ORDER BY w.AD_Window_ID) + " + count + ")";
+                int count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
+                count = DB.GetNextID(GetCtx(), "AD_Window_Access", null, count) - 1;
+                ADWindowAccessID = "(ROW_NUMBER() OVER (ORDER BY w.AD_Window_ID) + " + count + ")";
 
-            //    qry= "SELECT COUNT(AD_Process_ID) FROM AD_Process WHERE AccessLevel IN " + roleAccessLevel;
-            //    count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
-            //    count = DB.GetNextID(GetCtx(), "AD_Process_Access", null, count) - 1;
-            //    ADProcessAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Process_ID) + " + count + ")";
+                qry = "SELECT COUNT(AD_Process_ID) FROM AD_Process WHERE AccessLevel IN " + roleAccessLevel;
+                count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
+                count = DB.GetNextID(GetCtx(), "AD_Process_Access", null, count) - 1;
+                ADProcessAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Process_ID) + " + count + ")";
 
-            //    qry = "SELECT COUNT(AD_Form_ID) FROM AD_Form WHERE AccessLevel IN " + roleAccessLevel;
-            //    count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
-            //    count = DB.GetNextID(GetCtx(), "AD_Form_Access", null, count) - 1;
-            //    ADFormAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Form_ID) + " + count + ")";
+                qry = "SELECT COUNT(AD_Form_ID) FROM AD_Form WHERE AccessLevel IN " + roleAccessLevel;
+                count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
+                count = DB.GetNextID(GetCtx(), "AD_Form_Access", null, count) - 1;
+                ADFormAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Form_ID) + " + count + ")";
 
-            //    qry = "SELECT COUNT(AD_Workflow_ID) FROM AD_Workflow WHERE AccessLevel IN " + roleAccessLevel;
-            //    count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
-            //    count = DB.GetNextID(GetCtx(), "AD_Workflow_Access", null, count) - 1;
-            //    ADWorkflowAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Workflow_ID) + " + count + ")";
-            //}
+                qry = "SELECT COUNT(AD_Workflow_ID) FROM AD_Workflow WHERE AccessLevel IN " + roleAccessLevel;
+                count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
+                count = DB.GetNextID(GetCtx(), "AD_Workflow_Access", null, count) - 1;
+                ADWorkflowAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Workflow_ID) + " + count + ")";
+            }
 
             String roleClientOrgUser = GetAD_Role_ID() + ","
             + GetAD_Client_ID() + "," + GetAD_Org_ID() + ",'Y', SysDate,"
             + GetUpdatedBy() + ", SysDate," + GetUpdatedBy()
             + ",'Y' ";	//	IsReadWrite
 
-            //String sqlWindow = "INSERT INTO AD_Window_Access "
-            //    + "(AD_Window_Access_ID,AD_Window_ID, AD_Role_ID,"
-            //    + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
-            //    + "SELECT " + ADWindowAccessID + ", w.AD_Window_ID, " + roleClientOrgUser
-            //    + "FROM AD_Window w"
-            //    + " INNER JOIN AD_Tab t ON (w.AD_Window_ID=t.AD_Window_ID)"
-            //    + " INNER JOIN AD_Table tt ON (t.AD_Table_ID=tt.AD_Table_ID) "
-            //    + "WHERE t.name=(SELECT MIN(name) FROM AD_Tab xt "	// only check first tab
-            //        + "WHERE xt.AD_Window_ID=w.AD_Window_ID)"
-            //    + "AND tt.AccessLevel IN ";
-
-            //String sqlProcess = "INSERT INTO AD_Process_Access "
-            //    + "(AD_Process_Access_ID,AD_Process_ID, AD_Role_ID,"
-            //    + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
-            //    + "SELECT " + ADProcessAccessID + ", p.AD_Process_ID, " + roleClientOrgUser
-            //    + "FROM AD_Process p "
-            //    + "WHERE AccessLevel IN ";
-
-            //String sqlForm = "INSERT INTO AD_Form_Access "
-            //    + "(AD_Form_Access_ID,AD_Form_ID, AD_Role_ID,"
-            //    + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
-            //    + "SELECT " + ADFormAccessID + ", f.AD_Form_ID, " + roleClientOrgUser
-            //    + "FROM AD_Form f "
-            //    + "WHERE AccessLevel IN ";
-
-            //String sqlWorkflow = "INSERT INTO AD_Workflow_Access "
-            //    + "(AD_Workflow_Access_ID,AD_Workflow_ID, AD_Role_ID,"
-            //    + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
-            //    + "SELECT " + ADWorkflowAccessID + ", w.AD_Workflow_ID, " + roleClientOrgUser
-            //    + "FROM AD_Workflow w "
-            //    + "WHERE AccessLevel IN ";
-
             String sqlWindow = "INSERT INTO AD_Window_Access "
-                + "(AD_Window_ID, AD_Role_ID,"
+                + "(AD_Window_Access_ID,AD_Window_ID, AD_Role_ID,"
                 + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
-                + "SELECT DISTINCT w.AD_Window_ID, " + roleClientOrgUser
+                + "SELECT " + ADWindowAccessID + ", w.AD_Window_ID, " + roleClientOrgUser
                 + "FROM AD_Window w"
                 + " INNER JOIN AD_Tab t ON (w.AD_Window_ID=t.AD_Window_ID)"
                 + " INNER JOIN AD_Table tt ON (t.AD_Table_ID=tt.AD_Table_ID) "
-                + "WHERE t.SeqNo=(SELECT MIN(SeqNo) FROM AD_Tab xt "	// only check first tab
+                + "WHERE t.name=(SELECT MIN(name) FROM AD_Tab xt "	// only check first tab
                     + "WHERE xt.AD_Window_ID=w.AD_Window_ID)"
                 + "AND tt.AccessLevel IN ";
 
             String sqlProcess = "INSERT INTO AD_Process_Access "
-                + "(AD_Process_ID, AD_Role_ID,"
+                + "(AD_Process_Access_ID,AD_Process_ID, AD_Role_ID,"
                 + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
-                + "SELECT DISTINCT p.AD_Process_ID, " + roleClientOrgUser
+                + "SELECT " + ADProcessAccessID + ", p.AD_Process_ID, " + roleClientOrgUser
                 + "FROM AD_Process p "
                 + "WHERE AccessLevel IN ";
 
             String sqlForm = "INSERT INTO AD_Form_Access "
-                + "(AD_Form_ID, AD_Role_ID,"
+                + "(AD_Form_Access_ID,AD_Form_ID, AD_Role_ID,"
                 + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
-                + "SELECT f.AD_Form_ID, " + roleClientOrgUser
+                + "SELECT " + ADFormAccessID + ", f.AD_Form_ID, " + roleClientOrgUser
                 + "FROM AD_Form f "
                 + "WHERE AccessLevel IN ";
 
             String sqlWorkflow = "INSERT INTO AD_Workflow_Access "
-                + "(AD_Workflow_ID, AD_Role_ID,"
+                + "(AD_Workflow_Access_ID,AD_Workflow_ID, AD_Role_ID,"
                 + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
-                + "SELECT w.AD_Workflow_ID, " + roleClientOrgUser
+                + "SELECT " + ADWorkflowAccessID + ", w.AD_Workflow_ID, " + roleClientOrgUser
                 + "FROM AD_Workflow w "
                 + "WHERE AccessLevel IN ";
+
+            //String sqlWindow = "INSERT INTO AD_Window_Access "
+            //    + "(AD_Window_ID, AD_Role_ID,"
+            //    + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
+            //    + "SELECT DISTINCT w.AD_Window_ID, " + roleClientOrgUser
+            //    + "FROM AD_Window w"
+            //    + " INNER JOIN AD_Tab t ON (w.AD_Window_ID=t.AD_Window_ID)"
+            //    + " INNER JOIN AD_Table tt ON (t.AD_Table_ID=tt.AD_Table_ID) "
+            //    + "WHERE t.SeqNo=(SELECT MIN(SeqNo) FROM AD_Tab xt "	// only check first tab
+            //        + "WHERE xt.AD_Window_ID=w.AD_Window_ID)"
+            //    + "AND tt.AccessLevel IN ";
+
+            //String sqlProcess = "INSERT INTO AD_Process_Access "
+            //    + "(AD_Process_ID, AD_Role_ID,"
+            //    + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
+            //    + "SELECT DISTINCT p.AD_Process_ID, " + roleClientOrgUser
+            //    + "FROM AD_Process p "
+            //    + "WHERE AccessLevel IN ";
+
+            //String sqlForm = "INSERT INTO AD_Form_Access "
+            //    + "(AD_Form_ID, AD_Role_ID,"
+            //    + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
+            //    + "SELECT f.AD_Form_ID, " + roleClientOrgUser
+            //    + "FROM AD_Form f "
+            //    + "WHERE AccessLevel IN ";
+
+            //String sqlWorkflow = "INSERT INTO AD_Workflow_Access "
+            //    + "(AD_Workflow_ID, AD_Role_ID,"
+            //    + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy,IsReadWrite) "
+            //    + "SELECT w.AD_Workflow_ID, " + roleClientOrgUser
+            //    + "FROM AD_Workflow w "
+            //    + "WHERE AccessLevel IN ";
 
 
             //
@@ -2015,11 +2015,13 @@ namespace VAdvantage.Model
 
             //	Use First Table
             string tableName = "";
+            string mainTableName = "";
             if (ti.Length > 0 &&
                 (ti[0].GetTableName().Equals(TableNameIn)
                 || ti[0].GetSynonym().Equals(TableNameIn)))
             {
                 tableName = ti[0].GetSynonym();
+                mainTableName = ti[0].GetTableName();
                 if (tableName.Length == 0)
                     tableName = ti[0].GetTableName();
             }
@@ -2047,9 +2049,9 @@ namespace VAdvantage.Model
             {
                 retSQL.Append(" AND ");
                 if (fullyQualified && !Util.IsEmpty(tableName))
-                    retSQL.Append(GetOrgWhere(tableName, rw));
+                    retSQL.Append(GetOrgWhere(tableName, rw, mainTableName));
                 else
-                    retSQL.Append(GetOrgWhere(null, rw));
+                    retSQL.Append(GetOrgWhere(null, rw, mainTableName));
             }
 
             if (IsUseBPRestrictions())
@@ -2279,7 +2281,7 @@ namespace VAdvantage.Model
 	 *            read write
 	 * @return "AD_Org_ID=0" or "AD_Org_ID IN(0,1)" or null (if access all org)
 	 */
-        public String GetOrgWhere(String tableName, bool rw)
+        public String GetOrgWhere(String tableName, bool rw,string mainTableName)
         {
             if (IsAccessAllOrgs())
                 return null;
@@ -2329,10 +2331,10 @@ namespace VAdvantage.Model
 
                     // Check login organization exist in list ---- VIS0228 06-Dec-2022
                     //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
-                    if (!string.IsNullOrEmpty(tableName))
+                    if (!string.IsNullOrEmpty(mainTableName))
                     {
                         // Get Shared record with organisation.
-                        GetShareRecord(ref sql, tableName);
+                        GetShareRecord(ref sql, tableName, mainTableName);
                     }
                     sb = new StringBuilder();
                 }
@@ -2821,16 +2823,16 @@ namespace VAdvantage.Model
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="tableName"></param>
-        public void GetShareRecord(ref StringBuilder sql, string tableName)
+        public void GetShareRecord(ref StringBuilder sql, string tableName, string mainTableName)
         {
-            string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(tableName);
+            string qry = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive='Y' AND AD_OrgShared_ID=" + GetCtx().GetAD_Org_ID() + " AND AD_Table_ID=" + GetAD_Table_ID(mainTableName);
             DataSet ds = DB.ExecuteDataset(qry);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
                 sql.Append(" OR (");
 
                 //select * from C_Order where (AD_Client_ID=11 AD AD_Org_ID =0 OR C_Order_ID IN (qry)
-                sql.Append(tableName+"."+tableName + "_ID IN (" + qry + "))");
+                sql.Append(tableName+"."+ mainTableName + "_ID IN (" + qry + "))");
 
             }
         }
