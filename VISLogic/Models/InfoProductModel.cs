@@ -398,14 +398,16 @@ namespace VIS.Models
                         LEFT OUTER JOIN M_AttributeSet pa ON (p.M_AttributeSet_ID=pa.M_AttributeSet_ID) 
                         LEFT OUTER JOIN C_UOM c ON (p.C_UOM_ID=c.C_UOM_ID)
                         LEFT OUTER JOIN M_Manufacturer mr ON (p.M_Product_ID = mr.M_Product_ID)
-                        LEFT OUTER JOIN M_ProductAttributes patr ON (p.M_Product_ID = patr.M_Product_ID)
+                        LEFT OUTER JOIN M_ProductAttributes patr ON (p.M_Product_ID = patr.M_Product_ID) AND patr.AD_Org_ID IN 
+                        (SELECT AD_Org_ID FROM AD_Role_OrgAccess WHERE AD_Role_ID=" + ctx.GetAD_Role_ID()+@" AND IsActive='Y')
                         LEFT OUTER JOIN C_UOM_Conversion uc ON (p.M_Product_ID = uc.M_Product_ID)
                         , M_Warehouse w " + sqlWhere + " ORDER BY p.M_Product_ID, M_PriceList_Version_ID, M_AttriButeSetInstance_ID, C_UOM_ID";
                 sqlPaging = MRole.GetDefault(ctx).AddAccessSQL(sqlPaging, tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 sqlPaging = @"JOIN (SELECT row_num, M_Product_ID, M_AttriButeSetInstance_ID, C_UOM_ID, M_PriceList_Version_ID, M_Warehouse_ID FROM (SELECT prd.*, row_number() over (order by prd.M_Product_ID) AS row_num FROM 
                         (" + sqlPaging + @") prd) t WHERE row_num BETWEEN " + startPage + " AND " + endPage +
                         @") pp ON pp.M_Product_ID = p.M_Product_ID AND pp.M_AttriButeSetInstance_ID = NVL(pr.M_AttriButeSetInstance_ID,0) AND pp.C_UOM_ID = NVL(pr.C_UOM_ID,0) 
-                        AND pp.M_Warehouse_ID = w.M_Warehouse_ID AND pp.M_PriceList_Version_ID = NVL(pr.M_PriceList_Version_ID,0)";
+                        AND pp.M_Warehouse_ID = w.M_Warehouse_ID AND pp.M_PriceList_Version_ID = NVL(pr.M_PriceList_Version_ID,0) AND w.AD_Org_ID IN 
+                        (SELECT AD_Org_ID FROM AD_Role_OrgAccess WHERE AD_Role_ID=" + ctx.GetAD_Role_ID() + @" AND IsActive='Y')";
                 sql += sqlPaging;       // + where;
                 DataSet data = DB.ExecuteDataset(sql, null, null);
                 if (data == null)

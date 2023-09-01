@@ -101,14 +101,24 @@ namespace VAdvantage.Model
         {
             try
             {
-                DataSet ds = DB.ExecuteDataset(@"SELECT DISTINCT CM.AD_Process_ID,GP.AD_Process_ID  AS IsProcessExist
+                // Union is used to get processes which is bind on node of workflow and by column.
+                DataSet ds = DB.ExecuteDataset($@"SELECT DISTINCT CM.AD_Process_ID,GP.AD_Process_ID  AS IsProcessExist
                                 FROM AD_Field FD 
                                 INNER JOIN AD_Column CM ON (CM.AD_Column_ID = FD.AD_Column_ID)
                                 INNER JOIN AD_Tab TB ON (TB.AD_Tab_ID = FD.AD_Tab_ID)
                                 INNER JOIN AD_Table TL ON (TL.AD_Table_ID = TB.AD_Table_ID)
-                                LEFT JOIN AD_Group_Process GP ON(GP.AD_Process_ID=CM.AD_Process_ID) AND GP.AD_GroupInfo_ID=" + GetAD_GroupInfo_ID() + @"
-                                WHERE TB.AD_Window_ID =" + GetAD_Window_ID() + @"
-                                AND CM.AD_Process_ID > 0 AND FD.IsActive='Y'");
+                                LEFT JOIN AD_Group_Process GP ON(GP.AD_Process_ID=CM.AD_Process_ID) AND GP.AD_GroupInfo_ID={ GetAD_GroupInfo_ID() }  
+                                WHERE TB.AD_Window_ID ={ GetAD_Window_ID()} 
+                                AND CM.AD_Process_ID > 0 AND FD.IsActive='Y'
+                                UNION
+                                SELECT DISTINCT ND.AD_Process_ID,GP.AD_Process_ID  AS IsProcessExist
+                                FROM AD_Window WD
+                                INNER JOIN AD_TABLE TL ON (WD.AD_Window_ID = TL.AD_Window_ID)
+                                INNER JOIN AD_Workflow WF ON (TL.AD_Table_ID = WF.AD_Table_ID)
+                                INNER JOIN AD_WF_Node ND ON(ND.AD_Workflow_ID=WF.AD_Workflow_ID)
+                                LEFT JOIN AD_Group_Process GP ON(GP.AD_Process_ID=ND.AD_Process_ID) AND GP.AD_GroupInfo_ID={ GetAD_GroupInfo_ID() } 
+                                WHERE TL.AD_Window_ID ={ GetAD_Window_ID() }
+                                AND ND.AD_Process_ID > 0 AND ND.IsActive='Y'");
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
                     for (int i = 0, ln = ds.Tables[0].Rows.Count; i < ln; i++)
@@ -133,7 +143,7 @@ namespace VAdvantage.Model
                                     SET IsActive='Y'
                                     WHERE AD_Process_ID=" + Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Process_ID"])+@"
                                     AND AD_GroupInfo_ID = " + GetAD_GroupInfo_ID());
-                        }                     
+                        }   
                     }
                 }
             }
@@ -202,13 +212,23 @@ namespace VAdvantage.Model
         {
             try
             {
-                DataSet ds = DB.ExecuteDataset(@"SELECT DISTINCT WF.AD_Workflow_ID,GW.AD_Workflow_ID AS IsWorkflowExist
+                // Union is used to get workflow which is bind on process window and by Table.
+                DataSet ds = DB.ExecuteDataset($@"SELECT DISTINCT WF.AD_Workflow_ID,GW.AD_Workflow_ID AS IsWorkflowExist
                                             FROM AD_Window WD
                                             INNER JOIN AD_TABLE TL ON (WD.AD_Window_ID = TL.AD_Window_ID)
                                             INNER JOIN AD_Workflow WF ON (TL.AD_Table_ID = WF.AD_Table_ID)
-                                            LEFT JOIN AD_Group_Workflow GW ON (GW.AD_Workflow_ID=WF.AD_Workflow_ID) AND GW.AD_GroupInfo_ID="+ GetAD_GroupInfo_ID() + @" 
-                                            WHERE WD.AD_Window_ID =" + GetAD_Window_ID() + @" 
-                                            AND WF.AD_Workflow_ID > 0 AND WD.IsActive ='Y'");
+                                            LEFT JOIN AD_Group_Workflow GW ON (GW.AD_Workflow_ID=WF.AD_Workflow_ID) AND GW.AD_GroupInfo_ID={GetAD_GroupInfo_ID() }
+                                            WHERE WD.AD_Window_ID ={ GetAD_Window_ID() } 
+                                            AND WF.AD_Workflow_ID > 0 AND WD.IsActive ='Y'
+                                            UNION
+                                            SELECT DISTINCT PR.AD_Workflow_ID,GW.AD_Workflow_ID AS IsWorkflowExist
+                                            FROM AD_Window WD
+                                            INNER JOIN AD_TABLE TL ON (WD.AD_Window_ID = TL.AD_Window_ID)
+                                            INNER JOIN AD_Column CM ON (CM.AD_Table_ID = TL.AD_Table_ID)
+                                            INNER JOIN AD_Process PR ON(PR.AD_Process_ID=CM.AD_Process_ID)
+                                            LEFT JOIN AD_Group_Workflow GW ON (GW.AD_Workflow_ID=PR.AD_Workflow_ID) AND GW.AD_GroupInfo_ID={ GetAD_GroupInfo_ID() } 
+                                            WHERE TL.AD_Window_ID ={ GetAD_Window_ID() } 
+                                            AND PR.AD_Workflow_ID > 0 AND PR.IsActive='Y'");                                
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
                     for (int i = 0, ln = ds.Tables[0].Rows.Count; i < ln; i++)
