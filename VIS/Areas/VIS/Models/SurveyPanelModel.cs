@@ -459,7 +459,15 @@ namespace VIS.Models
 
             return UList;
         }
-      
+
+        /// <summary>
+        /// Check Checklist Required
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Window_ID"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
         public List<CheckListCondition> IsCheckListRequire(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int Record_ID)
         {
             string sql = "";

@@ -3631,35 +3631,16 @@
             return;
         }
 
-        // Check survey panel Exist
-        var isSurveyPanel = false;
-        if (this.curTab.getHasPanel()) {
-            var panels = this.curTab.getTabPanels();
-            for (var i = 0; i < panels.length; i++) {
-                if (panels[i].getClassName() == 'VIS.SurveyPanel') {
-                    isSurveyPanel = true;
-                    i = panels.length;
-                }
-            }
-
-        }
         var $this = this;
 
         // Check valid condition for checklist
-        if (isSurveyPanel) {
-            this.curGC.IsCheckListRequire(function (isCheckListRequire) {
-                if (!isCheckListRequire) {
-                    VIS.ADialog.error("CheckListRequired");
-                    return false;
-                }
-                return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
-            });
-        } else {
+        this.curGC.IsCheckListRequire(function (isCheckListRequire) {
+            if (!isCheckListRequire) {
+                VIS.ADialog.error("CheckListRequired");
+                return false;
+            }
             return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
-        }
-
-        
-
+        });
     };
 
     APanel.prototype.cmd_save2 = function (manual, curTab, curGC, selfPanel, callback) {
@@ -3705,9 +3686,9 @@
             if (callback) {
                 callback(retValue);
             }
-            if (curTab.getRecord_ID() > 0) {
-                curGC.refreshTabPanelData(curTab.getRecord_ID());
-            }
+            
+            curGC.refreshTabPanelData(curTab.getRecord_ID());
+
             this.curTab.loadShared();
             if (this.aSharedRecord) {
                 this.aSharedRecord.setPressed(this.curTab.hasShared());

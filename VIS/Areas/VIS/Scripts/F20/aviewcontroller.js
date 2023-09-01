@@ -514,6 +514,23 @@
 
     /// Check Checklist required
     VIS.GridController.prototype.IsCheckListRequire = function (callback) {
+
+        var isSurveyPanel = false;
+        if (this.gTab.getHasPanel()) {
+            var panels = this.gTab.getTabPanels();
+            for (var i = 0; i < panels.length; i++) {
+                if (panels[i].getClassName() == 'VIS.SurveyPanel') {
+                    isSurveyPanel = true;
+                    i = panels.length;
+                }
+            }
+        }
+
+        if (!isSurveyPanel) {
+            return true;
+        }
+
+
         var tableID = this.gTab.getAD_Table_ID();
         var recordID = this.gTab.getRecord_ID();
         var windowID = this.gTab.getAD_Window_ID();

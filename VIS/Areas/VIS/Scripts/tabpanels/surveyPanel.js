@@ -113,6 +113,10 @@ VIS = window.VIS || {};
 
         this.update = function (Record_ID) {
             if (self.isCheckListFill) {
+                if (Record_ID < 0) {
+                    return false;
+                }
+
                 self.SaveData(Record_ID);
             }
             self.panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, this.curTab.getAD_Table_ID(), Record_ID, $root,0);
@@ -745,10 +749,10 @@ VIS = window.VIS || {};
          *	This function will execute when user navigate  or refresh a record
          */
     surveyPanel.prototype.refreshPanelData = function (recordID, selectedRow) {
-        
         this.record_ID = recordID;
         this.selectedRow = selectedRow;
         this.update(recordID);
+
     };
 
     /**
