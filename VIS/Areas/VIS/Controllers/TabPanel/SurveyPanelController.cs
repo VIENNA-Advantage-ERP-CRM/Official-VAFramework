@@ -97,5 +97,19 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(obj.CheckResponseAccess(ctx, AD_Survey_ID, AD_SurveyAssignment_ID, AD_User_ID, AD_Role_ID, Record_ID, AD_Window_ID, AD_Table_ID, IsSelfShow)), JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Check Checklist Required
+        /// </summary>
+        /// <param name="Record_ID"></param>
+        /// <param name="AD_Window_ID"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <returns></returns>
+        public JsonResult IsCheckListRequire(int Record_ID, int AD_Window_ID, int AD_Table_ID)
+        {
+            SurveyPanelModel obj = new SurveyPanelModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(obj.IsCheckListRequire(ctx, AD_Window_ID, AD_Table_ID, Record_ID)), JsonRequestBehavior.AllowGet);
+        }
+
     }
 }
