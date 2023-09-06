@@ -121,6 +121,10 @@ VIS = window.VIS || {};
             }
             self.panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, this.curTab.getAD_Table_ID(), Record_ID, $root,0);
         }
+
+        this.setisCheckListFill = function (value) {
+            this.isCheckListFill = value;
+        }
             
         this.panelDetails = function (AD_window_ID, AD_Tab_ID, AD_Table_ID, Record_ID, $root, AD_WF_Activity_ID) {
             self.isCheckListFill = false;

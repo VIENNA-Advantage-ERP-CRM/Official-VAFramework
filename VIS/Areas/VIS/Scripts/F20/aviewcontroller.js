@@ -527,7 +527,8 @@
         }
 
         if (!isSurveyPanel) {
-            return true;
+            callback(true);
+            return;
         }
 
 
@@ -1720,6 +1721,11 @@
 
     VIS.GridController.prototype.dataDelete = function () {
         var retValue = this.gTab.dataDelete(this.vTable.getSelection(true));
+
+        if (this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
+            this.vTabPanel.curTabPanel.setisCheckListFill(false);
+        }
+
         this.refreshTabPanelData(this.gTab.getRecord_ID());
         this.dynamicDisplay(-1);
         return retValue;
@@ -1730,6 +1736,11 @@
         var that = this;
         that.gTab.getTableModel().dataDeleteAsync(that.vTable.getSelection(true), that.gTab.currentRow).then(function (info) {
             that.gTab.setCurrentRow(that.gTab.currentRow, true);
+
+            if (that.vTabPanel.curTabPanel && that.vTabPanel.curTabPanel.isCheckListFill) {
+                that.vTabPanel.curTabPanel.setisCheckListFill(false);
+            }
+
             that.refreshTabPanelData(that.gTab.getRecord_ID());
             that.dynamicDisplay(-1);
             that.aPanel.setBusy(false);
