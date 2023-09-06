@@ -14,7 +14,7 @@ namespace VAdvantage.ModelAD
     public class MDirectQueryLog : X_AD_DirectQueryLog
     {
         /// <summary>
-        /// Standard Constructor
+        /// Standard Constructor 
         /// </summary>
         /// <param name="ctx">context</param>
         /// <param name="M_MovementLineConfirm_ID">id</param>

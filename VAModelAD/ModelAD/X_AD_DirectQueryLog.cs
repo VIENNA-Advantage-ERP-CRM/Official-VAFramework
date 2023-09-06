@@ -20,7 +20,7 @@ namespace ViennaAdvantage.Model
         public X_AD_DirectQueryLog(Ctx ctx, int AD_DirectQueryLog_ID, Trx trxName) : base(ctx, AD_DirectQueryLog_ID, trxName)
         {/** if (AD_DirectQueryLog_ID == 0){SetAD_DirectQueryLog_ID (0);SetRecordCount (0);SetSqlQuery (null);} */
         }/** Load Constructor 
-@param ctx context
+@param ctx context 
 @param rs result set 
 @param trxName transaction
 */
