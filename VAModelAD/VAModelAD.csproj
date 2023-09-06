@@ -199,6 +199,7 @@
     <Compile Include="ModelAD\MColor.cs" />
     <Compile Include="ModelAD\MColumn.cs" />
     <Compile Include="ModelAD\MColumnAccess.cs" />
+    <Compile Include="ModelAD\MDirectQueryLog.cs" />
     <Compile Include="ModelAD\MIndexColumn.cs" />
     <Compile Include="ModelAD\MExportToClient.cs" />
     <Compile Include="ModelAD\MField.cs" />
@@ -296,6 +297,7 @@
     <Compile Include="ModelAD\TranslationTable.cs" />
     <Compile Include="ModelAD\ViennaProcessorLog.cs" />
     <Compile Include="ModelAD\ViennatProcessor.cs" />
+    <Compile Include="ModelAD\X_AD_DirectQueryLog.cs" />
     <Compile Include="ModelAD\X_AD_IndexColumn.cs" />
     <Compile Include="ModelAD\X_AD_TableIndex.cs" />
     <Compile Include="Model\Callout.cs" />
