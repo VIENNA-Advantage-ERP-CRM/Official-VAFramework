@@ -317,7 +317,11 @@ VIS = window.VIS || {};
          */
         function loadSurveyDesign(SurveyData, SurveyType, root, AD_Survey_ID) {
             var $dsgn;
-            var dsg = '<div class="VIS_SI_Main' + self.windowNo + '" style="width:100%; height:calc(100% - 38px);">' +
+            var stl = "width: calc(100% - 35px);height: calc(100% - 65px);position: absolute;";
+            if (self.curTab.getIsTPBottomAligned()) {
+                stl = "";
+            }
+            var dsg = '<div class="VIS_SI_Main' + self.windowNo + '" style="' + stl+'">' +
                 '<div class="vis-tp-mainContainer"> ' +
                 '<ol class="list-unstyled vis-tp-orderListWrap"> ';
             if (SurveyType == "CL") //if survey type is Checklist.
@@ -415,7 +419,11 @@ VIS = window.VIS || {};
             } else {
                 questionSection.append($dsgn);
                 var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
-                var btns = '<div class="vis-survey">';
+                var stl1 ="bottom: 0px;position: absolute;width: calc(100% - 35px);"
+                if (self.curTab.getIsTPBottomAligned()) {
+                    stl1 = "bottom: 0px;position: absolute;width: calc(100% - 10px);";
+                }
+                var btns = '<div class="vis-survey" style="'+stl1+'">';
                 var totalQues = main.find('[class^=VIS_Quest_]').length;
 
                 //show pagging button according to page size and question length.
@@ -423,7 +431,7 @@ VIS = window.VIS || {};
                     btns += '<div class="' + (VIS.Application.isRTL ? " float-right" : " float-left") + '"><a class="prev btn mr-2"><i class="fa fa-chevron-' + (VIS.Application.isRTL ? "right" : "left") +'" aria-hidden="true"></i> ' + VIS.Msg.getMsg('VIS_Prev') + '</a></div>';
                 }
 
-                btns += '<div class="vis-tp-btnWrap' + (VIS.Application.isRTL ? " float-left" :" float-right")+'"> ' +
+                btns += '<div style="padding-bottom: 10px;" class="vis-tp-btnWrap' + (VIS.Application.isRTL ? " float-left" : " float-right") + '" > ' +
                     '<a class="next btn">' + VIS.Msg.getMsg('VIS_Next') + ' <i class="fa fa-chevron-' + (VIS.Application.isRTL ? "left" : "right") +'" aria-hidden="true"></i></a>' +
                     '<a href="#" id="VIS_SI_BtnSubmit_' + self.windowNo + '" class="btn" >' + VIS.Msg.getMsg("VIS_Submit") +'</a> ' +
                     '</div >';

@@ -62,7 +62,7 @@ namespace VIS.Helpers
         public List<Dictionary<string, object>> LoadModules(Ctx ctx)
         {
             List<Dictionary<string, object>> retDic = null;
-            string sql = "SELECT AD_ModuleInfo_ID, Name FROM AD_Moduleinfo WHERE IsActive='Y' ORDER BY Upper(Name)";
+            string sql = "SELECT AD_ModuleInfo_ID, Name, Prefix FROM AD_Moduleinfo WHERE IsActive='Y' ORDER BY Upper(Name)";
             DataSet ds = DB.ExecuteDataset(sql);
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
@@ -72,6 +72,7 @@ namespace VIS.Helpers
                     Dictionary<string, object> obj = new Dictionary<string, object>();
                     obj["AD_ModuleInfo_ID"] = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ModuleInfo_ID"]);
                     obj["Name"] = Util.GetValueOfString(ds.Tables[0].Rows[i]["Name"]);
+                    obj["Prefix"] = Util.GetValueOfString(ds.Tables[0].Rows[i]["Prefix"]);
                     retDic.Add(obj);
                 }
             }
