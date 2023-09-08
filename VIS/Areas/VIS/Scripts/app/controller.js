@@ -1989,6 +1989,7 @@
     GridTab.prototype.dataDelete = function (indices) {
         var retValue = this.gridTable.dataDelete(indices, this.currentRow);
         this.setCurrentRow(this.currentRow, true);
+        this.IsSharedAccess();
         return retValue;
     };
 
