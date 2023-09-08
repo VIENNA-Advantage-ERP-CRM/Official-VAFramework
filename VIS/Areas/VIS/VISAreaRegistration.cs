@@ -141,15 +141,14 @@ namespace VIS
 
                  "~/Areas/VIS/Scripts/tabpanels/bipanel.js",
                  "~/Areas/VIS/Scripts/model/CalloutColumn.js",
-
                    "~/Areas/VIS/Scripts/app/ssemanager.js",
-
-
-                   "~/Areas/VIS/Scripts/tabpanels/verinfo.js",
                     "~/Areas/VIS/Scripts/tabpanels/HistoryDetailsTabPanel.js",
                     "~/Areas/VIS/Scripts/tabpanels/surveyPanel.js",
                   "~/Areas/VIS/Scripts/TestPanel.js",
-                 "~/Areas/VIS/Scripts/app/forms/form.js");
+                   "~/Areas/VIS/Scripts/tabpanels/verinfo.js",
+                 "~/Areas/VIS/Scripts/app/forms/form.js",
+                 "~/Areas/VIS/Scripts/forms/chatSample.js"
+                 );
 
 
             modScript.Include(

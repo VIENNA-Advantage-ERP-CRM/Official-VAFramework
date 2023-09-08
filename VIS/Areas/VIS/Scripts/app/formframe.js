@@ -106,7 +106,8 @@
 
         try {
             var type = "";
-            if (true) {
+            var isReact = className.split('.');
+            if (isReact[0].toLowerCase()=='react') {
                 type = VIS.Utility.getFunctionByName('VIS.Apps.ReactTemplate', window);
                 additionalInfo = className;
             } else {
