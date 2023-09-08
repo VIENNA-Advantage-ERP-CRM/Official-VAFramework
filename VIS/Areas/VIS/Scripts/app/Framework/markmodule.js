@@ -80,6 +80,12 @@
                     module = {};
                     module.AD_ModuleInfo_ID = dr[i]["AD_ModuleInfo_ID"];
                     module.Name = dr[i]["Name"];
+                    module.Prefix = dr[i]["Prefix"];
+                    //if (module.Name.indexOf("_") > -1) {
+                    //    var px = module.Name.split("_");
+                    //    module.Prefix = px[1];
+                    //    module.Name = px[0];
+                    //}
                     lstModules.push(module);
                 }
             }
@@ -110,6 +116,9 @@
                     td = $('<td>');
                     lbl = $('<label class="vis-gc-vpanel-table-label-checkbox" style="display: inline-block; opacity: 1;">');
                     chkbox = $("<input type='checkbox'>");
+                    if (lstModules[i].Prefix == "VA093_") { //special check for Auto Makring
+                        chkbox.prop('disabled', true);
+                    }
                     lbl.append(chkbox);
                     lbl.append(lstModules[i].Name);
                     td.append(lbl);
@@ -139,6 +148,10 @@
                         chkbox = $("<input type='checkbox'>");
                         // htmlstr += "<tr><td><label class='vis-gc-vpanel-table-label-checkbox' style='display: inline-block; opacity: 1;'><input type='checkbox'>" + lstModules[j].Name + "</label></td></tr>";
                     }
+                    if (lstModules[i].Prefix == "VA093_") { //special check for marking requestd by auto marking team
+                        chkbox.prop('disabled', true);
+                    }
+
                     lbl.append(chkbox);
                     lbl.append(lstModules[j].Name);
                     td.append(lbl);

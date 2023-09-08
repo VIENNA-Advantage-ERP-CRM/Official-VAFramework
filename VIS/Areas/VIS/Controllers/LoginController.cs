@@ -12,19 +12,19 @@ namespace VIS.Controllers
 {
     public class LoginController : ApiController
     {
-        // GET api/login
-        public List<KeyNamePair> GetOrg(int role,int user,int client)
-        {
-            return LoginHelper.GetOrgs(role, user, client);
-
-           
-            
-        }
+        //// GET api/login
+        //public List<KeyNamePair> GetOrg(int role,int user,int client)
+        //{
+        //    return LoginHelper.GetOrgs(role, user, client);
 
 
-        public List<KeyNamePair> GetClients(int id)
-        {
-            return LoginHelper.GetClients(id);
-        }
+
+        //}
+
+
+        //public List<KeyNamePair> GetClients(int id)
+        //{
+        //    return LoginHelper.GetClients(id);
+        //}
     }
 }
