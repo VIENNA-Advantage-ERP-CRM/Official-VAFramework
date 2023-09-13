@@ -345,7 +345,7 @@ html[dir="rtl"] .vis-advancedSearchInput > label, html[dir="rtl"] .vis-advancedS
     background: rgba(var(--v-c-secondary), 1);
 }
 .vis-advancedSearchTableHead > th, .vis-advancedSearchTableRow > td {
-    text-align: center !important;
+    text-align: center;
     font-size: 12px;
     font-weight: normal;
     /*color: #494949;*/
@@ -499,4 +499,9 @@ html[dir="rtl"] .vis-advancedSearchInput > label, html[dir="rtl"] .vis-advancedS
 
 .vis-advancedSearch-AddFilter {
 cursor:pointer;
+}
+
+.vis-batchUpdate-txtalign {
+    text-align: left !important;
+    padding-left: 15px !important;
 }

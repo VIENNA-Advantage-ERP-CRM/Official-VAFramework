@@ -329,7 +329,7 @@
             {
                 first = first.replaceAll('@', ' ').trim(); 			//	strip 'tag'
                 //firstEval = source.get_ValueAsString(first);		//	replace with it's value
-                firstEval = rowData.getValue(first);
+                firstEval = rowData.getValueAsString(first);
                 if (firstEval == null)
                     firstEval = "";
             }
@@ -343,7 +343,7 @@
             if (second.indexOf('@') != -1 && second[0] == '@' && second[second.length - 1] == '@') {
                 second = second.replaceAll('@', ' ').trim();			// strip tag
                 //secondEval = source.get_ValueAsString(second);		//	replace with it's value
-                secondEval = rowData.getValue(second);		//	replace with it's value
+                secondEval = rowData.getValueAsString(second);		//	replace with it's value
                 if (secondEval == null)
                     secondEval = "";
             }

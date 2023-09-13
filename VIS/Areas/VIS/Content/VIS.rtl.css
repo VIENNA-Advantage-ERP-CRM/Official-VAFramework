@@ -899,5 +899,7 @@ html[dir="rtl"] .vis-tp-listWrap {
     margin-right: 1rem;
 }
 /*rtl css End here*/
-
-
+html[dir="rtl"] .vis-batchUpdate-txtalign {
+    padding-right: 15px;
+    text-align:right !important;
+}

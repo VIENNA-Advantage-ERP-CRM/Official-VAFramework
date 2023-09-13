@@ -54,10 +54,11 @@ namespace VIS.Models
             }
             msg += PassedIds + values;
 
-            if (failedIds.Length > 0 && failedIds.EndsWith(", "))
+            if (failedIds.EndsWith(", "))
             {
-                failedIds = PassedIds.Substring(0, PassedIds.Length - 2);
+                failedIds = failedIds.Substring(0, failedIds.Length - 2);
                 msg += failedIds;
+                return Util.GetValueOfString(count) + Msg.GetMsg(ctx, "RecordUpdated") + Util.GetValueOfString(updateList.recordIds.Length);
             }
 
             MDirectQueryLog DQL = new MDirectQueryLog(ctx, 0, null);
@@ -67,7 +68,7 @@ namespace VIS.Models
             DQL.SetAD_Table_ID(updateList.AD_Table_ID);
             DQL.SetAD_Session_ID(ctx.GetAD_Session_ID());
             DQL.Save();
-            return Util.GetValueOfString(count) + Msg.GetMsg(ctx, "RecordUpdated") + Util.GetValueOfString(updateList.recordIds.Length);
+            return "OK";
         }
     }
 
