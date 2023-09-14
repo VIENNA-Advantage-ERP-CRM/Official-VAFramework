@@ -898,8 +898,9 @@ html[dir="rtl"] .vis-tp-listWrap {
     margin-left: unset;
     margin-right: 1rem;
 }
-/*rtl css End here*/
-html[dir="rtl"] .vis-batchUpdate-txtalign {
+
+html[dir="rtl"] .vis-advancedSearchTableRowBatch > td .vis-advancedSearchTableHeadBatch > th {
     padding-right: 15px;
-    text-align:right !important;
-}
+    text-align: right ;
+}   
+/*rtl css End here*/
