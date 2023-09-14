@@ -504,7 +504,8 @@ namespace VAdvantage.Common
 
             string newpwdExpireDate = GlobalVariable.TO_DATE(DateTime.Now.AddMonths(passwordValidity), true);
 
-            string sql = "UPDATE AD_User set Updated=Sysdate,UpdatedBy=" + UpdatedBy + ",PasswordExpireOn=" + newpwdExpireDate + ",password='" + newPwd + "' WHERE AD_User_ID=" + AD_User_ID;
+            // VIS0060: Work done to set Last Password Updated on date when user changed the password.
+            string sql = "UPDATE AD_User set Updated=Sysdate, LastPwdUpdatedOn=SYSDATE, UpdatedBy=" + UpdatedBy + ",PasswordExpireOn=" + newpwdExpireDate + ",password='" + newPwd + "' WHERE AD_User_ID=" + AD_User_ID;
             int count = DB.ExecuteQuery(sql);
             if (count > 0)
                 return true;
