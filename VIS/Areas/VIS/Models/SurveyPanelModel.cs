@@ -527,7 +527,7 @@ namespace VIS.Models
                     }
                     else if (oprtr == "!=")
                     {
-                        oprtr = "!=";
+                        oprtr = "!";
                     }
                     else if (oprtr == "<=")
                     {
@@ -567,16 +567,37 @@ namespace VIS.Models
                         value = "'" + value + "'";
                     }
 
-
+                    
 
                     if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
                     {
                         idx++;
-                        conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                        if (oprtr.Length == 2)
+                        {
+                            char[] charArray = oprtr.ToCharArray();
+                            conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
+                            conditions += " | ";
+                            conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                        }
+                        else
+                        {
+                            conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                        }
                     }
                     else
                     {
-                        conditions += "@" + columnName + "@ " + oprtr + " " + value + "" + andOR;
+                        conditions += andOR;
+                        if (oprtr.Length == 2)
+                        {
+                            char[] charArray = oprtr.ToCharArray();
+                            conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
+                            conditions += " | ";
+                            conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                        }
+                        else
+                        {
+                            conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                        }
                     }
 
                 }
