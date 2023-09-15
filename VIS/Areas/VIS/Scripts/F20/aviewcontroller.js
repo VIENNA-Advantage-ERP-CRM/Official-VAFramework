@@ -1722,7 +1722,7 @@
     VIS.GridController.prototype.dataDelete = function () {
         var retValue = this.gTab.dataDelete(this.vTable.getSelection(true));
 
-        if (this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
+        if (this.vTabPanel && this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
             this.vTabPanel.curTabPanel.setisCheckListFill(false);
         }
 
@@ -1737,7 +1737,7 @@
         that.gTab.getTableModel().dataDeleteAsync(that.vTable.getSelection(true), that.gTab.currentRow).then(function (info) {
             that.gTab.setCurrentRow(that.gTab.currentRow, true);
 
-            if (that.vTabPanel.curTabPanel && that.vTabPanel.curTabPanel.isCheckListFill) {
+            if (that.vTabPanel && that.vTabPanel.curTabPanel && that.vTabPanel.curTabPanel.isCheckListFill) {
                 that.vTabPanel.curTabPanel.setisCheckListFill(false);
             }
 

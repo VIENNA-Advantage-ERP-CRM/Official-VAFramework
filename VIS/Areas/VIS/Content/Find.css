@@ -500,3 +500,46 @@ html[dir="rtl"] .vis-advancedSearchInput > label, html[dir="rtl"] .vis-advancedS
 .vis-advancedSearch-AddFilter {
 cursor:pointer;
 }
+
+.vis-batchUpdate-footerbtn {
+    position: absolute;
+    bottom: 0;
+    padding-right: 20px;
+    padding-left: 10px;
+    padding-bottom: 10px;
+}
+
+.vis-batchUpdate-inputwrap {
+    overflow: auto;
+    max-height: 337px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(var(--v-c-on-secondary), .2);
+}
+
+.vis-advancedSearchTableHeadBatch {
+    background: rgba(var(--v-c-secondary), 1);
+}
+
+.vis-advancedSearchTableHeadBatch > th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 10px 10px 10px 10px;
+    font-weight: 600;
+}
+
+.vis-advancedSearchTableRowBatch > td {
+    text-align: left;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 10px 10px 10px 10px;
+}
+
+.vis-batchUpdate-deletewrap {
+    text-align: center !important;
+    width:100px;
+}
+
+.vis-batchUpdate-font {
+    font-size: 15px;
+}

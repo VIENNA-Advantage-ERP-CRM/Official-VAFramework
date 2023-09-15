@@ -92,6 +92,7 @@ namespace VIS
                 "~/Areas/VIS/Scripts/app/Framework/appointments.js",
                 "~/Areas/VIS/Scripts/app/Framework/vpayment.js",
                 "~/Areas/VIS/Scripts/app/Framework/addnewproduct.js",
+                "~/Areas/VIS/Scripts/app/Framework/batchUpdate.js",
 
 
                 "~/Areas/VIS/Scripts/app/forms/generatexmodel.js",

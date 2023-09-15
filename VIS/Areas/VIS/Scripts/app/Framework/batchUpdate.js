@@ -45,7 +45,7 @@
 
                 + ' <div class="vis-form-group vis-advancedSearchInput vis-advancedSearchInput-v" id="divSetValue1_' + windowNo + '">'
                 + '   <label  id="lblSetQryValue_' + windowNo + '" for="QueryValue">' + VIS.Msg.getMsg("QueryValue") + '</label>'
-                + ' <input  id="txtSetQryValue_' + windowNo + '" type="text" name="QueryValue">'
+                + ' <input class="vis-batchUpdate-font" id="txtSetQryValue_' + windowNo + '" type="text" name="QueryValue">'
                 + '</div>'
 
                 + '<div class="vis-advancedSearch-calender-Icon ">'
@@ -55,13 +55,13 @@
                 + '</div>'
 
                 + '</div>'
-                + '<div class="vis-advanedSearch-InputsWrap vis-advs-inputwraps " style="overflow:auto; height:300px; margin-bottom:10px;border: 1px solid rgba(var(--v-c-on-secondary), .2);">'
+                + '<div class="vis-advanedSearch-InputsWrap vis-advs-inputwraps vis-batchUpdate-inputwrap">'
                 + '<table id="tblSetValue_' + windowNo + '" rules="rows" class="vis-advancedSearchTable">'
                 + '<thead>'
-                + '<tr class="vis-advancedSearchTableHead">'
+                + '<tr class="vis-advancedSearchTableHeadBatch">'
                 + '<th>' + VIS.Msg.translate(VIS.Env.getCtx(), "AD_Column_ID") + '</th>'
                 + '<th>' + VIS.Msg.translate(VIS.Env.getCtx(), "QueryValue") + '</th>'
-                + '<th>' + VIS.Msg.translate(VIS.Env.getCtx(), "Action") + '</th>'
+                + '<th class="vis-batchUpdate-deletewrap">' + VIS.Msg.translate(VIS.Env.getCtx(), "Action") + '</th>'
                 + '</tr>'
                 + '</thead>'
                 + '<div><tbody></tbody></div></table>'
@@ -69,10 +69,10 @@
                 + '</div>';
 
             html +=
-                '<div class="vis-advcedfooterBtn">'
+                '<div class="vis-advcedfooterBtn vis-batchUpdate-footerbtn">'
                 + '<div class="vis-ctrfrm-btnwrp">'
-                + '<button id="btnCancel_' + windowNo + '" class="ui-button ui-corner-all ui-widget mr-0 vis-pull-right"  style="margin: 0 10px;">' + VIS.Msg.getMsg("close") + '</button>'
-                + '<button id="btnOk_' + windowNo + '" class="ui-button ui-corner-all ui-widget vis-pull-right" >' + VIS.Msg.getMsg("Apply") + '</button>'
+                + '<button id="btnCancel_' + windowNo + '" class="ui-button ui-corner-all ui-widget vis-pull-right ml-2 mr-2">' + VIS.Msg.getMsg("close") + '</button>'
+                + '<button id="btnOk_' + windowNo + '" class="ui-button ui-corner-all ui-widget vis-pull-right ml-2">' + VIS.Msg.getMsg("Apply") + '</button>'
                 + '<div class="vis-ad-w-p-s-main pull-left"><div class="vis-ad-w-p-s-infoline"></div><div class="vis-ad-w-p-s-msg" style="align-items:flex-end;" id="divMessage_' + windowNo + '"></div></div>'
                 + '</div>'
                 + '</div>';
@@ -127,6 +127,9 @@
                             field.lookup = new VIS.MLookupFactory.getMLookUp(VIS.context, windowNo, field.getAD_Column_ID(), VIS.DisplayType.List);
                         }
                     }
+                }
+                if (field.getDisplayType() == VIS.DisplayType.Image) {
+                    continue;
                 }
                 var header = field.getHeader();
                 if (header == null || header.length == 0) {
@@ -435,11 +438,12 @@
                 colValue = cVal.toString();
             }
             if (tblSetValue.find('tbody [data-cVal="' + cVal + '"]').length > 0) {
+                VIS.ADialog.info('AlreadyAdded');
                 return;
             }
-            var htm = '<tr class="vis-advancedSearchTableRow"><td data-cVal="' + cVal + '">' + colName + '</td>'
+            var htm = '<tr class="vis-advancedSearchTableRowBatch"><td data-cVal="' + cVal + '">' + colName + '</td>'
                 + '<td data-setVal="' + getControlValue(true) + '">' + getControlText(true) + '</td>'
-                + '<td><i style="cursor:pointer" class="vis vis-delete" onclick="$(this).closest(\'tr\').remove()"></i></td></tr>'
+                + '<td class="vis-batchUpdate-deletewrap"><i style="cursor:pointer;" class="vis vis-delete" onclick="$(this).closest(\'tr\').remove()"></i></td></tr>'
             tblSetValue.find('tbody').append(htm);
         }
 
@@ -478,14 +482,13 @@
                         async: false,
                         data: JSON.stringify(obj),
                         success: function (result) {
-                            if (result) {
+                            if (result == "OK") {
                                 curTab.dataRefreshAll();
-                                divMessage.text(result);
                                 dispose();
                             }
                             else {
+                                divMessage.text(result);
                                 setBusy(false);
-                                divMessage.text(VIS.Msg.getMsg("BatchUpdateNotAllow"));
                             }
                         },
                         error: function (error) {
@@ -496,7 +499,6 @@
                 else {
                     return;
                 }
-
             });
         }
 
@@ -508,11 +510,11 @@
             ch = new VIS.ChildDialog();
             var windowWidth = $(window).width();
             if (windowWidth >= 1366) {
-                ch.setHeight(530);
+                ch.setHeight(550);
                 ch.setWidth(870);
             }
             else {
-                ch.setHeight(430);
+                ch.setHeight(450);
                 ch.setWidth(670);
             }
             ch.setTitle(VIS.Msg.getMsg("BatchUpdate"));
@@ -531,15 +533,14 @@
         //*************Clean Up ******************//
 
         function dispose() {
-            setBusy(false);
             ch.close();
             if ($root)
                 $root.remove();
             $root = null;
-            if (okBtn)
+            if (btnOk)
                 okBtn.off(VIS.Events.onClick);
             okBtn = null;
-            if (closeBtn)
+            if (btnCancel)
                 closeBtn.off(VIS.Events.onClick);
             closeBtn = null;
             AD_Table_ID = null;
@@ -558,6 +559,7 @@
             btnSetSave = null;
             tblSetValue = null;
             divMessage = null;
+            setBusy(false);
         }
 
         this.disposeComponent = function () {
