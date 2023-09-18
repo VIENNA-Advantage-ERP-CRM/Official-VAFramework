@@ -709,7 +709,7 @@
             editor.getControl()[0].tagName == 'TEXTAREA' || editor.getControl()[0].className == 'vis-progressCtrlWrap') && editor.getControl()[0].type != 'checkbox') {
             //editor.getControl().addClass("custom-select");
             ctrlP.append(editor.getControl().attr("placeholder", " ").attr("data-placeholder", ""));
-            if (label != null && mField.getDisplayType() != VIS.DisplayType.TelePhone) {
+            if (label != null) { // && mField.getDisplayType() != VIS.DisplayType.TelePhone)
                 ctrlP.append(label.getControl());
             }
         }

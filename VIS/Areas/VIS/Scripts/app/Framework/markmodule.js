@@ -148,7 +148,7 @@
                         chkbox = $("<input type='checkbox'>");
                         // htmlstr += "<tr><td><label class='vis-gc-vpanel-table-label-checkbox' style='display: inline-block; opacity: 1;'><input type='checkbox'>" + lstModules[j].Name + "</label></td></tr>";
                     }
-                    if (lstModules[i].Prefix == "VA093_") { //special check for marking requestd by auto marking team
+                    if (lstModules[j].Prefix == "VA093_") { //special check for marking requestd by auto marking team
                         chkbox.prop('disabled', true);
                     }
 
