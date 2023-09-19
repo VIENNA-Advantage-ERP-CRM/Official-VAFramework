@@ -318,7 +318,7 @@ VIS = window.VIS || {};
         function loadSurveyDesign(SurveyData, SurveyType, root, AD_Survey_ID) {
             var $dsgn;
             var stl = "width: calc(100% - 35px);height: calc(100% - 65px);position: absolute;";
-            if (self.curTab.getIsTPBottomAligned()) {
+            if (self.curTab && self.curTab.getIsTPBottomAligned()) {
                 stl = "";
             }
             var dsg = '<div class="VIS_SI_Main' + self.windowNo + '" style="' + stl+'">' +
@@ -420,7 +420,7 @@ VIS = window.VIS || {};
                 questionSection.append($dsgn);
                 var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
                 var stl1 ="bottom: 0px;position: absolute;width: calc(100% - 35px);"
-                if (self.curTab.getIsTPBottomAligned()) {
+                if (self.curTab && self.curTab.getIsTPBottomAligned()) {
                     stl1 = "bottom: 0px;position: absolute;width: calc(100% - 10px);";
                 }
                 var btns = '<div class="vis-survey" style="'+stl1+'">';
