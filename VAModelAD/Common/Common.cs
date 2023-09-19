@@ -1589,7 +1589,7 @@ namespace VAdvantage.Common
 
             string WhereCondition = "";
 
-            if (ShowEverytime == "N")
+            if (true)
             {
                 string sql = @"SELECT AD_Column.AD_column_ID,
                             ad_surveyshowcondition.seqno,AD_Column.ColumnName,ad_surveyshowcondition.operation,ad_surveyshowcondition.ad_equalto,ad_surveyshowcondition.Value2,
@@ -1798,10 +1798,6 @@ namespace VAdvantage.Common
                 {
                     isExist = false;
                 }
-            }
-            else if(ShowEverytime == "N")
-            {
-                isExist = false;
             }
             
 
