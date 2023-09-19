@@ -2779,7 +2779,7 @@
         function createPageSettings() {
             ulPaging = $('<ul class="vis-statusbar-ul">');
 
-            liPageNo = $('<li class="flex-fill"><div class="vis-ad-w-p-s-result"><span></span></div></li>');
+            liPageNo = $('<li class="flex-fill"><section class="vis-ad-w-p-s-result"><span></span></section></li>');
 
             liFirstPage = $('<li style="opacity: 1;"><div><i class="vis vis-shiftleft" title="' + VIS.Msg.getMsg("FirstPage") + '"  style="opacity: 0.6;"></i></div></li>');
 
