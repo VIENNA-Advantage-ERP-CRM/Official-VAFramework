@@ -195,7 +195,14 @@
         var launchReport = function (pp, Ad_Table_ID, TableID) {
             var queryInfo = [];
             queryInfo.push(query.getTableName());
-            queryInfo.push(query.getWhereClause(true));
+
+            if (query.reportWhere && query.reportWhere != "") {
+                queryInfo.push(query.reportWhere);
+            } else {
+                queryInfo.push(query.getWhereClause(true));
+            }
+
+            
             if (AD_Tab_ID) {
                 queryInfo.push(AD_Tab_ID.toString());
             }

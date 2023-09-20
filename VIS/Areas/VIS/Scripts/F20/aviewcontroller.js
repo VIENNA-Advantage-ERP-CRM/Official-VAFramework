@@ -1390,6 +1390,7 @@
     VIS.GridController.prototype.applyFilters = function (qry) {
 
         //var finalwhere = qry.getWhereClause();
+        var reportWhere = "";
         var whrs = [];
         if (this.searchCode && this.searchCode != '') {
             whrs.push(this.searchCode);
@@ -1405,12 +1406,19 @@
                 whrs.push(where);
             //qry.addRestriction(where);
         }
+        // For Report add Orignal Condition
+        reportWhere = qry.getWhereClause(true);
         qry.clear();
-        if (whrs.length > 0)
+        if (whrs.length > 0) {
             qry.addRestriction(whrs.join(' AND '));
-        else qry = null;
+            qry['reportWhere'] = reportWhere;
+        }
+        else {
+            qry = null
+        };
         //Set Page value to 1
         this.getMTab().getTableModel().setCurrentPage(1);
+        
         this.getMTab().setQuery(qry);
         this.query(0, 0, null);
     };
@@ -1722,7 +1730,7 @@
     VIS.GridController.prototype.dataDelete = function () {
         var retValue = this.gTab.dataDelete(this.vTable.getSelection(true));
 
-        if (this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
+        if (this.vTabPanel && this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
             this.vTabPanel.curTabPanel.setisCheckListFill(false);
         }
 
@@ -1737,7 +1745,7 @@
         that.gTab.getTableModel().dataDeleteAsync(that.vTable.getSelection(true), that.gTab.currentRow).then(function (info) {
             that.gTab.setCurrentRow(that.gTab.currentRow, true);
 
-            if (that.vTabPanel.curTabPanel && that.vTabPanel.curTabPanel.isCheckListFill) {
+            if (that.vTabPanel && that.vTabPanel.curTabPanel && that.vTabPanel.curTabPanel.isCheckListFill) {
                 that.vTabPanel.curTabPanel.setisCheckListFill(false);
             }
 
