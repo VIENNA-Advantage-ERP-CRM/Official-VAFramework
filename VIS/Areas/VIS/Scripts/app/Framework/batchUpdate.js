@@ -71,8 +71,8 @@
             html +=
                 '<div class="vis-advcedfooterBtn vis-batchUpdate-footerbtn">'
                 + '<div class="vis-ctrfrm-btnwrp">'
-                + '<button id="btnCancel_' + windowNo + '" class="ui-button ui-corner-all ui-widget vis-pull-right ml-2 mr-2">' + VIS.Msg.getMsg("close") + '</button>'
-                + '<button id="btnOk_' + windowNo + '" class="ui-button ui-corner-all ui-widget vis-pull-right ml-2">' + VIS.Msg.getMsg("Apply") + '</button>'
+            + '<button id="btnCancel_' + windowNo + '" class="ui-button ui-widget vis-pull-right ml-2 mr-2" style="border-radius: 0.1rem">' + VIS.Msg.getMsg("close") + '</button>'
+            + '<button id="btnOk_' + windowNo + '" class="ui-button ui-widget vis-pull-right ml-2" style="border-radius: 0.1rem">' + VIS.Msg.getMsg("Apply") + '</button>'
                 + '<div class="vis-ad-w-p-s-main pull-left"><div class="vis-ad-w-p-s-infoline"></div><div class="vis-ad-w-p-s-msg" style="align-items:flex-end;" id="divMessage_' + windowNo + '"></div></div>'
                 + '</div>'
                 + '</div>';
@@ -445,6 +445,9 @@
                 + '<td data-setVal="' + getControlValue(true) + '">' + getControlText(true) + '</td>'
                 + '<td class="vis-batchUpdate-deletewrap"><i style="cursor:pointer;" class="vis vis-delete" onclick="$(this).closest(\'tr\').remove()"></i></td></tr>'
             tblSetValue.find('tbody').append(htm);
+            drpSetColumns.val(-1);
+            setControlNullValue(true);
+
         }
 
         //*************Update records ******************//
