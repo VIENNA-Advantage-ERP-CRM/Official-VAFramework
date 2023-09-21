@@ -298,7 +298,7 @@ VIS.VTabbedPane.prototype.evaluate = function (e) {
     };
 
     VIS.VTabbedPane.prototype.notifyDataChanged = function (e) {
-        if (this.multiTabView && !e.getIsInserting() && !e.getIsChanged()) { /* do not fire on field value change*/
+        if (this.multiTabView) { //&& !e.getIsInserting() && !e.getIsChanged()) { /* do not fire on field value change*/
             this.contentPane.dataStatusChanged();
         }
     };
