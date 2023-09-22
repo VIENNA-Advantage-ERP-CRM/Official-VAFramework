@@ -118,8 +118,9 @@ VIS = window.VIS || {};
                 }
 
                 self.SaveData(Record_ID);
+            } else {
+                self.panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, this.curTab.getAD_Table_ID(), Record_ID, $root, 0);
             }
-            self.panelDetails(this.curTab.vo.AD_Window_ID, this.curTab.vo.AD_Tab_ID, this.curTab.getAD_Table_ID(), Record_ID, $root,0);
         }
 
         this.setisCheckListFill = function (value) {
@@ -317,7 +318,7 @@ VIS = window.VIS || {};
          */
         function loadSurveyDesign(SurveyData, SurveyType, root, AD_Survey_ID) {
             var $dsgn;
-            var stl = "width: calc(100% - 35px);height: calc(100% - 65px);position: absolute;";
+            var stl = "width: calc(100% - 35px);height: calc(100% - 71px);position: absolute;";
             if (self.curTab && self.curTab.getIsTPBottomAligned()) {
                 stl = "";
             }
