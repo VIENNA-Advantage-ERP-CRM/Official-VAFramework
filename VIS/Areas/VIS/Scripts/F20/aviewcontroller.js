@@ -506,6 +506,84 @@
         }
     };
 
+    VIS.GridController.prototype.getSurveyCondition = function (record_ID) {
+        if (this.vTabPanel && this.vTabPanel.curTabPanel.getSurveyCondition) {//&& $(this.vTabPanel.getRoot()).is(':visible'))
+            return this.vTabPanel.curTabPanel.getSurveyCondition();
+        }
+    };
+
+    /// Check Checklist required
+    VIS.GridController.prototype.IsCheckListRequire = function (callback) {
+
+        var isSurveyPanel = false;
+        if (this.gTab.getHasPanel()) {
+            var panels = this.gTab.getTabPanels();
+            for (var i = 0; i < panels.length; i++) {
+                if (panels[i].getClassName() == 'VIS.SurveyPanel') {
+                    isSurveyPanel = true;
+                    i = panels.length;
+                }
+            }
+        }
+
+        if (!isSurveyPanel) {
+            callback(true);
+            return;
+        }
+
+
+        var tableID = this.gTab.getAD_Table_ID();
+        var recordID = this.gTab.getRecord_ID();
+        var windowID = this.gTab.getAD_Window_ID();
+        var cIdx = this.gTab.currentRow;
+        var rowData = this.gTab;//.gridTable.getRow(cIdx);
+        var isCheckListFill = false;
+        if (this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
+            isCheckListFill = this.vTabPanel.curTabPanel.isCheckListFill;
+        }
+           
+        $.ajax({
+            async: false,
+            url: VIS.Application.contextUrl + "SurveyPanel/IsCheckListRequire",
+            data: {
+                AD_Window_ID: windowID,
+                AD_Table_ID: tableID,
+                Record_ID: recordID
+            },
+            success: function (data) {
+                data = JSON.parse(data);
+                data = data[0];
+
+                if (data.ResponseCount > 0) {
+                    callback(true);
+                }
+                else if (data.Condition != "") {
+                    var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
+                    if (isValidate && isCheckListFill) {
+                        callback(true);
+                    } else if (!isValidate) {
+                        callback(true);
+                    } else {
+                        callback(false);
+                    }
+
+                    
+                } else {
+                    callback(true);
+                }
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+
+    }
+
+    VIS.GridController.prototype.SaveSurvey = function (recordID) {
+        return this.vTabPanel.curTabPanel.SaveData(recordID);
+    }
+
+
     VIS.GridController.prototype.refreshFilterPanelData = function () {
         if (this.aFilterPanel) {//&& $(this.vTabPanel.getRoot()).is(':visible')) 
             this.aFilterPanel.refreshFilterOptions("", true);
@@ -1643,6 +1721,11 @@
 
     VIS.GridController.prototype.dataDelete = function () {
         var retValue = this.gTab.dataDelete(this.vTable.getSelection(true));
+
+        if (this.vTabPanel && this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.isCheckListFill) {
+            this.vTabPanel.curTabPanel.setisCheckListFill(false);
+        }
+
         this.refreshTabPanelData(this.gTab.getRecord_ID());
         this.dynamicDisplay(-1);
         return retValue;
@@ -1653,6 +1736,11 @@
         var that = this;
         that.gTab.getTableModel().dataDeleteAsync(that.vTable.getSelection(true), that.gTab.currentRow).then(function (info) {
             that.gTab.setCurrentRow(that.gTab.currentRow, true);
+
+            if (that.vTabPanel && that.vTabPanel.curTabPanel && that.vTabPanel.curTabPanel.isCheckListFill) {
+                that.vTabPanel.curTabPanel.setisCheckListFill(false);
+            }
+
             that.refreshTabPanelData(that.gTab.getRecord_ID());
             that.dynamicDisplay(-1);
             that.aPanel.setBusy(false);

@@ -504,7 +504,8 @@ namespace VAdvantage.Common
 
             string newpwdExpireDate = GlobalVariable.TO_DATE(DateTime.Now.AddMonths(passwordValidity), true);
 
-            string sql = "UPDATE AD_User set Updated=Sysdate,UpdatedBy=" + UpdatedBy + ",PasswordExpireOn=" + newpwdExpireDate + ",password='" + newPwd + "' WHERE AD_User_ID=" + AD_User_ID;
+            // VIS0060: Work done to set Last Password Updated on date when user changed the password.
+            string sql = "UPDATE AD_User set Updated=Sysdate, LastPwdUpdatedOn=SYSDATE, UpdatedBy=" + UpdatedBy + ",PasswordExpireOn=" + newpwdExpireDate + ",password='" + newPwd + "' WHERE AD_User_ID=" + AD_User_ID;
             int count = DB.ExecuteQuery(sql);
             if (count > 0)
                 return true;
@@ -1588,7 +1589,7 @@ namespace VAdvantage.Common
 
             string WhereCondition = "";
 
-            if (ShowEverytime == "N")
+            if (true)
             {
                 string sql = @"SELECT AD_Column.AD_column_ID,
                             ad_surveyshowcondition.seqno,AD_Column.ColumnName,ad_surveyshowcondition.operation,ad_surveyshowcondition.ad_equalto,ad_surveyshowcondition.Value2,
@@ -1797,10 +1798,6 @@ namespace VAdvantage.Common
                 {
                     isExist = false;
                 }
-            }
-            else if(ShowEverytime == "N")
-            {
-                isExist = false;
             }
             
 

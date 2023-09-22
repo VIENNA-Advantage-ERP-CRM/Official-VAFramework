@@ -4085,6 +4085,9 @@ table.fixed-header thead tr {
     min-width:50px;
 }
 
+.vis-BatchUpdateContentArea {
+    height: auto;
+}
 
 
 /* modify Ends */

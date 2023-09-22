@@ -114,7 +114,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="ModelLibrary, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\VAStandard\Official-VAStandard-ERP-CRM\ModelLibrary\bin\Debug\ModelLibrary.dll</HintPath>
+      <HintPath>..\ViennaAdvantageWeb\Dll\ModelLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -644,6 +644,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\archiveviewer.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentHistory.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\batchUpdate.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\bpartner.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\cardTemplateMaster.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\cardviewdialog.js" />
@@ -759,6 +760,7 @@
     <Compile Include="Areas\VIS\Controllers\ASearchController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentHistoryController.cs" />
+    <Compile Include="Areas\VIS\Controllers\BatchUpdateController.cs" />
     <Compile Include="Areas\VIS\Controllers\Bitmap.cs" />
     <Compile Include="Areas\VIS\Controllers\BPartnerController.cs" />
     <Compile Include="Areas\VIS\Controllers\CallOut\CalloutColumnController.cs" />
@@ -812,6 +814,7 @@
     <Compile Include="Areas\VIS\Helpers\MenuHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\ProcessHelper.cs" />
     <Compile Include="Areas\VIS\Models\AddProductModel.cs" />
+    <Compile Include="Areas\VIS\Models\BatchUpdateModel.cs" />
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />
     <Compile Include="Areas\VIS\Models\EmailModel.cs" />
     <Compile Include="Areas\VIS\Models\GmailContactsSettings.cs" />
