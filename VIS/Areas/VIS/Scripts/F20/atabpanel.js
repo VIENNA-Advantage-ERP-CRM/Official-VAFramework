@@ -95,7 +95,12 @@
                 return;
             }
             if (size && size > 40) {
-                $outerwrap.css('height', size + 'px');
+                if (this.curTabPanel.curTab.getIsTPBottomAligned()) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023 
+                    $outerwrap.css('height','100%');
+                } else {
+                    $outerwrap.css('height', size + 'px');
+                }
+                
                 $outerwrap.css('width', size + 'px');
                 this.isClosed = false;
                 $divHead.show();

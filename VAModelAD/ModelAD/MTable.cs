@@ -498,8 +498,17 @@ namespace VAdvantage.Model
             string tableName = GetTableName();
             if (Record_ID != 0 && !IsSingleKey())
             {
-                log.Log(Level.WARNING, "(id) - Multi-Key " + tableName);
-                return null;
+               int id= Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Column_ID FROM AD_Column WHERE ColumnName='"+ tableName + "_ID' AND AD_Table_ID=" + GetAD_Table_ID()));
+                if (id > 0)
+                {
+                    return GetPO(ctx, tableName+"_ID=" + Record_ID, trxName);
+                }
+                else
+                {
+                    log.Log(Level.WARNING, "(id) - Multi-Key " + tableName);
+                    return null;
+                }
+                
             }
             PO po = null;
             List<IModelFactory> factoryList = VAModelAD.Classes.ModelFactoryLoader.GetList();
