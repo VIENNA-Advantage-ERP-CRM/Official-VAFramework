@@ -204,15 +204,15 @@ select.vis-ev-col-mandatory {
     border-left: 1px solid rgba(var(--v-c-secondary),1);
 }
 
-.vis-input-wrap input:focus ~ label, 
-.vis-input-wrap input:not(:placeholder-shown) ~ label, 
-.vis-input-wrap textarea:not(:placeholder-shown) ~ label, 
-.vis-input-wrap select:focus ~ label, 
-.vis-input-wrap textarea:focus ~ label, 
+.vis-input-wrap input:focus ~ label,
+.vis-input-wrap input:not(:placeholder-shown) ~ label,
+.vis-input-wrap textarea:not(:placeholder-shown) ~ label,
+.vis-input-wrap select:focus ~ label,
+.vis-input-wrap textarea:focus ~ label,
 .vis-input-wrap select ~ label {
     top: -7px;
     font-size: 12px;
-    background: linear-gradient(#fff 50%, transparent 50%);
+    background: linear-gradient(rgba(var(--v-c-common), 1) 50%, transparent 50%);
     padding: 0 0.4rem;
     height: auto;
     left: 5px;
@@ -416,6 +416,8 @@ label.vis-ec-col-lblchkbox {
     font-size: .875rem;
 }
 
+
+
 /*.vis-ev-col label.vis-ec-col-lblchkbox {
     color: rgba(var(--v-c-on-secondary), 1);
     align-items: center;
@@ -475,6 +477,33 @@ label.vis-ec-col-lblchkbox + .vis-ev-ctrlinfowrap {
 .vis-input-wrap label + button + .vis-ev-ctrlinfowrap {
     margin-top: 21px;
 }
+
+
+/* Telephone control*/
+.vis-input-wrap .iti--allow-dropdown + label {
+    left: 80px;
+    background: rgba(var(--v-c-common), 1);
+    height: 80%;
+    bottom: 0;
+    margin: auto;
+    width: Calc(100% - 85px);
+}
+
+.vis-input-wrap .iti--allow-dropdown:has(input:focus) + label,
+.vis-input-wrap .iti--allow-dropdown:has(input:not(:placeholder-shown)) ~ label 
+{
+    top: -7px;
+    font-size: 12px;
+    background: linear-gradient(rgba(var(--v-c-common), 1) 50%, transparent 50%);
+    padding: 0 0.4rem;
+    height: auto;
+    left: 80px;
+    opacity: 1;
+    color: rgba(var(--v-c-on-secondary), 1);
+    width: auto;
+    bottom: auto;
+}
+
 
 /*bootstrap popover*/
 .popover {
@@ -688,7 +717,7 @@ input[type="radio"]:not(:checked){
 .vis-input-wrap .vis-progressCtrlWrap ~ .vis-ev-ctrlinfowrap,
 .w2ui-editable .vis-progressCtrlWrap ~ .vis-ev-ctrlinfowrap {
     left: 0;
-    Top: 2px !important;
+    padding-top: 12px !important;
 }
 
 .w2ui-grid-data .vis-progressCtrlWrap {

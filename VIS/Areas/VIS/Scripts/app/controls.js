@@ -79,7 +79,7 @@
         return result;
     };
 
-    
+
 
 
     VIS.DisplayType = {
@@ -87,7 +87,7 @@
         YesNo: 20, Location: 21, Number: 22, Binary: 23, Time: 24, Account: 25, RowID: 26, Color: 27, Button: 28, Quantity: 29,
         Search: 30, Locator: 31, Image: 32, Assignment: 33, Memo: 34, PAttribute: 35, TextLong: 36, CostPrice: 37, FilePath: 38,
         FileName: 39, URL: 40, PrinterName: 42, Label: 44, MultiKey: 45, GAttribute: 46, AmtDimension: 47, ProductContainer: 48, ProgressBar: 49,
-        TelePhone:50,
+        TelePhone: 50,
 
         IsString: function (displayType) {
             return VIS.DisplayType.String == displayType;
@@ -124,7 +124,7 @@
             if (displayType == VIS.DisplayType.ID || displayType == VIS.DisplayType.Table || displayType == VIS.DisplayType.TableDir
                 || displayType == VIS.DisplayType.Search || displayType == VIS.DisplayType.Location || displayType == VIS.DisplayType.Locator
                 || displayType == VIS.DisplayType.Account || displayType == VIS.DisplayType.Assignment || displayType == VIS.DisplayType.PAttribute
-                || displayType == VIS.DisplayType.Image ||  displayType == VIS.DisplayType.AmtDimension || displayType == VIS.DisplayType.ProductContainer)
+                || displayType == VIS.DisplayType.Image || displayType == VIS.DisplayType.AmtDimension || displayType == VIS.DisplayType.ProductContainer)
                 return true;
             return false;
         },
@@ -759,10 +759,20 @@
             //    return;
             if (this.activeClass == e)
                 return;
+            //if (e.length > 0 && (e.indexOf(['vis-ev-col-error', 'vis-ev-col-readonly', 'vis-ev-col-mandatory']) > -1)) {
+            //    var oldC = this.ctrl.attr('class');
+            //   if(oldC.length>0) {
+            //       this.oldClass = oldC;
+            //    }
+            //}
 
-            this.ctrl.removeClass();
+            this.ctrl.removeClass('vis-ev-col-error');
+            this.ctrl.removeClass('vis-ev-col-readonly');
+            this.ctrl.removeClass('vis-ev-col-mandatory');
+
             if (e.length > 0)
                 this.ctrl.addClass(e);
+            
             this.activeClass = e;
             //this.ctrl.css('background-color', color);
             //console.log(this.ctrl.css('background-color'));
@@ -2420,7 +2430,7 @@
                 options[VIS.Actions.update] = true
             }
 
-            if (columnName === "M_Product_ID") { 
+            if (columnName === "M_Product_ID") {
                 options[VIS.Actions.addnewrec] = false;
                 options[VIS.Actions.add] = false; //false by Ruby as discuss with Mandeep Sir/Mukesh Arora Sir --02 May 2023
                 options[VIS.Actions.update] = true;
@@ -3536,7 +3546,7 @@
                 else if (action == VIS.Actions.addproduct) {
                     var val = self.getValue();
                     VIS.AddUpdateMProduct(self.mField.getWindowNo(), 0, VIS.Msg.getMsg("Product"), null, 0, 0);
-                   
+
                 }
                 else if (action == VIS.Actions.update) {
                     var val = self.getValue();
@@ -6501,22 +6511,22 @@
 
     VIS.Utility.inheritPrototype(VKeyText, IControl); //Inherit
 
-    VKeyText.prototype.setValue = function (newValue, isHTML,records) {
+    VKeyText.prototype.setValue = function (newValue, isHTML, records) {
         var validation = null;
         var validationData = [];
-       
+
         if (this.needtoParse) {
             if (records && !$.isEmptyObject(records)) { // parse sql query with records 
                 validationData = VIS.Env.parseSQLFromRecords(this.colSql, records);
                 for (var i = 0; i < validationData.length > 0; i++) {
-                    this.colSql = this.colSql.replace('@'+validationData[i].Key+'@', validationData[i].Value);
+                    this.colSql = this.colSql.replace('@' + validationData[i].Key + '@', validationData[i].Value);
                 }
                 validation = this.colSql;
             } else {
                 validationData = VIS.Env.parseContext2(VIS.context, this.windowNo, 0, this.colSql, false, true);
                 validation = VIS.Env.parseContext(VIS.context, this.windowNo, 0, this.colSql, false, true);
             }
-            
+
         }
         else {
             validation = this.colSql;
@@ -6599,19 +6609,19 @@
         }
     };
 
-    
+
 
     // VProgressBar
 
     function VProgressBar(columnName, isMandatory, isReadOnly, isUpdateable, displayLength, fieldLength, controlDisplayType) {
-        var $ctrl = $('<div class="vis-progressCtrlWrap">');
+        var $ctrl = $('<div class="vis-progressCtrlWrap"></div>');
         var $rangeCtrl = $('<input>', { type: 'range', step: '1', name: columnName, maxlength: fieldLength, 'data-type': 'int' });
         var $oputput = $('<output  class="vis-progress-output">');
 
         $ctrl.append($oputput).append($rangeCtrl);
 
 
-        IControl.call(this, $ctrl, controlDisplayType, isReadOnly, columnName, isMandatory);        
+        IControl.call(this, $ctrl, controlDisplayType, isReadOnly, columnName, isMandatory);
 
         this.rangeCtrl = $rangeCtrl;
         this.oputput = $oputput;
@@ -6734,6 +6744,8 @@
         this.ctrl.find('output').attr('contenteditable', readOnly ? false : true);
         this.setBackground(false);
     };
+
+    
 
     VProgressBar.prototype.setHtmlStyle = function (style) {
         if (style && this.dynStyle != style) {
