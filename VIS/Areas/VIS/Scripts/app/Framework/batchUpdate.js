@@ -391,6 +391,15 @@
             return "";
         };
 
+        function getControlType() {
+            var crtlObj = null;
+            crtlObj = control1;
+            if (crtlObj != null) {
+                return crtlObj.getDisplayType();
+            }
+            return 0;
+        };
+
         function getControlText(isValue1) {
             var crtlObj = null;
             // get control
@@ -442,7 +451,7 @@
                 return;
             }
             var htm = '<tr class="vis-advancedSearchTableRowBatch"><td data-cVal="' + cVal + '">' + colName + '</td>'
-                + '<td data-setVal="' + getControlValue(true) + '">' + getControlText(true) + '</td>'
+                + '<td data-settype="' + getControlType() +'" data-setVal="' + getControlValue(true) + '">' + getControlText(true) + '</td>'
                 + '<td class="vis-batchUpdate-deletewrap"><i style="cursor:pointer;" class="vis vis-delete" onclick="$(this).closest(\'tr\').remove()"></i></td></tr>'
             tblSetValue.find('tbody').append(htm);
         }
@@ -456,7 +465,7 @@
                 objSetValue.push({
                     column: $(this).find('td:eq(0)').data('cval'),
                     setValue: $(this).find('td:eq(1)').data('setval'),
-
+                    setType: $(this).find('td:eq(1)').data('settype')
                 });
             });
             if (objSetValue.length == 0) {
@@ -538,8 +547,8 @@
                 $root.remove();
             $root = null;
             if (btnOk)
-                okBtn.off(VIS.Events.onClick);
-            okBtn = null;
+                btnOk.off(VIS.Events.onClick);
+            btnOk = null;
             if (btnCancel)
                 closeBtn.off(VIS.Events.onClick);
             closeBtn = null;
