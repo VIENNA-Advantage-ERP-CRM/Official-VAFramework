@@ -247,6 +247,8 @@ namespace VAdvantage.CrystalReport
                                             else if (Convert.ToInt32(dsPara.Tables[0].Rows[c]["AD_Reference_ID"]) == DisplayType.DateTime ||
                                                 Convert.ToInt32(dsPara.Tables[0].Rows[c]["AD_Reference_ID"]) == DisplayType.Time)
                                             {
+                                               
+
                                                 if (paramValue != null && paramValueTo != null)
                                                 {
                                                     sb.Append("TRUNC(" + paramName + ",'MI')").Append(" BETWEEN ").Append("TO_DATE('" + Convert.ToDateTime(paramValue).ToString("yyyy-MM-dd HH:mm") + "','YYYY-MM-DD HH24:MI')");
@@ -341,7 +343,8 @@ namespace VAdvantage.CrystalReport
                                         {
                                             if (paramValue != null)
                                             {
-                                                string val = Convert.ToDateTime(parameters[para].GetInfo()).ToString();
+
+                                                string val = Convert.ToDateTime(parameters[para].GetInfo()).ToUniversalTime().ToString();
 
                                                 if (val.Contains("12:00:00"))
                                                 {
@@ -366,7 +369,7 @@ namespace VAdvantage.CrystalReport
 
                                             if (!String.IsNullOrEmpty(sInfoTo))
                                             {
-                                                string val = Convert.ToDateTime(parameters[para].GetInfo_To()).ToString();
+                                                string val = Convert.ToDateTime(parameters[para].GetInfo_To()).ToUniversalTime().ToString();
                                                 //incrementCount++;
 
                                                 if (val.Contains("12:00:00"))
@@ -1127,6 +1130,9 @@ namespace VAdvantage.CrystalReport
                                         {
                                             if (Convert.ToInt32(dsPara.Tables[0].Rows[c]["AD_Reference_ID"]) == DisplayType.Date)
                                             {
+                                                paramValue = Convert.ToDateTime(paramValue).ToUniversalTime();
+                                                paramValueTo = Convert.ToDateTime(paramValueTo).ToUniversalTime();
+
                                                 if (paramValue != null && paramValueTo != null)
                                                 {
                                                     sb.Append("TRUNC(" + paramName + ",'DD')").Append(" BETWEEN ").Append(GlobalVariable.TO_DATE((DateTime)paramValue, true));
@@ -1220,7 +1226,7 @@ namespace VAdvantage.CrystalReport
                                         {
                                             if (paramValue != null)
                                             {
-                                                string val = Convert.ToDateTime(parameters[para].GetInfo()).ToString();
+                                                string val = Convert.ToDateTime(parameters[para].GetInfo()).ToUniversalTime().ToString();
 
                                                 if (val.Contains("12:00:00"))
                                                 {
@@ -1245,7 +1251,7 @@ namespace VAdvantage.CrystalReport
 
                                             if (!String.IsNullOrEmpty(sInfoTo))
                                             {
-                                                string val = Convert.ToDateTime(parameters[para].GetInfo_To()).ToString();
+                                                string val = Convert.ToDateTime(parameters[para].GetInfo_To()).ToUniversalTime().ToString();
 
                                                 if (val.Contains("12:00:00"))
                                                 {
