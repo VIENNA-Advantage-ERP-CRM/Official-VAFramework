@@ -368,6 +368,7 @@
     <Compile Include="ProcessAD\SystemValidate.cs" />
     <Compile Include="ProcessAD\TabCreateFields.cs" />
     <Compile Include="ProcessAD\TableCreateColumns.cs" />
+    <Compile Include="ProcessAD\TableIndexConstraints.cs" />
     <Compile Include="ProcessAD\TableIndexValidate.cs" />
     <Compile Include="ProcessAD\TransactionXRef.cs" />
     <Compile Include="ProcessAD\TranslationDocSync.cs" />
