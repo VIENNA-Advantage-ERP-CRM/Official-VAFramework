@@ -3545,6 +3545,7 @@
         }
 
         if (this.curWinTab == this.vTabbedPane) {
+            VIS.context.setContext(this.curWindowNo,"tb_Index" , this.curTabIndex);
             this.curWinTab.evaluate(null);
             this.curWinTab.notifyDataChanged(e);
         }

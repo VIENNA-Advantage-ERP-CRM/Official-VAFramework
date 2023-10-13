@@ -599,9 +599,14 @@
     };	//	i
 
     GridTab.prototype.getValueAsString = function (variableName) {
-        var value = VIS.context.getWindowContext(this.vo.windowNo, variableName, true);
-        if( value === undefined)
-         value = VIS.context.getWindowContext(this.vo.windowNo, this.vo.tabNo, variableName, true);
+        var curTabIndex = VIS.context.getContext(this.vo.windowNo, "tb_Index",true);
+
+        if (curTabIndex == this.vo.tabNo) {// 1 && this.vo.windowNo + "|" + variableName in VIS.context.m_map[this.vo.windowNo])
+            value = VIS.context.getWindowContext(this.vo.windowNo, this.vo.tabNo, variableName, true);
+        }
+        else
+           value = VIS.context.getWindowContext(this.vo.windowNo, variableName, true);
+       
         if (!value) {
             return '';
         }
