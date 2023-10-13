@@ -155,7 +155,22 @@ namespace VAdvantage.Model
             sb.Append(unqConstraints);
             sb.Append(")");
             return sb.ToString();
-        }	//	getSQLCreate
+        }   //	getSQLCreate
+
+        public static bool IsZeroIDTables(string tableName)
+        {
+            if (String.Equals(tableName, "AD_Org", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(tableName, "AD_ReportView", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(tableName, "AD_Role", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(tableName, "AD_System", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(tableName, "AD_User", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(tableName, "C_DocType", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(tableName, "GL_Category", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(tableName, "M_AttributeSet", StringComparison.OrdinalIgnoreCase) ||
+                String.Equals(tableName, "M_AttributeSetInstance", StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
+        }
 
 
 

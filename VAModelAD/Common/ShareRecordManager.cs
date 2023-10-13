@@ -36,20 +36,22 @@ namespace VAdvantage.Common
 
 
             DataSet ds = DB.ExecuteDataset("SELECT Distinct AD_Table_ID, Record_ID, AD_ORGSHARED_ID, IsReadOnly,IsChildShare FROM AD_ShareRecordOrg ORDER BY AD_Table_ID");
-            for (int a = 0; a < ds.Tables[0].Rows.Count; a++)
+            if (ds != null)
             {
-                ShareOrg org = new ShareOrg();
-                org.OrgID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_OrgShared_ID"]);
-                org.RecordID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["Record_ID"]);
-                org.Readonly = ds.Tables[0].Rows[a]["IsReadOnly"].ToString() == "Y" ? true : false;
-                org.ChildShare = ds.Tables[0].Rows[a]["IsChildShare"].ToString() == "Y" ? true : false;
+                for (int a = 0; a < ds.Tables[0].Rows.Count; a++)
+                {
+                    ShareOrg org = new ShareOrg();
+                    org.OrgID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_OrgShared_ID"]);
+                    org.RecordID = Util.GetValueOfInt(ds.Tables[0].Rows[a]["Record_ID"]);
+                    org.Readonly = ds.Tables[0].Rows[a]["IsReadOnly"].ToString() == "Y" ? true : false;
+                    org.ChildShare = ds.Tables[0].Rows[a]["IsChildShare"].ToString() == "Y" ? true : false;
 
-                if (!tableRecordHirarerichy.ContainsKey(Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])))
-                    tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] = new List<ShareOrg>();
-                //Dictionary of tableID and list of records of that table which are shared
-                tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])].Add(org);
+                    if (!tableRecordHirarerichy.ContainsKey(Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])))
+                        tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])] = new List<ShareOrg>();
+                    //Dictionary of tableID and list of records of that table which are shared
+                    tableRecordHirarerichy[Util.GetValueOfInt(ds.Tables[0].Rows[a]["AD_Table_ID"])].Add(org);
+                }
             }
-
             encludedTableHirarichy.Clear();
 
             string qry = "SELECT distinct t.AD_Table_ID FROM AD_Table t INNER JOIN AD_Tab tab ON t.AD_Table_ID=tab.AD_Table_ID WHERE tab.AD_Window_ID IN (SELECT AD_WIndow_ID FROM AD_Window WHERE  IsActive='Y' AND WindowType ='M') AND tab.IsActive='Y' AND IsView='N'";
