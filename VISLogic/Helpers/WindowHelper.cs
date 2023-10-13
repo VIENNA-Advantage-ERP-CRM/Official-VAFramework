@@ -82,6 +82,8 @@ namespace VIS.Helpers
 
             key = ctx.GetSecureKey();
 
+           
+
             try
             {
                 if (!tableName.EndsWith("_Trl"))	//	translation tables have no model
@@ -1000,7 +1002,7 @@ namespace VIS.Helpers
             //};
             // VIS0008 Create PO object for original screen from where record is being saved
             int Ver_Window_ID = 0;
-            PO OrigPO = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, false, out Ver_Window_ID);
+            PO OrigPO = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, false, inserting, out Ver_Window_ID);
 
             // check if Maintain versions property is true / else skip
             if (inn.MaintainVersions)
@@ -1047,7 +1049,7 @@ namespace VIS.Helpers
                         trxMas = Trx.Get("VerTrx" + System.DateTime.Now.Ticks);
                         ctx.SetContext("VerifyVersionRecord", "Y");
                         int parentWinID = inn.AD_WIndow_ID;
-                        PO poMas = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trxMas, parentWinID, inn.AD_Table_ID, true, out parentWinID);
+                        PO poMas = GetPO(ctx, AD_Table_ID, Record_ID, whereClause, trxMas, parentWinID, inn.AD_Table_ID, true, inserting, out parentWinID);
                         //	No Persistent Object
 
                         if (poMas == null)
@@ -1161,7 +1163,7 @@ namespace VIS.Helpers
             }
 
             Ver_Window_ID = 0;
-            PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, out Ver_Window_ID);
+            PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, inserting,out Ver_Window_ID);
 
             for (int i = 0; i < lstColumns.Count; i++)
             {
@@ -1294,7 +1296,7 @@ namespace VIS.Helpers
             if (inn.MaintainVersions)
             {
                 var masDet = po.GetMasterDetails();
-                po = GetPO(ctx, AD_Table_ID, masDet.Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, true, out Ver_Window_ID);
+                po = GetPO(ctx, AD_Table_ID, masDet.Record_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, true, inserting, out Ver_Window_ID);
                 //	No Persistent Object
                 if (po == null)
                 {
@@ -1504,7 +1506,7 @@ namespace VIS.Helpers
                 return true;
 
             int parentWinID = inn.AD_WIndow_ID;
-            PO po = GetPO(ctx, inn.AD_Table_ID, inn.Record_ID, inn.WhereClause, null, inn.AD_WIndow_ID, inn.AD_Table_ID, false, out parentWinID);
+            PO po = GetPO(ctx, inn.AD_Table_ID, inn.Record_ID, inn.WhereClause, null, inn.AD_WIndow_ID, inn.AD_Table_ID, false, inserting, out parentWinID);
 
             int size = m_fields.Count;
 
@@ -1675,14 +1677,38 @@ namespace VIS.Helpers
             return Util.GetValueOfInt(DB.ExecuteScalar(sql, null, _trx)) > 0;
         }
 
-        private PO GetPO(Ctx ctx, int AD_Table_ID, int Record_ID, string whereClause, Trx trx, int CurrWindow_ID, int CurrTable_ID, bool isMaintainVer, out int AD_Window_ID)
+        private PO GetPO(Ctx ctx, int AD_Table_ID, int Record_ID, string whereClause, Trx trx, int CurrWindow_ID, int CurrTable_ID, bool isMaintainVer, bool inserting, out int AD_Window_ID)
         {
             MTable table = MTable.Get(ctx, AD_Table_ID);
+
+            //Special Check ID zero tables
+            bool _idZeroUpdate = false;
+            if (!inserting // not inserting, updating a record 
+                && (ctx.GetAD_User_ID() == 0 || ctx.GetAD_User_ID() == 100)  // Hard Coded for System and SuperUser only
+                && Record_ID == 0)
+            { // the record being changed has ID = 0
+                if (MTable.IsZeroIDTables(table.GetTableName()))
+                {
+                    _idZeroUpdate = true;
+                }
+            }
+
             PO po = null;
             // VIS0008 change to handle save of OrgInfo (record without PK) through PO
             if ((table.IsSingleKey() && table.HasPKColumn()) || Record_ID == 0)
             {
-                po = table.GetPO(ctx, Record_ID, trx);
+                if (!_idZeroUpdate)
+                {
+                    po = table.GetPO(ctx, Record_ID, trx);
+                }
+                else
+                {
+                    //po = table.GetPO(ctx, table.GetTableName() + "_ID=" + Record_ID, trx);
+                    
+                    po = null;
+                    /* intentially by pass PO , will handle in next release 
+                     will undo code in next release (Break dependency on vienna base of this hotfix)*/
+                }
             }
             else	//	Multi - Key
             {

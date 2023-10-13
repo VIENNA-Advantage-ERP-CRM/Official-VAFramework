@@ -296,7 +296,7 @@ namespace VAdvantage.Model
                     s_log.Severe("Error Generating Export ID for Table " + TableName + ": " + e.ToString());
                     return -1;
                 }
-                conn = null;
+               // conn = null;
             }	//	loop
 
             return retValue;
