@@ -31,7 +31,7 @@ namespace VIS.Helpers
         /// <param name="roles">out roles , has role list of user</param>
         /// <param name="ctx" ></param>
         /// <returns>true if athenicated</returns>
-        public static bool Login(LoginModel model, out List<KeyNamePair> roles)
+        public static bool Login(LoginModel model, out List<KeyNamePair> roles, bool isSSO)
         {
             // loginModel = null;
             //bool isMatch = false;
@@ -56,6 +56,11 @@ namespace VIS.Helpers
 
                 isLDAP = true;
             }
+
+            if (isSSO) {
+                authenticated = true;
+            }
+
             //Save Failed Login Count and Password validty in cache
             GetSysConfigForlogin();
 

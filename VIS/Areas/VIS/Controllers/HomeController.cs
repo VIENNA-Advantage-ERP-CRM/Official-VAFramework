@@ -24,6 +24,11 @@ using VAdvantage.Login;
 using VAdvantage.Logging;
 using System.Data;
 using System.Threading;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.OpenIdConnect;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security.Cookies;
+using System.Security.Claims;
 
 namespace VIS.Controllers
 {
@@ -46,7 +51,30 @@ namespace VIS.Controllers
         private static bool isBundleAdded = false;
         private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
+        public ActionResult SignIn()
+        {           
+            if (!Request.IsAuthenticated)
+            {
+                HttpContext.GetOwinContext().Authentication.Challenge(
+                    new AuthenticationProperties { RedirectUri = "Account/ExternalLoginCallback" },
+                    OpenIdConnectAuthenticationDefaults.AuthenticationType);
+                return new HttpUnauthorizedResult();
+            }
+            else
+            {
+             return  RedirectToAction("Index");
+            }
+        }
 
+        /// <summary>
+        /// Send an OpenID Connect sign-out request.
+        /// </summary>
+        public void SignOut()
+        {
+            HttpContext.GetOwinContext().Authentication.SignOut(
+                    OpenIdConnectAuthenticationDefaults.AuthenticationType,
+                    CookieAuthenticationDefaults.AuthenticationType);
+        }        
 
         //public ActionResult Index(string param )
         //{
@@ -69,7 +97,6 @@ namespace VIS.Controllers
         /// <returns></returns>
         public ActionResult Index(FormCollection form)
         {
-
 
             //if (LoginHelper.IsSiteUnderMaintenance())
             //{
@@ -139,12 +166,13 @@ namespace VIS.Controllers
 
                 //AccountController a = new AccountController();
                 //a.LogOff();
-                FormsIdentity ident = User.Identity as FormsIdentity;
+                var ident = (ClaimsIdentity)User.Identity;
                 Ctx ctx = null;
                 if (ident != null)
                 {
-                    FormsAuthenticationTicket ticket = ident.Ticket;
-                    string loginContextString = ticket.UserData; // get login context string from Form Ticket
+                    //FormsAuthenticationTicket ticket = ident.Ticket;
+                   
+                    string loginContextString = ident.FindFirst(ClaimTypes.UserData).Value; // get login context string from Form Ticket
                     LoginContext lCtx = JsonHelper.Deserialize(loginContextString, typeof(LoginContext)) as LoginContext;
                     IDataReader dr = null;
 

@@ -14,12 +14,53 @@ using System.ComponentModel;
 using System.Threading;
 using Newtonsoft.Json;
 using VAdvantage.Logging;
+using System.Security.Claims;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.OpenIdConnect;
+using Microsoft.Owin.Security.Cookies;
+using CoreLibrary.DataBase;
 
 namespace VIS.Controllers
 {
 
     public class AccountController : Controller
     {
+
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult ExternalLoginCallback()
+        {
+            //    var identity = HttpContext.GetOwinContext().Authentication.GetExternalIdentityAsync(DefaultAuthenticationTypes.ApplicationCookie);
+            //    if (identity == null)
+            //    {
+            //         RedirectToAction("Login");
+            //    }
+            if (!Request.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
+            var Username = userClaims?.FindFirst("preferred_username")?.Value;
+            string qry = Util.GetValueOfString(DB.ExecuteScalar("SELECT value FROM AD_User WHERE email='"+ Username + "'"));
+            if (qry.Length > 0)
+            {
+                LoginModel model = new LoginModel();
+                model.Login1Model = new Login1Model();
+                model.Login1Model.UserValue = qry;
+                CommonLogin(model, "/", true);
+
+            }
+            else
+            {
+                LogOff();
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
         //
         // POST: /Account/JsonLogin
 
@@ -27,6 +68,12 @@ namespace VIS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public JsonResult JsonLogin(LoginModel model, string returnUrl)
+        {            
+            return CommonLogin(model, returnUrl,false);
+        }
+
+
+        public JsonResult CommonLogin(LoginModel model, string returnUrl, bool isSSO)
         {
             if (ModelState.IsValid)
             {
@@ -130,7 +177,7 @@ namespace VIS.Controllers
                     //Pwd is assigned to tempdata, bcoz if user's passsword setting is encrypted, then code encrypt the pwd to use in query.
                     //But original pwd entered by user is required in reset pwd setup.. to match with new pwd.
                     TempData["Password"] = model.Login1Model.Password;
-                    if (LoginHelper.Login(model, out roles))
+                    if (LoginHelper.Login(model, out roles, isSSO))
                     {
                         // ViewBag.QRCodeURL = model.Login1Model.QRCodeURL;
                         TempData["roles"] = roles;
@@ -166,6 +213,7 @@ namespace VIS.Controllers
             // If we got this far, something failed
             return Json(new { errors = GetErrorsFromModelState() });
         }
+
         [NonAction]
         private JsonResult Login(LoginModel model, string returnUrl, List<KeyNamePair> roles)
         {
@@ -246,27 +294,48 @@ namespace VIS.Controllers
         /// <param name="response">http response</param>
         internal void SetAuthCookie(LoginModel model, HttpResponseBase response)
         {
+            var claims = new List<Claim>();
             LoginContext lCtx = LoginHelper.GetLoginContext(model);
-            response.Cookies.Clear();
-
-            DateTime expiryDate = DateTime.Now.AddDays(30);
-
-            HttpCookie authCookie = FormsAuthentication.GetAuthCookie(model.Login1Model.UserValue, model.Login1Model.RememberMe);
-
-            if (model.Login1Model.RememberMe)
+            try
             {
-                authCookie.Expires = expiryDate;
+                // Setting
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Login1Model.UserValue));
+                claims.Add(new Claim(ClaimTypes.UserData, JsonHelper.Serialize(lCtx)));
+                var claimIdenties = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+                var ctx = Request.GetOwinContext();
+                var authenticationManager = ctx.Authentication;
+                // Sign In.
+                authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = model.Login1Model.RememberMe }, claimIdenties);
             }
+            catch (Exception ex)
+            {
+                // Info
+                throw ex;
+            }
+            //LoginContext lCtx = LoginHelper.GetLoginContext(model);
+            //response.Cookies.Clear();
 
-            FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
+            //DateTime expiryDate = DateTime.Now.AddDays(30);
 
-            FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, model.Login1Model.RememberMe ? expiryDate : ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
+            //HttpCookie authCookie = FormsAuthentication.GetAuthCookie(model.Login1Model.UserValue, model.Login1Model.RememberMe);
 
-            // Update the authCookie's Value to use the encrypted version of newTicket
+            //if (model.Login1Model.RememberMe)
+            //{
+            //    authCookie.Expires = expiryDate;
+            //}
 
-            authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+            //FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
 
-            response.Cookies.Add(authCookie);
+            //FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, model.Login1Model.RememberMe ? expiryDate : ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
+
+            //// Update the authCookie's Value to use the encrypted version of newTicket
+
+            //authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+            //response.Cookies.Add(authCookie);
+
+
+
+
         }
 
         [AllowAnonymous]
@@ -388,7 +457,22 @@ namespace VIS.Controllers
         {
            if (ctx != null)
              VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx);
-            FormsAuthentication.SignOut();
+            //FormsAuthentication.SignOut();
+            HttpContext.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            if (Request.IsAuthenticated)
+            {
+                var userClaims = System.Security.Claims.ClaimsPrincipal.Current;
+                var tenantID = userClaims?.FindFirst("http://schemas.microsoft.com/identity/claims/tenantid")?.Value;
+                if (!string.IsNullOrEmpty(tenantID))
+                {
+                    HttpContext.GetOwinContext().Authentication.SignOut(
+                      OpenIdConnectAuthenticationDefaults.AuthenticationType,
+                      CookieAuthenticationDefaults.AuthenticationType);
+                }
+            }
+
+           
+
             //if (Session != null)
             //    Session.Abandon();
             return RedirectToAction("Index", "Home");

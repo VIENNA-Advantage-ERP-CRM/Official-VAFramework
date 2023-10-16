@@ -39,39 +39,39 @@
                     </label>
                     <div class="language">
                         @Html.DropDownListFor(m => m.Login1Model.LoginLanguage,@*new[]
-            {
-                       new SelectListItem() {Text = "English", Value="en_US"},
-                       new SelectListItem() {Text = "\u0411\u044A\u043B\u0433\u0430\u0440\u0441\u043A\u0438 (BG)", Value="bg_BG"},
-                       new SelectListItem() {Text = "Catal\u00e0", Value="ca_ES"},
-                       new SelectListItem() {Text = "Dansk", Value="da_DK"},
-                       new SelectListItem() {Text = "Deutsch",  Value="de_DE"},
-                       new SelectListItem() {Text = "English(AU)", Value="en_AU"},
-                       new SelectListItem() {Text = "English(UK)", Value="en_GB"},
-                       new SelectListItem() {Text = "Finnish", Value="fi_FI"},
-                       new SelectListItem() {Text = "Italiano",  Value="it_IT"},
-                       new SelectListItem() {Text = "\uFE94\uFEF4\uFE91\uFEAE\uFECC\uFEDF\uFE8D (AR)",  Value="ar_TN"},
-                       new SelectListItem() {Text = "العربية (Iraq)",  Value="ar_IQ"},
-                       new SelectListItem() {Text = "Espa\u00f1ol",  Value="es_ES"},
-                            new SelectListItem() {Text = "Espa\u00f1ol (UY)",  Value="es_UY"},
-                       new SelectListItem() {Text = "Fran\u00e7ais",  Value="fr_FR"},
-                       new SelectListItem() {Text = "Hrvatski",  Value="hr_HR"},
-                       new SelectListItem() {Text = "Indonesia Bahasa",  Value="id_ID"},
-                       new SelectListItem() {Text = "Malay",  Value="ms_BN"},
-                       new SelectListItem() {Text = "Norsk",  Value="nb_NO"},
-                       new SelectListItem() {Text = "Portuguese (BR)",  Value="pt_BR"},
-                       new SelectListItem() {Text = "Rom\u00e2n\u0103",  Value="ro_RO"},
-                       new SelectListItem() {Text = "Farsi",  Value="fa_IR"},
-                       new SelectListItem() {Text = "Polski",  Value="pl_PL"},
-                       new SelectListItem() {Text = "Slovenski",  Value="sl_SI"},
-                       new SelectListItem() {Text = "\u0420\u0443\u0441\u0441\u043a\u0438\u0439 (Russian)",  Value="ru_RU"},
-                       new SelectListItem() {Text = "Nederlands",  Value="nl_NL"},
-                       new SelectListItem() {Text = "Svenska",  Value="sv_SE"},
-                       new SelectListItem() {Text = "کوردی (Kurdi)",  Value="ar_KU"},
-                         new SelectListItem() {Text = "\u7b80\u4f53\u4e2d\u6587 (CN)",  Value="zh_CN"},
-                         new SelectListItem() {Text = "\u7b80\u4f53\u4e2d\u6587 (Hongkong)",  Value="zh_HK"},
-                         new SelectListItem() {Text = "العربية (Saudi Arabia)",  Value="ar_SA"},
-                           new SelectListItem() {Text = "繁體中文 (Chinese Taiwan)",  Value="zh_TW"},
-            }*@
+    {
+               new SelectListItem() {Text = "English", Value="en_US"},
+               new SelectListItem() {Text = "\u0411\u044A\u043B\u0433\u0430\u0440\u0441\u043A\u0438 (BG)", Value="bg_BG"},
+               new SelectListItem() {Text = "Catal\u00e0", Value="ca_ES"},
+               new SelectListItem() {Text = "Dansk", Value="da_DK"},
+               new SelectListItem() {Text = "Deutsch",  Value="de_DE"},
+               new SelectListItem() {Text = "English(AU)", Value="en_AU"},
+               new SelectListItem() {Text = "English(UK)", Value="en_GB"},
+               new SelectListItem() {Text = "Finnish", Value="fi_FI"},
+               new SelectListItem() {Text = "Italiano",  Value="it_IT"},
+               new SelectListItem() {Text = "\uFE94\uFEF4\uFE91\uFEAE\uFECC\uFEDF\uFE8D (AR)",  Value="ar_TN"},
+               new SelectListItem() {Text = "العربية (Iraq)",  Value="ar_IQ"},
+               new SelectListItem() {Text = "Espa\u00f1ol",  Value="es_ES"},
+                    new SelectListItem() {Text = "Espa\u00f1ol (UY)",  Value="es_UY"},
+               new SelectListItem() {Text = "Fran\u00e7ais",  Value="fr_FR"},
+               new SelectListItem() {Text = "Hrvatski",  Value="hr_HR"},
+               new SelectListItem() {Text = "Indonesia Bahasa",  Value="id_ID"},
+               new SelectListItem() {Text = "Malay",  Value="ms_BN"},
+               new SelectListItem() {Text = "Norsk",  Value="nb_NO"},
+               new SelectListItem() {Text = "Portuguese (BR)",  Value="pt_BR"},
+               new SelectListItem() {Text = "Rom\u00e2n\u0103",  Value="ro_RO"},
+               new SelectListItem() {Text = "Farsi",  Value="fa_IR"},
+               new SelectListItem() {Text = "Polski",  Value="pl_PL"},
+               new SelectListItem() {Text = "Slovenski",  Value="sl_SI"},
+               new SelectListItem() {Text = "\u0420\u0443\u0441\u0441\u043a\u0438\u0439 (Russian)",  Value="ru_RU"},
+               new SelectListItem() {Text = "Nederlands",  Value="nl_NL"},
+               new SelectListItem() {Text = "Svenska",  Value="sv_SE"},
+               new SelectListItem() {Text = "کوردی (Kurdi)",  Value="ar_KU"},
+                 new SelectListItem() {Text = "\u7b80\u4f53\u4e2d\u6587 (CN)",  Value="zh_CN"},
+                 new SelectListItem() {Text = "\u7b80\u4f53\u4e2d\u6587 (Hongkong)",  Value="zh_HK"},
+                 new SelectListItem() {Text = "العربية (Saudi Arabia)",  Value="ar_SA"},
+                   new SelectListItem() {Text = "繁體中文 (Chinese Taiwan)",  Value="zh_TW"},
+    }*@
 new SelectList(ViewBag.Languages, "Key", "Name"), new { id = "cmbLang" })
                     </div>
                 </div>
@@ -140,21 +140,44 @@ new SelectList(ViewBag.Languages, "Key", "Name"), new { id = "cmbLang" })
                 <img style="display: none;margin:0px auto 10px;position: absolute;bottom: 23%;left: 44%;z-index: 999;" class="img-login" src="~/Areas/VIS/Images/busy.gif" />
                 <input class="btn-login" id="btnLogin1" type="submit" value="Log in" />
             </div>
-            <!-- end of input-row -->
-            @*@Html.HiddenFor(m => m.Login2Model.Login1Data, new { id = "login1Data" })*@
-            @Html.ValidationSummary()
+            <div class="login-button">
+                <a href="@Url.Action("SignIn", "Home")" style="display: block; width: 100%; text-decoration: none; background-color: #020202; height: 50px; ">
+                    <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="300px" height="50px" viewBox="0 0 3278 522" class="SignInButton">
+                    <style type="text/css">
+                        .fil0:hover {
+                            fill: #4B4B4B;
+                        }
 
-            <!-- end of login-form -->
+                        .fnt0 {
+                            font-size: 260px;
+                            font-family: 'Segoe UI Semibold', 'Segoe UI';
+                            text-decoration: none;
+                        }
+</style>
+                    <rect class="fil0" x="2" y="2" width="3174" height="517" fill="black" />
+                    <rect x="150" y="129" width="122" height="122" fill="#F35325" />
+                    <rect x="284" y="129" width="122" height="122" fill="#81BC06" />
+                    <rect x="150" y="263" width="122" height="122" fill="#05A6F0" />
+                    <rect x="284" y="263" width="122" height="122" fill="#FFBA08" />
+                    <text x="470" y="357" fill="white" class="fnt0">Sign in with Microsoft</text>
+        </svg>
+                </a>
+            </div>
+                <!-- end of input-row -->
+                @*@Html.HiddenFor(m => m.Login2Model.Login1Data, new { id = "login1Data" })*@
+                @Html.ValidationSummary()
+
+                <!-- end of login-form -->
+            </div>
+            <!-- end of login-content -->
+            <div class="vienna-logo">
+
+                <img src="~/Areas/VIS/Images/login/logo.png" alt="logo">
+            </div>
+            <img style="display: none;margin:0px auto 10px;position: absolute;left: 44%;z-index: 999;" class="img-autologin" src="~/Areas/VIS/Images/busy.gif" />
+            <!-- end of vienna-logo -->
+
         </div>
-        <!-- end of login-content -->
-        <div class="vienna-logo">
-
-            <img src="~/Areas/VIS/Images/login/logo.png" alt="logo">
-        </div>
-        <img style="display: none;margin:0px auto 10px;position: absolute;left: 44%;z-index: 999;" class="img-autologin" src="~/Areas/VIS/Images/busy.gif" />
-        <!-- end of vienna-logo -->
-
-    </div>
     <!-- end of login-wrap -->
 
 }
