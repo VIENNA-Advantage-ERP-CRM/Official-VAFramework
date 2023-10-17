@@ -3809,7 +3809,7 @@ namespace VIS.Helpers
             //If Login org is not * , then fetch records of * org which are shared with current org and ignore records of * which are shared 
             // with other orgs and not with current org
 
-            if (ctxp.GetAD_Org_ID() > 0)
+            if (ctxp.GetAD_Org_ID() > 0 && !TableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !TableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
             {
                 if (string.IsNullOrEmpty(WhereClause))
                 {
