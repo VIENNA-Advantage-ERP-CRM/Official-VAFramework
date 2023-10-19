@@ -3578,15 +3578,7 @@
 
         if (!e.getIsInserting()) {
             //var trxInfo = VIS.GridTab.prototype.getTrxInfo(this.curTab.getTableName(), VIS.context, this.curTab.getWindowNo(), this.curTab.getTabNo());
-            var tht = this;
-            VIS.GridTab.prototype.getFooterInfo(this.curTab.getTableName(), VIS.context, this.curTab.getWindowNo(),
-                this.curTab.getTabNo(), e.getRecord_ID()).then(function (info) {
-                    if (tht && tht.statusBar)
-                        tht.statusBar.setInfo(info);
-                }, function (err) {
-                    if (tht && tht.statusBar)
-                        tht.statusBar.setInfo(err);
-                });
+            this.setStatusInfo(e.getRecord_ID());
 
             //if (trxInfo != null)
             //    this.statusBar.setInfo(trxInfo);
@@ -3596,6 +3588,7 @@
         }
 
         if (this.curWinTab == this.vTabbedPane) {
+            VIS.context.setContext(this.curWindowNo,"tb_Index" , this.curTabIndex);
             this.curWinTab.evaluate(null);
             this.curWinTab.notifyDataChanged(e);
         }
@@ -3605,6 +3598,22 @@
 
 
     };   //
+
+    // Common function for set footer
+    APanel.prototype.setStatusInfo = function (record_ID) {
+        if (!record_ID && this.curTab) {
+            record_ID = this.curTab.getRecord_ID();
+        }
+        var tht = this;
+        VIS.GridTab.prototype.getFooterInfo(this.curTab.getTableName(), VIS.context, this.curTab.getWindowNo(),
+            this.curTab.getTabNo(), record_ID).then(function (info) {
+                if (tht && tht.statusBar)
+                    tht.statusBar.setInfo(info);
+            }, function (err) {
+                if (tht && tht.statusBar)
+                    tht.statusBar.setInfo(err);
+            });
+    }
 
     /**
      *	Set Status Line to text

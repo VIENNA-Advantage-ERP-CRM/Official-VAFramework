@@ -908,226 +908,174 @@ namespace VAdvantage.Print
                 //DataTable dt = new DataTable();
                 //dt.Load(dr);
                 //	Row Loop
-                for (int x = 0; x < ds.Tables[0].Rows.Count; x++)
+                if (ds != null && ds.Tables.Count > 0)
                 {
-                    if (hasLevelNo)
-                        levelNo = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[x]["LevelNo"].ToString());
-                    else
-                        levelNo = 0;
-                    //	Check Group Change ----------------------------------------
-                    if (_group.GetGroupColumnCount() > 1)	//	one is GRANDTOTAL_
+                    for (int x = 0; x < ds.Tables[0].Rows.Count; x++)
                     {
-                        //	Check Columns for Function Columns
-                        for (int i = pd.GetColumnInfo().Length - 1; i >= 0; i--)	//	backwards (leaset group first)
+                        if (hasLevelNo)
+                            levelNo = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[x]["LevelNo"].ToString());
+                        else
+                            levelNo = 0;
+                        //	Check Group Change ----------------------------------------
+                        if (_group.GetGroupColumnCount() > 1)   //	one is GRANDTOTAL_
                         {
-                            PrintDataColumn group_pdc = pd.GetColumnInfo()[i];
-                            if (!_group.IsGroupColumn(group_pdc.GetColumnName()))
-                                continue;
-
-                            //	Group change
-                            Object value = _group.GroupChange(group_pdc.GetColumnName(), ds.Tables[0].Rows[x][group_pdc.GetAlias()]);
-                            if (value != null)	//	Group change
+                            //	Check Columns for Function Columns
+                            for (int i = pd.GetColumnInfo().Length - 1; i >= 0; i--)    //	backwards (leaset group first)
                             {
-                                char[] functions = _group.GetFunctions(group_pdc.GetColumnName());
-                                for (int f = 0; f < functions.Length; f++)
+                                PrintDataColumn group_pdc = pd.GetColumnInfo()[i];
+                                if (!_group.IsGroupColumn(group_pdc.GetColumnName()))
+                                    continue;
+
+                                //	Group change
+                                Object value = _group.GroupChange(group_pdc.GetColumnName(), ds.Tables[0].Rows[x][group_pdc.GetAlias()]);
+                                if (value != null)  //	Group change
                                 {
-                                    PrintRunningTotal(pd, levelNo, rowNo++);
-                                    pd.AddRow(true, levelNo);
-                                    //	Get columns
+                                    char[] functions = _group.GetFunctions(group_pdc.GetColumnName());
+                                    for (int f = 0; f < functions.Length; f++)
+                                    {
+                                        PrintRunningTotal(pd, levelNo, rowNo++);
+                                        pd.AddRow(true, levelNo);
+                                        //	Get columns
+                                        for (int c = 0; c < pd.GetColumnInfo().Length; c++)
+                                        {
+                                            pdc = pd.GetColumnInfo()[c];
+                                            //	log.fine("loadPrintData - PageBreak = " + pdc.isPageBreak());
+
+                                            if (group_pdc.GetColumnName().Equals(pdc.GetColumnName()))
+                                            {
+                                                String valueString = value.ToString();
+                                                if (value.GetType() == typeof(DateTime))
+                                                { }
+                                                //        valueString = DisplayType.GetDateFormat(pdc.GetDisplayType(), _language).format(value);
+                                                valueString += PrintDataFunction.GetFunctionSymbol(functions[f]);
+                                                pd.AddNode(new PrintDataElement(pdc.GetColumnName(), valueString, DisplayType.String, false, pdc.IsPageBreak()));
+                                            }
+                                            else if (_group.IsFunctionColumn(pdc.GetColumnName(), functions[f]))
+                                            {
+                                                pd.AddNode(new PrintDataElement(pdc.GetColumnName(), NativeDigitConverter.ConvertToNativeNumerals(
+                                                    _group.GetValue(group_pdc.GetColumnName(), pdc.GetColumnName(), functions[f]), pd.GetCtx()),
+                                                    PrintDataFunction.GetFunctionDisplayType(functions[f]), false, pdc.IsPageBreak()));
+                                            }
+                                        }   //	 for all columns
+                                    }   //	for all functions
+                                        //	Reset Group Values
                                     for (int c = 0; c < pd.GetColumnInfo().Length; c++)
                                     {
                                         pdc = pd.GetColumnInfo()[c];
-                                        //	log.fine("loadPrintData - PageBreak = " + pdc.isPageBreak());
+                                        _group.Reset(group_pdc.GetColumnName(), pdc.GetColumnName());
+                                    }
+                                }   //	Group change
+                            }   //	for all columns
+                        }   //	group change
 
-                                        if (group_pdc.GetColumnName().Equals(pdc.GetColumnName()))
-                                        {
-                                            String valueString = value.ToString();
-                                            if (value.GetType() == typeof(DateTime))
-                                            { }
-                                            //        valueString = DisplayType.GetDateFormat(pdc.GetDisplayType(), _language).format(value);
-                                            valueString += PrintDataFunction.GetFunctionSymbol(functions[f]);
-                                            pd.AddNode(new PrintDataElement(pdc.GetColumnName(), valueString, DisplayType.String, false, pdc.IsPageBreak()));
-                                        }
-                                        else if (_group.IsFunctionColumn(pdc.GetColumnName(), functions[f]))
-                                        {
-                                            pd.AddNode(new PrintDataElement(pdc.GetColumnName(), NativeDigitConverter.ConvertToNativeNumerals(
-                                                _group.GetValue(group_pdc.GetColumnName(), pdc.GetColumnName(), functions[f]), pd.GetCtx()),
-                                                PrintDataFunction.GetFunctionDisplayType(functions[f]), false, pdc.IsPageBreak()));
-                                        }
-                                    }	//	 for all columns
-                                }	//	for all functions
-                                //	Reset Group Values
-                                for (int c = 0; c < pd.GetColumnInfo().Length; c++)
-                                {
-                                    pdc = pd.GetColumnInfo()[c];
-                                    _group.Reset(group_pdc.GetColumnName(), pdc.GetColumnName());
-                                }
-                            }	//	Group change
-                        }	//	for all columns
-                    }	//	group change
-
-                    //	new row ---------------------------------------------------
-                    PrintRunningTotal(pd, levelNo, rowNo++);
-                    pd.AddRow(false, levelNo);
-                    int counter = 0;
-                    //	Get columns
-                    for (int i = 0; i < pd.GetColumnInfo().Length; i++)
-                    {
-                        pdc = pd.GetColumnInfo()[i];
-                        PrintDataElement pde = null;
-
-                        //	Key Column - No DisplayColumn
-                        if (pdc.GetAlias().Equals(KEY))
+                        //	new row ---------------------------------------------------
+                        PrintRunningTotal(pd, levelNo, rowNo++);
+                        pd.AddRow(false, levelNo);
+                        int counter = 0;
+                        //	Get columns
+                        for (int i = 0; i < pd.GetColumnInfo().Length; i++)
                         {
-                            if (pdc.GetColumnName().EndsWith("_ID"))
+                            pdc = pd.GetColumnInfo()[i];
+                            PrintDataElement pde = null;
+
+                            //	Key Column - No DisplayColumn
+                            if (pdc.GetAlias().Equals(KEY))
                             {
-                                //	int id = rs.GetInt(pdc.GetColumnIDName());
-                                int id = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[x][counter++]);
-                                if (!string.IsNullOrEmpty(id.ToString()))
-                                {
-                                    KeyNamePair pp = new KeyNamePair(id, KEY);	//	Key
-                                    pde = new PrintDataElement(pdc.GetColumnName(), pp, pdc.GetDisplayType(), true, pdc.IsPageBreak());
-                                }
-                            }
-                            else
-                            {
-                                //	String id = rs.GetString(pdc.GetColumnIDName());
-                                String id = ds.Tables[0].Rows[x][counter++].ToString();
-                                if (!string.IsNullOrEmpty(id))
-                                {
-                                    ValueNamePair pp = new ValueNamePair(id, KEY);	//	Key
-                                    pde = new PrintDataElement(pdc.GetColumnName(), pp, pdc.GetDisplayType(), true, pdc.IsPageBreak());
-                                }
-                            }
-                        }
-                        //	Non-Key Column
-                        else
-                        {
-                            //	Display and Value Column
-                            if (pdc.HasAlias())
-                            {
-                                //	DisplayColumn first
-                                String display = ds.Tables[0].Rows[x][counter++].ToString();
                                 if (pdc.GetColumnName().EndsWith("_ID"))
                                 {
-                                    string id = ds.Tables[0].Rows[x][counter++].ToString();
-                                    if (display != null && !string.IsNullOrEmpty(id))
+                                    //	int id = rs.GetInt(pdc.GetColumnIDName());
+                                    int id = Utility.Util.GetValueOfInt(ds.Tables[0].Rows[x][counter++]);
+                                    if (!string.IsNullOrEmpty(id.ToString()))
                                     {
-                                        KeyNamePair pp = new KeyNamePair(int.Parse(id), display);
-                                        pde = new PrintDataElement(pdc.GetColumnName(), pp, pdc.GetDisplayType());
+                                        KeyNamePair pp = new KeyNamePair(id, KEY);  //	Key
+                                        pde = new PrintDataElement(pdc.GetColumnName(), pp, pdc.GetDisplayType(), true, pdc.IsPageBreak());
                                     }
                                 }
                                 else
                                 {
-                                    string id = ds.Tables[0].Rows[x][counter++].ToString();
-                                    if (display != null && !string.IsNullOrEmpty(id))
+                                    //	String id = rs.GetString(pdc.GetColumnIDName());
+                                    String id = ds.Tables[0].Rows[x][counter++].ToString();
+                                    if (!string.IsNullOrEmpty(id))
                                     {
-                                        ValueNamePair pp = new ValueNamePair(id, display);
-                                        pde = new PrintDataElement(pdc.GetColumnName(), pp, pdc.GetDisplayType());
+                                        ValueNamePair pp = new ValueNamePair(id, KEY);  //	Key
+                                        pde = new PrintDataElement(pdc.GetColumnName(), pp, pdc.GetDisplayType(), true, pdc.IsPageBreak());
                                     }
                                 }
                             }
-                            //	Display Value only
+                            //	Non-Key Column
                             else
                             {
-                                //	Transformation for bools
-                                if (pdc.GetDisplayType() == DisplayType.YesNo)
+                                //	Display and Value Column
+                                if (pdc.HasAlias())
                                 {
-                                    String s = ds.Tables[0].Rows[x][counter++].ToString();
-                                    if (!string.IsNullOrEmpty(s))
+                                    //	DisplayColumn first
+                                    String display = ds.Tables[0].Rows[x][counter++].ToString();
+                                    if (pdc.GetColumnName().EndsWith("_ID"))
                                     {
-                                        bool b = s.Equals("Y");
-                                        pde = new PrintDataElement(pdc.GetColumnName(), (bool)b, pdc.GetDisplayType());
-                                    }
-                                }
-                                else if (pdc.GetDisplayType() == DisplayType.TextLong)
-                                {
-
-                                    string clob = ds.Tables[0].Rows[x][counter++].ToString();
-                                    String value = "";
-                                    if (clob != null)
-                                    {
-                                        long Length = clob.Length;
-                                        value = clob.Substring(0, (int)Length);
-                                    }
-                                    pde = new PrintDataElement(pdc.GetColumnName(), value, pdc.GetDisplayType());
-                                }
-
-                                /* Modified by Deepak */
-                                /* to resolve DateTime Issue*/
-
-                                else if (DisplayType.IsDate(pdc.GetDisplayType()))
-                                {
-                                    //Modified by Jagmohan Bhatt
-                                    //Purpose: There are some unkonwn errors which are not being traced (only on few systems).
-                                    //In case any error comes (rare), we will show it blank so that report does not get interrupted. 
-                                    DateTime? time = null;
-                                    string sValue = ds.Tables[0].Rows[x][counter++].ToString();
-                                    if (string.IsNullOrEmpty(sValue))
-                                    {
-                                        continue;
-                                    }
-
-                                    if (pdc.GetDisplayType() == DisplayType.DateTime)
-                                    {
-                                        try
+                                        string id = ds.Tables[0].Rows[x][counter++].ToString();
+                                        if (display != null && !string.IsNullOrEmpty(id))
                                         {
-                                            time = Convert.ToDateTime(sValue);
-                                            //DateTime finalValue = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind((DateTime)time, DateTimeKind.Utc), TimeZoneInfo.FindSystemTimeZoneById(format.GetCtx().GetContext("#TimeZoneName")));
-
-                                            DateTime finalValue = time.Value;//.ToUniversalTime();
-                                            string offset = format.GetCtx().GetContext("#TimezoneOffset");
-                                            if (!string.IsNullOrEmpty(offset))
-                                            {
-                                                finalValue = finalValue.AddMinutes(-int.Parse(offset));
-                                            }
-
-                                            pde = new PrintDataElement(pdc.GetColumnName(), finalValue, pdc.GetDisplayType());
-
-                                            sValue = finalValue.ToString("G");
-                                            //continue;
+                                            KeyNamePair pp = new KeyNamePair(int.Parse(id), display);
+                                            pde = new PrintDataElement(pdc.GetColumnName(), pp, pdc.GetDisplayType());
                                         }
-                                        catch
+                                    }
+                                    else
+                                    {
+                                        string id = ds.Tables[0].Rows[x][counter++].ToString();
+                                        if (display != null && !string.IsNullOrEmpty(id))
+                                        {
+                                            ValueNamePair pp = new ValueNamePair(id, display);
+                                            pde = new PrintDataElement(pdc.GetColumnName(), pp, pdc.GetDisplayType());
+                                        }
+                                    }
+                                }
+                                //	Display Value only
+                                else
+                                {
+                                    //	Transformation for bools
+                                    if (pdc.GetDisplayType() == DisplayType.YesNo)
+                                    {
+                                        String s = ds.Tables[0].Rows[x][counter++].ToString();
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            bool b = s.Equals("Y");
+                                            pde = new PrintDataElement(pdc.GetColumnName(), (bool)b, pdc.GetDisplayType());
+                                        }
+                                    }
+                                    else if (pdc.GetDisplayType() == DisplayType.TextLong)
+                                    {
+
+                                        string clob = ds.Tables[0].Rows[x][counter++].ToString();
+                                        String value = "";
+                                        if (clob != null)
+                                        {
+                                            long Length = clob.Length;
+                                            value = clob.Substring(0, (int)Length);
+                                        }
+                                        pde = new PrintDataElement(pdc.GetColumnName(), value, pdc.GetDisplayType());
+                                    }
+
+                                    /* Modified by Deepak */
+                                    /* to resolve DateTime Issue*/
+
+                                    else if (DisplayType.IsDate(pdc.GetDisplayType()))
+                                    {
+                                        //Modified by Jagmohan Bhatt
+                                        //Purpose: There are some unkonwn errors which are not being traced (only on few systems).
+                                        //In case any error comes (rare), we will show it blank so that report does not get interrupted. 
+                                        DateTime? time = null;
+                                        string sValue = ds.Tables[0].Rows[x][counter++].ToString();
+                                        if (string.IsNullOrEmpty(sValue))
                                         {
                                             continue;
                                         }
-                                    }
 
-                                    else if (pdc.GetDisplayType() == DisplayType.Date)
-                                    {
-                                        try
+                                        if (pdc.GetDisplayType() == DisplayType.DateTime)
                                         {
-                                            if (sValue.Length > 10)
+                                            try
                                             {
                                                 time = Convert.ToDateTime(sValue);
                                                 //DateTime finalValue = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind((DateTime)time, DateTimeKind.Utc), TimeZoneInfo.FindSystemTimeZoneById(format.GetCtx().GetContext("#TimeZoneName")));
-                                                DateTime finalValue = time.Value;//.ToUniversalTime();
-                                                //string offset = format.GetCtx().GetContext("#TimezoneOffset");
-                                                //if (!string.IsNullOrEmpty(offset))
-                                                //{
-                                                //    finalValue = finalValue.AddMinutes(- int.Parse(offset));
-                                                //}
-
-                                                sValue = finalValue.ToString("d"); // sValue.Substring(0, sValue.IndexOf(" "));
-                                            }
-                                            // time = Convert.ToDateTime(sValue);
-                                            //pde = new PrintDataElement(pdc.GetColumnName(), sValue, pdc.GetDisplayType());
-
-                                        }
-                                        catch
-                                        {
-                                            continue;
-                                        }
-                                    }
-                                    else  // only Time
-                                    {
-                                        try
-                                        {
-                                            if (sValue.Length > 10)
-                                            {
-                                                time = Convert.ToDateTime(sValue);
-                                                //DateTime finalValue = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind((DateTime)time, DateTimeKind.Utc), TimeZoneInfo.FindSystemTimeZoneById(format.GetCtx().GetContext("#TimeZoneName")));
-                                                //sValue = sValue.Substring(10);
 
                                                 DateTime finalValue = time.Value;//.ToUniversalTime();
                                                 string offset = format.GetCtx().GetContext("#TimezoneOffset");
@@ -1136,64 +1084,118 @@ namespace VAdvantage.Print
                                                     finalValue = finalValue.AddMinutes(-int.Parse(offset));
                                                 }
 
-                                                //sValue = finalValue.ToString("d"); // sValue.Substring(0, sValue.IndexOf(" "));
+                                                pde = new PrintDataElement(pdc.GetColumnName(), finalValue, pdc.GetDisplayType());
 
-                                                sValue = finalValue.ToString("T"); // sValue.Substring(sValue.IndexOf(" ") + 1);
+                                                sValue = finalValue.ToString("G");
+                                                //continue;
                                             }
-                                            //pde = new PrintDataElement(pdc.GetColumnName(), sValue, pdc.GetDisplayType());
-                                        }
-                                        catch
-                                        {
-                                            continue;
-                                        }
-                                    }
-                                    pde = new PrintDataElement(pdc.GetColumnName(), NativeDigitConverter.ConvertToNativeNumerals(sValue, pd.GetCtx()), pdc.GetDisplayType());
-                                }
-
-                                else
-                                //	The general case
-                                {
-                                    Object obj = ds.Tables[0].Rows[x][counter++];
-                                    if (obj != null && obj.GetType() == typeof(String))
-                                    {
-                                        obj = ((String)obj).Trim();
-                                        if (((String)obj).Length == 0)
-                                            obj = null;
-                                    }
-                                    if (obj != null)
-                                    {
-                                        //	Translate Spool Output
-                                        if (translateSpool && obj.GetType() == typeof(String))
-                                        {
-                                            String s = (String)obj;
-                                            s = Utility.Msg.ParseTranslation(pd.GetCtx(), s);
-                                            pde = new PrintDataElement(pdc.GetColumnName(), s, pdc.GetDisplayType());
-                                        }
-                                        else
-                                        {
-                                            object toSting = obj;
-
-                                            if (!Env.IsBaseLanguage(pd.GetCtx().GetContext("#AD_Language"), "") && DisplayType.IsNumeric(pdc.GetDisplayType()) && !pdc.GetColumnName().Equals("AmtInWords")) // Convert to native Digits
+                                            catch
                                             {
-                                                toSting = NativeDigitConverter.ConvertToNativeNumerals(toSting.ToString(), pd.GetCtx());
+                                                continue;
                                             }
-                                            pde = new PrintDataElement(pdc.GetColumnName(), toSting, obj, pdc.GetDisplayType());
+                                        }
+
+                                        else if (pdc.GetDisplayType() == DisplayType.Date)
+                                        {
+                                            try
+                                            {
+                                                if (sValue.Length > 10)
+                                                {
+                                                    time = Convert.ToDateTime(sValue);
+                                                    //DateTime finalValue = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind((DateTime)time, DateTimeKind.Utc), TimeZoneInfo.FindSystemTimeZoneById(format.GetCtx().GetContext("#TimeZoneName")));
+                                                    DateTime finalValue = time.Value;//.ToUniversalTime();
+                                                                                     //string offset = format.GetCtx().GetContext("#TimezoneOffset");
+                                                                                     //if (!string.IsNullOrEmpty(offset))
+                                                                                     //{
+                                                                                     //    finalValue = finalValue.AddMinutes(- int.Parse(offset));
+                                                                                     //}
+
+                                                    sValue = finalValue.ToString("d"); // sValue.Substring(0, sValue.IndexOf(" "));
+                                                }
+                                                // time = Convert.ToDateTime(sValue);
+                                                //pde = new PrintDataElement(pdc.GetColumnName(), sValue, pdc.GetDisplayType());
+
+                                            }
+                                            catch
+                                            {
+                                                continue;
+                                            }
+                                        }
+                                        else  // only Time
+                                        {
+                                            try
+                                            {
+                                                if (sValue.Length > 10)
+                                                {
+                                                    time = Convert.ToDateTime(sValue);
+                                                    //DateTime finalValue = TimeZoneInfo.ConvertTime(DateTime.SpecifyKind((DateTime)time, DateTimeKind.Utc), TimeZoneInfo.FindSystemTimeZoneById(format.GetCtx().GetContext("#TimeZoneName")));
+                                                    //sValue = sValue.Substring(10);
+
+                                                    DateTime finalValue = time.Value;//.ToUniversalTime();
+                                                    string offset = format.GetCtx().GetContext("#TimezoneOffset");
+                                                    if (!string.IsNullOrEmpty(offset))
+                                                    {
+                                                        finalValue = finalValue.AddMinutes(-int.Parse(offset));
+                                                    }
+
+                                                    //sValue = finalValue.ToString("d"); // sValue.Substring(0, sValue.IndexOf(" "));
+
+                                                    sValue = finalValue.ToString("T"); // sValue.Substring(sValue.IndexOf(" ") + 1);
+                                                }
+                                                //pde = new PrintDataElement(pdc.GetColumnName(), sValue, pdc.GetDisplayType());
+                                            }
+                                            catch
+                                            {
+                                                continue;
+                                            }
+                                        }
+                                        pde = new PrintDataElement(pdc.GetColumnName(), NativeDigitConverter.ConvertToNativeNumerals(sValue, pd.GetCtx()), pdc.GetDisplayType());
+                                    }
+
+                                    else
+                                    //	The general case
+                                    {
+                                        Object obj = ds.Tables[0].Rows[x][counter++];
+                                        if (obj != null && obj.GetType() == typeof(String))
+                                        {
+                                            obj = ((String)obj).Trim();
+                                            if (((String)obj).Length == 0)
+                                                obj = null;
+                                        }
+                                        if (obj != null)
+                                        {
+                                            //	Translate Spool Output
+                                            if (translateSpool && obj.GetType() == typeof(String))
+                                            {
+                                                String s = (String)obj;
+                                                s = Utility.Msg.ParseTranslation(pd.GetCtx(), s);
+                                                pde = new PrintDataElement(pdc.GetColumnName(), s, pdc.GetDisplayType());
+                                            }
+                                            else
+                                            {
+                                                object toSting = obj;
+
+                                                if (!Env.IsBaseLanguage(pd.GetCtx().GetContext("#AD_Language"), "") && DisplayType.IsNumeric(pdc.GetDisplayType()) && !pdc.GetColumnName().Equals("AmtInWords")) // Convert to native Digits
+                                                {
+                                                    toSting = NativeDigitConverter.ConvertToNativeNumerals(toSting.ToString(), pd.GetCtx());
+                                                }
+                                                pde = new PrintDataElement(pdc.GetColumnName(), toSting, obj, pdc.GetDisplayType());
+                                            }
                                         }
                                     }
-                                }
-                            }	//	Value only
-                        }	//	Non-Key Column
-                        if (pde != null)
-                        {
-                            pd.AddNode(pde);
-                            _group.AddValue(pde.GetColumnName(), pde.GetFunctionOriginalValue());
-                        }
-                    }	//	for all columns
+                                }   //	Value only
+                            }   //	Non-Key Column
+                            if (pde != null)
+                            {
+                                pd.AddNode(pde);
+                                _group.AddValue(pde.GetColumnName(), pde.GetFunctionOriginalValue());
+                            }
+                        }   //	for all columns
 
 
 
+                    }
                 }
-
 
                 //while (dr.Read())
                 //{

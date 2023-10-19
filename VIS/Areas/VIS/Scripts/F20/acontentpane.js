@@ -597,7 +597,9 @@
                 this.evaluate(null);
             //}
 
-
+            if (!e.getIsInserting()) {
+                this.aTabbedPane.getAPanel().setStatusInfo();
+            }
 
         /******End Header Panel******/
         }
@@ -741,7 +743,7 @@
 
         VIS.ADialog.confirm("DeleteRecord?", true, "", "Confirm", function (result) {
             if (result) {
-                thisPanel.curGC.dataDeleteAsync();
+                thisPanel.curGC.dataDeleteAsync();               
             }
             thisPanel = null;
         });

@@ -912,6 +912,12 @@ namespace VAdvantage.Process
                 CheckImage(sField.GetAD_Image_ID());
             }
 
+            //check for field Data Validation 
+            if (Util.GetValueOfInt(sField.Get_Value("AD_Val_Rule_ID"))>0)
+            {
+                GetValRule(Util.GetValueOfInt(sField.Get_Value("AD_Val_Rule_ID")));
+            }
+
             InsertIntoDBSchema(X_AD_Field.Table_ID, sAD_Field_ID, X_AD_Field.Table_Name, sField.GetName(), " AD_Field_ID = " + sAD_Field_ID);
             return name;
         }
