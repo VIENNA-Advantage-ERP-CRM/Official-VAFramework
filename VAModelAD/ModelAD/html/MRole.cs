@@ -2334,7 +2334,10 @@ namespace VAdvantage.Model
                     if (!string.IsNullOrEmpty(mainTableName))
                     {
                         // Get Shared record with organisation.
-                        GetShareRecord(ref sql, tableName, mainTableName);
+                        if (!mainTableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !mainTableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
+                        {
+                            GetShareRecord(ref sql, tableName, mainTableName);
+                        }
                     }
                     sb = new StringBuilder();
                 }

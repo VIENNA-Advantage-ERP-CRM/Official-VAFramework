@@ -188,65 +188,65 @@ namespace VAModelAD.Model
             MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
             //VIS323 Insert Record in ExportData for marking on Save records.
 
-            if (Env.IsModuleInstalled("VA093_") && success && MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
-                && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
+            //if (Env.IsModuleInstalled("VA093_") && success && MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
+            //    && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
 
-            {
-                if (!_exportTableAccessed)
-                {
-                    _ExportCheckTableNames = GetExportTableNames();
-                }
+            //{
+            //    if (!_exportTableAccessed)
+            //    {
+            //        _ExportCheckTableNames = GetExportTableNames();
+            //    }
 
-                if (!_ExportCheckTableNames.Contains(po.GetTableName()))
-                {
-                    if (!_exportDataChecked)
-                    {
-                        GetExportedData();
-                    }
-                    #region Commented Code
+            //    if (!_ExportCheckTableNames.Contains(po.GetTableName()))
+            //    {
+            //        if (!_exportDataChecked)
+            //        {
+            //            GetExportedData();
+            //        }
+            //        #region Commented Code
 
-                    //string[] ModulInfo = po.GetCtx().Get("#ENABLE_DATA_MARKING_ON_SAVE").Split('@');
+            //        //string[] ModulInfo = po.GetCtx().Get("#ENABLE_DATA_MARKING_ON_SAVE").Split('@');
 
-                    //if (ModulInfo.Length == 1)
+            //        //if (ModulInfo.Length == 1)
 
-                    //{
+            //        //{
 
-                    //    ModulInfo = new string[] { ModulInfo[0], "VA093_" };
+            //        //    ModulInfo = new string[] { ModulInfo[0], "VA093_" };
 
-                    //}
+            //        //}
 
-                    //if (MRole.GetDefault(po.GetCtx()).IsAutoDataMarking() && Env.IsModuleInstalled(ModulInfo[1])
+            //        //if (MRole.GetDefault(po.GetCtx()).IsAutoDataMarking() && Env.IsModuleInstalled(ModulInfo[1])
 
-                    #endregion Commented Code
-                    if (po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
-                    {
-                        int expRecord_ID = 0;
-                        if (po.GetKeyLength() > 1)
-                        {
-                            if (po.Get_ColumnIndex(po.Get_TableName() + "_ID") >= 0)
-                                expRecord_ID = Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID"));
-                        }
-                        else
+            //        #endregion Commented Code
+            //        if (po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
+            //        {
+            //            int expRecord_ID = 0;
+            //            if (po.GetKeyLength() > 1)
+            //            {
+            //                if (po.Get_ColumnIndex(po.Get_TableName() + "_ID") >= 0)
+            //                    expRecord_ID = Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID"));
+            //            }
+            //            else
 
-                            expRecord_ID = po.Get_ID();
+            //                expRecord_ID = po.Get_ID();
 
 
 
-                        if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
+            //            if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
 
-                        {
+            //            {
 
-                            if (!SaveExportData(po))
+            //                if (!SaveExportData(po))
 
-                                return false;
+            //                    return false;
 
-                        }
+            //            }
 
-                    }
+            //        }
 
-                }
+            //    }
 
-            }
+            //}
 
             if (success && newRecord)
                 InsertTreeNode(po);
