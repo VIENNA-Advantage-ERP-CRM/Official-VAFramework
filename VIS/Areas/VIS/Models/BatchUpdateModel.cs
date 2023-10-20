@@ -98,7 +98,7 @@ namespace VIS.Models
     public class SetValue
     {
         public string column { get; set; }
-        public string setValue { get; set; }
+        public object setValue { get; set; }
         public int setType { get; set; }
     }
 }
