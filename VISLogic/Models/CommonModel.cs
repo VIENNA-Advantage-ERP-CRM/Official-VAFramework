@@ -174,7 +174,7 @@ namespace VISLogic.Models
                         else if (column.DisplayType == DisplayType.Location)
                         {
                             // Change done to pick full address with help of function created in the database
-                            _querySQL.Append(", (SELECT l.Get_Location(l.C_Location_ID) FROM C_Location l LEFT JOIN C_Country c ON (c.C_Country_ID = l.C_Country_ID) WHERE l.C_Location_ID = " + tbl.GetTableName() + "." + column.ColumnName + ") AS " + column.ColumnName + "_LOC");
+                            _querySQL.Append(", (SELECT l.Get_Location(l.C_Location_ID) FROM C_Location l WHERE l.C_Location_ID = " + tbl.GetTableName() + "." + column.ColumnName + ") AS " + column.ColumnName + "_LOC");
                         }
                         // case for Locator type of columns
                         else if (column.DisplayType == DisplayType.Locator)
