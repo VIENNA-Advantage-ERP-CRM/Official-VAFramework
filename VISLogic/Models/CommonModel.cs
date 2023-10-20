@@ -97,31 +97,32 @@ namespace VISLogic.Models
                     dr[sbColName.ToString()] = (Util.GetValueOfString(dr[sbColName.ToString()]) == "Y") ? true : false;
 
                 var val = od[sbColName.ToString().ToLower()];
-                if (val != null)
+                // Commented null check so that if any column value is set to null, even then it shows the old value in the Version Tab Panel
+                //if (val != null)
+                //{
+                if (Util.GetValueOfString(dr[sbColName.ToString()]) != Util.GetValueOfString(od[sbColName.ToString().ToLower()].Value).ToLower())
                 {
-                    if (Util.GetValueOfString(dr[sbColName.ToString()]) != Util.GetValueOfString(od[sbColName.ToString().ToLower()].Value))
-                    {
-                        colNames.Add(Util.GetValueOfString(dsColumns.Tables[0].Rows[i]["Name"]));
-                        dbColNames.Add(sbColName.ToString());
-                        // get text for column based on different reference types
-                        if (dr.Table.Columns.Contains(sbColName.ToString() + "_TXT"))
-                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_TXT"]));
-                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_LOC"))
-                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_LOC"]));
-                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_LTR"))
-                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_LTR"]));
-                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_ASI"))
-                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_ASI"]));
-                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_ACT"))
-                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_ACT"]));
-                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_CTR"))
-                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_CTR"]));
-                        else
-                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString()]));
+                    colNames.Add(Util.GetValueOfString(dsColumns.Tables[0].Rows[i]["Name"]));
+                    dbColNames.Add(sbColName.ToString());
+                    // get text for column based on different reference types
+                    if (dr.Table.Columns.Contains(sbColName.ToString() + "_TXT"))
+                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_TXT"]));
+                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_LOC"))
+                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_LOC"]));
+                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_LTR"))
+                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_LTR"]));
+                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_ASI"))
+                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_ASI"]));
+                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_ACT"))
+                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_ACT"]));
+                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_CTR"))
+                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_CTR"]));
+                    else
+                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString()]));
 
-                        oldValues.Add(sbColValue.ToString());
-                    }
+                    oldValues.Add(sbColValue.ToString());
                 }
+                //}
             }
 
             data.ColumnNames = colNames;
@@ -168,11 +169,12 @@ namespace VISLogic.Models
                             }
                         }
                         // VIS0008
-                        // Changed to pick date from subquery in case of Location, Locator, Attribute and Account References
+                        // Changed to pick data from subquery in case of Location, Locator, Attribute and Account References
                         // case for Location type of columns
                         else if (column.DisplayType == DisplayType.Location)
                         {
-                            _querySQL.Append(", (SELECT l.Address1 || ', ' || l.City || ', ' || c.Name FROM C_Location l LEFT JOIN C_Country c ON (c.C_Country_ID = l.C_Country_ID) WHERE l.C_Location_ID = " + tbl.GetTableName() + "." + column.ColumnName + ") AS " + column.ColumnName + "_LOC");
+                            // Change done to pick full address with help of function created in the database
+                            _querySQL.Append(", (SELECT l.Get_Location(l.C_Location_ID) FROM C_Location l LEFT JOIN C_Country c ON (c.C_Country_ID = l.C_Country_ID) WHERE l.C_Location_ID = " + tbl.GetTableName() + "." + column.ColumnName + ") AS " + column.ColumnName + "_LOC");
                         }
                         // case for Locator type of columns
                         else if (column.DisplayType == DisplayType.Locator)
