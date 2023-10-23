@@ -100,27 +100,32 @@ namespace VISLogic.Models
                 // Commented null check so that if any column value is set to null, even then it shows the old value in the Version Tab Panel
                 //if (val != null)
                 //{
-                if (Util.GetValueOfString(dr[sbColName.ToString()]) != Util.GetValueOfString(od[sbColName.ToString().ToLower()].Value).ToLower())
-                {
-                    colNames.Add(Util.GetValueOfString(dsColumns.Tables[0].Rows[i]["Name"]));
-                    dbColNames.Add(sbColName.ToString());
-                    // get text for column based on different reference types
-                    if (dr.Table.Columns.Contains(sbColName.ToString() + "_TXT"))
-                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_TXT"]));
-                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_LOC"))
-                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_LOC"]));
-                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_LTR"))
-                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_LTR"]));
-                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_ASI"))
-                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_ASI"]));
-                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_ACT"))
-                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_ACT"]));
-                    else if (dr.Table.Columns.Contains(sbColName.ToString() + "_CTR"))
-                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_CTR"]));
-                    else
-                        sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString()]));
 
-                    oldValues.Add(sbColValue.ToString());
+                // VIS0008 check applied if column exists, then only compare
+                if (od.ContainsKey(sbColName.ToString().ToLower()))
+                {
+                    if (Util.GetValueOfString(dr[sbColName.ToString()]).ToLower() != Util.GetValueOfString(od[sbColName.ToString().ToLower()].Value).ToLower())
+                    {
+                        colNames.Add(Util.GetValueOfString(dsColumns.Tables[0].Rows[i]["Name"]));
+                        dbColNames.Add(sbColName.ToString());
+                        // get text for column based on different reference types
+                        if (dr.Table.Columns.Contains(sbColName.ToString() + "_TXT"))
+                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_TXT"]));
+                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_LOC"))
+                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_LOC"]));
+                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_LTR"))
+                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_LTR"]));
+                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_ASI"))
+                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_ASI"]));
+                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_ACT"))
+                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_ACT"]));
+                        else if (dr.Table.Columns.Contains(sbColName.ToString() + "_CTR"))
+                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString() + "_CTR"]));
+                        else
+                            sbColValue.Append(Util.GetValueOfString(dr[sbColName.ToString()]));
+
+                        oldValues.Add(sbColValue.ToString());
+                    }
                 }
                 //}
             }
