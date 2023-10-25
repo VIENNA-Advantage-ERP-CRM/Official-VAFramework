@@ -82,7 +82,7 @@ namespace VISLogic.Models
             {
                 dr = dsRec.Tables[0].Rows[0];
             }
-            if (!(dr != null && dr.Table != null && dr.Table.Rows.Count > 0))
+            else
             {
                 VAdvantage.Logging.VLogger.Get().SaveError("", "No record found against version " + Util.GetValueOfInt(od["oldversion"].Value) + " for table " + origTableName);
                 return data;

@@ -415,6 +415,8 @@ namespace VIS.Models
                 sql1 = "SELECT DISTINCT ";
                 for (int i = 0; i < columns.Count; i++)
                 {
+                    if (Util.GetValueOfString(columns[i]) == "")
+                        continue;
                     if (i != 0)
                         sql1 += ",";
                     sql1 += columns[i].ToString();
@@ -430,48 +432,45 @@ namespace VIS.Models
             try
             {
                 ds = DB.ExecuteDataset(sql1, null);
-                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                for (int cnt = 0; cnt < ds.Tables[0].Rows.Count; cnt++)
                 {
-                    for (int cnt = 0; cnt < ds.Tables[0].Rows.Count; cnt++)
+                    if (columns.Count > 0)
                     {
-                        if (columns.Count > 0)
+                        columnValues.Clear();
+                        // store column names with their values in the variable
+                        for (int i = 0; i < columns.Count; i++)
                         {
-                            columnValues.Clear();
-                            // store column names with their values in the variable
-                            for (int i = 0; i < columns.Count; i++)
-                            {
-                                String columnName = (String)columns[i].ToString();
-                                String columnValue = (String)ds.Tables[0].Rows[cnt][columnName].ToString();
-                                //log.Fine(columnName + " = " + columnValue);
-                                columnValues.Add(new ValueNamePair(columnValue, columnName));
-                            }
+                            String columnName = (String)columns[i].ToString();
+                            String columnValue = (String)ds.Tables[0].Rows[cnt][columnName].ToString();
+                            //log.Fine(columnName + " = " + columnValue);
+                            columnValues.Add(new ValueNamePair(columnValue, columnName));
+                        }
 
-                            // Find matching windows
-                            for (int i = 0; i < windowList.Count; i++)
+                        // Find matching windows
+                        for (int i = 0; i < windowList.Count; i++)
+                        {
+                            //log.Fine("Window : " + windowList[i].windowName + " WhereClause : " + windowList[i].whereClause);
+                            if (EvaluateWhereClause(columnValues, windowList[i].whereClause))
                             {
-                                //log.Fine("Window : " + windowList[i].windowName + " WhereClause : " + windowList[i].whereClause);
-                                if (EvaluateWhereClause(columnValues, windowList[i].whereClause))
-                                {
-                                    //log.Fine("MatchFound : " + windowList[i].windowName);
-                                    KeyNamePair pp = new KeyNamePair(windowList[i].AD_Window_ID, windowList[i].windowName);
-                                    zoomList.Add(pp);
-                                    // Use first window found. Ideally there should be just one matching
+                                //log.Fine("MatchFound : " + windowList[i].windowName);
+                                KeyNamePair pp = new KeyNamePair(windowList[i].AD_Window_ID, windowList[i].windowName);
+                                zoomList.Add(pp);
+                                // Use first window found. Ideally there should be just one matching
 
-                                    //this break is remove by karan on 18 jan 2021, to show a record which can exist in more than one window.
-                                    //break;
-                                }
+                                //this break is remove by karan on 18 jan 2021, to show a record which can exist in more than one window.
+                                //break;
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        // get total number of records
+                        int rowCount = int.Parse(ds.Tables[0].Rows[cnt][0].ToString());
+                        if (rowCount != 0)
                         {
-                            // get total number of records
-                            int rowCount = int.Parse(ds.Tables[0].Rows[cnt][0].ToString());
-                            if (rowCount != 0)
-                            {
-                                // make a key name pair
-                                KeyNamePair pp = new KeyNamePair(ZoomWindow_ID, zoom_WindowName);
-                                zoomList.Add(pp);
-                            }
+                            // make a key name pair
+                            KeyNamePair pp = new KeyNamePair(ZoomWindow_ID, zoom_WindowName);
+                            zoomList.Add(pp);
                         }
                     }
                 }
@@ -479,7 +478,7 @@ namespace VIS.Models
             catch (Exception e)
             {
                 // fill error log
-                //log.Log(Level.SEVERE, sql1, e);
+                log.Log(Level.SEVERE, sql1, e.Message);
                 //VAdvantage.Common.ErrorLog.FillErrorLog("ZoomTarget.GetZoomTargets", GlobalVariable.LAST_EXECUTED_QUERY, e.Message, VAdvantage.Framework.Message.MessageType.ERROR);
             }
 
