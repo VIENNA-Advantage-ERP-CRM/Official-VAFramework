@@ -77,8 +77,16 @@ namespace VISLogic.Models
             // get data from Version table according to the Record Version 
             DataSet dsRec = DB.ExecuteDataset(sqlCol + " WHERE " + sbSQL.ToString() + " AND RecordVersion = " + Util.GetValueOfInt(od["oldversion"].Value));
             DataRow dr = null;
+
             if (dsRec != null && dsRec.Tables[0].Rows.Count > 0)
+            {
                 dr = dsRec.Tables[0].Rows[0];
+            }
+            if (!(dr != null && dr.Table != null && dr.Table.Rows.Count > 0))
+            {
+                VAdvantage.Logging.VLogger.Get().SaveError("", "No record found against version " + Util.GetValueOfInt(od["oldversion"].Value) + " for table " + origTableName);
+                return data;
+            }
 
             StringBuilder sbColName = new StringBuilder("");
             StringBuilder sbColValue = new StringBuilder("");
@@ -179,7 +187,7 @@ namespace VISLogic.Models
                         else if (column.DisplayType == DisplayType.Location)
                         {
                             // Change done to pick full address with help of function created in the database
-                            _querySQL.Append(", (SELECT l.Get_Location(l.C_Location_ID) FROM C_Location l WHERE l.C_Location_ID = " + tbl.GetTableName() + "." + column.ColumnName + ") AS " + column.ColumnName + "_LOC");
+                            _querySQL.Append(", (SELECT Get_Location(l.C_Location_ID) FROM C_Location l WHERE l.C_Location_ID = " + tbl.GetTableName() + "." + column.ColumnName + ") AS " + column.ColumnName + "_LOC");
                         }
                         // case for Locator type of columns
                         else if (column.DisplayType == DisplayType.Locator)

@@ -162,7 +162,7 @@ namespace VIS.Models
                     variable = variable.Substring(beginIndex, len);
                 }
 
-                if (!list.Contains(variable))
+                if (variable != "" && !list.Contains(variable))
                     list.Add(variable);
 
                 s = s.Substring(endIndex + 1);
@@ -430,45 +430,48 @@ namespace VIS.Models
             try
             {
                 ds = DB.ExecuteDataset(sql1, null);
-                for (int cnt = 0; cnt < ds.Tables[0].Rows.Count; cnt++)
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
-                    if (columns.Count > 0)
+                    for (int cnt = 0; cnt < ds.Tables[0].Rows.Count; cnt++)
                     {
-                        columnValues.Clear();
-                        // store column names with their values in the variable
-                        for (int i = 0; i < columns.Count; i++)
+                        if (columns.Count > 0)
                         {
-                            String columnName = (String)columns[i].ToString();
-                            String columnValue = (String)ds.Tables[0].Rows[cnt][columnName].ToString();
-                            //log.Fine(columnName + " = " + columnValue);
-                            columnValues.Add(new ValueNamePair(columnValue, columnName));
-                        }
-
-                        // Find matching windows
-                        for (int i = 0; i < windowList.Count; i++)
-                        {
-                            //log.Fine("Window : " + windowList[i].windowName + " WhereClause : " + windowList[i].whereClause);
-                            if (EvaluateWhereClause(columnValues, windowList[i].whereClause))
+                            columnValues.Clear();
+                            // store column names with their values in the variable
+                            for (int i = 0; i < columns.Count; i++)
                             {
-                                //log.Fine("MatchFound : " + windowList[i].windowName);
-                                KeyNamePair pp = new KeyNamePair(windowList[i].AD_Window_ID, windowList[i].windowName);
-                                zoomList.Add(pp);
-                                // Use first window found. Ideally there should be just one matching
+                                String columnName = (String)columns[i].ToString();
+                                String columnValue = (String)ds.Tables[0].Rows[cnt][columnName].ToString();
+                                //log.Fine(columnName + " = " + columnValue);
+                                columnValues.Add(new ValueNamePair(columnValue, columnName));
+                            }
 
-                                //this break is remove by karan on 18 jan 2021, to show a record which can exist in more than one window.
-                                //break;
+                            // Find matching windows
+                            for (int i = 0; i < windowList.Count; i++)
+                            {
+                                //log.Fine("Window : " + windowList[i].windowName + " WhereClause : " + windowList[i].whereClause);
+                                if (EvaluateWhereClause(columnValues, windowList[i].whereClause))
+                                {
+                                    //log.Fine("MatchFound : " + windowList[i].windowName);
+                                    KeyNamePair pp = new KeyNamePair(windowList[i].AD_Window_ID, windowList[i].windowName);
+                                    zoomList.Add(pp);
+                                    // Use first window found. Ideally there should be just one matching
+
+                                    //this break is remove by karan on 18 jan 2021, to show a record which can exist in more than one window.
+                                    //break;
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        // get total number of records
-                        int rowCount = int.Parse(ds.Tables[0].Rows[cnt][0].ToString());
-                        if (rowCount != 0)
+                        else
                         {
-                            // make a key name pair
-                            KeyNamePair pp = new KeyNamePair(ZoomWindow_ID, zoom_WindowName);
-                            zoomList.Add(pp);
+                            // get total number of records
+                            int rowCount = int.Parse(ds.Tables[0].Rows[cnt][0].ToString());
+                            if (rowCount != 0)
+                            {
+                                // make a key name pair
+                                KeyNamePair pp = new KeyNamePair(ZoomWindow_ID, zoom_WindowName);
+                                zoomList.Add(pp);
+                            }
                         }
                     }
                 }
