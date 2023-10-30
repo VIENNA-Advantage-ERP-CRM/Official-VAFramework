@@ -39,7 +39,14 @@ namespace VIS.Models
                     }
                     else if (updateList.setValue[i].setType == DisplayType.Integer || DisplayType.IsID(updateList.setValue[i].setType))
                     {
-                        prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfInt(updateList.setValue[i].setValue));
+                        if (int.TryParse(updateList.setValue[i].setValue.ToString(), out int result))
+                        {
+                            prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfInt(updateList.setValue[i].setValue));
+                        }
+                        else
+                        {
+                            prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfString(updateList.setValue[i].setValue));
+                        }                       
                     }
                     else if (DisplayType.IsNumeric(updateList.setValue[i].setType))
                     {

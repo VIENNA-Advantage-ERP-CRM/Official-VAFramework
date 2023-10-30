@@ -1610,7 +1610,7 @@ namespace VAdvantage.Common
                     foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                     {
                         string type = "";
-                        string value = Util.GetValueOfString(dt["ad_equalto"]);
+                        object value = dt["ad_equalto"];
                         string columnName = Util.GetValueOfString(dt["ColumnName"]);
                         int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
 
@@ -1677,8 +1677,8 @@ namespace VAdvantage.Common
                                 WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                             }
                             else if (type == "DateTime")
-                            {
-                                WhereCondition += "CAST(" + columnName + " AS DATE) " + oprtr;
+                            {                               
+                                WhereCondition += columnName +" " + oprtr;
                             }
                             else
                             {
@@ -1749,7 +1749,7 @@ namespace VAdvantage.Common
                         }
                         else if (type == "String")
                         {
-                            WhereCondition += "'" + value + "'";
+                            WhereCondition += "'" + Util.GetValueOfString(value) + "'";
                             if (Util.GetValueOfString(dt["operation"]) == "AB")
                             {
                                 WhereCondition += " AND " + columnName + " <'" + Util.GetValueOfString(dt["Value2"]) + "'";
@@ -1757,10 +1757,10 @@ namespace VAdvantage.Common
                         }
                         else if (type == "DateTime")
                         {
-                            WhereCondition += "CAST('" + value + "' AS DATE)";
+                            WhereCondition += DB.TO_DATE(Convert.ToDateTime(value), true);
                             if (Util.GetValueOfString(dt["operation"]) == "AB")
                             {
-                                WhereCondition += " AND COST( " + columnName + " AS DATE) < CAST('" + Util.GetValueOfString(dt["Value2"]) + "' AS DATE)";
+                                WhereCondition += " AND " + columnName + "  < " + DB.TO_DATE(Convert.ToDateTime(dt["Value2"]), true);
                             }
                         }
                     }
