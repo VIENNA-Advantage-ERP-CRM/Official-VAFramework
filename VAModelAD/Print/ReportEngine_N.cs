@@ -1260,6 +1260,7 @@ namespace VAdvantage.Print
 
             System.Threading.Thread.CurrentThread.CurrentCulture = cInfo;
             System.Threading.Thread.CurrentThread.CurrentUICulture = cInfo;
+            //Convert the Hijri calendar date to the Gregorian calendar.The Hijri calendar date does not match with the date in the database.
             if (System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.Calendar.ToString() != "System.Globalization.GregorianCalendar")
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.Calendar = new System.Globalization.GregorianCalendar();
