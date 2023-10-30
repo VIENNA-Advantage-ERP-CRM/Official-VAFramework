@@ -829,6 +829,11 @@ namespace VAdvantage.ProcessEngine
                 }
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(lang);
                 System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(lang);
+                if (System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.Calendar.ToString() != "System.Globalization.GregorianCalendar")
+                {
+                    System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.Calendar = new System.Globalization.GregorianCalendar();
+                }
+
 
                 if (procedureName.Length > 0)
                 {

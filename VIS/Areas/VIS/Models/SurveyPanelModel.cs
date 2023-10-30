@@ -520,6 +520,7 @@ namespace VIS.Models
                         type = VAdvantage.Classes.DisplayType.GetClass(displayType, true).Name;
                     }
 
+                    
 
                     if (oprtr == "==")
                     {
@@ -565,6 +566,9 @@ namespace VIS.Models
                     if (type == "String")
                     {
                         value = "'" + value + "'";
+                    }else if(type.ToLower()=="date" || type.ToLower() == "datetime")
+                    {
+                        value ="'"+ Convert.ToDateTime(value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")+"'";
                     }
 
                     

@@ -1260,6 +1260,10 @@ namespace VAdvantage.Print
 
             System.Threading.Thread.CurrentThread.CurrentCulture = cInfo;
             System.Threading.Thread.CurrentThread.CurrentUICulture = cInfo;
+            if (System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.Calendar.ToString() != "System.Globalization.GregorianCalendar")
+            {
+                System.Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.Calendar = new System.Globalization.GregorianCalendar();
+            }
 
             /*** END  *******/
 
