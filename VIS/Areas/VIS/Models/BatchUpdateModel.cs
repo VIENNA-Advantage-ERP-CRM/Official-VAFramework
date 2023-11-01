@@ -39,7 +39,7 @@ namespace VIS.Models
                     }
                     else if (updateList.setValue[i].setType == DisplayType.Integer || DisplayType.IsID(updateList.setValue[i].setType))
                     {
-                        if (int.TryParse(updateList.setValue[i].setValue.ToString(), out int result))
+                        if (int.TryParse(Util.GetValueOfString(updateList.setValue[i].setValue), out int result))
                         {
                             prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfInt(updateList.setValue[i].setValue));
                         }
