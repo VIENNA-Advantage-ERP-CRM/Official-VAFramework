@@ -21,6 +21,7 @@ using VAdvantage.Process;
 using VAdvantage.Utility;
 using VAdvantage.Logging;
 using VAdvantage.Controller;
+using System.Text.RegularExpressions;
 
 namespace VAdvantage.Classes
 {
@@ -254,19 +255,31 @@ namespace VAdvantage.Classes
             }
             //	Validation
             string local_validationCode = "";
+           
+
+
             if (info.validationCode == null || info.validationCode.Length == 0) { info.isValidated = true; }
             else
             {
-                local_validationCode = Utility.Env.ParseContext(ctx, windowNum, info.validationCode, true);
-                //  returns "" if not all variables were parsed
-                if (local_validationCode.Length == 0
-                    || info.validationCode.IndexOf("@AD_Org_ID@") != -1)	//	don't validate Org
+                Regex regex = new Regex(@"@[A-Za-z]");
+                if (regex.IsMatch(info.validationCode))
                 {
                     info.isValidated = false;
-                    local_validationCode = "";
                 }
                 else
-                    info.isValidated = true;
+                {
+
+                    local_validationCode = Utility.Env.ParseContext(ctx, windowNum, info.validationCode, true);
+                    //  returns "" if not all variables were parsed
+                    if (local_validationCode.Length == 0
+                        || info.validationCode.IndexOf("@AD_Org_ID@") != -1)    //	don't validate Org
+                    {
+                        info.isValidated = false;
+                        local_validationCode = "";
+                    }
+                    else
+                        info.isValidated = true;
+                }
             }
 
             //	Add Local Validation

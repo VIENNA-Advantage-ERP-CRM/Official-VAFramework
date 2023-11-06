@@ -311,6 +311,107 @@
                 }
             }
             return result;
+        },
+        // Evaluate Logic By passing current row data  -- Mandeep 
+
+        evaluateLogicByRowData: function (source, logic) {
+            //	ConditionalStringTokenizer
+            var st = new VIS.StringTokenizer(logic.trim(), "&|", true);
+            // try {
+
+            var it = st.countTokens();
+            if (((it / 2) - ((it + 1) / 2)) == 0)		//	only uneven arguments
+            {
+                //log.severe("Logic does not comply with format "
+                //    + "'<expression> [<logic> <expression>]' => " + logic);
+                return false;
+            }
+
+            var retValue = this.evaluateLogicByRowDouble(source, st.nextToken());
+            while (st.hasMoreTokens()) {
+                var logOp = st.nextToken().trim();
+                var temp = this.evaluateLogicByRowDouble(source, st.nextToken());
+                if (logOp.equals("&"))
+                    retValue = retValue && temp;
+                else if (logOp.equals("|"))
+                    retValue = retValue || temp;
+                else {
+                    //            //Common.ErrorLog.FillErrorLog("Evaluatot.EvaluateLogic()", "DynamicDisplay", "Logic operant '|' or '&' expected => " + logic, VAdvantage.Framework.Message.MessageType.ERROR);
+                    //            //log.warning("Logic operant '|' or '&' expected => " + logic);
+                    return false;
+                }
+            }
+            return retValue;
+            //}
+            // catch (exception) {
+            //    return false;
+            // }
+        },
+
+
+        // Evaluate Logic By passing current row data  -- Mandeep 
+        evaluateLogicByRowDouble: function (rowData, logic) {
+            var st = new VIS.StringTokenizer(logic.trim(), "!=^><", true);
+
+            if (st.countTokens() !== 3) {
+                //log.warning("Logic tuple does not comply with format "
+                //    + "'@context@=value' where operand could be one of '=!^><' => " + logic);
+
+                return false;
+            }
+            //	First Part
+            var first = st.nextToken().trim();					//	get '@tag@'
+            var firstEval = first.trim();
+            if (first.indexOf('@') != -1)		//	variable
+            {
+                first = first.replaceAll('@', ' ').trim(); 			//	strip 'tag'
+                //firstEval = source.get_ValueAsString(first);	
+                //	replace with it's value
+                firstEval = rowData.getValue(first);
+                if (firstEval == null) {
+                    firstEval = "";
+                } else {
+                    firstEval = firstEval.toString();
+                }
+            }
+            firstEval = firstEval.replaceAll('\'', ' ').replaceAll('"', ' ').trim();	//	strip ' and "
+            //	Comperator
+            var operand = st.nextToken();
+
+            //	Second Part
+            var second = st.nextToken();							//	get value
+            var secondEval = second.trim();
+            if (second.indexOf('@') != -1 && second[0] == '@' && second[second.length - 1] == '@') {
+                second = second.replaceAll('@', ' ').trim();			// strip tag
+                //secondEval = source.get_ValueAsString(second);		//	replace with it's value
+                secondEval = rowData.getValue(second);		//	replace with it's value
+                if (secondEval == null) {
+                    secondEval = "";
+                } else {
+                    secondEval = secondEval.toString();
+                }
+            }
+            secondEval = secondEval.replaceAll('\'', ' ').replaceAll('"', ' ').trim();	//	strip ' and "
+            //	Handling of ID compare (null => 0)
+            if (first.indexOf("_ID") != -1 && firstEval.length == 0)
+                firstEval = "0";
+            if (second.indexOf("_ID") != -1 && secondEval.length == 0)
+                secondEval = "0";
+            //handle null value 
+            if (firstEval == "0" && (secondEval == "" || secondEval == "null"))
+                secondEval = "0";
+            if (firstEval.length == 0 && secondEval == "null")
+                secondEval = "";
+
+
+            //	Logical Comparison
+            var result = this.evaluateLogicTuple(firstEval, operand, secondEval);
+
+            //if (log.isLevelFinest())
+            //    //log.finest(logic
+            //        + " => \"" + firstEval + "\" " + operand + " \"" + secondEval + "\" => " + result);
+            //
+            return result;
         }
     };
 

@@ -504,7 +504,8 @@ namespace VAdvantage.Common
 
             string newpwdExpireDate = GlobalVariable.TO_DATE(DateTime.Now.AddMonths(passwordValidity), true);
 
-            string sql = "UPDATE AD_User set Updated=Sysdate,UpdatedBy=" + UpdatedBy + ",PasswordExpireOn=" + newpwdExpireDate + ",password='" + newPwd + "' WHERE AD_User_ID=" + AD_User_ID;
+            // VIS0060: Work done to set Last Password Updated on date when user changed the password.
+            string sql = "UPDATE AD_User set Updated=Sysdate, LastPwdUpdatedOn=SYSDATE, UpdatedBy=" + UpdatedBy + ",PasswordExpireOn=" + newpwdExpireDate + ",password='" + newPwd + "' WHERE AD_User_ID=" + AD_User_ID;
             int count = DB.ExecuteQuery(sql);
             if (count > 0)
                 return true;
@@ -1515,7 +1516,7 @@ namespace VAdvantage.Common
                     };
 
                     DataSet ds = DataBase.DB.ExecuteDataset("SELECT AlignItems,    ColumnSpan,   Justifyitems,   Rowspan,   Seqno,   Startcolumn,   Startrow," +
-                        " AD_GridLayoutItems_ID,BackgroundColor, FontColor, FontSize,Padding, ColumnSql,HideFieldIcon, HideFieldText, FieldValueStyle,IsAlwaysExecute, FieldLabelStyle FROM Ad_Gridlayoutitems WHERE IsActive ='Y' AND AD_GridLayout_ID=" + hGrid.AD_GridLayout_ID + " ORDER BY Seqno ");
+                        " AD_GridLayoutItems_ID,BackgroundColor, FontColor, FontSize,Padding, ColumnSql,HideFieldIcon, HideFieldText, FieldValueStyle,IsAlwaysExecute, FieldLabelStyle,contentFieldLable,contentFieldValue,IsStaticContent FROM Ad_Gridlayoutitems WHERE IsActive ='Y' AND AD_GridLayout_ID=" + hGrid.AD_GridLayout_ID + " ORDER BY Seqno ");
                     if (ds != null && ds.Tables[0].Rows.Count > 0)
                     {
                         hGrid.HeaderItems = new Dictionary<int, object>();
@@ -1540,7 +1541,11 @@ namespace VAdvantage.Common
                                 HideFieldText = Util.GetValueOfString(row["HideFieldtext"]) == "Y",
                                 FieldValueStyle = Convert.ToString(row["FieldValueStyle"]),
                                 FieldLabelStyle = Convert.ToString(row["FieldLabelStyle"]),
-                                IsAlwaysExecute = Util.GetValueOfString(row["IsAlwaysExecute"]) == "Y"
+                                IsAlwaysExecute = Util.GetValueOfString(row["IsAlwaysExecute"]) == "Y",
+                                IsStaticContent = Util.GetValueOfString(row["IsStaticContent"]) == "Y",
+                                ContentFieldLabel = Convert.ToString(row["contentFieldLable"]),
+                                ContentFieldValue = Convert.ToString(row["contentFieldValue"])
+
                             };
                         }
                     }
@@ -1588,7 +1593,7 @@ namespace VAdvantage.Common
 
             string WhereCondition = "";
 
-            if (ShowEverytime == "N")
+            if (true)
             {
                 string sql = @"SELECT AD_Column.AD_column_ID,
                             ad_surveyshowcondition.seqno,AD_Column.ColumnName,ad_surveyshowcondition.operation,ad_surveyshowcondition.ad_equalto,ad_surveyshowcondition.Value2,
@@ -1605,7 +1610,7 @@ namespace VAdvantage.Common
                     foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                     {
                         string type = "";
-                        string value = Util.GetValueOfString(dt["ad_equalto"]);
+                        object value = dt["ad_equalto"];
                         string columnName = Util.GetValueOfString(dt["ColumnName"]);
                         int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
 
@@ -1672,8 +1677,8 @@ namespace VAdvantage.Common
                                 WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                             }
                             else if (type == "DateTime")
-                            {
-                                WhereCondition += "CAST(" + columnName + " AS DATE) " + oprtr;
+                            {                               
+                                WhereCondition += columnName +" " + oprtr;
                             }
                             else
                             {
@@ -1744,7 +1749,7 @@ namespace VAdvantage.Common
                         }
                         else if (type == "String")
                         {
-                            WhereCondition += "'" + value + "'";
+                            WhereCondition += "'" + Util.GetValueOfString(value) + "'";
                             if (Util.GetValueOfString(dt["operation"]) == "AB")
                             {
                                 WhereCondition += " AND " + columnName + " <'" + Util.GetValueOfString(dt["Value2"]) + "'";
@@ -1752,10 +1757,10 @@ namespace VAdvantage.Common
                         }
                         else if (type == "DateTime")
                         {
-                            WhereCondition += "CAST('" + value + "' AS DATE)";
+                            WhereCondition += DB.TO_DATE(Convert.ToDateTime(value), true);
                             if (Util.GetValueOfString(dt["operation"]) == "AB")
                             {
-                                WhereCondition += " AND COST( " + columnName + " AS DATE) < CAST('" + Util.GetValueOfString(dt["Value2"]) + "' AS DATE)";
+                                WhereCondition += " AND " + columnName + "  < " + DB.TO_DATE(Convert.ToDateTime(dt["Value2"]), true);
                             }
                         }
                     }
@@ -1797,10 +1802,6 @@ namespace VAdvantage.Common
                 {
                     isExist = false;
                 }
-            }
-            else if(ShowEverytime == "N")
-            {
-                isExist = false;
             }
             
 

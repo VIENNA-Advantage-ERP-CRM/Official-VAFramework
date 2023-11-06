@@ -102,14 +102,15 @@ namespace VAdvantage.Process
             log.Log(Level.SEVERE, "UserPassword Change Log Step Password Change=>" + Convert.ToString(p_AD_User_ID));
             String originalPwd = p_NewPassword;
 
-            String sql = "UPDATE AD_User SET Updated=SYSDATE,FailedloginCount=0, UpdatedBy=" + GetAD_User_ID();
+            // VIS0060: Work done to set Last Password Updated on date when user changed the password.
+            String sql = "UPDATE AD_User SET Updated=SYSDATE, LastPwdUpdatedOn=SYSDATE, FailedloginCount=0, UpdatedBy=" + GetAD_User_ID();
             if (user.GetAD_User_ID() == current.GetAD_User_ID())
             {
                 Common.Common.UpdatePasswordAndValidity(p_NewPassword, p_AD_User_ID, GetAD_User_ID(), -1, GetCtx());
             }
             else
             {
-                sql += ",  PasswordExpireOn = null";
+                sql += ", PasswordExpireOn = null";
             }
 
 

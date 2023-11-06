@@ -78,6 +78,10 @@
             return $outerwrap;
         }
 
+        this.getcurTabPanel = function () {
+            return this.curTabPanel;
+        }
+
         this.setPanelList = function (htm, defPnlId) {
             $ulIconList.append(htm);
             var defaultPanel = $ulIconList.find("[default='true']").first();

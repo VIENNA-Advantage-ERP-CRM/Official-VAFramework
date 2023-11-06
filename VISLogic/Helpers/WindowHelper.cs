@@ -3126,7 +3126,7 @@ namespace VIS.Helpers
             outt.Headers.Add(Msg.Translate(ctx, "NewValue"));
             outt.Headers.Add(Msg.Translate(ctx, "OldValue"));
             outt.Headers.Add(Msg.Translate(ctx, "UpdatedBy"));
-            outt.Headers.Add(Msg.Translate(ctx, "Updated") + " (" + Msg.GetMsg(ctx, "UTC") + ")");
+            outt.Headers.Add(Msg.Translate(ctx, "Updated"));
 
             return outt;
         }
@@ -3263,7 +3263,7 @@ namespace VIS.Helpers
             MUser user = MUser.Get(ctx, UpdatedBy);
             line.UpdatedBy = user.GetName();
             //	Updated
-            line.Updated = Convert.ToDateTime(Updated);
+            line.Updated = new DateTime(Convert.ToDateTime(Updated).Ticks, DateTimeKind.Utc);
             return line;
         }
 

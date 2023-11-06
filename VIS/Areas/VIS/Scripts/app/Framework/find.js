@@ -1328,7 +1328,7 @@
 
                 //total = VIS.DB.executeScalar(finalSQL, null);
 
-                var _sql = VIS.secureEngine.encrypt(sql);
+                var _sql = VIS.secureEngine.encrypt(finalSQL);
                 total = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ASearch/GetNoOfRecrds", { "RecQuery": _sql }, null);
             }
             catch (ex) {
