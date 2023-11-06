@@ -383,7 +383,8 @@
             $ulToobar.append(this.aRefresh.getListItm());
             $ulToobar.append(this.aReport.getListItm());
             $ulToobar.append(this.aPrint.getListItm());
-            $ulToobar.append(this.aBatchUpdate.getListItm());
+            //$ulToobar.append(this.aBatchUpdate.getListItm());
+            this.aBatchUpdate.getListItm();
 
 
 
