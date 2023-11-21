@@ -415,6 +415,10 @@ namespace VAdvantage.Controller
                     {
                         vo.TabSeqNo = Util.GetValueOfInt(dr[i].ToString());
                     }
+                    else if (columnName.Equals("AD_Action", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.ADAction = Util.GetValueOfString(dr[i].ToString());
+                    }
                 }
                 if (vo.Header == null)
                     vo.Header = vo.ColumnName;
@@ -467,6 +471,7 @@ namespace VAdvantage.Controller
                 vo.AD_Reference_Value_ID = Utility.Util.GetValueOfInt(dr["AD_Reference_Value_ID"]);
                 vo.ValidationCode = Utility.Util.GetValueOfString(dr["ValidationCode"]);
                 vo.AD_InfoWindow_ID = Util.GetValueOfInt(dr["AD_INFOWINDOW_ID"]);
+
             }
             catch (System.Exception e)
             {
@@ -925,6 +930,7 @@ namespace VAdvantage.Controller
             clone.GridImageStyle = GridImageStyle;
             clone.IsAction = IsAction;
             clone.TabSeqNo = TabSeqNo;
+            clone.ADAction = ADAction;
             return clone;
         }
 

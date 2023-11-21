@@ -372,7 +372,7 @@
             this.aReport = this.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
             this.aPrint = this.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
             this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
-
+            
             //Ndw Back button
             this.aBack = this.addActions("Back", null, true, true, false, onAction, null, "Shct_Back");
             $ulToobar.append(this.aBack.getListItm());
@@ -2568,7 +2568,7 @@
         /*Special handling
           Move to next tab */
         else if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()));
+            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()),mField.getAction());
             return;
         }
 
@@ -2864,20 +2864,28 @@
     /**
      *	tab change
      *  @param action tab item's id
+     *  @param actionType OTD 
      */
-    APanel.prototype.tabActionPerformed = function (action) {
+    APanel.prototype.tabActionPerformed = function (action, actionType) {
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
             return false;
         }
 
-
+        
         var back = false;
         var isAPanelTab = false;
         var tabEle = this.vTabbedPane.getTabElement(action);
         var curEle = this.curST || this.curGC;
         var oldGC = null;
+
+        //Handle Open Tab in Dialog
+        if (actionType =='OTD') {
+            VIS.TabMngr.show(tabEle, curEle.gTab.keyColumnName, curEle.gTab.getRecord_ID());
+            this.vTabbedPane.restoreTabChange();
+            return;
+        }
 
         //// To Clear SearchText Box on Tab Change
         this.toggleASearchIcons(false, false);
