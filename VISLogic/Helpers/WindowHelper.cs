@@ -3808,8 +3808,8 @@ namespace VIS.Helpers
 
             //If Login org is not * , then fetch records of * org which are shared with current org and ignore records of * which are shared 
             // with other orgs and not with current org
-
-            if (ctxp.GetAD_Org_ID() > 0 && !TableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !TableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
+            MTable table = MTable.Get(ctxp, AD_Table_ID);
+            if (ctxp.GetAD_Org_ID() > 0 && !table.IsView() && !TableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !TableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
             {
                 if (string.IsNullOrEmpty(WhereClause))
                 {

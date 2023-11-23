@@ -3875,6 +3875,7 @@ html[dir="rtl"] .vis-cvd-editbtn {
     float: right;
 }
 
+
     .vis-Dialog-buttons input {
         margin-left: 10px;
         background: rgba(var(--v-c-primary), 1);
@@ -3884,6 +3885,10 @@ html[dir="rtl"] .vis-cvd-editbtn {
         border-radius: .25rem;
         outline: none;
     }
+
+        .vis-Dialog-buttons input:focus {
+            box-shadow: 0 0 10px rgb(0 0 0 / 50%);
+        }
 
 .vis-PopupInput-alert > label {
     clear: both;

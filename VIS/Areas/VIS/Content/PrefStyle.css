@@ -609,14 +609,15 @@ div.VIS_Pref_slide-show.pp {
 }
 
 .VIS_Pref_callout {
-    /*z-index: 20;*/
+    /* z-index: 20; */
     position: absolute;
-    bottom: -17px;
+    /* bottom: -17px; */
     border: 0;
     left: 10px;
+    top: -16px;
     transform: rotate(-90deg);
     -ms-transform: rotate(-90deg);
-    -webkit-transform: rotate(-90deg);
+    -webkit-transform: rotate(90deg);
     font-size: 1.5rem;
     color: rgba(var(--v-c-secondary), 1);
 }
@@ -634,6 +635,7 @@ div.VIS_Pref_slide-show.pp {
 
 a.VIS_Pref_tooltip {
     outline: none;
+    position:relative;
     /*margin-bottom: 15px;*/
 }
 
@@ -645,15 +647,6 @@ a.VIS_Pref_tooltip {
         text-decoration: none;
     }
 
-    a.VIS_Pref_tooltip span {
-        z-index: 10;
-        display: none;
-        padding: 17px 20px;
-        margin-top: -60px;
-        margin-left: -20px;
-        width: 240px;
-        /*line-height: 16px;*/
-    }
 
     a.VIS_Pref_tooltip:hover span {
         display: inline;
@@ -661,10 +654,12 @@ a.VIS_Pref_tooltip {
         color: rgba(var(--v-c-on-secondary), 1);
         border: 1px solid rgba(var(--v-c-secondary), 1);
         background: rgba(var(--v-c-secondary), 1);
-        right: 40px;
-        bottom: 20px;
+        /* right: 0; */
+        /* bottom: 22px; */
         z-index: 9;
         word-break: break-word;
+        left: 5px;
+        top: 27px;
     }
 
     /*CSS3 extras*/
@@ -672,6 +667,13 @@ a.VIS_Pref_tooltip {
         border-radius: 7px;
         -moz-border-radius: 7px;
         -webkit-border-radius: 7px;
+        z-index: 10;
+        display: none;
+        padding: 12px 15px;
+        /* margin-top: -60px; */
+        /* margin-left: -20px; */
+        width: 240px;
+        /* line-height: 16px; */
     }
 
 /*placeholder color*/
