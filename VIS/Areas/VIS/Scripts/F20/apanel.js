@@ -2568,7 +2568,7 @@
         /*Special handling
           Move to next tab */
         else if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()));
+            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction());
             return;
         }
 
@@ -2865,7 +2865,7 @@
      *	tab change
      *  @param action tab item's id
      */
-    APanel.prototype.tabActionPerformed = function (action) {
+    APanel.prototype.tabActionPerformed = function (action, actionType) {
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
@@ -2878,6 +2878,13 @@
         var tabEle = this.vTabbedPane.getTabElement(action);
         var curEle = this.curST || this.curGC;
         var oldGC = null;
+
+        //Handle Open Tab in Dialog
+        if (actionType == 'OTD') {
+            VIS.TabMngr.show(tabEle, curEle.gTab.keyColumnName, curEle.gTab.getRecord_ID());
+            this.vTabbedPane.restoreTabChange();
+            return;
+        }
 
         //// To Clear SearchText Box on Tab Change
         this.toggleASearchIcons(false, false);

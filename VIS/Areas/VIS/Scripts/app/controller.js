@@ -7322,6 +7322,9 @@
     GridField.prototype.getTabSeqNo = function () {
         return this.vo.TabSeqNo;
     };
+    GridField.prototype.getAction = function () {
+        return this.vo.ADAction;
+    };
 
     /**
      *  Refresh Lookup if the lookup is unstable
