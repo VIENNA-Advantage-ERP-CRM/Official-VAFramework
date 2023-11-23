@@ -383,6 +383,10 @@
         return this.vo.IsCompositeView;
     }
 
+    GridWindow.prototype.getIsHideTabLinks = function () {
+        return this.vo.IsHideTabLinks;
+    }
+
     GridWindow.prototype.dispose = function () {
 
         originalLength = this.tabs.length;

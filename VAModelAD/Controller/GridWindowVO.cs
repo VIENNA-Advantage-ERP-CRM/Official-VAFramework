@@ -115,7 +115,8 @@ namespace VAdvantage.Controller
         public string ImageUrl = "";
         public bool IsCompositeView = true;
         public bool IsGenerateAttachmentCode = true;
-       
+
+        public bool IsHideTabLinks = false;
 
 
         public List<GridTabVO> GetTabs()
@@ -191,7 +192,7 @@ namespace VAdvantage.Controller
              + "AD_Color_ID,AD_Image_ID, IsReadWrite, WinHeight,WinWidth, "
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
-             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared ");
+             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared,IsHideTabLinks ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
@@ -369,6 +370,8 @@ namespace VAdvantage.Controller
                             vo.IsCompositeView = dr[36].ToString() == "Y";
                             vo.IsGenerateAttachmentCode = !("N".Equals(dr[37].ToString()));
                             vo.IsRecordShared = dr[38].ToString() == "Y";
+                            vo.IsHideTabLinks = dr[39].ToString() == "Y";
+
                         }
                     }
                 }
@@ -885,6 +888,7 @@ namespace VAdvantage.Controller
                 clone.ImageUrl = ImageUrl;
                 clone.IsCompositeView = IsCompositeView;
                 clone.IsGenerateAttachmentCode = IsGenerateAttachmentCode;
+                clone.IsHideTabLinks = IsHideTabLinks;
 
                 //
                 clone.hasPanel = hasPanel;

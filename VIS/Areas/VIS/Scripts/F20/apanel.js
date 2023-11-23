@@ -327,6 +327,10 @@
             }
             self.vTabbedPane.finishLayout(VIS.Application.isMobile);
 
+            if (self.gridWindow.getIsHideTabLinks()) {
+                $divHeaderNav.find('*').css('visibility', 'hidden');
+            }
+
             setToolTipMessages();
         };
         /* Tool bar */
