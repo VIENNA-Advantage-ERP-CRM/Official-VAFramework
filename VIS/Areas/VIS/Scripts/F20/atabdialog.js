@@ -4,6 +4,7 @@
 
 ; (function (VIS, $) {
     function TabDialog(gc, WhereClause) {
+        "use strict";
         this.bufferList = [];
         this.grid;
         var self = this;

@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="ViennaAdvantageWeb.MvcApplication" Language="C#" %>
+﻿<%@ Application CodeBehind="Global.asax.cs" Inherits="ViennaBase.Global" Language="C#" %>

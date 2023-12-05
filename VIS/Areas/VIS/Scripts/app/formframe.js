@@ -101,24 +101,30 @@
         console.log(className);
 
 
-        this.log.info("Form Name= " + json.Name + ", Class=" + className);
-        this.ctx.setWindowContext(windowNo, "WindowName", json.DisplayName);
-
         try {
-
-            //className = "VIS.Apps.TestForm";
-            var type = VIS.Utility.getFunctionByName(className, window);
+            var type = "";
+            var isReact = className.split('.');
+            additionalInfo = null;
+            if (isReact[1].toLowerCase() == 'react') {
+                additionalInfo = isReact[2];
+                className = isReact[0] + '.' + isReact[1];
+            }
+            //    type = VIS.Utility.getFunctionByName('VIS.Apps.ReactTemplate', window);
+            //    additionalInfo = className;
+            //} else {
+            type = VIS.Utility.getFunctionByName(className, window);
+            //}
             var o = new type(windowNo);
             o.init(windowNo, this, additionalInfo);
             this.mPanel = o;
             o = null;
         }
         catch (e) {
-           
-                this.log.log(VIS.Logging.Level.WARNING, "Class=" + className + ", AD_Form Name=" + json.Name, e)
-                return false;
-           
-            
+
+            this.log.log(VIS.Logging.Level.WARNING, "Class=" + className + ", AD_Form Name=" + json.Name, e)
+            return false;
+
+
         }
 
         //this.getRoot().html("Form _ID=>" + json.ClassName);

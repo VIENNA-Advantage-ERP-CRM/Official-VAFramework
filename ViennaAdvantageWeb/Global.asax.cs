@@ -17,6 +17,7 @@ namespace ViennaAdvantageWeb
     {
         protected void Application_Start()
         {
+            ReactConfig.Configure();
             AreaRegistration.RegisterAllAreas();
             WebApiConfig.Register(GlobalConfiguration.Configuration); 
 
@@ -31,5 +32,11 @@ namespace ViennaAdvantageWeb
            
             VAdvantage.Classes.SessionEventHandler.SessionEnd(Session["ctx"] as VAdvantage.Utility.Ctx);
         }
+
+
+
+
+
+
     }
 }
