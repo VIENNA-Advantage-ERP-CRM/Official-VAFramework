@@ -3676,13 +3676,15 @@
         var $this = this;
 
         // Check valid condition for checklist
-        this.curGC.IsCheckListRequire(function (isCheckListRequire) {
-            if (!isCheckListRequire) {
-                VIS.ADialog.error("CheckListRequired");
-                return false;
-            }
-            return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
-        });
+        //this.curGC.IsCheckListRequire(function (isCheckListRequire) {
+        //    if (!isCheckListRequire) {
+        //        VIS.ADialog.error("CheckListRequired");
+        //        return false;
+        //    }
+            
+        //});
+
+        return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
     };
 
     APanel.prototype.cmd_save2 = function (manual, curTab, curGC, selfPanel, callback) {
