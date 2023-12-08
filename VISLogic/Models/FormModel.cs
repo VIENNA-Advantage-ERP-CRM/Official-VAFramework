@@ -1236,7 +1236,7 @@ namespace VIS.Models
                         + " INNER JOIN C_InvoiceLine l ON (o.C_Invoice_ID=l.C_Invoice_ID) "
                         + "WHERE o.C_Invoice_ID=" + Record_ID + "");
             }
-            sql.Append("GROUP BY o.C_Currency_ID, c.ISO_Code, o.TotalLines, o.GrandTotal, o.DateAcct, o.AD_Client_ID, o.AD_Org_ID,o.C_CONVERSIONTYPE_ID");
+            sql.Append(" GROUP BY o.C_Currency_ID, c.ISO_Code, o.TotalLines, o.GrandTotal, o.DateAcct, o.AD_Client_ID, o.AD_Org_ID,o.C_CONVERSIONTYPE_ID");
 
             SqlParamsIn sqlP = new SqlParamsIn();
             sqlP.sql = sql.ToString();
