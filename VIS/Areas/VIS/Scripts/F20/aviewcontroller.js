@@ -1679,19 +1679,28 @@
     };
 
     VIS.GridController.prototype.dataSave = function (manualCmd) {
+        var $this = this;
+        $this.IsCheckListRequire(function (isCheckListRequire) {
+            if (!isCheckListRequire) {
+                VIS.ADialog.error("CheckListRequired");
+                return false;
+            }
 
-        if (this.m_tree != null) {
-            this.gTab.SetSelectedNode(this.m_tree.currentNode);
-            this.gTab.setTreeID(this.treeID);
-        }
+            if ($this.m_tree != null) {
+                $this.gTab.SetSelectedNode($this.m_tree.currentNode);
+                $this.gTab.setTreeID($this.treeID);
+            }
 
 
-        var retVal = this.gTab.dataSave(manualCmd);
-        if (retVal) {
-            //refresh Grid Row
-            // this.vTable.refreshRow();
-        }
-        return retVal;
+            var retVal = $this.gTab.dataSave(manualCmd);
+            if (retVal) {
+                //refresh Grid Row
+                // this.vTable.refreshRow();
+            }
+            return retVal;
+        });
+
+        
     };
 
     VIS.GridController.prototype.dataNew = function (copy) {
