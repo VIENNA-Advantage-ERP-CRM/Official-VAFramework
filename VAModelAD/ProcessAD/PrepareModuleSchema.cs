@@ -777,7 +777,7 @@ namespace VAdvantage.Process
                                             + " AND AD_Tab_ID=" + sAD_Tab_ID + " AND AD_Client_ID = 0 AND IsActive='Y'");
             for (int i = 0; i < ds.Tables[0].Rows.Count; i++) //Grid View
             {
-                DataRow dr = ds.Tables[0].Rows[0];
+                DataRow dr = ds.Tables[0].Rows[i];
                 if (Util.GetValueOfInt(dr["AD_HeaderLayout_ID"]) > 0)
                 {
                     //insert
