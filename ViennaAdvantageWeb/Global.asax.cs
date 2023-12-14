@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -17,20 +19,20 @@ namespace ViennaAdvantageWeb
     {
         protected void Application_Start()
         {
-            ReactConfig.Configure();
-            AreaRegistration.RegisterAllAreas();
-            WebApiConfig.Register(GlobalConfiguration.Configuration); 
+            //ReactConfig.Configure();
+            //AreaRegistration.RegisterAllAreas();
+            //WebApiConfig.Register(GlobalConfiguration.Configuration); 
 
-            RouteConfig.RegisterRoutes(RouteTable.Routes); 
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            AuthConfig.RegisterAuth();//test
-           
+            //RouteConfig.RegisterRoutes(RouteTable.Routes); 
+            //BundleConfig.RegisterBundles(BundleTable.Bundles);
+            //FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            ////AuthConfig.RegisterAuth();//test
+            //AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
         }
         protected void Session_End()
         {
            
-            VAdvantage.Classes.SessionEventHandler.SessionEnd(Session["ctx"] as VAdvantage.Utility.Ctx);
+            //VAdvantage.Classes.SessionEventHandler.SessionEnd(Session["ctx"] as VAdvantage.Utility.Ctx);
         }
 
 

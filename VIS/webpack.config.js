@@ -19,10 +19,13 @@ module.exports = {
         path: path.resolve(__dirname, 'Areas/VIS/Scripts'), // Output directory
 
     },
+    resolve: {
+        extensions: ['.jsx', '.js'],
+    },
     module: {
         rules: [
             {
-                test: /\.(js|jsx|ts)$/,
+                test: /\.(js|jsx)$/,
                 exclude: /node_modules/,               
                 use: {
                     loader: 'babel-loader'                    
