@@ -2925,6 +2925,16 @@
                     if (this.curTab.needSave(true, true)) {
                         //	Automatic Save
                         if (this.ctx.isAutoCommit(this.curWindowNo)) {
+
+                            var isCheckListRequire = this.curGC.IsCheckListRequire();
+
+                            if (!isCheckListRequire) {
+                                this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
+                                this.setBusy(false, true);
+                                VIS.ADialog.error("CheckListRequired");
+                                return false;
+                            }
+
                             if (!this.curTab.dataSave(true)) {	//  there is a problem, so we go back	
                                 this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
                                 this.setBusy(false, true);

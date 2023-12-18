@@ -230,7 +230,8 @@ namespace VIS.Models
                         sort = Util.GetValueOfInt(ds.Tables[0].Rows[i]["SORTNO"]),
                         SeqNo = Util.GetValueOfInt(ds.Tables[0].Rows[i]["SeqNo"]),
                         UserID = uid,
-                        OrderByClause = sortOrder
+                        OrderByClause = sortOrder,
+                        ExportID = Util.GetValueOfString(ds.Tables[0].Rows[i]["Export_ID"]),
 
                     };
                     lstCardViewColumns.Add(objCardView);
@@ -243,8 +244,8 @@ namespace VIS.Models
                     FieldName = "",
                     AD_Field_ID = 0,
                     AD_GroupField_ID = fid,
-                    UserID = uid
-
+                    UserID = uid,
+                    ExportID = ""
                 };
                 lstCardViewColumns.Add(objCardView);
             }
@@ -391,7 +392,7 @@ namespace VIS.Models
         /// <param name="sqNo"></param>
         /// <param name="ctx"></param>
         /// <param name="sort"></param>
-        public void SaveCardViewColumns(int ad_cardview_id, int ad_Field_ID, int sqNo, Ctx ctx, int sort)
+        public void SaveCardViewColumns(int ad_cardview_id, int ad_Field_ID, int sqNo, Ctx ctx, int sort,string exportID)
         {
 
             MCardViewColumn objCardViewColumn = new MCardViewColumn(ctx, 0, null);
@@ -399,6 +400,7 @@ namespace VIS.Models
             objCardViewColumn.SetAD_Field_ID(ad_Field_ID);
             objCardViewColumn.SetSeqNo(sqNo);
             objCardViewColumn.Set_Value("SortNo", sort);
+            objCardViewColumn.SetExport_ID(exportID);
             if (!objCardViewColumn.Save())
             {
             }
@@ -1288,6 +1290,7 @@ namespace VIS.Models
         public int AD_HeaderLayout_ID { get; set; }
         public int sort { get; set; }
         public string OrderByClause { get; set; }
+        public string ExportID { get; set; }
         public bool disableWindowPageSize { get; set; }
         public DateTime Updated { get; set; }
     }

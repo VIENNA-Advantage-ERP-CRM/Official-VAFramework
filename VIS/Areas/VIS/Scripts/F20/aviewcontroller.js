@@ -515,6 +515,7 @@
     /// Check Checklist required
     VIS.GridController.prototype.IsCheckListRequire = function (callback) {
 
+        var output = true;
         var isSurveyPanel = false;
         if (this.gTab.getHasPanel()) {
             var panels = this.gTab.getTabPanels();
@@ -527,8 +528,8 @@
         }
 
         if (!isSurveyPanel) {
-            callback(true);
-            return;
+            //callback(true);
+            return true;
         }
 
 
@@ -555,28 +556,33 @@
                 data = data[0];
 
                 if (data.ResponseCount > 0) {
-                    callback(true);
+                    output = true;
+                    //callback(true);
                 }
                 else if (data.Condition != "") {
                     var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
                     if (isValidate && isCheckListFill) {
-                        callback(true);
+                        output = true;
+                        //callback(true);
                     } else if (!isValidate) {
-                        callback(true);
+                        output = true;
+                       // callback(true);
                     } else {
-                        callback(false);
+                        output = false;
+                        //callback(false);
                     }
 
                     
                 } else {
-                    callback(true);
+                    output = true;
+                    //callback(true);
                 }
             },
             error: function (err) {
                 console.log(err);
             }
         });
-
+        return output;
     }
 
     VIS.GridController.prototype.SaveSurvey = function (recordID) {
@@ -1680,7 +1686,8 @@
 
     VIS.GridController.prototype.dataSave = function (manualCmd) {
         var $this = this;
-        $this.IsCheckListRequire(function (isCheckListRequire) {
+        var isCheckListRequire = $this.IsCheckListRequire();
+
             if (!isCheckListRequire) {
                 VIS.ADialog.error("CheckListRequired");
                 return false;
@@ -1698,7 +1705,7 @@
                 // this.vTable.refreshRow();
             }
             return retVal;
-        });
+       // });
 
         
     };

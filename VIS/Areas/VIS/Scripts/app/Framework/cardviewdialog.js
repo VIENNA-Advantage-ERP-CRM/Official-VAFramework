@@ -1335,6 +1335,7 @@
             if (!isNewRecord && !isChangeTemplate) {
                 DivCardField.find('.fieldLbl[seqNo]').each(function (i) {
                     var fID = $(this).attr('fieldid');
+                    var eId = $(this).attr('exportid');
                     if (DivViewBlock.find('[fieldid="' + fID + '"]').length == 0) {
 
                         var vlu = $(this).text();
@@ -1414,10 +1415,10 @@
                             var src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='50' height='50'%3E%3Cdefs%3E%3Cpath d='M23 31l-3.97-2.9L19 28l-.24-.09.19.13L13 33v2h24v-2l-3-9-5-3-6 10zm-2-12c0-1.66-1.34-3-3-3s-3 1.34-3 3 1.34 3 3 3 3-1.34 3-3zm-11-8c-.55 0-1 .45-1 1v26c0 .55.45 1 1 1h30c.55 0 1-.45 1-1V12c0-.55-.45-1-1-1H10zm28 26H12c-.55 0-1-.45-1-1V14c0-.55.45-1 1-1h26c.55 0 1 .45 1 1v22c-.3.67-.63 1-1 1z' id='a'/%3E%3C/defs%3E%3Cuse xlink:href='%23a' fill='%23fff'/%3E%3Cuse xlink:href='%23a' fill-opacity='0' stroke='%23000' stroke-opacity='0'/%3E%3C/svg%3E";
                             var displayType = mTab.getFieldById(Number(fID)).getDisplayType();
                             if (displayType == VIS.DisplayType.Image) {
-                                fieldHtml.append($('<span style="' + fidItm.attr("fieldValueLabel") + '" class="fieldLbl ' + cls + '" draggable="false" showFieldText="' + hideTxt + '" showFieldIcon="' + hideIcon + '"  title="' + vlu + '" fieldid="' + fID + '" id="' + $(this).attr('id') + '">' + vlu + '</span><img class="vis-colorInvert imgField" style="' + imgStyle + '" src="' + src + '"/>'));
+                                fieldHtml.append($('<span style="' + fidItm.attr("fieldValueLabel") + '" class="fieldLbl ' + cls + '" draggable="false" showFieldText="' + hideTxt + '" showFieldIcon="' + hideIcon + '"  title="' + vlu + '" fieldid="' + fID + '" id="' + $(this).attr('id') + '" exportid="' + eId+'">' + vlu + '</span><img class="vis-colorInvert imgField" style="' + imgStyle + '" src="' + src + '"/>'));
                             } else if (displayType == VIS.DisplayType.TableDir || displayType == VIS.DisplayType.Table || displayType == VIS.DisplayType.List || displayType == VIS.DisplayType.Search) {
 
-                                var fldlbl = '<span style="' + fidItm.attr("fieldValueLabel") + '" class="fieldLbl ' + cls + '" draggable="false" showFieldText="' + hideTxt + '" showFieldIcon="' + hideIcon + '" ondragstart="drag(event)" title="' + vlu + '" fieldid="' + fID + '" id="' + $(this).attr('id') + '">' + vlu + '</span>';
+                                var fldlbl = '<span style="' + fidItm.attr("fieldValueLabel") + '" class="fieldLbl ' + cls + '" draggable="false" showFieldText="' + hideTxt + '" showFieldIcon="' + hideIcon + '" ondragstart="drag(event)" title="' + vlu + '" fieldid="' + fID + '" id="' + $(this).attr('id') + '" exportid="' + eId +'">' + vlu + '</span>';
                                 src = "data:image/svg+xml,%3Csvg width='30' height='30' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cdefs%3E%3Cpath id='a' d='m23,31l-3.97,-2.9l-0.03,-0.1l-0.24,-0.09l0.19,0.13l-5.95,4.96l0,2l24,0l0,-2l-3,-9l-5,-3l-6,10zm-2,-12c0,-1.66 -1.34,-3 -3,-3s-3,1.34 -3,3s1.34,3 3,3s3,-1.34 3,-3zm-11,-8c-0.55,0 -1,0.45 -1,1l0,26c0,0.55 0.45,1 1,1l30,0c0.55,0 1,-0.45 1,-1l0,-26c0,-0.55 -0.45,-1 -1,-1l-30,0zm28,26l-26,0c-0.55,0 -1,-0.45 -1,-1l0,-22c0,-0.55 0.45,-1 1,-1l26,0c0.55,0 1,0.45 1,1l0,22c-0.3,0.67 -0.63,1 -1,1z'/%3E%3C/defs%3E%3Cg%3E%3Cuse transform='matrix(0.567292 0 0 0.499809 0.901418 2.3385)' x='0' y='0' stroke='null' id='svg_1' fill='%23fff' xlink:href='%23a'/%3E%3C/g%3E%3C/svg%3E";
                                 var img = '<img class="vis-colorInvert imgField" style="' + imgStyle + '" src="' + src + '"/>';
                                 var spn = '';
@@ -1440,7 +1441,7 @@
                             }
                             else {
 
-                                fieldHtml.append($('<span style="' + fidItm.attr("fieldValueLabel") + '" class="fieldLbl ' + cls + '" draggable="false" showFieldText="' + hideTxt + '" showFieldIcon="' + hideIcon + '" ondragstart="drag(event)" title="' + vlu + '" fieldid="' + fID + '" id="' + $(this).attr('id') + '">' + vlu + '</span><span class="fieldValue" style="' + vlstyle + '">:Value</span>'));
+                                fieldHtml.append($('<span style="' + fidItm.attr("fieldValueLabel") + '" class="fieldLbl ' + cls + '" draggable="false" showFieldText="' + hideTxt + '" showFieldIcon="' + hideIcon + '" ondragstart="drag(event)" title="' + vlu + '" fieldid="' + fID + '" id="' + $(this).attr('id') + '" exportid="' + eId +'">' + vlu + '</span><span class="fieldValue" style="' + vlstyle + '">:Value</span>'));
                             }
 
                             if (fidItm.attr("query") != null && fidItm.attr("query") != "") {
@@ -1603,7 +1604,7 @@
                                     iClone.attr("showfieldicon", false);
                                 }
 
-                                iClone.attr("fieldid", CVColumns[i].AD_Field_ID).attr("seqNo", CVColumns[i].SeqNo);
+                                iClone.attr("fieldid", CVColumns[i].AD_Field_ID).attr("seqNo", CVColumns[i].SeqNo).attr("exportid", CVColumns[i].ExportID);
                                 iClone.attr("id", WindowNo + "_" + CVColumns[i].AD_Field_ID);
                                 DivCardField.append(iClone);
                                 iClone = DivCardField.find('.fieldLbl:first').clone(true);
@@ -1645,7 +1646,7 @@
                             columnFieldArray.push(fieldItem[0].getAD_Field_ID());
                         }
 
-                        cardViewColArray.push({ AD_Field_ID: includedFields[i].getAD_Field_ID(), CardViewID: AD_CardView_ID, SeqNo: 0, FieldName: includedFields[i].getHeader() });
+                        cardViewColArray.push({ AD_Field_ID: includedFields[i].getAD_Field_ID(), CardViewID: AD_CardView_ID, SeqNo: 0, FieldName: includedFields[i].getHeader(), ExportID: includedFields[i].ExportID });
 
 
                         iClone.prepend(includedFields[i].getHeader()).attr("title", includedFields[i].getHeader());
@@ -1654,7 +1655,7 @@
                             iClone.attr("showfieldicon", false);
                         }
 
-                        iClone.attr("fieldid", includedFields[i].getAD_Field_ID()).attr("seqNo", includedFields[i].SeqNo);
+                        iClone.attr("fieldid", includedFields[i].getAD_Field_ID()).attr("seqNo", includedFields[i].SeqNo).attr("exportid", includedFields[i].ExportID);
                         iClone.attr("id", WindowNo + "_" + includedFields[i].getAD_Field_ID());
                         DivCardField.append(iClone);
                         iClone = DivCardField.find('.fieldLbl:first').clone(true);
@@ -4144,13 +4145,15 @@
                             hideFieldText: $(this).find('.fieldLbl').attr('showfieldtext') == 'true' ? true : false,
                             columnSQL: columnSQL,
                             contentFieldValue: null,
-                            contentFieldLabel: null
+                            contentFieldLabel: null,
+                            exportID: $(this).find('.fieldLbl').attr('exportid'),
                         }
 
                         var f = {}
                         f.AD_Field_ID = obj1.fieldID;
                         f.CardViewID = AD_CardView_ID;
                         f.SeqNo = obj1.seq;
+                        f.ExportID = obj1.exportID
                         cardViewColArray.push(f);
                         fieldObj.push(obj1);
                     });
@@ -4181,13 +4184,15 @@
                         hideFieldText: hideTxt,
                         columnSQL: columnSQL,
                         contentFieldValue: null,
-                        contentFieldLabel: null
+                        contentFieldLabel: null,
+                        exportID:null
                     }
 
                     var f = {}
                     f.AD_Field_ID = obj1.fieldID;
                     f.CardViewID = AD_CardView_ID;
                     f.SeqNo = obj1.seq;
+                    f.ExportID = obj1.exportID;
                     cardViewColArray.push(f);
                     fieldObj.push(obj1);
                 }
@@ -4469,6 +4474,7 @@
                 if (blok.hasClass('grdDiv')) {
                     var fieldHtml = $('<div class="fieldGroup" draggable="true"></div>');
                     var fID = itm.attr('fieldid');
+                    var eId = itm.attr('exportid');
                     var newitm = itm.clone(true);
                     newitm.attr("showfieldicon", true);
                     itm.find('.vis-grey-icon').remove();
