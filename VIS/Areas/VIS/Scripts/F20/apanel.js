@@ -430,15 +430,18 @@
 
             var mWindow = this.gridWindow;
             actionItemCount_Right = 0;
+
+            if (VIS.Env.getCtx().getContext('#ENABLE_BATCHUPDATE') == 'Y' && this.ctx.getAD_User_ID() == 100) {
+                this.aBatchUpdate = this.addActions("BUE", null, false, false, false, onAction); //1
+                this.aBatchUpdate.setTextDirection("r");
+                $ulactionbar.append(this.aBatchUpdate.getListItmIT());
+            }
+
             if (mWindow.getIsAppointment()) {
                 this.aAppointment = this.addActions("APT", null, false, false, false, onAction); //1
                 this.aAppointment.setTextDirection("r");
                 $ulactionbar.append(this.aAppointment.getListItmIT());
-            }
-            
-                this.aBatchUpdate = this.addActions("BUE", null, false, false, false, onAction); //1
-                this.aBatchUpdate.setTextDirection("r");
-                $ulactionbar.append(this.aBatchUpdate.getListItmIT());
+            }           
             
             if (mWindow.getIsTask()) {
                 this.aTask = this.addActions("TAK", null, false, false, false, onAction); //1
@@ -3185,12 +3188,6 @@
         }
         else {
             this.aMap.hide();
-        }
-        if (VIS.Env.getCtx().getContext('#ENABLE_BATCHUPDATE') =='Y' && this.ctx.getAD_User_ID() == 100) {
-            this.aBatchUpdate.$li.show();
-        }
-        else {
-            this.aBatchUpdate.$li.hide();
         }
      
         this.setLastView(""); //clear view history
