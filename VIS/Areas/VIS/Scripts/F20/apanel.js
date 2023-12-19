@@ -1,7 +1,7 @@
 ﻿; (function (VIS, $) {
+      //****************************************************//
+     //**             APanel                             **//
     //****************************************************//
-    //**             APanel                            **//
-    //**************************************************//
 
     var baseUrl = VIS.Application.contextUrl;
     var dataSetUrl = baseUrl + "JsonData/JDataSetWithCode";
@@ -141,8 +141,8 @@
         this.isAutoCompleteOpen = false;
         this.instructionPop = {};
         this.instructionPop[this.ACTION_NAME_NEW] = false;
-        function initComponenet() {
 
+        function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
             $root = $(clone.querySelector(".vis-ad-w-p"));
             $busyDiv = $root.find(".vis-ad-w-p-busy"); // busy indicator
@@ -375,7 +375,7 @@
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
             this.aPrint = this.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
-            this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
+           // this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
 
             //Ndw Back button
             this.aBack = this.addActions("Back", null, true, true, false, onAction, null, "Shct_Back");
@@ -387,7 +387,7 @@
             $ulToobar.append(this.aRefresh.getListItm());
             $ulToobar.append(this.aReport.getListItm());
             $ulToobar.append(this.aPrint.getListItm());
-            $ulToobar.append(this.aBatchUpdate.getListItm());
+           // $ulToobar.append(this.aBatchUpdate.getListItm());
 
 
 
@@ -435,6 +435,11 @@
                 this.aAppointment.setTextDirection("r");
                 $ulactionbar.append(this.aAppointment.getListItmIT());
             }
+            
+                this.aBatchUpdate = this.addActions("BUE", null, false, false, false, onAction); //1
+                this.aBatchUpdate.setTextDirection("r");
+                $ulactionbar.append(this.aBatchUpdate.getListItmIT());
+            
             if (mWindow.getIsTask()) {
                 this.aTask = this.addActions("TAK", null, false, false, false, onAction); //1
                 this.aTask.setTextDirection("r");
@@ -1251,7 +1256,9 @@
                 if (this.aAppointment) {
                     this.aAppointment.dispose();
                 }
-
+                if (this.aBatchUpdate) {
+                    this.aBatchUpdate.dispose();
+                }
                 this.aHelp.dispose();
                 if (this.aSubscribe) {
                     this.aSubscribe.dispose();
@@ -1285,7 +1292,7 @@
                 this.aChat = this.aPageUp = this.aPageFirst = this.aPageLast = this.aPageDown = null;
                 this.aHelp = this.aSubscribe = this.aAttachment = null, this.toolbarCreated = null;
                 this.aZoomAcross = this.aRequest = this.aMark = this.aWorkflow = this.aHistory = null;
-                this.aAppointment = null; this.aRecAccess = this.aImportMap = this.aCard = this.aCardDialog = this.aShowSummaryLevel = null;
+                this.aAppointment = null; this.aBatchUpdate = null; this.aRecAccess = this.aImportMap = this.aCard = this.aCardDialog = this.aShowSummaryLevel = null;
             }
 
             this.statusBar.dispose();
@@ -2597,6 +2604,9 @@
             switch (vButton.value) {
                 case 'APT':
                     aPanel.cmd_appointment();
+                    break;
+                case 'BUE':
+                    aPanel.cmd_batchUpdatedialog();
                     break;
                 case 'EML':
                     aPanel.cmd_email();
