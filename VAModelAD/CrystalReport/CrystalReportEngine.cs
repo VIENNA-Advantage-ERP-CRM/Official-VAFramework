@@ -210,8 +210,8 @@ namespace VAdvantage.CrystalReport
                                         {
                                             if (Convert.ToInt32(dsPara.Tables[0].Rows[c]["AD_Reference_ID"]) == DisplayType.Date)
                                             {
-                                                paramValue = Convert.ToDateTime(paramValue).ToUniversalTime();
-                                                paramValueTo = Convert.ToDateTime(paramValueTo).ToUniversalTime();
+                                                //paramValue = Convert.ToDateTime(paramValue).ToUniversalTime();
+                                                //paramValueTo = Convert.ToDateTime(paramValueTo).ToUniversalTime();
 
 
                                                 if (paramValue != null && paramValueTo != null)
@@ -1130,8 +1130,8 @@ namespace VAdvantage.CrystalReport
                                         {
                                             if (Convert.ToInt32(dsPara.Tables[0].Rows[c]["AD_Reference_ID"]) == DisplayType.Date)
                                             {
-                                                paramValue = Convert.ToDateTime(paramValue).ToUniversalTime();
-                                                paramValueTo = Convert.ToDateTime(paramValueTo).ToUniversalTime();
+                                                //paramValue = Convert.ToDateTime(paramValue).ToUniversalTime();
+                                                //paramValueTo = Convert.ToDateTime(paramValueTo).ToUniversalTime();
 
                                                 if (paramValue != null && paramValueTo != null)
                                                 {
