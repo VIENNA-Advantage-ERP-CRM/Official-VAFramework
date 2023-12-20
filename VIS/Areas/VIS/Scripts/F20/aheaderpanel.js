@@ -583,6 +583,7 @@
                 }
                 //	Date
                 else if (VIS.DisplayType.IsDate(displayType)) {
+                    colValue = colValue.replace('Z',''); //remove Universal time
                     if (displayType == VIS.DisplayType.DateTime) {
                         colValue = new Date(colValue).toLocaleString();
                     }

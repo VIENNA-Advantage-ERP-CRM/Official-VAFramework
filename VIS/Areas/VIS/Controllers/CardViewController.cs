@@ -124,7 +124,7 @@ namespace VIS.Controllers
                     lstCardViewColumns[i].CardViewID = id;
                     //}
                     sqNo = lstCardViewColumns[i].SeqNo; //((i + 1) * 10);
-                    objCardViewModel.SaveCardViewColumns(lstCardViewColumns[i].CardViewID, lstCardViewColumns[i].AD_Field_ID, sqNo, ctx, lstCardViewColumns[i].sort, lstCardViewColumns[i].ExportID);
+                    objCardViewModel.SaveCardViewColumns(lstCardViewColumns[i].CardViewID, lstCardViewColumns[i].AD_Field_ID, sqNo, ctx, lstCardViewColumns[i].sort);
                     id = lstCardViewColumns[i].CardViewID;
                 }
             }
