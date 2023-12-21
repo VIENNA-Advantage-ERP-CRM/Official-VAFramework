@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Dynamic;
 using VAdvantage.DataBase;
@@ -20,8 +21,9 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         /// <returns></returns>
         public List<CardViewPropeties> GetCardView(int ad_Window_ID, int ad_Tab_ID, Ctx ctx)
-        {
-            List<CardViewPropeties> lstCardView = null;
+        {            
+
+                List<CardViewPropeties> lstCardView = null;
             //string sqlQuery = "SELECT * FROM AD_CardView WHERE AD_Window_id=" + ad_Window_ID + " and AD_Tab_id=" + ad_Tab_ID + " AND (createdby=" + ctx.GetAD_User_ID() + " OR AD_USER_ID Is NULL OR AD_User_ID = " + ctx.GetAD_User_ID() + ") AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             //string sqlQuery = " SELECT * FROM AD_CardView c WHERE c.AD_Window_id=" + ad_Window_ID + " and c.AD_Tab_id=" + ad_Tab_ID + " AND (c.createdby=" + ctx.GetAD_User_ID() +
             //                  " OR ((c.AD_USER_ID    IS NULL) AND exists (select * from ad_cardview_role r where r.ad_cardview_id = c.ad_cardview_id and r.ad_role_id = " + ctx.GetAD_Role_ID() + ")) OR c.AD_User_ID     = " + ctx.GetAD_User_ID() +
@@ -52,6 +54,13 @@ namespace VIS.Models
                         isDefault = true;
                     }
 
+                    bool isEditable = true;
+
+                    if (!String.IsNullOrEmpty(Convert.ToString(ds.Tables[0].Rows[i]["Export_ID"])) && ConfigurationManager.AppSettings["transportEnviroment"] !="Y")
+                    {
+                        isEditable = false;
+                    }
+
 
                     CardViewPropeties objCardView = new CardViewPropeties()
                     {
@@ -68,8 +77,8 @@ namespace VIS.Models
                         disableWindowPageSize = Convert.ToString(ds.Tables[0].Rows[i]["DISABLEWINDOWPAGESIZE"]) == "Y",
                         //IsDefault = VAdvantage.Utility.Util.GetValueOfString(ds.Tables[0].Rows[i]["ISDEFAULT"])=="Y"?true:false,
                         DefaultID = isDefault,
-                        Updated = Convert.ToDateTime(ds.Tables[0].Rows[i]["UPDATED"])
-
+                        Updated = Convert.ToDateTime(ds.Tables[0].Rows[i]["UPDATED"]),
+                        IsEditable= isEditable
                     };
                     lstCardView.Add(objCardView);
                 }
@@ -244,7 +253,6 @@ namespace VIS.Models
                     AD_Field_ID = 0,
                     AD_GroupField_ID = fid,
                     UserID = uid
-
                 };
                 lstCardViewColumns.Add(objCardView);
             }
@@ -417,7 +425,7 @@ namespace VIS.Models
             DB.ExecuteQuery("DELETE FROM AD_GridLayout WHERE AD_HeaderLayout_ID=" + headerID, null, null);
             DB.ExecuteQuery("DELETE FROM AD_HeaderLayout WHERE AD_HeaderLayout_ID=" + headerID, null, null);
 
-            string sqlQuery = "DELETE FROM AD_CARDVIEW WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_CARDVIEW WHERE AD_CARDVIEW_ID=" + ad_CardView_ID; //+ " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -432,7 +440,7 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteAllCardViewColumns(int ad_CardView_ID, Ctx ctx)
         {
-            string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE AD_CARDVIEW_ID=" + ad_CardView_ID;// AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -447,7 +455,7 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteAllCardViewRole(int ad_CardView_ID, Ctx ctx)
         {
-            string sqlQuery = "DELETE FROM AD_CARDVIEW_ROLE WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_CARDVIEW_ROLE WHERE AD_CARDVIEW_ID=" + ad_CardView_ID; //+ " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -461,7 +469,7 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteAllCardViewCondition(int ad_CardView_ID, Ctx ctx)
         {
-            string sqlQuery = "DELETE FROM AD_CARDVIEW_CONDITION WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_CARDVIEW_CONDITION WHERE AD_CARDVIEW_ID=" + ad_CardView_ID;// + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -475,7 +483,7 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteDefaultCardView(int ad_CardView_ID, Ctx ctx)
         {
-            string sqlQuery = "DELETE FROM AD_DefaultCardView WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_DefaultCardView WHERE AD_CARDVIEW_ID=" + ad_CardView_ID;// + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -1289,6 +1297,7 @@ namespace VIS.Models
         public int sort { get; set; }
         public string OrderByClause { get; set; }
         public bool disableWindowPageSize { get; set; }
+        public bool IsEditable { get; set; }
         public DateTime Updated { get; set; }
     }
 

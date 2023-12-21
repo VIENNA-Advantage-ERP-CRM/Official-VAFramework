@@ -1651,6 +1651,7 @@
                     }
 
                     else if (VIS.DisplayType.IsDate(dt)) {
+                        value = value.replace('Z', ''); //remove universal time
                         if (value) {
                             // JID_1826 Date is showing as per browser culture
                             var d = new Date(value);
