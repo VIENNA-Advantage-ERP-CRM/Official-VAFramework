@@ -40,7 +40,7 @@ namespace VAdvantage.Model
             //if (newRecord)
             //{
                 MTabPanel tp = new MTabPanel(GetCtx(), 0, null);
-                tp.SetName("Survey Panel");
+                tp.SetName(Msg.GetMsg(GetCtx(), "SurveyPanelName"));
                 tp.SetClassname("VIS.SurveyPanel");
                 tp.SetAD_Tab_ID(GetAD_Tab_ID());
                 tp.SetSeqNo(10);
