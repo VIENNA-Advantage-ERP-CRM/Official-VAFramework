@@ -56,7 +56,7 @@ namespace VIS.Models
 
                     bool isEditable = true;
 
-                    if (!String.IsNullOrEmpty(Convert.ToString(ds.Tables[0].Rows[i]["Export_ID"])) && String.IsNullOrEmpty(ConfigurationManager.AppSettings["transportEnviroment"]))
+                    if (!String.IsNullOrEmpty(Convert.ToString(ds.Tables[0].Rows[i]["Export_ID"])) && ConfigurationManager.AppSettings["transportEnviroment"] !="Y")
                     {
                         isEditable = false;
                     }
