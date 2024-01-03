@@ -17,6 +17,7 @@ using Oracle.ManagedDataAccess.Client;
 using Npgsql;
 using VAdvantage.SqlExec;
 using VAdvantage.Controller;
+using System.Configuration;
 
 namespace VAdvantage.Common
 {
@@ -28,7 +29,7 @@ namespace VAdvantage.Common
 
         public static string Password_Valid_Upto_Key = "PASSWORD_VALID_UPTO";
         public static string Failed_Login_Count_Key = "FAILED_LOGIN_COUNT";
-
+        public static string transportEnvironment = ConfigurationManager.AppSettings["transportEnviroment"];
         public static int GetPassword_Valid_Upto
         {
             get { return 3; }

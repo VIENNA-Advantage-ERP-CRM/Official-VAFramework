@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Dynamic;
+using VAdvantage.Common;
 using VAdvantage.DataBase;
 using VAdvantage.Model;
 using VAdvantage.Utility;
@@ -402,7 +403,7 @@ namespace VIS.Models
         public void SaveCardViewColumns(int ad_cardview_id, int ad_Field_ID, int sqNo, Ctx ctx, int sort)
         {
             int CardViewColumnID = 0;
-            if (ConfigurationManager.AppSettings["transportEnviroment"] == "Y")
+            if (Common.transportEnvironment == "Y")
             {
                 CardViewColumnID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Cardview_Column_ID FROM AD_Cardview_Column WHERE AD_CardView_ID=" + ad_cardview_id + " AND AD_Field_ID=" + ad_Field_ID));
             }
@@ -462,7 +463,7 @@ namespace VIS.Models
         public void DeleteAllCardViewColumns(int ad_CardView_ID, Ctx ctx, List<CardViewPropeties> lstCardViewColumns)
         {
             string fieldID = "";
-            if (ConfigurationManager.AppSettings["transportEnviroment"] == "Y")
+            if (Common.transportEnvironment == "Y")
             {
                 for (int i = 0; i < lstCardViewColumns.Count; i++)
                 {
