@@ -29,7 +29,21 @@ namespace VAdvantage.Common
 
         public static string Password_Valid_Upto_Key = "PASSWORD_VALID_UPTO";
         public static string Failed_Login_Count_Key = "FAILED_LOGIN_COUNT";
-        public static string transportEnvironment = ConfigurationManager.AppSettings["transportEnviroment"];
+        public static string transportEnvironment
+        {
+            get
+            {
+                try
+                {
+                    return ConfigurationManager.AppSettings["transportEnvironment"];
+                }
+                catch
+                {
+                    return "N";
+                }
+            }
+        }
+
         public static int GetPassword_Valid_Upto
         {
             get { return 3; }
