@@ -401,8 +401,12 @@ namespace VIS.Models
         /// <param name="sort"></param>
         public void SaveCardViewColumns(int ad_cardview_id, int ad_Field_ID, int sqNo, Ctx ctx, int sort)
         {
-
-            MCardViewColumn objCardViewColumn = new MCardViewColumn(ctx, 0, null);
+            int CardViewColumnID = 0;
+            if (ConfigurationManager.AppSettings["transportEnviroment"] == "Y")
+            {
+                CardViewColumnID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Cardview_Column_ID FROM AD_Cardview_Column WHERE AD_CardView_ID=" + ad_cardview_id + " AND AD_Field_ID=" + ad_Field_ID));
+            }
+            MCardViewColumn objCardViewColumn = new MCardViewColumn(ctx, CardViewColumnID, null);
             objCardViewColumn.SetAD_CardView_ID(ad_cardview_id);
             objCardViewColumn.SetAD_Field_ID(ad_Field_ID);
             objCardViewColumn.SetSeqNo(sqNo);
@@ -440,7 +444,41 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteAllCardViewColumns(int ad_CardView_ID, Ctx ctx)
         {
+
+            string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE Export_ID IS NULL AND AD_CARDVIEW_ID=" + ad_CardView_ID;// AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            int result = DB.ExecuteQuery(sqlQuery);
+            if (result < 1)
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// Delete card view columns
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
+        /// <param name="lstCardViewColumns"></param>
+        public void DeleteAllCardViewColumns(int ad_CardView_ID, Ctx ctx, List<CardViewPropeties> lstCardViewColumns)
+        {
+            string fieldID = "";
+            if (ConfigurationManager.AppSettings["transportEnviroment"] == "Y")
+            {
+                for (int i = 0; i < lstCardViewColumns.Count; i++)
+                {
+                    if (i > 0)
+                    {
+                        fieldID += ",";
+                    }
+                    fieldID += Util.GetValueOfString(lstCardViewColumns[i].AD_Field_ID);
+                }
+
+            }
             string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE AD_CARDVIEW_ID=" + ad_CardView_ID;// AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            if (fieldID != "")
+            {
+                sqlQuery += " AND AD_Field_ID NOT IN (" + fieldID + ")";
+            }
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
