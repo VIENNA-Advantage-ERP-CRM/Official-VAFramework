@@ -96,6 +96,7 @@
       <HintPath>..\ViennaAdvantageWeb\Dll\PdfSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
