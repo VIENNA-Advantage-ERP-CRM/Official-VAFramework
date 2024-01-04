@@ -17,6 +17,7 @@ using Oracle.ManagedDataAccess.Client;
 using Npgsql;
 using VAdvantage.SqlExec;
 using VAdvantage.Controller;
+using System.Configuration;
 
 namespace VAdvantage.Common
 {
@@ -28,6 +29,20 @@ namespace VAdvantage.Common
 
         public static string Password_Valid_Upto_Key = "PASSWORD_VALID_UPTO";
         public static string Failed_Login_Count_Key = "FAILED_LOGIN_COUNT";
+        public static string transportEnvironment
+        {
+            get
+            {
+                try
+                {
+                    return ConfigurationManager.AppSettings["transportEnvironment"];
+                }
+                catch
+                {
+                    return "N";
+                }
+            }
+        }
 
         public static int GetPassword_Valid_Upto
         {
@@ -804,8 +819,14 @@ namespace VAdvantage.Common
 
             if (column.GetAD_Reference_ID() == DisplayType.Date)
             {
-                //return Util.GetValueOfDateTime(value).Value.Date.ToShortDateString();
-                return DisplayType.GetDateFormat(column.GetAD_Reference_ID()).Format(value, po.GetCtx().GetContext("#ClientLanguage"), SimpleDateFormat.DATESHORT);
+                if (!string.IsNullOrEmpty(po.GetCtx().GetContext("#ClientLanguage")))
+                {
+                    return DisplayType.GetDateFormat(column.GetAD_Reference_ID()).Format(value, po.GetCtx().GetContext("#ClientLanguage"), SimpleDateFormat.DATESHORT);
+                }
+                else
+                {
+                    return Util.GetValueOfDateTime(value).Value.Date.ToShortDateString();
+                }
             }
             else if (column.GetAD_Reference_ID() == DisplayType.Time)
             {
@@ -813,7 +834,7 @@ namespace VAdvantage.Common
             }
 
             // Show Amount according to browser culture
-            if (column.GetAD_Reference_ID() == DisplayType.Amount || column.GetAD_Reference_ID() == DisplayType.CostPrice)
+            if (!string.IsNullOrEmpty(po.GetCtx().GetContext("#ClientLanguage")) && (column.GetAD_Reference_ID() == DisplayType.Amount || column.GetAD_Reference_ID() == DisplayType.CostPrice))
             {
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
@@ -1610,7 +1631,7 @@ namespace VAdvantage.Common
                     foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                     {
                         string type = "";
-                        string value = Util.GetValueOfString(dt["ad_equalto"]);
+                        object value = dt["ad_equalto"];
                         string columnName = Util.GetValueOfString(dt["ColumnName"]);
                         int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
 
@@ -1677,8 +1698,8 @@ namespace VAdvantage.Common
                                 WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                             }
                             else if (type == "DateTime")
-                            {
-                                WhereCondition += "CAST(" + columnName + " AS DATE) " + oprtr;
+                            {                               
+                                WhereCondition += columnName +" " + oprtr;
                             }
                             else
                             {
@@ -1749,7 +1770,7 @@ namespace VAdvantage.Common
                         }
                         else if (type == "String")
                         {
-                            WhereCondition += "'" + value + "'";
+                            WhereCondition += "'" + Util.GetValueOfString(value) + "'";
                             if (Util.GetValueOfString(dt["operation"]) == "AB")
                             {
                                 WhereCondition += " AND " + columnName + " <'" + Util.GetValueOfString(dt["Value2"]) + "'";
@@ -1757,10 +1778,10 @@ namespace VAdvantage.Common
                         }
                         else if (type == "DateTime")
                         {
-                            WhereCondition += "CAST('" + value + "' AS DATE)";
+                            WhereCondition += DB.TO_DATE(Convert.ToDateTime(value), true);
                             if (Util.GetValueOfString(dt["operation"]) == "AB")
                             {
-                                WhereCondition += " AND COST( " + columnName + " AS DATE) < CAST('" + Util.GetValueOfString(dt["Value2"]) + "' AS DATE)";
+                                WhereCondition += " AND " + columnName + "  < " + DB.TO_DATE(Convert.ToDateTime(dt["Value2"]), true);
                             }
                         }
                     }

@@ -327,6 +327,10 @@
             }
             self.vTabbedPane.finishLayout(VIS.Application.isMobile);
 
+            if (self.gridWindow.getIsHideTabLinks()) {
+                $divHeaderNav.find('*').css('visibility', 'hidden');
+            }
+
             setToolTipMessages();
         };
         /* Tool bar */
@@ -2568,7 +2572,7 @@
         /*Special handling
           Move to next tab */
         else if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()));
+            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction());
             return;
         }
 
@@ -2865,7 +2869,7 @@
      *	tab change
      *  @param action tab item's id
      */
-    APanel.prototype.tabActionPerformed = function (action) {
+    APanel.prototype.tabActionPerformed = function (action, actionType) {
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
@@ -2878,6 +2882,13 @@
         var tabEle = this.vTabbedPane.getTabElement(action);
         var curEle = this.curST || this.curGC;
         var oldGC = null;
+
+        //Handle Open Tab in Dialog
+        if (actionType == 'OTD') {
+            VIS.TabMngr.show(tabEle, curEle.gTab.keyColumnName, curEle.gTab.getRecord_ID());
+            this.vTabbedPane.restoreTabChange();
+            return;
+        }
 
         //// To Clear SearchText Box on Tab Change
         this.toggleASearchIcons(false, false);
@@ -2914,6 +2925,16 @@
                     if (this.curTab.needSave(true, true)) {
                         //	Automatic Save
                         if (this.ctx.isAutoCommit(this.curWindowNo)) {
+
+                            var isCheckListRequire = this.curGC.IsCheckListRequire();
+
+                            if (!isCheckListRequire) {
+                                this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
+                                this.setBusy(false, true);
+                                VIS.ADialog.error("CheckListRequired");
+                                return false;
+                            }
+
                             if (!this.curTab.dataSave(true)) {	//  there is a problem, so we go back	
                                 this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
                                 this.setBusy(false, true);
@@ -3588,6 +3609,7 @@
         }
 
         if (this.curWinTab == this.vTabbedPane) {
+            VIS.context.setContext(this.curWindowNo,"tb_Index" , this.curTabIndex);
             this.curWinTab.evaluate(null);
             this.curWinTab.notifyDataChanged(e);
         }
@@ -3664,13 +3686,15 @@
         var $this = this;
 
         // Check valid condition for checklist
-        this.curGC.IsCheckListRequire(function (isCheckListRequire) {
-            if (!isCheckListRequire) {
-                VIS.ADialog.error("CheckListRequired");
-                return false;
-            }
-            return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
-        });
+        //this.curGC.IsCheckListRequire(function (isCheckListRequire) {
+        //    if (!isCheckListRequire) {
+        //        VIS.ADialog.error("CheckListRequired");
+        //        return false;
+        //    }
+            
+        //});
+
+        return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
     };
 
     APanel.prototype.cmd_save2 = function (manual, curTab, curGC, selfPanel, callback) {

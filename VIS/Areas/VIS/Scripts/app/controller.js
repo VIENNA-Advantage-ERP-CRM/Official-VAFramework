@@ -383,6 +383,10 @@
         return this.vo.IsCompositeView;
     }
 
+    GridWindow.prototype.getIsHideTabLinks = function () {
+        return this.vo.IsHideTabLinks;
+    }
+
     GridWindow.prototype.dispose = function () {
 
         originalLength = this.tabs.length;
@@ -599,7 +603,14 @@
     };	//	i
 
     GridTab.prototype.getValueAsString = function (variableName) {
-        var value = VIS.context.getWindowContext(this.vo.windowNo, this.vo.tabNo, variableName, true);
+        var curTabIndex = VIS.context.getContext(this.vo.windowNo, "tb_Index",true);
+
+        if (curTabIndex == this.vo.tabNo) {// 1 && this.vo.windowNo + "|" + variableName in VIS.context.m_map[this.vo.windowNo])
+            value = VIS.context.getWindowContext(this.vo.windowNo, this.vo.tabNo, variableName, true);
+        }
+        else
+           value = VIS.context.getWindowContext(this.vo.windowNo, variableName, true);
+       
         if (!value) {
             return '';
         }
@@ -2043,6 +2054,10 @@
 
         if (recordID < 0 && this.getRecords().length && this.currentRow > -1 && this.getTableName() && this.getRecords()[this.currentRow]) {
             recordID = this.getRecords()[this.currentRow][this.getTableName().toLower() + "_id"];
+        }
+
+        if (recordID && recordID < 0) {
+            return;
         }
 
         var that = this;
@@ -7314,6 +7329,9 @@
     };
     GridField.prototype.getTabSeqNo = function () {
         return this.vo.TabSeqNo;
+    };
+    GridField.prototype.getAction = function () {
+        return this.vo.ADAction;
     };
 
     /**

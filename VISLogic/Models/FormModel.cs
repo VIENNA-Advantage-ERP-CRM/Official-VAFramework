@@ -162,7 +162,7 @@ namespace VIS.Models
                     variable = variable.Substring(beginIndex, len);
                 }
 
-                if (!list.Contains(variable))
+                if (variable != "" && !list.Contains(variable))
                     list.Add(variable);
 
                 s = s.Substring(endIndex + 1);
@@ -415,6 +415,8 @@ namespace VIS.Models
                 sql1 = "SELECT DISTINCT ";
                 for (int i = 0; i < columns.Count; i++)
                 {
+                    if (Util.GetValueOfString(columns[i]) == "")
+                        continue;
                     if (i != 0)
                         sql1 += ",";
                     sql1 += columns[i].ToString();
@@ -476,7 +478,7 @@ namespace VIS.Models
             catch (Exception e)
             {
                 // fill error log
-                //log.Log(Level.SEVERE, sql1, e);
+                log.Log(Level.SEVERE, sql1, e.Message);
                 //VAdvantage.Common.ErrorLog.FillErrorLog("ZoomTarget.GetZoomTargets", GlobalVariable.LAST_EXECUTED_QUERY, e.Message, VAdvantage.Framework.Message.MessageType.ERROR);
             }
 

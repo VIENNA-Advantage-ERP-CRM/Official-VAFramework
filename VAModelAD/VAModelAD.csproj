@@ -96,6 +96,7 @@
       <HintPath>..\ViennaAdvantageWeb\Dll\PdfSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
@@ -368,6 +369,7 @@
     <Compile Include="ProcessAD\SystemValidate.cs" />
     <Compile Include="ProcessAD\TabCreateFields.cs" />
     <Compile Include="ProcessAD\TableCreateColumns.cs" />
+    <Compile Include="ProcessAD\TableIndexConstraints.cs" />
     <Compile Include="ProcessAD\TableIndexValidate.cs" />
     <Compile Include="ProcessAD\TransactionXRef.cs" />
     <Compile Include="ProcessAD\TranslationDocSync.cs" />

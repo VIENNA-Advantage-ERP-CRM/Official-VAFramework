@@ -777,7 +777,7 @@ namespace VAdvantage.Process
                                             + " AND AD_Tab_ID=" + sAD_Tab_ID + " AND AD_Client_ID = 0 AND IsActive='Y'");
             for (int i = 0; i < ds.Tables[0].Rows.Count; i++) //Grid View
             {
-                DataRow dr = ds.Tables[0].Rows[0];
+                DataRow dr = ds.Tables[0].Rows[i];
                 if (Util.GetValueOfInt(dr["AD_HeaderLayout_ID"]) > 0)
                 {
                     //insert
@@ -870,46 +870,18 @@ namespace VAdvantage.Process
                 //    InsertIntoDBSchema(X_AD_Window.Table_ID, sField.GetZoomWindow_ID(), X_AD_Window.Table_Name, name, " AD_Window_ID = " + sField.GetZoomWindow_ID());
                 //}
             }
-            if (sField.GetAD_InfoWindow_ID() > 0)
-            {
-                //Insert Table ID
-                int sTableId = GetID("AD_InfoWindow", "AD_Table_ID", "AD_InfoWindow_ID = " + sField.GetAD_InfoWindow_ID());
-                if (sTableId > 0)
-                {
-                    GetTable(sTableId);
-                }
 
-                if (HasModulePrefix("Value", "AD_InfoWindow", "AD_InfoWindow_ID = " + sField.GetAD_InfoWindow_ID(), out name))
-                {
-                    InsertIntoDBSchema(X_AD_InfoWindow.Table_ID, sField.GetAD_InfoWindow_ID(), X_AD_InfoWindow.Table_Name, name, " AD_InfoWindow_ID = " + sField.GetAD_InfoWindow_ID());
-                }
-
-                DataSet ds = DB.ExecuteDataset("SELECT * FROM AD_InfoColumn WHERE AD_InfoWindow_ID=" + sField.GetAD_InfoWindow_ID());
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                {
-                    if (HasModulePrefix("Name", "AD_InfoColumn", "AD_InfoColumn_ID = " + ds.Tables[0].Rows[i]["AD_InfoColumn_ID"], out name))
-                    {
-
-                        if (Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_REFERENCE_VALUE_ID"]) > 0)
-                        {
-                            InsertIntoDBSchema(X_AD_Reference.Table_ID, Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_REFERENCE_VALUE_ID"]), X_AD_Reference.Table_Name, name,
-                           " AD_Reference_ID = " + ds.Tables[0].Rows[i]["AD_REFERENCE_VALUE_ID"]);
-                        }
-                        if (Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ELEMENT_ID"]) > 0)
-                        {
-                            InsertIntoDBSchema(X_AD_Element.Table_ID, Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ELEMENT_ID"]), X_AD_Element.Table_Name, name,
-                           " AD_Element_ID = " + ds.Tables[0].Rows[i]["AD_ELEMENT_ID"]);
-                        }
-
-                        InsertIntoDBSchema(X_AD_InfoColumn.Table_ID, Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_InfoColumn_ID"]), X_AD_InfoColumn.Table_Name, name,
-                            " AD_InfoColumn_ID = " + ds.Tables[0].Rows[i]["AD_InfoColumn_ID"]);
-                    }
-                }
-            }
+            MarkInfoWindow(sField.GetAD_InfoWindow_ID());
 
             if (sField.GetAD_Image_ID() > 0)
             {
                 CheckImage(sField.GetAD_Image_ID());
+            }
+
+            //check for field Data Validation 
+            if (Util.GetValueOfInt(sField.Get_Value("AD_Val_Rule_ID"))>0)
+            {
+                GetValRule(Util.GetValueOfInt(sField.Get_Value("AD_Val_Rule_ID")));
             }
 
             InsertIntoDBSchema(X_AD_Field.Table_ID, sAD_Field_ID, X_AD_Field.Table_Name, sField.GetName(), " AD_Field_ID = " + sAD_Field_ID);
@@ -1179,10 +1151,60 @@ namespace VAdvantage.Process
                     {
                         GetValRule(sPara.GetAD_Val_Rule_ID());
                     }
+
+                    MarkInfoWindow(sPara.GetAD_InfoWindow_ID());
+
                     InsertIntoDBSchema(X_AD_Process_Para.Table_ID, sPara.GetAD_Process_Para_ID(), X_AD_Process_Para.Table_Name, sPara.GetName(), "AD_Process_Para_ID=" + sPara.GetAD_Process_Para_ID());
                 }
             }
         }
+
+        /// <summary>
+        /// /Mark Info window 
+        /// </summary>
+        /// <param name="AD_InfoWindow_ID"></param>
+        private void MarkInfoWindow(int AD_InfoWindow_ID)
+        {
+            if (AD_InfoWindow_ID > 0)
+            {
+                //Insert Table ID
+                int sTableId = GetID("AD_InfoWindow", "AD_Table_ID", "AD_InfoWindow_ID = " + AD_InfoWindow_ID);
+                if (sTableId > 0)
+                {
+                    GetTable(sTableId);
+                }
+                string name = "";
+
+                if (HasModulePrefix("Value", "AD_InfoWindow", "AD_InfoWindow_ID = " + AD_InfoWindow_ID, out name))
+                {
+                    InsertIntoDBSchema(X_AD_InfoWindow.Table_ID, AD_InfoWindow_ID, X_AD_InfoWindow.Table_Name, name, " AD_InfoWindow_ID = " + AD_InfoWindow_ID);
+                }
+
+                DataSet ds = DB.ExecuteDataset("SELECT * FROM AD_InfoColumn WHERE AD_InfoWindow_ID=" + AD_InfoWindow_ID);
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    if (HasModulePrefix("Name", "AD_InfoColumn", "AD_InfoColumn_ID = " + ds.Tables[0].Rows[i]["AD_InfoColumn_ID"], out name))
+                    {
+
+                        if (Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_REFERENCE_VALUE_ID"]) > 0)
+                        {
+                            InsertIntoDBSchema(X_AD_Reference.Table_ID, Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_REFERENCE_VALUE_ID"]), X_AD_Reference.Table_Name, name,
+                           " AD_Reference_ID = " + ds.Tables[0].Rows[i]["AD_REFERENCE_VALUE_ID"]);
+                        }
+                        if (Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ELEMENT_ID"]) > 0)
+                        {
+                            InsertIntoDBSchema(X_AD_Element.Table_ID, Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_ELEMENT_ID"]), X_AD_Element.Table_Name, name,
+                           " AD_Element_ID = " + ds.Tables[0].Rows[i]["AD_ELEMENT_ID"]);
+                        }
+
+                        InsertIntoDBSchema(X_AD_InfoColumn.Table_ID, Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_InfoColumn_ID"]), X_AD_InfoColumn.Table_Name, name,
+                            " AD_InfoColumn_ID = " + ds.Tables[0].Rows[i]["AD_InfoColumn_ID"]);
+                    }
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// New Report Marking(22/8/13)

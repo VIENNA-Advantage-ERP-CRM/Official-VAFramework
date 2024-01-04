@@ -279,7 +279,7 @@ namespace VAdvantage.Controller
 
         public int TabSeqNo = 0; /* Seq of tab */
 
-
+        public string ADAction = ""; /*Action for Tab*/
 
         /// <summary>
         /// calaculate MaxDisplayLength

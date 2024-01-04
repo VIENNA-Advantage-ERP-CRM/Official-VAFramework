@@ -2333,8 +2333,13 @@ namespace VAdvantage.Model
                     //if (!set.Contains(Util.GetValueOfString(GetCtx().GetAD_Org_ID())))
                     if (!string.IsNullOrEmpty(mainTableName))
                     {
+
+                        string isView = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsView FROM AD_Table WHERE TableName='" + mainTableName + "'"));
                         // Get Shared record with organisation.
-                        GetShareRecord(ref sql, tableName, mainTableName);
+                        if (isView!="Y" && !mainTableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !mainTableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
+                        {
+                            GetShareRecord(ref sql, tableName, mainTableName);
+                        }
                     }
                     sb = new StringBuilder();
                 }

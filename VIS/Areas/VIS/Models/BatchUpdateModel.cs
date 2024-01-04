@@ -39,7 +39,14 @@ namespace VIS.Models
                     }
                     else if (updateList.setValue[i].setType == DisplayType.Integer || DisplayType.IsID(updateList.setValue[i].setType))
                     {
-                        prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfInt(updateList.setValue[i].setValue));
+                        if (int.TryParse(Util.GetValueOfString(updateList.setValue[i].setValue), out int result))
+                        {
+                            prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfInt(updateList.setValue[i].setValue));
+                        }
+                        else
+                        {
+                            prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfString(updateList.setValue[i].setValue));
+                        }                       
                     }
                     else if (DisplayType.IsNumeric(updateList.setValue[i].setType))
                     {
@@ -98,7 +105,7 @@ namespace VIS.Models
     public class SetValue
     {
         public string column { get; set; }
-        public string setValue { get; set; }
+        public object setValue { get; set; }
         public int setType { get; set; }
     }
 }
