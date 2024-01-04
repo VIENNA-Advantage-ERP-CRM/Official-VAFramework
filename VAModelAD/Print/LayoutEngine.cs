@@ -1646,8 +1646,13 @@ namespace VAdvantage.Print
             StringBuilder colHeaderHtml = new StringBuilder("<thead><tr class='vis-report-table-head'>");
             for (int colh = 0; colh < columnHeader.Length; colh++)
             {
+                string fAlign = "";
+                if (fieldAlignment.Count > 0)
+                {
+                    fAlign = fieldAlignment[colh];
+                }
                 //colHeaderHtml.Append("<th style=\'text-align:" +( GetCtx().GetIsRightToLeft()?"right":"left") + ";\'>" + columnHeader[colh] + "</th>");
-                colHeaderHtml.Append("<th style=\'text-align:" + fieldAlignment[colh] + ";\'>" + columnHeader[colh] + "</th>");
+                colHeaderHtml.Append("<th style=\'text-align:" + fAlign + ";\'>" + columnHeader[colh] + "</th>");
             }
             colHeaderHtml.Append("</tr></thead>");
 

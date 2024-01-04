@@ -77,8 +77,16 @@ namespace VISLogic.Models
             // get data from Version table according to the Record Version 
             DataSet dsRec = DB.ExecuteDataset(sqlCol + " WHERE " + sbSQL.ToString() + " AND RecordVersion = " + Util.GetValueOfInt(od["oldversion"].Value));
             DataRow dr = null;
+
             if (dsRec != null && dsRec.Tables[0].Rows.Count > 0)
+            {
                 dr = dsRec.Tables[0].Rows[0];
+            }
+            else
+            {
+                VAdvantage.Logging.VLogger.Get().SaveError("", "No record found against version " + Util.GetValueOfInt(od["oldversion"].Value) + " for table " + origTableName);
+                return data;
+            }
 
             StringBuilder sbColName = new StringBuilder("");
             StringBuilder sbColValue = new StringBuilder("");
@@ -97,9 +105,14 @@ namespace VISLogic.Models
                     dr[sbColName.ToString()] = (Util.GetValueOfString(dr[sbColName.ToString()]) == "Y") ? true : false;
 
                 var val = od[sbColName.ToString().ToLower()];
-                if (val != null)
+                // Commented null check so that if any column value is set to null, even then it shows the old value in the Version Tab Panel
+                //if (val != null)
+                //{
+
+                // VIS0008 check applied if column exists, then only compare
+                if (od.ContainsKey(sbColName.ToString().ToLower()))
                 {
-                    if (Util.GetValueOfString(dr[sbColName.ToString()]) != Util.GetValueOfString(od[sbColName.ToString().ToLower()].Value))
+                    if (Util.GetValueOfString(dr[sbColName.ToString()]).ToLower() != Util.GetValueOfString(od[sbColName.ToString().ToLower()].Value).ToLower())
                     {
                         colNames.Add(Util.GetValueOfString(dsColumns.Tables[0].Rows[i]["Name"]));
                         dbColNames.Add(sbColName.ToString());
@@ -122,6 +135,7 @@ namespace VISLogic.Models
                         oldValues.Add(sbColValue.ToString());
                     }
                 }
+                //}
             }
 
             data.ColumnNames = colNames;
@@ -168,11 +182,12 @@ namespace VISLogic.Models
                             }
                         }
                         // VIS0008
-                        // Changed to pick date from subquery in case of Location, Locator, Attribute and Account References
+                        // Changed to pick data from subquery in case of Location, Locator, Attribute and Account References
                         // case for Location type of columns
                         else if (column.DisplayType == DisplayType.Location)
                         {
-                            _querySQL.Append(", (SELECT l.Address1 || ', ' || l.City || ', ' || c.Name FROM C_Location l LEFT JOIN C_Country c ON (c.C_Country_ID = l.C_Country_ID) WHERE l.C_Location_ID = " + tbl.GetTableName() + "." + column.ColumnName + ") AS " + column.ColumnName + "_LOC");
+                            // Change done to pick full address with help of function created in the database
+                            _querySQL.Append(", (SELECT Get_Location(l.C_Location_ID) FROM C_Location l WHERE l.C_Location_ID = " + tbl.GetTableName() + "." + column.ColumnName + ") AS " + column.ColumnName + "_LOC");
                         }
                         // case for Locator type of columns
                         else if (column.DisplayType == DisplayType.Locator)

@@ -721,6 +721,7 @@
     <Content Include="Areas\VIS\Scripts\F20\aheaderpanel.js" />
     <Content Include="Areas\VIS\Scripts\F20\apanel.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabbedpane.js" />
+    <Content Include="Areas\VIS\Scripts\F20\atabdialog.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabpanel.js" />
     <Content Include="Areas\VIS\Scripts\F20\aviewcontroller.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabbedpanemgr.js" />

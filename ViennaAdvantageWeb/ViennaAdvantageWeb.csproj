@@ -54,8 +54,9 @@
     <Reference Include="BaseLibrary">
       <HintPath>Dll\BaseLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="CoreLibrary">
-      <HintPath>DLL\CoreLibrary.dll</HintPath>
+    <Reference Include="CoreLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Dll\CoreLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>

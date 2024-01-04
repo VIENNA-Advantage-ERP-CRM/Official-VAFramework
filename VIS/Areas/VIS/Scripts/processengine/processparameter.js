@@ -441,8 +441,19 @@
                     continue;
                 }
                 else {
+                    var nValue = dep.getDefault(VIS.Env.getCtx(), this.windowNo);
+                    if (nValue == null) {
+
+                        for (var a = 0; a < this.vEditors.length; a++) {
+                            if (this.vEditors[a].colName == dep.getColumnName()) {
+                                this.vEditors[a].ctrl[0].selectedIndex = -1;
+                                break;
+                            }
+                        }
+                    }
+
                     dep.refreshLookup();
-                    dep.setValue(dep.getDefault(VIS.Env.getCtx(), this.windowNo), true);
+                    dep.setValue(nValue, true);
                 }
             }
         }

@@ -173,7 +173,8 @@ namespace VIS
                  "~/Areas/VIS/Scripts/F20/apanel.js",
                  "~/Areas/VIS/Scripts/F20/acontentpane.js",
                  "~/Areas/VIS/Scripts/F20/afilterpanel.js",
-                 "~/Areas/VIS/Scripts/F20/themecnfgtr.js"
+                 "~/Areas/VIS/Scripts/F20/themecnfgtr.js",
+                 "~/Areas/VIS/Scripts/F20/atabdialog.js"
                  );
 
 

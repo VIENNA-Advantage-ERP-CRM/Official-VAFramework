@@ -73,8 +73,13 @@ namespace VAdvantage.Controller
 
         public bool HideFieldText = false;
 
+        public bool IsStaticContent = false;
+
         public string FieldValueStyle = "";
         public string FieldLabelStyle = "";
+
+        public string ContentFieldLabel = "";
+        public string ContentFieldValue = "";
 
         public bool IsAlwaysExecute = false;
 

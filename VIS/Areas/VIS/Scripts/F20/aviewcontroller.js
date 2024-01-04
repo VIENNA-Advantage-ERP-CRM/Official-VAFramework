@@ -515,6 +515,7 @@
     /// Check Checklist required
     VIS.GridController.prototype.IsCheckListRequire = function (callback) {
 
+        var output = true;
         var isSurveyPanel = false;
         if (this.gTab.getHasPanel()) {
             var panels = this.gTab.getTabPanels();
@@ -527,8 +528,8 @@
         }
 
         if (!isSurveyPanel) {
-            callback(true);
-            return;
+            //callback(true);
+            return true;
         }
 
 
@@ -555,28 +556,33 @@
                 data = data[0];
 
                 if (data.ResponseCount > 0) {
-                    callback(true);
+                    output = true;
+                    //callback(true);
                 }
                 else if (data.Condition != "") {
                     var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
                     if (isValidate && isCheckListFill) {
-                        callback(true);
+                        output = true;
+                        //callback(true);
                     } else if (!isValidate) {
-                        callback(true);
+                        output = true;
+                       // callback(true);
                     } else {
-                        callback(false);
+                        output = false;
+                        //callback(false);
                     }
 
                     
                 } else {
-                    callback(true);
+                    output = true;
+                    //callback(true);
                 }
             },
             error: function (err) {
                 console.log(err);
             }
         });
-
+        return output;
     }
 
     VIS.GridController.prototype.SaveSurvey = function (recordID) {
@@ -1390,6 +1396,7 @@
     VIS.GridController.prototype.applyFilters = function (qry) {
 
         //var finalwhere = qry.getWhereClause();
+        var reportWhere = "";
         var whrs = [];
         if (this.searchCode && this.searchCode != '') {
             whrs.push(this.searchCode);
@@ -1405,12 +1412,19 @@
                 whrs.push(where);
             //qry.addRestriction(where);
         }
+        // For Report add Orignal Condition
+        reportWhere = qry.getWhereClause(true);
         qry.clear();
-        if (whrs.length > 0)
+        if (whrs.length > 0) {
             qry.addRestriction(whrs.join(' AND '));
-        else qry = null;
+            qry['reportWhere'] = reportWhere;
+        }
+        else {
+            qry = null
+        };
         //Set Page value to 1
         this.getMTab().getTableModel().setCurrentPage(1);
+        
         this.getMTab().setQuery(qry);
         this.query(0, 0, null);
     };
@@ -1671,19 +1685,29 @@
     };
 
     VIS.GridController.prototype.dataSave = function (manualCmd) {
+        var $this = this;
+        var isCheckListRequire = $this.IsCheckListRequire();
 
-        if (this.m_tree != null) {
-            this.gTab.SetSelectedNode(this.m_tree.currentNode);
-            this.gTab.setTreeID(this.treeID);
-        }
+            if (!isCheckListRequire) {
+                VIS.ADialog.error("CheckListRequired");
+                return false;
+            }
+
+            if ($this.m_tree != null) {
+                $this.gTab.SetSelectedNode($this.m_tree.currentNode);
+                $this.gTab.setTreeID($this.treeID);
+            }
 
 
-        var retVal = this.gTab.dataSave(manualCmd);
-        if (retVal) {
-            //refresh Grid Row
-            // this.vTable.refreshRow();
-        }
-        return retVal;
+            var retVal = $this.gTab.dataSave(manualCmd);
+            if (retVal) {
+                //refresh Grid Row
+                // this.vTable.refreshRow();
+            }
+            return retVal;
+       // });
+
+        
     };
 
     VIS.GridController.prototype.dataNew = function (copy) {

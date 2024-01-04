@@ -214,256 +214,300 @@
                     if ($div.length <= 0)
                         $div = $('<div class="vis-w-p-header-data-f ' + dynamicClassName + '">');
 
-                    if (!headergFields) {
-                        headergFields = {};
-                        fields = fields.sort(function (a, b) { return a.getHeaderSeqno() - b.getHeaderSeqno() });
-                        for (var i = 0; i < fields.length; i++) {
-                            var field = fields[i];
+                    if (headerItem.IsStaticContent) {
+                        var controls = {}
+                        ContentFieldValue = headerItem.ContentFieldValue;
+                        var ContentFieldLabel = VIS.Msg.getMsg(headerItem.ContentFieldLabel);
+                       
 
+                        if (ContentFieldLabel.indexOf('[') > -1) {
+                            ContentFieldLabel = headerItem.ContentFieldLabel;
+                        }
 
-                            // Check if field is marked as Header Panel Item or Not.
-                            if (field.getIsHeaderPanelitem()) {
-                                if (field.getHeaderSeqno() in headergFields) {
-                                    headergFields[field.getHeaderSeqno()].push(field);
-                                }
-                                else {
-                                    headergFields[field.getHeaderSeqno()] = [field];
-                                }
+                       
+
+                        $divLabel = $('<div class="vis-w-p-header-data-label">' + ContentFieldLabel + '</div>');
+                        if (headerItem.FieldLabelStyle) {
+                            $divLabel.attr('style', headerItem.FieldLabelStyle);
+                        }
+                        
+                        var $sapn = "";
+                        if (ContentFieldValue.indexOf('fa-') > -1 || ContentFieldValue.indexOf('vis-') > -1) {
+                            if (ContentFieldValue.indexOf('fa-') != -1 && ContentFieldValue.indexOf('fa ') == -1) {
+                                ContentFieldValue = 'fa ' + ContentFieldValue;
+                            } else if (ContentFieldValue.indexOf('vis-') != -1 && ContentFieldValue.indexOf('vis ') == -1) {
+                                ContentFieldValue = 'vis ' + ContentFieldValue
                             }
-                        }
-                    }
+                            $sapn = $('<i class="' + ContentFieldValue + '"></i>');
+                        } else if (ContentFieldValue.indexOf('data:image/')>-1) {
+                            $sapn = $('<img src="' + ContentFieldValue+'"/>');
+                        } else {
+                            ContentFieldValue = VIS.Msg.getMsg(ContentFieldValue);
+                            if (ContentFieldValue.indexOf('[') > -1) {
+                                ContentFieldValue = headerItem.ContentFieldValue;
+                            }
+                            $sapn = $('<span class="">' + ContentFieldValue + '</span>');
+                        }                       
 
-                    var mFields = headergFields[headerSeqNo];
-
-                    if (!mFields && headerItem.ColSql.length < 0)
-                        continue;
-                    else if (!mFields && headerItem.ColSql.length > 0) {
-                        var controls = {};
-                        $divLabel = $('<div class="vis-w-p-header-Label-f"></div>');
-                        iControl = new VIS.Controls.VKeyText(headerItem.ColSql, $self.gTab.getWindowNo(),
-                            $self.gTab.getWindowNo() + "_" + headerSeqNo, headerItem.IsAlwaysExecute, mField, headerItem.AD_GridLayoutItems_ID);
-
-                        if (iControl == null) {
-                            continue;
+                        if (headerItem.FieldValueStyle) {
+                            $sapn.attr('style', headerItem.FieldValueStyle);
                         }
 
-                        controls["control"] = iControl;
-                        var objctrls = { "control": controls, "field": null };
-
-                        $divLabel.append(iControl.getControl());
-                        $div.append($divLabel);
-                        // $div.append($divLabel);
+                        $div.append($divLabel).append($sapn);
                         $containerDiv.append($div);
-                        $self.controls.push(objctrls);
-                    }
-                    else if (mFields) {
-                        for (var x = 0; x < mFields.length; x++) {
-                            var mField = mFields[x];
-                            if (!mField)
-                                continue;
+                    } else {
 
+                        if (!headergFields) {
+                            headergFields = {};
+                            fields = fields.sort(function (a, b) { return a.getHeaderSeqno() - b.getHeaderSeqno() });
+                            for (var i = 0; i < fields.length; i++) {
+                                var field = fields[i];
+
+
+                                // Check if field is marked as Header Panel Item or Not.
+                                if (field.getIsHeaderPanelitem()) {
+                                    if (field.getHeaderSeqno() in headergFields) {
+                                        headergFields[field.getHeaderSeqno()].push(field);
+                                    }
+                                    else {
+                                        headergFields[field.getHeaderSeqno()] = [field];
+                                    }
+                                }
+                            }
+                        }
+
+                        var mFields = headergFields[headerSeqNo];
+
+                        if (!mFields && headerItem.ColSql.length < 0)
+                            continue;
+                        else if (!mFields && headerItem.ColSql.length > 0) {
                             var controls = {};
-                            $divIcon = $('<div class="vis-w-p-header-icon-f"></div>');
-
                             $divLabel = $('<div class="vis-w-p-header-Label-f"></div>');
-                            // If Referenceof field is Image then added extra class to align image and Label in center.
-                            if (mField.getDisplayType() == VIS.DisplayType.Image) {
-                                $divLabel.addClass('vis-w-p-header-Label-center-f');
-                                var dynamicClassForImageJustyfy = this.justifyAlignImageItems(headerSeqNo, justyFy, alignItem);
-                                $divLabel.addClass(dynamicClassForImageJustyfy);
-                            }
+                            iControl = new VIS.Controls.VKeyText(headerItem.ColSql, $self.gTab.getWindowNo(),
+                                $self.gTab.getWindowNo() + "_" + headerSeqNo, headerItem.IsAlwaysExecute, mField, headerItem.AD_GridLayoutItems_ID);
 
-                            // Get Controls to be displayed in Header Panel
-                            $label = VIS.VControlFactory.getHeaderLabel(mField, true);
-
-                            if (headerItem.ColSql.length > 0) {
-                                iControl = new VIS.Controls.VKeyText(headerItem.ColSql, $self.gTab.getWindowNo(),
-                                    $self.gTab.getWindowNo() + "_" + headerSeqNo, headerItem.IsAlwaysExecute, null , headerItem.AD_GridLayoutItems_ID);
-                            } else {
-                                iControl = VIS.VControlFactory.getReadOnlyControl(this.curTab, mField, false, false, false);
-                            }
-
-                            if (mField.getDisplayType() == VIS.DisplayType.Button) {
-                                if (iControl != null)
-                                    iControl.addActionListner(this);
-                            }
-
-                            var dynamicFieldValue = this.applyCustomUIForFieldValue(headerSeqNo, startCol, startRow, mField);
-
-                            iControl.getControl().addClass(dynamicFieldValue);
-
-                            // Create object of controls and push object and Field in Array
-                            // THis array is used when user navigate from one record to another.
-                            controls["control"] = iControl;
-
-                            var objctrls = { "control": controls, "field": mField };
-
-                            var $spanIcon = $('<span></span>');
-                            var icon = VIS.VControlFactory.getIcon(mField);
                             if (iControl == null) {
                                 continue;
                             }
 
-                            var $lblControl = null;
-                            if ($label) {
-                                $lblControl = $label.getControl().addClass('vis-w-p-header-data-label');
-                            }
+                            controls["control"] = iControl;
+                            var objctrls = { "control": controls, "field": null };
 
-                            var colValue = getFieldValue(mField);
+                            $divLabel.append(iControl.getControl());
+                            $div.append($divLabel);
+                            // $div.append($divLabel);
+                            $containerDiv.append($div);
+                            $self.controls.push(objctrls);
+                        }
+                        else if (mFields) {
+                            for (var x = 0; x < mFields.length; x++) {
+                                var mField = mFields[x];
+                                if (!mField)
+                                    continue;
 
-                            styleArr = mField.getHeaderStyle();
-                            if (styleArr && styleArr.length > 0)
-                                styleArr = styleArr.split("|");
+                                var controls = {};
+                                $divIcon = $('<div class="vis-w-p-header-icon-f"></div>');
 
-                            if (styleArr && styleArr.length > 0) {
-                                for (var j = 0; j < styleArr.length; j++) {
-                                    if (styleArr[j].indexOf("@img::") > -1 || styleArr[j].indexOf("@span::") > -1) {
-                                        $div.append($divIcon);
-                                        var css = "";
-                                        if (styleArr[j].indexOf("@img::") > -1) {
-                                            css = styleArr[j].replace("@img::", "");
-                                        }
-                                        else if (styleArr[j].indexOf("@span::")) {
-                                            css = styleArr[j].replace("@span::", "");
-                                        }
-                                        $divIcon.attr('style', css);
-                                    }
-                                    else if (styleArr[j].indexOf("@value::") > -1) {
-                                        //var css = "";
-
-                                        //css = styleArr[j].replace("@value::", "");
-                                        //$divLabel.attr('style', css);
-                                        $div.append($divLabel);
-                                    }
-                                    else if (styleArr[j].indexOf("<br>") > -1) {
-                                        $div.css("flex-direction", "column");
-                                    }
-                                    else {
-                                        $div.append($divIcon);
-                                        $div.append($divLabel);
-                                    }
+                                $divLabel = $('<div class="vis-w-p-header-Label-f"></div>');
+                                // If Referenceof field is Image then added extra class to align image and Label in center.
+                                if (mField.getDisplayType() == VIS.DisplayType.Image) {
+                                    $divLabel.addClass('vis-w-p-header-Label-center-f');
+                                    var dynamicClassForImageJustyfy = this.justifyAlignImageItems(headerSeqNo, justyFy, alignItem);
+                                    $divLabel.addClass(dynamicClassForImageJustyfy);
                                 }
-                            }
-                            else {
-                                $div.append($divIcon);
-                                $div.append($divLabel);
-                            }
 
-                            var $image = $('<img>');
-                            var $imageSpan = $('<span>');
-                            objctrls["img"] = $image;
+                                // Get Controls to be displayed in Header Panel
+                                $label = VIS.VControlFactory.getHeaderLabel(mField, true);
 
+                                if (headerItem.ColSql.length > 0) {
+                                    iControl = new VIS.Controls.VKeyText(headerItem.ColSql, $self.gTab.getWindowNo(),
+                                        $self.gTab.getWindowNo() + "_" + headerSeqNo, headerItem.IsAlwaysExecute, null, headerItem.AD_GridLayoutItems_ID);
+                                } else {
+                                    iControl = VIS.VControlFactory.getReadOnlyControl(this.curTab, mField, false, false, false);
+                                }
 
-                            if (mField.lookup && mField.lookup.gethasImageIdentifier()) {
+                                if (mField.getDisplayType() == VIS.DisplayType.Button) {
+                                    if (iControl != null)
+                                        iControl.addActionListner(this);
+                                }
 
+                                var dynamicFieldValue = this.applyCustomUIForFieldValue(headerSeqNo, startCol, startRow, mField);
 
-                                objctrls["imgspan"] = $imageSpan;
+                                iControl.getControl().addClass(dynamicFieldValue);
 
-                                var img = null;
-                                var imgSpan = null;
-                                var imgStyle = null;
-                                var styleArr = null;
-                                if (VIS.DisplayType.List == mField.lookup.displayType) {
+                                // Create object of controls and push object and Field in Array
+                                // THis array is used when user navigate from one record to another.
+                                controls["control"] = iControl;
 
-                                    img = mField.lookup.getLOVIconElement(mField.getValue(), true);
-                                    //Fetch style of icon for list from image window and apply style on that icon
-                                    imgStyle = mField.lookup.getLOVIconStyle(mField.getValue());
-                                    if (!img && colValue) {
-                                        imgSpan = colValue.substring(0, 1);
-                                    }
-                                    if (img && !img.contains("Images/")) {
-                                        imgSpan = img;//img contains First charater of Name or Identifier text
-                                        $imageSpan.text(imgSpan);//.attr('style', imgStyle);
-                                    }
-                                    else {
-                                        $image.attr('src', img);//.attr('style', imgStyle);
+                                var objctrls = { "control": controls, "field": mField };
+
+                                var $spanIcon = $('<span></span>');
+                                var icon = VIS.VControlFactory.getIcon(mField);
+                                if (iControl == null) {
+                                    continue;
+                                }
+
+                                var $lblControl = null;
+                                if ($label) {
+                                    $lblControl = $label.getControl().addClass('vis-w-p-header-data-label');
+                                }
+
+                                var colValue = getFieldValue(mField);
+
+                                styleArr = mField.getHeaderStyle();
+                                if (styleArr && styleArr.length > 0)
+                                    styleArr = styleArr.split("|");
+
+                                if (styleArr && styleArr.length > 0) {
+                                    for (var j = 0; j < styleArr.length; j++) {
+                                        if (styleArr[j].indexOf("@img::") > -1 || styleArr[j].indexOf("@span::") > -1) {
+                                            $div.append($divIcon);
+                                            var css = "";
+                                            if (styleArr[j].indexOf("@img::") > -1) {
+                                                css = styleArr[j].replace("@img::", "");
+                                            }
+                                            else if (styleArr[j].indexOf("@span::")) {
+                                                css = styleArr[j].replace("@span::", "");
+                                            }
+                                            $divIcon.attr('style', css);
+                                        }
+                                        else if (styleArr[j].indexOf("@value::") > -1) {
+                                            //var css = "";
+
+                                            //css = styleArr[j].replace("@value::", "");
+                                            //$divLabel.attr('style', css);
+                                            $div.append($divLabel);
+                                        }
+                                        else if (styleArr[j].indexOf("<br>") > -1) {
+                                            $div.css("flex-direction", "column");
+                                        }
+                                        else {
+                                            $div.append($divIcon);
+                                            $div.append($divLabel);
+                                        }
                                     }
                                 }
                                 else {
-                                    colValue = VIS.Utility.Util.getIdentifierDisplayVal(colValue);
-                                    img = getIdentifierImage(mField);
-                                    if (img && !img.contains("Images/")) {
-                                        imgSpan = img;//img contains First charater of Name or Identifier text
-                                        $imageSpan.text(imgSpan);
+                                    $div.append($divIcon);
+                                    $div.append($divLabel);
+                                }
+
+                                var $image = $('<img>');
+                                var $imageSpan = $('<span>');
+                                objctrls["img"] = $image;
+
+
+                                if (mField.lookup && mField.lookup.gethasImageIdentifier()) {
+
+
+                                    objctrls["imgspan"] = $imageSpan;
+
+                                    var img = null;
+                                    var imgSpan = null;
+                                    var imgStyle = null;
+                                    var styleArr = null;
+                                    if (VIS.DisplayType.List == mField.lookup.displayType) {
+
+                                        img = mField.lookup.getLOVIconElement(mField.getValue(), true);
+                                        //Fetch style of icon for list from image window and apply style on that icon
+                                        imgStyle = mField.lookup.getLOVIconStyle(mField.getValue());
+                                        if (!img && colValue) {
+                                            imgSpan = colValue.substring(0, 1);
+                                        }
+                                        if (img && !img.contains("Images/")) {
+                                            imgSpan = img;//img contains First charater of Name or Identifier text
+                                            $imageSpan.text(imgSpan);//.attr('style', imgStyle);
+                                        }
+                                        else {
+                                            $image.attr('src', img);//.attr('style', imgStyle);
+                                        }
                                     }
                                     else {
-                                        $image.attr('src', img);
-                                    }
-                                }
-
-
-                                $divIcon.append($imageSpan);
-                                $divIcon.append($image);
-
-                                /*Set what do you want to show? Icon OR Label OR Both OR None*/
-                                if (!mField.getHeaderIconOnly() && !mField.getHeaderHeadingOnly()) {
-                                    if (imgSpan != null)
-                                        $image.hide();
-                                    else {
-                                        $imageSpan.hide();
+                                        colValue = VIS.Utility.Util.getIdentifierDisplayVal(colValue);
+                                        img = getIdentifierImage(mField);
+                                        if (img && !img.contains("Images/")) {
+                                            imgSpan = img;//img contains First charater of Name or Identifier text
+                                            $imageSpan.text(imgSpan);
+                                        }
+                                        else {
+                                            $image.attr('src', img);
+                                        }
                                     }
 
-                                    if ($lblControl && $lblControl.length > 0)
-                                        $divLabel.append($lblControl);
-                                }
-                                else if (mField.getHeaderIconOnly() && mField.getHeaderHeadingOnly()) {
-                                    //$divIcon.hide();
-                                    $divIcon.remove();
-                                }
-                                else if (mField.getHeaderIconOnly()) {
-                                    if (imgSpan != null)
-                                        $image.hide();
-                                    else
-                                        $imageSpan.hide();
 
-                                    if ($lblControl && $lblControl.length > 0)
-                                        $lblControl.remove();
-                                }
-                                else if (mField.getHeaderHeadingOnly()) {
-                                    if ($lblControl && $lblControl.length > 0) {
-                                        $divLabel.append($lblControl);
+                                    $divIcon.append($imageSpan);
+                                    $divIcon.append($image);
+
+                                    /*Set what do you want to show? Icon OR Label OR Both OR None*/
+                                    if (!mField.getHeaderIconOnly() && !mField.getHeaderHeadingOnly()) {
+                                        if (imgSpan != null)
+                                            $image.hide();
+                                        else {
+                                            $imageSpan.hide();
+                                        }
+
+                                        if ($lblControl && $lblControl.length > 0)
+                                            $divLabel.append($lblControl);
                                     }
-                                    $divIcon.remove();
-                                }
+                                    else if (mField.getHeaderIconOnly() && mField.getHeaderHeadingOnly()) {
+                                        //$divIcon.hide();
+                                        $divIcon.remove();
+                                    }
+                                    else if (mField.getHeaderIconOnly()) {
+                                        if (imgSpan != null)
+                                            $image.hide();
+                                        else
+                                            $imageSpan.hide();
 
+                                        if ($lblControl && $lblControl.length > 0)
+                                            $lblControl.remove();
+                                    }
+                                    else if (mField.getHeaderHeadingOnly()) {
+                                        if ($lblControl && $lblControl.length > 0) {
+                                            $divLabel.append($lblControl);
+                                        }
+                                        $divIcon.remove();
+                                    }
+
+                                    $divLabel.append(iControl.getControl());
+
+                                    $containerDiv.append($div);
+                                    setValue(colValue, iControl, mField);
+                                }
+                                else {
+                                    $spanIcon.addClass('vis-w-p-header-icon-fixed');
+                                    objctrls["imgspan"] = $spanIcon;
+                                    /*Set what do you want to show? Icon OR Label OR Both OR None*/
+                                    if (mField.getDisplayType() == VIS.DisplayType.Button) {
+                                        $divIcon.remove(); // button has image with field
+                                    }
+                                    else if (!mField.getHeaderIconOnly() && !mField.getHeaderHeadingOnly()) {
+                                        $divIcon.append($spanIcon.append(icon));
+                                        if ($lblControl && $lblControl.length > 0)
+                                            $divLabel.append($lblControl);
+                                    }
+                                    else if (mField.getHeaderIconOnly() && mField.getHeaderHeadingOnly()) {
+                                        $divIcon.remove();
+                                    }
+                                    else if (mField.getHeaderIconOnly()) {
+                                        $divIcon.append($spanIcon.append(icon));
+                                        if ($lblControl && $lblControl.length > 0)
+                                            $lblControl.hide();
+                                    }
+                                    else if (mField.getHeaderHeadingOnly()) {
+                                        if ($lblControl && $lblControl.length > 0) {
+                                            $divLabel.append($lblControl);
+                                        }
+                                        $divIcon.remove();
+                                    }
+
+                                    setValue(colValue, iControl, mField);
+                                    /****END ******  Set what do you want to show? Icon OR Label OR Both OR None*/
+                                }
                                 $divLabel.append(iControl.getControl());
-
                                 $containerDiv.append($div);
-                                setValue(colValue, iControl, mField);
+                                $self.controls.push(objctrls);
                             }
-                            else {
-                                $spanIcon.addClass('vis-w-p-header-icon-fixed');
-                                objctrls["imgspan"] = $spanIcon;
-                                /*Set what do you want to show? Icon OR Label OR Both OR None*/
-                                if (mField.getDisplayType() == VIS.DisplayType.Button) {
-                                    $divIcon.remove(); // button has image with field
-                                }
-                                else if (!mField.getHeaderIconOnly() && !mField.getHeaderHeadingOnly()) {
-                                    $divIcon.append($spanIcon.append(icon));
-                                    if ($lblControl && $lblControl.length > 0)
-                                        $divLabel.append($lblControl);
-                                }
-                                else if (mField.getHeaderIconOnly() && mField.getHeaderHeadingOnly()) {
-                                    $divIcon.remove();
-                                }
-                                else if (mField.getHeaderIconOnly()) {
-                                    $divIcon.append($spanIcon.append(icon));
-                                    if ($lblControl && $lblControl.length > 0)
-                                        $lblControl.hide();
-                                }
-                                else if (mField.getHeaderHeadingOnly()) {
-                                    if ($lblControl && $lblControl.length > 0) {
-                                        $divLabel.append($lblControl);
-                                    }
-                                    $divIcon.remove();
-                                }
-
-                                setValue(colValue, iControl, mField);
-                                /****END ******  Set what do you want to show? Icon OR Label OR Both OR None*/
-                            }
-                            $divLabel.append(iControl.getControl());
-                            $containerDiv.append($div);
-                            $self.controls.push(objctrls);
                         }
                     }
                 }
@@ -526,9 +570,20 @@
 
                 if (mField.lookup) {
                     colValue = mField.lookup.getDisplay(colValue, true, true);
+
+                    if (colValue.startsWith && colValue.startsWith("<") && colValue.endsWith(">")) {
+                        colValue = colValue.replace("<", "").replace(">", "");
+                        var colValueTemp = mField.lookup.getDirect(colValue, true, true)
+                        if (colValueTemp && colValueTemp.Name) {
+                            colValue = colValueTemp.Name;
+                        }
+                    }
+
+
                 }
                 //	Date
                 else if (VIS.DisplayType.IsDate(displayType)) {
+                    colValue = colValue.replace('Z',''); //remove Universal time
                     if (displayType == VIS.DisplayType.DateTime) {
                         colValue = new Date(colValue).toLocaleString();
                     }

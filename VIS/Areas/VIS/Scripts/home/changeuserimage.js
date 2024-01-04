@@ -40,7 +40,8 @@
                             success: function (data) {
                                 $('.vis-userAvatar-Container').find('img').remove();
                                 $('.vis-userAvatar-Container').append('<i id="imgUsrImage" class="vis-userAvatar-Large vis vis-user"></i>');
-                                $('.vis-app-user-img-wrap').remove('img');
+                                $('.vis-app-user-img-wrap').find('img').remove();
+                                document.getElementById('vis-file-input').value = null;
                             },
                             error: function (err) {
                             }

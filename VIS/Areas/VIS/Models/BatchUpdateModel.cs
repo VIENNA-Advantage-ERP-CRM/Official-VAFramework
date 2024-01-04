@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Web;
+using VAdvantage.Classes;
 using VAdvantage.DataBase;
 using VAdvantage.Model;
 using VAdvantage.ModelAD;
@@ -32,7 +33,29 @@ namespace VIS.Models
                 PO prntObj = MTable.GetPO(ctx, tableName, updateList.recordIds[j], null);
                 for (int i = 0; i < updateList.setValue.Count(); i++)
                 {
-                    prntObj.Set_ValueNoCheck(updateList.setValue[i].column, updateList.setValue[i].setValue);
+                    if (updateList.setValue[i].setValue!=null && DisplayType.IsDate(updateList.setValue[i].setType))
+                    {
+                        prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfDateTime(updateList.setValue[i].setValue));
+                    }
+                    else if (updateList.setValue[i].setType == DisplayType.Integer || DisplayType.IsID(updateList.setValue[i].setType))
+                    {
+                        if (int.TryParse(Util.GetValueOfString(updateList.setValue[i].setValue), out int result))
+                        {
+                            prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfInt(updateList.setValue[i].setValue));
+                        }
+                        else
+                        {
+                            prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfString(updateList.setValue[i].setValue));
+                        }                       
+                    }
+                    else if (DisplayType.IsNumeric(updateList.setValue[i].setType))
+                    {
+                        prntObj.Set_ValueNoCheck(updateList.setValue[i].column, Util.GetValueOfDecimal(updateList.setValue[i].setValue));
+                    }
+                    else
+                    {
+                        prntObj.Set_ValueNoCheck(updateList.setValue[i].column, updateList.setValue[i].setValue);
+                    }
                     if (j == 0)
                     {
                         values += Util.GetValueOfString(updateList.setValue[i].column) + " : " + Util.GetValueOfString(updateList.setValue[i].setValue) + ", ";
@@ -82,6 +105,7 @@ namespace VIS.Models
     public class SetValue
     {
         public string column { get; set; }
-        public string setValue { get; set; }
+        public object setValue { get; set; }
+        public int setType { get; set; }
     }
 }
