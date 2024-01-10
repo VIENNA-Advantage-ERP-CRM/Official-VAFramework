@@ -347,7 +347,7 @@ namespace VAdvantage.Model
                 }
             }
 
-            
+
 
             if (column.GetAD_Reference_ID() == DisplayType.Date)
             {

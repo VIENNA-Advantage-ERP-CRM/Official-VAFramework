@@ -2471,7 +2471,10 @@ namespace VIS.Helpers
             if (sqlIn.card_ID > 0)
             {
                 string SQL = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf(" FROM " + sqlIn.tableName));
-                SQL = SQL.Substring(0, SQL.LastIndexOf("ORDER"));
+                if (SQL.LastIndexOf("ORDER") > -1)
+                {
+                    SQL = SQL.Substring(0, SQL.LastIndexOf("ORDER"));
+                }
                 retVal.CardViewTpl = WindowHelper.GetCardViewDetail(0, sqlIn.ad_Tab_ID, ctx, sqlIn.card_ID, SQL);
                 if (retVal.CardViewTpl.DisableWindowPageSize)
                 {
@@ -2481,8 +2484,14 @@ namespace VIS.Helpers
 
                 string condition = "";
                 string getCondition = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf("WHERE"));
-                string whereCondition = getCondition.Substring(0, getCondition.LastIndexOf("ORDER"));
-                string orderBY = getCondition.Substring(getCondition.LastIndexOf("ORDER"));
+                string whereCondition = getCondition;
+                string orderBY = "";
+                if (getCondition.LastIndexOf("ORDER") > -1)
+                {
+                    whereCondition = getCondition.Substring(0, getCondition.LastIndexOf("ORDER"));
+                    orderBY = getCondition.Substring(getCondition.LastIndexOf("ORDER"));
+                }
+
                 if (!string.IsNullOrEmpty(retVal.CardViewTpl.ExcludedGroup))
                 {
                     string[] textSplit = retVal.CardViewTpl.ExcludedGroup.Split(',');
@@ -3808,27 +3817,27 @@ namespace VIS.Helpers
 
             //If Login org is not * , then fetch records of * org which are shared with current org and ignore records of * which are shared 
             // with other orgs and not with current org
+            //MTable table = MTable.Get(ctxp, AD_Table_ID);
+            //if (ctxp.GetAD_Org_ID() > 0 && !table.IsView() && !TableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !TableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
+            //{
+            //    if (string.IsNullOrEmpty(WhereClause))
+            //    {
+            //        SQL += " WHERE ";
+            //    }
+            //    else
+            //    {
+            //        SQL += " AND ";
+            //    }
 
-            if (ctxp.GetAD_Org_ID() > 0 && !TableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !TableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
-            {
-                if (string.IsNullOrEmpty(WhereClause))
-                {
-                    SQL += " WHERE ";
-                }
-                else
-                {
-                    SQL += " AND ";
-                }
 
+            //    SQL += @" (" + TableName + @"_ID NOT IN
+            //    (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID != " + ctxp.GetAD_Org_ID() +
+            //    " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)) OR " +
+            //     TableName + @"_ID IN
+            //    (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID = " + ctxp.GetAD_Org_ID() +
+            //    " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)))";
 
-                SQL += @" (" + TableName + @"_ID NOT IN
-                (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID != " + ctxp.GetAD_Org_ID() +
-                " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)) OR " +
-                 TableName + @"_ID IN
-                (SELECT Record_ID FROM AD_ShareRecordOrg WHERE AD_Table_ID = " + gt.AD_Table_ID + @" AND AD_OrgShared_ID = " + ctxp.GetAD_Org_ID() +
-                " AND Record_ID IN(SELECT " + TableName + @"_ID FROM " + TableName + " WHERE AD_Org_ID = 0)))";
-
-            }
+            //}
 
             if (!String.IsNullOrEmpty(gt.OrderByClause))
             {

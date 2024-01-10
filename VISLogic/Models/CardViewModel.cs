@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Dynamic;
+using VAdvantage.Common;
 using VAdvantage.DataBase;
 using VAdvantage.Model;
 using VAdvantage.Utility;
@@ -20,8 +22,9 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         /// <returns></returns>
         public List<CardViewPropeties> GetCardView(int ad_Window_ID, int ad_Tab_ID, Ctx ctx)
-        {
-            List<CardViewPropeties> lstCardView = null;
+        {            
+
+                List<CardViewPropeties> lstCardView = null;
             //string sqlQuery = "SELECT * FROM AD_CardView WHERE AD_Window_id=" + ad_Window_ID + " and AD_Tab_id=" + ad_Tab_ID + " AND (createdby=" + ctx.GetAD_User_ID() + " OR AD_USER_ID Is NULL OR AD_User_ID = " + ctx.GetAD_User_ID() + ") AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             //string sqlQuery = " SELECT * FROM AD_CardView c WHERE c.AD_Window_id=" + ad_Window_ID + " and c.AD_Tab_id=" + ad_Tab_ID + " AND (c.createdby=" + ctx.GetAD_User_ID() +
             //                  " OR ((c.AD_USER_ID    IS NULL) AND exists (select * from ad_cardview_role r where r.ad_cardview_id = c.ad_cardview_id and r.ad_role_id = " + ctx.GetAD_Role_ID() + ")) OR c.AD_User_ID     = " + ctx.GetAD_User_ID() +
@@ -52,6 +55,13 @@ namespace VIS.Models
                         isDefault = true;
                     }
 
+                    bool isEditable = true;
+
+                    if (!String.IsNullOrEmpty(Convert.ToString(ds.Tables[0].Rows[i]["Export_ID"])) && Common.transportEnvironment != "Y")
+                    {
+                        isEditable = false;
+                    }
+
 
                     CardViewPropeties objCardView = new CardViewPropeties()
                     {
@@ -68,8 +78,8 @@ namespace VIS.Models
                         disableWindowPageSize = Convert.ToString(ds.Tables[0].Rows[i]["DISABLEWINDOWPAGESIZE"]) == "Y",
                         //IsDefault = VAdvantage.Utility.Util.GetValueOfString(ds.Tables[0].Rows[i]["ISDEFAULT"])=="Y"?true:false,
                         DefaultID = isDefault,
-                        Updated = Convert.ToDateTime(ds.Tables[0].Rows[i]["UPDATED"])
-
+                        Updated = Convert.ToDateTime(ds.Tables[0].Rows[i]["UPDATED"]),
+                        IsEditable= isEditable
                     };
                     lstCardView.Add(objCardView);
                 }
@@ -244,7 +254,6 @@ namespace VIS.Models
                     AD_Field_ID = 0,
                     AD_GroupField_ID = fid,
                     UserID = uid
-
                 };
                 lstCardViewColumns.Add(objCardView);
             }
@@ -393,8 +402,12 @@ namespace VIS.Models
         /// <param name="sort"></param>
         public void SaveCardViewColumns(int ad_cardview_id, int ad_Field_ID, int sqNo, Ctx ctx, int sort)
         {
-
-            MCardViewColumn objCardViewColumn = new MCardViewColumn(ctx, 0, null);
+            int CardViewColumnID = 0;
+            if (Common.transportEnvironment == "Y")
+            {
+                CardViewColumnID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Cardview_Column_ID FROM AD_Cardview_Column WHERE AD_CardView_ID=" + ad_cardview_id + " AND AD_Field_ID=" + ad_Field_ID));
+            }
+            MCardViewColumn objCardViewColumn = new MCardViewColumn(ctx, CardViewColumnID, null);
             objCardViewColumn.SetAD_CardView_ID(ad_cardview_id);
             objCardViewColumn.SetAD_Field_ID(ad_Field_ID);
             objCardViewColumn.SetSeqNo(sqNo);
@@ -417,7 +430,7 @@ namespace VIS.Models
             DB.ExecuteQuery("DELETE FROM AD_GridLayout WHERE AD_HeaderLayout_ID=" + headerID, null, null);
             DB.ExecuteQuery("DELETE FROM AD_HeaderLayout WHERE AD_HeaderLayout_ID=" + headerID, null, null);
 
-            string sqlQuery = "DELETE FROM AD_CARDVIEW WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_CARDVIEW WHERE AD_CARDVIEW_ID=" + ad_CardView_ID; //+ " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -432,7 +445,41 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteAllCardViewColumns(int ad_CardView_ID, Ctx ctx)
         {
-            string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+
+            string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE Export_ID IS NULL AND AD_CARDVIEW_ID=" + ad_CardView_ID;// AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            int result = DB.ExecuteQuery(sqlQuery);
+            if (result < 1)
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// Delete card view columns
+        /// </summary>
+        /// <param name="ad_CardView_ID"></param>
+        /// <param name="ctx"></param>
+        /// <param name="lstCardViewColumns"></param>
+        public void DeleteAllCardViewColumns(int ad_CardView_ID, Ctx ctx, List<CardViewPropeties> lstCardViewColumns)
+        {
+            string fieldID = "";
+            if (Common.transportEnvironment == "Y")
+            {
+                for (int i = 0; i < lstCardViewColumns.Count; i++)
+                {
+                    if (i > 0)
+                    {
+                        fieldID += ",";
+                    }
+                    fieldID += Util.GetValueOfString(lstCardViewColumns[i].AD_Field_ID);
+                }
+
+            }
+            string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE AD_CARDVIEW_ID=" + ad_CardView_ID;// AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            if (fieldID != "")
+            {
+                sqlQuery += " AND AD_Field_ID NOT IN (" + fieldID + ")";
+            }
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -447,7 +494,7 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteAllCardViewRole(int ad_CardView_ID, Ctx ctx)
         {
-            string sqlQuery = "DELETE FROM AD_CARDVIEW_ROLE WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_CARDVIEW_ROLE WHERE AD_CARDVIEW_ID=" + ad_CardView_ID; //+ " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -461,7 +508,7 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteAllCardViewCondition(int ad_CardView_ID, Ctx ctx)
         {
-            string sqlQuery = "DELETE FROM AD_CARDVIEW_CONDITION WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_CARDVIEW_CONDITION WHERE AD_CARDVIEW_ID=" + ad_CardView_ID;// + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -475,7 +522,7 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         public void DeleteDefaultCardView(int ad_CardView_ID, Ctx ctx)
         {
-            string sqlQuery = "DELETE FROM AD_DefaultCardView WHERE AD_CARDVIEW_ID=" + ad_CardView_ID + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+            string sqlQuery = "DELETE FROM AD_DefaultCardView WHERE AD_CARDVIEW_ID=" + ad_CardView_ID;// + " AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)
             {
@@ -981,9 +1028,9 @@ namespace VIS.Models
                 if (templateID > 0)
                 {
                     dsContent = DB.ExecuteDataset("SELECT contentfieldlable,contentfieldvalue,seqNo,(SELECT name FROM AD_GridLayout WHERE AD_GridLayout.AD_GridLayout_ID=AD_GridLayoutItems.AD_GridLayout_ID) AS secName FROM AD_GridLayoutItems WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID() + ")");
-                    string sql = "DELETE FROM AD_GridLayoutItems WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID() + ")";
-                    DB.ExecuteQuery(sql, null, trx);
-                    DB.ExecuteQuery("DELETE FROM AD_GridLayout WHERE AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID(), null, trx);
+                    string sql = "DELETE FROM AD_GridLayoutItems WHERE Export_ID IS NULL AND AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID() + ")";
+                    int result=  DB.ExecuteQuery(sql, null, trx);
+                    result= DB.ExecuteQuery("DELETE FROM AD_GridLayout WHERE Export_ID IS NULL AND AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID(), null, trx);
                 }
                 else
                 {
@@ -1003,7 +1050,8 @@ namespace VIS.Models
 
                     for (int i = 0; i < cardSection.Count; i++)
                     {
-                        MGridLayout mgl = new MGridLayout(ctx, 0, trx);
+                        int GridLayoutid =Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID="+ mhl.GetAD_HeaderLayout_ID()+ " AND Name='"+ cardSection[i].sectionName.Trim() + "'",null,trx));
+                        MGridLayout mgl = new MGridLayout(ctx, GridLayoutid, trx);
                         mgl.SetAD_HeaderLayout_ID(mhl.GetAD_HeaderLayout_ID());
                         mgl.SetName(cardSection[i].sectionName.Trim());
                         mgl.SetBackgroundColor(cardSection[i].style.Trim());
@@ -1022,7 +1070,11 @@ namespace VIS.Models
                                     {
                                         columnSQL = SecureEngineBridge.DecryptByClientKey(cardTempField[j].columnSQL, ctx.GetSecureKey());
                                     }
-                                    MGridLayoutItems mli = new MGridLayoutItems(ctx, 0, trx);
+
+                                    int GridLayoutItemsid = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems WHERE AD_GridLayout_ID=" + mgl.GetAD_GridLayout_ID() + " AND SeqNo='" + cardTempField[j].seq + "'",null,trx));
+
+
+                                    MGridLayoutItems mli = new MGridLayoutItems(ctx, GridLayoutItemsid, trx);
                                     mli.SetAD_GridLayout_ID(mgl.GetAD_GridLayout_ID());
                                     mli.SetSeqNo(cardTempField[j].seq);
                                     mli.SetStartRow(cardTempField[j].rowStart);
@@ -1289,6 +1341,7 @@ namespace VIS.Models
         public int sort { get; set; }
         public string OrderByClause { get; set; }
         public bool disableWindowPageSize { get; set; }
+        public bool IsEditable { get; set; }
         public DateTime Updated { get; set; }
     }
 

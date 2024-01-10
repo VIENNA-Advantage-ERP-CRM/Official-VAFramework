@@ -104,7 +104,7 @@ namespace VIS.Controllers
             {
                 if (lstCardViewColumns != null)
                 {
-                    objCardViewModel.DeleteAllCardViewColumns(lstCardView[0].CardViewID, ctx);
+                    objCardViewModel.DeleteAllCardViewColumns(lstCardView[0].CardViewID, ctx, lstCardViewColumns);
                 }
                 id = objCardViewModel.SaveCardViewRecord(lstCardView[0].CardViewName, lstCardView[0].AD_Window_ID, lstCardView[0].AD_Tab_ID, lstCardView[0].UserID, lstCardView[0].AD_GroupField_ID, ctx, lstCardView[0].CardViewID/*, LstRoleID*/, lstCardViewCondition, lstCardView[0].AD_HeaderLayout_ID, lstCardView[0].isPublic, lstCardView[0].groupSequence, excludeGrp, orderByClause);
             }
