@@ -2471,7 +2471,10 @@ namespace VIS.Helpers
             if (sqlIn.card_ID > 0)
             {
                 string SQL = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf(" FROM " + sqlIn.tableName));
-                SQL = SQL.Substring(0, SQL.LastIndexOf("ORDER"));
+                if (SQL.LastIndexOf("ORDER") > -1)
+                {
+                    SQL = SQL.Substring(0, SQL.LastIndexOf("ORDER"));
+                }
                 retVal.CardViewTpl = WindowHelper.GetCardViewDetail(0, sqlIn.ad_Tab_ID, ctx, sqlIn.card_ID, SQL);
                 if (retVal.CardViewTpl.DisableWindowPageSize)
                 {
@@ -2481,8 +2484,14 @@ namespace VIS.Helpers
 
                 string condition = "";
                 string getCondition = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf("WHERE"));
-                string whereCondition = getCondition.Substring(0, getCondition.LastIndexOf("ORDER"));
-                string orderBY = getCondition.Substring(getCondition.LastIndexOf("ORDER"));
+                string whereCondition = getCondition;
+                string orderBY = "";
+                if (getCondition.LastIndexOf("ORDER") > -1)
+                {
+                    whereCondition = getCondition.Substring(0, getCondition.LastIndexOf("ORDER"));
+                    orderBY = getCondition.Substring(getCondition.LastIndexOf("ORDER"));
+                }
+
                 if (!string.IsNullOrEmpty(retVal.CardViewTpl.ExcludedGroup))
                 {
                     string[] textSplit = retVal.CardViewTpl.ExcludedGroup.Split(',');
