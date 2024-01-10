@@ -350,25 +350,9 @@ namespace VAdvantage.Model
 
 
             if (column.GetAD_Reference_ID() == DisplayType.Date)
-            {                
-                if (string.IsNullOrEmpty(po.GetCtx().GetContext("#ClientLanguage"))){
-                    return Util.GetValueOfDateTime(value).Value.Date.ToShortDateString();
-                }
-                else {
-                    return DisplayType.GetDateFormat(column.GetAD_Reference_ID()).Format(value, po.GetCtx().GetContext("#ClientLanguage"), SimpleDateFormat.DATESHORT);
-                }
-            }
-            else if (column.GetAD_Reference_ID() == DisplayType.Time)
             {
-                return Util.GetValueOfDateTime(value).Value.ToLocalTime().ToShortTimeString();
+                return Util.GetValueOfDateTime(value).Value.Date.ToShortDateString();
             }
-
-            // Show Amount according to browser culture
-            if (!string.IsNullOrEmpty(po.GetCtx().GetContext("#ClientLanguage")) && (column.GetAD_Reference_ID() == DisplayType.Amount || column.GetAD_Reference_ID() == DisplayType.CostPrice))
-            {
-                return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
-            }
-
             return value.ToString();
         }
 

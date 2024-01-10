@@ -383,6 +383,10 @@
         return this.vo.IsCompositeView;
     }
 
+    GridWindow.prototype.getIsHideTabLinks = function () {
+        return this.vo.IsHideTabLinks;
+    }
+
     GridWindow.prototype.dispose = function () {
 
         originalLength = this.tabs.length;
@@ -2050,6 +2054,10 @@
 
         if (recordID < 0 && this.getRecords().length && this.currentRow > -1 && this.getTableName() && this.getRecords()[this.currentRow]) {
             recordID = this.getRecords()[this.currentRow][this.getTableName().toLower() + "_id"];
+        }
+
+        if (recordID && recordID < 0) {
+            return;
         }
 
         var that = this;
@@ -7321,6 +7329,9 @@
     };
     GridField.prototype.getTabSeqNo = function () {
         return this.vo.TabSeqNo;
+    };
+    GridField.prototype.getAction = function () {
+        return this.vo.ADAction;
     };
 
     /**

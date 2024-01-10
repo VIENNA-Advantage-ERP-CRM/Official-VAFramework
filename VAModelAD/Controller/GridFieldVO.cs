@@ -415,6 +415,10 @@ namespace VAdvantage.Controller
                     {
                         vo.TabSeqNo = Util.GetValueOfInt(dr[i].ToString());
                     }
+                    else if (columnName.Equals("AD_Action", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.ADAction = Util.GetValueOfString(dr[i].ToString());
+                    }
                 }
                 if (vo.Header == null)
                     vo.Header = vo.ColumnName;
@@ -925,6 +929,7 @@ namespace VAdvantage.Controller
             clone.GridImageStyle = GridImageStyle;
             clone.IsAction = IsAction;
             clone.TabSeqNo = TabSeqNo;
+            clone.ADAction = ADAction;
             return clone;
         }
 

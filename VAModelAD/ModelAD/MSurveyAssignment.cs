@@ -40,7 +40,7 @@ namespace VAdvantage.Model
             //if (newRecord)
             //{
                 MTabPanel tp = new MTabPanel(GetCtx(), 0, null);
-                tp.SetName("Survey Panel");
+                tp.SetName(Msg.GetMsg(GetCtx(), "SurveyPanelName"));
                 tp.SetClassname("VIS.SurveyPanel");
                 tp.SetAD_Tab_ID(GetAD_Tab_ID());
                 tp.SetSeqNo(10);
@@ -81,7 +81,7 @@ namespace VAdvantage.Model
             }
             DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Client_ID=" + GetAD_Client_ID() + " AND AD_ORG_ID=" + GetAD_Org_ID() + "  AND AD_Tab_ID IN (" + GetAD_Tab_ID() + ")");
 
-            string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='Y' AND isActive='Y'";
+            string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND isActive='Y' AND AD_Client_ID="+GetAD_Client_ID();
 
             if (!newRecord)
             {
@@ -95,7 +95,7 @@ namespace VAdvantage.Model
             }
             else if (IsAD_ShowEverytime() == true)
             {
-                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND isActive='Y'";
+                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
                 if (!newRecord)
                 {
                     sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
@@ -113,7 +113,7 @@ namespace VAdvantage.Model
             }
             else if (IsAD_ShowEverytime() == false)
             {
-                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND AD_Survey_ID=" + GetAD_Survey_ID() + " AND isActive='Y'";
+                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND AD_Survey_ID=" + GetAD_Survey_ID() + " AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
                 if (!newRecord)
                 {
                     sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
