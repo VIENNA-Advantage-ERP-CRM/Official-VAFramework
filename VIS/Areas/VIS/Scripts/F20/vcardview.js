@@ -1650,9 +1650,9 @@
                             value = value = VIS.Msg.getMsg('No');
                     }
 
-                    else if (VIS.DisplayType.IsDate(dt)) {
-                        value = value.replace('Z', ''); //remove universal time
+                    else if (VIS.DisplayType.IsDate(dt)) {                        
                         if (value) {
+                            value = value.replace('Z', ''); //remove universal time
                             // JID_1826 Date is showing as per browser culture
                             var d = new Date(value);
                             if (dt == VIS.DisplayType.Date)
