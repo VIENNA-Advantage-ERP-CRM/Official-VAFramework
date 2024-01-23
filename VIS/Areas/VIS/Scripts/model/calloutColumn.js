@@ -67,6 +67,33 @@
         return "";
     };
 
+    //Check organisation access for user.
+
+    calloutColumn.prototype.checkOrgAccess = function (ctx, windowNo, mTab, mField, value, oldValue) {
+
+        if (this.isCalloutActive() || value == null) {
+            return;
+        }
+
+        var userID = Util.getValueOfInt(mTab.getValue("AD_User_ID"));
+        this.setCalloutActive(true);
+        $.ajax({
+            url: VIS.Application.contextUrl + "VIS/CalloutColumn/CheckOrgAccessByRole",
+            data: { AD_Role_ID: value, AD_User_ID: userID },
+            success: function (result) {
+                if (Util.getValueOfInt(result) == 0)
+                    VIS.ADialog.info(VIS.Msg.getMsg("VIS_NoOrgAccess"));
+            },
+            error: function (err) {
+                this.log.severe(err);
+            }
+        });
+
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
     VIS.calloutColumn = calloutColumn;
 
     //*********** Callout check DocAction in table  Start ****

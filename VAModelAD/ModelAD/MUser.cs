@@ -633,7 +633,46 @@ namespace VAdvantage.Model
                     base.SetPasswordExpireOn(DateTime.Now.AddMonths(validity));
                 }
             }
+
+            if (newRecord)
+            {
+                string password = GeneratePassword();
+                SetPassword(password);
+                SetVA037_BIPassword(password);
+            }
             return true;
+        }
+
+        /*Create random password with Minimum length for password is 5 and maximum length is 8, Password must have at least 1 upper case character,
+        1 lower case character, one special character(@$!%*?&) and one digit. Password must start with character*/
+        public static string GeneratePassword()
+        {
+            const string upperCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowerCaseChars = "abcdefghijklmnopqrstuvwxyz";
+            const string specialChars = "@$!%*?&";
+            const string digits = "0123456789";
+
+            Random random = new Random();
+
+            // Generate at least one character of each type
+            char upperCase = upperCaseChars[random.Next(upperCaseChars.Length)];
+            char lowerCase = lowerCaseChars[random.Next(lowerCaseChars.Length)];
+            char specialChar = specialChars[random.Next(specialChars.Length)];
+            char digit = digits[random.Next(digits.Length)];
+
+            // Combine the characters to form the password
+            string password = $"{upperCase}{lowerCase}{specialChar}{digit}";
+
+            // Generate the remaining characters within the specified length range (5 to 8)
+            int remainingLength = random.Next(5, 9);
+
+            for (int i = 4; i < remainingLength; i++)
+            {
+                string allChars = upperCaseChars + lowerCaseChars + specialChars + digits;
+                char nextChar = allChars[random.Next(allChars.Length)];
+                password += nextChar;
+            }
+            return password;
         }
 
         string sql = "SELECT count(AD_User_ID) FROM AD_USER WHERE IsLoginUser='Y' AND IsActive = 'Y' AND AD_Client_ID=";

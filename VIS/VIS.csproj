@@ -196,6 +196,8 @@
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
     <Content Include="Areas\VIS\Content\Home.css" />
     <Content Include="Areas\VIS\Content\Images\logo.png" />
+    <Content Include="Areas\VIS\Content\Images\mail.svg" />
+    <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
     <Content Include="Areas\VIS\Content\Login.css" />
     <Content Include="Areas\VIS\Content\notify.mp3" />
     <Content Include="Areas\VIS\Content\notify.wav" />
@@ -826,6 +828,13 @@
     <Compile Include="Areas\VIS\Models\VImageModel.cs" />
     <Compile Include="Areas\VIS\Models\VTree.cs" />
     <Compile Include="Areas\VIS\VISAreaRegistration.cs" />
+    <Compile Include="Areas\VIS\WebPages\CreatePassword.aspx.cs">
+      <DependentUpon>CreatePassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Areas\VIS\WebPages\CreatePassword.aspx.designer.cs">
+      <DependentUpon>CreatePassword.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Areas\VIS\WebPages\CreateUser.aspx.cs">
       <DependentUpon>CreateUser.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -840,6 +849,13 @@
     <Compile Include="Areas\VIS\WebPages\CrystalReprotViewer.aspx.designer.cs">
       <DependentUpon>CrystalReprotViewer.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Areas\VIS\WebPages\Expire.aspx.cs">
+      <DependentUpon>Expire.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Areas\VIS\WebPages\Expire.aspx.designer.cs">
+      <DependentUpon>Expire.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -850,8 +866,10 @@
     <Content Include="Areas\VIS\Views\AccountForm\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
+    <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
     <Content Include="Areas\VIS\WebPages\CrystalReprotViewer.aspx" />
+    <Content Include="Areas\VIS\WebPages\Expire.aspx" />
     <Content Include="packages.config" />
     <Content Include="Areas\VIS\Views\ASearch\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Chat\LoadChat.cshtml" />
