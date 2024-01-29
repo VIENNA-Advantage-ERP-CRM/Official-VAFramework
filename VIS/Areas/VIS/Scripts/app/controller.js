@@ -1257,6 +1257,16 @@
         this.fireDataStatusChanged(this.mDataStatusEvent);
     };
 
+    // Get Foucs element;
+    GridTab.prototype.getLastFoucs = function () {
+        return this.gridTable.getLastFoucs();
+    }
+
+    //Set Foucs element
+    GridTab.prototype.setLastFoucs = function (ctl) {
+        this.gridTable.setLastFoucs(ctl);
+    }
+
     //Set Query Object
     GridTab.prototype.setQuery = function (query) {
         if (query == null)
@@ -3228,6 +3238,8 @@
         this.log = VIS.Logging.VLogger.getVLogger("VIS.GridTable");
         //this.outerOrderClause = "";
         this.card_ID = 0;
+        this.lastFoucs = null;
+
     };
 
     GridTable.prototype.ctx = VIS.context;			//	the only OK condition
@@ -3526,6 +3538,7 @@
 
         //	Check all columns
         var size = this.gridFields.length;
+        var isFoucsed = false;
         for (var i = 0; i < size; i++) {
             var field = this.gridFields[i];
             if (field.getIsMandatory(true))        //  check context
@@ -3537,6 +3550,13 @@
                     if (sb.length() > 0)
                         sb.append(", ");
                     sb.append(field.getHeader());
+
+                    // Handle Focus Mandatory column
+                    if (!isFoucsed) {                       
+                        this.lastFoucs = field.propertyChangeListner.getControl();
+                        isFoucsed = true;
+                    }
+
                 }
             }
         }
@@ -3545,6 +3565,17 @@
             return "";
         return sb.toString();
     };	//	getManda
+
+    // Get Last Foucs
+    GridTable.prototype.getLastFoucs = function () {
+        var lf = this.lastFoucs;
+        return lf;
+    }
+
+    // Set Last Foucs
+    GridTable.prototype.setLastFoucs = function (ctrl) {
+        this.lastFoucs = ctrl;
+    }
 
     GridTable.prototype.getErrorColumns = function () {
         //  see also => ProcessParameter.saveParameter

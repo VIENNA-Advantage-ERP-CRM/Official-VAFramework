@@ -89,8 +89,9 @@
                                 colValue = VIS.Utility.Util.getIdentifierDisplayVal(colValue);
 
                                 var $imgCtrl = objControl["img"];
+                                $imgCtrl.attr("src", "");
                                 var $imgSpanCtrl = objControl["imgspan"];
-
+                                $imgSpanCtrl.text('');
                                 var img = null;
                                 var imgStyle = null;
 
@@ -132,6 +133,7 @@
                                         imgSpan = img;//img contains First charater of Name or Identifier text
                                         $imgSpanCtrl.text(imgSpan);
                                         $imgSpanCtrl.show();
+                                        $imgCtrl.attr('src', "");
                                         $imgCtrl.hide();
                                     }
                                     else {
@@ -417,9 +419,12 @@
                                         if (img && !img.contains("Images/")) {
                                             imgSpan = img;//img contains First charater of Name or Identifier text
                                             $imageSpan.text(imgSpan);//.attr('style', imgStyle);
+                                            $image.attr('src', "");
+                                            $image.hide();
                                         }
                                         else {
                                             $image.attr('src', img);//.attr('style', imgStyle);
+                                            $image.show();
                                         }
                                     }
                                     else {
@@ -428,9 +433,12 @@
                                         if (img && !img.contains("Images/")) {
                                             imgSpan = img;//img contains First charater of Name or Identifier text
                                             $imageSpan.text(imgSpan);
+                                            $image.attr('src', "");
+                                            $image.hide();
                                         }
                                         else {
                                             $image.attr('src', img);
+                                            $image.show();
                                         }
                                     }
 
@@ -647,9 +655,16 @@
                     value = value.split("^^^");
                     var highlightChar = '';
                     for (var c = 0; c < value.length; c++) {
-                        if (value[c].trim().length > 0) {
+                        if (value[c].trim().length > 0) {                            
                             if (highlightChar.length == 0)
-                                highlightChar = value[c].trim().substring(0, 1).toUpper();
+                                var txt = value[c].trim().split(' ');
+                            highlightChar = txt[0].substring(0, 1).toUpper();
+                            if (txt.length > 1) {
+                                highlightChar += txt[txt.length - 1].substring(0, 1).toUpper();
+                            } else {
+                                highlightChar = txt[0].substring(0, 2).toUpper();
+                            }
+
                             return highlightChar;
                         }
 
