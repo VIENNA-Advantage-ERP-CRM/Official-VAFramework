@@ -67,7 +67,10 @@
         return "";
     };
 
-    //Check organisation access for user.
+    /// <summary>
+    /// Check organisation access for user.
+    /// </summary>
+    /// <returns>Message</returns>
 
     calloutColumn.prototype.checkOrgAccess = function (ctx, windowNo, mTab, mField, value, oldValue) {
 
@@ -94,16 +97,20 @@
         return "";
     };
 
-    // Activate User button enable when IsExpireLink is False
-    
-    calloutColumn.prototype.buttonDisable = function (ctx, windowNo, mTab, mField, value, oldValue) {debugger
+    /// <summary>
+    ///   Activate User button enable when IsExpireLink is False
+    /// </summary>
+    /// <returns></returns>
+
+    calloutColumn.prototype.buttonDisable = function (ctx, windowNo, mTab, mField, value, oldValue) {
+        debugger
 
         if (this.isCalloutActive() || value == null) {
             return;
         }
 
         this.setCalloutActive(true);
-        mTab.setValue("IsExpireLink",'N')
+        mTab.setValue("IsExpireLink", 'N')
         this.setCalloutActive(false);
         ctx = windowNo = mTab = mField = value = oldValue = null;
         return "";

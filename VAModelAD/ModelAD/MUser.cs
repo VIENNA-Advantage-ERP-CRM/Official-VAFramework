@@ -643,8 +643,12 @@ namespace VAdvantage.Model
             return true;
         }
 
-        /*Create random password with Minimum length for password is 5 and maximum length is 8, Password must have at least 1 upper case character,
-        1 lower case character, one special character(@$!%*?&) and one digit. Password must start with character*/
+        /// <summary>
+        /// Create random password for user
+        /// </summary>
+        /// <returns>password with Minimum length for password is 5 and maximum length is 8, Password must have at least 1 upper case character,
+        ///1 lower case character, one special character(@$!%*?&) and one digit.Password must start with character</returns>
+
         public static string GeneratePassword()
         {
             const string upperCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

@@ -26,7 +26,12 @@ namespace VIS.Controllers
             return Content(DB.ExecuteScalar(sql).ToString());
         }
 
-        // Check organisation access for user.If IsUseUserOrgAccess is true user uses User Org Access otherwise use Role Org Access.
+        /// <summary>
+        /// Check organisation access for user
+        /// </summary>
+        /// <param name="AD_Role_ID">AD_Role_ID</param>
+        /// <param name="AD_User_ID">AD_User_ID</param>
+        /// <returns>count</returns>
         public int CheckOrgAccessByRole(int AD_Role_ID, int AD_User_ID)
         {
             string sql = @"SELECT CASE WHEN AD_Role.IsUseUserOrgAccess = 'Y' 
