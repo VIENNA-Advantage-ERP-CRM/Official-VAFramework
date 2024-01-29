@@ -1051,8 +1051,8 @@
 
         // opening parenthesis for case insensitive search
         //if (Code instanceof String)
-        if (typeof this.code == "string" && isNaN(this.code)) {
-                sb += " UPPER( ";
+        if (typeof this.code == "string" && isNaN(this.code) && (this.code.toString().toUpper() != ("NULLValue").toUpper())) {
+            sb += " UPPER( ";
         }
         if (tableName != null && tableName.length > 0) {
             //	Assumes - REPLACE(INITCAP(variable),'s','X') or UPPER(variable)
@@ -1071,13 +1071,13 @@
         }
 
         // closing parenthesis for case insensitive search
-        if (typeof this.code == "string" && isNaN(this.code)) {
+        if (typeof this.code == "string" && isNaN(this.code) && (this.code.toString().toUpper() != ("NULLValue").toUpper())) {
             sb += " ) ";
         }
 
 
         //	NULL Operator
-        if (this.code == null || "NULL".equals(this.code.toString().toUpper()) || ("NullValue").toUpper().equals(this.code.toString().toUpper())) {
+        if (this.code == null || "NULL".equals(this.code.toString().toUpper()) || ("NULLValue").toUpper().equals(this.code.toString().toUpper())) {
             if (this.operator.equals(VIS.Query.prototype.EQUAL))
                 sb += " IS NULL ";
             else
@@ -1118,7 +1118,7 @@
 
                 else if (typeof (this.code_to) == "string") {
                     sb += VIS.DB.to_string(this.code_to.toString());
-                   
+
                 }
 
                 else
