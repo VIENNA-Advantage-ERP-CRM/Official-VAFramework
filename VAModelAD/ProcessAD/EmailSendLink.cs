@@ -41,6 +41,7 @@ namespace VAModelAD.ProcessAD
             _ctx = GetCtx();
             
         }
+
         /// <summary>
         /// Send url link of reset password
         /// </summary>
@@ -62,7 +63,7 @@ namespace VAModelAD.ProcessAD
                     string roleName = Util.GetValueOfString(dataSet.Tables[0].Rows[i]["Name"]);
                     if (Util.GetValueOfString(dataSet.Tables[0].Rows[i]["IsUseUserOrgAccess"]) == "Y")
                     {
-                        int userOrgCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(AD_Org_ID) FROM AD_User_OrgAccess WHERE AD_User_ID =" + GetRecord_ID()));
+                        int userOrgCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(AD_Org_ID) FROM AD_User_OrgAccess WHERE ISACTIVE ='Y' AND AD_User_ID =" + GetRecord_ID()));
                         if (userOrgCount == 0)
                         {
                             message += roleName + ", ";
@@ -74,7 +75,7 @@ namespace VAModelAD.ProcessAD
                     }
                     else
                     {
-                        int roleOrgCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(AD_Org_ID) FROM AD_Role_OrgAccess WHERE AD_ROLE_ID=" + dataSet.Tables[0].Rows[i]["AD_ROLE_ID"]));
+                        int roleOrgCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(AD_Org_ID) FROM AD_Role_OrgAccess WHERE ISACTIVE ='Y' AND AD_ROLE_ID=" + dataSet.Tables[0].Rows[i]["AD_ROLE_ID"]));
                         if (roleOrgCount == 0)
                         {
                             message += roleName + ", ";
@@ -100,12 +101,20 @@ namespace VAModelAD.ProcessAD
                             url = _ctx.GetApplicationUrl();
                             url = url.Substring(0, url.LastIndexOf("/"));
                             url = url + "/Areas/VIS/WebPages/CreatePassword.aspx";
-                            mailTemplate_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT R_MAILTEXT_ID FROM AD_MailTemplateSetting WHERE MailTemplateKey='OUC' AND AD_CLIENT_ID="+_ctx.GetAD_Client_ID()));
+                            mailTemplate_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT R_MAILTEXT_ID FROM AD_MailTemplateSetting WHERE ISACTIVE ='Y' AND MailTemplateKey='OUC' AND AD_CLIENT_ID=" + _ctx.GetAD_Client_ID()));
+                            if (mailTemplate_ID == 0)
+                            {
+                                mailTemplate_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT R_MAILTEXT_ID FROM AD_MailTemplateSetting WHERE ISACTIVE ='Y' AND MailTemplateKey='OUC' AND AD_CLIENT_ID=0"));
+                                if (mailTemplate_ID == 0)
+                                {
+                                    return Msg.GetMsg(GetCtx(), "VIS_TemplateNotFound");
+                                }
+                            }
                             GetPO();
                             MMailText mtext = new MMailText(_ctx, mailTemplate_ID, Get_TrxName());
                             mtext.SetPO(_po, true);
                             EMail objMail = new EMail(GetCtx(), "", "", "", "", "", "", true, false);
-                            string queryString = "?ID=" + SecureEngine.Encrypt(GetRecord_ID().ToString()) + "&lang=" + _ctx.GetAD_Language();
+                            string queryString = "?ID=" + SecureEngine.Encrypt(GetRecord_ID().ToString()) + "&lang=" + _ctx.GetAD_Language() + "&path=" + _ctx.GetApplicationUrl();
                             objMail.SetMessageHTML(mtext.GetMailText()
                                                   .Replace("@ClickHereLink@", "<a href='" + url + queryString + "'>Click Here</a>"));
                             objMail.SetSubject(mtext.GetMailHeader());
@@ -126,7 +135,7 @@ namespace VAModelAD.ProcessAD
                                 }
                                 else
                                 {
-                                    res.Append(" " + Msg.GetMsg(GetCtx(), "MailNotSentTo") + Email);
+                                    res.Append(" " + Msg.GetMsg(GetCtx(), "VIS_MailNotSentTo") + Email);
                                     log.Fine(res.ToString());
                                 }
                             }
@@ -139,12 +148,12 @@ namespace VAModelAD.ProcessAD
                                     res.Append("MailSent");
                                     if (totalRole - count > 0)
                                     {
-                                        return Msg.GetMsg(GetCtx(), "MailSendSuccessfully") +" " + Msg.GetMsg(GetCtx(), "But")+ " " + Util.GetValueOfString(totalRole - count) +" "+ Msg.GetMsg(GetCtx(), "Role/RolesOutOf") +" "+ Util.GetValueOfString(totalRole) + ", " +
-                                           Msg.GetMsg(GetCtx(), "DoNotOrgAccess");
+                                        return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") +" " + Msg.GetMsg(GetCtx(), "VIS_But")+ " " + Util.GetValueOfString(totalRole - count) +" "+ Msg.GetMsg(GetCtx(), "VIS_Role/RolesOutOf") +" "+ Util.GetValueOfString(totalRole) + ", " +
+                                           Msg.GetMsg(GetCtx(), "VIS_DoNotOrgAccess");
                                     }
                                     else
                                     {
-                                        return Msg.GetMsg(GetCtx(), "MailSendSuccessfully");
+                                        return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully");
                                     }                                
                                 }
                             }
@@ -162,10 +171,10 @@ namespace VAModelAD.ProcessAD
                     {
                         message = message.Substring(0, message.Length - 2);
                     }
-                    return Msg.GetMsg(GetCtx(), "OrgAccessMandatory") +" "+ message +" "+ Msg.GetMsg(GetCtx(), "DoNotOrgAccess");
+                    return Msg.GetMsg(GetCtx(), "VIS_OrgAccessMandatory") +" "+ message +" "+ Msg.GetMsg(GetCtx(), "VIS_DoNotOrgAccess");
                 }
             }
-            return Msg.GetMsg(GetCtx(), "RoleRequired");
+            return Msg.GetMsg(GetCtx(), "VIS_RoleRequired");
         }
 
         /// <summary>
@@ -178,7 +187,6 @@ namespace VAModelAD.ProcessAD
                 return _po;
             if (GetRecord_ID() == 0)
                 return null;
-
             MTable table = MTable.Get(GetCtx(), GetTable_ID());
             _po = table.GetPO(GetCtx(), GetRecord_ID(), Get_TrxName());
             return _po;

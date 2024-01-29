@@ -1601,6 +1601,7 @@
 
         if (recid == -1) {
             this.cancelSel = true;
+            this.refreshTabPanelData(-1);
             return;
         }
         if (recid > -1) {

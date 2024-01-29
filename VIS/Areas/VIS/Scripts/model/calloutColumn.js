@@ -94,6 +94,21 @@
         return "";
     };
 
+    // Activate User button enable when IsExpireLink is False
+    
+    calloutColumn.prototype.buttonDisable = function (ctx, windowNo, mTab, mField, value, oldValue) {debugger
+
+        if (this.isCalloutActive() || value == null) {
+            return;
+        }
+
+        this.setCalloutActive(true);
+        mTab.setValue("IsExpireLink",'N')
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
     VIS.calloutColumn = calloutColumn;
 
     //*********** Callout check DocAction in table  Start ****

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CreatePassword.aspx.cs" Inherits="VIS.WebPages.CreatePassword" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CreatePassword.aspx.cs" Inherits="VIS.Areas.VIS.WebPages.CreatePassword" %>
 
 <!DOCTYPE html>
 
@@ -69,7 +69,10 @@
                         </div>
                         <!-- end of form-content -->
                     </div>
-                    <h1 runat="server" id="passwordMsg"> <%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"PasswordReset") %></h1>
+                    <div runat="server" id="passwordMsg">
+                               <h4> <%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"PasswordReset") %></h4><br/>
+                                 <a  href="<%=((HttpRequest)Request)["path"] %>" id="homeLink">Click Here To Login</a>      
+                    </div>
                     <div class="VIS-mail-img-wrap">
                         <div class="VIS-mail-img w">
                             <img src="../Content/Images/set-pass.svg" />

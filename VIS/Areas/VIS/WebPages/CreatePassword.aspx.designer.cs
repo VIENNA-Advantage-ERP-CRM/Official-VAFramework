@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace VIS.WebPages
+namespace VIS.Areas.VIS.WebPages
 {
 
 
