@@ -371,6 +371,7 @@
                 if (firstEval == null) {
                     firstEval = "";
                 } else {
+                    firstEval = (firstEval === true) ? 'Y' : (firstEval === false) ? 'N' : firstEval;
                     firstEval = firstEval.toString();
                 }
             }
@@ -388,6 +389,7 @@
                 if (secondEval == null) {
                     secondEval = "";
                 } else {
+                    secondEval = (secondEval === true) ? 'Y' : (secondEval === false) ? 'N' : secondEval;
                     secondEval = secondEval.toString();
                 }
             }
