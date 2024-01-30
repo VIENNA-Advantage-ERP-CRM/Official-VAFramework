@@ -1702,6 +1702,11 @@
 
             var retVal = $this.gTab.dataSave(manualCmd);
             if (retVal) {
+                if (manualCmd && $this.vHeaderPanel) {
+                    $this.vHeaderPanel.navigate();
+                    //refresh Grid Row
+                    // this.vTable.refreshRow();
+                }
                 //refresh Grid Row
                 // this.vTable.refreshRow();
             }

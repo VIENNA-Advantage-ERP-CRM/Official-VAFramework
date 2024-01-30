@@ -1029,8 +1029,10 @@ namespace VIS.Models
                 {
                     dsContent = DB.ExecuteDataset("SELECT contentfieldlable,contentfieldvalue,seqNo,(SELECT name FROM AD_GridLayout WHERE AD_GridLayout.AD_GridLayout_ID=AD_GridLayoutItems.AD_GridLayout_ID) AS secName FROM AD_GridLayoutItems WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID() + ")");
                     string sql = "DELETE FROM AD_GridLayoutItems WHERE Export_ID IS NULL AND AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID() + ")";
-                    DB.ExecuteQuery(sql, null, trx);
-                    DB.ExecuteQuery("DELETE FROM AD_GridLayout WHERE Export_ID IS NULL AND AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID(), null, trx);
+
+                    int result=  DB.ExecuteQuery(sql, null, trx);
+                    result= DB.ExecuteQuery("DELETE FROM AD_GridLayout WHERE Export_ID IS NULL AND AD_HeaderLayout_ID=" + mhl.GetAD_HeaderLayout_ID(), null, trx);
+
                 }
                 else
                 {
@@ -1050,7 +1052,8 @@ namespace VIS.Models
 
                     for (int i = 0; i < cardSection.Count; i++)
                     {
-                        int GridLayoutid =Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID="+ mhl.GetAD_HeaderLayout_ID()+ " AND Name='"+ cardSection[i].sectionName.Trim() + "'"));
+                        int GridLayoutid =Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID="+ mhl.GetAD_HeaderLayout_ID()+ " AND Name='"+ cardSection[i].sectionName.Trim() + "'",null,trx));
+
                         MGridLayout mgl = new MGridLayout(ctx, GridLayoutid, trx);
                         mgl.SetAD_HeaderLayout_ID(mhl.GetAD_HeaderLayout_ID());
                         mgl.SetName(cardSection[i].sectionName.Trim());
@@ -1071,7 +1074,7 @@ namespace VIS.Models
                                         columnSQL = SecureEngineBridge.DecryptByClientKey(cardTempField[j].columnSQL, ctx.GetSecureKey());
                                     }
 
-                                    int GridLayoutItemsid = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems WHERE AD_GridLayout_ID=" + mgl.GetAD_GridLayout_ID() + " AND SeqNo='" + cardTempField[j].seq + "'"));
+                                    int GridLayoutItemsid = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems WHERE AD_GridLayout_ID=" + mgl.GetAD_GridLayout_ID() + " AND SeqNo='" + cardTempField[j].seq + "'",null,trx));
 
 
                                     MGridLayoutItems mli = new MGridLayoutItems(ctx, GridLayoutItemsid, trx);

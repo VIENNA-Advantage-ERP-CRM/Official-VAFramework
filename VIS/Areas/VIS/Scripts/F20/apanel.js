@@ -86,6 +86,7 @@
      *  StatusBar
      *
      */
+    
     function APanel() {
         //This variable public to Instance
         var clsSuffix;
@@ -140,7 +141,9 @@
         this.defaultSearch = true;
         this.isAutoCompleteOpen = false;
         this.instructionPop = {};
-        this.instructionPop[this.ACTION_NAME_NEW] = false;
+        this.instructionPop[this.ACTION_NAME_NEW] = false;        
+        function initComponenet() {
+
 
         function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
@@ -216,12 +219,16 @@
             $btnFilter.attr('title', VIS.Msg.getMsg('FilterRecord'));
             $spanSetting.attr('title', VIS.Msg.getMsg('Settings'));
         };
-
-        var eventHandling = function () {
+        var self = this;
+        var eventHandling = function () {            
             $root.on('click', function (e) {
                 $root.find('.vis-window-instruc-overlay-new').remove();
                 $root.find('.vis-window-instruc-overlay-new-li').removeClass('.vis-window-instruc-overlay-new-li');
+                if ($(e.target).is(':focus')) {
+                    self.compositViewChangeSave(e);
+                }
             });
+          
         };
 
         this.createSearchAutoComplete = function (text) {
@@ -315,7 +322,7 @@
             }
         };
 
-        var self = this;
+       
 
         function finishLayout() {
             $divHeaderNav.show();
@@ -1353,6 +1360,7 @@
     APanel.prototype.ACTION_NAME_ARCHIVE = "Archive";
     APanel.prototype.ACTION_NAME_SHAREDREC = "RSD";
 
+    var currentFocusClass = null;
     APanel.prototype.keyDown = function (evt) {
         if (!evt.ctrlKey && evt.altKey && this.curGC) {
             var en = this.aNew.getIsEnabled();
@@ -1505,6 +1513,10 @@
             if (this.vTabbedPane && this.vTabbedPane.keyDown)
                 this.vTabbedPane.keyDown(evt);
         }
+
+        if (evt.keyCode === 9) {
+            this.compositViewChangeSave(evt);
+        }
     }
 
     APanel.prototype.ShortcutNavigation = function (action) {
@@ -1555,6 +1567,92 @@
         var action = new VIS.AppsAction({ action: action, parent: parent, enableDisable: disableIcon, toggle: toggle, imageOnly: imageOnly, isSmall: isSmall, onAction: onAction, toolTipText: toolTipText }); //Create Apps Action
         return action;
     };
+
+    //Handle Composite view Change focus Save
+    APanel.prototype.compositViewChangeSave= function (e) {
+        var $ths = this;
+        if ($(e.target).closest('.vis-ad-w-p-center-inctab').length > 0 || $(e.target).closest('.vis-ad-w-p-vc').length > 0) {
+            var activeElement = $(document.activeElement);
+            setTimeout(function () {
+                var newFocusClass = $(document.activeElement).closest('.vis-ad-w-p-center-inctab').length > 0 ? 'vis-ad-w-p-center-inctab' : 'vis-ad-w-p-vc';
+                if (!currentFocusClass) {
+                    currentFocusClass = newFocusClass;
+                }
+
+                if (currentFocusClass !== newFocusClass && currentFocusClass !== '') {
+
+                    if (currentFocusClass == 'vis-ad-w-p-vc') {
+                        var lf = $ths.vTabbedPane.contentPane.curTab.getLastFocus();
+                        $ths.vTabbedPane.contentPane.curTab.setLastFocus(null);
+                        if (lf) {
+                            $ths.curTab.setLastFocus(lf);
+                        }
+                        //$ths.curTab.setLastFocus(activeElement);
+                    }
+                    //lastFocus.focus();
+                    if (currentFocusClass == 'vis-ad-w-p-center-inctab') {
+                        var lf = $ths.curTab.getLastFocus();
+                        $ths.curTab.setLastFocus(null);
+                        $ths = $ths.vTabbedPane.contentPane;
+                        if (lf) {
+                            $ths.curTab.setLastFocus(lf);
+                        }
+                        //$ths.curTab.setLastFocus(activeElement);
+                        //$ths.lastFocus = activeElement;
+                    }
+
+                    if ($ths.curGC != null) {
+                        if ($ths.curTab.needSave(true, false)) {   //  do we have real change
+                            if ($ths.curTab.needSave(true, true)) {
+                                if (VIS.Env.getCtx().isAutoCommit($ths.curWindowNo)) {
+                                    if (currentFocusClass == 'vis-ad-w-p-vc') {
+                                        var isCheckListRequire = $ths.curGC.IsCheckListRequire();
+                                        if (!isCheckListRequire) {
+                                            //$ths.lastFocus.focus();
+                                            $ths.curTab.getLastFocus().focus();
+                                            return false;
+                                        }
+                                    }
+                                    if (!$ths.curTab.dataSave(true)) {	//  there is a problem, so we go back
+                                        //$ths.lastFocus.focus();
+                                        $ths.curTab.getLastFocus().focus();
+                                        return false;
+                                    } else {
+                                        $ths.curTab.setLastFocus(activeElement);
+                                    }
+                                }
+                                else {
+                                    canExecute = false;
+                                    VIS.ADialog.confirm("SaveChanges?", true, $ths.curTab.getCommitWarning(), 'Confirm', function (results) {
+                                        if (results) {
+                                            if (!$ths.curTab.dataSave(true)) {
+                                                //$ths.lastFocus.focus();
+                                                $ths.curTab.getLastFocus().focus();
+                                                return false;
+                                            } else {
+                                                $ths.curTab.setLastFocus(activeElement);
+                                            }
+                                        }
+
+                                    });
+                                }
+                            } else {
+                                $ths.curTab.setLastFocus(activeElement);
+                            }
+                        }
+                        else {
+                            $ths.curTab.setLastFocus(activeElement);
+                        }
+                    } else {
+                        $ths.curTab.setLastFocus(activeElement);
+                    }
+                } else {
+                    $ths.curTab.setLastFocus(activeElement);
+                }
+                currentFocusClass = newFocusClass;                
+            }, 100)
+        }
+    }
 
     /** ************************************************************************
      *	Dynamic Panel Initialization -  single window .
@@ -3289,7 +3387,7 @@
         if (findPressed)
             dbInfo = "[ " + dbInfo + " ]";
         this.statusBar.setStatusDB(dbInfo, e);
-
+        var $ths = this;
         //	Set Message / Info
         if (e.getAD_Message() != null || e.getInfo() != null) {
             var sb = new StringBuilder();
@@ -3310,20 +3408,31 @@
             }
         }
 
-        //  Confirm Error
+        //  Confirm Error with CallBack
         if (e.getIsError() && !e.getIsConfirmed()) {
-            VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
+
+            VIS.ADialogCallback.error(e.getAD_Message(), e.getInfo(), null, function () {
+                var lf = $ths.curTab.getLastFocus();
+                if (lf) {
+                    lf.focus();
+                    $ths.curTab.setLastFocus(null);
+                }
+            });
+            
             e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
             this.errorDisplayed = true;
         }
-        //  Confirm Warning
+        //  Confirm Warning with Call back
         else if (e.getIsWarning() && !e.getIsConfirmed()) {
-            VIS.ADialog.warn(e.getAD_Message(), true, e.getInfo());
+            VIS.ADialogCallback.warn(e.getAD_Message(), e.getInfo(), null, function () {
+                var lf = $ths.curTab.getLastFocus();
+                if (lf) {
+                    lf.focus();
+                    $ths.curTab.setLastFocus(null);
+                }
+            });
             e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
         }
-
-
-
 
         //	update Navigation
         var firstRow = e.getIsFirstRow();

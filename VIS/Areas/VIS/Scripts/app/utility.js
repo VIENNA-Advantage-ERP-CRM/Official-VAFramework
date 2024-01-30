@@ -633,7 +633,12 @@
                     //_log.config("No Context Win=" + WindowNo + " for: " + token);
                     if (!ignoreUnparsable)
                         return "";
-                    resultData.push({ 'Key': token, 'Value': null });
+                    if (token.endsWith('_ID')) {
+                        resultData.push({ 'Key': token, 'Value': -1 });
+                    } else {
+                        resultData.push({ 'Key': token, 'Value': null });
+                    }
+                   
                     outStr += ' NULL ';
                     //						//	token not found
                 }
