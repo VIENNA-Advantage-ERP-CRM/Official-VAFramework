@@ -225,7 +225,7 @@
                 $root.find('.vis-window-instruc-overlay-new').remove();
                 $root.find('.vis-window-instruc-overlay-new-li').removeClass('.vis-window-instruc-overlay-new-li');
                 if ($(e.target).is(':focus')) {
-                    self.CompositViewChangeSave(e);
+                    self.compositViewChangeSave(e);
                 }
             });
           
@@ -1515,7 +1515,7 @@
         }
 
         if (evt.keyCode === 9) {
-            this.CompositViewChangeSave(evt);
+            this.compositViewChangeSave(evt);
         }
     }
 
@@ -1569,7 +1569,7 @@
     };
 
     //Handle Composite view Change focus Save
-    APanel.prototype.CompositViewChangeSave= function (e) {
+    APanel.prototype.compositViewChangeSave= function (e) {
         var $ths = this;
         if ($(e.target).closest('.vis-ad-w-p-center-inctab').length > 0 || $(e.target).closest('.vis-ad-w-p-vc').length > 0) {
             var activeElement = $(document.activeElement);
@@ -1582,22 +1582,22 @@
                 if (currentFocusClass !== newFocusClass && currentFocusClass !== '') {
 
                     if (currentFocusClass == 'vis-ad-w-p-vc') {
-                        var lf = $ths.vTabbedPane.contentPane.curTab.getLastFoucs();
-                        $ths.vTabbedPane.contentPane.curTab.setLastFoucs(null);
+                        var lf = $ths.vTabbedPane.contentPane.curTab.getLastFocus();
+                        $ths.vTabbedPane.contentPane.curTab.setLastFocus(null);
                         if (lf) {
-                            $ths.curTab.setLastFoucs(lf);
+                            $ths.curTab.setLastFocus(lf);
                         }
-                        //$ths.curTab.setLastFoucs(activeElement);
+                        //$ths.curTab.setLastFocus(activeElement);
                     }
                     //lastFocus.focus();
                     if (currentFocusClass == 'vis-ad-w-p-center-inctab') {
-                        var lf = $ths.curTab.getLastFoucs();
-                        $ths.curTab.setLastFoucs(null);
+                        var lf = $ths.curTab.getLastFocus();
+                        $ths.curTab.setLastFocus(null);
                         $ths = $ths.vTabbedPane.contentPane;
                         if (lf) {
-                            $ths.curTab.setLastFoucs(lf);
+                            $ths.curTab.setLastFocus(lf);
                         }
-                        //$ths.curTab.setLastFoucs(activeElement);
+                        //$ths.curTab.setLastFocus(activeElement);
                         //$ths.lastFocus = activeElement;
                     }
 
@@ -1609,16 +1609,16 @@
                                         var isCheckListRequire = $ths.curGC.IsCheckListRequire();
                                         if (!isCheckListRequire) {
                                             //$ths.lastFocus.focus();
-                                            $ths.curTab.getLastFoucs().focus();
+                                            $ths.curTab.getLastFocus().focus();
                                             return false;
                                         }
                                     }
                                     if (!$ths.curTab.dataSave(true)) {	//  there is a problem, so we go back
                                         //$ths.lastFocus.focus();
-                                        $ths.curTab.getLastFoucs().focus();
+                                        $ths.curTab.getLastFocus().focus();
                                         return false;
                                     } else {
-                                        $ths.curTab.setLastFoucs(activeElement);
+                                        $ths.curTab.setLastFocus(activeElement);
                                     }
                                 }
                                 else {
@@ -1627,27 +1627,27 @@
                                         if (results) {
                                             if (!$ths.curTab.dataSave(true)) {
                                                 //$ths.lastFocus.focus();
-                                                $ths.curTab.getLastFoucs().focus();
+                                                $ths.curTab.getLastFocus().focus();
                                                 return false;
                                             } else {
-                                                $ths.curTab.setLastFoucs(activeElement);
+                                                $ths.curTab.setLastFocus(activeElement);
                                             }
                                         }
 
                                     });
                                 }
                             } else {
-                                $ths.curTab.setLastFoucs(activeElement);
+                                $ths.curTab.setLastFocus(activeElement);
                             }
                         }
                         else {
-                            $ths.curTab.setLastFoucs(activeElement);
+                            $ths.curTab.setLastFocus(activeElement);
                         }
                     } else {
-                        $ths.curTab.setLastFoucs(activeElement);
+                        $ths.curTab.setLastFocus(activeElement);
                     }
                 } else {
-                    $ths.curTab.setLastFoucs(activeElement);
+                    $ths.curTab.setLastFocus(activeElement);
                 }
                 currentFocusClass = newFocusClass;                
             }, 100)
@@ -3412,10 +3412,10 @@
         if (e.getIsError() && !e.getIsConfirmed()) {
 
             VIS.ADialogCallback.error(e.getAD_Message(), e.getInfo(), null, function () {
-                var lf = $ths.curTab.getLastFoucs();
+                var lf = $ths.curTab.getLastFocus();
                 if (lf) {
                     lf.focus();
-                    $ths.curTab.setLastFoucs(null);
+                    $ths.curTab.setLastFocus(null);
                 }
             });
             
@@ -3425,10 +3425,10 @@
         //  Confirm Warning with Call back
         else if (e.getIsWarning() && !e.getIsConfirmed()) {
             VIS.ADialogCallback.warn(e.getAD_Message(), e.getInfo(), null, function () {
-                var lf = $ths.curTab.getLastFoucs();
+                var lf = $ths.curTab.getLastFocus();
                 if (lf) {
                     lf.focus();
-                    $ths.curTab.setLastFoucs(null);
+                    $ths.curTab.setLastFocus(null);
                 }
             });
             e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued

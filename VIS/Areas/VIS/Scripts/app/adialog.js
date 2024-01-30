@@ -459,7 +459,7 @@
     VIS.ADialog = {
 
         /**
-         *  Show PAIN message with info 
+         *  Show Plain message with info 
          *  @method info
          *  @param keyName Keyword Name
          *  @param isTextMsg if true returns Message Text, if false returns Message Tip
@@ -646,7 +646,7 @@
     VIS.ADialogCallback = {
 
         /**
-         *  Show PAIN message with info 
+         *  Show Plain message with info 
          *  @method info
          *  @param keyName Keyword Name
          *  @param isTextMsg if true returns Message Text, if false returns Message Tip

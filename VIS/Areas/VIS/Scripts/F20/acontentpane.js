@@ -545,10 +545,10 @@
                // VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
 
                 VIS.ADialogCallback.error(e.getAD_Message(), e.getInfo(), null, function () {
-                    var lf = $ths.curTab.getLastFoucs();
+                    var lf = $ths.curTab.getLastFocus();
                     if (lf) {
                         lf.focus();
-                        $ths.curTab.setLastFoucs(null);
+                        $ths.curTab.setLastFocus(null);
                     }
                 });
 

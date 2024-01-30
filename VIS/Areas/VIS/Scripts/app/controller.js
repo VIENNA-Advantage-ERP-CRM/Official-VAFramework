@@ -1257,14 +1257,14 @@
         this.fireDataStatusChanged(this.mDataStatusEvent);
     };
 
-    // Get Foucs element;
-    GridTab.prototype.getLastFoucs = function () {
-        return this.gridTable.getLastFoucs();
+    // Get Focus element;
+    GridTab.prototype.getLastFocus = function () {
+        return this.gridTable.getLastFocus();
     }
 
-    //Set Foucs element
-    GridTab.prototype.setLastFoucs = function (ctl) {
-        this.gridTable.setLastFoucs(ctl);
+    //Set Focus element
+    GridTab.prototype.setLastFocus = function (ctl) {
+        this.gridTable.setLastFocus(ctl);
     }
 
     //Set Query Object
@@ -3238,7 +3238,7 @@
         this.log = VIS.Logging.VLogger.getVLogger("VIS.GridTable");
         //this.outerOrderClause = "";
         this.card_ID = 0;
-        this.lastFoucs = null;
+        this.lastFocus = null;
 
     };
 
@@ -3538,7 +3538,7 @@
 
         //	Check all columns
         var size = this.gridFields.length;
-        var isFoucsed = false;
+        var isFocused = false;
         for (var i = 0; i < size; i++) {
             var field = this.gridFields[i];
             if (field.getIsMandatory(true))        //  check context
@@ -3552,9 +3552,9 @@
                     sb.append(field.getHeader());
 
                     // Handle Focus Mandatory column
-                    if (!isFoucsed) {                       
-                        this.lastFoucs = field.propertyChangeListner.getControl();
-                        isFoucsed = true;
+                    if (!isFocused) {
+                        this.lastFocus = field.propertyChangeListner.getControl();
+                        isFocused = true;
                     }
 
                 }
@@ -3566,15 +3566,15 @@
         return sb.toString();
     };	//	getManda
 
-    // Get Last Foucs
-    GridTable.prototype.getLastFoucs = function () {
-        var lf = this.lastFoucs;
+    // Get Last Focus
+    GridTable.prototype.getLastFocus = function () {
+        var lf = this.lastFocus;
         return lf;
     }
 
-    // Set Last Foucs
-    GridTable.prototype.setLastFoucs = function (ctrl) {
-        this.lastFoucs = ctrl;
+    // Set Last Focus
+    GridTable.prototype.setLastFocus = function (ctrl) {
+        this.lastFocus = ctrl;
     }
 
     GridTable.prototype.getErrorColumns = function () {
