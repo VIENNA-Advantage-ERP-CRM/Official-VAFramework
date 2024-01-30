@@ -1713,7 +1713,7 @@
             }
 
             // $btnPop = $('<button tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-            $btnPop = $('<button tabindex="-1" class="input-group-text"><i tabindex="-1" class="fa fa-ellipsis-v" /></button>');
+            $btnPop = $('<button  class="input-group-text"><i tabindex="-1" class="fa fa-ellipsis-v" /></button>');
             options[VIS.Actions.refresh] = true;
 
             if (VIS.MRole.getIsShowPreference())
@@ -2394,7 +2394,7 @@
         var $ctrl = $('<input>', { type: 'text', name: columnName });
         $ctrl.attr('autocomplete', 'off');
 
-        var $btnSearch = $('<button  tabindex="-1" class="input-group-text"><i  tabindex="-1" class="' + src + '"></i></button>');
+        var $btnSearch = $('<button   class="input-group-text"><i  tabindex="-1" class="' + src + '"></i></button>');
         btnCount += 1;
 
         //Set Buttons and [pop up]
@@ -2421,7 +2421,7 @@
             options[VIS.Actions.addnewrec] = true;
 
             //$btnPop = $('<button  tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-            $btnPop = $('<button  tabindex="-1" class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
+            $btnPop = $('<button   class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
             //	VBPartner quick entry link
             var isBP = false;
             if (columnName === "C_BPartner_ID") {
@@ -2455,7 +2455,7 @@
         }
 
         if (this.isMultiKeyTextBox) {
-            $btnPop = $('<button  tabindex="-1" class="input-group-text"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>');
+            $btnPop = $('<button   class="input-group-text"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>');
             btnCount += 1;
         }
 
@@ -3406,6 +3406,11 @@
                             }
                             else {
                                 self.setValue(newVal, false, true);
+                                if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
+                                    setTimeout(function () {
+                                        self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, newVal);
+                                    }, 500);
+                                }
                             }
                         }
                     }
@@ -4812,6 +4817,11 @@
                 if (instanceIDs != null)
                     self.setInstanceIDs = instanceIDs;
                 self.getControl().val(name);
+                if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
+                    setTimeout(function () {
+                        self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, mGenAttributeSetInstanceId);
+                    }, 500);
+                }
             };
         }
 
@@ -4881,6 +4891,11 @@
                 obj.onClose = function (mAttributeSetInstanceId, name, mLocatorId) {
                     this.M_Locator_ID = mLocatorId;
                     setValueInControl(mAttributeSetInstanceId, name);
+                    if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
+                        setTimeout(function () {
+                            self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, mAttributeSetInstanceId);
+                        }, 500);
+                    }
                 };
             }
         }
@@ -5146,7 +5161,7 @@
         var $ctrl = null;
         var dimension = "Thumb500x375";
 
-        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl', tabIndex: '-1' });
+        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl' });
         $txt.css("color", "blue");
 
 
@@ -6152,7 +6167,7 @@
         $ctrl.attr('autocomplete', 'off');
         var $btnpContainer = $('<button class="input-group-text"><i class="vis vis-pcontainer" /></button>');
         //var $btnPop = $('<button  tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-        var $btnPop = $('<button  tabindex="-1" class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
+        var $btnPop = $('<button   class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
         var btnCount = 1;
         btnCount += 1;
         var self = this;

@@ -137,29 +137,28 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
 		log.Finer(sql2.ToString());
 		//
 		Boolean ok = true;
-        IDataReader idr = null;
-		//PreparedStatement pstmt = null;
+        DataSet ds = null;
+		
         try
         {
-            //pstmt = DataBase.prepareStatement(sql.toString(), Get_Trx());
-            //ResultSet rs = pstmt.executeQuery();
-            idr = DataBase.DB.ExecuteReader(sql2.ToString(), null, Get_Trx());
+            ds = DataBase.DB.ExecuteDataset(sql2.ToString(), null, Get_Trx());
 
-            //Manish 8/06/2016
+            // 8/06/2016
 
             int setSeqManually = -1;
 
-            //End
+                //End
 
-            while (idr.Read())
-            {
-                int Node_ID = Utility.Util.GetValueOfInt(idr[0]);// rs.getInt(1);
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+
+                int Node_ID = Utility.Util.GetValueOfInt(dr[0]);// rs.getInt(1);
                 PO node = null;
                 if (nodeTableName.Equals("AD_TreeNode"))
                 {
                   // node = new MTreeNode(tree, Node_ID);
 
-                   //Manish
+                 
                    setSeqManually += 1;
                    node = new MTreeNode(tree, Node_ID, setSeqManually);
                     //end
@@ -169,7 +168,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                 {
                    //node = new MTreeNodeBP(tree, Node_ID);
 
-                   //Manish
+                  
                    setSeqManually += 1;
                    node = new MTreeNodeBP(tree, Node_ID, setSeqManually);
                     //end
@@ -179,7 +178,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                 {
                   //node = new MTreeNodePR(tree, Node_ID);
 
-                  //Manish
+                 
                   setSeqManually += 1;
                   node = new MTreeNodePR(tree, Node_ID, setSeqManually);
                     //end
@@ -201,7 +200,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                 {
                   //node = new MTreeNodeCMM(tree, Node_ID);
 
-                  //Manish
+                 
                   setSeqManually += 1;
                   node = new MTreeNodeCMM(tree, Node_ID, setSeqManually);
                     //end
@@ -212,7 +211,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                 {
                   // node = new MTreeNodeCMS(tree, Node_ID);
 
-                   //Manish
+                 
                    setSeqManually += 1;
                    node = new MTreeNodeCMS(tree, Node_ID, setSeqManually);
                     //end
@@ -222,7 +221,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                 {
                    //node = new MTreeNodeCMT(tree, Node_ID);
 
-                   //Manish
+                  
                    setSeqManually += 1;
                    node = new MTreeNodeCMT(tree, Node_ID, setSeqManually);
                     //end
@@ -232,7 +231,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                 {
                    // node = new MTreeNodeMM(tree, Node_ID);
                     
-                    //Manish
+                   
                     setSeqManually += 1;
                     node = new MTreeNodeMM(tree, Node_ID, setSeqManually);
                     //end
@@ -261,10 +260,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
             log.Log(Level.SEVERE, sql2.ToString(), e);
             ok = false;
         }
-        finally
-        {
-            idr.Close();
-        }
+       
 		AddLog(0,null, new Decimal(inserts), tree.GetName()+ " Inserted");
 		return tree.GetName() + (ok ? " OK" : " Error");
 	}	//	verifyTree
