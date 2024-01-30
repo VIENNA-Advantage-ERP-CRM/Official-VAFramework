@@ -198,7 +198,8 @@ namespace VIS
                 "~/Areas/VIS/Content/GlJournalDimension.css",
                 "~/Areas/VIS/Content/BudgetControl.css",
                 "~/Areas/VIS/Content/HistoryTabPanel.css",
-                "~/Areas/VIS/Content/SurveyTabPanel.css"
+                "~/Areas/VIS/Content/SurveyTabPanel.css",
+                "~/Areas/VIS/Content/emailLinkStyle.css"
                );
 
 

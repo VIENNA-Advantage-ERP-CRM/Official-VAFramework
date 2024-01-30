@@ -21,11 +21,11 @@
         this.isClosed = true;
 
         
-        if (wWidth <= 50) {
+        if (wWidth <= 25) {
             if (wWidth <= 0)
                 wWidth = 75;
             else
-                wWidth = 50;
+                wWidth = 25;
         }
         else if (wWidth > 75)
             wWidth = 75
