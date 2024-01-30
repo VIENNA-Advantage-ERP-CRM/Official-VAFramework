@@ -141,9 +141,7 @@
         this.defaultSearch = true;
         this.isAutoCompleteOpen = false;
         this.instructionPop = {};
-        this.instructionPop[this.ACTION_NAME_NEW] = false;        
-        function initComponenet() {
-
+        this.instructionPop[this.ACTION_NAME_NEW] = false; 
 
         function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
