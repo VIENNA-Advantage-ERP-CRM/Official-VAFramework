@@ -352,10 +352,12 @@
     <Compile Include="ProcessAD\CreateModuleFields.cs" />
     <Compile Include="ProcessAD\CreateModuleTabAndFields.cs" />
     <Compile Include="ProcessAD\DocAction.cs" />
+    <Compile Include="ProcessAD\EmailSendLink.cs" />
     <Compile Include="ProcessAD\GenerateXmlFiles.cs" />
     <Compile Include="ProcessAD\GenerateXmlForExportData .cs" />
     <Compile Include="ProcessAD\LanguageMaintenance.cs" />
     <Compile Include="ProcessAD\MailConfigration.cs" />
+    <Compile Include="ProcessAD\MakeItLoginable.cs" />
     <Compile Include="ProcessAD\MasterVersionFields.cs" />
     <Compile Include="ProcessAD\MasterVersions.cs" />
     <Compile Include="ProcessAD\MasterVersionSchedules.cs" />
@@ -369,6 +371,7 @@
     <Compile Include="ProcessAD\SystemValidate.cs" />
     <Compile Include="ProcessAD\TabCreateFields.cs" />
     <Compile Include="ProcessAD\TableCreateColumns.cs" />
+    <Compile Include="ProcessAD\TableIndexConstraints.cs" />
     <Compile Include="ProcessAD\TableIndexValidate.cs" />
     <Compile Include="ProcessAD\TransactionXRef.cs" />
     <Compile Include="ProcessAD\TranslationDocSync.cs" />

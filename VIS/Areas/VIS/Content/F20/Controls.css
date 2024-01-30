@@ -43,6 +43,17 @@
     padding: 6px 8px !important;
 }
 
+.vis-input-wrap .iti__flag-container:focus-within {
+    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
+    border-top-left-radius: 0.3rem;
+    border-bottom-left-radius: .3rem;
+    border-right: 1px solid rgba(var(--v-c-primary), 1);
+}
+
+    .vis-input-wrap .iti__flag-container:focus-within + input {
+        border-color: rgba(var(--v-c-primary), 1) !important;
+    }
+
 .vis-ev-col input:not([type=button]):not([type="checkbox"]):not([type="radio"]),
 .vis-ev-col textarea {
     padding: 5px 16px 5px 30px;
@@ -180,10 +191,28 @@ select.vis-ev-col-mandatory {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
-.vis-ev-col .vis-input-wrap .vis-control-wrap input:focus, 
-.vis-ev-col .vis-input-wrap .vis-control-wrap select:focus, 
-.vis-ev-col .vis-input-wrap .vis-control-wrap textarea:focus {
-    border: 1px solid rgba(var(--v-c-primary), 1);
+.vis-input-wrap .input-group-text:focus {
+    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
+    border-left-color: rgba(var(--v-c-primary), 1) !important;
+    position: relative;
+}
+
+.vis-input-wrap .input-group-append:not(:last-child) .input-group-text:focus:after {
+    position: absolute;
+    content: '';
+    height: 100%;
+    width: 1px;
+    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
+    right: 0;
+    background: rgba(var(--v-c-primary), 1);
+}
+
+.vis-ev-col .vis-input-wrap .vis-control-wrap input:focus,
+.vis-ev-col .vis-input-wrap .vis-control-wrap select:focus,
+.vis-ev-col .vis-input-wrap .vis-control-wrap textarea:focus,
+.vis-control-wrap > button:focus,
+button.vis-ev-col-img-ctrl:focus {
+    border: 1px solid rgba(var(--v-c-primary), 1) !important;
 }
 
 .vis-input-wrap *[data-hasBtn] {

@@ -1,0 +1,395 @@
+﻿.VIS-logo-wrap,
+.VIS-sidebarBgImg,
+.VIS-main-container,
+.VIS-sidebar-wrap,
+.VIS-frm-btnwrap,
+.VIS-frm-data label,
+.VIS-frm-row,
+.VIS-confirmation-wrap,
+.VIS-content-wrap {
+    display: flex;
+}
+
+.VIS-sidebar-wrap,
+.VIS-middle-align {
+    justify-content: center;
+}
+
+.VIS-mail-img-wrap img,
+.VIS-frm-data,
+.VIS-confirm-text-wrap,
+.VIS-content-wrap {
+    flex: 1;
+}
+
+.VIS-confirmation-wrap,
+.VIS-middle-align {
+    align-items: center;
+}
+
+.VIS-frm-data input,
+.VIS-frm-data select,
+.VIS-confirmation-wrap {
+    color: var(--va-bg3);
+}
+
+.VIS-sidebarBgImg {
+    width: 100%;
+    background-image: url('../Images/girl.svg');
+    background-size: cover;
+    background-blend-mode: overlay;
+    background-repeat: no-repeat;
+    position: absolute;
+    height: 100%;
+    z-index: 0;
+    background-color: rgba(var(--v-c-primary),1);
+    filter: opacity(0.95);
+    left: 0;
+}
+
+.VIS-sidebarInnerWrap {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    color: var(--white);
+    height: 100%;
+}
+
+.VIS-logo-wrap {
+    align-items: flex-start;
+}
+
+.VIS-SideTextWrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.VIS-content-wrap {
+    flex-direction: column;
+    padding: 1rem;
+    height: 100vh;
+    /*overflow: auto;*/
+}
+
+.VIS-confirmation-wrap {
+    font-family: var(--va-montserrat-font);
+    width: 70%;
+    min-width: 500px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+    border-radius: .25rem;
+}
+
+.VIS-setpass-wrap h4 {
+    margin-bottom: .5rem;
+}
+
+.VIS-confirm-text-wrap {
+    padding: 0.5rem;
+}
+
+.VIS-setpass-form .VIS-frm-data input {
+    background-color: var(--va-bg2);
+}
+
+.VIS-frmFiledsWrp .VIS-frm-row {
+    margin-bottom: 0.75rem;
+}
+
+.VIS-frm-row {
+    align-items: flex-start;
+    padding-right: 1rem;
+}
+
+.VIS-frm-row input[type="checkbox"] {
+     margin-top: .4rem;
+     margin-right: .6rem;
+}
+
+.VIS-frm-data sup {
+    /*padding-left: 3px;*/
+    top: -.18rem;
+    display: inline-block;
+    color: red;
+}
+
+.VIS-frm-data input:focus,
+.VIS-frm-data select:focus {
+    border-color: var(--va-blue);
+}
+
+.VIS-frm-data:not(:only-child):first-child {
+    padding-right: .7rem;
+}
+
+.VIS-frm-data:not(:only-child):last-child {
+    padding-left: .7rem;
+}
+
+.VIS-frm-data input,
+.VIS-frm-data select {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgb(112 112 112 / 45%);
+    border-radius: .2rem;
+    height: 40px;
+    outline: none;
+    padding: 5px 10px;
+}
+
+.VIS-frm-data select {
+    webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--font-color-70) 50%), linear-gradient(135deg, var(--font-color-70) 50%, transparent 50%);
+    background-position: calc(100% - 17px), calc(100% - 10px);
+    background-size: 8px 5px, 9px 5px;
+    background-repeat: no-repeat;
+    padding-right: 1.5rem;
+}
+
+.VIS-frm-data label {
+    font-size: .875rem;
+    /* width: 100%; */
+    color: var(--font-color-70);
+    margin-bottom: 0;
+    display: inline-block;
+}
+
+.VIS-frm-data {
+    font-family: var(--va-noto-font);
+}
+
+.VIS-frm-btnwrap {
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.VIS-frm-btnwrap a {
+    color: var(--va-blue);
+}
+
+.VIS-mail-img-wrap img {
+    max-width: 300px;
+    max-height: 100%;
+    margin-left: 11px;
+}
+
+
+.vis-main-container {
+    clear: both;
+    height: 100%;
+    background: url("../Images/logo.jpg") no-repeat;
+    background-position: bottom right;
+}
+
+.VIS-sidebar-wrap {
+    background-color: var(--va-blue);
+    width: 350px;
+    padding: 1rem;
+    flex-direction: column;
+    position: relative;
+}
+
+.VIS-sidebarBgImg {
+    width: 100%;
+    background-image: url('../Images/girl.svg');
+    background-size: cover;
+    background-blend-mode: overlay;
+    background-repeat: no-repeat;
+    position: absolute;
+    height: 100%;
+    z-index: 0;
+    background-color: rgba(var(--v-c-primary),1);
+    filter: opacity(0.95);
+    left: 0;
+}
+
+.VIS-sidebarInnerWrap {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    color: var(--white);
+    height: 100%;
+}
+
+.VIS-logo-wrap {
+    align-items: flex-start;
+}
+
+.VIS-SideTextWrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.VIS-poweredBy {
+    align-items: flex-end;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.VIS-content-wrap {
+    flex-direction: column;
+    padding: 1rem;
+    height: 100vh;
+    /*overflow: auto;*/
+}
+
+.VIS-mail-img-wrap img,
+.VIS-frm-data,
+.VIS-confirm-text-wrap,
+.VIS-content-wrap {
+    flex: 1;
+}
+
+    .VIS-logo-wrap,
+    .VIS-sidebarBgImg,
+    .VIS-main-container,
+    .VIS-sidebar-wrap,
+    .VIS-frm-btnwrap,
+    .VIS-frm-data label,
+    .VIS-frm-row,
+    .VIS-confirmation-wrap,
+    .VIS-content-wrap {
+        display: flex;
+    }
+
+.VIS-sidebar-wrap,
+.VIS-middle-align {
+    justify-content: center;
+}
+
+/*.VIS-frm-btnwrap,*/
+.VIS-confirmation-wrap,
+.VIS-middle-align {
+    align-items: center;
+}
+
+.VIS-frm-data input,
+.VIS-frm-data select,
+.VIS-confirmation-wrap {
+    color: var(--va-bg3);
+}
+
+.VIS-confirmation-wrap {
+    font-family: var(--va-montserrat-font);
+    width: 70%;
+    min-width: 500px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+    border-radius: .25rem;
+}
+
+.VIS-setpass-wrap h4 {
+    margin-bottom: .5rem;
+}
+
+.VIS-confirm-text-wrap {
+    padding: 0.5rem;
+}
+
+.VIS-setpass-form .VIS-frm-data input {
+    background-color: var(--va-bg2);
+}
+
+.VIS-frmFiledsWrp .VIS-frm-row {
+    margin-bottom: 0.75rem;
+}
+
+.VIS-frm-row {
+    align-items: flex-start;
+    padding-right: 1rem;
+}
+
+    .VIS-frm-row input[type="checkbox"] {
+        margin-top: .4rem;
+        margin-right: .6rem;
+    }
+
+.VIS-frm-data sup {
+    /*padding-left: 3px;*/
+    top: -.18rem;
+    display: inline-block;
+    color: red;
+}
+
+.VIS-frm-data input:focus,
+.VIS-frm-data select:focus {
+    border-color: var(--va-blue);
+}
+
+.VIS-frm-data:not(:only-child):first-child {
+    padding-right: .7rem;
+}
+
+.VIS-frm-data:not(:only-child):last-child {
+    padding-left: .7rem;
+}
+
+.VIS-frm-data input,
+.VIS-frm-data select {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgb(112 112 112 / 45%);
+    border-radius: .2rem;
+    height: 40px;
+    outline: none;
+    padding: 5px 10px;
+}
+
+.VIS-frm-data select {
+    webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--font-color-70) 50%), linear-gradient(135deg, var(--font-color-70) 50%, transparent 50%);
+    background-position: calc(100% - 17px), calc(100% - 10px);
+    background-size: 8px 5px, 9px 5px;
+    background-repeat: no-repeat;
+    padding-right: 1.5rem;
+}
+
+.VIS-frm-data label {
+    font-size: .875rem;
+    /* width: 100%; */
+    color: var(--font-color-70);
+    margin-bottom: 0;
+    display: inline-block;
+}
+
+.VIS-frm-data {
+    font-family: var(--va-noto-font);
+}
+
+.VIS-frm-btnwrap {
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+    .VIS-frm-btnwrap a {
+        color: var(--va-blue);
+    }
+
+.VIS-submit-btn {
+    border: 2px solid var(--va-yellow);
+    background: rgba(var(--v-c-primary),1);
+    color: #fff;
+    border-radius: .2rem;
+    padding: .2rem .8rem;
+    cursor: pointer;
+    outline: none;
+    min-width: 150px;
+}
+
+.VIS-mail-img-wrap img {
+    max-width: 300px;
+    max-height: 100%;
+    margin-left: 11px;
+}

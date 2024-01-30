@@ -1273,7 +1273,7 @@
                     var grdAreaRow = $(this)[0].style.gridTemplateRows.split(' ');
                     var Obj = {};
                     for (var i = 0; i < totalRow; i++) {
-                        if (grdAreaRow.length > 0 && grdAreaRow[i] != 'auto') {
+                        if (grdAreaRow.length > 0 && grdAreaRow[i] && grdAreaRow[i] != 'auto') {
                             var v = grdAreaRow[i].replace(/\'/g, '').split(/(\d+)/).filter(Boolean);
                             Obj['row_' + i] = {
                                 val: v[0],
@@ -1288,7 +1288,7 @@
                     };
 
                     for (var j = 0; j < totalCol; j++) {
-                        if (grdAreaCol.length > 0 && grdAreaCol[j] != 'auto') {
+                        if (grdAreaCol.length > 0 && grdAreaCol[j] && grdAreaCol[j] != 'auto') {
                             var c = grdAreaCol[j].replace(/\'/g, '').split(/(\d+)/).filter(Boolean);
                             Obj['col_' + j] = {
                                 val: c[0],
@@ -1512,9 +1512,9 @@
                         continue;
                     }
 
-                    if (!tabField[i].getIsDisplayed()) {
-                        continue;
-                    }
+                    //if (!tabField[i].getIsDisplayed()) {
+                    //    continue;
+                    //}
 
                     if (!isShowAllColumn) {
                         var result = jQuery.grep(columnFieldArray, function (value) {

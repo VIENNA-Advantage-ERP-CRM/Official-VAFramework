@@ -538,10 +538,20 @@
             this.reQuery();
         }
         else {
+            $ths = this;
 
             //  Confirm Error
             if (e.getIsError() && !e.getIsConfirmed()) {
-                VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
+               // VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
+
+                VIS.ADialogCallback.error(e.getAD_Message(), e.getInfo(), null, function () {
+                    var lf = $ths.curTab.getLastFocus();
+                    if (lf) {
+                        lf.focus();
+                        $ths.curTab.setLastFocus(null);
+                    }
+                });
+
                 e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
                 this.errorDisplayed = true;
             }
