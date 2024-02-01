@@ -72,9 +72,10 @@
                          new SelectListItem() {Text = "العربية (Saudi Arabia)",  Value="ar_SA"},
                            new SelectListItem() {Text = "繁體中文 (Chinese Taiwan)",  Value="zh_TW"},
             }*@
-new SelectList(ViewBag.Languages, "Key", "Name"), new { id = "cmbLang" })
+     new SelectList(ViewBag.Languages, "Key", "Name"), new { id = "cmbLang" })
                     </div>
                 </div>
+
                 <!-- end of input-row -->
 
                 <div class="remember" style="float: left">
@@ -88,8 +89,6 @@ new SelectList(ViewBag.Languages, "Key", "Name"), new { id = "cmbLang" })
                     </div>
                 </div>
                 <input name="Login1Model.RememberMe" type="hidden" value="false">
-
-
             </div>
 
             <div id="login-form-2" class="login-form">
@@ -140,6 +139,12 @@ new SelectList(ViewBag.Languages, "Key", "Name"), new { id = "cmbLang" })
                 <img style="display: none;margin:0px auto 10px;position: absolute;bottom: 23%;left: 44%;z-index: 999;" class="img-login" src="~/Areas/VIS/Images/busy.gif" />
                 <input class="btn-login" id="btnLogin1" type="submit" value="Log in" />
             </div>
+            <hr />
+            @foreach (var provider in ViewBag.ServiceProvider)
+            {
+                <a href="@Url.Action("SignIn", "Home", new { provider = provider.Provider.ToLower() })">Login with @provider.ProviderDisplayName</a>
+            }
+
             <!-- end of input-row -->
             @*@Html.HiddenFor(m => m.Login2Model.Login1Data, new { id = "login1Data" })*@
             @Html.ValidationSummary()
