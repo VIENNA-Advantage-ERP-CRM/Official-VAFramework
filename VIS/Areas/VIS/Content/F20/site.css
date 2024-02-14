@@ -82,6 +82,14 @@ select {
             color: rgba(var(--v-c-primary), 1);
         }
 
+.vis-app-hdr-l-menu:focus {
+    border: 1px solid rgba(var(--v-c-primary), 1);
+}
+
+.vis-app-hdr a:focus {
+    color: rgba(var(--v-c-primary), 1);
+}
+
 .vis-app-hdr-l {
     flex: 0;
     flex-basis: auto;
