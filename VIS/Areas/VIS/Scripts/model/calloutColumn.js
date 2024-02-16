@@ -84,8 +84,10 @@
             url: VIS.Application.contextUrl + "VIS/CalloutColumn/CheckOrgAccessByRole",
             data: { AD_Role_ID: value, AD_User_ID: userID },
             success: function (result) {
-                if (Util.getValueOfInt(result) == 0)
-                    VIS.ADialog.info(VIS.Msg.getMsg("VIS_NoOrgAccess"));
+                if (result == 'NoRoleAcc')
+                    VIS.ADialog.warn("VIS_NoRoleAccess");
+                if (result == 'NoUserAcc')
+                    VIS.ADialog.warn("VIS_NoUserAccess");
             },
             error: function (err) {
                 this.log.severe(err);
