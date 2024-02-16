@@ -655,10 +655,15 @@
             tis.cmd_save(true);
         }
         else if (tis.aNew.getAction() === action) {
-            if (!tis.curTab.getIsInsertRecord()) {
-                return;
+            if (this.curGC.aPanel.curTab.needSave()) {
+                VIS.ADialog.warn('VIS_SaveParentFirst');
             }
-            tis.curGC.dataNew(false);
+            else {
+                if (!tis.curTab.getIsInsertRecord()) {
+                    return;
+                }
+                tis.curGC.dataNew(false);
+            }
         }
         else if (tis.aDelete.getAction() === action) {
             tis.cmd_delete();

@@ -805,9 +805,9 @@
             var d = $("<div></div>");
             var fired = true;
             var mouseDown = false;
-            if (this.action == "Save") {
+            if (this.action == "Save" || this.action == "New") {
                // Handle case if user direct click on save button 
-                li.on("mousedown touchstrat", function (e) {
+                li.on("mousedown touchstart", function (e) {
 
                     mouseDown = true;
                     window.setTimeout(function (md) {

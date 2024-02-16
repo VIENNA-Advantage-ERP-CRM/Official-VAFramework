@@ -4,7 +4,7 @@
     var tmpTabPnl = document.querySelector('#vis-ad-tabpnltmp').content;// $("#vis-ad-windowtmp");
 
     function VTabPanel(windowNo,wWidth) {
-
+        this.width = wWidth;
         this.tabPanels = [];
        // this.panelSize = 50;
         //var panelMaxWidth = $(document).width() / 2;
@@ -32,7 +32,8 @@
 
        
             wWidth = 100 - wWidth;
-            wWidth = ($(document).width() * wWidth) / 100;
+        wWidth = ($(document).width() * wWidth) / 100;
+        this.width = wWidth;
         
 
     /********************************* END Tab Panels ***********************************/
@@ -94,24 +95,37 @@
         };
 
         this.setSize = function (size) {
-
+           
             if (!this.isClosed && size && size > 40) {
                 return;
             }
+             if (size == 0) {
+                size = this.width;
+            }
             if (size && size > 40) {
+                var h = $outerwrap.closest('.vis-ad-w-p-center').height() - $divHead.height()-15;
+                if (!h) {
+                    h = size;
+                }
+
                 if (this.curTabPanel.curTab.getIsTPBottomAligned()) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023 
                     $outerwrap.css('height','100%');
                 } else {
-                    $outerwrap.css('height', size + 'px');
+                    $outerwrap.css('height', h+'px');
                 }
                 
                 $outerwrap.css('width', size + 'px');
+                $divContent.css('height', h + 'px');
+                $divContent.css('width', size-40 + 'px');
+                $divContent.css('overflow', 'auto');
                 this.isClosed = false;
                 $divHead.show();
             }
             else {
                 $outerwrap.css('height', '35px');
+                $divContent.css('height', '0px');
                 $outerwrap.css('width', '35px');
+                $divContent.css('width', '0px');
                 this.isClosed = true;
                 $divHead.hide();
             }
@@ -121,6 +135,7 @@
 
         this.disposeComponent = function () {
             $outerwrap.remove();
+            $divContent.remove();
             selLI = null;
             self = null;
         }
@@ -189,6 +204,13 @@
         if (this.curTabPanel) {
             this.curTabPanel.refreshPanelData(rec_Id, dataRow);
         }
+    }
+
+    VTabPanel.prototype.setTabPanelSize = function (size) {
+        if (size == 0) {
+            size = this.width;
+        }
+        this.setSize(size);
     }
 
     VTabPanel.prototype.dispose = function () {

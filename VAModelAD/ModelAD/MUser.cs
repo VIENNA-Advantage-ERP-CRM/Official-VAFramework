@@ -638,7 +638,10 @@ namespace VAdvantage.Model
             {
                 string password = GeneratePassword();
                 SetPassword(password);
-                SetVA037_BIPassword(password);
+                if (Env.IsModuleInstalled("VA037_") == true)
+                {
+                    SetVA037_BIPassword(password);
+                }
             }
             return true;
         }

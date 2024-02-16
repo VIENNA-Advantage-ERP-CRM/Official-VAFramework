@@ -707,7 +707,11 @@
 
         function eventHandling() {
             $slider.on("click", function () {
-                if (alignmentHorizontal) {
+                setTimeout(function () {
+                    $self.curGC.vTabPanel.setSize(0);
+                },200)
+
+                if (alignmentHorizontal) {                   
                     if ($parentRoot.height() == 0) {
                         $parentRoot.height($self.gTab.getHeaderHeight());
                         $root.show();
@@ -719,7 +723,7 @@
                         $root.hide();
                         $parentRoot.find('.vis-ad-w-p-header-arrow-l').css('padding', '0px');
                         $slider.removeClass('fa-angle-double-up').addClass('fa-angle-double-down').addClass('vis-ad-w-p-header-v');
-                    }
+                    }        
                 }
                 else {
                     if ($parentRoot.width() == 0) {

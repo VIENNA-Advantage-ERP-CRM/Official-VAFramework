@@ -845,7 +845,7 @@ input:required:valid {
 }
 
     .right-inner-addon input:focus, .input-group-addon input:focus, .location input:focus {
-        /*box-shadow: none;
+       /*box-shadow: none;
         border: 1px solid rgba(var(--v-c-primary), 1);*/
     }
 
@@ -1214,6 +1214,10 @@ html[dir="rtl"] .input-group-addon {
 
 .VIS_Pref_show:last-child .vis-input-wrap {
     margin-bottom: 5px;
+}
+
+.vis-checkbox-target .vis-ec-col-lblchkbox input[type=checkbox]:focus {
+    border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
 @media (max-width:679px) {
