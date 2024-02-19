@@ -436,8 +436,8 @@
             var mWindow = this.gridWindow;
             actionItemCount_Right = 0;
 
+            this.aBatchUpdate = this.addActions("BUE", null, false, false, false, onAction); //1
             if (VIS.Env.getCtx().getContext('#ENABLE_BATCHUPDATE') == 'Y' && this.ctx.getAD_User_ID() == 100) {
-                this.aBatchUpdate = this.addActions("BUE", null, false, false, false, onAction); //1
                 this.aBatchUpdate.setTextDirection("r");
                 $ulactionbar.append(this.aBatchUpdate.getListItmIT());
             }
@@ -1613,7 +1613,7 @@
                                     }
                                     if (!$ths.curTab.dataSave(true)) {	//  there is a problem, so we go back
                                         //$ths.lastFocus.focus();
-                                        $ths.curTab.getLastFocus().focus();
+                                        //$ths.curTab.getLastFocus().focus();
                                         return false;
                                     } else {
                                         $ths.curTab.setLastFocus(activeElement);
@@ -1625,7 +1625,7 @@
                                         if (results) {
                                             if (!$ths.curTab.dataSave(true)) {
                                                 //$ths.lastFocus.focus();
-                                                $ths.curTab.getLastFocus().focus();
+                                                //$ths.curTab.getLastFocus().focus();
                                                 return false;
                                             } else {
                                                 $ths.curTab.setLastFocus(activeElement);

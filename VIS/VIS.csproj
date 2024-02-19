@@ -183,6 +183,7 @@
     <Content Include="Areas\VIS\Content\BudgetControl.css" />
     <Content Include="Areas\VIS\Content\ClientSetup.css" />
     <Content Include="Areas\VIS\Content\Email.css" />
+    <Content Include="Areas\VIS\Content\emailLinkStyle.css" />
     <Content Include="Areas\VIS\Content\F20\Color.css" />
     <Content Include="Areas\VIS\Content\F20\Controls.css" />
     <Content Include="Areas\VIS\Content\F20\Media.css" />
