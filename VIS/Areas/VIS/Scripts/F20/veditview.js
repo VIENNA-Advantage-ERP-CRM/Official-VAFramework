@@ -347,7 +347,7 @@
             var showGroupFieldDefault = false;
 
 
-            if (target.is('span')) {
+            if (target.is('span') || target.hasClass('vis-ev-col-fg-more')) {
                 if (dis !== "show") {// If group is vlosed and user click on show more then no processing.
                     return;
                 }
