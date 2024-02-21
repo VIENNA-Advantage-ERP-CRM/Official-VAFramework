@@ -102,7 +102,7 @@
     grid-template-rows: auto auto auto auto auto 1fr auto;
     height: calc(100vh - 66px);
     height: calc((var(--vis-screen-height,1vh) *100) - 66);
-    max-height: height: calc((var(--vis-screen-height,1vh) *100) - 66);
+    max-height: calc((var(--vis-screen-height,1vh) *100) - 66);
     position: relative;
     /*overflow: auto;*/
 }
@@ -1767,7 +1767,7 @@ li.vis-page-item-select {
 
 .vis-ad-w-p-actionpanel-b .vis-ad-w-p-ap-tp-outerwrap {
     flex-direction: column;
-    width: auto !important;
+  /*  width: auto !important;*/
     height: 250px;
 }
 

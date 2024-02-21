@@ -707,9 +707,11 @@
 
         function eventHandling() {
             $slider.on("click", function () {
-                setTimeout(function () {
-                    $self.curGC.vTabPanel.setSize(0);
-                },200)
+                if ($self.curGC.vTabPanel) {
+                    setTimeout(function () {
+                        $self.curGC.vTabPanel.setSize(0);
+                    }, 200)
+                }
 
                 if (alignmentHorizontal) {                   
                     if ($parentRoot.height() == 0) {

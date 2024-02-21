@@ -95,40 +95,68 @@
         };
 
         this.setSize = function (size) {
-           
+
             if (!this.isClosed && size && size > 40) {
                 return;
             }
-             if (size == 0) {
+
+            if (size == 0) {
                 size = this.width;
             }
+            var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
             if (size && size > 40) {
-                var h = $outerwrap.closest('.vis-ad-w-p-center').height() - $divHead.height()-15;
-                if (!h) {
-                    h = size;
+
+                if (!this.curTabPanel) {
+                    return;
+                }
+                if (!height) {
+                    height = VIS.Env.getScreenHeight() - 225;
+                    if (this.gTab.isHeaderPanel) {
+                        height = height - VIS.Utility.Util.getValueOfInt(this.curTabPanel.curTab.getHeaderHeight().replace('px', ' ')) - 10;
+                    }
                 }
 
                 if (this.curTabPanel.curTab.getIsTPBottomAligned()) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023 
-                    $outerwrap.css('height','100%');
-                } else {
-                    $outerwrap.css('height', h+'px');
+                    $outerwrap.css({
+                        'height': '100%',
+                        'width': '100%'
+                    });
+
+                    $divContent.css({
+                        'height': '100%',
+                        'width': ($(document).width() - 72) + 'px',
+                        'overflow': 'auto'
+                    });
                 }
-                
-                $outerwrap.css('width', size + 'px');
-                $divContent.css('height', h + 'px');
-                $divContent.css('width', size-40 + 'px');
-                $divContent.css('overflow', 'auto');
-                this.isClosed = false;
+                else {
+                    $outerwrap.css({
+                        'height': height + 'px',
+                        'width': size + 'px'
+                    });
+
+                    $divContent.css({
+                        'height': height + 'px',
+                        'width': size - 35 + 'px',
+                        'overflow': 'auto'
+                    });
+                }
                 $divHead.show();
+                $divContent.show();
             }
             else {
-                $outerwrap.css('height', '35px');
-                $divContent.css('height', '0px');
-                $outerwrap.css('width', '35px');
-                $divContent.css('width', '0px');
+                $outerwrap.css({
+                    'height': '35px',
+                    'width': '35px'
+                });
+                $divContent.css({
+                    'height': '35px',
+                    'width': '0px'
+                });
                 this.isClosed = true;
                 $divHead.hide();
+                $divContent.hide();
             }
+
             if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
                 this.sizeChangedListner.onSizeChanged((size && size > 40));
         }
