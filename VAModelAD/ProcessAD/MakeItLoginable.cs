@@ -33,7 +33,7 @@ namespace VAModelAD.ProcessAD
         /// <returns></returns>
         protected override String DoIt()
         {
-            String Sql = "UPDATE AD_User SET IsLoginUser='Y'  WHERE AD_User_ID=" + GetRecord_ID();
+            String Sql = "UPDATE AD_User SET IsLoginable='Y'  WHERE AD_User_ID=" + GetRecord_ID();
             int res=DB.ExecuteQuery(Sql);
             if (res > 0)
             {

@@ -591,7 +591,7 @@
                 }
                 //	Date
                 else if (VIS.DisplayType.IsDate(displayType)) {
-                    colValue = colValue.replace('Z',''); //remove Universal time
+                    colValue = colValue.toString().replace('Z', ' '); //remove Universal time
                     if (displayType == VIS.DisplayType.DateTime) {
                         colValue = new Date(colValue).toLocaleString();
                     }
@@ -707,9 +707,11 @@
 
         function eventHandling() {
             $slider.on("click", function () {
-                setTimeout(function () {
-                    $self.curGC.vTabPanel.setSize(0);
-                },200)
+                if ($self.curGC.vTabPanel) {
+                    setTimeout(function () {
+                        $self.curGC.vTabPanel.setSize(0);
+                    }, 200)
+                }
 
                 if (alignmentHorizontal) {                   
                     if ($parentRoot.height() == 0) {

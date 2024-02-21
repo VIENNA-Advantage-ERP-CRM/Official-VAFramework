@@ -26,10 +26,10 @@ namespace VAModelAD.Model
         public static void LoadLocationType()
         {
             Assembly asm = Assembly.Load(LOC_CLASS);
-            Type _type = Type.GetType("VAdvantage.Model.MLocation");
+            Type _type = asm.GetType("VAdvantage.Model.MLocation");
             if (_type != null)
             {
-                _Get = _type.GetMethod("Get", BindingFlags.Static);
+                _Get = _type.GetMethod("Get", new Type[] { typeof(Ctx), typeof(int), typeof(Trx) });
                 _GetBPLocation = _type.GetMethod("GetBPLocation", BindingFlags.Static);
             }
         }

@@ -38,7 +38,11 @@ VIS = window.VIS || {};
         this.init = function () {
             setBusy(false);
             $root = $('<div></div>').append(bsyDiv);
-            h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
+           // h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
+            h = VIS.Env.getScreenHeight() - 230;
+            if (self.curTab.isHeaderPanel) {
+                h = h - VIS.Utility.Util.getValueOfInt(self.curTab.getHeaderHeight().replace('px', ' ')) - 10;
+            }
             if (!h || h < 0) {
                 h = $('.divWorkflowActivity').height() - 19;
             } 

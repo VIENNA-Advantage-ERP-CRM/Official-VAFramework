@@ -42,7 +42,7 @@ namespace VAdvantage.Model
         {
             if (value == null || value == DBNull.Value)
                 return null;
-            MLocation loc = GetLocation(value, null);
+            dynamic loc = GetLocation(value, null);
             if (loc == null)
                 return "<" + value.ToString() + ">";
             return loc.ToString();
@@ -78,7 +78,7 @@ namespace VAdvantage.Model
         /// <param name="key">ID as string or integer</param>
         /// <param name="trxName">transaction</param>
         /// <returns>Location</returns>
-        public MLocation GetLocation(Object key, Trx trxName)
+        public dynamic GetLocation(Object key, Trx trxName)
         {
             if (key == null)
                 return null;
@@ -97,7 +97,7 @@ namespace VAdvantage.Model
         /// <param name="C_Location_ID">C_Location_ID id</param>
         /// <param name="trxName">transaction</param>
         /// <returns></returns>
-        public MLocation GetLocation(int C_Location_ID, Trx trxName)
+        public dynamic GetLocation(int C_Location_ID, Trx trxName)
         {
             return MLocation.Get((Context)GetCtx(), C_Location_ID, trxName);
         }

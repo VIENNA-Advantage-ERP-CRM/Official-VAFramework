@@ -458,7 +458,7 @@
                 controlText=controlText.replace('Z',' ');
             }
             var htm = '<tr class="vis-advancedSearchTableRowBatch"><td data-cVal="' + cVal + '">' + colName + '</td>'
-                + '<td data-settype="' + getControlType() + '" data-setVal="' + getControlValue(true) + '">' + controlText + '</td>'
+                + '<td data-settype="' + getControlType() + '" data-setVal="' + controlText + '">' + controlText + '</td>'
                 + '<td class="vis-batchUpdate-deletewrap"><i style="cursor:pointer;" class="vis vis-delete" onclick="$(this).closest(\'tr\').remove()"></i></td></tr>'
             tblSetValue.find('tbody').append(htm);
             setControl(true, null, divSetValue1);
