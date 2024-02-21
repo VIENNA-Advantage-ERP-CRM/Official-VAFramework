@@ -43,21 +43,21 @@
             <div class="VIS-content-wrap VIS-middle-align">
                 <div class="VIS-confirmation-wrap VIS-setpass-wrap">
                     <div class="VIS-confirm-text-wrap" runat="server" id="divSetPassword">
-                        <%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"VIS_EmailVerified") %>
+                        <%--<%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"VIS_EmailVerified") %>--%>
                         <div >
-                                  <h2 runat="server" id="lblHeader">Setup Your Password</h2>
+                                  <h2 runat="server" id="lblHeader"><%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"VIS_SetUpPassword") %></h2>
                           </div>
                         <div class="VIS-setpass-form">
                             <div class="VIS-frm-row">
                                 <div class="VIS-frm-data">
-                                    <label runat="server" id="lblCreatePass">Create Password</label>
+                                    <label runat="server" id="lblCreatePass"><%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"VIS_CreatePassword") %></label>
                                     <sup>*</sup>
                                     <input runat="server" id="txtCreatePass" type="password" autocomplete="new-password" />
                                 </div>
                             </div>
                             <div class="VIS-frm-row">
                                 <div class="VIS-frm-data">
-                                    <label runat="server" id="lblConfirmPass">Confirm Password</label>
+                                    <label runat="server" id="lblConfirmPass"><%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"VIS_ConfirmPassword") %></label>
                                     <sup>*</sup>
                                     <input runat="server" id="txtConfirmPass" type="password" autocomplete="off" />
                                 </div>
@@ -72,7 +72,7 @@
                     </div>
                     <div runat="server" id="passwordMsg">
                                <h4> <%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"PasswordReset") %></h4><br/>
-                                 <a  href="<%=((HttpRequest)Request)["path"] %>" id="homeLink">Click Here To Login</a>      
+                                 <a  href="<%=((HttpRequest)Request)["path"] %>" id="homeLink"><%= VAdvantage.Utility.Msg.GetMsg(((HttpRequest)Request)["lang"],"VIS_ClickToLongin") %></a>      
                     </div>
                     <div class="VIS-mail-img-wrap">
                         <div class="VIS-mail-img w">
