@@ -137,17 +137,17 @@ label.vis-chcklist-label {
 }
 
 .vis-Email-Open {
-    background: url('../Images/open.png');
+    /*background: url('../Images/open.png');*/
     background-repeat: no-repeat;
 }
 
 .vis-Email-Save {
-    background: url('../Images/save.png');
+    /*background: url('../Images/save.png');*/
     background-repeat: no-repeat;
 }
 
 .vis-Email-SaveAs {
-    background: url('../Images/saveas.png');
+    /*background: url('../Images/saveas.png');*/
     background-repeat: no-repeat;
 }
 
@@ -157,14 +157,14 @@ label.vis-chcklist-label {
 }
 
 .vis-Email-Cancel {
-    background: url('../img/cancel.png');
+    /*background: url('../img/cancel.png');*/
     background-repeat: no-repeat;
     border-right: 1px solid #1493dc;
     padding-right: 30px;
 }
 
 .vis-Email-Send {
-    background: url('../img/send.png');
+    /* background: url('../img/send.png');*/
     background-repeat: no-repeat;
 }
 

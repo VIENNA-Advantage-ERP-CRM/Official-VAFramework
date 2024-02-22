@@ -42,7 +42,7 @@
 
 .vis-btn-close {
     width: 4%;
-    background: url('../Images/close.png');
+    /* background: url('../Images/close.png');*/
     background-color: #616364;
     float: right;
     background-repeat: no-repeat;
@@ -84,7 +84,7 @@
 }
 
 .vis-plus-ico {
-    background: url(../Images/plus-ico.png);
+    /* background: url(../Images/plus-ico.png);*/
     background-repeat: no-repeat;
     width: 10px;
     height: 10px;
@@ -223,24 +223,24 @@
 }
 
 .vis-download-ico {
-    background: url('../Images/download-ico.png') no-repeat;
+    /* background: url('../Images/download-ico.png') no-repeat;*/
 }
 
 .vis-browse-ico {
     /*background: url('../Images/browse.png') no-repeat;*/
-    background: url('../Images/attachment.png') no-repeat;
+    /* background: url('../Images/attachment.png') no-repeat;*/
 }
 
 .vis-cancelall-ico {
-    background: url('../Images/cancelfiles.png') no-repeat;
+    /* background: url('../Images/cancelfiles.png') no-repeat;*/
 }
 
 .vis-uploadall-ico {
-    background: url('../Images/upload.png') no-repeat;
+    /* background: url('../Images/upload.png') no-repeat;*/
 }
 
 .vis-delete-ico {
-    background: url('../Images/delete-ico.png') no-repeat;
+    /*background: url('../Images/delete-ico.png') no-repeat;*/
     margin-left: 7px;
 }
 /*.vis-attach-file-icon, .vis-attach-fileBottom-Text, .vis-attach-BottomLeft{ float:left;position:relative;}*/
@@ -281,14 +281,14 @@
     width: 9px;
     height: 17px;
     float: left;
-    background: url('../Images/download.png');
+    /*background: url('../Images/download.png');*/
 }
 
 .vis-attach-delete {
     width: 15px;
     height: 17px;
     float: left;
-    background: url('../Images/delete.png');
+    /*background: url('../Images/delete.png');*/
     margin-left: 15px;
 }
 /*.vis-attach-file-icon{ margin-right:5px; float:left;}*/
@@ -340,12 +340,12 @@
 }
 
 .vis-left-shift {
-    background: url(../Images/left-shift-arrow.png);
+    /*background: url(../Images/left-shift-arrow.png);*/
     background-repeat: no-repeat;
 }
 
 .vis-right-shift {
-    background: url(../Images/right-shift-arrow.png);
+    /* background: url(../Images/right-shift-arrow.png);*/
     background-repeat: no-repeat;
 }
 
@@ -615,7 +615,7 @@
 }
 
 .VIS-Tm-deletetreenode {
-    background: url('../Images/link-del.png') no-repeat;
+    /*background: url('../Images/link-del.png') no-repeat;*/
     height: 19px;
     width: 16px;
 }
@@ -656,7 +656,7 @@ ul.VIS-TM-root-node li {
     width: 20px;
     height: 14px;
     float: left;
-    background-image: url(../img/folder.png);
+    /*background-image: url(../img/folder.png);*/
     background-position: -25px 0px;
     margin-right: 7px;
 }
@@ -957,7 +957,7 @@ ul.VIS-TM-root-node li a {
 }
 
 .vis-tm-unlinkimgss {
-    background: url('../Images/link-del.png') no-repeat;
+    /*background: url('../Images/link-del.png') no-repeat;*/
     width: 100%;
     /*height: auto;*/
     float: left;
@@ -1044,7 +1044,7 @@ ul.VIS-TM-root-node li a {
 .vis-tmlinkdel-icon {
     width: 16px;
     height: 16px;
-    background: url('../Images/croswithText.png') no-repeat center;
+    /*background: url('../Images/croswithText.png') no-repeat center;*/
     float: left;
     position: absolute;
     right: 145px;
@@ -1343,7 +1343,6 @@ center {
     text-align: center !important;
 }
 
-}
 /*contactinfo form homepage END*/
 @media (max-width: 1024px) {
     .VIS-TM-textdivTreedata {
@@ -4082,29 +4081,13 @@ table.fixed-header thead tr {
     display: inline-flex;
     align-items: center;
     margin-bottom: 5px;
-    min-width:50px;
+    min-width: 50px;
 }
 
 .vis-BatchUpdateContentArea {
     height: auto;
 }
 
-    .vis-ctrfrm-btnwrp.vis-add-right-btns input[type="button"] {
-        float: none;
-    }
-
-.vis-Dialog-buttons button:focus,
-.vis-Dialog-buttons input[type="button"]:focus,
-.vis-Dialog-buttons input[type="submit"]:focus,
-.ui-widget.ui-widget-content button:focus,
-.ui-widget.ui-widget-content input[type="button"]:focus,
-.ui-widget.ui-widget-content input[type="submit"]:focus,
-.VIS_Pref_btn-2:focus,
-.vis-group-btn:focus,
-.k-button:focus {
-    box-shadow: 0 0 10px rgb(0 0 0 / 50%) !important;
-    border: none !important;
-}
 
 /* modify Ends */
 /*Media query*/

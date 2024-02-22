@@ -1208,7 +1208,7 @@ html[dir="rtl"] .vis-viewMoreComments {
 
 /*Feed icons */
 .vis-processZoomIcon {
-    background: url('../Images/home/process-icon.png') 0px 0px no-repeat;
+    /*background: url('../Images/home/process-icon.png') 0px 0px no-repeat;*/
     display: block;
 }
 
@@ -2826,7 +2826,7 @@ div.requestScreen-20 h2 {
     padding-left: 35px;
     font-weight: 200;
     color: #0093DA;
-    background: url(../images/zvono.png);
+    /*background: url(../images/zvono.png);*/
     background-repeat: no-repeat;
     background-position: 1px;
     margin-left: 10px;
@@ -2844,7 +2844,7 @@ div.requestScreen-20 h2 {
 }
 
 .icon-link1 {
-    background: url('..Area/WSP/Images/icons-feeds.png') 0px 0px no-repeat;
+    /*background: url('..Area/WSP/Images/icons-feeds.png') 0px 0px no-repeat;*/
     display: block;
 }
 

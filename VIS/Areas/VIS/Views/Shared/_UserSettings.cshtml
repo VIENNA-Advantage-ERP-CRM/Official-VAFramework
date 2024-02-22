@@ -1,4 +1,4 @@
-﻿@if (Request.IsAuthenticated)
+﻿@if (Request.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
 {
     @model VIS.Models.LoginModel
 
@@ -101,26 +101,26 @@
         <li id="vis_userDisplayName" class="vis-app-hdr-r-user">
             <a id="vis_userName">@ViewBag.DisplayName</a>
             @*
-        <div class="vis-div-userAvatar">*@
+                <div class="vis-div-userAvatar">*@
             @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
             {
-            ViewBag.UserPic="";
+                ViewBag.UserPic = "";
             }
             <div class="vis-app-user-img-wrap">
                 <i class="fa fa-user"></i>
                 <img src="@ViewBag.UserPic" alt="profile image">
             </div><!-- user-img-wrap -->
             @*else
-        {
-        <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
-        }
-        }
-        else
-        {
-        <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
-        }*@
+                {
+                <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
+                }
+                }
+                else
+                {
+                <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
+                }*@
             @*
-        </div>*@
+                </div>*@
 
 
         </li>

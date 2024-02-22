@@ -100,7 +100,6 @@ div.VIS_Pref_slide-show.pp {
     /*font-weight: 200;*/
     display: flex;
     align-items: center;
-    fv
 }
 
 .VIS_Pref_settings {
@@ -635,7 +634,7 @@ div.VIS_Pref_slide-show.pp {
 
 a.VIS_Pref_tooltip {
     outline: none;
-    position:relative;
+    position: relative;
     /*margin-bottom: 15px;*/
 }
 
@@ -648,19 +647,19 @@ a.VIS_Pref_tooltip {
     }
 
 
-    a.VIS_Pref_tooltip:hover span {
-        display: inline;
-        position: absolute;
-        color: rgba(var(--v-c-on-secondary), 1);
-        border: 1px solid rgba(var(--v-c-secondary), 1);
-        background: rgba(var(--v-c-secondary), 1);
-        /* right: 0; */
-        /* bottom: 22px; */
-        z-index: 9;
-        word-break: break-word;
-        left: 5px;
-        top: 27px;
-    }
+        a.VIS_Pref_tooltip:hover span {
+            display: inline;
+            position: absolute;
+            color: rgba(var(--v-c-on-secondary), 1);
+            border: 1px solid rgba(var(--v-c-secondary), 1);
+            background: rgba(var(--v-c-secondary), 1);
+            /* right: 0; */
+            /* bottom: 22px; */
+            z-index: 9;
+            word-break: break-word;
+            left: 5px;
+            top: 27px;
+        }
 
     /*CSS3 extras*/
     a.VIS_Pref_tooltip span {
@@ -845,7 +844,7 @@ input:required:valid {
 }
 
     .right-inner-addon input:focus, .input-group-addon input:focus, .location input:focus {
-       /*box-shadow: none;
+        /*box-shadow: none;
         border: 1px solid rgba(var(--v-c-primary), 1);*/
     }
 
@@ -1216,10 +1215,6 @@ html[dir="rtl"] .input-group-addon {
     margin-bottom: 5px;
 }
 
-.vis-checkbox-target .vis-ec-col-lblchkbox input[type=checkbox]:focus {
-    border: 1px solid rgba(var(--v-c-primary), 1);
-}
-
 @media (max-width:679px) {
     .VIS_Pref_close {
         /*width: 8%;*/
@@ -1255,7 +1250,7 @@ html[dir="rtl"] .input-group-addon {
     .VIS_Pref_slide-show {
         width: 42%;
         overflow: hidden;
-        background: url('../img/arr.png') no-repeat right #FFFFFF;
+        /*background: url('../img/arr.png') no-repeat right #FFFFFF;*/
         border: #E8E8E8 1px solid;
         -webkit-border-radius: 3px;
         border-radius: 3px;

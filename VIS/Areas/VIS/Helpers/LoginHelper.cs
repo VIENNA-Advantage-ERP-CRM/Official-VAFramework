@@ -31,7 +31,7 @@ namespace VIS.Helpers
         /// <param name="roles">out roles , has role list of user</param>
         /// <param name="ctx" ></param>
         /// <returns>true if athenicated</returns>
-        public static bool Login(LoginModel model, out List<KeyNamePair> roles)
+        public static bool Login(LoginModel model, out List<KeyNamePair> roles, bool isSSO)
         {
             // loginModel = null;
             //bool isMatch = false;
@@ -56,6 +56,12 @@ namespace VIS.Helpers
 
                 isLDAP = true;
             }
+
+            if (isSSO)
+            {
+                authenticated = true;
+            }
+
             //Save Failed Login Count and Password validty in cache
             GetSysConfigForlogin();
 
@@ -903,5 +909,46 @@ namespace VIS.Helpers
             }
             return isUnderMaintenance;
         }
+
+
+
+        public static List<ExternalLogin> GetExternalProvider()
+        {
+            List<ExternalLogin> list = new List<ExternalLogin>();
+            DataSet DS = DB.ExecuteDataset(@"SELECT sso_configuration.sso_configuration_ID, AD_Ref_List.value,ad_ref_list.name, 
+(SELECT COALESCE(FontName,ImageURL)||'|'|| NVL(FontStyle,'') FROM AD_Image WHERE AD_Image_ID=sso_configuration.AD_Image_ID) AS ImageIco
+FROM sso_configuration 
+                        INNER JOIN AD_Ref_List  ON AD_Ref_List.Value=sso_configuration.Provider
+                        WHERE sso_configuration.IsActive='Y' AND AD_Reference_ID IN (
+                        SELECT ad_reference_ID FROM ad_reference WHERE NAme='VIS_ServiceProvider'
+                        )");
+            if (DS != null && DS.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < DS.Tables[0].Rows.Count; i++)
+                {
+                    string icon = Util.GetValueOfString(DS.Tables[0].Rows[i]["ImageIco"]);
+                    if (icon.StartsWith("fa fa-") || icon.StartsWith("vis vis-"))
+                    {
+                        icon = "<i class='" + icon.Split('|')[0] + "' style='" + icon.Split('|')[1] + "' ></i>";
+                    }
+                    else
+                    {
+                        icon = "<img src='" + icon.Split('|')[0] + "' style='" + icon.Split('|')[1] + "'/>";
+                    }
+                    ExternalLogin obj = new ExternalLogin()
+                    {
+                        Provider = Util.GetValueOfString(DS.Tables[0].Rows[i]["value"]).ToLower(),
+                        ProviderDisplayName = Util.GetValueOfString(DS.Tables[0].Rows[i]["name"]),
+                        Configuration_ID = Util.GetValueOfInt(DS.Tables[0].Rows[i]["sso_configuration_ID"]),
+                        ImageIcon = icon,
+                    };
+
+                    list.Add(obj);
+                }
+            }
+
+            return list;
+        }
+
     }
 }

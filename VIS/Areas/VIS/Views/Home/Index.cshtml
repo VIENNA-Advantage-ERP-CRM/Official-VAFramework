@@ -31,7 +31,7 @@
     </script>
 
 
-    @if (@User.Identity.IsAuthenticated)
+    @if (@User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
     {
 
         var lst = VAdvantage.ModuleBundles.GetStyleBundles(); //Get All Style Bundle
@@ -128,7 +128,7 @@
     }
 }
 
-@if (@User.Identity.IsAuthenticated)
+@if (@User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
 {
     <input id="vis_antiForgeryToken" type="hidden" value="@GetAntiForgeryToken()" />
 
@@ -348,6 +348,7 @@
 }
 else //Login Page
 {
+
     <div class="loginConatiner">
         <div id="loginPanel">
             @Html.Partial("_Login")

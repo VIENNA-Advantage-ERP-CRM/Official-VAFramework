@@ -857,7 +857,7 @@
         for (var c = 0; c < curTabfieldlist.length; c++) {
             // get field
             var fieldorg = curTabfieldlist[c];
-           // var field = Object.assign(Object.create(Object.getPrototypeOf(fieldorg)), fieldorg);
+            // var field = Object.assign(Object.create(Object.getPrototypeOf(fieldorg)), fieldorg);
 
             //let field = JSON.parse(JSON.stringify(fieldorg));
 
@@ -1025,11 +1025,11 @@
                 'AD_Reference_Value_ID': field.getAD_Reference_Value_ID(),
                 'validationCode': VIS.secureEngine.encrypt(validationCode),
                 whereClause: VIS.secureEngine.encrypt(whereClause),
-                'isParent':false,
+                'isParent': false,
                 'pTableName': this.curTab.getTableName()
-            }; 
+            };
 
-           // lookupData = JSON.stringify(lookupData);
+            // lookupData = JSON.stringify(lookupData);
 
             var tht = this;
 
@@ -1280,8 +1280,8 @@
                 var yearr = parsedValue.getFullYear();
                 var month = parsedValue.getMonth();
                 var date = parsedValue.getDate();
-                parsedValue2 = new Date(yearr, month, date, 24, 00, 00);
-                parsedValue = new Date(yearr, month, date, 00, 00, 00);
+                parsedValue2 = new Date(yearr, month, date, 24, 0, 0);
+                parsedValue = new Date(yearr, month, date, 0, 0, 0);
                 optr = VIS.Query.prototype.BETWEEN;
             }
             //	Value2

@@ -627,7 +627,7 @@
                 if (ctxInfo.length == 0 && (token.startsWith("#") || token.startsWith("$")))
                     ctxInfo = ctx.getContext(token);	// get global context
 
-                
+
 
                 if (ctxInfo.length == 0) {
                     //_log.config("No Context Win=" + WindowNo + " for: " + token);
@@ -638,7 +638,7 @@
                     } else {
                         resultData.push({ 'Key': token, 'Value': null });
                     }
-                   
+
                     outStr += ' NULL ';
                     //						//	token not found
                 }
@@ -700,7 +700,7 @@
                 if (ctxInfo.length == 0 && (token.startsWith("#") || token.startsWith("$")))
                     ctxInfo = ctx.getContext(token);	// get global context
 
-                
+
 
                 if (ctxInfo.length == 0) {
                     //_log.config("No Context Win=" + WindowNo + " for: " + token);
@@ -1031,7 +1031,7 @@
 
         var baseUrl = VIS.Application.contextUrl;
         var dataSetUrl = baseUrl + "JsonData/JDataSetWithCode";
-        
+
 
         var executeReader = function (sql, param, callback) {
             var async = callback ? true : false;
@@ -1079,7 +1079,7 @@
 
         function getGridWindowFromServer(curWindowNo, ID) {
 
-           
+
         };
 
         function getZoomButton(disabled) {
@@ -1088,7 +1088,7 @@
         }
 
         function getContextPopup(options, fieldName) {
-            
+
             var ulPopup = $("<ul class='vis-apanel-rb-ul'>");
             if (typeof options[VIS.Actions.zoom] !== "undefined") {
                 ulPopup.append($("<li data-action='" + VIS.Actions.zoom + "' style='opacity:" + (options[VIS.Actions.zoom] ? .7 : 1) +
@@ -1565,7 +1565,7 @@
 
 
 
-    function validateAndExecute(arguments, dataIn, async, callback) {
+    function validateAndExecute(myarguments, dataIn, async, callback) {
         //if (traceConsole(arguments))
         //    return null;
         //dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
@@ -1574,7 +1574,7 @@
         });
     };
 
-    function validateAndExecuteQuery(arguments, dataIn, async, callback) {
+    function validateAndExecuteQuery(myarguments, dataIn, async, callback) {
         //if (traceConsole(arguments))
         //    return null;
         // dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
@@ -1583,7 +1583,7 @@
         });
     };
 
-    function validateAndExecuteQueries(arguments, dataIn, async, callback) {
+    function validateAndExecuteQueries(myarguments, dataIn, async, callback) {
         //if (traceConsole(arguments))
         //    return null;
         // dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);

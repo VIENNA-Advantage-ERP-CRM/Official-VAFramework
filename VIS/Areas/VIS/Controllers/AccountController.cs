@@ -1,25 +1,90 @@
-﻿using System;
+﻿using CoreLibrary.DataBase;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
+//using Microsoft.Owin.Security.OpenIdConnect;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-
-using System.Web;
-using VIS.Models;
-using VIS.Helpers;
 using VAdvantage.Model;
-using VIS.Filters;
 using VAdvantage.Utility;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
-using VAdvantage.Logging;
+using VIS.Filters;
+using VIS.Helpers;
+using VIS.Models;
 
 namespace VIS.Controllers
 {
 
     public class AccountController : Controller
     {
+
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult ExternalLoginCallback(string provider)
+        {
+            //    var identity = HttpContext.GetOwinContext().Authentication.GetExternalIdentityAsync(DefaultAuthenticationTypes.ApplicationCookie);
+            //    if (identity == null)
+            //    {
+            //         RedirectToAction("Login");
+            //    }
+            if (!Request.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+
+            var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
+            string sql = "SELECT ct.claimtype,ct.code FROM SSO_Mapping INNER JOIN claim_type ct ON SSO_Mapping.claimtype=ct.code WHERE SSO_Configuration_ID=" + provider.Split('_')[0];
+            DataSet DS = DB.ExecuteDataset(sql);
+
+            if (DS != null && DS.Tables.Count > 0)
+            {
+                sql = "SELECT DISTINCT SSO_DataMapping.Ad_User_id,AD_User.value FROM SSO_DataMapping INNER JOIN AD_User ON SSO_DataMapping.Ad_User_id=AD_User.Ad_User_id  Where SSO_Configuration_ID=" + provider.Split('_')[0];
+                for (int i = 0; i < DS.Tables[0].Rows.Count; i++)
+                {
+                    sql += " AND ";
+                    var claimsVal = userClaims?.FindFirst(Util.GetValueOfString(DS.Tables[0].Rows[i]["claimtype"]))?.Value;
+                    sql += "claimtype=" + Util.GetValueOfInt(DS.Tables[0].Rows[i]["code"]) + " AND Claim_Value='" + claimsVal + "'";
+                }
+
+            }
+
+
+
+            //int cid = Util.GetValueOfInt(SecureEngine.Decrypt(provider));
+
+            // ClaimTypes
+            HttpCookie cookie = new HttpCookie("ProviderType");
+            cookie.Value = provider.Split('_')[1];
+            Response.Cookies.Add(cookie);
+
+            DS = DB.ExecuteDataset(sql);
+            if (DS != null && DS.Tables.Count > 0 && DS.Tables[0].Rows.Count == 1)
+            {
+                LoginModel model = new LoginModel();
+                model.Login1Model = new Login1Model();
+                model.Login1Model.UserValue = Util.GetValueOfString(DS.Tables[0].Rows[0]["value"]);
+                CommonLogin(model, "/", true);
+            }
+            else
+            {
+
+
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
         //
         // POST: /Account/JsonLogin
 
@@ -27,6 +92,12 @@ namespace VIS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public JsonResult JsonLogin(LoginModel model, string returnUrl)
+        {
+            return CommonLogin(model, returnUrl, false);
+        }
+
+
+        public JsonResult CommonLogin(LoginModel model, string returnUrl, bool isSSO)
         {
             if (ModelState.IsValid)
             {
@@ -130,7 +201,7 @@ namespace VIS.Controllers
                     //Pwd is assigned to tempdata, bcoz if user's passsword setting is encrypted, then code encrypt the pwd to use in query.
                     //But original pwd entered by user is required in reset pwd setup.. to match with new pwd.
                     TempData["Password"] = model.Login1Model.Password;
-                    if (LoginHelper.Login(model, out roles))
+                    if (LoginHelper.Login(model, out roles, isSSO))
                     {
                         // ViewBag.QRCodeURL = model.Login1Model.QRCodeURL;
                         TempData["roles"] = roles;
@@ -166,6 +237,7 @@ namespace VIS.Controllers
             // If we got this far, something failed
             return Json(new { errors = GetErrorsFromModelState() });
         }
+
         [NonAction]
         private JsonResult Login(LoginModel model, string returnUrl, List<KeyNamePair> roles)
         {
@@ -246,27 +318,49 @@ namespace VIS.Controllers
         /// <param name="response">http response</param>
         internal void SetAuthCookie(LoginModel model, HttpResponseBase response)
         {
+            var claims = new List<Claim>();
             LoginContext lCtx = LoginHelper.GetLoginContext(model);
-            response.Cookies.Clear();
-
-            DateTime expiryDate = DateTime.Now.AddDays(30);
-
-            HttpCookie authCookie = FormsAuthentication.GetAuthCookie(model.Login1Model.UserValue, model.Login1Model.RememberMe);
-
-            if (model.Login1Model.RememberMe)
+            try
             {
-                authCookie.Expires = expiryDate;
+                // Setting
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Login1Model.UserValue));
+                claims.Add(new Claim(ClaimTypes.UserData, JsonHelper.Serialize(lCtx)));
+                claims.Add(new Claim("Authorization", "true"));
+                var claimIdenties = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+                var ctx = Request.GetOwinContext();
+                var authenticationManager = ctx.Authentication;
+                // Sign In.
+                authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = model.Login1Model.RememberMe }, claimIdenties);
             }
+            catch (Exception ex)
+            {
+                // Info
+                throw ex;
+            }
+            //LoginContext lCtx = LoginHelper.GetLoginContext(model);
+            //response.Cookies.Clear();
 
-            FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
+            //DateTime expiryDate = DateTime.Now.AddDays(30);
 
-            FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, model.Login1Model.RememberMe ? expiryDate : ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
+            //HttpCookie authCookie = FormsAuthentication.GetAuthCookie(model.Login1Model.UserValue, model.Login1Model.RememberMe);
 
-            // Update the authCookie's Value to use the encrypted version of newTicket
+            //if (model.Login1Model.RememberMe)
+            //{
+            //    authCookie.Expires = expiryDate;
+            //}
 
-            authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+            //FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
 
-            response.Cookies.Add(authCookie);
+            //FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, model.Login1Model.RememberMe ? expiryDate : ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
+
+            //// Update the authCookie's Value to use the encrypted version of newTicket
+
+            //authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+            //response.Cookies.Add(authCookie);
+
+
+
+
         }
 
         [AllowAnonymous]
@@ -374,7 +468,7 @@ namespace VIS.Controllers
                 //VAdvantage.Logging.VLogMgt.Shutdown(ctx);
                 // MSession s = MSession.Get(ctx);
                 // s.Logout();
-               
+
             }
             catch
             {
@@ -386,11 +480,41 @@ namespace VIS.Controllers
 
         public ActionResult SignOff(Ctx ctx)
         {
-           if (ctx != null)
-             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx);
-            FormsAuthentication.SignOut();
-            //if (Session != null)
-            //    Session.Abandon();
+            if (ctx != null)
+                VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx);
+            //FormsAuthentication.SignOut();          
+            HttpCookie cookie = Request.Cookies["ProviderType"];
+            var userClaims = System.Security.Claims.ClaimsPrincipal.Current;
+            if (!string.IsNullOrEmpty(cookie?.Value))
+            {
+                HttpContext.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie, cookie.Value);
+
+            }
+            else
+            {
+                HttpContext.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            }
+
+            HttpContext.GetOwinContext().Authentication.SignOut(
+                      OpenIdConnectAuthenticationDefaults.AuthenticationType,
+                      CookieAuthenticationDefaults.AuthenticationType);
+
+            //if (Request.IsAuthenticated)
+            //{
+
+
+            //    var UserData = userClaims?.FindFirst(ClaimTypes.UserData)?.Value;
+            //    if (!string.IsNullOrEmpty(UserData))
+            //    {
+
+            //    }
+            //}
+
+
+
+            if (Session != null)
+                Session.Abandon();
+
             return RedirectToAction("Index", "Home");
         }
 

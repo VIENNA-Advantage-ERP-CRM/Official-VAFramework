@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using System.Web.Security;
 
 namespace ViennaAdvantageWeb
 {
@@ -18,17 +13,17 @@ namespace ViennaAdvantageWeb
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
-            WebApiConfig.Register(GlobalConfiguration.Configuration); 
+            WebApiConfig.Register(GlobalConfiguration.Configuration);
 
-            RouteConfig.RegisterRoutes(RouteTable.Routes); 
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            AuthConfig.RegisterAuth();//test
-           
+            //AuthConfig.RegisterAuth();//test
+
         }
         protected void Session_End()
         {
-           
+
             VAdvantage.Classes.SessionEventHandler.SessionEnd(Session["ctx"] as VAdvantage.Utility.Ctx);
         }
     }
