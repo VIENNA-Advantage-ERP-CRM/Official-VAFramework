@@ -24,12 +24,13 @@
     <form id="form1" runat="server">
         <div class="VIS-main-container d-flex h-100">
              <div class="VIS-sidebar-wrap">
-                <div class="VIS-sidebarBgImg"></div>
                 <div class="VIS-sidebarInnerWrap">
+                    <div class="VIS-SideTextWrap"> 
+                        <h2>Welcome to Vienna Advantage</h2>
+                        <p>Please create your password to proceed.</p>
+                    </div>
                     <div class="VIS-logo-wrap">
                         <img src="../Images/V-logo.png" alt="Logo" />
-                    </div>
-                    <div class="VIS-SideTextWrap">                        
                     </div>
                     <%--<div class="VIS-poweredBy">
 					<small>Powered By:</small>

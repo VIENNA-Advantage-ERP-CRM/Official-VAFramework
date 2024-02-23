@@ -46,7 +46,7 @@ namespace VAModelAD.ProcessAD
         /// Send url link of reset password
         /// </summary>
         /// <returns></returns>
-        protected override String DoIt()
+        protected override string DoIt()
         {
             string message = "";
             int count = 0;
@@ -85,6 +85,10 @@ namespace VAModelAD.ProcessAD
                             count++;
                         }
                     }
+                }
+                if (message.Length > 0 && message.EndsWith(", "))
+                {
+                    message = message.Substring(0, message.Length - 2);
                 }
                 if (count > 0)
                 {
@@ -125,53 +129,51 @@ namespace VAModelAD.ProcessAD
                             {
                                 if (res1 == "AuthenticationFailed.")
                                 {
-                                    res.Append("AuthenticationFailed");
+                                    res.Append(Msg.GetMsg(GetCtx(), "AuthenticationFailed"));
                                     log.Fine(res.ToString());
                                 }
                                 else if (res1 == "ConfigurationIncompleteOrNotFound")
                                 {
-                                    res.Append("ConfigurationIncompleteOrNotFound");
+                                    res.Append(Msg.GetMsg(GetCtx(), "ConfigurationIncompleteOrNotFound"));
                                     log.Fine(res.ToString());
                                 }
                                 else
                                 {
-                                    res.Append(" " + Msg.GetMsg(GetCtx(), "VIS_MailNotSentTo") + Email);
+                                    res.Append(res1);
                                     log.Fine(res.ToString());
                                 }
+                                return res.ToString();
                             }
                             else
                             {
                                 if (!res.ToString().Contains("MailSent"))
-                                {                                   
+                                {
                                     String Sql = "UPDATE AD_User SET IsLoginUser='Y'  WHERE AD_User_ID=" + GetRecord_ID();
                                     DB.ExecuteQuery(Sql);
                                     res.Append("MailSent");
                                     if (totalRole - count > 0)
                                     {
-                                        return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") +" " + Msg.GetMsg(GetCtx(), "VIS_But")+ " " + Util.GetValueOfString(totalRole - count) +" "+ Msg.GetMsg(GetCtx(), "VIS_Role/RolesOutOf") +" "+ Util.GetValueOfString(totalRole) + ", " +
-                                           Msg.GetMsg(GetCtx(), "VIS_DoNotOrgAccess");
+                                        return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + " " + Msg.GetMsg(GetCtx(), "VIS_But") + " " + Util.GetValueOfString(totalRole - count) + " " + Msg.GetMsg(GetCtx(), "Role") + ": \"" + message + "\" " + Msg.GetMsg(GetCtx(), "VIS_OutOfAssign") + " " + Util.GetValueOfString(totalRole) + " " +
+                                           Msg.GetMsg(GetCtx(), "VIS_NotHaveOrgAccess");
                                     }
                                     else
                                     {
-                                        return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully");
-                                    }                                
+                                        return Msg.GetMsg(GetCtx(), "VIS_MailSendSuccessfully") + ".";
+                                    }
                                 }
                             }
                         }
                         else
                         {
-                            log.Fine("Enter Email Address");
-                            return "";
+                            log.Fine(Msg.GetMsg(GetCtx(), "NoEmailAddressFound"));
+                            return Msg.GetMsg(GetCtx(), "NoEmailAddressFound");
                         }
                     }
+          
                 }
                 else
                 {
-                    if (message.Length > 0 && message.EndsWith(", "))
-                    {
-                        message = message.Substring(0, message.Length - 2);
-                    }
-                    return Msg.GetMsg(GetCtx(), "VIS_OrgAccessMandatory") +" "+ message +" "+ Msg.GetMsg(GetCtx(), "VIS_DoNotOrgAccess");
+                    return Msg.GetMsg(GetCtx(), "VIS_AssingedRole") + ": \"" + message + "\" " + Msg.GetMsg(GetCtx(), "VIS_DoNotOrgAccess");
                 }
             }
             return Msg.GetMsg(GetCtx(), "VIS_RoleRequired");

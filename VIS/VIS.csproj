@@ -196,6 +196,7 @@
     <Content Include="Areas\VIS\Content\GroupStyle.css" />
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
     <Content Include="Areas\VIS\Content\Home.css" />
+    <Content Include="Areas\VIS\Content\Images\bg-patt.svg" />
     <Content Include="Areas\VIS\Content\Images\logo.png" />
     <Content Include="Areas\VIS\Content\Images\mail.svg" />
     <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
