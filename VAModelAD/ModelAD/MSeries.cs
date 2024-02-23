@@ -921,8 +921,8 @@ namespace VAdvantage.Model
         {
             //currently 3 types of date types are supported : daily, monthly, yearly
             string s_reportType = this.GetDateTimeTypes();
-            StringBuilder sb = new StringBuilder("TO_Date(").Append(colName);
-            sb.Append(",").Append("'" + customFormat + "'");
+            StringBuilder sb = new StringBuilder("CAST(").Append(colName);
+            sb.Append(" AS ").Append("DATE");
 
             sb.Append(")");
             return sb.ToString();
