@@ -1,7 +1,5 @@
 ﻿.VIS-logo-wrap,
-.VIS-sidebarBgImg,
 .VIS-main-container,
-.VIS-sidebar-wrap,
 .VIS-frm-btnwrap,
 .VIS-frm-data label,
 .VIS-frm-row,
@@ -10,7 +8,7 @@
     display: flex;
 }
 
-.VIS-sidebar-wrap,
+
 .VIS-middle-align {
     justify-content: center;
 }
@@ -33,30 +31,22 @@
     color: var(--va-bg3);
 }
 
-.VIS-sidebarBgImg {
+.VIS-sidebarInnerWrap {
     width: 100%;
     background-image: url('../Images/girl.svg');
     background-size: cover;
     background-blend-mode: overlay;
     background-repeat: no-repeat;
-    position: absolute;
     height: 100%;
-    z-index: 0;
     background-color: rgba(var(--v-c-primary),1);
-    filter: opacity(0.95);
-    left: 0;
-}
-
-.VIS-sidebarInnerWrap {
-    z-index: 1;
     display: flex;
     flex-direction: column;
-    color: var(--white);
-    height: 100%;
+    color: rgba(var(--v-c-on-primary),1);
+    padding: 1rem;
 }
 
 .VIS-logo-wrap {
-    align-items: flex-start;
+    justify-content: end;
 }
 
 .VIS-SideTextWrap {
@@ -64,6 +54,10 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    flex: 1;
+}
+.VIS-SideTextWrap h2 {
+    font-size: 1.4rem;
 }
 
 .VIS-content-wrap {
@@ -188,45 +182,10 @@
 }
 
 .VIS-sidebar-wrap {
-    background-color: var(--va-blue);
     width: 350px;
-    padding: 1rem;
-    flex-direction: column;
     position: relative;
 }
 
-.VIS-sidebarBgImg {
-    width: 100%;
-    background-image: url('../Images/girl.svg');
-    background-size: cover;
-    background-blend-mode: overlay;
-    background-repeat: no-repeat;
-    position: absolute;
-    height: 100%;
-    z-index: 0;
-    background-color: rgba(var(--v-c-primary),1);
-    filter: opacity(0.95);
-    left: 0;
-}
-
-.VIS-sidebarInnerWrap {
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    color: var(--white);
-    height: 100%;
-}
-
-.VIS-logo-wrap {
-    align-items: flex-start;
-}
-
-.VIS-SideTextWrap {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
 
 .VIS-poweredBy {
     align-items: flex-end;
@@ -251,7 +210,6 @@
     .VIS-logo-wrap,
     .VIS-sidebarBgImg,
     .VIS-main-container,
-    .VIS-sidebar-wrap,
     .VIS-frm-btnwrap,
     .VIS-frm-data label,
     .VIS-frm-row,
@@ -260,7 +218,7 @@
         display: flex;
     }
 
-.VIS-sidebar-wrap,
+
 .VIS-middle-align {
     justify-content: center;
 }

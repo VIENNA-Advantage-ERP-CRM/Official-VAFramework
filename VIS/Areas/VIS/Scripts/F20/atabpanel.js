@@ -111,7 +111,7 @@
                 }
                 if (!height) {
                     height = VIS.Env.getScreenHeight() - 225;
-                    if (this.gTab.isHeaderPanel) {
+                    if (this.gTab.getIsHeaderPanel()) {
                         height = height - VIS.Utility.Util.getValueOfInt(this.curTabPanel.curTab.getHeaderHeight().replace('px', ' ')) - 10;
                     }
                 }
