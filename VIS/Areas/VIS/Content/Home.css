@@ -233,6 +233,28 @@ ul.vis-userLinks-ListMenu li, ul.vis-userLinks-ListMenu li * {
             color: rgba(var(--v-c-on-secondary), 1);
             font-size: 1.2rem;
         }
+.userLinks_activeTab a,
+#favLinks .row.userFavs_inactiveTab a,
+.vis-welcomeScreenTabMenu li a {
+    border: 1px solid transparent;
+}
+    .vis-welcomeScreenTabMenu li a:focus,
+    .vis-feedicon:focus,
+    .vis-feedMessage:focus-within,
+    .vis-viewMoreComments:focus,
+    .userLinks_activeTab a:focus,
+    #favLinks .row.userFavs_inactiveTab a:focus,
+    .vis-welcomeScreenTabMenu li a:focus {
+        border-color: rgba(var(--v-c-primary), 1);
+    }
+.vis-feedTitleBar-buttons ul li a:focus {
+    border: 1px solid rgba(var(--v-c-primary), 1);
+}
+
+.vis-welcomeScreenTabMenu li.vis-activeTab a:focus {
+    box-shadow: 0 0 6px rgba(var(--v-c-primary), 1);
+}
+
 
             .vis-welcomeScreenTabMenu li a:hover {
                 /*background-color: #eeeeee;*/
@@ -1135,13 +1157,14 @@ html[dir="rtl"] .vis-feedDateTime {
     /*background-image: url('../Images/home/comments.png');*/
     background-repeat: no-repeat;
     color: rgba(var(--v-c-primary), 1);
-    padding-left: 22px;
+    /*padding-left: 22px;*/
     text-decoration: none !important;
     -webkit-transition: all 0.5s; /*For Safari 3.1 to 6.0*/
     transition: all 0.5s;
     font-size: 12px;
     float: right;
     margin-right: 10px;
+    border: 1px solid transparent;
 }
 
     .vis-viewMoreComments:hover {
@@ -1530,10 +1553,10 @@ ul.vis-userLinks-ListMenu, ul.vis-userFavourites-ListMenu {
     ul.vis-userLinks-ListMenu li, ul.vis-userFavourites-ListMenu li {
         /*float: left;
         width: 30%;*/
-        border: 1px solid rgba(var(--v-c-primary), 1);
+        /*border: 1px solid rgba(var(--v-c-primary), 1);*/
         /*text-align: center;*/
         /*margin: 0px 10px 10px 0px;*/
-        padding: 10px;
+       /* padding: 10px;*/
         display: flex;
         cursor: pointer;
     }
@@ -1569,6 +1592,15 @@ ul.vis-userLinks-ListMenu li a {
     flex-direction: column;
     align-items: center;
     color: rgba(var(--v-c-primary), 1);
+    flex: 1;
+    height: 100%;
+    justify-content: center;
+    border: 1px solid rgba(var(--v-c-primary), .5);
+    padding: 0.625rem;
+}
+
+ul.vis-userLinks-ListMenu li a:focus {
+    border-color: rgba(var(--v-c-primary), 1);
 }
 
 ul.vis-userLinks-ListMenu li:last-child {

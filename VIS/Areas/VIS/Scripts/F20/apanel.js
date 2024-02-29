@@ -3728,6 +3728,10 @@
             this.curWinTab.notifyDataChanged(e);
         }
 
+        if (this.curTab.getParentTab() && this.aSharedRecord) {
+            this.curTab.loadShared();
+            this.aSharedRecord.setPressed(this.curTab.hasShared());
+        }
 
         /******End Header Panel******/
 
