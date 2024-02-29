@@ -814,8 +814,12 @@
 
                 if (self.ctrl.parent().length != 0)
                     self.ctrl.detach();
-
+             
                 self.editingGrid.editChange.call(self.editingGrid, self.ctrl[0], self.gridPos.index, self.gridPos.col, evt, evt.newValue);
+                if (self.oldValue == evt.newValue)// special handling
+                {
+                    self.vetoablechangeListner.vetoablechange(evt);
+                }
                 self = null;
                 evt = null;
             }, 10, this);
