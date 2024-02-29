@@ -1,7 +1,7 @@
 ﻿
 ; $(function () {
     var user = 11;
-
+    var provider = null;
     //var contextUrl = '/';
 
     var getValidationSummaryErrors = function ($form) {
@@ -69,18 +69,8 @@
 
                     if (json.step2) {
                         //TODO init 
-                        showLogin2();
-                        user = json.ctx.AD_User_ID;
-
-                        /*Set context form local Ini */
-
-                        $('#login1Data').val(JSON.stringify(json.ctx));
-                        localStorage.setItem("vis_login_langCode", $cmbLang.val());
-                        fillCombo($cmbRole, json.role);
-                        $btnLogin1.prop('disabled', false);
-                        $btnLogin2.prop('disabled', false);
-                        $backButton.prop('disabled', false);
-                        $imgbusy1.css('display', 'none');
+                        showLogin2(json);
+                      
                     }
                     else if (json.ctx && json.ctx.ResetPwd) {
                         $imgbusy1.css('display', 'none');
@@ -158,7 +148,7 @@
         return true;
     };
 
-    function showLogin2() {
+    function showLogin2(json) {
         $("#loginPanel").hide();//"slide", function () {
         $("#login2Panel").show();//"slide", function () {
         $("#roleName").focus();
@@ -167,6 +157,19 @@
         $cmbWarehouse.empty();
         $("#login2Panel").find("ul").empty();
         $(".login-content").show();
+
+        user = json.ctx.AD_User_ID;
+
+        /*Set context form local Ini */
+
+        $('#login1Data').val(JSON.stringify(json.ctx));
+        localStorage.setItem("vis_login_langCode", $cmbLang.val());
+        fillCombo($cmbRole, json.role);
+        $btnLogin1.prop('disabled', false);
+        $btnLogin2.prop('disabled', false);
+        $backButton.prop('disabled', false);
+        $imgbusy1.css('display', 'none');
+
     };
 
     var showLoginResetPwd = function () {
@@ -196,12 +199,20 @@
     }
 
     var showLogin = function (e) {
+        if (provider) {
+            var form = document.createElement('form');
+            form.action = 'Account/LogOff';
+            form.method = 'post';
+            document.body.appendChild(form);
+            form.submit();            
+        }
         $("#login3Data1").val(false);
         $("#login2Panel").hide();//  "slide", function () {
         $("#loginPanel").show();//"slide", function () {
         $("#loginName").focus();
         $imgAuto.hide();
         e.preventDefault();
+        
     };
 
     var showLogin1 = function () {
@@ -470,6 +481,11 @@
         $txtUser.focus();
     }
 
+    if (isStep2Validate) {
+        showLogin2(ModelData.Data);
+        provider = ModelData.Data.provider;
+    }
+  
 
 });
 

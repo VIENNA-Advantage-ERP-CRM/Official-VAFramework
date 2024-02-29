@@ -994,6 +994,48 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(lst), JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult RoleSetup()
+        {
+            var model = TempData["LoginModel"] as LoginModel;
+            var RoleList = new List<KeyNamePair>();
+            var ClientList = new List<KeyNamePair>();
+            var OrgList = new List<KeyNamePair>();
+            var WareHouseList = new List<KeyNamePair>();
+            string username = "";
+
+            IDataReader drRoles = LoginHelper.GetRoles(model.Login1Model.UserValue, false, false);
+            int AD_User_ID = 0;
+            if (drRoles.Read())
+            {
+                do  //	read all roles
+                {
+                    AD_User_ID = Util.GetValueOfInt(drRoles[0].ToString());
+                    int AD_Role_ID = Util.GetValueOfInt(drRoles[1].ToString());
+                    String Name = drRoles[2].ToString();
+                    KeyNamePair p = new KeyNamePair(AD_Role_ID, Name);
+                    RoleList.Add(p);
+                    username = Util.GetValueOfString(drRoles["username"].ToString());
+                }
+                while (drRoles.Read());
+            }
+            drRoles.Close();
+
+            //ClientList = LoginHelper.GetClients(ctx.GetAD_Role_ID());// .Add(new KeyNamePair(ctx.GetAD_Client_ID(), ctx.GetAD_Client_Name()));
+            //OrgList = LoginHelper.GetOrgs(ctx.GetAD_Role_ID(), ctx.GetAD_User_ID(), ctx.GetAD_Client_ID());// .Add(new KeyNamePair(ctx.GetAD_Org_ID(), ctx.GetAD_Org_Name()));
+            //WareHouseList = LoginHelper.GetWarehouse(ctx.GetAD_Org_ID());// .Add(new KeyNamePair(ctx.GetAD_Warehouse_ID(), ctx.GetContext("#M_Warehouse_Name")));
+
+
+
+            ViewBag.RoleList = RoleList;
+            ViewBag.JsonData = TempData["result"];
+
+            //ViewBag.ClientList = ClientList;
+            //ViewBag.OrgList = OrgList;
+            //ViewBag.WarehouseList = WareHouseList;
+
+
+            return View("RoleSetup");
+        }
     }
 
 

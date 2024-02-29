@@ -359,9 +359,44 @@ else //Login Page
     </div>
 
     @section scripts {
+        <script>
+            var isStep2Validate = @Html.Raw(Json.Encode(TempData["isStep2Validate"]));
+            var ModelData = @Html.Raw(Json.Encode(TempData["ModelData"]));
+            if (isStep2Validate) {
+                $("#loginPanel").hide();
+            }
+        </script>
         <link type="text/css" href="~/Areas/VIS/Content/Login.css" rel="stylesheet" />
         <script type="text/javascript">  var contextUrl = '@Url.Content("~/")'  </script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/globalize.js"></script>
         <script src="~/Areas/VIS/Scripts/app/ajaxlogin.js"></script>
+        <script>
+           
+            //if (json) {
+              // window.showLogin2();
+                //var $cmbRole = $("#role");
+                //var $cmbClient = $("#client");
+                //var $cmbOrg = $("#org");
+                //var $cmbWarehouse = $("#warehouse");
+
+                //$("#loginPanel").hide();//"slide", function () {
+                //$("#login2Panel").show();//"slide", function () {
+                //$("#roleName").focus();
+                //$cmbClient.empty();
+                //$cmbOrg.empty();
+                //$cmbWarehouse.empty();
+                //$("#login2Panel").find("ul").empty();
+                //$(".login-content").show();
+
+                //$('#login1Data').val(JSON.stringify(json.ctx));
+                //localStorage.setItem("vis_login_langCode", $cmbLang.val());
+                //fillCombo($cmbRole, json.role);
+                //$btnLogin1.prop('disabled', false);
+                //$btnLogin2.prop('disabled', false);
+                //$backButton.prop('disabled', false);
+                //$imgbusy1.css('display', 'none');
+
+            //}
+        </script>
     }
 }

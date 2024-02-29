@@ -74,7 +74,15 @@ namespace VIS.Controllers
                 LoginModel model = new LoginModel();
                 model.Login1Model = new Login1Model();
                 model.Login1Model.UserValue = Util.GetValueOfString(DS.Tables[0].Rows[0]["value"]);
-                CommonLogin(model, "/", true);
+                var result = CommonLogin(model, "/", true);
+                dynamic data = result.Data;
+                if (data !=null && data.GetType().GetProperty("step2") !=null && (bool)data.step2)
+                {
+                    //TempData["LoginModel"] = model;
+                    TempData["ModelData"] = result;
+                    TempData["isStep2Validate"] = true;
+                    //return RedirectToAction("RoleSetup", "Home");
+                }
             }
             else
             {
@@ -249,7 +257,9 @@ namespace VIS.Controllers
             }
             //System.Threading.Thread.Sleep(10000);
             //FormsAuthentication.SetAuthCookie(model.Login1Model.UserName, false);
-            return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model });
+            HttpCookie cookie = Request.Cookies["ProviderType"];
+
+            return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model, provider= cookie?.Value });
         }
 
         [AllowAnonymous]
@@ -311,6 +321,7 @@ namespace VIS.Controllers
             return Json(new { errors = GetErrorsFromModelState() });
         }
 
+      
         /// <summary>
         /// set authorize cookie in response object
         /// </summary>

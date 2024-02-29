@@ -10,9 +10,12 @@
         <div class="vis-logoutMsgWrp">
             <div class="vis-logoutmsgAlert">
                 <p>
-                    You do not have authorization to access our system.
-                    Please reach out to the system administrator for assistance.
-                    You will be redirected to the Single Sign-On (SSO) logout page in
+                    @{ 
+                        string lang = Model.Login1Model.LoginLanguage;
+                        string message = VAdvantage.Utility.Msg.GetMsg(lang, "VIS_UnAuthorization");
+                    }
+                    @message
+                   
                     <span id="countdown"></span>.
                 </p>
 
@@ -50,7 +53,11 @@
     }
             // Start the countdown when the page is loaded
             document.addEventListener('DOMContentLoaded', function () {
-                startCountdown(5); // Start countdown for 5 seconds
+                if (!isStep2Validate) {
+                    startCountdown(5); // Start countdown for 5 seconds
+                } else {
+                    $('.vis-logoutMsgWrp').hide();
+                }
             });
         </script>
 

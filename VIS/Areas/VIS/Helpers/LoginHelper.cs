@@ -916,7 +916,8 @@ namespace VIS.Helpers
         {
             List<ExternalLogin> list = new List<ExternalLogin>();
             DataSet DS = DB.ExecuteDataset(@"SELECT sso_configuration.sso_configuration_ID, AD_Ref_List.value,ad_ref_list.name, 
-(SELECT COALESCE(FontName,ImageURL)||'|'|| NVL(FontStyle,'') FROM AD_Image WHERE AD_Image_ID=sso_configuration.AD_Image_ID) AS ImageIco
+(SELECT COALESCE(FontName,ImageURL)||'|'|| NVL(FontStyle,'') FROM AD_Image 
+WHERE AD_Image_ID=sso_configuration.AD_Image_ID) AS ImageIco
 FROM sso_configuration 
                         INNER JOIN AD_Ref_List  ON AD_Ref_List.Value=sso_configuration.Provider
                         WHERE sso_configuration.IsActive='Y' AND AD_Reference_ID IN (
@@ -931,10 +932,15 @@ FROM sso_configuration
                     {
                         icon = "<i class='" + icon.Split('|')[0] + "' style='" + icon.Split('|')[1] + "' ></i>";
                     }
-                    else
+                    else if(!string.IsNullOrEmpty(icon.Split('|')[0]))
                     {
                         icon = "<img src='" + icon.Split('|')[0] + "' style='" + icon.Split('|')[1] + "'/>";
+                    }                   
+                    else
+                    {
+                        icon = null;
                     }
+
                     ExternalLogin obj = new ExternalLogin()
                     {
                         Provider = Util.GetValueOfString(DS.Tables[0].Rows[i]["value"]).ToLower(),

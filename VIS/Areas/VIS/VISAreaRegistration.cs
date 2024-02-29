@@ -214,12 +214,12 @@ namespace VIS
 
 
 
-            style.Include("~/Areas/VIS/Content/VIS.all.min.css");
-            modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js",
-                "~/Areas/VIS/Scripts/React.min.js"
+            style.Include("~/Areas/VIS/Content/VIS.all.min{version}.css");
+            modScript.Include("~/Areas/VIS/Scripts/VIS.all.min{version}.js",
+                "~/Areas/VIS/Scripts/React.min{version}.js"
                 );
             modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
-            modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");
+            modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min{version}.js");
 
 
 
