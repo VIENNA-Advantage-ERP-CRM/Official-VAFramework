@@ -35,10 +35,10 @@ deleteLicenseFiles(path.resolve(__dirname, 'Areas/VIS/Content'));
 
 
 const versions = {
-    'VIS.all': '13.0.0',
-    'VIS2_0': '13.1.0',
-    'React': '13.0.0',
-    'VIS': '13.0.0'
+    'VIS.all': '16.0.0',
+    'VIS2_0': '16.1.0',
+    'React': '16.0.0',
+    'VIS': '16.0.0'
 };
 
 module.exports = {
@@ -95,15 +95,13 @@ module.exports = {
                 const version = versions[name] || '1.0.0'; // Default version if not specified
                 return `../Content/${name}.all.min${version}.css`;
             },
-           
-            //filename: 'Content/[name].all.min.css',
-        }),       
+        }),
     ],
     optimization: {
+        minimize: true, // Webpack 5 uses "minimize" instead of "minimizer"
         minimizer: [
             new CssMinimizerPlugin(), // Minify CSS
             new TerserPlugin(), // Minify JavaScript
         ]
     },
-
 };
