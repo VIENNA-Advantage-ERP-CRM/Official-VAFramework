@@ -211,7 +211,8 @@ select.vis-ev-col-mandatory {
 .vis-ev-col .vis-input-wrap .vis-control-wrap select:focus,
 .vis-ev-col .vis-input-wrap .vis-control-wrap textarea:focus,
 .vis-control-wrap > button:focus,
-button.vis-ev-col-img-ctrl:focus {
+button.vis-ev-col-img-ctrl:focus, 
+.vis-ec-col-lblchkbox input:focus {
     border: 1px solid rgba(var(--v-c-primary), 1) !important;
 }
 
@@ -585,7 +586,7 @@ input[type="radio"]:checked {
 }
 input[type="checkbox"]:focus, 
 input[type="radio"]:focus {
-    border: 1px solid rgba(var(--v-c-primary), 1);
+    border: 1px solid rgba(var(--v-c-primary), 1) !important;
 }
 input[type="checkbox"]:checked:before,
 input[type="radio"]:checked:before {

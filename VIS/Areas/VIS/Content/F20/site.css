@@ -87,7 +87,7 @@ select {
 }
 
 .vis-app-hdr a:focus {
-    color: rgba(var(--v-c-primary), 1);
+    border-color: rgba(var(--v-c-primary), 1);
 }
 
 .vis-app-hdr-l {
@@ -158,16 +158,21 @@ select {
     .vis-app-hdr-r-user a {
         padding-right: 5px;
         cursor: pointer;
+        border: 1px solid transparent;
     }
+        .vis-app-hdr-r-user a:focus {
+            border-color: rgba(var(--v-c-primary), 1);
+        }
 
 .vis-app-hdr-r-logout {
     font-size: 1.4rem;
     margin-right: 2px;
     display: flex;
     /*padding: 6px;*/
-    border-radius: 10px;
+    /*border-radius: 10px;*/
     /*background-color: rgba(var(--v-c-primary),1);*/
     color: rgba(var(--v-c-on-secondary), 0.5);
+    border: 1px solid transparent;
 }
 
 .vis-app-overlay {

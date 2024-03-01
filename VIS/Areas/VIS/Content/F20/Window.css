@@ -1208,12 +1208,14 @@ label.vis-css-treewindow-selected, label.vis-css-treewindow-selected:before {
     }
 
     .vis-ad-w-p-s-plst li select {
-        border: none;
+       /* border: none;*/
         background-color: transparent;
+        border: 1px solid transparent;
     }
 
         .vis-ad-w-p-s-plst li select:focus {
             outline: none;
+            border-color: rgba(var(--v-c-primary), 1);
         }
 
 li.vis-page-item-select {
@@ -2623,12 +2625,13 @@ html[dir="rtl"] .vis-window-instruc-overlay-new-inn {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
-.vis-ad-w-p-inc-tabs-oflow a:focus {
+.vis-ad-w-p-inc-tabs-oflow a:focus, .vis-ad-w-p-tabs-oflow a:focus {
     box-shadow: 0 0 10px rgba(var(--v-c-primary), .7);
     padding: 0;
 }
 
-.vis-ad-w-p-inc-tabs-oflow a {
+.vis-ad-w-p-inc-tabs-oflow a,
+.vis-ad-w-p-tabs-oflow a {
     width: 25px;
     height: 25px;
     display: flex;
