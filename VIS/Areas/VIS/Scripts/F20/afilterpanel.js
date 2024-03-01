@@ -730,7 +730,7 @@
                         ;
                     }
                     else {
-                        var $InputLabel1 = $('<label>Query Value To</label>');
+                        var $InputLabel1 = $('<label>'+ VIS.Msg.getMsg("VIS_QueryValueTo") +'</label>');
                         valueInputWrap.append($InputLabel1);
                     }
                 }
