@@ -1319,12 +1319,12 @@
         }
 
         if (value == null || value.toString().length < 1) {
-            if (VIS.Query.prototype.BETWEEN.equals(optr))
-                return whereCondition;
+            /*if (VIS.Query.prototype.BETWEEN.equals(optr))
+                return whereCondition;*/
             parsedValue = VIS.Env.NULLString;
 
         }
-        if (field.getDisplayType() == VIS.DisplayType.DateTime && VIS.Query.prototype.BETWEEN.equals(optr)) {
+        if (VIS.DisplayType.IsDate(field.getDisplayType()) && VIS.Query.prototype.BETWEEN.equals(optr)) {
             parsedValue2 = this.parseValue(field, value2);
         }
         if (field.getIsVirtualColumn()) {
@@ -1332,11 +1332,12 @@
             columnName = field.vo.ColumnSQL;
             if (VIS.Query.prototype.BETWEEN.equals(optr)) {
 
-                if (value2 == null || value2.toString().trim().length < 1)
-                    return whereCondition;
+                if (value2 == null || value2.toString().trim().length < 1) {
+                    parsedValue = null;
+                    parsedValue2 = null;
+                    // return whereCondition;
+                }
                 parsedValue2 = this.parseValue(field, value2);
-                if (parsedValue2 == null || parsedValue == null)
-                    return whereCondition;
                 whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true);
             }
             else {
@@ -1368,10 +1369,13 @@
             }
             //	Value2
             // if "BETWEEN" selected
-            if (VIS.Query.prototype.BETWEEN.equals(optr)) {              
+            if (VIS.Query.prototype.BETWEEN.equals(optr)) {
                 value2 = parsedValue2;
-                if (value2 == null || value2.toString().trim().length < 1)
-                    return whereCondition;
+                if (value2 == null || value2.toString().trim().length < 1) {
+                    parsedValue = null
+                    parsedValue2 = null;
+                    //return whereCondition;
+                }
                 if (field.getDisplayType() == VIS.DisplayType.AmtDimension) {
                     var sqlAmount = S + E + L + elt + " " + tabName + "_ID " + F + R + OM + " " + tabName + " " + WH + E + R + E + " " + isAct + "='Y' AND " + amt + " " + optr + value + " AND " + value2;
                     parsedValue = VIS.MRole.getDefault().addAccessSQL(sqlAmount.toString(), "C_DimAmt",
