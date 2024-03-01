@@ -331,7 +331,7 @@
             html += '<button id="btnRefresh_' + windowNo + '" class="ui-button ui-corner-all ui-widget">' + VIS.Msg.getMsg("Refresh") + '</button>'
                 + '<div class="vis-pull-right">'
                 + '<button id="btnOk_' + windowNo + '" class="ui-button ui-corner-all ui-widget" >' + VIS.Msg.getMsg("Apply") + '</button>'
-                + '  <button id="btnCancel_' + windowNo + '" class="ui-button ui-corner-all ui-widget"  style="margin: 0 10px;">' + VIS.Msg.getMsg("close") + '</button>'
+                + '  <button id="btnCancel_' + windowNo + '" class="ui-button ui-corner-all ui-widget"  style="margin: 0 10px;">' + VIS.Msg.getMsg("Close") + '</button>'
 
                 + '</div>'
                 + '</div>'
@@ -1387,8 +1387,11 @@
 
             var cVal = drpColumns.val();
 
-            if (!cVal || cVal == "-1")
+            if (!cVal || cVal == "-1") {
+                colValue = -1;
                 return false;
+            }
+                
 
             var colName = drpColumns.find("option:selected").text();
             var colValue = "";

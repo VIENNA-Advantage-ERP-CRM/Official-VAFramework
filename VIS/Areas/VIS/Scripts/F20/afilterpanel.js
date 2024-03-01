@@ -43,7 +43,7 @@
             '                     <div class="vis-fp-valuethree">                              ' +
             '                     </div>                                                       ' +
             '                     <div class="vis-fp-cc-addbtnwrp">                            ' +
-            '                         <span class="vis-fp-cc-addbutton">' + VIS.Msg.getMsg("Add") + '</span>             ' +
+            '                         <span class="vis-fp-cc-addbutton">' + VIS.Msg.getMsg("ADD") + '</span>             ' +
             '                     </div>                                                       ' +
             '                 </div>                                                           ' +
             '             </div>                                                               ' +
