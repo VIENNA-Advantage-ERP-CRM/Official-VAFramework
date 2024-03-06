@@ -65,8 +65,9 @@ namespace VAdvantage.Process
 			}
 			if (p_AD_TableIndex_ID > 0 && p_Delete)    //Delete Contraints
 			{
-				int aValue = DB.ExecuteQuery("ALTER TABLE " + tableName + " DROP CONSTRAINT " + indexName);
-				if (aValue < 0)
+				string sql = index.GetDropDDL();
+				int aValue = DB.ExecuteQuery(sql);
+				if (aValue == -1)					
 				{
 					return Msg.GetMsg(ctx, "NotExistConstraints");
 				}
