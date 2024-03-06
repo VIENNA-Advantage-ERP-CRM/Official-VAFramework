@@ -1,4 +1,5 @@
-﻿; (function (VIS, $) {
+﻿window.VIS = window.VIS || {};
+; (function (VIS, $) {
     VIS.React = VIS.React || {};
     VIS.React = function () { }
 

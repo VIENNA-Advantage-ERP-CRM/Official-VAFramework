@@ -78,7 +78,7 @@ namespace VIS.Controllers
                 dynamic data = result.Data;
                 if (data !=null && data.GetType().GetProperty("step2") !=null && (bool)data.step2)
                 {
-                    //TempData["LoginModel"] = model;
+                    TempData["LoginModel"] = model.Login1Model;
                     TempData["ModelData"] = result;
                     TempData["isStep2Validate"] = true;
                     //return RedirectToAction("RoleSetup", "Home");
@@ -336,6 +336,7 @@ namespace VIS.Controllers
                 // Setting
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Login1Model.UserValue));
                 claims.Add(new Claim(ClaimTypes.UserData, JsonHelper.Serialize(lCtx)));
+                claims.Add(new Claim(ClaimTypes.IsPersistent,  model.Login1Model.RememberMe?"true":"false"));
                 claims.Add(new Claim("Authorization", "true"));
                 var claimIdenties = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
                 var ctx = Request.GetOwinContext();
@@ -387,46 +388,70 @@ namespace VIS.Controllers
                 //model.Login1Model = JsonHelper.Deserialize(model.Login2Model.Login1Data, typeof(Login1Model)) as Login1Model;
 
                 LoginContext lCtx = LoginHelper.GetLoginContext(model, Session["Ctx"] as VAdvantage.Utility.Ctx);
-
-
-                if (!string.IsNullOrEmpty(User.Identity.Name))
-                {
-                    //Response.Cookies.Clear();
-
-                    //DateTime expiryDate = DateTime.Now.AddDays(30);
-
-                    HttpCookie authCookie = FormsAuthentication.GetAuthCookie(User.Identity.Name, true);// , User.Identity. .Name);
-
-                    //if (model.Login1Model.RememberMe)
-                    //{
-                    //    authCookie.Expires = expiryDate;
-                    //}
-
-                    FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
-
-                    FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
-
-                    // Update the authCookie's Value to use the encrypted version of newTicket
-
-                    // authCookie.Value = FormsAuthentication.Encrypt(newTicket);
-
-                    //Response.Cookies.  .Add(authCookie);
-
-                    Response.Cookies[".ASPXAUTH"].Value = FormsAuthentication.Encrypt(newTicket);
-
-                    // Determine redirect URL and send user there
-
-                    //string redirUrl = FormsAuthentication.GetRedirectUrl(model.Login1Model.UserName, false);
-
-                    //RedirectToAction("Index", "Home");
-                    // return;
-                    //Response.Redirect(redirUrl);
-
-                    //FormsAuthentication.SetAuthCookie(login1Model.UserName, false);
-
-                    // TempData["LoginModel"] = model;
-                    return Json(new { success = true });
+                var userClaims = System.Security.Claims.ClaimsPrincipal.Current;
+                var UserData = userClaims?.FindFirst(ClaimTypes.UserData)?.Value;
+                if (!string.IsNullOrEmpty(UserData)) {
+                    var claims = new List<Claim>();
+                    //LoginContext lCtx = LoginHelper.GetLoginContext(model);
+                    try
+                    {
+                        // Setting
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, userClaims?.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+                        claims.Add(new Claim(ClaimTypes.UserData, JsonHelper.Serialize(lCtx)));
+                        claims.Add(new Claim("Authorization", "true"));
+                        var claimIdenties = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+                        var ctx = Request.GetOwinContext();
+                        var authenticationManager = ctx.Authentication;
+                        // Sign In.
+                        authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = Util.GetValueOfBool(userClaims?.FindFirst(ClaimTypes.IsPersistent)?.Value) }, claimIdenties);
+                        return Json(new { success = true });
+                    }
+                    catch (Exception ex)
+                    {
+                        // Info
+                        throw ex;
+                    }
                 }
+
+
+                //if (!string.IsNullOrEmpty(User.Identity.Name))
+                //{
+                //    //Response.Cookies.Clear();
+
+                //    //DateTime expiryDate = DateTime.Now.AddDays(30);
+
+                //    HttpCookie authCookie = FormsAuthentication.GetAuthCookie(User.Identity.Name, true);// , User.Identity. .Name);
+
+                //    //if (model.Login1Model.RememberMe)
+                //    //{
+                //    //    authCookie.Expires = expiryDate;
+                //    //}
+
+                //    FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
+
+                //    FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
+
+                //    // Update the authCookie's Value to use the encrypted version of newTicket
+
+                //    // authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+
+                //    //Response.Cookies.  .Add(authCookie);
+
+                //    Response.Cookies[".ASPXAUTH"].Value = FormsAuthentication.Encrypt(newTicket);
+
+                //    // Determine redirect URL and send user there
+
+                //    //string redirUrl = FormsAuthentication.GetRedirectUrl(model.Login1Model.UserName, false);
+
+                //    //RedirectToAction("Index", "Home");
+                //    // return;
+                //    //Response.Redirect(redirUrl);
+
+                //    //FormsAuthentication.SetAuthCookie(login1Model.UserName, false);
+
+                //    // TempData["LoginModel"] = model;
+                //    return Json(new { success = true });
+                //}
                 else
                 {
                     ModelState.AddModelError("", "FillMandatoryFields");
