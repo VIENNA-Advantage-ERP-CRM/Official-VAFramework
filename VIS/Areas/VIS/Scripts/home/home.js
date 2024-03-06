@@ -1031,10 +1031,10 @@
                             else {
                                 if (isFllScroll == false) {
                                     if (VIS.Application.isRTL) {
-                                        FllUpsMain.append("<p style='margin-top: 200px;text-align: center '>" + VIS.Msg.getMsg("NoRecordFound") + "!!!</p>");
+                                        FllUpsMain.append("<p style='margin-top: 200px;text-align: center '>" + VIS.Msg.getMsg("VIS_NotSubscribedYet") + "</p>");
                                     }
                                     else {
-                                        FllUpsMain.append("<p style='margin-top: 200px;text-align: center '>" + VIS.Msg.getMsg("NoRecordFound") + "!!!</p>");
+                                        FllUpsMain.append("<p style='margin-top: 200px;text-align: center '>" + VIS.Msg.getMsg("VIS_NotSubscribedYet") + "</p>");
                                     }
                                 }
                             }

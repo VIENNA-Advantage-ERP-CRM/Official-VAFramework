@@ -105,7 +105,6 @@
     /// <returns></returns>
 
     calloutColumn.prototype.buttonDisable = function (ctx, windowNo, mTab, mField, value, oldValue) {
-        debugger
 
         if (this.isCalloutActive() || value == null) {
             return;

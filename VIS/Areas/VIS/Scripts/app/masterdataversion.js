@@ -17,6 +17,8 @@
         this.gridCols = new Array();
         this.htmlUI = new Array();
 
+        this.busyInd = null;
+
         this.deletable = false;
         this.maintTblVer = mtnTblVer;
 
@@ -109,63 +111,72 @@
             if (ismvRunning)
                 return;
 
-            // callback function
-            if (self._callbackClose) {
-                ismvRunning = true;
+            self.setBusy(true);
+            setTimeout(function () {
+                // callback function
+                if (self._callbackClose) {
+                    ismvRunning = true;
 
-                var dtValidFromDate = dtValFrom.val();
-                if (!dtValidFromDate || dtValidFromDate == "")
-                    dtValidFromDate = new Date();
-                // Cases if save immediate is false
-                if (!chkImmSave.prop("checked") && (new Date(dtValFrom.val()) > new Date())) {
-                    // get rows from Dialog that are already saved
-                    var rows = masVerUI.find(".vis-mas-ver-recRow");
-                    var recordExist = false;
-                    var verRecID = 0;
-                    // if any records found then check 
-                    // whether there are any records saved already for the
-                    // date which user selected in Valid From Field
-                    if (rows.length > 0) {
-                        for (var i = 0; i < rows.length; i++) {
-                            var rowData = $(rows[i]);
-                            var valFromDt = rowData.find('.vis-mas-ver-valFromDate');
-                            var dateSaved = new Date($(valFromDt).attr('valdt')).getTime();
-                            var dateSelected = new Date(new Date(dtValFrom.val()).setHours(0, 0, 0, 0)).getTime();
-                            // if date matched then break
-                            if (dateSaved == dateSelected) {
-                                recordExist = true;
-                                verRecID = rowData.attr("recid");
-                                break;
+                    var dtValidFromDate = dtValFrom.val();
+                    if (!dtValidFromDate || dtValidFromDate == "")
+                        dtValidFromDate = new Date();
+                    // Cases if save immediate is false
+                    if (!chkImmSave.prop("checked") && (new Date(dtValFrom.val()) > new Date())) {
+                        // get rows from Dialog that are already saved
+                        var rows = masVerUI.find(".vis-mas-ver-recRow");
+                        var recordExist = false;
+                        var verRecID = 0;
+                        // if any records found then check 
+                        // whether there are any records saved already for the
+                        // date which user selected in Valid From Field
+                        if (rows.length > 0) {
+                            for (var i = 0; i < rows.length; i++) {
+                                var rowData = $(rows[i]);
+                                var valFromDt = rowData.find('.vis-mas-ver-valFromDate');
+                                var dateSaved = new Date($(valFromDt).attr('valdt')).getTime();
+                                var dateSelected = new Date(new Date(dtValFrom.val()).setHours(0, 0, 0, 0)).getTime();
+                                // if date matched then break
+                                if (dateSaved == dateSelected) {
+                                    recordExist = true;
+                                    verRecID = rowData.attr("recid");
+                                    break;
+                                }
                             }
                         }
-                    }
-                    // if record already exist for the date that user selected 
-                    // then return with message, either overwrite or cancel
-                    if (recordExist) {
-                        VIS.ADialog.confirm("VersionExistOverwrite", true, "", "Confirm", function (result) {
-                            // if user want to overwrite then versiont record will be overwritten for that date in version table
-                            if (result) {
-                                // call callback function
-                                self._callbackClose(chkImmSave.prop("checked"), dtValidFromDate, verRecID);
-                                gpDia.close();
-                                ismvRunning = false;
-                            }
-                            else
-                                ismvRunning = false;
-                        });
-                        return false;
+                        // if record already exist for the date that user selected 
+                        // then return with message, either overwrite or cancel
+                        if (recordExist) {
+                            VIS.ADialog.confirm("VersionExistOverwrite", true, "", "Confirm", function (result) {
+                                // if user want to overwrite then versiont record will be overwritten for that date in version table
+                                if (result) {
+                                    // call callback function
+                                    self._callbackClose(chkImmSave.prop("checked"), dtValidFromDate, verRecID);
+                                    gpDia.close();
+                                    ismvRunning = false;
+                                }
+                                else
+                                    ismvRunning = false;
+                            });
+                            return false;
+                        }
+                        else {
+                            self._callbackClose(chkImmSave.prop("checked"), dtValidFromDate, 0);
+                            ismvRunning = false;
+                            gpDia.close();
+                        }
                     }
                     else {
+                        // in case of save immediate call the callback function
                         self._callbackClose(chkImmSave.prop("checked"), dtValidFromDate, 0);
                         ismvRunning = false;
+                        gpDia.close();
                     }
                 }
-                else {
-                    // in case of save immediate call the callback function
-                    self._callbackClose(chkImmSave.prop("checked"), dtValidFromDate, 0);
-                    ismvRunning = false;
-                }
-            }
+                else
+                    gpDia.close();
+            }, 10);
+
+            return false;
         };
 
         gpDia.onCancelClick = function () {
@@ -268,7 +279,8 @@
             + '</div>'
             + '</div>'
             + this.getGrid(dr)
-            + '</div>');
+            + '</div>'
+            + '<div class="vis-busyindicatorouterwrap" style="visibility: hidden;"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
         return mvUI;
     };
 
@@ -459,6 +471,12 @@
 
     MasterDataVersion.prototype.getNoRecDiv = function () {
         return '<div class="vis-mas-ver-norecord">' + VIS.Utility.encodeText(VIS.Msg.getMsg("NoRecords")) + '</div>';
+    };
+
+    MasterDataVersion.prototype.setBusy = function (isbusy) {
+        var bsyDiv = this.busyInd;
+        if (bsyDiv)
+            bsyDiv.css("visibility", isbusy ? 'visible' : 'hidden');
     };
 
     VIS.MasterDataVersion = MasterDataVersion;

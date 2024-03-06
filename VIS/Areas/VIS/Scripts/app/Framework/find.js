@@ -222,7 +222,7 @@
                 + '</ul>'
                 + '</div></div>'
                 + '<div class="vis-advanedSearch-AddFilterWrap vis-pull-left">'
-                + '<label id="spnAddFilter_' + windowNo + '" class="vis-advancedSearch-AddFilter">' + VIS.Msg.getMsg("AddFilter") + '</label>'
+                + '<a href="javascript:;" id="spnAddFilter_' + windowNo + '" class="vis-advancedSearch-AddFilter">' + VIS.Msg.getMsg("AddFilter") + '</a>'
                 + '</div>'
                 + '  <div class="vis-as-backbtn"><button id="btnArowBack_' + windowNo + '" class="vis-ads-icon"><i class="fa fa-arrow-left" aria-hidden="true"></i></button></div> '
                 + '</div>'
