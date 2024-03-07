@@ -30,6 +30,7 @@ namespace VAdvantage.Process
         // Pcol (primary key column of table)
         private object Pcol = 0;
 
+        //Sequence check class
         private SequenceCheck clsSeqCheck = new SequenceCheck();
         #endregion
 
@@ -77,10 +78,7 @@ namespace VAdvantage.Process
                         MTable table = new MTable(GetCtx(), Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Table_ID"]), null);
                         CreateSequence(table, Get_TrxName());
                     }
-
                 }
-
-                 
 
                 ok = true;
                 //Update Db Sequence if

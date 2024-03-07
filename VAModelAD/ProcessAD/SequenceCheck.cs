@@ -75,8 +75,8 @@ namespace VAdvantage.Process
         /// <summary>
         /// Update value in DB Sequence if Native sequence is ON
         /// </summary>
-        /// <param name="ctx"></param>
-        /// <param name="sp"></param>
+        /// <param name="ctx">context</param>
+        /// <param name="sp">parent</param>
         internal  void CheckDBSequence(Ctx ctx, SvrProcess sp)
         {
             if (MSysConfig.IsNativeSequence(false))
@@ -118,10 +118,10 @@ namespace VAdvantage.Process
         /// <summary>
         /// Update DB sequence
         /// </summary>
-        /// <param name="tblName"></param>
-        /// <param name="ctx"></param>
-        /// <param name="trxName"></param>
-        /// <param name="sp"></param>
+        /// <param name="tblName">table name</param>
+        /// <param name="ctx">context</param>
+        /// <param name="trxName">trx object</param>
+        /// <param name="sp">parent class</param>
         private  void UpdateDBSequence(string tblName,Ctx ctx,Trx trxName,SvrProcess sp)
         {
             //var seqID =
