@@ -47,7 +47,8 @@ namespace VAdvantage.Process
             //
             CheckTableSequences(GetCtx(), this);
             CheckTableID(GetCtx(), this);
-            CheckClientSequences(GetCtx(), this);
+             CheckClientSequences(GetCtx(), this);
+            CheckDBSequence(GetCtx(), this);
             return "Sequence Check";
         }	//	doIt
 
@@ -59,15 +60,124 @@ namespace VAdvantage.Process
         {
             try
             {
-                CheckTableSequences(ctx, null);
-                CheckTableID(ctx, null);
-                CheckClientSequences(ctx, null);
+                SequenceCheck chk = new SequenceCheck();
+                chk.CheckTableSequences(ctx, null);
+                chk.CheckTableID(ctx, null);
+                chk.CheckClientSequences(ctx, null);
+                chk.CheckDBSequence(ctx, null);
             }
             catch (Exception e)
             {
                 _log.Log(Level.SEVERE, "validate", e);
             }
-        }	//	validate
+        }   //	validate
+
+        /// <summary>
+        /// Update value in DB Sequence if Native sequence is ON
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <param name="sp">parent</param>
+        internal  void CheckDBSequence(Ctx ctx, SvrProcess sp)
+        {
+            if (MSysConfig.IsNativeSequence(false))
+            {
+                Trx trx = null;
+                //First commit the transaction to get latest data if Db sequence is on
+                if (sp != null)
+                {
+                    trx = sp.Get_Trx();
+                    trx.Commit();
+                }
+
+                String sql = "SELECT * FROM AD_Sequence "
+                       + "WHERE IsTableID='Y' "
+                       + "ORDER BY Name";
+                DataSet ds = null;
+                
+                Trx trxName = null;
+                
+                try
+                {
+                    ds = DataBase.DB.ExecuteDataset(sql, null, null);
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        //Get Max value from Table_ID or AD_Sequence and update.
+                        //copare and update DB Sequence
+                        string tblName = ds.Tables[0].Rows[i]["Name"].ToString();
+                        UpdateDBSequence(tblName,ctx,trxName,sp);
+                        
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.Log(Level.SEVERE, sql, ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update DB sequence
+        /// </summary>
+        /// <param name="tblName">table name</param>
+        /// <param name="ctx">context</param>
+        /// <param name="trxName">trx object</param>
+        /// <param name="sp">parent class</param>
+        private  void UpdateDBSequence(string tblName,Ctx ctx,Trx trxName,SvrProcess sp)
+        {
+            //var seqID =
+            //VConnection.Get().GetDatabase().GetNextID(tblName + "_SEQ");
+            int seqID = 0;
+
+            //get id from Db sequence
+            seqID = DB.GetNextID(ctx, tblName, null) - 1; //11
+
+            if (seqID > 0) // positive
+            {
+                int increment = -1;
+                //Select maxium id
+                String sql0 = "SELECT MAX(" + tblName + "_ID) FROM " + tblName;
+
+                int maxTableID = DataBase.DB.GetSQLValue(null, sql0);//10
+                if (maxTableID > 0)
+                {
+                     int diff = maxTableID - seqID ;//10
+                    if (diff > 0) // incement in seq only one way
+                    {
+                        increment = diff + increment;
+                        seqID = maxTableID; //assign max
+                    }
+                }
+                //update db seq
+                if (increment != 0)
+                {
+                    if (DB.IsOracle())
+                    {
+                        DB.ExecuteQuery("ALTER SEQUENCE " + tblName + "_SEQ INCREMENT BY " + increment, null, null);
+                        DB.GetNextID(ctx, tblName, trxName);//10
+                        if (DB.ExecuteQuery("ALTER SEQUENCE " + tblName + "_SEQ INCREMENT BY 1", null, null) > -1)
+                        {
+                            sp.AddLog(0, null, null, "Sequence Updated For :" + tblName + "_SEQ");
+                        }
+                        else
+                        {
+                            sp.AddLog(0, null, null, "Sequence not Updated For :" + tblName + "_SEQ");
+                        }
+                    }
+                    else if (DB.IsPostgreSQL())
+                    {
+                        if (DB.ExecuteQuery("SELECT setval('" + tblName + "_seq'," + seqID + ", true)", null, null) > -1)
+                        {
+                            sp.AddLog(0, null, null, "Sequence Updated For :" + tblName + "_SEQ");
+                        }
+                        else
+                        {
+                            sp.AddLog(0, null, null, "Sequence not Updated For :" + tblName + "_SEQ");
+                        }
+                    }
+                }
+            }
+        }
+
 
 
 
@@ -76,7 +186,7 @@ namespace VAdvantage.Process
         /// </summary>
         /// <param name="ctx">context</param>
         /// <param name="sp">server process or null</param>
-        private static void CheckTableSequences(Ctx ctx, SvrProcess sp)
+        private  void CheckTableSequences(Ctx ctx, SvrProcess sp)
         {
             Trx trxName = null;
             if (sp != null)
@@ -183,7 +293,7 @@ namespace VAdvantage.Process
         /// </summary>
         /// <param name="ctx">context</param>
         /// <param name="sp">server process or null</param>
-        private static void CheckTableID(Ctx ctx, SvrProcess sp)
+        private  void CheckTableID(Ctx ctx, SvrProcess sp)
         {
             if (MSysConfig.IsNativeSequence(false))
             {
@@ -202,7 +312,7 @@ namespace VAdvantage.Process
                     ds = DataBase.DB.ExecuteDataset(sql, null, trxName);
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-
+                        
                         //Get Max value from Table_ID or AD_Sequence and update.
                         sql = @"Update AD_Sequence set updatedby=" + ctx.GetAD_User_ID() + ", updated=getdate(), CurrentNext=(SELECT max(maximum) FROM ( SELECT max(" + ds.Tables[0].Rows[i]["Name"].ToString() + @"_ID)+1 as maximum from " + ds.Tables[0].Rows[i]["Name"].ToString() +
                          @" Union
@@ -328,7 +438,7 @@ namespace VAdvantage.Process
         /// </summary>
         /// <param name="ctx">context</param>
         /// <param name="sp">server process or null</param>
-        private static void CheckClientSequences(Ctx ctx, SvrProcess sp)
+        private  void CheckClientSequences(Ctx ctx, SvrProcess sp)
         {
             Trx trxName = null;
             if (sp != null)
@@ -345,6 +455,7 @@ namespace VAdvantage.Process
                     continue;
                 }
                 MSequence.CheckClientSequences(ctx, client.GetAD_Client_ID(), trxName);
+               
             }	//	for all clients
 
         }	//	checkClientSequences
