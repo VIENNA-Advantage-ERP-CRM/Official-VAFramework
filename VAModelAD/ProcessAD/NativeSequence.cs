@@ -30,6 +30,7 @@ namespace VAdvantage.Process
         // Pcol (primary key column of table)
         private object Pcol = 0;
 
+        private SequenceCheck clsSeqCheck = new SequenceCheck();
         #endregion
 
         // Prepare - e.g., get Parameters.
@@ -79,7 +80,11 @@ namespace VAdvantage.Process
 
                 }
 
+                 
+
                 ok = true;
+                //Update Db Sequence if
+                clsSeqCheck.CheckDBSequence(GetCtx(), this);
             }
             finally
             {
@@ -111,6 +116,8 @@ namespace VAdvantage.Process
                 {
                     this.AddLog("Created Native Sequence for : " + table.GetTableName());
                 }
+
+               
             }
         }
         private void CreateSequence(String tableName, Trx trxName)
