@@ -263,6 +263,7 @@
                 dtValFrom.val(self.getDateString(true));
             }
         });
+        this.busyInd = masVerUI.parent().find('.vis-busyindicatorouterwrap');
     };
 
     MasterDataVersion.prototype.getMasterVersionUI = function (dr) {
