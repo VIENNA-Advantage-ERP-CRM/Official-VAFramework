@@ -42,6 +42,7 @@ const versions = {
 };
 
 module.exports = {
+     mode: 'development', // or 'production'
     entry: {
         'VIS.all': './Areas/VIS/Scripts/src/VISjs.js',
         'VIS2_0': './Areas/VIS/Scripts/src/VIS_v2.js',

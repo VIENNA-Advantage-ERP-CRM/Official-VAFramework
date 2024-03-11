@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "buildDev": "webpack --mode development",
+    "build": "webpack",
     "buildPro": "webpack --mode production",
     "process": "webpack --progress"
   },

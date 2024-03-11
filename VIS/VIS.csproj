@@ -1030,7 +1030,12 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /E /Y /I  "$(ProjectDir)Areas\*" "$(ProjectDir)..\ViennaAdvantageWeb\Areas"</PostBuildEvent>
+    <PostBuildEvent>rmdir /s /q "$(SolutionDir)\ViennaAdvantageWeb\Areas\$(TargetName)"
+xcopy /E /Y /I  "$(ProjectDir)Areas\*" "$(ProjectDir)..\ViennaAdvantageWeb\Areas"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>npm run build
+</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
