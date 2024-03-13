@@ -169,6 +169,9 @@ namespace VAdvantage.Controller
 
         public bool? IsAutoNewRecord = null;
 
+        //Hide field group from (number)
+        public Int16 HideFieldGroupFrom = 0;
+
         public string SelectSQL
         {
             get;
@@ -548,6 +551,7 @@ namespace VAdvantage.Controller
                     vo.IsAutoNewRecord = true;
                 else if (isAuto == "N")
                     vo.IsAutoNewRecord = false;
+                vo.HideFieldGroupFrom = Convert.ToInt16(Util.GetValueOfInt(dr["HideFieldGroupFrom"]));
             }
             catch (System.Exception ex)
             {
@@ -1000,6 +1004,7 @@ namespace VAdvantage.Controller
 
             clone.IsAutoNewRecord = IsAutoNewRecord;
             clone.RecordLimit = RecordLimit;
+            clone.HideFieldGroupFrom = HideFieldGroupFrom;
 
             clone.fields = new List<GridFieldVO>();
             for (int i = 0; i < fields.Count; i++)

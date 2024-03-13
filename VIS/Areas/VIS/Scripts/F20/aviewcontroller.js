@@ -673,7 +673,7 @@
                     iControl = null;
                 }
             }
-            this.vGridPanel.flushLayout();
+            this.vGridPanel.flushLayout(mTab.getHideFGFrom());
 
         }
 

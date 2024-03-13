@@ -804,6 +804,10 @@
         return this.vo.IsAutoNewRecord === true;
     };
 
+    GridTab.prototype.getHideFGFrom = function () {
+        return this.vo.HideFieldGroupFrom;
+    };
+
     GridTab.prototype.getIsInsertRecord = function () {
         if (this.getIsReadOnly())
             return false;
