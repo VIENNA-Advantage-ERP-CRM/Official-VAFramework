@@ -26,6 +26,11 @@ namespace VIS.Controllers
             return Content(DB.ExecuteScalar(sql).ToString());
         }
 
+        public ContentResult GetEmailAddress(int AD_User_ID)
+        {
+            string sql = "SELECT Email from AD_User WHERE AD_User_ID=" + AD_User_ID;
+            return Content(DB.ExecuteScalar(sql).ToString());
+        }
         /// <summary>
         /// Check organisation access for user
         /// </summary>
