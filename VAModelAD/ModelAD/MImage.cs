@@ -34,7 +34,7 @@ namespace VAdvantage.Model
         private string imageFormat;
 
 
-        private List<string> imageExtensions = new List<string>() { ".png", ".jpg", ".ico", ".webp", ".svg", ".jpeg" };
+        private List<string> imageExtensions = new List<string>() { ".png", ".jpg", ".ico", ".webp", ".svg", ".jpeg",".jfif" };
 
         public string ImageFormat
         {
@@ -191,7 +191,7 @@ namespace VAdvantage.Model
                 {
                     //imageUrl = imageUrl.Insert(imageUrl.Length, "/" + GetAD_Image_ID() + ImageFormat);
                     imageUrl = "Images/" + GetAD_Image_ID() + imageFormat;
-                    int count = DB.ExecuteQuery("UPDATE AD_IMAGE SET IMAGEURL='" + imageUrl + "' WHERE AD_IMAGE_ID=" + GetAD_Image_ID());
+                    int count = DB.ExecuteQuery("UPDATE AD_IMAGE SET IMAGEURL='" + imageUrl + "' WHERE AD_IMAGE_ID=" + GetAD_Image_ID(),null, Get_TrxName());
                 }
 
                 ConvertByteArrayToThumbnail(byteArray, GetAD_Image_ID().ToString() + imageExt);
@@ -204,7 +204,7 @@ namespace VAdvantage.Model
                 {
                    // imageFormat = imageUrl.Substring(imageUrl.LastIndexOf("."));
                     imageUrl = "Images/" + GetAD_Image_ID() + imageExt;
-                    int count = DB.ExecuteQuery("UPDATE AD_IMAGE SET IMAGEURL='" + imageUrl + "' WHERE AD_IMAGE_ID=" + GetAD_Image_ID());
+                    int count = DB.ExecuteQuery("UPDATE AD_IMAGE SET IMAGEURL='" + imageUrl + "' WHERE AD_IMAGE_ID=" + GetAD_Image_ID(),null, Get_TrxName());
                 }
                 ConvertByteArrayToThumbnail(GetBinaryData(), GetAD_Image_ID().ToString() + imageExt);
             }

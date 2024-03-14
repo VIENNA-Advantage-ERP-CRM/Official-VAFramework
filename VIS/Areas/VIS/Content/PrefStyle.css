@@ -647,6 +647,17 @@ a.VIS_Pref_tooltip {
         text-decoration: none;
     }
 
+    .vis-workflowActivityDetails a.VIS_Pref_tooltip {
+    position: unset;
+}
+
+.vis-workflowActivityDetails a.VIS_Pref_tooltip:hover span {
+    top: auto;
+    left: auto;
+    margin-top: 30px;
+    margin-left: -22px;
+}
+
 
     a.VIS_Pref_tooltip:hover span {
         display: inline;

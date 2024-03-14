@@ -623,7 +623,7 @@ namespace VAdvantage.Print
                 //	User supplied Where Clause
                 if (query != null && query.IsActive())
                 {
-                    finalSQL.Append(" WHERE ");
+                    finalSQL.Append(" WHERE IsActive = 'Y' AND ");
                     if (!query.GetTableName().Equals(tableName))
                         query.SetTableName(tableName);
 
