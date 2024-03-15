@@ -25,7 +25,16 @@ namespace VIS.Controllers
             string sql = "SELECT ColumnName from AD_Element WHERE AD_Element_ID="+AD_Element_ID;
             return Content(DB.ExecuteScalar(sql).ToString());
         }
-
+        /// <summary>
+        /// Get Email Address from AD_User Table 
+        /// </summary>
+        /// <param name="AD_User_ID">AD_User_ID</param>
+        /// <returns>Email ID </returns>
+        public ContentResult GetEmailAddress(int AD_User_ID)
+        {
+            string sql = "SELECT Email FROM AD_User WHERE IsActive='Y' AND AD_User_ID=" + AD_User_ID;
+            return Content(DB.ExecuteScalar(sql).ToString());
+        }
         /// <summary>
         /// Check organisation access for user
         /// </summary>

@@ -117,6 +117,37 @@
         return "";
     };
 
+    /// <summary>
+    ///   Set Email Id in BI User Name  when BI User CheckBox is True
+    /// </summary>
+    /// <returns></returns>
+
+    calloutColumn.prototype.SetBIUserName = function (ctx, windowNo, mTab, mField, value, oldValue) {
+
+        if (this.isCalloutActive() || value == null) {
+            return;
+        }
+
+        this.setCalloutActive(true);
+        var userID = Util.getValueOfInt(mTab.getValue("AD_User_ID"));
+        $.ajax({
+            url: VIS.Application.contextUrl + "VIS/CalloutColumn/GetEmailAddress",
+            data: { AD_User_ID: userID },
+            async: false, 
+            success: function (result) {
+                if (result)
+                   mTab.setValue("VA037_BIUserName",result);
+            },
+            error: function (err) {
+                this.log.severe(err);
+            }
+        });
+
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
     VIS.calloutColumn = calloutColumn;
 
     //*********** Callout check DocAction in table  Start ****
