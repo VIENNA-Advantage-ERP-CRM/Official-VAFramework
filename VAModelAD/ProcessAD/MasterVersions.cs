@@ -583,8 +583,11 @@ namespace VAdvantage.Process
                 return msg;
             }
 
-            Commit(); //save column of version table
-
+            //Commit(); //save column of version table
+            if (_trx != null)
+            {
+                _trx.Commit();
+            }
             // Apply constraints on columns for Version table
             ColumnSync colSync = new ColumnSync();
             colSync.SetAD_Column_ID(AD_Column_ID);
