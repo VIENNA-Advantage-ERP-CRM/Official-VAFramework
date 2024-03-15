@@ -1002,11 +1002,14 @@
     HeaderPanel.prototype.actionPerformed = function (action) {
         //selfPan.actionButton(action.source);
 
-
-
-        if (this.aPanel.curTab.needSave(true, false)) {
-            this.aPanel.cmd_save(true);
-            return;
+        //By pass condition for undo action
+        var field = action.source.getField();
+        if (!(field.getIsAction() && field.getAction()=== "MTU"))
+        {
+            if (this.aPanel.curTab.needSave(true, false)) {
+                this.aPanel.cmd_save(true);
+                return;
+            }
         }
 
 

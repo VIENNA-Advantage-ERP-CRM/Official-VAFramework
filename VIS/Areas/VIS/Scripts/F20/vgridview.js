@@ -94,8 +94,11 @@
                     else
                         VIS.ADialog.info("ComModuleNotInstalled");
                 }
+                else if (self.grid.columns[evt.column].gridField.getDisplayType() == VIS.DisplayType.Button) {
+                    self.grid.columns[evt.column].editable.ctrl.getControl().click();
+                }
             } catch (err) {
-
+                console.log(err);
             }
         }
 
@@ -994,9 +997,12 @@
 
                 oColumn.sortable = true;
 
-                //oColumn.render = function (record) {
-                //    return '<div>button</div>';
-                //}
+                oColumn.render = function (record, index, colIndex) {
+                    var f = oColumns[colIndex].field;
+                    var val = record[f];
+                    return '<span style="cursor:pointer" class="vis-ev-col-linkbutton">' + oColumns[colIndex].gridField.getHeader() + '</span>';
+                   
+                }
             }
 
             else if (displayType == VIS.DisplayType.Image) {
@@ -1123,7 +1129,7 @@
             }
 
 
-            if (mField.getHtmlStyle() != "") {
+            if (mField.getHtmlStyle() != "" && displayType != VIS.DisplayType.Button ) {
                 oColumn.style = mField.getHtmlStyle();
             }
 
