@@ -130,21 +130,19 @@
 
         this.setCalloutActive(true);
         var userID = Util.getValueOfInt(mTab.getValue("AD_User_ID"));
-        var Email = "";
         $.ajax({
             url: VIS.Application.contextUrl + "VIS/CalloutColumn/GetEmailAddress",
             data: { AD_User_ID: userID },
             async: false, 
             success: function (result) {
                 if (result)
-                    Email = result;
-                  // mTab.setValue("VA037_BIUserName",result);
+                   mTab.setValue("VA037_BIUserName",result);
             },
             error: function (err) {
                 this.log.severe(err);
             }
         });
-        mTab.setValue("VA037_BIUserName", Email);
+
         this.setCalloutActive(false);
         ctx = windowNo = mTab = mField = value = oldValue = null;
         return "";
