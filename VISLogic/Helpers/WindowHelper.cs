@@ -1158,7 +1158,10 @@ namespace VIS.Helpers
                         }
                     }
                     else
-                        versionInfo.IsLatestVersion = true;
+                    {
+                        if (!versionInfo.HasDocValWF)
+                            versionInfo.IsLatestVersion = true;
+                    }
                 }
             }
 
@@ -1991,8 +1994,10 @@ namespace VIS.Helpers
                     else if (IsBackDateVersion(inn.ValidFrom.Value) && isLatestVersion)
                     {
                         if (!HasDocValWF)
+                        {
                             inn.ImmediateSave = true;
-                        po.Set_Value("ProcessedVersion", true);
+                            po.Set_Value("ProcessedVersion", true);
+                        }
                     }
                 }
             }
