@@ -134,6 +134,7 @@
         var $btnClose = null;
         var $spnTitle = null;
         var $spanSetting = null;
+        var $divRightbar = null;
         this.excludeFromShare = ['ad_org', 'm_warehouse','ad_sharerecordorg'];
         /***END Tab panel**/
 
@@ -157,8 +158,8 @@
             $divTabNav = $root.find(".vis-ad-w-p-tabs-oflow").hide();// $("<div class='vis-apanel-tab-oflow'>").hide();
             $divHeaderNav = $root.find(".vis-ad-w-p-tabs-t");
 
-            // $td0leftbar = $root.find(".vis-ad-w-p-action");
-            $btnlbToggle = $root.find(".vis-ad-w-p-tb-rc-abar");
+            $divRightbar = $root.find(".vis-ad-w-p-action").hide();
+            $btnlbToggle = $root.find(".vis-ad-w-p-tb-rc-abar").hide();
 
             $ulactionbar = $root.find('.vis-ad-w-p-a-m-slist');   // $ ("<ul class='vis-apanel-lb-ul'>");
             $uldynactionbar = $root.find('.vis-ad-w-p-a-m-dlist');   // $ ("<ul class='vis-apanel-lb-ul'>");
@@ -335,6 +336,8 @@
             if (self.gridWindow.getIsHideTabLinks()) {
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             }
+            
+            self.gridWindow.getIsHideTabLinks()
 
             setToolTipMessages();
         };
@@ -380,20 +383,23 @@
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
             this.aPrint = this.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
-           // this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
+            // this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
 
             //Ndw Back button
             this.aBack = this.addActions("Back", null, true, true, false, onAction, null, "Shct_Back");
-            $ulToobar.append(this.aBack.getListItm());
-            $ulToobar.append(this.aIgnore.getListItm());
-            $ulToobar.append(this.aNew.getListItm());
-            $ulToobar.append(this.aDelete.getListItm());
-            $ulToobar.append(this.aSave.getListItm());
-            $ulToobar.append(this.aRefresh.getListItm());
-            $ulToobar.append(this.aReport.getListItm());
-            $ulToobar.append(this.aPrint.getListItm());
-           // $ulToobar.append(this.aBatchUpdate.getListItm());
 
+            //check toolbar
+            if (!this.gridWindow.getIsHideToolbar()) {
+                $ulToobar.append(this.aBack.getListItm());
+                $ulToobar.append(this.aIgnore.getListItm());
+                $ulToobar.append(this.aNew.getListItm());
+                $ulToobar.append(this.aDelete.getListItm());
+                $ulToobar.append(this.aSave.getListItm());
+                $ulToobar.append(this.aRefresh.getListItm());
+                $ulToobar.append(this.aReport.getListItm());
+                $ulToobar.append(this.aPrint.getListItm());
+                // $ulToobar.append(this.aBatchUpdate.getListItm());
+            }
 
 
             //lakhwinder
@@ -411,7 +417,7 @@
             this.aLast = this.addActions(this.ACTION_NAME_LAST, null, true, true, true, onAction, null, "Shct_LastRec");
             this.aNext = this.addActions(this.ACTION_NAME_NEXT, null, true, true, true, onAction, null, "Shct_NextRec");
             this.aMulti = this.addActions("Multi", null, false, true, true, onAction, true, "Shct_MultiRow");
-            this.aCard = this.addActions("Card", null, false, true, true, onAction, true, "Shct_CardView");
+            this.aCard = this.addActions("Card", null, false, true, true, onAction, true, "Shct_CardView", "card-o");
 
             this.aMap = this.addActions("Map", null, false, true, true, onAction);
 
@@ -431,28 +437,31 @@
             this.aPageLast = this.addActions("PageLast", null, true, true, true, onAction, null, "Shct_PageLast");
             this.aPageDown = this.addActions(this.ACTION_NAME_PAGEDOWN, null, true, true, true, onAction, null, "Shct_PageDown");
 
-            //Action Bar[Left] 
+            //Action Bar[] 
 
             var mWindow = this.gridWindow;
             actionItemCount_Right = 0;
 
+            if (!mWindow.getIsHideActionbar()) {
+                //hide action bat toggle 
+                $btnlbToggle.show();
+                $divRightbar.show();
+            }
+
             this.aBatchUpdate = this.addActions("BUE", null, false, false, false, onAction); //1
-            if (VIS.Env.getCtx().getContext('#ENABLE_BATCHUPDATE') == 'Y' && this.ctx.getAD_User_ID() == 100) {
+            if (VIS.Env.getCtx().getContext('#ENABLE_BATCHUPDATE') === 'Y' && this.ctx.getAD_User_ID() == 100) {
                 this.aBatchUpdate.setTextDirection("r");
                 $ulactionbar.append(this.aBatchUpdate.getListItmIT());
             }
-
             if (mWindow.getIsAppointment()) {
                 this.aAppointment = this.addActions("APT", null, false, false, false, onAction); //1
                 this.aAppointment.setTextDirection("r");
                 $ulactionbar.append(this.aAppointment.getListItmIT());
-            }           
-            
+            }
             if (mWindow.getIsTask()) {
                 this.aTask = this.addActions("TAK", null, false, false, false, onAction); //1
                 this.aTask.setTextDirection("r");
                 $ulactionbar.append(this.aTask.getListItmIT());
-
             }
             if (mWindow.getIsEmail()) {
                 this.aEmail = this.addActions("EML", null, false, false, false, onAction); //1
@@ -474,7 +483,6 @@
                 this.aFaxEmail.setTextDirection("r");
                 $ulactionbar.append(this.aFaxEmail.getListItmIT());
             }
-
             //add
             if (mWindow.getIsChat()) {
                 this.aChat = this.addActions(this.ACTION_NAME_CHAT, null, false, false, false, onAction, true);  //1
@@ -496,13 +504,11 @@
                 this.aRequest.setTextDirection("r");
                 $ulactionbar.append(this.aRequest.getListItmIT());
             }
-
             if (VIS.AEnv.getIsWorkflowProcess()) {
                 this.aWorkflow = this.addActions("Workflow", null, true, false, false, onAction);
                 this.aWorkflow.setTextDirection("r");
                 $ulactionbar.append(this.aWorkflow.getListItmIT());
             }
-
             if (mWindow.getIsCopyReocrd()) {
                 this.aCopy = this.addActions("CRD", null, false, false, false, onAction);
                 this.aCopy.setTextDirection("r");
@@ -542,7 +548,7 @@
                 }
                 //Added by Anil Kumar as Discussed with Vinay Bhatt
                 if (mWindow.getIsGenerateAttachmentCode()) {
-                    this.aGenerateAttachmentCode = this.addActions("CAC", null, false, false, false, onAction ); //1
+                    this.aGenerateAttachmentCode = this.addActions("CAC", null, false, false, false, onAction); //1
                     this.aGenerateAttachmentCode.setTextDirection("r");
                     $ulactionbar.append(this.aGenerateAttachmentCode.getListItmIT());
                 }
@@ -623,12 +629,8 @@
                 //else
                 //    $ulRightBar2.parent().addclass('show')
             };
-
             /* Set Tool Bar */
-
             finishLayout();
-
-
         };
 
         this.setDynamicActions = function () {
@@ -675,7 +677,6 @@
         this.getFilterPane = function () {
             return $fltrPnlBody;
         };
-
 
         /**Clear search box
          * */
@@ -819,7 +820,7 @@
                 //$busyDiv.hide();
                 $busyDiv[0].style.visibility = 'hidden';
                 if (focus) {
-
+                    //void 0;
                 }
             }
         };
@@ -1561,8 +1562,12 @@
         this.setBusy(true);
     };
 
-    APanel.prototype.addActions = function (action, parent, disableIcon, imageOnly, isSmall, onAction, toggle, toolTipText) {
-        var action = new VIS.AppsAction({ action: action, parent: parent, enableDisable: disableIcon, toggle: toggle, imageOnly: imageOnly, isSmall: isSmall, onAction: onAction, toolTipText: toolTipText }); //Create Apps Action
+    APanel.prototype.addActions = function (action, parent, disableIcon, imageOnly, isSmall, onAction, toggle, toolTipText, iconName) {
+        var obj = { action: action, parent: parent, enableDisable: disableIcon, toggle: toggle, imageOnly: imageOnly, isSmall: isSmall, onAction: onAction, toolTipText: toolTipText };
+        if (iconName) {
+            obj.iconName = iconName;
+        }
+        var action = new VIS.AppsAction(obj); //Create Apps Action
         return action;
     };
 
@@ -2222,7 +2227,7 @@
         else if (tis.aFind.getAction() === action) {
             tis.cmd_finddialog();
         }
-        else if (tis.aBatchUpdate.getAction() === action) {
+        else if (tis.aBatchUpdate && tis.aBatchUpdate.getAction() === action) {
             tis.cmd_batchUpdatedialog();
         }
         else if (tis.aChat && tis.aChat.getAction() === action) {
@@ -2385,13 +2390,20 @@
 
         var needExecute = true;
 
-        if (curCtrller.curTab.needSave(true, false)) {
+        //check action type
+        //Undo
+        if (vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU") {
+            aPanel.cmd_ignore();
+            aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction());
+            needExecute = false;
+        }
+        else if (curCtrller.curTab.needSave(true, false)) {
             needExecute = false;
             curCtrller.cmd_save(true, function (result) {
                 if (result) {
                     aPanel.actionButtonCallBack(vButton, startWOasking, batch, dateScheduledStart, columnName, ctx, curCtrller);
                 }
-            })
+            });
         }
 
 
@@ -3223,7 +3235,7 @@
             this.aNew.setEnabled(false);
             this.aDelete.setEnabled(false);
             this.aFind.setEnabled(false);
-            this.aBatchUpdate.setEnabled(false);
+            this.aBatchUpdate ? this.aBatchUpdate.setEnabled(false):'' ;
             this.aRefresh.setEnabled(false);
             this.aNext.setEnabled(false);
             this.aLast.setEnabled(false);
@@ -3246,7 +3258,7 @@
             this.aCard.setEnabled(true);
             this.aCardDialog.setEnabled(true);
             this.aFind.setEnabled(true);
-            this.aBatchUpdate.setEnabled(true);
+            this.aBatchUpdate ? this.aBatchUpdate : '';
             this.aRefresh.setEnabled(true);
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);

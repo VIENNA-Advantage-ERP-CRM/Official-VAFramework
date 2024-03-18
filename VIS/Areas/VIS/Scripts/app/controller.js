@@ -387,6 +387,14 @@
         return this.vo.IsHideTabLinks;
     }
 
+    GridWindow.prototype.getIsHideToolbar = function () {
+        return this.vo.IsHideToolbar;
+    }
+
+    GridWindow.prototype.getIsHideActionbar = function () {
+        return this.vo.IsHideTabLinks;
+    }
+
     GridWindow.prototype.dispose = function () {
 
         originalLength = this.tabs.length;

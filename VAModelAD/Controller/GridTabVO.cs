@@ -14,6 +14,7 @@ using System.Data;
 using VAdvantage.Logging;
 using VAdvantage.Utility;
 using VAdvantage.Classes;
+using VAModelAD.Model;
 
 namespace VAdvantage.Controller
 {
@@ -592,7 +593,8 @@ namespace VAdvantage.Controller
                     if (voF != null)
                     {
                         mTabVO.fields.Add(voF);
-                        if (voF.displayType == VAdvantage.Classes.DisplayType.Location && voF.IsDisplayedf)
+                        if (voF.displayType == VAdvantage.Classes.DisplayType.Location 
+                            && voF.IsDisplayedf && !String.IsNullOrEmpty(MClient.Get(mTabVO.ctx).GetGoogleMapAPI()))
                         {
                             mTabVO.locationCols.Add(voF.ColumnName);
                         }

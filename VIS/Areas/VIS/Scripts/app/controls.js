@@ -206,8 +206,11 @@
             var isUpdateable = mField.getIsEditable(false);
             var windowNo = mField.getWindowNo();
             var tabNo = 0;
-            if (mTab)
+            var hideMapBtn = false;
+            if (mTab) {
                 tabNo = mTab.getTabNo();
+                hideMapBtn = !mTab.getIsMapView();
+            }
 
             if (displayType == VIS.DisplayType.Button) {
 
@@ -308,7 +311,8 @@
             }
             else if (displayType == VIS.DisplayType.Location) {
 
-                var txtLoc = new VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, mField.getLookup());
+                var txtLoc = new VLocation(columnName, isMandatory, isReadOnly,
+                    isUpdateable, displayType, mField.getLookup(),hideMapBtn);
                 txtLoc.setField(mField);
                 ctrl = txtLoc;
             }
@@ -4228,7 +4232,7 @@
      *  @param title title
      */
 
-    function VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, lookup) {
+    function VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, lookup,hideMapButton) {
         if (!displayType) {
             displayType = VIS.DisplayType.Location;
         }
@@ -4244,8 +4248,8 @@
         //create ui
         var $ctrl = $('<input readonly>', { type: 'text', name: columnName });
         var $btnMap = $('<button class="input-group-text"><i class="vis vis-location" aria-hidden="true"></i></button>');
-        var $btnLocation = $('<button class="input-group-text"><i class="vis vis-card" aria-hidden="true"></i></button>');
-        var btnCount = 2;
+        var $btnLocation = $('<button class="input-group-text"><i class="vis vis-pencil" aria-hidden="true"></i></button>');
+        var btnCount = hideMapButton ? 1 : 2;
         //$ctrl.append($btnMap).append($btnLocation);
         var self = this;
         IControl.call(this, $ctrl, displayType, isReadOnly, columnName, isMandatory); //call base function
@@ -4259,12 +4263,16 @@
         }
 
         this.getBtn = function (index) {
-            if (index == 0) {
-                return $btnMap;
+            if (btnCount == 2) {
+                if (index == 0) {
+                    return $btnMap;
+                }
+                if (index == 1) {
+                    return $btnLocation;
+                }
             }
-            if (index == 1) {
+            else
                 return $btnLocation;
-            }
         };
 
         this.getBtnCount = function () {
