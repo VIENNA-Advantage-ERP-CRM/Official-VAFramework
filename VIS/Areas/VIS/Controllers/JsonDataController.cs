@@ -1390,6 +1390,19 @@ namespace VIS.Controllers
             CommonModel cm = new CommonModel();
             return Json(JsonConvert.SerializeObject(cm.CheckAccessForAction(columnName, roleID)), JsonRequestBehavior.AllowGet); 
         }
+
+        /// <summary>
+        /// Check Table map with any window and get their ID
+        /// </summary>
+        /// <param name="tableID"></param>
+        /// <param name="actionType"></param>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        public JsonResult CheckTableMapWithAction(int tableID, string actionType, string actionName) {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.CheckTableMapWithAction(tableID, actionType, actionName, ctx)), JsonRequestBehavior.AllowGet);
+        }
     }
 
     public class FilterDataContract

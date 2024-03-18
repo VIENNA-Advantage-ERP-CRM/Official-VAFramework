@@ -339,5 +339,68 @@ namespace VISLogic.Models
         {
             return Util.GetValueOfString(DB.ExecuteScalar("SELECT " + columnName + " FROM AD_ROLE WHERE AD_role_ID=" + roleID));
         }
+
+        /// <summary>
+        /// Check Table map with any window and get their ID
+        /// </summary>
+        /// <param name="tableID"></param>
+        /// <param name="actionType"></param>
+        /// <param name="actionName"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<dynamic> CheckTableMapWithAction(int tableID, string actionType, string actionName,Ctx ctx)
+        {
+            var DyObjectsList = new List<dynamic>();
+            string[] actions = actionName.Split(';');
+            string formattedString = "'" + string.Join("','", actions) + "'";
+            string sql = "";
+            string action = "";
+             bool baseLanguage = Env.IsBaseLanguage(ctx, "");// GlobalVariable.IsBaseLanguage();
+           
+            if (actionType == "WIW")
+            {
+                if (baseLanguage)
+                {
+                    sql = @"SELECT AD_Tab.AD_Window_ID AS ID,w.Name FROM AD_Tab 
+                            INNER JOIN AD_Window w ON  AD_Tab.AD_Window_ID=w.ad_window_id";
+                    
+                }
+                else
+                {
+                    sql = @"SELECT AD_Tab.AD_Window_ID AS ID,wt.Name FROM AD_Tab
+                            INNER JOIN AD_Window w ON  AD_Tab.AD_Window_ID=w.ad_window_id
+                            INNER JOIN AD_Window_Trl wt ON (w.AD_Window_ID=wt.AD_Window_ID AND wt.AD_Language='" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "')";
+                }
+                sql += " WHERE AD_Table_ID =" + tableID + @" AND w.Name IN (" + formattedString + ") ORDER BY w.Name";
+                action = "W";
+
+
+            }
+            else if (actionType == "FOM")
+            {
+                if (baseLanguage)
+                {
+                    sql = "SELECT NAME, AD_Form_ID AS ID FROM AD_Form WHERE NAME IN (" + formattedString + ") ORDER BY NAME ";
+                }
+                else {
+                    sql = "SELECT AD_Form_Trl.NAME, AD_Form.AD_Form_ID AS ID FROM AD_Form INNER JOIN AD_Form_Trl ON (AD_Form.AD_Form_ID=AD_Form_Trl.AD_FORM_ID AND AD_Form_Trl.AD_Language='" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "')  WHERE AD_Form.NAME IN (" + formattedString + ") ORDER BY AD_Form_Trl.NAME ";
+                }
+                action = "X";
+            }
+            DataSet ds = DB.ExecuteDataset(sql);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    dynamic DyObj = new ExpandoObject();
+                    DyObj.ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["ID"]);
+                    DyObj.Name = Util.GetValueOfString(ds.Tables[0].Rows[i]["Name"]);
+                    DyObj.ActionType = action;
+                    DyObjectsList.Add(DyObj);
+                }
+            }
+            return DyObjectsList;
+
+        }
     }
 }

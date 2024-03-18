@@ -387,6 +387,14 @@
         return this.vo.IsHideTabLinks;
     }
 
+    GridWindow.prototype.getIsHideToolbar = function () {
+        return this.vo.IsHideToolbar;
+    }
+
+    GridWindow.prototype.getIsHideActionbar = function () {
+        return this.vo.IsHideTabLinks;
+    }
+
     GridWindow.prototype.dispose = function () {
 
         originalLength = this.tabs.length;
@@ -804,6 +812,10 @@
         return this.vo.IsAutoNewRecord === true;
     };
 
+    GridTab.prototype.getHideFGFrom = function () {
+        return this.vo.HideFieldGroupFrom;
+    };
+
     GridTab.prototype.getIsInsertRecord = function () {
         if (this.getIsReadOnly())
             return false;
@@ -813,6 +825,26 @@
         }
 
         return this.vo.IsInsertRecord && !limitReached;
+    };
+
+    GridTab.prototype.getIsHideTabName = function () {
+        return this.vo.HideTabName;
+    };
+
+    GridTab.prototype.getIsResetLayout = function () {
+        return this.vo.ResetLayout;
+    };
+
+    GridTab.prototype.getIsHideGridToggle = function () {
+        return this.vo.IsHideGridToggle;
+    };
+
+    GridTab.prototype.getIsHideCardToggle = function () {
+        return this.vo.IsHideCardToggle;
+    };
+
+    GridTab.prototype.getIsHideRecordNav = function () {
+        return this.vo.IsHideRecordNav;
     };
 
     GridTab.prototype.getIncluded_Tab_ID = function () {
@@ -7363,6 +7395,9 @@
     };
     GridField.prototype.getAction = function () {
         return this.vo.ADAction;
+    };
+    GridField.prototype.getActionName = function () {
+        return this.vo.ADActionName;
     };
 
     /**

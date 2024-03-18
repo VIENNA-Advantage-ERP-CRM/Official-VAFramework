@@ -250,6 +250,9 @@ VIS.VTabbedPane.prototype.evaluate = function (e) {
             for (var i = 0; i < tabs.length; i++) {
                 var li = tabs[i].getListItm();
                 this.tabLIObj[tabs[i].action] = li;
+                if (tabs[i].isHideTab) { // if tab hide then not append in UI
+                    li.hide();
+                } 
                 $ulTabControl.append(li);
             }
             this.aPanel.setTabNavigation();

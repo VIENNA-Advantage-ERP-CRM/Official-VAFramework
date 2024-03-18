@@ -14,6 +14,7 @@ using System.Data;
 using VAdvantage.Logging;
 using VAdvantage.Utility;
 using VAdvantage.Classes;
+using VAModelAD.Model;
 
 namespace VAdvantage.Controller
 {
@@ -166,8 +167,16 @@ namespace VAdvantage.Controller
         public int DefaultCardID = 0;
 
         public int RecordLimit = 0;
+        public bool? HideTabName = null;
+        public bool? ResetLayout = null;
+        public bool? IsHideGridToggle = null;
+        public bool? IsHideCardToggle = null;
+        public bool? IsHideRecordNav = null;
 
         public bool? IsAutoNewRecord = null;
+
+        //Hide field group from (number)
+        public Int16 HideFieldGroupFrom = 0;
 
         public string SelectSQL
         {
@@ -543,11 +552,18 @@ namespace VAdvantage.Controller
 
                 vo.RecordLimit = Util.GetValueOfInt(dr["RecordLimit"]);
 
+                vo.HideTabName = Utility.Util.GetValueOfString(dr["hidetabname"]).Equals("Y");
+                vo.ResetLayout = Utility.Util.GetValueOfString(dr["resetlayout"]).Equals("Y");
+                vo.IsHideGridToggle = Utility.Util.GetValueOfString(dr["ishidegridtoggle"]).Equals("Y");
+                vo.IsHideCardToggle = Utility.Util.GetValueOfString(dr["ishidecardtoggle"]).Equals("Y");
+                vo.IsHideRecordNav = Utility.Util.GetValueOfString(dr["IsHideRecordNav"]).Equals("Y");
+
                 string isAuto = dr["IsAutoNewRecord"].ToString();
                 if (isAuto == "Y")
                     vo.IsAutoNewRecord = true;
                 else if (isAuto == "N")
                     vo.IsAutoNewRecord = false;
+                vo.HideFieldGroupFrom = Convert.ToInt16(Util.GetValueOfInt(dr["HideFieldGroupFrom"]));
             }
             catch (System.Exception ex)
             {
@@ -588,7 +604,8 @@ namespace VAdvantage.Controller
                     if (voF != null)
                     {
                         mTabVO.fields.Add(voF);
-                        if (voF.displayType == VAdvantage.Classes.DisplayType.Location && voF.IsDisplayedf)
+                        if (voF.displayType == VAdvantage.Classes.DisplayType.Location 
+                            && voF.IsDisplayedf && !String.IsNullOrEmpty(MClient.Get(mTabVO.ctx).GetGoogleMapAPI()))
                         {
                             mTabVO.locationCols.Add(voF.ColumnName);
                         }
@@ -1000,6 +1017,12 @@ namespace VAdvantage.Controller
 
             clone.IsAutoNewRecord = IsAutoNewRecord;
             clone.RecordLimit = RecordLimit;
+            clone.HideTabName = HideTabName;
+            clone.ResetLayout = ResetLayout;
+            clone.IsHideGridToggle = IsHideGridToggle;
+            clone.IsHideCardToggle = IsHideCardToggle;
+            clone.HideFieldGroupFrom = HideFieldGroupFrom;
+            clone.IsHideRecordNav = IsHideRecordNav;
 
             clone.fields = new List<GridFieldVO>();
             for (int i = 0; i < fields.Count; i++)

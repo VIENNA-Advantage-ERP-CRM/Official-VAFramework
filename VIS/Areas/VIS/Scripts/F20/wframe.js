@@ -839,7 +839,7 @@
             }
             else if (this.imageOnly) {
                 //this.img = $('<img />').attr({ 'src': this.imgUrl, 'alt': this.text, 'title': this.text });
-                this.img = $('<i class="vis ' + this.imgUrl + '" title = "' + this.toolTipText + '"})>');
+                this.img = $('<i class="vis ' + this.imgUrl + '" title = "' + this.toolTipText + '">');
                 li.append(d);
                 d.append(this.img);
             }
@@ -895,7 +895,7 @@
                 //this.img = $('<img />').attr({ 'src': this.imgUrl, 'alt': this.text, 'title': this.text });
                 //li.append(d);
                 //d.append(this.img);
-                this.img = $('<i class="vis ' + this.imgUrl + '" title = "' + this.toolTipText + '"})>');
+                this.img = $('<i class="vis ' + this.imgUrl + '" title = "' + this.toolTipText + '">');
                 li.append(d);
                 d.append(this.img);
             }
