@@ -82,7 +82,7 @@ namespace VIS.Helpers
 
             key = ctx.GetSecureKey();
 
-           
+
 
             try
             {
@@ -773,7 +773,7 @@ namespace VIS.Helpers
                 string SQL_Select = "SELECT " + String.Join(",", lstColumns);
 
                 StringBuilder refreshSQL = new StringBuilder(SQL_Select)
-                    .Append(" FROM "+gTableIn.TableName).Append(" WHERE ").Append(whereClause);
+                    .Append(" FROM " + gTableIn.TableName).Append(" WHERE ").Append(whereClause);
                 drRef = DB.ExecuteReader(refreshSQL.ToString());
 
                 if (((System.Data.Common.DbDataReader)drRef).HasRows)
@@ -1166,7 +1166,7 @@ namespace VIS.Helpers
             }
 
             Ver_Window_ID = 0;
-            PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, inserting,out Ver_Window_ID);
+            PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, inserting, out Ver_Window_ID);
 
             for (int i = 0; i < lstColumns.Count; i++)
             {
@@ -1275,10 +1275,10 @@ namespace VIS.Helpers
                     string finalColumn = "";
                     string[] errorCol = info.Replace("VISDBERRORCOLUMN: ", "").Split(',');
                     var fldList = m_fields.Where(a => errorCol.Contains(a.ColumnName.ToUpper())).ToList();
-                    for(int i=0; i< fldList.Count(); i++)
+                    for (int i = 0; i < fldList.Count(); i++)
                     {
                         finalColumn += fldList[i].Name;
-                        if (fldList.Count() != (i+1))
+                        if (fldList.Count() != (i + 1))
                         {
                             finalColumn += " and ";
                         }
@@ -1320,7 +1320,7 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
-            
+
 
             string SQL_Select = "SELECT " + String.Join(",", lstColumns);
 
@@ -1707,7 +1707,7 @@ namespace VIS.Helpers
                 else
                 {
                     //po = table.GetPO(ctx, table.GetTableName() + "_ID=" + Record_ID, trx);
-                    
+
                     po = null;
                     /* intentially by pass PO , will handle in next release 
                      will undo code in next release (Break dependency on vienna base of this hotfix)*/
@@ -2491,7 +2491,8 @@ namespace VIS.Helpers
                 string getCondition = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf("WHERE"));
                 string whereCondition = getCondition;
                 string orderBY = "";
-                if (getCondition.LastIndexOf("ORDER")>-1) {
+                if (getCondition.LastIndexOf("ORDER") > -1)
+                {
                     whereCondition = getCondition.Substring(0, getCondition.LastIndexOf("ORDER"));
                     orderBY = getCondition.Substring(getCondition.LastIndexOf("ORDER"));
                 }
@@ -3860,7 +3861,7 @@ namespace VIS.Helpers
                 {
                     using (var w = new WindowHelper())
                     {
-          
+
                         resultData = w.GetWindowRecordsForTreeNode(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, ObscureFields);
                     }
                 }
