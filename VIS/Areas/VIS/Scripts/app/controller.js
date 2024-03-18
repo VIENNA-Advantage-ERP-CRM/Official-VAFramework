@@ -827,6 +827,22 @@
         return this.vo.IsInsertRecord && !limitReached;
     };
 
+    GridTab.prototype.getIsHideTabName = function () {
+        return this.vo.HideTabName;
+    };
+
+    GridTab.prototype.getIsResetLayout = function () {
+        return this.vo.ResetLayout;
+    };
+
+    GridTab.prototype.getIsHideGridToggle = function () {
+        return this.vo.IsHideGridToggle;
+    };
+
+    GridTab.prototype.getIsHideCardToggle = function () {
+        return this.vo.IsHideCardToggle;
+    };
+
     GridTab.prototype.getIncluded_Tab_ID = function () {
         return this.vo.Included_Tab_ID;
     };	//	getIncluded_Tab_ID
@@ -7375,6 +7391,9 @@
     };
     GridField.prototype.getAction = function () {
         return this.vo.ADAction;
+    };
+    GridField.prototype.getActionName = function () {
+        return this.vo.ADActionName;
     };
 
     /**

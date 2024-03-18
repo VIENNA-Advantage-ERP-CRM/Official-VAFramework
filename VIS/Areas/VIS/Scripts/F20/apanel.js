@@ -374,32 +374,28 @@
         this.createToolBar = function () {
 
             //1. toolbar action
-            this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh");
-            this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete");
-            this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New");
-            this.aIgnore = this.addActions("Ignore", null, true, true, false, onAction, null, "Shct_Ignore");
-            this.aSave = this.addActions("Save", null, true, true, false, onAction, null, "Shct_Save");
+            this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh","Refresh");
+            this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete","Delete");
+            this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New","New");
+            this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore","Ignore");
+            this.aSave = this.addActions("SAR", null, true, true, false, onAction, null, "Shct_Save","Save");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
-            this.aReport = this.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
-            this.aPrint = this.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
-            // this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
+            this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report","Report");
+            this.aPrint = this.addActions("PRT", null, true, true, false, onAction, null, "Shct_Print","Print");
+           // this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
 
             //Ndw Back button
-            this.aBack = this.addActions("Back", null, true, true, false, onAction, null, "Shct_Back");
-
-            //check toolbar
-            if (!this.gridWindow.getIsHideToolbar()) {
-                $ulToobar.append(this.aBack.getListItm());
-                $ulToobar.append(this.aIgnore.getListItm());
-                $ulToobar.append(this.aNew.getListItm());
-                $ulToobar.append(this.aDelete.getListItm());
-                $ulToobar.append(this.aSave.getListItm());
-                $ulToobar.append(this.aRefresh.getListItm());
-                $ulToobar.append(this.aReport.getListItm());
-                $ulToobar.append(this.aPrint.getListItm());
-                // $ulToobar.append(this.aBatchUpdate.getListItm());
-            }
+            this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back","back-arrow");
+            $ulToobar.append(this.aBack.getListItm());
+            $ulToobar.append(this.aIgnore.getListItm());
+            $ulToobar.append(this.aNew.getListItm());
+            $ulToobar.append(this.aDelete.getListItm());
+            $ulToobar.append(this.aSave.getListItm());
+            $ulToobar.append(this.aRefresh.getListItm());
+            $ulToobar.append(this.aReport.getListItm());
+            $ulToobar.append(this.aPrint.getListItm());
+           // $ulToobar.append(this.aBatchUpdate.getListItm());
 
 
             //lakhwinder
@@ -1350,9 +1346,9 @@
     APanel.prototype.ACTION_NAME_PAGEDOWN = "PageDown";// "Previous";
     APanel.prototype.ACTION_NAME_PAGEUP = "PageUp";// "Next";
 
-    APanel.prototype.ACTION_NAME_NEW = "New";
-    APanel.prototype.ACTION_NAME_DELETE = "Delete";
-    APanel.prototype.ACTION_NAME_REFRESH = "Refresh";
+    APanel.prototype.ACTION_NAME_NEW = "NRD";
+    APanel.prototype.ACTION_NAME_DELETE = "DRD";
+    APanel.prototype.ACTION_NAME_REFRESH = "RQY";
     APanel.prototype.ACTION_NAME_FIND = "Find";
     APanel.prototype.ACTION_NAME_CHAT = "CHT";
     APanel.prototype.ACTION_NAME_APPOINTMENT = "Appointment";
@@ -1723,7 +1719,7 @@
         for (var i = 0; i < tabs.length; i++) {
 
             var id = curWindowNo + "_" + tabs[i].getAD_Tab_ID(); //uniqueID
-            var tObj = { action: id, text: tabs[i].getName(), toolTipText: tabs[i].getDescription(), textOnly: true, iconName: '' };
+            var tObj = { action: id, text: tabs[i].getName(), toolTipText: tabs[i].getDescription(), textOnly: true, iconName: '', isHideTab: tabs[i].getIsHideTabName() };
             if (tabs[i].getTabLevel() > 0) {
                 tObj.textOnly = false;
                 if (tabs[i].getTabLevel() > 3)
@@ -2181,17 +2177,7 @@
             tis.aCard.setPressed(false);
             tis.curGC.switchMapRow();
         } else if (tis.aBack.getAction() === action) {
-            if (tis.getLastView() == "Multi") {
-                tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
-                tis.aCard.setPressed(false);
-                tis.curGC.switchMultiRow(true);
-            }
-            else if (tis.getLastView() == "Card") {
-                tis.curGC.switchCardRow(true);
-                tis.aMulti.setPressed(false);
-                tis.aCard.setPressed(true);
-            }
-            tis.setLastView("");
+            tis.cmd_back();
         } else if (tis.aPageUp.getAction() === action) {
             tis.isDefaultFocusSet = false;
             tis.curGC.navigatePage(-1);
@@ -2690,7 +2676,7 @@
         /*Special handling
           Move to next tab */
         else if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction());
+            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(), mField.getActionName());
             return;
         }
 
@@ -2761,6 +2747,32 @@
                 case 'RSD':
                     aPanel.cmd_RecordShared();
                     break;
+
+                case 'NRD':
+                    aPanel.cmd_new()
+                    break;
+                case 'SAR':
+                    aPanel.cmd_save(false)
+                    break;
+                case 'DRD':
+                    aPanel.cmd_delete()
+                    break;
+                case 'RQY':
+                    aPanel.cmd_refresh()
+                    break;
+                case 'BVW':
+                    aPanel.cmd_back()
+                    break;
+                case 'UNO':
+                    aPanel.cmd_ignore();
+                    break;
+                case 'RET':
+                    aPanel.cmd_report();
+                    break;
+                case 'PRT':
+                    aPanel.cmd_print();
+                    break;
+
                 default: actionVADMSDocument(aPanel, vButton.value)
             }
 
@@ -2990,7 +3002,54 @@
      *	tab change
      *  @param action tab item's id
      */
-    APanel.prototype.tabActionPerformed = function (action, actionType) {
+    APanel.prototype.tabActionPerformed = function (action, actionType, actionName) {
+
+        /* Check for any window or form added in action*/
+        if ((actionType == 'WIW' || actionType == 'FOM') && actionName!= "") {
+            var obj = {
+                tableID: this.curTab.getAD_Table_ID(),
+                actionType: actionType,
+                actionName: actionName
+            }
+            var $this = this;
+            $this.setBusy(true);
+            $.ajax({
+                url: baseUrl + "JsonData/CheckTableMapWithAction",
+                type: "POST",
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(obj)
+            }).done(function (json) {
+                $this.setBusy(false);
+                list = JSON.parse(json);
+                var popover = $("<div>");
+                var ul = $('<ul class=vis-apanel-rb-ul>');
+                popover.append(ul);
+                if (list.length > 1) {
+                    for (var i in list) {
+                        var li = $("<li data-id='" + list[i].ID + "' data-action='" + list[i].ActionType + "'>");
+                        li.append(list[i].Name);
+                        li.on('click', function (e) {
+                            e.stopImmediatePropagation();
+                            var ID = $(this).data('id');
+                            var atype = $(this).data('action');
+                            VIS.viewManager.startAction(atype, ID);
+                            var overlay = $('#w2ui-overlay-main');
+                            overlay.hide();
+                            overlay = null;
+                        });
+                        ul.append(li);
+                    }
+                    $(document.activeElement).w2overlay(popover.clone(true), { align:"right", css: { height: '200px' } });
+                } else if (list.length == 1) {
+                    VIS.viewManager.startAction(list[0].ActionType, list[0].ID);
+                }
+
+            }).error(function () {
+                $this.setBusy(false);
+            });
+            return;
+        } 
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
@@ -3009,7 +3068,7 @@
             VIS.TabMngr.show(tabEle, curEle.gTab.keyColumnName, curEle.gTab.getRecord_ID());
             this.vTabbedPane.restoreTabChange();
             return;
-        }
+        }  
 
         //// To Clear SearchText Box on Tab Change
         this.toggleASearchIcons(false, false);
@@ -3147,18 +3206,36 @@
 
         curEle.setVisible(false);
         curEle.getRoot().detach();
+        
         this.getLayout().prepend(tabEle.getRoot());
-        tabEle.setVisible(true);
-
+       
         this.vTabbedPane.setSelectedTab(action); //set Seleted tab
 
         var keepFilters = back;
         if (isAPanelTab) {
+            tabEle.setVisible(true);
             this.curST = st;
             st.registerAPanel(this);
             st.loadData();
         }
         else {
+
+            var mTab = gc.getMTab();
+
+            /* if reset tab is true then set default view which is set on tab */
+            if (mTab.getIsResetLayout()) {
+                var defaultTabLayout = mTab.getTabLayout();
+                if (defaultTabLayout == 'N')
+                    gc.switchMultiRow();
+                else if (defaultTabLayout == 'Y')
+                    gc.switchSingleRow(true);
+                else if (defaultTabLayout == 'C') {
+                    gc.switchCardRow(true);
+                }
+            }
+
+            tabEle.setVisible(true);
+
             gc.activate(oldGC);
             if (oldGC)
                 oldGC.detachDynamicAction();
@@ -3226,17 +3303,26 @@
 
         }
 
+        var gPanel = this.curGC.vGridPanel;
         //	Order Tab
         if (isAPanelTab) {
             this.aMulti.setPressed(false);
             this.aMulti.setEnabled(false);
             this.aCard.setEnabled(false);
             this.aCardDialog.setEnabled(false);
+
             this.aNew.setEnabled(false);
+            gPanel.setEnabled("NRD",false);
+
             this.aDelete.setEnabled(false);
+            gPanel.setEnabled("DRD",false);
+
             this.aFind.setEnabled(false);
-            this.aBatchUpdate ? this.aBatchUpdate.setEnabled(false):'' ;
+            this.aBatchUpdate.setEnabled(false);
+
             this.aRefresh.setEnabled(false);
+            gPanel.setEnabled("RQY",false);
+
             this.aNext.setEnabled(false);
             this.aLast.setEnabled(false);
             this.aFirst.setEnabled(false);
@@ -3260,6 +3346,7 @@
             this.aFind.setEnabled(true);
             this.aBatchUpdate ? this.aBatchUpdate : '';
             this.aRefresh.setEnabled(true);
+            gPanel.setEnabled("RQY", true);
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);
         }
@@ -3298,14 +3385,32 @@
 
         if (this.curTab.getAD_Process_ID() == 0) {
             this.aPrint.setEnabled(false);
+            gPanel.setEnabled("PRT", false);
         }
-        else this.aPrint.setEnabled(true);
+        else {
+            this.aPrint.setEnabled(true);
+            gPanel.setEnabled("PRT", true);
+        }
 
         if (this.curTab.getIsMapView()) {
             this.aMap.show();
         }
         else {
             this.aMap.hide();
+        }
+
+        if (this.curTab.getIsHideGridToggle()) {
+            this.aMulti.hide();
+        }
+        else {
+            this.aMulti.show();
+        }
+
+        if (this.curTab.getIsHideCardToggle()) {
+            this.aCard.hide();
+        }
+        else {
+            this.aCard.show();
         }
      
         this.setLastView(""); //clear view history
@@ -3391,7 +3496,7 @@
      *  @param e event 
      */
     APanel.prototype.dataStatusChanged = function (e) {
-
+        var gPanel = this.curGC.vGridPanel;
         var dbInfo = e.getMessage();
         var findPressed = this.curTab.getIsQueryActive() || this.curTab.getOnlyCurrentDays() > 0;
         if (findPressed)
@@ -3466,23 +3571,34 @@
         if (insertRecord)
             insertRecord = this.curTab.getIsInsertRecord();
         this.aNew.setEnabled(!changed && insertRecord);
+        gPanel.setEnabled("NRD",!changed && insertRecord);
         if (this.aCopy) {
             this.aCopy.setEnabled(!changed && insertRecord);
         }
         this.aRefresh.setEnabled(!changed);
+        gPanel.setEnabled("RQY",!changed);
         this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1);
+        gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1);
         //
         if (readOnly && this.curTab.getIsAlwaysUpdateField())
             readOnly = false;
         this.aIgnore.setEnabled(changed && !readOnly);
+        gPanel.setEnabled("UNO", changed && !readOnly);
+
         this.aSave.setEnabled(changed && !readOnly);
+        gPanel.setEnabled("SAR", changed && !readOnly);
+
         this.aCardDialog.setEnabled(!changed);
 
         //
         //	No Rows
         if (e.getTotalRows() == 0 && insertRecord) {
             this.aNew.setEnabled(true);
+            gPanel.setEnabled("NRD", true);
+
             this.aDelete.setEnabled(false);
+            gPanel.setEnabled("DRD", true);
+
             if (!this.curGC.isZoomAction) {
                 this.highlightButton(true, this.aNew);
             }
@@ -3496,6 +3612,8 @@
         this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
         this.aCard.setPressed(this.curGC.getIsCardRow());
         this.aBack.setEnabled(this.getLastView().length > 0);
+        gPanel.setEnabled("BVW", this.getLastView().length > 0);
+
         if (this.aChat) {
             this.aChat.setPressed(this.curTab.hasChat());
         }
@@ -3810,6 +3928,7 @@
         if (this.curST != null) {
             this.curST.saveData();
             this.aSave.setEnabled(false);	//	set explicitly
+            this.curGC.vGridPanel.setEnabled("SAR", false);
             return;
         }
 
@@ -3949,6 +4068,20 @@
 
     };
 
+    APanel.prototype.cmd_back = function () {
+        var tis = this;
+        if (tis.getLastView() == "Multi") {
+            tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
+            tis.aCard.setPressed(false);
+            tis.curGC.switchMultiRow(true);
+        }
+        else if (tis.getLastView() == "Card") {
+            tis.curGC.switchCardRow(true);
+            tis.aMulti.setPressed(false);
+            tis.aCard.setPressed(true);
+        }
+        tis.setLastView("");
+    }
     /* 
      -Quick Search 
      @param val text to search
@@ -4828,9 +4961,11 @@
     APanel.prototype.setLastView = function (strView) {
         if (strView == "Card" || strView == "Multi") {
             this.aBack.setEnabled(true);
+            this.curGC.vGridPanel.setEnabled("BVW", true);
         }
         else {
             this.aBack.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled("BVW", false);
             strview = "";
         }
         this.lastView = strView;
