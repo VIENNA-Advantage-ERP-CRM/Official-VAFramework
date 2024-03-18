@@ -8,6 +8,8 @@
         var allControls = [];
         var allLinkControls = [];
 
+        var toolbarButtonList = {};
+
         var $table;
 
         var $td0, $td1, $td2, $td3;
@@ -489,6 +491,12 @@
                 return;
             }
 
+            if (mField.getDisplayType() == VIS.DisplayType.Button && mField.getAD_Reference_Value_ID() == 435) {
+                var defaultValue = mField.getDefault(VIS.context, this.windowNo);
+                toolbarButtonList[defaultValue] = editor;
+            }
+
+
             var label = VIS.VControlFactory.getLabel(mField);
             if (label == null && editor == null)
                 return;
@@ -611,6 +619,16 @@
 
         this.getLinkComponents = function () {
             return allLinkControls;
+        }
+
+        this.setEnabled = function (action, enable) {
+            if (Object.keys(toolbarButtonList).length > 0 && toolbarButtonList[action]) {
+                //toolbarButtonList[action].css({
+                //    "opacity": (enable ? 1 : .6),
+                //    "pointer-events": (enable ? "unset" : "none")
+                //});
+                toolbarButtonList[action].setReadOnly(!enable);
+            }
         }
 
         this.setVisible = function (colName, show) {

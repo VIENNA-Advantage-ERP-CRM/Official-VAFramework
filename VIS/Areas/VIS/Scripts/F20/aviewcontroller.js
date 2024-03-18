@@ -977,6 +977,11 @@
                 }
                 var mField = this.gTab.getField(columnName);
                 if (mField != null) {
+
+                    if (mField.getDisplayType() == VIS.DisplayType.Button && (mField.getAD_Reference_Value_ID() == 435 || mField.getIsAction())) {
+                        return;
+                    }
+
                     if (mField.getIsDisplayed(true)) {		//  check context
                         var vis = comp.tag;
                         if (!comp.getIsVisible() && ((vis == null || vis == "undefined") || vis)) {
