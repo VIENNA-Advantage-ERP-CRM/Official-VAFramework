@@ -843,6 +843,10 @@
         return this.vo.IsHideCardToggle;
     };
 
+    GridTab.prototype.getIsHideRecordNav = function () {
+        return this.vo.IsHideRecordNav;
+    };
+
     GridTab.prototype.getIncluded_Tab_ID = function () {
         return this.vo.Included_Tab_ID;
     };	//	getIncluded_Tab_ID

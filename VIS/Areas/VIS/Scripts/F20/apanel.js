@@ -387,16 +387,18 @@
 
             //Ndw Back button
             this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back","back-arrow");
-            $ulToobar.append(this.aBack.getListItm());
-            $ulToobar.append(this.aIgnore.getListItm());
-            $ulToobar.append(this.aNew.getListItm());
-            $ulToobar.append(this.aDelete.getListItm());
-            $ulToobar.append(this.aSave.getListItm());
-            $ulToobar.append(this.aRefresh.getListItm());
-            $ulToobar.append(this.aReport.getListItm());
-            $ulToobar.append(this.aPrint.getListItm());
-           // $ulToobar.append(this.aBatchUpdate.getListItm());
-
+            //check toolbar
+            if (!this.gridWindow.getIsHideToolbar()) {
+                $ulToobar.append(this.aBack.getListItm());
+                $ulToobar.append(this.aIgnore.getListItm());
+                $ulToobar.append(this.aNew.getListItm());
+                $ulToobar.append(this.aDelete.getListItm());
+                $ulToobar.append(this.aSave.getListItm());
+                $ulToobar.append(this.aRefresh.getListItm());
+                $ulToobar.append(this.aReport.getListItm());
+                $ulToobar.append(this.aPrint.getListItm());
+                // $ulToobar.append(this.aBatchUpdate.getListItm());
+            }
 
             //lakhwinder
             //$ulToobar.append(this.aInfo.getListItm());
@@ -2110,7 +2112,11 @@
             return;
 
         if (action.source instanceof VIS.Controls.VButton) {
-            if (!action.source.getField().getIsEditable(true) || this.curTab.getIsReadOnly()) {
+            var btnField = action.source.getField();
+            if (btnField.getAD_Reference_Value_ID() == 435 || btnField.getIsAction()) {
+                //blank do-not check readonly
+            }
+            else if (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly()) {
                 return;
             }
         }
@@ -2698,7 +2704,7 @@
 
         if (vButton.mField.getAD_Reference_Value_ID() == 435) {
 
-            switch (vButton.value) {
+            switch (vButton.mField.vo.DefaultValue) {
                 case 'APT':
                     aPanel.cmd_appointment();
                     break;
@@ -3412,6 +3418,16 @@
         else {
             this.aCard.show();
         }
+
+        if (this.curTab.getIsHideRecordNav()) {
+            this.aNext.hide();
+            this.aPrevious.hide();
+        }
+        else {
+            this.aNext.show();
+            this.aPrevious.show();
+        }
+
      
         this.setLastView(""); //clear view history
 
@@ -3632,16 +3648,20 @@
 
         if (this.isPersonalLock) {
             this.aLock.setEnabled(true);
+            gPanel.setEnabled(this.aLock.getAction(), true);
             this.aLock.setPressed(this.curTab.getIsLocked());
             this.aRecAccess.setEnabled(true);
+            gPanel.setEnabled(this.aRecAccess.getAction(), true);
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
             if (this.curTab.getValue('AD_Org_ID') > 0 && this.excludeFromShare.indexOf(this.curTab.getTableName().toLowerCase()) == -1) {
                 this.aSharedRecord.setEnabled(true);
+                gPanel.setEnabled(this.aSharedRecord.getAction(), true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {
                 this.aSharedRecord.setEnabled(false);
+                gPanel.setEnabled(this.aSharedRecord.getAction(), false);
             }
         }
 
@@ -3651,84 +3671,109 @@
             //this.aMulti.setEnabled(false);
             if (this.aChat) {
                 this.aChat.setEnabled(false);
+                gPanel.setEnabled(this.aChat.getAction(), false);
             }
             if (this.aAttachment) {
                 this.aAttachment.setEnabled(false);
+                gPanel.setEnabled(this.aAttachment.getAction(), false);
             }
             if (this.aSubscribe) {
                 this.aSubscribe.setEnabled(false);
+                gPanel.setEnabled(this.aSubscribe.getAction(), false);
             }
             //if (this.aImportMap) {
             //    this.aImportMap.setEnabled(false);
             //}
             if (this.aHistory) {
                 this.aHistory.setEnabled(false);
+                gPanel.setEnabled(this.aHistory.getAction(), false);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(false);
+                gPanel.setEnabled(this.aEmail.getAction(), false);
             }
             if (this.aLetter) {
                 this.aLetter.setEnabled(false);
+                gPanel.setEnabled(this.aLetter.getAction(), false);
             }
             if (this.aSms) {
                 this.aSms.setEnabled(false);
+                gPanel.setEnabled(this.aSms.getAction(), false);
             }
             if (this.aFaxEmail) {
                 this.aFaxEmail.setEnabled(false);
+                gPanel.setEnabled(this.aFaxEmail.getAction(), false);
             }
 
             if (this.aCreateDocument) {
                 this.aCreateDocument.setEnabled(false);
+                gPanel.setEnabled(this.aCreateDocument.getAction(), false);
             }
             if (this.aUploadDocument) {
                 this.aUploadDocument.setEnabled(false);
+                gPanel.setEnabled(this.aUploadDocument.getAction(), false);
             }
             if (this.aViewDocument) {
                 this.aViewDocument.setEnabled(false);
+                gPanel.setEnabled(this.aViewDocument.getAction(), false);
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(false);
+                gPanel.setEnabled(this.aAttachment.getAction(), false);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(false);
+                gPanel.setEnabled(this.aZoomAcross.getAction(), false);
             }
             if (this.aMarkToExport) {
                 this.aMarkToExport.setEnabled(false);
+                gPanel.setEnabled(this.aMarkToExport.getAction(), false);
             }
             if (this.aArchive) {
                 this.aArchive.setEnabled(false);
+                gPanel.setEnabled(this.aArchive.getAction(), false);
             }
             if (this.aEmailAttach) {
                 this.aEmailAttach.setEnabled(false);
+                gPanel.setEnabled(this.aEmailAttach.getAction(), false);
             }
             if (this.aAppointment) {
                 this.aAppointment.setEnabled(false);
+                gPanel.setEnabled(this.aAppointment.getAction(), false);
             }
             if (this.aTask) {
                 this.aTask.setEnabled(false);
+                gPanel.setEnabled(this.aTask.getAction(), false);
             }
             if (this.aRequest) {
                 this.aRequest.setEnabled(false);
+                gPanel.setEnabled(this.aRequest.getAction(), false);
             }
             if (this.aWorkflow) {
                 this.aWorkflow.setEnabled(false);
+                gPanel.setEnabled(this.aWorkflow.getAction(), false);
             }
             if (this.aCopy) {
                 this.aCopy.setEnabled(false);
+                gPanel.setEnabled(this.aCopy.getAction(), false);
             }
             if (this.aLock) {
                 this.aLock.setEnabled(false);
+                gPanel.setEnabled(this.aLock.getAction(), false);
             }
             if (this.aRecAccess) {
                 this.aRecAccess.setEnabled(false);
+                gPanel.setEnabled(this.aRecAccess.getAction(), false);
             }
 
             if (this.aSharedRecord) {
                 this.aSharedRecord.setEnabled(false);
+                gPanel.setEnabled(this.aSharedRecord.getAction(), false);
             }
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(false);
+                gPanel.setEnabled(this.aBatchUpdate.getAction(), false);
             }
 
             //if (this.aCall) {
@@ -3739,76 +3784,100 @@
 
             if (this.aChat) {
                 this.aChat.setEnabled(true);
+                gPanel.setEnabled(this.aChat.getAction(), true);
             }
             if (this.aAttachment) {
                 this.aAttachment.setEnabled(true);
+                gPanel.setEnabled(this.aAttachment.getAction(), true);
             }
             if (this.aSubscribe) {
                 this.aSubscribe.setEnabled(true);
+                gPanel.setEnabled(this.aSubscribe.getAction(), true);
             }
             if (this.aHistory) {
                 this.aHistory.setEnabled(true);
+                gPanel.setEnabled(this.aHistory.getAction(), true);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(true);
+                gPanel.setEnabled(this.aEmail.getAction(), true);
             }
             if (this.aLetter) {
                 this.aLetter.setEnabled(true);
+                gPanel.setEnabled(this.aLetter.getAction(), true);
             }
             if (this.aSms) {
                 this.aSms.setEnabled(true);
+                gPanel.setEnabled(this.aSms.getAction(), true);
             }
             if (this.aFaxEmail) {
                 this.aFaxEmail.setEnabled(true);
+                gPanel.setEnabled(this.aFaxEmail.getAction(), true);
             }
             if (this.aImportMap) {
                 this.aImportMap.setEnabled(true);
+                gPanel.setEnabled(this.aImportMap.getAction(), true);
             }
             if (this.aCreateDocument) {
                 this.aCreateDocument.setEnabled(true);
+                gPanel.setEnabled(this.aCreateDocument.getAction(), true);
             }
             if (this.aUploadDocument) {
                 this.aUploadDocument.setEnabled(true);
+                gPanel.setEnabled(this.aUploadDocument.getAction(), true);
             }
             if (this.aViewDocument) {
                 this.aViewDocument.setEnabled(true);
+                gPanel.setEnabled(this.aViewDocument.getAction(), true);
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(true);
+                gPanel.setEnabled(this.aAttachFrom.getAction(), true);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(true);
+                gPanel.setEnabled(this.aZoomAcross.getAction(), true);
             }
             if (this.aMarkToExport) {
                 this.aMarkToExport.setEnabled(true);
+                gPanel.setEnabled(this.aMarkToExport.getAction(), true);
             }
             if (this.aArchive) {
                 this.aArchive.setEnabled(true);
+                gPanel.setEnabled(this.aArchive.getAction(), true);
             }
             if (this.aEmailAttach) {
                 this.aEmailAttach.setEnabled(true);
+                gPanel.setEnabled(this.aEmailAttach.getAction(), true);
             }
             if (this.aAppointment) {
                 this.aAppointment.setEnabled(true);
+                gPanel.setEnabled(this.aAppointment.getAction(), true);
             }
             if (this.aTask) {
                 this.aTask.setEnabled(true);
+                gPanel.setEnabled(this.aTask.getAction(), true);
             }
             if (this.aRequest) {
                 this.aRequest.setEnabled(true);
+                gPanel.setEnabled(this.aRequest.getAction(), true);
             }
             if (this.aWorkflow) {
                 this.aWorkflow.setEnabled(true);
+                gPanel.setEnabled(this.aWorkflow.getAction(), true);
             }
             if (this.aCopy) {
                 this.aCopy.setEnabled(true);
+                gPanel.setEnabled(this.aCopy.getAction(), true);
             }
             if (this.aLock) {
                 this.aLock.setEnabled(true);
+                gPanel.setEnabled(this.aLock.getAction(), true);
             }
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(true);
+                gPanel.setEnabled(this.aBatchUpdate.getAction(), true);
             }
             //if (this.aCall) {
             //    this.aCall.setEnabled(true);
@@ -4114,6 +4183,7 @@
         if (record_ID == -1)	//	No Key
         {
             this.aChat.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled(this.aChat.getAction(), false);
             return;
         }
 
@@ -4175,6 +4245,7 @@
         if (record_ID == -1)	//	No Key
         {
             this.aLetter.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled(this.aLetter.getAction(), false);
             return;
         }
 
@@ -4197,6 +4268,7 @@
         if (record_ID == -1)	//	No Key
         {
             this.aEmail.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled(this.aEmail.getAction(), false);
             return;
         }
 
@@ -4410,6 +4482,7 @@
         if (record_ID == -1)	//	No Key
         {
             this.aSms.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled(this.aSms.getAction(), false);
             return;
         }
 
@@ -4472,6 +4545,7 @@
         if (record_ID == -1)	//	No Key
         {
             this.aSubscribe.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled(this.aSubscribe.getAction(), false);
             return;
         }
         var self = this;
@@ -4509,6 +4583,7 @@
         //alert("attachment");
         if (this.curTab.getRecord_ID() < 1) {
             this.aAttachment.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled(this.aAttachment.getAction(), false);
             return;
         }
         var self = this;
@@ -4551,6 +4626,7 @@
     APanel.prototype.cmd_RecordShared = function () {
         if (this.curTab.getRecord_ID() < 1) {
             this.aSharedRecord.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled(this.aSharedRecord.getAction(), false);
             return;
         }
 
@@ -4923,6 +4999,7 @@
         if (record_ID == -1)	//	No Key
         {
             this.aCall.setEnabled(false);
+            this.curGC.vGridPanel.setEnabled(this.aCall.getAction(), false);
             return;
         }
         var table_ID = this.curTab.getAD_Table_ID();

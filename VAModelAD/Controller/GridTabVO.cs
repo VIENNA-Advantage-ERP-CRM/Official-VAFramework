@@ -171,6 +171,7 @@ namespace VAdvantage.Controller
         public bool? ResetLayout = null;
         public bool? IsHideGridToggle = null;
         public bool? IsHideCardToggle = null;
+        public bool? IsHideRecordNav = null;
 
         public bool? IsAutoNewRecord = null;
 
@@ -555,6 +556,7 @@ namespace VAdvantage.Controller
                 vo.ResetLayout = Utility.Util.GetValueOfString(dr["resetlayout"]).Equals("Y");
                 vo.IsHideGridToggle = Utility.Util.GetValueOfString(dr["ishidegridtoggle"]).Equals("Y");
                 vo.IsHideCardToggle = Utility.Util.GetValueOfString(dr["ishidecardtoggle"]).Equals("Y");
+                vo.IsHideRecordNav = Utility.Util.GetValueOfString(dr["IsHideRecordNav"]).Equals("Y");
 
                 string isAuto = dr["IsAutoNewRecord"].ToString();
                 if (isAuto == "Y")
@@ -1020,6 +1022,7 @@ namespace VAdvantage.Controller
             clone.IsHideGridToggle = IsHideGridToggle;
             clone.IsHideCardToggle = IsHideCardToggle;
             clone.HideFieldGroupFrom = HideFieldGroupFrom;
+            clone.IsHideRecordNav = IsHideRecordNav;
 
             clone.fields = new List<GridFieldVO>();
             for (int i = 0; i < fields.Count; i++)
