@@ -1137,7 +1137,11 @@ namespace VIS.Controllers
             }
             if (displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(ImageURL,'')") > 0)
             {
-                displayCol = displayCol.Replace(displayCol.Substring(displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(Imag"), displayCol.IndexOf("Images/nothing.png^^')") + 21), "");
+                int startIndex = displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(Imag");
+                int endIndex = displayCol.IndexOf("Images/nothing.png^^')") + "Images/nothing.png^^')".Length;
+                int length = endIndex - startIndex;
+                displayCol = displayCol.Remove(startIndex, length);
+                // displayCol = displayCol.Replace(displayCol.Substring(displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(Imag"), displayCol.IndexOf("Images/nothing.png^^')") + 21), "");
             }
             else if (displayCol.IndexOf("nothing.png") > -1)
             {

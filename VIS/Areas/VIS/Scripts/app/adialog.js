@@ -459,7 +459,7 @@
     VIS.ADialog = {
 
         /**
-         *  Show PAIN message with info 
+         *  Show Plain message with info 
          *  @method info
          *  @param keyName Keyword Name
          *  @param isTextMsg if true returns Message Text, if false returns Message Tip
@@ -493,6 +493,7 @@
             //alert(content);
             content = null;
         },
+
 
         /**
        *	Ask Question with question icon and (OK) (Cancel) buttons
@@ -635,6 +636,104 @@
             return retValue;
         },
 
+
+    };
+
+    /**
+     * Handle Callback on close -- VIS0228 29-Jan-2024
+     * */
+
+    VIS.ADialogCallback = {
+
+        /**
+         *  Show Plain message with info 
+         *  @method info
+         *  @param keyName Keyword Name
+         *  @param isTextMsg if true returns Message Text, if false returns Message Tip
+         *     and if null then returns both message text and tip.
+         *  @param extraMsg extra message to be displayed
+         */
+        info: function (keyName, extraMsg, header,callback) {
+
+            var content = "";
+            // if user has given a key
+            if (keyName != null && !keyName.equals("")) {
+                // get key's value
+                content += VIS.Msg.getMsg(keyName);
+            }
+            // if user has given any extra content
+            if (extraMsg != null && extraMsg.length > 0) {
+                // add the content
+                content += "\n" + extraMsg;
+            }
+
+            VIS.ADialogUI.info(content, header, callback);
+
+
+
+            //var $p = $('<p>');
+            //$p.text(content);
+            //div.append($p);
+
+            //div.dialog();
+
+            //alert(content);
+            content = null;
+        },     
+
+
+        /**
+	     *	Display error with error icon
+         *  @method error
+	     *	@param	keyName	Message to be translated
+         *  @param  isMsgText 
+	     *	@param	extraMsg			Additional message
+	     */
+        error: function (keyName, extraMsg, header, callback) {
+            var content = "";
+            // if user has given a key
+            if (keyName != null && !keyName.equals("")) {
+                // get key's value
+                content += VIS.Msg.getMsg(keyName);
+            }
+            // if user has given any extra content
+            if (extraMsg != null && extraMsg.length > 0) {
+                // add the content
+                content += "\n" + extraMsg;
+            }
+
+            // if user has given statusbar label, then show the messsage on status bar also
+
+            VIS.ADialogUI.error(content, header, callback);
+
+            content = null;
+        },
+
+        /**
+	     *	Display warning with warning icon
+         *  @method warn
+	     *	@param	keyName	Message to be translated
+         *  @param  isMsgText 
+	     *	@param	extraMsg			Additional message
+	     */
+        warn: function (keyName, extraMsg, header, callback) {
+            var content = "";
+            // if user has given a key
+            if (keyName != null && !keyName.equals("")) {
+                // get key's value
+                content += VIS.Msg.getMsg(keyName);
+            }
+            // if user has given any extra content
+            if (extraMsg != null && extraMsg.length > 0) {
+                // add the content
+                content += "\n" + extraMsg;
+            }
+
+            //  alert(content);
+
+            VIS.ADialogUI.warn(content, header, callback);
+            content = null;
+        },
 
     };
 

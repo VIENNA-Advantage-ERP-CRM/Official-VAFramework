@@ -102,7 +102,7 @@
     grid-template-rows: auto auto auto auto auto 1fr auto;
     height: calc(100vh - 66px);
     height: calc((var(--vis-screen-height,1vh) *100) - 66);
-    max-height: height: calc((var(--vis-screen-height,1vh) *100) - 66);
+    max-height: calc((var(--vis-screen-height,1vh) *100) - 66);
     position: relative;
     /*overflow: auto;*/
 }
@@ -655,6 +655,7 @@ span.vis-ad-w-p-tb-rc-action {
     flex-flow: wrap;
     padding-right: 10px;
     padding-left: 10px;
+    align-items: center;
 }
 
 .vis-ad-w-p-tabs-t .vis-ad-w-p-tabs-oflow:first-child {
@@ -1207,12 +1208,14 @@ label.vis-css-treewindow-selected, label.vis-css-treewindow-selected:before {
     }
 
     .vis-ad-w-p-s-plst li select {
-        border: none;
+       /* border: none;*/
         background-color: transparent;
+        border: 1px solid transparent;
     }
 
         .vis-ad-w-p-s-plst li select:focus {
             outline: none;
+            border-color: rgba(var(--v-c-primary), 1);
         }
 
 li.vis-page-item-select {
@@ -1353,6 +1356,25 @@ li.vis-page-item-select {
     padding-right: 10px !important;
     font-size: .875rem;
     color: rgba(var(--v-c-primary), 1) !important;
+    border: 1px solid transparent;
+}
+.vis-ev-col-fg-more:focus {
+    border-color: rgba(var(--v-c-primary), 1);
+}
+ 
+.vis-ev-fg-arrowBtn {
+    border: none;
+    display: flex;
+    padding-top: 3px !important;
+}
+ 
+.vis-ev-fg-arrowBtn i {
+    background: none;
+    padding: 0 !important;
+}
+ 
+.vis-ev-fg-arrowBtn:focus i { 
+    border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
 .vis-ev-col-fieldgroup :last-child {
@@ -1696,9 +1718,9 @@ li.vis-page-item-select {
         cursor: pointer;
     }
 
-.vis-ad-w-p-ap-tp-o-b-content {
+/*.vis-ad-w-p-ap-tp-o-b-content {
     height: calc(100% - 30px);
-}
+}*/
 
 .vis-ad-w-p-a-oflow span {
     width: 100%;
@@ -1747,7 +1769,7 @@ li.vis-page-item-select {
 
 .vis-ad-w-p-actionpanel-b .vis-ad-w-p-ap-tp-outerwrap {
     flex-direction: column;
-    width: auto !important;
+  /*  width: auto !important;*/
     height: 250px;
 }
 
@@ -2587,6 +2609,35 @@ html[dir="rtl"] .vis-window-instruc-overlay-new-inn {
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
     border-bottom: 6px solid rgba(var(--v-c-primary), 1);
+}
+
+
+.vis-css-treewindow input[type="checkbox"]:focus + label:before,
+.vis-css-treewindow a:focus {
+    color: rgba(var(--v-c-primary), 1);
+}
+
+.vis-tree-search .input-group-text:focus {
+    box-shadow: 0 0 6px rgba(var(--v-c-primary), 1);
+}
+
+.vis-ad-w-p-tb-search:focus-within {
+    border: 1px solid rgba(var(--v-c-primary), 1);
+}
+
+.vis-ad-w-p-inc-tabs-oflow a:focus, .vis-ad-w-p-tabs-oflow a:focus {
+    box-shadow: 0 0 10px rgba(var(--v-c-primary), .7);
+    padding: 0;
+}
+
+.vis-ad-w-p-inc-tabs-oflow a,
+.vis-ad-w-p-tabs-oflow a {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 /*.vis-menu-heading-divider-left,

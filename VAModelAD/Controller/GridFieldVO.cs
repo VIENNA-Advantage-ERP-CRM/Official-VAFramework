@@ -796,7 +796,8 @@ namespace VAdvantage.Controller
             }
             if (DisplayType.IsLookup(displayType))
             {
-                if (IsDisplayedf || IsDisplayedMR || ColumnName.ToLower().Equals("createdby") || ColumnName.ToLower().Equals("updatedby")
+                //Special case for Chat bot, create lookup for hideen field also
+                if (ctx.GetContext("EnforceLookup") == "Y" ||  IsDisplayedf || IsDisplayedMR || ColumnName.ToLower().Equals("createdby") || ColumnName.ToLower().Equals("updatedby")
                     || IsHeaderPanelitem)
                 {
                     try

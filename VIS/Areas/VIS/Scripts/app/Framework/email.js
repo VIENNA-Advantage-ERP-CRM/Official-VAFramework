@@ -564,22 +564,30 @@
             }
             else {
                 if (rowsSource.length > 0) {
-                    var htm = '';
+                    //var htm = '';
+                    var emails = "";
                     for (var i = 0; i < rowsSource.length; i++) {
 
                         // else {
                         if (isEmail) {
                             if (rowsSource[i]["email"] != null) {
                                 isEmail = true;
-                                var ID = rowsSource[i][_curtab.getKeyColumnName().toLower()];
-
-                                htm += '<li class="vis-list-li-bcc"  data-email="' + rowsSource[i]["email"] + '"><input data-currentrec="Y" data-recID="' + ID + '" id="' + self.windowNo + '_' + rowsSource[i]["email"] + '_CheckBoxList1" type="checkbox" value="' + rowsSource[i]["email"] + '" checked/><label class="vis-chcklist-label"  for="' + self.windowNo + '_' + rowsSource[i]["email"] + '_CheckBoxList1">' + rowsSource[i]["email"] + '(' + ID + ')</label></li>';
+                                //var ID = rowsSource[i][_curtab.getKeyColumnName().toLower()];
+                                //htm += '<li class="vis-list-li-bcc"  data-email="' + rowsSource[i]["email"] + '"><input data-currentrec="Y" data-recID="' + ID + '" id="' + self.windowNo + '_' + rowsSource[i]["email"] + '_CheckBoxList1" type="checkbox" value="' + rowsSource[i]["email"] + '" checked/><label class="vis-chcklist-label"  for="' + self.windowNo + '_' + rowsSource[i]["email"] + '_CheckBoxList1">' + rowsSource[i]["email"] + '(' + ID + ')</label></li>';
+                                emails += rowsSource[i]["email"] + ";";
                             }
 
                         }
                     }
-                    $bccChkList.append(htm);
-                    htm = null;
+                   // $bccChkList.append(htm);
+                    //htm = null;
+                    // Remove the trailing semi-colon if there are any emails
+                    //if (emails.length > 0) {
+                    //    emails = emails.slice(0, -1);
+                    //}
+
+                    // Set the accumulated email values as the value of $to
+                    $to.val(emails);
                 }
                 else {
                     loademailforSingleView();
@@ -596,8 +604,9 @@
                     isEmail = true;
                     var ID = rowsSingleView[_curtab.getKeyColumnName().toLower()];
 
-                    $bccChkList.append('<li class="vis-list-li-bcc" data-email="' + rowsSingleView["email"] + '"><input id="' + self.windowNo + '_' + rowsSingleView["email"] + '_CheckBoxList1" type="checkbox" value="' + rowsSingleView["email"]
-                        + '" checked /><label class="vis-chcklist-label" for="' + self.windowNo + '_' + rowsSingleView["email"] + '_CheckBoxList1">' + rowsSingleView["email"] + '(' + ID + ')</label></li>');
+                    //$bccChkList.append('<li class="vis-list-li-bcc" data-email="' + rowsSingleView["email"] + '"><input id="' + self.windowNo + '_' + rowsSingleView["email"] + '_CheckBoxList1" type="checkbox" value="' + rowsSingleView["email"]
+                    //    + '" checked /><label class="vis-chcklist-label" for="' + self.windowNo + '_' + rowsSingleView["email"] + '_CheckBoxList1">' + rowsSingleView["email"] + '(' + ID + ')</label></li>');
+                    $to.val(rowsSingleView["email"]);
                 }
             }
         };

@@ -17,7 +17,8 @@ using System.Data;
 using VAdvantage.Model;
 using VAdvantage.Classes;
 
-using VAdvantage.ProcessEngine;namespace VAdvantage.Process
+using VAdvantage.ProcessEngine;
+namespace VAdvantage.Process
 {
     /// <summary>
     /// Create Columns of Table or View
@@ -63,7 +64,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
         /// <returns></returns>
         protected override String DoIt()
         {
-           if (p_AD_Table_ID == 0)
+            if (p_AD_Table_ID == 0)
                 throw new Exception("@NotFound@ @AD_Table_ID@ " + p_AD_Table_ID);
             log.Info("EntityType=" + p_EntityType
                 + ", AllTables=" + p_AllTables
@@ -86,8 +87,10 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                     throw new Exception("@NotFound@ @AD_Table_ID@ " + p_AD_Table_ID);
                 log.Info(table.GetTableName() + ", EntityType=" + p_EntityType);
                 String tableName = table.GetTableName();
-                
-                //tableName = tableName.ToUpper();
+
+                // tableName = tableName.ToUpper();
+
+
                 DataSet rs = md.GetColumns(catalog, schema, tableName.ToUpper());
                 AddTableColumn(GetCtx(), rs, table, p_EntityType);
                 SubTableUtil.CheckStandardColumns(table, p_EntityType);
@@ -207,7 +210,7 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                     column.SetAD_Element_ID(element.GetAD_Element_ID());
                     //	Other
                     column.SetIsMandatory("NO".Equals(nullable));
-                    column.SetIsMandatoryUI(column.IsMandatory());                    
+                    column.SetIsMandatoryUI(column.IsMandatory());
 
                     // Key
                     if (columnName.Equals(tableName + "_ID", StringComparison.OrdinalIgnoreCase))
@@ -329,13 +332,13 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                     {
                         column.SetAD_Val_Rule_ID(116);	//	Client Login
                         column.SetDefaultValue("@#AD_Client_ID@");
-                        column.SetIsUpdateable(false);                        
+                        column.SetIsUpdateable(false);
                     }
                     else if (columnName.Equals("AD_Org_ID"))
                     {
                         column.SetAD_Val_Rule_ID(104);	//	Org Security
                         column.SetDefaultValue("@#AD_Org_ID@");
-                        column.SetIsUpdateable(false);                        
+                        column.SetIsUpdateable(false);
                     }
                     else if (columnName.Equals("Processed"))
                     {
@@ -364,9 +367,290 @@ using VAdvantage.ProcessEngine;namespace VAdvantage.Process
                     }
                 }	//	while columns
             }
+            else
+            {
+                if (DatabaseType.IsPostgre)
+                {
+                    tableName = tableName.ToUpper();
+                    for (int i = 0; i <= rs.Tables[0].Rows.Count - 1; i++)
+                    {
+                        String tn = rs.Tables[0].Rows[i]["TABLE_NAME"].ToString();
+                        if (!tableName.Equals(tn, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        String columnName = rs.Tables[0].Rows[i]["COLUMN_NAME"].ToString();
+                        colName.Add(columnName);
+                        MColumn column = table.GetColumn(columnName);
+                        if (column != null)
+                            continue;
+                        //int dataType = Utility.Util.GetValueOfInt(rs.Tables[0].Rows[i]["DATATYPE"].ToString());
+                        String typeName = rs.Tables[0].Rows[i]["DATA_TYPE"].ToString().ToUpper();
+                        String nullable = rs.Tables[0].Rows[i]["IS_NULLABLE"].ToString();
+                        int size = Utility.Util.GetValueOfInt(rs.Tables[0].Rows[i]["CHARACTER_MAXIMUM_LENGTH"]);
+                        int digits = Utility.Util.GetValueOfInt(rs.Tables[0].Rows[i]["NUMERIC_PRECISION"]);
+                        //
+                        log.Config(columnName + " - DataType=" + " " + typeName
+                            + ", Nullable=" + nullable + ", Size=" + size + ", Digits="
+                            + digits);
+                        //
+                        column = new MColumn(table);
+                        column.SetEntityType(entityType);
+                        //	Element
+                        M_Element element = M_Element.Get(ctx, columnName, Get_Trx());
+                        if (element == null)
+                        {
+                            
+                            string capsColName = ColElementCaps(columnName);
+                            element = new M_Element(ctx, capsColName, entityType, Get_Trx());
+                            element.SetName(capsColName.Replace("_", " "));
+                            element.Save();
+                        }
+                        //	Column Sync
+
+                        column.SetColumnName(element.GetColumnName());
+                        column.SetName(element.GetName());
+                        column.SetDescription(element.GetDescription());
+                        column.SetHelp(element.GetHelp());
+                        column.SetAD_Element_ID(element.GetAD_Element_ID());
+                        //	Other
+                        column.SetIsMandatory("NO".Equals(nullable));
+                        column.SetIsMandatoryUI(column.IsMandatory());
+                        if (columnName.Equals(tableName + "_ID", StringComparison.OrdinalIgnoreCase))
+                        {
+                            column.SetIsKey(true);
+                            column.SetAD_Reference_ID(DisplayType.ID);
+                            column.SetIsUpdateable(false);
+                        }
+                        // Account
+                        else if ((columnName.ToUpper().IndexOf("ACCT") != -1)
+                            && (size == 10))
+                            column.SetAD_Reference_ID(DisplayType.Account);
+                        // Location
+                        else if (columnName.Equals("C_Location_ID", StringComparison.OrdinalIgnoreCase))
+                            column.SetAD_Reference_ID(DisplayType.Location);
+                        // Product Attribute
+                        else if (columnName.Equals("M_AttributeSetInstance_ID"))
+                            column.SetAD_Reference_ID(DisplayType.PAttribute);
+                        // SalesRep_ID (=User)
+                        else if (columnName.Equals("SalesRep_ID", StringComparison.OrdinalIgnoreCase))
+                        {
+                            column.SetAD_Reference_ID(DisplayType.Table);
+                            column.SetAD_Reference_Value_ID(190);
+                        }
+                        // ID
+                        else if (columnName.EndsWith("_ID"))
+                            column.SetAD_Reference_ID(DisplayType.TableDir);
+                        // Date
+                        else if ((typeName == Types.DATE) || (typeName == Types.TIME)
+                            || (typeName == Types.TIMESTAMP)
+                            // || columnName.toUpperCase().indexOf("DATE") != -1
+                            || columnName.Equals("Created", StringComparison.OrdinalIgnoreCase)
+                            || columnName.Equals("Updated", StringComparison.OrdinalIgnoreCase))
+                        {
+                            column.SetAD_Reference_ID(DisplayType.DateTime);
+                            column.SetIsUpdateable(false);
+                        }
+                        // CreatedBy/UpdatedBy (=User)
+                        else if (columnName.Equals("CreatedBy", StringComparison.OrdinalIgnoreCase)
+                            || columnName.Equals("UpdatedBy", StringComparison.OrdinalIgnoreCase))
+                        {
+                            column.SetAD_Reference_ID(DisplayType.Table);
+                            column.SetAD_Reference_Value_ID(110);
+                            column.SetConstraintType(X_AD_Column.CONSTRAINTTYPE_DoNOTCreate);
+                            column.SetIsUpdateable(false);
+                        }
+                        // Export_ID
+                        // By Default isCopy check box should be False on this Column.
+                        else if (columnName.Equals("Export_ID", StringComparison.OrdinalIgnoreCase))
+                        {
+                            column.SetIsCopy(false);
+                        }
+                        //	Entity Type
+                        else if (columnName.Equals("EntityType", StringComparison.OrdinalIgnoreCase))
+                        {
+                            column.SetAD_Reference_ID(DisplayType.Table);
+                            column.SetAD_Reference_Value_ID(389);
+                            column.SetDefaultValue("U");
+                            column.SetConstraintType(X_AD_Column.CONSTRAINTTYPE_Restrict);
+                            column.SetReadOnlyLogic("@EntityType@=D");
+                        }
+                        // CLOB
+                        else if ((typeName == Types.CLOB)|| (size > 500)||typeName.StartsWith("TEXT"))
+                            column.SetAD_Reference_ID(DisplayType.TextLong);
+                        // BLOB----checked
+                        else if ((typeName == Types.BLOB) || (typeName.StartsWith("BYTEA")))
+                            column.SetAD_Reference_ID(DisplayType.Binary);
+                        // Amount
+                        else if (columnName.ToUpper().IndexOf("AMT") != -1)
+                            column.SetAD_Reference_ID(DisplayType.Amount);
+                        // Qty
+                        else if (columnName.ToUpper().IndexOf("QTY") != -1)
+                            column.SetAD_Reference_ID(DisplayType.Quantity);
+                        // Boolean-----checked
+                        else if ((size == 1) || columnName.ToUpper().StartsWith("IS") || typeName == Types.CHAR)
+                            column.SetAD_Reference_ID(DisplayType.YesNo);
+                        // List
+                        else if ((size < 4) && (typeName == Types.CHAR))
+                            column.SetAD_Reference_ID(DisplayType.List);
+                        // Name, DocumentNo
+                        else if (columnName.Equals("Name", StringComparison.OrdinalIgnoreCase)
+                            || columnName.Equals("DocumentNo", StringComparison.OrdinalIgnoreCase))
+                        {
+                            column.SetAD_Reference_ID(DisplayType.String);
+                            column.SetIsIdentifier(true);
+                            column.SetSeqNo(1);
+                        }
+                        // String, Text
+                        else if ((typeName == Types.CHAR) || (typeName == Types.VARCHAR)
+                            || typeName.StartsWith("NVAR")
+                            || typeName.StartsWith("NCHAR") || typeName.StartsWith("CHARACTER VARYING"))
+                        {
+                            if (typeName.StartsWith("N"))   //	MultiByte
+                                size /= 2;
+                            if (size > 255)
+                                column.SetAD_Reference_ID(DisplayType.Text);
+                            else
+                                column.SetAD_Reference_ID(DisplayType.String);
+                        }
+
+                        // Number
+                        else if ((typeName == Types.INTEGER) || (typeName == Types.SMALLINT)
+                            || (typeName == Types.DECIMAL) || (typeName == Types.NUMERIC))
+                        {
+                            if (size <= 10)
+                                column.SetAD_Reference_ID(DisplayType.Integer);
+                            else
+                                column.SetAD_Reference_ID(DisplayType.Number);
+                        }
+                        //	??
+                        else
+                            column.SetAD_Reference_ID(DisplayType.String);
+
+                        //	General Defaults
+                        if (columnName.EndsWith("_ID"))
+                            column.SetConstraintType(X_AD_Column.CONSTRAINTTYPE_Restrict);
+                        if (columnName.Equals("AD_Client_ID"))
+                        {
+                            column.SetAD_Val_Rule_ID(116);  //	Client Login
+                            column.SetDefaultValue("@#AD_Client_ID@");
+                            column.SetIsUpdateable(false);
+                        }
+                        else if (columnName.Equals("AD_Org_ID"))
+                        {
+                            column.SetAD_Val_Rule_ID(104);  //	Org Security
+                            column.SetDefaultValue("@#AD_Org_ID@");
+                            column.SetIsUpdateable(false);
+                        }
+                        else if (columnName.Equals("Processed"))
+                        {
+                            column.SetAD_Reference_ID(DisplayType.YesNo);
+                            column.SetDefaultValue("N");
+                            column.SetIsUpdateable(false);
+                        }
+                        else if (columnName.Equals("Posted"))
+                        {
+                            column.SetAD_Reference_ID(DisplayType.Button);
+                            column.SetAD_Reference_Value_ID(234);   //	_PostedStatus
+                            column.SetDefaultValue("N");
+                            column.SetIsUpdateable(false);
+                        }
+
+                        //	General
+                        column.SetFieldLength(size);
+                        if (column.IsUpdateable() && table.IsView())
+                            column.SetIsUpdateable(false);
+
+                        //	Done
+                        if (column.Save())
+                        {
+                            AddLog(0, DateTime.Now, null, table.GetTableName() + "." + column.GetColumnName());
+                            m_count++;
+                        }
+
+                    }
+
+                }
+            }
+
             return colName;
-        }	//	addTableColumn
+
+        }   //	addTableColumn
+
+        /// <summary>
+        /// To convert column name in proper case 
+        /// </summary>
+        /// <param name="columnName"> DB column name</param>
+        /// <returns></returns>
+        private string ColElementCaps(string columnName)
+        {
+            StringBuilder result = new StringBuilder();
+
+            bool capitalizeNext = true;
+
+            for (int i = 0; i < columnName.Length; i++)
+            {
+                char word = columnName[i];
+                if (word == '_')
+                {
+                    capitalizeNext = true;
+
+                    result.Append("_");
+                }
+                else if (capitalizeNext)
+                {
+                    result.Append(char.ToUpper(word));
+
+                    capitalizeNext = false;
+                }
+                else
+                {
+                    result.Append(word);
+
+                }
+            }
+            return result.ToString();
+
+        }
     }
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

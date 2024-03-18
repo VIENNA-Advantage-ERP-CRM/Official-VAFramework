@@ -1601,6 +1601,7 @@
 
         if (recid == -1) {
             this.cancelSel = true;
+            this.refreshTabPanelData(-1);
             return;
         }
         if (recid > -1) {
@@ -1701,6 +1702,11 @@
 
             var retVal = $this.gTab.dataSave(manualCmd);
             if (retVal) {
+                if (manualCmd && $this.vHeaderPanel) {
+                    $this.vHeaderPanel.navigate();
+                    //refresh Grid Row
+                    // this.vTable.refreshRow();
+                }
                 //refresh Grid Row
                 // this.vTable.refreshRow();
             }

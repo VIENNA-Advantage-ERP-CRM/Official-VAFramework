@@ -67,6 +67,56 @@
         return "";
     };
 
+    /// <summary>
+    /// Check organisation access for user.
+    /// </summary>
+    /// <returns>Message</returns>
+
+    calloutColumn.prototype.checkOrgAccess = function (ctx, windowNo, mTab, mField, value, oldValue) {
+
+        if (this.isCalloutActive() || value == null) {
+            return;
+        }
+
+        var userID = Util.getValueOfInt(mTab.getValue("AD_User_ID"));
+        this.setCalloutActive(true);
+        $.ajax({
+            url: VIS.Application.contextUrl + "VIS/CalloutColumn/CheckOrgAccessByRole",
+            data: { AD_Role_ID: value, AD_User_ID: userID },
+            success: function (result) {
+                if (result == 'NoRoleAcc')
+                    VIS.ADialog.warn("VIS_NoRoleAccess");
+                if (result == 'NoUserAcc')
+                    VIS.ADialog.warn("VIS_NoUserAccess");
+            },
+            error: function (err) {
+                this.log.severe(err);
+            }
+        });
+
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
+    /// <summary>
+    ///   Activate User button enable when IsExpireLink is False
+    /// </summary>
+    /// <returns></returns>
+
+    calloutColumn.prototype.buttonDisable = function (ctx, windowNo, mTab, mField, value, oldValue) {
+
+        if (this.isCalloutActive() || value == null) {
+            return;
+        }
+
+        this.setCalloutActive(true);
+        mTab.setValue("IsExpireLink", 'N')
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
     VIS.calloutColumn = calloutColumn;
 
     //*********** Callout check DocAction in table  Start ****

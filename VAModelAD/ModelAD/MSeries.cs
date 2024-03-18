@@ -92,9 +92,9 @@ namespace VAdvantage.Model
         public MSeries(Ctx ctx, DataRow rs, Trx trxName)
             : base(ctx, rs, trxName)
         {
-        }	//	MSeries
+        }   //	MSeries
 
-        
+
         /** Cached Fonts						*/
         private static CCache<int, MSeries> s_chart = new CCache<int, MSeries>("D_Series", 5);
 
@@ -165,7 +165,7 @@ namespace VAdvantage.Model
         /// </summary>
         /// <param name="D_Chart_ID"></param>
         /// <returns></returns>
-        static public MSeries GetByID(int D_Series_ID,Ctx ctx)
+        static public MSeries GetByID(int D_Series_ID, Ctx ctx)
         {
             MSeries pfi = new MSeries(ctx, D_Series_ID, null);
             return pfi;
@@ -555,6 +555,8 @@ namespace VAdvantage.Model
 
             if (!IsIdentifier_X())
                 sb.Append(ApplyAggregateFunction(s_colY, false));
+
+
             else //in case of identifier column, do not aggregate it (we will do it in top level query)
                 sb.Append("NVL(")
                     .Append(s_colY)
@@ -655,7 +657,21 @@ namespace VAdvantage.Model
             // if (datatype_Y.Equals(IS_STRING) || datatype_Y.Equals(IS_INTEGER) && !IsNone())
             //Changes made on 5jul2011 to query view as we do with tables (req. by amardeep/done by jagmohan)
             if ((!IsIdentifier_X() && isFiltered) || IsString_X())
-                sb.Append(AddGroupByClause(s_colX));
+                
+                    sb.Append(AddGroupByClause(s_colX));
+               
+                if(!IsSum() && !IsCount() && !IsAvg() && !IsNone())
+                {
+                sb.Append(",");
+                sb.Append("NVL(ROUND(");
+                sb.Append(s_colY);
+                sb.Append(",3),0)");
+
+                }
+
+
+
+
 
             if (IsDate_X() && isFiltered)
             {
@@ -855,13 +871,18 @@ namespace VAdvantage.Model
         /// <returns>group by query</returns>
         private string AddGroupByClause(string colName)
         {
+           
             if (!IsNone())
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(" GROUP BY ").Append(colName);
                 return sb.ToString();
+
             }
             return "";
+
+
+
         }
 
         /// <summary>
@@ -900,8 +921,8 @@ namespace VAdvantage.Model
         {
             //currently 3 types of date types are supported : daily, monthly, yearly
             string s_reportType = this.GetDateTimeTypes();
-            StringBuilder sb = new StringBuilder("TO_Date(").Append(colName);
-            sb.Append(",").Append("'" + customFormat + "'");
+            StringBuilder sb = new StringBuilder("CAST(").Append(colName);
+            sb.Append(" AS ").Append("DATE");
 
             sb.Append(")");
             return sb.ToString();
@@ -931,6 +952,8 @@ namespace VAdvantage.Model
         /// </summary>
         /// <param name="colName">colName</param>
         /// <returns>SQL Query with aggregate function on X</returns>
+        /// 
+
         public string ApplyAggregateFunction(string colName, bool checkCountIssue)
         {
             StringBuilder sb = new StringBuilder();
@@ -955,10 +978,15 @@ namespace VAdvantage.Model
             else
             {
                 sb.Append(colName);
-                return sb.ToString();
             }
-
-            sb.Append(",3),0)");
+            
+                if (!this.IsNone())
+                {
+                    sb.Append(",3),0)");
+                }
+               
+           
+            
             return sb.ToString();
         }
 
@@ -982,7 +1010,7 @@ namespace VAdvantage.Model
                         {
                             alternateDate = DateTime.Parse(dr[0].ToString());
                         }
-                        catch 
+                        catch
                         {
                             alternateDate = DateTime.MinValue;
                             continue;
@@ -998,9 +1026,9 @@ namespace VAdvantage.Model
                     {
                         m_date_1 = (DateTime)GetDateFrom().Value;
                         //dt = GetDateFrom().Value.AddMonths(-1);
-                        dt = GetDateFrom().Value;                        
+                        dt = GetDateFrom().Value;
                         //m_date1 = dt.Month + "/01/" + dt.Year;
-                        m_date1 = dt.Month + "/"+dt.Day+"/" + dt.Year;
+                        m_date1 = dt.Month + "/" + dt.Day + "/" + dt.Year;
                     }
                     else
                     {
@@ -1031,16 +1059,16 @@ namespace VAdvantage.Model
                         //dt = GetDateTo().Value.AddMonths(1);
                         dt = GetDateTo().Value;
 
-                         int tDays= DateTime.DaysInMonth(dt.Year, dt.Month);
+                        int tDays = DateTime.DaysInMonth(dt.Year, dt.Month);
 
-                         if (tDays == dt.Day)
-                         {
-                             m_date2 = dt.Month + "/" + (dt.Day) + "/" + dt.Year;
-                         }
-                         else
-                         {
-                             m_date2 = dt.Month + "/" + (dt.Day + 1) + "/" + dt.Year;
-                         }
+                        if (tDays == dt.Day)
+                        {
+                            m_date2 = dt.Month + "/" + (dt.Day) + "/" + dt.Year;
+                        }
+                        else
+                        {
+                            m_date2 = dt.Month + "/" + (dt.Day + 1) + "/" + dt.Year;
+                        }
                     }
 
                     //sb.Append(m_colX).Append(" BETWEEN ");
@@ -1083,11 +1111,11 @@ namespace VAdvantage.Model
                     else
                     {
                         m_date_2 = (DateTime)GetDateTo().Value;
-//                        dt = GetDateTo().Value.AddYears(1);
+                        //                        dt = GetDateTo().Value.AddYears(1);
                         //m_date2 = "12/31/" + dt.Year;
                         dt = GetDateTo().Value;
 
-                        int tDays= DateTime.DaysInMonth(dt.Year, dt.Month);
+                        int tDays = DateTime.DaysInMonth(dt.Year, dt.Month);
 
                         if (tDays == dt.Day)
                         {
@@ -1137,16 +1165,16 @@ namespace VAdvantage.Model
                         //dt = GetDateTo().Value.AddDays(1);                        
                         dt = GetDateTo().Value;
 
-                         int tDays= DateTime.DaysInMonth(dt.Year, dt.Month);
+                        int tDays = DateTime.DaysInMonth(dt.Year, dt.Month);
 
-                         if (tDays == dt.Day)
-                         {
-                             m_date2 = dt.Month + "/" + (dt.Day) + "/" + dt.Year;
-                         }
-                         else
-                         {
-                             m_date2 = dt.Month + "/" + (dt.Day + 1) + "/" + dt.Year;
-                         }
+                        if (tDays == dt.Day)
+                        {
+                            m_date2 = dt.Month + "/" + (dt.Day) + "/" + dt.Year;
+                        }
+                        else
+                        {
+                            m_date2 = dt.Month + "/" + (dt.Day + 1) + "/" + dt.Year;
+                        }
                     }
                 }
                 else if (GetDateTimeTypes() == IS_LAST_N_DAYS)
@@ -1158,10 +1186,10 @@ namespace VAdvantage.Model
                     m_date_1 = (DateTime)lastNDate.AddDays(1);
                     m_date_2 = DateTime.Now;
                     //m_date1 = lastNDate.Month + "/" + (lastNDate.Day - 1) + "/" + lastNDate.Year;
-                    
+
                     m_date1 = lastNDate.Month + "/" + (lastNDate.Day) + "/" + lastNDate.Year;
                     m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
-                    
+
                 }
                 else if (GetDateTimeTypes() == IS_LAST_N_MONTHS)
                 {
@@ -1172,27 +1200,27 @@ namespace VAdvantage.Model
                     m_date_1 = (DateTime)lastNDate.AddMonths(1);
                     m_date_2 = DateTime.Now;
 
-                   // m_date1 = (lastNDate.Month - 1) + "/" + lastNDate.Day + "/" + lastNDate.Year; 
+                    // m_date1 = (lastNDate.Month - 1) + "/" + lastNDate.Day + "/" + lastNDate.Year; 
                     //if ((lastNDate.Month - 1) == 0)
                     //{
                     //    m_date1 = "12/" + lastNDate.Day + "/" + (lastNDate.Year - 1);
                     //}
                     //else
                     //{
-                        //m_date1 = (lastNDate.Month - 1) + "/" + lastNDate.Day + "/" + lastNDate.Year;
+                    //m_date1 = (lastNDate.Month - 1) + "/" + lastNDate.Day + "/" + lastNDate.Year;
                     m_date1 = (lastNDate.Month) + "/" + lastNDate.Day + "/" + lastNDate.Year;
-                   // }                     
+                    // }                     
                     //m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
                     int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
 
                     if (tDays == dt_to.Day)
-                     {
-                         m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day) + "/" + dt_to.Year;
-                     }
-                     else
-                     {
-                         m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
-                     }
+                    {
+                        m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day) + "/" + dt_to.Year;
+                    }
+                    else
+                    {
+                        m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
+                    }
                 }
                 else if (GetDateTimeTypes() == IS_LAST_N_YEARS)
                 {
@@ -1254,7 +1282,7 @@ namespace VAdvantage.Model
         /// <returns></returns>
         public string GetFormattedDateColumn(string colName, string format)
         {
-            return " TRIM(TO_DATE('" + colName + "','" + format + "'))";
+            return " TO_DATE('" + colName + "','" + format + "')";
         }
 
         /// <summary>

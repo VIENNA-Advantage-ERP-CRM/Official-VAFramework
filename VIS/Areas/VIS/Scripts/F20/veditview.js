@@ -347,7 +347,7 @@
             var showGroupFieldDefault = false;
 
 
-            if (target.is('span')) {
+            if (target.is('span') || target.hasClass('vis-ev-col-fg-more')) {
                 if (dis !== "show") {// If group is vlosed and user click on show more then no processing.
                     return;
                 }
@@ -414,8 +414,8 @@
             //<i class="fa fa-ellipsis-h"></i>
             var gDiv = $('<div class="vis-ev-col-fieldgroup" data-showmore="Y" data-name="' + fieldGroup + '" data-display="show">' +
                 '<span class="vis-ev-col-fg-hdr"  >' + fieldGroup + ' </span> ' +
-                '<span class="vis-ev-col-fg-more">' + VIS.Msg.getMsg("ShowMore") + '</span>' +
-                '<i class= "fa fa-angle-up">' +
+                '<button class="vis-ev-col-fg-more">' + VIS.Msg.getMsg("ShowMore") + '</button>' +
+                '<button class="vis-ev-fg-arrowBtn"><i class= "fa fa-angle-up"></button>' +
                 '</span>' +
                 '</div>');
 

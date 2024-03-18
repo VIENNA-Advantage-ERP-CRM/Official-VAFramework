@@ -38,6 +38,7 @@ select {
 }
 button:focus {
     outline: none;
+    border: 1px solid rgba(var(--v-c-primary), 1);
 }
 /*html[dir="rtl"] select
 {

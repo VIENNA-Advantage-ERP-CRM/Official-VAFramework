@@ -4,7 +4,7 @@
     var tmpTabPnl = document.querySelector('#vis-ad-tabpnltmp').content;// $("#vis-ad-windowtmp");
 
     function VTabPanel(windowNo,wWidth) {
-
+        this.width = wWidth;
         this.tabPanels = [];
        // this.panelSize = 50;
         //var panelMaxWidth = $(document).width() / 2;
@@ -21,18 +21,19 @@
         this.isClosed = true;
 
         
-        if (wWidth <= 50) {
+        if (wWidth <= 25) {
             if (wWidth <= 0)
                 wWidth = 75;
             else
-                wWidth = 50;
+                wWidth = 25;
         }
         else if (wWidth > 75)
             wWidth = 75
 
        
             wWidth = 100 - wWidth;
-            wWidth = ($(document).width() * wWidth) / 100;
+        wWidth = ($(document).width() * wWidth) / 100;
+        this.width = wWidth;
         
 
     /********************************* END Tab Panels ***********************************/
@@ -98,29 +99,71 @@
             if (!this.isClosed && size && size > 40) {
                 return;
             }
+
+            if (size == 0) {
+                size = this.width;
+            }
+            var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
             if (size && size > 40) {
-                if (this.curTabPanel.curTab.getIsTPBottomAligned()) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023 
-                    $outerwrap.css('height','100%');
-                } else {
-                    $outerwrap.css('height', size + 'px');
+
+                if (!this.curTabPanel) {
+                    return;
                 }
-                
-                $outerwrap.css('width', size + 'px');
-                this.isClosed = false;
+                if (!height) {
+                    height = VIS.Env.getScreenHeight() - 225;
+                    if (this.gTab.getIsHeaderPanel()) {
+                        height = height - VIS.Utility.Util.getValueOfInt(this.curTabPanel.curTab.getHeaderHeight().replace('px', ' ')) - 10;
+                    }
+                }
+
+                if (this.curTabPanel.curTab.getIsTPBottomAligned()) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023 
+                    $outerwrap.css({
+                        'height': '100%',
+                        'width': '100%'
+                    });
+
+                    $divContent.css({
+                        'height': '100%',
+                        'width': ($(document).width() - 72) + 'px',
+                        'overflow': 'auto'
+                    });
+                }
+                else {
+                    $outerwrap.css({
+                        'height': height + 'px',
+                        'width': size + 'px'
+                    });
+
+                    $divContent.css({
+                        'height': height + 'px',
+                        'width': size - 35 + 'px',
+                        'overflow': 'auto'
+                    });
+                }
                 $divHead.show();
+                $divContent.show();
             }
             else {
-                $outerwrap.css('height', '35px');
-                $outerwrap.css('width', '35px');
+                $outerwrap.css({
+                    'height': '35px',
+                    'width': '35px'
+                });
+                $divContent.css({
+                    'height': '35px',
+                    'width': '0px'
+                });
                 this.isClosed = true;
                 $divHead.hide();
+                $divContent.hide();
             }
+
             if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
                 this.sizeChangedListner.onSizeChanged((size && size > 40));
         }
 
         this.disposeComponent = function () {
             $outerwrap.remove();
+            $divContent.remove();
             selLI = null;
             self = null;
         }
@@ -189,6 +232,13 @@
         if (this.curTabPanel) {
             this.curTabPanel.refreshPanelData(rec_Id, dataRow);
         }
+    }
+
+    VTabPanel.prototype.setTabPanelSize = function (size) {
+        if (size == 0) {
+            size = this.width;
+        }
+        this.setSize(size);
     }
 
     VTabPanel.prototype.dispose = function () {

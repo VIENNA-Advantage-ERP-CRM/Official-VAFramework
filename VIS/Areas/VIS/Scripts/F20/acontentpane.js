@@ -538,10 +538,20 @@
             this.reQuery();
         }
         else {
+            $ths = this;
 
             //  Confirm Error
             if (e.getIsError() && !e.getIsConfirmed()) {
-                VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
+               // VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
+
+                VIS.ADialogCallback.error(e.getAD_Message(), e.getInfo(), null, function () {
+                    var lf = $ths.curTab.getLastFocus();
+                    if (lf) {
+                        lf.focus();
+                        $ths.curTab.setLastFocus(null);
+                    }
+                });
+
                 e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
                 this.errorDisplayed = true;
             }
@@ -645,10 +655,15 @@
             tis.cmd_save(true);
         }
         else if (tis.aNew.getAction() === action) {
-            if (!tis.curTab.getIsInsertRecord()) {
-                return;
+            if (this.curGC.aPanel.curTab.needSave()) {
+                VIS.ADialog.warn('VIS_SaveParentFirst');
             }
-            tis.curGC.dataNew(false);
+            else {
+                if (!tis.curTab.getIsInsertRecord()) {
+                    return;
+                }
+                tis.curGC.dataNew(false);
+            }
         }
         else if (tis.aDelete.getAction() === action) {
             tis.cmd_delete();

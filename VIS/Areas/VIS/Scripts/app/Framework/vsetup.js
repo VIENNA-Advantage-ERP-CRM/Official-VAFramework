@@ -256,7 +256,7 @@
             dLbtns.append(fileBrowser);
 
           
-            btnOK = $("<a class='vis-initial-btn' style='margin-right: 15px;'>").append(VIS.Msg.getMsg("Done"));
+            btnOK = $("<a href='javascript:;' class='vis-initial-btn' style='margin-right: 15px;'>").append(VIS.Msg.getMsg("Done"));
             btnOK.on('click', function () {
                 createTenant();
             });

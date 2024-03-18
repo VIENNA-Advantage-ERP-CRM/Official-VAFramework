@@ -2486,8 +2486,7 @@ namespace VIS.Helpers
                 string getCondition = sqlIn.sql.Substring(sqlIn.sql.LastIndexOf("WHERE"));
                 string whereCondition = getCondition;
                 string orderBY = "";
-                if (getCondition.LastIndexOf("ORDER") > -1)
-                {
+                if (getCondition.LastIndexOf("ORDER")>-1) {
                     whereCondition = getCondition.Substring(0, getCondition.LastIndexOf("ORDER"));
                     orderBY = getCondition.Substring(getCondition.LastIndexOf("ORDER"));
                 }
@@ -3856,6 +3855,7 @@ namespace VIS.Helpers
                 {
                     using (var w = new WindowHelper())
                     {
+          
                         resultData = w.GetWindowRecordsForTreeNode(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, ObscureFields);
                     }
                 }

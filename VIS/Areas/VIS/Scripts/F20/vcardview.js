@@ -1379,11 +1379,14 @@
                                         $imageSpan.append(img);
                                     } else {
                                         $image.attr('src', $(img).attr('src'));
+                                        $imageSpan.append($image);
                                     }
                                 }
                                 else {
-                                    if (img.indexOf('fa fa-') == -1 && img.indexOf('vis vis-') == -1)
+                                    if (img.indexOf('fa fa-') == -1 && img.indexOf('vis vis-') == -1) {
                                         $image.attr('src', img);
+                                        $imageSpan.append($image);
+                                    }
                                     else {
                                         imgSpan = $('<i style="' + this.iconStyle + '" class="' + img + '"></i>');
                                         $imageSpan.append(imgSpan);
@@ -1650,7 +1653,8 @@
                             value = value = VIS.Msg.getMsg('No');
                     }
 
-                    else if (VIS.DisplayType.IsDate(dt)) {                        
+                    else if (VIS.DisplayType.IsDate(dt)) {
+                         
                         if (value) {
                             value = value.replace('Z', ''); //remove universal time
                             // JID_1826 Date is showing as per browser culture

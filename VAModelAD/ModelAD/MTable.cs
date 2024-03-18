@@ -938,5 +938,17 @@ namespace VAdvantage.Model
             return m_vcs;
         }
 
+
+        /// <summary>
+        /// Get Window id from menu by tab id
+        /// </summary>
+        /// <returns>Ad_Window_ID</returns>
+        public int GetWindowIDFromMenu()
+        {
+            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT a.AD_Window_ID FROM AD_Window a "
+                    + "INNER JOIN AD_Tab b ON (a.AD_Window_ID=b.AD_Window_ID) "
+                    + "INNER JOIN AD_Menu m ON (a.AD_Window_ID=m.AD_Window_ID AND m.IsActive='Y' AND m.Action='W') "
+                    + "WHERE a.IsActive='Y' AND b.IsActive='Y' AND b.AD_Table_ID="+GetAD_Table_ID()+" ORDER BY b.TabLevel, a.AD_Window_ID"));
+        }
     }
 }

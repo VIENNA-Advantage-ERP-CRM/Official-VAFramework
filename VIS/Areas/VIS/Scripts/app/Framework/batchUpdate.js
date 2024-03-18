@@ -38,9 +38,9 @@
 
                 + '<div class="vis-form-group vis-advancedSearchInput vis-advancedSearchInput-op">'
                 + '<label id="lblSetOperator_' + windowNo + '" for="Oprator">' + VIS.Msg.getMsg("Operator") + '</label>'
-                + '<select id="drpSetOperator_' + windowNo + '">'
-                + '<option value="=">=</option>'
-                + '</select>'
+                + '<input id="drpSetOperator_' + windowNo + '"value="=" disabled>'
+                //+ '<option value="=">=</option>'
+               // + '</select>'
                 + '</div>'
 
                 + ' <div class="vis-form-group vis-advancedSearchInput vis-advancedSearchInput-v" id="divSetValue1_' + windowNo + '">'
@@ -71,8 +71,8 @@
             html +=
                 '<div class="vis-advcedfooterBtn vis-batchUpdate-footerbtn">'
                 + '<div class="vis-ctrfrm-btnwrp">'
-            + '<button id="btnCancel_' + windowNo + '" class="ui-button ui-widget vis-pull-right ml-2 mr-2" style="border-radius: 0.1rem">' + VIS.Msg.getMsg("close") + '</button>'
-            + '<button id="btnOk_' + windowNo + '" class="ui-button ui-widget vis-pull-right ml-2" style="border-radius: 0.1rem">' + VIS.Msg.getMsg("Apply") + '</button>'
+                + '<button id="btnCancel_' + windowNo + '" class="ui-button ui-widget vis-pull-right ml-2 mr-2" style="border-radius: 0.1rem">' + VIS.Msg.getMsg("close") + '</button>'
+                + '<button id="btnOk_' + windowNo + '" class="ui-button ui-widget vis-pull-right ml-2" style="border-radius: 0.1rem">' + VIS.Msg.getMsg("Apply") + '</button>'
                 + '<div class="vis-ad-w-p-s-main pull-left"><div class="vis-ad-w-p-s-infoline"></div><div class="vis-ad-w-p-s-msg" style="align-items:flex-end;" id="divMessage_' + windowNo + '"></div></div>'
                 + '</div>'
                 + '</div>';
@@ -114,7 +114,7 @@
             for (var c = 0; c < findFields.length; c++) {
                 var field = findFields[c];  // get field                       
                 var columnName = field.getColumnName();   // get field's column name
-                if (field.getDisplayType() == VIS.DisplayType.Button) {
+                /*if (field.getDisplayType() == VIS.DisplayType.Button) {
                     if (field.getAD_Reference_Value_ID() == 0)
                         // change done here to display textbox for search in case where buttons don't have Reference List bind with Column
                         field.setDisplayType(VIS.DisplayType.String);
@@ -127,8 +127,8 @@
                             field.lookup = new VIS.MLookupFactory.getMLookUp(VIS.context, windowNo, field.getAD_Column_ID(), VIS.DisplayType.List);
                         }
                     }
-                }
-                if (field.getDisplayType() == VIS.DisplayType.Image) {
+                }*/
+                if (field.getDisplayType() == VIS.DisplayType.Image || field.getDisplayType() == VIS.DisplayType.Button) {
                     continue;
                 }
                 var header = field.getHeader();
@@ -324,7 +324,7 @@
                         field.getColumnName());
                 }
                 else {
-                    crt = VIS.VControlFactory.getControl(null, field, true, true, false);
+                    crt = VIS.VControlFactory.getControl(null, field, true, false, false);
                 }
             }
             else {
@@ -332,7 +332,7 @@
                 crt = new VIS.Controls.VTextBox("columnName", false, true, false, 20, 20, "format",
                     "GetObscureType", false);
             }
-            if (crt != null) {
+            if (crt != null && field!=null) {
                 crt.setReadOnly(false);
                 if (field.getDisplayType() == VIS.DisplayType.AmtDimension) {
                     crt.hideButton(false);
@@ -363,6 +363,9 @@
                 if (field.getDisplayType() == VIS.DisplayType.AmtDimension) {
                     crt.getControl().css("width", "100%");
                 }
+            } else {
+                div1.append(crt.getControl());
+                lblSetQryValue.show();
             }
         };
 
@@ -450,13 +453,17 @@
                 VIS.ADialog.info('AlreadyAdded');
                 return;
             }
+            var controlText = getControlValue(true);
+            if (getControlType() == VIS.DisplayType.Date) {
+                controlText=controlText.replace('Z',' ');
+            }
             var htm = '<tr class="vis-advancedSearchTableRowBatch"><td data-cVal="' + cVal + '">' + colName + '</td>'
-                + '<td data-settype="' + getControlType() +'" data-setVal="' + getControlValue(true) + '">' + getControlText(true) + '</td>'
+                + '<td data-settype="' + getControlType() + '" data-setVal="' + controlText + '">' + controlText + '</td>'
                 + '<td class="vis-batchUpdate-deletewrap"><i style="cursor:pointer;" class="vis vis-delete" onclick="$(this).closest(\'tr\').remove()"></i></td></tr>'
             tblSetValue.find('tbody').append(htm);
+            setControl(true, null, divSetValue1);
             drpSetColumns.val(-1);
             setControlNullValue(true);
-
         }
 
         //*************Update records ******************//
@@ -553,8 +560,8 @@
                 btnOk.off(VIS.Events.onClick);
             btnOk = null;
             if (btnCancel)
-                closeBtn.off(VIS.Events.onClick);
-            closeBtn = null;
+                btnCancel.off(VIS.Events.onClick);
+            btnCancel = null;
             AD_Table_ID = null;
             tableName = null;
             findFields = null;
