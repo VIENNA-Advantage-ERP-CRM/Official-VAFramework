@@ -281,6 +281,8 @@ namespace VAdvantage.Controller
 
         public string ADAction = ""; /*Action for Tab*/
 
+        public string ADActionName = ""; /*Action Name for Open window or form */
+
         /// <summary>
         /// calaculate MaxDisplayLength
         /// </summary>

@@ -115,8 +115,12 @@ namespace VAdvantage.Controller
         public string ImageUrl = "";
         public bool IsCompositeView = true;
         public bool IsGenerateAttachmentCode = true;
-
+        //Hide Tab control
         public bool IsHideTabLinks = false;
+        //Hide window tool bar Icons
+        public bool IsHideToolbar = false;
+        //Hide action bar
+        public bool IsHideActionbar = false;
 
 
         public List<GridTabVO> GetTabs()
@@ -192,7 +196,8 @@ namespace VAdvantage.Controller
              + "AD_Color_ID,AD_Image_ID, IsReadWrite, WinHeight,WinWidth, "
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
-             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared,IsHideTabLinks ");
+             + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared,IsHideTabLinks,"
+             + "IsHideToolbar,IsHideActionbar ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
@@ -371,6 +376,8 @@ namespace VAdvantage.Controller
                             vo.IsGenerateAttachmentCode = !("N".Equals(dr[37].ToString()));
                             vo.IsRecordShared = dr[38].ToString() == "Y";
                             vo.IsHideTabLinks = dr[39].ToString() == "Y";
+                            vo.IsHideToolbar = dr[40].ToString() == "Y";
+                            vo.IsHideActionbar = dr[41].ToString() == "Y";
 
                         }
                     }
@@ -889,6 +896,8 @@ namespace VAdvantage.Controller
                 clone.IsCompositeView = IsCompositeView;
                 clone.IsGenerateAttachmentCode = IsGenerateAttachmentCode;
                 clone.IsHideTabLinks = IsHideTabLinks;
+                clone.IsHideActionbar = IsHideActionbar;
+                clone.IsHideToolbar = IsHideToolbar;
 
                 //
                 clone.hasPanel = hasPanel;

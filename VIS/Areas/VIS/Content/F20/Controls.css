@@ -347,6 +347,12 @@ button.vis-ev-col-img-ctrl:focus,
 .vis-ev-col-fg-rotate {
     transform: rotateX(180deg);
 }
+
+.vis-ev-fgbtn {
+    cursor: pointer;
+    color: rgba(var(--v-c-primary), 1);
+    align-self:end;
+}
 /* field group css END*/
 /****** Style Inputs Control END*****/
 /***************************** Control Prop *******************************************/
