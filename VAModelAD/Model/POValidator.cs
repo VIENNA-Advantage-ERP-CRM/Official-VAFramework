@@ -188,9 +188,10 @@ namespace VAModelAD.Model
             MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
             //VIS323 Insert Record in ExportData for marking on Save records.
 
-            if (Env.IsModuleInstalled("VA093_") && success && MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
-                && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
-
+            if (Env.IsModuleInstalled("VA093_") &&
+                 success &&
+                 MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
+                 )
             {
                 if (!_exportTableAccessed)
                 {
@@ -227,18 +228,26 @@ namespace VAModelAD.Model
                                 expRecord_ID = Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID"));
                         }
                         else
-
                             expRecord_ID = po.Get_ID();
 
-
-
                         if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
-
                         {
+                            //Enable Auto data  marking as per configuration defined on Role in which user logged IN
+                            if (MRole.GetDefault(po.GetCtx()).GetRecordType() == MRole.RECORDTYPE_MasterDataAndTransactionData
+                               && (Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M" ||
+                                   Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "T")
+                               )
+                            {
+                                if (!SaveExportData(po))
+                                    return false;
+                            }
+                            else if (MRole.GetDefault(po.GetCtx()).GetRecordType() == MRole.RECORDTYPE_MasterData
+                                && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
+                            {
+                                if (!SaveExportData(po))
+                                    return false;
+                            }
 
-                            if (!SaveExportData(po))
-
-                                return false;
 
                         }
 
@@ -247,7 +256,6 @@ namespace VAModelAD.Model
                 }
 
             }
-
             if (success && newRecord)
                 InsertTreeNode(po);
 
