@@ -978,8 +978,8 @@
                 var mField = this.gTab.getField(columnName);
                 if (mField != null) {
 
-                    if (mField.getDisplayType() == VIS.DisplayType.Button && (mField.getAD_Reference_Value_ID() == 435 || mField.getIsAction())) {
-                        return;
+                    if (mField.getDisplayType() == VIS.DisplayType.Button && mField.getAD_Reference_Value_ID() == 435) {
+                        continue;
                     }
 
                     if (mField.getIsDisplayed(true)) {		//  check context

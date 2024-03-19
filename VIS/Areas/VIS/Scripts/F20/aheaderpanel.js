@@ -1024,7 +1024,7 @@
         //selfPan.actionButton(action.source);
 
         //skip save for undo action
-        if (!(vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU")) {
+        if (!(action.source.getField().getIsAction() && action.source.getField().getAction() === "MTU")) {
             if (this.aPanel.curTab.needSave(true, false)) {
                 this.aPanel.cmd_save(true);
                 return;

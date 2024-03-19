@@ -2113,7 +2113,7 @@
 
         if (action.source instanceof VIS.Controls.VButton) {
             var btnField = action.source.getField();
-            if (btnField.getAD_Reference_Value_ID() == 435 || btnField.getIsAction()) {
+            if (btnField.getAD_Reference_Value_ID() == 435) {
                 //blank do-not check readonly
             }
             else if (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly()) {
