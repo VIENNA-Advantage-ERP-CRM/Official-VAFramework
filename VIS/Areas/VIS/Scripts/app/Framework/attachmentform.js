@@ -712,7 +712,7 @@
                     });
 
 
-                    var btnCancel = $('<a title="' + VIS.Msg.getMsg('Cancel') + '" class="vis-btn">').append(VIS.Msg.getMsg('Cancel'));
+                    var btnCancel = $('<a title="' + VIS.Msg.getMsg('close') + '" class="vis-btn">').append(VIS.Msg.getMsg('close'));
                     btnCancel.on('click', function () {
                         if (selfi.onClose) {
                             selfi.onClose();

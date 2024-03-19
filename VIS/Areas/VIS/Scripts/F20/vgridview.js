@@ -1131,8 +1131,7 @@
                 }
             }
 
-
-            if (mField.getHtmlStyle() != "") {
+            if (mField.getHtmlStyle() != "" && displayType != VIS.DisplayType.Button) {
                 oColumn.style = mField.getHtmlStyle();
             }
 

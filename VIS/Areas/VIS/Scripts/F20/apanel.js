@@ -1,6 +1,6 @@
 ﻿; (function (VIS, $) {
-      //****************************************************//
-     //**             APanel                             **//
+    //****************************************************//
+    //**             APanel                             **//
     //****************************************************//
 
     var baseUrl = VIS.Application.contextUrl;
@@ -86,7 +86,7 @@
      *  StatusBar
      *
      */
-    
+
     function APanel() {
         //This variable public to Instance
         var clsSuffix;
@@ -135,14 +135,14 @@
         var $spnTitle = null;
         var $spanSetting = null;
         var $divRightbar = null;
-        this.excludeFromShare = ['ad_org', 'm_warehouse','ad_sharerecordorg'];
+        this.excludeFromShare = ['ad_org', 'm_warehouse', 'ad_sharerecordorg'];
         /***END Tab panel**/
 
         var tabItems = [], tabLIObj = {};
         this.defaultSearch = true;
         this.isAutoCompleteOpen = false;
         this.instructionPop = {};
-        this.instructionPop[this.ACTION_NAME_NEW] = false; 
+        this.instructionPop[this.ACTION_NAME_NEW] = false;
 
         function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
@@ -219,7 +219,7 @@
             $spanSetting.attr('title', VIS.Msg.getMsg('Settings'));
         };
         var self = this;
-        var eventHandling = function () {            
+        var eventHandling = function () {
             $root.on('click', function (e) {
                 $root.find('.vis-window-instruc-overlay-new').remove();
                 $root.find('.vis-window-instruc-overlay-new-li').removeClass('.vis-window-instruc-overlay-new-li');
@@ -227,7 +227,7 @@
                     self.compositViewChangeSave(e);
                 }
             });
-          
+
         };
 
         this.createSearchAutoComplete = function (text) {
@@ -321,7 +321,7 @@
             }
         };
 
-       
+
 
         function finishLayout() {
             $divHeaderNav.show();
@@ -336,7 +336,7 @@
             if (self.gridWindow.getIsHideTabLinks()) {
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             }
-            
+
             self.gridWindow.getIsHideTabLinks()
 
             setToolTipMessages();
@@ -374,19 +374,19 @@
         this.createToolBar = function () {
 
             //1. toolbar action
-            this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh","Refresh");
-            this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete","Delete");
-            this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New","New");
-            this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore","Ignore");
-            this.aSave = this.addActions("SAR", null, true, true, false, onAction, null, "Shct_Save","Save");
+            this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh", "Refresh");
+            this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete", "Delete");
+            this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
+            this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore", "Ignore");
+            this.aSave = this.addActions("SAR", null, true, true, false, onAction, null, "Shct_Save", "Save");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
-            this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report","Report");
-            this.aPrint = this.addActions("PRT", null, true, true, false, onAction, null, "Shct_Print","Print");
-           // this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
+            this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report", "Report");
+            this.aPrint = this.addActions("PRT", null, true, true, false, onAction, null, "Shct_Print", "Print");
+            // this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
 
             //Ndw Back button
-            this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back","back-arrow");
+            this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back", "back-arrow");
             //check toolbar
             if (!this.gridWindow.getIsHideToolbar()) {
                 $ulToobar.append(this.aBack.getListItm());
@@ -1570,7 +1570,7 @@
     };
 
     //Handle Composite view Change focus Save
-    APanel.prototype.compositViewChangeSave= function (e) {
+    APanel.prototype.compositViewChangeSave = function (e) {
         var $ths = this;
         if ($(e.target).closest('.vis-ad-w-p-center-inctab').length > 0 || $(e.target).closest('.vis-ad-w-p-vc').length > 0) {
             var activeElement = $(document.activeElement);
@@ -1650,7 +1650,7 @@
                 } else {
                     $ths.curTab.setLastFocus(activeElement);
                 }
-                currentFocusClass = newFocusClass;                
+                currentFocusClass = newFocusClass;
             }, 100)
         }
     }
@@ -3011,7 +3011,7 @@
     APanel.prototype.tabActionPerformed = function (action, actionType, actionName) {
 
         /* Check for any window or form added in action*/
-        if ((actionType == 'WIW' || actionType == 'FOM') && actionName!= "") {
+        if ((actionType == 'WIW' || actionType == 'FOM') && actionName != "") {
             var obj = {
                 tableID: this.curTab.getAD_Table_ID(),
                 actionType: actionType,
@@ -3046,7 +3046,7 @@
                         });
                         ul.append(li);
                     }
-                    $(document.activeElement).w2overlay(popover.clone(true), { align:"right", css: { height: '200px' } });
+                    $(document.activeElement).w2overlay(popover.clone(true), { align: "right", css: { height: '200px' } });
                 } else if (list.length == 1) {
                     VIS.viewManager.startAction(list[0].ActionType, list[0].ID);
                 }
@@ -3055,7 +3055,7 @@
                 $this.setBusy(false);
             });
             return;
-        } 
+        }
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
@@ -3074,7 +3074,7 @@
             VIS.TabMngr.show(tabEle, curEle.gTab.keyColumnName, curEle.gTab.getRecord_ID());
             this.vTabbedPane.restoreTabChange();
             return;
-        }  
+        }
 
         //// To Clear SearchText Box on Tab Change
         this.toggleASearchIcons(false, false);
@@ -3207,14 +3207,14 @@
         return true;
     };
 
-    APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st ) {
+    APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st) {
 
 
         curEle.setVisible(false);
         curEle.getRoot().detach();
-        
+
         this.getLayout().prepend(tabEle.getRoot());
-       
+
         this.vTabbedPane.setSelectedTab(action); //set Seleted tab
 
         var keepFilters = back;
@@ -3318,16 +3318,16 @@
             this.aCardDialog.setEnabled(false);
 
             this.aNew.setEnabled(false);
-            gPanel.setEnabled("NRD",false);
+            gPanel.setEnabled("NRD", false);
 
             this.aDelete.setEnabled(false);
-            gPanel.setEnabled("DRD",false);
+            gPanel.setEnabled("DRD", false);
 
             this.aFind.setEnabled(false);
             this.aBatchUpdate.setEnabled(false);
 
             this.aRefresh.setEnabled(false);
-            gPanel.setEnabled("RQY",false);
+            gPanel.setEnabled("RQY", false);
 
             this.aNext.setEnabled(false);
             this.aLast.setEnabled(false);
@@ -3357,9 +3357,9 @@
             //aChat.setEnabled(true);
         }
 
-       
-       
-   
+
+
+
 
 
         ///*******     Tab Panels      ******/
@@ -3428,7 +3428,7 @@
             this.aPrevious.show();
         }
 
-     
+
         this.setLastView(""); //clear view history
 
         var selff = this;
@@ -3549,7 +3549,7 @@
                     $ths.curTab.setLastFocus(null);
                 }
             });
-            
+
             e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
             this.errorDisplayed = true;
         }
@@ -3587,12 +3587,12 @@
         if (insertRecord)
             insertRecord = this.curTab.getIsInsertRecord();
         this.aNew.setEnabled(!changed && insertRecord);
-        gPanel.setEnabled("NRD",!changed && insertRecord);
+        gPanel.setEnabled("NRD", !changed && insertRecord);
         if (this.aCopy) {
             this.aCopy.setEnabled(!changed && insertRecord);
         }
         this.aRefresh.setEnabled(!changed);
-        gPanel.setEnabled("RQY",!changed);
+        gPanel.setEnabled("RQY", !changed);
         this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1);
         gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1);
         //
@@ -3922,7 +3922,7 @@
         }
 
         if (this.curWinTab == this.vTabbedPane) {
-            VIS.context.setContext(this.curWindowNo,"tb_Index" , this.curTabIndex);
+            VIS.context.setContext(this.curWindowNo, "tb_Index", this.curTabIndex);
             this.curWinTab.evaluate(null);
             this.curWinTab.notifyDataChanged(e);
         }
@@ -4009,7 +4009,7 @@
         //        VIS.ADialog.error("CheckListRequired");
         //        return false;
         //    }
-            
+
         //});
 
         return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
@@ -4058,7 +4058,7 @@
             if (callback) {
                 callback(retValue);
             }
-            
+
             curGC.refreshTabPanelData(curTab.getRecord_ID());
 
             this.curTab.loadShared();
@@ -4098,7 +4098,7 @@
         var bUpdate = new VIS.BatchUpdate(this.curWindowNo, this.curTab, this.curGC.getSelectedRows());
         bUpdate.onClose = function () {
         };
-        bUpdate.show();     
+        bUpdate.show();
     };
 
     APanel.prototype.cmd_delete = function () {
@@ -4592,7 +4592,8 @@
         att.show();
         att.onClose = function () {
             self.curTab.loadAttachments();
-            self.aAttachment.setPressed(self.curTab.hasAttachment());
+            if (self.aAttachment)
+                self.aAttachment.setPressed(self.curTab.hasAttachment());
             self = null;
         };
 
@@ -4666,7 +4667,7 @@
         var parentTableID = 0;
         if (this.curTab.getParentTab()) {
             parentTableID = this.curTab.getParentTab().getAD_Table_ID();
-            if (!this.curTab.getParentTab().hasShared() && this.curTab.getParentTab().getValue('AD_Org_ID')!=0) {
+            if (!this.curTab.getParentTab().hasShared() && this.curTab.getParentTab().getValue('AD_Org_ID') != 0) {
                 VIS.ADialog.info("ShareParentFirst", true, "", "");
                 this.aSharedRecord.setPressed(false);
                 return;;

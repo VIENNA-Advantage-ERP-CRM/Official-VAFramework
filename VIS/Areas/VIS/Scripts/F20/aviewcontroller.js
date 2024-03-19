@@ -667,6 +667,11 @@
                                 //this.leftPaneLinkItems.push(iControl);
                             }
                         }
+
+                        if (mField.getAD_Reference_Value_ID() == 435) {
+                            iControl.setReadOnly(false);
+                        }
+
                         iControl.addActionListner(this);
                     }
 
@@ -1862,6 +1867,13 @@
         else if (this.aPanel.vHeaderPanel) {
             this.aPanel.vHeaderPanel.navigate(true);
         }
+
+        if (e.m_info == "VER") { /*version call back */
+            e.m_info = "";
+            this.gTab.setCurrentRow(e.m_currentRow);
+            this.dynamicDisplay(col);
+        }
+
         if (!e.getIsChanged() || col < 0)
             return;
 
