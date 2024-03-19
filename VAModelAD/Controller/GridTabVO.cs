@@ -177,6 +177,7 @@ namespace VAdvantage.Controller
 
         //Hide field group from (number)
         public Int16 HideFieldGroupFrom = 0;
+        public bool IsHideVerNewRecord = false;
 
         public string SelectSQL
         {
@@ -543,6 +544,7 @@ namespace VAdvantage.Controller
 
                 // set property for Maintain version on approval
                 vo.MaintainVerOnApproval = Utility.Util.GetValueOfString(dr["MaintainVerOnApproval"]).Equals("Y");
+                vo.IsHideVerNewRecord = Utility.Util.GetValueOfString(dr["IsHideVerNewRecord"]).Equals("Y");
 
                 vo.IsMaintainVersions = Utility.Util.GetValueOfString(dr["IsMaintainVersions"]).Equals("Y");
 
@@ -1009,6 +1011,7 @@ namespace VAdvantage.Controller
 
             // set Maintain Version on Approval from Tab
             clone.MaintainVerOnApproval = MaintainVerOnApproval;
+            clone.IsHideVerNewRecord = IsHideVerNewRecord;
 
             clone.IsMaintainVersions = IsMaintainVersions;
             clone.TabLayout = TabLayout;
