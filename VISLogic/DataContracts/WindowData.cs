@@ -89,6 +89,8 @@ namespace VIS.DataContracts
         public bool LatestVersion { get; set; }
 
         public EventParamOut EventParam;
+
+        public Dictionary<string, object> VersionResult { get; set; }
     }
 
     public class EventParamOut

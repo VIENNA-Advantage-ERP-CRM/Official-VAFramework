@@ -1330,6 +1330,12 @@ namespace VIS.Helpers
             outt.RowData = rowData;
             try
             {
+                Dictionary<string, object> verResult = new Dictionary<string, object>();
+                verResult.Add("Record_ID", po.Get_ID());
+                verResult.Add("KeyColName", po.GetTableName() + "_ID");
+                verResult.Add("IsActive", po.IsActive());
+                outt.VersionResult = verResult;
+
                 if (!inn.MaintainVersions)
                     outt.LatestVersion = true;
                 if (inn.MaintainVersions && (!inn.ImmediateSave || hasDocValWF) && (hasDocValWF || !versionInfo.IsLatestVersion))
@@ -1674,7 +1680,7 @@ namespace VIS.Helpers
         public bool GetDocValueWF(Ctx ctx, int AD_Client_ID, int AD_Table_ID, Trx _trx)
         {
             String sql = "SELECT COUNT(AD_Workflow_ID) FROM AD_Workflow "
-                + " WHERE WorkflowType='V' AND IsActive='Y' AND IsValid='Y' AND AD_Table_ID = " + AD_Table_ID + " AND AD_Client_ID = " + AD_Client_ID
+                + " WHERE (WorkflowType='V' OR WorkflowType='P') AND IsActive='Y' AND IsValid='Y' AND AD_Table_ID = " + AD_Table_ID + " AND AD_Client_ID = " + AD_Client_ID
                 + " GROUP BY AD_Client_ID, AD_Table_ID ORDER BY AD_Client_ID, AD_Table_ID";
 
             return Util.GetValueOfInt(DB.ExecuteScalar(sql, null, _trx)) > 0;
