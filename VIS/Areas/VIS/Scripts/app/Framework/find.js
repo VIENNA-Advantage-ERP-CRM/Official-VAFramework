@@ -449,6 +449,7 @@
             for (var c = 0; c < findFields.length; c++) {
                 // get field
                 var field = findFields[c];
+                
                 if (field.getIsEncrypted())
                     continue;
                 // get field's column name
@@ -545,7 +546,9 @@
                 divDynamic.hide();
 
                 // set control at value1 position according to the column selected
+               
                 var columnName = drpColumns.val();
+                var f = curTab.getField(columnName);
                 setControlNullValue(true);
                 if (columnName && columnName != "-1") {
                     var dsOp = null;
@@ -555,16 +558,23 @@
                         // fill dataset with operators of type ID
                         dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_ID);
                     }
-                    else if (columnName.startsWith("Is")) {
-                        // fill dataset with operators of type Yes No
+                     if (columnName.startsWith("Is"))
+                     {
+                          // fill dataset with operators of type Yes No
                         dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_YN);
                     }
+                   
+                    else if (f.getDisplayType() == VIS.DisplayType.YesNo) {
+                            // fill dataset with operators of type Yes No
+                            dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_YN);
+                        }
+                     
                     else {
                         // fill dataset with all operators available
                         dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS);
                     }
 
-                    var f = curTab.getField(columnName);
+                  
                     $root.find('.vis-advancedSearchContentArea-down').css('height', 'calc(100% - 150px)');
                     if (f != null && VIS.DisplayType.IsDate(f.getDisplayType())) {
                         drpDynamicOp.html($self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_DATE_DYNAMIC, true));
@@ -573,9 +583,9 @@
                         setDynamicQryControls();
                         $root.find('.vis-advancedSearchContentArea-down').css('height', 'calc(100% - 195px)');
 
-                        if (f.getDisplayType() == VIS.DisplayType.DateTime)// If Datetime, then on = operator, show full day checkbox.
+                        if (f.getDisplayType() == VIS.DisplayType.DateTime || f.getDisplayType() == VIS.DisplayType.Date)// If Datetime, then on = operator, show full day checkbox.
                         {
-                            showValue2(false);
+                            showValue2(true);
                             showFullDay(true);
                         }
                     }
@@ -587,9 +597,9 @@
                         setDynamicQryControls(true);
                     }
 
-                    if (f.getDisplayType() != VIS.DisplayType.DateTime)// If Datetime, then on = operator, show full day checkbox.
+                    if (f.getDisplayType() != VIS.DisplayType.DateTime && f.getDisplayType() != VIS.DisplayType.Date )// If Datetime, then on = operator, show full day checkbox.
                     {
-                        showValue2(true);
+                        showValue2(false);
                         showFullDay(false);
                     }
 
@@ -617,8 +627,8 @@
                 // enable control at value1 position
                 setValueEnabled(true);
                 // disable control at value2 position
-                setValue2Enabled(false);
-
+                //setValue2Enabled(false);
+                showValue2(false);
             });
 
             drpOp.on("change", function () {
@@ -644,6 +654,7 @@
 
 
                         // enable the control at value2 position
+                         showValue2(true);
                         setValue2Enabled(true);
                     }
                     else {
@@ -654,7 +665,7 @@
                             showFullDay(true);
                         }
                         else {
-                            showValue2(true);
+                            showValue2(false);
                             showFullDay(false);
                             setValue2Enabled(false);
                         }
