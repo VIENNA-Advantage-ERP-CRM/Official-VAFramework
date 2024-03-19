@@ -1014,7 +1014,7 @@ VIS.MRole.getIsClientAccess = function (AD_Client_ID, rw) {
     if (AD_Client_ID == 0 && !rw) // can always read System
         return true;
     if (this.vo.IsAccessAllOrgs)
-        return true;
+        return this.vo.AD_Client_ID == AD_Client_ID;// User has access to given AD_Client_ID if the role is defined on that AD_Client_ID
     // Positive List
     var m_orgAccess = this.vo.orgAccess;
     for (var i = 0; i < m_orgAccess.length; i++) {
