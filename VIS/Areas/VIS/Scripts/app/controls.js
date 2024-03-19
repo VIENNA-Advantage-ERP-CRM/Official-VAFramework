@@ -1407,7 +1407,6 @@
         if (refid && refid > 0 && refid != 195 && refid != 135 && refid != 234 && refid != 435) {
             this.readReference(refid);
         }
-        
     }
 
     VButton.prototype.setValue = function (value) {
