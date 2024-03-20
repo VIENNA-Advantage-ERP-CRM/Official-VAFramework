@@ -1242,6 +1242,9 @@
     VTable.prototype.getValueAsString = function (field) {
         var record = this.grid.records[this.cellRowIndex];
         var data = this.grid.parseField(record, field.toLowerCase());
+        if (this.mTab && VIS.DisplayType.YesNo == this.mTab.getField(field).getDisplayType()) {
+            data = data ? "Y" : "N";
+        }
         if (!data)
             return '';
         return data.toString();

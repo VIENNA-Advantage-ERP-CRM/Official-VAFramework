@@ -793,13 +793,13 @@
 
             var next = null;
             if (forward) {
-                next = $ulTabControl.find('.vis-apanel-tab-selected').next();
+                next = $ulTabControl.find('.vis-apanel-tab-selected').nextAll("[style='opacity: 1;']:first");
                 if (!next || next.length <= 0) {
                     next = $ulTabControl.children().first();
                 }
             }
             else {
-                next = $ulTabControl.find('.vis-apanel-tab-selected').prev();
+                next = $ulTabControl.find('.vis-apanel-tab-selected').prevAll("[style='opacity: 1;']:first");
                 if (!next || next.length <= 0) {
                     next = $ulTabControl.children().last();
                 }

@@ -564,6 +564,11 @@ label.vis-ec-col-lblchkbox + .vis-ev-ctrlinfowrap {
     padding: 10px;
     border-bottom-left-radius: .25rem;
     cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.vis-img-ctrl-icon:focus{
+     border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
 /*checkbox and radio css*/

@@ -34,9 +34,10 @@
         subRoot.append(container);
         var divRight = $("<div class='vis-its-ryt-panel vis-pull-right' >");
         var divRightInner = $("<div class='vis-its-ryt-panel-inner vis-pull-left' >");
+        var btnSave = $('<a href="javascript:void(o)"  style="display:none;" class="vis-initial-btn vis-initial-btn-blue">').append($("<i class='vis vis-save'></i>"));
 
         subRoot.append(divRight);
-        divRight.append(divRightInner);
+        divRight.append(divRightInner).append(btnSave);
         divRightInner.append($('<h3>').append(VIS.Msg.getMsg('Result')));
         var $busyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
         var windowNo = VIS.Env.getWindowNo();
@@ -267,6 +268,32 @@
 
             $root.append($busyDiv);
 
+            cmbCou.change(function () {
+                if (cmbCou.val() > 0) {
+                    $.ajax({
+                        url: VIS.Application.contextUrl + "VSetup/GetRegion",
+                        dataType: "json",
+                        data: { countryID: cmbCou.val() },
+                        error: function () {
+                            VIS.ADialog.error(VIS.Msg.getMsg('ERRORGettingInitialData'));
+                            $busyDiv[0].style.visibility = "hidden";
+                        },
+                        success: function (data) {
+                            var result = data.result;
+                            if (result == null) {
+                                VIS.ADialog.error(VIS.Msg.getMsg('ERRORGettingInitialData'));
+                                $busyDiv[0].style.visibility = "hidden";
+                                return;
+                            }
+                            cmbReg.empty();
+                            loadRegion(result);
+                            $busyDiv[0].style.visibility = "hidden";
+                        }
+                    });
+                }
+
+            });
+
             $busyDiv[0].style.visibility = "visible";
 
             $.ajax({
@@ -303,7 +330,7 @@
             }
             for (var itm in currency) {
 
-                cmbCurr.append($('<option value="' + currency[itm].ID + '">').append(currency[itm].Name));
+                cmbCurr.append($('<option value="' + currency[itm].ID + '">').append(currency[itm].Name + " (" + currency[itm].ISO_Code+")"));
             }
         };
         var loadCountry = function (country) {
@@ -348,6 +375,7 @@
             //showLog(null);
             //return;
             divRightInner.empty();
+            btnSave.hide();
             var clientName = txtTenant.val();
             if (clientName == null || clientName.length == 0 || clientName.trim().length == 0) {
                 VIS.ADialog.error('FillTenantName');
@@ -488,12 +516,12 @@
             //divRight.append($('<div style="margin-bottom:10px">').append(" Org Username - BB"));
             //divRight.append($('<div style="margin-bottom:10px">').append(" Org User Password - BB"));
 
-            var btnSave = null;
+             //btnSave = null;
             //if (VIS.Application.isRTL) {
             //    btnSave = $('<a href="javascript:void(o)" style="float:left;" class="vis-initial-btn vis-initial-btn-blue">').append($("<i class='vis vis-save'></i>"));
             //}
             //else {
-                btnSave = $('<a href="javascript:void(o)" class="vis-initial-btn vis-initial-btn-blue">').append($("<i class='vis vis-save'></i>"));
+               // btnSave = $('<a href="javascript:void(o)" class="vis-initial-btn vis-initial-btn-blue">').append($("<i class='vis vis-save'></i>"));
             //}
             btnSave.on('click', function () {
 
@@ -523,7 +551,8 @@
                 //divLog.dialog('close');
                // divLog = null;
             });
-            divRight.append(btnSave);
+            btnSave.show();
+           // divRight.append(btnSave);
 
             //divLog.dialog({
             //    width: 520,
