@@ -968,6 +968,10 @@
             ul.append(li1);
 
 
+            if (info.AttachmentCount > 0) {
+                li1.append("<pre style='margin-top: 10px; margin-bottom: 0px; font-size: 14px; font-family: NoirPro-Regular; color: inherit;'>" + VIS.Msg.getMsg('Attachment') + " : " + VIS.Msg.getMsg('Yes') + "</pre>");
+            }
+
             // var li2 = $("<li>");
             // if  any checkbox is checked, then don't show summary in middle panel.
             if (selectedItems.length <= 1) {
@@ -985,6 +989,8 @@
                 p2.append(VIS.Utility.encodeText(fulldata[index].Summary));
                 li1.append(p2);
             }
+
+           
             //ul.append(li2);
 
             divWorkflowActivity.append($("<div class='clearfix'>"));

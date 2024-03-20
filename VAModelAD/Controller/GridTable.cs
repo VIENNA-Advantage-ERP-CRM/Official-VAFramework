@@ -136,6 +136,8 @@ namespace VAdvantage.Model
 
         /** Sent for WF Approval - W	*/
         public const char SAVE_WFAPPROVAL = 'W';
+        /** Sent for WF Approval - P	*/
+        public const char SAVE_WFPROCESS = 'P';
 
         /** Back Date Version - B	*/
         public const char SAVE_BACKDATEVER = 'B';

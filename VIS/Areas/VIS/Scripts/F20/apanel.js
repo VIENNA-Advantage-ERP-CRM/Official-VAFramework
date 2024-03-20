@@ -3309,7 +3309,15 @@
 
         }
 
-        var gPanel = this.curGC.vGridPanel;
+        var gPanel = null;
+        if (this.curGC) {
+            gPanel = this.curGC.vGridPanel;
+        } else {
+            gPanel = {};
+            gPanel.setEnabled = function (action,enable) {
+                
+            }
+        }
         //	Order Tab
         if (isAPanelTab) {
             this.aMulti.setPressed(false);
@@ -3318,16 +3326,16 @@
             this.aCardDialog.setEnabled(false);
 
             this.aNew.setEnabled(false);
-            gPanel.setEnabled("NRD", false);
+            //gPanel.setEnabled("NRD", false);
 
             this.aDelete.setEnabled(false);
-            gPanel.setEnabled("DRD", false);
+           // gPanel.setEnabled("DRD", false);
 
             this.aFind.setEnabled(false);
             this.aBatchUpdate.setEnabled(false);
 
             this.aRefresh.setEnabled(false);
-            gPanel.setEnabled("RQY", false);
+            //gPanel.setEnabled("RQY", false);
 
             this.aNext.setEnabled(false);
             this.aLast.setEnabled(false);
@@ -3356,6 +3364,7 @@
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);
         }
+
 
 
 
@@ -3512,7 +3521,16 @@
      *  @param e event 
      */
     APanel.prototype.dataStatusChanged = function (e) {
-        var gPanel = this.curGC.vGridPanel;
+        var gPanel = null;
+        if (this.curGC) {
+            gPanel = this.curGC.vGridPanel;
+        } else {
+            gPanel = {};
+            gPanel.setEnabled = function (action, enable) {
+
+            }
+        }
+
         var dbInfo = e.getMessage();
         var findPressed = this.curTab.getIsQueryActive() || this.curTab.getOnlyCurrentDays() > 0;
         if (findPressed)
@@ -3997,7 +4015,9 @@
         if (this.curST != null) {
             this.curST.saveData();
             this.aSave.setEnabled(false);	//	set explicitly
-            this.curGC.vGridPanel.setEnabled("SAR", false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled("SAR", false);
+            }
             return;
         }
 
@@ -4037,11 +4057,13 @@
                 if (manual)
                     curGC.dynamicDisplay(-1);
 
+                if (callback) {
+                    callback(retValue);
+                }
+
             });
 
-            if (callback) {
-                callback(retValue);
-            }
+           
         }
 
         if (needExecute) {
@@ -4183,7 +4205,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aChat.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled(this.aChat.getAction(), false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aChat.getAction(), false);
+            }
             return;
         }
 
@@ -4245,7 +4269,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aLetter.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled(this.aLetter.getAction(), false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aLetter.getAction(), false);
+            }
             return;
         }
 
@@ -4268,7 +4294,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aEmail.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled(this.aEmail.getAction(), false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aEmail.getAction(), false);
+            }
             return;
         }
 
@@ -4482,7 +4510,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aSms.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled(this.aSms.getAction(), false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aSms.getAction(), false);
+            }
             return;
         }
 
@@ -4545,7 +4575,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aSubscribe.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled(this.aSubscribe.getAction(), false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aSubscribe.getAction(), false);
+            }
             return;
         }
         var self = this;
@@ -4583,7 +4615,9 @@
         //alert("attachment");
         if (this.curTab.getRecord_ID() < 1) {
             this.aAttachment.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled(this.aAttachment.getAction(), false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aAttachment.getAction(), false);
+            }
             return;
         }
         var self = this;
@@ -4627,7 +4661,9 @@
     APanel.prototype.cmd_RecordShared = function () {
         if (this.curTab.getRecord_ID() < 1) {
             this.aSharedRecord.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled(this.aSharedRecord.getAction(), false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aSharedRecord.getAction(), false);
+            }
             return;
         }
 
@@ -5000,7 +5036,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aCall.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled(this.aCall.getAction(), false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aCall.getAction(), false);
+            }
             return;
         }
         var table_ID = this.curTab.getAD_Table_ID();
@@ -5039,11 +5077,15 @@
     APanel.prototype.setLastView = function (strView) {
         if (strView == "Card" || strView == "Multi") {
             this.aBack.setEnabled(true);
-            this.curGC.vGridPanel.setEnabled("BVW", true);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled("BVW", true);
+            }
         }
         else {
             this.aBack.setEnabled(false);
-            this.curGC.vGridPanel.setEnabled("BVW", false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled("BVW", false);
+            }
             strview = "";
         }
         this.lastView = strView;
