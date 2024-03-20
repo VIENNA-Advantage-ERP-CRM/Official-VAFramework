@@ -188,5 +188,13 @@ namespace VIS.Controllers
             AttachmentModel am = new AttachmentModel();
             return Json(new { result = am.DeleteAttachment(AttachmentLines) }, JsonRequestBehavior.AllowGet);
         }
+
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        public JsonResult GetTableName(string fields)
+        {
+            AttachmentModel am = new AttachmentModel();
+            return Json(JsonConvert.SerializeObject(am.GetTableName(fields)), JsonRequestBehavior.AllowGet);
+        }
     }
 }

@@ -661,6 +661,15 @@ OR
                                 ON (usr.AD_User_ID         =wfea.ad_User_ID)
                               WHERE wfea.AD_WF_Process_ID=" + wfProcessID + @"
                               Order By wfea.ad_wf_eventaudit_id desc";
+
+
+                int attachmentCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT Count(AD_AttachmentLine.AD_Attachment_ID) FROM AD_Attachment 
+                                        INNER JOIN AD_AttachmentLine ON AD_Attachment.AD_Attachment_ID = AD_AttachmentLine.AD_Attachment_ID
+                                        INNER JOIN ad_wf_activity ON  ad_attachment.record_id = ad_wf_activity.record_id AND ad_attachment.ad_table_id = ad_wf_activity.ad_table_id
+                                        WHERE ad_wf_activity.ad_wf_activity_id ="+ activityID));
+
+                info.AttachmentCount = attachmentCount;
+
                 DataSet ds = DB.ExecuteDataset(sql);
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
@@ -1429,6 +1438,10 @@ OR
         }
         public bool IsSurveyResponseRequired
         {
+            get;
+            set;
+        }
+        public int AttachmentCount {
             get;
             set;
         }
