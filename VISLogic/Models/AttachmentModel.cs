@@ -268,6 +268,10 @@ namespace ViennaAdvantageWeb.Areas.VIS.Models
 
             return count;
         }
+        public string GetTableName(string TableID)
+        {
+            return Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + TableID, null, null));
+        }
     }
 
     public class FileLocation

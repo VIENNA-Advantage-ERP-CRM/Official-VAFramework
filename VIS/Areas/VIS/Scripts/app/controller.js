@@ -4735,7 +4735,7 @@
                     if (!(out.FireEEvent || out.FireIEvent))
                         VIS.ADialog.info(out.ErrorMsg);
                 }
-                else if (out.Status == "W") {
+                else {
                     if (out.VersionResult) {
                         out.RowData = gridTableIn.RowData;
                         if (out.VersionResult.KeyColName != "") {
@@ -4763,7 +4763,8 @@
                         else if (out.FireIEvent) {
                             self.fireDataStatusIEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError);
                         }
-                        VIS.ADialog.info("SentForApproval");
+                        if (out.Status == "W")
+                            VIS.ADialog.info("SentForApproval");
                         //self.dataRefreshAll();
                     }
                 }

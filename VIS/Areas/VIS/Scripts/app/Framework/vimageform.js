@@ -102,7 +102,7 @@
                     var fd = new FormData();
                     fd.append("file", fileUpload[0].files[0]);
                     fd.append("isDatabaseSave", chkDataBaseSave.prop("checked"));
-                    fd.append("ad_image_id", ad_image_id);
+                    fd.append("ad_image_id", 0);
                     xhr.open("POST", VIS.Application.contextUrl + "VImageForm/SaveImage", true);
                     xhr.send(fd);
                     xhr.addEventListener("load", function (event) {
