@@ -173,11 +173,11 @@
 
             var pnl = this.aTabbedPane.getAPanel();
             //1. toolbar action
-            this.aRefresh = pnl.addActions(pnl.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_CV_Refresh");
-            this.aDelete = pnl.addActions(pnl.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_CV_Delete");
-            this.aNew = pnl.addActions(pnl.ACTION_NAME_NEW, null, true, true, false, onAction, null, "Shct_CV_New");
-            this.aIgnore = pnl.addActions("Ignore", null, true, true, false, onAction, null, "Shct_CV_Ignore");
-            this.aSave = pnl.addActions("Save", null, true, true, false, onAction, null, "Shct_CV_Save");
+            this.aRefresh = pnl.addActions(pnl.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_CV_Refresh", "Refresh");
+            this.aDelete = pnl.addActions(pnl.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_CV_Delete", "Delete");
+            this.aNew = pnl.addActions(pnl.ACTION_NAME_NEW, null, true, true, false, onAction, null, "Shct_CV_New", "New");
+            this.aIgnore = pnl.addActions("UNO", null, true, true, false, onAction, null, "Shct_CV_Ignore", "Ignore");
+            this.aSave = pnl.addActions("SAR", null, true, true, false, onAction, null, "Shct_CV_Save", "Save");
             //this.aFind = pnl.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             //this.aInfo = pnl.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             //this.aReport = pnl.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");

@@ -824,7 +824,7 @@
                 }
 
                 var fileInfo = {};
-                var dAWrap = $("<div class='vis-attach-file-wrapla' style='opacity: 0.3'>");
+                var dAWrap = $("<div class='vis-attach-file-wrapla' style='opacity: 0.5'>");
                 dLAContent.append(dAWrap);
 
                 var dTop = $("<div class='vis-attach-file-top'>");

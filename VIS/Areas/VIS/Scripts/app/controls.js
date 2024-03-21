@@ -1432,7 +1432,13 @@
 
     VButton.prototype.setReadOnly = function (readOnly) {
         this.isReadOnly = readOnly;
-        this.ctrl.css('opacity', readOnly ? .6 : 1);
+
+        if (this.dynStyle && this.dynStyle.indexOf('opacity') > -1) {
+            // by pass opacity in case of style logic already have
+        } else {
+            this.ctrl.css('opacity', readOnly ? .6 : 1);
+        }
+
         if (this.isLink) {
         }
         else {

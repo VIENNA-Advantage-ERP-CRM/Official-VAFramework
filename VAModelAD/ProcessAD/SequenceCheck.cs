@@ -156,7 +156,10 @@ namespace VAdvantage.Process
                         DB.GetNextID(ctx, tblName, trxName);//10
                         if (DB.ExecuteQuery("ALTER SEQUENCE " + tblName + "_SEQ INCREMENT BY 1", null, null) > -1)
                         {
-                            sp.AddLog(0, null, null, "Sequence Updated For :" + tblName + "_SEQ");
+                            if (increment != -1)
+                            {
+                                sp.AddLog(0, null, null, "Sequence Updated For :" + tblName + "_SEQ");
+                            }
                         }
                         else
                         {
@@ -167,7 +170,10 @@ namespace VAdvantage.Process
                     {
                         if (DB.ExecuteQuery("SELECT setval('" + tblName + "_seq'," + seqID + ", true)", null, null) > -1)
                         {
-                            sp.AddLog(0, null, null, "Sequence Updated For :" + tblName + "_SEQ");
+                            if (increment != -1)
+                            {
+                                sp.AddLog(0, null, null, "Sequence Updated For :" + tblName + "_SEQ");
+                            }
                         }
                         else
                         {
