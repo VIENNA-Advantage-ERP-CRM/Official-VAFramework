@@ -2384,10 +2384,17 @@
 
         //check action type
         //Undo
+        var btnactionName = vButton.mField.vo.DefaultValue;
+
         if (vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU") {
             aPanel.cmd_ignore();
             aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction());
             needExecute = false;
+        } else if (vButton.mField.getAD_Reference_Value_ID() == 435 && (btnactionName === "UNO" || btnactionName === "NRD" || btnactionName === "SAR"
+            || btnactionName === "DRD" || btnactionName === "RQY" || btnactionName === "RET"
+            || btnactionName === "PRT" || btnactionName === "BVW")) {
+
+            //return aPanel.actionButtonCallBack(vButton, startWOasking, batch, dateScheduledStart, columnName, ctx, curCtrller);
         }
         else if (curCtrller.curTab.needSave(true, false)) {
             needExecute = false;
