@@ -2390,13 +2390,17 @@
         var needExecute = true;
 
         //check action type
+
         //Undo     
+
 
         if (vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU") {
             aPanel.cmd_ignore();
             aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction());
             needExecute = false;
+
         } 
+
         else if (curCtrller.curTab.needSave(true, false)) {
             needExecute = false;
             curCtrller.cmd_save(true, function (result) {
