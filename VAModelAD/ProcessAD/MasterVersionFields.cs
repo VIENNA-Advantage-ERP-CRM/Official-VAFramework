@@ -83,14 +83,27 @@ namespace VAdvantage.Process
             if (Ver_AD_Table_ID <= 0)
                 return Msg.GetMsg(GetCtx(), "VerTableNotFound");
 
+
             // Get Display Name of Window linked with the tab
-            string displayName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Window WHERE AD_Window_ID = " + tab.GetAD_Window_ID(), null, Get_TrxName())) + " Version";
+            DataSet dsWindowData = DB.ExecuteDataset("SELECT Name, DisplayName FROM AD_Window WHERE AD_Window_ID = " + tab.GetAD_Window_ID(), null, Get_TrxName());
+            string displayName = "";
+            string winDisplayName = "";
+            if (dsWindowData != null && dsWindowData.Tables != null && dsWindowData.Tables[0].Rows.Count > 0)
+            {
+                displayName = dsWindowData.Tables[0].Rows[0]["Name"] + " Version";
+                winDisplayName = Util.GetValueOfString(dsWindowData.Tables[0].Rows[0]["DisplayName"]);
+                if (winDisplayName == "")
+                    winDisplayName = displayName;
+                else
+                    winDisplayName = winDisplayName + " Version";
+            }
+           // string displayName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Window WHERE AD_Window_ID = " + tab.GetAD_Window_ID(), null, Get_TrxName())) + " Version";
 
             Ver_AD_Window_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Window_ID FROM AD_Window WHERE Name = '" + displayName + "_" + tab.GetName() + "'", null, Get_TrxName()));
             // Check if Version window do not exist, then create new version window
             if (Ver_AD_Window_ID <= 0)
             {
-                Ver_AD_Window_ID = CreateVerWindow(displayName, tab.GetName());
+                Ver_AD_Window_ID = CreateVerWindow(displayName, tab.GetName(), winDisplayName);
                 // if window not created then return message
                 if (Ver_AD_Window_ID <= 0)
                     return Msg.GetMsg(GetCtx(), "VersionWinNotCreated");
@@ -136,14 +149,14 @@ namespace VAdvantage.Process
         /// </summary>
         /// <param name="DisplayName">name of window</param>
         /// <returns>int (Window ID)</returns>
-        private int CreateVerWindow(string DisplayName, string TabName)
+        private int CreateVerWindow(string DisplayName, string TabName, string winDisplayName = "")
         {
             // create new version window
             MWindow verWnd = new MWindow(GetCtx(), 0, Get_TrxName());
             verWnd.SetAD_Client_ID(0);
             verWnd.SetAD_Org_ID(0);
             verWnd.SetName(DisplayName + "_" + TabName);
-            verWnd.SetDisplayName(DisplayName);
+            verWnd.SetDisplayName(winDisplayName + "_" + TabName);
             // set window as Query Only
             verWnd.SetWindowType("M");
             verWnd.SetDescription("Display version data");
