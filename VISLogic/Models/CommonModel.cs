@@ -361,7 +361,7 @@ namespace VISLogic.Models
             {
                 if (baseLanguage)
                 {
-                    sql = @"SELECT AD_Tab.AD_Window_ID AS ID,w.Name FROM AD_Tab 
+                    sql = @"SELECT AD_Tab.AD_Window_ID AS ID,w.displayName AS Name FROM AD_Tab 
                             INNER JOIN AD_Window w ON  AD_Tab.AD_Window_ID=w.ad_window_id";
                     
                 }
@@ -380,7 +380,7 @@ namespace VISLogic.Models
             {
                 if (baseLanguage)
                 {
-                    sql = "SELECT NAME, AD_Form_ID AS ID FROM AD_Form WHERE NAME IN (" + formattedString + ") ORDER BY NAME ";
+                    sql = "SELECT DisplayName AS NAME, AD_Form_ID AS ID FROM AD_Form WHERE NAME IN (" + formattedString + ") ORDER BY DisplayName ";
                 }
                 else {
                     sql = "SELECT AD_Form_Trl.NAME, AD_Form.AD_Form_ID AS ID FROM AD_Form INNER JOIN AD_Form_Trl ON (AD_Form.AD_Form_ID=AD_Form_Trl.AD_FORM_ID AND AD_Form_Trl.AD_Language='" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "')  WHERE AD_Form.NAME IN (" + formattedString + ") ORDER BY AD_Form_Trl.NAME ";

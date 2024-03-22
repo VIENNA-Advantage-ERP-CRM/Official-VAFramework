@@ -2113,10 +2113,7 @@
 
         if (action.source instanceof VIS.Controls.VButton) {
             var btnField = action.source.getField();
-            if (btnField.getAD_Reference_Value_ID() == 435) {
-                //blank do-not check readonly
-            }
-            else if (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly()) {
+            if (btnField.getAD_Reference_Value_ID() != 435 && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
                 return;
             }
         }
@@ -2125,11 +2122,21 @@
         var selfPan = this;
         setTimeout(function () {
             //  Command Buttons
+
+
             if (action.source instanceof VIS.Controls.VButton) {
-                if (!selfPan.actionButton(action.source, controller)) {
-                    selfPan.setBusy(false, true);
+                var btnactionName = action.source.getField().vo.DefaultValue;
+                if (action.source.mField.getAD_Reference_Value_ID() == 435 && (btnactionName === "UNO" || btnactionName === "NRD" || btnactionName === "SAR"
+                    || btnactionName === "DRD" || btnactionName === "RQY" || btnactionName === "RET" || btnactionName === "PRT" || btnactionName === "BVW")) {
+                    // handle Toolbar action by Button
+                    selfPan.actionPerformedCallback(selfPan, btnactionName);
+                    return;
+                } else {
+                    if (!selfPan.actionButton(action.source, controller)) {
+                        selfPan.setBusy(false, true);
+                    }
+                    return;
                 }
-                return;
             }
 
             selfPan.actionPerformedCallback(selfPan, action);
@@ -2383,19 +2390,13 @@
         var needExecute = true;
 
         //check action type
-        //Undo
-        var btnactionName = vButton.mField.vo.DefaultValue;
+        //Undo     
 
         if (vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU") {
             aPanel.cmd_ignore();
             aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction());
             needExecute = false;
-        } else if (vButton.mField.getAD_Reference_Value_ID() == 435 && (btnactionName === "UNO" || btnactionName === "NRD" || btnactionName === "SAR"
-            || btnactionName === "DRD" || btnactionName === "RQY" || btnactionName === "RET"
-            || btnactionName === "PRT" || btnactionName === "BVW")) {
-
-            //return aPanel.actionButtonCallBack(vButton, startWOasking, batch, dateScheduledStart, columnName, ctx, curCtrller);
-        }
+        } 
         else if (curCtrller.curTab.needSave(true, false)) {
             needExecute = false;
             curCtrller.cmd_save(true, function (result) {
