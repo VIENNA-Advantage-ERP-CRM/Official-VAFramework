@@ -3240,18 +3240,7 @@
 
             var mTab = gc.getMTab();
 
-            /* if reset tab is true then set default view which is set on tab */
-            if (mTab.getIsResetLayout()) {
-                var defaultTabLayout = mTab.getTabLayout();
-                if (defaultTabLayout == 'N')
-                    gc.switchMultiRow();
-                else if (defaultTabLayout == 'Y')
-                    gc.switchSingleRow(true);
-                else if (defaultTabLayout == 'C') {
-                    gc.switchCardRow(true);
-                }
-            }
-
+            
             tabEle.setVisible(true);
 
             gc.activate(oldGC);
@@ -3269,6 +3258,8 @@
             }
 
             if (back && this.curTab.getIsCurrent()) {
+                
+
                 if (this.curTab.getTabLevel() == 0) {
                     if (this.curTab.searchText) {
                         this.setAdvancedSerachText(false, this.curTab.searchText);
@@ -3289,6 +3280,18 @@
             }
             else	//	Requery and bind
             {
+                /* if reset tab is true then set default view which is set on tab */
+                if (mTab.getIsResetLayout()) {
+                    var defaultTabLayout = mTab.getTabLayout();
+                    if (defaultTabLayout == 'N')
+                        gc.switchMultiRow();
+                    else if (defaultTabLayout == 'Y')
+                        gc.switchSingleRow(true);
+                    else if (defaultTabLayout == 'C') {
+                        gc.switchCardRow(true);
+                    }
+                }
+
                 this.curTab.getTableModel().setCurrentPage(1);
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
 
