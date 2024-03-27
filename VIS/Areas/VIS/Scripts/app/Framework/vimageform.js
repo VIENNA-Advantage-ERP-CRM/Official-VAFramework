@@ -71,18 +71,28 @@
             lblfileUpload = root.find("#lblfileUpload_" + windowNo);
             chkDataBaseSave = root.find("#chkDataBaseSave_" + windowNo);
 
+            
             fileUpload.on("change", function () {
-                imgUsrImage.show();
                 var file = fileUpload[0].files[0],
                     reader = new FileReader();
+                
+                // Validate file extension
+                var allowedExtensions = /(\.jpg|\.png|\.ico|\.webp|\.svg|\.jpeg|\.jfif)$/i;
+                if (!allowedExtensions.exec(file.name)) {
+                    VIS.ADialog.warn("SelectImageOnly");
+                    fileUpload.val(''); // Clear the file input to prevent upload
+                    imgUsrImage.hide(); // Hide the image element
+                    return false;
+                }
+
+                imgUsrImage.show();
                 reader.onload = function (event) {
                     imgUsrImage.removeAttr("src").attr("src", event.target.result);
-
                     // if (imgUsrImage[0].width > 300) { // holder width
-                    holderDiv.css("overflow", "auto");
-                    //
+                    //     holderDiv.css("overflow", "auto");
                     // }
                 };
+
                 reader.readAsDataURL(file);
                 change = true;
                 reader = null;

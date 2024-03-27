@@ -437,287 +437,339 @@ namespace VIS.Models
         {
             StringBuilder strError = new StringBuilder();
             int AD_Client_ID = ctx.GetAD_Client_ID();
-            if (C_BPartner_ID > 0)
+            Trx trx = Trx.Get(Trx.CreateTrxName("BPTRX"));
+            try
             {
-                _partner = new MBPartner(ctx, C_BPartner_ID, null);
-            }
-            else
-            {
-                _partner = MBPartner.GetTemplate(ctx, AD_Client_ID);
-            }
-            bool isSOTrx = ctx.IsSOTrx(_windowNo);
-            _partner.SetIsCustomer(isSOTrx);
-            _partner.SetIsVendor(!isSOTrx);
-            // JID_1197 IN Business partner  updating Createdby,Updatedby,Created,Updated fields as per changed date
-            _partner.Set_ValueNoCheck("CreatedBy", ctx.GetAD_User_ID());
-            _partner.Set_ValueNoCheck("Created", DateTime.Now);
-            _partner.Set_ValueNoCheck("Updated", DateTime.Now);
-            _partner.Set_ValueNoCheck("UpdatedBy", ctx.GetAD_User_ID());
-            if (BPtype != null && (!isCustomer && !isVendor))
-            {
-                if (BPtype.Contains("Customer"))
-                {
-                    _partner.SetIsCustomer(true);
-                }
-                if (BPtype.Contains("Employee"))
-                {
-                    _partner.SetIsEmployee(true);
-                }
-                if (BPtype.Contains("Vendor"))
-                {
-                    _partner.SetIsVendor(true);
-                }
-                if (BPtype.Contains("Prospect"))
-                {
-                    _partner.SetIsProspect(true);
-                }
-                /*
-                if (BPtype == "Customer")
-                {
-                    _partner.SetIsCustomer(true);
-                }
-                else if (BPtype == "Employee")
-                {
-                    _partner.SetIsEmployee(true);
-                }
-                else if (BPtype == "Vendor")
-                {
-                    _partner.SetIsVendor(true);
-                }
-                else if (BPtype == "Prospect")
-                {
-                    _partner.SetIsProspect(true);
-                }*/
-            }
-            if (isCustomer)
-            {
-                _partner.SetIsCustomer(true);
-            }
-            else
-            {
-                _partner.SetIsCustomer(false);
-            }
-            if (isVendor)
-            {
-                _partner.SetIsVendor(true);
-            }
-            else
-            {
-                _partner.SetIsVendor(false);
-            }
-            if (isProspect)
-            {
-                _partner.SetIsProspect(true);
-            }
-            else
-            {
-                _partner.SetIsProspect(false);
-            }
 
-            if (isEmployee)
-            {
-                _partner.SetIsEmployee(true);
-            }
-            else
-            {
-                _partner.SetIsEmployee(false);
-            }
 
-            if (searchKey == null || searchKey.Length == 0)
-            {
-                //	get Table Documet No
-                searchKey = MSequence.GetDocumentNo(ctx.GetAD_Client_ID(), "C_BPartner", null, ctx);
-                //Dispatcher.BeginInvoke(() => { txtValue.Text = value; });
-            }
-            _partner.SetValue(searchKey);
-            //
-            _partner.SetName(name);
-            _partner.SetURL(webUrl);
-            //  _partner.SetName2(name2);
-            //KeyNamePair p = (KeyNamePair)cmbGreetingBP.SelectedItem;
-            //if (greeting >0)
-            //{
-            //    _partner.SetC_Greeting_ID(greeting);
-            //}
-            //else
-            //{
-            //    _partner.SetC_Greeting_ID(0);
-            //}
-            if (greeting != string.Empty)
-            {
-                _partner.SetC_Greeting_ID(Convert.ToInt32(greeting));
-            }
-            else
-            {
-                _partner.SetC_Greeting_ID(0);
-            }
-            /***************************************************/
-            _partner.SetC_BP_Group_ID(Util.GetValueOfInt(bpGroup));
-            /***************************************************/
-
-            if (_partner.Save())
-            {
-                log.Fine("C_BPartner_ID=" + _partner.GetC_BPartner_ID());
-            }
-            else
-            {
-                ValueNamePair pp = VLogger.RetrieveError();
-                if (pp != null && !string.IsNullOrEmpty(pp.GetName()))
-                {
-                    strError.Append("BPSaveError -- " + pp.GetName());
-                }
-                // Classes.ShowMessage.Error("SearchKeyExist", null);
-                //strError.Append("SearchKeyExist");
-                //this.Cursor = Cursors.Arrow;
-                return strError.ToString();
-            }
-
-            //	***** Business Partner - Location *****
-            if (_pLocation == null)
                 if (C_BPartner_ID > 0)
                 {
-                    _pLocation = new MBPartnerLocation(ctx, GetBPartnerLocationID(_partner.Get_ID()), null);
-                    if (_pLocation.Get_ID() <= 0)
+                    _partner = new MBPartner(ctx, C_BPartner_ID, trx);
+                }
+                else
+                {
+                    _partner = MBPartner.GetTemplate(ctx, AD_Client_ID);
+                }
+                bool isSOTrx = ctx.IsSOTrx(_windowNo);
+                _partner.SetIsCustomer(isSOTrx);
+                _partner.SetIsVendor(!isSOTrx);
+                // JID_1197 IN Business partner  updating Createdby,Updatedby,Created,Updated fields as per changed date
+                _partner.Set_ValueNoCheck("CreatedBy", ctx.GetAD_User_ID());
+                _partner.Set_ValueNoCheck("Created", DateTime.Now);
+                _partner.Set_ValueNoCheck("Updated", DateTime.Now);
+                _partner.Set_ValueNoCheck("UpdatedBy", ctx.GetAD_User_ID());
+                if (BPtype != null && (!isCustomer && !isVendor))
+                {
+                    if (BPtype.Contains("Customer"))
                     {
-                        _pLocation = new MBPartnerLocation(_partner);
+                        _partner.SetIsCustomer(true);
                     }
+                    if (BPtype.Contains("Employee"))
+                    {
+                        _partner.SetIsEmployee(true);
+                    }
+                    if (BPtype.Contains("Vendor"))
+                    {
+                        _partner.SetIsVendor(true);
+                    }
+                    if (BPtype.Contains("Prospect"))
+                    {
+                        _partner.SetIsProspect(true);
+                    }
+                    /*
+                    if (BPtype == "Customer")
+                    {
+                        _partner.SetIsCustomer(true);
+                    }
+                    else if (BPtype == "Employee")
+                    {
+                        _partner.SetIsEmployee(true);
+                    }
+                    else if (BPtype == "Vendor")
+                    {
+                        _partner.SetIsVendor(true);
+                    }
+                    else if (BPtype == "Prospect")
+                    {
+                        _partner.SetIsProspect(true);
+                    }*/
+                }
+                if (isCustomer)
+                {
+                    _partner.SetIsCustomer(true);
                 }
                 else
                 {
-                    _pLocation = new MBPartnerLocation(_partner);
+                    _partner.SetIsCustomer(false);
                 }
-            if (address != string.Empty)
-            {
-                _pLocation.SetC_Location_ID(Convert.ToInt32(address));
-            }
-
-            //
-            _pLocation.SetPhone(phoneNo);
-            // _pLocation.SetPhone2(phoneNo2);
-            _pLocation.SetFax(fax);
-            if (_pLocation.Save())
-            {
-                log.Fine("C_BPartner_Location_ID=" + _pLocation.GetC_BPartner_Location_ID());
-            }
-            else
-            {
-                //   ADialog.error(m_WindowNo, this, "BPartnerNotSaved", Msg.translate(Env.getCtx(), "C_BPartner_Location_ID"));
-                // Classes.ShowMessage.Error("BPartnerNotSaved", null);
-                //this.Cursor = Cursors.Arrow;
-                strError.Append("BPartnerNotSaved");
-                return strError.ToString();
-            }
-
-            //	***** Business Partner - User *****
-            //String contact = txtContact.Text;
-            //String email = txtEMail.Text;
-            if (_user == null && (contact.Length > 0 || email.Length > 0))
-                if (C_BPartner_ID > 0)
+                if (isVendor)
                 {
-                    _user = new MUser(ctx, GetUserID(_partner.Get_ID()), null);
+                    _partner.SetIsVendor(true);
                 }
                 else
                 {
-                    _user = new MUser(_partner);
+                    _partner.SetIsVendor(false);
                 }
-            if (_user != null)
-            {
-                if (contact.Length == 0)
-                    contact = name;
-                _user.SetName(contact);
-                _user.SetEMail(email);
-                _user.SetTitle(title);
-                _user.SetC_Location_ID(Convert.ToInt32(address));
-
-                // = (KeyNamePair)cmbGreetingC.SelectedItem;
-
-                //if (greeting1 >0)
-                //    _user.SetC_Greeting_ID(greeting1);
-                if (greeting1 != string.Empty)
-                    _user.SetC_Greeting_ID(Convert.ToInt32(greeting1));
+                if (isProspect)
+                {
+                    _partner.SetIsProspect(true);
+                }
                 else
-                    _user.SetC_Greeting_ID(0);
+                {
+                    _partner.SetIsProspect(false);
+                }
+
+                if (isEmployee)
+                {
+                    _partner.SetIsEmployee(true);
+                }
+                else
+                {
+                    _partner.SetIsEmployee(false);
+                }
+
+                if (searchKey == null || searchKey.Length == 0)
+                {
+                    //	get Table Documet No
+                    searchKey = MSequence.GetDocumentNo(ctx.GetAD_Client_ID(), "C_BPartner", null, ctx);
+                    //Dispatcher.BeginInvoke(() => { txtValue.Text = value; });
+                }
+                _partner.SetValue(searchKey);
                 //
-                _user.SetPhone(phoneNo);
-                // _user.SetPhone2(phoneNo2);
-                _user.SetMobile(umobile);
-                _user.SetFax(fax);
-                _user.SetC_BPartner_Location_ID(_pLocation.GetC_BPartner_Location_ID());
-                if (_user.Save())
+                _partner.SetName(name);
+                _partner.SetURL(webUrl);
+                //  _partner.SetName2(name2);
+                //KeyNamePair p = (KeyNamePair)cmbGreetingBP.SelectedItem;
+                //if (greeting >0)
+                //{
+                //    _partner.SetC_Greeting_ID(greeting);
+                //}
+                //else
+                //{
+                //    _partner.SetC_Greeting_ID(0);
+                //}
+                if (greeting != string.Empty)
                 {
-                    if (fileUrl != null && fileUrl != string.Empty)
-                    {
-                        _user.SetAD_Image_ID(SaveUserImage(ctx, fileUrl, _user.GetAD_User_ID()));
-                    }
-                    if (_user.Save())
-                    {
-                        log.Fine("AD_User_ID(AD_Image_ID)=" + _user.GetAD_User_ID() + "(" + _user.GetAD_Image_ID() + ")");
-                    }
-                    log.Fine("AD_User_ID=" + _user.GetAD_User_ID());
+                    _partner.SetC_Greeting_ID(Convert.ToInt32(greeting));
                 }
                 else
                 {
-                    //Classes.ShowMessage.Error("BPartnerNotSaved", null);
+                    _partner.SetC_Greeting_ID(0);
+                }
+                /***************************************************/
+                _partner.SetC_BP_Group_ID(Util.GetValueOfInt(bpGroup));
+                /***************************************************/
+
+                if (_partner.Save(trx))
+                {
+                    log.Fine("C_BPartner_ID=" + _partner.GetC_BPartner_ID());
+                }
+                else
+                {
+                    ValueNamePair pp = VLogger.RetrieveError();
+                    if (pp != null && !string.IsNullOrEmpty(pp.GetName()))
+                    {
+                        strError.Append("BPSaveError -- " + pp.GetName());
+                    }
+                    // Classes.ShowMessage.Error("SearchKeyExist", null);
+                    //strError.Append("SearchKeyExist");
                     //this.Cursor = Cursors.Arrow;
-                    strError.Append("BPartnerNotSaved");
+                    trx.Rollback();
+                    trx.Close();
                     return strError.ToString();
                 }
 
-                /*************************************************/
-                if ((bpRelation != null && bpLocation != null) && (bpRelation != string.Empty && bpLocation != string.Empty))
-                {
-                    if (bpRelation.ToString().Trim() == "" || bpLocation.ToString().Trim() == "")
+                //	***** Business Partner - Location *****
+                if (_pLocation == null)
+                    if (C_BPartner_ID > 0)
                     {
-                        int dele = DB.ExecuteQuery("DELETE from C_BP_Relation where c_bpartner_id=" + _partner.GetC_BPartner_ID(), null, null);
-                        if (dele == -1)
+                        _pLocation = new MBPartnerLocation(ctx, GetBPartnerLocationID(_partner.Get_ID()), trx);
+                        if (_pLocation.Get_ID() <= 0)
                         {
-                            log.SaveError("C_BP_RelationNotDeleted", "c_bpartner_id=" + _partner.GetC_BPartner_ID());
+                            _pLocation = new MBPartnerLocation(_partner);
                         }
                     }
                     else
                     {
-                        //Business Partner Relation 
-                        if (C_BPartner_ID > 0)
-                        {
-                            _bprelation = new X_C_BP_Relation(ctx, GetBPRelationID(_partner.Get_ID()), null);
-                        }
-                        else
-                        {
-                            _bprelation = new X_C_BP_Relation(ctx, 0, null);
-                        }
-                        _bprelation.SetAD_Client_ID(_partner.GetAD_Client_ID());
-                        _bprelation.SetAD_Org_ID(_partner.GetAD_Org_ID());
-                        _bprelation.SetName(_partner.GetName());
-                        _bprelation.SetDescription(_partner.GetDescription());
-                        _bprelation.SetC_BPartner_ID(_partner.GetC_BPartner_ID());
-                        _bprelation.SetC_BPartner_Location_ID(_pLocation.GetC_BPartner_Location_ID());
-                        _bprelation.SetC_BP_Relation_ID(Util.GetValueOfInt(bpRelation));
-                        _bprelation.SetC_BPartnerRelation_ID(Util.GetValueOfInt(bpRelation));
-                        _bprelation.SetC_BPartnerRelation_Location_ID(Util.GetValueOfInt(bpLocation));
-                        _bprelation.SetIsBillTo(true);
-                        if (_bprelation.Save())
-                        {
-                            log.Fine("C_BP_Relation_ID=" + _bprelation.GetC_BP_Relation_ID());
-                        }
-                        else
-                        {
-                            //Classes.ShowMessage.Error("BPRelationNotSaved", null);
+                        _pLocation = new MBPartnerLocation(_partner);
+                    }
+                if (address != string.Empty)
+                {
+                    _pLocation.SetC_Location_ID(Convert.ToInt32(address));
+                }
 
-                            //this.Cursor = Cursors.Arrow;
-                            strError.Append("BPRelationNotSaved");
+                //
+                _pLocation.SetPhone(phoneNo);
+                // _pLocation.SetPhone2(phoneNo2);
+                _pLocation.SetFax(fax);
+                if (_pLocation.Save(trx))
+                {
+                    log.Fine("C_BPartner_Location_ID=" + _pLocation.GetC_BPartner_Location_ID());
+                }
+                else
+                {
+                    //   ADialog.error(m_WindowNo, this, "BPartnerNotSaved", Msg.translate(Env.getCtx(), "C_BPartner_Location_ID"));
+                    // Classes.ShowMessage.Error("BPartnerNotSaved", null);
+                    //this.Cursor = Cursors.Arrow;
+                    strError.Append("BPartnerNotSaved");
+                    trx.Rollback();
+                    trx.Close();
+                    return strError.ToString();
+                }
+
+                //	***** Business Partner - User *****
+                //String contact = txtContact.Text;
+                //String email = txtEMail.Text;
+                if (_user == null && (contact.Length > 0 || email.Length > 0))
+                    if (C_BPartner_ID > 0)
+                    {
+                        _user = new MUser(ctx, GetUserID(_partner.Get_ID()), null);
+                    }
+                    else
+                    {
+                        _user = new MUser(_partner);
+                    }
+                if (_user != null)
+                {
+                    if (contact.Length == 0)
+                        contact = name;
+                    _user.SetName(contact);
+                    _user.SetEMail(email);
+                    _user.SetTitle(title);
+                    _user.SetC_Location_ID(Convert.ToInt32(address));
+
+                    // = (KeyNamePair)cmbGreetingC.SelectedItem;
+
+                    //if (greeting1 >0)
+                    //    _user.SetC_Greeting_ID(greeting1);
+                    if (greeting1 != string.Empty)
+                        _user.SetC_Greeting_ID(Convert.ToInt32(greeting1));
+                    else
+                        _user.SetC_Greeting_ID(0);
+                    //
+                    _user.SetPhone(phoneNo);
+                    // _user.SetPhone2(phoneNo2);
+                    _user.SetMobile(umobile);
+                    _user.SetFax(fax);
+                    _user.SetC_BPartner_Location_ID(_pLocation.GetC_BPartner_Location_ID());
+                    if (_user.Save(trx))
+                    {
+                        if (fileUrl != null && fileUrl != string.Empty)
+                        {
+                            // _user.SetAD_Image_ID(SaveUserImage(ctx, fileUrl, _user.GetAD_User_ID()));
+                            int imageID = SaveUserImage(ctx, fileUrl, _user.GetAD_User_ID(),trx);
+                            _user.SetAD_Image_ID(imageID);
+                            _partner.SetPic(imageID);
+                            if (_partner.Save(trx))
+                            {
+                                log.Fine("C_BPartner_ID(AD_Image_ID)=" + _partner.GetC_BPartner_ID() + "(" + _partner.GetPic() + ")");
+                            }
+                            else
+                            {
+                                strError.Append("BPartnerNotSaved");
+                                trx.Rollback();
+                                trx.Close();
+                                return strError.ToString();
+                            }
+                        }
+                        if (_user.Save(trx))
+                        {
+                            log.Fine("AD_User_ID(AD_Image_ID)=" + _user.GetAD_User_ID() + "(" + _user.GetAD_Image_ID() + ")");
+                        }
+                        else
+                        {
+                            strError.Append("BPartnerNotSaved");
+                            trx.Rollback();
+                            trx.Close();
                             return strError.ToString();
                         }
+                        log.Fine("AD_User_ID=" + _user.GetAD_User_ID());
                     }
-                }
-                /*************************************************/
+                    else
+                    {
+                        //Classes.ShowMessage.Error("BPartnerNotSaved", null);
+                        //this.Cursor = Cursors.Arrow;
+                        strError.Append("BPartnerNotSaved");
+                        trx.Rollback();
+                        trx.Close();
+                        return strError.ToString();
+                    }
 
+                    /*************************************************/
+                    if ((bpRelation != null && bpLocation != null) && (bpRelation != string.Empty && bpLocation != string.Empty))
+                    {
+                        if (bpRelation.ToString().Trim() == "" || bpLocation.ToString().Trim() == "")
+                        {
+                            int dele = DB.ExecuteQuery("DELETE from C_BP_Relation where c_bpartner_id=" + _partner.GetC_BPartner_ID(), null, trx);
+                            if (dele == -1)
+                            {
+                                log.SaveError("C_BP_RelationNotDeleted", "c_bpartner_id=" + _partner.GetC_BPartner_ID());
+                            }
+                        }
+                        else
+                        {
+                            //Business Partner Relation 
+                            if (C_BPartner_ID > 0)
+                            {
+                                _bprelation = new X_C_BP_Relation(ctx, GetBPRelationID(_partner.Get_ID()), trx);
+                            }
+                            else
+                            {
+                                _bprelation = new X_C_BP_Relation(ctx, 0, trx);
+                            }
+                            _bprelation.SetAD_Client_ID(_partner.GetAD_Client_ID());
+                            _bprelation.SetAD_Org_ID(_partner.GetAD_Org_ID());
+                            _bprelation.SetName(_partner.GetName());
+                            _bprelation.SetDescription(_partner.GetDescription());
+                            _bprelation.SetC_BPartner_ID(_partner.GetC_BPartner_ID());
+                            _bprelation.SetC_BPartner_Location_ID(_pLocation.GetC_BPartner_Location_ID());
+                            _bprelation.SetC_BP_Relation_ID(Util.GetValueOfInt(bpRelation));
+                            _bprelation.SetC_BPartnerRelation_ID(Util.GetValueOfInt(bpRelation));
+                            _bprelation.SetC_BPartnerRelation_Location_ID(Util.GetValueOfInt(bpLocation));
+                            _bprelation.SetIsBillTo(true);
+                            if (_bprelation.Save(trx))
+                            {
+                                log.Fine("C_BP_Relation_ID=" + _bprelation.GetC_BP_Relation_ID());
+                            }
+                            else
+                            {
+                                //Classes.ShowMessage.Error("BPRelationNotSaved", null);
+
+                                //this.Cursor = Cursors.Arrow;
+                                strError.Append("BPRelationNotSaved");
+                                trx.Rollback();
+                                trx.Close();
+                                return strError.ToString();
+                            }
+                        }
+                    }
+                    /*************************************************/
+                    trx.Commit();
+                    trx.Close();
+                }
+                else
+                {
+                    trx.Rollback();
+                    trx.Close();
+                }
             }
+            catch (Exception ex)
+            {
+                strError.Append(ex.Message);
+                trx.Rollback();
+                trx.Close();
+            }
+            finally
+            {
+                trx.Close();
+            }
+            
             return strError.ToString();
 
         }
 
 
-        private int SaveUserImage(Ctx ctx, string fileUrl, int userID)
+        private int SaveUserImage(Ctx ctx, string fileUrl, int userID, Trx trx)
         {
             int imageID = 0;
             if (File.Exists(fileUrl))
@@ -725,7 +777,7 @@ namespace VIS.Models
                 byte[] byteArray = File.ReadAllBytes(fileUrl);
                 string fileName = Path.GetFileName(fileUrl);
                 File.Delete(fileUrl); //Delete Temporary file             
-                imageID = CommonFunctions.SaveUserImage(ctx, byteArray, fileName, false, userID);
+                imageID = CommonFunctions.SaveUserImage(ctx, byteArray, fileName, false, userID, trx);
             }
             return imageID;
         }
