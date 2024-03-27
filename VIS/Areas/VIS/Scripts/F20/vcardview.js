@@ -7,7 +7,7 @@
         var divbody = $('<div class=vis-cv-rd-body>');
         root.append(divTopArrow).append(divbody).append(divDownArrow);
 
-        this.addItem = function (name) {            
+        this.addItem = function (name) {
             var $spn = $('<span class="vis-cv-rd-body-item">');
             $spn.text(name);
             divbody.append($spn);
@@ -1654,7 +1654,7 @@
                     }
 
                     else if (VIS.DisplayType.IsDate(dt)) {
-                         
+
                         if (value) {
                             value = value.replace('Z', ''); //remove universal time
                             // JID_1826 Date is showing as per browser culture
@@ -1748,6 +1748,7 @@
             this.dc = null;
         };
 
+        
         var setValue = function (colValue, iControl, mField) {
             if (colValue) {
                 if (colValue.startsWith && colValue.startsWith("<") && colValue.endsWith(">")) {
@@ -1767,8 +1768,8 @@
                     colValue = iControl.format.GetFormatAmount(iControl.format.GetFormatedValue(colValue), "init", VIS.Env.isDecimalPoint());
                 }
 
-
-                iControl.setValue(w2utils.encodeTags(colValue), false);
+                // iControl.setValue(w2utils.encodeTags(colValue), false);
+                iControl.setValue(colValue, false);
 
 
             }
