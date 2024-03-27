@@ -333,7 +333,15 @@
                     }
                 },
                 error: function (error) {
-                    lblBottomMsg.text(error);
+                    setBusy(false);
+                    //html to be converted to doc
+                    var doc = (new DOMParser).parseFromString(error.responseText, "text/html");
+                    //select title element and get its text content
+                    var message = doc.querySelector("title").textContent;
+                    VIS.ADialog.error(message);
+
+                    
+                    
                 }
             });
         };

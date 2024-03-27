@@ -398,7 +398,7 @@ namespace VAdvantage.Process
                         M_Element element = M_Element.Get(ctx, columnName, Get_Trx());
                         if (element == null)
                         {
-                            
+
                             string capsColName = ColElementCaps(columnName);
                             element = new M_Element(ctx, capsColName, entityType, Get_Trx());
                             element.SetName(capsColName.Replace("_", " "));
@@ -441,7 +441,7 @@ namespace VAdvantage.Process
                             column.SetAD_Reference_ID(DisplayType.TableDir);
                         // Date
                         else if ((typeName == Types.DATE) || (typeName == Types.TIME)
-                            || (typeName == Types.TIMESTAMP)
+                            || (typeName == Types.TIMESTAMP) || typeName.StartsWith("TIMESTAMP")
                             // || columnName.toUpperCase().indexOf("DATE") != -1
                             || columnName.Equals("Created", StringComparison.OrdinalIgnoreCase)
                             || columnName.Equals("Updated", StringComparison.OrdinalIgnoreCase))
@@ -474,16 +474,16 @@ namespace VAdvantage.Process
                             column.SetReadOnlyLogic("@EntityType@=D");
                         }
                         // CLOB
-                        else if ((typeName == Types.CLOB)|| (size > 500)||typeName.StartsWith("TEXT"))
+                        else if ((typeName == Types.CLOB) || (size > 500) || typeName.StartsWith("TEXT"))
                             column.SetAD_Reference_ID(DisplayType.TextLong);
                         // BLOB----checked
                         else if ((typeName == Types.BLOB) || (typeName.StartsWith("BYTEA")))
                             column.SetAD_Reference_ID(DisplayType.Binary);
                         // Amount
-                        else if (columnName.ToUpper().IndexOf("AMT") != -1)
+                        else if ((columnName.ToUpper().IndexOf("AMT") != -1)||typeName.StartsWith("DOUBLE PRECISION"))
                             column.SetAD_Reference_ID(DisplayType.Amount);
                         // Qty
-                        else if (columnName.ToUpper().IndexOf("QTY") != -1)
+                        else if ((columnName.ToUpper().IndexOf("QTY") != -1)||columnName.StartsWith("Quantity"))
                             column.SetAD_Reference_ID(DisplayType.Quantity);
                         // Boolean-----checked
                         else if ((size == 1) || columnName.ToUpper().StartsWith("IS") || typeName == Types.CHAR)
@@ -513,10 +513,10 @@ namespace VAdvantage.Process
                         }
 
                         // Number
-                        else if ((typeName == Types.INTEGER) || (typeName == Types.SMALLINT)
-                            || (typeName == Types.DECIMAL) || (typeName == Types.NUMERIC))
+                        else if ((typeName == Types.INTEGER) || (typeName == Types.SMALLINT) || (typeName.StartsWith("BIGINT"))
+                            || (typeName == Types.DECIMAL) || (typeName == Types.NUMERIC)||(typeName.StartsWith("DOUBLE PRECISION")))
                         {
-                            if (size <= 10)
+                            if (size == 10)
                                 column.SetAD_Reference_ID(DisplayType.Integer);
                             else
                                 column.SetAD_Reference_ID(DisplayType.Number);

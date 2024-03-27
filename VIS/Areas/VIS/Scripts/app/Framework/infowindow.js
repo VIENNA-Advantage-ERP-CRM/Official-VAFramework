@@ -1256,7 +1256,7 @@
             dGrid = null;
 
         };
-
+        
         var btnOKClick = function () {
             //for (item in selectedItems) {
             //    multiValues.push(selectedItems[item]);

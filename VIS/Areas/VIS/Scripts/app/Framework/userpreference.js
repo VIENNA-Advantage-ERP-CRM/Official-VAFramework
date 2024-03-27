@@ -115,7 +115,8 @@
         var ulTheme = null;
 
         var btnTheme = null;
-
+        var themeId = null;
+        var changeThemeColor = null;
         var $root = $("<div class='vis-forms-container'>");
         var $busyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>')
         var windowNo = VIS.Env.getWindowNo();
@@ -582,15 +583,15 @@
             // drpTheme.on()
             drpTheme.on("click", "div.vis-theme-rec", function (e) {
                 var $tgt = $(e.currentTarget);
-                var clr = $tgt.data("color");
-                var id = Number($tgt.data("id"));
+                changeThemeColor = $tgt.data("color");
+                themeId = Number($tgt.data("id"));
 
                 if (VIS.themeMgr)
-                    VIS.themeMgr.applyTheme(clr);
+                    VIS.themeMgr.applyTheme(changeThemeColor);
                 //save theme 
-                VIS.dataContext.postJSONData(VIS.Application.contextUrl + 'Theme/SaveForUser', { id: id, uid: VIS.context.getAD_User_ID() }, function (e) {
+                //VIS.dataContext.postJSONData(VIS.Application.contextUrl + 'Theme/SaveForUser', { id: id, uid: VIS.context.getAD_User_ID() }, function (e) {
 
-                });
+                //});
 
             });
 
@@ -1537,6 +1538,10 @@
 
             function savePreference(data, callback) {
                 var result = null;
+                VIS.dataContext.postJSONData(VIS.Application.contextUrl + 'Theme/SaveForUser', { id: themeId, uid: VIS.context.getAD_User_ID() }, function (e) {
+
+                });
+                VIS.Application.theme = changeThemeColor;
                 $.ajax({
                     url: VIS.Application.contextUrl + "UserPreference/SavePrefrence",
                     type: "POST",
@@ -1709,6 +1714,9 @@
                 height: h,
                 position: { at: "center top", of: window },
                 close: function () {
+                    if (VIS.Application.theme && VIS.Application.theme != "") {
+                        VIS.themeMgr.applyTheme(VIS.Application.theme);
+                    }
                     $self.dispose();
 
                     $root.dialog("destroy");

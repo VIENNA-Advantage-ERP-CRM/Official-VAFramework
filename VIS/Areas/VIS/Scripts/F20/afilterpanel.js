@@ -1229,14 +1229,14 @@
     FilterPanel.prototype.createDirectSql = function (code, code_to, column, operator, convertToString) {
         var sb = "";
         var isoDateRegx = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
-        if (typeof code == "string") {
+        if (typeof code == "string" && isNaN(code) && (code.toString().toUpper() != ("NULLValue").toUpper())) {
             sb += " UPPER( ";
         }
 
         sb += this.curTab.getTableName() + '.' + column;
 
 
-        if (typeof code == "string") {
+        if (typeof code == "string" && isNaN(code) && (code.toString().toUpper() != ("NULLValue").toUpper())) {
             sb += " ) ";
         }
 
@@ -1256,7 +1256,7 @@
                 sb += VIS.DB.to_date(code, false);
             }
 
-            else if ("string" == typeof code) {
+            else if ("string" == typeof code && isNaN(code)) {
                 if (convertToString) {
                     sb += " UPPER( ";
                     sb += VIS.DB.to_string(code.toString());

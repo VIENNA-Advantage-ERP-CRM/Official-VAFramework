@@ -177,7 +177,7 @@ namespace VAdvantage.Print
                     retValue = DisplayType.GetNumberFormat(_displayType).GetFormatedValue(_value);
                 if (DisplayType.IsDate(_displayType))
                 {
-                    //  retValue = DisplayType.GetDateFormat(_displayType).Format(_value);
+                    //retValue = DisplayType.GetDateFormat(_displayType).Format(_value);
                 }
             }
             return retValue;
