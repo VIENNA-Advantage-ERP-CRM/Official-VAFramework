@@ -455,7 +455,7 @@
             }
             var controlText = getControlValue(true);
             if (getControlType() == VIS.DisplayType.Date) {
-                controlText=controlText.replace('Z',' ');
+                controlText=controlText.replace('Z','');
             }
             var htm = '<tr class="vis-advancedSearchTableRowBatch"><td data-cVal="' + cVal + '">' + colName + '</td>'
                 + '<td data-settype="' + getControlType() + '" data-setVal="' + controlText + '">' + controlText + '</td>'

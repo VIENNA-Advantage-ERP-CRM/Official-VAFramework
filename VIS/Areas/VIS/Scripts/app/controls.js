@@ -5175,11 +5175,11 @@
         var $img = $("<img >");
         var $icon = $("<i>");
         var $txt = $("<span>").text("-");
-        var $spanIcon = $('<span class="vis vis-edit vis-img-ctrl-icon">')
+        var $spanIcon = $('<a href="javascript:;" class="vis vis-edit vis-img-ctrl-icon">')
         var $ctrl = null;
         var dimension = "Thumb500x375";
 
-        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl' });
+        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl', tabindex: '-1' });
         $txt.css("color", "blue");
 
 

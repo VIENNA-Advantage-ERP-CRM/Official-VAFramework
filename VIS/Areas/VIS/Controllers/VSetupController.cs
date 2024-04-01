@@ -40,5 +40,16 @@ namespace VIS.Controllers
             currencyID, currencyName, countryID, countryName, regionID, regionName,
             cfProduct, cfBPartner, cfProject,cfMCampaign,cfSRegion, fileName,folderKey,ctx) }, JsonRequestBehavior.AllowGet);
         }
+        /// <summary>
+        /// Get Region accroding to country
+        /// </summary>
+        /// <param name="countryID"></param>
+        /// <returns>region</returns>
+        public JsonResult GetRegion(int countryID)
+        {
+            VSetupModel model = new VSetupModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(new { result = model.GetRegion(ctx, countryID) }, JsonRequestBehavior.AllowGet);
+        }
 	}
 }
