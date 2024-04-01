@@ -29,6 +29,9 @@ namespace VAdvantage.Common
 
         public static string Password_Valid_Upto_Key = "PASSWORD_VALID_UPTO";
         public static string Failed_Login_Count_Key = "FAILED_LOGIN_COUNT";
+
+        public static Dictionary<string, bool> _approvalStatusCols = new Dictionary<string, bool>();
+
         public static string transportEnvironment
         {
             get
@@ -839,8 +842,8 @@ namespace VAdvantage.Common
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
 
-            
-           
+
+
 
 
 
@@ -1601,7 +1604,7 @@ namespace VAdvantage.Common
         /// <param name="AD_SurveyAssignment_ID"></param>
         /// <param name="ShowEverytime"></param>
         /// <returns></returns>
-        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID, string ShowEverytime)
+        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID, int AD_SurveyAssignment_ID, string ShowEverytime)
         {
             bool isExist = true;
             bool isConditionGiven = true;
@@ -1626,7 +1629,7 @@ namespace VAdvantage.Common
                 DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
                 //prepare where condition for filter
                 if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
-                {                    
+                {
                     int idx = 0;
                     foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                     {
@@ -1698,8 +1701,8 @@ namespace VAdvantage.Common
                                 WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                             }
                             else if (type == "DateTime")
-                            {                               
-                                WhereCondition += columnName +" " + oprtr;
+                            {
+                                WhereCondition += columnName + " " + oprtr;
                             }
                             else
                             {
@@ -1792,9 +1795,9 @@ namespace VAdvantage.Common
                     isConditionGiven = false;
                 }
             }
-          
 
-            if (!string.IsNullOrEmpty(sqlWhere)|| !string.IsNullOrEmpty(WhereCondition))
+
+            if (!string.IsNullOrEmpty(sqlWhere) || !string.IsNullOrEmpty(WhereCondition))
             {
                 string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID=" + AD_Table_ID));
 
@@ -1824,7 +1827,7 @@ namespace VAdvantage.Common
                     isExist = false;
                 }
             }
-            
+
 
             return isExist;
 
@@ -1857,11 +1860,11 @@ namespace VAdvantage.Common
                     bool isvalidate = false;
                     //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
                     //{
-                        isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
-                        //if (isvalidate)
-                        //{
-                        //    isvalidate = true;
-                        //}
+                    isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    //if (isvalidate)
+                    //{
+                    //    isvalidate = true;
+                    //}
                     //}
 
                     if (!isvalidate)
@@ -1871,7 +1874,7 @@ namespace VAdvantage.Common
                     int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
 
                     sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    if(!autoApproval && AD_WF_Activity_ID > 0)
+                    if (!autoApproval && AD_WF_Activity_ID > 0)
                     {
                         sql += " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID;
                     }
@@ -1890,6 +1893,27 @@ namespace VAdvantage.Common
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// this function will check if the ApprovalStatus column exists in table
+        /// </summary>
+        /// <param name="TableName">Name of the table where ApprovalStatus column needs to be checked</param>
+        /// <returns></returns>
+        public static bool HasApprovalStatusColumn(string TableName)
+        {
+            if (_approvalStatusCols.ContainsKey(TableName))
+                return _approvalStatusCols[TableName];
+            string sql = "SELECT COUNT(AD_Column_ID) FROM AD_Column WHERE AD_Table_ID = (SELECT AD_Table_ID FROM AD_Table WHERE TableName = '" + TableName + "') AND ColumnName = 'ApprovalStatus'";
+            int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            if (count > 0)
+            {
+                _approvalStatusCols[TableName] = true;
+                return true;
+            }
+            else
+                _approvalStatusCols[TableName] = false;
+            return false;
         }
     }
 

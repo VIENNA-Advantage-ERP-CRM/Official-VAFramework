@@ -985,7 +985,8 @@ namespace VAdvantage.WF
                     }
 
                 }
-                else {
+                else
+                {
                     invoiceReportID = _node.GetAD_Process_ID();
                 }
                 //	Process
@@ -1030,7 +1031,7 @@ namespace VAdvantage.WF
                 {
                     pi.SetIsCrystal(false);
                 }
-                
+
                 pi.SetAD_ReportFormat_ID(process.GetAD_ReportFormat_ID());
                 pi.SetAD_ReportMaster_ID(process.GetAD_ReportMaster_ID());
                 process.ProcessIt(pi, trx);
@@ -1166,7 +1167,7 @@ namespace VAdvantage.WF
                             SetAD_User_ID(nextAD_User_ID);
                         }
 
-                        if(autoApproval && _node.IsSurveyResponseRequired())
+                        if (autoApproval && _node.IsSurveyResponseRequired())
                         {
                             if (!VAdvantage.Common.Common.CheckSurveyResponseExist(GetCtx(), GetAD_Window_ID(), _process.GetRecord_ID(), _process.GetAD_Table_ID(), GetAD_WF_Activity_ID(), autoApproval))
                             {
@@ -2188,6 +2189,27 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 dbValue = value;
             _po.Set_ValueOfColumn(GetNode().GetAD_Column_ID(), dbValue);
             _po.Save();
+
+            if (_po.GetTableName().ToLower().EndsWith("_ver") && column.GetColumnName().Equals("IsVersionApproved"))
+            {
+                try
+                {
+                    string parentTblName = Util.GetValueOfString(_po.GetTableName()).Replace("_Ver", "");
+                    StringBuilder sql = new StringBuilder("SELECT COUNT(" + _po.GetTableName() + "_ID) FROM " + _po.GetTableName() + " WHERE IsVersionApproved = 'Y' AND " + parentTblName + "_ID" + " = " + _po.Get_Value(parentTblName + "_ID"));
+                    int _count = Util.GetValueOfInt(DB.ExecuteScalar(sql.ToString()));
+
+                    if (!Util.GetValueOfBool(dbValue) && _count <= 0 && Common.Common.HasApprovalStatusColumn(parentTblName))
+                    {
+                        sql.Clear().Append("UPDATE " + parentTblName + " SET ApprovalStatus = 'R' WHERE " + parentTblName + "_ID = " + _po.Get_Value(parentTblName + "_ID"));
+                        _count = DB.ExecuteQuery(sql.ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.SaveError("Error in updating Master record for versioning of table : " + _po.GetTableName(), "");
+                }
+            }
+
             Object dbValueNew = _po.Get_ValueOfColumn(GetNode().GetAD_Column_ID());
             if (!dbValue.Equals(dbValueNew))
             {

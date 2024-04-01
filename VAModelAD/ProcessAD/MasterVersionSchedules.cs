@@ -258,6 +258,11 @@ namespace VAdvantage.Process
                         }
                     }
 
+                    if (Common.Common.HasApprovalStatusColumn(poDest.GetTableName()))
+                    {
+                        poDest.Set_Value("ApprovalStatus", "A");
+                    }
+
                     // Save Master Record
                     if (!poDest.Save())
                     {
@@ -335,6 +340,7 @@ namespace VAdvantage.Process
             defcolNames.Add("ProcessedVersion");
             defcolNames.Add("RecordVersion");
             defcolNames.Add("VersionValidFrom");
+            defcolNames.Add("ApprovalStatus");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿﻿using BaseLibrary.Engine;
+﻿using BaseLibrary.Engine;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -441,9 +441,17 @@ namespace VAModelAD.Model
                 }
             }
 
-            if (HasDocValueWF && Util.GetValueOfInt(poMaster.Get_ID()) == 0)
+            if (Util.GetValueOfInt(poMaster.Get_ID()) == 0)
             {
-                poMaster.SetIsActive(false);
+                if (HasDocValueWF)
+                    poMaster.SetIsActive(false);
+                else
+                {
+                    if (Common.HasApprovalStatusColumn(poMaster.GetTableName()))
+                    {
+                        poMaster.Set_Value("ApprovalStatus", "A");
+                    }
+                }
             }
 
             if (!poMaster.Save())
