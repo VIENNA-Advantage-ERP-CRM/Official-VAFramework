@@ -643,6 +643,25 @@ namespace VAdvantage.Model
                     SetVA037_BIPassword(password);
                 }
             }
+            string emailCount = "SELECT COUNT(*) FROM AD_User WHERE LOWER(Email) =LOWER('" + GetEMail() + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
+            if (newRecord)
+            {
+                int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
+                if (mailExist > 0)
+                {
+                    log.SaveError("", Msg.GetMsg(GetCtx(), "EmailShouldBeUnique", true));
+                    return false;
+                }
+            }
+            else {
+                emailCount +=" AND AD_User_ID != " + GetAD_User_ID();
+                int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
+                if (mailExist > 0)
+                {
+                    log.SaveError("", Msg.GetMsg(GetCtx(), "EmailShouldBeUnique", true));
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -682,7 +701,7 @@ namespace VAdvantage.Model
             return password;
         }
 
-        string sql = "SELECT count(AD_User_ID) FROM AD_USER WHERE IsLoginUser='Y' AND IsActive = 'Y' AND AD_Client_ID=";
+        string sql = "SELECT COUNT(AD_User_ID) FROM AD_USER WHERE IsLoginUser='Y' AND IsActive = 'Y' AND AD_Client_ID=";
 
         protected override bool AfterSave(bool newRecord, bool success)
         {

@@ -56,7 +56,7 @@ namespace VIS.Controllers
                 LocationModel obj = new LocationModel();
 
                 var _location = obj.LocationSave(ctx, pref);
-                return Json(new { locationid = _location.Get_ID(), locaddress = _location.ToString()+ ", "+Util.GetValueOfString(pref["countryName"])});
+                return Json(new { locationid = _location.Get_ID(), locaddress = _location.ToString()});
             }
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
@@ -149,7 +149,19 @@ namespace VIS.Controllers
                     return Json(lr, JsonRequestBehavior.AllowGet);
                 }
 
-                name = loc.ToString();
+                name = loc.ToString().Trim();
+                if (name.Length <= 0)
+                {
+                    name = loc.GetCountryName();
+                }
+                else {
+                    name += ", "+ loc.GetCountryName().Trim();
+                }
+
+                if (name.Length > 0 && name.StartsWith(", "))
+                {
+                    name = name.Substring(1).Trim();
+                }
 
                 ll.Longitude = loc.GetLongitude();
                 ll.Latitude = loc.GetLatitude();
