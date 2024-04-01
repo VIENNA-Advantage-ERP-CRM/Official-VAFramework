@@ -29,6 +29,9 @@ namespace VAdvantage.Common
 
         public static string Password_Valid_Upto_Key = "PASSWORD_VALID_UPTO";
         public static string Failed_Login_Count_Key = "FAILED_LOGIN_COUNT";
+
+        // approvalstatus columns table wise
+        public static Dictionary<string, bool> _approvalStatusCols = new Dictionary<string, bool>();
         public static string transportEnvironment
         {
             get
@@ -1890,6 +1893,27 @@ namespace VAdvantage.Common
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// this function will check if the ApprovalStatus column exists in table
+        /// </summary>
+        /// <param name="TableName">Name of the table where ApprovalStatus column needs to be checked</param>
+        /// <returns></returns>
+        public static bool HasApprovalStatusColumn(string TableName)
+        {
+            if (_approvalStatusCols.ContainsKey(TableName))
+                return _approvalStatusCols[TableName];
+            string sql = "SELECT COUNT(AD_Column_ID) FROM AD_Column WHERE AD_Table_ID = (SELECT AD_Table_ID FROM AD_Table WHERE TableName = '" + TableName + "') AND ColumnName = 'ApprovalStatus'";
+            int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            if (count > 0)
+            {
+                _approvalStatusCols[TableName] = true;
+                return true;
+            }
+            else
+                _approvalStatusCols[TableName] = false;
+            return false;
         }
     }
 
