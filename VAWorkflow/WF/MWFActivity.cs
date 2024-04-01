@@ -2190,6 +2190,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             _po.Set_ValueOfColumn(GetNode().GetAD_Column_ID(), dbValue);
             _po.Save();
 
+            /// VIS0008 Rejection Case handled for versioning
             if (_po.GetTableName().ToLower().EndsWith("_ver") && column.GetColumnName().Equals("IsVersionApproved"))
             {
                 try
