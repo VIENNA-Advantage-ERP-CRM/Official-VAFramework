@@ -6305,6 +6305,20 @@
 
     };
 
+    /**
+     * Evaluate Readonly and Display logic
+     *@return true if readonly 
+     * */
+    GridField.prototype.evaluateLogicsOnly = function () {
+        var _vo = this.vo;
+        var retReadOnly = false;
+        if (_vo.ReadOnlyLogic.length > 0)
+            retReadOnly = VIS.Evaluator.evaluateLogic(this, _vo.ReadOnlyLogic);//true
+        if (!retReadOnly && _vo.DisplayLogic.length > 0)
+            retReadOnly = VIS.Evaluator.evaluateLogic(this, _vo.DisplayLogic);//true
+        return retReadOnly;
+    };
+
     GridField.prototype.getWindowNo = function () {
         return this.vo.windowNo;
     };

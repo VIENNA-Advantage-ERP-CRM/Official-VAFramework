@@ -51,8 +51,11 @@ namespace ModelLibrary.Utility
             {
                 while (true)
                 {
-                    // Get records from mail queue table to send them one by one as email
-                    DataSet mailds = DB.ExecuteDataset("SELECT AD_Org_ID, AD_Client_ID, CreatedBy, AD_Role_ID, ToEMail, ToName, MailSubject, MailMessage, IsHtmlEmail, AD_Table_ID, Record_ID, AD_WF_Activity_ID, AD_WF_EventAudit_ID, AD_MailQueue_ID, AD_WF_Process_ID FROM AD_MailQueue WHERE MailStatus = 'Q' AND ROWNUM <= 5 ORDER BY AD_MailQueue_ID");
+                   
+                    DataSet mailds = DB.ExecuteDataset("SELECT AD_Org_ID, AD_Client_ID, CreatedBy, AD_Role_ID, ToEMail," +
+                        " ToName, MailSubject, MailMessage, IsHtmlEmail, AD_Table_ID, Record_ID, AD_WF_Activity_ID, " +
+                        "AD_WF_EventAudit_ID, AD_MailQueue_ID, AD_WF_Process_ID FROM AD_MailQueue" +
+                        " WHERE MailStatus = 'Q' ORDER BY AD_MailQueue_ID FETCH FIRST 5 ROWS ONLY");
 
                     if (mailds != null && mailds.Tables.Count > 0 && mailds.Tables[0].Rows.Count > 0)
                     {
