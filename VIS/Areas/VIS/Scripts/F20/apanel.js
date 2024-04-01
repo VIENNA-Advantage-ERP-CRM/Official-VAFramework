@@ -146,7 +146,7 @@
 
         this.tabStack = []; // Maintain tab and view change history;
 
-        this.isToolbarAction = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT','BVW']; // ToolBar Action
+        this.toolbarActionList = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT','BVW']; // ToolBar Action
 
         function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
@@ -2142,7 +2142,7 @@
 
             if (action.source instanceof VIS.Controls.VButton) {
                 var btnactionName = action.source.getField().vo.DefaultValue;
-                if (selfPan.getIsWindowAction(action.source.mField.getAD_Reference_Value_ID()) && selfPan.isToolbarAction.indexOf(btnactionName)>-1) {
+                if (selfPan.getIsWindowAction(action.source.mField.getAD_Reference_Value_ID()) && selfPan.toolbarActionList.indexOf(btnactionName)>-1) {
                     // handle Toolbar action by Button
                     selfPan.actionPerformedCallback(selfPan, btnactionName);
                     return;
@@ -3264,19 +3264,19 @@
 
             //Remove tab which sequence ias higher then ccurrent selected tab
             this.tabStack = this.tabStack.filter(function (tab) {
-                return tab.tabSeq <= clickedTabSeq && tab.windowNo == winNo;
+                return tab.tabSeq <= clickedTabSeq;
             });
 
             //Check Selected tab is exist or not
             var clickedTab = undefined;
             if (this.tabStack.length > 0) {
                 clickedTab = this.tabStack.find(function (tab) {
-                    return tab.tabSeq === clickedTabSeq && tab.windowNo == winNo;
+                    return tab.tabSeq === clickedTabSeq ;
                 });
             }
 
             if (!clickedTab) { // if selected tab not exist then add.
-                this.tabStack.push({ windowNo: winNo, tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [gc.getMTab().getTabLayout()] });
+                this.tabStack.push({tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [gc.getMTab().getTabLayout()] });
             }
            
 
