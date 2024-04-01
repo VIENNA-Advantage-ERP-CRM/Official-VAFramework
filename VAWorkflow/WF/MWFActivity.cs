@@ -2205,7 +2205,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 }
                 catch (Exception ex)
                 {
-                    log.SaveError("Error in updating Master record for versioning of table : " + _po.GetTableName(), "");
+                    log.SaveError("Error in updating Master record for versioning of table : " + _po.GetTableName()+"->"+ex.Message, "");
                 }
             }
             
