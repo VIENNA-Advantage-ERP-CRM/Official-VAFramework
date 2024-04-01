@@ -433,14 +433,7 @@ street
                         if (count > MAX_ROWS)
                             break;
                         MLocation loc = MLocation.Get(ctx, ds.Tables[0].Rows[i], null);
-                        if (loc.GetCountryName() != null && loc.GetCountryName().Length > 0)
-                        {
-                            locs[loc.Get_ID()] = new KeyNamePair(loc.Get_ID(), loc.ToString() +", "+ Util.GetValueOfString(loc.GetCountryName()));
-                        }
-                        else
-                        {
-                            locs[loc.Get_ID()] = new KeyNamePair(loc.Get_ID(), loc.ToString());
-                        }
+                        locs[loc.Get_ID()] = new KeyNamePair(loc.Get_ID(), loc.ToString());
                         lstLatLng[loc.Get_ID()] = new LatLng() { Latitude = loc.GetLatitude(), Longitude = loc.GetLongitude() };
                         count++;
                     }
