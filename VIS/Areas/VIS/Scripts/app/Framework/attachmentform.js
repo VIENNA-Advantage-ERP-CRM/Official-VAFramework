@@ -1,5 +1,6 @@
 ﻿(function (VIS, $) {
-    function attachmentForm(windowNo, AD_Attachment_ID, AD_Table_ID, Record_ID, trxName, newRecord_ID, restrictUpload, isDMSAttachment) {
+    function attachmentForm(windowNo, AD_Attachment_ID, AD_Table_ID, Record_ID, trxName, newRecord_ID,
+        restrictUpload, isDMSAttachment,isViewOnly) {
         var tableName = "";
         var isFALoaded = false;
         var isIMALoaded = false;
@@ -468,6 +469,7 @@
 
 
                     var dlatestAtt = $("<div class='vis-latest-attachments'>");
+                    if(!isViewOnly)
                     divFA.append(dlatestAtt);
 
                     var dlaHeader = $("<div class='vis-attach-top'>");
@@ -676,6 +678,7 @@
                     //dfLeft.append(btnInsert);
 
                     var btnDeleteAll = $('<a  title="' + VIS.Msg.getMsg('DeleteAll') + '" class="vis-btn">').append(VIS.Msg.getMsg('DeleteAll'));
+                    if(!isViewOnly)
                     dfLeft.append(btnDeleteAll);
                     btnDeleteAll.on('click', function () {
                         if (tableName.endsWith('_ver')) {
@@ -1009,7 +1012,9 @@
             });
 
             var btnDelete = $("<a class='vis-attach-ico' data-id='" + index + "'><i class='vis vis-delete' aria-hidden='true'></i></a>");
-            dbtns.append(btnDelete);
+            if (!isViewOnly) { //if view only do-not add delete file
+                dbtns.append(btnDelete);
+            }
             btnDelete.on('click', function () {
 
                 if (tableName.endsWith('_ver')) {

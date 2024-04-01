@@ -95,6 +95,7 @@
                         VIS.ADialog.info("ComModuleNotInstalled");
                 }
                 else if (self.grid.columns[evt.column].gridField.getDisplayType() == VIS.DisplayType.Button) {
+                    self.grid.select(Number(evt.recid));
                     self.grid.columns[evt.column].editable.ctrl.getControl().click();
                 }
             } catch (err) {

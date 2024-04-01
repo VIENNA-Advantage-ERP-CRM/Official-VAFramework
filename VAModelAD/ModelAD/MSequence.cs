@@ -1702,11 +1702,16 @@ namespace VAdvantage.Model
             if (MSysConfig.IsNativeSequence(false))
             {
                 int nextid = DB.GetSQLValue(trxName, "SELECT CurrentNext FROM AD_Sequence WHERE Name='" + TableName + "' AND IsActive='Y' AND IsTableID='Y' AND IsAutoSequence='Y'");
+                int nextidTbl = DB.GetSQLValue(trxName, "SELECT MAX( " + TableName + "_ID) FROM " + TableName);
 
                 if (nextid == -1)
                 {
                     CreateSequence(ctx, TableName, trxName);
                     nextid = INIT_NO;
+                }
+                if (nextid < nextidTbl)
+                {
+                    nextid = nextidTbl; //Set max table id 
                 }
 
                 // Creeate sequence in respective DB.

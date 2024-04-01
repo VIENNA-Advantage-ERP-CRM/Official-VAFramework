@@ -2739,7 +2739,7 @@
                     aPanel.cmd_chat();
                     break;
                 case 'ATT':
-                    aPanel.cmd_attachment();
+                    aPanel.cmd_attachment(vButton.getField().evaluateLogicsOnly());
                     break;
                 case 'HIY':
                     aPanel.cmd_history();
@@ -4626,7 +4626,7 @@
         }
     };
 
-    APanel.prototype.cmd_attachment = function () {
+    APanel.prototype.cmd_attachment = function (isViewOnly) {
         //alert("attachment");
         if (this.curTab.getRecord_ID() < 1) {
             this.aAttachment.setEnabled(false);
@@ -4636,8 +4636,10 @@
             return;
         }
         var self = this;
-        var att = new VIS.attachmentForm(this.curTab.getWindowNo(), 0, this.curTab.getAD_Table_ID(), this.curTab.getRecord_ID(), '');
+        var att = new VIS.attachmentForm(this.curTab.getWindowNo(), 0, this.curTab.getAD_Table_ID(),
+            this.curTab.getRecord_ID(), '', null, null, null,isViewOnly);
         att.setIsWindowAction(true);
+        
         att.show();
         att.onClose = function () {
             self.curTab.loadAttachments();
