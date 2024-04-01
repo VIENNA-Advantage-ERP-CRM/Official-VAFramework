@@ -144,6 +144,10 @@
         this.instructionPop = {};
         this.instructionPop[this.ACTION_NAME_NEW] = false;
 
+        this.tabStack = []; // Maintain tab and view change history;
+
+        this.isToolbarAction = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT','BVW']; // ToolBar Action
+
         function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
             $root = $(clone.querySelector(".vis-ad-w-p"));
@@ -349,6 +353,18 @@
         this.setSize = function (height, width) {
             return;
         };
+
+        /**
+         * Check given refrence is window action.
+         * @param {any} refrenceValue
+         */
+        this.getIsWindowAction = function (refrenceValue) {
+            if (refrenceValue == 435) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         //Action Perormed
         var onAction = function (action) {
@@ -2113,7 +2129,7 @@
 
         if (action.source instanceof VIS.Controls.VButton) {
             var btnField = action.source.getField();
-            if (btnField.getAD_Reference_Value_ID() != 435 && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
+            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
                 return;
             }
         }
@@ -2126,8 +2142,7 @@
 
             if (action.source instanceof VIS.Controls.VButton) {
                 var btnactionName = action.source.getField().vo.DefaultValue;
-                if (action.source.mField.getAD_Reference_Value_ID() == 435 && (btnactionName === "UNO" || btnactionName === "NRD" || btnactionName === "SAR"
-                    || btnactionName === "DRD" || btnactionName === "RQY" || btnactionName === "RET" || btnactionName === "PRT" || btnactionName === "BVW")) {
+                if (selfPan.getIsWindowAction(action.source.mField.getAD_Reference_Value_ID()) && selfPan.isToolbarAction.indexOf(btnactionName)>-1) {
                     // handle Toolbar action by Button
                     selfPan.actionPerformedCallback(selfPan, btnactionName);
                     return;
@@ -2145,6 +2160,39 @@
     };
 
     APanel.prototype.actionPerformedCallback = function (tis, action) {
+        /*Handle view change for back button */
+        if (action === "Multi" || action === "Card") {
+            var view = "Y";
+            if (action === "Multi") {
+                if (tis.curGC.getIsSingleRow()) {
+                    view = "N";
+                } else {
+                    view = "Y";
+                }
+            } else if (action === "Card") {
+                if (tis.curGC.getIsCardRow()) {
+                    view = "N";
+                }
+                else {
+                    view = "C";
+                }
+            }
+
+
+            //Maintain stack for view change
+            if (this.tabStack.length > 0) {
+                var currentTabSeq = this.curWinTab.getSelectedIndex();
+                var currentTab = this.tabStack.find(function (tab) {
+                    return tab.tabSeq === currentTabSeq;
+                });
+
+                if (currentTab.tabView.includes(view)) {
+                    currentTab.tabView = [];
+                }
+                currentTab.tabView.push(view);
+            }
+            this.setBackEnable();
+        }
 
         /*Naviagtion */
         if (tis.aFirst.getAction() === action) {
@@ -2160,21 +2208,21 @@
             tis.isDefaultFocusSet = false;
             tis.curGC.navigateRelative(+1);
         } else if (tis.aMulti.getAction() === action) {
-            tis.setLastView("");
-            if (!tis.curGC.getIsSingleRow() && tis.curGC.getIsCardRow()) {
-                tis.setLastView("Card");
-            }
-            else if (!tis.curGC.getIsSingleRow()) {
-                tis.setLastView("Multi");
-            }
+            //tis.setLastView("");
+            //if (!tis.curGC.getIsSingleRow() && tis.curGC.getIsCardRow()) {
+            //    tis.setLastView("Card");
+            //}
+            //else if (!tis.curGC.getIsSingleRow()) {
             //    tis.setLastView("Multi");
-            //else 
+            //}
+            ////    tis.setLastView("Multi");
+            ////else 
 
             tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
             tis.aCard.setPressed(false);
             tis.curGC.switchRowPresentation();
         } else if (tis.aCard.getAction() === action) {
-            tis.setLastView("");
+           // tis.setLastView("");
             if (tis.curGC.getIsCardRow()) {
                 //tis.setLastView("Multi");
                 tis.curGC.switchMultiRow();
@@ -2714,7 +2762,7 @@
             }
         }
 
-        if (vButton.mField.getAD_Reference_Value_ID() == 435) {
+        if (aPanel.getIsWindowAction(vButton.mField.getAD_Reference_Value_ID())) {
 
             switch (vButton.mField.vo.DefaultValue) {
                 case 'APT':
@@ -2765,7 +2813,6 @@
                 case 'RSD':
                     aPanel.cmd_RecordShared();
                     break;
-
                 case 'NRD':
                     aPanel.cmd_new()
                     break;
@@ -3211,6 +3258,28 @@
 
             }
 
+            var clickedTabSeq = tpIndex; //Get Tab index
+            var clickedTabID = action; // Get the tab ID
+            var winNo = this.curWindowNo;
+
+            //Remove tab which sequence ias higher then ccurrent selected tab
+            this.tabStack = this.tabStack.filter(function (tab) {
+                return tab.tabSeq <= clickedTabSeq && tab.windowNo == winNo;
+            });
+
+            //Check Selected tab is exist or not
+            var clickedTab = undefined;
+            if (this.tabStack.length > 0) {
+                clickedTab = this.tabStack.find(function (tab) {
+                    return tab.tabSeq === clickedTabSeq && tab.windowNo == winNo;
+                });
+            }
+
+            if (!clickedTab) { // if selected tab not exist then add.
+                this.tabStack.push({ windowNo: winNo, tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [gc.getMTab().getTabLayout()] });
+            }
+           
+
         }
         if (canExecute) {
             selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st);
@@ -3450,7 +3519,7 @@
         }
 
 
-        this.setLastView(""); //clear view history
+        //this.setLastView(""); //clear view history
 
         var selff = this;
         //if (this.isShowSharedRecord && this.aSharedRecord) {
@@ -3657,8 +3726,7 @@
         //	Single-Multi
         this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
         this.aCard.setPressed(this.curGC.getIsCardRow());
-        this.aBack.setEnabled(this.getLastView().length > 0);
-        gPanel.setEnabled("BVW", this.getLastView().length > 0);
+        this.setBackEnable();
 
         if (this.aChat) {
             this.aChat.setPressed(this.curTab.hasChat());
@@ -4172,18 +4240,45 @@
     };
 
     APanel.prototype.cmd_back = function () {
-        var tis = this;
-        if (tis.getLastView() == "Multi") {
-            tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
-            tis.aCard.setPressed(false);
-            tis.curGC.switchMultiRow(true);
+        var tis = this;     
+        
+        if (this.tabStack.length > 0) {
+            var currentTab = this.tabStack[this.tabStack.length - 1];
+            if (currentTab.tabView.length > 0) {
+                this.tabStack[this.tabStack.length - 1].tabView.pop();
+                var defaultTabLayout = currentTab.tabView[(currentTab.tabView.length - 1)];
+                if (defaultTabLayout == 'N')
+                    tis.curGC.switchMultiRow();
+                else if (defaultTabLayout == 'Y')
+                    tis.curGC.switchSingleRow(true);
+                else if (defaultTabLayout == 'C') {
+                    tis.curGC.switchCardRow(true);
+                }
+            }
         }
-        else if (tis.getLastView() == "Card") {
-            tis.curGC.switchCardRow(true);
-            tis.aMulti.setPressed(false);
-            tis.aCard.setPressed(true);
+
+        this.setBackEnable();
+
+        if (this.tabStack.length > 0 && this.tabStack[this.tabStack.length - 1].tabView.length === 0) {
+            this.tabStack.pop();
+            currentTab = this.tabStack[this.tabStack.length - 1];            
+            this.onTabChange(currentTab.tabID);
         }
-        tis.setLastView("");
+
+     
+
+
+        //if (tis.getLastView() == "Multi") {
+        //    tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
+        //    tis.aCard.setPressed(false);
+        //    tis.curGC.switchMultiRow(true);
+        //}
+        //else if (tis.getLastView() == "Card") {
+        //    tis.curGC.switchCardRow(true);
+        //    tis.aMulti.setPressed(false);
+        //    tis.aCard.setPressed(true);
+        //}
+        //tis.setLastView("");
     }
     /* 
      -Quick Search 
@@ -5083,24 +5178,20 @@
     };
 
     /**
-     * Set Last selected view (Card Or Multi)
-     * @param {string} strView
+     * Set Enable disable Back button   
      */
-    APanel.prototype.setLastView = function (strView) {
-        if (strView == "Card" || strView == "Multi") {
+    APanel.prototype.setBackEnable = function () {
+        if (this.tabStack.length == 1 && this.tabStack[0].tabView.length === 1) {
+            this.aBack.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled("BVW", false);
+            }
+        } else {
             this.aBack.setEnabled(true);
             if (this.curGC) {
                 this.curGC.vGridPanel.setEnabled("BVW", true);
             }
         }
-        else {
-            this.aBack.setEnabled(false);
-            if (this.curGC) {
-                this.curGC.vGridPanel.setEnabled("BVW", false);
-            }
-            strview = "";
-        }
-        this.lastView = strView;
     };
 
 
