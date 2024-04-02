@@ -1024,7 +1024,7 @@
         //selfPan.actionButton(action.source);
 
         //skip save for undo action
-        if (this.aPanel.getIsWindowAction(action.source.getField().getAD_Reference_Value_ID()) && this.aPanel.toolbarActionList.indexOf(action.source.getField().vo.DefaultValue)) {
+        if (this.aPanel.getIsWindowAction(action.source.getField().getAD_Reference_Value_ID()) && this.aPanel.toolbarActionList.indexOf(action.source.getField().vo.DefaultValue)>-1) {
             this.aPanel.actionPerformed(action, this);
             return;
         }
