@@ -289,7 +289,7 @@ namespace VIS.Models
                             upcSearch = true;
                             //s_productFrom += " LEFT OUTER JOIN M_manufacturer mr ON (p.M_Product_ID=mr.M_Product_ID) LEFT OUTER JOIN M_ProductAttributes patr ON (p.M_Product_ID=patr.M_Product_ID)"
                             whereClause += " AND (UPPER(patr.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%') OR UPPER(p.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%')"
-                                + " OR UPPER(mr.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%') OR UPPER(uc.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%')";
+                                + " OR UPPER(mr.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%') OR UPPER(uc.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%'))";
                         }
 
                         else if (srchCtrls[i].CtrlColumnName == "SKU")
