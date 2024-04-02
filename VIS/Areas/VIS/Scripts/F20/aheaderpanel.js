@@ -1024,6 +1024,12 @@
         //selfPan.actionButton(action.source);
 
         //skip save for undo action
+        if (this.aPanel.getIsWindowAction(action.source.getField().getAD_Reference_Value_ID()) && this.aPanel.toolbarActionList.indexOf(action.source.getField().vo.DefaultValue)) {
+            this.aPanel.actionPerformed(action, this);
+            return;
+        }
+
+        //skip save for undo action
         if (!(action.source.getField().getIsAction() && action.source.getField().getAction() === "MTU")) {
             if (this.aPanel.curTab.needSave(true, false)) {
                 this.aPanel.cmd_save(true);
