@@ -1007,7 +1007,7 @@ namespace VAdvantage.WF
 
                 }
                 //
-                ProcessInfo pi = new ProcessInfo(_node.GetName(true), invoiceReportID,
+                ProcessInfo pi = new ProcessInfo(process.GetValue(), invoiceReportID,
                     GetAD_Table_ID(), GetRecord_ID());
                 pi.SetAD_User_ID(GetAD_User_ID());
                 pi.SetAD_Client_ID(GetAD_Client_ID());
@@ -1048,7 +1048,7 @@ namespace VAdvantage.WF
                 MPInstance pInstance = new MPInstance(process, GetRecord_ID());
                 FillParameter(pInstance, trx);
                 //
-                ProcessInfo pi = new ProcessInfo(_node.GetName(true), _node.GetAD_Process_ID(),
+                ProcessInfo pi = new ProcessInfo(process.GetValue(), _node.GetAD_Process_ID(),
                     GetAD_Table_ID(), GetRecord_ID());
                 pi.SetAD_User_ID(GetAD_User_ID());
                 pi.SetAD_Client_ID(GetAD_Client_ID());
