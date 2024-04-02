@@ -4262,7 +4262,9 @@
         this.setBackEnable();
 
 
-        if (this.tabStack.length > 0 && this.tabStack[this.tabStack.length - 1].tabView.length === 0) {
+
+        if (this.tabStack.length > 1 && this.tabStack[this.tabStack.length - 1].tabView.length === 0) {
+
             this.tabStack.pop();
             currentTab = this.tabStack[this.tabStack.length - 1];
             if (currentTab && Object.keys(currentTab).length > 0) {
@@ -5189,8 +5191,8 @@
     /**
      * Set Enable disable Back button   
      */
-    APanel.prototype.setBackEnable = function () {
-        if (this.tabStack.length == 1 && this.tabStack[0].tabView.length === 1) {
+    APanel.prototype.setBackEnable = function () {       
+        if (this.tabStack.length == 1 && this.tabStack[0].tabView.length <= 1) {
             this.aBack.setEnabled(false);
             if (this.curGC) {
                 this.curGC.vGridPanel.setEnabled("BVW", false);
