@@ -22,13 +22,13 @@ namespace VIS.Models
             string sqlRe = null;
             if (isBaseLanguage)
             {
-                sqlCu = "SELECT C_Currency_ID, Description FROM C_Currency ORDER BY 1";
+                sqlCu = "SELECT C_Currency_ID, Description, ISO_Code FROM C_Currency ORDER BY 1";
                 sqlCo = "SELECT C_Country_ID, Name FROM C_Country WHERE IsSummary='N' ORDER BY 1";
                 sqlRe = "SELECT C_Region_ID, Name FROM C_Region ORDER BY C_Country_ID, Name";
             }
             else
             {
-                sqlCu = @"SELECT C.C_Currency_ID, CL.Description
+                sqlCu = @"SELECT C.C_Currency_ID, CL.Description, C.ISO_Code
                             FROM C_Currency C
                             INNER JOIN C_Currency_Trl CL
                             ON (C.C_Currency_ID=CL.C_Currency_ID
@@ -50,7 +50,8 @@ namespace VIS.Models
                 curr.Add(new Currency()
                 {
                     ID = Util.GetValueOfInt(ds.Tables[0].Rows[i][0]),
-                    Name = Util.GetValueOfString(ds.Tables[0].Rows[i][1])
+                    Name = Util.GetValueOfString(ds.Tables[0].Rows[i][1]),
+                    ISO_Code = Util.GetValueOfString(ds.Tables[0].Rows[i][2])
                 });
             }
             ini.currency = curr;
@@ -204,6 +205,22 @@ namespace VIS.Models
 
 
         }
+
+        public List<Region> GetRegion(Ctx ctx,int countryID) {
+            string sqlRe = "SELECT C_Region_ID, Name FROM C_Region WHERE C_Country_ID="+countryID+" AND IsActive='Y' ORDER BY C_Country_ID, Name";
+            DataSet ds = DBase.DB.ExecuteDataset(sqlRe);
+            List<Region> region = new List<Region>();
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                region.Add(new Region()
+                {
+                    ID = Util.GetValueOfInt(ds.Tables[0].Rows[i][0]),
+                    Name = Util.GetValueOfString(ds.Tables[0].Rows[i][1])
+                });
+            }
+            return region;
+
+        }
     }
     public class InitialData
     {
@@ -232,6 +249,11 @@ namespace VIS.Models
 
         }
         public String Name
+        {
+            get;
+            set;
+        }
+        public String ISO_Code
         {
             get;
             set;

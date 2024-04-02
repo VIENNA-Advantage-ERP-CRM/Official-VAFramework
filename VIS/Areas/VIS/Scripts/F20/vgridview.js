@@ -95,6 +95,7 @@
                         VIS.ADialog.info("ComModuleNotInstalled");
                 }
                 else if (self.grid.columns[evt.column].gridField.getDisplayType() == VIS.DisplayType.Button) {
+                    self.grid.select(Number(evt.recid));
                     self.grid.columns[evt.column].editable.ctrl.getControl().click();
                 }
             } catch (err) {
@@ -1247,6 +1248,9 @@
     VTable.prototype.getValueAsString = function (field) {
         var record = this.grid.records[this.cellRowIndex];
         var data = this.grid.parseField(record, field.toLowerCase());
+        if (this.mTab && VIS.DisplayType.YesNo == this.mTab.getField(field).getDisplayType()) {
+            data = data ? "Y" : "N";
+        }
         if (!data)
             return '';
         return data.toString();

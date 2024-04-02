@@ -1358,8 +1358,12 @@
                         $menu.append(li);
                         li = null;
                     }
-
-                    $btnInfo.w2overlay($root.clone(true), { css: { height: '300px' } });
+                    if (document.activeElement === document.body) {
+                        $btnInfo.w2overlay($root.clone(true), { css: { height: '300px' } });
+                    } else {
+                        $(document.activeElement).w2overlay($root.clone(true), { align: "right", css: { height: '300px' } });
+                    }
+                   
                 }
             });
         };
@@ -1398,7 +1402,12 @@
             }
 
             if ($menu.find("LI").length > 0) {
-                $btnInfo.w2overlay($root.clone(true), { css: { height: '300px' } });
+                if (document.activeElement === document.body) {
+                    $btnInfo.w2overlay($root.clone(true), { css: { height: '300px' } });
+                } else {
+                    $(document.activeElement).w2overlay($root.clone(true), { css: { height: '300px' }, align: "right" });
+                }
+
                 window.setTimeout(function () {
                     scrollList();
                 }, 100);
