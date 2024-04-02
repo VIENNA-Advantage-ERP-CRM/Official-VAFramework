@@ -4262,7 +4262,9 @@
         this.setBackEnable();
 
 
+
         if (this.tabStack.length > 1 && this.tabStack[this.tabStack.length - 1].tabView.length === 0) {
+
             this.tabStack.pop();
             currentTab = this.tabStack[this.tabStack.length - 1];
             if (currentTab && Object.keys(currentTab).length > 0) {
