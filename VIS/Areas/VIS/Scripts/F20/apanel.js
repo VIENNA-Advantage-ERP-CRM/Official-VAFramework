@@ -4244,8 +4244,7 @@
     };
 
     APanel.prototype.cmd_back = function () {
-        var tis = this;     
-        
+        var tis = this;
         if (this.tabStack.length > 0) {
             var currentTab = this.tabStack[this.tabStack.length - 1];
             if (currentTab.tabView.length > 0) {
@@ -4263,14 +4262,19 @@
 
         this.setBackEnable();
 
+
         if (this.tabStack.length > 0 && this.tabStack[this.tabStack.length - 1].tabView.length === 0) {
             this.tabStack.pop();
-            currentTab = this.tabStack[this.tabStack.length - 1];            
-            this.onTabChange(currentTab.tabID);
+            currentTab = this.tabStack[this.tabStack.length - 1];
+            if (currentTab && Object.keys(currentTab).length > 0) {
+                if (this.curTab.needSave(true, false) && this.curTab.needSave(true, true)) {
+                    this.cmd_ignore();
+                }
+                this.onTabChange(currentTab.tabID);
+            } else {
+                this.setBackEnable();
+            }
         }
-
-     
-
 
         //if (tis.getLastView() == "Multi") {
         //    tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
