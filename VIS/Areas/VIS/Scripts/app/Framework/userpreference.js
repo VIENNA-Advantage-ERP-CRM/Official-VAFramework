@@ -1538,10 +1538,13 @@
 
             function savePreference(data, callback) {
                 var result = null;
-                VIS.dataContext.postJSONData(VIS.Application.contextUrl + 'Theme/SaveForUser', { id: themeId, uid: VIS.context.getAD_User_ID() }, function (e) {
+                if (themeId != null) {
+                    VIS.dataContext.postJSONData(VIS.Application.contextUrl + 'Theme/SaveForUser', { id: themeId, uid: VIS.context.getAD_User_ID() }, function (e) {
 
-                });
-                VIS.Application.theme = changeThemeColor;
+                    });
+                    VIS.Application.theme = changeThemeColor;
+                }
+                
                 $.ajax({
                     url: VIS.Application.contextUrl + "UserPreference/SavePrefrence",
                     type: "POST",
