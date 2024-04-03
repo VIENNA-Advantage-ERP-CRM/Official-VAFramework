@@ -127,17 +127,10 @@ namespace VIS.Classes
             {
                 VLookUpInfo lInfo = null;
                 //In case of Created by and updatedby column, field id is zero
-                if (AD_Field_ID > 0)
-                {
-                    lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
-                    lookupQuery = lInfo.queryDirect;
-                }
-                else
-                {
-                    lookupQuery = "SELECT AD_User.AD_User_ID,NULL,NVL(AD_User.Name,'-1'),AD_User.IsActive FROM AD_User WHERE AD_User.Name IS NOT NULL  AND AD_User.AD_User_ID=@key";
-                }
 
-
+                lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
+                lookupQuery = lInfo.queryDirect;
+               
                 List<SqlParams> listParam = new List<SqlParams>();
                 if (Key != null)
                     key = ((string[])Key)[0];
@@ -179,8 +172,19 @@ namespace VIS.Classes
             {
                 if (AD_Window_ID > 0)
                 {
-                    GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
-                    lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+                    if (AD_Field_ID > 0)
+                    {
+                        GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+                        lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+                    }
+                    else
+                    {
+                        //case handling for updated and created by 
+                        lInfo = new VLookUpInfo
+                        {
+                            queryDirect = "SELECT AD_User.AD_User_ID,NULL,NVL(AD_User.Name,'-1'),AD_User.IsActive FROM AD_User WHERE AD_User.Name IS NOT NULL  AND AD_User.AD_User_ID=@key"
+                        };
+                    }
                 }
                 else
                 {
