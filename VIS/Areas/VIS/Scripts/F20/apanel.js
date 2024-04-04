@@ -3276,7 +3276,7 @@
             }
 
             if (!clickedTab) { // if selected tab not exist then add.
-                this.tabStack.push({tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [gc.getMTab().getTabLayout()] });
+                this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
             }
            
 
