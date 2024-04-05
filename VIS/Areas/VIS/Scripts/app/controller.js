@@ -392,7 +392,7 @@
     }
 
     GridWindow.prototype.getIsHideActionbar = function () {
-        return this.vo.IsHideTabLinks;
+        return this.vo.IsHideActionbar;
     }
 
     GridWindow.prototype.dispose = function () {
