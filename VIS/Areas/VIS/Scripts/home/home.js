@@ -1839,9 +1839,8 @@
         $('#vis_appInfoWindow').click(function () {
             VIS.InfoMenu.show($(this));
         });
-        //hadle event
         $('#vis_addconfigfile').click(function () {
-            //open Auto mark config window
+            
             VIS.viewManager.startWindow(executeScalar("VIS_158"));
         });
 

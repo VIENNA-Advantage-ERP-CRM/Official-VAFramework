@@ -887,12 +887,8 @@ namespace VIS.Helpers
             dynamic versionInfo = new System.Dynamic.ExpandoObject();
             Trx trx = null;
             bool hasDocValWF = false;
-            bool docProcWF = false;
-            bool hideWFVerMsg = false;
-            if (inserting && inn.RowData.ContainsKey("ishidewfvermsg"))
-            {
-                hideWFVerMsg = Util.GetValueOfBool(inn.RowData["ishidewfvermsg"]);
-            }
+
+
 
             if (UnqFields != null && UnqFields.Count > 0)
             {
@@ -1033,17 +1029,8 @@ namespace VIS.Helpers
                 versionInfo.IsLatestVersion = false;
 
                 // check whether any Document Value type workflow is attached with Version table
-                hasDocValWF = GetWFCount(ctx, ctx.GetAD_Client_ID(), InsAD_Table_ID, "V", trx);
-
-                // check whether any Document Process type workflow is attached with Version table
-                docProcWF = GetWFCount(ctx, ctx.GetAD_Client_ID(), InsAD_Table_ID, "P", trx);
-                if (docProcWF)
-                {
-                    if (!hasDocValWF)
-                        hasDocValWF = true;
-                }
+                hasDocValWF = GetDocValueWF(ctx, ctx.GetAD_Client_ID(), InsAD_Table_ID, trx);
                 versionInfo.HasDocValWF = hasDocValWF;
-                versionInfo.HasDocProcWF = docProcWF;
 
                 // EmpCode : VIS0008
                 // Check applied in case of Maintain version whether anyone else changed something
@@ -1222,9 +1209,8 @@ namespace VIS.Helpers
 
             // vinay bhatt window id
             po.SetAD_Window_ID(inn.AD_WIndow_ID);
-            //Set selected tab ID 
-            //Lakhwinder 11 Apr 2024            
-            po.SetWindowTabID(inn.AD_Tab_ID);
+            //
+            
             
             // check and set field values based on Master Versions 
             // else execute normally
@@ -1344,7 +1330,6 @@ namespace VIS.Helpers
 
             IDataReader dr = null;
             outt.RowData = rowData;
-            outt.Status = GridTable.SAVE_OK;
             try
             {
                 Dictionary<string, object> verResult = new Dictionary<string, object>();
@@ -1359,28 +1344,18 @@ namespace VIS.Helpers
                 {
                     outt.RowData = inn.OldRowData;
                     outt.LatestVersion = versionInfo.IsLatestVersion;
-                    if (docProcWF)
+                    // if table has Workflow then return status as has WF (W)
+                    if (hasDocValWF)
+                        outt.Status = GridTable.SAVE_WFAPPROVAL;
+                    // if record is not Immediate Save then return Save in Future (F)
+                    else if (!inn.ImmediateSave)
                     {
-                        outt.Status = GridTable.SAVE_WFPROCESS;
-                    }
-                    else
-                    {
-                        // if table has Workflow then return status as has WF (W)
-                        if (hasDocValWF)
+                        if (!versionInfo.IsLatestVersion)
                         {
-                            if (!hideWFVerMsg)
-                                outt.Status = GridTable.SAVE_WFAPPROVAL;
-                        }
-                        // if record is not Immediate Save then return Save in Future (F)
-                        else if (!inn.ImmediateSave)
-                        {
-                            if (!versionInfo.IsLatestVersion)
-                            {
-                                if (IsBackDateVersion(inn.ValidFrom))
-                                    outt.Status = GridTable.SAVE_BACKDATEVER;
-                                else
-                                    outt.Status = GridTable.SAVE_FUTURE;
-                            }
+                            if (IsBackDateVersion(inn.ValidFrom))
+                                outt.Status = GridTable.SAVE_BACKDATEVER;
+                            else
+                                outt.Status = GridTable.SAVE_FUTURE;
                         }
                     }
                 }
@@ -1704,11 +1679,10 @@ namespace VIS.Helpers
         /// <param name="AD_Table_ID"></param>
         /// <param name="_trx"></param>
         /// <returns>true/false</returns>
-        public bool GetWFCount(Ctx ctx, int AD_Client_ID, int AD_Table_ID, String WFType, Trx _trx)
+        public bool GetDocValueWF(Ctx ctx, int AD_Client_ID, int AD_Table_ID, Trx _trx)
         {
-            // VIS0008 CMS
             String sql = "SELECT COUNT(AD_Workflow_ID) FROM AD_Workflow "
-                + " WHERE WorkflowType='" + WFType + "' AND IsActive='Y' AND IsValid='Y' AND AD_Table_ID = " + AD_Table_ID + " AND AD_Client_ID = " + AD_Client_ID
+                + " WHERE (WorkflowType='V' OR WorkflowType='P') AND IsActive='Y' AND IsValid='Y' AND AD_Table_ID = " + AD_Table_ID + " AND AD_Client_ID = " + AD_Client_ID
                 + " GROUP BY AD_Client_ID, AD_Table_ID ORDER BY AD_Client_ID, AD_Table_ID";
 
             return Util.GetValueOfInt(DB.ExecuteScalar(sql, null, _trx)) > 0;
