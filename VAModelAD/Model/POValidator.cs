@@ -25,6 +25,7 @@ namespace VAModelAD.Model
         private static bool _exportTableAccessed = false;
         private static List<string> _alreadyExpData = new List<string>();
         private static bool _exportDataChecked = false;
+        private int _expModuleID = 0;
 
         private void RegisterPORecordList()
         {
@@ -192,6 +193,20 @@ namespace VAModelAD.Model
                 && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
 
             {
+                int curRefModID= Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA093_RefModule_ID FROM  VA093_AutoMarkingConfig WHERE IsProcessed='N' AND AD_Role_ID=" + po.GetCtx().GetAD_Role_ID()));
+                if (curRefModID == 0)
+                {
+                    curRefModID= MModuleInfo.Get("VA093_");
+                }
+                if (_expModuleID == 0)
+                {
+                    _expModuleID = curRefModID;
+                }
+                else if (_expModuleID!= curRefModID) {
+                    _expModuleID = curRefModID;
+                    _exportDataChecked = false;
+                }
+
                 if (!_exportTableAccessed)
                 {
                     _ExportCheckTableNames = GetExportTableNames();
@@ -574,7 +589,8 @@ namespace VAModelAD.Model
         /// </summary>
         private void GetExportedData()
         {
-            DataSet dsExpData = DB.ExecuteDataset(@"SELECT AD_ModuleInfo_ID || '_' || AD_Table_ID || '_' || Record_ID FROM AD_ExportData WHERE AD_ModuleInfo_ID =" + MModuleInfo.Get("VA093_"));
+            //DataSet dsExpData = DB.ExecuteDataset(@"SELECT AD_ModuleInfo_ID || '_' || AD_Table_ID || '_' || Record_ID FROM AD_ExportData WHERE AD_ModuleInfo_ID =" + MModuleInfo.Get("VA093_"));
+            DataSet dsExpData = DB.ExecuteDataset(@"SELECT AD_ModuleInfo_ID || '_' || AD_Table_ID || '_' || Record_ID FROM AD_ExportData WHERE AD_ModuleInfo_ID =" + _expModuleID);
             if (dsExpData != null && dsExpData.Tables != null && dsExpData.Tables[0].Rows.Count > 0)
             {
                 _alreadyExpData = dsExpData.Tables[0].AsEnumerable()
@@ -606,6 +622,14 @@ namespace VAModelAD.Model
             {
                 obj.SetAD_Table_ID(po.Get_Table_ID());
                 obj.SetAD_ModuleInfo_ID(MModuleInfo.Get("VA093_"));
+                if (obj.Get_ColumnIndex("AD_Window_ID") > -1)
+                {
+                    obj.Set_Value("AD_Window_ID", po.GetAD_Window_ID());
+                }
+                if (obj.Get_ColumnIndex("AD_Tab_ID") > -1)
+                { 
+                    obj.Set_Value("AD_Tab_ID", po.GetWindowTabID());
+                }
                 if (!obj.Save())
                 {
                     return false;

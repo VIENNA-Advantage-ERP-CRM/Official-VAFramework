@@ -4691,7 +4691,8 @@
             MaintainVersions: false,
             UnqFields: this.gFieldUnique,
             Ctx: VIS.context.getWindowCtx(this.gTable._windowNo),
-            WindowNo: this.gTable._windowNo
+            WindowNo: this.gTable._windowNo,
+            AD_Tab_ID:this.AD_Tab_ID
             //ImmediateSave: true,
             //ValidFrom: new Date().toISOString(),
         };

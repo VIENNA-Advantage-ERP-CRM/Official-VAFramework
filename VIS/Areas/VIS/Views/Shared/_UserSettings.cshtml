@@ -10,6 +10,8 @@
             return VAdvantage.Utility.Msg.GetMsg(lang, key);
         }
 
+
+
     }
 
 
@@ -31,6 +33,14 @@
                     <i class="fa fa-info"></i>
                 </a>
             </li>
+            @if (VAdvantage.Utility.Env.IsModuleInstalled("VA093_") && ViewBag.IsAutoDataMarking)
+            {
+                <li class="vis-blinkingDotContainer"><div class="vis-blinking-dot"></div></li>
+                <li>
+                    <span class="d-inline-block vis-autodatamarkingfilename mr-1 vis-autodataMkFilename">@ViewBag.ConfigModule</span>
+                    <span class="d-inline-block vis-autodatafontplus" id="vis_addconfigfile"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
+                </li>
+            }
             @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-alerts" title="Alerts">Alerts</a><span class="vis-notify-counter">55</span></li>*@
             @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-call" title="@GetMsg((string)ViewBag.culture, "VA048_CallingInterface")" id="vis_appCall">Call</a></li>*@
         </ul>
@@ -99,28 +109,28 @@
                 <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
         </li>
         <li id="vis_userDisplayName" class="vis-app-hdr-r-user">
-            <a href="javascript:;"id="vis_userName">@ViewBag.DisplayName</a>
+            <a href="javascript:;" id="vis_userName">@ViewBag.DisplayName</a>
             @*
-        <div class="vis-div-userAvatar">*@
+                <div class="vis-div-userAvatar">*@
             @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
             {
-            ViewBag.UserPic="";
+                ViewBag.UserPic = "";
             }
             <div class="vis-app-user-img-wrap">
                 <i class="fa fa-user"></i>
                 <img src="@ViewBag.UserPic" alt="profile image">
             </div><!-- user-img-wrap -->
             @*else
-        {
-        <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
-        }
-        }
-        else
-        {
-        <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
-        }*@
+                {
+                <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
+                }
+                }
+                else
+                {
+                <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
+                }*@
             @*
-        </div>*@
+                </div>*@
 
 
         </li>

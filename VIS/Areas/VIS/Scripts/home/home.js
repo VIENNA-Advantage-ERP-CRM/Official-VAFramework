@@ -1839,6 +1839,12 @@
         $('#vis_appInfoWindow').click(function () {
             VIS.InfoMenu.show($(this));
         });
+        $('#vis_addconfigfile').click(function () {
+            
+            VIS.viewManager.startWindow(executeScalar("VIS_158"));
+        });
+
+        
 
         function emptyWelcomeTabDatacontainers() {
             if (WelcomeTabDatacontainers.children().length > 0)
