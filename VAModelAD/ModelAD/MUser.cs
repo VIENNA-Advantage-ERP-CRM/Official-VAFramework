@@ -634,7 +634,7 @@ namespace VAdvantage.Model
                 }
             }
 
-            if (newRecord)
+            if (newRecord && string.IsNullOrEmpty(GetPassword()))
             {
                 string password = GeneratePassword();
                 SetPassword(password);
