@@ -1,4 +1,4 @@
-﻿/* Version 2.0.13.7 */
+﻿/* Version 2.0.13.8 */
 html, body {
     height: 100%;
     width: 100%;
@@ -7566,12 +7566,19 @@ input:required:valid {
 /*VImage 01-Aug-2014*/
 .VIS-VImage-file-label {
     background: rgba(var(--v-c-primary), 1);
-    color: #fff;
+    color: #fff !important;
     padding: 8px 15px;
     cursor: pointer;
     font-weight: normal;
     margin-right: 10px;
+    display: inline-block !important;
+    margin-bottom: 0.5rem;
+    border: none;
 }
+
+    .VIS-VImage-file-label:focus {
+        box-shadow: 0 0 10px rgb(0 0 0 / 50%);
+    }
 
 /*#file-input {
         opacity: 0;
@@ -23062,7 +23069,12 @@ label.vis-ec-col-lblchkbox + .vis-ev-ctrlinfowrap {
     padding: 10px;
     border-bottom-left-radius: .25rem;
     cursor: pointer;
+    border: 1px solid transparent;
 }
+
+    .vis-img-ctrl-icon:focus {
+        border: 1px solid rgba(var(--v-c-primary), 1);
+    }
 
 /*checkbox and radio css*/
 input[type="checkbox"], input[type="radio"] {
