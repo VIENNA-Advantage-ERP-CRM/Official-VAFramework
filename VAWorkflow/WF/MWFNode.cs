@@ -520,7 +520,8 @@ namespace VAdvantage.WF
             {
                 if (GetAttributeValue() == null)
                 {
-                    errorMsg = Msg.GetElement(GetCtx(), "AttributeValue");
+                    // errorMsg = Msg.GetElement(GetCtx(), "AttributeValue");
+                    errorMsg = Msg.GetMsg(GetCtx(), "ColumnValue");
                 }
             }
             else if (action.Equals(ACTION_SubWorkflow))
