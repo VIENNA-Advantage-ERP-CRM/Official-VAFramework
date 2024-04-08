@@ -217,7 +217,7 @@ namespace VIS.Classes
              int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string values, string LookupData)
         {
             VLookUpInfo lInfo = null;
-            if (AD_Window_ID > 0)
+            if (AD_Window_ID > 0 && AD_Field_ID > 0)
             {
                 GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
 
