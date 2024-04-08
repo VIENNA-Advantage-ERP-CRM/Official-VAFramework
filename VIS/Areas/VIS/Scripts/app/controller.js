@@ -4804,7 +4804,8 @@
         var msVer = new VIS.MasterDataVersion(slf.gTable._tableName, slf.gridFields, rec_ID, gTblIn.WhereClause, slf.IsMaintainVersions, newRecord, function (immediate, valFrom, verRecID) {
             gTblIn.MaintainVersions = true;
             gTblIn.ImmediateSave = immediate;
-            gTblIn.ValidFrom = new Date(valFrom).toISOString();
+            // VIS0008 Change done as we need only date string which doesn't include time
+            gTblIn.ValidFrom = valFrom;
             gTblIn.VerRecID = verRecID;
             var rowChg = slf.rowChanged;
             var out = slf.dataSaveDB(gTblIn, rdNew);
