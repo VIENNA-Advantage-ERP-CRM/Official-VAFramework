@@ -597,7 +597,7 @@ namespace VAdvantage.WF
                 }
                 if (errorMsg != "")
                 {
-                    SaveNodeErrors(Msg.GetMsg(GetCtx(), "PleaseSelectThe") + " : " + errorMsg);
+                    SaveNodeErrors(Msg.GetMsg(GetCtx(), "PleaseSelectThe") + " " + errorMsg);
                     errorMsg = "";
                     return true;
                 }
