@@ -501,13 +501,13 @@ namespace VIS.Classes
         }
 
 
-        public static int SaveUserImage(Ctx ctx, byte[] buffer, string imageName, bool isSaveInDB, int userID)
+        public static int SaveUserImage(Ctx ctx, byte[] buffer, string imageName, bool isSaveInDB, int userID, Trx trx)
         {
 
-            MUser user = new MUser(ctx, userID, null);
+            MUser user = new MUser(ctx, userID, trx);
             int imageID = Util.GetValueOfInt(user.GetAD_Image_ID());
 
-            MImage mimg = new MImage(ctx, imageID, null);
+            MImage mimg = new MImage(ctx, imageID, trx);
             mimg.ByteArray = buffer;
             mimg.ImageFormat = imageName.Substring(imageName.LastIndexOf('.'));
             mimg.SetName(imageName);
@@ -524,13 +524,17 @@ namespace VIS.Classes
             //    mimg.SetImageURL("Images/Thumb100x100");//Image Saved in File System so instead of byteArray image Url will be set
             //    mimg.SetBinaryData(new byte[0]);
             //}
-            if (!mimg.Save())
+            if (!mimg.Save(trx))
             {
+                trx.Rollback();
+                trx.Close();
                 return 0;
             }
             user.SetAD_Image_ID(mimg.GetAD_Image_ID());
-            if (!user.Save())
+            if (!user.Save(trx))
             {
+                trx.Rollback();
+                trx.Close();
                 return 0;
             }
 
