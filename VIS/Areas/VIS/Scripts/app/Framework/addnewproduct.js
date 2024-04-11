@@ -338,6 +338,9 @@
                     var doc = (new DOMParser).parseFromString(error.responseText, "text/html");
                     //select title element and get its text content
                     var message = doc.querySelector("title").textContent;
+                    if (message.length <= 0 && message == null) {
+                        message = VIS.Msg.getMsg("VIS_SomethingWentWrong");
+                    }
                     VIS.ADialog.error(message);
 
                     
