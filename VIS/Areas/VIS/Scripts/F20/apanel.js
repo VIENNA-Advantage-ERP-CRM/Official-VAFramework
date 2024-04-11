@@ -3346,7 +3346,7 @@
                 this.curTab.query = queryy;
                 keepFilters = false;
             }
-
+            var defaultTabLayout = mTab.getTabLayout();
             if (back && this.curTab.getIsCurrent()) {
                 if (this.curTab.getTabLevel() == 0) {
                     if (this.curTab.searchText) {
@@ -3365,26 +3365,33 @@
                     }
                 }
                 gc.dataRefresh();
+
+                if (this.tabStack.length > 0) {
+                    var currentTabSeq = this.curWinTab.getSelectedIndex();
+                    var currentTab = this.tabStack.find(function (tab) {
+                        return tab.tabSeq === currentTabSeq;
+                    });
+
+                    if (currentTab.tabView.length > 0) {
+                        defaultTabLayout = currentTab.tabView[currentTab.tabView.length - 1];
+                    }
+                }
             }
             else	//	Requery and bind
             {
 
                 /* if reset tab is true then set default view which is set on tab */
-                //if (mTab.getIsResetLayout()) {
-                    var defaultTabLayout = mTab.getTabLayout();
+                if (mTab.getIsResetLayout()) {                    
                     if (defaultTabLayout == 'N') {
-                        this.ShowHideViewIcon(this.aMulti);
-                        mTab.getIsResetLayout() ? gc.switchMultiRow() : null;
+                        gc.switchMultiRow();
                     }
                     else if (defaultTabLayout == 'Y') {
-                        this.ShowHideViewIcon(this.aSingle);
-                        mTab.getIsResetLayout()?gc.switchSingleRow(true):null;
+                        gc.switchSingleRow(true);
                     }
                     else if (defaultTabLayout == 'C') {
-                        this.ShowHideViewIcon(this.aCard);
-                        mTab.getIsResetLayout() ? gc.switchCardRow(true) : null;
+                        gc.switchCardRow(true);
                     }
-                //}
+                }
 
                 this.curTab.getTableModel().setCurrentPage(1);
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
@@ -3405,6 +3412,18 @@
                 else {
                     this.setDefaultSearch(gc);
                 }
+            }
+
+            
+            //Change Icon
+            if (defaultTabLayout == 'N') {
+                this.ShowHideViewIcon(this.aMulti);
+            }
+            else if (defaultTabLayout == 'Y') {
+                this.ShowHideViewIcon(this.aSingle);
+            }
+            else if (defaultTabLayout == 'C') {
+                this.ShowHideViewIcon(this.aCard);
             }
 
 
