@@ -15,7 +15,7 @@ namespace PdfUnicodeGlyphsResharper
     {
         private static Dictionary<string, string[]> _ArabicGlyphs;
 
-        static Regex _RegIsEnglish = new Regex("^[a-zA-Z0-9\\.,!@#$%\\^&\\*\\?()<>{}|'\"\\-_/]*$");
+        static Regex _RegIsEnglish = new Regex("^[a-zA-Z0-9\\.,:!@#$%\\^&\\*\\?()<>{}|'\"\\-_/]*$");
         static PdfExtention()
         {
             _ArabicGlyphs = InitializeTableUnicode();
