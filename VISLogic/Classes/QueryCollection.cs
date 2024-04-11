@@ -570,8 +570,8 @@ namespace VIS.Classes
             queryList.VIS_156 = "SELECT AD_Tree_BPartner_ID FROM AD_OrgInfo WHERE AD_Org_ID=@AD_Org_ID";
 
             queryList.VIS_157 = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Table_ID = @AD_Table_ID";
-
-            queryList.VIS_158 = "SELECT AD_Window_ID FROM AD_Window WHERE Name='VA093_AutoMarkingConfig'";
+            //Get Window ID of Auto Mark Config
+            queryList.VIS_158 = "SELECT AD_Window_ID FROM AD_Window WHERE IsActive = 'Y' AND Name='VA093_AutoMarkingConfig'";
         }
 
 

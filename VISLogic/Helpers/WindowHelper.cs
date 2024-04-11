@@ -1209,8 +1209,9 @@ namespace VIS.Helpers
 
             // vinay bhatt window id
             po.SetAD_Window_ID(inn.AD_WIndow_ID);
-            //
-            
+            //Set selected tab ID 
+            //Lakhwinder 11 Apr 2024            
+            po.SetWindowTabID(inn.AD_Tab_ID);
             
             // check and set field values based on Master Versions 
             // else execute normally
