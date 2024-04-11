@@ -1544,7 +1544,7 @@
                     });
                     VIS.Application.theme = changeThemeColor;
                 }
-                
+
                 $.ajax({
                     url: VIS.Application.contextUrl + "UserPreference/SavePrefrence",
                     type: "POST",
@@ -1553,9 +1553,10 @@
                     async: false,
                     data: JSON.stringify({ pref: data })
                 }).done(function (json) {
-                        result = json;
-                        $root.dialog('close');
-                    });
+                    result = json;
+                    $root.dialog('close');
+                });
+            }
         };
 
         var loadDefault = function () {
