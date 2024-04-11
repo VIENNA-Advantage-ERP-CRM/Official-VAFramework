@@ -1538,9 +1538,9 @@
 
             function savePreference(data, callback) {
                 var result = null;
+
                 if (themeId != null) {
                     VIS.dataContext.postJSONData(VIS.Application.contextUrl + 'Theme/SaveForUser', { id: themeId, uid: VIS.context.getAD_User_ID() }, function (e) {
-
                     });
                     VIS.Application.theme = changeThemeColor;
                 }
@@ -1553,14 +1553,9 @@
                     async: false,
                     data: JSON.stringify({ pref: data })
                 }).done(function (json) {
-
-                    result = json;
-                    $root.dialog('close');
-                })
-            };
-
-
-
+                        result = json;
+                        $root.dialog('close');
+                    });
         };
 
         var loadDefault = function () {

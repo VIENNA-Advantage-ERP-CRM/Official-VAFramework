@@ -1006,8 +1006,14 @@ namespace VAdvantage.WF
                     throw new Exception("Not a Report AD_Process_ID=" + invoiceReportID);
 
                 }
-                //
-                ProcessInfo pi = new ProcessInfo(process.GetValue(), invoiceReportID,
+                // Check applied to find prefix in name or search key
+                Tuple<String, String, String> aInfo = null;
+                string processName = process.GetValue();
+                if (!Env.HasModulePrefix(processName, out aInfo))
+                {
+                    processName = process.GetName();
+                }
+                ProcessInfo pi = new ProcessInfo(processName, invoiceReportID,
                     GetAD_Table_ID(), GetRecord_ID());
                 pi.SetAD_User_ID(GetAD_User_ID());
                 pi.SetAD_Client_ID(GetAD_Client_ID());
@@ -1048,7 +1054,14 @@ namespace VAdvantage.WF
                 MPInstance pInstance = new MPInstance(process, GetRecord_ID());
                 FillParameter(pInstance, trx);
                 //
-                ProcessInfo pi = new ProcessInfo(process.GetValue(), _node.GetAD_Process_ID(),
+                // Check applied to find prefix in name or search key
+                Tuple<String, String, String> aInfo = null;
+                string processName = process.GetValue();
+                if (!Env.HasModulePrefix(processName, out aInfo))
+                {
+                    processName = process.GetName();
+                }
+                ProcessInfo pi = new ProcessInfo(processName, _node.GetAD_Process_ID(),
                     GetAD_Table_ID(), GetRecord_ID());
                 pi.SetAD_User_ID(GetAD_User_ID());
                 pi.SetAD_Client_ID(GetAD_Client_ID());

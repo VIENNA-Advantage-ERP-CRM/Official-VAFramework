@@ -394,6 +394,10 @@ namespace VIS.Helpers
                 rep.IsBiHTMlReport = pi.GetFileType().Equals(ProcessCtl.ReportType_BIHTML);
                 rep.IsError = pi.IsError();
 
+                if (rep.IsError) {
+                    rep.Message = rep.Result;
+                }
+
                 // Change Lokesh Chauhan
                 rep.CustomHTML = pi.GetCustomHTML();
 
