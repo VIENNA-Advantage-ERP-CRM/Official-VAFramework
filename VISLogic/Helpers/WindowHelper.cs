@@ -1180,7 +1180,7 @@ namespace VIS.Helpers
 
             Ver_Window_ID = 0;
             PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, inserting, out Ver_Window_ID);
-
+            
             for (int i = 0; i < lstColumns.Count; i++)
             {
                 WindowField gField = m_fields.Where(a => a.ColumnName == lstColumns[i]).FirstOrDefault();
@@ -1222,7 +1222,10 @@ namespace VIS.Helpers
 
             // vinay bhatt window id
             po.SetAD_Window_ID(inn.AD_WIndow_ID);
-            //      
+            //Set selected tab ID 
+            //Lakhwinder 11 Apr 2024            
+            po.SetWindowTabID(inn.AD_Tab_ID);
+            
             // check and set field values based on Master Versions 
             // else execute normally
             bool hasSingleKey = true;

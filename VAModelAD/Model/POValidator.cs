@@ -25,6 +25,7 @@ namespace VAModelAD.Model
         private static bool _exportTableAccessed = false;
         private static List<string> _alreadyExpData = new List<string>();
         private static bool _exportDataChecked = false;
+        private int _expModuleID = 0;
 
         private void RegisterPORecordList()
         {
@@ -192,6 +193,21 @@ namespace VAModelAD.Model
                 && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
 
             {
+                //Check and proceed marking with new module
+                int curRefModID= Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA093_RefModule_ID FROM  VA093_AutoMarkingConfig WHERE Processed='N' AND IsActive='Y' AND AD_Role_ID=" + po.GetCtx().GetAD_Role_ID()));
+                if (curRefModID == 0)
+                {
+                    curRefModID= MModuleInfo.Get("VA093_");
+                }
+                if (_expModuleID == 0)
+                {
+                    _expModuleID = curRefModID;
+                }
+                else if (_expModuleID!= curRefModID) {
+                    _expModuleID = curRefModID;
+                    _exportDataChecked = false;
+                }
+
                 if (!_exportTableAccessed)
                 {
                     _ExportCheckTableNames = GetExportTableNames();
@@ -231,12 +247,12 @@ namespace VAModelAD.Model
                             expRecord_ID = po.Get_ID();
 
 
-
-                        if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
-
+                        
+                       // if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
+                        if (!_alreadyExpData.Contains(_expModuleID + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
                         {
 
-                            if (!SaveExportData(po))
+                            if (!SaveExportData(po, _expModuleID))
 
                                 return false;
 
@@ -582,7 +598,9 @@ namespace VAModelAD.Model
         /// </summary>
         private void GetExportedData()
         {
-            DataSet dsExpData = DB.ExecuteDataset(@"SELECT AD_ModuleInfo_ID || '_' || AD_Table_ID || '_' || Record_ID FROM AD_ExportData WHERE AD_ModuleInfo_ID =" + MModuleInfo.Get("VA093_"));
+            //DataSet dsExpData = DB.ExecuteDataset(@"SELECT AD_ModuleInfo_ID || '_' || AD_Table_ID || '_' || Record_ID FROM AD_ExportData WHERE AD_ModuleInfo_ID =" + MModuleInfo.Get("VA093_"));
+           //Reload exportdata with respect to configured Automarking module
+            DataSet dsExpData = DB.ExecuteDataset(@"SELECT AD_ModuleInfo_ID || '_' || AD_Table_ID || '_' || Record_ID FROM AD_ExportData WHERE AD_ModuleInfo_ID =" + _expModuleID);
             if (dsExpData != null && dsExpData.Tables != null && dsExpData.Tables[0].Rows.Count > 0)
             {
                 _alreadyExpData = dsExpData.Tables[0].AsEnumerable()
@@ -597,7 +615,7 @@ namespace VAModelAD.Model
         /// </summary>
         /// <param name="po"></param>
         /// <returns></returns>
-        public bool SaveExportData(PO po)
+        public bool SaveExportData(PO po,int expModID)
         {
             bool saveMarkData = true;
             X_AD_ExportData obj = new X_AD_ExportData(po.GetCtx(), 0, null);
@@ -613,7 +631,17 @@ namespace VAModelAD.Model
             if (saveMarkData)
             {
                 obj.SetAD_Table_ID(po.Get_Table_ID());
-                obj.SetAD_ModuleInfo_ID(MModuleInfo.Get("VA093_"));
+                obj.SetAD_ModuleInfo_ID(expModID);
+                //Set WIndowID
+                if (obj.Get_ColumnIndex("AD_Window_ID") > -1)
+                {
+                    obj.Set_Value("AD_Window_ID", po.GetAD_Window_ID());
+                }
+                //Set Tab ID
+                if (obj.Get_ColumnIndex("AD_Tab_ID") > -1)
+                { 
+                    obj.Set_Value("AD_Tab_ID", po.GetWindowTabID());
+                }
                 if (!obj.Save())
                 {
                     return false;

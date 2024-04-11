@@ -58,6 +58,8 @@ namespace VIS.DataContracts
         public int WindowNo { get; set; }
 
         public string SelectSQL { get; set; }
+
+        public int AD_Tab_ID { get; set; }
     }
 
     public class WindowField
