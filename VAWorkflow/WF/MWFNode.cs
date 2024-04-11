@@ -47,6 +47,8 @@ namespace VAdvantage.WF
         //Duration Base MS	
         private long _durationBaseMS = -1;
         private static CCache<int, MWFNode> _cache = new CCache<int, MWFNode>("AD_WF_Node", 50);
+        // Error Message for Before Save
+        private string errorMsg = "";
         #endregion
 
         /// <summary>
@@ -490,72 +492,64 @@ namespace VAdvantage.WF
             {
                 if (GetAD_Process_ID() == 0)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "AD_Process_ID"));
-                    return false;
+                    errorMsg = Msg.GetElement(GetCtx(), "AD_Process_ID");
                 }
             }
             else if (action.Equals(ACTION_AppsTask))
             {
                 if (GetAD_Task_ID() == 0)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "AD_Task_ID"));
-                    return false;
+                    errorMsg = Msg.GetElement(GetCtx(), "AD_Task_ID");
                 }
             }
             else if (action.Equals(ACTION_DocumentAction))
             {
                 if (GetDocAction() == null || GetDocAction().Length == 0)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "DocAction"));
-                    return false;
+                    errorMsg = Msg.GetElement(GetCtx(), "DocAction");
                 }
             }
             else if (action.Equals(ACTION_EMail))
             {
                 if (GetR_MailText_ID() == 0)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "R_MailText_ID"));
-                    return false;
+                    errorMsg = Msg.GetElement(GetCtx(), "R_MailText_ID");
                 }
             }
             else if (action.Equals(ACTION_SetVariable))
             {
                 if (GetAttributeValue() == null)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "AttributeValue"));
-                    return false;
+                    // errorMsg = Msg.GetElement(GetCtx(), "AttributeValue");
+                    errorMsg = Msg.GetMsg(GetCtx(), "ColumnValue");
                 }
             }
             else if (action.Equals(ACTION_SubWorkflow))
             {
                 if (GetAD_Workflow_ID() == 0)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "AD_Workflow_ID"));
-                    return false;
+                    errorMsg = Msg.GetElement(GetCtx(), "AD_Workflow_ID");
                 }
             }
             else if (action.Equals(ACTION_UserChoice))
             {
                 if (GetAD_Column_ID() == 0)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "AD_Column_ID"));
-                    return false;
+                    errorMsg = Msg.GetElement(GetCtx(), "AD_Column_ID");
                 }
             }
             else if (action.Equals(ACTION_UserForm))
             {
                 if (GetAD_Form_ID() == 0)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "AD_Form_ID"));
-                    return false;
+                    errorMsg = Msg.GetElement(GetCtx(), "AD_Form_ID");
                 }
             }
             else if (action.Equals(ACTION_UserWindow))
             {
                 if (GetAD_Window_ID() == 0)
                 {
-                    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "AD_Window_ID"));
-                    return false;
+                    errorMsg = Msg.GetElement(GetCtx(), "AD_Window_ID");
                 }
             }
             //else if (action.equals(ACTION_UserWorkbench)) 
@@ -564,6 +558,19 @@ namespace VAdvantage.WF
             //    log.SaveError("FillMandatory", Msg.GetElement(GetCtx(), "AD_Workbench_ID"));
             //    return false;
             //}
+
+            // Changes done for workflow editor module
+            if (errorMsg != "" && Util.GetValueOfBool(Get_Value("VA102_IsSkipValidation")))
+            {
+                Set_Value("VA102_IsSkipValidation", false);
+                return true;
+            }
+            else if (errorMsg != "")
+            {
+                Set_Value("VA102_IsSkipValidation", false);
+                log.SaveError("FillMandatory", errorMsg);
+                return false;
+            }
 
             return true;
         }
@@ -578,6 +585,24 @@ namespace VAdvantage.WF
         {
             if (!success)
                 return success;
+
+            // Save data in Node Error table if there is any error while saving the node
+            // in case of Workflow Editor module is installed
+            if (Env.IsModuleInstalled("VA102_"))
+            {
+                int count = DB.ExecuteQuery("DELETE FROM VA102_NodeErrors WHERE AD_WF_Node_ID = " + GetAD_WF_Node_ID(), null, Get_Trx());
+                if (count < 0)
+                {
+                    log.SaveError("VA102_ErrorDeletion", "Error in deleteing data from Node Error table against Node ==>> " + GetName());
+                }
+                if (errorMsg != "")
+                {
+                    SaveNodeErrors(Msg.GetMsg(GetCtx(), "PleaseSelectThe") + " " + errorMsg);
+                    errorMsg = "";
+                    return true;
+                }
+            }
+
             TranslationTable.Save(this, newRecord);
             return true;
         }
@@ -622,6 +647,24 @@ namespace VAdvantage.WF
             if (_paras == null)
                 _paras = MWFNodePara.GetParameters(GetCtx(), GetAD_WF_Node_ID());
             return _paras;
+        }
+
+        /// <summary>
+        /// Function to save Error messages for Node
+        /// </summary>
+        /// <param name="ErrorMsg"></param>
+        /// <returns>True/False</returns>
+        public bool SaveNodeErrors(string ErrorMsg)
+        {
+            PO _nodeError = MTable.GetPO(GetCtx(), "VA102_NodeErrors", 0, Get_Trx());
+            _nodeError.Set_ValueNoCheck("AD_WF_Node_ID", GetAD_WF_Node_ID());
+            _nodeError.Set_ValueNoCheck("AD_Workflow_ID", GetAD_Workflow_ID());
+            _nodeError.Set_ValueNoCheck("ErrorMessage", ErrorMsg);
+            if (!_nodeError.Save())
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
