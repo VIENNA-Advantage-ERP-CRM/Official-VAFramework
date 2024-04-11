@@ -321,7 +321,7 @@
 
         var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ValuePreference/GetPrefrenceID", { "sql": sql }, null); // spelling corrected by vinay bhatt on 18 oct 2018
 
-        var ds = new VIS.DB.DataSet().toJson(JSON.stringify(data));
+       /* var ds = new VIS.DB.DataSet().toJson(JSON.stringify(data));
 
         if (ds != null && ds.tables[0].rows.length > 0) {
             // get id
@@ -329,6 +329,10 @@
         }
         if (preferenceId < 0) {
             preferenceId = 0;
+        }*/
+
+        if (data > 0) {
+            preferenceId = VIS.Utility.Util.getValueOfInt(data);
         }
         return preferenceId;
     };

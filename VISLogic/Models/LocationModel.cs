@@ -292,6 +292,10 @@ street
             ds = DB.ExecuteDataset(sqlquery);
             if (ds != null)
             {
+                if (ds.Tables[0].Rows.Count == 0) {
+                    obj.Add(new KeyNamePair(Util.GetValueOfInt(0), Util.GetValueOfString(Msg.GetMsg(ctx, "NoRecordFound"))));
+                    return obj;
+                }
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
                     obj.Add(new KeyNamePair(Convert.ToInt32(ds.Tables[0].Rows[i]["C_COUNTRY_ID"]), Convert.ToString(ds.Tables[0].Rows[i]["Name"])));
