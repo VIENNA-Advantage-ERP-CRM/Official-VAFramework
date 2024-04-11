@@ -354,8 +354,8 @@
             self.onTableRowSelect(event);
             //switch self.singleRow = false; //force single view
             if (!onlySelect) {
-                self.aPanel.actionPerformedCallback(self.aPanel, "Multi");
-                self.aPanel.setLastView("Card");
+                self.aPanel.actionPerformedCallback(self.aPanel, "Single");
+                //self.aPanel.setLastView("Card");
             }
             //self.switchSingleRow();
         };

@@ -430,8 +430,9 @@
             this.aFirst = this.addActions(this.ACTION_NAME_FIRST, null, true, true, true, onAction, null, "Shct_FirstRec");
             this.aLast = this.addActions(this.ACTION_NAME_LAST, null, true, true, true, onAction, null, "Shct_LastRec");
             this.aNext = this.addActions(this.ACTION_NAME_NEXT, null, true, true, true, onAction, null, "Shct_NextRec");
-            this.aMulti = this.addActions("Multi", null, false, true, true, onAction, true, "Shct_MultiRow");
-            this.aCard = this.addActions("Card", null, false, true, true, onAction, true, "Shct_CardView", "card-o");
+            this.aMulti = this.addActions("Multi", null, false, true, true, onAction, false, "Shct_MultiRow", "Multix");
+            this.aSingle = this.addActions("Single", null, false, true, true, onAction, false, "Shct_MultiRow","Multi");
+            this.aCard = this.addActions("Card", null, false, true, true, onAction, false, "Shct_CardView", "card-o");
 
             this.aMap = this.addActions("Map", null, false, true, true, onAction);
 
@@ -441,6 +442,7 @@
                 .append(this.aNext.getListItm())
             //.append(this.aLast.getListItm());
             $ulNav.append(this.aMulti.getListItm());
+            $ulNav.append(this.aSingle.getListItm());
             $ulNav.append(this.aCard.getListItm());
             $ulNav.append(this.aMap.getListItm().hide());
 
@@ -1671,6 +1673,31 @@
         }
     }
 
+    APanel.prototype.ShowHideViewIcon = function (action) {
+        if (this.curTab != null && this.curGC !=null) {
+            if (!this.curTab.getIsHideGridToggle()) {
+                this.aMulti.show();
+                this.aSingle.show();
+
+            } else {
+                this.aMulti.hide();
+                this.aSingle.hide();
+            }
+
+            if (!this.curTab.getIsHideCardToggle()) {
+                this.aCard.show();
+            } else {
+                this.aCard.hide();
+            }
+            action.hide();
+        } else {
+            this.aMulti.hide();
+            this.aSingle.hide();
+            this.aCard.hide();
+        }
+       
+    }
+
     /** ************************************************************************
      *	Dynamic Panel Initialization -  single window .
      *  <pre>
@@ -1850,8 +1877,10 @@
                 gc.initFilterPanel(curWindowNo, this.getFilterPane());
 
                 tabElement = gc;
-                if (i === 0 && goSingleRow)
+                if (i === 0 && goSingleRow) {
+                    this.ShowHideViewIcon(this.aSingle);
                     gc.switchSingleRow();
+                }
                 //	Store GC if it has a included Tab
                 if (gTab.getIncluded_Tab_ID() != 0) {
                     includedMap[gTab.getIncluded_Tab_ID()] = gc;
@@ -2161,21 +2190,27 @@
 
     APanel.prototype.actionPerformedCallback = function (tis, action) {
         /*Handle view change for back button */
-        if (action === "Multi" || action === "Card") {
+        if (action === "Multi" || action === "Card" || action === "Single") {
             var view = "Y";
             if (action === "Multi") {
-                if (tis.curGC.getIsSingleRow()) {
-                    view = "N";
-                } else {
-                    view = "Y";
-                }
-            } else if (action === "Card") {
-                if (tis.curGC.getIsCardRow()) {
-                    view = "N";
-                }
-                else {
-                    view = "C";
-                }
+                view = "N";
+                //if (tis.curGC.getIsSingleRow()) {
+                //    view = "N";
+                //} else {
+                //    view = "Y";
+                //}
+            } else if (action === "Single") {
+                view = "Y";
+            }
+
+            else if (action === "Card") {
+                view = "C";
+                //if (tis.curGC.getIsCardRow()) {
+                //    view = "N";
+                //}
+                //else {
+                //    view = "C";
+                //}
             }
 
 
@@ -2207,31 +2242,16 @@
         } else if (tis.aNext.getAction() === action) {
             tis.isDefaultFocusSet = false;
             tis.curGC.navigateRelative(+1);
-        } else if (tis.aMulti.getAction() === action) {
-            //tis.setLastView("");
-            //if (!tis.curGC.getIsSingleRow() && tis.curGC.getIsCardRow()) {
-            //    tis.setLastView("Card");
-            //}
-            //else if (!tis.curGC.getIsSingleRow()) {
-            //    tis.setLastView("Multi");
-            //}
-            ////    tis.setLastView("Multi");
-            ////else 
-
-            tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
-            tis.aCard.setPressed(false);
-            tis.curGC.switchRowPresentation();
+        } else if (tis.aSingle.getAction() === action) {
+            tis.ShowHideViewIcon(tis.aSingle);
+            tis.curGC.switchSingleRow(true);
+        }
+        else if (tis.aMulti.getAction() === action) {
+            tis.ShowHideViewIcon(tis.aMulti);
+            tis.curGC.switchMultiRow();
         } else if (tis.aCard.getAction() === action) {
-           // tis.setLastView("");
-            if (tis.curGC.getIsCardRow()) {
-                //tis.setLastView("Multi");
-                tis.curGC.switchMultiRow();
-            }
-            else {
-                //tis.setLastView("Card");
-                tis.curGC.switchCardRow();
-            }
-            tis.aMulti.setPressed(false);
+            tis.ShowHideViewIcon(tis.aCard);
+            tis.curGC.switchCardRow();            
             // tis.aBack.setEnabled(!tis.curGC.getIsCardRow());
         } else if (tis.aMap.getAction() === action) {
             tis.aMulti.setPressed(true);
@@ -3350,16 +3370,21 @@
             {
 
                 /* if reset tab is true then set default view which is set on tab */
-                if (mTab.getIsResetLayout()) {
+                //if (mTab.getIsResetLayout()) {
                     var defaultTabLayout = mTab.getTabLayout();
-                    if (defaultTabLayout == 'N')
-                        gc.switchMultiRow();
-                    else if (defaultTabLayout == 'Y')
-                        gc.switchSingleRow(true);
-                    else if (defaultTabLayout == 'C') {
-                        gc.switchCardRow(true);
+                    if (defaultTabLayout == 'N') {
+                        this.ShowHideViewIcon(this.aMulti);
+                        mTab.getIsResetLayout() ? gc.switchMultiRow() : null;
                     }
-                }
+                    else if (defaultTabLayout == 'Y') {
+                        this.ShowHideViewIcon(this.aSingle);
+                        mTab.getIsResetLayout()?gc.switchSingleRow(true):null;
+                    }
+                    else if (defaultTabLayout == 'C') {
+                        this.ShowHideViewIcon(this.aCard);
+                        mTab.getIsResetLayout() ? gc.switchCardRow(true) : null;
+                    }
+                //}
 
                 this.curTab.getTableModel().setCurrentPage(1);
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
@@ -3404,9 +3429,10 @@
         }
         //	Order Tab
         if (isAPanelTab) {
-            this.aMulti.setPressed(false);
-            this.aMulti.setEnabled(false);
-            this.aCard.setEnabled(false);
+            this.ShowHideViewIcon(null);
+            //this.aMulti.setPressed(false);
+            //this.aMulti.setEnabled(false);
+            //this.aCard.setEnabled(false);
             this.aCardDialog.setEnabled(false);
 
             this.aNew.setEnabled(false);
@@ -3437,9 +3463,9 @@
         }
         else	//	Grid Tab
         {
-            this.aMulti.setEnabled(true);
-            this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
-            this.aCard.setEnabled(true);
+            //this.aMulti.setEnabled(true);
+            //this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
+            //this.aCard.setEnabled(true);
             this.aCardDialog.setEnabled(true);
             this.aFind.setEnabled(true);
             this.aBatchUpdate ? this.aBatchUpdate : '';
@@ -3498,19 +3524,19 @@
             this.aMap.hide();
         }
 
-        if (this.curTab.getIsHideGridToggle()) {
-            this.aMulti.hide();
-        }
-        else {
-            this.aMulti.show();
-        }
+        //if (this.curTab.getIsHideGridToggle()) {
+        //    this.aMulti.hide();
+        //}
+        //else {
+        //    this.aMulti.show();
+        //}
 
-        if (this.curTab.getIsHideCardToggle()) {
-            this.aCard.hide();
-        }
-        else {
-            this.aCard.show();
-        }
+        //if (this.curTab.getIsHideCardToggle()) {
+        //    this.aCard.hide();
+        //}
+        //else {
+        //    this.aCard.show();
+        //}
 
         if (this.curTab.getIsHideRecordNav()) {
             this.aNext.hide();
@@ -3727,8 +3753,8 @@
 
 
         //	Single-Multi
-        this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
-        this.aCard.setPressed(this.curGC.getIsCardRow());
+        //this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
+        //this.aCard.setPressed(this.curGC.getIsCardRow());
         this.setBackEnable();
 
         if (this.aChat) {
@@ -4249,13 +4275,19 @@
             if (currentTab.tabView.length > 0) {
                 this.tabStack[this.tabStack.length - 1].tabView.pop();
                 var defaultTabLayout = currentTab.tabView[(currentTab.tabView.length - 1)];
-                if (defaultTabLayout == 'N')
+                if (defaultTabLayout == 'N') {
+                    tis.ShowHideViewIcon(tis.aMulti);
                     tis.curGC.switchMultiRow();
-                else if (defaultTabLayout == 'Y')
+                }
+                else if (defaultTabLayout == 'Y') {
+                    tis.ShowHideViewIcon(tis.aSingle);
                     tis.curGC.switchSingleRow(true);
+                }
                 else if (defaultTabLayout == 'C') {
+                    tis.ShowHideViewIcon(tis.aCard);
                     tis.curGC.switchCardRow(true);
                 }
+
             }
         }
 
