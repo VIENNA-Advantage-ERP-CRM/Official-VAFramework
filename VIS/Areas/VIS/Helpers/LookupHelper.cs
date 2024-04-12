@@ -126,17 +126,9 @@ namespace VIS.Classes
             try
             {
                 VLookUpInfo lInfo = null;
-                //In case of Created by and updatedby column, field id is zero
-                if (AD_Field_ID > 0)
-                {
-                    lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
-                    lookupQuery = lInfo.queryDirect;
-                }
-                else
-                {
-                    lookupQuery = "SELECT AD_User.AD_User_ID,NULL,NVL(AD_User.Name,'-1'),AD_User.IsActive FROM AD_User WHERE AD_User.Name IS NOT NULL  AND AD_User.AD_User_ID=@key";
-                }
-
+                //In case of Created by and updatedby column, field id is zero               
+                lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
+                lookupQuery = lInfo.queryDirect;
 
                 List<SqlParams> listParam = new List<SqlParams>();
                 if (Key != null)
@@ -179,8 +171,18 @@ namespace VIS.Classes
             {
                 if (AD_Window_ID > 0)
                 {
-                    GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
-                    lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+                    if (AD_Field_ID > 0)
+                    {
+                        GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+                        lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+                    }
+                    else
+                    {
+                        lInfo = new VLookUpInfo
+                        {
+                            queryDirect = "SELECT AD_User.AD_User_ID,NULL,NVL(AD_User.Name,'-1'),AD_User.IsActive FROM AD_User WHERE AD_User.Name IS NOT NULL  AND AD_User.AD_User_ID=@key"
+                        };
+                    }
                 }
                 else
                 {
@@ -365,7 +367,13 @@ namespace VIS.Classes
             {
                 isColumnMatch = true;
                 sql += " (UPPER(M_Product.Value) LIKE " + DB.TO_STRING(text) +
-                    " OR UPPER(M_Product.Name) LIKE " + DB.TO_STRING(text) + ")";
+                    " OR UPPER(M_Product.Name) LIKE " + DB.TO_STRING(text) +
+                    " OR M_Product.M_Product_ID IN (SELECT DISTINCT p.M_Product_ID FROM M_Product p LEFT OUTER JOIN M_Manufacturer mr ON (p.M_Product_ID=mr.M_Product_ID)" +
+                    " LEFT OUTER JOIN M_ProductAttributes patr ON (p.M_Product_ID=patr.M_Product_ID) WHERE (UPPER(p.Value) LIKE " + DB.TO_STRING(text) +
+                    " OR UPPER(p.Name) LIKE " + DB.TO_STRING(text) + " OR UPPER(mr.UPC) LIKE " + DB.TO_STRING(text) +
+                    " OR UPPER(patr.UPC) LIKE " + DB.TO_STRING(text) + " OR UPPER(p.UPC) LIKE " + DB.TO_STRING(text) + ")))";
+
+
                 sql += " AND ";
             }
             else if (_columnName.Equals("C_BPartner_ID"))

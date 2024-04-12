@@ -196,7 +196,7 @@
                     $isBusy.hide();
                     $IsBPartnerBusy.css("visibility", "collapse");
                     // addBPartnerDialog.dialog("close");
-                    alert(data);
+                    //alert(data);
                     $addBPartnerRoot.empty();
 
                 }
@@ -1279,7 +1279,7 @@
                     return false;
                 }
                 if ($chkCustomer.is(":checked") == false && $chkVendor.is(":checked") == false && $chkProspect.is(":checked") == false && $chkEmployee.is(":checked") == false) {
-                    alert(VIS.Msg.getMsg("PleaseSelectBusinessType"));
+                    VIS.ADialog.info("PleaseSelectBusinessType");
                     if ($isBusy != null) {
                         $isBusy.hide();
                     }

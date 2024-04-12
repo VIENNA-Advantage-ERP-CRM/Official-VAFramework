@@ -2570,11 +2570,15 @@
                                     parseObj[Object.keys(result[i])[0].toLowerCase()] = result[i][Object.keys(result[i])[0]];
                                     parseObj[Object.keys(result[i])[1].toLowerCase()] = result[i][Object.keys(result[i])[1]];
                                     parseObj[Object.keys(result[i])[2].toLowerCase()] = result[i][Object.keys(result[i])[2]];
+                                    if (columnName.toUpperCase() == "M_PRODUCT_ID" && parseObj.finalvalue.indexOf(term) == -1) {
+                                        parseObj.finalvalue = parseObj.finalvalue + '_' + term;
+                                    }
                                     res.push({
                                         id: parseObj.id,
                                         value: VIS.Utility.Util.getIdentifierDisplayVal(parseObj.finalvalue)
                                     });
                                 }
+
                                 response(res);
                             }
                             if (res.length == 0) {
@@ -2600,6 +2604,11 @@
                         }, 500);
                     } else {
                         self.setValue(item.id, true, true);
+
+                        if (columnName.toUpperCase() =='M_PRODUCT_ID') {
+                            VIS.context.setContext(self.lookup.windowNo, "AttrCode", item.id);
+                        }
+
                         if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
                             setTimeout(function () {
                                 self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, item.id);
