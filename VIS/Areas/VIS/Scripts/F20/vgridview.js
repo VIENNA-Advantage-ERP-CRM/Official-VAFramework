@@ -58,8 +58,8 @@
                     } else {
                         // main view
                         //self.aPanel.getRoot().find(' .vis-multi:first').click();
-                        self.aPanel.actionPerformedCallback(self.aPanel, "Multi");
-                        self.aPanel.setLastView("Multi");
+                        self.aPanel.actionPerformedCallback(self.aPanel, "Single");
+                        //self.aPanel.setLastView("Multi");
                     }
                 }
                 else if (self.grid.columns[evt.column].gridField.getDisplayType() == VIS.DisplayType.TelePhone) {

@@ -404,6 +404,7 @@ select {
 }
 
 
+
 /*Sessions*/
 .vis-chatOverlay {
     position: absolute;
@@ -470,5 +471,54 @@ select {
 }
 
 
+/*End */
+
+
+.vis-blinking-dot {
+    width: 14px;
+    height: 14px;
+    background-color: rgb(233, 0, 0);
+    border-radius: 50%;
+    animation: blinkdot 1s infinite;
+}
+
+.vis-blinkingDotContainer {
+    padding: 0.8rem 0.4rem;    
+}
+
+.vis-autodatamarkingfilename {
+    font-size: 14px;
+}
+
+.vis-autodataMkFilename {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+}
+.vis-autodatafont {
+    font-size: 14px;
+    cursor: pointer;
+    color: rgba(var(--v-c-primary), 1);
+}
+
+.vis-autodatafontplus {
+    font-size: 16px;
+    cursor: pointer;
+    color: rgba(var(--v-c-primary),1);
+}
+
+@keyframes blinkdot {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
 
 /*End */

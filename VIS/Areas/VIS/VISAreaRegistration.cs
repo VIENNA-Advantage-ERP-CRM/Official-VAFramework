@@ -33,8 +33,6 @@ namespace VIS
 
             ScriptBundle modScript_v2 = new ScriptBundle("~/Areas/VIS/Scripts/VIS_v2");
 
-
-
              modScript.Include(
                    "~/Areas/VIS/Scripts/app/native-extension.js",
                  "~/Areas/VIS/Scripts/app/utility.js",
@@ -145,7 +143,6 @@ namespace VIS
 
                     "~/Areas/VIS/Scripts/app/ssemanager.js",
 
-
                     "~/Areas/VIS/Scripts/tabpanels/verinfo.js",
                      "~/Areas/VIS/Scripts/tabpanels/HistoryDetailsTabPanel.js",
                      "~/Areas/VIS/Scripts/tabpanels/surveyPanel.js",
@@ -204,18 +201,18 @@ namespace VIS
                 );
 
 
-             style.Include("~/Areas/VIS/Content/F20/Color.css",
-                 "~/Areas/VIS/Content/F20/Site.css",
-                 "~/Areas/VIS/Content/F20/Window.css",
-                         "~/Areas/VIS/Content/F20/Controls.css",
-                          "~/Areas/VIS/Content/F20/Media.css",
-                          "~/Areas/VIS/Content/F20/ThemeCnfgtr.css"
-                 );
-             style.Include("~/Areas/VIS/Content/VIS.rtl.css");
+            style.Include("~/Areas/VIS/Content/F20/Color.css",
+                "~/Areas/VIS/Content/F20/Site.css",
+                "~/Areas/VIS/Content/F20/Window.css",
+                        "~/Areas/VIS/Content/F20/Controls.css",
+                         "~/Areas/VIS/Content/F20/Media.css",
+                         "~/Areas/VIS/Content/F20/ThemeCnfgtr.css"
+                );
+            style.Include("~/Areas/VIS/Content/VIS.rtl.css");
 
 
 
-           /* style.Include("~/Areas/VIS/Content/VIS.all.min.css");
+            /*style.Include("~/Areas/VIS/Content/VIS.all.min.css");
             modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js");
             modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
             modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");*/
