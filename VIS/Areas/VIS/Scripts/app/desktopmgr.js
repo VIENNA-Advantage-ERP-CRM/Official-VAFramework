@@ -30,6 +30,7 @@
         var $vis_menuSearch = $('#vis_menuSearch'); //Search Box
         var $menuTree = $('#vis_divTree');  //tree div
         var $menuOverlay = $("#vis_menuOverlay"); // Menu Overlay div
+        var $vIcon = $(".vis-app-footer-c-r");
 
         var $mainNavigationDiv = null;
 
@@ -54,6 +55,10 @@
         * layout and events binding
         */
         function bindEvents() {
+
+            $vIcon.on('click', function () {
+                VIS.UserSession.show();
+            });
 
             $menuOverlay.on(VIS.Events.onTouchStartOrClick, function (event) {
                 event.preventDefault();

@@ -150,7 +150,8 @@ namespace VIS
                      "~/Areas/VIS/Scripts/tabpanels/HistoryDetailsTabPanel.js",
                      "~/Areas/VIS/Scripts/tabpanels/surveyPanel.js",
                    "~/Areas/VIS/Scripts/TestPanel.js",
-                  "~/Areas/VIS/Scripts/app/forms/form.js");
+                  "~/Areas/VIS/Scripts/app/forms/form.js",
+                  "~/Areas/VIS/Scripts/home/usersession.js");
 
 
              modScript.Include(

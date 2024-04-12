@@ -171,6 +171,8 @@ namespace ModelLibrary.PushNotif
     {
         public int UserId { get; set; }
          public string Name { get; set; }
+        public DateTime LoginTime { get; set; } = DateTime.Now.ToUniversalTime();
+        public int Key { get; set; }
     }
 
 
@@ -183,6 +185,10 @@ namespace ModelLibrary.PushNotif
         private static SessionManager _obj = null;
         private static object _lockObj = new object();
         private Dictionary<int,SessionData> _sessionLst = null;
+
+
+
+
 
         /// <summary>
         /// Get Single constructor
@@ -219,7 +225,7 @@ namespace ModelLibrary.PushNotif
                 }
             }
             //Notify
-            SSEManager.Get().AddMessage(sessionid, data.Name + " Logged in" , "LOGIN", SSEManager.Cast.BroadCast);
+            SSEManager.Get().AddMessage(sessionid, Newtonsoft.Json.JsonConvert.SerializeObject(data), "LOGIN", SSEManager.Cast.BroadCast);
         }
         public void RemoveSession(int sessionid)
         {
@@ -235,13 +241,18 @@ namespace ModelLibrary.PushNotif
             if (sData != null)
             {
                 //Notify
-                SSEManager.Get().AddMessage(sessionid, sData.Name +  " Logged off", "LOGOFF", SSEManager.Cast.BroadCast);
+                SSEManager.Get().AddMessage(sessionid, Newtonsoft.Json.JsonConvert.SerializeObject(sData), "LOGOFF", SSEManager.Cast.BroadCast);
             }
         }
 
         public List<int> GetSessionIds()
         {
             return _sessionLst.Keys.ToList();
+        }
+
+        public Dictionary<int,SessionData> GetSessions()
+        {
+            return _obj._sessionLst;
         }
     }
 }
