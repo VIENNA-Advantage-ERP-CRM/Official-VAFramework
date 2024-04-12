@@ -729,6 +729,7 @@
     <Content Include="Areas\VIS\Scripts\F20\atabpanel.js" />
     <Content Include="Areas\VIS\Scripts\F20\aviewcontroller.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabbedpanemgr.js" />
+    <Content Include="Areas\VIS\Scripts\home\usersession.js" />
     <Content Include="Areas\VIS\Scripts\F20\themecnfgtr.js" />
     <Content Include="Areas\VIS\Scripts\F20\thememgr.js" />
     <Content Include="Areas\VIS\Scripts\F20\vcardview.js" />

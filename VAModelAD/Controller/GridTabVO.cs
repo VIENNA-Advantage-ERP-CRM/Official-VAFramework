@@ -549,7 +549,10 @@ namespace VAdvantage.Controller
                 vo.IsMaintainVersions = Utility.Util.GetValueOfString(dr["IsMaintainVersions"]).Equals("Y");
 
                 vo.TabLayout = Utility.Util.GetValueOfString(dr["TabLayout"]);
-
+                if (String.IsNullOrEmpty(vo.TabLayout))
+                {
+                    vo.TabLayout = "N";
+                }
                 vo.NewRecordView = Util.GetValueOfString(dr["NewRecordView"]);
 
                 vo.RecordLimit = Util.GetValueOfInt(dr["RecordLimit"]);

@@ -38,12 +38,7 @@
                         if (returnedItem[i].Event == "MSG") {
                             toastr.success(returnedItem[i].Message, '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
                         }
-                        else if (returnedItem[i].Event == "LOGIN") {
-                            //toastr.success(returnedItem[i].Message, '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
-                        }
-                        else if (returnedItem[i].Event == "LOGOFF") {
-                            //toastr.success(returnedItem[i].Message, '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
-                        }
+                        
                         else
                             notify(returnedItem[i]);
                     }

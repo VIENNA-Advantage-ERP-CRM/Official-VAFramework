@@ -325,6 +325,7 @@ namespace VIS.Controllers
                     ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
                     sessionData.UserId = ctx.GetAD_User_ID();
                     sessionData.Name = ctx.GetAD_User_Name();
+                    sessionData.Key = ctx.GetAD_Session_ID();
                     ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
 
                     _lockSlim.EnterReadLock();

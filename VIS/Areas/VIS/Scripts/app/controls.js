@@ -1080,7 +1080,7 @@
 
         IControl.call(this, $ctrl, VIS.DisplayType.Label, true, isADControl ? name : "lbl" + name);
         if (isMandatory) {
-            $ctrl.text(value).append("<sup>*</sup>");
+            $ctrl.append('<span>'+value+'</span>').append("<sup>*</sup>");
         }
         else {
             $ctrl.text(value);

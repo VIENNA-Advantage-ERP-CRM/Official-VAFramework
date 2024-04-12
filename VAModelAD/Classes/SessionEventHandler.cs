@@ -20,6 +20,7 @@ namespace VAdvantage.Classes
                 {
                     s.Logout();
                 }
+                //ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), "Session End","MSG", ModelLibrary.PushNotif.SSEManager.Cast.BroadCast);
                 ModelLibrary.PushNotif.SessionManager.Get().RemoveSession(ctx.GetAD_Session_ID());
               }
             catch(Exception ex)
