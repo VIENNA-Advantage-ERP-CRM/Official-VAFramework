@@ -212,10 +212,10 @@ namespace VIS
 
 
 
-            /*style.Include("~/Areas/VIS/Content/VIS.all.min.css");
+            style.Include("~/Areas/VIS/Content/VIS.all.min.css");
             modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js");
             modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
-            modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");*/
+            modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");
 
             /// with webpack and want to genrate files with version
             style.Include("~/Areas/VIS/Content/VIS.all.min{version}.css");
