@@ -173,7 +173,7 @@
                     <td style="@sty">
                         @Html.LabelFor(m => m.Login2Model.Client)
                     <td style="width: 100%">
-                        @Html.DropDownListFor(m => m.Login2Model.Client, new SelectList(ViewBag.ClientList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Client)), new { id = "vis_home_client" })
+                        @Html.DropDownListFor(m => m.Login2Model.Client, new SelectList(ViewBag.ClientList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Client)),@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectClient"), new { id = "vis_home_client" })
                         @Html.HiddenFor(m => m.Login2Model.ClientName, new { id = "vis_home_clientName" })
                     </td>
 
@@ -184,17 +184,17 @@
                         @Html.LabelFor(m => m.Login2Model.Org)
                     </td>
                     <td style="width: 100%">
-                        @Html.DropDownListFor(m => m.Login2Model.Org, new SelectList(ViewBag.OrgList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Org)), new { id = "vis_home_org" })
+                        @Html.DropDownListFor(m => m.Login2Model.Org, new SelectList(ViewBag.OrgList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Org)),@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectOrganization"), new { id = "vis_home_org" })
                         @Html.HiddenFor(m => m.Login2Model.OrgName, new { id = "vis_home_orgName" })
                     </td>
                 </tr>
 
                 <tr>
-                    <td style="@sty">
+                    <td style="@sty">                                                           
                         @Html.LabelFor(m => m.Login2Model.Warehouse)
                     </td>
                     <td style="width: 100%">
-                        @Html.DropDownListFor(m => m.Login2Model.Warehouse, new SelectList(ViewBag.WareHouseList, "Key", "Name"), new { id = "vis_home_warehouse" })
+                        @Html.DropDownListFor(m => m.Login2Model.Warehouse, new SelectList(ViewBag.WareHouseList, "Key", "Name"), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectWarehouse"),new { id = "vis_home_warehouse" })
                         @Html.HiddenFor(m => m.Login2Model.WarehouseName, new { id = "vis_home_warehouseName" })
                         @Html.HiddenFor(m => m.Login2Model.Warehouse, new { id = "vis_home_warehouseId" })
                         @Html.HiddenFor(m => m.Login2Model.LoginLanguage, new { id = "vis_home_langugage" })
