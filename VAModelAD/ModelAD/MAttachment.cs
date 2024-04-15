@@ -2268,20 +2268,22 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
         {
             try
             {
-                var client = new HttpClient();
                 //read file in byte array
-                byte[] filedata = System.IO.File.ReadAllBytes(filepath);
-                string filename = Path.GetFileName(filepath);
-                string fullPath = Path.Combine(PreAuthURL, filename);
-                var request = new HttpRequestMessage(HttpMethod.Put, fullPath);
-                request.Headers.Add("opc-meta-version", filename);
-                request.Content = new ByteArrayContent(filedata);
-                var response = await client.SendAsync(request).ConfigureAwait(false);
-                if (!response.IsSuccessStatusCode)
-                    return "FileWriteError";
-                response.EnsureSuccessStatusCode();
-                System.Console.WriteLine(await response.Content.ReadAsStringAsync());
-                return Msg.GetMsg(_ct, "AttachedFiles");
+                using (HttpClient _httpClient = new HttpClient())
+                {
+                    byte[] filedata = System.IO.File.ReadAllBytes(filepath);
+                    string filename = Path.GetFileName(filepath);
+                    string fullPath = Path.Combine(PreAuthURL, filename);
+                    var request = new HttpRequestMessage(HttpMethod.Put, fullPath);
+                    request.Headers.Add("opc-meta-version", filename);
+                    request.Content = new ByteArrayContent(filedata);
+                    var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode)
+                        return "FileWriteError";
+                    response.EnsureSuccessStatusCode();
+                    System.Console.WriteLine(await response.Content.ReadAsStringAsync());
+                    return Msg.GetMsg(_ct, "AttachedFiles");
+                }
             }
             catch (Exception e)
             {
@@ -2301,26 +2303,28 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
         {
             try
             {
-                HttpClient _httpClient = new HttpClient();
-                var response = await _httpClient.GetAsync(Path.Combine(preAuth, fileName));
-                if (!response.IsSuccessStatusCode)
+                using (HttpClient _httpClient = new HttpClient())
                 {
-                    System.Console.WriteLine("Error while downloading File");
-                    return "DownloadingError";
+                    var response = await _httpClient.GetAsync(Path.Combine(preAuth, fileName));
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        System.Console.WriteLine("Error while downloading File");
+                        return "DownloadingError";
+                    }
+                    using (var fileStream = new FileStream(Path.Combine(filepath, fileName), FileMode.Create))
+                    {
+                        await response.Content.CopyToAsync(fileStream);
+                    }
+                    return "";
                 }
-                using (var fileStream = new FileStream(Path.Combine(filepath, fileName), FileMode.Create))
-                {
-                    await response.Content.CopyToAsync(fileStream);
-                }
-                return "";
             }
             catch (Exception e)
             {
                 System.Console.WriteLine("Error while downloading File");
                 return "DownloadingError";
-            }
+            }           
         }
-        
+
     }
 
     public class AttachmentLineInfo
