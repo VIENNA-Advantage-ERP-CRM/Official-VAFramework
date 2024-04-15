@@ -2560,6 +2560,11 @@ display:none !important;
     justify-content: center;
     padding: 3px !important;
 }
+.vis-grid-defualtImage {
+    background-color: rgba(var(--v-c-secondary), 1) !important;
+    color: rgba(var(--v-c-on-secondary), .8);
+}
+
 
 .vis-window-instruc-overlay-new {
     position: absolute;

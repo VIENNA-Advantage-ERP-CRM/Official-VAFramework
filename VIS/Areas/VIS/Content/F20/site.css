@@ -403,6 +403,77 @@ select {
     margin: 4px 4px 0 0;
 }
 
+
+
+/*Sessions*/
+.vis-chatOverlay {
+    position: absolute;
+    background: rgba(var(--v-c-common), 1);
+    right: 0px;
+    width: 250px;
+    top: 41px;
+    visibility:hidden;
+    bottom: 24px;
+    z-index: 9;
+    padding: .8rem 1rem;
+    border-left: 1px solid rgba(var(--v-c-secondary), 1);
+    border-top: 1px solid rgba(var(--v-c-secondary), 1);
+}
+
+    .vis-chatOverlay ul {
+        height: calc(100% - 48px);
+        overflow: auto;
+    }
+
+.vis-chatBoxInputWrap textarea {
+    flex: 1;
+    border: none;
+    background: none;
+    resize: none;
+}
+
+.vis-chatBoxInputWrap:has(textarea:focus) {
+    border-color: rgba(var(--v-c-primary), 1);
+}
+
+.vis-chatBoxInputWrap {
+    border-radius: .3rem;
+    padding: 0 .2rem;
+    border: 1px solid rgba(var(--v-c-on-secondary),.3);
+}
+
+    .vis-chatBoxInputWrap button {
+        background: none;
+        border: none;
+        color: rgba(var(--v-c-primary), 1);
+        font-size: 1rem;
+    }
+
+.vis-chatOverlay li {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+}
+
+
+
+.vis-chatOverlay p {
+    margin: 0;
+    flex: 1;
+}
+
+.vis-chatLoginStatus {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: green;
+}
+
+
+/*End */
+
+
 .vis-blinking-dot {
     width: 14px;
     height: 14px;
@@ -449,4 +520,5 @@ select {
         opacity: 0;
     }
 }
+
 /*End */

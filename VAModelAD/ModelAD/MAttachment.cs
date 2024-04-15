@@ -24,6 +24,8 @@ using System.Net;
 using System.Data.SqlClient;
 using System.Web;
 using VAdvantage.AzureBlob;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace VAdvantage.Model
 {
@@ -1525,7 +1527,7 @@ namespace VAdvantage.Model
 
                 System.IO.File.Delete(zipfileName);
 
-                
+
                 if (GetFileLocation() == FILELOCATION_FTPLocation)
                 {
                     try
@@ -1656,6 +1658,59 @@ namespace VAdvantage.Model
                     }
                     return true;
                 }
+                // VIS071- If file upload location is Oracle OCI Bucket
+                else if (GetFileLocation() == FILELOCATION_OCIObjectStorage)
+                {
+                    try
+                    {
+                        SetFileLocation(FILELOCATION_OCIObjectStorage);
+                        if (cInfo == null)
+                        {
+                            if (AD_Client_ID > 0)
+                            {
+                                cInfo = new X_AD_ClientInfo(GetCtx(), AD_Client_ID, Get_Trx());
+                            }
+                            else
+                            {
+                                cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(cInfo.GetAD_WebServiceURL()))
+                        {
+                            error.Append(Msg.GetMsg(GetCtx(), "VIS_OCIBucketUriEmpty"));
+                            CleanUp(filePath + "\\" + folderKey + "\\" + fileName, zipfileName, filePath + "\\" + outputfileName, zipinput);
+                            return false;
+                        }
+                        Task<string> uploadTask = UploadFilesToOCI(GetCtx(), filePath + "\\" + folderKey + "\\" + fileName, cInfo.GetAD_WebServiceURL());
+                        string result = uploadTask.Result;
+                        if (result.ToUpper().Contains("ERROR"))
+                        {
+                            error.Append(Msg.GetMsg(GetCtx(), result));
+                            CleanUp(filePath + "\\" + folderKey + "\\" + fileName, zipfileName, filePath + "\\" + outputfileName, zipinput);
+                            return false;
+                        }
+
+                        CleanUp(filePath + "\\" + folderKey + "\\" + fileName, zipfileName, filePath + "\\" + outputfileName, zipinput);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Severe("OCI Location->" + ex.Message);
+                        error.Append(ex.Message);
+                        if (!Force)
+                        {
+                            CleanUp(filePath + "\\" + folderKey + "\\" + fileName, zipfileName, filePath + "\\" + outputfileName, zipinput);
+                            return false;
+                        }
+                    }
+                    finally
+                    {
+                        CleanUp(filePath + "\\" + folderKey + "\\" + fileName, zipfileName, filePath + "\\" + outputfileName, zipinput);
+                    }
+                    return true;
+                }
+
                 else
                 {
                     //SetIsFileSystem(false);
@@ -1957,7 +2012,7 @@ namespace VAdvantage.Model
                         return "";
                     }
                     // VIS264 - If file location is Azure Blob Storage
-                    else if(fileLocation == X_AD_Attachment.FILELOCATION_AzureBlobStorage)
+                    else if (fileLocation == X_AD_Attachment.FILELOCATION_AzureBlobStorage)
                     {
                         // VIS264 - Get file from Azure Blob container and save it in temp folder
 
@@ -1994,6 +2049,37 @@ namespace VAdvantage.Model
                         else
                         {
                             return Msg.GetMsg(GetCtx(), "VIS_AzureContainerUriEmpty");
+                        }
+                    }
+                    //VIS71- if file location is OCI Oracle Bucket
+                    else if (fileLocation == X_AD_Attachment.FILELOCATION_OCIObjectStorage)
+                    {
+                        X_AD_ClientInfo cInfo = null;
+                        if (AD_Client_ID > 0)
+                        {
+                            cInfo = new X_AD_ClientInfo(GetCtx(), AD_Client_ID, Get_Trx());
+                        }
+                        else
+                        {
+                            cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
+                        }
+
+                        string containerUri = cInfo.GetAD_WebServiceURL();
+
+                        if (!string.IsNullOrEmpty(containerUri))
+                        {
+                            string downloadFullPath = Path.Combine(Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            var result = System.Threading.Tasks.Task.Run(async () => await DownloadFilesFromOCI(containerUri, Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]))).ConfigureAwait(false).GetAwaiter().GetResult();
+                            if (Directory.GetFiles(Path.Combine(filePath, "TempDownload", folder)).Length > 0)
+                            {
+                                return folder;
+                            }
+                            else
+                                return Msg.GetMsg(GetCtx(), "VIS_OCIErrorOccurred");
+                        }
+                        else
+                        {
+                            return Msg.GetMsg(GetCtx(), "VIS_OCIUriEmpty");
                         }
                     }
                     //unzipfile
@@ -2165,11 +2251,80 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
 
                 response.Close();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _log.Log(Level.WARNING, "DeleteFileFromFtpServer -> ", ex.Message);
             }
         }
+
+        /// <summary>
+        /// To save attachment on OCI(Oracle Cloud Infrastructure) object storage bucket
+        /// </summary>
+        /// <param name="_ct">context</param>
+        /// <param name="filepath">file path with folder and Name of file</param>
+        /// <param name="PreAuthURL">OCI Pre-Autherization Request URL</param>
+        /// <returns>Status of Request files saved or not</returns>
+        public static async System.Threading.Tasks.Task<string> UploadFilesToOCI(Ctx _ct, string filepath, string PreAuthURL)
+        {
+            try
+            {
+                //read file in byte array
+                using (HttpClient _httpClient = new HttpClient())
+                {
+                    byte[] filedata = System.IO.File.ReadAllBytes(filepath);
+                    string filename = Path.GetFileName(filepath);
+                    string fullPath = Path.Combine(PreAuthURL, filename);
+                    var request = new HttpRequestMessage(HttpMethod.Put, fullPath);
+                    request.Headers.Add("opc-meta-version", filename);
+                    request.Content = new ByteArrayContent(filedata);
+                    var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode)
+                        return "FileWriteError";
+                    response.EnsureSuccessStatusCode();
+                    System.Console.WriteLine(await response.Content.ReadAsStringAsync());
+                    return Msg.GetMsg(_ct, "AttachedFiles");
+                }
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine("FileWriteError: " + e.Message);
+                return "FileWriteError";
+            }
+        }
+
+        /// <summary>
+        /// To download attachemnt from OCI(Oracle Cloud Infrastructure) object storage bucket
+        /// </summary>
+        /// <param name="preAuth">OCI Pre-Autherization Request URL</param>
+        /// <param name="filepath">file path with folder</param>
+        /// <param name="fileName">Name of the file</param>
+        /// <returns>Status of files downloaded or not</returns>
+        public static async System.Threading.Tasks.Task<string> DownloadFilesFromOCI(string preAuth, string filepath, string fileName)
+        {
+            try
+            {
+                using (HttpClient _httpClient = new HttpClient())
+                {
+                    var response = await _httpClient.GetAsync(Path.Combine(preAuth, fileName));
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        System.Console.WriteLine("Error while downloading File");
+                        return "DownloadingError";
+                    }
+                    using (var fileStream = new FileStream(Path.Combine(filepath, fileName), FileMode.Create))
+                    {
+                        await response.Content.CopyToAsync(fileStream);
+                    }
+                    return "";
+                }
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine("Error while downloading File");
+                return "DownloadingError";
+            }           
+        }
+
     }
 
     public class AttachmentLineInfo
