@@ -7490,6 +7490,14 @@
     };
 
     /**
+     * Get Action Params
+     * @return json objectof action params
+     * */
+    GridField.prototype.getActionParams = function () {
+        return this.vo.ADActionParams;
+    };
+
+    /**
      *  Refresh Lookup if the lookup is unstable
      *  @return true if lookup is validated
      */
