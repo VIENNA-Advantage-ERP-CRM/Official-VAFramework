@@ -3087,7 +3087,7 @@
      *	tab change
      *  @param action tab item's id
      */
-    APanel.prototype.tabActionPerformed = function (action, actionType, actionName) {
+    APanel.prototype.tabActionPerformed = function (action, actionType, actionName,actionParams) {
 
         /* Check for any window or form added in action*/
         if ((actionType == 'WIW' || actionType == 'FOM') && actionName != "") {
@@ -3250,7 +3250,7 @@
                                     selfPanel.curGC = gc;
 
 
-                                selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st);
+                                selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st, actionParams);
                             });
                         }
                     }
@@ -3302,13 +3302,13 @@
 
         }
         if (canExecute) {
-            selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st);
+            selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st,actionParams);
         }
 
         return true;
     };
 
-    APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st) {
+    APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st,aParams) {
 
 
         curEle.setVisible(false);

@@ -418,10 +418,25 @@ namespace VAdvantage.Controller
                     else if (columnName.Equals("AD_Action", StringComparison.OrdinalIgnoreCase))
                     {
                         vo.ADAction = Util.GetValueOfString(dr[i].ToString());
-                    } 
+                    }
                     else if (columnName.Equals("AD_ACTIONNAME", StringComparison.OrdinalIgnoreCase))
                     {
                         vo.ADActionName = Util.GetValueOfString(dr[i].ToString());
+                    }
+                    else if (columnName.Equals("ActionParams", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var ap = Util.GetValueOfString(dr[i].ToString());
+                        if(!string.IsNullOrEmpty(ap))
+                        {
+                            try
+                            {
+                                vo.ADActionParams = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(ap);
+                            }
+                            catch
+                            {
+                                VLogger.Get().Warning("Action param not in correct json format [" + columnName + "]");
+                            }
+                        }
                     }
                 }
                 if (vo.Header == null)
