@@ -969,7 +969,7 @@
                     data: { Record_ID: Record_ID, isOrder: isOrder },
                     success: function (data) {
                         try {
-                            var arguments = [];//new Object[6];
+                            var myarguments = [];//new Object[6];
                             var filled = false;
                             var dr = new VIS.DB.DataReader().toJson(data);
                             var format = VIS.DisplayType.GetNumberFormat(VIS.DisplayType.Amount);
@@ -977,19 +977,19 @@
                             if (dr.read()) {
                                 //	{0} - Number of lines
                                 var lines = dr.getInt(0);
-                                arguments[0] = lines;
+                                myarguments[0] = lines;
                                 //	{1} - Line toral
-                                arguments[1] = format.getLocaleAmount(dr.getDecimal(2));
+                                myarguments[1] = format.getLocaleAmount(dr.getDecimal(2));
                                 //	{2} - Grand total (including tax, etc.)
 
-                                arguments[2] = format.getLocaleAmount(dr.getDecimal(3));
+                                myarguments[2] = format.getLocaleAmount(dr.getDecimal(3));
                                 //	{3} - Currency
                                 var currency = dr.getString(1);
-                                arguments[3] = currency;
+                                myarguments[3] = currency;
                                 //	(4) - Grand total converted to Base
 
-                                arguments[4] = format.getLocaleAmount(dr.getDecimal(4));
-                                arguments[5] = ctx.getContext("$CurrencyISO");
+                                myarguments[4] = format.getLocaleAmount(dr.getDecimal(4));
+                                myarguments[5] = ctx.getContext("$CurrencyISO");
                                 filled = true;
                             }
                         }
@@ -998,10 +998,10 @@
                         }
 
                         if (filled) {
-                            if (arguments[2] === arguments[4])
-                                resolve(mf.format(arguments));
+                            if (myarguments[2] === myarguments[4])
+                                resolve(mf.format(myarguments));
                             else
-                                resolve(mfMC.format(arguments));
+                                resolve(mfMC.format(myarguments));
                         }
                         else
                             resolve(" ");
@@ -1043,7 +1043,7 @@
              *	(4) - Grand total converted to local currency
              *	{5} - Base Currency
              */
-            var arguments = [];//new Object[6];
+            var myarguments = [];//new Object[6];
             var filled = false;
             //
 
@@ -1075,20 +1075,20 @@
                 if (dr.read()) {
                     //	{0} - Number of lines
                     var lines = dr.getInt(0);
-                    arguments[0] = lines;
+                    myarguments[0] = lines;
                     //	{1} - Line toral
                     var lineTotal = dr.getDecimal(2).toLocaleString();//.toFixed(2);
-                    arguments[1] = lineTotal;
+                    myarguments[1] = lineTotal;
                     //	{2} - Grand total (including tax, etc.)
                     var grandTotal = dr.getDecimal(3).toLocaleString();//.toFixed(2);
-                    arguments[2] = grandTotal;
+                    myarguments[2] = grandTotal;
                     //	{3} - Currency
                     var currency = dr.getString(1);
-                    arguments[3] = currency;
+                    myarguments[3] = currency;
                     //	(4) - Grand total converted to Base
                     var grandBase = dr.getDecimal(4).toLocaleString();//.toFixed(2);
-                    arguments[4] = grandBase;
-                    arguments[5] = ctx.getContext("$CurrencyISO");
+                    myarguments[4] = grandBase;
+                    myarguments[5] = ctx.getContext("$CurrencyISO");
                     filled = true;
                 }
             }
@@ -1100,10 +1100,10 @@
                     dr.dispose();
             }
             if (filled) {
-                if (arguments[2] === arguments[4])
-                    return mf.format(arguments);
+                if (myarguments[2] === myarguments[4])
+                    return mf.format(myarguments);
                 else
-                    return mfMC.format(arguments);
+                    return mfMC.format(myarguments);
             }
             return " ";
         }	//	Order || Invoice
@@ -5744,7 +5744,7 @@
     GridTable.prototype.fireDataStatusEEvent = function (AD_Message, info, isError, isWarn) {
 
         if (arguments.length === 1) {
-            this.fireDataStatusEEvent(arguments[0].value, arguments[0].name, true, false);
+            this.fireDataStatusEEvent(myarguments[0].value, myarguments[0].name, true, false);
         }
         else {
             var e = this.createDSE();

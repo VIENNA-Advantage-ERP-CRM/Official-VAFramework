@@ -746,6 +746,12 @@
     <Content Include="Areas\VIS\Scripts\processengine\processctl.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processinfo.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processparameter.js" />
+    <Content Include="Areas\VIS\Scripts\react\Component\TestComponent.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\index.jsx" />
+    <Content Include="Areas\VIS\Scripts\src\cssStyle.css" />
+    <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
+    <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\bipanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\HistoryDetailsTabPanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\surveyPanel.js" />
@@ -755,6 +761,7 @@
     <Content Include="Areas\VIS\Scripts\VIS1_0.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS2_0.min.js" />
     <Content Include="Areas\VIS\Templates\VIS_Templates.html" />
+    <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
@@ -927,6 +934,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Areas\VIS\Views\BiPanel\GetUserBILogin.cshtml" />
+    <Content Include="babel.config.json" />
+    <Content Include="package.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -973,7 +982,12 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /E /Y /I  "$(ProjectDir)Areas\*" "$(ProjectDir)..\ViennaAdvantageWeb\Areas"</PostBuildEvent>
+    <PostBuildEvent>rmdir /s /q "$(SolutionDir)\ViennaAdvantageWeb\Areas\$(TargetName)"
+xcopy /E /Y /I  "$(ProjectDir)Areas\*" "$(ProjectDir)..\ViennaAdvantageWeb\Areas"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
