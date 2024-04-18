@@ -1,6 +1,8 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
 
+//VIS Replace with module prefix
+
 // Ensure VIS namespace and dependencies are available
 window.VIS = window.VIS || {};
 (function (VIS, $) {
@@ -13,7 +15,7 @@ window.VIS = window.VIS || {};
     // Initialize method to render React component dynamically
     VIS.React.prototype.init = function (windowNo, frame, componentName) {
         // Lazy load the component based on componentName
-        const MyComponent = React.lazy(() => import(`./Component/${componentName}`));
+        const MyComponent = React.lazy(() => import(`./pages/${componentName}`));
 
         // Render the component with Suspense for fallback
         ReactDOM.createRoot(frame.getContentGrid()[0]).render(
