@@ -18,32 +18,30 @@
 
     if (!ViewBag.disableMenu)
     {
-<ul class="vis-app-hdr-l">
-    <li>
-        <a href="javascript:void(0)" class="vis-app-hdr-l-menu" title="@GetMsg((string)ViewBag.culture, "AppMenu") @GetMsg((string)ViewBag.culture, "Shct_AppMenu")" id="vis_appMenu">
-            <i class="fa fa-bars"></i>
-        </a>
-    </li>
-    <li>
-        <span class="vis-app-v-line"></span>
-    </li>
-    <li style="display:none">
-        <a href="javascript:void(0)" class="vis-app-hdr-l-menu" title="@GetMsg((string)ViewBag.culture, "InfoWindow")" id="vis_appInfoWindow">
-            <i class="fa fa-info"></i>
-        </a>
-    </li>
-    <!-- Show Config File Name If Auto data marking enabled -->
-    @if (VAdvantage.Utility.Env.IsModuleInstalled("VA093_") && ViewBag.IsAutoDataMarking)
-    {
-        <li class="vis-blinkingDotContainer"><div class="vis-blinking-dot"></div></li>
-        <li>
-            <span class="d-inline-block vis-autodatamarkingfilename mr-1 vis-autodataMkFilename" id="vis_configfilename">@ViewBag.ConfigModule</span>
-            <span class="d-inline-block vis-autodatafontplus" id="vis_addconfigfile"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
-        </li>
-    }
-    @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-alerts" title="Alerts">Alerts</a><span class="vis-notify-counter">55</span></li>*@
-    @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-call" title="@GetMsg((string)ViewBag.culture, "VA048_CallingInterface")" id="vis_appCall">Call</a></li>*@
-</ul>
+        <ul class="vis-app-hdr-l">
+            <li>
+                <a href="javascript:void(0)" class="vis-app-hdr-l-menu" title="@GetMsg((string)ViewBag.culture, "AppMenu") @GetMsg((string)ViewBag.culture, "Shct_AppMenu")" id="vis_appMenu">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </li>
+            <li>
+                <span class="vis-app-v-line"></span>
+            </li>
+            <li style="display:none">
+                <a href="javascript:void(0)" class="vis-app-hdr-l-menu" title="@GetMsg((string)ViewBag.culture, "InfoWindow")" id="vis_appInfoWindow">
+                    <i class="fa fa-info"></i>
+                </a>
+            </li>
+            <!-- Show Config File Name If Auto data marking enabled -->
+            <li class="vis-blinkingDotContainer @ViewBag.ConfigFileBlock" id="vis_recordingADM"><div class="vis-blinking-dot"></div></li>
+            <li class="@ViewBag.ConfigFileBlock" id="vis_configfile">
+                <span class="d-inline-block vis-autodatamarkingfilename mr-1 vis-autodataMkFilename" id="vis_configfilename">@ViewBag.ConfigModule</span>
+                <span class="d-inline-block vis-autodatafontplus" id="vis_addconfigfile"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
+            </li>
+
+            @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-alerts" title="Alerts">Alerts</a><span class="vis-notify-counter">55</span></li>*@
+            @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-call" title="@GetMsg((string)ViewBag.culture, "VA048_CallingInterface")" id="vis_appCall">Call</a></li>*@
+        </ul>
     }
     else
     {
@@ -109,12 +107,12 @@
                 <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
         </li>
         <li id="vis_userDisplayName" class="vis-app-hdr-r-user">
-            <a href="javascript:;"id="vis_userName">@ViewBag.DisplayName</a>
+            <a href="javascript:;" id="vis_userName">@ViewBag.DisplayName</a>
             @*
                 <div class="vis-div-userAvatar">*@
             @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
             {
-                ViewBag.UserPic="";
+                ViewBag.UserPic = "";
             }
             <div class="vis-app-user-img-wrap">
                 <i class="fa fa-user"></i>
