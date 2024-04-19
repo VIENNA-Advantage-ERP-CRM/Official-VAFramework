@@ -398,16 +398,18 @@ namespace VIS.Controllers
                         ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), Msg.GetMsg(ctx, "PlzLinkVAApp"));
 
                     //Show If recording happening for Auto data marking
-                    ViewBag.IsAutoDataMarking = MRole.GetDefault(ctx).IsAutoDataMarking();
                     ViewBag.ConfigModule = "";
-                    if (Env.IsModuleInstalled("VA093_") && MRole.GetDefault(ctx).IsAutoDataMarking())
+                    ViewBag.ConfigFileBlock = "vis-hideadmconfigblock";
+                    if (Env.IsModuleInstalled("VA093_") )
                     {
-                        ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name,1 AS RowNumber FROM  VA093_AutoMarkingConfig adc 
+                        ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name FROM  VA093_AutoMarkingConfig adc 
                                                 INNER JOIN AD_ModuleInfo m ON (m.AD_ModuleInfo_ID=adc.VA093_RefModule_ID)
-                                                WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()+ @"
-                                                UNION 
-                                                SELECT m.Name,2 AS RowNumber FROM AD_ModuleInfo m
-                                                WHERE m.Prefix='VA093_' ORDER BY RowNumber"));
+                                                WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()
+                                                ));
+                        if (!string.IsNullOrEmpty(ViewBag.ConfigModule))
+                        {
+                            ViewBag.ConfigFileBlock = "vis-displayadmconfigblock";
+                        }
                        
 
                     }

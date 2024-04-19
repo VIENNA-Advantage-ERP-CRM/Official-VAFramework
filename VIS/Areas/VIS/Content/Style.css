@@ -4160,3 +4160,9 @@ table.fixed-header thead tr {
         width: 200px;
     }
 }
+.vis-displayadmconfigblock {
+    display: block;
+}
+.vis-hideadmconfigblock {
+   display:none;
+}
