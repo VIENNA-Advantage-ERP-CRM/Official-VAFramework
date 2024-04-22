@@ -107,7 +107,7 @@
         this.onRowInserting = null;
         //this.curTabPanel = null;
         // this.ul_tabPanels = null;
-
+        this.actionParams = {}; // 
 
 
 
@@ -758,7 +758,7 @@
             }
             else    //  No Graphics - hide
             {
-
+                ;
             }
         }
 
@@ -1203,7 +1203,7 @@
 
     };
 
-    VIS.GridController.prototype.activate = function (oldGC) {
+    VIS.GridController.prototype.activate = function (oldGC,aParams) {
 
         this.vTable.activate();
         oldGC = oldGC || {};
@@ -1250,6 +1250,26 @@
         //    this.cardSetup = true;
         //}
 
+        //Overwrite setting according to actionParam
+        this.actionParams = aParams;
+        if (aParams) {
+            if (aParams.IsHideHeaderPanel) {
+                if (this.vHeaderPanel)
+                    this.vHeaderPanel.hidePanel();
+                else if (this.aPanel.vHeaderPanel)
+                    this.aPanel.vHeaderPanel.hidePanel();
+            }
+            else {
+                if ((this.gTab.isHPanelNotShowInMultiRow && !this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
+                    this.vHeaderPanel.showPanel();
+                    if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
+                        this.vHeaderPanel.sizeChangedListner.onSizeChanged();
+                }
+            }
+        }
+        else {
+            this.actionParams = {};
+        }
     };
 
     VIS.GridController.prototype.multiRowResize = function () {
@@ -1502,11 +1522,12 @@
         }
         //Set Initial record
         //  Set initial record
-        if (this.gTab.getTableModel().getTotalRowCount() == 0 || this.gTab.getTableModel().getTotalRowCount() == null) {
+        if (this.gTab.getTableModel().getTotalRowCount() == 0 || this.gTab.getTableModel().getTotalRowCount() == null ||
+            this.actionParams.IsTabInNewMode ) {
             //	Automatically create New Record, if none & tab not RO
             if (!this.gTab.getIsReadOnly() &&
                 (this.gTab.getIsZoomAction() == true || VIS.context.getIsAutoNew(this.windowNo)
-                || this.gTab.getIsQueryNewRecord() || this.gTab.getIsAutoNewRecord()) && parentValid) {
+                    || this.gTab.getIsQueryNewRecord() || this.gTab.getIsAutoNewRecord()) && parentValid) {
                 if (this.gTab.getIsInsertRecord() && !this.skipInserting) {
 
                     //When user clicks on new record from combo or search button, then switch view 
@@ -1520,6 +1541,7 @@
                 }
             }
         }
+
         //reset
         return false;
     };
@@ -1955,7 +1977,7 @@
 
         }
 
-        if (this.gTab.isHPanelNotShowInMultiRow && this.vHeaderPanel != null) {
+        if ((this.gTab.isHPanelNotShowInMultiRow && !this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
             this.vHeaderPanel.showPanel();
             if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
                 this.vHeaderPanel.sizeChangedListner.onSizeChanged();
@@ -1998,7 +2020,7 @@
             p1 = null;
             this.vTable.resize();
             this.vTable.refreshRow();
-            if (this.gTab.isHPanelNotShowInMultiRow && this.vHeaderPanel != null) {
+            if ((this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
                 this.vHeaderPanel.hidePanel();
                 if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
                     this.vHeaderPanel.sizeChangedListner.onSizeChanged();

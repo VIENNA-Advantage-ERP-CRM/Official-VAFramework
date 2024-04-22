@@ -366,33 +366,33 @@ namespace VIS.Controllers
 
                     _lockSlim.ExitReadLock();
 
-                    ViewBag.LibSuffix = "";
-                    ViewBag.FrameSuffix = "_v1";
+                    ViewBag.LibSuffix = "_v3";
+                    ViewBag.FrameSuffix = "_v2";
                     int libFound = 0;
-                    foreach (Bundle b in BundleTable.Bundles)
-                    {
-                        if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
-                        {
-                            ViewBag.LibSuffix = Util.GetValueOfInt(ctx.GetContext("#FRONTEND_LIB_VERSION")) > 2
-                                                  ? "_v3" : "_v2";
-                            libFound++;
-                        }
+                    //foreach (Bundle b in BundleTable.Bundles)
+                    //{
+                    //    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
+                    //    {
+                    //        ViewBag.LibSuffix = Util.GetValueOfInt(ctx.GetContext("#FRONTEND_LIB_VERSION")) > 2
+                    //                              ? "_v3" : "_v2";
+                    //        libFound++;
+                    //    }
 
-                        if (b.Path.Contains("VIS") && b.Path.Contains("_v"))
-                        {
-                            ViewBag.FrameSuffix = Util.GetValueOfInt(ctx.GetContext("#FRAMEWORK_VERSION")) > 1
-                                                  ? "_v2" : "_v1";
-                            libFound++;
-                        }
-                        if (libFound >= 2)
-                        {
-                            break;
-                        }
-                        //}
-                        //check system setting// set to skipped lib
+                    //    if (b.Path.Contains("VIS") && b.Path.Contains("_v"))
+                    //    {
+                    //        ViewBag.FrameSuffix = Util.GetValueOfInt(ctx.GetContext("#FRAMEWORK_VERSION")) > 1
+                    //                              ? "_v2" : "_v1";
+                    //        libFound++;
+                    //    }
+                    //    if (libFound >= 2)
+                    //    {
+                    //        break;
+                    //    }
+                    //    //}
+                    //    //check system setting// set to skipped lib
 
 
-                    }
+                    //}
 
                     /// VIS0008
                     /// Check applied for adding message to toastr if 2FA method is VA and VA App is not linked with device

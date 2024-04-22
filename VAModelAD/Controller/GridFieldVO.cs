@@ -951,6 +951,7 @@ namespace VAdvantage.Controller
             clone.TabSeqNo = TabSeqNo;
             clone.ADAction = ADAction;
             clone.ADActionName = ADActionName;
+            clone.ADActionParams = ADActionParams;
             return clone;
         }
 
