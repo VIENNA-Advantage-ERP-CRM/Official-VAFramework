@@ -397,22 +397,21 @@ namespace VIS.Controllers
                     if (!LoginHelper.IsDeviceLinked(ctx, AD_User_ID))
                         ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), Msg.GetMsg(ctx, "PlzLinkVAApp"));
 
+                    //this code moved to VA093 Module
                     //Show If recording happening for Auto data marking
-                    ViewBag.ConfigModule = "";
-                    ViewBag.ConfigFileBlock = "vis-hideadmconfigblock";
-                    if (Env.IsModuleInstalled("VA093_") )
-                    {
-                        ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name FROM  VA093_AutoMarkingConfig adc 
-                                                INNER JOIN AD_ModuleInfo m ON (m.AD_ModuleInfo_ID=adc.VA093_RefModule_ID)
-                                                WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()
-                                                ));
-                        if (!string.IsNullOrEmpty(ViewBag.ConfigModule))
-                        {
-                            ViewBag.ConfigFileBlock = "vis-displayadmconfigblock";
-                        }
-                       
-
-                    }
+                    //ViewBag.ConfigModule = "";
+                    //ViewBag.ConfigFileBlock = "vis-hideadmconfigblock";
+                    //if (Env.IsModuleInstalled("VA093_") )
+                    //{
+                    //    ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name FROM  VA093_AutoMarkingConfig adc 
+                    //                            INNER JOIN AD_ModuleInfo m ON (m.AD_ModuleInfo_ID=adc.VA093_RefModule_ID)
+                    //                            WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()
+                    //                            ));
+                    //    if (!string.IsNullOrEmpty(ViewBag.ConfigModule))
+                    //    {
+                    //        ViewBag.ConfigFileBlock = "vis-displayadmconfigblock";
+                    //    }
+                    //}
 
                     VAdvantage.Classes.ThreadInstance.Get().Start();
                 }
