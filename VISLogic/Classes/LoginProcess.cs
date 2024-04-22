@@ -1060,56 +1060,53 @@ namespace VAdvantage.Login
         {
             //	Report Page Size Element
             m_ctx.SetContext("#REPORT_PAGE_SIZE", "500");
-            string sql = "SELECT NAME, VALUE FROM AD_SysConfig WHERE NAME = 'REPORT_PAGE_SIZE'";
-            IDataReader dr = DataBase.DB.ExecuteReader(sql);
-            while (dr.Read())
-                if (!string.IsNullOrEmpty(dr[1].ToString()))
-                {
-                    Regex regex = new Regex(@"^[1-9]\d*$");
-                    if (regex.IsMatch(dr[1].ToString()))
-                        m_ctx.SetContext("#REPORT_PAGE_SIZE", (dr[1].ToString()));
-                }
-            dr.Close();
-
-            //	Bulk Report Download
+            // Bulk Repport download
             m_ctx.SetContext("#BULK_REPORT_DOWNLOAD", "N");
-            sql = "SELECT NAME, VALUE FROM AD_SysConfig WHERE NAME = 'BULK_REPORT_DOWNLOAD'";
-            dr = DataBase.DB.ExecuteReader(sql);
-            while (dr.Read())
-                if (!string.IsNullOrEmpty(dr[1].ToString()))
-                {
-                    Regex regex = new Regex(@"Y|N");
-                    if (regex.IsMatch(dr[1].ToString()))
-                        m_ctx.SetContext("#BULK_REPORT_DOWNLOAD", (dr[1].ToString()));
-                }
-            dr.Close();
-
-            // Set Default Value of System Config in Context
-            sql = "SELECT NAME, VALUE FROM AD_SysConfig WHERE ISACTIVE = 'Y' AND NAME NOT IN ('REPORT_PAGE_SIZE' , 'BULK_REPORT_DOWNLOAD')";
-            dr = DataBase.DB.ExecuteReader(sql);
-            while (dr.Read())
-                if (!string.IsNullOrEmpty(dr[1].ToString()))
-                {
-                    m_ctx.SetContext("#" + dr[0].ToString(), (dr[1].ToString()));
-                }
-            dr.Close();
-
-
             //	BULK Location name load
             m_ctx.SetContext("#LOCATION_NAME_BULK_REQUEST", "Y");
-            sql = "SELECT NAME, VALUE FROM AD_SysConfig WHERE NAME = 'LOCATION_NAME_BULK_REQUEST'";
+
+            string sql = "SELECT NAME, VALUE FROM AD_SysConfig";
             DataSet ds = DataBase.DB.ExecuteDataset(sql);
+            
+            Regex regex = new Regex(@"Y|N");
+            Regex regexNo = new Regex(@"^[1-9]\d*$");
+
             if (ds != null && ds.Tables != null && ds.Tables[0].Rows.Count > 0)
             {
-                if (!string.IsNullOrEmpty(ds.Tables[0].Rows[0][1].ToString()))
+                foreach (DataRow drRow in ds.Tables[0].Rows)
                 {
-                    Regex regex = new Regex(@"Y|N");
-                    if (regex.IsMatch(ds.Tables[0].Rows[0][1].ToString()))
-                        m_ctx.SetContext("#LOCATION_NAME_BULK_REQUEST", (ds.Tables[0].Rows[0][1].ToString()));
+                    if (!string.IsNullOrEmpty(drRow[0].ToString()))
+                    {
+                        string name = drRow[0].ToString();
+                        //1
+                        if (name == "LOCATION_NAME_BULK_REQUEST")
+                        {
+                            if (regex.IsMatch(drRow[1].ToString()))
+                                m_ctx.SetContext("#LOCATION_NAME_BULK_REQUEST", (ds.Tables[0].Rows[0][1].ToString()));
+                        }//2
+                        else if (name == "REPORT_PAGE_SIZE")
+                        {
+                            if (regexNo.IsMatch(drRow[1].ToString()))
+                            {
+                                m_ctx.SetContext("#REPORT_PAGE_SIZE", (drRow[1].ToString()));
+                            }
+                        }//3
+                        else if (name == "BULK_REPORT_DOWNLOAD")
+                        {
+                            if (regex.IsMatch(drRow[1].ToString()))
+                                m_ctx.SetContext("#BULK_REPORT_DOWNLOAD", (drRow[1].ToString()));
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(drRow[1].ToString()))
+                            {
+                                m_ctx.SetContext("#" + name, (drRow[1].ToString()));
+                            }
+                        }
+                    }
                 }
             }
-
+          
         }
-
     }
 }
