@@ -3357,3 +3357,19 @@ ul.vis-userLinks-ListMenu li a i {
     background: rgba(var(--v-c-on-secondary), .4);
     margin-left: 1px;
 }
+
+.vis-widget-container {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 5px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    width: 100%;
+    height: 100%;
+}
+
+
+.vis-widget-item {    
+    padding: 10px; /* Add padding as needed */
+}

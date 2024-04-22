@@ -730,6 +730,7 @@
     <Content Include="Areas\VIS\Scripts\F20\aviewcontroller.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabbedpanemgr.js" />
     <Content Include="Areas\VIS\Scripts\F20\widgetsframe.js" />
+    <Content Include="Areas\VIS\Scripts\home\home.js" />
     <Content Include="Areas\VIS\Scripts\home\usersession.js" />
     <Content Include="Areas\VIS\Scripts\F20\themecnfgtr.js" />
     <Content Include="Areas\VIS\Scripts\F20\thememgr.js" />
@@ -741,7 +742,7 @@
     <Content Include="Areas\VIS\Scripts\forms\form.js" />
     <Content Include="Areas\VIS\Scripts\home\changeuserimage.js" />
     <Content Include="Areas\VIS\Scripts\home\favourite.js" />
-    <Content Include="Areas\VIS\Scripts\home\home.js" />
+    <Content Include="Areas\VIS\Scripts\home\home1.js" />
     <Content Include="Areas\VIS\Scripts\home\shortcut.js" />
     <Content Include="Areas\VIS\Scripts\model\calloutColumn.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processctl.js" />
@@ -877,6 +878,7 @@
     <Content Include="Areas\VIS\Views\CardViewWizard\Index.cshtml" />
     <Content Include="Areas\VIS\Views\AccountForm\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
+    <Content Include="Areas\VIS\Views\Home\HomeOld.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
