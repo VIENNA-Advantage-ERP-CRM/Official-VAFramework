@@ -32,15 +32,15 @@
             <i class="fa fa-info"></i>
         </a>
     </li>
+
     <!-- Show Config File Name If Auto data marking enabled -->
-    @if (VAdvantage.Utility.Env.IsModuleInstalled("VA093_") && ViewBag.IsAutoDataMarking)
-    {
-        <li class="vis-blinkingDotContainer"><div class="vis-blinking-dot"></div></li>
-        <li>
-            <span class="d-inline-block vis-autodatamarkingfilename mr-1 vis-autodataMkFilename" id="vis_configfilename">@ViewBag.ConfigModule</span>
-            <span class="d-inline-block vis-autodatafontplus" id="vis_addconfigfile"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
-        </li>
-    }
+    <li class="vis-blinkingDotContainer vis-hideadmconfigblock" id="vis_recordingADM"><div class="vis-blinking-dot"></div></li>
+    <li class="vis-hideadmconfigblock" id="vis_configfile">
+        <span class="d-inline-block vis-autodatamarkingfilename mr-1 vis-autodataMkFilename" id="vis_configfilename"></span>
+        <span class="d-inline-block vis-autodatafontplus" id="vis_addconfigfile"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
+    </li>
+
+
     @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-alerts" title="Alerts">Alerts</a><span class="vis-notify-counter">55</span></li>*@
     @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-call" title="@GetMsg((string)ViewBag.culture, "VA048_CallingInterface")" id="vis_appCall">Call</a></li>*@
 </ul>
@@ -109,12 +109,12 @@
                 <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
         </li>
         <li id="vis_userDisplayName" class="vis-app-hdr-r-user">
-            <a href="javascript:;"id="vis_userName">@ViewBag.DisplayName</a>
+            <a href="javascript:;" id="vis_userName">@ViewBag.DisplayName</a>
             @*
                 <div class="vis-div-userAvatar">*@
             @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
             {
-                ViewBag.UserPic="";
+                ViewBag.UserPic = "";
             }
             <div class="vis-app-user-img-wrap">
                 <i class="fa fa-user"></i>
@@ -173,7 +173,7 @@
                     <td style="@sty">
                         @Html.LabelFor(m => m.Login2Model.Client)
                     <td style="width: 100%">
-                        @Html.DropDownListFor(m => m.Login2Model.Client, new SelectList(ViewBag.ClientList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Client)),@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectClient"), new { id = "vis_home_client" })
+                        @Html.DropDownListFor(m => m.Login2Model.Client, new SelectList(ViewBag.ClientList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Client)), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectClient"), new { id = "vis_home_client" })
                         @Html.HiddenFor(m => m.Login2Model.ClientName, new { id = "vis_home_clientName" })
                     </td>
 
@@ -184,17 +184,17 @@
                         @Html.LabelFor(m => m.Login2Model.Org)
                     </td>
                     <td style="width: 100%">
-                        @Html.DropDownListFor(m => m.Login2Model.Org, new SelectList(ViewBag.OrgList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Org)),@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectOrganization"), new { id = "vis_home_org" })
+                        @Html.DropDownListFor(m => m.Login2Model.Org, new SelectList(ViewBag.OrgList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Org)), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectOrganization"), new { id = "vis_home_org" })
                         @Html.HiddenFor(m => m.Login2Model.OrgName, new { id = "vis_home_orgName" })
                     </td>
                 </tr>
 
                 <tr>
-                    <td style="@sty">                                                           
+                    <td style="@sty">
                         @Html.LabelFor(m => m.Login2Model.Warehouse)
                     </td>
                     <td style="width: 100%">
-                        @Html.DropDownListFor(m => m.Login2Model.Warehouse, new SelectList(ViewBag.WareHouseList, "Key", "Name"), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectWarehouse"),new { id = "vis_home_warehouse" })
+                        @Html.DropDownListFor(m => m.Login2Model.Warehouse, new SelectList(ViewBag.WareHouseList, "Key", "Name"), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectWarehouse"), new { id = "vis_home_warehouse" })
                         @Html.HiddenFor(m => m.Login2Model.WarehouseName, new { id = "vis_home_warehouseName" })
                         @Html.HiddenFor(m => m.Login2Model.Warehouse, new { id = "vis_home_warehouseId" })
                         @Html.HiddenFor(m => m.Login2Model.LoginLanguage, new { id = "vis_home_langugage" })

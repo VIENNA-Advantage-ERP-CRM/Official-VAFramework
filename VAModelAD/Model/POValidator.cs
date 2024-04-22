@@ -189,16 +189,22 @@ namespace VAModelAD.Model
             MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
             //VIS323 Insert Record in ExportData for marking on Save records.
 
-            if (Env.IsModuleInstalled("VA093_") && success && MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
-                && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M")
+            //Pick ModuleID from AutoMarking Configuration window
+            int curRefModID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA093_RefModule_ID FROM  VA093_AutoMarkingConfig WHERE Processed='N' AND IsActive='Y' AND AD_Role_ID=" + po.GetCtx().GetAD_Role_ID()));
 
+            //Do not Check Config on Role Window
+            if (Env.IsModuleInstalled("VA093_") && success
+                //&& MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
+                && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M"
+                && curRefModID > 0)
             {
                 //Check and proceed marking with new module
-                int curRefModID= Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA093_RefModule_ID FROM  VA093_AutoMarkingConfig WHERE Processed='N' AND IsActive='Y' AND AD_Role_ID=" + po.GetCtx().GetAD_Role_ID()));
-                if (curRefModID == 0)
-                {
-                    curRefModID= MModuleInfo.Get("VA093_");
-                }
+
+                //do not proceed recording in VA093 module
+                //if (curRefModID > 0)
+                //{                    
+                //curRefModID= MModuleInfo.Get("VA093_");
+                //}
                 if (_expModuleID == 0)
                 {
                     _expModuleID = curRefModID;
