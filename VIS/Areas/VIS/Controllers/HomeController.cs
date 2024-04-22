@@ -329,46 +329,46 @@ namespace VIS.Controllers
                     sessionData.Key = ctx.GetAD_Session_ID();
                     ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
 
-                    _lockSlim.EnterReadLock();
+                    //_lockSlim.EnterReadLock();
 
-                    if (!isBundleAdded)
-                    {
-                        var lst = VAdvantage.ModuleBundles.GetStyleBundles(); //Get All Style Bundle
-                        foreach (var b in lst)
-                        {
-                            if (!BundleTable.Bundles.Contains(b))
-                            {
-                                BundleTable.Bundles.Add(b); //Add in Mvc Bundle Table
-                            }
-                        }
+                    //if (!isBundleAdded)
+                    //{
+                    //    var lst = VAdvantage.ModuleBundles.GetStyleBundles(); //Get All Style Bundle
+                    //    foreach (var b in lst)
+                    //    {
+                    //        if (!BundleTable.Bundles.Contains(b))
+                    //        {
+                    //            BundleTable.Bundles.Add(b); //Add in Mvc Bundle Table
+                    //        }
+                    //    }
 
-                        var lstRTLStyle = VAdvantage.ModuleBundles.GetRTLStyleBundles(); //Get All Script Bundle
+                    //    var lstRTLStyle = VAdvantage.ModuleBundles.GetRTLStyleBundles(); //Get All Script Bundle
 
-                        foreach (var b in lstRTLStyle)
-                        {
-                            if (!BundleTable.Bundles.Contains(b))
-                            {
-                                BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
-                            }
-                        }
+                    //    foreach (var b in lstRTLStyle)
+                    //    {
+                    //        if (!BundleTable.Bundles.Contains(b))
+                    //        {
+                    //            BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
+                    //        }
+                    //    }
 
-                        var lstScript = VAdvantage.ModuleBundles.GetScriptBundles(); //Get All Script Bundle
+                    //    var lstScript = VAdvantage.ModuleBundles.GetScriptBundles(); //Get All Script Bundle
 
-                        foreach (var b in lstScript)
-                        {
-                            if (!BundleTable.Bundles.Contains(b))
-                            {
-                                BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
-                            }
-                        }
-                        isBundleAdded = true;
-                    }
+                    //    foreach (var b in lstScript)
+                    //    {
+                    //        if (!BundleTable.Bundles.Contains(b))
+                    //        {
+                    //            BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
+                    //        }
+                    //    }
+                    //    isBundleAdded = true;
+                    //}
 
-                    _lockSlim.ExitReadLock();
+                    //_lockSlim.ExitReadLock();
 
                     ViewBag.LibSuffix = "_v3";
                     ViewBag.FrameSuffix = "_v2";
-                    int libFound = 0;
+                    //int libFound = 0;
                     //foreach (Bundle b in BundleTable.Bundles)
                     //{
                     //    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
@@ -476,15 +476,15 @@ namespace VIS.Controllers
                 Session["ctx"] = null;
                 ViewBag.direction = "ltr";
 
-                ViewBag.LibSuffix = "";
-                foreach (Bundle b in BundleTable.Bundles)
-                {
-                    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v"))
-                    {
-                        ViewBag.LibSuffix = "_v2";
-                        break;
-                    }
-                }
+                ViewBag.LibSuffix = "_v2";
+                //foreach (Bundle b in BundleTable.Bundles)
+                //{
+                //    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v"))
+                //    {
+                //        ViewBag.LibSuffix = "_v2";
+                //        break;
+                //    }
+                //}
             }
             return View(model);
 

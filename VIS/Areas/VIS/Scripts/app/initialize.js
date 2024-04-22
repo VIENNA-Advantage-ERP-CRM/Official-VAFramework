@@ -15,7 +15,7 @@
 
             /* get Validation token and set in ajax default setting*/
             var token = $("#vis_antiForgeryToken").val();
-            //prject label token setting
+            //project level token setting
             $.ajaxSetup({
                 headers: {
                     'VerificationToken': token

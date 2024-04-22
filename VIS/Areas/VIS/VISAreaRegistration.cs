@@ -221,7 +221,7 @@ namespace VIS
 
 
             VAdvantage.ModuleBundles.RegisterScriptBundle(modScript, "VIS", -1);
-            VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v1, "VIS1_0", -2);
+            //VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v1, "VIS1_0", -2);
             VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v2, "VIS2_0", -3);
 
             VAdvantage.ModuleBundles.RegisterStyleBundle(style, "VIS", -1);

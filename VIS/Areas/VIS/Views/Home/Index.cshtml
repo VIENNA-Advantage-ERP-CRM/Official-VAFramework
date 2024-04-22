@@ -83,7 +83,7 @@
             {
 
 
-                if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix != "" && !b.Path.Contains(ViewBag.LibSuffix))
+                if (b.Path.Contains("ViennaBase") && !b.Path.Contains("_v3"))
                 {
                     continue;
                 }
@@ -322,18 +322,18 @@
 
             foreach (string b in ViewBag.ScriptsPath)
             {
-                if (b.Contains("ViennaBase") && b.Contains("_v") && ViewBag.LibSuffix != "" && !b.Contains(ViewBag.LibSuffix))
+                if (b.Contains("ViennaBase") && !b.Contains("_v3"))
                 {
                     continue;
                 }
-                else if (b.Contains("VIS_") && !b.Contains(ViewBag.FrameSuffix))
-                {
-                    continue;
-                }
-                else
-                {
+                //else if (b.Contains("VIS_") && !b.Contains(ViewBag.FrameSuffix))
+                //{
+                //    continue;
+                //}
+                //else
+                //{
                     @Scripts.Render(b); // Render all Script files
-                }
+                //}
             }
         }
         <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
