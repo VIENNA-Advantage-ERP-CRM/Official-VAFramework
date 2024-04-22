@@ -8,19 +8,20 @@ namespace VAdvantage.Controller
 {
     public class ActionParams
     {
-        public bool IsHideHeaderPanel { get; set; }//1
-        public bool IsHideTabPanel { get; set; }
-        public bool IsHideToolbar { get; set; }//3
-        public bool IsHideGridToggle { get; set; }
-        public bool IsHideCardToggle { get; set; }//5
-        public bool IsHideSingleToggle { get; set; }
-        public bool IsHideMapToggle { get; set; }//7
-        public bool IsHideRecordNav { get; set; }
-        public bool IsTabInNewMode { get; set; }//9
-        public bool IsEditable { get; set; }
-        public bool IsDeletable { get; set; }//11
-        public int AD_Card_ID { get; set; }
-        public string TabWhereClause { get; set; }//13
-
+        public bool? IsHideHeaderPanel { get; set; }//1 w
+        public bool? IsHideTabPanel { get; set; } //2 w
+        public bool? IsHideTabLinks { get; set; } // 3 w
+        public bool? IsHideActionbar { get; set; }//4 w
+        public bool? IsHideToolbar { get; set; }//5 w
+        public bool? IsHideGridToggle { get; set; } //6 T
+        public bool? IsHideCardToggle { get; set; }//7 T
+        public bool? IsHideSingleToggle { get; set; }//8 T 
+        public bool? IsHideMapToggle { get; set; }//9 T
+        public bool? IsHideRecordNav { get; set; }//10 T
+        public bool? IsTabInNewMode { get; set; }//11 T 
+        public bool? IsEditable { get; set; } //12 T
+        public bool? IsDeletable { get; set; }//13 T
+        public int? AD_Card_ID { get; set; }//14 T
+        public string TabWhereClause { get; set; }//15 T
     }
 }

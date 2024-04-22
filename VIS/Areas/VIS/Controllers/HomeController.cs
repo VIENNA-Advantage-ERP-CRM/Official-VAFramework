@@ -365,33 +365,33 @@ namespace VIS.Controllers
 
                     _lockSlim.ExitReadLock();
 
-                    ViewBag.LibSuffix = "";
-                    ViewBag.FrameSuffix = "_v1";
+                    ViewBag.LibSuffix = "_v3";
+                    ViewBag.FrameSuffix = "_v2";
                     int libFound = 0;
-                    foreach (Bundle b in BundleTable.Bundles)
-                    {
-                        if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
-                        {
-                            ViewBag.LibSuffix = Util.GetValueOfInt(ctx.GetContext("#FRONTEND_LIB_VERSION")) > 2
-                                                  ? "_v3" : "_v2";
-                            libFound++;
-                        }
+                    //foreach (Bundle b in BundleTable.Bundles)
+                    //{
+                    //    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
+                    //    {
+                    //        ViewBag.LibSuffix = Util.GetValueOfInt(ctx.GetContext("#FRONTEND_LIB_VERSION")) > 2
+                    //                              ? "_v3" : "_v2";
+                    //        libFound++;
+                    //    }
 
-                        if (b.Path.Contains("VIS") && b.Path.Contains("_v"))
-                        {
-                            ViewBag.FrameSuffix = Util.GetValueOfInt(ctx.GetContext("#FRAMEWORK_VERSION")) > 1
-                                                  ? "_v2" : "_v1";
-                            libFound++;
-                        }
-                        if (libFound >= 2)
-                        {
-                            break;
-                        }
-                        //}
-                        //check system setting// set to skipped lib
+                    //    if (b.Path.Contains("VIS") && b.Path.Contains("_v"))
+                    //    {
+                    //        ViewBag.FrameSuffix = Util.GetValueOfInt(ctx.GetContext("#FRAMEWORK_VERSION")) > 1
+                    //                              ? "_v2" : "_v1";
+                    //        libFound++;
+                    //    }
+                    //    if (libFound >= 2)
+                    //    {
+                    //        break;
+                    //    }
+                    //    //}
+                    //    //check system setting// set to skipped lib
 
 
-                    }
+                    //}
 
                     /// VIS0008
                     /// Check applied for adding message to toastr if 2FA method is VA and VA App is not linked with device
@@ -401,17 +401,17 @@ namespace VIS.Controllers
                     //Show If recording happening for Auto data marking
                     ViewBag.IsAutoDataMarking = MRole.GetDefault(ctx).IsAutoDataMarking();
                     ViewBag.ConfigModule = "";
-                    if (Env.IsModuleInstalled("VA093_") && MRole.GetDefault(ctx).IsAutoDataMarking())
-                    {
-                        ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name,1 AS RowNumber FROM  VA093_AutoMarkingConfig adc 
-                                                INNER JOIN AD_ModuleInfo m ON (m.AD_ModuleInfo_ID=adc.VA093_RefModule_ID)
-                                                WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()+ @"
-                                                UNION 
-                                                SELECT m.Name,2 AS RowNumber FROM AD_ModuleInfo m
-                                                WHERE m.Prefix='VA093_' ORDER BY RowNumber"));
+                    //if (Env.IsModuleInstalled("VA093_") && MRole.GetDefault(ctx).IsAutoDataMarking())
+                    //{
+                    //    ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name,1 AS RowNumber FROM  VA093_AutoMarkingConfig adc 
+                    //                            INNER JOIN AD_ModuleInfo m ON (m.AD_ModuleInfo_ID=adc.VA093_RefModule_ID)
+                    //                            WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()+ @"
+                    //                            UNION 
+                    //                            SELECT m.Name,2 AS RowNumber FROM AD_ModuleInfo m
+                    //                            WHERE m.Prefix='VA093_' ORDER BY RowNumber"));
                        
 
-                    }
+                    //}
 
                     VAdvantage.Classes.ThreadInstance.Get().Start();
                 }
