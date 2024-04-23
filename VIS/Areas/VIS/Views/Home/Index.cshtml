@@ -83,7 +83,7 @@
             {
 
 
-                if (b.Path.Contains("ViennaBase") && !b.Path.Contains("_v3"))
+                if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && !b.Path.Contains("_v3"))
                 {
                     continue;
                 }
@@ -100,6 +100,7 @@
                     else
                     {
                         @Styles.Render(b.Path); //render style
+
                     }
                 }
             }
@@ -322,7 +323,7 @@
 
             foreach (string b in ViewBag.ScriptsPath)
             {
-                if (b.Contains("ViennaBase") && !b.Contains("_v3"))
+                if (b.Contains("ViennaBase") && b.Contains("_v") && !b.Contains("_v3"))
                 {
                     continue;
                 }
