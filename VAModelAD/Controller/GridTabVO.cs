@@ -550,6 +550,10 @@ namespace VAdvantage.Controller
 
                 vo.TabLayout = Utility.Util.GetValueOfString(dr["TabLayout"]);
 
+                if (string.IsNullOrEmpty(vo.TabLayout)) {
+                    vo.TabLayout = "N";
+                }
+
                 vo.NewRecordView = Util.GetValueOfString(dr["NewRecordView"]);
 
                 vo.RecordLimit = Util.GetValueOfInt(dr["RecordLimit"]);
