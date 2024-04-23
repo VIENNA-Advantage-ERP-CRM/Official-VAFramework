@@ -109,16 +109,7 @@ namespace VIS.Controllers
                     foreach (var key in msgs.Keys)
                     {
                         --total;
-                        //if (key.Contains('\n') || key.Contains('\'')
-                        //   || key.Contains('\"') || key.StartsWith("SC_") || key.Contains('\r'))
-                        //{
-                        //    continue;
-                        //}
-                        //if (msgs.Get(key).ToString().Contains('\n') || msgs.Get(key).ToString().Contains('\'')
-                        //    || msgs.Get(key).ToString().Contains('\"') || msgs.Get(key).ToString().Contains('\r'))
-                        //{
-                        //    continue;
-                        //}
+                        
                         string msg = (string)msgs.Get(key) ?? "";
                         msg = msg.Replace("\n", " ").Replace("\r", " ").Replace("\"", "'");
                         sb.Append("\"").Append(key).Append("\": ").Append("\"").Append(msg).Append("\"");

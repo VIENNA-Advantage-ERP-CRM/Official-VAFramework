@@ -47,7 +47,7 @@ namespace VIS.Controllers
         HomeHelper objHomeHelp = null;
 
         private static bool isBundleAdded = false;
-        private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        //private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 
 
@@ -73,16 +73,6 @@ namespace VIS.Controllers
         public ActionResult Index(FormCollection form)
         {
 
-
-            //if (LoginHelper.IsSiteUnderMaintenance())
-            //{
-            //    if (User.Identity.IsAuthenticated)
-            //    {
-            //        return new AccountController().SignOff(Session["ctx"] as Ctx);
-            //    }
-            //    return View("Maintenance"); 
-            //}
-
             if (Request.QueryString.Count > 0)
             {
                 // string user = Request.QueryString["U"];
@@ -96,19 +86,6 @@ namespace VIS.Controllers
                 // ac.SetAuthCookie(md, Response); //AutoLogin if all passed
                 // return RedirectToAction("Index");
             }
-
-            //if (!User.Identity.IsAuthenticated)
-            //{
-            //    // Required to allow javascript redirection through to browser
-            //    this.Response.TrySkipIisCustomErrors = true;
-            //    this.Response.Status = "401 Unauthorized";
-            //    this.Response.StatusCode = 401;
-            //    // note that the following line is .NET 4.5 or later only
-            //    // otherwise you have to suppress the return URL etc manually!
-            //    this.Response.SuppressFormsAuthenticationRedirect = true;
-            //    // If we got this far, something failed
-
-            //}
 
 
             var url = CloudLogin.IsAllowedToLogin(Request.Url.ToString());
@@ -140,8 +117,7 @@ namespace VIS.Controllers
                 }
 
 
-                //AccountController a = new AccountController();
-                //a.LogOff();
+                
                 FormsIdentity ident = User.Identity as FormsIdentity;
                 Ctx ctx = null;
                 if (ident != null)
@@ -151,28 +127,16 @@ namespace VIS.Controllers
                     LoginContext lCtx = JsonHelper.Deserialize(loginContextString, typeof(LoginContext)) as LoginContext;
                     IDataReader dr = null;
 
-
-
-
-
                     //create class from string  
                     string key = "";
                     if (Session["ctx"] != null)
                     {
                         ctx = Session["ctx"] as Ctx;
 
-                        //Update Old Session
-                        //MSession session = MSession.Get(ctx, false);
-                        //if (session != null)
-                        //    session.Logout();
-
                         key = ctx.GetSecureKey();
-
-                        //if (Session.Timeout < 2)
-                        //{
+                       
                         SessionEventHandler.SessionEnd(ctx);
                         Session.Timeout = 17;
-                        //}
                         Session["ctx"] = null;
 
                     }
@@ -188,12 +152,9 @@ namespace VIS.Controllers
 
 
                     //if not system admin
-                    if (LoginHelper.IsSiteUnderMaintenance() && ctx.GetAD_Role_ID() != 0)
+                    if (ctx.GetAD_Role_ID() != 0 &&
+                        LoginHelper.IsSiteUnderMaintenance())
                     {
-                        // if (User.Identity.IsAuthenticated)
-                        //{
-                        //  return new AccountController().SignOff(ctx);
-                        //}
                         return View("Maintenance");
                     }
 
@@ -202,13 +163,6 @@ namespace VIS.Controllers
                         ctx.SetSecureKey(key);
                     }
                     Session["ctx"] = ctx;
-
-
-                    //Check For 
-
-
-
-
 
                     //get login Language object on server
                     var loginLang = ctx.GetAD_Language();
