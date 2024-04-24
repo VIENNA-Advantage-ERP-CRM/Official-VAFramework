@@ -130,9 +130,10 @@ namespace VAdvantage.ProcessEngine
                                       i.AD_Org_ID,
                                       i.AD_User_ID,
                                       NVL(PP.LOADRECURSIVEDATA,'N') as LOADRECURSIVEDATA,
-                                     nvl(pp.ShowChildOfSelected,'N') as ShowChildOfSelected,nvl(pp.AD_Reference_ID,0) as AD_Reference_ID
+                                     nvl(pp.ShowChildOfSelected,'N') as ShowChildOfSelected,nvl(pp.AD_Reference_ID,0) as AD_Reference_ID,
+                                    ip.P_Date_Time,ip.P_Date_Time_To,ip.P_Time, ip.P_Time_To
                                     FROM AD_PInstance_Para ip JOIN AD_PInstance i ON (ip.AD_PINstance_ID=i.AD_PINstance_ID)
-                                   Left Outer JOIN AD_Process_Para pp
+                                    Left Outer JOIN AD_Process_Para pp
                                         ON (pp.AD_Process_Para_ID=ip.AD_Process_Para_ID
                                         AND pp.AD_Process_ID=i.AD_Process_ID)
                                     WHERE ip.AD_PInstance_ID =@pinstanceid";
@@ -196,10 +197,31 @@ namespace VAdvantage.ProcessEngine
                         {
                             Parameter = DateTime.Parse(dr[5].ToString());
                         }
+
                         if (dr[6] != null && dr[6] != DBNull.Value)
                         {
                             Parameter_To = DateTime.Parse(dr[6].ToString());
                         }
+
+                        if (dr[15] != null && dr[15] != DBNull.Value)
+                        {
+                            Parameter = DateTime.Parse(dr[15].ToString());
+                        }
+                        if (dr[16] != null && dr[16] != DBNull.Value)
+                        {
+                            Parameter_To = DateTime.Parse(dr[16].ToString());
+                        }
+
+                        if (dr[17] != null && dr[17] != DBNull.Value)
+                        {
+                            Parameter = DateTime.Parse(dr[17].ToString());
+                        }
+
+                        if (dr[18] != null && dr[18] != DBNull.Value)
+                        {
+                            Parameter_To = DateTime.Parse(dr[18].ToString());
+                        }
+
                         //}
                         //else if (displayType == DisplayType.DateTime)
                         //{
@@ -230,7 +252,6 @@ namespace VAdvantage.ProcessEngine
                     String Info_To = dr[8].ToString();
 
 
-
                     if (dr[12].ToString().Equals("Y") && ((DisplayType.IsID(Utility.Util.GetValueOfInt(dr[14])) || DisplayType.MultiKey == Utility.Util.GetValueOfInt(dr[14]))))
                     {
                         string result = Parameter.ToString();
@@ -240,7 +261,6 @@ namespace VAdvantage.ProcessEngine
                             Info = Info + ", " + recResult;
                         }
                         Parameter = result;
-
 
                         if (Parameter_To != null && Parameter_To.ToString().Length > 0)
                         {
@@ -252,7 +272,6 @@ namespace VAdvantage.ProcessEngine
                             }
                             Parameter_To = result;
                         }
-
                     }
 
                     if (Parameter_To != null && Parameter_To.ToString().EndsWith(","))
@@ -264,7 +283,6 @@ namespace VAdvantage.ProcessEngine
                     {
                         Parameter = Parameter.ToString().Substring(0, Parameter.ToString().Length - 1);
                     }
-
 
                     //
                     list.Add(new ProcessInfoParameter(ParameterName, Parameter, Parameter_To, Info, Info_To));
@@ -473,8 +491,8 @@ namespace VAdvantage.ProcessEngine
             String sql = "SELECT p.ParameterName,"         			    	//  1
                    + " p.P_String,p.P_String_To, p.P_Number,p.P_Number_To,"    //  2/3 4/5
                    + " p.P_Date,p.P_Date_To, p.Info,p.Info_To, "               //  6/7 8/9
-                   + " i.AD_Client_ID, i.AD_Org_ID, i.AD_User_ID "				//	10..12
-                // +" p.P_Date_Time,p.P_Date_Time_To,p.P_Time, p.P_Time_To "
+                   + " i.AD_Client_ID, i.AD_Org_ID, i.AD_User_ID "              //	10..12
+                                                                                // +" p.P_Date_Time,p.P_Date_Time_To,p.P_Time, p.P_Time_To "
                    + "FROM AD_PInstance_Para p"
                    + " INNER JOIN AD_PInstance i ON (p.AD_PInstance_ID=i.AD_PInstance_ID) "
                    + "WHERE p.AD_PInstance_ID=@pinstanceid "

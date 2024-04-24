@@ -418,6 +418,10 @@ namespace VAdvantage.Controller
                     else if (columnName.Equals("AD_Action", StringComparison.OrdinalIgnoreCase))
                     {
                         vo.ADAction = Util.GetValueOfString(dr[i].ToString());
+                    } 
+                    else if (columnName.Equals("AD_ACTIONNAME", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.ADActionName = Util.GetValueOfString(dr[i].ToString());
                     }
                 }
                 if (vo.Header == null)
@@ -796,7 +800,8 @@ namespace VAdvantage.Controller
             }
             if (DisplayType.IsLookup(displayType))
             {
-                if (IsDisplayedf || IsDisplayedMR || ColumnName.ToLower().Equals("createdby") || ColumnName.ToLower().Equals("updatedby")
+                //Special case for Chat bot, create lookup for hideen field also
+                if (ctx.GetContext("EnforceLookup") == "Y" ||  IsDisplayedf || IsDisplayedMR || ColumnName.ToLower().Equals("createdby") || ColumnName.ToLower().Equals("updatedby")
                     || IsHeaderPanelitem)
                 {
                     try
@@ -930,6 +935,7 @@ namespace VAdvantage.Controller
             clone.IsAction = IsAction;
             clone.TabSeqNo = TabSeqNo;
             clone.ADAction = ADAction;
+            clone.ADActionName = ADActionName;
             return clone;
         }
 

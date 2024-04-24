@@ -7,7 +7,7 @@
         var divbody = $('<div class=vis-cv-rd-body>');
         root.append(divTopArrow).append(divbody).append(divDownArrow);
 
-        this.addItem = function (name) {            
+        this.addItem = function (name) {
             var $spn = $('<span class="vis-cv-rd-body-item">');
             $spn.text(name);
             divbody.append($spn);
@@ -1379,11 +1379,14 @@
                                         $imageSpan.append(img);
                                     } else {
                                         $image.attr('src', $(img).attr('src'));
+                                        $imageSpan.append($image);
                                     }
                                 }
                                 else {
-                                    if (img.indexOf('fa fa-') == -1 && img.indexOf('vis vis-') == -1)
+                                    if (img.indexOf('fa fa-') == -1 && img.indexOf('vis vis-') == -1) {
                                         $image.attr('src', img);
+                                        $imageSpan.append($image);
+                                    }
                                     else {
                                         imgSpan = $('<i style="' + this.iconStyle + '" class="' + img + '"></i>');
                                         $imageSpan.append(imgSpan);
@@ -1650,7 +1653,8 @@
                             value = value = VIS.Msg.getMsg('No');
                     }
 
-                    else if (VIS.DisplayType.IsDate(dt)) {                        
+                    else if (VIS.DisplayType.IsDate(dt)) {
+
                         if (value) {
                             value = value.replace('Z', ''); //remove universal time
                             // JID_1826 Date is showing as per browser culture
@@ -1744,6 +1748,7 @@
             this.dc = null;
         };
 
+        
         var setValue = function (colValue, iControl, mField) {
             if (colValue) {
                 if (colValue.startsWith && colValue.startsWith("<") && colValue.endsWith(">")) {
@@ -1763,8 +1768,8 @@
                     colValue = iControl.format.GetFormatAmount(iControl.format.GetFormatedValue(colValue), "init", VIS.Env.isDecimalPoint());
                 }
 
-
-                iControl.setValue(w2utils.encodeTags(colValue), false);
+                // iControl.setValue(w2utils.encodeTags(colValue), false);
+                iControl.setValue(colValue, false);
 
 
             }

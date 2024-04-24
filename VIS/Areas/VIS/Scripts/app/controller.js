@@ -387,6 +387,14 @@
         return this.vo.IsHideTabLinks;
     }
 
+    GridWindow.prototype.getIsHideToolbar = function () {
+        return this.vo.IsHideToolbar;
+    }
+
+    GridWindow.prototype.getIsHideActionbar = function () {
+        return this.vo.IsHideActionbar;
+    }
+
     GridWindow.prototype.dispose = function () {
 
         originalLength = this.tabs.length;
@@ -434,7 +442,7 @@
         // Maintain version on approval property on tab
         this.gridTable.MaintainVerOnApproval = this.vo.MaintainVerOnApproval;
         this.gridTable.IsMaintainVersions = this.vo.IsMaintainVersions;
-
+        this.gridTable.IsHideVerNewRecord = this.vo.IsHideVerNewRecord;
         this.parents = [];
         this.orderBys = [];
         this.depOnFieldColumn = [];
@@ -804,6 +812,10 @@
         return this.vo.IsAutoNewRecord === true;
     };
 
+    GridTab.prototype.getHideFGFrom = function () {
+        return this.vo.HideFieldGroupFrom;
+    };
+
     GridTab.prototype.getIsInsertRecord = function () {
         if (this.getIsReadOnly())
             return false;
@@ -813,6 +825,26 @@
         }
 
         return this.vo.IsInsertRecord && !limitReached;
+    };
+
+    GridTab.prototype.getIsHideTabName = function () {
+        return this.vo.HideTabName;
+    };
+
+    GridTab.prototype.getIsResetLayout = function () {
+        return this.vo.ResetLayout;
+    };
+
+    GridTab.prototype.getIsHideGridToggle = function () {
+        return this.vo.IsHideGridToggle;
+    };
+
+    GridTab.prototype.getIsHideCardToggle = function () {
+        return this.vo.IsHideCardToggle;
+    };
+
+    GridTab.prototype.getIsHideRecordNav = function () {
+        return this.vo.IsHideRecordNav;
     };
 
     GridTab.prototype.getIncluded_Tab_ID = function () {
@@ -1256,6 +1288,16 @@
             this.mDataStatusEvent.setInfo("NavigateOrUpdate", null, false, false);
         this.fireDataStatusChanged(this.mDataStatusEvent);
     };
+
+    // Get Focus element;
+    GridTab.prototype.getLastFocus = function () {
+        return this.gridTable.getLastFocus();
+    }
+
+    //Set Focus element
+    GridTab.prototype.setLastFocus = function (ctl) {
+        this.gridTable.setLastFocus(ctl);
+    }
 
     //Set Query Object
     GridTab.prototype.setQuery = function (query) {
@@ -3228,6 +3270,8 @@
         this.log = VIS.Logging.VLogger.getVLogger("VIS.GridTable");
         //this.outerOrderClause = "";
         this.card_ID = 0;
+        this.lastFocus = null;
+
     };
 
     GridTable.prototype.ctx = VIS.context;			//	the only OK condition
@@ -3526,6 +3570,7 @@
 
         //	Check all columns
         var size = this.gridFields.length;
+        var isFocused = false;
         for (var i = 0; i < size; i++) {
             var field = this.gridFields[i];
             if (field.getIsMandatory(true))        //  check context
@@ -3537,6 +3582,13 @@
                     if (sb.length() > 0)
                         sb.append(", ");
                     sb.append(field.getHeader());
+
+                    // Handle Focus Mandatory column
+                    if (!isFocused) {
+                        this.lastFocus = field.propertyChangeListner.getControl();
+                        isFocused = true;
+                    }
+
                 }
             }
         }
@@ -3545,6 +3597,17 @@
             return "";
         return sb.toString();
     };	//	getManda
+
+    // Get Last Focus
+    GridTable.prototype.getLastFocus = function () {
+        var lf = this.lastFocus;
+        return lf;
+    }
+
+    // Set Last Focus
+    GridTable.prototype.setLastFocus = function (ctrl) {
+        this.lastFocus = ctrl;
+    }
 
     GridTable.prototype.getErrorColumns = function () {
         //  see also => ProcessParameter.saveParameter
@@ -4652,7 +4715,12 @@
             var self = this;
             // in case of new record in Master Version window
             if (OldRowData["updatedby"] == null) {
-                if (!this.MaintainVerOnApproval || (this.MaintainVerOnApproval && VIS.context.getWindowContext(this.gTable._windowNo, VIS.Env.approveCol) == 'Y')) {
+                if (this.IsHideVerNewRecord) {
+                    gridTableIn.MaintainVersions = true;
+                    gridTableIn.ImmediateSave = true;
+                    gridTableIn.ValidFrom = new Date().toISOString();
+                }
+                else if (!this.MaintainVerOnApproval || (this.MaintainVerOnApproval && VIS.context.getWindowContext(this.gTable._windowNo, VIS.Env.approveCol) == 'Y')) {
                     gridTableIn.MaintainVersions = true;
                     gridTableIn.ImmediateSave = true;
                     gridTableIn.ValidFrom = new Date().toISOString();
@@ -4667,9 +4735,38 @@
                     if (!(out.FireEEvent || out.FireIEvent))
                         VIS.ADialog.info(out.ErrorMsg);
                 }
-                else if (out.Status == "W") {
-                    VIS.ADialog.info("SentForApproval");
-                    self.dataRefreshAll();
+                else {
+                    if (out.VersionResult) {
+                        out.RowData = gridTableIn.RowData;
+                        if (out.VersionResult.KeyColName != "") {
+                            // out.RowData[out.KeyColName.toLower()] = out.Record_ID;
+                            rowDataNew[out.VersionResult.KeyColName.toLower()] = out.VersionResult.Record_ID;
+                            rowDataNew["isactive"] = out.VersionResult.IsActive;
+                        }
+                        self.fireTableModelChanged(VIS.VTable.prototype.ROW_REFRESH, rowDataNew, self.rowChanged);
+                        self.fireRowChanged(true, self.getKeyID(self.rowChanged));
+
+                        //	everything ok
+                        self.rowData = null;
+                        self.changed = false;
+                        self.compareDB = true;
+                        self.rowChanged = -1;
+                        self.newRow = -1;
+                        self.inserting = false;
+
+                        if (out.ErrorMsg != null) {
+                            self.log.log(VIS.Logging.Level.SEVERE, out.ErrorMsg);
+                        }
+                        if (out.FireEEvent) {
+                            self.fireDataStatusEEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError, out.IsWarning);
+                        }
+                        else if (out.FireIEvent) {
+                            self.fireDataStatusIEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError);
+                        }
+                        if (out.Status == "W")
+                            VIS.ADialog.info("SentForApproval");
+                        //self.dataRefreshAll();
+                    }
                 }
                 return out.Status;
             }
@@ -4707,8 +4804,10 @@
         var msVer = new VIS.MasterDataVersion(slf.gTable._tableName, slf.gridFields, rec_ID, gTblIn.WhereClause, slf.IsMaintainVersions, newRecord, function (immediate, valFrom, verRecID) {
             gTblIn.MaintainVersions = true;
             gTblIn.ImmediateSave = immediate;
-            gTblIn.ValidFrom = new Date(valFrom).toISOString();
+            // VIS0008 Change done as we need only date string which doesn't include time
+            gTblIn.ValidFrom = valFrom;
             gTblIn.VerRecID = verRecID;
+            var rowChg = slf.rowChanged;
             var out = slf.dataSaveDB(gTblIn, rdNew);
             // if Stauts is not OK
             if (out.Status != "O") {
@@ -4718,17 +4817,48 @@
                         VIS.ADialog.info(out.ErrorMsg);
                 }
                 else {
-                    // in case of sucess and if not saved for immediate refresh UI
-                    if (!immediate && !out.LatestVersion)
-                        slf.dataRefreshAll();
-                    // if sent for WF Approval then display Message
-                    if (out.Status == "W")
-                        VIS.ADialog.info("SentForApproval");
-                    // if saved for future then display Message and refresh UI
-                    else if (out.Status == "F")
-                        VIS.ADialog.info("SavedForFuture");
-                    else if (out.Status == "B")
-                        VIS.ADialog.info("SavedForBackDate");
+                    if (out.VersionResult) {
+                        slf.rowChanged = rowChg;
+                        out.RowData = gTblIn.RowData;
+                        if (out.VersionResult.KeyColName != "") {
+                            // out.RowData[out.KeyColName.toLower()] = out.Record_ID;
+                            rdNew[out.VersionResult.KeyColName.toLower()] = out.VersionResult.Record_ID;
+                            rdNew["isactive"] = out.VersionResult.IsActive;
+                        }
+
+                        slf.fireTableModelChanged(VIS.VTable.prototype.ROW_REFRESH, rdNew, slf.rowChanged);
+                        slf.fireRowChanged(true, slf.getKeyID(slf.rowChanged));
+
+                        //	everything ok
+                        slf.rowData = null;
+                        slf.changed = false;
+                        slf.compareDB = true;
+                        slf.rowChanged = -1;
+                        slf.newRow = -1;
+                        slf.inserting = false;
+
+                        if (out.ErrorMsg != null) {
+                            slf.log.log(VIS.Logging.Level.SEVERE, out.ErrorMsg);
+                        }
+
+                        if (out.FireEEvent) {
+                            slf.fireDataStatusEEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError, out.IsWarning);
+                        }
+                        else if (out.FireIEvent) {
+                            out.EventParam.Info = "VER";
+                            slf.fireDataStatusIEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError);
+                        }
+
+                        // if sent for WF Approval then display Message
+                        if (out.Status == "W")
+                            VIS.ADialog.info("SentForApproval");
+                        // if saved for future then display Message and refresh UI
+                        else if (out.Status == "F")
+                            VIS.ADialog.info("SavedForFuture");
+                        else if (out.Status == "B")
+                            VIS.ADialog.info("SavedForBackDate");
+                        // }
+                    }
                 }
             }
             return out.Status;
@@ -5804,7 +5934,7 @@
 
         var m_lookup = null;
         /* Load Lookup */
-        if (this.vo.IsDisplayedf || this.vo.ColumnName.toLower().equals("createdby") || gField._vo.ColumnName.toLower().equals("updatedby")
+        if (this.vo.IsDisplayedf || this.vo.IsDisplayedMR || this.vo.ColumnName.toLower().equals("createdby") || gField._vo.ColumnName.toLower().equals("updatedby")
             || this.vo.IsHeaderPanelitem) {
             if (gField._vo.lookupInfo != null && VIS.DisplayType.IsLookup(gField._vo.displayType)) {
                 if (VIS.DisplayType.IsLookup(gField._vo.displayType)) {
@@ -6174,6 +6304,20 @@
             return this.getIsDisplayed(checkContext);
         return this.getIsDisplayedMR(checkContext);
 
+    };
+
+    /**
+     * Evaluate Readonly and Display logic
+     *@return true if readonly 
+     * */
+    GridField.prototype.evaluateLogicsOnly = function () {
+        var _vo = this.vo;
+        var retReadOnly = false;
+        if (_vo.ReadOnlyLogic.length > 0)
+            retReadOnly = VIS.Evaluator.evaluateLogic(this, _vo.ReadOnlyLogic);//true
+        if (!retReadOnly && _vo.DisplayLogic.length > 0)
+            retReadOnly = VIS.Evaluator.evaluateLogic(this, _vo.DisplayLogic);//true
+        return retReadOnly;
     };
 
     GridField.prototype.getWindowNo = function () {
@@ -7332,6 +7476,9 @@
     };
     GridField.prototype.getAction = function () {
         return this.vo.ADAction;
+    };
+    GridField.prototype.getActionName = function () {
+        return this.vo.ADActionName;
     };
 
     /**

@@ -173,11 +173,11 @@
 
             var pnl = this.aTabbedPane.getAPanel();
             //1. toolbar action
-            this.aRefresh = pnl.addActions(pnl.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_CV_Refresh");
-            this.aDelete = pnl.addActions(pnl.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_CV_Delete");
-            this.aNew = pnl.addActions(pnl.ACTION_NAME_NEW, null, true, true, false, onAction, null, "Shct_CV_New");
-            this.aIgnore = pnl.addActions("Ignore", null, true, true, false, onAction, null, "Shct_CV_Ignore");
-            this.aSave = pnl.addActions("Save", null, true, true, false, onAction, null, "Shct_CV_Save");
+            this.aRefresh = pnl.addActions(pnl.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_CV_Refresh", "Refresh");
+            this.aDelete = pnl.addActions(pnl.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_CV_Delete", "Delete");
+            this.aNew = pnl.addActions(pnl.ACTION_NAME_NEW, null, true, true, false, onAction, null, "Shct_CV_New", "New");
+            this.aIgnore = pnl.addActions("UNO", null, true, true, false, onAction, null, "Shct_CV_Ignore", "Ignore");
+            this.aSave = pnl.addActions("SAR", null, true, true, false, onAction, null, "Shct_CV_Save", "Save");
             //this.aFind = pnl.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             //this.aInfo = pnl.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             //this.aReport = pnl.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
@@ -538,10 +538,20 @@
             this.reQuery();
         }
         else {
+            $ths = this;
 
             //  Confirm Error
             if (e.getIsError() && !e.getIsConfirmed()) {
-                VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
+               // VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
+
+                VIS.ADialogCallback.error(e.getAD_Message(), e.getInfo(), null, function () {
+                    var lf = $ths.curTab.getLastFocus();
+                    if (lf) {
+                        lf.focus();
+                        $ths.curTab.setLastFocus(null);
+                    }
+                });
+
                 e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
                 this.errorDisplayed = true;
             }
@@ -645,10 +655,15 @@
             tis.cmd_save(true);
         }
         else if (tis.aNew.getAction() === action) {
-            if (!tis.curTab.getIsInsertRecord()) {
-                return;
+            if (this.curGC.aPanel.curTab.needSave()) {
+                VIS.ADialog.warn('VIS_SaveParentFirst');
             }
-            tis.curGC.dataNew(false);
+            else {
+                if (!tis.curTab.getIsInsertRecord()) {
+                    return;
+                }
+                tis.curGC.dataNew(false);
+            }
         }
         else if (tis.aDelete.getAction() === action) {
             tis.cmd_delete();

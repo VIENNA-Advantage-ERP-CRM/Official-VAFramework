@@ -1503,8 +1503,8 @@ namespace VAdvantage.Model
                 Directory.CreateDirectory(zipinput);
 
                 System.IO.File.Copy(filePath + "\\" + folderKey + "\\" + fileName, zipinput + "\\" + newFileName);
-
-                System.IO.File.Delete(filePath + "\\" + folderKey + "\\" + fileName);
+                //to save same attachment with version table
+                //System.IO.File.Delete(filePath + "\\" + folderKey + "\\" + fileName);
 
                 ICSharpCode.SharpZipLib.Zip.FastZip z = new ICSharpCode.SharpZipLib.Zip.FastZip();
                 z.CreateZip(zipfileName, zipinput, true, null);
@@ -1804,7 +1804,8 @@ namespace VAdvantage.Model
                         return false;
                     }
                 }
-                Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload", FolderKey));
+                //to save same attachment on verion table
+                //Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload", FolderKey));
 
 
             }

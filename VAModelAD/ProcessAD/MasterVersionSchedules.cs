@@ -257,7 +257,10 @@ namespace VAdvantage.Process
                             }
                         }
                     }
-
+                    if (Common.Common.HasApprovalStatusColumn(poDest.GetTableName()))
+                    {
+                        poDest.Set_Value("ApprovalStatus", "A");
+                    }
                     // Save Master Record
                     if (!poDest.Save())
                     {

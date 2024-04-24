@@ -1,5 +1,7 @@
 ﻿(function (VIS, $) {
-    function attachmentForm(windowNo, AD_Attachment_ID, AD_Table_ID, Record_ID, trxName, newRecord_ID, restrictUpload, isDMSAttachment) {
+    function attachmentForm(windowNo, AD_Attachment_ID, AD_Table_ID, Record_ID, trxName, newRecord_ID,
+        restrictUpload, isDMSAttachment,isViewOnly) {
+        var tableName = "";
         var isFALoaded = false;
         var isIMALoaded = false;
         var isSMALoaded = false;
@@ -401,6 +403,10 @@
             setActive(sentMailAtt, false);
             setActive(letter, false);
             setActive(appointment, false);
+            tableName = VIS.dataContext.getJSONRecord("Attachment/GetTableName", AD_Table_ID);
+            if (tableName != "")
+                tableName = tableName.toLowerCase();
+
             LoadFileAttachment();
 
             root.dialog({
@@ -463,6 +469,7 @@
 
 
                     var dlatestAtt = $("<div class='vis-latest-attachments'>");
+                    if(!isViewOnly)
                     divFA.append(dlatestAtt);
 
                     var dlaHeader = $("<div class='vis-attach-top'>");
@@ -521,7 +528,7 @@
                     });
 
 
-                    var btnUpload = $("<a title='" + VIS.Msg.getMsg('SelectFile') + "' class='vis-attach-ico'><i class='fa fa-paperclip' aria-hidden='true'></i></a>");
+                    var btnUpload = $("<a title='" + VIS.Msg.getMsg('SelectFile') + "' class='vis-attach-ico'><i class='fa fa-paperclip' style='font-size: 35px; color: rgba(var(--v-c-primary),1)' aria-hidden='true'></i></a>");
                     // btnUpload.append($("<span class='plus-ico'>"));
                     // btnUpload.append(VIS.Msg.getMsg('Upload'));
 
@@ -529,6 +536,10 @@
 
                     //open file dialog
                     btnUpload.on("click", function () {
+                        if (tableName.endsWith('_ver')) {
+                            //VIS.ADialog.info("AccessCannotDelete");
+                            return;
+                        }
                         fileBrowser.trigger('click');
                     });
 
@@ -582,15 +593,15 @@
                     //btns in Latest file Region
                     // ddLABtnsFull = $("<div style='width:100%;overflow: auto;margin-top: 5px;border-bottom: 2px solid #eee'>");
                     dlatestAtt.append(ddLABtnsFull);
-                    var dLABtns = $("<div class='vis-pull-right'>");
+                    var dLABtns = $("<div style='text-align:center;'>");
                     ddLABtnsFull.append(dLABtns);
-                    var btnuploadFiles = $("<a title='" + VIS.Msg.getMsg('Upload') + "' href='javascript:void(0)'  class='vis-attach-ico'><i class='fa fa-upload' aria-hidden='true'></i></a>");
+                    var btnuploadFiles = $("<a title='" + VIS.Msg.getMsg('Upload') + "' href='javascript:void(0)' style='font-size: 35px; background: none;' class='vis-attach-ico'><i class='fa fa-upload' aria-hidden='true'></i></a>");
                     dLABtns.append(btnuploadFiles);
                     btnuploadFiles.on('click', function () {
                         UploadFiles();
                     });
 
-                    var btnCancelAll = $("<a title='" + VIS.Msg.getMsg('Cancel') + "' href='javascript:void(0)'  class='vis-attach-ico'><i class='fa fa-times-circle-o' aria-hidden='true'></i></a>");
+                    var btnCancelAll = $("<a title='" + VIS.Msg.getMsg('Cancel') + "' href='javascript:void(0)' style='font-size: 35px; background: none;'  class='vis-attach-ico'><i class='fa fa-times-circle-o' aria-hidden='true'></i></a>");
                     dLABtns.append(btnCancelAll);
                     btnCancelAll.on('click', function () {
                         dLAContent.empty();
@@ -667,8 +678,13 @@
                     //dfLeft.append(btnInsert);
 
                     var btnDeleteAll = $('<a  title="' + VIS.Msg.getMsg('DeleteAll') + '" class="vis-btn">').append(VIS.Msg.getMsg('DeleteAll'));
+                    if(!isViewOnly)
                     dfLeft.append(btnDeleteAll);
                     btnDeleteAll.on('click', function () {
+                        if (tableName.endsWith('_ver')) {
+                            VIS.ADialog.info("AccessCannotDelete");
+                            return;
+                        }
 
                         if (oldFiles.length == 0 || restrictUpload) {
                             return;
@@ -712,7 +728,7 @@
                     });
 
 
-                    var btnCancel = $('<a title="' + VIS.Msg.getMsg('Cancel') + '" class="vis-btn">').append(VIS.Msg.getMsg('Cancel'));
+                    var btnCancel = $('<a title="' + VIS.Msg.getMsg('close') + '" class="vis-btn">').append(VIS.Msg.getMsg('close'));
                     btnCancel.on('click', function () {
                         if (selfi.onClose) {
                             selfi.onClose();
@@ -811,7 +827,7 @@
                 }
 
                 var fileInfo = {};
-                var dAWrap = $("<div class='vis-attach-file-wrapla'>");
+                var dAWrap = $("<div class='vis-attach-file-wrapla' style='opacity: 0.5'>");
                 dLAContent.append(dAWrap);
 
                 var dTop = $("<div class='vis-attach-file-top'>");
@@ -836,12 +852,12 @@
                         }
                     }
                     if (lstLatestFiles.length > 4) {
-                        dLAContent.css('height', '153px');
-                        dOAContent.css('height', '153px');
+                        dLAContent.css('height', '135px');
+                        dOAContent.css('height', '135px');
                     }
                     else {
                         dLAContent.css('height', '97px');
-                        dOAContent.css('height', '209px');
+                        dOAContent.css('height', '180px');
 
                     }
                     if (lstLatestFiles.length == 0) {
@@ -885,12 +901,12 @@
                 fileInfo.Size = file.size;
                 lstLatestFiles.push(file);
                 if (lstLatestFiles.length > 4) {
-                    dLAContent.css('height', '153px');
-                    dOAContent.css('height', '153px');
+                    dLAContent.css('height', '135px');
+                    dOAContent.css('height', '135px');
                 }
                 else {
                     dLAContent.css('height', '97px');
-                    dOAContent.css('height', '209px');
+                    dOAContent.css('height', '180px');
 
                 }
             }
@@ -996,8 +1012,15 @@
             });
 
             var btnDelete = $("<a class='vis-attach-ico' data-id='" + index + "'><i class='vis vis-delete' aria-hidden='true'></i></a>");
-            dbtns.append(btnDelete);
+            if (!isViewOnly) { //if view only do-not add delete file
+                dbtns.append(btnDelete);
+            }
             btnDelete.on('click', function () {
+
+                if (tableName.endsWith('_ver')) {
+                    VIS.ADialog.info("AccessCannotDelete");
+                    return;
+                }
 
                 if (restrictUpload) {
                     return false;

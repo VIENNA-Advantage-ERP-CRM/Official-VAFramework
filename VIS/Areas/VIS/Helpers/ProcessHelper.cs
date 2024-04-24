@@ -187,17 +187,24 @@ namespace VIS.Helpers
 
                         MProcess pro = MProcess.Get(ctx, Convert.ToInt32(processInfo["Process_ID"]));
 
-                        // Insert Notice
-                        MNote note = new MNote(ctx, msgID, ctx.GetAD_User_ID(), null);
-                        note.SetTextMsg(Msg.GetMsg(ctx, "ProcessCompleted") + ": " + pro.GetName());
-
-                        note.SetDescription(pro.GetName());
-                        note.SetRecord(X_AD_PInstance_Result.Table_ID, pResult.GetAD_PInstance_Result_ID());
-                        note.Save();
                         if (ret.Result != null && ret.Result.Length > 100)
                         {
                             ret.Result = ret.Result.Substring(0, 100) + "...";
                         }
+                        // Insert Notice
+                        MNote note = new MNote(ctx, msgID, ctx.GetAD_User_ID(), null);
+                        if (ret.IsError)
+                        {
+                            note.SetTextMsg(Msg.GetMsg(ctx, "ProcessCompleted") + ": " + pro.GetName()+", "+ Msg.GetMsg(ctx, "VIS_WithError") +" " + ret.Result);
+                        }
+                        else
+                        {
+                            note.SetTextMsg(Msg.GetMsg(ctx, "ProcessCompleted")+ ": " + pro.GetName());
+                        }
+
+                        note.SetDescription(pro.GetName());
+                        note.SetRecord(X_AD_PInstance_Result.Table_ID, pResult.GetAD_PInstance_Result_ID());
+                        note.Save();
 
                         //VIS.Controllers.JsonDataController.AddMessageForToastr(Convert.ToInt32(processInfo["Process_ID"]) + "_P_" + ctx.GetAD_Session_ID(), pro.GetName() + " " + Msg.GetMsg(ctx, "Completed") + ": " + ret.Result);
                         ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(),  pro.GetName() + " " + Msg.GetMsg(ctx, "Completed") + ": " + ret.Result );
@@ -385,6 +392,11 @@ namespace VIS.Helpers
                 ctl.ReportString = null;
                 rep.HTML = ctl.GetRptHtml();
                 rep.IsBiHTMlReport = pi.GetFileType().Equals(ProcessCtl.ReportType_BIHTML);
+                rep.IsError = pi.IsError();
+
+                if (rep.IsError) {
+                    rep.Message = rep.Result;
+                }
 
                 // Change Lokesh Chauhan
                 rep.CustomHTML = pi.GetCustomHTML();

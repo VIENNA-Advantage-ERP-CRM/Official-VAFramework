@@ -354,8 +354,8 @@
             self.onTableRowSelect(event);
             //switch self.singleRow = false; //force single view
             if (!onlySelect) {
-                self.aPanel.actionPerformedCallback(self.aPanel, "Multi");
-                self.aPanel.setLastView("Card");
+                self.aPanel.actionPerformedCallback(self.aPanel, "Single");
+                //self.aPanel.setLastView("Card");
             }
             //self.switchSingleRow();
         };
@@ -667,13 +667,18 @@
                                 //this.leftPaneLinkItems.push(iControl);
                             }
                         }
+
+                        if (mField.getAD_Reference_Value_ID() == 435) {
+                            iControl.setReadOnly(false);
+                        }
+
                         iControl.addActionListner(this);
                     }
 
                     iControl = null;
                 }
             }
-            this.vGridPanel.flushLayout();
+            this.vGridPanel.flushLayout(mTab.getHideFGFrom());
 
         }
 
@@ -977,6 +982,11 @@
                 }
                 var mField = this.gTab.getField(columnName);
                 if (mField != null) {
+
+                    if (mField.getDisplayType() == VIS.DisplayType.Button && mField.getAD_Reference_Value_ID() == 435) {
+                        continue;
+                    }
+
                     if (mField.getIsDisplayed(true)) {		//  check context
                         var vis = comp.tag;
                         if (!comp.getIsVisible() && ((vis == null || vis == "undefined") || vis)) {
@@ -1601,6 +1611,7 @@
 
         if (recid == -1) {
             this.cancelSel = true;
+            this.refreshTabPanelData(-1);
             return;
         }
         if (recid > -1) {
@@ -1701,6 +1712,11 @@
 
             var retVal = $this.gTab.dataSave(manualCmd);
             if (retVal) {
+                if (manualCmd && $this.vHeaderPanel) {
+                    $this.vHeaderPanel.navigate();
+                    //refresh Grid Row
+                    // this.vTable.refreshRow();
+                }
                 //refresh Grid Row
                 // this.vTable.refreshRow();
             }
@@ -1851,6 +1867,13 @@
         else if (this.aPanel.vHeaderPanel) {
             this.aPanel.vHeaderPanel.navigate(true);
         }
+
+        if (e.m_info == "VER") { /*version call back */
+            e.m_info = "";
+            this.gTab.setCurrentRow(e.m_currentRow);
+            this.dynamicDisplay(col);
+        }
+
         if (!e.getIsChanged() || col < 0)
             return;
 

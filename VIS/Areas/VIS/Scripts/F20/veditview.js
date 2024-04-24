@@ -8,9 +8,13 @@
         var allControls = [];
         var allLinkControls = [];
 
+        var toolbarButtonList = {};
+
         var $table;
 
         var $td0, $td1, $td2, $td3;
+
+        var $spndisplayFG = $('<span class="vis-ev-fgbtn" data-state="N">'+VIS.Msg.getMsg("More")+'...</span>' );
 
         var _curParent = null;
 
@@ -33,6 +37,7 @@
         function initComponent() {
             $table = $("<div class='vis-ad-w-p-vc-ev-grid'>"); //   $("<table class='vis-gc-vpanel-table'>");
             $table.on("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
+            $table.on("click", "span.vis-ev-fgbtn", onBtnFGClick);
         };
 
         function onInfoClick(e) {
@@ -338,7 +343,8 @@
             e.stopPropagation();
             var divGroup = $(this);
             var target = $(e.target);
-            var name = divGroup.data("name");
+            var name = divGroup.data("name") + "_" + divGroup.data("seqno");
+           // var idx = div.Group.data("seqno");
             var dis = divGroup.data("display");
             var viewMore = $(divGroup.find('.vis-ev-col-fg-more')[0]);
             //console.log(name);
@@ -347,7 +353,7 @@
             var showGroupFieldDefault = false;
 
 
-            if (target.is('span')) {
+            if (target.is('span') || target.hasClass('vis-ev-col-fg-more')) {
                 if (dis !== "show") {// If group is vlosed and user click on show more then no processing.
                     return;
                 }
@@ -379,7 +385,17 @@
                     $(divGroup.children()[2]).removeClass("vis-ev-col-fg-rotate");
                 }
             }
+            displayFieldGroupControls(name,show,showGroupFieldDefault)
+           
+        };
 
+        /**
+         * show/hide controls
+         * @param {any} name nam of group
+         * @param {any} show flag to show controls
+         * @param {any} showGroupFieldDefault  default state of field gp controls
+         */
+        function displayFieldGroupControls(name, show,showGroupFieldDefault) {
             var list = groupToCompsMap[name];
 
             for (var i = 0; i < list.length; i++) {
@@ -395,16 +411,19 @@
                 else
                     fieldToCompParentMap[field.getColumnName()].hide();
             }
-        };
+        }
 
         function addGroup(fieldGroup) {
             if (oldFieldGroup == null) {
                 //addTop();
                 oldFieldGroup = "";
             }
+            
             if (fieldGroup == null || fieldGroup.length == 0 || fieldGroup.equals(oldFieldGroup))
                 return false;
-            oldFieldGroup = fieldGroup;
+           
+            var seqSuffix = Object.keys(groupToCompsMap).length + 1;
+            oldFieldGroup = fieldGroup;// + "_" + seqSuffix;
 
             //setColumns(columnIndex);
             // clearRowSpan();
@@ -412,10 +431,11 @@
             reset();
             initCols(true);
             //<i class="fa fa-ellipsis-h"></i>
-            var gDiv = $('<div class="vis-ev-col-fieldgroup" data-showmore="Y" data-name="' + fieldGroup + '" data-display="show">' +
+            var gDiv = $('<div class="vis-ev-col-fieldgroup" data-showmore="Y" data-name="' + fieldGroup
+                +  '" data-display="show" data-seqno="' + seqSuffix + '">' +
                 '<span class="vis-ev-col-fg-hdr"  >' + fieldGroup + ' </span> ' +
-                '<span class="vis-ev-col-fg-more">' + VIS.Msg.getMsg("ShowMore") + '</span>' +
-                '<i class= "fa fa-angle-up">' +
+                '<button class="vis-ev-col-fg-more">' + VIS.Msg.getMsg("ShowMore") + '</button>' +
+                '<button class="vis-ev-fg-arrowBtn"><i class= "fa fa-angle-up"></button>' +
                 '</span>' +
                 '</div>');
 
@@ -461,20 +481,79 @@
 
             if (oldFieldGroup != null && !oldFieldGroup.equals("")) {
                 var fieldList = null;
-
-                if (groupToCompsMap[oldFieldGroup]) {
-                    fieldList = groupToCompsMap[oldFieldGroup];
+                var seqSuffix = Object.keys(groupToCompsMap).length;
+                var oldFg = oldFieldGroup + "_" + seqSuffix;
+                if (groupToCompsMap[oldFg]) {
+                    fieldList = groupToCompsMap[oldFg];
                 }
 
                 if (fieldList == null) {
+                    //add unique entry
                     fieldList = [];
-                    groupToCompsMap[oldFieldGroup] = fieldList;
+                    groupToCompsMap[oldFieldGroup + "_" + (seqSuffix+1)] = fieldList;
                 }
                 fieldList.push(mField);
                 if (!mField.getIsFieldgroupDefault()) {
                     fieldToCompParentMap[mField.getColumnName()].hide();
                 }
             }
+        };
+
+        /**
+         * Show hide field group
+         * 
+         * @param {any} hideFGFrom
+         */
+        function addFGDisplayBtn(hideFGFrom) {
+            //addRow();
+            reset();
+            initCols(false, false, false, true);
+            $spndisplayFG.data('position', hideFGFrom);
+            _curParent.append($spndisplayFG);
+            //hide fg group
+            addRow();
+            displayFiledGroup(hideFGFrom, true);
+        }
+
+        /**
+         * show hide Field Group based on position
+         * @param {any} position start seq no
+         * @param {any} hide true if hide
+         */
+        function displayFiledGroup(position, hide) {
+            var idx = 1;
+            for (var prop in groupToCompsMap) {
+                if (idx >= position) {
+                    var ele = $table.find("[data-name='" + prop + "'],[data-seqno=" + idx + "]");
+                    if (ele && ele.length > 0) {
+                        if (hide) {
+                            ele.hide();
+                            displayFieldGroupControls(prop, false, false);
+                        }
+                        else {
+                            ele.show();
+                            displayFieldGroupControls(prop, true, ele.data("showmore") == 'N');
+                        }
+                    }
+                }
+                idx++;
+            }
+        }
+
+        function onBtnFGClick() {
+            var state = $spndisplayFG.data("state");
+            var pos = $spndisplayFG.data("position");
+            if (state == "Y") {
+                displayFiledGroup(pos, true);
+                state = "N";
+                $spndisplayFG.text(VIS.Msg.getMsg("More") + "...");
+            }
+            else {
+                displayFiledGroup(pos, false);
+                state = "Y";
+                $spndisplayFG.text("..." + VIS.Msg.getMsg("Less"));
+            }
+            $spndisplayFG.data("state", state);
         };
 
         this.addField = function (editor, mField) {
@@ -489,11 +568,17 @@
                 return;
             }
 
+            if (mField.getDisplayType() == VIS.DisplayType.Button && mField.getAD_Reference_Value_ID() == 435) {
+                var defaultValue = mField.getDefault(VIS.context, this.windowNo);
+                toolbarButtonList[defaultValue] = editor;
+            }
+
+
             var label = VIS.VControlFactory.getLabel(mField);
             if (label == null && editor == null)
                 return;
             var sameLine = mField.getIsSameLine();
-            if (addGroup(mField.getFieldGroup(), columnIndex)) {
+            if (addGroup(mField.getFieldGroup() , columnIndex)) {
                 sameLine = false;
             }
 
@@ -597,8 +682,11 @@
             }
         };
 
-        this.flushLayout = function () {
+        this.flushLayout = function (hideFGFrom) {
             addRow();
+            if (hideFGFrom > 0 && Object.keys(groupToCompsMap).length >= hideFGFrom) {
+                addFGDisplayBtn(hideFGFrom);
+            }
         };
 
         this.getRoot = function () {
@@ -613,6 +701,16 @@
             return allLinkControls;
         }
 
+        this.setEnabled = function (action, enable) {
+            if (Object.keys(toolbarButtonList).length > 0 && toolbarButtonList[action]) {
+                //toolbarButtonList[action].css({
+                //    "opacity": (enable ? 1 : .6),
+                //    "pointer-events": (enable ? "unset" : "none")
+                //});
+                toolbarButtonList[action].setReadOnly(!enable);
+            }
+        }
+
         this.setVisible = function (colName, show) {
             if (fieldToCompParentMap[colName])
                 show ? fieldToCompParentMap[colName].show() : fieldToCompParentMap[colName].hide();
@@ -620,6 +718,7 @@
 
         this.dispose = function () {
             $table.off("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
+            $table.off();
             colDescHelpList = {};
             if (lastPopover) {
                 lastPopover.popover('dispose');
@@ -657,8 +756,9 @@
             $table.remove();
             $table = null;
             this.addField = null;
-            addRow = null;
-            addToCompList = null;
+            $spndisplayFG = null;
+           // addRow = null;
+            //addToCompList = null;
         };
 
     };

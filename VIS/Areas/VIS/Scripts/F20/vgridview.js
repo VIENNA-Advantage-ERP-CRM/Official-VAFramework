@@ -58,21 +58,21 @@
                     } else {
                         // main view
                         //self.aPanel.getRoot().find(' .vis-multi:first').click();
-                        self.aPanel.actionPerformedCallback(self.aPanel, "Multi");
-                        self.aPanel.setLastView("Multi");
+                        self.aPanel.actionPerformedCallback(self.aPanel, "Single");
+                        //self.aPanel.setLastView("Multi");
                     }
                 }
                 else if (self.grid.columns[evt.column].gridField.getDisplayType() == VIS.DisplayType.TelePhone) {
 
                     self.grid.select(Number(evt.recid));
 
-                    if (window.VA048) {
+                    if (window.VA048) { //check for  module
 
                         var row = self.grid.get(evt.recid);
                         var val = row[self.grid.columns[evt.column].columnName.toLowerCase()];
 
                         // var val = self.getValue();
-                        if (!val || val == "")
+                        if (!val || val === "")
                             return;
 
 
@@ -94,8 +94,12 @@
                     else
                         VIS.ADialog.info("ComModuleNotInstalled");
                 }
+                else if (self.grid.columns[evt.column].gridField.getDisplayType() == VIS.DisplayType.Button) {
+                    self.grid.select(Number(evt.recid));
+                    self.grid.columns[evt.column].editable.ctrl.getControl().click();
+                }
             } catch (err) {
-
+                console.log(err);
             }
         }
 
@@ -729,7 +733,7 @@
                         if (l && VIS.DisplayType.List == l.displayType) {
 
                             var hue = Math.floor(Math.random() * (360 - 0)) + 0;
-                            var v = 60; //Math.floor(Math.random() * 16) + 75;
+                            var v = Math.floor(Math.random() * (75 - 60 + 1)) + 60; //Math.floor(Math.random() * 16) + 75;
                             var pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
 
                             var lType = l.getLovIconType(val, true);
@@ -804,7 +808,7 @@
                                 for (var c = 0; c < d.length; c++) {
                                     //random pastel color generator 
                                     var hue = Math.floor(Math.random() * (360 - 0)) + 0;
-                                    var v = 60; //Math.floor(Math.random() * 16) + 75;
+                                    var v = Math.floor(Math.random() * (75 - 60 + 1)) + 60; //Math.floor(Math.random() * 16) + 75;
                                     var pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
 
                                     if (d[c].trim().length > 0) {
@@ -820,19 +824,22 @@
                                         //If image contains nothing.png that means image not found in identfier and 
                                         //we will Display highlightChar
                                         if (c > 0 && img.indexOf("nothing.png") > -1 && highlightChar.length > 0) {
-                                          
-                                            strDiv += "<div style='background-color:" + pastel +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
+
+                                            strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
                                         }
                                         strDiv += "<span>" + d[c] + "</span>";
+                                    } else if (img.indexOf("nothing.png") > -1 && highlightChar.length > 0) {
+                                        strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
                                     }
+
                                     //If image found, then display that image.
                                     if (c == 0 || img.indexOf("nothing.png") > -1) {
                                         if (img.indexOf("nothing.png") == -1) {
-                                            strDiv += "<div style='background-color:" + pastel +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'"
+                                            strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'"
                                                 + " > <img src='" + img +
                                                 "'></div > ";
                                             // "' onerror='this.style.display=\"none\"' ></img></div > ";
-                                        }
+                                        } 
 
                                     }
                                 }
@@ -994,9 +1001,12 @@
 
                 oColumn.sortable = true;
 
-                //oColumn.render = function (record) {
-                //    return '<div>button</div>';
-                //}
+                oColumn.render = function (record, index, colIndex) {
+                    var f = oColumns[colIndex].field;
+                    var val = record[f];
+                    return '<span style="cursor:pointer" class="vis-ev-col-linkbutton">' + oColumns[colIndex].gridField.getHeader() + '</span>';
+
+                }
             }
 
             else if (displayType == VIS.DisplayType.Image) {
@@ -1122,8 +1132,7 @@
                 }
             }
 
-
-            if (mField.getHtmlStyle() != "") {
+            if (mField.getHtmlStyle() != "" && displayType != VIS.DisplayType.Button) {
                 oColumn.style = mField.getHtmlStyle();
             }
 
@@ -1239,6 +1248,9 @@
     VTable.prototype.getValueAsString = function (field) {
         var record = this.grid.records[this.cellRowIndex];
         var data = this.grid.parseField(record, field.toLowerCase());
+        if (this.mTab && VIS.DisplayType.YesNo == this.mTab.getField(field).getDisplayType()) {
+            data = data ? "Y" : "N";
+        }
         if (!data)
             return '';
         return data.toString();

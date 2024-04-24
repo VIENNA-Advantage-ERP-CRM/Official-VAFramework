@@ -126,13 +126,11 @@ namespace VIS.Classes
             try
             {
                 VLookUpInfo lInfo = null;
+                //In case of Created by and updatedby column, field id is zero
 
                 lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
                 lookupQuery = lInfo.queryDirect;
-
-
-
-
+               
                 List<SqlParams> listParam = new List<SqlParams>();
                 if (Key != null)
                     key = ((string[])Key)[0];
@@ -170,29 +168,47 @@ namespace VIS.Classes
         private VLookUpInfo GetLookupInfo(Ctx ctx, int WindowNo, int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string LookupData)
         {
             VLookUpInfo lInfo = null;
-            if (AD_Window_ID > 0)
+            try
             {
-                GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
-                lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
-            }
-            else
-            {
-                dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(LookupData, new ExpandoObjectConverter());
-                Ctx _ctx = new Ctx(json.ctx);
-                string validationCode = "";
-                if (((IDictionary<String, object>)json).ContainsKey("validationCode"))
+                if (AD_Window_ID > 0)
                 {
-                    validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+                    if (AD_Field_ID > 0)
+                    {
+                        GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
+                        lInfo = vo.GetTabs().Where(a => a.AD_Tab_ID == AD_Tab_ID).FirstOrDefault().GetFields().Where(x => x.AD_Field_ID == AD_Field_ID).FirstOrDefault().lookupInfo;
+                    }
+                    else
+                    {
+                        //case handling for updated and created by 
+                        lInfo = new VLookUpInfo
+                        {
+                            queryDirect = "SELECT AD_User.AD_User_ID,NULL,NVL(AD_User.Name,'-1'),AD_User.IsActive FROM AD_User WHERE AD_User.Name IS NOT NULL  AND AD_User.AD_User_ID=@key"
+                        };
+                    }
                 }
+                else
+                {
+                    dynamic json = JsonConvert.DeserializeObject<ExpandoObject>(LookupData, new ExpandoObjectConverter());
+                    Ctx _ctx = new Ctx(json.ctx);
+                    string validationCode = "";
+                    if (((IDictionary<String, object>)json).ContainsKey("validationCode"))
+                    {
+                        validationCode = SecureEngineBridge.DecryptByClientKey(json.validationCode, _ctx.GetSecureKey());
+                    }
 
 
-                if (!QueryValidator.IsValid(validationCode))
-                    return null;
+                    if (!QueryValidator.IsValid(validationCode))
+                        return null;
 
-                //Ctx _ctx = null;//(ctx) as Ctx;
-                MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
-                    Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
-                lInfo = res._vInfo;
+                    //Ctx _ctx = null;//(ctx) as Ctx;
+                    MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
+                        Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
+                    lInfo = res._vInfo;
+                }
+            }
+            catch
+            {
+
             }
             return lInfo;
         }
@@ -201,7 +217,7 @@ namespace VIS.Classes
              int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string values, string LookupData)
         {
             VLookUpInfo lInfo = null;
-            if (AD_Window_ID > 0)
+            if (AD_Window_ID > 0 && AD_Field_ID > 0)
             {
                 GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
 

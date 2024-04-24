@@ -206,8 +206,11 @@
             var isUpdateable = mField.getIsEditable(false);
             var windowNo = mField.getWindowNo();
             var tabNo = 0;
-            if (mTab)
+            var hideMapBtn = false;
+            if (mTab) {
                 tabNo = mTab.getTabNo();
+                hideMapBtn = !mTab.getIsMapView();
+            }
 
             if (displayType == VIS.DisplayType.Button) {
 
@@ -308,7 +311,8 @@
             }
             else if (displayType == VIS.DisplayType.Location) {
 
-                var txtLoc = new VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, mField.getLookup());
+                var txtLoc = new VLocation(columnName, isMandatory, isReadOnly,
+                    isUpdateable, displayType, mField.getLookup(),hideMapBtn);
                 txtLoc.setField(mField);
                 ctrl = txtLoc;
             }
@@ -814,8 +818,12 @@
 
                 if (self.ctrl.parent().length != 0)
                     self.ctrl.detach();
-
+             
                 self.editingGrid.editChange.call(self.editingGrid, self.ctrl[0], self.gridPos.index, self.gridPos.col, evt, evt.newValue);
+                if (self.oldValue == evt.newValue)// special handling
+                {
+                    self.vetoablechangeListner.vetoablechange(evt);
+                }
                 self = null;
                 evt = null;
             }, 10, this);
@@ -1396,7 +1404,7 @@
 
 
     VButton.prototype.setReferenceKey = function (refid) {
-        if (refid && refid > 0 && refid != 195 && refid != 135 && refid != 234) {
+        if (refid && refid > 0 && refid != 195 && refid != 135 && refid != 234 && refid != 435) {
             this.readReference(refid);
         }
     }
@@ -1424,7 +1432,13 @@
 
     VButton.prototype.setReadOnly = function (readOnly) {
         this.isReadOnly = readOnly;
-        this.ctrl.css('opacity', readOnly ? .6 : 1);
+
+        if (this.dynStyle && this.dynStyle.indexOf('opacity') > -1) {
+            // by pass opacity in case of style logic already have
+        } else {
+            this.ctrl.css('opacity', readOnly ? .6 : 1);
+        }
+
         if (this.isLink) {
         }
         else {
@@ -1713,7 +1727,7 @@
             }
 
             // $btnPop = $('<button tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-            $btnPop = $('<button tabindex="-1" class="input-group-text"><i tabindex="-1" class="fa fa-ellipsis-v" /></button>');
+            $btnPop = $('<button  class="input-group-text"><i tabindex="-1" class="fa fa-ellipsis-v" /></button>');
             options[VIS.Actions.refresh] = true;
 
             if (VIS.MRole.getIsShowPreference())
@@ -2394,7 +2408,7 @@
         var $ctrl = $('<input>', { type: 'text', name: columnName });
         $ctrl.attr('autocomplete', 'off');
 
-        var $btnSearch = $('<button  tabindex="-1" class="input-group-text"><i  tabindex="-1" class="' + src + '"></i></button>');
+        var $btnSearch = $('<button   class="input-group-text"><i  tabindex="-1" class="' + src + '"></i></button>');
         btnCount += 1;
 
         //Set Buttons and [pop up]
@@ -2421,7 +2435,7 @@
             options[VIS.Actions.addnewrec] = true;
 
             //$btnPop = $('<button  tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-            $btnPop = $('<button  tabindex="-1" class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
+            $btnPop = $('<button   class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
             //	VBPartner quick entry link
             var isBP = false;
             if (columnName === "C_BPartner_ID") {
@@ -2455,7 +2469,7 @@
         }
 
         if (this.isMultiKeyTextBox) {
-            $btnPop = $('<button  tabindex="-1" class="input-group-text"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>');
+            $btnPop = $('<button   class="input-group-text"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>');
             btnCount += 1;
         }
 
@@ -3406,6 +3420,11 @@
                             }
                             else {
                                 self.setValue(newVal, false, true);
+                                if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
+                                    setTimeout(function () {
+                                        self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, newVal);
+                                    }, 500);
+                                }
                             }
                         }
                     }
@@ -4219,7 +4238,7 @@
      *  @param title title
      */
 
-    function VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, lookup) {
+    function VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, lookup,hideMapButton) {
         if (!displayType) {
             displayType = VIS.DisplayType.Location;
         }
@@ -4235,8 +4254,8 @@
         //create ui
         var $ctrl = $('<input readonly>', { type: 'text', name: columnName });
         var $btnMap = $('<button class="input-group-text"><i class="vis vis-location" aria-hidden="true"></i></button>');
-        var $btnLocation = $('<button class="input-group-text"><i class="vis vis-card" aria-hidden="true"></i></button>');
-        var btnCount = 2;
+        var $btnLocation = $('<button class="input-group-text"><i class="vis vis-pencil" aria-hidden="true"></i></button>');
+        var btnCount = hideMapButton ? 1 : 2;
         //$ctrl.append($btnMap).append($btnLocation);
         var self = this;
         IControl.call(this, $ctrl, displayType, isReadOnly, columnName, isMandatory); //call base function
@@ -4250,12 +4269,16 @@
         }
 
         this.getBtn = function (index) {
-            if (index == 0) {
-                return $btnMap;
+            if (btnCount == 2) {
+                if (index == 0) {
+                    return $btnMap;
+                }
+                if (index == 1) {
+                    return $btnLocation;
+                }
             }
-            if (index == 1) {
+            else
                 return $btnLocation;
-            }
         };
 
         this.getBtnCount = function () {
@@ -4812,6 +4835,11 @@
                 if (instanceIDs != null)
                     self.setInstanceIDs = instanceIDs;
                 self.getControl().val(name);
+                if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
+                    setTimeout(function () {
+                        self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, mGenAttributeSetInstanceId);
+                    }, 500);
+                }
             };
         }
 
@@ -4881,6 +4909,11 @@
                 obj.onClose = function (mAttributeSetInstanceId, name, mLocatorId) {
                     this.M_Locator_ID = mLocatorId;
                     setValueInControl(mAttributeSetInstanceId, name);
+                    if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
+                        setTimeout(function () {
+                            self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, mAttributeSetInstanceId);
+                        }, 500);
+                    }
                 };
             }
         }
@@ -5142,11 +5175,11 @@
         var $img = $("<img >");
         var $icon = $("<i>");
         var $txt = $("<span>").text("-");
-        var $spanIcon = $('<span class="vis vis-edit vis-img-ctrl-icon">')
+        var $spanIcon = $('<a href="javascript:;" class="vis vis-edit vis-img-ctrl-icon">')
         var $ctrl = null;
         var dimension = "Thumb500x375";
 
-        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl', tabIndex: '-1' });
+        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl', tabindex: '-1' });
         $txt.css("color", "blue");
 
 
@@ -6152,7 +6185,7 @@
         $ctrl.attr('autocomplete', 'off');
         var $btnpContainer = $('<button class="input-group-text"><i class="vis vis-pcontainer" /></button>');
         //var $btnPop = $('<button  tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-        var $btnPop = $('<button  tabindex="-1" class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
+        var $btnPop = $('<button   class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
         var btnCount = 1;
         btnCount += 1;
         var self = this;

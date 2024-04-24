@@ -1006,8 +1006,14 @@ namespace VAdvantage.WF
                     throw new Exception("Not a Report AD_Process_ID=" + invoiceReportID);
 
                 }
-                //
-                ProcessInfo pi = new ProcessInfo(_node.GetName(true), invoiceReportID,
+                // Check applied to find prefix in name or search key
+                Tuple<String, String, String> aInfo = null;
+                string processName = process.GetValue();
+                if (!Env.HasModulePrefix(processName, out aInfo))
+                {
+                    processName = process.GetName();
+                }
+                ProcessInfo pi = new ProcessInfo(processName, invoiceReportID,
                     GetAD_Table_ID(), GetRecord_ID());
                 pi.SetAD_User_ID(GetAD_User_ID());
                 pi.SetAD_Client_ID(GetAD_Client_ID());
@@ -1048,7 +1054,14 @@ namespace VAdvantage.WF
                 MPInstance pInstance = new MPInstance(process, GetRecord_ID());
                 FillParameter(pInstance, trx);
                 //
-                ProcessInfo pi = new ProcessInfo(_node.GetName(true), _node.GetAD_Process_ID(),
+                // Check applied to find prefix in name or search key
+                Tuple<String, String, String> aInfo = null;
+                string processName = process.GetValue();
+                if (!Env.HasModulePrefix(processName, out aInfo))
+                {
+                    processName = process.GetName();
+                }
+                ProcessInfo pi = new ProcessInfo(processName, _node.GetAD_Process_ID(),
                     GetAD_Table_ID(), GetRecord_ID());
                 pi.SetAD_User_ID(GetAD_User_ID());
                 pi.SetAD_Client_ID(GetAD_Client_ID());
@@ -2188,7 +2201,29 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 dbValue = value;
             _po.Set_ValueOfColumn(GetNode().GetAD_Column_ID(), dbValue);
             _po.Save();
-            Object dbValueNew = _po.Get_ValueOfColumn(GetNode().GetAD_Column_ID());
+            /// VIS0008 Rejection Case handled for versioning
+            if (_po.GetTableName().ToLower().EndsWith("_ver") && column.GetColumnName().Equals("IsVersionApproved"))
+            {
+                try
+                {
+                    string parentTblName = _po.GetTableName().Substring(0, _po.GetTableName().Length - 4); 
+                    StringBuilder sql = new StringBuilder("SELECT COUNT(" + _po.GetTableName() + "_ID) FROM " + _po.GetTableName() + " WHERE IsVersionApproved = 'Y' AND " + parentTblName + "_ID" + " = " + _po.Get_Value(parentTblName + "_ID"));
+                    int _count = Util.GetValueOfInt(DB.ExecuteScalar(sql.ToString()));
+
+                    if (!Util.GetValueOfBool(dbValue) && _count <= 0 && Common.Common.HasApprovalStatusColumn(parentTblName))
+                    {
+                        sql.Clear().Append("UPDATE " + parentTblName + " SET ApprovalStatus = 'R' WHERE " + parentTblName + "_ID = " + _po.Get_Value(parentTblName + "_ID"));
+                        _count = DB.ExecuteQuery(sql.ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.SaveError("Error in updating Master record for versioning of table : " + _po.GetTableName()+"->"+ex.Message, "");
+                }
+            }
+            
+
+                        Object dbValueNew = _po.Get_ValueOfColumn(GetNode().GetAD_Column_ID());
             if (!dbValue.Equals(dbValueNew))
             {
                 if (!value.Equals(dbValueNew))

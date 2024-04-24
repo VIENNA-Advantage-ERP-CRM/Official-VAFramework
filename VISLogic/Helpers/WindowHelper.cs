@@ -82,7 +82,7 @@ namespace VIS.Helpers
 
             key = ctx.GetSecureKey();
 
-           
+
 
             try
             {
@@ -773,7 +773,7 @@ namespace VIS.Helpers
                 string SQL_Select = "SELECT " + String.Join(",", lstColumns);
 
                 StringBuilder refreshSQL = new StringBuilder(SQL_Select)
-                    .Append(" FROM "+gTableIn.TableName).Append(" WHERE ").Append(whereClause);
+                    .Append(" FROM " + gTableIn.TableName).Append(" WHERE ").Append(whereClause);
                 drRef = DB.ExecuteReader(refreshSQL.ToString());
 
                 if (((System.Data.Common.DbDataReader)drRef).HasRows)
@@ -887,8 +887,12 @@ namespace VIS.Helpers
             dynamic versionInfo = new System.Dynamic.ExpandoObject();
             Trx trx = null;
             bool hasDocValWF = false;
-
-
+            bool docProcWF = false;
+            bool hideWFVerMsg = false;
+            if (inserting && inn.RowData.ContainsKey("ishidewfvermsg"))
+            {
+                hideWFVerMsg = Util.GetValueOfBool(inn.RowData["ishidewfvermsg"]);
+            }
 
             if (UnqFields != null && UnqFields.Count > 0)
             {
@@ -1029,8 +1033,17 @@ namespace VIS.Helpers
                 versionInfo.IsLatestVersion = false;
 
                 // check whether any Document Value type workflow is attached with Version table
-                hasDocValWF = GetDocValueWF(ctx, ctx.GetAD_Client_ID(), InsAD_Table_ID, trx);
+                hasDocValWF = GetWFCount(ctx, ctx.GetAD_Client_ID(), InsAD_Table_ID, "V", trx);
+
+                // check whether any Document Process type workflow is attached with Version table
+                docProcWF = GetWFCount(ctx, ctx.GetAD_Client_ID(), InsAD_Table_ID, "P", trx);
+                if (docProcWF)
+                {
+                    if (!hasDocValWF)
+                        hasDocValWF = true;
+                }
                 versionInfo.HasDocValWF = hasDocValWF;
+                versionInfo.HasDocProcWF = docProcWF;
 
                 // EmpCode : VIS0008
                 // Check applied in case of Maintain version whether anyone else changed something
@@ -1158,12 +1171,15 @@ namespace VIS.Helpers
                         }
                     }
                     else
-                        versionInfo.IsLatestVersion = true;
+                    {
+                        if (!versionInfo.HasDocValWF)
+                            versionInfo.IsLatestVersion = true;
+                    }
                 }
             }
 
             Ver_Window_ID = 0;
-            PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, inserting,out Ver_Window_ID);
+            PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, inserting, out Ver_Window_ID);
 
             for (int i = 0; i < lstColumns.Count; i++)
             {
@@ -1272,10 +1288,10 @@ namespace VIS.Helpers
                     string finalColumn = "";
                     string[] errorCol = info.Replace("VISDBERRORCOLUMN: ", "").Split(',');
                     var fldList = m_fields.Where(a => errorCol.Contains(a.ColumnName.ToUpper())).ToList();
-                    for(int i=0; i< fldList.Count(); i++)
+                    for (int i = 0; i < fldList.Count(); i++)
                     {
                         finalColumn += fldList[i].Name;
-                        if (fldList.Count() != (i+1))
+                        if (fldList.Count() != (i + 1))
                         {
                             finalColumn += " and ";
                         }
@@ -1317,7 +1333,7 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
-            
+
 
             string SQL_Select = "SELECT " + String.Join(",", lstColumns);
 
@@ -1325,26 +1341,43 @@ namespace VIS.Helpers
 
             IDataReader dr = null;
             outt.RowData = rowData;
+            outt.Status = GridTable.SAVE_OK;
             try
             {
+                Dictionary<string, object> verResult = new Dictionary<string, object>();
+                verResult.Add("Record_ID", po.Get_ID());
+                verResult.Add("KeyColName", po.GetTableName() + "_ID");
+                verResult.Add("IsActive", po.IsActive());
+                outt.VersionResult = verResult;
+
                 if (!inn.MaintainVersions)
                     outt.LatestVersion = true;
                 if (inn.MaintainVersions && (!inn.ImmediateSave || hasDocValWF) && (hasDocValWF || !versionInfo.IsLatestVersion))
                 {
                     outt.RowData = inn.OldRowData;
                     outt.LatestVersion = versionInfo.IsLatestVersion;
-                    // if table has Workflow then return status as has WF (W)
-                    if (hasDocValWF)
-                        outt.Status = GridTable.SAVE_WFAPPROVAL;
-                    // if record is not Immediate Save then return Save in Future (F)
-                    else if (!inn.ImmediateSave)
+                    if (docProcWF)
                     {
-                        if (!versionInfo.IsLatestVersion)
+                        outt.Status = GridTable.SAVE_WFPROCESS;
+                    }
+                    else
+                    {
+                        // if table has Workflow then return status as has WF (W)
+                        if (hasDocValWF)
                         {
-                            if (IsBackDateVersion(inn.ValidFrom))
-                                outt.Status = GridTable.SAVE_BACKDATEVER;
-                            else
-                                outt.Status = GridTable.SAVE_FUTURE;
+                            if (!hideWFVerMsg)
+                                outt.Status = GridTable.SAVE_WFAPPROVAL;
+                        }
+                        // if record is not Immediate Save then return Save in Future (F)
+                        else if (!inn.ImmediateSave)
+                        {
+                            if (!versionInfo.IsLatestVersion)
+                            {
+                                if (IsBackDateVersion(inn.ValidFrom))
+                                    outt.Status = GridTable.SAVE_BACKDATEVER;
+                                else
+                                    outt.Status = GridTable.SAVE_FUTURE;
+                            }
                         }
                     }
                 }
@@ -1668,10 +1701,11 @@ namespace VIS.Helpers
         /// <param name="AD_Table_ID"></param>
         /// <param name="_trx"></param>
         /// <returns>true/false</returns>
-        public bool GetDocValueWF(Ctx ctx, int AD_Client_ID, int AD_Table_ID, Trx _trx)
+        public bool GetWFCount(Ctx ctx, int AD_Client_ID, int AD_Table_ID, String WFType, Trx _trx)
         {
+            // VIS0008 CMS
             String sql = "SELECT COUNT(AD_Workflow_ID) FROM AD_Workflow "
-                + " WHERE WorkflowType='V' AND IsActive='Y' AND IsValid='Y' AND AD_Table_ID = " + AD_Table_ID + " AND AD_Client_ID = " + AD_Client_ID
+                + " WHERE WorkflowType='" + WFType + "' AND IsActive='Y' AND IsValid='Y' AND AD_Table_ID = " + AD_Table_ID + " AND AD_Client_ID = " + AD_Client_ID
                 + " GROUP BY AD_Client_ID, AD_Table_ID ORDER BY AD_Client_ID, AD_Table_ID";
 
             return Util.GetValueOfInt(DB.ExecuteScalar(sql, null, _trx)) > 0;
@@ -1704,7 +1738,7 @@ namespace VIS.Helpers
                 else
                 {
                     //po = table.GetPO(ctx, table.GetTableName() + "_ID=" + Record_ID, trx);
-                    
+
                     po = null;
                     /* intentially by pass PO , will handle in next release 
                      will undo code in next release (Break dependency on vienna base of this hotfix)*/
@@ -1991,8 +2025,10 @@ namespace VIS.Helpers
                     else if (IsBackDateVersion(inn.ValidFrom.Value) && isLatestVersion)
                     {
                         if (!HasDocValWF)
+                        {
                             inn.ImmediateSave = true;
-                        po.Set_Value("ProcessedVersion", true);
+                            po.Set_Value("ProcessedVersion", true);
+                        }
                     }
                 }
             }
@@ -3856,6 +3892,7 @@ namespace VIS.Helpers
                 {
                     using (var w = new WindowHelper())
                     {
+
                         resultData = w.GetWindowRecordsForTreeNode(sqlIn, Fields, ctxp, rCount, SQL_Count, AD_Table_ID, sqlIn.tree_id, sqlIn.treeNode_ID, ObscureFields);
                     }
                 }

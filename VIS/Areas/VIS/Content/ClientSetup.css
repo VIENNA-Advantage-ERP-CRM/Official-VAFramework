@@ -161,7 +161,12 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
     cursor: pointer;
     text-decoration: none;
     float: left;
-    border-radius:.25rem;
+    border-radius: .25rem;
+    border: 1px solid rgba(var(--v-c-primary), 1);
+}
+
+.vis-initial-btn:focus {
+    box-shadow: 0 0 10px rgb(0 0 0 / 50%) !important;
 }
 .vis-initial-btn-blue, .vis-initial-btn-blue:hover {
     background: rgba(var(--v-c-primary), 1);

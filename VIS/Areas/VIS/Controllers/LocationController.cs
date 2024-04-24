@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -56,7 +57,7 @@ namespace VIS.Controllers
                 LocationModel obj = new LocationModel();
 
                 var _location = obj.LocationSave(ctx, pref);
-                return Json(new { locationid = _location.Get_ID(), locaddress = _location.ToString() });
+                return Json(new { locationid = _location.Get_ID(), locaddress = _location.ToString()});
             }
             return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
         }
@@ -148,8 +149,15 @@ namespace VIS.Controllers
                 {
                     return Json(lr, JsonRequestBehavior.AllowGet);
                 }
-
-                name = loc.ToString();
+                name = loc.ToString().Trim();
+                name=Regex.Replace(name, @"(^,)|(,$)|,(?=,)", "");
+                if (name.Length <= 0)
+                {
+                    name = loc.GetCountryName();
+                }
+                else {
+                    name += ", "+ loc.GetCountryName().Trim();
+                }
 
                 ll.Longitude = loc.GetLongitude();
                 ll.Latitude = loc.GetLatitude();

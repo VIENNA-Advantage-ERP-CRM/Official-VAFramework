@@ -633,10 +633,75 @@ namespace VAdvantage.Model
                     base.SetPasswordExpireOn(DateTime.Now.AddMonths(validity));
                 }
             }
+
+            if (newRecord && string.IsNullOrEmpty(GetPassword()))
+            {
+                string password = GeneratePassword();
+                SetPassword(password);
+                if (Env.IsModuleInstalled("VA037_") == true)
+                {
+                    SetVA037_BIPassword(password);
+                }
+            }
+            string emailCount = "SELECT COUNT(*) FROM AD_User WHERE LOWER(Email) =LOWER('" + GetEMail() + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID();
+            if (newRecord)
+            {
+                int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
+                if (mailExist > 0)
+                {
+                    log.SaveError("", Msg.GetMsg(GetCtx(), "EmailShouldBeUnique", true));
+                    return false;
+                }
+            }
+            else {
+                emailCount +=" AND AD_User_ID != " + GetAD_User_ID();
+                int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
+                if (mailExist > 0)
+                {
+                    log.SaveError("", Msg.GetMsg(GetCtx(), "EmailShouldBeUnique", true));
+                    return false;
+                }
+            }
             return true;
         }
 
-        string sql = "SELECT count(AD_User_ID) FROM AD_USER WHERE IsLoginUser='Y' AND IsActive = 'Y' AND AD_Client_ID=";
+        /// <summary>
+        /// Create random password for user
+        /// </summary>
+        /// <returns>password with Minimum length for password is 5 and maximum length is 8, Password must have at least 1 upper case character,
+        ///1 lower case character, one special character(@$!%*?&) and one digit.Password must start with character</returns>
+
+        public static string GeneratePassword()
+        {
+            const string upperCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowerCaseChars = "abcdefghijklmnopqrstuvwxyz";
+            const string specialChars = "@$!%*?&";
+            const string digits = "0123456789";
+
+            Random random = new Random();
+
+            // Generate at least one character of each type
+            char upperCase = upperCaseChars[random.Next(upperCaseChars.Length)];
+            char lowerCase = lowerCaseChars[random.Next(lowerCaseChars.Length)];
+            char specialChar = specialChars[random.Next(specialChars.Length)];
+            char digit = digits[random.Next(digits.Length)];
+
+            // Combine the characters to form the password
+            string password = $"{upperCase}{lowerCase}{specialChar}{digit}";
+
+            // Generate the remaining characters within the specified length range (5 to 8)
+            int remainingLength = random.Next(5, 9);
+
+            for (int i = 4; i < remainingLength; i++)
+            {
+                string allChars = upperCaseChars + lowerCaseChars + specialChars + digits;
+                char nextChar = allChars[random.Next(allChars.Length)];
+                password += nextChar;
+            }
+            return password;
+        }
+
+        string sql = "SELECT COUNT(AD_User_ID) FROM AD_USER WHERE IsLoginUser='Y' AND IsActive = 'Y' AND AD_Client_ID=";
 
         protected override bool AfterSave(bool newRecord, bool success)
         {

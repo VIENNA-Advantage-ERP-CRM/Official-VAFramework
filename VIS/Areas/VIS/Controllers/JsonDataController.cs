@@ -1137,7 +1137,11 @@ namespace VIS.Controllers
             }
             if (displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(ImageURL,'')") > 0)
             {
-                displayCol = displayCol.Replace(displayCol.Substring(displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(Imag"), displayCol.IndexOf("Images/nothing.png^^')") + 21), "");
+                int startIndex = displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(Imag");
+                int endIndex = displayCol.IndexOf("Images/nothing.png^^')") + "Images/nothing.png^^')".Length;
+                int length = endIndex - startIndex;
+                displayCol = displayCol.Remove(startIndex, length);
+                // displayCol = displayCol.Replace(displayCol.Substring(displayCol.IndexOf("||'^^'|| NVL((SELECT NVL(Imag"), displayCol.IndexOf("Images/nothing.png^^')") + 21), "");
             }
             else if (displayCol.IndexOf("nothing.png") > -1)
             {
@@ -1385,6 +1389,19 @@ namespace VIS.Controllers
         public JsonResult CheckAccessForAction(string columnName,int roleID) {
             CommonModel cm = new CommonModel();
             return Json(JsonConvert.SerializeObject(cm.CheckAccessForAction(columnName, roleID)), JsonRequestBehavior.AllowGet); 
+        }
+
+        /// <summary>
+        /// Check Table map with any window and get their ID
+        /// </summary>
+        /// <param name="tableID"></param>
+        /// <param name="actionType"></param>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        public JsonResult CheckTableMapWithAction(int tableID, string actionType, string actionName) {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.CheckTableMapWithAction(tableID, actionType, actionName, ctx)), JsonRequestBehavior.AllowGet);
         }
     }
 

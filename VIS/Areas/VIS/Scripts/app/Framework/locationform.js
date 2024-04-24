@@ -153,6 +153,9 @@
                 },
                 minLength: 1,
                 select: function (event, ui) {
+                    if (ui.item.id==0) {
+                        country.val('');
+                    }
                     contryId = ui.item.id;
                     //var contryId = null;
                     //var stateId = null;
@@ -169,6 +172,9 @@
                     //cityId = 0;
                     if (Number(contryId) > 0) {
                         change = true;
+                    }
+                    else {
+                        country.val('');
                     }
                 }
             });

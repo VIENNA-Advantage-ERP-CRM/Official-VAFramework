@@ -335,36 +335,72 @@ namespace VIS.Models
             #endregion
 
             // Find windows where the first tab is based on the table
-            string sql = "SELECT DISTINCT w.AD_Window_ID, w.Name, tt.WhereClause, t.TableName, " +
-                    "wp.AD_Window_ID, wp.Name, ws.AD_Window_ID, ws.Name "
-                + "FROM AD_Table t "
-                + "INNER JOIN AD_Tab tt ON (tt.AD_Table_ID = t.AD_Table_ID) ";
+            StringBuilder sbSql = new StringBuilder("");
+
+            //string sql = "SELECT DISTINCT w.AD_Window_ID, w.Name, tt.WhereClause, t.TableName, " +
+
+            //        "wp.AD_Window_ID, wp.Name, ws.AD_Window_ID, ws.Name "
+
+            //    + "FROM AD_Table t "
+
+            //    + "INNER JOIN AD_Tab tt ON (tt.AD_Table_ID = t.AD_Table_ID) ";
 
             bool baseLanguage = Env.IsBaseLanguage(ctx, "");// GlobalVariable.IsBaseLanguage();
+
             if (baseLanguage)
+
             {
-                sql += "INNER JOIN AD_Window w ON (tt.AD_Window_ID=w.AD_Window_ID)";
-                sql += " LEFT OUTER JOIN AD_Window ws ON (t.AD_Window_ID=ws.AD_Window_ID)"
-                    + " LEFT OUTER JOIN AD_Window wp ON (t.PO_Window_ID=wp.AD_Window_ID)";
+
+                sbSql.Append("SELECT DISTINCT w.AD_Window_ID, w.Name, tt.WhereClause, t.TableName, " +
+                    "wp.AD_Window_ID, wp.Name, ws.AD_Window_ID, ws.DisplayName "
+                + "FROM AD_Table t "
+                + "INNER JOIN AD_Tab tt ON (tt.AD_Table_ID = t.AD_Table_ID) "
+                + "INNER JOIN AD_Window w ON (tt.AD_Window_ID=w.AD_Window_ID) "
+                + " LEFT OUTER JOIN AD_Window ws ON (t.AD_Window_ID=ws.AD_Window_ID)"
+                + " LEFT OUTER JOIN AD_Window wp ON (t.PO_Window_ID=wp.AD_Window_ID)"
+
+                );
+
+                //sql += "INNER JOIN AD_Window w ON (tt.AD_Window_ID=w.AD_Window_ID)";
+
+                //sql += " LEFT OUTER JOIN AD_Window ws ON (t.AD_Window_ID=ws.AD_Window_ID)"
+
+                //    + " LEFT OUTER JOIN AD_Window wp ON (t.PO_Window_ID=wp.AD_Window_ID)";
+
             }
+
             else
+
             {
-                sql += "INNER JOIN AD_Window_Trl w ON (tt.AD_Window_ID=w.AD_Window_ID AND w.AD_Language='" + Env.GetAD_Language(ctx) + "')";
-                sql += " LEFT OUTER JOIN AD_Window_Trl ws ON (t.AD_Window_ID=ws.AD_Window_ID AND ws.AD_Language='" + Env.GetAD_Language(ctx) + "')"
-                    + " LEFT OUTER JOIN AD_Window_Trl wp ON (t.PO_Window_ID=wp.AD_Window_ID AND wp.AD_Language='" + Env.GetAD_Language(ctx) + "')";
+
+                sbSql.Append("SELECT DISTINCT w.AD_Window_ID, w.Name, tt.WhereClause, t.TableName, " +
+                    "wp.AD_Window_ID, wp.Name, ws.AD_Window_ID, ws.Name "
+                + "FROM AD_Table t "
+                + "INNER JOIN AD_Tab tt ON (tt.AD_Table_ID = t.AD_Table_ID) "
+                + "INNER JOIN AD_Window_Trl w ON (tt.AD_Window_ID=w.AD_Window_ID AND w.AD_Language='" + Env.GetAD_Language(ctx) + "')"
+                + " LEFT OUTER JOIN AD_Window_Trl ws ON (t.AD_Window_ID=ws.AD_Window_ID AND ws.AD_Language='" + Env.GetAD_Language(ctx) + "')"
+                + " LEFT OUTER JOIN AD_Window_Trl wp ON (t.PO_Window_ID=wp.AD_Window_ID AND wp.AD_Language='" + Env.GetAD_Language(ctx) + "')"
+               );
+
+                //sql += "INNER JOIN AD_Window_Trl w ON (tt.AD_Window_ID=w.AD_Window_ID AND w.AD_Language='" + Env.GetAD_Language(ctx) + "')";
+
+                //sql += " LEFT OUTER JOIN AD_Window_Trl ws ON (t.AD_Window_ID=ws.AD_Window_ID AND ws.AD_Language='" + Env.GetAD_Language(ctx) + "')"
+
+                //    + " LEFT OUTER JOIN AD_Window_Trl wp ON (t.PO_Window_ID=wp.AD_Window_ID AND wp.AD_Language='" + Env.GetAD_Language(ctx) + "')";
+
             }
-            sql += "WHERE t.TableName ='" + targetTableName
+            sbSql.Append("WHERE t.TableName ='" + targetTableName
                 + "' AND w.AD_Window_ID <>" + curWindow_ID
                 + " AND tt.SeqNo=10"
                 + " AND (wp.AD_Window_ID IS NOT NULL "
                         + "OR EXISTS (SELECT 1 FROM AD_Tab tt2 WHERE tt2.AD_Window_ID = ws.AD_Window_ID AND tt2.AD_Table_ID=t.AD_Table_ID AND tt2.SeqNo=10))"
-                + " ORDER BY 2";
+                + " ORDER BY 2");
 
 
             DataSet ds = null;
             try
             {
-                ds = DB.ExecuteDataset(sql, null);
+                ds = DB.ExecuteDataset(sbSql.ToString(), null);
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
                     //rs = ds.Tables[0].Rows[i];

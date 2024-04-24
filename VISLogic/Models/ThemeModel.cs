@@ -16,7 +16,7 @@ namespace VIS.Models
         public static List<ThemeData> GetThemeData()
         {
             List<ThemeData> tml = new List<ThemeData>();
-            string sql = "SELECT Name, PrimaryColor, OnPrimaryColor, SecondaryColor,OnSecondaryColor, IsDefault, AD_Theme_ID FROM AD_Theme";
+            string sql = "SELECT Name, PrimaryColor, OnPrimaryColor, SecondaryColor,OnSecondaryColor, IsDefault, AD_Theme_ID FROM AD_Theme ORDER BY Name";
             DataSet ds = DBase.DB.ExecuteDataset(sql);
             if (ds != null && ds.Tables.Count > 0)
             {

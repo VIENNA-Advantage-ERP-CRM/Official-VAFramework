@@ -1,7 +1,7 @@
 ﻿; (function (VIS, $) {
     //****************************************************//
-    //**             APanel                            **//
-    //**************************************************//
+    //**             APanel                             **//
+    //****************************************************//
 
     var baseUrl = VIS.Application.contextUrl;
     var dataSetUrl = baseUrl + "JsonData/JDataSetWithCode";
@@ -86,6 +86,7 @@
      *  StatusBar
      *
      */
+
     function APanel() {
         //This variable public to Instance
         var clsSuffix;
@@ -133,7 +134,8 @@
         var $btnClose = null;
         var $spnTitle = null;
         var $spanSetting = null;
-        this.excludeFromShare = ['ad_org', 'm_warehouse','ad_sharerecordorg'];
+        var $divRightbar = null;
+        this.excludeFromShare = ['ad_org', 'm_warehouse', 'ad_sharerecordorg'];
         /***END Tab panel**/
 
         var tabItems = [], tabLIObj = {};
@@ -141,8 +143,12 @@
         this.isAutoCompleteOpen = false;
         this.instructionPop = {};
         this.instructionPop[this.ACTION_NAME_NEW] = false;
-        function initComponenet() {
 
+        this.tabStack = []; // Maintain tab and view change history;
+
+        this.toolbarActionList = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT','BVW']; // ToolBar Action
+
+        function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
             $root = $(clone.querySelector(".vis-ad-w-p"));
             $busyDiv = $root.find(".vis-ad-w-p-busy"); // busy indicator
@@ -156,8 +162,8 @@
             $divTabNav = $root.find(".vis-ad-w-p-tabs-oflow").hide();// $("<div class='vis-apanel-tab-oflow'>").hide();
             $divHeaderNav = $root.find(".vis-ad-w-p-tabs-t");
 
-            // $td0leftbar = $root.find(".vis-ad-w-p-action");
-            $btnlbToggle = $root.find(".vis-ad-w-p-tb-rc-abar");
+            $divRightbar = $root.find(".vis-ad-w-p-action").hide();
+            $btnlbToggle = $root.find(".vis-ad-w-p-tb-rc-abar").hide();
 
             $ulactionbar = $root.find('.vis-ad-w-p-a-m-slist');   // $ ("<ul class='vis-apanel-lb-ul'>");
             $uldynactionbar = $root.find('.vis-ad-w-p-a-m-dlist');   // $ ("<ul class='vis-apanel-lb-ul'>");
@@ -216,12 +222,16 @@
             $btnFilter.attr('title', VIS.Msg.getMsg('FilterRecord'));
             $spanSetting.attr('title', VIS.Msg.getMsg('Settings'));
         };
-
+        var self = this;
         var eventHandling = function () {
             $root.on('click', function (e) {
                 $root.find('.vis-window-instruc-overlay-new').remove();
                 $root.find('.vis-window-instruc-overlay-new-li').removeClass('.vis-window-instruc-overlay-new-li');
+                if ($(e.target).is(':focus')) {
+                    self.compositViewChangeSave(e);
+                }
             });
+
         };
 
         this.createSearchAutoComplete = function (text) {
@@ -315,7 +325,7 @@
             }
         };
 
-        var self = this;
+
 
         function finishLayout() {
             $divHeaderNav.show();
@@ -331,6 +341,8 @@
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             }
 
+            self.gridWindow.getIsHideTabLinks()
+
             setToolTipMessages();
         };
         /* Tool bar */
@@ -341,6 +353,18 @@
         this.setSize = function (height, width) {
             return;
         };
+
+        /**
+         * Check given refrence is window action.
+         * @param {any} refrenceValue
+         */
+        this.getIsWindowAction = function (refrenceValue) {
+            if (refrenceValue == 435) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         //Action Perormed
         var onAction = function (action) {
@@ -366,31 +390,31 @@
         this.createToolBar = function () {
 
             //1. toolbar action
-            this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh");
-            this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete");
-            this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New");
-            this.aIgnore = this.addActions("Ignore", null, true, true, false, onAction, null, "Shct_Ignore");
-            this.aSave = this.addActions("Save", null, true, true, false, onAction, null, "Shct_Save");
+            this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh", "Refresh");
+            this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete", "Delete");
+            this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
+            this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore", "Ignore");
+            this.aSave = this.addActions("SAR", null, true, true, false, onAction, null, "Shct_Save", "Save");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
-            this.aReport = this.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
-            this.aPrint = this.addActions("Print", null, true, true, false, onAction, null, "Shct_Print");
-            this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
+            this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report", "Report");
+            this.aPrint = this.addActions("PRT", null, true, true, false, onAction, null, "Shct_Print", "Print");
+            // this.aBatchUpdate = this.addActions("BatchUpdate", null, true, true, false, onAction, null, "Shct_BatchUpdate");
 
             //Ndw Back button
-            this.aBack = this.addActions("Back", null, true, true, false, onAction, null, "Shct_Back");
-            $ulToobar.append(this.aBack.getListItm());
-            $ulToobar.append(this.aIgnore.getListItm());
-            $ulToobar.append(this.aNew.getListItm());
-            $ulToobar.append(this.aDelete.getListItm());
-            $ulToobar.append(this.aSave.getListItm());
-            $ulToobar.append(this.aRefresh.getListItm());
-            $ulToobar.append(this.aReport.getListItm());
-            $ulToobar.append(this.aPrint.getListItm());
-            //$ulToobar.append(this.aBatchUpdate.getListItm());
-            this.aBatchUpdate.getListItm();
-
-
+            this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back", "back-arrow");
+            //check toolbar
+            if (!this.gridWindow.getIsHideToolbar()) {
+                $ulToobar.append(this.aBack.getListItm());
+                $ulToobar.append(this.aIgnore.getListItm());
+                $ulToobar.append(this.aNew.getListItm());
+                $ulToobar.append(this.aDelete.getListItm());
+                $ulToobar.append(this.aSave.getListItm());
+                $ulToobar.append(this.aRefresh.getListItm());
+                $ulToobar.append(this.aReport.getListItm());
+                $ulToobar.append(this.aPrint.getListItm());
+                // $ulToobar.append(this.aBatchUpdate.getListItm());
+            }
 
             //lakhwinder
             //$ulToobar.append(this.aInfo.getListItm());
@@ -406,8 +430,9 @@
             this.aFirst = this.addActions(this.ACTION_NAME_FIRST, null, true, true, true, onAction, null, "Shct_FirstRec");
             this.aLast = this.addActions(this.ACTION_NAME_LAST, null, true, true, true, onAction, null, "Shct_LastRec");
             this.aNext = this.addActions(this.ACTION_NAME_NEXT, null, true, true, true, onAction, null, "Shct_NextRec");
-            this.aMulti = this.addActions("Multi", null, false, true, true, onAction, true, "Shct_MultiRow");
-            this.aCard = this.addActions("Card", null, false, true, true, onAction, true, "Shct_CardView");
+            this.aMulti = this.addActions("Multi", null, false, true, true, onAction, false, "Shct_MultiRow", "Multix");
+            this.aSingle = this.addActions("Single", null, false, true, true, onAction, false, "Shct_MultiRow","Multi");
+            this.aCard = this.addActions("Card", null, false, true, true, onAction, false, "Shct_CardView", "card-o");
 
             this.aMap = this.addActions("Map", null, false, true, true, onAction);
 
@@ -417,6 +442,7 @@
                 .append(this.aNext.getListItm())
             //.append(this.aLast.getListItm());
             $ulNav.append(this.aMulti.getListItm());
+            $ulNav.append(this.aSingle.getListItm());
             $ulNav.append(this.aCard.getListItm());
             $ulNav.append(this.aMap.getListItm().hide());
 
@@ -427,10 +453,22 @@
             this.aPageLast = this.addActions("PageLast", null, true, true, true, onAction, null, "Shct_PageLast");
             this.aPageDown = this.addActions(this.ACTION_NAME_PAGEDOWN, null, true, true, true, onAction, null, "Shct_PageDown");
 
-            //Action Bar[Left] 
+            //Action Bar[] 
 
             var mWindow = this.gridWindow;
             actionItemCount_Right = 0;
+
+            if (!mWindow.getIsHideActionbar()) {
+                //hide action bat toggle 
+                $btnlbToggle.show();
+                $divRightbar.show();
+            }
+
+            this.aBatchUpdate = this.addActions("BUE", null, false, false, false, onAction); //1
+            if (VIS.Env.getCtx().getContext('#ENABLE_BATCHUPDATE') === 'Y' && this.ctx.getAD_User_ID() == 100) {
+                this.aBatchUpdate.setTextDirection("r");
+                $ulactionbar.append(this.aBatchUpdate.getListItmIT());
+            }
             if (mWindow.getIsAppointment()) {
                 this.aAppointment = this.addActions("APT", null, false, false, false, onAction); //1
                 this.aAppointment.setTextDirection("r");
@@ -440,7 +478,6 @@
                 this.aTask = this.addActions("TAK", null, false, false, false, onAction); //1
                 this.aTask.setTextDirection("r");
                 $ulactionbar.append(this.aTask.getListItmIT());
-
             }
             if (mWindow.getIsEmail()) {
                 this.aEmail = this.addActions("EML", null, false, false, false, onAction); //1
@@ -462,7 +499,6 @@
                 this.aFaxEmail.setTextDirection("r");
                 $ulactionbar.append(this.aFaxEmail.getListItmIT());
             }
-
             //add
             if (mWindow.getIsChat()) {
                 this.aChat = this.addActions(this.ACTION_NAME_CHAT, null, false, false, false, onAction, true);  //1
@@ -484,13 +520,11 @@
                 this.aRequest.setTextDirection("r");
                 $ulactionbar.append(this.aRequest.getListItmIT());
             }
-
             if (VIS.AEnv.getIsWorkflowProcess()) {
                 this.aWorkflow = this.addActions("Workflow", null, true, false, false, onAction);
                 this.aWorkflow.setTextDirection("r");
                 $ulactionbar.append(this.aWorkflow.getListItmIT());
             }
-
             if (mWindow.getIsCopyReocrd()) {
                 this.aCopy = this.addActions("CRD", null, false, false, false, onAction);
                 this.aCopy.setTextDirection("r");
@@ -530,7 +564,7 @@
                 }
                 //Added by Anil Kumar as Discussed with Vinay Bhatt
                 if (mWindow.getIsGenerateAttachmentCode()) {
-                    this.aGenerateAttachmentCode = this.addActions("CAC", null, false, false, false, onAction ); //1
+                    this.aGenerateAttachmentCode = this.addActions("CAC", null, false, false, false, onAction); //1
                     this.aGenerateAttachmentCode.setTextDirection("r");
                     $ulactionbar.append(this.aGenerateAttachmentCode.getListItmIT());
                 }
@@ -611,12 +645,8 @@
                 //else
                 //    $ulRightBar2.parent().addclass('show')
             };
-
             /* Set Tool Bar */
-
             finishLayout();
-
-
         };
 
         this.setDynamicActions = function () {
@@ -663,7 +693,6 @@
         this.getFilterPane = function () {
             return $fltrPnlBody;
         };
-
 
         /**Clear search box
          * */
@@ -781,13 +810,13 @@
 
             var next = null;
             if (forward) {
-                next = $ulTabControl.find('.vis-apanel-tab-selected').next();
+                next = $ulTabControl.find('.vis-apanel-tab-selected').nextAll("[style='opacity: 1;']:first");
                 if (!next || next.length <= 0) {
                     next = $ulTabControl.children().first();
                 }
             }
             else {
-                next = $ulTabControl.find('.vis-apanel-tab-selected').prev();
+                next = $ulTabControl.find('.vis-apanel-tab-selected').prevAll("[style='opacity: 1;']:first");
                 if (!next || next.length <= 0) {
                     next = $ulTabControl.children().last();
                 }
@@ -807,7 +836,7 @@
                 //$busyDiv.hide();
                 $busyDiv[0].style.visibility = 'hidden';
                 if (focus) {
-
+                    //void 0;
                 }
             }
         };
@@ -1252,7 +1281,9 @@
                 if (this.aAppointment) {
                     this.aAppointment.dispose();
                 }
-
+                if (this.aBatchUpdate) {
+                    this.aBatchUpdate.dispose();
+                }
                 this.aHelp.dispose();
                 if (this.aSubscribe) {
                     this.aSubscribe.dispose();
@@ -1286,7 +1317,7 @@
                 this.aChat = this.aPageUp = this.aPageFirst = this.aPageLast = this.aPageDown = null;
                 this.aHelp = this.aSubscribe = this.aAttachment = null, this.toolbarCreated = null;
                 this.aZoomAcross = this.aRequest = this.aMark = this.aWorkflow = this.aHistory = null;
-                this.aAppointment = null; this.aRecAccess = this.aImportMap = this.aCard = this.aCardDialog = this.aShowSummaryLevel = null;
+                this.aAppointment = null; this.aBatchUpdate = null; this.aRecAccess = this.aImportMap = this.aCard = this.aCardDialog = this.aShowSummaryLevel = null;
             }
 
             this.statusBar.dispose();
@@ -1335,15 +1366,16 @@
     APanel.prototype.ACTION_NAME_PAGEDOWN = "PageDown";// "Previous";
     APanel.prototype.ACTION_NAME_PAGEUP = "PageUp";// "Next";
 
-    APanel.prototype.ACTION_NAME_NEW = "New";
-    APanel.prototype.ACTION_NAME_DELETE = "Delete";
-    APanel.prototype.ACTION_NAME_REFRESH = "Refresh";
+    APanel.prototype.ACTION_NAME_NEW = "NRD";
+    APanel.prototype.ACTION_NAME_DELETE = "DRD";
+    APanel.prototype.ACTION_NAME_REFRESH = "RQY";
     APanel.prototype.ACTION_NAME_FIND = "Find";
     APanel.prototype.ACTION_NAME_CHAT = "CHT";
     APanel.prototype.ACTION_NAME_APPOINTMENT = "Appointment";
     APanel.prototype.ACTION_NAME_ARCHIVE = "Archive";
     APanel.prototype.ACTION_NAME_SHAREDREC = "RSD";
 
+    var currentFocusClass = null;
     APanel.prototype.keyDown = function (evt) {
         if (!evt.ctrlKey && evt.altKey && this.curGC) {
             var en = this.aNew.getIsEnabled();
@@ -1496,6 +1528,10 @@
             if (this.vTabbedPane && this.vTabbedPane.keyDown)
                 this.vTabbedPane.keyDown(evt);
         }
+
+        if (evt.keyCode === 9) {
+            this.compositViewChangeSave(evt);
+        }
     }
 
     APanel.prototype.ShortcutNavigation = function (action) {
@@ -1542,10 +1578,125 @@
         this.setBusy(true);
     };
 
-    APanel.prototype.addActions = function (action, parent, disableIcon, imageOnly, isSmall, onAction, toggle, toolTipText) {
-        var action = new VIS.AppsAction({ action: action, parent: parent, enableDisable: disableIcon, toggle: toggle, imageOnly: imageOnly, isSmall: isSmall, onAction: onAction, toolTipText: toolTipText }); //Create Apps Action
+    APanel.prototype.addActions = function (action, parent, disableIcon, imageOnly, isSmall, onAction, toggle, toolTipText, iconName) {
+        var obj = { action: action, parent: parent, enableDisable: disableIcon, toggle: toggle, imageOnly: imageOnly, isSmall: isSmall, onAction: onAction, toolTipText: toolTipText };
+        if (iconName) {
+            obj.iconName = iconName;
+        }
+        var action = new VIS.AppsAction(obj); //Create Apps Action
         return action;
     };
+
+    //Handle Composite view Change focus Save
+    APanel.prototype.compositViewChangeSave = function (e) {
+        var $ths = this;
+        if ($(e.target).closest('.vis-ad-w-p-center-inctab').length > 0 || $(e.target).closest('.vis-ad-w-p-vc').length > 0) {
+            var activeElement = $(document.activeElement);
+            setTimeout(function () {
+                var newFocusClass = $(document.activeElement).closest('.vis-ad-w-p-center-inctab').length > 0 ? 'vis-ad-w-p-center-inctab' : 'vis-ad-w-p-vc';
+                if (!currentFocusClass) {
+                    currentFocusClass = newFocusClass;
+                }
+
+                if (currentFocusClass !== newFocusClass && currentFocusClass !== '') {
+
+                    if (currentFocusClass == 'vis-ad-w-p-vc') {
+                        var lf = $ths.vTabbedPane.contentPane.curTab.getLastFocus();
+                        $ths.vTabbedPane.contentPane.curTab.setLastFocus(null);
+                        if (lf) {
+                            $ths.curTab.setLastFocus(lf);
+                        }
+                        //$ths.curTab.setLastFocus(activeElement);
+                    }
+                    //lastFocus.focus();
+                    if (currentFocusClass == 'vis-ad-w-p-center-inctab') {
+                        var lf = $ths.curTab.getLastFocus();
+                        $ths.curTab.setLastFocus(null);
+                        $ths = $ths.vTabbedPane.contentPane;
+                        if (lf) {
+                            $ths.curTab.setLastFocus(lf);
+                        }
+                        //$ths.curTab.setLastFocus(activeElement);
+                        //$ths.lastFocus = activeElement;
+                    }
+
+                    if ($ths.curGC != null) {
+                        if ($ths.curTab.needSave(true, false)) {   //  do we have real change
+                            if ($ths.curTab.needSave(true, true)) {
+                                if (VIS.Env.getCtx().isAutoCommit($ths.curWindowNo)) {
+                                    if (currentFocusClass == 'vis-ad-w-p-vc') {
+                                        var isCheckListRequire = $ths.curGC.IsCheckListRequire();
+                                        if (!isCheckListRequire) {
+                                            //$ths.lastFocus.focus();
+                                            $ths.curTab.getLastFocus().focus();
+                                            return false;
+                                        }
+                                    }
+                                    if (!$ths.curTab.dataSave(true)) {	//  there is a problem, so we go back
+                                        //$ths.lastFocus.focus();
+                                        //$ths.curTab.getLastFocus().focus();
+                                        return false;
+                                    } else {
+                                        $ths.curTab.setLastFocus(activeElement);
+                                    }
+                                }
+                                else {
+                                    canExecute = false;
+                                    VIS.ADialog.confirm("SaveChanges?", true, $ths.curTab.getCommitWarning(), 'Confirm', function (results) {
+                                        if (results) {
+                                            if (!$ths.curTab.dataSave(true)) {
+                                                //$ths.lastFocus.focus();
+                                                //$ths.curTab.getLastFocus().focus();
+                                                return false;
+                                            } else {
+                                                $ths.curTab.setLastFocus(activeElement);
+                                            }
+                                        }
+
+                                    });
+                                }
+                            } else {
+                                $ths.curTab.setLastFocus(activeElement);
+                            }
+                        }
+                        else {
+                            $ths.curTab.setLastFocus(activeElement);
+                        }
+                    } else {
+                        $ths.curTab.setLastFocus(activeElement);
+                    }
+                } else {
+                    $ths.curTab.setLastFocus(activeElement);
+                }
+                currentFocusClass = newFocusClass;
+            }, 100)
+        }
+    }
+
+    APanel.prototype.ShowHideViewIcon = function (action) {
+        if (this.curTab != null && this.curGC !=null) {
+            if (!this.curTab.getIsHideGridToggle()) {
+                this.aMulti.show();
+                this.aSingle.show();
+
+            } else {
+                this.aMulti.hide();
+                this.aSingle.hide();
+            }
+
+            if (!this.curTab.getIsHideCardToggle()) {
+                this.aCard.show();
+            } else {
+                this.aCard.hide();
+            }
+            action.hide();
+        } else {
+            this.aMulti.hide();
+            this.aSingle.hide();
+            this.aCard.hide();
+        }
+       
+    }
 
     /** ************************************************************************
      *	Dynamic Panel Initialization -  single window .
@@ -1613,7 +1764,7 @@
         for (var i = 0; i < tabs.length; i++) {
 
             var id = curWindowNo + "_" + tabs[i].getAD_Tab_ID(); //uniqueID
-            var tObj = { action: id, text: tabs[i].getName(), toolTipText: tabs[i].getDescription(), textOnly: true, iconName: '' };
+            var tObj = { action: id, text: tabs[i].getName(), toolTipText: tabs[i].getDescription(), textOnly: true, iconName: '', isHideTab: tabs[i].getIsHideTabName() };
             if (tabs[i].getTabLevel() > 0) {
                 tObj.textOnly = false;
                 if (tabs[i].getTabLevel() > 3)
@@ -1726,8 +1877,10 @@
                 gc.initFilterPanel(curWindowNo, this.getFilterPane());
 
                 tabElement = gc;
-                if (i === 0 && goSingleRow)
+                if (i === 0 && goSingleRow) {
+                    this.ShowHideViewIcon(this.aSingle);
                     gc.switchSingleRow();
+                }
                 //	Store GC if it has a included Tab
                 if (gTab.getIncluded_Tab_ID() != 0) {
                     includedMap[gTab.getIncluded_Tab_ID()] = gc;
@@ -2004,7 +2157,8 @@
             return;
 
         if (action.source instanceof VIS.Controls.VButton) {
-            if (!action.source.getField().getIsEditable(true) || this.curTab.getIsReadOnly()) {
+            var btnField = action.source.getField();
+            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
                 return;
             }
         }
@@ -2013,11 +2167,20 @@
         var selfPan = this;
         setTimeout(function () {
             //  Command Buttons
+
+
             if (action.source instanceof VIS.Controls.VButton) {
-                if (!selfPan.actionButton(action.source, controller)) {
-                    selfPan.setBusy(false, true);
+                var btnactionName = action.source.getField().vo.DefaultValue;
+                if (selfPan.getIsWindowAction(action.source.mField.getAD_Reference_Value_ID()) && selfPan.toolbarActionList.indexOf(btnactionName)>-1) {
+                    // handle Toolbar action by Button
+                    selfPan.actionPerformedCallback(selfPan, btnactionName);
+                    return;
+                } else {
+                    if (!selfPan.actionButton(action.source, controller)) {
+                        selfPan.setBusy(false, true);
+                    }
+                    return;
                 }
-                return;
             }
 
             selfPan.actionPerformedCallback(selfPan, action);
@@ -2026,6 +2189,45 @@
     };
 
     APanel.prototype.actionPerformedCallback = function (tis, action) {
+        /*Handle view change for back button */
+        if (action === "Multi" || action === "Card" || action === "Single") {
+            var view = "Y";
+            if (action === "Multi") {
+                view = "N";
+                //if (tis.curGC.getIsSingleRow()) {
+                //    view = "N";
+                //} else {
+                //    view = "Y";
+                //}
+            } else if (action === "Single") {
+                view = "Y";
+            }
+
+            else if (action === "Card") {
+                view = "C";
+                //if (tis.curGC.getIsCardRow()) {
+                //    view = "N";
+                //}
+                //else {
+                //    view = "C";
+                //}
+            }
+
+
+            //Maintain stack for view change
+            if (this.tabStack.length > 0) {
+                var currentTabSeq = this.curWinTab.getSelectedIndex();
+                var currentTab = this.tabStack.find(function (tab) {
+                    return tab.tabSeq === currentTabSeq;
+                });
+
+                if (currentTab.tabView.includes(view)) {
+                    currentTab.tabView = [];
+                }
+                currentTab.tabView.push(view);
+            }
+            this.setBackEnable();
+        }
 
         /*Naviagtion */
         if (tis.aFirst.getAction() === action) {
@@ -2040,48 +2242,23 @@
         } else if (tis.aNext.getAction() === action) {
             tis.isDefaultFocusSet = false;
             tis.curGC.navigateRelative(+1);
-        } else if (tis.aMulti.getAction() === action) {
-            tis.setLastView("");
-            if (!tis.curGC.getIsSingleRow() && tis.curGC.getIsCardRow()) {
-                tis.setLastView("Card");
-            }
-            else if (!tis.curGC.getIsSingleRow()) {
-                tis.setLastView("Multi");
-            }
-            //    tis.setLastView("Multi");
-            //else 
-
-            tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
-            tis.aCard.setPressed(false);
-            tis.curGC.switchRowPresentation();
+        } else if (tis.aSingle.getAction() === action) {
+            tis.ShowHideViewIcon(tis.aSingle);
+            tis.curGC.switchSingleRow(true);
+        }
+        else if (tis.aMulti.getAction() === action) {
+            tis.ShowHideViewIcon(tis.aMulti);
+            tis.curGC.switchMultiRow();
         } else if (tis.aCard.getAction() === action) {
-            tis.setLastView("");
-            if (tis.curGC.getIsCardRow()) {
-                //tis.setLastView("Multi");
-                tis.curGC.switchMultiRow();
-            }
-            else {
-                //tis.setLastView("Card");
-                tis.curGC.switchCardRow();
-            }
-            tis.aMulti.setPressed(false);
+            tis.ShowHideViewIcon(tis.aCard);
+            tis.curGC.switchCardRow();            
             // tis.aBack.setEnabled(!tis.curGC.getIsCardRow());
         } else if (tis.aMap.getAction() === action) {
             tis.aMulti.setPressed(true);
             tis.aCard.setPressed(false);
             tis.curGC.switchMapRow();
         } else if (tis.aBack.getAction() === action) {
-            if (tis.getLastView() == "Multi") {
-                tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
-                tis.aCard.setPressed(false);
-                tis.curGC.switchMultiRow(true);
-            }
-            else if (tis.getLastView() == "Card") {
-                tis.curGC.switchCardRow(true);
-                tis.aMulti.setPressed(false);
-                tis.aCard.setPressed(true);
-            }
-            tis.setLastView("");
+            tis.cmd_back();
         } else if (tis.aPageUp.getAction() === action) {
             tis.isDefaultFocusSet = false;
             tis.curGC.navigatePage(-1);
@@ -2117,7 +2294,7 @@
         else if (tis.aFind.getAction() === action) {
             tis.cmd_finddialog();
         }
-        else if (tis.aBatchUpdate.getAction() === action) {
+        else if (tis.aBatchUpdate && tis.aBatchUpdate.getAction() === action) {
             tis.cmd_batchUpdatedialog();
         }
         else if (tis.aChat && tis.aChat.getAction() === action) {
@@ -2280,13 +2457,25 @@
 
         var needExecute = true;
 
-        if (curCtrller.curTab.needSave(true, false)) {
+        //check action type
+
+        //Undo     
+
+
+        if (vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU") {
+            aPanel.cmd_ignore();
+            aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction());
+            needExecute = false;
+
+        } 
+
+        else if (curCtrller.curTab.needSave(true, false)) {
             needExecute = false;
             curCtrller.cmd_save(true, function (result) {
                 if (result) {
                     aPanel.actionButtonCallBack(vButton, startWOasking, batch, dateScheduledStart, columnName, ctx, curCtrller);
                 }
-            })
+            });
         }
 
 
@@ -2573,7 +2762,7 @@
         /*Special handling
           Move to next tab */
         else if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction());
+            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(), mField.getActionName());
             return;
         }
 
@@ -2593,11 +2782,14 @@
             }
         }
 
-        if (vButton.mField.getAD_Reference_Value_ID() == 435) {
+        if (aPanel.getIsWindowAction(vButton.mField.getAD_Reference_Value_ID())) {
 
-            switch (vButton.value) {
+            switch (vButton.mField.vo.DefaultValue) {
                 case 'APT':
                     aPanel.cmd_appointment();
+                    break;
+                case 'BUE':
+                    aPanel.cmd_batchUpdatedialog();
                     break;
                 case 'EML':
                     aPanel.cmd_email();
@@ -2615,7 +2807,7 @@
                     aPanel.cmd_chat();
                     break;
                 case 'ATT':
-                    aPanel.cmd_attachment();
+                    aPanel.cmd_attachment(vButton.getField().evaluateLogicsOnly());
                     break;
                 case 'HIY':
                     aPanel.cmd_history();
@@ -2641,6 +2833,31 @@
                 case 'RSD':
                     aPanel.cmd_RecordShared();
                     break;
+                case 'NRD':
+                    aPanel.cmd_new()
+                    break;
+                case 'SAR':
+                    aPanel.cmd_save(false)
+                    break;
+                case 'DRD':
+                    aPanel.cmd_delete()
+                    break;
+                case 'RQY':
+                    aPanel.cmd_refresh()
+                    break;
+                case 'BVW':
+                    aPanel.cmd_back()
+                    break;
+                case 'UNO':
+                    aPanel.cmd_ignore();
+                    break;
+                case 'RET':
+                    aPanel.cmd_report();
+                    break;
+                case 'PRT':
+                    aPanel.cmd_print();
+                    break;
+
                 default: actionVADMSDocument(aPanel, vButton.value)
             }
 
@@ -2870,7 +3087,54 @@
      *	tab change
      *  @param action tab item's id
      */
-    APanel.prototype.tabActionPerformed = function (action, actionType) {
+    APanel.prototype.tabActionPerformed = function (action, actionType, actionName) {
+
+        /* Check for any window or form added in action*/
+        if ((actionType == 'WIW' || actionType == 'FOM') && actionName != "") {
+            var obj = {
+                tableID: this.curTab.getAD_Table_ID(),
+                actionType: actionType,
+                actionName: actionName
+            }
+            var $this = this;
+            $this.setBusy(true);
+            $.ajax({
+                url: baseUrl + "JsonData/CheckTableMapWithAction",
+                type: "POST",
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(obj)
+            }).done(function (json) {
+                $this.setBusy(false);
+                list = JSON.parse(json);
+                var popover = $("<div>");
+                var ul = $('<ul class=vis-apanel-rb-ul>');
+                popover.append(ul);
+                if (list.length > 1) {
+                    for (var i in list) {
+                        var li = $("<li data-id='" + list[i].ID + "' data-action='" + list[i].ActionType + "'>");
+                        li.append(list[i].Name);
+                        li.on('click', function (e) {
+                            e.stopImmediatePropagation();
+                            var ID = $(this).data('id');
+                            var atype = $(this).data('action');
+                            VIS.viewManager.startAction(atype, ID);
+                            var overlay = $('#w2ui-overlay-main');
+                            overlay.hide();
+                            overlay = null;
+                        });
+                        ul.append(li);
+                    }
+                    $(document.activeElement).w2overlay(popover.clone(true), { align: "right", css: { height: '200px' } });
+                } else if (list.length == 1) {
+                    VIS.viewManager.startAction(list[0].ActionType, list[0].ID);
+                }
+
+            }).error(function () {
+                $this.setBusy(false);
+            });
+            return;
+        }
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
@@ -3014,6 +3278,28 @@
 
             }
 
+            var clickedTabSeq = tpIndex; //Get Tab index
+            var clickedTabID = action; // Get the tab ID
+            var winNo = this.curWindowNo;
+
+            //Remove tab which sequence ias higher then ccurrent selected tab
+            this.tabStack = this.tabStack.filter(function (tab) {
+                return tab.tabSeq <= clickedTabSeq;
+            });
+
+            //Check Selected tab is exist or not
+            var clickedTab = undefined;
+            if (this.tabStack.length > 0) {
+                clickedTab = this.tabStack.find(function (tab) {
+                    return tab.tabSeq === clickedTabSeq ;
+                });
+            }
+
+            if (!clickedTab) { // if selected tab not exist then add.
+                this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
+            }
+           
+
         }
         if (canExecute) {
             selfPanel.tabActionPerformedCallback(action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st);
@@ -3022,23 +3308,31 @@
         return true;
     };
 
-    APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st ) {
+    APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st) {
 
 
         curEle.setVisible(false);
         curEle.getRoot().detach();
+
         this.getLayout().prepend(tabEle.getRoot());
-        tabEle.setVisible(true);
 
         this.vTabbedPane.setSelectedTab(action); //set Seleted tab
 
         var keepFilters = back;
         if (isAPanelTab) {
+            tabEle.setVisible(true);
             this.curST = st;
             st.registerAPanel(this);
             st.loadData();
         }
         else {
+
+            var mTab = gc.getMTab();
+
+            
+
+            tabEle.setVisible(true);
+
             gc.activate(oldGC);
             if (oldGC)
                 oldGC.detachDynamicAction();
@@ -3052,8 +3346,10 @@
                 this.curTab.query = queryy;
                 keepFilters = false;
             }
-
+            var defaultTabLayout = mTab.getTabLayout();
             if (back && this.curTab.getIsCurrent()) {
+                
+
                 if (this.curTab.getTabLevel() == 0) {
                     if (this.curTab.searchText) {
                         this.setAdvancedSerachText(false, this.curTab.searchText);
@@ -3071,9 +3367,33 @@
                     }
                 }
                 gc.dataRefresh();
+
+                if (this.tabStack.length > 0) {
+                    var currentTabSeq = this.curWinTab.getSelectedIndex();
+                    var currentTab = this.tabStack.find(function (tab) {
+                        return tab.tabSeq === currentTabSeq;
+                    });
+
+                    if (currentTab.tabView.length > 0) {
+                        defaultTabLayout = currentTab.tabView[currentTab.tabView.length - 1];
+                    }
+                }
             }
             else	//	Requery and bind
             {
+                /* if reset tab is true then set default view which is set on tab */
+                if (mTab.getIsResetLayout()) {                    
+                    if (defaultTabLayout == 'N') {
+                        gc.switchMultiRow();
+                    }
+                    else if (defaultTabLayout == 'Y') {
+                        gc.switchSingleRow(true);
+                    }
+                    else if (defaultTabLayout == 'C') {
+                        gc.switchCardRow(true);
+                    }
+                }
+
                 this.curTab.getTableModel().setCurrentPage(1);
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
 
@@ -3095,6 +3415,18 @@
                 }
             }
 
+            
+            //Change Icon
+            if (defaultTabLayout == 'N') {
+                this.ShowHideViewIcon(this.aMulti);
+            }
+            else if (defaultTabLayout == 'Y') {
+                this.ShowHideViewIcon(this.aSingle);
+            }
+            else if (defaultTabLayout == 'C') {
+                this.ShowHideViewIcon(this.aCard);
+            }
+
 
             if (this.curGC.onDemandTree) {
                 this.aShowSummaryLevel.show();
@@ -3106,17 +3438,35 @@
 
         }
 
+        var gPanel = null;
+        if (this.curGC) {
+            gPanel = this.curGC.vGridPanel;
+        } else {
+            gPanel = {};
+            gPanel.setEnabled = function (action,enable) {
+                
+            }
+        }
         //	Order Tab
         if (isAPanelTab) {
-            this.aMulti.setPressed(false);
-            this.aMulti.setEnabled(false);
-            this.aCard.setEnabled(false);
+            this.ShowHideViewIcon(null);
+            //this.aMulti.setPressed(false);
+            //this.aMulti.setEnabled(false);
+            //this.aCard.setEnabled(false);
             this.aCardDialog.setEnabled(false);
+
             this.aNew.setEnabled(false);
+            //gPanel.setEnabled("NRD", false);
+
             this.aDelete.setEnabled(false);
+           // gPanel.setEnabled("DRD", false);
+
             this.aFind.setEnabled(false);
             this.aBatchUpdate.setEnabled(false);
+
             this.aRefresh.setEnabled(false);
+            //gPanel.setEnabled("RQY", false);
+
             this.aNext.setEnabled(false);
             this.aLast.setEnabled(false);
             this.aFirst.setEnabled(false);
@@ -3133,20 +3483,22 @@
         }
         else	//	Grid Tab
         {
-            this.aMulti.setEnabled(true);
-            this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
-            this.aCard.setEnabled(true);
+            //this.aMulti.setEnabled(true);
+            //this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
+            //this.aCard.setEnabled(true);
             this.aCardDialog.setEnabled(true);
             this.aFind.setEnabled(true);
-            this.aBatchUpdate.setEnabled(true);
+            this.aBatchUpdate ? this.aBatchUpdate : '';
             this.aRefresh.setEnabled(true);
+            gPanel.setEnabled("RQY", true);
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);
         }
 
-       
-       
-   
+
+
+
+
 
 
         ///*******     Tab Panels      ******/
@@ -3178,8 +3530,12 @@
 
         if (this.curTab.getAD_Process_ID() == 0) {
             this.aPrint.setEnabled(false);
+            gPanel.setEnabled("PRT", false);
         }
-        else this.aPrint.setEnabled(true);
+        else {
+            this.aPrint.setEnabled(true);
+            gPanel.setEnabled("PRT", true);
+        }
 
         if (this.curTab.getIsMapView()) {
             this.aMap.show();
@@ -3187,14 +3543,32 @@
         else {
             this.aMap.hide();
         }
-        if (VIS.Env.getCtx().getContext('#ENABLE_BATCHUPDATE') =='Y' && this.ctx.getAD_User_ID() == 100) {
-            this.aBatchUpdate.$li.show();
+
+        //if (this.curTab.getIsHideGridToggle()) {
+        //    this.aMulti.hide();
+        //}
+        //else {
+        //    this.aMulti.show();
+        //}
+
+        //if (this.curTab.getIsHideCardToggle()) {
+        //    this.aCard.hide();
+        //}
+        //else {
+        //    this.aCard.show();
+        //}
+
+        if (this.curTab.getIsHideRecordNav()) {
+            this.aNext.hide();
+            this.aPrevious.hide();
         }
         else {
-            this.aBatchUpdate.$li.hide();
+            this.aNext.show();
+            this.aPrevious.show();
         }
-     
-        this.setLastView(""); //clear view history
+
+
+        //this.setLastView(""); //clear view history
 
         var selff = this;
         //if (this.isShowSharedRecord && this.aSharedRecord) {
@@ -3277,13 +3651,22 @@
      *  @param e event 
      */
     APanel.prototype.dataStatusChanged = function (e) {
+        var gPanel = null;
+        if (this.curGC) {
+            gPanel = this.curGC.vGridPanel;
+        } else {
+            gPanel = {};
+            gPanel.setEnabled = function (action, enable) {
+
+            }
+        }
 
         var dbInfo = e.getMessage();
         var findPressed = this.curTab.getIsQueryActive() || this.curTab.getOnlyCurrentDays() > 0;
         if (findPressed)
             dbInfo = "[ " + dbInfo + " ]";
         this.statusBar.setStatusDB(dbInfo, e);
-
+        var $ths = this;
         //	Set Message / Info
         if (e.getAD_Message() != null || e.getInfo() != null) {
             var sb = new StringBuilder();
@@ -3304,20 +3687,31 @@
             }
         }
 
-        //  Confirm Error
+        //  Confirm Error with CallBack
         if (e.getIsError() && !e.getIsConfirmed()) {
-            VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
+
+            VIS.ADialogCallback.error(e.getAD_Message(), e.getInfo(), null, function () {
+                var lf = $ths.curTab.getLastFocus();
+                if (lf) {
+                    lf.focus();
+                    $ths.curTab.setLastFocus(null);
+                }
+            });
+
             e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
             this.errorDisplayed = true;
         }
-        //  Confirm Warning
+        //  Confirm Warning with Call back
         else if (e.getIsWarning() && !e.getIsConfirmed()) {
-            VIS.ADialog.warn(e.getAD_Message(), true, e.getInfo());
+            VIS.ADialogCallback.warn(e.getAD_Message(), e.getInfo(), null, function () {
+                var lf = $ths.curTab.getLastFocus();
+                if (lf) {
+                    lf.focus();
+                    $ths.curTab.setLastFocus(null);
+                }
+            });
             e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
         }
-
-
-
 
         //	update Navigation
         var firstRow = e.getIsFirstRow();
@@ -3341,23 +3735,34 @@
         if (insertRecord)
             insertRecord = this.curTab.getIsInsertRecord();
         this.aNew.setEnabled(!changed && insertRecord);
+        gPanel.setEnabled("NRD", !changed && insertRecord);
         if (this.aCopy) {
             this.aCopy.setEnabled(!changed && insertRecord);
         }
         this.aRefresh.setEnabled(!changed);
+        gPanel.setEnabled("RQY", !changed);
         this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1);
+        gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1);
         //
         if (readOnly && this.curTab.getIsAlwaysUpdateField())
             readOnly = false;
         this.aIgnore.setEnabled(changed && !readOnly);
+        gPanel.setEnabled("UNO", changed && !readOnly);
+
         this.aSave.setEnabled(changed && !readOnly);
+        gPanel.setEnabled("SAR", changed && !readOnly);
+
         this.aCardDialog.setEnabled(!changed);
 
         //
         //	No Rows
         if (e.getTotalRows() == 0 && insertRecord) {
             this.aNew.setEnabled(true);
+            gPanel.setEnabled("NRD", true);
+
             this.aDelete.setEnabled(false);
+            gPanel.setEnabled("DRD", true);
+
             if (!this.curGC.isZoomAction) {
                 this.highlightButton(true, this.aNew);
             }
@@ -3368,9 +3773,10 @@
 
 
         //	Single-Multi
-        this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
-        this.aCard.setPressed(this.curGC.getIsCardRow());
-        this.aBack.setEnabled(this.getLastView().length > 0);
+        //this.aMulti.setPressed(this.curGC.getIsSingleRow() || this.curGC.getIsMapRow());
+        //this.aCard.setPressed(this.curGC.getIsCardRow());
+        this.setBackEnable();
+
         if (this.aChat) {
             this.aChat.setPressed(this.curTab.hasChat());
         }
@@ -3389,16 +3795,20 @@
 
         if (this.isPersonalLock) {
             this.aLock.setEnabled(true);
+            gPanel.setEnabled(this.aLock.getAction(), true);
             this.aLock.setPressed(this.curTab.getIsLocked());
             this.aRecAccess.setEnabled(true);
+            gPanel.setEnabled(this.aRecAccess.getAction(), true);
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
             if (this.curTab.getValue('AD_Org_ID') > 0 && this.excludeFromShare.indexOf(this.curTab.getTableName().toLowerCase()) == -1) {
                 this.aSharedRecord.setEnabled(true);
+                gPanel.setEnabled(this.aSharedRecord.getAction(), true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {
                 this.aSharedRecord.setEnabled(false);
+                gPanel.setEnabled(this.aSharedRecord.getAction(), false);
             }
         }
 
@@ -3408,84 +3818,109 @@
             //this.aMulti.setEnabled(false);
             if (this.aChat) {
                 this.aChat.setEnabled(false);
+                gPanel.setEnabled(this.aChat.getAction(), false);
             }
             if (this.aAttachment) {
                 this.aAttachment.setEnabled(false);
+                gPanel.setEnabled(this.aAttachment.getAction(), false);
             }
             if (this.aSubscribe) {
                 this.aSubscribe.setEnabled(false);
+                gPanel.setEnabled(this.aSubscribe.getAction(), false);
             }
             //if (this.aImportMap) {
             //    this.aImportMap.setEnabled(false);
             //}
             if (this.aHistory) {
                 this.aHistory.setEnabled(false);
+                gPanel.setEnabled(this.aHistory.getAction(), false);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(false);
+                gPanel.setEnabled(this.aEmail.getAction(), false);
             }
             if (this.aLetter) {
                 this.aLetter.setEnabled(false);
+                gPanel.setEnabled(this.aLetter.getAction(), false);
             }
             if (this.aSms) {
                 this.aSms.setEnabled(false);
+                gPanel.setEnabled(this.aSms.getAction(), false);
             }
             if (this.aFaxEmail) {
                 this.aFaxEmail.setEnabled(false);
+                gPanel.setEnabled(this.aFaxEmail.getAction(), false);
             }
 
             if (this.aCreateDocument) {
                 this.aCreateDocument.setEnabled(false);
+                gPanel.setEnabled(this.aCreateDocument.getAction(), false);
             }
             if (this.aUploadDocument) {
                 this.aUploadDocument.setEnabled(false);
+                gPanel.setEnabled(this.aUploadDocument.getAction(), false);
             }
             if (this.aViewDocument) {
                 this.aViewDocument.setEnabled(false);
+                gPanel.setEnabled(this.aViewDocument.getAction(), false);
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(false);
+                gPanel.setEnabled(this.aAttachment.getAction(), false);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(false);
+                gPanel.setEnabled(this.aZoomAcross.getAction(), false);
             }
             if (this.aMarkToExport) {
                 this.aMarkToExport.setEnabled(false);
+                gPanel.setEnabled(this.aMarkToExport.getAction(), false);
             }
             if (this.aArchive) {
                 this.aArchive.setEnabled(false);
+                gPanel.setEnabled(this.aArchive.getAction(), false);
             }
             if (this.aEmailAttach) {
                 this.aEmailAttach.setEnabled(false);
+                gPanel.setEnabled(this.aEmailAttach.getAction(), false);
             }
             if (this.aAppointment) {
                 this.aAppointment.setEnabled(false);
+                gPanel.setEnabled(this.aAppointment.getAction(), false);
             }
             if (this.aTask) {
                 this.aTask.setEnabled(false);
+                gPanel.setEnabled(this.aTask.getAction(), false);
             }
             if (this.aRequest) {
                 this.aRequest.setEnabled(false);
+                gPanel.setEnabled(this.aRequest.getAction(), false);
             }
             if (this.aWorkflow) {
                 this.aWorkflow.setEnabled(false);
+                gPanel.setEnabled(this.aWorkflow.getAction(), false);
             }
             if (this.aCopy) {
                 this.aCopy.setEnabled(false);
+                gPanel.setEnabled(this.aCopy.getAction(), false);
             }
             if (this.aLock) {
                 this.aLock.setEnabled(false);
+                gPanel.setEnabled(this.aLock.getAction(), false);
             }
             if (this.aRecAccess) {
                 this.aRecAccess.setEnabled(false);
+                gPanel.setEnabled(this.aRecAccess.getAction(), false);
             }
 
             if (this.aSharedRecord) {
                 this.aSharedRecord.setEnabled(false);
+                gPanel.setEnabled(this.aSharedRecord.getAction(), false);
             }
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(false);
+                gPanel.setEnabled(this.aBatchUpdate.getAction(), false);
             }
 
             //if (this.aCall) {
@@ -3496,76 +3931,100 @@
 
             if (this.aChat) {
                 this.aChat.setEnabled(true);
+                gPanel.setEnabled(this.aChat.getAction(), true);
             }
             if (this.aAttachment) {
                 this.aAttachment.setEnabled(true);
+                gPanel.setEnabled(this.aAttachment.getAction(), true);
             }
             if (this.aSubscribe) {
                 this.aSubscribe.setEnabled(true);
+                gPanel.setEnabled(this.aSubscribe.getAction(), true);
             }
             if (this.aHistory) {
                 this.aHistory.setEnabled(true);
+                gPanel.setEnabled(this.aHistory.getAction(), true);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(true);
+                gPanel.setEnabled(this.aEmail.getAction(), true);
             }
             if (this.aLetter) {
                 this.aLetter.setEnabled(true);
+                gPanel.setEnabled(this.aLetter.getAction(), true);
             }
             if (this.aSms) {
                 this.aSms.setEnabled(true);
+                gPanel.setEnabled(this.aSms.getAction(), true);
             }
             if (this.aFaxEmail) {
                 this.aFaxEmail.setEnabled(true);
+                gPanel.setEnabled(this.aFaxEmail.getAction(), true);
             }
             if (this.aImportMap) {
                 this.aImportMap.setEnabled(true);
+                gPanel.setEnabled(this.aImportMap.getAction(), true);
             }
             if (this.aCreateDocument) {
                 this.aCreateDocument.setEnabled(true);
+                gPanel.setEnabled(this.aCreateDocument.getAction(), true);
             }
             if (this.aUploadDocument) {
                 this.aUploadDocument.setEnabled(true);
+                gPanel.setEnabled(this.aUploadDocument.getAction(), true);
             }
             if (this.aViewDocument) {
                 this.aViewDocument.setEnabled(true);
+                gPanel.setEnabled(this.aViewDocument.getAction(), true);
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(true);
+                gPanel.setEnabled(this.aAttachFrom.getAction(), true);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(true);
+                gPanel.setEnabled(this.aZoomAcross.getAction(), true);
             }
             if (this.aMarkToExport) {
                 this.aMarkToExport.setEnabled(true);
+                gPanel.setEnabled(this.aMarkToExport.getAction(), true);
             }
             if (this.aArchive) {
                 this.aArchive.setEnabled(true);
+                gPanel.setEnabled(this.aArchive.getAction(), true);
             }
             if (this.aEmailAttach) {
                 this.aEmailAttach.setEnabled(true);
+                gPanel.setEnabled(this.aEmailAttach.getAction(), true);
             }
             if (this.aAppointment) {
                 this.aAppointment.setEnabled(true);
+                gPanel.setEnabled(this.aAppointment.getAction(), true);
             }
             if (this.aTask) {
                 this.aTask.setEnabled(true);
+                gPanel.setEnabled(this.aTask.getAction(), true);
             }
             if (this.aRequest) {
                 this.aRequest.setEnabled(true);
+                gPanel.setEnabled(this.aRequest.getAction(), true);
             }
             if (this.aWorkflow) {
                 this.aWorkflow.setEnabled(true);
+                gPanel.setEnabled(this.aWorkflow.getAction(), true);
             }
             if (this.aCopy) {
                 this.aCopy.setEnabled(true);
+                gPanel.setEnabled(this.aCopy.getAction(), true);
             }
             if (this.aLock) {
                 this.aLock.setEnabled(true);
+                gPanel.setEnabled(this.aLock.getAction(), true);
             }
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(true);
+                gPanel.setEnabled(this.aBatchUpdate.getAction(), true);
             }
             //if (this.aCall) {
             //    this.aCall.setEnabled(true);
@@ -3610,11 +4069,15 @@
         }
 
         if (this.curWinTab == this.vTabbedPane) {
-            VIS.context.setContext(this.curWindowNo,"tb_Index" , this.curTabIndex);
+            VIS.context.setContext(this.curWindowNo, "tb_Index", this.curTabIndex);
             this.curWinTab.evaluate(null);
             this.curWinTab.notifyDataChanged(e);
         }
 
+        if (this.curTab.getParentTab() && this.aSharedRecord) {
+            this.curTab.loadShared();
+            this.aSharedRecord.setPressed(this.curTab.hasShared());
+        }
 
         /******End Header Panel******/
 
@@ -3681,6 +4144,9 @@
         if (this.curST != null) {
             this.curST.saveData();
             this.aSave.setEnabled(false);	//	set explicitly
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled("SAR", false);
+            }
             return;
         }
 
@@ -3692,7 +4158,7 @@
         //        VIS.ADialog.error("CheckListRequired");
         //        return false;
         //    }
-            
+
         //});
 
         return $this.cmd_save2(manual, $this.curTab, $this.curGC, $this, callback);
@@ -3720,11 +4186,13 @@
                 if (manual)
                     curGC.dynamicDisplay(-1);
 
+                if (callback) {
+                    callback(retValue);
+                }
+
             });
 
-            if (callback) {
-                callback(retValue);
-            }
+           
         }
 
         if (needExecute) {
@@ -3741,7 +4209,7 @@
             if (callback) {
                 callback(retValue);
             }
-            
+
             curGC.refreshTabPanelData(curTab.getRecord_ID());
 
             this.curTab.loadShared();
@@ -3781,7 +4249,7 @@
         var bUpdate = new VIS.BatchUpdate(this.curWindowNo, this.curTab, this.curGC.getSelectedRows());
         bUpdate.onClose = function () {
         };
-        bUpdate.show();     
+        bUpdate.show();
     };
 
     APanel.prototype.cmd_delete = function () {
@@ -3820,6 +4288,59 @@
 
     };
 
+    APanel.prototype.cmd_back = function () {
+        var tis = this;
+        if (this.tabStack.length > 0) {
+            var currentTab = this.tabStack[this.tabStack.length - 1];
+            if (currentTab.tabView.length > 0) {
+                this.tabStack[this.tabStack.length - 1].tabView.pop();
+                var defaultTabLayout = currentTab.tabView[(currentTab.tabView.length - 1)];
+                if (defaultTabLayout == 'N') {
+                    tis.ShowHideViewIcon(tis.aMulti);
+                    tis.curGC.switchMultiRow();
+                }
+                else if (defaultTabLayout == 'Y') {
+                    tis.ShowHideViewIcon(tis.aSingle);
+                    tis.curGC.switchSingleRow(true);
+                }
+                else if (defaultTabLayout == 'C') {
+                    tis.ShowHideViewIcon(tis.aCard);
+                    tis.curGC.switchCardRow(true);
+                }
+
+            }
+        }
+
+        this.setBackEnable();
+
+
+
+        if (this.tabStack.length > 1 && this.tabStack[this.tabStack.length - 1].tabView.length === 0) {
+
+            this.tabStack.pop();
+            currentTab = this.tabStack[this.tabStack.length - 1];
+            if (currentTab && Object.keys(currentTab).length > 0) {
+                if (this.curTab.needSave(true, false) && this.curTab.needSave(true, true)) {
+                    this.cmd_ignore();
+                }
+                this.onTabChange(currentTab.tabID);
+            } else {
+                this.setBackEnable();
+            }
+        }
+
+        //if (tis.getLastView() == "Multi") {
+        //    tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
+        //    tis.aCard.setPressed(false);
+        //    tis.curGC.switchMultiRow(true);
+        //}
+        //else if (tis.getLastView() == "Card") {
+        //    tis.curGC.switchCardRow(true);
+        //    tis.aMulti.setPressed(false);
+        //    tis.aCard.setPressed(true);
+        //}
+        //tis.setLastView("");
+    }
     /* 
      -Quick Search 
      @param val text to search
@@ -3852,6 +4373,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aChat.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aChat.getAction(), false);
+            }
             return;
         }
 
@@ -3913,6 +4437,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aLetter.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aLetter.getAction(), false);
+            }
             return;
         }
 
@@ -3935,6 +4462,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aEmail.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aEmail.getAction(), false);
+            }
             return;
         }
 
@@ -4148,6 +4678,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aSms.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aSms.getAction(), false);
+            }
             return;
         }
 
@@ -4210,6 +4743,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aSubscribe.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aSubscribe.getAction(), false);
+            }
             return;
         }
         var self = this;
@@ -4243,19 +4779,25 @@
         }
     };
 
-    APanel.prototype.cmd_attachment = function () {
+    APanel.prototype.cmd_attachment = function (isViewOnly) {
         //alert("attachment");
         if (this.curTab.getRecord_ID() < 1) {
             this.aAttachment.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aAttachment.getAction(), false);
+            }
             return;
         }
         var self = this;
-        var att = new VIS.attachmentForm(this.curTab.getWindowNo(), 0, this.curTab.getAD_Table_ID(), this.curTab.getRecord_ID(), '');
+        var att = new VIS.attachmentForm(this.curTab.getWindowNo(), 0, this.curTab.getAD_Table_ID(),
+            this.curTab.getRecord_ID(), '', null, null, null,isViewOnly);
         att.setIsWindowAction(true);
+        
         att.show();
         att.onClose = function () {
             self.curTab.loadAttachments();
-            self.aAttachment.setPressed(self.curTab.hasAttachment());
+            if (self.aAttachment)
+                self.aAttachment.setPressed(self.curTab.hasAttachment());
             self = null;
         };
 
@@ -4289,6 +4831,9 @@
     APanel.prototype.cmd_RecordShared = function () {
         if (this.curTab.getRecord_ID() < 1) {
             this.aSharedRecord.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aSharedRecord.getAction(), false);
+            }
             return;
         }
 
@@ -4328,7 +4873,7 @@
         var parentTableID = 0;
         if (this.curTab.getParentTab()) {
             parentTableID = this.curTab.getParentTab().getAD_Table_ID();
-            if (!this.curTab.getParentTab().hasShared() && this.curTab.getParentTab().getValue('AD_Org_ID')!=0) {
+            if (!this.curTab.getParentTab().hasShared() && this.curTab.getParentTab().getValue('AD_Org_ID') != 0) {
                 VIS.ADialog.info("ShareParentFirst", true, "", "");
                 this.aSharedRecord.setPressed(false);
                 return;;
@@ -4661,6 +5206,9 @@
         if (record_ID == -1)	//	No Key
         {
             this.aCall.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aCall.getAction(), false);
+            }
             return;
         }
         var table_ID = this.curTab.getAD_Table_ID();
@@ -4693,18 +5241,20 @@
     };
 
     /**
-     * Set Last selected view (Card Or Multi)
-     * @param {string} strView
+     * Set Enable disable Back button   
      */
-    APanel.prototype.setLastView = function (strView) {
-        if (strView == "Card" || strView == "Multi") {
-            this.aBack.setEnabled(true);
-        }
-        else {
+    APanel.prototype.setBackEnable = function () {       
+        if (this.tabStack.length == 1 && this.tabStack[0].tabView.length <= 1) {
             this.aBack.setEnabled(false);
-            strview = "";
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled("BVW", false);
+            }
+        } else {
+            this.aBack.setEnabled(true);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled("BVW", true);
+            }
         }
-        this.lastView = strView;
     };
 
 

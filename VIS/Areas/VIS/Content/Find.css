@@ -287,6 +287,7 @@ html[dir="rtl"] .vis-advancedSearchInput > label, html[dir="rtl"] .vis-advancedS
         font-size: 1rem;
     }
 
+
 /*.vis-advancedSearch-EditIcon
 {
     background: url('../img/edit-icon.jpg');
@@ -471,14 +472,19 @@ html[dir="rtl"] .vis-advancedSearchInput > label, html[dir="rtl"] .vis-advancedS
 .vis-advancedSearchInput label.vis-ec-col-lblchkbox input[type="checkbox"] {
     margin-left: 0;
 }
-.vis-advanedSearch-AddFilterWrap label {
+.vis-advanedSearch-AddFilterWrap a {
     margin-bottom: 0;
     font-weight: normal;
-    text-decoration: underline;
+    text-decoration: underline !important;
     color: rgba(var(--v-c-primary), 1);
     font-size: 1rem;
+    border: 1px solid transparent;
 }
-.vis-as-topfieldswrap {
+
+.vis-advanedSearch-AddFilterWrap a:focus {
+    border-color: rgba(var(--v-c-primary), 1);
+}
+    .vis-as-topfieldswrap {
     flex: 1;
     margin-top: 10px;
 }

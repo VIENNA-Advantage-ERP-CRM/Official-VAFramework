@@ -30,6 +30,8 @@ namespace VAdvantage.Process
         // Pcol (primary key column of table)
         private object Pcol = 0;
 
+        //Sequence check class
+        private SequenceCheck clsSeqCheck = new SequenceCheck();
         #endregion
 
         // Prepare - e.g., get Parameters.
@@ -76,10 +78,11 @@ namespace VAdvantage.Process
                         MTable table = new MTable(GetCtx(), Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Table_ID"]), null);
                         CreateSequence(table, Get_TrxName());
                     }
-
                 }
 
                 ok = true;
+                //Update Db Sequence if
+                clsSeqCheck.CheckDBSequence(GetCtx(), this);
             }
             finally
             {
@@ -111,6 +114,8 @@ namespace VAdvantage.Process
                 {
                     this.AddLog("Created Native Sequence for : " + table.GetTableName());
                 }
+
+               
             }
         }
         private void CreateSequence(String tableName, Trx trxName)

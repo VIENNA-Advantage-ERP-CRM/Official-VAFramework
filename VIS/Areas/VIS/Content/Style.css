@@ -4089,6 +4089,22 @@ table.fixed-header thead tr {
     height: auto;
 }
 
+    .vis-ctrfrm-btnwrp.vis-add-right-btns input[type="button"] {
+        float: none;
+    }
+
+.vis-Dialog-buttons button:focus,
+.vis-Dialog-buttons input[type="button"]:focus,
+.vis-Dialog-buttons input[type="submit"]:focus,
+.ui-widget.ui-widget-content button:focus,
+.ui-widget.ui-widget-content input[type="button"]:focus,
+.ui-widget.ui-widget-content input[type="submit"]:focus,
+.VIS_Pref_btn-2:focus,
+.vis-group-btn:focus,
+.k-button:focus {
+    box-shadow: 0 0 10px rgb(0 0 0 / 50%) !important;
+    border: none !important;
+}
 
 /* modify Ends */
 /*Media query*/

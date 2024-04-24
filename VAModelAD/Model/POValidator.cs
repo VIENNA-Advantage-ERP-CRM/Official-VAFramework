@@ -261,69 +261,75 @@ namespace VAModelAD.Model
                 // Get Master Data Properties
                 var MasterDetails = po.GetMasterDetails();
                 // check if Record has any Workflow (Value Type) linked, or Is Immediate save etc
-                if (MasterDetails != null && MasterDetails.AD_Table_ID > 0 && MasterDetails.ImmediateSave && !MasterDetails.HasDocValWF)
+                if (MasterDetails != null && MasterDetails.AD_Table_ID > 0)
                 {
-                    // create object of parent table
-                    MTable tbl = MTable.Get(p_ctx, MasterDetails.AD_Table_ID);
-                    PO _po = null;
-                    bool updateMasID = false;
-                    // check if Master table has single key or multiple keys or single key
-                    // then create object 
-                    if (tbl.IsSingleKey())
+                    if (!MasterDetails.HasDocValWF || (MasterDetails.HasDocValWF && Util.GetValueOfInt(MasterDetails.Record_ID) == 0))
                     {
-                        _po = tbl.GetPO(p_ctx, MasterDetails.Record_ID, trx);
-                        if (_po.Get_ID() <= 0)
-                            updateMasID = true;
-                    }
-                    else
-                    {
-                        // fetch key columns for parent table
-                        string[] keyCols = tbl.GetKeyColumns();
-                        StringBuilder whereCond = new StringBuilder("");
-                        for (int w = 0; w < keyCols.Length; w++)
+                        if (MasterDetails.ImmediateSave || ((Util.GetValueOfInt(MasterDetails.Record_ID) == 0) && !MasterDetails.ImmediateSave))
                         {
-                            if (w == 0)
+                            // create object of parent table
+                            MTable tbl = MTable.Get(p_ctx, MasterDetails.AD_Table_ID);
+                            PO _po = null;
+                            bool updateMasID = false;
+                            // check if Master table has single key or multiple keys or single key
+                            // then create object 
+                            if (tbl.IsSingleKey())
                             {
-                                if (keyCols[w] != null)
-                                    whereCond.Append(keyCols[w] + " = " + po.Get_Value(keyCols[w]));
-                                else
-                                    whereCond.Append(" NVL(" + keyCols[w] + ",0) = 0");
+                                _po = tbl.GetPO(p_ctx, MasterDetails.Record_ID, trx);
+                                if (_po.Get_ID() <= 0)
+                                    updateMasID = true;
                             }
                             else
                             {
-                                if (keyCols[w] != null)
-                                    whereCond.Append(" AND " + keyCols[w] + " = " + po.Get_Value(keyCols[w]));
+                                // fetch key columns for parent table
+                                string[] keyCols = tbl.GetKeyColumns();
+                                StringBuilder whereCond = new StringBuilder("");
+                                for (int w = 0; w < keyCols.Length; w++)
+                                {
+                                    if (w == 0)
+                                    {
+                                        if (keyCols[w] != null)
+                                            whereCond.Append(keyCols[w] + " = " + po.Get_Value(keyCols[w]));
+                                        else
+                                            whereCond.Append(" NVL(" + keyCols[w] + ",0) = 0");
+                                    }
+                                    else
+                                    {
+                                        if (keyCols[w] != null)
+                                            whereCond.Append(" AND " + keyCols[w] + " = " + po.Get_Value(keyCols[w]));
+                                        else
+                                            whereCond.Append(" AND NVL(" + keyCols[w] + ",0) = 0");
+                                    }
+                                }
+                                _po = tbl.GetPO(p_ctx, whereCond.ToString(), trx);
+                            }
+                            if (_po != null)
+                            {
+                                _po.SetAD_Window_ID(MasterDetails.AD_Window_ID);
+                                // copy date from Version table to Master table
+                                bool saveSuccess = CopyVersionToMaster(_po, po, MasterDetails.HasDocValWF);
+                                if (!saveSuccess)
+                                {
+                                    if (trx != null)
+                                    {
+                                        trx.Rollback();
+                                        trx.Close();
+                                        return false;
+                                    }
+                                }
                                 else
-                                    whereCond.Append(" AND NVL(" + keyCols[w] + ",0) = 0");
-                            }
-                        }
-                        _po = tbl.GetPO(p_ctx, whereCond.ToString(), trx);
-                    }
-                    if (_po != null)
-                    {
-                        _po.SetAD_Window_ID(MasterDetails.AD_Window_ID);
-                        // copy date from Version table to Master table
-                        bool saveSuccess = CopyVersionToMaster(_po, po);
-                        if (!saveSuccess)
-                        {
-                            if (trx != null)
-                            {
-                                trx.Rollback();
-                                trx.Close();
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            if (updateMasID)
-                            {
-                                MasterDetails.Record_ID = _po.Get_ID();
-                                // set new values in MaserDetails Object
-                                po.SetMasterDetails(MasterDetails);
-                                // Update key column in version table against Master table 
-                                // only in case of single key column and in case of new record
-                                string sqlQuery = "UPDATE " + tableName + " SET " + _po.Get_TableName() + "_ID = " + _po.Get_ID() + " WHERE " + tableName + "_ID = " + po.Get_ID();
-                                int count = DB.ExecuteQuery(sqlQuery, null, trx);
+                                {
+                                    if (updateMasID)
+                                    {
+                                        MasterDetails.Record_ID = _po.Get_ID();
+                                        // set new values in MaserDetails Object
+                                        po.SetMasterDetails(MasterDetails);
+                                        // Update key column in version table against Master table 
+                                        // only in case of single key column and in case of new record
+                                        string sqlQuery = "UPDATE " + tableName + " SET " + _po.Get_TableName() + "_ID = " + _po.Get_ID() + " WHERE " + tableName + "_ID = " + po.Get_ID();
+                                        int count = DB.ExecuteQuery(sqlQuery, null, trx);
+                                    }
+                                }
                             }
                         }
                     }
@@ -416,11 +422,12 @@ namespace VAModelAD.Model
         /// </summary>
         /// <param name="po"></param>
         /// <returns></returns>
-        private bool CopyVersionToMaster(PO poMaster, PO po)
+        private bool CopyVersionToMaster(PO poMaster, PO po, bool HasDocValueWF)
         {
             int count = po.Get_ColumnCount();
             for (int i = 0; i < count; i++)
             {
+
                 string columnName = po.Get_ColumnName(i);
                 // skip column if column name is either "Created" or "CreatedBy"
                 if (columnName.Trim().ToLower() == "created" || columnName.Trim().ToLower() == "createdby")
@@ -431,6 +438,19 @@ namespace VAModelAD.Model
                 if (poMaster.Get_Value(columnName) != po.Get_ValueOld(columnName))
                 {
                     poMaster.Set_ValueNoCheck(columnName, po.Get_Value(columnName));
+                }
+            }
+
+            if (Util.GetValueOfInt(poMaster.Get_ID()) == 0)
+            {
+                if (HasDocValueWF)
+                    poMaster.SetIsActive(false);
+                else
+                {
+                    if (Common.HasApprovalStatusColumn(poMaster.GetTableName()))
+                    {
+                        poMaster.Set_Value("ApprovalStatus", "A");
+                    }
                 }
             }
 

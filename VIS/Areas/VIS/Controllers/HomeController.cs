@@ -159,9 +159,9 @@ namespace VIS.Controllers
                         ctx = Session["ctx"] as Ctx;
 
                         //Update Old Session
-                        MSession session = MSession.Get(ctx, false);
-                        if (session != null)
-                            session.Logout();
+                        //MSession session = MSession.Get(ctx, false);
+                        //if (session != null)
+                        //    session.Logout();
 
                         key = ctx.GetSecureKey();
 

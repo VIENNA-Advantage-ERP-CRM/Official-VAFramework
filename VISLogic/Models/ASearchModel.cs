@@ -79,8 +79,10 @@ namespace VIS.Models
 
         // Added by Bharat on 05 June 2017
         public int GetNoOfRecrds(string sqlWhere, Ctx ctx)
+        
         {
             int count = Util.GetValueOfInt(DB.ExecuteScalar(sqlWhere));
+
             return count;
         }
     }

@@ -197,7 +197,7 @@
                     pheader = $('<p>' + VIS.Msg.getMsg("EMail") + ' (' + _curGC.aPanel.$parentWindow.getName() + ')' + ' </p>');
                 }
                 //$btncloseChart.append(pheader); 
-                
+
             }
             else {
                 $btncloseChart = $('<a href="javascript:void(0)"  class="vis-icon-menuclose"><i class="vis vis-cross"></i></a>');

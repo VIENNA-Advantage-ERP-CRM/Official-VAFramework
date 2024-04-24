@@ -101,24 +101,44 @@ namespace VIS.Models
         {
             try
             {
+                
+                //Change by mohit-to handle translation in general info.
+                //Added 2 new parametere- string AD_Language, bool IsBaseLangage.
+                //Asked by mukesh sir - 09/03/2018
+                
                 bool _trlTableExist = false;
                 if (!IsBaseLangage)
                 {
-
                     VAdvantage.DataBase.VConnection con = new VAdvantage.DataBase.VConnection();
                     string owner = con.Db_uid;
                     if (Util.GetValueOfInt(DB.ExecuteQuery("SELECT count(*) FROM ALL_OBJECTS WHERE OBJECT_TYPE = 'TABLE' AND OWNER =upper( '" + owner + "') AND OBJECT_NAME =upper( '" + _tableName + "_TRL')", null, null)) > 0)
                     {
                         _trlTableExist = true;
                     }
+                }              
+
+                //"check tab id against table id"
+                int tabId = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Tab_ID FROM AD_Tab WHERE AD_Table_ID= " + AD_Table_ID, null, null));
+                bool hasWindowAndTab = false; 
+
+                if (tabId > 0)
+                {
+                    hasWindowAndTab = true;
                 }
 
-                //Change by mohit-to handle translation in general info.
-                //Added 2 new parametere- string AD_Language, bool IsBaseLangage.
-                //Asked by mukesh sir - 09/03/2018
+                string sql = "SELECT AD_Window_ID FROM AD_Table WHERE AD_Table_Id=" + AD_Table_ID;
+                int AD_Window_ID = Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
 
-                string sql = string.Empty;
-                if (IsBaseLangage)
+                if (AD_Window_ID == 0)
+                {
+                    AD_Window_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT a.AD_Window_ID FROM AD_Window a "
+                    + "INNER JOIN AD_Tab b ON (a.AD_Window_ID=b.AD_Window_ID) "
+                    + "INNER JOIN AD_Menu m ON (a.AD_Window_ID=m.AD_Window_ID AND m.IsActive='Y' AND m.Action='W') "
+                    + "WHERE a.IsActive='Y' AND b.IsActive='Y' AND b.AD_Table_ID=" + AD_Table_ID + " ORDER BY b.TabLevel, a.AD_Window_ID", null, null)); ;
+                }
+
+                sql = string.Empty;
+                /*if (IsBaseLangage)
                 {
                     sql = @"SELECT c.ColumnName,c.Name,
                               c.AD_Reference_ID,
@@ -170,7 +190,81 @@ namespace VIS.Models
                             AND f.ObscureType IS NULL))                            
                             ORDER BY c.IsKey DESC,
                               f.SeqNo";
+                }*/
+
+                /*Handle case when a table is used for multiple tabs.*/
+
+                sql = "SELECT c.ColumnName,";
+                if (!IsBaseLangage)
+                {
+                    sql += " trl.Name, ";
                 }
+                else
+                {
+                    sql += " c.Name, ";
+                }
+                sql += "c.AD_Reference_ID, c.IsKey,";
+                if (hasWindowAndTab)
+                {
+                    sql += " f.IsDisplayed, ";
+
+                }
+                else
+                {
+                    sql += " 'Y' AS IsDisplayed, ";
+                }
+                sql += @"c.AD_Reference_Value_ID,
+                              c.ColumnSQL,
+                              C.IsTranslated,
+                              c.AD_Column_ID
+                            FROM AD_Column c
+                            INNER JOIN AD_Table t
+                            ON (c.AD_Table_ID=t.AD_Table_ID)";
+                if (!IsBaseLangage)
+                {
+                    sql += @" INNER JOIN AD_Column_Trl trl
+                            ON(c.ad_column_ID = trl.AD_Column_ID)";
+                }
+
+                //if table is linked with any tab
+                if (hasWindowAndTab)
+                {
+                    sql += @" INNER JOIN AD_Tab tab
+                            ON (t.AD_Window_ID=tab.AD_Window_ID)
+                            INNER JOIN AD_Field f
+                            ON (tab.AD_Tab_ID  =f.AD_Tab_ID)
+                            AND (f.AD_Column_ID =c.AD_Column_ID)";
+                }
+
+                sql += @" WHERE t.AD_Table_ID=" + AD_Table_ID;
+                if (!IsBaseLangage)
+                {
+                    sql += " AND trl.AD_Language = '" + AD_Language + "'";
+                }
+                if (hasWindowAndTab)
+                {
+                    //Get first created tab if we have multiple tabs linked with same table on same window.
+                    sql += @" AND tab.IsSortTab='N' 
+                                AND tab.Ad_Tab_ID=(SELECT MIN(mt.AD_Tab_ID) FROM AD_tab mt WHERE mt.AD_Window_ID=" + AD_Window_ID + @" AND mt.AD_Table_ID=t.AD_Table_ID AND mt.IsActive='Y')
+                                AND (c.IsKey='Y' OR (f.IsEncrypted='N' AND f.ObscureType IS NULL))";
+                }
+                else
+                {
+                    sql += @" AND (c.IsKey ='Y'
+                                        OR c.IsIdentifier='Y'
+                                        OR c.IsParent='Y'
+                                        OR c.IsSelectionColumn='Y'
+                                        OR Upper(c.ColumnName) IN ('NAME','VALUE','DESCRIPTION','DOCUMENTNO')
+                                        OR Upper(c.ColumnName) Like '%_NAME'
+                                        OR Upper(c.ColumnName) Like '%_Value')";                        
+                            
+                }
+                sql += " AND c.IsActive = 'Y' ORDER BY c.IsKey DESC";
+                if (hasWindowAndTab)
+                {
+                    sql += ", f.SeqNo";
+                }
+
                 DataSet ds = DB.ExecuteDataset(sql);
 
                 if (ds == null || ds.Tables[0].Rows.Count == 0)
@@ -284,7 +378,7 @@ namespace VIS.Models
         {
             InfoData _iData = new InfoData();
             try
-            {
+            {               
 
                 var sql = "SELECT ";
                 //var colName = null;

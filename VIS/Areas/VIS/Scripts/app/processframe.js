@@ -82,7 +82,7 @@
         self = this; //self pointer
 
         var $root, $busyDiv, $contentGrid, $table;
-        var $btnOK, $btnClose, $text, $cmbType, $lblRptTypeHeader, $chkIsBG, $lblIsBG;
+        var $btnOK, $btnClose, $text, $cmbType, $lblRptTypeHeader, $chkIsBG, $lblIsBG, $DivInputWrap;
         function initilizedComponent() {
 
             $root = $("<div style='position:relative;width:100%'>");
@@ -106,7 +106,7 @@
             $text = $("<span class='vis-process-description-Span' style='height: 40px;'>").val("asassasasasasaasa");
             //ProcessDialog
             $contentGrid.append($text);
-            var $DivInputWrap = $('<div class="input-group vis-input-wrap">');
+            $DivInputWrap = $('<div class="input-group vis-input-wrap">');
             var $DivInputCtrlWrap = $('<div class="vis-control-wrap">');
             $lblRptTypeHeader = $('<label style="display:none;">' + VIS.Msg.getMsg("ChooseReportType") + '</label>');
             var divrptType = $('<div style="display:inherit"></div>');
@@ -387,14 +387,17 @@
 
         };
 
-        this.enableBackgroundSetting = function (value) {
-            $chkIsBG.prop('checked', value);
-            if (value == true) {
+        this.enableBackgroundSetting = function (value) {                     
+            $chkIsBG.prop('checked');
+            if (!value) {
+                $DivInputWrap.hide();
+            }
+            /*if (value == true) {
                 $chkIsBG.prop('disabled', 'disabled');
             }
             else {
-                $chkIsBG.prop('disabled', '');
-            }
+                $DivInputWrap.hide();
+            }*/      
         }
 
         // to Archive Document
