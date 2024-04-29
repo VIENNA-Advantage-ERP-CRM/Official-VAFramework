@@ -1712,18 +1712,26 @@
             }
             else if (!this.curTab.getIsHideGridToggle()) {
                 this.aMulti.show();
-                this.aSingle.show();
+               
 
             } else {
                 this.aMulti.hide();
-                this.aSingle.hide();
+               
             }
 
             if (this.actionParams.IsHideSingleToggle) {
                 this.aSingle.hide();
             }
+            else if (!this.curTab.getIsHideSingleToggle()) {
+                
+                this.aSingle.show();
 
-            if (!this.actionParams.IsHideCardToggle) {
+            } else {
+                
+                this.aSingle.hide();
+            }
+
+            if (this.actionParams.IsHideCardToggle) {
                 this.aCard.hide();
             }
             else if (!this.curTab.getIsHideCardToggle()) {
@@ -2226,7 +2234,7 @@
 
             selfPan.actionPerformedCallback(selfPan, action);
 
-        }, 100);
+        }, 10);
     };
 
     APanel.prototype.actionPerformedCallback = function (tis, action) {
@@ -2557,6 +2565,14 @@
             return;
         }
 
+        /*Special handling
+          Move to next tab */
+        if (mField.getIsAction()) {
+            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(),
+                mField.getActionName(), mField.getActionParams());
+            return true;
+        }
+
         //	Pop up Payment Rules
         if (columnName.equals("PaymentRule")) {
             var vp = new VIS.VPayment(curWindowNo, curTab, vButton);
@@ -2797,13 +2813,7 @@
         else if (columnName.equals("OpenCardDialog")) {
             aPanel.cmd_cardDialog(true);
         }
-        /*Special handling
-          Move to next tab */
-        else if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(),
-                mField.getActionName(),mField.getActionParams());
-            return;
-        }
+        
 
         if (vButton.AD_Process_ID > 0) {
 
@@ -3596,7 +3606,7 @@
         };
 
         //hide action bar Links
-        if (this.actionParams.IsHideActionbar || this.gridWindow.getIsHideActionbar) {
+        if (this.actionParams.IsHideActionbar || this.gridWindow.getIsHideActionbar()) {
             this.hideActionbar(true);
         }
         else {
@@ -3774,8 +3784,8 @@
         }
         this.aRefresh.setEnabled(!changed);
         gPanel.setEnabled("RQY", !changed);
-        this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1);
-        gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1);
+        this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
+        gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
         //
         if (readOnly && this.curTab.getIsAlwaysUpdateField())
             readOnly = false;

@@ -19,8 +19,8 @@ namespace VAdvantage.Controller
         public bool? IsHideMapToggle { get; set; }//9 T
         public bool? IsHideRecordNav { get; set; }//10 T
         public bool? IsTabInNewMode { get; set; }//11 T 
-        public bool? IsEditable { get; set; } //12 T
-        public bool? IsDeletable { get; set; }//13 T
+        public bool? IsReadOnly { get; set; } //12 T
+        public bool? IsDeleteDisabled { get; set; }//13 T
         public int? AD_Card_ID { get; set; }//14 T
         public string TabWhereClause { get; set; }//15 T
     }
