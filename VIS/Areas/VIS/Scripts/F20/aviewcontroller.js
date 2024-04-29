@@ -1270,6 +1270,15 @@
         else {
             this.actionParams = {};
         }
+        //set in Grid tab also
+        this.gTab.actionParams = this.actionParams;
+        //check for defalut card in Action Params
+        if (this.actionParams.AD_Card_ID > 0) {
+            this.gTab.getTableModel().setCardID(this.actionParams.AD_Card_ID);
+            if (!this.isCardRow && this.vCardView)
+                this.vCardView.cardID = this.actionParams.AD_Card_ID;
+
+        }
     };
 
     VIS.GridController.prototype.multiRowResize = function () {
@@ -1527,7 +1536,8 @@
             //	Automatically create New Record, if none & tab not RO
             if (!this.gTab.getIsReadOnly() &&
                 (this.gTab.getIsZoomAction() == true || VIS.context.getIsAutoNew(this.windowNo)
-                    || this.gTab.getIsQueryNewRecord() || this.gTab.getIsAutoNewRecord()) && parentValid) {
+                    || this.gTab.getIsQueryNewRecord() || this.gTab.getIsAutoNewRecord() || this.actionParams.IsTabInNewMode)
+                && parentValid) {
                 if (this.gTab.getIsInsertRecord() && !this.skipInserting) {
 
                     //When user clicks on new record from combo or search button, then switch view 

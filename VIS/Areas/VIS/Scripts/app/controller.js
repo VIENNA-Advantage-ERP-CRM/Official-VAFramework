@@ -784,7 +784,7 @@
     };
 
     GridTab.prototype.getIsReadOnly = function () {
-        if (this.vo.IsReadOnly)
+        if (this.vo.IsReadOnly || (this.actionParams && this.actionParams.IsReadOnly)) //ActinParams
             return true;
 
         //  no restrictions
@@ -837,6 +837,9 @@
 
     GridTab.prototype.getIsHideGridToggle = function () {
         return this.vo.IsHideGridToggle;
+    };
+    GridTab.prototype.getIsHideSingleToggle = function () {
+        return this.vo.IsHideSingleToggle;
     };
 
     GridTab.prototype.getIsHideCardToggle = function () {

@@ -170,6 +170,7 @@ namespace VAdvantage.Controller
         public bool? HideTabName = null;
         public bool? ResetLayout = null;
         public bool? IsHideGridToggle = null;
+        public bool? IsHideSingleToggle = null;
         public bool? IsHideCardToggle = null;
         public bool? IsHideRecordNav = null;
 
@@ -560,6 +561,7 @@ namespace VAdvantage.Controller
                 vo.HideTabName = Utility.Util.GetValueOfString(dr["hidetabname"]).Equals("Y");
                 vo.ResetLayout = Utility.Util.GetValueOfString(dr["resetlayout"]).Equals("Y");
                 vo.IsHideGridToggle = Utility.Util.GetValueOfString(dr["ishidegridtoggle"]).Equals("Y");
+                vo.IsHideSingleToggle = Utility.Util.GetValueOfString(dr["IsHideSingleToggle"]).Equals("Y"); 
                 vo.IsHideCardToggle = Utility.Util.GetValueOfString(dr["ishidecardtoggle"]).Equals("Y");
                 vo.IsHideRecordNav = Utility.Util.GetValueOfString(dr["IsHideRecordNav"]).Equals("Y");
 
@@ -1026,6 +1028,7 @@ namespace VAdvantage.Controller
             clone.HideTabName = HideTabName;
             clone.ResetLayout = ResetLayout;
             clone.IsHideGridToggle = IsHideGridToggle;
+            clone.IsHideSingleToggle = IsHideSingleToggle;
             clone.IsHideCardToggle = IsHideCardToggle;
             clone.HideFieldGroupFrom = HideFieldGroupFrom;
             clone.IsHideRecordNav = IsHideRecordNav;
