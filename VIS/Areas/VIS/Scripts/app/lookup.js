@@ -1849,10 +1849,10 @@
         var self = this;
         executeReader(SQL, param, function (dr) {
 
-            var dr = null;
+            //var dr = null;
             try {
                 //	Prepare Statement
-                dr = executeReader(SQL, param);
+                //dr = executeReader(SQL, param);
                 if (!dr.read())
                     return false;
 

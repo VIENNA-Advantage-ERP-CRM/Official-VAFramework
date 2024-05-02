@@ -127,10 +127,10 @@ namespace VIS.Classes
             {
                 VLookUpInfo lInfo = null;
                 //In case of Created by and updatedby column, field id is zero
-
+               
                 lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
                 lookupQuery = lInfo.queryDirect;
-               
+
                 List<SqlParams> listParam = new List<SqlParams>();
                 if (Key != null)
                     key = ((string[])Key)[0];
@@ -179,7 +179,6 @@ namespace VIS.Classes
                     }
                     else
                     {
-                        //case handling for updated and created by 
                         lInfo = new VLookUpInfo
                         {
                             queryDirect = "SELECT AD_User.AD_User_ID,NULL,NVL(AD_User.Name,'-1'),AD_User.IsActive FROM AD_User WHERE AD_User.Name IS NOT NULL  AND AD_User.AD_User_ID=@key"
@@ -369,7 +368,12 @@ namespace VIS.Classes
             {
                 isColumnMatch = true;
                 sql += " (UPPER(M_Product.Value) LIKE " + DB.TO_STRING(text) +
-                    " OR UPPER(M_Product.Name) LIKE " + DB.TO_STRING(text) + ")";
+                    " OR UPPER(M_Product.Name) LIKE " + DB.TO_STRING(text) +
+                    " OR M_Product.M_Product_ID IN (SELECT DISTINCT p.M_Product_ID FROM M_Product p LEFT OUTER JOIN M_Manufacturer mr ON (p.M_Product_ID=mr.M_Product_ID)" +
+                    " LEFT OUTER JOIN M_ProductAttributes patr ON (p.M_Product_ID=patr.M_Product_ID) WHERE (UPPER(p.Value) LIKE " + DB.TO_STRING(text) +
+                    " OR UPPER(p.Name) LIKE " + DB.TO_STRING(text) + " OR UPPER(mr.UPC) LIKE " + DB.TO_STRING(text) +
+                    " OR UPPER(patr.UPC) LIKE " + DB.TO_STRING(text) + " OR UPPER(p.UPC) LIKE " + DB.TO_STRING(text) + ")))";
+
                 sql += " AND ";
             }
             else if (_columnName.Equals("C_BPartner_ID"))
