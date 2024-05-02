@@ -100,6 +100,8 @@ namespace VIS.Controllers
             LoginModel model = null;
             if (User.Identity.IsAuthenticated)
             {
+                StringBuilder sb = new StringBuilder("Start/n");
+
 
                 if (Request.QueryString.Count > 0) /* if has value */
                 {
@@ -126,27 +128,16 @@ namespace VIS.Controllers
                     string loginContextString = ticket.UserData; // get login context string from Form Ticket
                     LoginContext lCtx = JsonHelper.Deserialize(loginContextString, typeof(LoginContext)) as LoginContext;
                     IDataReader dr = null;
+                    bool createNew = false;
 
-                    //create class from string  
-                    string key = "";
-                    if (Session["ctx"] != null)
-                    {
-                        ctx = Session["ctx"] as Ctx;
-
-                        key = ctx.GetSecureKey();
-                       
-                        SessionEventHandler.SessionEnd(ctx);
-                        Session.Timeout = 17;
-                        Session["ctx"] = null;
-
-                    }
+                   
                     ctx = new Ctx(lCtx.ctxMap); //cretae new context
 
                     /* fix for User Value Null value */
 
                     if (string.IsNullOrEmpty(ctx.GetContext("##AD_User_Value")))
                     {
-                        return new AccountController().SignOff(ctx);
+                        return new AccountController().SignOff(ctx,Session.SessionID);
 
                     }
 
@@ -156,6 +147,24 @@ namespace VIS.Controllers
                         LoginHelper.IsSiteUnderMaintenance())
                     {
                         return View("Maintenance");
+                    }
+
+                    //create class from string  
+                    string key = "";
+                    if (Session["ctx"] != null)
+                    {
+                        var oldctx = Session["ctx"] as Ctx;
+
+                        key = oldctx.GetSecureKey();
+
+                        //SessionEventHandler.SessionEnd(ctx);
+                        Session.Timeout = 17;
+                        // Session["ctx"] = null;
+
+                    }
+                    else
+                    {
+                        createNew = true;
                     }
 
                     if (key != "")
@@ -275,13 +284,18 @@ namespace VIS.Controllers
 
                     // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
                     //{
-                    //Cretae new Sessin
-                    MSession sessionNew = MSession.Get(ctx, true, Common.GetVisitorIPAddress(Request,true));
-                    ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
-                    sessionData.UserId = ctx.GetAD_User_ID();
-                    sessionData.Name = ctx.GetAD_User_Name();
-                    sessionData.Key = ctx.GetAD_Session_ID();
-                    ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
+                    if (createNew)
+                    {
+                        //Cretae new Sessin
+                       
+                        MSession sessionNew = MSession.Get(ctx,Session.SessionID, true, GetVisitorIPAddress(true));
+                       // sessionNew.SetWebSession(Session.SessionID);
+                        ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
+                        sessionData.UserId = ctx.GetAD_User_ID();
+                        sessionData.Name = ctx.GetAD_User_Name();
+                        sessionData.Key = ctx.GetAD_Session_ID();
+                        ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
+                    }
 
                     //_lockSlim.EnterReadLock();
 
@@ -368,7 +382,7 @@ namespace VIS.Controllers
 
                     //}
 
-                    VAdvantage.Classes.ThreadInstance.Get().Start();
+                    //VAdvantage.Classes.ThreadInstance.Get().Start();
                 }
             }
 
@@ -430,7 +444,7 @@ namespace VIS.Controllers
                 Session["ctx"] = null;
                 ViewBag.direction = "ltr";
 
-                ViewBag.LibSuffix = "_v2";
+                ViewBag.LibSuffix = "_v3";
                 //foreach (Bundle b in BundleTable.Bundles)
                 //{
                 //    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v"))

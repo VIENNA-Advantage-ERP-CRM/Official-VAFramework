@@ -384,17 +384,25 @@ namespace VIS.Controllers
             {
 
             }
-            return SignOff(ctx);
+            return SignOff(ctx,Session.SessionID);
 
         }
 
-        public ActionResult SignOff(Ctx ctx)
+        public ActionResult SignOff(Ctx  ctx, string webSessionId)
         {
-           if (ctx != null)
-             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx);
+          // if (ctx != null)
+             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx,webSessionId);
             FormsAuthentication.SignOut();
-            //if (Session != null)
-            //    Session.Abandon();
+            Session.Clear();
+
+            // Invalidate session
+            //Session.Abandon();
+
+            // Regenerate session ID
+            Response.Cookies.Add(new HttpCookie("ASP.NET_SessionId", ""));
+
+            // Redirect to login page or any other desired page
+           
             return RedirectToAction("Index", "Home");
         }
 

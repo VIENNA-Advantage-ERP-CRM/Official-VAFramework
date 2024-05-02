@@ -1303,12 +1303,15 @@
     }
 
     //Set Query Object
-    GridTab.prototype.setQuery = function (query) {
+    GridTab.prototype.setQuery = function (query,requery) {
         if (query == null)
             this.query = new VIS.Query();
         else {
             this.query = query;
             this.vo.onlyCurrentDays = 0;
+            if (requery) {
+                this.vo.oldQuery = '';
+            }
         }
     };
 
@@ -4814,7 +4817,7 @@
             var rowChg = slf.rowChanged;
             var out = slf.dataSaveDB(gTblIn, rdNew);
             // if Stauts is not OK
-            if (out.Status != "O") {
+           // if (out.Status != "O") {
                 // if there is any error then display error message
                 if (out.Status == "E") {
                     if (!(out.FireEEvent || out.FireIEvent))
@@ -4864,7 +4867,7 @@
                         // }
                     }
                 }
-            }
+            //}
             return out.Status;
         });
         msVer.show();

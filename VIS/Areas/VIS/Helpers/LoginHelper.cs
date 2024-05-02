@@ -867,7 +867,7 @@ namespace VIS.Helpers
         public static bool IsDeviceLinked(Ctx ctx, int AD_User_ID)
         {
             bool isLinked = true;
-            if (X_AD_User.TWOFAMETHOD_VAMobileApp == Util.GetValueOfString(DB.ExecuteScalar("SELECT TwoFAMethod FROM AD_User WHERE AD_User_ID = " + AD_User_ID)))
+            if (X_AD_User.TWOFAMETHOD_VAMobileApp == MUser.Get(ctx,AD_User_ID).GetTwoFAMethod())
             {
                 isLinked = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(VA074_MobileLinked_ID) FROM VA074_MobileLinked 
                             WHERE VA074_AD_User_ID = " + AD_User_ID + " AND VA074_PushNotiToken IS NOT NULL AND IsActive = 'Y'")) > 0;

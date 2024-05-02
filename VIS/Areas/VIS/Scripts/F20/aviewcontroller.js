@@ -1273,10 +1273,10 @@
         //set in Grid tab also
         this.gTab.actionParams = this.actionParams;
         //check for defalut card in Action Params
-        if (this.actionParams.AD_Card_ID > 0) {
-            this.gTab.getTableModel().setCardID(this.actionParams.AD_Card_ID);
+        if (this.actionParams.Card_ID > 0) {
+            this.gTab.getTableModel().setCardID(this.actionParams.Card_ID);
             if (!this.isCardRow && this.vCardView)
-                this.vCardView.cardID = this.actionParams.AD_Card_ID;
+                this.vCardView.cardID = this.actionParams.Card_ID;
 
         }
     };
