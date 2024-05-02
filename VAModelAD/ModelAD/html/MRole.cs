@@ -1985,7 +1985,7 @@ namespace VAdvantage.Model
         /// <param name="fullyQualified"></param>
         /// <param name="rw">if false, includes System Data</param>
         /// <returns></returns>
-        public string AddAccessSQL1(string inSql, string TableNameIn,
+        public string AddAccessSQL(string inSql, string TableNameIn,
                                     bool fullyQualified, bool rw)
         {
             if (fullyQualified && Util.IsEmpty(TableNameIn))
@@ -2168,7 +2168,7 @@ namespace VAdvantage.Model
             return retSQL.ToString();
         }   //	addAccessSQL
 
-        public string AddAccessSQL(string inSql, string TableNameIn,
+       /* public string AddAccessSQL(string inSql, string TableNameIn,
                                 bool fullyQualified, bool rw)
         {
             if (fullyQualified && Util.IsEmpty(TableNameIn))
@@ -2439,7 +2439,7 @@ namespace VAdvantage.Model
             }
 
             return resultQuery;
-        }	//	addAccessSQL
+        }	//	addAccessSQL*/
 
         /// <summary>
         /// Get Client Where Clause Value 
