@@ -184,20 +184,28 @@ namespace VAdvantage.Model
             //    AD_User_ID = 0; //Form Preference
 
             MRole role = (MRole)s_cache.Get(AD_Role_ID);
-            lock (_lock)
+
+            if (reload || role == null || role.GetAD_Role_ID() != AD_Role_ID
+            || role.GetAD_User_ID() != AD_User_ID)
             {
-                if (reload || role == null)
+               if( s_cache.ContainsKey(AD_Role_ID))
+                s_cache.Remove(AD_Role_ID);
+                lock (_lock)
                 {
-                    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
-                    s_cache[AD_Role_ID] = role;
-                }
-                else if (role.GetAD_Role_ID() != AD_Role_ID
-                || role.GetAD_User_ID() != AD_User_ID)
-                {
-                    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
-                    s_cache[AD_Role_ID] = role;
+                    role = (MRole)s_cache.Get(AD_Role_ID);
+                    if (role == null)
+                    {
+                        role = Get(ctx, AD_Role_ID, AD_User_ID, true);
+                        s_cache[AD_Role_ID] = role;
+                    }
                 }
             }
+            //else if (role.GetAD_Role_ID() != AD_Role_ID
+            //|| role.GetAD_User_ID() != AD_User_ID)
+            //{
+            //    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
+            //    s_cache[AD_Role_ID] = role;
+            //}
             return role;
 
 
@@ -686,7 +694,7 @@ namespace VAdvantage.Model
                 return "-";
             }
 
-            
+
 
             /**
              *	Fill AD_xx_Access
@@ -2281,7 +2289,7 @@ namespace VAdvantage.Model
 	 *            read write
 	 * @return "AD_Org_ID=0" or "AD_Org_ID IN(0,1)" or null (if access all org)
 	 */
-        public String GetOrgWhere(String tableName, bool rw,string mainTableName)
+        public String GetOrgWhere(String tableName, bool rw, string mainTableName)
         {
             if (IsAccessAllOrgs())
                 return null;
@@ -2336,7 +2344,7 @@ namespace VAdvantage.Model
 
                         string isView = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsView FROM AD_Table WHERE TableName='" + mainTableName + "'"));
                         // Get Shared record with organisation.
-                        if (isView!="Y" && !mainTableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !mainTableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
+                        if (isView != "Y" && !mainTableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !mainTableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
                         {
                             GetShareRecord(ref sql, tableName, mainTableName);
                         }
@@ -2837,7 +2845,7 @@ namespace VAdvantage.Model
                 sql.Append(" OR (");
 
                 //select * from C_Order where (AD_Client_ID=11 AD AD_Org_ID =0 OR C_Order_ID IN (qry)
-                sql.Append(tableName+"."+ mainTableName + "_ID IN (" + qry + "))");
+                sql.Append(tableName + "." + mainTableName + "_ID IN (" + qry + "))");
 
             }
         }
@@ -2850,7 +2858,7 @@ namespace VAdvantage.Model
         //public void LoadSharedRecord(bool reload)
         //{
         //    List<MShareRecordOrg> sharedRecordAccess = new List<MShareRecordOrg>();
-            
+
         //    if (!(reload || _sharedRecordAccess == null || IsShowSharedRecords()))
         //    {
         //        _sharedRecordAccess = sharedRecordAccess.ToArray();
@@ -2896,7 +2904,7 @@ namespace VAdvantage.Model
         //        }
         //    }
         //    _sharedRecordAccess = list.ToArray();
-            
+
         //}
 
         public override String ToString()

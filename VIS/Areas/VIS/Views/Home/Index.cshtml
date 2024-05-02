@@ -63,12 +63,7 @@
             {
                 BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
             }
-
-
         }
-
-
-
 
         List<string> paths = new List<string>();
 
@@ -115,19 +110,24 @@
 
     else //login
     {
-        if (ViewBag.LibSuffix != "")
+        if (ViewBag.LibSuffix != "_v3")
         {
             @Styles.Render("~/Areas/ViennaBase/bundles/boot" + ViewBag.LibSuffix);
             @Scripts.Render("~/Areas/ViennaBase/bundles/jquery" + ViewBag.LibSuffix);
         }
+        else if (ViewBag.LibSuffix == "_v3")
+        {
+            @Styles.Render("~/Areas/ViennaBase/Content/boot" + ViewBag.LibSuffix);
+            @Scripts.Render("~/Areas/ViennaBase/Scripts/jquery" + ViewBag.LibSuffix);
+        }
         else
         {
-            @Styles.Render("~/bundles/boot");
-            @Scripts.Render("~/bundles/jquery");
-        }
+    @Styles.Render("~/bundles/boot");
+    @Scripts.Render("~/bundles/jquery");
+            }
 
+        }
     }
-}
 
 @if (@User.Identity.IsAuthenticated)
 {
@@ -333,8 +333,8 @@
                 //}
                 //else
                 //{
-                    @Scripts.Render(b); // Render all Script files
-                //}
+                @Scripts.Render(b); // Render all Script files
+                  //}
             }
         }
         <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>

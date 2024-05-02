@@ -1464,18 +1464,19 @@
                     this.ShortcutNavigation(this.aLast.getAction());
                     break;
                 case 38:      // ArrowUP for preivious Record
-                    //var fEle = $(document.activeElement);
-                    //if (fEle && fEle.length > 0)
-                    //    fEle.trigger("change");
-                    //this.actionPerformed(tis.aPrevious.getAction());
+                    
                     this.ShortcutNavigation(this.aPrevious.getAction());
                     break;
                 case 40:      // Arrow Down for next record
                     //this.actionPerformed(this.aNext.getAction());
                     this.ShortcutNavigation(this.aNext.getAction());
                     break;
-                case 84:      // Arrow Down for next record
-                    this.actionPerformed(this.aMulti.getAction());
+                case 84:      // Arrow Multi/single  Alt+T
+                    if (this.curGC && this.curGC.getIsSingleRow()) {
+                        this.actionPerformed(this.aMulti.getAction());
+                    } else {
+                        this.actionPerformed(this.aSingle.getAction());
+                    }
                     break;
                 case 86:      // Arrow Down for next record
                     this.actionPerformed(this.aCard.getAction());
@@ -1856,7 +1857,6 @@
                             }
                         }
                     }
-
                 }//	query on first tab
             }
             var tabElement = null;
@@ -1947,9 +1947,6 @@
 
             this.vTabbedPane.addTab(id, gTab, tabElement, tabActions[i]);
 
-            //if (!oldTabLayout) {
-            //    this.getLayout().append(tabElement.getRoot());
-            //}
             //TabChange Action Callback
             tabActions[i].onAction = this.onTabChange; //Perform tab Change
         }
@@ -1957,18 +1954,9 @@
             this.curTab.setQuery(query);
         }
 
-        // for (var item = 0 ; item < this.vTabbedPane.Items.length ; item++) {
-        // this.vTabbedPane.Items[item].setTabControl(tabActions); //Set TabPage 
-        // }
-        //this.setTabControl(tabActions);
-
         this.vTabbedPane.setTabControl(tabActions);
 
         tabActions = null;
-
-
-
-
 
         this.ctx.setWindowContext(curWindowNo, "WindowName", jsonData._vo.DisplayName);
         $parent.setTitle(VIS.Env.getHeader(this.ctx, curWindowNo));
@@ -2234,7 +2222,7 @@
     };
 
     APanel.prototype.actionPerformedCallback = function (tis, action) {
-        /*Handle view change for back button */
+                /*Handle view change for back button */
         if (action === "Multi" || action === "Card" || action === "Single") {
             var view = "Y";
             if (action === "Multi") {
@@ -3390,7 +3378,7 @@
                 this.curTab.query = queryy;
                 keepFilters = false;
             }
-            var defaultTabLayout = mTab.getTabLayout();
+            var defaultTabLayout =   mTab.getTabLayout();
             if (back && this.curTab.getIsCurrent()) {
                 if (this.curTab.getTabLevel() == 0) {
                     if (this.curTab.searchText) {
@@ -3423,8 +3411,15 @@
             }
             else	//	Requery and bind
             {
+                var resetLayout = mTab.getIsResetLayout();
+                if (this.actionParams.TabLayout &&
+                    ['N', 'Y', 'C'].indexOf(this.actionParams.TabLayout) > -1) {
+                    defaultTabLayout = this.actionParams.TabLayout;
+                    resetLayout = true;
+                }
+
                 /* if reset tab is true then set default view which is set on tab */
-                if (mTab.getIsResetLayout()) {                    
+                if (resetLayout) {                    
                     if (defaultTabLayout == 'N') {
                         gc.switchMultiRow();
                     }
@@ -3437,22 +3432,17 @@
                 }
                 this.curTab.getTableModel().setCurrentPage(1);
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
-                    //var query = new VIS.Query(this.curTab.getTableName(), true);
-                    //query.addRestriction(" 1 = 1 ");
-                    //this.curTab.setQuery(query);
-                    //this.curTab.searchText = "";
+                    
                     this.clearSearchText();
-                    //if (this.curTab.getTabLevel() > 0) {
-                    //    this.curTab.linkValue = "-1";
-                    //}
+                    
                     this.setDefaultSearch(gc);
 
                     if ((this.actionParams.TabWhereClause||'') != '') { // check if param has where clause or not
                         var query = new VIS.Query(this.curTab.getTableName(), false);
                         query.addRestriction(this.actionParams.TabWhereClause);
-                        this.curTab.setQuery(query);
+                        this.curTab.setQuery(query,true);
                     }
-                    //}
+                    
                     gc.query(this.curTab.getOnlyCurrentDays(), 0, false);	//	updated
                 }
                 else {

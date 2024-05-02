@@ -142,15 +142,12 @@ namespace VAdvantage.Login
             return -1;
         }	//	getAD_User_ID
 
-
         public int GetAD_Role_ID()
         {
             if (m_role != null)
                 return m_role.GetKey();
             return -1;
         }	//	getAD_Role_ID
-
-
 
         /// <summary>
         /// Load Preferences into Context for selected client.
@@ -338,7 +335,6 @@ namespace VAdvantage.Login
             return retValue;
         }	//	loadPreferences
 
-
         private void LoadDefault(String TableName, String ColumnName)
         {
             if (TableName.StartsWith("AD_Window")
@@ -380,7 +376,6 @@ namespace VAdvantage.Login
             }
         }	//	loadDefault
 
-
         /// <summary>
         /// Validate Login.
         /// Creates session and calls ModelValidationEngine
@@ -415,12 +410,10 @@ namespace VAdvantage.Login
             return null;
         }	//	validateLogin
 
-
         public KeyNamePair[] GetRoles(String app_user, String app_pwd)
         {
             return GetRoles(app_user, app_pwd, false, false);
         }   //  login
-
 
         /// <summary>
         /// Actual DB login procedure.
@@ -537,7 +530,6 @@ namespace VAdvantage.Login
 
             return retValue;
         }	//	getRoles
-
 
         /// <summary>
         /// Load Clients.
@@ -717,7 +709,6 @@ namespace VAdvantage.Login
             return retValue;
         }   //  getOrgs
 
-
         /// <summary>
         /// Get Orgs - Add Summary Org
         /// </summary>
@@ -781,7 +772,6 @@ namespace VAdvantage.Login
             }
         }	//	getOrgAddSummary
 
-
         /// <summary>
         ///  Load Warehouses
         /// </summary>
@@ -841,9 +831,6 @@ namespace VAdvantage.Login
 
             return retValue;
         }   //  getWarehouses
-
-
-
 
         /* HTML5 */
 
