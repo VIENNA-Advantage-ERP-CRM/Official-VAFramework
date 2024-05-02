@@ -26,6 +26,7 @@ using System.Data;
 using System.Threading;
 using VAdvantage.DataBase;
 using System.Text;
+using VAdvantage.Common;
 
 namespace VIS.Controllers
 {
@@ -321,7 +322,7 @@ namespace VIS.Controllers
                     // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
                     //{
                     //Cretae new Sessin
-                    MSession sessionNew = MSession.Get(ctx, true, GetVisitorIPAddress(true));
+                    MSession sessionNew = MSession.Get(ctx, true, Common.GetVisitorIPAddress(Request,true));
                     ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
                     sessionData.UserId = ctx.GetAD_User_ID();
                     sessionData.Name = ctx.GetAD_User_Name();
@@ -489,65 +490,6 @@ namespace VIS.Controllers
 
         }
 
-        /// <summary>
-        /// method to get Client ip address
-        /// </summary>
-        /// <param name="GetLan"> set to true if want to get local(LAN) Connected ip address</param>
-        /// <returns></returns>
-        public string GetVisitorIPAddress(bool GetLan = false)
-        {
-            string visitorIPAddress = Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-
-            if (String.IsNullOrEmpty(visitorIPAddress))
-                visitorIPAddress = Request.ServerVariables["REMOTE_ADDR"];
-
-            if (string.IsNullOrEmpty(visitorIPAddress))
-                visitorIPAddress = Request.UserHostAddress;
-
-            if (string.IsNullOrEmpty(visitorIPAddress) || visitorIPAddress.Trim() == "::1")
-            {
-                GetLan = true;
-                visitorIPAddress = string.Empty;
-            }
-
-            if (GetLan)
-            {
-                if (string.IsNullOrEmpty(visitorIPAddress))
-                {
-                    //This is for Local(LAN) Connected ID Address
-                    string stringHostName = Dns.GetHostName();
-                    //Get Ip Host Entry
-                    IPHostEntry ipHostEntries = Dns.GetHostEntry(stringHostName);
-                    //Get Ip Address From The Ip Host Entry Address List
-                    IPAddress[] arrIpAddress = ipHostEntries.AddressList;
-
-                    try
-                    {
-                        visitorIPAddress = arrIpAddress[arrIpAddress.Length - 2].ToString();
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            visitorIPAddress = arrIpAddress[0].ToString();
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                arrIpAddress = Dns.GetHostAddresses(stringHostName);
-                                visitorIPAddress = arrIpAddress[0].ToString();
-                            }
-                            catch
-                            {
-                                visitorIPAddress = "127.0.0.1";
-                            }
-                        }
-                    }
-                }
-            }
-            return visitorIPAddress;
-        }
 
 
 

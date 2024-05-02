@@ -6679,9 +6679,27 @@
         }
 
         /**
+       *	(d) Preference (user) - P|
+       */
+        var defStr = "";
+        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, false);
+        if (defStr !== "") {
+            this.log.fine("[UserPreference] " + vo.ColumnName + "=" + defStr);
+            return this.createDefault("", defStr);
+        }
+
+        /**
+         *	(e) Preference (System) - # $
+         */
+        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, true);
+        if (defStr !== "") {
+            this.log.fine("[SystemPreference] " + vo.ColumnName + "=" + defStr);
+            return this.createDefault("", defStr);
+        }
+
+        /**
          *  (b) SQL Statement (for data integity & consistency)
          */
-        var defStr = "";
         if (vo.DefaultValue.startsWith("@SQL=")) {
             var sql0 = vo.DefaultValue.substring(5);			//	w/o tag
             var sql = VIS.Env.parseContext(ctx, vo.windowNo, sql0, false, true);	//	replace variables
@@ -6801,23 +6819,6 @@
             }
         }	//	dependent
 
-        /**
-         *	(d) Preference (user) - P|
-         */
-        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, false);
-        if (defStr !== "") {
-            this.log.fine("[UserPreference] " + vo.ColumnName + "=" + defStr);
-            return this.createDefault("", defStr);
-        }
-
-        /**
-         *	(e) Preference (System) - # $
-         */
-        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, true);
-        if (defStr !== "") {
-            this.log.fine("[SystemPreference] " + vo.ColumnName + "=" + defStr);
-            return this.createDefault("", defStr);
-        }
 
         /**
          *	(f) DataType defaults
@@ -6908,9 +6909,27 @@
         }
 
         /**
-         *  (b) SQL Statement (for data integity & consistency)
+         *	(d) Preference (user) - P|
          */
         var defStr = "";
+        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, false);
+        if (defStr !== "") {
+            this.log.fine("[UserPreference] " + vo.ColumnName + "=" + defStr);
+            return this.createDefault("", defStr);
+        }
+
+        /**
+         *	(e) Preference (System) - # $
+         */
+        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, true);
+        if (defStr !== "") {
+            this.log.fine("[SystemPreference] " + vo.ColumnName + "=" + defStr);
+            return this.createDefault("", defStr);
+        }
+
+        /**
+         *  (b) SQL Statement (for data integity & consistency)
+         */      
         if (vo.DefaultValue2.startsWith("@SQL=")) {
             var sql0 = vo.DefaultValue2.substring(5);			//	w/o tag
             var sql = VIS.Env.parseContext(ctx, vo.windowNo, sql0, false, true);	//	replace variables
@@ -7021,23 +7040,6 @@
             }
         }	//	dependent
 
-        /**
-         *	(d) Preference (user) - P|
-         */
-        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, false);
-        if (defStr !== "") {
-            this.log.fine("[UserPreference] " + vo.ColumnName + "=" + defStr);
-            return this.createDefault("", defStr);
-        }
-
-        /**
-         *	(e) Preference (System) - # $
-         */
-        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, true);
-        if (defStr !== "") {
-            this.log.fine("[SystemPreference] " + vo.ColumnName + "=" + defStr);
-            return this.createDefault("", defStr);
-        }
 
         /**
          *	(f) DataType defaults
@@ -7102,9 +7104,12 @@
         //	see also MTable.readData
         try {
 
-            /*return null if default value exist in validation code. TUV Points*/
-            if (!this.vo.IsReadOnly && (this.vo.ValidationCode != "" && this.vo.ValidationCode.indexOf(value) != -1)) {
-                return null;
+            /*return empty if default value exist in validation code for list.*/
+            if (!this.vo.IsReadOnly && this.vo.ValidationCode != "" && this.lookup != null
+                && this.lookup.displayType == VIS.DisplayType.List && this.lookup.getIsValidated()) {
+                if (!Object.keys(this.lookup.lookup).includes(" " + value)) {
+                    return '';
+                }
             }
 
             //	IDs & Integer & CreatedBy/UpdatedBy

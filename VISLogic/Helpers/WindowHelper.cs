@@ -3801,7 +3801,7 @@ namespace VIS.Helpers
 
             for (int i = 0; i < lstFields.Count; i++)
             {
-                if (lstFields[i].lookupInfo != null && lstFields[i].AD_Reference_ID != DisplayType.Account)
+                if (lstFields[i].lookupInfo != null && lstFields[i].displayType != DisplayType.Account)
                 {
                     var lInfo = lstFields[i].lookupInfo;
                     if (!string.IsNullOrEmpty(lInfo.displayColSubQ) && gt.TableName.ToLower() != lInfo.tableName.ToLower())
@@ -3828,7 +3828,7 @@ namespace VIS.Helpers
                             selectDirect.Append(" ) AS ").Append(lstFields[i].ColumnName + "_T");
                         selectDirect.Append(',').Append(GetColumnSQL(true, lstFields[i]));
                     }
-                    else if (lstFields[i].lookupInfo != null && lstFields[i].AD_Reference_ID == DisplayType.Account)
+                    else if (lstFields[i].displayType == DisplayType.Account)
                     {
                         if (selectDirect == null)
                             selectDirect = new StringBuilder("SELECT ");
@@ -3836,9 +3836,9 @@ namespace VIS.Helpers
                             selectDirect.Append(",");
 
                         selectDirect.Append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
-                            .Append(gt.TableName + "." + GetColumnSQL(false, lstFields[i])).Append(" ) AS ")
-                            .Append(GetColumnSQL(false, lstFields[i]) + "_T")
-                            .Append(',').Append(GetColumnSQL(true, lstFields[i]));
+                         .Append(gt.TableName + "." + GetColumnSQL(false, lstFields[i])).Append(" ) AS ")
+                         .Append(GetColumnSQL(false, lstFields[i]) + "_T")
+                         .Append(',').Append(GetColumnSQL(true, lstFields[i]));
 
                     }
                 }
