@@ -521,4 +521,10 @@ select {
     }
 }
 
+.vis-hideadmconfigblock {
+    display:none;
+}
+.vis-displayadmconfigblock {
+    display: block;
+}
 /*End */

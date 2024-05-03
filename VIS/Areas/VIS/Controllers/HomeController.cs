@@ -398,21 +398,21 @@ namespace VIS.Controllers
                     /// Check applied for adding message to toastr if 2FA method is VA and VA App is not linked with device
                     if (!LoginHelper.IsDeviceLinked(ctx, AD_User_ID))
                         ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), Msg.GetMsg(ctx, "PlzLinkVAApp"));
-
+                    //Moved to Module VA093
                     //Show If recording happening for Auto data marking
-                    ViewBag.IsAutoDataMarking = MRole.GetDefault(ctx).IsAutoDataMarking();
-                    ViewBag.ConfigModule = "";
-                    if (Env.IsModuleInstalled("VA093_") && MRole.GetDefault(ctx).IsAutoDataMarking())
-                    {
-                        ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name,1 AS RowNumber FROM  VA093_AutoMarkingConfig adc 
-                                                INNER JOIN AD_ModuleInfo m ON (m.AD_ModuleInfo_ID=adc.VA093_RefModule_ID)
-                                                WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()+ @"
-                                                UNION 
-                                                SELECT m.Name,2 AS RowNumber FROM AD_ModuleInfo m
-                                                WHERE m.Prefix='VA093_' ORDER BY RowNumber"));
+                    //ViewBag.IsAutoDataMarking = MRole.GetDefault(ctx).IsAutoDataMarking();
+                    //ViewBag.ConfigModule = "";
+                    //if (Env.IsModuleInstalled("VA093_") && MRole.GetDefault(ctx).IsAutoDataMarking())
+                    //{
+                    //    ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name,1 AS RowNumber FROM  VA093_AutoMarkingConfig adc 
+                    //                            INNER JOIN AD_ModuleInfo m ON (m.AD_ModuleInfo_ID=adc.VA093_RefModule_ID)
+                    //                            WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()+ @"
+                    //                            UNION 
+                    //                            SELECT m.Name,2 AS RowNumber FROM AD_ModuleInfo m
+                    //                            WHERE m.Prefix='VA093_' ORDER BY RowNumber"));
                        
 
-                    }
+                    //}
 
                     VAdvantage.Classes.ThreadInstance.Get().Start();
                 }
