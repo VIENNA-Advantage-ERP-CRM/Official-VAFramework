@@ -100,8 +100,9 @@ namespace VIS.Controllers
             LoginModel model = null;
             if (User.Identity.IsAuthenticated)
             {
-                StringBuilder sb = new StringBuilder("Start/n");
-
+                
+                
+                StringBuilder sbLogin = new StringBuilder();
 
                 if (Request.QueryString.Count > 0) /* if has value */
                 {
@@ -118,8 +119,9 @@ namespace VIS.Controllers
                 {
                 }
 
+                Stopwatch st = new Stopwatch();
+                st.Start();
 
-                
                 FormsIdentity ident = User.Identity as FormsIdentity;
                 Ctx ctx = null;
                 if (ident != null)
@@ -149,18 +151,17 @@ namespace VIS.Controllers
                         return View("Maintenance");
                     }
 
+                    Stopwatch stLogin = new Stopwatch();
+                    stLogin.Start();
+
                     //create class from string  
                     string key = "";
                     if (Session["ctx"] != null)
                     {
                         var oldctx = Session["ctx"] as Ctx;
-
-                        key = oldctx.GetSecureKey();
-
-                        //SessionEventHandler.SessionEnd(ctx);
+                        ctx.SetAD_Session_ID(oldctx.GetAD_Session_ID());
+                        ctx.SetSecureKey(oldctx.GetSecureKey());
                         Session.Timeout = 17;
-                        // Session["ctx"] = null;
-
                     }
                     else
                     {
@@ -171,7 +172,6 @@ namespace VIS.Controllers
                     {
                         ctx.SetSecureKey(key);
                     }
-                    Session["ctx"] = ctx;
 
                     //get login Language object on server
                     var loginLang = ctx.GetAD_Language();
@@ -225,6 +225,8 @@ namespace VIS.Controllers
 
                     model.Login1Model.AD_User_ID = AD_User_ID;
                     model.Login1Model.DisplayName = username;
+
+                    sbLogin.Append("auth,role,session =>" + stLogin.Elapsed);
 
                     //string diableMenu = ctx.GetContext("#DisableMenu");
                     Helpers.MenuHelper mnuHelper = new Helpers.MenuHelper(ctx); // inilitilize menu class
@@ -281,7 +283,7 @@ namespace VIS.Controllers
                     ViewBag.OrgList = OrgList;
                     ViewBag.WarehouseList = WareHouseList;
 
-
+                    sbLogin.Append("menu,client+ware =>" + stLogin.Elapsed);
                     // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
                     //{
                     if (createNew)
@@ -296,6 +298,7 @@ namespace VIS.Controllers
                         sessionData.Key = ctx.GetAD_Session_ID();
                         ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
                     }
+                    Session["ctx"] = ctx;
 
                     //_lockSlim.EnterReadLock();
 
@@ -378,11 +381,14 @@ namespace VIS.Controllers
                     //                            UNION 
                     //                            SELECT m.Name,2 AS RowNumber FROM AD_ModuleInfo m
                     //                            WHERE m.Prefix='VA093_' ORDER BY RowNumber"));
-                       
+
 
                     //}
 
                     //VAdvantage.Classes.ThreadInstance.Get().Start();
+                    sbLogin.Append("home complete =>" + stLogin.Elapsed);
+                    stLogin.Stop();
+                    //ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), sbLogin.ToString());
                 }
             }
 

@@ -19,6 +19,16 @@
             ul = main.find('ul');
             btn = main.find("button");
             txt = main.find("textarea");
+            txt.on("keydown", function (evt) {
+                var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : evt.keyCode;
+                if (keyCode == 13) {
+                    evt.preventDefault();
+                    onBtnClick(evt);
+                }
+                if (keyCode == 27) {
+                    txt.val('');
+                }
+            });
             btn.on('click', onBtnClick);
         };
         init();
@@ -27,6 +37,7 @@
             var d = { sessionid: VIS.context.getContext('#AD_Session_ID'),   txt: txt.val() };
             VIS.dataContext.postJSONData(VIS.Application.contextUrl + "Message/PushMessage", d, function (data) {
                 txt.val('');
+                txt.focus();
             });
         };
        

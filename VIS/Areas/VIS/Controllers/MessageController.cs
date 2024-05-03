@@ -63,7 +63,7 @@ namespace VIS.Controllers
         {
             SSEManager.Get().AddMessage(sessionid, txt,
                 "MSG", SSEManager.Cast.BroadCast);
-            return Json("OK");
+            return Json(new { result = "OK" });
         }
 
 
