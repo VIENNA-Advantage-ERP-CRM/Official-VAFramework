@@ -1,4 +1,4 @@
-﻿/* Version 2.0.14.2 */
+﻿/* Version 2.0.14.3 */
 
 html, body {
     height: 100%;
@@ -20606,6 +20606,13 @@ select {
     }
 }
 
+.vis-hideadmconfigblock {
+    display: none;
+}
+
+.vis-displayadmconfigblock {
+    display: block;
+}
 /*End */
 
 
