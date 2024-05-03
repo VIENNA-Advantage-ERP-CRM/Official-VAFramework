@@ -2191,7 +2191,8 @@
 
         if (action.source instanceof VIS.Controls.VButton) {
             var btnField = action.source.getField();
-            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
+            //exempt window action button, and field Button actions from Readonly state of tab and field
+            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && !btnField.getIsAction() && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
                 return;
             }
         }
