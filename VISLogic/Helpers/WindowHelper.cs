@@ -3828,19 +3828,19 @@ namespace VIS.Helpers
                             selectDirect.Append(" ) AS ").Append(lstFields[i].ColumnName + "_T");
                         selectDirect.Append(',').Append(GetColumnSQL(true, lstFields[i]));
                     }
-                    else if (lstFields[i].displayType == DisplayType.Account)
-                    {
-                        if (selectDirect == null)
-                            selectDirect = new StringBuilder("SELECT ");
-                        else
-                            selectDirect.Append(",");
+                }
+                else if (lstFields[i].displayType == DisplayType.Account)
+                {
+                    if (selectDirect == null)
+                        selectDirect = new StringBuilder("SELECT ");
+                    else
+                        selectDirect.Append(",");
 
-                        selectDirect.Append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
-                         .Append(gt.TableName + "." + GetColumnSQL(false, lstFields[i])).Append(" ) AS ")
-                         .Append(GetColumnSQL(false, lstFields[i]) + "_T")
-                         .Append(',').Append(GetColumnSQL(true, lstFields[i]));
+                    selectDirect.Append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
+                     .Append(gt.TableName + "." + GetColumnSQL(false, lstFields[i])).Append(" ) AS ")
+                     .Append(GetColumnSQL(false, lstFields[i]) + "_T")
+                     .Append(',').Append(GetColumnSQL(true, lstFields[i]));
 
-                    }
                 }
             }
 
