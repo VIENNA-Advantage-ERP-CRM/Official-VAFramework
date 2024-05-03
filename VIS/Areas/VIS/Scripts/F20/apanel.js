@@ -1446,8 +1446,12 @@
                     //this.actionPerformed(this.aNext.getAction());
                     this.ShortcutNavigation(this.aNext.getAction());
                     break;
-                case 84:      // Arrow Down for next record
-                    this.actionPerformed(this.aMulti.getAction());
+                case 84:      // Arrow Multi/single  Alt+T
+                    if (this.curGC && this.curGC.getIsSingleRow()) {
+                        this.actionPerformed(this.aMulti.getAction());
+                    } else {
+                        this.actionPerformed(this.aSingle.getAction());
+                    }
                     break;
                 case 86:      // Arrow Down for next record
                     this.actionPerformed(this.aCard.getAction());

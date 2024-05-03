@@ -101,7 +101,8 @@ namespace VIS.Helpers
 
                         if (!ipMatch)
                         {
-                            throw new Exception("UserIPNotMatch");
+                        Ctx ctx = new Ctx();
+                        throw new Exception(Msg.GetMsg(ctx, "VIS_UserIPNotMatch"));
                         }
                 }
             }
