@@ -423,6 +423,7 @@ select {
     .vis-chatOverlay ul {
         height: calc(100% - 48px);
         overflow: auto;
+        padding:10px;
     }
 
 .vis-chatBoxInputWrap textarea {
