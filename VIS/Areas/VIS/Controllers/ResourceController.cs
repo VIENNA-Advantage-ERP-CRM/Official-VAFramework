@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using VAdvantage.Classes;
 using VAdvantage.Login;
 using VAdvantage.Model;
@@ -58,6 +60,9 @@ namespace VIS.Controllers
                 ctx.SetContextUrl(@Url.Content("~/"));
 
                 SecureEngine.Encrypt("a");
+                //var sbLogin = new  StringBuilder();
+                //var stLogin = new Stopwatch();
+                //stLogin.Start();
 
                 CCache<string, string> msgs = Msg.Get().GetMsgMap(ctx.GetAD_Language());
 
@@ -93,10 +98,13 @@ namespace VIS.Controllers
                 sb.Append(", columnSynonym : { 'AD_User_ID': 'SalesRep_ID','C_ElementValue_ID':'Account_ID'}");
                 sb.Append("};");
 
+
                 /* CTX */
                 SetLoginContext(ctx);
                 // VIS0008 Setting other values into Context
                 SetOtherContext(ctx);
+
+
                 sb.Append(" VIS.context.ctx = ").Append(Newtonsoft.Json.JsonConvert.SerializeObject(ctx.GetMap())).Append("; ");
 
                 /* Message */
@@ -147,6 +155,7 @@ namespace VIS.Controllers
                 }
 
                 sb.Append("};");
+
                 // sb.Append(" console.log(VIS.I18N.labels)");
                 //return View();
                 //System.Web.Optimization.JsMinify d = new System.Web.Optimization.JsMinify();
@@ -158,6 +167,10 @@ namespace VIS.Controllers
                 var r = new ResourceManager(fullUrl, ctx.GetAD_Client_ID());
                 r.RunAsync();
                 r = null;
+
+                //sbLogin.Append("/n").Append("complete =>" + stLogin.Elapsed);
+                //stLogin.Stop();
+                //ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), sbLogin.ToString());
             }
 
             return JavaScript(sb.ToString());

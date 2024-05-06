@@ -102,7 +102,7 @@ namespace VIS.Controllers
             {
                 
                 
-                StringBuilder sbLogin = new StringBuilder();
+                //StringBuilder sbLogin = new StringBuilder();
 
                 if (Request.QueryString.Count > 0) /* if has value */
                 {
@@ -110,10 +110,7 @@ namespace VIS.Controllers
                 }
                 try
                 {
-                    //var conf = WebConfigurationManager.OpenWebConfiguration(System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath);
-                    //  SessionStateSection section = (SessionStateSection) conf.GetSection("system.web/sessionState");
-                    // int timeout = (int) section.Timeout.TotalMinutes;
-                    Session.Timeout = 20; // ideal timout
+                    Session.Timeout = 20; // idle timeout
                 }
                 catch
                 {
@@ -226,7 +223,7 @@ namespace VIS.Controllers
                     model.Login1Model.AD_User_ID = AD_User_ID;
                     model.Login1Model.DisplayName = username;
 
-                    sbLogin.Append("auth,role,session =>" + stLogin.Elapsed);
+                    //sbLogin.Append("auth,role,session =>" + stLogin.Elapsed);
 
                     //string diableMenu = ctx.GetContext("#DisableMenu");
                     Helpers.MenuHelper mnuHelper = new Helpers.MenuHelper(ctx); // inilitilize menu class
@@ -282,8 +279,8 @@ namespace VIS.Controllers
                     ViewBag.ClientList = ClientList;
                     ViewBag.OrgList = OrgList;
                     ViewBag.WarehouseList = WareHouseList;
-
-                    sbLogin.Append("menu,client+ware =>" + stLogin.Elapsed);
+                    
+                    //sbLogin.Append("/n").Append("menu,client+ware =>" + stLogin.Elapsed);
                     // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
                     //{
                     if (createNew)
@@ -300,70 +297,11 @@ namespace VIS.Controllers
                     }
                     Session["ctx"] = ctx;
 
-                    //_lockSlim.EnterReadLock();
-
-                    //if (!isBundleAdded)
-                    //{
-                    //    var lst = VAdvantage.ModuleBundles.GetStyleBundles(); //Get All Style Bundle
-                    //    foreach (var b in lst)
-                    //    {
-                    //        if (!BundleTable.Bundles.Contains(b))
-                    //        {
-                    //            BundleTable.Bundles.Add(b); //Add in Mvc Bundle Table
-                    //        }
-                    //    }
-
-                    //    var lstRTLStyle = VAdvantage.ModuleBundles.GetRTLStyleBundles(); //Get All Script Bundle
-
-                    //    foreach (var b in lstRTLStyle)
-                    //    {
-                    //        if (!BundleTable.Bundles.Contains(b))
-                    //        {
-                    //            BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
-                    //        }
-                    //    }
-
-                    //    var lstScript = VAdvantage.ModuleBundles.GetScriptBundles(); //Get All Script Bundle
-
-                    //    foreach (var b in lstScript)
-                    //    {
-                    //        if (!BundleTable.Bundles.Contains(b))
-                    //        {
-                    //            BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
-                    //        }
-                    //    }
-                    //    isBundleAdded = true;
-                    //}
-
-                    //_lockSlim.ExitReadLock();
+                   
 
                     ViewBag.LibSuffix = "_v3";
                     ViewBag.FrameSuffix = "_v2";
-                    //int libFound = 0;
-                    //foreach (Bundle b in BundleTable.Bundles)
-                    //{
-                    //    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
-                    //    {
-                    //        ViewBag.LibSuffix = Util.GetValueOfInt(ctx.GetContext("#FRONTEND_LIB_VERSION")) > 2
-                    //                              ? "_v3" : "_v2";
-                    //        libFound++;
-                    //    }
-
-                    //    if (b.Path.Contains("VIS") && b.Path.Contains("_v"))
-                    //    {
-                    //        ViewBag.FrameSuffix = Util.GetValueOfInt(ctx.GetContext("#FRAMEWORK_VERSION")) > 1
-                    //                              ? "_v2" : "_v1";
-                    //        libFound++;
-                    //    }
-                    //    if (libFound >= 2)
-                    //    {
-                    //        break;
-                    //    }
-                    //    //}
-                    //    //check system setting// set to skipped lib
-
-
-                    //}
+                   
 
                     /// VIS0008
                     /// Check applied for adding message to toastr if 2FA method is VA and VA App is not linked with device
@@ -386,8 +324,8 @@ namespace VIS.Controllers
                     //}
 
                     //VAdvantage.Classes.ThreadInstance.Get().Start();
-                    sbLogin.Append("home complete =>" + stLogin.Elapsed);
-                    stLogin.Stop();
+                    //sbLogin.Append("/n").Append("home complete =>" + stLogin.Elapsed);
+                    //stLogin.Stop();
                     //ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), sbLogin.ToString());
                 }
             }
