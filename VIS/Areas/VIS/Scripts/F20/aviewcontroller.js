@@ -1534,14 +1534,19 @@
         var newRecordView = this.gTab.getNewRecordView();
         if (newRecordView == NEWRECORDVIEW_SingleRowLayout) {
             this.switchSingleRow();
+            this.aPanel.showHideViewIcon(this.aPanel.aSingle);
+
         }
         else if (newRecordView == NEWRECORDVIEW_GridLayout) {
             this.isNewClick = true; // use for stop requery data
             this.switchMultiRow();
+            this.aPanel.showHideViewIcon(this.aPanel.aMulti);
         }
         else {
             if (this.getIsCardRow()) {
                 this.switchSingleRow();
+                this.aPanel.showHideViewIcon(this.aPanel.aSingle);
+
             }
         }
     };
@@ -2053,8 +2058,8 @@
     VIS.GridController.prototype.switchMapRow = function (locationID) {
         if (!this.isMapRow) {
 
-            this.singleRow = true;
-            this.isCardRow = false;
+            //this.singleRow = true;
+            //this.isCardRow = false;
             this.isMapRow = true;
 
 

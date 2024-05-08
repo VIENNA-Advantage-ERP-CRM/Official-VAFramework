@@ -91,27 +91,27 @@
         function adjustRowSpan(colIndex) {
 
             if (col0.rSpan > 1) { //skip column 
-                if (col0.set && colIndex == 1 &&  col0.cSpan < 4) { //special case
-                    col0.set = false;
-                }
-                else
+                //if (col0.set && colIndex == 1 &&  col0.cSpan < 4) { //special case
+                //    col0.set = false;
+                //}
+                //else
                     --col0.rSpan;
 
                 reset(col0);
             }
             if (col1.rSpan > 1) { //skip column 
-                if (colIndex == 2 && col1.set &&  col1.cSpan < 3) { //special case
-                    col1.set = false;
-                }
-                else
+                //if (colIndex == 2 && col1.set &&  col1.cSpan < 3) { //special case
+                //    col1.set = false;
+                //}
+                //else
                     --col1.rSpan;
                 reset(col1);
             }
             if (col2.rSpan > 1) { //skip column 
-                if (colIndex == 3 && col2.set && col2.cSpan <2) { //special case
-                    col2.set = false;
-                }
-                else
+                //if (colIndex == 3 && col2.set && col2.cSpan <2) { //special case
+                //    col2.set = false;
+                //}
+                //else
                     --col2.rSpan;
                 reset(col2);
             }
