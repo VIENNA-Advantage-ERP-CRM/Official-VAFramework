@@ -397,7 +397,7 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label {
     border: 1px solid #ec3f3f;
 }*/
 .vis-input-wrap .vis-ev-col-mandatory ~ label span, 
-.vis-input-wrap .vis-ev-col-mandatory:not(:focus) ~ label sup, 
+.vis-input-wrap .vis-ev-col-mandatory ~ label sup, 
 .vis-input-wrap .vis-ev-col-mandatory::-webkit-input-placeholder {
     color: rgba(var(--v-c-mandatory),1) !important;
 }
