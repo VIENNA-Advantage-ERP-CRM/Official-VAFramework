@@ -6688,14 +6688,7 @@
             return this.createDefault("", defStr);
         }
 
-        /**
-         *	(e) Preference (System) - # $
-         */
-        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, true);
-        if (defStr !== "") {
-            this.log.fine("[SystemPreference] " + vo.ColumnName + "=" + defStr);
-            return this.createDefault("", defStr);
-        }
+        
 
         /**
          *  (b) SQL Statement (for data integity & consistency)
@@ -6819,6 +6812,15 @@
             }
         }	//	dependent
 
+
+        /**
+         *	(e) Preference (System) - # $
+         */
+        defStr = VIS.Env.getPreference(ctx, vo.AD_Window_ID, vo.ColumnName, true);
+        if (defStr !== "") {
+            this.log.fine("[SystemPreference] " + vo.ColumnName + "=" + defStr);
+            return this.createDefault("", defStr);
+        }
 
         /**
          *	(f) DataType defaults
