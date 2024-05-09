@@ -87,23 +87,23 @@ namespace VIS.Helpers
                 
                 string ipAddress = Util.GetValueOfString(dsUserInfo.Tables[0].Rows[0]["IP_Address"]);
                 if (!string.IsNullOrEmpty(ipAddress))
-                {   
+                {
                     bool ipMatch = false;
                     List<string> userIPList = new List<string>(ipAddress.Split(','));
-                        for (int i = 0; i < userIPList.Count; i++)
+                    for (int i = 0; i < userIPList.Count; i++)
+                    {
+                        if (userIPList[i].Trim() == IP)
                         {
-                            if (userIPList[i].Trim() == IP)
-                            {
-                                ipMatch = true;
-                                break;
-                            }
+                            ipMatch = true;
+                            break;
                         }
+                    }
 
-                        if (!ipMatch)
-                        {
+                    if (!ipMatch)
+                    {
                         Ctx ctx = new Ctx();
                         throw new Exception(Msg.GetMsg(ctx, "VIS_UserIPNotMatch"));
-                        }
+                    }
                 }
             }
             else

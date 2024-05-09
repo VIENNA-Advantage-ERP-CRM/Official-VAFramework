@@ -201,21 +201,21 @@ namespace VIS
             //   );
 
 
-            //style.Include("~/Areas/VIS/Content/F20/Color.css",
-            //    "~/Areas/VIS/Content/F20/Site.css",
-            //    "~/Areas/VIS/Content/F20/Window.css",
-            //            "~/Areas/VIS/Content/F20/Controls.css",
-            //             "~/Areas/VIS/Content/F20/Media.css",
-            //             "~/Areas/VIS/Content/F20/ThemeCnfgtr.css"
-            //    );
-            //style.Include("~/Areas/VIS/Content/VIS.rtl.css");
+            style.Include("~/Areas/VIS/Content/F20/Color.css",
+                "~/Areas/VIS/Content/F20/Site.css",
+                "~/Areas/VIS/Content/F20/Window.css",
+                        "~/Areas/VIS/Content/F20/Controls.css",
+                         "~/Areas/VIS/Content/F20/Media.css",
+                         "~/Areas/VIS/Content/F20/ThemeCnfgtr.css"
+                );
+            style.Include("~/Areas/VIS/Content/VIS.rtl.css");
 
 
 
-            style.Include("~/Areas/VIS/Content/VIS.all.min.css");
-            modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js");
-            modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
-            modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");
+            /* style.Include("~/Areas/VIS/Content/VIS.all.min.css");
+             modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js");
+             modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
+             modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");*/
 
             /// with webpack and want to genrate files with version
             style.Include("~/Areas/VIS/Content/VIS.all.min{version}.css");
