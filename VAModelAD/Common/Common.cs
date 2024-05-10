@@ -356,7 +356,7 @@ namespace VAdvantage.Common
                 }
             }
 
-            _pi.SetSummary("Report", rpe != null);
+            _pi.SetSummary("Report", rpe == null);
             System.Threading.Thread.CurrentThread.CurrentCulture = original;
             System.Threading.Thread.CurrentThread.CurrentUICulture = original;
             //ReportCtl.Report = re;

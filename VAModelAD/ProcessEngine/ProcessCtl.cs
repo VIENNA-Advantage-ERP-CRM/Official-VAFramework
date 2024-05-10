@@ -543,7 +543,7 @@ namespace VAdvantage.ProcessEngine
                         irv.GetView();
                         _pi.Set_AD_PrintFormat_Table_ID(irv.GetPrintFormat().GetAD_Table_ID());
                     }
-                    _pi.SetSummary("Report", re != null);
+                    _pi.SetSummary("Report", re == null);
                     Unlock();
                     if (re != null)
                     {
@@ -590,7 +590,7 @@ namespace VAdvantage.ProcessEngine
                     int totalRecords = 0;
                     re = VAdvantage.ReportFormat.ReportFormatEngine.Get(_ctx, _pi, out totalRecords, _pi.IsArabicReportFromOutside);
                     Unlock();
-                    _pi.SetSummary("Report", re != null);
+                    _pi.SetSummary("Report", re == null);
                     _pi.SetTotalRecords(totalRecords);
                     if (re != null)
                     {
@@ -610,7 +610,7 @@ namespace VAdvantage.ProcessEngine
                     _rep.GetView();
                     _pi.Set_AD_PrintFormat_Table_ID(_rep.GetPrintFormat().GetAD_Table_ID());
                     _pi.Set_AD_PrintFormat_ID(_rep.GetPrintFormat().GetAD_PrintFormat_ID());
-                    _pi.SetSummary("Report", re != null);
+                    _pi.SetSummary("Report", re == null);
                     Unlock();
                     if (re != null)
                     {
@@ -788,7 +788,7 @@ namespace VAdvantage.ProcessEngine
                         irv.GetView();
                         _pi.Set_AD_PrintFormat_Table_ID(irv.GetPrintFormat().GetAD_Table_ID());
                     }
-                    _pi.SetSummary("Report", re != null);
+                    _pi.SetSummary("Report", re == null);
                     Unlock();
                     if (re != null)
                     {
@@ -912,7 +912,7 @@ namespace VAdvantage.ProcessEngine
                     _pi.SetTotalPage(_pi.GetTotalPage());
                     _pi.SetIsSupportPaging(true);
 
-                    _pi.SetSummary("Report", re != null);
+                    _pi.SetSummary("Report", re == null);
                 }
 
                 else if (IsBIReport)
@@ -942,7 +942,7 @@ namespace VAdvantage.ProcessEngine
                         _pi.Set_AD_PrintFormat_ID(_rep.GetPrintFormat().GetAD_PrintFormat_ID());
                         //_pi.SetTotalRecords(_rep.GetPrintFormat().TotalPage);
                         _pi.Set_AD_ReportView_ID(AD_ReportView_ID);
-                        _pi.SetSummary("Report", re != null);
+                        _pi.SetSummary("Report", re == null);
 
                         // "#REPORT_PAGE_SIZE"
                         int pageSize = Util.GetValueOfInt(ctx.GetContext("#REPORT_PAGE_SIZE")); //500;
@@ -1549,7 +1549,7 @@ namespace VAdvantage.ProcessEngine
                 //	Start Report	-----------------------------------------------
                 re = ReportCtl.Start(_ctx, _pi, IsDirectPrint);
 
-                _pi.SetSummary("Report", re != null);
+                _pi.SetSummary("Report", re == null);
                 Unlock();
                 if (re != null && IsDirectPrint)
                 {

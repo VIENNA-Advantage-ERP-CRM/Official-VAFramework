@@ -778,6 +778,7 @@
                 if (!back) {
                     this.curGC.refreshFilterPanelData();
                 }
+
             }
             else {
                 $fltrPanel.hide();
@@ -869,9 +870,15 @@
             }
         };
 
-        this.startFilterPanel = function () {
-            $fltrPanel.show();
-            this.refresh();
+        this.startFilterPanel = function (hide) {
+            if (!hide) {
+                $fltrPanel.show();
+                this.refresh();
+            }
+            else {
+                $fltrPanel.hide();
+                self.refresh();
+            }
         };
 
         this.getTabSuffix = function () {
@@ -882,10 +889,8 @@
             self.startFilterPanel();
         });
 
-
         $btnFPClose.on("click", function (e) {
-            $fltrPanel.hide();
-            self.refresh();
+            self.startFilterPanel(true);
         });
 
         $divTabNav.on("click", function (e) {
@@ -1704,8 +1709,10 @@
 
     APanel.prototype.ShowHideViewIcon = function (action) {
         if (this.curTab != null && this.curGC != null) {
-            if (this.actionParams.IsHideGridToggle) {
-                this.aMulti.hide();
+            if (this.actionParams.IsHideGridToggle != null) {
+                if(this.actionParams.IsHideGridToggle)
+                    this.aMulti.hide();
+                else this.aMulti.show();
             }
             else if (!this.curTab.getIsHideGridToggle()) {
                 this.aMulti.show();
@@ -1716,8 +1723,11 @@
                
             }
 
-            if (this.actionParams.IsHideSingleToggle) {
-                this.aSingle.hide();
+            if (this.actionParams.IsHideSingleToggle != null) {
+                if (this.actionParams.IsHideSingleToggle)
+                    this.aSingle.hide();
+                else
+                    this.aSingle.show();
             }
             else if (!this.curTab.getIsHideSingleToggle()) {
                 
@@ -1728,8 +1738,11 @@
                 this.aSingle.hide();
             }
 
-            if (this.actionParams.IsHideCardToggle) {
-                this.aCard.hide();
+            if (this.actionParams.IsHideCardToggle != null) {
+                if (this.actionParams.IsHideCardToggle)
+                    this.aCard.hide();
+                else
+                    this.aCard.show();
             }
             else if (!this.curTab.getIsHideCardToggle()) {
                 this.aCard.show();
@@ -3527,9 +3540,12 @@
             //aChat.setEnabled(true);
         }
         
-        this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel() );
+        this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
+        
         this.showFilterPanel(keepFilters);
-
+        if (this.actionParams.IsShowFilterPanel != null) {//set
+            this.startFilterPanel(!this.actionParams.IsShowFilterPanel);
+        }
         //}
 
         this.refresh();
