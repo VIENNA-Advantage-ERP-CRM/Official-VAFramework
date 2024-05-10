@@ -25,6 +25,7 @@
 
         return dataSet;
     };
+
     var executeScalar = function (sql, params, callback) {
         var async = callback ? true : false;
         var dataIn = { sql: sql, page: 1, pageSize: 0 }
@@ -72,7 +73,6 @@
         });
         return result;
     };
-
 
     var tmpAPanel = document.querySelector('#vis-ad-paneltmp').content;// $("#vis-ad-windowtmp");
 
@@ -341,7 +341,7 @@
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             }
 
-            self.gridWindow.getIsHideTabLinks()
+            
 
             setToolTipMessages();
         };
@@ -350,10 +350,34 @@
         initComponenet();
         $divStatus.append(this.statusBar.getRoot()); //Status bar
 
+        this.hideToolbar = function (hide) {
+            if (hide)
+                $ulToobar.find('*').hide();
+            else
+                $ulToobar.find('*').show();
+        };
+
+        this.hideTabLinks = function (hide) {
+            if(hide)
+                $divHeaderNav.find('*').css('visibility', 'hidden');
+            else
+                $divHeaderNav.find('*').css('visibility', 'show');
+        };
+
+        this.hideActionbar = function (hide) {
+            if (hide) {
+                $btnlbToggle.hide();
+                $divRightbar.hide();
+            }
+            else {
+                $btnlbToggle.show();
+                $divRightbar.show();
+            }
+        };
+
         this.setSize = function (height, width) {
             return;
         };
-
         /**
          * Check given refrence is window action.
          * @param {any} refrenceValue
@@ -404,7 +428,7 @@
             //Ndw Back button
             this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back", "back-arrow");
             //check toolbar
-            if (!this.gridWindow.getIsHideToolbar()) {
+           // if (!this.gridWindow.getIsHideToolbar()) {
                 $ulToobar.append(this.aBack.getListItm());
                 $ulToobar.append(this.aIgnore.getListItm());
                 $ulToobar.append(this.aNew.getListItm());
@@ -414,6 +438,10 @@
                 $ulToobar.append(this.aReport.getListItm());
                 $ulToobar.append(this.aPrint.getListItm());
                 // $ulToobar.append(this.aBatchUpdate.getListItm());
+           // }
+
+            if (!this.gridWindow.getIsHideToolbar()) {
+                $ulToobar.find("LI").hide();
             }
 
             //lakhwinder
@@ -750,6 +778,7 @@
                 if (!back) {
                     this.curGC.refreshFilterPanelData();
                 }
+
             }
             else {
                 $fltrPanel.hide();
@@ -841,9 +870,15 @@
             }
         };
 
-        this.startFilterPanel = function () {
-            $fltrPanel.show();
-            this.refresh();
+        this.startFilterPanel = function (hide) {
+            if (!hide) {
+                $fltrPanel.show();
+                this.refresh();
+            }
+            else {
+                $fltrPanel.hide();
+                self.refresh();
+            }
         };
 
         this.getTabSuffix = function () {
@@ -854,10 +889,8 @@
             self.startFilterPanel();
         });
 
-
         $btnFPClose.on("click", function (e) {
-            $fltrPanel.hide();
-            self.refresh();
+            self.startFilterPanel(true);
         });
 
         $divTabNav.on("click", function (e) {
@@ -1436,10 +1469,7 @@
                     this.ShortcutNavigation(this.aLast.getAction());
                     break;
                 case 38:      // ArrowUP for preivious Record
-                    //var fEle = $(document.activeElement);
-                    //if (fEle && fEle.length > 0)
-                    //    fEle.trigger("change");
-                    //this.actionPerformed(tis.aPrevious.getAction());
+                    
                     this.ShortcutNavigation(this.aPrevious.getAction());
                     break;
                 case 40:      // Arrow Down for next record
@@ -1677,22 +1707,44 @@
         }
     }
 
-    /**
-     * show or hide view toggle buttons
-     * @param {any} current action
-     */
     APanel.prototype.showHideViewIcon = function (action) {
-        if (this.curTab != null && this.curGC !=null) {
-            if (!this.curTab.getIsHideGridToggle()) {
+        if (this.curTab != null && this.curGC != null) {
+            if (this.actionParams.IsHideGridToggle != null) {
+                if(this.actionParams.IsHideGridToggle)
+                    this.aMulti.hide();
+                else this.aMulti.show();
+            }
+            else if (!this.curTab.getIsHideGridToggle()) {
                 this.aMulti.show();
-                this.aSingle.show();
+               
 
             } else {
                 this.aMulti.hide();
+               
+            }
+
+            if (this.actionParams.IsHideSingleToggle != null) {
+                if (this.actionParams.IsHideSingleToggle)
+                    this.aSingle.hide();
+                else
+                    this.aSingle.show();
+            }
+            else if (!this.curTab.getIsHideSingleToggle()) {
+                
+                this.aSingle.show();
+
+            } else {
+                
                 this.aSingle.hide();
             }
 
-            if (!this.curTab.getIsHideCardToggle()) {
+            if (this.actionParams.IsHideCardToggle != null) {
+                if (this.actionParams.IsHideCardToggle)
+                    this.aCard.hide();
+                else
+                    this.aCard.show();
+            }
+            else if (!this.curTab.getIsHideCardToggle()) {
                 this.aCard.show();
             } else {
                 this.aCard.hide();
@@ -1818,7 +1870,6 @@
                             }
                         }
                     }
-
                 }//	query on first tab
             }
             var tabElement = null;
@@ -1909,9 +1960,6 @@
 
             this.vTabbedPane.addTab(id, gTab, tabElement, tabActions[i]);
 
-            //if (!oldTabLayout) {
-            //    this.getLayout().append(tabElement.getRoot());
-            //}
             //TabChange Action Callback
             tabActions[i].onAction = this.onTabChange; //Perform tab Change
         }
@@ -1919,18 +1967,9 @@
             this.curTab.setQuery(query);
         }
 
-        // for (var item = 0 ; item < this.vTabbedPane.Items.length ; item++) {
-        // this.vTabbedPane.Items[item].setTabControl(tabActions); //Set TabPage 
-        // }
-        //this.setTabControl(tabActions);
-
         this.vTabbedPane.setTabControl(tabActions);
 
         tabActions = null;
-
-
-
-
 
         this.ctx.setWindowContext(curWindowNo, "WindowName", jsonData._vo.DisplayName);
         $parent.setTitle(VIS.Env.getHeader(this.ctx, curWindowNo));
@@ -2065,7 +2104,6 @@
         }
     }
 
-
     //Updated by raghu 
     //date:19-01-2016
     //Change/Update for:Zoom from workflow on home page
@@ -2166,7 +2204,8 @@
 
         if (action.source instanceof VIS.Controls.VButton) {
             var btnField = action.source.getField();
-            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
+            //exempt window action button, and field Button actions from Readonly state of tab and field
+            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && !btnField.getIsAction() && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
                 return;
             }
         }
@@ -2193,11 +2232,11 @@
 
             selfPan.actionPerformedCallback(selfPan, action);
 
-        }, 100);
+        }, 10);
     };
 
     APanel.prototype.actionPerformedCallback = function (tis, action) {
-        /*Handle view change for back button */
+                /*Handle view change for back button */
         if (action === "Multi" || action === "Card" || action === "Single") {
             var view = "Y";
             if (action === "Multi") {
@@ -2467,14 +2506,11 @@
 
         //check action type
 
-        //Undo     
-
-
-        if (vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU") {
+        //Undo  and tab change   
+        if (vButton.getField().getIsAction()&& vButton.getField().getAction() === "MTU") {
             aPanel.cmd_ignore();
-            aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction());
+                aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(), vButton.getField().getActionParams());
             needExecute = false;
-
         } 
 
         else if (curCtrller.curTab.needSave(true, false)) {
@@ -2525,6 +2561,14 @@
         if (record_ID == -1 && curTab.getKeyColumnName().toUpperCase().endsWith("_ID")) {
             VIS.ADialog.error("SaveErrorRowNotFound", true, "");
             return;
+        }
+
+        /*Special handling
+          Move to next tab */
+        if (mField.getIsAction()) {
+            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(),
+                mField.getActionName(), mField.getActionParams());
+            return true;
         }
 
         //	Pop up Payment Rules
@@ -2767,12 +2811,7 @@
         else if (columnName.equals("OpenCardDialog")) {
             aPanel.cmd_cardDialog(true);
         }
-        /*Special handling
-          Move to next tab */
-        else if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(), mField.getActionName());
-            return;
-        }
+        
 
         if (vButton.AD_Process_ID > 0) {
 
@@ -3095,7 +3134,7 @@
      *	tab change
      *  @param action tab item's id
      */
-    APanel.prototype.tabActionPerformed = function (action, actionType, actionName) {
+        APanel.prototype.tabActionPerformed = function (action, actionType, actionName, actionParams) {
 
         /* Check for any window or form added in action*/
         if ((actionType == 'WIW' || actionType == 'FOM') && actionName != "") {
@@ -3162,6 +3201,8 @@
             this.vTabbedPane.restoreTabChange();
             return;
         }
+
+        
 
         //// To Clear SearchText Box on Tab Change
         this.toggleASearchIcons(false, false);
@@ -3286,6 +3327,12 @@
 
             }
 
+            //assign action params
+            if (actionParams)
+                this.actionParams = actionParams;
+            else this.actionParams = {};
+
+
             var clickedTabSeq = tpIndex; //Get Tab index
             var clickedTabID = action; // Get the tab ID
             var winNo = this.curWindowNo;
@@ -3318,14 +3365,10 @@
 
     APanel.prototype.tabActionPerformedCallback = function (action, back, isAPanelTab, tabEle, curEle, oldGC, gc, st) {
 
-
         curEle.setVisible(false);
         curEle.getRoot().detach();
-
         this.getLayout().prepend(tabEle.getRoot());
-
         this.vTabbedPane.setSelectedTab(action); //set Seleted tab
-
         var keepFilters = back;
         if (isAPanelTab) {
             tabEle.setVisible(true);
@@ -3334,14 +3377,9 @@
             st.loadData();
         }
         else {
-
             var mTab = gc.getMTab();
-
-            
-
             tabEle.setVisible(true);
-
-            gc.activate(oldGC);
+            gc.activate(oldGC,this.actionParams);
             if (oldGC)
                 oldGC.detachDynamicAction();
             this.curTab = gc.getMTab();
@@ -3354,7 +3392,7 @@
                 this.curTab.query = queryy;
                 keepFilters = false;
             }
-            var defaultTabLayout = mTab.getTabLayout();
+            var defaultTabLayout =   mTab.getTabLayout();
             if (back && this.curTab.getIsCurrent()) {
                 if (this.curTab.getTabLevel() == 0) {
                     if (this.curTab.searchText) {
@@ -3387,9 +3425,15 @@
             }
             else	//	Requery and bind
             {
+                var resetLayout = mTab.getIsResetLayout();
+                if (this.actionParams.TabLayout &&
+                    ['N', 'Y', 'C'].indexOf(this.actionParams.TabLayout) > -1) {
+                    defaultTabLayout = this.actionParams.TabLayout;
+                    resetLayout = true;
+                }
 
                 /* if reset tab is true then set default view which is set on tab */
-                if (mTab.getIsResetLayout()) {                    
+                if (resetLayout) {                    
                     if (defaultTabLayout == 'N') {
                         gc.switchMultiRow();
                     }
@@ -3400,28 +3444,25 @@
                         gc.switchCardRow(true);
                     }
                 }
-
                 this.curTab.getTableModel().setCurrentPage(1);
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
-
-                    //var query = new VIS.Query(this.curTab.getTableName(), true);
-                    //query.addRestriction(" 1 = 1 ");
-                    //this.curTab.setQuery(query);
-
-                    //this.curTab.searchText = "";
+                    
                     this.clearSearchText();
-                    //if (this.curTab.getTabLevel() > 0) {
-                    //    this.curTab.linkValue = "-1";
-                    //}
+                    
                     this.setDefaultSearch(gc);
-                    //}
+
+                    if ((this.actionParams.TabWhereClause||'') != '') { // check if param has where clause or not
+                        var query = new VIS.Query(this.curTab.getTableName(), false);
+                        query.addRestriction(this.actionParams.TabWhereClause);
+                        this.curTab.setQuery(query,true);
+                    }
+                    
                     gc.query(this.curTab.getOnlyCurrentDays(), 0, false);	//	updated
                 }
                 else {
                     this.setDefaultSearch(gc);
                 }
             }
-
             
             //Change Icon
             if (defaultTabLayout == 'N') {
@@ -3434,15 +3475,12 @@
                 this.showHideViewIcon(this.aCard);
             }
 
-
             if (this.curGC.onDemandTree) {
                 this.aShowSummaryLevel.show();
             }
             else {
                 this.aShowSummaryLevel.hide();
             }
-
-
         }
 
         var gPanel = null;
@@ -3451,7 +3489,7 @@
         } else {
             gPanel = {};
             gPanel.setEnabled = function (action,enable) {
-                
+                ;
             }
         }
         //	Order Tab
@@ -3501,24 +3539,13 @@
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);
         }
-
-
-
-
-
-
-
-        ///*******     Tab Panels      ******/
-        //if (this.curTab.getHasPanel()) {
-        //    this.setCurrentTabPanel();
-        //    this.setTabPanelIcons();
-        //    this.showTabPanel(true);
-        //}
-        //else {
-        //    this.setTabPanelIcons();
-        this.showTabPanel(this.curTab.getHasPanel());
+        
+        this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
+        
         this.showFilterPanel(keepFilters);
-
+        if (this.actionParams.IsShowFilterPanel != null) {//set
+            this.startFilterPanel(!this.actionParams.IsShowFilterPanel);
+        }
         //}
 
         this.refresh();
@@ -3526,9 +3553,6 @@
         this.setTabNavigation();
 
         /*******    END Tab Panels     ******/
-
-
-
 
         if (this.aParentDetail)
             this.aParentDetail.evaluate(tabEle);
@@ -3544,28 +3568,14 @@
             gPanel.setEnabled("PRT", true);
         }
 
-        if (this.curTab.getIsMapView()) {
+        if (!this.actionParams.IsHideMapToggle && this.curTab.getIsMapView()) {
             this.aMap.show();
         }
         else {
             this.aMap.hide();
         }
 
-        //if (this.curTab.getIsHideGridToggle()) {
-        //    this.aMulti.hide();
-        //}
-        //else {
-        //    this.aMulti.show();
-        //}
-
-        //if (this.curTab.getIsHideCardToggle()) {
-        //    this.aCard.hide();
-        //}
-        //else {
-        //    this.aCard.show();
-        //}
-
-        if (this.curTab.getIsHideRecordNav()) {
+        if (this.actionParams.IsHideRecordNav || this.curTab.getIsHideRecordNav()) {
             this.aNext.hide();
             this.aPrevious.hide();
         }
@@ -3574,8 +3584,37 @@
             this.aPrevious.show();
         }
 
+        //Hide tool bar
+        if (this.actionParams.IsHideToolbar || this.gridWindow.getIsHideToolbar()) {
+            this.hideToolbar(true);
+        }
+        else {
+            this.hideToolbar(false);
+        };
 
-        //this.setLastView(""); //clear view history
+        //hide Tab Links
+        if (this.actionParams.IsHideTabLinks || this.gridWindow.getIsHideTabLinks()) {
+            this.hideTabLinks(true);
+        }
+        else {
+            this.hideTabLinks(false);
+        };
+
+        //hide action bar Links
+        if (this.actionParams.IsHideTabLinks || this.gridWindow.getIsHideTabLinks()) {
+            this.hideTabLinks(true);
+        }
+        else {
+            this.hideTabLinks(false);
+        };
+
+        //hide action bar Links
+        if (this.actionParams.IsHideActionbar || this.gridWindow.getIsHideActionbar()) {
+            this.hideActionbar(true);
+        }
+        else {
+            this.hideActionbar(false);
+        };
 
         var selff = this;
         //if (this.isShowSharedRecord && this.aSharedRecord) {
@@ -3748,8 +3787,8 @@
         }
         this.aRefresh.setEnabled(!changed);
         gPanel.setEnabled("RQY", !changed);
-        this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1);
-        gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1);
+        this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
+        gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
         //
         if (readOnly && this.curTab.getIsAlwaysUpdateField())
             readOnly = false;

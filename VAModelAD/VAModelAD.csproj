@@ -144,6 +144,7 @@
     <Compile Include="Classes\ZoomTarget.cs" />
     <Compile Include="Common\Common.cs" />
     <Compile Include="Common\ShareRecordManager.cs" />
+    <Compile Include="Controller\ActionParams.cs" />
     <Compile Include="Controller\FieldVObj.cs" />
     <Compile Include="Controller\GridField.cs" />
     <Compile Include="Controller\GridFieldVO.cs" />
@@ -279,6 +280,7 @@
     <Compile Include="ModelAD\MTreeNodeMM.cs" />
     <Compile Include="ModelAD\MTreeNodePR.cs" />
     <Compile Include="ModelAD\MUser.cs" />
+    <Compile Include="ModelAD\MUserHomeWidget.cs" />
     <Compile Include="ModelAD\MUserMail.cs" />
     <Compile Include="ModelAD\MUserMailConfigration.cs" />
     <Compile Include="ModelAD\MUserOrgAccess.cs" />
@@ -302,6 +304,7 @@
     <Compile Include="ModelAD\X_AD_DirectQueryLog.cs" />
     <Compile Include="ModelAD\X_AD_IndexColumn.cs" />
     <Compile Include="ModelAD\X_AD_TableIndex.cs" />
+    <Compile Include="ModelAD\X_AD_UserHomeWidget.cs" />
     <Compile Include="Model\Callout.cs" />
     <Compile Include="Model\CalloutEngine.cs" />
     <Compile Include="Model\MClient.cs" />

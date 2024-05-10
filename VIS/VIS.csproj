@@ -729,6 +729,7 @@
     <Content Include="Areas\VIS\Scripts\F20\atabpanel.js" />
     <Content Include="Areas\VIS\Scripts\F20\aviewcontroller.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabbedpanemgr.js" />
+    <Content Include="Areas\VIS\Scripts\home\home.js" />
     <Content Include="Areas\VIS\Scripts\home\usersession.js" />
     <Content Include="Areas\VIS\Scripts\F20\themecnfgtr.js" />
     <Content Include="Areas\VIS\Scripts\F20\thememgr.js" />
@@ -740,12 +741,20 @@
     <Content Include="Areas\VIS\Scripts\forms\form.js" />
     <Content Include="Areas\VIS\Scripts\home\changeuserimage.js" />
     <Content Include="Areas\VIS\Scripts\home\favourite.js" />
-    <Content Include="Areas\VIS\Scripts\home\home.js" />
+    <Content Include="Areas\VIS\Scripts\home\home1.js" />
     <Content Include="Areas\VIS\Scripts\home\shortcut.js" />
     <Content Include="Areas\VIS\Scripts\model\calloutColumn.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processctl.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processinfo.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processparameter.js" />
+    <Content Include="Areas\VIS\Scripts\react\component\helloWord.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\pages\HomePage.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\pages\TestComponent.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\index.jsx" />
+    <Content Include="Areas\VIS\Content\src\css-style.css" />
+    <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
+    <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\bipanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\HistoryDetailsTabPanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\surveyPanel.js" />
@@ -755,6 +764,7 @@
     <Content Include="Areas\VIS\Scripts\VIS1_0.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS2_0.min.js" />
     <Content Include="Areas\VIS\Templates\VIS_Templates.html" />
+    <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
@@ -868,6 +878,7 @@
     <Content Include="Areas\VIS\Views\CardViewWizard\Index.cshtml" />
     <Content Include="Areas\VIS\Views\AccountForm\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
+    <Content Include="Areas\VIS\Views\Home\HomeOld.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
@@ -897,6 +908,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\VIS\Scripts\app\processengine\" />
+    <Folder Include="Areas\VIS\Scripts\dist\" />
     <Folder Include="Areas\VIS\Views\AmountDivision\" />
     <Folder Include="Areas\VIS\Views\ArchiveViewer\" />
     <Folder Include="Areas\VIS\Views\Channel\" />
@@ -927,6 +939,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Areas\VIS\Views\BiPanel\GetUserBILogin.cshtml" />
+    <Content Include="babel.config.json" />
+    <Content Include="package.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -973,7 +987,11 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /E /Y /I  "$(ProjectDir)Areas\*" "$(ProjectDir)..\ViennaAdvantageWeb\Areas"</PostBuildEvent>
+    <PostBuildEvent>rmdir /s /q "$(SolutionDir)\ViennaAdvantageWeb\Areas\$(TargetName)"
+xcopy /E /Y /I  "$(ProjectDir)Areas\*" "$(ProjectDir)..\ViennaAdvantageWeb\Areas"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>npm run build</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
