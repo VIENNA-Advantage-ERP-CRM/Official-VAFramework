@@ -117,8 +117,8 @@ namespace VIS.Controllers
                 {
                 }
 
-                Stopwatch st = new Stopwatch();
-                st.Start();
+                //Stopwatch st = new Stopwatch();
+                //st.Start();
 
                 FormsIdentity ident = User.Identity as FormsIdentity;
                 Ctx ctx = null;
@@ -149,8 +149,8 @@ namespace VIS.Controllers
                         return View("Maintenance");
                     }
 
-                    Stopwatch stLogin = new Stopwatch();
-                    stLogin.Start();
+                    //Stopwatch stLogin = new Stopwatch();
+                    //stLogin.Start();
 
                     //create class from string  
                     string key = "";
@@ -288,7 +288,7 @@ namespace VIS.Controllers
                     {
                         //Cretae new Sessin
                        
-                        MSession sessionNew = MSession.Get(ctx,Session.SessionID, true, GetVisitorIPAddress(true));
+                        MSession sessionNew = MSession.Get(ctx,Session.SessionID, true, Common.GetVisitorIPAddress(Request, true));
                        // sessionNew.SetWebSession(Session.SessionID);
                         ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
                         sessionData.UserId = ctx.GetAD_User_ID();
