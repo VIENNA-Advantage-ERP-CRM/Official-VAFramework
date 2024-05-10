@@ -27,6 +27,7 @@ using System.Threading;
 using VAdvantage.DataBase;
 using System.Text;
 using VAdvantage.Common;
+using System.Diagnostics;
 
 namespace VIS.Controllers
 {
@@ -296,12 +297,6 @@ namespace VIS.Controllers
                         ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
                     }
                     Session["ctx"] = ctx;
-
-                   
-
-                    ViewBag.LibSuffix = "_v3";
-                    ViewBag.FrameSuffix = "_v2";
-                   
 
                    
 
