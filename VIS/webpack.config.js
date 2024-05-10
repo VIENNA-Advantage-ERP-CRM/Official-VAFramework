@@ -17,22 +17,12 @@ const deleteFilesByPattern = (directory, pattern) => {
 
 deleteFilesByPattern(path.resolve(__dirname, 'Areas/VIS/Content'), /^VIS\.all\.min\d+\.\d+\.\d+\.\d+\.css$/);
 
-deleteFilesByPattern(path.resolve(__dirname, 'Areas/VIS/Scripts'), /^VIS\.all\.min\d+\.\d+\.\d+\.js$/);
-deleteFilesByPattern(path.resolve(__dirname, 'Areas/VIS/Scripts'), /^VIS2_0\.min\d+\.\d+\.\d+\.js$/);
-deleteFilesByPattern(path.resolve(__dirname, 'Areas/VIS/Scripts'), /^React\.min\d+\.\d+\.\d+\.js$/);
-deleteFilesByPattern(path.resolve(__dirname, 'Areas/VIS/Scripts'), /^VIS\.min\d+\.\d+\.\d+\.js$/);
-deleteFilesByPattern(path.resolve(__dirname, 'Areas/VIS/Content'), /^VIS\.all\.min\d+\.\d+\.\d+\.css$/);
-
-// Delete LICENSE.txt files
-deleteLicenseFiles(path.resolve(__dirname, 'Areas/VIS/Scripts'));
-deleteLicenseFiles(path.resolve(__dirname, 'Areas/VIS/Content'));
-
 
 const versions = {
-    'VIS.all': '1.0.0.0',
-    'VIS2_0': '1.1.0.0',
+    'VIS.all': '3.0.0.1',
+    'VIS2_0': '3.0.0.1',
     'React': '1.0.0.1',
-    'VIS': '1.0.0.0' // CSS Version
+    'VIS': '3.0.0.1' // CSS Version
 };
 
 module.exports = {
