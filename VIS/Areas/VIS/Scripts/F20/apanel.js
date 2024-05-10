@@ -1707,7 +1707,7 @@
         }
     }
 
-    APanel.prototype.ShowHideViewIcon = function (action) {
+    APanel.prototype.showHideViewIcon = function (action) {
         if (this.curTab != null && this.curGC != null) {
             if (this.actionParams.IsHideGridToggle != null) {
                 if(this.actionParams.IsHideGridToggle)
@@ -1937,7 +1937,7 @@
 
                 tabElement = gc;
                 if (i === 0 && goSingleRow) {
-                    this.ShowHideViewIcon(this.aSingle);
+                    this.showHideViewIcon(this.aSingle);
                     gc.switchSingleRow();
                 }
                 //	Store GC if it has a included Tab
@@ -2290,14 +2290,14 @@
             tis.isDefaultFocusSet = false;
             tis.curGC.navigateRelative(+1);
         } else if (tis.aSingle.getAction() === action) {
-            tis.ShowHideViewIcon(tis.aSingle);
+            tis.showHideViewIcon(tis.aSingle);
             tis.curGC.switchSingleRow(true);
         }
         else if (tis.aMulti.getAction() === action) {
-            tis.ShowHideViewIcon(tis.aMulti);
+            tis.showHideViewIcon(tis.aMulti);
             tis.curGC.switchMultiRow();
         } else if (tis.aCard.getAction() === action) {
-            tis.ShowHideViewIcon(tis.aCard);
+            tis.showHideViewIcon(tis.aCard);
             tis.curGC.switchCardRow();            
             // tis.aBack.setEnabled(!tis.curGC.getIsCardRow());
         } else if (tis.aMap.getAction() === action) {
@@ -3466,13 +3466,13 @@
             
             //Change Icon
             if (defaultTabLayout == 'N') {
-                this.ShowHideViewIcon(this.aMulti);
+                this.showHideViewIcon(this.aMulti);
             }
             else if (defaultTabLayout == 'Y') {
-                this.ShowHideViewIcon(this.aSingle);
+                this.showHideViewIcon(this.aSingle);
             }
             else if (defaultTabLayout == 'C') {
-                this.ShowHideViewIcon(this.aCard);
+                this.showHideViewIcon(this.aCard);
             }
 
             if (this.curGC.onDemandTree) {
@@ -3494,7 +3494,7 @@
         }
         //	Order Tab
         if (isAPanelTab) {
-            this.ShowHideViewIcon(null);
+            this.showHideViewIcon(null);
             //this.aMulti.setPressed(false);
             //this.aMulti.setEnabled(false);
             //this.aCard.setEnabled(false);
@@ -4342,15 +4342,15 @@
                 this.tabStack[this.tabStack.length - 1].tabView.pop();
                 var defaultTabLayout = currentTab.tabView[(currentTab.tabView.length - 1)];
                 if (defaultTabLayout == 'N') {
-                    tis.ShowHideViewIcon(tis.aMulti);
+                    tis.showHideViewIcon(tis.aMulti);
                     tis.curGC.switchMultiRow();
                 }
                 else if (defaultTabLayout == 'Y') {
-                    tis.ShowHideViewIcon(tis.aSingle);
+                    tis.showHideViewIcon(tis.aSingle);
                     tis.curGC.switchSingleRow(true);
                 }
                 else if (defaultTabLayout == 'C') {
-                    tis.ShowHideViewIcon(tis.aCard);
+                    tis.showHideViewIcon(tis.aCard);
                     tis.curGC.switchCardRow(true);
                 }
 
