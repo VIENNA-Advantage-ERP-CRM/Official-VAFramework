@@ -5,6 +5,7 @@
  */
 ; (function (VIS, $) {
     function HomeMgr() {
+        'use strict';
         var $home = null;
         var self = this;
         var widgetList = null;
