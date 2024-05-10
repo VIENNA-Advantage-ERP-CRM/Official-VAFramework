@@ -102,6 +102,7 @@
 .vis-input-wrap {
     position: relative;
     margin-bottom: 15px;
+    flex-wrap:nowrap;
 }
 .vis-input-wrap input:not([type="checkbox"]):not([type="radio"]), 
 .vis-input-wrap select, .vis-control-wrap > button {
@@ -248,7 +249,20 @@ button.vis-ev-col-img-ctrl:focus,
     left: 5px;
     opacity: 1;
     color: rgba(var(--v-c-on-secondary), 1);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display:block;
 }
+/*show ... if label text is bigger than available area*/
+.vis-input-wrap label span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
 .vis-input-wrap input:focus ~ label, 
 .vis-input-wrap select:focus ~ label, 
 .vis-input-wrap input:focus ~ label sup, 
@@ -382,8 +396,8 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label {
     /*.vis-input-wrap input.vis-ev-col-mandatory:not(:focus), .vis-input-wrap select:not(:focus).vis-ev-col-mandatory {
     border: 1px solid #ec3f3f;
 }*/
-.vis-input-wrap .vis-ev-col-mandatory ~ label, 
-.vis-input-wrap .vis-ev-col-mandatory:not(:focus) ~ label sup, 
+.vis-input-wrap .vis-ev-col-mandatory ~ label span, 
+.vis-input-wrap .vis-ev-col-mandatory ~ label sup, 
 .vis-input-wrap .vis-ev-col-mandatory::-webkit-input-placeholder {
     color: rgba(var(--v-c-mandatory),1) !important;
 }

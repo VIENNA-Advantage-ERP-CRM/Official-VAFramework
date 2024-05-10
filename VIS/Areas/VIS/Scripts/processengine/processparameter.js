@@ -350,7 +350,9 @@
             this.vEditors.push(vEditor);                   //  add to Editors
             this.addFields(label, vEditor);
             if (i == 0 && vEditor) {
-                vEditor.setDefaultFocus(true);
+                window.setTimeout(function ($this) {
+                    $this.vEditors[0].setDefaultFocus(true);
+                }, 200,this);
             }
 
             if (mField.getIsRange()) {

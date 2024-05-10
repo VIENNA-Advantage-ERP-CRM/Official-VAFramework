@@ -1037,7 +1037,7 @@
                     }
 
                     if (!val) {
-                        val = '<div class="vis-grid-row-td-icon-center">-</div>';
+                        val = '<div class="vis-grid-row-td-icon-center"><div class="vis-grid-row-td-icon vis-grid-defualtImage"><i class="fa fa-camera"></div></div>';
                         return val;
                     }
                     //return VIS.Msg.getElement1('AD_Image_ID') + '-' + val;

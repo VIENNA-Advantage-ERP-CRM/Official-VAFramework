@@ -30,6 +30,7 @@
         var $vis_menuSearch = $('#vis_menuSearch'); //Search Box
         var $menuTree = $('#vis_divTree');  //tree div
         var $menuOverlay = $("#vis_menuOverlay"); // Menu Overlay div
+        var $vIcon = $(".vis-app-footer-c-r");
 
         var $mainNavigationDiv = null;
 
@@ -54,6 +55,10 @@
         * layout and events binding
         */
         function bindEvents() {
+
+            $vIcon.on('click', function () {
+                VIS.UserSession.show();
+            });
 
             $menuOverlay.on(VIS.Events.onTouchStartOrClick, function (event) {
                 event.preventDefault();
@@ -908,15 +913,18 @@
         *@param data input data
         */
         function getdata(combo, url, data) {
-            //$imgbusy1.show();
-            $.ajax(url, {
-                data: data
-            }).success(function (result) {
-                fillCombo(combo, result.data);
-            })
-                .fail(function (result) {
-                    alert(result);
-                });
+            if (data.client!= "" && data.id!="") {
+                //$imgbusy1.show();
+                $.ajax(url, {
+                    data: data
+                }).success(function (result) {
+                    fillCombo(combo, result.data);
+                })
+                    .fail(function (result) {
+
+                        alert(result);
+                    });
+            }
         };
 
         /* handle combobox change event
@@ -958,10 +966,9 @@
 
             var $hidden = $('#' + combo.id + 'Name');
             var text = this.options[this.selectedIndex].innerHTML;
-
-            $hidden.val(text);
-
-
+        
+               $hidden.val(text);
+         
         };
 
         /* function to fill combo
@@ -984,7 +991,7 @@
             $("<option />", {
                 val: "-1",
                 text: text
-            }).appendTo(combo);
+               }).appendTo(combo);
 
 
             $(data).each(function () {
@@ -1040,7 +1047,7 @@
                     });
             }
             // Prevent the normal behavior since we opened the dialog
-            e.preventDefault();
+           e.preventDefault();
         };
 
         var getValidationSummaryErrors = function ($form) {
