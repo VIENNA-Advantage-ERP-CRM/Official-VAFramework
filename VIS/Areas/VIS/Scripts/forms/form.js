@@ -89,7 +89,10 @@
         //Event
 
         $okBtn.on(VIS.Events.onTouchStartOrClick, function () {
-            alert("Test From has value :==> " + $text.val());
+            //alert("Test From has value :==> " + $text.val());
+            var value = $text.val(); // Get the value from the text input
+            $root.trigger('widgetListner', value); 
+
         });
 
         $cancelBtn.on(VIS.Events.onTouchStartOrClick, function () {

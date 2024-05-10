@@ -2128,7 +2128,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 }
 .vis-fp-currntrcrds span {
     flex: 1;
-    color: rgba(var(--v-c-primary), 1);
+    color: black; /*rgba(var(--v-c-primary), 1);*/
 }
 .vis-fp-currntrcrds i {
     font-size: .6rem;

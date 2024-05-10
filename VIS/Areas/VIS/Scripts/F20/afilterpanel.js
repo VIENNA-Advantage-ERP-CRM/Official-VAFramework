@@ -281,9 +281,13 @@
             if (this.ctrlObjects[evt.propertyName])
                 this.ctrlObjects[evt.propertyName].setValue(evt.newValue);
 
+            var hue = Math.floor(Math.random() * 360);
+            var v = Math.floor(Math.random() * 16) + 75;
+            var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
+
             var spann = $('<span data-id="' + evt.newValue + '" class="vis-fp-inputvalueforupdate" >' + displayVal + '</span>');
             var iconCross = $('<i data-id="' + evt.newValue + '" data-keyval="' + evt.propertyName + "_" + evt.newValue + '" class="vis vis-mark"></i></div></div>');
-            wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div class="vis-fp-currntrcrds">').append(spann).append(iconCross)));
+            wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div style="background-color:' + pastel +'" class="vis-fp-currntrcrds">').append(spann).append(iconCross)));
 
             if (this.ctrlObjects[evt.propertyName])
                 this.ctrlObjects[evt.propertyName].setValue(null);
@@ -898,7 +902,11 @@
             if (colValue in dsAdvanceData) {
                 var htm = [];
                 var arrVal = dsAdvanceData[colValue];
-                htm.push('<div class="vis-fp-currntrcrds" data-id="' + colValue + '"><span  class="vis-fp-inputvalueforupdate">')
+                var hue = Math.floor(Math.random() * 360);
+                var v = Math.floor(Math.random() * 16) + 75;
+                var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
+
+                htm.push('<div class="vis-fp-currntrcrds" style="background-color:' + pastel +'" data-id="' + colValue + '"><span  class="vis-fp-inputvalueforupdate">')
                 for (var i = 0; i < arrVal.length; i++) {
                     if (i != 0)
                         htm.push(' | ');
@@ -1363,8 +1371,8 @@
                 var yearr = parsedValue.getFullYear();
                 var month = parsedValue.getMonth();
                 var date = parsedValue.getDate();
-                parsedValue2 = new Date(yearr, month, date, 24, 00, 00);
-                parsedValue = new Date(yearr, month, date, 00, 00, 00);
+                parsedValue2 = new Date(yearr, month, date, 24, 0, 0);
+                parsedValue = new Date(yearr, month, date, 0, 0, 0);
                 optr = VIS.Query.prototype.BETWEEN;
             }
             //	Value2
