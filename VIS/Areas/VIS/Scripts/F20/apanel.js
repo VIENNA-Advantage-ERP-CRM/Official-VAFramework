@@ -1707,7 +1707,7 @@
         }
     }
 
-    APanel.prototype.ShowHideViewIcon = function (action) {
+    APanel.prototype.showHideViewIcon = function (action) {
         if (this.curTab != null && this.curGC != null) {
             if (this.actionParams.IsHideGridToggle != null) {
                 if(this.actionParams.IsHideGridToggle)
