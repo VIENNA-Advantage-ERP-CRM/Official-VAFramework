@@ -749,6 +749,7 @@
     <Content Include="Areas\VIS\Scripts\processengine\processinfo.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processparameter.js" />
     <Content Include="Areas\VIS\Scripts\react\component\helloWord.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\pages\HomePage.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\TestComponent.jsx" />
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />

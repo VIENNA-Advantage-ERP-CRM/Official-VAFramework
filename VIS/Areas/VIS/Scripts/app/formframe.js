@@ -202,6 +202,13 @@
         }
     };
 
+    AForm.prototype.addChangeListener = function (e) {
+        if (this.mPanel && this.mPanel.addChangeListener) {
+            this.listener = e;
+            this.mPanel.addChangeListener(e);
+        }
+    }
+
 
 
     /**

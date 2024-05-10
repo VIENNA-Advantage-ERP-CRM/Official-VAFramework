@@ -1,8 +1,31 @@
-﻿@model   VIS.Models.HomeModels
+﻿@model  VIS.Models.HomeModels
 
 <div class="container-fluid" id="dataContainer">
     <div class="row scrollerHorizontal">
-       HEllo
+        <div class="vis-home-leftPanel">
+            @*<div class="vis-trash-area" style="display:none ">
+                <div class="vis-drag-info">
+                    <span class="vis vis-info"></span>
+                    <p>Drag widgets from left panel to add new widget, drag existing widgets on trash to remove. Change position of widgets by dragging and dropping.</p>
+                </div>
+                <div class="vis-trash-box editPanel">
+                    <i class="fa fa-trash-o" aria-hidden="true"></i>Trash Area
+                </div>
+            </div>*@           
+        </div>
+        <div class="vis-home-rightPanel">
+            <div class="vis-widget-header">
+                <h4 class="">Widgets</h4>
+                <span class="vis vis-cross" id="btnCloseWidget"></span>                
+            </div>
+            <div class="vis-widget-body">
+                <div class="vis-widgetDrag-container">
+                    <div class="vis-widgetDrag-item" data-recid="1">1</div>
+
+                </div>
+            </div>
+          
+        </div>
     </div>
 </div>
 <div class="vis-apanel-busy" id="divfeedbsy" style="width: 98%; height: 98%; text-align: center; position: relative; visibility: hidden; z-index: 6;"></div>

@@ -44,7 +44,8 @@
         //Event
 
         $okBtn.on(VIS.Events.onTouchStartOrClick, function () {
-            alert("Test From has value :==> " + $text.val());
+            var value = $text.val(); // Get the value from the text input           
+            self.widgetFirevalueChanged(value);
         });
 
         $cancelBtn.on(VIS.Events.onTouchStartOrClick, function () {
@@ -85,6 +86,16 @@
         this.frame = frame;
         this.frame.getContentGrid().append(this.getRoot());
     };
+
+    VIS.TestForm.prototype.widgetFirevalueChanged = function (value) {     
+        // this.getRoot().trigger('widgetFirevalueChanged', value); // Trigger custom event with the value
+        if (this.listener)
+            this.listener.widgetFirevalueChanged(value);
+    };
+
+    VIS.TestForm.prototype.addChangeListener = function (listener) {
+        this.listener = listener;
+    }
 
     //Must implement dispose
     VIS.TestForm.prototype.dispose = function () {

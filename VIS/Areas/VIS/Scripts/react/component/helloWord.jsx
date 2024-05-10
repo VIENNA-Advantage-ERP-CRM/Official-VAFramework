@@ -1,18 +1,22 @@
 ﻿import { PieChart } from 'react-minimal-pie-chart';
 const Charts = (props) => {
 
-    return (
-        <div style={{ maxWidth: "400px", margin: "0px auto", padding: "50px" }}>
-            <p>Current time:</p>
+    let data = [
+        { title: 'One', value: 10, color: '#E38627' },
+        { title: 'Two', value: 15, color: '#C13C37' },
+        { title: 'Three', value: 20, color: '#6A2135' },
+    ]
+
+    const handleClick = (event, i, dataIndex) => {
+        props.self.widgetFirevalueChanged(data[i].title);
+    };
+    
+
+    return (       
             <PieChart
-                data={[
-                    { title: 'One', value: 10, color: '#E38627' },
-                    { title: 'Two', value: 15, color: '#C13C37' },
-                    { title: 'Three', value: 20, color: '#6A2135' },
-                ]}
-            />
-            <pi />
-        </div>
+            data={data}
+            onClick={handleClick}
+            />  
     );
 };
 

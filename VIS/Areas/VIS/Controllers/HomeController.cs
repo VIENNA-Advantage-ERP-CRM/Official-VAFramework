@@ -973,6 +973,40 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(lst), JsonRequestBehavior.AllowGet);
         }
 
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult GetWidgets()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels  homeModels = new HomeModels();
+            return Json(JsonConvert.SerializeObject(homeModels.GetHomeWidget(ctx)));
+            
+        } 
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult GetUserWidgets()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels  homeModels = new HomeModels();
+            return Json(JsonConvert.SerializeObject(homeModels.GetUserWidgets(ctx)));
+            
+        }
+
+        public int SaveDashboard(List<WidgetSize> widgetSizes)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return homeModels.SaveDashboard(ctx, widgetSizes);
+        } 
+        public int DeleteWidgetFromHome(int id)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return homeModels.DeleteWidgetFromHome(ctx, id);
+        }
+
     }
 
 
