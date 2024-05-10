@@ -1,19 +1,29 @@
-﻿(function (VIS, $) {
+﻿/**
+ * Home Widget
+ * VIS228 Date 10-May-2024
+ * purpose - Show widget on home page
+ */
+; (function (VIS, $) {
     function HomeMgr() {
-        'use strict';
         var $home = null;
         var self = this;
         var widgetList = null;
-        var originalPosition; // Store the original position here
-        var isEditMode = false;
+        var originalPosition; // Store the original position of a draggable element
+        var isEditMode = false; // Flag to indicate whether the widget is in edit mode
+
+        // Function to initialize the home widget
         function initHome(home) {
+            // Show the user date element
             $('#vis_userDate').show();
             $home = home;
-            var openRightPanel = $('<div class="vis-add-widgetContainer" style="display:none"><button class="vis-add-widgetButton">+</button><p>Click to select what you would like to see here</p></div>').hover(function () {
-                $(this).toggleClass("hover");
-            });
+
+            // Create and configure the open right panel button
+            var openRightPanel = $('<div class="vis-add-widgetContainer" style="display:none"><button class="vis-add-widgetButton">+</button><p>' + VIS.Msg.getMsg("VISEditHomeMsg") + '</p></div>');
+
+            // Create the widget container
             var $container = $('<div class="vis-widget-container" style="--rowheight:' + (($home.width() - 25)) / 9 + 'px">');
 
+            // Function to resize the widget container based on window size
             function resizeWidgetContainer() {
                 var w = ($home.find('.vis-home-leftPanel').width() - 25) / 9;
                 if ($(window).width() <= 500) {
@@ -24,18 +34,21 @@
                
                 $home.find('.vis-widget-container').attr('style', '--rowheight:' + w + 'px');
             }
-
+            /**
+             * Adjust Size
+             */
             function adjustDivSize() {
                 var windowWidth = $(window).width();
                 $('.scrollerHorizontal').width(windowWidth);
                 resizeWidgetContainer();
             }
 
+            // Event handling functions
             function events() {
                 var $leftPanel = $home.find('.vis-home-leftPanel');
                 var $rightPanel = $home.find('.vis-home-rightPanel');
 
-
+                // Event handler for clicking the edit button
                 openRightPanel.add($('#vis_editHome')).on('click',function () {
                     var leftPanelWidth = '70%';
                     $leftPanel.animate({
@@ -55,6 +68,7 @@
                     }, 300);
                 });
 
+                // Event handler for closing the widget
                 $home.find('#btnCloseWidget').click(function () {
                     $leftPanel.animate({
                         width: '100%'
@@ -77,6 +91,7 @@
                     }, 300);
                 });
 
+                // Event handler for deleting a widget
                 $leftPanel.on('click', '.vis-widgetDelete', function (e) {
                     var ui = $(this).closest('.vis-widget-item');
                     if (ui.data('wid')) {
@@ -94,6 +109,7 @@
                 })
             }
 
+            // Function to enable drag and drop functionality
             function dragDrop() {
                 // Make the .vis-widgetDrag-item elements draggable
                 $home.find('.vis-widgetDrag-item').draggable({
@@ -203,7 +219,7 @@
                 //});
             }
            
-
+            // Function to render widgets
             function renderWidgets(widget) {
                 var hue = Math.floor(Math.random() * 360);
                 var v = Math.floor(Math.random() * 16) + 75;
@@ -229,10 +245,11 @@
                 }
 
                 $item.append(trash);
-                $container.append($item); // FadeIn effect
+                $container.append($item);
                 $item.slideDown("slow");
             }
 
+            // Function to load widgets
             function loadWidgets() {
                 $container.append(openRightPanel);
                 $home.find('.vis-home-leftPanel').append($container);
@@ -271,6 +288,7 @@
                 });
             }
 
+            // Function to save the dashboard layout
             function saveDashboard() {
                 var widgetSizes = [];
                 $('.vis-widget-item').each(function (index) {
@@ -287,6 +305,7 @@
                 }
             }
 
+            // Load the home widget content and initialize it
             $home.load(VIS.Application.contextUrl + 'Home/Home', function () {
                 adjustDivSize();
                 loadWidgets();
@@ -303,7 +322,6 @@
     VIS.HomeMgr = HomeMgr();
 
     VIS.HomeMgr.widgetFirevalueChanged = function (data) {
-        alert(data);
-        //
+       
     };
 })(VIS, jQuery);
