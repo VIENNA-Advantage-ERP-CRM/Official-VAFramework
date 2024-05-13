@@ -198,7 +198,12 @@ namespace VAModelAD.Model
             {
 
                 //Pick ModuleID from AutoMarking Configuration window
-                int curRefModID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA093_RefModule_ID FROM  VA093_AutoMarkingConfig WHERE Processed='N' AND IsActive='Y' AND AD_Role_ID=" + po.GetCtx().GetAD_Role_ID()));
+                int curRefModID = 0;
+                try
+                {
+                    curRefModID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA093_RefModule_ID FROM  VA093_AutoMarkingConfig WHERE Processed='N' AND IsActive='Y' AND AD_Role_ID=" + po.GetCtx().GetAD_Role_ID()));
+                }
+                catch { }
                 if (curRefModID > 0)
                 {
                     //Check and proceed marking with new module
@@ -272,7 +277,6 @@ namespace VAModelAD.Model
 
                     }
                 }
-
             }
 
             if (success && newRecord)
