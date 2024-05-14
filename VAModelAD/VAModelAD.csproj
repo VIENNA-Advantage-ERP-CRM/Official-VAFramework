@@ -387,6 +387,7 @@
     <Compile Include="ProcessAD\ValidateTableColumns.cs" />
     <Compile Include="ProcessAD\VerifyQueryForAlert.cs" />
     <Compile Include="ProcessAD\ViewImport.cs" />
+    <Compile Include="ProcessAD\WindowCopy.cs" />
     <Compile Include="ProcessAD\XmlHelper.cs" />
     <Compile Include="ProcessEngine\MCrystalInstance.cs" />
     <Compile Include="ProcessEngine\MCrystalInstancePara.cs" />
