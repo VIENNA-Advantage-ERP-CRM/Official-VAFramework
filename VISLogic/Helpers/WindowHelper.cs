@@ -1818,11 +1818,13 @@ namespace VIS.Helpers
                 {
                     if (value != null && !value.Equals(""))
                     {
-                        value = Convert.ToDateTime(value).ToUniversalTime();
+                        if (!(value is DateTime))
+                            value = Convert.ToDateTime(value).ToUniversalTime();
                     }
                     if (oldValue != null && !oldValue.Equals(""))
                     {
-                        oldValue = Convert.ToDateTime(oldValue).ToUniversalTime();
+                        if (!(oldValue is DateTime))
+                            oldValue = Convert.ToDateTime(oldValue).ToUniversalTime();
                     }
                 }
                 if (field.DisplayType == DisplayType.Binary)
@@ -1952,13 +1954,18 @@ namespace VIS.Helpers
             if (VersionRecord)
             {
                 if (inn.ValidFrom != null)
-                    po.Set_Value("VersionValidFrom", inn.ValidFrom.Value.ToUniversalTime());
+                {
+                    if (!(inn.ValidFrom is DateTime))
+                        po.Set_Value("VersionValidFrom", Convert.ToDateTime(inn.ValidFrom.Value).ToUniversalTime());
+                    else
+                        po.Set_Value("VersionValidFrom", inn.ValidFrom.Value);
+                }
 
                 po.Set_Value("IsVersionApproved", true);
                 if (inn.ImmediateSave)
                 {
                     po.Set_Value("ProcessedVersion", true);
-                    po.Set_Value("VersionValidFrom", System.DateTime.Now.ToUniversalTime());
+                    po.Set_Value("VersionValidFrom", System.DateTime.Now);              
                 }
                 // Only increase record version if Version do not exist for same date
                 if (po.Get_ID() <= 0)
