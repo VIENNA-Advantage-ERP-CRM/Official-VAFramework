@@ -63,7 +63,7 @@
                     $rightPanel.show('slide', { direction: 'right' }, 200);
                     $home.find('.vis-home-leftPanel').sortable("enable");
                     isEditMode = true;
-                    $leftPanel.find('.vis-widget-item').css('cursor', 'grab');
+                    $container.addClass('vis-editModeWidget');                   
                     $home.find('.vis-widgetDelete').show();
                     $('#vis_editHome').hide();
                     /*$leftPanel.find('.vis-trash-area').show();*/
@@ -83,7 +83,7 @@
                         $home.find('.vis-add-widgetContainer').show();
                     }
 
-                    $leftPanel.find('.vis-widget-item').css('cursor','unset');
+                    $container.removeClass('vis-editModeWidget');                   
                     $rightPanel.hide('slide', { direction: 'left' }, 300);
                     $home.find('.vis-home-leftPanel').sortable("disable");
                     $home.find('.vis-widgetDelete').hide();

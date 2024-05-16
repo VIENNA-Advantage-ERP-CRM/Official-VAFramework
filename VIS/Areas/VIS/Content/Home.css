@@ -3526,16 +3526,15 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 .vis-widgetSize {
+    border-radius: 0 0 5px 5px;
     bottom: 0;
+    font-size: .8rem;
+    font-weight: 600;
+    margin: -5px -5px 0;
+    padding: 5px;
     position: absolute;
     width: 100%;
-    margin: -5px;
-    margin-bottom: 0;
-    background-color: #e1e1e1;
-    border-radius: 0 0 5px 5px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    padding:5px;
+    background-color: rgba(var(--v-c-on-secondary), .08);
 }
 
 .vis-widgetImg {
@@ -3626,4 +3625,9 @@ ul.vis-userLinks-ListMenu li a i {
 
 #vis_editHome{
     cursor:pointer;
+}
+
+.vis-editModeWidget .vis-widget-item, 
+.vis-editModeWidget .vis-linksWidget {
+    cursor: grab;
 }
