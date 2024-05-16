@@ -282,7 +282,7 @@
                 this.ctrlObjects[evt.propertyName].setValue(evt.newValue);
 
             var hue = Math.floor(Math.random() * 360);
-            var v = Math.floor(Math.random() * 16) + 75;
+            var v = Math.floor(Math.random() * 16) + 85;
             var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
 
             var spann = $('<span data-id="' + evt.newValue + '" class="vis-fp-inputvalueforupdate" >' + displayVal + '</span>');
@@ -903,7 +903,7 @@
                 var htm = [];
                 var arrVal = dsAdvanceData[colValue];
                 var hue = Math.floor(Math.random() * 360);
-                var v = Math.floor(Math.random() * 16) + 75;
+                var v = Math.floor(Math.random() * 16) + 85;
                 var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
 
                 htm.push('<div class="vis-fp-currntrcrds" style="background-color:' + pastel +'" data-id="' + colValue + '"><span  class="vis-fp-inputvalueforupdate">')

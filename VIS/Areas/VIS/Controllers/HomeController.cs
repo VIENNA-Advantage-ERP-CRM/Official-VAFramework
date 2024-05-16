@@ -28,6 +28,7 @@ using VAdvantage.DataBase;
 using System.Text;
 using VAdvantage.Common;
 using System.Diagnostics;
+using iTextSharp.text;
 
 namespace VIS.Controllers
 {
@@ -834,10 +835,16 @@ namespace VIS.Controllers
         public JsonResult GetWidgets()
         {
             Ctx ctx = Session["ctx"] as Ctx;
-            HomeModels  homeModels = new HomeModels();
-            return Json(JsonConvert.SerializeObject(homeModels.GetHomeWidget(ctx)));
-            
-        } 
+            HomeModels homeModels = new HomeModels();
+
+            var shortCut = ShortcutHelper.GetShortcutItems(Session["ctx"] as Ctx);
+            var widgets = homeModels.GetHomeWidget(ctx);
+            List<Object> list = new List<Object>();
+            list.AddRange(widgets);
+            list.AddRange(shortCut);
+            return Json(JsonConvert.SerializeObject(list), JsonRequestBehavior.AllowGet);
+        }
+
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [HttpPost]
