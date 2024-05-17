@@ -3390,7 +3390,7 @@
             else	//	Requery and bind
             {
                 /* if reset tab is true then set default view which is set on tab */
-                if (mTab.getIsResetLayout()) {                    
+                if (mTab.getIsResetLayout()) {
                     if (defaultTabLayout == 'N') {
                         gc.switchMultiRow();
                     }
@@ -3399,6 +3399,15 @@
                     }
                     else if (defaultTabLayout == 'C') {
                         gc.switchCardRow(true);
+                    }
+                }
+                else {
+                    if (gc.getIsSingleRow()) {
+                        defaultTabLayout = 'Y'
+                    } else if (gc.getIsCardRow()) {
+                        defaultTabLayout = 'C'
+                    } else if (!gc.getIsMapRow()) {
+                        defaultTabLayout = 'N'
                     }
                 }
 
