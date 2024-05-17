@@ -6,6 +6,8 @@
 
         this.headerItems = null;
         var $self = this;
+        this.evt = { sender: 'hdrpnl', isHorizontal: false, width: '0px', height: '0px', isClosed: true };
+
         this.curTab = null;
         this.controls = [];
         this.textAlignEnum = { "C": "Center", "R": "flex-end", "L": "flex-start" };
@@ -688,13 +690,28 @@
             return $parentRoot;
         }
         this.hidePanel = function () {
-            return $parentRoot.hide();
+            $parentRoot.hide();
+            this.isClosed = true;
+            this.evt.width = $parentRoot.width();
+            this.evt.height = $parentRoot.height();
+            this.evt.isClosed = this.isClosed;
+            this.fireSizeChanged(this.evt);
+            
         }
 
         this.showPanel = function () {
-            return $parentRoot.show();
-        }
 
+            $parentRoot.show();
+            this.isClosed = false;
+            this.evt.width = $parentRoot.width();
+            this.evt.height = $parentRoot.height();
+            this.evt.isClosed = this.isClosed;
+            this.fireSizeChanged(this.evt);
+        };
+
+        this.getIsClosed = function () {
+            return this.isClosed;
+        };
 
 
         this.alignHorzontal = function () {
@@ -707,24 +724,28 @@
 
         function eventHandling() {
             $slider.on("click", function () {
-                if ($self.curGC.vTabPanel) {
-                    setTimeout(function () {
-                        $self.curGC.vTabPanel.setSize(0);
-                    }, 200)
-                }
+                
+                var evt = $self.evt;
+               
 
-                if (alignmentHorizontal) {                   
+                if (alignmentHorizontal) {
                     if ($parentRoot.height() == 0) {
                         $parentRoot.height($self.gTab.getHeaderHeight());
                         $root.show();
                         $parentRoot.find('.vis-ad-w-p-header-arrow-l').css('padding', '');
                         $slider.removeClass('fa-angle-double-down').addClass('fa-angle-double-up').removeClass('vis-ad-w-p-header-v');
+                        evt.height = $parentRoot.height();
+                       
+                        this.isClosed = false;
                     }
                     else {
                         $parentRoot.height(0);
                         $root.hide();
                         $parentRoot.find('.vis-ad-w-p-header-arrow-l').css('padding', '0px');
                         $slider.removeClass('fa-angle-double-up').addClass('fa-angle-double-down').addClass('vis-ad-w-p-header-v');
+                        evt.height = 0;
+                      
+                        this.isClosed = true;
                     }        
                 }
                 else {
@@ -736,21 +757,30 @@
                             $root.show();
                         }, 50);
 
+                        evt.width = $parentRoot.width();
+                        this.isClosed = false;
                     }
                     else {
                         $parentRoot.width(0);
                         $root.hide();
                         $parentRoot.find('.vis-ad-w-p-header-arrow-l').css('padding', '0px');
                         $slider.removeClass('fa-angle-double-left').addClass('fa-angle-double-right').addClass('vis-ad-w-p-header-h');
+                        evt.width = 0;
+                        this.isClosed = true;
                     }
                 }
-                if ($self.sizeChangedListner && $self.sizeChangedListner.onSizeChanged)
-                    $self.sizeChangedListner.onSizeChanged();
+                evt.isClosed = this.isClosed;
+                $self.fireSizeChanged(evt);
             });
         };
 
         eventHandling();
 
+
+        this.fireSizeChanged = function (evt) {
+            if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
+                this.sizeChangedListner.onSizeChanged(evt);
+        }
 
         /**
          * Dispose component
@@ -794,48 +824,54 @@
         root.addClass(rootCustomStyle);
 
         if (alignmentHorizontal) {
+            this.evt.isHorizontal = alignmentHorizontal;
             this.alignHorzontal();
             rootClass = 'vis-w-p-Header-Root-h';//Fixed Class for Horizontal Alignment
         }
 
-        if (!this.headerItems || this.headerItems.length <= 0) {
-            return;
-        }
+        if (!this.headerItems && this.headerItems.length >= 0) {
 
-        for (var j = 0; j < this.headerItems.length; j++) {
 
-            var currentItem = this.headerItems[j];
 
-            var rows = currentItem.HeaderTotalRow;
-            var columns = currentItem.HeaderTotalColumn;
-            var backColor = currentItem.HeaderBackColor;
-            var padding = currentItem.HeaderPadding;
+            for (var j = 0; j < this.headerItems.length; j++) {
 
-            if (!backColor) {
-                backColor = '';
+                var currentItem = this.headerItems[j];
+
+                var rows = currentItem.HeaderTotalRow;
+                var columns = currentItem.HeaderTotalColumn;
+                var backColor = currentItem.HeaderBackColor;
+                var padding = currentItem.HeaderPadding;
+
+                if (!backColor) {
+                    backColor = '';
+                }
+
+                if (!padding) {
+                    padding = '';
+                }
+
+                var dymcClass = this.fieldGroupContainerUISettings(columns, rows, backColor, padding, j);
+
+                var $containerDiv = $('<div class="' + rootClass + ' ' + dymcClass + '">');
+                root.append($containerDiv);
+
+                //Load Header Panel Items and add them to UI.
+                if (!currentItem || !currentItem.HeaderItems || currentItem.HeaderItems.length <= 0) {
+                    continue;
+                }
+                this.setHeaderItems(currentItem, $containerDiv);
+
             }
-
-            if (!padding) {
-                padding = '';
-            }
-
-            var dymcClass = this.fieldGroupContainerUISettings(columns, rows, backColor, padding, j);
-
-            var $containerDiv = $('<div class="' + rootClass + ' ' + dymcClass + '">');
-            root.append($containerDiv);
-
-            //Load Header Panel Items and add them to UI.
-            if (!currentItem || !currentItem.HeaderItems || currentItem.HeaderItems.length <= 0) {
-                continue;
-            }
-            this.setHeaderItems(currentItem, $containerDiv);
-
         }
         this.addStyleToDom();
 
         // Add Header Panel to Parent Control
         $parentRoot.append(root);
 
+        if (this.curTab.isHPanelNotShowInMultiRow && this.curTab.getTabLayout() != "Y") {
+            this.hidePanel();
+        }
+        
     };
 
     HeaderPanel.prototype.addSizeChangeListner = function (lstnr) {

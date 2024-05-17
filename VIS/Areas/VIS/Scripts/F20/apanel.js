@@ -361,7 +361,7 @@
             if(hide)
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             else
-                $divHeaderNav.find('*').css('visibility', 'show');
+                $divHeaderNav.find('*').css('visibility', 'visible');
         };
 
         this.hideActionbar = function (hide) {
@@ -760,10 +760,10 @@
                 if (this.curGC)
                     $tabPanel.append(this.curGC.getTabPanel());
                 $tabPanel.css({ "display": "grid" });
-                if (this.curGC.getIsSingleRow() && clsSuffix == 'b') {
-                    this.getLayout().removeClass('vis-ad-w-p-center-view-height');
-                    this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
-                }
+                //if (this.curGC.getIsSingleRow() && clsSuffix == 'b') {
+                //    this.getLayout().removeClass('vis-ad-w-p-center-view-height');
+                //    this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
+                //}
             }
             else {
                 $tabPanel.css({ "display": "none" });
@@ -877,7 +877,7 @@
             }
             else {
                 $fltrPanel.hide();
-                self.refresh();
+                this.refresh();
             }
         };
 
@@ -1587,10 +1587,7 @@
 
     APanel.prototype.refresh = function () {
         if (this.curGC) {
-            this.curGC.vTable.resize();
-            if (this.curGC.vIncludedGC) {
-                this.curGC.vIncludedGC.vTable.refresh();
-            }
+            this.curGC.onSizeChanged(true);
         }
         this.vTabbedPane.refresh();
     };
@@ -1888,7 +1885,7 @@
 
             else	//	normal tab
             {
-                var gc = new VIS.GridController(true, true, id);
+                var gc = new VIS.GridController(true, true, id,multiTabview);
                 gc.initGrid(false, curWindowNo, this, gTab);
 
                 //if (i === 0 && !setCurrent) {
@@ -1926,11 +1923,7 @@
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
                         this.vHeaderPanel = gc.vHeaderPanel; // set in parent class , so it is accessible in all GC
-                        if (gTab.isHPanelNotShowInMultiRow && gTab.getTabLayout() != "Y") {
-                            gc.vHeaderPanel.hidePanel();
-                            if (gc.vHeaderPanel.sizeChangedListner && gc.vHeaderPanel.sizeChangedListner.onSizeChanged)
-                                gc.vHeaderPanel.sizeChangedListner.onSizeChanged();
-                        }
+                       
                     }
                 }
                 gc.initFilterPanel(curWindowNo, this.getFilterPane());
@@ -1977,7 +1970,11 @@
         $parent.setName(jsonData._vo.DisplayName);
         this.curWindowNo = curWindowNo;
         if (multiTabview) {
-            this.setIncTabReziable();
+
+            this.getLayout().removeClass('vis-ad-w-p-center-view-height');
+            this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
+            this.getLayout().find('.vis-ad-w-p-center-inctab').css("background", "rgba(var(--v-c-common), 1)");
+            //this.setIncTabReziable();
         }
         jsonData = null;
         $parent = null;
@@ -2013,13 +2010,7 @@
                         'top': '',
                         'width': ''
                     });
-                    //incTab.css('flex-basis', ui.size.height + 'px');
-                    //if (VIS.Application.isRTL) {
-                    //    incTab.css({ 'position': 'relative', "right": "", "z-index": "" });
-                    //}
-                    //else {
-                    //    incTab.css({ 'position': 'relative', "left": "", "z-index": "" });
-                    //}
+                   
                     aPanel.refresh();
                 }
             });
@@ -2055,13 +2046,7 @@
                         'top': '',
                         'width': ''
                     });
-                    //incTab.css('flex-basis', ui.size.height + 'px');
-                    //if (VIS.Application.isRTL) {
-                    //    incTab.css({ 'position': 'relative', "right": "", "z-index": "" });
-                    //}
-                    //else {
-                    //    incTab.css({ 'position': 'relative', "left": "", "z-index": "" });
-                    //}
+                    
                     aPanel.refresh();
                 }
             });
@@ -3636,10 +3621,7 @@
         //}
     };
 
-    APanel.prototype.onQueryCompleted = function () {
-
-    };
-
+   
     APanel.prototype.onQueryCompleted = function () {
 
     };

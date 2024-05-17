@@ -431,10 +431,24 @@ namespace VAdvantage.Controller
                             try
                             {
                                 vo.ADActionParams = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(ap);
+                                
                             }
                             catch
                             {
                                 VLogger.Get().Warning("Action param not in correct json format [" + columnName + "]");
+                            }
+                            if (vo.ADActionParams.Card_ID != null)
+                            {
+                              //Get From Export _ID
+                                string exp = vo.ADActionParams.Card_ID.ToString();
+                                if (exp.Contains("_")){
+                                    int cid = VAdvantage.DataBase.DB.GetSQLValue(null,
+                                        "SELECT AD_CardView_ID FROM AD_CardView WHERE Export_ID='" + exp + "'");
+                                    if (cid > 0)
+                                        vo.ADActionParams.Card_ID = cid;
+                                    else
+                                        vo.ADActionParams.Card_ID = null;
+                                }
                             }
                         }
                     }

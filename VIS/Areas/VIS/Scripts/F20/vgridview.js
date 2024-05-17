@@ -1260,8 +1260,11 @@
         return this.grid.get(recid, isIndex);
     };
 
-    VTable.prototype.activate = function () {
+    VTable.prototype.activate = function (multiTabView) {
         if (this.grid && !this.rendred) {
+            this.grid.fixedBody = true;
+            if (multiTabView)
+                this.grid.fixedBody = false;
             this.$container.w2render(this.grid['name']);
             this.rendred = true;
         }

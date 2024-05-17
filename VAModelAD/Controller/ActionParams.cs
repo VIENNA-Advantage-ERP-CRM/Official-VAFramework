@@ -27,7 +27,7 @@ namespace VAdvantage.Controller
         public bool? IsTabInNewMode { get; set; }//11 T 
         public bool? IsReadOnly { get; set; } //12 T
         public bool? IsDeleteDisabled { get; set; }//13 T
-        public int?  Card_ID { get; set; }//14 T
+        public object  Card_ID { get; set; }//14 T
         public string TabWhereClause { get; set; }//15 T
         public string TabLayout { get; set; } //16 T { 'N'[Grid],'Y'[Single],'C'[Card]}
         public bool? IsShowFilterPanel { get; set; } //17

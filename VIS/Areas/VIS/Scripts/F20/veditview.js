@@ -14,7 +14,7 @@
 
         var $td0, $td1, $td2, $td3;
 
-        var $spndisplayFG = $('<span class="vis-ev-fgbtn" data-state="N">'+VIS.Msg.getMsg("More")+'...</span>' );
+        var $spndisplayFG = $('<span class="vis-ev-fgbtn" data-state="N">'+VIS.Msg.getMsg("More")+'</span>' );
 
         var _curParent = null;
 
@@ -541,17 +541,24 @@
         }
 
         function onBtnFGClick() {
+
+             
+
             var state = $spndisplayFG.data("state");
             var pos = $spndisplayFG.data("position");
             if (state == "Y") {
+                //var scrollDiv = $table.parent();
                 displayFiledGroup(pos, true);
                 state = "N";
-                $spndisplayFG.text(VIS.Msg.getMsg("More") + "...");
+                $spndisplayFG.text(VIS.Msg.getMsg("More"));
             }
             else {
+                var sPos = $table.parent().scrollTop();
+
                 displayFiledGroup(pos, false);
                 state = "Y";
-                $spndisplayFG.text("..." + VIS.Msg.getMsg("Less"));
+                $spndisplayFG.text(VIS.Msg.getMsg("Less"));
+                $table.parent().scrollTop(sPos);
             }
             $spndisplayFG.data("state", state);
         };

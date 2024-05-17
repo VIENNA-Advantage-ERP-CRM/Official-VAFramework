@@ -2483,6 +2483,7 @@
             this.isReadOnly = readOnly;
             $ctrl.prop('disabled', readOnly ? true : false);
             // this.$super.setReadOnly(readonly);
+            this.setBackground(readOnly);
             if (readOnly) {
                 $btnSearch.css("opacity", .7);
             } else {

@@ -277,17 +277,21 @@
     flex-direction: column;
 }
 
-.vis-ad-w-p-action {
-    grid-column: 6/6;
-    grid-row: 3/8;
-    width: 45px;
-    display: flex;
-    flex-flow: column;
-    color: rgba(var(--v-c-primary), 1);
-    position: relative;
-    align-items: center;
-    background-color: transparent;
-}
+    .vis-ad-w-p-center-flow-b .vis-ad-w-p-center-view {
+        flex:0 !important;
+    }
+
+    .vis-ad-w-p-action {
+        grid-column: 6/6;
+        grid-row: 3/8;
+        width: 45px;
+        display: flex;
+        flex-flow: column;
+        color: rgba(var(--v-c-primary), 1);
+        position: relative;
+        align-items: center;
+        background-color: transparent;
+    }
 
 
 .vis-ad-w-p-status {
@@ -535,6 +539,7 @@ span.vis-ad-w-p-tb-rc-action {
     overflow-x: auto;
     width: 1px;
     overflow: hidden;
+    padding-top:3px;
 }
 
 .vis-ad-w-p-tabs-t ul {
@@ -699,11 +704,7 @@ span.vis-ad-w-p-tb-rc-action {
     display: flex;
     flex-direction: column;
     flex: 1;
-   
-    /*overflow-y: hidden;*/
     padding: 0 10px;
-    /*grid-template-columns: 1fr auto;
-    grid-template-rows: 1fr auto auto auto auto;*/
 }
 
 .vis-ad-w-p-center-view-height {
@@ -712,9 +713,10 @@ span.vis-ad-w-p-tb-rc-action {
 }
 
 
-    .vis-ad-w-p-actionpanel-b {
-        padding: 0 10px;
-    }
+.vis-ad-w-p-actionpanel-b {
+    padding: 0 10px;
+    
+}
 
 .vis-ad-w-p-center-tc {
     order: 1;
@@ -728,8 +730,9 @@ span.vis-ad-w-p-tb-rc-action {
     order: 2;
     padding: 0;
     flex: 0;
-    flex-basis: 250px;
+    /*flex-basis: 250px;*/
     flex-flow: column;
+    padding-bottom:7px;
     /*padding-top:7px;*/
     /*height: 325px;*/
 }
@@ -746,14 +749,14 @@ span.vis-ad-w-p-tb-rc-action {
     position: relative;
 }
 
-    .vis-ad-w-p-c-inc-main:before {
+   /* .vis-ad-w-p-c-inc-main:before {
         position: absolute;
         content: "\f141";
         font: normal normal normal 18px/1 FontAwesome;
         color: rgba(var(--v-c-on-secondary), 1);
         top: -5px;
         left: 50%;
-    }
+    }*/
 
 .vis-ad-w-p-center-inctab .ui-resizable-n {
     top: 0;
@@ -1671,6 +1674,8 @@ li.vis-page-item-select {
 
 
 /* Tab Panel CSS*/
+
+
 
 .vis-ad-w-p-ap-tp-outerwrap {
     display: flex;
