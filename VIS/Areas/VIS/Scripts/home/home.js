@@ -235,7 +235,7 @@
                 var $item = $('<div>');
                 if (widget.Type == "W") {
                     var wform = new VIS.AForm();
-                    wform.openWidget(widget.ClassName, 99999);
+                    wform.openWidget(widget.ClassName, -99999);
                     wform.addChangeListener(VIS.HomeMgr);
                     $item = wform.getRoot();
                 } else if (widget.Type == "L") {

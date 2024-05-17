@@ -43,7 +43,7 @@
         this.getMultiSelectedRows = function () {
             return curGC.getSelectedRows();
         }
-        this.GridDataRefreshAll = function () {
+        this.gridDataRefreshAll = function () {
             return curGC.gTab.dataRefreshAll();
         }
 
