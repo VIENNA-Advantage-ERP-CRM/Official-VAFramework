@@ -316,11 +316,11 @@
                 });
             }
 
-            $('#visMarket').click(function () {
-                var type = VIS.Utility.getFunctionByName('Market.ImpModule.Market_', window);
-                var o = new type();
-                o.show();
-            });
+            //$('#visMarket').click(function () {
+            //    var type = VIS.Utility.getFunctionByName('Market.ImpModule.Market_', window);
+            //    var o = new type();
+            //    o.show();
+            //});
 
             $(window).resize(adjustHeight);
 

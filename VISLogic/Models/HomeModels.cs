@@ -113,10 +113,10 @@ namespace VIS.Models
             List<HomeWidget> list = null;
             string sql = @"SELECT AD_Widget.AD_Widget_ID,AD_Widget.Name,AD_Widget.displayName,AD_WidgetSize.className,AD_WidgetSize.Rowspan,AD_WidgetSize.Colspan,AD_WidgetSize.AD_WidgetSize_ID,AD_IMAGE.BINARYDATA,AD_ModuleInfo.name AS ModuleName FROM AD_Widget 
                             INNER JOIN AD_WidgetSize  ON AD_Widget.AD_Widget_ID=AD_WidgetSize.AD_Widget_ID
-                            INNER JOIN AD_WidgetAccess ON AD_Widget.AD_Widget_ID=AD_WidgetAccess.AD_Widget_ID
+                            INNER JOIN AD_Widget_Access ON AD_Widget.AD_Widget_ID=AD_Widget_Access.AD_Widget_ID
                             INNER JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID
                             INNER JOIN AD_ModuleInfo ON AD_ModuleInfo.AD_ModuleInfo_ID=AD_Widget.AD_ModuleInfo_ID
-                            WHERE AD_Widget.isActive='Y' AND AD_Role_ID=" + ctx.GetAD_Role_ID()+ " ORDER BY AD_ModuleInfo.name";
+                            WHERE AD_Widget.isActive='Y' AND AD_Widget_Access.AD_Role_ID=" + ctx.GetAD_Role_ID()+ " ORDER BY AD_ModuleInfo.name";
 
             DataSet dataSet = DB.ExecuteDataset(sql);
             if (dataSet != null && dataSet.Tables.Count > 0)
@@ -129,14 +129,15 @@ namespace VIS.Models
                     HomeWidget l = new HomeWidget()
                     {
                         WidgetID = Util.GetValueOfInt(row[i]["AD_Widget_ID"]),
-                        WidgetSizeID = Util.GetValueOfInt(row[i]["AD_WidgetSize_ID"]),
+                        KeyID = Util.GetValueOfInt(row[i]["AD_WidgetSize_ID"]),
                         Name = Util.GetValueOfString(row[i]["Name"]),
                         DisplayName = Util.GetValueOfString(row[i]["displayName"]),
                         ClassName = Util.GetValueOfString(row[i]["className"]),
                         Rows = Util.GetValueOfInt(row[i]["Rowspan"]),
                         Cols = Util.GetValueOfInt(row[i]["Colspan"]),
                         Img = img,
-                        ModuleName=Util.GetValueOfString(row[i]["ModuleName"])
+                        ModuleName=Util.GetValueOfString(row[i]["ModuleName"]),
+                        Type="W"
                     };
 
                     list.Add(l);
@@ -147,8 +148,7 @@ namespace VIS.Models
 
         public List<HomeWidget> GetUserWidgets(Ctx ctx)
         {
-            string sql = @"SELECT AD_UserHomeWidget.AD_UserHomeWidget_ID, AD_UserHomeWidget.AD_WidgetSize_ID,AD_WidgetSize.className, SRNO,AD_WidgetSize.Rowspan,AD_WidgetSize.Colspan FROM AD_UserHomeWidget
-                            INNER JOIN AD_WidgetSize  ON AD_UserHomeWidget.AD_WidgetSize_ID=AD_WidgetSize.AD_WidgetSize_ID
+            string sql = @"SELECT AD_UserHomeWidget.AD_UserHomeWidget_ID, AD_UserHomeWidget.componentID,componentType,SRNO FROM AD_UserHomeWidget
                             WHERE AD_UserHomeWidget.IsActive='Y' AND AD_Role_ID=" + ctx.GetAD_Role_ID() + " AND  AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY SRNO";
             List<HomeWidget> list = null;
             DataSet dataSet = DB.ExecuteDataset(sql);
@@ -162,11 +162,11 @@ namespace VIS.Models
                     HomeWidget l = new HomeWidget()
                     {
                         ID = Util.GetValueOfInt(row[i]["AD_UserHomeWidget_ID"]),
-                        WidgetSizeID = Util.GetValueOfInt(row[i]["AD_WidgetSize_ID"]),
-                        ClassName = Util.GetValueOfString(row[i]["className"]),
+                        KeyID = Util.GetValueOfInt(row[i]["componentID"]),
+                        Type = Util.GetValueOfString(row[i]["componentType"]),
                         SRNO = Util.GetValueOfInt(row[i]["SRNO"]),
-                        Rows = Util.GetValueOfInt(row[i]["Rowspan"]),
-                        Cols = Util.GetValueOfInt(row[i]["Colspan"])
+                        //Rows = Util.GetValueOfInt(row[i]["Rowspan"]),
+                        //Cols = Util.GetValueOfInt(row[i]["Colspan"])
                     };
 
                     list.Add(l);
@@ -182,7 +182,8 @@ namespace VIS.Models
             {
                 MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
                 mUserHomeWidget.SetSRNO(widgetSizes[i].SRNO);
-                mUserHomeWidget.SetAD_WidgetSize_ID(widgetSizes[i].WidgetSizeID);
+                mUserHomeWidget.SetComponentID(widgetSizes[i].KeyID);
+                mUserHomeWidget.SetComponentType(widgetSizes[i].Type);
                 mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
                 mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
                 mUserHomeWidget.Save();
@@ -279,8 +280,9 @@ namespace VIS.Models
 
     public class WidgetSize
     {
-        public int WidgetSizeID { get; set; }
+        public int KeyID { get; set; }
         public int SRNO { get; set; }
+        public string Type { get; set; }
     }
 
     public class HomeWidget: WidgetSize
@@ -296,6 +298,8 @@ namespace VIS.Models
         public string ModuleName { get; set; }
       
     }
+
+    
 }
 
    
