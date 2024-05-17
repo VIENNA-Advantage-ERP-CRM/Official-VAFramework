@@ -366,6 +366,7 @@ button.vis-ev-col-img-ctrl:focus,
     cursor: pointer;
     color: rgba(var(--v-c-primary), 1);
     align-self:end;
+    font-size:1rem;
 }
 /* field group css END*/
 /****** Style Inputs Control END*****/

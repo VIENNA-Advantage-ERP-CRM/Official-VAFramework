@@ -87,9 +87,10 @@
     //****************************************************//
     //**            Grid Controller                    **//
     //**************************************************//
-    VIS.GridController = function (showRowNo, doPaging, id) {
+    VIS.GridController = function (showRowNo, doPaging, id,multiTabView) {
 
         this.id = id;
+        this.multiTabView = multiTabView;
         this.vGridPanel = new VIS.VGridPanel();
         this.vTable = new VIS.VTable();
         this.vCardView = new VIS.VCardView();
@@ -164,6 +165,9 @@
             /* Multi,card and single view */
             $divGrid = $("<div class='vis-gc-vtable'>");
             $divPanel = $("<div class='vis-ad-w-p-vc-editview' id='AS_" + id + "'>");
+            if (multiTabView) {
+                $divPanel.css("position", "unset");
+            }
             $divCard = $("<div class='vis-gc-vcard'>");
             $divMap = $("<div class='vis-gc-vmap'>");
             /* End */
@@ -463,21 +467,21 @@
     };
 
 
-    VIS.GridController.prototype.initTabPanel = function (wWidth, windowNo) {
-        this.vTabPanel = new VIS.VTabPanel(windowNo, wWidth);
-        this.vTabPanel.init(this.getMTab());
-        this.vTabPanel.addSizeChangeListner(this);
-    };
-
     VIS.GridController.prototype.initHeaderPanel = function (parent) {
         this.vHeaderPanel = new VIS.HeaderPanel(parent);
-        this.vHeaderPanel.init(this);
         this.vHeaderPanel.addSizeChangeListner(this);
+        this.vHeaderPanel.init(this);
     };
 
+    VIS.GridController.prototype.initTabPanel = function (wWidth, windowNo) {
+        this.vTabPanel = new VIS.VTabPanel(windowNo, wWidth);
+        this.vTabPanel.addSizeChangeListner(this);
+        this.vTabPanel.init(this.getMTab());
+    };
+
+   
     VIS.GridController.prototype.initFilterPanel = function (winNo) {
         this.aFilterPanel = new VIS.FilterPanel(winNo, this);
-
     };
 
     VIS.GridController.prototype.initFilterUI = function () {
@@ -493,11 +497,17 @@
     VIS.GridController.prototype.getFilterPanel = function () {
         return this.aFilterPanel.getRoot();
     };
-    VIS.GridController.prototype.onSizeChanged = function (isOpened) {
+    VIS.GridController.prototype.onSizeChanged = function (resize) {
+            if (resize && this.vTabPanel) {
+                this.vTabPanel.setSize(0);
+        }
+
         this.multiRowResize();
         if (this.vIncludedGC) {
             this.vIncludedGC.multiRowResize();
         }
+        if (this.aPanel.vTabbedPane)
+            this.aPanel.vTabbedPane.refresh();
     };
 
     VIS.GridController.prototype.refreshTabPanelData = function (record_ID) {
@@ -681,7 +691,7 @@
             this.vGridPanel.flushLayout(mTab.getHideFGFrom());
 
         }
-
+        
 
         //  Tree Graphics Layout
         var AD_Tree_ID = 0;
@@ -983,6 +993,7 @@
                 var mField = this.gTab.getField(columnName);
                 if (mField != null) {
 
+                    //exempt tool bar button or window action
                     if (mField.getDisplayType() == VIS.DisplayType.Button && mField.getAD_Reference_Value_ID() == 435) {
                         continue;
                     }
@@ -997,10 +1008,10 @@
                         if (comp instanceof VIS.Controls.IControl) {
                             var ve = comp;
                             if (noData)
-                                ve.setReadOnly(true);
+                                ve.setReadOnly(true && !mField.getIsAction());
                             else {
                                 //   mField.vo.tabReadOnly = this.gTab.getIsReadOnly();
-                                var rw = mField.getIsEditable(true) && !this.gTab.getIsReadOnly();	//  r/w - check Context
+                                var rw = mField.getIsAction() || (mField.getIsEditable(true) && !this.gTab.getIsReadOnly());	//  r/w - check Context
 
 
 
@@ -1205,7 +1216,7 @@
 
     VIS.GridController.prototype.activate = function (oldGC, aParams) {
 
-        this.vTable.activate();
+        this.vTable.activate(this.multiTabView);
         oldGC = oldGC || {};
 
         //if (oldGC.isIncludedGCVisible) { //Hide Included of Old GC
@@ -1284,7 +1295,7 @@
         //check for defalut card in Action Params
         if (this.actionParams.Card_ID > 0) {
             this.gTab.getTableModel().setCardID(this.actionParams.Card_ID);
-            if (!this.isCardRow && this.vCardView)
+            if (this.isCardRow && this.vCardView)
                 this.vCardView.cardID = this.actionParams.Card_ID;
 
         }
@@ -2002,10 +2013,10 @@
                 this.vHeaderPanel.sizeChangedListner.onSizeChanged();
         }
         this.dynamicDisplay(-1);
-        if (this.aPanel.getTabSuffix() == 'b') {
-            this.aPanel.getLayout().removeClass('vis-ad-w-p-center-view-height');
-            this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "unset");
-        }
+        //if (this.aPanel.getTabSuffix() == 'b') {
+        //    this.aPanel.getLayout().removeClass('vis-ad-w-p-center-view-height');
+        //    this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "unset");
+        //}
     };
 
     VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {
@@ -2015,10 +2026,10 @@
 
             //    this.gTab.getTableModel().setCurrentPage(1);
             //}
-            if (this.aPanel.getTabSuffix() == 'b') {
-                this.aPanel.getLayout().addClass('vis-ad-w-p-center-view-height');
-                this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "absolute");
-            }
+            //if (this.aPanel.getTabSuffix() == 'b') {
+            //    this.aPanel.getLayout().addClass('vis-ad-w-p-center-view-height');
+            //    this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "absolute");
+            //}
 
             this.singleRow = false;
             this.isCardRow = false;

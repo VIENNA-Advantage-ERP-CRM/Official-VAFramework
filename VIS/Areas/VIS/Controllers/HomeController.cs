@@ -99,6 +99,7 @@ namespace VIS.Controllers
             VAdvantage.DataBase.DBConn.SetConnectionString();//Init database conection
             Language.GetLanguages();
             LoginModel model = null;
+            SecureEngine.Encrypt("test"); //init secure engine class
             if (User.Identity.IsAuthenticated)
             {
                 
