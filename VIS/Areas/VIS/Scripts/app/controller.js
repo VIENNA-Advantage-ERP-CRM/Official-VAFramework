@@ -2104,10 +2104,10 @@
             recordID = this.getRecords()[this.currentRow][this.getTableName().toLower() + "_id"];
         }
 
-        if (recordID && recordID < 0) {
+        if (!recordID || recordID < 0) {
             return;
         }
-
+        n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
         var that = this;
         $.ajax({
             async: false,

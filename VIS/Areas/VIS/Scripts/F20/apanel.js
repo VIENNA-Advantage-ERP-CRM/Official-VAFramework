@@ -2822,7 +2822,7 @@
         else if (vButton.AD_Form_ID > 0) {
 
             if (VIS.MRole.getFormAccess(vButton.AD_Form_ID)) {
-                var wForm = new VIS.WForm(VIS.Env.getScreenHeight(), vButton.AD_Form_ID, curTab, curWindowNo);
+                var wForm = new VIS.WForm(VIS.Env.getScreenHeight(), vButton.AD_Form_ID, curGC, curWindowNo);
             }
             else {
                 VIS.ADialog.warn("AccessTableNoView");
@@ -3433,7 +3433,7 @@
                 }
 
                 /* if reset tab is true then set default view which is set on tab */
-                if (resetLayout) {                    
+                if (resetLayout) {
                     if (defaultTabLayout == 'N') {
                         gc.switchMultiRow();
                     }
@@ -3444,6 +3444,17 @@
                         gc.switchCardRow(true);
                     }
                 }
+                else {
+                    if (gc.getIsSingleRow()) {
+                        defaultTabLayout = 'Y'
+                    } else if (gc.getIsCardRow()) {
+                        defaultTabLayout = 'C'
+                    } else if (!gc.getIsMapRow()) {
+                        defaultTabLayout = 'N'
+                    }
+                }
+
+
                 this.curTab.getTableModel().setCurrentPage(1);
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
                     

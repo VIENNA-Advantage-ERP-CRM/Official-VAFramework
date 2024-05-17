@@ -3631,3 +3631,7 @@ ul.vis-userLinks-ListMenu li a i {
 .vis-editModeWidget .vis-linksWidget {
     cursor: grab;
 }
+
+.vis-widget-item .vis-height-full{
+    width:100%;
+}
