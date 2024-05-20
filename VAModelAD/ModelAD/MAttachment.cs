@@ -1682,7 +1682,7 @@ namespace VAdvantage.Model
                             CleanUp(filePath + "\\" + folderKey + "\\" + fileName, zipfileName, filePath + "\\" + outputfileName, zipinput);
                             return false;
                         }
-                        Task<string> uploadTask = UploadFilesToOCI(GetCtx(), filePath + "\\" + folderKey + "\\" + fileName, cInfo.GetAD_WebServiceURL());
+                        Task<string> uploadTask = UploadFilesToOCI(GetCtx(), filePath + "\\" + folderKey + "\\" + outputfileName, cInfo.GetAD_WebServiceURL());
                         string result = uploadTask.Result;
                         if (result.ToUpper().Contains("ERROR"))
                         {

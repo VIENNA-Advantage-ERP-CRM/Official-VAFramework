@@ -3379,6 +3379,8 @@
             }
             var defaultTabLayout =   mTab.getTabLayout();
             if (back && this.curTab.getIsCurrent()) {
+                
+
                 if (this.curTab.getTabLevel() == 0) {
                     if (this.curTab.searchText) {
                         this.setAdvancedSerachText(false, this.curTab.searchText);
@@ -3410,13 +3412,13 @@
             }
             else	//	Requery and bind
             {
+
                 var resetLayout = mTab.getIsResetLayout();
                 if (this.actionParams.TabLayout &&
                     ['N', 'Y', 'C'].indexOf(this.actionParams.TabLayout) > -1) {
                     defaultTabLayout = this.actionParams.TabLayout;
                     resetLayout = true;
                 }
-
                 /* if reset tab is true then set default view which is set on tab */
                 if (resetLayout) {
                     if (defaultTabLayout == 'N') {

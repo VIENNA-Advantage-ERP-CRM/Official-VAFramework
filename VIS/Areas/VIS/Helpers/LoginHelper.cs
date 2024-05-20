@@ -101,8 +101,7 @@ namespace VIS.Helpers
 
                     if (!ipMatch)
                     {
-                        Ctx ctx = new Ctx();
-                        throw new Exception(Msg.GetMsg(ctx, "VIS_UserIPNotMatch"));
+                        throw new Exception("AccessNotGranted");
                     }
                 }
             }

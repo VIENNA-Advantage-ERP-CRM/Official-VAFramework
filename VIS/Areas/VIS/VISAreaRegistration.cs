@@ -33,6 +33,7 @@ namespace VIS
 
             ScriptBundle modScript_v2 = new ScriptBundle("~/Areas/VIS/Scripts/VIS_v2");
 
+
             //modScript.Include(
             //      "~/Areas/VIS/Scripts/app/native-extension.js",
             //    "~/Areas/VIS/Scripts/app/utility.js",
@@ -143,12 +144,15 @@ namespace VIS
 
             //       "~/Areas/VIS/Scripts/app/ssemanager.js",
 
+
             //       "~/Areas/VIS/Scripts/tabpanels/verinfo.js",
             //        "~/Areas/VIS/Scripts/tabpanels/HistoryDetailsTabPanel.js",
             //        "~/Areas/VIS/Scripts/tabpanels/surveyPanel.js",
             //      "~/Areas/VIS/Scripts/TestPanel.js",
+
             //     "~/Areas/VIS/Scripts/app/forms/form.js",
             //     "~/Areas/VIS/Scripts/home/usersession.js");
+
 
 
             //modScript.Include(
@@ -212,10 +216,12 @@ namespace VIS
 
 
 
+
             /* style.Include("~/Areas/VIS/Content/VIS.all.min.css");
              modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js");
              modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
              modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");*/
+
 
             /// with webpack and want to genrate files with version
             style.Include("~/Areas/VIS/Content/VIS.all.min{version}.css");
