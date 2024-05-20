@@ -1568,7 +1568,7 @@
 
 
 
-    function validateAndExecute(arguments, dataIn, async, callback) {
+    function validateAndExecute(myarguments, dataIn, async, callback) {
         //if (traceConsole(arguments))
         //    return null;
         //dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
@@ -1577,7 +1577,7 @@
         });
     };
 
-    function validateAndExecuteQuery(arguments, dataIn, async, callback) {
+    function validateAndExecuteQuery(myarguments, dataIn, async, callback) {
         //if (traceConsole(arguments))
         //    return null;
         // dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);
@@ -1586,7 +1586,7 @@
         });
     };
 
-    function validateAndExecuteQueries(arguments, dataIn, async, callback) {
+    function validateAndExecuteQueries(myarguments, dataIn, async, callback) {
         //if (traceConsole(arguments))
         //    return null;
         // dataIn.sql = VIS.secureEngine.encrypt(dataIn.sql);

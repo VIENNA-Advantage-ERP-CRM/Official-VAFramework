@@ -11,7 +11,8 @@
 
         var atab = $('#userLinks-Tab');
         var mgr = {
-            init: init
+            init: init,
+            SettingDialog: SettingDialog
         };
 
         return mgr;
@@ -57,7 +58,7 @@
                             html.push('<i data-index="' + i + '" class="vis vis-shortcut"');
                         }
                         html.push('" />');
-                        html.push(itm.ShortcutName + '</a></li>');
+                        html.push(itm.DisplayName + '</a></li>');
                     }
                 }
                 html.push('</ul>');
@@ -185,7 +186,7 @@
                             html.push('<i data-index="' + i + '" class="vis vis-shortcut"');
                         }
                         html.push('" />');
-                        html.push(itm.ShortcutName + '</a></li>');
+                        html.push(itm.DisplayName + '</a></li>');
                     }
                 }
                 html.push('</ul>');

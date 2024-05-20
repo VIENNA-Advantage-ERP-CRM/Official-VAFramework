@@ -27,6 +27,8 @@ using System.Threading;
 using VAdvantage.DataBase;
 using System.Text;
 using VAdvantage.Common;
+using System.Diagnostics;
+using iTextSharp.text;
 
 namespace VIS.Controllers
 {
@@ -47,7 +49,7 @@ namespace VIS.Controllers
         HomeHelper objHomeHelp = null;
 
         private static bool isBundleAdded = false;
-        private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        //private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 
 
@@ -73,16 +75,6 @@ namespace VIS.Controllers
         public ActionResult Index(FormCollection form)
         {
 
-
-            //if (LoginHelper.IsSiteUnderMaintenance())
-            //{
-            //    if (User.Identity.IsAuthenticated)
-            //    {
-            //        return new AccountController().SignOff(Session["ctx"] as Ctx);
-            //    }
-            //    return View("Maintenance"); 
-            //}
-
             if (Request.QueryString.Count > 0)
             {
                 // string user = Request.QueryString["U"];
@@ -97,19 +89,6 @@ namespace VIS.Controllers
                 // return RedirectToAction("Index");
             }
 
-            //if (!User.Identity.IsAuthenticated)
-            //{
-            //    // Required to allow javascript redirection through to browser
-            //    this.Response.TrySkipIisCustomErrors = true;
-            //    this.Response.Status = "401 Unauthorized";
-            //    this.Response.StatusCode = 401;
-            //    // note that the following line is .NET 4.5 or later only
-            //    // otherwise you have to suppress the return URL etc manually!
-            //    this.Response.SuppressFormsAuthenticationRedirect = true;
-            //    // If we got this far, something failed
-
-            //}
-
 
             var url = CloudLogin.IsAllowedToLogin(Request.Url.ToString());
             if (!string.IsNullOrEmpty(url))
@@ -121,8 +100,12 @@ namespace VIS.Controllers
             VAdvantage.DataBase.DBConn.SetConnectionString();//Init database conection
             Language.GetLanguages();
             LoginModel model = null;
+            SecureEngine.Encrypt("test"); //init secure engine class
             if (User.Identity.IsAuthenticated)
             {
+                
+                
+                //StringBuilder sbLogin = new StringBuilder();
 
                 if (Request.QueryString.Count > 0) /* if has value */
                 {
@@ -130,18 +113,15 @@ namespace VIS.Controllers
                 }
                 try
                 {
-                    //var conf = WebConfigurationManager.OpenWebConfiguration(System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath);
-                    //  SessionStateSection section = (SessionStateSection) conf.GetSection("system.web/sessionState");
-                    // int timeout = (int) section.Timeout.TotalMinutes;
-                    Session.Timeout = 20; // ideal timout
+                    Session.Timeout = 20; // idle timeout
                 }
                 catch
                 {
                 }
 
+                //Stopwatch st = new Stopwatch();
+                //st.Start();
 
-                //AccountController a = new AccountController();
-                //a.LogOff();
                 FormsIdentity ident = User.Identity as FormsIdentity;
                 Ctx ctx = null;
                 if (ident != null)
@@ -150,65 +130,48 @@ namespace VIS.Controllers
                     string loginContextString = ticket.UserData; // get login context string from Form Ticket
                     LoginContext lCtx = JsonHelper.Deserialize(loginContextString, typeof(LoginContext)) as LoginContext;
                     IDataReader dr = null;
+                    bool createNew = false;
 
-
-
-
-
-                    //create class from string  
-                    string key = "";
-                    if (Session["ctx"] != null)
-                    {
-                        ctx = Session["ctx"] as Ctx;
-
-                        //Update Old Session
-                        //MSession session = MSession.Get(ctx, false);
-                        //if (session != null)
-                        //    session.Logout();
-
-                        key = ctx.GetSecureKey();
-
-                        //if (Session.Timeout < 2)
-                        //{
-                        SessionEventHandler.SessionEnd(ctx);
-                        Session.Timeout = 17;
-                        //}
-                        Session["ctx"] = null;
-
-                    }
+                   
                     ctx = new Ctx(lCtx.ctxMap); //cretae new context
 
                     /* fix for User Value Null value */
 
                     if (string.IsNullOrEmpty(ctx.GetContext("##AD_User_Value")))
                     {
-                        return new AccountController().SignOff(ctx);
+                        return new AccountController().SignOff(ctx,Session.SessionID);
 
                     }
 
 
                     //if not system admin
-                    if (LoginHelper.IsSiteUnderMaintenance() && ctx.GetAD_Role_ID() != 0)
+                    if (ctx.GetAD_Role_ID() != 0 &&
+                        LoginHelper.IsSiteUnderMaintenance())
                     {
-                        // if (User.Identity.IsAuthenticated)
-                        //{
-                        //  return new AccountController().SignOff(ctx);
-                        //}
                         return View("Maintenance");
+                    }
+
+                    //Stopwatch stLogin = new Stopwatch();
+                    //stLogin.Start();
+
+                    //create class from string  
+                    string key = "";
+                    if (Session["ctx"] != null)
+                    {
+                        var oldctx = Session["ctx"] as Ctx;
+                        ctx.SetAD_Session_ID(oldctx.GetAD_Session_ID());
+                        ctx.SetSecureKey(oldctx.GetSecureKey());
+                        Session.Timeout = 17;
+                    }
+                    else
+                    {
+                        createNew = true;
                     }
 
                     if (key != "")
                     {
                         ctx.SetSecureKey(key);
                     }
-                    Session["ctx"] = ctx;
-
-
-                    //Check For 
-
-
-
-
 
                     //get login Language object on server
                     var loginLang = ctx.GetAD_Language();
@@ -262,6 +225,8 @@ namespace VIS.Controllers
 
                     model.Login1Model.AD_User_ID = AD_User_ID;
                     model.Login1Model.DisplayName = username;
+
+                    //sbLogin.Append("auth,role,session =>" + stLogin.Elapsed);
 
                     //string diableMenu = ctx.GetContext("#DisableMenu");
                     Helpers.MenuHelper mnuHelper = new Helpers.MenuHelper(ctx); // inilitilize menu class
@@ -317,82 +282,29 @@ namespace VIS.Controllers
                     ViewBag.ClientList = ClientList;
                     ViewBag.OrgList = OrgList;
                     ViewBag.WarehouseList = WareHouseList;
-
-
+                    
+                    //sbLogin.Append("/n").Append("menu,client+ware =>" + stLogin.Elapsed);
                     // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
                     //{
-                    //Cretae new Sessin
-                    MSession sessionNew = MSession.Get(ctx, true, Common.GetVisitorIPAddress(Request,true));
-                    ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
-                    sessionData.UserId = ctx.GetAD_User_ID();
-                    sessionData.Name = ctx.GetAD_User_Name();
-                    sessionData.Key = ctx.GetAD_Session_ID();
-                    ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
-
-                    _lockSlim.EnterReadLock();
-
-                    if (!isBundleAdded)
+                    if (createNew)
                     {
-                        var lst = VAdvantage.ModuleBundles.GetStyleBundles(); //Get All Style Bundle
-                        foreach (var b in lst)
-                        {
-                            if (!BundleTable.Bundles.Contains(b))
-                            {
-                                BundleTable.Bundles.Add(b); //Add in Mvc Bundle Table
-                            }
-                        }
-
-                        var lstRTLStyle = VAdvantage.ModuleBundles.GetRTLStyleBundles(); //Get All Script Bundle
-
-                        foreach (var b in lstRTLStyle)
-                        {
-                            if (!BundleTable.Bundles.Contains(b))
-                            {
-                                BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
-                            }
-                        }
-
-                        var lstScript = VAdvantage.ModuleBundles.GetScriptBundles(); //Get All Script Bundle
-
-                        foreach (var b in lstScript)
-                        {
-                            if (!BundleTable.Bundles.Contains(b))
-                            {
-                                BundleTable.Bundles.Add(b); //Add in Mvc Bundlw Table
-                            }
-                        }
-                        isBundleAdded = true;
+                        //Cretae new Sessin
+                       
+                        MSession sessionNew = MSession.Get(ctx,Session.SessionID, true, Common.GetVisitorIPAddress(Request, true));
+                       // sessionNew.SetWebSession(Session.SessionID);
+                        ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
+                        sessionData.UserId = ctx.GetAD_User_ID();
+                        sessionData.Name = ctx.GetAD_User_Name();
+                        sessionData.Key = ctx.GetAD_Session_ID();
+                        ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
                     }
+                    Session["ctx"] = ctx;
 
-                    _lockSlim.ExitReadLock();
+                   
 
-                    ViewBag.LibSuffix = "";
-                    ViewBag.FrameSuffix = "_v1";
-                    int libFound = 0;
-                    foreach (Bundle b in BundleTable.Bundles)
-                    {
-                        if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v") && ViewBag.LibSuffix == "")
-                        {
-                            ViewBag.LibSuffix = Util.GetValueOfInt(ctx.GetContext("#FRONTEND_LIB_VERSION")) > 2
-                                                  ? "_v3" : "_v2";
-                            libFound++;
-                        }
-
-                        if (b.Path.Contains("VIS") && b.Path.Contains("_v"))
-                        {
-                            ViewBag.FrameSuffix = Util.GetValueOfInt(ctx.GetContext("#FRAMEWORK_VERSION")) > 1
-                                                  ? "_v2" : "_v1";
-                            libFound++;
-                        }
-                        if (libFound >= 2)
-                        {
-                            break;
-                        }
-                        //}
-                        //check system setting// set to skipped lib
-
-
-                    }
+                    ViewBag.LibSuffix = "_v3";
+                    ViewBag.FrameSuffix = "_v2";
+                   
 
                     /// VIS0008
                     /// Check applied for adding message to toastr if 2FA method is VA and VA App is not linked with device
@@ -410,11 +322,14 @@ namespace VIS.Controllers
                     //                            UNION 
                     //                            SELECT m.Name,2 AS RowNumber FROM AD_ModuleInfo m
                     //                            WHERE m.Prefix='VA093_' ORDER BY RowNumber"));
-                       
+
 
                     //}
 
-                    VAdvantage.Classes.ThreadInstance.Get().Start();
+                    //VAdvantage.Classes.ThreadInstance.Get().Start();
+                    //sbLogin.Append("/n").Append("home complete =>" + stLogin.Elapsed);
+                    //stLogin.Stop();
+                    //ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), sbLogin.ToString());
                 }
             }
 
@@ -476,15 +391,15 @@ namespace VIS.Controllers
                 Session["ctx"] = null;
                 ViewBag.direction = "ltr";
 
-                ViewBag.LibSuffix = "";
-                foreach (Bundle b in BundleTable.Bundles)
-                {
-                    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v"))
-                    {
-                        ViewBag.LibSuffix = "_v2";
-                        break;
-                    }
-                }
+                ViewBag.LibSuffix = "_v3";
+                //foreach (Bundle b in BundleTable.Bundles)
+                //{
+                //    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v"))
+                //    {
+                //        ViewBag.LibSuffix = "_v2";
+                //        break;
+                //    }
+                //}
             }
             return View(model);
 
@@ -913,6 +828,46 @@ namespace VIS.Controllers
             dr.Close();
 
             return Json(JsonConvert.SerializeObject(lst), JsonRequestBehavior.AllowGet);
+        }
+
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult GetWidgets()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+
+            var shortCut = ShortcutHelper.GetShortcutItems(Session["ctx"] as Ctx);
+            var widgets = homeModels.GetHomeWidget(ctx);
+            List<Object> list = new List<Object>();
+            list.AddRange(widgets);
+            list.AddRange(shortCut);
+            return Json(JsonConvert.SerializeObject(list), JsonRequestBehavior.AllowGet);
+        }
+
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        public JsonResult GetUserWidgets()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels  homeModels = new HomeModels();
+            return Json(JsonConvert.SerializeObject(homeModels.GetUserWidgets(ctx)));
+            
+        }
+
+        public int SaveDashboard(List<WidgetSize> widgetSizes)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return homeModels.SaveDashboard(ctx, widgetSizes);
+        } 
+        public int DeleteWidgetFromHome(int id)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return homeModels.DeleteWidgetFromHome(ctx, id);
         }
 
     }

@@ -1965,7 +1965,9 @@ namespace VIS.Helpers
                 if (inn.ImmediateSave)
                 {
                     po.Set_Value("ProcessedVersion", true);
-                    po.Set_Value("VersionValidFrom", System.DateTime.Now);              
+
+                    po.Set_Value("VersionValidFrom", System.DateTime.Now);
+
                 }
                 // Only increase record version if Version do not exist for same date
                 if (po.Get_ID() <= 0)

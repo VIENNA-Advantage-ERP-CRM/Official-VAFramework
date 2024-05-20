@@ -105,7 +105,7 @@ namespace VIS.Helpers
 
                 ShortcutItemModel itm = new ShortcutItemModel();
 
-                itm.ShortcutName = Util.GetValueOfString(dr["Name2"]);
+                itm.DisplayName = Util.GetValueOfString(dr["Name2"]);
                 itm.Action = Util.GetValueOfString(dr["Action"]);
                 itm.ActionID = Util.GetValueOfInt(dr["ActionID"]);
                 itm.SpecialAction = Util.GetValueOfString(dr["ClassName"]);

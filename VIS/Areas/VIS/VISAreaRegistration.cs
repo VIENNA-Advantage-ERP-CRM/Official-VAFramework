@@ -23,7 +23,7 @@ namespace VIS
                                new { controller = "Home", action = "Index", id = UrlParameter.Optional }
                                , new[] { "VIS.Controllers" }
                                );
-            
+
             StyleBundle style = new StyleBundle("~/Areas/VIS/Content/VISstyle");
             //StyleBundle styleRTL = new StyleBundle("~/Areas/VIS/Content/VISstyleRTL");
 
@@ -32,7 +32,6 @@ namespace VIS
             ScriptBundle modScript_v1 = new ScriptBundle("~/Areas/VIS/Scripts/VIS_v1");
 
             ScriptBundle modScript_v2 = new ScriptBundle("~/Areas/VIS/Scripts/VIS_v2");
-
 
 
             //modScript.Include(
@@ -150,7 +149,10 @@ namespace VIS
             //        "~/Areas/VIS/Scripts/tabpanels/HistoryDetailsTabPanel.js",
             //        "~/Areas/VIS/Scripts/tabpanels/surveyPanel.js",
             //      "~/Areas/VIS/Scripts/TestPanel.js",
-            //     "~/Areas/VIS/Scripts/app/forms/form.js");
+
+            //     "~/Areas/VIS/Scripts/app/forms/form.js",
+            //     "~/Areas/VIS/Scripts/home/usersession.js");
+
 
 
             //modScript.Include(
@@ -214,16 +216,26 @@ namespace VIS
 
 
 
-            style.Include("~/Areas/VIS/Content/VIS.all.min.css");
-            modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js");
+
+            /* style.Include("~/Areas/VIS/Content/VIS.all.min.css");
+             modScript.Include("~/Areas/VIS/Scripts/VIS.all.min.js");
+             modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
+             modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");*/
+
+
+            /// with webpack and want to genrate files with version
+            style.Include("~/Areas/VIS/Content/VIS.all.min{version}.css");
+            modScript.Include("~/Areas/VIS/Scripts/dist/VIS.all.min{version}.js",
+                "~/Areas/VIS/Scripts/dist/React.min{version}.js"
+                );
             modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
-            modScript_v2.Include("~/Areas/VIS/Scripts/VIS2_0.min.js");
+            modScript_v2.Include("~/Areas/VIS/Scripts/dist/VIS2_0.min{version}.js");
 
 
 
 
             VAdvantage.ModuleBundles.RegisterScriptBundle(modScript, "VIS", -1);
-            VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v1, "VIS1_0", -2);
+            //VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v1, "VIS1_0", -2);
             VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v2, "VIS2_0", -3);
 
             VAdvantage.ModuleBundles.RegisterStyleBundle(style, "VIS", -1);
@@ -232,4 +244,3 @@ namespace VIS
         }
     }
 }
-

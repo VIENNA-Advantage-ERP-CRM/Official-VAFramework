@@ -75,7 +75,8 @@ namespace ModelLibrary.PushNotif
         public enum Cast
         {
             Unicast=0,
-            BroadCast=1
+            BroadCast=1,
+            Both=2,
         }
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace ModelLibrary.PushNotif
         /// <param name="type">message cast</param>
         public  void  AddMessage(int sessionid, SSEData data, Cast type = Cast.Unicast)
         {
-            if (type == Cast.BroadCast)
+            if (type == Cast.BroadCast || type== Cast.Both)
             {
                 var sList = SessionManager.Get().GetSessionIds();
                 lock (_lockObj)
@@ -109,6 +110,14 @@ namespace ModelLibrary.PushNotif
                     for (int i = 0, j = sList.Count; i < j; i++)
                     {
                         if (sessionid != sList[i])
+                        {
+                            if (!_messageList.ContainsKey(sList[i]))
+                            {
+                                _messageList[sList[i]] = new List<SSEData>();
+                            }
+                            _messageList[sList[i]].Add(data);
+                        }
+                        else if(type == Cast.Both)
                         {
                             if (!_messageList.ContainsKey(sList[i]))
                             {
@@ -133,14 +142,6 @@ namespace ModelLibrary.PushNotif
             }
         }
 
-        //private void RemoveMessage(int sessionid)
-        //{
-        //    lock (_lockObj)
-        //    {
-        //        if (_messageList.ContainsKey(sessionid))
-        //            _messageList.Remove(sessionid);
-        //    }
-        //}
 
         /// <summary>
         /// Return message for Session ids
@@ -186,10 +187,6 @@ namespace ModelLibrary.PushNotif
         private static object _lockObj = new object();
         private Dictionary<int,SessionData> _sessionLst = null;
 
-
-
-
-
         /// <summary>
         /// Get Single constructor
         /// </summary>
@@ -227,6 +224,7 @@ namespace ModelLibrary.PushNotif
             //Notify
             SSEManager.Get().AddMessage(sessionid, Newtonsoft.Json.JsonConvert.SerializeObject(data), "LOGIN", SSEManager.Cast.BroadCast);
         }
+
         public void RemoveSession(int sessionid)
         {
             SessionData sData = null;

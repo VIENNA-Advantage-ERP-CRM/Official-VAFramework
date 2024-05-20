@@ -3,6 +3,10 @@
     //**             userSession                            **//
     //****************************************************//
 
+    /**
+     * show logined user sessions
+     * @returns
+     */
     function UserSession() {
         var shown = false;
         var main = $("<div class='vis-chatOverlay'></div>");
@@ -12,13 +16,26 @@
         var btn = null;
         var txt = null;
 
+        /**
+         * int UI
+         */
         function init() {
             main.append($('<ul class="list-unstyled m-0">'
-                + '</ul><div class="d-flex vis-chatBoxInputWrap"><textarea></textarea>' +
+                + '</ul><div class="d-flex vis-chatBoxInputWrap"><textarea placeholder="broadcast message(beta)"></textarea>' +
                 '<button><i class="fa fa-paper-plane"></i></button></div>'));
             ul = main.find('ul');
             btn = main.find("button");
             txt = main.find("textarea");
+            txt.on("keydown", function (evt) {
+                var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : evt.keyCode;
+                if (keyCode == 13) {
+                    evt.preventDefault();
+                    onBtnClick(evt);
+                }
+                if (keyCode == 27) {
+                    txt.val('');
+                }
+            });
             btn.on('click', onBtnClick);
         };
         init();
@@ -27,6 +44,7 @@
             var d = { sessionid: VIS.context.getContext('#AD_Session_ID'),   txt: txt.val() };
             VIS.dataContext.postJSONData(VIS.Application.contextUrl + "Message/PushMessage", d, function (data) {
                 txt.val('');
+                txt.focus();
             });
         };
        
@@ -85,6 +103,6 @@
     };
 
     VIS.UserSession = UserSession();
-    //Register SSE
+    //Register for SSE
     VIS.sseManager.register(VIS.UserSession);
 })(VIS, jQuery);
