@@ -2072,7 +2072,11 @@ namespace VAdvantage.Model
                             var result = System.Threading.Tasks.Task.Run(async () => await DownloadFilesFromOCI(containerUri, downloadFullPath, filename)).ConfigureAwait(false).GetAwaiter().GetResult();
                             if (Directory.GetFiles(Path.Combine(filePath, "TempDownload", folder)).Length > 0)
                             {
-                                return folder;
+                                //Decrypt File
+                                SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                                //Delete file from temp folder
+                                System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
+                                //return folder;
                             }
                             else
                                 return Msg.GetMsg(GetCtx(), "VIS_OCIErrorOccurred");
