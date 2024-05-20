@@ -2069,7 +2069,7 @@ namespace VAdvantage.Model
                         if (!string.IsNullOrEmpty(containerUri))
                         {
                             string downloadFullPath = Path.Combine(Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
-                            var result = System.Threading.Tasks.Task.Run(async () => await DownloadFilesFromOCI(containerUri, Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]))).ConfigureAwait(false).GetAwaiter().GetResult();
+                            var result = System.Threading.Tasks.Task.Run(async () => await DownloadFilesFromOCI(containerUri, downloadFullPath, filename)).ConfigureAwait(false).GetAwaiter().GetResult();
                             if (Directory.GetFiles(Path.Combine(filePath, "TempDownload", folder)).Length > 0)
                             {
                                 return folder;
@@ -2299,7 +2299,7 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
         /// <param name="filepath">file path with folder</param>
         /// <param name="fileName">Name of the file</param>
         /// <returns>Status of files downloaded or not</returns>
-        public static async System.Threading.Tasks.Task<string> DownloadFilesFromOCI(string preAuth, string filepath, string fileName)
+        public static async System.Threading.Tasks.Task<string> DownloadFilesFromOCI(string preAuth, string downloadFilePath, string fileName)
         {
             try
             {
@@ -2311,7 +2311,7 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
                         System.Console.WriteLine("Error while downloading File");
                         return "DownloadingError";
                     }
-                    using (var fileStream = new FileStream(Path.Combine(filepath, fileName), FileMode.Create))
+                    using (var fileStream = new FileStream(downloadFilePath, FileMode.Create))
                     {
                         await response.Content.CopyToAsync(fileStream);
                     }
