@@ -347,7 +347,7 @@ namespace VAdvantage.Model
                 }
             }
 
-            
+
 
             if (column.GetAD_Reference_ID() == DisplayType.Date)
             {
@@ -369,7 +369,6 @@ namespace VAdvantage.Model
             {
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
-
             return value.ToString();
         }
 
