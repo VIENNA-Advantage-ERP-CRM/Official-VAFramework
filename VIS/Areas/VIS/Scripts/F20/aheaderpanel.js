@@ -829,7 +829,7 @@
             rootClass = 'vis-w-p-Header-Root-h';//Fixed Class for Horizontal Alignment
         }
 
-        if (!this.headerItems && this.headerItems.length >= 0) {
+        if (this.headerItems && this.headerItems.length >= 0) {
 
 
 
