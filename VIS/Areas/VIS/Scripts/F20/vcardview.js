@@ -1093,6 +1093,7 @@
         this.styleTag = document.createElement('style');
         this.windowNo = windowNo;
         this.fieldStyles = fieldStyles;
+        this.tabID = aPanel.curTab.getAD_Tab_ID();
 
 
         var root = $('<div class="vis-cv-card va-dragdrop" data-recid=' + record.recid + ' name = vc_' + record.recid + ' ></div>');
@@ -2065,7 +2066,7 @@
      */
     VCard.prototype.applyCustomUIForFieldValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle) {
         var style = fieldValueStyle;
-        var dynamicClassName = "vis-hp-card-FieldValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
+        var dynamicClassName = "vis-hp-card-FieldValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
         if (style && style.toLower().indexOf("@value::") > -1) {
             style = getStylefromCompositeValue(style, "@value::");
         }
@@ -2085,7 +2086,7 @@
      */
     VCard.prototype.applyCustomUIForLabelValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle) {
         var style = fieldValueStyle;
-        var dynamicClassName = "vis-hp-card-LabelValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
+        var dynamicClassName = "vis-hp-card-LabelValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID  + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
         if (style && style.toLower().indexOf("@value::") > -1) {
             style = getStylefromCompositeValue(style, "@value::");
         }
@@ -2180,7 +2181,7 @@
      * @param {any} padding
      */
     VCard.prototype.applyCustomUISettings = function (headerSeqNo, startCol, colSpan, startRow, rowSpan, justify, alignment, backColor, fontColor, fontSize, padding) {
-        var dynamicClassName = "vis-hp-card-FieldGroup_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + headerSeqNo;
+        var dynamicClassName = "vis-hp-card-FieldGroup_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID + "_" + headerSeqNo;
         this.dynamicStyle.push("." + dynamicClassName + "  {grid-column:" + startCol + " / span " + colSpan + "; grid-row: " + startRow + " / span " + rowSpan + ";");
 
         this.dynamicStyle.push("justify-content:" + this.textAlignEnum[justify] + ";align-items:" + this.alignItemEnum[alignment]);

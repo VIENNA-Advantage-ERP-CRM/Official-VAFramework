@@ -20,6 +20,7 @@ import "../processengine/processparameter.js";
 import "../app/datacontext.js";
 import "../app/calloutengine.js";
 import "../home/home.js";
+import "../home/home1.js";
 import "../home/changeuserimage.js";
 import "../home/shortcut.js";
 import "../app/historymgr.js";
