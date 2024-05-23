@@ -253,7 +253,7 @@
             btnSave.on("click", saveRowTemp);
             btnOk.on("click", function () {
                 excuteQuery();
-                curTab.dataRefreshAll();
+               // curTab.dataRefreshAll();
             });
             btnCancel.on("click", function () {
                 dispose();
