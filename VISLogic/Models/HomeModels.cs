@@ -107,6 +107,11 @@ namespace VIS.Models
             return true;
         }
 
+        /// <summary>
+        /// Get Home page widget
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<HomeWidget> GetHomeWidget(Ctx ctx)
         {
 
@@ -146,6 +151,11 @@ namespace VIS.Models
             return list;
         }
 
+        /// <summary>
+        /// Get User Widgets
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<HomeWidget> GetUserWidgets(Ctx ctx)
         {
             string sql = @"SELECT AD_UserHomeWidget.AD_UserHomeWidget_ID, AD_UserHomeWidget.componentID,componentType,SRNO,AdditionalInfo FROM AD_UserHomeWidget
@@ -176,6 +186,12 @@ namespace VIS.Models
             return list;
         }
 
+        /// <summary>
+        /// Save Dasboard
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="widgetSizes"></param>
+        /// <returns></returns>
         public int SaveDashboard(Ctx ctx, List<WidgetSize> widgetSizes)
         {
             DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE AD_User_ID="+ctx.GetAD_User_ID()+" AND AD_Role_ID="+ctx.GetAD_Role_ID());
@@ -192,6 +208,12 @@ namespace VIS.Models
             return 1;
         }
 
+        /// <summary>
+        /// Save widget on drop
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="widgetSizes"></param>
+        /// <returns></returns>
         public int SaveSingleWidget(Ctx ctx, List<WidgetSize> widgetSizes)
         {
             MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
@@ -207,6 +229,12 @@ namespace VIS.Models
             return mUserHomeWidget.Get_ID();
         }
 
+        /// <summary>
+        /// Delete Widgets
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public int DeleteWidgetFromHome(Ctx ctx,int id)
         {
             DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE  AD_UserHomeWidget_ID=" + id);
