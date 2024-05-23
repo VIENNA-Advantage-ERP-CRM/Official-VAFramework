@@ -3170,6 +3170,7 @@
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
+            this.setBusy(false, true);
             return false;
         }
 
