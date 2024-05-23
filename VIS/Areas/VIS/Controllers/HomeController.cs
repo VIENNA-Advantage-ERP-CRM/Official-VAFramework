@@ -419,8 +419,6 @@ namespace VIS.Controllers
         public ActionResult Home()
         {
 
-
-
             Ctx ct = Session["ctx"] as Ctx;
             ViewBag.Current_Ad_Lang = ct.GetAD_Language();
             objHomeHelp = new HomeHelper();
@@ -440,20 +438,27 @@ namespace VIS.Controllers
             return PartialView(HM);
         }
 
-        //public ActionResult Manifest()
-        //{
-        //    Response.ContentType = "text/cache-manifest";
-        //    Response.ContentEncoding = System.Text.Encoding.UTF8;
-        //    Response.Cache.SetCacheability(
-        //        System.Web.HttpCacheability.NoCache);
-        //    return View();
-        //}
+        public ActionResult HomeNew()
+        {
+            Ctx ct = Session["ctx"] as Ctx;
+            ViewBag.lang = ct.GetAD_Language();
+            return PartialView("HomeNew");
+        }
+
+            //public ActionResult Manifest()
+            //{
+            //    Response.ContentType = "text/cache-manifest";
+            //    Response.ContentEncoding = System.Text.Encoding.UTF8;
+            //    Response.Cache.SetCacheability(
+            //        System.Web.HttpCacheability.NoCache);
+            //    return View();
+            //}
 
 
-        #region Follups start
-        /*----------------Folloups Strat-----------------------*/
-        // Get Folloups
-        [AjaxAuthorizeAttribute]
+            #region Follups start
+            /*----------------Folloups Strat-----------------------*/
+            // Get Folloups
+            [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public JsonResult GetJSONFllups(int fllPageSize, int fllPage, Boolean isRef)
@@ -862,6 +867,13 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
             return homeModels.SaveDashboard(ctx, widgetSizes);
+        } 
+        
+        public int SaveSingleWidget(List<WidgetSize> widgetSizes)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return homeModels.SaveSingleWidget(ctx, widgetSizes);
         } 
         public int DeleteWidgetFromHome(int id)
         {

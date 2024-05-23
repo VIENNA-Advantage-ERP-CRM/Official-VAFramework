@@ -578,12 +578,6 @@
                 });
                 /* Start Referesh New tab data */
 
-                var www = new VIS.AForm(500);
-                www.openWidget('VIS.React.TestComponent',99999);
-                $('#welcomeScreen').empty();
-                $('#welcomeScreen').append(www.getRoot());
-
-
                 /* start  bind click event of Main data container of Tab Menu */
                 //for notice and request
                 WelcomeTabDatacontainers.on("click", function (evnt) {
@@ -1185,13 +1179,7 @@
                     console.log("PleaseInstallWSPModule");
 
                 }
-
-                var www = new VIS.AForm();
-                www.openWidget('VIS.TestForm', 99999);
-                FllUpsMain.empty();
-                FllUpsMain.append(www.getRoot());
-
-               
+              
                 /*End Wsp Module */
             });
         }

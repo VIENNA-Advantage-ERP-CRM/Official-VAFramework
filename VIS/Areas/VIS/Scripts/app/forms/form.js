@@ -82,10 +82,14 @@
 
     //Must Implement with same parameter
     VIS.TestForm.prototype.init = function (windowNo, frame) {
-        //Assign to this Varable
+        //Assign to this Varable      
         this.frame = frame;
         this.frame.getContentGrid().append(this.getRoot());
     };
+
+    VIS.TestForm.prototype.widgetSizeChange = function (size) {
+       
+    }
 
     VIS.TestForm.prototype.widgetFirevalueChanged = function (value) {     
         // this.getRoot().trigger('widgetFirevalueChanged', value); // Trigger custom event with the value

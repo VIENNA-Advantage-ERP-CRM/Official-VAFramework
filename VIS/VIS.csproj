@@ -878,7 +878,7 @@
     <Content Include="Areas\VIS\Views\CardViewWizard\Index.cshtml" />
     <Content Include="Areas\VIS\Views\AccountForm\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
-    <Content Include="Areas\VIS\Views\Home\HomeOld.cshtml" />
+    <Content Include="Areas\VIS\Views\Home\Home.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
@@ -889,7 +889,7 @@
     <Content Include="Areas\VIS\Views\Chat\LoadChat.cshtml" />
     <Content Include="Areas\VIS\Views\Email\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Email\Init.cshtml" />
-    <Content Include="Areas\VIS\Views\Home\Home.cshtml" />
+    <Content Include="Areas\VIS\Views\Home\HomeNew.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Home\TimeoutRedirect.cshtml" />
     <Content Include="Areas\VIS\Views\Home\_Login.cshtml" />

@@ -18,7 +18,7 @@
 }
 
 
-.scrollerHorizontal {
+.scrollerHorizontal, .scrollerHorizontalWidget {
     position: absolute;
     z-index: 1;
     height: 100%;
@@ -3625,6 +3625,7 @@ ul.vis-userLinks-ListMenu li a i {
 
 #vis_editHome{
     cursor:pointer;
+    display:none;
 }
 
 .vis-editModeWidget .vis-widget-item, 
@@ -3634,4 +3635,8 @@ ul.vis-userLinks-ListMenu li a i {
 
 .vis-widget-item .vis-height-full{
     width:100%;
+}
+
+.vis-editModeWidget .vis-widget-item .vis-height-full {
+    pointer-events: none;
 }
