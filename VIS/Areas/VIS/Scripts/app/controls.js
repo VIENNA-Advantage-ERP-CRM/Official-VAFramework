@@ -1080,7 +1080,7 @@
 
         IControl.call(this, $ctrl, VIS.DisplayType.Label, true, isADControl ? name : "lbl" + name);
         if (isMandatory) {
-            $ctrl.text(value).append("<sup>*</sup>");
+            $ctrl.append('<span>'+value+'</span>').append("<sup>*</sup>");
         }
         else {
             $ctrl.text(value);
@@ -2570,6 +2570,9 @@
                                     parseObj[Object.keys(result[i])[0].toLowerCase()] = result[i][Object.keys(result[i])[0]];
                                     parseObj[Object.keys(result[i])[1].toLowerCase()] = result[i][Object.keys(result[i])[1]];
                                     parseObj[Object.keys(result[i])[2].toLowerCase()] = result[i][Object.keys(result[i])[2]];
+                                    if (columnName.toUpperCase() == "M_PRODUCT_ID" && parseObj.finalvalue.indexOf(term) == -1) {
+                                        parseObj.finalvalue = parseObj.finalvalue + '_' + term;
+                                    }
                                     res.push({
                                         id: parseObj.id,
                                         value: VIS.Utility.Util.getIdentifierDisplayVal(parseObj.finalvalue)
@@ -2600,6 +2603,11 @@
                         }, 500);
                     } else {
                         self.setValue(item.id, true, true);
+                        
+                        if (columnName.toUpperCase() =='M_PRODUCT_ID') {
+                            VIS.context.setContext(self.lookup.windowNo, "AttrCode", item.id);
+                        }
+
                         if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
                             setTimeout(function () {
                                 self.editingGrid.editField(self.gridPos.recid, self.gridPos.col, item.id);
@@ -5175,11 +5183,11 @@
         var $img = $("<img >");
         var $icon = $("<i>");
         var $txt = $("<span>").text("-");
-        var $spanIcon = $('<a href="javascript:;" class="vis vis-edit vis-img-ctrl-icon">')
+        var $spanIcon = $('<span class="vis vis-edit vis-img-ctrl-icon">');
         var $ctrl = null;
         var dimension = "Thumb500x375";
 
-        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl', tabindex: '-1' });
+        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl'});
         $txt.css("color", "blue");
 
 
@@ -5199,7 +5207,7 @@
 
         var self = this; //self pointer
 
-        $spanIcon.on(VIS.Events.onClick, function (e) { //click handler
+        $ctrl.on(VIS.Events.onClick, function (e) { //click handler
             e.stopPropagation();
             if (!self.isReadOnly) {
                 //self.invokeActionPerformed({ source: self });

@@ -1180,7 +1180,7 @@ namespace VIS.Helpers
 
             Ver_Window_ID = 0;
             PO po = GetPO(ctx, InsAD_Table_ID, InsRecord_ID, whereClause, trx, inn.AD_WIndow_ID, inn.AD_Table_ID, inn.MaintainVersions, inserting, out Ver_Window_ID);
-
+            
             for (int i = 0; i < lstColumns.Count; i++)
             {
                 WindowField gField = m_fields.Where(a => a.ColumnName == lstColumns[i]).FirstOrDefault();
@@ -1222,7 +1222,10 @@ namespace VIS.Helpers
 
             // vinay bhatt window id
             po.SetAD_Window_ID(inn.AD_WIndow_ID);
-            //      
+            //Set selected tab ID 
+            //Lakhwinder 11 Apr 2024            
+            po.SetWindowTabID(inn.AD_Tab_ID);
+            
             // check and set field values based on Master Versions 
             // else execute normally
             bool hasSingleKey = true;
@@ -1815,11 +1818,13 @@ namespace VIS.Helpers
                 {
                     if (value != null && !value.Equals(""))
                     {
-                        value = Convert.ToDateTime(value).ToUniversalTime();
+                        if (!(value is DateTime))
+                            value = Convert.ToDateTime(value).ToUniversalTime();
                     }
                     if (oldValue != null && !oldValue.Equals(""))
                     {
-                        oldValue = Convert.ToDateTime(oldValue).ToUniversalTime();
+                        if (!(oldValue is DateTime))
+                            oldValue = Convert.ToDateTime(oldValue).ToUniversalTime();
                     }
                 }
                 if (field.DisplayType == DisplayType.Binary)
@@ -1949,13 +1954,18 @@ namespace VIS.Helpers
             if (VersionRecord)
             {
                 if (inn.ValidFrom != null)
-                    po.Set_Value("VersionValidFrom", inn.ValidFrom.Value.ToUniversalTime());
+                {
+                    if (!(inn.ValidFrom is DateTime))
+                        po.Set_Value("VersionValidFrom", Convert.ToDateTime(inn.ValidFrom.Value).ToUniversalTime());
+                    else
+                        po.Set_Value("VersionValidFrom", inn.ValidFrom.Value);
+                }
 
                 po.Set_Value("IsVersionApproved", true);
                 if (inn.ImmediateSave)
                 {
                     po.Set_Value("ProcessedVersion", true);
-                    po.Set_Value("VersionValidFrom", System.DateTime.Now.ToUniversalTime());
+                    po.Set_Value("VersionValidFrom", System.DateTime.Now);              
                 }
                 // Only increase record version if Version do not exist for same date
                 if (po.Get_ID() <= 0)
@@ -3798,7 +3808,7 @@ namespace VIS.Helpers
 
             for (int i = 0; i < lstFields.Count; i++)
             {
-                if (lstFields[i].lookupInfo != null && lstFields[i].AD_Reference_ID != DisplayType.Account)
+                if (lstFields[i].lookupInfo != null && lstFields[i].displayType != DisplayType.Account)
                 {
                     var lInfo = lstFields[i].lookupInfo;
                     if (!string.IsNullOrEmpty(lInfo.displayColSubQ) && gt.TableName.ToLower() != lInfo.tableName.ToLower())
@@ -3825,19 +3835,19 @@ namespace VIS.Helpers
                             selectDirect.Append(" ) AS ").Append(lstFields[i].ColumnName + "_T");
                         selectDirect.Append(',').Append(GetColumnSQL(true, lstFields[i]));
                     }
-                    else if (lstFields[i].lookupInfo != null && lstFields[i].AD_Reference_ID == DisplayType.Account)
-                    {
-                        if (selectDirect == null)
-                            selectDirect = new StringBuilder("SELECT ");
-                        else
-                            selectDirect.Append(",");
+                }
+                else if (lstFields[i].displayType == DisplayType.Account)
+                {
+                    if (selectDirect == null)
+                        selectDirect = new StringBuilder("SELECT ");
+                    else
+                        selectDirect.Append(",");
 
-                        selectDirect.Append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
-                            .Append(gt.TableName + "." + GetColumnSQL(false, lstFields[i])).Append(" ) AS ")
-                            .Append(GetColumnSQL(false, lstFields[i]) + "_T")
-                            .Append(',').Append(GetColumnSQL(true, lstFields[i]));
+                    selectDirect.Append("( SELECT C_ValidCombination.Combination FROM C_ValidCombination WHERE C_ValidCombination.C_ValidCombination_ID=")
+                     .Append(gt.TableName + "." + GetColumnSQL(false, lstFields[i])).Append(" ) AS ")
+                     .Append(GetColumnSQL(false, lstFields[i]) + "_T")
+                     .Append(',').Append(GetColumnSQL(true, lstFields[i]));
 
-                    }
                 }
             }
 

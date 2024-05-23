@@ -24,6 +24,9 @@ using VAdvantage.Login;
 using VAdvantage.Logging;
 using System.Data;
 using System.Threading;
+using VAdvantage.DataBase;
+using System.Text;
+using VAdvantage.Common;
 
 namespace VIS.Controllers
 {
@@ -319,10 +322,11 @@ namespace VIS.Controllers
                     // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
                     //{
                     //Cretae new Sessin
-                    MSession sessionNew = MSession.Get(ctx, true, GetVisitorIPAddress(true));
+                    MSession sessionNew = MSession.Get(ctx, true, Common.GetVisitorIPAddress(Request,true));
                     ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
                     sessionData.UserId = ctx.GetAD_User_ID();
                     sessionData.Name = ctx.GetAD_User_Name();
+                    sessionData.Key = ctx.GetAD_Session_ID();
                     ModelLibrary.PushNotif.SessionManager.Get().AddSession(ctx.GetAD_Session_ID(), sessionData);
 
                     _lockSlim.EnterReadLock();
@@ -394,6 +398,21 @@ namespace VIS.Controllers
                     /// Check applied for adding message to toastr if 2FA method is VA and VA App is not linked with device
                     if (!LoginHelper.IsDeviceLinked(ctx, AD_User_ID))
                         ModelLibrary.PushNotif.SSEManager.Get().AddMessage(ctx.GetAD_Session_ID(), Msg.GetMsg(ctx, "PlzLinkVAApp"));
+                    //Moved to Module VA093
+                    //Show If recording happening for Auto data marking
+                    //ViewBag.IsAutoDataMarking = MRole.GetDefault(ctx).IsAutoDataMarking();
+                    //ViewBag.ConfigModule = "";
+                    //if (Env.IsModuleInstalled("VA093_") && MRole.GetDefault(ctx).IsAutoDataMarking())
+                    //{
+                    //    ViewBag.ConfigModule = Util.GetValueOfString( DB.ExecuteScalar(@"SELECT m.Name,1 AS RowNumber FROM  VA093_AutoMarkingConfig adc 
+                    //                            INNER JOIN AD_ModuleInfo m ON (m.AD_ModuleInfo_ID=adc.VA093_RefModule_ID)
+                    //                            WHERE adc.Processed='N' AND adc.IsActive='Y' AND adc.AD_Role_ID="+ctx.GetAD_Role_ID()+ @"
+                    //                            UNION 
+                    //                            SELECT m.Name,2 AS RowNumber FROM AD_ModuleInfo m
+                    //                            WHERE m.Prefix='VA093_' ORDER BY RowNumber"));
+                       
+
+                    //}
 
                     VAdvantage.Classes.ThreadInstance.Get().Start();
                 }
@@ -471,65 +490,6 @@ namespace VIS.Controllers
 
         }
 
-        /// <summary>
-        /// method to get Client ip address
-        /// </summary>
-        /// <param name="GetLan"> set to true if want to get local(LAN) Connected ip address</param>
-        /// <returns></returns>
-        public string GetVisitorIPAddress(bool GetLan = false)
-        {
-            string visitorIPAddress = Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-
-            if (String.IsNullOrEmpty(visitorIPAddress))
-                visitorIPAddress = Request.ServerVariables["REMOTE_ADDR"];
-
-            if (string.IsNullOrEmpty(visitorIPAddress))
-                visitorIPAddress = Request.UserHostAddress;
-
-            if (string.IsNullOrEmpty(visitorIPAddress) || visitorIPAddress.Trim() == "::1")
-            {
-                GetLan = true;
-                visitorIPAddress = string.Empty;
-            }
-
-            if (GetLan)
-            {
-                if (string.IsNullOrEmpty(visitorIPAddress))
-                {
-                    //This is for Local(LAN) Connected ID Address
-                    string stringHostName = Dns.GetHostName();
-                    //Get Ip Host Entry
-                    IPHostEntry ipHostEntries = Dns.GetHostEntry(stringHostName);
-                    //Get Ip Address From The Ip Host Entry Address List
-                    IPAddress[] arrIpAddress = ipHostEntries.AddressList;
-
-                    try
-                    {
-                        visitorIPAddress = arrIpAddress[arrIpAddress.Length - 2].ToString();
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            visitorIPAddress = arrIpAddress[0].ToString();
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                arrIpAddress = Dns.GetHostAddresses(stringHostName);
-                                visitorIPAddress = arrIpAddress[0].ToString();
-                            }
-                            catch
-                            {
-                                visitorIPAddress = "127.0.0.1";
-                            }
-                        }
-                    }
-                }
-            }
-            return visitorIPAddress;
-        }
 
 
 

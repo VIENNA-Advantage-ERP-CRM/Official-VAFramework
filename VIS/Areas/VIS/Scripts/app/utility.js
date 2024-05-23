@@ -273,6 +273,9 @@
             //maximumFractionDigits set to 6, so that same decimal value can be generated. We assume that in our system there will be no amount more than 6 decimal places
             var formattedAmount = this.GetFormatedValue(amount).toLocaleString(undefined, { maximumFractionDigits: 6 });//.toFixed(2);
             // 2nd parameter changed from init to formatonly because init was checking . only.
+            // new case if browser culture is in decimal coma, and init is in decimal dot point
+            if (!VIS.Env.isDecimalPoint() && formattedAmount.contains("."))
+                formattedAmount = formattedAmount.replace(".", ",");
             return this.GetFormatAmount(formattedAmount, "formatOnly", VIS.Env.isDecimalPoint());
         };
 

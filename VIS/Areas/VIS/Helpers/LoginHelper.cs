@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -31,7 +32,7 @@ namespace VIS.Helpers
         /// <param name="roles">out roles , has role list of user</param>
         /// <param name="ctx" ></param>
         /// <returns>true if athenicated</returns>
-        public static bool Login(LoginModel model, out List<KeyNamePair> roles)
+        public static bool Login(LoginModel model, out List<KeyNamePair> roles,string IP)
         {
             // loginModel = null;
             //bool isMatch = false;
@@ -65,9 +66,7 @@ namespace VIS.Helpers
             SqlParameter[] param = new SqlParameter[1];
             param[0] = new SqlParameter("@username", model.Login1Model.UserValue);
 
-
-
-            DataSet dsUserInfo = DB.ExecuteDataset("SELECT AD_User_ID, Value, Password,IsLoginUser,FailedLoginCount, IsOnlyLDAP FROM AD_User WHERE Value=@username", param);
+            DataSet dsUserInfo = DB.ExecuteDataset("SELECT AD_User_ID, Value, Password,IsLoginUser,FailedLoginCount, IsOnlyLDAP,IP_Address FROM AD_User WHERE Value=@username", param);
             if (dsUserInfo != null && dsUserInfo.Tables[0].Rows.Count > 0)
             {
                 // skipped Login user check for SuperUser (100)
@@ -84,6 +83,26 @@ namespace VIS.Helpers
                     && isLDAP && !authenticated)
                 {
                     throw new Exception(output);
+                }
+                
+                string ipAddress = Util.GetValueOfString(dsUserInfo.Tables[0].Rows[0]["IP_Address"]);
+                if (!string.IsNullOrEmpty(ipAddress))
+                {
+                    bool ipMatch = false;
+                    List<string> userIPList = new List<string>(ipAddress.Split(','));
+                    for (int i = 0; i < userIPList.Count; i++)
+                    {
+                        if (userIPList[i].Trim() == IP)
+                        {
+                            ipMatch = true;
+                            break;
+                        }
+                    }
+
+                    if (!ipMatch)
+                    {
+                        throw new Exception("AccessNotGranted");
+                    }
                 }
             }
             else

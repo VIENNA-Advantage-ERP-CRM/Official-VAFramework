@@ -326,10 +326,10 @@ namespace VAdvantage.Process
         public void GetSkipColumns()
         {
             defcolNames.Add("AD_Client_ID");
-            defcolNames.Add("AD_Org_ID");
+            //defcolNames.Add("AD_Org_ID");
             defcolNames.Add("Created");
             defcolNames.Add("CreatedBy");
-            defcolNames.Add("UpdatedBy");
+            //defcolNames.Add("UpdatedBy");
             defcolNames.Add("Updated");
             defcolNames.Add("Export_ID");
             defcolNames.Add("Processed");

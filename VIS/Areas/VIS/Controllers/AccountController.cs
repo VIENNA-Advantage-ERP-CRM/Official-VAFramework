@@ -14,6 +14,8 @@ using System.ComponentModel;
 using System.Threading;
 using Newtonsoft.Json;
 using VAdvantage.Logging;
+using System.Net;
+using VAdvantage.Common;
 
 namespace VIS.Controllers
 {
@@ -130,7 +132,8 @@ namespace VIS.Controllers
                     //Pwd is assigned to tempdata, bcoz if user's passsword setting is encrypted, then code encrypt the pwd to use in query.
                     //But original pwd entered by user is required in reset pwd setup.. to match with new pwd.
                     TempData["Password"] = model.Login1Model.Password;
-                    if (LoginHelper.Login(model, out roles))
+                    string IP = Common.GetVisitorIPAddress(Request,false);
+                    if (LoginHelper.Login(model, out roles,IP))
                     {
                         // ViewBag.QRCodeURL = model.Login1Model.QRCodeURL;
                         TempData["roles"] = roles;
@@ -166,6 +169,7 @@ namespace VIS.Controllers
             // If we got this far, something failed
             return Json(new { errors = GetErrorsFromModelState() });
         }
+
         [NonAction]
         private JsonResult Login(LoginModel model, string returnUrl, List<KeyNamePair> roles)
         {
