@@ -1269,6 +1269,17 @@
             this.rendred = true;
         }
         else {
+            if (this.grid.fixedBody !== !multiTabView) {
+                this.grid.fixedBody = !multiTabView;
+                if (this.grid.fixedBody) {
+                    this.$container.height(this.$container.parent().height());
+                }
+            }
+            //this.grid.fixedBody = !multiTabView;
+            //window.setTimeout(function (tht) {
+            //    tht.grid.resize();
+            //   // that.grid.reload();
+            //},2000, this);
             //this.grid.refresh();
             //this.grid.resize();
 
