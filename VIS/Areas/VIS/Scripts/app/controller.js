@@ -4405,6 +4405,9 @@
                     var str = colValue.toString();
                     if (field.getIsEncryptedColumn())
                         str = this.decrypt(str);
+                    // VIS0008 fix done to check boolean value
+                    if (str.toLower().equals("true"))
+                        str = "Y";
                     colValue = str.equals("Y");	//	Boolean
                 }
                 //	LOB
