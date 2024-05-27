@@ -28,12 +28,16 @@
 
             // Function to resize the widget container based on window size
             function resizeWidgetContainer() {
-                var w = $home.find('.vis-home-leftPanel').width() || $(window).width();
-                w = (w - 25) / 9;
+                var wd = $home.find('.vis-home-leftPanel').width();
+                if (wd < 300) {
+                    wd = $(window).width(); 
+                }
+
+                var w = (wd - 25) / 9;
                 if ($(window).width() <= 500) {
-                    w = (w - 25) / 3;
+                    w = (wd - 25) / 3;
                 } else if ($(window).width() <= 960) {
-                    w = (w - 25) / 6;
+                    w = (wd - 25) / 6;
                 } 
 
 

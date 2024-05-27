@@ -2211,6 +2211,11 @@
                     if (!selfPan.actionButton(action.source, controller)) {
                         selfPan.setBusy(false, true);
                     }
+
+                    if (action.source.mField.getIsAction()) {
+                        selfPan.setBusy(false, true);
+                    }
+
                     return;
                 }
             }

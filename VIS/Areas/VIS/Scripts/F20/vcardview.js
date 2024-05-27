@@ -1698,7 +1698,7 @@
 
                     if (!value && value != 0)
                         value = ' -- ';
-                    value = w2utils.encodeTags(value);
+                    //value = w2utils.encodeTags(value);
 
                     if (field.getIsEncryptedField()) {
                         value = value.replace(/\w|\W/g, "*");
