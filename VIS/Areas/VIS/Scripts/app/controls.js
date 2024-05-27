@@ -6883,11 +6883,7 @@
         }
         else {
             this.setReadOnly(false);
-        }
-
-        function setChangeValue() {
-
-        }
+        }      
 
         this.getBtn = function (index) {
             if (index == 0 ) {
