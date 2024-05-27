@@ -6885,6 +6885,10 @@
             this.setReadOnly(false);
         }
 
+        function setChangeValue() {
+
+        }
+
         this.getBtn = function (index) {
             if (index == 0 ) {
                 //this.setReadOnly(true);
@@ -6901,11 +6905,9 @@
 
         var self = this; //self pointer
 
-        /* Event */
-        $ctrl.on("change", function (e) {
-            e.stopPropagation();
-           //var newVal = $ctrl.val();
-            var newVal = self.iti ? self.iti.getNumber():self.ctrl.val();
+        function setChangeValue(e) {
+            //var newVal = $ctrl.val();
+            var newVal = self.iti ? self.iti.getNumber() : self.ctrl.val();
             this.value = newVal;
             if (newVal !== self.oldValue) {
                 var evt = { newValue: newVal, propertyName: self.getName() };
@@ -6915,6 +6917,12 @@
             if (obscureType) {
                 self.setReadOnly(true);
             }
+        }
+
+        /* Event */
+        $ctrl.on("change", function (e) {
+            e.stopPropagation();
+            setChangeValue(e);
         });
 
 
@@ -6931,16 +6939,8 @@
 
         $ctrl.on("countrychange", function (e, countryData) {
             e.stopPropagation();
-            //var newVal = $ctrl.val();
-            var newVal = self.iti ? self.iti.getNumber() : self.ctrl.val();
-            this.value = newVal;
-            if (newVal !== self.oldValue) {
-                var evt = { newValue: newVal, propertyName: self.getName() };
-                self.fireValueChanged(evt);
-                evt = null;
-            }
-            if (obscureType) {
-                self.setReadOnly(true);
+            if (!self.settingVal) {
+                setChangeValue(e);
             }
         });
 
