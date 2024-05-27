@@ -1286,7 +1286,7 @@
             }
             else {
                 if (this.vHeaderPanel != null) {
-                    if (this.gTab.isHPanelNotShowInMultiRow && !this.singleRow()) {
+                    if (this.gTab.isHPanelNotShowInMultiRow && !this.gTab.getIsSingleRow()) {
                         this.vHeaderPanel.hidePanel();
                     }
                     else {
