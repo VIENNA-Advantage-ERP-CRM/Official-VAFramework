@@ -124,7 +124,7 @@
             rightDiv = $("<div class='vis-cv-rd'>");
             //bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div>');
             //root.append(bsyDiv);
-            //bsyDiv.css("display", 'none');
+            //bsyDiv.css("display", 'none');startCol
             body = $("<div class='vis-cv-main' style='max-width:" + width + "px'>");
             headerdiv = $("<div class='vis-cv-header'>");
             $cmbCards = $('<input  class="vis-vs-card-autoComplete" style="display:inline">')
@@ -1176,14 +1176,14 @@
                 var $label = null;
                 var iControl = null;
                 var gridLayout_ID = currentItem.AD_GridLayout_ID;
-                if (!this.fieldStyles[startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID])
-                    this.fieldStyles[startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID] = {};
+                if (!this.fieldStyles[this.tabID + '_' +startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID])
+                    this.fieldStyles[this.tabID + '_' +startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID] = {};
                 //Apply HTML Style
-                this.dynamicClassName = this.fieldStyles[startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID]['applyCustomUISettings'];
+                this.dynamicClassName = this.fieldStyles[this.tabID + '_' +startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID]['applyCustomUISettings'];
                 if (!this.dynamicClassName) {
                     this.dynamicClassName = this.applyCustomUISettings(headerSeqNo, startCol, colSpan, startRow, rowSpan, justyFy, alignItem,
                         backgroundColor, FontColor, fontSize, fieldPadding);
-                    this.fieldStyles[startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID]['applyCustomUISettings'] = this.dynamicClassName;
+                    this.fieldStyles[this.tabID + '_' +startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID]['applyCustomUISettings'] = this.dynamicClassName;
                 }
 
                 // Find the div with dynamic class from container. Class will only be available in DOm if two fields are having same item seq. No.
