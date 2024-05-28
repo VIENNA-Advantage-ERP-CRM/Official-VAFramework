@@ -240,7 +240,7 @@ namespace VISLogic.Models
                         {
                             sbSql.Clear();
                             sbSql.Append(@"SELECT COUNT(" + rowData.TableName + "_ID) FROM " + rowData.TableName + "_Ver " +
-                                " WHERE " + rowData.TableName + "_ID = " + rowData.Record_ID + " AND ProcessedVersion = 'N' AND VersionLog IS NULL AND TRUNC(VersionValidFrom) >= TRUNC(SYSDATE)");
+                                " WHERE " + rowData.TableName + "_ID = " + rowData.Record_ID + " AND COALESCE(ProcessedVersion,'N') != 'Y' AND VersionLog IS NULL AND TRUNC(VersionValidFrom) >= TRUNC(SYSDATE)");
                             Count = Util.GetValueOfInt(DB.ExecuteScalar(sbSql.ToString()));
                             if (Count > 0)
                                 return true;
@@ -275,7 +275,7 @@ namespace VISLogic.Models
                         }
                         if (hasCols)
                         {
-                            sbSql.Append(" AND ProcessedVersion = 'N' AND VersionLog IS NULL AND TRUNC(VersionValidFrom) >= TRUNC(SYSDATE)");
+                            sbSql.Append(" AND COALESCE(ProcessedVersion,'N') != 'Y' AND VersionLog IS NULL AND TRUNC(VersionValidFrom) >= TRUNC(SYSDATE)");
                             Count = Util.GetValueOfInt(DB.ExecuteScalar(sbSql.ToString()));
                             if (Count > 0)
                                 return true;
