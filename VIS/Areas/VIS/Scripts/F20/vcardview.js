@@ -2051,7 +2051,9 @@
      * Add dynamically created style tags to HTML document
      * */
     VCard.prototype.addStyleToDom = function () {
+        $('head').find("[cardview='true']").remove();
         this.styleTag.type = 'text/css';
+        $(this.styleTag).attr("cardview", "true")
         this.styleTag.innerHTML = this.dynamicStyle.join(" ");
         $($('head')[0]).append(this.styleTag);
     };
