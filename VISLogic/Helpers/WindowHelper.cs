@@ -1231,8 +1231,16 @@ namespace VIS.Helpers
             bool hasSingleKey = true;
             if (inn.MaintainVersions)
             {
+                // VIS0008 Bug fix in case of update version (overwrite case)
+                int recVersion = Util.GetValueOfInt(po.Get_Value("RecordVersion"));
+                int oldVersion = Util.GetValueOfInt(po.Get_Value("OldVersion"));
                 /// VIS0008 copy orginal PO to the po object of Version
                 OrigPO.CopyTo(po);
+                if (po.Get_ID() > 0)
+                {
+                    po.Set_Value("RecordVersion", recVersion);
+                    po.Set_Value("OldVersion", oldVersion);
+                }
                 MTable tblParent = new MTable(ctx, AD_Table_ID, trx);
                 hasSingleKey = tblParent.IsSingleKey();
                 po.SetAD_Window_ID(Ver_Window_ID);
