@@ -513,6 +513,7 @@
                 if (isBusy) return;
                 $self.okBtnPressed = false;
                 ch.close();
+                VIS.Env.setIsAdvanceSearch(false);
             });
 
             chkDynamic.on("change", function () {
@@ -756,6 +757,7 @@
                         if (no != 0) {
                             $self.okBtnPressed = true;
                             ch.close();
+                           // VIS.Env.setIsAdvanceSearch(false);
                             //Close(_isOkButtonPressed);
                         }
                     }, 10);
@@ -764,6 +766,7 @@
                     // SetBusy(false);
                     $self.okBtnPressed = false;
                     ch.close();
+                   // VIS.Env.setIsAdvanceSearch(false);
                     // Close(_isOkButtonPressed);
                 }
             });
@@ -834,7 +837,10 @@
                 $self.okPressed = true;
                 $self.okBtnPressed = true;
                 //	Save pending
+               
+                VIS.Env.setAdvanceFlag(true);
                 saveAdvanced();
+                //VIS.Env.setIsAdvanceSearch(false);
             });
 
             btnRefresh.on("click", function () {
@@ -1897,12 +1903,15 @@
             if (query.getRestrictionCount() == 0) {
                 setBusy(false);
                 ch.close();
+               // VIS.Env.setIsAdvanceSearch(false);
+                return;
                 return;
             }
 
 
             // get where clause
             var where = query.getWhereClause(true);
+            VIS.Env.setAdvanceWhere(where);
             // get query name entered by the user
             var name = VIS.Utility.encodeText(txtQryName.val());// vtxtQueryName.Text.Trim();
             if (name != null && name.trim().length == 0)
@@ -1955,6 +1964,7 @@
                 }
                 if (result) {
                     ch.close();
+                   // VIS.Env.setIsAdvanceSearch(false);
                 }
             }, 10);
         };
@@ -2008,6 +2018,7 @@
             //}, 100);
 
             //  bindEvents();
+            VIS.Env.setIsAdvanceSearch(true);
         };
 
         this.getSavedQueryName = function () {
@@ -2045,6 +2056,7 @@
             this.created = this.days = 0, this.okPressed = this.okBtnPressed = null;
             control1 = control2 = ulListStaticHtml = null;
             query = null;
+            
         };
     };
 

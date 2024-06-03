@@ -513,6 +513,12 @@
         var windowNo = 1;
         var WINDOW_PAGE_SIZE = 50;
         var window_height = 400;
+        var filterWhere = "";
+        var advanceWhere = "";
+        var isAdvanceSearch = false;
+        var isFilter = false;
+        var advanceFlag = false;
+        var filterFlag = false;
         var NULLString = "NULLValue";
         var obscureTypes = { DigitButLast4: "904", DigitButFirstLast4: "944", AlphanumButLast4: "A04", AlphaNumButFirstLast4: "A44" };
 
@@ -778,6 +784,51 @@
             window_height = height
         };
 
+        function getFilterWhere() {
+            return filterWhere;
+        };
+
+        function setFilterWhere(where) {
+            filterWhere = where
+        };
+
+        function getIsAdvanceSearch() {
+            return isAdvanceSearch;
+        };
+
+        function setIsAdvanceSearch(aSearch) {
+            isAdvanceSearch = aSearch
+        };
+
+        function getAdvanceWhere() {
+            return advanceWhere;
+        };
+
+        function setAdvanceWhere(where) {
+            advanceWhere = where
+        };
+
+        function getIsFilter() {
+            return isFilter;
+        };
+        function setIsFilter(filter) {
+            isFilter = filter;
+        };
+        function getFilterFlag() {
+            return filterFlag;
+        };
+
+        function setFilterFlag(fil) {
+            filterFlag= fil;
+        };
+
+        function getAdvanceFlag() {
+            return advanceFlag;
+        };
+        function setAdvanceFlag(adv) {
+            advanceFlag = adv
+        };
+
         function getPreference(ctx, AD_Window_ID, context, system) {
             /**************************************************************************
          *	Get Preference.
@@ -995,6 +1046,18 @@
             setWINDOW_PAGE_SIZE: setWINDOW_PAGE_SIZE,
             setScreenHeight: setScreenHeight,
             getScreenHeight: getScreenHeight,
+            getFilterWhere: getFilterWhere,
+            setFilterWhere: setFilterWhere,
+            getIsAdvanceSearch: getIsAdvanceSearch,
+            setIsAdvanceSearch: setIsAdvanceSearch,
+            getIsFilter: getIsFilter,
+            setIsFilter: setIsFilter,
+            getAdvanceWhere: getAdvanceWhere,
+            setAdvanceWhere: setAdvanceWhere,
+            setAdvanceFlag: setAdvanceFlag,
+            getAdvanceFlag: getAdvanceFlag,
+            getFilterFlag: getFilterFlag,
+            setFilterFlag: setFilterFlag,
             getPreference: getPreference,
             getHeader: getHeader,
             clearWinContext: clearWinContext,

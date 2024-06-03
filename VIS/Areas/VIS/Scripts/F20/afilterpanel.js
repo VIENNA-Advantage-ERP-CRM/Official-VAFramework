@@ -361,6 +361,7 @@
             divStatic.find('.vis-fp-currntrcrdswrap').remove();
             divDynFilters.find('.vis-fp-currntrcrds').remove();
             dsAdvanceData = [];
+            VIS.Env.setFilterWhere("");
             cmbColumns.val(-1);
             cmbOp.val(-1);
             setControlNullValue();
@@ -368,7 +369,17 @@
         };
 
         this.getFilterClause = function () {
-            return prepareWhereClause(this);
+            var whereExtended = prepareWhereClause(this);
+            VIS.Env.setFilterWhere(whereExtended);
+           /* var query = new VIS.Query(this.curTab.getTableName()); //query
+            query.addRestriction(whereExtended); // restriction*/
+            if (whereExtended.length > 0) {
+                VIS.Env.setIsFilter(true);
+            } else {
+                VIS.Env.setIsFilter(false);
+            }
+            VIS.Env.setFilterFlag(true);
+            return whereExtended;
         };
 
         //dynamic
@@ -587,6 +598,7 @@
         };
 
         this.disposeComponent = function () {
+            VIS.Env.setFilterWhere("");
             bodyDiv.remove();
             this.listOfFilterQueries = [];
             self = null;
@@ -871,7 +883,7 @@
             dsAdvanceData[colValue].push({
                 'Name': colName, 'Value': value1Value, 'Value2': value1Value, 'Text': value1Name, 'Text2': value2Name, 'Optr': optr,
                 'Where': self.parseWhereCondition(colValue, optr, value1Value, value2Value)
-            });
+            });        
             refreshDynFiltersUI(colValue);
         };
 
@@ -888,7 +900,7 @@
                 //    }
                 //}
                 //if (values.length < 1)
-                delete dsAdvanceData[colValue];
+                delete dsAdvanceData[colValue];         
             }
             refreshDynFiltersUI(colValue);
         };
@@ -1422,6 +1434,15 @@
     FilterPanel.prototype.dispose = function () {
         this.disposeComponent();
         this.curGC = this.curTab = this.curTabfields = this.selectionfields = null;
+    };
+
+    FilterPanel.prototype.getWhereClause = function () {
+        return this.finalWhere;
+
+    };
+
+    FilterPanel.prototype.setWhereClause = function (sql) {
+        this.finalWhere = sql;
     };
 
     FilterPanel.prototype.getOperatorsQuery = function (vnpObj, translate) {

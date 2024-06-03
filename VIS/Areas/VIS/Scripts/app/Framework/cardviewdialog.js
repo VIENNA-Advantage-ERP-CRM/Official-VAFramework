@@ -98,6 +98,7 @@
         var templateName = null;
         var txtCustomStyle = null;
         var txtSQLQuery = null;
+        var txtStyleLogic = null;
         var CardCreatedby = null;
         var hideShowGridSec = null;
         var txtZoomInOut = null;
@@ -702,6 +703,17 @@
 
             });
 
+            txtStyleLogic.change(function () {
+                var selectedItem = DivViewBlock.find('.vis-active-block');
+                
+                if ($(this).val() == null || $(this).val() == "") {
+                    selectedItem.attr("styleLogic", "");
+                } else {
+                    selectedItem.attr("styleLogic", $(this).val());
+                }
+               
+            });
+
             txtZoomInOut.on('input', function () {
                 DivViewBlock.find('.canvas').css('zoom', $(this).val());
             })
@@ -982,6 +994,7 @@
                 DivCardFieldSec = root.find('#DivCardFieldSec_' + WindowNo);
                 txtCustomStyle = root.find('#txtCustomStyle_' + WindowNo);
                 txtSQLQuery = root.find('#txtSQLQuery_' + WindowNo);
+                txtStyleLogic = root.find('#txtStyleLogic_' + WindowNo);
                 txtZoomInOut = root.find('#txtZoomInOut_' + WindowNo);
                 btn_BlockCancel = root.find('#Btn_BlockCancel_' + WindowNo);
 
@@ -1456,6 +1469,7 @@
                         $(this).append('<sql>SQL</sql>');
                     }
                 })
+   
             } else {
                 isChangeTemplate = false;
                 if (isUndoRedo) {
@@ -3059,8 +3073,12 @@
                     }
                     else {
                         divTopNavigator.find('[command="Show"]').parent().hide();
-                        divTopNavigator.find('[command="Hide"]').parent().hide();
-
+                            divTopNavigator.find('[command="Hide"]').parent().hide();
+                        if ($(e.target)[0].innerText.length > 0 && $(e.target)[0].innerText && $(e.target).attr('query').length <= 0) {
+                            txtStyleLogic.removeClass('vis-disable-event');
+                        } else {
+                            txtStyleLogic.addClass('vis-disable-event');
+                        }
                         if ($(e.target).closest('.fieldGroup').length > 0) {
                             var target = $(e.target).closest('.fieldGroup').find('.fieldLbl');
                             var displayType = mTab.getFieldById(Number(target.attr('fieldid'))).getDisplayType();
@@ -4092,6 +4110,7 @@
                 if ($(this).find('sql').length > 0) {
                     columnSQL = $(this).attr('query') || null;
                 }
+                var styleLogic = $(this).attr('styleLogic') || null;
                 if ($(this).find('.fieldGroup:not(:hidden)').length > 0) {
                     $(this).find('.fieldGroup:not(:hidden)').each(function (index) {
                         isFieldLinked = true;
@@ -4143,6 +4162,7 @@
                             hideFieldIcon: hideFieldIcon,
                             hideFieldText: $(this).find('.fieldLbl').attr('showfieldtext') == 'true' ? true : false,
                             columnSQL: columnSQL,
+                            styleLogic: styleLogic,
                             contentFieldValue: null,
                             contentFieldLabel: null                            
                         }
@@ -4180,6 +4200,7 @@
                         hideFieldIcon: hideIcon,
                         hideFieldText: hideTxt,
                         columnSQL: columnSQL,
+                        styleLogic: styleLogic,
                         contentFieldValue: null,
                         contentFieldLabel: null
                     }
@@ -4299,6 +4320,11 @@
                 txtSQLQuery.val(VIS.secureEngine.decrypt(htm.attr("query")));
             } else {
                 txtSQLQuery.val('');
+            }
+            if (htm.attr("styleLogic")) {
+                txtStyleLogic.val(htm.attr("styleLogic"));
+            } else {
+                txtStyleLogic.val('');
             }
 
             //styles = styles.split(';');

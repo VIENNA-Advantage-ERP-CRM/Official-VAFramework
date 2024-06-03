@@ -1004,6 +1004,10 @@
 
         if (!VIS.Application.isMobile) {
             $txtSearch.on("keyup", function (e) {
+                VIS.Env.setAdvanceWhere("");
+                VIS.Env.setFilterWhere("");
+                VIS.Env.setAdvanceFlag(false);
+                VIS.Env.setFilterFlag(false);
                 var code = e.charCode || e.keyCode;
                 if (code == 13) {
                     if (!self.defaultSearch) {
@@ -1021,7 +1025,7 @@
                     query.addRestriction(" 1 = 1 ");
                     self.findRecords(query);
                 }
-            });
+            });          
         }
 
         $imgdownSearch.on("click", function () {
@@ -1926,6 +1930,10 @@
                        
                     }
                 }
+                VIS.Env.setAdvanceWhere("");
+                VIS.Env.setFilterWhere("");
+                VIS.Env.setAdvanceFlag(false);
+                VIS.Env.setFilterFlag(false);
                 gc.initFilterPanel(curWindowNo, this.getFilterPane());
 
                 tabElement = gc;
@@ -4984,7 +4992,7 @@
                 }
                 var findPressed = self.curTab.getIsQueryActive() || self.curTab.getOnlyCurrentDays() > 0;
                 self.aFind.setPressed(findPressed);
-
+                
 
             }
             ////Refresh everytime bcoz smtimes user create an ASearch and save it, 

@@ -1823,6 +1823,18 @@
             }
 
         }
+        if (VIS.Env.getFilterWhere().length > 0 && VIS.Env.getAdvanceFlag()) {
+            if (where.length > 0)
+                where += " AND ";
+            where += VIS.Env.getFilterWhere();
+            VIS.Env.setAdvanceFlag(false);
+        }
+        if (VIS.Env.getAdvanceWhere().length > 0 && VIS.Env.getFilterFlag()) {
+            if (where.length > 0)
+                where += " AND ";
+            where += VIS.Env.getAdvanceWhere();
+            VIS.Env.setFilterFlag(false);
+        }
         this.extendedWhere = where.toString();
         //if (this.oldCardQuery != this.cardWhereCondition) {
         //    refresh = false;
@@ -3983,6 +3995,17 @@
         var _whereClause = gt._whereClause;
 
         if (_whereClause.length > 0) {
+            if (VIS.Env.getIsAdvanceSearch() && VIS.Env.getFilterWhere().length > 0 && VIS.Env.getAdvanceFlag()) {
+                _whereClause += " AND " + VIS.Env.getFilterWhere();                
+                VIS.Env.setAdvanceFlag(false);
+
+            }
+
+            if (VIS.Env.getIsFilter() && VIS.Env.getAdvanceWhere().length > 0 && VIS.Env.getFilterFlag()) {
+                _whereClause += " AND " + VIS.Env.getAdvanceWhere();
+                VIS.Env.setFilterFlag(false);
+
+            }
             m_SQL_Where.append(" WHERE ");
             if (_whereClause.indexOf("@") == -1) {
                 m_SQL_Where.append(_whereClause);
@@ -4000,7 +4023,9 @@
                 this.log.Severe("Invalid NULL - " + _tableName + "=" + _whereClause);
             }
         }
+       
         this.whereClause = m_SQL_Where;
+
 
         this.SQL = this.SQL_Select + m_SQL_Where.toString();
         this.SQL_Count += m_SQL_Where.toString();
@@ -4157,7 +4182,7 @@
                     that.changed = false;
                     that.rowChanged = -1;
                     that.fillData(retObj);
-
+                   
                 }
                 else {
                     //console.log("clear");
@@ -4177,6 +4202,8 @@
                         that.fireQueryCompleted(true);//Inform GridController   
                     }, 300, that);
                 }
+                VIS.Env.setFilterFlag(false);
+                VIS.Env.setAdvanceFlag(false);
             },
             error: function () {
 

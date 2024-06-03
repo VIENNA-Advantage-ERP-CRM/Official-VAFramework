@@ -69,6 +69,8 @@ namespace VAdvantage.Controller
 
         public string ColSql = "";
 
+        public string FieldStyleLogic = "";
+
         public bool HideFieldIcon = false;
 
         public bool HideFieldText = false;
