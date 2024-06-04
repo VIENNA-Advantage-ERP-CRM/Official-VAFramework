@@ -271,6 +271,9 @@
 
 .vis-ad-w-p-center-flow-r {
     flex-direction: row;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 1fr;
+    display: grid;
 }
 
 .vis-ad-w-p-center-flow-b {
@@ -705,12 +708,21 @@ span.vis-ad-w-p-tb-rc-action {
     flex-direction: column;
     flex: 1;
     padding: 0 10px;
+    
+}
+.vis-ad-w-p-center-flow-r .vis-ad-w-p-center-view {
+    max-height: 100%;
+    overflow-y: auto;
+    position: absolute;
+    grid-column: 1 / 1;
+    width: 100%;
+    height:100%;
 }
 
-.vis-ad-w-p-center-view-height {
+/*.vis-ad-w-p-center-flow-r .vis-ad-w-p-center-view-height {
     min-height: 80%;
     max-height: 99%;
-}
+}*/
 
 
 .vis-ad-w-p-actionpanel-b {
@@ -796,8 +808,7 @@ span.vis-ad-w-p-tb-rc-action {
 
 
 .vis-ad-w-p-actionpanel-r {
-    /*grid-column: 2/2;
-    grid-row: 1/4;*/
+    grid-column: 2 / 2;
 }
 
 /*.vis-ad-w-p-actionpanel-b {
@@ -817,7 +828,7 @@ span.vis-ad-w-p-tb-rc-action {
 /*View Controller*/
 .vis-ad-w-p-vc {
     order: 0;
-    flex: 1;
+    flex: 0;
     display: grid;
     grid-template-rows: auto 1fr;
     grid-template-columns: auto 1fr;
@@ -830,6 +841,13 @@ span.vis-ad-w-p-tb-rc-action {
     height: auto;
 }
 
+.vis-ad-w-p-center-view-height .vis-ad-w-p-vc {
+    flex: 1;
+}
+.vis-ad-w-p-inc-content .vis-ad-w-p-vc
+{
+    flex:1;
+}
 /*tree css START here*/
 .vis-ad-w-p-vc-tree {
     grid-row: 1/3;

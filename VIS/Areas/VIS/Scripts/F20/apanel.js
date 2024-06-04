@@ -1973,6 +1973,7 @@
 
             this.getLayout().removeClass('vis-ad-w-p-center-view-height');
             this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
+            /*this.getLayout().find('.vis-ad-w-p-vc').addClass('vis-ad-w-p-vc-flex0');*/
             this.getLayout().find('.vis-ad-w-p-center-inctab').css("background", "rgba(var(--v-c-common), 1)");
             //this.setIncTabReziable();
         }
