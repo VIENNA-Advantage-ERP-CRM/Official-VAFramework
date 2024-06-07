@@ -855,6 +855,7 @@ span.vis-ad-w-p-tb-rc-action {
     display: flex;
     width: 300px;
     background: rgba(var(--v-c-secondary), 0.5);
+    min-height:150px;
 }
 
 .vis-css-treewindow ul,

@@ -1909,16 +1909,6 @@
                     this.curTab = gTab;
                     this.curGC = gc;
                     this.firstTabId = id;
-                    //if (query != null) {
-                    //    gTab.setQuery(query);
-                    //}
-                    //}
-
-
-                    ////Set Title of Tab
-                    //if (i === 0) {
-                    //    this.curGC = gc;
-                    //    this.firstTabId = id;
 
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
@@ -1973,9 +1963,7 @@
 
             this.getLayout().removeClass('vis-ad-w-p-center-view-height');
             this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
-            /*this.getLayout().find('.vis-ad-w-p-vc').addClass('vis-ad-w-p-vc-flex0');*/
             this.getLayout().find('.vis-ad-w-p-center-inctab').css("background", "rgba(var(--v-c-common), 1)");
-            //this.setIncTabReziable();
         }
         jsonData = null;
         $parent = null;
