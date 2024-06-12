@@ -842,13 +842,13 @@ namespace VIS.Controllers
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [HttpPost]
-        public JsonResult GetWidgets()
+        public JsonResult GetWidgets(int windowID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
 
             var shortCut = ShortcutHelper.GetShortcutItems(Session["ctx"] as Ctx);
-            var widgets = homeModels.GetHomeWidget(ctx);
+            var widgets = homeModels.GetHomeWidget(ctx, windowID);
             List<Object> list = new List<Object>();
             list.AddRange(widgets);
             list.AddRange(shortCut);
@@ -862,11 +862,11 @@ namespace VIS.Controllers
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [HttpPost]
-        public JsonResult GetUserWidgets()
+        public JsonResult GetUserWidgets(int windowID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels  homeModels = new HomeModels();
-            return Json(JsonConvert.SerializeObject(homeModels.GetUserWidgets(ctx)));
+            return Json(JsonConvert.SerializeObject(homeModels.GetUserWidgets(ctx, windowID)));
             
         }
 
@@ -875,11 +875,11 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="widgetSizes"></param>
         /// <returns></returns>
-        public int SaveDashboard(List<WidgetSize> widgetSizes)
+        public int SaveDashboard(List<WidgetSize> widgetSizes, int windowID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
-            return homeModels.SaveDashboard(ctx, widgetSizes);
+            return homeModels.SaveDashboard(ctx, widgetSizes, windowID);
         } 
         
         /// <summary>
@@ -887,11 +887,11 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="widgetSizes"></param>
         /// <returns></returns>
-        public int SaveSingleWidget(List<WidgetSize> widgetSizes)
+        public int SaveSingleWidget(List<WidgetSize> widgetSizes, int windowID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
-            return homeModels.SaveSingleWidget(ctx, widgetSizes);
+            return homeModels.SaveSingleWidget(ctx, widgetSizes, windowID);
         } 
 
         /// <summary>

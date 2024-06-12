@@ -1,16 +1,10 @@
-﻿using System;
+﻿using CoreLibrary.DataBase;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using VAdvantage.Utility;
-using VAdvantage.Model;
-using System.Web.Hosting;
-using System.Text;
-using System.IO;
-using VAdvantage.Logging;
-using CoreLibrary.DataBase;
 using System.Data;
-using Newtonsoft.Json.Linq;
+using VAdvantage.Logging;
+using VAdvantage.Model;
+using VAdvantage.Utility;
 
 namespace VIS.Models
 {
@@ -112,25 +106,50 @@ namespace VIS.Models
         /// </summary>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public List<HomeWidget> GetHomeWidget(Ctx ctx)
+        public List<HomeWidget> GetHomeWidget(Ctx ctx, int windowID)
         {
 
             List<HomeWidget> list = null;
-            string sql = @"SELECT AD_Widget.AD_Widget_ID,AD_Widget.Name,AD_Widget.displayName,AD_WidgetSize.className,AD_WidgetSize.Rowspan,AD_WidgetSize.Colspan,AD_WidgetSize.AD_WidgetSize_ID,AD_IMAGE.BINARYDATA,AD_ModuleInfo.name AS ModuleName FROM AD_Widget 
+            string sql = @"SELECT AD_Widget.AD_Widget_ID,AD_Widget.Name,AD_Widget.displayName,AD_WidgetSize.className,AD_WidgetSize.Rowspan,AD_WidgetSize.Colspan,AD_WidgetSize.AD_WidgetSize_ID,AD_IMAGE.BINARYDATA,AD_ModuleInfo.name AS ModuleName, AD_Window_ID, IsDefault, Sequence FROM AD_Widget 
                             INNER JOIN AD_WidgetSize  ON AD_Widget.AD_Widget_ID=AD_WidgetSize.AD_Widget_ID
                             INNER JOIN AD_Widget_Access ON AD_Widget.AD_Widget_ID=AD_Widget_Access.AD_Widget_ID
                             INNER JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID
                             INNER JOIN AD_ModuleInfo ON AD_ModuleInfo.AD_ModuleInfo_ID=AD_Widget.AD_ModuleInfo_ID
-                            WHERE AD_Widget.isActive='Y' AND AD_Widget_Access.AD_Role_ID=" + ctx.GetAD_Role_ID()+ " ORDER BY AD_ModuleInfo.name";
+                            WHERE AD_Widget.isActive='Y' AND AD_Widget_Access.AD_Role_ID=" + ctx.GetAD_Role_ID();
+            if(windowID > 0)
+            {
+                sql += " AND window='Y'";
+            }
+            else
+            {
+                sql += " AND Homepage='Y'";
+            }
+
+            sql += " ORDER BY AD_ModuleInfo.name";
 
             DataSet dataSet = DB.ExecuteDataset(sql);
             if (dataSet != null && dataSet.Tables.Count > 0)
             {
+                
+
                 list = new List<HomeWidget>();
                 var row = dataSet.Tables[0].Rows;
                 for (int i = 0; i < row.Count; i++)
                 {
-                    string img = "data:image/jpg;base64,"+ Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
+                    bool WindowSpecific = false;
+                    if (windowID> 0 && !string.IsNullOrEmpty(Util.GetValueOfString(row[i]["AD_Window_ID"])))
+                    {
+                        string[] numbers = Util.GetValueOfString(row[i]["AD_Window_ID"]).Split(',');
+                        bool numberExists = Array.Exists(numbers, element => element == Util.GetValueOfString(windowID));
+                        if (!numberExists)
+                        {
+                            continue;
+                        }
+                        WindowSpecific = true;
+                    }
+                    
+
+                    string img = "data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
                     HomeWidget l = new HomeWidget()
                     {
                         WidgetID = Util.GetValueOfInt(row[i]["AD_Widget_ID"]),
@@ -141,8 +160,11 @@ namespace VIS.Models
                         Rows = Util.GetValueOfInt(row[i]["Rowspan"]),
                         Cols = Util.GetValueOfInt(row[i]["Colspan"]),
                         Img = img,
-                        ModuleName=Util.GetValueOfString(row[i]["ModuleName"]),
-                        Type="W"
+                        ModuleName = Util.GetValueOfString(row[i]["ModuleName"]),
+                        Type = "W",
+                        WindowSpecific = WindowSpecific,
+                        IsDefault = Util.GetValueOfString(row[i]["IsDefault"]) == "Y",
+                        Sequence = Util.GetValueOfInt(row[i]["Sequence"])
                     };
 
                     list.Add(l);
@@ -156,10 +178,13 @@ namespace VIS.Models
         /// </summary>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public List<HomeWidget> GetUserWidgets(Ctx ctx)
+        public List<HomeWidget> GetUserWidgets(Ctx ctx, int windowID)
         {
             string sql = @"SELECT AD_UserHomeWidget.AD_UserHomeWidget_ID, AD_UserHomeWidget.componentID,componentType,SRNO,AdditionalInfo FROM AD_UserHomeWidget
-                            WHERE AD_UserHomeWidget.IsActive='Y' AND AD_Role_ID=" + ctx.GetAD_Role_ID() + " AND  AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY SRNO";
+                           WHERE AD_UserHomeWidget.IsActive='Y' AND AD_Window_ID='"+ windowID + "' AND AD_Role_ID=" + ctx.GetAD_Role_ID() + " AND  AD_User_ID=" + ctx.GetAD_User_ID();
+
+            sql += " ORDER BY SRNO";
+
             List<HomeWidget> list = null;
             DataSet dataSet = DB.ExecuteDataset(sql);
             if (dataSet != null && dataSet.Tables.Count > 0)
@@ -192,9 +217,9 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         /// <param name="widgetSizes"></param>
         /// <returns></returns>
-        public int SaveDashboard(Ctx ctx, List<WidgetSize> widgetSizes)
+        public int SaveDashboard(Ctx ctx, List<WidgetSize> widgetSizes, int windowID)
         {
-            DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE AD_User_ID="+ctx.GetAD_User_ID()+" AND AD_Role_ID="+ctx.GetAD_Role_ID());
+            DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE AD_Window_ID="+ windowID + " AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND AD_Role_ID=" + ctx.GetAD_Role_ID());
             for (int i = 0; i < widgetSizes.Count; i++)
             {
                 MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
@@ -203,6 +228,7 @@ namespace VIS.Models
                 mUserHomeWidget.SetComponentType(widgetSizes[i].Type);
                 mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
                 mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
+                mUserHomeWidget.Set_Value("AD_Window_ID", windowID);
                 mUserHomeWidget.Save();
             }
             return 1;
@@ -214,16 +240,17 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         /// <param name="widgetSizes"></param>
         /// <returns></returns>
-        public int SaveSingleWidget(Ctx ctx, List<WidgetSize> widgetSizes)
+        public int SaveSingleWidget(Ctx ctx, List<WidgetSize> widgetSizes, int windowID)
         {
             MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
             for (int i = 0; i < widgetSizes.Count; i++)
-            {               
+            {
                 mUserHomeWidget.SetSRNO(widgetSizes[i].SRNO);
                 mUserHomeWidget.SetComponentID(widgetSizes[i].KeyID);
                 mUserHomeWidget.SetComponentType(widgetSizes[i].Type);
                 mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
                 mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
+                mUserHomeWidget.Set_Value("AD_Window_ID", windowID);
                 mUserHomeWidget.Save();
             }
             return mUserHomeWidget.Get_ID();
@@ -235,7 +262,7 @@ namespace VIS.Models
         /// <param name="ctx"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public int DeleteWidgetFromHome(Ctx ctx,int id)
+        public int DeleteWidgetFromHome(Ctx ctx, int id)
         {
             DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE  AD_UserHomeWidget_ID=" + id);
             return 1;
@@ -331,10 +358,10 @@ namespace VIS.Models
         public string AdditionalInfo { get; set; }
     }
 
-    public class HomeWidget: WidgetSize
+    public class HomeWidget : WidgetSize
     {
         public int ID { get; set; }
-        public int WidgetID { get; set; }        
+        public int WidgetID { get; set; }
         public string Name { get; set; }
         public string DisplayName { get; set; }
         public int Rows { get; set; }
@@ -342,11 +369,11 @@ namespace VIS.Models
         public string ClassName { get; set; }
         public string Img { get; set; }
         public string ModuleName { get; set; }
-       
-      
+        public bool WindowSpecific { get; set; }
+        public bool IsDefault {  get; set; }
+        public Int32 Sequence { get; set; } 
     }
 
-    
+
 }
 
-   

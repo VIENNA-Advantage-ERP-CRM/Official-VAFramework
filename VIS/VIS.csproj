@@ -616,6 +616,7 @@
     <Content Include="Areas\VIS\Images\valid.png" />
     <Content Include="Areas\VIS\Images\vis_home_fav1.png" />
     <Content Include="Areas\VIS\Images\vis_home_myLink1.png" />
+    <Content Include="Areas\VIS\Images\widgets.jpg" />
     <Content Include="Areas\VIS\Images\word.png" />
     <Content Include="Areas\VIS\Images\xml.png" />
     <Content Include="Areas\VIS\Images\zoom.png" />
@@ -729,6 +730,7 @@
     <Content Include="Areas\VIS\Scripts\F20\atabpanel.js" />
     <Content Include="Areas\VIS\Scripts\F20\aviewcontroller.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabbedpanemgr.js" />
+    <Content Include="Areas\VIS\Scripts\F20\vlandingpage.js" />
     <Content Include="Areas\VIS\Scripts\home\home.js" />
     <Content Include="Areas\VIS\Scripts\home\usersession.js" />
     <Content Include="Areas\VIS\Scripts\F20\themecnfgtr.js" />
@@ -796,6 +798,7 @@
     <Compile Include="Areas\VIS\Controllers\InfoProductController.cs" />
     <Compile Include="Areas\VIS\Controllers\InfoWindowController.cs" />
     <Compile Include="Areas\VIS\Controllers\JsonDataController.cs" />
+    <Compile Include="Areas\VIS\Controllers\LandingPageController.cs" />
     <Compile Include="Areas\VIS\Controllers\LocationController.cs" />
     <Compile Include="Areas\VIS\Controllers\LocatorController.cs" />
     <Compile Include="Areas\VIS\Controllers\LoginController.cs" />
@@ -879,6 +882,8 @@
     <Content Include="Areas\VIS\Views\AccountForm\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Home.cshtml" />
+    <Content Include="Areas\VIS\Views\LandingPage.cshtml" />
+    <Content Include="Areas\VIS\Views\LandingPage\Index.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
