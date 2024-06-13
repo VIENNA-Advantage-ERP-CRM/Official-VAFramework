@@ -361,7 +361,7 @@
             divStatic.find('.vis-fp-currntrcrdswrap').remove();
             divDynFilters.find('.vis-fp-currntrcrds').remove();
             dsAdvanceData = [];
-            VIS.Env.setFilterWhere("");
+            this.curGC.aPanel.setFilterWhere("");
             cmbColumns.val(-1);
             cmbOp.val(-1);
             setControlNullValue();
@@ -370,15 +370,13 @@
 
         this.getFilterClause = function () {
             var whereExtended = prepareWhereClause(this);
-            VIS.Env.setFilterWhere(whereExtended);
-           /* var query = new VIS.Query(this.curTab.getTableName()); //query
-            query.addRestriction(whereExtended); // restriction*/
+            this.curGC.aPanel.setFilterWhere(whereExtended);
             if (whereExtended.length > 0) {
-                VIS.Env.setIsFilter(true);
+                this.curGC.aPanel.setIsFilter(true);
             } else {
-                VIS.Env.setIsFilter(false);
+                this.curGC.aPanel.setIsFilter(false);
             }
-            VIS.Env.setFilterFlag(true);
+            this.curGC.aPanel.setFilterFlag(true);
             return whereExtended;
         };
 
@@ -598,7 +596,6 @@
         };
 
         this.disposeComponent = function () {
-            VIS.Env.setFilterWhere("");
             bodyDiv.remove();
             this.listOfFilterQueries = [];
             self = null;

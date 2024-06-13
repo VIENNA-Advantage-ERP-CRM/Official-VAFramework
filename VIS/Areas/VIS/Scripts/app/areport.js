@@ -805,7 +805,7 @@
                 });
             });
             btnSearch.on('click', function () {
-                var find = new VIS.Find(windowNo, curTab, 0);
+                var find = new VIS.Find(windowNo, curTab, 0,null);
                 find.onClose = function () {
                     if (find.getIsOKPressed()) {
                         var query = find.getQuery();

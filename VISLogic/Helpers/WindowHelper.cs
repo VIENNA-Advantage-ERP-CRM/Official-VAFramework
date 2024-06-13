@@ -2574,7 +2574,10 @@ namespace VIS.Helpers
                 if (!string.IsNullOrEmpty(condition))
                 {
                     sqlIn.sql = sqlIn.sql.Substring(0, sqlIn.sql.LastIndexOf("WHERE")) + " " + condition;
-                    sqlIn.sqlDirect = sqlIn.sqlDirect.Substring(0, sqlIn.sqlDirect.LastIndexOf("WHERE")) + " " + condition;
+                    if (sqlIn.sqlDirect != "")
+                    {
+                        sqlIn.sqlDirect = sqlIn.sqlDirect.Substring(0, sqlIn.sqlDirect.LastIndexOf("WHERE")) + " " + condition;
+                    }
                     sqlCount = sqlCount.Substring(0, sqlCount.LastIndexOf("WHERE")) + " " + condition;
                 }
             }
@@ -3890,7 +3893,10 @@ namespace VIS.Helpers
             if (!String.IsNullOrEmpty(gt.OrderByClause))
             {
                 SQL += " ORDER BY " + gt.OrderByClause;
-                SQL_Direct += " ORDER BY " + gt.OrderByClause;
+                if (SQL_Direct != "")
+                {
+                    SQL_Direct += " ORDER BY " + gt.OrderByClause;
+                }
             }
 
 

@@ -152,7 +152,7 @@
 
     };
 
-    function Find(windowNo, curTab, minRecord) {
+    function Find(windowNo, curTab, minRecord,aPanel) {
         var title = curTab.getName();
         var AD_Tab_ID = curTab.getAD_Tab_ID();
         var AD_Table_ID = curTab.getAD_Table_ID();
@@ -160,6 +160,7 @@
         var whereExtended = curTab.getWhereClause();
         var findFields = curTab.getFields();
         this.btnfields = [];
+        this.aPanel = aPanel;
 
         var $root = $("<div  class='vis-forms-container' style='height:100%'>");
         var $busy = null;
@@ -513,7 +514,7 @@
                 if (isBusy) return;
                 $self.okBtnPressed = false;
                 ch.close();
-                VIS.Env.setIsAdvanceSearch(false);
+                $self.aPanel.setIsAdvanceSearch(false);
             });
 
             chkDynamic.on("change", function () {
@@ -757,7 +758,6 @@
                         if (no != 0) {
                             $self.okBtnPressed = true;
                             ch.close();
-                           // VIS.Env.setIsAdvanceSearch(false);
                             //Close(_isOkButtonPressed);
                         }
                     }, 10);
@@ -766,7 +766,6 @@
                     // SetBusy(false);
                     $self.okBtnPressed = false;
                     ch.close();
-                   // VIS.Env.setIsAdvanceSearch(false);
                     // Close(_isOkButtonPressed);
                 }
             });
@@ -837,8 +836,9 @@
                 $self.okPressed = true;
                 $self.okBtnPressed = true;
                 //	Save pending
-               
-                VIS.Env.setAdvanceFlag(true);
+                if ($self.aPanel) {
+                    $self.aPanel.setAdvanceFlag(true);
+                }
                 saveAdvanced();
                 //VIS.Env.setIsAdvanceSearch(false);
             });
@@ -1903,7 +1903,6 @@
             if (query.getRestrictionCount() == 0) {
                 setBusy(false);
                 ch.close();
-               // VIS.Env.setIsAdvanceSearch(false);
                 return;
                 return;
             }
@@ -1911,7 +1910,9 @@
 
             // get where clause
             var where = query.getWhereClause(true);
-            VIS.Env.setAdvanceWhere(where);
+            if ($self.aPanel) {
+                $self.aPanel.setAdvanceWhere(where);
+            }
             // get query name entered by the user
             var name = VIS.Utility.encodeText(txtQryName.val());// vtxtQueryName.Text.Trim();
             if (name != null && name.trim().length == 0)
@@ -1964,7 +1965,6 @@
                 }
                 if (result) {
                     ch.close();
-                   // VIS.Env.setIsAdvanceSearch(false);
                 }
             }, 10);
         };
@@ -2018,7 +2018,9 @@
             //}, 100);
 
             //  bindEvents();
-            VIS.Env.setIsAdvanceSearch(true);
+            if (this.aPanel) {
+                this.aPanel.setIsAdvanceSearch(true);
+            }
         };
 
         this.getSavedQueryName = function () {

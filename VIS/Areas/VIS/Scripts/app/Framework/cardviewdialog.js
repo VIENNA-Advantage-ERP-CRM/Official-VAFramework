@@ -4690,7 +4690,7 @@
                 data: obj,
                 success: function (data) {
                     dbResult = JSON.parse(data.result);
-                    var GridWindow = new VIS.GridWindow(dbResult);
+                    var GridWindow = new VIS.GridWindow(dbResult,null);
                     if (GridWindow == null) {
                         return;
                     }
@@ -4873,15 +4873,15 @@
         var self = this;
         var $root = $('<div>');
         var $inputText = $('<div class="input-group vis-input-wrap mb-0" >');
-        var $controlBlock = $('<div class="vis-control-wrap d-block mt-1" >');
-        var txtDescription = $('<span style="display:block;margin-bottom:5px;">' + VIS.Msg.getMsg('NewCardInfo') + '</span>');
+        var $controlBlock = $('<div class="vis-control-wrap d-block mt-1 vis-card-control" >');
+        var txtDescription = $('<span class="vis-card-copy">' + VIS.Msg.getMsg('NewCardInfo') + '</span>');
         $inputText.append(txtDescription).append($controlBlock);
         var $txtName = $('<input type="text">');
         var $lblName = $('<label>' + VIS.Msg.getMsg('EnterName') + '</label>');
         $controlBlock.append($txtName).append($lblName);
         var btnDiv = $('<div class="d-flex align-items-center justify-content-end mt-2">');
         self.btnCopySave = $('<button class="vis-save-cont mr-2">' + VIS.Msg.getMsg('Ok') + '</button>');
-        self.btnCopyCancle = $('<button class="vis-save-cont mr-2">' + VIS.Msg.getMsg('Cancle') + '</button>');
+        self.btnCopyCancle = $('<button class="vis-save-cont">' + VIS.Msg.getMsg('Cancle') + '</button>');
         btnDiv.append(self.btnCopySave).append(self.btnCopyCancle);
         $root.append($inputText).append(btnDiv);
 

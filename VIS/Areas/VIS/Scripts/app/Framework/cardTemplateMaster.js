@@ -28,7 +28,6 @@
         var chkAllBorder = null;
         var txtCustomStyle = null;
         var txtSQLQuery = null;
-        var txtStyleLogic = null;
         var txtRowGap = null;
         var txtColGap = null;
         var btnAddField = null;
@@ -424,7 +423,6 @@
                 btnFinesh = root.find('#BtnFinesh_' + WindowNo);
                 txtCustomStyle = root.find('#txtCustomStyle_' + WindowNo);
                 txtSQLQuery = root.find('#txtSQLQuery_' + WindowNo);
-                txtStyleLogic = root.find('#txtStyleLogic_' + WindowNo);
                 txtRowGap = DivGridSec.find('.rowGap');
                 txtColGap = DivGridSec.find('.colGap');
                 btn_BlockCancel = root.find('#Btn_BlockCancel_' + WindowNo);
@@ -1033,11 +1031,6 @@
                     }
                 }
                 templatechanges();
-            });
-
-            txtStyleLogic.change(function () {
-                var selectedItem = DivViewBlock.find('.vis-active-block');
-                
             });
 
             DivGridSec.find('.addGridRow').click(function () {

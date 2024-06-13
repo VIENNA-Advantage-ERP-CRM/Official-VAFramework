@@ -3987,6 +3987,17 @@ table.fixed-header thead tr {
     background: rgba(var(--v-c-secondary), 1);
 }
 
+.vis-card-copy {
+    display: block;
+    margin-bottom: 5px;
+    height: 80px;
+}
+
+.vis-card-control {
+    position: absolute !important;
+    bottom: 0px;
+}
+
 .iconDelete {
     cursor: pointer;
 }

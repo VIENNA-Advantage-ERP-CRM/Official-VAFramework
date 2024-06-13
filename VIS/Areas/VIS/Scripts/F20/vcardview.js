@@ -1086,6 +1086,7 @@
     function VCard(fields, record, headerItems, headerStyle, headerPadding, windowNo, fieldStyles, aPanel) {
         this.record = record;
         this.aPanel = aPanel;
+        this.rIndex = record.recid;
         this.dynamicStyle = [];
         this.textAlignEnum = { "C": "Center", "R": "flex-end", "L": "flex-start" };
         this.alignItemEnum = { "C": "Center", "T": "flex-start", "B": "flex-end" };
@@ -1158,6 +1159,18 @@
                 var fieldLabelStyle = headerItem.FieldLabelStyle;
                 var fieldStyleLogic = headerItem.FieldStyleLogic;
 
+                if (fieldStyleLogic && fieldStyleLogic.toLower().indexOf("?") > -1) {
+                    fieldStyleLogic = this.evaluateStyleLogic(fieldStyleLogic);
+                    if (fieldStyleLogic) {
+                        fieldStyleLogic = " " + fieldStyleLogic + " ";
+                    }
+                    else {
+                        fieldStyleLogic = '';
+                    }
+                } else {
+                    fieldStyleLogic = '';
+                }
+
                 if (!backgroundColor) {
                     backgroundColor = '';
                 }
@@ -1193,7 +1206,10 @@
                 //If div not found, then create new one.
                 if ($div.length <= 0)
                     $div = $('<div class="vis-w-p-card-data-f ' + this.dynamicClassName + '">');
-
+                
+                if (fieldStyleLogic.length > 0) {
+                    $div.attr('style', fieldStyleLogic);
+                }
 
 
 
@@ -2067,14 +2083,11 @@
      * @param {any} fieldValueStyle
      */
     VCard.prototype.applyCustomUIForFieldValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle, fieldStyleLogic) {
-        var style = fieldValueStyle;
+        var style = fieldValueStyle + " " + fieldStyleLogic;
         var dynamicClassName = "vis-hp-card-FieldValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
         if (style && style.toLower().indexOf("@value::") > -1) {
             style = getStylefromCompositeValue(style, "@value::");
-        }
-        if (fieldStyleLogic && fieldStyleLogic.toLower().indexOf("?") > -1) {
-            style += " " + evaluateStyleCondition(mField, fieldStyleLogic) + " " ;
-        }
+        }      
 
         this.dynamicStyle.push("." + dynamicClassName + "  {" + style + "} ");
         return dynamicClassName;
@@ -2090,15 +2103,11 @@
      * @param {any} fieldValueStyle
      */
     VCard.prototype.applyCustomUIForLabelValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle, fieldStyleLogic) {
-        var style = fieldValueStyle;
+        var style = fieldValueStyle + " "+fieldStyleLogic;
         var dynamicClassName = "vis-hp-card-LabelValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
         if (style && style.toLower().indexOf("@value::") > -1) {
             style = getStylefromCompositeValue(style, "@value::");
         }
-        if (fieldStyleLogic && fieldStyleLogic.toLower().indexOf("?") > -1) {
-            style += " " + evaluateStyleCondition(mField, fieldStyleLogic)+" ";
-        }
-
         this.dynamicStyle.push("." + dynamicClassName + "  {" + style + "} ");
         return dynamicClassName;
     };
@@ -2132,7 +2141,7 @@
         }
     }
 
-    var evaluateStyleCondition = function (mField, styleLogic) {
+    VCard.prototype.evaluateStyleLogic = function (styleLogic) {
         var arr = styleLogic.split(',');
 
         //this.cellColumnName = col.field;
@@ -2141,7 +2150,7 @@
             var cArr = arr[j].split("?");
             if (cArr.length != 2)
                 continue;
-            if (VIS.Evaluator.evaluateLogic(mField, cArr[0])) {
+            if (VIS.Evaluator.evaluateLogic(this, cArr[0])) {
                 ret = cArr[1];
                 break;
             }
