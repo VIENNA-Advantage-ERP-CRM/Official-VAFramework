@@ -191,7 +191,11 @@ namespace VAModelAD.Model
 
 
             //Do not Check Config on Role Window
-            if (Env.IsModuleInstalled("VA093_") && success
+            //DO not save Record if window ID tab ID not exist
+            if (po.GetAD_Window_ID()>0 &&
+                po.GetWindowTabID()>0 &&
+                Env.IsModuleInstalled("VA093_") && 
+                success
                 //&& MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
                 && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M"
                )
