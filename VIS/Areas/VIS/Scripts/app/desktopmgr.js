@@ -485,11 +485,11 @@
         function activateTaskBarItem(itm) {
             if (itm.length > 0) {
 
-                if (itm[0].id == "vis_lhome2") {
-                    $('#vis_editHome').show();
-                } else {
+                //if (itm[0].id == "vis_lhome2") {
+                //    $('#vis_editHome').show();
+                //} else {
                     $('#vis_editHome').hide();
-                }
+                //}
 
                 if (itm[0].id == "vis_lhome")
                     return;               
@@ -616,11 +616,11 @@
 
         function renderHomePage() {
             $('#vis_lhome').show();
-            $('#vis_lhome2').show();
+            //$('#vis_lhome2').show();
             dynamicViewCache['vis_lhome'] = $home ;
-            dynamicViewCache['vis_lhome2'] = $home2 ;
+            //dynamicViewCache['vis_lhome2'] = $home2 ;
             currentActiveView = $home.show();
-            VIS.HomeMgr2.initHome($home2);
+            //VIS.HomeMgr2.initHome($home2);
             VIS.HomeMgr.initHome($home);
         }
 

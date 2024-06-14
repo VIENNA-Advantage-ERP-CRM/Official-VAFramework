@@ -471,7 +471,8 @@ namespace VAModelAD.Model
                 }
             }
 
-            if (Util.GetValueOfInt(poMaster.Get_ID()) == 0)
+            // check applied for tables not having key column
+            if ((Util.GetValueOfInt(poMaster.Get_ID()) == 0) || (poMaster.CreateNewRecord && poMaster.Get_KeyColumns().Length > 1))
             {
                 if (HasDocValueWF)
                     poMaster.SetIsActive(false);
