@@ -152,7 +152,7 @@
 
     };
 
-    function Find(windowNo, curTab, minRecord) {
+    function Find(windowNo, curTab, minRecord,aPanel) {
         var title = curTab.getName();
         var AD_Tab_ID = curTab.getAD_Tab_ID();
         var AD_Table_ID = curTab.getAD_Table_ID();
@@ -160,6 +160,7 @@
         var whereExtended = curTab.getWhereClause();
         var findFields = curTab.getFields();
         this.btnfields = [];
+        this.aPanel = aPanel;
 
         var $root = $("<div  class='vis-forms-container' style='height:100%'>");
         var $busy = null;
@@ -513,6 +514,7 @@
                 if (isBusy) return;
                 $self.okBtnPressed = false;
                 ch.close();
+                $self.aPanel.setIsAdvanceSearch(false);
             });
 
             chkDynamic.on("change", function () {
@@ -834,7 +836,11 @@
                 $self.okPressed = true;
                 $self.okBtnPressed = true;
                 //	Save pending
+                if ($self.aPanel) {
+                    $self.aPanel.setAdvanceFlag(true);
+                }
                 saveAdvanced();
+                //VIS.Env.setIsAdvanceSearch(false);
             });
 
             btnRefresh.on("click", function () {
@@ -1898,11 +1904,15 @@
                 setBusy(false);
                 ch.close();
                 return;
+                return;
             }
 
 
             // get where clause
             var where = query.getWhereClause(true);
+            if ($self.aPanel) {
+                $self.aPanel.setAdvanceWhere(where);
+            }
             // get query name entered by the user
             var name = VIS.Utility.encodeText(txtQryName.val());// vtxtQueryName.Text.Trim();
             if (name != null && name.trim().length == 0)
@@ -2008,6 +2018,9 @@
             //}, 100);
 
             //  bindEvents();
+            if (this.aPanel) {
+                this.aPanel.setIsAdvanceSearch(true);
+            }
         };
 
         this.getSavedQueryName = function () {
@@ -2045,6 +2058,7 @@
             this.created = this.days = 0, this.okPressed = this.okBtnPressed = null;
             control1 = control2 = ulListStaticHtml = null;
             query = null;
+            
         };
     };
 

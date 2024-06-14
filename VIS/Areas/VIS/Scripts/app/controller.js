@@ -199,13 +199,13 @@
     /**
      *	Window Model
      */
-    function GridWindow(json) {
-
+    function GridWindow(json,apanel) {
+        this.apanel = apanel;
         this.vo = json._vo;
 
         this.tabs = [];
         for (var i = 0; i < json._tabs.length; i++) {
-            var gridTab = new VIS.GridTab(json._tabs[i], this.vo);
+            var gridTab = new VIS.GridTab(json._tabs[i], this.vo, apanel);
             gridTab.setGridWindow(this);
             this.tabs.push(gridTab);
         }
@@ -434,10 +434,11 @@
  *          - Callout
  *  
  */
-    function GridTab(gTab, windowVo) {
+    function GridTab(gTab, windowVo, apanel) {
+        this.apanel = apanel;
         this.gTab = gTab;
         this.vo = gTab._vo;
-        this.gridTable = new VIS.GridTable(gTab._gridTable);
+        this.gridTable = new VIS.GridTable(gTab._gridTable,apanel);
         this.gridTable.onlyCurrentDays = this.vo.onlyCurrentDays;
         // Maintain version on approval property on tab
         this.gridTable.MaintainVerOnApproval = this.vo.MaintainVerOnApproval;
@@ -1722,7 +1723,9 @@
 
         this.oldQuery = this.query.getWhereClause();
         this.vo.onlyCurrentDays = onlyCurrentDays;
-
+        if (this.apanel.getAdvanceWhere()== '') {
+            refresh = false;
+        }
         var where = "";
         if (!isVisualEdtr) //show all tab in visual editor
         {
@@ -1823,7 +1826,22 @@
             }
 
         }
-        this.extendedWhere = where.toString();
+        if (this.apanel) {
+            if (this.apanel.getFilterWhere().length > 0 && this.apanel.getAdvanceFlag()) {
+                if (where.length > 0)
+                    where += " AND ";
+                where += this.apanel.getFilterWhere();
+                this.apanel.setAdvanceFlag(false);
+            }
+            if (this.apanel.getAdvanceWhere().length > 0 && this.apanel.getFilterFlag()) {
+                if (where.length > 0)
+                    where += " AND ";
+                where += this.apanel.getAdvanceWhere();
+                this.apanel.setFilterFlag(false);
+                refresh = false;
+            }
+        }
+        this.extendedWhere = where.toString();    
         //if (this.oldCardQuery != this.cardWhereCondition) {
         //    refresh = false;
         //}
@@ -3242,7 +3260,8 @@
  *
  */
 
-    function GridTable(gTable) {
+    function GridTable(gTable, aPanel) {
+        this.aPanel = aPanel;
         this.gTable = gTable;
         this.readOnly = this.gTable._readOnly;
         this.AD_Table_ID = gTable._AD_Table_ID;
@@ -3983,6 +4002,20 @@
         var _whereClause = gt._whereClause;
 
         if (_whereClause.length > 0) {
+            if (this.aPanel) {
+
+                if (this.aPanel.getIsAdvanceSearch() && this.aPanel.getFilterWhere().length > 0 && this.aPanel.getAdvanceFlag()) {
+                    _whereClause += " AND " + this.aPanel.getFilterWhere();
+                    this.aPanel.setAdvanceFlag(false);
+
+                }
+
+                if (this.aPanel.getIsFilter() && this.aPanel.getAdvanceWhere().length > 0 && this.aPanel.getFilterFlag()) {
+                    _whereClause += " AND " + VIS.Env.getAdvanceWhere();
+                    this.aPanel.setFilterFlag(false);
+
+                }
+            }
             m_SQL_Where.append(" WHERE ");
             if (_whereClause.indexOf("@") == -1) {
                 m_SQL_Where.append(_whereClause);
@@ -4000,7 +4033,9 @@
                 this.log.Severe("Invalid NULL - " + _tableName + "=" + _whereClause);
             }
         }
+       
         this.whereClause = m_SQL_Where;
+
 
         this.SQL = this.SQL_Select + m_SQL_Where.toString();
         this.SQL_Count += m_SQL_Where.toString();
@@ -4157,7 +4192,7 @@
                     that.changed = false;
                     that.rowChanged = -1;
                     that.fillData(retObj);
-
+                   
                 }
                 else {
                     //console.log("clear");
@@ -4177,14 +4212,18 @@
                         that.fireQueryCompleted(true);//Inform GridController   
                     }, 300, that);
                 }
+                if (that.aPanel) {
+                    that.aPanel.setFilterFlag(false);
+                    that.aPanel.setAdvanceFlag(false);
+                }
             },
             error: function () {
 
-            }
-
+            } 
+            
         });
 
-
+        
         return true;
 
 

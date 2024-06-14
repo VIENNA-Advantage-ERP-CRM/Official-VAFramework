@@ -368,7 +368,7 @@
                     }
                     var jsonData = JSON.parse(json.result); // widow json
                     VIS.context.setContextOfWindow(JSON.parse(json.wCtx), windowNo);// set window context
-                    var GridWindow = new VIS.GridWindow(jsonData);
+                    var GridWindow = new VIS.GridWindow(jsonData,null);
                     if (GridWindow == null) {
                         return;
                     }

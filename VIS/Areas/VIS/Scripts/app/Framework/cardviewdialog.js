@@ -98,6 +98,7 @@
         var templateName = null;
         var txtCustomStyle = null;
         var txtSQLQuery = null;
+        var txtStyleLogic = null;
         var CardCreatedby = null;
         var hideShowGridSec = null;
         var txtZoomInOut = null;
@@ -702,6 +703,17 @@
 
             });
 
+            txtStyleLogic.change(function () {
+                var selectedItem = DivViewBlock.find('.vis-active-block');
+                
+                if ($(this).val() == null || $(this).val() == "") {
+                    selectedItem.attr("styleLogic", "");
+                } else {
+                    selectedItem.attr("styleLogic", $(this).val());
+                }
+               
+            });
+
             txtZoomInOut.on('input', function () {
                 DivViewBlock.find('.canvas').css('zoom', $(this).val());
             })
@@ -982,6 +994,7 @@
                 DivCardFieldSec = root.find('#DivCardFieldSec_' + WindowNo);
                 txtCustomStyle = root.find('#txtCustomStyle_' + WindowNo);
                 txtSQLQuery = root.find('#txtSQLQuery_' + WindowNo);
+                txtStyleLogic = root.find('#txtStyleLogic_' + WindowNo);
                 txtZoomInOut = root.find('#txtZoomInOut_' + WindowNo);
                 btn_BlockCancel = root.find('#Btn_BlockCancel_' + WindowNo);
 
@@ -1456,6 +1469,7 @@
                         $(this).append('<sql>SQL</sql>');
                     }
                 })
+   
             } else {
                 isChangeTemplate = false;
                 if (isUndoRedo) {
@@ -3059,8 +3073,12 @@
                     }
                     else {
                         divTopNavigator.find('[command="Show"]').parent().hide();
-                        divTopNavigator.find('[command="Hide"]').parent().hide();
-
+                            divTopNavigator.find('[command="Hide"]').parent().hide();
+                        if ($(e.target)[0].innerText.length > 0 && $(e.target)[0].innerText && $(e.target).attr('query').length <= 0) {
+                            txtStyleLogic.removeClass('vis-disable-event');
+                        } else {
+                            txtStyleLogic.addClass('vis-disable-event');
+                        }
                         if ($(e.target).closest('.fieldGroup').length > 0) {
                             var target = $(e.target).closest('.fieldGroup').find('.fieldLbl');
                             var displayType = mTab.getFieldById(Number(target.attr('fieldid'))).getDisplayType();
@@ -4092,6 +4110,7 @@
                 if ($(this).find('sql').length > 0) {
                     columnSQL = $(this).attr('query') || null;
                 }
+                var styleLogic = $(this).attr('styleLogic') || null;
                 if ($(this).find('.fieldGroup:not(:hidden)').length > 0) {
                     $(this).find('.fieldGroup:not(:hidden)').each(function (index) {
                         isFieldLinked = true;
@@ -4143,6 +4162,7 @@
                             hideFieldIcon: hideFieldIcon,
                             hideFieldText: $(this).find('.fieldLbl').attr('showfieldtext') == 'true' ? true : false,
                             columnSQL: columnSQL,
+                            styleLogic: styleLogic,
                             contentFieldValue: null,
                             contentFieldLabel: null                            
                         }
@@ -4180,6 +4200,7 @@
                         hideFieldIcon: hideIcon,
                         hideFieldText: hideTxt,
                         columnSQL: columnSQL,
+                        styleLogic: styleLogic,
                         contentFieldValue: null,
                         contentFieldLabel: null
                     }
@@ -4299,6 +4320,11 @@
                 txtSQLQuery.val(VIS.secureEngine.decrypt(htm.attr("query")));
             } else {
                 txtSQLQuery.val('');
+            }
+            if (htm.attr("styleLogic")) {
+                txtStyleLogic.val(htm.attr("styleLogic"));
+            } else {
+                txtStyleLogic.val('');
             }
 
             //styles = styles.split(';');
@@ -4664,7 +4690,7 @@
                 data: obj,
                 success: function (data) {
                     dbResult = JSON.parse(data.result);
-                    var GridWindow = new VIS.GridWindow(dbResult);
+                    var GridWindow = new VIS.GridWindow(dbResult,null);
                     if (GridWindow == null) {
                         return;
                     }
@@ -4847,15 +4873,15 @@
         var self = this;
         var $root = $('<div>');
         var $inputText = $('<div class="input-group vis-input-wrap mb-0" >');
-        var $controlBlock = $('<div class="vis-control-wrap d-block mt-1" >');
-        var txtDescription = $('<span style="display:block;margin-bottom:5px;">' + VIS.Msg.getMsg('NewCardInfo') + '</span>');
+        var $controlBlock = $('<div class="vis-control-wrap d-block mt-1 vis-card-control" >');
+        var txtDescription = $('<span class="vis-card-copy">' + VIS.Msg.getMsg('NewCardInfo') + '</span>');
         $inputText.append(txtDescription).append($controlBlock);
         var $txtName = $('<input type="text">');
         var $lblName = $('<label>' + VIS.Msg.getMsg('EnterName') + '</label>');
         $controlBlock.append($txtName).append($lblName);
         var btnDiv = $('<div class="d-flex align-items-center justify-content-end mt-2">');
         self.btnCopySave = $('<button class="vis-save-cont mr-2">' + VIS.Msg.getMsg('Ok') + '</button>');
-        self.btnCopyCancle = $('<button class="vis-save-cont mr-2">' + VIS.Msg.getMsg('Cancle') + '</button>');
+        self.btnCopyCancle = $('<button class="vis-save-cont">' + VIS.Msg.getMsg('Cancle') + '</button>');
         btnDiv.append(self.btnCopySave).append(self.btnCopyCancle);
         $root.append($inputText).append(btnDiv);
 

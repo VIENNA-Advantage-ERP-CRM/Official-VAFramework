@@ -119,6 +119,13 @@
 
         this.isSummaryVisible = false;
         this.lastView = "";
+
+        this.advanceWhere = "";
+        this.filterWhere = "";
+        this.advanceFlag = false;
+        this.filterFlag = false;
+        this.isAdvancesearch = false;
+        this.isFilter = false;
         //private 
         var $divContentArea, $ulNav, $ulToobar, $divStatus, $ulTabControl, $divTabControl, $divTabNav;
         var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter;
@@ -1004,6 +1011,10 @@
 
         if (!VIS.Application.isMobile) {
             $txtSearch.on("keyup", function (e) {
+                self.setAdvanceWhere("");
+                self.setFilterWhere("");
+                self.setAdvanceFlag(false);
+                self.setFilterFlag(false);
                 var code = e.charCode || e.keyCode;
                 if (code == 13) {
                     if (!self.defaultSearch) {
@@ -1021,7 +1032,7 @@
                     query.addRestriction(" 1 = 1 ");
                     self.findRecords(query);
                 }
-            });
+            });          
         }
 
         $imgdownSearch.on("click", function () {
@@ -1771,7 +1782,7 @@
     APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel) {
 
         this.$parentWindow = $parent;
-        var gridWindow = new VIS.GridWindow(jsonData);
+        var gridWindow = new VIS.GridWindow(jsonData, this);
         this.gridWindow = gridWindow; //ref to call dispose
         //this.setWidth(gridWindow.getWindowWidth());
         this.createToolBar(); // Init ToolBar
@@ -4947,7 +4958,7 @@
 
     APanel.prototype.cmd_finddialog = function () {
 
-        var find = new VIS.Find(this.curWindowNo, this.curTab, 0);
+        var find = new VIS.Find(this.curWindowNo, this.curTab, 0,this);
         var self = this;
         var savedSearchName = "";
         find.onClose = function () {
@@ -4990,7 +5001,7 @@
                 }
                 var findPressed = self.curTab.getIsQueryActive() || self.curTab.getOnlyCurrentDays() > 0;
                 self.aFind.setPressed(findPressed);
-
+                
 
             }
             ////Refresh everytime bcoz smtimes user create an ASearch and save it, 
@@ -5340,6 +5351,54 @@
         this.curTab = null;
         this.disposeComponent();
 
+    };
+
+    APanel.prototype.setAdvanceWhere = function (advanceWhere) {
+        this.advanceWhere = advanceWhere;
+    };
+
+    APanel.prototype.getAdvanceWhere = function () {
+        return this.advanceWhere;
+    };
+
+    APanel.prototype.setFilterWhere = function (filterWhere) {
+        this.filterWhere = filterWhere;
+    };
+
+    APanel.prototype.getFilterWhere = function () {
+        return this.filterWhere;
+    };
+
+    APanel.prototype.setAdvanceFlag = function (advanceFlag) {
+        this.advanceFlag = advanceFlag;
+    };
+
+    APanel.prototype.getAdvanceFlag = function () {
+        return this.advanceFlag;
+    };
+
+    APanel.prototype.setFilterFlag = function (filterFlag) {
+        this.filterFlag = filterFlag;
+    };
+
+    APanel.prototype.getFilterFlag = function () {
+        return this.filterFlag;
+    };
+
+    APanel.prototype.setIsAdvanceSearch = function (isAdvancesearch) {
+        this.isAdvancesearch = isAdvancesearch;
+    };
+
+    APanel.prototype.getIsAdvanceSearch = function () {
+        return this.isAdvancesearch;
+    };
+
+    APanel.prototype.getIsFilter = function (isFilter) {
+        this.isFilter = isFilter;
+    };
+
+    APanel.prototype.setIsFilter = function () {
+        return this.isFilter;
     };
 
     //****************** APanel END ***********************//
