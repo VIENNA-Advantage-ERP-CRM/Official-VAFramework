@@ -329,7 +329,7 @@
             } else if (widget.Type == "L") {
                 var $div = $('<div class="vis-linksWidget">');
                 $div.append(widget.items).append('<div class="linktitle">' + widget.DisplayName + '</div>');
-                $item.append($div);
+                $item.append($div);                
             }
 
             $item.addClass("vis-widget-item");
