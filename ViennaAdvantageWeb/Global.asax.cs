@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.Security;
+using VAdvantage.Utility;
 
 namespace ViennaAdvantageWeb
 {
@@ -29,7 +30,9 @@ namespace ViennaAdvantageWeb
         protected void Session_End()
         {
            
-            VAdvantage.Classes.SessionEventHandler.SessionEnd(Session["ctx"] as VAdvantage.Utility.Ctx);
+            VAdvantage.Classes.SessionEventHandler.SessionEnd(Session["ctx"] as Ctx, Session.SessionID);
         }
+
+        
     }
 }

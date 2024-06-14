@@ -2,7 +2,7 @@
 
 ; (function (VIS, $) {
 
-    function WForm(height, AD_Form_ID, curTab, pWwindowNo) {
+    function WForm(height, AD_Form_ID, curGC, pWwindowNo) {
         var $root, $busyDiv, $contentGrid, ch;
         var ctx = VIS.Env.getCtx(); //ctx
         var log = VIS.Logging.VLogger.getVLogger("VIS.AForm"); //Logger
@@ -25,16 +25,28 @@
         };
 
         this.getAD_Table_ID = function () {
-            return curTab.getAD_Table_ID();
+            return curGC.gTab.getAD_Table_ID();
         }
 
         this.getAD_Window_ID = function () {
-            return curTab.getAD_Window_ID();
+            return curGC.gTab.getAD_Window_ID();
         }
 
         this.getRecord_ID = function () {
-            return curTab.getRecord_ID();
+            return curGC.gTab.getRecord_ID();
         }
+
+        this.getRecord_ID = function () {
+            return curGC.gTab.getRecord_ID();
+        }
+
+        this.getMultiSelectedRows = function () {
+            return curGC.getSelectedRows();
+        }
+        this.gridDataRefreshAll = function () {
+            return curGC.gTab.dataRefreshAll();
+        }
+
 
         this.getContentGrid = function () { return $contentGrid; };
 
@@ -98,7 +110,7 @@
                 var o = new type(windowNo);
                 o.init(pWwindowNo, self);
                 if (o.setRecordID) {
-                    o.setRecordID(curTab.getRecord_ID());
+                    o.setRecordID(curGC.gTab.getRecord_ID());
                 }
                 showForm(o);
             }
@@ -140,7 +152,7 @@
                     ch.dispose();
                 }
                 // Refresh current record of window..
-                curTab.dataRefresh();
+                curGC.gTab.dataRefresh();
 
                 // dispose self..
                 if (self.disposeComponent) {

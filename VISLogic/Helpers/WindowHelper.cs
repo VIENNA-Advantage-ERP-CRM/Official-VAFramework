@@ -1740,7 +1740,8 @@ namespace VIS.Helpers
 
             PO po = null;
             // VIS0008 change to handle save of OrgInfo (record without PK) through PO
-            if ((table.IsSingleKey() && table.HasPKColumn()) || Record_ID == 0)
+            if ((table.IsSingleKey() && table.HasPKColumn())
+                || ((ctx.GetAD_User_ID() == 0 || ctx.GetAD_User_ID() == 100) && Record_ID == 0))
             {
                 if (!_idZeroUpdate)
                 {
@@ -1973,7 +1974,9 @@ namespace VIS.Helpers
                 if (inn.ImmediateSave)
                 {
                     po.Set_Value("ProcessedVersion", true);
-                    po.Set_Value("VersionValidFrom", System.DateTime.Now);              
+
+                    po.Set_Value("VersionValidFrom", System.DateTime.Now);
+
                 }
                 // Only increase record version if Version do not exist for same date
                 if (po.Get_ID() <= 0)

@@ -274,7 +274,6 @@ namespace VAModelAD.Model
 
                     }
                 }
-
             }
 
             if (success && newRecord)

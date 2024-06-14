@@ -475,10 +475,17 @@ namespace VIS.Models
                 }
 
             }
+
+            if (fieldID != "")
+            {
+                string updt = "UPDATE AD_CARDVIEW_COLUMN SET ISACTIVE='N' WHERE Export_ID IS NOT NULL AND AD_Field_ID NOT IN (" + fieldID + ")";
+                DB.ExecuteQuery(updt);
+            }
+
             string sqlQuery = "DELETE FROM AD_CARDVIEW_COLUMN WHERE AD_CARDVIEW_ID=" + ad_CardView_ID;// AND AD_Client_ID=" + ctx.GetAD_Client_ID();
             if (fieldID != "")
             {
-                sqlQuery += " AND AD_Field_ID NOT IN (" + fieldID + ")";
+                sqlQuery += " AND ISACTIVE='Y' AND AD_Field_ID NOT IN (" + fieldID + ")";
             }
             int result = DB.ExecuteQuery(sqlQuery);
             if (result < 1)

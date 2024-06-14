@@ -1260,12 +1260,26 @@
         return this.grid.get(recid, isIndex);
     };
 
-    VTable.prototype.activate = function () {
+    VTable.prototype.activate = function (multiTabView) {
         if (this.grid && !this.rendred) {
+            this.grid.fixedBody = true;
+            if (multiTabView)
+                this.grid.fixedBody = false;
             this.$container.w2render(this.grid['name']);
             this.rendred = true;
         }
         else {
+            if (this.grid.fixedBody !== !multiTabView) {
+                this.grid.fixedBody = !multiTabView;
+                if (this.grid.fixedBody) {
+                    this.$container.height(this.$container.parent().height());
+                }
+            }
+            //this.grid.fixedBody = !multiTabView;
+            //window.setTimeout(function (tht) {
+            //    tht.grid.resize();
+            //   // that.grid.reload();
+            //},2000, this);
             //this.grid.refresh();
             //this.grid.resize();
 

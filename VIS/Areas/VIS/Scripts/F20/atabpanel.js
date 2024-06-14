@@ -94,41 +94,47 @@
             }
         };
 
-        this.setSize = function (size) {
+        this.setSize = function (size,evt) {
 
             if (!this.isClosed && size && size > 40) {
                 return;
             }
 
+
             if (size == 0) {
                 size = this.width;
             }
+            var tWidth = $outerwrap.closest('.vis-ad-w-p-center').width() -40;
             var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
-            if (size && size > 40) {
 
-                if (!this.curTabPanel) {
-                    return;
-                }
-                if (!height) {
-                    height = VIS.Env.getScreenHeight() - 225;
-                    if (this.gTab.getIsHeaderPanel()) {
-                        height = height - VIS.Utility.Util.getValueOfInt(this.curTabPanel.curTab.getHeaderHeight().replace('px', ' ')) - 10;
-                    }
-                }
+            if (evt && !evt.isClosed) {
+                //if (this.isHorizontalAligned && !evt.isHorizontal)
+                //    tWidth = tWidth - evt.width;
+                //else if (!this.curTabPanel.curTab.getIsTPBottomAligned() && evt.isHorizontal) {
+                //    //height
+                //}
+            }
+            
 
-                if (this.curTabPanel.curTab.getIsTPBottomAligned()) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023 
+            if (size && size > 40 && this.curTabPanel) {
+
+                if (this.isHorizontalAligned) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023 
+
                     $outerwrap.css({
                         'height': '100%',
                         'width': '100%'
                     });
-
+                    
+                    
                     $divContent.css({
                         'height': '100%',
-                        'width': ($(document).width() - 72) + 'px',
+                        'width': tWidth+'px',
                         'overflow': 'auto'
                     });
+                    $divHead.hide();
                 }
-                else {
+                else { //vertical
+                    
                     $outerwrap.css({
                         'height': height + 'px',
                         'width': size + 'px'
@@ -139,9 +145,12 @@
                         'width': size - 35 + 'px',
                         'overflow': 'auto'
                     });
+                   
+                    $divHead.show();
                 }
-                $divHead.show();
+
                 $divContent.show();
+                this.isClosed = false;
             }
             else {
                 $outerwrap.css({
@@ -157,9 +166,13 @@
                 $divContent.hide();
             }
 
+          
+
             if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
-                this.sizeChangedListner.onSizeChanged((size && size > 40));
-        }
+                this.sizeChangedListner.onSizeChanged();
+        };
+
+        
 
         this.disposeComponent = function () {
             $outerwrap.remove();
@@ -171,6 +184,7 @@
 
     VTabPanel.prototype.init = function (gTab) {
         this.gTab = gTab;
+        this.isHorizontalAligned = this.gTab.getIsTPBottomAligned()
         var panels = this.gTab.getTabPanels();
 
         var defPnlId = 0;

@@ -59,5 +59,18 @@ namespace VIS.Controllers
             return Json(new { result = "OK" }, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult PushMessage(int sessionid,string txt)
+        {
+            SSEManager.Get().AddMessage(sessionid, txt,
+                "MSG", SSEManager.Cast.BroadCast);
+            return Json(new { result = "OK" });
+        }
+
+
+        public ActionResult GetSessionList()
+        {
+            var list = SessionManager.Get().GetSessions();
+            return Json(Newtonsoft.Json.JsonConvert.SerializeObject(list));
+        }
     }
 }

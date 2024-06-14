@@ -767,7 +767,7 @@ namespace VAdvantage.Model
             if (!String.IsNullOrEmpty(imageUrl))
             {
                 imageUrl = imageUrl.ToLower();
-                if (!imageUrl.Contains(".") || imageExtensions.IndexOf(imageUrl.Substring(imageUrl.LastIndexOf("."))) < 0)
+                if (!imageUrl.Contains(".") || imageExtensions.IndexOf(imageUrl.Substring(imageUrl.LastIndexOf(".")).ToLower()) < 0)
                 {
                     log.SaveError("AddExtension", "");
                     return false;
@@ -778,7 +778,7 @@ namespace VAdvantage.Model
             if (GetBinaryData() != null )
             {
                 String imgExt = GetImageExtension();
-                if (String.IsNullOrEmpty(imgExt) || !imgExt.Contains(".") || imageExtensions.IndexOf(imgExt.Substring(imgExt.LastIndexOf("."))) < 0)
+                if (String.IsNullOrEmpty(imgExt) || !imgExt.Contains(".") || imageExtensions.IndexOf(imgExt.Substring(imgExt.LastIndexOf(".")).ToLower()) < 0)
                 {
                     log.SaveError("AddExtension", "");
                     return false;
