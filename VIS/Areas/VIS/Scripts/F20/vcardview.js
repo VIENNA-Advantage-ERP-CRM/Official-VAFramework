@@ -124,7 +124,7 @@
             rightDiv = $("<div class='vis-cv-rd'>");
             //bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div>');
             //root.append(bsyDiv);
-            //bsyDiv.css("display", 'none');
+            //bsyDiv.css("display", 'none');startCol
             body = $("<div class='vis-cv-main' style='max-width:" + width + "px'>");
             headerdiv = $("<div class='vis-cv-header'>");
             $cmbCards = $('<input  class="vis-vs-card-autoComplete" style="display:inline">')
@@ -536,9 +536,9 @@
         if (this.grpCount == 1) {
             changeCard.getRoot().width("240px").css({ 'margin': '5px 12px 12px 5px', 'float': (VIS.Application.isRTL ? 'right' : 'left') });
         }
-        if ($('head:contains("' + changeCard.headerCustom + ' {")').length == 0) {
+        //if ($('head:contains("' + changeCard.headerCustom + ' {")').length == 0) {
             changeCard.addStyleToDom();
-        }
+        //}
 
         this.getRoot().find("[name='vc_" + id + "']").replaceWith(changeCard.getRoot());
         changeCard.evaluate(this.cConditions);
@@ -1095,6 +1095,7 @@
         this.windowNo = windowNo;
         this.tabID = aPanel.curTab.getAD_Tab_ID()
         this.fieldStyles = fieldStyles;
+        this.tabID = aPanel.curTab.getAD_Tab_ID();
 
 
         var root = $('<div class="vis-cv-card va-dragdrop" data-recid=' + record.recid + ' name = vc_' + record.recid + ' ></div>');
@@ -1190,14 +1191,14 @@
                 var $label = null;
                 var iControl = null;
                 var gridLayout_ID = currentItem.AD_GridLayout_ID;
-                if (!this.fieldStyles[startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID])
-                    this.fieldStyles[startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID] = {};
+                if (!this.fieldStyles[this.tabID + '_' +startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID])
+                    this.fieldStyles[this.tabID + '_' +startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID] = {};
                 //Apply HTML Style
-                this.dynamicClassName = this.fieldStyles[startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID]['applyCustomUISettings'];
+                this.dynamicClassName = this.fieldStyles[this.tabID + '_' +startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID]['applyCustomUISettings'];
                 if (!this.dynamicClassName) {
                     this.dynamicClassName = this.applyCustomUISettings(headerSeqNo, startCol, colSpan, startRow, rowSpan, justyFy, alignItem,
                         backgroundColor, FontColor, fontSize, fieldPadding);
-                    this.fieldStyles[startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID]['applyCustomUISettings'] = this.dynamicClassName;
+                    this.fieldStyles[this.tabID + '_' +startCol + '_' + colSpan + '_' + startRow + '_' + rowSpan + '_' + gridLayout_ID]['applyCustomUISettings'] = this.dynamicClassName;
                 }
 
                 // Find the div with dynamic class from container. Class will only be available in DOm if two fields are having same item seq. No.
@@ -1716,7 +1717,7 @@
 
                     if (!value && value != 0)
                         value = ' -- ';
-                    value = w2utils.encodeTags(value);
+                    //value = w2utils.encodeTags(value);
 
                     if (field.getIsEncryptedField()) {
                         value = value.replace(/\w|\W/g, "*");
@@ -2069,7 +2070,9 @@
      * Add dynamically created style tags to HTML document
      * */
     VCard.prototype.addStyleToDom = function () {
+        $('head').find("[cardview='" + this.windowNo + "']").remove();
         this.styleTag.type = 'text/css';
+        $(this.styleTag).attr("cardview", this.windowNo)
         this.styleTag.innerHTML = this.dynamicStyle.join(" ");
         $($('head')[0]).append(this.styleTag);
     };
@@ -2082,8 +2085,10 @@
      * @param {any} mField
      * @param {any} fieldValueStyle
      */
+
     VCard.prototype.applyCustomUIForFieldValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle, fieldStyleLogic) {
         var style = fieldValueStyle + " " + fieldStyleLogic;
+
         var dynamicClassName = "vis-hp-card-FieldValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
         if (style && style.toLower().indexOf("@value::") > -1) {
             style = getStylefromCompositeValue(style, "@value::");
@@ -2102,9 +2107,11 @@
      * @param {any} mField
      * @param {any} fieldValueStyle
      */
+
     VCard.prototype.applyCustomUIForLabelValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle, fieldStyleLogic) {
         var style = fieldValueStyle + " "+fieldStyleLogic;
         var dynamicClassName = "vis-hp-card-LabelValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
+
         if (style && style.toLower().indexOf("@value::") > -1) {
             style = getStylefromCompositeValue(style, "@value::");
         }

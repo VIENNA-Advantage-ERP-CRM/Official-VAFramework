@@ -101,9 +101,8 @@
         try {
             var type = "";
             var isReact = className.split('.');
-            additionalInfo = null;
             if (isReact[1].toLowerCase() == 'react') {
-                additionalInfo = isReact[2];
+                this.componentName = isReact[2];
                 className = isReact[0] + '.' + isReact[1];
             }
             //    type = VIS.Utility.getFunctionByName('VIS.Apps.ReactTemplate', window);
@@ -139,13 +138,13 @@
         return true;
     };
 
-    AForm.prototype.openWidget = function (className, windowNo) {
+    AForm.prototype.openWidget = function (className, windowNo, widgetInfo) {
         try {
             var type = "";
+            this.widgetInfo = widgetInfo;
             var isReact = className.split('.');
-            additionalInfo = null;
             if (isReact[1].toLowerCase() == 'react') {
-                additionalInfo = isReact[2];
+                this.componentName = isReact[2];
                 className = isReact[0] + '.' + isReact[1];
             }
             //    type = VIS.Utility.getFunctionByName('VIS.Apps.ReactTemplate', window);
@@ -154,7 +153,7 @@
             type = VIS.Utility.getFunctionByName(className, window);
             //}
             var o = new type(windowNo);
-            o.init(windowNo, this, additionalInfo);
+            o.init(windowNo, this);
             this.mPanel = o;
             o = null;
         }
@@ -166,6 +165,12 @@
 
         }
         this.setBusy(false);
+    }
+
+    AForm.prototype.widgetSizeChange = function (size) {
+        if (this.mPanel && this.mPanel.widgetSizeChange) {
+            this.mPanel.widgetSizeChange(size);
+        }
     }
 
     /**

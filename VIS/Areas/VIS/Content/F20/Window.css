@@ -720,9 +720,7 @@ span.vis-ad-w-p-tb-rc-action {
 
 .vis-ad-w-p-center-tc {
     order: 1;
-    /*background-color: floralwhite;*/
-    /*height:200px;*/
-}
+ }
 
 .vis-ad-w-p-center-inctab {
     /*grid-row: 3/3;*/
@@ -732,9 +730,10 @@ span.vis-ad-w-p-tb-rc-action {
     flex: 0;
     /*flex-basis: 250px;*/
     flex-flow: column;
-    padding-bottom:7px;
+    padding-bottom: 7px;
     /*padding-top:7px;*/
     /*height: 325px;*/
+    background :rgba(var(--v-c-common), 1);
 }
 
 .vis-ad-w-p-inc-content .w2ui-grid .w2ui-grid-body table .w2ui-head {

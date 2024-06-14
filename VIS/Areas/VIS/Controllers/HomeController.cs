@@ -419,8 +419,6 @@ namespace VIS.Controllers
         public ActionResult Home()
         {
 
-
-
             Ctx ct = Session["ctx"] as Ctx;
             ViewBag.Current_Ad_Lang = ct.GetAD_Language();
             objHomeHelp = new HomeHelper();
@@ -440,20 +438,27 @@ namespace VIS.Controllers
             return PartialView(HM);
         }
 
-        //public ActionResult Manifest()
-        //{
-        //    Response.ContentType = "text/cache-manifest";
-        //    Response.ContentEncoding = System.Text.Encoding.UTF8;
-        //    Response.Cache.SetCacheability(
-        //        System.Web.HttpCacheability.NoCache);
-        //    return View();
-        //}
+        public ActionResult HomeNew()
+        {
+            Ctx ct = Session["ctx"] as Ctx;
+            ViewBag.lang = ct.GetAD_Language();
+            return PartialView("HomeNew");
+        }
+
+            //public ActionResult Manifest()
+            //{
+            //    Response.ContentType = "text/cache-manifest";
+            //    Response.ContentEncoding = System.Text.Encoding.UTF8;
+            //    Response.Cache.SetCacheability(
+            //        System.Web.HttpCacheability.NoCache);
+            //    return View();
+            //}
 
 
-        #region Follups start
-        /*----------------Folloups Strat-----------------------*/
-        // Get Folloups
-        [AjaxAuthorizeAttribute]
+            #region Follups start
+            /*----------------Folloups Strat-----------------------*/
+            // Get Folloups
+            [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public JsonResult GetJSONFllups(int fllPageSize, int fllPage, Boolean isRef)
@@ -830,6 +835,10 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(lst), JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Get Widgets and Shortcuts
+        /// </summary>
+        /// <returns></returns>
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [HttpPost]
@@ -846,6 +855,10 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(list), JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// Get User widgets for home
+        /// </summary>
+        /// <returns></returns>
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [HttpPost]
@@ -857,12 +870,35 @@ namespace VIS.Controllers
             
         }
 
+        /// <summary>
+        /// Save Dashboard widget
+        /// </summary>
+        /// <param name="widgetSizes"></param>
+        /// <returns></returns>
         public int SaveDashboard(List<WidgetSize> widgetSizes)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
             return homeModels.SaveDashboard(ctx, widgetSizes);
         } 
+        
+        /// <summary>
+        /// Save widget on drop
+        /// </summary>
+        /// <param name="widgetSizes"></param>
+        /// <returns></returns>
+        public int SaveSingleWidget(List<WidgetSize> widgetSizes)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            return homeModels.SaveSingleWidget(ctx, widgetSizes);
+        } 
+
+        /// <summary>
+        /// Delete widget
+        /// </summary>
+        /// <param name="id">Widget ID</param>
+        /// <returns></returns>
         public int DeleteWidgetFromHome(int id)
         {
             Ctx ctx = Session["ctx"] as Ctx;

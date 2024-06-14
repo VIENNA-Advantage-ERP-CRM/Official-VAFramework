@@ -4,13 +4,13 @@
  * purpose - Show widget on home page
  */
 ; (function (VIS, $) {
-    function HomeMgr() {
+    function HomeMgr2() {
         'use strict';
         var $home = null;
         var self = this;
-        var widgetList = null;
-        var shortcutItem = [];
-        var shortcutItems = [];
+        var widgetList = {};
+        var widgetWidth = null;
+        var homeItems = {};
         var originalPosition; // Store the original position of a draggable element
         var isEditMode = false; // Flag to indicate whether the widget is in edit mode
 
@@ -28,21 +28,41 @@
 
             // Function to resize the widget container based on window size
             function resizeWidgetContainer() {
-                var w = ($home.find('.vis-home-leftPanel').width() - 25) / 9;
+                var wd = $home.find('.vis-home-leftPanel').width();
+                if (wd < 300) {
+                    wd = $(window).width(); 
+                }
+
+                var w = (wd - 25) / 9;
                 if ($(window).width() <= 500) {
-                    w = ($home.find('.vis-home-leftPanel').width() - 25) / 3;
+                    w = (wd - 25) / 3;
                 } else if ($(window).width() <= 960) {
-                    w = ($home.find('.vis-home-leftPanel').width() - 25) / 6;
+                    w = (wd - 25) / 6;
                 } 
-               
+
+
+                widgetWidth = w;               
                 $home.find('.vis-widget-container').attr('style', '--rowheight:' + w + 'px');
+
+                var itm = Object.keys(homeItems);
+                for (var i = 0; i < itm.length; i++) {
+                    var obj = {
+                        AD_UserHomeWidgetID: homeItems[itm[i]].AD_UserHomeWidgetID,
+                        editMode: isEditMode,
+                        rows: homeItems[itm[i]].rows,
+                        Cols: homeItems[itm[i]].cols,
+                        width: ((homeItems[itm[i]].cols || 1) * widgetWidth).toFixed(2) + 'px',
+                        height: ((homeItems[itm[i]].rows || 1) * widgetWidth).toFixed(2) + 'px',
+                    }
+                    homeItems[itm[i]].wform.widgetSizeChange(obj);
+                }
             }
             /**
              * Adjust Size
              */
-            function adjustDivSize() {
+            function adjustWidgetDivSize() {
                 var windowWidth = $(window).width();
-                $('.scrollerHorizontal').width(windowWidth);
+                $home.find('.scrollerHorizontalWidget').width(windowWidth);
                 resizeWidgetContainer();
             }
 
@@ -99,13 +119,18 @@
                 // Event handler for deleting a widget
                 $leftPanel.on('click', '.vis-widgetDelete', function (e) {
                     var ui = $(this).closest('.vis-widget-item');
-                    if (ui.data('wid')) {
+                    if (ui.data('wid') && ui.data('wid').toString().indexOf('temp_') ==-1) {
                         var obj = {
                             id: ui.data('wid')
                         };
                         VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Home/DeleteWidgetFromHome", obj, function (result) {
 
                         });
+                    }
+
+                    if (homeItems && homeItems[ui.data('wid')]) {
+                        homeItems[ui.data('wid')].wform.dispose();
+                        delete homeItems[ui.data('wid')];
                     }
 
                     ui.slideUp(function () {
@@ -120,13 +145,15 @@
 
                     var ui = $(this).closest('.vis-widget-item');
 
-                    var dsi = $.grep(widgetList, function (element, index) {
-                        return element.KeyID == ui.data('ws') && element.Type == ui.data('type');
-                    });
+                    //var dsi = $.grep(widgetList, function (element, index) {
+                    //    return element.KeyID == ui.data('ws') && element.Type == ui.data('type');
+                    //});
+
+                    var dsi = widgetList[ui.data('ws') + '_' + ui.data('type')];
 
                     //1   Contain Child ShortCut
-                    if (dsi && dsi.length > 0) {
-                        dsi = dsi[0];
+                    if (dsi) {
+                        //dsi = dsi[0];
                         if (dsi.HasChild) {
                             // alert("setting Dialog");
                             var sd =new VIS.shortcutMgr.SettingDialog(dsi.KeyID);// new SettingDialog(dsi.KeyID);
@@ -191,8 +218,21 @@
                     drop: function (event, ui) {
                         // Clone the dragged element and append it to the .vis-home-leftPanel
                         var type = $(ui.helper).data('type')
-                        var idx = $(ui.helper).data('idx');
-                        renderWidgets(widgetList[idx],0);
+                        var keyid = $(ui.helper).data('keyid');
+                      
+                        var widgetSizes = [];
+                        widgetSizes.push({
+                            SRNO: 99,
+                            KeyID: $(ui.helper).data('keyid'),
+                            Type: $(ui.helper).data('type'),
+                        });
+
+                        VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Home/SaveSingleWidget", widgetSizes, function (result) {                            
+                            renderWidgets(widgetList[keyid + '_' + type], result, null);
+                        });
+
+
+
                     }
                 });
 
@@ -225,19 +265,34 @@
             }
            
             // Function to render widgets
-            function renderWidgets(widget,wid) {
+            function renderWidgets(widget, wid, AdditionalInfo) {
                 //var hue = Math.floor(Math.random() * 360);
                 //var v = Math.floor(Math.random() * 16) + 85;
                 //var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
+                var info = {
+                    AD_UserHomeWidgetID: wid,
+                    editMode: isEditMode,
+                    rows: (widget.Rows || 1),
+                    cols: (widget.Cols || 1),
+                    width: ((widget.Cols || 1) * widgetWidth).toFixed(2) + 'px',
+                    height: ((widget.Rows || 1) * widgetWidth).toFixed(2) + 'px',
+                    AdditionalInfo: AdditionalInfo || null
+                }
 
+                if (wid == 0) {
+                    wid = 'temp_' + Math.floor(Date.now());
+                }
 
 
                 var $item = $('<div>');
                 if (widget.Type == "W") {
                     var wform = new VIS.AForm();
-                    wform.openWidget(widget.ClassName, -99999);
+                    wform.openWidget(widget.ClassName, -99999, info);
                     wform.addChangeListener(VIS.HomeMgr);
                     $item = wform.getRoot();
+                    var obj = JSON.parse(JSON.stringify(info));
+                    obj['wform'] = wform;
+                    homeItems[wid] = obj;
                 } else if (widget.Type == "L") {
                     var $div = $('<div class="vis-linksWidget">');
                     $div.append(widget.items).append('<div class="linktitle">'+widget.DisplayName+'</div>');
@@ -279,16 +334,16 @@
                         return;
                     }
                     result.sort((a, b) => a.DisplayName - b.DisplayName);
-                    widgetList = result;
+                    //var widgetLst = result;
                  
 
                     for (var i = 0; i < result.length; i++) {
                        
                         var moduelName = null;
                         var img = null;
+                        var itm = result[i];
                         if (result[i].Type == 'L') {
-                            moduelName="Links"
-                            var itm = result[i];
+                            moduelName="Links"                            
                             if (itm.HasImage) {
                                 if (!itm.IsImageByteArray && itm.IconUrl.indexOf('.') < 0) {
                                     img = '<i data-index="' + i + '" class="' + itm.IconUrl + '"></i>';
@@ -310,12 +365,14 @@
                                 img = '<i data-index="' + i + '" class="vis vis-shortcut"></i>';
                             }
 
-                            widgetList[i]['items'] = img;
+                            itm['items'] = img;
 
                         } else if (result[i].Type == 'W') {
                             moduelName = result[i].ModuleName
                             img = '<img class="vis-widgetImg" src="' + result[i].Img + '" />';
                         }
+
+                        widgetList[itm.KeyID + '_' + itm.Type] = itm;
 
                         if ($home.find('.vis-widget-body').find('div:contains("' + moduelName + '")').length === 0) {
                             $home.find('.vis-widget-body').append($('<div class="vis-main-widget-heading">' + moduelName + '</div>'));
@@ -323,100 +380,51 @@
                         }
 
 
-                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-idx="' + i + '">' + img +'<div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Rows ||1) + 'X' + (result[i].Cols || 1) + '</span></div></div>');
+                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '">' + img +'<div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Rows ||1) + 'X' + (result[i].Cols || 1) + '</span></div></div>');
                         $home.find('.vis-widgetDrag-container:last').append(witem);
                     }
 
                     dragDrop();
+                    loadHomeWidgets();
                 });
+            }
 
-                // Load Shortcut
-                //shortcutItem = [];
-                //VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Home/GetShortcutItems", null, function (data) {
-                //    if (data) {
-                //        shortcutItems = data;
-                //        var itm = null;
-                //        var ModuleName = 'Links'
-                //        for (var i = 0; i < data.length; i++) {
-                //            itm = data[i];
-                //            var img = null;
+            function loadHomeWidgets() {
+                var url = VIS.Application.contextUrl + "Home/GetUserWidgets";
+                VIS.dataContext.getJSONData(url, null, function (result) {
+                    if (result && result.length > 0) {
+                        $home.find('.vis-add-widgetContainer').hide();
+                        for (var i = 0; i < result.length; i++) {
+                            //var dsi = $.grep(widgetList, function (element, index) {
+                            //    return element.KeyID == result[i].KeyID && element.Type==result[i].Type;
+                            //});
+                            var dsi = widgetList[result[i].KeyID + '_' + result[i].Type];
 
-                //            if ($home.find('.vis-widget-body').find('div:contains("' + ModuleName + '")').length === 0) {
-                //                $home.find('.vis-widget-body').append($('<div class="vis-main-widget-heading">' + ModuleName + '</div>'));
-                //                $home.find('.vis-widget-body').append($('<div class="vis-widgetDrag-container">'));
-                //            }
-
-
-                //            if (itm.HasImage) {
-                //                if (!itm.IsImageByteArray && itm.IconUrl.indexOf('.') < 0) {
-                //                    img = '<i data-index="' + i + '" class="' + itm.IconUrl + '"></i>';
-                //                }
-                //                else {
-                //                    var url = "";
-                //                    if (itm.IsImageByteArray) {
-                //                        url = 'data:image/*;base64,' + itm.IconBytes;
-                //                    }
-                //                    else {
-                //                        url = VIS.Application.contextUrl + itm.IconUrl;
-
-                //                    }
-                //                    img = '<img data-index="' + i + '" src="' + url + '"/>';
-
-                //                }
-
-                //            } else {
-                //                img = '<i data-index="' + i + '" class="vis vis-shortcut"></i>';
-                //            }
-
-                //            var witem = $('<div class="vis-widgetDrag-item" data-type="L" data-idx="' + i + '">' + img + '<div class="vis-widgetSize">' + itm.ShortcutName + '<span style="display:block">1X1<span></div></div>');
-                //            $home.find('.vis-widgetDrag-container:last').append(witem);
-
-                //            shortcutItems[i]['wid'] = 0;
-                //            shortcutItems[i]['Rows'] = 1;
-                //            shortcutItems[i]['Cols'] = 1;
-                //            shortcutItems[i]['DisplayName'] = itm.ShortcutName;
-                //            shortcutItems[i]['items'] = img;
-                //            shortcutItems[i]['Type'] = 'L';
-
-                //        }
-                //        dragDrop();
-                //    }
-                //});
-
-                //Load Home Widget
-                setTimeout(function () {
-                    url = VIS.Application.contextUrl + "Home/GetUserWidgets";
-                    VIS.dataContext.getJSONData(url, null, function (result) {
-                        if (result && result.length > 0) {
-                            $('.vis-add-widgetContainer').hide();
-                            for (var i = 0; i < result.length; i++) {
-                                var dsi = $.grep(widgetList, function (element, index) {
-                                    return element.KeyID == result[i].KeyID && element.Type==result[i].Type;
-                                });
-                                if (dsi && dsi.length > 0) {
-                                    renderWidgets(dsi[0], result[i].ID);
-                                }
+                            if (dsi) {
+                                renderWidgets(dsi, result[i].ID, result[i].AdditionalInfo);
                             }
-                            dragDrop();
-                        } else {
-                            $('.vis-add-widgetContainer').show();
                         }
-                    });
-                }, 1000);
-              
-
-               
-
+                        dragDrop();
+                    } else {
+                        $home.find('.vis-add-widgetContainer').show();
+                    }
+                });
             }
 
             // Function to save the dashboard layout
             function saveDashboard() {
                 var widgetSizes = [];
-                $('.vis-widget-item').each(function (index) {
+                $home.find('.vis-widget-item').each(function (index) {
+                    var aInfo = null;
+                    if ($(this).data('type') == "W") {
+                        aInfo = homeItems[$(this).data('wid')].AdditionalInfo;
+                    }
+
                     widgetSizes.push({
                         SRNO: (index + 1),
                         KeyID: $(this).data('ws'),
                         Type: $(this).data('type'),
+                        AdditionalInfo: aInfo
                     });
                 });
 
@@ -428,11 +436,11 @@
             }
 
             // Load the home widget content and initialize it
-            $home.load(VIS.Application.contextUrl + 'Home/Home', function () {
-                adjustDivSize();
+            $home.load(VIS.Application.contextUrl + 'Home/HomeNew', function () {
+                adjustWidgetDivSize();
                 loadWidgets();
                 events();
-                $(window).resize(adjustDivSize);              
+                $(window).resize(adjustWidgetDivSize);              
 
             });
 
@@ -445,9 +453,9 @@
         };
     }
 
-    VIS.HomeMgr = HomeMgr();
+    VIS.HomeMgr2 = HomeMgr2();
 
-    VIS.HomeMgr.widgetFirevalueChanged = function (data) {
+    VIS.HomeMgr2.widgetFirevalueChanged = function (data) {
        
     };
 })(VIS, jQuery);

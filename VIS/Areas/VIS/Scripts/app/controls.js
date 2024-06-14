@@ -1143,7 +1143,7 @@
                 this.ctrl.html(VIS.VTelePhoneInstance.getHtml(newValue));
             }
             else {
-                this.ctrl.text(newValue);
+                this.ctrl.text(VIS.Utility.decodeText(newValue));
                 if (isHTML) {
                     this.ctrl.html(newValue);
                 }
@@ -6883,7 +6883,7 @@
         }
         else {
             this.setReadOnly(false);
-        }
+        }      
 
         this.getBtn = function (index) {
             if (index == 0 ) {
@@ -6901,11 +6901,9 @@
 
         var self = this; //self pointer
 
-        /* Event */
-        $ctrl.on("change", function (e) {
-            e.stopPropagation();
-           //var newVal = $ctrl.val();
-            var newVal = self.iti ? self.iti.getNumber():self.ctrl.val();
+        function setChangeValue(e) {
+            //var newVal = $ctrl.val();
+            var newVal = self.iti ? self.iti.getNumber() : self.ctrl.val();
             this.value = newVal;
             if (newVal !== self.oldValue) {
                 var evt = { newValue: newVal, propertyName: self.getName() };
@@ -6915,6 +6913,12 @@
             if (obscureType) {
                 self.setReadOnly(true);
             }
+        }
+
+        /* Event */
+        $ctrl.on("change", function (e) {
+            e.stopPropagation();
+            setChangeValue(e);
         });
 
 
@@ -6930,12 +6934,9 @@
         });
 
         $ctrl.on("countrychange", function (e, countryData) {
+            e.stopPropagation();
             if (!self.settingVal) {
-               //self.iti.setNumber('');
-                //$ctrl.val('');
-                //var res = $ctrl.attr('placeholder').replace(/[0-9]/g, 0);
-                //$ctrl.unmask();
-               // $ctrl.mask(res);
+                setChangeValue(e);
             }
         });
 

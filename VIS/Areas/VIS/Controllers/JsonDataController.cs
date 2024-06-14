@@ -1291,7 +1291,7 @@ namespace VIS.Controllers
                 {
                     if (sqlCol.Contains("WHERE"))
                     {
-                        sqlCol += " AND " + TableName + ".ProcessedVersion = 'N' ";
+                        sqlCol += " AND COALESCE(" + TableName + ".ProcessedVersion,'N') = 'N' ";
                     }
                     sqlCol += " ORDER BY " + TableName + ".VERSIONVALIDFROM DESC, " + TableName + ".RecordVersion DESC";
                 }

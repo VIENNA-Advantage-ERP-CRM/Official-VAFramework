@@ -55,6 +55,25 @@
                         '</div>';
                     }
 
+                    if (data.processNotBinded != null && data.processNotBinded != undefined && data.processNotBinded != "") {
+                        script += '<div class="vis-group-gi-data">' +
+                            '<label>' + VIS.Msg.getMsg("VIS_ProcessNotBind") + ':</label>' +
+                            '<p class="text-danger">' + data.processNotBinded + '</p>';
+                        '</div>';
+                    }
+                    if (data.formNotBinded != null && data.formNotBinded != undefined && data.formNotBinded != "") {
+                        script += '<div class="vis-group-gi-data">' +
+                            '<label>' + VIS.Msg.getMsg("VIS_FormNotBind") + ':</label>' +
+                            '<p class="text-danger">' + data.formNotBinded + '</p>';
+                        '</div>';
+                    }
+                    if (data.workflowNotBinded != null && data.workflowNotBinded != undefined && data.workflowNotBinded != "") {
+                        script += '<div class="vis-group-gi-data">' +
+                            '<label>' + VIS.Msg.getMsg("VIS_WorkFlowNotBind") + ':</label>' +
+                            '<p class="text-danger">' + data.workflowNotBinded + '</p>';
+                        '</div>';
+                    }
+
 
 
                     script += '</div>';

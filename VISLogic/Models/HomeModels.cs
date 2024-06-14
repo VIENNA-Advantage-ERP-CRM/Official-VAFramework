@@ -107,6 +107,11 @@ namespace VIS.Models
             return true;
         }
 
+        /// <summary>
+        /// Get Home page widget
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<HomeWidget> GetHomeWidget(Ctx ctx)
         {
 
@@ -146,9 +151,14 @@ namespace VIS.Models
             return list;
         }
 
+        /// <summary>
+        /// Get User Widgets
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public List<HomeWidget> GetUserWidgets(Ctx ctx)
         {
-            string sql = @"SELECT AD_UserHomeWidget.AD_UserHomeWidget_ID, AD_UserHomeWidget.componentID,componentType,SRNO FROM AD_UserHomeWidget
+            string sql = @"SELECT AD_UserHomeWidget.AD_UserHomeWidget_ID, AD_UserHomeWidget.componentID,componentType,SRNO,AdditionalInfo FROM AD_UserHomeWidget
                             WHERE AD_UserHomeWidget.IsActive='Y' AND AD_Role_ID=" + ctx.GetAD_Role_ID() + " AND  AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY SRNO";
             List<HomeWidget> list = null;
             DataSet dataSet = DB.ExecuteDataset(sql);
@@ -165,6 +175,7 @@ namespace VIS.Models
                         KeyID = Util.GetValueOfInt(row[i]["componentID"]),
                         Type = Util.GetValueOfString(row[i]["componentType"]),
                         SRNO = Util.GetValueOfInt(row[i]["SRNO"]),
+                        AdditionalInfo = Util.GetValueOfString(row[i]["AdditionalInfo"])
                         //Rows = Util.GetValueOfInt(row[i]["Rowspan"]),
                         //Cols = Util.GetValueOfInt(row[i]["Colspan"])
                     };
@@ -175,6 +186,12 @@ namespace VIS.Models
             return list;
         }
 
+        /// <summary>
+        /// Save Dasboard
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="widgetSizes"></param>
+        /// <returns></returns>
         public int SaveDashboard(Ctx ctx, List<WidgetSize> widgetSizes)
         {
             DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE AD_User_ID="+ctx.GetAD_User_ID()+" AND AD_Role_ID="+ctx.GetAD_Role_ID());
@@ -190,6 +207,34 @@ namespace VIS.Models
             }
             return 1;
         }
+
+        /// <summary>
+        /// Save widget on drop
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="widgetSizes"></param>
+        /// <returns></returns>
+        public int SaveSingleWidget(Ctx ctx, List<WidgetSize> widgetSizes)
+        {
+            MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
+            for (int i = 0; i < widgetSizes.Count; i++)
+            {               
+                mUserHomeWidget.SetSRNO(widgetSizes[i].SRNO);
+                mUserHomeWidget.SetComponentID(widgetSizes[i].KeyID);
+                mUserHomeWidget.SetComponentType(widgetSizes[i].Type);
+                mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
+                mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
+                mUserHomeWidget.Save();
+            }
+            return mUserHomeWidget.Get_ID();
+        }
+
+        /// <summary>
+        /// Delete Widgets
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public int DeleteWidgetFromHome(Ctx ctx,int id)
         {
             DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE  AD_UserHomeWidget_ID=" + id);
@@ -283,6 +328,7 @@ namespace VIS.Models
         public int KeyID { get; set; }
         public int SRNO { get; set; }
         public string Type { get; set; }
+        public string AdditionalInfo { get; set; }
     }
 
     public class HomeWidget: WidgetSize
@@ -296,6 +342,7 @@ namespace VIS.Models
         public string ClassName { get; set; }
         public string Img { get; set; }
         public string ModuleName { get; set; }
+       
       
     }
 

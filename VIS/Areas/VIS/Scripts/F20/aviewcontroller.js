@@ -855,6 +855,10 @@
     VIS.GridController.prototype.getIsMapRow = function () {
         return this.isMapRow;
     };
+    VIS.GridController.prototype.getIsMultiRow = function () {
+        return !(this.singleRow || this.isCardRow || this.isMapRow);
+    };
+
 
     VIS.GridController.prototype.onTableRowSelect = function (event) {
 
@@ -1216,13 +1220,9 @@
 
     VIS.GridController.prototype.activate = function (oldGC, aParams) {
 
-        this.vTable.activate(this.multiTabView);
+        
         oldGC = oldGC || {};
 
-        //if (oldGC.isIncludedGCVisible) { //Hide Included of Old GC
-        //    oldGC.vIncludedGC.setVisible(false);
-        //}
-        this.vTable.setReadOnly(false);
 
         if (this.displayAsIncludedGC) {
             var tdArea = this.aPanel.getLayout();
@@ -1231,6 +1231,9 @@
             tdArea.append(this.getRoot());
             this.displayAsIncludedGC = false;
             this.aPanel.getIncludedEmptyArea().css({ 'display': 'none' });
+            tdArea.addClass('vis-ad-w-p-center-view-height');
+            tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
+           
         }
         else if (this.gTab.getIncluded_Tab_ID() == 0) {
             var olcIncludedTab = oldGC.vIncludedGC;
@@ -1239,6 +1242,8 @@
                 olcIncludedTab.setUI(false);
                 olcIncludedTab.getRoot().detach();
                 this.aPanel.getIncludedEmptyArea().css({ 'display': 'none' });
+                tdArea.addClass('vis-ad-w-p-center-view-height');
+                tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
             }
 
         }
@@ -1249,17 +1254,17 @@
             //  this.vIncludedGC.vTable.activate();
             this.vIncludedGC.displayAsIncludedGC = false;
             this.vIncludedGC.isIncludedGCVisible = false;
+            var tdArea = this.aPanel.getLayout();
+            tdArea.removeClass('vis-ad-w-p-center-view-height');
+            tdArea.find('.vis-ad-w-p-vc-editview').css("position", "unset");
 
         }
+
+        this.vTable.activate(this.multiTabView || this.vIncludedGC !=null);
+        this.vTable.setReadOnly(false);
+
         this.activateTree();
 
-        //check for defalut view 
-        //if (!this.cardSetup && this.gTab.getTabLayout() == "C") {
-        //    var cardTmp = this.gTab.vo.Cards[0];
-        //    this.vCardView.setCardSqlInTabModel(this.gTab, cardTmp);
-        //    this.vCardView.setCardViewData(cardTmp);
-        //    this.cardSetup = true;
-        //}
 
         //Overwrite setting according to actionParam
         this.actionParams = aParams;
@@ -1280,8 +1285,13 @@
                 }
             }
             else {
-                if ((this.gTab.isHPanelNotShowInMultiRow && !this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
-                    this.vHeaderPanel.showPanel();
+                if (this.vHeaderPanel != null) {
+                    if (this.gTab.isHPanelNotShowInMultiRow && !this.getIsSingleRow()) {
+                        this.vHeaderPanel.hidePanel();
+                    }
+                    else {
+                        this.vHeaderPanel.showPanel();
+                    }
                     if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
                         this.vHeaderPanel.sizeChangedListner.onSizeChanged();
                 }
@@ -2101,7 +2111,11 @@
                 this.query(this.gTab.getOnlyCurrentDays(), 0, false);
             }
             //this.vCardView.requeryData();
-
+            if ((this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
+                this.vHeaderPanel.hidePanel();
+                if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
+                    this.vHeaderPanel.sizeChangedListner.onSizeChanged();
+            }
 
             p1 = null;
         }
@@ -2167,11 +2181,13 @@
             tdArea.append(inGc);
 
 
-            tdArea.height(VIS.Application.isMobile ? 250 : 350);
+            //tdArea.height(VIS.Application.isMobile ? 250 : 350);
             tdArea.css('display', 'flex');
+            
 
             inGc.show();
-            this.vIncludedGC.vTable.activate();
+            this.vIncludedGC.vTable.activate(true);
+            
             this.vIncludedGC.vTable.setReadOnly(true);
 
 

@@ -15,9 +15,10 @@ window.VIS = window.VIS || {};
     };
 
     // Initialize method to render React component dynamically
-    VIS.React.prototype.init = function (windowNo, frame, componentName) {
+    VIS.React.prototype.init = function (windowNo, frame, additionalInfo) {
         this.windowNo = windowNo;
         this.frame = frame;
+        var componentName = frame.componentName;
         let self = this;
        
         // Lazy load the component based on componentName

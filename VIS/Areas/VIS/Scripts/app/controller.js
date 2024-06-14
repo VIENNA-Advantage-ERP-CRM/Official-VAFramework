@@ -4450,6 +4450,9 @@
                     var str = colValue.toString();
                     if (field.getIsEncryptedColumn())
                         str = this.decrypt(str);
+                    if (str.toLower().equals("true")) {
+                        str = "Y";
+                    }
                     colValue = str.equals("Y");	//	Boolean
                 }
                 //	LOB

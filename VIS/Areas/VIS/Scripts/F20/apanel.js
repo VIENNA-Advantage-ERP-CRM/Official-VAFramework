@@ -2222,6 +2222,11 @@
                     if (!selfPan.actionButton(action.source, controller)) {
                         selfPan.setBusy(false, true);
                     }
+
+                    if (action.source.mField.getIsAction()) {
+                        selfPan.setBusy(false, true);
+                    }
+
                     return;
                 }
             }
@@ -3181,6 +3186,7 @@
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
+            this.setBusy(false, true);
             return false;
         }
 
