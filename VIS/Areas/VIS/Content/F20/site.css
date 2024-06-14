@@ -287,6 +287,10 @@ select {
     height: 23px;
 }
 
+.vis-app-footer-c-r1 {
+    flex: 0;
+}
+
 .vis-app-footer-c-r {
     flex: 0;
     flex-basis: 23px;
