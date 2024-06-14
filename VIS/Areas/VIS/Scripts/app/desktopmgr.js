@@ -587,7 +587,7 @@
         function start() {
             polyFills();//implement fallback for Datalist and other newer controls 
             menuFilterMgr.init($menuTree, $('#vis_filterMenu'), $vis_mainMenu); //init Menu filter popup Manager
-            authDialog.init($('#vis_home_ca'), $('#vis_userName')); //Init Authorization Dialog
+            authDialog.init($('#vis_home_ca'), $('.vis-app-user-img-wrap')); //Init Authorization Dialog
             setAndLoadHomePage(); //Home Page
             historyMgr.restoreHistory(); //Restore History of App if any
             navigationInit();

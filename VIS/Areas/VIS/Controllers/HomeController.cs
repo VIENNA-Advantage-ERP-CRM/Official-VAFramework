@@ -196,6 +196,7 @@ namespace VIS.Controllers
                     model.Login1Model.LoginLanguage = ctx.GetAD_Language();
 
                     model.Login2Model.Role = ctx.GetAD_Role_ID().ToString();
+                    model.Login2Model.RoleName = ctx.GetAD_Role_Name();
                     model.Login2Model.Client = ctx.GetAD_Client_ID().ToString();
                     model.Login2Model.Org = ctx.GetAD_Org_ID().ToString();
                     model.Login2Model.Warehouse = ctx.GetAD_Warehouse_ID().ToString();
@@ -241,7 +242,7 @@ namespace VIS.Controllers
                     {
                         HomeModels hm = new HomeModels();
                         objHomeHelp = new HomeHelper();
-                        hm = objHomeHelp.getLoginUserInfo(ctx, 32, 32);
+                        hm = objHomeHelp.getLoginUserInfo(ctx, 140, 120);
                         ViewBag.UserPic = hm.UsrImage;
                     }
                     ViewBag.DisplayName = model.Login1Model.DisplayName;
