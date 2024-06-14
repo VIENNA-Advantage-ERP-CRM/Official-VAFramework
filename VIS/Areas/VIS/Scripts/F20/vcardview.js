@@ -536,9 +536,9 @@
         if (this.grpCount == 1) {
             changeCard.getRoot().width("240px").css({ 'margin': '5px 12px 12px 5px', 'float': (VIS.Application.isRTL ? 'right' : 'left') });
         }
-        if ($('head:contains("' + changeCard.headerCustom + ' {")').length == 0) {
+        //if ($('head:contains("' + changeCard.headerCustom + ' {")').length == 0) {
             changeCard.addStyleToDom();
-        }
+        //}
 
         this.getRoot().find("[name='vc_" + id + "']").replaceWith(changeCard.getRoot());
         changeCard.evaluate(this.cConditions);
@@ -2051,9 +2051,9 @@
      * Add dynamically created style tags to HTML document
      * */
     VCard.prototype.addStyleToDom = function () {
-        $('head').find("[cardview='true']").remove();
+        $('head').find("[cardview='" + this.windowNo + "']").remove();
         this.styleTag.type = 'text/css';
-        $(this.styleTag).attr("cardview", "true")
+        $(this.styleTag).attr("cardview", this.windowNo)
         this.styleTag.innerHTML = this.dynamicStyle.join(" ");
         $($('head')[0]).append(this.styleTag);
     };

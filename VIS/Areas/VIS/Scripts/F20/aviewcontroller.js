@@ -2111,7 +2111,11 @@
                 this.query(this.gTab.getOnlyCurrentDays(), 0, false);
             }
             //this.vCardView.requeryData();
-
+            if ((this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
+                this.vHeaderPanel.hidePanel();
+                if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
+                    this.vHeaderPanel.sizeChangedListner.onSizeChanged();
+            }
 
             p1 = null;
         }
