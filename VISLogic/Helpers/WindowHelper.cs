@@ -1740,7 +1740,8 @@ namespace VIS.Helpers
 
             PO po = null;
             // VIS0008 change to handle save of OrgInfo (record without PK) through PO
-            if ((table.IsSingleKey() && table.HasPKColumn()) || Record_ID == 0)
+            if ((table.IsSingleKey() && table.HasPKColumn())
+                || ((ctx.GetAD_User_ID() == 0 || ctx.GetAD_User_ID() == 100) && Record_ID == 0))
             {
                 if (!_idZeroUpdate)
                 {
