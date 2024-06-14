@@ -404,6 +404,8 @@
 
             var jsonData = $.parseJSON(json.result); // widow json
 
+        
+
             VIS.context.setContextOfWindow($.parseJSON(json.wCtx), windowNo);// set window context
             //console.log(jsonData);
 

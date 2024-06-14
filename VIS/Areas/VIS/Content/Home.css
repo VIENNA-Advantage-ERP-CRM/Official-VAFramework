@@ -3470,7 +3470,7 @@ ul.vis-userLinks-ListMenu li a i {
     float: left;
     width: 30%;
     box-shadow: 0 0 7px 1px #cccccc;
-    height: 100%;
+    height: calc(100% - 3px);
 }
 
 .vis-widget-header {

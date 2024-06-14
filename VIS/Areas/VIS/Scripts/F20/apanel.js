@@ -159,6 +159,8 @@
             var clone = document.importNode(tmpAPanel, true);
             $root = $(clone.querySelector(".vis-ad-w-p"));
             $busyDiv = $root.find(".vis-ad-w-p-busy"); // busy indicator
+            $landingpage = $root.find(".vis-landingpage");
+            $windowpage = $root.find(".vis-windowpage");
 
             //tolbar and search 
             $ulToobar = $root.find(".vis-ad-w-p-tb-lc");// $("<ul class='vis-appsaction-ul'>"); //toolbar item list
@@ -237,6 +239,14 @@
                 if ($(e.target).is(':focus')) {
                     self.compositViewChangeSave(e);
                 }
+            });
+
+            $landingpage.on('click', function () {
+                self.showLandingPage(true);
+            });
+
+            $windowpage.on('click', function () {
+                self.showLandingPage(false);
             });
 
         };
@@ -712,9 +722,13 @@
         };
 
         //privilized function
-        this.getRoot = function () { return $root; };
+        this.getRoot = function () {
+            return $root;
+        };
 
-        this.getLayout = function () { return $divContentArea; };
+        this.getLayout = function () {
+            return $divContentArea;
+        };
 
         this.getIncludedEmptyArea = function () {
             return $divIncludeTab;
@@ -890,6 +904,31 @@
 
         this.getTabSuffix = function () {
             return clsSuffix;
+        }
+
+        /**
+         * Handle Landing page hide/show and manage event
+         * @param {any} show
+         * @param {any} actionParams
+         */
+        this.showLandingPage = function (show,actionParams) {
+            if (show) {
+                this.landingPage.getRoot().show();
+                this.getRoot().hide();
+            } else {
+                this.landingPage.getRoot().hide();
+                this.getRoot().show();
+                //tab selection
+                this.vTabbedPane.restoreTabChange();
+                if (actionParams)
+                    this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "","", actionParams);
+                else {
+                    this.curTab.setQuery(null);
+                    this.tabActionPerformed(this.firstTabId);
+                }
+                //this.setTabNavigation();
+            }
+
         }
 
         $btnFilter.on("click", function (e) {
@@ -1785,6 +1824,8 @@
         var gridWindow = new VIS.GridWindow(jsonData, this);
         this.gridWindow = gridWindow; //ref to call dispose
         //this.setWidth(gridWindow.getWindowWidth());
+       
+
         this.createToolBar(); // Init ToolBar
 
         var curWindowNo = $parent.getWindowNo();
@@ -1978,6 +2019,27 @@
         }
         jsonData = null;
         $parent = null;
+
+        /**
+         * Handle Landing Page
+         */
+
+        if (gridWindow.getIsLandingPage()) {
+            this.getRoot().hide();
+            var landingPage = new VIS.VLandingPage(this, curWindowNo);
+            this.landingPage = landingPage;
+            this.getRoot().parent().append(landingPage.getRoot());
+            //$landingpage.show();
+            //$windowpage.show();
+            this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility', 'visible');
+
+        } else {
+            this.getRoot().show();
+            //$landingpage.hide();
+            //$windowpage.hide();
+            this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility','hidden');
+        }
+
         // this.curGC.setVisible(true);
     };
 
@@ -2499,7 +2561,7 @@
         //Undo  and tab change   
         if (vButton.getField().getIsAction()&& vButton.getField().getAction() === "MTU") {
             aPanel.cmd_ignore();
-                aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(), vButton.getField().getActionParams());
+                aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(),"", vButton.getField().getActionParams());
             needExecute = false;
         } 
 
@@ -2901,6 +2963,16 @@
             curTab = curGC = aPanel = null;
 
         };
+    }
+
+    /**
+     * Handle widget Action
+     * @param {any} actionParams
+     */
+    APanel.prototype.landingPageActionPerformed= function (actionParams) {
+        this.vTabbedPane.restoreTabChange();
+        this.showLandingPage(false);
+        this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", actionParams);        
     }
 
     function checkPostingByNewLogic(callback) {

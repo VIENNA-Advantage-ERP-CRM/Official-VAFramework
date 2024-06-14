@@ -907,5 +907,38 @@ html[dir="rtl"] .vis-tp-listWrap {
 html[dir="rtl"] .vis-advancedSearchTableRowBatch > td .vis-advancedSearchTableHeadBatch > th {
     padding-right: 15px;
     text-align: right ;
-}   
+}
+
+html[dir="rtl"] .mr-2, html[dir="rtl"] .mx-2 {
+    margin-left: .5rem !important;
+}
+
+html[dir="rtl"] .vis-landingpageEdit {
+    justify-content: left;
+}
+
+html[dir="rtl"] .ml-3, html[dir="rtl"] .mx-3 {
+    margin-right: 1rem !important;
+}
+
+html[dir="rtl"] .arrow-upicon {
+    margin-right: 49px;
+}
+
+html[dir="rtl"] .vis-ad-w-p-titleLanding .arrow-upicon {
+    margin-right: 0px !important;
+}
+
+html[dir="rtl"] .vis-widgetSize * {
+    text-align:center !important;
+}
+
+html[dir="rtl"] .vis-widgetDelete {
+    right:unset;
+    left: 2px;
+}
+
+html[dir="rtl"] .vis-home-leftPanel, html[dir="rtl"] .vis-home-rightPanel {
+    float: right;
+}
 /*rtl css End here*/

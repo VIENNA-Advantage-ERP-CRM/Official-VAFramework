@@ -2072,7 +2072,7 @@
     VCard.prototype.addStyleToDom = function () {
         $('head').find("[cardview='" + this.windowNo + "']").remove();
         this.styleTag.type = 'text/css';
-        $(this.styleTag).attr("cardview", this.windowNo)
+        $(this.styleTag).attr("cardview", this.windowNo);
         this.styleTag.innerHTML = this.dynamicStyle.join(" ");
         $($('head')[0]).append(this.styleTag);
     };

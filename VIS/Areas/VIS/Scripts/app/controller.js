@@ -394,6 +394,9 @@
     GridWindow.prototype.getIsHideActionbar = function () {
         return this.vo.IsHideActionbar;
     }
+    GridWindow.prototype.getIsLandingPage = function () {
+        return this.vo.IsLandingPage;
+    }
 
     GridWindow.prototype.dispose = function () {
 
