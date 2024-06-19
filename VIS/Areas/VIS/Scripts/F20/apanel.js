@@ -119,6 +119,13 @@
 
         this.isSummaryVisible = false;
         this.lastView = "";
+
+        this.advanceWhere = "";
+        this.filterWhere = "";
+        this.advanceFlag = false;
+        this.filterFlag = false;
+        this.isAdvancesearch = false;
+        this.isFilter = false;
         //private 
         var $divContentArea, $ulNav, $ulToobar, $divStatus, $ulTabControl, $divTabControl, $divTabNav;
         var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter;
@@ -152,6 +159,8 @@
             var clone = document.importNode(tmpAPanel, true);
             $root = $(clone.querySelector(".vis-ad-w-p"));
             $busyDiv = $root.find(".vis-ad-w-p-busy"); // busy indicator
+            $landingpage = $root.find(".vis-landingpage");
+            $windowpage = $root.find(".vis-windowpage");
 
             //tolbar and search 
             $ulToobar = $root.find(".vis-ad-w-p-tb-lc");// $("<ul class='vis-appsaction-ul'>"); //toolbar item list
@@ -230,6 +239,14 @@
                 if ($(e.target).is(':focus')) {
                     self.compositViewChangeSave(e);
                 }
+            });
+
+            $landingpage.on('click', function () {
+                self.showLandingPage(true);
+            });
+
+            $windowpage.on('click', function () {
+                self.showLandingPage(false);
             });
 
         };
@@ -705,9 +722,13 @@
         };
 
         //privilized function
-        this.getRoot = function () { return $root; };
+        this.getRoot = function () {
+            return $root;
+        };
 
-        this.getLayout = function () { return $divContentArea; };
+        this.getLayout = function () {
+            return $divContentArea;
+        };
 
         this.getIncludedEmptyArea = function () {
             return $divIncludeTab;
@@ -885,6 +906,31 @@
             return clsSuffix;
         }
 
+        /**
+         * Handle Landing page hide/show and manage event
+         * @param {any} show
+         * @param {any} actionParams
+         */
+        this.showLandingPage = function (show,actionParams) {
+            if (show) {
+                this.landingPage.getRoot().show();
+                this.getRoot().hide();
+            } else {
+                this.landingPage.getRoot().hide();
+                this.getRoot().show();
+                //tab selection
+                this.vTabbedPane.restoreTabChange();
+                if (actionParams)
+                    this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "","", actionParams);
+                else {
+                    this.curTab.setQuery(null);
+                    this.tabActionPerformed(this.firstTabId);
+                }
+                //this.setTabNavigation();
+            }
+
+        }
+
         $btnFilter.on("click", function (e) {
             self.startFilterPanel();
         });
@@ -1004,6 +1050,10 @@
 
         if (!VIS.Application.isMobile) {
             $txtSearch.on("keyup", function (e) {
+                self.setAdvanceWhere("");
+                self.setFilterWhere("");
+                self.setAdvanceFlag(false);
+                self.setFilterFlag(false);
                 var code = e.charCode || e.keyCode;
                 if (code == 13) {
                     if (!self.defaultSearch) {
@@ -1021,7 +1071,7 @@
                     query.addRestriction(" 1 = 1 ");
                     self.findRecords(query);
                 }
-            });
+            });          
         }
 
         $imgdownSearch.on("click", function () {
@@ -1771,9 +1821,11 @@
     APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel) {
 
         this.$parentWindow = $parent;
-        var gridWindow = new VIS.GridWindow(jsonData);
+        var gridWindow = new VIS.GridWindow(jsonData, this);
         this.gridWindow = gridWindow; //ref to call dispose
         //this.setWidth(gridWindow.getWindowWidth());
+       
+
         this.createToolBar(); // Init ToolBar
 
         var curWindowNo = $parent.getWindowNo();
@@ -1909,16 +1961,6 @@
                     this.curTab = gTab;
                     this.curGC = gc;
                     this.firstTabId = id;
-                    //if (query != null) {
-                    //    gTab.setQuery(query);
-                    //}
-                    //}
-
-
-                    ////Set Title of Tab
-                    //if (i === 0) {
-                    //    this.curGC = gc;
-                    //    this.firstTabId = id;
 
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
@@ -1974,10 +2016,30 @@
             this.getLayout().removeClass('vis-ad-w-p-center-view-height');
             this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
             this.getLayout().find('.vis-ad-w-p-center-inctab').css("background", "rgba(var(--v-c-common), 1)");
-            //this.setIncTabReziable();
         }
         jsonData = null;
         $parent = null;
+
+        /**
+         * Handle Landing Page
+         */
+
+        if (gridWindow.getIsLandingPage()) {
+            this.getRoot().hide();
+            var landingPage = new VIS.VLandingPage(this, curWindowNo);
+            this.landingPage = landingPage;
+            this.getRoot().parent().append(landingPage.getRoot());
+            //$landingpage.show();
+            //$windowpage.show();
+            this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility', 'visible');
+
+        } else {
+            this.getRoot().show();
+            //$landingpage.hide();
+            //$windowpage.hide();
+            this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility','hidden');
+        }
+
         // this.curGC.setVisible(true);
     };
 
@@ -2499,7 +2561,7 @@
         //Undo  and tab change   
         if (vButton.getField().getIsAction()&& vButton.getField().getAction() === "MTU") {
             aPanel.cmd_ignore();
-                aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(), vButton.getField().getActionParams());
+                aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(),"", vButton.getField().getActionParams());
             needExecute = false;
         } 
 
@@ -2901,6 +2963,16 @@
             curTab = curGC = aPanel = null;
 
         };
+    }
+
+    /**
+     * Handle widget Action
+     * @param {any} actionParams
+     */
+    APanel.prototype.landingPageActionPerformed= function (actionParams) {
+        this.vTabbedPane.restoreTabChange();
+        this.showLandingPage(false);
+        this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", actionParams);        
     }
 
     function checkPostingByNewLogic(callback) {
@@ -4947,7 +5019,7 @@
 
     APanel.prototype.cmd_finddialog = function () {
 
-        var find = new VIS.Find(this.curWindowNo, this.curTab, 0);
+        var find = new VIS.Find(this.curWindowNo, this.curTab, 0,this);
         var self = this;
         var savedSearchName = "";
         find.onClose = function () {
@@ -4990,7 +5062,7 @@
                 }
                 var findPressed = self.curTab.getIsQueryActive() || self.curTab.getOnlyCurrentDays() > 0;
                 self.aFind.setPressed(findPressed);
-
+                
 
             }
             ////Refresh everytime bcoz smtimes user create an ASearch and save it, 
@@ -5340,6 +5412,54 @@
         this.curTab = null;
         this.disposeComponent();
 
+    };
+
+    APanel.prototype.setAdvanceWhere = function (advanceWhere) {
+        this.advanceWhere = advanceWhere;
+    };
+
+    APanel.prototype.getAdvanceWhere = function () {
+        return this.advanceWhere;
+    };
+
+    APanel.prototype.setFilterWhere = function (filterWhere) {
+        this.filterWhere = filterWhere;
+    };
+
+    APanel.prototype.getFilterWhere = function () {
+        return this.filterWhere;
+    };
+
+    APanel.prototype.setAdvanceFlag = function (advanceFlag) {
+        this.advanceFlag = advanceFlag;
+    };
+
+    APanel.prototype.getAdvanceFlag = function () {
+        return this.advanceFlag;
+    };
+
+    APanel.prototype.setFilterFlag = function (filterFlag) {
+        this.filterFlag = filterFlag;
+    };
+
+    APanel.prototype.getFilterFlag = function () {
+        return this.filterFlag;
+    };
+
+    APanel.prototype.setIsAdvanceSearch = function (isAdvancesearch) {
+        this.isAdvancesearch = isAdvancesearch;
+    };
+
+    APanel.prototype.getIsAdvanceSearch = function () {
+        return this.isAdvancesearch;
+    };
+
+    APanel.prototype.getIsFilter = function (isFilter) {
+        this.isFilter = isFilter;
+    };
+
+    APanel.prototype.setIsFilter = function () {
+        return this.isFilter;
     };
 
     //****************** APanel END ***********************//

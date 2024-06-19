@@ -361,6 +361,7 @@
             divStatic.find('.vis-fp-currntrcrdswrap').remove();
             divDynFilters.find('.vis-fp-currntrcrds').remove();
             dsAdvanceData = [];
+            this.curGC.aPanel.setFilterWhere("");
             cmbColumns.val(-1);
             cmbOp.val(-1);
             setControlNullValue();
@@ -368,7 +369,15 @@
         };
 
         this.getFilterClause = function () {
-            return prepareWhereClause(this);
+            var whereExtended = prepareWhereClause(this);
+            this.curGC.aPanel.setFilterWhere(whereExtended);
+            if (whereExtended.length > 0) {
+                this.curGC.aPanel.setIsFilter(true);
+            } else {
+                this.curGC.aPanel.setIsFilter(false);
+            }
+            this.curGC.aPanel.setFilterFlag(true);
+            return whereExtended;
         };
 
         //dynamic
@@ -871,7 +880,7 @@
             dsAdvanceData[colValue].push({
                 'Name': colName, 'Value': value1Value, 'Value2': value1Value, 'Text': value1Name, 'Text2': value2Name, 'Optr': optr,
                 'Where': self.parseWhereCondition(colValue, optr, value1Value, value2Value)
-            });
+            });        
             refreshDynFiltersUI(colValue);
         };
 
@@ -888,7 +897,7 @@
                 //    }
                 //}
                 //if (values.length < 1)
-                delete dsAdvanceData[colValue];
+                delete dsAdvanceData[colValue];         
             }
             refreshDynFiltersUI(colValue);
         };
@@ -1422,6 +1431,15 @@
     FilterPanel.prototype.dispose = function () {
         this.disposeComponent();
         this.curGC = this.curTab = this.curTabfields = this.selectionfields = null;
+    };
+
+    FilterPanel.prototype.getWhereClause = function () {
+        return this.finalWhere;
+
+    };
+
+    FilterPanel.prototype.setWhereClause = function (sql) {
+        this.finalWhere = sql;
     };
 
     FilterPanel.prototype.getOperatorsQuery = function (vnpObj, translate) {

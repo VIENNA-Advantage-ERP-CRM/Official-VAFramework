@@ -121,6 +121,7 @@ namespace VAdvantage.Controller
         public bool IsHideToolbar = false;
         //Hide action bar
         public bool IsHideActionbar = false;
+        public bool IsLandingPage = false;
 
 
         public List<GridTabVO> GetTabs()
@@ -197,7 +198,7 @@ namespace VAdvantage.Controller
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
              + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared,IsHideTabLinks,"
-             + "IsHideToolbar,IsHideActionbar ");
+             + "IsHideToolbar,IsHideActionbar,IsLandingPage ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
@@ -378,6 +379,7 @@ namespace VAdvantage.Controller
                             vo.IsHideTabLinks = dr[39].ToString() == "Y";
                             vo.IsHideToolbar = dr[40].ToString() == "Y";
                             vo.IsHideActionbar = dr[41].ToString() == "Y";
+                            vo.IsLandingPage = dr[42].ToString() == "Y";
 
                         }
                     }
@@ -897,6 +899,7 @@ namespace VAdvantage.Controller
                 clone.IsGenerateAttachmentCode = IsGenerateAttachmentCode;
                 clone.IsHideTabLinks = IsHideTabLinks;
                 clone.IsHideActionbar = IsHideActionbar;
+                clone.IsLandingPage = IsLandingPage;
                 clone.IsHideToolbar = IsHideToolbar;
 
                 //

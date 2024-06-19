@@ -191,10 +191,12 @@ namespace VAModelAD.Model
 
             //DO not mark record created from backend
             //Do not Check Config on Role Window
-            if (po.GetWindowTabID()>0
-                &&po.GetAD_Window_ID()>0 
-                &&Env.IsModuleInstalled("VA093_") 
-                && success
+
+            //DO not save Record if window ID tab ID not exist
+            if (po.GetAD_Window_ID()>0 &&
+                po.GetWindowTabID()>0 &&
+                Env.IsModuleInstalled("VA093_") && 
+                success
                 //&& MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
                 && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M"
                )
@@ -474,7 +476,8 @@ namespace VAModelAD.Model
                 }
             }
 
-            if (Util.GetValueOfInt(poMaster.Get_ID()) == 0)
+            // check applied for tables not having key column
+            if ((Util.GetValueOfInt(poMaster.Get_ID()) == 0) || (poMaster.CreateNewRecord && poMaster.Get_KeyColumns().Length > 1))
             {
                 if (HasDocValueWF)
                     poMaster.SetIsActive(false);

@@ -33,6 +33,14 @@
         var $menuOverlay = $("#vis_menuOverlay"); // Menu Overlay div
         var $vIcon = $(".vis-app-footer-c-r");
 
+        var $navMenuAction = $(".vis-nm-navbar");
+        var $appMenuDiv = $(".vis-nm-appSelected");
+        var $topHdrDiv = $(".vis-app-hdr");
+
+        var container = $('#vis-nm-container');
+        var scrollLeftButton = $('#vis-nm-scrollLeftButton');
+        var scrollRightButton = $('#vis-nm-scrollRightButton');
+
         var $mainNavigationDiv = null;
 
         var curSelTaskBarItem = null; //Current active TaskBar item
@@ -80,8 +88,50 @@
 
             $($menuTree.find('.vis-navLeftWrap a')[0]).trigger("click");
 
+            $appMenuDiv.on("click", function (e) {
+                if ($topHdrDiv.hasClass("vis-nm-active"))
+                    $topHdrDiv.removeClass("vis-nm-active");
+                else
+                    $topHdrDiv.addClass("vis-nm-active");
+            });
+
+
             function menuItemClick(event) {
+
+                // vis0008 changes done for new menu
                 var $target = $(event.target);
+                if (!$target.hasClass("VIS-nm-opt-link")) {
+                    $target = $target.parent();
+                    if (!$target.hasClass("VIS-nm-opt-link"))
+                        return;
+                }
+                $appMenuDiv.css("display", "flex");
+                $appMenuDiv.find(".vis-nm-selAppLabel").text($target.find('span').text()).attr('title', $target.find('span').text());
+                $appMenuDiv.find("i").attr("class", $target.find("i").attr("class")).css("color", $target.find("i").css("color"));
+                $navMenuAction.empty();
+                var appItems = $menuTree.find("[data-menuid='menuAppID_" + $target.attr("data-value") + "']");
+                if (appItems.length > 0) {
+                    $navMenuAction.css("width", "auto");
+                    bindScrollMenuEvents(false);
+                    if (scrollLeftButton) {
+                        scrollLeftButton.css("display", "none");
+                        scrollRightButton.css("display", "none");
+                    }
+                    $navMenuAction.append($(appItems[0].children).clone());
+                    var width = $topHdrDiv.width() - $appMenuDiv.width() - 200;
+                    if ($navMenuAction.width() > width) {
+                        $navMenuAction.css("width", width - 20 + "px");
+                        if (scrollLeftButton) {
+                            bindScrollMenuEvents(true);
+                            scrollLeftButton.css("display", "block");
+                            scrollRightButton.css("display", "block");
+                        }
+                    }
+                    hideMenu();
+                }
+                return;
+
+                // var $target = $(event.target);
                 if ($target.hasClass('fa fa-arrow-left')) {
                     $target = $target.parent();
                 }
@@ -336,6 +386,52 @@
             };
             refreshSession(1);
             //window.setInterval(refreshSession, 1000 * 60 * 3); // every 1.5 minutes
+
+            $navMenuAction.on("click", function (e) {
+                if ((VIS.Application.isMobile || VIS.Application.isIOS) && document.documentElement) {
+                    var $liTarget = $(event.target);
+                    if (!$(event.target).hasClass('vis-nm-subMenuCat')) {
+                        var $liTarget = $(event.target).parents(".vis-nm-subMenuCat");
+                        $navMenuAction.find(".vis-nm-liActiveCls").removeClass("vis-nm-liActiveCls");
+                        $liTarget.addClass("vis-nm-liActiveCls");
+                        if ($navMenuAction.hasClass("vis-nm-liActiveCls")) {
+                            $navMenuAction.removeClass("vis-nm-liActiveCls");
+                        }
+                        else {
+                            $navMenuAction.addClass("vis-nm-liActiveCls");
+                        }
+                    }
+                }
+                if ($(e.target).hasClass("vis-linkTxt") || $(e.target).hasClass("vis-nm-subMenuCat"))
+                    return;
+                // remove active and show class to hide menu items
+                $($(e.target).parents(".vis-nav-show")[0]).removeClass("vis-nav-show");
+                $topHdrDiv.removeClass("vis-nm-active");
+                // start to open menu item
+                if ($(e.target).is('a')) {
+                    startMenuAction($(e.target).data('action'), $(e.target).data('actionid')); //start action
+                }
+                else if ($(e.target).is('span')) {
+                    startMenuAction($(e.target).parent().data('action'), $(e.target).parent().data('actionid')); //start action
+                }
+            });
+        };
+
+        function bindScrollMenuEvents(bind) {
+            if (scrollLeftButton) {
+                if (bind) {
+                    scrollLeftButton.on('click', function () {
+                        container[0].scrollLeft -= 100; // Adjust scroll distance as needed
+                    });
+                    scrollRightButton.on('click', function () {
+                        container[0].scrollLeft += 100; // Adjust scroll distance as needed
+                    });
+                }
+                else {
+                    scrollLeftButton.off('click');
+                    scrollRightButton.off('click');
+                }
+            }
         };
 
         /*
@@ -485,11 +581,11 @@
         function activateTaskBarItem(itm) {
             if (itm.length > 0) {
 
-                if (itm[0].id == "vis_lhome2") {
-                    $('#vis_editHome').show();
-                } else {
+                //if (itm[0].id == "vis_lhome2") {
+                //    $('#vis_editHome').show();
+                //} else {
                     $('#vis_editHome').hide();
-                }
+                //}
 
                 if (itm[0].id == "vis_lhome")
                     return;               
@@ -587,7 +683,7 @@
         function start() {
             polyFills();//implement fallback for Datalist and other newer controls 
             menuFilterMgr.init($menuTree, $('#vis_filterMenu'), $vis_mainMenu); //init Menu filter popup Manager
-            authDialog.init($('#vis_home_ca'), $('#vis_userName')); //Init Authorization Dialog
+            authDialog.init($('#vis_home_ca'), $('.vis-app-user-img-wrap')); //Init Authorization Dialog
             setAndLoadHomePage(); //Home Page
             historyMgr.restoreHistory(); //Restore History of App if any
             navigationInit();
@@ -616,11 +712,11 @@
 
         function renderHomePage() {
             $('#vis_lhome').show();
-            $('#vis_lhome2').show();
+            //$('#vis_lhome2').show();
             dynamicViewCache['vis_lhome'] = $home ;
-            dynamicViewCache['vis_lhome2'] = $home2 ;
+            //dynamicViewCache['vis_lhome2'] = $home2 ;
             currentActiveView = $home.show();
-            VIS.HomeMgr2.initHome($home2);
+            //VIS.HomeMgr2.initHome($home2);
             VIS.HomeMgr.initHome($home);
         }
 

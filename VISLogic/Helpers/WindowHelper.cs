@@ -1740,7 +1740,8 @@ namespace VIS.Helpers
 
             PO po = null;
             // VIS0008 change to handle save of OrgInfo (record without PK) through PO
-            if ((table.IsSingleKey() && table.HasPKColumn()) || Record_ID == 0)
+            if ((table.IsSingleKey() && table.HasPKColumn())
+                || ((ctx.GetAD_User_ID() == 0 || ctx.GetAD_User_ID() == 100) && Record_ID == 0))
             {
                 if (!_idZeroUpdate)
                 {
@@ -2582,7 +2583,10 @@ namespace VIS.Helpers
                 if (!string.IsNullOrEmpty(condition))
                 {
                     sqlIn.sql = sqlIn.sql.Substring(0, sqlIn.sql.LastIndexOf("WHERE")) + " " + condition;
-                    sqlIn.sqlDirect = sqlIn.sqlDirect.Substring(0, sqlIn.sqlDirect.LastIndexOf("WHERE")) + " " + condition;
+                    if (sqlIn.sqlDirect != "")
+                    {
+                        sqlIn.sqlDirect = sqlIn.sqlDirect.Substring(0, sqlIn.sqlDirect.LastIndexOf("WHERE")) + " " + condition;
+                    }
                     sqlCount = sqlCount.Substring(0, sqlCount.LastIndexOf("WHERE")) + " " + condition;
                 }
             }
@@ -3898,7 +3902,10 @@ namespace VIS.Helpers
             if (!String.IsNullOrEmpty(gt.OrderByClause))
             {
                 SQL += " ORDER BY " + gt.OrderByClause;
-                SQL_Direct += " ORDER BY " + gt.OrderByClause;
+                if (SQL_Direct != "")
+                {
+                    SQL_Direct += " ORDER BY " + gt.OrderByClause;
+                }
             }
 
 

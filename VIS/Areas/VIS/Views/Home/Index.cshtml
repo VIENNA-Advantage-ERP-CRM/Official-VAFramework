@@ -145,29 +145,42 @@
 
         @if (ViewBag.IsMobile == true)
         {
+            <div id="vis_mainMenu" class="VIS-nm-dashboard-flyout d-flex flex-column vis-navMainWrapMobile" style="display: none !important; width:160px;">
+                <div class="vis-nm-searchOuter">
+                    <div class="VIS-nm-dasboard-search">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <input type="text" class="form-control" id="vis_menuSearch" name="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes">
+                        <datalist id="vis_leafNodes">
+                            @foreach (var item in ViewBag.Menu.GetLeafNodes())
+                            {
+                                <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
+                            }
+                        </datalist>
+                    </div>
+                </div>
+                <div id="vis_divTree" class="VIS-nm-menu-links mt-3 d-flex vis-navContentWrap">
+                    @Html.Raw(@ViewBag.TreeHtml)
+                </div>
+            </div>
 
-            <div id="vis_mainMenu" class="vis-mainMenu" style="display: none">
+            // Old Mobile Menu
+
+
+            @*<div id="vis_mainMenu" class="vis-mainMenu" style="display: none">
                 <div class="d-flex align-items-center vis-navHeadWrap" style="display: none">
                     <h5 class="m-0 vis-menu-headerName">@ViewBag.Menu.GetRootNode().Text</h5>
                     <div class="d-flex align-items-center vis-navHeadRight">
                         <div class="vis-navSearchWrap">
                             <div class="input-group">
-                                @*<input type="text" class="form-control" id="vis_menuSearch" name="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes">*@
                                 <datalist id="vis_leafNodes">
                                     @foreach (var item in ViewBag.Menu.GetLeafNodes())
                                     {
                                         <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
                                     }
                                 </datalist>
-                                @*<div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <i class="vis vis-search"></i>
-                                        </span>
-                                    </div>*@
                             </div>
                         </div>
                         <div class="vis-navFilterIco">
-                            @*<i class="fa fa-filter"></i>*@
                             <a href="javascript:void(0)" id="vis_filterMenu" title="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Filter")" class="fa fa-filter"></a>
                             <span style="display:none" class="vis vis-cross vis-removeFilter"></span>
                         </div>
@@ -191,13 +204,36 @@
                         @Html.Raw(@ViewBag.TreeHtml)
                     </div>
                 </div>
-            </div>
+            </div>*@
+            // Old Mobile Menu End
         }
         else
         {
             if (ViewBag.Menu != null)
             {
-                <div id="vis_mainMenu" class="d-flex flex-column vis-navMainWrap" style="display: none !important">
+                <div id="vis_mainMenu" class="VIS-nm-dashboard-flyout d-flex flex-column vis-navMainWrap" style="display: none !important">
+                    <div class="vis-nm-searchOuter">
+                        <div class="VIS-nm-dasboard-search">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                            @*<input type="text" placeholder="Search">*@
+                            <input type="text" class="form-control" id="vis_menuSearch" name="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes">
+                            <datalist id="vis_leafNodes">
+                                @foreach (var item in ViewBag.Menu.GetLeafNodes())
+                                {
+                                    <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
+                                }
+                            </datalist>
+                        </div>
+                    </div>
+                    <div id="vis_divTree" class="VIS-nm-menu-links mt-3 d-flex vis-navContentWrap">
+                        @Html.Raw(@ViewBag.TreeHtml)
+                    </div>
+                </div>
+
+
+                //Old Menu Start
+
+                @*<div id="vis_mainMenu" class="d-flex flex-column vis-navMainWrap" style="display: none !important">
                     <div class="d-flex align-items-center vis-navHeadWrap" style="display: none">
                         <h5 class="m-0 vis-menu-headerName">@ViewBag.Menu.GetRootNode().Text</h5>
                         <div class="d-flex align-items-center vis-navHeadRight">
@@ -218,7 +254,6 @@
                                 </div>
                             </div>
                             <div class="vis-navFilterIco">
-                                @*<i class="fa fa-filter"></i>*@
                                 <a href="javascript:void(0)" id="vis_filterMenu" title="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Filter")" class="fa fa-filter"></a>
                                 <span style="display:none" class="vis vis-cross vis-removeFilter"></span>
                             </div>
@@ -229,43 +264,37 @@
                         @Html.Raw(@ViewBag.TreeHtml)
                     </div>
 
-                    @*<datalist id="vis_leafNodes">
+
+                </div>*@
+
+                //Old Menu END
+
+                @*<div id="vis_mainMenu" class="vis-mainMenu" style="display: none">
+                    <div class="vis-menuTitle">
+                        <p>@ViewBag.Menu.GetRootNode().Text</p>
+                        <a href="javascript:void(0)" id="vis_closeMenu"><i class="fa fa-times" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="vis-menuSearch">
+                        <input type="text" name="vis_menuSearch" dir="@ViewBag.direction" id="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes" />
+                        <datalist id="vis_leafNodes">
                             @foreach (var item in ViewBag.Menu.GetLeafNodes())
                             {
                                 <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
                             }
-                        </datalist>*@
+                        </datalist>
 
-
-                </div>
-
-
-
-                @*<div id="vis_mainMenu" class="vis-mainMenu" style="display: none">
-                        <div class="vis-menuTitle">
-                            <p>@ViewBag.Menu.GetRootNode().Text</p>
-                            <a href="javascript:void(0)" id="vis_closeMenu"><i class="fa fa-times" aria-hidden="true"></i></a>
+                        <a href="javascript:void(0)" id="vis_filterMenu" title="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Filter")" class="fa fa-filter"></a>
+                        <a href="javascript:void(0)" class="fa fa-search"></a>
+                    </div>
+                    <div class="vis-sidebarMenuWrapper">
+                        <div id="vis_divTree" class="vis-css-treeview vis-css-menu">
+                            @Html.Raw(@ViewBag.TreeHtml)
                         </div>
-                        <div class="vis-menuSearch">
-                            <input type="text" name="vis_menuSearch" dir="@ViewBag.direction" id="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes" />
-                            <datalist id="vis_leafNodes">
-                                @foreach (var item in ViewBag.Menu.GetLeafNodes())
-                                {
-                                    <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
-                                }
-                            </datalist>
-
-                            <a href="javascript:void(0)" id="vis_filterMenu" title="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Filter")" class="fa fa-filter"></a>
-                            <a href="javascript:void(0)" class="fa fa-search"></a>
-                        </div>
-                        <div class="vis-sidebarMenuWrapper">
-                            <div id="vis_divTree" class="vis-css-treeview vis-css-menu">
-                                @Html.Raw(@ViewBag.TreeHtml)
-                            </div>
-                        </div>
-                    </div>*@
+                    </div>
+                </div>*@
             }
         }
+
 
         <div id="vis_menuOverlay" class="vis-app-overlay" style="display:none">
         </div> <!-- App Main Menu END -->
@@ -312,6 +341,8 @@
 
                     </ul>
                 </div>
+                <div class="vis-app-footer-c-r1">
+                </div>
                 <div class="vis-app-footer-c-r">
                 </div>
             </div>
@@ -347,6 +378,7 @@
         <script src="http://www.geoplugin.net/javascript.gp" type="text/javascript"></script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/globalize.js"></script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/cultures/@String.Format("globalize.culture.{0}.js", ((String)ViewBag.culture).Replace("_", "-"))"></script>
+        <script src="~/Areas/ViennaBase/Scripts/chart.min.js"></script>
         <script>
             VIS.VApp.init(); //Initlize App ()
         </script>

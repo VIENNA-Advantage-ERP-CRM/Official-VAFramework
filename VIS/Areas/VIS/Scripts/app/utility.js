@@ -777,7 +777,7 @@
         function setScreenHeight(height) {
             window_height = height
         };
-
+      
         function getPreference(ctx, AD_Window_ID, context, system) {
             /**************************************************************************
          *	Get Preference.
