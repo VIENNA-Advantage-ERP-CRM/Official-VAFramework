@@ -79,7 +79,7 @@ select {
 
         .vis-app-hdr a:hover {
             text-decoration: none;
-            color: rgba(var(--v-c-primary), 1);
+            /*color: rgba(var(--v-c-primary), 1);*/
         }
 
 .vis-app-hdr-l-menu:focus {
@@ -232,6 +232,7 @@ select {
         list-style: none;
         display: flex;
         flex-wrap: wrap;
+        background-color: rgba(var(--v-c-on-secondary),1);
     }
 
     .vis-app-footer li {
@@ -245,7 +246,7 @@ select {
         /*margin-right: 10px;
         margin-left: 10px;*/
         padding: 0px 10px 0px 10px;
-        color: rgba(var(--v-c-on-secondary), 1);
+        color: rgba(var(--v-c-on-primary), 1);
         align-items: center;
         min-height: 23px;
     }

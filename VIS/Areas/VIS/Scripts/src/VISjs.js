@@ -90,6 +90,7 @@ import "../app/forms/productContainerMove.js";
 import "../app/forms/productContainerTree.js";
 import "../app/windowformcontainer.js";
 import "../app/masterdataversion.js";
+import "../app/menuScript.js";
 import "../tabpanels/bipanel.js";
 import "../model/CalloutColumn.js";
 import "../app/ssemanager.js";

@@ -2333,9 +2333,10 @@ a:hover {
 
 .vis-navMainWrap {
     /*width: 80vw;*/
-    height: calc(100vh - 66px);
+    max-height: calc(100% - 70px);
     box-shadow: 2px 2px 5px 2px rgb(0 0 0 / 10%);
-    min-width: 550px !important;
+    min-width: 600px !important;
+    overflow: auto;
 }
 
 .vis-navFilterIco {
@@ -2436,7 +2437,7 @@ a:hover {
 }
 
 .vis-navMainWrap > .vis-navContentWrap {
-    height: calc(100% - 43px);
+    height: calc(100% - 56px);
     width: 100%;
 }
 
