@@ -665,7 +665,7 @@ namespace VAModelAD.Model
                     return false;
                 }
             }
-            _alreadyExpData.Add(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
+            _alreadyExpData.Add(expModID + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
             return true;
         }
     }
