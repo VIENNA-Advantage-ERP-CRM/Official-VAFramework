@@ -189,9 +189,12 @@ namespace VAModelAD.Model
             MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
             //VIS323 Insert Record in ExportData for marking on Save records.
 
-
+            //DO not mark record created from backend
             //Do not Check Config on Role Window
-            if (Env.IsModuleInstalled("VA093_") && success
+            if (po.GetWindowTabID()>0
+                &&po.GetAD_Window_ID()>0 
+                &&Env.IsModuleInstalled("VA093_") 
+                && success
                 //&& MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
                 && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M"
                )
@@ -661,7 +664,10 @@ namespace VAModelAD.Model
                     return false;
                 }
             }
-            _alreadyExpData.Add(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
+            //Update Current module instead of VA093_
+            //_alreadyExpData.Add(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
+            _alreadyExpData.Add(expModID + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
+            
             return true;
         }
     }
