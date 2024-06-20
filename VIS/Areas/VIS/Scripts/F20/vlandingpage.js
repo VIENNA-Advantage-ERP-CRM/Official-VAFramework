@@ -502,12 +502,8 @@
 
     }
     VLandingPage.prototype.widgetFirevalueChanged = function (data) {
-        var ap = {
-            "TabWhereClause": "Name Like '%Test%'",
-            "TabLayout": "Y",  // 'N'[Grid],'Y'[Single],'C'[Card]}
-            "TabIndex": 0
-        }
-        this.apanel.showLandingPage(false, ap);
+       
+        this.apanel.showLandingPage(false, data);
         //tabactionperform
     }
 
