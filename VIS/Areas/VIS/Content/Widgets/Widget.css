@@ -135,16 +135,28 @@
     align-items:center;
     justify-content:space-between;
 }
-.vis-welcomeScreenFeeds > .row h2 {
-    color: #ffffff;
-    float: left;
-    font-size: 1.125em;
-    margin-top: 0.625em;
-    background: rgba(var(--v-c-primary), 1);
-    height: 2.375em;
-    border-radius: 0.375em;
-    padding: 0 0.625em;
+.vis-welcomeScreenFeeds > .row {
+    width: calc(100% - 20px);
+    margin:0 10px;
 }
+.vis-welcomeScreenFeeds #welcomeScreenFeedsList {
+    padding: 0;
+    margin: 0 .625em;
+    width: calc(100% - 1.3em);
+    position: relative;
+    top: 0;
+    height: calc(100% - 4.8em);
+}
+    .vis-welcomeScreenFeeds > .row h2 {
+        color: #ffffff;
+        float: left;
+        font-size: 1.125em;
+        margin-top: 0.625em;
+        background: rgba(var(--v-c-primary), 1);
+        height: 2.375em;
+        border-radius: 0.375em;
+        padding: 0 0.625em;
+    }
 .vis-welcomeScreenFeeds > .row h2 strong {
     font-weight: 500;
 }
@@ -184,6 +196,7 @@
     box-shadow: 0.125em 0.0625em 0.3125em -0.125em #cccccc;
     border-radius: 0.375em;
     background-color: #ffffff;
+    margin:0 3px 10px 0;
 }
     .vis-activityContainer .vis-feedTitleBar {
         padding: 0.375em 0.625em;
@@ -198,17 +211,18 @@
     .vis-activityContainer .vis-feedDetails {
         padding: 0.625em 0px 0;
     }
-.workflow-homepage-activites .vis-feedTitleBar-buttons ul li {
+.workflow-homepage-activites .vis-feedTitleBar-buttons ul li, .vis-feedTitleBar .vis-feedTitleBar-buttons ul li {
     background-color: rgba(var(--v-c-primary),1);
     border: 0;
     width: 1.75em;
     height: 1.75em;
     border-radius: 0.375em;
-    font-size:1em;
+    font-size: 1em;
+    margin-left: .2rem;
 }
-.workflow-homepage-activites .vis-feedTitleBar-buttons ul li a {
-    color: rgba(var(--v-c-on-primary),1)
-}
+    .workflow-homepage-activites .vis-feedTitleBar-buttons ul li a, .vis-feedTitleBar .vis-feedTitleBar-buttons ul li a{
+        color: rgba(var(--v-c-on-primary),1)
+    }
 .vis-activityContainer .vis-feedDetails pre {
     padding: 0 0.625em;
 }
