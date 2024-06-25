@@ -181,7 +181,7 @@
                 </div><!-- user-img-wrap -->
                 @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
                 {
-                    ViewBag.UserPic = "~/Areas/VIS/Images/home/userAvatar.png";
+                    ViewBag.UserPic = "Areas/VIS/Images/home/userAvatar.png";
                 }
                 <img id="vis_imguserImage" src="@ViewBag.UserPic" alt="profile image">
             </div>
