@@ -169,15 +169,21 @@
 
 
 <div id="vis_home_ca" class="vis-dialog vis-auth-dialog">
-    <div class="vis-setting-submenu" style="width: 316px;">
+    <div class="vis-setting-submenu">
         <div class="vis-user-detail">
             <div class="vis-thumb-img">
-                <div class="vis-edit-icon"><span class="vis vis-pencil"></span></div><!-- user-img-wrap -->
+                
+                <div class="vis-edit-icon">
+                    <label for="vis-file-inputUI" class="vis-file-labelUI">
+                        <span class="vis vis-pencil"></span>
+                    </label>
+                    <input id="vis-file-inputUI" title="@GetMsg((string)ViewBag.culture, "ChangeImage")" class="vis-change-pic-inputUI" type="file" accept="image/*">
+                </div><!-- user-img-wrap -->
                 @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
-                    {
-                        ViewBag.UserPic = "~/Areas/VIS/Images/home/userAvatar.png";
-                    }
-                <img src="@ViewBag.UserPic" alt="profile image">
+                {
+                    ViewBag.UserPic = "~/Areas/VIS/Images/home/userAvatar.png";
+                }
+                <img id="vis_imguserImage" src="@ViewBag.UserPic" alt="profile image">
             </div>
             <h1>@ViewBag.DisplayName <span>@Model.Login2Model.RoleName</span></h1>
         </div>

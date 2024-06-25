@@ -954,6 +954,39 @@
             if (wareHouseId.val() == "-1") {
                 cmbWare.val(null);
             }
+
+
+            //edit user Image
+
+            function EditUserImage() {
+                var imgConatiner = $('.vis-thumb-img');
+                // debugger;
+                $("#vis-file-inputUI").change(function () {
+                    var file = document.getElementById('vis-file-inputUI').files[0];
+                    if (file != null) {
+                        var type = file.type.split('/').pop().toLowerCase();
+                        if (type != "jpeg" && type != "jpg" && type != "png" && type != "ico" && type != "webp" && type != "svg") {
+                            VIS.ADialog.info("SelectImageOnly");
+                            return false;
+                        }
+                        var xhr = new XMLHttpRequest();
+                        var fd = new FormData();
+                        fd.append("file", file);
+                        xhr.open("POST", VIS.Application.contextUrl + "Home/SaveImageAsByte", true);
+                        xhr.send(fd);
+                        xhr.addEventListener("load", function (event) {
+                            var dd = event.target.response;
+                            var res = JSON.parse(dd);
+                            var a = JSON.parse(res);
+                            imgConatiner.find('img').remove();
+                            imgConatiner.append('<img id="vis_imguserImage" src="data:image/jpg;base64,' + a +'" alt="profile image"></img>');
+                        }, false);
+                    }
+                });
+
+
+            };
+            EditUserImage();
         };
 
         /*

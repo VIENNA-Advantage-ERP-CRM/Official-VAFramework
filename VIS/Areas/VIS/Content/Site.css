@@ -284,7 +284,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
     align-items: center;
     gap: 1.2rem;
     border-bottom: 1px solid rgba(var(--v-c-on-secondary), .5);
-    padding: 0.875rem 0;
+    padding: 0.875rem;
 }
 
     .vis-user-detail h1 {
@@ -307,6 +307,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
     padding: 4px;
     box-shadow: 2px 4px 7px -1px #cccccc;
     position: relative;
+    border: 2px solid #f2f2;
 }
 
     .vis-thumb-img img {
@@ -337,8 +338,15 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
         font-size: 0.75rem;
     }
 
+.vis-setting-submenu {
+    width: 290px;
+    box-shadow: 0 0 12px 0 #cccccc;
+    border-radius: 8px;
+}
+
+
 .vis-setting-form {
-    padding: 1rem 0;
+    padding: 1rem;
     border-bottom: 1px solid rgba(var(--v-c-on-secondary), .5);
 }
 
@@ -361,8 +369,8 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
     }
 
 .vis-setting-link {
-    border-bottom: 1px solid rgba(var(--v-c-on-secondary), .5);
-    padding: 1rem 0;
+    /*border-bottom: 1px solid rgba(var(--v-c-on-secondary), .5);*/
+    padding: 1rem;
     width: 100%;
 }
 
@@ -1212,8 +1220,6 @@ html[dir="rtl"] .vis-taskbar-right
             height: 14px;
         }
 
-
-
 .vis-wakeup-main
 {
     position: absolute;
@@ -1222,7 +1228,7 @@ html[dir="rtl"] .vis-taskbar-right
     top: 0;
     z-index: 99997;
     background-color: lightgray;
-    opacity: .5;
+    opacity: .2;
 }
 .vis-wakeup-content {
     position: absolute;
@@ -1292,14 +1298,15 @@ html[dir="rtl"] .vis-taskbar-right
         position: absolute;
         width: 0;
     }
-
+    
 
 .vis-auth-dialog {
-    top: 40px;
+    top: 38px;
     right: 5px;
     width: auto;
-    /*padding-top: 20px;*/
+    padding: 0px;
     display: none;
+    background:white;
     /*color: rgba(var(--v-c-on-secondary), 1);*/
     /*box-shadow: 0px 2px 3px 1px rgba(var(--v-c-on-secondary), 0.18);
     border: 1px solid rgba(var(--v-c-primary), .15);*/
@@ -1320,15 +1327,13 @@ html[dir="rtl"] .vis-auth-dialog
 }*/
 
 .vis-auth-dialog label {
-    background: rgba(var(--v-c-secondary), 1) !important;
+     background:white; 
+     /*rgba(var(--v-c-secondary), 1) !important;*/
 }
 
 .vis-auth-dialog select {
-    background: rgba(var(--v-c-secondary), 1);
-    /*border: 1px solid rgba(var(--v-c-primary), .07);
-    border-radius: .25rem;
-    width: 100%;
-    height: 30px;*/
+    background:white; 
+    
     color: rgba(var(--v-c-on-secondary), 1);
     /*margin: 5px 0px 5px 0px;
     background-image: linear-gradient(45deg, transparent 50%, rgba(var(--v-c-primary),1) 50%), linear-gradient(135deg, rgba(var(--v-c-primary),1) 50%, transparent 50%);
@@ -1346,6 +1351,27 @@ html[dir="rtl"] .vis-auth-dialog
 .vis-auth-dialog input[disabled] {
     text-decoration: line-through;
 }
+
+.vis-file-labelUI {
+    cursor: pointer;
+    /*color: rgba(var(--v-c-on-secondary), .8);*/
+    font-weight: normal;
+    margin-bottom: 0;
+    background:unset !important;
+}
+
+.vis-change-pic-inputUI {
+    margin-top: 0px;
+    width: 30px;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    opacity:0;
+    position:absolute;
+}
+
+
 
 .vis-filter-dialog {
     top: 85px;
