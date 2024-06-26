@@ -325,7 +325,7 @@
     }
 
     .vis-nav-horizontal-scroll ul li {
-        padding: 0.75rem 0.90em;
+        padding: 0.6em 0.9em;
         text-align: center;
         color: rgba(var(--v-c-primary), 1);
         width: fit-content;
@@ -368,7 +368,7 @@ nav.vis-nav-horizontal-scroll {
 
 .vis-nav-horizontal-scroll-onhover-items {
     position: absolute;
-    top: 45px !important;
+    top: 41px !important;
     background-color: #2A2F35;
     z-index: 1;
     padding: 1rem;
@@ -426,7 +426,7 @@ nav.vis-nav-horizontal-scroll {
     background-color: rgba(var(--v-c-on-secondary), 1);
     /*background-color: #95b7df;*/
     z-index: 100;
-    padding: 1rem;
+    padding: 1rem 1rem 1rem 1rem;
     min-width: auto;
     visibility: hidden;
     opacity: 0;
@@ -450,6 +450,18 @@ nav.vis-nav-horizontal-scroll {
 
     .vis-subnav-content span {
         cursor: pointer;
+    }
+
+
+    .vis-subnav-content::before {
+        content: " ";
+        display: block;
+        height: 10px;
+        background-color: #ffffff;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
     }
 
 .vis-subnav:hover .vis-subnav-content {
