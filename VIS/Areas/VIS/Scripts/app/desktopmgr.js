@@ -118,7 +118,8 @@
                         scrollRightButton.css("display", "none");
                     }
                     $navMenuAction.append($(appItems[0].children).clone());
-                    var width = $topHdrDiv.width() - $appMenuDiv.width() - 200;
+                    // subtract width of user image, auto data recording, app menu and menu icons
+                    var width = $topHdrDiv.width() - $appMenuDiv.width() - 250;
                     if ($navMenuAction.width() > width) {
                         $navMenuAction.css("width", width - 20 + "px");
                         if (scrollLeftButton) {
