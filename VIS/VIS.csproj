@@ -201,6 +201,7 @@
     <Content Include="Areas\VIS\Content\Images\mail.svg" />
     <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
     <Content Include="Areas\VIS\Content\Login.css" />
+    <Content Include="Areas\VIS\Content\Menu.css" />
     <Content Include="Areas\VIS\Content\notify.mp3" />
     <Content Include="Areas\VIS\Content\notify.wav" />
     <Content Include="Areas\VIS\Content\PrefStyle.css" />
@@ -705,6 +706,7 @@
     <Content Include="Areas\VIS\Scripts\app\logger.js" />
     <Content Include="Areas\VIS\Scripts\app\lookup.js" />
     <Content Include="Areas\VIS\Scripts\app\masterdataversion.js" />
+    <Content Include="Areas\VIS\Scripts\app\menuScript.js" />
     <Content Include="Areas\VIS\Scripts\app\native-extension.js" />
     <Content Include="Areas\VIS\Scripts\app\processframe.js" />
     <Content Include="Areas\VIS\Scripts\app\processwrapper.js" />
