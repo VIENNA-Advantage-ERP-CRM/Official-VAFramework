@@ -49,7 +49,8 @@
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="BaseLibrary">
+    <Reference Include="BaseLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\BaseLibrary.dll</HintPath>
     </Reference>
     <Reference Include="CoreLibrary">
@@ -201,6 +202,7 @@
     <Content Include="Areas\VIS\Content\Images\mail.svg" />
     <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
     <Content Include="Areas\VIS\Content\Login.css" />
+    <Content Include="Areas\VIS\Content\Menu.css" />
     <Content Include="Areas\VIS\Content\notify.mp3" />
     <Content Include="Areas\VIS\Content\notify.wav" />
     <Content Include="Areas\VIS\Content\PrefStyle.css" />
@@ -705,6 +707,7 @@
     <Content Include="Areas\VIS\Scripts\app\logger.js" />
     <Content Include="Areas\VIS\Scripts\app\lookup.js" />
     <Content Include="Areas\VIS\Scripts\app\masterdataversion.js" />
+    <Content Include="Areas\VIS\Scripts\app\menuScript.js" />
     <Content Include="Areas\VIS\Scripts\app\native-extension.js" />
     <Content Include="Areas\VIS\Scripts\app\processframe.js" />
     <Content Include="Areas\VIS\Scripts\app\processwrapper.js" />

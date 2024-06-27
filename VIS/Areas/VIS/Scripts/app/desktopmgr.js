@@ -118,7 +118,8 @@
                         scrollRightButton.css("display", "none");
                     }
                     $navMenuAction.append($(appItems[0].children).clone());
-                    var width = $topHdrDiv.width() - $appMenuDiv.width() - 200;
+                    // subtract width of user image, auto data recording, app menu and menu icons
+                    var width = $topHdrDiv.width() - $appMenuDiv.width() - 250;
                     if ($navMenuAction.width() > width) {
                         $navMenuAction.css("width", width - 20 + "px");
                         if (scrollLeftButton) {
@@ -582,7 +583,7 @@
             if (itm.length > 0) {
 
                 if (itm[0].id == "vis_lhome2") {
-                    $('#vis_editHome').show();
+                   $('#vis_editHome').show();
                 } else {
                     $('#vis_editHome').hide();
                 }
@@ -954,6 +955,39 @@
             if (wareHouseId.val() == "-1") {
                 cmbWare.val(null);
             }
+
+
+            //edit user Image
+
+            function EditUserImage() {
+                var imgConatiner = $('.vis-thumb-img');
+                // debugger;
+                $("#vis-file-inputUI").change(function () {
+                    var file = document.getElementById('vis-file-inputUI').files[0];
+                    if (file != null) {
+                        var type = file.type.split('/').pop().toLowerCase();
+                        if (type != "jpeg" && type != "jpg" && type != "png" && type != "ico" && type != "webp" && type != "svg") {
+                            VIS.ADialog.info("SelectImageOnly");
+                            return false;
+                        }
+                        var xhr = new XMLHttpRequest();
+                        var fd = new FormData();
+                        fd.append("file", file);
+                        xhr.open("POST", VIS.Application.contextUrl + "Home/SaveImageAsByte", true);
+                        xhr.send(fd);
+                        xhr.addEventListener("load", function (event) {
+                            var dd = event.target.response;
+                            var res = JSON.parse(dd);
+                            var a = JSON.parse(res);
+                            imgConatiner.find('img').remove();
+                            imgConatiner.append('<img id="vis_imguserImage" src="data:image/jpg;base64,' + a +'" alt="profile image"></img>');
+                        }, false);
+                    }
+                });
+
+
+            };
+            EditUserImage();
         };
 
         /*
