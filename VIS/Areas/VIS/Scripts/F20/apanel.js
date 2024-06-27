@@ -2007,6 +2007,7 @@
         tabActions = null;
 
         this.ctx.setWindowContext(curWindowNo, "WindowName", jsonData._vo.DisplayName);
+        this.ctx.setWindowContext(curWindowNo, "AD_Window_ID", jsonData._vo.AD_Window_ID);
         $parent.setTitle(VIS.Env.getHeader(this.ctx, curWindowNo));
         this.setTitle(VIS.Env.getHeader(this.ctx, curWindowNo));
         $parent.setName(jsonData._vo.DisplayName);
@@ -4238,6 +4239,7 @@
     APanel.prototype.cmd_ignore = function () {
         //m_curGC.stopEditor(false);
         this.curGC.dataIgnore();
+        this.curGC.refreshTabPanelData(this.curTab.getRecord_ID());
 
     };//Undo
 
@@ -4360,6 +4362,7 @@
 
         this.curGC.setNewRecordLayout();
         this.curGC.dataNew(copy);
+        this.curGC.refreshTabPanelData(-1);
     };// New
 
     APanel.prototype.cmd_batchUpdatedialog = function () {

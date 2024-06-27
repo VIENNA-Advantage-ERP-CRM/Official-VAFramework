@@ -850,9 +850,11 @@ namespace VIS.Controllers
 
             var shortCut = ShortcutHelper.GetShortcutItems(Session["ctx"] as Ctx);
             var widgets = homeModels.GetHomeWidget(ctx, windowID);
+            var charts = homeModels.GetAnalyticalChart(ctx, windowID);
             List<Object> list = new List<Object>();
             list.AddRange(widgets);
             list.AddRange(shortCut);
+            list.AddRange(charts);
             return Json(JsonConvert.SerializeObject(list), JsonRequestBehavior.AllowGet);
         }
 

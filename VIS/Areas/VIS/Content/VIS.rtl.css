@@ -941,4 +941,14 @@ html[dir="rtl"] .vis-widgetDelete {
 html[dir="rtl"] .vis-home-leftPanel, html[dir="rtl"] .vis-home-rightPanel {
     float: right;
 }
+
+
+html[dir="rtl"] .vis-valpreferencedatawrp .vis-input-wrap + label {
+    padding-right: 10px;
+}
+
+html[dir="rtl"] .VIS_Pref_col-50 .VIS_Pref_Label_Font {
+    padding-right: 5px;
+}
+
 /*rtl css End here*/
