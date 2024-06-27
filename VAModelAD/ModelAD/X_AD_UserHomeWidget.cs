@@ -90,15 +90,16 @@ namespace ViennaAdvantage.Model{
         public static String COMPONENTTYPE_KPI = "K";/** Links = L */
         public static String COMPONENTTYPE_Links = "L";/** View = V */
         public static String COMPONENTTYPE_View = "V";/** Widget = W */
-        public static String COMPONENTTYPE_Widget = "W";/** Is test a valid value.
+        public static String COMPONENTTYPE_Widget = "W";/** Is test a valid value.*/
+        public static String COMPONENTTYPE_Charts = "C";/** Is test a valid value.
 @param test testvalue
 @returns true if valid **/
-        public bool IsComponentTypeValid(String test) { return test == null || test.Equals("K") || test.Equals("L") || test.Equals("V") || test.Equals("W"); }/** Set Component Type.
+        public bool IsComponentTypeValid(String test) { return test == null || test.Equals("C") || test.Equals("K") || test.Equals("L") || test.Equals("V") || test.Equals("W"); }/** Set Component Type.
 @param ComponentType Component Type */
         public void SetComponentType(String ComponentType)
         {
             if (!IsComponentTypeValid(ComponentType))
-                throw new ArgumentException("ComponentType Invalid value - " + ComponentType + " - Reference_ID=1001046 - K - L - V - W"); if (ComponentType != null && ComponentType.Length > 1) { log.Warning("Length > 1 - truncated"); ComponentType = ComponentType.Substring(0, 1); }
+                throw new ArgumentException("ComponentType Invalid value - " + ComponentType + " - Reference_ID=1001046 - K - L - V - W - C"); if (ComponentType != null && ComponentType.Length > 1) { log.Warning("Length > 1 - truncated"); ComponentType = ComponentType.Substring(0, 1); }
             Set_Value("ComponentType", ComponentType);
         }/** Get Component Type.
 @return Component Type */

@@ -15,6 +15,12 @@
         var isEditMode = false; // Flag to indicate whether the widget is in edit mode
         var isChanged = false;
         // Function to initialize the home widget
+
+        function setAdditionalInfo(id, info) {
+            if (homeItems[id]) {
+                homeItems[id].additionalInfo = info;
+            }
+        }
         function initHome(home) {
             // Show the user date element
             $('#vis_userDate').show();
@@ -54,6 +60,8 @@
                         Cols: homeItems[itm[i]].cols,
                         width: ((homeItems[itm[i]].cols || 1) * widgetWidth).toFixed(2) + 'px',
                         height: ((homeItems[itm[i]].rows || 1) * widgetWidth).toFixed(2) + 'px',
+                        additionalInfo: homeItems[itm[i]].additionalInfo,
+                        setAdditionalInfo: setAdditionalInfo
                     }
                     homeItems[itm[i]].wform.widgetSizeChange(obj);
                 }
@@ -110,6 +118,7 @@
                     $home.find('.vis-home-leftPanel').sortable("disable");
                     $home.find('.vis-widgetDelete').hide();
                     $('#vis_editHome').show();
+
                     isEditMode = false;
                     
                     saveDashboard();
@@ -218,7 +227,17 @@
                 // Make the .vis-home-leftPanel droppable
                 $home.find('.vis-home-leftPanel').droppable({
                     accept: '.vis-widgetDrag-item', // Only accept .vis-widgetDrag-item elements
+                    over: function (event, ui) {
+                        // Show placeholder                      
+                        $(this).find('.vis-editModeWidget').addClass('droppable-placeholder');
+                    },
+                    out: function (event, ui) {
+                        // Remove placeholder
+                        $(this).find('.droppable-placeholder').removeClass('droppable-placeholder');
+                    },
                     drop: function (event, ui) {
+                        $(this).find('.droppable-placeholder').removeClass('droppable-placeholder');
+
                         isChanged = true;
                         // Clone the dragged element and append it to the .vis-home-leftPanel
                         var type = $(ui.helper).data('type')
@@ -282,7 +301,9 @@
                     cols: (widget.Cols || 1),
                     width: ((widget.Cols || 1) * widgetWidth).toFixed(2) + 'px',
                     height: ((widget.Rows || 1) * widgetWidth).toFixed(2) + 'px',
-                    AdditionalInfo: AdditionalInfo || null
+                    additionalInfo: AdditionalInfo || null,
+                    setAdditionalInfo: setAdditionalInfo
+
                 }
 
                 if (wid == 0) {
@@ -299,23 +320,31 @@
                     var obj = JSON.parse(JSON.stringify(info));
                     obj['wform'] = wform;
                     homeItems[wid] = obj;
-                } else if (widget.Type == "L") {
-                    var $div = $('<div class="vis-linksWidget">');
-                    $div.append(widget.items).append('<div class="linktitle">'+widget.DisplayName+'</div>');
-                    $item.append($div);
                 }
 
                 $item.addClass("vis-widget-item");
                 //$item.css("background-color", pastel);
                 $item.attr('data-ws', widget.KeyID);
-                $item.attr('data-wid', wid ||0);
+                $item.attr('data-wid', wid || 0);
                 $item.attr('data-type', widget.Type);
-               
+
                 $item.css({
                     gridRow: "span " + (widget.Rows || 1),
                     gridColumn: "span " + (widget.Cols || 1),
                     display: "none"
                 });
+
+                if (widget.Type == "L") {
+                    var $div = $('<div class="vis-linksWidget">');
+                    $div.append(widget.items).append('<div class="linktitle">'+widget.DisplayName+'</div>');
+                    $item.append($div);                    
+
+                }
+                else if (widget.Type == "C" || widget.Type == "K" || widget.Type == "V") {
+                    VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type);               
+                }
+
+                
                 var trash = $('<i class="fa fa-trash-o vis-widgetDelete" aria-hidden="true" ></i>');
                 if (isEditMode) {
                     trash.show();
@@ -377,6 +406,9 @@
                         } else if (result[i].Type == 'W') {
                             moduelName = result[i].ModuleName
                             img = '<img class="vis-widgetImg" src="' + result[i].Img + '" />';
+                        } else if (result[i].Type == 'C' || result[i].Type == 'K' || result[i].Type == 'V') {
+                            moduelName = VIS.Msg.getMsg(result[i].ModuleName) ;
+                            img = result[i].Img
                         }
 
                         widgetList[itm.KeyID + '_' + itm.Type] = itm;
@@ -428,9 +460,13 @@
                             return a.SRNO - b.SRNO;
                         });
 
-
-                        for (var j = 0; j < filteredArray.length; j++) {
-                            renderWidgets(filteredArray[j], 0, filteredArray[j].AdditionalInfo);
+                        if (filteredArray && filteredArray.length > 0) {
+                            for (var j = 0; j < filteredArray.length; j++) {
+                                renderWidgets(filteredArray[j], 0, filteredArray[j].AdditionalInfo);
+                            }
+                        }
+                        else {
+                            $home.find('.vis-add-widgetContainer').show();
                         }
 
                         dragDrop();
@@ -447,7 +483,7 @@
                 $home.find('.vis-widget-item').each(function (index) {
                     var aInfo = null;
                     if ($(this).data('type') == "W") {
-                        aInfo = homeItems[$(this).data('wid')].AdditionalInfo;
+                        aInfo = homeItems[$(this).data('wid')].additionalInfo;
                     }
 
                     widgetSizes.push({

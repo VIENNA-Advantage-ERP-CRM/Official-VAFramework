@@ -3414,7 +3414,7 @@ ul.vis-userLinks-ListMenu li a i {
     flex-direction: column;
     grid-area: span 1 / span 1;
     justify-content: center;
-    margin: 0 auto;
+    /*margin: 0 auto;*/
     text-align: center;
     padding: 5px;
 }
@@ -3539,7 +3539,7 @@ ul.vis-userLinks-ListMenu li a i {
 
 .vis-widgetImg {
     width: 100%;
-    height: auto;
+    height: 75px;
     object-fit: contain;
 }
 
@@ -3639,4 +3639,9 @@ ul.vis-userLinks-ListMenu li a i {
 
 .vis-editModeWidget .vis-widget-item .vis-height-full {
     pointer-events: none;
+}
+
+.droppable-placeholder {
+    border: 2px dashed #ccc;
+    background-color: #f9f9f9;
 }
