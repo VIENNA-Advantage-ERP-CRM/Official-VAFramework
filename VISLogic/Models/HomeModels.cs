@@ -163,9 +163,15 @@ namespace VIS.Models
                         }
                         WindowSpecific = true;
                     }
-                    
+                    string img = "";
+                    try
+                    {
+                       img = "data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
+                    }catch (Exception ex)
+                    {
 
-                    string img = "data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
+                    }
+
                     HomeWidget l = new HomeWidget()
                     {
                         WidgetID = Util.GetValueOfInt(row[i]["AD_Widget_ID"]),
@@ -181,6 +187,113 @@ namespace VIS.Models
                         WindowSpecific = WindowSpecific,
                         IsDefault = Util.GetValueOfString(row[i]["IsDefault"]) == "Y",
                         Sequence = Util.GetValueOfInt(row[i]["Sequence"])
+                    };
+
+                    list.Add(l);
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Get Charts, KPI and views
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="windowID"></param>
+        /// <returns></returns>
+        public List<HomeWidget> GetAnalyticalChart(Ctx ctx, int windowID)
+        {
+            List<HomeWidget> list = null;
+
+            string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,VADB_ChartSize.VADB_ChartSize_ID,CAST(D_Chart.SEQNO AS integer) AS SEQNO FROM D_Chart INNER JOIN 
+                            D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
+                            INNER JOIN VADB_ChartSize ON (D_Chart.D_Chart_ID=VADB_ChartSize.D_Chart_ID)
+                            WHERE D_ChartAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+            sql += " UNION ALL ";
+
+            sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,VADB_KPISize.VADB_KPISize_ID AS VADB_ChartSize_ID,CAST(RC_KPI.SEQNO AS integer) AS SEQNO FROM RC_KPI INNER JOIN 
+                            RC_KPIAccess ON (RC_KPI.RC_KPI_ID=RC_KPIAccess.RC_KPI_ID)
+                            INNER JOIN VADB_KPISize ON (RC_KPI.RC_KPI_ID=VADB_KPISize.RC_KPI_ID)
+                            WHERE RC_KPIAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+
+
+            DataSet dataSet = DB.ExecuteDataset(sql);
+            if (dataSet != null && dataSet.Tables.Count > 0)
+            {
+                list = new List<HomeWidget>();
+                var row = dataSet.Tables[0].Rows;
+                for (int i = 0; i < row.Count; i++)
+                {
+                    string chartType = Util.GetValueOfString(row[i]["chartType"]);
+                    var newgalary = "";
+                    if (chartType == "1")
+                    {
+                        newgalary = "<img src='Areas/VADB/Images/Column.png'>";
+                    }
+                    else if (chartType == "2")
+                    {
+                        newgalary = "<img src='Areas/VADB/Images/Line.png'>";
+                    }
+                    else if (chartType == "3")
+                    {
+                        newgalary = "<img src='Areas/VADB/Images/Pie.png>";
+                    }
+                    else if (chartType == "4")
+                    {
+                        newgalary = "<img src='Areas/VADB/Images/Bar.png'>";
+                    }
+                    else if (chartType == "5")
+                    {
+                        newgalary = "<img src='Areas/VADB/Images/Donut.png' >";
+                    }
+                    else if (chartType == "6")
+                    {
+                        newgalary = "<img src='Areas/VADB/Images/Area.png'>";
+                    }
+                    else if (chartType.ToLower() == "li")
+                    {
+                        newgalary += "<img src='Areas/VADB/Images/Linear.png'>";                        
+                    }
+                    else if (chartType.ToLower() == "ra")
+                    {
+                        newgalary += "<img src='Areas/VADB/Images/Radial.png'>";                        
+                    }
+                    else if (chartType.ToLower() == "te")
+                    {
+                        newgalary += "<img src='Areas/VADB/Images/Kpi.png' >";
+                    }
+
+
+                    string moduleName = "";
+                    if (Util.GetValueOfString(row[i]["Type"]) == "C")
+                    {
+                        moduleName = "Charts";
+                    }
+                    else if(Util.GetValueOfString(row[i]["Type"]) == "K")
+                    {
+                        moduleName = "KPI";
+                    }
+                    else if (Util.GetValueOfString(row[i]["Type"]) == "V")
+                    {
+                        moduleName ="Views";
+                    }
+
+
+                    HomeWidget l = new HomeWidget()
+                    {
+                        WidgetID = Util.GetValueOfInt(row[i]["d_chart_id"]),
+                        KeyID = Util.GetValueOfInt(row[i]["VADB_ChartSize_ID"]),
+                        Name = Util.GetValueOfString(row[i]["Name"]),
+                        DisplayName = Util.GetValueOfString(row[i]["Name"]),
+                        ClassName ="",
+                        Rows = Util.GetValueOfInt(row[i]["rowspan"]),
+                        Cols = Util.GetValueOfInt(row[i]["colspan"]),
+                        Img = newgalary,
+                        ModuleName = moduleName,
+                        Type = Util.GetValueOfString(row[i]["Type"]),
+                        WindowSpecific = false,
+                        IsDefault = false,
+                        Sequence = Util.GetValueOfInt(row[i]["SEQNO"])
                     };
 
                     list.Add(l);
@@ -387,6 +500,7 @@ namespace VIS.Models
                 mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
                 mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
                 mUserHomeWidget.Set_Value("AD_Window_ID", windowID);
+                mUserHomeWidget.Set_Value("AdditionalInfo", widgetSizes[i].AdditionalInfo);
                 mUserHomeWidget.Save();
             }
             return 1;
@@ -425,6 +539,7 @@ namespace VIS.Models
             DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE  AD_UserHomeWidget_ID=" + id);
             return 1;
         }
+
     }
     #endregion
 

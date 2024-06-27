@@ -136,17 +136,19 @@
 
             if (VIS.Application.isRTL) {
                 this.Okbtn.css("margin-right", "-128px");
-                this.cancelbtn.css("margin-right", "55px");
+                this.cancelbtn.css("margin-right", "10px");
                 this.lblAttributeText.css("text-align", "right");
                 this.lblValueText.css("text-align", "right");
                 this.lblLevelText.css("text-align", "right");
                 this.chkOrg.css("margin-right", "0px");
                 this.chkTenant.css("margin-right", "37px");
+                this.deletebtn.attr('style','float:right !important');
                 //this.chkUser.css("margin-right", "72px");
                 //this.chkWindow.css("margin-right", "72px");
                 $root.find("#divMsg_" + this.windowNum).css("text-align", "right");
             }
             else {
+                this.deletebtn.css('float', 'left');
                 //this.chkUser.css("margin-left", "83px");
                 //this.chkWindow.css("margin-left", "45px");
             }
