@@ -204,6 +204,10 @@ namespace VIS.Models
         public List<HomeWidget> GetAnalyticalChart(Ctx ctx, int windowID)
         {
             List<HomeWidget> list = null;
+            if (!Env.IsModuleInstalled("VADB_") && Util.GetValueOfInt(MTable.Get_Table_ID("VADB_ChartSize")) == 0)
+            {
+                return list;
+            }
 
             string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,VADB_ChartSize.VADB_ChartSize_ID,CAST(D_Chart.SEQNO AS integer) AS SEQNO FROM D_Chart INNER JOIN 
                             D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
