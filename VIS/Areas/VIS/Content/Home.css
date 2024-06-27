@@ -3414,7 +3414,7 @@ ul.vis-userLinks-ListMenu li a i {
     flex-direction: column;
     grid-area: span 1 / span 1;
     justify-content: center;
-    margin: 0 auto;
+    /*margin: 0 auto;*/
     text-align: center;
     padding: 5px;
 }
