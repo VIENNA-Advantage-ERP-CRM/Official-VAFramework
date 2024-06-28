@@ -1,62 +1,11 @@
-﻿.flip-card {
-    perspective: 62.5em;
-}
-.card {
+﻿.vis-cardCls{
     background-color: #f3f3f3;
-}
-
-.flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-}
-
-
-/*.flip-card:hover .flip-card-inner {
-    transform: rotateY(180deg);
-}*/
-
-
-.flip-card-front,
-.flip-card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-}
-
-
-.flip-card-front {
-    background-color: #f8f9fa;
-    color: #000;
-}
-
-
-.flip-card-back {
-    background-color: #343a40;
-    color: #000;
-    transform: rotateY(180deg);
-    z-index:2;
-}
-
-
-.card-img-top {
-    max-height: 12.5em;
-    object-fit: cover;
-}
-.BackBtnCls {
-    text-align: right;
-    margin-right: 0.625em;
-    cursor: pointer
 }
 .container{
     width:100%;
     /*position:relative;*/
 }
-.scrollerVerticalNewCls {
+.vis-scrollerVerticalNewCls {
     padding: 0 0.625em;
     top: 4.6875em;
     width: 100%;
@@ -98,7 +47,7 @@
     /*position: absolute;*/
     top: 0px;
 }
-.workflow-homepage-parentdiv {
+.vis-workflow-homepage-parentdiv {
     /* float: left; */
     padding-top: 0.125em;
     width: 100%;
@@ -127,7 +76,7 @@
         border-radius: 6px;
         color: rgba(var(--v-c-primary), 1);
         display: flex;
-        height: 1.8em;
+        height: 1.8em !important;
         justify-content: center;
         margin-left: .375em;
         max-width: 5em;
@@ -142,7 +91,7 @@
     align-items:center;
     justify-content:space-between;
 }
-.vis-welcomeScreenFeeds > .row {
+.vis-welcomeScreenFeeds > .vis-row {
     width: calc(100% - 20px);
     margin: 0 10px;
 }
@@ -154,7 +103,7 @@
     top: 0;
     height: calc(100% - 4.8em);
 }
-.vis-welcomeScreenFeeds > .row h2 {
+.vis-welcomeScreenFeeds > .vis-row h2 {
     color: #ffffff;
     float: left;
     font-size: 1.125em;
@@ -168,7 +117,7 @@
     align-items: center;
     justify-content: space-between;*/
 }
-    .vis-welcomeScreenFeeds > .row h2 strong {
+    .vis-welcomeScreenFeeds > .vis-row h2 strong {
         font-weight: 500;
         float: left;
     }
@@ -191,7 +140,7 @@
 .vis-feedicon:hover {
     color: #d9f0ff;
 }
-.workflow-homepage-parentdiv .frm-data-search-wrap {
+.vis-workflow-homepage-parentdiv .frm-data-search-wrap {
     border-radius: 0.375em;
     overflow: hidden;
     background-color: #ffffff;
@@ -200,7 +149,7 @@
     background-color: transparent;
     height: 1.875em;
 }
-.vis-app-aform-root .workflow-homepage-parentdiv .frm-data-col-wrap input {
+.vis-app-aform-root .vis-workflow-homepage-parentdiv .frm-data-col-wrap input {
     border-radius: 0.375em;
     font-size: 0.75em;
     padding: 0.3125em 0.625em;
@@ -505,7 +454,7 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
 
 
 @media screen and (max-width:1400px) {
-    .workflow-homepage-parentdiv .frm-data-search-wrap{
+    .vis-workflow-homepage-parentdiv .frm-data-search-wrap{
         display:flex; align-items:center;
     }
     .VIS-ActiveCls .workflow-homepage-activites {
@@ -519,7 +468,7 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
     .vis-editModeWidget .workflow-Activity {
         font-size:12px;
     }
-    .vis-welcomeScreenFeeds > .row h2{font-size:.75em}
+    .vis-welcomeScreenFeeds > .vis-row h2{font-size:.75em}
 }
 @media screen and (max-width:1024px) {
     .vis-welcomeScreenFeeds{font-size:10px;}
@@ -533,7 +482,7 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
       
 }
 @media screen and (max-width:900px) {
-    .workflow-homepage-parentdiv{font-size:11px;}
+    .vis-workflow-homepage-parentdiv{font-size:11px;}
     .vis-activityContainer { font-size: 13px; }
     .vis-editModeWidget .vis-welcomeScreenFeeds {font-size: 9px;}
 }
@@ -547,13 +496,13 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
     .workflow-Activity {
         font-size: 11px;
     }
-    .workflow-homepage-parentdiv {
+    .vis-workflow-homepage-parentdiv {
         font-size: 9px;
     }
-    .VIS-ActiveCls.workflow-homepage-parentdiv {
+    .VIS-ActiveCls.vis-workflow-homepage-parentdiv {
         font-size: 7px;
     }
-    .vis-welcomeScreenFeeds > .row h2{font-size:.75em}
+    .vis-welcomeScreenFeeds > .vis-row h2{font-size:.75em}
 }
 
 .vis-h2Div {
@@ -585,6 +534,9 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
     margin-top: 0px;
     width: 100%;
 }
+.vis-aTagCls {
+    margin-right: 0.3125em;
+}
 @media screen and (max-width:480px) {
     .vis-welcomeScreenFeeds {
         font-size: 14px;
@@ -613,4 +565,37 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
     
 }
 /*NoticeWidget*/
-
+.vis-welcomeScreenMainDiv {
+    background-color: #f3f3f3;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25em;
+}
+.vis-secndDiv {
+    display: flex;
+    align-items: center;
+}
+.vis-countDivCls {
+    margin-left: 0.4375em;
+    margin-top: -0.125em;
+}
+.vis-hlnkTabDataRefCls {
+    float: right;
+    margin-top: 0px;
+    cursor: pointer;
+}
+.vis-scrollerVerticalCls {
+    margin-left: auto;
+    overflow-y: auto;
+}
+.vis-snoticemoreCls {
+    color: rgba(var(--v-c-primary), 1);
+    float: right;
+    height: 1.25em;
+}
+.vis-snoticelessCls {
+    display: none;
+    color: rgba(var(--v-c-primary), 1);
+    float: right;
+    height: 20px;
+    /*vis-feedTitleBar;*/
+}
