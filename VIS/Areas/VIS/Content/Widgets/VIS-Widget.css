@@ -1,10 +1,12 @@
-﻿.vis-cardCls{
+﻿.vis-cardCls {
     background-color: #f3f3f3;
 }
-.container{
-    width:100%;
+
+.container {
+    width: 100%;
     /*position:relative;*/
 }
+
 .vis-scrollerVerticalNewCls {
     padding: 0 0.625em;
     top: 4.6875em;
@@ -12,6 +14,7 @@
     z-index: 1;
     height: 100%;
 }
+
 .vis-workflowActivityTitleBar {
     align-items: center;
     background: rgba(var(--v-c-primary), 1);
@@ -20,9 +23,11 @@
     width: 100%;
     gap: 0.625em;
 }
+
 .wfactivity-homepage-activites {
     padding-right: 0px;
 }
+
 .workflow-homepage-activites {
     /*height: calc(100% - 7.8em);*/
     /* height: calc(100% - 26.5em);*/
@@ -30,23 +35,28 @@
     overflow-y: auto;
     margin-top: 0.625em;
 }
+
 .VIS-ActiveCls .workflow-homepage-activites {
     height: calc(100% - 8em);
 }
+
 .workflowActivityDataCls {
 }
+
 .Workflow-ScrollerVertical {
     width: 100%;
     z-index: 1;
     height: calc(100vh - 0px);
     border: 0.0625em solid #eee;
 }
+
 .workflow-Activity {
     bottom: 0;
     /* padding: 0 10px; */
     /*position: absolute;*/
     top: 0px;
 }
+
 .vis-workflow-homepage-parentdiv {
     /* float: left; */
     padding-top: 0.125em;
@@ -55,20 +65,23 @@
     grid-template-columns: 1fr 1fr;
     gap: 0.5em;
 }
+
 .vis-welcomeScreenTab-notificationBubble {
     background: url(../Images/home/welcomeScreen-AlertBubbles.png) 0 0 no-repeat;
     color: #fff;
     display: block;
     font-size: 60%;
     font-weight: 700;
-    height: 2.25em;   
+    height: 2.25em;
     text-align: center !important;
     width: 1.8125em;
 }
+
 .vis-topSecndDivCls {
     display: flex;
     align-items: center;
 }
+
     .vis-topSecndDivCls .vis-welcomeScreenTab-notificationBubble, .vis-welcomeScreenFeeds .vis-welcomeScreenTab-notificationBubble {
         align-items: center;
         background: transparent;
@@ -86,15 +99,18 @@
         padding: 0 4px;
         height: 100%;
     }
+
 .vis-welcomeScreenFeeds .vis-noticeHeading {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
+
 .vis-welcomeScreenFeeds > .vis-row {
     width: calc(100% - 20px);
     margin: 0 10px;
 }
+
 .vis-welcomeScreenFeeds #welcomeScreenFeedsList {
     padding: 0;
     margin: 0 .625em;
@@ -103,6 +119,7 @@
     top: 0;
     height: calc(100% - 4.8em);
 }
+
 .vis-welcomeScreenFeeds > .vis-row h2 {
     color: #ffffff;
     float: left;
@@ -112,11 +129,12 @@
     height: 2.375em;
     border-radius: 0.375em;
     padding: 0 0.625em;
-  /*  width: 100%;
+    /*  width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;*/
 }
+
     .vis-welcomeScreenFeeds > .vis-row h2 strong {
         font-weight: 500;
         float: left;
@@ -137,29 +155,36 @@
     cursor: pointer;
     margin-right: 0.625em;
 }
-.vis-feedicon:hover {
-    color: #d9f0ff;
-}
+
+    .vis-feedicon:hover {
+        color: #d9f0ff;
+    }
+
 .vis-workflow-homepage-parentdiv .frm-data-search-wrap {
     border-radius: 0.375em;
     overflow: hidden;
     background-color: #ffffff;
 }
+
 .frm-data-col-wrap .vis-wfSearch-btn {
     background-color: transparent;
     height: 1.875em;
 }
+
 .vis-app-aform-root .vis-workflow-homepage-parentdiv .frm-data-col-wrap input {
     border-radius: 0.375em;
     font-size: 0.75em;
     padding: 0.3125em 0.625em;
 }
+
 .vis-app-aform-root input {
     border: 0.0625em solid rgba(var(--v-c-on-secondary),.1);
 }
+
 .vis-feedTitleBar {
     gap: 0.375em;
 }
+
 .vis-activityContainer {
     border: 0.0625em solid rgba(var(--v-c-secondary),1);
     box-shadow: 0.125em 0.0625em 0.3125em -0.125em #cccccc;
@@ -168,28 +193,34 @@
     margin: 0 3px 10px 0;
     margin-right: 3px !important;
 }
-.vis-activityContainer .vis-feedTitleBar {
-    padding: 0.375em 0.625em;
-    margin: 0 0px;
-    background-color: rgba(var(--v-c-primary),.2);
-    border-radius: 0.375em 0.375em 0 0;
-    border-bottom: 0;
-}
-    .vis-activityContainer .vis-feedTitleBar h3 {
-        color: rgba(var(--v-c-on-secondary),1);
+
+    .vis-activityContainer .vis-feedTitleBar {
+        padding: 0.375em 0.625em;
+        margin: 0 0px;
+        background-color: rgba(var(--v-c-primary),.2);
+        border-radius: 0.375em 0.375em 0 0;
+        border-bottom: 0;
     }
+
+        .vis-activityContainer .vis-feedTitleBar h3 {
+            color: rgba(var(--v-c-on-secondary),1);
+        }
+
     .vis-activityContainer .vis-feedDetails {
         padding: 0.625em 0px 0;
     }
+
 .wfActivity-selectchk {
     font-weight: normal;
     text-align: left !important;
 }
+
 .vis-NoRecordCls {
     margin-top: 12.5em;
     text-align: center;
     display: block;
 }
+
 .workflow-homepage-activites .vis-feedTitleBar-buttons ul li, .vis-feedTitleBar .vis-feedTitleBar-buttons ul li {
     background-color: rgba(var(--v-c-primary),1);
     border: 0;
@@ -199,33 +230,40 @@
     font-size: 1em;
     margin-left: .2rem;
 }
-    .workflow-homepage-activites .vis-feedTitleBar-buttons ul li a, .vis-feedTitleBar .vis-feedTitleBar-buttons ul li a{
+
+    .workflow-homepage-activites .vis-feedTitleBar-buttons ul li a, .vis-feedTitleBar .vis-feedTitleBar-buttons ul li a {
         color: rgba(var(--v-c-on-primary),1)
     }
+
 .vis-activityContainer .vis-feedDetails pre {
     padding: 0 0.625em;
 }
+
 .vis-activityContainer .vis-feedDetails .vis-feedDateTime {
     text-align: center;
     padding: 0.375em 0;
     border-top: 0.0625em solid rgba(var(--v-c-on-secondary),.1);
     font-size: 0.625em;
-    margin-top:.75em;
+    margin-top: .75em;
 }
+
 .vis-workflowActivityDetails-Heading {
     text-align: left;
 }
+
 .divWorkflowActivity {
     height: calc(100% - 3.125em);
 }
+
 .vis-workflowActivityDetails {
     padding: 0.625em;
 }
+
     .vis-workflowActivityDetails .divWorkflowActivity h3 {
         color: rgba(var(--v-c-on-secondary),1);
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .vis-workflowActivityDetails .vis-workflowActivityDetails-Heading {
@@ -235,12 +273,15 @@
         border-radius: 0.375em;
         margin-bottom: 0.625em;
     }
-.vis-workflowActivityDetails-Heading .vis-arrow-left{
-    color:#ffffff;
+
+.vis-workflowActivityDetails-Heading .vis-arrow-left {
+    color: #ffffff;
 }
+
 .vis-workflowActivityDetails .vis-workflowActivityDetails-Heading h3 {
     color: rgba(var(--v-c-common), 1);
 }
+
 .vis-btn-zoom {
     background: transparent;
     border: 0;
@@ -252,15 +293,18 @@
     padding-top: 0.125em;
     padding-bottom: 0.125em;
 }
+
     .vis-btn-zoom .vis-btn-ico {
         margin-right: 0;
         font-size: 1.25em;
     }
+
 .vis-ActionHeadingCls {
     background-color: rgba(var(--v-c-primary), .2);
     border-radius: 0.375em;
     padding: 0.375em 0.625em;
 }
+
 .vis-home-wf-forwardWrap {
     align-items: center;
     display: flex;
@@ -269,19 +313,24 @@
     padding-top: 0.9375em;
     border-top: 0.0625em solid #e4e4e4;
 }
-.vis-home-wf-forwardWrap .vis-input-wrap {
-    margin-bottom: 0px;
-}
-.vis-home-wf-forwardWrap .vis-home-wf-forwardInput {
-    width:87%;
-}
+
+    .vis-home-wf-forwardWrap .vis-input-wrap {
+        margin-bottom: 0px;
+    }
+
+    .vis-home-wf-forwardWrap .vis-home-wf-forwardInput {
+        width: 87%;
+    }
+
     .vis-home-wf-forwardWrap .vis-home-wf-forwardBtn {
         width: auto;
         padding: 0;
     }
+
         .vis-home-wf-forwardWrap .vis-home-wf-forwardBtn .vis-btn-done {
             width: 1.625em;
         }
+
     .vis-home-wf-forwardWrap .vis-workflowActivityIcons.vis-icon-doneButton {
         align-items: center;
         display: flex;
@@ -289,56 +338,73 @@
         width: 1.9em;
         padding: 0;
     }
-    .vis-IIColumnContent li {
-        padding: 0;
-    }
+
+.vis-IIColumnContent li {
+    padding: 0;
+}
 
 .vis-IIColumnContent .vis-input-wrap textarea {
-    height:auto;
+    height: auto;
 }
+
 .vis-IIColumnContent .vis-home-wf-answerWrap .vis-input-wrap {
-    margin:0;
+    margin: 0;
 }
+
 .vis-IIColumnContent .vis-home-wf-answerWrap {
     margin-bottom: 0.9375em;
     align-items: center;
     gap: 0.75em;
     justify-content: space-between;
 }
-.vis-home-wf-answerBtn{
-    margin-bottom:0;
 
-}
-.vis-home-wf-answerBtn .vis-btn-ico {
-    margin: 0;
+.vis-home-wf-answerBtn {
+    margin-bottom: 0;
 }
 
-.vis-home-wf-answerBtn .vis-btn-done {
-    padding: 0;
-}
+    .vis-home-wf-answerBtn .vis-btn-ico {
+        margin: 0;
+    }
+
+    .vis-home-wf-answerBtn .vis-btn-done {
+        padding: 0;
+    }
+
 .vis-IIColumnContent .vis-home-wf-answerWrap .vis-home-wf-answerInput {
     width: 87%;
 }
+
 .vis-home-wf-answerBtn .vis-workflowActivityIcons.vis-icon-doneButton {
     width: 1.9em;
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
 .vis-IIColumnContent .vis-home-wf-answerWrap .vis-home-wf-answerBtn {
     width: auto;
 }
-.historyArrow{
-    display:flex;
+
+.historyArrow {
+    display: flex;
 }
+
     .historyArrow .vis {
         font-size: 0.9375em;
     }
+
 ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
-    width:87%;
+    width: 87%;
 }
-.vis-vertical-img{position:relative;}
-.vis-vertical-img img{display:none;}
+
+.vis-vertical-img {
+    position: relative;
+}
+
+    .vis-vertical-img img {
+        display: none;
+    }
+
     .vis-vertical-img::before {
         content: " ";
         display: block;
@@ -347,8 +413,17 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
         background-color: rgba(var(--v-c-primary), 1);
         margin: auto;
     }
-.vis-approved_wrap{display:flex; align-items:center; position:relative;}
-.vis-approved_wrap{background:transparent;}
+
+.vis-approved_wrap {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.vis-approved_wrap {
+    background: transparent;
+}
+
     .vis-approved_wrap::before {
         content: " ";
         display: block;
@@ -360,6 +435,7 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
         left: 0;
         right: 0;
     }
+
     .vis-approved_wrap .vis-ApproveCircleCls {
         position: absolute;
         content: " ";
@@ -379,11 +455,17 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
         align-items: center;
         justify-content: center;
     }
+
 .vis-ApproveCircleCls .vis {
     font-size: .875em;
     color: rgba(var(--v-c-primary), 1);
 }
-.vis-pending_wrap{position:relative; background:transparent; }
+
+.vis-pending_wrap {
+    position: relative;
+    background: transparent;
+}
+
     .vis-pending_wrap::before {
         display: flex;
         width: 1.6em;
@@ -396,6 +478,7 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
         content: " ";
         border: 0.125em solid rgba(var(--v-c-primary), 1);
     }
+
     .vis-pending_wrap::after {
         display: block;
         content: " ";
@@ -403,106 +486,153 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
         height: 0.6em;
         border-radius: 100%;
         background-color: rgba(var(--v-c-primary), 1);
-        position:absolute;
-        left:0;
-        right:0;
-        top:0;
-        bottom:0;
-        margin:auto;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
     }
 
-.vis-start_wrap{position:relative; background:transparent; overflow:inherit;}
-.vis-start_wrap::after {
-    display: block;
-    content: " ";
-    width: 0.6em;
-    height: 0.6em;
-    border-radius: 100%;
-    background-color: rgba(var(--v-c-primary), 1);
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
+.vis-start_wrap {
+    position: relative;
+    background: transparent;
+    overflow: inherit;
 }
+
+    .vis-start_wrap::after {
+        display: block;
+        content: " ";
+        width: 0.6em;
+        height: 0.6em;
+        border-radius: 100%;
+        background-color: rgba(var(--v-c-primary), 1);
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+    }
+
 .vis-right-part .vis-app_by {
-    display:block;
+    display: block;
 }
+
 .vis-feedTitleBar h3 {
     font-size: 0.875em;
 }
+
 .vis-feedDetails pre {
     font-size: 0.75em;
 }
-.frm-data-col-wrap select{font-size:0.75em;}
+
+.frm-data-col-wrap select {
+    font-size: 0.75em;
+}
+
 .vis-editModeWidget .vis-welcomeScreenFeeds {
     font-size: 10px;
 }
+
 .vis-workflowActivityDetails h3 {
     font-size: 1.125em;
 }
+
 .vis-IIColumnContent .vis-input-wrap select ~ label {
     font-size: 0.75em;
 }
+
 .vis-IIColumnContent .vis-input-wrap input:not(:placeholder-shown) ~ label {
     font-size: 0.75em;
 }
+
 .vis-input-wrap textarea {
     font-size: 0.875em
 }
 
 
 @media screen and (max-width:1400px) {
-    .vis-workflow-homepage-parentdiv .frm-data-search-wrap{
-        display:flex; align-items:center;
+    .vis-workflow-homepage-parentdiv .frm-data-search-wrap {
+        display: flex;
+        align-items: center;
     }
+
     .VIS-ActiveCls .workflow-homepage-activites {
         height: calc(100% - 8em);
     }
 }
+
 @media screen and (max-width:1366px) {
     .vis-editModeWidget .vis-welcomeScreenFeeds {
-        font-size:9px
+        font-size: 9px
     }
+
     .vis-editModeWidget .workflow-Activity {
-        font-size:12px;
+        font-size: 12px;
     }
-    .vis-welcomeScreenFeeds > .vis-row h2{font-size:.75em}
+
+    .vis-welcomeScreenFeeds > .vis-row h2 {
+        font-size: .75em
+    }
 }
+
 @media screen and (max-width:1024px) {
-    .vis-welcomeScreenFeeds{font-size:10px;}
+    .vis-welcomeScreenFeeds {
+        font-size: 10px;
+    }
+
     .vis-editModeWidget .vis-welcomeScreenFeeds {
         font-size: 6px;
     }
-    .vis-activityContainer{font-size:11px;}
+
+    .vis-activityContainer {
+        font-size: 11px;
+    }
+
     .VIS-ActiveCls .workflow-homepage-activites {
         height: calc(100% - 9em);
     }
-      
 }
+
 @media screen and (max-width:900px) {
-    .vis-workflow-homepage-parentdiv{font-size:11px;}
-    .vis-activityContainer { font-size: 13px; }
-    .vis-editModeWidget .vis-welcomeScreenFeeds {font-size: 9px;}
+    .vis-workflow-homepage-parentdiv {
+        font-size: 11px;
+    }
+
+    .vis-activityContainer {
+        font-size: 13px;
+    }
+
+    .vis-editModeWidget .vis-welcomeScreenFeeds {
+        font-size: 9px;
+    }
 }
+
 @media screen and (max-width:680px) {
     .vis-welcomeScreenFeeds {
         font-size: 8px;
     }
+
     .workflow-homepage-activites {
         height: calc(100% - 3.6em);
     }
+
     .workflow-Activity {
         font-size: 11px;
     }
+
     .vis-workflow-homepage-parentdiv {
         font-size: 9px;
     }
+
     .VIS-ActiveCls.vis-workflow-homepage-parentdiv {
         font-size: 7px;
     }
-    .vis-welcomeScreenFeeds > .vis-row h2{font-size:.75em}
+
+    .vis-welcomeScreenFeeds > .vis-row h2 {
+        font-size: .75em
+    }
 }
 
 .vis-h2Div {
@@ -511,91 +641,147 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
     align-items: center;
     justify-content: space-between;
 }
+
 .vis-activityContainerDiv {
     margin-right: 0.1875em !important;
 }
+
 .vis-selectchkDiv {
     font-weight: normal;
     text-align: left !important;
 }
+
 .vis-preCls {
     margin-bottom: 0px;
     font-size: 0.875em;
     font-family: NoirPro-Regular;
     color: inherit;
 }
+
 .vis-btnCls {
     margin-bottom: 10px;
     margin-top: 0px;
     width: 100%;
 }
+
 .vis-xBtnCls {
     margin-bottom: 0.625em;
     margin-top: 0px;
     width: 100%;
 }
+
 .vis-aTagCls {
     margin-right: 0.3125em;
 }
+
 @media screen and (max-width:480px) {
     .vis-welcomeScreenFeeds {
         font-size: 14px;
     }
+
     .workflow-Activity {
         font-size: 13px;
     }
-    
 }
+
 @media screen and (max-width:350px) {
     .vis-welcomeScreenFeeds {
         font-size: 10px;
     }
-    
 }
+
 @media screen and (max-width:320px) {
     .vis-welcomeScreenFeeds {
         font-size: 9px;
     }
+
     .workflow-Activity {
         font-size: 11px;
     }
+
     .vis-workflowActivityDetails h3 {
         font-size: 0.875em;
     }
-    
 }
 /*NoticeWidget*/
-.vis-welcomeScreenMainDiv {
+.vis-welcomeScreenNoticeMainDiv {
     background-color: #f3f3f3;
     border: 1px solid rgba(0,0,0,.125);
     border-radius: .25em;
 }
+
 .vis-secndDiv {
     display: flex;
     align-items: center;
 }
+
 .vis-countDivCls {
     margin-left: 0.4375em;
     margin-top: -0.125em;
 }
+
 .vis-hlnkTabDataRefCls {
     float: right;
     margin-top: 0px;
     cursor: pointer;
 }
+
 .vis-scrollerVerticalCls {
     margin-left: auto;
     overflow-y: auto;
 }
+
 .vis-snoticemoreCls {
     color: rgba(var(--v-c-primary), 1);
     float: right;
     height: 1.25em;
 }
+
 .vis-snoticelessCls {
     display: none;
     color: rgba(var(--v-c-primary), 1);
     float: right;
     height: 20px;
     /*vis-feedTitleBar;*/
+}
+
+.vis-strongWhiteClrCls {
+    color: #666666;
+}
+
+.vis-pTagStyleCls {
+    margin-top: 12.5em;
+    text-align: center;
+}
+
+/*Request widget*/
+.vis-RequestwelcomeScreenCls {
+    background-color: #f3f3f3;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25em;
+}
+.vis-RequestWidth{
+    width:100%;
+}
+.vis-RequestInnerDivCls {
+    display: flex;
+    align-items: center;
+}
+.vis-RequestStrongCls {
+    float: left;
+}
+.vis-RequestHlnkTabDataRefReq {
+    float: right;
+    margin-top: 0px;
+    cursor: pointer;
+}
+.vis-RequestNewNtsCls {
+    float: right;
+    margin-top: 0px;
+    cursor: pointer;
+    margin-right: 6px;
+}
+.vis-RequestWelcomeScreenFeedsListCls {
+    margin-left: auto;
+    overflow-y: auto;
 }

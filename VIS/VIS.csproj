@@ -215,7 +215,7 @@
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
     <Content Include="Areas\VIS\Content\VIS.all.min.css" />
     <Content Include="Areas\VIS\Content\VISAD.css" />
-    <Content Include="Areas\VIS\Content\Widgets\Widget.css" />
+    <Content Include="Areas\VIS\Content\Widgets\VIS-Widget.css" />
     <Content Include="Areas\VIS\Images\11.png" />
     <Content Include="Areas\VIS\Images\12.png" />
     <Content Include="Areas\VIS\Images\21.png" />
@@ -771,6 +771,7 @@
     <Content Include="Areas\VIS\Scripts\VIS1_0.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS2_0.min.js" />
     <Content Include="Areas\VIS\Scripts\widgets\NoticeWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\RequestWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\WorkflowWidget.js" />
     <Content Include="Areas\VIS\Templates\VIS_Templates.html" />
     <Content Include="webpack.config.js" />
