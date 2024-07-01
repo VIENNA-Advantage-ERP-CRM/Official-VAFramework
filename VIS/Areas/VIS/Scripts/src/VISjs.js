@@ -104,3 +104,4 @@ import "../app/initialize.js";
 import "../home/usersession.js"
 import "../widgets/WorkflowWidget";
 import "../widgets/NoticeWidget";
+import "../widgets/RequestWidget";
