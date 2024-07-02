@@ -315,7 +315,7 @@
                 if (widget.Type == "W") {
                     var wform = new VIS.AForm();
                     wform.openWidget(widget.ClassName, -99999, info);
-                    wform.addChangeListener(VIS.HomeMgr);
+                    wform.addChangeListener(VIS.HomeMgr2);
                     $item = wform.getRoot();
                     var obj = JSON.parse(JSON.stringify(info));
                     obj['wform'] = wform;
@@ -522,6 +522,6 @@
     VIS.HomeMgr2 = HomeMgr2();
 
     VIS.HomeMgr2.widgetFirevalueChanged = function (data) {
-       
+        
     };
 })(VIS, jQuery);
