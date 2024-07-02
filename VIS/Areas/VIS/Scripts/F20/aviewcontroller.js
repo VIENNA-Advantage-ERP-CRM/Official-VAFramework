@@ -1323,6 +1323,11 @@
         }
     };
 
+    VIS.GridController.prototype.resetActionParams = function () {
+        this.actionParams = { };
+        this.gTab.actionParams = this.actionParams;
+    }
+
     VIS.GridController.prototype.multiRowResize = function () {
         if (!this.singleRow && !this.isCardRow)
             this.vTable.resize();
@@ -1555,10 +1560,8 @@
         this.skipInserting = false; // reset 
 
         this.dynamicDisplay(-1);
-        //if (this.aPanel.$parentWindow.onLoad) {  //Change/Update for:Zoom from workflow on home page
-        //    this.aPanel.$parentWindow.onLoad();
-        //    this.aPanel.$parentWindow.onLoad = null;
-        //}
+
+        this.resetActionParams();
     };
 
     VIS.GridController.prototype.checkInsertNewRow = function () {
@@ -1821,6 +1824,7 @@
         }
 
         this.isDefaultFocusSet = true;
+        this.refreshTabPanelData(-1);
     };
 
     VIS.GridController.prototype.canDeleteRecords = function () {
@@ -1906,6 +1910,7 @@
         this.dynamicDisplay(-1);
         this.notifyDependents();
         this.vTable.refreshUndo();
+        this.refreshTabPanelData(this.gTab.getRecord_ID());
     };
 
     /**

@@ -2683,13 +2683,14 @@
             //  m_curWindowNo
             // Change by Lokesh Chauhan 18/05/2015
             var chkModule = false;
-            if (curTab.getAD_Window_ID() == 341 || curTab.getAD_Window_ID() == 170) {
+            if (curTab.getAD_Window_ID() == 341 || curTab.getAD_Window_ID() == 170
+                 || curTab.getAD_Table_ID() == 323 || curTab.getAD_Table_ID() == 321) {
                 if (window.MMPM) {
-                    var vvcf = MMPM.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID());
+                    var vvcf = MMPM.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID(), curTab.getAD_Table_ID());
                     chkModule = true;
                 }
                 else if (window.DTD001) {
-                    var vvcf = DTD001.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID());
+                    var vvcf = DTD001.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID(), curTab.getAD_Table_ID());
                     chkModule = true;
                 }
             }
@@ -3448,7 +3449,7 @@
         else {
             var mTab = gc.getMTab();
             tabEle.setVisible(true);
-            gc.activate(oldGC,this.actionParams);
+            gc.activate(oldGC,JSON.parse(JSON.stringify(this.actionParams)));
             if (oldGC)
                 oldGC.detachDynamicAction();
             this.curTab = gc.getMTab();
@@ -3698,7 +3699,10 @@
             this.hideActionbar(false);
         };
 
-        var selff = this;
+
+        this.actionParams = {}; //clear 
+
+       //var selff = this;
         //if (this.isShowSharedRecord && this.aSharedRecord) {
         //    window.setTimeout(function () {
         //        selff.aSharedRecord.setEnabled(true);
@@ -4244,8 +4248,6 @@
     APanel.prototype.cmd_ignore = function () {
         //m_curGC.stopEditor(false);
         this.curGC.dataIgnore();
-        this.curGC.refreshTabPanelData(this.curTab.getRecord_ID());
-
     };//Undo
 
     APanel.prototype.cmd_help = function ()//sarab
@@ -4367,7 +4369,7 @@
 
         this.curGC.setNewRecordLayout();
         this.curGC.dataNew(copy);
-        this.curGC.refreshTabPanelData(-1);
+        
     };// New
 
     APanel.prototype.cmd_batchUpdatedialog = function () {
