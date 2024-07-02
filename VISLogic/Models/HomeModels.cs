@@ -204,115 +204,122 @@ namespace VIS.Models
         public List<HomeWidget> GetAnalyticalChart(Ctx ctx, int windowID)
         {
             List<HomeWidget> list = null;
-            if (!Env.IsModuleInstalled("VADB_") && Util.GetValueOfInt(MTable.Get_Table_ID("AD_WidgetSize")) == 0)
+            try
             {
-                return list;
-            }
+                if (!Env.IsModuleInstalled("VADB_") && Util.GetValueOfInt(MTable.Get_Table_ID("AD_WidgetSize")) == 0)
+                {
+                    return list;
+                }
 
-            string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA FROM D_Chart INNER JOIN 
+                string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA FROM D_Chart INNER JOIN 
                             D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
                             INNER JOIN AD_WidgetSize ON (D_Chart.D_Chart_ID=AD_WidgetSize.D_Chart_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                           
                             WHERE D_ChartAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
-            sql += " UNION ALL ";
+                sql += " UNION ALL ";
 
-            sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_KPI INNER JOIN 
+                sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_KPI INNER JOIN 
                             RC_KPIAccess ON (RC_KPI.RC_KPI_ID=RC_KPIAccess.RC_KPI_ID)
                             INNER JOIN AD_WidgetSize ON (RC_KPI.RC_KPI_ID=AD_WidgetSize.RC_KPI_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
                             WHERE RC_KPIAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
 
 
-            DataSet dataSet = DB.ExecuteDataset(sql);
-            if (dataSet != null && dataSet.Tables.Count > 0)
-            {
-                list = new List<HomeWidget>();
-                var row = dataSet.Tables[0].Rows;
-                for (int i = 0; i < row.Count; i++)
+                DataSet dataSet = DB.ExecuteDataset(sql);
+                if (dataSet != null && dataSet.Tables.Count > 0)
                 {
-                    string chartType = Util.GetValueOfString(row[i]["chartType"]);
-                    var newgalary = "";
-                    try
+                    list = new List<HomeWidget>();
+                    var row = dataSet.Tables[0].Rows;
+                    for (int i = 0; i < row.Count; i++)
                     {
-                        newgalary = "data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
-                        chartType = null;
-                    }
-                    catch (Exception ex)
-                    {
+                        string chartType = Util.GetValueOfString(row[i]["chartType"]);
+                        var newgalary = "";
+                        try
+                        {
+                            newgalary = "data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
+                            chartType = null;
+                        }
+                        catch (Exception ex)
+                        {
 
-                    }
-                    if (chartType == "1")
-                    {
-                        newgalary = "<img src='Areas/VADB/Images/Column.png'>";
-                    }
-                    else if (chartType == "2")
-                    {
-                        newgalary = "<img src='Areas/VADB/Images/Line.png'>";
-                    }
-                    else if (chartType == "3")
-                    {
-                        newgalary = "<img src='Areas/VADB/Images/Pie.png'>";
-                    }
-                    else if (chartType == "4")
-                    {
-                        newgalary = "<img src='Areas/VADB/Images/Bar.png'>";
-                    }
-                    else if (chartType == "5")
-                    {
-                        newgalary = "<img src='Areas/VADB/Images/Donut.png' >";
-                    }
-                    else if (chartType == "6")
-                    {
-                        newgalary = "<img src='Areas/VADB/Images/Area.png'>";
-                    }
-                    else if (chartType.ToLower() == "li")
-                    {
-                        newgalary += "<img src='Areas/VADB/Images/Linear.png'>";                        
-                    }
-                    else if (chartType.ToLower() == "ra")
-                    {
-                        newgalary += "<img src='Areas/VADB/Images/Radial.png'>";                        
-                    }
-                    else if (chartType.ToLower() == "te")
-                    {
-                        newgalary += "<img src='Areas/VADB/Images/Kpi.png' >";
-                    }
-
-
-                    string moduleName = "";
-                    if (Util.GetValueOfString(row[i]["Type"]) == "C")
-                    {
-                        moduleName = "Charts";
-                    }
-                    else if(Util.GetValueOfString(row[i]["Type"]) == "K")
-                    {
-                        moduleName = "KPI";
-                    }
-                    else if (Util.GetValueOfString(row[i]["Type"]) == "V")
-                    {
-                        moduleName ="Views";
-                    }
+                        }
+                        if (chartType == "1")
+                        {
+                            newgalary = "<img src='Areas/VADB/Images/Column.png'>";
+                        }
+                        else if (chartType == "2")
+                        {
+                            newgalary = "<img src='Areas/VADB/Images/Line.png'>";
+                        }
+                        else if (chartType == "3")
+                        {
+                            newgalary = "<img src='Areas/VADB/Images/Pie.png'>";
+                        }
+                        else if (chartType == "4")
+                        {
+                            newgalary = "<img src='Areas/VADB/Images/Bar.png'>";
+                        }
+                        else if (chartType == "5")
+                        {
+                            newgalary = "<img src='Areas/VADB/Images/Donut.png' >";
+                        }
+                        else if (chartType == "6")
+                        {
+                            newgalary = "<img src='Areas/VADB/Images/Area.png'>";
+                        }
+                        else if (chartType.ToLower() == "li")
+                        {
+                            newgalary += "<img src='Areas/VADB/Images/Linear.png'>";
+                        }
+                        else if (chartType.ToLower() == "ra")
+                        {
+                            newgalary += "<img src='Areas/VADB/Images/Radial.png'>";
+                        }
+                        else if (chartType.ToLower() == "te")
+                        {
+                            newgalary += "<img src='Areas/VADB/Images/Kpi.png' >";
+                        }
 
 
-                    HomeWidget l = new HomeWidget()
-                    {
-                        WidgetID = Util.GetValueOfInt(row[i]["d_chart_id"]),
-                        KeyID = Util.GetValueOfInt(row[i]["AD_WidgetSize_ID"]),
-                        Name = Util.GetValueOfString(row[i]["Name"]),
-                        DisplayName = Util.GetValueOfString(row[i]["Name"]),
-                        ClassName ="",
-                        Rows = Util.GetValueOfInt(row[i]["rowspan"]),
-                        Cols = Util.GetValueOfInt(row[i]["colspan"]),
-                        Img = newgalary,
-                        ModuleName = moduleName,
-                        Type = Util.GetValueOfString(row[i]["Type"]),
-                        WindowSpecific = false,
-                        IsDefault = Util.GetValueOfString(row[i]["IsDefault"]) == "Y",
-                        Sequence = Util.GetValueOfInt(row[i]["Sequence"])
-                    };
+                        string moduleName = "";
+                        if (Util.GetValueOfString(row[i]["Type"]) == "C")
+                        {
+                            moduleName = "Charts";
+                        }
+                        else if (Util.GetValueOfString(row[i]["Type"]) == "K")
+                        {
+                            moduleName = "KPI";
+                        }
+                        else if (Util.GetValueOfString(row[i]["Type"]) == "V")
+                        {
+                            moduleName = "Views";
+                        }
 
-                    list.Add(l);
+
+                        HomeWidget l = new HomeWidget()
+                        {
+                            WidgetID = Util.GetValueOfInt(row[i]["d_chart_id"]),
+                            KeyID = Util.GetValueOfInt(row[i]["AD_WidgetSize_ID"]),
+                            Name = Util.GetValueOfString(row[i]["Name"]),
+                            DisplayName = Util.GetValueOfString(row[i]["Name"]),
+                            ClassName = "",
+                            Rows = Util.GetValueOfInt(row[i]["rowspan"]),
+                            Cols = Util.GetValueOfInt(row[i]["colspan"]),
+                            Img = newgalary,
+                            ModuleName = moduleName,
+                            Type = Util.GetValueOfString(row[i]["Type"]),
+                            WindowSpecific = false,
+                            IsDefault = Util.GetValueOfString(row[i]["IsDefault"]) == "Y",
+                            Sequence = Util.GetValueOfInt(row[i]["Sequence"])
+                        };
+
+                        list.Add(l);
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+
             }
             return list;
         }
