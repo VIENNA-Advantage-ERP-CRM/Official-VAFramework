@@ -125,7 +125,7 @@ namespace VIS.Models
             sql += @" AD_WidgetSize.className,AD_WidgetSize.Rowspan,AD_WidgetSize.Colspan,AD_WidgetSize.AD_WidgetSize_ID,AD_IMAGE.BINARYDATA,AD_ModuleInfo.name AS ModuleName, AD_Window_ID, IsDefault, Sequence FROM AD_Widget 
                             INNER JOIN AD_WidgetSize  ON AD_Widget.AD_Widget_ID=AD_WidgetSize.AD_Widget_ID
                             INNER JOIN AD_Widget_Access ON AD_Widget.AD_Widget_ID=AD_Widget_Access.AD_Widget_ID
-                            INNER JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID
+                            LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID
                             INNER JOIN AD_ModuleInfo ON AD_ModuleInfo.AD_ModuleInfo_ID=AD_Widget.AD_ModuleInfo_ID";
             if (!baseLanguage)
             {
@@ -163,7 +163,7 @@ namespace VIS.Models
                         }
                         WindowSpecific = true;
                     }
-                    string img = "";
+                    string img = "";                   
                     try
                     {
                        img = "data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
@@ -204,20 +204,22 @@ namespace VIS.Models
         public List<HomeWidget> GetAnalyticalChart(Ctx ctx, int windowID)
         {
             List<HomeWidget> list = null;
-            if (!Env.IsModuleInstalled("VADB_") && Util.GetValueOfInt(MTable.Get_Table_ID("VADB_ChartSize")) == 0)
+            if (!Env.IsModuleInstalled("VADB_") && Util.GetValueOfInt(MTable.Get_Table_ID("AD_WidgetSize")) == 0)
             {
                 return list;
             }
 
-            string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,VADB_ChartSize.VADB_ChartSize_ID,CAST(D_Chart.SEQNO AS integer) AS SEQNO FROM D_Chart INNER JOIN 
+            string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA FROM D_Chart INNER JOIN 
                             D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
-                            INNER JOIN VADB_ChartSize ON (D_Chart.D_Chart_ID=VADB_ChartSize.D_Chart_ID)
+                            INNER JOIN AD_WidgetSize ON (D_Chart.D_Chart_ID=AD_WidgetSize.D_Chart_ID)
+                            LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                           
                             WHERE D_ChartAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
             sql += " UNION ALL ";
 
-            sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,VADB_KPISize.VADB_KPISize_ID AS VADB_ChartSize_ID,CAST(RC_KPI.SEQNO AS integer) AS SEQNO FROM RC_KPI INNER JOIN 
+            sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_KPI INNER JOIN 
                             RC_KPIAccess ON (RC_KPI.RC_KPI_ID=RC_KPIAccess.RC_KPI_ID)
-                            INNER JOIN VADB_KPISize ON (RC_KPI.RC_KPI_ID=VADB_KPISize.RC_KPI_ID)
+                            INNER JOIN AD_WidgetSize ON (RC_KPI.RC_KPI_ID=AD_WidgetSize.RC_KPI_ID)
+                            LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
                             WHERE RC_KPIAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
 
 
@@ -230,6 +232,15 @@ namespace VIS.Models
                 {
                     string chartType = Util.GetValueOfString(row[i]["chartType"]);
                     var newgalary = "";
+                    try
+                    {
+                        newgalary = "data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
+                        chartType = null;
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                     if (chartType == "1")
                     {
                         newgalary = "<img src='Areas/VADB/Images/Column.png'>";
@@ -240,7 +251,7 @@ namespace VIS.Models
                     }
                     else if (chartType == "3")
                     {
-                        newgalary = "<img src='Areas/VADB/Images/Pie.png>";
+                        newgalary = "<img src='Areas/VADB/Images/Pie.png'>";
                     }
                     else if (chartType == "4")
                     {
@@ -286,7 +297,7 @@ namespace VIS.Models
                     HomeWidget l = new HomeWidget()
                     {
                         WidgetID = Util.GetValueOfInt(row[i]["d_chart_id"]),
-                        KeyID = Util.GetValueOfInt(row[i]["VADB_ChartSize_ID"]),
+                        KeyID = Util.GetValueOfInt(row[i]["AD_WidgetSize_ID"]),
                         Name = Util.GetValueOfString(row[i]["Name"]),
                         DisplayName = Util.GetValueOfString(row[i]["Name"]),
                         ClassName ="",
@@ -296,8 +307,8 @@ namespace VIS.Models
                         ModuleName = moduleName,
                         Type = Util.GetValueOfString(row[i]["Type"]),
                         WindowSpecific = false,
-                        IsDefault = false,
-                        Sequence = Util.GetValueOfInt(row[i]["SEQNO"])
+                        IsDefault = Util.GetValueOfString(row[i]["IsDefault"]) == "Y",
+                        Sequence = Util.GetValueOfInt(row[i]["Sequence"])
                     };
 
                     list.Add(l);

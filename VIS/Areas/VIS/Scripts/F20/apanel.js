@@ -2329,16 +2329,18 @@
             //Maintain stack for view change
             if (this.tabStack.length > 0) {
                 var currentTabSeq = this.curWinTab.getSelectedIndex();
-                var currentTab = this.tabStack.find(function (tab) {
-                    return tab.tabSeq === currentTabSeq;
-                });
+                if (currentTabSeq > -1) {
+                    var currentTab = this.tabStack.find(function (tab) {
+                        return tab.tabSeq === currentTabSeq;
+                    });
 
-                if (currentTab.tabView.includes(view)) {
-                    currentTab.tabView = [];
+                    if (currentTab.tabView.includes(view)) {
+                        currentTab.tabView = [];
+                    }
+                    currentTab.tabView.push(view);
                 }
-                currentTab.tabView.push(view);
+                this.setBackEnable();
             }
-            this.setBackEnable();
         }
 
         /*Naviagtion */
@@ -3414,21 +3416,24 @@
             var winNo = this.curWindowNo;
 
             //Remove tab which sequence ias higher then ccurrent selected tab
-            this.tabStack = this.tabStack.filter(function (tab) {
-                return tab.tabSeq <= clickedTabSeq;
-            });
-
-            //Check Selected tab is exist or not
-            var clickedTab = undefined;
-            if (this.tabStack.length > 0) {
-                clickedTab = this.tabStack.find(function (tab) {
-                    return tab.tabSeq === clickedTabSeq ;
+            if (actionType != 'OTD') {
+                this.tabStack = this.tabStack.filter(function (tab) {
+                    return tab.tabSeq <= clickedTabSeq;
                 });
+                //Check Selected tab is exist or not
+                var clickedTab = undefined;
+                if (this.tabStack.length > 0) {
+                    clickedTab = this.tabStack.find(function (tab) {
+                        return tab.tabSeq === clickedTabSeq;
+                    });
+                }
+
+                if (!clickedTab) { // if selected tab not exist then add.
+                    this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
+                }
             }
 
-            if (!clickedTab) { // if selected tab not exist then add.
-                this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
-            }
+           
            
 
         }
