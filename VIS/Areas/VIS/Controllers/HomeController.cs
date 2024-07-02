@@ -854,7 +854,11 @@ namespace VIS.Controllers
             List<Object> list = new List<Object>();
             list.AddRange(widgets);
             list.AddRange(shortCut);
-            list.AddRange(charts);
+            try
+            {
+                list.AddRange(charts);
+            }
+            catch (Exception ex) { }
             return Json(JsonConvert.SerializeObject(list), JsonRequestBehavior.AllowGet);
         }
 
