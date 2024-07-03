@@ -64,21 +64,23 @@
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            $bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
-            $bsyDiv[0].style.visibility = "visible";
+            $bsyDiv = $('<div id="busyDivId' + $self.windowNo + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.windowNo + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+            //$bsyDiv[0].style.visibility = "visible";
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
         function ShowBusy(show) {
-
             if (show) {
-                $bsyDiv[0].style.visibility = "visible";
+                $root.find("#busyDivId" + $self.windowNo).css('visibility', 'visible')
+                // $bsyDiv[0].style.visibility = "visible";
             }
             else {
-                $bsyDiv[0].style.visibility = "hidden";
+                $root.find("#busyDivId" + $self.windowNo).css('visibility', 'hidden')
+                //$bsyDiv[0].style.visibility = "hidden";
             }
         };
+
         //Create Widget
         function createWidget() {
             $requestWidget = ' <div id="requestwelcomeDivId' + $self.windowNo + '" class="vis-welcomeScreenFeeds w-100 vis-RequestwelcomeScreenCls" > '
@@ -86,7 +88,7 @@
                 + '      <h2 class="vis-noticeHeading vis-RequestWidth"> '
                 + ' <div class="vis-RequestInnerDivCls">'
                 + '          <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon fa fa-bell-o"></span> '
-                + '          <strong class="vis-RequestStrongCls" id="sAlrtTxtType">' + VIS.Msg.getMsg("Requests") +'</strong>'
+                + '          <strong class="vis-RequestStrongCls" id="sAlrtTxtType">' + VIS.Msg.getMsg("Requests") + '</strong>'
                 + ' <div id="reqCountDiv" title="Request" class="vis-welcomeScreenTab-notificationBubble blank"></div>'
                 + ' </div>'
                 + ' <div >'
@@ -308,7 +310,7 @@
     /* init method called on loading a form . */
     VIS.RequestWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        this.windowNo = windowNo;
+        this.windowNo = VIS.Env.getWindowNo();
 
         window.setTimeout(function (t) {
             t.Initalize();

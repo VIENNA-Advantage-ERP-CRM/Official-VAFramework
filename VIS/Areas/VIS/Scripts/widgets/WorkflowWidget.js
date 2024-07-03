@@ -12,6 +12,7 @@
         /* Variables*/
         this.frame;
         this.windowNo;
+        this.$bsyDiv;
         var $self = this; //scoped $self pointer
         var $root = $('<div class="vis-group-assign-content" style="height:100%">');
         var $workflowWidget;
@@ -210,22 +211,20 @@
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            $bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
-            //$bsyDiv.css({
-            //    "position": "absolute", "width": "98%", "height": "97%", 'text-align': 'center', 'z-index': '999'
-            //});
-            $bsyDiv[0].style.visibility = "visible";
+            $bsyDiv = $('<div id="busyDivId' + $self.windowNo + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.windowNo + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+            //$bsyDiv[0].style.visibility = "visible";
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
         function ShowBusy(show) {
-
             if (show) {
-                $bsyDiv[0].style.visibility = "visible";
+                $root.find("#busyDivId" + $self.windowNo).css('visibility', 'visible')
+               // $bsyDiv[0].style.visibility = "visible";
             }
             else {
-                $bsyDiv[0].style.visibility = "hidden";
+                $root.find("#busyDivId" + $self.windowNo).css('visibility', 'hidden')
+                //$bsyDiv[0].style.visibility = "hidden";
             }
         };
         //Create Widget
@@ -400,7 +399,7 @@
             scrollWF = true;
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
-                ShowBusy(true);
+                ShowBusy(true);                
                 window.setTimeout(function () {
                     scrollWF = false;
                     var tabdataLastPage = parseInt($countDiv_ID.html());
@@ -633,7 +632,7 @@
             divDetail.append(divWorkflowActivity);
             divDetail.append(divWorkflowChecklist);
 
-            divWorkflowActivity.append($bsyDiv);
+            //divWorkflowActivity.append($bsyDiv);
 
             var ul = $("<ul class='vis-IIColumnContent'>");
             divWorkflowActivity.append(ul);
@@ -1195,8 +1194,8 @@
             return $root;
         };
         //Dispose function
-        this.disposeComponent = function () {                    
-            $workflowWidget = null;            
+        this.disposeComponent = function () {
+            $workflowWidget = null;
             $wFSearchshow_ID = null;
             $fromDate_ID = null;
             $toDate_ID = null;
@@ -1240,7 +1239,7 @@
     /* init method called on loading a form . */
     VIS.WorkflowWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        this.windowNo = windowNo;
+        this.windowNo = VIS.Env.getWindowNo();
 
         window.setTimeout(function (t) {
             t.Initalize();
