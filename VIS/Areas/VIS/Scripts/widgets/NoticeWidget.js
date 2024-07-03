@@ -153,27 +153,26 @@
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            $bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
-            //$bsyDiv.css({
-            //    "position": "absolute", "width": "98%", "height": "97%", 'text-align': 'center', 'z-index': '999'
-            //});
-            $bsyDiv[0].style.visibility = "visible";
+            $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+            //$bsyDiv[0].style.visibility = "visible";
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
         function ShowBusy(show) {
-
             if (show) {
-                $bsyDiv[0].style.visibility = "visible";
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'visible')
+                // $bsyDiv[0].style.visibility = "visible";
             }
             else {
-                $bsyDiv[0].style.visibility = "hidden";
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'hidden')
+                //$bsyDiv[0].style.visibility = "hidden";
             }
         };
+
         //Create Widget
         function createWidget() {
-            $noticeWidget = ' <div id="welcomeScreenFeedsDivId' + $self.windowNo + '" class="vis-welcomeScreenFeeds w-100 vis-welcomeScreenNoticeMainDiv" >'
+            $noticeWidget = ' <div id="welcomeScreenFeedsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-welcomeScreenFeeds w-100 vis-welcomeScreenNoticeMainDiv" >'
                 + '     <div class="vis-row">'
                 + '         <h2 style="width: 100%" class="vis-noticeHeading">'
                 + ' <div class="vis-secndDiv">'
@@ -191,7 +190,7 @@
                 + ' </div>';
 
             $root.append($noticeWidget);
-            welcomeScreenFeedsDivId = $root.find("#welcomeScreenFeedsDivId" + $self.windowNo);
+            welcomeScreenFeedsDivId = $root.find("#welcomeScreenFeedsDivId" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers = welcomeScreenFeedsDivId.find("#welcomeScreenFeedsList");
             $hlnkTabDataRef_ID = welcomeScreenFeedsDivId.find("#hlnkTabDataRef");
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
@@ -362,8 +361,13 @@
     /* init method called on loading a form . */
     VIS.NoticeWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        this.windowNo = windowNo;
-
+        if (windowNo == -99999) {
+            this.windowNo = VIS.Env.getWindowNo();
+        }
+        else {
+            this.windowNo = windowNo;
+        }
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
         window.setTimeout(function (t) {
             t.Initalize();
         }, 10, this);

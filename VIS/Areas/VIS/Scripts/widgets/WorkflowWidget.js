@@ -12,6 +12,7 @@
         /* Variables*/
         this.frame;
         this.windowNo;
+        this.$bsyDiv;
         var $self = this; //scoped $self pointer
         var $root = $('<div class="vis-group-assign-content" style="height:100%">');
         var $workflowWidget;
@@ -81,12 +82,12 @@
         /* Get controls from root */
         function getControls() {
             $flipCard_ID = $workflowWidgetDtls_ID.find(".vis-feedDetails");
-            $backBtn_ID = $workflowActivitys.find("#VIS_backBtn_ID" + $self.windowNo);
-            $zoom = $workflowWidgetDtls_ID.find("#VIS_Zoom_ID" + $self.windowNo);
+            $backBtn_ID = $workflowActivitys.find("#VIS_backBtn_ID" + $self.AD_UserHomeWidgetID);
+            $zoom = $workflowWidgetDtls_ID.find("#VIS_Zoom_ID" + $self.AD_UserHomeWidgetID);
             $wfZoomCls = $workflowWidgetDtls_ID.find(".VIS_WfZoomCls");
             $txtSearch = $fstMainDiv_ID.find('#homeSearchWorkflow');
             $btnSearch = $fstMainDiv_ID.find('#btnWorkflowSearch');
-            $addDetails_ID = $fstMainDiv_ID.find("#VIS_AddDetails_ID" + $self.windowNo);
+            $addDetails_ID = $fstMainDiv_ID.find("#VIS_AddDetails_ID" + $self.AD_UserHomeWidgetID);
             divDetail = $fstMainDiv_ID.find("#workflowActivityDetails");
         };
         /* Declare events */
@@ -116,8 +117,8 @@
                 else {
                     $fromDate_ID.css('display', 'none');
                     $toDate_ID.css('display', 'none');
-                    $("#VIS_FromDateInput_ID" + $self.windowNo).val('');
-                    $("#VIS_ToDateInput_ID" + $self.windowNo).val('');
+                    $("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val('');
+                    $("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val('');
                     $welcomeScreenFeedsLists.removeClass('VIS-ActiveCls')
                     showToAndFromDate = true;
                 }
@@ -210,50 +211,48 @@
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            $bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
-            //$bsyDiv.css({
-            //    "position": "absolute", "width": "98%", "height": "97%", 'text-align': 'center', 'z-index': '999'
-            //});
-            $bsyDiv[0].style.visibility = "visible";
+            $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+            //$bsyDiv[0].style.visibility = "visible";
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
         function ShowBusy(show) {
-
             if (show) {
-                $bsyDiv[0].style.visibility = "visible";
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'visible')
+               // $bsyDiv[0].style.visibility = "visible";
             }
             else {
-                $bsyDiv[0].style.visibility = "hidden";
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'hidden')
+                //$bsyDiv[0].style.visibility = "hidden";
             }
         };
         //Create Widget
         function createWidget() {
-            $workflowWidget = ' <div id="FstMainDiv' + $self.windowNo + '" class="vis-cardCls w-100">'// style="background-color:#f3f3f3"
+            $workflowWidget = ' <div id="FstMainDiv' + $self.AD_UserHomeWidgetID + '" class="vis-cardCls w-100">'// style="background-color:#f3f3f3"
                 + '     <div class="vis-welcomeScreenFeeds" style="height: 100%;">'
                 + ' <div class="vis-row vis-rowDiv">'
                 + '     <h2 class="vis-h2Div">'
                 + ' <div class="vis-topSecndDivCls">'
                 + '         <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon vis vis-userfeed"></span>'
                 + '         <strong id="sAlrtTxtType">Workflow Activities</strong>'// style="float: left;"
-                + ' <div id="divfActivity' + $self.windowNo + '" title="Workflow" class="vis-welcomeScreenTab-notificationBubble blank"></div>'//' + data.length + '
+                + ' <div id="divfActivity' + $self.AD_UserHomeWidgetID + '" title="Workflow" class="vis-welcomeScreenTab-notificationBubble blank"></div>'//' + data.length + '
                 + ' </div>'
                 + ' <div>'
-                + '         <a id="hlnkTabDataRef' + $self.windowNo + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon"><i class="vis vis-refresh"></i></a>'// style="float: right; margin-top: 0px; cursor: pointer; "
+                + '         <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon"><i class="vis vis-refresh"></i></a>'// style="float: right; margin-top: 0px; cursor: pointer; "
                 //+ '         <span id="sNewNts" style="display: none; float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;" class="vis-feedicon border-0" title="New Record"><i class="vis vis-plus"></i></span>'
-                + '         <span id="WFSearchshow' + $self.windowNo + '"  class="vis-feedicon vis vis-eye-plus border-0" title="Show Search"></span>'//style="float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;"
+                + '         <span id="WFSearchshow' + $self.AD_UserHomeWidgetID + '"  class="vis-feedicon vis vis-eye-plus border-0" title="Show Search"></span>'//style="float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;"
                 + ' </div>'
                 + '     </h2></div>'
                 + ' <div id = "welcomeScreenFeedsLists" class="vis-scrollerVerticalNewCls ml-0" style="height: calc(100% - 54px);"><div class="vis-workflow-homepage-parentdiv">'
                 + '<div class="frm-data-col-wrap w-100" style=""> <div class="frm-data-search-wrap">'
-                + '<select id="VIS_CmbWindows_ID' + $self.windowNo + '" class="vis-custom-select">'
+                + '<select id="VIS_CmbWindows_ID' + $self.AD_UserHomeWidgetID + '" class="vis-custom-select">'
                 + '</select></div></div><div class="frm-data-col-wrap w-100"><div class="frm-data-search-wrap">'
                 + '<input class="frm-data-col-searchinput" id="homeSearchWorkflow" type="text" placeholder="Search"><button id="btnWorkflowSearch" class="vis-wfSearch-btn">'//  style="height: 1.875em;"
-                + '<i class="fa fa-search" aria-hidden="true"></i></button></div></div><div id="VIS_FromDate_ID' + $self.windowNo + '" style="display:none;" class="frm-data-col-wrap w-100">'
-                + '<label>' + VIS.Msg.getMsg("FromDate") + '</label><input id="VIS_FromDateInput_ID' + $self.windowNo + '" type="date" placeholder="date"></div><div id="VIS_ToDate_ID' + $self.windowNo + '" style="display:none;" class="frm-data-col-wrap w-100">'
-                + '<label>' + VIS.Msg.getMsg("ToDate") + '</label><input id="VIS_ToDateInput_ID' + $self.windowNo + '" type="date" placeholder="date"></div></div>'
-                + '<div id="VIS_WorkflowWidgetDtls_ID' + $self.windowNo + '" class="workflow-homepage-activites" >'
+                + '<i class="fa fa-search" aria-hidden="true"></i></button></div></div><div id="VIS_FromDate_ID' + $self.AD_UserHomeWidgetID + '" style="display:none;" class="frm-data-col-wrap w-100">'
+                + '<label>' + VIS.Msg.getMsg("FromDate") + '</label><input id="VIS_FromDateInput_ID' + $self.AD_UserHomeWidgetID + '" type="date" placeholder="date"></div><div id="VIS_ToDate_ID' + $self.windowNo + '" style="display:none;" class="frm-data-col-wrap w-100">'
+                + '<label>' + VIS.Msg.getMsg("ToDate") + '</label><input id="VIS_ToDateInput_ID' + $self.AD_UserHomeWidgetID + '" type="date" placeholder="date"></div></div>'
+                + '<div id="VIS_WorkflowWidgetDtls_ID' + $self.AD_UserHomeWidgetID + '" class="workflow-homepage-activites" >'
                 + '</div>'
                 + '     </div>'
                 + '          </div>'
@@ -266,20 +265,20 @@
                 + '   </div>';
 
             $root.append($workflowWidget);
-            $fstMainDiv_ID = $root.find("#FstMainDiv" + $self.windowNo);
-            $countDiv_ID = $fstMainDiv_ID.find("#divfActivity" + $self.windowNo);
-            $workflowWidgetDtls_ID = $fstMainDiv_ID.find("#VIS_WorkflowWidgetDtls_ID" + $self.windowNo);
-            $cmbWindows = $fstMainDiv_ID.find("#VIS_CmbWindows_ID" + $self.windowNo);
-            $cmbAnswer = $fstMainDiv_ID.find("#VIS_AnswerCmb_ID" + $self.windowNo);
+            $fstMainDiv_ID = $root.find("#FstMainDiv" + $self.AD_UserHomeWidgetID);
+            $countDiv_ID = $fstMainDiv_ID.find("#divfActivity" + $self.AD_UserHomeWidgetID);
+            $workflowWidgetDtls_ID = $fstMainDiv_ID.find("#VIS_WorkflowWidgetDtls_ID" + $self.AD_UserHomeWidgetID);
+            $cmbWindows = $fstMainDiv_ID.find("#VIS_CmbWindows_ID" + $self.AD_UserHomeWidgetID);
+            $cmbAnswer = $fstMainDiv_ID.find("#VIS_AnswerCmb_ID" + $self.AD_UserHomeWidgetID);
             $workflowActivitys = $fstMainDiv_ID.find("#workflowActivitys");
             $welcomeScreenFeedsLists = $fstMainDiv_ID.find("#welcomeScreenFeedsLists");
             $row = $fstMainDiv_ID.find(".vis-welcomeScreenFeeds");
-            $hlnkTabDataRef_ID = $fstMainDiv_ID.find("#hlnkTabDataRef" + $self.windowNo);
-            $wFSearchshow_ID = $fstMainDiv_ID.find("#WFSearchshow" + $self.windowNo);
-            $fromDate_ID = $fstMainDiv_ID.find("#VIS_FromDate_ID" + $self.windowNo);
-            $toDate_ID = $fstMainDiv_ID.find("#VIS_ToDate_ID" + $self.windowNo);
-            $fromDateInput_ID = $fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.windowNo);
-            $toDateInput_ID = $fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.windowNo);
+            $hlnkTabDataRef_ID = $fstMainDiv_ID.find("#hlnkTabDataRef" + $self.AD_UserHomeWidgetID);
+            $wFSearchshow_ID = $fstMainDiv_ID.find("#WFSearchshow" + $self.AD_UserHomeWidgetID);
+            $fromDate_ID = $fstMainDiv_ID.find("#VIS_FromDate_ID" + $self.AD_UserHomeWidgetID);
+            $toDate_ID = $fstMainDiv_ID.find("#VIS_ToDate_ID" + $self.AD_UserHomeWidgetID);
+            $fromDateInput_ID = $fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID);
+            $toDateInput_ID = $fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID);
         };
         //Get Widget 1st page data
         function getworkflowWidget(refresh) {
@@ -297,14 +296,14 @@
             else {
                 searchText = "";
             }
-            if ($fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.windowNo).val() != null && $fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.windowNo).val() != '') {
-                fromDate = $fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.windowNo).val();
+            if ($fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val() != null && $fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val() != '') {
+                fromDate = $fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val();
             }
             else {
                 fromDate = null;
             }
-            if ($fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.windowNo).val() != null && $fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.windowNo).val() != '') {
-                toDate = $fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.windowNo).val();
+            if ($fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val() != null && $fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val() != '') {
+                toDate = $fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val();
             }
             else {
                 toDate = null;
@@ -321,7 +320,7 @@
                 success: function (dyndata) {
                     var reslt = JSON.parse(dyndata.result);
                     if (reslt) {
-                        $fstMainDiv_ID.find("#pnorecFound" + $self.windowNo).css('display', 'none');
+                        $fstMainDiv_ID.find("#pnorecFound" + $self.AD_UserHomeWidgetID).css('display', 'none');
                         data = reslt.LstInfo;
                         maxCount = (data.length - 1);
                         $countDiv_ID.append(reslt.count);
@@ -335,7 +334,7 @@
                                 + '<div class="vis-feedTitleBar-buttons">'
                                 + '<ul><li><a href="javascript:void(0)" class="VIS_WfZoomCls" data-index="' + item + '" data-viswfazoom="wfZoom">'
                                 + '<i class= "vis vis-find" data-index="' + item + '" data-viswfazoom="wfZoom" ></i></a></li></ul></div></div>'
-                                + '<div id="VIS_FlipCard_ID' + $self.windowNo + '" class="vis-feedDetails">'
+                                + '<div id="VIS_FlipCard_ID' + $self.AD_UserHomeWidgetID + '" class="vis-feedDetails">'
                                 + '<pre style="text-align:left;" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">';
                             var summry = null;
                             if (data[item].DocumentNameValue == undefined || data[item].DocumentNameValue == '') {
@@ -362,7 +361,7 @@
                     }
                     else {
                         data = null;
-                        $workflowWidgetDtls_ID.append('<p id="pnorecFound' + $self.windowNo + '" class="vis-NoRecordCls">' + VIS.Msg.getMsg("NoRecordFound") + '</p>');// style="margin-top:12.5em; text-align:center; display:block;"
+                        $workflowWidgetDtls_ID.append('<p id="pnorecFound' + $self.AD_UserHomeWidgetID + '" class="vis-NoRecordCls">' + VIS.Msg.getMsg("NoRecordFound") + '</p>');// style="margin-top:12.5em; text-align:center; display:block;"
                     }
                 }
             });
@@ -400,7 +399,7 @@
             scrollWF = true;
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
-                ShowBusy(true);
+                ShowBusy(true);                
                 window.setTimeout(function () {
                     scrollWF = false;
                     var tabdataLastPage = parseInt($countDiv_ID.html());
@@ -438,14 +437,14 @@
             else {
                 searchText = "";
             }
-            if ($("#VIS_FromDateInput_ID" + $self.windowNo).val() != null && $("#VIS_FromDateInput_ID" + $self.windowNo).val() != '') {
-                fromDate = $("#VIS_FromDateInput_ID" + $self.windowNo).val();
+            if ($("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val() != null && $("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val() != '') {
+                fromDate = $("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val();
             }
             else {
                 fromDate = null;
             }
-            if ($("#VIS_ToDateInput_ID" + $self.windowNo).val() != null && $("#VIS_ToDateInput_ID" + $self.windowNo).val() != '') {
-                toDate = $("#VIS_ToDateInput_ID" + $self.windowNo).val();
+            if ($("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val() != null && $("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val() != '') {
+                toDate = $("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val();
             }
             else {
                 toDate = null;
@@ -475,7 +474,7 @@
                                 + '<div class="vis-feedTitleBar-buttons">'
                                 + '<ul><li><a href="javascript:void(0)" class="VIS_WfZoomCls" data-index="' + maxCount + '" data-viswfazoom="wfZoom">'//(Number(10 * 1) + Number(item))
                                 + '<i class= "vis vis-find" data-index="' + maxCount + '" data-viswfazoom="wfZoom" ></i></a></li></ul></div></div>'
-                                + '<div id="VIS_FlipCard_ID' + $self.windowNo + '" class="vis-feedDetails">'
+                                + '<div id="VIS_FlipCard_ID' + $self.AD_UserHomeWidgetID + '" class="vis-feedDetails">'
                                 + '<pre style="text-align:left;" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + maxCount + '">';//<div class='vis-feedDetails'>
                             var summry = null;
                             if (data[item].DocumentNameValue == undefined || data[item].DocumentNameValue == '') {
@@ -549,7 +548,7 @@
             var divHeader = $("<div class='vis-workflowActivityDetails-Heading'>");// style='text-align:left;'
             divDetail.append(divHeader);
 
-            var hHeader = $("<div id='VIS_backBtn_ID" + $self.windowNo + "' style='cursor: pointer;' title='Back Window' class='vis vis-arrow-left'></div><h3 style='margin-left: 0.3125em;'>" + VIS.Msg.getMsg('Detail') + "</h3>");
+            var hHeader = $("<div id='VIS_backBtn_ID" + $self.AD_UserHomeWidgetID + "' style='cursor: pointer;' title='Back Window' class='vis vis-arrow-left'></div><h3 style='margin-left: 0.3125em;'>" + VIS.Msg.getMsg('Detail') + "</h3>");
             divHeader.append(hHeader);
 
             // if  any checkbox is checked, then don't show History in middle panel.
@@ -633,7 +632,7 @@
             divDetail.append(divWorkflowActivity);
             divDetail.append(divWorkflowChecklist);
 
-            divWorkflowActivity.append($bsyDiv);
+            //divWorkflowActivity.append($bsyDiv);
 
             var ul = $("<ul class='vis-IIColumnContent'>");
             divWorkflowActivity.append(ul);
@@ -853,25 +852,25 @@
             // if  any checkbox is checked, then don't show History in middle panel.
             if (selectedItems.length <= 1) {
 
-                divWorkflowActivity.append($("<h3 id='HistoryMain_ID" + $self.windowNo + "'class='vis-ActionHeadingCls' style='cursor:pointer;'>").append(VIS.Msg.getMsg('ViewHistoryRecord')
-                    + "<div class='historyArrow' id='VIS_DownArrowID_" + $self.windowNo + "' style='display:block;'><span class='vis vis-arrow-down'></span></div>"
-                    + "<div class='historyArrow' id='VIS_UpArrowID_" + $self.windowNo + "' style='display:none;'><span class='vis vis-arrow-up'></span></div>"));
+                divWorkflowActivity.append($("<h3 id='HistoryMain_ID" + $self.AD_UserHomeWidgetID + "'class='vis-ActionHeadingCls' style='cursor:pointer;'>").append(VIS.Msg.getMsg('ViewHistoryRecord')
+                    + "<div class='historyArrow' id='VIS_DownArrowID_" + $self.AD_UserHomeWidgetID + "' style='display:block;'><span class='vis vis-arrow-down'></span></div>"
+                    + "<div class='historyArrow' id='VIS_UpArrowID_" + $self.AD_UserHomeWidgetID + "' style='display:none;'><span class='vis vis-arrow-up'></span></div>"));
                 divWorkflowActivity.append($("<div class='clearfix'>"));
 
-                var divHistory = $("<div id='History_ID" + $self.windowNo + "' class='vis-history-wrap' style='display: none;'>");
+                var divHistory = $("<div id='History_ID" + $self.AD_UserHomeWidgetID + "' class='vis-history-wrap' style='display: none;'>");
                 divWorkflowActivity.append(divHistory);
 
-                $workflowActivitys.find("#HistoryMain_ID" + $self.windowNo).on("click", function () {
+                $workflowActivitys.find("#HistoryMain_ID" + $self.AD_UserHomeWidgetID).on("click", function () {
                     if (historyDivShow == true) {
-                        $(divWorkflowActivity).find("#VIS_DownArrowID_" + $self.windowNo).css('display', 'none');
-                        $(divWorkflowActivity).find("#VIS_UpArrowID_" + $self.windowNo).css('display', 'block');
-                        $(divWorkflowActivity).find("#History_ID" + $self.windowNo).css('display', 'block');
+                        $(divWorkflowActivity).find("#VIS_DownArrowID_" + $self.AD_UserHomeWidgetID).css('display', 'none');
+                        $(divWorkflowActivity).find("#VIS_UpArrowID_" + $self.AD_UserHomeWidgetID).css('display', 'block');
+                        $(divWorkflowActivity).find("#History_ID" + $self.AD_UserHomeWidgetID).css('display', 'block');
                         historyDivShow = false;
                     }
                     else {
-                        $(divWorkflowActivity).find("#VIS_DownArrowID_" + $self.windowNo).css('display', 'block');
-                        $(divWorkflowActivity).find("#VIS_UpArrowID_" + $self.windowNo).css('display', 'none');
-                        $(divWorkflowActivity).find("#History_ID" + $self.windowNo).css('display', 'none');
+                        $(divWorkflowActivity).find("#VIS_DownArrowID_" + $self.AD_UserHomeWidgetID).css('display', 'block');
+                        $(divWorkflowActivity).find("#VIS_UpArrowID_" + $self.AD_UserHomeWidgetID).css('display', 'none');
+                        $(divWorkflowActivity).find("#History_ID" + $self.AD_UserHomeWidgetID).css('display', 'none');
                         historyDivShow = true;
                     }
                 });
@@ -979,7 +978,7 @@
 
 
             });
-            $workflowActivitys.find("#VIS_backBtn_ID" + $self.windowNo).on('click', function () {
+            $workflowActivitys.find("#VIS_backBtn_ID" + $self.AD_UserHomeWidgetID).on('click', function () {
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
                 $welcomeScreenFeedsLists.css('display', 'block');
                 $row.css('display', 'block');
@@ -1195,8 +1194,8 @@
             return $root;
         };
         //Dispose function
-        this.disposeComponent = function () {                    
-            $workflowWidget = null;            
+        this.disposeComponent = function () {
+            $workflowWidget = null;
             $wFSearchshow_ID = null;
             $fromDate_ID = null;
             $toDate_ID = null;
@@ -1234,14 +1233,19 @@
             data = null;
             $self = null;
             $root = null;
-            $root.remove();
+            $root.remove();            
         };
     }
     /* init method called on loading a form . */
     VIS.WorkflowWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        this.windowNo = windowNo;
-
+        if (windowNo == -99999) {
+            this.windowNo = VIS.Env.getWindowNo();
+        }
+        else {
+            this.windowNo = windowNo;
+        }
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
         window.setTimeout(function (t) {
             t.Initalize();
         }, 10, this);
