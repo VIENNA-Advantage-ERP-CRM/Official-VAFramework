@@ -64,7 +64,7 @@
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            $bsyDiv = $('<div id="busyDivId' + $self.windowNo + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.windowNo + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+            $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             //$bsyDiv[0].style.visibility = "visible";
             $root.append($bsyDiv);
         };
@@ -72,18 +72,18 @@
         /* Method to enable and disable busy indicator */
         function ShowBusy(show) {
             if (show) {
-                $root.find("#busyDivId" + $self.windowNo).css('visibility', 'visible')
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'visible')
                 // $bsyDiv[0].style.visibility = "visible";
             }
             else {
-                $root.find("#busyDivId" + $self.windowNo).css('visibility', 'hidden')
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'hidden')
                 //$bsyDiv[0].style.visibility = "hidden";
             }
         };
 
         //Create Widget
         function createWidget() {
-            $requestWidget = ' <div id="requestwelcomeDivId' + $self.windowNo + '" class="vis-welcomeScreenFeeds w-100 vis-RequestwelcomeScreenCls" > '
+            $requestWidget = ' <div id="requestwelcomeDivId' + $self.AD_UserHomeWidgetID + '" class="vis-welcomeScreenFeeds w-100 vis-RequestwelcomeScreenCls" > '
                 + '  <div class="vis-row"> '
                 + '      <h2 class="vis-noticeHeading vis-RequestWidth"> '
                 + ' <div class="vis-RequestInnerDivCls">'
@@ -101,7 +101,7 @@
                 + ' </div>';
 
             $root.append($requestWidget);
-            $requestwelcomeDivId = $root.find("#requestwelcomeDivId" + $self.windowNo);
+            $requestwelcomeDivId = $root.find("#requestwelcomeDivId" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers = $requestwelcomeDivId.find("#welcomeScreenFeedsList");
             reqCountDiv = $requestwelcomeDivId.find("#reqCountDiv");
             $hlnkTabDataRef_ID = $requestwelcomeDivId.find("#hlnkTabDataRefReq");
@@ -310,8 +310,13 @@
     /* init method called on loading a form . */
     VIS.RequestWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        this.windowNo = VIS.Env.getWindowNo();
-
+        if (windowNo == -99999) {
+            this.windowNo = VIS.Env.getWindowNo();
+        }
+        else {
+            this.windowNo = windowNo;
+        }
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
         window.setTimeout(function (t) {
             t.Initalize();
         }, 10, this);
