@@ -1232,7 +1232,6 @@
             divDetail = null;
             data = null;
             $self = null;
-            $root = null;
             $root.remove();            
         };
     }
