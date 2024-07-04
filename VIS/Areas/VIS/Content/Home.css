@@ -3617,9 +3617,9 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 .vis-widgetImg {
-    width: 100%;
-    height: 75px;
+    height: 100%;
     object-fit: contain;
+    width: 100%;
 }
 
 .vis-widgetField-icon {
@@ -3728,4 +3728,15 @@ ul.vis-userLinks-ListMenu li a i {
 .droppable-placeholder {
     border: 2px dashed #ccc;
     background-color: #f9f9f9;
+}
+.vis-imgsec {
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow:hidden;
+}
+.vis-widgetdefault {
+    width: 35px;
+    height: 35px
 }

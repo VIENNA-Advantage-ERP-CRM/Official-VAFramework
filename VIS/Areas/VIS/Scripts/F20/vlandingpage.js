@@ -428,9 +428,9 @@
 
                     } else if (result[i].Type == 'W') {
                         moduelName = result[i].ModuleName
-                        img = '<img class="vis-widgetImg" src="' + result[i].Img + '" />';
+                        img = result[i].Img;
                     } else if (result[i].Type == 'C' || result[i].Type == 'K' || result[i].Type == 'V') {
-                        moduelName = result[i].ModuleName;
+                        moduelName = VIS.Msg.getMsg(result[i].ModuleName);
                         img = result[i].Img
                     }
 

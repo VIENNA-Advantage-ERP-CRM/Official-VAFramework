@@ -1757,7 +1757,7 @@
     }
 
     APanel.prototype.showHideViewIcon = function (action) {
-        if (this.curTab != null && this.curGC != null) {
+        if (this.curTab != null && this.curGC != null) {            
             if (this.actionParams.IsHideGridToggle != null) {
                 if(this.actionParams.IsHideGridToggle)
                     this.aMulti.hide();
@@ -1804,6 +1804,7 @@
             this.aSingle.hide();
             this.aCard.hide();
         }
+      
        
     }
 
@@ -2300,8 +2301,7 @@
         }, 10);
     };
 
-    APanel.prototype.actionPerformedCallback = function (tis, action) {
-                /*Handle view change for back button */
+    APanel.prototype.setTabstackview = function (action) {
         if (action === "Multi" || action === "Card" || action === "Single") {
             var view = "Y";
             if (action === "Multi") {
@@ -2329,19 +2329,24 @@
             //Maintain stack for view change
             if (this.tabStack.length > 0) {
                 var currentTabSeq = this.curWinTab.getSelectedIndex();
-                if (currentTabSeq > -1) {
-                    var currentTab = this.tabStack.find(function (tab) {
-                        return tab.tabSeq === currentTabSeq;
-                    });
+                //if (currentTabSeq > -1) {
+                var currentTab = this.tabStack.find(function (tab) {
+                    return tab.tabSeq === currentTabSeq;
+                });
 
-                    if (currentTab.tabView.includes(view)) {
-                        currentTab.tabView = [];
-                    }
-                    currentTab.tabView.push(view);
+                if (currentTab.tabView.includes(view)) {
+                    currentTab.tabView = [];
                 }
+                currentTab.tabView.push(view);
+                //}
                 this.setBackEnable();
             }
         }
+    }
+
+    APanel.prototype.actionPerformedCallback = function (tis, action) {
+                /*Handle view change for back button */
+        this.setTabstackview(action);
 
         /*Naviagtion */
         if (tis.aFirst.getAction() === action) {
@@ -3259,7 +3264,9 @@
                 $this.setBusy(false);
             });
             return;
-        }
+            }
+
+           
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
@@ -3277,7 +3284,7 @@
         //Handle Open Tab in Dialog
         if (actionType == 'OTD') {
             VIS.TabMngr.show(tabEle, curEle.gTab.keyColumnName, curEle.gTab.getRecord_ID());
-            this.vTabbedPane.restoreTabChange();
+            this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());
             return;
         }
 
@@ -3322,14 +3329,14 @@
                             var isCheckListRequire = this.curGC.IsCheckListRequire();
 
                             if (!isCheckListRequire) {
-                                this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
+                                this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());//m_curWinTab.setSelectedIndex(m_curTabIndex);
                                 this.setBusy(false, true);
                                 VIS.ADialog.error("CheckListRequired");
                                 return false;
                             }
 
                             if (!this.curTab.dataSave(true)) {	//  there is a problem, so we go back	
-                                this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
+                                this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());//m_curWinTab.setSelectedIndex(m_curTabIndex);
                                 this.setBusy(false, true);
                                 return false;
                             }
@@ -3352,7 +3359,7 @@
                                 if (results) {
                                     if (!selfPanel.curTab.dataSave(true)) {   //  there is a problem, so we go back
                                         //m_curWinTab.setSelectedIndex(m_curTabIndex);
-                                        selfPanel.vTabbedPane.restoreTabChange();
+                                        selfPanel.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());
                                         selfPanel.setBusy(false, true);
                                         return false;
                                     }

@@ -166,10 +166,10 @@ namespace VIS.Models
                     string img = "";                   
                     try
                     {
-                       img = "data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
+                       img = "<img class='vis-widgetImg' src='data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"])+"' />";
                     }catch (Exception ex)
                     {
-
+                        img = "<img class='vis-widgetImg vis-widgetdefault' src='Areas/VIS/Images/home/defaultWidget.svg' />";
                     }
 
                     HomeWidget l = new HomeWidget()
