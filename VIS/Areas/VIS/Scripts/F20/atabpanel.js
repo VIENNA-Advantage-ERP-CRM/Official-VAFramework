@@ -242,9 +242,9 @@
         }
     };
 
-    VTabPanel.prototype.refreshPanelData = function (rec_Id,dataRow) {
+    VTabPanel.prototype.refreshPanelData = function (rec_Id,dataRow,action) {
         if (this.curTabPanel) {
-            this.curTabPanel.refreshPanelData(rec_Id, dataRow);
+            this.curTabPanel.refreshPanelData(rec_Id, dataRow,action);
         }
     }
 
