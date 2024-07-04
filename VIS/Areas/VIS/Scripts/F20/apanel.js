@@ -2618,13 +2618,14 @@
             //  m_curWindowNo
             // Change by Lokesh Chauhan 18/05/2015
             var chkModule = false;
-            if (curTab.getAD_Window_ID() == 341 || curTab.getAD_Window_ID() == 170) {
+            if (curTab.getAD_Window_ID() == 341 || curTab.getAD_Window_ID() == 170
+                || curTab.getAD_Table_ID() == 323 || curTab.getAD_Table_ID() == 321) {
                 if (window.MMPM) {
-                    var vvcf = MMPM.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID());
+                    var vvcf = MMPM.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID(), curTab.getAD_Table_ID());
                     chkModule = true;
                 }
                 else if (window.DTD001) {
-                    var vvcf = DTD001.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID());
+                    var vvcf = DTD001.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID(), curTab.getAD_Table_ID());
                     chkModule = true;
                 }
             }
