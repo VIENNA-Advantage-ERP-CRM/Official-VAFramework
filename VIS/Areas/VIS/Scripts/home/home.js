@@ -268,7 +268,7 @@
                     items: ".vis-widget-item",
                     cursor: "grabbing",
                    /* connectWith: ".editPanel",*/
-                    disabled: true,
+                    disabled: true,                  
                     sort: function (event, ui) {
                         // Update the original position during sorting
                         originalPosition = ui.helper.position();
@@ -285,7 +285,6 @@
                     }
                 });
 
-                
             }
            
             // Function to render widgets
@@ -405,7 +404,7 @@
 
                         } else if (result[i].Type == 'W') {
                             moduelName = result[i].ModuleName
-                            img = '<img class="vis-widgetImg" src="' + result[i].Img + '" />';
+                            img = result[i].Img;
                         } else if (result[i].Type == 'C' || result[i].Type == 'K' || result[i].Type == 'V') {
                             moduelName = VIS.Msg.getMsg(result[i].ModuleName) ;
                             img = result[i].Img
@@ -419,7 +418,7 @@
                         }
 
 
-                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '">' + img +'<div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Rows ||1) + 'X' + (result[i].Cols || 1) + '</span></div></div>');
+                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img +'</div><div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Rows ||1) + 'X' + (result[i].Cols || 1) + '</span></div></div>');
                         $home.find('.vis-widgetDrag-container:last').append(witem);
                     }
 
