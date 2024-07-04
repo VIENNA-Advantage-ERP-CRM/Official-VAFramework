@@ -372,7 +372,7 @@
             $.ajax({
                 url: VIS.Application.contextUrl + "WFActivity/GetWorkflowWindows",
                 dataType: "json",
-                async: false,
+                async: true,
                 type: "POST",
                 error: function () {
                     return;
