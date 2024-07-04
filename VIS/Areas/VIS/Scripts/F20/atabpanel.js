@@ -320,7 +320,7 @@
      */
     VTabPanel.prototype.refreshPanelData = function (rec_Id, dataRow) {
         if (this.curTabPanel) {
-            this.curTabPanel.refreshPanelData(rec_Id, dataRow);
+            this.curTabPanel.refreshPanelData(rec_Id, dataRow,action);
         }
         else {
             for (var i = 0; i < this.tabPanels.length; i++) {

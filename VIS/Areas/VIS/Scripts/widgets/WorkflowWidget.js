@@ -705,7 +705,7 @@
                 detailCtrl.AnswerCtrl = ctrl;
                 if (ctrl != null) {
                     if (ctrl.getBtnCount() > 0) {
-                        var divFwd = $("<div class='vis-wforwardwrap vis-control-wrap'>");
+                        var divFwd = $("<div class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0'>");
                         divFwd.append(ctrl.getControl());
                         var divFwdBtn = $("<div class='input-group-append'>");
                         divFwdBtn.append(ctrl.getBtn(0));
@@ -770,7 +770,7 @@
             txtb.getBtn();
 
             if (txtb.getBtnCount() == 2) {
-                var divFwd = $("<div class='vis-wforwardwrap vis-control-wrap'>");
+                var divFwd = $("<div class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0'>");
                 divFwd.append(txtb.getControl());
 
                 var divFwdBtn = $("<div class='input-group-append'>");
