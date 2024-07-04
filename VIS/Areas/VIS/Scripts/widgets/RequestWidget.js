@@ -89,23 +89,23 @@
                 + ' <div class="vis-RequestInnerDivCls">'
                 + '          <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon fa fa-bell-o"></span> '
                 + '          <strong class="vis-RequestStrongCls" id="sAlrtTxtType">' + VIS.Msg.getMsg("Requests") + '</strong>'
-                + ' <div id="reqCountDiv" title="Request" class="vis-welcomeScreenTab-notificationBubble blank"></div>'
+                + ' <div id="reqCountDiv' + $self.AD_UserHomeWidgetID + '" title="Request" class="vis-welcomeScreenTab-notificationBubble blank"></div>'
                 + ' </div>'
                 + ' <div >'
-                + '          <a id="hlnkTabDataRefReq" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-RequestHlnkTabDataRefReq"><i class="vis vis-refresh"></i></a> '
-                + '          <span id="sNewNts" class="vis-feedicon vis-RequestNewNtsCls" title="New Record"><i class="vis vis-plus"></i></span> '
+                + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-RequestHlnkTabDataRefReq"><i class="vis vis-refresh"></i></a> '
+                + '          <span id="sNewNts' + $self.AD_UserHomeWidgetID + '" class="vis-feedicon vis-RequestNewNtsCls" title="New Record"><i class="vis vis-plus"></i></span> '
                 + ' </div>'
                 + '      </h2> '
                 + '  </div> '
-                + '  <div id="welcomeScreenFeedsList" class="scrollerVertical vis-RequestWelcomeScreenFeedsListCls" ></div> '
+                + '  <div id="welcomeScreenFeedsList' + $self.AD_UserHomeWidgetID + '" class="scrollerVertical vis-RequestWelcomeScreenFeedsListCls" ></div> '
                 + ' </div>';
 
             $root.append($requestWidget);
             $requestwelcomeDivId = $root.find("#requestwelcomeDivId" + $self.AD_UserHomeWidgetID);
-            welcomeTabDatacontainers = $requestwelcomeDivId.find("#welcomeScreenFeedsList");
-            reqCountDiv = $requestwelcomeDivId.find("#reqCountDiv");
-            $hlnkTabDataRef_ID = $requestwelcomeDivId.find("#hlnkTabDataRefReq");
-            $welcomeNewRecord = $requestwelcomeDivId.find("#sNewNts");
+            welcomeTabDatacontainers = $requestwelcomeDivId.find("#welcomeScreenFeedsList" + $self.AD_UserHomeWidgetID);
+            reqCountDiv = $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID);
+            $hlnkTabDataRef_ID = $requestwelcomeDivId.find("#hlnkTabDataRefReq" + $self.AD_UserHomeWidgetID);
+            $welcomeNewRecord = $requestwelcomeDivId.find("#sNewNts" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
         };
         /* Start Request */
@@ -121,8 +121,8 @@
                     var data = JSON.parse(result.data);
                     var str = "";
                     if (isTabDataRef == true) {
-                        $requestwelcomeDivId.find("#reqCountDiv").empty();
-                        $requestwelcomeDivId.find("#reqCountDiv").append(parseInt(result.count));
+                        $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).empty();
+                        $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).append(parseInt(result.count));
                     }
                     if (data.length > 0) {
 
@@ -279,7 +279,7 @@
                 ShowBusy(true);
                 window.setTimeout(function () {
                     //scrollWF = false;
-                    var tabdataLastPage = parseInt($root.find("#reqCountDiv").html());
+                    var tabdataLastPage = parseInt($root.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).html());
                     var tabdatacntpage = pageNo * pageSize;
                     if (tabdatacntpage <= tabdataLastPage) {
                         pageNo += 1;

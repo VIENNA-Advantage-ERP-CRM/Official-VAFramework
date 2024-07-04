@@ -181,18 +181,18 @@
                 + '     <div id="countDiv" title="Notice" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
                 + ' </div>'                
                 + ' <div >'
-                + '             <a id="hlnkTabDataRef" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
+                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
                 + ' </div>'
                 + '         </h2>'
                 + '     </div>'
-                + '     <div id="welcomeScreenFeedsList" class="scrollerVertical vis-scrollerVerticalCls">'
+                + '     <div id="welcomeScreenFeedsList' + $self.AD_UserHomeWidgetID + '" class="scrollerVertical vis-scrollerVerticalCls vis-welcomeNoticeScreenFeedsListCls">'
                 + '     </div>'
                 + ' </div>';
 
             $root.append($noticeWidget);
             welcomeScreenFeedsDivId = $root.find("#welcomeScreenFeedsDivId" + $self.AD_UserHomeWidgetID);
-            welcomeTabDatacontainers = welcomeScreenFeedsDivId.find("#welcomeScreenFeedsList");
-            $hlnkTabDataRef_ID = welcomeScreenFeedsDivId.find("#hlnkTabDataRef");
+            welcomeTabDatacontainers = welcomeScreenFeedsDivId.find("#welcomeScreenFeedsList" + $self.AD_UserHomeWidgetID);
+            $hlnkTabDataRef_ID = welcomeScreenFeedsDivId.find("#hlnkTabDataRef" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
             $hlnkTabDataRef_ID.on("click", RefreshWidget)
         };
