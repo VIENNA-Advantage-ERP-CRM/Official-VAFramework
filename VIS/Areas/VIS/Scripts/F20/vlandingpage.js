@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Window Landing page
  * VIS228 Date 06-May-2024
  * purpose - Show widget on landing page
