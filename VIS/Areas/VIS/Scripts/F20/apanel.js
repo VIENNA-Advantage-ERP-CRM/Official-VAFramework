@@ -4317,7 +4317,7 @@
                 if (manual && !retValue && !selfPanel.errorDisplayed) {
 
                 }
-                curGC.refreshTabPanelData(selfPanel.curTab.getRecord_ID());
+                curGC.refreshTabPanelData(selfPanel.curTab.getRecord_ID(),'S');
                 if (manual)
                     curGC.dynamicDisplay(-1);
 
@@ -4345,7 +4345,7 @@
                 callback(retValue);
             }
 
-            curGC.refreshTabPanelData(curTab.getRecord_ID());
+            curGC.refreshTabPanelData(curTab.getRecord_ID(),'S');
 
             this.curTab.loadShared();
             if (this.aSharedRecord) {

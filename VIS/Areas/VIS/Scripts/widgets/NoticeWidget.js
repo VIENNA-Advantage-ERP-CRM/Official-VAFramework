@@ -34,10 +34,10 @@
 
         /* Initialize the form design*/
         this.Initalize = function () {
+            createWidget();
             createBusyIndicator();
             ShowBusy(true);
             window.setTimeout(function () {
-                createWidget();
                 LoadHomeNotice(true);
                 events();
                 ShowBusy(false);
@@ -52,26 +52,26 @@
                     if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
                         var divid = evnt.target.parentNode.parentNode.id;
 
-                        var $divntitleid = $("#snoticetitle_" + divid);
-                        var $divndescid = $("#snoticedesc_" + divid);
-                        var $divnmorecid = $("#snoticemore_" + divid);
+                        var $divntitleid = $root.find("#snoticetitle_" + divid);
+                        var $divndescid = $root.find("#snoticedesc_" + divid);
+                        var $divnmorecid = $root.find("#snoticemore_" + divid);
                         $divnmorecid.hide();
                         $divntitleid.hide();
                         $divndescid.show();
-                        $("#snoticeless_" + divid).show();
+                        $root.find("#snoticeless_" + divid).show();
                     }
                 }
                 else {
 
                     if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
                         var divid = evnt.target.parentNode.parentNode.id;
-                        var $divntitleid = $("#snoticetitle_" + divid);
-                        var $divndescid = $("#snoticedesc_" + divid);
-                        var $divnmorecid = $("#snoticemore_" + divid);
+                        var $divntitleid = $root.find("#snoticetitle_" + divid);
+                        var $divndescid = $root.find("#snoticedesc_" + divid);
+                        var $divnmorecid = $root.find("#snoticemore_" + divid);
                         $divnmorecid.show();
                         $divntitleid.show();
                         $divndescid.hide();
-                        $("#snoticeless_" + divid).hide();
+                        $root.find("#snoticeless_" + divid).hide();
                     }
                 }
                 //for notice view/zoom
@@ -153,20 +153,18 @@
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
-            //$bsyDiv[0].style.visibility = "visible";
-            $root.append($bsyDiv);
+            //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+            $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
+            welcomeTabDatacontainers.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
         function ShowBusy(show) {
             if (show) {
-                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'visible')
-                // $bsyDiv[0].style.visibility = "visible";
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
             }
             else {
-                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'hidden')
-                //$bsyDiv[0].style.visibility = "hidden";
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).hide();
             }
         };
 
@@ -178,21 +176,21 @@
                 + ' <div class="vis-secndDiv">'
                 + '             <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon vis vis-notice"></span>'
                 + '             <strong style="float: left;" id="sAlrtTxtType">' + VIS.Msg.getMsg("Notice") + '</strong>'
-                + '     <div id="countDiv" title="Notice" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
-                + ' </div>'                
+                + '     <div id="countDiv" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
+                + ' </div>'
                 + ' <div >'
-                + '             <a id="hlnkTabDataRef" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
+                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
                 + ' </div>'
                 + '         </h2>'
                 + '     </div>'
-                + '     <div id="welcomeScreenFeedsList" class="scrollerVertical vis-scrollerVerticalCls">'
+                + '     <div id="welcomeScreenFeedsList' + $self.AD_UserHomeWidgetID + '" class="scrollerVertical vis-scrollerVerticalCls vis-welcomeNoticeScreenFeedsListCls">'
                 + '     </div>'
                 + ' </div>';
 
             $root.append($noticeWidget);
             welcomeScreenFeedsDivId = $root.find("#welcomeScreenFeedsDivId" + $self.AD_UserHomeWidgetID);
-            welcomeTabDatacontainers = welcomeScreenFeedsDivId.find("#welcomeScreenFeedsList");
-            $hlnkTabDataRef_ID = welcomeScreenFeedsDivId.find("#hlnkTabDataRef");
+            welcomeTabDatacontainers = welcomeScreenFeedsDivId.find("#welcomeScreenFeedsList" + $self.AD_UserHomeWidgetID);
+            $hlnkTabDataRef_ID = welcomeScreenFeedsDivId.find("#hlnkTabDataRef" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
             $hlnkTabDataRef_ID.on("click", RefreshWidget)
         };
@@ -212,7 +210,7 @@
                             recordsCount = parseInt(result.count);
                             welcomeScreenFeedsDivId.find("#countDiv").empty();
                             welcomeScreenFeedsDivId.find("#countDiv").append(parseInt(result.count));
-                        }                        
+                        }
                         for (var s in data) {
                             if (data[s].CDate != null && data[s].CDate != "") {
                                 var cd_ = new Date(data[s].CDate);
@@ -310,19 +308,19 @@
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.80) && scrollWF) {//Condition true when 75 scroll is done
                 ShowBusy(true);
-               // window.setTimeout(function () {
-                    scrollWF = false;
-                    var tabdataLastPage = parseInt($root.find("#countDiv").html());
-                    var tabdatacntpage = pageNo * pageSize;
-                    if (tabdatacntpage <= tabdataLastPage) {
-                        pageNo += 1;
-                        LoadHomeNotice(false);
-                    }
-                    else {
-                        scrollWF = true;
-                    }
-                    ShowBusy(false);
-               // }, 200);
+                // window.setTimeout(function () {
+                scrollWF = false;
+                var tabdataLastPage = parseInt($root.find("#countDiv").html());
+                var tabdatacntpage = pageNo * pageSize;
+                if (tabdatacntpage <= tabdataLastPage) {
+                    pageNo += 1;
+                    LoadHomeNotice(false);
+                }
+                else {
+                    scrollWF = true;
+                }
+                ShowBusy(false);
+                // }, 200);
             }
         };
         //Refresh Widget
@@ -342,8 +340,8 @@
                 datatype: 'json',
                 success: function (result) {
                     var data = JSON.parse(result);
-                    $("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 700, "", function () {
-                        $("#divrecdcntnr_" + Ad_Note_ID).remove();
+                    $root.find("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 700, "", function () {
+                        $root.find("#divrecdcntnr_" + Ad_Note_ID).remove();
                     });
 
                 }

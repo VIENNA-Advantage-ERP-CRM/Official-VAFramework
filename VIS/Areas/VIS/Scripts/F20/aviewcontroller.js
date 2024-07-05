@@ -510,9 +510,9 @@
             this.aPanel.vTabbedPane.refresh();
     };
 
-    VIS.GridController.prototype.refreshTabPanelData = function (record_ID) {
+    VIS.GridController.prototype.refreshTabPanelData = function (record_ID, action) {
         if (this.vTabPanel) {//&& $(this.vTabPanel.getRoot()).is(':visible')) 
-            this.vTabPanel.refreshPanelData(record_ID, this.gTab.getTableModel().getRow(this.gTab.getCurrentRow()));
+            this.vTabPanel.refreshPanelData(record_ID, this.gTab.getTableModel().getRow(this.gTab.getCurrentRow()), action);
         }
     };
 
@@ -1840,7 +1840,7 @@
         }
 
         this.isDefaultFocusSet = true;
-        this.refreshTabPanelData(-1);
+        this.refreshTabPanelData(-1,'N');
     };
 
     VIS.GridController.prototype.canDeleteRecords = function () {
@@ -1865,7 +1865,7 @@
             this.vTabPanel.curTabPanel.setisCheckListFill(false);
         }
 
-        this.refreshTabPanelData(this.gTab.getRecord_ID());
+        this.refreshTabPanelData(this.gTab.getRecord_ID(),'D');
         this.dynamicDisplay(-1);
         return retValue;
     };
@@ -1880,7 +1880,7 @@
                 that.vTabPanel.curTabPanel.setisCheckListFill(false);
             }
 
-            that.refreshTabPanelData(that.gTab.getRecord_ID());
+            that.refreshTabPanelData(that.gTab.getRecord_ID(),'D');
             that.dynamicDisplay(-1);
             that.aPanel.setBusy(false);
         });
@@ -1926,7 +1926,7 @@
         this.dynamicDisplay(-1);
         this.notifyDependents();
         this.vTable.refreshUndo();
-        this.refreshTabPanelData(this.gTab.getRecord_ID());
+        this.refreshTabPanelData(this.gTab.getRecord_ID(),'U');
     };
 
     /**
