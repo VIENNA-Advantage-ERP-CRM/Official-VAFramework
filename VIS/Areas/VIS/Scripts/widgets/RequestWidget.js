@@ -89,7 +89,7 @@
                 + ' <div class="vis-RequestInnerDivCls">'
                 + '          <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon fa fa-bell-o"></span> '
                 + '          <strong class="vis-RequestStrongCls" id="sAlrtTxtType">' + VIS.Msg.getMsg("Requests") + '</strong>'
-                + ' <div id="reqCountDiv' + $self.AD_UserHomeWidgetID + '" title="Request" class="vis-welcomeScreenTab-notificationBubble blank"></div>'
+                + ' <div id="reqCountDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Requests") + '" class="vis-welcomeScreenTab-notificationBubble blank"></div>'
                 + ' </div>'
                 + ' <div >'
                 + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-RequestHlnkTabDataRefReq"><i class="vis vis-refresh"></i></a> '
