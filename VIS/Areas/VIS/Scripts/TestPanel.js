@@ -50,7 +50,11 @@ VIS = window.VIS || {};
         */
         this.update = function (record_ID) {
             // Get Value from Context
-            $lblName.text(VIS.context.getWindowContext(this.windowNo, "Name"));
+            var name = VIS.context.getWindowContext(this.windowNo, "Name");
+            if (!name || name.length < 1) {
+              name =   VIS.context.getWindowContext(this.windowNo, "DocumentNo");
+            }
+            $lblName.text(name);
             try{
                 // Get Value for lookup Fields
                 var columnName = "C_Location_ID";
