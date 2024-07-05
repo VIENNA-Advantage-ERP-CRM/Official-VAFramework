@@ -68,10 +68,10 @@
 
         /* Initialize the form design*/
         this.Initalize = function () {
+            createWidget();
             createBusyIndicator();
             ShowBusy(true);
-            window.setTimeout(function () {
-                createWidget();
+            window.setTimeout(function () {                
                 getworkflowWidget(true);
                 getControls();
                 loadWindows();
@@ -211,20 +211,18 @@
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
-            //$bsyDiv[0].style.visibility = "visible";
-            $root.append($bsyDiv);
+            //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+            $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
+            $workflowWidgetDtls_ID.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
         function ShowBusy(show) {
             if (show) {
-                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'visible')
-               // $bsyDiv[0].style.visibility = "visible";
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
             }
             else {
-                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).css('visibility', 'hidden')
-                //$bsyDiv[0].style.visibility = "hidden";
+                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).hide();
             }
         };
         //Create Widget

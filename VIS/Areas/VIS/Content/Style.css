@@ -4170,3 +4170,35 @@ table.fixed-header thead tr {
         width: 200px;
     }
 }
+
+/*Widget Loader*/
+.vis_widgetloader {
+    width: 35px;
+    height: 35px;
+    --c: no-repeat linear-gradient(rgba(var(--v-c-primary), 1) 0 0);
+    background: var(--c),var(--c),var(--c),var(--c);
+    background-size: 18px 18px;
+    animation: viswidget_l 1.5s infinite cubic-bezier(0.3,1,0,1);
+}
+
+@keyframes viswidget_l {
+    0% {
+        background-position: 0 0,100% 0,100% 100%,0 100%
+    }
+
+    33% {
+        background-position: 0 0,100% 0,100% 100%,0 100%;
+        height: 45px;
+        width: 45px
+    }
+
+    66% {
+        background-position: 100% 0,100% 100%,0 100%,0 0;
+        height: 45px;
+        width: 45px
+    }
+
+    to {
+        background-position: 100% 0,100% 100%,0 100%,0 0
+    }
+}
