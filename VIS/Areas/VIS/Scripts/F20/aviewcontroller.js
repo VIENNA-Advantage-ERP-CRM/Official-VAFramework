@@ -1609,23 +1609,39 @@
      * */
     VIS.GridController.prototype.setNewRecordLayout = function () {
         var newRecordView = this.gTab.getNewRecordView();
+        var action = "";
+        var type = "";
+        if (this.getIsMultiRow()) {
+            type = NEWRECORDVIEW_GridLayout;
+        } else {
+            type = NEWRECORDVIEW_SingleRowLayout;
+        }
+
         if (newRecordView == NEWRECORDVIEW_SingleRowLayout) {
             this.switchSingleRow();
             this.aPanel.showHideViewIcon(this.aPanel.aSingle);
+            action = this.aPanel.aSingle.action;
 
         }
         else if (newRecordView == NEWRECORDVIEW_GridLayout) {
             this.isNewClick = true; // use for stop requery data
             this.switchMultiRow();
             this.aPanel.showHideViewIcon(this.aPanel.aMulti);
+            action = this.aPanel.aMulti.action;
         }
         else {
             if (this.getIsCardRow()) {
                 this.switchSingleRow();
                 this.aPanel.showHideViewIcon(this.aPanel.aSingle);
-
+                action = this.aSingle.aMulti.action;
             }
         }
+
+        
+        if (type != newRecordView) {
+            this.aPanel.setTabstackview(action);
+        }
+       
     };
     /*
       - Handle Control's Change value Event

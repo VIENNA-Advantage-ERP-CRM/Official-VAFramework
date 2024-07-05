@@ -1726,7 +1726,7 @@
 
         this.oldQuery = this.query.getWhereClause();
         this.vo.onlyCurrentDays = onlyCurrentDays;
-        if (this.apanel.getAdvanceWhere()== '') {
+        if (this.apanel && this.apanel.getAdvanceWhere()== '') {
             refresh = false;
         }
         var where = "";

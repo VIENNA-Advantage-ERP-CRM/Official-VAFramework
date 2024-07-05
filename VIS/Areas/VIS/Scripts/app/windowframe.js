@@ -5257,8 +5257,14 @@
         return true;
     };
 
-    VIS.VTabbedPane.prototype.restoreTabChange = function () {
+    VIS.VTabbedPane.prototype.restoreTabChange = function (currentTabIndex) {
         this.oldTabIndex = -1;
+        if (currentTabIndex) {
+            this.oldLastTabIndex = currentTabIndex;
+        } else {
+            this.oldLastTabIndex = -1;
+        }
+        
     }
 
     /**
@@ -5272,6 +5278,9 @@
      */
     VIS.VTabbedPane.prototype.getSelectedIndex = function () {
         return this.oldTabIndex;
+    };
+    VIS.VTabbedPane.prototype.getSelectedOldIndex = function () {
+        return this.oldLastTabIndex;
     };
 
     VIS.VTabbedPane.prototype.sizeChanged = function (height, width) {

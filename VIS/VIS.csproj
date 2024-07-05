@@ -499,6 +499,7 @@
     <Content Include="Areas\VIS\Images\home\comments.png" />
     <Content Include="Areas\VIS\Images\home\defaultUser.png" />
     <Content Include="Areas\VIS\Images\home\defaultUser46X46.png" />
+    <Content Include="Areas\VIS\Images\home\defaultWidget.svg" />
     <Content Include="Areas\VIS\Images\home\done-ico.png" />
     <Content Include="Areas\VIS\Images\home\icons-favourites.png" />
     <Content Include="Areas\VIS\Images\home\icons-feeds.png" />
