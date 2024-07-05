@@ -52,26 +52,26 @@
                     if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
                         var divid = evnt.target.parentNode.parentNode.id;
 
-                        var $divntitleid = $("#snoticetitle_" + divid);
-                        var $divndescid = $("#snoticedesc_" + divid);
-                        var $divnmorecid = $("#snoticemore_" + divid);
+                        var $divntitleid = $root.find("#snoticetitle_" + divid);
+                        var $divndescid = $root.find("#snoticedesc_" + divid);
+                        var $divnmorecid = $root.find("#snoticemore_" + divid);
                         $divnmorecid.hide();
                         $divntitleid.hide();
                         $divndescid.show();
-                        $("#snoticeless_" + divid).show();
+                        $root.find("#snoticeless_" + divid).show();
                     }
                 }
                 else {
 
                     if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
                         var divid = evnt.target.parentNode.parentNode.id;
-                        var $divntitleid = $("#snoticetitle_" + divid);
-                        var $divndescid = $("#snoticedesc_" + divid);
-                        var $divnmorecid = $("#snoticemore_" + divid);
+                        var $divntitleid = $root.find("#snoticetitle_" + divid);
+                        var $divndescid = $root.find("#snoticedesc_" + divid);
+                        var $divnmorecid = $root.find("#snoticemore_" + divid);
                         $divnmorecid.show();
                         $divntitleid.show();
                         $divndescid.hide();
-                        $("#snoticeless_" + divid).hide();
+                        $root.find("#snoticeless_" + divid).hide();
                     }
                 }
                 //for notice view/zoom
@@ -178,7 +178,7 @@
                 + ' <div class="vis-secndDiv">'
                 + '             <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon vis vis-notice"></span>'
                 + '             <strong style="float: left;" id="sAlrtTxtType">' + VIS.Msg.getMsg("Notice") + '</strong>'
-                + '     <div id="countDiv" title="Notice" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
+                + '     <div id="countDiv" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
                 + ' </div>'                
                 + ' <div >'
                 + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
@@ -342,8 +342,8 @@
                 datatype: 'json',
                 success: function (result) {
                     var data = JSON.parse(result);
-                    $("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 700, "", function () {
-                        $("#divrecdcntnr_" + Ad_Note_ID).remove();
+                    $root.find("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 700, "", function () {
+                        $root.find("#divrecdcntnr_" + Ad_Note_ID).remove();
                     });
 
                 }

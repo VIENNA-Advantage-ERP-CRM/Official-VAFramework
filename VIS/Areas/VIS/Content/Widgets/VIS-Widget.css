@@ -703,6 +703,29 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
         font-size: 0.875em;
     }
 }
+.vis-workflow-textarea {
+    width: 100%;
+    resize: none;
+}
+.vis-workflow-historyCls {
+    margin-top: 0.9375em;
+    margin-bottom: 0.9375em;
+}
+.vis-workflow-startCls {
+    margin-bottom: -0.5em;
+}
+.vis-workflow-welcomfeed-cls {
+    height: calc(100% - 54px);
+}
+.vis-workflow-pre-cls {
+    text-align: left;
+}
+.vis-workflow-h2-cls {
+    margin-left: 0.3125em;
+}
+.vis-workflow-p-cls {
+    margin-bottom: 0.3125em !important;
+}
 /*NoticeWidget*/
 .vis-welcomeScreenNoticeMainDiv {
     background-color: #f3f3f3;
