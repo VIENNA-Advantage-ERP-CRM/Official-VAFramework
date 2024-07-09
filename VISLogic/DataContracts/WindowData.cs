@@ -166,6 +166,10 @@ namespace VIS.DataContracts
         public String Info { get; set; }
         public List<RecordRow> Rows { get; set; }
         public List<string> Headers { get; set; }
+
+        public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
+
     }
 
     public class RecordRow
