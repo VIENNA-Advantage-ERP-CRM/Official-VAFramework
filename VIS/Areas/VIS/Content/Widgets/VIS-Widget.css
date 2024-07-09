@@ -776,7 +776,7 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
 }
 
 .vis-strongWhiteClrCls {
-    color: #666666 !important;
+    color: rgba(var(--v-c-on-secondary), 1) !important;
     cursor: context-menu !important;
 }
 .vis-notClickCls{
