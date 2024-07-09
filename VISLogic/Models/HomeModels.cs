@@ -223,7 +223,14 @@ namespace VIS.Models
                             INNER JOIN AD_WidgetSize ON (RC_KPI.RC_KPI_ID=AD_WidgetSize.RC_KPI_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
                             WHERE RC_KPIAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+                
+                sql += " UNION ALL ";
 
+                sql += @" SELECT 'V' AS chartType, RC_View.RC_View_ID AS d_chart_id,RC_View.Name,colspan,rowspan,'V' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_View INNER JOIN 
+                            RC_ViewAccess ON (RC_View.RC_View_ID=RC_ViewAccess.RC_View_ID)
+                            INNER JOIN AD_WidgetSize ON (RC_View.RC_View_ID=AD_WidgetSize.RC_View_ID)
+                            LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
+                            WHERE RC_ViewAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
 
                 DataSet dataSet = DB.ExecuteDataset(sql);
                 if (dataSet != null && dataSet.Tables.Count > 0)
