@@ -78,7 +78,7 @@
                 + ' <div class="vis-secndDiv">'
                 + '             <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon vis vis-notice"></span>'
                 + '             <strong style="float: left;" id="sAlrtTxtType">' + VIS.Msg.getMsg("Notice") + '</strong>'
-                + '     <div id="countDiv" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
+                + '     <div id="countDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
                 + ' </div>'
                 + ' <div >'
                 + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
@@ -110,8 +110,8 @@
                         str = "";
                         if (isTabAjaxBusy == true) {
                             recordsCount = parseInt(result.count);
-                            welcomeScreenFeedsDivId.find("#countDiv").empty();
-                            welcomeScreenFeedsDivId.find("#countDiv").append(parseInt(result.count));
+                            welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
+                            welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).append(parseInt(result.count));
                         }
                         for (var s in data) {
                             if (data[s].CDate != null && data[s].CDate != "") {
@@ -129,10 +129,10 @@
                             }
                             else {
                                 divtitle_ = "<pre>"
-                                    + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "' class='vis-strongWhiteClrCls' >" + title + "...</strong>"
-                                    + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "' class='vis-strongWhiteClrCls style='display:none;>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
-                                    + "<span id='snoticemore_" + data[s].AD_Note_ID + "' data-vishomercrd='more' class='vis-snoticemoreCls vis-clickCls'>" + VIS.Msg.getMsg("more") + "</span>"
-                                    + "<span id='snoticeless_" + data[s].AD_Note_ID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
+                                    + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' >" + title + "...</strong>"
+                                        + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls style='display:none;>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
+                                        + "<span id='snoticemore_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='more' class='vis-snoticemoreCls vis-clickCls'>" + VIS.Msg.getMsg("more") + "</span>"
+                                        + "<span id='snoticeless_" + data[s].AD_Note_ID + "" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
                                     + "</pre>";
                             }
 
@@ -212,7 +212,7 @@
                 ShowBusy(true);
                 // window.setTimeout(function () {
                 scrollWF = false;
-                var tabdataLastPage = parseInt($root.find("#countDiv").html());
+                var tabdataLastPage = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html());
                 var tabdatacntpage = pageNo * pageSize;
                 if (tabdatacntpage <= tabdataLastPage) {
                     pageNo += 1;
@@ -233,26 +233,26 @@
                 if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
                     var divid = evnt.target.parentNode.parentNode.id;
 
-                    var $divntitleid = $root.find("#snoticetitle_" + divid);
-                    var $divndescid = $root.find("#snoticedesc_" + divid);
-                    var $divnmorecid = $root.find("#snoticemore_" + divid);
+                    var $divntitleid = $root.find("#snoticetitle_" + divid + "_" + $self.AD_UserHomeWidgetID);
+                    var $divndescid = $root.find("#snoticedesc_" + divid + "_" + $self.AD_UserHomeWidgetID);
+                    var $divnmorecid = $root.find("#snoticemore_" + divid + "_" + $self.AD_UserHomeWidgetID);
                     $divnmorecid.hide();
                     $divntitleid.hide();
                     $divndescid.show();
-                    $root.find("#snoticeless_" + divid).show();
+                    $root.find("#snoticeless_" + divid + "_" + $self.AD_UserHomeWidgetID).show();
                 }
             }
             else {
 
                 if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
                     var divid = evnt.target.parentNode.parentNode.id;
-                    var $divntitleid = $root.find("#snoticetitle_" + divid);
-                    var $divndescid = $root.find("#snoticedesc_" + divid);
-                    var $divnmorecid = $root.find("#snoticemore_" + divid);
+                    var $divntitleid = $root.find("#snoticetitle_" + divid + "_" + $self.AD_UserHomeWidgetID);
+                    var $divndescid = $root.find("#snoticedesc_" + divid + "_" + $self.AD_UserHomeWidgetID);
+                    var $divnmorecid = $root.find("#snoticemore_" + divid + "_" + $self.AD_UserHomeWidgetID);
                     $divnmorecid.show();
                     $divntitleid.show();
                     $divndescid.hide();
-                    $root.find("#snoticeless_" + divid).hide();
+                    $root.find("#snoticeless_" + divid + "_" + $self.AD_UserHomeWidgetID).hide();
                 }
             }
             //for notice view/zoom
@@ -291,17 +291,17 @@
             else if (datarcrd === "approve") {
                 var vid = evnt.target.id;
                 ApproveNotice(vid, true);
-                var count = parseInt($root.find("#countDiv").html()) - 1;
-                $root.find("#countDiv").empty();
-                $root.find("#countDiv").append(count);
+                var count = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html()) - 1;
+                $root.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
+                $root.find("#countDiv" + $self.AD_UserHomeWidgetID).append(count);
             }
             //for notice approve
             else if (datarcrd === "liapprove") {
                 var vid = evnt.target.firstChild.id;
                 ApproveNotice(vid, true);
-                var count = parseInt($root.find("#countDiv").html()) - 1;
-                $root.find("#countDiv").empty();
-                $root.find("#countDiv").append(count);
+                var count = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html()) - 1;
+                $root.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
+                $root.find("#countDiv" + $self.AD_UserHomeWidgetID).append(count);
             }
             else if (datarcrd === "lispecial") {
                 var vid = evnt.target.firstChild.id;
