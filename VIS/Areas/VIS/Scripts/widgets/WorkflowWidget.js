@@ -94,13 +94,13 @@
         function events() {
             $flipCard_ID.on('click', function (e) {
                 ShowBusy(true);
+                $welcomeScreenFeedsLists.css('display', 'none');
+                $row.css('display', 'none');
                 window.setTimeout(function () {
-                    $welcomeScreenFeedsLists.css('display', 'none');
-                    $row.css('display', 'none');
                     getChld(e);
+                    $workflowActivitys.css('display', 'block').css('zindex', '2');
                     ShowBusy(false);
-                }, 500);
-                $workflowActivitys.css('display', 'block').css('zindex', '2');
+                }, 500);                
             });
             $backBtn_ID.on('click', function () {
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
@@ -213,7 +213,7 @@
         function createBusyIndicator() {
             //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
-            $workflowWidgetDtls_ID.append($bsyDiv);
+            $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
@@ -546,7 +546,7 @@
             var divHeader = $("<div class='vis-workflowActivityDetails-Heading'>");// style='text-align:left;'
             divDetail.append(divHeader);
 
-            var hHeader = $("<div id='VIS_backBtn_ID" + $self.AD_UserHomeWidgetID + "' style='cursor: pointer;' title='Back Window' class='vis vis-arrow-left'></div><h3 class='vis-workflow-h2-cls'>" + VIS.Msg.getMsg('Detail') + "</h3>");
+            var hHeader = $("<div id='VIS_backBtn_ID" + $self.AD_UserHomeWidgetID + "' style='cursor: pointer;' title='Back Window' class='vis vis-arrow-left'></div><h3 class='vis-workflow-h2-cls ml-2'>" + VIS.Msg.getMsg('Detail') + "</h3>");
             divHeader.append(hHeader);
 
             // if  any checkbox is checked, then don't show History in middle panel.
