@@ -1232,23 +1232,26 @@
             this.displayAsIncludedGC = false;
             this.aPanel.getIncludedEmptyArea().css({ 'display': 'none' });
             tdArea.addClass('vis-ad-w-p-center-view-height');
-          
             tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
-           
         }
         else if (this.gTab.getIncluded_Tab_ID() == 0) {
             var olcIncludedTab = oldGC.vIncludedGC;
+            var tdArea = this.aPanel.getLayout();
             if (olcIncludedTab) {
-                var tdArea = olcIncludedTab.aPanel.getLayout();
                 olcIncludedTab.setUI(false);
                 olcIncludedTab.getRoot().detach();
                 this.aPanel.getIncludedEmptyArea().css({ 'display': 'none' });
                 tdArea.addClass('vis-ad-w-p-center-view-height');
-               
                 tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
             }
-
+            else if (!this.multiTabView) {
+                if (!tdArea.hasClass('vis-ad-w-p-center-view-height')) {
+                    tdArea.addClass('vis-ad-w-p-center-view-height');
+                    tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
+                }
+            }
         }
+        
         //vIncludedGC
         this.isIncludedGCVisible = false;
         var gridAutoHeight = false; // grid fixed height body
@@ -1264,7 +1267,7 @@
             gridAutoHeight = true;
 
         }
-        else if (this.gTab.getIsTPBottomAligned()) { // show single scroll in case of tab panel bottom aligned also
+        else if (this.gTab.getHasPanel() && this.gTab.getIsTPBottomAligned()) { // show single scroll in case of tab panel bottom aligned also
             var tdArea = this.aPanel.getLayout();
             tdArea.removeClass('vis-ad-w-p-center-view-height');
             tdArea.find('.vis-ad-w-p-vc-editview').css("position", "unset");
@@ -1274,6 +1277,10 @@
 
         this.vTable.activate(this.multiTabView || gridAutoHeight);
         this.vTable.setReadOnly(false);
+        if (this.vCardView)
+        this.vCardView.setIsFixedBody(!(this.multiTabView || gridAutoHeight));
+
+        
 
         this.activateTree();
 

@@ -19,6 +19,7 @@
         var $spnName = $outerwrap.find(".vis-ad-w-p-ap-tp-o-b-head h6");
         var $spnClose = $outerwrap.find(".vis-ad-w-p-ap-tp-o-b-head span");
         var $divContent = $outerwrap.find(".vis-ad-w-p-ap-tp-o-b-content");
+        var $divBody = $outerwrap.find(".vis-ad-w-p-ap-tp-o-body");
 
         this.isClosed = true;
 
@@ -73,6 +74,9 @@
             setContent(null);
             
         });
+        this.getBody = function () {
+            return $divBody;
+        }
 
         this.getRoot = function () {
             return $outerwrap;
@@ -97,12 +101,10 @@
             if (!this.isClosed && size && size > 40) {
                 return;
             }
-
-
             if (size == 0) {
                 size = this.width;
             }
-            var tWidth = $outerwrap.closest('.vis-ad-w-p-center').width() -40;
+            var tWidth = $outerwrap.closest('vis-ad-w-p-center-view').width() -20;
             var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
 
             if (evt && !evt.isClosed) {
@@ -113,7 +115,6 @@
                 //}
             }
             
-
             if (size && size > 40 && (this.curTabPanel || this.tabPanels.length>0)) {
 
                 if (this.isHorizontalAligned) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023
@@ -179,9 +180,6 @@
                 $divHead.hide();
                 $divContent.hide();
             }
-
-          
-
             if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
                 this.sizeChangedListner.onSizeChanged();
         };
@@ -239,10 +237,17 @@
     };
 
   /**
-   * 
+   * append all tab panel in conatiner
    * @param {any} panels
    */
     VTabPanel.prototype.appedAllPanel = function (panels) {
+        //remove border
+
+        var body = this.getBody();
+        body.css({ 'box-shadow': 'unset', 'border-top': 'unset' });
+
+
+
         if (panels && panels.length > 0) {
             for (var i = 0; i < panels.length; i++) {
                 var iconPath = '';

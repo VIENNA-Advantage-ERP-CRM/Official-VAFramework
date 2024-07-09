@@ -96,7 +96,7 @@
         this.onCardEdit = null;
 
         this.cardViewData = null;
-
+        this.isFixedBody = true;
         var root;
         var body = null;
         var headerdiv;
@@ -750,7 +750,9 @@
         //this.getBody().empty();
 
     };
-
+    VCardView.prototype.setIsFixedBody = function (fixed) {
+        this.isFixedBody = fixed;
+    };
     VCardView.prototype.refresh = function (width) {
         var $this = this;
         window.setTimeout(function () {
@@ -951,6 +953,16 @@
             }
             $this.calculateWidth(width);
             $this.SyncScroll();
+
+            //check fixed height
+
+            var prnt = $this.getRoot().parent();
+            prnt.css('height', '100%'); //reset height
+            //card view
+            if (!$this.isFixedBody) {
+                prnt.height($this.getBody()[0].scrollHeight+52);
+            }
+
             $this.aPanel.setBusy(false);
         }, 10);
     }
