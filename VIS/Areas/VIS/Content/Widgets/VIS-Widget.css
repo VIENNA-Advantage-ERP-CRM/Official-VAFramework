@@ -703,26 +703,33 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
         font-size: 0.875em;
     }
 }
+
 .vis-workflow-textarea {
     width: 100%;
     resize: none;
 }
+
 .vis-workflow-historyCls {
     margin-top: 0.9375em;
     margin-bottom: 0.9375em;
 }
+
 .vis-workflow-startCls {
     margin-bottom: -0.5em;
 }
+
 .vis-workflow-welcomfeed-cls {
     height: calc(100% - 54px);
 }
+
 .vis-workflow-pre-cls {
     text-align: left;
 }
+
 .vis-workflow-h2-cls {
     margin-left: 0.3125em;
 }
+
 .vis-workflow-p-cls {
     margin-bottom: 0.3125em !important;
 }
@@ -769,9 +776,15 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
 }
 
 .vis-strongWhiteClrCls {
-    color: #666666;
+    color: #666666 !important;
+    cursor: context-menu !important;
 }
-
+.vis-notClickCls{
+    cursor:context-menu !important;
+}
+.vis-clickCls{
+    cursor:pointer;
+}
 .vis-pTagStyleCls {
     margin-top: 12.5em;
     text-align: center;
@@ -783,27 +796,33 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
     border: 1px solid rgba(0,0,0,.125);
     border-radius: .25em;
 }
-.vis-RequestWidth{
-    width:100%;
+
+.vis-RequestWidth {
+    width: 100%;
 }
+
 .vis-RequestInnerDivCls {
     display: flex;
     align-items: center;
 }
+
 .vis-RequestStrongCls {
     float: left;
 }
+
 .vis-RequestHlnkTabDataRefReq {
     float: right;
     margin-top: 0px;
     cursor: pointer;
 }
+
 .vis-RequestNewNtsCls {
     float: right;
     margin-top: 0px;
     cursor: pointer;
     margin-right: 6px;
 }
+
 .vis-RequestWelcomeScreenFeedsListCls {
     margin-left: auto;
     overflow-y: auto;

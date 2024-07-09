@@ -45,109 +45,11 @@
         };
         /* Declare events */
         function events() {
-            $root.find(".vis-feedTitleBar-buttons").on("click", function (evnt) {
-                var datarcrd = $(evnt.target).data("vishomercrd");
-                if (evnt.target.tagName === "SPAN" && datarcrd === "more") {
-                    //more-details
-                    if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
-                        var divid = evnt.target.parentNode.parentNode.id;
-
-                        var $divntitleid = $root.find("#snoticetitle_" + divid);
-                        var $divndescid = $root.find("#snoticedesc_" + divid);
-                        var $divnmorecid = $root.find("#snoticemore_" + divid);
-                        $divnmorecid.hide();
-                        $divntitleid.hide();
-                        $divndescid.show();
-                        $root.find("#snoticeless_" + divid).show();
-                    }
-                }
-                else {
-
-                    if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
-                        var divid = evnt.target.parentNode.parentNode.id;
-                        var $divntitleid = $root.find("#snoticetitle_" + divid);
-                        var $divndescid = $root.find("#snoticedesc_" + divid);
-                        var $divnmorecid = $root.find("#snoticemore_" + divid);
-                        $divnmorecid.show();
-                        $divntitleid.show();
-                        $divndescid.hide();
-                        $root.find("#snoticeless_" + divid).hide();
-                    }
-                }
-                //for notice view/zoom
-                if (datarcrd === "view") {
-
-                    var vid = evnt.target.id;
-                    var arrn = vid.toString().split('|');
-
-                    var n_id = arrn[0];
-                    var n_table = arrn[1];
-                    var n_win = arrn[2];
-                    var n_rcrd = arrn[3];
-
-                    var zoomQuery = new VIS.Query();
-                    zoomQuery.addRestriction(n_table + "_ID", VIS.Query.prototype.EQUAL, VIS.Utility.Util.getValueOfInt(n_id));
-                    VIS.viewManager.startWindow(n_win, zoomQuery);
-
-                }
-                //for notice view/zoom
-                else if (datarcrd === "liview") {
-                    var vid = evnt.target.firstChild.id;
-                    var arrn = vid.toString().split('|');
-
-
-                    var n_id = arrn[0];
-                    var n_table = arrn[1];
-                    var n_win = arrn[2];
-                    var n_rcrd = arrn[3];
-
-                    var zoomQuery = new VIS.Query();
-                    zoomQuery.addRestriction(n_table + "_ID", VIS.Query.prototype.EQUAL, VIS.Utility.Util.getValueOfInt(n_id));
-                    VIS.viewManager.startWindow(n_win, zoomQuery);
-
-                }
-                //for notice approve
-                else if (datarcrd === "approve") {
-                    var vid = evnt.target.id;
-                    ApproveNotice(vid, true);
-                    var count = parseInt($root.find("#countDiv").html()) - 1;
-                    $root.find("#countDiv").empty();
-                    $root.find("#countDiv").append(count);
-                }
-                //for notice approve
-                else if (datarcrd === "liapprove") {
-                    var vid = evnt.target.firstChild.id;
-                    ApproveNotice(vid, true);
-                    var count = parseInt($root.find("#countDiv").html()) - 1;
-                    $root.find("#countDiv").empty();
-                    $root.find("#countDiv").append(count);
-                }
-                else if (datarcrd === "lispecial") {
-                    var vid = evnt.target.firstChild.id;
-                    var arrn = vid.toString().split('|');
-
-
-                    var recID = arrn[0];
-                    var tableName = arrn[1];
-                    var winID = arrn[2];
-
-                    var zoomQuery = new VIS.Query();
-                    zoomQuery.addRestriction(tableName + "_ID", VIS.Query.prototype.EQUAL, VIS.Utility.Util.getValueOfInt(recID));
-                    VIS.viewManager.startWindow(winID, zoomQuery);
-                }
-                else if (datarcrd === "lispecial1") {
-                    var vid = evnt.target.id;
-                    var arrn = vid.toString().split('|');
-
-
-                    var recID = arrn[0];
-                    var tableName = arrn[1];
-                    var winID = arrn[2];
-
-                    var zoomQuery = new VIS.Query();
-                    zoomQuery.addRestriction(tableName + "_ID", VIS.Query.prototype.EQUAL, VIS.Utility.Util.getValueOfInt(recID));
-                    VIS.viewManager.startWindow(winID, zoomQuery);
-                }
+            $root.find('.vis-feedTitleBar-buttons').on("click", function (evnt) {
+                Actions(evnt);
+            });
+            $root.find('.vis-feedDetails').on("click", function (evnt) {
+                Actions(evnt);
             });
         };
 
@@ -229,8 +131,8 @@
                                 divtitle_ = "<pre>"
                                     + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "' class='vis-strongWhiteClrCls' >" + title + "...</strong>"
                                     + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "' class='vis-strongWhiteClrCls style='display:none;>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
-                                    + "<span id='snoticemore_" + data[s].AD_Note_ID + "' data-vishomercrd='more' class='vis-snoticemoreCls'>" + VIS.Msg.getMsg("more") + "</span>"
-                                    + "<span id='snoticeless_" + data[s].AD_Note_ID + "' data-vishomercrd='less' class='vis-snoticelessCls'>" + VIS.Msg.getMsg("less") + "</span>"
+                                    + "<span id='snoticemore_" + data[s].AD_Note_ID + "' data-vishomercrd='more' class='vis-snoticemoreCls vis-clickCls'>" + VIS.Msg.getMsg("more") + "</span>"
+                                    + "<span id='snoticeless_" + data[s].AD_Note_ID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
                                     + "</pre>";
                             }
 
@@ -253,9 +155,9 @@
                                 + "</ul>"
                                 + "  </div>"
                                 + "</div>"
-                                + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-feedDetails'>"
+                                + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-feedDetails vis-notClickCls'>"
                                 + divtitle_
-                                + " <p class='vis-feedDateTime'>" + VIS.Utility.encodeText(dbdate) + "</p>"
+                                + " <p class='vis-feedDateTime vis-strongWhiteClrCls'>" + VIS.Utility.encodeText(dbdate) + "</p>"
                                 + " </div>"
                                 + " </div>"
 
@@ -321,6 +223,111 @@
                 }
                 ShowBusy(false);
                 // }, 200);
+            }
+        };
+        //Actions
+        function Actions(evnt) {
+            var datarcrd = $(evnt.target).data("vishomercrd");
+            if (evnt.target.tagName === "SPAN" && datarcrd === "more") {
+                //more-details
+                if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
+                    var divid = evnt.target.parentNode.parentNode.id;
+
+                    var $divntitleid = $root.find("#snoticetitle_" + divid);
+                    var $divndescid = $root.find("#snoticedesc_" + divid);
+                    var $divnmorecid = $root.find("#snoticemore_" + divid);
+                    $divnmorecid.hide();
+                    $divntitleid.hide();
+                    $divndescid.show();
+                    $root.find("#snoticeless_" + divid).show();
+                }
+            }
+            else {
+
+                if ($(evnt.target.parentNode.parentNode).data("vishomercrd") == "more-details") {
+                    var divid = evnt.target.parentNode.parentNode.id;
+                    var $divntitleid = $root.find("#snoticetitle_" + divid);
+                    var $divndescid = $root.find("#snoticedesc_" + divid);
+                    var $divnmorecid = $root.find("#snoticemore_" + divid);
+                    $divnmorecid.show();
+                    $divntitleid.show();
+                    $divndescid.hide();
+                    $root.find("#snoticeless_" + divid).hide();
+                }
+            }
+            //for notice view/zoom
+            if (datarcrd === "view") {
+
+                var vid = evnt.target.id;
+                var arrn = vid.toString().split('|');
+
+                var n_id = arrn[0];
+                var n_table = arrn[1];
+                var n_win = arrn[2];
+                var n_rcrd = arrn[3];
+
+                var zoomQuery = new VIS.Query();
+                zoomQuery.addRestriction(n_table + "_ID", VIS.Query.prototype.EQUAL, VIS.Utility.Util.getValueOfInt(n_id));
+                VIS.viewManager.startWindow(n_win, zoomQuery);
+
+            }
+            //for notice view/zoom
+            else if (datarcrd === "liview") {
+                var vid = evnt.target.firstChild.id;
+                var arrn = vid.toString().split('|');
+
+
+                var n_id = arrn[0];
+                var n_table = arrn[1];
+                var n_win = arrn[2];
+                var n_rcrd = arrn[3];
+
+                var zoomQuery = new VIS.Query();
+                zoomQuery.addRestriction(n_table + "_ID", VIS.Query.prototype.EQUAL, VIS.Utility.Util.getValueOfInt(n_id));
+                VIS.viewManager.startWindow(n_win, zoomQuery);
+
+            }
+            //for notice approve
+            else if (datarcrd === "approve") {
+                var vid = evnt.target.id;
+                ApproveNotice(vid, true);
+                var count = parseInt($root.find("#countDiv").html()) - 1;
+                $root.find("#countDiv").empty();
+                $root.find("#countDiv").append(count);
+            }
+            //for notice approve
+            else if (datarcrd === "liapprove") {
+                var vid = evnt.target.firstChild.id;
+                ApproveNotice(vid, true);
+                var count = parseInt($root.find("#countDiv").html()) - 1;
+                $root.find("#countDiv").empty();
+                $root.find("#countDiv").append(count);
+            }
+            else if (datarcrd === "lispecial") {
+                var vid = evnt.target.firstChild.id;
+                var arrn = vid.toString().split('|');
+
+
+                var recID = arrn[0];
+                var tableName = arrn[1];
+                var winID = arrn[2];
+
+                var zoomQuery = new VIS.Query();
+                zoomQuery.addRestriction(tableName + "_ID", VIS.Query.prototype.EQUAL, VIS.Utility.Util.getValueOfInt(recID));
+                VIS.viewManager.startWindow(winID, zoomQuery);
+            }
+            else if (datarcrd === "lispecial1") {
+                var vid = evnt.target.id;
+                var arrn = vid.toString().split('|');
+
+
+                var recID = arrn[0];
+                var tableName = arrn[1];
+                var winID = arrn[2];
+
+                var zoomQuery = new VIS.Query();
+                zoomQuery.addRestriction(tableName + "_ID", VIS.Query.prototype.EQUAL, VIS.Utility.Util.getValueOfInt(recID));
+                VIS.viewManager.startWindow(winID, zoomQuery);
             }
         };
         //Refresh Widget
