@@ -200,9 +200,7 @@
         this.gTab = gTab;
         this.isHorizontalAligned = this.gTab.getIsTPBottomAligned()
         var panels = this.gTab.getTabPanels();
-        if (this.isHorizontalAligned) {
-            this.isShowAll = true; //get form gtab
-        }
+        this.isShowAll = this.gTab.getIsTPBottomShowAll();
 
         if (!this.isShowAll) { //old
             if (panels && panels.length > 0) {

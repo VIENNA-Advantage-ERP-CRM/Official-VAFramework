@@ -706,7 +706,11 @@
     };
 
     GridTab.prototype.getIsTPBottomAligned = function () {
-        return this.vo.TabPanelAlignment == "H";
+        return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+    };
+
+    GridTab.prototype.getIsTPBottomShowAll = function () {
+        return  this.vo.TabPanelAlignment == "B";
     };
 
 
