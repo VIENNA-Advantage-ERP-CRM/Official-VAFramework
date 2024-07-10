@@ -178,7 +178,7 @@
                                 + "<p class='vis-maintain-customer-p'>"
                                 + "<strong>" + VIS.Utility.encodeText(casetype) + " </strong><br />"
                                 + "<span>" + VIS.Msg.getMsg('Message') + ":</span><br>" + VIS.Utility.encodeText(summary) + "</p>"
-                                + "<p class='vis-feedDateTime'  style=' width: 69%; margin-right: 10px;'>" + CreatedDate + "</p>"
+                                + "<p class='vis-feedDateTime vis-secondary-clr'  style=' width: 69%; margin-right: 10px;'>" + CreatedDate + "</p>"
                                 + "</div>"
                                 + "</div>"
                         }

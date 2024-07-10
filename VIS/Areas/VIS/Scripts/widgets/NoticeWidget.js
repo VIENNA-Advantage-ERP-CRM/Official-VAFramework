@@ -157,7 +157,7 @@
                                 + "</div>"
                                 + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-feedDetails vis-notClickCls'>"
                                 + divtitle_
-                                + " <p class='vis-feedDateTime vis-strongWhiteClrCls'>" + VIS.Utility.encodeText(dbdate) + "</p>"
+                                + " <p class='vis-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
                                 + " </div>"
                                 + " </div>"
 
