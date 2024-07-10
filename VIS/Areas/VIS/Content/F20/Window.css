@@ -873,8 +873,23 @@ span.vis-ad-w-p-tb-rc-action {
     border-top-right-radius: .50rem;
 }
 
-/* end center */
+.vis-ad-w-p-ap-tp-body-head {
+    border-top: 2px solid rgba(var(--v-c-secondary), 1);
+    font-size: 1.1rem;
+    padding: 8px 5px 3px;
+    border-bottom: 1px solid rgba(var(--v-c-secondary), 1);
+    color: rgba(var(--v-c-on-secondary), 1);
+}
 
+.vis-ad-w-p-ap-tp-body-head-img {
+    /*color:rgba(var(--v-c-primary),1);*/
+}
+.vis-ad-w-p-ap-tp-body-head-txt {
+    margin: 0 4px;
+    /*color: rgba(var(--v-c-primary),1);*/
+}
+
+/* end center */
 /*View Controller*/
 .vis-ad-w-p-vc {
     order: 0;

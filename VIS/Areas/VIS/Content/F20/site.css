@@ -331,6 +331,7 @@ select {
     border-radius: 50%;
     position: relative;
     overflow: hidden;
+    cursor:pointer;
 }
 
     .vis-app-user-img-wrap img {

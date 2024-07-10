@@ -757,37 +757,28 @@
         *   @param {boolean} show - show tab panel if true
         */
         this.showTabPanel = function (show) {
+            var clsName = 'vis-ad-w-p-center-flow-';
+            var cls2 = "vis-ad-w-p-actionpanel-";
             if (show) {
-                //$tabpanel.empty();
-                var clsName = 'vis-ad-w-p-center-flow-';
-                var cls2 = "vis-ad-w-p-actionpanel-";
-
-                //if (this.curTab.getIsTPBottomAligned()) {
-                //    clsName = "vis-ad-w-p-center-flow-b";
-                //    cls2 = "vis-ad-w-p-actionpanel-b";
-                //}
-
                 clsSuffix = this.curTab.getIsTPBottomAligned() ? 'b' : 'r';
                 var clsSuffixOld = this.curTab.getIsTPBottomAligned() ? 'r' : 'b';
 
                 if (!$tabPanel.hasClass(cls2 + clsSuffix)) {
-                    $tabPanel.parent().removeClass(clsName + clsSuffixOld).addClass(
-                        clsName + clsSuffix);
-
                     $tabPanel.removeClass();
                     $tabPanel.addClass(cls2 + clsSuffix);
-
+                }
+                if (!$tabPanel.parent().hasClass(cls2 + clsSuffix)) {
+                    $tabPanel.parent().removeClass(clsName + clsSuffixOld).addClass(
+                        clsName + clsSuffix);
                 }
                 if (this.curGC)
                     $tabPanel.append(this.curGC.getTabPanel());
                 $tabPanel.css({ "display": "grid" });
-                //if (this.curGC.getIsSingleRow() && clsSuffix == 'b') {
-                //    this.getLayout().removeClass('vis-ad-w-p-center-view-height');
-                //    this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
-                //}
             }
             else {
                 $tabPanel.css({ "display": "none" });
+                $tabPanel.parent().removeClass(clsName + 'b').removeClass(
+                    clsName + 'r').addClass(clsName + 'r');
             }
         };
 
