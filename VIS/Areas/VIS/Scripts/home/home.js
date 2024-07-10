@@ -267,24 +267,23 @@
                 $container.sortable({
                     items: ".vis-widget-item",
                     cursor: "grabbing",
-                   /* connectWith: ".editPanel",*/
-                    disabled: true,                  
+                    helper: "clone",   
+                    disabled: true,
+                    tolerance: "pointer",
+                    placeholder: "ui-sortable-placeholder",
                     sort: function (event, ui) {
-                        // Update the original position during sorting
-                        originalPosition = ui.helper.position();
-                        $(ui.placeholder).addClass("ui-sortable-placeholder");
+                        ui.placeholder.css('visibility', 'visible');
                     },
                     start: function (event, ui) {
-                        // Capture the original position when sorting starts
-                        originalPosition = ui.helper.position();
-                        $(ui.helper).addClass("ui-sortable-helper");
+                        var gridArea = ui.helper.css('grid-area');
+                        ui.placeholder.height(ui.helper.outerHeight());
+                        ui.placeholder.width(ui.helper.outerWidth());
+                        ui.placeholder.css('grid-area', gridArea);
                     },
                     stop: function (event, ui) {
-                        isChanged = true;
-                        $(ui.helper).removeClass("ui-sortable-helper");
+                        isChanged = true;                       
                     }
                 });
-
             }
            
             // Function to render widgets
@@ -315,7 +314,7 @@
                     var wform = new VIS.AForm();
                     wform.openWidget(widget.ClassName, -99999, info);
                     wform.addChangeListener(VIS.HomeMgr2);
-                    $item = wform.getRoot();
+                    $item = wform.getContentGrid();
                     var obj = JSON.parse(JSON.stringify(info));
                     obj['wform'] = wform;
                     homeItems[wid] = obj;
@@ -416,9 +415,9 @@
                             $home.find('.vis-widget-body').append($('<div class="vis-main-widget-heading">' + moduelName + '</div>'));
                             $home.find('.vis-widget-body').append($('<div class="vis-widgetDrag-container">'));
                         }
+                      
+                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img +'</div><div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols ||1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
 
-
-                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img +'</div><div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Rows ||1) + 'X' + (result[i].Cols || 1) + '</span></div></div>');
                         $home.find('.vis-widgetDrag-container:last').append(witem);
                     }
 

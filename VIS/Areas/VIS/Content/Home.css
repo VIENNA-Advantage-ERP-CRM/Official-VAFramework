@@ -3403,9 +3403,9 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 
-.ui-sortable-helper {
+/*.ui-sortable-helper {
     transform: scale(0.9);
-}
+}*/
 
 .vis-add-widgetContainer {
     align-items: center;
@@ -3580,16 +3580,16 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 /* Sorting helper */
-.ui-sortable-helper {
+/*.ui-sortable-helper {
     background-color: rgba(255, 255, 255, 0.8);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s ease-in-out;
-}
+}*/
 
     /* Sorting helper while dragging */
-    .ui-sortable-helper.sorting {
+    /*.ui-sortable-helper.sorting {
         transform: scale(1.05);
-    }
+    }*/
 
     .vis-widgetDelete{
         position:absolute;
@@ -3656,4 +3656,8 @@ ul.vis-userLinks-ListMenu li a i {
 .vis-widgetdefault {
     width: 35px;
     height: 35px
+}
+
+.vis-widgetDelete:hover {
+    color: red
 }

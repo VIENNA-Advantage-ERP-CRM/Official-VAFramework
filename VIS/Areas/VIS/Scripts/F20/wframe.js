@@ -2102,6 +2102,11 @@
 
 
         VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetRecordInfo", { dse: dataIn }, function (data) {
+
+            data.Info=  data.Info.replace("@Created@", Globalize.format(new Date(data.Created), 'f') );
+            data.Info =  data.Info.replace("@Updated@", Globalize.format(new Date(data.Updated), 'f') );
+
+
             $root.html("<span>" + data.Info + "</span>");
             if (data.ShowGrid) {
 

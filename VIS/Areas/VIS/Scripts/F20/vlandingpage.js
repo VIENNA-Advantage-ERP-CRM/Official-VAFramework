@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Window Landing page
  * VIS228 Date 06-May-2024
  * purpose - Show widget on landing page
@@ -293,25 +293,23 @@
             $container.sortable({
                 items: ".vis-widget-item",
                 cursor: "grabbing",
-                /* connectWith: ".editPanel",*/
+                helper: "clone",
+                connectWith: $container,
                 disabled: true,
+                placeholder: "ui-sortable-placeholder", // Ensure there's a placeholder class
                 sort: function (event, ui) {
-                    // Update the original position during sorting
-                    originalPosition = ui.helper.position();
-                    $(ui.placeholder).addClass("ui-sortable-placeholder");
+                    ui.placeholder.css('visibility', 'visible');
                 },
                 start: function (event, ui) {
-                    // Capture the original position when sorting starts
-                    originalPosition = ui.helper.position();
-                    $(ui.helper).addClass("ui-sortable-helper");
+                    var gridArea = ui.helper.css('grid-area');
+                    ui.placeholder.height(ui.helper.outerHeight());
+                    ui.placeholder.width(ui.helper.outerWidth());
+                    ui.placeholder.css('grid-area', gridArea);
                 },
                 stop: function (event, ui) {
                     isChanged = true;
-                    $(ui.helper).removeClass("ui-sortable-helper");
                 }
             });
-
-
         }
 
         // Function to render widgets
@@ -341,7 +339,7 @@
                 var wform = new VIS.AForm();
                 wform.openWidget(widget.ClassName, curWindowNo, info);
                 wform.addChangeListener(self);
-                $item = wform.getRoot();
+                $item = wform.getContentGrid();
                 var obj = JSON.parse(JSON.stringify(info));
                 obj['wform'] = wform;
                 homeItems[wid] = obj;
@@ -438,7 +436,7 @@
                     }
 
 
-                    var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '">' + img + '<div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Rows || 1) + 'X' + (result[i].Cols || 1) + '</span></div></div>');
+                    var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '">' + img + '<div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols || 1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
                     $root.find('.vis-widgetDrag-container:last').append(witem);
                 }
 
