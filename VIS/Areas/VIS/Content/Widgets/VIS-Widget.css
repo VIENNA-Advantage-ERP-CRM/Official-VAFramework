@@ -242,11 +242,20 @@
 .vis-activityContainer .vis-feedDetails .vis-feedDateTime {
     text-align: center;
     padding: 0.375em 0;
-    border-top: 0.0625em solid rgba(var(--v-c-on-secondary),.1);
-    font-size: 0.625em;
+    border-top: 0.0625em solid rgba(var(--v-c-on-secondary),.1);    
+    font-size: 0.825em;
+    /*font-size: 0.625em;*/
     margin-top: .75em;
 }
-
+.vis-secondary-clr {
+    color: rgba(var(--v-c-on-secondary),.9) !important;
+}
+.vis-setworkflow-font label{
+    font-size:.900em !important;
+}
+.vis-selectworkflow-fontsize{
+    font-size:.900em !important;
+}
 .vis-workflowActivityDetails-Heading {
     text-align: left;
 }
@@ -520,15 +529,18 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
 }
 
 .vis-feedTitleBar h3 {
-    font-size: 0.875em;
+    font-size: 1em;
+   /* font-size: 0.875em;*/
 }
 
 .vis-feedDetails pre {
-    font-size: 0.75em;
+    font-size: 1em;
+    /*font-size: 0.75em;*/
 }
 
 .frm-data-col-wrap select {
-    font-size: 0.75em;
+    font-size: 1em;
+    /*font-size: 0.75em;*/
 }
 
 .vis-editModeWidget .vis-welcomeScreenFeeds {
@@ -540,11 +552,13 @@ ul.vis-IIColumnContent li .vis-home-wf-forwardInput {
 }
 
 .vis-IIColumnContent .vis-input-widgetswrap select ~ label {
-    font-size: 0.75em;
+    font-size: 1em;
+    /*font-size: 0.75em;*/
 }
 
 .vis-IIColumnContent .vis-input-widgetswrap input:not(:placeholder-shown) ~ label {
-    font-size: 0.75em;
+    font-size: 1em;
+    /*font-size: 0.75em;*/
 }
 
 .vis-input-widgetswrap textarea {

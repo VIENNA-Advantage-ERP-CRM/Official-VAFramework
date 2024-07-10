@@ -57,7 +57,7 @@
         function createBusyIndicator() {
             //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
-            welcomeTabDatacontainers.append($bsyDiv);
+            $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
@@ -130,9 +130,9 @@
                             else {
                                 divtitle_ = "<pre>"
                                     + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' >" + title + "...</strong>"
-                                        + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls style='display:none;>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
+                                        + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' style='display:none;'>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
                                         + "<span id='snoticemore_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='more' class='vis-snoticemoreCls vis-clickCls'>" + VIS.Msg.getMsg("more") + "</span>"
-                                        + "<span id='snoticeless_" + data[s].AD_Note_ID + "" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
+                                        + "<span id='snoticeless_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
                                     + "</pre>";
                             }
 
@@ -157,7 +157,7 @@
                                 + "</div>"
                                 + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-feedDetails vis-notClickCls'>"
                                 + divtitle_
-                                + " <p class='vis-feedDateTime vis-strongWhiteClrCls'>" + VIS.Utility.encodeText(dbdate) + "</p>"
+                                + " <p class='vis-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
                                 + " </div>"
                                 + " </div>"
 
