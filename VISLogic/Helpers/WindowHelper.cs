@@ -3135,7 +3135,7 @@ namespace VIS.Helpers
             _info.Append(" ")
                 .Append(Msg.Translate(ctx, "CreatedBy"))
                 .Append(": ").Append(user.GetName())
-                .Append(" - ").Append(String.Format("{0:D}", dse.Created)).Append("<br/>");
+                .Append(" - ").Append("@Created@").Append("<br/>");
 
             if (!dse.Created.Equals(dse.Updated)
                 || !dse.CreatedBy.Equals(dse.UpdatedBy))
@@ -3145,10 +3145,12 @@ namespace VIS.Helpers
                 _info.Append(" ")
                     .Append(Msg.Translate(ctx, "UpdatedBy"))
                     .Append(": ").Append(user.GetName())
-                    .Append(" - ").Append(String.Format("{0:D}", dse.Updated)).Append("<br/>");
+                    .Append(" - ").Append("@Updated@").Append("<br/>");
             }
             if (dse.Info != null && dse.Info.Length > 0)
                 _info.Append("<br/> (").Append(dse.Info).Append(")");
+            outt.Updated = new DateTime(Convert.ToDateTime(dse.Updated).Ticks, DateTimeKind.Utc);
+            outt.Created = new DateTime(Convert.ToDateTime(dse.Created).Ticks, DateTimeKind.Utc);
 
             outt.Info = _info.ToString();
             //	Only Client Preference can view Change Log
