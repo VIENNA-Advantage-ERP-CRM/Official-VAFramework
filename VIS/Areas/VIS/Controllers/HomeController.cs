@@ -857,6 +857,33 @@ namespace VIS.Controllers
         }
 
         /// <summary>
+        /// Getting widget fields for dynamic controls
+        /// </summary>
+        /// <param name="AD_WidgetSize_ID">AD_WidgetSize_ID</param>
+        /// <returns>Field Details</returns>
+
+        public JsonResult GetDynamicWidget( int AD_WidgetSize_ID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            var widgets = homeModels.GetDynamicWidget(ctx, AD_WidgetSize_ID);
+            return Json(JsonConvert.SerializeObject(widgets), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Getting Ad_Widget_Id and Htmlstyle
+        /// </summary>
+        /// <param name="AD_UserHomeWidget_ID">AD_UserHomeWidget_ID</param>
+        /// <returns>AD_UserHomeWidget_ID and Htmlstyle</returns>
+        public JsonResult GetWidgetID( int AD_UserHomeWidget_ID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HomeModels homeModels = new HomeModels();
+            var widgets = homeModels.GetWidgetID(ctx, AD_UserHomeWidget_ID);
+            return Json(JsonConvert.SerializeObject(widgets), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// Get User widgets for home
         /// </summary>
         /// <returns></returns>

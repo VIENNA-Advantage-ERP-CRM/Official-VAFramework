@@ -161,6 +161,7 @@
             $busyDiv = $root.find(".vis-ad-w-p-busy"); // busy indicator
             $landingpage = $root.find(".vis-landingpage");
             $windowpage = $root.find(".vis-windowpage");
+            $root.find('.vis-ad-w-p-tb').attr('style', 'display:none');
 
             //tolbar and search 
             $ulToobar = $root.find(".vis-ad-w-p-tb-lc");// $("<ul class='vis-appsaction-ul'>"); //toolbar item list
@@ -915,16 +916,17 @@
             if (show) {
                 this.landingPage.getRoot().show();
                 this.getRoot().hide();
-            } else {
+            } else {              
                 this.landingPage.getRoot().hide();
                 this.getRoot().show();
                 //tab selection
                 this.vTabbedPane.restoreTabChange();
-                if (actionParams)
-                    this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "","", actionParams);
+                if (actionParams && actionParams.TabIndex) {
+                    this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", "", actionParams);
+                }
                 else {
                     this.curTab.setQuery(null);
-                    this.tabActionPerformed(this.firstTabId);
+                    this.tabActionPerformed(this.firstTabId,"","", actionParams);
                 }
                 //this.setTabNavigation();
             }
@@ -1818,14 +1820,13 @@
      *  @return true if Panel is initialized successfully
      */
 
-    APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel) {
+    APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel,aParams) {
 
         this.$parentWindow = $parent;
         var gridWindow = new VIS.GridWindow(jsonData, this);
         this.gridWindow = gridWindow; //ref to call dispose
         //this.setWidth(gridWindow.getWindowWidth());
-       
-
+        this.actionParams = aParams;
         this.createToolBar(); // Init ToolBar
 
         var curWindowNo = $parent.getWindowNo();
@@ -2023,23 +2024,30 @@
         /**
          * Handle Landing Page
          */
+        var busy = $('<div class="vis-ad-w-p-busy"><i style="text-align:center" class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>');
 
         if (gridWindow.getIsLandingPage()) {
-            this.getRoot().hide();
+            this.getRoot().parent().append(busy);
+            //this.getRoot().hide();
             var landingPage = new VIS.VLandingPage(this, curWindowNo);
             this.landingPage = landingPage;
-            this.getRoot().parent().append(landingPage.getRoot());
+            this.getRoot().parent().append(landingPage.getRoot().hide());
             //$landingpage.show();
             //$windowpage.show();
             this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility', 'visible');
-
+        }
+        //by pass for zoom query and action parameter
+        if (query != null || this.actionParams !=null) {
+            this.getRoot().show();          
+        
+        } else if (this.landingPage) {
+            this.getRoot().hide();
+            this.landingPage.getRoot().show();
         } else {
             this.getRoot().show();
-            //$landingpage.hide();
-            //$windowpage.hide();
-            this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility','hidden');
         }
-
+        busy.remove();
+        this.getRoot().find('.vis-ad-w-p-tb').removeAttr('style');
         // this.curGC.setVisible(true);
     };
 
@@ -2159,7 +2167,11 @@
         this.curTab.setIsZoomAction(isSelect);
         setTimeout(function (that) {
             //that.curGC.isZoomAction = isSelect;
-            that.tabActionPerformed(that.firstTabId);
+            var tid = that.firstTabId;
+            if (that.actionParams && that.actionParams.TabIndex) {
+               tid= this.vTabbedPane.getNextTabId(that.actionParams.TabIndex)
+            }
+            that.tabActionPerformed(tid, "", "", that.actionParams);
             that.setTabNavigation();
             that = null;
         }, 10, this);
@@ -2972,7 +2984,7 @@
     APanel.prototype.landingPageActionPerformed= function (actionParams) {
         this.vTabbedPane.restoreTabChange();
         this.showLandingPage(false);
-        this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", actionParams);        
+        this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "","", actionParams);        
     }
 
     function checkPostingByNewLogic(callback) {

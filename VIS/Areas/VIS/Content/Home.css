@@ -3205,6 +3205,63 @@ p.vis-maintain-customer-p span {
     position: relative;
     overflow: hidden;
 }
+
+.vis-widgetfield-margin {
+    margin: 0px 5px 5px 0px;
+}
+
+.vis-add-row {
+    display: block;
+    padding: 10px;
+    clear:both;
+}
+    .vis-add-row button {
+        display: flex;
+        align-items: center;
+        border: 0;
+        border-radius: 6px;
+        min-height: 42px;
+        width: auto;
+        float: left;
+        margin: 0 6px 6px;
+        gap: 8px;
+        padding: 0px 12px;
+        overflow: hidden;
+    }
+    .vis-add-row label, .vis-add-row a {
+        display: flex;
+        align-items: center;
+        float: left;
+        margin: 0 6px 0px;
+        gap: 8px;
+        min-height: 42px;
+        padding: 0px 5px;
+        overflow: hidden;
+    }
+        .vis-add-row label.default {
+            color: rgba(var(--v-c-on-secondary),1);
+        }
+        .vis-add-row a.default {
+            color: rgba(var(--v-c-primary), 1);
+            text-decoration: underline;
+        }
+    .vis-add-row button.default {
+        box-shadow: 2px 2px 4px #ccc;
+        color: rgba(var(--v-c-on-primary),1);
+        background-color: rgba(var(--v-c-primary), 1);
+    }
+    .vis-add-row button img, .vis-add-row label img, .vis-add-row a img {
+        width: 20px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        object-fit: cover;
+    }
+
+.vis-widget-field {
+    margin: 0px;
+}
+
 /* new Changes */
 
 .vis-feedDetails-cmnt i {
@@ -3541,6 +3598,11 @@ ul.vis-userLinks-ListMenu li a i {
     width: 100%;
     height: auto;
     object-fit: contain;
+}
+
+.vis-widgetField-icon {
+    width: 10%;
+    height: auto;
 }
 
 .vis-widget-body {

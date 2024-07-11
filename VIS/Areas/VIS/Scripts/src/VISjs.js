@@ -53,6 +53,7 @@ import "../app/Framework/vdocaction.js";
 import "../app/Framework/appointments.js";
 import "../app/Framework/vpayment.js";
 import "../app/Framework/addnewproduct.js";
+import "../app/Framework/dynamicWidget.js";
 import "../app/Framework/batchUpdate.js";
 import "../app/forms/generatexmodel.js";
 import "../app/Framework/find.js";

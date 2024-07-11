@@ -1403,6 +1403,29 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             return Json(JsonConvert.SerializeObject(cm.CheckTableMapWithAction(tableID, actionType, actionName, ctx)), JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Getting Ad_Form_ID 
+        /// </summary>
+        /// <param name="formName">Name</param>
+        /// <returns>Ad_Form_ID</returns>
+        public JsonResult GetFormID(string formName) {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.GetFormID(formName)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Getting Ad_Process_ID
+        /// </summary>
+        /// <param name="processName">Name</param>
+        /// <returns>Ad_Process_ID</returns>
+
+        public JsonResult GetProcessID(string processName) {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.GetProcessID(processName)), JsonRequestBehavior.AllowGet);
+        }
     }
 
     public class FilterDataContract
