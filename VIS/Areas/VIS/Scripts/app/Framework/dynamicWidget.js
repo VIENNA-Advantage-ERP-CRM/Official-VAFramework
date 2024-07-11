@@ -38,11 +38,11 @@
                         /* Create different type of controls like Button/Link/label/Badge */
 
                         switch (controlType) {
-                            case 'BT':  
+                            case 'BT':
                                 if (isBadge == 'Y' && badgeName != '') {
                                     $element = $("<button title='" + name + "' class='vis-widget-field'>").html(name + " <span style='margin: 0; " + badgeStyle+"' class='badge vis-widget-badge'>" + badgeName + "</span>").attr('index', i);
                                 } else {
-                                    $element = $("<button title='" + name + "' class='vis-widget-field'>").text(name).attr('index', i);
+                                $element = $("<button title='" + name + "' class='vis-widget-field'>").text(name).attr('index', i);
                                 }
                                 if (HtmlStyle) {
                                     $element.attr('style', HtmlStyle);
@@ -54,7 +54,7 @@
                                 if (isBadge == 'Y' && badgeName != '') {
                                     $element = $("<a title='" + name + "' class='vis-widget-field' href='javascript:void(0)'>").html(name + " <span style='margin: 0; " + badgeStyle +"' class='badge vis-widget-badge'>" + badgeName + "</span>").attr('index', i);
                                 } else {
-                                    $element = $("<a title='" + name + "' class='vis-widget-field' href='javascript:void(0)'>").text(name).attr('index', i);
+                                $element = $("<a title='" + name + "' class='vis-widget-field' href='javascript:void(0)'>").text(name).attr('index', i);
                                 }
                                 if (HtmlStyle) {
                                     $element.attr('style', HtmlStyle);
@@ -74,7 +74,7 @@
                                 if (isBadge == 'Y' && badgeName != '') {
                                     $element = $("<label title='" + name + "' class='vis-widget-field' >").html(name + " <span style='margin: 0; " + badgeStyle +"' class='badge vis-widget-badge'>" + badgeName + "</span>").attr('index', i);
                                 } else {
-                                    $element = $("<label title='" + name + "' class='vis-widget-field' >").text(name).attr('index', i);
+                                $element = $("<label title='" + name + "' class='vis-widget-field' >").text(name).attr('index', i);
                                 }
                                 if (HtmlStyle) {
                                     $element.attr('style', HtmlStyle);
@@ -137,6 +137,7 @@
                         callback(result);
                 }
             });
+            return result;
         }
 
         /* Getting AD_WidgetSize_ID */
@@ -144,6 +145,7 @@
             if (AD_UserHomeWidget_ID > 0) {
                 $.ajax({
                     url: VIS.Application.contextUrl + "home/GetWidgetID",
+                    async: false,
                     data: { AD_UserHomeWidget_ID: AD_UserHomeWidget_ID },
                     success: function (data) {
                         data = JSON.parse(data);
