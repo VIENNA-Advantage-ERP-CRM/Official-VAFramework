@@ -15,7 +15,10 @@
             }
             if (AD_WidgetSize_ID > 0) {
                 var onClickParameters = [];
-                var data = getField(AD_WidgetSize_ID);
+                getField(AD_WidgetSize_ID, afterLoad);
+            }
+
+            function afterLoad(data) {
                 if (data && data.length > 0) {
                     data.sort(function (a, b) {
                         return a.SeqNo - b.SeqNo;
@@ -95,11 +98,10 @@
         }
 
         /* Getting Widget Fields */
-        function getField(AD_WidgetSize_ID) {
+        function getField(AD_WidgetSize_ID,callback) {
             var result = [];
             $.ajax({
                 url: VIS.Application.contextUrl + "home/GetDynamicWidget",
-                async: false,
                 data: { AD_WidgetSize_ID: AD_WidgetSize_ID },
                 success: function (data) {
                     data = JSON.parse(data);
@@ -108,9 +110,10 @@
                             result.push(data[i]);
                         }
                     }
+                    if (callback)
+                        callback(result);
                 }
             });
-            return result;
         }
 
         /* Getting AD_WidgetSize_ID */
@@ -118,7 +121,6 @@
             if (AD_UserHomeWidget_ID > 0) {
                 $.ajax({
                     url: VIS.Application.contextUrl + "home/GetWidgetID",
-                    async: false,
                     data: { AD_UserHomeWidget_ID: AD_UserHomeWidget_ID },
                     success: function (data) {
                         data = JSON.parse(data);
