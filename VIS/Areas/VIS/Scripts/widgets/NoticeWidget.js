@@ -38,18 +38,18 @@
             createBusyIndicator();
             ShowBusy(true);
             window.setTimeout(function () {
-                LoadHomeNotice(true);
+                loadHomeNotice(true);
                 events();
                 ShowBusy(false);
             }, 500);
         };
         /* Declare events */
         function events() {
-            $root.find('.vis-feedTitleBar-buttons').on("click", function (evnt) {
-                Actions(evnt);
+            $root.find('.vis-w-feedTitleBar-buttons').on("click", function (evnt) {
+                actions(evnt);
             });
-            $root.find('.vis-feedDetails').on("click", function (evnt) {
-                Actions(evnt);
+            $root.find('.vis-w-feedDetails').on("click", function (evnt) {
+                actions(evnt);
             });
         };
 
@@ -72,16 +72,16 @@
 
         //Create Widget
         function createWidget() {
-            $noticeWidget = ' <div id="welcomeScreenFeedsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-welcomeScreenFeeds w-100 vis-welcomeScreenNoticeMainDiv" >'
-                + '     <div class="vis-row">'
+            $noticeWidget = ' <div id="welcomeScreenFeedsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-w-welcomeScreenFeeds w-100 vis-welcomeScreenNoticeMainDiv" >'
+                + '     <div class="vis-w-row">'
                 + '         <h2 style="width: 100%" class="vis-noticeHeading">'
                 + ' <div class="vis-secndDiv">'
                 + '             <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon vis vis-notice"></span>'
                 + '             <strong style="float: left;" id="sAlrtTxtType">' + VIS.Msg.getMsg("Notice") + '</strong>'
-                + '     <div id="countDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
+                + '     <div id="countDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-w-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
                 + ' </div>'
                 + ' <div >'
-                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
+                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-w-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
                 + ' </div>'
                 + '         </h2>'
                 + '     </div>'
@@ -94,10 +94,10 @@
             welcomeTabDatacontainers = welcomeScreenFeedsDivId.find("#welcomeScreenFeedsList" + $self.AD_UserHomeWidgetID);
             $hlnkTabDataRef_ID = welcomeScreenFeedsDivId.find("#hlnkTabDataRef" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
-            $hlnkTabDataRef_ID.on("click", RefreshWidget)
+            $hlnkTabDataRef_ID.on("click", $self.refreshWidget)
         };
         //Load Data
-        function LoadHomeNotice(isTabAjaxBusy) {
+        function loadHomeNotice(isTabAjaxBusy) {
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeNotice',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabAjaxBusy },
@@ -136,8 +136,8 @@
                                     + "</pre>";
                             }
 
-                            str += "<div data-vishomercrd='view-recrd-cntainer' id='divrecdcntnr_" + data[s].AD_Note_ID + "' class='vis-activityContainer'>"
-                                + " <div class='vis-feedTitleBar'>";
+                            str += "<div data-vishomercrd='view-recrd-cntainer' id='divrecdcntnr_" + data[s].AD_Note_ID + "' class='vis-w-activityContainer'>"
+                                + " <div class='vis-w-feedTitleBar'>";
 
                             if (data[s].SpecialTable) {
                                 str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
@@ -147,7 +147,7 @@
                             }
 
 
-                            str += " <div class='vis-feedTitleBar-buttons'>"
+                            str += " <div class='vis-w-feedTitleBar-buttons'>"
                                 + "  <ul>";
                             // Renaming of Approve highlight to Acknowledge under notification
                             str += "<li data-vishomercrd='liapprove'><a href='javascript:void(0)' data-vishomercrd='approve'  id=" + data[s].AD_Note_ID + "  title='" + VIS.Msg.getMsg("Acknowledge") + "' class='vis vis-markx'></a></li>"
@@ -155,9 +155,9 @@
                                 + "</ul>"
                                 + "  </div>"
                                 + "</div>"
-                                + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-feedDetails vis-notClickCls'>"
+                                + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-w-feedDetails vis-notClickCls'>"
                                 + divtitle_
-                                + " <p class='vis-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
+                                + " <p class='vis-w-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
                                 + " </div>"
                                 + " </div>"
 
@@ -165,7 +165,7 @@
                     }
                     else {
 
-                        if (welcomeTabDatacontainers.find(".vis-feedTitleBar").length == 0) {
+                        if (welcomeTabDatacontainers.find(".vis-w-feedTitleBar").length == 0) {
 
                             if (VIS.Application.isRTL) {
                                 str = "<p class='vis-pTagStyleCls'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
@@ -216,7 +216,7 @@
                 var tabdatacntpage = pageNo * pageSize;
                 if (tabdatacntpage <= tabdataLastPage) {
                     pageNo += 1;
-                    LoadHomeNotice(false);
+                    loadHomeNotice(false);
                 }
                 else {
                     scrollWF = true;
@@ -226,7 +226,7 @@
             }
         };
         //Actions
-        function Actions(evnt) {
+        function actions(evnt) {
             var datarcrd = $(evnt.target).data("vishomercrd");
             if (evnt.target.tagName === "SPAN" && datarcrd === "more") {
                 //more-details
@@ -290,7 +290,7 @@
             //for notice approve
             else if (datarcrd === "approve") {
                 var vid = evnt.target.id;
-                ApproveNotice(vid, true);
+                approveNotice(vid, true);
                 var count = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html()) - 1;
                 $root.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
                 $root.find("#countDiv" + $self.AD_UserHomeWidgetID).append(count);
@@ -298,7 +298,7 @@
             //for notice approve
             else if (datarcrd === "liapprove") {
                 var vid = evnt.target.firstChild.id;
-                ApproveNotice(vid, true);
+                approveNotice(vid, true);
                 var count = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html()) - 1;
                 $root.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
                 $root.find("#countDiv" + $self.AD_UserHomeWidgetID).append(count);
@@ -331,15 +331,15 @@
             }
         };
         //Refresh Widget
-        function RefreshWidget() {
+        this.refreshWidget = function() {
             welcomeTabDatacontainers.empty();
             pageNo = 1;
-            LoadHomeNotice(true);
+            loadHomeNotice(true);
             events();
         };
 
         //Approve
-        function ApproveNotice(Ad_Note_ID, isAcknowldge) {
+        function approveNotice(Ad_Note_ID, isAcknowldge) {
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/ApproveNotice',
                 data: { "Ad_Note_ID": Ad_Note_ID, "isAcknowldge": isAcknowldge },
@@ -363,16 +363,21 @@
             $root.remove();
         };
     }
+    VIS.NoticeWidget.prototype.refreshWidget = function () {
+
+    };
     /* init method called on loading a form . */
     VIS.NoticeWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
         if (windowNo == -99999) {
             this.windowNo = VIS.Env.getWindowNo();
+            this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
         }
         else {
             this.windowNo = windowNo;
+            this.AD_UserHomeWidgetID = windowNo;
         }
-        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
+        
         window.setTimeout(function (t) {
             t.Initalize();
         }, 10, this);
