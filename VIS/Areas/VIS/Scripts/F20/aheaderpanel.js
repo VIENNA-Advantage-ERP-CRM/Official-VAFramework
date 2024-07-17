@@ -5,6 +5,7 @@
         var alignmentHorizontal = false;
 
         this.headerItems = null;
+        this.imgCtrl = [];
         var $self = this;
         this.evt = { sender: 'hdrpnl', isHorizontal: false, width: '0px', height: '0px', isClosed: true };
 
@@ -343,11 +344,20 @@
                                         $self.gTab.getWindowNo() + "_" + headerSeqNo, headerItem.IsAlwaysExecute, null, headerItem.AD_GridLayoutItems_ID);
                                 } else {
                                     iControl = VIS.VControlFactory.getReadOnlyControl(this.curTab, mField, false, false, false);
+                               
                                 }
 
                                 if (mField.getDisplayType() == VIS.DisplayType.Button) {
                                     if (iControl != null)
                                         iControl.addActionListner(this);
+                                } else if (mField.getDisplayType() == VIS.DisplayType.Image) {
+                                    if (iControl != null) {
+                                        this.imgCtrl.push(iControl);
+                                        iControl.setReadOnly(false);
+                                        iControl.addVetoableChangeListener(this);
+
+
+                                    }
                                 }
 
                                 var dynamicFieldValue = this.applyCustomUIForFieldValue(headerSeqNo, startCol, startRow, mField);
@@ -827,7 +837,7 @@
         var backColor = this.curTab.getHeaderBackColor();
         this.setHeaderLayout(this.curTab, backColor);
         var root = this.getRoot();
-
+        this.imgCtrl = [];
         var $parentRoot = this.getParent();
         var rootClass = "vis-w-p-Header-Root-v";//Fixed Class for vertical Alignment
         var alignmentHorizontal = this.curTab.getHeaderHorizontal();
@@ -1069,6 +1079,7 @@
         this.isChild = isChild;
         this.pRowData = null;
         if (this.isChild) {
+
             var self = this;
             this.curTab.getTableModel().getRowFromDB(this.curTab.getCurrentRow(), function (data) {
                 self.pRowData = data;
@@ -1117,6 +1128,24 @@
     HeaderPanel.prototype.cmd_save = function (manual, callback) {
         return this.aPanel.cmd_save2(manual, this.curTab, this.curGC, this.aPanel, callback);
     }
+
+    HeaderPanel.prototype.setImgReadonly = function (isReadonly) {
+        if (this.imgCtrl) {
+            for (var i = 0; i < this.imgCtrl.length; i++) {
+                this.imgCtrl[i].setReadOnly(isReadonly);
+            }
+        }
+    }
+
+    HeaderPanel.prototype.vetoablechange = function (e) {
+        if (this.curGC != this.aPanel.curGC) {
+            return;
+        }
+
+        this.curGC.vetoablechange(e);
+        
+    };
+
     VIS.HeaderPanel = HeaderPanel;
 
 }(VIS, jQuery));

@@ -3675,14 +3675,58 @@ ul.vis-userLinks-ListMenu li a i {
         transform: scale(1.05);
     }*/
 
-    .vis-widgetDelete{
-        position:absolute;
-        top:2px;
-        right:2px;
-        color:black;
-        cursor:pointer;
-        z-index:99999;
+.vis-widgetDelete {
+    background: transparent;
+    position: absolute;
+    right: 0px;
+    top: 0;
+    z-index: 99999;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+    .vis-widgetDelete:hover {
+        background: #ffff;
+        border: 1px solid #bababa;
     }
+
+
+
+.vis-widget-container:not(.vis-editModeWidget) .vis-widget-item:not([data-type="W"]) .vis-widgetDelete {
+    display: none;
+}
+
+.vis-editModeWidget .vis-widgetDelete i{
+    display: block;
+}
+
+.vis-editModeWidget .vis-widgetDelete svg {
+    display: none;
+}
+
+.vis-widgetDelete svg{
+    fill:#777;
+}
+
+.vis-widgetDelete:hover svg{
+    fill:#000;
+}
+
+
+.vis-widget-container:not(.vis-editModeWidget) .vis-widgetDelete svg {
+    display: block;
+}
+
+.vis-widget-container:not(.vis-editModeWidget) .vis-widgetDelete i {
+    display: none;
+}
+
+
+
 
 .vis-linksWidget {
     width: 100%;
@@ -3699,6 +3743,14 @@ ul.vis-userLinks-ListMenu li a i {
     margin-top:10px;
     text-align:center;
 }
+
+    .vis-linksWidget img, .vis-imgsec img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+
 
 .vis-dotdot {
     display: block;
@@ -3722,7 +3774,7 @@ ul.vis-userLinks-ListMenu li a i {
     width:100%;
 }
 
-.vis-editModeWidget .vis-widget-item .vis-height-full {
+.vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) {
     pointer-events: none;
 }
 
@@ -3742,6 +3794,4 @@ ul.vis-userLinks-ListMenu li a i {
     height: 35px
 }
 
-.vis-widgetDelete:hover {
-    color: red
-}
+

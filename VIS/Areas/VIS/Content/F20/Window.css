@@ -1721,11 +1721,12 @@ li.vis-page-item-select {
         text-align: center;
     }
 
+    
 
-.vis-w-p-card-Label-center-f {
-    display: flex;
-    justify-content: center;
-}
+    .vis-w-p-card-Label-center-f {
+        display: flex;
+        justify-content: center;
+    }
 
     .vis-w-p-card-Label-center-f label {
         text-align: center;
