@@ -923,8 +923,8 @@
                 if (actionParams)
                     this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "","", actionParams);
                 else {
-                    this.curTab.setQuery(null);
-                    this.tabActionPerformed(this.firstTabId);
+                    this.actionParams = {};
+                    this.cmd_find('');
                 }
                 //this.setTabNavigation();
             }
