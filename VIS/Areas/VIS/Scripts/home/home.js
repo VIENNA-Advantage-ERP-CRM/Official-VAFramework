@@ -388,11 +388,15 @@
                     var $div = $('<div class="vis-linksWidget">');
                     $div.append(widget.items).append('<div class="linktitle">'+widget.DisplayName+'</div>');
                     $item.append($div);                    
-
                 }
                 else if (widget.Type == "C" || widget.Type == "K" || widget.Type == "V") {
                     VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type);               
                 }
+
+
+                var trash = $('<div class="vis-widgetDelete"><i class="fa fa-trash-o"></i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(90 8 8)" d="M5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2z"></path></svg></div>');
+                
+                //hideShowIcon();
 
 
                 var trash = $('<div class="vis-widgetDelete"><i class="fa fa-trash-o"></i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(90 8 8)" d="M5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2z"></path></svg></div>');
@@ -466,10 +470,8 @@
                             $home.find('.vis-widget-body').append($('<div class="vis-main-widget-heading">' + moduelName + '</div>'));
                             $home.find('.vis-widget-body').append($('<div class="vis-widgetDrag-container">'));
                         }
-
-
-                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img + '</div><div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols ||1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
-  
+                      
+                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img +'</div><div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols ||1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
                         $home.find('.vis-widgetDrag-container:last').append(witem);
                     }
                    

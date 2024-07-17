@@ -224,6 +224,7 @@
 
                     str.push('</li>');
 
+
                 }
             }
 
@@ -243,8 +244,6 @@
 
         var body = this.getBody();
         body.css({ 'box-shadow': 'unset', 'border-top': 'unset' });
-
-
 
         if (panels && panels.length > 0) {
             for (var i = 0; i < panels.length; i++) {
@@ -313,18 +312,25 @@
         return panel;
     };
 
+
     /**
      * Refresh tab panel data
      * @param {any} rec_Id record Id
      * @param {any} dataRow  slected row object
      */
-    VTabPanel.prototype.refreshPanelData = function (rec_Id, dataRow) {
+
+
+    VTabPanel.prototype.refreshPanelData = function (rec_Id,dataRow,action) {
+
+
         if (this.curTabPanel) {
             this.curTabPanel.refreshPanelData(rec_Id, dataRow,action);
         }
         else {
             for (var i = 0; i < this.tabPanels.length; i++) {
-                this.tabPanels[i].refreshPanelData(rec_Id, dataRow);
+
+                this.tabPanels[i].refreshPanelData(rec_Id, dataRow,action);
+
             }
         }
     };

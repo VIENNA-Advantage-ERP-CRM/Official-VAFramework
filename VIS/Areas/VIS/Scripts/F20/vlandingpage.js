@@ -110,6 +110,7 @@
             $container.append(openRightPanel);
             $root.find('.vis-home-leftPanel').append($container);
             busy.hide();
+
             loadWidgets();
         }
         /**
