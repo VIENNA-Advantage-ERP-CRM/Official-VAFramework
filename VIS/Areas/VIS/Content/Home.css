@@ -3610,6 +3610,8 @@ ul.vis-userLinks-ListMenu li a i {
         border: 1px solid #bababa;
     }
 
+
+
 .vis-widget-container:not(.vis-editModeWidget) .vis-widget-item:not([data-type="W"]) .vis-widgetDelete {
     display: none;
 }
@@ -3621,6 +3623,15 @@ ul.vis-userLinks-ListMenu li a i {
 .vis-editModeWidget .vis-widgetDelete svg {
     display: none;
 }
+
+.vis-widgetDelete svg{
+    fill:#777;
+}
+
+.vis-widgetDelete:hover svg{
+    fill:#000;
+}
+
 
 .vis-widget-container:not(.vis-editModeWidget) .vis-widgetDelete svg {
     display: block;
