@@ -190,7 +190,7 @@ namespace VIS.Helpers
 
                 #region Notes
                 //To get The Notes count
-                strQuery = MRole.GetDefault(ctx).AddAccessSQL("SELECT COUNT(wsp_note_id) As NCount FROM WSP_Note", "WSP_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO) + " AND AD_USER_ID=" + ctx.GetAD_User_ID() ;
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL("SELECT COUNT(wsp_note_id) As NCount FROM WSP_Note", "WSP_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO) + " AND AD_USER_ID=" + ctx.GetAD_User_ID();
                 dsData = new DataSet();
                 dsData = DB.ExecuteDataset(strQuery);
                 int nNotes = 0;
@@ -207,9 +207,9 @@ namespace VIS.Helpers
                 string sql1 = "SELECT AppointmentsInfo.Appointmentsinfo_id AS ID,AppointmentsInfo.AD_Client_ID,AppointmentsInfo.AD_Org_ID"
                           //+ "  FROM AppointmentsInfo JOIN AD_User ON AD_User.AD_User_ID =AppointmentsInfo.CreatedBy WHERE AppointmentsInfo.IsRead='N' AND AppointmentsInfo.istask ='N' AND  AppointmentsInfo.CreatedBy  !=" + ctx.GetAD_User_ID() + " AND AppointmentsInfo.AD_User_ID  = " + ctx.GetAD_User_ID() + ""
                           + " FROM AppointmentsInfo AppointmentsInfo INNER JOIN AD_User AD_User ON (AD_User.AD_User_ID =AppointmentsInfo.CreatedBy) WHERE AppointmentsInfo.IsRead='N' AND AppointmentsInfo.istask ='N' AND AppointmentsInfo.AD_User_ID  = " + ctx.GetAD_User_ID() + "";
-                        //+ " UNION (";
-                  strQuery =  " SELECT AppointmentsInfo.Appointmentsinfo_id AS ID, AppointmentsInfo.AD_Client_ID,AppointmentsInfo.AD_Org_ID FROM AppointmentsInfo AppointmentsInfo"
-                         + " INNER JOIN AD_User AD_User ON (AD_User.AD_User_ID = AppointmentsInfo.CreatedBy)  WHERE (AppointmentsInfo.IsRead ='Y' AND AppointmentsInfo.AD_User_ID = " + ctx.GetAD_User_ID() + " ) AND AppointmentsInfo.istask ='N' AND AppointmentsInfo.startDate BETWEEN to_date('";
+                //+ " UNION (";
+                strQuery = " SELECT AppointmentsInfo.Appointmentsinfo_id AS ID, AppointmentsInfo.AD_Client_ID,AppointmentsInfo.AD_Org_ID FROM AppointmentsInfo AppointmentsInfo"
+                       + " INNER JOIN AD_User AD_User ON (AD_User.AD_User_ID = AppointmentsInfo.CreatedBy)  WHERE (AppointmentsInfo.IsRead ='Y' AND AppointmentsInfo.AD_User_ID = " + ctx.GetAD_User_ID() + " ) AND AppointmentsInfo.istask ='N' AND AppointmentsInfo.startDate BETWEEN to_date('";
                 //DateTime.Now.ToShortDateString()
                 strQuery += DateTime.Now.AddDays(-1).ToString("M/dd/yy");
                 // Use current time
@@ -1182,9 +1182,6 @@ namespace VIS.Helpers
             return lstAlerts;
         }
         #endregion
-
-
-
         public List<FavNode> GetBarNodes(List<VTreeNode> nodes)
         {
             List<FavNode> items = new List<FavNode>();
@@ -1208,7 +1205,6 @@ namespace VIS.Helpers
 
 
         }
-
 
         public string SetNodeFavourite(int nodeID, Ctx ctx)
         {
@@ -1364,6 +1360,145 @@ namespace VIS.Helpers
             }
 
         }
+        //////
+        # region Get Widgets Counts
+        //Count of notice
+        public HomeModels getWidgetsCnt(Ctx ctx)
+        {
+            HomeModels objHome = new HomeModels();
+            try
+            {
+                #region Request Count
+                //To Get Request count
+                strQuery = " SELECT  count(R_Request.r_request_id) FROM R_Request  inner join  r_requesttype rt on (R_Request.r_requesttype_id=rt.r_requesttype_ID)";
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                strQuery += " AND ( R_Request.SalesRep_ID =" + ctx.GetAD_User_ID() + " OR R_Request.AD_Role_ID =" + ctx.GetAD_Role_ID() + ")"
+                 + " AND R_Request.Processed ='N'"
+                + " AND (R_Request.R_Status_ID IS NULL OR R_Request.R_Status_ID IN (SELECT R_Status_ID FROM R_Status WHERE IsClosed='N'))";
+                dsData = new DataSet();
+                dsData = DB.ExecuteDataset(strQuery);
+                int nRequest = 0;
+                if (dsData != null)
+                {
+                    nRequest = Util.GetValueOfInt(dsData.Tables[0].Rows[0][0].ToString());
+                }
+
+                #endregion
+
+                # region Notice Count
+                //To get Notice Count
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL("SELECT count(AD_Note_ID) FROM AD_Note "
+                    , "AD_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                strQuery += " AND AD_User_ID IN (" + ctx.GetAD_User_ID() + ")"
+                  + " AND Processed='N'";
+                dsData = new DataSet();
+                dsData = DB.ExecuteDataset(strQuery);
+                int nNotice = 0;
+                if (dsData != null)
+                {
+                    nNotice = Util.GetValueOfInt(dsData.Tables[0].Rows[0][0].ToString());
+                }
+                #endregion
+
+                #region WorkFlow Count
+                //To Get Work flow Count
+                
+                strQuery = @"SELECT COUNT(*)
+                            FROM AD_WF_Activity a
+                            WHERE a.Processed  ='N'
+                            AND a.WFState      ='OS'
+                            AND a.AD_Client_ID =" + ctx.GetAD_Client_ID() + @"
+                            AND ( (a.AD_User_ID=" + ctx.GetAD_User_ID() + @"
+                            OR a.AD_User_ID   IN
+                              (SELECT AD_User_ID
+                              FROM AD_User_Substitute
+                              WHERE IsActive   ='Y'
+                              AND Substitute_ID=" + ctx.GetAD_User_ID() + @"
+                              AND (validfrom  <=sysdate)
+                              AND (sysdate    <=validto )
+                              ))
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND COALESCE(r.AD_User_ID,0)=0
+                              AND (a.AD_User_ID           =" + ctx.GetAD_User_ID() + @"
+                              OR a.AD_User_ID            IS NULL
+                              OR a.AD_User_ID            IN
+                                (SELECT AD_User_ID
+                                FROM AD_User_Substitute
+                                WHERE IsActive   ='Y'
+                                AND Substitute_ID=" + ctx.GetAD_User_ID() + @"
+                                AND (validfrom  <=sysdate)
+                                AND (sysdate    <=validto )
+                                ))
+                              )
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND a.AD_User_ID = " + ctx.GetAD_User_ID() + @" AND r.ResponsibleType = 'H'
+                              AND (r.AD_User_ID           =" + ctx.GetAD_User_ID() + @"
+                              OR a.AD_User_ID            IN
+                                (SELECT AD_User_ID
+                                FROM AD_User_Substitute
+                                WHERE IsActive   ='Y'
+                                AND Substitute_ID=" + ctx.GetAD_User_ID() + @"
+                                AND (validfrom  <=sysdate)
+                                AND (sysdate    <=validto )
+                                ))
+                              )
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              INNER JOIN AD_User_Roles ur
+                              ON (r.AD_Role_ID            =ur.AD_Role_ID)
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND (ur.AD_User_ID          =" + ctx.GetAD_User_ID() + @"
+                              OR a.AD_User_ID            IN
+                                (SELECT AD_User_ID
+                                FROM AD_User_Substitute
+                                WHERE IsActive   ='Y'
+                                AND Substitute_ID=" + ctx.GetAD_User_ID() + @"
+                                AND (validfrom  <=sysdate)
+                                AND (sysdate    <=validto )
+                                ))
+                              AND r.responsibletype NOT IN ('H','C', 'M')
+                              ) 
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              INNER JOIN AD_Role ro
+                              ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND r.IsActive = 'Y'
+                              AND (CASE WHEN instr(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                              AND r.responsibletype ='M'
+                              )
+                            )";
+                // Applied Role access on workflow Activities
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "a", true, true);
+                dsData = new DataSet();
+                dsData = DB.ExecuteDataset(strQuery);
+                int nWorkFlow = 0;
+                if (dsData != null)
+                {
+                    nWorkFlow = Util.GetValueOfInt(dsData.Tables[0].Rows[0][0].ToString());
+                }
+                #endregion
+
+                objHome.RequestCnt = nRequest;
+                objHome.NoticeCnt = nNotice;
+                objHome.WorkFlowCnt = nWorkFlow;
+                return objHome;
+            }
+            catch (Exception)
+            {
+
+            }
+            return objHome;
+        }
+        #endregion
     }
 
 

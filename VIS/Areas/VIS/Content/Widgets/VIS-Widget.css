@@ -29,8 +29,6 @@
 }
 
 .vis-w-workflow-homepage-activites {
-    /*height: calc(100% - 7.8em);*/
-    /* height: calc(100% - 26.5em);*/
     height: calc(100% - 3.8em);
     overflow-y: auto;
     margin-top: 0.625em;
@@ -68,7 +66,7 @@
 
 .vis-w-welcomeScreenTab-notificationBubble {
     background: url(../Images/home/welcomeScreen-AlertBubbles.png) 0 0 no-repeat;
-    color: #fff;
+    color: rgba(var(--v-c-common), 1);
     display: block;
     font-size: 70%;
     font-weight: 700;
@@ -85,8 +83,10 @@
     .vis-w-topSecndDivCls .vis-w-welcomeScreenTab-notificationBubble, .vis-w-welcomeScreenFeeds .vis-w-welcomeScreenTab-notificationBubble {
         align-items: center;
         background: transparent;
-        background-color: #fff;
+        background-color: #f3f3f3;
+        /*background-color: #fff;*/
         border-radius: 6px;
+        /*color: rgba(var(--v-c-on-secondary), 1);*/
         color: rgba(var(--v-c-primary), 1);
         display: flex;
         height: 1.8em !important;
@@ -121,11 +121,13 @@
 }
 
 .vis-w-welcomeScreenFeeds > .vis-w-row h2 {
-    color: #ffffff;
+    color: rgba(var(--v-c-primary), 1);
+    /*color: #ffffff;*/
     float: left;
     font-size: 1.125em;
     margin-top: 0.625em;
-    background: rgba(var(--v-c-primary), 1);
+    background: rgba(var(--v-c-common), 1);
+    /*background: rgba(var(--v-c-primary), 1);*/
     height: 2.375em;
     border-radius: 0.375em;
     padding: 0 0.625em;
@@ -136,18 +138,19 @@
 }
 
     .vis-w-welcomeScreenFeeds > .vis-w-row h2 strong {
-        font-weight: 500;
+        font-weight: 600;
         float: left;
     }
-
+.vis-w-iconsCls .vis-w-feedicon:last-child {
+    border-left:0;
+}
 .vis-w-feedicon {
-    background: transparent;
-    color: #ffffff;
+    /*background: transparent;*/
+    /*color: #ffffff;*/
+    color: rgba(var(--v-c-primary),1);
     padding-left: 0.5625em;
     width: auto;
-    border-color: #ffffff;
-    border-style: solid;
-    border-width: 0 0 0 0.0625em;
+    border-left: 1px solid rgba(var(--v-c-primary),1);
     font-size: 0.875em;
     height: 1.5em;
     float: right;
@@ -163,14 +166,15 @@
     width: 24px
 }
 
-    .vis-w-feedicon:hover {
-        color: #d9f0ff;
-    }
+    /*.vis-w-feedicon:hover {*/
+        /*color: #d9f0ff;*/
+        /*color: rgba(var(--v-c-on-secondary),1);
+    }*/
 
 .vis-w-workflow-homepage-parentdiv .vis-w-frm-data-search-wrap {
     border-radius: 0.375em;
     overflow: hidden;
-    background-color: #ffffff;
+    background-color: rgba(var(--v-c-common), 1);
 }
 
 .vis-w-frm-data-col-wrap .vis-wfSearch-btn {
@@ -192,7 +196,7 @@
     width: 27px
 }
 .vis-workflow-homepage-parentdiv .vis-w-frm-data-search-wrap {
-    background-color: #fff;
+    background-color: rgba(var(--v-c-common), 1);
     border-radius: .375em;
     overflow: hidden
 }
@@ -243,7 +247,7 @@
     border: 0.0625em solid rgba(var(--v-c-secondary),1);
     box-shadow: 0.125em 0.0625em 0.3125em -0.125em #cccccc;
     border-radius: 0.375em;
-    background-color: #ffffff;
+    background-color: rgba(var(--v-c-common), 1);
     margin: 0 3px 10px 0;
     margin-right: 3px !important;
 }
@@ -251,7 +255,7 @@
     .vis-w-activityContainer .vis-w-feedTitleBar {
         padding: 0.375em 0.625em;
         margin: 0 0px;
-        background-color: rgba(var(--v-c-primary),.2);
+        background-color: rgba(var(--v-c-primary),.1);
         border-radius: 0.375em 0.375em 0 0;
         border-bottom: 0;
         display:flex;
@@ -332,13 +336,8 @@
 .vis-w-workflow-homepage-activites .vis-w-feedDetails {
     cursor: pointer;
 }
-.vis-w-activityContainer:hover {
+/*.vis-w-activityContainer:hover {
     border: .0625em solid rgba(var(--v-c-primary),1);
-}
-/*.vis-w-feedDetails .vis-w-feedDateTime {
-    float: right;
-    margin-bottom: 0;
-    width: 100%
 }*/
 .vis-secondary-clr {
     color: rgba(var(--v-c-on-secondary),.9) !important;
@@ -374,7 +373,7 @@
     }
 
     .vis-w-workflowActivityDetails .vis-w-workflowActivityDetails-Heading {
-        background-color: rgba(var(--v-c-primary),1);
+        background-color: #f3f3f3;
         padding: 0 0.625em;
         height: 2.375em;
         border-radius: 0.375em;
@@ -382,18 +381,18 @@
     }
 
 .vis-w-workflowActivityDetails-Heading .vis-arrow-left {
-    color: rgba(var(--v-c-common),1)
+    color: rgba(var(--v-c-primary), 1);
 }
 
 .vis-w-workflowActivityDetails .vis-w-workflowActivityDetails-Heading h3 {
-    color: rgba(var(--v-c-common), 1);
+    color: rgba(var(--v-c-primary), 1);
 }
 
 .vis-btn-widgetzoom {
     background: transparent;
     border: 0;
     border-radius: 0;
-    color: rgba(var(--v-c-common),1);
+    color: rgba(var(--v-c-primary),1);
     padding: 0;
     padding-left: 0.625em;
     padding-right: 0.625em;
@@ -407,7 +406,7 @@
     }
 
 .vis-w-ActionHeadingCls {
-    background-color: rgba(var(--v-c-primary), .2);
+    background-color: rgba(var(--v-c-primary), .1);
     border-radius: 0.375em;
     padding: 0.375em 0.625em;
 }
@@ -664,15 +663,18 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-editModeWidget .vis-w-welcomeScreenFeeds {
     font-size: 10px;
 }
-
+.vis-w-txtBold {
+    font-weight: 600;
+}
 .vis-w-workflowActivityDetails h3 {
     font-size: 1.125em;
-    flex:1;
+    flex: 1;
 }
-.vis-w-workflowActivityDetails-Heading a:hover {
+/*.vis-w-workflowActivityDetails-Heading a:hover {*/
     /*color: rgba(var(--v-c-common),1);*/
-    color: #d9f0ff;
-}
+    /*color: #d9f0ff;*/
+    /*color: rgba(var(--v-c-on-secondary),1);
+}*/
 
 .vis-w-IIColumnContent .vis-w-input-widgetswrap select ~ label {
     font-size: 1em;
@@ -926,9 +928,14 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     margin-top: 12.5em;
     text-align: center;
 }
-
-/*Request widget*/
-.vis-RequestwelcomeScreenCls {
+.vis-w-zoomClrChngCls {
+    background-color: rgba(var(--v-c-primary),.0) !important;    
+}
+    .vis-w-zoomClrChngCls a {
+        color: rgba(var(--v-c-primary), 1) !important;
+    }
+    /*Request widget*/
+    .vis-RequestwelcomeScreenCls {
     background-color: #f3f3f3;
     border: 1px solid rgba(0,0,0,.125);
     border-radius: .25em;
@@ -970,11 +977,129 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     top: 0;
     height: calc(100% - 4.8em);
 }
+/*Action Widgets*/
+.vis-a-task-status-panel{ height: 100%; width: 100%; padding: 0.2em;}
+.vis-a-statusBox-container{grid-template-columns:repeat(1, 1fr); display: grid; gap:0.4em; height: 100%; background-color: #ffffff; padding: 0.3rem;}
+.vis-a-status-box{width: 100%; text-align: center; display: flex; border-radius: 0.375em; border: 1px solid transparent; align-items: center; justify-content: space-between; padding: 0.625em; }
+.vis-a-status-box .fa, .vis-a-status-box .vis{font-size: 1.8em; display: flex; align-items: center; justify-content: center;  }
+.vis-a-headWico{display: flex;align-items: center; gap: 0.625em ;}
+.vis-a-status-name{font-size: 1.2em; color: #333333;}
+.vis-a-status-count{min-width: 6.875em; border-radius: 3.125em;font-weight: 600; display: flex; align-items: center; justify-content: center; color: #ffffff; height: 1.75em;}
 
-/*Widget Refresh*/
-.vis-a-task-status-panel:hover .vis-a-refreshIco {
-    display: flex;
+.vis-a-green-box{border-color: #B1FFEF; background-color: #E6FFFA; }
+.vis-a-green-box .vis, .vis-a-green-box .fa{color: #00C8A0;}
+.vis-a-orange-box{border-color: #FFE6B3; background-color: #FFF1D4;}
+.vis-a-orange-box .vis, .vis-a-orange-box .fa{color: #FECB62;}
+.vis-a-blue-box{border-color: #C3DDFF; background-color: #EBF3FE;}
+.vis-a-blue-box .vis, .vis-a-blue-box .fa{color: #5093EF;}
+
+.vis-a-greenbg{background-color: #00C8A0;}
+.vis-a-bluebg{background-color: #5093EF;}
+.vis-a-orangebg{background-color: #FECB62;}
+
+
+
+
+@media screen and (max-width: 2000px) {
+  .widgetEditMode .vis-a-task-status-panel {font-size: 13px; }
 }
+@media screen and (max-width: 1920px) {
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 12px;
+  }
+}
+@media screen and (max-width: 1366px) {
+  .vis-a-task-status-panel{font-size: 13px;}
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 8px;
+  }
+}
+@media screen and (max-width: 1024px) {
+  .vis-a-task-status-panel {
+    font-size: 9px;
+  }
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 6px;
+  }
+}
+@media screen and (max-width:900px) {
+  .vis-a-task-status-panel {
+    font-size: 12px;
+  }
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 8px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .vis-a-task-status-panel {
+    font-size: 10px;
+  }
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 7px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .vis-a-task-status-panel {
+    font-size: 16px;
+  }
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 12px;
+  }
+}
+@media screen and (max-width: 480px) {
+  .vis-a-task-status-panel {
+    font-size: 12px;
+  }
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 9px;
+  } 
+}
+@media screen and (max-width: 375px) {
+  .vis-a-task-status-panel {
+    font-size: 10px;
+  }
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 6px;
+  }
+}
+@media screen and (max-width: 320px) {
+  .vis-a-task-status-panel {
+    font-size: 9px;
+  }
+  .widgetEditMode .vis-a-task-status-panel {
+    font-size: 5px;
+  }
+}
+.vis-a-closeBtnCls.close:hover {
+    color: rgba(var(--v-c-primary), 1);
+}
+.vis-a-closeBtnCls.close {
+    position: absolute;
+    right: -12px;
+    top: -12px;
+    padding: 6px;
+    border-radius: 50px;
+    background-color: #f3f3f3;
+    color: rgba(var(--v-c-on-secondary), 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    opacity: 1 !important;
+    border: 1px solid rgba(var(--v-c-on-secondary), 1)
+}
+    .vis-a-closeBtnCls.close span{
+        position:relative;
+        top:-2px;
+    }
+    /*Widget Refresh*/
+    .vis-a-task-status-panel:hover .vis-a-refreshIco {
+        display: flex;
+    }
 .vis-a-refreshIco {
     top: 0.625em;
     right: 0.625em;
