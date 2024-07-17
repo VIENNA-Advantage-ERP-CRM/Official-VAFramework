@@ -29,14 +29,21 @@
                         var sameLine = data[i].IsSameLine;
                         var HtmlStyle = data[i].HtmlStyle;
                         var imageURL = data[i].ImageURL;
+                        var badgeName = data[i].BadgeName;
+                        var isBadge = data[i].IsBadge;
+                        var badgeStyle = data[i].BadgeStyle;
                         var $element;
                         onClickParameters.push(data[i].OnClick);
 
-                        /* Create different type of controls like Button/Link/label */
+                        /* Create different type of controls like Button/Link/label/Badge */
 
                         switch (controlType) {
-                            case 'BT':
-                                $element = $("<button title='" + name + "' class='vis-widget-field'>").text(name).attr('index', i);
+                            case 'BT':  
+                                if (isBadge == 'Y' && badgeName != '') {
+                                    $element = $("<button title='" + name + "' class='vis-widget-field'>").html(name + " <span style='margin: 0; " + badgeStyle+"' class='badge vis-widget-badge'>" + badgeName + "</span>").attr('index', i);
+                                } else {
+                                    $element = $("<button title='" + name + "' class='vis-widget-field'>").text(name).attr('index', i);
+                                }
                                 if (HtmlStyle) {
                                     $element.attr('style', HtmlStyle);
                                 } else {
@@ -44,7 +51,19 @@
                                 }
                                 break;
                             case 'LN':
-                                $element = $("<a title='" + name + "' class='vis-widget-field' href='javascript:void(0)'>").text(name).attr('index', i);
+                                if (isBadge == 'Y' && badgeName != '') {
+                                    $element = $("<a title='" + name + "' class='vis-widget-field' href='javascript:void(0)'>").html(name + " <span style='margin: 0; " + badgeStyle +"' class='badge vis-widget-badge'>" + badgeName + "</span>").attr('index', i);
+                                } else {
+                                    $element = $("<a title='" + name + "' class='vis-widget-field' href='javascript:void(0)'>").text(name).attr('index', i);
+                                }
+                                if (HtmlStyle) {
+                                    $element.attr('style', HtmlStyle);
+                                } else {
+                                    $element.addClass('default');
+                                }
+                                break;
+                            case 'BG':
+                                $element = $("<span title='" + name + "' class='vis-widget-field badge vis-widget-badge'>").text(name).attr('index', i);
                                 if (HtmlStyle) {
                                     $element.attr('style', HtmlStyle);
                                 } else {
@@ -52,7 +71,11 @@
                                 }
                                 break;
                             case 'LB':
-                                $element = $("<label title='" + name + "' class='vis-widget-field' >").text(name).attr('index', i);
+                                if (isBadge == 'Y' && badgeName != '') {
+                                    $element = $("<label title='" + name + "' class='vis-widget-field' >").html(name + " <span style='margin: 0; " + badgeStyle +"' class='badge vis-widget-badge'>" + badgeName + "</span>").attr('index', i);
+                                } else {
+                                    $element = $("<label title='" + name + "' class='vis-widget-field' >").text(name).attr('index', i);
+                                }
                                 if (HtmlStyle) {
                                     $element.attr('style', HtmlStyle);
                                 } else {
@@ -102,7 +125,7 @@
             var result = [];
             $.ajax({
                 url: VIS.Application.contextUrl + "home/GetDynamicWidget",
-                data: { AD_WidgetSize_ID: AD_WidgetSize_ID },
+                data: { AD_WidgetSize_ID: AD_WidgetSize_ID, windowNo: self.windowNo},
                 success: function (data) {
                     data = JSON.parse(data);
                     if (data) {

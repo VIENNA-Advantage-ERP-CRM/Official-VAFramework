@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text.RegularExpressions;
 using VAdvantage.Controller;
 using VAdvantage.Logging;
 using VAdvantage.Model;
@@ -233,10 +234,10 @@ namespace VIS.Models
         /// <param name="AD_WidgetSize_ID">AD_WidgetSize_ID</param>
         /// <returns>Field Details</returns>
 
-        public List<DynamicWidget> GetDynamicWidget(Ctx ctx, int AD_WidgetSize_ID)
+        public List<DynamicWidget> GetDynamicWidget(Ctx ctx, int AD_WidgetSize_ID,int windowNo)
         {
             bool baseLanguage = Env.IsBaseLanguage(ctx, "");
-            string sql = @"SELECT AD_WidgetField.Control_Type, AD_WidgetField.IsSameLine, AD_WidgetField.OnClick,
+            string sql = @"SELECT AD_WidgetField.Control_Type,AD_WidgetField.BadgeStyle,AD_WidgetField.IsBadge,AD_WidgetField.BadgeValue, AD_WidgetField.IsSameLine, AD_WidgetField.OnClick,
                    AD_WidgetField.HtmlStyle, AD_WidgetField.SeqNo, AD_WidgetField.OnClick, AD_WidgetField.AD_Image_ID, ";
 
             if (baseLanguage) {
@@ -263,6 +264,7 @@ namespace VIS.Models
                 for (int i = 0; i < row.Count; i++)
                 {
                     string imageURL = "";
+                    string badgeValue = Util.GetValueOfString(row[i]["BadgeValue"]);
                     int Ad_Image_ID = Util.GetValueOfInt(row[i]["AD_Image_ID"]);
                     if (Ad_Image_ID > 0)
                     {
@@ -271,7 +273,7 @@ namespace VIS.Models
                         {
                             if (img.Get_Value("FontStyle") != null)
                             {
-                                imageURL = "<i class='" + img.GetFontName() + "' style='"+ img.Get_Value("FontStyle") + "'></i>";
+                                imageURL = "<i class='" + img.GetFontName() + "' style='" + img.Get_Value("FontStyle") + "'></i>";
                             }
                             else
                             {
@@ -287,6 +289,31 @@ namespace VIS.Models
                             imageURL = "<img src ='data:image/*;base64, " + Convert.ToBase64String((byte[])img.GetBinaryData()) + "'></img>";
                         }
                     }
+
+                    if (badgeValue.StartsWith("@SQL="))
+                    {
+                        badgeValue = badgeValue.Substring(5);
+                        var sqlTest = badgeValue.ToUpper();
+                        if ((sqlTest.IndexOf("INSERT ") != -1) || (sqlTest.IndexOf("DELETE ") != -1) || (sqlTest.IndexOf("UPDATE ") != -1) || (sqlTest.IndexOf("DROP ") != -1) || (sqlTest.IndexOf("TRUNCATE ") != -1))
+                            badgeValue = "";
+                        else
+                        {
+                            string query = Env.ParseContext(ctx, windowNo, badgeValue, false);
+                            string pattern = @"FROM\s+([\w.]+)";
+                            Match match = Regex.Match(query, pattern, RegexOptions.IgnoreCase);
+                            if (match.Success)
+                            {
+                                string tableName = match.Groups[1].Value;
+                                query = MRole.GetDefault(ctx).AddAccessSQL(query, tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                                badgeValue = Util.GetValueOfString(DB.ExecuteScalar(query));
+                            }
+                            else
+                            {
+                                badgeValue = "";
+                            }
+                        }
+                    }
+
                     DynamicWidget l = new DynamicWidget()
                     {
                         ControlType = Util.GetValueOfString(row[i]["Control_Type"]),
@@ -295,6 +322,9 @@ namespace VIS.Models
                         HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
                         OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
                         IsSameLine = Util.GetValueOfString(row[i]["IsSameLine"]),
+                        IsBadge = Util.GetValueOfString(row[i]["IsBadge"]),
+                        BadgeStyle = Util.GetValueOfString(row[i]["BadgeStyle"]),
+                        BadgeName = badgeValue,
                         ImageURL = imageURL
                     };
 
@@ -495,6 +525,9 @@ namespace VIS.Models
         public string IsSameLine { get; set; }
         public int SeqNo { get; set; }
         public string ImageURL { get; set; }
+        public string BadgeName { get; set; }
+        public string IsBadge { get; set; }
+        public string BadgeStyle { get; set; }
     }
     public class WidgetSizeID
     {

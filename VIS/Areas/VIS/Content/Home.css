@@ -3227,6 +3227,8 @@ p.vis-maintain-customer-p span {
         gap: 8px;
         padding: 0px 12px;
         overflow: hidden;
+        justify-content: center;
+        cursor: pointer;
     }
     .vis-add-row label, .vis-add-row a {
         display: flex;
@@ -3237,13 +3239,29 @@ p.vis-maintain-customer-p span {
         min-height: 42px;
         padding: 0px 5px;
         overflow: hidden;
+        justify-content: center;
     }
-        .vis-add-row label.default {
-            color: rgba(var(--v-c-on-secondary),1);
+
+    .vis-add-row a {
+        cursor: pointer;
+    }
+        .vis-add-row span {
+            display: flex;
+            float: left;
+            gap: 8px;
+            overflow: hidden;
+            min-height: 15px;
+            padding: 5px;
+            margin: 0 6px 6px;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
         }
+    .vis-add-row label.default {
+        color: rgba(var(--v-c-on-secondary),1);
+    } 
         .vis-add-row a.default {
             color: rgba(var(--v-c-primary), 1);
-            text-decoration: underline;
         }
     .vis-add-row button.default {
         box-shadow: 2px 2px 4px #ccc;
@@ -3260,6 +3278,10 @@ p.vis-maintain-customer-p span {
 
 .vis-widget-field {
     margin: 0px;
+}
+.vis-widget-badge {
+    background: #fff;
+    color: rgba(var(--v-c-on-secondary), 1);
 }
 
 /* new Changes */
