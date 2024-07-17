@@ -80,8 +80,8 @@
                 + '             <strong style="float: left;" id="sAlrtTxtType">' + VIS.Msg.getMsg("Notice") + '</strong>'
                 + '     <div id="countDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-w-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
                 + ' </div>'
-                + ' <div >'
-                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-w-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
+                + ' <div class="vis-w-iconsCls">'
+                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="Refresh" class="vis-w-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
                 + ' </div>'
                 + '         </h2>'
                 + '     </div>'
@@ -114,53 +114,7 @@
                             welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).append(parseInt(result.count));
                         }
                         for (var s in data) {
-                            if (data[s].CDate != null && data[s].CDate != "") {
-                                var cd_ = new Date(data[s].CDate);
-                                dbdate = Globalize.format(cd_, "F", Globalize.cultureSelector);
-                            }
-
-                            var divtitle_ = "";
-                            var title = VIS.Utility.encodeText(data[s].Title);
-                            title = noticeTimeConversion(title);
-                            data[s].Description = noticeTimeConversion(data[s].Description);
-                            var title_ = data[s].Description;
-                            if (title_.length <= 100) {
-                                divtitle_ = "<pre><strong class='vis-strongWhiteClrCls' data-vishomercrd='title' id='" + data[s].AD_Note_ID + "'>" + title + "</strong></pre>";
-                            }
-                            else {
-                                divtitle_ = "<pre>"
-                                    + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' >" + title + "...</strong>"
-                                        + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' style='display:none;'>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
-                                        + "<span id='snoticemore_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='more' class='vis-snoticemoreCls vis-clickCls'>" + VIS.Msg.getMsg("more") + "</span>"
-                                        + "<span id='snoticeless_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
-                                    + "</pre>";
-                            }
-
-                            str += "<div data-vishomercrd='view-recrd-cntainer' id='divrecdcntnr_" + data[s].AD_Note_ID + "' class='vis-w-activityContainer'>"
-                                + " <div class='vis-w-feedTitleBar'>";
-
-                            if (data[s].SpecialTable) {
-                                str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
-                            }
-                            else {
-                                str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
-                            }
-
-
-                            str += " <div class='vis-w-feedTitleBar-buttons'>"
-                                + "  <ul>";
-                            // Renaming of Approve highlight to Acknowledge under notification
-                            str += "<li data-vishomercrd='liapprove'><a href='javascript:void(0)' data-vishomercrd='approve'  id=" + data[s].AD_Note_ID + "  title='" + VIS.Msg.getMsg("Acknowledge") + "' class='vis vis-markx'></a></li>"
-                                + "<li data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].AD_Note_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "|" + data[s].Record_ID + " title='" + VIS.Msg.getMsg("View") + "' class='vis vis-find'></a></li>"
-                                + "</ul>"
-                                + "  </div>"
-                                + "</div>"
-                                + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-w-feedDetails vis-notClickCls'>"
-                                + divtitle_
-                                + " <p class='vis-w-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
-                                + " </div>"
-                                + " </div>"
-
+                            appendRecords(data, s);
                         }
                     }
                     else {
@@ -182,6 +136,58 @@
                 }
             });
         }
+
+        //Append Records
+        function appendRecords(data,s) {
+            if (data[s].CDate != null && data[s].CDate != "") {
+                var cd_ = new Date(data[s].CDate);
+                dbdate = Globalize.format(cd_, "F", Globalize.cultureSelector);
+            }
+
+            var divtitle_ = "";
+            var title = VIS.Utility.encodeText(data[s].Title);
+            title = noticeTimeConversion(title);
+            data[s].Description = noticeTimeConversion(data[s].Description);
+            var title_ = data[s].Description;
+            if (title_.length <= 100) {
+                divtitle_ = "<pre><strong class='vis-strongWhiteClrCls' data-vishomercrd='title' id='" + data[s].AD_Note_ID + "'>" + title + "</strong></pre>";
+            }
+            else {
+                divtitle_ = "<pre>"
+                    + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' >" + title + "...</strong>"
+                    + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' style='display:none;'>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
+                    + "<span id='snoticemore_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='more' class='vis-snoticemoreCls vis-clickCls'>" + VIS.Msg.getMsg("more") + "</span>"
+                    + "<span id='snoticeless_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
+                    + "</pre>";
+            }
+
+            str += "<div data-vishomercrd='view-recrd-cntainer' id='divrecdcntnr_" + data[s].AD_Note_ID + "' class='vis-w-activityContainer'>"
+                + " <div class='vis-w-feedTitleBar'>";
+
+            if (data[s].SpecialTable) {
+                str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
+            }
+            else {
+                str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
+            }
+
+
+            str += " <div class='vis-w-feedTitleBar-buttons'>"
+                + "  <ul>";
+            // Renaming of Approve highlight to Acknowledge under notification
+            str += "<li class='vis-w-zoomClrChngCls' data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].AD_Note_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "|" + data[s].Record_ID + " title='" + VIS.Msg.getMsg("View") + "' class='vis vis-find'></a></li>"
+                + "<li data-vishomercrd='liapprove'><a href='javascript:void(0)' data-vishomercrd='approve'  id=" + data[s].AD_Note_ID + "  title='" + VIS.Msg.getMsg("Acknowledge") + "' class='vis vis-markx'></a></li>"
+                + "</ul>"
+                + "  </div>"
+                + "</div>"
+                + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-w-feedDetails vis-notClickCls'>"
+                + divtitle_
+                + " <p class='vis-w-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
+                + " </div>"
+                + " </div>"
+
+        }
+
         /**
         * UTC Time conversion for Notice
         * @param {any} title
@@ -331,7 +337,7 @@
             }
         };
         //Refresh Widget
-        this.refreshWidget = function() {
+        this.refreshWidget = function () {
             welcomeTabDatacontainers.empty();
             pageNo = 1;
             loadHomeNotice(true);
@@ -377,7 +383,7 @@
             this.windowNo = windowNo;
             this.AD_UserHomeWidgetID = windowNo;
         }
-        
+
         window.setTimeout(function (t) {
             t.Initalize();
         }, 10, this);

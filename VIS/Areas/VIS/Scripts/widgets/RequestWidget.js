@@ -89,7 +89,7 @@
                 + '          <strong class="vis-RequestStrongCls" id="sAlrtTxtType">' + VIS.Msg.getMsg("Requests") + '</strong>'
                 + ' <div id="reqCountDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Requests") + '" class="vis-w-welcomeScreenTab-notificationBubble blank"></div>'
                 + ' </div>'
-                + ' <div >'
+                + ' <div class="vis-w-iconsCls">'
                 + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-w-feedicon vis-RequestHlnkTabDataRefReq"><i class="vis vis-refresh"></i></a> '
                 + '          <span id="sNewNts' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis-RequestNewNtsCls" title="New Record"><i class="vis vis-plus"></i></span> '
                 + ' </div>'
@@ -125,74 +125,81 @@
                     if (data.length > 0) {
 
                         for (var s in data) {
-                            var StartDate = "";
-                            if (data[s].StartDate != null || data[s].StartDate != "") {
-                                var cd = new Date(data[s].StartDate);
-                                StartDate = Globalize.format(cd, "d", Globalize.cultureSelector);
-                            }
-                            var NextActionDate = "";
-                            if (data[s].NextActionDate != null) {
-                                var cd = new Date(data[s].NextActionDate);
-                                NextActionDate = Globalize.format(cd, "d", Globalize.cultureSelector);
-                            }
-                            else {
-                                NextActionDate = "&nbsp;-----------";
-                            }
-                            var CreatedDate = "";
-                            if (data[s].CreatedDate != null || data[s].CreatedDate != "") {
-                                var cd = new Date(data[s].CreatedDate);
-                                CreatedDate = Globalize.format(cd, "F", Globalize.cultureSelector);
-                            }
-
-                            var summary = data[s].Summary;
-                            if (summary.length > 80) {
-                                summary = summary.substr(0, 80) + "..."
-                            }
-                            var casetype = data[s].CaseType;
-                            if (casetype.length > 30) {
-                                casetype = casetype.substr(0, 30) + "..."
-                            }
-
-                            str += "<div class='vis-w-activityContainer'>"
-                                + "<div class='vis-w-feedTitleBar'>"
-                                + "<h3>#" + data[s].DocumentNo + "</h3>";
-                            if (data[s].Name && data[s].Name.length > 0) {
-                                str += "<li class='vis-home-request-BP'>" + data[s].Name + "</li>"
-                            }
-
-                            str += "<div class='vis-w-feedTitleBar-buttons'>"
-                                + "<ul>"
-                                + "<li data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].R_Request_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "  title='" + VIS.Msg.getMsg("View") + "'  class='vis vis-find'></a></li>"
-                                + "</ul>"
-                                + "</div>"
-                                + "</div>"
-
-                                + "<div  class='vis-w-feedDetails vis-pt-0 vis-pl-0'>"
-                                + "<div class='vis-table-request'>"
-                                + "<ul>"
-                                + "<li><span>" + VIS.Msg.getMsg('Priority') + ":</span><br>" + data[s].Priority + "</li>"
-                                + "<li><span>" + VIS.Msg.getMsg('Status') + ":</span><br>" + data[s].Status + "</li>"
-                                + "<li><span>" + VIS.Msg.getMsg('NextActionDate') + ":</span><br>" + NextActionDate + "</li>"
-                                + "</ul>"
-                                + "</div>"
-                                + "<p class='vis-maintain-customer-p'>"
-                                + "<strong>" + VIS.Utility.encodeText(casetype) + " </strong><br />"
-                                + "<span>" + VIS.Msg.getMsg('Message') + ":</span><br>" + VIS.Utility.encodeText(summary) + "</p>"
-                                + "<p class='vis-w-feedDateTime vis-secondary-clr'  style=' width: 95%; margin-right: 10px;'>" + CreatedDate + "</p>"
-                                + "</div>"
-                                + "</div>"
+                            appendRecords(data, s);
                         }
-
                     }
                     else {
                         if (welcomeTabDatacontainers.find(".vis-table-request").length == 0) {
                             str = "<p style=' margin-top:200px;text-align: center'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
+                            welcomeTabDatacontainers.append(str);
                         }
                     }
-                    welcomeTabDatacontainers.append(str);
+                    
                 }
             });
         }
+
+        //Append Records
+        function appendRecords(data,s) {
+            var StartDate = "";
+            if (data[s].StartDate != null || data[s].StartDate != "") {
+                var cd = new Date(data[s].StartDate);
+                StartDate = Globalize.format(cd, "d", Globalize.cultureSelector);
+            }
+            var NextActionDate = "";
+            if (data[s].NextActionDate != null) {
+                var cd = new Date(data[s].NextActionDate);
+                NextActionDate = Globalize.format(cd, "d", Globalize.cultureSelector);
+            }
+            else {
+                NextActionDate = "&nbsp;-----------";
+            }
+            var CreatedDate = "";
+            if (data[s].CreatedDate != null || data[s].CreatedDate != "") {
+                var cd = new Date(data[s].CreatedDate);
+                CreatedDate = Globalize.format(cd, "F", Globalize.cultureSelector);
+            }
+
+            var summary = data[s].Summary;
+            if (summary.length > 80) {
+                summary = summary.substr(0, 80) + "..."
+            }
+            var casetype = data[s].CaseType;
+            if (casetype.length > 30) {
+                casetype = casetype.substr(0, 30) + "..."
+            }
+
+            str += "<div class='vis-w-activityContainer'>"
+                + "<div class='vis-w-feedTitleBar'>"
+                + "<h3>#" + data[s].DocumentNo + "</h3>";
+            if (data[s].Name && data[s].Name.length > 0) {
+                str += "<li class='vis-home-request-BP'>" + data[s].Name + "</li>"
+            }
+
+            str += "<div class='vis-w-feedTitleBar-buttons'>"
+                + "<ul>"
+                + "<li class='vis-w-zoomClrChngCls' data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].R_Request_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "  title='" + VIS.Msg.getMsg("View") + "'  class='vis vis-find'></a></li>"
+                + "</ul>"
+                + "</div>"
+                + "</div>"
+
+                + "<div  class='vis-w-feedDetails vis-pt-0 vis-pl-0'>"
+                + "<div class='vis-table-request'>"
+                + "<ul>"
+                + "<li><span>" + VIS.Msg.getMsg('Priority') + ":</span><br>" + data[s].Priority + "</li>"
+                + "<li><span>" + VIS.Msg.getMsg('Status') + ":</span><br>" + data[s].Status + "</li>"
+                + "<li><span>" + VIS.Msg.getMsg('NextActionDate') + ":</span><br>" + NextActionDate + "</li>"
+                + "</ul>"
+                + "</div>"
+                + "<p class='vis-maintain-customer-p'>"
+                + "<strong>" + VIS.Utility.encodeText(casetype) + " </strong><br />"
+                + "<span>" + VIS.Msg.getMsg('Message') + ":</span><br>" + VIS.Utility.encodeText(summary) + "</p>"
+                + "<p class='vis-w-feedDateTime vis-secondary-clr'  style=' width: 95%; margin-right: 10px;'>" + CreatedDate + "</p>"
+                + "</div>"
+                + "</div>"
+            welcomeTabDatacontainers.append(str);
+        };
+
         //Zoom 
         function zoomFunction(evnt) {
             var datarcrd = $(evnt.target).data("vishomercrd");
