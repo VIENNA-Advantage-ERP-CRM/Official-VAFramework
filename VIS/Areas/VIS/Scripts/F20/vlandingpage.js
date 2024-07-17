@@ -8,6 +8,8 @@
         this.apanel = apanel;
         var windowID = apanel.curTab.getAD_Window_ID();
         var $root = $('<div class="vis-ad-w-p-landing">');
+        var busy = $('<div class="vis-ad-w-p-busy"><i style="text-align:center" class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>');
+        $root.append(busy);
         var $spnTitle = "";
         var $widgetBody = "";
         var $btnClose = "";
@@ -89,6 +91,7 @@
             $root.find('.vis-widget-header h4').text(VIS.Msg.getMsg("visWidgets"));
             $root.find('.vis-landingpageEdit u').text(VIS.Msg.getMsg("VIS_Edit"));
             $spnTitle = $root.find('.vis-ad-w-p-t-name h5');
+            $busy = $root.find('.vis-ad-w-p-busy');
             $widgetBody = $root.find('.vis-landingpage-body');
           
             $btnClose = $root.find('.vis-ad-w-p-t-close');
@@ -106,6 +109,8 @@
 
             $container.append(openRightPanel);
             $root.find('.vis-home-leftPanel').append($container);
+            busy.hide();
+
             loadWidgets();
         }
         /**
