@@ -1287,7 +1287,15 @@
 
         //Overwrite setting according to actionParam
         this.actionParams = aParams;
-        
+
+        if (this.vHeaderPanel) {
+            this.vHeaderPanel.setImgReadonly(false);
+        }
+        else if (this.aPanel.vHeaderPanel) {
+            this.aPanel.vHeaderPanel.setImgReadonly(true);
+        }
+
+
         if (aParams) {
             if (aParams.IsHideHeaderPanel != null) {
                 if (aParams.IsHideHeaderPanel) {

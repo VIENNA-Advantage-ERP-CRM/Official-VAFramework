@@ -14,7 +14,10 @@
         <div class="vis-home-rightPanel">
             <div class="vis-widget-header">
                 <h4 class="">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "visWidgets") </h4>
-                <span class="vis vis-cross" id="btnCloseWidget"></span>                
+               <div class="d-flex">
+                <span class="vis vis vis-refresh mr-1" id="btnRefreshWidget"></span>
+                <span class="vis vis-cross" id="btnCloseWidget"></span>
+                   </div>
             </div>
             <div class="vis-widget-body">
                 <div class="vis-widgetDrag-container">
@@ -26,5 +29,5 @@
         </div>
     </div>
 </div>
-<div class="vis-apanel-busy" id="divfeedbsy" style="width: 98%; height: 98%; text-align: center; position: relative; visibility: hidden; z-index: 6;"></div>
+<div class="vis-apanel-busy" id="divfeedbsy" style="width: 98%; height: 98%; text-align: center; position: relative; display: none; z-index: 6;"></div>
 

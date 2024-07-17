@@ -14,7 +14,61 @@
         var originalPosition; // Store the original position of a draggable element
         var isEditMode = false; // Flag to indicate whether the widget is in edit mode
         var isChanged = false;
+        var $ulPopup = null;
         // Function to initialize the home widget
+
+        //function hideShowIcon() {
+        //    if (isEditMode) {
+        //        $home.find('.vis-widgetDelete svg').hide();
+        //        $home.find('.vis-widgetDelete i').show();
+        //    } else {
+        //        $home.find('.vis-widgetDelete i').hide();
+        //        $home.find('.vis-widgetDelete svg').show();
+        //    }
+        //}
+
+        function deleteWidget(ui) {
+            isChanged = true;
+            if (ui.data('wid') && ui.data('wid').toString().indexOf('temp_') == -1) {
+                var obj = {
+                    id: ui.data('wid')
+                };
+                VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Home/DeleteWidgetFromHome", obj, function (result) {
+
+                });
+            }
+
+            $home.find('.vis-widget-item[data-wid="' + ui.data('wid') + '"]').slideUp(function () {
+                $(this).remove();
+                if (homeItems && homeItems[ui.data('wid')]) {
+                    homeItems[ui.data('wid')].wform.dispose();
+                    delete homeItems[ui.data('wid')];
+                }
+            });
+
+
+        }
+
+        function getPopupList() {
+            var ullst = $("<ul class='vis-apanel-rb-ul'>");
+            ullst.append($('<li data-action="R"><i data-action="R" class="fa fa-refresh"></i></li>'));
+            return ullst;
+        };
+
+        $ulPopup = getPopupList();
+
+        if ($ulPopup) {
+            $ulPopup.on("click", "LI", function (e) {
+                var action = $(e.target).data("action");
+                var ui = $(e.target).closest('ul');
+                if (action == 'D') {    
+                    deleteWidget(ui);
+                }
+                else if (action == 'R') {
+                    homeItems[ui.data('wid')].wform.widgetRefresh();
+                }
+            });
+        }
 
         function setAdditionalInfo(id, info) {
             if (homeItems[id]) {
@@ -94,7 +148,7 @@
                     $home.find('.vis-home-leftPanel').sortable("enable");
                     isEditMode = true;
                     $container.addClass('vis-editModeWidget');                   
-                    $home.find('.vis-widgetDelete').show();
+                    //hideShowIcon();
                     $('#vis_editHome').hide();
                     /*$leftPanel.find('.vis-trash-area').show();*/
                     setTimeout(function () {
@@ -115,39 +169,37 @@
 
                     $container.removeClass('vis-editModeWidget');                   
                     $rightPanel.hide('slide', { direction: 'left' }, 300);
-                    $home.find('.vis-home-leftPanel').sortable("disable");
-                    $home.find('.vis-widgetDelete').hide();
+                    $home.find('.vis-home-leftPanel').sortable("disable");                    
                     $('#vis_editHome').show();
 
                     isEditMode = false;
-                    
+                    //hideShowIcon();
                     saveDashboard();
                     setTimeout(function () {
                         resizeWidgetContainer();
                     }, 300);
                 });
 
+                $home.find('#btnRefreshWidget').click(function () {
+                    loadWidgets();
+                });
+
                 // Event handler for deleting a widget
                 $leftPanel.on('click', '.vis-widgetDelete', function (e) {
-                    var ui = $(this).closest('.vis-widget-item');
-                    isChanged = true;
-                    if (ui.data('wid') && ui.data('wid').toString().indexOf('temp_') ==-1) {
-                        var obj = {
-                            id: ui.data('wid')
-                        };
-                        VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Home/DeleteWidgetFromHome", obj, function (result) {
+                    e.stopPropagation();
+                    if (!isEditMode) {
+                        var ulPopup = $ulPopup.clone(true);
+                        var ui = $(this).closest('.vis-widget-item');
+                        if (ui.data('type') == "L") {
+                            ulPopup.find('li:first').remove();
+                        }
 
-                        });
+                        ulPopup.attr('data-wid', ui.data('wid'));
+                        $(this).w2overlay(ulPopup, { html: ulPopup, left: -5, top: -9 });
+                    } else {
+                        var ui = $(this).closest('.vis-widget-item');
+                        deleteWidget(ui);                                         
                     }
-
-                    if (homeItems && homeItems[ui.data('wid')]) {
-                        homeItems[ui.data('wid')].wform.dispose();
-                        delete homeItems[ui.data('wid')];
-                    }
-
-                    ui.slideUp(function () {
-                        $(this).remove();
-                    });
                 });
 
                 $leftPanel.on('click', '.vis-linksWidget', function () {
@@ -342,13 +394,10 @@
                     VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type);               
                 }
 
+
+                var trash = $('<div class="vis-widgetDelete"><i class="fa fa-trash-o"></i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(90 8 8)" d="M5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2z"></path></svg></div>');
                 
-                var trash = $('<i class="fa fa-trash-o vis-widgetDelete" aria-hidden="true" ></i>');
-                if (isEditMode) {
-                    trash.show();
-                } else {
-                    trash.hide();
-                }
+                //hideShowIcon();
 
                 $item.append(trash);
                 $container.append($item);
@@ -359,11 +408,13 @@
 
             // Function to load widgets
             function loadWidgets() {
-                $container.append(openRightPanel);
-                $home.find('.vis-home-leftPanel').append($container);
+                //$container.append(openRightPanel);
+                //$home.find('.vis-home-leftPanel').append($container);
                 $home.find('.vis-widget-body').empty();
+                $home.find('#divfeedbsy').show();
                 var url = VIS.Application.contextUrl + "Home/GetWidgets";
                 VIS.dataContext.getJSONData(url, { windowID: 0 }, function (result) {
+                    $home.find('#divfeedbsy').hide();
                     if (!result) {
                         return;
                     }
@@ -420,14 +471,20 @@
 
                         $home.find('.vis-widgetDrag-container:last').append(witem);
                     }
-
+                   
                     dragDrop();
                     loadHomeWidgets();
+                   
+                   
                 });
             }
 
+
+
             function loadHomeWidgets() {
+                $home.find('.vis-widget-container .vis-widget-item').remove();
                 var url = VIS.Application.contextUrl + "Home/GetUserWidgets";
+                $home.find('#divfeedbsy').show();
                 VIS.dataContext.getJSONData(url, { windowID: 0 }, function (result) {
                     if (result && result.length > 0) {
                         $home.find('.vis-add-widgetContainer').hide();
@@ -469,6 +526,8 @@
 
                         dragDrop();
                     }
+
+                    $home.find('#divfeedbsy').hide();
                 });
             }
 
@@ -502,6 +561,8 @@
             // Load the home widget content and initialize it
             $home.load(VIS.Application.contextUrl + 'Home/HomeNew', function () {
                 adjustWidgetDivSize();
+                $container.append(openRightPanel);
+                $home.find('.vis-home-leftPanel').append($container);
                 loadWidgets();
                 events();
                 $(window).resize(adjustWidgetDivSize);              
