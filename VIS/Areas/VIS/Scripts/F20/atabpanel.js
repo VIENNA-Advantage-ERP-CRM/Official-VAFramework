@@ -252,13 +252,17 @@
                     iconPath = panels[i].getIconPath();
                 }
                 else {
-                    iconPath = 'fa fa-object-group';// 'VIS/Images/base/defPanel.ico';// "fa fa-window-maximize";//'VIS/Images/base/defPanel.ico';
+                    iconPath = '';// fa fa-object-group';// 'VIS/Images/base/defPanel.ico';// "fa fa-window-maximize";//'VIS/Images/base/defPanel.ico';
                 }
                 var panel = this.initalizeTabPanel(panels[i].getClassName(), this.windowNo, panels[i].getExtraInfo(), panels[i]);
                 if (panel) {
                     var contectDiv = this.getContentDiv();
-                    var html = "<div class='vis-ad-w-p-ap-tp-body-head'><span class='vis-ad-w-p-ap-tp-body-head-img'><i class='"
-                        + iconPath + "'></i></span><span class='vis-ad-w-p-ap-tp-body-head-txt'> "
+                    var html = "<div class='vis-ad-w-p-ap-tp-body-head'>";
+                    if (iconPath != '') {
+                        html += "<span class='vis-ad-w-p-ap-tp-body-head-img'>" +
+                            "<i class='" + iconPath + "'></i></span>";
+                    }
+                     html+="<span class='vis-ad-w-p-ap-tp-body-head-txt'> "
                         + panels[i].getName()
                         + "</span></div>";
                     contectDiv.append(html).append(panel.getRoot());

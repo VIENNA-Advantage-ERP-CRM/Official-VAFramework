@@ -3677,6 +3677,12 @@
                 this.value = null;
             }
 
+            if (this.lastDisplay.startsWith("<") && this.lastDisplay.endsWith(">")
+                && newValue > 0 && this.mField.getIsInserting()) {
+                newValue = -1;
+                this.lastDisplay = "";
+            }
+
             this.value = newValue;
 
             var ctrlval = VIS.Utility.Util.getIdentifierDisplayVal(this.lastDisplay);
