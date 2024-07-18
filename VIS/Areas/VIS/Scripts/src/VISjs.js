@@ -105,3 +105,4 @@ import "../home/usersession.js"
 import "../widgets/WorkflowWidget";
 import "../widgets/NoticeWidget";
 import "../widgets/RequestWidget";
+import "../widgets/ActionsWidget";

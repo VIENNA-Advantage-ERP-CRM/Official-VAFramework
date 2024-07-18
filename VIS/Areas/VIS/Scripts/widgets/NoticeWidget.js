@@ -36,12 +36,10 @@
         this.Initalize = function () {
             createWidget();
             createBusyIndicator();
-            ShowBusy(true);
-            window.setTimeout(function () {
-                loadHomeNotice(true);
-                events();
-                ShowBusy(false);
-            }, 500);
+            showBusy(true);
+            loadHomeNotice(true);
+            events();
+            showBusy(false);
         };
         /* Declare events */
         function events() {
@@ -54,14 +52,13 @@
         };
 
         /*Create Busy Indicator */
-        function createBusyIndicator() {
-            //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+        function createBusyIndicator() {           
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
-        function ShowBusy(show) {
+        function showBusy(show) {
             if (show) {
                 $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
             }
@@ -98,6 +95,7 @@
         };
         //Load Data
         function loadHomeNotice(isTabAjaxBusy) {
+            showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeNotice',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabAjaxBusy },
@@ -135,10 +133,11 @@
                     welcomeTabDatacontainers.append(str);
                 }
             });
+            showBusy(false);
         }
 
         //Append Records
-        function appendRecords(data,s) {
+        function appendRecords(data, s) {
             if (data[s].CDate != null && data[s].CDate != "") {
                 var cd_ = new Date(data[s].CDate);
                 dbdate = Globalize.format(cd_, "F", Globalize.cultureSelector);
@@ -215,8 +214,7 @@
             scrollWF = true;
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.80) && scrollWF) {//Condition true when 75 scroll is done
-                ShowBusy(true);
-                // window.setTimeout(function () {
+                showBusy(true);
                 scrollWF = false;
                 var tabdataLastPage = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html());
                 var tabdatacntpage = pageNo * pageSize;
@@ -227,8 +225,7 @@
                 else {
                     scrollWF = true;
                 }
-                ShowBusy(false);
-                // }, 200);
+                showBusy(false);
             }
         };
         //Actions
@@ -346,6 +343,7 @@
 
         //Approve
         function approveNotice(Ad_Note_ID, isAcknowldge) {
+            showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/ApproveNotice',
                 data: { "Ad_Note_ID": Ad_Note_ID, "isAcknowldge": isAcknowldge },
@@ -356,9 +354,9 @@
                     $root.find("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 700, "", function () {
                         $root.find("#divrecdcntnr_" + Ad_Note_ID).remove();
                     });
-
                 }
             });
+            showBusy(false);
         }
         /* get design from root*/
         this.getRoot = function () {
@@ -375,15 +373,8 @@
     /* init method called on loading a form . */
     VIS.NoticeWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        if (windowNo == -99999) {
-            this.windowNo = VIS.Env.getWindowNo();
             this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
-        }
-        else {
             this.windowNo = windowNo;
-            this.AD_UserHomeWidgetID = windowNo;
-        }
-
         window.setTimeout(function (t) {
             t.Initalize();
         }, 10, this);

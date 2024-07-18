@@ -918,12 +918,12 @@ namespace VIS.Controllers
         /// <param name="pagesize"></param>
         /// <param name="page"></param>
         /// <param name="isTabDataRef"></param>
-        /// <returns></returns>
+        /// <returns>Json</returns>
         #region Get Widgets Count
         //Get Widgets Count
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
-        public JsonResult GetWidgetsCnt()
+        public JsonResult GetWidgetsCount()
         {
             HomeModels count = new HomeModels();
             string error = "";
@@ -931,7 +931,7 @@ namespace VIS.Controllers
             {
                 objHomeHelp = new HomeHelper();
                 Ctx ct = Session["ctx"] as Ctx;
-                count = objHomeHelp.getWidgetsCnt(ct);
+                count = objHomeHelp.getWidgetsCount(ct);
             }
             else
             {

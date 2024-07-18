@@ -39,12 +39,10 @@
         this.Initalize = function () {
             createWidget();
             createBusyIndicator();
-            ShowBusy(true);
-            window.setTimeout(function () {
-                loadHomeRequest(true);
-                events();
-                ShowBusy(false);
-            }, 500);
+            showBusy(true);
+            loadHomeRequest(true);
+            events();
+            showBusy(false);
         };
         /* Declare events */
         function events() {
@@ -63,14 +61,13 @@
         };
 
         /*Create Busy Indicator */
-        function createBusyIndicator() {
-            //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+        function createBusyIndicator() {            
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
-        function ShowBusy(show) {
+        function showBusy(show) {
             if (show) {
                 $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
             }
@@ -108,6 +105,7 @@
         };
         /* Start Request */
         function loadHomeRequest(isTabDataRef) {
+            showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeRequest',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabDataRef },
@@ -132,15 +130,16 @@
                         if (welcomeTabDatacontainers.find(".vis-table-request").length == 0) {
                             str = "<p style=' margin-top:200px;text-align: center'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
                             welcomeTabDatacontainers.append(str);
+                            showBusy(false);
                         }
                     }
-                    
+                    showBusy(false);
                 }
             });
         }
 
         //Append Records
-        function appendRecords(data,s) {
+        function appendRecords(data, s) {
             var StartDate = "";
             if (data[s].StartDate != null || data[s].StartDate != "") {
                 var cd = new Date(data[s].StartDate);
@@ -281,20 +280,17 @@
         function loadOnScroll(e) {
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
-                ShowBusy(true);
-                window.setTimeout(function () {
-                    //scrollWF = false;
-                    var tabdataLastPage = parseInt($root.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).html());
-                    var tabdatacntpage = pageNo * pageSize;
-                    if (tabdatacntpage <= tabdataLastPage) {
-                        pageNo += 1;
-                        loadHomeRequest(false);
-                    }
-                    else {
-                        // scrollWF = true;
-                    }
-                    ShowBusy(false);
-                }, 200);
+                showBusy(true);
+                //scrollWF = false;
+                var tabdataLastPage = parseInt($root.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).html());
+                var tabdatacntpage = pageNo * pageSize;
+                if (tabdatacntpage <= tabdataLastPage) {
+                    pageNo += 1;
+                    loadHomeRequest(false);
+                }
+                else {
+                }
+                showBusy(false);
             }
         };
         //Refresh Widget function
@@ -317,15 +313,8 @@
     /* init method called on loading a form . */
     VIS.RequestWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        if (windowNo == -99999) {
-            this.windowNo = VIS.Env.getWindowNo();
-            this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
-        }
-        else {
-            this.windowNo = windowNo;
-            this.AD_UserHomeWidgetID = windowNo;
-        }
-       
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
+        this.windowNo = windowNo;
         window.setTimeout(function (t) {
             t.Initalize();
         }, 10, this);

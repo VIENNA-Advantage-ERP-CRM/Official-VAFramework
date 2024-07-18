@@ -70,14 +70,12 @@
         this.Initalize = function () {
             createWidget();
             createBusyIndicator();
-            ShowBusy(true);
-            window.setTimeout(function () {
-                getworkflowWidget(true);
-                getControls();
-                loadWindows();
-                events();
-                ShowBusy(false);
-            }, 500);
+            showBusy(true);
+            getworkflowWidget(true);
+            getControls();
+            loadWindows();
+            events();
+            showBusy(false);
         };
         /* Get controls from root */
         function getControls() {
@@ -93,14 +91,12 @@
         /* Declare events */
         function events() {
             $flipCard_ID.on('click', function (e) {
-                ShowBusy(true);
+                showBusy(true);
                 $welcomeScreenFeedsLists.css('display', 'none');
                 $row.css('display', 'none');
-                window.setTimeout(function () {
-                    getChld(e);
-                    $workflowActivitys.css('display', 'block').css('zindex', '2');
-                    ShowBusy(false);
-                }, 500);
+                getChld(e);
+                $workflowActivitys.css('display', 'block').css('zindex', '2');
+                showBusy(false);
             });
             $backBtn_ID.on('click', function () {
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
@@ -142,61 +138,56 @@
                 }
             });
             $btnSearch.on('click', function () {
-                ShowBusy(true);
-                window.setTimeout(function () {
-                    $countDiv_ID.empty();
-                    $workflowWidgetDtls_ID.empty();
-                    pageNo = 1;
-                    getworkflowWidget(true);
-                    //loadWindows();
-                    $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                        $welcomeScreenFeedsLists.css('display', 'none');
-                        $row.css('display', 'none');
-                        $workflowActivitys.css('display', 'block').css('zindex', '2');
-                    });
-                    $backBtn_ID.on('click', function () {
-                        $workflowActivitys.css('display', 'none').css('zindex', '2');
-                        $welcomeScreenFeedsLists.css('display', 'block');
-                        $row.css('display', 'block');
-                    });
-                    search = false;
-                    //searchRecord();
-                    ShowBusy(false);
-                }, 500);
+                showBusy(true);
+                $countDiv_ID.empty();
+                $workflowWidgetDtls_ID.empty();
+                pageNo = 1;
+                getworkflowWidget(true);
+                //loadWindows();
+                $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+                    $welcomeScreenFeedsLists.css('display', 'none');
+                    $row.css('display', 'none');
+                    $workflowActivitys.css('display', 'block').css('zindex', '2');
+                });
+                $backBtn_ID.on('click', function () {
+                    $workflowActivitys.css('display', 'none').css('zindex', '2');
+                    $welcomeScreenFeedsLists.css('display', 'block');
+                    $row.css('display', 'block');
+                });
+                search = false;
+                //searchRecord();
+                showBusy(false);
             });
             $cmbWindows.on('change', function (e) {
-                ShowBusy(true);
-                window.setTimeout(function () {
-                    $countDiv_ID.empty();
-                    $workflowWidgetDtls_ID.empty();
-                    pageNo = 1;
-                    getworkflowWidget(true);
-                    //loadWindows();
-                    $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                        $welcomeScreenFeedsLists.css('display', 'none');
-                        $row.css('display', 'none');
-                        $workflowActivitys.css('display', 'block').css('zindex', '2');
-                    });
-                    $backBtn_ID.on('click', function () {
-                        $workflowActivitys.css('display', 'none').css('zindex', '2');
-                        $welcomeScreenFeedsLists.css('display', 'block');
-                        $row.css('display', 'block');
-                    });
-                    ShowBusy(false);
-                }, 500);
+                showBusy(true);
+                $countDiv_ID.empty();
+                $workflowWidgetDtls_ID.empty();
+                pageNo = 1;
+                getworkflowWidget(true);
+                //loadWindows();
+                $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+                    $welcomeScreenFeedsLists.css('display', 'none');
+                    $row.css('display', 'none');
+                    $workflowActivitys.css('display', 'block').css('zindex', '2');
+                });
+                $backBtn_ID.on('click', function () {
+                    $workflowActivitys.css('display', 'none').css('zindex', '2');
+                    $welcomeScreenFeedsLists.css('display', 'block');
+                    $row.css('display', 'block');
+                });
+                showBusy(false);
             });
             $workflowWidgetDtls_ID.on("scroll", loadOnScroll);
         };
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
-        function ShowBusy(show) {
+        function showBusy(show) {
             if (show) {
                 $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
             }
@@ -259,6 +250,7 @@
         };
         //Get Widget 1st page data
         function getworkflowWidget(refresh) {
+            showBusy(true);
             if ($cmbWindows.val() != null && $cmbWindows.val() != "") {
                 windowID = $cmbWindows.val().split('_')[0];
                 nodeID = $cmbWindows.val().split('_')[1];
@@ -292,7 +284,7 @@
                 dataType: "json",
                 type: "POST",
                 error: function () {
-                    ShowBusy(false);
+                    showBusy(false);
                 },
                 success: function (dyndata) {
                     var reslt = JSON.parse(dyndata.result);
@@ -302,7 +294,7 @@
                         maxCount = (data.length - 1);
                         $countDiv_ID.append(reslt.count);
                         for (var item in data) {
-                            appendRecords(data, item);                            
+                            appendRecords(data, item);
                         }
                     }
                     else {
@@ -311,9 +303,9 @@
                     }
                 }
             });
-            //ShowBusy(false);
+            showBusy(false);
         };
-        
+
         //Append Records
         function appendRecords(data, item) {
             fulldata.push(data[item]);
@@ -352,12 +344,14 @@
 
         //Get Windows name
         function loadWindows() {
+            showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "WFActivity/GetWorkflowWindows",
                 dataType: "json",
                 async: true,
                 type: "POST",
                 error: function () {
+                    showBusy(false);
                     return;
                 },
                 success: function (result) {
@@ -376,31 +370,31 @@
                     }
                 }
             });
+            showBusy(false);
         };
         //Get more data on Scroll 
         function loadOnScroll(e) {
             scrollWF = true;
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
-                ShowBusy(true);
-                window.setTimeout(function () {
-                    scrollWF = false;
-                    var tabdataLastPage = parseInt($countDiv_ID.html());
-                    var tabdatacntpage = pageNo * PageSize;
-                    if (tabdatacntpage <= tabdataLastPage) {
-                        pageNo += 1;
-                        appendRecord(pageNo, PageSize);
-                    }
-                    else {
-                        refresh = true;
-                        scrollWF = true;
-                    }
-                    ShowBusy(false);
-                }, 500);
+                showBusy(true);
+                scrollWF = false;
+                var tabdataLastPage = parseInt($countDiv_ID.html());
+                var tabdatacntpage = pageNo * PageSize;
+                if (tabdatacntpage <= tabdataLastPage) {
+                    pageNo += 1;
+                    appendRecord(pageNo, PageSize);
+                }
+                else {
+                    refresh = true;
+                    scrollWF = true;
+                }
+                showBusy(false);
             }
         };
         //Get more data on Scroll
         function appendRecord(pageNo, paeSize, refresh) {
+            showBusy(true);
             if (!refresh) {
                 refresh = false;
             }
@@ -440,7 +434,7 @@
                 type: "POST",
                 error: function () {
                     refresh = true;
-                    ShowBusy(false);
+                    showBusy(false);
                 },
                 success: function (dyndata) {
                     var reslt = JSON.parse(dyndata.result);
@@ -487,9 +481,11 @@
                     }
                 }
             });
+            showBusy(false);
         };
         //Get Cheild Records
         function getChld(e) {
+            showBusy(true);
             //var id = $workflowWidget.find('.vis-activityContainer').attr('data-id');
             if (e.target.hasAttribute("data-ids")) {
                 let ids = e.target.getAttribute('data-ids');
@@ -508,7 +504,7 @@
                         wfProcessID: fulldata[index].AD_WF_Process_ID
                     },
                     error: function () {
-                        ShowBusy(false);
+                        showBusy(false);
                         return;
                     },
                     success: function (res) {
@@ -516,9 +512,11 @@
                     }
                 });
             }
+            showBusy(false);
         };
         //Create Child Record design 
         function loadDetail(wfActivityID, index, info) {
+            showBusy(true);
             var detailCtrl = {};
             lstDetailCtrls = [];
             detailCtrl.Index = index;
@@ -966,6 +964,7 @@
                 $welcomeScreenFeedsLists.css('display', 'block');
                 $row.css('display', 'block');
             });
+            showBusy(false);
         };
         //Create Controls based on data
         function getControl(info, wfActivityID) {
@@ -1049,9 +1048,7 @@
                         lstDetailCtrls = [];
                         selectedItems = [];
 
-                        window.setTimeout(function () {
-                            loadWindows(true);
-                        }, 5000);
+                        loadWindows(true);
                     }
                     else {
                         aOk.data('clicked', 'N');
@@ -1075,97 +1072,90 @@
         var approveIt = function (index, aOK) {
             var aOK = aOK;
             $("#divfeedbsy")[0].style.visibility = "visible";
-            window.setTimeout(function () {
-                for (var item in lstDetailCtrls) {
-                    try {
-                        if (index === parseInt(lstDetailCtrls[item].Index)) {
-                            var fwdTo = lstDetailCtrls[item].FwdCtrl.getValue();
-                            var msg = VIS.Utility.encodeText(lstDetailCtrls[item].MsgCtrl.val());
-                            var answer = null;
-                            if (lstDetailCtrls[item].Action == 'C') {
-                                var answer = lstDetailCtrls[item].AnswerCtrl.getValue();
+            for (var item in lstDetailCtrls) {
+                try {
+                    if (index === parseInt(lstDetailCtrls[item].Index)) {
+                        var fwdTo = lstDetailCtrls[item].FwdCtrl.getValue();
+                        var msg = VIS.Utility.encodeText(lstDetailCtrls[item].MsgCtrl.val());
+                        var answer = null;
+                        if (lstDetailCtrls[item].Action == 'C') {
+                            var answer = lstDetailCtrls[item].AnswerCtrl.getValue();
 
-                            }
-                            var activitIDs = "";
-                            // if checkbox is selected, then join activity ID using comma splitter.
-                            if (selectedItems && selectedItems.length > 0) {
-                                for (var k = 0; k < selectedItems.length; k++) {
-                                    if (activitIDs.length > 0) {
-                                        activitIDs += ",";
-                                    }
-                                    activitIDs += selectedItems[k].split("_")[2];
-                                }
-                            }
-                            else {
-                                activitIDs = fulldata[index].AD_WF_Activity_ID;
-                            }
-
-                            // set window ID of activity
-                            windowID = fulldata[index].AD_Window_ID;
-                            ShowBusy(true);
-                            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "WFActivity/ApproveIt",
-                                { "activityID": activitIDs, "nodeID": fulldata[index].AD_Node_ID, "txtMsg": msg, "fwd": fwdTo, "answer": answer, "AD_Window_ID": windowID }, function apprvoIt(info) {
-                                    ShowBusy(false);
-                                    if (info.result == '') {
-                                        $("#divfeedbsy")[0].style.visibility = "hidden";
-                                        aOK.data('clicked', 'N');
-                                        divScroll.empty();
-                                        adjust_size();
-                                        lstDetailCtrls = [];
-                                        selectedItems = [];
-                                        loadWindows(true);
-                                    }
-                                    else {
-                                        VIS.ADialog.error(info.result);
-                                        aOK.data('clicked', 'N');
-                                        $("#divfeedbsy")[0].style.visibility = "hidden";
-                                    }
-                                });
-                            break;
                         }
-                    }
-                    catch (e) {
-                        setBusy(false);
-                        VIS.ADialog.error("FillMandatory", true, "");
-                        aOK.data('clicked', 'N');
-                        $("#divfeedbsy")[0].style.visibility = "hidden";
-                    }
+                        var activitIDs = "";
+                        // if checkbox is selected, then join activity ID using comma splitter.
+                        if (selectedItems && selectedItems.length > 0) {
+                            for (var k = 0; k < selectedItems.length; k++) {
+                                if (activitIDs.length > 0) {
+                                    activitIDs += ",";
+                                }
+                                activitIDs += selectedItems[k].split("_")[2];
+                            }
+                        }
+                        else {
+                            activitIDs = fulldata[index].AD_WF_Activity_ID;
+                        }
 
+                        // set window ID of activity
+                        windowID = fulldata[index].AD_Window_ID;
+                        showBusy(true);
+                        VIS.dataContext.getJSONData(VIS.Application.contextUrl + "WFActivity/ApproveIt",
+                            { "activityID": activitIDs, "nodeID": fulldata[index].AD_Node_ID, "txtMsg": msg, "fwd": fwdTo, "answer": answer, "AD_Window_ID": windowID }, function apprvoIt(info) {
+                                showBusy(false);
+                                if (info.result == '') {
+                                    $("#divfeedbsy")[0].style.visibility = "hidden";
+                                    aOK.data('clicked', 'N');
+                                    divScroll.empty();
+                                    adjust_size();
+                                    lstDetailCtrls = [];
+                                    selectedItems = [];
+                                    loadWindows(true);
+                                }
+                                else {
+                                    VIS.ADialog.error(info.result);
+                                    aOK.data('clicked', 'N');
+                                    $("#divfeedbsy")[0].style.visibility = "hidden";
+                                }
+                            });
+                        break;
+                    }
                 }
-                aOK.data('clicked', 'N');
+                catch (e) {
+                    setBusy(false);
+                    VIS.ADialog.error("FillMandatory", true, "");
+                    aOK.data('clicked', 'N');
+                    $("#divfeedbsy")[0].style.visibility = "hidden";
+                }
 
-            }, 2);
+            }
+            aOK.data('clicked', 'N');
         };
         //Go to home page and refresh page
         var adjust_size = function () {
-            ShowBusy(true);
-            window.setTimeout(function () {
-                $countDiv_ID.empty();
-                $workflowWidgetDtls_ID.empty();
-                pageNo = 1;
-                getworkflowWidget(true);
-                loadWindows();
-                ShowBusy(false);
+            showBusy(true);
+            $countDiv_ID.empty();
+            $workflowWidgetDtls_ID.empty();
+            pageNo = 1;
+            getworkflowWidget(true);
+            loadWindows();
+            showBusy(false);
 
+            $workflowActivitys.css('display', 'none').css('zindex', '2');
+            $welcomeScreenFeedsLists.css('display', 'block');
+            $row.css('display', 'block');
+            $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+                showBusy(true);
+                getChld(e);
+                showBusy(false);
+                $welcomeScreenFeedsLists.css('display', 'none');
+                $row.css('display', 'none');
+                $workflowActivitys.css('display', 'block').css('zindex', '2');
+            });
+            $backBtn_ID.on('click', function () {
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
                 $welcomeScreenFeedsLists.css('display', 'block');
                 $row.css('display', 'block');
-                $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                    ShowBusy(true);
-                    window.setTimeout(function () {
-                        getChld(e);
-                        ShowBusy(false);
-                    }, 500);
-                    $welcomeScreenFeedsLists.css('display', 'none');
-                    $row.css('display', 'none');
-                    $workflowActivitys.css('display', 'block').css('zindex', '2');
-                });
-                $backBtn_ID.on('click', function () {
-                    $workflowActivitys.css('display', 'none').css('zindex', '2');
-                    $welcomeScreenFeedsLists.css('display', 'block');
-                    $row.css('display', 'block');
-                });
-            }, 500);
+            });
         };
         var zoom = function (index) {
             //window id
@@ -1173,25 +1163,23 @@
         };
         //Refresh Widget
         this.refreshWidget = function () {
-            ShowBusy(true);
-            window.setTimeout(function () {
-                $countDiv_ID.empty();
-                $workflowWidgetDtls_ID.empty();
-                pageNo = 1;
-                getworkflowWidget(true);
-                //loadWindows();
-                $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                    $welcomeScreenFeedsLists.css('display', 'none');
-                    $row.css('display', 'none');
-                    $workflowActivitys.css('display', 'block').css('zindex', '2');
-                });
-                $backBtn_ID.on('click', function () {
-                    $workflowActivitys.css('display', 'none').css('zindex', '2');
-                    $welcomeScreenFeedsLists.css('display', 'block');
-                    $row.css('display', 'block');
-                });
-                ShowBusy(false);
-            }, 500);
+            showBusy(true);
+            $countDiv_ID.empty();
+            $workflowWidgetDtls_ID.empty();
+            pageNo = 1;
+            getworkflowWidget(true);
+            //loadWindows();
+            $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+                $welcomeScreenFeedsLists.css('display', 'none');
+                $row.css('display', 'none');
+                $workflowActivitys.css('display', 'block').css('zindex', '2');
+            });
+            $backBtn_ID.on('click', function () {
+                $workflowActivitys.css('display', 'none').css('zindex', '2');
+                $welcomeScreenFeedsLists.css('display', 'block');
+                $row.css('display', 'block');
+            });
+            showBusy(false);
         };
 
         /* get design from root*/
@@ -1245,14 +1233,8 @@
     /* init method called on loading a form . */
     VIS.WorkflowWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        if (windowNo == -99999) {
-            this.windowNo = VIS.Env.getWindowNo();
-            this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
-        }
-        else {
-            this.windowNo = windowNo;
-            this.AD_UserHomeWidgetID = windowNo;
-        }
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
+        this.windowNo = windowNo;
 
         window.setTimeout(function (t) {
             t.Initalize();
