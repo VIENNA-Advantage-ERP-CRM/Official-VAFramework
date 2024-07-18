@@ -35,18 +35,16 @@
             createBusyIndicator();
             ShowBusy(true);
             widgetsPopup();
-            window.setTimeout(function () {
-                events();
-                loadCounts();
-                ShowBusy(false);
-            }, 500);
+            events();
+            loadCounts();
+            ShowBusy(false);
         };
         /* Declare events */
         function events() {
             workflowDivId.on("click", opneWorkflow);
             noticeDivId.on("click", opneNotice);
             requestsDivId.on("click", opneRequests);
-           // welcomeActionsDivId.find("#refreshDivId" + $self.AD_UserHomeWidgetID).on("click", $self.refreshWidget);
+            // welcomeActionsDivId.find("#refreshDivId" + $self.AD_UserHomeWidgetID).on("click", $self.refreshWidget);
             modelPopupId.find("#closeBtnId" + $self.AD_UserHomeWidgetID).on("click", function () {
                 modelPopupId.hide();
                 wform.dispose();
@@ -71,7 +69,7 @@
         //Create Widget
         function createWidget() {
             actionsWidget = ' <div id="welcomeActionsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-task-status-panel">  '
-               // + '<div id="refreshDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-refreshIco"><span class="vis vis-refresh"></span></div>'
+                // + '<div id="refreshDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-refreshIco"><span class="vis vis-refresh"></span></div>'
                 + ' <div class="vis-a-statusBox-container" >'
                 + '  <div id="workflowDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-status-box vis-a-green-box" style="cursor: pointer;">'
                 + '    <div class="vis-a-headWico">'
@@ -111,17 +109,17 @@
                 + '                 <span aria-hidden="true">&times;</span>'
                 + '             </button>'
                 + '         <div id="appendWidgetDivId' + $self.AD_UserHomeWidgetID + '" style="height:650px;">'
-                + '         </div>'               
+                + '         </div>'
                 + '      </div>'
                 + '   </div>'
                 + '</div>'
             $root.append(popup);
-            modelPopupId = $root.find("#widgetsModalId" + $self.AD_UserHomeWidgetID);                     
+            modelPopupId = $root.find("#widgetsModalId" + $self.AD_UserHomeWidgetID);
         };
         //Load Data
         function loadCounts() {
             $.ajax({
-                url: VIS.Application.contextUrl + 'Home/GetWidgetsCnt',
+                url: VIS.Application.contextUrl + 'Home/getWidgetsCount',
                 async: true,
                 type: 'GET',
                 datatype: 'json',
@@ -150,41 +148,39 @@
         };
 
         //Opne Workflow Widget
-        function opneWorkflow() {            
-            showWidgets('VIS.WorkflowWidget', "Workflow");
+        function opneWorkflow() {
+            showWidgets('VIS.WorkflowWidget');
             // var objWorkflowWidget = new VIS.WorkflowWidget();
             // objWorkflowWidget.init($self.windowNo, $self.frame);
         };
         //Opne Workflow Widget
         function opneNotice() {
-            showWidgets('VIS.NoticeWidget', "Notice");
+            showWidgets('VIS.NoticeWidget');
             //var objNoticeWidget = new VIS.NoticeWidget();
             //objNoticeWidget.init($self.windowNo, $self.frame);
         };
         //Opne Workflow Widget
         function opneRequests() {
-            showWidgets('VIS.RequestWidget', "Requests");
+            showWidgets('VIS.RequestWidget');
             //var objRequestsWidget = new VIS.RequestWidget();
             //objRequestsWidget.init($self.windowNo, $self.frame);
         };
-        function showWidgets(clsName, title) {
+        function showWidgets(clsName) {
             modelPopupId.find("#appendWidgetDivId" + $self.AD_UserHomeWidgetID).empty();
             wform = new VIS.AForm();
             wform.openWidget(clsName, $self.windowNo, null);
             modelPopupId.find("#appendWidgetDivId" + $self.AD_UserHomeWidgetID).append(wform.getContentGrid());
-            modelPopupId.show();            
+            modelPopupId.show();
         };
 
         //Refresh Widget
         this.refreshWidget = function () {
             ShowBusy(true);
-            window.setTimeout(function () {
                 welcomeActionsDivId.find("#workflowCntDivId" + $self.AD_UserHomeWidgetID).empty();
                 welcomeActionsDivId.find("#noticeCntDivId" + $self.AD_UserHomeWidgetID).empty();
                 welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).empty();
                 loadCounts();
                 ShowBusy(false);
-            }, 500);
         };
 
         /* get design from root*/
@@ -197,20 +193,12 @@
         };
     }
     VIS.ActionsWidget.prototype.refreshWidget = function () {
-        alert("Refresh Method");
     };
     /* init method called on loading a form . */
     VIS.ActionsWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        if (windowNo == -99999) {
-            this.windowNo = VIS.Env.getWindowNo();
-            this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
-        }
-        else {
-            this.windowNo = windowNo;
-            this.AD_UserHomeWidgetID = windowNo;
-        }
-        // this.windowNo = windowNo;
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
+        this.windowNo = windowNo;
         window.setTimeout(function (t) {
             t.Initalize();
         }, 10, this);

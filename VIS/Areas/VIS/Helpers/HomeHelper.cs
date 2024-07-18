@@ -1360,17 +1360,21 @@ namespace VIS.Helpers
             }
 
         }
-        //////
+        /// <summary>
+        /// Count of Widgets Records
+        /// </summary>
+        /// <param name="ctx">ctx</param>
+        /// <returns>Obj</returns>
         # region Get Widgets Counts
-        //Count of notice
-        public HomeModels getWidgetsCnt(Ctx ctx)
+        //Count of Widgets Records
+        public HomeModels getWidgetsCount(Ctx ctx)
         {
             HomeModels objHome = new HomeModels();
             try
             {
                 #region Request Count
                 //To Get Request count
-                strQuery = " SELECT  count(R_Request.r_request_id) FROM R_Request  inner join  r_requesttype rt on (R_Request.r_requesttype_id=rt.r_requesttype_ID)";
+                strQuery = " SELECT  COUNT(R_Request.r_request_id) FROM R_Request  INNER JOIN  r_requesttype rt ON (R_Request.r_requesttype_id=rt.r_requesttype_ID)";
                 strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 strQuery += " AND ( R_Request.SalesRep_ID =" + ctx.GetAD_User_ID() + " OR R_Request.AD_Role_ID =" + ctx.GetAD_Role_ID() + ")"
                  + " AND R_Request.Processed ='N'"
@@ -1387,7 +1391,7 @@ namespace VIS.Helpers
 
                 # region Notice Count
                 //To get Notice Count
-                strQuery = MRole.GetDefault(ctx).AddAccessSQL("SELECT count(AD_Note_ID) FROM AD_Note "
+                strQuery = MRole.GetDefault(ctx).AddAccessSQL("SELECT COUNT(AD_Note_ID) FROM AD_Note "
                     , "AD_Note", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 strQuery += " AND AD_User_ID IN (" + ctx.GetAD_User_ID() + ")"
                   + " AND Processed='N'";

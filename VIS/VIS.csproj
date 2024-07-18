@@ -771,6 +771,7 @@
     <Content Include="Areas\VIS\Scripts\VIS.all.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS1_0.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS2_0.min.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\ActionsWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\NoticeWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\RequestWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\WorkflowWidget.js" />
