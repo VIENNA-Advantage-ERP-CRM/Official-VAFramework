@@ -19,15 +19,9 @@
         var workflowDivId;
         var noticeDivId;
         var requestsDivId;
-
         var popup;
         var modelPopupId;
         var wform;
-
-        //var elements = [
-        //    "SelectWindow"];
-        //var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
-
 
         /* Initialize the form design*/
         this.Initalize = function () {
@@ -36,8 +30,7 @@
             ShowBusy(true);
             widgetsPopup();
             events();
-            loadCounts();
-            ShowBusy(false);
+            loadCounts(true);
         };
         /* Declare events */
         function events() {
@@ -101,14 +94,15 @@
             noticeDivId = welcomeActionsDivId.find("#noticeDivId" + $self.AD_UserHomeWidgetID);
             requestsDivId = welcomeActionsDivId.find("#requestsDivId" + $self.AD_UserHomeWidgetID);
         };
+        //Create Popup
         function widgetsPopup() {
-            popup = ' <div class="modal" id="widgetsModalId' + $self.AD_UserHomeWidgetID + '" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">'
-                + ' <div class="modal-dialog" role="document">'
-                + '     <div class="modal-content">'
+            popup = ' <div class="modal vis-a-actionsModelMain" id="widgetsModalId' + $self.AD_UserHomeWidgetID + '" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">'
+                + ' <div class="modal-dialog vis-a-actionsMdialog" role="document">'
+                + '     <div class="modal-content vis-a-actionsMcontent">'
                 + '             <button id="closeBtnId' + $self.AD_UserHomeWidgetID + '" type="button" class="close vis-a-closeBtnCls" data-dismiss="modal" aria-label="Close">'
                 + '                 <span aria-hidden="true">&times;</span>'
                 + '             </button>'
-                + '         <div id="appendWidgetDivId' + $self.AD_UserHomeWidgetID + '" style="height:650px;">'
+                + '         <div id="appendWidgetDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-actionsWidgetCls">'
                 + '         </div>'
                 + '      </div>'
                 + '   </div>'
@@ -117,10 +111,10 @@
             modelPopupId = $root.find("#widgetsModalId" + $self.AD_UserHomeWidgetID);
         };
         //Load Data
-        function loadCounts() {
+        function loadCounts(async) {
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/getWidgetsCount',
-                async: true,
+                async: async,
                 type: 'GET',
                 datatype: 'json',
                 success: function (result) {
@@ -143,6 +137,7 @@
                     else {
                         welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).append(0);
                     }
+                    ShowBusy(false);
                 }
             });
         };
@@ -165,10 +160,11 @@
             //var objRequestsWidget = new VIS.RequestWidget();
             //objRequestsWidget.init($self.windowNo, $self.frame);
         };
+        //Show Widget in Popup
         function showWidgets(clsName) {
             modelPopupId.find("#appendWidgetDivId" + $self.AD_UserHomeWidgetID).empty();
             wform = new VIS.AForm();
-            wform.openWidget(clsName, $self.windowNo, null);
+            wform.openWidget(clsName, $self.windowNo, $self.frame.widgetInfo);
             modelPopupId.find("#appendWidgetDivId" + $self.AD_UserHomeWidgetID).append(wform.getContentGrid());
             modelPopupId.show();
         };
@@ -176,11 +172,11 @@
         //Refresh Widget
         this.refreshWidget = function () {
             ShowBusy(true);
-                welcomeActionsDivId.find("#workflowCntDivId" + $self.AD_UserHomeWidgetID).empty();
-                welcomeActionsDivId.find("#noticeCntDivId" + $self.AD_UserHomeWidgetID).empty();
-                welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).empty();
-                loadCounts();
-                ShowBusy(false);
+            welcomeActionsDivId.find("#workflowCntDivId" + $self.AD_UserHomeWidgetID).empty();
+            welcomeActionsDivId.find("#noticeCntDivId" + $self.AD_UserHomeWidgetID).empty();
+            welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).empty();
+            loadCounts(false);
+            ShowBusy(false);
         };
 
         /* get design from root*/
@@ -199,9 +195,7 @@
         this.frame = frame;
         this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
         this.windowNo = windowNo;
-        window.setTimeout(function (t) {
-            t.Initalize();
-        }, 10, this);
+        this.Initalize();
         this.frame.getContentGrid().append(this.getRoot());
     };
 

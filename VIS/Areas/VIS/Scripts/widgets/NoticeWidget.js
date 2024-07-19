@@ -37,9 +37,7 @@
             createWidget();
             createBusyIndicator();
             showBusy(true);
-            loadHomeNotice(true);
-            events();
-            showBusy(false);
+            loadHomeNotice(true,true);
         };
         /* Declare events */
         function events() {
@@ -94,12 +92,12 @@
             $hlnkTabDataRef_ID.on("click", $self.refreshWidget)
         };
         //Load Data
-        function loadHomeNotice(isTabAjaxBusy) {
+        function loadHomeNotice(isTabAjaxBusy, async) {
             showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeNotice',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabAjaxBusy },
-                async: false,
+                async: async,
                 type: 'GET',
                 datatype: 'json',
                 success: function (result) {
@@ -114,6 +112,10 @@
                         for (var s in data) {
                             appendRecords(data, s);
                         }
+                        if (async == true) {
+                            events();
+                        }
+                        showBusy(false);
                     }
                     else {
 
@@ -125,15 +127,13 @@
                             else {
                                 str = "<p class='vis-pTagStyleCls'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
                             }
-                            if (activeTabType == NoticeType) {
-                            }
                         }
+                        showBusy(false);
                     }
                     isTabAjaxBusy = false;
                     welcomeTabDatacontainers.append(str);
                 }
-            });
-            showBusy(false);
+            });            
         }
 
         //Append Records
@@ -220,7 +220,7 @@
                 var tabdatacntpage = pageNo * pageSize;
                 if (tabdatacntpage <= tabdataLastPage) {
                     pageNo += 1;
-                    loadHomeNotice(false);
+                    loadHomeNotice(false, false);
                 }
                 else {
                     scrollWF = true;
@@ -337,7 +337,7 @@
         this.refreshWidget = function () {
             welcomeTabDatacontainers.empty();
             pageNo = 1;
-            loadHomeNotice(true);
+            loadHomeNotice(true, false);
             events();
         };
 
@@ -375,9 +375,7 @@
         this.frame = frame;
             this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
             this.windowNo = windowNo;
-        window.setTimeout(function (t) {
-            t.Initalize();
-        }, 10, this);
+            this.Initalize();
         this.frame.getContentGrid().append(this.getRoot());
     };
 

@@ -71,11 +71,7 @@
             createWidget();
             createBusyIndicator();
             showBusy(true);
-            getworkflowWidget(true);
-            getControls();
-            loadWindows();
-            events();
-            showBusy(false);
+            getworkflowWidget(true, true);
         };
         /* Get controls from root */
         function getControls() {
@@ -91,12 +87,10 @@
         /* Declare events */
         function events() {
             $flipCard_ID.on('click', function (e) {
-                showBusy(true);
                 $welcomeScreenFeedsLists.css('display', 'none');
                 $row.css('display', 'none');
                 getChld(e);
                 $workflowActivitys.css('display', 'block').css('zindex', '2');
-                showBusy(false);
             });
             $backBtn_ID.on('click', function () {
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
@@ -119,7 +113,7 @@
                     showToAndFromDate = true;
                 }
             });
-            $hlnkTabDataRef_ID.on('click', $self.refrashWidgwt);
+            $hlnkTabDataRef_ID.on('click', $self.refreshWidget);
             $zoom.on('click', function (e) {
                 var id = $(this).data("id");
                 zoom(id);
@@ -142,7 +136,7 @@
                 $countDiv_ID.empty();
                 $workflowWidgetDtls_ID.empty();
                 pageNo = 1;
-                getworkflowWidget(true);
+                getworkflowWidget(true, false);
                 //loadWindows();
                 $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
                     $welcomeScreenFeedsLists.css('display', 'none');
@@ -163,7 +157,7 @@
                 $countDiv_ID.empty();
                 $workflowWidgetDtls_ID.empty();
                 pageNo = 1;
-                getworkflowWidget(true);
+                getworkflowWidget(true, false);
                 //loadWindows();
                 $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
                     $welcomeScreenFeedsLists.css('display', 'none');
@@ -178,6 +172,7 @@
                 showBusy(false);
             });
             $workflowWidgetDtls_ID.on("scroll", loadOnScroll);
+            showBusy(false);
         };
 
         /*Create Busy Indicator */
@@ -249,7 +244,7 @@
             $toDateInput_ID = $fstMainDiv_ID.find("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID);
         };
         //Get Widget 1st page data
-        function getworkflowWidget(refresh) {
+        function getworkflowWidget(refresh, async) {
             showBusy(true);
             if ($cmbWindows.val() != null && $cmbWindows.val() != "") {
                 windowID = $cmbWindows.val().split('_')[0];
@@ -280,13 +275,14 @@
             $.ajax({
                 url: VIS.Application.contextUrl + "WFActivity/GetActivities",
                 data: { pageNo: pageNo, pageSize: PageSize, refresh: refresh, searchText: searchText, "AD_Window_ID": windowID, "dateFrom": fromDate, "dateTo": toDate, "AD_Node_ID": nodeID },//$self.windowNo
-                async: false,
+                async: async,
                 dataType: "json",
                 type: "POST",
                 error: function () {
                     showBusy(false);
                 },
                 success: function (dyndata) {
+                    //showBusy(false);
                     var reslt = JSON.parse(dyndata.result);
                     if (reslt) {
                         $fstMainDiv_ID.find("#pnorecFound" + $self.AD_UserHomeWidgetID).css('display', 'none');
@@ -296,6 +292,11 @@
                         for (var item in data) {
                             appendRecords(data, item);
                         }
+                        if (async == true) {
+                            getControls();
+                            loadWindows();
+                            events();
+                        }
                     }
                     else {
                         data = null;
@@ -303,7 +304,7 @@
                     }
                 }
             });
-            showBusy(false);
+
         };
 
         //Append Records
@@ -344,7 +345,6 @@
 
         //Get Windows name
         function loadWindows() {
-            showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "WFActivity/GetWorkflowWindows",
                 dataType: "json",
@@ -370,7 +370,6 @@
                     }
                 }
             });
-            showBusy(false);
         };
         //Get more data on Scroll 
         function loadOnScroll(e) {
@@ -394,7 +393,6 @@
         };
         //Get more data on Scroll
         function appendRecord(pageNo, paeSize, refresh) {
-            showBusy(true);
             if (!refresh) {
                 refresh = false;
             }
@@ -481,7 +479,6 @@
                     }
                 }
             });
-            showBusy(false);
         };
         //Get Cheild Records
         function getChld(e) {
@@ -509,14 +506,13 @@
                     },
                     success: function (res) {
                         loadDetail(wfActivityID, index, res.result);
+                        showBusy(false);
                     }
                 });
             }
-            showBusy(false);
         };
         //Create Child Record design 
         function loadDetail(wfActivityID, index, info) {
-            showBusy(true);
             var detailCtrl = {};
             lstDetailCtrls = [];
             detailCtrl.Index = index;
@@ -964,7 +960,6 @@
                 $welcomeScreenFeedsLists.css('display', 'block');
                 $row.css('display', 'block');
             });
-            showBusy(false);
         };
         //Create Controls based on data
         function getControl(info, wfActivityID) {
@@ -1136,8 +1131,8 @@
             $countDiv_ID.empty();
             $workflowWidgetDtls_ID.empty();
             pageNo = 1;
-            getworkflowWidget(true);
-            loadWindows();
+            getworkflowWidget(true, false);
+            //loadWindows();
             showBusy(false);
 
             $workflowActivitys.css('display', 'none').css('zindex', '2');
@@ -1167,7 +1162,7 @@
             $countDiv_ID.empty();
             $workflowWidgetDtls_ID.empty();
             pageNo = 1;
-            getworkflowWidget(true);
+            getworkflowWidget(true, false);
             //loadWindows();
             $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
                 $welcomeScreenFeedsLists.css('display', 'none');
@@ -1233,12 +1228,9 @@
     /* init method called on loading a form . */
     VIS.WorkflowWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
         this.windowNo = windowNo;
-
-        window.setTimeout(function (t) {
-            t.Initalize();
-        }, 10, this);
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
+        this.Initalize();
         this.frame.getContentGrid().append(this.getRoot());
     };
 
