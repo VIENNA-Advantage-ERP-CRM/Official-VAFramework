@@ -40,9 +40,7 @@
             createWidget();
             createBusyIndicator();
             showBusy(true);
-            loadHomeRequest(true);
-            events();
-            showBusy(false);
+            loadHomeRequest(true, true);
         };
         /* Declare events */
         function events() {
@@ -61,7 +59,7 @@
         };
 
         /*Create Busy Indicator */
-        function createBusyIndicator() {            
+        function createBusyIndicator() {
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
             $root.append($bsyDiv);
         };
@@ -104,18 +102,17 @@
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
         };
         /* Start Request */
-        function loadHomeRequest(isTabDataRef) {
+        function loadHomeRequest(isTabDataRef, async) {
             showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeRequest',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabDataRef },
                 type: 'GET',
-                async: false,
+                async: async,
                 datatype: 'json',
                 cache: false,
                 success: function (result) {
                     var data = JSON.parse(result.data);
-                    var str = "";
                     if (isTabDataRef == true) {
                         $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).empty();
                         $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).append(parseInt(result.count));
@@ -125,6 +122,10 @@
                         for (var s in data) {
                             appendRecords(data, s);
                         }
+                        if (isTabDataRef == true) {
+                            events();
+                        }
+                        showBusy(false);
                     }
                     else {
                         if (welcomeTabDatacontainers.find(".vis-table-request").length == 0) {
@@ -133,13 +134,13 @@
                             showBusy(false);
                         }
                     }
-                    showBusy(false);
                 }
             });
         }
 
         //Append Records
         function appendRecords(data, s) {
+            var str = "";
             var StartDate = "";
             if (data[s].StartDate != null || data[s].StartDate != "") {
                 var cd = new Date(data[s].StartDate);
@@ -286,7 +287,7 @@
                 var tabdatacntpage = pageNo * pageSize;
                 if (tabdatacntpage <= tabdataLastPage) {
                     pageNo += 1;
-                    loadHomeRequest(false);
+                    loadHomeRequest(false, false);
                 }
                 else {
                 }
@@ -295,8 +296,9 @@
         };
         //Refresh Widget function
         this.refreshWidget = function () {
+            showBusy(true);
             welcomeTabDatacontainers.empty();
-            loadHomeRequest(true);
+            loadHomeRequest(true, false);
         };
 
         /* get design from root*/
@@ -315,9 +317,7 @@
         this.frame = frame;
         this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
         this.windowNo = windowNo;
-        window.setTimeout(function (t) {
-            t.Initalize();
-        }, 10, this);
+        this.Initalize();
         this.frame.getContentGrid().append(this.getRoot());
     };
 
