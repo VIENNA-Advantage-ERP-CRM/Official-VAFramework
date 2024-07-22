@@ -36,32 +36,27 @@
         this.Initalize = function () {
             createWidget();
             createBusyIndicator();
-            ShowBusy(true);
-            window.setTimeout(function () {
-                LoadHomeNotice(true);
-                events();
-                ShowBusy(false);
-            }, 500);
+            showBusy(true);
+            loadHomeNotice(true,true);
         };
         /* Declare events */
         function events() {
-            $root.find('.vis-feedTitleBar-buttons').on("click", function (evnt) {
-                Actions(evnt);
+            $root.find('.vis-w-feedTitleBar-buttons').on("click", function (evnt) {
+                actions(evnt);
             });
-            $root.find('.vis-feedDetails').on("click", function (evnt) {
-                Actions(evnt);
+            $root.find('.vis-w-feedDetails').on("click", function (evnt) {
+                actions(evnt);
             });
         };
 
         /*Create Busy Indicator */
-        function createBusyIndicator() {
-            //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
+        function createBusyIndicator() {           
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
-        function ShowBusy(show) {
+        function showBusy(show) {
             if (show) {
                 $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
             }
@@ -72,16 +67,16 @@
 
         //Create Widget
         function createWidget() {
-            $noticeWidget = ' <div id="welcomeScreenFeedsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-welcomeScreenFeeds w-100 vis-welcomeScreenNoticeMainDiv" >'
-                + '     <div class="vis-row">'
+            $noticeWidget = ' <div id="welcomeScreenFeedsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-w-welcomeScreenFeeds w-100 vis-welcomeScreenNoticeMainDiv" >'
+                + '     <div class="vis-w-row">'
                 + '         <h2 style="width: 100%" class="vis-noticeHeading">'
                 + ' <div class="vis-secndDiv">'
                 + '             <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon vis vis-notice"></span>'
                 + '             <strong style="float: left;" id="sAlrtTxtType">' + VIS.Msg.getMsg("Notice") + '</strong>'
-                + '     <div id="countDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
+                + '     <div id="countDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-w-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
                 + ' </div>'
-                + ' <div >'
-                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
+                + ' <div class="vis-w-iconsCls">'
+                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="Refresh" class="vis-w-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
                 + ' </div>'
                 + '         </h2>'
                 + '     </div>'
@@ -94,14 +89,15 @@
             welcomeTabDatacontainers = welcomeScreenFeedsDivId.find("#welcomeScreenFeedsList" + $self.AD_UserHomeWidgetID);
             $hlnkTabDataRef_ID = welcomeScreenFeedsDivId.find("#hlnkTabDataRef" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
-            $hlnkTabDataRef_ID.on("click", RefreshWidget)
+            $hlnkTabDataRef_ID.on("click", $self.refreshWidget)
         };
         //Load Data
-        function LoadHomeNotice(isTabAjaxBusy) {
+        function loadHomeNotice(isTabAjaxBusy, async) {
+            showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeNotice',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabAjaxBusy },
-                async: false,
+                async: async,
                 type: 'GET',
                 datatype: 'json',
                 success: function (result) {
@@ -114,58 +110,16 @@
                             welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).append(parseInt(result.count));
                         }
                         for (var s in data) {
-                            if (data[s].CDate != null && data[s].CDate != "") {
-                                var cd_ = new Date(data[s].CDate);
-                                dbdate = Globalize.format(cd_, "F", Globalize.cultureSelector);
-                            }
-
-                            var divtitle_ = "";
-                            var title = VIS.Utility.encodeText(data[s].Title);
-                            title = noticeTimeConversion(title);
-                            data[s].Description = noticeTimeConversion(data[s].Description);
-                            var title_ = data[s].Description;
-                            if (title_.length <= 100) {
-                                divtitle_ = "<pre><strong class='vis-strongWhiteClrCls' data-vishomercrd='title' id='" + data[s].AD_Note_ID + "'>" + title + "</strong></pre>";
-                            }
-                            else {
-                                divtitle_ = "<pre>"
-                                    + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' >" + title + "...</strong>"
-                                        + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' style='display:none;'>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
-                                        + "<span id='snoticemore_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='more' class='vis-snoticemoreCls vis-clickCls'>" + VIS.Msg.getMsg("more") + "</span>"
-                                        + "<span id='snoticeless_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
-                                    + "</pre>";
-                            }
-
-                            str += "<div data-vishomercrd='view-recrd-cntainer' id='divrecdcntnr_" + data[s].AD_Note_ID + "' class='vis-activityContainer'>"
-                                + " <div class='vis-feedTitleBar'>";
-
-                            if (data[s].SpecialTable) {
-                                str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
-                            }
-                            else {
-                                str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
-                            }
-
-
-                            str += " <div class='vis-feedTitleBar-buttons'>"
-                                + "  <ul>";
-                            // Renaming of Approve highlight to Acknowledge under notification
-                            str += "<li data-vishomercrd='liapprove'><a href='javascript:void(0)' data-vishomercrd='approve'  id=" + data[s].AD_Note_ID + "  title='" + VIS.Msg.getMsg("Acknowledge") + "' class='vis vis-markx'></a></li>"
-                                + "<li data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].AD_Note_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "|" + data[s].Record_ID + " title='" + VIS.Msg.getMsg("View") + "' class='vis vis-find'></a></li>"
-                                + "</ul>"
-                                + "  </div>"
-                                + "</div>"
-                                + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-feedDetails vis-notClickCls'>"
-                                + divtitle_
-                                + " <p class='vis-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
-                                + " </div>"
-                                + " </div>"
-
+                            appendRecords(data, s);
                         }
+                        if (async == true) {
+                            events();
+                        }
+                        showBusy(false);
                     }
                     else {
 
-                        if (welcomeTabDatacontainers.find(".vis-feedTitleBar").length == 0) {
+                        if (welcomeTabDatacontainers.find(".vis-w-feedTitleBar").length == 0) {
 
                             if (VIS.Application.isRTL) {
                                 str = "<p class='vis-pTagStyleCls'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
@@ -173,15 +127,66 @@
                             else {
                                 str = "<p class='vis-pTagStyleCls'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
                             }
-                            if (activeTabType == NoticeType) {
-                            }
                         }
+                        showBusy(false);
                     }
                     isTabAjaxBusy = false;
                     welcomeTabDatacontainers.append(str);
                 }
-            });
+            });            
         }
+
+        //Append Records
+        function appendRecords(data, s) {
+            if (data[s].CDate != null && data[s].CDate != "") {
+                var cd_ = new Date(data[s].CDate);
+                dbdate = Globalize.format(cd_, "F", Globalize.cultureSelector);
+            }
+
+            var divtitle_ = "";
+            var title = VIS.Utility.encodeText(data[s].Title);
+            title = noticeTimeConversion(title);
+            data[s].Description = noticeTimeConversion(data[s].Description);
+            var title_ = data[s].Description;
+            if (title_.length <= 100) {
+                divtitle_ = "<pre><strong class='vis-strongWhiteClrCls' data-vishomercrd='title' id='" + data[s].AD_Note_ID + "'>" + title + "</strong></pre>";
+            }
+            else {
+                divtitle_ = "<pre>"
+                    + "<strong  id='snoticetitle_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' >" + title + "...</strong>"
+                    + "<strong id='snoticedesc_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' class='vis-strongWhiteClrCls' style='display:none;'>" + VIS.Utility.encodeText(data[s].Description) + "...</strong> "
+                    + "<span id='snoticemore_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='more' class='vis-snoticemoreCls vis-clickCls'>" + VIS.Msg.getMsg("more") + "</span>"
+                    + "<span id='snoticeless_" + data[s].AD_Note_ID + "_" + $self.AD_UserHomeWidgetID + "' data-vishomercrd='less' class='vis-snoticelessCls vis-clickCls'>" + VIS.Msg.getMsg("less") + "</span>"
+                    + "</pre>";
+            }
+
+            str += "<div data-vishomercrd='view-recrd-cntainer' id='divrecdcntnr_" + data[s].AD_Note_ID + "' class='vis-w-activityContainer'>"
+                + " <div class='vis-w-feedTitleBar'>";
+
+            if (data[s].SpecialTable) {
+                str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
+            }
+            else {
+                str += "<h3>" + VIS.Utility.encodeText(data[s].MsgType) + "</h3>";
+            }
+
+
+            str += " <div class='vis-w-feedTitleBar-buttons'>"
+                + "  <ul>";
+            // Renaming of Approve highlight to Acknowledge under notification
+            str += "<li class='vis-w-zoomClrChngCls' data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].AD_Note_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "|" + data[s].Record_ID + " title='" + VIS.Msg.getMsg("View") + "' class='vis vis-find'></a></li>"
+                + "<li data-vishomercrd='liapprove'><a href='javascript:void(0)' data-vishomercrd='approve'  id=" + data[s].AD_Note_ID + "  title='" + VIS.Msg.getMsg("Acknowledge") + "' class='vis vis-markx'></a></li>"
+                + "</ul>"
+                + "  </div>"
+                + "</div>"
+                + "<div data-vishomercrd='more-details' id=" + data[s].AD_Note_ID + " class='vis-w-feedDetails vis-notClickCls'>"
+                + divtitle_
+                + " <p class='vis-w-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
+                + " </div>"
+                + " </div>"
+
+        }
+
         /**
         * UTC Time conversion for Notice
         * @param {any} title
@@ -209,24 +214,22 @@
             scrollWF = true;
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.80) && scrollWF) {//Condition true when 75 scroll is done
-                ShowBusy(true);
-                // window.setTimeout(function () {
+                showBusy(true);
                 scrollWF = false;
                 var tabdataLastPage = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html());
                 var tabdatacntpage = pageNo * pageSize;
                 if (tabdatacntpage <= tabdataLastPage) {
                     pageNo += 1;
-                    LoadHomeNotice(false);
+                    loadHomeNotice(false, false);
                 }
                 else {
                     scrollWF = true;
                 }
-                ShowBusy(false);
-                // }, 200);
+                showBusy(false);
             }
         };
         //Actions
-        function Actions(evnt) {
+        function actions(evnt) {
             var datarcrd = $(evnt.target).data("vishomercrd");
             if (evnt.target.tagName === "SPAN" && datarcrd === "more") {
                 //more-details
@@ -290,7 +293,7 @@
             //for notice approve
             else if (datarcrd === "approve") {
                 var vid = evnt.target.id;
-                ApproveNotice(vid, true);
+                approveNotice(vid, true);
                 var count = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html()) - 1;
                 $root.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
                 $root.find("#countDiv" + $self.AD_UserHomeWidgetID).append(count);
@@ -298,7 +301,7 @@
             //for notice approve
             else if (datarcrd === "liapprove") {
                 var vid = evnt.target.firstChild.id;
-                ApproveNotice(vid, true);
+                approveNotice(vid, true);
                 var count = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html()) - 1;
                 $root.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
                 $root.find("#countDiv" + $self.AD_UserHomeWidgetID).append(count);
@@ -331,15 +334,16 @@
             }
         };
         //Refresh Widget
-        function RefreshWidget() {
+        this.refreshWidget = function () {
             welcomeTabDatacontainers.empty();
             pageNo = 1;
-            LoadHomeNotice(true);
+            loadHomeNotice(true, false);
             events();
         };
 
         //Approve
-        function ApproveNotice(Ad_Note_ID, isAcknowldge) {
+        function approveNotice(Ad_Note_ID, isAcknowldge) {
+            showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/ApproveNotice',
                 data: { "Ad_Note_ID": Ad_Note_ID, "isAcknowldge": isAcknowldge },
@@ -350,9 +354,9 @@
                     $root.find("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 700, "", function () {
                         $root.find("#divrecdcntnr_" + Ad_Note_ID).remove();
                     });
-
                 }
             });
+            showBusy(false);
         }
         /* get design from root*/
         this.getRoot = function () {
@@ -363,19 +367,15 @@
             $root.remove();
         };
     }
+    VIS.NoticeWidget.prototype.refreshWidget = function () {
+
+    };
     /* init method called on loading a form . */
     VIS.NoticeWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        if (windowNo == -99999) {
-            this.windowNo = VIS.Env.getWindowNo();
-        }
-        else {
+            this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
             this.windowNo = windowNo;
-        }
-        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
-        window.setTimeout(function (t) {
-            t.Initalize();
-        }, 10, this);
+            this.Initalize();
         this.frame.getContentGrid().append(this.getRoot());
     };
 

@@ -39,16 +39,12 @@
         this.Initalize = function () {
             createWidget();
             createBusyIndicator();
-            ShowBusy(true);
-            window.setTimeout(function () {
-                LoadHomeRequest(true);
-                events();
-                ShowBusy(false);
-            }, 500);
+            showBusy(true);
+            loadHomeRequest(true, true);
         };
         /* Declare events */
         function events() {
-            $hlnkTabDataRef_ID.on("click", RefreshWidget);
+            $hlnkTabDataRef_ID.on("click", $self.refreshWidget);
             $welcomeNewRecord.on("click", function () {
                 var sql = "VIS_129";
                 var n_win = executeScalar(sql);
@@ -58,19 +54,18 @@
                 VIS.viewManager.startWindow(n_win, zoomQuery);
             });
             welcomeTabDatacontainers.on("click", function (e) {
-                ZoomFunction(e);
+                zoomFunction(e);
             });
         };
 
         /*Create Busy Indicator */
         function createBusyIndicator() {
-            //$bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
             $root.append($bsyDiv);
         };
 
         /* Method to enable and disable busy indicator */
-        function ShowBusy(show) {
+        function showBusy(show) {
             if (show) {
                 $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
             }
@@ -81,17 +76,17 @@
 
         //Create Widget
         function createWidget() {
-            $requestWidget = ' <div id="requestwelcomeDivId' + $self.AD_UserHomeWidgetID + '" class="vis-welcomeScreenFeeds w-100 vis-RequestwelcomeScreenCls" > '
-                + '  <div class="vis-row"> '
+            $requestWidget = ' <div id="requestwelcomeDivId' + $self.AD_UserHomeWidgetID + '" class="vis-w-welcomeScreenFeeds w-100 vis-RequestwelcomeScreenCls" > '
+                + '  <div class="vis-w-row"> '
                 + '      <h2 class="vis-noticeHeading vis-RequestWidth"> '
                 + ' <div class="vis-RequestInnerDivCls">'
                 + '          <span id="spanWelcomeTabtopHdr" class="vis-welcomeScreenContentTittle-icon fa fa-bell-o"></span> '
                 + '          <strong class="vis-RequestStrongCls" id="sAlrtTxtType">' + VIS.Msg.getMsg("Requests") + '</strong>'
-                + ' <div id="reqCountDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Requests") + '" class="vis-welcomeScreenTab-notificationBubble blank"></div>'
+                + ' <div id="reqCountDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Requests") + '" class="vis-w-welcomeScreenTab-notificationBubble blank"></div>'
                 + ' </div>'
-                + ' <div >'
-                + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-feedicon vis-RequestHlnkTabDataRefReq"><i class="vis vis-refresh"></i></a> '
-                + '          <span id="sNewNts' + $self.AD_UserHomeWidgetID + '" class="vis-feedicon vis-RequestNewNtsCls" title="New Record"><i class="vis vis-plus"></i></span> '
+                + ' <div class="vis-w-iconsCls">'
+                + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-w-feedicon vis-RequestHlnkTabDataRefReq"><i class="vis vis-refresh"></i></a> '
+                + '          <span id="sNewNts' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis-RequestNewNtsCls" title="New Record"><i class="vis vis-plus"></i></span> '
                 + ' </div>'
                 + '      </h2> '
                 + '  </div> '
@@ -107,17 +102,17 @@
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
         };
         /* Start Request */
-        function LoadHomeRequest(isTabDataRef) {
+        function loadHomeRequest(isTabDataRef, async) {
+            showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeRequest',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabDataRef },
                 type: 'GET',
-                async: false,
+                async: async,
                 datatype: 'json',
                 cache: false,
                 success: function (result) {
                     var data = JSON.parse(result.data);
-                    var str = "";
                     if (isTabDataRef == true) {
                         $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).empty();
                         $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).append(parseInt(result.count));
@@ -125,76 +120,88 @@
                     if (data.length > 0) {
 
                         for (var s in data) {
-                            var StartDate = "";
-                            if (data[s].StartDate != null || data[s].StartDate != "") {
-                                var cd = new Date(data[s].StartDate);
-                                StartDate = Globalize.format(cd, "d", Globalize.cultureSelector);
-                            }
-                            var NextActionDate = "";
-                            if (data[s].NextActionDate != null) {
-                                var cd = new Date(data[s].NextActionDate);
-                                NextActionDate = Globalize.format(cd, "d", Globalize.cultureSelector);
-                            }
-                            else {
-                                NextActionDate = "&nbsp;-----------";
-                            }
-                            var CreatedDate = "";
-                            if (data[s].CreatedDate != null || data[s].CreatedDate != "") {
-                                var cd = new Date(data[s].CreatedDate);
-                                CreatedDate = Globalize.format(cd, "F", Globalize.cultureSelector);
-                            }
-
-                            var summary = data[s].Summary;
-                            if (summary.length > 80) {
-                                summary = summary.substr(0, 80) + "..."
-                            }
-                            var casetype = data[s].CaseType;
-                            if (casetype.length > 30) {
-                                casetype = casetype.substr(0, 30) + "..."
-                            }
-
-                            str += "<div class='vis-activityContainer'>"
-                                + "<div class='vis-feedTitleBar'>"
-                                + "<h3>#" + data[s].DocumentNo + "</h3>";
-                            if (data[s].Name && data[s].Name.length > 0) {
-                                str += "<li class='vis-home-request-BP'>" + data[s].Name + "</li>"
-                            }
-
-                            str += "<div class='vis-feedTitleBar-buttons'>"
-                                + "<ul>"
-                                + "<li data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].R_Request_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "  title='" + VIS.Msg.getMsg("View") + "'  class='vis vis-find'></a></li>"
-                                + "</ul>"
-                                + "</div>"
-                                + "</div>"
-
-                                + "<div  class='vis-feedDetails vis-pt-0 vis-pl-0'>"
-                                + "<div class='vis-table-request'>"
-                                + "<ul>"
-                                + "<li><span>" + VIS.Msg.getMsg('Priority') + ":</span><br>" + data[s].Priority + "</li>"
-                                + "<li><span>" + VIS.Msg.getMsg('Status') + ":</span><br>" + data[s].Status + "</li>"
-                                + "<li><span>" + VIS.Msg.getMsg('NextActionDate') + ":</span><br>" + NextActionDate + "</li>"
-                                + "</ul>"
-                                + "</div>"
-                                + "<p class='vis-maintain-customer-p'>"
-                                + "<strong>" + VIS.Utility.encodeText(casetype) + " </strong><br />"
-                                + "<span>" + VIS.Msg.getMsg('Message') + ":</span><br>" + VIS.Utility.encodeText(summary) + "</p>"
-                                + "<p class='vis-feedDateTime vis-secondary-clr'  style=' width: 69%; margin-right: 10px;'>" + CreatedDate + "</p>"
-                                + "</div>"
-                                + "</div>"
+                            appendRecords(data, s);
                         }
-
+                        if (isTabDataRef == true) {
+                            events();
+                        }
+                        showBusy(false);
                     }
                     else {
                         if (welcomeTabDatacontainers.find(".vis-table-request").length == 0) {
                             str = "<p style=' margin-top:200px;text-align: center'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
+                            welcomeTabDatacontainers.append(str);
+                            showBusy(false);
                         }
                     }
-                    welcomeTabDatacontainers.append(str);
                 }
             });
         }
+
+        //Append Records
+        function appendRecords(data, s) {
+            var str = "";
+            var StartDate = "";
+            if (data[s].StartDate != null || data[s].StartDate != "") {
+                var cd = new Date(data[s].StartDate);
+                StartDate = Globalize.format(cd, "d", Globalize.cultureSelector);
+            }
+            var NextActionDate = "";
+            if (data[s].NextActionDate != null) {
+                var cd = new Date(data[s].NextActionDate);
+                NextActionDate = Globalize.format(cd, "d", Globalize.cultureSelector);
+            }
+            else {
+                NextActionDate = "&nbsp;-----------";
+            }
+            var CreatedDate = "";
+            if (data[s].CreatedDate != null || data[s].CreatedDate != "") {
+                var cd = new Date(data[s].CreatedDate);
+                CreatedDate = Globalize.format(cd, "F", Globalize.cultureSelector);
+            }
+
+            var summary = data[s].Summary;
+            if (summary.length > 80) {
+                summary = summary.substr(0, 80) + "..."
+            }
+            var casetype = data[s].CaseType;
+            if (casetype.length > 30) {
+                casetype = casetype.substr(0, 30) + "..."
+            }
+
+            str += "<div class='vis-w-activityContainer'>"
+                + "<div class='vis-w-feedTitleBar'>"
+                + "<h3>#" + data[s].DocumentNo + "</h3>";
+            if (data[s].Name && data[s].Name.length > 0) {
+                str += "<li class='vis-home-request-BP'>" + data[s].Name + "</li>"
+            }
+
+            str += "<div class='vis-w-feedTitleBar-buttons'>"
+                + "<ul>"
+                + "<li class='vis-w-zoomClrChngCls' data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].R_Request_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "  title='" + VIS.Msg.getMsg("View") + "'  class='vis vis-find'></a></li>"
+                + "</ul>"
+                + "</div>"
+                + "</div>"
+
+                + "<div  class='vis-w-feedDetails vis-pt-0 vis-pl-0'>"
+                + "<div class='vis-table-request'>"
+                + "<ul>"
+                + "<li><span>" + VIS.Msg.getMsg('Priority') + ":</span><br>" + data[s].Priority + "</li>"
+                + "<li><span>" + VIS.Msg.getMsg('Status') + ":</span><br>" + data[s].Status + "</li>"
+                + "<li><span>" + VIS.Msg.getMsg('NextActionDate') + ":</span><br>" + NextActionDate + "</li>"
+                + "</ul>"
+                + "</div>"
+                + "<p class='vis-maintain-customer-p'>"
+                + "<strong>" + VIS.Utility.encodeText(casetype) + " </strong><br />"
+                + "<span>" + VIS.Msg.getMsg('Message') + ":</span><br>" + VIS.Utility.encodeText(summary) + "</p>"
+                + "<p class='vis-w-feedDateTime vis-secondary-clr'  style=' width: 95%; margin-right: 10px;'>" + CreatedDate + "</p>"
+                + "</div>"
+                + "</div>"
+            welcomeTabDatacontainers.append(str);
+        };
+
         //Zoom 
-        function ZoomFunction(evnt) {
+        function zoomFunction(evnt) {
             var datarcrd = $(evnt.target).data("vishomercrd");
 
             //for request view/zoom
@@ -274,26 +281,24 @@
         function loadOnScroll(e) {
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
-                ShowBusy(true);
-                window.setTimeout(function () {
-                    //scrollWF = false;
-                    var tabdataLastPage = parseInt($root.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).html());
-                    var tabdatacntpage = pageNo * pageSize;
-                    if (tabdatacntpage <= tabdataLastPage) {
-                        pageNo += 1;
-                        LoadHomeRequest(false);
-                    }
-                    else {
-                        // scrollWF = true;
-                    }
-                    ShowBusy(false);
-                }, 200);
+                showBusy(true);
+                //scrollWF = false;
+                var tabdataLastPage = parseInt($root.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).html());
+                var tabdatacntpage = pageNo * pageSize;
+                if (tabdatacntpage <= tabdataLastPage) {
+                    pageNo += 1;
+                    loadHomeRequest(false, false);
+                }
+                else {
+                }
+                showBusy(false);
             }
         };
-
-        function RefreshWidget() {
+        //Refresh Widget function
+        this.refreshWidget = function () {
+            showBusy(true);
             welcomeTabDatacontainers.empty();
-            LoadHomeRequest(true);
+            loadHomeRequest(true, false);
         };
 
         /* get design from root*/
@@ -305,19 +310,14 @@
             $root.remove();
         };
     }
+    VIS.RequestWidget.prototype.refreshWidget = function () {
+    };
     /* init method called on loading a form . */
     VIS.RequestWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-        if (windowNo == -99999) {
-            this.windowNo = VIS.Env.getWindowNo();
-        }
-        else {
-            this.windowNo = windowNo;
-        }
         this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
-        window.setTimeout(function (t) {
-            t.Initalize();
-        }, 10, this);
+        this.windowNo = windowNo;
+        this.Initalize();
         this.frame.getContentGrid().append(this.getRoot());
     };
 
