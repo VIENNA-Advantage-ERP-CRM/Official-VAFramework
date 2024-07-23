@@ -74,7 +74,7 @@
                     deleteWidget(ui);
                 }
                 else if (action == 'R') {
-                    homeItems[ui.data('wid')].wform.widgetRefresh();
+                    homeItems[ui.data('wid')].wform.refreshWidget();
                 }
             });
         }
@@ -552,6 +552,9 @@
 
 
                     dragDrop();
+                    if (isEditMode) {
+                        $root.find('.vis-home-leftPanel').sortable("enable");
+                    }
                 }
             });
         }

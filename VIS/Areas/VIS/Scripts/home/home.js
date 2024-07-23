@@ -65,7 +65,7 @@
                     deleteWidget(ui);
                 }
                 else if (action == 'R') {
-                    homeItems[ui.data('wid')].wform.widgetRefresh();
+                    homeItems[ui.data('wid')].wform.refreshWidget();
                 }
             });
         }
@@ -529,7 +529,9 @@
 
                         dragDrop();
                     }
-
+                    if (isEditMode) {
+                        $home.find('.vis-home-leftPanel').sortable("enable");
+                    }
                     $home.find('#divfeedbsy').hide();
                 });
             }
