@@ -1110,7 +1110,8 @@ namespace VIS.Controllers
                 return null;
 
             //Ctx _ctx = null;//(ctx) as Ctx;
-            MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
+            MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID),
+                Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
                 Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
 
             if (res == null)
@@ -1121,6 +1122,7 @@ namespace VIS.Controllers
             string pTableName = json.pTableName;
             string pColumnName = res.GetColumnName();
             string keyCol = lInfo.keyColumn;
+            string tblColName = Convert.ToString(json.columnName);
             if (pColumnName.IndexOf(".") > -1)
             {
                 pColumnName = pColumnName.Substring(pColumnName.IndexOf(".") + 1);
@@ -1170,15 +1172,16 @@ namespace VIS.Controllers
                 if (tableName.Equals("AD_Ref_List"))
                 {
                     //sql = "SELECT " + keyCol + ", " + displayCol + " || '('|| count(" + keyCol + ") || ')' FROM " + tableName + " WHERE IsActive='Y'";
-                    sql = "SELECT " + pColumnName + ", (Select Name from AD_REf_List where Value= " + pColumnName + " AND AD_Reference_ID=" + json.AD_Reference_Value_ID + ")  as name ,count(" + pColumnName + ")"
+                    sql = "SELECT " + tblColName + ", (Select Name from AD_REf_List where Value= " + tblColName + " AND AD_Reference_ID=" + json.AD_Reference_Value_ID + ")  as name ,count(" + tblColName + ")"
                         + " FROM " + pTableName;// + " WHERE " + pTableName + ".IsActive='Y'";
                     sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(validationCode))
                         sql += " AND " + validationCode;
                     if (!string.IsNullOrEmpty(whereClause))
                         sql += " AND " + whereClause;
-                    sql += " GROUP BY " + pColumnName +
-                             " ORDER BY COUNT(" + pColumnName + ") DESC)";
+                    sql += " GROUP BY " + tblColName +
+                             " ORDER BY COUNT(" + tblColName + ") DESC)";
+                    pColumnName = tblColName;
                 }
                 else
                 {
