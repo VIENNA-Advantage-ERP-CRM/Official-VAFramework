@@ -102,7 +102,7 @@
                 + '             <button id="closeBtnId' + $self.AD_UserHomeWidgetID + '" type="button" class="close vis-a-closeBtnCls" data-dismiss="modal" aria-label="Close">'
                 + '                 <span aria-hidden="true">&times;</span>'
                 + '             </button>'
-                + '         <div id="appendWidgetDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-actionsWidgetCls">'
+                + '         <div id="appendWidgetDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-actionsWidgetCls vis-a-modelHeightSetCls">'
                 + '         </div>'
                 + '      </div>'
                 + '   </div>'

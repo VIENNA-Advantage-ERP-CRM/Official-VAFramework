@@ -1374,11 +1374,23 @@ namespace VIS.Helpers
             {
                 #region Request Count
                 //To Get Request count
-                strQuery = " SELECT  COUNT(R_Request.r_request_id) FROM R_Request  INNER JOIN  r_requesttype rt ON (R_Request.r_requesttype_id=rt.r_requesttype_ID)";
+                strQuery = @" SELECT  count(R_Request.r_request_id) FROM R_Request
+                        LEFT OUTER JOIN C_BPartner
+                        ON (R_Request.C_BPartner_ID=C_BPartner.C_BPartner_ID)
+                        LEFT OUTER JOIN r_requesttype rt
+                        ON (R_Request.r_requesttype_id = rt.r_requesttype_ID)
+                        LEFT OUTER JOIN R_Status rs
+                        ON (rs.R_Status_ID=R_request.R_Status_ID)
+                        LEFT OUTER JOIN ad_ref_list adl
+                        ON (adl.Value=R_Request.Priority)
+                        INNER JOIN AD_reference adr
+                        ON (adr.AD_Reference_ID=adl.AD_Reference_ID) ";
+
                 strQuery = MRole.GetDefault(ctx).AddAccessSQL(strQuery, "R_Request", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
-                strQuery += " AND ( R_Request.SalesRep_ID =" + ctx.GetAD_User_ID() + " OR R_Request.AD_Role_ID =" + ctx.GetAD_Role_ID() + ")"
+                strQuery += "  AND adr.Name='_PriorityRule'  AND ( R_Request.SalesRep_ID =" + ctx.GetAD_User_ID() + " OR R_Request.AD_Role_ID =" + ctx.GetAD_Role_ID() + ")"
                  + " AND R_Request.Processed ='N'"
                 + " AND (R_Request.R_Status_ID IS NULL OR R_Request.R_Status_ID IN (SELECT R_Status_ID FROM R_Status WHERE IsClosed='N'))";
+
                 dsData = new DataSet();
                 dsData = DB.ExecuteDataset(strQuery);
                 int nRequest = 0;
@@ -1386,7 +1398,6 @@ namespace VIS.Helpers
                 {
                     nRequest = Util.GetValueOfInt(dsData.Tables[0].Rows[0][0].ToString());
                 }
-
                 #endregion
 
                 # region Notice Count
