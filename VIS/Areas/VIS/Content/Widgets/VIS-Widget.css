@@ -977,8 +977,16 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     top: 0;
     height: calc(100% - 4.8em);
 }
+.vis-r-notRecordFndCls {
+    margin-top: 12.5em;
+    text-align: center;
+}
 /*Action Widgets*/
-.vis-a-task-status-panel{ height: 100%; width: 100%; padding: 0.2em;}
+.vis-a-task-status-panel {
+    height: 100%;
+    width: 100%;
+    padding: 0.2em;
+}
 .vis-a-statusBox-container{grid-template-columns:repeat(1, 1fr); display: grid; gap:0.4em; height: 100%; background-color: #ffffff; padding: 0.3rem;}
 .vis-a-status-box{width: 100%; text-align: center; display: flex; border-radius: 0.375em; border: 1px solid transparent; align-items: center; justify-content: space-between; padding: 0.625em; }
 .vis-a-status-box .fa, .vis-a-status-box .vis{font-size: 1.8em; display: flex; align-items: center; justify-content: center;  }
@@ -997,20 +1005,51 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-a-bluebg{background-color: #5093EF;}
 .vis-a-orangebg{background-color: #FECB62;}
 
+.vis-a-modelHeightSetCls {
+    height: calc(100vh - 80px);
+}
+    .vis-a-modelHeightSetCls .vis-w-welcomeScreenFeeds .vis-welcomeNoticeScreenFeedsListCls {
+        height: calc(100vh - 12em) !important;
+        height: 89.5% !important;
+    }
+    .vis-a-modelHeightSetCls .vis-a-setHeightReqstAtcion {
+        height: calc(100vh - 148px) !important;
+    }
+    .vis-a-modelHeightSetCls .vis-w-welcomeScreenFeeds .VIS-ActiveCls .vis-w-workflow-homepage-activites {
+        height: calc(100vh - 237px) !important;
+    }
+    .vis-a-modelHeightSetCls .vis-w-workflow-welcomfeed-cls {
+        height: calc(100vh - 80px);
+    }
+    .vis-a-modelHeightSetCls .vis-w-workflow-homepage-activites {
+        height: calc(100vh - 185px);
+    }
+    .vis-a-modelHeightSetCls .vis-RequestWelcomeScreenFeedsListCls {
+        height: calc(100% - 3.8em);
+    }
+    .vis-a-modelHeightSetCls .scrollerVertical .vis-a-pTagSetHeight, .vis-a-modelHeightSetCls .vis-w-scrollerVerticalNewCls .vis-a-pTagSetHeight {
+        margin-top: 0px !important;
+        text-align: center;
+        padding: 19% 0;
+    }
 
-
-
-@media screen and (max-width: 2000px) {
-  .widgetEditMode .vis-a-task-status-panel {font-size: 13px; }
+    @media screen and (max-width: 2000px) {
+        .vis-a-task-status-panel {
+            font-size: 13px;
+        }
+        .vis-editModeWidget .vis-a-task-status-panel {font-size: 13px; }
 }
 @media screen and (max-width: 1920px) {
-  .widgetEditMode .vis-a-task-status-panel {
-    font-size: 12px;
+    .vis-a-task-status-panel {
+        font-size: 13px;
+    }
+  .vis-editModeWidget .vis-a-task-status-panel {
+    font-size: 8px;
   }
 }
-@media screen and (max-width: 1366px) {
+@media screen and (max-width: 1367px) {
   .vis-a-task-status-panel{font-size: 13px;}
-  .widgetEditMode .vis-a-task-status-panel {
+  .vis-editModeWidget .vis-a-task-status-panel {
     font-size: 8px;
   }
 }
@@ -1018,7 +1057,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
   .vis-a-task-status-panel {
     font-size: 9px;
   }
-  .widgetEditMode .vis-a-task-status-panel {
+  .vis-editModeWidget .vis-a-task-status-panel {
     font-size: 6px;
   }
 }
@@ -1026,7 +1065,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
   .vis-a-task-status-panel {
     font-size: 12px;
   }
-  .widgetEditMode .vis-a-task-status-panel {
+  .vis-editModeWidget .vis-a-task-status-panel {
     font-size: 8px;
   }
 }
@@ -1035,24 +1074,24 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
   .vis-a-task-status-panel {
     font-size: 10px;
   }
-  .widgetEditMode .vis-a-task-status-panel {
+  .vis-editModeWidget .vis-a-task-status-panel {
     font-size: 7px;
   }
 }
 
 @media screen and (max-width: 600px) {
   .vis-a-task-status-panel {
-    font-size: 16px;
+    font-size: 7px;
   }
-  .widgetEditMode .vis-a-task-status-panel {
-    font-size: 12px;
+  .vis-editModeWidget .vis-a-task-status-panel {
+    font-size: 5px;
   }
 }
 @media screen and (max-width: 480px) {
   .vis-a-task-status-panel {
-    font-size: 12px;
+    font-size: 10px;
   }
-  .widgetEditMode .vis-a-task-status-panel {
+  .vis-editModeWidget .vis-a-task-status-panel {
     font-size: 9px;
   } 
 }
@@ -1060,7 +1099,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
   .vis-a-task-status-panel {
     font-size: 10px;
   }
-  .widgetEditMode .vis-a-task-status-panel {
+  .vis-editModeWidget .vis-a-task-status-panel {
     font-size: 6px;
   }
 }
@@ -1068,7 +1107,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
   .vis-a-task-status-panel {
     font-size: 9px;
   }
-  .widgetEditMode .vis-a-task-status-panel {
+  .vis-editModeWidget .vis-a-task-status-panel {
     font-size: 5px;
   }
 }
@@ -1096,28 +1135,6 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
         position:relative;
         top:-2px;
     }
-    /*Widget Refresh*/
-    .vis-a-task-status-panel:hover .vis-a-refreshIco {
-        display: flex;
-    }
-.vis-a-refreshIco {
-    top: 0.625em;
-    right: 0.625em;
-    font-size: 1em;
-    text-align: right;
-    display: none;
-    cursor: pointer;
-    background-color: rgba(var(--v-c-common),1);
-    padding: 6px;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-}
-.vis-a-refreshIco .vis {
-font-size: 0.875rem
-}
-
-
 
 
 

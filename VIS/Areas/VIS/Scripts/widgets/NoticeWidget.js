@@ -50,7 +50,7 @@
         };
 
         /*Create Busy Indicator */
-        function createBusyIndicator() {           
+        function createBusyIndicator() {
             $bsyDiv = $('<div id="busyDivId' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
             $root.append($bsyDiv);
         };
@@ -112,7 +112,7 @@
                         for (var s in data) {
                             appendRecords(data, s);
                         }
-                        if (async == true) {
+                        if (isTabAjaxBusy == true) {
                             events();
                         }
                         showBusy(false);
@@ -120,24 +120,19 @@
                     else {
 
                         if (welcomeTabDatacontainers.find(".vis-w-feedTitleBar").length == 0) {
-
-                            if (VIS.Application.isRTL) {
-                                str = "<p class='vis-pTagStyleCls'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
-                            }
-                            else {
-                                str = "<p class='vis-pTagStyleCls'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
-                            }
+                            str = "<p class='vis-pTagStyleCls vis-a-pTagSetHeight'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
                         }
+                        welcomeTabDatacontainers.append(str);
                         showBusy(false);
                     }
                     isTabAjaxBusy = false;
-                    welcomeTabDatacontainers.append(str);
                 }
-            });            
+            });
         }
 
         //Append Records
         function appendRecords(data, s) {
+            str = "";
             if (data[s].CDate != null && data[s].CDate != "") {
                 var cd_ = new Date(data[s].CDate);
                 dbdate = Globalize.format(cd_, "F", Globalize.cultureSelector);
@@ -184,7 +179,7 @@
                 + " <p class='vis-w-feedDateTime vis-strongWhiteClrCls vis-secondary-clr'>" + VIS.Utility.encodeText(dbdate) + "</p>"
                 + " </div>"
                 + " </div>"
-
+            welcomeTabDatacontainers.append(str);
         }
 
         /**
@@ -373,9 +368,9 @@
     /* init method called on loading a form . */
     VIS.NoticeWidget.prototype.init = function (windowNo, frame) {
         this.frame = frame;
-            this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
-            this.windowNo = windowNo;
-            this.Initalize();
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
+        this.windowNo = windowNo;
+        this.Initalize();
         this.frame.getContentGrid().append(this.getRoot());
     };
 

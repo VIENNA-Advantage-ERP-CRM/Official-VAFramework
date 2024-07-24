@@ -90,7 +90,7 @@
                 + ' </div>'
                 + '      </h2> '
                 + '  </div> '
-                + '  <div id="welcomeScreenFeedsList' + $self.AD_UserHomeWidgetID + '" class="scrollerVertical vis-RequestWelcomeScreenFeedsListCls" ></div> '
+                + '  <div id="welcomeScreenFeedsList' + $self.AD_UserHomeWidgetID + '" class="scrollerVertical vis-RequestWelcomeScreenFeedsListCls vis-a-setHeightReqstAtcion" ></div> '
                 + ' </div>';
 
             $root.append($requestWidget);
@@ -129,7 +129,7 @@
                     }
                     else {
                         if (welcomeTabDatacontainers.find(".vis-table-request").length == 0) {
-                            str = "<p style=' margin-top:200px;text-align: center'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
+                            str = "<p class='vis-a-pTagSetHeight vis-r-notRecordFndCls'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
                             welcomeTabDatacontainers.append(str);
                             showBusy(false);
                         }

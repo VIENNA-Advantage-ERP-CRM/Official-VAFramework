@@ -3680,7 +3680,7 @@ ul.vis-userLinks-ListMenu li a i {
     position: absolute;
     right: 0px;
     top: 0;
-    z-index: 99999;
+    z-index: 9;
     cursor: pointer;
     width: 25px;
     height: 25px;

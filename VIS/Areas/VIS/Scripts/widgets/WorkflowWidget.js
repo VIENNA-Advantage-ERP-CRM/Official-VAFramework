@@ -282,7 +282,6 @@
                     showBusy(false);
                 },
                 success: function (dyndata) {
-                    //showBusy(false);
                     var reslt = JSON.parse(dyndata.result);
                     if (reslt) {
                         $fstMainDiv_ID.find("#pnorecFound" + $self.AD_UserHomeWidgetID).css('display', 'none');
@@ -300,7 +299,8 @@
                     }
                     else {
                         data = null;
-                        $workflowWidgetDtls_ID.append('<p id="pnorecFound' + $self.AD_UserHomeWidgetID + '" class="vis-NoRecordCls">' + VIS.Msg.getMsg("NoRecordFound") + '</p>');// style="margin-top:12.5em; text-align:center; display:block;"
+                        $workflowWidgetDtls_ID.append('<p id="pnorecFound' + $self.AD_UserHomeWidgetID + '" class="vis-NoRecordCls vis-a-pTagSetHeight">' + VIS.Msg.getMsg("NoRecordFound") + '</p>');// style="margin-top:12.5em; text-align:center; display:block;"
+                        showBusy(false);
                     }
                 }
             });
