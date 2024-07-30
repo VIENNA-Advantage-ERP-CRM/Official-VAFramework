@@ -153,7 +153,6 @@
         this.frame.getContentGrid().append(this.getRoot());
     };
 
-    VIS.Apps.TestForm.prototype.sizeChanged = function (height, width) {
 
     };
 
