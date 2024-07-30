@@ -1222,9 +1222,10 @@
 
         
         oldGC = oldGC || {};
+        //
+        var isWPanel = this.aPanel instanceof VIS.APanel;
 
-
-        if (this.displayAsIncludedGC) {
+        if (this.displayAsIncludedGC && isWPanel) {
             var tdArea = this.aPanel.getLayout();
             this.setUI(false);
             this.getRoot().detach();
@@ -1234,7 +1235,7 @@
             tdArea.addClass('vis-ad-w-p-center-view-height');
             tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
         }
-        else if (this.gTab.getIncluded_Tab_ID() == 0) {
+        else if (this.gTab.getIncluded_Tab_ID() == 0 && isWPanel) {
             var olcIncludedTab = oldGC.vIncludedGC;
             var tdArea = this.aPanel.getLayout();
             if (olcIncludedTab) {

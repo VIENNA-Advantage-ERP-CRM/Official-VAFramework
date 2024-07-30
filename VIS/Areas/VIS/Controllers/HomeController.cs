@@ -103,8 +103,8 @@ namespace VIS.Controllers
             SecureEngine.Encrypt("test"); //init secure engine class
             if (User.Identity.IsAuthenticated)
             {
-                
-                
+
+
                 //StringBuilder sbLogin = new StringBuilder();
 
                 if (Request.QueryString.Count > 0) /* if has value */
@@ -132,14 +132,14 @@ namespace VIS.Controllers
                     IDataReader dr = null;
                     bool createNew = false;
 
-                   
+
                     ctx = new Ctx(lCtx.ctxMap); //cretae new context
 
                     /* fix for User Value Null value */
 
                     if (string.IsNullOrEmpty(ctx.GetContext("##AD_User_Value")))
                     {
-                        return new AccountController().SignOff(ctx,Session.SessionID);
+                        return new AccountController().SignOff(ctx, Session.SessionID);
 
                     }
 
@@ -283,16 +283,16 @@ namespace VIS.Controllers
                     ViewBag.ClientList = ClientList;
                     ViewBag.OrgList = OrgList;
                     ViewBag.WarehouseList = WareHouseList;
-                    
+
                     //sbLogin.Append("/n").Append("menu,client+ware =>" + stLogin.Elapsed);
                     // lock (_lock)    // Locked bundle Object and session Creation to handle concurrent requests.
                     //{
                     if (createNew)
                     {
                         //Cretae new Sessin
-                       
-                        MSession sessionNew = MSession.Get(ctx,Session.SessionID, true, Common.GetVisitorIPAddress(Request, true));
-                       // sessionNew.SetWebSession(Session.SessionID);
+
+                        MSession sessionNew = MSession.Get(ctx, Session.SessionID, true, Common.GetVisitorIPAddress(Request, true));
+                        // sessionNew.SetWebSession(Session.SessionID);
                         ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
                         sessionData.UserId = ctx.GetAD_User_ID();
                         sessionData.Name = ctx.GetAD_User_Name();
@@ -301,11 +301,11 @@ namespace VIS.Controllers
                     }
                     Session["ctx"] = ctx;
 
-                   
+
 
                     ViewBag.LibSuffix = "_v3";
                     ViewBag.FrameSuffix = "_v2";
-                   
+
 
                     /// VIS0008
                     /// Check applied for adding message to toastr if 2FA method is VA and VA App is not linked with device
@@ -446,20 +446,20 @@ namespace VIS.Controllers
             return PartialView("HomeNew");
         }
 
-            //public ActionResult Manifest()
-            //{
-            //    Response.ContentType = "text/cache-manifest";
-            //    Response.ContentEncoding = System.Text.Encoding.UTF8;
-            //    Response.Cache.SetCacheability(
-            //        System.Web.HttpCacheability.NoCache);
-            //    return View();
-            //}
+        //public ActionResult Manifest()
+        //{
+        //    Response.ContentType = "text/cache-manifest";
+        //    Response.ContentEncoding = System.Text.Encoding.UTF8;
+        //    Response.Cache.SetCacheability(
+        //        System.Web.HttpCacheability.NoCache);
+        //    return View();
+        //}
 
 
-            #region Follups start
-            /*----------------Folloups Strat-----------------------*/
-            // Get Folloups
-            [AjaxAuthorizeAttribute]
+        #region Follups start
+        /*----------------Folloups Strat-----------------------*/
+        // Get Folloups
+        [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
         [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public JsonResult GetJSONFllups(int fllPageSize, int fllPage, Boolean isRef)
@@ -898,9 +898,9 @@ namespace VIS.Controllers
         public JsonResult GetUserWidgets(int windowID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
-            HomeModels  homeModels = new HomeModels();
+            HomeModels homeModels = new HomeModels();
             return Json(JsonConvert.SerializeObject(homeModels.GetUserWidgets(ctx, windowID)));
-            
+
         }
 
         /// <summary>
@@ -913,8 +913,8 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
             return homeModels.SaveDashboard(ctx, widgetSizes, windowID);
-        } 
-        
+        }
+
         /// <summary>
         /// Save widget on drop
         /// </summary>
@@ -925,7 +925,7 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
             return homeModels.SaveSingleWidget(ctx, widgetSizes, windowID);
-        } 
+        }
 
         /// <summary>
         /// Delete widget
@@ -938,7 +938,34 @@ namespace VIS.Controllers
             HomeModels homeModels = new HomeModels();
             return homeModels.DeleteWidgetFromHome(ctx, id);
         }
-
+        /// <summary>
+        /// Get Widgets Records Count
+        /// </summary>
+        /// <param name="pagesize"></param>
+        /// <param name="page"></param>
+        /// <param name="isTabDataRef"></param>
+        /// <returns>Json</returns>
+        #region Get Widgets Count
+        //Get Widgets Count
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        public JsonResult GetWidgetsCount()
+        {
+            HomeModels count = new HomeModels();
+            string error = "";
+            if (Session["ctx"] != null)
+            {
+                objHomeHelp = new HomeHelper();
+                Ctx ct = Session["ctx"] as Ctx;
+                count = objHomeHelp.getWidgetsCount(ct);
+            }
+            else
+            {
+                error = "Session Expired";
+            }
+            return Json(new { count = count,error = error }, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
     }
 
 
