@@ -61,7 +61,7 @@
             $ulPopup.on("click", "LI", function (e) {
                 var action = $(e.target).data("action");
                 var ui = $(e.target).closest('ul');
-                if (action == 'D') {    
+                if (action == 'D') {
                     deleteWidget(ui);
                 }
                 else if (action == 'R') {
@@ -90,7 +90,7 @@
             function resizeWidgetContainer() {
                 var wd = $home.find('.vis-home-leftPanel').width();
                 if (wd < 300) {
-                    wd = $(window).width(); 
+                    wd = $(window).width();
                 }
 
                 var w = (wd - 25) / 9;
@@ -98,10 +98,10 @@
                     w = (wd - 25) / 3;
                 } else if ($(window).width() <= 960) {
                     w = (wd - 25) / 6;
-                } 
+                }
 
 
-                widgetWidth = w;               
+                widgetWidth = w;
                 $home.find('.vis-widget-container').attr('style', '--rowheight:' + w + 'px');
 
                 var itm = Object.keys(homeItems);
@@ -147,7 +147,7 @@
                     $rightPanel.show('slide', { direction: 'right' }, 200);
                     $home.find('.vis-home-leftPanel').sortable("enable");
                     isEditMode = true;
-                    $container.addClass('vis-editModeWidget');                   
+                    $container.addClass('vis-editModeWidget');
                     //hideShowIcon();
                     $('#vis_editHome').hide();
                     /*$leftPanel.find('.vis-trash-area').show();*/
@@ -167,9 +167,9 @@
                         $home.find('.vis-add-widgetContainer').show();
                     }
 
-                    $container.removeClass('vis-editModeWidget');                   
+                    $container.removeClass('vis-editModeWidget');
                     $rightPanel.hide('slide', { direction: 'left' }, 300);
-                    $home.find('.vis-home-leftPanel').sortable("disable");                    
+                    $home.find('.vis-home-leftPanel').sortable("disable");
                     $('#vis_editHome').show();
 
                     isEditMode = false;
@@ -198,7 +198,7 @@
                         $(this).w2overlay(ulPopup, { html: ulPopup, left: -5, top: -9 });
                     } else {
                         var ui = $(this).closest('.vis-widget-item');
-                        deleteWidget(ui);                                         
+                        deleteWidget(ui);
                     }
                 });
 
@@ -220,7 +220,7 @@
                         //dsi = dsi[0];
                         if (dsi.HasChild) {
                             // alert("setting Dialog");
-                            var sd =new VIS.shortcutMgr.SettingDialog(dsi.KeyID);// new SettingDialog(dsi.KeyID);
+                            var sd = new VIS.shortcutMgr.SettingDialog(dsi.KeyID);// new SettingDialog(dsi.KeyID);
                             sd.show();
                             sd = null;
                         }
@@ -294,7 +294,7 @@
                         // Clone the dragged element and append it to the .vis-home-leftPanel
                         var type = $(ui.helper).data('type')
                         var keyid = $(ui.helper).data('keyid');
-                      
+
                         var widgetSizes = [];
                         widgetSizes.push({
                             SRNO: 99,
@@ -302,7 +302,7 @@
                             Type: $(ui.helper).data('type'),
                         });
 
-                        VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Home/SaveSingleWidget", { widgetSizes: widgetSizes, windowID: 0 }, function (result) {                            
+                        VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Home/SaveSingleWidget", { widgetSizes: widgetSizes, windowID: 0 }, function (result) {
                             renderWidgets(widgetList[keyid + '_' + type], result, null);
                         });
 
@@ -319,7 +319,7 @@
                 $container.sortable({
                     items: ".vis-widget-item",
                     cursor: "grabbing",
-                    helper: "clone",   
+                    helper: "clone",
                     disabled: true,
                     tolerance: "pointer",
                     placeholder: "ui-sortable-placeholder",
@@ -333,11 +333,11 @@
                         ui.placeholder.css('grid-area', gridArea);
                     },
                     stop: function (event, ui) {
-                        isChanged = true;                       
+                        isChanged = true;
                     }
                 });
             }
-           
+
             // Function to render widgets
             function renderWidgets(widget, wid, AdditionalInfo) {
                 //var hue = Math.floor(Math.random() * 360);
@@ -386,21 +386,21 @@
 
                 if (widget.Type == "L") {
                     var $div = $('<div class="vis-linksWidget">');
-                    $div.append(widget.items).append('<div class="linktitle">'+widget.DisplayName+'</div>');
-                    $item.append($div);                    
+                    $div.append(widget.items).append('<div class="linktitle">' + widget.DisplayName + '</div>');
+                    $item.append($div);
                 }
                 else if (widget.Type == "C" || widget.Type == "K" || widget.Type == "V") {
-                    VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type);               
+                    VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type, info);
                 }
 
 
                 var trash = $('<div class="vis-widgetDelete"><i class="fa fa-trash-o"></i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(90 8 8)" d="M5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2z"></path></svg></div>');
-                
+
                 //hideShowIcon();
 
 
                 var trash = $('<div class="vis-widgetDelete"><i class="fa fa-trash-o"></i><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path transform="rotate(90 8 8)" d="M5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2z"></path></svg></div>');
-                
+
                 //hideShowIcon();
 
                 $item.append(trash);
@@ -408,7 +408,7 @@
                 $item.slideDown("slow");
 
             }
-           
+
 
             // Function to load widgets
             function loadWidgets() {
@@ -424,15 +424,15 @@
                     }
                     result.sort((a, b) => a.DisplayName - b.DisplayName);
                     //var widgetLst = result;
-                 
+
 
                     for (var i = 0; i < result.length; i++) {
-                       
+
                         var moduelName = null;
                         var img = null;
                         var itm = result[i];
                         if (result[i].Type == 'L') {
-                            moduelName="Links"                            
+                            moduelName = "Links"
                             if (itm.HasImage) {
                                 if (!itm.IsImageByteArray && itm.IconUrl.indexOf('.') < 0) {
                                     img = '<i data-index="' + i + '" class="' + itm.IconUrl + '"></i>';
@@ -460,7 +460,7 @@
                             moduelName = result[i].ModuleName
                             img = result[i].Img;
                         } else if (result[i].Type == 'C' || result[i].Type == 'K' || result[i].Type == 'V') {
-                            moduelName = VIS.Msg.getMsg(result[i].ModuleName) ;
+                            moduelName = VIS.Msg.getMsg(result[i].ModuleName);
                             img = result[i].Img
                         }
 
@@ -470,15 +470,15 @@
                             $home.find('.vis-widget-body').append($('<div class="vis-main-widget-heading">' + moduelName + '</div>'));
                             $home.find('.vis-widget-body').append($('<div class="vis-widgetDrag-container">'));
                         }
-                      
-                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img +'</div><div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols ||1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
+
+                        var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img + '</div><div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols || 1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
                         $home.find('.vis-widgetDrag-container:last').append(witem);
                     }
-                   
+
                     dragDrop();
                     loadHomeWidgets();
-                   
-                   
+
+
                 });
             }
 
@@ -570,11 +570,11 @@
                 $home.find('.vis-home-leftPanel').append($container);
                 loadWidgets();
                 events();
-                $(window).resize(adjustWidgetDivSize);              
+                $(window).resize(adjustWidgetDivSize);
 
             });
 
-           
+
 
         }
 
@@ -586,6 +586,6 @@
     VIS.HomeMgr2 = HomeMgr2();
 
     VIS.HomeMgr2.widgetFirevalueChanged = function (data) {
-        
+
     };
 })(VIS, jQuery);
