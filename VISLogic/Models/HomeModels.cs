@@ -376,115 +376,40 @@ namespace VIS.Models
         /// <param name="AD_WidgetSize_ID">AD_WidgetSize_ID</param>
         /// <returns>Field Details</returns>
 
-        public List<DynamicWidget> GetDynamicWidget(Ctx ctx, int AD_WidgetSize_ID)
+        public List<DynamicWidget> GetDynamicWidget(Ctx ctx, int widgetSize_ID, int windowNo, int tabID, int tableID, string isAdvanceSearch)
         {
             bool baseLanguage = Env.IsBaseLanguage(ctx, "");
-            string sql = @"SELECT AD_WidgetField.Control_Type, AD_WidgetField.IsSameLine, AD_WidgetField.OnClick,
-                   AD_WidgetField.HtmlStyle, AD_WidgetField.SeqNo, AD_WidgetField.OnClick, AD_WidgetField.AD_Image_ID, ";
-
-            if (baseLanguage) {
-                sql += " AD_WidgetField.Name ";
-            }
-            else {
-                sql += " AD_WidgetField_Trl.Name ";
-            }
-
-            sql += " FROM AD_WidgetField ";
-
-            if (!baseLanguage) {
-              sql += " INNER JOIN AD_WidgetField_Trl ON(AD_WidgetField_Trl.AD_WidgetField_ID=AD_WidgetField.AD_WidgetField_ID AND AD_WidgetField_Trl.AD_Language='" + Env.GetAD_Language(ctx) + "' AND AD_WidgetField_Trl.isActive='Y' )";
-            }
-            sql += @" WHERE AD_WidgetField.AD_WIDGET_ID =(SELECT WS.AD_WIDGET_ID FROM AD_WidgetSize WS
-                      INNER JOIN AD_Widget WD ON (WD.AD_Widget_ID=WS.AD_Widget_ID) WHERE WD.WidgetType='D' 
-                      AND WS.AD_WidgetSize_ID = " + AD_WidgetSize_ID + " ) AND AD_WidgetField.IsActive='Y' ";
-            List<DynamicWidget> list = null;
-            DataSet dataSet = DB.ExecuteDataset(sql);
-            if (dataSet != null && dataSet.Tables.Count > 0)
-            {
-                list = new List<DynamicWidget>();
-                var row = dataSet.Tables[0].Rows;
-                for (int i = 0; i < row.Count; i++)
-                {
-                    string imageURL = "";
-                    int Ad_Image_ID = Util.GetValueOfInt(row[i]["AD_Image_ID"]);
-                    if (Ad_Image_ID > 0)
-                    {
-                        var img = new VAdvantage.Model.MImage(ctx, Ad_Image_ID, null);
-                        if (img.GetFontName() != null && img.GetFontName().Length > 0)
-                        {
-                            if (img.Get_Value("FontStyle") != null)
-                            {
-                                imageURL = "<i class='" + img.GetFontName() + "' style='"+ img.Get_Value("FontStyle") + "'></i>";
-                            }
-                            else
-                            {
-                                imageURL = "<i class='" + img.GetFontName() + "'></i>";
-                            }
-                        }
-                        else if (img.GetImageURL() != null && img.GetImageURL().Length > 0)
-                        {
-                            imageURL = "<img src ='" + ctx.GetApplicationUrl() + img.GetImageURL() + "'></img>";
-                        }
-                        else if (img.GetBinaryData() != null)
-                        {
-                            imageURL = "<img src ='data:image/*;base64, " + Convert.ToBase64String((byte[])img.GetBinaryData()) + "'></img>";
-                        }
-                    }
-                    DynamicWidget l = new DynamicWidget()
-                    {
-                        ControlType = Util.GetValueOfString(row[i]["Control_Type"]),
-                        SeqNo = Util.GetValueOfInt(row[i]["SeqNo"]),
-                        Name = Util.GetValueOfString(row[i]["Name"]),
-                        HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
-                        OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
-                        IsSameLine = Util.GetValueOfString(row[i]["IsSameLine"]),
-                        ImageURL = imageURL
-                    };
-
-                    list.Add(l);
-                }
-            }
-            return list;
-        }
-
-
-        /// <summary>
-        /// Getting Widget Field for dynamic controls
-        /// </summary>
-        /// <param name="ctx">context</param>
-        /// <param name="AD_WidgetSize_ID">AD_WidgetSize_ID</param>
-        /// <returns>Field Details</returns>
-
-        public List<DynamicWidget> GetDynamicWidget(Ctx ctx, int AD_WidgetSize_ID,int windowNo)
-        {
-            bool baseLanguage = Env.IsBaseLanguage(ctx, "");
+            int sequenceNo = 0;
             string sql = @"SELECT AD_WidgetField.Control_Type,AD_WidgetField.BadgeStyle,AD_WidgetField.IsBadge,AD_WidgetField.BadgeValue, AD_WidgetField.IsSameLine, AD_WidgetField.OnClick,
                    AD_WidgetField.HtmlStyle, AD_WidgetField.SeqNo, AD_WidgetField.OnClick, AD_WidgetField.AD_Image_ID, ";
 
-            if (baseLanguage) {
+            if (baseLanguage)
+            {
                 sql += " AD_WidgetField.Name ";
             }
-            else {
+            else
+            {
                 sql += " AD_WidgetField_Trl.Name ";
             }
 
             sql += " FROM AD_WidgetField ";
 
-            if (!baseLanguage) {
-              sql += " INNER JOIN AD_WidgetField_Trl ON(AD_WidgetField_Trl.AD_WidgetField_ID=AD_WidgetField.AD_WidgetField_ID AND AD_WidgetField_Trl.AD_Language='" + Env.GetAD_Language(ctx) + "' AND AD_WidgetField_Trl.isActive='Y' )";
+            if (!baseLanguage)
+            {
+                sql += " INNER JOIN AD_WidgetField_Trl ON(AD_WidgetField_Trl.AD_WidgetField_ID=AD_WidgetField.AD_WidgetField_ID AND AD_WidgetField_Trl.AD_Language='" + Env.GetAD_Language(ctx) + "' AND AD_WidgetField_Trl.isActive='Y' )";
             }
             sql += @" WHERE AD_WidgetField.AD_WIDGET_ID =(SELECT WS.AD_WIDGET_ID FROM AD_WidgetSize WS
                       INNER JOIN AD_Widget WD ON (WD.AD_Widget_ID=WS.AD_Widget_ID) WHERE WD.WidgetType='D' 
-                      AND WS.AD_WidgetSize_ID = " + AD_WidgetSize_ID + " ) AND AD_WidgetField.IsActive='Y' ";
-            List<DynamicWidget> list = null;
+                      AND WS.AD_WidgetSize_ID = " + widgetSize_ID + " ) AND AD_WidgetField.IsActive='Y' ";
+            List<DynamicWidget> list = new List<DynamicWidget>(); ;
             DataSet dataSet = DB.ExecuteDataset(sql);
             if (dataSet != null && dataSet.Tables.Count > 0)
             {
-                list = new List<DynamicWidget>();
                 var row = dataSet.Tables[0].Rows;
                 for (int i = 0; i < row.Count; i++)
                 {
                     string imageURL = "";
+                    sequenceNo = Util.GetValueOfInt(row[i]["SeqNo"]);
                     string badgeValue = Util.GetValueOfString(row[i]["BadgeValue"]);
                     int Ad_Image_ID = Util.GetValueOfInt(row[i]["AD_Image_ID"]);
                     if (Ad_Image_ID > 0)
@@ -538,7 +463,7 @@ namespace VIS.Models
                     DynamicWidget l = new DynamicWidget()
                     {
                         ControlType = Util.GetValueOfString(row[i]["Control_Type"]),
-                        SeqNo = Util.GetValueOfInt(row[i]["SeqNo"]),
+                        SeqNo = sequenceNo,
                         Name = Util.GetValueOfString(row[i]["Name"]),
                         HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
                         OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
@@ -548,8 +473,62 @@ namespace VIS.Models
                         BadgeName = badgeValue,
                         ImageURL = imageURL
                     };
-
                     list.Add(l);
+                }
+            }
+            if (isAdvanceSearch == "Y" && tableID != 0 && tabID != 0)
+            {
+                string query = $@"SELECT AD_UserQuery_ID,Name,IsShowOnLandingPage,TargetView,AD_CardView_ID,Code,
+                (SELECT TableName FROM AD_Table WHERE AD_Table_ID={tableID}) AS TableName
+                FROM AD_UserQuery WHERE 
+                AD_Client_ID = { ctx.GetAD_Client_ID() } AND IsActive='Y' 
+                AND (AD_Tab_ID={ tabID } OR AD_Table_ID= { tableID }) 
+                ORDER BY Upper(Name), AD_UserQuery_ID";
+                DataSet ds = DB.ExecuteDataset(query);
+                if (ds != null && ds.Tables.Count > 0)
+                {
+                    var row = ds.Tables[0].Rows;
+                    for (int i = 0; i < row.Count; i++)
+                    {
+                        sequenceNo += sequenceNo + 10;
+                        string code = Util.GetValueOfString(row[i]["Code"]);
+                        string tableName = Util.GetValueOfString(row[i]["TableName"]);
+                        string tabLayout = Util.GetValueOfString(row[i]["TargetView"]);
+                        string AD_CardView_ID = Util.GetValueOfString(row[i]["AD_CardView_ID"]);
+                        if (Util.GetValueOfString(row[i]["IsShowOnLandingPage"]) == "Y")
+                        {
+                            string badgeSql = "SELECT COUNT(*) FROM " + tableName;
+                            if (!String.IsNullOrEmpty(code))
+                            {
+                                badgeSql += " WHERE " + code;
+                            }
+
+                            badgeSql = MRole.GetDefault(ctx).AddAccessSQL(badgeSql, tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+
+                            string badgeCount = Util.GetValueOfString(DB.ExecuteScalar(badgeSql));
+                            ActionParams obj = new ActionParams
+                            {
+                                TabWhereClause = Util.GetValueOfString(code),
+                                Card_ID = Util.GetValueOfString(AD_CardView_ID),
+                                TabLayout = Util.GetValueOfString(tabLayout),
+                                TabIndex = Util.GetValueOfString(0)
+                            };
+                            DynamicWidget l = new DynamicWidget()
+                            {
+                                ControlType = "LN",
+                                SeqNo = sequenceNo,
+                                Name = Util.GetValueOfString(row[i]["Name"]),
+                                HtmlStyle = "",
+                                OnClick = obj,
+                                IsSameLine = "N",
+                                IsBadge = "Y",
+                                BadgeStyle = "",
+                                BadgeName = badgeCount,
+                                ImageURL = ""
+                            };
+                            list.Add(l);
+                        }
+                    }
                 }
             }
             return list;
@@ -560,14 +539,14 @@ namespace VIS.Models
         /// Get Widget Style and wigdet ID
         /// </summary>
         /// <param name="ctx">Context</param>
-        /// <param name="AD_UserHomeWidget_ID">AD_UserHomeWidget_ID</param>
+        /// <param name="userHomeWidget_ID">AD_UserHomeWidget_ID</param>
         /// <returns>AD_WidgetSize_ID and HtmlStyle</returns>
-        public List<WidgetSizeID> GetWidgetID(Ctx ctx,int AD_UserHomeWidget_ID)
+        public List<WidgetSizeID> GetWidgetID(Ctx ctx, int userHomeWidgetID)
         {
-            string sql = @"SELECT WS.AD_WidgetSize_ID,WD.HtmlStyle FROM Ad_widgetSize WS
+            string sql = @"SELECT WS.AD_WidgetSize_ID,WD.HtmlStyle,WD.AD_Widget_ID,WD.IsShowAdvanced FROM Ad_widgetSize WS
                        INNER JOIN AD_Widget WD ON(WD.AD_Widget_ID=WS.AD_Widget_ID) 
                        WHERE WS.AD_WidgetSize_ID IN (SELECT COMPONENTID  FROM AD_UserHomeWidget 
-                       WHERE COMPONENTTYPE='W' AND AD_UserHomeWidget_ID= "+ AD_UserHomeWidget_ID + " )" +
+                       WHERE COMPONENTTYPE='W' AND AD_UserHomeWidget_ID= " + userHomeWidgetID + " )" +
                        " AND WD.IsActive='Y' AND WS.IsActive='Y' ";
             List<WidgetSizeID> list = null;
             DataSet dataSet = DB.ExecuteDataset(sql);
@@ -581,7 +560,9 @@ namespace VIS.Models
                     WidgetSizeID l = new WidgetSizeID()
                     {
                         AD_WidgetSize_ID = Util.GetValueOfInt(row[i]["AD_WidgetSize_ID"]),
-                        WidgetStyle = Util.GetValueOfString(row[i]["HtmlStyle"])     
+                        AD_Widget_ID = Util.GetValueOfInt(row[i]["AD_Widget_ID"]),
+                        WidgetStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
+                        IsShowAdvanced = Util.GetValueOfString(row[i]["IsShowAdvanced"])
                     };
 
                     list.Add(l);
@@ -755,7 +736,9 @@ namespace VIS.Models
     public class WidgetSizeID
     {
         public string WidgetStyle { get; set; }
+        public string IsShowAdvanced { get; set; }
         public int AD_WidgetSize_ID { get; set; }
+        public int AD_Widget_ID { get; set; }
     }
 
     public class HomeWidget : WidgetSize

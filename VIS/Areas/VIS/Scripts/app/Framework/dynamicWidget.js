@@ -7,17 +7,17 @@
         this.frame;
         this.windowNo;
         var self = this;
-        var $root = $("<div class='vis-height-full'>");
+        var $root = $("<div class='vis-dynamicWidget-main'>");
 
-        function initializeComponent(AD_WidgetSize_ID, WidgetStyle) {
+        function initializeComponent(AD_WidgetSize_ID, WidgetStyle,isAdvanceSearch) {
             if (WidgetStyle) {
                 $root.attr('style', WidgetStyle);
             }
             if (AD_WidgetSize_ID > 0) {
                 var onClickParameters = [];
-                getField(AD_WidgetSize_ID, afterLoad);
+                getField(AD_WidgetSize_ID, isAdvanceSearch, afterLoad);
             }
-
+           
             function afterLoad(data) {
                 if (data && data.length > 0) {
                     data.sort(function (a, b) {
@@ -121,11 +121,17 @@
         }
 
         /* Getting Widget Fields */
-        function getField(AD_WidgetSize_ID,callback) {
+        function getField(AD_WidgetSize_ID, isAdvanceSearch,callback) {
             var result = [];
             $.ajax({
                 url: VIS.Application.contextUrl + "home/GetDynamicWidget",
-                data: { AD_WidgetSize_ID: AD_WidgetSize_ID, windowNo: self.windowNo},
+                data: {
+                    widgetSize_ID: AD_WidgetSize_ID,
+                    windowNo: self.windowNo,
+                    tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
+                    tableID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Table_ID"),
+                    isAdvanceSearch: isAdvanceSearch
+                },
                 success: function (data) {
                     data = JSON.parse(data);
                     if (data) {
@@ -146,11 +152,11 @@
                 $.ajax({
                     url: VIS.Application.contextUrl + "home/GetWidgetID",
                     async: false,
-                    data: { AD_UserHomeWidget_ID: AD_UserHomeWidget_ID },
+                    data: { userHomeWidgetID: AD_UserHomeWidget_ID },
                     success: function (data) {
                         data = JSON.parse(data);
                         if (data) {
-                            initializeComponent(data[0].AD_WidgetSize_ID, data[0].WidgetStyle);
+                            initializeComponent(data[0].AD_WidgetSize_ID, data[0].WidgetStyle, data[0].IsShowAdvanced);
                         }
                     }
                 });
