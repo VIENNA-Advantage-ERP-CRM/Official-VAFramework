@@ -73,17 +73,17 @@ namespace VIS.Models
         /// <summary>
         /// Getting Data from advance filter table to show filters on landing page
         /// </summary>
-        /// <param name="AD_Tab_ID">AD_Tab_ID</param>
-        /// <param name="AD_Table_ID">AD_Tab_ID</param>
+        /// <param name="tabID">AD_Tab_ID</param>
+        /// <param name="tableID">AD_Tab_ID</param>
         /// <param name="ctx">Context</param>
         /// <returns>AD_UserQuery List</returns>
-        public List<UserQuery> GetUserQuery(int AD_Tab_ID, int AD_Table_ID, Ctx ctx)
+        public List<UserQuery> GetUserQuery(int tabID, int tableID, Ctx ctx)
         {
-            List<CardViewDetail> cardList = GetCardView(AD_Tab_ID, ctx);
+            List<CardViewDetail> cardList = GetCardView(tabID, ctx);
             List<UserQuery> list = null;
             string sql = $@"SELECT AD_UserQuery_ID,Name,IsShowOnLandingPage,TargetView,AD_CardView_ID FROM AD_UserQuery WHERE 
                 AD_Client_ID = { ctx.GetAD_Client_ID() } AND IsActive='Y' 
-                AND (AD_Tab_ID={ AD_Tab_ID } OR AD_Table_ID= { AD_Table_ID }) 
+                AND (AD_Tab_ID={ tabID } OR AD_Table_ID= { tableID }) 
                 ORDER BY Upper(Name), AD_UserQuery_ID";
             sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "AD_UserQuery", true, true);
             DataSet ds = DB.ExecuteDataset(sql);
@@ -95,15 +95,15 @@ namespace VIS.Models
                 {
                     UserQuery obj = new UserQuery()
                     {
-                        name = Util.GetValueOfString(row[i]["Name"]),
-                        isShowOnLandingPage = Util.GetValueOfString(row[i]["IsShowOnLandingPage"]),
-                        targetView = Util.GetValueOfString(row[i]["TargetView"]),
+                        Name = Util.GetValueOfString(row[i]["Name"]),
+                        IsShowOnLandingPage = Util.GetValueOfString(row[i]["IsShowOnLandingPage"]),
+                        TargetView = Util.GetValueOfString(row[i]["TargetView"]),
                         AD_CardView_ID = Util.GetValueOfString(row[i]["AD_CardView_ID"]),
                         AD_UserQuery_ID = Util.GetValueOfString(row[i]["AD_UserQuery_ID"])
                     };
                     if (cardList != null && cardList.Count > 0)
                     {
-                        obj.cardViewList = cardList;
+                        obj.CardViewList = cardList;
                     }
                     list.Add(obj);
                 }
@@ -115,12 +115,12 @@ namespace VIS.Models
         /// <summary>
         /// Getting card view binded with window
         /// </summary>
-        /// <param name="AD_Tab_ID">AD_Tab_ID</param>
+        /// <param name="tabID">tabID</param>
         /// <param name="ctx">context</param>
         /// <returns>CardView data</returns>
-        public List<CardViewDetail> GetCardView(int AD_Tab_ID,Ctx ctx) {
+        public List<CardViewDetail> GetCardView(int tabID, Ctx ctx) {
             List<CardViewDetail> List = new List<CardViewDetail>();
-            string sql = @"SELECT Name,Ad_CardView_ID FROM AD_CardView WHERE AD_TAB_ID = "+ AD_Tab_ID;
+            string sql = @"SELECT Name,Ad_CardView_ID FROM AD_CardView WHERE Ad_Tab_ID = "+ tabID;
             //sql= MRole.GetDefault(ctx).AddAccessSQL(sql, "AD_CardView", true, true);
             DataSet ds = DB.ExecuteDataset(sql);
             if (ds != null && ds.Tables.Count > 0)
@@ -153,8 +153,8 @@ namespace VIS.Models
                 for (int i = 0; i < userQueryList.Count; i++)
                 {
                     MUserQuery obj = new MUserQuery(ctx, Util.GetValueOfInt(userQueryList[i].AD_UserQuery_ID), null);
-                    obj.Set_Value("IsShowOnLandingPage", userQueryList[i].isShowOnLandingPage);
-                    obj.Set_Value("TargetView", userQueryList[i].targetView);
+                    obj.Set_Value("IsShowOnLandingPage", userQueryList[i].IsShowOnLandingPage);
+                    obj.Set_Value("TargetView", userQueryList[i].TargetView);
                     obj.Set_Value("AD_CardView_ID", userQueryList[i].AD_CardView_ID);
                     if (obj.Save())
                     {
@@ -190,24 +190,17 @@ namespace VIS.Models
     {
         public string AD_CardView_ID { get; set; }
         public string AD_UserQuery_ID { get; set; }
-        public string isShowOnLandingPage { get; set; }
-        public string name { get; set; }
-        public string targetView { get; set; }
-        public List<CardViewDetail> cardViewList { get; set; } // New property
+        public string IsShowOnLandingPage { get; set; }
+        public string Name { get; set; }
+        public string TargetView { get; set; }
+        public List<CardViewDetail> CardViewList { get; set; } // New property
 
     }
 
     public class CardViewDetail { 
         public int AD_CardView_ID { get; set; }
-
         public string Name { get; set; }
 
     }
-
-   /* public class UserQueryList
-    {
-        public List<UserQuery> UserQueryList { get; set; } = new List<UserQuery>()*//**//*
-    }
-*/
 
 }
