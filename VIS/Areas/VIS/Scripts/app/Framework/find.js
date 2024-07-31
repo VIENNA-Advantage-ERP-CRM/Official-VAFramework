@@ -387,7 +387,7 @@
 
             var $landinPageTable = $("<div class='vis-landingPage-main'><table class='vis-landingPage-table' id='LandingPage_" + windowNo + "'><thead><tr>"
                 + "<th style='display:none;'><div class='vis-landingpage-head'>userqueryID</div></th>"
-                + "<th><div class='vis-landingpage-head'>" + VIS.Msg.getMsg("Name") + " </div></th>"
+                + "<th><div class='vis-landingpage-head'>" + VIS.Msg.getMsg("VIS_Name") + " </div></th>"
                 + "<th><div class='vis-landingpage-head text-center'>" + VIS.Msg.getMsg("ShowOnLandingPage") + " </div></th>"
                 + "<th><div class='vis-landingpage-head'>" + VIS.Msg.getMsg("TargetView") + "  </div></th>"
                 + "<th><div class='vis-landingpage-head'>" + VIS.Msg.getMsg("CardViewID") + "  </div></th>"
