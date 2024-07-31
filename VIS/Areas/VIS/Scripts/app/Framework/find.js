@@ -169,12 +169,16 @@
         var $busy = null;
         var $self = this;
         var ch = null;
-        var btnOk, btnCancel, btnDelete, btnSave, btnRefresh;
+        var btnOk, btnCancel, btnDelete, btnSave, btnRefresh, adsearchgroup1;
         var txtQryName, drpSavedQry, drpColumns, drpOp, drpDynamicOp, chkDynamic, txtYear, txtMonth, txtDay, txtStatus, chkFullDay, spanAddFilter, btnBack;
         var ulQryList, divDynamic, divYear, divMonth, divDay, divValue1, divValue2, tblGrid, tblBody, divFullDay, inputWarps, lblQryValue;
         var lblBottomMsgLP = $('<label></label>');
         var okBtnLP, closeBtnLP, mainAdvaceDiv, btnBackLP;
-
+        var gridView =
+            "<option value='Y'>" + VIS.Msg.getMsg("SingleView") + "</option>" +
+            "<option value='N'>" + VIS.Msg.getMsg("GridView") + "</option>" +
+            "<option value='C'>" + VIS.Msg.getMsg("CardView") + "</option>"
+            ;
         var FIELDLENGTH = 20, TABNO = 99;
 
         var total = 0, isLoadError = false, isSaveError = false, isBusy = false;
@@ -212,10 +216,10 @@
 
             var html = '<div id="mainAdvance_' + windowNo + '" class="vis-advancedSearch-contentWrap"> <div class="vis-advancedSearchContentArea vis-pull-left" style="' + dStyle + '">'
                 + ' <div class="vis-advancedSearchContentArea-up"> <div class="vis-advanedSearch-InputsWrap"><div class="vis-as-topfieldswrap">'
-                + '<div style="display:none" class="vis-form-group vis-advancedSearchInput vis-adsearchgroup1">'
+                + '<div id="adsearchgroup1_' + windowNo+'" style="display:none" class="vis-form-group vis-advancedSearchInput vis-adsearchgroup1">'
                 + '<input readonly id="txtQryName_' + windowNo + '" type="text" name="QueryName" maxlength="60">'
                 + '<label id="lblQryName_' + windowNo + '" for="QueryName">' + VIS.Msg.getMsg("AddNameToSaveSearch") + '</label>'
-                + '</div> <div  class="vis-form-group vis-advancedSearchInput vis-adsearchgroup2">'
+                + '</div> <div class="vis-form-group vis-advancedSearchInput vis-adsearchgroup2">'
                 + '<label id="lblSavedQry_' + windowNo + '" for="GetSavedQuery">' + VIS.Msg.getMsg("GetSavedSearch") + '</label>'
                 + '<select id="drpSavedQry_' + windowNo + '"></select>'
                 + '</div>'
@@ -372,13 +376,13 @@
                 + '</div>'
                 + '</div>'
 
-                + '</div>'
+                + '</div>';
 
                 //<!-- end of advancedSearch-GrayWrap -->
 
-                + '<div class="vis-apanel-busy vis-advancedSearchbusy" id="divBusy_' + windowNo + '" >'
-                + '<p style="text-align:center"> ' + VIS.Msg.getMsg("Loading") + '</p>'
-                + '</div>'
+            var busyDiv = '<div class="vis-apanel-busy vis-advancedSearchbusy" id="divBusy_' + windowNo + '" >'
+                + '<p style="text-align:center"></p>'
+                + '</div>';
 
 
             var $landinPageTable = $("<div class='vis-landingPage-main'><table class='vis-landingPage-table' id='LandingPage_" + windowNo + "'><thead><tr>"
@@ -404,7 +408,7 @@
 
             //grid 
             $landinPageRoot.append($landinPageTable).append(landingPageBtn);
-            $root.append(html).append($landinPageRoot);
+            $root.append(html).append($landinPageRoot).append(busyDiv);
             initUI();
             initFind();
             bindEvents();
@@ -444,6 +448,7 @@
             mainAdvaceDiv = $root.find('#mainAdvance_' + windowNo);
             landingPage = $root.find('#landingPageSetting_' + windowNo);
             btnBack = $root.find('#btnArowBack_' + windowNo);
+            adsearchgroup1 = $root.find('#adsearchgroup1_' + windowNo);
             inputWarps = $($root.find('.vis-advs-inputwraps')[0]);
             closeBtnLP = $landinPageRoot.find("#closeBtn_" + windowNo);
             okBtnLP = $landinPageRoot.find("#okBtn_" + windowNo);
@@ -552,6 +557,8 @@
 
 
             okBtnLP.on("click", function () {
+                setBusy(true);
+                lblBottomMsgLP.text("");
                 var userQueryList = getAllRowData();
                 if (userQueryList.length > 0) {
                     updateUserQuery(userQueryList);
@@ -911,7 +918,7 @@
                     inputWarps.show();
                     btnBack.show();
                     $('.vis-adsearchgroup2').hide();
-                    $('.vis-adsearchgroup1').show();
+                    adsearchgroup1.show();
                     $('.vis-advancedSearchContentArea-down').css('height', 'calc(100% - 150px)');
                 }
             });
@@ -938,7 +945,7 @@
                 landingPage.show();
                 toggleDisplay();
                 //if (savedFiltersCount == 0) {
-                $('.vis-adsearchgroup1').hide();
+                adsearchgroup1.hide();
                 $('.vis-adsearchgroup2').show();
                 drpSavedQry[0].selectedIndex = 0;
                 tblBody.empty();
@@ -978,12 +985,13 @@
                 var rowData = {
                     AD_CardView_ID: row.find('#cardID_' + windowNo).val(),
                     AD_UserQuery_ID: row.find('#userqueryID_' + windowNo).val(),
-                    isShowOnLandingPage: row.find('#isShowLandingPage_' + windowNo).is(':checked') ? 'Y' : 'N',
-                    name: row.find('#txtName_' + windowNo).val(),
-                    targetView: row.find('#gridView_' + windowNo).val(),
+                    IsShowOnLandingPage: row.find('#isShowLandingPage_' + windowNo).is(':checked') ? 'Y' : 'N',
+                    Name: row.find('#txtName_' + windowNo).val(),
+                    TargetView: row.find('#gridView_' + windowNo).val(),
                 };
                 userQueryList.push(rowData);
             });
+            setBusy(false);
             return userQueryList;
         }
 
@@ -991,7 +999,7 @@
             dsUserQuery = [];
             $.ajax({
                 url: VIS.Application.contextUrl + "ASearch/GetUserQuery",
-                data: { AD_Tab_ID: AD_Tab_ID, AD_Table_ID: AD_Table_ID },
+                data: { tab_ID: AD_Tab_ID, table_ID: AD_Table_ID },
                 success: function (data) {
                     data = JSON.parse(data);
                     if (data) {
@@ -1007,6 +1015,7 @@
 
 
         function updateUserQuery(data) {
+            setBusy(true);
             if (data.length > 0) {
                 $.ajax({
                     type: "POST",
@@ -1015,6 +1024,7 @@
                     success: function (data) {
                         data = JSON.parse(data);
                         lblBottomMsgLP.text(data);
+                        setBusy(false);
                     }
                 });
             }
@@ -1399,7 +1409,7 @@
             tblBody.html(html);
         };
 
-        function bindLandingGrid(list) {
+        function bindLandingGrid(list) {         
             tbleBodyLP.empty();
             var html = "";
             var htm = "", obj = null;
@@ -1409,29 +1419,23 @@
                     htm = "<tr>";
                     obj = list[i];
 
-                    var gridView = '';
                     var isCardViewDisabled ='';
 
-                    if (obj.targetView == 'Y') gridView = "<option value='Y' selected>Single View</option><option value='N'>Grid View</option><option value='C'>Card View</option>";
-                    else if (obj.targetView == 'N') gridView = "<option value='Y'>Single View</option><option value='N' selected>Grid View</option><option value='C'>Card View</option>";
-                    else if (obj.targetView == 'C') gridView = "<option value='Y'>Single View</option><option value='N'>Grid View</option><option value='C' selected>Card View</option>";
-                    else gridView = "<option value='Y'>Single View</option><option value='N'>Grid View</option><option value='C'>Card View</option>";
-
                     var cardView = "<option value='0' selected>NA</option>";
-                    if (obj.cardViewList != null) {
-                        for (var j = 0; j < obj.cardViewList.length; j++) {
-                            var selected = obj.cardViewList[j].AD_CardView_ID == obj.AD_CardView_ID ? 'selected' : '';
-                            if (obj.targetView == 'Y' || obj.targetView == 'N') {
+                    if (obj.CardViewList != null) {
+                        for (var j = 0; j < obj.CardViewList.length; j++) {
+                            var selected = obj.CardViewList[j].AD_CardView_ID == obj.AD_CardView_ID ? 'selected' : '';
+                            if (!obj.TargetView == 'C') {
                                 selected = '';
                                 isCardViewDisabled = 'disabled';
                             }
-                            cardView += "<option value='" + obj.cardViewList[j].AD_CardView_ID + "' " + selected + ">" + obj.cardViewList[j].Name + "</option>";
+                            cardView += "<option value='" + obj.CardViewList[j].AD_CardView_ID + "' " + selected + ">" + obj.CardViewList[j].Name + "</option>";
                         }
                     }
 
                     htm += "<td class='vis-landingpage-row' style='display:none;'><div><input id='userqueryID_" + windowNo + "' value='" + obj.AD_UserQuery_ID + "' type='text'></div></td>"
-                        + "<td class='vis-landingpage-row'><div><label class='w-100' style='font-weight: normal;' id='txtName_" + windowNo + "' value='" + obj.name + "'>" + obj.name + "</label></div></td>"
-                        + "<td class='vis-landingpage-row text-center'><div><input id='isShowLandingPage_" + windowNo + "' value='" + obj.isShowOnLandingPage + "' type='checkbox' " + (obj.isShowOnLandingPage == 'Y' ? 'checked' : '') + "></div></td>"
+                        + "<td class='vis-landingpage-row'><div><label class='w-100' style='font-weight: normal;' id='txtName_" + windowNo + "' value='" + obj.Name + "'>" + obj.Name + "</label></div></td>"
+                        + "<td class='vis-landingpage-row text-center'><div><input id='isShowLandingPage_" + windowNo + "' value='" + obj.IsShowOnLandingPage + "' type='checkbox' " + (obj.IsShowOnLandingPage == 'Y' ? 'checked' : '') + "></div></td>"
                         + "<td class='vis-landingpage-row'><div><select index='" + i + "' id='gridView_" + windowNo + "' class='vis-landingPage-tr-border'>" + gridView + "</select></div></td>"
                         + "<td class='vis-landingpage-row'><div><select class='vis-landingPage-tr-border index_" + i + "' id='cardID_" + windowNo + "' " + isCardViewDisabled + ">" + cardView + "</select></div></td>";
                     htm += "</tr>";
@@ -1439,6 +1443,8 @@
                 }
             }
             tbleBodyLP.html(html);
+
+            tbleBodyLP.find('#gridView_' + windowNo).val(obj.TargetView);
 
             tbleBodyLP.on('change', '#gridView_'+ windowNo, function () {
                 var index = $(this).attr('index');
@@ -1451,6 +1457,16 @@
                 }
             });
         }
+
+       /* function setSelectedView(TargetView) {
+            gridView.each(function () {
+                if ($(this).val() == TargetView) {
+                    $(this).prop('selected', true);
+                } else {
+                    $(this).prop('selected', false);
+                }
+            });
+        }*/
 
 
         /* get total number of record */
@@ -1629,7 +1645,7 @@
                 spanAddFilter.show();
                 btnBack.hide();
                 $('.vis-adsearchgroup2').hide();
-                $('.vis-adsearchgroup1').show();
+                adsearchgroup1.show();
             }
             return true;
         };

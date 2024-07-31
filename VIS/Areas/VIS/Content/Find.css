@@ -556,12 +556,12 @@ margin-right:5px;
     
 }
 .vis-landingPage-table thead tr th {
-    background-color: #ededed;
+    background-color: rgba(var(--v-c-secondary), 1);
     padding: 6px 8px;
 }
 
 .vis-landingPage-table tbody tr {
-   border-bottom:1px solid #e4e4e4;
+    border-bottom: 1px solid rgba(var(--v-c-secondary), 1);
 }
 
 .vis-landingPage-table {

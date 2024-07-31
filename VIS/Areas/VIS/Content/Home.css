@@ -3212,6 +3212,8 @@ p.vis-maintain-customer-p span {
 
 .vis-dynamicWidget-main {
     overflow: hidden;
+    width:100%;
+    height:100%;
 }
 
 .vis-add-row {
@@ -3224,7 +3226,7 @@ p.vis-maintain-customer-p span {
         align-items: center;
         border: 0;
         border-radius: 6px;
-        min-height: 42px;
+        min-height: 40px;
         width: auto;
         float: left;
         margin: 0 6px 6px;
@@ -3240,7 +3242,6 @@ p.vis-maintain-customer-p span {
         float: left;
         margin: 0 6px 0px;
         gap: 8px;
-        min-height: 42px;
         padding: 0px 5px;
         overflow: hidden;
         justify-content: center;
@@ -3273,6 +3274,14 @@ p.vis-maintain-customer-p span {
         color: rgba(var(--v-c-on-primary),1);
         background-color: rgba(var(--v-c-primary), 1);
     }
+
+    .vis-add-row button i.default,
+    .vis-add-row button img.default {
+        color: rgba(var(--v-on-c-primary), 1);
+    }
+
+
+
     .vis-add-row button img, .vis-add-row label img, .vis-add-row a img {
         width: 20px;
         overflow: hidden;
@@ -3285,8 +3294,9 @@ p.vis-maintain-customer-p span {
     margin: 0px;
 }
 .vis-widget-badge {
-    background: #fff;
-    color: rgba(var(--v-c-on-secondary), 1);
+    background: rgba(var(--v-c-on-secondary), 1);
+    color: rgba(var(--v-c-on-primary), 1);
+    font-weight: 600;
 }
 
 /* new Changes */

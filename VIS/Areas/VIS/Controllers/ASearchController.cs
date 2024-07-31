@@ -137,11 +137,11 @@ namespace VIS.Controllers
         /// <param name="AD_Table_ID">AD_Tab_ID</param>
         /// <param name="ctx">Context</param>
         /// <returns>AD_UserQuery List</returns>
-        public JsonResult GetUserQuery(int AD_Tab_ID,int AD_Table_ID)
+        public JsonResult GetUserQuery(int tab_ID,int table_ID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             ASearchModel mod = new ASearchModel();
-            return Json(JsonConvert.SerializeObject(mod.GetUserQuery(AD_Tab_ID, AD_Table_ID, ctx)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(mod.GetUserQuery(tab_ID, table_ID, ctx)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>

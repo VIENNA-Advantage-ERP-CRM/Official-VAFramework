@@ -865,13 +865,13 @@ namespace VIS.Controllers
         /// <summary>
         /// Getting widget fields for dynamic controls
         /// </summary>
-        /// <param name="AD_WidgetSize_ID">AD_WidgetSize_ID</param>
+        /// <param name="widgetSize_ID">AD_WidgetSize_ID</param>
         /// <returns>Field Details</returns>
-        public JsonResult GetDynamicWidget( int AD_WidgetSize_ID,int windowNo, int AD_Tab_ID, int AD_Table_ID, string isAdvanceSearch)
+        public JsonResult GetDynamicWidget( int widgetSize_ID,int windowNo, int tabID, int tableID, string isAdvanceSearch)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
-            var widgets = homeModels.GetDynamicWidget(ctx, AD_WidgetSize_ID, windowNo, AD_Tab_ID, AD_Table_ID, isAdvanceSearch);
+            var widgets = homeModels.GetDynamicWidget(ctx, widgetSize_ID, windowNo, tabID, tableID, isAdvanceSearch);
             return Json(JsonConvert.SerializeObject(widgets), JsonRequestBehavior.AllowGet);
         }
 
@@ -880,11 +880,11 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="AD_UserHomeWidget_ID">AD_UserHomeWidget_ID</param>
         /// <returns>AD_UserHomeWidget_ID and Htmlstyle</returns>
-        public JsonResult GetWidgetID( int AD_UserHomeWidget_ID)
+        public JsonResult GetWidgetID( int userHomeWidgetID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
-            var widgets = homeModels.GetWidgetID(ctx, AD_UserHomeWidget_ID);
+            var widgets = homeModels.GetWidgetID(ctx, userHomeWidgetID);
             return Json(JsonConvert.SerializeObject(widgets), JsonRequestBehavior.AllowGet);
         }
 

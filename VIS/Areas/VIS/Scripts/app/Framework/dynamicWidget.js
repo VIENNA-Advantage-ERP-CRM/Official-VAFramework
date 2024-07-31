@@ -7,7 +7,7 @@
         this.frame;
         this.windowNo;
         var self = this;
-        var $root = $("<div class='vis-height-full vis-dynamicWidget-main'>");
+        var $root = $("<div class='vis-dynamicWidget-main'>");
 
         function initializeComponent(AD_WidgetSize_ID, WidgetStyle,isAdvanceSearch) {
             if (WidgetStyle) {
@@ -126,10 +126,10 @@
             $.ajax({
                 url: VIS.Application.contextUrl + "home/GetDynamicWidget",
                 data: {
-                    AD_WidgetSize_ID: AD_WidgetSize_ID,
+                    widgetSize_ID: AD_WidgetSize_ID,
                     windowNo: self.windowNo,
-                    AD_Tab_ID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
-                    AD_Table_ID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Table_ID"),
+                    tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
+                    tableID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Table_ID"),
                     isAdvanceSearch: isAdvanceSearch
                 },
                 success: function (data) {
@@ -152,7 +152,7 @@
                 $.ajax({
                     url: VIS.Application.contextUrl + "home/GetWidgetID",
                     async: false,
-                    data: { AD_UserHomeWidget_ID: AD_UserHomeWidget_ID },
+                    data: { userHomeWidgetID: AD_UserHomeWidget_ID },
                     success: function (data) {
                         data = JSON.parse(data);
                         if (data) {

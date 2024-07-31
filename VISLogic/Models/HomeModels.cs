@@ -376,7 +376,7 @@ namespace VIS.Models
         /// <param name="AD_WidgetSize_ID">AD_WidgetSize_ID</param>
         /// <returns>Field Details</returns>
 
-        public List<DynamicWidget> GetDynamicWidget(Ctx ctx, int AD_WidgetSize_ID, int windowNo, int AD_Tab_ID, int AD_Table_ID, string isAdvanceSearch)
+        public List<DynamicWidget> GetDynamicWidget(Ctx ctx, int widgetSize_ID, int windowNo, int tabID, int tableID, string isAdvanceSearch)
         {
             bool baseLanguage = Env.IsBaseLanguage(ctx, "");
             int sequenceNo = 0;
@@ -400,7 +400,7 @@ namespace VIS.Models
             }
             sql += @" WHERE AD_WidgetField.AD_WIDGET_ID =(SELECT WS.AD_WIDGET_ID FROM AD_WidgetSize WS
                       INNER JOIN AD_Widget WD ON (WD.AD_Widget_ID=WS.AD_Widget_ID) WHERE WD.WidgetType='D' 
-                      AND WS.AD_WidgetSize_ID = " + AD_WidgetSize_ID + " ) AND AD_WidgetField.IsActive='Y' ";
+                      AND WS.AD_WidgetSize_ID = " + widgetSize_ID + " ) AND AD_WidgetField.IsActive='Y' ";
             List<DynamicWidget> list = new List<DynamicWidget>(); ;
             DataSet dataSet = DB.ExecuteDataset(sql);
             if (dataSet != null && dataSet.Tables.Count > 0)
@@ -476,13 +476,13 @@ namespace VIS.Models
                     list.Add(l);
                 }
             }
-            if (isAdvanceSearch == "Y" && AD_Table_ID != 0 && AD_Tab_ID != 0)
+            if (isAdvanceSearch == "Y" && tableID != 0 && tabID != 0)
             {
                 string query = $@"SELECT AD_UserQuery_ID,Name,IsShowOnLandingPage,TargetView,AD_CardView_ID,Code,
-                (SELECT TableName FROM AD_Table WHERE AD_Table_ID={AD_Table_ID}) AS TableName
+                (SELECT TableName FROM AD_Table WHERE AD_Table_ID={tableID}) AS TableName
                 FROM AD_UserQuery WHERE 
                 AD_Client_ID = { ctx.GetAD_Client_ID() } AND IsActive='Y' 
-                AND (AD_Tab_ID={ AD_Tab_ID } OR AD_Table_ID= { AD_Table_ID }) 
+                AND (AD_Tab_ID={ tabID } OR AD_Table_ID= { tableID }) 
                 ORDER BY Upper(Name), AD_UserQuery_ID";
                 DataSet ds = DB.ExecuteDataset(query);
                 if (ds != null && ds.Tables.Count > 0)
@@ -539,14 +539,14 @@ namespace VIS.Models
         /// Get Widget Style and wigdet ID
         /// </summary>
         /// <param name="ctx">Context</param>
-        /// <param name="AD_UserHomeWidget_ID">AD_UserHomeWidget_ID</param>
+        /// <param name="userHomeWidget_ID">AD_UserHomeWidget_ID</param>
         /// <returns>AD_WidgetSize_ID and HtmlStyle</returns>
-        public List<WidgetSizeID> GetWidgetID(Ctx ctx, int AD_UserHomeWidget_ID)
+        public List<WidgetSizeID> GetWidgetID(Ctx ctx, int userHomeWidgetID)
         {
             string sql = @"SELECT WS.AD_WidgetSize_ID,WD.HtmlStyle,WD.AD_Widget_ID,WD.IsShowAdvanced FROM Ad_widgetSize WS
                        INNER JOIN AD_Widget WD ON(WD.AD_Widget_ID=WS.AD_Widget_ID) 
                        WHERE WS.AD_WidgetSize_ID IN (SELECT COMPONENTID  FROM AD_UserHomeWidget 
-                       WHERE COMPONENTTYPE='W' AND AD_UserHomeWidget_ID= " + AD_UserHomeWidget_ID + " )" +
+                       WHERE COMPONENTTYPE='W' AND AD_UserHomeWidget_ID= " + userHomeWidgetID + " )" +
                        " AND WD.IsActive='Y' AND WS.IsActive='Y' ";
             List<WidgetSizeID> list = null;
             DataSet dataSet = DB.ExecuteDataset(sql);
