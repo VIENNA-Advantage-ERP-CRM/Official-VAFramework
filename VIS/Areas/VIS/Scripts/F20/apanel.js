@@ -2163,7 +2163,7 @@
             //that.curGC.isZoomAction = isSelect;
             var tid = that.firstTabId;
             if (that.actionParams && that.actionParams.TabIndex) {
-               tid= this.vTabbedPane.getNextTabId(that.actionParams.TabIndex)
+                tid = that.vTabbedPane.getNextTabId(that.actionParams.TabIndex)
             }
             that.tabActionPerformed(tid, "", "", that.actionParams);
             that.setTabNavigation();
