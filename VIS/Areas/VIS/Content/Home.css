@@ -3294,7 +3294,7 @@ p.vis-maintain-customer-p span {
     margin: 0px;
 }
 .vis-widget-badge {
-    background: rgba(var(--v-c-on-secondary), 1);
+    background: rgba(var(--v-c-primary), 1);
     color: rgba(var(--v-c-on-primary), 1);
     font-weight: 600;
 }
