@@ -452,6 +452,15 @@ namespace VAdvantage.Controller
                             }
                         }
                     }
+                    //Action Group
+                    else if (columnName.Equals("AGName", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.AGName = Util.GetValueOfString(dr[i].ToString());
+                    }
+                    else if (columnName.Equals("AGFontName", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.AGFontName = Util.GetValueOfString(dr[i].ToString());
+                    }
                 }
                 if (vo.Header == null)
                     vo.Header = vo.ColumnName;
@@ -966,6 +975,8 @@ namespace VAdvantage.Controller
             clone.ADAction = ADAction;
             clone.ADActionName = ADActionName;
             clone.ADActionParams = ADActionParams;
+            clone.AGName = AGName;
+            clone.AGFontName = AGFontName;
             return clone;
         }
 

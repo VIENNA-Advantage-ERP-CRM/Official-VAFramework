@@ -7551,6 +7551,24 @@
     GridField.prototype.getActionParams = function () {
         return this.vo.ADActionParams;
     };
+    /**
+     * Get Action Group Name
+     * @returns action Group Name
+     */
+    GridField.prototype.getAGName = function () {
+        return this.vo.AGName;
+    };
+
+    /**
+     * Get Action Group Font Name
+     * @returns Action Group Font name
+     */
+    GridField.prototype.getAGFontName = function () {
+        return this.vo.AGFontName;
+    };
+    GridField.prototype.getAGStyle = function () {
+        return this.vo.AGStylehh;
+    };
 
     /**
      *  Refresh Lookup if the lookup is unstable

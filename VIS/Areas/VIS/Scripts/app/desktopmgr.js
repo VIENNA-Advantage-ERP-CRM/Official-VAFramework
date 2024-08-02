@@ -594,7 +594,7 @@
                 }
 
                 if (itm[0].id == "vis_lhome")
-                    return;               
+                    return;
 
                 //select unselect taskbar items
                 if (curSelTaskBarItem) {
@@ -702,7 +702,7 @@
            - set active view to home page
         */
         function setAndLoadHomePage() {
-           // if (!VIS.MRole.getIsDisableMenu() || (VIS.MRole.getIsDisableMenu() && VIS.MRole.getHomePage() == 0)) {
+            // if (!VIS.MRole.getIsDisableMenu() || (VIS.MRole.getIsDisableMenu() && VIS.MRole.getHomePage() == 0)) {
             if (!VIS.MRole.getIsDisableMenu()) {
                 renderHomePage();
             }
@@ -719,8 +719,8 @@
         function renderHomePage() {
             $('#vis_lhome').show();
             $('#vis_lhome2').show();
-            dynamicViewCache['vis_lhome'] = $home ;
-            dynamicViewCache['vis_lhome2'] = $home2 ;
+            dynamicViewCache['vis_lhome'] = $home;
+            dynamicViewCache['vis_lhome2'] = $home2;
             currentActiveView = $home.show();
             VIS.HomeMgr2.initHome($home2);
             VIS.HomeMgr.initHome($home);
@@ -910,8 +910,9 @@
         var orgRoleVal, orgClientHtml, orgOrgHtml, orgWareHtml, wareHouseId;
         var changed = false, setting = false;
         var contextUrl = "";
+        var lstOrgs, hFilterOrg, chkFilter;
 
-        var lblRole, lblClient, lblOrg, lblWare;
+        var lblRole, lblClient, lblOrg, lblWare, lstOrgs;
         var main = $('<div class="vis-wakeup-main" >').hide();
 
         /* 
@@ -936,6 +937,10 @@
             //hidWareName = $root.find('#vis_home_warehouseName');
             wareHouseId = $root.find('#vis_home_warehouseId');
 
+            //org ids
+            lstOrgs = $root.find('#vis_home_filterorgs');
+            hFilterOrg = $root.find('#vis_home_filterorgval');//hidden comma seprated
+            chkFilter = $root.find('#vis_home_isfilter');
 
             btnClose = $root.find('#vis-auth-close'); //cancel
             btnChange = $root.find('#vis-auth-change'); //change
@@ -945,11 +950,16 @@
             lblOrg = $root.find('label[for="Login2Model_Org"]');
             lblWare = $root.find('label[for="Login2Model_Warehouse"]');
 
+            //convert to multoselect 
+
             orgRoleVal = cmbRole.val();
 
             orgClientHtml = cmbClient.html();
             orgOrgHtml = cmbOrg.html();
             orgWareHtml = cmbWare.html();
+
+            //set value
+            setFilterOrg();
 
             events();
 
@@ -960,7 +970,6 @@
             if (wareHouseId.val() == "-1") {
                 cmbWare.val(null);
             }
-
 
             //edit user Image
 
@@ -985,7 +994,7 @@
                             var res = JSON.parse(dd);
                             var a = JSON.parse(res);
                             imgConatiner.find('img').remove();
-                            imgConatiner.append('<img id="vis_imguserImage" src="data:image/jpg;base64,' + a +'" alt="profile image"></img>');
+                            imgConatiner.append('<img id="vis_imguserImage" src="data:image/jpg;base64,' + a + '" alt="profile image"></img>');
                         }, false);
                     }
                 });
@@ -994,6 +1003,33 @@
             };
             EditUserImage();
         };
+
+        function setFilterOrg() {
+            var strOrgFilter = hFilterOrg.val();
+            if (strOrgFilter && strOrgFilter != "") {
+                chkFilter.prop('checked', true);
+            }
+
+            if (!strOrgFilter || strOrgFilter == "") {
+                strOrgFilter = cmbOrg.val();
+            }
+
+            var arrVal = strOrgFilter.split(',');
+            lstOrgs.val(arrVal);
+        }
+
+        function resetOrgFiletr(data) {
+            lstOrgs.empty();
+            $(data).each(function () {
+                $("<option />", {
+                    val: this.Key,
+                    text: this.Name
+                }).appendTo(lstOrgs);
+            });
+
+            chkFilter.prop('checked',false);
+            lstOrgs.val([cmbOrg.val()]);
+        }
 
         /*
           set text according to culture
@@ -1066,7 +1102,7 @@
         *@param data input data
         */
         function getdata(combo, url, data) {
-            if (data.client!= "" && data.id!="") {
+            if (data.client != "" && data.id != "") {
                 //$imgbusy1.show();
                 $.ajax(url, {
                     data: data
@@ -1101,17 +1137,19 @@
                 cmbWare.empty();
 
                 getdata(cmbClient, contextUrl + "Account/GetClients", { 'Id': combo.value });
-
+                
             }
             else if (combo.id === cmbClient.attr('id')) {
                 cmbOrg.empty();
                 cmbWare.empty();
 
                 getdata(cmbOrg, contextUrl + "Account/GetOrgs", { 'role': cmbRole.val(), 'user': VIS.context.getAD_User_ID(), 'client': combo.value });
+              
             }
             else if (combo.id === cmbOrg.attr('id')) {
                 cmbWare.empty();
                 getdata(cmbWare, contextUrl + "Account/GetWarehouse", { 'id': cmbOrg.val() });
+                
             }
             else if (combo.id === cmbWare.attr('id')) {
 
@@ -1119,9 +1157,9 @@
 
             var $hidden = $('#' + combo.id + 'Name');
             var text = this.options[this.selectedIndex].innerHTML;
-        
-               $hidden.val(text);
-         
+
+            $hidden.val(text);
+
         };
 
         /* function to fill combo
@@ -1136,15 +1174,17 @@
             }
             else if (combo === cmbClient) {
                 text = Globalize.localize('SelectClient');
+                
             }
             else if (combo === cmbOrg) {
                 text = Globalize.localize('SelectOrg');
+                resetOrgFiletr(data);
             }
 
             $("<option />", {
                 val: "-1",
                 text: text
-               }).appendTo(combo);
+            }).appendTo(combo);
 
 
             $(data).each(function () {
@@ -1155,7 +1195,28 @@
             });
             setting = false;
         };
-
+        function setHiddenOrgFilter() {
+            var orgFilter = "";
+            if (chkFilter.prop('checked') == true) {
+                //set filtered org val
+                var selVals = lstOrgs.val();
+                for (var i = 0; i < selVals.length; i++) {
+                    if (selVals[i] > 0) {
+                        if (orgFilter != "") {
+                            orgFilter += ',';
+                        }
+                        orgFilter += selVals[i];
+                    }
+                }
+                if (orgFilter == "") {
+                    orgFilter = cmbOrg.val();
+                }
+            }
+            else {
+                orgFilter = "";
+            }
+            hFilterOrg.val(orgFilter);// set org filter
+        }
         /*
            handle form sumbit handler
            - true then reload page 
@@ -1167,6 +1228,8 @@
             btnClose.prop('disabled', true);
             btnChange.prop('disabled', true);
             $form.find('#vis_home_langugage').val(localStorage.getItem("vis_login_langCode"));
+
+            setHiddenOrgFilter();
             //$imgbusy1.show();
             // We check if jQuery.validator exists on the form
             if (!$form.valid || $form.valid()) {
@@ -1200,7 +1263,7 @@
                     });
             }
             // Prevent the normal behavior since we opened the dialog
-           e.preventDefault();
+            e.preventDefault();
         };
 
         var getValidationSummaryErrors = function ($form) {

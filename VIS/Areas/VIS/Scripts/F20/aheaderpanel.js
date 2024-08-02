@@ -16,6 +16,7 @@
         this.windowNo = 0;
         this.dynamicStyle = [];
         this.styleTag = document.createElement('style');
+        this.agGroupToAGInsMap = {};
 
         var $slider = $parentRoot.find('.fa-angle-double-left');
 
@@ -355,8 +356,6 @@
                                         this.imgCtrl.push(iControl);
                                         iControl.setReadOnly(false);
                                         iControl.addVetoableChangeListener(this);
-
-
                                     }
                                 }
 
@@ -382,6 +381,9 @@
                                 }
 
                                 var colValue = getFieldValue(mField);
+
+                                var agInstance = $self.addActionGroup(mField, iControl);
+                               
 
                                 styleArr = mField.getHeaderStyle();
                                 if (styleArr && styleArr.length > 0)
@@ -539,8 +541,18 @@
                                     setValue(colValue, iControl, mField);
                                     /****END ******  Set what do you want to show? Icon OR Label OR Both OR None*/
                                 }
-                                $divLabel.append(iControl.getControl());
-                                $containerDiv.append($div);
+
+                                
+                                //* action Group */
+                                if (agInstance && agInstance.getIsNewIns()) {
+                                    $divLabel.append(agInstance.getControl());
+                                    $containerDiv.append($div);
+                                }
+                                else if (!agInstance) {
+                                    $divLabel.append(iControl.getControl());
+                                    $containerDiv.append($div);
+                                }
+                               
                                 $self.controls.push(objctrls);
                             }
                         }
@@ -548,6 +560,26 @@
                 }
             }
         };
+
+
+        this.addActionGroup=function(mField, editor) {
+
+            if (mField.getAGName() == "" || mField.getDisplayType() != VIS.DisplayType.Button || editor == null) {
+                return null;
+            }
+            var agName = mField.getAGName().replace(' ', '');
+            var agIns = null;
+            if (agName in this.agGroupToAGInsMap) {
+                agIns = this.agGroupToAGInsMap[agName];
+            }
+            else {
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName());
+                this.agGroupToAGInsMap[agName] = agIns;
+            }
+            agIns.addItem(editor);
+            return agIns;
+        }
+
 
         var setValue = function (colValue, iControl, mField) {
             if (colValue) {

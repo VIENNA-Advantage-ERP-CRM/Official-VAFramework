@@ -726,6 +726,9 @@ namespace VIS.Helpers
             ctx.SetContext("#AD_Org_ID", model.Login2Model.Org);
             ctx.SetContext("#AD_Org_Name", model.Login2Model.OrgName);
 
+            //new entry commaseprated orgids
+            ctx.SetContext("#AD_FilteredOrg", model.Login2Model.FilteredOrg);
+
             ctx.SetContext("#M_Warehouse_ID", model.Login2Model.Warehouse);
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);
             //ctx.SetContext("#Date", model.Login2Model.Date.ToString());
