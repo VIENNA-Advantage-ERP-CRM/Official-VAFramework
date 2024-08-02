@@ -200,6 +200,8 @@ namespace VIS.Controllers
                     model.Login2Model.Client = ctx.GetAD_Client_ID().ToString();
                     model.Login2Model.Org = ctx.GetAD_Org_ID().ToString();
                     model.Login2Model.Warehouse = ctx.GetAD_Warehouse_ID().ToString();
+                    model.Login2Model.FilteredOrg = ctx.GetContext("#AD_FilteredOrg");
+
 
 
                     var RoleList = new List<KeyNamePair>();

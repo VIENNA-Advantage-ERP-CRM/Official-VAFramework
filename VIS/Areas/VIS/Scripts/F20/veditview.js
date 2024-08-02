@@ -14,7 +14,7 @@
 
         var $td0, $td1, $td2, $td3;
 
-        var $spndisplayFG = $('<span class="vis-ev-fgbtn" data-state="N">'+VIS.Msg.getMsg("More")+'</span>' );
+        var $spndisplayFG = $('<span class="vis-ev-fgbtn" data-state="N">' + VIS.Msg.getMsg("More") + '</span>');
 
         var _curParent = null;
 
@@ -34,6 +34,9 @@
         var colDescHelpList = {};
 
         var lastPopover = null;
+
+        var agGroupToAGInsMap = {};
+
         function initComponent() {
             $table = $("<div class='vis-ad-w-p-vc-ev-grid'>"); //   $("<table class='vis-gc-vpanel-table'>");
             $table.on("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
@@ -95,7 +98,7 @@
                 //    col0.set = false;
                 //}
                 //else
-                    --col0.rSpan;
+                --col0.rSpan;
 
                 reset(col0);
             }
@@ -104,7 +107,7 @@
                 //    col1.set = false;
                 //}
                 //else
-                    --col1.rSpan;
+                --col1.rSpan;
                 reset(col1);
             }
             if (col2.rSpan > 1) { //skip column 
@@ -112,7 +115,7 @@
                 //    col2.set = false;
                 //}
                 //else
-                    --col2.rSpan;
+                --col2.rSpan;
                 reset(col2);
             }
             if (col3.rSpan > 1) { //skip column 
@@ -337,14 +340,14 @@
             //}
         };
 
-       
+
 
         function onGroupClick(e) {
             e.stopPropagation();
             var divGroup = $(this);
             var target = $(e.target);
             var name = divGroup.data("name") + "_" + divGroup.data("seqno");
-           // var idx = div.Group.data("seqno");
+            // var idx = div.Group.data("seqno");
             var dis = divGroup.data("display");
             var viewMore = $(divGroup.find('.vis-ev-col-fg-more')[0]);
             //console.log(name);
@@ -385,8 +388,8 @@
                     $(divGroup.children()[2]).removeClass("vis-ev-col-fg-rotate");
                 }
             }
-            displayFieldGroupControls(name,show,showGroupFieldDefault)
-           
+            displayFieldGroupControls(name, show, showGroupFieldDefault)
+
         };
 
         /**
@@ -395,7 +398,7 @@
          * @param {any} show flag to show controls
          * @param {any} showGroupFieldDefault  default state of field gp controls
          */
-        function displayFieldGroupControls(name, show,showGroupFieldDefault) {
+        function displayFieldGroupControls(name, show, showGroupFieldDefault) {
             var list = groupToCompsMap[name];
 
             for (var i = 0; i < list.length; i++) {
@@ -418,10 +421,10 @@
                 //addTop();
                 oldFieldGroup = "";
             }
-            
+
             if (fieldGroup == null || fieldGroup.length == 0 || fieldGroup.equals(oldFieldGroup))
                 return false;
-           
+
             var seqSuffix = Object.keys(groupToCompsMap).length + 1;
             oldFieldGroup = fieldGroup;// + "_" + seqSuffix;
 
@@ -432,7 +435,7 @@
             initCols(true);
             //<i class="fa fa-ellipsis-h"></i>
             var gDiv = $('<div class="vis-ev-col-fieldgroup" data-showmore="Y" data-name="' + fieldGroup
-                +  '" data-display="show" data-seqno="' + seqSuffix + '">' +
+                + '" data-display="show" data-seqno="' + seqSuffix + '">' +
                 '<span class="vis-ev-col-fg-hdr"  >' + fieldGroup + ' </span> ' +
                 '<button class="vis-ev-col-fg-more">' + VIS.Msg.getMsg("ShowMore") + '</button>' +
                 '<button class="vis-ev-fg-arrowBtn"><i class= "fa fa-angle-up"></button>' +
@@ -490,7 +493,7 @@
                 if (fieldList == null) {
                     //add unique entry
                     fieldList = [];
-                    groupToCompsMap[oldFieldGroup + "_" + (seqSuffix+1)] = fieldList;
+                    groupToCompsMap[oldFieldGroup + "_" + (seqSuffix + 1)] = fieldList;
                 }
                 fieldList.push(mField);
                 if (!mField.getIsFieldgroupDefault()) {
@@ -542,7 +545,7 @@
 
         function onBtnFGClick() {
 
-             
+
 
             var state = $spndisplayFG.data("state");
             var pos = $spndisplayFG.data("position");
@@ -562,6 +565,24 @@
             }
             $spndisplayFG.data("state", state);
         };
+
+        function addActionGroup(mField, editor) {
+
+            if (mField.getAGName() == "" || mField.getDisplayType() != VIS.DisplayType.Button || editor == null) {
+                return null;
+            }
+            var agName = mField.getAGName().replace(' ', '');
+            var agIns = null;
+            if (agName in agGroupToAGInsMap) {
+                agIns = agGroupToAGInsMap[agName];
+            }
+            else {
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName());
+                agGroupToAGInsMap[agName] = agIns;
+            }
+            agIns.addItem(editor);
+            return agIns;
+        }
 
         this.addField = function (editor, mField) {
 
@@ -585,42 +606,43 @@
             if (label == null && editor == null)
                 return;
             var sameLine = mField.getIsSameLine();
-            if (addGroup(mField.getFieldGroup() , columnIndex)) {
-                sameLine = false;
-            }
 
+            var agInstance = addActionGroup(mField, editor);
+            //Check for Action Group
+            //var isAGNew = agInstance && agInstance.getItemCount() == 1;
 
-
-            if (sameLine) {
-                ++columnIndex;
-                if (columnIndex > 3) {
+            if (!agInstance) {
+                if (addGroup(mField.getFieldGroup(), columnIndex)) {
                     sameLine = false;
-                    insertRow = true;
-                    // columnIndex = 0;
                 }
-                else if (columnIndex < 0) {
-                    //addRow();
-                    insertRow = true;
+            }
+            if (!agInstance || agInstance.getIsNewIns()) {
+                if (sameLine) {
+                    ++columnIndex;
+                    if (columnIndex > 3) {
+                        sameLine = false;
+                        insertRow = true;
+                        // columnIndex = 0;
+                    }
+                    else if (columnIndex < 0) {
+                        //addRow();
+                        insertRow = true;
+                        //columnIndex = 0;
+                    }
+                }
+                else {
                     //columnIndex = 0;
+                    insertRow = true;
+                    //addRow();
                 }
+                adjustLayout(mField, insertRow);
             }
-            else {
-                //columnIndex = 0;
-                insertRow = true;
-                //addRow();
-            }
-
-
-            adjustLayout(mField, insertRow);
-
 
             if (label != null) {
-
 
                 if (mField.getDescription().length > 0) {
                     //label.getControl().prop('title', mField.getDescription());
                 }
-
 
                 //addToCompList(label);
                 //compToFieldMap[label.getName()] = mField;
@@ -629,7 +651,6 @@
             }
 
             if (editor != null) {
-
 
                 var fieldVFormat = mField.getVFormat();
                 var formatErr = mField.getVFormatError();
@@ -662,22 +683,26 @@
 
                 var count = editor.getBtnCount();
 
-
                 //addToCompList(editor);
                 // compToFieldMap[editor.getName()] = mField;
                 addCompToFieldList(mField.getColumnName(), editor);
                 allControls[++allControlCount] = editor;
-
             }
-
 
             //new design container
             if (label != null || editor != null) {
 
                 var ctnr = _curParent;
 
-
-                insertCWrapper(label, editor, ctnr, mField);
+                //check for agGroup
+                if (agInstance) {
+                    if (agInstance.getIsNewIns()) { //only Once
+                        insertCWrapper(label, agInstance, ctnr, mField);
+                    }
+                }
+                else {
+                    insertCWrapper(label, editor, ctnr, mField);
+                }
 
 
                 fieldToCompParentMap[mField.getColumnName()] = ctnr;
@@ -688,7 +713,6 @@
                 };
             }
         };
-
         this.flushLayout = function (hideFGFrom) {
             addRow();
             if (hideFGFrom > 0 && Object.keys(groupToCompsMap).length >= hideFGFrom) {
@@ -764,7 +788,7 @@
             $table = null;
             this.addField = null;
             $spndisplayFG = null;
-           // addRow = null;
+            // addRow = null;
             //addToCompList = null;
         };
 
@@ -829,7 +853,7 @@
 
 
 
-        if (mField.getDisplayType() != VIS.DisplayType.Label && !mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.TelePhone ) { // exclude Label display type
+        if (mField.getDisplayType() != VIS.DisplayType.Label && !mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.TelePhone) { // exclude Label display type
             ctrlP.append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
                 "<i class='vis vis-info' aria-hidden='true'></i></span'>");
         }
@@ -867,6 +891,57 @@
             ctrlP.css("z-index", "auto");
         }
     }
+
+    function ActionGroup(name, fontname) {
+        this.name = name;
+        this.fontname = fontname;
+        this.vEditors = [];
+        var $root = null;
+        var popOver = null;
+        var id = "vis_ev_col_ag_btn" + Math.random();
+
+        function InitUI() {
+            var html = '<div class="dropdown vis-ev-col-actiongroup">'
+                + '<span class="dropdown-toggle" id="' + id + '" data-toggle="dropdown">'
+                + '<i class="' + fontname + '"></i>'
+                + name + '</span>'
+                + '<div class="dropdown-menu" aria-labelledby="' + id + '">'
+                + '<ul class="vis-ev-col-ag-btn-list">'
+                + '</ul>'
+                + '</div>'
+                + '</div>';
+            $root = $(html);
+            $actionList = $root.find('.vis-ev-col-ag-btn-list');
+        };
+
+        InitUI();
+
+        this.getControl = function () {
+            return $root;
+        }
+        this.getActionList = function () {
+            return $actionList;
+        }
+    }
+    ActionGroup.prototype.addItem = function (veditor) {
+        this.vEditors.push(veditor);
+        var li = $('<li>');
+        li.append(veditor.getControl());
+        this.getActionList().append(li);
+    };
+    ActionGroup.prototype.getItemCount = function () {
+        return this.vEditors.length;
+    };
+
+    ActionGroup.prototype.getBtnCount = function () {
+        return 0;
+    }
+
+    ActionGroup.prototype.getIsNewIns = function () {
+        return this.getItemCount() == 1;
+    }
+
+    VIS.ActionGroup = ActionGroup;
 
 }(VIS, jQuery));
 
