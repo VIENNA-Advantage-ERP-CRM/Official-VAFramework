@@ -351,7 +351,7 @@ namespace VIS.Models
 
             {
 
-                sbSql.Append("SELECT DISTINCT w.AD_Window_ID, w.Name, tt.WhereClause, t.TableName, " +
+                sbSql.Append("SELECT DISTINCT w.AD_Window_ID, w.DisplayName, tt.WhereClause, t.TableName, " +
                     "wp.AD_Window_ID, wp.Name, ws.AD_Window_ID, ws.DisplayName "
                 + "FROM AD_Table t "
                 + "INNER JOIN AD_Tab tt ON (tt.AD_Table_ID = t.AD_Table_ID) "
@@ -373,7 +373,7 @@ namespace VIS.Models
 
             {
 
-                sbSql.Append("SELECT DISTINCT w.AD_Window_ID, w.DisplayName, tt.WhereClause, t.TableName, " +
+                sbSql.Append("SELECT DISTINCT w.AD_Window_ID, w.Name, tt.WhereClause, t.TableName, " +
                     "wp.AD_Window_ID, wp.Name, ws.AD_Window_ID, ws.Name "
                 + "FROM AD_Table t "
                 + "INNER JOIN AD_Tab tt ON (tt.AD_Table_ID = t.AD_Table_ID) "
