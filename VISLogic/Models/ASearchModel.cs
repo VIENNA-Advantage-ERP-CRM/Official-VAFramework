@@ -40,11 +40,11 @@ namespace VIS.Models
         }
 
         // Added by Bharat on 05 June 2017
-        public List<Dictionary<string, object>> GetQueryLines(int AD_UserQuery_ID, Ctx ctx)
+        public List<Dictionary<string, object>> GetQueryLines(int AD_UserQuery_ID, Ctx ctx, bool isFilter)
         {
             List<Dictionary<string, object>> retDic = null;
             string sql = "SELECT KEYNAME, KEYVALUE, OPERATOR AS OPERATORNAME,VALUE1NAME," +
-                "VALUE1VALUE, VALUE2NAME, VALUE2VALUE, AD_USERQUERYLINE_ID, Isfullday FROM AD_UserQueryLine WHERE AD_UserQuery_ID=" +
+                "VALUE1VALUE, VALUE2NAME, VALUE2VALUE, AD_USERQUERYLINE_ID, Isfullday,AD_TAB_ID FROM AD_UserQueryLine WHERE AD_UserQuery_ID=" +
                 AD_UserQuery_ID + " ORDER BY SeqNo";
 
             DataSet ds = DB.ExecuteDataset(sql, null, null);
@@ -63,6 +63,7 @@ namespace VIS.Models
                     obj["VALUE2VALUE"] = Util.GetValueOfString(ds.Tables[0].Rows[i]["VALUE2VALUE"]);
                     obj["AD_USERQUERYLINE_ID"] = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_USERQUERYLINE_ID"]);
                     obj["FULLDAY"] = Util.GetValueOfString(ds.Tables[0].Rows[i]["ISFULLDAY"]);
+                    obj["AD_TAB_ID"] = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_TAB_ID"]);
                     retDic.Add(obj);
                 }
             }

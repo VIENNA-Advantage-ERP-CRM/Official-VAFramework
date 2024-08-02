@@ -2135,6 +2135,11 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
         font-size: .875rem;
     }
 
+.vis-fb-savebtnPnl {
+    justify-content: center;
+    display: flex;
+}
+
 .main-fp-wrap {
     width: 100%;
     height: 100%;

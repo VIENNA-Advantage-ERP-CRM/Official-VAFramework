@@ -256,8 +256,10 @@
             if ($txtSearch) {
 
                 var $selfpanel = this;
+                var isDel = false;
                 $txtSearch.autocomplete({
-                    select: function (ev, ui) {
+                    select: function (ev, ui) {                       
+
                         self.defaultSearch = false;
                         if (self.isSummaryVisible) {
                             self.curTab.setShowSummaryNodes(true);
@@ -273,6 +275,7 @@
                         if (ui.item.code != VIS.Msg.getMsg("All")) {
                             //query.addRestriction(ui.item.code);
                             self.curGC.searchCode = ui.item.code;
+                            self.curTab.searchCode = ui.item.code;
                         }
                         //	History
 
@@ -281,9 +284,11 @@
                         ////	Confirmed query
                         //self.curTab.setQuery(query);
                         //self.curGC.query(0, 0, false);   //  autoSize
-                        self.curGC.applyFilters(query);
+                        //self.curGC.applyFilters(query);
                         $btnClrSearch.css("visibility", "visible");
                         $imgdownSearch.css("visibility", "visible").css("transform", "rotate(360deg)");
+                        self.curGC.aFilterPanel.setFilterLineAdvance(self.curTab.userQueryID);
+                        $txtSearch.attr('readonly','readonly');
                         ev.stopPropagation();
                     },
                     minLength: 0,
@@ -314,9 +319,13 @@
                         span = $("<span title='" + VIS.Msg.getMsg("DefaultSearch") + "'  data-id='" + item.id + "'></span>");
                     }
 
+                    var del = $("<span data-id='" + item.id + "' class='fa fa-trash-o'></span>");
+
+                    var d = $('<div class="d-flex align-items-center justify-content-center">');
+                    d.append(span).append(del);
 
                     var li = $("<li>")
-                        .append($("<a style='display:block' title='" + item.title + "'>" + item.label + "</a>").append(span))
+                        .append($("<a style='display:block' title='" + item.title + "'>" + item.label + "</a>").append(d))
                         .appendTo(ul);
 
 
@@ -336,6 +345,26 @@
                             }
 
                         });
+                    });
+
+                    del.on("click", function (ev) {
+                        ev.stopPropagation();
+                        var $t = $(this);
+                        var uQueryID = $(this).data('id');
+                        var no = -1;
+                        self.setBusy(true);
+                        $.ajax({
+                            url: VIS.Application.contextUrl + 'ASearch/DeleteQuery',
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            data: { id: uQueryID }
+                        }).done(function (json) {
+                            self.setBusy(false);
+                            $t.closest('li').remove();
+                            no = parseInt(json);
+                            toastr.success(VIS.Msg.getMsg('DeleteSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+                        })
                     });
 
                     return li;
@@ -911,8 +940,9 @@
                 this.landingPage.getRoot().hide();
                 this.getRoot().show();
                 //tab selection
-                this.vTabbedPane.restoreTabChange();
+                
                 if (actionParams && actionParams.TabIndex) {
+                    this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());
                     this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", "", actionParams);
                 }
                 else {
@@ -1034,10 +1064,16 @@
 
         //Search
         $imgSearch.on(VIS.Events.onTouchStartOrClick, function (e) {
-            self.cmd_find($txtSearch.val());
-            //self.curTab.searchText = "";
-            self.clearSearchText();
-            $txtSearch.val("");
+
+            if (self.curTab.userQueryID > 0) {
+                self.curGC.aFilterPanel.fireValChanged();
+            } else {
+
+                self.cmd_find($txtSearch.val());
+                //self.curTab.searchText = "";
+                self.clearSearchText();
+                $txtSearch.val("");
+            }
             e.stopPropagation();
         });
 
@@ -1078,17 +1114,26 @@
         });
 
         $btnClrSearch.on("click", function () {
+            self.removeSearchOnDelete();
+        });
+
+        this.removeSearchOnDelete = function () {
             $btnClrSearch.css("visibility", "hidden");
             self.defaultSearch = true;
             //self.curTab.searchText = "";
             self.clearSearchText();
             $txtSearch.val("");
-            var query = new VIS.Query();
+            //var query = new VIS.Query();
             ////query.addRestriction(" 1 = 1 ");
             //self.findRecords(query);
-            self.findRecords(query);
+            //self.findRecords(query);
             $imgdownSearch.css("transform", "rotate(360deg)");
-        });
+            self.curTab.searchCode = "";
+            self.curTab.searchText = "";
+            self.curTab.userQueryID = 0;
+            $txtSearch.removeAttr('readonly');
+            self.curGC.aFilterPanel.removeAdvance();
+        };
 
         this.setAdvancedSerachText = function (hideicon, text) {
             if (hideicon) {
@@ -5034,6 +5079,7 @@
         if (this.curGC) {
             this.curGC.searchCode = "";
             this.curTab.searchText = "";
+            this.curTab.userQueryID = "";
         }
     };
 
@@ -5061,7 +5107,9 @@
                 var onlyCurrentDays = find.getCurrentDays();
                 var created = find.getIsCreated();
                 savedSearchName = find.getSavedQueryName();
-                self.curTab.userQueryID = find.getSavedID() //find.getID();
+                self.curTab.userQueryID = find.getSavedID(); //find.getID();
+                self.curTab.searchCode = find.getSearchCode();
+                self.curTab.searchText = find.getSearchName();
                 find.dispose();
                 find = null;
 
@@ -5082,7 +5130,8 @@
                 }
                 var findPressed = self.curTab.getIsQueryActive() || self.curTab.getOnlyCurrentDays() > 0;
                 self.aFind.setPressed(findPressed);
-                
+
+                self.curGC.aFilterPanel.setFilterLineAdvance(self.curTab.userQueryID);
 
             }
             ////Refresh everytime bcoz smtimes user create an ASearch and save it, 

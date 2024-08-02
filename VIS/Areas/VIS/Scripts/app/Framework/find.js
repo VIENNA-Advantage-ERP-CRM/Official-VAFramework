@@ -181,6 +181,8 @@
 
         var control1, control2, ulListStaticHtml = "";;
         this.saveQueryID = -1;
+        this.searchCode = "";
+        this.searchName = "";
         var saveChanges = false;
         var savedFiltersCount = 0;
 
@@ -811,7 +813,7 @@
                                 fillList(drListQueries);
                                 drpSavedQry[0].selectedIndex = 0;
                                 //// show message to user
-                                VIS.ADialog.info("Deleted", true, name, "");
+                                //VIS.ADialog.info("Deleted", true, name, "");
                                 txtQryName.val("");
                                 txtQryName.prop("readony", true);
                                 setBusy(false);
@@ -1357,7 +1359,7 @@
             if (total == 0 || total == null) {
                 total = 0;
                 if (alertZeroRecords) {
-                    VIS.ADialog.info("FindZeroRecords", true, "");
+                    //VIS.ADialog.info("FindZeroRecords", true, "");
                 }
             }
             //	More then allowed
@@ -1904,15 +1906,22 @@
                 setBusy(false);
                 ch.close();
                 return;
-                return;
             }
 
 
             // get where clause
             var where = query.getWhereClause(true);
-            if ($self.aPanel) {
-                $self.aPanel.setAdvanceWhere(where);
-            }
+            $self.searchCode = where;
+
+            //var fwc = $self.aPanel.curGC.aFilterPanel.getFilterClause();
+            //if (fwc != "") {
+            //    where += " AND " + fwc;
+            //}
+
+
+            //if ($self.aPanel) {
+            //    $self.aPanel.setAdvanceWhere(where);
+            //}
             // get query name entered by the user
             var name = VIS.Utility.encodeText(txtQryName.val());// vtxtQueryName.Text.Trim();
             if (name != null && name.trim().length == 0)
@@ -1920,6 +1929,7 @@
             else
                 $self.needRefreshWindow = true;
 
+            $self.searchName = name;
             // get the selected value
             var value = drpSavedQry.val();// vcmbQueryA.SelectedValue;
             var s = "";// vcmbQueryA.Text;//silverlight comment
@@ -1935,7 +1945,7 @@
                     if (MUserQuery.insertOrUpdate(value, name, where, AD_Tab_ID, AD_Table_ID, dsAdvanceData, $self.getID)) {
                         isSaveError = false;
                         //ShowMessage.Info("Updated", true, uq.GetName(), "");
-                        qMessage = (value > 0 ? "Updated" : "Saved");
+                        //qMessage = (value > 0 ? "Updated" : "Saved");
                         $self.saveQueryID = MUserQuery.id;
                     }
                     else {
@@ -1961,7 +1971,7 @@
                 setBusy(false);
                 if (qMessage != "") {
                     //MessageBox.Show(qMessage);
-                    VIS.ADialog.info("", true, VIS.Msg.getMsg(qMessage) + " " + name, null);
+                    //VIS.ADialog.info("", true, VIS.Msg.getMsg(qMessage) + " " + name, null);
                 }
                 if (result) {
                     ch.close();
@@ -1984,6 +1994,13 @@
         this.getSavedID = function (id) {
             return this.saveQueryID;
         };
+        this.getSearchCode = function () {
+            return this.searchCode;
+        }
+
+        this.getSearchName = function () {
+            return this.searchName;
+        }
 
         this.show = function () {
             ch = new VIS.ChildDialog();

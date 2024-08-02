@@ -12,7 +12,7 @@
             '     <div class="vis-fp-static-ctrlwrp">                                          ' +
             ' <div class="vis-fp-static-ctrlinnerwrp"></div>    ' +
             '     </div>                                                                       ' +
-            '     <div class="vis-fp-custcolumns" id="accordion_' + winNo + '"">                ' +
+            '      <div class="vis-fp-custcolumns" id="accordion_' + winNo + '"">                ' +
             '         <div class="card">                                                       ' +
             '             <div class="card-header" style="cursor:pointer" data-toggle="collapse" href="#collapseOne_' + winNo + '">                                            ' +
             '                 <span>' + VIS.Msg.getMsg("CustomCondition") + '</span>                                  ' +
@@ -22,6 +22,13 @@
             '             </div>                                                               ' +
             '             <div id="collapseOne_' + winNo + '"" class="collapse" data-parent="#accordion_' + winNo + '" >' +
             '                 <div class="card-body">                                          ' +
+            '                   <div class="input-group vis-input-wrap">                       ' +
+            '                         <div class="vis-control-wrap">                           ' +
+            '                             <select class="vis-fp-tabs">                         ' +
+            '                             </select>                                            ' +
+            '                             <label class="vis-fp-lbltabs">' + VIS.Msg.getMsg("Tab") + '</label>         ' +
+            '                         </div>                                                   ' +
+            '                     </div>                                                       ' +
             '                     <div class="input-group vis-input-wrap">                     ' +
             '                         <div class="vis-control-wrap">                           ' +
             '                             <select class="vis-fp-cols">                         ' +
@@ -41,18 +48,52 @@
             '                     <div class="vis-fp-valuetwo">                                ' +
             '                     </div>                                                       ' +
             '                     <div class="vis-fp-valuethree">                              ' +
+            '                       <div class="vis-form-group mb-0" style="display:none;" id="divFullDay_' + winNo + '">' +
+            '                       <input class="mt-1" id="checkFullDay_' + winNo + '" type="checkbox" name="QueryName">' +
+            '                       <label for="QueryName" class="font-weight-normal ml-1"  id="lblToQryValue_' + winNo + '">' + VIS.Msg.getMsg("FullDay") + '</label>' +
+            '                       </div>                                                    ' +
+
+            '<div id="divDynamic_' + winNo + '">'
+            + '<div class="input-group">'
+            + '<input type="checkbox"  id="chkDynamic_' + winNo + '"  name="IsDynamic" class="mt-1">'
+            + '<label class="font-weight-normal ml-1" for="IsDynamic" >' + VIS.Msg.getMsg("IsDynamic") + '</label>'
+            + '</div>'
+            + '<div class="input-group vis-input-wrap">'
+            + '<select id="drpDynamicOp_' + winNo + '" disabled>'
+            + '<option>' + VIS.Msg.getMsg("Today") + '</option>'
+            + '<option>' + VIS.Msg.getMsg("lastxDays") + '</option>'
+            + '<option>' + VIS.Msg.getMsg("lastxMonth") + '</option>'
+            + '<option>' + VIS.Msg.getMsg("lastxYears") + '</option>'
+            + '</select>'
+            + '</div>'
+            + '<div class="input-group vis-input-wrap" id="divYear_' + winNo + '">'
+            + '<input id="txtYear_' + winNo + '" type="number" min="1" max="99" />'
+            + '<label for="Year">' + VIS.Msg.getMsg("Year") + '</label>'
+            + '</div>'
+            + '<div class="input-group vis-input-wrap" id="divMonth_' + winNo + '">'
+            + '<input id="txtMonth_' + winNo + '" type="number" min="0" max="12" />'
+            + '<label for="Month">' + VIS.Msg.getMsg("Month") + '</label>'
+            + '</div>'
+            + '<div class="input-group vis-input-wrap" id="divDay_' + winNo + '">'
+            + '<input id="txtDay_' + winNo + '" type="number" min="0" max="31" />'
+            + ' <label for="Day">' + VIS.Msg.getMsg("Day") + '</label>'
+            + '</div>' +
             '                     </div>                                                       ' +
             '                     <div class="vis-fp-cc-addbtnwrp">                            ' +
-            '                         <span class="vis-fp-cc-addbutton">' + VIS.Msg.getMsg("ADD") + '</span>             ' +
+            '                         <span class="vis-fp-cc-addbutton">' + VIS.Msg.getMsg("ADD") + '</span>' +
             '                     </div>                                                       ' +
             '                 </div>                                                           ' +
             '             </div>                                                               ' +
-            '         </div>                                                                   ' +
+            '         </div>  </div>                                                                 ' +
             '         <div class="vis-fp-custcoltagswrp">                                      ' +
             '             <div class="vis-fp-custcoltag">                                      ' +
             '             </div>                                                               ' +
             '         </div><!-- vis-fp-custcoltagswrp -->                                     ' +
-            '     </div>  </div>                                                                     ' +
+            '</div>' +
+
+            '  <div class="mb-2 vis-fp-static-ctrlwrp"><div class="input-group vis-input-wrap"><div class="vis-control-wrap vis-fb-txtFilterName"><label><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div></div> ' +
+            '  <div class="vis-fb-savebtnPnl"></div> ' +
+            '</div > ' +
             ' </div>';
         return str;
     };
@@ -64,7 +105,7 @@
 
         var control1, control2;
         var dsAdvanceData = null;
-
+        var dsFilterData = [];
         var bodyDiv = $(tmp);
         var divCtrlWrap = bodyDiv.find(".vis-fp-datawrap");
         var divStatic = bodyDiv.find(".vis-fp-static-ctrlwrp");
@@ -72,13 +113,34 @@
         var btnViewAll = bodyDiv.find(".vis-fp-viwall");
         var spnViewAll = $(btnViewAll.find('span')[0]);
         var divDynamic = bodyDiv.find(".vis-fp-custcolumns");
+        this.cmbTabs = divDynamic.find('.vis-fp-tabs');
         var cmbColumns = divDynamic.find('.vis-fp-cols');
         var cmbOp = divDynamic.find('.vis-fp-op');
-        var drpDynamicOp = divDynamic.find("#drpDynamicOp_" + windowNo);
         var btnAdd = divDynamic.find('.vis-fp-cc-addbtnwrp');
         var divValue1 = divDynamic.find('.vis-fp-valueone');
         var divValue2 = divDynamic.find('.vis-fp-valuetwo');
         var divDynFilters = divDynamic.find('.vis-fp-custcoltag');
+        var divFullDay = divDynamic.find("#divFullDay_" + windowNo);
+        var btnSave = $('<button class="vis-fp-cc-addbutton">Save</button>');
+        var txtFilterName = $('<input type="text" class="w-100">');
+
+        bodyDiv.find('.vis-fb-savebtnPnl').append(btnSave);
+        bodyDiv.find('.vis-fb-txtFilterName').prepend(txtFilterName);
+
+
+        var dynamicDiv = divDynamic.find("#divDynamic_" + windowNo);
+        var chkDynamic = divDynamic.find("#chkDynamic_" + windowNo);
+        var drpDynamicOp = divDynamic.find("#drpDynamicOp_" + windowNo);
+        var txtYear = divDynamic.find("#txtYear_" + windowNo);
+        var txtMonth = divDynamic.find("#txtMonth_" + windowNo);
+        var txtDay = divDynamic.find("#txtDay_" + windowNo);
+        var divYear = divDynamic.find("#divYear_" + windowNo);
+        var divMonth = divDynamic.find("#divMonth_" + windowNo);
+        var divDay = divDynamic.find("#divDay_" + windowNo);
+        divYear.hide();
+        divMonth.hide();
+        divDay.hide();
+        dynamicDiv.hide();
 
         spnViewAll.text(VIS.Msg.getMsg("ViewMore"));
 
@@ -87,9 +149,9 @@
         this.selectionfields = null;
         this.curTabfields = null;
         this.curTab = null;
+        this.tabs = gc.aPanel.gridWindow.getTabs();
         this.listOfFilterQueries = [];
         this.ctrlObjects = {};
-
         this.getRoot = function () {
             return bodyDiv;
         };
@@ -131,8 +193,6 @@
                     crt.setReadOnly(false);
                     crt.setMandatory(false);
                     this.ctrlObjects[field.getColumnName()] = crt;
-
-
 
                     var inputWrapGroup = $('<div class="vis-fp-inputgroupseprtr" data-ColumnName="' + crt.getName() + '" data-cid="' + crt.getName() + '_' + this.curTab.getAD_Tab_ID() + '"></div>');
                     var inputWrap = $('<div class="vis-control-wrap">');
@@ -287,7 +347,7 @@
 
             var spann = $('<span data-id="' + evt.newValue + '" class="vis-fp-inputvalueforupdate" >' + displayVal + '</span>');
             var iconCross = $('<i data-id="' + evt.newValue + '" data-keyval="' + evt.propertyName + "_" + evt.newValue + '" class="vis vis-mark"></i></div></div>');
-            wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div style="background-color:' + pastel +'" class="vis-fp-currntrcrds">').append(spann).append(iconCross)));
+            wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div style="background-color:' + pastel + '" class="vis-fp-currntrcrds">').append(spann).append(iconCross)));
 
             if (this.ctrlObjects[evt.propertyName])
                 this.ctrlObjects[evt.propertyName].setValue(null);
@@ -381,8 +441,101 @@
         };
 
         //dynamic
-        this.fillColumns = function (htm) {
-            cmbColumns.append(htm);
+        this.fillColumns = function (i) {
+
+            var curTabfieldlist = this.tabs[i].getFields();
+            this.selectionfields = [];
+            this.curTabfields = [];
+
+            var html = '<option value="-1"> </option>';
+            var sortedFields = [];
+            //Fill Dynamic Column List 
+            for (var c = 0; c < curTabfieldlist.length; c++) {
+                // get field
+                var fieldorg = curTabfieldlist[c];
+                // var field = Object.assign(Object.create(Object.getPrototypeOf(fieldorg)), fieldorg);
+
+                //let field = JSON.parse(JSON.stringify(fieldorg));
+
+                //Object.setPrototypeOf(field, Object.getPrototypeOf(fieldorg));
+
+                var field = jQuery.extend(true, {}, fieldorg);
+                if (fieldorg.lookup && (VIS.DisplayType.IsLookup(fieldorg.getDisplayType()) || VIS.DisplayType.ID == fieldorg.getDisplayType())) {
+                    field.lookup = jQuery.extend(true, {}, fieldorg.lookup);
+                    if (field.lookup.initialize)
+                        field.lookup.initialize();
+                }
+
+
+
+                this.curTabfields.push(field);
+
+                if (field.getIsEncrypted())
+                    continue;
+                // get field's column name
+                var columnName = field.getColumnName();
+                if (field.getDisplayType() == VIS.DisplayType.Button) {
+                    if (field.getAD_Reference_Value_ID() == 0)
+                        // change done here to display textbox for search in case where buttons don't have Reference List bind with Column
+                        //continue;
+                        field.setDisplayType(VIS.DisplayType.String);
+                    else {
+                        if (columnName.endsWith("_ID"))
+                            field.setDisplayType(VIS.DisplayType.Table);
+                        else {
+                            field.setDisplayType(VIS.DisplayType.List);
+                            // bind lookup for buttons having Reference List bind with column
+                            field.lookup = new VIS.MLookupFactory.getMLookUp(VIS.context, this.winNo, field.getAD_Column_ID(), VIS.DisplayType.List);
+                        }
+                        //field.loadLookUp();
+                    }
+                }
+
+                // get text to be displayed
+                var header = field.getHeader();
+                if (header == null || header.length == 0) {
+                    // get text according to the language selected
+                    header = VIS.Msg.getElement(VIS.context, columnName);
+                    if (header == null || header.Length == 0)
+                        continue;
+                }
+                // if given field is any key, then add "(ID)" to it
+                if (field.getIsKey())
+                    header += (" (ID)");
+
+                if ((VIS.DisplayType.IsLookup(field.getDisplayType()) || VIS.DisplayType.ID == field.getDisplayType()) && !field.lookup) {
+                    ;
+                }
+
+                else if (field.getIsSelectionColumn()) {
+                    this.selectionfields.push(field);
+
+                }
+                else
+                    sortedFields.push({ 'value': columnName, 'text': header });
+                // html += '<option value="' + columnName + '">' + header + '</option>';
+            }
+            sortedFields.sort(function (a, b) {
+                var n1 = a.text.toUpperCase();
+                var n2 = b.text.toUpperCase();
+                if (n1 > n2) return 1;
+                if (n1 < n2) return -1;
+                return 0;
+            });
+
+
+            for (var col = 0; col < sortedFields.length; col++) {
+                html += '<option value="' + sortedFields[col].value + '">' + sortedFields[col].text + '</option>';
+            }
+            cmbColumns.empty();
+            //Add this html in Dynamic created column
+            cmbColumns.append(html);
+
+        };
+
+        this.fillTabs = function (htm) {
+            this.cmbTabs.append(htm);
+            self.fillColumns(this.cmbTabs.val());
         };
 
         var self = this;
@@ -417,6 +570,60 @@
             saveDynFilter();
         });
 
+        btnSave.on('click', function () {
+            var advanceSearch = self.curTab.searchCode;
+            var searchText = self.curTab.searchText;
+            var userQueryID = self.curTab.userQueryID;
+            if (searchText == "") {
+                userQueryID = 0;
+                if (txtFilterName.val() == "") {
+                    VIS.ADialog.error("ValidationError", true, "Filter Name Required");
+                    return;
+                } else {
+                    searchText = txtFilterName.val();
+                }
+            }
+            
+
+
+            var filterClause = self.getFilterClause();
+
+            var where = "";
+            //if (where != "" && where != null) {
+            //    where += " AND ";
+            //}
+
+            where += filterClause;
+
+            var obj = {
+                id: userQueryID,
+                name: searchText,
+                where: VIS.secureEngine.encrypt(where),
+                tabid: self.curTab.getAD_Tab_ID(),
+                tid: self.curTab.getAD_Table_ID(),
+                qLines: dsFilterData,
+                isFilter: true
+            };
+
+            $.ajax({
+                url: VIS.Application.contextUrl + 'ASearch/InsertOrUpdateQuery',
+                type: "POST",
+                datatype: "json",
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                data: JSON.stringify(obj)
+            }).done(function (json) {
+                no = parseInt(json);
+                self.curTab.searchCode = where;
+                self.curTab.searchText = searchText;
+                self.curTab.userQueryID = no;
+                toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+            })
+
+
+        });
+        
+
         btnViewAll.on("click", "span", function (e) {
             divStatic.toggleClass('vis-fp-static-ctrlwrp-auto');
             if (spnViewAll.text() == VIS.Msg.getMsg("ViewMore")) {
@@ -427,13 +634,21 @@
             }
         });
 
+        this.cmbTabs.on('change', function (e) {
+            //divDynFilters.find('.vis-fp-currntrcrds').remove();
+            //dsAdvanceData = null;
+            //deleteDynRow();
+            var tabIdx = self.cmbTabs.val();
+            self.fillColumns(tabIdx);
+        })
+
         //dynamic
         cmbColumns.on('change', function (e) {
             // if (isBusy) return;
-            //chkDynamic.prop("disabled", true);
-            //chkDynamic.prop("checked", false);
-            // chkDynamic.trigger("change");
-            // divDynamic.hide();
+            chkDynamic.prop("disabled", true);
+            chkDynamic.prop("checked", false);
+            chkDynamic.trigger("change");
+            dynamicDiv.hide();
 
             // set control at value1 position according to the column selected
             var columnName = cmbColumns.val();
@@ -457,26 +672,43 @@
                     dsOp = self.getOperatorsQuery(VIS.Query.prototype.CVOPERATORS);
                 }
 
+                if (f != null && VIS.DisplayType.IsDate(f.getDisplayType())) {
+                    drpDynamicOp.html(self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_DATE_DYNAMIC, true));
+                    dynamicDiv.show();
+                    chkDynamic.prop("disabled", false);
+                    setDynamicQryControls();
 
+                    if (f.getDisplayType() == VIS.DisplayType.DateTime || f.getDisplayType() == VIS.DisplayType.Date)// If Datetime, then on = operator, show full day checkbox.
+                    {
+                        showValue2(true);
+                        showFullDay(true);
+                    }
+                } 
 
-                if (f != null && VIS.DisplayType.IsDate(f.getDisplayType()) && VIS.Query.prototype.BETWEEN.equals(dsOp)) {
-                    /*drpDynamicOp.html(self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_DATE_DYNAMIC, true));
-                    divDynamic.show();
-                     chkDynamic.prop("disabled", false);
-                     setDynamicQryControls();
-                     $root.find('.vis-advancedSearchContentArea-down').css('height', 'calc(100% - 195px)');
-
-                     if (f.getDisplayType() == VIS.DisplayType.DateTime)// If Datetime, then on = operator, show full day checkbox.
-                     {
-                       showValue2(false);
-                     showFullDay(true);
-                     }*/
-
-                    setControl(false, f);
-                    setValueEnabled(false);
-                    // disable control at value2 position
-                    setValue2Enabled(true);
+                if (f.getDisplayType() != VIS.DisplayType.DateTime && f.getDisplayType() != VIS.DisplayType.Date)// If Datetime, then on = operator, show full day checkbox.
+                {
+                    showValue2(false);
+                    showFullDay(false);
                 }
+
+                //if (f != null && VIS.DisplayType.IsDate(f.getDisplayType()) && VIS.Query.prototype.BETWEEN.equals(dsOp)) {
+                //    /*drpDynamicOp.html(self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_DATE_DYNAMIC, true));
+                //    divDynamic.show();
+                //     chkDynamic.prop("disabled", false);
+                //     setDynamicQryControls();
+                //     $root.find('.vis-advancedSearchContentArea-down').css('height', 'calc(100% - 195px)');
+                //    */
+                //     if (f.getDisplayType() == VIS.DisplayType.DateTime)// If Datetime, then on = operator, show full day checkbox.
+                //     {
+                //       //showValue2(false);
+                //       showFullDay(true);
+                //     }
+
+                //    setControl(false, f);
+                //    setValueEnabled(false);
+                //    // disable control at value2 position
+                //    setValue2Enabled(true);
+                //}
 
                 /*else if (self.getIsUserColumn(columnName)) {
                 drpDynamicOp.html($self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_DYNAMIC_ID, true));
@@ -486,11 +718,11 @@
                 setDynamicQryControls(true);
                 }*/
 
-                if (f.getDisplayType() != VIS.DisplayType.DateTime)// If Datetime, then on = operator, show full day checkbox.
-                {
-                    //  showValue2(true);
-                    // showFullDay(false);
-                }
+                //if (f.getDisplayType() != VIS.DisplayType.DateTime)// If Datetime, then on = operator, show full day checkbox.
+                //{
+                //    //  showValue2(true);
+                //     showFullDay(false);
+                //}
 
 
 
@@ -505,8 +737,8 @@
                 cmbOp.prop("disabled", false);
             }
             else {
-                // showFullDay(false);
-                // showValue2(true);
+                showFullDay(false);
+                showValue2(true);
             }
             // enable control at value1 position
             setValueEnabled(true);
@@ -524,7 +756,16 @@
                 divValue2.show();
             }
             else {
-                divValue2.hide();
+               
+                if (f.getDisplayType() == VIS.DisplayType.DateTime && VIS.Query.prototype.EQUAL.equals(selOp)) {
+                    showValue2(false);
+                    showFullDay(true);
+                }
+                else {
+                    showValue2(false);
+                    showFullDay(false);
+                    setValue2Enabled(false);
+                }
             }
 
         });
@@ -544,6 +785,25 @@
             if (spnViewAll.text() == VIS.Msg.getMsg("ViewMore"))
                 btnViewAll.css('visibility', 'hidden');
         });
+
+        chkDynamic.on("change", function () {
+            var enable = chkDynamic.prop("checked");
+            drpDynamicOp.prop("disabled", !enable);
+            cmbOp.prop("disabled", enable);
+            setValueEnabled(!enable);
+            setValue2Enabled(!enable);
+            setEnabledFullDay(enable);
+            //setFullDayState(!enable);
+            if (enable) {
+                setDynamicQryControls(self.getIsUserColumn(cmbColumns.val()));
+            }
+            else {
+                divYear.hide();
+                divMonth.hide();
+                divDay.hide();
+            }
+        });
+
         drpDynamicOp.on("change", function () {
 
             setDynamicQryControls();
@@ -743,7 +1003,7 @@
                         ;
                     }
                     else {
-                        var $InputLabel1 = $('<label>'+ VIS.Msg.getMsg("VIS_QueryValueTo") +'</label>');
+                        var $InputLabel1 = $('<label>' + VIS.Msg.getMsg("VIS_QueryValueTo") + '</label>');
                         valueInputWrap.append($InputLabel1);
                     }
                 }
@@ -768,7 +1028,7 @@
             // if control exists
             if (crtlObj != null) {
                 // if control is any checkbox
-                if (crtlObj.getDisplayType() == VIS.DisplayType.YesNo) {
+                if (crtlObj.getDisplayType() == VIS.DisplayType.YesNo)   {
                     if (crtlObj.getValue().toString().toLowerCase() == "true") {
                         return "Y";
                     }
@@ -854,33 +1114,94 @@
                 colValue = cVal.toString();
             }
 
-            // set operator name
-            var opName = cmbOp.val();
+            var dCheck = chkDynamic.prop("checked");
 
-            if (opName == null || opName == undefined)
-                opName = cmbOp.find("option:selected").text();;;// vcmbOperator.Text;//silverlight comment
-            // set operator (sign)
-            var opValue = cmbOp.val();
+            if (dCheck) {
 
-            // add row in dataset
-            addDynRow(colName, colValue, opName, opValue, getControlText(true), getControlValue(true), getControlText(false), getControlValue(false), true);
+                if (getIsDyanamicVisible()) {
+                    var opValueD = ">=";
+                    var opNameD = " >= ";
+                    var controlText = getDynamicText(drpDynamicOp[0].selectedIndex);
+                    var controlValue = getDynamicValue(drpDynamicOp[0].selectedIndex);
+                    addDynRow(colName, colValue, opNameD, opValueD, controlText, controlValue, null, null, getFullDay());
+                }
+                else {
+                    var opValueD = "=";
+                    var opNameD = " = ";
+                    var controlText = drpDynamicOp.find("option:selected").text();
+                    var controlValue = drpDynamicOp.val();
+                    addDynRow(colName, colValue, opNameD, opValueD, controlText, controlValue, null, null, getFullDay());
+                }
 
+            } else {
+
+
+                // set operator name
+                var opName = cmbOp.val();
+
+                if (opName == null || opName == undefined)
+                    opName = cmbOp.find("option:selected").text();;;// vcmbOperator.Text;//silverlight comment
+                // set operator (sign)
+                var opValue = cmbOp.val();
+
+                // add row in dataset
+                addDynRow(colName, colValue, opName, opValue, getControlText(true), getControlValue(true), getControlText(false), getControlValue(false), getFullDay());
+            }
         }
 
         function addDynRow(colName, colValue, optr, optrName,
-            value1Name, value1Value, value2Name, value2Value) {
+            value1Name, value1Value, value2Name, value2Value, fullDay) {
 
             if (dsAdvanceData == null)
                 dsAdvanceData = {};
+
+            if (dsFilterData == null)
+                dsFilterData = [];
 
 
             if (!(colValue in dsAdvanceData))
                 dsAdvanceData[colValue] = [];
 
+            var where = self.parseWhereCondition(colValue, optr, value1Value, value2Value, fullDay);
+            if (self.curTab.getAD_Tab_ID() != self.tabs[self.cmbTabs.val()].getAD_Tab_ID()) {
+                where = self.curTab.getTableName() + '.' + self.curTab.getTableName() + '_ID IN(SELECT ' + self.curTab.getTableName() + '_ID FROM ' + self.tabs[self.cmbTabs.val()].getTableName() + ' WHERE ' + where + ')';
+            }
+
+            if (self.curTab.searchText == '') {
+                txtFilterName.val('');    
+                txtFilterName.removeAttr('readonly');
+            }
+
+            //txtFilterName.show();
+
+            var obj = {
+                KEYNAME: colName,
+                KEYVALUE: colValue,
+                OPERATORNAME: optrName,
+                VALUE1NAME: VIS.Utility.encodeText(value1Name),
+                FULLDAY: fullDay,
+                VALUE1VALUE: value1Name || "",
+                VALUE1VALUE: VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(value1Value)) || "NULL",
+                VALUE2NAME: VIS.Utility.encodeText(value2Name),
+                VALUE2VALUE: VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(value2Value)),
+                AD_USERQUERYLINE_ID: 0,
+                OPERATOR: optr,
+                AD_TAB_ID: self.tabs[self.cmbTabs.val()].getAD_Tab_ID()
+            }
+
+            dsFilterData.push(obj);
+
             dsAdvanceData[colValue].push({
-                'Name': colName, 'Value': value1Value, 'Value2': value1Value, 'Text': value1Name, 'Text2': value2Name, 'Optr': optr,
-                'Where': self.parseWhereCondition(colValue, optr, value1Value, value2Value)
-            });        
+                'Name': colName,
+                'Value': value1Value,
+                'Value2': value1Value,
+                'Text': value1Name,
+                'Text2': value2Name,
+                'Optr': optr,
+                'Where': where
+            });
+
+
             refreshDynFiltersUI(colValue);
         };
 
@@ -897,12 +1218,108 @@
                 //    }
                 //}
                 //if (values.length < 1)
-                delete dsAdvanceData[colValue];         
+                delete dsAdvanceData[colValue];
             }
+
+
+            var index = dsFilterData.findIndex(function (item) {
+                return item.KEYVALUE === colValue;
+            });
+
+            if (index !== -1) {
+                dsFilterData.splice(index, 1);
+            }
+
             refreshDynFiltersUI(colValue);
         };
 
-        function refreshDynFiltersUI(colValue) {
+        function showValue2(show) {
+            divValue2.css("display", show ? "block" : "none");
+        };
+        function showFullDay(show) {
+            divFullDay.css('display', show ? "flex" : "none");
+        };
+
+        function getIsDyanamicVisible() {
+            return divDay.is(':visible') || divYear.is(':visible') || divDay.is(':visible');
+        };
+
+        function getFullDay() {
+            if (divFullDay) {
+                return divFullDay.is(':checked') ? 'Y' : 'N';
+            }
+        };
+
+        function getDynamicText(index) {
+            var text = "";
+            var timeUnit;
+            if (index == 3 || index == 6) {
+                timeUnit = Math.round((getTotalDays(index) / 365), 1);
+                text = "Last " + timeUnit.toString() + " Years";
+            }
+            else if (index == 2 || index == 5) {
+                timeUnit = Math.round((getTotalDays(index) / 31), 1);
+                text = "Last " + timeUnit.toString() + " Month";
+            }
+            else {
+                if (getTotalDays() != 0) {
+                    text = "Last " + getTotalDays() + " Days";
+                }
+                else {
+                    text = "This Day";
+                }
+            }
+            return text;
+        };
+
+        function getDynamicValue(index) {
+            var text = "";
+            text = " adddays(sysdate, - " + getTotalDays(index) + ") ";
+            return text;
+        };
+
+        function getTotalDays(index) {
+            var totasldays = 0;
+            if (index == 3 || index == 6) {
+                var y = txtYear.val(), m = txtMonth.val(), d = txtDay.val();
+
+                y = (y && y != "") ? parseInt(y) : 0;
+                m = (m && m != "") ? parseInt(m) : 0;
+                d = (d && d != "") ? parseInt(d) : 0;
+
+                totasldays = (y * 365) + (m * 31) + (d);
+            }
+            else if (index == 2 || index == 5) {
+                var m = txtMonth.val(), d = txtDay.val();
+
+                m = (m && m != "") ? parseInt(m) : 0;
+                d = (d && d != "") ? parseInt(d) : 0;
+
+                totasldays = (m * 31) + (d);
+            }
+            else {
+                var d = d = txtDay.val();
+                d = (d && d != "") ? parseInt(d) : 0;
+                totasldays = d;
+            }
+            return totasldays;
+        };
+
+        /*
+       *   Set Enable or disable full day icon
+       *   Added By Karan
+       */
+        function setEnabledFullDay(enable) {
+            if (enable) {
+                divFullDay.prop('disabled', true);
+            }
+            else {
+                divFullDay.prop('disabled', false);
+            }
+        };
+
+
+        function refreshDynFiltersUI(colValue, fromAdvance) {
             var selDiv = divDynFilters.find('[data-id="' + colValue + '"]');
             if (selDiv.length > 0) {
                 selDiv.remove();
@@ -915,7 +1332,7 @@
                 var v = Math.floor(Math.random() * 16) + 85;
                 var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
 
-                htm.push('<div class="vis-fp-currntrcrds" style="background-color:' + pastel +'" data-id="' + colValue + '"><span  class="vis-fp-inputvalueforupdate">')
+                htm.push('<div class="vis-fp-currntrcrds" style="background-color:' + pastel + '" data-id="' + colValue + '"><span  class="vis-fp-inputvalueforupdate">')
                 for (var i = 0; i < arrVal.length; i++) {
                     if (i != 0)
                         htm.push(' | ');
@@ -929,9 +1346,53 @@
                 divDynFilters.append(htm.join(' '));
             }
 
+            if (fromAdvance) {
+                return;
+            }
+
             self.fireValChanged();
             setControlNullValue();
             setControlNullValue(true);
+        }
+
+        this.setFilterLineAdvance = function (id) {
+            if (id < 1) {
+                return;
+            }
+            var dr = null;
+            txtFilterName.val(self.curTab.searchText);
+            txtFilterName.attr('readonly','readonly');
+
+            dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ASearch/GetQueryLines", { "UserQuery_ID": id, isFilter: true }, null);
+            dsAdvanceData = {};
+            dsFilterData = [];
+            for (var i = 0; i < dr.length; i++) {             
+
+                var optrName = dr[i]["OPERATORNAME"];
+                var optr = VIS.Query.prototype.OPERATORS[optrName];
+                var tabID = dr[i]["AD_TAB_ID"];
+                if (!tabID) {
+                    self.cmbTabs.val('0');
+                } else {
+                    self.cmbTabs.val(self.cmbTabs.find('option[tabid="' + tabID + '"]').val());
+                }
+
+                addDynRow(dr[i].KEYNAME, dr[i].KEYVALUE, optr, optrName,
+                    dr[i].VALUE1NAME, dr[i].VALUE1VALUE, dr[i].VALUE2NAME, dr[i].VALUE2VALUE);
+
+            }
+
+            self.cmbTabs.val('0').change();
+        }
+
+        this.removeAdvance = function () {
+            //txtFilterName.show();
+            txtFilterName.val('');
+            txtFilterName.removeAttr('readonly');
+            dsAdvanceData = {};
+            dsFilterData = [];
+            divDynFilters.find('.vis-fp-currntrcrds').remove(); 
+            this.fireValChanged();
         }
     };
 
@@ -940,97 +1401,36 @@
         if (this.initialzed)
             return;
 
-
         this.curTab = this.curGC.getMTab();
-        var curTabfieldlist = this.curTab.getFields();
-        this.selectionfields = [];
-        this.curTabfields = [];
 
-        var html = '<option value="-1"> </option>';
-        var sortedFields = [];
-        //Fill Dynamic Column List 
-        for (var c = 0; c < curTabfieldlist.length; c++) {
-            // get field
-            var fieldorg = curTabfieldlist[c];
-            // var field = Object.assign(Object.create(Object.getPrototypeOf(fieldorg)), fieldorg);
-
-            //let field = JSON.parse(JSON.stringify(fieldorg));
-
-            //Object.setPrototypeOf(field, Object.getPrototypeOf(fieldorg));
-
-            var field = jQuery.extend(true, {}, fieldorg);
-            if (fieldorg.lookup && (VIS.DisplayType.IsLookup(fieldorg.getDisplayType()) || VIS.DisplayType.ID == fieldorg.getDisplayType())) {
-                field.lookup = jQuery.extend(true, {}, fieldorg.lookup);
-                if (field.lookup.initialize)
-                    field.lookup.initialize();
-            }
+        
 
 
+        var tabs = this.tabs;
 
-            this.curTabfields.push(field);
-
-            if (field.getIsEncrypted())
-                continue;
-            // get field's column name
-            var columnName = field.getColumnName();
-            if (field.getDisplayType() == VIS.DisplayType.Button) {
-                if (field.getAD_Reference_Value_ID() == 0)
-                    // change done here to display textbox for search in case where buttons don't have Reference List bind with Column
-                    //continue;
-                    field.setDisplayType(VIS.DisplayType.String);
-                else {
-                    if (columnName.endsWith("_ID"))
-                        field.setDisplayType(VIS.DisplayType.Table);
-                    else {
-                        field.setDisplayType(VIS.DisplayType.List);
-                        // bind lookup for buttons having Reference List bind with column
-                        field.lookup = new VIS.MLookupFactory.getMLookUp(VIS.context, this.winNo, field.getAD_Column_ID(), VIS.DisplayType.List);
-                    }
-                    //field.loadLookUp();
-                }
-            }
-
-            // get text to be displayed
-            var header = field.getHeader();
-            if (header == null || header.length == 0) {
-                // get text according to the language selected
-                header = VIS.Msg.getElement(VIS.context, columnName);
-                if (header == null || header.Length == 0)
-                    continue;
-            }
-            // if given field is any key, then add "(ID)" to it
-            if (field.getIsKey())
-                header += (" (ID)");
-
-            if ((VIS.DisplayType.IsLookup(field.getDisplayType()) || VIS.DisplayType.ID == field.getDisplayType()) && !field.lookup) {
-                ;
-            }
-
-            else if (field.getIsSelectionColumn()) {
-                this.selectionfields.push(field);
-
-            }
-            else
-                sortedFields.push({ 'value': columnName, 'text': header });
-            // html += '<option value="' + columnName + '">' + header + '</option>';
-        }
-        sortedFields.sort(function (a, b) {
-            var n1 = a.text.toUpperCase();
-            var n2 = b.text.toUpperCase();
+        tabs.sort(function (a, b) {
+            var n1 = a.getTabLevel();
+            var n2 = b.getTabLevel();
             if (n1 > n2) return 1;
             if (n1 < n2) return -1;
             return 0;
         });
 
-        for (var col = 0; col < sortedFields.length; col++) {
-            html += '<option value="' + sortedFields[col].value + '">' + sortedFields[col].text + '</option>';
+        var html = "";
+        for (var i = 0; i < tabs.length; i++) {
+            if (this.curTab.getTabLevel() == tabs[i].getTabLevel() || (this.curTab.getTabLevel() + 1) == tabs[i].getTabLevel()) {
+                html += '<option tabid="' + tabs[i].getAD_Tab_ID() +'" value="' + i + '">' + tabs[i].getName() + '</option>';
+            }
         }
-        //Add this html in Dynamic created column
-        this.fillColumns(html);
+
+        this.fillTabs(html);
+
 
         this.selectionfields.sort(function (a, b) { return a.getSelectionSeqNo() - b.getSelectionSeqNo() });
         this.getFixedColumns();
         this.setLayout();
+        
+      
         this.initialzed = true;
 
     };
@@ -1250,7 +1650,7 @@
             sb += " UPPER( ";
         }
 
-        sb += this.curTab.getTableName() + '.' + column;
+        sb += this.tabs[this.cmbTabs.val()].getTableName() + '.' + column;
 
 
         if (typeof code == "string" && isNaN(code) && (code.toString().toUpper() != ("NULLValue").toUpper())) {
@@ -1314,7 +1714,7 @@
 
     };
 
-    FilterPanel.prototype.parseWhereCondition = function (columnName, optr, value, value2) {
+    FilterPanel.prototype.parseWhereCondition = function (columnName, optr, value, value2, fullDay) {
         //	Column
         var field = this.getTargetMField(columnName);
         var columnSQL = field.getColumnSQL(); //
@@ -1375,7 +1775,7 @@
             var OM = "OM";
             var WH = "WH";
 
-            if (field.getDisplayType() == VIS.DisplayType.DateTime && VIS.Query.prototype.EQUAL.equals(optr) && parsedValue) {
+            if (field.getDisplayType() == VIS.DisplayType.DateTime && VIS.Query.prototype.EQUAL.equals(optr) && parsedValue && fullDay == 'Y') {
 
                 var yearr = parsedValue.getFullYear();
                 var month = parsedValue.getMonth();
@@ -1452,6 +1852,14 @@
             html += '<option value="' + p + '">' + val + '</option>';
         }
         return html;
+    };
+
+    FilterPanel.prototype.getIsUserColumn = function (columnName) {
+        if (columnName.endsWith("atedBy") || columnName.equals("AD_User_ID"))
+            return true;
+        if (columnName.equals("SalesRep_ID"))
+            return true;
+        return false;
     };
 
     var filterContext = {
