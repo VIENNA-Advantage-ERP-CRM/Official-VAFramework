@@ -351,7 +351,7 @@ namespace VIS.Models
 
             {
 
-                sbSql.Append("SELECT DISTINCT w.AD_Window_ID, w.Name, tt.WhereClause, t.TableName, " +
+                sbSql.Append("SELECT DISTINCT w.AD_Window_ID, w.DisplayName, tt.WhereClause, t.TableName, " +
                     "wp.AD_Window_ID, wp.Name, ws.AD_Window_ID, ws.DisplayName "
                 + "FROM AD_Table t "
                 + "INNER JOIN AD_Tab tt ON (tt.AD_Table_ID = t.AD_Table_ID) "
@@ -401,21 +401,26 @@ namespace VIS.Models
             try
             {
                 ds = DB.ExecuteDataset(sbSql.ToString(), null);
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                // vis0008 checked dataset for null and rows
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
-                    //rs = ds.Tables[0].Rows[i];
-                    windowFound = true;
-                    ZoomWindow_ID = int.Parse(ds.Tables[0].Rows[i][6].ToString());
-                    zoom_WindowName = ds.Tables[0].Rows[i][7].ToString();
-                    PO_Window_ID = ds.Tables[0].Rows[i][4].ToString();
-                    whereClause = ds.Tables[0].Rows[i][2].ToString();
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        //rs = ds.Tables[0].Rows[i];
+                        windowFound = true;
+                        ZoomWindow_ID = int.Parse(ds.Tables[0].Rows[i][6].ToString());
+                        zoom_WindowName = ds.Tables[0].Rows[i][7].ToString();
+                        PO_Window_ID = ds.Tables[0].Rows[i][4].ToString();
+                        whereClause = ds.Tables[0].Rows[i][2].ToString();
 
-                    // Multiple window support only for Order, Invoice, Shipment/Receipt which have PO windows
-                    if (PO_Window_ID == null || PO_Window_ID.Length == 0)
-                        break;
+                        // vis0008 commented code for as there is requirement to display all linked screens zoom Across
+                        // Multiple window support only for Order, Invoice, Shipment/Receipt which have PO windows
+                        //if (PO_Window_ID == null || PO_Window_ID.Length == 0)
+                        //    break;
 
-                    WindowWhereClause windowClause = new WindowWhereClause(int.Parse(ds.Tables[0].Rows[i][0].ToString()), ds.Tables[0].Rows[i][1].ToString(), whereClause);
-                    windowList.Add(windowClause);
+                        WindowWhereClause windowClause = new WindowWhereClause(int.Parse(ds.Tables[0].Rows[i][0].ToString()), ds.Tables[0].Rows[i][1].ToString(), whereClause);
+                        windowList.Add(windowClause);
+                    }
                 }
                 ds = null;
             }
@@ -433,7 +438,7 @@ namespace VIS.Models
             if (windowList.Count <= 1)
             {
                 //Check if record exists in target table
-                sql1 = "SELECT count(*) FROM " + targetTableName + " WHERE " + targetWhereClause;
+                sql1 = "SELECT COUNT(*) FROM " + targetTableName + " WHERE " + targetWhereClause;
                 if (whereClause != null && whereClause.Length != 0)
                 {
                     sql1 += " AND " + Evaluator.ReplaceVariables(whereClause, ctx, null);
@@ -459,7 +464,7 @@ namespace VIS.Models
                 }
 
                 if (columns.Count == 0)
-                    sql1 += "count(*) ";
+                    sql1 += "COUNT(*) ";
                 sql1 += " FROM " + targetTableName + " WHERE " + targetWhereClause;
             }
             //log.Fine(sql1);
@@ -468,20 +473,35 @@ namespace VIS.Models
             try
             {
                 ds = DB.ExecuteDataset(sql1, null);
-                for (int cnt = 0; cnt < ds.Tables[0].Rows.Count; cnt++)
+                // vis0008 checked dataset for null and rows
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
-                    if (columns.Count > 0)
+                    for (int cnt = 0; cnt < ds.Tables[0].Rows.Count; cnt++)
                     {
+                        // vis0008 cleared column values list
                         columnValues.Clear();
-                        // store column names with their values in the variable
-                        for (int i = 0; i < columns.Count; i++)
+                        if (columns.Count > 0)
                         {
-                            String columnName = (String)columns[i].ToString();
-                            String columnValue = (String)ds.Tables[0].Rows[cnt][columnName].ToString();
-                            //log.Fine(columnName + " = " + columnValue);
-                            columnValues.Add(new ValueNamePair(columnValue, columnName));
+                            // store column names with their values in the variable
+                            for (int i = 0; i < columns.Count; i++)
+                            {
+                                String columnName = (String)columns[i].ToString();
+                                String columnValue = (String)ds.Tables[0].Rows[cnt][columnName].ToString();
+                                //log.Fine(columnName + " = " + columnValue);
+                                columnValues.Add(new ValueNamePair(columnValue, columnName));
+                            }
+                        }
+                        else
+                        {
+                            // get total number of records
+                            int rowCount = int.Parse(ds.Tables[0].Rows[cnt][0].ToString());
+                            if (rowCount <= 0)
+                            {
+                                continue;
+                            }
                         }
 
+                        // vis0008 zoom Across changes to get all screens 
                         // Find matching windows
                         for (int i = 0; i < windowList.Count; i++)
                         {
@@ -496,17 +516,6 @@ namespace VIS.Models
                                 //this break is remove by karan on 18 jan 2021, to show a record which can exist in more than one window.
                                 //break;
                             }
-                        }
-                    }
-                    else
-                    {
-                        // get total number of records
-                        int rowCount = int.Parse(ds.Tables[0].Rows[cnt][0].ToString());
-                        if (rowCount != 0)
-                        {
-                            // make a key name pair
-                            KeyNamePair pp = new KeyNamePair(ZoomWindow_ID, zoom_WindowName);
-                            zoomList.Add(pp);
                         }
                     }
                 }

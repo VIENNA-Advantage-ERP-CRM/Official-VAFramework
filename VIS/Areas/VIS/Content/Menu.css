@@ -249,7 +249,7 @@
 
 .vis-nm-nav-arrow {
     position: absolute;
-    top: 50%;
+    top: 56%;
     transform: translate(0, -50%);
     display: flex;
     cursor: pointer;
@@ -260,11 +260,11 @@
     }
 
 .vis-nm-prev {
-    left: -16px;
+    left: -19px;
 }
 
 .vis-nm-forward {
-    right: -16px;
+    right: -22px;
 }
 
 .vis-nm-selAppLabel {
@@ -351,7 +351,7 @@ nav.vis-nav-horizontal-scroll {
 .vis-nav-horizontal-scroll ul li:hover,
 .vis-nav-horizontal-scroll ul li:active {
     color: white;
-    cursor: pointer;
+    /*cursor: pointer;*/
     background-color: rgba(var(--v-c-on-secondary), 1);
 }
 
@@ -426,7 +426,7 @@ nav.vis-nav-horizontal-scroll {
     background-color: rgba(var(--v-c-on-secondary), 1);
     /*background-color: #95b7df;*/
     z-index: 100;
-    padding: 1rem 1rem 1rem 1rem;
+    padding: 1.5rem 1rem 1rem 1rem;
     min-width: auto;
     visibility: hidden;
     opacity: 0;
@@ -442,6 +442,7 @@ nav.vis-nav-horizontal-scroll {
         align-items: center;
         gap: 8px;
         font-size: 0.875rem;
+        cursor: pointer;
     }
 
         .vis-subnav-content a:hover {
