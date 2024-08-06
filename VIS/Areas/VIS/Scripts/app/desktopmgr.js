@@ -958,6 +958,15 @@
             orgOrgHtml = cmbOrg.html();
             orgWareHtml = cmbWare.html();
 
+            lstOrgs.multiselect({
+                disableIfEmpty: true,
+                disabledText: '--',
+                nonSelectedText: 'Select Org!',
+                nSelectedText: ' - Too many options selected!',
+                allSelectedText: 'No option left ...',
+
+            });
+
             //set value
             setFilterOrg();
 
@@ -1015,20 +1024,25 @@
             }
 
             var arrVal = strOrgFilter.split(',');
-            lstOrgs.val(arrVal);
+            lstOrgs.multiselect('select', arrVal);
+
         }
 
-        function resetOrgFiletr(data) {
-            lstOrgs.empty();
-            $(data).each(function () {
-                $("<option />", {
-                    val: this.Key,
-                    text: this.Name
-                }).appendTo(lstOrgs);
-            });
+        function resetOrgFiletr(data, isSelect) {
+            if(!isSelect){
+                lstOrgs.empty();
+                $(data).each(function () {
+                    $("<option />", {
+                        val: this.Key,
+                        text: this.Name
+                    }).appendTo(lstOrgs);
+                });
 
-            chkFilter.prop('checked',false);
-            lstOrgs.val([cmbOrg.val()]);
+                lstOrgs.multiselect('rebuild');
+                chkFilter.prop('checked', false);
+            }
+            lstOrgs.multiselect('deselectAll');
+            lstOrgs.multiselect('select', [cmbOrg.val()]);
         }
 
         /*
@@ -1137,19 +1151,19 @@
                 cmbWare.empty();
 
                 getdata(cmbClient, contextUrl + "Account/GetClients", { 'Id': combo.value });
-                
+
             }
             else if (combo.id === cmbClient.attr('id')) {
                 cmbOrg.empty();
                 cmbWare.empty();
 
                 getdata(cmbOrg, contextUrl + "Account/GetOrgs", { 'role': cmbRole.val(), 'user': VIS.context.getAD_User_ID(), 'client': combo.value });
-              
+
             }
             else if (combo.id === cmbOrg.attr('id')) {
                 cmbWare.empty();
                 getdata(cmbWare, contextUrl + "Account/GetWarehouse", { 'id': cmbOrg.val() });
-                
+
             }
             else if (combo.id === cmbWare.attr('id')) {
 
@@ -1174,11 +1188,14 @@
             }
             else if (combo === cmbClient) {
                 text = Globalize.localize('SelectClient');
-                
+
             }
             else if (combo === cmbOrg) {
                 text = Globalize.localize('SelectOrg');
                 resetOrgFiletr(data);
+            }
+            else {
+                resetOrgFiletr(null, true); //select Only
             }
 
             $("<option />", {
@@ -1200,6 +1217,11 @@
             if (chkFilter.prop('checked') == true) {
                 //set filtered org val
                 var selVals = lstOrgs.val();
+                //check for login Org
+                if (selVals.indexOf(cmbOrg.val()) <= -1) {
+                    selVals.push(cmbOrg.val());
+                }
+
                 for (var i = 0; i < selVals.length; i++) {
                     if (selVals[i] > 0) {
                         if (orgFilter != "") {

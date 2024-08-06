@@ -178,6 +178,8 @@ select.vis-ev-col-mandatory {
     display: flex;
 }
 
+
+
 .vis-input-wrap textarea ~ label {
     display: inline-block;
     padding-top: 5px;
@@ -191,7 +193,7 @@ select.vis-ev-col-mandatory {
 .vis-input-wrap input:focus, .vis-input-wrap select:focus, .vis-input-wrap textarea:focus {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
-
+vis-input-wrap 
 .vis-input-wrap .input-group-text:focus {
     box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
     border-left-color: rgba(var(--v-c-primary), 1) !important;
