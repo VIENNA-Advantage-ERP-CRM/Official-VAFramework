@@ -141,9 +141,11 @@
         font-weight: 600;
         float: left;
     }
+
 .vis-w-iconsCls .vis-w-feedicon:last-child {
-    border-left:0;
+    border-left: 0;
 }
+
 .vis-w-feedicon {
     /*background: transparent;*/
     /*color: #ffffff;*/
@@ -166,9 +168,9 @@
     width: 24px
 }
 
-    /*.vis-w-feedicon:hover {*/
-        /*color: #d9f0ff;*/
-        /*color: rgba(var(--v-c-on-secondary),1);
+/*.vis-w-feedicon:hover {*/
+/*color: #d9f0ff;*/
+/*color: rgba(var(--v-c-on-secondary),1);
     }*/
 
 .vis-w-workflow-homepage-parentdiv .vis-w-frm-data-search-wrap {
@@ -188,6 +190,7 @@
     font-weight: 400;
     margin-bottom: 0
 }
+
 .vis-w-frm-data-col-wrap button {
     background-color: rgba(var(--v-c-on-secondary),.07);
     border: none;
@@ -195,22 +198,26 @@
     height: 26px;
     width: 27px
 }
+
 .vis-workflow-homepage-parentdiv .vis-w-frm-data-search-wrap {
     background-color: rgba(var(--v-c-common), 1);
     border-radius: .375em;
     overflow: hidden
 }
+
 .vis-w-frm-data-search-wrap {
     border: 1px solid rgba(var(--v-c-on-secondary),.1);
     display: flex;
     float: left;
     width: 100%
 }
+
 .vis-w-frm-data-col-wrap input .vis-w-frm-data-col-searchinput {
     border: none;
     flex: 1;
     height: 26px
 }
+
 .vis-w-frm-data-col-wrap input:not([type=button]), .vis-w-frm-data-col-wrap select {
     border-radius: 5px;
     color: rgba(var(--v-c-on-secondary),1);
@@ -221,9 +228,9 @@
     outline: none;
     padding-left: 5px;
     width: 100%;
-    border:none;
-    
+    border: none;
 }
+
 .vis-app-aform-root .vis-w-workflow-homepage-parentdiv .vis-w-frm-data-col-wrap input {
     border-radius: 0.375em;
     font-size: 0.75em;
@@ -258,7 +265,7 @@
         background-color: rgba(var(--v-c-primary),.1);
         border-radius: 0.375em 0.375em 0 0;
         border-bottom: 0;
-        display:flex;
+        display: flex;
     }
 
         .vis-w-activityContainer .vis-w-feedTitleBar h3 {
@@ -296,21 +303,22 @@
         height: 40px;
         justify-content: center;
     }
-/*.workflow-homepage-activites */
-.vis-w-feedTitleBar-buttons ul li, .vis-w-feedTitleBar .vis-w-feedTitleBar-buttons ul li {
-    background-color: rgba(var(--v-c-primary),1);
-    border: 0;
-    width: 1.75em;
-    height: 1.75em;
-    border-radius: 0.375em;
-    font-size: 1em;
-    margin-left: .2rem;
-}
-
     /*.workflow-homepage-activites */
-    .vis-w-feedTitleBar-buttons ul li a, .vis-w-feedTitleBar .vis-w-feedTitleBar-buttons ul li a {
-        color: rgba(var(--v-c-on-primary),1)
+    .vis-w-feedTitleBar-buttons ul li, .vis-w-feedTitleBar .vis-w-feedTitleBar-buttons ul li {
+        background-color: rgba(var(--v-c-primary),1);
+        border: 0;
+        width: 1.75em;
+        height: 1.75em;
+        border-radius: 0.375em;
+        font-size: 1em;
+        margin-left: .2rem;
     }
+
+        /*.workflow-homepage-activites */
+        .vis-w-feedTitleBar-buttons ul li a, .vis-w-feedTitleBar .vis-w-feedTitleBar-buttons ul li a {
+            color: rgba(var(--v-c-on-primary),1)
+        }
+
 .vis-w-feedDetails p {
     /*display: inline;*/
     margin-bottom: 0rem;
@@ -319,6 +327,7 @@
 .vis-w-activityContainer .vis-w-feedDetails pre {
     padding: 0 0.625em;
 }
+
 .vis-w-feedDetails pre strong, .vis-w-feedDetails p strong {
     flex: 1;
     font-weight: 400;
@@ -328,11 +337,12 @@
 .vis-w-activityContainer .vis-w-feedDetails .vis-w-feedDateTime {
     text-align: center;
     padding: 0.375em 0;
-    border-top: 0.0625em solid rgba(var(--v-c-on-secondary),.1);    
+    border-top: 0.0625em solid rgba(var(--v-c-on-secondary),.1);
     font-size: 0.875em;
     /*font-size: 0.625em;*/
     margin-top: .75em;
 }
+
 .vis-w-workflow-homepage-activites .vis-w-feedDetails {
     cursor: pointer;
 }
@@ -342,12 +352,15 @@
 .vis-secondary-clr {
     color: rgba(var(--v-c-on-secondary),.9) !important;
 }
-.vis-setworkflow-font label{
-    font-size:.900em !important;
+
+.vis-setworkflow-font label {
+    font-size: .900em !important;
 }
-.vis-selectworkflow-fontsize{
-    font-size:.900em !important;
+
+.vis-selectworkflow-fontsize {
+    font-size: .900em !important;
 }
+
 .vis-w-workflowActivityDetails-Heading {
     text-align: left;
     align-items: center;
@@ -444,19 +457,23 @@
         width: 1.9em;
         padding: 0;
     }
+
 .vis-w-workflowActivityIcons.vis-w-icon-doneButton {
     float: right;
     height: 26px;
 }
+
 .vis-w-IIColumnContent li {
     padding: 0;
 }
+
 ul.vis-w-IIColumnContent {
     list-style: none;
     margin: 0;
     padding: 0;
     width: 100%
 }
+
 .vis-w-IIColumnContent .vis-w-input-widgetswrap textarea {
     height: auto;
 }
@@ -471,10 +488,12 @@ ul.vis-w-IIColumnContent {
     gap: 0.75em;
     justify-content: space-between;
 }
+
 .vis-w-home-wf-answerWrap {
     display: flex;
     margin-top: .75rem
 }
+
 .vis-w-home-wf-answerBtn {
     margin-bottom: 0;
 }
@@ -663,17 +682,19 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-editModeWidget .vis-w-welcomeScreenFeeds {
     font-size: 10px;
 }
+
 .vis-w-txtBold {
     font-weight: 600;
 }
+
 .vis-w-workflowActivityDetails h3 {
     font-size: 1.125em;
     flex: 1;
 }
 /*.vis-w-workflowActivityDetails-Heading a:hover {*/
-    /*color: rgba(var(--v-c-common),1);*/
-    /*color: #d9f0ff;*/
-    /*color: rgba(var(--v-c-on-secondary),1);
+/*color: rgba(var(--v-c-common),1);*/
+/*color: #d9f0ff;*/
+/*color: rgba(var(--v-c-on-secondary),1);
 }*/
 
 .vis-w-IIColumnContent .vis-w-input-widgetswrap select ~ label {
@@ -690,6 +711,17 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     font-size: 0.875em
 }
 
+@media screen and (max-width: 1920px) {
+    .vis-editModeWidget .vis-w-workflow-homepage-parentdiv .vis-w-setSearchSize {
+        font-size: 1em !important;
+    }
+}
+
+@media screen and (max-width: 1600px) {
+    .vis-editModeWidget .vis-w-workflow-homepage-parentdiv .vis-w-setSearchSize {
+        font-size: 0.9em !important;
+    }
+}
 
 @media screen and (max-width:1400px) {
     .vis-w-workflow-homepage-parentdiv .vis-w-frm-data-search-wrap {
@@ -699,6 +731,10 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 
     .VIS-ActiveCls .vis-w-workflow-homepage-activites {
         height: calc(100% - 8em);
+    }
+
+    .vis-editModeWidget .vis-w-workflow-homepage-parentdiv .vis-w-setSearchSize {
+        font-size: 0.9em !important;
     }
 }
 
@@ -732,6 +768,14 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     .VIS-ActiveCls .vis-w-workflow-homepage-activites {
         height: calc(100% - 9em);
     }
+
+    .vis-w-setSearchSize {
+        font-size: 0.9em !important;
+    }
+
+    .vis-editModeWidget .vis-w-workflow-homepage-parentdiv .vis-w-setSearchSize {
+        font-size: 0.9em !important;
+    }
 }
 
 @media screen and (max-width:900px) {
@@ -746,6 +790,16 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     .vis-editModeWidget .vis-w-welcomeScreenFeeds {
         font-size: 9px;
     }
+
+    .vis-editModeWidget .vis-w-workflow-homepage-parentdiv .vis-w-setSearchSize {
+        font-size: 0.7em !important;
+    }
+}
+
+@media screen and (max-width:768px) {
+    .vis-editModeWidget .vis-w-workflow-homepage-parentdiv .vis-w-setSearchSize {
+        font-size: 0.6em !important;
+    }
 }
 
 @media screen and (max-width:680px) {
@@ -758,7 +812,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     }
 
     .vis-w-workflow-Activity {
-        font-size: 11px;      
+        font-size: 11px;
     }
 
     .vis-w-workflow-homepage-parentdiv {
@@ -771,6 +825,10 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 
     .vis-w-welcomeScreenFeeds > .vis-w-row h2 {
         font-size: .75em
+    }
+
+    .vis-editModeWidget .vis-w-workflow-homepage-parentdiv .vis-w-setSearchSize {
+        font-size: 0.6em !important;
     }
 }
 
@@ -918,24 +976,29 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     color: rgba(var(--v-c-on-secondary), 1) !important;
     cursor: context-menu !important;
 }
-.vis-notClickCls{
-    cursor:context-menu !important;
+
+.vis-notClickCls {
+    cursor: context-menu !important;
 }
-.vis-clickCls{
-    cursor:pointer;
+
+.vis-clickCls {
+    cursor: pointer;
 }
+
 .vis-pTagStyleCls {
     margin-top: 12.5em;
     text-align: center;
 }
+
 .vis-w-zoomClrChngCls {
-    background-color: rgba(var(--v-c-primary),.0) !important;    
+    background-color: rgba(var(--v-c-primary),.0) !important;
 }
+
     .vis-w-zoomClrChngCls a {
         color: rgba(var(--v-c-primary), 1) !important;
     }
-    /*Request widget*/
-    .vis-RequestwelcomeScreenCls {
+/*Request widget*/
+.vis-RequestwelcomeScreenCls {
     background-color: #f3f3f3;
     border: 1px solid rgba(0,0,0,.125);
     border-radius: .25em;
@@ -977,9 +1040,14 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     top: 0;
     height: calc(100% - 4.8em);
 }
+
 .vis-r-notRecordFndCls {
     margin-top: 12.5em;
     text-align: center;
+}
+
+.vis-w-requestFlx {
+    display: flex;
 }
 /*Action Widgets*/
 .vis-a-task-status-panel {
@@ -987,133 +1055,244 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     width: 100%;
     padding: 0.2em;
 }
-.vis-a-statusBox-container{grid-template-columns:repeat(1, 1fr); display: grid; gap:0.4em; height: 100%; background-color: #ffffff; padding: 0.3rem;}
-.vis-a-status-box{width: 100%; text-align: center; display: flex; border-radius: 0.375em; border: 1px solid transparent; align-items: center; justify-content: space-between; padding: 0.625em; }
-.vis-a-status-box .fa, .vis-a-status-box .vis{font-size: 1.8em; display: flex; align-items: center; justify-content: center;  }
-.vis-a-headWico{display: flex;align-items: center; gap: 0.625em ;}
-.vis-a-status-name{font-size: 1.2em; color: #333333;}
-.vis-a-status-count{min-width: 6.875em; border-radius: 3.125em;font-weight: 600; display: flex; align-items: center; justify-content: center; color: #ffffff; height: 1.75em;}
 
-.vis-a-green-box{border-color: #B1FFEF; background-color: #E6FFFA; }
-.vis-a-green-box .vis, .vis-a-green-box .fa{color: #00C8A0;}
-.vis-a-orange-box{border-color: #FFE6B3; background-color: #FFF1D4;}
-.vis-a-orange-box .vis, .vis-a-orange-box .fa{color: #FECB62;}
-.vis-a-blue-box{border-color: #C3DDFF; background-color: #EBF3FE;}
-.vis-a-blue-box .vis, .vis-a-blue-box .fa{color: #5093EF;}
+.vis-a-statusBox-container {
+    grid-template-columns: repeat(1, 1fr);
+    display: grid;
+    gap: 0.4em;
+    height: 100%;
+    background-color: #ffffff;
+    padding: 0.3rem;
+}
 
-.vis-a-greenbg{background-color: #00C8A0;}
-.vis-a-bluebg{background-color: #5093EF;}
-.vis-a-orangebg{background-color: #FECB62;}
+.vis-a-status-box {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    border-radius: 0.375em;
+    border: 1px solid transparent;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625em;
+}
+
+    .vis-a-status-box .fa, .vis-a-status-box .vis {
+        font-size: 1.8em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+.vis-a-headWico {
+    display: flex;
+    align-items: center;
+    gap: 0.625em;
+}
+
+.vis-a-status-name {
+    font-size: 1.2em;
+    color: #333333;
+}
+
+.vis-a-status-count {
+    min-width: 6.875em;
+    border-radius: 3.125em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    height: 1.75em;
+}
+
+.vis-a-green-box {
+    border-color: #B1FFEF;
+    background-color: #E6FFFA;
+}
+
+    .vis-a-green-box .vis, .vis-a-green-box .fa {
+        color: #00C8A0;
+    }
+
+.vis-a-orange-box {
+    border-color: #FFE6B3;
+    background-color: #FFF1D4;
+}
+
+    .vis-a-orange-box .vis, .vis-a-orange-box .fa {
+        color: #FECB62;
+    }
+
+.vis-a-blue-box {
+    border-color: #C3DDFF;
+    background-color: #EBF3FE;
+}
+
+    .vis-a-blue-box .vis, .vis-a-blue-box .fa {
+        color: #5093EF;
+    }
+
+.vis-a-greenbg {
+    background-color: #00C8A0;
+}
+
+.vis-a-bluebg {
+    background-color: #5093EF;
+}
+
+.vis-a-orangebg {
+    background-color: #FECB62;
+}
 
 .vis-a-modelHeightSetCls {
     height: calc(100vh - 80px);
 }
+
     .vis-a-modelHeightSetCls .vis-w-welcomeScreenFeeds .vis-welcomeNoticeScreenFeedsListCls {
         height: calc(100vh - 12em) !important;
         height: 89.5% !important;
     }
+
     .vis-a-modelHeightSetCls .vis-a-setHeightReqstAtcion {
         height: calc(100vh - 148px) !important;
     }
+
     .vis-a-modelHeightSetCls .vis-w-welcomeScreenFeeds .VIS-ActiveCls .vis-w-workflow-homepage-activites {
         height: calc(100vh - 237px) !important;
     }
+
     .vis-a-modelHeightSetCls .vis-w-workflow-welcomfeed-cls {
         height: calc(100vh - 80px);
     }
+
     .vis-a-modelHeightSetCls .vis-w-workflow-homepage-activites {
         height: calc(100vh - 185px);
     }
+
     .vis-a-modelHeightSetCls .vis-RequestWelcomeScreenFeedsListCls {
         height: calc(100% - 3.8em);
     }
+
     .vis-a-modelHeightSetCls .scrollerVertical .vis-a-pTagSetHeight, .vis-a-modelHeightSetCls .vis-w-scrollerVerticalNewCls .vis-a-pTagSetHeight {
         margin-top: 0px !important;
         text-align: center;
         padding: 19% 0;
     }
 
-    @media screen and (max-width: 2000px) {
-        .vis-a-task-status-panel {
-            font-size: 13px;
-        }
-        .vis-editModeWidget .vis-a-task-status-panel {font-size: 13px; }
+@media screen and (max-width: 2000px) {
+    .vis-a-task-status-panel {
+        font-size: 13px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 13px;
+    }
 }
+
 @media screen and (max-width: 1920px) {
     .vis-a-task-status-panel {
         font-size: 13px;
     }
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 8px;
-  }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 8px;
+    }
 }
+
 @media screen and (max-width: 1367px) {
-  .vis-a-task-status-panel{font-size: 13px;}
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 8px;
-  }
+    .vis-a-task-status-panel {
+        font-size: 13px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 8px;
+    }
 }
+
+@media screen and (max-width: 1200px) {
+    .vis-a-task-status-panel {
+        font-size: 11px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 7px;
+    }
+}
+
 @media screen and (max-width: 1024px) {
-  .vis-a-task-status-panel {
-    font-size: 9px;
-  }
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 6px;
-  }
+    .vis-a-task-status-panel {
+        font-size: 9px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 6px;
+    }
 }
+
 @media screen and (max-width:900px) {
-  .vis-a-task-status-panel {
-    font-size: 12px;
-  }
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 8px;
-  }
+    .vis-a-task-status-panel {
+        font-size: 12px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 8px;
+    }
 }
 
 @media screen and (max-width: 768px) {
-  .vis-a-task-status-panel {
-    font-size: 10px;
-  }
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 7px;
-  }
+    .vis-a-task-status-panel {
+        font-size: 10px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 7px;
+    }
 }
 
 @media screen and (max-width: 600px) {
-  .vis-a-task-status-panel {
-    font-size: 7px;
-  }
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 5px;
-  }
+    .vis-a-task-status-panel {
+        font-size: 7px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 5px;
+    }
 }
+
 @media screen and (max-width: 480px) {
-  .vis-a-task-status-panel {
-    font-size: 10px;
-  }
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 9px;
-  } 
+    .vis-a-task-status-panel {
+        font-size: 10px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 9px;
+    }
 }
+
 @media screen and (max-width: 375px) {
-  .vis-a-task-status-panel {
-    font-size: 10px;
-  }
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 6px;
-  }
+    .vis-a-task-status-panel {
+        font-size: 10px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 6px;
+    }
 }
+
 @media screen and (max-width: 320px) {
-  .vis-a-task-status-panel {
-    font-size: 9px;
-  }
-  .vis-editModeWidget .vis-a-task-status-panel {
-    font-size: 5px;
-  }
+    .vis-a-task-status-panel {
+        font-size: 9px;
+    }
+
+    .vis-editModeWidget .vis-a-task-status-panel {
+        font-size: 5px;
+    }
 }
+
 .vis-a-closeBtnCls.close:hover {
     color: rgba(var(--v-c-primary), 1);
 }
+
 .vis-a-closeBtnCls.close {
     position: absolute;
     right: -12px;
@@ -1131,12 +1310,8 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     opacity: 1 !important;
     border: 1px solid rgba(var(--v-c-on-secondary), 1)
 }
-    .vis-a-closeBtnCls.close span{
-        position:relative;
-        top:-2px;
+
+    .vis-a-closeBtnCls.close span {
+        position: relative;
+        top: -2px;
     }
-
-
-
-
-

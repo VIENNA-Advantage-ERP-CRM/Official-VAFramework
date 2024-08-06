@@ -41,6 +41,7 @@
             modelPopupId.find("#closeBtnId" + $self.AD_UserHomeWidgetID).on("click", function () {
                 modelPopupId.hide();
                 wform.dispose();
+                $self.refreshWidget();
             });
         };
 
@@ -176,7 +177,6 @@
             welcomeActionsDivId.find("#noticeCntDivId" + $self.AD_UserHomeWidgetID).empty();
             welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).empty();
             loadCounts(false);
-            ShowBusy(false);
         };
 
         /* get design from root*/

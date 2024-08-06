@@ -37,13 +37,10 @@
             createWidget();
             createBusyIndicator();
             showBusy(true);
-            loadHomeNotice(true,true);
+            loadHomeNotice(true, true);
         };
         /* Declare events */
         function events() {
-            $root.find('.vis-w-feedTitleBar-buttons').on("click", function (evnt) {
-                actions(evnt);
-            });
             $root.find('.vis-w-feedDetails').on("click", function (evnt) {
                 actions(evnt);
             });
@@ -120,6 +117,8 @@
                     else {
 
                         if (welcomeTabDatacontainers.find(".vis-w-feedTitleBar").length == 0) {
+                            welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
+                            welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).append(0);
                             str = "<p class='vis-pTagStyleCls vis-a-pTagSetHeight'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
                         }
                         welcomeTabDatacontainers.append(str);
@@ -166,7 +165,7 @@
             }
 
 
-            str += " <div class='vis-w-feedTitleBar-buttons'>"
+            str += " <div id='feedTitleBtnId" + data[s].AD_Note_ID + data[s].Record_ID + "' class='vis-w-feedTitleBar-buttons'>"
                 + "  <ul>";
             // Renaming of Approve highlight to Acknowledge under notification
             str += "<li class='vis-w-zoomClrChngCls' data-vishomercrd='liview'><a href='javascript:void(0)' data-vishomercrd='view' id=" + data[s].AD_Note_ID + "|" + data[s].TableName + "|" + data[s].AD_Window_ID + "|" + data[s].Record_ID + " title='" + VIS.Msg.getMsg("View") + "' class='vis vis-find'></a></li>"
@@ -180,6 +179,11 @@
                 + " </div>"
                 + " </div>"
             welcomeTabDatacontainers.append(str);
+            //Actions events
+            welcomeTabDatacontainers.find('#feedTitleBtnId' + data[s].AD_Note_ID + data[s].Record_ID).off("click");
+            welcomeTabDatacontainers.find('#feedTitleBtnId' + data[s].AD_Note_ID + data[s].Record_ID).on("click", function (evnt) {
+                actions(evnt);
+            });
         }
 
         /**
@@ -330,10 +334,11 @@
         };
         //Refresh Widget
         this.refreshWidget = function () {
+            showBusy(true);
             welcomeTabDatacontainers.empty();
             pageNo = 1;
             loadHomeNotice(true, false);
-            events();
+            welcomeTabDatacontainers.scrollTop(0);
         };
 
         //Approve
@@ -363,7 +368,6 @@
         };
     }
     VIS.NoticeWidget.prototype.refreshWidget = function () {
-
     };
     /* init method called on loading a form . */
     VIS.NoticeWidget.prototype.init = function (windowNo, frame) {

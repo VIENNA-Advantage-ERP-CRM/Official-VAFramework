@@ -129,6 +129,8 @@
                     }
                     else {
                         if (welcomeTabDatacontainers.find(".vis-table-request").length == 0) {
+                            $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).empty();
+                            $requestwelcomeDivId.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).append(0);
                             str = "<p class='vis-a-pTagSetHeight vis-r-notRecordFndCls'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
                             welcomeTabDatacontainers.append(str);
                             showBusy(false);
@@ -183,18 +185,20 @@
                 + "</div>"
                 + "</div>"
 
-                + "<div  class='vis-w-feedDetails vis-pt-0 vis-pl-0'>"
+                + "<div  class='vis-w-feedDetails vis-pt-0 vis-pl-0 vis-w-requestFlx'>"
                 + "<div class='vis-table-request'>"
-                + "<ul>"
+                + "<ul class='h-100'>"
                 + "<li><span>" + VIS.Msg.getMsg('Priority') + ":</span><br>" + data[s].Priority + "</li>"
                 + "<li><span>" + VIS.Msg.getMsg('Status') + ":</span><br>" + data[s].Status + "</li>"
                 + "<li><span>" + VIS.Msg.getMsg('NextActionDate') + ":</span><br>" + NextActionDate + "</li>"
                 + "</ul>"
                 + "</div>"
+                + "<div class='w-100'>"
                 + "<p class='vis-maintain-customer-p'>"
                 + "<strong>" + VIS.Utility.encodeText(casetype) + " </strong><br />"
                 + "<span>" + VIS.Msg.getMsg('Message') + ":</span><br>" + VIS.Utility.encodeText(summary) + "</p>"
                 + "<p class='vis-w-feedDateTime vis-secondary-clr'  style=' width: 95%; margin-right: 10px;'>" + CreatedDate + "</p>"
+                + "</div>"
                 + "</div>"
                 + "</div>"
             welcomeTabDatacontainers.append(str);
@@ -282,7 +286,6 @@
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
                 showBusy(true);
-                //scrollWF = false;
                 var tabdataLastPage = parseInt($root.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).html());
                 var tabdatacntpage = pageNo * pageSize;
                 if (tabdatacntpage <= tabdataLastPage) {
@@ -299,6 +302,7 @@
             showBusy(true);
             welcomeTabDatacontainers.empty();
             loadHomeRequest(true, false);
+            welcomeTabDatacontainers.scrollTop(0);
         };
 
         /* get design from root*/
