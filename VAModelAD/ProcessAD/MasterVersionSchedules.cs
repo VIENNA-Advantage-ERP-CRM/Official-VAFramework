@@ -240,8 +240,7 @@ namespace VAdvantage.Process
                                 poDest.Set_Value(sbColName.ToString(), val);
                         }
                         else
-                        {
-                            // VIS0008 for date time and Time only reference
+                        {   // VIS0008 for date time and Time only reference
                             if (Util.GetValueOfInt(dsDBColNames.Tables[0].Rows[j]["AD_Reference_ID"]) == 16 || Util.GetValueOfInt(dsDBColNames.Tables[0].Rows[j]["AD_Reference_ID"]) == 24)
                             {
                                 poDest.Set_ValueNoCheck(sbColName.ToString(), Convert.ToDateTime(poSource.Get_Value(sbColName.ToString())).ToLocalTime());
@@ -249,7 +248,6 @@ namespace VAdvantage.Process
                             else
                                 poDest.Set_ValueNoCheck(sbColName.ToString(), poSource.Get_Value(sbColName.ToString()));
                         }
-
                         // Check if Master record is Processed and Always Updatable is false then check whether any value updated in such column
                         // if value updated then return false, can't change data in Processed record if it's not Always Updatable
                         if (recordProcessed && Util.GetValueOfString(dsDBColNames.Tables[0].Rows[j]["IsAlwaysUpdateable"]) == "N")

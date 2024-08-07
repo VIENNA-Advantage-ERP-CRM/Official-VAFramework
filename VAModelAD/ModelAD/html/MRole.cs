@@ -185,20 +185,28 @@ namespace VAdvantage.Model
             //    AD_User_ID = 0; //Form Preference
 
             MRole role = (MRole)s_cache.Get(AD_Role_ID);
-            lock (_lock)
+
+            if (reload || role == null || role.GetAD_Role_ID() != AD_Role_ID
+            || role.GetAD_User_ID() != AD_User_ID)
             {
-                if (reload || role == null)
+               if( s_cache.ContainsKey(AD_Role_ID))
+                s_cache.Remove(AD_Role_ID);
+                lock (_lock)
                 {
-                    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
-                    s_cache[AD_Role_ID] = role;
-                }
-                else if (role.GetAD_Role_ID() != AD_Role_ID
-                || role.GetAD_User_ID() != AD_User_ID)
-                {
-                    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
-                    s_cache[AD_Role_ID] = role;
+                    role = (MRole)s_cache.Get(AD_Role_ID);
+                    if (role == null)
+                    {
+                        role = Get(ctx, AD_Role_ID, AD_User_ID, true);
+                        s_cache[AD_Role_ID] = role;
+                    }
                 }
             }
+            //else if (role.GetAD_Role_ID() != AD_Role_ID
+            //|| role.GetAD_User_ID() != AD_User_ID)
+            //{
+            //    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
+            //    s_cache[AD_Role_ID] = role;
+            //}
             return role;
 
 
@@ -687,7 +695,7 @@ namespace VAdvantage.Model
                 return "-";
             }
 
-            
+
 
             /**
              *	Fill AD_xx_Access
@@ -2168,278 +2176,278 @@ namespace VAdvantage.Model
             return retSQL.ToString();
         }   //	addAccessSQL
 
-       /* public string AddAccessSQL(string inSql, string TableNameIn,
-                                bool fullyQualified, bool rw)
-        {
-            if (fullyQualified && Util.IsEmpty(TableNameIn))
-                fullyQualified = false;
+        //public string AddAccessSQL(string inSql, string TableNameIn,
+        //                        bool fullyQualified, bool rw)
+        //{
+        //    if (fullyQualified && Util.IsEmpty(TableNameIn))
+        //        fullyQualified = false;
 
-            StringBuilder retSQL = new StringBuilder();
+        //    StringBuilder retSQL = new StringBuilder();
 
-            //	Cut off last ORDER BY clause
-            string orderBy = "";
-            int posOrder = inSql.LastIndexOf(" ORDER BY ");
-            if (posOrder != -1)
-            {
-                orderBy = inSql.Substring(posOrder);
-                retSQL.Append(inSql.Substring(0, posOrder));
-            }
-            else
-                retSQL.Append(inSql);
+        //    //	Cut off last ORDER BY clause
+        //    string orderBy = "";
+        //    int posOrder = inSql.LastIndexOf(" ORDER BY ");
+        //    if (posOrder != -1)
+        //    {
+        //        orderBy = inSql.Substring(posOrder);
+        //        retSQL.Append(inSql.Substring(0, posOrder));
+        //    }
+        //    else
+        //        retSQL.Append(inSql);
 
-            //	Parse inSql
-            AccessSqlParser asp = new AccessSqlParser(retSQL.ToString());
-            AccessSqlParser.TableInfo[] ti = asp.GetTableInfo(asp.GetMainSqlIndex());
+        //    //	Parse inSql
+        //    AccessSqlParser asp = new AccessSqlParser(retSQL.ToString());
+        //    AccessSqlParser.TableInfo[] ti = asp.GetTableInfo(asp.GetMainSqlIndex());
 
-            //  Do we have to add WHERE or AND
-            if (asp.GetMainSql().IndexOf(" WHERE ") == -1)
-                retSQL.Append(" WHERE ");
-            else
-                retSQL.Append(" AND ");
+        //    //  Do we have to add WHERE or AND
+        //    if (asp.GetMainSql().IndexOf(" WHERE ") == -1)
+        //        retSQL.Append(" WHERE ");
+        //    else
+        //        retSQL.Append(" AND ");
 
-            //	Use First Table
-            string tableName = "";
-            string mainTableName = "";
-            if (ti.Length > 0 &&
-                (ti[0].GetTableName().Equals(TableNameIn)
-                || ti[0].GetSynonym().Equals(TableNameIn)))
-            {
-                tableName = ti[0].GetSynonym();
-                mainTableName = ti[0].GetTableName();
-                if (tableName.Length == 0)
-                    tableName = ti[0].GetTableName();
-            }
-            //	Check for error condition
-            if (TableNameIn != null
-                && (tableName == null || tableName.Length == 0))
-            {
-                string msg = "TableName not correctly parsed - TableNameIn="
-                    + TableNameIn + " - " + asp;
-                if (ti.Length > 0)
-                    msg += " - #1 " + ti[0];
-                msg += "\n = " + inSql;
-                log.Log(Level.SEVERE, msg);
-                //Trace.printStack();
-                tableName = TableNameIn;
-            }
+        //    //	Use First Table
+        //    string tableName = "";
+        //    string mainTableName = "";
+        //    if (ti.Length > 0 &&
+        //        (ti[0].GetTableName().Equals(TableNameIn)
+        //        || ti[0].GetSynonym().Equals(TableNameIn)))
+        //    {
+        //        tableName = ti[0].GetSynonym();
+        //        mainTableName = ti[0].GetTableName();
+        //        if (tableName.Length == 0)
+        //            tableName = ti[0].GetTableName();
+        //    }
+        //    //	Check for error condition
+        //    if (TableNameIn != null
+        //        && (tableName == null || tableName.Length == 0))
+        //    {
+        //        string msg = "TableName not correctly parsed - TableNameIn="
+        //            + TableNameIn + " - " + asp;
+        //        if (ti.Length > 0)
+        //            msg += " - #1 " + ti[0];
+        //        msg += "\n = " + inSql;
+        //        log.Log(Level.SEVERE, msg);
+        //        //Trace.printStack();
+        //        tableName = TableNameIn;
+        //    }
 
-            //	Client Access
-            if (fullyQualified)
-                retSQL.Append(tableName).Append(".");
-            retSQL.Append(GetClientWhere(rw));
+        //    //	Client Access
+        //    if (fullyQualified)
+        //        retSQL.Append(tableName).Append(".");
+        //    retSQL.Append(GetClientWhere(rw));
 
-            //	Org Access
-            if (!IsAccessAllOrgs())
-            {
-                retSQL.Append(" AND ");
-                if (fullyQualified && !Util.IsEmpty(tableName))
-                    retSQL.Append(GetOrgWhere(tableName, rw, mainTableName));
-                else
-                    retSQL.Append(GetOrgWhere(null, rw, mainTableName));
-            }
+        //    //	Org Access
+        //    if (!IsAccessAllOrgs())
+        //    {
+        //        retSQL.Append(" AND ");
+        //        if (fullyQualified && !Util.IsEmpty(tableName))
+        //            retSQL.Append(GetOrgWhere(tableName, rw, mainTableName));
+        //        else
+        //            retSQL.Append(GetOrgWhere(null, rw, mainTableName));
+        //    }
 
-            if (IsUseBPRestrictions())
-            {
-                string documentWhere = GetDocWhere(tableName);
-                if (documentWhere.Length > 0)
-                {
-                    retSQL.Append(" AND ");
-                    retSQL.Append(documentWhere);
-                }
-            }
-            int AD_Table_ID = 0;
-            //	** Data Access	**
-            for (int i = 0; i < ti.Length; i++)
-            {
-                string TableName = ti[i].GetTableName();
-                AD_Table_ID = GetAD_Table_ID(TableName);
+        //    if (IsUseBPRestrictions())
+        //    {
+        //        string documentWhere = GetDocWhere(tableName);
+        //        if (documentWhere.Length > 0)
+        //        {
+        //            retSQL.Append(" AND ");
+        //            retSQL.Append(documentWhere);
+        //        }
+        //    }
+        //    int AD_Table_ID = 0;
+        //    //	** Data Access	**
+        //    for (int i = 0; i < ti.Length; i++)
+        //    {
+        //        string TableName = ti[i].GetTableName();
+        //        AD_Table_ID = GetAD_Table_ID(TableName);
 
-                // Org Access
-                //if (AD_Table_ID != 0 && !IsAccessAllOrgs())
-                //{
-                //    String TableSynonym = ti[i].GetSynonym();
-                //    if ( String.IsNullOrEmpty( TableSynonym))
-                //        TableSynonym = TableName;
+        //        // Org Access
+        //        //if (AD_Table_ID != 0 && !IsAccessAllOrgs())
+        //        //{
+        //        //    String TableSynonym = ti[i].GetSynonym();
+        //        //    if ( String.IsNullOrEmpty( TableSynonym))
+        //        //        TableSynonym = TableName;
 
-                //    retSQL.Append(" AND ");
-                //    retSQL.Append(GetOrgWhere(TableSynonym, rw));
-                //}
+        //        //    retSQL.Append(" AND ");
+        //        //    retSQL.Append(GetOrgWhere(TableSynonym, rw));
+        //        //}
 
 
 
-                //	Data Table Access
-                if (AD_Table_ID != 0 && !IsTableAccess(AD_Table_ID, !rw))
-                {
-                    retSQL.Append(" AND 1=3");	//	prevent access at all
-                    log.Fine("No access to AD_Table_ID=" + AD_Table_ID
-                      + " - " + TableName + " - " + retSQL);
-                    break;	//	no need to check further 
-                }
+        //        //	Data Table Access
+        //        if (AD_Table_ID != 0 && !IsTableAccess(AD_Table_ID, !rw))
+        //        {
+        //            retSQL.Append(" AND 1=3");	//	prevent access at all
+        //            log.Fine("No access to AD_Table_ID=" + AD_Table_ID
+        //              + " - " + TableName + " - " + retSQL);
+        //            break;	//	no need to check further 
+        //        }
 
-                //	Data Column Access
-                //	Data Record Access
-                String keyColumnName = "";
+        //        //	Data Column Access
+        //        //	Data Record Access
+        //        String keyColumnName = "";
 
-                if (fullyQualified)
-                {
-                    keyColumnName = ti[i].GetSynonym();	//	table synonym
-                    if (keyColumnName.Length == 0)
-                        keyColumnName = TableName;
-                    keyColumnName += ".";
-                }
-                keyColumnName += TableName + "_ID";	//	derived from table
+        //        if (fullyQualified)
+        //        {
+        //            keyColumnName = ti[i].GetSynonym();	//	table synonym
+        //            if (keyColumnName.Length == 0)
+        //                keyColumnName = TableName;
+        //            keyColumnName += ".";
+        //        }
+        //        keyColumnName += TableName + "_ID";	//	derived from table
 
-                // log.Fine("addAccessSQL - " + TableName + "(" + AD_Table_ID + ") " + keyColumnName);
-                string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rw);
-                if (recordWhere.Length > 0)
-                {
-                    retSQL.Append(" AND ").Append(recordWhere);
-                    log.Finest("Record access - " + recordWhere);
-                }
-            }	//	for all table info
+        //        // log.Fine("addAccessSQL - " + TableName + "(" + AD_Table_ID + ") " + keyColumnName);
+        //        string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rw);
+        //        if (recordWhere.Length > 0)
+        //        {
+        //            retSQL.Append(" AND ").Append(recordWhere);
+        //            log.Finest("Record access - " + recordWhere);
+        //        }
+        //    }	//	for all table info
 
-            //	Dependent Records (only for main inSql)
-            string mainSql = asp.GetMainSql();
-            LoadRecordAccess(false);
-            AD_Table_ID = 0;
-            String whereColumnName = null;
-            List<int> includes = new List<int>();
-            List<int> excludes = new List<int>();
-            bool isIncludeNull = false;
-            for (int i = 0; i < _recordDependentAccess.Length; i++)
-            {
-                String columnName = _recordDependentAccess[i].GetKeyColumnName(asp.GetTableInfo(asp.GetMainSqlIndex()));
-                if (columnName == null)
-                    continue;	//	no key column
-                int posColumn = mainSql.IndexOf(columnName);
-                if (posColumn == -1)
-                    continue;
-                //	we found the column name - make sure it's a column name
-                // string charCheck = mainSql.Substring(posColumn - 1, posColumn);	//	before
-                //Updated by Raghu--14-Feb-2012 to run lock functinality for dependent records--Both for Before and after
-                string charCheck = mainSql.Substring(posColumn - 1, 1);	//	before
-                if (!(charCheck == "," || charCheck == "." || charCheck == " " || charCheck == "("))
-                    continue;
-                // charCheck = mainSql.Substring(posColumn, (posColumn + columnName.Length));	//	after
-                charCheck = mainSql.Substring((posColumn + columnName.Length), 1);	//	after
-                if (!(charCheck == "," || charCheck == " " || charCheck == ")"))
-                    continue;
+        //    //	Dependent Records (only for main inSql)
+        //    string mainSql = asp.GetMainSql();
+        //    LoadRecordAccess(false);
+        //    AD_Table_ID = 0;
+        //    String whereColumnName = null;
+        //    List<int> includes = new List<int>();
+        //    List<int> excludes = new List<int>();
+        //    bool isIncludeNull = false;
+        //    for (int i = 0; i < _recordDependentAccess.Length; i++)
+        //    {
+        //        String columnName = _recordDependentAccess[i].GetKeyColumnName(asp.GetTableInfo(asp.GetMainSqlIndex()));
+        //        if (columnName == null)
+        //            continue;	//	no key column
+        //        int posColumn = mainSql.IndexOf(columnName);
+        //        if (posColumn == -1)
+        //            continue;
+        //        //	we found the column name - make sure it's a column name
+        //        // string charCheck = mainSql.Substring(posColumn - 1, posColumn);	//	before
+        //        //Updated by Raghu--14-Feb-2012 to run lock functinality for dependent records--Both for Before and after
+        //        string charCheck = mainSql.Substring(posColumn - 1, 1);	//	before
+        //        if (!(charCheck == "," || charCheck == "." || charCheck == " " || charCheck == "("))
+        //            continue;
+        //        // charCheck = mainSql.Substring(posColumn, (posColumn + columnName.Length));	//	after
+        //        charCheck = mainSql.Substring((posColumn + columnName.Length), 1);	//	after
+        //        if (!(charCheck == "," || charCheck == " " || charCheck == ")"))
+        //            continue;
 
-                if (AD_Table_ID != 0 && AD_Table_ID != _recordDependentAccess[i].GetAD_Table_ID())
-                    retSQL.Append(GetDependentAccess(whereColumnName, includes, excludes, isIncludeNull));
+        //        if (AD_Table_ID != 0 && AD_Table_ID != _recordDependentAccess[i].GetAD_Table_ID())
+        //            retSQL.Append(GetDependentAccess(whereColumnName, includes, excludes, isIncludeNull));
 
-                AD_Table_ID = _recordDependentAccess[i].GetAD_Table_ID();
-                //	*** we found the column in the main query
-                if (_recordDependentAccess[i].IsExclude())
-                {
-                    excludes.Add(_recordDependentAccess[i].GetRecord_ID());
-                    log.Fine("Exclude " + columnName + " - " + _recordDependentAccess[i]);
-                }
-                else if (!rw || !_recordDependentAccess[i].IsReadOnly())
-                {
-                    includes.Add(_recordDependentAccess[i].GetRecord_ID());
-                    log.Fine("Include " + columnName + " - " + _recordDependentAccess[i]);
-                }
+        //        AD_Table_ID = _recordDependentAccess[i].GetAD_Table_ID();
+        //        //	*** we found the column in the main query
+        //        if (_recordDependentAccess[i].IsExclude())
+        //        {
+        //            excludes.Add(_recordDependentAccess[i].GetRecord_ID());
+        //            log.Fine("Exclude " + columnName + " - " + _recordDependentAccess[i]);
+        //        }
+        //        else if (!rw || !_recordDependentAccess[i].IsReadOnly())
+        //        {
+        //            includes.Add(_recordDependentAccess[i].GetRecord_ID());
+        //            log.Fine("Include " + columnName + " - " + _recordDependentAccess[i]);
+        //        }
 
-                isIncludeNull = isIncludeNull || _recordDependentAccess[i].IsIncludeNull();
-                whereColumnName = GetDependentRecordWhereColumn(mainSql, columnName);
+        //        isIncludeNull = isIncludeNull || _recordDependentAccess[i].IsIncludeNull();
+        //        whereColumnName = GetDependentRecordWhereColumn(mainSql, columnName);
 
-            }	//	for all dependent records
-            retSQL.Append(GetDependentAccess(whereColumnName, includes, excludes, isIncludeNull));
-            retSQL.Append(orderBy);
-            log.Finest(retSQL.ToString());
+        //    }	//	for all dependent records
+        //    retSQL.Append(GetDependentAccess(whereColumnName, includes, excludes, isIncludeNull));
+        //    retSQL.Append(orderBy);
+        //    log.Finest(retSQL.ToString());
 
-            string resultQuery = retSQL.ToString();
+        //    string resultQuery = retSQL.ToString();
 
-            //VIS0228 -11-Apr-2024
-            // Regular expression pattern to identify SQL JOIN statements, capturing join type, table names, and join condition
-            string joinPattern = @"\b(INNER|LEFT|RIGHT|FULL)\s+(?:OUTER\s+)?JOIN\s+(\w+)(?:\s+(\w+))?\s+ON\s+\((.*?)\)";
+        //    //VIS0228 -11-Apr-2024
+        //    // Regular expression pattern to identify SQL JOIN statements, capturing join type, table names, and join condition
+        //    string joinPattern = @"\b(INNER|LEFT|RIGHT|FULL)\s+(?:OUTER\s+)?JOIN\s+(\w+)(?:\s+(\w+))?\s+ON\s+\((.*?)\)";
+        //    //string joinPattern = @"\b(?:(INNER|LEFT|RIGHT|FULL)\s+|((?:LEFT|RIGHT)?\s+OUTER\s+)?)(?:JOIN\s+(\w+)(?:\s+(\w+))?\s+ON\s+\((.*?)\))";
+        //    // Match the join statements in the SQL query using the defined pattern
+        //    MatchCollection matches = Regex.Matches(retSQL.ToString(), joinPattern, RegexOptions.IgnoreCase);
 
-            // Match the join statements in the SQL query using the defined pattern
-            MatchCollection matches = Regex.Matches(retSQL.ToString(), joinPattern, RegexOptions.IgnoreCase);
+        //    try
+        //    {
+        //        // Iterate through each matched join statement
+        //        foreach (Match match in matches)
+        //        {
+        //            // Ensure the match contains necessary groups
+        //            if (match.Groups.Count >= 5)
+        //            {
+        //                // Extract components of the join statement
+        //                string joinType = match.Groups[1].Value;
+        //                string tblName = match.Groups[2].Value;
+        //                string aliasName = match.Groups[3].Success ? match.Groups[3].Value : null; // Handle optional table alias
+        //                string joinCondition = match.Groups[4].Value;
+        //                string condition = "";
 
-            try
-            {
-                // Iterate through each matched join statement
-                foreach (Match match in matches)
-                {
-                    // Ensure the match contains necessary groups
-                    if (match.Groups.Count >= 5)
-                    {
-                        // Extract components of the join statement
-                        string joinType = match.Groups[1].Value;
-                        string tblName = match.Groups[2].Value;
-                        string aliasName = match.Groups[3].Success ? match.Groups[3].Value : null; // Handle optional table alias
-                        string joinCondition = match.Groups[4].Value;
-                        string condition = "";
+        //                // Determine the appropriate table name or alias to use in conditions
+        //                string optionName = string.IsNullOrEmpty(aliasName) ? tblName : aliasName;
 
-                        // Determine the appropriate table name or alias to use in conditions
-                        string optionName = string.IsNullOrEmpty(aliasName) ? tblName : aliasName;
+        //                // Build the condition based on business logic and access restrictions
+        //                condition = optionName + "." + GetClientWhere(rw);
 
-                        // Build the condition based on business logic and access restrictions
-                        condition = optionName + "." + GetClientWhere(rw);
+        //                // Check if access is limited to specific organizations
+        //                if (!IsAccessAllOrgs())
+        //                {
+        //                    condition += " AND ";
 
-                        // Check if access is limited to specific organizations
-                        if (!IsAccessAllOrgs())
-                        {
-                            condition += " AND ";
+        //                    // Append organization-specific conditions based on table or alias
+        //                    if (!string.IsNullOrEmpty(aliasName))
+        //                    {
+        //                        condition += (GetOrgWhere(aliasName, rw, tblName));
+        //                    }
+        //                    else
+        //                    {
+        //                        condition += (GetOrgWhere(tblName, rw, tblName));
+        //                    }
+        //                }
 
-                            // Append organization-specific conditions based on table or alias
-                            if (!string.IsNullOrEmpty(aliasName))
-                            {
-                                condition += (GetOrgWhere(aliasName, rw, tblName));
-                            }
-                            else
-                            {
-                                condition += (GetOrgWhere(tblName, rw, tblName));
-                            }
-                        }
+        //                // Check if additional document-level restrictions are applied
+        //                if (IsUseBPRestrictions())
+        //                {
+        //                    string documentWhere = GetDocWhere(tblName);
 
-                        // Check if additional document-level restrictions are applied
-                        if (IsUseBPRestrictions())
-                        {
-                            string documentWhere = GetDocWhere(tblName);
+        //                    // Append document-specific conditions if applicable
+        //                    if (documentWhere.Length > 0)
+        //                    {
+        //                        condition += (" AND ");
+        //                        condition += (optionName + "." + documentWhere);
+        //                    }
+        //                }
 
-                            // Append document-specific conditions if applicable
-                            if (documentWhere.Length > 0)
-                            {
-                                condition += (" AND ");
-                                condition += (optionName + "." + documentWhere);
-                            }
-                        }
+        //                // Determine table ID and key column name
+        //                AD_Table_ID = GetAD_Table_ID(tblName);
+        //                string keyColumnName = tblName + "_ID";
 
-                        // Determine table ID and key column name
-                        AD_Table_ID = GetAD_Table_ID(tblName);
-                        string keyColumnName = tblName + "_ID";
+        //                // Fetch and append record-specific conditions
+        //                string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rw);
+        //                if (recordWhere.Length > 0)
+        //                {
+        //                    condition += (" AND ");
+        //                    condition += (optionName + "." + recordWhere);
+        //                }
 
-                        // Fetch and append record-specific conditions
-                        string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rw);
-                        if (recordWhere.Length > 0)
-                        {
-                            condition += (" AND ");
-                            condition += (optionName + "." + recordWhere);
-                        }
+        //                // Append the dynamically generated condition to the existing join condition
+        //                string modifiedCondition = joinCondition + " AND " + condition;
 
-                        // Append the dynamically generated condition to the existing join condition
-                        string modifiedCondition = joinCondition + " AND " + condition;
+        //                // Formulate the new join statement with the modified condition
+        //                string oldJoinStatement = match.Value;
+        //                string newJoinStatement = $"{joinType} JOIN {tblName} {aliasName} ON ({modifiedCondition})";
 
-                        // Formulate the new join statement with the modified condition
-                        string oldJoinStatement = match.Value;
-                        string newJoinStatement = $"{joinType} JOIN {tblName} {aliasName} ON ({modifiedCondition})";
+        //                // Replace the original join statement with the updated version in the result query
+        //                resultQuery = resultQuery.Replace(oldJoinStatement, newJoinStatement);
+        //            }
+        //        }
+        //    }
 
-                        // Replace the original join statement with the updated version in the result query
-                        resultQuery = resultQuery.Replace(oldJoinStatement, newJoinStatement);
-                    }
-                }
-            }
+        //    catch (Exception ex)
+        //    {
 
-            catch (Exception ex)
-            {
+        //    }
 
-            }
-
-            return resultQuery;
-        }	//	addAccessSQL*/
+        //    return resultQuery;
+        //}	//	addAccessSQL
 
         /// <summary>
         /// Get Client Where Clause Value 
@@ -2555,7 +2563,7 @@ namespace VAdvantage.Model
 	 *            read write
 	 * @return "AD_Org_ID=0" or "AD_Org_ID IN(0,1)" or null (if access all org)
 	 */
-        public String GetOrgWhere(String tableName, bool rw,string mainTableName)
+        public String GetOrgWhere(String tableName, bool rw, string mainTableName)
         {
             if (IsAccessAllOrgs())
                 return null;
@@ -2610,7 +2618,7 @@ namespace VAdvantage.Model
 
                         string isView = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsView FROM AD_Table WHERE TableName='" + mainTableName + "'"));
                         // Get Shared record with organisation.
-                        if (isView!="Y" && !mainTableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !mainTableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
+                        if (isView != "Y" && !mainTableName.EndsWith("_Trl", StringComparison.OrdinalIgnoreCase) && !mainTableName.EndsWith("_Log", StringComparison.OrdinalIgnoreCase))
                         {
                             GetShareRecord(ref sql, tableName, mainTableName);
                         }
@@ -3111,7 +3119,7 @@ namespace VAdvantage.Model
                 sql.Append(" OR (");
 
                 //select * from C_Order where (AD_Client_ID=11 AD AD_Org_ID =0 OR C_Order_ID IN (qry)
-                sql.Append(tableName+"."+ mainTableName + "_ID IN (" + qry + "))");
+                sql.Append(tableName + "." + mainTableName + "_ID IN (" + qry + "))");
 
             }
         }
@@ -3124,7 +3132,7 @@ namespace VAdvantage.Model
         //public void LoadSharedRecord(bool reload)
         //{
         //    List<MShareRecordOrg> sharedRecordAccess = new List<MShareRecordOrg>();
-            
+
         //    if (!(reload || _sharedRecordAccess == null || IsShowSharedRecords()))
         //    {
         //        _sharedRecordAccess = sharedRecordAccess.ToArray();
@@ -3170,7 +3178,7 @@ namespace VAdvantage.Model
         //        }
         //    }
         //    _sharedRecordAccess = list.ToArray();
-            
+
         //}
 
         public override String ToString()

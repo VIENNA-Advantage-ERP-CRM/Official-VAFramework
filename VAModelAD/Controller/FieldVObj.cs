@@ -283,6 +283,8 @@ namespace VAdvantage.Controller
 
         public string ADActionName = ""; /*Action Name for Open window or form */
 
+        public ActionParams ADActionParams = null;
+
         /// <summary>
         /// calaculate MaxDisplayLength
         /// </summary>

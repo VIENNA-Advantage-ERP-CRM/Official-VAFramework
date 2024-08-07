@@ -1677,8 +1677,8 @@
                             var yearr = parsedValue.getFullYear();
                             var month = parsedValue.getMonth();
                             var date = parsedValue.getDate();
-                            parsedValue2 = new Date(yearr, month, date, 24, 00, 00);
-                            parsedValue = new Date(yearr, month, date, 00, 00, 00);
+                            parsedValue2 = new Date(yearr, month, date, 24, 0, 0);
+                            parsedValue = new Date(yearr, month, date, 0, 0, 0);
                             dtRowObj["VALUE2VALUE"] = parsedValue2.toUTCString();
                             optr = VIS.Query.prototype.BETWEEN;
                         }

@@ -870,13 +870,14 @@ namespace VIS.Models
             }
 
 
-            sql = @"SELECT AD_WIndow.Name FROM AD_Group_Window  JOIN AD_WIndow
+            sql = @"SELECT AD_WIndow.Name,AD_WIndow.AD_Window_ID FROM AD_Group_Window  JOIN AD_WIndow
                          ON AD_Group_Window.AD_Window_ID=AD_Window.AD_Window_ID
                          WHERE AD_Group_Window.IsActive='Y' AND AD_Group_Window.AD_GroupInfo_ID=" + groupID + " ORDER BY AD_WIndow.Name";
 
             ds = DB.ExecuteDataset(sql);
 
             StringBuilder windows = new StringBuilder();
+            StringBuilder windowID = new StringBuilder();
 
             if (ds == null || ds.Tables[0].Rows.Count > 0)
             {
@@ -885,13 +886,15 @@ namespace VIS.Models
                     if (windows.Length > 0)
                     {
                         windows.Append(",  ");
+                        windowID.Append(",  ");
                     }
                     windows.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    windowID.Append(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Window_ID"]));
                 }
             }
             gInfo.WindowName = windows.ToString();
 
-            sql = @"SELECT AD_Form.Name FROM AD_Group_Form  JOIN AD_Form
+            sql = @"SELECT AD_Form.Name,AD_Form.AD_Form_ID FROM AD_Group_Form JOIN AD_Form
                      ON AD_Group_Form.AD_Form_ID=AD_Form.AD_Form_ID
                      WHERE AD_Group_Form.IsActive='Y' AND  AD_Group_Form.AD_GroupInfo_ID=" + groupID + " ORDER BY AD_Form.Name";
 
@@ -900,7 +903,7 @@ namespace VIS.Models
             ds = DB.ExecuteDataset(sql);
 
             StringBuilder forms = new StringBuilder();
-
+            StringBuilder formID = new StringBuilder();
             if (ds == null || ds.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
@@ -908,21 +911,23 @@ namespace VIS.Models
                     if (forms.Length > 0)
                     {
                         forms.Append(",  ");
+                        formID.Append(",  ");
                     }
                     forms.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    formID.Append(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Form_ID"]));
                 }
             }
 
             gInfo.FormName = forms.ToString();
 
-            sql = @"SELECT AD_Process.Name FROM AD_Group_Process  JOIN AD_Process
+            sql = @"SELECT AD_Process.Name,AD_Process.AD_Process_ID FROM AD_Group_Process  JOIN AD_Process
                      ON AD_Group_Process.AD_Process_ID=AD_Process.AD_Process_ID
                      WHERE AD_Group_Process.IsActive='Y' AND AD_Group_Process.AD_GroupInfo_ID=" + groupID + " ORDER BY AD_Process.Name";
 
             ds = DB.ExecuteDataset(sql);
 
             StringBuilder processes = new StringBuilder();
-
+            StringBuilder processID = new StringBuilder();
             if (ds == null || ds.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
@@ -930,21 +935,23 @@ namespace VIS.Models
                     if (processes.Length > 0)
                     {
                         processes.Append(",  ");
+                        processID.Append(",  ");
                     }
                     processes.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    processID.Append(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Process_ID"]));
                 }
             }
             gInfo.ProcessName = processes.ToString();
 
 
-            sql = @"SELECT AD_workflow.Name FROM AD_Group_workflow  JOIN AD_workflow
+            sql = @"SELECT AD_workflow.Name,AD_workflow.AD_workflow_ID FROM AD_Group_workflow  JOIN AD_workflow
                      ON AD_Group_workflow.AD_workflow_ID=AD_workflow.AD_workflow_ID
                      WHERE AD_Group_workflow.IsActive='Y' AND AD_Group_workflow.AD_GroupInfo_ID=" + groupID + " ORDER BY AD_workflow.Name";
 
             ds = DB.ExecuteDataset(sql);
 
             StringBuilder workflows = new StringBuilder();
-
+            StringBuilder workflowsID = new StringBuilder();
             if (ds == null || ds.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
@@ -952,12 +959,128 @@ namespace VIS.Models
                     if (workflows.Length > 0)
                     {
                         workflows.Append(",  ");
+                        workflowsID.Append(",  ");
                     }
                     workflows.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    workflowsID.Append(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_workflow_ID"]));
                 }
             }
-
             gInfo.WorkflowName = workflows.ToString();
+
+            //Getting the processes, forms and workflows which is available but not displaying on window.
+
+            if (windowID.Length > 0)
+            {
+                sql = $@"SELECT DISTINCT PR.Name FROM AD_Process PR
+                      INNER JOIN AD_Column CM ON (CM.AD_Process_ID=PR.AD_Process_ID)
+                      INNER JOIN AD_Table TB ON (CM.AD_Table_ID = TB.AD_Table_ID)
+                      INNER JOIN AD_Tab TL ON (TB.AD_Table_ID = TL.AD_Table_ID)
+                      INNER JOIN AD_Window WD ON (TL.AD_Window_ID = WD.AD_Window_ID)
+                      WHERE WD.AD_Window_ID IN ({ windowID }) AND CM.IsActive='Y'";
+
+                if (processID.Length > 0)
+                {
+                    sql += " AND CM.AD_Process_ID NOT IN (" + processID + ")";
+                }
+
+                sql += $@" UNION
+                            SELECT DISTINCT PR.Name FROM AD_Process PR
+                               INNER JOIN AD_WF_Node ND ON (PR.AD_Process_ID = ND.AD_Process_ID)
+                               INNER JOIN AD_Workflow WF ON (ND.AD_Workflow_ID = WF.AD_Workflow_ID)
+                               INNER JOIN AD_Table TL ON (TL.AD_Table_ID = WF.AD_Table_ID)
+                               INNER JOIN AD_Tab TB ON (TB.AD_Table_ID = TL.AD_Table_ID)
+                               INNER JOIN AD_Window WD ON (TL.AD_Window_ID = WD.AD_Window_ID)
+                               WHERE WF.AD_Workflow_ID > 0 AND ND.IsActive ='Y'
+                               AND WD.AD_Window_ID IN ({ windowID })";
+                if (processID.Length > 0)
+                {
+                    sql += " AND PR.AD_Process_ID NOT IN (" + processID + ")";
+                }
+
+                ds = DB.ExecuteDataset(sql);
+
+                StringBuilder processNotBind = new StringBuilder();
+                if (ds == null || ds.Tables[0].Rows.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        if (processNotBind.Length > 0)
+                        {
+                            processNotBind.Append(",  ");
+                        }
+                        processNotBind.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    }
+                }
+                gInfo.processNotBinded = processNotBind.ToString();
+
+                sql=$@"SELECT DISTINCT FM.Name FROM AD_Form FM
+                      INNER JOIN AD_Column CM ON(CM.AD_Form_ID = FM.AD_Form_ID)
+                      INNER JOIN AD_Table TB ON(CM.AD_Table_ID = TB.AD_Table_ID)
+                      INNER JOIN AD_Tab TL ON(TB.AD_Table_ID = TL.AD_Table_ID)
+                      INNER JOIN AD_Window WD ON(TL.AD_Window_ID = WD.AD_Window_ID)
+                      WHERE WD.AD_Window_ID IN ({ windowID }) AND CM.IsActive='Y'";
+                if (formID.Length > 0) {
+                    sql += " AND CM.AD_Form_ID NOT IN (" + formID + ")";
+                }
+
+                ds = DB.ExecuteDataset(sql);
+
+                StringBuilder fromNotBind = new StringBuilder();
+                if (ds == null || ds.Tables[0].Rows.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        if (fromNotBind.Length > 0)
+                        {
+                            fromNotBind.Append(",  ");
+                        }
+                        fromNotBind.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    }
+                }
+                gInfo.formNotBinded = fromNotBind.ToString();
+
+
+                sql = $@"SELECT DISTINCT WF.Name FROM AD_Workflow WF
+                      INNER JOIN AD_Table TL ON (TL.AD_Table_ID = WF.AD_Table_ID)
+                      INNER JOIN AD_Tab TB ON (TB.AD_Table_ID = TL.AD_Table_ID)
+                      INNER JOIN AD_Window WD ON (TL.AD_Window_ID = WD.AD_Window_ID)
+                      WHERE WF.AD_Workflow_ID > 0 AND WD.IsActive ='Y'
+                      AND WD.AD_Window_ID IN ({ windowID })"; 
+                if (workflowsID.Length > 0) {
+                    sql += " AND WF.AD_Workflow_ID NOT IN (" + workflowsID + ")";
+                }
+
+                sql += $@" UNION
+                            SELECT DISTINCT WF.Name FROM AD_Workflow WF
+                               INNER JOIN AD_Process PR ON(PR.AD_Workflow_ID = WF.AD_Workflow_ID)
+                               INNER JOIN AD_Column CM ON(CM.AD_Process_ID = PR.AD_Process_ID)
+                               INNER JOIN AD_Table TL ON (TL.AD_Table_ID = WF.AD_Table_ID)
+                               INNER JOIN AD_Tab TB ON (TB.AD_Table_ID = TL.AD_Table_ID)
+                               INNER JOIN AD_Window WD ON (TL.AD_Window_ID = WD.AD_Window_ID)
+                               WHERE WF.AD_Workflow_ID > 0 AND WD.IsActive ='Y'
+                               AND WD.AD_Window_ID IN ({ windowID })";
+                if (workflowsID.Length > 0)
+                {
+                    sql += " AND WF.AD_Workflow_ID NOT IN (" + workflowsID + ")";
+                }
+
+                ds = DB.ExecuteDataset(sql);
+
+                StringBuilder workflowNotBind = new StringBuilder();
+                if (ds == null || ds.Tables[0].Rows.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        if (workflowNotBind.Length > 0)
+                        {
+                            workflowNotBind.Append(",  ");
+                        }
+                        workflowNotBind.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    }
+                }
+                gInfo.workflowNotBinded = workflowNotBind.ToString();
+
+            }
 
             return gInfo;
 
@@ -1153,6 +1276,9 @@ namespace VIS.Models
         public string FormName { get; set; }
         public string ProcessName { get; set; }
         public string WorkflowName { get; set; }
+        public string processNotBinded { get; set; }
+        public string formNotBinded { get; set; }
+        public string workflowNotBinded { get; set; }
     }
 
     public class KeyVal

@@ -84,8 +84,7 @@ namespace VAdvantage.Model
         public MField(MTab parent, MField from)
             : base(parent.GetCtx(), 0, parent.Get_TrxName())
         {
-            //this(parent.getCtx(), 0, parent.get_TrxName());
-            // copyValues(from, this);
+            CopyValues(from, this);
             SetClientOrg(parent);
             SetAD_Tab_ID(parent.GetAD_Tab_ID());
             SetEntityType(parent.GetEntityType());

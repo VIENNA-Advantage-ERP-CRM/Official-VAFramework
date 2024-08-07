@@ -9,6 +9,8 @@ using System.Text;
 using System.IO;
 using VAdvantage.Logging;
 using CoreLibrary.DataBase;
+using System.Data;
+using Newtonsoft.Json.Linq;
 
 namespace VIS.Models
 {
@@ -100,12 +102,144 @@ namespace VIS.Models
                 //    return false;
                 //}
                 //log.SaveError("ImageDeleteUpdateStart=", DateTime.Now.Second.ToString());
-                DB.ExecuteQuery("UPDATE AD_User Set AD_Image_ID=null WHERE AD_User_ID="+ctx.GetAD_User_ID());
+                DB.ExecuteQuery("UPDATE AD_User Set AD_Image_ID=null WHERE AD_User_ID=" + ctx.GetAD_User_ID());
             }
             return true;
         }
 
+        /// <summary>
+        /// Get Home page widget
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<HomeWidget> GetHomeWidget(Ctx ctx)
+        {
 
+            List<HomeWidget> list = null;
+            string sql = @"SELECT AD_Widget.AD_Widget_ID,AD_Widget.Name,AD_Widget.displayName,AD_WidgetSize.className,AD_WidgetSize.Rowspan,AD_WidgetSize.Colspan,AD_WidgetSize.AD_WidgetSize_ID,AD_IMAGE.BINARYDATA,AD_ModuleInfo.name AS ModuleName FROM AD_Widget 
+                            INNER JOIN AD_WidgetSize  ON AD_Widget.AD_Widget_ID=AD_WidgetSize.AD_Widget_ID
+                            INNER JOIN AD_Widget_Access ON AD_Widget.AD_Widget_ID=AD_Widget_Access.AD_Widget_ID
+                            INNER JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID
+                            INNER JOIN AD_ModuleInfo ON AD_ModuleInfo.AD_ModuleInfo_ID=AD_Widget.AD_ModuleInfo_ID
+                            WHERE AD_Widget.isActive='Y' AND AD_Widget_Access.AD_Role_ID=" + ctx.GetAD_Role_ID()+ " ORDER BY AD_ModuleInfo.name";
+
+            DataSet dataSet = DB.ExecuteDataset(sql);
+            if (dataSet != null && dataSet.Tables.Count > 0)
+            {
+                list = new List<HomeWidget>();
+                var row = dataSet.Tables[0].Rows;
+                for (int i = 0; i < row.Count; i++)
+                {
+                    string img = "data:image/jpg;base64,"+ Convert.ToBase64String((byte[])row[i]["BINARYDATA"]);
+                    HomeWidget l = new HomeWidget()
+                    {
+                        WidgetID = Util.GetValueOfInt(row[i]["AD_Widget_ID"]),
+                        KeyID = Util.GetValueOfInt(row[i]["AD_WidgetSize_ID"]),
+                        Name = Util.GetValueOfString(row[i]["Name"]),
+                        DisplayName = Util.GetValueOfString(row[i]["displayName"]),
+                        ClassName = Util.GetValueOfString(row[i]["className"]),
+                        Rows = Util.GetValueOfInt(row[i]["Rowspan"]),
+                        Cols = Util.GetValueOfInt(row[i]["Colspan"]),
+                        Img = img,
+                        ModuleName=Util.GetValueOfString(row[i]["ModuleName"]),
+                        Type="W"
+                    };
+
+                    list.Add(l);
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Get User Widgets
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<HomeWidget> GetUserWidgets(Ctx ctx)
+        {
+            string sql = @"SELECT AD_UserHomeWidget.AD_UserHomeWidget_ID, AD_UserHomeWidget.componentID,componentType,SRNO,AdditionalInfo FROM AD_UserHomeWidget
+                            WHERE AD_UserHomeWidget.IsActive='Y' AND AD_Role_ID=" + ctx.GetAD_Role_ID() + " AND  AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY SRNO";
+            List<HomeWidget> list = null;
+            DataSet dataSet = DB.ExecuteDataset(sql);
+            if (dataSet != null && dataSet.Tables.Count > 0)
+            {
+                list = new List<HomeWidget>();
+                var row = dataSet.Tables[0].Rows;
+                for (int i = 0; i < row.Count; i++)
+                {
+
+                    HomeWidget l = new HomeWidget()
+                    {
+                        ID = Util.GetValueOfInt(row[i]["AD_UserHomeWidget_ID"]),
+                        KeyID = Util.GetValueOfInt(row[i]["componentID"]),
+                        Type = Util.GetValueOfString(row[i]["componentType"]),
+                        SRNO = Util.GetValueOfInt(row[i]["SRNO"]),
+                        AdditionalInfo = Util.GetValueOfString(row[i]["AdditionalInfo"])
+                        //Rows = Util.GetValueOfInt(row[i]["Rowspan"]),
+                        //Cols = Util.GetValueOfInt(row[i]["Colspan"])
+                    };
+
+                    list.Add(l);
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Save Dasboard
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="widgetSizes"></param>
+        /// <returns></returns>
+        public int SaveDashboard(Ctx ctx, List<WidgetSize> widgetSizes)
+        {
+            DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE AD_User_ID="+ctx.GetAD_User_ID()+" AND AD_Role_ID="+ctx.GetAD_Role_ID());
+            for (int i = 0; i < widgetSizes.Count; i++)
+            {
+                MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
+                mUserHomeWidget.SetSRNO(widgetSizes[i].SRNO);
+                mUserHomeWidget.SetComponentID(widgetSizes[i].KeyID);
+                mUserHomeWidget.SetComponentType(widgetSizes[i].Type);
+                mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
+                mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
+                mUserHomeWidget.Save();
+            }
+            return 1;
+        }
+
+        /// <summary>
+        /// Save widget on drop
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="widgetSizes"></param>
+        /// <returns></returns>
+        public int SaveSingleWidget(Ctx ctx, List<WidgetSize> widgetSizes)
+        {
+            MUserHomeWidget mUserHomeWidget = new MUserHomeWidget(ctx, 0, null);
+            for (int i = 0; i < widgetSizes.Count; i++)
+            {               
+                mUserHomeWidget.SetSRNO(widgetSizes[i].SRNO);
+                mUserHomeWidget.SetComponentID(widgetSizes[i].KeyID);
+                mUserHomeWidget.SetComponentType(widgetSizes[i].Type);
+                mUserHomeWidget.SetAD_User_ID(ctx.GetAD_User_ID());
+                mUserHomeWidget.SetAD_Role_ID(ctx.GetAD_Role_ID());
+                mUserHomeWidget.Save();
+            }
+            return mUserHomeWidget.Get_ID();
+        }
+
+        /// <summary>
+        /// Delete Widgets
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public int DeleteWidgetFromHome(Ctx ctx,int id)
+        {
+            DB.ExecuteQuery("DELETE FROM AD_UserHomeWidget WHERE  AD_UserHomeWidget_ID=" + id);
+            return 1;
+        }
     }
     #endregion
 
@@ -189,5 +323,30 @@ namespace VIS.Models
 
     #endregion
 
+    public class WidgetSize
+    {
+        public int KeyID { get; set; }
+        public int SRNO { get; set; }
+        public string Type { get; set; }
+        public string AdditionalInfo { get; set; }
+    }
 
+    public class HomeWidget: WidgetSize
+    {
+        public int ID { get; set; }
+        public int WidgetID { get; set; }        
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public int Rows { get; set; }
+        public int Cols { get; set; }
+        public string ClassName { get; set; }
+        public string Img { get; set; }
+        public string ModuleName { get; set; }
+       
+      
+    }
+
+    
 }
+
+   

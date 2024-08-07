@@ -89,7 +89,7 @@ namespace VIS.Models
             set;
         }
 
-        public string ShortcutName
+        public string DisplayName
         {
             get;
             set;
@@ -97,7 +97,13 @@ namespace VIS.Models
         public bool IsSelected
         { get; set; }
 
+        private string _type = "L"; // Default value
 
+        public string Type
+        {
+            get { return _type; }
+            set { _type = value; }
+        }
 
         // public ShortcutItemParamModel ItemParam { get; set; }
 

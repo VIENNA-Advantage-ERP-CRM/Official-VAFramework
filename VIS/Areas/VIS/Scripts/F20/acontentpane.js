@@ -31,6 +31,7 @@
         var $ulToolbar = null;
         var $dynActionList = null;
         var $actionDiv = null;
+        var $divUlTabNav = null;
 
         var self = this;
 
@@ -40,6 +41,8 @@
             $divTabControl = $root.find(".vis-ad-w-p-t-c-inc");// $("<div class='vis-apanel-tabcontrol'>").append($ulTabControl);
             $divTabNav = $root.find(".vis-ad-w-p-inc-tabs-oflow").hide();// $("<div class='vis-apanel-tab-oflow'>").hide();
             $divHeaderNav = $root.find(".vis-ad-w-p-inc-tabs");
+            $divUlTabNav = $root.find(".vis-ad-w-p-inc-tb");
+
             $root.css('display', 'flex');
 
             $divContent = $root.find(".vis-ad-w-p-inc-content");
@@ -52,7 +55,7 @@
         function display(hide) {
             if (hide)
                 $root.css('display', 'none');
-            else
+            else 
                 $root.css('display', 'flex');
         }
         //Action Perormed
@@ -140,6 +143,8 @@
                    // this.onTabChange(childTab.getAction());
                 }
             }
+
+            
             //  this.setTabNavigation();
         };
 
@@ -190,9 +195,11 @@
             $ulToolbar.append(this.aSave.getListItm());
             $ulToolbar.append(this.aRefresh.getListItm());
             $ulToolbar.append(this.aMulti.getListItm());
+
+            
             //$ulToobar.append(this.aReport.getListItm());
             //$ulToobar.append(this.aPrint.getListItm());
-
+            this.toolbarCreated = true;
         }
 
         this.createToolBar();
@@ -200,6 +207,7 @@
         this.finishLayout = function () {
             if (!VIS.Application.isMobile)
                 $divTabControl.addClass("vis-ad-w-p-t-c-mob");
+            
         };
 
         this.setDynamicActions = function (gc,remove) {

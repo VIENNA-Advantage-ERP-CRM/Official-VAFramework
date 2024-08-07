@@ -20,15 +20,15 @@
             $root = $("<div class='vis-height-full vis-app-aform-root' >");
             $busyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             $contentGrid = $("<div class='vis-height-full'>");
-            $root.append($contentGrid).append($busyDiv);  
+            $root.append($contentGrid).append($busyDiv);
         };
 
         initComponent();
 
         this.setSize = function (height, width) {
-             $root.height(height); //height 
+            $root.height(height); //height 
             //$busyDiv.height(height);
-             $contentGrid.height(height);
+            $contentGrid.height(height);
         };
         this.setSize(height);
 
@@ -66,12 +66,12 @@
     };
 
     /**
-	 * 	Open Form (directly)
-	 *	@param jObject form object
-	 *	@param $parent parent control
-	 *	@param windowNo window number 
-	 *	@return true if started
-	 */
+     * 	Open Form (directly)
+     *	@param jObject form object
+     *	@param $parent parent control
+     *	@param windowNo window number 
+     *	@return true if started
+     */
     AForm.prototype.openForm = function (json, $parent, windowNo, additionalInfo) {
 
         if (json.IsReport) {
@@ -98,32 +98,34 @@
         //className = json.Prefix + json.ClassName;
         className = json.Prefix + json.ClassName;
 
-        console.log(className);
-
-
-        this.log.info("Form Name= " + json.Name + ", Class=" + className);
-        this.ctx.setWindowContext(windowNo, "WindowName", json.DisplayName);
-
         try {
-
-            //className = "VIS.Apps.TestForm";
-            var type = VIS.Utility.getFunctionByName(className, window);
+            var type = "";
+            var isReact = className.split('.');
+            if (isReact[1].toLowerCase() == 'react') {
+                this.componentName = isReact[2];
+                className = isReact[0] + '.' + isReact[1];
+            }
+            //    type = VIS.Utility.getFunctionByName('VIS.Apps.ReactTemplate', window);
+            //    additionalInfo = className;
+            //} else {
+            type = VIS.Utility.getFunctionByName(className, window);
+            //}
             var o = new type(windowNo);
             o.init(windowNo, this, additionalInfo);
             this.mPanel = o;
             o = null;
         }
         catch (e) {
-           
-                this.log.log(VIS.Logging.Level.WARNING, "Class=" + className + ", AD_Form Name=" + json.Name, e)
-                return false;
-           
-            
+
+            this.log.log(VIS.Logging.Level.WARNING, "Class=" + className + ", AD_Form Name=" + json.Name, e)
+            return false;
+
+
         }
 
         //this.getRoot().html("Form _ID=>" + json.ClassName);
 
-       
+
         this.setBusy(false);
         this.windowNo = windowNo;
 
@@ -135,6 +137,42 @@
 
         return true;
     };
+
+    AForm.prototype.openWidget = function (className, windowNo, widgetInfo) {
+        try {
+            var type = "";
+            this.widgetInfo = widgetInfo;
+            var isReact = className.split('.');
+            if (isReact[1].toLowerCase() == 'react') {
+                this.componentName = isReact[2];
+                className = isReact[0] + '.' + isReact[1];
+            }
+            //    type = VIS.Utility.getFunctionByName('VIS.Apps.ReactTemplate', window);
+            //    additionalInfo = className;
+            //} else {
+            type = VIS.Utility.getFunctionByName(className, window);
+            //}
+            var o = new type(windowNo);
+            o.init(windowNo, this);
+            this.mPanel = o;
+            o = null;
+        }
+        catch (e) {
+
+            this.log.log(VIS.Logging.Level.WARNING, "Class=" + className, e)
+            return false;
+
+
+        }
+        this.setBusy(false);
+    }
+
+    AForm.prototype.widgetSizeChange = function (size) {
+        if (this.mPanel && this.mPanel.widgetSizeChange) {
+            this.mPanel.widgetSizeChange(size);
+        }
+    }
+
     /**
     *  set title of form
     *  @param title 
@@ -169,6 +207,13 @@
         }
     };
 
+    AForm.prototype.addChangeListener = function (e) {
+        if (this.mPanel && this.mPanel.addChangeListener) {
+            this.listener = e;
+            this.mPanel.addChangeListener(e);
+        }
+    }
+
 
 
     /**
@@ -195,7 +240,7 @@
 
 
 
-    
+
 
 
 
