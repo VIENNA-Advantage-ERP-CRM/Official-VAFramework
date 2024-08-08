@@ -577,7 +577,7 @@
                 agIns = agGroupToAGInsMap[agName];
             }
             else {
-                agIns = new VIS.ActionGroup(agName, mField.getAGFontName());
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(),mField.getAGStyle());
                 agGroupToAGInsMap[agName] = agIns;
             }
             agIns.addItem(editor);
@@ -892,24 +892,41 @@
         }
     }
 
-    function ActionGroup(name, fontname) {
+    function ActionGroup(name, fontname,style) {
         this.name = name;
-        this.fontname = fontname;
         this.vEditors = [];
         var $root = null;
-        var popOver = null;
+      
         var id = "vis_ev_col_ag_btn" + Math.random();
 
         function InitUI() {
-            var html = '<div class="dropdown vis-ev-col-actiongroup">'
-                + '<span class="dropdown-toggle" id="' + id + '" data-toggle="dropdown">'
-                + '<i class="' + fontname + '"></i>'
-                + name + '</span>'
-                + '<div class="dropdown-menu" aria-labelledby="' + id + '">'
-                + '<ul class="vis-ev-col-ag-btn-list">'
-                + '</ul>'
-                + '</div>'
-                + '</div>';
+            
+            //var html = '<div class="dropdown vis-ev-col-actiongroup">'
+            //    + '<span class="dropdown-toggle" id="' + id + '" data-toggle="dropdown">'
+            //    + '<i class="' + fontname + '"></i>'
+            //    + name + '</span>'
+            //    + '<div class="dropdown-menu" aria-labelledby="' + id + '">'
+            //    + '<ul class="vis-ev-col-ag-btn-list">'
+            //    + '</ul>'
+            //    + '</div>'
+            //    + '</div>';
+
+            var styl = '';
+            if (style && style != '') {
+                styl = ' style=' + style;
+            }
+
+           var  html = '<div class="dropdown vis-ev-col-actiongroup">'
+                + ' <div id="' + id + '" class="vis-ev-col-ag-dropdown-btn btn dropdown-toggle" data-toggle="dropdown" '+styl+'>'
+                     + '<span class="' + fontname + '"></span>'
+                         + name + '<span class="caret"></span>'
+                     +'</div> '
+                     + '<div class="dropdown-menu" aria-labelledby="' + id + '" > '
+                       + '<ul class="vis-ev-col-ag-btn-list">'
+                       + '</ul>'
+                     + '</div>'
+               + '</div>';
+
             $root = $(html);
             $actionList = $root.find('.vis-ev-col-ag-btn-list');
         };
@@ -922,6 +939,10 @@
         this.getActionList = function () {
             return $actionList;
         }
+        this.dispose = function () {
+            $root.remove();
+        }
+
     }
     ActionGroup.prototype.addItem = function (veditor) {
         this.vEditors.push(veditor);

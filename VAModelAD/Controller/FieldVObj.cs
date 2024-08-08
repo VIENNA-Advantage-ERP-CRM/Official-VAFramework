@@ -287,6 +287,7 @@ namespace VAdvantage.Controller
 
         public string AGName = ""; /* Action Group Name */
         public string AGFontName = ""; /* Action Group Font Name */
+        public string AGStyle = "";
 
 
         /// <summary>

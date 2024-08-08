@@ -802,19 +802,41 @@ input[type="radio"] {
 
 /* Action Group*/
 
-.vis-ev-col-actiongroup .dropdown-toggle:after {
-    margin-left: 0px;
-    margin-right: 5px;
+.vis-ev-col-ag-dropdown-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    position: relative;
+   
+    color: rgba(var(--v-c-primary), 1) !important;
+    border: 1px solid rgba(var(--v-c-primary), 1);
+    background: #ffffff;
+    padding: .4rem 2rem .4rem .75rem;
 }
+
+    .vis-ev-col-ag-dropdown-btn .vis {
+        font-size: 1.5rem;
+    }
+
+    .vis-ev-col-ag-dropdown-btn .caret {
+        font-size: 1rem;
+    }
+
+    .vis-ev-col-ag-dropdown-btn.dropdown-toggle::after {
+        position: absolute;
+        right: 0.75rem;
+        border-top: .4em solid;
+        border-right: .4em solid transparent;
+        border-left: .4em solid transparent;
+        display: inline-block;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+    }
 
 .vis-ev-col-actiongroup {
     cursor: pointer;
 }
-
-    .vis-ev-col-actiongroup .dropdown-toggle:after {
-        display: none;
-    }
-
 
     .vis-ev-col-actiongroup .dropdown-menu {
         padding: 0;
@@ -882,7 +904,13 @@ input[type="radio"] {
             padding-left: 5px;
         }
 
-
+    .vis-ev-col-ag-btn-list .vis-ev-col-linkbutton{
+        color:inherit;
+    }
+    /*/Multiselect/*/
+    .vis_home_filterorgs button {
+        outline: none;
+    }
 
 
 /***************************** Control Prop End ****************************************/

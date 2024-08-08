@@ -461,6 +461,10 @@ namespace VAdvantage.Controller
                     {
                         vo.AGFontName = Util.GetValueOfString(dr[i].ToString());
                     }
+                    else if (columnName.Equals("AGStyle", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.AGStyle = Util.GetValueOfString(dr[i].ToString());
+                    }
                 }
                 if (vo.Header == null)
                     vo.Header = vo.ColumnName;

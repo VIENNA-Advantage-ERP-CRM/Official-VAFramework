@@ -230,15 +230,17 @@
                     </div>
                     <div class="input-group vis-input-wrap">
                         <div class="vis-control-wrap">
-                            @Html.CheckBox("vis-home-isfilter", false, new { id = "vis_home_isfilter" })
-                            @Html.Label("vis-home-isfilter", "Apply Filter")
+                            <label class="vis-ec-col-lblchkbox" style="opacity: 1;">
+                                @Html.CheckBox("vis-home-isfilter", false, new { id = "vis_home_isfilter" })
+                                @GetMsg((string)ViewBag.culture, "ApplyFilter")
+                            </label>
                         </div>
                     </div>
                     <div class="input-group vis-input-wrap">
                         <div class="vis-control-wrap">
                             @Html.DropDownList("vis-home-filterorgs", new SelectList(ViewBag.OrgList, "Key", "Name", ""), null, new { id = "vis_home_filterorgs", multiple = "multiple" })
                             @Html.HiddenFor(m => m.Login2Model.FilteredOrg, new { id = "vis_home_filterorgval" })
-                            @Html.Label("vis-home-filterorgs","Select Org")
+                            @Html.Label("vis-home-filterorgs", @GetMsg((string)ViewBag.culture, "FilterOrganization"))
                         </div>
                     </div>
 

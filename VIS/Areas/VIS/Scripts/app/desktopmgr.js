@@ -961,10 +961,11 @@
             lstOrgs.multiselect({
                 disableIfEmpty: true,
                 disabledText: '--',
-                nonSelectedText: 'Select Org!',
-                nSelectedText: ' - Too many options selected!',
-                allSelectedText: 'No option left ...',
-
+                nonSelectedText: '-',
+                nSelectedText: ' - ' +  VIS.Msg.getMsg("Selected") ,
+                allSelectedText: VIS.Msg.getMsg("All"),
+                buttonContainer: '<div class="btn-group w-100" />',
+                buttonTextAlignment:'left'
             });
 
             //set value
@@ -1070,6 +1071,8 @@
             cmbOrg.on("change", comboChange);
             cmbWare.on("change", comboChange);
 
+            chkFilter.on("change", chkFilterChange);
+
             form.submit(formSubmitHandler);
         };
 
@@ -1085,6 +1088,9 @@
             if (wareHouseId.val() == "-1") {
                 cmbWare.val(null);
             }
+
+            setFilterOrg()//reset multiselect
+
             btnChange.prop("disabled", true);
             displayErrors(form, []);
             changed = false;
@@ -1238,7 +1244,24 @@
                 orgFilter = "";
             }
             hFilterOrg.val(orgFilter);// set org filter
-        }
+        };
+
+        function chkFilterChange() {
+            if (chkFilter.prop('checked') == true) {
+                //apply
+                lstOrgs.multiselect('deselectAll');
+                lstOrgs.multiselect('select', [cmbOrg.val()]);
+            }
+            else {
+                setFilterOrg();
+            }
+            if (!changed) {
+                changed = true;
+                btnChange.prop("disabled", false);
+            }
+        };
+
+
         /*
            handle form sumbit handler
            - true then reload page 
