@@ -802,6 +802,26 @@ input[type="radio"] {
 
 /* Action Group*/
 
+.vis-ev-col-actiongroup .dropdown-toggle:after {
+    margin-left: 0px;
+    margin-right: 5px;
+}
+
+.vis-ev-col-actiongroup {
+    cursor: pointer;
+}
+
+    .vis-ev-col-actiongroup .dropdown-toggle:after {
+        display: none;
+    }
+
+.w2ui-editable .vis-ev-col-img-ctrl + button {
+    max-height: 32px;
+}
+
+
+/* Action Group*/
+
 .vis-ev-col-ag-dropdown-btn {
     display: inline-flex;
     align-items: center;
