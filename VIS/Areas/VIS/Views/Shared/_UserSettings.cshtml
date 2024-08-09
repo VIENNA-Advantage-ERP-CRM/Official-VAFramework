@@ -1,8 +1,8 @@
 ﻿@if (Request.IsAuthenticated)
 {
-@model VIS.Models.LoginModel
+    @model VIS.Models.LoginModel
 
-@functions{
+    @functions{
 
 
         public string GetMsg(string lang, string key)
@@ -11,186 +11,186 @@
         }
 
 
-}
+    }
 
 
- <!-- App Top Header START -->
+    <!-- App Top Header START -->
 
     if (!ViewBag.disableMenu)
     {
-<ul class="vis-app-hdr-l">
-    <li>
-        <a href="javascript:void(0)" class="vis-app-hdr-l-menu" title="@GetMsg((string)ViewBag.culture, "AppMenu") @GetMsg((string)ViewBag.culture, "Shct_AppMenu")" id="vis_appMenu">
-            <i class="fa fa-bars"></i>
-        </a>
-    </li>
-    <li>
-        <span class="vis-app-v-line"></span>
-    </li>
-    <li style="display:none">
-        <a href="javascript:void(0)" class="vis-app-hdr-l-menu" title="@GetMsg((string)ViewBag.culture, "InfoWindow")" id="vis_appInfoWindow">
-            <i class="fa fa-info"></i>
-        </a>
-    </li>
+        <ul class="vis-app-hdr-l">
+            <li>
+                <a href="javascript:void(0)" class="vis-app-hdr-l-menu" title="@GetMsg((string)ViewBag.culture, "AppMenu") @GetMsg((string)ViewBag.culture, "Shct_AppMenu")" id="vis_appMenu">
+                    <i class="fa fa-bars"></i>
+                </a>
+            </li>
+            <li>
+                <span class="vis-app-v-line"></span>
+            </li>
+            <li style="display:none">
+                <a href="javascript:void(0)" class="vis-app-hdr-l-menu" title="@GetMsg((string)ViewBag.culture, "InfoWindow")" id="vis_appInfoWindow">
+                    <i class="fa fa-info"></i>
+                </a>
+            </li>
 
-    <!-- Show Config File Name If Auto data marking enabled -->
-    <li class="vis-blinkingDotContainer vis-hideadmconfigblock" id="vis_recordingADM"><div class="vis-blinking-dot"></div></li>
-    <li class="vis-hideadmconfigblock" id="vis_configfile">
-        <span class="d-inline-block vis-autodatamarkingfilename mr-1 vis-autodataMkFilename" id="vis_configfilename"></span>
-        <span class="d-inline-block vis-autodatafontplus" id="vis_addconfigfile"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
-    </li>
+            <!-- Show Config File Name If Auto data marking enabled -->
+            <li class="vis-blinkingDotContainer vis-hideadmconfigblock" id="vis_recordingADM"><div class="vis-blinking-dot"></div></li>
+            <li class="vis-hideadmconfigblock" id="vis_configfile">
+                <span class="d-inline-block vis-autodatamarkingfilename mr-1 vis-autodataMkFilename" id="vis_configfilename"></span>
+                <span class="d-inline-block vis-autodatafontplus" id="vis_addconfigfile"><i class="fa fa-plus-circle" aria-hidden="true"></i></span>
+            </li>
 
 
-    @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-alerts" title="Alerts">Alerts</a><span class="vis-notify-counter">55</span></li>*@
-    @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-call" title="@GetMsg((string)ViewBag.culture, "VA048_CallingInterface")" id="vis_appCall">Call</a></li>*@
-</ul>
+            @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-alerts" title="Alerts">Alerts</a><span class="vis-notify-counter">55</span></li>*@
+            @*<li><a href="javascript:void(0)" class="vis-icons-menuBar vis-icon-call" title="@GetMsg((string)ViewBag.culture, "VA048_CallingInterface")" id="vis_appCall">Call</a></li>*@
+        </ul>
     }
     else
     {
-<ul class="vis-app-hdr-l-menu" style="display: none; margin: 5px 0 0 0">
-    <li>
-        <img src="~/Areas/VIS/Images/logo.jpg" />
-    </li>
-</ul>
+        <ul class="vis-app-hdr-l-menu" style="display: none; margin: 5px 0 0 0">
+            <li>
+                <img src="~/Areas/VIS/Images/logo.jpg" />
+            </li>
+        </ul>
     }
 
-<div class="vis-app.hdr-clouddaysleft">
-    <p id="vis_cloud_daysleft"></p>
-</div>
+    <div class="vis-app.hdr-clouddaysleft">
+        <p id="vis_cloud_daysleft"></p>
+    </div>
 
-<div class="vis-nm-page-close vis-nm-appSelected" style="display:none;">
-    <i class="fa fa-briefcase" style="color:red; font-size:25px;" aria-hidden="true"></i>
-    <span class="vis-nm-selAppLabel"></span>
-    <span class="vis vis-arrow-down vis-nm-appDownArrow"></span>
-    @*<a href=""><span class="vis vis-cross"></span></a>*@
-</div>
-@*<div class="vis-nm-navbar">*@
-<div class="position-relative vis-nm-navbar-container" style="margin: 0 16px;">
-    <nav class="vis-nav-horizontal-scroll">
-        <ul id="vis-nm-container" class="vis-nm-navbar" style="width: auto;">
-        </ul>
-    </nav>
-    <div id="vis-nm-scrollLeftButton" class="vis-nm-nav-arrow vis-nm-prev" style="display:none;"><span class="vis vis-arrow-left"></span></div>
-    <div id="vis-nm-scrollRightButton" class="vis-nm-nav-arrow vis-nm-forward" style="display:none;"><span class="vis vis-arrow-right"></span></div>
-</div>
-@*</div>*@
-
-<ul class="vis-app-hdr-r">
-    @*<li id="visMarket">
-            <img style="width:21px; height:21px" src=" data:image/*;base64,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 ">
-        </li>*@
-    <li id="vis_editHome"><i class="fa fa-th-large mr-2" aria-hidden="true"></i><u class="vis-color-primary">@GetMsg((string)ViewBag.culture, "EditHome")</u></li>
-    @* <li id="vis_userDate"><i class="fa fa-calendar"></i><span>@DateTime.Now.ToString("D", new System.Globalization.CultureInfo(ViewBag.culture.ToString().Replace("_", "-")))</span> </li>*@
-    <li id="vis_theme" style="display:none">
-        <div class="dropdown">
-            <span class="dropdown-toggle vis-app-hdr-r-theme" data-toggle="dropdown">
-                <i class="fa fa-paint-brush">
-                </i>
-            </span>
-            <ul class="dropdown-menu">
-
-                <li>
-                    <div class="vis-theme-rec" data-color="0, 152, 247|255,255,255|238,238,238|102,102,102">
-                        <span class="vis-theme-color" style="background-color:#0098f7"></span>
-                        <span class="vis-theme-color" style="background-color:white"></span>
-                        <span class="vis-theme-color" style="background-color:#eee"></span>
-                        <span class="vis-theme-color" style="background-color:#666"></span>
-                    </div>
-                </li>
-
-                <li>
-                    <div class="vis-theme-rec" data-color="209,65,17|255,255,255|240, 236, 235|74, 1, 2">
-                        <span class="vis-theme-color" style="background-color:#d14111"></span>
-                        <span class="vis-theme-color" style="background-color:White"></span>
-                        <span class="vis-theme-color" style="background-color:#f0e1dd"></span>
-                        <span class="vis-theme-color" style="background-color:#4a0102"></span>
-                    </div>
-                </li>
-                <li>
-                    <div class="vis-theme-rec" data-color="129, 177, 52|255,255,255|236, 241, 228|34, 44, 10">
-                        <span class="vis-theme-color" style="background-color:#94c83f"></span>
-                        <span class="vis-theme-color" style="background-color:White"></span>
-                        <span class="vis-theme-color" style="background-color:rgba(236, 241, 228, 1)"></span>
-                        <span class="vis-theme-color" style="background-color:rgba(34,44,10, 1)"></span>
-                    </div>
-                </li>
-                <li>
-                    <div class="vis-theme-rec" data-color="0, 152, 247|255,255,255|240,249,255|36,61,76">
-                        <span class="vis-theme-color" style="background-color:#1aa0ed"></span>
-                        <span class="vis-theme-color" style="background-color:white"></span>
-                        <span class="vis-theme-color" style="background-color:#f0f9ff"></span>
-                        <span class="vis-theme-color" style="background-color:#243d4c"></span>
-                    </div>
-                </li>
-                <li></li>
+    <div class="vis-nm-page-close vis-nm-appSelected" style="display:none;">
+        <i class="fa fa-briefcase" style="color:red; font-size:25px;" aria-hidden="true"></i>
+        <span class="vis-nm-selAppLabel"></span>
+        <span class="vis vis-arrow-down vis-nm-appDownArrow"></span>
+        @*<a href=""><span class="vis vis-cross"></span></a>*@
+    </div>
+    @*<div class="vis-nm-navbar">*@
+    <div class="position-relative vis-nm-navbar-container" style="margin: 0 16px;">
+        <nav class="vis-nav-horizontal-scroll">
+            <ul id="vis-nm-container" class="vis-nm-navbar" style="width: auto;">
             </ul>
-        </div>
+        </nav>
+        <div id="vis-nm-scrollLeftButton" class="vis-nm-nav-arrow vis-nm-prev" style="display:none;"><span class="vis vis-arrow-left"></span></div>
+        <div id="vis-nm-scrollRightButton" class="vis-nm-nav-arrow vis-nm-forward" style="display:none;"><span class="vis vis-arrow-right"></span></div>
+    </div>
+    @*</div>*@
 
-        @*<select id="vis_cmbtheme"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option> </select>  </li>*@
-        @*
-            <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
-    </li>
-    <li id="vis_userDisplayName" class="vis-app-hdr-r-user">
-        <a href="javascript:;" id="vis_userName" style="display:none">@ViewBag.DisplayName</a>
-        @*
-            <div class="vis-div-userAvatar">*@
-        @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
+    <ul class="vis-app-hdr-r">
+        @*<li id="visMarket">
+                <img style="width:21px; height:21px" src=" data:image/*;base64,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 ">
+            </li>*@
+        <li id="vis_editHome"><i class="fa fa-th-large mr-2" aria-hidden="true"></i><u class="vis-color-primary">@GetMsg((string)ViewBag.culture, "EditHome")</u></li>
+        @* <li id="vis_userDate"><i class="fa fa-calendar"></i><span>@DateTime.Now.ToString("D", new System.Globalization.CultureInfo(ViewBag.culture.ToString().Replace("_", "-")))</span> </li>*@
+        <li id="vis_theme" style="display:none">
+            <div class="dropdown">
+                <span class="dropdown-toggle vis-app-hdr-r-theme" data-toggle="dropdown">
+                    <i class="fa fa-paint-brush">
+                    </i>
+                </span>
+                <ul class="dropdown-menu">
+
+                    <li>
+                        <div class="vis-theme-rec" data-color="0, 152, 247|255,255,255|238,238,238|102,102,102">
+                            <span class="vis-theme-color" style="background-color:#0098f7"></span>
+                            <span class="vis-theme-color" style="background-color:white"></span>
+                            <span class="vis-theme-color" style="background-color:#eee"></span>
+                            <span class="vis-theme-color" style="background-color:#666"></span>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="vis-theme-rec" data-color="209,65,17|255,255,255|240, 236, 235|74, 1, 2">
+                            <span class="vis-theme-color" style="background-color:#d14111"></span>
+                            <span class="vis-theme-color" style="background-color:White"></span>
+                            <span class="vis-theme-color" style="background-color:#f0e1dd"></span>
+                            <span class="vis-theme-color" style="background-color:#4a0102"></span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="vis-theme-rec" data-color="129, 177, 52|255,255,255|236, 241, 228|34, 44, 10">
+                            <span class="vis-theme-color" style="background-color:#94c83f"></span>
+                            <span class="vis-theme-color" style="background-color:White"></span>
+                            <span class="vis-theme-color" style="background-color:rgba(236, 241, 228, 1)"></span>
+                            <span class="vis-theme-color" style="background-color:rgba(34,44,10, 1)"></span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="vis-theme-rec" data-color="0, 152, 247|255,255,255|240,249,255|36,61,76">
+                            <span class="vis-theme-color" style="background-color:#1aa0ed"></span>
+                            <span class="vis-theme-color" style="background-color:white"></span>
+                            <span class="vis-theme-color" style="background-color:#f0f9ff"></span>
+                            <span class="vis-theme-color" style="background-color:#243d4c"></span>
+                        </div>
+                    </li>
+                    <li></li>
+                </ul>
+            </div>
+
+            @*<select id="vis_cmbtheme"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option> </select>  </li>*@
+            @*
+                <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
+        </li>
+        <li id="vis_userDisplayName" class="vis-app-hdr-r-user">
+            <a href="javascript:;" id="vis_userName" style="display:none">@ViewBag.DisplayName</a>
+            @*
+                <div class="vis-div-userAvatar">*@
+            @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
             {
                 ViewBag.UserPic = "Areas/VIS/Images/home/userAvatar.png";
             }
-        <div class="vis-app-user-img-wrap">
-            <i class="fa fa-user"></i>
-            <img src="@ViewBag.UserPic" alt="profile image">
-        </div><!-- user-img-wrap -->
-        @*else
-            {
-            <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
-            }
-            }
-            else
-            {
-            <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
-            }*@
-        @*
-            </div>*@
-
-
-    </li>
-    <li style="display:none">
-        @using (Html.BeginForm("LogOff", "Account", new { area = "VIS" }, FormMethod.Post, new { id = "logoutForm" }))
-            {
-        @Html.AntiForgeryToken()
-        <a href="javascript:document.getElementById('logoutForm').submit()" class="vis-app-hdr-r-logout" title="@GetMsg((string)ViewBag.culture, "Shct_LogOut")">
-            <i class="vis vis-logout"></i>
-        </a>
-            }
-    </li>
-</ul>
-
-
-<div id="vis_home_ca" class="vis-dialog vis-auth-dialog">
-    <div class="vis-setting-submenu">
-        <div class="vis-user-detail">
-            <div class="vis-thumb-img">
-                
-                <div class="vis-edit-icon">
-                    <label for="vis-file-inputUI" class="vis-file-labelUI">
-                        <span class="vis vis-pencil"></span>
-                    </label>
-                    <input id="vis-file-inputUI" title="@GetMsg((string)ViewBag.culture, "ChangeImage")" class="vis-change-pic-inputUI" type="file" accept="image/*">
-                </div><!-- user-img-wrap -->
-                @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
+            <div class="vis-app-user-img-wrap">
+                <i class="fa fa-user"></i>
+                <img src="@ViewBag.UserPic" alt="profile image">
+            </div><!-- user-img-wrap -->
+            @*else
                 {
-                    ViewBag.UserPic = "Areas/VIS/Images/home/userAvatar.png";
+                <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
                 }
-                <img id="vis_imguserImage" src="@ViewBag.UserPic" alt="profile image">
-            </div>
-            <h1>@ViewBag.DisplayName <span>@Model.Login2Model.RoleName</span></h1>
-        </div>
-        <div class="vis-setting-form">
-            @using (Html.BeginForm("JsonChangeAuthentication", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "vis_changeAuthForm" }))
+                }
+                else
                 {
-            @Html.AntiForgeryToken()
+                <img id="vis_LoginUserImage" src="~/Areas/VIS/Images/home/userAvatar.png" class="vis-userAvatar" />
+                }*@
+            @*
+                </div>*@
+
+
+        </li>
+        <li style="display:none">
+            @using (Html.BeginForm("LogOff", "Account", new { area = "VIS" }, FormMethod.Post, new { id = "logoutForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <a href="javascript:document.getElementById('logoutForm').submit()" class="vis-app-hdr-r-logout" title="@GetMsg((string)ViewBag.culture, "Shct_LogOut")">
+                    <i class="vis vis-logout"></i>
+                </a>
+            }
+        </li>
+    </ul>
+
+
+    <div id="vis_home_ca" class="vis-dialog vis-auth-dialog">
+        <div class="vis-setting-submenu">
+            <div class="vis-user-detail">
+                <div class="vis-thumb-img">
+
+                    <div class="vis-edit-icon">
+                        <label for="vis-file-inputUI" class="vis-file-labelUI">
+                            <span class="vis vis-pencil"></span>
+                        </label>
+                        <input id="vis-file-inputUI" title="@GetMsg((string)ViewBag.culture, "ChangeImage")" class="vis-change-pic-inputUI" type="file" accept="image/*">
+                    </div><!-- user-img-wrap -->
+                    @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
+                    {
+                        ViewBag.UserPic = "Areas/VIS/Images/home/userAvatar.png";
+                    }
+                    <img id="vis_imguserImage" src="@ViewBag.UserPic" alt="profile image">
+                </div>
+                <h1>@ViewBag.DisplayName <span>@Model.Login2Model.RoleName</span></h1>
+            </div>
+            <div class="vis-setting-form">
+                @using (Html.BeginForm("JsonChangeAuthentication", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "vis_changeAuthForm" }))
+                {
+                    @Html.AntiForgeryToken()
 
                     var sty = "width: auto; text-align: left; padding-right: 5px;";
                     if (ViewBag.direction == "rtl")
@@ -198,56 +198,74 @@
                         sty = "width: auto; text-align: right; padding-left: 5px;";
                     }
 
-            <div class="input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.DropDownListFor(m => m.Login2Model.Role, new SelectList(ViewBag.RoleList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Role)), new { id = "vis_home_role" })
-                    @Html.HiddenFor(m => m.Login2Model.RoleName, new { id = "vis_home_roleName" })
-                    @Html.LabelFor(m => m.Login2Model.Role)
-                </div>
-            </div>
-            <div class="input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.DropDownListFor(m => m.Login2Model.Client, new SelectList(ViewBag.ClientList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Client)), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectClient"), new { id = "vis_home_client" })
-                    @Html.HiddenFor(m => m.Login2Model.ClientName, new { id = "vis_home_clientName" })
-                    @Html.LabelFor(m => m.Login2Model.Client)
-                </div>
-            </div>
-            <div class="input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.DropDownListFor(m => m.Login2Model.Org, new SelectList(ViewBag.OrgList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Org)), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectOrganization"), new { id = "vis_home_org" })
-                    @Html.HiddenFor(m => m.Login2Model.OrgName, new { id = "vis_home_orgName" })
-                    @Html.LabelFor(m => m.Login2Model.Org)
-                </div>
-            </div>
-            <div class="input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.DropDownListFor(m => m.Login2Model.Warehouse, new SelectList(ViewBag.WareHouseList, "Key", "Name"), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectWarehouse"), new { id = "vis_home_warehouse" })
-                    @Html.HiddenFor(m => m.Login2Model.WarehouseName, new { id = "vis_home_warehouseName" })
-                    @Html.HiddenFor(m => m.Login2Model.Warehouse, new { id = "vis_home_warehouseId" })
-                    @Html.HiddenFor(m => m.Login2Model.LoginLanguage, new { id = "vis_home_langugage" })
-                    @Html.LabelFor(m => m.Login2Model.Warehouse)
-                </div>
-            </div>
-            <div class="vis-changeBtn">
-                <input id="vis-auth-change" type="submit" value="Change" class="ui-button ui-widget" disabled />
-            </div>
-            @Html.ValidationSummary()
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownListFor(m => m.Login2Model.Role, new SelectList(ViewBag.RoleList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Role)), new { id = "vis_home_role" })
+                            @Html.HiddenFor(m => m.Login2Model.RoleName, new { id = "vis_home_roleName" })
+                            @Html.LabelFor(m => m.Login2Model.Role)
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownListFor(m => m.Login2Model.Client, new SelectList(ViewBag.ClientList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Client)), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectClient"), new { id = "vis_home_client" })
+                            @Html.HiddenFor(m => m.Login2Model.ClientName, new { id = "vis_home_clientName" })
+                            @Html.LabelFor(m => m.Login2Model.Client)
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownListFor(m => m.Login2Model.Org, new SelectList(ViewBag.OrgList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Org)), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectOrganization"), new { id = "vis_home_org" })
+                            @Html.HiddenFor(m => m.Login2Model.OrgName, new { id = "vis_home_orgName" })
+                            @Html.LabelFor(m => m.Login2Model.Org)
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownListFor(m => m.Login2Model.Warehouse, new SelectList(ViewBag.WareHouseList, "Key", "Name"), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectWarehouse"), new { id = "vis_home_warehouse" })
+                            @Html.HiddenFor(m => m.Login2Model.WarehouseName, new { id = "vis_home_warehouseName" })
+                            @Html.HiddenFor(m => m.Login2Model.Warehouse, new { id = "vis_home_warehouseId" })
+                            @Html.HiddenFor(m => m.Login2Model.LoginLanguage, new { id = "vis_home_langugage" })
+                            @Html.LabelFor(m => m.Login2Model.Warehouse)
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            <label class="vis-ec-col-lblchkbox" style="opacity: 1;">
+                                @Html.CheckBox("vis-home-isfilter", false, new { id = "vis_home_isfilter" })
+                                @GetMsg((string)ViewBag.culture, "ApplyFilter")
+                            </label>
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownList("vis-home-filterorgs", new SelectList(ViewBag.OrgList, "Key", "Name", ""), null, new { id = "vis_home_filterorgs", multiple = "multiple" })
+                            @Html.HiddenFor(m => m.Login2Model.FilteredOrg, new { id = "vis_home_filterorgval" })
+                            @Html.Label("vis-home-filterorgs", @GetMsg((string)ViewBag.culture, "FilterOrganization"))
+                        </div>
+                    </div>
+
+
+                    <div class="vis-changeBtn">
+                        <input id="vis-auth-change" type="submit" value="Change" class="ui-button ui-widget" disabled />
+                    </div>
+                    @Html.ValidationSummary()
 
                 }
-        </div>
-        <div class="vis-setting-link">
-            @using (Html.BeginForm("LogOff", "Account", new { area = "VIS" }, FormMethod.Post, new { id = "logoutForm" }))
+            </div>
+
+            <div class="vis-setting-link">
+                @using (Html.BeginForm("LogOff", "Account", new { area = "VIS" }, FormMethod.Post, new { id = "logoutForm" }))
                 {
-            @Html.AntiForgeryToken()
-            <a href="javascript:document.getElementById('logoutForm').submit()"
-               title="@GetMsg((string)ViewBag.culture, "Shct_LogOut")">
-                <img src="~/Areas/VIS/Images/power-off.svg" alt="">
-                @GetMsg((string)ViewBag.culture, "LogOut")
-            </a>
-            @*<a href="javascript:void(0);"><img src="images/power-off.svg" alt=""> Logout</a>*@
+                    @Html.AntiForgeryToken()
+                    <a href="javascript:document.getElementById('logoutForm').submit()"
+                       title="@GetMsg((string)ViewBag.culture, "Shct_LogOut")">
+                        <img src="~/Areas/VIS/Images/power-off.svg" alt="">
+                        @GetMsg((string)ViewBag.culture, "LogOut")
+                    </a>
+                    @*<a href="javascript:void(0);"><img src="images/power-off.svg" alt=""> Logout</a>*@
                 }
+            </div>
         </div>
     </div>
-</div>
- <!-- App Top Header END -->
+    <!-- App Top Header END -->
 }

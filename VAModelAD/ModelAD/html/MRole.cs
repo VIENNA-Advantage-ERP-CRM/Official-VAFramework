@@ -189,8 +189,8 @@ namespace VAdvantage.Model
             if (reload || role == null || role.GetAD_Role_ID() != AD_Role_ID
             || role.GetAD_User_ID() != AD_User_ID)
             {
-               if( s_cache.ContainsKey(AD_Role_ID))
-                s_cache.Remove(AD_Role_ID);
+                if (s_cache.ContainsKey(AD_Role_ID))
+                    s_cache.Remove(AD_Role_ID);
                 lock (_lock)
                 {
                     role = (MRole)s_cache.Get(AD_Role_ID);
@@ -2053,14 +2053,36 @@ namespace VAdvantage.Model
                 retSQL.Append(tableName).Append(".");
             retSQL.Append(GetClientWhere(rw));
 
-            //	Org Access
-            if (!IsAccessAllOrgs())
+
+            ////new enhacement Filter data accroding to Filtered Org value in Context
+            //if (!string.IsNullOrEmpty(GetCtx().GetContext("AD_FilteredOrg")))
+            //{
+            //    retSQL.Append(" AND ");
+            //    retSQL.Append("COALESCE(");
+
+            //    if (fullyQualified && !Util.IsEmpty(tableName))
+            //        retSQL.Append(tableName + ".");
+            //    retSQL.Append("AD_Org_ID,0) IN(").Append(GetCtx().GetContext("AD_FilteredOrg")).Append(")");
+            //}
+            //else if (!IsAccessAllOrgs())
+            //{
+            //    retSQL.Append(" AND ");
+            //    if (fullyQualified && !Util.IsEmpty(tableName))
+            //        retSQL.Append(GetOrgWhere(tableName, rw, mainTableName));
+            //    else
+            //        retSQL.Append(GetOrgWhere(null, rw, mainTableName));
+            //}
+
+            //AppendOrg
+            string orgWhereSql = "";
+            if (fullyQualified && !Util.IsEmpty(tableName))
+                orgWhereSql = GetOrgWhere(tableName, rw, mainTableName);
+            else
+                orgWhereSql = GetOrgWhere(null, rw, mainTableName);
+
+            if(!string.IsNullOrEmpty(orgWhereSql))
             {
-                retSQL.Append(" AND ");
-                if (fullyQualified && !Util.IsEmpty(tableName))
-                    retSQL.Append(GetOrgWhere(tableName, rw, mainTableName));
-                else
-                    retSQL.Append(GetOrgWhere(null, rw, mainTableName));
+                retSQL.Append(" AND ").Append(orgWhereSql);
             }
 
             if (IsUseBPRestrictions())
@@ -2565,20 +2587,32 @@ namespace VAdvantage.Model
 	 */
         public String GetOrgWhere(String tableName, bool rw, string mainTableName)
         {
-            if (IsAccessAllOrgs())
+            //Check for filtered Org
+            bool isFiltredOrg = !string.IsNullOrEmpty(GetCtx().GetContext("#AD_FilteredOrg"));
+
+            if (IsAccessAllOrgs() && !isFiltredOrg)
                 return null;
-            LoadOrgAccess(false);
-            // Unique Strings
             List<String> set = new List<string>();
-            if (!rw)
-                set.Add("0");
-            // Positive List
-            for (int i = 0; i < _orgAccess.Length; i++)
+
+            if (!isFiltredOrg)
             {
+                LoadOrgAccess(false);
+                // Unique Strings
+
                 if (!rw)
-                    set.Add(_orgAccess[i].AD_Org_ID.ToString());
-                else if (!_orgAccess[i].readOnly) // rw
-                    set.Add(_orgAccess[i].AD_Org_ID.ToString());
+                    set.Add("0");
+                // Positive List
+                for (int i = 0; i < _orgAccess.Length; i++)
+                {
+                    if (!rw)
+                        set.Add(_orgAccess[i].AD_Org_ID.ToString());
+                    else if (!_orgAccess[i].readOnly) // rw
+                        set.Add(_orgAccess[i].AD_Org_ID.ToString());
+                }
+            }
+            else
+            {
+                set = GetCtx().GetContext("#AD_FilteredOrg").Split(',').ToList();
             }
             //
             if (set.Count == 1)

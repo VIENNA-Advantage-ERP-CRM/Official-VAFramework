@@ -149,32 +149,6 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(mod.GetUserQuery(tab_ID, table_ID, ctx)), JsonRequestBehavior.AllowGet);
         }
 
-        /// <summary>
-        /// Update advance filter data
-        /// </summary>
-        /// <param name="userQueryList">new AD_UserQuery data</param>
-        /// <param name="ctx">context</param>
-        /// <returns>update/notupdated</returns>
-        public JsonResult UpdateUserQuery(List<UserQuery> userQueryList)
-        {
-            Ctx ctx = Session["ctx"] as Ctx;
-            ASearchModel mod = new ASearchModel();
-            return Json(JsonConvert.SerializeObject(mod.UpdateUserQuery(userQueryList, ctx)), JsonRequestBehavior.AllowGet);
-        }
-
-        /// <summary>
-        /// Getting Data from advance filter table to show filters on landing page
-        /// </summary>
-        /// <param name="AD_Tab_ID">AD_Tab_ID</param>
-        /// <param name="AD_Table_ID">AD_Tab_ID</param>
-        /// <param name="ctx">Context</param>
-        /// <returns>AD_UserQuery List</returns>
-        public JsonResult GetUserQuery(int tab_ID,int table_ID)
-        {
-            Ctx ctx = Session["ctx"] as Ctx;
-            ASearchModel mod = new ASearchModel();
-            return Json(JsonConvert.SerializeObject(mod.GetUserQuery(tab_ID, table_ID, ctx)), JsonRequestBehavior.AllowGet);
-        }
 
         /// <summary>
         /// Update advance filter data
@@ -188,6 +162,8 @@ namespace VIS.Controllers
             ASearchModel mod = new ASearchModel();
             return Json(JsonConvert.SerializeObject(mod.UpdateUserQuery(userQueryList, ctx)), JsonRequestBehavior.AllowGet);
         }
+
+       
 
         // Added by Bharat on 05 june 2017
         public JsonResult GetQueryDefault(int UserQuery_ID)
