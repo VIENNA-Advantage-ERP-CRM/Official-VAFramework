@@ -932,11 +932,11 @@
          * @param {any} show
          * @param {any} actionParams
          */
-        this.showLandingPage = function (show,actionParams) {
+        this.showLandingPage = function (show, actionParams) {
             if (show) {
                 this.landingPage.getRoot().show();
                 this.getRoot().hide();
-            } else {              
+            } else {
                 this.landingPage.getRoot().hide();
                 this.getRoot().show();
                 //tab selection
@@ -949,8 +949,8 @@
                     this.cmd_find('');
                 }
                 //this.setTabNavigation();
-            }
-
+                this.refresh();
+            }        
         }
 
         $btnFilter.on("click", function (e) {

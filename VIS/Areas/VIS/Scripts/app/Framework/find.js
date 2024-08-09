@@ -173,12 +173,7 @@
         var txtQryName, drpSavedQry, drpColumns, drpOp, drpDynamicOp, chkDynamic, txtYear, txtMonth, txtDay, txtStatus, chkFullDay, spanAddFilter, btnBack;
         var ulQryList, divDynamic, divYear, divMonth, divDay, divValue1, divValue2, tblGrid, tblBody, divFullDay, inputWarps, lblQryValue;
         var lblBottomMsgLP = $('<label></label>');
-        var okBtnLP, closeBtnLP, mainAdvaceDiv, btnBackLP;
-        var gridView =
-            "<option value='Y'>" + VIS.Msg.getMsg("SingleView") + "</option>" +
-            "<option value='N'>" + VIS.Msg.getMsg("GridView") + "</option>" +
-            "<option value='C'>" + VIS.Msg.getMsg("CardView") + "</option>"
-            ;
+        var okBtnLP, closeBtnLP, mainAdvaceDiv, btnBackLP;      
         var FIELDLENGTH = 20, TABNO = 99;
 
         var total = 0, isLoadError = false, isSaveError = false, isBusy = false;
@@ -217,7 +212,7 @@
 
 
             var html = '<div id="mainAdvance_' + windowNo + '" class="vis-advancedSearch-contentWrap"> <div class="vis-advancedSearchContentArea vis-pull-left" style="' + dStyle + '">'
-                + ' <div class="vis-advancedSearchContentArea-up"> <div class="vis-advanedSearch-InputsWrap"><div class="vis-as-topfieldswrap">'
+                + ' <div class="vis-landingPageSetting-Heading">' + VIS.Msg.getMsg("landingPageSetting") + '</div><div class="vis-advancedSearchContentArea-up" style="display:none !important"> <div class="vis-advanedSearch-InputsWrap"><div class="vis-as-topfieldswrap">'
                 + '<div id="adsearchgroup1_' + windowNo+'" style="display:none" class="vis-form-group vis-advancedSearchInput vis-adsearchgroup1">'
                 + '<input readonly id="txtQryName_' + windowNo + '" type="text" name="QueryName" maxlength="60">'
                 + '<label id="lblQryName_' + windowNo + '" for="QueryName">' + VIS.Msg.getMsg("AddNameToSaveSearch") + '</label>'
@@ -305,7 +300,7 @@
 
                 + '</div>'
 
-                + '<div class="vis-advancedSearchContentArea-down">'
+                + '<div class="vis-advancedSearchContentArea-down" style="display:none !important">'
                 + '<div class="vis-advancedSearchTableWrap vis-table-responsive vis-pull-left">'
 
                 + '<table id="tblQry_' + windowNo + '" class="vis-advancedSearchTable">'
@@ -333,7 +328,7 @@
                 + '</div>'
                 + '</div>'
 
-                + '<div class="vis-advancedSearchContentArea-button">'
+                + '<div class="vis-advancedSearchContentArea-button" style="display:none !important">'
                 + '<div class="vis-advcedfooterBtn">';
 
 
@@ -397,24 +392,28 @@
                 + "</thead>"
                 + "<tbody class='vis-LandingPageTableBody'>"
                 + "</tbody>"
-                + "</table></div>");
-
-            var landingPageBtn = $('<div style="margin: 10px 0px;" class="vis-ctrfrm-btnwrp">'
-                + '<input id="closeBtn_' + windowNo + '" class= "VIS_Pref_btn-2" type = "button" value = "' + VIS.Msg.getMsg("close") + '">'
-                + '<input id="okBtn_' + windowNo + '" class="VIS_Pref_btn-2" type="button" value="' + VIS.Msg.getMsg("OK") + '">'
-                + '<div class="vis-ad-w-p-s-main pull-left">'
-                + '<div class="vis-as-backbtn pull-left"><button id="btnArowBackLP_' + windowNo + '" class="vis-ads-icon"><i class="fa fa-arrow-left"></i></button></div>'
-                +' <div class= "vis-ad-w-p-s-infoline" ></div>'
-                +'<div class= "vis-ad-w-p-s-msg vis-landingPage-lblmsg" id = "lblBottomMsg_' + windowNo + '"></div></div> '
-                + '</div>');
+                + "</table></div>"
+                + "<div class='vis-ctrfrm-btnwrp vis-landingPage-btn'>"
+                + "<input id='closeBtn_" + windowNo + "' class= 'VIS_Pref_btn-2' type = 'button' value = '" + VIS.Msg.getMsg('close') + "'>"
+                + "<input id='okBtn_" + windowNo + "' class='VIS_Pref_btn-2' type='button' value='" + VIS.Msg.getMsg('OK') + "'>"
+                + "<div class='vis-ad-w-p-s-main pull-left'>"
+                + "<div class='vis-as-backbtn pull-left'><button id='btnArowBackLP_" + windowNo + "' class='vis-ads-icon'><i class='fa fa-arrow-left'></i></button></div>"
+                + "<div class= 'vis-ad-w-p-s-infoline' ></div>"
+                + "<div class= 'vis-ad-w-p-s-msg vis-landingPage-lblmsg' id = 'lblBottomMsg_" + windowNo + "'></div></div> "
+                + "</div>");
 
             //grid 
-            $landinPageRoot.append($landinPageTable).append(landingPageBtn);
-            $root.append(html).append($landinPageRoot).append(busyDiv);
+            $landinPageRoot.append($landinPageTable);           
+            $root.append(html);
+            $root.find('.vis-advancedSearchContentArea').append($landinPageRoot).append(busyDiv);
             initUI();
-            initFind();
+            //initFind();
             bindEvents();
             getUserQuery(bindLandingGrid);
+            landingPage.hide();
+            $landinPageRoot.show();
+           // mainAdvaceDiv.hide();
+            //btnBackLP.show();
         };
 
         function initUI() {
@@ -1422,6 +1421,21 @@
                     obj = list[i];
 
                     var isCardViewDisabled ='';
+                    var gridView = "<option value='Y'>" + VIS.Msg.getMsg("SingleView") + "</option>" +
+                        "<option value='N'>" + VIS.Msg.getMsg("GridView") + "</option>" +
+                        "<option value='C'>" + VIS.Msg.getMsg("CardView") + "</option>";
+
+                    switch (obj.TargetView) {
+                        case 'Y':
+                            gridView = gridView.replace("value='Y'", "value='Y' selected");
+                            break;
+                        case 'N':
+                            gridView = gridView.replace("value='N'", "value='N' selected");
+                            break;
+                        case 'C':
+                            gridView = gridView.replace("value='C'", "value='C' selected");
+                            break;
+                    }
 
                     var cardView = "<option value='0' selected>NA</option>";
                     if (obj.CardViewList != null) {
@@ -1445,8 +1459,6 @@
                 }
             }
             tbleBodyLP.html(html);
-
-            tbleBodyLP.find('#gridView_' + windowNo).val(obj.TargetView);
 
             tbleBodyLP.on('change', '#gridView_'+ windowNo, function () {
                 var index = $(this).attr('index');

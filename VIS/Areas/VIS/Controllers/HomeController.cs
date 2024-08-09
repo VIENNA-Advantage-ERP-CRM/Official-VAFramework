@@ -867,11 +867,11 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="widgetSize_ID">AD_WidgetSize_ID</param>
         /// <returns>Field Details</returns>
-        public JsonResult GetDynamicWidget( int widgetSize_ID,int windowNo, int tabID, int tableID, string isAdvanceSearch)
+        public JsonResult GetDynamicWidget( int widgetID,int windowNo, int tabID, int tableID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
-            var widgets = homeModels.GetDynamicWidget(ctx, widgetSize_ID, windowNo, tabID, tableID, isAdvanceSearch);
+            var widgets = homeModels.GetDynamicWidget(ctx, widgetID, windowNo, tabID, tableID);
             return Json(JsonConvert.SerializeObject(widgets), JsonRequestBehavior.AllowGet);
         }
 

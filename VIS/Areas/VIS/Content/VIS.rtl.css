@@ -951,4 +951,7 @@ html[dir="rtl"] .VIS_Pref_col-50 .VIS_Pref_Label_Font {
     padding-right: 5px;
 }
 
+html[dir=rtl] .vis-add-widgetButton {
+    text-align: center !important;
+}
 /*rtl css End here*/
