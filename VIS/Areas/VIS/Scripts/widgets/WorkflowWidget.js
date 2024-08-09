@@ -1184,23 +1184,21 @@
         //Search Function
         function searchFunction() {
             showBusy(true);
-            setTimeout(function () {
-                $countDiv_ID.empty();
-                $workflowWidgetDtls_ID.empty();
-                pageNo = 1;
-                getworkflowWidget(true, false);
-                //loadWindows();
-                $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                    $welcomeScreenFeedsLists.css('display', 'none');
-                    $row.css('display', 'none');
-                    $workflowActivitys.css('display', 'block').css('zindex', '2');
-                });
-                $backBtn_ID.on('click', function () {
-                    $workflowActivitys.css('display', 'none').css('zindex', '2');
-                    $welcomeScreenFeedsLists.css('display', 'block');
-                    $row.css('display', 'block');
-                });
-            }, 5);
+            $countDiv_ID.empty();
+            $workflowWidgetDtls_ID.empty();
+            pageNo = 1;
+            getworkflowWidget(true, false);
+            //loadWindows();
+            $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+                $welcomeScreenFeedsLists.css('display', 'none');
+                $row.css('display', 'none');
+                $workflowActivitys.css('display', 'block').css('zindex', '2');
+            });
+            $backBtn_ID.on('click', function () {
+                $workflowActivitys.css('display', 'none').css('zindex', '2');
+                $welcomeScreenFeedsLists.css('display', 'block');
+                $row.css('display', 'block');
+            });
         };
 
         //Refresh Widget
@@ -1233,7 +1231,7 @@
         };
     }
     VIS.WorkflowWidget.prototype.refreshWidget = function () {
-        
+
     };
     /* init method called on loading a form . */
     VIS.WorkflowWidget.prototype.init = function (windowNo, frame) {
