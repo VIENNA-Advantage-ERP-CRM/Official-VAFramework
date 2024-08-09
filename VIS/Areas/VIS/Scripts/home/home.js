@@ -537,7 +537,6 @@
                     if (isEditMode) {
                         $home.find('.vis-home-leftPanel').sortable("enable");
                         $home.find('.vis-add-widgetContainer').hide();
-
                     }
                     $home.find('#divfeedbsy').hide();
                 });

@@ -940,7 +940,6 @@
                 this.landingPage.getRoot().hide();
                 this.getRoot().show();
                 //tab selection
-                
                 if (actionParams && actionParams.TabIndex) {
                     this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());
                     this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", "", actionParams);

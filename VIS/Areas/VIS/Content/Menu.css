@@ -422,7 +422,7 @@ nav.vis-nav-horizontal-scroll {
 
 .vis-subnav-content {
     position: absolute;
-    top: 45px !important;
+    top: 42px !important;
     background-color: rgba(var(--v-c-on-secondary), 1);
     /*background-color: #95b7df;*/
     z-index: 100;
@@ -457,7 +457,7 @@ nav.vis-nav-horizontal-scroll {
     .vis-subnav-content::before {
         content: " ";
         display: block;
-        height: 10px;
+        height: 14px;
         background-color: #ffffff;
         position: absolute;
         top: 0;
