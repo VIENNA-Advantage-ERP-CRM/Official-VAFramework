@@ -573,7 +573,7 @@
                 agIns = this.agGroupToAGInsMap[agName];
             }
             else {
-                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(),mfiled.getAGStyle());
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle());
                 this.agGroupToAGInsMap[agName] = agIns;
             }
             agIns.addItem(editor);
