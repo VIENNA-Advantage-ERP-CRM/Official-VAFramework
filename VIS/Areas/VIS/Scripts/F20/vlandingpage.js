@@ -536,6 +536,10 @@
                         }
                     }
                     dragDrop();
+                    if (isEditMode) {
+                        $root.find('.vis-home-leftPanel').sortable("enable");
+                        $root.find('.vis-add-widgetContainer').hide();
+                    }
                 }
                 //else {
                 //    $root.find('.vis-add-widgetContainer').show();
@@ -562,6 +566,7 @@
                     dragDrop();
                     if (isEditMode) {
                         $root.find('.vis-home-leftPanel').sortable("enable");
+                        $root.find('.vis-add-widgetContainer').hide();
                     }
                 }
             });

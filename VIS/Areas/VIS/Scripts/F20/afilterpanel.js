@@ -5,8 +5,9 @@
     function getTemplate(winNo) {
         var str =
             ' <div class="vis-fp-bodycontent vis-formouterwrpdiv">                                                 ' +
-            '     <div class="vis-fp-viwall" >                                                  ' +
-            '         <span>' + VIS.Msg.getMsg("ViewMore") + '</span>                               ' +
+            '     <div class="vis-fp-viwall mt-2 pb-2 mb-3" >                                                  ' +
+            '         <div class="input-group vis-input-wrap m-0"><div class="vis-control-wrap vis-fb-txtFilterName"><label><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div>                               ' +
+            '         <div class="ml-1"><i class="saveFilter vis vis-save fa-2x" title="' + VIS.Msg.getMsg("VISSave") + '"></i><i title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-1 fa-2x"></i><i title="' + VIS.Msg.getMsg("VISClearName") + '" class="clearName vis vis-close ml-1 fa-2x" style="display:none"></i></div>                                                              '+
             '     </div>                                                                       ' +
             '  <div class="vis-fp-datawrap"> ' +
             '     <div class="vis-fp-static-ctrlwrp">                                          ' +
@@ -84,15 +85,15 @@
             '                     </div>                                                       ' +
             '                 </div>                                                           ' +
             '             </div>                                                               ' +
-            '         </div>  </div>                                                                 ' +
+            '         </div>  </div>                                                           ' +
             '         <div class="vis-fp-custcoltagswrp">                                      ' +
             '             <div class="vis-fp-custcoltag">                                      ' +
             '             </div>                                                               ' +
             '         </div><!-- vis-fp-custcoltagswrp -->                                     ' +
             '</div>' +
 
-            '  <div class="mb-2 vis-fp-static-ctrlwrp"><div class="input-group vis-input-wrap"><div class="vis-control-wrap vis-fb-txtFilterName"><label><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div></div> ' +
-            '  <div class="vis-fb-savebtnPnl"></div> ' +
+            /*'  <div class="mb-2 vis-fp-static-ctrlwrp"><div class="input-group vis-input-wrap"><div class="vis-control-wrap vis-fb-txtFilterName"><label><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div></div> ' +*/
+            '  <div class="vis-fb-savebtnPnl"><span class="vis-fp-cc-ClearAll vis-fp-cc-addbutton">' + VIS.Msg.getMsg("ClearAll") + '</span></div> ' +
             '</div > ' +
             ' </div>';
         return str;
@@ -121,10 +122,14 @@
         var divValue2 = divDynamic.find('.vis-fp-valuetwo');
         var divDynFilters = divDynamic.find('.vis-fp-custcoltag');
         var divFullDay = divDynamic.find("#divFullDay_" + windowNo);
-        var btnSave = $('<button class="vis-fp-cc-addbutton">Save</button>');
+        var btnSave = bodyDiv.find('.saveFilter');
+        var btnSaveAs = bodyDiv.find('.saveAs');
+        var btnClearAll = bodyDiv.find('.vis-fp-cc-ClearAll');
+        var btnClearName = bodyDiv.find('.clearName');
         var txtFilterName = $('<input type="text" class="w-100">');
+        var isSaveAs = false;
 
-        bodyDiv.find('.vis-fb-savebtnPnl').append(btnSave);
+        /*bodyDiv.find('.vis-fb-savebtnPnl').append(btnSave);*/
         bodyDiv.find('.vis-fb-txtFilterName').prepend(txtFilterName);
 
 
@@ -142,7 +147,7 @@
         divDay.hide();
         dynamicDiv.hide();
 
-        spnViewAll.text(VIS.Msg.getMsg("ViewMore"));
+        //spnViewAll.text(VIS.Msg.getMsg("ViewMore"));
 
         this.curGC = gc;
         this.winNo = windowNo;
@@ -269,7 +274,11 @@
                             if (inputType[0].type == 'checkbox' && !inputType.is(":checked")) {
                                 continue;
                             }
-                            var pasedVal = context.parseWhereCondition(col, VIS.Query.prototype.EQUAL, inputType.data('id'), null);
+                            var tabindex = inputType.data('tabindex');
+                            self.fillColumns(tabindex);
+                            //self.cmbTabs.val(self.cmbTabs.find('option[tabid="' + tabindex + '"]').val());
+
+                            var pasedVal = context.parseWhereCondition(col, VIS.Query.prototype.EQUAL, inputType.data('id'), null, null, inputType.data('tabindex'));
 
                             if (whereClause != '') {
                                 whereClause += " OR " + pasedVal;
@@ -278,12 +287,22 @@
                                 whereClause += "(" + pasedVal;
                             }
                         }
+
+                        self.fillColumns(0);
+
                         if (whereClause != '') {
                             whereClause += ")";
-                            if (finalWhereClause != "")
+
+                            if (self.curTab.getAD_Tab_ID() != self.tabs[tabindex].getAD_Tab_ID()) {
+                                whereClause = self.curTab.getTableName() + '.' + self.curTab.getTableName() + '_ID IN(SELECT ' + self.curTab.getTableName() + '_ID FROM ' + self.tabs[tabindex].getTableName() + ' WHERE ' + whereClause + ')';
+                            }
+
+                            if (finalWhereClause != "") {
                                 finalWhereClause += " AND " + whereClause;
-                            else
+                            }
+                            else {
                                 finalWhereClause += whereClause;
+                            }
                         }
 
                         var found = false;
@@ -296,6 +315,7 @@
                                     context.listOfFilterQueries.splice(k, 1);
                             }
                         }
+
                         if (!found && whereClause != '')
                             context.listOfFilterQueries.push({ 'columnName': col, 'whereClause': whereClause });
                     }
@@ -345,7 +365,7 @@
             var v = Math.floor(Math.random() * 16) + 85;
             var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
 
-            var spann = $('<span data-id="' + evt.newValue + '" class="vis-fp-inputvalueforupdate" >' + displayVal + '</span>');
+            var spann = $('<span data-tabindex="' + field[0].tabIndex +'" data-id="' + evt.newValue + '" class="vis-fp-inputvalueforupdate" >' + displayVal + '</span>');
             var iconCross = $('<i data-id="' + evt.newValue + '" data-keyval="' + evt.propertyName + "_" + evt.newValue + '" class="vis vis-mark"></i></div></div>');
             wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div style="background-color:' + pastel + '" class="vis-fp-currntrcrds">').append(spann).append(iconCross)));
 
@@ -444,7 +464,7 @@
         this.fillColumns = function (i) {
 
             var curTabfieldlist = this.tabs[i].getFields();
-            this.selectionfields = [];
+            //this.selectionfields = [];
             this.curTabfields = [];
 
             var html = '<option value="-1"> </option>';
@@ -507,10 +527,10 @@
                     ;
                 }
 
-                else if (field.getIsSelectionColumn()) {
-                    this.selectionfields.push(field);
+                //else if (field.getIsSelectionColumn()) {
+                //    this.selectionfields.push(field);
 
-                }
+                //}
                 else
                     sortedFields.push({ 'value': columnName, 'text': header });
                 // html += '<option value="' + columnName + '">' + header + '</option>';
@@ -573,20 +593,31 @@
         btnSave.on('click', function () {
             var advanceSearch = self.curTab.searchCode;
             var searchText = self.curTab.searchText;
+            if (isSaveAs) {
+                searchText = "";
+            }
+
             var userQueryID = self.curTab.userQueryID;
             if (searchText == "") {
                 userQueryID = 0;
                 if (txtFilterName.val() == "") {
-                    VIS.ADialog.error("ValidationError", true, "Filter Name Required");
+                    VIS.ADialog.error("", true, VIS.Msg.getMsg("FilterNameRequired"));
                     return;
                 } else {
                     searchText = txtFilterName.val();
                 }
             }
+
+           
             
 
 
             var filterClause = self.getFilterClause();
+
+            if (filterClause == "") {
+                VIS.ADialog.error("", true, VIS.Msg.getMsg("SelectAtleastOneColumn"));
+                return;
+            }
 
             var where = "";
             //if (where != "" && where != null) {
@@ -613,6 +644,10 @@
                 async: false,
                 data: JSON.stringify(obj)
             }).done(function (json) {
+                isSaveAs = false;
+                btnClearName.hide();
+                btnSaveAs.show();
+                txtFilterName.removeClass('vis-filterNameReadonly');
                 no = parseInt(json);
                 self.curTab.searchCode = where;
                 self.curTab.searchText = searchText;
@@ -622,17 +657,39 @@
 
 
         });
-        
 
-        btnViewAll.on("click", "span", function (e) {
-            divStatic.toggleClass('vis-fp-static-ctrlwrp-auto');
-            if (spnViewAll.text() == VIS.Msg.getMsg("ViewMore")) {
-                spnViewAll.text(VIS.Msg.getMsg('ViewLess'));
-            }
-            else {
-                spnViewAll.text(VIS.Msg.getMsg('ViewMore'));
-            }
+        btnSaveAs.on('click', function () {
+            btnSaveAs.hide();
+            btnClearName.show();
+            txtFilterName.val('');
+            isSaveAs = true;
+            txtFilterName.removeClass('vis-filterNameReadonly');
         });
+
+        btnClearName.on('click', function () {
+            btnSaveAs.show();
+            btnClearName.hide();
+            isSaveAs = false;
+            txtFilterName.val(self.curTab.searchText);
+            if (txtFilterName.val() !="") {
+                txtFilterName.addClass('vis-filterNameReadonly');
+            }
+
+        });
+
+        btnClearAll.on('click', function () {
+            self.curGC.aPanel.removeSearchOnDelete();
+        });
+
+        //btnViewAll.on("click", "span", function (e) {
+        //    divStatic.toggleClass('vis-fp-static-ctrlwrp-auto');
+        //    if (spnViewAll.text() == VIS.Msg.getMsg("ViewMore")) {
+        //        spnViewAll.text(VIS.Msg.getMsg('ViewLess'));
+        //    }
+        //    else {
+        //        spnViewAll.text(VIS.Msg.getMsg('ViewMore'));
+        //    }
+        //});
 
         this.cmbTabs.on('change', function (e) {
             //divDynFilters.find('.vis-fp-currntrcrds').remove();
@@ -772,19 +829,19 @@
 
         bodyDiv.on("mouseover", function () {
 
-            if ((divStaticInner.height() > (divStatic.parent().height() - 60)) && (divStaticInner.height() + 15) >= divStatic.height()) {
+            //if ((divStaticInner.height() > (divStatic.parent().height() - 60)) && (divStaticInner.height() + 15) >= divStatic.height()) {
 
-                btnViewAll.css('visibility', 'visible');
-            }
-            else {
-                btnViewAll.css('visibility', 'hidden');
-            }
+            //    btnViewAll.css('visibility', 'visible');
+            //}
+            //else {
+            //    btnViewAll.css('visibility', 'hidden');
+            //}
         });
 
-        bodyDiv.on("mouseout", function () {
-            if (spnViewAll.text() == VIS.Msg.getMsg("ViewMore"))
-                btnViewAll.css('visibility', 'hidden');
-        });
+        //bodyDiv.on("mouseout", function () {
+        //    if (spnViewAll.text() == VIS.Msg.getMsg("ViewMore"))
+        //        btnViewAll.css('visibility', 'hidden');
+        //});
 
         chkDynamic.on("change", function () {
             var enable = chkDynamic.prop("checked");
@@ -1123,14 +1180,14 @@
                     var opNameD = " >= ";
                     var controlText = getDynamicText(drpDynamicOp[0].selectedIndex);
                     var controlValue = getDynamicValue(drpDynamicOp[0].selectedIndex);
-                    addDynRow(colName, colValue, opNameD, opValueD, controlText, controlValue, null, null, getFullDay());
+                    addDynRow(colName, colValue, opNameD, opValueD, controlText, controlValue, null, null, getFullDay(), self.cmbTabs.val());
                 }
                 else {
                     var opValueD = "=";
                     var opNameD = " = ";
                     var controlText = drpDynamicOp.find("option:selected").text();
                     var controlValue = drpDynamicOp.val();
-                    addDynRow(colName, colValue, opNameD, opValueD, controlText, controlValue, null, null, getFullDay());
+                    addDynRow(colName, colValue, opNameD, opValueD, controlText, controlValue, null, null, getFullDay(), self.cmbTabs.val());
                 }
 
             } else {
@@ -1145,12 +1202,12 @@
                 var opValue = cmbOp.val();
 
                 // add row in dataset
-                addDynRow(colName, colValue, opName, opValue, getControlText(true), getControlValue(true), getControlText(false), getControlValue(false), getFullDay());
+                addDynRow(colName, colValue, opName, opValue, getControlText(true), getControlValue(true), getControlText(false), getControlValue(false), getFullDay(), self.cmbTabs.val());
             }
         }
 
         function addDynRow(colName, colValue, optr, optrName,
-            value1Name, value1Value, value2Name, value2Value, fullDay) {
+            value1Name, value1Value, value2Name, value2Value, fullDay, tabindex) {
 
             if (dsAdvanceData == null)
                 dsAdvanceData = {};
@@ -1162,14 +1219,14 @@
             if (!(colValue in dsAdvanceData))
                 dsAdvanceData[colValue] = [];
 
-            var where = self.parseWhereCondition(colValue, optr, value1Value, value2Value, fullDay);
-            if (self.curTab.getAD_Tab_ID() != self.tabs[self.cmbTabs.val()].getAD_Tab_ID()) {
-                where = self.curTab.getTableName() + '.' + self.curTab.getTableName() + '_ID IN(SELECT ' + self.curTab.getTableName() + '_ID FROM ' + self.tabs[self.cmbTabs.val()].getTableName() + ' WHERE ' + where + ')';
+            var where = self.parseWhereCondition(colValue, optr, value1Value, value2Value, fullDay, tabindex);
+            if (self.curTab.getAD_Tab_ID() != self.tabs[tabindex].getAD_Tab_ID()) {
+                where = self.curTab.getTableName() + '.' + self.curTab.getTableName() + '_ID IN(SELECT ' + self.curTab.getTableName() + '_ID FROM ' + self.tabs[tabindex].getTableName() + ' WHERE ' + where + ')';
             }
 
             if (self.curTab.searchText == '') {
-                txtFilterName.val('');    
-                txtFilterName.removeAttr('readonly');
+                txtFilterName.val('');
+                txtFilterName.removeClass('vis-filterNameReadonly');
             }
 
             //txtFilterName.show();
@@ -1192,7 +1249,7 @@
             dsFilterData.push(obj);
 
             dsAdvanceData[colValue].push({
-                'Name': colName,
+                'Name': self.tabs[tabindex].getTableName()+"."+ colName,
                 'Value': value1Value,
                 'Value2': value1Value,
                 'Text': value1Name,
@@ -1361,7 +1418,7 @@
             }
             var dr = null;
             txtFilterName.val(self.curTab.searchText);
-            txtFilterName.attr('readonly','readonly');
+            txtFilterName.addClass('vis-filterNameReadonly');
 
             dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ASearch/GetQueryLines", { "UserQuery_ID": id, isFilter: true }, null);
             dsAdvanceData = {};
@@ -1371,24 +1428,20 @@
                 var optrName = dr[i]["OPERATORNAME"];
                 var optr = VIS.Query.prototype.OPERATORS[optrName];
                 var tabID = dr[i]["AD_TAB_ID"];
-                if (!tabID) {
-                    self.cmbTabs.val('0');
-                } else {
-                    self.cmbTabs.val(self.cmbTabs.find('option[tabid="' + tabID + '"]').val());
-                }
-
+                var tabIndex = self.cmbTabs.find('option[tabid="' + tabID + '"]').val() || 0;               
+                self.fillColumns(tabIndex);
                 addDynRow(dr[i].KEYNAME, dr[i].KEYVALUE, optr, optrName,
-                    dr[i].VALUE1NAME, dr[i].VALUE1VALUE, dr[i].VALUE2NAME, dr[i].VALUE2VALUE);
+                    dr[i].VALUE1NAME, dr[i].VALUE1VALUE, dr[i].VALUE2NAME, dr[i].VALUE2VALUE, dr[i]["FULLDAY"], tabIndex);
 
             }
 
-            self.cmbTabs.val('0').change();
+            self.fillColumns(0);
         }
 
         this.removeAdvance = function () {
             //txtFilterName.show();
             txtFilterName.val('');
-            txtFilterName.removeAttr('readonly');
+            txtFilterName.removeClass('vis-filterNameReadonly');
             dsAdvanceData = {};
             dsFilterData = [];
             divDynFilters.find('.vis-fp-currntrcrds').remove(); 
@@ -1403,28 +1456,31 @@
 
         this.curTab = this.curGC.getMTab();
 
-        
-
+        this.selectionfields = [];
 
         var tabs = this.tabs;
-
-        tabs.sort(function (a, b) {
-            var n1 = a.getTabLevel();
-            var n2 = b.getTabLevel();
-            if (n1 > n2) return 1;
-            if (n1 < n2) return -1;
-            return 0;
-        });
 
         var html = "";
         for (var i = 0; i < tabs.length; i++) {
             if (this.curTab.getTabLevel() == tabs[i].getTabLevel() || (this.curTab.getTabLevel() + 1) == tabs[i].getTabLevel()) {
-                html += '<option tabid="' + tabs[i].getAD_Tab_ID() +'" value="' + i + '">' + tabs[i].getName() + '</option>';
+                html += '<option tabid="' + tabs[i].getAD_Tab_ID() + '" value="' + i + '">' + tabs[i].getName() + '</option>';
+
+                var fld = tabs[i].getFields();
+                for (var c = 0; c < fld.length; c++) {
+                    var fieldorg = fld[c];
+                    var field = jQuery.extend(true, {}, fieldorg);
+
+                    if (field.getIsSelectionColumn()) {
+                        field['tabIndex'] = i;
+                        this.selectionfields.push(field);
+
+                    }
+                }
+
             }
         }
 
         this.fillTabs(html);
-
 
         this.selectionfields.sort(function (a, b) { return a.getSelectionSeqNo() - b.getSelectionSeqNo() });
         this.getFixedColumns();
@@ -1643,14 +1699,14 @@
         return inStr;
     };	//	pa
 
-    FilterPanel.prototype.createDirectSql = function (code, code_to, column, operator, convertToString) {
+    FilterPanel.prototype.createDirectSql = function (code, code_to, column, operator, convertToString, tabindex) {
         var sb = "";
         var isoDateRegx = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
         if (typeof code == "string" && isNaN(code) && (code.toString().toUpper() != ("NULLValue").toUpper())) {
             sb += " UPPER( ";
         }
 
-        sb += this.tabs[this.cmbTabs.val()].getTableName() + '.' + column;
+        sb += this.tabs[tabindex].getTableName() + '.' + column;
 
 
         if (typeof code == "string" && isNaN(code) && (code.toString().toUpper() != ("NULLValue").toUpper())) {
@@ -1714,7 +1770,7 @@
 
     };
 
-    FilterPanel.prototype.parseWhereCondition = function (columnName, optr, value, value2, fullDay) {
+    FilterPanel.prototype.parseWhereCondition = function (columnName, optr, value, value2, fullDay,tabIndex) {
         //	Column
         var field = this.getTargetMField(columnName);
         var columnSQL = field.getColumnSQL(); //
@@ -1755,10 +1811,10 @@
                     // return whereCondition;
                 }
                 parsedValue2 = this.parseValue(field, value2);
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex);
             }
             else {
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex);
             }
         }
         else {
@@ -1799,7 +1855,7 @@
                         VIS.MRole.SQL_NOTQUALIFIED, VIS.MRole.SQL_RO);
                     optr = VIS.Query.prototype.IN;
                 }
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false, tabIndex);
             }
             else {
                 // else add simple restriction where clause to query
@@ -1820,7 +1876,7 @@
                     }
                 }
                 else {
-                    whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, true);
+                    whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, true, tabIndex);
 
                 }
             }

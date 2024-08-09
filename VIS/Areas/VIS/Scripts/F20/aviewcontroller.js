@@ -1333,7 +1333,7 @@
         //check for defalut card in Action Params
         if (this.actionParams.Card_ID > 0) {
             this.gTab.getTableModel().setCardID(this.actionParams.Card_ID);
-            if (this.isCardRow && this.vCardView)
+            if (this.vCardView)
                 this.vCardView.cardID = this.actionParams.Card_ID;
 
         }
