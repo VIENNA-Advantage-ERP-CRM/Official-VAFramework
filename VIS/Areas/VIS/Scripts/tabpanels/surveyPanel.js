@@ -40,7 +40,7 @@ VIS = window.VIS || {};
             $root = $('<div></div>').append(bsyDiv);
            // h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
             h = VIS.Env.getScreenHeight() - 230;
-            if (self.curTab.getIsHeaderPanel()) {
+            if (self.curTab && self.curTab.getIsHeaderPanel()) {
                 h = h - VIS.Utility.Util.getValueOfInt(self.curTab.getHeaderHeight().replace('px', ' ')) - 10;
             }
             if (!h || h < 0) {

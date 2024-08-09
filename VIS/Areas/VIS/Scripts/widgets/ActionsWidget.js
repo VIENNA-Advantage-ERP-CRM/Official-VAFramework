@@ -41,6 +41,7 @@
             modelPopupId.find("#closeBtnId" + $self.AD_UserHomeWidgetID).on("click", function () {
                 modelPopupId.hide();
                 wform.dispose();
+                $self.refreshWidget();
             });
         };
 
@@ -176,7 +177,6 @@
             welcomeActionsDivId.find("#noticeCntDivId" + $self.AD_UserHomeWidgetID).empty();
             welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).empty();
             loadCounts(false);
-            ShowBusy(false);
         };
 
         /* get design from root*/
@@ -199,7 +199,7 @@
         this.frame.getContentGrid().append(this.getRoot());
     };
 
-    VIS.ActionsWidget.prototype.sizeChanged = function (height, width) {
+    VIS.ActionsWidget.prototype.widgetSizeChange = function (height, width) {
 
     };
 
