@@ -378,7 +378,7 @@
         this.frame.getContentGrid().append(this.getRoot());
     };
 
-    VIS.NoticeWidget.prototype.sizeChanged = function (height, width) {
+    VIS.NoticeWidget.prototype.widgetSizeChange = function (height, width) {
 
     };
 

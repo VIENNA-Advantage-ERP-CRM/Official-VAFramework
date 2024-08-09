@@ -1244,7 +1244,7 @@
         this.frame.getContentGrid().append(this.getRoot());
     };
 
-    VIS.WorkflowWidget.prototype.sizeChanged = function (height, width) {
+    VIS.WorkflowWidget.prototype.widgetSizeChange = function (height, width) {
 
     };
 

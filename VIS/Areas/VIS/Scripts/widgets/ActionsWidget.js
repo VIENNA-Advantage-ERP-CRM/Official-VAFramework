@@ -199,7 +199,7 @@
         this.frame.getContentGrid().append(this.getRoot());
     };
 
-    VIS.ActionsWidget.prototype.sizeChanged = function (height, width) {
+    VIS.ActionsWidget.prototype.widgetSizeChange = function (height, width) {
 
     };
 

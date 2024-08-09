@@ -325,7 +325,7 @@
         this.frame.getContentGrid().append(this.getRoot());
     };
 
-    VIS.RequestWidget.prototype.sizeChanged = function (height, width) {
+    VIS.RequestWidget.prototype.widgetSizeChange = function (height, width) {
 
     };
     //Must implement dispose
