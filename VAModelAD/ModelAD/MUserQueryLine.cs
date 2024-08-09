@@ -53,7 +53,7 @@ namespace VAdvantage.Model
         /// <param name="value2Name">"to query value" text</param>
         /// <param name="value2Value">"to query value's" value</param>
         public MUserQueryLine(MUserQuery parent, int seqNo, string keyName, string keyValue, string optr,
-            string value1Name, string value1Value, string value2Name, string value2Value, bool fullDay = false)
+            string value1Name, string value1Value, string value2Name, string value2Value,int AD_TAB_ID, bool fullDay = false, bool isFilter=false)
             : base(parent.GetCtx(), 0, parent.Get_TrxName())
         {
             SetClientOrg(parent);
@@ -72,6 +72,9 @@ namespace VAdvantage.Model
                 SetValue2Name(value2Name);
             }
             SetIsFullDay(fullDay);
+            //Set_Value("IsFilter", isFilter);
+            Set_Value("AD_Tab_ID", AD_TAB_ID);
+
         }
 
         /// <summary>

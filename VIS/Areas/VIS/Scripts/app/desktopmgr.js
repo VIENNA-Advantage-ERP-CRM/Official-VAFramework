@@ -583,7 +583,12 @@
             if (itm.length > 0) {
 
                 if (itm[0].id == "vis_lhome2") {
-                   $('#vis_editHome').show();
+                    if ($('#vis_home2 .vis-editModeWidget').length > 0) {
+                        $('#vis_editHome').hide();
+                    } else {
+                        $('#vis_editHome').show();
+                    }
+                   
                 } else {
                     $('#vis_editHome').hide();
                 }

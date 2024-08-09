@@ -5540,7 +5540,7 @@ a.VIS_Pref_btn-2, a.VIS_Pref_btn-2:hover {
 
 /*jquery ui dropdown list 09Nov2021*/
 .ui-menu .ui-menu-item-wrapper {
-    padding: 3px 0 3px .4em;
+    padding: 3px .4em 3px .4em;
     display: flex !important;
     justify-content: space-between;
 }

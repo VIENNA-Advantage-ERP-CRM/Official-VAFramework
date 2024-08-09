@@ -426,7 +426,7 @@ nav.vis-nav-horizontal-scroll {
     background-color: rgba(var(--v-c-on-secondary), 1);
     /*background-color: #95b7df;*/
     z-index: 100;
-    padding: 1.8rem 1rem 1rem 1rem;
+    padding: 1.5rem 1rem 1rem 1rem;
     min-width: auto;
     visibility: hidden;
     opacity: 0;
