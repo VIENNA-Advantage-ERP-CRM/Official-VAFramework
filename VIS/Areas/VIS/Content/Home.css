@@ -3212,8 +3212,9 @@ p.vis-maintain-customer-p span {
 
 .vis-dynamicWidget-main {
     overflow: hidden;
-    width:100%;
-    height:100%;
+    width: 100%;
+    height: 90%;
+    margin-bottom: 5px;
 }
 
 .vis-add-row {
@@ -3293,6 +3294,33 @@ p.vis-maintain-customer-p span {
 .vis-widget-field {
     margin: 0px;
 }
+
+.vis-exclamation-icon {
+    color: #e92d2d;
+}
+.vis-bottomArrow-icon {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.vis-topArrow-icon {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+    top: 1px;
+    cursor: pointer;
+}
+
+.vis-add-row button .vis-widget-badge {
+    background: rgba(var(--v-c-on-primary), 1);
+    color: rgba(var(--v-c-primary), 1);
+}
+
 .vis-widget-badge {
     background: rgba(var(--v-c-primary), 1);
     color: rgba(var(--v-c-on-primary), 1);
