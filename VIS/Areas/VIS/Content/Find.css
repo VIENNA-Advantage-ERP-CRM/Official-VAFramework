@@ -573,8 +573,8 @@ margin-right:5px;
 }
 
 .vis-landingPage-main {
-    max-height: 430px;
-    overflow-y: auto;
+    /*max-height: 430px;
+    overflow-y: auto;*/
 }
 .vis-landingPage-table thead {
     position: sticky;
@@ -596,7 +596,7 @@ margin-right:5px;
 .vis-landingPage-table tbody {
     display: block;
     overflow-y: auto;
-    max-height: 350px;
+    height: 328px;
 }
 
 .vis-landingPage-lblmsg {

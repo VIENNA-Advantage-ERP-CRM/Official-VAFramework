@@ -582,19 +582,20 @@
         function activateTaskBarItem(itm) {
             if (itm.length > 0) {
 
-                if (itm[0].id == "vis_lhome2") {
-                    if ($('#vis_home2 .vis-editModeWidget').length > 0) {
+                if (itm[0].id == "vis_lhome") {
+                    if ($('#vis_home .vis-editModeWidget').length > 0) {
                         $('#vis_editHome').hide();
                     } else {
                         $('#vis_editHome').show();
                     }
+                    return;
                    
                 } else {
                     $('#vis_editHome').hide();
                 }
 
-                if (itm[0].id == "vis_lhome")
-                    return;
+                //if (itm[0].id == "vis_lhome")
+                //    return;
 
                 //select unselect taskbar items
                 if (curSelTaskBarItem) {
@@ -718,12 +719,12 @@
 
         function renderHomePage() {
             $('#vis_lhome').show();
-            $('#vis_lhome2').show();
+            //$('#vis_lhome2').show();
             dynamicViewCache['vis_lhome'] = $home;
-            dynamicViewCache['vis_lhome2'] = $home2;
+            //dynamicViewCache['vis_lhome2'] = $home2;
             currentActiveView = $home.show();
-            VIS.HomeMgr2.initHome($home2);
-            VIS.HomeMgr.initHome($home);
+            VIS.HomeMgr2.initHome($home);
+            //VIS.HomeMgr.initHome($home);
         }
 
         /*

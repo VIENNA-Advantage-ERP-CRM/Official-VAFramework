@@ -3297,6 +3297,7 @@ p.vis-maintain-customer-p span {
 
 .vis-exclamation-icon {
     color: #e92d2d;
+    padding-left:10px;
 }
 .vis-bottomArrow-icon {
     position: absolute;
@@ -3810,7 +3811,7 @@ ul.vis-userLinks-ListMenu li a i {
 
 #vis_editHome{
     cursor:pointer;
-    display:none;
+    /*display:none;*/
 }
 
 .vis-editModeWidget .vis-widget-item, 
