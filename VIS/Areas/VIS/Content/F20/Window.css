@@ -2195,9 +2195,9 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
     font-size:1.2rem;
 }
 
-.vis-fb-txtFilterName input {
-    height: 30px;
-    padding: 5px;
+.vis-fb-txtFilterName .visfilterName {
+    height: 25px !important;
+    padding: 5px !important;
 }
 
 .vis-filterNameReadonly {
@@ -2207,7 +2207,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 }
 
 .vis-fp-datawrap {
-    height: calc(100% - 23px);
+    height: calc(100% - 65px);
     overflow: auto;
     padding-top: 1px;
 }

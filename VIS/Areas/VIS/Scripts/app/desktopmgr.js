@@ -589,19 +589,20 @@
         function activateTaskBarItem(itm) {
             if (itm.length > 0) {
 
-                if (itm[0].id == "vis_lhome2") {
-                    if ($('#vis_home2 .vis-editModeWidget').length > 0) {
+                if (itm[0].id == "vis_lhome") {
+                    if ($('#vis_home .vis-editModeWidget').length > 0) {
                         $('#vis_editHome').hide();
                     } else {
                         $('#vis_editHome').show();
                     }
-
+                    return;
+                  
                 } else {
                     $('#vis_editHome').hide();
                 }
 
-                if (itm[0].id == "vis_lhome")
-                    return;
+                //if (itm[0].id == "vis_lhome")
+                //    return;
 
                 //select unselect taskbar items
                 if (curSelTaskBarItem) {
@@ -725,12 +726,12 @@
 
         function renderHomePage() {
             $('#vis_lhome').show();
-            $('#vis_lhome2').show();
+            //$('#vis_lhome2').show();
             dynamicViewCache['vis_lhome'] = $home;
-            dynamicViewCache['vis_lhome2'] = $home2;
+            //dynamicViewCache['vis_lhome2'] = $home2;
             currentActiveView = $home.show();
-            VIS.HomeMgr2.initHome($home2);
-            VIS.HomeMgr.initHome($home);
+            VIS.HomeMgr2.initHome($home);
+            //VIS.HomeMgr.initHome($home);
         }
 
         /*
@@ -972,7 +973,15 @@
                 nSelectedText: ' - ' + VIS.Msg.getMsg("Selected"),
                 allSelectedText: VIS.Msg.getMsg("All"),
                 buttonContainer: '<div class="btn-group w-100" />',
-                buttonTextAlignment: 'left'
+
+                buttonTextAlignment: 'left',
+                onChange: function (option, checked, select) {
+                    if (!changed) {
+                        changed = true;
+                        btnChange.prop("disabled", false);
+                    }
+                }
+
             });
 
             //set value
@@ -1021,10 +1030,17 @@
             EditUserImage();
         };
 
-        function setFilterOrg() {
+        function setFilterOrg(isChkBoxcontrol) {
             var strOrgFilter = hFilterOrg.val();
-            if (strOrgFilter && strOrgFilter != "") {
-                chkFilter.prop('checked', true);
+            if (!isChkBoxcontrol) {
+                if (strOrgFilter && strOrgFilter != "") {
+                    chkFilter.prop('checked', true);
+                    lstOrgs.multiselect('enable');
+                }
+                else {
+                    chkFilter.prop('checked', false);
+                    lstOrgs.multiselect('disable');
+                }
             }
 
             if (!strOrgFilter || strOrgFilter == "") {
@@ -1032,6 +1048,7 @@
             }
 
             var arrVal = strOrgFilter.split(',');
+            lstOrgs.multiselect('deselectAll');
             lstOrgs.multiselect('select', arrVal);
 
         }
@@ -1256,11 +1273,12 @@
         function chkFilterChange() {
             if (chkFilter.prop('checked') == true) {
                 //apply
-                lstOrgs.multiselect('deselectAll');
                 lstOrgs.multiselect('select', [cmbOrg.val()]);
+                lstOrgs.multiselect('enable');
             }
             else {
-                setFilterOrg();
+                setFilterOrg(true);
+                lstOrgs.multiselect('disable');
             }
             if (!changed) {
                 changed = true;

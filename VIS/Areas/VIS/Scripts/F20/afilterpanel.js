@@ -6,8 +6,8 @@
         var str =
             ' <div class="vis-fp-bodycontent vis-formouterwrpdiv">                                                 ' +
             '     <div class="vis-fp-viwall mt-2 pb-2 mb-3" >                                                  ' +
-            '         <div class="input-group vis-input-wrap m-0"><div class="vis-control-wrap vis-fb-txtFilterName"><label><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div>                               ' +
-            '         <div class="ml-1"><i class="saveFilter vis vis-save fa-2x" title="' + VIS.Msg.getMsg("VISSave") + '"></i><i title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-1 fa-2x"></i><i title="' + VIS.Msg.getMsg("VISClearName") + '" class="clearName vis vis-close ml-1 fa-2x" style="display:none"></i></div>                                                              '+
+            '         <div class="input-group vis-input-wrap m-0"><div class="vis-control-wrap vis-fb-txtFilterName"></div></div>                               ' +
+            '         <div class="ml-2 d-flex"><i class="saveFilter vis vis-save fa-2x" title="' + VIS.Msg.getMsg("VISSave") + '"></i><i title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-2 fa-2x"></i><i title="' + VIS.Msg.getMsg("VISClearName") + '" class="clearName vis vis-close ml-2 fa-2x" style="display:none"></i></div>                                                              '+
             '     </div>                                                                       ' +
             '  <div class="vis-fp-datawrap"> ' +
             '     <div class="vis-fp-static-ctrlwrp">                                          ' +
@@ -126,7 +126,7 @@
         var btnSaveAs = bodyDiv.find('.saveAs');
         var btnClearAll = bodyDiv.find('.vis-fp-cc-ClearAll');
         var btnClearName = bodyDiv.find('.clearName');
-        var txtFilterName = $('<input type="text" class="w-100">');
+        var txtFilterName = $('<input type="text" placeholder="Enter filter name..." class="w-100 visfilterName">');
         var isSaveAs = false;
 
         /*bodyDiv.find('.vis-fb-savebtnPnl').append(btnSave);*/
@@ -1440,6 +1440,7 @@
 
         this.removeAdvance = function () {
             //txtFilterName.show();
+            isSaveAs = false;
             txtFilterName.val('');
             txtFilterName.removeClass('vis-filterNameReadonly');
             dsAdvanceData = {};
