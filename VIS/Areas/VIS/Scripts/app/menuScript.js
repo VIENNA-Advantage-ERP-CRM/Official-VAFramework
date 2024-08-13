@@ -119,7 +119,7 @@
                 document.querySelector("[data-page='" + page + "']").classList.add(self.options.page.show);
             if (self.active) self.active.classList.add(self.options.page.nav);
             if (item != self.active) item.classList.add(self.options.page.nav);
-            self.hideSubNavs();
+            //self.hideSubNavs();
         }
     };
 
