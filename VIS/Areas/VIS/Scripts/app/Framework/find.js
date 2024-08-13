@@ -212,7 +212,7 @@
 
 
             var html = '<div id="mainAdvance_' + windowNo + '" class="vis-advancedSearch-contentWrap"> <div class="vis-advancedSearchContentArea vis-pull-left" style="' + dStyle + '">'
-                + ' <div class="vis-landingPageSetting-Heading">' + VIS.Msg.getMsg("landingPageSetting") + '</div><div class="vis-advancedSearchContentArea-up" style="display:none !important"> <div class="vis-advanedSearch-InputsWrap"><div class="vis-as-topfieldswrap">'
+                + '<div class="vis-advancedSearchContentArea-up" style="display:none !important"> <div class="vis-advanedSearch-InputsWrap"><div class="vis-as-topfieldswrap">'
                 + '<div id="adsearchgroup1_' + windowNo+'" style="display:none" class="vis-form-group vis-advancedSearchInput vis-adsearchgroup1">'
                 + '<input readonly id="txtQryName_' + windowNo + '" type="text" name="QueryName" maxlength="60">'
                 + '<label id="lblQryName_' + windowNo + '" for="QueryName">' + VIS.Msg.getMsg("AddNameToSaveSearch") + '</label>'
@@ -382,7 +382,7 @@
                 + '</div>';
 
 
-            var $landinPageTable = $("<div class='vis-landingPage-main'><table class='vis-landingPage-table' id='LandingPage_" + windowNo + "'><thead><tr>"
+            var $landinPageTable = $("<div class='vis-landingPage-main'> <div class='vis-landingPageSetting-Heading'>" + VIS.Msg.getMsg("landingPageSetting") + "</div><table class='vis-landingPage-table' id='LandingPage_" + windowNo + "'><thead><tr>"
                 + "<th style='display:none;'><div class='vis-landingpage-head'>userqueryID</div></th>"
                 + "<th><div class='vis-landingpage-head'>" + VIS.Msg.getMsg("VIS_Name") + " </div></th>"
                 + "<th><div class='vis-landingpage-head text-center'>" + VIS.Msg.getMsg("ShowOnLandingPage") + " </div></th>"
@@ -392,7 +392,7 @@
                 + "</thead>"
                 + "<tbody class='vis-LandingPageTableBody'>"
                 + "</tbody>"
-                + "</table></div>"
+                + "</table>"
                 + "<div class='vis-ctrfrm-btnwrp vis-landingPage-btn'>"
                 + "<input id='closeBtn_" + windowNo + "' class= 'VIS_Pref_btn-2' type = 'button' value = '" + VIS.Msg.getMsg('close') + "'>"
                 + "<input id='okBtn_" + windowNo + "' class='VIS_Pref_btn-2' type='button' value='" + VIS.Msg.getMsg('OK') + "'>"
