@@ -965,7 +965,13 @@
                 nSelectedText: ' - ' +  VIS.Msg.getMsg("Selected") ,
                 allSelectedText: VIS.Msg.getMsg("All"),
                 buttonContainer: '<div class="btn-group w-100" />',
-                buttonTextAlignment:'left'
+                buttonTextAlignment: 'left',
+                onChange: function (option, checked, select) {
+                    if (!changed) {
+                        changed = true;
+                        btnChange.prop("disabled", false);
+                    }
+                }
             });
 
             //set value
@@ -1014,10 +1020,17 @@
             EditUserImage();
         };
 
-        function setFilterOrg() {
+        function setFilterOrg(isChkBoxcontrol) {
             var strOrgFilter = hFilterOrg.val();
-            if (strOrgFilter && strOrgFilter != "") {
-                chkFilter.prop('checked', true);
+            if (!isChkBoxcontrol) {
+                if (strOrgFilter && strOrgFilter != "") {
+                    chkFilter.prop('checked', true);
+                    lstOrgs.multiselect('enable');
+                }
+                else {
+                    chkFilter.prop('checked', false);
+                    lstOrgs.multiselect('disable');
+                }
             }
 
             if (!strOrgFilter || strOrgFilter == "") {
@@ -1025,6 +1038,7 @@
             }
 
             var arrVal = strOrgFilter.split(',');
+            lstOrgs.multiselect('deselectAll');
             lstOrgs.multiselect('select', arrVal);
 
         }
@@ -1249,11 +1263,12 @@
         function chkFilterChange() {
             if (chkFilter.prop('checked') == true) {
                 //apply
-                lstOrgs.multiselect('deselectAll');
                 lstOrgs.multiselect('select', [cmbOrg.val()]);
+                lstOrgs.multiselect('enable');
             }
             else {
-                setFilterOrg();
+                setFilterOrg(true);
+                lstOrgs.multiselect('disable');
             }
             if (!changed) {
                 changed = true;
