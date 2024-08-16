@@ -35,5 +35,8 @@ namespace VAdvantage.Controller
         public string WindowName { get; set; } //19
         public string ActionName { get; set; } //20
         public string ActionType { get; set; } //21 {'W'[Window], 'X'[Form], 'P'[Process]}
+
+        public string DefaultTabPanel { get; set; }
+
     }
 }

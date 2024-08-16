@@ -1332,7 +1332,7 @@ html[dir="rtl"] .vis-auth-dialog
 }
 
 .vis-auth-dialog select {
-    background:white; 
+    background-color:white; 
     
     color: rgba(var(--v-c-on-secondary), 1);
     /*margin: 5px 0px 5px 0px;

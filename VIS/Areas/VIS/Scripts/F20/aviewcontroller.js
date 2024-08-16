@@ -1337,6 +1337,10 @@
                 this.vCardView.cardID = this.actionParams.Card_ID;
 
         }
+        //check tab Panel Name and Select it
+        if (this.vTabPanel && this.actionParams.DefaultTabPanel && this.actionParams.DefaultTabPanel != "") {
+            this.vTabPanel.setDefaultPanel(this.actionParams.DefaultTabPanel);
+        }
     };
 
     VIS.GridController.prototype.resetActionParams = function () {
