@@ -107,6 +107,7 @@
             });
             $hlnkTabDataRef_ID.on('click', $self.refreshWidget);
             //$txtSearch.on('change', searchFunction);
+
             $zoom.on('click', function (e) {
                 var id = $(this).data("id");
                 zoom(id);
@@ -1200,6 +1201,7 @@
             //    $row.css('display', 'none');
             //    $workflowActivitys.css('display', 'block').css('zindex', '2');
             //});
+
             $backBtn_ID.on('click', function () {
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
                 $welcomeScreenFeedsLists.css('display', 'block');

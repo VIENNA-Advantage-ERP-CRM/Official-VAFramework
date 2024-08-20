@@ -555,6 +555,10 @@ margin-right:5px;
     padding: 6px 8px;
     
 }
+
+.vis-landingPage-btn {
+    margin: 10px 0;
+}
 .vis-landingPage-table thead tr th {
     background-color: rgba(var(--v-c-secondary), 1);
     padding: 6px 8px;
@@ -569,8 +573,8 @@ margin-right:5px;
 }
 
 .vis-landingPage-main {
-    max-height: 430px;
-    overflow-y: auto;
+    /*max-height: 430px;
+    overflow-y: auto;*/
 }
 .vis-landingPage-table thead {
     position: sticky;
@@ -585,10 +589,14 @@ margin-right:5px;
     table-layout: fixed;
 }
 
+.vis-landingPageSetting-Heading {
+    margin-bottom: 10px;
+}
+
 .vis-landingPage-table tbody {
     display: block;
     overflow-y: auto;
-    max-height: 350px;
+    height: 328px;
 }
 
 .vis-landingPage-lblmsg {
@@ -603,5 +611,4 @@ margin-right:5px;
 
 .vis-landingPage-root {
     height: 100%;
-    display: none;
 }

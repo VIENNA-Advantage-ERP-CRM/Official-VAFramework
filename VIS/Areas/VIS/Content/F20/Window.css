@@ -2024,7 +2024,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 }
 .vis-fp-bodywrap {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     height: calc(100% - 30px);
 }
 .vis-fp-bodycontent {
@@ -2135,6 +2135,12 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
         font-size: .875rem;
     }
 
+.vis-fb-savebtnPnl {
+    justify-content: end;
+    display: flex;
+    margin-right: 0.9rem;
+}
+
 .main-fp-wrap {
     width: 100%;
     height: 100%;
@@ -2177,23 +2183,37 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
 .vis-fp-viwall {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     font-size: .75rem;
     color: rgba(var(--v-c-primary), 1);
     padding: 4px 10px 0 10px;
-    visibility:hidden;
+    align-items: center;
+    box-shadow: 0 5px 5px 0px #ccc;
 }
-.vis-fp-viwall span {
+.vis-fp-viwall i {
     cursor: pointer;
+    font-size:1.2rem;
 }
+
+.vis-fb-txtFilterName .visfilterName {
+    height: 25px !important;
+    padding: 5px !important;
+}
+
+.vis-filterNameReadonly {
+    border: none !important;
+    background: transparent !important;
+    pointer-events: none;
+}
+
 .vis-fp-datawrap {
-    height: calc(100% - 23px);
-    overflow: hidden;
+    height: calc(100% - 65px);
+    overflow: auto;
     padding-top: 1px;
 }
-.vis-fp-datawrap:hover{
-    overflow: overlay;
-}
+ .vis-fp-datawrap:hover {
+        overflow: auto;
+    }
 .vis-fp-currntrcrdswrap {
     display: flex;
     flex-direction: column;

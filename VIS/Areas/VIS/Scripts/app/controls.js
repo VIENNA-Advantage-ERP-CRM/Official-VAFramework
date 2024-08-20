@@ -1292,7 +1292,7 @@
         };
 
         $ctrl.on(VIS.Events.onClick, function (evt) { //click handler
-            evt.stopPropagation();
+            //evt.stopPropagation();
 
             var isReport = null;
             // self.invokeActionPerformed({ source: self });

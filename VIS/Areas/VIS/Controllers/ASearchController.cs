@@ -47,7 +47,7 @@ namespace VIS.Controllers
         }
 
         [HttpPost]
-        public ActionResult InsertOrUpdateQuery(int id, string name, string where, int tabid, int tid, List<QueryModel> qLines)
+        public ActionResult InsertOrUpdateQuery(int id, string name, string where, int tabid, int tid, List<QueryModel> qLines,bool isFilter=false)
         {
             int no = -1;
             Ctx ctx = Session["ctx"] as VAdvantage.Utility.Ctx;
@@ -82,12 +82,13 @@ namespace VIS.Controllers
             uq.SetAD_Tab_ID(tabid);
             // set table id
             uq.SetAD_Table_ID(tid);
+            //uq.Set_Value("isFilter", isFilter);
             // save the values in database
             if (uq.Save())
             {
                 no = uq.Get_ID();
                 // delete existing query lines
-                uq.DeleteLines();
+                uq.DeleteLines(isFilter);
                 // if no lines then return
                 if (qLines == null || qLines.Count < 1)
                 {
@@ -105,7 +106,11 @@ namespace VIS.Controllers
                                 m.KEYVALUE ?? "", m.OPERATORNAME ?? "",
                                 m.VALUE1NAME ?? "", m.VALUE1VALUE ?? "",
                                 m.VALUE2NAME ?? "", m.VALUE2VALUE ?? "",
-                                m.FULLDAY == "Y" ? true : false);
+                                m.AD_TAB_ID,
+                                m.FULLDAY == "Y" ? true : false,
+                                isFilter
+                                
+                                );
                         // save query line
                         line.Save();
                     }
@@ -123,11 +128,11 @@ namespace VIS.Controllers
         }
 
         // Added by Bharat on 05 june 2017
-        public JsonResult GetQueryLines(int UserQuery_ID)
+        public JsonResult GetQueryLines(int UserQuery_ID,bool isFilter=false)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             ASearchModel mod = new ASearchModel();
-            return Json(JsonConvert.SerializeObject(mod.GetQueryLines(UserQuery_ID, ctx)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(mod.GetQueryLines(UserQuery_ID, ctx, isFilter)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -144,6 +149,7 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(mod.GetUserQuery(tab_ID, table_ID, ctx)), JsonRequestBehavior.AllowGet);
         }
 
+
         /// <summary>
         /// Update advance filter data
         /// </summary>
@@ -156,6 +162,8 @@ namespace VIS.Controllers
             ASearchModel mod = new ASearchModel();
             return Json(JsonConvert.SerializeObject(mod.UpdateUserQuery(userQueryList, ctx)), JsonRequestBehavior.AllowGet);
         }
+
+       
 
         // Added by Bharat on 05 june 2017
         public JsonResult GetQueryDefault(int UserQuery_ID)
@@ -189,6 +197,8 @@ namespace VIS.Controllers
             public string AD_USERQUERYLINE_ID { get; set; }
             public string OPERATOR { get; set; }
             public string FULLDAY { get; set; }
+            public bool ISFILTER { get; set; }
+            public int AD_TAB_ID { get; set; } 
         }
     }
 }

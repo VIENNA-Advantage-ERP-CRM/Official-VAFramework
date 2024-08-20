@@ -6362,6 +6362,11 @@
 
     };
 
+
+    GridField.prototype.hasReadonlyLogic = function () {
+        return this.vo.ReadOnlyLogic.length > 0; 
+    }
+
     /**
      * Evaluate Readonly and Display logic
      *@return true if readonly 
@@ -7550,6 +7555,24 @@
      * */
     GridField.prototype.getActionParams = function () {
         return this.vo.ADActionParams;
+    };
+    /**
+     * Get Action Group Name
+     * @returns action Group Name
+     */
+    GridField.prototype.getAGName = function () {
+        return this.vo.AGName;
+    };
+
+    /**
+     * Get Action Group Font Name
+     * @returns Action Group Font name
+     */
+    GridField.prototype.getAGFontName = function () {
+        return this.vo.AGFontName;
+    };
+    GridField.prototype.getAGStyle = function () {
+        return this.vo.AGStyleh;
     };
 
     /**

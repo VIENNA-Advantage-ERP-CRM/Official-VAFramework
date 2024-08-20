@@ -194,7 +194,7 @@
 
 .vis-nm-navbar a:hover, .vis-nm-subnav:hover .vis-nm-subnavbtn {
     /*background-color: #2A2F35; rgba(var(--v-c-on-secondary), 1); */
-    background-color: rgba(var(--v-c-on-primary), 0.1);
+    /*background-color: rgba(var(--v-c-on-primary), 0.1);*/
     color: white;
 }
 
@@ -422,7 +422,7 @@ nav.vis-nav-horizontal-scroll {
 
 .vis-subnav-content {
     position: absolute;
-    top: 45px !important;
+    top: 42px !important;
     background-color: rgba(var(--v-c-on-secondary), 1);
     /*background-color: #95b7df;*/
     z-index: 100;
@@ -457,7 +457,7 @@ nav.vis-nav-horizontal-scroll {
     .vis-subnav-content::before {
         content: " ";
         display: block;
-        height: 10px;
+        height: 14px;
         background-color: #ffffff;
         position: absolute;
         top: 0;
@@ -499,6 +499,11 @@ nav.vis-nav-horizontal-scroll {
 
 .vis-app-userRoleChange {
     width: 100%;
+}
+
+.vis-nm-MenuFav {
+    width: 15px;
+    top: 2px !important;
 }
 
 @media screen and (max-width: 1366px) {

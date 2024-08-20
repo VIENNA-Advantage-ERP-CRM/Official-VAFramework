@@ -108,6 +108,7 @@
                 for (var i = 0; i < itm.length; i++) {
                     var obj = {
                         AD_UserHomeWidgetID: homeItems[itm[i]].AD_UserHomeWidgetID,
+                        widgetID: homeItems[itm[i]].WidgetID,
                         windowSpecific: homeItems[itm[i]].WindowSpecific,
                         editMode: isEditMode,
                         rows: homeItems[itm[i]].rows,
@@ -345,6 +346,7 @@
                 //var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
                 var info = {
                     AD_UserHomeWidgetID: wid,
+                    widgetID:widget.WidgetID,
                     windowSpecific: widget.WindowSpecific,
                     editMode: isEditMode,
                     rows: (widget.Rows || 1),
@@ -503,6 +505,11 @@
                         }
 
                         dragDrop();
+                        if (isEditMode) {
+                            $home.find('.vis-home-leftPanel').sortable("enable");
+                            $home.find('.vis-add-widgetContainer').hide();
+
+                        }
                     }
                     //else {
                     //    $home.find('.vis-add-widgetContainer').show();
@@ -531,6 +538,7 @@
                     }
                     if (isEditMode) {
                         $home.find('.vis-home-leftPanel').sortable("enable");
+                        $home.find('.vis-add-widgetContainer').hide();
                     }
                     $home.find('#divfeedbsy').hide();
                 });

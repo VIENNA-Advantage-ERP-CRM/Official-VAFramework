@@ -149,9 +149,11 @@ namespace VIS.Models
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime Date { get; set; }
-
         public String Login1Data { get; set; }
         public string LoginLanguage { get; set; }
+        public string FilteredOrg { get; set; }
+
+      
     }
 
     /// <summary>

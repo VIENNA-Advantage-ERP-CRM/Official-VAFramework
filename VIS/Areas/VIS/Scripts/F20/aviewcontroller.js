@@ -1012,10 +1012,10 @@
                         if (comp instanceof VIS.Controls.IControl) {
                             var ve = comp;
                             if (noData)
-                                ve.setReadOnly(true && !mField.getIsAction());
+                                ve.setReadOnly(true && !(mField.getIsAction() && !mField.hasReadonlyLogic()));
                             else {
                                 //   mField.vo.tabReadOnly = this.gTab.getIsReadOnly();
-                                var rw = mField.getIsAction() || (mField.getIsEditable(true) && !this.gTab.getIsReadOnly());	//  r/w - check Context
+                                var rw = (mField.getIsAction() && !mField.hasReadonlyLogic())  || (mField.getIsEditable(true) && !this.gTab.getIsReadOnly());	//  r/w - check Context
 
 
 
@@ -1333,7 +1333,7 @@
         //check for defalut card in Action Params
         if (this.actionParams.Card_ID > 0) {
             this.gTab.getTableModel().setCardID(this.actionParams.Card_ID);
-            if (this.isCardRow && this.vCardView)
+            if (this.vCardView)
                 this.vCardView.cardID = this.actionParams.Card_ID;
 
         }
@@ -1649,7 +1649,7 @@
             if (this.getIsCardRow()) {
                 this.switchSingleRow();
                 this.aPanel.showHideViewIcon(this.aPanel.aSingle);
-                action = this.aSingle.aMulti.action;
+                action = this.aPanel.aMulti.action;
             }
         }
 

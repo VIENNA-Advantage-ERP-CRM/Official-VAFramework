@@ -346,7 +346,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
 
 
 .vis-setting-form {
-    padding: 1rem;
+    padding: 1rem 1rem 0;
     border-bottom: 1px solid rgba(var(--v-c-on-secondary), .5);
 }
 

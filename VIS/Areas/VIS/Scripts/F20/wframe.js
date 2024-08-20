@@ -821,7 +821,7 @@
 
             li.on(VIS.Events.onClick, function (e) {
                 mouseDown = false;
-                e.stopPropagation();
+                //e.stopPropagation();
                 if (fired && that.onAction && that.isEnabled) {
                     if (that.toggle) {
                         that.setPressed(!that.pressed);
