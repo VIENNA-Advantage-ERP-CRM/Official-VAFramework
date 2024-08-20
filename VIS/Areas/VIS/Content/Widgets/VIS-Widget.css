@@ -46,6 +46,7 @@
     z-index: 1;
     height: calc(100vh - 0px);
     border: 0.0625em solid #eee;
+    border-radius:6px;
 }
 
 .vis-w-workflow-Activity {
@@ -376,6 +377,7 @@
 .vis-w-workflowActivityDetails {
     padding: 0.625em;
     background-color: rgba(var(--v-c-common),1);
+    border-radius:6px;
 }
 
     .vis-w-workflowActivityDetails .divWorkflowActivity h3 {
@@ -917,6 +919,8 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 
 .vis-w-workflow-welcomfeed-cls {
     height: calc(100% - 54px);
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25em
 }
 
 .vis-workflow-pre-cls {
@@ -934,7 +938,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-welcomeScreenNoticeMainDiv {
     background-color: #f3f3f3;
     border: 1px solid rgba(0,0,0,.125);
-    border-radius: .25em;
+    border-radius: 6px;
 }
 
 .vis-secndDiv {
@@ -1001,7 +1005,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-RequestwelcomeScreenCls {
     background-color: #f3f3f3;
     border: 1px solid rgba(0,0,0,.125);
-    border-radius: .25em;
+    border-radius: 6px;
 }
 
 .vis-RequestWidth {
@@ -1050,6 +1054,18 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     display: flex;
 }
 /*Action Widgets*/
+.vis-a-actionsModelMain {
+    background-color: rgba(var(--v-c-on-secondary), 0.5);
+}
+.modal-content.vis-a-actionsMcontent {
+    border-radius: 7px;
+}
+.vis-a-actionsMcontent .vis-cardCls {
+    border-radius: 6px;
+}
+.vis-a-actionsMcontent .vis-w-workflow-welcomfeed-cls {
+    border-radius: 6px;
+}
 .vis-a-task-status-panel {
     height: 100%;
     width: 100%;

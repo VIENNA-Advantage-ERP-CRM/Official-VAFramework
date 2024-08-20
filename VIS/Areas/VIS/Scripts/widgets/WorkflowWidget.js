@@ -106,18 +106,15 @@
                 }
             });
             $hlnkTabDataRef_ID.on('click', $self.refreshWidget);
-            $txtSearch.on('change', searchFunction);
+            //$txtSearch.on('change', searchFunction);
             $zoom.on('click', function (e) {
                 var id = $(this).data("id");
                 zoom(id);
             });
             $txtSearch.on("keydown", function (e) {
                 if (e.keyCode == 13) {
-                    search = true;
-                    if (search) {
-                        search = false;
-                        //searchRecord();
-                    }
+                    showBusy(true);
+                    searchFunction();                    
                 }
             });
             $btnSearch.on('click', function () {
@@ -127,11 +124,11 @@
                 pageNo = 1;
                 getworkflowWidget(true, false);
                 //loadWindows();
-                $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                    $welcomeScreenFeedsLists.css('display', 'none');
-                    $row.css('display', 'none');
-                    $workflowActivitys.css('display', 'block').css('zindex', '2');
-                });
+                //$workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+                //    $welcomeScreenFeedsLists.css('display', 'none');
+                //    $row.css('display', 'none');
+                //    $workflowActivitys.css('display', 'block').css('zindex', '2');
+                //});
                 $backBtn_ID.on('click', function () {
                     $workflowActivitys.css('display', 'none').css('zindex', '2');
                     $welcomeScreenFeedsLists.css('display', 'block');
@@ -143,16 +140,18 @@
             });
             $cmbWindows.on('change', function (e) {
                 showBusy(true);
+                winNideID = $cmbWindows.val();
                 $countDiv_ID.empty();
                 $workflowWidgetDtls_ID.empty();
                 pageNo = 1;
                 getworkflowWidget(true, false);
                 //loadWindows();
-                $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                    $welcomeScreenFeedsLists.css('display', 'none');
-                    $row.css('display', 'none');
-                    $workflowActivitys.css('display', 'block').css('zindex', '2');
-                });
+                //$workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+                //    $welcomeScreenFeedsLists.css('display', 'none');
+                //    $row.css('display', 'none');
+                //    $workflowActivitys.css('display', 'block').css('zindex', '2');
+                //});
+                $workflowWidgetDtls_ID.scrollTop(0);
                 $backBtn_ID.on('click', function () {
                     $workflowActivitys.css('display', 'none').css('zindex', '2');
                     $welcomeScreenFeedsLists.css('display', 'block');
@@ -274,6 +273,7 @@
                     fulldata = [];
                     var reslt = JSON.parse(dyndata.result);
                     if (reslt) {
+                        $fstMainDiv_ID.find('#homeSearchWorkflow' + $self.AD_UserHomeWidgetID).val('');
                         $fstMainDiv_ID.find("#pnorecFound" + $self.AD_UserHomeWidgetID).css('display', 'none');
                         data = reslt.LstInfo;
                         maxCount = (data.length - 1);
@@ -326,7 +326,7 @@
             var date = null;
             date = Globalize.format(new Date(data[item].Created), "F", Globalize.cultureSelector);
 
-            ChldDiv += '<br>' + Priority + '</pre><div class="vis-w-feedDateTime vis-secondary-clr">'
+            ChldDiv += '<br>' + Priority + '</pre><div class="vis-w-feedDateTime vis-secondary-clr" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
                 + date + '</div></div></div>';
 
             dataIem.recordID = data[item].Record_ID;
@@ -366,14 +366,26 @@
                 success: function (result) {
                     if (result) {
                         result = JSON.parse(result);
+                        var windowExist = false;
                         $cmbWindows.empty();
                         $cmbWindows.append('<option value="0_0">' + msgs.SelectWindow + '</option>');
                         if (result && result.length > 0) {
                             for (let i = 0; i < result.length; i++) {
                                 $cmbWindows.append('<option value="' + result[i].AD_Window_ID + '_' + result[i].AD_Node_ID + '">' + result[i].WindowName + '</option>');
+                                if (result[i].AD_Window_ID + '_' + result[i].AD_Node_ID == winNideID) {
+                                    windowExist = true;
+                                }
+                            }
+                            if (windowExist == true) {
+                                $cmbWindows.val(winNideID);
+                            }
+                            else {
+                                winNideID = "0_0";
+                                $cmbWindows.val("0_0");
                             }
                         }
                         else {
+                            winNideID = "0_0";
                             $cmbWindows.val("0_0");
                         }
                     }
@@ -381,8 +393,7 @@
             });
         };
         //Get more data on Scroll 
-        function loadOnScroll(e) {
-            scrollWF = true;
+        function loadOnScroll(e) {            
             // do something
             if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
                 showBusy(true);
@@ -396,8 +407,9 @@
                 else {
                     refresh = true;
                     scrollWF = true;
-                }
-                showBusy(false);
+                    showBusy(false);
+                }                
+                e.stopPropagation();
             }
         };
         //Get more data on Scroll
@@ -474,7 +486,7 @@
                             var date = null;
                             date = Globalize.format(new Date(data[item].Created), "F", Globalize.cultureSelector);
 
-                            ChldDiv += '<br>' + Priority + '</pre><div class="vis-w-feedDateTime">'
+                            ChldDiv += '<br>' + Priority + '</pre><div class="vis-w-feedDateTime" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
                                 + date + '</div></div></div>';
                             //+ '<br>' + date + '</div></div></div>';
                             dataIem.recordID = data[item].Record_ID;
@@ -498,9 +510,11 @@
                                 $workflowActivitys.css('display', 'block').css('zindex', '2');
                             });
                         }
+                        scrollWF = true;
+                        showBusy(false);
                     }
                     else {
-
+                        showBusy(false);
                     }
                 }
             });
@@ -547,7 +561,7 @@
             var divWorkflowChecklist = null;
             var btnCheckList = null;
 
-            var divHeader = $("<div class='vis-w-workflowActivityDetails-Heading'>");// style='text-align:left;'
+            var divHeader = $("<div class='vis-w-workflowActivityDetails-Heading'>");
             divDetail.append(divHeader);
 
             var hHeader = $("<div id='VIS_backBtn_ID" + $self.AD_UserHomeWidgetID + "' style='cursor: pointer;' title='Back Window' class='vis vis-arrow-left'></div><h3 class='vis-workflow-h2-cls vis-w-txtBold ml-2 mb-0'>" + VIS.Msg.getMsg('Detail') + "</h3>");
@@ -661,6 +675,7 @@
                 p2.css('font-size', '0.875em');
                 p2.css('font-family', 'NoirPro-Regular');
                 p2.css('color', 'inherit');
+                p2.css('white-space', 'pre-wrap');
                 //p2.append(VIS.Msg.getMsg('Summary'));
                 //p2.append($("<br>"));
 
@@ -750,8 +765,111 @@
             //aOkA.append(VIS.Msg.getMsg('Done'));
             divAInpt.append($('<div class="vis-w-home-wf-answerBtn">').append(aOkA));
 
+            function okClick(aOk) {
+                if (aOk.data('clicked') == 'Y') {
+                    return;
+                }
+                aOk.data('clicked', 'Y');
+                // Digital signature work - Apply default sign at default location with selected status
+                if (window.VA055 && window.VADMS && info.ColName == 'VADMS_SignStatus') {
 
+                    var signData = {
+                        documentNo: docnameval[docnameval.length - 1],
+                        defaultReasonKey: $('[name="VADMS_SignStatus"]').children("option:selected").val(),
+                        defaultReason: $('[name="VADMS_SignStatus"]').children("option:selected").text(),
+                    };
 
+                    if (signData.defaultReasonKey == undefined || signData.defaultReasonKey == '' || signData.defaultReason == undefined || signData.defaultReason == '') {
+                        aOk.data('clicked', 'N');
+                        VIS.ADialog.info('VA055_ChooseStatus');
+                        return;
+                    }
+
+                    showBusy(true);
+                    $.post(VIS.Application.contextUrl + 'VADMS/Document/SignatureUsingWorkflow', signData, function (res) {                        
+                        if (res && res != 'null' && res.result == 'success') {                            
+                            adjust_size();
+                            lstDetailCtrls = [];
+                            selectedItems = [];
+                            showBusy(false);
+                        }
+                        else {
+                            aOk.data('clicked', 'N');
+                            showBusy(false);
+                            VIS.ADialog.error(res.result);
+                        }
+
+                    }, 'json').fail(function (jqXHR, exception) {
+                        showBusy(false);
+                        aOk.data('clicked', 'N');
+                        showBusy(false);
+                        VIS.ADialog.error(exception);
+                    });
+                }
+                else {
+                    var id = $(aOk).data("id");
+                    approveIt(id, aOk);
+                    //showBusy(false);
+                }
+            };
+            //Given Approve
+            var approveIt = function (index, aOK) {
+                var aOK = aOK;
+                showBusy(true);
+                for (var item in lstDetailCtrls) {
+                    try {
+                        if (index === parseInt(lstDetailCtrls[item].Index)) {
+                            var fwdTo = lstDetailCtrls[item].FwdCtrl.getValue();
+                            var msg = VIS.Utility.encodeText(lstDetailCtrls[item].MsgCtrl.val());
+                            var answer = null;
+                            if (lstDetailCtrls[item].Action == 'C') {
+                                var answer = lstDetailCtrls[item].AnswerCtrl.getValue();
+
+                            }
+                            var activitIDs = "";
+                            // if checkbox is selected, then join activity ID using comma splitter.
+                            if (selectedItems && selectedItems.length > 0) {
+                                for (var k = 0; k < selectedItems.length; k++) {
+                                    if (activitIDs.length > 0) {
+                                        activitIDs += ",";
+                                    }
+                                    activitIDs += selectedItems[k].split("_")[2];
+                                }
+                            }
+                            else {
+                                activitIDs = fulldata[index].AD_WF_Activity_ID;
+                            }
+
+                            // set window ID of activity
+                            windowID = fulldata[index].AD_Window_ID;
+                            showBusy(true);
+                            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "WFActivity/ApproveIt",
+                                { "activityID": activitIDs, "nodeID": fulldata[index].AD_Node_ID, "txtMsg": msg, "fwd": fwdTo, "answer": answer, "AD_Window_ID": windowID }, function apprvoIt(info) {                                    
+                                    if (info.result == '') {    
+                                        aOK.data('clicked', 'N');
+                                        adjust_size();
+                                        lstDetailCtrls = [];
+                                        selectedItems = [];
+                                        showBusy(false);
+                                    }
+                                    else {
+                                        VIS.ADialog.error(info.result);
+                                        aOK.data('clicked', 'N');
+                                        showBusy(false);
+                                    }
+                                });
+                            break;
+                        }
+                    }
+                    catch (e) {
+                        showBusy(false);
+                        VIS.ADialog.error("FillMandatory", true, "");
+                        aOK.data('clicked', 'N');
+                    }
+
+                }
+                aOK.data('clicked', 'N');
+            };
 
             var liFInput = $("<li>");
             ulA.append(liFInput);
@@ -828,26 +946,25 @@
                     aOkA.css('display', 'none');
                 }
             };
+            if (info.NodeAction == 'X' || info.NodeAction == 'W' || info.NodeAction == 'C') {
+                detailCtrl.AnswerCtrl.fireValueChanged = function () {
+                    if (detailCtrl.AnswerCtrl.getValue() == '' || detailCtrl.AnswerCtrl.getValue() == null) {
+                        detailCtrl.FwdCtrl.getControl().prop('disabled', '');
+                        detailCtrl.FwdCtrl.getBtn(0).prop('disabled', '');
+                        detailCtrl.FwdCtrl.getBtn(1).prop('disabled', '');
+                        aOkF.css('display', 'none');
+                        aOkA.css('display', 'none');
+                    }
+                    else {
+                        detailCtrl.FwdCtrl.getControl().prop('disabled', true);
+                        detailCtrl.FwdCtrl.getBtn(0).prop('disabled', true);
+                        detailCtrl.FwdCtrl.getBtn(1).prop('disabled', true);
+                        aOkF.css('display', 'none');
+                        aOkA.css('display', '');
+                    }
 
-            detailCtrl.AnswerCtrl.fireValueChanged = function () {
-                if (detailCtrl.AnswerCtrl.getValue() == '' || detailCtrl.AnswerCtrl.getValue() == null) {
-                    detailCtrl.FwdCtrl.getControl().prop('disabled', '');
-                    detailCtrl.FwdCtrl.getBtn(0).prop('disabled', '');
-                    detailCtrl.FwdCtrl.getBtn(1).prop('disabled', '');
-                    aOkF.css('display', 'none');
-                    aOkA.css('display', 'none');
-                }
-                else {
-                    detailCtrl.FwdCtrl.getControl().prop('disabled', true);
-                    detailCtrl.FwdCtrl.getBtn(0).prop('disabled', true);
-                    detailCtrl.FwdCtrl.getBtn(1).prop('disabled', true);
-                    aOkF.css('display', 'none');
-                    aOkA.css('display', '');
-                }
-
-            };
-
-
+                };
+            }
 
             lstDetailCtrls.push(detailCtrl);
 
@@ -1037,119 +1154,7 @@
             }
         };
 
-        function okClick(aOk) {
-            if (aOk.data('clicked') == 'Y') {
-                return;
-            }
-            aOk.data('clicked', 'Y');
-            // Digital signature work - Apply default sign at default location with selected status
-            if (window.VA055 && window.VADMS && info.ColName == 'VADMS_SignStatus') {
 
-                var signData = {
-                    documentNo: docnameval[docnameval.length - 1],
-                    defaultReasonKey: $('[name="VADMS_SignStatus"]').children("option:selected").val(),
-                    defaultReason: $('[name="VADMS_SignStatus"]').children("option:selected").text(),
-                };
-
-                if (signData.defaultReasonKey == undefined || signData.defaultReasonKey == '' || signData.defaultReason == undefined || signData.defaultReason == '') {
-                    aOk.data('clicked', 'N');
-                    VIS.ADialog.info('VA055_ChooseStatus');
-                    return;
-                }
-
-                setBusy(true);
-                $.post(VIS.Application.contextUrl + 'VADMS/Document/SignatureUsingWorkflow', signData, function (res) {
-                    setBusy(false);
-                    if (res && res != 'null' && res.result == 'success') {
-
-                        $("#divfeedbsy")[0].style.visibility = "hidden";
-                        divScroll.empty();
-                        adjust_size();
-                        lstDetailCtrls = [];
-                        selectedItems = [];
-
-                        loadWindows(true);
-                    }
-                    else {
-                        aOk.data('clicked', 'N');
-                        VIS.ADialog.error(res.result);
-                    }
-
-                }, 'json').fail(function (jqXHR, exception) {
-                    setBusy(false);
-                    aOk.data('clicked', 'N');
-                    VIS.ADialog.error(exception);
-                });
-            }
-            else {
-                var id = $(aOk).data("id");
-                approveIt(id, aOk);
-            }
-
-
-        };
-        //Given Approve
-        var approveIt = function (index, aOK) {
-            var aOK = aOK;
-            $("#divfeedbsy")[0].style.visibility = "visible";
-            for (var item in lstDetailCtrls) {
-                try {
-                    if (index === parseInt(lstDetailCtrls[item].Index)) {
-                        var fwdTo = lstDetailCtrls[item].FwdCtrl.getValue();
-                        var msg = VIS.Utility.encodeText(lstDetailCtrls[item].MsgCtrl.val());
-                        var answer = null;
-                        if (lstDetailCtrls[item].Action == 'C') {
-                            var answer = lstDetailCtrls[item].AnswerCtrl.getValue();
-
-                        }
-                        var activitIDs = "";
-                        // if checkbox is selected, then join activity ID using comma splitter.
-                        if (selectedItems && selectedItems.length > 0) {
-                            for (var k = 0; k < selectedItems.length; k++) {
-                                if (activitIDs.length > 0) {
-                                    activitIDs += ",";
-                                }
-                                activitIDs += selectedItems[k].split("_")[2];
-                            }
-                        }
-                        else {
-                            activitIDs = fulldata[index].AD_WF_Activity_ID;
-                        }
-
-                        // set window ID of activity
-                        windowID = fulldata[index].AD_Window_ID;
-                        showBusy(true);
-                        VIS.dataContext.getJSONData(VIS.Application.contextUrl + "WFActivity/ApproveIt",
-                            { "activityID": activitIDs, "nodeID": fulldata[index].AD_Node_ID, "txtMsg": msg, "fwd": fwdTo, "answer": answer, "AD_Window_ID": windowID }, function apprvoIt(info) {
-                                showBusy(false);
-                                if (info.result == '') {
-                                    $("#divfeedbsy")[0].style.visibility = "hidden";
-                                    aOK.data('clicked', 'N');
-                                    divScroll.empty();
-                                    adjust_size();
-                                    lstDetailCtrls = [];
-                                    selectedItems = [];
-                                    loadWindows(true);
-                                }
-                                else {
-                                    VIS.ADialog.error(info.result);
-                                    aOK.data('clicked', 'N');
-                                    $("#divfeedbsy")[0].style.visibility = "hidden";
-                                }
-                            });
-                        break;
-                    }
-                }
-                catch (e) {
-                    setBusy(false);
-                    VIS.ADialog.error("FillMandatory", true, "");
-                    aOK.data('clicked', 'N');
-                    $("#divfeedbsy")[0].style.visibility = "hidden";
-                }
-
-            }
-            aOK.data('clicked', 'N');
-        };
         //Go to home page and refresh page
         var adjust_size = function () {
             showBusy(true);
@@ -1158,24 +1163,25 @@
             pageNo = 1;
             getworkflowWidget(true, false);
             //loadWindows();
-            showBusy(false);
+            
 
             $workflowActivitys.css('display', 'none').css('zindex', '2');
             $welcomeScreenFeedsLists.css('display', 'block');
             $row.css('display', 'block');
-            $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                showBusy(true);
-                getChld(e);
-                showBusy(false);
-                $welcomeScreenFeedsLists.css('display', 'none');
-                $row.css('display', 'none');
-                $workflowActivitys.css('display', 'block').css('zindex', '2');
-            });
+            //$workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+            //    showBusy(true);
+            //    getChld(e);
+            //    showBusy(false);
+            //    $welcomeScreenFeedsLists.css('display', 'none');
+            //    $row.css('display', 'none');
+            //    $workflowActivitys.css('display', 'block').css('zindex', '2');
+            //});
             $backBtn_ID.on('click', function () {
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
                 $welcomeScreenFeedsLists.css('display', 'block');
                 $row.css('display', 'block');
             });
+            showBusy(false);
         };
         var zoom = function (index) {
             //window id
@@ -1189,16 +1195,17 @@
             pageNo = 1;
             getworkflowWidget(true, false);
             //loadWindows();
-            $workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
-                $welcomeScreenFeedsLists.css('display', 'none');
-                $row.css('display', 'none');
-                $workflowActivitys.css('display', 'block').css('zindex', '2');
-            });
+            //$workflowWidgetDtls_ID.find(".vis-w-feedDetails").on('click', function (e) {
+            //    $welcomeScreenFeedsLists.css('display', 'none');
+            //    $row.css('display', 'none');
+            //    $workflowActivitys.css('display', 'block').css('zindex', '2');
+            //});
             $backBtn_ID.on('click', function () {
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
                 $welcomeScreenFeedsLists.css('display', 'block');
                 $row.css('display', 'block');
             });
+            $workflowWidgetDtls_ID.scrollTop(0);
         };
 
         //Refresh Widget
