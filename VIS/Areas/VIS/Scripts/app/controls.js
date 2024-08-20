@@ -7082,7 +7082,7 @@
                 if (window.geoplugin_countryCode)
                     success(geoplugin_countryCode());
                 else
-                    success("IN");
+                    success(navigator.language.split("-")[1]);
                // });
             },
             utilsScript: baseUrl + "Areas/ViennaBase/Scripts/tel_Input/utils.js?1638200991544"
