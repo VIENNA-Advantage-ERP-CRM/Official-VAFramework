@@ -1427,6 +1427,29 @@ li.vis-page-item-select {
 }
 
 
+.vis-ad-w-p-vc-ev-grid-abs {
+   position:absolute;
+   top:50px;
+   left:150px;
+   bottom:100px;
+   right:150px;
+   max-height:500px;
+   overflow:auto;
+   border:solid 1px blue;
+   display:block;
+   width:unset;
+   background:white;
+}
+
+
+.vis-ad-w-p-vc-ev-grid-abs-close {
+    position: absolute;
+    top:0;
+    right: 0;
+   width:25px;
+   height:25px;
+    display: block;
+}
 
 
 /* End Single */

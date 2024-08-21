@@ -913,6 +913,7 @@ input[type="radio"] {
         padding: 5px;
         display: flex;
         align-items: center;
+        flex-flow:column;
     }
         .vis-ev-col-ag-btn-list li:hover {
             background-color: rgba(var(--v-c-primary),1);
@@ -927,6 +928,12 @@ input[type="radio"] {
     .vis-ev-col-ag-btn-list .vis-ev-col-linkbutton{
         color:inherit;
     }
+    .vis-ev-col-ag-btn-list .vis-ev-col-wrap-button {
+        color: inherit;
+    }
+
+
+
     /*/Multiselect/*/
     .vis_home_filterorgs button {
         outline: none;

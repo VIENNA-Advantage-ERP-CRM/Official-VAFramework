@@ -1890,7 +1890,7 @@
         return retValue;
     };
 
-    VIS.GridController.prototype.dataDeleteAsync = function () {
+    VIS.GridController.prototype.dataDeleteAsync = function (isFromCompisteView) {
         this.aPanel.setBusy(true);
         var that = this;
         that.gTab.getTableModel().dataDeleteAsync(that.vTable.getSelection(true), that.gTab.currentRow).then(function (info) {
@@ -1899,8 +1899,12 @@
             if (that.vTabPanel && that.vTabPanel.curTabPanel && that.vTabPanel.curTabPanel.isCheckListFill) {
                 that.vTabPanel.curTabPanel.setisCheckListFill(false);
             }
-
-            that.refreshTabPanelData(that.gTab.getRecord_ID(),'D');
+            if (isFromCompisteView) {
+                that.aPanel.setStatusInfo(null, 'D');
+            }
+            else {
+                that.refreshTabPanelData(that.gTab.getRecord_ID(), 'D');
+            }
             that.dynamicDisplay(-1);
             that.aPanel.setBusy(false);
         });
@@ -2061,8 +2065,8 @@
         var p = this.getVPanel();
 
         if (this.isIncludedGCVisible || true) {
-            //p1.width("0%");//  css('width:50%');;
-            //p.width("99%");//  css('width:50%');;
+            p1.width("0%");//  css('width:50%');;
+            p.width("99%");//  css('width:50%');;
             p1.hide();
             p.css("display", "block");// .show();
             this.getVCardPanel().hide();
@@ -2076,6 +2080,10 @@
                 this.vHeaderPanel.sizeChangedListner.onSizeChanged();
         }
         this.dynamicDisplay(-1);
+
+        //chnage to popup
+       // this.vGridPanel.showAsPopUp(p);
+
         
     };
 

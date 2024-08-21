@@ -162,6 +162,11 @@ namespace VIS.Controllers
                         ctx.SetAD_Session_ID(oldctx.GetAD_Session_ID());
                         ctx.SetSecureKey(oldctx.GetSecureKey());
                         Session.Timeout = 17;
+                        if (oldctx.GetContext("NewSession") == "Y")
+                        {
+                            VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx, Session.SessionID);
+                            createNew = true;
+                        }
                     }
                     else
                     {

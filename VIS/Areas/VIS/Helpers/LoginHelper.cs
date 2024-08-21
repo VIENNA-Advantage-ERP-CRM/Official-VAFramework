@@ -732,6 +732,8 @@ namespace VIS.Helpers
 
             ctx.SetContext("#M_Warehouse_ID", model.Login2Model.Warehouse);
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);
+
+            ctxLogIn.SetContext("NewSession","Y");
             //ctx.SetContext("#Date", model.Login2Model.Date.ToString());
             return ctx;
         }

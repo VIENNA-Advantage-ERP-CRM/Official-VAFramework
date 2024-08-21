@@ -4268,7 +4268,7 @@
     };   //
 
     // Common function for set footer
-    APanel.prototype.setStatusInfo = function (record_ID) {
+    APanel.prototype.setStatusInfo = function (record_ID, action) {
         if (!record_ID && this.curTab) {
             record_ID = this.curTab.getRecord_ID();
         }
@@ -4281,7 +4281,14 @@
                 if (tht && tht.statusBar)
                     tht.statusBar.setInfo(err);
             });
+
+        // refesh current tab panel
+        if (action && action != '' && this.curGC) {
+            this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), action)
+        }
     }
+
+    
 
     /**
      *	Set Status Line to text
