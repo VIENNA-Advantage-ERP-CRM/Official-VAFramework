@@ -596,7 +596,7 @@
                         $('#vis_editHome').show();
                     }
                     return;
-                  
+
                 } else {
                     $('#vis_editHome').hide();
                 }

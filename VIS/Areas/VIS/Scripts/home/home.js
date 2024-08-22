@@ -418,6 +418,7 @@
                 //$home.find('.vis-home-leftPanel').append($container);
                 $home.find('.vis-widget-body').empty();
                 $home.find('#divfeedbsy').show();
+                widgetList = {};
                 var url = VIS.Application.contextUrl + "Home/GetWidgets";
                 VIS.dataContext.getJSONData(url, { windowID: 0 }, function (result) {
                     $home.find('#divfeedbsy').hide();
