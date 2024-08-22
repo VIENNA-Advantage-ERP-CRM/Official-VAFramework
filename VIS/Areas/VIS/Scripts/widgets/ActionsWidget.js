@@ -203,7 +203,7 @@
 
     };
 
-    //Must implement dispose
+    //Must implement dispose 
     VIS.ActionsWidget.prototype.dispose = function () {
         this.disposeComponent();
         //call frame dispose function

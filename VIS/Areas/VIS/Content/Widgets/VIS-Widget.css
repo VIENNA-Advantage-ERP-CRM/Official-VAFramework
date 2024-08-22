@@ -920,7 +920,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-w-workflow-welcomfeed-cls {
     height: calc(100% - 54px);
     /*border: 1px solid rgba(0,0,0,.125);*/
-    border-radius: .25em
+    border-radius: .25em;
 }
 
 .vis-workflow-pre-cls {

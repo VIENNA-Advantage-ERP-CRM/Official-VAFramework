@@ -107,7 +107,7 @@
             });
             $hlnkTabDataRef_ID.on('click', $self.refreshWidget);
             //$txtSearch.on('change', searchFunction);
-            $zoom.on('click', function (e) {
+            $zoom.on('click', function (e) { 
                 var id = $(this).data("id");
                 zoom(id);
             });
