@@ -2583,7 +2583,10 @@ namespace VIS.Helpers
                 if (!string.IsNullOrEmpty(condition))
                 {
                     sqlIn.sql = sqlIn.sql.Substring(0, sqlIn.sql.LastIndexOf("WHERE")) + " " + condition;
-                    sqlIn.sqlDirect = sqlIn.sqlDirect.Substring(0, sqlIn.sqlDirect.LastIndexOf("WHERE")) + " " + condition;
+                    if (sqlIn.sqlDirect != "")
+                    {
+                        sqlIn.sqlDirect = sqlIn.sqlDirect.Substring(0, sqlIn.sqlDirect.LastIndexOf("WHERE")) + " " + condition;
+                    }
                     sqlCount = sqlCount.Substring(0, sqlCount.LastIndexOf("WHERE")) + " " + condition;
                 }
             }
@@ -3132,7 +3135,7 @@ namespace VIS.Helpers
             _info.Append(" ")
                 .Append(Msg.Translate(ctx, "CreatedBy"))
                 .Append(": ").Append(user.GetName())
-                .Append(" - ").Append(String.Format("{0:D}", dse.Created)).Append("<br/>");
+                .Append(" - ").Append("@Created@").Append("<br/>");
 
             if (!dse.Created.Equals(dse.Updated)
                 || !dse.CreatedBy.Equals(dse.UpdatedBy))
@@ -3142,10 +3145,12 @@ namespace VIS.Helpers
                 _info.Append(" ")
                     .Append(Msg.Translate(ctx, "UpdatedBy"))
                     .Append(": ").Append(user.GetName())
-                    .Append(" - ").Append(String.Format("{0:D}", dse.Updated)).Append("<br/>");
+                    .Append(" - ").Append("@Updated@").Append("<br/>");
             }
             if (dse.Info != null && dse.Info.Length > 0)
                 _info.Append("<br/> (").Append(dse.Info).Append(")");
+            outt.Updated = new DateTime(Convert.ToDateTime(dse.Updated).Ticks, DateTimeKind.Utc);
+            outt.Created = new DateTime(Convert.ToDateTime(dse.Created).Ticks, DateTimeKind.Utc);
 
             outt.Info = _info.ToString();
             //	Only Client Preference can view Change Log
@@ -3899,7 +3904,10 @@ namespace VIS.Helpers
             if (!String.IsNullOrEmpty(gt.OrderByClause))
             {
                 SQL += " ORDER BY " + gt.OrderByClause;
-                SQL_Direct += " ORDER BY " + gt.OrderByClause;
+                if (SQL_Direct != "")
+                {
+                    SQL_Direct += " ORDER BY " + gt.OrderByClause;
+                }
             }
 
 

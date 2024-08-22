@@ -315,7 +315,7 @@ namespace VAdvantage.Model
         /// Delete all Lines
         /// </summary>
         /// <returns>bool type true if deleted</returns>
-        public bool DeleteLines()
+        public bool DeleteLines(bool isFilter)
         {
             string sqlQry = "DELETE FROM AD_UserQueryLine WHERE AD_UserQuery_ID=" + GetAD_UserQuery_ID();
             int no = DataBase.DB.ExecuteQuery(sqlQry, null, null);

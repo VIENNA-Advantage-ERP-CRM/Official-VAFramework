@@ -5,6 +5,7 @@
         var alignmentHorizontal = false;
 
         this.headerItems = null;
+        this.imgCtrl = [];
         var $self = this;
         this.evt = { sender: 'hdrpnl', isHorizontal: false, width: '0px', height: '0px', isClosed: true };
 
@@ -15,6 +16,7 @@
         this.windowNo = 0;
         this.dynamicStyle = [];
         this.styleTag = document.createElement('style');
+        this.agGroupToAGInsMap = {};
 
         var $slider = $parentRoot.find('.fa-angle-double-left');
 
@@ -158,6 +160,20 @@
                         //    }
                         //}
                     }
+
+                    var fieldStyleLogic = this.controls[i].headerStyleLogic;
+                    if (fieldStyleLogic && fieldStyleLogic.toLower().indexOf("?") > -1 && fieldStyleLogic.length > 0) {
+                        fieldStyleLogic = this.evaluateStyleLogic(fieldStyleLogic);
+                        if (fieldStyleLogic) {
+                            fieldStyleLogic = " " + fieldStyleLogic + " ";
+                        }
+                        else {
+                            fieldStyleLogic = '';
+                        }
+                    } else {
+                        fieldStyleLogic = '';
+                    }
+                    $root.find('.vis-w-p-header-Label-f').eq(i).attr('style', fieldStyleLogic);
                 }
             }
             else {
@@ -199,6 +215,7 @@
                     if (!fontSize) {
                         fontSize = '';
                     }
+                    var fieldStyleLogic = headerItem.FieldStyleLogic;          
                     var $div = null;
                     var $divIcon = null;
                     //$divIconSpan = $('<span>');
@@ -234,7 +251,7 @@
                         if (headerItem.FieldLabelStyle) {
                             $divLabel.attr('style', headerItem.FieldLabelStyle);
                         }
-                        
+   
                         var $sapn = "";
                         if (ContentFieldValue.indexOf('fa-') > -1 || ContentFieldValue.indexOf('vis-') > -1) {
                             if (ContentFieldValue.indexOf('fa-') != -1 && ContentFieldValue.indexOf('fa ') == -1) {
@@ -328,11 +345,18 @@
                                         $self.gTab.getWindowNo() + "_" + headerSeqNo, headerItem.IsAlwaysExecute, null, headerItem.AD_GridLayoutItems_ID);
                                 } else {
                                     iControl = VIS.VControlFactory.getReadOnlyControl(this.curTab, mField, false, false, false);
+                               
                                 }
 
                                 if (mField.getDisplayType() == VIS.DisplayType.Button) {
                                     if (iControl != null)
                                         iControl.addActionListner(this);
+                                } else if (mField.getDisplayType() == VIS.DisplayType.Image) {
+                                    if (iControl != null) {
+                                        this.imgCtrl.push(iControl);
+                                        iControl.setReadOnly(false);
+                                        iControl.addVetoableChangeListener(this);
+                                    }
                                 }
 
                                 var dynamicFieldValue = this.applyCustomUIForFieldValue(headerSeqNo, startCol, startRow, mField);
@@ -343,7 +367,7 @@
                                 // THis array is used when user navigate from one record to another.
                                 controls["control"] = iControl;
 
-                                var objctrls = { "control": controls, "field": mField };
+                                var objctrls = { "control": controls, "field": mField, "headerStyleLogic": fieldStyleLogic};
 
                                 var $spanIcon = $('<span></span>');
                                 var icon = VIS.VControlFactory.getIcon(mField);
@@ -358,10 +382,13 @@
 
                                 var colValue = getFieldValue(mField);
 
+                                var agInstance = $self.addActionGroup(mField, iControl);
+                               
+
                                 styleArr = mField.getHeaderStyle();
                                 if (styleArr && styleArr.length > 0)
                                     styleArr = styleArr.split("|");
-
+                                
                                 if (styleArr && styleArr.length > 0) {
                                     for (var j = 0; j < styleArr.length; j++) {
                                         if (styleArr[j].indexOf("@img::") > -1 || styleArr[j].indexOf("@span::") > -1) {
@@ -514,8 +541,18 @@
                                     setValue(colValue, iControl, mField);
                                     /****END ******  Set what do you want to show? Icon OR Label OR Both OR None*/
                                 }
-                                $divLabel.append(iControl.getControl());
-                                $containerDiv.append($div);
+
+                                
+                                //* action Group */
+                                if (agInstance && agInstance.getIsNewIns()) {
+                                    $divLabel.append(agInstance.getControl());
+                                    $containerDiv.append($div);
+                                }
+                                else if (!agInstance) {
+                                    $divLabel.append(iControl.getControl());
+                                    $containerDiv.append($div);
+                                }
+                               
                                 $self.controls.push(objctrls);
                             }
                         }
@@ -523,6 +560,26 @@
                 }
             }
         };
+
+
+        this.addActionGroup=function(mField, editor) {
+
+            if (mField.getAGName() == "" || mField.getDisplayType() != VIS.DisplayType.Button || editor == null) {
+                return null;
+            }
+            var agName = mField.getAGName().replace(' ', '');
+            var agIns = null;
+            if (agName in this.agGroupToAGInsMap) {
+                agIns = this.agGroupToAGInsMap[agName];
+            }
+            else {
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle());
+                this.agGroupToAGInsMap[agName] = agIns;
+            }
+            agIns.addItem(editor);
+            return agIns;
+        }
+
 
         var setValue = function (colValue, iControl, mField) {
             if (colValue) {
@@ -536,8 +593,8 @@
                     if (oldValue == colValue) {
                         iControl.refreshImage(colValue);
                     }
-                }
-              
+                }           
+
 
                 else if (iControl.format) {
                     colValue = iControl.format.GetFormatAmount(iControl.format.GetFormatedValue(colValue), "init", VIS.Env.isDecimalPoint());
@@ -593,7 +650,7 @@
                 }
                 //	Date
                 else if (VIS.DisplayType.IsDate(displayType)) {
-                    colValue = colValue.toString().replace('Z', ''); //remove Universal time
+                    //colValue = colValue.toString().replace('Z', ''); //remove Universal time
                     if (displayType == VIS.DisplayType.DateTime) {
                         colValue = new Date(colValue).toLocaleString();
                     }
@@ -812,7 +869,7 @@
         var backColor = this.curTab.getHeaderBackColor();
         this.setHeaderLayout(this.curTab, backColor);
         var root = this.getRoot();
-
+        this.imgCtrl = [];
         var $parentRoot = this.getParent();
         var rootClass = "vis-w-p-Header-Root-v";//Fixed Class for vertical Alignment
         var alignmentHorizontal = this.curTab.getHeaderHorizontal();
@@ -878,6 +935,28 @@
         this.sizeChangedListner = lstnr;
     };
 
+    HeaderPanel.prototype.evaluateStyleLogic = function (styleLogic) {
+        var arr = styleLogic.split(',');
+        var ret = null;
+        for (var j = 0; j < arr.length; j++) {
+            var cArr = arr[j].split("?");
+            if (cArr.length != 2)
+                continue;
+            if (VIS.Evaluator.evaluateLogic(this, cArr[0])) {
+                ret = cArr[1];
+                break;
+            }
+        }
+        return ret;
+    };
+
+    HeaderPanel.prototype.getValueAsString = function (vName) {
+        var value = VIS.context.getWindowContext(this.curTab.vo.windowNo, this.curTab.vo.tabNo, vName, true);      
+        if (!value) {
+            return '';
+        }
+        return value.toString();
+    };
 
     /**
          * Create class that include  settings to be applied on Field Group Container
@@ -1032,6 +1111,7 @@
         this.isChild = isChild;
         this.pRowData = null;
         if (this.isChild) {
+
             var self = this;
             this.curTab.getTableModel().getRowFromDB(this.curTab.getCurrentRow(), function (data) {
                 self.pRowData = data;
@@ -1080,6 +1160,24 @@
     HeaderPanel.prototype.cmd_save = function (manual, callback) {
         return this.aPanel.cmd_save2(manual, this.curTab, this.curGC, this.aPanel, callback);
     }
+
+    HeaderPanel.prototype.setImgReadonly = function (isReadonly) {
+        if (this.imgCtrl) {
+            for (var i = 0; i < this.imgCtrl.length; i++) {
+                this.imgCtrl[i].setReadOnly(isReadonly);
+            }
+        }
+    }
+
+    HeaderPanel.prototype.vetoablechange = function (e) {
+        if (this.curGC != this.aPanel.curGC) {
+            return;
+        }
+
+        this.curGC.vetoablechange(e);
+        
+    };
+
     VIS.HeaderPanel = HeaderPanel;
 
 }(VIS, jQuery));

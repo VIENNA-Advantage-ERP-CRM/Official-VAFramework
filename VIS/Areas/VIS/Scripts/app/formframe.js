@@ -201,6 +201,12 @@
         }
     };
 
+    AForm.prototype.refreshWidget = function () {
+        if (this.mPanel && this.mPanel.refreshWidget) {
+            this.mPanel.refreshWidget();
+        }
+    };
+
     AForm.prototype.refresh = function () {
         if (this.mPanel && this.mPanel.refresh) {
             this.mPanel.refresh();

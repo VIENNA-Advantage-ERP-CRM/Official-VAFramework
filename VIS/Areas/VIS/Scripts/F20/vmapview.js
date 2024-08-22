@@ -12,12 +12,15 @@
         var bounds = null;
         var cmbLoc = null;
         var cmbDiv = null;
+        var geocoder = null;
         var searchText = $('<Input id="pac-input" class="controls" type="text" placeholder="Search Box"/>');
         var self = this;
         this.locationID = '';
 
         var isMapAvail = window.google && google.maps ? true : false;
-        var geocoder = new google.maps.Geocoder();
+        if (isMapAvail) {
+            geocoder = new google.maps.Geocoder();
+        }
 
 
 

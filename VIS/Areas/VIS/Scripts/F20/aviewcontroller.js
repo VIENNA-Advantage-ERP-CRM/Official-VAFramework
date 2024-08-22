@@ -510,9 +510,9 @@
             this.aPanel.vTabbedPane.refresh();
     };
 
-    VIS.GridController.prototype.refreshTabPanelData = function (record_ID) {
+    VIS.GridController.prototype.refreshTabPanelData = function (record_ID, action) {
         if (this.vTabPanel) {//&& $(this.vTabPanel.getRoot()).is(':visible')) 
-            this.vTabPanel.refreshPanelData(record_ID, this.gTab.getTableModel().getRow(this.gTab.getCurrentRow()));
+            this.vTabPanel.refreshPanelData(record_ID, this.gTab.getTableModel().getRow(this.gTab.getCurrentRow()), action);
         }
     };
 
@@ -1012,10 +1012,10 @@
                         if (comp instanceof VIS.Controls.IControl) {
                             var ve = comp;
                             if (noData)
-                                ve.setReadOnly(true && !mField.getIsAction());
+                                ve.setReadOnly(true && !(mField.getIsAction() && !mField.hasReadonlyLogic()));
                             else {
                                 //   mField.vo.tabReadOnly = this.gTab.getIsReadOnly();
-                                var rw = mField.getIsAction() || (mField.getIsEditable(true) && !this.gTab.getIsReadOnly());	//  r/w - check Context
+                                var rw = (mField.getIsAction() && !mField.hasReadonlyLogic())  || (mField.getIsEditable(true) && !this.gTab.getIsReadOnly());	//  r/w - check Context
 
 
 
@@ -1222,9 +1222,10 @@
 
         
         oldGC = oldGC || {};
+        //
+        var isWPanel = this.aPanel instanceof VIS.APanel;
 
-
-        if (this.displayAsIncludedGC) {
+        if (this.displayAsIncludedGC && isWPanel) {
             var tdArea = this.aPanel.getLayout();
             this.setUI(false);
             this.getRoot().detach();
@@ -1233,22 +1234,28 @@
             this.aPanel.getIncludedEmptyArea().css({ 'display': 'none' });
             tdArea.addClass('vis-ad-w-p-center-view-height');
             tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
-           
         }
-        else if (this.gTab.getIncluded_Tab_ID() == 0) {
+        else if (this.gTab.getIncluded_Tab_ID() == 0 && isWPanel) {
             var olcIncludedTab = oldGC.vIncludedGC;
+            var tdArea = this.aPanel.getLayout();
             if (olcIncludedTab) {
-                var tdArea = olcIncludedTab.aPanel.getLayout();
                 olcIncludedTab.setUI(false);
                 olcIncludedTab.getRoot().detach();
                 this.aPanel.getIncludedEmptyArea().css({ 'display': 'none' });
                 tdArea.addClass('vis-ad-w-p-center-view-height');
                 tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
             }
-
+            else if (!this.multiTabView) {
+                if (!tdArea.hasClass('vis-ad-w-p-center-view-height')) {
+                    tdArea.addClass('vis-ad-w-p-center-view-height');
+                    tdArea.find('.vis-ad-w-p-vc-editview').css("position", "absolute");
+                }
+            }
         }
+        
         //vIncludedGC
         this.isIncludedGCVisible = false;
+        var gridAutoHeight = false; // grid fixed height body
 
         if (this.vIncludedGC) { // has included GC
             //  this.vIncludedGC.vTable.activate();
@@ -1257,18 +1264,39 @@
             var tdArea = this.aPanel.getLayout();
             tdArea.removeClass('vis-ad-w-p-center-view-height');
             tdArea.find('.vis-ad-w-p-vc-editview').css("position", "unset");
+          
+            gridAutoHeight = true;
 
         }
+        else if (this.gTab.getHasPanel() && this.gTab.getIsTPBottomAligned()) { // show single scroll in case of tab panel bottom aligned also
+            var tdArea = this.aPanel.getLayout();
+            tdArea.removeClass('vis-ad-w-p-center-view-height');
+            tdArea.find('.vis-ad-w-p-vc-editview').css("position", "unset");
+           
+            gridAutoHeight = true;
+        }
 
-        this.vTable.activate(this.multiTabView || this.vIncludedGC !=null);
+        this.vTable.activate(this.multiTabView || gridAutoHeight);
         this.vTable.setReadOnly(false);
+        if (this.vCardView)
+        this.vCardView.setIsFixedBody(!(this.multiTabView || gridAutoHeight));
+
+        
 
         this.activateTree();
 
 
         //Overwrite setting according to actionParam
         this.actionParams = aParams;
-        
+
+        if (this.vHeaderPanel) {
+            this.vHeaderPanel.setImgReadonly(false);
+        }
+        else if (this.aPanel.vHeaderPanel) {
+            this.aPanel.vHeaderPanel.setImgReadonly(true);
+        }
+
+
         if (aParams) {
             if (aParams.IsHideHeaderPanel != null) {
                 if (aParams.IsHideHeaderPanel) {
@@ -1305,11 +1333,16 @@
         //check for defalut card in Action Params
         if (this.actionParams.Card_ID > 0) {
             this.gTab.getTableModel().setCardID(this.actionParams.Card_ID);
-            if (this.isCardRow && this.vCardView)
+            if (this.vCardView)
                 this.vCardView.cardID = this.actionParams.Card_ID;
 
         }
     };
+
+    VIS.GridController.prototype.resetActionParams = function () {
+        this.actionParams = { };
+        this.gTab.actionParams = this.actionParams;
+    }
 
     VIS.GridController.prototype.multiRowResize = function () {
         if (!this.singleRow && !this.isCardRow)
@@ -1543,10 +1576,8 @@
         this.skipInserting = false; // reset 
 
         this.dynamicDisplay(-1);
-        //if (this.aPanel.$parentWindow.onLoad) {  //Change/Update for:Zoom from workflow on home page
-        //    this.aPanel.$parentWindow.onLoad();
-        //    this.aPanel.$parentWindow.onLoad = null;
-        //}
+
+        this.resetActionParams();
     };
 
     VIS.GridController.prototype.checkInsertNewRow = function () {
@@ -1594,23 +1625,39 @@
      * */
     VIS.GridController.prototype.setNewRecordLayout = function () {
         var newRecordView = this.gTab.getNewRecordView();
+        var action = "";
+        var type = "";
+        if (this.getIsMultiRow()) {
+            type = NEWRECORDVIEW_GridLayout;
+        } else {
+            type = NEWRECORDVIEW_SingleRowLayout;
+        }
+
         if (newRecordView == NEWRECORDVIEW_SingleRowLayout) {
             this.switchSingleRow();
             this.aPanel.showHideViewIcon(this.aPanel.aSingle);
+            action = this.aPanel.aSingle.action;
 
         }
         else if (newRecordView == NEWRECORDVIEW_GridLayout) {
             this.isNewClick = true; // use for stop requery data
             this.switchMultiRow();
             this.aPanel.showHideViewIcon(this.aPanel.aMulti);
+            action = this.aPanel.aMulti.action;
         }
         else {
             if (this.getIsCardRow()) {
                 this.switchSingleRow();
                 this.aPanel.showHideViewIcon(this.aPanel.aSingle);
-
+                action = this.aPanel.aMulti.action;
             }
         }
+
+        
+        if (type != newRecordView) {
+            this.aPanel.setTabstackview(action);
+        }
+       
     };
     /*
       - Handle Control's Change value Event
@@ -1809,6 +1856,7 @@
         }
 
         this.isDefaultFocusSet = true;
+        this.refreshTabPanelData(-1,'N');
     };
 
     VIS.GridController.prototype.canDeleteRecords = function () {
@@ -1833,7 +1881,7 @@
             this.vTabPanel.curTabPanel.setisCheckListFill(false);
         }
 
-        this.refreshTabPanelData(this.gTab.getRecord_ID());
+        this.refreshTabPanelData(this.gTab.getRecord_ID(),'D');
         this.dynamicDisplay(-1);
         return retValue;
     };
@@ -1848,7 +1896,7 @@
                 that.vTabPanel.curTabPanel.setisCheckListFill(false);
             }
 
-            that.refreshTabPanelData(that.gTab.getRecord_ID());
+            that.refreshTabPanelData(that.gTab.getRecord_ID(),'D');
             that.dynamicDisplay(-1);
             that.aPanel.setBusy(false);
         });
@@ -1894,6 +1942,7 @@
         this.dynamicDisplay(-1);
         this.notifyDependents();
         this.vTable.refreshUndo();
+        this.refreshTabPanelData(this.gTab.getRecord_ID(),'U');
     };
 
     /**
@@ -2023,23 +2072,12 @@
                 this.vHeaderPanel.sizeChangedListner.onSizeChanged();
         }
         this.dynamicDisplay(-1);
-        //if (this.aPanel.getTabSuffix() == 'b') {
-        //    this.aPanel.getLayout().removeClass('vis-ad-w-p-center-view-height');
-        //    this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "unset");
-        //}
+        
     };
 
     VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {
         if (this.singleRow || this.isCardRow) {
 
-            //if (this.isCardRow && !this.isNewClick) {
-
-            //    this.gTab.getTableModel().setCurrentPage(1);
-            //}
-            //if (this.aPanel.getTabSuffix() == 'b') {
-            //    this.aPanel.getLayout().addClass('vis-ad-w-p-center-view-height');
-            //    this.getRoot().find('.vis-ad-w-p-vc-editview').css("position", "absolute");
-            //}
 
             this.singleRow = false;
             this.isCardRow = false;

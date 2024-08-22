@@ -1292,7 +1292,7 @@
         };
 
         $ctrl.on(VIS.Events.onClick, function (evt) { //click handler
-            evt.stopPropagation();
+            //evt.stopPropagation();
 
             var isReport = null;
             // self.invokeActionPerformed({ source: self });
@@ -3675,6 +3675,12 @@
                 this.lastDisplay = "";
                 this.oldValue = null;
                 this.value = null;
+            }
+
+            if (this.lastDisplay.startsWith("<") && this.lastDisplay.endsWith(">")
+                && newValue > 0 && this.mField.getIsInserting()) {
+                newValue = -1;
+                this.lastDisplay = "";
             }
 
             this.value = newValue;

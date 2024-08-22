@@ -157,14 +157,21 @@ VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
         newGC.setMnemonics(true);
     }
 
+    this.oldLastTabIndex = this.oldTabIndex;
     this.oldTabIndex = index;
-
+    
     return true;
 
     };
 
-    VIS.VTabbedPane.prototype.restoreTabChange = function () {
-        this.oldTabIndex = -1;
+    VIS.VTabbedPane.prototype.restoreTabChange = function (currentTabIndex) {
+        //this.oldTabIndex = -1;
+        if (currentTabIndex != undefined || currentTabIndex != null) {
+            this.oldTabIndex = currentTabIndex;
+        } else {
+            this.oldTabIndex = -1;
+            this.oldLastTabIndex = -1;
+        }
     };
 
 
@@ -210,6 +217,10 @@ VIS.VTabbedPane.prototype.getTabElement = function (action) {
 VIS.VTabbedPane.prototype.getSelectedIndex = function () {
     return this.oldTabIndex;
 };
+
+    VIS.VTabbedPane.prototype.getSelectedOldIndex = function () {
+        return this.oldLastTabIndex;
+    };
 
 VIS.VTabbedPane.prototype.sizeChanged = function (height, width) {
     for (var prop in this.Items) {

@@ -541,6 +541,7 @@
                         this.curGC.dataIgnore();
                     }
                 }
+                this.curGC.activateTree();
             }
 
             this.reQuery();

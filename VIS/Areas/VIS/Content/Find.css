@@ -473,7 +473,7 @@ html[dir="rtl"] .vis-advancedSearchInput > label, html[dir="rtl"] .vis-advancedS
     margin-left: 0;
 }
 .vis-advanedSearch-AddFilterWrap a {
-    margin-bottom: 0;
+    margin-left: 10px;
     font-weight: normal;
     text-decoration: underline !important;
     color: rgba(var(--v-c-primary), 1);
@@ -505,6 +505,7 @@ html[dir="rtl"] .vis-advancedSearchInput > label, html[dir="rtl"] .vis-advancedS
 
 .vis-advancedSearch-AddFilter {
 cursor:pointer;
+margin-right:5px;
 }
 
 .vis-batchUpdate-footerbtn {
@@ -548,4 +549,66 @@ cursor:pointer;
 
 .vis-batchUpdate-font {
     font-size: 15px;
+}
+
+.vis-landingpage-row {
+    padding: 6px 8px;
+    
+}
+
+.vis-landingPage-btn {
+    margin: 10px 0;
+}
+.vis-landingPage-table thead tr th {
+    background-color: rgba(var(--v-c-secondary), 1);
+    padding: 6px 8px;
+}
+
+.vis-landingPage-table tbody tr {
+    border-bottom: 1px solid rgba(var(--v-c-secondary), 1);
+}
+
+.vis-landingPage-table {
+    width: 100%;
+}
+
+.vis-landingPage-main {
+    /*max-height: 430px;
+    overflow-y: auto;*/
+}
+.vis-landingPage-table thead {
+    position: sticky;
+    top: 0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.vis-landingPage-table thead, .vis-landingPage-table tbody, .vis-landingPage-table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.vis-landingPageSetting-Heading {
+    margin-bottom: 10px;
+}
+
+.vis-landingPage-table tbody {
+    display: block;
+    overflow-y: auto;
+    height: 328px;
+}
+
+.vis-landingPage-lblmsg {
+    align-items: flex-end;
+    margin-left: 10px;
+}
+
+.vis-landingPage-tr-border {
+    width: 100%;
+    border: none;
+}
+
+.vis-landingPage-root {
+    height: 100%;
 }

@@ -198,7 +198,7 @@ namespace VIS.Helpers
                             Token2FAKey = userSKey + ADUserID.ToString() + decKey;
                         }
                         string url = Util.GetValueOfString(HttpContext.Current.Request.Url.AbsoluteUri).Replace("VIS/Account/JsonLogin", "").Replace("https://", "").Replace("http://", "");
-                        setupInfo = tfa.GenerateSetupCode("VA ", url + " " + userSKey, Token2FAKey, 150, 150);
+                        setupInfo = tfa.GenerateSetupCode("VA ", url + " " + userSKey, Token2FAKey,false,3);
                         model.Login1Model.QRCodeURL = setupInfo.QrCodeSetupImageUrl;
                     }
                     else if (method2FA == X_AD_User.TWOFAMETHOD_VAMobileApp)
@@ -725,6 +725,9 @@ namespace VIS.Helpers
 
             ctx.SetContext("#AD_Org_ID", model.Login2Model.Org);
             ctx.SetContext("#AD_Org_Name", model.Login2Model.OrgName);
+
+            //new entry commaseprated orgids
+            ctx.SetContext("#AD_FilteredOrg", model.Login2Model.FilteredOrg);
 
             ctx.SetContext("#M_Warehouse_ID", model.Login2Model.Warehouse);
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);

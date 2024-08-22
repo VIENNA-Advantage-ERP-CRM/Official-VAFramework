@@ -44,6 +44,7 @@
             sizeChanged: sizeChanged,
             startWindow: startWindow,
             startForm: startForm,
+            startProcess: startProcess,
             startCFrame: startCFrame,
             startActionInNewTab: startActionInNewTab,
             closeFrame:closeFrame
@@ -146,15 +147,16 @@
          *@param id id of window
          *@param qry Query Object
          */
-        function startWindow(id, qry) {
+        function startWindow(id, qry,aParams) {
 
             var sel = null;
             if (id.toString().indexOf("&") != -1) {
-                sel = id.split("&")[1];
-                id = id.split("&")[0];
+                sel = id.split("&")[1]; //record id
+                id = id.split("&")[0]; // window id
             }
 
             var windw = showWindow(id); //form cache
+            /*check later , potential error for cached window(refresh) */
             if (windw && !windw.hasError) {
                 windw.refreshData();
                 windw.show($mainConatiner, addShortcut);
@@ -164,8 +166,8 @@
             }
 
             windw = new VIS.AWindow();
-
-            if (windw.initWindow(id, qry, addShortcut, ACTION_WINDOW, sel)) {
+            
+            if (windw.initWindow(id, qry, addShortcut, ACTION_WINDOW, sel, aParams)) {
                 windw.onClosed = removeShortcut;
                 windw.show($mainConatiner);
                 registerView(windw);
