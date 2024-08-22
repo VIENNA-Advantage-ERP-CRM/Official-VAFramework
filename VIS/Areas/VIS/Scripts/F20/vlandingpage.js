@@ -452,6 +452,7 @@
             $root.find('.vis-widget-body').empty();
             var url = VIS.Application.contextUrl + "Home/GetWidgets";
             $busy.show();
+            widgetList = {};
             VIS.dataContext.getJSONData(url, { windowID: windowID }, function (result) {
                 $busy.hide();
                 if (!result) {

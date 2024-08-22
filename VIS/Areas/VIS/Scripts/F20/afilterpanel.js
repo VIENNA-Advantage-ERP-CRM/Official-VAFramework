@@ -3,12 +3,11 @@
     // var tmpfp = document.querySelector('#vis-ad-fptmp').content;// $("#vis-ad-windowtmp");
 
     function getTemplate(winNo) {
+
+
+
         var str =
             ' <div class="vis-fp-bodycontent vis-formouterwrpdiv">                                                 ' +
-            '     <div class="vis-fp-viwall mt-2 pb-2 mb-3" >                                                  ' +
-            '         <div class="input-group vis-input-wrap m-0"><div class="vis-control-wrap vis-fb-txtFilterName"></div></div>                               ' +
-            '         <div class="ml-2 d-flex"><i class="saveFilter vis vis-save fa-2x" title="' + VIS.Msg.getMsg("VISSave") + '"></i><i title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-2 fa-2x"></i><i title="' + VIS.Msg.getMsg("VISClearName") + '" class="clearName vis vis-close ml-2 fa-2x" style="display:none"></i></div>                                                              '+
-            '     </div>                                                                       ' +
             '  <div class="vis-fp-datawrap"> ' +
             '     <div class="vis-fp-static-ctrlwrp">                                          ' +
             ' <div class="vis-fp-static-ctrlinnerwrp"></div>    ' +
@@ -93,7 +92,7 @@
             '</div>' +
 
             /*'  <div class="mb-2 vis-fp-static-ctrlwrp"><div class="input-group vis-input-wrap"><div class="vis-control-wrap vis-fb-txtFilterName"><label><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div></div> ' +*/
-            '  <div class="vis-fb-savebtnPnl"><span class="vis-fp-cc-ClearAll vis-fp-cc-addbutton">' + VIS.Msg.getMsg("ClearAll") + '</span></div> ' +
+            '  <div class="vis-fb-savebtnPnl"><div><i class="saveFilter vis vis-save fa-2x" title="' + VIS.Msg.getMsg("VISSave") + '"></i><i title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-2 fa-2x"></i></div><i title="' + VIS.Msg.getMsg("ClearAll") +'" class="vis vis-clear-filter fa-2x ml-2 btnClearAll"></i></div> ' +
             '</div > ' +
             ' </div>';
         return str;
@@ -124,14 +123,27 @@
         var divFullDay = divDynamic.find("#divFullDay_" + windowNo);
         var btnSave = bodyDiv.find('.saveFilter');
         var btnSaveAs = bodyDiv.find('.saveAs');
-        var btnClearAll = bodyDiv.find('.vis-fp-cc-ClearAll');
-        var btnClearName = bodyDiv.find('.clearName');
-        var txtFilterName = $('<input type="text" placeholder="Enter filter name..." class="w-100 visfilterName">');
+        var btnClearAll = bodyDiv.find('.btnClearAll');
+        var btnClose = $('<button class="ml-1" style="border: 1px solid rgba(var(--v-c-primary),1);color: rgba(var(--v-c-primary),1); background:rgba(var(--v-c-on-primary),1); " ><i class="fa fa-times"></i></button>');
+        var txtFilterName = $('<input type="text" placeholder="' + VIS.Msg.getMsg("VISEnterFilterName") + '" class="w-100 visfilterName">');
         var isSaveAs = false;
+        var btnOk = $('<button><i class="fa fa-check"></i></button>');
+        //var ulPopup = $('<div class="m-2 d-flex"><div class="input-group vis-input-wrap m-0"><div class="vis-control-wrap vis-fb-txtFilterName"><label for="Name"><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div><div>');
 
-        /*bodyDiv.find('.vis-fb-savebtnPnl').append(btnSave);*/
-        bodyDiv.find('.vis-fb-txtFilterName').prepend(txtFilterName);
+        var ulPopup = $(`<div class="vis-fp-popup">
+                        <div class="vis-fp-popup-content">                            
+                        </div>
+                        <div class="vis-fp-popup-arrow"></div>
+                    </div>`);
 
+
+
+
+      
+        ulPopup.find('.vis-fp-popup-content').prepend(txtFilterName);
+        ulPopup.find('.vis-fp-popup-content').append(btnOk).append(btnClose);
+
+        bodyDiv.append(ulPopup);
 
         var dynamicDiv = divDynamic.find("#divDynamic_" + windowNo);
         var chkDynamic = divDynamic.find("#chkDynamic_" + windowNo);
@@ -275,10 +287,13 @@
                                 continue;
                             }
                             var tabindex = inputType.data('tabindex');
+                            if (tabindex == "undefined") {
+                                tabindex = Number(self.cmbTabs.find('option:first').val());
+                            }
                             self.fillColumns(tabindex);
                             //self.cmbTabs.val(self.cmbTabs.find('option[tabid="' + tabindex + '"]').val());
 
-                            var pasedVal = context.parseWhereCondition(col, VIS.Query.prototype.EQUAL, inputType.data('id'), null, null, inputType.data('tabindex'));
+                            var pasedVal = context.parseWhereCondition(col, VIS.Query.prototype.EQUAL, inputType.data('id').toString(), null, null, tabindex);
 
                             if (whereClause != '') {
                                 whereClause += " OR " + pasedVal;
@@ -288,7 +303,7 @@
                             }
                         }
 
-                        self.fillColumns(0);
+                        self.fillColumns(Number(self.cmbTabs.find('option:first').val()));
 
                         if (whereClause != '') {
                             whereClause += ")";
@@ -591,6 +606,23 @@
         });
 
         btnSave.on('click', function () {
+            if (self.curTab.searchText != "") {
+                btnOk.click();
+            } else {
+                const buttonOffset = $(this).offset();
+                const buttonHeight = $(this).outerHeight();
+                const popupHeight = bodyDiv.find('.vis-fp-popup').outerHeight();
+                const buttonWidth = $(this).outerWidth();
+                const popupWidth = bodyDiv.find('.vis-fp-popup').outerWidth();
+                bodyDiv.find('.vis-fp-popup').css({
+                    top: buttonOffset.top - (popupHeight + buttonHeight) - buttonHeight, // Position above the button
+                    left: buttonOffset.left - (buttonWidth / 2)+5// Center the popup horizontally relative to the button
+                }).fadeIn(200);
+            }
+        });
+        
+
+        btnOk.on('click', function () {
             var advanceSearch = self.curTab.searchCode;
             var searchText = self.curTab.searchText;
             if (isSaveAs) {
@@ -644,40 +676,67 @@
                 async: false,
                 data: JSON.stringify(obj)
             }).done(function (json) {
-                isSaveAs = false;
-                btnClearName.hide();
-                btnSaveAs.show();
-                txtFilterName.removeClass('vis-filterNameReadonly');
+                bodyDiv.find('.vis-fp-popup').fadeOut(200);
+                btnSaveAs.addClass('vis-fp-btnDisable');
+                btnSaveAs.show();   
+                //txtFilterName.removeClass('vis-filterNameReadonly');
                 no = parseInt(json);
                 self.curTab.searchCode = where;
                 self.curTab.searchText = searchText;
                 self.curTab.userQueryID = no;
                 toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+                self.curGC.aPanel.setAdvancedSerachText(false, searchText);
+                isSaveAs = false;
             })
-
 
         });
 
         btnSaveAs.on('click', function () {
-            btnSaveAs.hide();
-            btnClearName.show();
+            const buttonOffset = $(this).offset();
+            const buttonHeight = $(this).outerHeight();
+            const popupHeight = bodyDiv.find('.vis-fp-popup').outerHeight();
+            const buttonWidth = $(this).outerWidth();
+            const popupWidth = bodyDiv.find('.vis-fp-popup').outerWidth();
+            bodyDiv.find('.vis-fp-popup').css({
+                top: buttonOffset.top - (popupHeight + buttonHeight) - buttonHeight, // Position above the button
+                left: buttonOffset.left - (buttonWidth / 2)+5// Center the popup horizontally relative to the button
+            }).fadeIn(200);
+
+            //btnSaveAs.hide();            
             txtFilterName.val('');
             isSaveAs = true;
-            txtFilterName.removeClass('vis-filterNameReadonly');
+            //txtFilterName.removeClass('vis-filterNameReadonly');
         });
 
-        btnClearName.on('click', function () {
-            btnSaveAs.show();
-            btnClearName.hide();
+        btnClose.on('click', function () {
+            bodyDiv.find('.vis-fp-popup').fadeOut(200);
+            //btnSaveAs.show();
             isSaveAs = false;
             txtFilterName.val(self.curTab.searchText);
-            if (txtFilterName.val() !="") {
-                txtFilterName.addClass('vis-filterNameReadonly');
+            if (self.curTab.searchText == "") {
+                btnSaveAs.addClass('vis-fp-btnDisable');
             }
+            //if (txtFilterName.val() !="") {
+            //    txtFilterName.addClass('vis-filterNameReadonly');
+            //}
 
         });
 
+
+        $(document).click(function (event) {
+            if (!$(event.target).closest('.vis-fp-popup, .saveFilter, .saveAs').length) {
+                bodyDiv.find('.vis-fp-popup').fadeOut(200);
+                isSaveAs = false;
+                txtFilterName.val(self.curTab.searchText);
+                if (self.curTab.searchText == "") {
+                    btnSaveAs.addClass('vis-fp-btnDisable');
+                }
+            }
+        });
+
+
         btnClearAll.on('click', function () {
+            btnSaveAs.addClass('vis-fp-btnDisable');
             self.curGC.aPanel.removeSearchOnDelete();
         });
 
@@ -1207,7 +1266,7 @@
         }
 
         function addDynRow(colName, colValue, optr, optrName,
-            value1Name, value1Value, value2Name, value2Value, fullDay, tabindex) {
+            value1Name, value1Value, value2Name, value2Value, fullDay, tabindex, fromAdvance) {
 
             if (dsAdvanceData == null)
                 dsAdvanceData = {};
@@ -1226,7 +1285,7 @@
 
             if (self.curTab.searchText == '') {
                 txtFilterName.val('');
-                txtFilterName.removeClass('vis-filterNameReadonly');
+                //txtFilterName.removeClass('vis-filterNameReadonly');
             }
 
             //txtFilterName.show();
@@ -1259,7 +1318,7 @@
             });
 
 
-            refreshDynFiltersUI(colValue);
+            refreshDynFiltersUI(colValue, fromAdvance);
         };
 
         function deleteDynRow(colValue) {
@@ -1412,13 +1471,14 @@
             setControlNullValue(true);
         }
 
-        this.setFilterLineAdvance = function (id) {
+        this.setFilterLineAdvance = function (id, fromAdvance) {
             if (id < 1) {
                 return;
             }
             var dr = null;
             txtFilterName.val(self.curTab.searchText);
-            txtFilterName.addClass('vis-filterNameReadonly');
+            btnSaveAs.removeClass('vis-fp-btnDisable');
+            //txtFilterName.addClass('vis-filterNameReadonly');
 
             dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ASearch/GetQueryLines", { "UserQuery_ID": id, isFilter: true }, null);
             dsAdvanceData = {};
@@ -1431,18 +1491,19 @@
                 var tabIndex = self.cmbTabs.find('option[tabid="' + tabID + '"]').val() || 0;               
                 self.fillColumns(tabIndex);
                 addDynRow(dr[i].KEYNAME, dr[i].KEYVALUE, optr, optrName,
-                    dr[i].VALUE1NAME, dr[i].VALUE1VALUE, dr[i].VALUE2NAME, dr[i].VALUE2VALUE, dr[i]["FULLDAY"], tabIndex);
+                    dr[i].VALUE1NAME, dr[i].VALUE1VALUE, dr[i].VALUE2NAME, dr[i].VALUE2VALUE, dr[i]["FULLDAY"], tabIndex, fromAdvance);
 
             }
 
-            self.fillColumns(0);
+            self.fillColumns(Number(self.cmbTabs.find('option:first').val()));
         }
 
         this.removeAdvance = function () {
             //txtFilterName.show();
             isSaveAs = false;
             txtFilterName.val('');
-            txtFilterName.removeClass('vis-filterNameReadonly');
+            btnSaveAs.addClass('vis-fp-btnDisable');
+            //txtFilterName.removeClass('vis-filterNameReadonly');
             dsAdvanceData = {};
             dsFilterData = [];
             divDynFilters.find('.vis-fp-currntrcrds').remove(); 

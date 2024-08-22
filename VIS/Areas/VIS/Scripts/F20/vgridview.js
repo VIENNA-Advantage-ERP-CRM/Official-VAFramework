@@ -733,8 +733,11 @@
                         if (l && VIS.DisplayType.List == l.displayType) {
 
                             var hue = Math.floor(Math.random() * (360 - 0)) + 0;
-                            var v = Math.floor(Math.random() * (75 - 60 + 1)) + 60; //Math.floor(Math.random() * 16) + 75;
+                            var v = Math.floor(Math.random() * 16) + 80; //Math.floor(Math.random() * (75 - 60 + 1)) + 60;
                             var pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
+
+                            var pastelClr = 'hsl(' + hue + ', 100%,' + (v-50) + '%)';
+
 
                             var lType = l.getLovIconType(val, true);
 
@@ -760,7 +763,7 @@
                                     strDiv += "<div class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'> " + listIcon + "</div> ";
                                 }
                                 else {
-                                    strDiv += "<div style='background-color:" + pastel +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
+                                    strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
                                 }
                                 strDiv += "<span> " + d + "</span ><div>";
                             }
@@ -775,7 +778,7 @@
                                     strDiv += "<div class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'> " + listIcon + "</div> ";
                                 }
                                 else {
-                                    strDiv += "<div style='background-color:" + pastel +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
+                                    strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
                                 }
                                 strDiv += "<div>";
                             }
@@ -808,8 +811,11 @@
                                 for (var c = 0; c < d.length; c++) {
                                     //random pastel color generator 
                                     var hue = Math.floor(Math.random() * (360 - 0)) + 0;
-                                    var v = Math.floor(Math.random() * (75 - 60 + 1)) + 60; //Math.floor(Math.random() * 16) + 75;
+                                    var v = Math.floor(Math.random() * 16) + 80; //Math.floor(Math.random() * (75 - 60 + 1)) + 60;
                                     var pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
+                                    var pastelClr = 'hsl(' + hue + ', 100%,' + (v-50) + '%)';
+
+                                        
 
                                     if (d[c].trim().length > 0) {
                                         //If highlightChar is not found, then get it from first item encounterd.
@@ -825,17 +831,17 @@
                                         //we will Display highlightChar
                                         if (c > 0 && img.indexOf("nothing.png") > -1 && highlightChar.length > 0) {
 
-                                            strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
+                                            strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
                                         }
                                         strDiv += "<span>" + d[c] + "</span>";
                                     } else if (img.indexOf("nothing.png") > -1 && highlightChar.length > 0) {
-                                        strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
+                                        strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
                                     }
 
                                     //If image found, then display that image.
                                     if (c == 0 || img.indexOf("nothing.png") > -1) {
                                         if (img.indexOf("nothing.png") == -1) {
-                                            strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'"
+                                            strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'"
                                                 + " > <img src='" + img +
                                                 "'></div > ";
                                             // "' onerror='this.style.display=\"none\"' ></img></div > ";

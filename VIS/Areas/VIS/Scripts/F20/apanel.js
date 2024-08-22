@@ -1150,6 +1150,7 @@
             if (show && hasDefault) {
                 $btnClrSearch.css('visibility', 'visible');
                 $imgdownSearch.css('visibility', 'visible');
+                $txtSearch.attr('readonly', 'readonly');
             }
             else if (show && !hasDefault) {
                 $btnClrSearch.css('visibility', 'hidden');
@@ -1159,6 +1160,7 @@
                 $btnClrSearch.css('visibility', 'hidden');
                 $imgdownSearch.css('visibility', 'hidden');
             }
+           
         };
 
         this.setSearchFocus = function (focus) {
@@ -3580,13 +3582,17 @@
                     }
                 }
 
+                var AD_UserQuery_ID = 0;
+                if (this.actionParams && this.actionParams.AD_UserQuery_ID) {
+                    AD_UserQuery_ID = this.actionParams.AD_UserQuery_ID;
+                }
 
                 this.curTab.getTableModel().setCurrentPage(1);
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
                     
-                    this.clearSearchText();
-                    
-                    this.setDefaultSearch(gc);
+                    this.clearSearchText();                   
+
+                    this.setDefaultSearch(gc, AD_UserQuery_ID);
 
                     if ((this.actionParams.TabWhereClause||'') != '') { // check if param has where clause or not
                         var query = new VIS.Query(this.curTab.getTableName(), false);
@@ -3597,7 +3603,7 @@
                     gc.query(this.curTab.getOnlyCurrentDays(), 0, false);	//	updated
                 }
                 else {
-                    this.setDefaultSearch(gc);
+                    this.setDefaultSearch(gc, AD_UserQuery_ID);
                 }
             }
             
@@ -3753,6 +3759,10 @@
             this.hideActionbar(false);
         };
 
+        if (this.actionParams.AD_UserQuery_ID) {
+            this.curGC.aFilterPanel.setFilterLineAdvance(this.actionParams.AD_UserQuery_ID, true);
+        }
+
 
         this.actionParams = {}; //clear 
 
@@ -3770,20 +3780,25 @@
 
     };
 
-    APanel.prototype.setDefaultSearch = function (gc) {
+    APanel.prototype.setDefaultSearch = function (gc, AD_UserQuery_ID) {
 
         var $selfpanel = this;
 
         var sqlUserSearch = "VIS_117";
-
         var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", this.curTab.getAD_Tab_ID());
-        param[1] = new VIS.DB.SqlParam("@AD_User_ID", parseInt(this.ctx.getAD_User_ID()));
-        param[2] = new VIS.DB.SqlParam("@AD_Tab_ID1", this.curTab.getAD_Tab_ID());
-        param[3] = new VIS.DB.SqlParam("@AD_User_ID1", parseInt(this.ctx.getAD_User_ID()));
-        param[4] = new VIS.DB.SqlParam("@AD_Client_ID", parseInt(this.ctx.getAD_Client_ID()));
-        param[5] = new VIS.DB.SqlParam("@AD_Tab_ID2", this.curTab.getAD_Tab_ID());
-        param[6] = new VIS.DB.SqlParam("@AD_Table_ID", this.curTab.getAD_Table_ID());
+        if (AD_UserQuery_ID>0) {
+            sqlUserSearch = "VIS_159";
+            param[0] = new VIS.DB.SqlParam("@AD_UserQuery_ID", AD_UserQuery_ID);            
+
+        } else {
+            param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", this.curTab.getAD_Tab_ID());
+            param[1] = new VIS.DB.SqlParam("@AD_User_ID", parseInt(this.ctx.getAD_User_ID()));
+            param[2] = new VIS.DB.SqlParam("@AD_Tab_ID1", this.curTab.getAD_Tab_ID());
+            param[3] = new VIS.DB.SqlParam("@AD_User_ID1", parseInt(this.ctx.getAD_User_ID()));
+            param[4] = new VIS.DB.SqlParam("@AD_Client_ID", parseInt(this.ctx.getAD_Client_ID()));
+            param[5] = new VIS.DB.SqlParam("@AD_Tab_ID2", this.curTab.getAD_Tab_ID());
+            param[6] = new VIS.DB.SqlParam("@AD_Table_ID", this.curTab.getAD_Table_ID());
+        }
 
         var data = executeDataSet(sqlUserSearch, param);
 
@@ -3801,8 +3816,10 @@
                         $selfpanel.defaultSearch = false;
                         $selfpanel.curTab.searchText = data.tables[0].rows[i].cells["name"];
                         toastr.success(VIS.Msg.getMsg("DefaultSerachExist"), '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
+
                     }
                 }
+
                 if (!$selfpanel.curTab.hasSavedAdvancedSearch) {
                     //var query = new VIS.Query($selfpanel.curTab.getTableName(), true);
                     //$selfpanel.curTab.setQuery(query);

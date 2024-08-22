@@ -272,7 +272,7 @@
         }
         //add
         if (this.tabPanels.length < 1) {
-            self.setSize(0);
+            this.setSize(0);
             return;
         }
         this.setSize(this.width);
