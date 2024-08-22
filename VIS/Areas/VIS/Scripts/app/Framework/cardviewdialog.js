@@ -3015,10 +3015,14 @@
                     return;
                 }
                 DivCradStep2.find('.vis-v-rowcol').hide();
-                if ($(e.target).hasClass('grdDiv')) {
-                    e.preventDefault();
-                    ViewBlockAddDelRowCol(e);
-                }
+                    if ($(e.target).hasClass('grdDiv')) {
+                        e.preventDefault();
+                        ViewBlockAddDelRowCol(e);
+                        txtStyleLogic.removeClass('vis-disable-event');
+                    }
+                    else {
+                        txtStyleLogic.addClass('vis-disable-event');
+                    }
 
                 divTopNavigator.find('[command="Merge"]').parent().hide();
                 divTopNavigator.find('[command="ShowImg"]').parent().hide();
@@ -3074,11 +3078,6 @@
                     else {
                         divTopNavigator.find('[command="Show"]').parent().hide();
                             divTopNavigator.find('[command="Hide"]').parent().hide();
-                        if ($(e.target)[0].innerText.length > 0 && $(e.target)[0].innerText && $(e.target).attr('query').length <= 0) {
-                            txtStyleLogic.removeClass('vis-disable-event');
-                        } else {
-                            txtStyleLogic.addClass('vis-disable-event');
-                        }
                         if ($(e.target).closest('.fieldGroup').length > 0) {
                             var target = $(e.target).closest('.fieldGroup').find('.fieldLbl');
                             var displayType = mTab.getFieldById(Number(target.attr('fieldid'))).getDisplayType();
