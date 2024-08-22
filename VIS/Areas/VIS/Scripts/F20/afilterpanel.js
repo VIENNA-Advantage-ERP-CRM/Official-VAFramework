@@ -679,7 +679,7 @@
                 data: JSON.stringify(obj)
             }).done(function (json) {
                 bodyDiv.find('.vis-fp-popup').fadeOut(200);
-                btnSaveAs.addClass('vis-fp-btnDisable');
+                //btnSaveAs.addClass('vis-fp-btnDisable');
                 btnSaveAs.show();   
                 //txtFilterName.removeClass('vis-filterNameReadonly');
                 no = parseInt(json);

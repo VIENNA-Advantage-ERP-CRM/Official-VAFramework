@@ -134,7 +134,7 @@ namespace VIS.Models
                 sql += " WHERE AD_WidgetSize.isActive='Y' AND AD_Widget.isActive='Y' AND AD_Widget_Access.isActive='Y' AND AD_Widget_Access.AD_Role_ID=" + ctx.GetAD_Role_ID();
             if(windowID > 0)
             {
-                sql += " AND window='Y'";
+                sql += " AND IsWindow='Y'";
             }
             else
             {
