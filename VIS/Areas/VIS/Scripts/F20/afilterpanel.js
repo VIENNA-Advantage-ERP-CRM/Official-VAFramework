@@ -108,6 +108,7 @@
         var dsFilterData = [];
         var bodyDiv = $(tmp);
         var divCtrlWrap = bodyDiv.find(".vis-fp-datawrap");
+        var overLay = $('<div class="vis-fp-overlay"></div>');
         var divStatic = bodyDiv.find(".vis-fp-static-ctrlwrp");
         var divStaticInner = bodyDiv.find(".vis-fp-static-ctrlinnerwrp");
         var btnViewAll = bodyDiv.find(".vis-fp-viwall");
@@ -146,6 +147,7 @@
         ulPopup.find('.vis-fp-popup-content').append(btnOk).append(btnClose);
 
         bodyDiv.append(ulPopup);
+        bodyDiv.append(overLay);
 
         var dynamicDiv = divDynamic.find("#divDynamic_" + windowNo);
         var chkDynamic = divDynamic.find("#chkDynamic_" + windowNo);
@@ -611,6 +613,7 @@
             if (self.curTab.searchText != "") {
                 btnOk.click();
             } else {
+                overLay.show();
                 const buttonOffset = $(this).offset();
                 const buttonHeight = $(this).outerHeight();
                 const popupHeight = bodyDiv.find('.vis-fp-popup').outerHeight();
@@ -694,6 +697,7 @@
         });
 
         btnSaveAs.on('click', function () {
+            overLay.show();
             const buttonOffset = $(this).offset();
             const buttonHeight = $(this).outerHeight();
             const popupHeight = bodyDiv.find('.vis-fp-popup').outerHeight();
@@ -711,6 +715,7 @@
         });
 
         btnClose.on('click', function () {
+            overLay.hide();
             bodyDiv.find('.vis-fp-popup').fadeOut(200);
             //btnSaveAs.show();
             isSaveAs = false;
@@ -725,7 +730,7 @@
         });
 
 
-        $(document).click(function (event) {
+        overLay.click(function (event) {
             if (!$(event.target).closest('.vis-fp-popup, .saveFilter, .saveAs').length) {
                 bodyDiv.find('.vis-fp-popup').fadeOut(200);
                 isSaveAs = false;
@@ -733,6 +738,7 @@
                 if (self.curTab.searchText == "") {
                     btnSaveAs.addClass('vis-fp-btnDisable');
                 }
+                overLay.hide();
             }
         });
 
