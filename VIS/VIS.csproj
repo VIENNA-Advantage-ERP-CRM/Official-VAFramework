@@ -683,7 +683,6 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\recordaccessdialog.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\recordShared.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\sms.js" />
-    <Content Include="Areas\VIS\Scripts\app\Framework\dynamicWidget.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\treemaintenance.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\UploadAmountDimension.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\userpreference.js" />
@@ -772,6 +771,7 @@
     <Content Include="Areas\VIS\Scripts\VIS1_0.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS2_0.min.js" />
     <Content Include="Areas\VIS\Scripts\widgets\ActionsWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\dynamicWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\NoticeWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\RequestWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\WorkflowWidget.js" />
