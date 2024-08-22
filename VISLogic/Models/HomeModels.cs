@@ -535,10 +535,12 @@ namespace VIS.Models
                             string badgeCount = Util.GetValueOfString(DB.ExecuteScalar(badgeSql));
                             ActionParams obj = new ActionParams
                             {
-                                TabWhereClause = Util.GetValueOfString(code),
+                                //TabWhereClause = Util.GetValueOfString(code),
+                                AD_UserQuery_ID = Util.GetValueOfInt(row[i]["AD_UserQuery_ID"]),
                                 Card_ID = Util.GetValueOfString(AD_CardView_ID),
                                 TabLayout = Util.GetValueOfString(tabLayout),
-                                TabIndex = Util.GetValueOfString(0)
+                                TabIndex = Util.GetValueOfString(0),
+                                IsShowFilterPanel=true
                             };
                             DynamicWidget l = new DynamicWidget()
                             {
