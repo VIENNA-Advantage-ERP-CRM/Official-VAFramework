@@ -474,9 +474,47 @@ namespace VAdvantage.Process
                                                 {
                                                     if (!String.IsNullOrEmpty(colValue.ToString()))
                                                     {
-                                                        MTable fkTable = columns[cols].GetFKTable(); //Get the Parent table of the FK Column
-                                                        if (fkTable != null)
-                                                            GetForeignData(fkTable, new ExportDataRecords() { AD_Table_ID = fkTable.GetAD_Table_ID(), Record_ID = Convert.ToInt32(colValue) });
+                                                        MTable fkTable = null;
+                                                        //Check If Column Type is MultiSearch
+                                                        if (columns[cols].GetAD_Reference_ID() == DisplayType.MultiKey && colValue != null)
+                                                        {
+                                                            int fkTblID = 0;
+                                                            if (refVID > 0)
+                                                            {
+                                                                fkTblID = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_Table_ID FROM AD_Ref_Table WHERE AD_Reference_ID=" + refVID));
+                                                            }
+                                                            else
+                                                            {
+                                                                fkTblID = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_Table_ID FROM AD_Table WHERE TableName='" + columns[cols].GetColumnName().Remove(columns[cols].GetColumnName().Length - 3) + "'"));
+                                                            }
+
+                                                            if (fkTblID > 0)
+                                                            {
+                                                                fkTable = MTable.Get(GetCtx(), fkTblID);
+                                                                List<string> multiKeys = colValue.ToString().Split(',').ToList();
+                                                                StringBuilder fkExpIDs = new StringBuilder();
+                                                                foreach (string key in multiKeys)
+                                                                {
+                                                                    if (key.Trim().Length > 0)
+                                                                    {
+                                                                        GetForeignData(fkTable, new ExportDataRecords() { AD_Table_ID = fkTable.GetAD_Table_ID(), Record_ID = Convert.ToInt32(key) });
+                                                                        fkExpIDs.Append(DB.ExecuteScalar("SELECT Export_ID FROM " + fkTable.GetTableName() + " WHERE " + fkTable.GetKeyColumns()[0] + "=" + key) + ",");
+                                                                    }
+                                                                }
+                                                                var drs = ds.Tables[tableName].Select(tableName + "_ID=" + exportdata.Record_ID);
+                                                                if (drs != null && drs.Length > 0)
+                                                                {
+                                                                    drs[0][columns[cols].GetColumnName()] = fkExpIDs.ToString().TrimEnd(',');
+                                                                }
+                                                            }
+                                                        }
+
+                                                        else
+                                                        {
+                                                            fkTable = columns[cols].GetFKTable(); //Get the Parent table of the FK Column
+                                                            if (fkTable != null)
+                                                                GetForeignData(fkTable, new ExportDataRecords() { AD_Table_ID = fkTable.GetAD_Table_ID(), Record_ID = Convert.ToInt32(colValue) });
+                                                        }
                                                     }
                                                 }
                                             }
@@ -696,7 +734,7 @@ namespace VAdvantage.Process
         {
             List<ExportDataRecords> list = new List<ExportDataRecords>();
 
-            String _sql = "SELECT AD_Table_ID, Record_ID,AD_ColOne_ID FROM AD_ExportData WHERE IsActive = 'Y' AND AD_ModuleInfo_ID = @AD_ModuleInfo_ID ";
+            String _sql = "SELECT AD_Table_ID, Record_ID,AD_ColOne_ID FROM AD_ExportData WHERE IsActive = 'Y' AND AD_ModuleInfo_ID = @AD_ModuleInfo_ID AND AD_Table_ID=1002423 AND Record_ID IN (1000008)";
 
             SqlParameter[] param = new SqlParameter[1];
             param[0] = new SqlParameter("@AD_ModuleInfo_ID", _AD_ModuleInfo_ID);
