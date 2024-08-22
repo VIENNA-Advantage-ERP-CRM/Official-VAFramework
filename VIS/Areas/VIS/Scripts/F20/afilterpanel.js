@@ -123,9 +123,11 @@
         var divFullDay = divDynamic.find("#divFullDay_" + windowNo);
         var btnSave = bodyDiv.find('.saveFilter');
         var btnSaveAs = bodyDiv.find('.saveAs');
+
         var btnClearAll = bodyDiv.find('.btnClearAll');
         var btnClose = $('<button class="ml-1" style="border: 1px solid rgba(var(--v-c-primary),1);color: rgba(var(--v-c-primary),1); background:rgba(var(--v-c-on-primary),1); " ><i class="fa fa-times"></i></button>');
         var txtFilterName = $('<input type="text" placeholder="' + VIS.Msg.getMsg("VISEnterFilterName") + '" class="w-100 visfilterName">');
+
         var isSaveAs = false;
         var btnOk = $('<button><i class="fa fa-check"></i></button>');
         //var ulPopup = $('<div class="m-2 d-flex"><div class="input-group vis-input-wrap m-0"><div class="vis-control-wrap vis-fb-txtFilterName"><label for="Name"><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div><div>');

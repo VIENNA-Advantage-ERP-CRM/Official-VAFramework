@@ -405,15 +405,22 @@
                 }
                 if ($(e.target).hasClass("vis-linkTxt") || $(e.target).hasClass("vis-nm-subMenuCat"))
                     return;
-                // remove active and show class to hide menu items
-                $($(e.target).parents(".vis-nav-show")[0]).removeClass("vis-nav-show");
-                $topHdrDiv.removeClass("vis-nm-active");
-                // start to open menu item
-                if ($(e.target).is('a')) {
-                    startMenuAction($(e.target).data('action'), $(e.target).data('actionid')); //start action
+                if (!$(e.target).is('i')) {
+                    // remove active and show class to hide menu items
+                    $($(e.target).parents(".vis-nav-show")[0]).removeClass("vis-nav-show");
+                    $topHdrDiv.removeClass("vis-nm-active");
+                    // start to open menu item
+                    if ($(e.target).is('a')) {
+                        startMenuAction($(e.target).data('action'), $(e.target).data('actionid')); //start action
+                    }
+                    else if ($(e.target).is('span')) {
+                        startMenuAction($(e.target).parent().data('action'), $(e.target).parent().data('actionid')); //start action
+                    }
                 }
-                else if ($(e.target).is('span')) {
-                    startMenuAction($(e.target).parent().data('action'), $(e.target).parent().data('actionid')); //start action
+                //if($target.data('isfavbtn') == 'yes') {
+                else if ($(e.target).is('i')) {
+                    VIS.FavouriteHelper.addDelFav($(e.target)); // show menu item's options
+                    return;
                 }
             });
         };
@@ -589,7 +596,7 @@
                         $('#vis_editHome').show();
                     }
                     return;
-                   
+
                 } else {
                     $('#vis_editHome').hide();
                 }
@@ -963,10 +970,18 @@
                 disableIfEmpty: true,
                 disabledText: '--',
                 nonSelectedText: '-',
-                nSelectedText: ' - ' +  VIS.Msg.getMsg("Selected") ,
+                nSelectedText: ' - ' + VIS.Msg.getMsg("Selected"),
                 allSelectedText: VIS.Msg.getMsg("All"),
                 buttonContainer: '<div class="btn-group w-100" />',
-                buttonTextAlignment:'left'
+
+                buttonTextAlignment: 'left',
+                onChange: function (option, checked, select) {
+                    if (!changed) {
+                        changed = true;
+                        btnChange.prop("disabled", false);
+                    }
+                }
+
             });
 
             //set value
@@ -1015,10 +1030,17 @@
             EditUserImage();
         };
 
-        function setFilterOrg() {
+        function setFilterOrg(isChkBoxcontrol) {
             var strOrgFilter = hFilterOrg.val();
-            if (strOrgFilter && strOrgFilter != "") {
-                chkFilter.prop('checked', true);
+            if (!isChkBoxcontrol) {
+                if (strOrgFilter && strOrgFilter != "") {
+                    chkFilter.prop('checked', true);
+                    lstOrgs.multiselect('enable');
+                }
+                else {
+                    chkFilter.prop('checked', false);
+                    lstOrgs.multiselect('disable');
+                }
             }
 
             if (!strOrgFilter || strOrgFilter == "") {
@@ -1026,12 +1048,13 @@
             }
 
             var arrVal = strOrgFilter.split(',');
+            lstOrgs.multiselect('deselectAll');
             lstOrgs.multiselect('select', arrVal);
 
         }
 
         function resetOrgFiletr(data, isSelect) {
-            if(!isSelect){
+            if (!isSelect) {
                 lstOrgs.empty();
                 $(data).each(function () {
                     $("<option />", {
@@ -1250,11 +1273,12 @@
         function chkFilterChange() {
             if (chkFilter.prop('checked') == true) {
                 //apply
-                lstOrgs.multiselect('deselectAll');
                 lstOrgs.multiselect('select', [cmbOrg.val()]);
+                lstOrgs.multiselect('enable');
             }
             else {
-                setFilterOrg();
+                setFilterOrg(true);
+                lstOrgs.multiselect('disable');
             }
             if (!changed) {
                 changed = true;

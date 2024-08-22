@@ -194,7 +194,7 @@
 
 .vis-nm-navbar a:hover, .vis-nm-subnav:hover .vis-nm-subnavbtn {
     /*background-color: #2A2F35; rgba(var(--v-c-on-secondary), 1); */
-    background-color: rgba(var(--v-c-on-primary), 0.1);
+    /*background-color: rgba(var(--v-c-on-primary), 0.1);*/
     color: white;
 }
 
@@ -499,6 +499,11 @@ nav.vis-nav-horizontal-scroll {
 
 .vis-app-userRoleChange {
     width: 100%;
+}
+
+.vis-nm-MenuFav {
+    width: 15px;
+    top: 2px !important;
 }
 
 @media screen and (max-width: 1366px) {
