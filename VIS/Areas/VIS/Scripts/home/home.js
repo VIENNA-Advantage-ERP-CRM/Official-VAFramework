@@ -392,7 +392,7 @@
                     $item.append($div);
                 }
                 else if (widget.Type == "C" || widget.Type == "K" || widget.Type == "V") {
-                    VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type, info);
+                    if (window.VADB) { VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type, info); }
                 }
 
 

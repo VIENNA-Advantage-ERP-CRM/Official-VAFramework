@@ -331,7 +331,10 @@ select {
     border-radius: 50%;
     position: relative;
     overflow: hidden;
-    cursor:pointer;
+    cursor: pointer;
+    border: 2px solid #f2f2;
+    border-radius: 100%;
+    box-shadow: 2px 4px 7px -1px #ccc;
 }
 
     .vis-app-user-img-wrap img {
