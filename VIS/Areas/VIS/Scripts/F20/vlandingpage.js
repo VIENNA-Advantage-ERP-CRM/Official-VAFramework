@@ -142,8 +142,8 @@
                     windowSpecific: homeItems[itm[i]].WindowSpecific,
                     rows: homeItems[itm[i]].rows,
                     Cols: homeItems[itm[i]].cols,
-                    width: ((homeItems[itm[i]].Cols || 1) * widgetWidth).toFixed(2) + 'px',
-                    height: ((homeItems[itm[i]].Rows || 1) * widgetWidth).toFixed(2) + 'px',
+                    width: ((homeItems[itm[i]].cols || 1) * widgetWidth).toFixed(2) + 'px',
+                    height: ((homeItems[itm[i]].rows || 1) * widgetWidth).toFixed(2) + 'px',
                     additionalInfo: homeItems[itm[i]].additionalInfo,
                     setAdditionalInfo: setAdditionalInfo
                 }

@@ -1527,7 +1527,12 @@
         var html = "";
         for (var i = 0; i < tabs.length; i++) {
             if (this.curTab.getTabLevel() == tabs[i].getTabLevel() || (this.curTab.getTabLevel() + 1) == tabs[i].getTabLevel()) {
-                html += '<option tabid="' + tabs[i].getAD_Tab_ID() + '" value="' + i + '">' + tabs[i].getName() + '</option>';
+
+                if (this.curTab.getAD_Tab_ID() == tabs[i].getAD_Tab_ID()) {
+                    html += '<option selected tabid="' + tabs[i].getAD_Tab_ID() + '" value="' + i + '">' + tabs[i].getName() + '</option>';
+                } else {
+                    html += '<option tabid="' + tabs[i].getAD_Tab_ID() + '" value="' + i + '">' + tabs[i].getName() + '</option>';
+                }
 
                 var fld = tabs[i].getFields();
                 for (var c = 0; c < fld.length; c++) {
