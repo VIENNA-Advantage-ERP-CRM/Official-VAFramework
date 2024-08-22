@@ -170,7 +170,7 @@
             modelPopupId.show();
         };
 
-        //Refresh Widget
+        //Refresh Widget 
         this.refreshWidget = function () {
             ShowBusy(true);
             welcomeActionsDivId.find("#workflowCntDivId" + $self.AD_UserHomeWidgetID).empty();
