@@ -1338,8 +1338,8 @@
 
         }
         //check tab Panel Name and Select it
-        if (this.vTabPanel && this.actionParams.DefaultTabPanel && this.actionParams.DefaultTabPanel != "") {
-            this.vTabPanel.setDefaultPanel(this.actionParams.DefaultTabPanel);
+        if (this.vTabPanel && this.actionParams.TabPanelName && this.actionParams.TabPanelName != "") {
+            this.vTabPanel.setDefaultPanel(this.actionParams.TabPanelName);
         }
     };
 
