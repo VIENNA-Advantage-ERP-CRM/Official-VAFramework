@@ -808,7 +808,7 @@ input[type="radio"] {
 }
 
 .vis-ev-col-actiongroup {
-    cursor: pointer;
+    /*cursor: pointer;*/
 }
 
     .vis-ev-col-actiongroup .dropdown-toggle:after {
@@ -827,7 +827,7 @@ input[type="radio"] {
     align-items: center;
     gap: 0.4rem;
     position: relative;
-   
+    cursor:pointer;
     color: rgba(var(--v-c-primary), 1) !important;
     border: 1px solid rgba(var(--v-c-primary), 1);
     background: #ffffff;
@@ -930,6 +930,8 @@ input[type="radio"] {
     }
     .vis-ev-col-ag-btn-list .vis-ev-col-wrap-button {
         color: inherit;
+        border:0;
+        background:inherit;
     }
 
 
