@@ -92,7 +92,7 @@
             '</div>' +
 
             /*'  <div class="mb-2 vis-fp-static-ctrlwrp"><div class="input-group vis-input-wrap"><div class="vis-control-wrap vis-fb-txtFilterName"><label><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div></div> ' +*/
-            '  <div class="vis-fb-savebtnPnl"><div><i class="saveFilter vis vis-save fa-2x" title="' + VIS.Msg.getMsg("VISSave") + '"></i><i title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-2 fa-2x"></i></div><i title="' + VIS.Msg.getMsg("ClearAll") +'" class="vis vis-clear-filter fa-2x ml-2 btnClearAll"></i></div> ' +
+            '  <div class="vis-fb-savebtnPnl"><div><i class="saveFilter vis vis-save" title="' + VIS.Msg.getMsg("VISSave") + '"></i><i title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-2"></i></div><i title="' + VIS.Msg.getMsg("ClearAll") +'" class="vis vis-clear-filter ml-2 btnClearAll"></i></div> ' +
             '</div > ' +
             ' </div>';
         return str;

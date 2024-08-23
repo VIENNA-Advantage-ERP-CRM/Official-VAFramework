@@ -2166,7 +2166,9 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
     .vis-fb-savebtnPnl i{
         cursor:pointer;
+        font-size:1.5rem;
     }
+
 
     .main-fp-wrap {
         width: 100%;

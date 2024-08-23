@@ -431,6 +431,11 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label {
     /* justify-content: center;*/
 }
 
+.w2ui-grid-data .vis-ev-col-linkbutton {
+    text-decoration:none;
+}
+
+
     .vis-ev-col-linkbutton i {
         max-width: 35px;
         max-height: 35px;
