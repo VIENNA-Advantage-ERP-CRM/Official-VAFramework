@@ -901,7 +901,7 @@ input[type="radio"] {
     border-bottom-right-radius: .25rem;
 }
 
-.vis-ev-col-ag-btn-list {
+/*.vis-ev-col-ag-btn-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -923,15 +923,20 @@ input[type="radio"] {
         .vis-ev-col-ag-btn-list li span {
             font-size: 0.8rem;
             padding-left: 5px;
-        }
+        }*/
 
-    .vis-ev-col-ag-btn-list .vis-ev-col-linkbutton{
-        color:inherit;
+.vis-apanel-rb-ul .vis-ev-col-linkbutton {
+    color: inherit;
+    
+}
+    .vis-apanel-rb-ul .vis-ev-col-linkbutton span{
+        text-decoration:none;
     }
-    .vis-ev-col-ag-btn-list .vis-ev-col-wrap-button {
+
+    .vis-apanel-rb-ul .vis-ev-col-wrap-button {
         color: inherit;
-        border:0;
-        background:inherit;
+        border: 0;
+        background: inherit;
     }
 
 
@@ -941,5 +946,32 @@ input[type="radio"] {
         outline: none;
     }
 
+.multiselect-container {
+    max-height: 300px;
+    overflow: auto;
+}
 
-/***************************** Control Prop End ****************************************/
+    .multiselect-container .multiselect-option.active:not(.multiselect-active-item-fallback),
+    .multiselect-container .multiselect-group.active:not(.multiselect-active-item-fallback),
+    .multiselect-container .multiselect-all.active:not(.multiselect-active-item-fallback),
+    .multiselect-container .multiselect-option:not(.multiselect-active-item-fallback):active,
+    .multiselect-container .multiselect-group:not(.multiselect-active-item-fallback):active,
+    .multiselect-container .multiselect-all:not(.multiselect-active-item-fallback):active {
+        background-color: rgba(var(--v-c-primary), .7) !important;
+        /* color: rgba(var(--v-c-on-primary), 1);*/
+    }
+    .multiselect-container .multiselect-option:hover, .multiselect-container .multiselect-group:hover,
+    .multiselect-container .multiselect-all:hover, .multiselect-container .multiselect-option:focus,
+    .multiselect-container .multiselect-group:focus, .multiselect-container .multiselect-all:focus {
+        background-color: rgba(var(--v-c-primary), .7) !important;
+    }
+
+    .multiselect-container .multiselect-option:hover {
+        background-color: rgba(var(--v-c-primary), 1) !important;
+        color: rgba(var(--v-c-on-primary), 1) !important;
+    }
+
+    .multiselect-container .multiselect-option:hover  label{
+        color:inherit;
+    }
+    /***************************** Control Prop End ****************************************/
