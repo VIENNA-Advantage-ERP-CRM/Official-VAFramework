@@ -279,7 +279,8 @@
         this.frame.getContentGrid().append(this.getRoot());
     };
 
-    VIS.dynamicWidget.prototype.widgetSizeChange = function (size) {
+    VIS.dynamicWidget.prototype.widgetSizeChange = function (widgetInfo) {
+        this.frame.widgetInfo = widgetInfo;
         if (!size.editMode) {
             this.resize(Math.floor(size.height.replace('px', '')));
         }

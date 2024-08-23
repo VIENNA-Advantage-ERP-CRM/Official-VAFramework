@@ -502,6 +502,7 @@ namespace VIS.Models
                 AD_Client_ID = { ctx.GetAD_Client_ID() } AND IsActive='Y' 
                 AND (AD_Tab_ID={ tabID } AND AD_Table_ID= { tableID }) 
                 ORDER BY Upper(Name), AD_UserQuery_ID";
+                
                 DataSet ds = DB.ExecuteDataset(query);
                 if (ds != null && ds.Tables.Count > 0)
                 {

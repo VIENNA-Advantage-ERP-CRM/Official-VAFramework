@@ -2065,8 +2065,8 @@
         var p = this.getVPanel();
 
         if (this.isIncludedGCVisible || true) {
-            p1.width("0%");//  css('width:50%');;
-            p.width("99%");//  css('width:50%');;
+            //p1.width("0%");//  css('width:50%');;
+            //p.width("99%");//  css('width:50%');;
             p1.hide();
             p.css("display", "block");// .show();
             this.getVCardPanel().hide();
