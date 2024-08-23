@@ -1253,7 +1253,7 @@
                 }
 
                 for (var i = 0; i < selVals.length; i++) {
-                    if (selVals[i] > 0) {
+                    if (selVals[i] !="") {
                         if (orgFilter != "") {
                             orgFilter += ',';
                         }
