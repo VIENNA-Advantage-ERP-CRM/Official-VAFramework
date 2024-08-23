@@ -130,6 +130,13 @@
                     childTab.setEnabled(true);
                 }
 
+                //hide tab 
+                if (tab.ChildTabs[i].getIsHideTabName()) {
+                    li.hide();
+                }
+                else {
+                    li.show();
+                }
 
 
                 //Tab elements
@@ -616,9 +623,8 @@
                 this.evaluate(null);
             //}
 
-            if (!e.getIsInserting()) {
-                this.aTabbedPane.getAPanel().setStatusInfo();
-            }
+           
+               
 
         /******End Header Panel******/
         }
@@ -713,7 +719,7 @@
                 if (manual && !retValue && !selfPanel.errorDisplayed) {
 
                 }
-               // this.curGC.refreshTabPanelData(this.curTab.getRecord_ID());
+                this.aTabbedPane.getAPanel().setStatusInfo(null, 'S');
                 if (manual)
                     selfPanel.curGC.dynamicDisplay(-1);
 
@@ -738,7 +744,7 @@
             if (callback) {
                 callback(retValue);
             }
-            //this.curGC.refreshTabPanelData(this.curTab.getRecord_ID());
+            this.aTabbedPane.getAPanel().setStatusInfo(null, 'S');
             return retValue;
         }
 
@@ -767,7 +773,7 @@
 
         VIS.ADialog.confirm("DeleteRecord?", true, "", "Confirm", function (result) {
             if (result) {
-                thisPanel.curGC.dataDeleteAsync();               
+                thisPanel.curGC.dataDeleteAsync(true);               
             }
             thisPanel = null;
         });

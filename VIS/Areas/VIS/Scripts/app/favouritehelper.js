@@ -123,6 +123,38 @@
 
         };
 
+        function addDelFav(_btn) {
+            btn = _btn;
+            nodeID = btn.data('value');
+            action = btn.data('action');
+            actionid = btn.data('actionid');
+            nodeName = btn.data('name');
+            isFav = btn.attr('data-isfav');
+            if (isFav == 'yes') {
+                btn.attr('data-isfav', 'no');
+                removeFav(nodeID);
+                VIS.favMgr.removeFavourite(nodeID);
+                btn.removeClass("vis vis-star-full");
+                btn.addClass("vis vis-star-empty");
+                btn.attr("title", VIS.Msg.getMsg("AddFav"));
+            }
+            else {
+                barNode = {};
+                barNode.Action = action;//aAction.data('action');
+                barNode.WindowID = actionid;//aAction.data('actionid');
+                barNode.FormID = actionid; //aAction.data('actionid');
+                barNode.ProcessID = actionid; //aAction.data('actionid');
+                barNode.NodeID = nodeID;//btn.data('value');
+                barNode.Name = nodeName;// $(aAction).parent().children(0).text();
+                btn.attr('data-isfav', 'yes');                
+                addToFav(nodeID);
+                VIS.favMgr.addFavourite(barNode);
+                btn.removeClass("vis vis-star-empty");
+                btn.addClass("vis vis-star-full");
+                btn.attr("title", VIS.Msg.getMsg("RemoveFav"));
+            }
+        }
+
         function openNewTab() {
             //alert(action + " " + actionid);
             VIS.viewManager.startActionInNewTab(action, actionid);
@@ -153,7 +185,8 @@
         }
         var favHelper = {
             removeFavourite: removeFavourite,
-            showOverlay: showOverlay
+            showOverlay: showOverlay,
+            addDelFav: addDelFav
         };
         return favHelper;
     };

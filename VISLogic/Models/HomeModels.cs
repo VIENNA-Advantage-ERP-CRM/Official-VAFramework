@@ -134,7 +134,7 @@ namespace VIS.Models
                 sql += " WHERE AD_WidgetSize.isActive='Y' AND AD_Widget.isActive='Y' AND AD_Widget_Access.isActive='Y' AND AD_Widget_Access.AD_Role_ID=" + ctx.GetAD_Role_ID();
             if(windowID > 0)
             {
-                sql += " AND window='Y'";
+                sql += " AND IsWindow='Y'";
             }
             else
             {
@@ -397,94 +397,99 @@ namespace VIS.Models
                 sql += " AD_WidgetField_Trl.Name ";
             }
 
-            sql += " FROM AD_WidgetField ";
-
+            sql += @"FROM AD_Widget WD LEFT OUTER JOIN AD_WidgetField 
+                    ON(WD.AD_WIDGET_ID=AD_WidgetField.AD_WIDGET_ID) AND AD_WidgetField.IsActive='Y'  AND AD_WidgetField.AD_WIDGET_ID =" + widget_ID;
             if (!baseLanguage)
             {
                 sql += " INNER JOIN AD_WidgetField_Trl ON(AD_WidgetField_Trl.AD_WidgetField_ID=AD_WidgetField.AD_WidgetField_ID AND AD_WidgetField_Trl.AD_Language='" + Env.GetAD_Language(ctx) + "' AND AD_WidgetField_Trl.isActive='Y' )";
             }
-            sql += @" INNER JOIN AD_Widget WD ON(WD.AD_WIDGET_ID=AD_WidgetField.AD_WIDGET_ID) 
-                    WHERE WD.WidgetType='D' AND AD_WidgetField.IsActive='Y' AND WD.IsActive='Y' AND AD_WidgetField.AD_WIDGET_ID =" + widget_ID;
+
+            sql += " WHERE WD.WidgetType='D' AND WD.IsActive='Y' And WD.AD_WIDGET_ID =" + widget_ID;
             List<DynamicWidget> list = new List<DynamicWidget>(); ;
             DataSet dataSet = DB.ExecuteDataset(sql);
-            if (dataSet != null && dataSet.Tables.Count > 0)
+            if (dataSet != null && dataSet.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
             {
                 var row = dataSet.Tables[0].Rows;
                 widgetStyle = Util.GetValueOfString(row[0]["WidgetHTML"]);
                 isAdvanceSearch = Util.GetValueOfString(row[0]["IsShowAdvanced"]);
                 randomColor = Util.GetValueOfString(row[0]["IsShowRandomColor"]);
-                for (int i = 0; i < row.Count; i++)
+                if (!string.IsNullOrEmpty(Util.GetValueOfString(row[0]["Control_Type"])))
                 {
-                    try
+                    for (int i = 0; i < row.Count; i++)
                     {
-                        string imageURL = "";
-                        sequenceNo = Util.GetValueOfInt(row[i]["SeqNo"]);
-                        string badgeValue = Util.GetValueOfString(row[i]["BadgeValue"]);
-                        int Ad_Image_ID = Util.GetValueOfInt(row[i]["AD_Image_ID"]);
-                        if (Ad_Image_ID > 0)
+                        try
                         {
-                            var img = new VAdvantage.Model.MImage(ctx, Ad_Image_ID, null);
-                            if (img.GetFontName() != null && img.GetFontName().Length > 0)
+                            string imageURL = "";
+                            sequenceNo = Util.GetValueOfInt(row[i]["SeqNo"]);
+                            string badgeValue = Util.GetValueOfString(row[i]["BadgeValue"]);
+                            int Ad_Image_ID = Util.GetValueOfInt(row[i]["AD_Image_ID"]);
+                            if (Ad_Image_ID > 0)
                             {
-                                if (img.Get_Value("FontStyle") != null)
+                                var img = new VAdvantage.Model.MImage(ctx, Ad_Image_ID, null);
+                                if (img.GetFontName() != null && img.GetFontName().Length > 0)
                                 {
-                                    imageURL = "<i class='" + img.GetFontName() + "' style='" + img.Get_Value("FontStyle") + "'></i>";
+                                    if (img.Get_Value("FontStyle") != null)
+                                    {
+                                        imageURL = "<i class='" + img.GetFontName() + "' style='" + img.Get_Value("FontStyle") + "'></i>";
+                                    }
+                                    else
+                                    {
+                                        imageURL = "<i class='" + img.GetFontName() + "'></i>";
+                                    }
                                 }
-                                else
+                                else if (img.GetImageURL() != null && img.GetImageURL().Length > 0)
                                 {
-                                    imageURL = "<i class='" + img.GetFontName() + "'></i>";
+                                    imageURL = "<img src ='" + ctx.GetApplicationUrl() + img.GetImageURL() + "'></img>";
+                                }
+                                else if (img.GetBinaryData() != null)
+                                {
+                                    imageURL = "<img src ='data:image/*;base64, " + Convert.ToBase64String((byte[])img.GetBinaryData()) + "'></img>";
                                 }
                             }
-                            else if (img.GetImageURL() != null && img.GetImageURL().Length > 0)
-                            {
-                                imageURL = "<img src ='" + ctx.GetApplicationUrl() + img.GetImageURL() + "'></img>";
-                            }
-                            else if (img.GetBinaryData() != null)
-                            {
-                                imageURL = "<img src ='data:image/*;base64, " + Convert.ToBase64String((byte[])img.GetBinaryData()) + "'></img>";
-                            }
-                        }
 
-                        if (badgeValue.StartsWith("@SQL="))
-                        {
-                            badgeValue = badgeValue.Substring(5);
-                            var sqlTest = badgeValue.ToUpper();
-                            if ((sqlTest.IndexOf("INSERT ") != -1) || (sqlTest.IndexOf("DELETE ") != -1) || (sqlTest.IndexOf("UPDATE ") != -1) || (sqlTest.IndexOf("DROP ") != -1) || (sqlTest.IndexOf("TRUNCATE ") != -1))
-                                badgeValue = "";
-                            else
+                            if (badgeValue.StartsWith("@SQL="))
                             {
-                                string query = Env.ParseContext(ctx, windowNo, badgeValue, false);
-                                string pattern = @"FROM\s+([\w.]+)";
-                                Match match = Regex.Match(query, pattern, RegexOptions.IgnoreCase);
-                                if (match.Success)
-                                {
-                                    string tableName = match.Groups[1].Value;
-                                    query = MRole.GetDefault(ctx).AddAccessSQL(query, tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
-                                    badgeValue = Util.GetValueOfString(DB.ExecuteScalar(query));
-                                }
-                                else
-                                {
+                                badgeValue = badgeValue.Substring(5);
+                                var sqlTest = badgeValue.ToUpper();
+                                if ((sqlTest.IndexOf("INSERT ") != -1) || (sqlTest.IndexOf("DELETE ") != -1) || (sqlTest.IndexOf("UPDATE ") != -1) || (sqlTest.IndexOf("DROP ") != -1) || (sqlTest.IndexOf("TRUNCATE ") != -1))
                                     badgeValue = "";
+                                else
+                                {
+                                    string query = Env.ParseContext(ctx, windowNo, badgeValue, false);
+                                    string pattern = @"FROM\s+([\w.]+)";
+                                    Match match = Regex.Match(query, pattern, RegexOptions.IgnoreCase);
+                                    if (match.Success)
+                                    {
+                                        string tableName = match.Groups[1].Value;
+                                        query = MRole.GetDefault(ctx).AddAccessSQL(query, tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                                        badgeValue = Util.GetValueOfString(DB.ExecuteScalar(query));
+                                    }
+                                    else
+                                    {
+                                        badgeValue = "";
+                                    }
                                 }
                             }
-                        }
 
-                        DynamicWidget l = new DynamicWidget()
+                            DynamicWidget l = new DynamicWidget()
+                            {
+                                ControlType = Util.GetValueOfString(row[i]["Control_Type"]),
+                                SeqNo = sequenceNo,
+                                Name = Util.GetValueOfString(row[i]["Name"]),
+                                HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
+                                OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
+                                IsSameLine = Util.GetValueOfString(row[i]["IsSameLine"]),
+                                IsBadge = Util.GetValueOfString(row[i]["IsBadge"]),
+                                BadgeStyle = Util.GetValueOfString(row[i]["BadgeStyle"]),
+                                BadgeName = badgeValue,
+                                ImageURL = imageURL,
+                            };
+                            list.Add(l);
+                        }
+                        catch (Exception ex)
                         {
-                            ControlType = Util.GetValueOfString(row[i]["Control_Type"]),
-                            SeqNo = sequenceNo,
-                            Name = Util.GetValueOfString(row[i]["Name"]),
-                            HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
-                            OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
-                            IsSameLine = Util.GetValueOfString(row[i]["IsSameLine"]),
-                            IsBadge = Util.GetValueOfString(row[i]["IsBadge"]),
-                            BadgeStyle = Util.GetValueOfString(row[i]["BadgeStyle"]),
-                            BadgeName = badgeValue,
-                            ImageURL = imageURL,
-                        };
-                        list.Add(l);
-                    } catch (Exception ex) {
-                        msg += Util.GetValueOfString(row[i]["Name"])+", ";
+                            msg += Util.GetValueOfString(row[i]["Name"]) + ", ";
+                        }
                     }
                 }
             }
@@ -535,10 +540,12 @@ namespace VIS.Models
                             string badgeCount = Util.GetValueOfString(DB.ExecuteScalar(badgeSql));
                             ActionParams obj = new ActionParams
                             {
-                                TabWhereClause = Util.GetValueOfString(code),
+                                //TabWhereClause = Util.GetValueOfString(code),
+                                AD_UserQuery_ID = Util.GetValueOfInt(row[i]["AD_UserQuery_ID"]),
                                 Card_ID = Util.GetValueOfString(AD_CardView_ID),
                                 TabLayout = Util.GetValueOfString(tabLayout),
-                                TabIndex = Util.GetValueOfString(0)
+                                TabIndex = Util.GetValueOfString(0),
+                                IsShowFilterPanel=true
                             };
                             DynamicWidget l = new DynamicWidget()
                             {

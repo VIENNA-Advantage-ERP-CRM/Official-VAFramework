@@ -190,6 +190,16 @@
             selLI = null;
             self = null;
         }
+
+        this.setDefaultPanel = function (name) {
+            if (!this.isShowAll) {
+                var li = $ulIconList.find("[data-name='" + name + "']").first();
+                if (li && li.length > 0) {
+                    setContent(li);
+                }
+            }
+        };
+
     }
 
     /**
@@ -272,7 +282,7 @@
         }
         //add
         if (this.tabPanels.length < 1) {
-            self.setSize(0);
+            this.setSize(0);
             return;
         }
         this.setSize(this.width);
@@ -282,6 +292,10 @@
         this.sizeChangedListner = lsner;
     };
 
+    VTabPanel.prototype.selectTabPanelByName = function (name) {
+
+
+    }
 
     VTabPanel.prototype.resetTabPanel = function (tblPanel) {
         if (this.curTabPanel) {

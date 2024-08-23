@@ -392,7 +392,7 @@
                     $item.append($div);
                 }
                 else if (widget.Type == "C" || widget.Type == "K" || widget.Type == "V") {
-                    VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type, info);
+                    if (window.VADB) { VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type, info); }
                 }
 
 
@@ -418,6 +418,7 @@
                 //$home.find('.vis-home-leftPanel').append($container);
                 $home.find('.vis-widget-body').empty();
                 $home.find('#divfeedbsy').show();
+                widgetList = {};
                 var url = VIS.Application.contextUrl + "Home/GetWidgets";
                 VIS.dataContext.getJSONData(url, { windowID: 0 }, function (result) {
                     $home.find('#divfeedbsy').hide();

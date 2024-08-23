@@ -18,6 +18,7 @@ namespace VAdvantage.Model
     /// </summary>
     public class MSeries : X_D_Series
     {
+        private string calcBasis = "V"; // defaulted to Variable
 
         private static VLogger s_log = VLogger.GetVLogger(typeof(MSeries).FullName);
 
@@ -657,17 +658,17 @@ namespace VAdvantage.Model
             // if (datatype_Y.Equals(IS_STRING) || datatype_Y.Equals(IS_INTEGER) && !IsNone())
             //Changes made on 5jul2011 to query view as we do with tables (req. by amardeep/done by jagmohan)
             if ((!IsIdentifier_X() && isFiltered) || IsString_X())
-                
-                    sb.Append(AddGroupByClause(s_colX));
-               
-                if(!IsSum() && !IsCount() && !IsAvg() && !IsNone())
-                {
+
+                sb.Append(AddGroupByClause(s_colX));
+
+            if (!IsSum() && !IsCount() && !IsAvg() && !IsNone())
+            {
                 sb.Append(",");
                 sb.Append("NVL(ROUND(");
                 sb.Append(s_colY);
                 sb.Append(",3),0)");
 
-                }
+            }
 
 
 
@@ -871,7 +872,7 @@ namespace VAdvantage.Model
         /// <returns>group by query</returns>
         private string AddGroupByClause(string colName)
         {
-           
+
             if (!IsNone())
             {
                 StringBuilder sb = new StringBuilder();
@@ -979,14 +980,14 @@ namespace VAdvantage.Model
             {
                 sb.Append(colName);
             }
-            
-                if (!this.IsNone())
-                {
-                    sb.Append(",3),0)");
-                }
-               
-           
-            
+
+            if (!this.IsNone())
+            {
+                sb.Append(",3),0)");
+            }
+
+
+
             return sb.ToString();
         }
 
@@ -996,6 +997,12 @@ namespace VAdvantage.Model
         /// <param name="sqlwhere">contains where clause (mind you! its an out variable)</param>
         private string GetSQLWhere(out string sqlwhere)
         {
+            StringBuilder sbSQL = new StringBuilder("SELECT AD_Column_ID FROM AD_Column WHERE AD_Table_ID = (SELECT AD_Table_ID FROM AD_Table WHERE TableName = 'D_Series') AND LOWER(ColumnName) = 'vadb_calculationbasis'");
+            if (Util.GetValueOfInt(DB.ExecuteScalar(sbSQL.ToString())) > 0)
+            {
+                calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
+            }
+
             StringBuilder sb = new StringBuilder();
             sb.Append(" WHERE ");
             if ((IsDate_X() || IsIdentifier_X() || IsString_X()) && GetDateTimeTypes() != "N")     //if colx is datetime
@@ -1188,7 +1195,21 @@ namespace VAdvantage.Model
                     //m_date1 = lastNDate.Month + "/" + (lastNDate.Day - 1) + "/" + lastNDate.Year;
 
                     m_date1 = lastNDate.Month + "/" + (lastNDate.Day) + "/" + lastNDate.Year;
-                    m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                    if (calcBasis.Equals("F"))
+                    {
+                        if (this.GetLastNValue() == 0)
+                        {
+                            m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                        }
+                        else
+                        {
+                            m_date2 = dt_to.Month + "/" + (dt_to.Day - 1) + "/" + dt_to.Year;
+                        }
+                    }
+                    else
+                    {
+                        m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                    }
 
                 }
                 else if (GetDateTimeTypes() == IS_LAST_N_MONTHS)
@@ -1208,14 +1229,35 @@ namespace VAdvantage.Model
                     //else
                     //{
                     //m_date1 = (lastNDate.Month - 1) + "/" + lastNDate.Day + "/" + lastNDate.Year;
-                    m_date1 = (lastNDate.Month) + "/" + lastNDate.Day + "/" + lastNDate.Year;
-                    // }                     
-                    //m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
-                    int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
+                    if (calcBasis.Equals("F"))
+                    {
+                        //  m_date1 = (lastNDate.Month) + "/1/" + lastNDate.Year;
+                        m_date1 = (lastNDate.Month) + "/1/" + lastNDate.Year;
+                    }
+                    else
+                    {
+                        m_date1 = (lastNDate.Month) + "/" + lastNDate.Day + "/" + lastNDate.Year;
+                    }
+                        // }                     
+                        //m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                        int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
 
                     if (tDays == dt_to.Day)
                     {
                         m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day) + "/" + dt_to.Year;
+                    }
+                    else if (calcBasis.Equals("F"))
+                    {
+                        if (this.GetLastNValue() == 0)
+                        {
+                            m_date2 = DateTime.Now.Month + "/" + DateTime.DaysInMonth(dt_to.Year, DateTime.Now.Month - 1) + "/" + dt_to.Year;
+                        }
+                        else
+                        {
+                            m_date2 = (DateTime.Now.Month - 1) + "/" + DateTime.DaysInMonth(dt_to.Year, DateTime.Now.Month - 1) + "/" + dt_to.Year;
+                        }
+                        // m_date2 = (DateTime.Now.Month - 1) + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
+
                     }
                     else
                     {
@@ -1232,12 +1274,40 @@ namespace VAdvantage.Model
                     m_date_1 = (DateTime)lastNDate;
                     m_date_2 = DateTime.Now;
 
-                    m_date1 = lastNDate.Month + "/" + lastNDate.Day + "/" + (lastNDate.Year - 1);
+
+                    if (calcBasis.Equals("F"))
+                    {
+                        /* if (this.GetLastNValue() == 0)
+                         {
+                             m_date1 = "1/1/" + (lastNDate.Year - 1);
+                         }
+                         else
+                         {*/
+                        m_date1 = "1/1/" + (lastNDate.Year - 1);
+                        /* }*/
+
+                    }
+                    else
+                    {
+                        m_date1 = lastNDate.Month + "/" + lastNDate.Day + "/" + (lastNDate.Year - 1);
+                    }
                     int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
 
                     if (tDays == dt_to.Day)
                     {
                         m_date2 = dt_to.Month + "/" + (dt_to.Day) + "/" + dt_to.Year;
+                    }
+                    else if (calcBasis.Equals("F"))
+                    {
+                        if (this.GetLastNValue() == 0)
+                        {
+                            m_date2 = "12/" + DateTime.DaysInMonth(dt_to.Year, 12) + "/" + dt_to.Year;
+                        }
+                        else
+                        {
+                            DateTime cd_dt = dt_to.AddYears(-1);
+                            m_date2 = "12/31/" + cd_dt.Year;
+                        }
                     }
                     else
                     {

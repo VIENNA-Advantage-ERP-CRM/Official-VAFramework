@@ -405,15 +405,22 @@
                 }
                 if ($(e.target).hasClass("vis-linkTxt") || $(e.target).hasClass("vis-nm-subMenuCat"))
                     return;
-                // remove active and show class to hide menu items
-                $($(e.target).parents(".vis-nav-show")[0]).removeClass("vis-nav-show");
-                $topHdrDiv.removeClass("vis-nm-active");
-                // start to open menu item
-                if ($(e.target).is('a')) {
-                    startMenuAction($(e.target).data('action'), $(e.target).data('actionid')); //start action
+                if (!$(e.target).is('i')) {
+                    // remove active and show class to hide menu items
+                    $($(e.target).parents(".vis-nav-show")[0]).removeClass("vis-nav-show");
+                    $topHdrDiv.removeClass("vis-nm-active");
+                    // start to open menu item
+                    if ($(e.target).is('a')) {
+                        startMenuAction($(e.target).data('action'), $(e.target).data('actionid')); //start action
+                    }
+                    else if ($(e.target).is('span')) {
+                        startMenuAction($(e.target).parent().data('action'), $(e.target).parent().data('actionid')); //start action
+                    }
                 }
-                else if ($(e.target).is('span')) {
-                    startMenuAction($(e.target).parent().data('action'), $(e.target).parent().data('actionid')); //start action
+                //if($target.data('isfavbtn') == 'yes') {
+                else if ($(e.target).is('i')) {
+                    VIS.FavouriteHelper.addDelFav($(e.target)); // show menu item's options
+                    return;
                 }
             });
         };
@@ -589,7 +596,7 @@
                         $('#vis_editHome').show();
                     }
                     return;
-                   
+
                 } else {
                     $('#vis_editHome').hide();
                 }
@@ -963,9 +970,10 @@
                 disableIfEmpty: true,
                 disabledText: '--',
                 nonSelectedText: '-',
-                nSelectedText: ' - ' +  VIS.Msg.getMsg("Selected") ,
+                nSelectedText: ' - ' + VIS.Msg.getMsg("Selected"),
                 allSelectedText: VIS.Msg.getMsg("All"),
                 buttonContainer: '<div class="btn-group w-100" />',
+
                 buttonTextAlignment: 'left',
                 onChange: function (option, checked, select) {
                     if (!changed) {
@@ -973,6 +981,7 @@
                         btnChange.prop("disabled", false);
                     }
                 }
+
             });
 
             //set value
@@ -1045,7 +1054,7 @@
         }
 
         function resetOrgFiletr(data, isSelect) {
-            if(!isSelect){
+            if (!isSelect) {
                 lstOrgs.empty();
                 $(data).each(function () {
                     $("<option />", {

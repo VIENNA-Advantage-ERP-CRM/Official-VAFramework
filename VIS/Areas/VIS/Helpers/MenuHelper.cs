@@ -506,21 +506,31 @@ namespace VIS.Helpers
         {
             if (action.Trim() == "") { action = "W"; img = "W"; }
 
+            // string contextMenu = "<div class=''>";
+            // if (onBar)
+            // {
+            //     contextMenu += " <span data-isfavbtn='yes' data-value='" + id + "' data-isfav='yes' data-action='" + action + "' data-actionid ='" + aid + "' data-name ='" + text + "'><span class='fa fa-star'></span>";
+            // }
+            // else
+            // {
+            //     contextMenu += " <span data-isfavbtn='yes' data-value='" + id + "' data-isfav='no' data-action='" + action + "' data-actionid ='" + aid + "' data-name ='" + text + "'>";
+            // }
+
+            // contextMenu += "  <i  style='width:20px' class='fa fa-ellipsis-v'></i>" +
+            //"  </span> </div>";
+
             string contextMenu = "<div class=''>";
             if (onBar)
             {
-                contextMenu += " <span data-isfavbtn='yes' data-value='" + id + "' data-isfav='yes' data-action='" + action + "' data-actionid ='" + aid + "' data-name ='" + text + "'><span class='fa fa-star'></span>";
+                contextMenu += " <i title='" + Msg.GetMsg(_ctx, "RemoveFav") + "' class='vis vis-star-full vis-nm-MenuFav' data-isfavbtn='yes' data-value='" + id + "' data-isfav='yes' data-action='" + action + "' data-actionid ='" + aid + "' data-name ='" + text + "'>";
             }
             else
             {
-                contextMenu += " <span data-isfavbtn='yes' data-value='" + id + "' data-isfav='no' data-action='" + action + "' data-actionid ='" + aid + "' data-name ='" + text + "'>";
+                contextMenu += " <i title='" + Msg.GetMsg(_ctx, "AddFav") + "' class='vis vis-star-empty vis-nm-MenuFav' data-isfavbtn='yes' data-value='" + id + "' data-isfav='no' data-action='" + action + "' data-actionid ='" + aid + "' data-name ='" + text + "'>";
             }
 
-            contextMenu += "  <i class='fa fa-ellipsis-v'></i>" +
-           "  </span> </div>";
-
-
-
+            contextMenu += " </i>" +
+            "  </div>";
 
             if (isSettingItem)
                 settingsHTML.Append("<li class='vis-navList'  data-summary='N'><a title='" + text + "' href='javascript:void(0)'  data-seqno='" + seqNo + "'  data-value='" + id + "' data-action='" + action + "' data-actionid ='" + aid + "'><i class='" + menuIcons[action] + "'></i>" + text + "</a>" + contextMenu + "</li>");
@@ -530,10 +540,9 @@ namespace VIS.Helpers
             }
             else
             {
-                menu1HTML.Append("<a title='" + text + "' href='javascript:void(0)' data-seqno='" + seqNo + "'  data-value='" + id + "' data-action='" + action + "' data-actionid ='" + aid + "'><span class='" + menuIcons[action] + "'></span><span class='vis-navTxt'>" + text + "</span></a>");
+                menu1HTML.Append("<a style='display:flex;' title='" + text + "' href='javascript:void(0)' data-seqno='" + seqNo + "'  data-value='" + id + "' data-action='" + action + "' data-actionid ='" + aid + "'><span class='" + menuIcons[action] + "'></span><span class='vis-navTxt'>" + text + "</span>" + contextMenu + "</a>");
                 // menu1HTML.Append("<li class='vis-navList'  data-summary='N'><a href='javascript:void(0)'  data-seqno='" + seqNo + "'  data-value='" + id + "' data-action='" + action + "' data-actionid ='" + aid + "'><i class='" + menuIcons[action] + "'></i>" + text + "</a>" + contextMenu + "</li>");
             }
-
         }
 
         /// <summary>
