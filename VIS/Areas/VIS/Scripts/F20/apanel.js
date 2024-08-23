@@ -3686,8 +3686,10 @@
         this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
         
         this.showFilterPanel(keepFilters);
-        if (this.actionParams.IsShowFilterPanel != null) {//set
-            this.startFilterPanel(!this.actionParams.IsShowFilterPanel);
+        if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
+            this.startFilterPanel(false);
+        } else {
+            this.startFilterPanel(true);
         }
         //}
 

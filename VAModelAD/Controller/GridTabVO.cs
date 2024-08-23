@@ -173,6 +173,7 @@ namespace VAdvantage.Controller
         public bool? IsHideSingleToggle = null;
         public bool? IsHideCardToggle = null;
         public bool? IsHideRecordNav = null;
+        public bool? IsShowFilterPanel = null;
 
         public bool? IsAutoNewRecord = null;
 
@@ -565,6 +566,7 @@ namespace VAdvantage.Controller
                 vo.IsHideSingleToggle = Utility.Util.GetValueOfString(dr["IsHideSingleToggle"]).Equals("Y"); 
                 vo.IsHideCardToggle = Utility.Util.GetValueOfString(dr["ishidecardtoggle"]).Equals("Y");
                 vo.IsHideRecordNav = Utility.Util.GetValueOfString(dr["IsHideRecordNav"]).Equals("Y");
+                vo.IsShowFilterPanel = Utility.Util.GetValueOfString(dr["isShowFilterPanel"]).Equals("Y");
 
                 string isAuto = dr["IsAutoNewRecord"].ToString();
                 if (isAuto == "Y")
@@ -1033,6 +1035,7 @@ namespace VAdvantage.Controller
             clone.IsHideCardToggle = IsHideCardToggle;
             clone.HideFieldGroupFrom = HideFieldGroupFrom;
             clone.IsHideRecordNav = IsHideRecordNav;
+            clone.IsShowFilterPanel = IsShowFilterPanel;
 
             clone.fields = new List<GridFieldVO>();
             for (int i = 0; i < fields.Count; i++)
