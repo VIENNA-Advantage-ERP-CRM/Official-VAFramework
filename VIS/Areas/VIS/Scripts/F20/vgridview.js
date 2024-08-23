@@ -1006,12 +1006,30 @@
             else if (displayType == VIS.DisplayType.Button) {
 
                 oColumn.sortable = true;
-
+                oColumn.style = 'text-decoration:none; color:rgba(var(--v-c-primary), 1); cursor:pointer;' + mField.getHtmlStyle();
                 oColumn.render = function (record, index, colIndex) {
                     var f = oColumns[colIndex].field;
                     var val = record[f];
-                    return '<span style="cursor:pointer" class="vis-ev-col-linkbutton">' + oColumns[colIndex].gridField.getHeader() + '</span>';
-
+                    var itm = "<div class='d-flex'>";
+                    if (oColumns[colIndex].gridField.getIsFieldOnly() && oColumns[colIndex].gridField.getShowIcon()) {
+                        if (oColumns[colIndex].gridField.getFontClass() != '') {
+                            itm += '<i style="cursor:pointer" class="' + oColumns[colIndex].gridField.getFontClass() + '"></i>';
+                        } else {
+                            itm += '<img style="cursor:pointer" src="' + VIS.Application.contextUrl + 'Images/Thumb16x16/' + oColumns[colIndex].gridField.getImageName() + '"></img>';
+                        }
+                      
+                    } else if (oColumns[colIndex].gridField.getShowIcon()) {
+                        if (oColumns[colIndex].gridField.getFontClass() != '') {
+                            itm += '<i style="cursor:pointer" class="' + oColumns[colIndex].gridField.getFontClass() + '"></i>'
+                        } else {
+                            itm += '<img style="cursor:pointer" src="' + VIS.Application.contextUrl + 'Images/Thumb16x16/' + oColumns[colIndex].gridField.getImageName() + '"></img>';
+                        } 
+                        itm += '<span style="cursor:pointer" class="ml-1">' + oColumns[colIndex].gridField.getHeader() + '</span>';
+                    } else {
+                        itm += '<span style="cursor:pointer">' + oColumns[colIndex].gridField.getHeader() + '</span>';
+                    }
+                    itm += '</div>';
+                    return itm;
                 }
             }
 
