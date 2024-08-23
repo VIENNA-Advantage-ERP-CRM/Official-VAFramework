@@ -734,7 +734,7 @@ namespace VAdvantage.Process
         {
             List<ExportDataRecords> list = new List<ExportDataRecords>();
 
-            String _sql = "SELECT AD_Table_ID, Record_ID,AD_ColOne_ID FROM AD_ExportData WHERE IsActive = 'Y' AND AD_ModuleInfo_ID = @AD_ModuleInfo_ID AND AD_Table_ID=1002423 AND Record_ID IN (1000008)";
+            String _sql = "SELECT AD_Table_ID, Record_ID,AD_ColOne_ID FROM AD_ExportData WHERE IsActive = 'Y' AND AD_ModuleInfo_ID = @AD_ModuleInfo_ID";
 
             SqlParameter[] param = new SqlParameter[1];
             param[0] = new SqlParameter("@AD_ModuleInfo_ID", _AD_ModuleInfo_ID);
