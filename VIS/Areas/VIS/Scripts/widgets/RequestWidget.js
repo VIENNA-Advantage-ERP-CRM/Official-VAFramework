@@ -301,6 +301,7 @@
         this.refreshWidget = function () {
             showBusy(true);
             welcomeTabDatacontainers.empty();
+            pageNo = 1;
             loadHomeRequest(true, false);
             welcomeTabDatacontainers.scrollTop(0);
         };
