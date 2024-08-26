@@ -44,15 +44,6 @@
         };
         /* Declare events */
         function events() {
-            $hlnkTabDataRef_ID.on("click", $self.refreshWidget);
-            $welcomeNewRecord.on("click", function () {
-                var sql = "VIS_129";
-                var n_win = executeScalar(sql);
-
-                var zoomQuery = new VIS.Query();
-                zoomQuery.addRestriction("R_Request_ID", VIS.Query.prototype.EQUAL, 0);
-                VIS.viewManager.startWindow(n_win, zoomQuery);
-            });
             welcomeTabDatacontainers.on("click", function (e) {
                 zoomFunction(e);
             });
@@ -100,6 +91,15 @@
             $hlnkTabDataRef_ID = $requestwelcomeDivId.find("#hlnkTabDataRefReq" + $self.AD_UserHomeWidgetID);
             $welcomeNewRecord = $requestwelcomeDivId.find("#sNewNts" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
+            $hlnkTabDataRef_ID.on("click", $self.refreshWidget);
+            $welcomeNewRecord.on("click", function () {
+                var sql = "VIS_129";
+                var n_win = executeScalar(sql);
+
+                var zoomQuery = new VIS.Query();
+                zoomQuery.addRestriction("R_Request_ID", VIS.Query.prototype.EQUAL, 0);
+                VIS.viewManager.startWindow(n_win, zoomQuery);
+            });
         };
         /* Start Request */
         function loadHomeRequest(isTabDataRef, async) {
