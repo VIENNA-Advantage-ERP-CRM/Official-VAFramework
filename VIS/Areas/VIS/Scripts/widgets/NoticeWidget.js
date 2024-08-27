@@ -73,7 +73,7 @@
                 + '     <div id="countDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Notice") + '" class="vis-w-welcomeScreenTab-notificationBubble blank vis-countDivCls"></div>'
                 + ' </div>'
                 + ' <div class="vis-w-iconsCls">'
-                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="Refresh" class="vis-w-feedicon vis-hlnkTabDataRefCls"><i class="vis vis-refresh"></i></a>'
+                + '             <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="Refresh" class="vis-w-feedicon vis-hlnkTabDataRefCls" style="display:none;"><i class="vis vis-refresh"></i></a>'
                 + ' </div>'
                 + '         </h2>'
                 + '     </div>'

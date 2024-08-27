@@ -76,7 +76,7 @@
                 + ' <div id="reqCountDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Requests") + '" class="vis-w-welcomeScreenTab-notificationBubble blank"></div>'
                 + ' </div>'
                 + ' <div class="vis-w-iconsCls">'
-                + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-w-feedicon vis-RequestHlnkTabDataRefReq"><i class="vis vis-refresh"></i></a> '
+                + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-w-feedicon vis-RequestHlnkTabDataRefReq" style="display:none;"><i class="vis vis-refresh"></i></a> '
                 + '          <span id="sNewNts' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis-RequestNewNtsCls" title="New Record"><i class="vis vis-plus"></i></span> '
                 + ' </div>'
                 + '      </h2> '

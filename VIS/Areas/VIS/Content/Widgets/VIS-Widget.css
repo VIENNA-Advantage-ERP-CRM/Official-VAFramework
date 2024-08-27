@@ -1202,6 +1202,11 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
         padding: 19% 0;
     }
 
+.vis-a-actionsWidgetCls .vis-w-feedicon {
+    /*display: block;*/
+    display: flex !important;
+}
+
 @media screen and (max-width: 2000px) {
     .vis-a-task-status-panel {
         font-size: 13px;
