@@ -699,6 +699,12 @@
                     if (agInstance.getIsNewIns()) { //only Once
                         insertCWrapper(label, agInstance, ctnr, mField);
                     }
+                    else { //apply style only
+                        var customStyle = mField.getHtmlStyle();
+                        if (editor != null && customStyle != "") {
+                            editor.getControl().attr('style', customStyle);
+                        }
+                    }
                 }
                 else {
                     insertCWrapper(label, editor, ctnr, mField);
@@ -857,7 +863,7 @@
             }
         }
 
-        if (editor != null && customStyle != "") {
+        if (!(editor && editor instanceof VIS.ActionGroup) && editor != null && customStyle != "") {
             if (mField.getDisplayType() == VIS.DisplayType.ProgressBar) {
                 editor.setHtmlStyle(customStyle);
             } else {
