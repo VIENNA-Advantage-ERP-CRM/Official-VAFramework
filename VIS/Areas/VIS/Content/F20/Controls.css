@@ -807,18 +807,18 @@ input[type="radio"] {
 
 /* Action Group*/
 
-.vis-ev-col-actiongroup .dropdown-toggle:after {
+/*.vis-ev-col-actiongroup .dropdown-toggle:after {
     margin-left: 0px;
     margin-right: 5px;
 }
 
-.vis-ev-col-actiongroup {
+.vis-ev-col-actiongroup {*/
     /*cursor: pointer;*/
-}
+/*}
 
     .vis-ev-col-actiongroup .dropdown-toggle:after {
         display: none;
-    }
+    }*/
 
 .w2ui-editable .vis-ev-col-img-ctrl + button {
     max-height: 32px;
@@ -833,20 +833,21 @@ input[type="radio"] {
     gap: 0.4rem;
     position: relative;
     cursor:pointer;
-    color: rgba(var(--v-c-primary), 1) !important;
-    border: 1px solid rgba(var(--v-c-primary), 1);
-    background: #ffffff;
     padding: .4rem 2rem .4rem .75rem;
+    color:unset;
 }
 
-    .vis-ev-col-ag-dropdown-btn .vis {
+.vis-ev-col-ag-dropdown-btn-color {
+    color: rgba(var(--v-c-primary), 1);
+    border: 1px solid rgba(var(--v-c-primary), 1);
+    background-color: transparent;
+}
+    /*.vis-ev-col-ag-dropdown-btn .vis {
         font-size: 1.5rem;
-    }
-
-    .vis-ev-col-ag-dropdown-btn .caret {
+    }*/
+    /* .vis-ev-col-ag-dropdown-btn .caret {
         font-size: 1rem;
-    }
-
+    }*/
     .vis-ev-col-ag-dropdown-btn.dropdown-toggle::after {
         position: absolute;
         right: 0.75rem;
@@ -865,21 +866,20 @@ input[type="radio"] {
 
     .vis-ev-col-actiongroup .dropdown-menu {
         padding: 0;
-        background: rgba(var(--v-c-secondary), 1);
-        margin-top: 5px;
+        margin: 1px 0;
         border: 1px solid rgba(var(--v-c-primary), .05);
         box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.17);
     }
 
 
-    .vis-ev-col-actiongroup .dropdown-item {
+   /* .vis-ev-col-actiongroup .dropdown-item {
         font-weight: normal;
         font-size: .875rem;
         padding: .25rem 1rem;
-    }
+    }*/
 
 
-        .vis-ev-col-actiongroup .dropdown-item:hover {
+       /* .vis-ev-col-actiongroup .dropdown-item:hover {
             background: rgba(var(--v-c-primary), 1);
             color: rgba(var(--v-c-on-primary), 1);
         }
@@ -888,13 +888,13 @@ input[type="radio"] {
         .vis-ev-col-actiongroup .dropdown-item:first-child {
             border-top-right-radius: .25rem;
             border-top-left-radius: .25rem;
-        }
+        }*/
 
 
-.vis-ev-col-actiongroup .dropdown-item:last-child {
+/*.vis-ev-col-actiongroup .dropdown-item:last-child {
     border-bottom-right-radius: .25rem;
     border-bottom-left-radius: .25rem;
-}
+}*/
 
 .vis-ev-col-actiongroup .dropdown-menu li:first-child {
     border-top-left-radius: .25rem;
@@ -906,31 +906,47 @@ input[type="radio"] {
     border-bottom-right-radius: .25rem;
 }
 
-/*.vis-ev-col-ag-btn-list {
+.vis-ev-col-ag-btn-list {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
     .vis-ev-col-ag-btn-list li {
-        font-size: 12px;
-        cursor: pointer;
-        padding: 5px;
         display: flex;
-        align-items: center;
-        flex-flow:column;
-    }
+        border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
+        color: rgba(var(--v-c-on-secondary), 1);
+        cursor: pointer;
+        display: flex;
+        font-size: .75rem;
+       padding: 7px 10px;
+       position: relative;
+}
         .vis-ev-col-ag-btn-list li:hover {
             background-color: rgba(var(--v-c-primary),1);
             color: rgba(var(--v-c-on-primary),1);
         }
 
-        .vis-ev-col-ag-btn-list li span {
+       /* .vis-ev-col-ag-btn-list li span {
             font-size: 0.8rem;
             padding-left: 5px;
         }*/
 
-.vis-apanel-rb-ul .vis-ev-col-linkbutton {
+    .vis-ev-col-ag-btn-list .vis-ev-col-linkbutton {
+        color: inherit;
+    }
+
+        .vis-ev-col-ag-btn-list .vis-ev-col-linkbutton span {
+            text-decoration: none;
+        }
+
+    .vis-ev-col-ag-btn-list .vis-ev-col-wrap-button {
+        color: inherit;
+        border: 0;
+        background: inherit;
+    }
+
+/*.vis-apanel-rb-ul .vis-ev-col-linkbutton {
     color: inherit;
     
 }
@@ -942,14 +958,11 @@ input[type="radio"] {
         color: inherit;
         border: 0;
         background: inherit;
-    }
-
-
-
-    /*/Multiselect/*/
-    .vis_home_filterorgs button {
-        outline: none;
-    }
+    }*/
+/*/Multiselect/*/
+.vis_home_filterorgs button {
+    outline: none;
+}
 
 .multiselect-container {
     max-height: 300px;

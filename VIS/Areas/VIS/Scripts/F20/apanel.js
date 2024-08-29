@@ -153,7 +153,7 @@
 
         this.tabStack = []; // Maintain tab and view change history;
 
-        this.toolbarActionList = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT','BVW']; // ToolBar Action
+        this.toolbarActionList = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT','BVW','SAN','HOE']; // ToolBar Action
 
         function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
@@ -276,7 +276,7 @@
                             //query.addRestriction(ui.item.code);
                             self.curGC.searchCode = ui.item.code;
                             self.curTab.searchCode = ui.item.code;
-                        }
+                        } 
                         //	History
 
                         //Set Page value to 1
@@ -461,11 +461,13 @@
         this.createToolBar = function () {
 
             //1. toolbar action
+            this.aHome = this.addActions("HOE", null, true, true, false, onAction, null, "Shct_Home", "home");
             this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh", "Refresh");
             this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete", "Delete");
             this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
             this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore", "Ignore");
             this.aSave = this.addActions("SAR", null, true, true, false, onAction, null, "Shct_Save", "Save");
+            this.aSaveNew = this.addActions("SAN", null, true, true, false, onAction, null, "Shct_SaveNew", "save-as");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report", "Report");
@@ -476,11 +478,13 @@
             this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back", "back-arrow");
             //check toolbar
            // if (!this.gridWindow.getIsHideToolbar()) {
+                $ulToobar.append(this.aHome.getListItm());
                 $ulToobar.append(this.aBack.getListItm());
                 $ulToobar.append(this.aIgnore.getListItm());
                 $ulToobar.append(this.aNew.getListItm());
                 $ulToobar.append(this.aDelete.getListItm());
                 $ulToobar.append(this.aSave.getListItm());
+                /*$ulToobar.append(this.aSaveNew.getListItm());*/
                 $ulToobar.append(this.aRefresh.getListItm());
                 $ulToobar.append(this.aReport.getListItm());
                 $ulToobar.append(this.aPrint.getListItm());
@@ -1191,7 +1195,7 @@
 
                     //$($txtSearch[1]).css("display", "inherit");
                     $imgdownSearch.css('visibility', 'visible');
-                    userQueries.push({ 'label': VIS.Msg.getMsg("All"), 'value': VIS.Msg.getMsg("All"), 'code': VIS.Msg.getMsg("All") });
+                   /* userQueries.push({ 'label': VIS.Msg.getMsg("All"), 'value': VIS.Msg.getMsg("All"), 'code': VIS.Msg.getMsg("All") });*/
                     var hasDefaultSearch = false;
                     for (var i = 0; i < data.tables[0].rows.length; i++) {
 
@@ -1380,6 +1384,7 @@
                 this.aDelete.dispose();
                 this.aNew.dispose();
                 this.aSave.dispose();
+                this.aSaveNew.dispose();
                 this.aPrevious.dispose();
                 this.aFirst.dispose();
                 this.aLast.dispose();
@@ -2413,6 +2418,8 @@
             //tis.aMulti.setPressed(true);
             //tis.aCard.setPressed(false);
             tis.curGC.switchMapRow();
+        } else if (tis.aHome.getAction() === action) {
+            tis.cmd_home();
         } else if (tis.aBack.getAction() === action) {
             tis.cmd_back();
         } else if (tis.aPageUp.getAction() === action) {
@@ -2437,6 +2444,9 @@
         }
         else if (tis.aSave.getAction() === action) {
             tis.cmd_save(true);
+        }
+        else if (tis.aSaveNew.getAction() === action) {
+            tis.cmd_saveNew(true);
         }
         else if (tis.aNew.getAction() === action) {
             tis.cmd_new(false);
@@ -2996,6 +3006,9 @@
                 case 'SAR':
                     aPanel.cmd_save(false)
                     break;
+                case 'SAN':
+                    aPanel.cmd_saveNew(false)
+                    break;
                 case 'DRD':
                     aPanel.cmd_delete()
                     break;
@@ -3013,6 +3026,9 @@
                     break;
                 case 'PRT':
                     aPanel.cmd_print();
+                    break;
+                case 'HOE':
+                    aPanel.cmd_home();
                     break;
 
                 default: actionVADMSDocument(aPanel, vButton.value)
@@ -3954,6 +3970,9 @@
         this.aSave.setEnabled(changed && !readOnly);
         gPanel.setEnabled("SAR", changed && !readOnly);
 
+        this.aSaveNew.setEnabled(changed && !readOnly);
+        gPanel.setEnabled("SAN", changed && !readOnly);
+
         this.aCardDialog.setEnabled(!changed);
 
         //
@@ -4340,6 +4359,23 @@
         var card = new VIS.CVDialog(this, fromCardDialogBtn);
         card.show();
     };
+
+    APanel.prototype.cmd_home = function () {
+        this.selectFirstTab();
+    }
+
+    /**
+     * Save and new
+     * @param {any} manual
+     */
+    APanel.prototype.cmd_saveNew = function (manual) {
+        var $this = this;
+        this.cmd_save(true, function (result) {
+            if (result) {
+                $this.cmd_new(false);
+           }
+       });
+    }
 
     APanel.prototype.cmd_save = function (manual, callback) {
         //cmd_save(false);

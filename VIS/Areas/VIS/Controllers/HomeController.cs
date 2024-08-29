@@ -449,7 +449,15 @@ namespace VIS.Controllers
         public ActionResult HomeNew()
         {
             Ctx ct = Session["ctx"] as Ctx;
+            ViewBag.Current_Ad_Lang = ct.GetAD_Language();
             ViewBag.lang = ct.GetAD_Language();
+            ViewBag.User_ID = ct.GetAD_User_ID();
+            ViewBag.isRTL = ct.GetIsRightToLeft();
+
+            string storedPath = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "");
+            storedPath += "LOG_";
+            VLogMgt.Initialize(true, storedPath);
+
             return PartialView("HomeNew");
         }
 

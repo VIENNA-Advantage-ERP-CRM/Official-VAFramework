@@ -17,7 +17,7 @@
             '             <div class="card-header" style="cursor:pointer" data-toggle="collapse" href="#collapseOne_' + winNo + '">                                            ' +
             '                 <span>' + VIS.Msg.getMsg("CustomCondition") + '</span>                                  ' +
             '                 <a class="card-link" > ' +
-            '                     <i class="vis vis-arrow-up"></i>                             ' +
+            '                     <i class="vis vis-arrow-down"></i>                             ' +
             '                 </a>                                                             ' +
             '             </div>                                                               ' +
             '             <div id="collapseOne_' + winNo + '"" class="collapse" data-parent="#accordion_' + winNo + '" >' +
@@ -130,7 +130,7 @@
         var txtFilterName = $('<input type="text" placeholder="' + VIS.Msg.getMsg("VISEnterFilterName") + '" class="w-100 visfilterName">');
 
         var isSaveAs = false;
-        var btnOk = $('<button><i class="fa fa-check"></i></button>');
+        var btnOk = $('<button><i class="fa fa-check"></i><i class="fa fa-spinner vis-load-animate" style="display:none"></i> </button>');
         //var ulPopup = $('<div class="m-2 d-flex"><div class="input-group vis-input-wrap m-0"><div class="vis-control-wrap vis-fb-txtFilterName"><label for="Name"><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div><div>');
 
         var ulPopup = $(`<div class="vis-fp-popup">
@@ -291,7 +291,7 @@
                                 continue;
                             }
                             var tabindex = inputType.data('tabindex');
-                            if (tabindex == "undefined") {
+                            if (tabindex == "undefined" || tabindex == undefined) {
                                 tabindex = Number(self.cmbTabs.find('option:first').val());
                             }
                             self.fillColumns(tabindex);
@@ -394,7 +394,7 @@
 
         };
 
-        this.setFilterOptions = function (data, key) {
+        this.setFilterOptions = function (data, key, tabindex) {
             var fields;
             var selIds = [];
             var selItems = [];
@@ -440,7 +440,7 @@
                 }
                 if (i < 5) {
                     htm.push('<div class="vis-fp-inputspan">');
-                    htm.push('<div class="vis-fp-istagwrap"><input class="vis-fp-chboxInput vis-fp-inputvalueforupdate" type="checkbox" data-column="' + key + '" data-keyval="' + key + '_' + data[i].ID + '" data-id="' + data[i].ID + '"');
+                    htm.push('<div class="vis-fp-istagwrap"><input class="vis-fp-chboxInput vis-fp-inputvalueforupdate" type="checkbox" data-tabindex="' + tabindex +'" data-column="' + key + '" data-keyval="' + key + '_' + data[i].ID + '" data-id="' + data[i].ID + '"');
                     htm.push('><span data-id="' + data[i].ID + '">' + data[i].Name + '</span> </div><span class="vis-fp-spanCount">(' + data[i].Count + ')</span>');
                     htm.push('</div>');
                     fields.append(htm.join(''));
@@ -610,6 +610,9 @@
         });
 
         btnSave.on('click', function () {
+            bodyDiv.find('.vis-fp-popup').find('.fa-check').show();
+            bodyDiv.find('.vis-fp-popup').find('.fa-spinner').hide();
+            btnOk.removeAttr('disabled');
             if (self.curTab.searchText != "") {
                 btnOk.click();
             } else {
@@ -627,7 +630,8 @@
         });
         
 
-        btnOk.on('click', function () {
+        btnOk.on('click', function () {          
+
             var advanceSearch = self.curTab.searchCode;
             var searchText = self.curTab.searchText;
             if (isSaveAs) {
@@ -638,14 +642,13 @@
             if (searchText == "") {
                 userQueryID = 0;
                 if (txtFilterName.val() == "") {
-                    VIS.ADialog.error("", true, VIS.Msg.getMsg("FilterNameRequired"));
+                    VIS.ADialog.error("", true, VIS.Msg.getMsg("FilterNameRequired"));                  
                     return;
                 } else {
                     searchText = txtFilterName.val();
                 }
             }
 
-           
             
 
 
@@ -655,6 +658,11 @@
                 VIS.ADialog.error("", true, VIS.Msg.getMsg("SelectAtleastOneColumn"));
                 return;
             }
+
+
+            btnOk.find('.fa-check').hide();
+            btnOk.find('.fa-spinner').show();
+            btnOk.attr('disabled', 'disabled');
 
             var where = "";
             //if (where != "" && where != null) {
@@ -678,7 +686,7 @@
                 type: "POST",
                 datatype: "json",
                 contentType: "application/json; charset=utf-8",
-                async: false,
+                async: true,
                 data: JSON.stringify(obj)
             }).done(function (json) {
                 bodyDiv.find('.vis-fp-popup').fadeOut(200);
@@ -697,6 +705,9 @@
         });
 
         btnSaveAs.on('click', function () {
+            bodyDiv.find('.vis-fp-popup').find('.fa-check').show();
+            bodyDiv.find('.vis-fp-popup').find('.fa-spinner').hide();
+            btnOk.removeAttr('disabled');
             overLay.show();
             const buttonOffset = $(this).offset();
             const buttonHeight = $(this).outerHeight();
@@ -793,7 +804,7 @@
                 }
                 else {
                     // fill dataset with all operators available
-                    dsOp = self.getOperatorsQuery(VIS.Query.prototype.CVOPERATORS);
+                    dsOp = self.getOperatorsQuery(VIS.Query.prototype.OPERATORS);
                 }
 
                 if (f != null && VIS.DisplayType.IsDate(f.getDisplayType())) {
@@ -1283,8 +1294,8 @@
                 dsFilterData = [];
 
 
-            if (!(colValue in dsAdvanceData))
-                dsAdvanceData[colValue] = [];
+            if (!(colValue + '_' + tabindex in dsAdvanceData))
+                dsAdvanceData[colValue + '_' + tabindex] = [];
 
             var where = self.parseWhereCondition(colValue, optr, value1Value, value2Value, fullDay, tabindex);
             if (self.curTab.getAD_Tab_ID() != self.tabs[tabindex].getAD_Tab_ID()) {
@@ -1310,12 +1321,13 @@
                 VALUE2VALUE: VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(value2Value)),
                 AD_USERQUERYLINE_ID: 0,
                 OPERATOR: optr,
-                AD_TAB_ID: self.tabs[self.cmbTabs.val()].getAD_Tab_ID()
+                AD_TAB_ID: self.tabs[self.cmbTabs.val()].getAD_Tab_ID(),
+                tabindex: tabindex
             }
 
             dsFilterData.push(obj);
 
-            dsAdvanceData[colValue].push({
+            dsAdvanceData[colValue + '_' + tabindex].push({
                 'Name': self.tabs[tabindex].getTableName()+"."+ colName,
                 'Value': value1Value,
                 'Value2': value1Value,
@@ -1326,10 +1338,10 @@
             });
 
 
-            refreshDynFiltersUI(colValue, fromAdvance);
+            refreshDynFiltersUI(colValue, fromAdvance, tabindex);
         };
 
-        function deleteDynRow(colValue) {
+        function deleteDynRow(colValue, tabindex) {
 
             if (dsAdvanceData == null)
                 dsAdvanceData = {};
@@ -1345,16 +1357,22 @@
                 delete dsAdvanceData[colValue];
             }
 
-
+            var tabindex = -1;
+            var colV = '';
             var index = dsFilterData.findIndex(function (item) {
-                return item.KEYVALUE === colValue;
+                if (item.KEYVALUE + '_' + item.tabindex === colValue) {
+                    tabindex = item.tabindex;
+                    colV = colValue;
+                    return item.KEYVALUE + '_' + item.tabindex === colValue;
+                }
+               
             });
 
             if (index !== -1) {
                 dsFilterData.splice(index, 1);
             }
 
-            refreshDynFiltersUI(colValue);
+            refreshDynFiltersUI(colV, false, tabindex);
         };
 
         function showValue2(show) {
@@ -1443,20 +1461,20 @@
         };
 
 
-        function refreshDynFiltersUI(colValue, fromAdvance) {
-            var selDiv = divDynFilters.find('[data-id="' + colValue + '"]');
+        function refreshDynFiltersUI(colValue, fromAdvance, tabindex) {
+            var selDiv = divDynFilters.find('[data-id="' + colValue + '_' + tabindex+'"]');
             if (selDiv.length > 0) {
                 selDiv.remove();
             }
 
-            if (colValue in dsAdvanceData) {
+            if (colValue + '_' + tabindex in dsAdvanceData) {
                 var htm = [];
-                var arrVal = dsAdvanceData[colValue];
+                var arrVal = dsAdvanceData[colValue + '_' + tabindex];
                 var hue = Math.floor(Math.random() * 360);
                 var v = Math.floor(Math.random() * 16) + 85;
                 var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
 
-                htm.push('<div class="vis-fp-currntrcrds" style="background-color:' + pastel + '" data-id="' + colValue + '"><span  class="vis-fp-inputvalueforupdate">')
+                htm.push('<div class="vis-fp-currntrcrds" style="background-color:' + pastel + '" data-id="' + colValue + '_' + tabindex +'"><span  class="vis-fp-inputvalueforupdate">')
                 for (var i = 0; i < arrVal.length; i++) {
                     if (i != 0)
                         htm.push(' | ');
@@ -1488,22 +1506,27 @@
             btnSaveAs.removeClass('vis-fp-btnDisable');
             //txtFilterName.addClass('vis-filterNameReadonly');
 
+            self.curGC.aPanel.setBusy(true);
             dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "ASearch/GetQueryLines", { "UserQuery_ID": id, isFilter: true }, null);
             dsAdvanceData = {};
             dsFilterData = [];
-            for (var i = 0; i < dr.length; i++) {             
 
-                var optrName = dr[i]["OPERATORNAME"];
-                var optr = VIS.Query.prototype.OPERATORS[optrName];
-                var tabID = dr[i]["AD_TAB_ID"];
-                var tabIndex = self.cmbTabs.find('option[tabid="' + tabID + '"]').val() || 0;               
-                self.fillColumns(tabIndex);
-                addDynRow(dr[i].KEYNAME, dr[i].KEYVALUE, optr, optrName,
-                    dr[i].VALUE1NAME, dr[i].VALUE1VALUE, dr[i].VALUE2NAME, dr[i].VALUE2VALUE, dr[i]["FULLDAY"], tabIndex, fromAdvance);
+            if (dr) {
+                for (var i = 0; i < dr.length; i++) {
 
+                    var optrName = dr[i]["OPERATORNAME"];
+                    var optr = VIS.Query.prototype.OPERATORS[optrName];
+                    var tabID = dr[i]["AD_TAB_ID"];
+                    var tabIndex = self.cmbTabs.find('option[tabid="' + tabID + '"]').val() || 0;
+                    self.fillColumns(tabIndex);
+                    addDynRow(dr[i].KEYNAME, dr[i].KEYVALUE, optr, optrName,
+                        dr[i].VALUE1NAME, dr[i].VALUE1VALUE, dr[i].VALUE2NAME, dr[i].VALUE2VALUE, dr[i]["FULLDAY"], tabIndex, fromAdvance);
+
+                }
             }
 
             self.fillColumns(Number(self.cmbTabs.find('option:first').val()));
+            self.curGC.aPanel.setBusy(false);
         }
 
         this.removeAdvance = function () {
@@ -1664,7 +1687,7 @@
                 var key = data["keyCol"];
                 data = data["list"];
                 //if (data && data.length > 0) {
-                tht.setFilterOptions(data, key);
+                tht.setFilterOptions(data, key, field.tabIndex);
                 //}
                 tht = null;
             });
@@ -1850,9 +1873,10 @@
         var field = this.getTargetMField(columnName);
         var columnSQL = field.getColumnSQL(); //
 
-        if (value != null && value.length > 0 && VIS.DisplayType.IsText(field.getDisplayType()) && optr == VIS.Query.prototype.EQUAL) {
-            optr = VIS.Query.prototype.LIKE;
-            value = '%' + value + '%';
+        if (value != null && value.length > 0 && VIS.DisplayType.IsText(field.getDisplayType())) {
+            if (optr == VIS.Query.prototype.LIKE) {
+                value = '%' + value + '%';
+            } 
         }
 
         var whereCondition = '';

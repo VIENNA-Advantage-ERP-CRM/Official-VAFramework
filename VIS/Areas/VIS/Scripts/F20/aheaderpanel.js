@@ -573,7 +573,7 @@
                 agIns = this.agGroupToAGInsMap[agName];
             }
             else {
-                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle());
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle(),true);
                 this.agGroupToAGInsMap[agName] = agIns;
             }
             agIns.addItem(editor);
@@ -607,7 +607,7 @@
             }
             else {
                 if (mField.getDisplayType() == VIS.DisplayType.Image) {
-                    iControl.getControl().hide();
+                    iControl.getControl().show();
 
                     iControl.setValue(null, false);
                 }

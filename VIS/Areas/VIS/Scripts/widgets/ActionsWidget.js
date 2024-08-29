@@ -176,7 +176,7 @@
             welcomeActionsDivId.find("#workflowCntDivId" + $self.AD_UserHomeWidgetID).empty();
             welcomeActionsDivId.find("#noticeCntDivId" + $self.AD_UserHomeWidgetID).empty();
             welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).empty();
-            loadCounts(false);
+            loadCounts(true);
         };
 
         /* get design from root*/

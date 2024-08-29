@@ -7575,7 +7575,7 @@
         return this.vo.AGFontName;
     };
     GridField.prototype.getAGStyle = function () {
-        return this.vo.AGStyleh;
+        return this.vo.AGStyle;
     };
 
     /**
