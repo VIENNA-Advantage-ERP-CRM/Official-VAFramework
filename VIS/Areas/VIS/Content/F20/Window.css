@@ -1698,7 +1698,7 @@ li.vis-page-item-select {
         max-width: 100%;
         max-height: 100%;
         border: none;
-        transform: scale(1.3);
+        /*transform: scale(1.3);*/
     }
 
 
@@ -2240,7 +2240,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 }
 
 .vis-fp-datawrap {
-    height: calc(100% - 65px);
+    height: calc(100% - 5px);
     overflow: auto;
     padding-top: 1px;
 }
@@ -2847,15 +2847,21 @@ html[dir="rtl"] .vis-window-instruc-overlay-new-inn {
     }
 
 .vis-fp-popup-arrow {
-    width: 0;
+  
+    bottom: -6px;
     height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid white; /* Changed from bottom to top */
-    position: absolute;
-    bottom: -10px; /* Changed from top to bottom */
     left: 10px;
+    position: absolute;
+    width: 0;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-right: none;
+    width: 9px;
+    height: 9px;
+    background: #fff;
+    transform: rotate(-45deg);
 }
+
 
 .vis-fp-btnDisable {
     opacity: 0.6;
@@ -2871,4 +2877,34 @@ html[dir="rtl"] .vis-window-instruc-overlay-new-inn {
     height: 100%;
     background-color: transparent;
     z-index: 1000; /* Below the popup but above other content */
+}
+
+.vis-fp-custcolumns [aria-expanded="true"] .card-link{
+    rotate:180deg;
+}
+
+.vis-load-animate {
+    opacity:0.5;
+    -animation: vis-spin .7s infinite linear;
+    -webkit-animation: vis-spin2 .7s infinite linear;
+}
+
+@-webkit-keyframes vis-spin2 {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes vis-spin {
+    from {
+        transform: scale(1) rotate(0deg);
+    }
+
+    to {
+        transform: scale(1) rotate(360deg);
+    }
 }

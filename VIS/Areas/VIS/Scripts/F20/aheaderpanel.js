@@ -607,7 +607,7 @@
             }
             else {
                 if (mField.getDisplayType() == VIS.DisplayType.Image) {
-                    iControl.getControl().hide();
+                    iControl.getControl().show();
 
                     iControl.setValue(null, false);
                 }

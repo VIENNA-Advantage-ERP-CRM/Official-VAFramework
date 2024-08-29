@@ -5281,10 +5281,11 @@
                 this.ctrl.addClass('vis-input-wrap-button-image-add');
             }
             else {
-                $img.attr('src', "data:image/jpg;base64," + resImg);
-                $img.hide();
-                $txt.text("-");
-                this.ctrl.removeClass('vis-input-wrap-button-image-add');
+                $img.attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/camera01.svg");
+                $img.show();
+                $icon.hide();
+                $txt.text("");
+                this.ctrl.addClass('vis-input-wrap-button-image-add');
             }
         };
 
