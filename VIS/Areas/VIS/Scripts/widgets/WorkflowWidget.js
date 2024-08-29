@@ -775,8 +775,8 @@
 
                     var signData = {
                         documentNo: docnameval[docnameval.length - 1],
-                        defaultReasonKey: $('[name="VADMS_SignStatus"]').children("option:selected").val(),
-                        defaultReason: $('[name="VADMS_SignStatus"]').children("option:selected").text(),
+                        defaultReasonKey: $root.find('[name="VADMS_SignStatus"]').children("option:selected").val(),
+                        defaultReason: $root.find('[name="VADMS_SignStatus"]').children("option:selected").text(),
                     };
 
                     if (signData.defaultReasonKey == undefined || signData.defaultReasonKey == '' || signData.defaultReason == undefined || signData.defaultReason == '') {
@@ -807,7 +807,8 @@
                     });
                 }
                 else {
-                    var id = $(aOk).data("id");
+                    //var id = $(aOk).data("id");
+                    var id = $root.find(aOk).data("id");
                     approveIt(id, aOk);
                     //showBusy(false);
                 }
