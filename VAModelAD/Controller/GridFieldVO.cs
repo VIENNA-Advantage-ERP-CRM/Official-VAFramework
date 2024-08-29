@@ -981,6 +981,7 @@ namespace VAdvantage.Controller
             clone.ADActionParams = ADActionParams;
             clone.AGName = AGName;
             clone.AGFontName = AGFontName;
+            clone.AGStyle= AGStyle;
             return clone;
         }
 

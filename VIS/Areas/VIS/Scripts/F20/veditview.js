@@ -929,7 +929,7 @@
         }
     }
 
-    function ActionGroup(name, fontname,style) {
+    function ActionGroup(name, fontname,style,isHdrItem) {
         this.name = name;
         this.vEditors = [];
         var $root = null;
@@ -938,38 +938,43 @@
         var id = "vis_ev_col_ag_btn" + Math.random();
         var popup = null;
         function InitUI() {
-            
-            //var html = '<div class="dropdown vis-ev-col-actiongroup">'
-            //    + '<span class="dropdown-toggle" id="' + id + '" data-toggle="dropdown">'
-            //    + '<i class="' + fontname + '"></i>'
-            //    + name + '</span>'
-            //    + '<div class="dropdown-menu" aria-labelledby="' + id + '">'
-            //    + '<ul class="vis-ev-col-ag-btn-list">'
-            //    + '</ul>'
-            //    + '</div>'
-            //    + '</div>';
 
             var styl = '';
             if (style && style != '') {
                 styl = ' style=' + style;
             }
+            
+            var html = '<div class="dropdown vis-ev-col-actiongroup" >' 
+                + '<span class="dropdown-toggle btn vis-ev-col-ag-dropdown-btn" id="' + id + '"' + styl + '  data-toggle="dropdown">'
+                + '<i class="' + fontname + '"></i>'
+                + name + '</span>'
+                + '<div class="dropdown-menu" aria-labelledby="' + id + '">'
+                + '<ul class="vis-ev-col-ag-btn-list">'
+                + '</ul>'
+                + '</div>'
+                + '</div>';
 
-           var  html = '<div class="vis-ev-col-actiongroup">'
-                            + ' <div id="' + id + '" class="vis-ev-col-ag-dropdown-btn btn dropdown-toggle"  '+styl+'>'
-                             + '<span class="' + fontname + '"></span>'
-                                 + name + '<span class="caret"></span>'
-                      +'</div> '
-                     //+ '<div class="dropdown-menu" aria-labelledby="' + id + '" > '
-                     //  + '<ul class="vis-ev-col-ag-btn-list">'
-                     //  + '</ul>'
-                     //+ '</div>'
-               + '</div>';
+            
+
+           //var  html = '<div class="vis-ev-col-actiongroup">'
+           //                 + ' <div id="' + id + '" class="vis-ev-col-ag-dropdown-btn btn dropdown-toggle"  '+styl+'>'
+           //                  + '<span class="' + fontname + '"></span>'
+           //                      + name + '<span class="caret"></span>'
+           //           +'</div> '
+           //          //+ '<div class="dropdown-menu" aria-labelledby="' + id + '" > '
+           //          //  + '<ul class="vis-ev-col-ag-btn-list">'
+           //          //  + '</ul>'
+           //          //+ '</div>'
+           //    + '</div>';
 
             $root = $(html);
+            if (!isHdrItem) {
+                $root.find(".vis-ev-col-ag-dropdown-btn").addClass("vis-ev-col-ag-dropdown-btn-color");
+            }   
 
-            $actionList = $("<ul class='vis-apanel-rb-ul'>");
+            //$actionList = $("<ul class='vis-apanel-rb-ul'>");
 
-            //$actionList = $root.find('.vis-ev-col-ag-btn-list');
+            $actionList = $root.find('.vis-ev-col-ag-btn-list');
 
             
         };
@@ -977,9 +982,9 @@
         InitUI();
 
         function events() {
-            $root.on('click', function (e) {
-                $root.w2overlay($actionList.clone(true));
-            });
+            //$root.on('click', function (e) {
+            //    $root.w2overlay($actionList.clone(true));
+            //});
         }
         events();
 

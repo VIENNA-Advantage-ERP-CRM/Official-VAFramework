@@ -862,6 +862,11 @@ namespace VAdvantage.Process
                 InsertIntoDBSchema(X_AD_FieldGroup.Table_ID, sField.GetAD_FieldGroup_ID(), X_AD_FieldGroup.Table_Name, "FieldGroup_" + sField.GetAD_FieldGroup_ID(), "AD_FieldGroup_ID = " + sField.GetAD_FieldGroup_ID());
             }
 
+            if (sField.GetAD_ActionGroup_ID() > 0)
+            {
+                InsertIntoDBSchema(X_AD_ActionGroup.Table_ID, sField.GetAD_ActionGroup_ID(), X_AD_ActionGroup.Table_Name, "ActionGroup_" + sField.GetAD_ActionGroup_ID(), "AD_ActionGroup_ID = " + sField.GetAD_ActionGroup_ID());
+            }
+
             if (sField.GetZoomWindow_ID() > 0)
             {
                 GetWindow(sField.GetZoomWindow_ID(),0);
