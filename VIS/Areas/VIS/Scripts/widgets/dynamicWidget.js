@@ -294,7 +294,7 @@
         if (value.ActionName != null && value.ActionType != null) {
             var type = value.ActionType.toUpper();
             if (type == 'W') {
-                if (value.ActionName == value.WindowName) {
+                if (this.listener.apanel && this.listener.apanel.gridWindow && value.ActionName == this.listener.apanel.gridWindow.getName()) {
                     this.listener.widgetFirevalueChanged(value);
                 } else {
                     var AD_Window_ID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID",
