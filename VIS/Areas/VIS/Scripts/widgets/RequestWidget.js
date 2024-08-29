@@ -44,15 +44,6 @@
         };
         /* Declare events */
         function events() {
-            $hlnkTabDataRef_ID.on("click", $self.refreshWidget);
-            $welcomeNewRecord.on("click", function () {
-                var sql = "VIS_129";
-                var n_win = executeScalar(sql);
-
-                var zoomQuery = new VIS.Query();
-                zoomQuery.addRestriction("R_Request_ID", VIS.Query.prototype.EQUAL, 0);
-                VIS.viewManager.startWindow(n_win, zoomQuery);
-            });
             welcomeTabDatacontainers.on("click", function (e) {
                 zoomFunction(e);
             });
@@ -85,7 +76,7 @@
                 + ' <div id="reqCountDiv' + $self.AD_UserHomeWidgetID + '" title="' + VIS.Msg.getMsg("Requests") + '" class="vis-w-welcomeScreenTab-notificationBubble blank"></div>'
                 + ' </div>'
                 + ' <div class="vis-w-iconsCls">'
-                + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-w-feedicon vis-RequestHlnkTabDataRefReq"><i class="vis vis-refresh"></i></a> '
+                + '          <a id="hlnkTabDataRefReq' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="ReQuery" class="vis-w-feedicon vis-RequestHlnkTabDataRefReq" style="display:none;"><i class="vis vis-refresh"></i></a> '
                 + '          <span id="sNewNts' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis-RequestNewNtsCls" title="New Record"><i class="vis vis-plus"></i></span> '
                 + ' </div>'
                 + '      </h2> '
@@ -100,6 +91,15 @@
             $hlnkTabDataRef_ID = $requestwelcomeDivId.find("#hlnkTabDataRefReq" + $self.AD_UserHomeWidgetID);
             $welcomeNewRecord = $requestwelcomeDivId.find("#sNewNts" + $self.AD_UserHomeWidgetID);
             welcomeTabDatacontainers.on("scroll", loadOnScroll);
+            $hlnkTabDataRef_ID.on("click", $self.refreshWidget);
+            $welcomeNewRecord.on("click", function () {
+                var sql = "VIS_129";
+                var n_win = executeScalar(sql);
+
+                var zoomQuery = new VIS.Query();
+                zoomQuery.addRestriction("R_Request_ID", VIS.Query.prototype.EQUAL, 0);
+                VIS.viewManager.startWindow(n_win, zoomQuery);
+            });
         };
         /* Start Request */
         function loadHomeRequest(isTabDataRef, async) {
@@ -301,6 +301,7 @@
         this.refreshWidget = function () {
             showBusy(true);
             welcomeTabDatacontainers.empty();
+            pageNo = 1;
             loadHomeRequest(true, false);
             welcomeTabDatacontainers.scrollTop(0);
         };

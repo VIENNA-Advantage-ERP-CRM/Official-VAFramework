@@ -1,5 +1,6 @@
 ﻿.vis-cardCls {
     background-color: #f3f3f3;
+    border-radius:6px;
 }
 
 .container {
@@ -580,7 +581,6 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
         display: block;
         border-radius: 100%;
         margin: auto;
-        position: absolute;
         left: 0;
         right: 0;
         top: 0;
@@ -593,7 +593,9 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
         align-items: center;
         justify-content: center;
     }
-
+.vis-w-workflow-Activity .vis-approved_wrap {
+    overflow:inherit;
+}
 .vis-ApproveCircleCls .vis {
     font-size: .875em;
     color: rgba(var(--v-c-primary), 1);
@@ -693,12 +695,17 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     font-size: 1.125em;
     flex: 1;
 }
+.vis-w-workflow-Activity .VIS_Pref_callout {
+    left: 15px !important;
+}
+.vis-w-workflow-Activity .vis-left-part span{
+    left:-15px !important;
+}
 /*.vis-w-workflowActivityDetails-Heading a:hover {*/
 /*color: rgba(var(--v-c-common),1);*/
 /*color: #d9f0ff;*/
 /*color: rgba(var(--v-c-on-secondary),1);
 }*/
-
 .vis-w-IIColumnContent .vis-w-input-widgetswrap select ~ label {
     font-size: 1em;
     /*font-size: 0.75em;*/
@@ -1194,6 +1201,11 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
         text-align: center;
         padding: 19% 0;
     }
+
+.vis-a-actionsWidgetCls .vis-w-feedicon {
+    /*display: block;*/
+    display: flex !important;
+}
 
 @media screen and (max-width: 2000px) {
     .vis-a-task-status-panel {
