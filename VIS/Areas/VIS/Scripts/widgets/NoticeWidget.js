@@ -109,9 +109,9 @@
                         for (var s in data) {
                             appendRecords(data, s);
                         }
-                        if (isTabAjaxBusy == true) {
+                        //if (isTabAjaxBusy == true) {
                             events();
-                        }
+                        //}
                         showBusy(false);
                     }
                     else {
