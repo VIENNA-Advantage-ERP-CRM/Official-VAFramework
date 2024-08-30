@@ -1296,7 +1296,7 @@
             if (this.grid.fixedBody !== !multiTabView) {
                 this.grid.fixedBody = !multiTabView;
                 if (this.grid.fixedBody) {
-                    this.$container.height(this.$container.parent().height());
+                    this.$container.height(this.$container.closest('.vis-ad-w-p-center').height());
                 }
             }
             //this.grid.fixedBody = !multiTabView;

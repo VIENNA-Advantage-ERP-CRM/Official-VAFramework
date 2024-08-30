@@ -249,7 +249,6 @@
                 actions = null;
             }
         };
-        
 
         this.disposeComponents = function () {
             self = null;
@@ -445,7 +444,7 @@
         }
         else {
             this.curGC = gc;
-            gc.activate(oldGC);
+            gc.activate(oldGC,null,true);
             this.setDynamicActions(this.curGC);
            
             this.curTab = gc.getMTab();
