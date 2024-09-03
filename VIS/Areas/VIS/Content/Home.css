@@ -3857,3 +3857,144 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 
+/*Home Screen Favourites Start*/
+.vis_homeTopUsrIcon {
+    margin: 5px 10px 0px 5px !important;
+    font-size: x-large !important;
+    cursor: pointer;
+}
+
+.VIS-nm-favourites-flyout {
+    /*background-color: #fff;*/
+    /*background-color: #dfeaed !important;*/
+    min-width: 600px;
+    position: absolute;
+    top: 42px;
+    right: 16px;
+    z-index: 100;
+    border: 1px solid #e4e4e4;
+    padding: 0px 16px 16px;
+    border-radius: 8px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    max-width: 600px;
+    /*max-height: calc(100vh - 66px) !important;*/
+}
+
+/*New Favourites*/
+.vis-nm-fav-homeFavourite {
+    border: 1px solid #f2f2f2;
+    border-radius: 6px;
+    box-shadow: 0 0 12px 0 #cccccc;
+    padding: 10px;
+    width: 400px;
+    position: absolute;
+    right: 1rem;
+    top: 3rem;
+    z-index: 999;
+    background-color: white;
+}
+
+.vis-nm-fav-menu-heading h1 {
+    font-size: 0.875rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.vis-nm-fav-menu-heading {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.vis-nm-fav-favourite-lising {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: .4rem;
+}
+
+.vis-nm-fav-grid-view {
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.vis-nm-fav-tile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(var(--v-c-readonly), 1);
+    padding: 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .vis-nm-fav-tile:hover {
+        background-color: rgba(var(--v-c-readonly), 0.7);
+    }
+
+.vis-nm-fav-ico-w-txt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .vis-nm-fav-ico-w-txt .prefix-tile-txt {
+        font-size: 0.875rem;
+        color: rgba(var(--v-c-primary), 1);
+        line-height: 0.875rem;
+    }
+
+.vis-nm-fav-tile .vis-star-empty {
+    color: rgba(var(--v-c-primary), 1);
+    font-size: 1.1rem;
+}
+
+.vis-nm-fav-grid-view .vis-nm-fav-ico-w-txt {
+    flex-direction: column;
+    align-items: start;
+    gap: 4px;
+}
+
+.vis-nm-fav-views {
+    display: flex;
+    align-items: center;
+}
+
+    .vis-nm-fav-views .vis {
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    .vis-nm-fav-views .vis-list-view {
+        display: none;
+    }
+
+.vis-nm-fav-gridView .vis-grid-view {
+    display: none;
+}
+
+.vis-nm-fav-gridView .vis-list-view {
+    display: block;
+}
+
+.vis_home-fav-count {
+    position: relative;
+}
+
+    .vis_home-fav-count .vis {
+        font-size: 1.8rem;
+        color: rgba(var(--v-c-primary), 1);
+    }
+
+.vis_home-total-count {
+    background-color: rgba(var(--v-c-on-secondary), 1);
+    border-radius: 10px;
+    color: rgba(var(--v-c-common), 1);
+    font-size: .75rem;
+    max-width: 30px;
+    min-width: 18px;
+    position: absolute;
+    right: 1px;
+    text-align: center;
+    top: 0;
+}
+/*Home Screen Favourites End*/

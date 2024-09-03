@@ -1238,9 +1238,9 @@ namespace VAdvantage.Model
                     {
                         m_date1 = (lastNDate.Month) + "/" + lastNDate.Day + "/" + lastNDate.Year;
                     }
-                        // }                     
-                        //m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
-                        int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
+                    // }                     
+                    //m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                    int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
 
                     if (tDays == dt_to.Day)
                     {
@@ -1250,7 +1250,7 @@ namespace VAdvantage.Model
                     {
                         if (this.GetLastNValue() == 0)
                         {
-                            m_date2 = DateTime.Now.Month + "/" + DateTime.DaysInMonth(dt_to.Year, DateTime.Now.Month - 1) + "/" + dt_to.Year;
+                            m_date2 = DateTime.Now.Month + "/" + DateTime.DaysInMonth(dt_to.Year, DateTime.Now.Month) + "/" + dt_to.Year;
                         }
                         else
                         {
