@@ -55,7 +55,7 @@
         /* Method to enable and disable busy indicator */
         function showBusy(show) {
             if (show) {
-                $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
+               $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).show();
             }
             else {
                 $root.find("#busyDivId" + $self.AD_UserHomeWidgetID).hide();
@@ -212,7 +212,7 @@
             e.stopPropagation();
             scrollWF = true;
             // do something
-            if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.80) && scrollWF) {//Condition true when 75 scroll is done
+            if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.99) && scrollWF) {//Condition true when 75 scroll is done
                 showBusy(true);
                 scrollWF = false;
                 var tabdataLastPage = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html());
@@ -353,6 +353,9 @@
                     var data = JSON.parse(result);
                     $root.find("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 700, "", function () {
                         $root.find("#divrecdcntnr_" + Ad_Note_ID).remove();
+                        welcomeTabDatacontainers.empty();
+                        pageNo = 1;
+                        loadHomeNotice(true, false);
                     });
                 }
             });
