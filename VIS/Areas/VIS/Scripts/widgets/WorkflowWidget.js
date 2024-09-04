@@ -114,7 +114,7 @@
             $txtSearch.on("keydown", function (e) {
                 if (e.keyCode == 13) {
                     showBusy(true);
-                    searchFunction();                    
+                    searchFunction();
                 }
             });
             $btnSearch.on('click', function () {
@@ -393,9 +393,10 @@
             });
         };
         //Get more data on Scroll 
-        function loadOnScroll(e) {            
+        function loadOnScroll(e) {
             // do something
-            if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
+
+            if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.99) && scrollWF) {//Condition true when 99 scroll is done
                 showBusy(true);
                 scrollWF = false;
                 var tabdataLastPage = parseInt($countDiv_ID.html());
@@ -408,7 +409,7 @@
                     refresh = true;
                     scrollWF = true;
                     showBusy(false);
-                }                
+                }
                 e.stopPropagation();
             }
         };
@@ -786,8 +787,8 @@
                     }
 
                     showBusy(true);
-                    $.post(VIS.Application.contextUrl + 'VADMS/Document/SignatureUsingWorkflow', signData, function (res) {                        
-                        if (res && res != 'null' && res.result == 'success') {                            
+                    $.post(VIS.Application.contextUrl + 'VADMS/Document/SignatureUsingWorkflow', signData, function (res) {
+                        if (res && res != 'null' && res.result == 'success') {
                             adjust_size();
                             lstDetailCtrls = [];
                             selectedItems = [];
@@ -844,8 +845,8 @@
                             windowID = fulldata[index].AD_Window_ID;
                             showBusy(true);
                             VIS.dataContext.getJSONData(VIS.Application.contextUrl + "WFActivity/ApproveIt",
-                                { "activityID": activitIDs, "nodeID": fulldata[index].AD_Node_ID, "txtMsg": msg, "fwd": fwdTo, "answer": answer, "AD_Window_ID": windowID }, function apprvoIt(info) {                                    
-                                    if (info.result == '') {    
+                                { "activityID": activitIDs, "nodeID": fulldata[index].AD_Node_ID, "txtMsg": msg, "fwd": fwdTo, "answer": answer, "AD_Window_ID": windowID }, function apprvoIt(info) {
+                                    if (info.result == '') {
                                         aOK.data('clicked', 'N');
                                         adjust_size();
                                         lstDetailCtrls = [];
@@ -1012,13 +1013,12 @@
 
 
                                     var divLeft = $("<div class='vis-left-part'>");
-                                    if (info.Node[node].History[hNode].TextMsg.length > 0) {
-                                        var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info'></i>");
-                                        var span = $("<span>");
-                                        span.append($("<img class='VIS_Pref_callout'>").attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/ccc.png").append("ToolTip Text"));
-                                        span.append($("<label class='VIS_Pref_Label_Font'>").append(VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg)))
-                                        btnDetail.append(span);
-
+                                    if (info.Node[node].History[hNode].TextMsg.length > 0) {                                      
+                                        var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg) + "'></i>");
+                                        //var span = $("<span>");
+                                        //span.append($("<img class='VIS_Pref_callout'>").attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/ccc.png").append("ToolTip Text"));
+                                        //span.append($("<label class='VIS_Pref_Label_Font'>").append(VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg)));
+                                        //btnDetail.append(span);
                                         divLeft.append(btnDetail);
                                     }
                                     divLeft.append(nodename);
@@ -1043,12 +1043,12 @@
 
                                     var divLeft = $("<div class='vis-left-part'>");
                                     if (info.Node[node].History[hNode].TextMsg.length > 0) {
-                                        var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info'></i>");
+                                        var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg) + "'></i>");
                                         //var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip' style='margin-right:5px'>").append($("<img class='VIS_Pref_img-i'>").attr("src", VIS.Application.contextUrl + "Areas/VIS/Images/i.png"));
-                                        var span = $("<span >");
-                                        span.append($("<img class='VIS_Pref_callout'>").attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/ccc.png").append("ToolTip Text"));
-                                        span.append($("<label class='VIS_Pref_Label_Font'>").append(VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg)))
-                                        btnDetail.append(span);
+                                        //var span = $("<span >");
+                                        //span.append($("<img class='VIS_Pref_callout'>").attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/ccc.png").append("ToolTip Text"));
+                                        //span.append($("<label class='VIS_Pref_Label_Font'>").append(VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg)))
+                                        //btnDetail.append(span);
 
                                         divLeft.append(btnDetail);
                                     }
@@ -1163,7 +1163,7 @@
             pageNo = 1;
             getworkflowWidget(true, false);
             //loadWindows();
-            
+
 
             $workflowActivitys.css('display', 'none').css('zindex', '2');
             $welcomeScreenFeedsLists.css('display', 'block');

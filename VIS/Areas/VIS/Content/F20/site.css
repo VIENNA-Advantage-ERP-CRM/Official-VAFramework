@@ -486,8 +486,8 @@ select {
 
 
 .vis-blinking-dot {
-    width: 14px;
-    height: 14px;
+    width: 22px;
+    height: 22px;
     background-color: rgb(233, 0, 0);
     border-radius: 50%;
     animation: blinkdot 1s infinite;
