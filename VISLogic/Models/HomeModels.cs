@@ -120,7 +120,7 @@ namespace VIS.Models
             }
             else
             {
-                sql += "AD_Widget_Trl.Name AS displayName,";
+                sql += "AD_Widget_Trl.displayName AS displayName,";
             }
             sql += @" AD_WidgetSize.className,AD_WidgetSize.Rowspan,AD_WidgetSize.Colspan,AD_WidgetSize.AD_WidgetSize_ID,AD_IMAGE.BINARYDATA,AD_ModuleInfo.name AS ModuleName, AD_Window_ID, IsDefault, Sequence FROM AD_Widget 
                             INNER JOIN AD_WidgetSize  ON AD_Widget.AD_Widget_ID=AD_WidgetSize.AD_Widget_ID
