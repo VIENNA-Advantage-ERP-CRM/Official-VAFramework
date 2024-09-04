@@ -832,7 +832,7 @@ namespace VAdvantage.Model
                 + "SELECT " + ADWidgetAccessID + ", w.AD_Widget_ID, " + GetAD_Role_ID() + ","
                 + GetAD_Client_ID() + "," + GetAD_Org_ID() + ",'Y', SysDate,"
                 + GetUpdatedBy() + ", SysDate," + GetUpdatedBy()
-                + " FROM AD_Widget w ";
+                + " FROM AD_Widget w  WHERE AD_Client_ID=0";
 
             //String sqlWindow = "INSERT INTO AD_Window_Access "
             //    + "(AD_Window_ID, AD_Role_ID,"
