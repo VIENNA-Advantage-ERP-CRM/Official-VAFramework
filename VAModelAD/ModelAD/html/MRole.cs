@@ -2150,7 +2150,7 @@ namespace VAdvantage.Model
                 keyColumnName += TableName + "_ID";	//	derived from table
 
                 // log.Fine("addAccessSQL - " + TableName + "(" + AD_Table_ID + ") " + keyColumnName);
-                string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rw);
+                string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rwOrg);
                 if (recordWhere.Length > 0)
                 {
                     retSQL.Append(" AND ").Append(recordWhere);

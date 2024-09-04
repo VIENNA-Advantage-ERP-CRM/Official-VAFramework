@@ -300,15 +300,16 @@
         return false;
     };
 
-    ContentPane.prototype.onParentTabChange = function (action) {
-
-        if (this.curGC.aPanel.curTab.needSave()) {
-            VIS.ADialog.warn('VIS_SaveParentFirst');
-            return;
+    ContentPane.prototype.onParentTabChange = function (action,gc) {
+        if (gc) {
+            if (gc.aPanel.curTab.needSave()) {
+                VIS.ADialog.warn('VIS_SaveParentFirst');
+                return;
+            }
+            gc.switchRowPresentation();
         }
         action = action.replace('st_', '');
-        if (this.curGC)
-        this.curGC.switchRowPresentation();
+        
         this.aTabbedPane.getAPanel().onTabChange(action);
     };
 
@@ -434,7 +435,7 @@
         if (this.getIsZoomToHeader(action)) {
             console.log("zoom to parent tab");
 
-            this.onParentTabChange(action);
+            this.onParentTabChange(action,oldGC);
             return false;
         }
         this.curTabIndex = this.newTabIndex;
