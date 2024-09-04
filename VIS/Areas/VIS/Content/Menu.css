@@ -506,6 +506,14 @@ nav.vis-nav-horizontal-scroll {
     top: 2px !important;
 }
 
+.vis-subnav-links a .vis-star-empty {
+    opacity: 0;
+}
+
+.vis-subnav-links a:hover .vis-star-empty {
+    opacity: 1;
+}
+
 @media screen and (max-width: 1366px) {
     .vis-subnav-links {
         grid-template-columns: 1fr 1fr 1fr 1fr;
