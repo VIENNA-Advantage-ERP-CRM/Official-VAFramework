@@ -125,17 +125,17 @@
                         }
                     }
                     if (self != null) {
-                        this.height = Math.floor(self.frame.widgetInfo.height.replace("px", ""));
-                        divHeight = this.height;
+                        self.height = Math.floor(self.frame.widgetInfo.height.replace("px", ""));
+                        divHeight = self.height;
                     }
-                    this.scrollHeight = $root[0].scrollHeight;
+                    self.scrollHeight = $root[0].scrollHeight;
 
                     var arrowDiv = $('<div class="vis-dynamicwidget-arrow">'
                         + '<i class="fa fa-caret-up vis-topArrow-icon" style="pointer-events:none; opacity:0.3" aria-hidden="true"></i>'
                         + '<i class="fa fa-caret-down vis-bottomArrow-icon" aria-hidden="true"></i>'
                         + '</div>');
 
-                    if (divHeight > 0 && (this.scrollHeight > divHeight)) {
+                    if (divHeight > 0 && (self.scrollHeight > divHeight)) {
                         $root.append(arrowDiv);
                     }
                     if (self.frame.widgetInfo.editMode) {

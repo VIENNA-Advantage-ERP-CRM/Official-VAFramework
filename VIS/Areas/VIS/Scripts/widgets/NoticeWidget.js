@@ -37,7 +37,7 @@
             createWidget();
             createBusyIndicator();
             showBusy(true);
-            loadHomeNotice(true, true);
+            loadHomeNotice(true, true, true);
         };
         /* Declare events */
         function events() {
@@ -89,7 +89,7 @@
             $hlnkTabDataRef_ID.on("click", $self.refreshWidget)
         };
         //Load Data
-        function loadHomeNotice(isTabAjaxBusy, async) {
+        function loadHomeNotice(isTabAjaxBusy, async, divEmpty) {
             showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeNotice',
@@ -106,12 +106,14 @@
                             welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
                             welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).append(parseInt(result.count));
                         }
+                        if (divEmpty == true) {
+                            welcomeTabDatacontainers.empty();
+                        }
+
                         for (var s in data) {
                             appendRecords(data, s);
                         }
-                        //if (isTabAjaxBusy == true) {
-                            events();
-                        //}
+                        events();
                         showBusy(false);
                     }
                     else {
@@ -125,6 +127,7 @@
                         showBusy(false);
                     }
                     isTabAjaxBusy = false;
+                    scrollWF = true;
                 }
             });
         }
@@ -210,22 +213,22 @@
         function loadOnScroll(e) {
             e.preventDefault();
             e.stopPropagation();
-            scrollWF = true;
             // do something
-            if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.80) && scrollWF) {//Condition true when 75 scroll is done
+            if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.99) && scrollWF) {//Condition true when 99 scroll is done
                 showBusy(true);
                 scrollWF = false;
                 var tabdataLastPage = parseInt($root.find("#countDiv" + $self.AD_UserHomeWidgetID).html());
                 var tabdatacntpage = pageNo * pageSize;
                 if (tabdatacntpage <= tabdataLastPage) {
                     pageNo += 1;
-                    loadHomeNotice(false, false);
+                    loadHomeNotice(false, true, false);
                 }
                 else {
-                    scrollWF = true;
+                    //scrollWF = true;
+                    showBusy(false);
                 }
-                showBusy(false);
             }
+            e.stopPropagation();
         };
         //Actions
         function actions(evnt) {
@@ -335,9 +338,8 @@
         //Refresh Widget
         this.refreshWidget = function () {
             showBusy(true);
-            welcomeTabDatacontainers.empty();
             pageNo = 1;
-            loadHomeNotice(true, false);
+            loadHomeNotice(true, true, true);
             welcomeTabDatacontainers.scrollTop(0);
         };
 
@@ -351,8 +353,11 @@
                 datatype: 'json',
                 success: function (result) {
                     var data = JSON.parse(result);
-                    $root.find("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 700, "", function () {
+                    $root.find("#divrecdcntnr_" + Ad_Note_ID).animate({ "width": "0px", "height": "8.25em", "margin-left": "50em" }, 400, "", function () {
                         $root.find("#divrecdcntnr_" + Ad_Note_ID).remove();
+                        pageNo = 1;
+                        loadHomeNotice(true, true, true);
+                        welcomeTabDatacontainers.scrollTop(0);
                     });
                 }
             });

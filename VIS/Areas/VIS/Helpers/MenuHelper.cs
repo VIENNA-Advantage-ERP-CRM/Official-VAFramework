@@ -540,7 +540,7 @@ namespace VIS.Helpers
             }
             else
             {
-                menu1HTML.Append("<a style='display:flex;' title='" + text + "' href='javascript:void(0)' data-seqno='" + seqNo + "'  data-value='" + id + "' data-action='" + action + "' data-actionid ='" + aid + "'><span class='" + menuIcons[action] + "'></span><span class='vis-navTxt'>" + text + "</span>" + contextMenu + "</a>");
+                menu1HTML.Append("<a class='vis-nm-NodeItem' style='display:flex;' title='" + text + "' href='javascript:void(0)' data-seqno='" + seqNo + "'  data-value='" + id + "' data-action='" + action + "' data-actionid ='" + aid + "'><span class='" + menuIcons[action] + "'></span><span class='vis-navTxt'>" + text + "</span>" + contextMenu + "</a>");
                 // menu1HTML.Append("<li class='vis-navList'  data-summary='N'><a href='javascript:void(0)'  data-seqno='" + seqNo + "'  data-value='" + id + "' data-action='" + action + "' data-actionid ='" + aid + "'><i class='" + menuIcons[action] + "'></i>" + text + "</a>" + contextMenu + "</li>");
             }
         }
@@ -888,11 +888,21 @@ namespace VIS.Helpers
             //image = "vis vis-menu-default";
             if (fontStyle != "")
                 imgStyle = "style='" + fontStyle + "'";
-            leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' data-image='" + image + "' data-summary='Y' title='" + text + "'>" +
+            if (image.IndexOf("Images/") > -1)
+            {
+                leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' data-summary='Y' title='" + text + "'>" +
+                                        "<img src=" + _ctx.GetContextUrl() + "'Images/Thumb32x32" + image.Substring(text.IndexOf("Images/") + 7) + "'/>" +
+                                            "<span>" + text + "</span>" +
+                                    "</a>");
+            }
+            else
+            {
+                leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' data-image='" + image + "' data-summary='Y' title='" + text + "'>" +
                                     // "<i class='" + image + "' style='color:" + randColors[index] + "' aria-hidden='true''></i>" +
                                     "<i class='" + image + "' " + imgStyle + " aria-hidden='true''></i>" +
                                         "<span>" + text + "</span>" +
                                 "</a>");
+            }
         }
 
         public int updateTree(Ctx ctx, string nodeID, int oldParentID, int newParentID, int AD_Tree_ID)

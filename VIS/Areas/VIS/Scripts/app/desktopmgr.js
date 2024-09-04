@@ -45,6 +45,9 @@
 
         var curSelTaskBarItem = null; //Current active TaskBar item
 
+        var $showFav = $('#vis_favHomeScreen');
+        var $favContainer = $('#vis_home_favourites');
+
         // button for opening calling interface  
         //var $vis_appCall = $("#vis_appCall");
 
@@ -72,6 +75,7 @@
             $menuOverlay.on(VIS.Events.onTouchStartOrClick, function (event) {
                 event.preventDefault();
                 hideMenu(); //Hide start menu
+                $favContainer.attr('style', 'display: none !important');
             });
 
             // menu tree click
@@ -346,6 +350,18 @@
 
                 }, 2);
                 showMenu(); // show the menu
+            });
+
+            $showFav.on("click", function () {
+                event.preventDefault();
+                if ($favContainer.css("display") == "block") {
+                    $favContainer.attr('style', 'display: none !important');
+                    $menuOverlay.fadeOut();
+                }
+                else {
+                    $favContainer.attr('style', 'display: block !important');
+                    $menuOverlay.fadeIn();
+                }
             });
 
             // call/show calling module 

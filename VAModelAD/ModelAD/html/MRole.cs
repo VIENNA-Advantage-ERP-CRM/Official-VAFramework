@@ -746,7 +746,8 @@ namespace VAdvantage.Model
             string ADProcessAccessID = "";
             string ADFormAccessID = "";
             string ADWorkflowAccessID = "";
-
+            //Changes done to Assign Access to widget while creating/Updating Admin role
+            string ADWidgetAccessID = "";
             if (MSysConfig.IsNativeSequence(false))
             {
                 //Get Next sequence No
@@ -754,6 +755,8 @@ namespace VAdvantage.Model
                 ADProcessAccessID = DB.IsOracle() ? "AD_Process_Access_seq.nextval" : "nextval('AD_Process_Access_seq')";
                 ADFormAccessID = DB.IsOracle() ? "AD_Form_Access_seq.nextval" : "nextval('AD_Form_Access_seq')";
                 ADWorkflowAccessID = DB.IsOracle() ? "AD_Workflow_Access_seq.nextval" : "nextval('AD_Workflow_Access_seq')";
+                //Changes done to Assign Access to widget while creating/Updating Admin role
+                ADWidgetAccessID = DB.IsOracle() ? "AD_Widget_Access_seq.nextval" : "nextval('AD_Widget_Access_seq')";
             }
             else
             {
@@ -781,6 +784,12 @@ namespace VAdvantage.Model
                 count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
                 count = DB.GetNextID(GetCtx(), "AD_Workflow_Access", null, count) - 1;
                 ADWorkflowAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Workflow_ID) + " + count + ")";
+
+                //Changes done to Assign Access to widget while creating/Updating Admin role
+                qry = "SELECT COUNT(AD_Widget_ID) FROM AD_Widget WHERE AD_Client_ID=0";
+                count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
+                count = DB.GetNextID(GetCtx(), "AD_Widget_Access", null, count) - 1;
+                ADWidgetAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Widget_ID) + " + count + ")";
             }
 
             String roleClientOrgUser = GetAD_Role_ID() + ","
@@ -819,6 +828,15 @@ namespace VAdvantage.Model
                 + "SELECT " + ADWorkflowAccessID + ", w.AD_Workflow_ID, " + roleClientOrgUser
                 + "FROM AD_Workflow w "
                 + "WHERE AccessLevel IN ";
+
+            //Changes done to Assign Access to widget while creating/Updating Admin role
+            String sqlWidget = "INSERT INTO AD_Widget_Access "
+                + "(AD_Widget_Access_ID,AD_Widget_ID, AD_Role_ID,"
+                + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy) "
+                + "SELECT " + ADWidgetAccessID + ", w.AD_Widget_ID, " + GetAD_Role_ID() + ","
+                + GetAD_Client_ID() + "," + GetAD_Org_ID() + ",'Y', SysDate,"
+                + GetUpdatedBy() + ", SysDate," + GetUpdatedBy()
+                + " FROM AD_Widget w  WHERE AD_Client_ID=0";
 
             //String sqlWindow = "INSERT INTO AD_Window_Access "
             //    + "(AD_Window_ID, AD_Role_ID,"
@@ -865,6 +883,10 @@ namespace VAdvantage.Model
             int wfDel = DataBase.DB.ExecuteQuery("DELETE FROM AD_Workflow_Access" + whereDel, null, Get_TrxName());
             int wf = DataBase.DB.ExecuteQuery(sqlWorkflow + roleAccessLevel, null, Get_TrxName());
 
+            //Changes done to Assign Access to widget while creating/Updating Admin role
+            int widDel = DataBase.DB.ExecuteQuery("DELETE FROM AD_Widget_Access" + whereDel, null, Get_TrxName());
+            int widf = DataBase.DB.ExecuteQuery(sqlWidget, null, Get_TrxName());
+
             // called function to add Document action access
             string daAccess = AddDocActionAccess();
 
@@ -872,6 +894,7 @@ namespace VAdvantage.Model
                 + ", AD_Process_ID=" + procDel + "+" + proc
                 + ", AD_Form_ID=" + formDel + "+" + form
                 + ", AD_Workflow_ID=" + wfDel + "+" + wf
+                + ", AD_Widget_ID=" + widDel + "+" + widf
                 + daAccess);
 
             LoadAccess(true);
@@ -879,6 +902,7 @@ namespace VAdvantage.Model
                 + " -  @AD_Process_ID@ #" + proc
                 + " -  @AD_Form_ID@ #" + form
                 + " -  @AD_Workflow_ID@ #" + wf
+                + " -  @AD_Widget_ID@ #" + widf
                 + daAccess;
 
         }

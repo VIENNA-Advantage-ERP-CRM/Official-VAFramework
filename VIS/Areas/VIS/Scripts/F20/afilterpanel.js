@@ -659,6 +659,11 @@
                 return;
             }
 
+            if (Object.keys(dsAdvanceData).length < 1) {
+                VIS.ADialog.error("", true, VIS.Msg.getMsg("SelectAtleastOneColumn"));
+                return;
+            }
+
 
             btnOk.find('.fa-check').hide();
             btnOk.find('.fa-spinner').show();
@@ -1797,7 +1802,7 @@
         return inStr;
     };	//	pa
 
-    FilterPanel.prototype.createDirectSql = function (code, code_to, column, operator, convertToString, tabindex) {
+    FilterPanel.prototype.createDirectSql = function (code, code_to, column, operator, convertToString, tabindex, isText) {
         var sb = "";
         var isoDateRegx = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
         if (typeof code == "string" && isNaN(code) && (code.toString().toUpper() != ("NULLValue").toUpper())) {
@@ -1827,7 +1832,7 @@
                 sb += VIS.DB.to_date(code, false);
             }
 
-            else if ("string" == typeof code && isNaN(code)) {
+            else if ("string" == typeof code && isText) {
                 if (convertToString) {
                     sb += " UPPER( ";
                     sb += VIS.DB.to_string(code.toString());
@@ -1851,7 +1856,7 @@
                     sb += VIS.DB.to_date(code_to, false);
                 }
 
-                else if (typeof (code_to) == "string") {
+                else if (typeof (code_to) == "string" &&  isText) {
                     sb += " UPPER( ";
                     sb += VIS.DB.to_string(code_to.toString());
                     sb += " ) ";
@@ -1872,6 +1877,8 @@
         //	Column
         var field = this.getTargetMField(columnName);
         var columnSQL = field.getColumnSQL(); //
+
+        var isText = VIS.DisplayType.IsText(field.getDisplayType());
 
         if (value != null && value.length > 0 && VIS.DisplayType.IsText(field.getDisplayType())) {
             if (optr == VIS.Query.prototype.LIKE) {
@@ -1910,10 +1917,10 @@
                     // return whereCondition;
                 }
                 parsedValue2 = this.parseValue(field, value2);
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex, isText);
             }
             else {
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex, isText);
             }
         }
         else {
@@ -1954,7 +1961,7 @@
                         VIS.MRole.SQL_NOTQUALIFIED, VIS.MRole.SQL_RO);
                     optr = VIS.Query.prototype.IN;
                 }
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false, tabIndex);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false, tabIndex, isText);
             }
             else {
                 // else add simple restriction where clause to query
@@ -1975,7 +1982,7 @@
                     }
                 }
                 else {
-                    whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, true, tabIndex);
+                    whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, true, tabIndex, isText);
 
                 }
             }

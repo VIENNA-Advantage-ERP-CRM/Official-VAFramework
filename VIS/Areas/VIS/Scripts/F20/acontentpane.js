@@ -20,6 +20,7 @@
 
         this.aNew = null;
         this.aSave = null;
+        this.aSaveNew = null;
         this.aDelete = null;
         this.aRefresh = null;
         //tolbar 
@@ -190,6 +191,7 @@
             this.aNew = pnl.addActions(pnl.ACTION_NAME_NEW, null, true, true, false, onAction, null, "Shct_CV_New", "New");
             this.aIgnore = pnl.addActions("UNO", null, true, true, false, onAction, null, "Shct_CV_Ignore", "Ignore");
             this.aSave = pnl.addActions("SAR", null, true, true, false, onAction, null, "Shct_CV_Save", "Save");
+            this.aSaveNew = pnl.addActions("SAN", null, true, true, false, onAction, null, "Shct_CV_SaveNew", "save-new");
             //this.aFind = pnl.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             //this.aInfo = pnl.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             //this.aReport = pnl.addActions("Report", null, true, true, false, onAction, null, "Shct_Report");
@@ -200,6 +202,7 @@
             $ulToolbar.append(this.aNew.getListItm());
             $ulToolbar.append(this.aDelete.getListItm());
             $ulToolbar.append(this.aSave.getListItm());
+            $ulToolbar.append(this.aSaveNew.getListItm());
             $ulToolbar.append(this.aRefresh.getListItm());
             $ulToolbar.append(this.aMulti.getListItm());
 
@@ -603,6 +606,7 @@
                 readOnly = false;
             this.aIgnore.setEnabled(changed && !readOnly);
             this.aSave.setEnabled(changed && !readOnly);
+            this.aSaveNew.setEnabled(changed && !readOnly);
            
             //
             //	No Rows
@@ -671,6 +675,9 @@
         else if (tis.aSave.getAction() === action) {
             tis.cmd_save(true);
         }
+        else if (tis.aSaveNew.getAction() === action) {
+            tis.cmd_saveNew(true);
+        }
         else if (tis.aNew.getAction() === action) {
             if (this.curGC.aPanel.curTab.needSave()) {
                 VIS.ADialog.warn('VIS_SaveParentFirst');
@@ -690,6 +697,15 @@
         tis = null;
     };
 
+    ContentPane.prototype.cmd_saveNew = function (manual) {
+        var $this = this;
+        this.cmd_save(true, function (result) {
+            if (result) {
+                $this.cmd_new(false);
+            }
+        });
+    }
+
     ContentPane.prototype.cmd_save = function (manual, callback) {
         //cmd_save(false);
         //this.curGC.dataRefreshAll();
@@ -701,6 +717,7 @@
         if (this.curST != null) {
             this.curST.saveData();
             this.aSave.setEnabled(false);	//	set explicitly
+            this.aSaveNew.setEnabled(false);	//	set explicitly
             return;
         }
 
@@ -849,6 +866,7 @@
         this.disposeComponents();
         this.aNew.dispose();
         this.aSave.dispose();
+        this.aSaveNew.dispose();
         this.aDelete.dispose();
         this.aRefresh.dispose();
 

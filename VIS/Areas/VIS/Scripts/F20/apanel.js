@@ -94,7 +94,7 @@
         this.ctx = VIS.Env.getCtx();
         this.curGC;
         this.curST;
-        this.curTab;
+        this.curTab;        
         this.vTabbedPane = new VIS.VTabbedPane(false);
 
         this.statusBar = new VIS.StatusBar();
@@ -467,7 +467,7 @@
             this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
             this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore", "Ignore");
             this.aSave = this.addActions("SAR", null, true, true, false, onAction, null, "Shct_Save", "Save");
-            this.aSaveNew = this.addActions("SAN", null, true, true, false, onAction, null, "Shct_SaveNew", "save-as");
+            this.aSaveNew = this.addActions("SAN", null, true, true, false, onAction, null, "Shct_SaveNew", "save-new");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report", "Report");
@@ -484,7 +484,7 @@
                 $ulToobar.append(this.aNew.getListItm());
                 $ulToobar.append(this.aDelete.getListItm());
                 $ulToobar.append(this.aSave.getListItm());
-                /*$ulToobar.append(this.aSaveNew.getListItm());*/
+                $ulToobar.append(this.aSaveNew.getListItm());
                 $ulToobar.append(this.aRefresh.getListItm());
                 $ulToobar.append(this.aReport.getListItm());
                 $ulToobar.append(this.aPrint.getListItm());
@@ -836,6 +836,14 @@
 
         };
 
+        this.isHideFilterIcon = function (hide) {
+            if (hide) {
+                $btnFilter.hide();
+            } else {
+                $btnFilter.show();
+            }
+        }
+
 
 
         /* END Set Tab Panel Icons */
@@ -918,6 +926,11 @@
         };
 
         this.startFilterPanel = function (hide) {
+
+            if (typeof hide == "undefined") {
+                hide = true;
+            }
+
             if (!hide) {
                 $fltrPanel.show();
                 this.refresh();
@@ -926,6 +939,7 @@
                 $fltrPanel.hide();
                 this.refresh();
             }
+            this.curTab.isFPManualHide = hide;
         };
 
         this.getTabSuffix = function () {
@@ -959,7 +973,7 @@
         }
 
         $btnFilter.on("click", function (e) {
-            self.startFilterPanel();
+            self.startFilterPanel(false);
         });
 
         $btnFPClose.on("click", function (e) {
@@ -1075,9 +1089,10 @@
 
                 self.cmd_find($txtSearch.val());
                 //self.curTab.searchText = "";
-                self.clearSearchText();
-                $txtSearch.val("");
+                //self.clearSearchText();
+                //$txtSearch.val("");
             }
+
             e.stopPropagation();
         });
 
@@ -1581,11 +1596,14 @@
                 case 86:      // Arrow Down for next record
                     this.actionPerformed(this.aCard.getAction());
                     break;
+                case 72: //H for Home
+                    this.cmd_home()
+                    break;
                 case 88:      // X for close
                     this.$parentWindow.dispose();
                     break;
-                case 79:
-                    this.startFilterPanel();
+                case 79: // O for close
+                    this.startFilterPanel(false);
                     break;
                 case 33:
                     if (evt.ctrlKey) {
@@ -2351,6 +2369,8 @@
             var view = "Y";
             if (action === "Multi") {
                 view = "N";
+                this.isHideFilterIcon(false);
+                this.startFilterPanel(this.curTab.isFPManualHide);
                 //if (tis.curGC.getIsSingleRow()) {
                 //    view = "N";
                 //} else {
@@ -2358,10 +2378,17 @@
                 //}
             } else if (action === "Single") {
                 view = "Y";
+                var lastFP = this.curTab.isFPManualHide;
+                this.startFilterPanel(true);
+                this.isHideFilterIcon(true);
+                this.curTab.isFPManualHide = lastFP;
+
             }
 
             else if (action === "Card") {
                 view = "C";
+                this.isHideFilterIcon(false);
+                this.startFilterPanel(this.curTab.isFPManualHide);
                 //if (tis.curGC.getIsCardRow()) {
                 //    view = "N";
                 //}
@@ -2419,6 +2446,7 @@
             //tis.showHideViewIcon(tis.aCard);
             //tis.curGC.switchCardRow();    
             tis.switchRow(tis.curGC, "C", true);
+
             // tis.aBack.setEnabled(!tis.curGC.getIsCardRow());
         } else if (tis.aMap.getAction() === action) {
             //tis.aMulti.setPressed(true);
@@ -3723,8 +3751,17 @@
         if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
             this.startFilterPanel(false);
         } else {
-            this.startFilterPanel(true);
+            this.startFilterPanel(this.curTab['isFPManualHide']);
         }
+        
+        
+        if (this.curGC.getIsSingleRow()) {
+            this.isHideFilterIcon(true);
+            this.startFilterPanel(true);
+        } else {
+            this.isHideFilterIcon(false);
+        }
+
         //}
 
         this.refresh();
@@ -4596,14 +4633,22 @@
                 if (defaultTabLayout == 'N') {
                     tis.showHideViewIcon(tis.aMulti);
                     tis.curGC.switchMultiRow();
+                    tis.isHideFilterIcon(false);
                 }
                 else if (defaultTabLayout == 'Y') {
                     tis.showHideViewIcon(tis.aSingle);
                     tis.curGC.switchSingleRow(true);
+                    tis.isHideFilterIcon(true);
+
+                    var lastFP = tis.curTab.isFPManualHide;
+                    tis.startFilterPanel(true);
+                    tis.isHideFilterIcon(true);
+                    tis.curTab.isFPManualHide = lastFP;
                 }
                 else if (defaultTabLayout == 'C') {
                     tis.showHideViewIcon(tis.aCard);
                     tis.curGC.switchCardRow(true);
+                    tis.isHideFilterIcon(false);
                 }
 
             }

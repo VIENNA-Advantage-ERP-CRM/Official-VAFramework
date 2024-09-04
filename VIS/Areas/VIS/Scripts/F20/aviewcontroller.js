@@ -2222,9 +2222,13 @@
                 var query = new VIS.Query();
                 this.getMTab().setQuery(query);
                 this.query(this.gTab.getOnlyCurrentDays(), 0, false);
+            } else {
+                this.vCardView.refreshUI(this.getVCardPanel().width());
             }
+
             //this.vCardView.requeryData();
             if (!this.displayAsMultiView && (this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
+
                 this.vHeaderPanel.hidePanel();
                 if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
                     this.vHeaderPanel.sizeChangedListner.onSizeChanged();

@@ -545,6 +545,10 @@
                 });
             }
 
+            function loadFavourites() {
+                VIS.favMgr.init($('#vis_home_favourites'));
+            };
+
             // Function to save the dashboard layout
             function saveDashboard() {
                 if (!isChanged) {
@@ -575,6 +579,7 @@
             // Load the home widget content and initialize it
             $home.load(VIS.Application.contextUrl + 'Home/HomeNew', function () {
                 adjustWidgetDivSize();
+                loadFavourites();
                 $container.append(openRightPanel);
                 $home.find('.vis-home-leftPanel').append($container);
                 loadWidgets();
