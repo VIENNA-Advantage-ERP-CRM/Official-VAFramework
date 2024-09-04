@@ -284,7 +284,7 @@
         //on Scroll
         function loadOnScroll(e) {
             // do something
-            if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.75) && scrollWF) {//Condition true when 75 scroll is done
+            if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.99) && scrollWF) {//Condition true when 75 scroll is done
                 showBusy(true);
                 var tabdataLastPage = parseInt($root.find("#reqCountDiv" + $self.AD_UserHomeWidgetID).html());
                 var tabdatacntpage = pageNo * pageSize;
