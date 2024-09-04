@@ -225,6 +225,7 @@
                 }
                 else {
                     //scrollWF = true;
+                    showBusy(false);
                 }
             }
             e.stopPropagation();
