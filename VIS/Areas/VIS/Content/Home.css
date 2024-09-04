@@ -3316,15 +3316,15 @@ p.vis-maintain-customer-p span {
     float: right;
     color: rgba(var(--v-c-primary), 1);
     cursor: pointer;
-    font-size:20px;
+    font-size:1.5rem;
 }
 
-    .vis-topArrow-icon {
-        float: right;
-        color: rgba(var(--v-c-primary), 1);
-        cursor: pointer;
-        font-size: 20px;
-    }
+.vis-topArrow-icon {
+    float: right;
+    color: rgba(var(--v-c-primary), 1);
+    cursor: pointer;
+    font-size: 1.5rem;
+}
 
         .vis-topArrow-icon:active, .vis-bottomArrow-icon:active {
             box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
@@ -3339,6 +3339,7 @@ p.vis-maintain-customer-p span {
     background: rgba(var(--v-c-primary), 1);
     color: rgba(var(--v-c-on-primary), 1);
     font-weight: 600;
+    border-radius:15px;
 }
 
 .vis-add-row button .vis-widget-badge {
