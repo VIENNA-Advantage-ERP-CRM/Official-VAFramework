@@ -263,7 +263,6 @@
      * @param {string} action name
      */
 
-
     /**
      * remove all listner and do cleanup 
      * */
@@ -302,8 +301,14 @@
     };
 
     ContentPane.prototype.onParentTabChange = function (action) {
+
+        if (this.curGC.aPanel.curTab.needSave()) {
+            VIS.ADialog.warn('VIS_SaveParentFirst');
+            return;
+        }
         action = action.replace('st_', '');
-        
+        if (this.curGC)
+        this.curGC.switchRowPresentation();
         this.aTabbedPane.getAPanel().onTabChange(action);
     };
 
@@ -312,8 +317,6 @@
      *  @param action tab item's id
      */
     ContentPane.prototype.tabActionPerformed = function (action) {
-
-       
 
         var back = false;
         var isAPanelTab = false;
@@ -430,10 +433,12 @@
 
         if (this.getIsZoomToHeader(action)) {
             console.log("zoom to parent tab");
+
             this.onParentTabChange(action);
             return false;
         }
         this.curTabIndex = this.newTabIndex;
+        this.action = action;
         
 
 
@@ -444,7 +449,13 @@
         }
         else {
             this.curGC = gc;
-            gc.activate(oldGC,null,true);
+            gc.activate(oldGC, null, true);
+
+
+            //switchMutiview laways
+            gc.switchMultiRow();
+
+
             this.setDynamicActions(this.curGC);
            
             this.curTab = gc.getMTab();
@@ -492,11 +503,14 @@
             this.aRefresh.setEnabled(true);
         }
 
+        //hide Multiview
+        this.aMulti.hide();
 
         if (curEle) {
             curEle.setVisible(false);
             curEle.getRoot().detach();
         }
+
         this.getLayout().append(tabEle.getRoot());
         tabEle.setVisible(true);
 
@@ -549,12 +563,10 @@
                 }
                 this.curGC.activateTree();
             }
-
             this.reQuery();
         }
         else {
             $ths = this;
-
             //  Confirm Error
             if (e.getIsError() && !e.getIsConfirmed()) {
                // VIS.ADialog.error(e.getAD_Message(), true, e.getInfo());
@@ -566,7 +578,6 @@
                         $ths.curTab.setLastFocus(null);
                     }
                 });
-
                 e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
                 this.errorDisplayed = true;
             }
@@ -575,7 +586,6 @@
                 VIS.ADialog.warn(e.getAD_Message(), true, e.getInfo());
                 e.setConfirmed(true);   //  show just once - if MTable.setCurrentRow is involved the status event is re-issued
             }
-
 
             //	update Change
             var changed = e.getIsChanged() || e.getIsInserting();
@@ -593,7 +603,6 @@
             this.aIgnore.setEnabled(changed && !readOnly);
             this.aSave.setEnabled(changed && !readOnly);
            
-
             //
             //	No Rows
             if (e.getTotalRows() == 0 && insertRecord) {
@@ -612,19 +621,12 @@
                // this.aNew.setEnabled(false);
             }
             else {
-
-                
             }
 
             //	Transaction info
-
             //if (this.curWinTab == this.vTabbedPane) {
                 this.evaluate(null);
             //}
-
-           
-               
-
         /******End Header Panel******/
         }
     };   //
@@ -653,10 +655,10 @@
 
     ContentPane.prototype.actionPerformedCallback = function (tis, action) {
 
-
-        if (tis.aMulti.getAction() === action) {
-            tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
-            tis.curGC.switchRowPresentation();
+        if (tis.aMulti.getAction() === action) { 
+            //switch view depriciated . should open single view in Main tab
+            //tis.aMulti.setPressed(!tis.curGC.getIsSingleRow());
+            tis.tabActionPerformed(tis.action);
         }
         else if (tis.aRefresh.getAction() === action) {
             tis.cmd_save(false);
@@ -816,7 +818,7 @@
             evt.preventDefault();
             evt.stopPropagation();
         }
-    }
+    };
 
     /**
      * evaluate other tab logics

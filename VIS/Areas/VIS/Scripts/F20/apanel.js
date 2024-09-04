@@ -794,7 +794,7 @@
             var clsName = 'vis-ad-w-p-center-flow-';
             var cls2 = "vis-ad-w-p-actionpanel-";
             if (show) {
-                var tpalign = this.curTab.getIsTPBottomAligned() && !this.showMultiViewOnly; //only multiview
+                var tpalign = this.curTab.getIsTPBottomAligned();// && !this.showMultiViewOnly; //only multiview
                 clsSuffix = tpalign ? 'b' : 'r';
                 var clsSuffixOld = tpalign ? 'r' : 'b';
 
@@ -1889,7 +1889,7 @@
         this.ctx.setContext(curWindowNo, "WindowName", gridWindow.getName());
 
         var multiTabview = gridWindow.getIsCompositeView();
-        this.showMultiViewOnly = true; //new porp
+        this.showMultiViewOnly = gridWindow.getIsDependentInDetailView(); //new porp
         this.vTabbedPane.init(this, multiTabview);
 
 
@@ -3582,6 +3582,9 @@
                     defaultTabLayout = this.actionParams.TabLayout;
                     resetLayout = true;
                 }
+
+
+
                 /* if reset tab is true then set default view which is set on tab */
                 if (resetLayout) {
                     //if (defaultTabLayout == 'N') {
@@ -3604,6 +3607,7 @@
                         defaultTabLayout = 'N'
                     }
                 }
+                
 
                 var AD_UserQuery_ID = 0;
                 if (this.actionParams && this.actionParams.AD_UserQuery_ID) {
@@ -3640,7 +3644,9 @@
             //else if (defaultTabLayout == 'C') {
             //    this.showHideViewIcon(this.aCard);
             //}
+
             this.switchRow(null, defaultTabLayout, true);
+           
 
             if (this.curGC.onDemandTree) {
                 this.aShowSummaryLevel.show();
@@ -3708,7 +3714,11 @@
         }
         
         this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
-        
+
+        if (!isAPanelTab && this.showMultiViewOnly) { // in case of compiste and grid mode
+            this.curGC.refreshRowPresentation();
+        }
+
         this.showFilterPanel(keepFilters);
         if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
             this.startFilterPanel(false);
@@ -3829,8 +3839,10 @@
     }
 
     APanel.prototype.displayIncArea = function (show) {
-        if (show)
+        if (show) {
             this.getIncludedEmptyArea().css('display', 'flex');
+            this.vT    
+        }
         else
             this.getIncludedEmptyArea().css('display', 'none');
     }
