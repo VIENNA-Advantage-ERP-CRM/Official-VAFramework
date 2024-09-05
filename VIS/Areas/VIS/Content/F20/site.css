@@ -555,10 +555,10 @@ select {
 }
 
 .vis-hideadmconfigblock {
-    display: none;
+    display: none !important;
 }
 
 .vis-displayadmconfigblock {
-    display: block;
+    display: flex !important;
 }
 /*End */
