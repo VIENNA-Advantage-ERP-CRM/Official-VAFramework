@@ -142,6 +142,7 @@
         var $spnTitle = null;
         var $spanSetting = null;
         var $divRightbar = null;
+        var $landingpage = null;
         this.excludeFromShare = ['ad_org', 'm_warehouse', 'ad_sharerecordorg'];
         /***END Tab panel**/
 
