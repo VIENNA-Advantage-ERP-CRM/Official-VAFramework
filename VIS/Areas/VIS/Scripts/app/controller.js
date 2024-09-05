@@ -398,6 +398,10 @@
         return this.vo.IsLandingPage;
     }
 
+    GridWindow.prototype.getIsDependentInDetailView = function () {
+        return this.vo.IsDependentInDetailView;
+    }
+
     GridWindow.prototype.dispose = function () {
 
         originalLength = this.tabs.length;

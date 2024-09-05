@@ -3860,7 +3860,7 @@ ul.vis-userLinks-ListMenu li a i {
 
 /*Home Screen Favourites Start*/
 .vis_homeTopUsrIcon {
-    margin: 5px 10px 0px 5px !important;
+    margin: 5px 5px 0px 5px !important;
     font-size: x-large !important;
     cursor: pointer;
 }
@@ -3912,6 +3912,8 @@ ul.vis-userLinks-ListMenu li a i {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     gap: .4rem;
+    max-height: 350px;
+    overflow-y: auto;
 }
 
 .vis-nm-fav-grid-view {
@@ -3922,7 +3924,7 @@ ul.vis-userLinks-ListMenu li a i {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: rgba(var(--v-c-readonly), 1);
+    background-color: rgba(var(--v-c-on-secondary),.03);
     padding: 0.6rem;
     border-radius: 6px;
     cursor: pointer;

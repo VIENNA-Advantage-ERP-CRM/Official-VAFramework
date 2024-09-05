@@ -87,10 +87,11 @@
     //****************************************************//
     //**            Grid Controller                    **//
     //**************************************************//
-    VIS.GridController = function (showRowNo, doPaging, id,multiTabView) {
+    VIS.GridController = function (showRowNo, doPaging, id, multiTabView, showMultiViewOnly) {
 
         this.id = id;
         this.multiTabView = multiTabView;
+        this.showMultiViewOnly = showMultiViewOnly;
         this.vGridPanel = new VIS.VGridPanel();
         this.vTable = new VIS.VTable();
         this.vCardView = new VIS.VCardView();
@@ -100,6 +101,7 @@
         this.aPanel = null;
         this.singleRow = false;
         this.isCardRow = false;
+        this.isMapRow = false;
         this.doPaging = doPaging;
         this.vIncludedGC = null;
         this.m_tree = null;
@@ -498,13 +500,15 @@
         return this.aFilterPanel.getRoot();
     };
     VIS.GridController.prototype.onSizeChanged = function (resize) {
-            if (resize && this.vTabPanel) {
-                this.vTabPanel.setSize(0);
-        }
 
-        this.multiRowResize();
-        if (this.vIncludedGC) {
-            this.vIncludedGC.multiRowResize();
+        var gc = this.aPanel.curGC;
+
+        if (resize && gc.vTabPanel) {
+            gc.vTabPanel.setSize(0);
+        }
+        gc.multiRowResize();
+        if (gc.vIncludedGC) {
+            gc.vIncludedGC.multiRowResize();
         }
         if (this.aPanel.vTabbedPane)
             this.aPanel.vTabbedPane.refresh();
@@ -842,6 +846,28 @@
             this.switchMultiRow();
         else
             this.switchSingleRow();
+    };
+
+    /**
+     * refresh row presentation
+     */
+    VIS.GridController.prototype.refreshRowPresentation = function () {
+        if (this.isCardRow) {
+            this.isCardRow = false;
+            this.switchCardRow();
+        }
+        else if (this.isMapRow) {
+            this.isMapRow = false;
+            this.switchMapRow();
+        }
+        else if (this.singleRow) {
+            this.singleRow = false;
+            this.switchSingleRow();
+        }
+        else if (!this.singleRow) {
+            this.singleRow = true;
+            this.switchMultiRow();
+        }
     };
 
     VIS.GridController.prototype.getIsSingleRow = function () {
@@ -1218,12 +1244,15 @@
 
     };
 
-    VIS.GridController.prototype.activate = function (oldGC, aParams) {
+    VIS.GridController.prototype.activate = function (oldGC, aParams,displayAsMultiView) {
 
         
         oldGC = oldGC || {};
         //
         var isWPanel = this.aPanel instanceof VIS.APanel;
+        this.displayAsMultiView = displayAsMultiView;
+
+       
 
         if (this.displayAsIncludedGC && isWPanel) {
             var tdArea = this.aPanel.getLayout();
@@ -1275,11 +1304,18 @@
            
             gridAutoHeight = true;
         }
+        if (this.multiTabView)
+            gridAutoHeight = true;
+        if (gridAutoHeight && this.showMultiViewOnly)
+            gridAutoHeight = false;
 
-        this.vTable.activate(this.multiTabView || gridAutoHeight);
+        this.vTable.setUI(displayAsMultiView);
+        this.vTable.activate(displayAsMultiView || gridAutoHeight, this.showMultiViewOnly);
+        
+
         this.vTable.setReadOnly(false);
         if (this.vCardView)
-        this.vCardView.setIsFixedBody(!(this.multiTabView || gridAutoHeight));
+            this.vCardView.setIsFixedBody(!gridAutoHeight);
 
         
 
@@ -2073,8 +2109,19 @@
             this.getVMapPanel().hide();
 
         }
+        if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) {
+            //this.notifyDependents(); //show included grid
+            this.aPanel.displayIncArea(true);
+            this.aPanel.vTabbedPane.refresh(); //refrsh composite view
+            if(!this.displayAsIncludedGC && this.vIncludedGC !=null) {
+                this.vIncludedGC.vTable.resize();
+            }
+            if (this.gTab.getIsTPBottomAligned())
+                this.aPanel.showTabPanel(true);
+        }
 
-        if ((this.gTab.isHPanelNotShowInMultiRow && !this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
+
+        if (!this.displayAsMultiView && (this.gTab.isHPanelNotShowInMultiRow && !this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
             this.vHeaderPanel.showPanel();
             if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
                 this.vHeaderPanel.sizeChangedListner.onSizeChanged();
@@ -2108,9 +2155,18 @@
 
             p1.show();
             p1 = null;
+
+            if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
+                this.aPanel.displayIncArea(false);
+                this.vTable.activate(false, this.showMultiViewOnly); 
+                if (this.gTab.getIsTPBottomAligned())
+                this.aPanel.showTabPanel(false);
+            }
+
             this.vTable.resize();
             this.vTable.refreshRow();
-            if ((this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
+
+            if (!this.displayAsMultiView && (this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
                 this.vHeaderPanel.hidePanel();
                 if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
                     this.vHeaderPanel.sizeChangedListner.onSizeChanged();
@@ -2151,6 +2207,13 @@
             else p1.css({ "float": '' });
 
             p1.css('display', 'block');
+
+            if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
+                this.aPanel.displayIncArea(false);
+                if (this.gTab.getIsTPBottomAligned())
+                    this.aPanel.showTabPanel(false);
+            }
+
             this.gTab.getTableModel().setCardID(this.vCardView.cardID);
             if (!avoidRequery) {
                 this.aPanel.clearSearchBox();
@@ -2162,7 +2225,10 @@
             } else {
                 this.vCardView.refreshUI(this.getVCardPanel().width());
             }
-            if ((this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
+
+            //this.vCardView.requeryData();
+            if (!this.displayAsMultiView && (this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
+
                 this.vHeaderPanel.hidePanel();
                 if (this.vHeaderPanel.sizeChangedListner && this.vHeaderPanel.sizeChangedListner.onSizeChanged)
                     this.vHeaderPanel.sizeChangedListner.onSizeChanged();
@@ -2191,6 +2257,12 @@
             if (this.isIncludedGCVisible)
                 p1.css({ "float": 'right' });
             else p1.css({ "float": '' });
+
+            if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
+                this.aPanel.displayIncArea(false);
+                if (this.gTab.getIsTPBottomAligned())
+                    this.aPanel.showTabPanel(false);
+            }
 
             p1.show();
             this.vMapView.refreshUI(this.getVMapPanel().width(), locationID);

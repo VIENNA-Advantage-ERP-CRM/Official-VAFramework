@@ -794,8 +794,9 @@
             var clsName = 'vis-ad-w-p-center-flow-';
             var cls2 = "vis-ad-w-p-actionpanel-";
             if (show) {
-                clsSuffix = this.curTab.getIsTPBottomAligned() ? 'b' : 'r';
-                var clsSuffixOld = this.curTab.getIsTPBottomAligned() ? 'r' : 'b';
+                var tpalign = this.curTab.getIsTPBottomAligned();// && !this.showMultiViewOnly; //only multiview
+                clsSuffix = tpalign ? 'b' : 'r';
+                var clsSuffixOld = tpalign ? 'r' : 'b';
 
                 if (!$tabPanel.hasClass(cls2 + clsSuffix)) {
                     $tabPanel.removeClass();
@@ -1906,6 +1907,7 @@
         this.ctx.setContext(curWindowNo, "WindowName", gridWindow.getName());
 
         var multiTabview = gridWindow.getIsCompositeView();
+        this.showMultiViewOnly = gridWindow.getIsDependentInDetailView(); //new porp
         this.vTabbedPane.init(this, multiTabview);
 
 
@@ -1999,7 +2001,7 @@
 
             else	//	normal tab
             {
-                var gc = new VIS.GridController(true, true, id,multiTabview);
+                var gc = new VIS.GridController(true, true, id, multiTabview, this.showMultiViewOnly);
                 gc.initGrid(false, curWindowNo, this, gTab);
 
                 //if (i === 0 && !setCurrent) {
@@ -2034,8 +2036,9 @@
 
                 tabElement = gc;
                 if (i === 0 && goSingleRow) {
-                    this.showHideViewIcon(this.aSingle);
-                    gc.switchSingleRow();
+                    this.switchRow(gc, "Y", true);
+                    //this.showHideViewIcon(this.aSingle);
+                    //gc.switchSingleRow();
                 }
                 //	Store GC if it has a included Tab
                 if (gTab.getIncluded_Tab_ID() != 0) {
@@ -2431,15 +2434,19 @@
             tis.isDefaultFocusSet = false;
             tis.curGC.navigateRelative(+1);
         } else if (tis.aSingle.getAction() === action) {
-            tis.showHideViewIcon(tis.aSingle);
-            tis.curGC.switchSingleRow(true);
+            //tis.showHideViewIcon(tis.aSingle);
+            //tis.curGC.switchSingleRow(true);
+            tis.switchRow(tis.curGC, "Y", true);
         }
         else if (tis.aMulti.getAction() === action) {
-            tis.showHideViewIcon(tis.aMulti);
-            tis.curGC.switchMultiRow();
+            //tis.showHideViewIcon(tis.aMulti);
+            //tis.curGC.switchMultiRow();
+            tis.switchRow(tis.curGC, "N", true);
         } else if (tis.aCard.getAction() === action) {
-            tis.showHideViewIcon(tis.aCard);
-            tis.curGC.switchCardRow(true);            
+            //tis.showHideViewIcon(tis.aCard);
+            //tis.curGC.switchCardRow();    
+            tis.switchRow(tis.curGC, "C", true);
+
             // tis.aBack.setEnabled(!tis.curGC.getIsCardRow());
         } else if (tis.aMap.getAction() === action) {
             //tis.aMulti.setPressed(true);
@@ -3603,17 +3610,21 @@
                     defaultTabLayout = this.actionParams.TabLayout;
                     resetLayout = true;
                 }
+
+
+
                 /* if reset tab is true then set default view which is set on tab */
                 if (resetLayout) {
-                    if (defaultTabLayout == 'N') {
-                        gc.switchMultiRow();
-                    }
-                    else if (defaultTabLayout == 'Y') {
-                        gc.switchSingleRow(true);
-                    }
-                    else if (defaultTabLayout == 'C') {
-                        gc.switchCardRow(true);
-                    }
+                    //if (defaultTabLayout == 'N') {
+                    //    gc.switchMultiRow();
+                    //}
+                    //else if (defaultTabLayout == 'Y') {
+                    //    gc.switchSingleRow(true);
+                    //}
+                    //else if (defaultTabLayout == 'C') {
+                    //    gc.switchCardRow(true);
+                    //}
+                    this.switchRow(gc, defaultTabLayout)
                 }
                 else {
                     if (gc.getIsSingleRow()) {
@@ -3624,6 +3635,7 @@
                         defaultTabLayout = 'N'
                     }
                 }
+                
 
                 var AD_UserQuery_ID = 0;
                 if (this.actionParams && this.actionParams.AD_UserQuery_ID) {
@@ -3651,15 +3663,18 @@
             }
             
             //Change Icon
-            if (defaultTabLayout == 'N') {
-                this.showHideViewIcon(this.aMulti);
-            }
-            else if (defaultTabLayout == 'Y') {
-                this.showHideViewIcon(this.aSingle);
-            }
-            else if (defaultTabLayout == 'C') {
-                this.showHideViewIcon(this.aCard);
-            }
+            //if (defaultTabLayout == 'N') {
+            //    this.showHideViewIcon(this.aMulti);
+            //}
+            //else if (defaultTabLayout == 'Y') {
+            //    this.showHideViewIcon(this.aSingle);
+            //}
+            //else if (defaultTabLayout == 'C') {
+            //    this.showHideViewIcon(this.aCard);
+            //}
+
+            this.switchRow(null, defaultTabLayout, true);
+           
 
             if (this.curGC.onDemandTree) {
                 this.aShowSummaryLevel.show();
@@ -3727,7 +3742,11 @@
         }
         
         this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
-        
+
+        if (!isAPanelTab && this.showMultiViewOnly) { // in case of compiste and grid mode
+            this.curGC.refreshRowPresentation();
+        }
+
         this.showFilterPanel(keepFilters);
         if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
             this.startFilterPanel(false);
@@ -3820,16 +3839,51 @@
 
         this.actionParams = {}; //clear 
 
-       //var selff = this;
-        //if (this.isShowSharedRecord && this.aSharedRecord) {
-        //    window.setTimeout(function () {
-        //        selff.aSharedRecord.setEnabled(true);
-        //        selff.aSharedRecord.setPressed(selff.curTab.hasShared(true));
-        //    }, 200);
-        //}
     };
 
-   
+    /**
+     * 
+     * @param {any} gc    grid controller null if dont want to switch row
+     * @param {any} tabLayout  char for layout
+     * @param {any} updateViewIconState   true if want to show hide icon based on tablayout
+     */
+    APanel.prototype.switchRow = function (gc, tabLayout, updateViewIconState) {
+
+        if (gc) {
+            if (tabLayout == 'N') {
+                gc.switchMultiRow();
+            }
+            else if (tabLayout == 'Y') {
+                gc.switchSingleRow(true);
+                            }
+            else if (tabLayout == 'C') {
+                gc.switchCardRow(true);
+            }
+        }
+
+        if (updateViewIconState) {
+            if (tabLayout == 'N') {
+                this.showHideViewIcon(this.aMulti);
+            }
+            else if (tabLayout == 'Y') {
+                this.showHideViewIcon(this.aSingle);
+            }
+            else if (tabLayout == 'C') {
+                this.showHideViewIcon(this.aCard);
+            }
+        }
+
+    }
+
+    APanel.prototype.displayIncArea = function (show) {
+        if (show) {
+            this.getIncludedEmptyArea().css('display', 'flex');
+            this.vT    
+        }
+        else
+            this.getIncludedEmptyArea().css('display', 'none');
+    }
+
     APanel.prototype.onQueryCompleted = function () {
 
     };

@@ -208,7 +208,7 @@
      */
     VTabPanel.prototype.init = function (gTab) {
         this.gTab = gTab;
-        this.isHorizontalAligned = this.gTab.getIsTPBottomAligned()
+        this.isHorizontalAligned = this.gTab.getIsTPBottomAligned();
         var panels = this.gTab.getTabPanels();
         this.isShowAll = this.gTab.getIsTPBottomShowAll();
 

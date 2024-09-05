@@ -143,7 +143,7 @@
                 if (clickCount === 1) {
                     clickCount = 0;
                     onGridCellClick(evt);
-                } else if (clickCount === 2) {
+                } else if (clickCount >= 2) {
                     clearTimeout(singleClickTimer);
                     clickCount = 0;
                 }
@@ -1284,11 +1284,22 @@
         return this.grid.get(recid, isIndex);
     };
 
-    VTable.prototype.activate = function (multiTabView) {
+    VTable.prototype.setUI = function (displayAsMultiview) {
+       // this.grid.show.selectColumn = !displayAsMultiview;
+        this.displayAsMultiview = displayAsMultiview;
+    };
+
+    VTable.prototype.activate = function (multiTabView, showMultiViewOnly) {
+        this.$container.closest('.vis-ad-w-p-vc').css('flex', '');
         if (this.grid && !this.rendred) {
             this.grid.fixedBody = true;
             if (multiTabView)
                 this.grid.fixedBody = false;
+            if (this.grid.fixedBody && showMultiViewOnly) {
+               // this.$container.height(this.$container.closest('.vis-ad-w-p-center').height());
+                this.$container.closest('.vis-ad-w-p-vc').css('flex', '1');
+                this.$container.height('');
+            }
             this.$container.w2render(this.grid['name']);
             this.rendred = true;
         }
@@ -1296,9 +1307,18 @@
             if (this.grid.fixedBody !== !multiTabView) {
                 this.grid.fixedBody = !multiTabView;
                 if (this.grid.fixedBody) {
-                    this.$container.height(this.$container.parent().height());
+                    //this.$container.height(this.$container.closest('.vis-ad-w-p-center').height());
+                    
+                    this.$container.closest('.vis-ad-w-p-vc').css('flex', '1');
+                    this.$container.height('');
                 }
             }
+            if (this.grid.fixedBody && showMultiViewOnly) {
+               // this.$container.height(this.$container.closest('.vis-ad-w-p-center').height());
+                this.$container.closest('.vis-ad-w-p-vc').css('flex', '1');
+                this.$container.height('');
+            }
+           
             //this.grid.fixedBody = !multiTabView;
             //window.setTimeout(function (tht) {
             //    tht.grid.resize();
