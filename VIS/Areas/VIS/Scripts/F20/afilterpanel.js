@@ -1367,7 +1367,7 @@
             var index = dsFilterData.findIndex(function (item) {
                 if (item.KEYVALUE + '_' + item.tabindex === colValue) {
                     tabindex = item.tabindex;
-                    colV = colValue;
+                    colV = item.KEYVALUE;
                     return item.KEYVALUE + '_' + item.tabindex === colValue;
                 }
                

@@ -891,7 +891,7 @@ namespace VIS.Helpers
             if (image.IndexOf("Images/") > -1)
             {
                 leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' data-summary='Y' title='" + text + "'>" +
-                                        "<img src=" + _ctx.GetContextUrl() + "'Images/Thumb32x32" + image.Substring(text.IndexOf("Images/") + 7) + "'/>" +
+                                        "<img class='VIS-nm-favIconImg' " + imgStyle + " src=" + _ctx.GetContextUrl() + "'Images/Thumb32x32" + image.Substring(text.IndexOf("Images/") + 7) + "'/>" +
                                             "<span>" + text + "</span>" +
                                     "</a>");
             }
