@@ -281,8 +281,8 @@
 
     VIS.dynamicWidget.prototype.widgetSizeChange = function (widgetInfo) {
         this.frame.widgetInfo = widgetInfo;
-        if (!size.editMode) {
-            this.resize(Math.floor(size.height.replace('px', '')));
+        if (!widgetInfo.editMode) {
+            this.resize(Math.floor(widgetInfo.height.replace('px', '')));
         }
 
     };
