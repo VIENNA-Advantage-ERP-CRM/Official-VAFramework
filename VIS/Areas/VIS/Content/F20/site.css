@@ -555,7 +555,7 @@ select {
 }
 
 .vis-hideadmconfigblock {
-    display: none;
+    display: none !important;
 }
 
 .vis-displayadmconfigblock {
