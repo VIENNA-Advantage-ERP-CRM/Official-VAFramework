@@ -3860,7 +3860,7 @@ ul.vis-userLinks-ListMenu li a i {
 
 /*Home Screen Favourites Start*/
 .vis_homeTopUsrIcon {
-    margin: 5px 5px 0px 5px !important;
+    margin: 0px 5px 0px 0px !important;
     font-size: x-large !important;
     cursor: pointer;
 }
@@ -3981,10 +3981,14 @@ ul.vis-userLinks-ListMenu li a i {
 
 .vis_home-fav-count {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 1px;
 }
 
     .vis_home-fav-count .vis {
-        font-size: 1.8rem;
+        font-size: 1.1rem;
         color: rgba(var(--v-c-primary), 1);
     }
 
@@ -3994,10 +3998,11 @@ ul.vis-userLinks-ListMenu li a i {
     color: rgba(var(--v-c-common), 1);
     font-size: .75rem;
     max-width: 30px;
-    min-width: 18px;
+    min-width: 16px;
+    min-height: 16px;
     position: absolute;
-    right: 1px;
+    right: -8px;
     text-align: center;
-    top: 0;
+    top: -9px;
 }
 /*Home Screen Favourites End*/
