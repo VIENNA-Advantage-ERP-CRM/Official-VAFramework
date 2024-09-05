@@ -121,9 +121,10 @@
                         scrollLeftButton.css("display", "none");
                         scrollRightButton.css("display", "none");
                     }
+                    var totHdrWidth = $topHdrDiv.width();
                     $navMenuAction.append($(appItems[0].children).clone());
                     // subtract width of user image, auto data recording, app menu and menu icons
-                    var width = $topHdrDiv.width() - $appMenuDiv.width() - 250;
+                    var width = totHdrWidth - $appMenuDiv.width() - 270;
                     if ($navMenuAction.width() > width) {
                         $navMenuAction.css("width", width - 20 + "px");
                         if (scrollLeftButton) {
