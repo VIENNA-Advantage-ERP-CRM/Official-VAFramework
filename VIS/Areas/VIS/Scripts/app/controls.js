@@ -7080,11 +7080,25 @@
             geoIpLookup: function (success, failure) {
                // $.get("https://ipinfo.io", function () { }, "jsonp").always(function (resp) {
                  //   var countryCode = (resp && resp.country) ? resp.country : "us";
-                if (window.geoplugin_countryCode)
-                    success(geoplugin_countryCode());
-                else
-                    success(navigator.language.split("-")[1]);
+                //if (window.geoplugin_countryCode)
+                //    success(geoplugin_countryCode());
+                //else
+                //    success(navigator.language.split("-")[1]);
                // });
+                try {
+                    var lang = navigator.language;
+
+                    if (lang.length > 2)
+                        success(lang.split("-")[1]);
+                    else {
+                        console.log("Country code : " + lang);
+                        success(lang.toUpperCase());
+                    }
+                }
+                catch {
+                    //set login Language
+                    console.log("Not found country code : " + lang);
+                }
             },
             utilsScript: baseUrl + "Areas/ViennaBase/Scripts/tel_Input/utils.js?1638200991544"
         });

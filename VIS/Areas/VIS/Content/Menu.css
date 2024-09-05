@@ -514,6 +514,11 @@ nav.vis-nav-horizontal-scroll {
     opacity: 1;
 }
 
+.VIS-nm-favIconImg {
+    height: 32px;
+    width: 32px;
+}
+
 @media screen and (max-width: 1366px) {
     .vis-subnav-links {
         grid-template-columns: 1fr 1fr 1fr 1fr;
