@@ -24,6 +24,8 @@
         var widgetList = {};
         var widgetWidth = null;
         var homeItems = {};
+        var $busy = null;
+        var $ulPopup = null;
 
         //function hideShowIcon() {
         //    if (isEditMode) {
