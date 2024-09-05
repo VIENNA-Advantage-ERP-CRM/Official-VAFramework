@@ -559,6 +559,6 @@ select {
 }
 
 .vis-displayadmconfigblock {
-    display: flex;
+    display: flex !important;
 }
 /*End */
