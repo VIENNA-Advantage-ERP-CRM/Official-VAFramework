@@ -124,7 +124,7 @@
                     var totHdrWidth = $topHdrDiv.width();
                     $navMenuAction.append($(appItems[0].children).clone());
                     // subtract width of user image, auto data recording, app menu and menu icons
-                    var width = totHdrWidth - $appMenuDiv.width() - 270;
+                    var width = totHdrWidth - $appMenuDiv.width() - 300;
                     if ($navMenuAction.width() > width) {
                         $navMenuAction.css("width", width - 20 + "px");
                         if (scrollLeftButton) {

@@ -3996,13 +3996,13 @@ ul.vis-userLinks-ListMenu li a i {
     background-color: rgba(var(--v-c-on-secondary), 1);
     border-radius: 10px;
     color: rgba(var(--v-c-common), 1);
-    font-size: .75rem;
+    font-size: .65rem;
     max-width: 30px;
     min-width: 16px;
     min-height: 16px;
     position: absolute;
-    right: -8px;
+    right: -10px;
     text-align: center;
-    top: -9px;
+    top: -8px;
 }
 /*Home Screen Favourites End*/
