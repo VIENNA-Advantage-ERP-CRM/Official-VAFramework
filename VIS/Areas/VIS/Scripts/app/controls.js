@@ -312,7 +312,7 @@
             else if (displayType == VIS.DisplayType.Location) {
 
                 var txtLoc = new VLocation(columnName, isMandatory, isReadOnly,
-                    isUpdateable, displayType, mField.getLookup(),hideMapBtn);
+                    isUpdateable, displayType, mField.getLookup(), hideMapBtn);
                 txtLoc.setField(mField);
                 ctrl = txtLoc;
             }
@@ -776,7 +776,7 @@
 
             if (e.length > 0)
                 this.ctrl.addClass(e);
-            
+
             this.activeClass = e;
             //this.ctrl.css('background-color', color);
             //console.log(this.ctrl.css('background-color'));
@@ -818,7 +818,7 @@
 
                 if (self.ctrl.parent().length != 0)
                     self.ctrl.detach();
-             
+
                 self.editingGrid.editChange.call(self.editingGrid, self.ctrl[0], self.gridPos.index, self.gridPos.col, evt, evt.newValue);
                 if (self.oldValue == evt.newValue)// special handling
                 {
@@ -1080,7 +1080,7 @@
 
         IControl.call(this, $ctrl, VIS.DisplayType.Label, true, isADControl ? name : "lbl" + name);
         if (isMandatory) {
-            $ctrl.append('<span>'+value+'</span>').append("<sup>*</sup>");
+            $ctrl.append('<span>' + value + '</span>').append("<sup>*</sup>");
         }
         else {
             $ctrl.text(value);
@@ -2604,8 +2604,8 @@
                         }, 500);
                     } else {
                         self.setValue(item.id, true, true);
-                        
-                        if (columnName.toUpperCase() =='M_PRODUCT_ID') {
+
+                        if (columnName.toUpperCase() == 'M_PRODUCT_ID') {
                             VIS.context.setContext(self.lookup.windowNo, "AttrCode", item.id);
                         }
 
@@ -4253,7 +4253,7 @@
      *  @param title title
      */
 
-    function VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, lookup,hideMapButton) {
+    function VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, lookup, hideMapButton) {
         if (!displayType) {
             displayType = VIS.DisplayType.Location;
         }
@@ -5194,7 +5194,7 @@
         var $ctrl = null;
         var dimension = "Thumb500x375";
 
-        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl'});
+        $ctrl = $('<button >', { type: 'button', name: columnName, class: 'vis-ev-col-img-ctrl' });
         $txt.css("color", "blue");
 
 
@@ -6794,7 +6794,7 @@
         this.setBackground(false);
     };
 
-    
+
 
     VProgressBar.prototype.setHtmlStyle = function (style) {
         if (style && this.dynStyle != style) {
@@ -6876,24 +6876,26 @@
         this.obscureType = obscureType;
         var src = "fa fa-phone";
         //Init Control
-        
+
         var $ctrl = $('<input>', { type: 'tel', name: columnName, maxlength: fieldLength });
+
         var $btnSearch = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" /></button>');
        // if (!isReadOnly)
          //   $ctrl.append($btnSearch);
+
         var telCtrl = $ctrl;
         //Call base class
         IControl.call(this, $ctrl, displayType, isReadOnly, columnName, isMandatory);
 
-        if (isReadOnly || !isUpdateable ) {
+        if (isReadOnly || !isUpdateable) {
             this.setReadOnly(true);
         }
         else {
             this.setReadOnly(false);
-        }      
+        }
 
         this.getBtn = function (index) {
-            if (index == 0 ) {
+            if (index == 0) {
                 //this.setReadOnly(true);
                 return $btnSearch;
             }
@@ -6933,7 +6935,7 @@
             // Only ASCII character in that range allowed
             var ASCIICode = (evt.which) ? evt.which : evt.keyCode
             if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57)) {
-                if (ASCIICode == 43 && this.value.indexOf('+') <0)
+                if (ASCIICode == 43 && this.value.indexOf('+') < 0)
                     return true; //+ sign only
                 return false;
             }
@@ -6947,8 +6949,8 @@
             }
         });
 
-        $ctrl.on("blur", function (e){
-           // $ctrl.unmask();
+        $ctrl.on("blur", function (e) {
+            // $ctrl.unmask();
         });
 
         /* Event */
@@ -6964,14 +6966,14 @@
 
         $btnSearch.on("click", function () {
             //if (self.mField.getIsEditable(true) && !self.editingGrid) {
-                if (!self.editingGrid) {
+            if (!self.editingGrid) {
                 //self.setReadOnly(false, true, true);
-               // $ctrl.val(self.mField.getValue());
-               // $ctrl.focus();
+                // $ctrl.val(self.mField.getValue());
+                // $ctrl.focus();
                 if (window.VA048) {
 
                     var val = self.getValue();
-                    if (!val || val=="")
+                    if (!val || val == "")
                         return;
 
                     var numberinfo = {};
@@ -6998,8 +7000,8 @@
         this.disposeComponent = function () {
             $ctrl.off("change"); //u bind event
             $ctrl = null;
-            if(self.iti)
-            self.iti.destroy();
+            if (self.iti)
+                self.iti.destroy();
             self = null;
         }
 
@@ -7025,7 +7027,7 @@
      *  @param new value to set
      */
     VTelePhone.prototype.setValue = function (newValue) {
-        
+
         if (this.oldValue != newValue) {
 
             //console.log(newValue);
@@ -7035,20 +7037,20 @@
             //    this.setReadOnly(true);
             //}
             //else {
-                this.settingVal=true;
-                //else
-                //his.ctrl.val(newValue);
-                if (!newValue) {
-                    this.iti ? this.iti.setNumber('') : this.ctrl.val('');
-                    this.setCountry();
-                } else {
-                    this.iti ? this.iti.setNumber(newValue) : this.ctrl.val(newValue);
-                    //var res = this.ctrl.attr('placeholder').replace(/[0-9]/g, 0);
-                    //this.ctrl.mask(res);
-                }
-                this.settingVal = false;
+            this.settingVal = true;
+            //else
+            //his.ctrl.val(newValue);
+            if (!newValue) {
+                this.iti ? this.iti.setNumber('') : this.ctrl.val('');
+                this.setCountry();
+            } else {
+                this.iti ? this.iti.setNumber(newValue) : this.ctrl.val(newValue);
+                //var res = this.ctrl.attr('placeholder').replace(/[0-9]/g, 0);
+                //this.ctrl.mask(res);
+            }
+            this.settingVal = false;
             //}
-            
+
             this.oldValue = newValue;
             //this.setBackground("white");
         }
@@ -7067,24 +7069,34 @@
 
     VTelePhone.prototype.init = function () {
 
+        var lang = navigator.language;
+        if (lang.length > 2) {
+            lang = lang.split("-")[1]
+        }
+        else { //login language
+            lang = VIS.context.getAD_Language().split('_')[1];
+        }
+        this.lang = lang;
+
         this.iti = window.intlTelInput(this.ctrl[0], {
             initialCountry: "auto",
             separateDialCode: true,
             autoPlaceholder: "aggressive",
             //initialCountry: "in",
             formatOnDisplay: true,
-           // allowDropdown: false,
+            // allowDropdown: false,
             //customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
             //    return  selectedCountryPlaceholder;
             //},
             geoIpLookup: function (success, failure) {
-               // $.get("https://ipinfo.io", function () { }, "jsonp").always(function (resp) {
-                 //   var countryCode = (resp && resp.country) ? resp.country : "us";
-                if (window.geoplugin_countryCode)
-                    success(geoplugin_countryCode());
-                else
-                    success(navigator.language.split("-")[1]);
-               // });
+                // $.get("https://ipinfo.io", function () { }, "jsonp").always(function (resp) {
+                //   var countryCode = (resp && resp.country) ? resp.country : "us";
+                //if (window.geoplugin_countryCode)
+                //    success(geoplugin_countryCode());
+                //else
+                //    success(navigator.language.split("-")[1]);
+                // });
+                success(lang);
             },
             utilsScript: baseUrl + "Areas/ViennaBase/Scripts/tel_Input/utils.js?1638200991544"
         });
@@ -7092,20 +7104,20 @@
     };
 
     VTelePhone.prototype.getControl = function (parent) {
-       if (parent) {
-           if (!this.isMasked) {
-               this.ctrl.mask("Z0000000000000000", {
+        if (parent) {
+            if (!this.isMasked) {
+                this.ctrl.mask("Z0000000000000000", {
 
-                   translation: {
-                       '0': { pattern: /\d/ },
-                       '9': { pattern: /\d/, optional: true },
-                       'Z': { pattern: /[+]/, optional:true}
-                   }
+                    translation: {
+                        '0': { pattern: /\d/ },
+                        '9': { pattern: /\d/, optional: true },
+                        'Z': { pattern: /[+]/, optional: true }
+                    }
 
-               });
-               this.isMasked = true;
-           }
-           return this.ctrl;
+                });
+                this.isMasked = true;
+            }
+            return this.ctrl;
             //return this.ctrl;
         }
         return this.ctrl;
@@ -7113,21 +7125,18 @@
 
     VTelePhone.prototype.setCountry = function () {
         if (this.iti) {
-            if (window.geoplugin_countryCode)
-                this.iti.setCountry(geoplugin_countryCode());
-            else
-                this.iti.setCountry('IN');
+            this.iti.setCountry(this.lang);
         }
     };
 
     VTelePhone.prototype.getSelectedCountryData = function () {
-        if(this.iti)
+        if (this.iti)
             return this.iti.getSelectedCountryData();
         return { 'dialCode': '+91', 'iso2': 'en' };
     }
 
     VTelePhone.prototype.detach = function () {
-        
+
         this.prnt.detach();
     };
     //END VTelephone
@@ -7175,7 +7184,7 @@
         $ctrl.on("change", function (e) {
             e.stopPropagation();
             //var newVal = $ctrl.val();
-            var newVal =  self.ctrl.val();
+            var newVal = self.ctrl.val();
             this.value = newVal;
             if (newVal !== self.oldValue) {
                 var evt = { newValue: newVal, propertyName: self.getName() };
@@ -7193,7 +7202,7 @@
 
 
         $btnSearch.on("click", function () {
-            
+
         });
 
         this.disposeComponent = function () {
@@ -7212,7 +7221,7 @@
             this.oldValue = newValue;
         }
     };
-    
+
     //end color 
 
 
@@ -7243,7 +7252,7 @@
     VIS.Controls.VTelePhone = VTelePhone;
     VIS.Controls.VColor = VColor;
     VIS.Controls.VURL = VURL;
-/* END */
+    /* END */
 
 
 
@@ -7267,13 +7276,13 @@
             }
         };
 
-        function getFormatedHtml(val,showPointer) {
+        function getFormatedHtml(val, showPointer) {
             init();
             if (!val)
                 return '';
 
             if (val.indexOf('+') < 0) {
-                    telePhoneFormatter.setCountry();
+                telePhoneFormatter.setCountry();
             }
             telePhoneFormatter.setValue(val);
 
@@ -7298,7 +7307,7 @@
             if (showPointer) {
                 htm += 'cursor: pointer;';
             }
-                    htm+= '"> ' + fVal + '</div > '
+            htm += '"> ' + fVal + '</div > '
                 + '</div>';
             return htm;
         };

@@ -70,7 +70,8 @@ select {
         flex-basis: auto;
         /*height: 100%;*/
     }
-.vis-app-hdr-l li{
+
+.vis-app-hdr-l li {
     height: 100%;
 }
 
@@ -78,10 +79,10 @@ select {
     /*color: rgba(var(--v-c-primary),1);*/
 }
 
-        .vis-app-hdr a:hover {
-            text-decoration: none;
-            /*color: rgba(var(--v-c-primary), 1);*/
-        }
+    .vis-app-hdr a:hover {
+        text-decoration: none;
+        /*color: rgba(var(--v-c-primary), 1);*/
+    }
 
 .vis-app-hdr-l-menu:focus {
     border: 1px solid rgba(var(--v-c-primary), 1);
@@ -136,9 +137,19 @@ select {
 }
 
     .vis-app-hdr-r li {
-        margin: 0 5px;
+        /*margin: 0 5px;*/
+        font-size: 1.1rem !important;
+        border-radius: 100%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;        
     }
 
+        .vis-app-hdr-r li:hover {
+            background-color: #f2f2f2;
+        }
 
 .vis-app-hdr-r-theme {
     /*color: rgba(var(--v-c-primary),1);*/
@@ -154,6 +165,7 @@ select {
     display: inline-flex;
     align-items: center;
     font-size: 1.1rem;
+    margin: -2px 2.5px 0 0;    
 }
 
     .vis-app-hdr-r-user a {
@@ -161,6 +173,7 @@ select {
         cursor: pointer;
         border: 1px solid transparent;
     }
+
         .vis-app-hdr-r-user a:focus {
             border-color: rgba(var(--v-c-primary), 1);
         }
@@ -178,8 +191,8 @@ select {
 
 .vis-app-overlay {
     height: 100%;
-    width:100%;
-    z-index:998;
+    width: 100%;
+    z-index: 998;
     position: absolute;
 }
 
@@ -196,16 +209,16 @@ select {
     width: 100%;
     background: rgba(0, 0, 0, 0.29);
     display: none;
-    flex:1;
-    align-items:center;
-    justify-content:center;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
 }
 
 .vis-app-action-nav-inner {
     position: relative;
     max-width: calc(100% - 195px);
     max-height: calc(100% - 300px);
-     overflow-y: auto;
+    overflow-y: auto;
 }
 
 
@@ -224,7 +237,7 @@ select {
     grid-row-start: 3;
     background-color: rgba(var(--v-c-primary),0.12);
     border-top: 1px solid rgba(var(--v-c-primary), 0.3);
-    z-index:99;
+    z-index: 99;
 }
 
     .vis-app-footer ul {
@@ -253,11 +266,12 @@ select {
     }
 
         .vis-app-footer li:first-child {
-            background: rgba(var(--v-c-primary), 1);            
+            background: rgba(var(--v-c-primary), 1);
         }
-        .vis-app-footer li:first-child, .vis-app-footer li:first-child span{
-            color: rgba(var(--v-c-on-primary), 1);
-        }
+
+            .vis-app-footer li:first-child, .vis-app-footer li:first-child span {
+                color: rgba(var(--v-c-on-primary), 1);
+            }
 
         .vis-app-footer li.vis-app-f-selected {
             background: rgba(var(--v-c-primary), 0.07);
@@ -272,20 +286,22 @@ select {
     font-size: 0.80rem;
     word-wrap: break-word;
     text-decoration: none;
-    padding-left: 5px;    
+    padding-left: 5px;
 }
+
 .vis-app-f-taskbar li * {
     display: inline-flex;
     align-items: center;
     /*min-height: 23px;*/
 }
+
 .vis-app-footer-c {
     display: flex;
 }
 
 .vis-app-footer-c-l {
     flex: 1;
-    overflow-y:auto;
+    overflow-y: auto;
     height: 23px;
 }
 
@@ -332,7 +348,7 @@ select {
     position: relative;
     overflow: hidden;
     cursor: pointer;
-    border: 2px solid #f2f2;
+    border: 2px solid #fdfbfb;
     border-radius: 100%;
     box-shadow: 2px 4px 7px -1px #ccc;
 }
@@ -344,6 +360,7 @@ select {
         clip-path: circle(50%);
         display: block;
     }
+
         .vis-app-user-img-wrap img[src=""] {
             display: none;
         }
@@ -369,6 +386,7 @@ select {
     flex-direction: column;
     border-radius: .25rem;
 }
+
     .vis-nav-window span {
         text-align: center;
         font-weight: bold;
@@ -380,6 +398,7 @@ select {
         border-top-left-radius: .05rem;
         border-top-right-radius: .05rem;
     }
+
 .vis-nav-content-wrap {
     flex: 1;
     justify-content: center;
@@ -388,6 +407,7 @@ select {
     font-size: 4rem;
     color: rgba(var(--v-c-primary), 1);
 }
+
 .vis-nav-window.vis-current-nav-window {
     border: 3px solid rgba(var(--v-c-on-secondary), .8);
     /*background-color: rgba(var(--v-c-secondary), 1);*/
@@ -398,20 +418,22 @@ select {
 
 /* AForm */
 .vis-app-aform-root {
-    position:relative;
-    overflow:hidden;
+    position: relative;
+    overflow: hidden;
 }
-.vis-app-aform-root td {
-    margin: 0;
-    padding: 0;
-    border-width: 0;
-    border-collapse: collapse;
-    border-spacing: 0;
-    vertical-align: top;
-}
-.vis-app-aform-root input[type=checkbox], .ui-dialog input[type=checkbox] {
-    margin: 4px 4px 0 0;
-}
+
+    .vis-app-aform-root td {
+        margin: 0;
+        padding: 0;
+        border-width: 0;
+        border-collapse: collapse;
+        border-spacing: 0;
+        vertical-align: top;
+    }
+
+    .vis-app-aform-root input[type=checkbox], .ui-dialog input[type=checkbox] {
+        margin: 4px 4px 0 0;
+    }
 
 
 
@@ -422,7 +444,7 @@ select {
     right: 0px;
     width: 250px;
     top: 41px;
-    visibility:hidden;
+    visibility: hidden;
     bottom: 24px;
     z-index: 9;
     padding: .8rem 1rem;
@@ -433,7 +455,7 @@ select {
     .vis-chatOverlay ul {
         height: calc(100% - 48px);
         overflow: auto;
-        padding:10px;
+        padding: 10px;
     }
 
 .vis-chatBoxInputWrap textarea {
@@ -486,15 +508,15 @@ select {
 
 
 .vis-blinking-dot {
-    width: 22px;
-    height: 22px;
+    width: 14px;
+    height: 14px;
     background-color: rgb(233, 0, 0);
     border-radius: 50%;
     animation: blinkdot 1s infinite;
 }
 
 .vis-blinkingDotContainer {
-    padding: 0.8rem 0.4rem;    
+    padding: 0.8rem 0.4rem;
 }
 
 .vis-autodatamarkingfilename {
@@ -506,6 +528,7 @@ select {
     display: flex;
     align-items: center;
 }
+
 .vis-autodatafont {
     font-size: 14px;
     cursor: pointer;
@@ -533,9 +556,10 @@ select {
 }
 
 .vis-hideadmconfigblock {
-    display:none;
+    display: none !important;
 }
+
 .vis-displayadmconfigblock {
-    display: block;
+    display: flex !important;
 }
 /*End */

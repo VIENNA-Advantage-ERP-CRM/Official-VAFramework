@@ -54,6 +54,10 @@
         border-color: rgba(var(--v-c-primary), 1) !important;
     }
 
+.vis-input-wrap .iti__country-list {
+    z-index: 6;
+}
+
 .vis-ev-col input:not([type=button]):not([type="checkbox"]):not([type="radio"]),
 .vis-ev-col textarea {
     padding: 5px 16px 5px 30px;

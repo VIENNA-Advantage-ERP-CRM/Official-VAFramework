@@ -48,6 +48,10 @@ namespace VAdvantage.Model
         public const bool SQL_RW = true;
         //	Access SQL Read Only		*/
         public const bool SQL_RO = false;
+        //	Access SQL Read Only		*/
+        public const bool SQL_ORGRO = false;
+        //	Access SQL Read Only		*/
+        public const bool SQL_ORGRW = true;
         //	Access SQL Fully Qualified	
         public const bool SQL_FULLYQUALIFIED = true;
         //	Access SQL Not Fully Qualified	
@@ -2009,6 +2013,15 @@ namespace VAdvantage.Model
             return 0;
         }
 
+        public string AddAccessSQL(string inSql, string TableNameIn,
+                                   bool fullyQualified, bool rw)
+        {
+           return AddAccessSQL(inSql, TableNameIn,
+                                     fullyQualified, rw, rw);
+        }
+
+
+
         /// <summary>
         /// Add AccessSql Where Clause to sql query
         /// </summary>
@@ -2018,7 +2031,7 @@ namespace VAdvantage.Model
         /// <param name="rw">if false, includes System Data</param>
         /// <returns></returns>
         public string AddAccessSQL(string inSql, string TableNameIn,
-                                    bool fullyQualified, bool rw)
+                                    bool fullyQualified, bool rw,bool rwOrg)
         {
             if (fullyQualified && Util.IsEmpty(TableNameIn))
                 fullyQualified = false;
@@ -2100,9 +2113,9 @@ namespace VAdvantage.Model
             //AppendOrg
             string orgWhereSql = "";
             if (fullyQualified && !Util.IsEmpty(tableName))
-                orgWhereSql = GetOrgWhere(tableName, rw, mainTableName);
+                orgWhereSql = GetOrgWhere(tableName, rwOrg, mainTableName);
             else
-                orgWhereSql = GetOrgWhere(null, rw, mainTableName);
+                orgWhereSql = GetOrgWhere(null, rwOrg, mainTableName);
 
             if(!string.IsNullOrEmpty(orgWhereSql))
             {
@@ -2161,7 +2174,7 @@ namespace VAdvantage.Model
                 keyColumnName += TableName + "_ID";	//	derived from table
 
                 // log.Fine("addAccessSQL - " + TableName + "(" + AD_Table_ID + ") " + keyColumnName);
-                string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rw);
+                string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rwOrg);
                 if (recordWhere.Length > 0)
                 {
                     retSQL.Append(" AND ").Append(recordWhere);
@@ -2636,7 +2649,21 @@ namespace VAdvantage.Model
             }
             else
             {
-                set = GetCtx().GetContext("#AD_FilteredOrg").Split(',').ToList();
+                 set = GetCtx().GetContext("#AD_FilteredOrg").Split(',').ToList();
+                if (!rw)
+                {
+                    if (!set.Contains("0")) // add if rw false
+                    {
+                        set.Add("0");
+                    }
+                }
+                else
+                {
+                    if (set.Contains("0") && Util.GetValueOfInt(GetCtx().GetContext("#AD_Org_ID"))>0)
+                    {
+                        set.Remove("0");
+                    }
+                }
             }
             //
             if (set.Count == 1)

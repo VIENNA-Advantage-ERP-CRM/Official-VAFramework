@@ -44,6 +44,10 @@ VIS.VTabbedPane = function (isWorkBench) {
         }
     };
 
+    VIS.VTabbedPane.prototype.getIsMultiTabView = function () {
+        return this.multiTabView;
+    }
+
     //@not used
     VIS.VTabbedPane.prototype.setTabObject = function (obj) {
         this.tabObj = obj

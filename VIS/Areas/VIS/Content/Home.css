@@ -3867,7 +3867,7 @@ ul.vis-userLinks-ListMenu li a i {
 
 /*Home Screen Favourites Start*/
 .vis_homeTopUsrIcon {
-    margin: 5px 10px 0px 5px !important;
+    margin: 0px 5px 0px 0px !important;
     font-size: x-large !important;
     cursor: pointer;
 }
@@ -3919,6 +3919,8 @@ ul.vis-userLinks-ListMenu li a i {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     gap: .4rem;
+    max-height: 350px;
+    overflow-y: auto;
 }
 
 .vis-nm-fav-grid-view {
@@ -3929,7 +3931,7 @@ ul.vis-userLinks-ListMenu li a i {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: rgba(var(--v-c-readonly), 1);
+    background-color: rgba(var(--v-c-on-secondary),.03);
     padding: 0.6rem;
     border-radius: 6px;
     cursor: pointer;
@@ -3986,10 +3988,14 @@ ul.vis-userLinks-ListMenu li a i {
 
 .vis_home-fav-count {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 1px;
 }
 
     .vis_home-fav-count .vis {
-        font-size: 1.8rem;
+        font-size: 1.1rem;
         color: rgba(var(--v-c-primary), 1);
     }
 
@@ -3997,12 +4003,13 @@ ul.vis-userLinks-ListMenu li a i {
     background-color: rgba(var(--v-c-on-secondary), 1);
     border-radius: 10px;
     color: rgba(var(--v-c-common), 1);
-    font-size: .75rem;
+    font-size: .65rem;
     max-width: 30px;
-    min-width: 18px;
+    min-width: 16px;
+    min-height: 16px;
     position: absolute;
-    right: 1px;
+    right: -10px;
     text-align: center;
-    top: 0;
+    top: -8px;
 }
 /*Home Screen Favourites End*/
