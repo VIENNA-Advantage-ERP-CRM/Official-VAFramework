@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using VAdvantage.DataBase;
+using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.Filters;
 
@@ -22,7 +24,7 @@ namespace VIS.Controllers
 
         public ContentResult GetDBColunName(int AD_Element_ID)
         {
-            string sql = "SELECT ColumnName from AD_Element WHERE AD_Element_ID="+AD_Element_ID;
+            string sql = "SELECT ColumnName from AD_Element WHERE AD_Element_ID=" + AD_Element_ID;
             return Content(DB.ExecuteScalar(sql).ToString());
         }
         /// <summary>

@@ -129,7 +129,7 @@
         //private 
         var $divContentArea, $ulNav, $ulToobar, $divStatus, $ulTabControl, $divTabControl, $divTabNav;
         var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter;
-        var $root, $busyDiv;
+        var $root, $busyDiv, $landingpage;
         var $ulRightBar2; //right bar
         var $btnlbToggle, $ulactionbar, $uldynactionbar, $divlbMain, $divlbNav; //right bar
         var $hdrPanel = "", $divIncludeTab, $divHeaderNav;

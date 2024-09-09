@@ -10,7 +10,9 @@
         var $root = $('<div class="vis-ad-w-p-landing">');
         var busy = $('<div class="vis-ad-w-p-busy"><i style="text-align:center" class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>');
         $root.append(busy);
+        var $busy = null;           
         var $spnTitle = "";
+        var $ulPopup = null;
         var $widgetBody = "";
         var $btnClose = "";
         var openRightPanel = "";

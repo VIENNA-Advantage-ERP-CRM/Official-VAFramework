@@ -148,6 +148,22 @@
         return "";
     };
 
+    calloutColumn.prototype.IsSingleScreen = function (ctx, windowNo, mTab, mField, value, oldValue) {
+
+        if (this.isCalloutActive() || value == null) {
+            return;
+        }
+
+        this.setCalloutActive(true);
+        if (mTab.getValue("AD_Widget_ID") > 0 && value != oldValue && value.includes(',')) {
+            VIS.ADialog.warn("VIS_EffectDataSource");
+        }
+      
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
     VIS.calloutColumn = calloutColumn;
 
     //*********** Callout check DocAction in table  Start ****
