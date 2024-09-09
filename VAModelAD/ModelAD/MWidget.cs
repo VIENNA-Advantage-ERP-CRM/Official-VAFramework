@@ -22,14 +22,14 @@ namespace VAdvantage.Model
         {
 
         }
-        
+    
         protected override bool AfterSave(bool newRecord, bool success)
         {
             //Check single window on widget for apply datasource.
             string oldWidgetID = Util.GetValueOfString(Get_ValueOld("AD_Window_ID"));
-            if (!string.IsNullOrEmpty(GetAD_Window_ID()) && !newRecord && oldWidgetID!=GetAD_Window_ID())
+            if (!newRecord && oldWidgetID!=GetAD_Window_ID())
             {
-                bool IsSingleWindow = GetAD_Window_ID().Contains(',') ? false : true;
+                bool IsSingleWindow = !string.IsNullOrEmpty(GetAD_Window_ID()) && !GetAD_Window_ID().Contains(',');
                 string sql = "SELECT AD_WidgetField_ID FROM AD_WidgetField WHERE AD_Widget_ID = " + GetAD_Widget_ID();
                 sql = MRole.GetDefault(GetCtx()).AddAccessSQL(sql, "AD_WidgetField", true, true);
                 DataSet ds = DB.ExecuteDataset(sql);

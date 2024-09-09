@@ -77,7 +77,7 @@
             $_ContainerPopUp = $("<div class='VIS_form-data-row'>"
                                + "<div class='VIS_form-search-wrap input-group vis-input-wrap'><div class='vis-control-wrap'>"
                                + "<input class='VIS_form-search-wrap input' id='VIS_Search' type='text' placeholder='Search Here...' data-hasbtn=' '></div>"
-                               + "<div class='input-group-append'><button class='VIS_form-search-wrap button input-group-text' id=VIS_BtnSearch title=" + VIS.Msg.translate(VIS.Env.getCtx(), "VIS_Search") + "><i class='vis vis-search'></i></button>"
+                               + "<div class='input-group-append'><button tabindex='-1' class='VIS_form-search-wrap button input-group-text' id=VIS_BtnSearch title=" + VIS.Msg.translate(VIS.Env.getCtx(), "VIS_Search") + "><i class='vis vis-search'></i></button>"
                                + "<button class='VIS_form-search-wrap button input-group-text' id=VIS_BtnAdd title=" + VIS.Msg.translate(VIS.Env.getCtx(), "VIS_NewContainer") + "><i class='vis vis-plus'></i></button>"
                                + "<button class='VIS_form-search-wrap button input-group-text' style='display:none;' id=VIS_BtnSave title=" + VIS.Msg.translate(VIS.Env.getCtx(), "VIS_SaveContainer") + "><i class='vis vis-save'></i></button>"
                                + "<button class='VIS_form-search-wrap button input-group-text' style='display:none;' id=VIS_BtnCancel title=" + VIS.Msg.translate(VIS.Env.getCtx(), "VIS_Cancel") + "><i class='vis vis-mark'></i></button>"

@@ -10,7 +10,9 @@
         var $root = $('<div class="vis-ad-w-p-landing">');
         var busy = $('<div class="vis-ad-w-p-busy"><i style="text-align:center" class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>');
         $root.append(busy);
+        var $busy = null;           
         var $spnTitle = "";
+        var $ulPopup = null;
         var $widgetBody = "";
         var $btnClose = "";
         var openRightPanel = "";
@@ -510,7 +512,7 @@
                     }
 
 
-                    var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img + '</div><div class="vis-widgetSize"><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols || 1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
+                    var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img + '</div><div class="vis-widgetSize" title="' + result[i].DisplayName + '" ><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols || 1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
                     $root.find('.vis-widgetDrag-container:last').append(witem);
                 }
 

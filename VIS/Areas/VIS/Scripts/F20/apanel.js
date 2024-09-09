@@ -129,7 +129,7 @@
         //private 
         var $divContentArea, $ulNav, $ulToobar, $divStatus, $ulTabControl, $divTabControl, $divTabNav;
         var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter;
-        var $root, $busyDiv;
+        var $root, $busyDiv, $landingpage;
         var $ulRightBar2; //right bar
         var $btnlbToggle, $ulactionbar, $uldynactionbar, $divlbMain, $divlbNav; //right bar
         var $hdrPanel = "", $divIncludeTab, $divHeaderNav;
@@ -785,6 +785,7 @@
             self.defaultSearch = true;
             self.clearSearchText();
             $txtSearch.val("");
+            $txtSearch.removeAttr('readonly');
         }
 
         /**
@@ -1110,11 +1111,13 @@
                     }
                     self.cmd_find($txtSearch.val());
                     $txtSearch.val("");
+                    $txtSearch.removeAttr('readonly');
                 }
                 else if (code == 8 && $btnClrSearch.css('visibility') == 'visible') {
                     e.preventDefault();
                     self.defaultSearch = true;
                     $txtSearch.val("");
+                    $txtSearch.removeAttr('readonly');
                     $btnClrSearch.css('visibility', 'hidden');
                     var query = new VIS.Query();
                     query.addRestriction(" 1 = 1 ");
@@ -1158,9 +1161,11 @@
         this.setAdvancedSerachText = function (hideicon, text) {
             if (hideicon) {
                 $btnClrSearch.css("visibility", "hidden");
+                $txtSearch.removeAttr("readonly");
             }
             else {
                 $btnClrSearch.css("visibility", "visible");
+                $txtSearch.attr('readonly', 'readonly');
                 $imgdownSearch.css("visibility", "visible");
             }
             $txtSearch.val(text);
@@ -1175,10 +1180,12 @@
             }
             else if (show && !hasDefault) {
                 $btnClrSearch.css('visibility', 'hidden');
+                $txtSearch.removeAttr("readonly");
                 $imgdownSearch.css('visibility', 'visible');
             }
             else {
                 $btnClrSearch.css('visibility', 'hidden');
+                $txtSearch.removeAttr("readonly");
                 $imgdownSearch.css('visibility', 'hidden');
             }
            
@@ -1242,10 +1249,12 @@
                         $txtSearch.val(text);
                     }
                     $btnClrSearch.css('visibility', 'visible');
+                    $txtSearch.attr("readonly", "readonly");
                     $selfpanel.defaultSearch = false;
                 }
                 else {
                     $btnClrSearch.css('visibility', 'hidden');
+                    $txtSearch.removeAttr("readonly");
                 }
 
                 $txtSearch.autocomplete('option', 'source', userQueries);
