@@ -55,38 +55,5 @@ namespace VIS.Controllers
                          WHERE AD_Role.IsActive='Y' AND AD_Role.AD_Role_ID =" + AD_Role_ID;
             return Util.GetValueOfString(DB.ExecuteScalar(sql));
         }
-
-      /* public List<TabDetails> IsSingleScreen(int AD_Widget_ID)
-        {
-            Ctx ctx = Session["ctx"] as Ctx;
-            List<TabDetails> list = new List<TabDetails>();
-            string abcd = Util.GetValueOfString(DB.ExecuteScalar("SELECT AD_Window_ID FROM AD_Widget WHERE AD_Widget_ID = " + AD_Widget_ID));
-
-            string sql = "SELECT Name,AD_Tab_ID FROM AD_Tab WHERE AD_Window_ID IN (" + abcd + ") AND AD_Tab.TabLevel=0";
-            sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "AD_Tab", true, true);
-            DataSet ds = DB.ExecuteDataset(sql);
-            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-            {
-                var row = ds.Tables[0].Rows;
-                for (int i = 0; i < row.Count; i++)
-                {
-                    TabDetails obj = new TabDetails()
-                    {
-                        Name = Util.GetValueOfString(row[i]["Name"]),
-                        ID = Util.GetValueOfInt(row[i]["AD_Tab_ID"])
-                    };
-                    list.Add(obj);
-                }
-
-            }
-            return list;
-
-        }*/
     }
-
-   /* public class TabDetails
-    {
-        public string Name { get; set; }
-        public int ID { get; set; }
-    }*/
 }
