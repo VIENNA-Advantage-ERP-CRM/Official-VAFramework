@@ -931,7 +931,7 @@
         var src = "fa fa-credit-card";
         //Init Control
         var $ctrl = $('<input>', { type: (isPwdField) ? 'password' : 'text', name: columnName, maxlength: fieldLength });
-        var $btnSearch = $('<button class="input-group-text" style="display:none"><i class="' + src + '" /></button>');
+        var $btnSearch = $('<button tabindex="-1" class="input-group-text" style="display:none"><i class="' + src + '" /></button>');
         //if (obscureType && !isReadOnly)
         //    $ctrl.append($btnSearch);
 
@@ -1727,7 +1727,7 @@
             }
 
             // $btnPop = $('<button tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-            $btnPop = $('<button  class="input-group-text"><i tabindex="-1" class="fa fa-ellipsis-v" /></button>');
+            $btnPop = $('<button tabindex="-1"  class="input-group-text"><i tabindex="-1" class="fa fa-ellipsis-v" /></button>');
             options[VIS.Actions.refresh] = true;
 
             if (VIS.MRole.getIsShowPreference())
@@ -2408,7 +2408,7 @@
         var $ctrl = $('<input>', { type: 'text', name: columnName });
         $ctrl.attr('autocomplete', 'off');
 
-        var $btnSearch = $('<button   class="input-group-text"><i  tabindex="-1" class="' + src + '"></i></button>');
+        var $btnSearch = $('<button tabindex="-1"  class="input-group-text"><i  tabindex="-1" class="' + src + '"></i></button>');
         btnCount += 1;
 
         //Set Buttons and [pop up]
@@ -2435,7 +2435,7 @@
             options[VIS.Actions.addnewrec] = true;
 
             //$btnPop = $('<button  tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-            $btnPop = $('<button   class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
+            $btnPop = $('<button tabindex="-1"  class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
             //	VBPartner quick entry link
             var isBP = false;
             if (columnName === "C_BPartner_ID") {
@@ -2469,7 +2469,7 @@
         }
 
         if (this.isMultiKeyTextBox) {
-            $btnPop = $('<button   class="input-group-text"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>');
+            $btnPop = $('<button tabindex="-1" class="input-group-text"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>');
             btnCount += 1;
         }
 
@@ -4268,8 +4268,8 @@
 
         //create ui
         var $ctrl = $('<input readonly>', { type: 'text', name: columnName });
-        var $btnMap = $('<button class="input-group-text"><i class="vis vis-location" aria-hidden="true"></i></button>');
-        var $btnLocation = $('<button class="input-group-text"><i class="vis vis-pencil" aria-hidden="true"></i></button>');
+        var $btnMap = $('<button tabindex="-1" class="input-group-text"><i class="vis vis-location" aria-hidden="true"></i></button>');
+        var $btnLocation = $('<button tabindex="-1" class="input-group-text"><i class="vis vis-pencil" aria-hidden="true"></i></button>');
         var btnCount = hideMapButton ? 1 : 2;
         //$ctrl.append($btnMap).append($btnLocation);
         var self = this;
@@ -4464,8 +4464,8 @@
 
         //create ui
         var $ctrl = $('<input readonly>', { type: 'text', name: columnName });
-        var $btn = $('<button class="input-group-text"><i class="' + src + '" aria-hidden="true"></i></button>');
-        var $btnZoom = $('<button class="input-group-text"><i class="vis vis-find" aria-hidden="true"></i></button>');
+        var $btn = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" aria-hidden="true"></i></button>');
+        var $btnZoom = $('<button tabindex="-1" class="input-group-text"><i class="vis vis-find" aria-hidden="true"></i></button>');
         var btnCount = 2;
 
         var self = this;
@@ -4773,7 +4773,7 @@
 
         //create ui
         var $ctrl = $('<input>', { type: 'text', name: columnName });
-        var $btn = $('<button class="input-group-text"><i class="' + src + '"></i></button>');
+        var $btn = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '"></i></button>');
         var btnCount = 1;
 
         var self = this;
@@ -5053,7 +5053,7 @@
 
         //create ui
         var $ctrl = $('<input readonly>', { type: 'text', name: columnName });
-        var $btn = $('<button class="input-group-text"><i class="' + src + '" ></i></button>');
+        var $btn = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" ></i></button>');
         var btnCount = 1;
 
         var self = this;
@@ -5610,7 +5610,7 @@
         var btnCount = 0;
         //create ui
         var $ctrl = $('<input>', { type: 'text', name: columnName, maxlength: fieldLength });
-        var $btnSearch = $('<button class="input-group-text"><i class="' + src + '" ></i></button>');
+        var $btnSearch = $('<button  tabindex="-1" class="input-group-text"><i class="' + src + '" ></i></button>');
         btnCount += 1;
 
         //Set Buttons and [pop up]
@@ -5780,7 +5780,7 @@
         var btnCount = 0;
 
         var $ctrl = $('<input>', { type: 'text', name: columnName });
-        var $btnSearch = $('<button class="input-group-text"><i class="' + src + '" /></button>');
+        var $btnSearch = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" /></button>');
         btnCount += 1;
 
         var inputCtrl = $("<input autocomplete='off' type='file' class='file' name='file'/>");
@@ -5933,7 +5933,7 @@
         this.defaultValue = "";
         //create ui
         var $ctrl = $('<input readonly>', { type: 'text', name: columnName });
-        var $btnAmtDiv = $('<button class="input-group-text"><i class="vis vis-amtdimension" /></button>');
+        var $btnAmtDiv = $('<button tabindex="-1" class="input-group-text"><i class="vis vis-amtdimension" /></button>');
         var btnCount = 1;
         var self = this;
         IControl.call(this, $ctrl, displayType, isReadOnly, columnName, isMandatory); //call base function
@@ -6199,9 +6199,9 @@
         //create ui
         var $ctrl = $('<input>', { type: 'text', name: columnName });
         $ctrl.attr('autocomplete', 'off');
-        var $btnpContainer = $('<button class="input-group-text"><i class="vis vis-pcontainer" /></button>');
+        var $btnpContainer = $('<button tabindex="-1" class="input-group-text"><i class="vis vis-pcontainer" /></button>');
         //var $btnPop = $('<button  tabindex="-1" class="input-group-text"><img tabindex="-1" src="' + VIS.Application.contextUrl + "Areas/VIS/Images/base/Info20.png" + '" /></button>');
-        var $btnPop = $('<button   class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
+        var $btnPop = $('<button tabindex="-1"  class="input-group-text"><i tabindex="-1" Class="fa fa-ellipsis-v" /></button>');
         var btnCount = 1;
         btnCount += 1;
         var self = this;
@@ -6878,7 +6878,7 @@
         //Init Control
         
         var $ctrl = $('<input>', { type: 'tel', name: columnName, maxlength: fieldLength });
-        var $btnSearch = $('<button class="input-group-text"><i class="' + src + '" /></button>');
+        var $btnSearch = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" /></button>');
        // if (!isReadOnly)
          //   $ctrl.append($btnSearch);
         var telCtrl = $ctrl;
@@ -7141,7 +7141,7 @@
         //Init Control
 
         var $ctrl = $('<input>', { type: 'color', name: columnName, maxlength: fieldLength });
-        var $btnSearch = $('<button class="input-group-text"><i class="' + src + '" /></button>');
+        var $btnSearch = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" /></button>');
         // if (!isReadOnly)
         //   $ctrl.append($btnSearch);
         var telCtrl = $ctrl;
@@ -7291,7 +7291,7 @@
             var code = sel.iso2;
 
             var htm = '<div style="display:flex">'
-                + '<div class="iti__selected-flag">'
+                + '<div tabindex="-1" class="iti__selected-flag">'
                 + '<div class="iti__flag iti__' + code + '"></div>'
                 + '<div/>'
                 + '<div style="margin: 0 6px;';

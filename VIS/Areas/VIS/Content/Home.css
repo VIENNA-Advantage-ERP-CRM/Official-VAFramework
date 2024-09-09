@@ -3217,6 +3217,13 @@ p.vis-maintain-customer-p span {
     margin-bottom: 5px;
 }
 
+.vis-dynamicWidget-msg {
+    justify-content: center;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
 .vis-add-row {
     display: block;
     padding: 10px;
@@ -3254,7 +3261,7 @@ p.vis-maintain-customer-p span {
         .vis-add-row span {
             display: flex;
             float: left;
-            gap: 8px;
+            gap: 5px;
             overflow: hidden;
             min-height: 15px;
             padding: 5px;
