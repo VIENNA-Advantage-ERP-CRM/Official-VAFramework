@@ -3132,6 +3132,7 @@ border-top-left-radius:4px !important;
         display: none;
     }*/
 .vis-disable-event {
+    background-color: rgba(var(--v-c-secondary), 1);
     opacity: 0.6 !important;
     pointer-events: none !important;
 }

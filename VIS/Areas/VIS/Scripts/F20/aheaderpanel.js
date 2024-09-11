@@ -236,6 +236,12 @@
                         $div = $('<div class="vis-w-p-header-data-f ' + dynamicClassName + '">');
 
                     if (headerItem.IsStaticContent) {
+
+                        fieldStyleLogic = this.evaluateStyleLogic(fieldStyleLogic);
+                        if (fieldStyleLogic) {
+                            $div.attr("style", fieldStyleLogic);
+                        }
+
                         var controls = {}
                         ContentFieldValue = headerItem.ContentFieldValue;
                         var ContentFieldLabel = VIS.Msg.getMsg(headerItem.ContentFieldLabel);
@@ -545,6 +551,12 @@
                                 
                                 //* action Group */
                                 if (agInstance && agInstance.getIsNewIns()) {
+
+                                    agInstance.getControl().find('.dropdown-menu').css({
+                                        'maxHeight': $self.curTab.getHeaderHeight().replace('px', '') - 10,
+                                        'overflow':'auto'
+                                    })
+
                                     $divLabel.append(agInstance.getControl());
                                     $containerDiv.append($div);
                                 }
