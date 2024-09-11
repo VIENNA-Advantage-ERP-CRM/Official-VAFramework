@@ -859,6 +859,7 @@ span.vis-ad-w-p-tb-rc-action {
 
 .vis-ad-w-p-actionpanel-r {
     grid-column: 2 / 2;
+    margin-left: 5px;
 }
 
 /*.vis-ad-w-p-actionpanel-b {

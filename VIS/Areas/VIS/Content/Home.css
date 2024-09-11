@@ -3217,6 +3217,13 @@ p.vis-maintain-customer-p span {
     margin-bottom: 5px;
 }
 
+.vis-dynamicWidget-msg {
+    justify-content: center;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
 .vis-add-row {
     display: block;
     padding: 10px;
@@ -3254,7 +3261,7 @@ p.vis-maintain-customer-p span {
         .vis-add-row span {
             display: flex;
             float: left;
-            gap: 8px;
+            gap: 5px;
             overflow: hidden;
             min-height: 15px;
             padding: 5px;
@@ -3996,13 +4003,13 @@ ul.vis-userLinks-ListMenu li a i {
     background-color: rgba(var(--v-c-on-secondary), 1);
     border-radius: 10px;
     color: rgba(var(--v-c-common), 1);
-    font-size: .75rem;
+    font-size: .65rem;
     max-width: 30px;
     min-width: 16px;
     min-height: 16px;
     position: absolute;
-    right: -8px;
+    right: -10px;
     text-align: center;
-    top: -9px;
+    top: -8px;
 }
 /*Home Screen Favourites End*/

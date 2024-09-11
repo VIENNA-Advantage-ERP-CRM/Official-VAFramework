@@ -857,6 +857,7 @@ namespace VAdvantage.Model
         private string GetUnionQuery(DateTime date1, DateTime date2, string colName, string function)
         {
             StringBuilder sb = new StringBuilder();
+
             if (DB.IsPostgreSQL())
             {
                 sb.Append(@" SELECT " + colName + @", " + function + @" FROM
@@ -879,6 +880,7 @@ namespace VAdvantage.Model
                 //sb.Append(" GROUP BY dates." + colName);
                 //sb.Append(" ORDER BY " + colName + " ASC");
             }
+
             return sb.ToString();
         }
 

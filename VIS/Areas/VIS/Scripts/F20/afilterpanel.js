@@ -542,15 +542,15 @@
                 if (field.getIsKey())
                     header += (" (ID)");
 
-                if ((VIS.DisplayType.IsLookup(field.getDisplayType()) || VIS.DisplayType.ID == field.getDisplayType()) && !field.lookup) {
-                    ;
-                }
+                //if ((VIS.DisplayType.IsLookup(field.getDisplayType()) || VIS.DisplayType.ID == field.getDisplayType()) && !field.lookup) {
+                //    ;
+                //}
 
                 //else if (field.getIsSelectionColumn()) {
                 //    this.selectionfields.push(field);
 
                 //}
-                else
+                //else
                     sortedFields.push({ 'value': columnName, 'text': header });
                 // html += '<option value="' + columnName + '">' + header + '</option>';
             }
@@ -641,11 +641,11 @@
             var userQueryID = self.curTab.userQueryID;
             if (searchText == "") {
                 userQueryID = 0;
-                if (txtFilterName.val() == "") {
+                if (txtFilterName.val().trim() == "") {
                     VIS.ADialog.error("", true, VIS.Msg.getMsg("FilterNameRequired"));                  
                     return;
                 } else {
-                    searchText = txtFilterName.val();
+                    searchText = txtFilterName.val().trim();
                 }
             }
 
@@ -1421,7 +1421,12 @@
 
         function getDynamicValue(index) {
             var text = "";
-            text = " adddays(sysdate, - " + getTotalDays(index) + ") ";
+            if (Math.sign(getTotalDays(index)) == -1) {
+                text = " adddays(sysdate, " + getTotalDays(index) * -1 + ") ";
+            } else {
+                text = " adddays(sysdate, - " + getTotalDays(index) + ") ";
+            }
+           
             return text;
         };
 
@@ -1878,9 +1883,9 @@
         var field = this.getTargetMField(columnName);
         var columnSQL = field.getColumnSQL(); //
 
-        var isText = VIS.DisplayType.IsText(field.getDisplayType());
+        var isText = VIS.DisplayType.IsText(field.getDisplayType()) || VIS.DisplayType.List == field.getDisplayType() || VIS.DisplayType.YesNo == field.getDisplayType();
 
-        if (value != null && value.length > 0 && VIS.DisplayType.IsText(field.getDisplayType())) {
+        if (value != null && value.length > 0 && isText) {
             if (optr == VIS.Query.prototype.LIKE) {
                 value = '%' + value + '%';
             } 
