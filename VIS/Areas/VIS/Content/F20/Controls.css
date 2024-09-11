@@ -40,7 +40,7 @@
 }
 
 .vis-control-wrap .iti__selected-flag {
-    padding: 6px 8px !important;
+    padding: 0 6px !important;
 }
 
 .vis-input-wrap .iti__flag-container:focus-within {
