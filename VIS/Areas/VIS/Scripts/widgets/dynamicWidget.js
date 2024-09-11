@@ -13,6 +13,8 @@
 
         // Initialize the dynamic widget component
         this.initializeComponent = function (AD_Widget_ID) {
+            createBusyIndicator();
+            showBusy(true);
             if (AD_Widget_ID > 0) {
                 getField(AD_Widget_ID, afterLoad);
             }
@@ -31,7 +33,23 @@
 
             }
             bindEvents();
+            showBusy(false);
         }
+
+        function createBusyIndicator() {
+            var $bsyDiv = $('<div id="busyDiv" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id"'
+                +' class= "vis-busyindicatorinnerwrap" > <i class="vis_widgetloader"></i></div ></div > ');
+            $root.append($bsyDiv);
+        };
+
+        function showBusy(show) {
+            if (show) {
+                $root.find("#busyDiv").show();
+            }
+            else {
+                $root.find("#busyDiv").hide();
+            }
+        };
 
         // Clear root element and set style
         function clearRoot() {
@@ -162,7 +180,7 @@
 
         // Handle scroll arrows visibility
         function setupScrollArrows() {
-            if (self.scrollHeight > divHeight) {
+            if (($root[0].scrollHeight - 20) > divHeight) {
                 var arrowDiv = createScrollArrows();
                 $root.append(arrowDiv);
             }
@@ -215,7 +233,7 @@
 
         // Update arrow visibility based on scroll position
         function updateArrowVisibility(scrollTop, divHeight) {
-            toggleArrow($root.find('.vis-bottomArrow-icon'), scrollTop < $root[0].scrollHeight - divHeight);
+            toggleArrow($root.find('.vis-bottomArrow-icon'), scrollTop < ($root[0].scrollHeight)-20 - divHeight);
             toggleArrow($root.find('.vis-topArrow-icon'), scrollTop > 0);
         }
 
@@ -230,12 +248,12 @@
         function adjustHeight() {
             self.height = Math.floor(self.frame.widgetInfo.height.replace("px", ""));
             divHeight = self.height;
-            self.scrollHeight = $root[0].scrollHeight;
+            self.scrollHeight = $root[0].scrollHeight-20;
         }
 
         // Handle widget resizing
         this.resize = function (widgetHeight) {
-            if ($root[0].scrollHeight > widgetHeight) {
+            if (($root[0].scrollHeight-20) > widgetHeight) {
                 $root.find('.vis-dynamicwidget-arrow').removeClass('d-none');
             }
         };

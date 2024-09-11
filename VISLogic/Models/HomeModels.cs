@@ -389,7 +389,7 @@ namespace VIS.Models
             bool baseLanguage = Env.IsBaseLanguage(ctx, "");
             int sequenceNo = 0;
             string sql = @"SELECT WF.Control_Type,WF.BadgeStyle,WF.IsBadge,WF.BadgeValue, WF.IsSameLine, WF.OnClick,
-                   WF.HtmlStyle, WF.IsApplyDataSource, WF.SeqNo, WF.OnClick, WF.Top, WF.WhereClause, WF.Suffix, WF.Prefix,  
+                   WF.HtmlStyle, WF.IsApplyDataSource, WF.SeqNo, WF.OnClick, WF.Top, WF.Suffix, WF.Prefix,  
                    WF.AD_Image_ID, WD.HtmlStyle AS WidgetHTML, WD.IsShowAdvanced,WD.IsShowRandomColor, WF.AD_Tab_ID, WF.AD_Field_ID, ";
 
             if (baseLanguage)
@@ -426,7 +426,6 @@ namespace VIS.Models
                             string imageURL = "";
                             sequenceNo = Util.GetValueOfInt(row[i]["SeqNo"]);
                             string badgeValue = Util.GetValueOfString(row[i]["BadgeValue"]);
-                            string whereClause = Util.GetValueOfString(row[i]["WhereClause"]);
                             int Ad_Image_ID = Util.GetValueOfInt(row[i]["AD_Image_ID"]);
                             int widgetTabID = Util.GetValueOfInt(row[i]["AD_Tab_ID"]);
                             int widgetFieldID = Util.GetValueOfInt(row[i]["AD_Field_ID"]);
@@ -517,13 +516,13 @@ namespace VIS.Models
                                         string columnName = Util.GetValueOfString(rowCount[0]["ColumnName"]);
                                         dsObj = GetDataSource(ctx, windowNo, Util.GetValueOfInt(rowCount[0]["AD_Column_ID"]), Util.GetValueOfInt(rowCount[0]["AD_Reference_ID"]),
                                             Util.GetValueOfInt(rowCount[0]["AD_Reference_Value_ID"]), columnName, Util.GetValueOfString(rowCount[0]["TableName"]),
-                                            isParent, topTen, whereClause);
+                                            isParent, topTen, "");
                                         if (dsObj != null && dsObj.Count > 0)
                                         {
 
                                             for (int j = 0; j < dsObj.Count; j++)
                                             {
-                                                string where;
+                                                /*string where;
                                                 if (IsInteger(dsObj[j].ID))
                                                 {
                                                     where = columnName + " = " + dsObj[j].ID;
@@ -540,7 +539,7 @@ namespace VIS.Models
                                                     TabIndex = Util.GetValueOfString(0),
                                                     ActionType="W",
                                                     ActionName= Util.GetValueOfString(rowCount[0]["WindowName"])
-                                                };
+                                                };*/
                                                 string name = "";
                                                 if (!string.IsNullOrEmpty(Util.GetValueOfString(row[i]["Prefix"]))) { 
                                                 name = Util.GetValueOfString(row[i]["Prefix"])+" ";
@@ -557,7 +556,7 @@ namespace VIS.Models
                                                     SeqNo = sequenceNo,
                                                     Name = name,
                                                     HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
-                                                    OnClick = APobj,
+                                                    OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
                                                     IsSameLine = Util.GetValueOfString(row[i]["IsSameLine"]),
                                                     IsBadge = "Y",
                                                     BadgeStyle = Util.GetValueOfString(row[i]["BadgeStyle"]),
@@ -661,12 +660,21 @@ namespace VIS.Models
             return result;
         }
 
-        public bool IsInteger(string input)
-        {
-            int result;
-            return int.TryParse(input, out result);
-        }
 
+        /// <summary>
+        /// Getting most frequent using data from an window 
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="windowNo">windowNo</param>
+        /// <param name="columnID">Ad_Column_ID</param>
+        /// <param name="AD_Reference_ID">AD_Reference_ID</param>
+        /// <param name="AD_Reference_Value_ID">AD_Reference_Value_ID</param>
+        /// <param name="columnName">columnName</param>
+        /// <param name="TableName">TableName</param>
+        /// <param name="IsParent">IsParent</param>
+        /// <param name="top">Number of record</param>
+        /// <param name="whereClause">SQL Where</param>
+        /// <returns>Record's ID, Name and count</returns>
         public List<DataSource> GetDataSource(Ctx ctx, int windowNo, int columnID, int AD_Reference_ID, int AD_Reference_Value_ID,
             string columnName, string TableName, bool IsParent, int top,string whereClause)
         {
