@@ -235,7 +235,7 @@ namespace VAdvantage.Model
                 else if (GetDateTimeTypes() == IS_MONTHLY || GetDateTimeTypes() == IS_LAST_N_MONTHS)
                     sbGroupBy.Append(", ")
                         .Append(ApplyDateFunction(s_colX, "yyyy"))
-                        .Append(", ").Append(ApplyDateFunction(s_colX, "Mon-RRRR"));
+                        .Append(", ").Append(ApplyDateFunction(s_colX, "Mon-YYYY"));
 
                 s_groupby = sbGroupBy.ToString();   //set value into variable to be used later for group by clause (!important)
                 sb.Append(sbGroupBy.ToString());
@@ -321,7 +321,7 @@ namespace VAdvantage.Model
                     //put value
                     if (MColumn.Get(GetCtx(), filter[i].GetAD_Column_ID()).getSQLDataType() == "DATE")
                     {
-                        sqlFilter.Append("TO_DATE('").Append(filter[0].GetWhereValue()).Append("','dd/mm/RRRR'").Append(")");
+                        sqlFilter.Append("TO_DATE('").Append(filter[0].GetWhereValue()).Append("','dd/mm/YYYY'").Append(")");
                     }
                     else
                         sqlFilter.Append("'").Append(Env.ParseContext(GetCtx(), 0, filter[i].GetWhereValue(), false)).Append("'");
@@ -331,7 +331,7 @@ namespace VAdvantage.Model
                         {
                             //sqlFilter.Append("TO_DATE('").Append(colValue).Append("','dd/mm/yyyy'").Append(")");
                             sqlFilter.Append(" AND ");
-                            sqlFilter.Append("TO_DATE('").Append(filter[i].GetValueTo()).Append("','dd/mm/RRRR'").Append(")");
+                            sqlFilter.Append("TO_DATE('").Append(filter[i].GetValueTo()).Append("','dd/mm/YYYY'").Append(")");
                         }
                         else
                             sqlFilter.Append(" AND '").Append(filter[i].GetValueTo()).Append("'");
@@ -357,7 +357,7 @@ namespace VAdvantage.Model
                     unionTableQuery.Append(ApplyDateFunction(m_colX)).Append(", ")
                         .Append("TRIM(TO_CHAR(" + m_colX + ",'yyyy')), ")
                         .Append(ApplyAggregateFunction(m_colY, true)).Append(SPACE + "ColY");
-                    unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-RRRR')) as ColX");
+                    unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-YYYY')) as ColX");
                 }
                 else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
                 {
@@ -390,7 +390,7 @@ namespace VAdvantage.Model
 
                     if (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS)
                     {
-                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-RRRR'))")
+                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-YYYY'))")
                             .Append(", TRIM(TO_CHAR(" + m_colX + ",'yyyy'))");
                     }
                     else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
@@ -538,7 +538,7 @@ namespace VAdvantage.Model
                 else if (GetDateTimeTypes() == IS_MONTHLY || GetDateTimeTypes() == IS_LAST_N_MONTHS)
                     sbGroupBy.Append(", ")
                         .Append(ApplyDateFunction(s_colX, "yyyy"))
-                        .Append(", ").Append(ApplyDateFunction(s_colX, "Mon-RRRR"));
+                        .Append(", ").Append(ApplyDateFunction(s_colX, "Mon-YYYY"));
 
                 s_groupby = sbGroupBy.ToString();   //set value into variable to be used later for group by clause (!important)
                 sb.Append(sbGroupBy.ToString());
@@ -632,7 +632,7 @@ namespace VAdvantage.Model
                     //put value
                     if (MColumn.Get(_Ctx, filter[i].GetAD_Column_ID()).getSQLDataType() == "DATE")
                     {
-                        sqlFilter.Append("TO_DATE('").Append(filter[0].GetWhereValue()).Append("','dd/mm/RRRR'").Append(")");
+                        sqlFilter.Append("TO_DATE('").Append(filter[0].GetWhereValue()).Append("','dd/mm/YYYY'").Append(")");
                     }
                     else
                         sqlFilter.Append("'").Append(Env.ParseContext(_Ctx, 0, filter[i].GetWhereValue(), false)).Append("'");
@@ -642,7 +642,7 @@ namespace VAdvantage.Model
                         {
                             //sqlFilter.Append("TO_DATE('").Append(colValue).Append("','dd/mm/yyyy'").Append(")");
                             sqlFilter.Append(" AND ");
-                            sqlFilter.Append("TO_DATE('").Append(filter[i].GetValueTo()).Append("','dd/mm/RRRR'").Append(")");
+                            sqlFilter.Append("TO_DATE('").Append(filter[i].GetValueTo()).Append("','dd/mm/YYYY'").Append(")");
                         }
                         else
                             sqlFilter.Append(" AND '").Append(filter[i].GetValueTo()).Append("'");
@@ -682,7 +682,7 @@ namespace VAdvantage.Model
                     unionTableQuery.Append(ApplyDateFunction(m_colX)).Append(", ")
                         .Append("TRIM(TO_CHAR(" + m_colX + ",'yyyy')), ")
                         .Append(ApplyAggregateFunction(m_colY, true)).Append(SPACE + "ColY");
-                    unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-RRRR')) as ColX");
+                    unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-YYYY')) as ColX");
                 }
                 else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
                 {
@@ -710,12 +710,14 @@ namespace VAdvantage.Model
                 //group by the whole query
                 if (!IsNone())
                 {
+                    if (DB.IsPostgreSQL())
+                        unionTableQuery.Append(" FOO ");
                     unionTableQuery.Append(" GROUP BY ");
                     unionTableQuery.Append(ApplyDateFunction(m_colX));
 
                     if (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS)
                     {
-                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-RRRR'))")
+                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-YYYY'))")
                             .Append(", TRIM(TO_CHAR(" + m_colX + ",'yyyy'))");
                     }
                     else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
@@ -745,8 +747,11 @@ namespace VAdvantage.Model
                         MColumn idn_column = MColumn.Get(_Ctx, columns[i].Get_ID());
                         if (idn_column.IsIdentifier())
                         {
-                            s_identifierCol = idn_column.GetColumnName();
-                            break;
+                            if (!(idn_column.GetAD_Reference_ID() == 32))
+                            {
+                                s_identifierCol = idn_column.GetColumnName();
+                                break;
+                            }
                         }
                     }
                 }
@@ -852,15 +857,28 @@ namespace VAdvantage.Model
         private string GetUnionQuery(DateTime date1, DateTime date2, string colName, string function)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("SELECT dates." + colName + "," + function + " FROM");
-            sb.Append("(SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/RRRR') - 1 + rownum AS " + colName);
+            if (DB.IsPostgreSQL())
+            {
+                sb.Append(@" SELECT " + colName + @", " + function + @" FROM
+                    GENERATE_SERIES(TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY'), TO_DATE('" + date2.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY'), INTERVAL '1 day') AS " + colName + @"
+                    WHERE " + colName + @" > DATE '0001-01-01' GROUP BY " + colName);
+            }
+            else
+            {
+                sb.Append(@" SELECT dates." + colName + "," + function + @" FROM
+        (SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + LEVEL - 1 AS " + colName + @" FROM DUAL CONNECT BY
+            LEVEL <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') - TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + 1
+            ) dates WHERE dates." + colName + @" > TO_DATE('01/01/0001', 'MM/DD/YYYY') GROUP BY dates." + colName);
 
-            sb.Append(" FROM all_objects");
-            sb.Append(" WHERE TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/RRRR') - 1 + rownum <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + "', 'MM/DD/RRRR')) dates");
-            sb.Append(" WHERE dates.").Append(colName).Append(">TO_DATE('01/01/0001', 'MM/DD/RRRR')");
-            sb.Append(" GROUP BY dates." + colName);
-            //sb.Append(" ORDER BY " + colName + " ASC");
+                //sb.Append("SELECT dates." + colName + "," + function + " FROM");
+                //sb.Append("(SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum AS " + colName);
 
+                //sb.Append(" FROM all_objects");
+                //sb.Append(" WHERE TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY')) dates");
+                //sb.Append(" WHERE dates.").Append(colName).Append(">TO_DATE('01/01/0001', 'MM/DD/YYYY')");
+                //sb.Append(" GROUP BY dates." + colName);
+                //sb.Append(" ORDER BY " + colName + " ASC");
+            }
             return sb.ToString();
         }
 
@@ -905,7 +923,7 @@ namespace VAdvantage.Model
                 sb.Append(",").Append("'yyyy'").Append("))");
             else
             {
-                sb = new StringBuilder("TO_Date(").Append(colName).Append(",'DD-mm-RRRR')");
+                sb = new StringBuilder("TO_Date(").Append(colName).Append(",'DD-mm-YYYY')");
             }
 
             return sb.ToString();
@@ -1334,8 +1352,8 @@ namespace VAdvantage.Model
                 else
                     sb.Append(m_colX).Append(" BETWEEN ");
 
-                sb.Append(GetFormattedDateColumn(m_date1, "mm/dd/RRRR")).Append(" AND ");
-                sb.Append(GetFormattedDateColumn(m_date2, "mm/dd/RRRR"));
+                sb.Append(GetFormattedDateColumn(m_date1, "mm/dd/YYYY")).Append(" AND ");
+                sb.Append(GetFormattedDateColumn(m_date2, "mm/dd/YYYY"));
 
             }
             sqlwhere = sb.ToString();
@@ -1494,12 +1512,12 @@ namespace VAdvantage.Model
                                 {
                                     if (series.GetAlertLastRun() != null)
                                     {
-                                        if (DateTime.Parse(series.GetAlertLastRun().ToString()).ToString("dd/MM/RRRR") == DateTime.Now.ToString("dd/MM/RRRR"))
+                                        if (DateTime.Parse(series.GetAlertLastRun().ToString()).ToString("dd/MM/YYYY") == DateTime.Now.ToString("dd/MM/YYYY"))
                                         {
                                             continue;
                                         }
                                     }
-                                    specialWhere = series.GetFormattedDateDBColumn(series.GetColumnName(series.GetAD_Column_X_ID()), "dd/mm/RRRR") + "=" + series.GetFormattedDateDBColumn("SYSDATE", "dd/mm/RRRR");
+                                    specialWhere = series.GetFormattedDateDBColumn(series.GetColumnName(series.GetAD_Column_X_ID()), "dd/mm/YYYY") + "=" + series.GetFormattedDateDBColumn("SYSDATE", "dd/mm/YYYY");
                                     sql = series.GetSql(false, specialWhere);
 
                                 }
