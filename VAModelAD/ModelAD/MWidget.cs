@@ -22,12 +22,22 @@ namespace VAdvantage.Model
         {
 
         }
-    
+
         protected override bool AfterSave(bool newRecord, bool success)
         {
+            if (newRecord)	//	Add to all automatic roles
+            {
+                MRole[] roles = MRole.GetOf(GetCtx(), "IsManual='N'");
+                for (int i = 0; i < roles.Length; i++)
+                {
+                    MWidgetAccess wa = new MWidgetAccess(this, roles[i].GetAD_Role_ID());
+                    wa.Save();
+                }
+            }
+
             //Check single window on widget for apply datasource.
             string oldWidgetID = Util.GetValueOfString(Get_ValueOld("AD_Window_ID"));
-            if (!newRecord && oldWidgetID!=GetAD_Window_ID())
+            if (!newRecord && oldWidgetID != GetAD_Window_ID())
             {
                 bool IsSingleWindow = !string.IsNullOrEmpty(GetAD_Window_ID()) && !GetAD_Window_ID().Contains(',');
                 string sql = "SELECT AD_WidgetField_ID FROM AD_WidgetField WHERE AD_Widget_ID = " + GetAD_Widget_ID();
@@ -38,7 +48,7 @@ namespace VAdvantage.Model
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
                         MWidgetField obj = new MWidgetField(GetCtx(), Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WidgetField_ID"]), Get_TrxName());
-                        
+
                         if (IsSingleWindow)
                         {
                             obj.SetIsApplyDataSource(true);

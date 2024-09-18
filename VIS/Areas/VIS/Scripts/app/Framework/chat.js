@@ -6,22 +6,52 @@
 
         var $maindiv = $('<div class="vis-forms-container"></div>'); //layout
         var $div = $('<div class="vis-chatdetailouterwrap"></div>');
-        var $inputChat = $('<textarea  id="input-chat-new" class="vis-chat-msgbox"  maxlength="500" />');
+        var $inputChat = $('<div class="d-flex vis-chatBoxInputWrap"><textarea  id="input-chat-new" class="vis-chat-msgbox"  maxlength="500" /></textarea>');
+        var $enterIcon = $('<button><i class="fa fa-paper-plane"></i></button>');
         //  var $buttonsdiv = $('<div style="overflow:auto"></div>');
         // var $btnOK = $('<button>');
         // var $btnCancel = $('<button>');
-        $maindiv.append($div).append($inputChat);//.append($buttonsdiv); //ui
-        this.winNo = windowNo;
+        $maindiv.append($inputChat).append($div);//.append($buttonsdiv); //ui
+        this.windowNo = 0;
 
         var ch = null;
-        this.prop = { WindowNo: windowNo, ChatID: chat_id, AD_Table_ID: table_id, Record_ID: record_id, Description: description, TrxName: null, ChatText: "", page: 0, pageSize: 10 };
-
-        init($div, windowNo, this.prop);
+        if (record_id > 0 && table_id > 0) {
+            this.prop = { WindowNo: windowNo, ChatID: chat_id, AD_Table_ID: table_id, Record_ID: record_id, Description: description, TrxName: null, ChatText: "", page: 0, pageSize: 10 };
+            init($div, windowNo, this.prop);
+        }
         var self = this;
-        createButtons();
+        //createButtons();
         //events();
-      
-        
+
+
+        $enterIcon.on(VIS.Events.onTouchStartOrClick, function (e) {
+            triggerSave(e);
+        });
+
+        $inputChat.find('textarea').on('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();  // Prevents the default action of creating a new line
+                triggerSave(e);
+            }
+        });
+
+        function triggerSave(e) {
+            saveMsg(e);
+            $inputChat.find('textarea').val('');
+            self.refreshPanelData(self.record_ID, 0);
+        }
+
+
+        this.initializeComponent = function (windowNo, prop) {
+            $inputChat.append($enterIcon);
+            $maindiv.addClass('p-2');
+            init($div, windowNo, prop);
+        }
+
+        this.getRoot = function () {
+            return $maindiv;
+        };
+
         this.show = function () {
 
             ch = new VIS.ChildDialog();
@@ -72,17 +102,18 @@
 
         function events() {
             ch.onOkClick = function (e) {
-                var text = $inputChat.val();
-                if ($.trim(text) == "" || text == "" || text == null) {
-                    VIS.ADialog.info("EnterData");
-                    if (e != undefined) {
-                        e.preventDefault();
-                    }
-                    return false;
-                }
-                //  $btnOK.prop('disabled', true);
-                self.prop.ChatText = text;
-                VIS.dataContext.saveChat(self.prop);
+                saveMsg(e);
+                /* var text = $inputChat.val();
+                 if ($.trim(text) == "" || text == "" || text == null) {
+                     VIS.ADialog.info("EnterData");
+                     if (e != undefined) {
+                         e.preventDefault();
+                     }
+                     return false;
+                 }
+                 //  $btnOK.prop('disabled', true);
+                 self.prop.ChatText = text;
+                 VIS.dataContext.saveChat(self.prop);*/
                 //ch.close();
                 //if (self.onClose) self.onClose();
                 //self.dispose();
@@ -127,7 +158,7 @@
 
                     if (data.subChat[chat].AD_Image_ID == 0) {
                         //str += "<img  data-uID='" + data.subChat[chat].AD_User_ID + "'  src= '" + VIS.Application.contextUrl + "Areas/VIS/Images/Home/userAvatar.png'/>";
-                        str += "<i class='fa fa-user' data-uID='" + data.subChat[chat].AD_User_ID + "'></i>";                        
+                        str += "<i class='fa fa-user' data-uID='" + data.subChat[chat].AD_User_ID + "'></i>";
 
                         ispic = true;
                     }
@@ -172,7 +203,7 @@
                         str += '</span><span style="font-size: .75rem; padding-right: 5px;">' + date + '</span></div><div>';
                     }
 
-                          //+ '<textarea readonly style="width:640px">' + data[chat].ChatData + '</textarea>'
+                    //+ '<textarea readonly style="width:640px">' + data[chat].ChatData + '</textarea>'
                     if (VIS.Application.isRTL) {
                         str += '<span style="font-size: .75rem;padding-right:5px">' + VIS.Utility.encodeText(data.subChat[chat].ChatData) + '</span></div>'
                     }
@@ -202,9 +233,58 @@
 
         };
 
-
+        function saveMsg(e) {
+            var text = $inputChat.find('textarea').val();
+            if ($.trim(text) == "" || text == "" || text == null) {
+                VIS.ADialog.info("EnterData");
+                /* if (e != undefined) {
+                     e.preventDefault();
+                 }*/
+                return false;
+            }
+            self.prop.ChatText = text;
+            VIS.dataContext.saveChat(self.prop);
+        }
 
     };
+
+    /**
+     *	Invoked when user click on panel icon
+     */
+    Chat.prototype.startPanel = function (windowNo, curTab, extraInfo) {
+        this.windowNo = windowNo;
+        this.curTab = curTab;
+        this.extraInfo = extraInfo;
+
+    };
+
+    /**
+         *	This function will execute when user navigate  or refresh a record
+         */
+    Chat.prototype.refreshPanelData = function (recordID, selectedRow) {
+        this.record_ID = recordID;
+        this.selectedRow = selectedRow;
+        this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 0, pageSize: 10 };
+        this.initializeComponent(this.windowNo, this.prop);
+
+        // this.update(recordID);
+    };
+
+    /**
+     *	Fired When Size of panel Changed
+     */
+    Chat.prototype.sizeChanged = function (width) {
+        this.panelWidth = width;
+    };
+
+
+    /**
+     *	Dispose Component
+     */
+    Chat.prototype.dispose = function () {
+        this.disposeComponent();
+    };
+
 
     VIS.Chat = Chat;
 
