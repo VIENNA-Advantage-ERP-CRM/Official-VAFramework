@@ -2481,7 +2481,7 @@
         this.setReadOnly = function (readOnly) {
 
             this.isReadOnly = readOnly;
-            $ctrl.prop('disabled', readOnly ? true : false);
+            $ctrl.prop('disabled', readOnly || this.isMultiKeyTextBox ? true : false);
             // this.$super.setReadOnly(readonly);
             this.setBackground(readOnly);
             if (readOnly) {

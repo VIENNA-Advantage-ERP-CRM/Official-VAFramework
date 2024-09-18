@@ -50,7 +50,7 @@ namespace VAdvantage.Model
         public const bool SQL_RO = false;
         //	Access SQL Read Only		*/
         public const bool SQL_ORGRO = false;
-        //	Access SQL Read Only		*/
+        //	Access SQL Read write		*/
         public const bool SQL_ORGRW = true;
         //	Access SQL Fully Qualified	
         public const bool SQL_FULLYQUALIFIED = true;
@@ -2650,20 +2650,20 @@ namespace VAdvantage.Model
             else
             {
                  set = GetCtx().GetContext("#AD_FilteredOrg").Split(',').ToList();
-                if (!rw)
+                if (!rw) //both 
                 {
                     if (!set.Contains("0")) // add if rw false
                     {
                         set.Add("0");
                     }
                 }
-                else
-                {
-                    if (set.Contains("0") && Util.GetValueOfInt(GetCtx().GetContext("#AD_Org_ID"))>0)
-                    {
-                        set.Remove("0");
-                    }
-                }
+                //else
+                //{
+                //    if (set.Contains("0") && Util.GetValueOfInt(GetCtx().GetContext("#AD_Org_ID"))>0)
+                //    {
+                //        set.Remove("0");
+                //    }
+                //}
             }
             //
             if (set.Count == 1)

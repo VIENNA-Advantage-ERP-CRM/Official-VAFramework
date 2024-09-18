@@ -16,6 +16,7 @@ VIS.VTabbedPane = function (isWorkBench) {
 
     this.Items = [];
     this.ItemsIds = [];
+    this.Tabs = [];
     this.count = 0;
     this.dependents = [];
     this.TabItems = [];
@@ -70,6 +71,7 @@ VIS.VTabbedPane.prototype.addTab = function (id, gTab, tabElement, tabItem) {
     this.ItemsIds[this.count] = id;
     this.Items[this.count] = tabElement;
     this.TabItems.push(tabItem);
+    this.Tabs.push(gTab);
 
     var tabDependents = gTab.getDependentOn();
 
@@ -277,6 +279,9 @@ VIS.VTabbedPane.prototype.evaluate = function (e) {
             for (var i = 0; i < tabs.length; i++) {
                 var li = tabs[i].getListItm();
                 this.tabLIObj[tabs[i].action] = li;
+                if (tabs[i].isHideTab) { // if tab hide then not append in UI
+                    li.hide();
+                } 
                 //if (i == 0)
                     $ulTabControl.append(li.hide());
             }
@@ -304,6 +309,7 @@ VIS.VTabbedPane.prototype.evaluate = function (e) {
 
             for (var i = 0; i <= this.oldTabIndex; i++) {
                 // $ulTabControl.append(
+                if (!this.Tabs[i].getIsHideTabName())
                 this.tabLIObj[this.ItemsIds[i]].show();
             }
             /* set sub tabs*/

@@ -37,7 +37,7 @@ VIS = window.VIS || {};
         var ht = null;
         this.init = function () {
             setBusy(false);
-            $root = $('<div></div>').append(bsyDiv);
+            $root = $('<div class="vis-surveyTab-root"></div>').append(bsyDiv);
            // h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
             h = VIS.Env.getScreenHeight() - 230;
             if (self.curTab && self.curTab.getIsHeaderPanel()) {
