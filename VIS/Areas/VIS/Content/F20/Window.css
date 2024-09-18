@@ -2000,9 +2000,17 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
     flex: 1;
 }
 
+.vis-chat-arrowdown {
+    position: absolute;
+    text-align: center;
+    color: rgba(var(--v-c-primary), 1);
+    width: 100%;
+    font-size: 20px;
+}
+
 .vis-chatdetailouterwrap {
     overflow-y: auto;
-  /*  height: 260px;*/
+    /*  height: 260px;*/
 }
 
 .vis-gc-vtable.w2ui-grid .w2ui-editable input, .vis-gc-vtable.w2ui-grid .w2ui-editable select {

@@ -8,15 +8,17 @@
         var $div = $('<div class="vis-chatdetailouterwrap"></div>');
         var $inputChat = $('<div class="d-flex vis-chatBoxInputWrap"><textarea  id="input-chat-new" class="vis-chat-msgbox"  maxlength="500" /></textarea>');
         var $enterIcon = $('<button><i class="fa fa-paper-plane"></i></button>');
+        var $downArrow = $('<i class="fa fa-caret-down vis-chat-arrowdown" aria-hidden="true"></i>');
         //  var $buttonsdiv = $('<div style="overflow:auto"></div>');
         // var $btnOK = $('<button>');
         // var $btnCancel = $('<button>');
-        $maindiv.append($inputChat).append($div);//.append($buttonsdiv); //ui
+        $maindiv.append($inputChat).append($div).append($downArrow);//.append($buttonsdiv); //ui
         this.windowNo = 0;
+        this.page = 0;
 
         var ch = null;
         if (record_id > 0 && table_id > 0) {
-            this.prop = { WindowNo: windowNo, ChatID: chat_id, AD_Table_ID: table_id, Record_ID: record_id, Description: description, TrxName: null, ChatText: "", page: 0, pageSize: 10 };
+            this.prop = { WindowNo: windowNo, ChatID: chat_id, AD_Table_ID: table_id, Record_ID: record_id, Description: description, TrxName: null, ChatText: "", page: this.page, pageSize: 10 };
             init($div, windowNo, this.prop);
         }
         var self = this;
@@ -26,6 +28,10 @@
 
         $enterIcon.on(VIS.Events.onTouchStartOrClick, function (e) {
             triggerSave(e);
+        });
+
+        $downArrow.on(VIS.Events.onTouchStartOrClick, function (e) {
+            alert("ok");
         });
 
         $inputChat.find('textarea').on('keydown', function (e) {
