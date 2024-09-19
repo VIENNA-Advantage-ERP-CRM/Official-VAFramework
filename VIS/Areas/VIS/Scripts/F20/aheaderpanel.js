@@ -53,11 +53,21 @@
          * This method create headr panel items when user open header panel first time. After that when user change record, system simply change values of label
          * and icons.
          * */
-        this.setHeaderItems = function (currentItem, $containerDiv) {
-
+        this.setHeaderItems = function (currentItem, $containerDiv) {           
             /*If controls are already loaded, then do not manipulate DOM.Only fetch there reference from DOM and Change Values.
              *Else create header panel items. 
              */
+
+            if (this.staticList) {
+                for (var c = 0; c < this.staticList.length; c++) {
+                    var div = this.staticList[c].div;
+                    var logic = this.evaluateStyleLogic(this.staticList[c].styleLogic);
+                    if (logic) {
+                        div.attr("style", logic);
+                    }
+                }
+            }
+
             if (this.controls && this.controls.length > 0 && !currentItem && !$containerDiv) {
                 for (var i = 0; i < this.controls.length; i++) {
                     var objControl = this.controls[i];
@@ -237,10 +247,15 @@
 
                     if (headerItem.IsStaticContent) {
 
-                        fieldStyleLogic = this.evaluateStyleLogic(fieldStyleLogic);
-                        if (fieldStyleLogic) {
-                            $div.attr("style", fieldStyleLogic);
+                        if (!this.staticList) {
+                            this.staticList = [];
                         }
+
+                        this.staticList.push({
+                            div: $div,
+                            styleLogic: fieldStyleLogic
+                        });
+                       
 
                         var controls = {}
                         ContentFieldValue = headerItem.ContentFieldValue;
@@ -571,6 +586,8 @@
                     }
                 }
             }
+
+            
         };
 
 

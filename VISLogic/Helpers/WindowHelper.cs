@@ -3580,6 +3580,16 @@ namespace VIS.Helpers
         public void InsertUpdateDefaultSearch(Ctx _ctx, int AD_Tab_ID, int AD_Table_ID, int AD_User_ID, int? AD_UserQuery_ID)
         {
 
+            #region remove default when
+                string sql1 = "SELECT AD_UserQuery_ID FROM AD_DefaultUserQuery WHERE AD_Tab_ID=" + AD_Tab_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_User_ID=" + AD_User_ID;
+                object id1 = DB.ExecuteScalar(sql1);
+
+                if(Convert.ToInt32(id1) == AD_UserQuery_ID)
+                {
+                    AD_UserQuery_ID = 0;
+                }
+            #endregion
+
             if (AD_UserQuery_ID == 0 || AD_UserQuery_ID == null)
             {
                 DB.ExecuteQuery("DELETE FROM AD_DefaultUserQuery WHERE AD_Tab_ID=" + AD_Tab_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_User_ID=" + AD_User_ID);
@@ -3594,6 +3604,9 @@ namespace VIS.Helpers
             {
                 AD_DefaultUserQuery_ID = Convert.ToInt32(id);
             }
+
+            sql = "SELECT AD_UserQuery_ID FROM AD_DefaultUserQuery WHERE AD_Tab_ID=" + AD_Tab_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_User_ID=" + AD_User_ID;
+            id = DB.ExecuteScalar(sql);
 
 
             X_AD_DefaultUserQuery userQuery = new X_AD_DefaultUserQuery(_ctx, AD_DefaultUserQuery_ID, null);
