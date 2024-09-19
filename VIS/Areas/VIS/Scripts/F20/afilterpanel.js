@@ -550,7 +550,9 @@
                 //    this.selectionfields.push(field);
 
                 //}
-                //else
+                if (VIS.DisplayType.Image == field.getDisplayType()) {
+
+                }else
                     sortedFields.push({ 'value': columnName, 'text': header });
                 // html += '<option value="' + columnName + '">' + header + '</option>';
             }

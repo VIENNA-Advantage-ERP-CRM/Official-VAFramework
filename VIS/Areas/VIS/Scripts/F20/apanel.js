@@ -3657,7 +3657,7 @@
                     
                     this.clearSearchText();                   
 
-                    this.setDefaultSearch(gc, AD_UserQuery_ID);
+                    this.setDefaultSearch(gc, AD_UserQuery_ID);                  
 
                     if ((this.actionParams.TabWhereClause||'') != '') { // check if param has where clause or not
                         var query = new VIS.Query(this.curTab.getTableName(), false);
@@ -3668,7 +3668,7 @@
                     gc.query(this.curTab.getOnlyCurrentDays(), 0, false);	//	updated
                 }
                 else {
-                    this.setDefaultSearch(gc, AD_UserQuery_ID);
+                    this.setDefaultSearch(gc, AD_UserQuery_ID);                    
                 }
             }
             
@@ -3933,6 +3933,11 @@
                         $selfpanel.curTab.setQuery(query);
                         $selfpanel.defaultSearch = false;
                         $selfpanel.curTab.searchText = data.tables[0].rows[i].cells["name"];
+                        var userquery_id = data.tables[0].rows[i].cells["ad_defaultuserquery_id"];
+                        setTimeout(function () {
+                            $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(userquery_id, true);
+                        }, 1000);
+
                         toastr.success(VIS.Msg.getMsg("DefaultSerachExist"), '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
 
                     }
@@ -4462,6 +4467,7 @@
 
     APanel.prototype.cmd_home = function () {
         this.selectFirstTab();
+        this.getRoot().find(".vis-ad-w-p-t-c").animate({ scrollLeft: 0 }, 500);
     }
 
     /**

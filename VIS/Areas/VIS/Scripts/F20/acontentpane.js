@@ -42,7 +42,7 @@
             $divTabControl = $root.find(".vis-ad-w-p-t-c-inc");// $("<div class='vis-apanel-tabcontrol'>").append($ulTabControl);
             $divTabNav = $root.find(".vis-ad-w-p-inc-tabs-oflow").hide();// $("<div class='vis-apanel-tab-oflow'>").hide();
             $divHeaderNav = $root.find(".vis-ad-w-p-inc-tabs");
-            $divUlTabNav = $root.find(".vis-ad-w-p-inc-tb");
+            $divUlTabNav = $root.find(".vis-ad-w-p-inc-tb").hide();
 
             $root.css('display', 'flex');
 
@@ -151,7 +151,7 @@
                    // this.onTabChange(childTab.getAction());
                 }
             }
-
+            $divUlTabNav.show();
             
             //  this.setTabNavigation();
         };
@@ -180,6 +180,7 @@
             else {
                 $divTabNav.hide();
             }
+            
         };
 
         this.createToolBar = function () {
@@ -217,7 +218,7 @@
         this.finishLayout = function () {
             if (!VIS.Application.isMobile)
                 $divTabControl.addClass("vis-ad-w-p-t-c-mob");
-            
+            $root.find('.vis-ad-w-p-c-inc-main').css('display', '');
         };
 
         this.setDynamicActions = function (gc,remove) {
@@ -428,6 +429,7 @@
         if (this.curGC) {
             this.curGC.vTable.resize();
         }
+        this.setTabNavigation();
         return;
     };
 

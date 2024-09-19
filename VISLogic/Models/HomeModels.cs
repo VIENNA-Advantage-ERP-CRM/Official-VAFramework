@@ -213,14 +213,14 @@ namespace VIS.Models
                     return list;
                 }                
 
-                string sql = @"SELECT DISTINCT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA FROM D_Chart INNER JOIN 
+                string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA FROM D_Chart INNER JOIN 
                             D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
                             INNER JOIN AD_WidgetSize ON (D_Chart.D_Chart_ID=AD_WidgetSize.D_Chart_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                           
                             WHERE AD_WidgetSize.isActive='Y' AND  D_ChartAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
                 sql += " UNION ALL ";
 
-                sql += @" SELECT DISTINCT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_KPI INNER JOIN 
+                sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_KPI INNER JOIN 
                             RC_KPIAccess ON (RC_KPI.RC_KPI_ID=RC_KPIAccess.RC_KPI_ID)
                             INNER JOIN AD_WidgetSize ON (RC_KPI.RC_KPI_ID=AD_WidgetSize.RC_KPI_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
@@ -228,7 +228,7 @@ namespace VIS.Models
 
                 sql += " UNION ALL ";
 
-                sql += @" SELECT DISTINCT 'V' AS chartType, RC_View.RC_View_ID AS d_chart_id,RC_View.Name,colspan,rowspan,'V' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_View INNER JOIN 
+                sql += @" SELECT 'V' AS chartType, RC_View.RC_View_ID AS d_chart_id,RC_View.Name,colspan,rowspan,'V' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_View INNER JOIN 
                             RC_ViewAccess ON (RC_View.RC_View_ID=RC_ViewAccess.RC_View_ID)
                             INNER JOIN AD_WidgetSize ON (RC_View.RC_View_ID=AD_WidgetSize.RC_View_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
@@ -389,7 +389,7 @@ namespace VIS.Models
             bool baseLanguage = Env.IsBaseLanguage(ctx, "");
             int sequenceNo = 0;
             string sql = @"SELECT WF.Control_Type,WF.BadgeStyle,WF.IsBadge,WF.BadgeValue, WF.IsSameLine, WF.OnClick,
-                   WF.HtmlStyle, WF.IsApplyDataSource, WF.SeqNo, WF.OnClick, WF.Top, WF.WhereClause, WF.Suffix, WF.Prefix,  
+                   WF.HtmlStyle, WF.IsApplyDataSource, WF.SeqNo, WF.OnClick, WF.Top, WF.Suffix, WF.Prefix,  
                    WF.AD_Image_ID, WD.HtmlStyle AS WidgetHTML, WD.IsShowAdvanced,WD.IsShowRandomColor, WF.AD_Tab_ID, WF.AD_Field_ID, ";
 
             if (baseLanguage)
@@ -426,7 +426,6 @@ namespace VIS.Models
                             string imageURL = "";
                             sequenceNo = Util.GetValueOfInt(row[i]["SeqNo"]);
                             string badgeValue = Util.GetValueOfString(row[i]["BadgeValue"]);
-                            string whereClause = Util.GetValueOfString(row[i]["WhereClause"]);
                             int Ad_Image_ID = Util.GetValueOfInt(row[i]["AD_Image_ID"]);
                             int widgetTabID = Util.GetValueOfInt(row[i]["AD_Tab_ID"]);
                             int widgetFieldID = Util.GetValueOfInt(row[i]["AD_Field_ID"]);
@@ -517,13 +516,13 @@ namespace VIS.Models
                                         string columnName = Util.GetValueOfString(rowCount[0]["ColumnName"]);
                                         dsObj = GetDataSource(ctx, windowNo, Util.GetValueOfInt(rowCount[0]["AD_Column_ID"]), Util.GetValueOfInt(rowCount[0]["AD_Reference_ID"]),
                                             Util.GetValueOfInt(rowCount[0]["AD_Reference_Value_ID"]), columnName, Util.GetValueOfString(rowCount[0]["TableName"]),
-                                            isParent, topTen, whereClause);
+                                            isParent, topTen, "");
                                         if (dsObj != null && dsObj.Count > 0)
                                         {
 
                                             for (int j = 0; j < dsObj.Count; j++)
                                             {
-                                                string where;
+                                                /*string where;
                                                 if (IsInteger(dsObj[j].ID))
                                                 {
                                                     where = columnName + " = " + dsObj[j].ID;
@@ -540,7 +539,7 @@ namespace VIS.Models
                                                     TabIndex = Util.GetValueOfString(0),
                                                     ActionType="W",
                                                     ActionName= Util.GetValueOfString(rowCount[0]["WindowName"])
-                                                };
+                                                };*/
                                                 string name = "";
                                                 if (!string.IsNullOrEmpty(Util.GetValueOfString(row[i]["Prefix"]))) { 
                                                 name = Util.GetValueOfString(row[i]["Prefix"])+" ";
@@ -557,7 +556,7 @@ namespace VIS.Models
                                                     SeqNo = sequenceNo,
                                                     Name = name,
                                                     HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
-                                                    OnClick = APobj,
+                                                    OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
                                                     IsSameLine = Util.GetValueOfString(row[i]["IsSameLine"]),
                                                     IsBadge = "Y",
                                                     BadgeStyle = Util.GetValueOfString(row[i]["BadgeStyle"]),
@@ -661,12 +660,21 @@ namespace VIS.Models
             return result;
         }
 
-        public bool IsInteger(string input)
-        {
-            int result;
-            return int.TryParse(input, out result);
-        }
 
+        /// <summary>
+        /// Getting most frequent using data from an window 
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="windowNo">windowNo</param>
+        /// <param name="columnID">Ad_Column_ID</param>
+        /// <param name="AD_Reference_ID">AD_Reference_ID</param>
+        /// <param name="AD_Reference_Value_ID">AD_Reference_Value_ID</param>
+        /// <param name="columnName">columnName</param>
+        /// <param name="TableName">TableName</param>
+        /// <param name="IsParent">IsParent</param>
+        /// <param name="top">Number of record</param>
+        /// <param name="whereClause">SQL Where</param>
+        /// <returns>Record's ID, Name and count</returns>
         public List<DataSource> GetDataSource(Ctx ctx, int windowNo, int columnID, int AD_Reference_ID, int AD_Reference_Value_ID,
             string columnName, string TableName, bool IsParent, int top,string whereClause)
         {

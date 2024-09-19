@@ -369,11 +369,12 @@ namespace VAdvantage.Controller
         private static bool LoadTabDetails(GridTabVO vo, IDataReader dr)
         {
             MRole role = MRole.GetDefault(vo.ctx, false);
-            bool showTrl = "Y".Equals(vo.ctx.GetContext("#ShowTrl")) || DataBase.GlobalVariable.IsVisualEditor;
-            bool showAcct = "Y".Equals(vo.ctx.GetContext("#ShowAcct")) || DataBase.GlobalVariable.IsVisualEditor;
-            bool showAdvanced = "Y".Equals(vo.ctx.GetContext("#ShowAdvanced")) || DataBase.GlobalVariable.IsVisualEditor;
-            //	VLogger.get().warning("ShowTrl=" + showTrl + ", showAcct=" + showAcct);
             bool skipRole = vo.ctx.GetContext("skipRole") == "Y";
+            bool showTrl = "Y".Equals(vo.ctx.GetContext("#ShowTrl")) || skipRole;
+            bool showAcct = "Y".Equals(vo.ctx.GetContext("#ShowAcct")) || skipRole;
+            bool showAdvanced = "Y".Equals(vo.ctx.GetContext("#ShowAdvanced")) || skipRole;
+            //	VLogger.get().warning("ShowTrl=" + showTrl + ", showAcct=" + showAcct);
+            
             try
             {
                 vo.AD_Tab_ID = Utility.Util.GetValueOfInt(dr["AD_Tab_ID"]);
@@ -419,7 +420,7 @@ namespace VAdvantage.Controller
 
                 //	Access Level
                 vo.AccessLevel = Utility.Util.GetValueOfString(dr["AccessLevel"]);
-                if (!skipRole && !role.CanView(vo.ctx, vo.AccessLevel) && !DataBase.GlobalVariable.IsVisualEditor)	//	No Access
+                if (!skipRole && !role.CanView(vo.ctx, vo.AccessLevel))	//	No Access
                 {
                     VLogger.Get().Fine("No Role Access - AD_Tab_ID=" + vo.AD_Tab_ID + " " + vo.Name);
                     return false;
@@ -429,14 +430,14 @@ namespace VAdvantage.Controller
                 //	Table Access
                 vo.AD_Table_ID = Utility.Util.GetValueOfInt(dr["AD_Table_ID"]);
                 vo.ctx.SetContext(vo.windowNo, vo.tabNo, "AD_Table_ID", vo.AD_Table_ID.ToString());
-                if (!skipRole && !role.IsTableAccess(vo.AD_Table_ID, true) && !DataBase.GlobalVariable.IsVisualEditor)
+                if (!skipRole && !role.IsTableAccess(vo.AD_Table_ID, true) )
                 {
                     VLogger.Get().Config("No Table Access - AD_Tab_ID="
                         + vo.AD_Tab_ID + " " + vo.Name);
                     return false;
                 }
 
-                if (role.IsTableReadOnly(vo.AD_Table_ID) && !DataBase.GlobalVariable.IsVisualEditor)
+                if (role.IsTableReadOnly(vo.AD_Table_ID) && !skipRole)
                 {
                     vo.IsReadOnly = true;
                 }

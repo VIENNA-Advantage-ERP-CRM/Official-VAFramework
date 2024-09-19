@@ -710,6 +710,8 @@ namespace VAdvantage.Model
                 //group by the whole query
                 if (!IsNone())
                 {
+                    if (DB.IsPostgreSQL())
+                        unionTableQuery.Append(" FOO ");
                     unionTableQuery.Append(" GROUP BY ");
                     unionTableQuery.Append(ApplyDateFunction(m_colX));
 
@@ -745,8 +747,11 @@ namespace VAdvantage.Model
                         MColumn idn_column = MColumn.Get(_Ctx, columns[i].Get_ID());
                         if (idn_column.IsIdentifier())
                         {
-                            s_identifierCol = idn_column.GetColumnName();
-                            break;
+                            if (!(idn_column.GetAD_Reference_ID() == 32))
+                            {
+                                s_identifierCol = idn_column.GetColumnName();
+                                break;
+                            }
                         }
                     }
                 }
@@ -852,14 +857,29 @@ namespace VAdvantage.Model
         private string GetUnionQuery(DateTime date1, DateTime date2, string colName, string function)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("SELECT dates." + colName + "," + function + " FROM");
-            sb.Append("(SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum AS " + colName);
 
-            sb.Append(" FROM all_objects");
-            sb.Append(" WHERE TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY')) dates");
-            sb.Append(" WHERE dates.").Append(colName).Append(">TO_DATE('01/01/0001', 'MM/DD/YYYY')");
-            sb.Append(" GROUP BY dates." + colName);
-            //sb.Append(" ORDER BY " + colName + " ASC");
+            if (DB.IsPostgreSQL())
+            {
+                sb.Append(@" SELECT " + colName + @", " + function + @" FROM
+                    GENERATE_SERIES(TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY'), TO_DATE('" + date2.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY'), INTERVAL '1 day') AS " + colName + @"
+                    WHERE " + colName + @" > DATE '0001-01-01' GROUP BY " + colName);
+            }
+            else
+            {
+                sb.Append(@" SELECT dates." + colName + "," + function + @" FROM
+        (SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + LEVEL - 1 AS " + colName + @" FROM DUAL CONNECT BY
+            LEVEL <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') - TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + 1
+            ) dates WHERE dates." + colName + @" > TO_DATE('01/01/0001', 'MM/DD/YYYY') GROUP BY dates." + colName);
+
+                //sb.Append("SELECT dates." + colName + "," + function + " FROM");
+                //sb.Append("(SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum AS " + colName);
+
+                //sb.Append(" FROM all_objects");
+                //sb.Append(" WHERE TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY')) dates");
+                //sb.Append(" WHERE dates.").Append(colName).Append(">TO_DATE('01/01/0001', 'MM/DD/YYYY')");
+                //sb.Append(" GROUP BY dates." + colName);
+                //sb.Append(" ORDER BY " + colName + " ASC");
+            }
 
             return sb.ToString();
         }

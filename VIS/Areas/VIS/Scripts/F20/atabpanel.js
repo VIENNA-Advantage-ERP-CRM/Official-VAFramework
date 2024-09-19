@@ -104,7 +104,7 @@
             if (size == 0) {
                 size = this.width;
             }
-            var tWidth = $outerwrap.closest('vis-ad-w-p-center-view').width() -20;
+            var tWidth = $outerwrap.closest('.vis-ad-w-p-center').width() -25;
             var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
 
             if (evt && !evt.isClosed) {
