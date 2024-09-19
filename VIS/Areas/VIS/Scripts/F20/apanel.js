@@ -320,7 +320,7 @@
                         span = $("<span title='" + VIS.Msg.getMsg("DefaultSearch") + "'  data-id='" + item.id + "'></span>");
                     }
 
-                    var del = $("<span data-id='" + item.id + "' class='fa fa-trash-o'></span>");
+                    var del = $("<span data-id='" + item.id + "' title='" + VIS.Msg.getMsg("Delete") + "'   class='fa fa-trash-o'></span>");
 
                     var d = $('<div class="d-flex align-items-center justify-content-center">');
                     d.append(span).append(del);
@@ -3948,9 +3948,9 @@
                         $selfpanel.defaultSearch = false;
                         $selfpanel.curTab.searchText = data.tables[0].rows[i].cells["name"];
                         var userquery_id = data.tables[0].rows[i].cells["ad_defaultuserquery_id"];
-                        setTimeout(function () {
-                            $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(userquery_id, true);
-                        }, 1000);
+                        setTimeout(function (id) {
+                            $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(id, true);
+                        }, 1000,userquery_id);
 
                         toastr.success(VIS.Msg.getMsg("DefaultSerachExist"), '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
 
