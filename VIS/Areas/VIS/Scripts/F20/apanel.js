@@ -955,6 +955,7 @@
          */
         this.showLandingPage = function (show, actionParams) {
             if (show) {
+                this.cmd_ignore();
                 this.landingPage.getRoot().show();
                 this.getRoot().hide();
             } else {
@@ -4451,7 +4452,9 @@
 
     APanel.prototype.cmd_ignore = function () {
         //m_curGC.stopEditor(false);
-        this.curGC.dataIgnore();
+        if (this.curGC) {
+            this.curGC.dataIgnore();
+        }
     };//Undo
 
     APanel.prototype.cmd_help = function ()//sarab

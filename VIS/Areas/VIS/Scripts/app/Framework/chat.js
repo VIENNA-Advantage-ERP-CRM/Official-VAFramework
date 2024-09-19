@@ -8,11 +8,11 @@
         var $div = $('<div class="vis-chatdetailouterwrap"></div>');
         var $inputChat = $('<div class="d-flex vis-chatBoxInputWrap"><textarea  id="input-chat-new" class="vis-chat-msgbox"  maxlength="500" /></textarea>');
         var $enterIcon = $('<button><i class="fa fa-paper-plane"></i></button>');
-        var $downArrow = $('<i class="fa fa-caret-down vis-chat-arrowdown" aria-hidden="true"></i>');
+        var $downArrow = $('<button class="vis-chat-arrowdown">Show More</button>');
         //  var $buttonsdiv = $('<div style="overflow:auto"></div>');
         // var $btnOK = $('<button>');
         // var $btnCancel = $('<button>');
-        $maindiv.append($inputChat).append($div).append($downArrow);//.append($buttonsdiv); //ui
+        $maindiv.append($inputChat).append($div);//.append($buttonsdiv); //ui
         this.windowNo = 0;
         this.page = 0;
 
@@ -29,7 +29,7 @@
         $enterIcon.on(VIS.Events.onTouchStartOrClick, function (e) {
             triggerSave(e);
         });
-       
+
         $inputChat.find('textarea').on('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();  // Prevents the default action of creating a new line
@@ -264,10 +264,12 @@
          *	This function will execute when user navigate  or refresh a record
          */
     Chat.prototype.refreshPanelData = function (recordID, selectedRow) {
-        this.record_ID = recordID;
-        this.selectedRow = selectedRow;
-        this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 0, pageSize: 10 };
-        this.initializeComponent(this.windowNo, this.prop);
+        if (recordID > 0) {
+            this.record_ID = recordID;
+            this.selectedRow = selectedRow;
+            this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 0, pageSize: 10 };
+            this.initializeComponent(this.windowNo, this.prop);
+        }
 
         // this.update(recordID);
     };
