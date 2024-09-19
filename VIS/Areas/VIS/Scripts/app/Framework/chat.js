@@ -29,11 +29,7 @@
         $enterIcon.on(VIS.Events.onTouchStartOrClick, function (e) {
             triggerSave(e);
         });
-
-        $downArrow.on(VIS.Events.onTouchStartOrClick, function (e) {
-            alert("ok");
-        });
-
+       
         $inputChat.find('textarea').on('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();  // Prevents the default action of creating a new line
