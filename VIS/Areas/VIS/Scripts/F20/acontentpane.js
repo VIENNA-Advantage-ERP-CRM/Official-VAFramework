@@ -118,8 +118,19 @@
             }
             display();
             for (var i = 0; i < tab.ChildTabsItems.length; i++) {
+
                 var childTab = tab.ChildTabsItems[i];
                 var li = childTab.getListItm();
+
+                //hide tab 
+                if (tab.ChildTabs[i].getIsHideTabName()) {
+                    li.hide();
+                    continue;
+                }
+                else {
+                    li.show();
+                }
+
                 this.tabLIObj[childTab.action] = li;
                 $ulTabControl.append(li);
 
@@ -131,13 +142,7 @@
                     childTab.setEnabled(true);
                 }
 
-                //hide tab 
-                if (tab.ChildTabs[i].getIsHideTabName()) {
-                    li.hide();
-                }
-                else {
-                    li.show();
-                }
+                
 
 
                 //Tab elements

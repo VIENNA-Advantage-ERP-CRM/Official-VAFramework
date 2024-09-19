@@ -1712,6 +1712,10 @@
         if (this.curGC) {
             this.curGC.onSizeChanged(true);
         }
+        if (this.curTab) {
+            this.setUI();
+        }
+        this.setTabNavigation();
         this.vTabbedPane.refresh();
     };
 
@@ -3794,6 +3798,22 @@
             gPanel.setEnabled("PRT", true);
         }
 
+        this.setUI();
+
+        if (this.actionParams.AD_UserQuery_ID) {
+            this.curGC.aFilterPanel.setFilterLineAdvance(this.actionParams.AD_UserQuery_ID, true);
+        }
+
+
+        this.actionParams = {}; //clear 
+
+    };
+
+    /**
+     * set UI 
+     */
+    APanel.prototype.setUI = function () {
+
         if (!this.actionParams.IsHideMapToggle && this.curTab.getIsMapView()) {
             this.aMap.show();
         }
@@ -3840,16 +3860,10 @@
         }
         else {
             this.hideActionbar(false);
-        };
-
-        if (this.actionParams.AD_UserQuery_ID) {
-            this.curGC.aFilterPanel.setFilterLineAdvance(this.actionParams.AD_UserQuery_ID, true);
         }
-
-
-        this.actionParams = {}; //clear 
-
     };
+
+
 
     /**
      * 

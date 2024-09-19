@@ -2111,7 +2111,9 @@
         }
         if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) {
             //this.notifyDependents(); //show included grid
-            this.aPanel.displayIncArea(true);
+            if (this.multiTabView || this.vIncludedGC != null) {
+                this.aPanel.displayIncArea(true);
+            }
             this.aPanel.vTabbedPane.refresh(); //refrsh composite view
             if(!this.displayAsIncludedGC && this.vIncludedGC !=null) {
                 this.vIncludedGC.vTable.resize();

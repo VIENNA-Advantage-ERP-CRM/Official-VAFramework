@@ -1,4 +1,8 @@
-﻿.vis-tp-mainContainer {
+﻿.vis-surveyTab-root{
+    position:relative;
+}
+
+.vis-tp-mainContainer {
     display: flex;
     width: 100%;
     height: 100%;
