@@ -292,6 +292,7 @@
     <Compile Include="ModelAD\MViewColumn.cs" />
     <Compile Include="ModelAD\MViewComponent.cs" />
     <Compile Include="ModelAD\MWidget.cs" />
+    <Compile Include="ModelAD\MWidgetAccess.cs" />
     <Compile Include="ModelAD\MWidgetField.cs" />
     <Compile Include="ModelAD\MWindow.cs" />
     <Compile Include="ModelAD\MWindowAccess.cs" />
@@ -310,6 +311,7 @@
     <Compile Include="ModelAD\X_AD_UserHomeWidget.cs" />
     <Compile Include="ModelAD\X_AD_Widget.cs" />
     <Compile Include="ModelAD\X_AD_WidgetField.cs" />
+    <Compile Include="ModelAD\X_AD_Widget_Access.cs" />
     <Compile Include="Model\Callout.cs" />
     <Compile Include="Model\CalloutEngine.cs" />
     <Compile Include="Model\MClient.cs" />
