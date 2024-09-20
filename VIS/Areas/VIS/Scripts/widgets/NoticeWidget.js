@@ -119,6 +119,7 @@
                     else {
 
                         if (welcomeTabDatacontainers.find(".vis-w-feedTitleBar").length == 0) {
+                            welcomeTabDatacontainers.empty();
                             welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).empty();
                             welcomeScreenFeedsDivId.find("#countDiv" + $self.AD_UserHomeWidgetID).append(0);
                             str = "<p class='vis-pTagStyleCls vis-a-pTagSetHeight'>" + VIS.Msg.getMsg('NoRecordFound') + "</p>";
