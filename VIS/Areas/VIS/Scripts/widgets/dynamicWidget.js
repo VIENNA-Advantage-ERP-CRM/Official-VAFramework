@@ -10,19 +10,21 @@
         var $root = $("<div class='vis-dynamicWidget-main'>");
         var onClickParameters = [];
         var divHeight = 0;
+        this.records = [];
 
         // Initialize the dynamic widget component
         this.initializeComponent = function (AD_Widget_ID) {
             createBusyIndicator();
             showBusy(true);
             if (AD_Widget_ID > 0) {
-                getField(AD_Widget_ID, afterLoad);
+                getField(AD_Widget_ID);
             }
         };
 
         // Handle after loading data
-        function afterLoad(data, widgetStyle, isRandomColor, errorMsg) {
+        this.afterLoad = function (data, widgetStyle, isRandomColor, errorMsg) {
             clearRoot();
+            onClickParameters = [];
             applyWidgetStyle(widgetStyle);
             if (data && data.length > 0) {
                 processWidgetData(data, isRandomColor, errorMsg);
@@ -38,7 +40,7 @@
 
         function createBusyIndicator() {
             var $bsyDiv = $('<div id="busyDiv" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id"'
-                +' class= "vis-busyindicatorinnerwrap" > <i class="vis_widgetloader"></i></div ></div > ');
+                + ' class= "vis-busyindicatorinnerwrap" > <i class="vis_widgetloader"></i></div ></div > ');
             $root.append($bsyDiv);
         };
 
@@ -57,9 +59,7 @@
         }
 
         function applyWidgetStyle(style) {
-            if (style) {
-                $root.attr('style', style);
-            }
+            $root.attr('style', style);
         }
 
         // Process and render each widget field
@@ -233,7 +233,7 @@
 
         // Update arrow visibility based on scroll position
         function updateArrowVisibility(scrollTop, divHeight) {
-            toggleArrow($root.find('.vis-bottomArrow-icon'), scrollTop < ($root[0].scrollHeight)-20 - divHeight);
+            toggleArrow($root.find('.vis-bottomArrow-icon'), scrollTop < ($root[0].scrollHeight) - 20 - divHeight);
             toggleArrow($root.find('.vis-topArrow-icon'), scrollTop > 0);
         }
 
@@ -248,12 +248,12 @@
         function adjustHeight() {
             self.height = Math.floor(self.frame.widgetInfo.height.replace("px", ""));
             divHeight = self.height;
-            self.scrollHeight = $root[0].scrollHeight-20;
+            self.scrollHeight = $root[0].scrollHeight - 20;
         }
 
         // Handle widget resizing
         this.resize = function (widgetHeight) {
-            if (($root[0].scrollHeight-20) > widgetHeight) {
+            if (($root[0].scrollHeight - 20) > widgetHeight) {
                 $root.find('.vis-dynamicwidget-arrow').removeClass('d-none');
             }
         };
@@ -270,9 +270,11 @@
                 },
                 success: function (data) {
                     data = JSON.parse(data);
-                    if (callback) {
-                        callback(data.Widgets || [], data.WidgetStyle, data.IsRandomColor, data.MSG);
-                    }
+                    self.records = data;
+                    self.afterLoad(data.Widgets || [], data.WidgetStyle, data.IsRandomColor, data.MSG);
+                    /* if (callback) {
+                         callback(data.Widgets || [], data.WidgetStyle, data.IsRandomColor, data.MSG);
+                     }*/
                 }
             });
         }
@@ -312,6 +314,9 @@
 
     };
     VIS.dynamicWidget.prototype.refreshWidget = function () {
+        /* if (this.records && this.records.Widgets.length>0) {
+             this.afterLoad(this.records.Widgets || [], this.records.WidgetStyle, this.records.IsRandomColor, this.records.MSG);
+         }*/
         this.initializeComponent(this.widgetID);
     };
 

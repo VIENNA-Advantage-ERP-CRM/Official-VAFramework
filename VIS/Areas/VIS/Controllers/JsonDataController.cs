@@ -1219,6 +1219,7 @@ namespace VIS.Controllers
                     keyva.Add(val);
                 }
             }
+            result["colName"] = json.columnName;
             result["keyCol"] = pColumnName;
             result["list"] = keyva;
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);

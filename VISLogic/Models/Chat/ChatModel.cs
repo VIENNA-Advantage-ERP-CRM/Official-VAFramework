@@ -125,7 +125,7 @@ namespace VIS.Models
                 return _chatEntries;//return chat
             //list for chatEntry records
             List<MChatEntry> list = new List<MChatEntry>();
-            String sql = "SELECT * FROM CM_ChatEntry WHERE CM_Chat_ID=" + chatID + " ORDER BY Created";
+            String sql = "SELECT * FROM CM_ChatEntry WHERE CM_Chat_ID=" + chatID + " ORDER BY Created DESC";
 
 
             //SqlParamsIn objSP = new SqlParamsIn();

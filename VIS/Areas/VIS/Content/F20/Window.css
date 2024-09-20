@@ -1941,7 +1941,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
 /*actions popups css*/
 .vis-chat-msgbox {
-    Height: 65px;
+    Height: 48px;
     width: 100%;
     font-size: 10pt;
     resize: none;
@@ -1951,12 +1951,12 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
     /*margin-top: 10px;*/
 }
 
-    .vis-chat-msgbox:focus {
+   /* .vis-chat-msgbox:focus {
         border: 1px solid rgba(var(--v-c-primary), 1);
-    }
+    }*/
 
 .vis-chatboxwrap {
-    margin-bottom: 10px;
+    margin-top: 10px;
     border: 1px solid rgba(var(--v-c-on-secondary), .1);
     min-height: 50px;
     border-radius: .4rem;
@@ -2000,9 +2000,17 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
     flex: 1;
 }
 
+.vis-chat-arrowdown {
+    position: absolute;
+    text-align: center;
+    color: rgba(var(--v-c-primary), 1);
+    width: 100%;
+    font-size: 20px;
+}
+
 .vis-chatdetailouterwrap {
     overflow-y: auto;
-    height: 260px;
+    /*  height: 260px;*/
 }
 
 .vis-gc-vtable.w2ui-grid .w2ui-editable input, .vis-gc-vtable.w2ui-grid .w2ui-editable select {

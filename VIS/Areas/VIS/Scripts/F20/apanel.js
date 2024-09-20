@@ -320,7 +320,7 @@
                         span = $("<span title='" + VIS.Msg.getMsg("DefaultSearch") + "'  data-id='" + item.id + "'></span>");
                     }
 
-                    var del = $("<span data-id='" + item.id + "' class='fa fa-trash-o'></span>");
+                    var del = $("<span data-id='" + item.id + "' title='" + VIS.Msg.getMsg("Delete") + "'   class='fa fa-trash-o'></span>");
 
                     var d = $('<div class="d-flex align-items-center justify-content-center">');
                     d.append(span).append(del);
@@ -1712,6 +1712,10 @@
         if (this.curGC) {
             this.curGC.onSizeChanged(true);
         }
+        if (this.curTab) {
+            this.setUI();
+        }
+        this.setTabNavigation();
         this.vTabbedPane.refresh();
     };
 
@@ -3794,6 +3798,22 @@
             gPanel.setEnabled("PRT", true);
         }
 
+        this.setUI();
+
+        if (this.actionParams.AD_UserQuery_ID) {
+            this.curGC.aFilterPanel.setFilterLineAdvance(this.actionParams.AD_UserQuery_ID, true);
+        }
+
+
+        this.actionParams = {}; //clear 
+
+    };
+
+    /**
+     * set UI 
+     */
+    APanel.prototype.setUI = function () {
+
         if (!this.actionParams.IsHideMapToggle && this.curTab.getIsMapView()) {
             this.aMap.show();
         }
@@ -3840,16 +3860,10 @@
         }
         else {
             this.hideActionbar(false);
-        };
-
-        if (this.actionParams.AD_UserQuery_ID) {
-            this.curGC.aFilterPanel.setFilterLineAdvance(this.actionParams.AD_UserQuery_ID, true);
         }
-
-
-        this.actionParams = {}; //clear 
-
     };
+
+
 
     /**
      * 
@@ -3934,9 +3948,9 @@
                         $selfpanel.defaultSearch = false;
                         $selfpanel.curTab.searchText = data.tables[0].rows[i].cells["name"];
                         var userquery_id = data.tables[0].rows[i].cells["ad_defaultuserquery_id"];
-                        setTimeout(function () {
-                            $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(userquery_id, true);
-                        }, 1000);
+                        setTimeout(function (id) {
+                            $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(id, true);
+                        }, 1000,userquery_id);
 
                         toastr.success(VIS.Msg.getMsg("DefaultSerachExist"), '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
 

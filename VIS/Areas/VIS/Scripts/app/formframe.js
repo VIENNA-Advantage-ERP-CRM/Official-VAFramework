@@ -187,8 +187,6 @@
             this.parent.hideHeader(hide);
     };
 
-
-
     AForm.prototype.hideCloseIcon = function (hide) {
         if (this.parent)
             this.parent.hideCloseIcon(hide);
@@ -220,8 +218,6 @@
         }
     }
 
-
-
     /**
     * 	dispose
     */
@@ -243,13 +239,6 @@
 
         this.disposeComponent();
     };
-
-
-
-
-
-
-
 
     // global assignment
     VIS.AForm = AForm;

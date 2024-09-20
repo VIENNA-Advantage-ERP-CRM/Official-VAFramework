@@ -60,10 +60,10 @@
             + '</div>'
             + '<div class="input-group vis-input-wrap">'
             + '<select id="drpDynamicOp_' + winNo + '" disabled>'
-            + '<option>' + VIS.Msg.getMsg("Today") + '</option>'
-            + '<option>' + VIS.Msg.getMsg("lastxDays") + '</option>'
-            + '<option>' + VIS.Msg.getMsg("lastxMonth") + '</option>'
-            + '<option>' + VIS.Msg.getMsg("lastxYears") + '</option>'
+                    + '<option>' + VIS.Msg.getMsg("Today") + '</option>'
+                    + '<option>' + VIS.Msg.getMsg("lastxDays") + '</option>'
+                    + '<option>' + VIS.Msg.getMsg("lastxMonth") + '</option>'
+                    + '<option>' + VIS.Msg.getMsg("lastxYears") + '</option>'
             + '</select>'
             + '</div>'
             + '<div class="input-group vis-input-wrap" id="divYear_' + winNo + '">'
@@ -139,9 +139,6 @@
                         <div class="vis-fp-popup-arrow"></div>
                     </div>`);
 
-
-
-
       
         ulPopup.find('.vis-fp-popup-content').prepend(txtFilterName);
         ulPopup.find('.vis-fp-popup-content').append(btnOk).append(btnClose);
@@ -215,7 +212,7 @@
                     crt.setMandatory(false);
                     this.ctrlObjects[field.getColumnName()] = crt;
 
-                    var inputWrapGroup = $('<div class="vis-fp-inputgroupseprtr" data-ColumnName="' + crt.getName() + '" data-cid="' + crt.getName() + '_' + this.curTab.getAD_Tab_ID() + '"></div>');
+                    var inputWrapGroup = $('<div class="vis-fp-inputgroupseprtr" data-displayName="' + field.getHeader() + '" data-ColumnName="' + crt.getName() + '" data-cid="' + crt.getName() + '_' + this.curTab.getAD_Tab_ID() + '"></div>');
                     var inputWrap = $('<div class="vis-control-wrap">');
                     var grp = $('<div class="input-group vis-input-wrap">');
 
@@ -224,16 +221,16 @@
                         var htm = [];
                         htm.push('<div class="vis-fp-lst-searchrcrds">');
                         htm.push('<div class="vis-fp-inputspan">');
-                        htm.push('<div class="vis-fp-istagwrap"><input class="vis-fp-chboxInput vis-fp-inputvalueforupdate" type="checkbox" data-column="' + crt.getName() + '" data-keyval="' + crt.getName() + '_Y" data-id="Y"');
+                        htm.push('<div class="vis-fp-istagwrap"><input class="vis-fp-chboxInput vis-fp-inputvalueforupdate" value="' + VIS.Msg.getMsg("Yes") +'" type="checkbox" data-tabindex="' + field.tabIndex +'" data-column="' + crt.getName() + '" data-keyval="' + crt.getName() + '_Y" data-id="Y"');
                         htm.push('><span data-id="Y">' + VIS.Msg.getMsg("Yes") + '</span> </div>');
                         htm.push('</div>');
                         htm.push('<div class="vis-fp-inputspan">');
-                        htm.push('<div class="vis-fp-istagwrap"><input class="vis-fp-chboxInput vis-fp-inputvalueforupdate" type="checkbox" data-column="' + crt.getName() + '" data-keyval="' + crt.getName() + '_N" data-id="N"');
+                        htm.push('<div class="vis-fp-istagwrap"><input class="vis-fp-chboxInput vis-fp-inputvalueforupdate"  value="' + VIS.Msg.getMsg("No") +'"  type="checkbox" data-tabindex="' + field.tabIndex +'" data-column="' + crt.getName() + '" data-keyval="' + crt.getName() + '_N" data-id="N"');
                         htm.push('><span data-id="N">' + VIS.Msg.getMsg("No") + '</span> </div>');
                         htm.push('</div>');
                         htm.push('</div>');
 
-                        inputWrap.append('<label>' + field.getHeader() + '</label>');
+                        inputWrap.append('<span>' + field.getHeader() + '</span>');
                         grp.append(inputWrap);
                         grp.append(htm.join(''));
                     }
@@ -283,11 +280,12 @@
                         //if (finalWhereClause.length > 2) {
                         //    finalWhereClause += ' AND ';      //Append and in main where
                         //}
-
+                        var colName = selectedDiv.data('displayname');
                         var whereClause = '';
                         for (var j = 0; j < listOfSelectedIDs.length; j++) {
                             var inputType = $(listOfSelectedIDs[j]);
                             if (inputType[0].type == 'checkbox' && !inputType.is(":checked")) {
+                                //deleteDynRow(inputType.data('id').toString(), tabindex, true);
                                 continue;
                             }
                             var tabindex = inputType.data('tabindex');
@@ -299,12 +297,71 @@
 
                             var pasedVal = context.parseWhereCondition(col, VIS.Query.prototype.EQUAL, inputType.data('id').toString(), null, null, tabindex);
 
+                            if (dsAdvanceData == null)
+                                dsAdvanceData = {};
+
+                            if (dsFilterData == null)
+                                dsFilterData = [];
+
+
+                            if (!(col + '_' + tabindex in dsAdvanceData))
+                                dsAdvanceData[col + '_' + tabindex] = [];
+
+                            var valueName = inputType.text();
+                            if (inputType[0].type == 'checkbox') {
+                                valueName = inputType.val()
+                            }
+
+                            const exists = dsFilterData.some(
+                                obj => obj.KEYVALUE == col
+                                && obj.OPERATORNAME == VIS.Query.prototype.OPERATORS[VIS.Query.prototype.EQUAL]
+                                    && obj.VALUE1VALUE == VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(inputType.data('id')))
+                            );
+
+                            if (exists) {
+                                continue;
+                            }
+
+                            var obj = {
+                                KEYNAME: colName,
+                                KEYVALUE: col,
+                                OPERATORNAME: VIS.Query.prototype.OPERATORS[VIS.Query.prototype.EQUAL],
+                                VALUE1NAME: VIS.Utility.encodeText(valueName),
+                                FULLDAY: false,
+                                VALUE1VALUE: VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(inputType.data('id'))) || "NULL",
+                                VALUE2NAME: "NULL",
+                                VALUE2VALUE: "NULL",
+                                AD_USERQUERYLINE_ID: 0,
+                                OPERATOR: VIS.Query.prototype.EQUAL,
+                                AD_TAB_ID: self.tabs[tabindex].getAD_Tab_ID(),
+                                tabindex: tabindex,
+                                'IsSelection': true
+                            }
+
+                            dsFilterData.push(obj);
+
+                            dsAdvanceData[col + '_' + tabindex].push({
+                                'Name': self.tabs[tabindex].getTableName() + "." + colName,
+                                'Value': inputType.data('id').toString(),
+                                'Value2': null,
+                                'Text': valueName,
+                                'Text2': null,
+                                'Optr': VIS.Query.prototype.EQUAL,
+                                'Where': pasedVal,
+                                'tabindex': tabindex,
+                                'IsSelection': true
+                            });
+
+
+
+
                             if (whereClause != '') {
                                 whereClause += " OR " + pasedVal;
                             }
                             else {
                                 whereClause += "(" + pasedVal;
                             }
+
                         }
 
                         self.fillColumns(Number(self.cmbTabs.find('option:first').val()));
@@ -316,12 +373,12 @@
                                 whereClause = self.curTab.getTableName() + '.' + self.curTab.getTableName() + '_ID IN(SELECT ' + self.curTab.getTableName() + '_ID FROM ' + self.tabs[tabindex].getTableName() + ' WHERE ' + whereClause + ')';
                             }
 
-                            if (finalWhereClause != "") {
-                                finalWhereClause += " AND " + whereClause;
-                            }
-                            else {
-                                finalWhereClause += whereClause;
-                            }
+                            //if (finalWhereClause != "") {
+                            //    finalWhereClause += " AND " + whereClause;
+                            //}
+                            //else {
+                            //    finalWhereClause += whereClause;
+                            //}
                         }
 
                         var found = false;
@@ -337,6 +394,7 @@
 
                         if (!found && whereClause != '')
                             context.listOfFilterQueries.push({ 'columnName': col, 'whereClause': whereClause });
+
                     }
                     else { //delete consiftion of exist
                         for (var k = 0; k < context.listOfFilterQueries.length; k++) {
@@ -349,13 +407,13 @@
             }
 
             var dynFilter = self.getDynamicFilter();
-            if (dynFilter != '') {
-                if (finalWhereClause != '')
-                    finalWhereClause += ' AND ' + dynFilter;
-                else
-                    finalWhereClause = dynFilter;
-            }
-            return finalWhereClause;
+            //if (dynFilter != '') {
+            //    if (finalWhereClause != '')
+            //        finalWhereClause += ' AND ' + dynFilter;
+            //    else
+            //        finalWhereClause = dynFilter;
+            //}
+            return dynFilter;
         };
 
         this.fireValChanged = function (colName) {
@@ -372,6 +430,17 @@
                 if (field.getColumnName() == evt.propertyName)
                     return field;
             });
+
+
+            const exists = dsFilterData.some(obj => obj.KEYVALUE == evt.propertyName && obj.OPERATORNAME == VIS.Query.prototype.OPERATORS[VIS.Query.prototype.EQUAL] && obj.VALUE1VALUE == VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(evt.newValue)));
+
+            if (exists) {
+                if (this.ctrlObjects[evt.propertyName])
+                    this.ctrlObjects[evt.propertyName].setValue(-1);
+                VIS.ADialog.error("", true, "VISConditionExist");
+                return;
+            }
+
             var displayVal;
             if (field[0].lookup && field[0].lookup.getDisplay)
                 displayVal = field[0].lookup.getDisplay(evt.newValue);
@@ -380,13 +449,17 @@
             if (this.ctrlObjects[evt.propertyName])
                 this.ctrlObjects[evt.propertyName].setValue(evt.newValue);
 
+
+            
+
             var hue = Math.floor(Math.random() * 360);
             var v = Math.floor(Math.random() * 16) + 85;
-            var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
+            var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)';
 
             var spann = $('<span data-tabindex="' + field[0].tabIndex +'" data-id="' + evt.newValue + '" class="vis-fp-inputvalueforupdate" >' + displayVal + '</span>');
             var iconCross = $('<i data-id="' + evt.newValue + '" data-keyval="' + evt.propertyName + "_" + evt.newValue + '" class="vis vis-mark"></i></div></div>');
-            wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div style="background-color:' + pastel + '" class="vis-fp-currntrcrds">').append(spann).append(iconCross)));
+            wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div style="background-color:' + pastel + '" class="vis-fp-currntrcrds" data-id="' + evt.propertyName + '_' + field[0].tabIndex +'">').append(spann).append(iconCross)));
+
 
             if (this.ctrlObjects[evt.propertyName])
                 this.ctrlObjects[evt.propertyName].setValue(null);
@@ -440,7 +513,7 @@
                 }
                 if (i < 5) {
                     htm.push('<div class="vis-fp-inputspan">');
-                    htm.push('<div class="vis-fp-istagwrap"><input class="vis-fp-chboxInput vis-fp-inputvalueforupdate" type="checkbox" data-tabindex="' + tabindex +'" data-column="' + key + '" data-keyval="' + key + '_' + data[i].ID + '" data-id="' + data[i].ID + '"');
+                    htm.push('<div class="vis-fp-istagwrap"><input class="vis-fp-chboxInput vis-fp-inputvalueforupdate" type="checkbox" value="' + data[i].Name +'" data-tabindex="' + tabindex +'" data-column="' + key + '" data-keyval="' + key + '_' + data[i].ID + '" data-id="' + data[i].ID + '"');
                     htm.push('><span data-id="' + data[i].ID + '">' + data[i].Name + '</span> </div><span class="vis-fp-spanCount">(' + data[i].Count + ')</span>');
                     htm.push('</div>');
                     fields.append(htm.join(''));
@@ -460,6 +533,7 @@
             divStatic.find('.vis-fp-currntrcrdswrap').remove();
             divDynFilters.find('.vis-fp-currntrcrds').remove();
             dsAdvanceData = [];
+            dsFilterData = [];
             this.curGC.aPanel.setFilterWhere("");
             cmbColumns.val(-1);
             cmbOp.val(-1);
@@ -585,6 +659,17 @@
         divStatic.on("click", "i", function (e) {
             var tgt = $(this);
             if (tgt.hasClass("vis-mark")) {
+                var colName = tgt.parent().data("id");
+                
+                let indexToDelete = dsFilterData.findIndex(item => item.VALUE1VALUE == tgt.data('id') && item.IsSelection == true);
+                if (indexToDelete !== -1) {
+                    dsFilterData.splice(indexToDelete, 1);
+                }
+
+                indexToDelete = dsAdvanceData[colName].findIndex(item => item.Value == tgt.data('id') && item.IsSelection == true);
+                if (indexToDelete !== -1) {
+                    dsAdvanceData[colName].splice(indexToDelete, 1);
+                }
 
                 tgt.parent().parent().remove();
                 self.fireValChanged(tgt.data('keyval'));// evt.propertyName);
@@ -595,7 +680,7 @@
             var tgt = $(this);
             if (tgt.hasClass("vis-mark")) {
                 var colName = tgt.parent().data("id");
-                deleteDynRow(colName);// evt.propertyName);
+                deleteDynRow(colName, -1, false);// evt.propertyName);
             }
         });
 
@@ -603,6 +688,28 @@
             $target = $(e.target);
             if ($target.is('input') && $target.hasClass('vis-fp-chboxInput')) {
                 var currentColumnName = $target.data('column');
+
+                const exists = dsFilterData.some(obj => obj.KEYVALUE == currentColumnName && obj.OPERATORNAME == VIS.Query.prototype.OPERATORS[VIS.Query.prototype.EQUAL] && obj.VALUE1VALUE == VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString($target.data('id'))));
+
+                if (exists && $target.is(':checked')) {
+                    VIS.ADialog.error("", true, "VISConditionExist");
+                    return;
+                }
+
+                
+                var indexToDelete = dsFilterData.findIndex(item => item.VALUE1VALUE == $target.data('id') && item.IsSelection == true);
+                if (indexToDelete !== -1) {
+                    dsFilterData.splice(indexToDelete, 1);
+                }
+
+                if (dsAdvanceData[currentColumnName + '_' + $target.data('tabindex')]) {
+                    indexToDelete = dsAdvanceData[currentColumnName + '_' + $target.data('tabindex')].findIndex(item => item.Value == $target.data('id') && item.IsSelection == true);
+                    if (indexToDelete !== -1) {
+                        dsAdvanceData[currentColumnName + '_' + $target.data('tabindex')].splice(indexToDelete, 1);
+                    }
+                }
+
+
                 self.fireValChanged(currentColumnName);
             }
         });
@@ -1314,22 +1421,28 @@
                 //txtFilterName.removeClass('vis-filterNameReadonly');
             }
 
+            const exists = dsFilterData.some(obj => obj.KEYVALUE == colValue && obj.OPERATORNAME == VIS.Query.prototype.OPERATORS[optrName]  && obj.VALUE1VALUE == VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(value1Value)));
+
+            if (exists) {
+                VIS.ADialog.error("", true, "VISConditionExist");
+                return;
+            }
             //txtFilterName.show();
 
             var obj = {
                 KEYNAME: colName,
                 KEYVALUE: colValue,
-                OPERATORNAME: optrName,
+                OPERATORNAME: VIS.Query.prototype.OPERATORS[optrName],
                 VALUE1NAME: VIS.Utility.encodeText(value1Name),
-                FULLDAY: fullDay,
-                VALUE1VALUE: value1Name || "",
+                FULLDAY: fullDay,               
                 VALUE1VALUE: VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(value1Value)) || "NULL",
                 VALUE2NAME: VIS.Utility.encodeText(value2Name),
                 VALUE2VALUE: VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(value2Value)),
                 AD_USERQUERYLINE_ID: 0,
                 OPERATOR: optr,
                 AD_TAB_ID: self.tabs[self.cmbTabs.val()].getAD_Tab_ID(),
-                tabindex: tabindex
+                tabindex: tabindex,
+                IsSelection: false
             }
 
             dsFilterData.push(obj);
@@ -1341,45 +1454,53 @@
                 'Text': value1Name,
                 'Text2': value2Name,
                 'Optr': optr,
-                'Where': where
+                'Where': where,
+                'tabindex': tabindex,
+                'IsSelection': false
             });
 
 
             refreshDynFiltersUI(colValue, fromAdvance, tabindex);
         };
 
-        function deleteDynRow(colValue, tabindex) {
+        function deleteDynRow(colValue, tabindex,isSelection) {
 
             if (dsAdvanceData == null)
                 dsAdvanceData = {};
             if (colValue in dsAdvanceData) {
-                //var values = dsAdvanceData[col];
-                //for (var i = 0; i < values.length; i++) {
-                //    if (colValue == values[i]['Value']) {
-                //        values.splice(i, 1);
-                //        break;
-                //    }
-                //}
-                //if (values.length < 1)
-                delete dsAdvanceData[colValue];
+                var values = dsAdvanceData[colValue];
+                
+                let i = 0;
+                while (i < values.length) {
+                    if (values[i].IsSelection === false) {
+                        values.splice(i, 1);
+                    } else {
+                        i++;
+                    }
+                }
+
+
+                if (values.length < 1) {
+                    delete dsAdvanceData[colValue];
+                }
             }
 
             var tabindex = -1;
             var colV = '';
-            var index = dsFilterData.findIndex(function (item) {
-                if (item.KEYVALUE + '_' + item.tabindex === colValue) {
-                    tabindex = item.tabindex;
-                    colV = item.KEYVALUE;
-                    return item.KEYVALUE + '_' + item.tabindex === colValue;
-                }
-               
-            });
 
-            if (index !== -1) {
-                dsFilterData.splice(index, 1);
+            let x = 0;
+            while (x < dsFilterData.length) {
+                var item = dsFilterData[x];
+                if (item.KEYVALUE + '_' + item.tabindex === colValue && item.IsSelection == false) {
+                    colV = item.KEYVALUE;
+                    tabindex = item.tabindex;
+                    dsFilterData.splice(x, 1);
+                } else {
+                    x++;
+                }
             }
 
-            refreshDynFiltersUI(colV, false, tabindex);
+            refreshDynFiltersUI(colV, isSelection, tabindex);
         };
 
         function showValue2(show) {
@@ -1487,17 +1608,27 @@
                 var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)'
 
                 htm.push('<div class="vis-fp-currntrcrds" style="background-color:' + pastel + '" data-id="' + colValue + '_' + tabindex +'"><span  class="vis-fp-inputvalueforupdate">')
+                var c = 0;
                 for (var i = 0; i < arrVal.length; i++) {
-                    if (i != 0)
+
+                    if (arrVal[i].IsSelection) {
+                        continue;
+                    }
+
+                    if (c != 0)
                         htm.push(' | ');
                     else {
                         htm.push(arrVal[i]['Name']);
                         htm.push(arrVal[i]['Optr']);
                     }
                     htm.push(arrVal[i]['Text']);
+                    c++;
                 }
-                htm.push('</span> <i class="vis vis-mark"></i></div>');
-                divDynFilters.append(htm.join(' '));
+
+                if (c != 0) {
+                    htm.push('</span> <i class="vis vis-mark"></i></div>');
+                    divDynFilters.append(htm.join(' '));
+                }
             }
 
             if (fromAdvance) {
@@ -1550,6 +1681,7 @@
             dsAdvanceData = {};
             dsFilterData = [];
             divDynFilters.find('.vis-fp-currntrcrds').remove(); 
+            self.hardRefreshFilterPanel();
             this.fireValChanged();
         }
     };
@@ -1696,7 +1828,7 @@
 
             filterContext.getFilters(lookupData).then(function (data) {
 
-                var key = data["keyCol"];
+                var key = data["colName"];
                 data = data["list"];
                 //if (data && data.length > 0) {
                 tht.setFilterOptions(data, key, field.tabIndex);
