@@ -3778,7 +3778,7 @@ namespace VIS.Helpers
             string SQL_Count = "SELECT COUNT(*) FROM " + TableName + " " + WhereClause;
             string SQL_Direct = "";
 
-            SQL_Count = MRole.GetDefault(ctxp).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO,MRole.SQL_ORGRW);
+            SQL_Count = MRole.GetDefault(ctxp).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO,MRole.SQL_ORGRO);
 
             int rCount = 0;
             if (sqlIn.tree_id > 0)
@@ -3925,7 +3925,7 @@ namespace VIS.Helpers
 
 
 
-            sqlIn.sql = MRole.GetDefault(ctxp).AddAccessSQL(SQL.ToString(), TableName, true, false, MRole.SQL_ORGRW);
+            sqlIn.sql = MRole.GetDefault(ctxp).AddAccessSQL(SQL.ToString(), TableName, true, false, MRole.SQL_ORGRO);
             sqlIn.sqlDirect = SQL_Direct;
 
             if (rCount > 0)

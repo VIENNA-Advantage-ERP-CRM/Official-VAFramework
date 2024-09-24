@@ -387,7 +387,10 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
         gap: 8px;
         font-size: .875rem;
     }
-
+        .vis-setting-link a:focus {
+            /* font-size: 1rem; */
+            text-shadow: 1px 1px 1px rgba(var(--v-c-primary), 1);
+        }
 
 /*------------------------------------------*/
 /* App Side Main Menu Css Definations START */
@@ -1348,9 +1351,13 @@ html[dir="rtl"] .vis-auth-dialog
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
-.vis-auth-dialog input[disabled] {
-    text-decoration: line-through;
-}
+    .vis-auth-dialog input[type=submit]:focus {
+        box-shadow: 4px 4px 4px grey;
+    }
+
+    .vis-auth-dialog input[disabled] {
+        text-decoration: line-through;
+    }
 
 .vis-file-labelUI {
     cursor: pointer;
