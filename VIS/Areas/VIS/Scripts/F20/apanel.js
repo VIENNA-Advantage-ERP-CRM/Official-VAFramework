@@ -104,6 +104,7 @@
         this.curTabIndex;
         /* Sort Tab */
         this.firstTabId = null;
+        this.masterTabId = null;
         this.DocActionVariables = {};
         this.DocActionVariables.STATUS_COMPLETED = "CO";
         this.DocActionVariables.STATUS_CLOSED = "CL";
@@ -1496,6 +1497,7 @@
             this.curTabIndex = null;
             /* Sort Tab */
             this.firstTabId = null;
+            this.masterTabId = null;
 
 
 
@@ -1962,7 +1964,9 @@
             }
 
             tabActions[i] = new VIS.AppsAction(tObj); //Create Apps Action
-
+            if (i == 0) {
+                this.masterTabId = id;
+            }
             gTab = tabs[i];
             //if (i === 0) {
             //    this.curTab = gTab;
@@ -3814,6 +3818,9 @@
      * set UI 
      */
     APanel.prototype.setUI = function () {
+        if (!this.actionParams) {
+            this.actionParams = {};
+        }
 
         if (!this.actionParams.IsHideMapToggle && this.curTab.getIsMapView()) {
             this.aMap.show();
@@ -4483,6 +4490,7 @@
     };
 
     APanel.prototype.cmd_home = function () {
+        this.firstTabId = this.masterTabId;
         this.selectFirstTab();
         this.getRoot().find(".vis-ad-w-p-t-c").animate({ scrollLeft: 0 }, 500);
     }
