@@ -98,7 +98,7 @@
                 clsWinProPg = "fa fa-cog";
             }
 
-            var favItemDiv = $('<div data-id="' + id + '" data-action="' + barNode.Action + '" data-nodeid="' + barNode.NodeID + '" data-btn="action" class="vis-nm-fav-tile"><div class="vis-nm-fav-ico-w-txt"><span class="' + clsWinProPg + '"></span><div class="vis-nm-fav-tile-txt">' + barNode.Name + '</div></div><span class="vis vis-star-empty" data-action="' + barNode.Action + '" data-id=' + barNode.NodeID + '  data-btn="remove"></span></div>');
+            var favItemDiv = $('<div title="' + barNode.Name + '" data-id="' + id + '" data-action="' + barNode.Action + '" data-nodeid="' + barNode.NodeID + '" data-btn="action" class="vis-nm-fav-tile"><div class="vis-nm-fav-ico-w-txt"><span class="' + clsWinProPg + '"></span><div class="vis-nm-fav-tile-txt">' + barNode.Name + '</div></div><span class="vis vis-star-empty" data-action="' + barNode.Action + '" data-id=' + barNode.NodeID + '  data-btn="remove"></span></div>');
             favDivList.append(favItemDiv);
         };
 
