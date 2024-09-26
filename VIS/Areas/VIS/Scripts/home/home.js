@@ -102,7 +102,7 @@
 
 
                 widgetWidth = w;
-                $home.find('.vis-widget-container').attr('style', '--rowheight:' + w + 'px');
+                $container.attr('style', '--rowheight:' + w + 'px');
 
                 var itm = Object.keys(homeItems);
                 for (var i = 0; i < itm.length; i++) {
