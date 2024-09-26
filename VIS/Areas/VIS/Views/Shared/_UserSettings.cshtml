@@ -59,7 +59,8 @@
     </div>
 
     <div class="vis-nm-page-close vis-nm-appSelected" style="display:none;">
-        <i class="fa fa-briefcase" style="color:red; font-size:25px;" aria-hidden="true"></i>
+        <img id="vis-nm-menuIcoImg" class="VIS-nm-favIconImg" src="">
+        <i id="vis-nm-menuIcofont" class="fa fa-briefcase" style="color:red; font-size:25px;" aria-hidden="true"></i>
         <span class="vis-nm-selAppLabel"></span>
         <span class="vis vis-arrow-down vis-nm-appDownArrow"></span>
         @*<a href=""><span class="vis vis-cross"></span></a>*@
@@ -87,12 +88,12 @@
         </li>*@
     <li id="vis_editHome" class="vis_homeTopUsrIcon" style="margin-top: 2px !important;"><i style="font-size: 1rem" class="vis vis-dashboard-edit" aria-hidden="true" title="@GetMsg((string)ViewBag.culture, "EditHome")"></i>@*<u class="vis-color-primary">@GetMsg((string)ViewBag.culture, "EditHome")</u>*@</li>
     @*<li id="vis_editHome"><i class="fa fa-th-large mr-2" aria-hidden="true"></i><u class="vis-color-primary">@GetMsg((string)ViewBag.culture, "EditHome")</u></li>*@
-    <li id="vis_favHomeScreen" class="vis_homeTopUsrIcon" style="margin-right: 15px !important;">
-        <div class="vis_home-fav-count">
-            <div class="vis_home-total-count">0</div>
-            <span class="vis vis-star-full"></span>
-        </div>
-        @*<u class="vis-color-primary">@GetMsg((string)ViewBag.culture, "Favourites")</u>*@
+    <li title="@GetMsg((string)ViewBag.culture, "Favourites")" id="vis_favHomeScreen" class="vis_homeTopUsrIcon vis_nm_topFavIco" style="margin-right: 15px !important;">
+    <div class="vis_home-fav-count">
+        <div class="vis_home-total-count">0</div>
+        <span class="vis vis-star-full"></span>
+    </div>
+    @*<u class="vis-color-primary">@GetMsg((string)ViewBag.culture, "Favourites")</u>*@
     </li>
     @* <li id="vis_userDate"><i class="fa fa-calendar"></i><span>@DateTime.Now.ToString("D", new System.Globalization.CultureInfo(ViewBag.culture.ToString().Replace("_", "-")))</span> </li>*@
     <li id="vis_theme" style="display:none">
