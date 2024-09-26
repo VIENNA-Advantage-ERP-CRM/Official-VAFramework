@@ -162,7 +162,8 @@ namespace VIS.Controllers
                         ctx.SetAD_Session_ID(oldctx.GetAD_Session_ID());
                         ctx.SetSecureKey(oldctx.GetSecureKey());
                         Session.Timeout = 17;
-                        if (oldctx.GetContext("NewSession") == "Y")
+                        if (oldctx.GetContext("NewSession") == "Y") // logout previous session if user chnage 
+                            // authorization form auth dialog
                         {
                             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx, Session.SessionID);
                             createNew = true;
@@ -206,7 +207,7 @@ namespace VIS.Controllers
                     model.Login2Model.Org = ctx.GetAD_Org_ID().ToString();
                     model.Login2Model.Warehouse = ctx.GetAD_Warehouse_ID().ToString();
                     model.Login2Model.FilteredOrg = ctx.GetContext("#AD_FilteredOrg");
-
+                    
 
 
                     var RoleList = new List<KeyNamePair>();
