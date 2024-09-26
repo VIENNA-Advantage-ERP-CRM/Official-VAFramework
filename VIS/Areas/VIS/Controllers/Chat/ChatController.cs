@@ -53,6 +53,13 @@ namespace VIS.Controllers
             return Json(true, JsonRequestBehavior.AllowGet);
         }
 
+        public bool IsBottomTabPanel(int tabID)
+        {
+            Ctx ct = Session["ctx"] as Ctx;
+            ChatModel model = new ChatModel();
+            return model.IsBottomTabPanel(tabID);
+        }
+
 
     }
 }
