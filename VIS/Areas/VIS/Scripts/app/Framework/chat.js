@@ -239,7 +239,7 @@
                         str += '<div style="border-radius: 1.75rem; min-width: 48px;" class="vis-chatimgwrap">';
                     }*/
 
-                    if (self.isBtmTapPanel) {
+                    if (!self.isBtmTapPanel) {
                         str += '<div style="border-radius: 1.75rem; width:38px;height:38px; min-width: 38px;" class="vis-chatimgwrap">';
                     } else {
                         str += '<div style="border-radius: 1.75rem;  min-width: 48px;" class="vis-chatimgwrap">';
@@ -294,9 +294,6 @@
                     else {
                         str += '</span></div><div class="vis-chat-textwrap">';
                     }
-
-
-
 
                     //+ '<textarea readonly style="width:640px">' + data[chat].ChatData + '</textarea>'
                     if (VIS.Application.isRTL) {
