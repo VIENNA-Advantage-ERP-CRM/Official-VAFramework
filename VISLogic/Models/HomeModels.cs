@@ -217,14 +217,31 @@ namespace VIS.Models
                             D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
                             INNER JOIN AD_WidgetSize ON (D_Chart.D_Chart_ID=AD_WidgetSize.D_Chart_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                           
-                            WHERE AD_WidgetSize.isActive='Y' AND  D_ChartAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+                            WHERE D_Chart.isActive='Y' AND AD_WidgetSize.isActive='Y' AND  D_ChartAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+                            if (windowID > 0)
+                            {
+                                sql += " AND IsWindow='Y'";
+                            }
+                            else
+                            {
+                                sql += " AND Homepage='Y'";
+                            }
+
                 sql += " UNION ALL ";
 
                 sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA FROM RC_KPI INNER JOIN 
                             RC_KPIAccess ON (RC_KPI.RC_KPI_ID=RC_KPIAccess.RC_KPI_ID)
                             INNER JOIN AD_WidgetSize ON (RC_KPI.RC_KPI_ID=AD_WidgetSize.RC_KPI_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
-                            WHERE AD_WidgetSize.isActive='Y' AND   RC_KPIAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+                            WHERE RC_KPI.isActive='Y' AND AD_WidgetSize.isActive='Y' AND   RC_KPIAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+                            if (windowID > 0)
+                            {
+                                sql += " AND IsWindow='Y'";
+                            }
+                            else
+                            {
+                                sql += " AND Homepage='Y'";
+                            }
 
                 sql += " UNION ALL ";
 
@@ -232,7 +249,15 @@ namespace VIS.Models
                             RC_ViewAccess ON (RC_View.RC_View_ID=RC_ViewAccess.RC_View_ID)
                             INNER JOIN AD_WidgetSize ON (RC_View.RC_View_ID=AD_WidgetSize.RC_View_ID)
                             LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
-                            WHERE AD_WidgetSize.isActive='Y' AND   RC_ViewAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+                            WHERE RC_View.isActive='Y' AND AD_WidgetSize.isActive='Y' AND   RC_ViewAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
+                            if (windowID > 0)
+                            {
+                                sql += " AND IsWindow='Y'";
+                            }
+                            else
+                            {
+                                sql += " AND Homepage='Y'";
+                            }
 
                 DataSet dataSet = DB.ExecuteDataset(sql);
                 if (dataSet != null && dataSet.Tables.Count > 0)
@@ -241,6 +266,20 @@ namespace VIS.Models
                     var row = dataSet.Tables[0].Rows;
                     for (int i = 0; i < row.Count; i++)
                     {
+
+                        bool WindowSpecific = false;
+                        if (windowID > 0 && !string.IsNullOrEmpty(Util.GetValueOfString(row[i]["AD_Window_ID"])))
+                        {
+                            string[] numbers = Util.GetValueOfString(row[i]["AD_Window_ID"]).Split(',');
+                            bool numberExists = Array.Exists(numbers, element => element == Util.GetValueOfString(windowID));
+                            if (!numberExists)
+                            {
+                                continue;
+                            }
+                            WindowSpecific = true;
+                        }
+
+
                         string chartType = Util.GetValueOfString(row[i]["chartType"]);
                         var newgalary = "";
                         try
@@ -317,7 +356,7 @@ namespace VIS.Models
                             Img = newgalary,
                             ModuleName = moduleName,
                             Type = Util.GetValueOfString(row[i]["Type"]),
-                            WindowSpecific = false,
+                            WindowSpecific = WindowSpecific,
                             IsDefault = Util.GetValueOfString(row[i]["IsDefault"]) == "Y",
                             Sequence = Util.GetValueOfInt(row[i]["Sequence"])
                         };
