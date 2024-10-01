@@ -1,4 +1,5 @@
 ﻿using CoreLibrary.DataBase;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -211,7 +212,7 @@ namespace VIS.Models
                 if (!Env.IsModuleInstalled("VADB_") && Util.GetValueOfInt(MTable.Get_Table_ID("AD_WidgetSize")) == 0)
                 {
                     return list;
-                }                
+                }
 
                 string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA FROM D_Chart INNER JOIN 
                             D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
@@ -430,7 +431,13 @@ namespace VIS.Models
                             int widgetTabID = Util.GetValueOfInt(row[i]["AD_Tab_ID"]);
                             int widgetFieldID = Util.GetValueOfInt(row[i]["AD_Field_ID"]);
                             int topTen = Util.GetValueOfInt(row[i]["Top"]);
-                            bool isDataSource = Util.GetValueOfString(row[i]["IsApplyDataSource"])== "Y" ? true : false;
+                            string whereClause = "";
+                            ActionParams onClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString());
+                            if (onClick != null && !string.IsNullOrEmpty(onClick.TabWhereClause))
+                            {
+                                whereClause = Util.GetValueOfString(onClick.TabWhereClause);
+                            }
+                            bool isDataSource = Util.GetValueOfString(row[i]["IsApplyDataSource"]) == "Y" ? true : false;
                             if (!isDataSource)
                             {
                                 if (Ad_Image_ID > 0)
@@ -487,7 +494,7 @@ namespace VIS.Models
                                     SeqNo = sequenceNo,
                                     Name = Util.GetValueOfString(row[i]["Name"]),
                                     HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
-                                    OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
+                                    OnClick = onClick,
                                     IsSameLine = Util.GetValueOfString(row[i]["IsSameLine"]),
                                     IsBadge = Util.GetValueOfString(row[i]["IsBadge"]),
                                     BadgeStyle = Util.GetValueOfString(row[i]["BadgeStyle"]),
@@ -502,7 +509,8 @@ namespace VIS.Models
 
                                 string query = @"SELECT CM.AD_Column_ID, CM.ColumnName, CM.AD_Reference_ID,CM.IsParent,CM.AD_Reference_Value_ID,
                                          (SELECT TableName FROM AD_Table WHERE AD_Table_ID  IN(SELECT AD_Table_ID FROM AD_Tab WHERE AD_Tab_ID=" + widgetTabID + @")) As TableName,
-                                         (SELECT Name FROM AD_Window WHERE AD_Window_ID IN (SELECT AD_Window_ID FROM AD_Tab WHERE AD_Tab_ID = "+widgetTabID+ @")) AS WindowName 
+                                         (SELECT Name FROM AD_Window WHERE AD_Window_ID IN (SELECT AD_Window_ID FROM AD_Tab WHERE AD_Tab_ID = " + widgetTabID + @")) AS WindowName,
+                                         (SELECT WhereClause FROM AD_Tab WHERE AD_Tab_ID=" + tabID + @") AS TabWhere
                                          FROM AD_Column CM INNER JOIN AD_Field FD  
                                          ON (CM.AD_Column_ID=FD.AD_Column_ID) WHERE FD.IsActive='Y' AND CM.IsActive='Y' AND FD.AD_Field_ID = " + widgetFieldID;
                                 DataSet ds = DB.ExecuteDataset(query);
@@ -512,37 +520,70 @@ namespace VIS.Models
                                     var rowCount = ds.Tables[0].Rows;
                                     if (rowCount.Count > 0)
                                     {
-                                        bool isParent = Util.GetValueOfString(rowCount[0]["IsParent"]) == "Y"? true : false;
+                                        bool isParent = Util.GetValueOfString(rowCount[0]["IsParent"]) == "Y" ? true : false;
                                         string columnName = Util.GetValueOfString(rowCount[0]["ColumnName"]);
+                                        string tableName = Util.GetValueOfString(rowCount[0]["TableName"]);
+                                        string tabWhere = Util.GetValueOfString(rowCount[0]["TabWhere"]);
+                                        if (!string.IsNullOrEmpty(tabWhere))
+                                        {
+                                            tabWhere = Env.ParseContext(ctx, windowNo, tabWhere, false);
+                                            if (!string.IsNullOrEmpty(whereClause))
+                                            {
+                                                whereClause += " AND " + tabWhere;
+                                            }
+                                            else
+                                            {
+                                                whereClause = tabWhere;
+                                            }
+                                        }
                                         dsObj = GetDataSource(ctx, windowNo, Util.GetValueOfInt(rowCount[0]["AD_Column_ID"]), Util.GetValueOfInt(rowCount[0]["AD_Reference_ID"]),
-                                            Util.GetValueOfInt(rowCount[0]["AD_Reference_Value_ID"]), columnName, Util.GetValueOfString(rowCount[0]["TableName"]),
-                                            isParent, topTen, "");
+                                            Util.GetValueOfInt(rowCount[0]["AD_Reference_Value_ID"]), columnName, tableName,
+                                            isParent, topTen, whereClause);
                                         if (dsObj != null && dsObj.Count > 0)
                                         {
 
                                             for (int j = 0; j < dsObj.Count; j++)
                                             {
-                                                /*string where;
+                                                string where;
+                                                ActionParams clk = null;
+                                                if (onClick != null)
+                                                {
+                                                    var clonedJson = JsonConvert.SerializeObject(onClick);
+                                                    clk = (ActionParams)JsonConvert.DeserializeObject(clonedJson);
+                                                }
+
                                                 if (IsInteger(dsObj[j].ID))
                                                 {
-                                                    where = columnName + " = " + dsObj[j].ID;
-                                                } else{
-
-                                                    where = columnName + " = '" + dsObj[j].ID+"' ";
+                                                    where = tableName + "." + columnName + " = " + dsObj[j].ID;
                                                 }
-                                                if (!string.IsNullOrEmpty(whereClause)) {
-                                                    where += " AND " + whereClause;
-                                                }
-                                                ActionParams APobj = new ActionParams
+                                                else
                                                 {
-                                                    TabWhereClause = Util.GetValueOfString(where),
-                                                    TabIndex = Util.GetValueOfString(0),
-                                                    ActionType="W",
-                                                    ActionName= Util.GetValueOfString(rowCount[0]["WindowName"])
-                                                };*/
+
+                                                    where = tableName + "." + columnName + " = '" + dsObj[j].ID + "' ";
+                                                }
+                                                if (clk != null)
+                                                {
+                                                    if (!string.IsNullOrEmpty(clk.TabWhereClause))
+                                                    {
+                                                        where += " AND " + clk.TabWhereClause;
+                                                    }
+                                                    clk.TabWhereClause = Util.GetValueOfString(where);
+                                                }
+                                                else
+                                                {
+                                                    ActionParams APobj = new ActionParams
+                                                    {
+                                                        TabWhereClause = Util.GetValueOfString(where),
+                                                        TabIndex = Util.GetValueOfString(0),
+                                                        ActionType = "W",
+                                                        ActionName = Util.GetValueOfString(rowCount[0]["WindowName"])
+                                                    };
+                                                    clk = APobj;
+                                                }
                                                 string name = "";
-                                                if (!string.IsNullOrEmpty(Util.GetValueOfString(row[i]["Prefix"]))) { 
-                                                name = Util.GetValueOfString(row[i]["Prefix"])+" ";
+                                                if (!string.IsNullOrEmpty(Util.GetValueOfString(row[i]["Prefix"])))
+                                                {
+                                                    name = Util.GetValueOfString(row[i]["Prefix"]) + " ";
                                                 }
                                                 name += dsObj[j].Name;
                                                 if (!string.IsNullOrEmpty(Util.GetValueOfString(row[i]["Suffix"])))
@@ -556,7 +597,7 @@ namespace VIS.Models
                                                     SeqNo = sequenceNo,
                                                     Name = name,
                                                     HtmlStyle = Util.GetValueOfString(row[i]["HtmlStyle"]),
-                                                    OnClick = Newtonsoft.Json.JsonConvert.DeserializeObject<ActionParams>(Util.GetValueOfString(row[i]["OnClick"]).ToString()),
+                                                    OnClick = clk,
                                                     IsSameLine = Util.GetValueOfString(row[i]["IsSameLine"]),
                                                     IsBadge = "Y",
                                                     BadgeStyle = Util.GetValueOfString(row[i]["BadgeStyle"]),
@@ -589,7 +630,7 @@ namespace VIS.Models
                 AD_Client_ID = { ctx.GetAD_Client_ID() } AND IsActive='Y' 
                 AND (AD_Tab_ID={ tabID } AND AD_Table_ID= { tableID }) 
                 ORDER BY Upper(Name), AD_UserQuery_ID";
-                
+
                 DataSet ds = DB.ExecuteDataset(query);
                 if (ds != null && ds.Tables.Count > 0)
                 {
@@ -661,6 +702,12 @@ namespace VIS.Models
         }
 
 
+        public bool IsInteger(string input)
+        {
+            int result;
+            return int.TryParse(input, out result);
+        }
+
         /// <summary>
         /// Getting most frequent using data from an window 
         /// </summary>
@@ -676,7 +723,7 @@ namespace VIS.Models
         /// <param name="whereClause">SQL Where</param>
         /// <returns>Record's ID, Name and count</returns>
         public List<DataSource> GetDataSource(Ctx ctx, int windowNo, int columnID, int AD_Reference_ID, int AD_Reference_Value_ID,
-            string columnName, string TableName, bool IsParent, int top,string whereClause)
+            string columnName, string TableName, bool IsParent, int top, string whereClause)
         {
 
             MLookup res = VLookUpFactory.Get(ctx, windowNo, columnID, AD_Reference_ID, columnName, AD_Reference_Value_ID, IsParent, "");

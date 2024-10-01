@@ -113,7 +113,8 @@ namespace VAdvantage.Model
         private const string IS_DATETIME = "(15,16)      ";
         private const string IS_STRING = "(10,14)      ";
         private const string IS_INTEGER = "(12,11,22,29)";
-        private const string IS_IDENTIFIER = "(19)         ";
+        private const string IS_IDENTIFIER = "(19,18,30)   ";
+        private const string IS_LIST = "(17)         ";
 
         /** String Constants for DateTime Types **/
         private const string IS_YEARLY = "Y";
@@ -544,6 +545,11 @@ namespace VAdvantage.Model
                 sb.Append(sbGroupBy.ToString());
 
             }
+            else if (IsList_X())
+            {
+                //  sb.Append("r.Name");
+                // sb.Append("*");
+            }
             else
                 sb.Append(s_colX);  //in case of other than date and (no filter)
 
@@ -568,8 +574,18 @@ namespace VAdvantage.Model
             if (!IsIdentifier_X())
                 sb.Append(" ColY");
 
-            sb.Append(" From ").Append(s_tableName);    //append table name
 
+            if (IsList_X())
+            {
+                sb.Clear().Append("SELECT * ");
+                MColumn Lcolumn = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
+                //  sb.Append(" From ").Append(s_tableName).Append(" P JOIN ad_ref_list r ON P.").Append(Lcolumn.GetColumnName()).Append("=r.Value");    //append table name
+                sb.Append(" From ").Append(s_tableName).Append(" OUTT ");
+            }
+            else
+            {
+                sb.Append(" From ").Append(s_tableName);    //append table name
+            }
             string val = "";
             if (!string.IsNullOrEmpty(GetSQLWhere(out val)))    //get the where clause (actually it fectches only date condition. However, it can be used for other where clause purposes)
             {
@@ -594,7 +610,16 @@ namespace VAdvantage.Model
                 //for particular X value
                 if (!string.IsNullOrEmpty(specialWhere))
                 {
-                    sb.Append(" ").Append(" AND " + specialWhere);
+                    //  sb.Append(" ").Append(" AND " + specialWhere);
+                    string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(sb.ToString(), s_tableName, false, true);
+                    sb.Clear().Append(sbval);
+                    /*   if (IsList_X())
+                       {
+                           MColumn Lcolumn = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
+                           string refID = "SELECT c.AD_Reference_Value_ID FROM AD_Column c INNER JOIN ad_table t on(t.AD_Table_ID = c.AD_Table_id) WHERE c.ColumnName = '" + Lcolumn.GetColumnName() + "' AND t.TableName = '"+ m_tableName + "' ";
+                           int refVal =Util.GetValueOfInt(DB.ExecuteScalar(refID));
+                           sb.Append(" AND r.AD_Reference_ID =" + refVal);
+                       }*/
                 }
 
 
@@ -657,9 +682,14 @@ namespace VAdvantage.Model
             //string datatype_Y = GetDataType_Y();
             // if (datatype_Y.Equals(IS_STRING) || datatype_Y.Equals(IS_INTEGER) && !IsNone())
             //Changes made on 5jul2011 to query view as we do with tables (req. by amardeep/done by jagmohan)
-            if ((!IsIdentifier_X() && isFiltered) || IsString_X())
-
+            if (IsList_X())
+            {
+                //  sb.Append(AddGroupByClause("r.Name "));
+            }
+            else if ((!IsIdentifier_X() && isFiltered) || IsString_X())
+            {
                 sb.Append(AddGroupByClause(s_colX));
+            }
 
             if (!IsSum() && !IsCount() && !IsAvg() && !IsNone())
             {
@@ -732,7 +762,7 @@ namespace VAdvantage.Model
 
                 //SET ORDER
             }
-            else if (IsIdentifier_X())     //in case of the identifier column
+            else if (IsIdentifier_X() || IsList_X())     //in case of the identifier column
             {
                 StringBuilder unionTableQuery = new StringBuilder("SELECT ");
                 string s_identifierCol = "";
@@ -755,26 +785,49 @@ namespace VAdvantage.Model
                         }
                     }
                 }
+                if (IsList_X())
+                {
+                    unionTableQuery.Append("r.name AS colx,");
+                }
 
-                //Building main query before union (if required)
-                unionTableQuery.Append(IDENTIFIER_COL).Append(m_colX)
-                    .Append(",");
-
+                else
+                {
+                    //Building main query before union (if required)
+                    unionTableQuery.Append(IDENTIFIER_COL).Append(m_colX)
+                        .Append(",");
+                }
 
                 if (IsCount())
                 {
-                    unionTableQuery.Append(IDENTIFIER_COL).Append(s_identifierCol)
-                     .Append(" ColX,")
-                     .Append(ApplyAggregateFunction(m_colY, true))
-                     .Append(" ColY");
+                    if (IsList_X())
+                    {
+                        unionTableQuery.Append(ApplyAggregateFunction(m_colY, true))
+                                           .Append(" ColY");
+                    }
+                    else
+                    {
+                        unionTableQuery.Append(IDENTIFIER_COL).Append(s_identifierCol)
+                                           .Append(" ColX,")
+                                           .Append(ApplyAggregateFunction(m_colY, true))
+                                           .Append(" ColY");
+                    }
+
                 }
                 else
                 {
+                    if (IsList_X())
+                    {
+                        unionTableQuery.Append(ApplyAggregateFunction(m_colY, true))
+                                           .Append(" ColY");
+                    }
+                    else
+                    {
+                        unionTableQuery.Append(IDENTIFIER_COL).Append(s_identifierCol)
+                   .Append(" ColX,")
+                   .Append(ApplyAggregateFunction("OUTT." + m_colY, true))
+                   .Append(" ColY");
+                    }
 
-                    unionTableQuery.Append(IDENTIFIER_COL).Append(s_identifierCol)
-                        .Append(" ColX,")
-                        .Append(ApplyAggregateFunction("OUTT." + m_colY, true))
-                        .Append(" ColY");
                 }
 
                 unionTableQuery.Append(" FROM (");
@@ -782,19 +835,40 @@ namespace VAdvantage.Model
                 unionTableQuery.Append(") OUTT ");
 
                 //JOIN WITH IDENTIFIER TABLE
-                unionTableQuery.Append("INNER JOIN ")
+                if (IsList_X())
+                {
+                    MColumn Lcolumn = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
+                    unionTableQuery.Append(" JOIN ")
+                      .Append("ad_ref_list r ON OUTT." + Lcolumn.GetColumnName() + " = r.value");
+                    string refID = "SELECT c.AD_Reference_Value_ID FROM AD_Column c INNER JOIN ad_table t on(t.AD_Table_ID = c.AD_Table_id) WHERE c.ColumnName = '" + Lcolumn.GetColumnName() + "' AND t.TableName = '" + m_tableName + "' ";
+                    int refVal = Util.GetValueOfInt(DB.ExecuteScalar(refID));
+                    unionTableQuery.Append(" WHERE r.ad_reference_id = " + refVal);
+                }
+                else
+                {
+                    unionTableQuery.Append("INNER JOIN ")
                     .Append(fkTableName).Append(" idtnfr")
                     .Append(" ON ")
                     .Append(IDENTIFIER_COL).Append(m_colX)
                     .Append(" = OUTT.").Append(m_colX);
+                }
+
 
                 //group by the whole query
                 if (!IsNone())
                 {
-                    unionTableQuery.Append(" GROUP BY ")
-                        .Append(IDENTIFIER_COL).Append(m_colX)
-                        .Append(",")
-                        .Append(IDENTIFIER_COL).Append(s_identifierCol);
+                    if (IsList_X())
+                    {
+                        unionTableQuery.Append(" GROUP BY r.Name");
+                    }
+                    else
+                    {
+                        unionTableQuery.Append(" GROUP BY ")
+                                             .Append(IDENTIFIER_COL).Append(m_colX)
+                                             .Append(",")
+                                             .Append(IDENTIFIER_COL).Append(s_identifierCol);
+                    }
+
                 }
 
                 sb = unionTableQuery;
@@ -857,7 +931,6 @@ namespace VAdvantage.Model
         private string GetUnionQuery(DateTime date1, DateTime date2, string colName, string function)
         {
             StringBuilder sb = new StringBuilder();
-
             if (DB.IsPostgreSQL())
             {
                 sb.Append(@" SELECT " + colName + @", " + function + @" FROM
@@ -880,7 +953,6 @@ namespace VAdvantage.Model
                 //sb.Append(" GROUP BY dates." + colName);
                 //sb.Append(" ORDER BY " + colName + " ASC");
             }
-
             return sb.ToString();
         }
 
@@ -994,7 +1066,15 @@ namespace VAdvantage.Model
                     sb.Append("SUM(").Append(colName).Append(")");
                 }
                 else
+                    if (IsList_X())
+                {
+                    sb.Append("COUNT(OUTT.").Append(m_tableName + "_ID").Append(")");
+                }
+                else
+                {
                     sb.Append("COUNT(").Append("*").Append(")");
+                }
+
             }
             else
             {
@@ -1017,15 +1097,62 @@ namespace VAdvantage.Model
         /// <param name="sqlwhere">contains where clause (mind you! its an out variable)</param>
         private string GetSQLWhere(out string sqlwhere)
         {
+            DateTime earliestStartDate = DateTime.MaxValue;
+            DateTime latestEndDate = DateTime.MinValue;
             StringBuilder sbSQL = new StringBuilder("SELECT AD_Column_ID FROM AD_Column WHERE AD_Table_ID = (SELECT AD_Table_ID FROM AD_Table WHERE TableName = 'D_Series') AND LOWER(ColumnName) = 'vadb_calculationbasis'");
             if (Util.GetValueOfInt(DB.ExecuteScalar(sbSQL.ToString())) > 0)
             {
                 calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
             }
+            if (calcBasis.Equals("I"))
+            {
+                DateTime sysdate = DateTime.Now;
+                sysdate = sysdate.AddYears(-this.GetLastNValue());
+                /*   string sqlYear = "SELECT MIN(p.StartDate) AS EarliestStartDate, MAX(p.EndDate) AS LatestEndDate FROM C_Period p" +
+                           " INNER JOIN C_Year cy ON p.C_Year_ID = cy.C_Year_ID" +
+                           " INNER JOIN C_Calendar cal ON cy.C_Calendar_ID = cal.C_Calendar_ID " +
+                           "WHERE p.C_Year_ID IN( SELECT C_Year_ID FROM C_Period WHERE TO_DATE('"+sysdate+"', 'DD-MM-YYYY HH24:MI:SS')  BETWEEN StartDate AND EndDate) " +
+                           "AND cal.C_Calendar_ID = (SELECT C_Calendar_ID FROM D_SERIES WHERE D_Series_ID = " + GetD_Series_ID() + ") AND p.IsActive='Y'";*/
+                string sqlYear = @"SELECT 
+    p.PeriodNo,
+    MIN(p.StartDate) AS EarliestStartDate,
+    MAX(p.EndDate) AS LatestEndDate
+FROM
+    C_Period p
+INNER JOIN
+    C_Year cy ON p.C_Year_ID = cy.C_Year_ID
+INNER JOIN
+    C_Calendar cal ON cy.C_Calendar_ID = cal.C_Calendar_ID
+WHERE
+    p.C_Year_ID IN(
+        SELECT
+            C_Year_ID
+        FROM
+            C_Period
+        WHERE
+            TO_DATE('" + sysdate + "', 'DD-MM-YYYY HH24:MI:SS') BETWEEN StartDate AND EndDate) AND cal.C_Calendar_ID = (SELECT C_Calendar_ID FROM D_SERIES WHERE D_Series_ID = 1000727) AND p.IsActive = 'Y' GROUP By PeriodNo order by PeriodNo";
+                DataSet ds = DB.ExecuteDataset(sqlYear);
+                /*   if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                   {
+                       earliestStartDate = (DateTime)ds.Tables[0].Rows[0]["EarliestStartDate"];
+                       latestEndDate = (DateTime)ds.Tables[0].Rows[0]["LatestEndDate"];
+                   }*/
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+
+                    DataRow firstRow = ds.Tables[0].Rows[0];
+                    earliestStartDate = (DateTime)firstRow["EarliestStartDate"];
+
+                    DataRow lastRow = ds.Tables[0].Rows[ds.Tables[0].Rows.Count - 1];
+                    latestEndDate = (DateTime)lastRow["LatestEndDate"];
+
+                }
+
+            }
 
             StringBuilder sb = new StringBuilder();
             sb.Append(" WHERE ");
-            if ((IsDate_X() || IsIdentifier_X() || IsString_X()) && GetDateTimeTypes() != "N")     //if colx is datetime
+            if ((IsList_X() || IsDate_X() || IsIdentifier_X() || IsString_X()) && GetDateTimeTypes() != "N")     //if colx is datetime
             {
                 DateTime alternateDate = DateTime.Now;
                 if (GetDateFrom() == null && (GetDateTimeTypes() == IS_YEARLY || GetDateTimeTypes() == IS_MONTHLY || GetDateTimeTypes() == IS_DAILY))
@@ -1307,6 +1434,10 @@ namespace VAdvantage.Model
                         /* }*/
 
                     }
+                    else if (calcBasis.Equals("I"))
+                    {
+                        m_date1 = earliestStartDate.Month + "/" + earliestStartDate.Day + "/" + earliestStartDate.Year;
+                    }
                     else
                     {
                         m_date1 = lastNDate.Month + "/" + lastNDate.Day + "/" + (lastNDate.Year - 1);
@@ -1329,6 +1460,11 @@ namespace VAdvantage.Model
                             m_date2 = "12/31/" + cd_dt.Year;
                         }
                     }
+                    else if (calcBasis.Equals("I"))
+                    {
+                        m_date2 = latestEndDate.Month + "/" + latestEndDate.Day + "/" + latestEndDate.Year;
+
+                    }
                     else
                     {
                         m_date2 = dt_to.Month + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
@@ -1347,6 +1483,11 @@ namespace VAdvantage.Model
 
 
                 if (IsIdentifier_X() || IsString_X())
+                {
+                    MColumn dateCol = MColumn.Get(GetCtx(), GetAD_DateColumn_ID());
+                    sb.Append(dateCol.GetFKColumnName()).Append(" BETWEEN ");
+                }
+                else if (IsList_X())
                 {
                     MColumn dateCol = MColumn.Get(GetCtx(), GetAD_DateColumn_ID());
                     sb.Append(dateCol.GetFKColumnName()).Append(" BETWEEN ");
@@ -1665,7 +1806,12 @@ namespace VAdvantage.Model
 
             return false;
         }
-
+        public bool IsList_X()
+        {
+            if (GetDataType_X() == IS_LIST)
+                return true;
+            return false;
+        }
         public bool IsDate_X()
         {
             if (GetDataType_X() == IS_DATETIME)

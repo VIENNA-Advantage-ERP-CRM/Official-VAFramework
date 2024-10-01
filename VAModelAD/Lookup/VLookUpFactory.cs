@@ -22,6 +22,7 @@ using VAdvantage.Utility;
 using VAdvantage.Logging;
 using VAdvantage.Controller;
 using System.Text.RegularExpressions;
+using BaseLibrary.CloudService;
 
 namespace VAdvantage.Classes
 {
@@ -236,20 +237,24 @@ namespace VAdvantage.Classes
                 hasWhere = mainQuery.IndexOf(" WHERE ") != -1;
             }
 
+            //check for AD_Org Table , do-not show star(*) if not slected in filtered org
+            bool isOrgRW = MRole.SQL_ORGRO;
+            if(info.tableName.ToUpper() == "AD_ORG")
+                isOrgRW = MRole.SQL_ORGRW;
 
             if (posOrder == -1)
             {
                 info.queryDirect = info.query
                     + (hasWhere ? " AND " : " WHERE ") + info.keyColumn + "=@key";
                 info.queryAll = VAdvantage.Model.MRole.GetDefault(ctx, false).AddAccessSQL(info.query,
-                   info.tableName, VAdvantage.Model.MRole.SQL_FULLYQUALIFIED, VAdvantage.Model.MRole.SQL_RO);
+                   info.tableName, VAdvantage.Model.MRole.SQL_FULLYQUALIFIED, VAdvantage.Model.MRole.SQL_RO, isOrgRW);
                 // }
             }
             else
             {
                 info.queryDirect = info.query.Substring(0, posOrder);
                 info.queryAll = VAdvantage.Model.MRole.GetDefault(ctx, false).AddAccessSQL(info.queryDirect,
-                   info.tableName, VAdvantage.Model.MRole.SQL_FULLYQUALIFIED, VAdvantage.Model.MRole.SQL_RO);
+                   info.tableName, VAdvantage.Model.MRole.SQL_FULLYQUALIFIED, VAdvantage.Model.MRole.SQL_RO, isOrgRW);
 
                 info.queryDirect += (hasWhere ? " AND " : " WHERE ") + info.keyColumn + "=@key";
             }
@@ -295,24 +300,14 @@ namespace VAdvantage.Classes
                     + (hasWhere ? " AND " : " WHERE ") + local_validationCode;
 
                 info.queryAll = VAdvantage.Model.MRole.GetDefault(ctx, false).AddAccessSQL(info.query,
-                   info.tableName, VAdvantage.Model.MRole.SQL_FULLYQUALIFIED, VAdvantage.Model.MRole.SQL_RO);
+                   info.tableName, VAdvantage.Model.MRole.SQL_FULLYQUALIFIED, VAdvantage.Model.MRole.SQL_RO, isOrgRW);
                 // }
             }
-
-
-            // if (info.isValidated)
-            // {
-
-            // else
-            //  {
-
-            // }
-
 
             //	Add Security
             if (needToAddSecurity)
                 info.query = VAdvantage.Model.MRole.GetDefault(ctx, false).AddAccessSQL(info.query,
-                    info.tableName, VAdvantage.Model.MRole.SQL_FULLYQUALIFIED, VAdvantage.Model.MRole.SQL_RO);
+                    info.tableName, VAdvantage.Model.MRole.SQL_FULLYQUALIFIED, VAdvantage.Model.MRole.SQL_RO, isOrgRW);
 
             return info;
         }

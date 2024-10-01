@@ -24,7 +24,7 @@ namespace VIS.Models
         private MChat _chat;
         // private MChatEntry _entry; 
         //get login info from context class
-       // Ctx ctx = Env.GetContext();
+        // Ctx ctx = Env.GetContext();
         private MChatEntry[] _chatEntries = null;//chat entries
         //private SimpleDateFormat _createdDate = null;
         private DateTime _createdDate;//get date from database according to chat entry
@@ -80,7 +80,7 @@ namespace VIS.Models
         {
             //set current window
             _windowNo = windowNo;
-           
+
             //	when chatId is zero
 
 
@@ -105,9 +105,9 @@ namespace VIS.Models
                 _chat = new MChat(ct, CM_Chat_ID, trxName);
             }
             subsribedChat = new ChatInfo();
-            subsribedChat = GetHistory(MChat.CONFIDENTIALTYPE_Internal, _chat, page, pageSize,ct);
-            
-            
+            subsribedChat = GetHistory(MChat.CONFIDENTIALTYPE_Internal, _chat, page, pageSize, ct);
+
+
         }
         #endregion
 
@@ -118,7 +118,7 @@ namespace VIS.Models
         /// </summary>
         /// <param name="reload">Bool Type(reload data)</param>
         /// <returns>array of lines</returns>
-        public MChatEntry[] GetEntries(Boolean reload, int chatID, int page, int pageSize,Ctx ctx)
+        public MChatEntry[] GetEntries(Boolean reload, int chatID, int page, int pageSize, Ctx ctx)
         {
             //chat entries
             if (_chatEntries != null && !reload)
@@ -128,15 +128,18 @@ namespace VIS.Models
             String sql = "SELECT * FROM CM_ChatEntry WHERE CM_Chat_ID=" + chatID + " ORDER BY Created DESC";
 
 
-            //SqlParamsIn objSP = new SqlParamsIn();
-            //_ds = new DataSet();
-            //objSP.page = page;
-            //objSP.pageSize = pageSize;
-            //objSP.sql = sql.ToString();
+            // SqlParamsIn objSP = new SqlParamsIn();
+            _ds = new DataSet();
+            //  objSP.page = page;
+            //  objSP.pageSize = pageSize;
+            //  objSP.sql = sql.ToString();
 
-            //_ds = ExecuteDataSetPaging(objSP);
+            //_ds = DB.GetDatabase().ExecuteDataSetPaging(objSP);
 
-            _ds = DB.ExecuteDataset(sql);
+
+            _ds = DBase.DB.ExecuteDatasetPaging(sql, 1, pageSize);
+
+            //  _ds = DB.ExecuteDataset(sql);
 
 
             try
@@ -178,11 +181,11 @@ namespace VIS.Models
         /// </summary>
         /// <param name="ConfidentialType">confidential type</param>
         /// <returns>text from control</returns>
-        public ChatInfo GetHistory(String confidentialType, MChat _chat, int page, int pageSize,Ctx ctx)
+        public ChatInfo GetHistory(String confidentialType, MChat _chat, int page, int pageSize, Ctx ctx)
         {
             ChatInfo cinfo = new ChatInfo();
-            GetEntries(true, _chat.GetCM_Chat_ID(), page, pageSize,ctx);//array list status
-
+            GetEntries(true, _chat.GetCM_Chat_ID(), page, pageSize, ctx);//array list status
+            int totalCount = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM CM_ChatEntry WHERE CM_Chat_ID = " + _chat.GetCM_Chat_ID()));
             StringBuilder strName = new StringBuilder();
             List<LatestSubscribedRecordChat> subscribedChat = new List<LatestSubscribedRecordChat>();
             //List<int> imgIds = new List<int>();
@@ -242,6 +245,7 @@ namespace VIS.Models
             cinfo.chatId = _chat.GetCM_Chat_ID();
             cinfo.subChat = subscribedChat;
             cinfo.userimages = imgIds;
+            cinfo.totalCount = totalCount;
             return cinfo;
 
         }
@@ -279,6 +283,18 @@ namespace VIS.Models
             return subsribedChat;
         }
 
+        public ChatModel() { }
+
+        public bool IsBottomTabPanel(int tabID)
+        {
+            string isbtm = Util.GetValueOfString(DB.ExecuteScalar("SELECT TabPanelAlignment FROM Ad_Tab WHERE AD_Tab_ID = " + tabID));
+            if (isbtm == "B" || isbtm == "H")
+            {
+                return true;
+            }
+            return false;
+
+        }
 
         //public DataSet ExecuteDataSetPaging(SqlParamsIn sqlIn)
         //{
@@ -354,6 +370,7 @@ namespace VIS.Models
     public class ChatInfo
     {
         public int chatId { get; set; }
+        public int totalCount { get; set; }
         public List<UserImages> userimages { get; set; }
         public List<LatestSubscribedRecordChat> subChat { get; set; }
     }

@@ -250,7 +250,6 @@
             return null;
         };
 
-
         this.paintRow = function (index) {
 
             var rec = this.grid.records[index];
@@ -323,9 +322,16 @@
             var AD_Org_ID = co[1];
             var Record_ID = co[2];
 
-            return VIS.MRole.canUpdate
-                (AD_Client_ID, AD_Org_ID, self.AD_Table_ID, Record_ID, false);
-
+            if (!VIS.MRole.canUpdate
+                (AD_Client_ID, AD_Org_ID, self.AD_Table_ID, Record_ID, false))
+                return false;
+            //check for filter org
+            var fOrgs = VIS.context.getContext("#AD_FilteredOrg");
+            if (fOrgs && fOrgs != "") {
+                if (fOrgs.split(",").indexOf('0') < 0 && AD_Org_ID ==0) 
+                    return false;
+            }
+            return true;
         };
 
         function getClientOrgRecordID(row) {

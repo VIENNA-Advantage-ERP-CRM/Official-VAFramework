@@ -164,6 +164,38 @@
         return "";
     };
 
+    calloutColumn.prototype.ShowTable = function (ctx, windowNo, mTab, mField, value, oldValue) {
+
+        if (this.isCalloutActive() || value == null) {
+            return;
+        }
+
+        var TableID = Util.getValueOfInt(mTab.getValue("AD_Table_ID"));
+        if (TableID > 0) {
+            VIS.ADialog.warn("Column");
+        }
+
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
+    calloutColumn.prototype.ShowField = function (ctx, windowNo, mTab, mField, value, oldValue) {
+
+        if (this.isCalloutActive() || value == null) {
+            return;
+        }
+
+        var TableID = Util.getValueOfInt(mTab.getValue("AD_Table_ID"));
+        if (TableID > 0) {
+            VIS.ADialog.warn("Field");
+        }
+
+        this.setCalloutActive(false);
+        ctx = windowNo = mTab = mField = value = oldValue = null;
+        return "";
+    };
+
     VIS.calloutColumn = calloutColumn;
 
     //*********** Callout check DocAction in table  Start ****

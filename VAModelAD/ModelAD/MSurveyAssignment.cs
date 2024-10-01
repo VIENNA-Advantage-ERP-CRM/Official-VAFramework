@@ -43,6 +43,8 @@ namespace VAdvantage.Model
                 tp.SetName(Msg.GetMsg(GetCtx(), "SurveyPanelName"));
                 tp.SetClassname("VIS.SurveyPanel");
                 tp.SetAD_Tab_ID(GetAD_Tab_ID());
+                tp.SetAD_Org_ID(0);
+                tp.SetAD_Client_ID(0);
                 tp.SetSeqNo(10);
                 if (!tp.Save()) {
                     log.SaveError("Error", Msg.GetMsg(GetCtx(), "TabPanelNotSaved"));

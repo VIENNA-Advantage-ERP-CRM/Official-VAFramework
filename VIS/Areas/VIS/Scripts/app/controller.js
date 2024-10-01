@@ -5327,6 +5327,7 @@
                     this.ctx.setWindowContext(tempWindowNo, field.getColumnName(), oo.toString());
             }
         }
+        //check for default value for Org 
 
 
         //this.mQueryCompletedListener
@@ -6256,7 +6257,6 @@
      * @param {any} isMR
      */
     GridField.prototype.getIsEditable = function (checkContext, isMR) {
-        //TODO:
         var _vo = this.vo;
         if (this.getIsVirtualColumn())
             return false;
@@ -6316,6 +6316,8 @@
             if (Record_ID == "" && this.gridTab)
                 Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, this.gridTab.getTableName() + "_ID"); 
 
+
+
             if (Record_ID == "")
                 Record_ID = 0;
 
@@ -6331,6 +6333,13 @@
 
             if (this.gridTab && this.gridTab.IsSharedReadOnly)
                 return false;
+
+            //check for filter org
+            var fOrgs = ctx.getContext("#AD_FilteredOrg");
+            if (fOrgs && fOrgs != "") {
+                if (fOrgs.split(",").indexOf('0') < 0 && AD_Org_ID == 0 )
+                    return false;
+            }
         }
 
         //  Do we have a readonly rule
@@ -6730,6 +6739,13 @@
         if (vo.ColumnName.equals("IsActive")) {
             this.log.fine("[IsActive] " + vo.ColumnName + "=Y");
             return true;
+        }
+
+
+        //check for filterd org , if filter applied then return login org only
+        var fOrgs = ctx.getContext("#AD_FilteredOrg");
+        if (vo.ColumnName.equals("AD_Org_ID") && fOrgs && fOrgs != "") {
+            return ctx.getAD_Org_ID();
         }
 
         //	Set Client & Org to System, if System access

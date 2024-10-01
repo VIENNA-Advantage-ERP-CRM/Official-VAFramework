@@ -111,7 +111,16 @@
                 }
                 $appMenuDiv.css("display", "flex");
                 $appMenuDiv.find(".vis-nm-selAppLabel").text($target.find('span').text()).attr('title', $target.find('span').text());
-                $appMenuDiv.find("i").attr("class", $target.find("i").attr("class")).css("color", $target.find("i").css("color"));
+                if ($target.find("img").length > 0) {
+                    $appMenuDiv.find("i").css("display", "none");
+                    $appMenuDiv.find("img").css("display", "block");
+                    $appMenuDiv.find("img").attr("src", $target.find("img").attr("src"));
+                }
+                else {
+                    $appMenuDiv.find("i").css("display", "block");
+                    $appMenuDiv.find("img").css("display", "none");
+                    $appMenuDiv.find("i").attr("class", $target.find("i").attr("class")).css("color", $target.find("i").css("color"));
+                }
                 $navMenuAction.empty();
                 var appItems = $menuTree.find("[data-menuid='menuAppID_" + $target.attr("data-value") + "']");
                 if (appItems.length > 0) {

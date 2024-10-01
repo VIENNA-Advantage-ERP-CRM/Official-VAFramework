@@ -955,5 +955,18 @@ html[dir=rtl] .vis-add-widgetButton {
     text-align: center !important;
 }
 
+html[dir=rtl] .vis-nm-fav-homeFavourite {
+    left: 1rem;
+    right: unset;
+}
+
+html[dir=rtl] .vis_nm_topFavIco {
+    margin-left: 15px !important;
+    margin-right: unset;
+}
+
+html[dir=rtl] .vis_home-total-count {
+    text-align: center;
+}
 
 /*rtl css End here*/
