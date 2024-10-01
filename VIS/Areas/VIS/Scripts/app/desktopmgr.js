@@ -143,6 +143,12 @@
                         }
                     }
                     hideMenu();
+                    if ($target.data("actionid")>0) {
+                        startMenuAction($target.data('action'), $target.data('actionid')); //start action
+                    }
+                    //else if ($(e.target).is('span')) {
+                    //    startMenuAction($(e.target).parent().data('action'), $(e.target).parent().data('actionid')); //start action
+                    //}
                 }
                 return;
 

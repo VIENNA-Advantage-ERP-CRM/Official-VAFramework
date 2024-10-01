@@ -102,7 +102,7 @@ namespace VAdvantage.Model
             //	Reset info
             if (IsSummary() && GetAction() != null)
             {
-                SetAction(null);
+                //SetAction(null);
             }
             string action = GetAction();
             if (action == null)

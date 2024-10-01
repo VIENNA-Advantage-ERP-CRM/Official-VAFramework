@@ -348,7 +348,7 @@ namespace VIS.Helpers
                     if (vt.Parent_ID == 0)
                     {
                         rootParentID = vt.Node_ID;
-                        GetMainMenuSummaryItem(vt.Node_ID, System.Net.WebUtility.HtmlEncode(vt.SetName), vt.Image, vt.FontStyle, windowNo);
+                        GetMainMenuSummaryItem(vt, System.Net.WebUtility.HtmlEncode(vt.SetName), vt.Image, vt.FontStyle, windowNo);
                         itemNo = 0;
                         menu1HTML.Clear();
                         menu2HTML.Clear();
@@ -877,8 +877,9 @@ namespace VIS.Helpers
         /// <param name="id"></param>
         /// <param name="text"></param>
         /// <param name="windowNo"></param>
-        private void GetMainMenuSummaryItem(int id, string text, string image, string fontStyle, string windowNo = "")
+        private void GetMainMenuSummaryItem(VTreeNode vt, string text, string image, string fontStyle, string windowNo = "")
         {
+            int id = vt.Node_ID;
             string imgStyle = "";
             //leftMenuHTML.Append("<li class='vis-navList'><a  data-value='" + id + "' data-summary='Y' href='javascript:void(0)'>" + text + "<i class='vis vis-arrow-right'></i></a></li>");
             if (image == "")
@@ -888,16 +889,26 @@ namespace VIS.Helpers
             //image = "vis vis-menu-default";
             if (fontStyle != "")
                 imgStyle = "style='" + fontStyle + "'";
+            string action = "";
+            if (vt.GetActionID() > 0)
+            {
+                action = "data-actionid = '" + vt.GetActionID() + "' data-action ='" + vt.GetAction() + "'";
+            }
+            else
+            {
+                action = "data-action = 'X' data-actionid='0'";
+            }
+
             if (image.IndexOf("Images/") > -1)
             {
-                leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' data-summary='Y' title='" + text + "'>" +
+                leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' " + action + " data-summary='Y' title='" + text + "'>" +
                                         "<img class='VIS-nm-favIconImg' " + imgStyle + " src=" + _ctx.GetContextUrl() + "'Images/Thumb32x32" + image.Substring(text.IndexOf("Images/") + 7) + "'/>" +
                                             "<span>" + text + "</span>" +
                                     "</a>");
             }
             else
             {
-                leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' data-image='" + image + "' data-summary='Y' title='" + text + "'>" +
+                leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' " + action + " data-image='" + image + "' data-summary='Y' title='" + text + "'>" +
                                     // "<i class='" + image + "' style='color:" + randColors[index] + "' aria-hidden='true''></i>" +
                                     "<i class='" + image + "' " + imgStyle + " aria-hidden='true''></i>" +
                                         "<span>" + text + "</span>" +

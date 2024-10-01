@@ -1317,7 +1317,7 @@ namespace VAdvantage.Model
                     bool isSummary = "Y".Equals(dr[index++].ToString());
                     string actionColor = dr[index++].ToString().Trim();
                     //	Menu only
-                    if (GetTreeType().Equals(TREETYPE_Menu) && !isSummary)
+                    if (GetTreeType().Equals(TREETYPE_Menu))// && !isSummary)
                     {
                         AD_Window_ID = Utility.Util.GetValueOfInt(dr[index]);
                         index++;
@@ -1354,21 +1354,22 @@ namespace VAdvantage.Model
                                 name, description, Parent_ID, isSummary,
                                 actionColor, onBar);	//	menu has no color
                         }
-                    }
-                    else
-                    {
-                        //Color color = null;	//	action
-                        //if (actionColor != null && !getTreeType().equals(TREETYPE_Menu))
-                        //{
-                        //    MPrintColor printColor = MPrintColor.get(getCtx(), actionColor);
-                        //    if (printColor != null)
-                        //        color = printColor.getColor();
                         //}
+                        //else
+                        //{
+                        //    //Color color = null;	//	action
+                        //    //if (actionColor != null && !getTreeType().equals(TREETYPE_Menu))
+                        //    //{
+                        //    //    MPrintColor printColor = MPrintColor.get(getCtx(), actionColor);
+                        //    //    if (printColor != null)
+                        //    //        color = printColor.getColor();
+                        //    //}
 
-                        retValue = new VTreeNode(Node_ID, seqNo,
-                                    name, description, Parent_ID, isSummary,
-                                    actionColor, onBar);
-                        if (GetTreeType().Equals(TREETYPE_Menu))
+                        //    retValue = new VTreeNode(Node_ID, seqNo,
+                        //                name, description, Parent_ID, isSummary,
+                        //                actionColor, onBar);
+
+                        if (GetTreeType().Equals(TREETYPE_Menu) && isSummary)
                         {
 
                             retValue.Image = Utility.Util.GetValueOfString(dr["Image"]);
@@ -1377,7 +1378,6 @@ namespace VAdvantage.Model
 
                             retValue.IsSetting = Utility.Util.GetValueOfString(dr["IsSetting"]) == "Y";
                         }
-
                     }
                     break;
                 }
