@@ -1354,24 +1354,33 @@ namespace VAdvantage.Model
                                 name, description, Parent_ID, isSummary,
                                 actionColor, onBar);	//	menu has no color
                         }
-                        //}
-                        //else
-                        //{
-                        //    //Color color = null;	//	action
-                        //    //if (actionColor != null && !getTreeType().equals(TREETYPE_Menu))
-                        //    //{
-                        //    //    MPrintColor printColor = MPrintColor.get(getCtx(), actionColor);
-                        //    //    if (printColor != null)
-                        //    //        color = printColor.getColor();
-                        //    //}
 
-                        //    retValue = new VTreeNode(Node_ID, seqNo,
-                        //                name, description, Parent_ID, isSummary,
-                        //                actionColor, onBar);
+                        if (isSummary)
+                        {
+
+                            retValue.Image = Utility.Util.GetValueOfString(dr["Image"]);
+
+                            retValue.FontStyle = Utility.Util.GetValueOfString(dr["FontStyle"]);
+
+                            retValue.IsSetting = Utility.Util.GetValueOfString(dr["IsSetting"]) == "Y";
+                        }
+                    }
+                    else
+                    {
+                        //Color color = null;	//	action
+                        //if (actionColor != null && !getTreeType().equals(TREETYPE_Menu))
+                        //{
+                        //    MPrintColor printColor = MPrintColor.get(getCtx(), actionColor);
+                        //    if (printColor != null)
+                        //        color = printColor.getColor();
+                        //}
+
+                        retValue = new VTreeNode(Node_ID, seqNo,
+                                    name, description, Parent_ID, isSummary,
+                                    actionColor, onBar);
 
                         if (GetTreeType().Equals(TREETYPE_Menu) && isSummary)
                         {
-
                             retValue.Image = Utility.Util.GetValueOfString(dr["Image"]);
 
                             retValue.FontStyle = Utility.Util.GetValueOfString(dr["FontStyle"]);
