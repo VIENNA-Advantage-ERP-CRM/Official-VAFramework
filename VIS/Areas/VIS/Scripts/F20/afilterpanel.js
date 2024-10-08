@@ -122,6 +122,7 @@
         var divValue2 = divDynamic.find('.vis-fp-valuetwo');
         var divDynFilters = divDynamic.find('.vis-fp-custcoltag');
         var divFullDay = divDynamic.find("#divFullDay_" + windowNo);
+        var chkFullDay = divDynamic.find("#checkFullDay_" + windowNo);
         var btnSave = bodyDiv.find('.saveFilter');
         var btnSaveAs = bodyDiv.find('.saveAs');
 
@@ -290,7 +291,7 @@
                             }
                             var tabindex = inputType.data('tabindex');
                             if (tabindex == "undefined" || tabindex == undefined) {
-                                tabindex = Number(self.cmbTabs.find('option:first').val());
+                                tabindex = Number(self.cmbTabs.find('option:selected').val());
                             }
                             self.fillColumns(tabindex);
                             //self.cmbTabs.val(self.cmbTabs.find('option[tabid="' + tabindex + '"]').val());
@@ -320,6 +321,10 @@
 
                             if (exists) {
                                 continue;
+                            }
+
+                            if (self.curTab.getAD_Tab_ID() != self.tabs[tabindex].getAD_Tab_ID()) {
+                                pasedVal = self.curTab.getTableName() + '.' + self.curTab.getTableName() + '_ID IN(SELECT ' + self.curTab.getTableName() + '_ID FROM ' + self.tabs[tabindex].getTableName() + ' WHERE ' + pasedVal + ')';
                             }
 
                             var obj = {
@@ -355,31 +360,31 @@
 
 
 
-                            if (whereClause != '') {
-                                whereClause += " OR " + pasedVal;
-                            }
-                            else {
-                                whereClause += "(" + pasedVal;
-                            }
-
-                        }
-
-                        self.fillColumns(Number(self.cmbTabs.find('option:first').val()));
-
-                        if (whereClause != '') {
-                            whereClause += ")";
-
-                            if (self.curTab.getAD_Tab_ID() != self.tabs[tabindex].getAD_Tab_ID()) {
-                                whereClause = self.curTab.getTableName() + '.' + self.curTab.getTableName() + '_ID IN(SELECT ' + self.curTab.getTableName() + '_ID FROM ' + self.tabs[tabindex].getTableName() + ' WHERE ' + whereClause + ')';
-                            }
-
-                            //if (finalWhereClause != "") {
-                            //    finalWhereClause += " AND " + whereClause;
+                            //if (whereClause != '') {
+                            //    whereClause += " OR " + pasedVal;
                             //}
                             //else {
-                            //    finalWhereClause += whereClause;
+                            //    whereClause += "(" + pasedVal;
                             //}
+
                         }
+
+                        self.fillColumns(Number(self.cmbTabs.find('option[tabid="' + self.curTab.getAD_Tab_ID() +'"]').val()));
+
+                        //if (whereClause != '') {
+                        //    whereClause += ")";
+
+                        //    if (self.curTab.getAD_Tab_ID() != self.tabs[tabindex].getAD_Tab_ID()) {
+                        //        whereClause = self.curTab.getTableName() + '.' + self.curTab.getTableName() + '_ID IN(SELECT ' + self.curTab.getTableName() + '_ID FROM ' + self.tabs[tabindex].getTableName() + ' WHERE ' + whereClause + ')';
+                        //    }
+
+                        //    //if (finalWhereClause != "") {
+                        //    //    finalWhereClause += " AND " + whereClause;
+                        //    //}
+                        //    //else {
+                        //    //    finalWhereClause += whereClause;
+                        //    //}
+                        //}
 
                         var found = false;
                         for (var k = 0; k < context.listOfFilterQueries.length; k++) {
@@ -437,7 +442,7 @@
             if (exists) {
                 if (this.ctrlObjects[evt.propertyName])
                     this.ctrlObjects[evt.propertyName].setValue(-1);
-                VIS.ADialog.error("", true, "VISConditionExist");
+                VIS.ADialog.error("VISConditionExist");
                 return;
             }
 
@@ -449,16 +454,21 @@
             if (this.ctrlObjects[evt.propertyName])
                 this.ctrlObjects[evt.propertyName].setValue(evt.newValue);
 
-
-            
+            if (displayVal == null || displayVal == -1 || displayVal == "") {
+                return;
+            }
+           
 
             var hue = Math.floor(Math.random() * 360);
             var v = Math.floor(Math.random() * 16) + 85;
             var pastel = 'hsl(' + hue + ', 100%, ' + v + '%)';
-
-            var spann = $('<span data-tabindex="' + field[0].tabIndex +'" data-id="' + evt.newValue + '" class="vis-fp-inputvalueforupdate" >' + displayVal + '</span>');
+            var findex = field[0].tabIndex;
+            if (!findex) {
+                findex = Number(self.cmbTabs.find('option:selected').val());
+            }
+            var spann = $('<span data-tabindex="' + findex +'" data-id="' + evt.newValue + '" class="vis-fp-inputvalueforupdate" >' + displayVal + '</span>');
             var iconCross = $('<i data-id="' + evt.newValue + '" data-keyval="' + evt.propertyName + "_" + evt.newValue + '" class="vis vis-mark"></i></div></div>');
-            wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div style="background-color:' + pastel + '" class="vis-fp-currntrcrds" data-id="' + evt.propertyName + '_' + field[0].tabIndex +'">').append(spann).append(iconCross)));
+            wrapper.append($('<div class="vis-fp-currntrcrdswrap">').append($('<div style="background-color:' + pastel + '" class="vis-fp-currntrcrds" data-id="' + evt.propertyName + '_' + findex +'">').append(spann).append(iconCross)));
 
 
             if (this.ctrlObjects[evt.propertyName])
@@ -624,7 +634,7 @@
                 //    this.selectionfields.push(field);
 
                 //}
-                if (VIS.DisplayType.Image == field.getDisplayType()) {
+                if (VIS.DisplayType.Image == field.getDisplayType() || VIS.DisplayType.Label == field.getDisplayType()) {
 
                 }else
                     sortedFields.push({ 'value': columnName, 'text': header });
@@ -671,6 +681,10 @@
                     dsAdvanceData[colName].splice(indexToDelete, 1);
                 }
 
+                if (dsAdvanceData[colName] && dsAdvanceData[colName].length == 0) {
+                    delete dsAdvanceData[colName];
+                }
+
                 tgt.parent().parent().remove();
                 self.fireValChanged(tgt.data('keyval'));// evt.propertyName);
             }
@@ -692,7 +706,7 @@
                 const exists = dsFilterData.some(obj => obj.KEYVALUE == currentColumnName && obj.OPERATORNAME == VIS.Query.prototype.OPERATORS[VIS.Query.prototype.EQUAL] && obj.VALUE1VALUE == VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString($target.data('id'))));
 
                 if (exists && $target.is(':checked')) {
-                    VIS.ADialog.error("", true, "VISConditionExist");
+                    VIS.ADialog.error("VISConditionExist");
                     return;
                 }
 
@@ -1113,10 +1127,10 @@
         //functions
         function setValueEnabled(isEnabled) {
             // get control
-            var ctrl = divValue1.children()[1];
+            var ctrl = divValue1.find('.vis-control-wrap').children()[0];
             var btn = null;
-            if (divValue1.children().length > 2)
-                btn = divValue1.children()[2];
+            if (divValue1.find('.vis-control-wrap').children().length > 2)
+                btn = divValue1.find('.vis-control-wrap').children()[1];
 
             if (btn)
                 $(btn).prop("disabled", !isEnabled).prop("readonly", !isEnabled);
@@ -1126,10 +1140,10 @@
         };
 
         function setValue2Enabled(isEnabled) {
-            var ctrl = divValue2.children()[1];
+            var ctrl = divValue2.find('.vis-control-wrap').children()[0];
             var btn = null;
-            if (divValue2.children().length > 2)
-                btn = divValue2.children()[2];
+            if (divValue2.find('.vis-control-wrap').children().length > 2)
+                btn = divValue2.find('.vis-control-wrap').children()[1];
 
             if (btn)
                 $(btn).prop("disabled", !isEnabled).prop("readonly", !isEnabled);
@@ -1350,12 +1364,16 @@
             // set column name
             var cVal = cmbColumns.val();
 
-            if (!cVal || cVal == "-1")
+            if (!cVal || cVal == "-1") {
+                VIS.ADialog.error("VISSelectColumn");
                 return false;
+            }
+                
 
             var colName = cmbColumns.find("option:selected").text();
             var colValue = "";
             if (colName == null || colName.trim().length == 0) {
+                VIS.ADialog.error("VISSelectColumn");
                 return false;
             }
             else {
@@ -1389,9 +1407,14 @@
                 var opName = cmbOp.val();
 
                 if (opName == null || opName == undefined)
-                    opName = cmbOp.find("option:selected").text();;;// vcmbOperator.Text;//silverlight comment
+                    opName = cmbOp.find("option:selected").text();// vcmbOperator.Text;//silverlight comment
                 // set operator (sign)
                 var opValue = cmbOp.val();
+                var v = getControlValue(true);
+                if (v == null || v == undefined || v == "") {
+                    VIS.ADialog.error("VISQueryValueCantNull");
+                    return;
+                }
 
                 // add row in dataset
                 addDynRow(colName, colValue, opName, opValue, getControlText(true), getControlValue(true), getControlText(false), getControlValue(false), getFullDay(), self.cmbTabs.val());
@@ -1424,7 +1447,7 @@
             const exists = dsFilterData.some(obj => obj.KEYVALUE == colValue && obj.OPERATORNAME == VIS.Query.prototype.OPERATORS[optrName]  && obj.VALUE1VALUE == VIS.Utility.encodeText(VIS.Utility.Util.getValueOfString(value1Value)));
 
             if (exists) {
-                VIS.ADialog.error("", true, "VISConditionExist");
+                VIS.ADialog.error("VISConditionExist");
                 return;
             }
             //txtFilterName.show();
@@ -1515,8 +1538,8 @@
         };
 
         function getFullDay() {
-            if (divFullDay) {
-                return divFullDay.is(':checked') ? 'Y' : 'N';
+            if (chkFullDay) {
+                return chkFullDay.is(':checked') ? 'Y' : 'N';
             }
         };
 
@@ -1586,10 +1609,10 @@
        */
         function setEnabledFullDay(enable) {
             if (enable) {
-                divFullDay.prop('disabled', true);
+                chkFullDay.prop('disabled', true);
             }
             else {
-                divFullDay.prop('disabled', false);
+                chkFullDay.prop('disabled', false);
             }
         };
 
@@ -1668,7 +1691,7 @@
                 }
             }
 
-            self.fillColumns(Number(self.cmbTabs.find('option:first').val()));
+            self.fillColumns(Number(self.cmbTabs.find('option[tabid="' + self.curTab.getAD_Tab_ID() + '"]').val()));
             self.curGC.aPanel.setBusy(false);
         }
 
