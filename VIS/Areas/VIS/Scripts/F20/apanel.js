@@ -312,6 +312,7 @@
                     if ($selfpanel.curTab.getTabLevel() == 0) {
                         if (item.defaultids && item.userid > 0) {
                             span = $("<span title='" + VIS.Msg.getMsg("DefaultSearch") + "'  data-id='" + item.id + "' class='VIS-winSearch-defaultIcon'></span>");
+                           
                         }
                         else {
                             span = $("<span title='" + VIS.Msg.getMsg("MakeDefaultSearch") + "' data-id='" + item.id + "' class='VIS-winSearch-NonDefaultIcon'></span>");
@@ -365,6 +366,7 @@
                             self.setBusy(false);
                             $t.closest('li').remove();
                             no = parseInt(json);
+                            self.removeSearchOnDelete();
                             toastr.success(VIS.Msg.getMsg('DeleteSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
                         })
                     });
@@ -3955,7 +3957,7 @@
                         $selfpanel.curTab.setQuery(query);
                         $selfpanel.defaultSearch = false;
                         $selfpanel.curTab.searchText = data.tables[0].rows[i].cells["name"];
-                        var userquery_id = data.tables[0].rows[i].cells["ad_defaultuserquery_id"];
+                        var userquery_id = data.tables[0].rows[i].cells["ad_userquery_id"];
                         setTimeout(function (id) {
                             $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(id, true);
                         }, 1000,userquery_id);
