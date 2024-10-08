@@ -588,7 +588,7 @@ namespace VIS.Models
                                                 if (onClick != null)
                                                 {
                                                     var clonedJson = JsonConvert.SerializeObject(onClick);
-                                                    clk = (ActionParams)JsonConvert.DeserializeObject(clonedJson);
+                                                    clk = JsonConvert.DeserializeObject<ActionParams>(clonedJson);
                                                 }
 
                                                 if (IsInteger(dsObj[j].ID))
@@ -839,7 +839,7 @@ namespace VIS.Models
                 else
                 {
                     sql = "SELECT " + keyCol + ", " + displayCol + " , count(" + keyCol + ")  FROM " + pTableName + " " + pTableName + " JOIN " + tableName + " " + tableName
-                        + " ON " + tableName + "." + tableName + "_ID =" + pTableName + "." + pColumnName
+                        + " ON " + keyCol + " = " + pTableName + "." + pColumnName
                         + " ";// WHERE " + pTableName + ".IsActive='Y'";
                     sql = "SELECT * FROM (" + MRole.GetDefault(ctx).AddAccessSQL(sql, tableName, true, false);
                     if (!string.IsNullOrEmpty(""))

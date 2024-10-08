@@ -1,7 +1,7 @@
 VIS = window.VIS || {};
 (function () {
 
-    function surveyPanel() {
+    function surveyPanel(height) {
         this.record_ID = 0;
         this.windowNo = 99999;
         this.curTab = null;
@@ -38,14 +38,16 @@ VIS = window.VIS || {};
         this.init = function () {
             setBusy(false);
             $root = $('<div class="vis-surveyTab-root"></div>').append(bsyDiv);
-           // h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
-            h = VIS.Env.getScreenHeight() - 230;
-            if (self.curTab && self.curTab.getIsHeaderPanel()) {
-                h = h - VIS.Utility.Util.getValueOfInt(self.curTab.getHeaderHeight().replace('px', ' ')) - 10;
-            }
+            // h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
+            h = height-4;
+           
             if (!h || h < 0) {
                 h = $('.divWorkflowActivity').height() - 19;
             } 
+
+            if (self.curTab && self.curTab.getIsTPBottomAligned()) {
+                h = null;
+            }
 
             if (!h) {
                 h = 100 + '%';
@@ -322,7 +324,7 @@ VIS = window.VIS || {};
          */
         function loadSurveyDesign(SurveyData, SurveyType, root, AD_Survey_ID) {
             var $dsgn;
-            var stl = "width: calc(100% - 35px);height: calc(100% - 71px);position: absolute;";
+            var stl = "width: calc(100% - 1px);height: calc(100% - 30px);position: absolute;";
             if (self.curTab && self.curTab.getIsTPBottomAligned()) {
                 stl = "";
             }
@@ -424,7 +426,7 @@ VIS = window.VIS || {};
             } else {
                 questionSection.append($dsgn);
                 var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
-                var stl1 ="bottom: 0px;position: absolute;width: calc(100% - 35px);"
+                var stl1 ="bottom: 0px;position: absolute;width: calc(100% - 1px);"
                 if (self.curTab && self.curTab.getIsTPBottomAligned()) {
                     stl1 = "bottom: 0px;position: absolute;width: calc(100% - 10px);";
                 }
@@ -646,22 +648,24 @@ VIS = window.VIS || {};
 
         //Submit button show hide on the behalf of pagging
         function showHideSubmit() {
-           
-            if (questionSection.find('.vis-tp-orderListWrap li:last').is(':hidden')) {
-                $btnSubmit.hide();
-                questionSection.find('.next').show();
-            } else {
-                $btnSubmit.show();
-                questionSection.find('.next').hide();
-            }
+            setTimeout(function () {
+                if (questionSection.find('.vis-tp-orderListWrap li:last').is(':hidden')) {
+                    $btnSubmit.hide();
+                    questionSection.find('.next').show();
+                } else {
+                    $btnSubmit.show();
+                    questionSection.find('.next').hide();
+                }
 
-            //if first item  is hidden
-            if (questionSection.find('.vis-tp-orderListWrap li:first').is(':hidden')) {
-                questionSection.find('.prev').show();
-            } else {
-                questionSection.find('.prev').hide();
-            }
-            questionSection.find('.vis-tp-orderListWrap').scrollTop(0);
+                //if first item  is hidden
+                if (questionSection.find('.vis-tp-orderListWrap li:first').is(':hidden')) {
+                    questionSection.find('.prev').show();
+                } else {
+                    questionSection.find('.prev').hide();
+                }
+                questionSection.find('.vis-tp-orderListWrap').scrollTop(0);
+            }, 200);
+           
         }
 
         function eventHandling() {
@@ -778,6 +782,7 @@ VIS = window.VIS || {};
     surveyPanel.prototype.sizeChanged = function (width) {
         this.panelWidth = width;
     };
+
 
     /**
      *	Dispose Component
