@@ -958,6 +958,8 @@
             if (show) {
                 this.cmd_ignore();
                 this.landingPage.getRoot().show();
+                this.vTabbedPane.restoreTabChange(null);
+                this.curTabIndex = 0;
                 this.getRoot().hide();
             } else {
                 this.landingPage.getRoot().hide();

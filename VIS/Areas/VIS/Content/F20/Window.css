@@ -1977,16 +1977,6 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
     border-radius: .25rem;
 }
 
-.vis-loading-spinner {
-    position: absolute;
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%);
-    z-index: 999;
-    font-size: 1.5rem; 
-    color: #007bff;
-}
-
     .vis-chatimgwrap i {
         font-size: 1.75rem;
         color: rgba(var(--v-c-primary), 1);

@@ -180,7 +180,7 @@
 
         // Handle scroll arrows visibility
         function setupScrollArrows() {
-            if (($root[0].scrollHeight - 20) > divHeight) {
+            if (($root[0].scrollHeight - 22) > divHeight) {
                 var arrowDiv = createScrollArrows();
                 $root.append(arrowDiv);
             }
@@ -233,7 +233,7 @@
 
         // Update arrow visibility based on scroll position
         function updateArrowVisibility(scrollTop, divHeight) {
-            toggleArrow($root.find('.vis-bottomArrow-icon'), scrollTop < ($root[0].scrollHeight) - 20 - divHeight);
+            toggleArrow($root.find('.vis-bottomArrow-icon'), scrollTop < ($root[0].scrollHeight) - 22 - divHeight);
             toggleArrow($root.find('.vis-topArrow-icon'), scrollTop > 0);
         }
 
@@ -248,12 +248,12 @@
         function adjustHeight() {
             self.height = Math.floor(self.frame.widgetInfo.height.replace("px", ""));
             divHeight = self.height;
-            self.scrollHeight = $root[0].scrollHeight - 20;
+            self.scrollHeight = $root[0].scrollHeight - 22;
         }
 
         // Handle widget resizing
         this.resize = function (widgetHeight) {
-            if (($root[0].scrollHeight - 20) > widgetHeight) {
+            if (($root[0].scrollHeight - 22) > widgetHeight) {
                 $root.find('.vis-dynamicwidget-arrow').removeClass('d-none');
             }
         };
