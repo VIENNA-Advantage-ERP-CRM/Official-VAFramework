@@ -495,6 +495,10 @@
         return this.vTabPanel.getRoot();
     };
 
+    VIS.GridController.prototype.getSpecialTabPanel = function () {
+        return this.vTabPanel.getSpecialobj().getRoot();
+    };
+
 
     VIS.GridController.prototype.getFilterPanel = function () {
         return this.aFilterPanel.getRoot();
@@ -504,7 +508,7 @@
         var gc = this.aPanel.curGC;
 
         if (resize && gc.vTabPanel) {
-            gc.vTabPanel.setSize(0);
+            gc.vTabPanel.setSize(0, resize);
         }
         gc.multiRowResize();
         if (gc.vIncludedGC) {
@@ -833,7 +837,7 @@
         j = null;
 
         if (this.vTabPanel) {
-            this.vTabPanel.getRoot().detach();
+            this.vTabPanel.detach();
         }
         if (this.aFilterPanel) {
             this.aFilterPanel.getRoot().detach();
