@@ -111,9 +111,13 @@
             }
             var tWidth = $outerwrap.closest('.vis-ad-w-p-center').width() - 25;
             var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
+
             if (this.isSpecial) {
                 height = $outerwrap.closest('.vis-ad-w-p-actionpanel-r-b').height();
             }
+
+            this.height = height;
+
 
             if (evt && !evt.isClosed) {
                 //if (this.isHorizontalAligned && !evt.isHorizontal)
@@ -297,6 +301,10 @@
             $divContent.show();
         };
 
+        this.getHeight = function () {
+            return this.height;
+        }
+
         this.disposeComponent = function () {
             $outerwrap.remove();
             $divContent.remove();
@@ -458,7 +466,7 @@
         if (className) {
             var type = VIS.Utility.getFunctionByName(className, window);
             if (type) {
-                panel = new type();
+                panel = new type(this.getHeight());
                 panel.startPanel(windowNo, this.gTab, extrainfo);
                 if (this.gTab.getRecord_ID() > -1 || this.gTab.getCurrentRow() > -1) {
                     panel.refreshPanelData(this.gTab.getRecord_ID(), this.gTab.getTableModel().getRow(this.gTab.getCurrentRow()));

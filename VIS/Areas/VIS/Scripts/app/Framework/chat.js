@@ -10,14 +10,27 @@
         var $textArea = $('<div><textarea  id="chatBox_textArea" rows="1" class="vis-chat-msgbox" /></textarea></div>');
         var $sendIcon = $('<div><button class="pull-right"><i id="chatBox_sendicon"class="fa fa-paper-plane"></i></button></div>');
         var $showMoreIcon = $('<div class="vis-chat-showmore" style="display:none"><a class="vis-chat-arrowdown">' + VIS.Msg.getMsg("ShowMore") + '</a></div>');
+        var $bsyDiv = $('<div id="chatBusyDiv" style="width:90%;" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id"'
+            + ' class= "vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div ></div> ');
         //  var $buttonsdiv = $('<div style="overflow:auto"></div>');
         // var $btnOK = $('<button>');
         // var $btnCancel = $('<button>');
         $inputChat.append($textArea).append($sendIcon);
-        $maindiv.append($inputChat).append($div);//.append($buttonsdiv); //ui
+        $maindiv.append($inputChat).append($div).append($bsyDiv);//.append($buttonsdiv); //ui
         this.windowNo = 0;
         this.pageSize = 10;
         this.isBtmTapPanel = false;
+        this.isLoading = false;
+
+
+        function showBusy(show) {
+            if (show) {
+                $maindiv.find("#chatBusyDiv").show();
+            }
+            else {
+                $maindiv.find("#chatBusyDiv").hide();
+            }
+        };
 
         var ch = null;
         if (record_id > 0 && table_id > 0) {
@@ -36,36 +49,63 @@
 
         $showMoreIcon.on(VIS.Events.onTouchStartOrClick, function (e) {
             if (self.prop != null) {
-                if (self.isBtmTapPanel) {
-                    self.prop.pageSize = self.prop.pageSize + 4;
-                } else {
-                    self.prop.pageSize = self.prop.pageSize + 10;
-                }
-                init($div, windowNo, self.prop);
+                showBusy(true);
+                self.prop.pageSize += 4;
+                init($div, self.windowNo, self.prop);
             }
         });
 
         $textArea.find('#chatBox_textArea').on('input', function () {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 150) + 'px';
-            this.style.overflowY = this.scrollHeight > 150 ? 'scroll' : 'hidden';
+            this.style.overflowY = this.scrollHeight > 150 ? 'auto' : 'hidden';
         });
 
         $textArea.find('#chatBox_textArea').on('keydown', function (e) {
-            if (e.key === 'Enter') {
+            if (e.keyCode === 13) {
+                showBusy(true);
                 e.preventDefault();
                 triggerSave(e);
             }
         });
 
+        setTimeout(function () {
+            const onScroll = throttle(function () {
+                if ($maindiv.parent().scrollTop() + $maindiv.parent().height() >= $maindiv.height() - 50) {
+                    if (self.prop) {
+                        self.prop.pageSize += 10;
+                        showBusy(true);
+                        init($div, self.windowNo, self.prop);
+                    }
+                }
+            }, 200); // adjust the wait time as needed
+
+            $maindiv.parent().on('scroll', onScroll);
+        }, 100);
+
+        function throttle(fn, wait) {
+            let lastTime = 0;
+            return function () {
+                const now = new Date().getTime();
+                if (now - lastTime >= wait) {
+                    lastTime = now;
+                    return fn.apply(this, arguments);
+                }
+            };
+        }
+
+
         function triggerSave(e) {
             saveMsg(e);
             $textArea.find('#chatBox_textArea').val('');
+            $textArea.find('#chatBox_textArea').css('height', 'auto');
             self.refreshPanelData(self.record_ID, 0);
         }
 
 
         this.initializeComponent = function (windowNo, prop) {
+            showBusy(true);
+            $maindiv.parent().scrollTop(0);
             $maindiv.append($showMoreIcon);
             $maindiv.addClass('p-2');
             isBottomTapPanel();
@@ -168,13 +208,15 @@
         };
 
         function init($container, windowNo, prop) {
-
+            if (self.isLoading) return; // Prevent new fetch if already loading
+            self.isLoading = true;
+            showBusy(true);
             VIS.dataContext.getChatRecords(prop, function (result) {
-
+                self.isLoading = false;
                 var data = JSON.parse(result);
                 //set retrieved chatid in local var
                 self.prop.ChatID = data.chatId;
-                if ((self.isBtmTapPanel && data.subChat.length >= 4 || !self.isBtmTapPanel && data.subChat.length >= 10) && data.subChat.length != data.totalCount) {
+                if (self.isBtmTapPanel && data.subChat.length >= 4 && data.subChat.length != data.totalCount) {
                     $showMoreIcon.show();
                 } else {
                     $showMoreIcon.hide();
@@ -188,15 +230,19 @@
                     //     (Globalize.format(date, 'G', Globalize.cultureSelector));
 
 
-                    var str = '   <div class="vis-chatboxwrap">';
+                    var str = '   <div style="border:none;" class="vis-chatboxwrap">';
 
-                    str += '<div class="vis-chatdetailwrap"><div style="display: flex;">';
-
-                    if (VIS.Application.isRTL) {
-                        str += '<div class="vis-chatimg-wraping">';
+                    /*if (VIS.Application.isRTL) {
+                        str += '<div style="border-radius: 1.75rem; min-width: 48px;" class="vis-chatimgwrap">';
                     }
                     else {
-                        str += '<div class="vis-chatimg-wraping">';
+                        str += '<div style="border-radius: 1.75rem; min-width: 48px;" class="vis-chatimgwrap">';
+                    }*/
+
+                    if (!self.isBtmTapPanel) {
+                        str += '<div style="border-radius: 1.75rem; width:38px;height:38px; min-width: 38px;" class="vis-chatimgwrap">';
+                    } else {
+                        str += '<div style="border-radius: 1.75rem;  min-width: 48px;" class="vis-chatimgwrap">';
                     }
 
                     var ispic = false;
@@ -222,8 +268,11 @@
 
 
                     if (ispic == false) {
-                        str += "<i class='fa fa-user' data-uID='" + data.subChat[chat].AD_User_ID + "'></i></div>";
+                        str += "<i class='fa fa-user' data-uID='" + data.subChat[chat].AD_User_ID + "'></i>";
                     }
+
+                    str += '</div><div class="vis-chatdetailwrap"><div style="display: flex;">';
+
 
                     if (VIS.Application.isRTL) {
                         str += '<span data-uID="' + data.subChat[chat].AD_User_ID + '" class="vis-chatusername">';
@@ -240,25 +289,34 @@
                     }
 
                     if (VIS.Application.isRTL) {
-                        str += '</span><span style="font-size: .75rem; padding-right: 5px;">' + date + '</span></div><div  style="overflow:auto">';
+                        str += '</span></div><div class="vis-chat-textwrap" style="overflow:auto">';
                     }
                     else {
-                        str += '</span><span style="font-size: .75rem; padding-right: 5px;">' + date + '</span></div><div>';
+                        str += '</span></div><div class="vis-chat-textwrap">';
                     }
 
                     //+ '<textarea readonly style="width:640px">' + data[chat].ChatData + '</textarea>'
                     if (VIS.Application.isRTL) {
-                        str += '<span style="font-size: .75rem;padding-right:5px">' + VIS.Utility.encodeText(data.subChat[chat].ChatData) + '</span></div>'
+                        str += '<span style="font-size: .75rem;padding-right:5px">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
                     }
                     else {
-                        str += '<span style="font-size: .75rem;padding-right:5px">' + VIS.Utility.encodeText(data.subChat[chat].ChatData) + '</span></div>'
+                        str += '<span style="font-size: .75rem;padding-right:5px">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
                     }
+
+                    if (VIS.Application.isRTL) {
+                        str += '</span><span class="vis-chat-date">' + date + '</span></div>';
+                    }
+                    else {
+                        str += '</span><span class="vis-chat-date">' + date + '</span></div>';
+                    }
+
                     str += '</div>'
                     str += '            </div>  ';
 
                     htmll += str;
                 }
                 $container.html(htmll);
+                showBusy(false);
             });
 
 

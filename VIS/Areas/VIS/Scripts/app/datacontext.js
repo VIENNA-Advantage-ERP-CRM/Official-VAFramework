@@ -474,6 +474,7 @@
 
                 url: VIS.Application.contextUrl + 'Chat/SaveChat',
                 type: 'POST',
+                asyc:false,
                 dataType: 'Json',
                 data: prop,
                 success: function (data) {
