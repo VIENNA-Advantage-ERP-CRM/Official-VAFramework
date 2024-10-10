@@ -722,7 +722,7 @@
     };
 
     GridTab.prototype.getIsTPBottomShowAll = function () {
-        return this.IsTPBottomShowAll;
+        return this.vo.TabPanelAlignment != "H";
     };
 
 
@@ -1472,9 +1472,9 @@
                 var gridTabPanel = new GridTabPanel(this.gTab._panels[i]);
                 if (gridTabPanel.getIsTPBottomAligned()) {
                     this.tabPanelsBotm.push(gridTabPanel);
-                    if (gridTabPanel.getTabPanelAlignment() == "B") {
-                        this.IsTPBottomShowAll = true;
-                    }
+                    //if (gridTabPanel.getTabPanelAlignment() == "B") {
+                    //    this.IsTPBottomShowAll = true;
+                    //}
                 }
                 else {
                     this.tabPanelsRght.push(gridTabPanel);
@@ -1696,9 +1696,6 @@
         return result;
         // return "";
     };
-
-
-
 
     GridTab.prototype.setTreeNodeID = function (nodeID) {
         this.treeNode_ID = nodeID;
@@ -1964,6 +1961,7 @@
         this.setCurrentRow(row, true);
         return record;
     };
+
     GridTab.prototype.dataRefreshAll = function () {
         /* Query */
         this.mDataStatusEvent = null; //reset 
@@ -1982,7 +1980,6 @@
 
         //log.fine("#" + m_vo.TabNo + "- fini");
     };   //  dataIgnore
-
 
     GridTab.prototype.getLinkWhereClause = function () {
         var where = "";
@@ -2106,9 +2103,6 @@
         this.IsSharedAccess();
         return retValue;
     };
-
-
-
 
     GridTab.prototype.findColumn = function (columnName) {
         return this.gridTable.findColumn(columnName);

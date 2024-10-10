@@ -824,6 +824,9 @@
                     }
                 }
                 $tabPanel.css({ "display": "grid" });
+                if (this.curGC) {
+                    this.curGC.onSizeChanged(true);
+                }
             }
             else {
                 $tabPanel.css({ "display": "none" });
