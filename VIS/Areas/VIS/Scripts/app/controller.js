@@ -456,6 +456,8 @@
         this.depOnFieldColumn = [];
         this.depOnField = []; //Fields against columnname
         this.tabPanels = [];
+        this.tabPanelsRght = [];
+        this.tabPanelsBotm = []; //bottom aligned tab panels
         this.linkColumnName = gTab._linkColumnName;
         this.extendedWhere = gTab._extendedWhere;
         this.keyColumnName = "";
@@ -710,11 +712,17 @@
     };
 
     GridTab.prototype.getIsTPBottomAligned = function () {
-        return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+        // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+        return this.tabPanelsBotm.length>0;
+    };
+
+    GridTab.prototype.getIsShowBothTP = function () {
+        // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+        return this.tabPanelsBotm.length > 0 && this.tabPanelsRght.length > 0;            
     };
 
     GridTab.prototype.getIsTPBottomShowAll = function () {
-        return  this.vo.TabPanelAlignment == "B";
+        return this.vo.TabPanelAlignment != "H";
     };
 
 
@@ -1462,7 +1470,16 @@
             this.hasPanel = true;
             for (var i = 0; i < this.gTab._panels.length; i++) {
                 var gridTabPanel = new GridTabPanel(this.gTab._panels[i]);
-                this.tabPanels.push(gridTabPanel);
+                if (gridTabPanel.getIsTPBottomAligned()) {
+                    this.tabPanelsBotm.push(gridTabPanel);
+                    //if (gridTabPanel.getTabPanelAlignment() == "B") {
+                    //    this.IsTPBottomShowAll = true;
+                    //}
+                }
+                else {
+                    this.tabPanelsRght.push(gridTabPanel);
+                }
+                this.tabPanels.push(gridTabPanel); //all list
             }
         }
         else {
@@ -1529,6 +1546,12 @@
 
     GridTab.prototype.getTabPanels = function () {
         return this.tabPanels;
+    };
+    GridTab.prototype.getTabPanelsBotm = function () {
+        return this.tabPanelsBotm;
+    };
+    GridTab.prototype.getTabPanelsRght = function () {
+        return this.tabPanelsRght;
     };
 
     GridTab.prototype.validateQuery = function (query) {
@@ -1673,9 +1696,6 @@
         return result;
         // return "";
     };
-
-
-
 
     GridTab.prototype.setTreeNodeID = function (nodeID) {
         this.treeNode_ID = nodeID;
@@ -1941,6 +1961,7 @@
         this.setCurrentRow(row, true);
         return record;
     };
+
     GridTab.prototype.dataRefreshAll = function () {
         /* Query */
         this.mDataStatusEvent = null; //reset 
@@ -1959,7 +1980,6 @@
 
         //log.fine("#" + m_vo.TabNo + "- fini");
     };   //  dataIgnore
-
 
     GridTab.prototype.getLinkWhereClause = function () {
         var where = "";
@@ -2083,9 +2103,6 @@
         this.IsSharedAccess();
         return retValue;
     };
-
-
-
 
     GridTab.prototype.findColumn = function (columnName) {
         return this.gridTable.findColumn(columnName);
@@ -7661,6 +7678,13 @@
         return this.vo.ExtraInfo;
     }
 
+    GridTabPanel.prototype.getTabPanelAlignment = function () {
+        return this.vo.TabPanelAlignment;
+    }
+   
+    GridTabPanel.prototype.getIsTPBottomAligned = function () {
+        return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+    };
 
     function DataStatusEvent(source1, totalRows, changed, autoSave, inserting) {
 

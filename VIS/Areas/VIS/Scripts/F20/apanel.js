@@ -147,6 +147,11 @@
         this.excludeFromShare = ['ad_org', 'm_warehouse', 'ad_sharerecordorg'];
         /***END Tab panel**/
 
+        /* reserve pnl for right tab panel */
+        var $divReserveTabPanel = null;
+
+
+
         var tabItems = [], tabLIObj = {};
         this.defaultSearch = true;
         this.isAutoCompleteOpen = false;
@@ -199,6 +204,8 @@
             $divStatus = $root.find(".vis-ad-w-p-status");
 
             $tabPanel = $root.find('.vis-ad-w-p-actionpanel-r');
+
+            $divReserveTabPanel = $root.find('.vis-ad-w-p-actionpanel-r-b');
             /********* END Tab Panels **************/
 
             //Search 
@@ -799,7 +806,7 @@
             var clsName = 'vis-ad-w-p-center-flow-';
             var cls2 = "vis-ad-w-p-actionpanel-";
             if (show) {
-                var tpalign = this.curTab.getIsTPBottomAligned();// && !this.showMultiViewOnly; //only multiview
+                var tpalign =  this.curTab.getIsTPBottomAligned();// && !this.showMultiViewOnly; //only multiview
                 clsSuffix = tpalign ? 'b' : 'r';
                 var clsSuffixOld = tpalign ? 'r' : 'b';
 
@@ -811,14 +818,23 @@
                     $tabPanel.parent().removeClass(clsName + clsSuffixOld).addClass(
                         clsName + clsSuffix);
                 }
-                if (this.curGC)
+                if (this.curGC) {
                     $tabPanel.append(this.curGC.getTabPanel());
+                    if (this.curTab.getIsShowBothTP()) {
+                        $divReserveTabPanel.append(this.curGC.getSpecialTabPanel());
+                        $divReserveTabPanel.css({ "display": "grid" });
+                    }
+                }
                 $tabPanel.css({ "display": "grid" });
+                if (this.curGC) {
+                    this.curGC.onSizeChanged(true);
+                }
             }
             else {
                 $tabPanel.css({ "display": "none" });
                 $tabPanel.parent().removeClass(clsName + 'b').removeClass(
                     clsName + 'r').addClass(clsName + 'r');
+                $divReserveTabPanel.css({ "display": "none" });
             }
         };
 
@@ -2826,10 +2842,10 @@
                         vcf.dispose();
                         curTab.dataRefresh();//DataRefreshRow
                     };
-                    vcf = null;
                 }
                 else {
                     vcf.dispose();
+                    vcf = null;
                 }
                 return;
             }

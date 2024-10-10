@@ -3,7 +3,13 @@
 
     var tmpTabPnl = document.querySelector('#vis-ad-tabpnltmp').content;// $("#vis-ad-windowtmp");
 
-    function VTabPanel(windowNo,wWidth) {
+    function VTabPanel(windowNo, wWidth) {
+
+       // this.defaultObj = null; // it sontain obj if all tab panel is aligned to bootom or right old
+        this.specialObj = null; // it contain right aligmed tab panels ( deafault obj conatin bootom aligned TP)
+
+
+
         this.width = wWidth;
         this.tabPanels = []; //All object
         this.isShowAll = false;
@@ -95,8 +101,7 @@
                 setContent(null);
             }
         };
-
-        this.setSize = function (size,evt) {
+        this.setSize = function (size, evt) {
 
             if (!this.isClosed && size && size > 40) {
                 return;
@@ -104,9 +109,15 @@
             if (size == 0) {
                 size = this.width;
             }
-            var tWidth = $outerwrap.closest('.vis-ad-w-p-center').width() -25;
+            var tWidth = $outerwrap.closest('.vis-ad-w-p-center').width() - 25;
             var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
+
+            if (this.isSpecial) {
+                height = $outerwrap.closest('.vis-ad-w-p-actionpanel-r-b').height();
+            }
+
             this.height = height;
+
 
             if (evt && !evt.isClosed) {
                 //if (this.isHorizontalAligned && !evt.isHorizontal)
@@ -115,8 +126,8 @@
                 //    //height
                 //}
             }
-            
-            if (size && size > 40 && (this.curTabPanel || this.tabPanels.length>0)) {
+
+            if (size && size > 40 && (this.curTabPanel || this.tabPanels.length > 0)) {
 
                 if (this.isHorizontalAligned) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023
 
@@ -150,18 +161,31 @@
                     $divHead.hide();
                 }
                 else { //vertical
-                    
-                    $outerwrap.css({
-                        'height': height + 'px',
-                        'width': size + 'px'
-                    });
+                    if (this.isSpecial) {
+                        $outerwrap.css({
+                            'height': '100%',
+                            'width': size + 'px'
+                        });
 
-                    $divContent.css({
-                        'height': height + 'px',
-                        'width': size - 35 + 'px',
-                        'overflow': 'auto'
-                    });
-                   
+                        $divContent.css({
+                            'height': $outerwrap.height()-35 +'px',
+                            'width': size - 35 + 'px',
+                            'overflow': 'auto'
+                        });
+                    }
+                    else {
+                        $outerwrap.css({
+                            'height': height + 'px',
+                            'width': size + 'px'
+                        });
+
+                        $divContent.css({
+                            'height': height + 'px',
+                            'width': size - 35 + 'px',
+                            'overflow': 'auto'
+                        });
+                    }
+
                     $divHead.show();
                 }
 
@@ -181,8 +205,100 @@
                 $divHead.hide();
                 $divContent.hide();
             }
+
             if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
                 this.sizeChangedListner.onSizeChanged();
+
+            if (this.specialObj) {
+                this.specialObj.refreshSize(evt);
+            }
+            else if (this.isSpecial) {
+                this.parent.refreshSize();
+            }
+
+        };
+
+        this.refreshSize = function (evt) {
+
+            if (this.isClosed) {
+                return;
+            }
+                var    size = this.width;
+            var tWidth = $outerwrap.closest('.vis-ad-w-p-center').width() - 25;
+            var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
+            //if (this.isSpecial) {
+            //    height = $outerwrap.closest('.vis-ad-w-p-actionpanel-r-b').height();
+            //}
+
+            if (this.isHorizontalAligned) { // VIS0228 - for Horizontal as discussed with Mukesh Sir 10/07/2023
+
+                if (!this.isShowAll) {
+                    $outerwrap.css({
+                        'height': '100%',
+                        'width': '100%'
+                    });
+
+                    $divContent.css({
+                        'height': '100%',
+                        'width': tWidth + 'px',
+                        'overflow': 'auto'
+                    });
+                }
+                else { //show all
+                    $outerwrap.css({
+                        'height': 'auto',
+                        'width': '100%'
+                    });
+
+                    $divContent.css({
+                        'height': 'auto',
+                        'width': tWidth + 'px',
+                        'display': 'flex',
+                        'flex-direction': 'column',
+                        'overflow': 'auto'
+                    });
+                }
+
+                $divHead.hide();
+            }
+            else { //vertical
+
+                if (this.isSpecial) {
+                    var hHgt = 0;
+                    if (evt && !evt.isClosed && evt.isHorizontal) {
+                        hHgt = evt.height;
+                    }
+
+
+                    //$outerwrap.css({
+                    //    'height': 'calc(100% - ' + hHgt +' px)',
+                    //    'width': size + 'px'
+                    //});
+
+                    $outerwrap.attr('style', 'height:calc(100% - ' + hHgt + 'px) ; width:'+size+'px');
+
+                    $divContent.css({
+                        'height': $outerwrap.height() - 35 + 'px',
+                        'width': size - 35 + 'px',
+                        'overflow': 'auto'
+                    });
+                }
+                else {
+                    $outerwrap.css({
+                        'height': height + 'px',
+                        'width': size + 'px'
+                    });
+
+                    $divContent.css({
+                        'height': height + 'px',
+                        'width': size - 35 + 'px',
+                        'overflow': 'auto'
+                    });
+                }
+                $divHead.show();
+            }
+
+            $divContent.show();
         };
 
         this.getHeight = function () {
@@ -203,6 +319,8 @@
                     setContent(li);
                 }
             }
+            if (this.specialObj)
+                this.specialObj.setDefaultPanel(name);
         };
 
     }
@@ -211,16 +329,39 @@
      * 
      * @param {any} gTab
      */
-    VTabPanel.prototype.init = function (gTab) {
+    VTabPanel.prototype.init = function (gTab, isSpecial) {
         this.gTab = gTab;
-        this.isHorizontalAligned = this.gTab.getIsTPBottomAligned();
-        var panels = this.gTab.getTabPanels();
-        this.isShowAll = this.gTab.getIsTPBottomShowAll();
-
+        var panels = null;  
+        if (isSpecial) {
+            var panels = this.gTab.getTabPanelsRght();
+            this.isHorizontalAligned = false;
+            this.isShowAll = false;
+            this.isSpecial = true;
+        }
+        else if (gTab.getIsShowBothTP()) {
+            //special
+            this.specialObj = new VTabPanel(this.windowNo, this.width);
+            this.specialObj.addSizeChangeListner(this.sizeChangedListner);
+            this.specialObj.parent = this;
+            this.specialObj.init(gTab, true);
+            
+            this.isHorizontalAligned = true;
+            this.isShowAll = this.gTab.getIsTPBottomShowAll();
+            panels = this.gTab.getTabPanelsBotm();
+        }
+        else if (this.gTab.getTabPanelsRght().length > 0) { //all right
+            this.isHorizontalAligned = false;
+            this.isShowAll = false;
+            panels = this.gTab.getTabPanelsRght();
+        }
+        else if (this.gTab.getTabPanelsBotm().length > 0) {
+            this.isHorizontalAligned = true;
+            this.isShowAll = this.gTab.getIsTPBottomShowAll();
+            panels = this.gTab.getTabPanelsBotm();
+        }
+        var str = [];
         if (!this.isShowAll) { //old
             if (panels && panels.length > 0) {
-                var str = [];
-
                 for (var i = 0; i < panels.length; i++) {
                     var iconPath = '';
                     if (panels[i].getIconPath()) {
@@ -295,6 +436,7 @@
 
     VTabPanel.prototype.addSizeChangeListner = function (lsner) {
         this.sizeChangedListner = lsner;
+        
     };
 
     VTabPanel.prototype.selectTabPanelByName = function (name) {
@@ -356,6 +498,9 @@
 
             }
         }
+        if (this.specialObj) {
+            this.specialObj.refreshPanelData(rec_Id, dataRow, action);
+        }
     };
 
     VTabPanel.prototype.setTabPanelSize = function (size) {
@@ -364,6 +509,16 @@
         }
         this.setSize(size);
     }
+
+    VTabPanel.prototype.getSpecialobj = function () {
+        return this.specialObj;
+    };
+
+    VTabPanel.prototype.detach = function () {
+        this.getRoot().detach();
+        if (this.specialObj)
+            this.specialObj.getRoot().detach();
+    };
 
     VTabPanel.prototype.dispose = function () {
         this.disposeComponent();
@@ -378,6 +533,8 @@
             this.tabPanels[i] = null;
         }
         this.tabPanels = [];
+        if (this.specialObj)
+            this.specialObj.dispose();
     }
 
     VIS.VTabPanel = VTabPanel;
