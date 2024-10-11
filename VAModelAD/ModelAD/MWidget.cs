@@ -39,7 +39,7 @@ namespace VAdvantage.Model
             string oldWidgetID = Util.GetValueOfString(Get_ValueOld("AD_Window_ID"));
             if (!newRecord && oldWidgetID != GetAD_Window_ID())
             {
-                bool IsSingleWindow = !string.IsNullOrEmpty(GetAD_Window_ID()) && !GetAD_Window_ID().Contains(',');
+                //bool IsSingleWindow = !string.IsNullOrEmpty(GetAD_Window_ID()) && !GetAD_Window_ID().Contains(',');
                 string sql = "SELECT AD_WidgetField_ID FROM AD_WidgetField WHERE AD_Widget_ID = " + GetAD_Widget_ID();
                 sql = MRole.GetDefault(GetCtx()).AddAccessSQL(sql, "AD_WidgetField", true, true);
                 DataSet ds = DB.ExecuteDataset(sql);
@@ -49,14 +49,15 @@ namespace VAdvantage.Model
                     {
                         MWidgetField obj = new MWidgetField(GetCtx(), Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WidgetField_ID"]), Get_TrxName());
 
-                        if (IsSingleWindow)
+                      /*  if (IsSingleWindow)
                         {
                             obj.SetIsApplyDataSource(true);
                         }
                         else
                         {
                             obj.SetIsApplyDataSource(false);
-                        }
+                        }*/
+                        obj.SetIsApplyDataSource(false);
                         obj.SetAD_Field_ID(0);
                         obj.SetAD_Tab_ID(0);
                         obj.SetWhereClause("");
