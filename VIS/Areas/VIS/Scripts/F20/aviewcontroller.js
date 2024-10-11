@@ -1910,9 +1910,20 @@
 
         for (var i = 0; i < selIndices.length; i++) {
             var record = records[selIndices[i]];
+            var added = false;
             if ("ad_client_id" in record) {
-                if (!VIS.MRole.getIsClientAccess(record.ad_client_id, true))
+                if (!VIS.MRole.getIsClientAccess(record.ad_client_id, true)) {
                     retIndices.push(selIndices[i]);
+                    added = true;
+                }
+            }
+            //check for filter org
+            if (!added) {
+                var fOrgs = VIS.context.getContext("#AD_FilteredOrg");
+                if ("ad_org_id" in record && fOrgs && fOrgs != "") {
+                    if (fOrgs.split(",").indexOf('0') < 0 && record.ad_org_id == 0)
+                        retIndices.push(selIndices[i]);
+                }
             }
         }
         return retIndices;
