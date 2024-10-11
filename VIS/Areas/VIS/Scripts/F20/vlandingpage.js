@@ -93,7 +93,7 @@
 
         function init() {
             $root.find('.vis-widget-header h4').text(VIS.Msg.getMsg("visWidgets"));
-            $root.find('.vis-landingpageEdit u').text(VIS.Msg.getMsg("VIS_Edit"));
+            //$root.find('.vis-landingpageEdit u').text(VIS.Msg.getMsg("VIS_Edit"));
             $spnTitle = $root.find('.vis-ad-w-p-t-name h5');
             $busy = $root.find('.vis-ad-w-p-busy');
             $widgetBody = $root.find('.vis-landingpage-body');
@@ -180,7 +180,7 @@
                 apanel.$parentWindow.dispose(); //dispose
             });
 
-            openRightPanel.add($btnlandingpageEdit.find('u')).on('click', function () {
+            openRightPanel.add($btnlandingpageEdit.find('i')).on('click', function () {
                 var leftPanelWidth = '70%';
                 isChanged = false;
                 $leftPanel.animate({
@@ -512,7 +512,7 @@
                     }
 
 
-                    var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img + '</div><div class="vis-widgetSize" title="' + result[i].DisplayName + '" ><span class="vis-dotdot">' + result[i].DisplayName + '</span><span style="display:block">' + (result[i].Cols || 1) + 'X' + (result[i].Rows || 1) + '</span></div></div>');
+                    var witem = $('<div class="vis-widgetDrag-item" data-type="' + result[i].Type + '" data-keyid="' + itm.KeyID + '"><div class="vis-imgsec">' + img + '</div><span style="display:block" class="vis-widgetSizeValue">' + (result[i].Cols || 1) + 'X' + (result[i].Rows || 1) + '</span><div class="vis-widgetSize" title="' + result[i].DisplayName + '" ><span class="vis-dotdot2">' + result[i].DisplayName + '</span></div></div>');
                     $root.find('.vis-widgetDrag-container:last').append(witem);
                 }
 

@@ -4181,6 +4181,13 @@ table.fixed-header thead tr {
     background-size: 18px 18px;
     animation: viswidget_l 1.5s infinite cubic-bezier(0.3,1,0,1);
 }
+.multiselect-selected-text {
+    font-size: 14px;
+}
+
+.multiselect-container{
+    width:100%;
+}
 
 @keyframes viswidget_l {
     0% {

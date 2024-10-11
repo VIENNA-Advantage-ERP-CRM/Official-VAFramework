@@ -39,7 +39,7 @@
             caption: "",
             sortable: false,
             render: function (record) {
-                return '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/base/pencil.png"  />';
+                return '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/base/pencil.png"/>';
             },
             size: '25px'
         };
