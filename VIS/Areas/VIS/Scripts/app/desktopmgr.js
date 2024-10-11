@@ -368,7 +368,7 @@
                 showMenu(); // show the menu
             });
 
-            $showFav.on("click", function () {
+            $showFav.on("click", function (event) {
                 event.preventDefault();
                 if ($favContainer.css("display") == "block") {
                     $favContainer.attr('style', 'display: none !important');
@@ -455,6 +455,24 @@
                     return;
                 }
             });
+
+            setTimeout(function () {
+                const DEFAULTMENUITEM = VIS.context.ctx['#DEFAULT_MENU_ITEM'];
+                if (DEFAULTMENUITEM) {
+                    var pairs = DEFAULTMENUITEM.split(',');
+                    var result = pairs.find(function (pair) {
+                        return pair.split(':')[0] == $('#vis_home_role').val(); // Check if the part before the colon matches the id
+                    });
+
+                    if (result) {
+                        $vis_mainMenu.find('[data-value="' + result.split(':')[1] + '"]').click();
+                    }
+
+                }
+            }, 500);
+
+            
+
         };
 
         function bindScrollMenuEvents(bind) {
@@ -1083,6 +1101,17 @@
             lstOrgs.multiselect('deselectAll');
             lstOrgs.multiselect('select', arrVal);
 
+
+            setTimeout(function () {
+                var $dropdownMenu = $('.multiselect-container');
+                var $selectedOption = $dropdownMenu.find('.dropdown-item.active:first');
+                if ($selectedOption.length > 0) {
+                    $dropdownMenu.scrollTop(
+                        $selectedOption.position().top + $dropdownMenu.scrollTop() - $dropdownMenu.height() / 2
+                    );
+                }
+            },500)
+
         }
 
         function resetOrgFiletr(data, isSelect) {
@@ -1097,6 +1126,8 @@
 
                 lstOrgs.multiselect('rebuild');
                 chkFilter.prop('checked', false);
+            } else {
+                chkFilter.prop('checked', true);
             }
             lstOrgs.multiselect('deselectAll');
             lstOrgs.multiselect('select', [cmbOrg.val()]);

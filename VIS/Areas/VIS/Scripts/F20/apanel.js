@@ -2839,8 +2839,9 @@
                 if (vcf.isInitOK()) {
                     vcf.showDialog();
                     vcf.onClose = function (value) {
-                        vcf.dispose();
                         curTab.dataRefresh();//DataRefreshRow
+                        vcf.dispose();
+                        vcf = null;
                     };
                 }
                 else {

@@ -1,7 +1,7 @@
 ﻿
 /*rtl css Start here*/
 html[dir="rtl"] * {
-    text-align: right;
+    text-align: right !important;
 }
 html[dir="rtl"] .VIS-AMTD-MainContent .VIS_Pref_btn-2,
 html[dir="rtl"] .pull-right,
@@ -455,7 +455,7 @@ html[dir="rtl"] .vis-archive-sb-t-button {
     transform: rotate(180deg);
 }
 html[dir="rtl"] .vis-control-wrap > button {
-    text-align: center;
+    text-align: center !important;
 }
 html[dir="rtl"] .vis-ad-w-p-tb-search span:first-child i,
 html[dir="rtl"] .vis-menuSearch a.fa-search,
@@ -966,7 +966,29 @@ html[dir=rtl] .vis_nm_topFavIco {
 }
 
 html[dir=rtl] .vis_home-total-count {
-    text-align: center;
+    text-align: center !important;
+    left: -10px;
+    right:unset;
 }
 
-/*rtl css End here*/
+html[dir=rtl] .VIS-nm-opt-link {
+    margin: 5px 0px 2px 2px !important;
+}
+
+html[dir=rtl] .VIS-nm-dasboard-search .fa-search {
+    right: 15px;
+}
+
+html[dir=rtl] .VIS-nm-dasboard-search input {
+    padding: 4px 34px 4px 12px;
+}
+
+html[dir=rtl] .multiselect-container .multiselect-option .form-check {
+    padding: 0 20px 0 5px;
+}
+
+html[dir=rtl] .form-check-input {
+    margin-left: unset;
+    margin-right: -1.25rem;
+}
+    /*rtl css End here*/

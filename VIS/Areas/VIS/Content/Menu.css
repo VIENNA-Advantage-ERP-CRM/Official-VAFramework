@@ -457,7 +457,7 @@ nav.vis-nav-horizontal-scroll {
     .vis-subnav-content::before {
         content: " ";
         display: block;
-        height: 14px;
+        height: 5px;
         background-color: #ffffff;
         position: absolute;
         top: 0;
