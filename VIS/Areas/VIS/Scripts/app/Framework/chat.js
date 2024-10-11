@@ -20,7 +20,7 @@
         this.windowNo = 0;
         this.pageSize = 10;
         this.isBtmTapPanel = false;
-        this.isLoading = false;
+       // this.isLoading = false;
 
 
         function showBusy(show) {
@@ -71,11 +71,13 @@
 
         setTimeout(function () {
             const onScroll = throttle(function () {
-                if ($maindiv.parent().scrollTop() + $maindiv.parent().height() >= $maindiv.height() - 50) {
-                    if (self.prop) {
-                        self.prop.pageSize += 10;
-                        showBusy(true);
-                        init($div, self.windowNo, self.prop);
+                if ($maindiv != null) {
+                    if ($maindiv.parent().scrollTop() + $maindiv.parent().height() >= $maindiv.height() - 50) {
+                        if (self.prop) {
+                            self.prop.pageSize += 10;
+                            showBusy(true);
+                            init($div, self.windowNo, self.prop);
+                        }
                     }
                 }
             }, 200); // adjust the wait time as needed
@@ -208,11 +210,11 @@
         };
 
         function init($container, windowNo, prop) {
-            if (self.isLoading) return; // Prevent new fetch if already loading
-            self.isLoading = true;
+            //if (self.isLoading) return; // Prevent new fetch if already loading
+            //self.isLoading = true;
             showBusy(true);
             VIS.dataContext.getChatRecords(prop, function (result) {
-                self.isLoading = false;
+                //self.isLoading = false;
                 var data = JSON.parse(result);
                 //set retrieved chatid in local var
                 self.prop.ChatID = data.chatId;
@@ -345,6 +347,9 @@
             }
             self.prop.ChatText = text;
             VIS.dataContext.saveChat(self.prop);
+            if (ch != null) {
+                ch.close();
+            }
         }
 
     };

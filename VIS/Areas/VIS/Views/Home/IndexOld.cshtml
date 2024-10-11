@@ -176,13 +176,13 @@
                     
     <footer>
         @*taskbar div*@
-        <div class="vis-footer">
-            <div class="vis-taskbar-left">
-                <ul id="vis_taskbar" class="vis-taskbar">
-                    <li id="vis_lhome" style="display: none">
-                        <img src="~/Areas/VIS/Images/base/icon-home.png" style="vertical-align: text-top;" />
-                        <a>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Home")</a>
-                    </li>
+        <div class="vis-footer">       
+            <div class="vis-taskbar-left">                
+                <ul id="vis_taskbar" class="vis-taskbar" style="padding-left: 75px;">
+                    <li id="vis_lhome" style="display: none; position: absolute; left: 0;">
+                  <img src="~/Areas/VIS/Images/base/icon-home.png" style="vertical-align: text-top;" />
+                   <a>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Home")</a>
+                 </li>
                     |
                 </ul>
             </div>
