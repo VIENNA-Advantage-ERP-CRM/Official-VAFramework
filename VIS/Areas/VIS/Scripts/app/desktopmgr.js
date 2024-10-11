@@ -947,7 +947,7 @@
 
         var form, cmbRole, hidRoleName, hidClientName, cmbClient, cmbOrg, hidOrgName, cmbWare, hidWareName, liUserName;
         var root, btnClose, btnChange;
-        var orgRoleVal, orgClientHtml, orgOrgHtml, orgWareHtml, wareHouseId;
+        var orgRoleVal, orgClientHtml, orgOrgHtml, orgWareHtml, wareHouseId, orgFilterHtml;
         var changed = false, setting = false;
         var contextUrl = "";
         var lstOrgs, hFilterOrg, chkFilter;
@@ -997,6 +997,7 @@
             orgClientHtml = cmbClient.html();
             orgOrgHtml = cmbOrg.html();
             orgWareHtml = cmbWare.html();
+            orgFilterHtml = lstOrgs.html();
 
             lstOrgs.multiselect({
                 disableIfEmpty: true,
@@ -1144,7 +1145,8 @@
             if (wareHouseId.val() == "-1") {
                 cmbWare.val(null);
             }
-
+            lstOrgs.html(orgFilterHtml);
+            lstOrgs.multiselect('rebuild');
             setFilterOrg()//reset multiselect
 
             btnChange.prop("disabled", true);
