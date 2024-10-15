@@ -3795,7 +3795,7 @@
         }
         
         
-        if (!isAPanelTab && this.curGC.getIsSingleRow()) {
+        if (this.curGC.getIsSingleRow()) {
             this.isHideFilterIcon(true);
             this.startFilterPanel(true);
         } else {
