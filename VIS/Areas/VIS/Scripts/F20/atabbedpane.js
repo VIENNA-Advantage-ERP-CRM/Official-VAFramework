@@ -126,17 +126,21 @@ VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
     var newGC = null;
 
     if (oldGC instanceof VIS.GridController) {
-        newGC = oldGC; 
+        newGC = oldGC;
         var display = newGC.getIsDisplayed(); // if tab is not displayed
         if (!display) {
             //VLogger.Get().Info("Not displayed - " + newGC.ToString());
             return false;
         }
     }
+    else if (oldGC instanceof VIS.VSortTab) {
+        newGC = oldGC;
+    }
+
 
     if (newGC != null && oldIndex >= 0 && index != oldIndex) {
         var oldGC = this.Items[oldIndex];//.Controls[0];
-        if (oldGC != null && (oldGC instanceof VIS.GridController)) {
+        if (oldGC != null) /* && (oldGC instanceof VIS.GridController))*/ {
 
             /* check for tab Level of tab */
             if (newGC.getTabLevel() > oldGC.getTabLevel() + 1) {
@@ -144,24 +148,24 @@ VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
                 for (var i = index - 1; i >= 0; i--) {
                     var rightC = this.Items[i];// .Controls[0];// getComponentAt(i);
                     var rightGC = null;
-                    if (rightC instanceof VIS.GridController) {
+                    //if (rightC instanceof VIS.GridController) {
                         rightGC = rightC;
                         if (rightGC.getTabLevel() == oldGC.getTabLevel() + 1) {
                             VIS.ADialog.warn("TabSwitchJumpGo", true, "", rightGC.getTitle());
                             return false;;
                         }
-                    }
+                    //}
                 }
                 VIS.ADialog.warn("TabSwitchJump");
                 return false;
             }
-            oldGC.setMnemonics(false);
+            //oldGC.setMnemonics(false);
         }
     }
     //	Switch
-    if (newGC != null) {
-        newGC.setMnemonics(true);
-    }
+    //if (newGC != null) {
+    //    //newGC.setMnemonics(true);
+    //}
 
     this.oldLastTabIndex = this.oldTabIndex;
     this.oldTabIndex = index;
