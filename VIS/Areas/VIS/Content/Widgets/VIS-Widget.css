@@ -373,6 +373,7 @@
 .divWorkflowActivity {
     height: calc(100% - 3.125em);
     overflow-y: auto;
+    padding-right:5px;
 }
 
 .vis-w-workflowActivityDetails {
@@ -1205,6 +1206,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-a-actionsWidgetCls .vis-w-feedicon {
     /*display: block;*/
     display: flex !important;
+    cursor:pointer;
 }
 
 @media screen and (max-width: 2000px) {

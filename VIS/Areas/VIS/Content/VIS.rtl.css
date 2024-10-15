@@ -977,6 +977,7 @@ html[dir=rtl] .VIS-nm-opt-link {
 
 html[dir=rtl] .VIS-nm-dasboard-search .fa-search {
     right: 15px;
+    width:fit-content;
 }
 
 html[dir=rtl] .VIS-nm-dasboard-search input {

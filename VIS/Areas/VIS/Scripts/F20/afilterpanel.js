@@ -777,7 +777,7 @@
 
             var filterClause = self.getFilterClause();
 
-            if (filterClause == "") {
+            if (filterClause === "") {
                 VIS.ADialog.error("", true, VIS.Msg.getMsg("SelectAtleastOneColumn"));
                 return;
             }
@@ -1411,7 +1411,7 @@
                 // set operator (sign)
                 var opValue = cmbOp.val();
                 var v = getControlValue(true);
-                if (v == null || v == undefined || v == "") {
+                if (v == null || v == undefined || v === "") {
                     VIS.ADialog.error("VISQueryValueCantNull");
                     return;
                 }
@@ -1711,8 +1711,12 @@
 
     FilterPanel.prototype.init = function () {
 
-        if (this.initialzed)
+        if (this.initialzed) {
+            this.cmbTabs.val(this.cmbTabs.find('option[tabid="' + this.curTab.getAD_Tab_ID() + '"]').val());
+            this.cmbTabs.click();
             return;
+        }
+           
 
         this.curTab = this.curGC.getMTab();
 
@@ -2043,7 +2047,7 @@
         var isText = VIS.DisplayType.IsText(field.getDisplayType()) || VIS.DisplayType.List == field.getDisplayType() || VIS.DisplayType.YesNo == field.getDisplayType();
 
         if (value != null && value.length > 0 && isText) {
-            if (optr == VIS.Query.prototype.LIKE) {
+            if (optr == VIS.Query.prototype.LIKE || optr == VIS.Query.prototype.NOT_LIKE) {
                 value = '%' + value + '%';
             } 
         }
