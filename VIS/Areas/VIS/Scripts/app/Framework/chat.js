@@ -8,18 +8,21 @@
         var $div = $('<div class="vis-chatdetailouterwrap"></div>');
         var $inputChat = $('<div class="d-flex flex-column vis-chatBoxInputWrap ">');
         var $textArea = $('<div><textarea  id="chatBox_textArea" rows="1" class="vis-chat-msgbox" /></textarea></div>');
-        var $sendIcon = $('<div><button class="pull-right"><i id="chatBox_sendicon"class="fa fa-paper-plane"></i></button></div>');
+        var $sendIconDiv = $('<div>');
+        var $sendIconButton = $('<button id="chatBox_sendicon" class="pull-right"><i class="fa fa-paper-plane"></i></button>');
         var $showMoreIcon = $('<div class="vis-chat-showmore" style="display:none"><a class="vis-chat-arrowdown">' + VIS.Msg.getMsg("ShowMore") + '</a></div>');
-        var $bsyDiv = $('<div id="chatBusyDiv" style="width:90%;" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id"'
+        var $bsyDiv = $('<div id="chatBusyDiv" style="width:90%; display:none;" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id"'
             + ' class= "vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div ></div> ');
         //  var $buttonsdiv = $('<div style="overflow:auto"></div>');
         // var $btnOK = $('<button>');
         // var $btnCancel = $('<button>');
-        $inputChat.append($textArea).append($sendIcon);
+        $sendIconDiv.append($sendIconButton);
+        $inputChat.append($textArea).append($sendIconDiv);
         $maindiv.append($inputChat).append($div).append($bsyDiv);//.append($buttonsdiv); //ui
         this.windowNo = 0;
         this.pageSize = 10;
         this.isBtmTapPanel = false;
+        this.record_ID = record_id;
        // this.isLoading = false;
 
 
@@ -42,7 +45,7 @@
         //events();
 
 
-        $sendIcon.find('#chatBox_sendicon').on(VIS.Events.onTouchStartOrClick, function (e) {
+        $sendIconButton.on(VIS.Events.onTouchStartOrClick, function (e) {
             triggerSave(e);
         });
 
@@ -139,8 +142,8 @@
                 self.dispose();
             };
             ch.show();
-            events();
-            //ch.hidebuttons();
+           // events();
+            ch.hidebuttons();
         };
 
         this.dispose = function () {
@@ -151,6 +154,7 @@
 
             ch = null;
             self = null;
+            
 
         };
 
@@ -343,6 +347,7 @@
                 /* if (e != undefined) {
                      e.preventDefault();
                  }*/
+                showBusy(false);
                 return false;
             }
             self.prop.ChatText = text;
@@ -374,7 +379,6 @@
             this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
             this.initializeComponent(this.windowNo, this.prop);
         }
-
         // this.update(recordID);
     };
 
