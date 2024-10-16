@@ -15,14 +15,12 @@
         var $bsyDiv;
         var $self = this;
         var $root = $('<div class="h-100 w-100">');
+        this.log = VIS.Logging.VLogger.getVLogger("VIS_DownloadFile");
         var widgetID = 0;
         var templateExcelDetailLink;
         var formDialog;
         var excelItemDiv = null;
         var excelItem = null;
-        var ctx = VIS.Env.getCtx();
-        var elements = ["VIS_NoDataFound", "VIS_TemplateExcelDetails"];
-        VIS.DownloadFile = VIS.Msg.translate(ctx, elements, true);
 
         // Initialize UI Elements
         this.load = function () {
@@ -31,9 +29,7 @@
             $root.append(excelItemDiv);
             createBusyIndicator();
             setBusy(true);
-            setTimeout(function () {
-                $self.templateExcelData();
-            }, 2000);
+            $self.templateExcelData();
         }
 
         this.initalize = function () {
@@ -42,7 +38,7 @@
             widgetID = (VIS.Utility.Util.getValueOfInt(this.widgetInfo.AD_UserHomeWidgetID) != 0 ? this.widgetInfo.AD_UserHomeWidgetID : $self.windowNo);
             $root.append('<div class="VIS-template-excel-container" id=' + widgetID +'>' +
                 '<div class="VIS-template-excel-block">' +
-                '<h6>' + VIS.DownloadFile.VIS_TemplateExcelDetails +'</h6>' +
+                '<h6>' + VIS.Msg.getMsg("VIS_TemplateExcelDetails") +'</h6>' +
                 '</div>' +
                 '</div>');
             templateExcelDetailLink = $root.find('h6');
@@ -124,7 +120,7 @@
             formDialog = ch;
             ch.setHeight(300);
             ch.setWidth(500);
-            ch.setTitle(VIS.DownloadFile.VIS_TemplateExcelDetails);
+            ch.setTitle(VIS.Msg.getMsg("VIS_TemplateExcelDetails"));
             ch.setContent($root); //set the content
             ch.show();
             ch.hideButtons();
