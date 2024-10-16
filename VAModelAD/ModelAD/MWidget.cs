@@ -61,6 +61,8 @@ namespace VAdvantage.Model
                         obj.SetAD_Field_ID(0);
                         obj.SetAD_Tab_ID(0);
                         obj.SetWhereClause("");
+                        obj.SetSuffix("");
+                        obj.SetPrefix("");                       
                         obj.Save();
                     }
 
