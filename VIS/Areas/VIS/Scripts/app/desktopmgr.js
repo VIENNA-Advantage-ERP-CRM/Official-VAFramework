@@ -1072,6 +1072,7 @@
                             var a = JSON.parse(res);
                             imgConatiner.find('img').remove();
                             imgConatiner.append('<img id="vis_imguserImage" src="data:image/jpg;base64,' + a + '" alt="profile image"></img>');
+                            $('#vis_userDisplayName .vis-app-user-img-wrap img').attr("src", 'data:image/jpg;base64,' + a);
                         }, false);
                     }
                 });
