@@ -15,6 +15,7 @@ using VAdvantage.Logging;
 using VAdvantage.Utility;
 using VAdvantage.Classes;
 using VAModelAD.Model;
+using PdfSharp.Pdf;
 
 namespace VAdvantage.Controller
 {
@@ -109,6 +110,8 @@ namespace VAdvantage.Controller
         /****   Has tab Panels   ***/
         public bool HasPanels = false;
 
+        
+
         /****   Is Header Panel   ***/
         public bool IsHeaderPanel = false;
 
@@ -146,7 +149,7 @@ namespace VAdvantage.Controller
         /****   Header Items   ***/
         public List<HeaderPanelGrid> HeaderItems = null;
 
-        public string TabPanelAlignment = "V";
+        public string TabPanelAlignment = "V"; 
 
         // Maintain versions on approval // for Master data Versioning
         public bool MaintainVerOnApproval = false;
@@ -180,6 +183,10 @@ namespace VAdvantage.Controller
         //Hide field group from (number)
         public Int16 HideFieldGroupFrom = 0;
         public bool IsHideVerNewRecord = false;
+
+
+        
+
 
         public string SelectSQL
         {
@@ -660,8 +667,8 @@ namespace VAdvantage.Controller
                         mTabVO.panels.Add(voF);
                     }
                 }
-
                 dr.Close();
+
                 param = null;
             }
             catch (Exception e)
@@ -991,6 +998,7 @@ namespace VAdvantage.Controller
             clone.panels = new List<GridTabPanelVO>();
             if (panels != null)
             {
+               
                 for (int i = 0; i < panels.Count; i++)
                 {
                     GridTabPanelVO tpo = panels[i];
@@ -998,6 +1006,7 @@ namespace VAdvantage.Controller
                     if (clonetp == null)
                         return null;
                     clone.panels.Add(clonetp);
+
                 }
             }
             if (clone.panels != null && clone.panels.Count > 0)

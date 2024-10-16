@@ -39,7 +39,7 @@
             caption: "",
             sortable: false,
             render: function (record) {
-                return '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/base/pencil.png"  />';
+                return '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/base/pencil.png"/>';
             },
             size: '25px'
         };
@@ -341,7 +341,8 @@
                 if (ii != null && ii !== "")
                     AD_Client_ID = VIS.Utility.Util.getValueOfInt(ii);
             }
-            var AD_Org_ID = 0;
+            
+            var AD_Org_ID = -1;
             if (typeof self.indexOrgColumn != "undefined" && self.indexOrgColumn != -1) {
                 var ii = self.grid.getCellValue(row, self.indexOrgColumn);
                 if (ii != null && ii !== "")
@@ -353,7 +354,9 @@
                 if (ii != null && ii !== "")
                     Record_ID = VIS.Utility.Util.getValueOfInt(ii);
             }
-
+            if (AD_Client_ID == -1 && self.mTab.getTableName() == "AD_Client") {
+                AD_Client_ID = Record_ID;
+            }
             return [AD_Client_ID, AD_Org_ID, Record_ID];
         };
 

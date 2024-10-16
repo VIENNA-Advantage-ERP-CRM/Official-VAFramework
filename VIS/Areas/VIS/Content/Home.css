@@ -3685,6 +3685,17 @@ ul.vis-userLinks-ListMenu li a i {
     background-color: rgba(var(--v-c-on-secondary), .08);
 }
 
+.vis-widgetSizeValue {
+    background-color: #000000;
+    color: #fff;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0px 5px;
+    border-radius: 0 5px 0 0;
+    font-size: 85%;
+}
+
 .vis-widgetImg {
     height: 100%;
     object-fit: contain;
@@ -3827,6 +3838,16 @@ ul.vis-userLinks-ListMenu li a i {
     white-space: nowrap;
     text-overflow: ellipsis;
     width: 100%;
+}
+
+.vis-dotdot2 {
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size:95%;
 }
 
 #vis_editHome{

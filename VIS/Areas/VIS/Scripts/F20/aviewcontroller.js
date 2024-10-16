@@ -495,6 +495,10 @@
         return this.vTabPanel.getRoot();
     };
 
+    VIS.GridController.prototype.getSpecialTabPanel = function () {
+        return this.vTabPanel.getSpecialobj().getRoot();
+    };
+
 
     VIS.GridController.prototype.getFilterPanel = function () {
         return this.aFilterPanel.getRoot();
@@ -504,7 +508,7 @@
         var gc = this.aPanel.curGC;
 
         if (resize && gc.vTabPanel) {
-            gc.vTabPanel.setSize(0);
+            gc.vTabPanel.setSize(0, resize);
         }
         gc.multiRowResize();
         if (gc.vIncludedGC) {
@@ -833,7 +837,7 @@
         j = null;
 
         if (this.vTabPanel) {
-            this.vTabPanel.getRoot().detach();
+            this.vTabPanel.detach();
         }
         if (this.aFilterPanel) {
             this.aFilterPanel.getRoot().detach();
@@ -1906,9 +1910,20 @@
 
         for (var i = 0; i < selIndices.length; i++) {
             var record = records[selIndices[i]];
+            var added = false;
             if ("ad_client_id" in record) {
-                if (!VIS.MRole.getIsClientAccess(record.ad_client_id, true))
+                if (!VIS.MRole.getIsClientAccess(record.ad_client_id, true)) {
                     retIndices.push(selIndices[i]);
+                    added = true;
+                }
+            }
+            //check for filter org
+            if (!added) {
+                var fOrgs = VIS.context.getContext("#AD_FilteredOrg");
+                if ("ad_org_id" in record && fOrgs && fOrgs != "") {
+                    if (fOrgs.split(",").indexOf('0') < 0 && record.ad_org_id == 0)
+                        retIndices.push(selIndices[i]);
+                }
             }
         }
         return retIndices;
