@@ -112,6 +112,9 @@
     <Reference Include="itextsharp">
       <HintPath>..\ViennaAdvantageWeb\Dll\itextsharp.dll</HintPath>
     </Reference>
+    <Reference Include="MarketSvc">
+      <HintPath>..\ViennaAdvantageWeb\DLL\MarketSvc.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="ModelLibrary, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -210,6 +213,7 @@
     <Content Include="Areas\VIS\Content\RecordAccessDialog.css" />
     <Content Include="Areas\VIS\Content\ReportStyle.css" />
     <Content Include="Areas\VIS\Content\Site.css" />
+    <Content Include="Areas\VIS\Content\src\VISTemplateExcel.css" />
     <Content Include="Areas\VIS\Content\Style.css" />
     <Content Include="Areas\VIS\Content\SurveyTabPanel.css" />
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
@@ -760,7 +764,10 @@
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
+    <Content Include="Areas\VIS\Scripts\src\VISTemplateExcelFormByDialog.js" />
+    <Content Include="Areas\VIS\Scripts\src\VISTemplateExcel.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\bipanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\HistoryDetailsTabPanel.js" />
@@ -824,6 +831,7 @@
     <Compile Include="Areas\VIS\Controllers\TabPanel\BiPanelController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\HistoryDetailsDataController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\SurveyPanelController.cs" />
+    <Compile Include="Areas\VIS\Controllers\TemplateExcelController.cs" />
     <Compile Include="Areas\VIS\Controllers\ThemeController.cs" />
     <Compile Include="Areas\VIS\Controllers\TreeMaintenanceController.cs" />
     <Compile Include="Areas\VIS\Controllers\UserPreferenceController.cs" />
@@ -849,6 +857,7 @@
     <Compile Include="Areas\VIS\Models\GmailContactsSettings.cs" />
     <Compile Include="Areas\VIS\Models\HistoryDetailsDataModel.cs" />
     <Compile Include="Areas\VIS\Models\SurveyPanelModel.cs" />
+    <Compile Include="Areas\VIS\Models\TemplateExcel.cs" />
     <Compile Include="Areas\VIS\Models\TreeMaintenanceModel.cs" />
     <Compile Include="Areas\VIS\Models\UserPreferenceModel.cs" />
     <Compile Include="Areas\VIS\Models\VImageModel.cs" />

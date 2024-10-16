@@ -107,3 +107,4 @@ import "../widgets/NoticeWidget";
 import "../widgets/RequestWidget";
 import "../widgets/ActionsWidget";
 import "../widgets/dynamicWidget.js";
+import "../widgets/VISDownloadFile.js";

@@ -1,0 +1,39 @@
+﻿.VIS-template-excel-block {
+    padding: 10px;
+}
+
+    .VIS-template-excel-block h6 {
+        cursor: pointer;
+    }
+
+        .VIS-template-excel-block h6:hover {
+            text-decoration: underline;
+        }
+.VIS-excelItemsBlock {
+    padding: 5px 4px;
+}
+
+.VIS-excelItem {
+    border: 1px solid rgba(var(--v-c-secondary), 1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+    .VIS-excelItem:last-child{
+        margin-bottom: 0px;
+    }
+    button.VIS-excelDownloadBtn {
+        background: none;
+        border: none;
+        padding: 0;
+        transition: all 0.3s ease-in-out;
+    }
+    button.VIS-excelDownloadBtn:hover {
+        color: rgba(var(--v-c-primary), 1);
+    }
+.ui-widget.ui-widget-content .VIS-excelItemsBlock button:focus {
+    box-shadow: none !important;
+}
