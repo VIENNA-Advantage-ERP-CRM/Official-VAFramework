@@ -19,7 +19,7 @@ namespace VAdvantage.Model
     public class MSeries : X_D_Series
     {
         private string calcBasis = "V"; // defaulted to Variable
-
+        private string Consolidate = "N";
         private static VLogger s_log = VLogger.GetVLogger(typeof(MSeries).FullName);
 
         /// <summary>
@@ -494,6 +494,7 @@ namespace VAdvantage.Model
 
         public string GetSql(bool isFiltered, string specialWhere, Ctx _Ctx)
         {
+
             StringBuilder sb = new StringBuilder("SELECT ");    //start the SELECT QUERY
             MTable m_Table = null;// MTable.Get(GetCtx(), GetAD_Table_ID());
             //get the table name
@@ -611,7 +612,8 @@ namespace VAdvantage.Model
                 if (!string.IsNullOrEmpty(specialWhere))
                 {
                     //  sb.Append(" ").Append(" AND " + specialWhere);
-                    string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(sb.ToString(), s_tableName, false, true);
+                    //string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(sb.ToString(), s_tableName, false, true);
+                    string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(sb.ToString(), s_tableName, false, false);
                     sb.Clear().Append(sbval);
                     /*   if (IsList_X())
                        {
@@ -729,7 +731,31 @@ namespace VAdvantage.Model
                         .Append(SPACE + "ColY");
 
                 unionTableQuery.Append(" FROM(");
-                unionTableQuery.Append(GetUnionQuery(m_date_1, m_date_2, m_colX, "0 " + m_colY));
+                calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
+                string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE C.D_Chart_ID=" + GetD_Chart_ID();
+                DataSet dsw = DB.ExecuteDataset(Consolidated);
+
+                if (dsw != null && dsw.Tables.Count > 0 && dsw.Tables[0].Rows.Count > 0)
+                {
+                    Consolidate = dsw.Tables[0].Rows[0]["VADB_Consolidate"].ToString();
+                }
+                if (calcBasis == "I" || calcBasis == "F")
+                {
+                    // unionTableQuery.Append(GetUnionFinancial(m_date1, m_date2, m_colX, "0 " + m_colY));
+                    if (Consolidate == "Y")
+                    {
+                        unionTableQuery.Append(GetUnionFinancial(m_date1, m_date2, m_colX, "0 " + m_colY, true));
+                    }
+                    else
+                    {
+                        unionTableQuery.Append(GetUnionFinancial(m_date1, m_date2, m_colX, "0 " + m_colY, false));
+                    }
+                }
+                else
+                {
+                    unionTableQuery.Append(GetUnionQuery(m_date_1, m_date_2, m_colX, "0 " + m_colY));
+                }
+
                 //UNION
                 unionTableQuery.Append(" UNION ALL ");
 
@@ -921,6 +947,34 @@ namespace VAdvantage.Model
             return sb.ToString();
         }
 
+        private string GetUnionFinancial(string m_date1, string m_date2, string colName, string function, bool Consolidate)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (DB.IsPostgreSQL())
+            {
+                sb.Append(@" SELECT " + colName + @", " + function + @" FROM
+                    GENERATE_SERIES(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), TO_DATE('" + m_date2 + "', 'MM/DD/YYYY'), INTERVAL '1 day') AS " + colName + @"
+                    WHERE " + colName + @" > DATE '0001-01-01' GROUP BY " + colName);
+            }
+            else
+            {
+                sb.Append(@" SELECT dates." + colName + "," + function + @" FROM (SELECT ADD_MONTHS(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), LEVEL - 1) AS " + colName + " FROM dual" +
+                " CONNECT BY  LEVEL <= MONTHS_BETWEEN(");
+                if (Consolidate)
+                {
+                    sb.Append(" TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), ");
+                }
+                else
+                {
+                    sb.Append(" TO_DATE('" + m_date2 + "', 'MM/DD/YYYY'),");
+                }
+                sb.Append("TO_DATE('" + m_date1 + "', 'MM/DD/YYYY')) + 1) dates" +
+                " WHERE dates ." + colName + " > TO_DATE('01/01/0001', 'MM/DD/YYYY')   " +
+                " GROUP BY   dates." + colName);
+            }
+            return sb.ToString();
+        }
+
 
         /// <summary>
         /// Get Union Query for Gap filling
@@ -985,6 +1039,14 @@ namespace VAdvantage.Model
         /// <returns>SQL Query with date function</returns>
         public string ApplyDateFunction(string colName)
         {
+            calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
+            string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE C.D_Chart_ID=" + GetD_Chart_ID();
+            DataSet dsw = DB.ExecuteDataset(Consolidated);
+
+            if (dsw != null && dsw.Tables.Count > 0 && dsw.Tables[0].Rows.Count > 0)
+            {
+                Consolidate = dsw.Tables[0].Rows[0]["VADB_Consolidate"].ToString();
+            }
             //currently 3 types of date types are supported : daily, monthly, yearly
             string s_reportType = this.GetDateTimeTypes();
             StringBuilder sb = new StringBuilder("trim(to_char(").Append(colName);
@@ -992,9 +1054,28 @@ namespace VAdvantage.Model
             if (s_reportType.Equals("D") || s_reportType.Equals("A") || s_reportType.Equals("W"))
                 sb.Append(",").Append("'dd'").Append("))");
             else if (s_reportType.Equals("M") || s_reportType.Equals("B"))
+            {
                 sb.Append(",").Append("'mm'").Append("))");
+            }
+            //  else if (s_reportType.Equals("Y") || s_reportType.Equals("C"))
+            else if (s_reportType.Equals("C") && calcBasis == "F" || calcBasis == "I")
+            {
+                if (Consolidate == "N")
+                {
+                    sb.Append(",").Append("'MON yyyy'").Append("))");
+
+                }
+                else
+                {
+                    sb.Append(",").Append("'yyyy'").Append("))");
+                }
+
+            }
             else if (s_reportType.Equals("Y") || s_reportType.Equals("C"))
+            {
                 sb.Append(",").Append("'yyyy'").Append("))");
+            }
+
             else
             {
                 sb = new StringBuilder("TO_Date(").Append(colName).Append(",'DD-mm-YYYY')");
@@ -1099,6 +1180,7 @@ namespace VAdvantage.Model
         {
             DateTime earliestStartDate = DateTime.MaxValue;
             DateTime latestEndDate = DateTime.MinValue;
+
             StringBuilder sbSQL = new StringBuilder("SELECT AD_Column_ID FROM AD_Column WHERE AD_Table_ID = (SELECT AD_Table_ID FROM AD_Table WHERE TableName = 'D_Series') AND LOWER(ColumnName) = 'vadb_calculationbasis'");
             if (Util.GetValueOfInt(DB.ExecuteScalar(sbSQL.ToString())) > 0)
             {
@@ -1108,36 +1190,24 @@ namespace VAdvantage.Model
             {
                 DateTime sysdate = DateTime.Now;
                 sysdate = sysdate.AddYears(-this.GetLastNValue());
-                /*   string sqlYear = "SELECT MIN(p.StartDate) AS EarliestStartDate, MAX(p.EndDate) AS LatestEndDate FROM C_Period p" +
-                           " INNER JOIN C_Year cy ON p.C_Year_ID = cy.C_Year_ID" +
-                           " INNER JOIN C_Calendar cal ON cy.C_Calendar_ID = cal.C_Calendar_ID " +
-                           "WHERE p.C_Year_ID IN( SELECT C_Year_ID FROM C_Period WHERE TO_DATE('"+sysdate+"', 'DD-MM-YYYY HH24:MI:SS')  BETWEEN StartDate AND EndDate) " +
-                           "AND cal.C_Calendar_ID = (SELECT C_Calendar_ID FROM D_SERIES WHERE D_Series_ID = " + GetD_Series_ID() + ") AND p.IsActive='Y'";*/
-                string sqlYear = @"SELECT 
-    p.PeriodNo,
-    MIN(p.StartDate) AS EarliestStartDate,
-    MAX(p.EndDate) AS LatestEndDate
-FROM
-    C_Period p
-INNER JOIN
-    C_Year cy ON p.C_Year_ID = cy.C_Year_ID
-INNER JOIN
-    C_Calendar cal ON cy.C_Calendar_ID = cal.C_Calendar_ID
-WHERE
-    p.C_Year_ID IN(
-        SELECT
-            C_Year_ID
-        FROM
-            C_Period
-        WHERE
-            TO_DATE('" + sysdate + "', 'DD-MM-YYYY HH24:MI:SS') BETWEEN StartDate AND EndDate) AND cal.C_Calendar_ID = (SELECT C_Calendar_ID FROM D_SERIES WHERE D_Series_ID = 1000727) AND p.IsActive = 'Y' GROUP By PeriodNo order by PeriodNo";
-                DataSet ds = DB.ExecuteDataset(sqlYear);
-                /*   if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-                   {
-                       earliestStartDate = (DateTime)ds.Tables[0].Rows[0]["EarliestStartDate"];
-                       latestEndDate = (DateTime)ds.Tables[0].Rows[0]["LatestEndDate"];
-                   }*/
-                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                StringBuilder sqlyearCalender = new StringBuilder();
+                int calendarID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Calendar_ID FROM D_SERIES WHERE D_Series_ID = " + GetD_Series_ID()));
+                sqlyearCalender.Append("SELECT p.PeriodNo, MIN(p.StartDate) AS EarliestStartDate, MAX(p.EndDate) AS LatestEndDate FROM " +
+                    "C_Period p INNER JOIN C_Year cy ON p.C_Year_ID = cy.C_Year_ID INNER JOIN C_Calendar cal ON cy.C_Calendar_ID = cal.C_Calendar_ID" +
+                    " WHERE p.C_Year_ID IN(SELECT C_Year_ID FROM C_Period WHERE " + GlobalVariable.TO_DATE(sysdate, true) + " BETWEEN StartDate AND EndDate) AND cal.C_Calendar_ID = ");
+                if (calendarID > 0)
+                {
+                    sqlyearCalender.Append("(SELECT C_Calendar_ID FROM D_SERIES WHERE D_Series_ID = " + GetD_Series_ID() + ")");
+                }
+                else
+                {
+                    sqlyearCalender.Append(" (SELECT CI.c_calendar_id FROM AD_Client A" +
+                        " INNER JOIN AD_ClientInfo CI ON(A.AD_Client_ID = CI.AD_Client_ID) WHERE A.AD_Client_ID = " + GetAD_Client_ID() + ")");
+                }
+                sqlyearCalender.Append("AND p.IsActive = 'Y' GROUP By PeriodNo order by PeriodNo");
+                DataSet ds = DB.ExecuteDataset(sqlyearCalender.ToString());
+
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
 
                     DataRow firstRow = ds.Tables[0].Rows[0];
@@ -1401,14 +1471,16 @@ WHERE
                         }
                         else
                         {
-                            m_date2 = (DateTime.Now.Month - 1) + "/" + DateTime.DaysInMonth(dt_to.Year, DateTime.Now.Month - 1) + "/" + dt_to.Year;
+                            //   m_date2 = lastNDate.Month+ "/"+ DateTime.DaysInMonth(lastNDate.Year, lastNDate.Month) + "/"+ lastNDate.Year;
+                            lastNDate = lastNDate.AddMonths(1);
+                            m_date2 = lastNDate.Month + "/1/" + lastNDate.Year;
                         }
-                        // m_date2 = (DateTime.Now.Month - 1) + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
 
                     }
                     else
                     {
-                        m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
+                        dt_to = dt_to.AddDays(1);
+                        m_date2 = (dt_to.Month - 1) + "/" + dt_to.Day + "/" + dt_to.Year;
                     }
                 }
                 else if (GetDateTimeTypes() == IS_LAST_N_YEARS)
@@ -1452,22 +1524,26 @@ WHERE
                     {
                         if (this.GetLastNValue() == 0)
                         {
-                            m_date2 = "12/" + DateTime.DaysInMonth(dt_to.Year, 12) + "/" + dt_to.Year;
+                            //  m_date2 = "12/" + DateTime.DaysInMonth(dt_to.Year, 12) + "/" + dt_to.Year;
+                            dt_to = dt_to.AddYears(1);
+                            m_date2 = "1/1/" + dt_to.Year;
                         }
                         else
                         {
-                            DateTime cd_dt = dt_to.AddYears(-1);
-                            m_date2 = "12/31/" + cd_dt.Year;
+                            //m_date2 = "12/31/" + (lastNDate.Year - 1);
+                            m_date2 = "1/1/" + (lastNDate.Year);
                         }
                     }
                     else if (calcBasis.Equals("I"))
                     {
+                        latestEndDate = latestEndDate.AddDays(1);///for last day 
                         m_date2 = latestEndDate.Month + "/" + latestEndDate.Day + "/" + latestEndDate.Year;
 
                     }
                     else
                     {
-                        m_date2 = dt_to.Month + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
+                        dt_to = dt_to.AddDays(1);
+                        m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
                     }
                 }
                 else if (GetDateTimeTypes() == IS_CURRENT_WEEK)

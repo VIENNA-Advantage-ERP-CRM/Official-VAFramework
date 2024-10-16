@@ -2445,6 +2445,10 @@
                     return tab.tabSeq === currentTabSeq;
                 });
 
+                if (currentTab && !currentTab.tabView) {
+                    currentTab.tabView = [];
+                }
+
                 if (currentTab.tabView.includes(view)) {
                     currentTab.tabView = [];
                 }
@@ -3795,7 +3799,7 @@
         }
         
         
-        if (this.curGC.getIsSingleRow()) {
+        if (!isAPanelTab && this.curGC.getIsSingleRow()) {
             this.isHideFilterIcon(true);
             this.startFilterPanel(true);
         } else {
