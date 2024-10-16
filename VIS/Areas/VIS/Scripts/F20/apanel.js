@@ -2030,7 +2030,7 @@
                 //var st = new VIS.VSortTab(curWindowNo, id);
                 var st = new VIS.VSortTab(curWindowNo, gTab.getAD_Table_ID(),
                     gTab.getAD_ColumnSortOrder_ID(), gTab.getAD_ColumnSortYesNo_ID(), gTab.getIsReadOnly(), id);
-                //st.setTabLevel(gTab.getTabLevel());
+                st.setTabLevel(gTab.getTabLevel());
                 tabElement = st;
                 if (i == 0) {
                     firstTabId = id;

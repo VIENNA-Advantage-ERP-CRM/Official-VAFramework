@@ -948,6 +948,7 @@ input[type="radio"] {
         color: inherit;
         border: 0;
         background: inherit;
+        width:auto;
     }
 
 /*.vis-apanel-rb-ul .vis-ev-col-linkbutton {

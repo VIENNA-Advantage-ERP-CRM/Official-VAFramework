@@ -1783,6 +1783,15 @@
         }
     };
 
+
+    VIS.VSortTab.prototype.setTabLevel = function (level) {
+        this.tabLevel = level;
+    }
+
+    VIS.VSortTab.prototype.getTabLevel = function () {
+        return this.tabLevel;
+    }
+
     VIS.VSortTab.prototype.notifyFireChanged = function (enable) {
         if (this.aContentPane)
             this.aContentPane.aSave.setEnabled(enable);
