@@ -298,6 +298,14 @@ select {
 .vis-app-footer-c {
     display: flex;
 }
+.vis-footer-ui-fix {
+    padding-left: 75px !important;
+}
+
+.vis-footer-home-fix {
+    position: absolute;
+    left: 0;
+}
 
 .vis-app-footer-c-l {
     flex: 1;
@@ -466,7 +474,7 @@ select {
 }
 
 .vis-chatBoxInputWrap:has(textarea:focus) {
-    border-color: rgba(var(--v-c-primary), 1);
+    border-color: none !important;
 }
 
 .vis-chatBoxInputWrap {

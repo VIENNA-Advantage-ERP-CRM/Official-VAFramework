@@ -267,8 +267,7 @@
                 var $selfpanel = this;
                 var isDel = false;
                 $txtSearch.autocomplete({
-                    select: function (ev, ui) {                       
-
+                    select: function (ev, ui) {
                         self.defaultSearch = false;
                         if (self.isSummaryVisible) {
                             self.curTab.setShowSummaryNodes(true);
@@ -277,7 +276,7 @@
                             self.curTab.setShowSummaryNodes(false);
                         }
                         var query = new VIS.Query(self.curTab.getTableName(), false);
-
+                        self.curGC.aFilterPanel.hardRefreshFilterPanel();
                         self.curTab.searchText = ui.item.value;
                         self.curTab.userQueryID = ui.item.id;
 
@@ -2031,7 +2030,7 @@
                 //var st = new VIS.VSortTab(curWindowNo, id);
                 var st = new VIS.VSortTab(curWindowNo, gTab.getAD_Table_ID(),
                     gTab.getAD_ColumnSortOrder_ID(), gTab.getAD_ColumnSortYesNo_ID(), gTab.getIsReadOnly(), id);
-                //st.setTabLevel(gTab.getTabLevel());
+                st.setTabLevel(gTab.getTabLevel());
                 tabElement = st;
                 if (i == 0) {
                     firstTabId = id;
@@ -4700,11 +4699,11 @@
                     tis.showHideViewIcon(tis.aMulti);
                     tis.curGC.switchMultiRow();
                     tis.isHideFilterIcon(false);
+                    this.startFilterPanel(this.curTab.isFPManualHide);
                 }
                 else if (defaultTabLayout == 'Y') {
                     tis.showHideViewIcon(tis.aSingle);
-                    tis.curGC.switchSingleRow(true);
-                    tis.isHideFilterIcon(true);
+                    tis.curGC.switchSingleRow(true);                 
 
                     var lastFP = tis.curTab.isFPManualHide;
                     tis.startFilterPanel(true);
@@ -4715,8 +4714,8 @@
                     tis.showHideViewIcon(tis.aCard);
                     tis.curGC.switchCardRow(true);
                     tis.isHideFilterIcon(false);
-                }
-
+                    this.startFilterPanel(this.curTab.isFPManualHide);
+                }                
             }
         }
 

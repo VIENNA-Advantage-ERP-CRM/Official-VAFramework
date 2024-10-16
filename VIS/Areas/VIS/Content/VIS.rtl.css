@@ -977,6 +977,7 @@ html[dir=rtl] .VIS-nm-opt-link {
 
 html[dir=rtl] .VIS-nm-dasboard-search .fa-search {
     right: 15px;
+    width:fit-content;
 }
 
 html[dir=rtl] .VIS-nm-dasboard-search input {
@@ -990,5 +991,15 @@ html[dir=rtl] .multiselect-container .multiselect-option .form-check {
 html[dir=rtl] .form-check-input {
     margin-left: unset;
     margin-right: -1.25rem;
+}
+
+html[dir=rtl] .vis-footer-ui-fix {
+    padding-right: 85px !important;
+}
+
+
+html[dir=rtl] .vis-footer-home-fix {
+    right: 0;
+    left: auto;
 }
     /*rtl css End here*/
