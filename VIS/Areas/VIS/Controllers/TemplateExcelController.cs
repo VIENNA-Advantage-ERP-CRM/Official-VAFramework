@@ -23,12 +23,12 @@ namespace VIS.Controllers
         /// <returns></returns>
         public JsonResult TemplateExcel(String windowName)
         {
-            List<MarketSvc.MService.ExcelDataTemplate> result = null;
+            dynamic result = null;
             if (Session["ctx"] != null)
             {
                 var ctx = Session["ctx"] as Ctx;
                 TemplateExcel obj = new TemplateExcel();
-                result = obj.excelDataTemplate(ctx, windowName);
+                result = obj.ExcelDataTemplate(ctx, windowName);               
             }
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }

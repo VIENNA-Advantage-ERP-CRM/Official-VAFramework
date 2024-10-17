@@ -50,11 +50,12 @@
 
         /* Function to load the template excel data */
         this.templateExcelData = function () {
+            var wName = VIS.context.getWindowContext($self.windowNo, "WindowName");
             $.ajax({
                 type: 'GET',
                 url: VIS.Application.contextUrl + "TemplateExcel/TemplateExcel",
                 data: {
-                    windowName: $self.windowName
+                    windowName: wName
                 },
                 success: function (data) {
                     data = JSON.parse(data);
