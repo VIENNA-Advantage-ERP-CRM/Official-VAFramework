@@ -494,7 +494,7 @@ namespace VAdvantage.Model
 
         public string GetSql(bool isFiltered, string specialWhere, Ctx _Ctx)
         {
-
+            int FetchRowsCount = 0;
             StringBuilder sb = new StringBuilder("SELECT ");    //start the SELECT QUERY
             MTable m_Table = null;// MTable.Get(GetCtx(), GetAD_Table_ID());
             //get the table name
@@ -513,6 +513,13 @@ namespace VAdvantage.Model
             //get X Column Name
             MColumn column = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
             string s_colX = column.GetFKColumnName();
+            string x_colY = column.GetColumnName();
+            int tableR = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_REFERENCE_VALUE_ID FROM AD_COLUMN C INNER JOIN AD_TABLE T ON(T.AD_TABLE_ID=C.AD_TABLE_ID) WHERE T.AD_TABLE_ID=291 AND AD_COLUMN_ID=(
+                                        SELECT AD_COLUMN_ID FROM AD_COLUMN WHERE COLUMNNAME = '" + x_colY + "' AND AD_TABLE_ID = " + GetAD_Table_ID() + ")"));
+            if (tableR > 0)
+            {
+                s_colX = column.GetColumnName();
+            }
 
             column = MColumn.Get(_Ctx, this.GetAD_Column_Y_ID());
 
@@ -790,6 +797,9 @@ namespace VAdvantage.Model
             }
             else if (IsIdentifier_X() || IsList_X())     //in case of the identifier column
             {
+                MColumn columnt = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
+                s_colX = columnt.GetFKColumnName();
+                m_colX = s_colX;
                 StringBuilder unionTableQuery = new StringBuilder("SELECT ");
                 string s_identifierCol = "";
                 string fkTableName = "";
@@ -875,8 +885,16 @@ namespace VAdvantage.Model
                     unionTableQuery.Append("INNER JOIN ")
                     .Append(fkTableName).Append(" idtnfr")
                     .Append(" ON ")
-                    .Append(IDENTIFIER_COL).Append(m_colX)
-                    .Append(" = OUTT.").Append(m_colX);
+                    .Append(IDENTIFIER_COL).Append(m_colX);
+                    if (tableR > 0)
+                    {
+                        unionTableQuery.Append(" = OUTT.").Append(columnt.GetColumnName());
+                    }
+                    else
+                    {
+                        unionTableQuery.Append(" = OUTT.").Append(m_colX);
+                    }
+                    //.Append(" = OUTT.").Append(m_colX);
                 }
 
 
@@ -943,7 +961,24 @@ namespace VAdvantage.Model
                     sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
                 }
             }
+            string FetchRows = @"SELECT
+                                   D.VADB_FetchRows
+                                FROM 
+                                  D_Series D
+                                   INNER JOIN D_Chart C ON(C.D_Chart_ID=D.D_Chart_ID)
+                                WHERE D.IsActive='Y' AND
+                                  C.D_Chart_ID=" + GetD_Chart_ID();
 
+            DataSet dsR = DB.ExecuteDataset(FetchRows);
+
+            if (dsR != null && dsR.Tables.Count > 0 && dsR.Tables[0].Rows.Count > 0)
+            {
+                FetchRowsCount = Util.GetValueOfInt(dsR.Tables[0].Rows[0]["VADB_FetchRows"]);
+            }
+            if (FetchRowsCount > 0)
+            {
+                sb.Append(" FETCH FIRST " + FetchRowsCount + " ROWS ONLY ");
+            }
             return sb.ToString();
         }
 
