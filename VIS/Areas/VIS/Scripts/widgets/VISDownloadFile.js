@@ -36,12 +36,17 @@
             createBusyIndicator();
             setBusy(false);
             widgetID = (VIS.Utility.Util.getValueOfInt(this.widgetInfo.AD_UserHomeWidgetID) != 0 ? this.widgetInfo.AD_UserHomeWidgetID : $self.windowNo);
-            $root.append('<div class="VIS-template-excel-container" id=' + widgetID +'>' +
-                '<div class="VIS-template-excel-block">' +
-                '<h6>' + VIS.Msg.getMsg("VIS_TemplateExcelDetails") +'</h6>' +
-                '</div>' +
+
+            $root.append('<div class="vis-downloadFile-col" id=' + widgetID +'>' +
+                '<span class="fa fa-download vis-downloadwidgeticonsize vis-downloadwidgeticoncolor"></span>' +
+                '<a href="#">' + VIS.Msg.getMsg("VIS_TemplateExcelDetails") +'</a>' +
                 '</div>');
-            templateExcelDetailLink = $root.find('h6');
+            //$root.append('<div class="VIS-template-excel-container" id=' + widgetID +'>' +
+            //    '<div class="VIS-template-excel-block">' +
+            //    '<h6>' + VIS.Msg.getMsg("VIS_TemplateExcelDetails") +'</h6>' +
+            //    '</div>' +
+            //    '</div>');
+            templateExcelDetailLink = $root.find('.vis-downloadFile-col');
             templateExcelDetailLink.off(VIS.Events.onTouchStartOrClick);
             templateExcelDetailLink.on(VIS.Events.onTouchStartOrClick, function () {
                 $self.show();
@@ -51,6 +56,9 @@
         /* Function to load the template excel data */
         this.templateExcelData = function () {
             var wName = VIS.context.getWindowContext($self.windowNo, "WindowName");
+            if ($self.windowNo == -99999) {
+                wName = "HomePage";
+            }
             $.ajax({
                 type: 'GET',
                 url: VIS.Application.contextUrl + "TemplateExcel/TemplateExcel",
@@ -63,14 +71,15 @@
                     if (data && data.length > 0) {
                         excelItemDiv.empty();
                         for (var i = 0; i < data.length; i++) {
-                            excelItem = $(`<div class="VIS-excelItem" fileId="${data[i].FileID}" fileName="${data[i].FileName}"><span class="excelFileName">${data[i].FileName}</span><button class="VIS-excelDownloadBtn"><i class="fa fa-download" aria-hidden="true"></i></button></div>`);
+                            excelItem = $('<div class="VIS-excelItem" fileId="' + data[i].FileID + '" fileName="' + data[i].FileName + '" fileUrl="'+data[i].URL+'"><span class="excelFileName">' + data[i].FileName +'</span><button class="VIS-excelDownloadBtn"><i class="fa fa-download vis-downloadwidgetpopupiconsize vis-downloadwidgeticoncolor" aria-hidden="true"></i></button></div>');
                             excelItemDiv.append(excelItem);
                         }
                         excelItemDiv.find('button.VIS-excelDownloadBtn').off(VIS.Events.onTouchStartOrClick);
                         excelItemDiv.find('button.VIS-excelDownloadBtn').on(VIS.Events.onTouchStartOrClick, function () {
                             var fileId = $(this).parent('.VIS-excelItem').attr('fileId');
                             var fileName = $(this).parent('.VIS-excelItem').attr('fileName');
-                            $self.downloadFile(fileId, fileName);
+                            var url = $(this).parent('.VIS-excelItem').attr('fileUrl');
+                            $self.downloadFile(fileId, fileName,url);
                         });
                     }
                     else {
@@ -91,7 +100,12 @@
         * @param {any} fileId
         * @param {any} fileName
         */
-        this.downloadFile = function (fileId, fileName) {
+        this.downloadFile = function (fileId, fileName, fileurl) {
+
+            if (fileurl) {
+                window.open(fileurl);
+                return;
+            }
             $.ajax({
                 type: 'GET',
                 url: VIS.Application.contextUrl + "TemplateExcel/DownloadTemplateExcel",
@@ -119,7 +133,7 @@
             $self.load();
             var ch = new VIS.ChildDialog(); //create object of child dialog
             formDialog = ch;
-            ch.setHeight(300);
+            ch.setHeight(340);
             ch.setWidth(500);
             ch.setTitle(VIS.Msg.getMsg("VIS_TemplateExcelDetails"));
             ch.setContent($root); //set the content
