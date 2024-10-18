@@ -56,9 +56,11 @@
         /* Function to load the template excel data */
         this.templateExcelData = function () {
             var wName = VIS.context.getWindowContext($self.windowNo, "WindowName");
+
             if ($self.windowNo == -99999) {
                 wName = "HomePage";
             }
+
             $.ajax({
                 type: 'GET',
                 url: VIS.Application.contextUrl + "TemplateExcel/TemplateExcel",
