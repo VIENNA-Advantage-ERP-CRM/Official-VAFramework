@@ -1002,4 +1002,10 @@ html[dir=rtl] .vis-footer-home-fix {
     right: 0;
     left: auto;
 }
+
+html[dir=rtl] .vis-ad-w-p-actionpanel-r-b {
+    margin-left:0;
+    margin-right:5px;
+} 
+
     /*rtl css End here*/

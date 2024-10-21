@@ -393,7 +393,10 @@ namespace VIS.Controllers
           // if (ctx != null)
              VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx,webSessionId);
             FormsAuthentication.SignOut();
-            Session.Clear();
+            if (Session != null)
+            {
+                Session.Clear();
+            }
 
             // Invalidate session
             //Session.Abandon();

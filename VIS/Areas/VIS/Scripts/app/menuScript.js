@@ -37,12 +37,7 @@
             let self = this;
             if (self.options.items.attribute) {
                 if (target) {
-                    while (
-
-                        target.getAttribute(self.options.items.attribute) == undefined ||
-                        target == self.nav
-
-                    )
+                    while (target.parentElement && (target.getAttribute(self.options.items.attribute) == undefined || target == self.nav))
                         target = target.parentNode;
                 }
             }
