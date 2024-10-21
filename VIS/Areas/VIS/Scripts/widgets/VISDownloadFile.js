@@ -38,7 +38,7 @@
             widgetID = (VIS.Utility.Util.getValueOfInt(this.widgetInfo.AD_UserHomeWidgetID) != 0 ? this.widgetInfo.AD_UserHomeWidgetID : $self.windowNo);
 
             $root.append('<div class="vis-downloadFile-col" id=' + widgetID +'>' +
-                '<span class="fa fa-download vis-downloadwidgeticonsize vis-downloadwidgeticoncolor"></span>' +
+                '<span class="fa fa-download vis-downloadwidgeticonsize vis-color-primary"></span>' +
                 '<a href="#">' + VIS.Msg.getMsg("VIS_TemplateExcelDetails") +'</a>' +
                 '</div>');
             //$root.append('<div class="VIS-template-excel-container" id=' + widgetID +'>' +
@@ -73,7 +73,7 @@
                     if (data && data.length > 0) {
                         excelItemDiv.empty();
                         for (var i = 0; i < data.length; i++) {
-                            excelItem = $('<div class="VIS-excelItem" fileId="' + data[i].FileID + '" fileName="' + data[i].FileName + '" fileUrl="'+data[i].URL+'"><span class="excelFileName">' + data[i].FileName +'</span><button class="VIS-excelDownloadBtn"><i class="fa fa-download vis-downloadwidgetpopupiconsize vis-downloadwidgeticoncolor" aria-hidden="true"></i></button></div>');
+                            excelItem = $('<div class="VIS-excelItem" fileId="' + data[i].FileID + '" fileName="' + data[i].FileName + '" fileUrl="' + data[i].URL + '"><span class="excelFileName">' + data[i].FileName +'</span><button class="VIS-excelDownloadBtn"><i class="fa fa-download vis-downloadwidgetpopupiconsize vis-color-primary" aria-hidden="true"></i></button></div>');
                             excelItemDiv.append(excelItem);
                         }
                         excelItemDiv.find('button.VIS-excelDownloadBtn').off(VIS.Events.onTouchStartOrClick);
