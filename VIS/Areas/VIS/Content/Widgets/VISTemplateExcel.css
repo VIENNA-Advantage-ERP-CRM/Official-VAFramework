@@ -40,7 +40,6 @@
 
 
 .vis-downloadFile-col {
-    background-color: rgba(var(--v-c-primary), 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -66,9 +65,7 @@
 .vis-downloadwidgetpopupiconsize {
     font-size: 22px;
 }
-.vis-downloadwidgeticoncolor {
-  color:rgba(var(--v-c-on-secondary), 1);
-}
+
 
 @media screen and (max-width: 1366px) {
     .vis-downloadFile-col {
