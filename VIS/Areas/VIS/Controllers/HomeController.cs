@@ -208,6 +208,7 @@ namespace VIS.Controllers
                         var oldctx = Session["ctx"] as Ctx;
                         ctx.SetAD_Session_ID(oldctx.GetAD_Session_ID());
                         ctx.SetSecureKey(oldctx.GetSecureKey());
+                        ctx.SetApplicationUrl(oldctx.GetApplicationUrl());
                         Session.Timeout = 17;
                         if (oldctx.GetContext("NewSession") == "Y") // logout previous session if user chnage 
                             // authorization form auth dialog

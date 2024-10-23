@@ -1132,7 +1132,7 @@
                         return;
                     }
                     self.cmd_find($txtSearch.val());
-                    $txtSearch.val("");
+                   // $txtSearch.val("");
                     $txtSearch.removeAttr('readonly');
                 }
                 else if (code == 8 && $btnClrSearch.css('visibility') == 'visible') {
@@ -3691,18 +3691,22 @@
                     
                     this.clearSearchText();                   
 
-                    this.setDefaultSearch(gc, AD_UserQuery_ID);                  
+                   // this.setDefaultSearch(gc, AD_UserQuery_ID);                  
 
-                    if ((this.actionParams.TabWhereClause||'') != '') { // check if param has where clause or not
+                    if ((this.actionParams.TabWhereClause || '') != '') { // check if param has where clause or not
                         var query = new VIS.Query(this.curTab.getTableName(), false);
                         query.addRestriction(this.actionParams.TabWhereClause);
-                        this.curTab.setQuery(query,true);
+                        this.curTab.setQuery(query, true);
+                    } else {
+                        this.setDefaultSearch(gc, AD_UserQuery_ID);
                     }
                     
                     gc.query(this.curTab.getOnlyCurrentDays(), 0, false);	//	updated
                 }
                 else {
-                    this.setDefaultSearch(gc, AD_UserQuery_ID);                    
+                    if ((this.actionParams.TabWhereClause || '') == '') {
+                        this.setDefaultSearch(gc, AD_UserQuery_ID);
+                    }
                 }
             }
             
