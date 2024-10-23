@@ -1474,6 +1474,7 @@
                                 //    $divDBIconSpan.append($imageSpan).append($image)
 
                                 setValue(colValue, iControl, mField);
+                                $divLabel.append(iControl.getControl());
                                 //    $divLabelValueContainer.append($divDBIconSpan);
                                 //    $divLabelValueContainer.append($divDBLevel);
                                 //}
