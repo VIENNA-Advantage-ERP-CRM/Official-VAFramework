@@ -279,6 +279,16 @@ namespace VIS.Helpers
                         bool deleteRecord = false;
                         int roleId = VAdvantage.Utility.Util.GetValueOfInt(drLogin[0]);
                         deleteRecord = !usersRoles.Contains(roleId);
+                        if (!deleteRecord)
+                        {
+                            // check org 
+                            var orgId = drLogin[2].ToString();
+                            if (Convert.ToInt32(DB.ExecuteScalar("SELECT AD_Org_ID FROM AD_Org WHERE IsActive='Y' AND AD_Org_ID =" 
+                                                  + orgId))<1)
+                            {
+                                deleteRecord = true;
+                            }
+                        }
 
                         //Delete Login Setting 
                         if (deleteRecord)
