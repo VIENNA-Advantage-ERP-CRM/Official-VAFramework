@@ -1544,10 +1544,10 @@
         //var finalwhere = qry.getWhereClause();
         var reportWhere = "";
         var whrs = [];
-        if (this.searchCode && this.searchCode != '') {
-            whrs.push(this.searchCode);
-            //qry.addRestriction(this.seachCode);
-        }
+        //if (this.searchCode && this.searchCode != '') {
+        //    whrs.push(this.searchCode);
+        //    //qry.addRestriction(this.seachCode);
+        //}
         var qryWhere = qry.getWhereClause();
         if (qryWhere != "")
             whrs.push(qry.getWhereClause());

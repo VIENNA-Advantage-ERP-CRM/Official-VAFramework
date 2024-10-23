@@ -959,6 +959,7 @@
                 $fltrPanel.hide();
                 this.refresh();
             }
+
             this.curTab.isFPManualHide = hide;
         };
 
@@ -3792,7 +3793,13 @@
 
         this.showFilterPanel(keepFilters);
         if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
+            var lastFP = this.curTab.isFPManualHide;
+            if (lastFP == undefined || lastFP == 'undefined') {
+                lastFP = !this.curTab.getIsShowFilterPanel();
+            }
+
             this.startFilterPanel(false);
+            this.curTab.isFPManualHide = lastFP;
         } else {
             this.startFilterPanel(this.curTab['isFPManualHide']);
         }
@@ -3800,7 +3807,9 @@
         
         if (!isAPanelTab && this.curGC.getIsSingleRow()) {
             this.isHideFilterIcon(true);
+            var lastFP = this.curTab.isFPManualHide;
             this.startFilterPanel(true);
+            this.curTab.isFPManualHide = lastFP;
         } else {
             this.isHideFilterIcon(false);
         }
