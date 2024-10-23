@@ -29,6 +29,7 @@ using System.Text;
 using VAdvantage.Common;
 using System.Diagnostics;
 using iTextSharp.text;
+using VIS.DataContracts;
 
 namespace VIS.Controllers
 {
@@ -151,8 +152,54 @@ namespace VIS.Controllers
                         return View("Maintenance");
                     }
 
-                    //Stopwatch stLogin = new Stopwatch();
-                    //stLogin.Start();
+                    string username = "";
+                    IDataReader drRoles = LoginHelper.GetRoles(ctx.GetContext("##AD_User_Value"), false, false);
+                    int AD_User_ID = 0;
+                    var RoleList = new List<KeyNamePair>();
+                    List<int> usersRoles = new List<int>();
+                    if (drRoles.Read())
+                    {
+                        do  //	read all roles
+                        {
+                            AD_User_ID = Util.GetValueOfInt(drRoles[0].ToString());
+                            int AD_Role_ID = Util.GetValueOfInt(drRoles[1].ToString());
+                            String Name = drRoles[2].ToString();
+                            KeyNamePair p = new KeyNamePair(AD_Role_ID, Name);
+                            RoleList.Add(p);
+                            username = Util.GetValueOfString(drRoles["username"].ToString());
+                            usersRoles.Add(AD_Role_ID);
+                        }
+                        while (drRoles.Read());
+                    }
+                    drRoles.Close();
+
+                    //Validate login Data
+                    #region "login validation"
+                    var deleteRecord = !usersRoles.Contains(ctx.GetAD_Role_ID());
+                    if (!deleteRecord)
+                    {
+                        // check org 
+                        var orgId = ctx.GetAD_Org_ID();
+                        if (Convert.ToInt32(DB.ExecuteScalar("SELECT AD_Org_ID FROM AD_Org WHERE IsActive='Y' AND AD_Org_ID ="
+                                              + orgId)) < 1)
+                        {
+                            deleteRecord = true;
+                        }
+                    }
+                    //Delete Login Setting 
+                    if (deleteRecord)
+                    {
+                        DB.ExecuteQuery("DELETE FROM AD_LoginSetting WHERE AD_User_ID = " + AD_User_ID);
+
+                        return RedirectToAction("SignOff", "Account", new
+                        {
+                            ctx=ctx,
+                            webSessionId = Session.SessionID
+                        });
+                        //return new AccountController().SignOff(ctx, Session.SessionID);
+                    }
+
+                    #endregion
 
                     //create class from string  
                     string key = "";
@@ -161,6 +208,7 @@ namespace VIS.Controllers
                         var oldctx = Session["ctx"] as Ctx;
                         ctx.SetAD_Session_ID(oldctx.GetAD_Session_ID());
                         ctx.SetSecureKey(oldctx.GetSecureKey());
+                        ctx.SetApplicationUrl(oldctx.GetApplicationUrl());
                         Session.Timeout = 17;
                         if (oldctx.GetContext("NewSession") == "Y") // logout previous session if user chnage 
                             // authorization form auth dialog
@@ -210,27 +258,11 @@ namespace VIS.Controllers
                     
 
 
-                    var RoleList = new List<KeyNamePair>();
+                   
                     var ClientList = new List<KeyNamePair>();
                     var OrgList = new List<KeyNamePair>();
                     var WareHouseList = new List<KeyNamePair>();
-                    string username = "";
-                    IDataReader drRoles = LoginHelper.GetRoles(model.Login1Model.UserValue, false, false);
-                    int AD_User_ID = 0;
-                    if (drRoles.Read())
-                    {
-                        do  //	read all roles
-                        {
-                            AD_User_ID = Util.GetValueOfInt(drRoles[0].ToString());
-                            int AD_Role_ID = Util.GetValueOfInt(drRoles[1].ToString());
-                            String Name = drRoles[2].ToString();
-                            KeyNamePair p = new KeyNamePair(AD_Role_ID, Name);
-                            RoleList.Add(p);
-                            username = Util.GetValueOfString(drRoles["username"].ToString());
-                        }
-                        while (drRoles.Read());
-                    }
-                    drRoles.Close();
+                   
 
                     model.Login1Model.AD_User_ID = AD_User_ID;
                     model.Login1Model.DisplayName = username;

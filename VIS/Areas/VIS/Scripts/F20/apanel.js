@@ -959,6 +959,7 @@
                 $fltrPanel.hide();
                 this.refresh();
             }
+
             this.curTab.isFPManualHide = hide;
         };
 
@@ -1131,7 +1132,7 @@
                         return;
                     }
                     self.cmd_find($txtSearch.val());
-                    $txtSearch.val("");
+                   // $txtSearch.val("");
                     $txtSearch.removeAttr('readonly');
                 }
                 else if (code == 8 && $btnClrSearch.css('visibility') == 'visible') {
@@ -3690,18 +3691,22 @@
                     
                     this.clearSearchText();                   
 
-                    this.setDefaultSearch(gc, AD_UserQuery_ID);                  
+                   // this.setDefaultSearch(gc, AD_UserQuery_ID);                  
 
-                    if ((this.actionParams.TabWhereClause||'') != '') { // check if param has where clause or not
+                    if ((this.actionParams.TabWhereClause || '') != '') { // check if param has where clause or not
                         var query = new VIS.Query(this.curTab.getTableName(), false);
                         query.addRestriction(this.actionParams.TabWhereClause);
-                        this.curTab.setQuery(query,true);
+                        this.curTab.setQuery(query, true);
+                    } else {
+                        this.setDefaultSearch(gc, AD_UserQuery_ID);
                     }
                     
                     gc.query(this.curTab.getOnlyCurrentDays(), 0, false);	//	updated
                 }
                 else {
-                    this.setDefaultSearch(gc, AD_UserQuery_ID);                    
+                    if ((this.actionParams.TabWhereClause || '') == '') {
+                        this.setDefaultSearch(gc, AD_UserQuery_ID);
+                    }
                 }
             }
             
@@ -3792,7 +3797,13 @@
 
         this.showFilterPanel(keepFilters);
         if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
+            var lastFP = this.curTab.isFPManualHide;
+            if (lastFP == undefined || lastFP == 'undefined') {
+                lastFP = !this.curTab.getIsShowFilterPanel();
+            }
+
             this.startFilterPanel(false);
+            this.curTab.isFPManualHide = lastFP;
         } else {
             this.startFilterPanel(this.curTab['isFPManualHide']);
         }
@@ -3800,7 +3811,9 @@
         
         if (!isAPanelTab && this.curGC.getIsSingleRow()) {
             this.isHideFilterIcon(true);
+            var lastFP = this.curTab.isFPManualHide;
             this.startFilterPanel(true);
+            this.curTab.isFPManualHide = lastFP;
         } else {
             this.isHideFilterIcon(false);
         }

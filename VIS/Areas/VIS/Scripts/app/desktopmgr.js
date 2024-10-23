@@ -1131,6 +1131,7 @@
             } else {
                 chkFilter.prop('checked', true);
             }
+            chkFilterChange();
             lstOrgs.multiselect('deselectAll');
             lstOrgs.multiselect('select', [cmbOrg.val()]);
         }

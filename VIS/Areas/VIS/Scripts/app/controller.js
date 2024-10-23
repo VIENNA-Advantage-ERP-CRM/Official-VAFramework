@@ -6377,7 +6377,7 @@
         if (checkContext
             && (ctx.getWindowContext(_vo.windowNo, _vo.tabNo, "Processed").equals("Y")
                 || ctx.getWindowContext(_vo.windowNo, _vo.tabNo, "Processing").equals("Y"))) {
-            if (!hasMRDisplayLogic)
+            //if (!hasMRDisplayLogic)
                 return false;
         }
 

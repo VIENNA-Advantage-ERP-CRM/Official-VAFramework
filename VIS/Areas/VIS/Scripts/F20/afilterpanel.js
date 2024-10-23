@@ -369,7 +369,7 @@
 
                         }
 
-                        self.fillColumns(Number(self.cmbTabs.find('option[tabid="' + self.curTab.getAD_Tab_ID() +'"]').val()));
+                        self.fillColumns(Number(self.cmbTabs.val()));
 
                         //if (whereClause != '') {
                         //    whereClause += ")";
@@ -1678,14 +1678,28 @@
             dsFilterData = [];
 
             if (dr) {
+
+                var notr = {
+                    "=": " = ",
+                    "!=": " != ",
+                    "~":" LIKE ",
+                    "!~": " NOT LIKE ",
+                    ">": " > ",
+                    ">=": " >= ",
+                    "<": " < ",
+                    "<=": " <= ",
+                    ">-<": " BETWEEN "
+                }
+
+
                 for (var i = 0; i < dr.length; i++) {
 
                     var optrName = dr[i]["OPERATORNAME"];
-                    var optr = VIS.Query.prototype.OPERATORS[optrName];
+                    var optr = notr[optrName];
                     var tabID = dr[i]["AD_TAB_ID"];
                     var tabIndex = self.cmbTabs.find('option[tabid="' + tabID + '"]').val() || 0;
                     self.fillColumns(tabIndex);
-                    addDynRow(dr[i].KEYNAME, dr[i].KEYVALUE, optr, optrName,
+                    addDynRow(dr[i].KEYNAME, dr[i].KEYVALUE, optr, optr,
                         dr[i].VALUE1NAME, dr[i].VALUE1VALUE, dr[i].VALUE2NAME, dr[i].VALUE2VALUE, dr[i]["FULLDAY"], tabIndex, fromAdvance);
 
                 }
