@@ -1097,6 +1097,7 @@
 
             if (!strOrgFilter || strOrgFilter == "") {
                 strOrgFilter = cmbOrg.val();
+                strOrgFilter = strOrgFilter || "";
             }
 
             var arrVal = strOrgFilter.split(',');

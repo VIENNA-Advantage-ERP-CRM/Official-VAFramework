@@ -180,7 +180,7 @@ namespace VIS.Controllers
                     {
                         // check org 
                         var orgId = ctx.GetAD_Org_ID();
-                        if (Convert.ToInt32(DB.ExecuteScalar("SELECT AD_Org_ID FROM AD_Org WHERE IsActive='Y' AND AD_Org_ID ="
+                        if (Convert.ToInt32(DB.ExecuteScalar("SELECT COUNT(AD_Org_ID) FROM AD_Org WHERE IsActive='Y' AND AD_Org_ID ="
                                               + orgId)) < 1)
                         {
                             deleteRecord = true;
