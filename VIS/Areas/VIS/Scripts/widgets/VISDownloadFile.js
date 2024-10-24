@@ -78,6 +78,7 @@
                         }
                         excelItemDiv.find('button.VIS-excelDownloadBtn').off(VIS.Events.onTouchStartOrClick);
                         excelItemDiv.find('button.VIS-excelDownloadBtn').on(VIS.Events.onTouchStartOrClick, function () {
+                            setBusy(true);
                             var fileId = $(this).parent('.VIS-excelItem').attr('fileId');
                             var fileName = $(this).parent('.VIS-excelItem').attr('fileName');
                             var url = $(this).parent('.VIS-excelItem').attr('fileUrl');
@@ -120,13 +121,15 @@
                     console.log(data);
                     if (data && data.length > 0) {
                         window.open(VIS.Application.contextUrl + data);
+                        setBusy(false);
                     }
                     else {
-                        VIS.ADialog.info("VIS_NoDataFound");
+                        VIS.ADialog.info("VIS_FileNotAvailable");
                     }
                 },
                 error: function (err) {
                     console.log(err);
+                    setBusy(false);
                 }
             });
         }
