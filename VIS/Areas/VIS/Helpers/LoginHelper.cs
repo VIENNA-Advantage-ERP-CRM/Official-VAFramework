@@ -283,7 +283,7 @@ namespace VIS.Helpers
                         {
                             // check org 
                             var orgId = drLogin[2].ToString();
-                            if (Convert.ToInt32(DB.ExecuteScalar("SELECT AD_Org_ID FROM AD_Org WHERE IsActive='Y' AND AD_Org_ID =" 
+                            if (Convert.ToInt32(DB.ExecuteScalar("SELECT COUNT(AD_Org_ID) FROM AD_Org WHERE IsActive='Y' AND AD_Org_ID =" 
                                                   + orgId))<1)
                             {
                                 deleteRecord = true;
