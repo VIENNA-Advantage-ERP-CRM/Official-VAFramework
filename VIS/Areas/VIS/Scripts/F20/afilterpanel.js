@@ -80,7 +80,7 @@
             + '</div>' +
             '                     </div>                                                       ' +
             '                     <div class="vis-fp-cc-addbtnwrp">                            ' +
-            '                         <span class="vis-fp-cc-addbutton">' + VIS.Msg.getMsg("ADD") + '</span>' +
+            '                         <a href="javascript:;" class="vis-fp-cc-addbutton btn">' + VIS.Msg.getMsg("ADD") + '</a>' +
             '                     </div>                                                       ' +
             '                 </div>                                                           ' +
             '             </div>                                                               ' +
@@ -92,8 +92,8 @@
             '</div>' +
 
             /*'  <div class="mb-2 vis-fp-static-ctrlwrp"><div class="input-group vis-input-wrap"><div class="vis-control-wrap vis-fb-txtFilterName"><label><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div></div> ' +*/
-            '  <div class="vis-fb-savebtnPnl"><div><i class="saveFilter vis vis-save" title="' + VIS.Msg.getMsg("VISSave") + '"></i><i title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-2"></i></div><i title="' + VIS.Msg.getMsg("ClearAll") +'" class="vis vis-clear-filter ml-2 btnClearAll"></i></div> ' +
-            '</div > ' +
+            '  <div class="vis-fb-savebtnPnl"><div><a href="javascript:;" class="saveFilter vis vis-save" title="' + VIS.Msg.getMsg("VISSave") + '"></a><a href="javascript:;" title="' + VIS.Msg.getMsg("SaveAs") + '" class="saveAs vis vis-save-as ml-2"></a></div><a href="javascript:;" title="' + VIS.Msg.getMsg("ClearAll") +'" class="vis vis-clear-filter ml-2 btnClearAll"></a></div> ' +
+            '</div> ' +
             ' </div>';
         return str;
     };
@@ -125,13 +125,13 @@
         var chkFullDay = divDynamic.find("#checkFullDay_" + windowNo);
         var btnSave = bodyDiv.find('.saveFilter');
         var btnSaveAs = bodyDiv.find('.saveAs');
-
+        var lastFocus = null;
         var btnClearAll = bodyDiv.find('.btnClearAll');
-        var btnClose = $('<button class="ml-1" style="border: 1px solid rgba(var(--v-c-primary),1);color: rgba(var(--v-c-primary),1); background:rgba(var(--v-c-on-primary),1); " ><i class="fa fa-times"></i></button>');
+        var btnClose = $('<button class="ml-1 vis-fp-btnfocus" style="border: 1px solid rgba(var(--v-c-primary),1);color: rgba(var(--v-c-primary),1); background:rgba(var(--v-c-on-primary),1); " ><i class="fa fa-times"></i></button>');
         var txtFilterName = $('<input type="text" placeholder="' + VIS.Msg.getMsg("VISEnterFilterName") + '" class="w-100 visfilterName">');
 
         var isSaveAs = false;
-        var btnOk = $('<button><i class="fa fa-check"></i><i class="fa fa-spinner vis-load-animate" style="display:none"></i> </button>');
+        var btnOk = $('<button class="vis-fp-btnfocus"><i class="fa fa-check"></i><i class="fa fa-spinner vis-load-animate" style="display:none"></i> </button>');
         //var ulPopup = $('<div class="m-2 d-flex"><div class="input-group vis-input-wrap m-0"><div class="vis-control-wrap vis-fb-txtFilterName"><label for="Name"><span>Filter Name</span><sup style="display: none;">*</sup></label></div></div><div>');
 
         var ulPopup = $(`<div class="vis-fp-popup">
@@ -733,6 +733,7 @@
         });
 
         btnSave.on('click', function () {
+            lastFocus = btnSave;
             bodyDiv.find('.vis-fp-popup').find('.fa-check').show();
             bodyDiv.find('.vis-fp-popup').find('.fa-spinner').hide();
             btnOk.removeAttr('disabled');
@@ -749,6 +750,7 @@
                     top: buttonOffset.top - (popupHeight + buttonHeight) - buttonHeight, // Position above the button
                     left: buttonOffset.left - (buttonWidth / 2)+5// Center the popup horizontally relative to the button
                 }).fadeIn(200);
+                txtFilterName.focus();
             }
         });
         
@@ -828,11 +830,13 @@
                 toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
                 self.curGC.aPanel.setAdvancedSerachText(false, searchText);
                 isSaveAs = false;
+                lastFocus.focus();
             })
 
         });
 
         btnSaveAs.on('click', function () {
+            lastFocus = btnSave;
             bodyDiv.find('.vis-fp-popup').find('.fa-check').show();
             bodyDiv.find('.vis-fp-popup').find('.fa-spinner').hide();
             btnOk.removeAttr('disabled');
@@ -849,6 +853,7 @@
 
             //btnSaveAs.hide();            
             txtFilterName.val('');
+            txtFilterName.focus();
             isSaveAs = true;
             //txtFilterName.removeClass('vis-filterNameReadonly');
         });
@@ -862,6 +867,7 @@
             if (self.curTab.searchText == "") {
                 btnSaveAs.addClass('vis-fp-btnDisable');
             }
+            lastFocus.focus();
             //if (txtFilterName.val() !="") {
             //    txtFilterName.addClass('vis-filterNameReadonly');
             //}
@@ -877,6 +883,7 @@
                 if (self.curTab.searchText == "") {
                     btnSaveAs.addClass('vis-fp-btnDisable');
                 }
+                lastFocus.focus();
                 overLay.hide();
             }
         });

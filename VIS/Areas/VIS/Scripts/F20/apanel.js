@@ -977,7 +977,7 @@
                 this.cmd_ignore();
                 this.landingPage.getRoot().show();
                 this.vTabbedPane.restoreTabChange(null);
-                this.curTabIndex = 0;
+                //this.curTabIndex = 0;
                 this.getRoot().hide();
             } else {
                 this.landingPage.getRoot().hide();
@@ -2440,7 +2440,9 @@
             //Maintain stack for view change
             if (this.tabStack.length > 0) {
                 var currentTabSeq = this.curWinTab.getSelectedIndex();
-                //if (currentTabSeq > -1) {
+                if (currentTabSeq == -1) {
+                    currentTabSeq = this.curTabIndex;
+                }
                 var currentTab = this.tabStack.find(function (tab) {
                     return tab.tabSeq === currentTabSeq;
                 });
@@ -3847,7 +3849,10 @@
         }
 
 
-        this.actionParams = {}; //clear 
+        this.actionParams = {}; //clear
+        if (!isAPanelTab && this.curGC) {
+            this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
+        }
 
     };
 

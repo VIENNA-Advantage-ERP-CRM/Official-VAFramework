@@ -1568,6 +1568,9 @@
         else {
             qry = null
         };
+
+        this.skipInserting = true;
+
         //Set Page value to 1
         this.getMTab().getTableModel().setCurrentPage(1);
 
