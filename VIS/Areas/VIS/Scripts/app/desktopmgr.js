@@ -875,6 +875,11 @@
                         options.push({ label: this.value, value: this.value, action: $(this).data("action"), id: $(this).data("actionid") });
                         //<option data-action="W" data-actionid="262" title="360" value="Expense Invoice (Alpha)"></option>
                     });
+
+                    options.sort(function (x, y) {
+                        return x.label.toLowerCase().localeCompare(y.label.toLowerCase());
+                    });
+
                     // Transform the input into a jQuery UI autocomplete widget.
                     $vis_menuSearch.autocomplete({
                         source: options,
