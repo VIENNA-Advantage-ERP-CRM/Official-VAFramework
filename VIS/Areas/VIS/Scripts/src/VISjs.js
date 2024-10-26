@@ -95,6 +95,7 @@ import "../tabpanels/bipanel.js";
 import "../model/CalloutColumn.js";
 import "../app/ssemanager.js";
 import "../tabpanels/verinfo.js";
+import "../tabpanels/wfPanel.js";
 import "../tabpanels/HistoryDetailsTabPanel.js";
 import "../tabpanels/surveyPanel.js";
 import "../TestPanel.js";
