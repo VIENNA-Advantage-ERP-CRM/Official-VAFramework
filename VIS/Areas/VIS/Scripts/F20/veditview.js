@@ -8,6 +8,8 @@
         var allControls = [];
         var allLinkControls = [];
 
+        const colCount = 4;
+
         var toolbarButtonList = {};
 
         var $table;
@@ -148,7 +150,7 @@
                     reset();
                     initCols(true);
                     $td0.addClass("vis-ev-col-end4");
-                    columnIndex = 4;
+                    columnIndex = colCount;
                 }
                 else {
                     // check for row span
@@ -158,8 +160,8 @@
                         //reset(col0);
                     }
                     else if (cellSpace > 0) {
-                        if (cellSpace > 3)
-                            cellSpace = 3;
+                        if (cellSpace > colCount-1)
+                            cellSpace = colCount -1;
                         columnIndex += cellSpace;
                         cellSpace = 0; //reset
                     }
@@ -284,6 +286,7 @@
             }
 
             if (columnIndex == 3) {
+
                 // check for row span
                 if (col3.rSpan > 1) { //skip column 
                     //--col3.rSpan;
@@ -315,7 +318,7 @@
                 //columnIndex = 0;
                 adjustLayout(mField, isNewRow);
             }
-            else if (!isLongFiled && columnIndex > 3) {
+            else if (!isLongFiled && columnIndex > colCount-1) {
                 adjustLayout(mField, true);
             }
         };
@@ -619,7 +622,7 @@
             if (!agInstance || agInstance.getIsNewIns()) {
                 if (sameLine) {
                     ++columnIndex;
-                    if (columnIndex > 3) {
+                    if (columnIndex > colCount-1) {
                         sameLine = false;
                         insertRow = true;
                         // columnIndex = 0;

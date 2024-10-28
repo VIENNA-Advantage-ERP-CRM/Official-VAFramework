@@ -3734,10 +3734,10 @@
 
         var gPanel = null;
         if (this.curGC) {
-            gPanel = this.curGC.vGridPanel;
+            gPanel = this.curGC;
         } else {
             gPanel = {};
-            gPanel.setEnabled = function (action,enable) {
+            gPanel.setToolbarBtnState = function (action,enable) {
                 ;
             }
         }
@@ -3750,16 +3750,16 @@
             this.aCardDialog.setEnabled(false);
 
             this.aNew.setEnabled(false);
-            //gPanel.setEnabled("NRD", false);
+            //gPanel.setToolbarBtnState("NRD", false);
 
             this.aDelete.setEnabled(false);
-           // gPanel.setEnabled("DRD", false);
+           // gPanel.setToolbarBtnState("DRD", false);
 
             this.aFind.setEnabled(false);
             this.aBatchUpdate.setEnabled(false);
 
             this.aRefresh.setEnabled(false);
-            //gPanel.setEnabled("RQY", false);
+            //gPanel.setToolbarBtnState("RQY", false);
 
             this.aNext.setEnabled(false);
             this.aLast.setEnabled(false);
@@ -3784,7 +3784,7 @@
             this.aFind.setEnabled(true);
             this.aBatchUpdate ? this.aBatchUpdate : '';
             this.aRefresh.setEnabled(true);
-            gPanel.setEnabled("RQY", true);
+            gPanel.setToolbarBtnState("RQY", true);
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);
         }
@@ -3833,11 +3833,11 @@
 
         if (this.curTab.getAD_Process_ID() == 0) {
             this.aPrint.setEnabled(false);
-            gPanel.setEnabled("PRT", false);
+            gPanel.setToolbarBtnState("PRT", false);
         }
         else {
             this.aPrint.setEnabled(true);
-            gPanel.setEnabled("PRT", true);
+            gPanel.setToolbarBtnState("PRT", true);
         }
 
         this.setUI();
@@ -4035,10 +4035,10 @@
     APanel.prototype.dataStatusChanged = function (e) {
         var gPanel = null;
         if (this.curGC) {
-            gPanel = this.curGC.vGridPanel;
+            gPanel = this.curGC;
         } else {
             gPanel = {};
-            gPanel.setEnabled = function (action, enable) {
+            gPanel.setToolbarBtnState = function (action, enable) {
 
             }
         }
@@ -4117,25 +4117,25 @@
         if (insertRecord)
             insertRecord = this.curTab.getIsInsertRecord();
         this.aNew.setEnabled(!changed && insertRecord);
-        gPanel.setEnabled("NRD", !changed && insertRecord);
+        gPanel.setToolbarBtnState("NRD", !changed && insertRecord);
         if (this.aCopy) {
             this.aCopy.setEnabled(!changed && insertRecord);
         }
         this.aRefresh.setEnabled(!changed);
-        gPanel.setEnabled("RQY", !changed);
+        gPanel.setToolbarBtnState("RQY", !changed);
         this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
-        gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
+        gPanel.setToolbarBtnState("DRD", !changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
         //
         if (readOnly && this.curTab.getIsAlwaysUpdateField())
             readOnly = false;
         this.aIgnore.setEnabled(changed && !readOnly);
-        gPanel.setEnabled("UNO", changed && !readOnly);
+        gPanel.setToolbarBtnState("UNO", changed && !readOnly);
 
         this.aSave.setEnabled(changed && !readOnly);
-        gPanel.setEnabled("SAR", changed && !readOnly);
+        gPanel.setToolbarBtnState("SAR", changed && !readOnly);
 
         this.aSaveNew.setEnabled(changed && !readOnly);
-        gPanel.setEnabled("SAN", changed && !readOnly);
+        gPanel.setToolbarBtnState("SAN", changed && !readOnly);
 
         this.aCardDialog.setEnabled(!changed);
 
@@ -4143,10 +4143,10 @@
         //	No Rows
         if (e.getTotalRows() == 0 && insertRecord) {
             this.aNew.setEnabled(true);
-            gPanel.setEnabled("NRD", true);
+            gPanel.setToolbarBtnState("NRD", true);
 
             this.aDelete.setEnabled(false);
-            gPanel.setEnabled("DRD", true);
+            gPanel.setToolbarBtnState("DRD", true);
 
             if (!this.curGC.isZoomAction) {
                 this.highlightButton(true, this.aNew);
@@ -4180,20 +4180,20 @@
 
         if (this.isPersonalLock) {
             this.aLock.setEnabled(true);
-            gPanel.setEnabled(this.aLock.getAction(), true);
+            gPanel.setToolbarBtnState(this.aLock.getAction(), true);
             this.aLock.setPressed(this.curTab.getIsLocked());
             this.aRecAccess.setEnabled(true);
-            gPanel.setEnabled(this.aRecAccess.getAction(), true);
+            gPanel.setToolbarBtnState(this.aRecAccess.getAction(), true);
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
             if (this.curTab.getValue('AD_Org_ID') > 0 && this.excludeFromShare.indexOf(this.curTab.getTableName().toLowerCase()) == -1) {
                 this.aSharedRecord.setEnabled(true);
-                gPanel.setEnabled(this.aSharedRecord.getAction(), true);
+                gPanel.setToolbarBtnState(this.aSharedRecord.getAction(), true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {
                 this.aSharedRecord.setEnabled(false);
-                gPanel.setEnabled(this.aSharedRecord.getAction(), false);
+                gPanel.setToolbarBtnState(this.aSharedRecord.getAction(), false);
             }
         }
 
@@ -4203,109 +4203,109 @@
             //this.aMulti.setEnabled(false);
             if (this.aChat) {
                 this.aChat.setEnabled(false);
-                gPanel.setEnabled(this.aChat.getAction(), false);
+                gPanel.setToolbarBtnState(this.aChat.getAction(), false);
             }
             if (this.aAttachment) {
                 this.aAttachment.setEnabled(false);
-                gPanel.setEnabled(this.aAttachment.getAction(), false);
+                gPanel.setToolbarBtnState(this.aAttachment.getAction(), false);
             }
             if (this.aSubscribe) {
                 this.aSubscribe.setEnabled(false);
-                gPanel.setEnabled(this.aSubscribe.getAction(), false);
+                gPanel.setToolbarBtnState(this.aSubscribe.getAction(), false);
             }
             //if (this.aImportMap) {
             //    this.aImportMap.setEnabled(false);
             //}
             if (this.aHistory) {
                 this.aHistory.setEnabled(false);
-                gPanel.setEnabled(this.aHistory.getAction(), false);
+                gPanel.setToolbarBtnState(this.aHistory.getAction(), false);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(false);
-                gPanel.setEnabled(this.aEmail.getAction(), false);
+                gPanel.setToolbarBtnState(this.aEmail.getAction(), false);
             }
             if (this.aLetter) {
                 this.aLetter.setEnabled(false);
-                gPanel.setEnabled(this.aLetter.getAction(), false);
+                gPanel.setToolbarBtnState(this.aLetter.getAction(), false);
             }
             if (this.aSms) {
                 this.aSms.setEnabled(false);
-                gPanel.setEnabled(this.aSms.getAction(), false);
+                gPanel.setToolbarBtnState(this.aSms.getAction(), false);
             }
             if (this.aFaxEmail) {
                 this.aFaxEmail.setEnabled(false);
-                gPanel.setEnabled(this.aFaxEmail.getAction(), false);
+                gPanel.setToolbarBtnState(this.aFaxEmail.getAction(), false);
             }
 
             if (this.aCreateDocument) {
                 this.aCreateDocument.setEnabled(false);
-                gPanel.setEnabled(this.aCreateDocument.getAction(), false);
+                gPanel.setToolbarBtnState(this.aCreateDocument.getAction(), false);
             }
             if (this.aUploadDocument) {
                 this.aUploadDocument.setEnabled(false);
-                gPanel.setEnabled(this.aUploadDocument.getAction(), false);
+                gPanel.setToolbarBtnState(this.aUploadDocument.getAction(), false);
             }
             if (this.aViewDocument) {
                 this.aViewDocument.setEnabled(false);
-                gPanel.setEnabled(this.aViewDocument.getAction(), false);
+                gPanel.setToolbarBtnState(this.aViewDocument.getAction(), false);
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(false);
-                gPanel.setEnabled(this.aAttachment.getAction(), false);
+                gPanel.setToolbarBtnState(this.aAttachment.getAction(), false);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(false);
-                gPanel.setEnabled(this.aZoomAcross.getAction(), false);
+                gPanel.setToolbarBtnState(this.aZoomAcross.getAction(), false);
             }
             if (this.aMarkToExport) {
                 this.aMarkToExport.setEnabled(false);
-                gPanel.setEnabled(this.aMarkToExport.getAction(), false);
+                gPanel.setToolbarBtnState(this.aMarkToExport.getAction(), false);
             }
             if (this.aArchive) {
                 this.aArchive.setEnabled(false);
-                gPanel.setEnabled(this.aArchive.getAction(), false);
+                gPanel.setToolbarBtnState(this.aArchive.getAction(), false);
             }
             if (this.aEmailAttach) {
                 this.aEmailAttach.setEnabled(false);
-                gPanel.setEnabled(this.aEmailAttach.getAction(), false);
+                gPanel.setToolbarBtnState(this.aEmailAttach.getAction(), false);
             }
             if (this.aAppointment) {
                 this.aAppointment.setEnabled(false);
-                gPanel.setEnabled(this.aAppointment.getAction(), false);
+                gPanel.setToolbarBtnState(this.aAppointment.getAction(), false);
             }
             if (this.aTask) {
                 this.aTask.setEnabled(false);
-                gPanel.setEnabled(this.aTask.getAction(), false);
+                gPanel.setToolbarBtnState(this.aTask.getAction(), false);
             }
             if (this.aRequest) {
                 this.aRequest.setEnabled(false);
-                gPanel.setEnabled(this.aRequest.getAction(), false);
+                gPanel.setToolbarBtnState(this.aRequest.getAction(), false);
             }
             if (this.aWorkflow) {
                 this.aWorkflow.setEnabled(false);
-                gPanel.setEnabled(this.aWorkflow.getAction(), false);
+                gPanel.setToolbarBtnState(this.aWorkflow.getAction(), false);
             }
             if (this.aCopy) {
                 this.aCopy.setEnabled(false);
-                gPanel.setEnabled(this.aCopy.getAction(), false);
+                gPanel.setToolbarBtnState(this.aCopy.getAction(), false);
             }
             if (this.aLock) {
                 this.aLock.setEnabled(false);
-                gPanel.setEnabled(this.aLock.getAction(), false);
+                gPanel.setToolbarBtnState(this.aLock.getAction(), false);
             }
             if (this.aRecAccess) {
                 this.aRecAccess.setEnabled(false);
-                gPanel.setEnabled(this.aRecAccess.getAction(), false);
+                gPanel.setToolbarBtnState(this.aRecAccess.getAction(), false);
             }
 
             if (this.aSharedRecord) {
                 this.aSharedRecord.setEnabled(false);
-                gPanel.setEnabled(this.aSharedRecord.getAction(), false);
+                gPanel.setToolbarBtnState(this.aSharedRecord.getAction(), false);
             }
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(false);
-                gPanel.setEnabled(this.aBatchUpdate.getAction(), false);
+                gPanel.setToolbarBtnState(this.aBatchUpdate.getAction(), false);
             }
 
             //if (this.aCall) {
@@ -4316,100 +4316,100 @@
 
             if (this.aChat) {
                 this.aChat.setEnabled(true);
-                gPanel.setEnabled(this.aChat.getAction(), true);
+                gPanel.setToolbarBtnState(this.aChat.getAction(), true);
             }
             if (this.aAttachment) {
                 this.aAttachment.setEnabled(true);
-                gPanel.setEnabled(this.aAttachment.getAction(), true);
+                gPanel.setToolbarBtnState(this.aAttachment.getAction(), true);
             }
             if (this.aSubscribe) {
                 this.aSubscribe.setEnabled(true);
-                gPanel.setEnabled(this.aSubscribe.getAction(), true);
+                gPanel.setToolbarBtnState(this.aSubscribe.getAction(), true);
             }
             if (this.aHistory) {
                 this.aHistory.setEnabled(true);
-                gPanel.setEnabled(this.aHistory.getAction(), true);
+                gPanel.setToolbarBtnState(this.aHistory.getAction(), true);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(true);
-                gPanel.setEnabled(this.aEmail.getAction(), true);
+                gPanel.setToolbarBtnState(this.aEmail.getAction(), true);
             }
             if (this.aLetter) {
                 this.aLetter.setEnabled(true);
-                gPanel.setEnabled(this.aLetter.getAction(), true);
+                gPanel.setToolbarBtnState(this.aLetter.getAction(), true);
             }
             if (this.aSms) {
                 this.aSms.setEnabled(true);
-                gPanel.setEnabled(this.aSms.getAction(), true);
+                gPanel.setToolbarBtnState(this.aSms.getAction(), true);
             }
             if (this.aFaxEmail) {
                 this.aFaxEmail.setEnabled(true);
-                gPanel.setEnabled(this.aFaxEmail.getAction(), true);
+                gPanel.setToolbarBtnState(this.aFaxEmail.getAction(), true);
             }
             if (this.aImportMap) {
                 this.aImportMap.setEnabled(true);
-                gPanel.setEnabled(this.aImportMap.getAction(), true);
+                gPanel.setToolbarBtnState(this.aImportMap.getAction(), true);
             }
             if (this.aCreateDocument) {
                 this.aCreateDocument.setEnabled(true);
-                gPanel.setEnabled(this.aCreateDocument.getAction(), true);
+                gPanel.setToolbarBtnState(this.aCreateDocument.getAction(), true);
             }
             if (this.aUploadDocument) {
                 this.aUploadDocument.setEnabled(true);
-                gPanel.setEnabled(this.aUploadDocument.getAction(), true);
+                gPanel.setToolbarBtnState(this.aUploadDocument.getAction(), true);
             }
             if (this.aViewDocument) {
                 this.aViewDocument.setEnabled(true);
-                gPanel.setEnabled(this.aViewDocument.getAction(), true);
+                gPanel.setToolbarBtnState(this.aViewDocument.getAction(), true);
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(true);
-                gPanel.setEnabled(this.aAttachFrom.getAction(), true);
+                gPanel.setToolbarBtnState(this.aAttachFrom.getAction(), true);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(true);
-                gPanel.setEnabled(this.aZoomAcross.getAction(), true);
+                gPanel.setToolbarBtnState(this.aZoomAcross.getAction(), true);
             }
             if (this.aMarkToExport) {
                 this.aMarkToExport.setEnabled(true);
-                gPanel.setEnabled(this.aMarkToExport.getAction(), true);
+                gPanel.setToolbarBtnState(this.aMarkToExport.getAction(), true);
             }
             if (this.aArchive) {
                 this.aArchive.setEnabled(true);
-                gPanel.setEnabled(this.aArchive.getAction(), true);
+                gPanel.setToolbarBtnState(this.aArchive.getAction(), true);
             }
             if (this.aEmailAttach) {
                 this.aEmailAttach.setEnabled(true);
-                gPanel.setEnabled(this.aEmailAttach.getAction(), true);
+                gPanel.setToolbarBtnState(this.aEmailAttach.getAction(), true);
             }
             if (this.aAppointment) {
                 this.aAppointment.setEnabled(true);
-                gPanel.setEnabled(this.aAppointment.getAction(), true);
+                gPanel.setToolbarBtnState(this.aAppointment.getAction(), true);
             }
             if (this.aTask) {
                 this.aTask.setEnabled(true);
-                gPanel.setEnabled(this.aTask.getAction(), true);
+                gPanel.setToolbarBtnState(this.aTask.getAction(), true);
             }
             if (this.aRequest) {
                 this.aRequest.setEnabled(true);
-                gPanel.setEnabled(this.aRequest.getAction(), true);
+                gPanel.setToolbarBtnState(this.aRequest.getAction(), true);
             }
             if (this.aWorkflow) {
                 this.aWorkflow.setEnabled(true);
-                gPanel.setEnabled(this.aWorkflow.getAction(), true);
+                gPanel.setToolbarBtnState(this.aWorkflow.getAction(), true);
             }
             if (this.aCopy) {
                 this.aCopy.setEnabled(true);
-                gPanel.setEnabled(this.aCopy.getAction(), true);
+                gPanel.setToolbarBtnState(this.aCopy.getAction(), true);
             }
             if (this.aLock) {
                 this.aLock.setEnabled(true);
-                gPanel.setEnabled(this.aLock.getAction(), true);
+                gPanel.setToolbarBtnState(this.aLock.getAction(), true);
             }
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(true);
-                gPanel.setEnabled(this.aBatchUpdate.getAction(), true);
+                gPanel.setToolbarBtnState(this.aBatchUpdate.getAction(), true);
             }
             //if (this.aCall) {
             //    this.aCall.setEnabled(true);
