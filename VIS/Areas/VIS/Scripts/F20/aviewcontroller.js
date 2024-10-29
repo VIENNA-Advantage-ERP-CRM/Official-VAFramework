@@ -294,6 +294,13 @@
             return $divMap;
         };
 
+        this.setToolbarBtnState = function (action, enable) {
+            this.vGridPanel.setEnabled(action, enable);
+            if (this.vHeaderPanel) {
+                this.vHeaderPanel.setEnabled(action, enable);
+            }
+        };
+
         //  this.setRecord(0);
 
         this.setUI = function (isIncluded) {

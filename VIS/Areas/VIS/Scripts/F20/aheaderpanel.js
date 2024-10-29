@@ -6,6 +6,8 @@
 
         this.headerItems = null;
         this.imgCtrl = [];
+        this.toolbarButtonList = {};
+
         var $self = this;
         this.evt = { sender: 'hdrpnl', isHorizontal: false, width: '0px', height: '0px', isClosed: true };
 
@@ -372,6 +374,10 @@
                                 if (mField.getDisplayType() == VIS.DisplayType.Button) {
                                     if (iControl != null)
                                         iControl.addActionListner(this);
+                                    if (mField.getAD_Reference_Value_ID() == 435) {
+                                        var defaultValue = mField.getDefault(VIS.context, this.windowNo);
+                                        $self.toolbarButtonList[defaultValue] = iControl;
+                                    }
                                 } else if (mField.getDisplayType() == VIS.DisplayType.Image) {
                                     if (iControl != null) {
                                         this.imgCtrl.push(iControl);
@@ -1205,6 +1211,12 @@
 
         this.curGC.vetoablechange(e);
         
+    };
+
+    HeaderPanel.prototype.setEnabled = function (action, enable) {
+        if (Object.keys(this.toolbarButtonList).length > 0 && this.toolbarButtonList[action]) {
+            this.toolbarButtonList[action].setReadOnly(!enable);
+        }
     };
 
     VIS.HeaderPanel = HeaderPanel;

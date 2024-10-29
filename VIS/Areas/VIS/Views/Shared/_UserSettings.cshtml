@@ -192,7 +192,7 @@
                         <label for="vis-file-inputUI" class="vis-file-labelUI">
                             <span class="vis vis-pencil"></span>
                         </label>
-                        <input id="vis-file-inputUI" title="@GetMsg((string)ViewBag.culture, "ChangeImage")" class="vis-change-pic-inputUI" type="file" accept="image/*">
+                        <input id="vis-file-inputUI" title="@GetMsg((string)ViewBag.culture, "ChangeImage")" class="vis-change-pic-inputUI" style="display:none" type="file" accept="image/*">
                     </div><!-- user-img-wrap -->
                     @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
                     {
