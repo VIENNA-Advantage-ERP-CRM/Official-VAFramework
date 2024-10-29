@@ -167,7 +167,7 @@
         this.winNo = windowNo;
         this.selectionfields = null;
         this.curTabfields = null;
-        this.curTab = null;
+        this.curTab = this.curGC.getMTab();
         this.tabs = gc.aPanel.gridWindow.getTabs();
         this.listOfFilterQueries = [];
         this.ctrlObjects = {};
@@ -1675,6 +1675,9 @@
                 return;
             }
             var dr = null;
+
+
+
             txtFilterName.val(self.curTab.searchText);
             btnSaveAs.removeClass('vis-fp-btnDisable');
             //txtFilterName.addClass('vis-filterNameReadonly');

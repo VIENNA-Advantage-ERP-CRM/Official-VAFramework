@@ -827,7 +827,12 @@
                 $tabPanel.css({ "display": "grid" });
                 if (this.curGC) {
                     this.curGC.onSizeChanged(true);
+                    if (this.curTab.getRecord_ID() > -1) {
+                        this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
+                    }
                 }
+
+
             }
             else {
                 $tabPanel.css({ "display": "none" });
@@ -3689,6 +3694,9 @@
                 }
 
                 this.curTab.getTableModel().setCurrentPage(1);
+
+                this.showFilterPanel(keepFilters);
+
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
                     
                     this.clearSearchText();                   
@@ -3797,7 +3805,7 @@
             this.curGC.refreshRowPresentation();
         }
 
-        this.showFilterPanel(keepFilters);
+       
         if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
             var lastFP = this.curTab.isFPManualHide;
             if (lastFP == undefined || lastFP == 'undefined') {
@@ -3850,7 +3858,7 @@
 
 
         this.actionParams = {}; //clear
-        if (!isAPanelTab && this.curGC) {
+        if (!isAPanelTab && this.curGC && this.curTab.getRecord_ID() > -1) {
             this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
         }
 
@@ -3999,7 +4007,7 @@
                         $selfpanel.curTab.searchText = data.tables[0].rows[i].cells["name"];
                         var userquery_id = data.tables[0].rows[i].cells["ad_userquery_id"];
                         setTimeout(function (id) {
-                            $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(id, true);
+                            $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(userquery_id, true);
                         }, 1000,userquery_id);
 
                         toastr.success(VIS.Msg.getMsg("DefaultSerachExist"), '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
