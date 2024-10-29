@@ -315,6 +315,23 @@
                 else if ("Y".equals(processed))
                     return false;
             }
+
+            if (self.indexProcessingColumn && self.indexProcessingColumn > 0)		//	&& m_TabNo != Find.s_TabNo)
+            {
+                //Object processed = GetCellValue(this.Rows[row], _indexProcessedColumn);
+                var processed = self.grid.getCellValue(row, self.indexProcessingColumn);
+                if (typeof processed == "boolean") {
+                    if (processed)
+                        return false;
+                }
+                else if ("True".equals(processed))// instanceof Boolean)
+                {
+                    return false;
+                }
+                else if ("Y".equals(processed))
+                    return false;
+            }
+
             //
             //int[] co = GetClientOrgRecordID(this.Rows[row]);
             var co = getClientOrgRecordID(row);
@@ -457,6 +474,8 @@
                 this.indexActiveColumn = j;
             else if (columnName.equals("Processed"))
                 this.indexProcessedColumn = j;
+            else if (columnName.equals("Processing"))
+                this.indexProcessingColumn = j;
             else if (columnName.equals("AD_Client_ID"))
                 this.indexClientColumn = j;
             else if (columnName.equals("AD_Org_ID"))

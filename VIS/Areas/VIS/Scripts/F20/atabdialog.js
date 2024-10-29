@@ -73,6 +73,8 @@
                     this.indexActiveColumn = j;
                 else if (columnName.equals("Processed"))
                     this.indexProcessedColumn = j;
+                else if (columnName.equals("Processing"))
+                    this.indexProcessingColumn = j;
                 else if (columnName.equals("AD_Client_ID"))
                     this.indexClientColumn = j;
                 else if (columnName.equals("AD_Org_ID"))

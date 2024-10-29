@@ -1926,6 +1926,11 @@
 
                     //var queryCode = VIS.DB.executeScalar(sqlDefaultSearch);
 
+
+                    if (this.apanel && (this.apanel.actionParams.TabWhereClause || '') != '') {
+                        queryCode = "";
+                    }
+
                     if (queryCode) {
                         if (where.length > 0) {
                             where = where + " AND " + queryCode;
