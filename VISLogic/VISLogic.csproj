@@ -143,6 +143,7 @@
     <Compile Include="Models\WFActivityModel.cs" />
     <Compile Include="Models\CommonModel.cs" />
     <Compile Include="Models\PAttributesModel.cs" />
+    <Compile Include="Models\WFManualModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

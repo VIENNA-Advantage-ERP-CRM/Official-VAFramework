@@ -144,3 +144,17 @@
     align-content: center;
 }
 
+.vis-wfm-wfHisCont {
+    margin-bottom: 10px;
+    border: 1px solid rgba(var(--v-c-on-secondary), .1);
+    border-radius: 5px;
+    box-shadow: 0 2px 8px 0 rgba(99, 99, 99, .2);
+    padding: 10px;
+}
+
+.vis-wfm-ApprovalCont {
+    border: 1px solid #ededed;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
