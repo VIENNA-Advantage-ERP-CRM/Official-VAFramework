@@ -1222,6 +1222,7 @@
                 
                 if (fieldStyleLogic.length > 0) {
                     $div.attr('style', fieldStyleLogic);
+                    fieldStyleLogic = '';
                 }
 
 
