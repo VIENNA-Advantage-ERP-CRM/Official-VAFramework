@@ -23,6 +23,8 @@
         this.aSaveNew = null;
         this.aDelete = null;
         this.aRefresh = null;
+
+        this.isHidden = false;
         //tolbar 
         var $ulTabControl = null;
         var $divTabControl = null;
@@ -33,6 +35,8 @@
         var $dynActionList = null;
         var $actionDiv = null;
         var $divUlTabNav = null;
+
+        
 
         var self = this;
 
@@ -54,11 +58,15 @@
         init();
 
         function display(hide) {
-            if (hide)
+            self.isHidden = hide;
+            if (hide) {
                 $root.css('display', 'none');
-            else 
+            }
+            else {
                 $root.css('display', 'flex');
-        }
+            }
+            $root.data('lasttab', hide ? 'Y' : 'N');
+        };
         //Action Perormed
         var onAction = function (action) {
             self.actionPerformed(action);
@@ -271,6 +279,11 @@
      *  tab change event 
      * @param {string} action name
      */
+
+    ContentPane.prototype.getIsHidden = function () {
+        return this.isHidden;
+    };
+
 
     /**
      * remove all listner and do cleanup 

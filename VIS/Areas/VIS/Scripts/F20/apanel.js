@@ -3945,12 +3945,12 @@
     }
 
     APanel.prototype.displayIncArea = function (show) {
-        if (show) {
-            this.getIncludedEmptyArea().css('display', 'flex');
-            this.vT    
+        var tdArea = this.getIncludedEmptyArea();
+        if (show && tdArea.data('lasttab') !='Y') {
+            tdArea.css('display', 'flex');
         }
         else
-            this.getIncludedEmptyArea().css('display', 'none');
+            tdArea.css('display', 'none');
     }
 
     APanel.prototype.onQueryCompleted = function () {
