@@ -35,7 +35,7 @@ namespace VIS.Controllers
             WFManualModel obj = new WFManualModel();
             Ctx ctx = Session["ctx"] as Ctx;
             WFExecStatus retRes = obj.SaveExecuteWF(ctx, AD_Table_ID, AD_Workflow_IDs, Record_ID, AD_Window_ID);
-            return Json(JsonConvert.SerializeObject(retRes), JsonRequestBehavior.AllowGet);
+            return GetWorkflows(AD_Table_ID, Record_ID, AD_Window_ID);
         }
     }
 }

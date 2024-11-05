@@ -22,14 +22,16 @@
         var _ad_table_id = 0;
         var _record_id = 0;
         var _ad_window_id = 0;
+        var _arrowEle = null;
 
         this.init = function () {
             _ad_table_id = this.curTab.getAD_Table_ID();
             _ad_window_id = this.curTab.getAD_Window_ID();
+            _arrowEle = $('<div class="vis-wfm-arrowEle"><i class="fa fa-long-arrow-down"></i></div>');
             bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             $root.append(bsyDiv);
             setBusy(true);
-            wfNoRecDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfNoRec p-3" style="display:none;">No Records Found !!!</div>');
+            wfNoRecDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfNoRec p-3" style="display:none;">' + VIS.Msg.getMsg('NoRecords')+'</div>');
             $root.append(wfNoRecDiv);
             wfActStatusDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfActStatus p-3" style="display:none; height: 100% !important"></div>');
             $root.append(wfActStatusDiv);
@@ -39,10 +41,10 @@
             $root.append(wfSequenceDiv);
             bottomDiv = $('<div class="vis-wfm-bottomCont" style="display:none;">'
                 + '<div class="vis-tp-btnWrap float-right" style="margin-right: 10px; display: flex;">'
-                + '<a class="next btn" style="display: none;">Next<i class="fa fa-chevron-right" aria-hidden="true"></i></a>'
-                + '<a href="#" class="vis-wfm-btnNext btn">Next</a>'
-                + '<a href="#" class="vis-wfm-btnBack btn" style="display:none;">Back</a>'
-                + '<a href="#" class="vis-wfm-btnAttExe btn" style="display:none; margin-left: 10px;">Attach & Execute</a>'
+                + '<a class="next btn" style="display: none;">' + VIS.Msg.getMsg('VIS_Next') +'<i class="fa fa-chevron-right" aria-hidden="true"></i></a>'
+                + '<a href="#" class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') +'</a>'
+                + '<a href="#" class="vis-wfm-btnBack btn" style="display:none;">' + VIS.Msg.getMsg('Back') +'</a>'
+                + '<a href="#" class="vis-wfm-btnAttExe btn" style="display:none; margin-left: 10px;">' + VIS.Msg.getMsg('VIS_AttachExecute') +'</a>'
                 + '</div>'
                 + '</div>');
             $root.append(bottomDiv);
@@ -56,6 +58,12 @@
                 placeholder: "ui-state-highlight",
                 opacity: 0.8,
                 update: function (event, ui) {
+                    wfSequenceDiv.find(".vis-wfm-arrowEle").remove();
+                    for (var i = 0; i < wfSequenceDiv.find(".vis-wfm-wfSingleCard").length; i++) {
+                        if (i != (wfSequenceDiv.find(".vis-wfm-wfSingleCard").length -1)) {
+                            _arrowEle.clone().insertAfter($(wfSequenceDiv.find(".vis-wfm-wfSingleCard")[i]));
+                        }
+                    }
                     //// Optional: Code to run after rearrangement (e.g., save order)
                     //console.log("New order:", $(this).sortable("toArray"));
                 }
@@ -67,8 +75,7 @@
         };
 
         function getWFDetails(onInit) {
-            //   if (_record_id > 0) {
-            wfSelectionDiv.empty();
+            setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/WFManual/GetWorkflows",
                 data: {
@@ -77,77 +84,80 @@
                     AD_Window_ID: _ad_window_id
                 },
                 success: function (data) {
-                    setBusy(false);
                     var resData = JSON.parse(data);
-                    if (resData.processing) {
-                        showPanel("A");
-                        createHistoryPanel(resData.wfActInfo.actInfo, resData.wfAppInfo);
-                        setBusy(false);
-                    }
-                    else {
-                        if (resData.wfDetails && resData.wfDetails.length > 0) {
-                            //if (onInit) {
-                            for (var i = 0; i < resData.wfDetails.length; i++) {
-                                wfSelectionDiv.append('<div data-workflowid="' + resData.wfDetails[i].AD_Workflow_ID + '" class="vis-wfm-wfSingleCard">'
-                                    + '<div class="vis-wfm-wf-cardTextWrap">'
-                                    + '<div class="d-flex justify-content-between mb-1" style="align-items: center;">'
-                                    + '<input type="checkbox" style="height: 18px;width: 18px;">'
-                                    + '<div class="d-flex align-items-center vis-wfm-wf-Cardheader">'
-                                    // + '<i class="vis vis-info vis-wfm-popover"></i>'
-                                    + '<span class="vis-wfm-wfCardTtl vis-wfm-textOverflow-ellipsis d-block vis-wfm-wfCardTtl" title="' + resData.wfDetails[i].Name + '">' + resData.wfDetails[i].Name + '</span>'
-                                    + '</div>'
-                                    + '</div>'
-                                    // + '<div class="vis-wfm-wfCardtblName vis-wfm-textOverflow-ellipsis d-block mb-1 vis-wfm_wfType vis-wfm-wfCardTtl" title="Document Process">Document Process</div>'
-                                    + '<div class="vis-wfm-wfCardTtl"><div class="vis-wfm-wfCardDesc vis-wfm-textOverflow-ellipsis mb-1" style="margin-bottom: 0 !important;">'
-                                    + '<span class="vis-wfm-wfCardDescTtl mr-1" style="font-size: 0.800rem;">Search Key:</span>'
-                                    + '</div>'
-                                    + '<span class="vis-wfm-wfCardDescValue vis-wfm-wfSearchKey" style="font-size: 0.875rem;" title="' + resData.wfDetails[i].Value + '">' + resData.wfDetails[i].Value + '</span>'
-                                    //+ '<div class="vis-wfm-wfCardDesc vis-wfm-textOverflow-ellipsis mb-1">'
-                                    //+ '<span class="vis-wfm-wfCardDescTtl mr-1">Table:</span>'
-                                    //+ '<span class="vis-wfm-wfCardDescValue" title="C_Invoice">C_Invoice</span>'
-                                    //+ '</div>'
-                                    //+ '<div class="vis-wfm-wfCardDesc vis-wfm-textOverflow-ellipsis mb-1 d-none">'
-                                    //+ '<span class="vis-wfm-wfCardDescTtl mr-1">Workflow Logic:</span>'
-                                    //+ '<span class="vis-wfm-wfCardDescValue vis-wfm-wfLogic" title=""></span>'
-                                    //+ '</div>'
-                                    + '</div>'
-                                    + '</div>'
-                                    + '<div class="justify-content-between align-items-center vis-wfm-wf-cardBottom" style="text-align:right;">'
-                                    + '<span style="text-decoration: underline; cursor: pointer;">View Detail</span>'
-                                    //+ '<div class="d-flex">'
-                                    //+ '<i class="vis vis-delete mr-2 ml-2 vis-wfm-wfAddEditWorkflow vis-wfm-wfDeleteWorkflow" title="Delete Workflow"></i>'
-                                    //+ '<i class="vis vis-edit vis-wfm-wfAddEditWorkflow vis-wfm-wfAddEditWorkflow" title="Edit Workflow"></i>'
-                                    //+ '</div>'
-                                    + '</div>'
-                                    + '</div>');
-                            }
-                            //}
-                            //else {
-                            //    var totalWF = wfSelectionDiv.find(".vis-wfm-wfSingleCard");
-                            //    if (totalWF.length > 0) {
-                            //        for (var i = 0; i < totalWF.length; i++) {
-                            //            if ($(totalWF.find("input")[i]).prop("checked")) {
-                            //                $(totalWF.find("input")[i]).prop("checked", false);
-                            //            }
-                            //        }
-                            //    }
-                            //}
-                            showPanel("S");
-                        }
-                        else {
-                            showPanel("N");
-                        }
-                        setBusy(false);
-                    }
+                    wfDetailResponse(resData);
                 },
                 error: function (e) {
                     setBusy(false);
                 }
             });
-            //}
-            //else {
-            //    setBusy(false);
-            //}
+        };
+
+        function wfDetailResponse(resData) {
+            wfSelectionDiv.empty();
+            if (resData.processing) {
+                showPanel("A");
+                createHistoryPanel(resData.wfActInfo.actInfo, resData.wfAppInfo);
+                setBusy(false);
+            }
+            else {
+                if (resData.wfDetails && resData.wfDetails.length > 0) {
+                    //if (onInit) {
+                    for (var i = 0; i < resData.wfDetails.length; i++) {
+                        wfSelectionDiv.append('<div data-workflowid="' + resData.wfDetails[i].AD_Workflow_ID + '" class="vis-wfm-wfSingleCard">'
+                            + '<div class="vis-wfm-wf-cardTextWrap">'
+                            + '<div class="d-flex justify-content-between mb-1" style="align-items: center;">'
+                            + '<input class="vis-wfm-chkSelection" type="checkbox" style="height: 18px;width: 18px;">'
+                            + '<div class="d-flex align-items-center vis-wfm-wf-Cardheader">'
+                            + '<span class="vis-wfm-wfCardTtl vis-wfm-textOverflow-ellipsis d-block vis-wfm-wfCardTtl" title="' + resData.wfDetails[i].Name + '">' + resData.wfDetails[i].Name + '</span>'
+                            + '</div>'
+                            + '</div>'
+                            + '<div class="vis-wfm-wfCardTtl"><div class="vis-wfm-wfCardDesc vis-wfm-textOverflow-ellipsis mb-1" style="margin-bottom: 0 !important;">'
+                            + '<span class="vis-wfm-wfCardDescTtl mr-1" style="font-size: 0.800rem;">' + VIS.Msg.getMsg('SearchKeyValue') +' : </span>'
+                            + '</div>'
+                            + '<span class="vis-wfm-wfCardDescValue vis-wfm-wfSearchKey" style="font-size: 0.850rem;" title="' + resData.wfDetails[i].Value + '">' + resData.wfDetails[i].Value + '</span>'
+                            + '</div>'
+                            + '</div>'
+                            + '<div class="justify-content-between align-items-center vis-wfm-wf-cardBottom" style="text-align:right;">'
+                            + '<span style="text-decoration: underline; cursor: pointer;">' + VIS.Msg.getMsg('VIS_ViewDetail') +'</span>'
+                            + '</div>'
+                            + '</div>');
+                    }
+                    //}
+                    //else {
+                    //    var totalWF = wfSelectionDiv.find(".vis-wfm-wfSingleCard");
+                    //    if (totalWF.length > 0) {
+                    //        for (var i = 0; i < totalWF.length; i++) {
+                    //            if ($(totalWF.find("input")[i]).prop("checked")) {
+                    //                $(totalWF.find("input")[i]).prop("checked", false);
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    wfSelectionDiv.find(".vis-wfm-wf-cardTextWrap").off("click");
+                    wfSelectionDiv.find(".vis-wfm-wf-cardTextWrap").on("click", function (e) {
+                        var chkWFSel = null;
+                        e.stopPropagation();
+                        if (!$(e.target).hasClass("vis-wfm-chkSelection")) {
+                            if ($(e.target).hasClass(".vis-wfm-wfSingleCard")) {
+                                chkWFSel = $(e.target).find(".vis-wfm-chkSelection");
+                            }
+                            else {
+                                chkWFSel = $(e.target.closest(".vis-wfm-wfSingleCard")).find(".vis-wfm-chkSelection");
+                            }
+                            if (chkWFSel.prop("checked"))
+                                chkWFSel.prop("checked", false);
+                            else
+                                chkWFSel.prop("checked", true);
+                        }
+                    });
+                    showPanel("S");
+                }
+                else {
+                    showPanel("N");
+                }
+                setBusy(false);
+            }
         };
 
         function createHistoryPanel(wfActInfo, wfAppInfo) {
@@ -199,7 +209,6 @@
                     detailCtrl.AnswerCtrl = ansBtn;
                     divAP.append(ansBtn);
                     ansBtn.on('click', function () {
-
                         ansBtnClick($(this).data("id"), $(this).data("window"), $(this).data("col"));
                     });
                     detailCtrl.Action = 'W';
@@ -244,7 +253,7 @@
                         setBusy(true);
                         $.post(VIS.Application.contextUrl + 'VADMS/Document/SignatureUsingWorkflow', signData, function (res) {
                             if (res && res != 'null' && res.result == 'success') {
-                                adjust_size();
+                                //adjust_size();
                                 lstDetailCtrls = [];
                                 selectedItems = [];
                                 setBusy(false);
@@ -288,10 +297,10 @@
                                     { "activityID": wfActivityID, "nodeID": _ad_wf_node_ID, "txtMsg": msg, "fwd": fwdTo, "answer": answer, "AD_Window_ID": _ad_window_id }, function apprvoIt(info) {
                                         if (info.result == '') {
                                             aOK.data('clicked', 'N');
-                                            adjust_size();
+                                            //adjust_size();
                                             lstDetailCtrls = [];
                                             selectedItems = [];
-                                            setBusy(false);
+                                            getWFDetails(false);
                                         }
                                         else {
                                             VIS.ADialog.error(info.result);
@@ -401,7 +410,6 @@
                             aOkF.css('display', 'none');
                             aOkA.css('display', '');
                         }
-
                     };
                 }
 
@@ -520,31 +528,52 @@
             }
         };
 
-        function showPanel(panelSec) {
-            wfNoRecDiv.css("display", "none");
-            wfSelectionDiv.css("display", "none");
-            wfSequenceDiv.css("display", "none");
-            wfActStatusDiv.css("display", "none");
-            _btnBack.css("display", "none");
-            _btnNext.css("display", "none");
-            _btnExecute.css("display", "none");
-            bottomDiv.css("display", "none");
-            if (panelSec == "S") {
+        function showPanel(panelSec, fromNextBack) {
+            if (fromNextBack && (panelSec == "S" || panelSec == "Q")) {
+                _btnBack.css("display", "none");
+                _btnNext.css("display", "none");
+                _btnExecute.css("display", "none");
                 bottomDiv.css("display", "block");
-                wfSelectionDiv.css("display", "block");
-                _btnNext.css("display", "block");
+                if (panelSec == "S") {
+                    wfSequenceDiv.fadeOut(function () {
+                        _btnNext.css("display", "block");
+                        wfSelectionDiv.fadeIn();
+                    });
+                }
+                else if (panelSec == "Q") {
+                    wfSelectionDiv.fadeOut(function () {
+                        _btnBack.css("display", "block");
+                        _btnExecute.css("display", "block");
+                        wfSequenceDiv.fadeIn();
+                    });
+                }
             }
-            else if (panelSec == "Q") {
-                bottomDiv.css("display", "block");
-                wfSequenceDiv.css("display", "block");
-                _btnBack.css("display", "block");
-                _btnExecute.css("display", "block");
-            }
-            else if (panelSec == "N") {
-                wfNoRecDiv.css("display", "block");
-            }
-            else if (panelSec == "A") {
-                wfActStatusDiv.css("display", "block");
+            else {
+                wfNoRecDiv.css("display", "none");
+                wfSelectionDiv.css("display", "none");
+                wfSequenceDiv.css("display", "none");
+                wfActStatusDiv.css("display", "none");
+                _btnBack.css("display", "none");
+                _btnNext.css("display", "none");
+                _btnExecute.css("display", "none");
+                bottomDiv.css("display", "none");
+                if (panelSec == "S") {
+                    bottomDiv.css("display", "block");
+                    wfSelectionDiv.css("display", "block");
+                    _btnNext.css("display", "block");
+                }
+                else if (panelSec == "Q") {
+                    bottomDiv.css("display", "block");
+                    wfSequenceDiv.css("display", "block");
+                    _btnBack.css("display", "block");
+                    _btnExecute.css("display", "block");
+                }
+                else if (panelSec == "N") {
+                    wfNoRecDiv.css("display", "block");
+                }
+                else if (panelSec == "A") {
+                    wfActStatusDiv.css("display", "block");
+                }
             }
         };
 
@@ -563,35 +592,39 @@
             if (totalWF.length > 0) {
                 var hasSelWF = false;
                 for (var i = 0; i < totalWF.length; i++) {
-                    if ($(totalWF.find("input")[i]).prop("checked")) {
+                    if ($(totalWF.find(".vis-wfm-chkSelection")[i]).prop("checked")) {
                         hasSelWF = true;
                     }
                 }
 
                 if (hasSelWF) {
-                    showPanel("Q");
                     wfSequenceDiv.empty();
                     for (var j = 0; j < totalWF.length; j++) {
-                        if ($(totalWF.find("input")[j]).prop("checked")) {
+                        if ($(totalWF.find(".vis-wfm-chkSelection")[j]).prop("checked")) {
+                            if (j > 0) {
+                                wfSequenceDiv.append(_arrowEle.clone());
+                            }
                             wfSequenceDiv.append($(totalWF[j]).clone());
                         }
+                        
                     }
                     wfSequenceDiv.find(".vis-wfm-wfSingleCard").addClass("draggable-div").css("background-color", "#f5f5f5");
-                    wfSequenceDiv.find("input").css("display", "none");
+                    wfSequenceDiv.find(".vis-wfm-chkSelection").css("display", "none");
+                    showPanel("Q", true);
                 }
                 else {
-                    VIS.ADialog.info("PleaseSelectWF");
+                    VIS.ADialog.info("VIS_PleaseSelectWF");
                     return;
                 }
             }
         };
 
         function onBackClick(e) {
-            showPanel("S");
+            showPanel("S", true);
         };
 
         function onExecuteClick(e) {
-            VIS.ADialog.confirm("AreYouSure", true, "", "Confirm", function (result) {
+            VIS.ADialog.confirm("VIS_AreYouSure", true, "", "Confirm", function (result) {
                 if (result) {
                     setBusy(true);
                     var workflowIDs = "";
@@ -612,8 +645,8 @@
                             AD_Window_ID: _ad_window_id
                         },
                         success: function (data) {
-                            var resp = "";
-                            setBusy(false);
+                            var resData = JSON.parse(data);
+                            wfDetailResponse(resData);
                         },
                         error: function (evt) {
                             setBusy(false);

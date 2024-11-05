@@ -19,7 +19,10 @@ namespace VIS.Models
         public List<WFDetails> GetWFDetails(Ctx _ctx, int AD_Table_ID)
         {
             List<WFDetails> _wfDet = new List<WFDetails>();
-            sbQuery.Clear().Append("SELECT AD_Workflow_ID, Name, Value, Description FROM AD_Workflow WHERE WorkflowType = 'P' AND IsActive = 'Y' AND AD_Client_ID IN (0," + _ctx.GetAD_Client_ID() + ") AND AD_Table_ID = " + AD_Table_ID);
+            sbQuery.Clear().Append(@"SELECT AD_Workflow_ID, Name, Value, Description FROM AD_Workflow WHERE WorkflowType = 'P' AND IsActive = 'Y'
+            AND AD_Workflow_ID NOT IN (SELECT COALESCE(AD_Workflow_ID,0) FROM AD_Process WHERE AD_Process_ID IN
+            (SELECT AD_Process_ID FROM AD_Column WHERE AD_Table_ID = " + AD_Table_ID + @"))
+            AND AD_Client_ID IN (0," + _ctx.GetAD_Client_ID() + @") AND AD_Table_ID = " + AD_Table_ID);
             DataSet dsRes = DB.ExecuteDataset(sbQuery.ToString(), null, null);
             if (dsRes != null && dsRes.Tables[0].Rows.Count > 0)
             {
@@ -81,37 +84,36 @@ namespace VIS.Models
                     seqNo = seqNo + 10;
             }
             _trxManWF.Commit();
-
-            StartWFExecution(_ctx, WF_ID, AD_Table_ID, Record_ID, AD_Window_ID);
+            WFCommon.StartWFExecution(_ctx, WF_ID, AD_Table_ID, Record_ID, AD_Window_ID);
 
             _trxManWF = null;
             return _wfStatus;
         }
 
-        public string StartWFExecution(Ctx _ctx, int AD_WorkFlow_ID, int AD_Table_ID, int Record_ID, int AD_Window_ID)
-        {
-            MWorkflow wf = new MWorkflow(_ctx, AD_WorkFlow_ID, null);
-            int AD_Process_ID = 305;        //	HARDCODED
-            VAdvantage.ProcessEngine.ProcessInfo pi = new VAdvantage.ProcessEngine.ProcessInfo(wf.GetName(), AD_Process_ID, AD_Table_ID, Record_ID);
-            pi.SetAD_User_ID(_ctx.GetAD_User_ID());
-            pi.SetAD_Client_ID(_ctx.GetAD_Client_ID());
+        //public string StartWFExecution(Ctx _ctx, int AD_WorkFlow_ID, int AD_Table_ID, int Record_ID, int AD_Window_ID)
+        //{
+        //    MWorkflow wf = new MWorkflow(_ctx, AD_WorkFlow_ID, null);
+        //    int AD_Process_ID = 305;        //	HARDCODED
+        //    VAdvantage.ProcessEngine.ProcessInfo pi = new VAdvantage.ProcessEngine.ProcessInfo(wf.GetName(), AD_Process_ID, AD_Table_ID, Record_ID);
+        //    pi.SetAD_User_ID(_ctx.GetAD_User_ID());
+        //    pi.SetAD_Client_ID(_ctx.GetAD_Client_ID());
 
-            // vinay bhatt for window id
-            pi.SetAD_Window_ID(AD_Window_ID);
+        //    // vinay bhatt for window id
+        //    pi.SetAD_Window_ID(AD_Window_ID);
 
-            wf.GetCtx().SetContext("#AD_Client_ID", pi.GetAD_Client_ID().ToString());
-            MWFProcess retVal = wf.Start(pi);
-            if (retVal != null)
-            {
-                //log.Config(wf.GetName());
-                //_noStarted++;
-                //started = true;
+        //    wf.GetCtx().SetContext("#AD_Client_ID", pi.GetAD_Client_ID().ToString());
+        //    MWFProcess retVal = wf.Start(pi);
+        //    if (retVal != null)
+        //    {
+        //        //log.Config(wf.GetName());
+        //        //_noStarted++;
+        //        //started = true;
 
-                // VIS0060: work done to Show Message from workflow Process
-                //document.SetDocWFMsg(retVal.GetProcessMsg());
-            }
-            return "";
-        }
+        //        // VIS0060: work done to Show Message from workflow Process
+        //        //document.SetDocWFMsg(retVal.GetProcessMsg());
+        //    }
+        //    return "";
+        //}
 
         public bool IsWFInExecution(Ctx _ctx, int AD_Table_ID, int Record_ID)
         {

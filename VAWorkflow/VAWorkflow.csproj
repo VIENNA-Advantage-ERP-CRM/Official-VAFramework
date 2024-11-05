@@ -75,6 +75,7 @@
     <Compile Include="WF\MWorkflowProcessor.cs" />
     <Compile Include="WF\MWorkflowProcessorLog.cs" />
     <Compile Include="WF\WFActivityManage.cs" />
+    <Compile Include="WF\WFCommon.cs" />
     <Compile Include="WF\WFProcessManage.cs" />
     <Compile Include="WF\WorkflowMoveToClient.cs" />
     <Compile Include="WF\WorkflowValidate.cs" />
