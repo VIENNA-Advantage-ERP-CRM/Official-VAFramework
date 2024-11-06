@@ -23,28 +23,42 @@
         var _record_id = 0;
         var _ad_window_id = 0;
         var _arrowEle = null;
+        var _wfCompPageID = 0;
 
+        /**
+         * init function to initialize design
+         */
         this.init = function () {
-            _ad_table_id = this.curTab.getAD_Table_ID();
-            _ad_window_id = this.curTab.getAD_Window_ID();
-            _arrowEle = $('<div class="vis-wfm-arrowEle"><i class="fa fa-long-arrow-down"></i></div>');
             bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             $root.append(bsyDiv);
             setBusy(true);
-            wfNoRecDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfNoRec p-3" style="display:none;">' + VIS.Msg.getMsg('NoRecords')+'</div>');
+            _ad_table_id = this.curTab.getAD_Table_ID();
+            _ad_window_id = this.curTab.getAD_Window_ID();
+            _arrowEle = $('<div class="vis-wfm-arrowEle"><i class="fa fa-long-arrow-down"></i></div>');
+
+            // No records section
+            wfNoRecDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfNoRec p-3" style="display:none;">' + VIS.Msg.getMsg('NoRecords') + '</div>');
             $root.append(wfNoRecDiv);
+
+            // Activity status section
             wfActStatusDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfActStatus p-3" style="display:none; height: 100% !important"></div>');
             $root.append(wfActStatusDiv);
+
+            // Selection workflow section
             wfSelectionDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfSelction p-3" style="display:none;"></div>');
             $root.append(wfSelectionDiv);
+
+            // Sequence workflow section
             wfSequenceDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfSequence p-3" style="display:none;"></div>');
             $root.append(wfSequenceDiv);
+
+            // Bottom buttons section
             bottomDiv = $('<div class="vis-wfm-bottomCont" style="display:none;">'
                 + '<div class="vis-tp-btnWrap float-right" style="margin-right: 10px; display: flex;">'
-                + '<a class="next btn" style="display: none;">' + VIS.Msg.getMsg('VIS_Next') +'<i class="fa fa-chevron-right" aria-hidden="true"></i></a>'
-                + '<a href="#" class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') +'</a>'
-                + '<a href="#" class="vis-wfm-btnBack btn" style="display:none;">' + VIS.Msg.getMsg('Back') +'</a>'
-                + '<a href="#" class="vis-wfm-btnAttExe btn" style="display:none; margin-left: 10px;">' + VIS.Msg.getMsg('VIS_AttachExecute') +'</a>'
+                + '<a class="next btn" style="display: none;">' + VIS.Msg.getMsg('VIS_Next') + '<i class="fa fa-chevron-right" aria-hidden="true"></i></a>'
+                + '<a href="#" class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') + '</a>'
+                + '<a href="#" class="vis-wfm-btnBack btn" style="display:none;">' + VIS.Msg.getMsg('Back') + '</a>'
+                + '<a href="#" class="vis-wfm-btnAttExe btn" style="display:none; margin-left: 10px;">' + VIS.Msg.getMsg('VIS_AttachExecute') + '</a>'
                 + '</div>'
                 + '</div>');
             $root.append(bottomDiv);
@@ -52,15 +66,17 @@
             _btnBack = bottomDiv.find(".vis-wfm-btnBack");
             _btnExecute = bottomDiv.find(".vis-wfm-btnAttExe");
 
+            // enable drag drop event on sequence workflows section section
             wfSequenceDiv.sortable({
                 items: ".draggable-div",
                 cursor: "move",
                 placeholder: "ui-state-highlight",
                 opacity: 0.8,
                 update: function (event, ui) {
+                    // reset arrows for sequence in sequence div
                     wfSequenceDiv.find(".vis-wfm-arrowEle").remove();
                     for (var i = 0; i < wfSequenceDiv.find(".vis-wfm-wfSingleCard").length; i++) {
-                        if (i != (wfSequenceDiv.find(".vis-wfm-wfSingleCard").length -1)) {
+                        if (i != (wfSequenceDiv.find(".vis-wfm-wfSingleCard").length - 1)) {
                             _arrowEle.clone().insertAfter($(wfSequenceDiv.find(".vis-wfm-wfSingleCard")[i]));
                         }
                     }
@@ -69,12 +85,16 @@
                 }
             });
 
+            // call bind events function
             bindEvents();
-
             //getWFDetails(true);
         };
 
-        function getWFDetails(onInit) {
+        /**
+         * ajax call to get workflow details against record and table id and then pass response 
+         * to another funtion to load design of workflow panel
+         */
+        function getWFDetails() {
             setBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/WFManual/GetWorkflows",
@@ -93,13 +113,25 @@
             });
         };
 
+        /**
+         * function to load design for workflow panel based on the response received from 
+         * controller function
+         * @param {object} resData - fetched from ajax call for workflow
+         */
         function wfDetailResponse(resData) {
+            // if workflow composer module is installed then get page id of workflow composer page
+            if (_wfCompPageID <= 0) {
+                _wfCompPageID = resData.composerID;
+            }
+            // clear workflow selection div
             wfSelectionDiv.empty();
+            // check if workflow is in processing (e.g. in approval) then display workflow history tree
             if (resData.processing) {
                 showPanel("A");
                 createHistoryPanel(resData.wfActInfo.actInfo, resData.wfAppInfo);
                 setBusy(false);
             }
+            // else show linked document process type of workflows with this table
             else {
                 if (resData.wfDetails && resData.wfDetails.length > 0) {
                     //if (onInit) {
@@ -113,13 +145,13 @@
                             + '</div>'
                             + '</div>'
                             + '<div class="vis-wfm-wfCardTtl"><div class="vis-wfm-wfCardDesc vis-wfm-textOverflow-ellipsis mb-1" style="margin-bottom: 0 !important;">'
-                            + '<span class="vis-wfm-wfCardDescTtl mr-1" style="font-size: 0.800rem;">' + VIS.Msg.getMsg('SearchKeyValue') +' : </span>'
+                            + '<span class="vis-wfm-wfCardDescTtl mr-1" style="font-size: 0.800rem;">' + VIS.Msg.getMsg('SearchKeyValue') + ' : </span>'
                             + '</div>'
                             + '<span class="vis-wfm-wfCardDescValue vis-wfm-wfSearchKey" style="font-size: 0.850rem;" title="' + resData.wfDetails[i].Value + '">' + resData.wfDetails[i].Value + '</span>'
                             + '</div>'
                             + '</div>'
                             + '<div class="justify-content-between align-items-center vis-wfm-wf-cardBottom" style="text-align:right;">'
-                            + '<span style="text-decoration: underline; cursor: pointer;">' + VIS.Msg.getMsg('VIS_ViewDetail') +'</span>'
+                            + '<span class="vis-wfm-viewDetail" style="text-decoration: underline; cursor: pointer;">' + VIS.Msg.getMsg('VIS_ViewDetail') + '</span>'
                             + '</div>'
                             + '</div>');
                     }
@@ -160,10 +192,17 @@
             }
         };
 
+        /**
+         * function to create workflow activity history for the nodes executed and 
+         * display approval request if any for the login user
+         * @param {object} wfActInfo - workflow activity details returned in response
+         * @param {object} wfAppInfo - workflow approval details returned in response based on which design will be created
+         */
         function createHistoryPanel(wfActInfo, wfAppInfo) {
             wfActStatusDiv.empty();
 
             var approvalContainer = $('<div class="vis-wfm-ApprovalCont"></div>');
+            // display approval requests for the login user here
             if (wfAppInfo) {
                 wfActStatusDiv.append(approvalContainer);
                 var detailCtrl = {};
@@ -416,7 +455,7 @@
                 lstDetailCtrls.push(detailCtrl);
             }
 
-            //var actInfo = wfActInfo.actInfo;
+            // display activity history for the nodes executed in past
             if (wfActInfo.length > 0) {
                 for (var i = 0; i < wfActInfo.length; i++) {
                     var divHistory = $("<div id='History_ID_'" + i + "' class='vis-history-wrap vis-wfm-wfHisCont' style='display: block;'></div>");
@@ -477,7 +516,12 @@
             }
         };
 
-        //Create Controls based on data
+        /**
+         * function to get VIS control based on the parameters passed
+         * @param {object} info - object of activity info
+         * @param {number} wfActivityID - workflow activity ID
+         * @returns {object} - VIS control based on the display type
+         */
         function getControl(info, wfActivityID) {
             var ctrl = null;
 
@@ -485,7 +529,6 @@
                 return ctrl;
             }
             if (info.ColReference == VIS.DisplayType.YesNo) {
-
                 var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.List, info.ColName, 319, false, null);
                 ctrl = new VIS.Controls.VComboBox(info.ColName, false, false, true, lookup, 50);
                 return ctrl;
@@ -528,6 +571,11 @@
             }
         };
 
+        /**
+         * function to show different panels based on the parameter passed
+         * @param {string} panelSec - varibale for the type of panel to be displayed
+         * @param {boolean} fromNextBack - parameter whether clicked from Next or Back button
+         */
         function showPanel(panelSec, fromNextBack) {
             if (fromNextBack && (panelSec == "S" || panelSec == "Q")) {
                 _btnBack.css("display", "none");
@@ -577,37 +625,78 @@
             }
         };
 
+        /**
+         * function to set the panel as busy or not
+         * @param {boolean} isBusy - true or false to specify whether to show busy indicator or hide it
+         */
         function setBusy(isBusy) {
             bsyDiv.css("display", isBusy ? 'block' : 'none');
         };
 
+        /**
+         * function to bind events for the controls and UI elements
+         */
         function bindEvents() {
             _btnNext.on("click", onNextClick);
             _btnBack.on("click", onBackClick);
             _btnExecute.on("click", onExecuteClick);
+            wfSelectionDiv.on("click", onSelectionDivClick);
+            wfSequenceDiv.on("click", onSequenceDivClick);
         };
 
+        /**
+         * click event handled when user clicks on selection div
+         * @param {Event} e - event triggered
+         */
+        function onSelectionDivClick(e) {
+            e.stopPropagation();
+            viewDetailClick($(e.target));
+        };
+
+        /**
+         * click event handled when user clicks on sequence div
+         * @param {Event} e - event triggered
+         */
+        function onSequenceDivClick(e) {
+            e.stopPropagation();
+            viewDetailClick($(e.target));
+        };
+
+        /**
+         * function to call workflow composer form when user clicked on View Detail button
+         * @param {Element} targetElement - target element which was clicked by the user
+         */
+        function viewDetailClick(targetElement) {
+            if (targetElement.hasClass("vis-wfm-viewDetail")) {
+                if (_wfCompPageID > 0) {
+                    VIS.viewManager.startForm(_wfCompPageID, targetElement.closest(".vis-wfm-wfSingleCard").attr("data-workflowid"));
+                }
+                else {
+                    VIS.ADialog.info("VIS_WFCompNotInstalled");
+                }
+            }
+        };
+
+        /**
+         * next button click event
+         * @param {Event} e - event
+         */
         function onNextClick(e) {
             var totalWF = wfSelectionDiv.find(".vis-wfm-wfSingleCard");
             if (totalWF.length > 0) {
                 var hasSelWF = false;
-                for (var i = 0; i < totalWF.length; i++) {
-                    if ($(totalWF.find(".vis-wfm-chkSelection")[i]).prop("checked")) {
+                wfSequenceDiv.empty();
+                for (var j = 0; j < totalWF.length; j++) {
+                    if ($(totalWF.find(".vis-wfm-chkSelection")[j]).prop("checked")) {
                         hasSelWF = true;
+                        if (wfSequenceDiv.find(".vis-wfm-wfSingleCard").length > 0)
+                            wfSequenceDiv.append(_arrowEle.clone());
+                        wfSequenceDiv.append($(totalWF[j]).clone());
                     }
                 }
-
+                // if there are any records selected from the selection div
+                // then display sequence div else display message to the user
                 if (hasSelWF) {
-                    wfSequenceDiv.empty();
-                    for (var j = 0; j < totalWF.length; j++) {
-                        if ($(totalWF.find(".vis-wfm-chkSelection")[j]).prop("checked")) {
-                            if (j > 0) {
-                                wfSequenceDiv.append(_arrowEle.clone());
-                            }
-                            wfSequenceDiv.append($(totalWF[j]).clone());
-                        }
-                        
-                    }
                     wfSequenceDiv.find(".vis-wfm-wfSingleCard").addClass("draggable-div").css("background-color", "#f5f5f5");
                     wfSequenceDiv.find(".vis-wfm-chkSelection").css("display", "none");
                     showPanel("Q", true);
@@ -619,11 +708,20 @@
             }
         };
 
+        /**
+         * back button click event
+         * @param {Event} e - event
+         */
         function onBackClick(e) {
             showPanel("S", true);
         };
 
+        /**
+         * attach and execute button click event
+         * @param {Event} e - event
+         */
         function onExecuteClick(e) {
+            // confirm dialog to make sure 
             VIS.ADialog.confirm("VIS_AreYouSure", true, "", "Confirm", function (result) {
                 if (result) {
                     setBusy(true);
@@ -676,6 +774,9 @@
             }
         };
 
+        /*
+        * Dispose components and turn off events
+        */
         this.disposeComponent = function () {
             this.record_ID = 0;
             this.windowNo = 0;
@@ -688,6 +789,10 @@
                 _btnBack.off("click");
             if (_btnExecute)
                 _btnExecute.off("click");
+            if (wfSelectionDiv)
+                wfSelectionDiv.off("click");
+            if (wfSequenceDiv)
+                wfSequenceDiv.off("click");
             $root.remove();
             $root = null;
         };

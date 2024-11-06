@@ -296,6 +296,7 @@ namespace VAdvantage.WF
                 if (_po != null)
                 {
                     _po.Unlock(Get_TrxName());
+                    // VIS0008 Changes done to execute next workflow in case if executed manually from the record
                     int nextWF_ID = GetNextManualWFID(GetAD_Table_ID(), GetRecord_ID(), GetAD_Workflow_ID());
                     if (nextWF_ID > 0)
                     {
@@ -580,6 +581,13 @@ namespace VAdvantage.WF
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Function to check next workflow ID to execute if workflow executed manaully from record itself
+        /// </summary>
+        /// <param name="AD_Table_ID">Table ID</param>
+        /// <param name="Record_ID">Record ID</param>
+        /// <param name="curr_WF_ID">Current workflow in execution</param>
+        /// <returns>Next workflow ID to execute</returns>
         public int GetNextManualWFID(int AD_Table_ID, int Record_ID, int curr_WF_ID)
         {
             int nextWF_ID = 0;
@@ -588,6 +596,8 @@ namespace VAdvantage.WF
             {
                 for (int i = 0; i < dsWF.Tables[0].Rows.Count; i++)
                 {
+                    // check if current workflow being executed is the same which is next in sequence then break the loop
+                    // else fetch next workflow in execution
                     if (Util.GetValueOfInt(dsWF.Tables[0].Rows[i]["AD_WorkFlow_ID"]) == curr_WF_ID)
                     {
                         break;

@@ -1,4 +1,12 @@
-﻿using System;
+﻿/********************************************************
+ * Module Name    : Workflow
+ * Purpose        : Model for Manual execution of workflow against record and display activities
+ * Class Used     : WFManualModel
+ * Chronological Development
+ * VIS0008        06-Nov-2024
+ ******************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -13,12 +21,25 @@ using VAdvantage.WF;
 
 namespace VIS.Models
 {
+    /// <summary>
+    /// Model class for workflow manual execution
+    /// </summary>
     public class WFManualModel
     {
-        StringBuilder sbQuery = new StringBuilder("");
+        #region Private Variables
+        private StringBuilder sbQuery = new StringBuilder("");
+        #endregion Private Variables
+
+        /// <summary>
+        /// Get workflows of document process type against the table passed in parameter
+        /// </summary>
+        /// <param name="_ctx">Context</param>
+        /// <param name="AD_Table_ID">Table</param>
+        /// <returns>List of workflow details</returns>
         public List<WFDetails> GetWFDetails(Ctx _ctx, int AD_Table_ID)
         {
             List<WFDetails> _wfDet = new List<WFDetails>();
+            // Fetch all workflows of type document process linked with table passed in parameter, which are not linked with any button on this table
             sbQuery.Clear().Append(@"SELECT AD_Workflow_ID, Name, Value, Description FROM AD_Workflow WHERE WorkflowType = 'P' AND IsActive = 'Y'
             AND AD_Workflow_ID NOT IN (SELECT COALESCE(AD_Workflow_ID,0) FROM AD_Process WHERE AD_Process_ID IN
             (SELECT AD_Process_ID FROM AD_Column WHERE AD_Table_ID = " + AD_Table_ID + @"))
@@ -39,6 +60,15 @@ namespace VIS.Models
             return _wfDet;
         }
 
+        /// <summary>
+        /// Save workflows in AD_WF_ManualAttached table passed in the parameter and execute workflows in sequence after that
+        /// </summary>
+        /// <param name="_ctx">Context</param>
+        /// <param name="AD_Table_ID">Table ID</param>
+        /// <param name="AD_Workflow_IDs">Workflow IDs string</param>
+        /// <param name="Record_ID">Record ID (Primary Key)</param>
+        /// <param name="AD_Window_ID">Screen ID</param>
+        /// <returns>Status of workflow execution with error message</returns>
         public WFExecStatus SaveExecuteWF(Ctx _ctx, int AD_Table_ID, string AD_Workflow_IDs, int Record_ID, int AD_Window_ID)
         {
             WFExecStatus _wfStatus = new WFExecStatus();
@@ -49,83 +79,103 @@ namespace VIS.Models
             int seqNo = 10;
             Trx _trxManWF = Trx.GetTrx("WFManual_" + System.DateTime.Now.Ticks);
             int WF_ID = 0;
-            for (int i = 0; i < ids.Length; i++)
+            try
             {
-                if (i == 0)
-                    WF_ID = Util.GetValueOfInt(ids[i]);
-                PO _po = MTable.GetPO(_ctx, "AD_WF_ManualAttached", 0, _trxManWF);
-                _po.SetAD_Client_ID(_ctx.GetAD_Client_ID());
-                _po.SetAD_Org_ID(_ctx.GetAD_Org_ID());
-                _po.Set_ValueNoCheck("AD_Table_ID", AD_Table_ID);
-                _po.Set_ValueNoCheck("Record_ID", Record_ID);
-                _po.Set_ValueNoCheck("AD_Workflow_ID", Util.GetValueOfInt(ids[i]));
-                _po.Set_ValueNoCheck("AD_Window_ID", AD_Window_ID);
-                _po.Set_Value("SeqNo", seqNo);
-                if (!_po.Save())
+                for (int i = 0; i < ids.Length; i++)
                 {
-                    ValueNamePair vnp = VLogger.RetrieveError();
-                    string error = "";
-                    if (vnp != null)
+                    // get first workflow in WF_ID, so that first workflow can be passed for execution
+                    if (i == 0)
+                        WF_ID = Util.GetValueOfInt(ids[i]);
+                    PO _po = MTable.GetPO(_ctx, "AD_WF_ManualAttached", 0, _trxManWF);
+                    _po.SetAD_Client_ID(_ctx.GetAD_Client_ID());
+                    _po.SetAD_Org_ID(_ctx.GetAD_Org_ID());
+                    _po.Set_ValueNoCheck("AD_Table_ID", AD_Table_ID);
+                    _po.Set_ValueNoCheck("Record_ID", Record_ID);
+                    _po.Set_ValueNoCheck("AD_Workflow_ID", Util.GetValueOfInt(ids[i]));
+                    _po.Set_ValueNoCheck("AD_Window_ID", AD_Window_ID);
+                    _po.Set_Value("SeqNo", seqNo);
+                    if (!_po.Save())
                     {
-                        error = vnp.GetName();
-                        if (error == "" && vnp.GetValue() != null)
-                            error = vnp.GetValue();
+                        ValueNamePair vnp = VLogger.RetrieveError();
+                        string error = "";
+                        if (vnp != null)
+                        {
+                            error = vnp.GetName();
+                            if (error == "" && vnp.GetValue() != null)
+                                error = vnp.GetValue();
+                        }
+                        if (error == "")
+                            error = "Error in saving manual workflow execution, Workflow ID -> " + Util.GetValueOfInt(ids[i]);
+                        //log.Log(Level.SEVERE, "Version Window not Created :: " + DisplayName + " :: " + error);
+                        _wfStatus.ErrorMsg = error;
+                        _wfStatus.Status = false;
+                        if (_trxManWF != null)
+                        {
+                            _trxManWF.Rollback();
+                            _trxManWF.Close();
+                            _trxManWF = null;
+                        }
+                        return _wfStatus;
                     }
-                    if (error == "")
-                        error = "Error in creating Version Window";
-                    //log.Log(Level.SEVERE, "Version Window not Created :: " + DisplayName + " :: " + error);
-                    _wfStatus.ErrorMsg = error;
-                    _wfStatus.Status = false;
-                    _trxManWF.Rollback();
-                    _trxManWF = null;
-                    return _wfStatus;
+                    else
+                        seqNo = seqNo + 10;
                 }
-                else
-                    seqNo = seqNo + 10;
+                if (_trxManWF != null)
+                {
+                    _trxManWF.Commit();
+                    _trxManWF.Close();
+                    _trxManWF = null;
+                }
+                // execute first workflow here against the record ID
+                string wfExeRes = WFCommon.StartWFExecution(_ctx, WF_ID, AD_Table_ID, Record_ID, AD_Window_ID);
+                _wfStatus.ErrorMsg = wfExeRes;
             }
-            _trxManWF.Commit();
-            WFCommon.StartWFExecution(_ctx, WF_ID, AD_Table_ID, Record_ID, AD_Window_ID);
+            catch (Exception ex)
+            {
+                if (_trxManWF != null)
+                {
+                    _trxManWF.Rollback();
+                    _trxManWF.Close();
+                    _trxManWF = null;
+                }
+                _wfStatus.ErrorMsg = ex.Message;
+                _wfStatus.Status = false;
+            }
+            finally
+            {
+                if (_trxManWF != null)
+                {
+                    _trxManWF.Commit();
+                    _trxManWF.Close();
+                    _trxManWF = null;
+                }
+            }
 
-            _trxManWF = null;
             return _wfStatus;
         }
 
-        //public string StartWFExecution(Ctx _ctx, int AD_WorkFlow_ID, int AD_Table_ID, int Record_ID, int AD_Window_ID)
-        //{
-        //    MWorkflow wf = new MWorkflow(_ctx, AD_WorkFlow_ID, null);
-        //    int AD_Process_ID = 305;        //	HARDCODED
-        //    VAdvantage.ProcessEngine.ProcessInfo pi = new VAdvantage.ProcessEngine.ProcessInfo(wf.GetName(), AD_Process_ID, AD_Table_ID, Record_ID);
-        //    pi.SetAD_User_ID(_ctx.GetAD_User_ID());
-        //    pi.SetAD_Client_ID(_ctx.GetAD_Client_ID());
-
-        //    // vinay bhatt for window id
-        //    pi.SetAD_Window_ID(AD_Window_ID);
-
-        //    wf.GetCtx().SetContext("#AD_Client_ID", pi.GetAD_Client_ID().ToString());
-        //    MWFProcess retVal = wf.Start(pi);
-        //    if (retVal != null)
-        //    {
-        //        //log.Config(wf.GetName());
-        //        //_noStarted++;
-        //        //started = true;
-
-        //        // VIS0060: work done to Show Message from workflow Process
-        //        //document.SetDocWFMsg(retVal.GetProcessMsg());
-        //    }
-        //    return "";
-        //}
-
+        /// <summary>
+        /// Check if the workflow is in execution from Workflow activity
+        /// </summary>
+        /// <param name="_ctx">Context</param>
+        /// <param name="AD_Table_ID">Table ID</param>
+        /// <param name="Record_ID">Record ID</param>
+        /// <returns>True/False</returns>
         public bool IsWFInExecution(Ctx _ctx, int AD_Table_ID, int Record_ID)
         {
             return Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_WF_Activity_ID) FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " AND Processed = 'N'")) > 0;
         }
 
+        /// <summary>
+        /// Fetch workflow activity details against table and record id
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="AD_Table_ID">Table ID</param>
+        /// <param name="Record_ID">Record ID</param>
+        /// <returns>Workflow activity details</returns>
         public WFActivityDetails GetWFActivity(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
             VIS.Models.WFActivityModel actModel = new WFActivityModel();
-            //ActivityInfo actInf = actModel.GetActivityInfo(0, 0, 0, ctx);
-
-            //List<WFActivityInfo> lstInfo = new List<WFActivityInfo>();
             WFActivityDetails _wfActDet = new WFActivityDetails();
             DataSet ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " AND Processed = 'N' ORDER BY Created DESC");
             if (ds != null && ds.Tables[0].Rows.Count > 0)
@@ -152,7 +202,6 @@ namespace VIS.Models
                     itm.TxtMsg = act.GetTextMsg();
                     itm.WfState = act.GetWFState();
                     itm.EndWaitTime = act.GetEndWaitTime();
-                    //itm.Created = Util.GetValueOfString(dr["Created"]);
                     DateTime _createdDate = new DateTime();
                     if (act.GetCreated().ToString() != null && act.GetCreated().ToString() != "")
                     {
@@ -173,7 +222,6 @@ namespace VIS.Models
                     itm.AD_Window_ID = Util.GetValueOfInt(act.GetAD_Window_ID());
                     _wfActDet.wfActInf = itm;
                     break;
-                    //lstInfo.Add(itm);
                 }
             }
 
@@ -200,13 +248,38 @@ namespace VIS.Models
             return _wfActDet;
         }
 
+        /// <summary>
+        /// Get approval activities against for the login user against the table and record ID
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="AD_Window_ID">Window ID</param>
+        /// <param name="Record_ID">Record ID</param>
+        /// <returns>Workflow Info</returns>
         public WFInfo GetAppActivities(Ctx ctx, int AD_Window_ID, int Record_ID)
         {
             WFActivityModel wfm = new WFActivityModel();
             return wfm.GetRecordActivities(ctx, ctx.GetAD_User_ID(), ctx.GetAD_Client_ID(), AD_Window_ID, Record_ID);
         }
+
+        /// <summary>
+        /// Function to check the page ID of workflow composer
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <returns>Workflow composer page ID</returns>
+        public int GetWFComposerPageID(Ctx ctx)
+        {
+            int wfCompPageID = 0;
+            if (Env.IsModuleInstalled("VA102_"))
+            {
+                wfCompPageID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Form_ID FROM AD_Form WHERE Name = 'VA102_WorkflowComposer'"));
+            }
+            return wfCompPageID;
+        }
     }
 
+    /// <summary>
+    /// Workflow Details class
+    /// </summary>
     public class WFDetails
     {
         public string Name { get; set; }
@@ -216,17 +289,22 @@ namespace VIS.Models
 
     }
 
+    /// <summary>
+    /// workflow execution status class
+    /// </summary>
     public class WFExecStatus
     {
         public string ErrorMsg { get; set; }
         public bool Status { get; set; }
     }
 
+    /// <summary>
+    /// Workflow activity details
+    /// </summary>
     public class WFActivityDetails
     {
         public WFActivityInfo wfActInf { get; set; }
 
         public List<ActivityInfo> actInfo { get; set; }
     }
-
 }
