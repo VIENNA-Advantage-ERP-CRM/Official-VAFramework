@@ -16,7 +16,7 @@
             '         <div class="card">                                                       ' +
             '             <div class="card-header" style="cursor:pointer" data-toggle="collapse" href="#collapseOne_' + winNo + '">                                            ' +
             '                 <span>' + VIS.Msg.getMsg("CustomCondition") + '</span>                                  ' +
-            '                 <a class="card-link" > ' +
+            '                 <a href="javascript:;" class="card-link" > ' +
             '                     <i class="vis vis-arrow-down"></i>                             ' +
             '                 </a>                                                             ' +
             '             </div>                                                               ' +
@@ -125,6 +125,8 @@
         var chkFullDay = divDynamic.find("#checkFullDay_" + windowNo);
         var btnSave = bodyDiv.find('.saveFilter');
         var btnSaveAs = bodyDiv.find('.saveAs');
+        btnSaveAs.addClass('vis-fp-btnDisable');
+        btnSaveAs.attr('tabindex','-1');
         var lastFocus = null;
         var btnClearAll = bodyDiv.find('.btnClearAll');
         var btnClose = $('<button class="ml-1 vis-fp-btnfocus" style="border: 1px solid rgba(var(--v-c-primary),1);color: rgba(var(--v-c-primary),1); background:rgba(var(--v-c-on-primary),1); " ><i class="fa fa-times"></i></button>');
@@ -206,7 +208,7 @@
                     }
 
                     else {
-                        crt = VIS.VControlFactory.getControl(null, field, true, true, false);
+                        crt = VIS.VControlFactory.getControl(null, field, true, false, false);
                     }
 
                     crt.setReadOnly(false);
@@ -866,6 +868,7 @@
             txtFilterName.val(self.curTab.searchText);
             if (self.curTab.searchText == "") {
                 btnSaveAs.addClass('vis-fp-btnDisable');
+                btnSaveAs.attr("tabindex", "-1");
             }
             lastFocus.focus();
             //if (txtFilterName.val() !="") {
@@ -882,6 +885,7 @@
                 txtFilterName.val(self.curTab.searchText);
                 if (self.curTab.searchText == "") {
                     btnSaveAs.addClass('vis-fp-btnDisable');
+                    btnSaveAs.attr("tabindex", "-1");
                 }
                 lastFocus.focus();
                 overLay.hide();
@@ -891,6 +895,7 @@
 
         btnClearAll.on('click', function () {
             btnSaveAs.addClass('vis-fp-btnDisable');
+            btnSaveAs.attr("tabindex", "-1");
             self.curGC.aPanel.removeSearchOnDelete();
         });
 
@@ -910,6 +915,12 @@
             //deleteDynRow();
             var tabIdx = self.cmbTabs.val();
             self.fillColumns(tabIdx);
+            if (divValue1) {
+                var ctrl = divValue1.children()[0];
+                if (ctrl) {
+                    ctrl.remove();
+                }
+            }
         })
 
         //dynamic
@@ -1680,6 +1691,7 @@
 
             txtFilterName.val(self.curTab.searchText);
             btnSaveAs.removeClass('vis-fp-btnDisable');
+            btnSaveAs.removeAttr("tabindex");
             //txtFilterName.addClass('vis-filterNameReadonly');
 
             self.curGC.aPanel.setBusy(true);
@@ -1690,14 +1702,14 @@
             if (dr) {
 
                 var notr = {
-                    "=": " = ",
-                    "!=": " != ",
+                    "=": "=",
+                    "!=": "!=",
                     "~":" LIKE ",
                     "!~": " NOT LIKE ",
-                    ">": " > ",
-                    ">=": " >= ",
-                    "<": " < ",
-                    "<=": " <= ",
+                    ">": ">",
+                    ">=": ">=",
+                    "<": "<",
+                    "<=": "<=",
                     ">-<": " BETWEEN "
                 }
 
@@ -1724,6 +1736,7 @@
             isSaveAs = false;
             txtFilterName.val('');
             btnSaveAs.addClass('vis-fp-btnDisable');
+            btnSaveAs.attr("tabindex", "-1");
             //txtFilterName.removeClass('vis-filterNameReadonly');
             dsAdvanceData = {};
             dsFilterData = [];
