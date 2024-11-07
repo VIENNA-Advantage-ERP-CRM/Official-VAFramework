@@ -26,8 +26,7 @@ namespace VIS.Controllers
         [AjaxSessionFilterAttribute]
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult GetData(string TableName, int PageNo, bool ForMobile,
-            bool Requery, string SrchCtrl, string Validation, int Window_ID)
+        public JsonResult GetData(string TableName, int PageNo, bool ForMobile, bool Requery, string SrchCtrl, string Validation, int Window_ID, string WindowName)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             VIS.Models.InfoProductModel model = new Models.InfoProductModel();
@@ -38,24 +37,24 @@ namespace VIS.Controllers
 
                 List<InfoSearchCol> srchCtrl = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrl);
 
-                return Json(JsonConvert.SerializeObject(model.GetData(TableName, PageNo, ForMobile, ctx,
-                    Requery, srchCtrl, Validation, Window_ID)), JsonRequestBehavior.AllowGet);
+                return Json(JsonConvert.SerializeObject(model.GetData(TableName, PageNo, ForMobile, ctx, Requery, srchCtrl, Validation, Window_ID, WindowName)), JsonRequestBehavior.AllowGet);
             }
             return Json(null);
         }
 
-        public JsonResult GetCart(int pageNo, bool isCart, int windowID, int WarehouseID, int WarehouseToID, int LocatorID,
+        public JsonResult GetCart(int pageNo, bool isCart, int windowID, string WindowName, int WarehouseID, int WarehouseToID, int LocatorID,
             int LocatorToID, int BPartnerID, string srchCtrl, bool requery)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             List<InfoSearchCol> srchCtrls = JsonConvert.DeserializeObject<List<InfoSearchCol>>(srchCtrl);
             VIS.Models.InfoProductModel model = new VIS.Models.InfoProductModel();
-            return Json(JsonConvert.SerializeObject(model.GetCart(pageNo, isCart, windowID, WarehouseID, WarehouseToID, LocatorID, LocatorToID, BPartnerID
-                , ctx, srchCtrls, requery)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(model.GetCart(pageNo, isCart, windowID, WindowName, WarehouseID, WarehouseToID, LocatorID,
+                LocatorToID, BPartnerID, ctx, srchCtrls, requery)), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public JsonResult Save(int id, string keyColumn, string prod, string C_UOM_ID, string listAst, string qty, int locatorTo, int lineID, string InvCountID, string ReferenceNo, int Locator_ID, int WindowID, int ContainerID, int ContainerToID)
+        public JsonResult Save(int id, string keyColumn, string prod, string C_UOM_ID, string listAst, string qty, int locatorTo, int lineID, string InvCountID,
+            string ReferenceNo, int Locator_ID, int WindowID, string WindowName, int ContainerID, int ContainerToID)
         {
             List<string> prodID = new List<string>();
             if (prod != null && prod.Trim().Length > 0)
@@ -88,7 +87,8 @@ namespace VIS.Controllers
                 RefNo = JsonConvert.DeserializeObject<List<string>>(ReferenceNo);
             }
             VIS.Models.InfoProductModel model = new Models.InfoProductModel();
-            var value = model.SetProductQty(id, keyColumn, prodID, uomID, Attributes, quantity, locatorTo, lineID, countID, RefNo, Locator_ID, WindowID, ContainerID, ContainerToID, Session["ctx"] as Ctx);
+            var value = model.SetProductQty(id, keyColumn, prodID, uomID, Attributes, quantity, locatorTo, lineID, countID, RefNo, Locator_ID, WindowID,
+                WindowName, ContainerID, ContainerToID, Session["ctx"] as Ctx);
             return Json(JsonConvert.SerializeObject(value), JsonRequestBehavior.AllowGet);
         }
 
@@ -210,11 +210,11 @@ namespace VIS.Controllers
 
         // Added by Bharat on 31 May 2017
         // Added new parameter for Window ID by Lokesh Chauhan on 20 Dec 2018
-        public JsonResult GetCartData(string invCount_ID, int WindowID)
+        public JsonResult GetCartData(string invCount_ID, int WindowID, string WindowName)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             VIS.Models.InfoProductModel model = new VIS.Models.InfoProductModel();
-            return Json(JsonConvert.SerializeObject(model.GetCartData(invCount_ID, WindowID, ctx)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(model.GetCartData(invCount_ID, WindowID, WindowName, ctx)), JsonRequestBehavior.AllowGet);
         }
     }
 }

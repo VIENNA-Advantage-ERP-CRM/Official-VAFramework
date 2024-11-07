@@ -47,7 +47,7 @@
         var keyCol = '';
         var window_ID = 0;
         var multiValues = [], multiAttr = [];
-        var singlevalue = null;
+        var windowName = null;
         var grdname = null;
         var lblValuetxt = null;
         var lblNametxt = null;
@@ -559,8 +559,9 @@
         // Added by Bharat on 31 May 2017 to remove client side queries
         var AD_tab_ID = VIS.context.getWindowTabContext(WindowNo, 0, "AD_Tab_ID");
         window_ID = VIS.dataContext.getJSONRecord("InfoProduct/GetWindowID", AD_tab_ID.toString());
+        windowName = VIS.context.getContext(WindowNo, "ScreenName");
         // Bharat
-        if (window_ID == 146) {
+        if (window_ID == 146 || windowName == "VAS_PriceList") {
 
         }
         else if (VIS.context.getContextAsInt(WindowNo, VIS.context.getWindowTabContext(WindowNo, 1, "KeyColumnName")) != 0) {
@@ -1646,14 +1647,14 @@
 
             prodContainerID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(WindowNo, "M_ProductContainer_ID", true));
 
-            if (window_ID == 170) {
+            if (window_ID == 170 || windowName == "VAS_InventoryMove") {
                 // change by Lokesh Chauhan, picked Locator To selected on Line
                 M_LocatorTo_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(WindowNo, "M_LocatorTo_ID", true));
                 prodContainerToID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(WindowNo, "Ref_M_ProductContainerTo_ID", true));
                 //M_LocatorTo_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(WindowNo, 1, "M_LocatorTo_ID"));
             }
 
-            if (window_ID == 146) {
+            if (window_ID == 146 || windowName == "VAS_PriceList") {
                 recordID = VIS.context.getContextAsInt(WindowNo, VIS.context.getWindowTabContext(WindowNo, 1, "KeyColumnName"));
                 lineID = 0;
             }
@@ -1771,6 +1772,7 @@
                             ReferenceNo: JSON.stringify(RefNo),
                             Locator_ID: M_Locator_ID,
                             WindowID: window_ID,
+                            WindowName: windowName,
                             ContainerID: prodContainerID,
                             ContainerToID: prodContainerToID
                         },
@@ -1871,6 +1873,7 @@
                         ReferenceNo: RefNo,
                         Locator_ID: M_Locator_ID,
                         WindowID: window_ID,
+                        WindowName: windowName,
                         ContainerID: prodContainerID,
                         ContainerToID: prodContainerToID
                     },
@@ -2211,7 +2214,8 @@
                     Requery: requery,
                     SrchCtrl: JSON.stringify(srhCtrls),
                     Validation: VIS.secureEngine.encrypt(validation),
-                    Window_ID: window_ID
+                    Window_ID: window_ID,
+                    WindowName: windowName
                 },
                 error: function () {
                     alert(VIS.Msg.getMsg('ErrorWhileGettingData'));
@@ -2734,7 +2738,7 @@
             self = null;
             keyCol = null;
             multiValues = null;
-            singlevalue = null;
+            windowName = null;
             infoLines = null;
             savedProduct = null;
             refreshUI = false;
