@@ -640,6 +640,10 @@
         var vCardId = curWindowNo + "_c" + mTab.vo.AD_Tab_ID;
         var vMapId = curWindowNo + "_m" + mTab.vo.AD_Tab_ID;
 
+        //Set Column Layout
+        this.vGridPanel.setColumnLayout(mTab.getDetailViewColCount());
+
+
         mTab.getTableModel().setDoPaging(this.doPaging);
 
         //bindingSource =  tab.GetDataTable();

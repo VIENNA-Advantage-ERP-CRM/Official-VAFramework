@@ -183,10 +183,8 @@ namespace VAdvantage.Controller
         //Hide field group from (number)
         public Int16 HideFieldGroupFrom = 0;
         public bool IsHideVerNewRecord = false;
-
-
-        
-
+        //single view column layout
+        public Int16 DetailViewColCount = 4;
 
         public string SelectSQL
         {
@@ -558,7 +556,7 @@ namespace VAdvantage.Controller
 
                 vo.IsMaintainVersions = Utility.Util.GetValueOfString(dr["IsMaintainVersions"]).Equals("Y");
 
-                vo.TabLayout = Utility.Util.GetValueOfString(dr["TabLayout"]);
+                vo.TabLayout = Utility.Util.GetValueOfString(dr["TabLayout"]); 
 
                 if (string.IsNullOrEmpty(vo.TabLayout)) {
                     vo.TabLayout = "N";
@@ -582,6 +580,7 @@ namespace VAdvantage.Controller
                 else if (isAuto == "N")
                     vo.IsAutoNewRecord = false;
                 vo.HideFieldGroupFrom = Convert.ToInt16(Util.GetValueOfInt(dr["HideFieldGroupFrom"]));
+                vo.DetailViewColCount =  Convert.ToInt16(Util.GetValueOfInt(dr["SingleViewLayout"])); //todo get from DB
             }
             catch (System.Exception ex)
             {
@@ -1046,6 +1045,7 @@ namespace VAdvantage.Controller
             clone.HideFieldGroupFrom = HideFieldGroupFrom;
             clone.IsHideRecordNav = IsHideRecordNav;
             clone.IsShowFilterPanel = IsShowFilterPanel;
+            clone.DetailViewColCount = DetailViewColCount;
 
             clone.fields = new List<GridFieldVO>();
             for (int i = 0; i < fields.Count; i++)

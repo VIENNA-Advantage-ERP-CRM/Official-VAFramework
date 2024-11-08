@@ -8,7 +8,7 @@
         var allControls = [];
         var allLinkControls = [];
 
-        const colCount = 4;
+        let colCount = 4;
 
         var toolbarButtonList = {};
 
@@ -27,7 +27,7 @@
 
         /** Map of group name to list of components in group. */
         //control = field array
-        var compToFieldMap = {}
+        var compToFieldMap = {};
 
         /** Map of group name to list of components in group. */
         var groupToCompsMap = {};
@@ -132,6 +132,13 @@
             var cellSpace = mField.getCellSpace();
             var isLongFiled = mField.getIsLongField();
             var isLineBreak = mField.getIsLineBreak();
+
+            if (colCount - 1 ==0) {
+                cellSpace = 0;
+            }
+            if (colSpan > colCount - 1)
+                colSpan = colCount;
+
 
             if (isLineBreak) {
                 reset();
@@ -343,8 +350,6 @@
             //}
         };
 
-
-
         function onGroupClick(e) {
             e.stopPropagation();
             var divGroup = $(this);
@@ -447,7 +452,7 @@
 
 
             $td0.append(gDiv);
-            $td0.addClass("vis-ev-col-end4");
+            $td0.addClass("vis-ev-col-end"+colCount+"");
             columnIndex = 0;
 
             //VLine fp = new VLine(fieldGroup);
@@ -519,7 +524,7 @@
             //hide fg group
             addRow();
             displayFiledGroup(hideFGFrom, true);
-        }
+        };
 
         /**
          * show hide Field Group based on position
@@ -544,7 +549,7 @@
                 }
                 idx++;
             }
-        }
+        };
 
         function onBtnFGClick() {
 
@@ -585,7 +590,7 @@
             }
             agIns.addItem(editor);
             return agIns;
-        }
+        };
 
         this.addField = function (editor, mField) {
 
@@ -722,6 +727,7 @@
                 };
             }
         };
+
         this.flushLayout = function (hideFGFrom) {
             addRow();
             if (hideFGFrom > 0 && Object.keys(groupToCompsMap).length >= hideFGFrom) {
@@ -735,11 +741,11 @@
 
         this.getComponents = function () {
             return allControls;
-        }
+        };
 
         this.getLinkComponents = function () {
             return allLinkControls;
-        }
+        };
 
         this.setEnabled = function (action, enable) {
             if (Object.keys(toolbarButtonList).length > 0 && toolbarButtonList[action]) {
@@ -749,7 +755,7 @@
                 //});
                 toolbarButtonList[action].setReadOnly(!enable);
             }
-        }
+        };
 
         this.setVisible = function (colName, show) {
             if (fieldToCompParentMap[colName])
@@ -769,23 +775,31 @@
                 img.remove();
             })
 
-           // var chDia = new VIS.ChildDialog();
-           // chDia.setTitle("");
-           // var wdth = window.innerWidth - 200;
-           // var hgt = window.innerHeight - 100;
-           //// var diaCtr = $('<div style="max-height: ' + hgt + 'px; max-width: ' + wdth + 'px; min-width: 150px; min-height: 60px;"></div>');
-           //// diaCtr.append(message);
-           // chDia.setContent(this.getRoot());
+            // var chDia = new VIS.ChildDialog();
+            // chDia.setTitle("");
+            // var wdth = window.innerWidth - 200;
+            // var hgt = window.innerHeight - 100;
+            //// var diaCtr = $('<div style="max-height: ' + hgt + 'px; max-width: ' + wdth + 'px; min-width: 150px; min-height: 60px;"></div>');
+            //// diaCtr.append(message);
+            // chDia.setContent(this.getRoot());
 
 
 
-           // chDia.close = function () {
-           //    // sPanel.detach();
-           //     parent.append(sPanel);
-           // }
-           // chDia.show();
-           // chDia.hidebuttons();
-        }
+            // chDia.close = function () {
+            //    // sPanel.detach();
+            //     parent.append(sPanel);
+            // }
+            // chDia.show();
+            // chDia.hidebuttons();
+        };
+
+        this.setColumnLayout = function (count) {
+            colCount = count;
+            if (colCount < 1 || colCount > 4) {
+                colCount = 4;
+            };
+            $table[0].style.gridTemplateColumns='repeat(' + colCount + ', 1fr)';
+        };
 
         this.dispose = function () {
             $table.off("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
