@@ -2944,7 +2944,14 @@ html[dir="rtl"] .vis-window-instruc-overlay-new-inn {
     rotate:180deg;
 }
 
-.vis-load-animate {
+.card-link {
+    color: rgba(var(--v-c-on-secondary),1) !important;
+}
+.card-link:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(var(--v-c-on-secondary), .7);
+}
+ .vis-load-animate {
     opacity:0.5;
     -animation: vis-spin .7s infinite linear;
     -webkit-animation: vis-spin2 .7s infinite linear;
