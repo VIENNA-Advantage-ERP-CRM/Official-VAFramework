@@ -910,6 +910,12 @@ input[type="radio"] {
     border-bottom-right-radius: .25rem;
 }
 
+.vis-ev-col-ag-div {
+    z-index: 1000;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
 .vis-ev-col-ag-btn-list {
     list-style: none;
     margin: 0;
