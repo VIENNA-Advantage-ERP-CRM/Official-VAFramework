@@ -473,11 +473,12 @@ VIS = window.VIS || {};
             if (_AD_WF_Activity_ID == 0) {
                 loadAccessData(AD_Survey_ID);
             } else {
-                if (_AD_WF_Activity_ID == 0) {                   
-                    questionSection.css('height', h);
-                } else {
-                    questionSection.css('height', '74vh');
-                }
+                //if (_AD_WF_Activity_ID == 0) {
+                //    questionSection.css('height', h);
+                //} else {
+                //    questionSection.css('height', '74vh');
+                //}
+                questionSection.css('height', h);
                 surveyTab.find('.respTab').hide();
                 surveyTab.find('.quesTab').hide();
                 return;
@@ -543,11 +544,12 @@ VIS = window.VIS || {};
                             }
                         }
                     } else {
-                        if (_AD_WF_Activity_ID == 0) {
-                            questionSection.css('height', h);
-                        } else {
-                            questionSection.css('height', '74vh');
-                        }
+                        //if (_AD_WF_Activity_ID == 0) {
+                        //    questionSection.css('height', h);
+                        //} else {
+                        //    questionSection.css('height', '74vh');
+                        //}
+                        questionSection.css('height', h);
                         surveyTab.find('.respTab').hide();
                         surveyTab.find('.quesTab').hide();
                         return;

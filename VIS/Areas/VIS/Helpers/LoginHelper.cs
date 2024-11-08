@@ -161,8 +161,7 @@ namespace VIS.Helpers
                 throw new Exception("RoleNotDefined");
             }
 
-            // if user logged in successfully, then set failed login count to 0
-            DB.ExecuteQuery("UPDATE AD_User SET FailedLoginCount=0 WHERE Value=@username", param);
+           
 
             int AD_User_ID = Util.GetValueOfInt(dr[0].ToString()); //User Id
 
@@ -250,6 +249,10 @@ namespace VIS.Helpers
             while (dr.Read());
 
             dr.Close();
+
+            // if user logged in successfully, then set failed login count to 0
+            DB.ExecuteQuery("UPDATE AD_User SET FailedLoginCount=0 WHERE Value=@username", param);
+
             model.Login1Model.AD_User_ID = AD_User_ID;
             model.Login1Model.DisplayName = username;
 
@@ -275,7 +278,6 @@ namespace VIS.Helpers
                     if (drLogin.Read())
                     {
 
-
                         bool deleteRecord = false;
                         int roleId = VAdvantage.Utility.Util.GetValueOfInt(drLogin[0]);
                         deleteRecord = !usersRoles.Contains(roleId);
@@ -293,6 +295,7 @@ namespace VIS.Helpers
                         //Delete Login Setting 
                         if (deleteRecord)
                         {
+                            drLogin.Close();
                             DB.ExecuteQuery("DELETE FROM AD_LoginSetting WHERE AD_User_ID = " + AD_User_ID);
                         }
                         else
@@ -307,11 +310,18 @@ namespace VIS.Helpers
                             model.Login2Model.Warehouse = drLogin[6].ToString();
                             model.Login2Model.WarehouseName = drLogin[7].ToString();
                             model.Login2Model.Date = System.DateTime.Now.Date;
+                            drLogin.Close();
                         }
                     }
-                    drLogin.Close();
                 }
                 catch
+                {
+                    if (drLogin != null)
+                    {
+                        drLogin.Close();
+                    }
+                }
+                finally
                 {
                     if (drLogin != null)
                     {

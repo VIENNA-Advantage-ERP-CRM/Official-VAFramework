@@ -514,7 +514,7 @@ namespace VAdvantage.Model
             MColumn column = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
             string s_colX = column.GetFKColumnName();
             string x_colY = column.GetColumnName();
-            int tableR = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_REFERENCE_VALUE_ID FROM AD_COLUMN C INNER JOIN AD_TABLE T ON(T.AD_TABLE_ID=C.AD_TABLE_ID) WHERE T.AD_TABLE_ID=291 AND AD_COLUMN_ID=(
+            int tableR = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_REFERENCE_VALUE_ID FROM AD_COLUMN C INNER JOIN AD_TABLE T ON(T.AD_TABLE_ID=C.AD_TABLE_ID) WHERE AD_COLUMN_ID=(
                                         SELECT AD_COLUMN_ID FROM AD_COLUMN WHERE COLUMNNAME = '" + x_colY + "' AND AD_TABLE_ID = " + GetAD_Table_ID() + ")"));
             if (tableR > 0)
             {

@@ -1946,7 +1946,7 @@
         if (!autoNew && gridWindow.getIsTransaction())
             this.ctx.setAutoNew(curWindowNo, true);
 
-        this.ctx.setContext(curWindowNo, "WindowName", gridWindow.getName());
+        this.ctx.setContext(curWindowNo, "ScreenName", gridWindow.getName());
 
         var multiTabview = gridWindow.getIsCompositeView();
         this.showMultiViewOnly = gridWindow.getIsDependentInDetailView(); //new porp

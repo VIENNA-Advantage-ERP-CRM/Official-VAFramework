@@ -523,7 +523,7 @@
                         });
 
                         filteredArray.sort(function (a, b) {
-                            return a.SRNO - b.SRNO;
+                            return a.Sequence - b.Sequence;
                         });
 
                         if (filteredArray && filteredArray.length > 0) {
