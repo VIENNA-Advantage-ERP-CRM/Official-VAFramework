@@ -31,7 +31,7 @@
         var dGrid = null;
         var self = this;
         var window_ID = 0;
-        var grdname = null;
+        var windowName = null;
         var lblNametxt = null;
         var lblReftxt = null;
         var lblFromDate = null;
@@ -52,6 +52,7 @@
         //window_ID = VIS.Utility.Util.getValueOfInt(VIS.DB.executeScalar(sql, null, null));
         var AD_tab_ID = VIS.context.getWindowTabContext(windowNo, 0, "AD_Tab_ID");
         window_ID = VIS.dataContext.getJSONRecord("InfoProduct/GetWindowID", AD_tab_ID.toString());
+        windowName = VIS.context.getContext(windowNo, "ScreenName");
 
         function initializeComponent() {
             inforoot.css("width", "100%");
@@ -372,11 +373,11 @@
                 //    query += " AND VAICNT_TransactionType = 'OT' ";
                 //}
                 /* else {*/
-                if (window_ID == 184) {   // JID_1026: System is not checking the document status of Order and requisition while loading cart on M_inout and internal use move line respectively
+                if (window_ID == 184 || windowName == "VAS_MaterialReceipt") {   // JID_1026: System is not checking the document status of Order and requisition while loading cart on M_inout and internal use move line respectively
                     //query += " AND VAICNT_TransactionType = 'MR' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE C_BPartner_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID")) + " AND DocStatus IN ('CO', 'CL'))";
                     C_BPartner_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID"));
                 }
-                else if (window_ID == 319 || window_ID == 170) {
+                else if (window_ID == 319 || window_ID == 170 || windowName == "VAS_Package" || windowName == "VAS_InventoryMove") {
                     // query += " AND VAICNT_TransactionType = 'IM' ";
                     // extra parameters only for these windows
                     M_Locator_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Locator_ID", true))
@@ -384,15 +385,15 @@
                     M_Warehouse_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "DTD001_MWarehouseSource_ID", true));
                     M_WarehouseTo_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true));
                 }
-                else if (window_ID == 168) {
+                else if (window_ID == 168 || windowName == "VAS_PhysicalInventory") {
                     //query += " AND VAICNT_TransactionType = 'PI' ";
                     M_Warehouse_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true));
                 }
-                else if (window_ID == 169) {
+                else if (window_ID == 169 || windowName == "VAS_DeliveryOrder") {
                     //query += " AND VAICNT_TransactionType = 'SH' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE  C_BPartner_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID")) + " AND DocStatus IN ('CO'))";
                     C_BPartner_ID = VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID");
                 }
-                else if (window_ID == 341) {
+                else if (window_ID == 341 || windowName == "VAS_InternalUseInventory") {
                     //query += " AND VAICNT_TransactionType = 'IU' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE IsActive = 'Y' AND M_Warehouse_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true)) + " AND DocStatus IN ('CO'))";
                     M_Warehouse_ID = VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true));
                 }
@@ -430,6 +431,7 @@
                     pageNo: pNo,
                     isCart: showCart,
                     windowID: window_ID,
+                    WindowName: windowName,
                     WarehouseID: M_Warehouse_ID,
                     WarehouseToID: M_WarehouseTo_ID,
                     LocatorID: M_Locator_ID,
@@ -563,7 +565,7 @@
                     //}
 
                     //var drProd = VIS.DB.executeReader(_query, null, null);
-                    var drProd = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "InfoProduct/GetCartData", { "invCount_ID": countID, "WindowID": window_ID }, null);
+                    var drProd = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "InfoProduct/GetCartData", { "invCount_ID": countID, "WindowID": window_ID, "WindowName": windowName, }, null);
                     if (self.onClose)
                         self.onClose(drProd, chkDelCart.prop("checked"), countID);
                     inforoot.dialog('close');
