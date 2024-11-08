@@ -965,7 +965,7 @@
                 + '<span class="dropdown-toggle btn vis-ev-col-ag-dropdown-btn" id="' + id + '"' + styl + '  data-toggle="dropdown">'
                 + '<i class="' + fontname + '"></i>'
                 + name + '</span>'
-                + '<div class="dropdown-menu" aria-labelledby="' + id + '">'
+                + '<div class="dropdown-menu vis-ev-col-ag-div" aria-labelledby="' + id + '">'
                 + '<ul class="vis-ev-col-ag-btn-list">'
                 + '</ul>'
                 + '</div>'
