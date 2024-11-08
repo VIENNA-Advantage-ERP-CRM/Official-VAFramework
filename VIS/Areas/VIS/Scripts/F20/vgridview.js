@@ -457,6 +457,11 @@
             mField = mFields[i];
             if (mField == null)
                 continue;
+
+            //  Not a Field
+            if (mField.getIsHeading())
+                continue;
+
             var columnName = mField.getColumnName();
             var displayType = mField.getDisplayType();
 
@@ -491,9 +496,7 @@
 
 
 
-            //  Not a Field
-            if (mField.getIsHeading())
-                continue;
+           
 
             var oColumn = {
 
