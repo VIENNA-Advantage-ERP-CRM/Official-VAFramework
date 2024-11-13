@@ -1549,7 +1549,7 @@
 
             var AD_Window_ID = 0;
 
-            if (targetWhereClause != null && targetWhereClause.length != 0) {
+            if (zoomWindow_ID == 0 && PO_zoomWindow_ID == 0 && targetWhereClause != null && targetWhereClause.length != 0) {
                 var zoomList = [];
                 zoomList = this.getZoomTargets(targetTableName, curWindow_ID, targetWhereClause);
                 if (zoomList != null && zoomList.length > 0)

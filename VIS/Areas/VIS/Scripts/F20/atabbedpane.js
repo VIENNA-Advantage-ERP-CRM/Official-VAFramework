@@ -8,7 +8,7 @@
  *  
  */
 
-VIS.VTabbedPane = function (isWorkBench) {
+    VIS.VTabbedPane = function (isWorkBench) {
     /** Workbench 				*/
     var _workbenchTab = false;
     /** List of dependent Variables		*/
@@ -28,10 +28,7 @@ VIS.VTabbedPane = function (isWorkBench) {
 
     this.contentPane = null;
 
-
     this.aTabPaneMgr = null;
-
-
     this.getIsWorkbench = function () {
         return _workbenchTab;
     }
@@ -54,19 +51,17 @@ VIS.VTabbedPane = function (isWorkBench) {
         this.tabObj = obj
     };
 
-
     VIS.VTabbedPane.prototype.finishLayout = function (isMobile) {
         if (this.contentPane)
             this.contentPane.finishLayout(isMobile);
     };
-
 /**
  * 	Add Tab
  *	@param id tab id
  *	@param gTab grid tab model
  *	@param tabElement GridController or VSortTab
  */
-VIS.VTabbedPane.prototype.addTab = function (id, gTab, tabElement, tabItem) {
+    VIS.VTabbedPane.prototype.addTab = function (id, gTab, tabElement, tabItem) {
 
     this.ItemsIds[this.count] = id;
     this.Items[this.count] = tabElement;
@@ -105,12 +100,11 @@ VIS.VTabbedPane.prototype.addTab = function (id, gTab, tabElement, tabItem) {
         this.TabLevelsItems.push({ 'TabLevel': tabLevel, 'ChildEle': [], 'ChildTabs': [], 'ChildTabsItems':[], 'Id': id });
     }
 };
-
 /**
 * 	is tab really change
 *	@param action tab id
 */
-VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
+    VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
 
     var index = this.ItemsIds.indexOf(action);
     var oldIndex = this.oldTabIndex;
@@ -184,7 +178,6 @@ VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
         }
     };
 
-
     VIS.VTabbedPane.prototype.getNextTabId = function (tabSeq) {
         if (!tabSeq || tabSeq<0)
             tabSeq = 0;
@@ -214,31 +207,30 @@ VIS.VTabbedPane.prototype.getIsTabChanged = function (action) {
             id = this.ItemsIds[this.oldTabIndex];
         return id;
     };
-
 /**
  *  current selected tab element either GridController or VSortTab
  */
-VIS.VTabbedPane.prototype.getTabElement = function (action) {
+    VIS.VTabbedPane.prototype.getTabElement = function (action) {
     return this.Items[this.oldTabIndex];
-};
+   };
 /**
  *  current selected tab index
  */
-VIS.VTabbedPane.prototype.getSelectedIndex = function () {
+    VIS.VTabbedPane.prototype.getSelectedIndex = function () {
     return this.oldTabIndex;
-};
+    };
 
     VIS.VTabbedPane.prototype.getSelectedOldIndex = function () {
         return this.oldLastTabIndex;
     };
 
-VIS.VTabbedPane.prototype.sizeChanged = function (height, width) {
+    VIS.VTabbedPane.prototype.sizeChanged = function (height, width) {
     for (var prop in this.Items) {
         this.Items[prop].sizeChanged(height, width);
     }
 }
 
-VIS.VTabbedPane.prototype.evaluate = function (e) {
+    VIS.VTabbedPane.prototype.evaluate = function (e) {
     var process = e == null;
     var columnName = null;
     if (!process) {
@@ -263,7 +255,7 @@ VIS.VTabbedPane.prototype.evaluate = function (e) {
     
 };
 
- VIS.VTabbedPane.prototype.setTabControl = function (tabs) {
+    VIS.VTabbedPane.prototype.setTabControl = function (tabs) {
         var $ulTabControl = this.aPanel.getTabControl();
         if (!this.multiTabView) {
             var $ulTabControl = this.aPanel.getTabControl();
@@ -349,11 +341,15 @@ VIS.VTabbedPane.prototype.evaluate = function (e) {
             this.contentPane.keyDown(evt);
         return this;
     };
+
+    VIS.VTabbedPane.prototype.getCount = function () {
+        return this.count;
+    };
         
 /**
  *  Dispose all contained VTabbedPanes and GridControllers
  */
-VIS.VTabbedPane.prototype.dispose = function () {
+    VIS.VTabbedPane.prototype.dispose = function () {
 
     for (var prop in this.Items) {
         this.Items[prop].dispose();
