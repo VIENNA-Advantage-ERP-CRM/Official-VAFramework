@@ -1522,14 +1522,16 @@
             };
 
             function setValuePref() {
-                //if (VIS.MRole.IsShowAcct())
-                //{
+                if (VIS.MRole.getIsShowAcct())
+                {
                 $acctab.prop("checked", VIS.Env.getCtx().ctx["#ShowAcct"] == "Y" ? true : false);
-                //}
-                //else {
-                //    $acctab.prop("checked", false);
-                //    $acctab.prop("enabled", false);
-                //}
+                }
+                else {
+                    //$acctab.prop("checked", false);
+                    $acctab.prop("enabled", false);
+                    
+                    $acctab.parent().remove();
+                }
 
                 //	Show Trl/Advanced Tab
                 $transtab.prop("checked", VIS.Env.getCtx().ctx["#ShowTrl"] == "Y" ? true : false);
