@@ -477,7 +477,7 @@
             this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
             this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore", "Ignore");
             this.aSave = this.addActions(this.ACTION_NAME_SAVE, null, true, true, false, onAction, null, "Shct_Save", "Save");
-            this.aSaveNew = this.addActions(this.ACTION_NAME_SAVENEW, null, true, true, false, onAction, null, "Shct_SaveNew", "save-new");
+            this.aSaveNew = this.addActions(this.ACTION_NAME_SAVE, null, true, true, false, onAction, null, "Shct_SaveNew", "save-new");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report", "Report");
@@ -4628,8 +4628,10 @@
 
                 }
                 curGC.refreshTabPanelData(selfPanel.curTab.getRecord_ID(),'S');
-                if (manual)
+                if (manual) {
                     curGC.dynamicDisplay(-1);
+                    selfPanel.vTabbedPane.notifyDataChanged();
+                }
 
                 if (callback) {
                     callback(retValue);
@@ -4648,8 +4650,10 @@
 
             }
 
-            if (manual)
+            if (manual) {
                 curGC.dynamicDisplay(-1);
+                selfPanel.vTabbedPane.notifyDataChanged();
+            }
 
             if (callback) {
                 callback(retValue);
