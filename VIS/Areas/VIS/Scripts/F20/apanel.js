@@ -994,6 +994,9 @@
                 }
                 else {
                     this.actionParams = {};
+                    if (!this.isFromSearch) {
+                        this.isFromSearch = false;
+                    }
                     this.cmd_find('');
                 }
                 //this.setTabNavigation();
@@ -1117,6 +1120,7 @@
             } else {
 
                 self.cmd_find($txtSearch.val());
+                self.isFromSearch = true;
                 //self.curTab.searchText = "";
                 //self.clearSearchText();
                 //$txtSearch.val("");
@@ -1137,6 +1141,7 @@
                         return;
                     }
                     self.cmd_find($txtSearch.val());
+                    self.isFromSearch = true;
                    // $txtSearch.val("");
                     $txtSearch.removeAttr('readonly');
                 }
@@ -3030,6 +3035,7 @@
             return;
         }
         else if (columnName.equals("OpenCardDialog")) {
+
             aPanel.cmd_cardDialog(true);
         }
         
@@ -3659,7 +3665,10 @@
                         this.toggleASearchIcons(true, false);
                     }
                 }
+               
                 gc.dataRefresh();
+
+                this.showFilterPanel(keepFilters);
 
                 if (this.tabStack.length > 0) {
                     var currentTabSeq = this.curWinTab.getSelectedIndex();
@@ -4554,7 +4563,6 @@
     };
 
     APanel.prototype.cmd_cardDialog = function (fromCardDialogBtn) {
-
         var card = new VIS.CVDialog(this, fromCardDialogBtn);
         card.show();
     };
@@ -4815,12 +4823,13 @@
         }
 
         this.setBusy(true);
+        if (this.isFromSearch) {
+            var query = null;
 
-        var query = null;
-
-        if (val && val.trim() !== "") {
-            val = "%" + val + "%";
-            query = this.curTab.getSearchQuery(val);
+            if (val && val.trim() !== "") {
+                val = "%" + val + "%";
+                query = this.curTab.getSearchQuery(val);
+            }
         }
 
         this.findRecords(query);

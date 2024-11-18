@@ -2084,6 +2084,10 @@ namespace VIS.Helpers
                     if (dr.IsDBNull(j))
                     {
                         rowData[colLower] = null;
+                        if (field.DisplayType == DisplayType.Image)
+                        {
+                            rowData["imgurlcolumn" + colLower] =null;
+                        }
                     }
                     else
                     {
