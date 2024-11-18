@@ -1360,20 +1360,22 @@
             for (var col in dsAdvanceData) {
                 var arr = dsAdvanceData[col];
                 var arrCondition = [];
-                for (var i = 0; i < arr.length; i++) {
-                    if (i == 0) {
-                        arrCondition.push(" ( ");
-                        arrCondition.push(arr[i].Where);
+                if (arr && arr.length > 0) {
+                    for (var i = 0; i < arr.length; i++) {
+                        if (i == 0) {
+                            arrCondition.push(" ( ");
+                            arrCondition.push(arr[i].Where);
+                        }
+                        else {
+                            arrCondition.push(' OR ' + arr[i].Where);
+                        }
                     }
-                    else {
-                        arrCondition.push(' OR ' + arr[i].Where);
-                    }
+                    if (arrCondition.length > 0)
+                        arrCondition.push(" ) ");
+                    if (dynWhere != '')
+                        dynWhere += ' AND ';
+                    dynWhere += arrCondition.join(' ');
                 }
-                if (arrCondition.length > 0)
-                    arrCondition.push(" ) ");
-                if (dynWhere != '')
-                    dynWhere += ' AND ';
-                dynWhere += arrCondition.join(' ');
             }
             return dynWhere;
         };
