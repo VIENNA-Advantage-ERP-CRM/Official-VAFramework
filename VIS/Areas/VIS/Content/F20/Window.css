@@ -2234,11 +2234,11 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
 .vis-fp-static-ctrlwrp {
     padding: 10px 10px 0px;
-    max-height: calc(100% - 60px);
+    /*max-height: calc(100% - 60px);*/
     overflow: hidden;
 }
 .vis-fp-static-ctrlwrp:hover{
-    overflow: overlay;
+    /*overflow: overlay;*/
 }
 
 .vis-fp-static-ctrlwrp-auto {

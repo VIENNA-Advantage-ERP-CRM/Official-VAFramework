@@ -213,6 +213,8 @@
 
                     crt.setReadOnly(false);
                     crt.setMandatory(false);
+                    crt.setBackground('');
+
                     this.ctrlObjects[field.getColumnName()] = crt;
 
                     var inputWrapGroup = $('<div class="vis-fp-inputgroupseprtr" data-displayName="' + field.getHeader() + '" data-ColumnName="' + crt.getName() + '" data-cid="' + crt.getName() + '_' + this.curTab.getAD_Tab_ID() + '"></div>');
@@ -1229,6 +1231,7 @@
             if (crt != null) {
                 crt.setMandatory(false);
                 crt.setReadOnly(false);
+                crt.setBackground('');
                 if (field.getDisplayType() == VIS.DisplayType.AmtDimension) {
                     crt.hideButton(false);
                     crt.setReadOnlyTextbox(false);
@@ -1431,10 +1434,10 @@
                 // set operator (sign)
                 var opValue = cmbOp.val();
                 var v = getControlValue(true);
-                if (v == null || v == undefined || v === "") {
-                    VIS.ADialog.error("VISQueryValueCantNull");
-                    return;
-                }
+                //if (v == null || v == undefined || v === "") {
+                //    VIS.ADialog.error("VISQueryValueCantNull");
+                //    return;
+                //}
 
                 // add row in dataset
                 addDynRow(colName, colValue, opName, opValue, getControlText(true), getControlValue(true), getControlText(false), getControlValue(false), getFullDay(), self.cmbTabs.val());
