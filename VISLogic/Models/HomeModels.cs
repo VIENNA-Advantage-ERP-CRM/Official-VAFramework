@@ -839,7 +839,7 @@ namespace VIS.Models
                 else
                 {
                     sql = "SELECT " + keyCol + ", " + displayCol + " , count(" + keyCol + ")  FROM " + pTableName + " " + pTableName + " JOIN " + tableName + " " + tableName
-                        + " ON " + keyCol + " = " + pTableName + "." + pColumnName
+                        + " ON " + keyCol + " = " + pTableName + "." + tblColName
                         + " ";// WHERE " + pTableName + ".IsActive='Y'";
                     sql = "SELECT * FROM (" + MRole.GetDefault(ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(""))
