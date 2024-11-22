@@ -518,7 +518,8 @@
         function addFGDisplayBtn(hideFGFrom) {
             //addRow();
             reset();
-            initCols(false, false, false, true);
+            
+            initCols(colCount < 2,colCount==2,colCount == 3, colCount >3);
             $spndisplayFG.data('position', hideFGFrom);
             _curParent.append($spndisplayFG);
             //hide fg group

@@ -807,7 +807,8 @@
             var d = $("<div></div>");
             var fired = true;
             var mouseDown = false;
-            if (this.action == "Save" || this.action == "New") {
+            if (this.action == VIS.APanel.prototype.ACTION_NAME_SAVE || this.action == VIS.APanel.prototype.ACTION_NAME_NEW
+                || this.action == VIS.APanel.prototype.ACTION_NAME_SAVENEW) {
                // Handle case if user direct click on save button 
                 li.on("mousedown touchstart", function (e) {
 

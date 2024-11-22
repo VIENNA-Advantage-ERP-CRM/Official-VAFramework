@@ -476,8 +476,8 @@
             this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete", "Delete");
             this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
             this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore", "Ignore");
-            this.aSave = this.addActions("SAR", null, true, true, false, onAction, null, "Shct_Save", "Save");
-            this.aSaveNew = this.addActions("SAN", null, true, true, false, onAction, null, "Shct_SaveNew", "save-new");
+            this.aSave = this.addActions(this.ACTION_NAME_SAVE, null, true, true, false, onAction, null, "Shct_Save", "Save");
+            this.aSaveNew = this.addActions(this.ACTION_NAME_SAVE, null, true, true, false, onAction, null, "Shct_SaveNew", "save-new");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report", "Report");
@@ -994,6 +994,9 @@
                 }
                 else {
                     this.actionParams = {};
+                    if (!this.isFromSearch) {
+                        this.isFromSearch = false;
+                    }
                     this.cmd_find('');
                 }
                 //this.setTabNavigation();
@@ -1117,6 +1120,7 @@
             } else {
 
                 self.cmd_find($txtSearch.val());
+                self.isFromSearch = true;
                 //self.curTab.searchText = "";
                 //self.clearSearchText();
                 //$txtSearch.val("");
@@ -1137,6 +1141,7 @@
                         return;
                     }
                     self.cmd_find($txtSearch.val());
+                    self.isFromSearch = true;
                    // $txtSearch.val("");
                     $txtSearch.removeAttr('readonly');
                 }
@@ -1548,6 +1553,9 @@
     APanel.prototype.ACTION_NAME_PAGEUP = "PageUp";// "Next";
 
     APanel.prototype.ACTION_NAME_NEW = "NRD";
+    APanel.prototype.ACTION_NAME_SAVE = "SAR";
+    APanel.prototype.ACTION_NAME_SAVENEW = "SAN";
+
     APanel.prototype.ACTION_NAME_DELETE = "DRD";
     APanel.prototype.ACTION_NAME_REFRESH = "RQY";
     APanel.prototype.ACTION_NAME_FIND = "Find";
@@ -2316,8 +2324,15 @@
         //  Process Result
         if (notPrint)		//	refresh if not print
         {
-            //	Refresh data
-            this.curTab.dataRefresh();
+            if (!pi.getIsError()) {
+                if (this.isHdrBtn) { // if headr "docaction" button click on child tab 
+                    this.curGC.dataRefreshAll();
+                }
+                else {
+                    //	Refresh data
+                    this.curTab.dataRefresh();
+                }
+            }
             //	Timeout
             if (pi.getIsTimeout())		//	set temporarily to R/O
                 VIS.context.setWindowContext(this.curWindowNo, "Processed", "Y");
@@ -2769,9 +2784,14 @@
         /*Special handling
           Move to next tab */
         if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(),
-                mField.getActionName(), mField.getActionParams());
-            return true;
+            /* is tab index in range (tab count) */
+            if (mField.getTabSeqNo() < this.vTabbedPane.getCount()) {
+                this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(),
+                    mField.getActionName(), mField.getActionParams());
+                return true;
+            }
+            console.log(" Tab index is greater than total count ");
+            return;
         }
 
         //	Pop up Payment Rules
@@ -2816,6 +2836,7 @@
                     startWOasking = true;
 
                     aPanel.checkAndCallProcess(vButton, table_ID, record_ID, ctx, self, startWOasking, batch);
+                    
                     vda.dispose();
                     self = null;
                 }
@@ -3014,6 +3035,7 @@
             return;
         }
         else if (columnName.equals("OpenCardDialog")) {
+
             aPanel.cmd_cardDialog(true);
         }
         
@@ -3251,6 +3273,10 @@
         pi.setIsBatch(batch);
         pi.setIsBackground(isbackground);
         //start process
+
+        /* Special flag to determine click event form header panel*/
+        aPanel.isHdrBtn = vButton.isHdrBtn;
+        /* */
 
         var pCtl = new VIS.ProcessCtl(aPanel, pi, null);
         //pCtl.setIsPdf(vButton.isPdf);
@@ -3639,7 +3665,10 @@
                         this.toggleASearchIcons(true, false);
                     }
                 }
+               
                 gc.dataRefresh();
+
+                this.showFilterPanel(keepFilters);
 
                 if (this.tabStack.length > 0) {
                     var currentTabSeq = this.curWinTab.getSelectedIndex();
@@ -4534,7 +4563,6 @@
     };
 
     APanel.prototype.cmd_cardDialog = function (fromCardDialogBtn) {
-
         var card = new VIS.CVDialog(this, fromCardDialogBtn);
         card.show();
     };
@@ -4608,8 +4636,10 @@
 
                 }
                 curGC.refreshTabPanelData(selfPanel.curTab.getRecord_ID(),'S');
-                if (manual)
+                if (manual) {
                     curGC.dynamicDisplay(-1);
+                    selfPanel.vTabbedPane.notifyDataChanged();
+                }
 
                 if (callback) {
                     callback(retValue);
@@ -4628,8 +4658,10 @@
 
             }
 
-            if (manual)
+            if (manual) {
                 curGC.dynamicDisplay(-1);
+                selfPanel.vTabbedPane.notifyDataChanged();
+            }
 
             if (callback) {
                 callback(retValue);
@@ -4791,12 +4823,13 @@
         }
 
         this.setBusy(true);
+        if (this.isFromSearch) {
+            var query = null;
 
-        var query = null;
-
-        if (val && val.trim() !== "") {
-            val = "%" + val + "%";
-            query = this.curTab.getSearchQuery(val);
+            if (val && val.trim() !== "") {
+                val = "%" + val + "%";
+                query = this.curTab.getSearchQuery(val);
+            }
         }
 
         this.findRecords(query);

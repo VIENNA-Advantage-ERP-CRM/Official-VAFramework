@@ -55,7 +55,7 @@
 
         /* Function to load the template excel data */
         this.templateExcelData = function () {
-            var wName = VIS.context.getWindowContext($self.windowNo, "WindowName");
+            var wName = VIS.context.getWindowContext($self.windowNo, "ScreenName");
 
             if ($self.windowNo == -99999) {
                 wName = "HomePage";
@@ -121,11 +121,11 @@
                     console.log(data);
                     if (data && data.length > 0) {
                         window.open(VIS.Application.contextUrl + data);
-                        setBusy(false);
                     }
                     else {
                         VIS.ADialog.info("VIS_FileNotAvailable");
                     }
+                    setBusy(false);
                 },
                 error: function (err) {
                     console.log(err);
