@@ -73,6 +73,8 @@
      *	@return true if started
      */
     AForm.prototype.openForm = function (json, $parent, windowNo, additionalInfo) {
+        this.log.info("Form Name= " + json.Name + ", Class=" + className);
+        this.ctx.setWindowContext(windowNo, "WindowName", json.DisplayName);
 
         if (json.IsReport) {
             VIS.ADialog.info("Form Report is not supported");
@@ -138,8 +140,10 @@
         return true;
     };
 
-    AForm.prototype.openWidget = function (className, windowNo, widgetInfo) {
+    AForm.prototype.openWidget = function (className, windowNo, widgetInfo) {      
+
         try {
+
             var type = "";
             this.widgetInfo = widgetInfo;
             var isReact = className.split('.');
