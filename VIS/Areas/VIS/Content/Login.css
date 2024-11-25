@@ -292,8 +292,8 @@ html, body {
     align-items: center;
     justify-content: center;
     justify-content: end;
-    
     padding: 2rem;
+    padding-right:11%;
 }
 
 .logindyn {
@@ -305,10 +305,15 @@ html, body {
     background-color:#fff;
 }
 
+.logindyn body {
+    overflow:hidden !important;
+}
+
 .loginConatiner {
     width: 100%;
     height: 100%;
     overflow: auto;
+    background-color: #010814;
 }
 
 .vienna-logo {
