@@ -94,7 +94,7 @@
         this.ctx = VIS.Env.getCtx();
         this.curGC;
         this.curST;
-        this.curTab;        
+        this.curTab;
         this.vTabbedPane = new VIS.VTabbedPane(false);
 
         this.statusBar = new VIS.StatusBar();
@@ -160,7 +160,7 @@
 
         this.tabStack = []; // Maintain tab and view change history;
 
-        this.toolbarActionList = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT','BVW','SAN','HOE']; // ToolBar Action
+        this.toolbarActionList = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT', 'BVW', 'SAN', 'HOE']; // ToolBar Action
 
         function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
@@ -284,7 +284,7 @@
                             //query.addRestriction(ui.item.code);
                             self.curGC.searchCode = ui.item.code;
                             self.curTab.searchCode = ui.item.code;
-                        } 
+                        }
                         //	History
 
                         //Set Page value to 1
@@ -296,7 +296,7 @@
                         $btnClrSearch.css("visibility", "visible");
                         $imgdownSearch.css("visibility", "visible").css("transform", "rotate(360deg)");
                         self.curGC.aFilterPanel.setFilterLineAdvance(self.curTab.userQueryID);
-                        $txtSearch.attr('readonly','readonly');
+                        $txtSearch.attr('readonly', 'readonly');
                         ev.stopPropagation();
                     },
                     minLength: 0,
@@ -318,7 +318,7 @@
                     if ($selfpanel.curTab.getTabLevel() == 0) {
                         if (item.defaultids && item.userid > 0) {
                             span = $("<span title='" + VIS.Msg.getMsg("DefaultSearch") + "'  data-id='" + item.id + "' class='VIS-winSearch-defaultIcon'></span>");
-                           
+
                         }
                         else {
                             span = $("<span title='" + VIS.Msg.getMsg("MakeDefaultSearch") + "' data-id='" + item.id + "' class='VIS-winSearch-NonDefaultIcon'></span>");
@@ -398,7 +398,7 @@
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             }
 
-            
+
 
             setToolTipMessages();
         };
@@ -415,7 +415,7 @@
         };
 
         this.hideTabLinks = function (hide) {
-            if(hide)
+            if (hide)
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             else
                 $divHeaderNav.find('*').css('visibility', 'visible');
@@ -477,7 +477,7 @@
             this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
             this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore", "Ignore");
             this.aSave = this.addActions(this.ACTION_NAME_SAVE, null, true, true, false, onAction, null, "Shct_Save", "Save");
-            this.aSaveNew = this.addActions(this.ACTION_NAME_SAVE, null, true, true, false, onAction, null, "Shct_SaveNew", "save-new");
+            this.aSaveNew = this.addActions(this.ACTION_NAME_SAVENEW, null, true, true, false, onAction, null, "Shct_SaveNew", "save-new");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report", "Report");
@@ -487,19 +487,19 @@
             //Ndw Back button
             this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back", "back-arrow");
             //check toolbar
-           // if (!this.gridWindow.getIsHideToolbar()) {
-                $ulToobar.append(this.aHome.getListItm());
-                $ulToobar.append(this.aBack.getListItm());
-                $ulToobar.append(this.aIgnore.getListItm());
-                $ulToobar.append(this.aNew.getListItm());
-                $ulToobar.append(this.aDelete.getListItm());
-                $ulToobar.append(this.aSave.getListItm());
-                $ulToobar.append(this.aSaveNew.getListItm());
-                $ulToobar.append(this.aRefresh.getListItm());
-                $ulToobar.append(this.aReport.getListItm());
-                $ulToobar.append(this.aPrint.getListItm());
-                // $ulToobar.append(this.aBatchUpdate.getListItm());
-           // }
+            // if (!this.gridWindow.getIsHideToolbar()) {
+            $ulToobar.append(this.aHome.getListItm());
+            $ulToobar.append(this.aBack.getListItm());
+            $ulToobar.append(this.aIgnore.getListItm());
+            $ulToobar.append(this.aNew.getListItm());
+            $ulToobar.append(this.aDelete.getListItm());
+            $ulToobar.append(this.aSave.getListItm());
+            $ulToobar.append(this.aSaveNew.getListItm());
+            $ulToobar.append(this.aRefresh.getListItm());
+            $ulToobar.append(this.aReport.getListItm());
+            $ulToobar.append(this.aPrint.getListItm());
+            // $ulToobar.append(this.aBatchUpdate.getListItm());
+            // }
 
             if (!this.gridWindow.getIsHideToolbar()) {
                 $ulToobar.find("LI").hide();
@@ -520,7 +520,7 @@
             this.aLast = this.addActions(this.ACTION_NAME_LAST, null, true, true, true, onAction, null, "Shct_LastRec");
             this.aNext = this.addActions(this.ACTION_NAME_NEXT, null, true, true, true, onAction, null, "Shct_NextRec");
             this.aMulti = this.addActions("Multi", null, false, true, true, onAction, false, "Shct_MultiRow", "Multix");
-            this.aSingle = this.addActions("Single", null, false, true, true, onAction, false, "Shct_MultiRow","Multi");
+            this.aSingle = this.addActions("Single", null, false, true, true, onAction, false, "Shct_MultiRow", "Multi");
             this.aCard = this.addActions("Card", null, false, true, true, onAction, false, "Shct_CardView", "card-o");
 
             this.aMap = this.addActions("Map", null, false, true, true, onAction);
@@ -805,7 +805,7 @@
             var clsName = 'vis-ad-w-p-center-flow-';
             var cls2 = "vis-ad-w-p-actionpanel-";
             if (show) {
-                var tpalign =  this.curTab.getIsTPBottomAligned();// && !this.showMultiViewOnly; //only multiview
+                var tpalign = this.curTab.getIsTPBottomAligned();// && !this.showMultiViewOnly; //only multiview
                 clsSuffix = tpalign ? 'b' : 'r';
                 var clsSuffixOld = tpalign ? 'r' : 'b';
 
@@ -1001,7 +1001,7 @@
                 }
                 //this.setTabNavigation();
                 this.refresh();
-            }        
+            }
         }
 
         $btnFilter.on("click", function (e) {
@@ -1142,7 +1142,7 @@
                     }
                     self.cmd_find($txtSearch.val());
                     self.isFromSearch = true;
-                   // $txtSearch.val("");
+                    // $txtSearch.val("");
                     $txtSearch.removeAttr('readonly');
                 }
                 else if (code == 8 && $btnClrSearch.css('visibility') == 'visible') {
@@ -1155,7 +1155,7 @@
                     query.addRestriction(" 1 = 1 ");
                     self.findRecords(query);
                 }
-            });          
+            });
         }
 
         $imgdownSearch.on("click", function () {
@@ -1220,7 +1220,7 @@
                 $txtSearch.removeAttr("readonly");
                 $imgdownSearch.css('visibility', 'hidden');
             }
-           
+
         };
 
         this.setSearchFocus = function (focus) {
@@ -1251,7 +1251,7 @@
 
                     //$($txtSearch[1]).css("display", "inherit");
                     $imgdownSearch.css('visibility', 'visible');
-                   /* userQueries.push({ 'label': VIS.Msg.getMsg("All"), 'value': VIS.Msg.getMsg("All"), 'code': VIS.Msg.getMsg("All") });*/
+                    /* userQueries.push({ 'label': VIS.Msg.getMsg("All"), 'value': VIS.Msg.getMsg("All"), 'code': VIS.Msg.getMsg("All") });*/
                     var hasDefaultSearch = false;
                     for (var i = 0; i < data.tables[0].rows.length; i++) {
 
@@ -1625,7 +1625,7 @@
                     this.ShortcutNavigation(this.aLast.getAction());
                     break;
                 case 38:      // ArrowUP for preivious Record
-                    
+
                     this.ShortcutNavigation(this.aPrevious.getAction());
                     break;
                 case 40:      // Arrow Down for next record
@@ -1868,19 +1868,19 @@
     }
 
     APanel.prototype.showHideViewIcon = function (action) {
-        if (this.curTab != null && this.curGC != null) {            
+        if (this.curTab != null && this.curGC != null) {
             if (this.actionParams.IsHideGridToggle != null) {
-                if(this.actionParams.IsHideGridToggle)
+                if (this.actionParams.IsHideGridToggle)
                     this.aMulti.hide();
                 else this.aMulti.show();
             }
             else if (!this.curTab.getIsHideGridToggle()) {
                 this.aMulti.show();
-               
+
 
             } else {
                 this.aMulti.hide();
-               
+
             }
 
             if (this.actionParams.IsHideSingleToggle != null) {
@@ -1890,11 +1890,11 @@
                     this.aSingle.show();
             }
             else if (!this.curTab.getIsHideSingleToggle()) {
-                
+
                 this.aSingle.show();
 
             } else {
-                
+
                 this.aSingle.hide();
             }
 
@@ -1915,8 +1915,8 @@
             this.aSingle.hide();
             this.aCard.hide();
         }
-      
-       
+
+
     }
 
     /** ************************************************************************
@@ -1932,7 +1932,7 @@
      *  @return true if Panel is initialized successfully
      */
 
-    APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel,aParams) {
+    APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel, aParams) {
 
         this.$parentWindow = $parent;
         var gridWindow = new VIS.GridWindow(jsonData, this);
@@ -2081,7 +2081,7 @@
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
                         this.vHeaderPanel = gc.vHeaderPanel; // set in parent class , so it is accessible in all GC
-                       
+
                     }
                 }
                 gc.initFilterPanel(curWindowNo, this.getFilterPane());
@@ -2154,9 +2154,9 @@
             this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility', 'visible');
         }
         //by pass for zoom query and action parameter
-        if (query != null || this.actionParams !=null) {
-            this.getRoot().show();          
-        
+        if (query != null || this.actionParams != null) {
+            this.getRoot().show();
+
         } else if (this.landingPage) {
             this.getRoot().hide();
             this.landingPage.getRoot().show();
@@ -2197,7 +2197,7 @@
                         'top': '',
                         'width': ''
                     });
-                   
+
                     aPanel.refresh();
                 }
             });
@@ -2233,7 +2233,7 @@
                         'top': '',
                         'width': ''
                     });
-                    
+
                     aPanel.refresh();
                 }
             });
@@ -2401,7 +2401,7 @@
 
             if (action.source instanceof VIS.Controls.VButton) {
                 var btnactionName = action.source.getField().vo.DefaultValue;
-                if (selfPan.getIsWindowAction(action.source.mField.getAD_Reference_Value_ID()) && selfPan.toolbarActionList.indexOf(btnactionName)>-1) {
+                if (selfPan.getIsWindowAction(action.source.mField.getAD_Reference_Value_ID()) && selfPan.toolbarActionList.indexOf(btnactionName) > -1) {
                     // handle Toolbar action by Button
                     selfPan.actionPerformedCallback(selfPan, btnactionName);
                     return;
@@ -2482,7 +2482,7 @@
     }
 
     APanel.prototype.actionPerformedCallback = function (tis, action) {
-                /*Handle view change for back button */
+        /*Handle view change for back button */
         this.setTabstackview(action);
 
         /*Naviagtion */
@@ -2725,11 +2725,11 @@
         //check action type
 
         //Undo  and tab change   
-        if (vButton.getField().getIsAction()&& vButton.getField().getAction() === "MTU") {
+        if (vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU") {
             aPanel.cmd_ignore();
-                aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(),"", vButton.getField().getActionParams());
+            aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(), "", vButton.getField().getActionParams());
             needExecute = false;
-        } 
+        }
 
         else if (curCtrller.curTab.needSave(true, false)) {
             needExecute = false;
@@ -2836,7 +2836,7 @@
                     startWOasking = true;
 
                     aPanel.checkAndCallProcess(vButton, table_ID, record_ID, ctx, self, startWOasking, batch);
-                    
+
                     vda.dispose();
                     self = null;
                 }
@@ -2853,7 +2853,7 @@
             // Change by Lokesh Chauhan 18/05/2015
             var chkModule = false;
             if (curTab.getAD_Window_ID() == 341 || curTab.getAD_Window_ID() == 170
-                 || curTab.getAD_Table_ID() == 323 || curTab.getAD_Table_ID() == 321) {
+                || curTab.getAD_Table_ID() == 323 || curTab.getAD_Table_ID() == 321) {
                 if (window.MMPM) {
                     var vvcf = MMPM.Requisition.prototype.create(curTab.getAD_Window_ID(), curTab.getRecord_ID(), curTab.getAD_Table_ID());
                     chkModule = true;
@@ -3038,7 +3038,7 @@
 
             aPanel.cmd_cardDialog(true);
         }
-        
+
 
         if (vButton.AD_Process_ID > 0) {
 
@@ -3150,10 +3150,10 @@
      * Handle widget Action
      * @param {any} actionParams
      */
-    APanel.prototype.landingPageActionPerformed= function (actionParams) {
+    APanel.prototype.landingPageActionPerformed = function (actionParams) {
         this.vTabbedPane.restoreTabChange();
         this.showLandingPage(false);
-        this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "","", actionParams);        
+        this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", "", actionParams);
     }
 
     function checkPostingByNewLogic(callback) {
@@ -3381,7 +3381,7 @@
      *	tab change
      *  @param action tab item's id
      */
-        APanel.prototype.tabActionPerformed = function (action, actionType, actionName, actionParams) {
+    APanel.prototype.tabActionPerformed = function (action, actionType, actionName, actionParams) {
 
         /* Check for any window or form added in action*/
         if ((actionType == 'WIW' || actionType == 'FOM') && actionName != "") {
@@ -3428,9 +3428,9 @@
                 $this.setBusy(false);
             });
             return;
-            }
+        }
 
-           
+
 
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
@@ -3452,7 +3452,7 @@
             return;
         }
 
-        
+
 
         //// To Clear SearchText Box on Tab Change
         this.toggleASearchIcons(false, false);
@@ -3605,8 +3605,8 @@
                 }
             }
 
-           
-           
+
+
 
         }
         if (canExecute) {
@@ -3632,7 +3632,7 @@
         else {
             var mTab = gc.getMTab();
             tabEle.setVisible(true);
-            gc.activate(oldGC,JSON.parse(JSON.stringify(this.actionParams)));
+            gc.activate(oldGC, JSON.parse(JSON.stringify(this.actionParams)));
             if (oldGC)
                 oldGC.detachDynamicAction();
             this.curTab = gc.getMTab();
@@ -3645,9 +3645,9 @@
                 this.curTab.query = queryy;
                 keepFilters = false;
             }
-            var defaultTabLayout =   mTab.getTabLayout();
+            var defaultTabLayout = mTab.getTabLayout();
             if (back && this.curTab.getIsCurrent()) {
-                
+
 
                 if (this.curTab.getTabLevel() == 0) {
                     if (this.curTab.searchText) {
@@ -3665,7 +3665,7 @@
                         this.toggleASearchIcons(true, false);
                     }
                 }
-               
+
                 gc.dataRefresh();
 
                 this.showFilterPanel(keepFilters);
@@ -3715,7 +3715,7 @@
                         defaultTabLayout = 'N'
                     }
                 }
-                
+
 
                 var AD_UserQuery_ID = 0;
                 if (this.actionParams && this.actionParams.AD_UserQuery_ID) {
@@ -3727,10 +3727,10 @@
                 this.showFilterPanel(keepFilters);
 
                 if (!this.curGC.onDemandTree || gc.isZoomAction) {
-                    
-                    this.clearSearchText();                   
 
-                   // this.setDefaultSearch(gc, AD_UserQuery_ID);                  
+                    this.clearSearchText();
+
+                    // this.setDefaultSearch(gc, AD_UserQuery_ID);                  
 
                     if ((this.actionParams.TabWhereClause || '') != '') { // check if param has where clause or not
                         var query = new VIS.Query(this.curTab.getTableName(), false);
@@ -3739,7 +3739,7 @@
                     } else {
                         this.setDefaultSearch(gc, AD_UserQuery_ID);
                     }
-                    
+
                     gc.query(this.curTab.getOnlyCurrentDays(), 0, false);	//	updated
                 }
                 else {
@@ -3748,7 +3748,7 @@
                     }
                 }
             }
-            
+
             //Change Icon
             //if (defaultTabLayout == 'N') {
             //    this.showHideViewIcon(this.aMulti);
@@ -3761,7 +3761,7 @@
             //}
 
             this.switchRow(null, defaultTabLayout, true);
-           
+
 
             if (this.curGC.onDemandTree) {
                 this.aShowSummaryLevel.show();
@@ -3776,7 +3776,7 @@
             gPanel = this.curGC;
         } else {
             gPanel = {};
-            gPanel.setToolbarBtnState = function (action,enable) {
+            gPanel.setToolbarBtnState = function (action, enable) {
                 ;
             }
         }
@@ -3792,7 +3792,7 @@
             //gPanel.setToolbarBtnState("NRD", false);
 
             this.aDelete.setEnabled(false);
-           // gPanel.setToolbarBtnState("DRD", false);
+            // gPanel.setToolbarBtnState("DRD", false);
 
             this.aFind.setEnabled(false);
             this.aBatchUpdate.setEnabled(false);
@@ -3827,14 +3827,14 @@
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);
         }
-        
+
         this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
 
         if (!isAPanelTab && this.showMultiViewOnly) { // in case of compiste and grid mode
             this.curGC.refreshRowPresentation();
         }
 
-       
+
         if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
             var lastFP = this.curTab.isFPManualHide;
             if (lastFP == undefined || lastFP == 'undefined') {
@@ -3846,8 +3846,8 @@
         } else {
             this.startFilterPanel(this.curTab['isFPManualHide']);
         }
-        
-        
+
+
         if (!isAPanelTab && this.curGC.getIsSingleRow()) {
             this.isHideFilterIcon(true);
             var lastFP = this.curTab.isFPManualHide;
@@ -3966,7 +3966,7 @@
             }
             else if (tabLayout == 'Y') {
                 gc.switchSingleRow(true);
-                            }
+            }
             else if (tabLayout == 'C') {
                 gc.switchCardRow(true);
             }
@@ -3988,7 +3988,7 @@
 
     APanel.prototype.displayIncArea = function (show) {
         var tdArea = this.getIncludedEmptyArea();
-        if (show && tdArea.data('lasttab') !='Y') {
+        if (show && tdArea.data('lasttab') != 'Y') {
             tdArea.css('display', 'flex');
         }
         else
@@ -4005,9 +4005,9 @@
 
         var sqlUserSearch = "VIS_117";
         var param = [];
-        if (AD_UserQuery_ID>0) {
+        if (AD_UserQuery_ID > 0) {
             sqlUserSearch = "VIS_159";
-            param[0] = new VIS.DB.SqlParam("@AD_UserQuery_ID", AD_UserQuery_ID);            
+            param[0] = new VIS.DB.SqlParam("@AD_UserQuery_ID", AD_UserQuery_ID);
 
         } else {
             param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", this.curTab.getAD_Tab_ID());
@@ -4037,7 +4037,7 @@
                         var userquery_id = data.tables[0].rows[i].cells["ad_userquery_id"];
                         setTimeout(function (id) {
                             $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(userquery_id, true);
-                        }, 1000,userquery_id);
+                        }, 1000, userquery_id);
 
                         toastr.success(VIS.Msg.getMsg("DefaultSerachExist"), '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
 
@@ -4498,7 +4498,9 @@
         if (this.curWinTab == this.vTabbedPane) {
             VIS.context.setContext(this.curWindowNo, "tb_Index", this.curTabIndex);
             this.curWinTab.evaluate(null);
-            this.curWinTab.notifyDataChanged(e);
+            if (e.getChangedColumn() < 0 || !e.getIsInserting()) {
+                this.curWinTab.notifyDataChanged(e);
+            }
         }
 
         if (this.curTab.getParentTab() && this.aSharedRecord) {
@@ -4532,7 +4534,7 @@
         }
     }
 
-    
+
 
     /**
      *	Set Status Line to text
@@ -4582,8 +4584,8 @@
         this.cmd_save(true, function (result) {
             if (result) {
                 $this.cmd_new(false);
-           }
-       });
+            }
+        });
     }
 
     APanel.prototype.cmd_save = function (manual, callback) {
@@ -4635,7 +4637,7 @@
                 if (manual && !retValue && !selfPanel.errorDisplayed) {
 
                 }
-                curGC.refreshTabPanelData(selfPanel.curTab.getRecord_ID(),'S');
+                curGC.refreshTabPanelData(selfPanel.curTab.getRecord_ID(), 'S');
                 if (manual) {
                     curGC.dynamicDisplay(-1);
                     selfPanel.vTabbedPane.notifyDataChanged();
@@ -4647,7 +4649,7 @@
 
             });
 
-           
+
         }
 
         if (needExecute) {
@@ -4667,7 +4669,7 @@
                 callback(retValue);
             }
 
-            curGC.refreshTabPanelData(curTab.getRecord_ID(),'S');
+            curGC.refreshTabPanelData(curTab.getRecord_ID(), 'S');
 
             this.curTab.loadShared();
             if (this.aSharedRecord) {
@@ -4698,7 +4700,7 @@
 
         this.curGC.setNewRecordLayout();
         this.curGC.dataNew(copy);
-        
+
     };// New
 
     APanel.prototype.cmd_batchUpdatedialog = function () {
@@ -4761,7 +4763,7 @@
                 }
                 else if (defaultTabLayout == 'Y') {
                     tis.showHideViewIcon(tis.aSingle);
-                    tis.curGC.switchSingleRow(true);                 
+                    tis.curGC.switchSingleRow(true);
 
                     var lastFP = tis.curTab.isFPManualHide;
                     tis.startFilterPanel(true);
@@ -4773,7 +4775,7 @@
                     tis.curGC.switchCardRow(true);
                     tis.isHideFilterIcon(false);
                     this.startFilterPanel(this.curTab.isFPManualHide);
-                }                
+                }
             }
         }
 
@@ -5257,9 +5259,9 @@
         }
         var self = this;
         var att = new VIS.attachmentForm(this.curTab.getWindowNo(), 0, this.curTab.getAD_Table_ID(),
-            this.curTab.getRecord_ID(), '', null, null, null,isViewOnly);
+            this.curTab.getRecord_ID(), '', null, null, null, isViewOnly);
         att.setIsWindowAction(true);
-        
+
         att.show();
         att.onClose = function () {
             self.curTab.loadAttachments();
@@ -5368,7 +5370,7 @@
 
     APanel.prototype.cmd_finddialog = function () {
 
-        var find = new VIS.Find(this.curWindowNo, this.curTab, 0,this);
+        var find = new VIS.Find(this.curWindowNo, this.curTab, 0, this);
         var self = this;
         var savedSearchName = "";
         find.onClose = function () {
@@ -5714,7 +5716,7 @@
     /**
      * Set Enable disable Back button   
      */
-    APanel.prototype.setBackEnable = function () {       
+    APanel.prototype.setBackEnable = function () {
         if (this.tabStack.length == 1 && this.tabStack[0].tabView.length <= 1) {
             this.aBack.setEnabled(false);
             if (this.curGC) {

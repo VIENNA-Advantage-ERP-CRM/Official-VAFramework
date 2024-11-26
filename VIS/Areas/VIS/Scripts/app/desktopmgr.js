@@ -852,6 +852,7 @@
             var $li = $(img.join(' '));
             $shortcutUL.append($li);
             activateTaskBarItem($li);
+            $li[0].scrollIntoView();
             $li = null;
         };
 

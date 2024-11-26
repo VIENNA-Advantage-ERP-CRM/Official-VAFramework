@@ -274,7 +274,7 @@
                 }
 
             .vis-app-footer li.vis-app-f-selected {
-                background: rgba(var(--v-c-primary), 0.07);
+                background: rgba(var(--v-c-primary), 0.4);
                 box-shadow: 0px 0px 5px rgba(var(--v-c-on-secondary), 0.39);
             }
 
