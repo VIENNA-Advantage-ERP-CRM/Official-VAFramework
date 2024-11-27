@@ -666,7 +666,7 @@
 
             //if (!mField.getIsDisplayed())
             //    return "";
-            if (colValue) {
+            if (colValue || mField.getColumnName() == 'AD_Org_ID' || mField.getColumnName() == 'AD_Client_ID' || mField.getColumnName() == 'AD_Role_ID' || mField.getDisplayType() == VIS.DisplayType.YesNo) {
                 var displayType = mField.getDisplayType();
 
 
