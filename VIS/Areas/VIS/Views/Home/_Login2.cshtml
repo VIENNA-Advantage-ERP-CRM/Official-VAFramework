@@ -16,7 +16,7 @@
 
                 <div class="input-row">
                     <label class="input-icon">
-                        <img src="~/Areas/VIS/Images/login/role.png" alt="icon"></label>
+                        <img src="~/Areas/VIS/Images/login/loginsvg/role.svg" alt="icon"></label>
                     <div class="language">
                         @Html.DropDownListFor(m => m.Login2Model.Role, new SelectList(ViewBag.RoleList), new { id = "role" })
                         @Html.HiddenFor(m => m.Login2Model.RoleName, new { id = "roleName" })
@@ -24,7 +24,7 @@
                 </div>
                 <div class="input-row">
                     <label class="input-icon">
-                        <img src="~/Areas/VIS/Images/login/client.png" alt="icon"></label>
+                        <img src="~/Areas/VIS/Images/login/loginsvg/client.svg" alt="icon"></label>
                     <div class="language">
                         @Html.DropDownListFor(m => m.Login2Model.Client, new SelectList(ViewBag.RoleList), new { id = "client" })
                         @Html.HiddenFor(m => m.Login2Model.ClientName, new { id = "clientName" })
@@ -32,7 +32,7 @@
                 </div>
                 <div class="input-row">
                     <label class="input-icon">
-                        <img src="~/Areas/VIS/Images/login/org.png" alt="icon"></label>
+                        <img src="~/Areas/VIS/Images/login/loginsvg/org.svg" alt="icon"></label>
                     <div class="language">
                         @Html.DropDownListFor(m => m.Login2Model.Org, new SelectList(ViewBag.RoleList), new { id = "org" })
                         @Html.HiddenFor(m => m.Login2Model.OrgName, new { id = "orgName" })
@@ -41,7 +41,7 @@
 
                 <div class="input-row">
                     <label class="input-icon">
-                        <img src="~/Areas/VIS/Images/login/warehouse.png" alt="icon"></label>
+                        <img src="~/Areas/VIS/Images/login/loginsvg/warehouse.svg" alt="icon"></label>
                     <div class="language">
                         @Html.DropDownListFor(m => m.Login2Model.Warehouse, new SelectList(ViewBag.RoleList), new { id = "warehouse" })
                         @Html.HiddenFor(m => m.Login2Model.WarehouseName, new { id = "warehouseName" })
@@ -50,7 +50,7 @@
 
                 <div class="input-row">
                     <label class="input-icon">
-                        <img src="~/Areas/VIS/Images/login/calender.png" alt="icon"></label>
+                        <img src="~/Areas/VIS/Images/login/loginsvg/calender.svg" alt="icon"></label>
                     @Html.EditorFor(m => m.Login2Model.Date, new { id = "date" })
                 </div>
                 <div class="login-button" style="text-align:center">
