@@ -545,11 +545,17 @@ namespace VAdvantage.Model
                 sb.Append(ApplyAggregateFunction(s_colY, false));
                 sb.Append(" AS " + s_colY);
                 sb.Append(" From ").Append(s_tableName);
+                string whereClause = GetWhereClause();
                 sb.Append(GetSQLWhere(out val));
                 if (!string.IsNullOrEmpty(specialWhere))
                 {
                     string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(sb.ToString(), s_tableName, false, false);
                     sb.Clear().Append(sbval);
+                }
+                if (!string.IsNullOrEmpty(whereClause))
+                {
+                    whereClause = Env.ParseContext(_Ctx, 0, whereClause, false);
+                    sb.Append("").Append(" AND (" + whereClause + ")");
                 }
                 sb.Append("GROUP BY " + m_colX + " ");
                 string innerQuery = sb.ToString();/// inner query

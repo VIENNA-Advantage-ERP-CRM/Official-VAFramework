@@ -160,59 +160,67 @@
 
 
     <div class="VIS_Pref_content-right-2" style="display: none" id="@("content2_" + ViewBag.WindowNumber)">
-        <h3 class="VIS_Pref_change-pass">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang,"VIS_WindowsSettings") </h3>
+        <h3 class="VIS_Pref_change-pass">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_WindowsSettings") </h3>
 
         <div class="VIS_Pref_col-33">
-            <input id= "@("chkAutoCommit_" + ViewBag.WindowNumber)"  checked="" type="checkbox"  class="VIS_Pref_automatic"><span><label id="@("lblAutoMatic_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Autimatic Commit</label></span>
+            <input id="@("chkAutoCommit_" + ViewBag.WindowNumber)" checked="" type="checkbox" class="VIS_Pref_automatic"><span><label id="@("lblAutoMatic_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Autimatic Commit</label></span>
             <a href="#" class="VIS_Pref_tooltip">
                 <i class="VIS_Pref_img-i vis vis-info"></i>
                 <span>
-                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgAutoMatic_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Autimatic Commit</label></span>
+                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgAutoMatic_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Autimatic Commit</label>
+                </span>
             </a>
         </div>
 
         <div class="VIS_Pref_col-33">
-            <input id= "@("chkShowTranslationTab_" + ViewBag.WindowNumber)"  checked="" type="checkbox"  class="VIS_Pref_automatic"><span><label id="@("lblTranslation_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Translation</label></span>
+            <input id="@("chkShowTranslationTab_" + ViewBag.WindowNumber)" checked="" type="checkbox" class="VIS_Pref_automatic"><span><label id="@("lblTranslation_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Translation</label></span>
             <a href="#" class="VIS_Pref_tooltip">
                 <i class="VIS_Pref_img-i vis vis-info"></i>
                 <span>
-                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgTranslation_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Translation</label></span>
+                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgTranslation_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Translation</label>
+                </span>
             </a>
         </div>
 
         <div class="VIS_Pref_col-33">
-            <input id= "@("chkShowAccountingTab_" + ViewBag.WindowNumber)"  checked="" type="checkbox"  class="VIS_Pref_automatic"><span><label id="@("lblShowAccounting_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Accounting Tabs</label></span>
+            <input id="@("chkShowAccountingTab_" + ViewBag.WindowNumber)" checked="" type="checkbox" class="VIS_Pref_automatic"><span><label id="@("lblShowAccounting_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Accounting Tabs</label></span>
             <a href="#" class="VIS_Pref_tooltip">
                 <i class="VIS_Pref_img-i vis vis-info"></i>
                 <span>
-                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgShowAccounting_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Accounting Tabs</label></span>
+                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgShowAccounting_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Accounting Tabs</label>
+                </span>
             </a>
         </div>
 
         <div class="VIS_Pref_col-33">
-            <input id= "@("chkAutoNewRecord_" + ViewBag.WindowNumber)"  checked="" type="checkbox"  class="VIS_Pref_automatic"><span><label id="@("lblAutoNewRecord_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Automatic New Record</label></span>
+            <input id="@("chkShowAdvancedTab_" + ViewBag.WindowNumber)" checked="" type="checkbox" class="VIS_Pref_automatic"><span><label id="@("lblShowAdvanced_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Advanced Tabs</label></span>
             <a href="#" class="VIS_Pref_tooltip">
                 <i class="VIS_Pref_img-i vis vis-info"></i>
                 <span>
-                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgAutoNewRecord_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Automatic New Record</label></span>
+                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgShowAdvanced_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Advanced Tabs</label>
+                </span>
             </a>
         </div>
 
         <div class="VIS_Pref_col-33">
-            <input id= "@("chkShowAdvancedTab_" + ViewBag.WindowNumber)"  checked="" type="checkbox"  class="VIS_Pref_automatic"><span><label id="@("lblShowAdvanced_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Advanced Tabs</label></span>
+            <input id="@("chkAutoNewRecord_" + ViewBag.WindowNumber)" checked="" type="checkbox" class="VIS_Pref_automatic"><span><label id="@("lblAutoNewRecord_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Automatic New Record</label></span>
             <a href="#" class="VIS_Pref_tooltip">
                 <i class="VIS_Pref_img-i vis vis-info"></i>
                 <span>
-                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgShowAdvanced_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Show Advanced Tabs</label></span>
+                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgAutoNewRecord_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Automatic New Record</label>
+                </span>
             </a>
         </div>
 
+
+
         <div class="VIS_Pref_col-33">
-            <input id= "@("chkCacheWindows_" + ViewBag.WindowNumber)"  checked="" type="checkbox"  class="VIS_Pref_automatic"><span><label id="@("lblCacheWindows_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Cache Windows</label></span>
+            <input id="@("chkCacheWindows_" + ViewBag.WindowNumber)" checked="" type="checkbox" class="VIS_Pref_automatic"><span><label id="@("lblCacheWindows_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Cache Windows</label></span>
             <a href="#" class="VIS_Pref_tooltip">
                 <i class="VIS_Pref_img-i vis vis-info"></i>
                 <span>
-                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgCacheWindows_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Cache Windows</label></span>
+                    <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgCacheWindows_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Cache Windows</label>
+                </span>
             </a>
         </div>
 
@@ -220,16 +228,17 @@
             <div class="VIS_Pref_dd">
                 <div class="VIS-Lavel-float">
                     <h5 style="width: 100%">
-                        <label class="VIS_Pref_Label_Font" id= "@("vlblClientOrg_" + ViewBag.WindowNumber)" >Show</label>
+                        <label class="VIS_Pref_Label_Font" id="@("vlblClientOrg_" + ViewBag.WindowNumber)">Show</label>
                     </h5>
                 </div>
                 <div class="VIS_Pref_slide-show pp">
-                    <select name="show"  id="@("cmbClientOrg_" + ViewBag.WindowNumber)"></select>
+                    <select name="show" id="@("cmbClientOrg_" + ViewBag.WindowNumber)"></select>
                 </div>
                 <a href="#" class="VIS_Pref_tooltip">
                     <i class="VIS_Pref_img-i vis vis-info"></i>
                     <span>
-                        <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgClientOrg_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Orgnisation client</label></span>
+                        <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgClientOrg_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Orgnisation client</label>
+                    </span>
                 </a>
                 <div class="VIS_Pref_clear-both"></div>
             </div>
@@ -246,7 +255,8 @@
                 <a href="#" class="VIS_Pref_tooltip">
                     <i class="VIS_Pref_img-i vis vis-info"></i>
                     <span>
-                        <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgWindowPageSize_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Window Page size</label></span>
+                        <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgWindowPageSize_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Window Page size</label>
+                    </span>
                 </a>
                 <div class="VIS_Pref_clear-both"></div>
             </div>
@@ -255,15 +265,13 @@
 
 
         <!-- end of show -->
-
-
         <!-- end of show -->
         <div class="VIS_Pref_clear-both"></div>
 
         <div style="display:none" class="VIS_Pref_email-configuration">
-            <h3>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang,"VIS_LoginSettings")</h3>
+            <h3>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_LoginSettings")</h3>
             <div style="display: none" class="VIS_Pref_col-50">
-                <input id= "@("chkAutoLogin_" + ViewBag.WindowNumber)" type="checkbox" class="VIS_Pref_automatic"><span><label id="@("lblAutoLogin_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Automatic Login</label></span>
+                <input id="@("chkAutoLogin_" + ViewBag.WindowNumber)" type="checkbox" class="VIS_Pref_automatic"><span><label id="@("lblAutoLogin_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Automatic Login</label></span>
                 <a href="#" class="VIS_Pref_tooltip">
                     <i class="VIS_Pref_img-i vis vis-info"></i><span><i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgAutoLogin_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Automatic Login</label></span>
                 </a>
@@ -274,7 +282,8 @@
                 <a href="#" class="VIS_Pref_tooltip">
                     <i class="VIS_Pref_img-i vis vis-info"></i>
                     <span>
-                        <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgStorePassword_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Store Password</label></span>
+                        <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgStorePassword_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Store Password</label>
+                    </span>
                 </a>
             </div>
             <div class="VIS_Pref_clear-both"></div>
@@ -282,15 +291,15 @@
 
         <!-- end of notification -->
         <div class="VIS_Pref_email-configuration">
-            <h3>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang,"VIS_LogSettings")</h3>
-            <div class="VIS_Pref_dd" >
+            <h3>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_LogSettings")</h3>
+            <div class="VIS_Pref_dd">
                 <div class="VIS-Lavel-float">
                     <h5 style="width: 100%">
-                        <label class="VIS_Pref_Label_Font" id= "@("lblTraceLevel_" + ViewBag.WindowNumber)">Trace Level</label>
+                        <label class="VIS_Pref_Label_Font" id="@("lblTraceLevel_" + ViewBag.WindowNumber)">Trace Level</label>
                     </h5>
                 </div>
                 <div class="VIS_Pref_slide-show VIS_Pref_pp">
-                    <select id="@("cmbTraceLevel_" + ViewBag.WindowNumber)" name="show" >
+                    <select id="@("cmbTraceLevel_" + ViewBag.WindowNumber)" name="show">
                     </select>
                 </div>
                 <a href="#" class="VIS_Pref_tooltip">
@@ -302,15 +311,17 @@
             </div>
 
             <div class="VIS_Pref_col-33">
-                <input id= "@("chkTraceFile_" + ViewBag.WindowNumber)" class="VIS_Pref_automatic" type="checkbox">
+                <input id="@("chkTraceFile_" + ViewBag.WindowNumber)" class="VIS_Pref_automatic" type="checkbox">
                 <span>
-                    <label id="@("lblTraceFile_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Trace File</label></span>
+                    <label id="@("lblTraceFile_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">Trace File</label>
+                </span>
 
                 <a href="#" class="VIS_Pref_tooltip">
                     <i class="VIS_Pref_img-i vis vis-info"></i>
                     <span>
                         <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgTraceFile_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">
-                            Trace File</label>
+                            Trace File
+                        </label>
                     </span>
                 </a>
             </div>
@@ -335,12 +346,12 @@
                 <div class="VIS_Pref_sett-1" style="display:none">
                     <div class="VIS-Lavel-float">
                         <h5 style="width: 100%">
-                            <label class="VIS_Pref_Label_Font" id="@("vlblDateText_" + ViewBag.WindowNumber)" >Date</label>
+                            <label class="VIS_Pref_Label_Font" id="@("vlblDateText_" + ViewBag.WindowNumber)">Date</label>
                         </h5>
                     </div>
 
                     <input type="date" style=" height: 34px;display:none" id="@("dt_Date_" + ViewBag.WindowNumber)" />
-                    <a  style="display:none" href="#" class="VIS_Pref_tooltip">
+                    <a style="display:none" href="#" class="VIS_Pref_tooltip">
                         <i class="VIS_Pref_img-i vis vis-info"></i>
                         <span>
                             <i class="fa fa-caret-left VIS_Pref_callout"></i><label id="@("imgDateText_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">
@@ -370,7 +381,7 @@
 
                         @*<select id="vis_cmbtheme"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option> </select>  </li>*@
                         @*
-            <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
+                        <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
                     </span>
 
                     <a href="#" class="VIS_Pref_tooltip">
@@ -415,7 +426,7 @@
 
         <label class="VIS_Pref_Label_Font" id="@("lblPrefSave_" + ViewBag.WindowNumber)">test</label>
 
-        <button id= "@("btnSave_" + ViewBag.WindowNumber)" class="VIS_Pref_btn-2">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang,"VIS_SaveChanges") </button>
+        <button id="@("btnSave_" + ViewBag.WindowNumber)" class="VIS_Pref_btn-2">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_SaveChanges") </button>
     </div>
     <!-- end of Prefrence -->
 

@@ -208,7 +208,7 @@
                     }
 
                     else {
-                        crt = VIS.VControlFactory.getControl(null, field, true, false, false);
+                        crt = VIS.VControlFactory.getControl(null, field, true, true, false);
                     }
 
                     crt.setReadOnly(false);
@@ -550,7 +550,7 @@
             dsFilterData = [];
             this.curGC.aPanel.setFilterWhere("");
             cmbColumns.val(-1);
-            cmbOp.val(-1);
+            cmbOp.val(-1);           
             setControlNullValue();
             setControlNullValue(true);
         };
@@ -1073,6 +1073,7 @@
             var enable = chkDynamic.prop("checked");
             drpDynamicOp.prop("disabled", !enable);
             cmbOp.prop("disabled", enable);
+            
             setValueEnabled(!enable);
             setValue2Enabled(!enable);
             setEnabledFullDay(enable);
@@ -1633,6 +1634,7 @@
         function setEnabledFullDay(enable) {
             if (enable) {
                 chkFullDay.prop('disabled', true);
+                chkFullDay.prop("checked", false);
             }
             else {
                 chkFullDay.prop('disabled', false);
@@ -1748,6 +1750,13 @@
             divDynFilters.find('.vis-fp-currntrcrds').remove(); 
             self.hardRefreshFilterPanel();
             this.fireValChanged();
+            if (divValue1) {
+                divValue1.find('Select option').remove();
+            }
+
+            if (divValue2) {
+                divValue2.find('Select option').remove();
+            }
         }
     };
 
@@ -2010,7 +2019,7 @@
         return inStr;
     };	//	pa
 
-    FilterPanel.prototype.createDirectSql = function (code, code_to, column, operator, convertToString, tabindex, isText) {
+    FilterPanel.prototype.createDirectSql = function (code, code_to, column, operator, convertToString, tabindex, isText, isList) {
         var sb = "";
         var isoDateRegx = /(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})/;
         if (typeof code == "string" && isNaN(code) && (code.toString().toUpper() != ("NULLValue").toUpper())) {
@@ -2042,10 +2051,14 @@
 
             else if ("string" == typeof code && isText) {
                 if (convertToString) {
-                    sb += " UPPER( ";
-                    sb += VIS.DB.to_string(code.toString());
+                    if (isList) {
+                        sb += VIS.DB.to_string(code.toString());
+                    } else {
+                        sb += " UPPER( ";
+                        sb += VIS.DB.to_string(code.toString());
 
-                    sb += " ) ";
+                        sb += " ) ";
+                    }
                 }
                 else {
                     sb += code.toString();
@@ -2064,10 +2077,15 @@
                     sb += VIS.DB.to_date(code_to, false);
                 }
 
-                else if (typeof (code_to) == "string" &&  isText) {
-                    sb += " UPPER( ";
-                    sb += VIS.DB.to_string(code_to.toString());
-                    sb += " ) ";
+                else if (typeof (code_to) == "string" && isText) {
+                    if (isList) {
+                        sb += VIS.DB.to_string(code_to.toString());
+                    } else {
+                        sb += " UPPER( ";
+                        sb += VIS.DB.to_string(code_to.toString());
+                        sb += " ) ";
+                    }
+                   
                 }
 
                 else
@@ -2087,7 +2105,7 @@
         var columnSQL = field.getColumnSQL(); //
 
         var isText = VIS.DisplayType.IsText(field.getDisplayType()) || VIS.DisplayType.List == field.getDisplayType() || VIS.DisplayType.YesNo == field.getDisplayType();
-
+        var isList = VIS.DisplayType.List == field.getDisplayType();
         if (value != null && value.length > 0 && isText) {
             if (optr == VIS.Query.prototype.LIKE || optr == VIS.Query.prototype.NOT_LIKE) {
                 value = '%' + value + '%';
@@ -2125,10 +2143,10 @@
                     // return whereCondition;
                 }
                 parsedValue2 = this.parseValue(field, value2);
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex, isText);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex, isText, isList);
             }
             else {
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex, isText);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnName, optr, true, tabIndex, isText, isList);
             }
         }
         else {
@@ -2169,7 +2187,7 @@
                         VIS.MRole.SQL_NOTQUALIFIED, VIS.MRole.SQL_RO);
                     optr = VIS.Query.prototype.IN;
                 }
-                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false, tabIndex, isText);
+                whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, false, tabIndex, isText, isList);
             }
             else {
                 // else add simple restriction where clause to query
@@ -2190,7 +2208,7 @@
                     }
                 }
                 else {
-                    whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, true, tabIndex, isText);
+                    whereCondition = this.createDirectSql(parsedValue, parsedValue2, columnSQL, optr, true, tabIndex, isText, isList);
 
                 }
             }
