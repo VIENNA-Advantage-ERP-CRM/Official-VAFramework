@@ -1118,9 +1118,9 @@
             if (self.curTab.userQueryID > 0) {
                 self.curGC.aFilterPanel.fireValChanged();
             } else {
-
-                self.cmd_find($txtSearch.val());
                 self.isFromSearch = true;
+                self.cmd_find($txtSearch.val());
+                
                 //self.curTab.searchText = "";
                 //self.clearSearchText();
                 //$txtSearch.val("");
@@ -1140,9 +1140,11 @@
                     if (!self.defaultSearch) {
                         return;
                     }
-                    self.cmd_find($txtSearch.val());
                     self.isFromSearch = true;
-                    // $txtSearch.val("");
+
+                    self.cmd_find($txtSearch.val());
+                   // $txtSearch.val("");
+
                     $txtSearch.removeAttr('readonly');
                 }
                 else if (code == 8 && $btnClrSearch.css('visibility') == 'visible') {
@@ -1218,7 +1220,7 @@
             else {
                 $btnClrSearch.css('visibility', 'hidden');
                 $txtSearch.removeAttr("readonly");
-                $imgdownSearch.css('visibility', 'hidden');
+                $imgdownSearch.css('visibility', 'visible');
             }
 
         };
