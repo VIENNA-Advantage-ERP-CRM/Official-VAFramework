@@ -157,8 +157,8 @@
                     reset();
                     initCols(true);
                     $td0.addClass("vis-ev-col-end4");
-                    columnIndex = colCount;
-                }
+                    columnIndex = colCount+4; //outbound
+                } 
                 else {
                     // check for row span
                     if (col0.rSpan > 1) { //skip column 
