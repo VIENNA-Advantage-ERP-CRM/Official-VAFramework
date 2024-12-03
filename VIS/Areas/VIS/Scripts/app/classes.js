@@ -1558,7 +1558,7 @@
                     if (zoomWindow_ID != 0 && PO_zoomWindow_ID != 0)
                         for (var o in zoomList) { //due to multiple window seq is mismatch, so mathc with table zoom window first
                             if (o.Key == zoomWindow_ID || o.Key == PO_zoomWindow_ID) {
-                                AD_Window_ID = zoomList[0].Key;
+                                AD_Window_ID = o.Key;
                                 break;
                             }
                         }
