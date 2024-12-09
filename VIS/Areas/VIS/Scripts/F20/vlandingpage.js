@@ -438,6 +438,7 @@
                 $div.append(widget.items).append('<div class="linktitle">' + widget.DisplayName + '</div>');
                 $item.append($div);
             } else if (widget.Type == "C" || widget.Type == "K" || widget.Type == "V") {
+                if (window.VADB)
                 VADB.chartFactory.getChart(widget.WidgetID, $item, widget.Type, info);
             }
 
