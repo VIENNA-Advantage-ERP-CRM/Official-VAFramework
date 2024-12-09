@@ -1125,7 +1125,7 @@
             } else {
                 self.isFromSearch = true;
                 self.cmd_find($txtSearch.val());
-                
+
                 //self.curTab.searchText = "";
                 //self.clearSearchText();
                 //$txtSearch.val("");
@@ -1148,7 +1148,7 @@
                     self.isFromSearch = true;
 
                     self.cmd_find($txtSearch.val());
-                   // $txtSearch.val("");
+                    // $txtSearch.val("");
 
                     $txtSearch.removeAttr('readonly');
                 }
@@ -1941,7 +1941,7 @@
      */
 
     APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel, aParams) {
-       
+
         this.$parentWindow = $parent;
         var gridWindow = new VIS.GridWindow(jsonData, this);
         this.gridWindow = gridWindow; //ref to call dispose
@@ -2283,37 +2283,26 @@
                     WhereValue: parentRecID
                 };
 
-                var parentRecRow = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomParentRec", data);
+                var parentRecRowID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomParentRec", data);
 
-                if (parentRecID) {
-                    VIS.context.setWindowContext(windowNo, parentDict[i].columnName, parentRecRow.toString());
-                }
+                if (parentRecRowID) {
+                    VIS.context.setWindowContext(windowNo, parentDict[i].columnName, parentRecRowID.toString());
 
+                    if (i == parentDict.length - 1) {// last one
 
-                if (parentRecRow) {
+                        var gTabPrnt = gTabs[parentDict[i].index];
 
-
-
-                    //var fields = gTabs[i].getFields();
-                    //var f = null;
-                    //for (var i = 0; i < fields.length; i++) {
-                    //    f = fields[i];
-                    //    if (f.getIsVirtualColumn())
-                    //        continue;
-                    //    if (f.getColumnName().toLowerCase() == "export_id")
-                    //        continue;
-                    //    if (f.getColumnName().toLowerCase() in parentRecRow && parentRecRow[f.getColumnName().toLowerCase()])
-                    //        VIS.context.setWindowContext(windowNo, f.getColumnName(), parentRecRow[f.getColumnName().toLowerCase()].toString());
-                    //}
-                    //if (this.vHeaderPanel) {
-                    //    this.vHeaderPanel.pZoomData = parentRecRow;
-                    //}
+                        var query = new VIS.Query(gTabPrnt.getTableName(), false);
+                        query.addRestriction(parentDict[i].columnName + ' = ' + parentRecRowID.toString());
+                        gTabPrnt.setQuery(query, true);
+                        gTabPrnt.prepareQuery(0, 0, false, false);
+                    }
                 }
             }
         }
     }
 
-    //Updated by raghu 
+    //Updated by  
     //date:19-01-2016
     //Change/Update for:Zoom from workflow on home page
     APanel.prototype.selectFirstTab = function (isSelect) {
