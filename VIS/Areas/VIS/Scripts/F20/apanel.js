@@ -1941,12 +1941,13 @@
      */
 
     APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel, aParams) {
-
+       
         this.$parentWindow = $parent;
         var gridWindow = new VIS.GridWindow(jsonData, this);
         this.gridWindow = gridWindow; //ref to call dispose
         //this.setWidth(gridWindow.getWindowWidth());
-        this.actionParams = aParams;
+        this.actionParams = aParams || {};
+
         this.createToolBar(); // Init ToolBar
 
         var curWindowNo = $parent.getWindowNo();
@@ -2045,6 +2046,8 @@
                     }
                 }//	query on first tab
             }
+
+
             var tabElement = null;
             //        //  GridController
             if (gTab.getIsSortTab())//     .IsSortTab())
@@ -2074,8 +2077,13 @@
 
                 // set current grid  controller
                 if (setCurrent) {
+                    //in case of zoom always swir=tch parent tab n single row
+                    if (this.vHeaderPanel) {
+                        this.switchRow(this.vHeaderPanel.curGC, "Y", true);
+                    }
                     this.curGC = gc;
                     setCurrent = false;
+                    //in case of zoom always swir=tch parent tab n single row
                 }
 
 
@@ -2085,11 +2093,11 @@
                     this.curTab = gTab;
                     this.curGC = gc;
                     this.firstTabId = id;
-
+                }
+                if (i === 0) {
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
                         this.vHeaderPanel = gc.vHeaderPanel; // set in parent class , so it is accessible in all GC
-
                     }
                 }
                 gc.initFilterPanel(curWindowNo, this.getFilterPane());
@@ -2275,10 +2283,31 @@
                     WhereValue: parentRecID
                 };
 
-                parentRecID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomParentRec", data);
+                var parentRecRow = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomParentRec", data);
 
                 if (parentRecID) {
-                    VIS.context.setWindowContext(windowNo, parentDict[i].columnName, parentRecID.toString());
+                    VIS.context.setWindowContext(windowNo, parentDict[i].columnName, parentRecRow.toString());
+                }
+
+
+                if (parentRecRow) {
+
+
+
+                    //var fields = gTabs[i].getFields();
+                    //var f = null;
+                    //for (var i = 0; i < fields.length; i++) {
+                    //    f = fields[i];
+                    //    if (f.getIsVirtualColumn())
+                    //        continue;
+                    //    if (f.getColumnName().toLowerCase() == "export_id")
+                    //        continue;
+                    //    if (f.getColumnName().toLowerCase() in parentRecRow && parentRecRow[f.getColumnName().toLowerCase()])
+                    //        VIS.context.setWindowContext(windowNo, f.getColumnName(), parentRecRow[f.getColumnName().toLowerCase()].toString());
+                    //}
+                    //if (this.vHeaderPanel) {
+                    //    this.vHeaderPanel.pZoomData = parentRecRow;
+                    //}
                 }
             }
         }
@@ -3893,8 +3922,18 @@
             this.curGC.aFilterPanel.setFilterLineAdvance(this.actionParams.AD_UserQuery_ID, true);
         }
 
+        var tbParams = {};
+        if (this.actionParams) {
+            //copy UI required prop
+            tbParams.IsHideGridToggle = this.actionParams.IsHideGridToggle;
+            tbParams.IsHideCardToggle = this.actionParams.IsHideCardToggle;
+            tbParams.IsHideSingleToggle = this.actionParams.IsHideSingleToggle;
+            tbParams.IsReadOnly = this.actionParams.IsReadOnly;
+            tbParams.IsDeleteDisabled = this.actionParams.IsDeleteDisabled;
+        }
 
-        this.actionParams = {}; //clear
+        this.actionParams = tbParams; //clear one time setting  properties not all
+
         if (!isAPanelTab && this.curGC && this.curTab.getRecord_ID() > -1) {
             this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
         }

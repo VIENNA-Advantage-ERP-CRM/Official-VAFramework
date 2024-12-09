@@ -400,11 +400,11 @@ html, body {
 
 
 input::-moz-placeholder {
-    color: rgba(238,238,238);
+    color: #AFAFAF;
 }
 
 input::-webkit-input-placeholder {
-    color: rgba(238,238,238);
+    color: #AFAFAF;
 }
 
 .login-button {
@@ -453,6 +453,7 @@ input::-webkit-input-placeholder {
         border: 0;
         color: rgba(102, 102, 102);
         outline: none;
+        padding-left:2px;
     }
 
         .language > select > option {
