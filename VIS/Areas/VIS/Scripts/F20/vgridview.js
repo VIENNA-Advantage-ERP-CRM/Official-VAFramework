@@ -604,7 +604,7 @@
                 oColumn.render = function (record, index, colIndex) {
                     var f = oColumns[colIndex].field;
                     var val = record[f];
-                    if (!val)
+                    if (!val && val != 0)
                         return;
                     //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
                     // return  Globalize.format(Number(oColumns[colIndex].customFormat.GetFormatedValue(val)));

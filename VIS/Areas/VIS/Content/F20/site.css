@@ -305,6 +305,7 @@
     .vis-footer-home-fix {
         position: absolute;
         left: 0;
+        bottom:0;
     }
 
     .vis-app-footer-c-l {
