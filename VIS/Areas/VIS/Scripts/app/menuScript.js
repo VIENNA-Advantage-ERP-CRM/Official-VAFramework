@@ -86,7 +86,7 @@
             let item = self.item(evt.target);
             if (self.active) {
                 if (self.active == item) return;
-                else if (self.active.contains(item)) return;
+               /* else if (self.active.contains(item)) return;*/
                 else self.hideSubNavs();
             }
             self.active = item;

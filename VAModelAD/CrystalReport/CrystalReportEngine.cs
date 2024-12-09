@@ -1218,6 +1218,12 @@ namespace VAdvantage.CrystalReport
                                             sb.Append(paramName).Append(" IN (")
                                                 .Append(paramValue.ToString()).Append(")");
                                         }
+                                        else if (DisplayType.List == Convert.ToInt32(dsPara.Tables[0].Rows[c]["AD_Reference_ID"])) // As discussed With AD Team 
+                                        {
+                                            sb.Append(paramName).Append(" = ")
+                                           .Append(GlobalVariable.TO_STRING(paramValue.ToString()));
+
+                                        }
                                         else if (DisplayType.IsID(Convert.ToInt32(dsPara.Tables[0].Rows[c]["AD_Reference_ID"])))
                                         {
                                             sb.Append(paramName).Append(" = ")
@@ -1226,7 +1232,13 @@ namespace VAdvantage.CrystalReport
                                         else
                                         {
                                             int outVal = 0;
-                                            if (int.TryParse(Convert.ToString(paramValue), out outVal))
+                                            if(DisplayType.List == Convert.ToInt32(dsPara.Tables[0].Rows[c]["AD_Reference_ID"])) // As discussed With AD Team 
+                                            {
+                                                sb.Append(paramName).Append(" = ")
+                                               .Append(GlobalVariable.TO_STRING(paramValue.ToString()));
+
+                                            }
+                                            else if (int.TryParse(Convert.ToString(paramValue), out outVal))
                                             {
                                                 sb.Append(paramName).Append(" = ")
                                               .Append(paramValue.ToString());
