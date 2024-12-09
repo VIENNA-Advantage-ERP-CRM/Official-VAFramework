@@ -435,6 +435,15 @@
         this.setSize = function (height, width) {
             return;
         };
+
+        this.setFilterActive = function (isActive) {
+            if (isActive) {
+                $btnFilter.find('i').addClass("vis-color-primary");
+            } else {
+                $btnFilter.find('i').removeClass("vis-color-primary");
+            }
+        }
+
         /**
          * Check given refrence is window action.
          * @param {any} refrenceValue
@@ -913,10 +922,6 @@
         };
 
         this.navigateThroghtShortcut = function (forward) {
-
-
-
-
             var next = null;
             if (forward) {
                 next = $ulTabControl.find('.vis-apanel-tab-selected').nextAll("[style='opacity: 1;']:first");
@@ -1267,6 +1272,7 @@
                     }
                 }
                 else {
+                    $imgdownSearch.css("transform", "rotate(360deg)");
                     $selfpanel.toggleASearchIcons(false, false);
                 }
 

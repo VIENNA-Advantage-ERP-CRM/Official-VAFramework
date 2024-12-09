@@ -415,6 +415,10 @@
                 }
             }
 
+            if (dsFilterData.length > 0) {
+                self.curGC.aPanel.setFilterActive(true);
+            }
+
             var dynFilter = self.getDynamicFilter();
             //if (dynFilter != '') {
             //    if (finalWhereClause != '')
@@ -689,6 +693,11 @@
                     delete dsAdvanceData[colName];
                 }
 
+
+                if (dsFilterData.length == 0) {
+                    self.curGC.aPanel.setFilterActive(false);
+                }
+
                 tgt.parent().parent().remove();
                 self.fireValChanged(tgt.data('keyval'));// evt.propertyName);
             }
@@ -899,6 +908,7 @@
             btnSaveAs.addClass('vis-fp-btnDisable');
             btnSaveAs.attr("tabindex", "-1");
             self.curGC.aPanel.removeSearchOnDelete();
+            self.curGC.aPanel.setFilterActive(false);            
         });
 
         //btnViewAll.on("click", "span", function (e) {
@@ -1547,6 +1557,10 @@
                 }
             }
 
+            if (dsFilterData.length == 0) {
+                self.curGC.aPanel.setFilterActive(false);
+            }
+
             refreshDynFiltersUI(colV, isSelection, tabindex);
         };
 
@@ -2171,6 +2185,16 @@
                 parsedValue2 = new Date(yearr, month, date, 24, 0, 0);
                 parsedValue = new Date(yearr, month, date, 0, 0, 0);
                 optr = VIS.Query.prototype.BETWEEN;
+            }
+
+            if (field.getDisplayType() == VIS.DisplayType.DateTime) {
+                if (parsedValue) {
+                    parsedValue = new Date(parsedValue).toUTCString();
+                }
+
+                if (parsedValue2) {
+                    parsedValue2 = new Date(parsedValue2).toUTCString();
+                }
             }
             //	Value2
             // if "BETWEEN" selected
