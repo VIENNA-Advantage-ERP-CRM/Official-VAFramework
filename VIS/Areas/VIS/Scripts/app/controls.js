@@ -1141,6 +1141,8 @@
             this.oldValue = newValue;
             if (this.mField.getDisplayType() == VIS.DisplayType.TelePhone && newValue && newValue != "- -") {
                 this.ctrl.html(VIS.VTelePhoneInstance.getHtml(newValue));
+            } else if (this.mField.getDisplayType() == VIS.DisplayType.YesNo && newValue == "- -") {
+                this.ctrl.html('false');
             }
             else {
                 this.ctrl.text(VIS.Utility.decodeText(newValue));
