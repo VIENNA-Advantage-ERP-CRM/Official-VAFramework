@@ -545,8 +545,14 @@
                     if (!val) {
                         val = 0; // show zero if null
                     }
+
+                    var lang = navigator.language;
+                    if (!lang && lang.length < 3) {
+                        lang = undefined;
+                    }
+
                     //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
-                    val = parseFloat(val).toLocaleString(undefined, {
+                    val = parseFloat(val).toLocaleString(lang, {
                         'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
                         'maximumFractionDigits': oColumns[colIndex].customFormat.getMaxFractionDigit()
                     });
@@ -561,9 +567,8 @@
                     var f = oColumns[colIndex].field;
                     var val = record[f];
 
-                    if (!val)
+                    if (!val && val != 0)
                         return;
-
                     //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
                     //val = parseFloat(val).toLocaleString(undefined, {
                     //    'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
