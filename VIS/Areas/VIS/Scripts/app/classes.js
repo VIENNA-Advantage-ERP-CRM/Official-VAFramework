@@ -1549,11 +1549,23 @@
 
             var AD_Window_ID = 0;
 
-            if (zoomWindow_ID == 0 && PO_zoomWindow_ID == 0 && targetWhereClause != null && targetWhereClause.length != 0) {
+            if (targetWhereClause != null && targetWhereClause.length != 0) {
                 var zoomList = [];
                 zoomList = this.getZoomTargets(targetTableName, curWindow_ID, targetWhereClause);
-                if (zoomList != null && zoomList.length > 0)
-                    AD_Window_ID = zoomList[0].Key;
+
+                if (zoomList != null && zoomList.length > 0) {
+
+                    if (zoomWindow_ID != 0 && PO_zoomWindow_ID != 0)
+                        for (var o = 0; o < zoomList.length; o++) { //due to multiple window seq is mismatch, so mathc with table zoom window first
+                            if (zoomList[o].Key == zoomWindow_ID || zoomList[o].Key == PO_zoomWindow_ID) {
+                                AD_Window_ID = zoomList[o].Key;
+                                break;
+                            }
+                        }
+                    if (AD_Window_ID == 0) {
+                        AD_Window_ID = zoomList[0].Key;
+                    }
+                }
             }
 
             if (AD_Window_ID != 0)

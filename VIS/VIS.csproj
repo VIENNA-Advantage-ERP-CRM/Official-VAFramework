@@ -581,6 +581,7 @@
     <Content Include="Areas\VIS\Images\mWorkFlow.png" />
     <Content Include="Areas\VIS\Images\nonfavItem.png" />
     <Content Include="Areas\VIS\Images\nonSummary.png" />
+    <Content Include="Areas\VIS\Images\onfinity-logo.png" />
     <Content Include="Areas\VIS\Images\orderedList0.png" />
     <Content Include="Areas\VIS\Images\orderedList1.png" />
     <Content Include="Areas\VIS\Images\orderedList2.png" />

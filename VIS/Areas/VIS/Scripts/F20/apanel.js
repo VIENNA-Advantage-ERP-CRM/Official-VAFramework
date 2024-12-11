@@ -435,6 +435,15 @@
         this.setSize = function (height, width) {
             return;
         };
+
+        this.setFilterActive = function (isActive) {
+            if (isActive) {
+                $btnFilter.find('i').addClass("vis-color-primary");
+            } else {
+                $btnFilter.find('i').removeClass("vis-color-primary");
+            }
+        }
+
         /**
          * Check given refrence is window action.
          * @param {any} refrenceValue
@@ -913,10 +922,6 @@
         };
 
         this.navigateThroghtShortcut = function (forward) {
-
-
-
-
             var next = null;
             if (forward) {
                 next = $ulTabControl.find('.vis-apanel-tab-selected').nextAll("[style='opacity: 1;']:first");
@@ -1120,7 +1125,7 @@
             } else {
                 self.isFromSearch = true;
                 self.cmd_find($txtSearch.val());
-                
+
                 //self.curTab.searchText = "";
                 //self.clearSearchText();
                 //$txtSearch.val("");
@@ -1143,7 +1148,7 @@
                     self.isFromSearch = true;
 
                     self.cmd_find($txtSearch.val());
-                   // $txtSearch.val("");
+                    // $txtSearch.val("");
 
                     $txtSearch.removeAttr('readonly');
                 }
@@ -1267,6 +1272,7 @@
                     }
                 }
                 else {
+                    $imgdownSearch.css("transform", "rotate(360deg)");
                     $selfpanel.toggleASearchIcons(false, false);
                 }
 
@@ -1940,7 +1946,8 @@
         var gridWindow = new VIS.GridWindow(jsonData, this);
         this.gridWindow = gridWindow; //ref to call dispose
         //this.setWidth(gridWindow.getWindowWidth());
-        this.actionParams = aParams;
+        this.actionParams = aParams || {};
+
         this.createToolBar(); // Init ToolBar
 
         var curWindowNo = $parent.getWindowNo();
@@ -2039,6 +2046,8 @@
                     }
                 }//	query on first tab
             }
+
+
             var tabElement = null;
             //        //  GridController
             if (gTab.getIsSortTab())//     .IsSortTab())
@@ -2068,8 +2077,13 @@
 
                 // set current grid  controller
                 if (setCurrent) {
+                    //in case of zoom always swir=tch parent tab n single row
+                    if (this.vHeaderPanel) {
+                        this.switchRow(this.vHeaderPanel.curGC, "Y", true);
+                    }
                     this.curGC = gc;
                     setCurrent = false;
+                    //in case of zoom always swir=tch parent tab n single row
                 }
 
 
@@ -2079,11 +2093,11 @@
                     this.curTab = gTab;
                     this.curGC = gc;
                     this.firstTabId = id;
-
+                }
+                if (i === 0) {
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
                         this.vHeaderPanel = gc.vHeaderPanel; // set in parent class , so it is accessible in all GC
-
                     }
                 }
                 gc.initFilterPanel(curWindowNo, this.getFilterPane());
@@ -2269,16 +2283,26 @@
                     WhereValue: parentRecID
                 };
 
-                parentRecID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomParentRec", data);
+                var parentRecRowID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomParentRec", data);
 
-                if (parentRecID) {
-                    VIS.context.setWindowContext(windowNo, parentDict[i].columnName, parentRecID.toString());
+                if (parentRecRowID) {
+                    VIS.context.setWindowContext(windowNo, parentDict[i].columnName, parentRecRowID.toString());
+
+                    if (i == parentDict.length - 1) {// last one
+
+                        var gTabPrnt = gTabs[parentDict[i].index];
+
+                        var query = new VIS.Query(gTabPrnt.getTableName(), false);
+                        query.addRestriction(parentDict[i].columnName + ' = ' + parentRecRowID.toString());
+                        gTabPrnt.setQuery(query, true);
+                        gTabPrnt.prepareQuery(0, 0, false, false);
+                    }
                 }
             }
         }
     }
 
-    //Updated by raghu 
+    //Updated by  
     //date:19-01-2016
     //Change/Update for:Zoom from workflow on home page
     APanel.prototype.selectFirstTab = function (isSelect) {
@@ -3887,8 +3911,18 @@
             this.curGC.aFilterPanel.setFilterLineAdvance(this.actionParams.AD_UserQuery_ID, true);
         }
 
+        var tbParams = {};
+        if (this.actionParams) {
+            //copy UI required prop
+            tbParams.IsHideGridToggle = this.actionParams.IsHideGridToggle;
+            tbParams.IsHideCardToggle = this.actionParams.IsHideCardToggle;
+            tbParams.IsHideSingleToggle = this.actionParams.IsHideSingleToggle;
+            tbParams.IsReadOnly = this.actionParams.IsReadOnly;
+            tbParams.IsDeleteDisabled = this.actionParams.IsDeleteDisabled;
+        }
 
-        this.actionParams = {}; //clear
+        this.actionParams = tbParams; //clear one time setting  properties not all
+
         if (!isAPanelTab && this.curGC && this.curTab.getRecord_ID() > -1) {
             this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
         }
