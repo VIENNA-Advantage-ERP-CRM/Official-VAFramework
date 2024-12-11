@@ -57,6 +57,7 @@ namespace VIS.Models
                     _wfDet.Add(wf);
                 }
             }
+
             return _wfDet;
         }
 

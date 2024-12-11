@@ -84,10 +84,21 @@
         hoverEvent: function (evt) {
             let self = this;
             let item = self.item(evt.target);
+           // console.log(evt.target);
             if (self.active) {
-                if (self.active == item) return;
-                else if (self.active.contains(item)) return;
-                else self.hideSubNavs();
+                //console.log("hasActive");
+                if (self.active == item) {
+                    //console.log("sameActiveItem");
+                    return;
+                }
+                //else if (self.active.contains(item)) {
+                //    //console.log("containsActiveItem");
+                //    return;
+                //}
+                else {
+                    //console.log("hideSubNavs");
+                    self.hideSubNavs();
+                }
             }
             self.active = item;
             self.showSubNav(item);
