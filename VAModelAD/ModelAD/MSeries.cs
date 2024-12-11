@@ -1558,26 +1558,29 @@ namespace VAdvantage.Model
 
                     if (tDays == dt_to.Day)
                     {
-                        m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day) + "/" + dt_to.Year;
+                        m_date2 = (dt_to.Month) + "/" + (dt_to.Day) + "/" + dt_to.Year;
                     }
                     else if (calcBasis.Equals("F"))
                     {
                         if (this.GetLastNValue() == 0)
                         {
-                            m_date2 = DateTime.Now.Month + "/" + DateTime.DaysInMonth(dt_to.Year, DateTime.Now.Month) + "/" + dt_to.Year;
+                            DateTime dt_toMon = DateTime.Now;
+                            m_date2 = DateTime.Now.Month + "/" + DateTime.DaysInMonth(dt_toMon.Year, DateTime.Now.Month) + "/" + dt_toMon.Year;
+
                         }
                         else
                         {
                             //   m_date2 = lastNDate.Month+ "/"+ DateTime.DaysInMonth(lastNDate.Year, lastNDate.Month) + "/"+ lastNDate.Year;
-                            lastNDate = lastNDate.AddMonths(1);
-                            m_date2 = lastNDate.Month + "/1/" + lastNDate.Year;
+                            // lastNDate = lastNDate.AddMonths();
+                            m_date2 = lastNDate.Month + "/" + DateTime.DaysInMonth(lastNDate.Year, lastNDate.Month) + "/" + lastNDate.Year;
+
                         }
 
                     }
                     else
                     {
                         dt_to = dt_to.AddDays(1);
-                        m_date2 = (dt_to.Month - 1) + "/" + dt_to.Day + "/" + dt_to.Year;
+                        m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
                     }
                 }
                 else if (GetDateTimeTypes() == IS_LAST_N_YEARS)
