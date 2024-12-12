@@ -2170,7 +2170,7 @@
             this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility', 'visible');
         }
         //by pass for zoom query and action parameter
-        if (query != null || this.actionParams != null) {
+        if (query != null || (this.actionParams != null && !$.isEmptyObject(this.actionParams))) {
             this.getRoot().show();
 
         } else if (this.landingPage) {
