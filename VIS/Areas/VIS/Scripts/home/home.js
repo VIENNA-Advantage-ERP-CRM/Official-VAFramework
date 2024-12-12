@@ -438,7 +438,7 @@
                             moduelName = "Links"
                             if (itm.HasImage) {
                                 if (!itm.IsImageByteArray && itm.IconUrl.indexOf('.') < 0) {
-                                    img = '<i data-index="' + i + '" class="' + itm.IconUrl + '"></i>';
+                                    img = '<i data-index="' + i + '" class="' + itm.IconUrl + ' " style="'+itm.FontStyle+'"></i>';
                                 }
                                 else {
                                     var url = "";
