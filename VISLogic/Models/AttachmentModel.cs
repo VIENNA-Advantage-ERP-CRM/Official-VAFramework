@@ -133,7 +133,8 @@ namespace ViennaAdvantageWeb.Areas.VIS.Models
             {
                 System.IO.File.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload") + "\\" + folderKey + "\\" + _files[i].Name);
             }
-            Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload", folderKey));
+            if (folderKey != "" && Directory.Exists(System.IO.Path.Combine(GetServerLocation(), "TempDownload", folderKey)))
+                Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload", folderKey));
 
             info.AD_attachment_ID = att.GetAD_Attachment_ID();
             info.Error = att.Error;

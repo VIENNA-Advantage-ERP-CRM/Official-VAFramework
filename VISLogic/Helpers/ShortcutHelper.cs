@@ -250,6 +250,7 @@ namespace VIS.Helpers
                         itm.HasImage = true;
                         itm.IsImageByteArray = false;
                         itm.IconUrl = img.GetFontName();
+                        itm.FontStyle = Convert.ToString(img.Get_Value("FontStyle"));
                     }
                     else if (img.GetImageURL() != null && img.GetImageURL().Length > 0)
                     {

@@ -580,7 +580,7 @@ namespace VAdvantage.Controller
                 else if (isAuto == "N")
                     vo.IsAutoNewRecord = false;
                 vo.HideFieldGroupFrom = Convert.ToInt16(Util.GetValueOfInt(dr["HideFieldGroupFrom"]));
-                vo.DetailViewColCount =  Convert.ToInt16(Util.GetValueOfInt(dr["SingleViewLayout"])); //todo get from DB
+                vo.DetailViewColCount = Convert.ToInt16(Util.GetValueOfInt(dr["SingleViewLayout"])); 
             }
             catch (System.Exception ex)
             {

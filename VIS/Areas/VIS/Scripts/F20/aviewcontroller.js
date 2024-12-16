@@ -812,18 +812,21 @@
 
         //  Set initial presentation
 
-        var defaultTabLayout = mTab.getTabLayout();
-        // check default layout of tab
-        //N means multirow layout
-        //Y means Single row layout
-        //C means Card view layout
-        if (defaultTabLayout == TABLAYOUT_GridLayout)
-            this.singleRow = false;
-        else if (defaultTabLayout == TABLAYOUT_SingleRowLayout)
-            this.switchSingleRow(true);
-        else if (defaultTabLayout == TABLAYOUT_CardViewLayout) {
-            this.isCardRow = false;
-            this.switchCardRow(true);
+        if (aPanel) {
+
+            var defaultTabLayout = mTab.getTabLayout();
+            // check default layout of tab
+            //N means multirow layout
+            //Y means Single row layout
+            //C means Card view layout
+            if (defaultTabLayout == TABLAYOUT_GridLayout)
+                this.singleRow = false;
+            else if (defaultTabLayout == TABLAYOUT_SingleRowLayout)
+                this.switchSingleRow(true);
+            else if (defaultTabLayout == TABLAYOUT_CardViewLayout) {
+                this.isCardRow = false;
+                this.switchCardRow(true);
+            }
         }
 
     };

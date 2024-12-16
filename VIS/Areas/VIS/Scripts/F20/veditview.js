@@ -157,8 +157,8 @@
                     reset();
                     initCols(true);
                     $td0.addClass("vis-ev-col-end4");
-                    columnIndex = colCount;
-                }
+                    columnIndex = colCount+4; //outbound
+                } 
                 else {
                     // check for row span
                     if (col0.rSpan > 1) { //skip column 
@@ -518,7 +518,8 @@
         function addFGDisplayBtn(hideFGFrom) {
             //addRow();
             reset();
-            initCols(false, false, false, true);
+            
+            initCols(colCount < 2,colCount==2,colCount == 3, colCount >3);
             $spndisplayFG.data('position', hideFGFrom);
             _curParent.append($spndisplayFG);
             //hide fg group

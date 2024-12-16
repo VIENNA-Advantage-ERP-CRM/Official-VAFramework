@@ -581,6 +581,7 @@
     <Content Include="Areas\VIS\Images\mWorkFlow.png" />
     <Content Include="Areas\VIS\Images\nonfavItem.png" />
     <Content Include="Areas\VIS\Images\nonSummary.png" />
+    <Content Include="Areas\VIS\Images\onfinity-logo.png" />
     <Content Include="Areas\VIS\Images\orderedList0.png" />
     <Content Include="Areas\VIS\Images\orderedList1.png" />
     <Content Include="Areas\VIS\Images\orderedList2.png" />
@@ -783,6 +784,12 @@
     <Content Include="Areas\VIS\Scripts\widgets\RequestWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\WorkflowWidget.js" />
     <Content Include="Areas\VIS\Templates\VIS_Templates.html" />
+    <Content Include="Areas\VIS\WebPages\login-form\css\style.css" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.svg" />
+    <Content Include="Areas\VIS\WebPages\login-form\images\form-bg.png" />
+    <Content Include="Areas\VIS\WebPages\login-form\images\onfinity-logo.png" />
+    <Content Include="Areas\VIS\WebPages\login-form\login-form.html" />
+    <Content Include="Areas\VIS\WebPages\login-form\vis-fonts.css" />
     <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
@@ -965,6 +972,17 @@
     <Content Include="Areas\VIS\Views\BiPanel\GetUserBILogin.cshtml" />
     <Content Include="babel.config.json" />
     <Content Include="package.json" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Bold.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Italic.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Light.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Medium.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-MediumItalic.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Regular.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-SemiBold.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-SemiBoldItalic.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.eot" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.woff" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

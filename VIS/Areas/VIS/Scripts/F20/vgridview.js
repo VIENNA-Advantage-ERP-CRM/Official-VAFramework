@@ -536,34 +536,39 @@
                 oColumn.style = 'text-decoration:underline; color:rgba(var(--v-c-primary), 1) !important; ';
             }
 
-            if (displayType == VIS.DisplayType.Amount) {
-                oColumn.sortable = true;
-                oColumn.customFormat = VIS.DisplayType.GetNumberFormat(displayType);
-                oColumn.render = function (record, index, colIndex) {
-                    var f = oColumns[colIndex].field;
-                    var val = record[f];
-                    if (!val) {
-                        val = 0; // show zero if null
-                    }
-                    //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
-                    val = parseFloat(val).toLocaleString(undefined, {
-                        'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
-                        'maximumFractionDigits': oColumns[colIndex].customFormat.getMaxFractionDigit()
-                    });
-                    return '<div data-type="int">' + val + '</div>';
-                };
-                //oColumn.caption = 'class="vis-control-wrap-int-amount"';
-            }
-            else if (displayType == VIS.DisplayType.Integer) {
+            //if (displayType == VIS.DisplayType.Amount) {
+            //    oColumn.sortable = true;
+            //    oColumn.customFormat = VIS.DisplayType.GetNumberFormat(displayType);
+            //    oColumn.render = function (record, index, colIndex) {
+            //        var f = oColumns[colIndex].field;
+            //        var val = record[f];
+            //        if (!val) {
+            //            val = 0; // show zero if null
+            //        }
+
+            //        var lang = navigator.language;
+            //        if (!lang && lang.length < 3) {
+            //            lang = undefined;
+            //        }
+
+            //        //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
+            //        val = parseFloat(val).toLocaleString(lang, {
+            //            'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
+            //            'maximumFractionDigits': oColumns[colIndex].customFormat.getMaxFractionDigit()
+            //        });
+            //        return '<div data-type="int">' + val + '</div>';
+            //    };
+            //    //oColumn.caption = 'class="vis-control-wrap-int-amount"';
+            //}
+            if (displayType == VIS.DisplayType.Integer) {
                 oColumn.sortable = true;
                 oColumn.customFormat = VIS.DisplayType.GetNumberFormat(displayType);
                 oColumn.render = function (record, index, colIndex) {
                     var f = oColumns[colIndex].field;
                     var val = record[f];
 
-                    if (!val)
+                    if (!val && val != 0)
                         return;
-
                     //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
                     //val = parseFloat(val).toLocaleString(undefined, {
                     //    'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
@@ -573,6 +578,7 @@
                 };
                 //oColumn.caption = 'class="vis-control-wrap-int-amount"';
             }
+
             else if (displayType == VIS.DisplayType.ProgressBar) {
                 oColumn.sortable = true;
                 oColumn.selfCellStyleRender = true;
@@ -598,17 +604,29 @@
                         '<div class="vis-progress-gridoutput" > ' + (val || '') + '</div></div >';
                 }
             }
+
             else if (VIS.DisplayType.IsNumeric(displayType)) {
                 oColumn.sortable = true;
                 oColumn.customFormat = VIS.DisplayType.GetNumberFormat(displayType);
                 oColumn.render = function (record, index, colIndex) {
                     var f = oColumns[colIndex].field;
                     var val = record[f];
-                    if (!val)
-                        return;
+                    if (!val) {
+                        if (displayType == VIS.DisplayType.Amount) {
+                            val = 0;
+                        }
+                        else if (val !=0) {
+                            return;
+                        }
+                    }
+                    var lang = navigator.language;
+                            if (!lang && lang.length < 3) {
+                                lang = undefined;
+                            }
+
                     //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
                     // return  Globalize.format(Number(oColumns[colIndex].customFormat.GetFormatedValue(val)));
-                    val = parseFloat(val).toLocaleString(undefined, {
+                    val = parseFloat(val).toLocaleString(lang, {
                         'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
                         'maximumFractionDigits': oColumns[colIndex].customFormat.getMaxFractionDigit()
                     });

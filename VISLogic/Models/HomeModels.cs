@@ -842,8 +842,10 @@ namespace VIS.Models
                 }
                 else
                 {
+
                     sql = "SELECT " + keyCol + " AS colID, " + displayCol + " AS colName FROM " + pTableName + " " + pTableName + " JOIN " + tableName + " " + tableName
                         + " ON " + keyCol + " = " + pTableName + "." + pColumnName
+
                         + " ";// WHERE " + pTableName + ".IsActive='Y'";
                    
                     
