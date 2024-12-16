@@ -183,7 +183,35 @@
 
                 $home.find('#btnRefreshWidget').click(function () {
                     loadWidgets();
+                    $home.find('#txtWidgetSearch').val('');
                 });
+
+                /**
+                 * search widgets
+                 */
+                $home.find('#txtWidgetSearch').keyup(function () {
+                    var searchText = $(this).val().toLowerCase();
+                    var containerVisibility = {};
+                    $home.find(".vis-widgetDrag-item").each(function () {
+                        var item = $(this);
+                        var itemText = item.find(".vis-dotdot2").text().toLowerCase();
+                        var container = item.closest(".vis-widgetDrag-container");
+                        var heading = container.prev(".vis-main-widget-heading");
+
+                        if (itemText.includes(searchText)) {
+                            item.show();
+                            containerVisibility[container.index()] = true;
+                        } else {
+                            item.hide();
+                        }
+                        if (!containerVisibility[container.index()]) {
+                            heading.hide();
+                        } else {
+                            heading.show();
+                        }
+                    });
+                })
+
 
                 // Event handler for deleting a widget
                 $leftPanel.on('click', '.vis-widgetDelete', function (e) {
