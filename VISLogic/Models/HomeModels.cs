@@ -819,6 +819,8 @@ namespace VIS.Models
 
                 sql += " GROUP BY " + pColumnName +
                          " ORDER BY COUNT(" + pColumnName + ") DESC) ";
+                if (DB.IsPostgreSQL())
+                    sql += " AS foo ";
             }
             else
             {
@@ -835,26 +837,34 @@ namespace VIS.Models
                     sql += " GROUP BY " + tblColName +
                              " ORDER BY COUNT(" + tblColName + ") DESC)";
                     pColumnName = tblColName;
+                    if (DB.IsPostgreSQL())
+                        sql += " AS foo ";
                 }
                 else
                 {
-                    sql = "SELECT " + keyCol + ", " + displayCol + " , count(" + keyCol + ")  FROM " + pTableName + " " + pTableName + " JOIN " + tableName + " " + tableName
-                        + " ON " + keyCol + " = " + pTableName + "." + tblColName
+
+                    sql = "SELECT " + keyCol + " AS colID, " + displayCol + " AS colName FROM " + pTableName + " " + pTableName + " JOIN " + tableName + " " + tableName
+                        + " ON " + keyCol + " = " + pTableName + "." + pColumnName
+
                         + " ";// WHERE " + pTableName + ".IsActive='Y'";
-                    sql = "SELECT * FROM (" + MRole.GetDefault(ctx).AddAccessSQL(sql, pTableName, true, false);
+                   
+                    
+                    sql = MRole.GetDefault(ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(""))
                         sql += " AND " + "";
                     if (!string.IsNullOrEmpty(whereClause))
                         sql += " AND " + whereClause;
-                    sql += " GROUP BY " + keyCol + ", " + displayCol
-                        + " ORDER BY COUNT(" + keyCol + ") DESC) ";
-
+                    string qeury = "SELECT  colID,colName,count(colID)  FROM ( " + sql + " )";
+                    if (DB.IsPostgreSQL())
+                        qeury += " AS foo ";
+                    qeury += " GROUP BY colID, colName ORDER BY COUNT(colID) DESC";
+                    sql = qeury;
                 }
             }
 
             //If DB is postgre, then append foo at end of subquery
-            if (DB.IsPostgreSQL())
-                sql += " AS foo ";
+          /*  if (DB.IsPostgreSQL())
+                sql += " AS foo ";*/
 
             List<DataSource> keyva = new List<DataSource>();
             DataSet ds = VIS.DBase.DB.ExecuteDatasetPaging(sql, 1, top);

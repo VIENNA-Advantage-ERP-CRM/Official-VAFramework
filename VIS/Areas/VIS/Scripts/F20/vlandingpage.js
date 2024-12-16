@@ -28,6 +28,8 @@
         var homeItems = {};
         var $busy = null;
         var $ulPopup = null;
+        var btnRefreshWidget = null;
+        var txtWidgetSearch = null;
 
         //function hideShowIcon() {
         //    if (isEditMode) {
@@ -102,6 +104,7 @@
             $btnlandingpageEdit = $root.find('.vis-landingpageEdit');
             btnCloseWidget = $root.find('.btnCloseWidget');
             btnRefreshWidget = $root.find('.btnRefreshWidget');
+            txtWidgetSearch = $root.find('.txtWidgetSearch');
             $spnTitle.append(VIS.Env.getHeader(apanel.ctx, curWindowNo));
 
             // Create and configure the open right panel button
@@ -204,7 +207,37 @@
 
             btnRefreshWidget.on('click', function () {
                 loadWidgets();
+                txtWidgetSearch.val('');
             });
+
+            /**
+             * 
+             * search widget
+             */
+            txtWidgetSearch.keyup(function () {
+                var searchText = $(this).val().toLowerCase();
+                var containerVisibility = {};
+                $root.find(".vis-widgetDrag-item").each(function () {
+                    var item = $(this);
+                    var itemText = item.find(".vis-dotdot2").text().toLowerCase();
+                    var container = item.closest(".vis-widgetDrag-container");
+                    var heading = container.prev(".vis-main-widget-heading");
+
+                    if (itemText.includes(searchText)) {
+                        item.show();
+                        containerVisibility[container.index()] = true;
+                    } else {
+                        item.hide();
+                    }
+
+                    if (!containerVisibility[container.index()]) {
+                        heading.hide();
+                    } else {
+                        heading.show();
+                    }
+                });
+            });
+
 
             btnCloseWidget.on('click', function () {
                 $leftPanel.animate({
