@@ -9,7 +9,7 @@
         var $inputChat = $('<div class="d-flex flex-column vis-chatBoxInputWrap ">');
         var $textArea = $('<div><textarea  id="chatBox_textArea" rows="1" class="vis-chat-msgbox" /></textarea></div>');
         var $sendIconDiv = $('<div>');
-        var $sendIconButton = $('<button id="chatBox_sendicon" class="pull-right"><i class="fa fa-paper-plane"></i></button>');
+        var $sendIconButton = $('<button id="chatBox_sendicon" class="pull-right"><i title="' + VIS.Msg.getMsg("Send") + '"class="fa fa-paper-plane"></i></button>');
         var $showMoreIcon = $('<div class="vis-chat-showmore" style="display:none"><a class="vis-chat-arrowdown">' + VIS.Msg.getMsg("ShowMore") + '</a></div>');
         var $bsyDiv = $('<div id="chatBusyDiv" style="width:90%; display:none;" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id"'
             + ' class= "vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div ></div> ');
@@ -23,6 +23,9 @@
         this.pageSize = 10;
         this.isBtmTapPanel = false;
         this.record_ID = record_id;
+        this.AD_Table_ID = table_id;
+        this.Description = description;
+        this.ChatID = chat_id;
        // this.isLoading = false;
 
 
@@ -352,9 +355,9 @@
             }
             self.prop.ChatText = text;
             VIS.dataContext.saveChat(self.prop);
-            if (ch != null) {
+            /*if (ch != null) {
                 ch.close();
-            }
+            }*/
         }
 
     };
@@ -376,7 +379,11 @@
         if (recordID > 0) {
             this.record_ID = recordID;
             this.selectedRow = selectedRow;
-            this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+            if (this.curTab ) {
+                this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+            } else {
+                this.prop = { WindowNo: this.windowNo, ChatID: this.ChatID, AD_Table_ID: this.AD_Table_ID, Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+            }
             this.initializeComponent(this.windowNo, this.prop);
         }
         // this.update(recordID);
