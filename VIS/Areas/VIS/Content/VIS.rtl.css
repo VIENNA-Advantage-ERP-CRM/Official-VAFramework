@@ -1006,6 +1006,10 @@ html[dir=rtl] .vis-footer-home-fix {
 html[dir=rtl] .vis-ad-w-p-actionpanel-r-b {
     margin-left:0;
     margin-right:5px;
-} 
+}
+
+html[dir="rtl"] .vis-nm-fav-icon-float {
+    float: left;
+}
 
     /*rtl css End here*/

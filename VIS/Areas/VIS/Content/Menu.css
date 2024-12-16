@@ -81,7 +81,7 @@
 
     .VIS-nm-opt-link span {
         color: #666666;
-        text-align: center;
+        text-align: center !important;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
         display: -webkit-box;

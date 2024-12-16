@@ -2969,6 +2969,10 @@ html[dir="rtl"] .vis-window-instruc-overlay-new-inn {
     }
 }
 
+html[dir="rtl"] .vis-chat-date {
+    justify-content: left;
+}
+
 @keyframes vis-spin {
     from {
         transform: scale(1) rotate(0deg);
