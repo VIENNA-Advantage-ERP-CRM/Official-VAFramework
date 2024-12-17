@@ -561,13 +561,48 @@ namespace VAdvantage.Model
                 string innerQuery = sb.ToString();/// inner query
                 sb.Clear();
                 sb.Append(GetUnionFinancial(m_date1, m_date2, m_colX, "0 " + m_colY, false));
-                sb.Append(" UNION ALL ");
+                if (DB.IsPostgreSQL())
+                {
+                    sb.Append(" AND " + m_colX + " IN (");
+                    StringBuilder insb = new StringBuilder();
+
+                    insb.Append("SELECT " + m_colX + " FROM " + s_tableName);
+                    insb.Append(GetSQLWhere(out val));
+                    if (!string.IsNullOrEmpty(specialWhere))
+                    {
+                        string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(insb.ToString(), s_tableName, false, false);
+                        insb.Clear().Append(sbval);
+                    }
+                    if (!string.IsNullOrEmpty(whereClause))
+                    {
+                        whereClause = Env.ParseContext(_Ctx, 0, whereClause, false);
+                        insb.Append("").Append(" AND (" + whereClause + "))");
+                    }
+                    else
+                    {
+                        insb.Append(")");
+                    }
+                    sb.Append(insb);
+                }
+                sb.Append(" UNION ALL");
                 string createMonth = sb.ToString();////month create
                 sb.Clear();
                 sb.Append("SELECT ");
                 sb.Append(" TRIM(to_char(p.StartDate, 'MON yyyy')) AS colx, ");
                 // sb.Append("p.Name AS ColX, ");
-                sb.Append(ApplyAggregateFunction(s_colY, false));
+                if (DB.IsPostgreSQL() && IsCount())
+                {
+                    sb.Append(ApplyAggregateFunction(m_colX, true));
+                }
+                else if (DB.IsPostgreSQL() && IsSum() && IsAvg())
+                {
+                    sb.Append(ApplyAggregateFunction(s_colY, true));
+                }
+                else
+                {
+                    sb.Append(ApplyAggregateFunction(s_colY, false));
+                }
+
                 sb.Append(" ColY ");
                 //sb.Append(" TRIM(to_char(p.StartDate, 'MON yyyy')) AS colx ");
                 sb.Append("FROM C_Period p JOIN C_Year y ON (p.C_Year_ID = y.C_Year_ID) LEFT JOIN ( " + createMonth + " " + innerQuery + ") ci ON p.StartDate <= ci." + m_colX + " AND p.EndDate >= ci." + m_colX + " ");
@@ -1047,9 +1082,9 @@ namespace VAdvantage.Model
             StringBuilder sb = new StringBuilder();
             if (DB.IsPostgreSQL())
             {
-                sb.Append(@" SELECT " + colName + @", " + function + @" FROM
-                    GENERATE_SERIES(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), TO_DATE('" + m_date2 + "', 'MM/DD/YYYY'), INTERVAL '1 day') AS " + colName + @"
-                    WHERE " + colName + @" > DATE '0001-01-01' GROUP BY " + colName);
+
+                sb.Append(@" SELECT " + colName + @", " + function + @" FROM GENERATE_SERIES(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), TO_DATE('" + m_date2 + "', 'MM/DD/YYYY'), INTERVAL '1 day') AS " + colName + @" WHERE " + colName + @" > DATE '0001-01-01'");
+
             }
             else
             {
@@ -1231,15 +1266,42 @@ namespace VAdvantage.Model
                 sb.Append("NVL(ROUND(");
 
             if (this.IsSum())
-                sb.Append("SUM(").Append(colName).Append(")");
+            {
+                if (DB.IsPostgreSQL() && checkCountIssue && calcBasis == "I")
+                {
+                    sb.Append("SUM(DISTINCT ci. " + colName + ")");
+                }
+                else
+                {
+                    sb.Append("SUM(").Append(colName).Append(")");
+                }
+            }
             else if (IsAvg())
-                sb.Append("AVG(").Append(colName).Append(")");
+            {
+                if (DB.IsPostgreSQL() && checkCountIssue && calcBasis == "I")
+                {
+                    sb.Append("AVG(DISTINCT ci. " + colName + ")");
+                }
+                else
+                {
+                    sb.Append("AVG(").Append(colName).Append(")");
+                }
+            }
+
             else if (IsCount())
             {
                 if (IsDate_X() && checkCountIssue && (this.GetDateTimeTypes() == IS_YEARLY || this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_LAST_N_MONTHS || this.GetDateTimeTypes() == IS_LAST_N_YEARS))
                 {
                     //sb.Append("CASE WHEN MOD(" + ApplyDateFunction(m_colX) + ",4) = 0 AND (MOD(" + ApplyDateFunction(m_colX) + ",400) = 0 OR MOD(" + ApplyDateFunction(m_colX) + ",100) <> 0) THEN COUNT(").Append(colName).Append(") - 366 ELSE COUNT(").Append(colName).Append(") - 365 END");
-                    sb.Append("SUM(").Append(colName).Append(")");
+                    if (DB.IsPostgreSQL() && checkCountIssue && calcBasis == "I")
+                    {
+                        sb.Append("COUNT(DISTINCT ci. " + colName + ")");
+                    }
+                    else
+                    {
+                        sb.Append("SUM(").Append(colName).Append(")");
+                    }
+
                 }
                 else
                     if (IsList_X())
@@ -1249,6 +1311,7 @@ namespace VAdvantage.Model
                 else
                 {
                     sb.Append("COUNT(").Append("*").Append(")");
+
                 }
 
             }
