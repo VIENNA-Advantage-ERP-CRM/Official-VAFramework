@@ -34,6 +34,8 @@ namespace VIS.Models
             MaterialReceipt = 184,
             Package = 319,
             InternalUse = 341,
+            CustomerReturn = 409,
+            VendorReturn = 411
         }
 
         StringBuilder _sqlQuery = new StringBuilder();
@@ -443,7 +445,7 @@ namespace VIS.Models
         }
 
         public InfoCartData GetCart(int pageNo, bool isCart, int window_ID, string windowName, int WarehouseID, int WarehouseToID,
-            int LocatorID, int LocatorToID, int BPartnerID, VAdvantage.Utility.Ctx ctx, List<InfoSearchCol> srchCtrls, bool requery)
+            int LocatorID, int LocatorToID, int BPartnerID, VAdvantage.Utility.Ctx ctx, List<InfoSearchCol> srchCtrls, bool requery, int OrderId)
         {
             string query = "";
             int M_Warehouse_ID = 0;
@@ -491,7 +493,17 @@ namespace VIS.Models
                 }
                 if (isCart)
                 {
-                    query += " AND VAICNT_TransactionType = 'OT' ";
+                    //VIS0336-implement the check for delivery order screen
+                    if (windowName == "VAS_DeliveryOrder")
+                    {
+
+                        query += " AND VAICNT_TransactionType = 'SH' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM C_Order WHERE docstatus='CO' AND C_Order_ID= " + OrderId + ")";
+                    }
+                    else
+                    {
+                        query += " AND VAICNT_TransactionType = 'OT' ";
+
+                    }
                 }
                 else
                 {
@@ -513,15 +525,18 @@ namespace VIS.Models
                         query += " AND VAICNT_TransactionType = 'PI' ";
                         M_Warehouse_ID = WarehouseID;
                     }
-                    else if (window_ID == 169 || windowName == "VAS_PhysicalInventory")
-                    {
-                        query += " AND VAICNT_TransactionType = 'SH' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE  C_BPartner_ID = " + BPartnerID + " AND DocStatus IN ('CO'))";
-                    }
+
                     else if (window_ID == 341 || windowName == "VAS_InternalUseInventory")
                     {
                         M_Warehouse_ID = WarehouseID;
-                        query += " AND VAICNT_TransactionType = 'IU' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE IsActive = 'Y' AND M_Warehouse_ID = " + M_Warehouse_ID + " AND DocStatus IN ('CO'))";
+                        query += " AND VAICNT_TransactionType = 'IU' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE IsActive = 'Y' AND  DTD001_MWarehouseSource_ID=" + M_Warehouse_ID + " AND   M_Warehouse_ID = " + M_Warehouse_ID + " AND DocStatus IN ('CO'))";
                     }
+                    //VIS0336-implement the check for delivery order screen
+                    else if (window_ID == 169 || windowName == "VAS_DeliveryOrder")
+                    {
+                        query += " AND VAICNT_TransactionType = 'SH' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM C_Order WHERE DocStatus='CO' AND C_Order_ID= " + OrderId + ")";
+                    }
+
                     else
                     {
                         query += " AND VAICNT_TransactionType = 'OT' ";
@@ -2419,19 +2434,28 @@ namespace VIS.Models
         public List<Dictionary<string, object>> GetCartData(string countID, int WindowID, string windowName, Ctx ctx)
         {
             List<Dictionary<string, object>> retCart = null;
+            string allowNonItem = Util.GetValueOfString(ctx.GetContext("$AllowNonItem"));
             string sql = "SELECT cl.M_Product_ID,prd.Name,prd.Value,cl.VAICNT_Quantity,cl.M_AttributeSetInstance_ID,cl.C_UOM_ID,uom.Name as UOM,ic.VAICNT_ReferenceNo,cl.VAICNT_InventoryCountLine_ID,"
-                        + " ats.Description FROM VAICNT_InventoryCount ic INNER JOIN VAICNT_InventoryCountLine cl ON ic.VAICNT_InventoryCount_ID = cl.VAICNT_InventoryCount_ID"
-                        + " INNER JOIN M_Product prd ON cl.M_Product_ID = prd.M_Product_ID INNER JOIN C_UOM uom ON cl.C_UOM_ID = uom.C_UOM_ID LEFT JOIN M_AttributeSetInstance ats"
-                         + " ON cl.M_AttributeSetInstance_ID = ats.M_AttributeSetInstance_ID WHERE cl.IsActive = 'Y' AND ic.VAICNT_InventoryCount_ID IN (" + countID + ")";
+                                   + " ats.Description FROM VAICNT_InventoryCount ic INNER JOIN VAICNT_InventoryCountLine cl ON ic.VAICNT_InventoryCount_ID = cl.VAICNT_InventoryCount_ID"
+                                   + " INNER JOIN M_Product prd ON cl.M_Product_ID = prd.M_Product_ID INNER JOIN C_UOM uom ON cl.C_UOM_ID = uom.C_UOM_ID LEFT JOIN M_AttributeSetInstance ats"
+                                    + " ON cl.M_AttributeSetInstance_ID = ats.M_AttributeSetInstance_ID WHERE cl.IsActive = 'Y' AND ic.VAICNT_InventoryCount_ID IN (" + countID + ")";
             // JID_1700: When physical inventory showing only available stock
             if (Util.GetValueOfInt(Windows.PhysicalInventory) == WindowID || Util.GetValueOfInt(Windows.InternalUse) == WindowID
-                || windowName == "VAS_PhysicalInventory" || windowName == "VAS_InternalUseInventory")
+                || windowName == "VAS_PhysicalInventory" || windowName == "VAS_InternalUseInventory" || Util.GetValueOfInt(Windows.InventoryMove) == WindowID || windowName == "VAS_InventoryMove")
             {
                 sql += "AND prd.IsStocked='Y' AND prd.ProductType='I'";     // DevOps #329, only show product type 'Item' in cart of Product info
             }
+            //VIS0336-implement the check for screens for allowitem checkbox
+            else if (windowName == "VAS_CustomerReturn" || windowName == "VAS_VendorReturn" || windowName == "VAS_DeliveryOrder" || windowName == "VAS_MaterialReceipt" ||
+                           WindowID == Util.GetValueOfInt(Windows.Shipment) || WindowID == Util.GetValueOfInt(Windows.CustomerReturn) || WindowID == Util.GetValueOfInt(Windows.VendorReturn))
+            {
+                if (allowNonItem == "N")
+                {
+                    sql += " AND prd.ProductType='I' ";
+                }
+            }
             sql += " ORDER BY ic.VAICNT_ReferenceNo, cl.Line";
             DataSet ds = DB.ExecuteDataset(sql, null, null);
-
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 bool checkRefLine = false;
