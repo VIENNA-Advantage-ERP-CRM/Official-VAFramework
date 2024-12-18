@@ -1037,7 +1037,7 @@
         if (pctl.pi.getSupportPaging() && canExport) {
             ulAction.append(btnsavepdfall);
         }
-        else {
+        else if(canExport) {
             btnSaveCsv.find('a').attr("title", VIS.Msg.getMsg("SaveCSV"));
             btnSavePdf.find('a').attr("title", VIS.Msg.getMsg("SavePdf"));
         }
