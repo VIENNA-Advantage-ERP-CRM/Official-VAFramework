@@ -21,19 +21,19 @@ namespace ViennaAdvantageWeb
         {
             AreaRegistration.RegisterAllAreas();
             WebApiConfig.Register(GlobalConfiguration.Configuration);
+
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-            //AuthConfig.RegisterAuth();//test
+            AuthConfig.RegisterAuth();//test
 
         }
         protected void Session_End()
         {
-           
+
             VAdvantage.Classes.SessionEventHandler.SessionEnd(Session["ctx"] as Ctx, Session.SessionID);
         }
 
-        
+
     }
 }

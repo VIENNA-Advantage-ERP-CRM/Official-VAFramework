@@ -14,5 +14,11 @@ namespace ViennaAdvantageWeb
             
             ViennaBase.AuthConfig.RegisterAuth(app);
         }
+
+        public static void RegisterAuth()
+        {
+
+            ViennaBase.AuthConfig.RegisterAuth();
+        }
     }
 }
