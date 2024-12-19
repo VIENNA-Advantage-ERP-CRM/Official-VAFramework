@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.Security;
+using VAdvantage.Classes;
 using VAdvantage.Utility;
 
 namespace ViennaAdvantageWeb
@@ -17,22 +18,50 @@ namespace ViennaAdvantageWeb
 
     public class MvcApplication : System.Web.HttpApplication
     {
-        protected void Application_Start()
+        ViennaBase.Global global = new ViennaBase.Global();
+        protected void Application_Start(object sender, EventArgs e)
         {
-            AreaRegistration.RegisterAllAreas();
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
+            
+            global.Application_Start(sender,e);
+            //AreaRegistration.RegisterAllAreas();
+            //WebApiConfig.Register(GlobalConfiguration.Configuration);
 
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            AuthConfig.RegisterAuth();//test
+            //RouteConfig.RegisterRoutes(RouteTable.Routes);
+            //BundleConfig.RegisterBundles(BundleTable.Bundles);
+            //FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            //AuthConfig.RegisterAuth();//test
 
         }
-        protected void Session_End()
-        {
 
-            VAdvantage.Classes.SessionEventHandler.SessionEnd(Session["ctx"] as Ctx, Session.SessionID);
+        protected void Session_Start(object sender, EventArgs e)
+        {
+            global.Session_Start(sender, e);
         }
+
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            global.Application_BeginRequest(sender, e);
+        }
+
+        protected void Application_AuthenticateRequest(object sender, EventArgs e)
+        {
+            global.Application_AuthenticateRequest(sender, e);
+        }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            global.Application_Error(sender, e);
+        }
+
+        protected void Session_End(object sender, EventArgs e)
+        {
+            global.Session_End(sender, e);
+        }
+
+        protected void Application_End(object sender, EventArgs e)
+        {
+            global.Application_End(sender, e);
+        }      
 
 
     }
