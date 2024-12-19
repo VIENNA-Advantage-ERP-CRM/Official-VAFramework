@@ -190,6 +190,7 @@
     <Content Include="Areas\VIS\Content\emailLinkStyle.css" />
     <Content Include="Areas\VIS\Content\F20\Color.css" />
     <Content Include="Areas\VIS\Content\F20\Controls.css" />
+    <Content Include="Areas\VIS\Content\F20\Controls_border.css" />
     <Content Include="Areas\VIS\Content\F20\Media.css" />
     <Content Include="Areas\VIS\Content\F20\site-rtl.css" />
     <Content Include="Areas\VIS\Content\F20\Site.css" />

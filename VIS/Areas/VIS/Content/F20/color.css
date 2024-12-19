@@ -14,7 +14,8 @@
     --v-c-mandatory: 236,63,63;
     --v-c-readonly: 241,241,241;
     /*font family*/
-    --v-c-font-family: 'NoirPro-Regular', sans-serif;
+    /* --v-c-font-family: 'NoirPro-Regular', sans-serif;*/
+    --v-c-font-family: "Roboto-Regular", sans-serif;
     /*--v-c-font-family: 'Montserrat-Regular', sans-serif;*/
 }
 
