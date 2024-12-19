@@ -9,9 +9,15 @@ namespace ViennaAdvantageWeb
 {
     public static class AuthConfig
     {
-        public static void RegisterAuth()
+        public static void RegisterAuth(Owin.IAppBuilder app)
         {
             
+            ViennaBase.AuthConfig.RegisterAuth(app);
+        }
+
+        public static void RegisterAuth()
+        {
+
             ViennaBase.AuthConfig.RegisterAuth();
         }
     }
