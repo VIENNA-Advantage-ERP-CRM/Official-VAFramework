@@ -849,6 +849,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
+    <Compile Include="Areas\VIS\Classes\VISAuthConfig.cs" />
+    <Compile Include="Areas\VIS\Classes\VISGlobal.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountController.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountFormController.cs" />
     <Compile Include="Areas\VIS\Controllers\AddProductController.cs" />

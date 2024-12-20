@@ -10,6 +10,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using VAdvantage.Classes;
 using VAdvantage.Utility;
+using VIS.Areas.VIS.Classes;
 
 namespace ViennaAdvantageWeb
 {
@@ -18,23 +19,23 @@ namespace ViennaAdvantageWeb
 
     public class MvcApplication : System.Web.HttpApplication
     {
-        ViennaBase.Global global = new ViennaBase.Global();
+        VISGlobal global = new VISGlobal();
         protected void Application_Start(object sender, EventArgs e)
-        {
-            
-            global.Application_Start(sender,e);
-            //AreaRegistration.RegisterAllAreas();
-            //WebApiConfig.Register(GlobalConfiguration.Configuration);
+        {            
+            AreaRegistration.RegisterAllAreas();
+            WebApiConfig.Register(GlobalConfiguration.Configuration);
 
-            //RouteConfig.RegisterRoutes(RouteTable.Routes);
-            //BundleConfig.RegisterBundles(BundleTable.Bundles);
-            //FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            //AuthConfig.RegisterAuth();//test
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            AuthConfig.RegisterAuth();//test
+            global.Application_Start(sender,e);
 
         }
 
         protected void Session_Start(object sender, EventArgs e)
         {
+            global._session = Session; 
             global.Session_Start(sender, e);
         }
 
@@ -55,6 +56,7 @@ namespace ViennaAdvantageWeb
 
         protected void Session_End(object sender, EventArgs e)
         {
+            global._session=Session;
             global.Session_End(sender, e);
         }
 
