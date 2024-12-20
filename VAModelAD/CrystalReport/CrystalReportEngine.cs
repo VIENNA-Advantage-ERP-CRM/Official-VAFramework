@@ -18,6 +18,7 @@ using VAdvantage.Classes;
 using Oracle.ManagedDataAccess.Client;
 using CrystalDecisions.Shared;
 using VAModelAD.DataBase;
+using Microsoft.SqlServer.Server;
 
 namespace VAdvantage.CrystalReport
 {
@@ -1356,14 +1357,14 @@ namespace VAdvantage.CrystalReport
                     {
                         if (sqlQ.Contains("WHERE"))
                         {
-                            sqlQ = sqlQ + " AND AD_PInstance_ID=" + _pi.GetAD_PInstance_ID();
+                            sqls[0] = sqls[0] + " AND AD_PInstance_ID=" + _pi.GetAD_PInstance_ID();
                         }
                         else
                         {
-                            sqlQ = sqlQ + " WHERE AD_PInstance_ID=" + _pi.GetAD_PInstance_ID();
+                            sqls[0] = sqls[0] + " WHERE AD_PInstance_ID=" + _pi.GetAD_PInstance_ID();
                         }
                     }
-                    sqlQ = sqlQ.ToLower();
+                    sqlQ = sqls[0];
                     DataSet ds = DB.ExecuteDataset(sqlQ);
                     log.Severe("CrystalReport Query: " + sqlQ);
 
@@ -1506,11 +1507,11 @@ namespace VAdvantage.CrystalReport
                                 sqlQ = GetObscureSql(sqlQ);
 
                                 //Check if AD_PInstance_ID exist in query, only then apply AD_PInstance_ID in where clause.
-                                sqlQ = sqlQ.ToUpper();
+                               var sqlQQ = sqlQ.ToUpper();
 
-                                if (sqlQ.Contains("T_CRYSTALPARAMETERS") || sqlQ.Contains("AD_PINSTANCE_ID"))
+                                if (sqlQQ.Contains("T_CRYSTALPARAMETERS") || sqlQQ.Contains("AD_PINSTANCE_ID"))
                                 {
-                                    if (sqlQ.Contains("WHERE"))
+                                    if (sqlQQ.Contains("WHERE"))
                                     {
                                         sqlQ = sqlQ + " AND AD_PInstance_ID=" + _pi.GetAD_PInstance_ID();
                                     }
@@ -1519,7 +1520,7 @@ namespace VAdvantage.CrystalReport
                                         sqlQ = sqlQ + " WHERE AD_PInstance_ID=" + _pi.GetAD_PInstance_ID();
                                     }
                                 }
-                                sqlQ = sqlQ.ToLower();
+                                //sqlQ = sqlQ.ToLower();
                                 ds = DB.ExecuteDataset(sqlQ);
                                 log.Severe("CrystalReport Query: " + sqlQ);
                                 subRepDoc.SetDataSource(ds.Tables[0]);

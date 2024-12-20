@@ -43,13 +43,13 @@ namespace VIS.Controllers
         }
 
         public JsonResult GetCart(int pageNo, bool isCart, int windowID, string WindowName, int WarehouseID, int WarehouseToID, int LocatorID,
-            int LocatorToID, int BPartnerID, string srchCtrl, bool requery)
+            int LocatorToID, int BPartnerID, string srchCtrl, bool requery,int OrderId)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             List<InfoSearchCol> srchCtrls = JsonConvert.DeserializeObject<List<InfoSearchCol>>(srchCtrl);
             VIS.Models.InfoProductModel model = new VIS.Models.InfoProductModel();
             return Json(JsonConvert.SerializeObject(model.GetCart(pageNo, isCart, windowID, WindowName, WarehouseID, WarehouseToID, LocatorID,
-                LocatorToID, BPartnerID, ctx, srchCtrls, requery)), JsonRequestBehavior.AllowGet);
+                LocatorToID, BPartnerID, ctx, srchCtrls, requery, OrderId)), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]

@@ -333,7 +333,7 @@
             var M_Warehouse_ID = 0;
             var M_WarehouseTo_ID = 0;
             var C_BPartner_ID = 0;
-
+            var OrderId = 0;
             if (requery == true) {
                 //var name = "";
                 //var ref = "";
@@ -392,6 +392,7 @@
                 else if (window_ID == 169 || windowName == "VAS_DeliveryOrder") {
                     //query += " AND VAICNT_TransactionType = 'SH' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE  C_BPartner_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID")) + " AND DocStatus IN ('CO'))";
                     C_BPartner_ID = VIS.context.getWindowTabContext(windowNo, 0, "C_BPartner_ID");
+                    OrderId = VIS.context.getWindowTabContext(windowNo, 0, "C_Order_ID");
                 }
                 else if (window_ID == 341 || windowName == "VAS_InternalUseInventory") {
                     //query += " AND VAICNT_TransactionType = 'IU' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE IsActive = 'Y' AND M_Warehouse_ID = " + VIS.Utility.Util.getValueOfInt(VIS.context.getWindowContext(windowNo, "M_Warehouse_ID", true)) + " AND DocStatus IN ('CO'))";
@@ -438,7 +439,8 @@
                     LocatorToID: M_LocatorTo_ID,
                     BPartnerID: C_BPartner_ID,
                     srchCtrl: JSON.stringify(srhCtrls),
-                    requery: requery
+                    requery: requery,
+                    OrderId: OrderId    //VIS0336-add parm for delivery order screen
                 },
                 error: function () {
                     alert(VIS.Msg.getMsg('ErrorWhileGettingData'));
