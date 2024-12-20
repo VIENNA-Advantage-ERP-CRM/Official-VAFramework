@@ -242,9 +242,10 @@
     display: flex;
     align-items: center;
     background: rgba(var(--v-c-secondary), 0.5);
-    padding-top: 7px;
+    /*padding-top: 7px;*/
+    padding-top: 0px;
     padding-left: 10px;
-    flex:1;
+    flex: 1;
 }
 
 .vis-ad-w-p-nav {
@@ -632,10 +633,23 @@ span.vis-ad-w-p-tb-rc-action {
     list-style: none;
     font-size: 1rem;
 }
-
-
-.vis-ad-w-p-t-c-tc {
-}
+    .vis-ad-w-p-t-c ul li::after {
+        content: "";
+        display: flex;
+        height: 12px;
+        width: 1px;
+        position: absolute;
+        background-color: rgba(var(--v-c-on-secondary), 1);
+        top:0;
+        bottom:0;
+        right:0;
+        margin:auto;
+    }
+    .vis-ad-w-p-t-c ul li:last-child::after{
+        display:none;
+    }
+        .vis-ad-w-p-t-c-tc {
+        }
 
 .vis-ad-w-p-t-c-inc-tc {
     flex-flow: row;
@@ -643,32 +657,41 @@ span.vis-ad-w-p-tb-rc-action {
 
 .vis-ad-w-p-t-c li, .vis-ad-w-p-t-c-inc li {
     /*margin: 1px 5px;*/
-    color: rgba(var(--v-c-on-secondary), 1);
-    padding: 0 10px 5px;
+    /*color: rgba(var(--v-c-on-secondary), 1);*/
+    color: rgba(var(--v-c-primary),1);
+    /*padding: 0 10px 5px;*/
+    padding: 0 10px 0px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    position:relative;
 }
 
 .vis-ad-w-p-t-c-tc i, .vis-ad-w-p-t-c-inc-tc i {
     font-size: .875rem;
     display: inline-flex;
     padding-right: 3px;
+    display:none;
 }
 
 .vis-ad-w-p-t-c-tc span, .vis-ad-w-p-t-c-inc-tc span {
     font-size: 0.9rem;
+    text-decoration:underline;
 }
 
 .vis-ad-w-p-t-c li.vis-apanel-tab-selected {
-    border-bottom: 2px solid rgba(var(--v-c-primary),1);
-    color: rgba(var(--v-c-primary),1);
+    /* border-bottom: 2px solid rgba(var(--v-c-primary),1);*/
+    /*color: rgba(var(--v-c-primary),1);*/
+    color: rgba(var(--v-c-on-secondary), 1);
 }
+    .vis-ad-w-p-t-c li.vis-apanel-tab-selected span{text-decoration:none;}
 
-.vis-ad-w-p-t-c li h5, .vis-ad-w-p-t-c-inc li h5 {
-    margin-bottom: 0;
-    font-size: 0.9rem;
-}
+    .vis-ad-w-p-t-c li h5, .vis-ad-w-p-t-c-inc li h5 {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+        font-weight:normal;
+        text-decoration:underline;
+    }
 .vis-ad-w-p-t-c-inc li.vis-apanel-tab-selected {
     border-top: 2px solid rgba(var(--v-c-primary), 1);
     margin-bottom: -1px;
@@ -711,7 +734,9 @@ span.vis-ad-w-p-tb-rc-action {
 }
 
 .vis-ad-w-p-t-c li.vis-apanel-tab-selected h5, .vis-ad-w-p-t-c-inc li.vis-apanel-tab-selected h5 {
-    font-size: 0.9375rem;
+    font-size: 0.9rem;
+    font-weight:normal;
+    text-decoration:none;
 }
 
 
@@ -2223,14 +2248,17 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
         cursor:pointer;
         font-size:1.5rem;
     }
+
         .vis-fb-savebtnPnl a:focus {
             box-shadow: 0 0 10px rgba(var(--v-c-on-secondary), .7);
         }
-        .main-fp-wrap {
-            width: 100%;
-            height: 100%;
-            /*position: absolute;*/
-        }
+
+
+    .main-fp-wrap {
+        width: 100%;
+        height: 100%;
+        /*position: absolute;*/
+    }
 
 .vis-fp-static-ctrlwrp {
     padding: 10px 10px 0px;
@@ -2391,11 +2419,11 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
     padding: 7px;
     cursor: pointer;
 }
-
 .vis-fp-btnfocus:focus {
     outline: 0;
     box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
 }
+
 
 .vis-apanel-sorttab-cont {
     display: flex;
@@ -2943,15 +2971,14 @@ html[dir="rtl"] .vis-window-instruc-overlay-new-inn {
 .vis-fp-custcolumns [aria-expanded="true"] .card-link{
     rotate:180deg;
 }
-
 .card-link {
     color: rgba(var(--v-c-on-secondary),1) !important;
 }
-.card-link:focus {
-    outline: none;
-    box-shadow: 0 0 10px rgba(var(--v-c-on-secondary), .7);
-}
- .vis-load-animate {
+    .card-link:focus {
+        outline: none;
+        box-shadow: 0 0 10px rgba(var(--v-c-on-secondary), .7);
+    }
+.vis-load-animate {
     opacity:0.5;
     -animation: vis-spin .7s infinite linear;
     -webkit-animation: vis-spin2 .7s infinite linear;
@@ -2968,11 +2995,9 @@ html[dir="rtl"] .vis-window-instruc-overlay-new-inn {
         -webkit-transform: rotate(360deg);
     }
 }
-
 html[dir="rtl"] .vis-chat-date {
     justify-content: left;
 }
-
 @keyframes vis-spin {
     from {
         transform: scale(1) rotate(0deg);
