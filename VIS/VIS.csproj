@@ -213,12 +213,12 @@
     <Content Include="Areas\VIS\Content\RecordAccessDialog.css" />
     <Content Include="Areas\VIS\Content\ReportStyle.css" />
     <Content Include="Areas\VIS\Content\Site.css" />
-    <Content Include="Areas\VIS\Content\src\VISTemplateExcel.css" />
     <Content Include="Areas\VIS\Content\Style.css" />
     <Content Include="Areas\VIS\Content\SurveyTabPanel.css" />
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
     <Content Include="Areas\VIS\Content\VIS.all.min.css" />
     <Content Include="Areas\VIS\Content\VISAD.css" />
+    <Content Include="Areas\VIS\Content\Widgets\AssignRecordWidget.css" />
     <Content Include="Areas\VIS\Content\Widgets\VIS-Widget.css" />
     <Content Include="Areas\VIS\Images\11.png" />
     <Content Include="Areas\VIS\Images\12.png" />
@@ -695,6 +695,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\vdocaction.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vimageform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\visimportfiles.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\visassignuser.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vpayment.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vsetup.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\wfactivity.js" />
@@ -759,15 +760,18 @@
     <Content Include="Areas\VIS\Scripts\processengine\processinfo.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processparameter.js" />
     <Content Include="Areas\VIS\Scripts\react\component\helloWord.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\component\WidgetLoader.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\CSS\Vis_AssignRecordWidget.css" />
+    <Content Include="Areas\VIS\Scripts\react\pages\AssignRecordWidget.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\HomePage.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\TestComponent.jsx" />
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\assignRecordWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\Checklist.js" />
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
-    <Content Include="Areas\VIS\Scripts\src\VISTemplateExcelFormByDialog.js" />
-    <Content Include="Areas\VIS\Scripts\src\VISTemplateExcel.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\bipanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\HistoryDetailsTabPanel.js" />
@@ -793,6 +797,7 @@
     <Compile Include="Areas\VIS\Controllers\AmountDivisionController.cs" />
     <Compile Include="Areas\VIS\Controllers\ArchiveViewerController.cs" />
     <Compile Include="Areas\VIS\Controllers\ASearchController.cs" />
+    <Compile Include="Areas\VIS\Controllers\AssigendRecordToUserController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentHistoryController.cs" />
     <Compile Include="Areas\VIS\Controllers\BatchUpdateController.cs" />
@@ -851,6 +856,7 @@
     <Compile Include="Areas\VIS\Helpers\MenuHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\ProcessHelper.cs" />
     <Compile Include="Areas\VIS\Models\AddProductModel.cs" />
+    <Compile Include="Areas\VIS\Models\AssignedRecordToUser.cs" />
     <Compile Include="Areas\VIS\Models\BatchUpdateModel.cs" />
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />
     <Compile Include="Areas\VIS\Models\EmailModel.cs" />
@@ -933,6 +939,7 @@
   <ItemGroup>
     <Folder Include="Areas\VIS\Scripts\app\processengine\" />
     <Folder Include="Areas\VIS\Scripts\dist\" />
+    <Folder Include="Areas\VIS\Scripts\widgets\NewFolder1\" />
     <Folder Include="Areas\VIS\Views\AmountDivision\" />
     <Folder Include="Areas\VIS\Views\ArchiveViewer\" />
     <Folder Include="Areas\VIS\Views\Channel\" />
