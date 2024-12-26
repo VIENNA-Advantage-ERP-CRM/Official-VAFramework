@@ -9,19 +9,31 @@
         .VIS-template-excel-block h6:hover {
             text-decoration: underline;
         }
+
 .VIS-excelItemsBlock {
     padding: 5px 4px;
 }
 
-.VIS-excelItem {
-    border: 1px solid rgba(var(--v-c-secondary), 1);
-    border-radius: 8px;
-    padding: 8px 10px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+    .VIS-excelItemsBlock.VIS-noExcelData {
+        text-align: center;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3em;
+        letter-spacing: -0.3px;
+        flex-direction: column;
+    }
+
+    .VIS-excelItem {
+        align-items: center;
+        border: 2px solid #d3d3d3a1;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 14px 14px 10px;
+    }
     .VIS-excelItem:last-child{
         margin-bottom: 0px;
     }
@@ -30,6 +42,7 @@
         border: none;
         padding: 0;
         transition: all 0.3s ease-in-out;
+        margin-right: 10px;
     }
     button.VIS-excelDownloadBtn:hover {
         color: rgba(var(--v-c-primary), 1);
@@ -57,15 +70,50 @@
         font-size: 0.875em;
         color: rgba(var(--v-c-primary), 1);
         text-decoration: underline;
+        text-align: center;
     }
 
 .vis-downloadwidgeticonsize {
     font-size: 30px;
 }
 .vis-downloadwidgetpopupiconsize {
-    font-size: 22px;
+    font-size: 29px;
 }
 
+.VIS-excelItem .excelFileName i {
+    font-size: 24px;
+    margin-right: 13px;
+    color: rgba(var(--v-c-primary),1);
+}
+
+    .VIS-excelItem .excelFileName i.VIS-excelItem-pdfIcon {
+        color: #ff0000;
+    }
+
+    .VIS-excelItem .excelFileName i.VIS-excelItem-excelIcon {
+        color: #008000;
+    }
+
+.VIS-excelItem span.excelFileName {
+    font-size: 17px;
+    letter-spacing: -0.3px;
+    display: flex;
+}
+
+.VIS-excelItems-block .excelFileDesc {
+    width: calc(100% - 40px);
+    margin-top: 7px;
+    line-height: 20px;
+}
+
+.VIS-excelItem .excelFileName i.vis.vis-doc-word {
+    color: rgb(0, 0, 255);
+}
+
+.VIS-excelItemsBlock i.fa.fa-exclamation-triangle {
+    font-size: 2em;
+    margin-bottom: 3px;
+}
 
 @media screen and (max-width: 1366px) {
     .vis-downloadFile-col {
