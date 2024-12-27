@@ -438,6 +438,8 @@
                 if ($(e.target).hasClass("vis-linkTxt") || $(e.target).hasClass("vis-nm-subMenuCat"))
                     return;
                 if (!$(e.target).is('i')) {
+                    if ($(e.target).hasClass("vis-subnav-links") || $(e.target).hasClass("vis-nav-heading"))
+                        return;
                     // remove active and show class to hide menu items
                     $($(e.target).parents(".vis-nav-show")[0]).removeClass("vis-nav-show");
                     $topHdrDiv.removeClass("vis-nm-active");
@@ -451,6 +453,8 @@
                 }
                 //if($target.data('isfavbtn') == 'yes') {
                 else if ($(e.target).is('i')) {
+                    if ($(e.target).hasClass("vis-nm-menuFolderIco"))
+                        return;
                     VIS.FavouriteHelper.addDelFav($(e.target)); // show menu item's options
                     return;
                 }
