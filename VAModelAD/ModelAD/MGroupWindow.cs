@@ -58,6 +58,7 @@ namespace VAdvantage.Model
             BindProcessInGroup();
             BindFormInGroup();
             BindWorkflowInGroup();
+            BindWidgetInGroup();
             return success;
         }
 
@@ -253,6 +254,56 @@ namespace VAdvantage.Model
                             DB.ExecuteQuery(@"UPDATE AD_Group_Workflow   
                                     SET IsActive='Y'
                                     WHERE AD_Workflow_ID=" + Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Workflow_ID"]) + @"
+                                    AND AD_GroupInfo_ID=" + GetAD_GroupInfo_ID());
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return true;
+        } 
+        
+        /// <summary>
+        /// Add Widget in GroupWidget Window
+        /// </summary>
+        /// <returns>true/false</returns>
+        private bool BindWidgetInGroup()
+        {
+            try
+            {
+                DataSet ds = DB.ExecuteDataset(@"SELECT DISTINCT WG.AD_Widget_ID, GW.AD_Widget_ID AS IsWidgetExist FROM AD_Widget WG 
+                                   INNER JOIN AD_Window WD ON (WD.AD_Window_ID=WG.AD_Window_ID)  
+                                   LEFT JOIN AD_Group_Widget GW ON(GW.AD_Widget_ID=WG.AD_Widget_ID) AND 
+                                   GW.AD_GroupInfo_ID= " + GetAD_GroupInfo_ID() + @" 
+                                   WHERE WD.AD_Window_ID="+ GetAD_Window_ID() + @" 
+                                   AND WG.IsActive='Y'");
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    for (int i = 0, ln = ds.Tables[0].Rows.Count; i < ln; i++)
+                    {
+                        if (Util.GetValueOfInt(ds.Tables[0].Rows[i]["IsWidgetExist"]) == 0)
+                        {
+                            MGroupWidget access = new MGroupWidget(GetCtx(), 0, null);
+                            access.SetAD_Widget_ID(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Widget_ID"]));
+                            access.SetAD_GroupInfo_ID(Util.GetValueOfInt(GetAD_GroupInfo_ID()));
+
+                            if (!access.Save())
+                            {
+                                ValueNamePair vnp = VLogger.RetrieveError();
+                                if (vnp != null && vnp.GetName() != null)
+                                {
+                                    _log.Log(Level.SEVERE, "Could not Save", vnp.GetName());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            DB.ExecuteQuery(@"UPDATE AD_Group_Widget   
+                                    SET IsActive='Y'
+                                    WHERE AD_Widget_ID=" + Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Widget_ID"]) + @"
                                     AND AD_GroupInfo_ID=" + GetAD_GroupInfo_ID());
                         }
                     }

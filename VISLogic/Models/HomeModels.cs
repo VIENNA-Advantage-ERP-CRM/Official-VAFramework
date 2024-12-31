@@ -1,4 +1,5 @@
 ﻿using CoreLibrary.DataBase;
+using CoreLibrary.DataBase;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -844,7 +845,7 @@ namespace VIS.Models
                 {
 
                     sql = "SELECT " + keyCol + " AS colID, " + displayCol + " AS colName FROM " + pTableName + " " + pTableName + " JOIN " + tableName + " " + tableName
-                        + " ON " + keyCol + " = " + pTableName + "." + pColumnName
+                        + " ON " + keyCol + " = " + pTableName + "." + tblColName
 
                         + " ";// WHERE " + pTableName + ".IsActive='Y'";
                    

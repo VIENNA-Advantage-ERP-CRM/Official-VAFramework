@@ -108,3 +108,4 @@ import "../widgets/RequestWidget";
 import "../widgets/ActionsWidget";
 import "../widgets/dynamicWidget.js";
 import "../widgets/VISDownloadFile.js";
+import "../widgets/taskActionWidget.js";
