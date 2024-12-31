@@ -304,6 +304,7 @@
     <Compile Include="ModelAD\MUserRoles.cs" />
     <Compile Include="ModelAD\MViewColumn.cs" />
     <Compile Include="ModelAD\MViewComponent.cs" />
+    <Compile Include="ModelAD\MVISAssignedRecordToUser.cs" />
     <Compile Include="ModelAD\MWidget.cs" />
     <Compile Include="ModelAD\MWidgetAccess.cs" />
     <Compile Include="ModelAD\MWidgetField.cs" />
@@ -326,6 +327,7 @@
     <Compile Include="ModelAD\X_AD_Widget.cs" />
     <Compile Include="ModelAD\X_AD_WidgetField.cs" />
     <Compile Include="ModelAD\X_AD_Widget_Access.cs" />
+    <Compile Include="ModelAD\X_VIS_AssignedRecordToUser.cs" />
     <Compile Include="Model\Callout.cs" />
     <Compile Include="Model\CalloutEngine.cs" />
     <Compile Include="Model\MClient.cs" />

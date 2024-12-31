@@ -692,6 +692,12 @@
                 //$ulactionbar.append(this.aRoleCenterView.getListItmIT());
             }
 
+            if (mWindow.getIsAssignRecord()) {
+                this.aAssignRecord = this.addActions("ASR", null, false, false, false, onAction, true); //1
+                this.aAssignRecord.setTextDirection("r");
+                $ulactionbar.append(this.aAssignRecord.getListItmIT());
+            }
+
             if (this.isPersonalLock) {
                 this.aLock = this.addActions("Lock", null, true, false, false, onAction, true);
                 this.aLock.setTextDirection("r");
@@ -1506,6 +1512,10 @@
                     this.aImportMap.dispose();
                 }
 
+                if (this.aAsssignRecord) {
+                    this.aAsssignRecord.dispose();
+                }
+
                 this.aRefresh = this.aDelete = this.aNew = this.aPrevious = this.aFirst = this.aLast = this.aNext = null;
                 this.aChat = this.aPageUp = this.aPageFirst = this.aPageLast = this.aPageDown = null;
                 this.aHelp = this.aSubscribe = this.aAttachment = null, this.toolbarCreated = null;
@@ -1571,6 +1581,7 @@
     APanel.prototype.ACTION_NAME_APPOINTMENT = "Appointment";
     APanel.prototype.ACTION_NAME_ARCHIVE = "Archive";
     APanel.prototype.ACTION_NAME_SHAREDREC = "RSD";
+    APanel.prototype.ACTION_NAME_AssignRecord = "ASR";
 
     var currentFocusClass = null;
     APanel.prototype.keyDown = function (evt) {
@@ -2654,6 +2665,10 @@
         else if (tis.isShowSharedRecord && tis.aSharedRecord.getAction() === action) {
             tis.cmd_RecordShared();
         }
+            //Rahul Mittal
+        else if (tis.aAssignRecord && tis.aAssignRecord.getAction() === action) {
+            tis.cmd_AssignRecord();
+        }
 
         //	Tools
         else if (tis.aWorkflow != null && action === (tis.aWorkflow.getAction())) {
@@ -3163,7 +3178,9 @@
                 case 'HOE':
                     aPanel.cmd_home();
                     break;
-
+                case 'ASR':
+                    aPanel.cmd_AssignRecord();
+                    break;
                 default: actionVADMSDocument(aPanel, vButton.value)
             }
 
@@ -4254,6 +4271,9 @@
             this.aSubscribe.setPressed(this.curTab.HasSubscribed());
         }
 
+        if (this.aAssignRecord) {
+            this.aAssignRecord.setPressed(this.curTab.hasAssignedRecord());
+        }
         //  this.aChat.setEnabled(true);
 
         if (this.isPersonalLock) {
@@ -4383,7 +4403,12 @@
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(false);
+
                 gPanel.setToolbarBtnState(this.aBatchUpdate.getAction(), false);
+            }
+            if (this.aAssignRecord) {
+                this.aAssignRecord.setEnabled(false);
+                gPanel.setToolbarBtnState(this.aAssignRecord.getAction(), false);
             }
 
             //if (this.aCall) {
@@ -4489,6 +4514,11 @@
                 this.aBatchUpdate.setEnabled(true);
                 gPanel.setToolbarBtnState(this.aBatchUpdate.getAction(), true);
             }
+            if (this.aAssignRecord) {
+                this.aAssignRecord.setEnabled(true);
+                gPanel.setToolbarBtnState(this.aAssignRecord.getAction(), true);
+            }
+
             //if (this.aCall) {
             //    this.aCall.setEnabled(true);
             //}
@@ -5738,6 +5768,59 @@
         }
     };
 
+
+    //assign record action panel 
+    APanel.prototype.cmd_AssignRecord = function () {
+        var recordsids = [];
+        var self = this;
+       // get selected Rows 
+        var gridSelectedRows = this.curGC.getSelectedRows();
+        // not select any row 
+        if (gridSelectedRows.length == 0) {
+            return;
+        };
+
+        var recID = this.curTab.getRecord_ID();
+        if (recID == -1)//	No Key
+        {
+           // disable the action
+            this.aAssignRecord.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aAssignRecord.getAction(), false);
+            }
+            return;
+        }
+
+       // get primary key of table
+        var data = {
+            AD_Table_ID: this.curTab.getAD_Table_ID()
+        };
+        var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetKeyColumns", data);
+        if (res == null) {
+            return;
+        }
+
+        //assigned Records
+        var assignedRecords = this.curTab.assignedRecords;
+        for (var i = 0; i < gridSelectedRows.length; i++) {
+
+            recID = gridSelectedRows[i][(this.curGC.gTab.getTableName() + '_id').toLower()];
+
+            //selected rows of record ID
+            recordsids.push(recID);
+        };
+
+       // Call the popup
+        var userAssign = new VIS.userAssign(recordsids, this.curTab.getAD_Table_ID(), this.curWindowNo, this.curTab.getAD_Window_ID(), assignedRecords);
+       // close popup
+        userAssign.onClose = function () {
+          
+            self.aAssignRecord.setPressed(self.curTab.hasAssignedRecord());
+            self = null;
+        }
+        userAssign.show();
+    }
+    
     /* END */
 
     /**
@@ -5788,7 +5871,9 @@
             this.gridWindow = null;
             this.ctx.setAutoCommit(this.$parentWindow.getWindowNo(), false);
             this.ctx.removeWindow(this.$parentWindow.getWindowNo());
-            VIS.MLookupCache.cacheReset(this.$parentWindow.getWindowNo());
+            VIS.MLo
+
+            upCache.cacheReset(this.$parentWindow.getWindowNo());
         }
 
 
