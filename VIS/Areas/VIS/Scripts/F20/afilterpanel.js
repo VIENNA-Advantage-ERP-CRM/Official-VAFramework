@@ -2187,7 +2187,7 @@
                 optr = VIS.Query.prototype.BETWEEN;
             }
 
-            if (field.getDisplayType() == VIS.DisplayType.DateTime) {
+           /* if (field.getDisplayType() == VIS.DisplayType.DateTime) {
                 if (parsedValue) {
                     parsedValue = new Date(parsedValue).toUTCString();
                 }
@@ -2195,7 +2195,7 @@
                 if (parsedValue2) {
                     parsedValue2 = new Date(parsedValue2).toUTCString();
                 }
-            }
+            }*/
             //	Value2
             // if "BETWEEN" selected
             if (VIS.Query.prototype.BETWEEN.equals(optr)) {
