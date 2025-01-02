@@ -275,6 +275,7 @@
     <Content Include="Areas\VIS\Content\VISAD.css" />
     <Content Include="Areas\VIS\Content\Widgets\AssignRecordWidget.css" />
     <Content Include="Areas\VIS\Content\Widgets\VIS-Widget.css" />
+    <Content Include="Areas\VIS\Content\Widgets\VISTemplateExcel.css" />
     <Content Include="Areas\VIS\Images\11.png" />
     <Content Include="Areas\VIS\Images\12.png" />
     <Content Include="Areas\VIS\Images\21.png" />
@@ -518,6 +519,7 @@
     <Content Include="Areas\VIS\Images\excel.png" />
     <Content Include="Areas\VIS\Images\favicon.ico" />
     <Content Include="Areas\VIS\Images\favItem.png" />
+    <Content Include="Areas\VIS\Images\files-icon.png" />
     <Content Include="Areas\VIS\Images\folder-open.png" />
     <Content Include="Areas\VIS\Images\folder.png" />
     <Content Include="Areas\VIS\Images\forword.png" />

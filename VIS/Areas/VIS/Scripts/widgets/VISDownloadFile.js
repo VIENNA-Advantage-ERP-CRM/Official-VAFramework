@@ -111,8 +111,13 @@
                         //VIS.ADialog.info("VIS_NoDataFound");
                         //formDialog.close();
                         excelItemDiv.html(
-                            '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>' +
-                            '<span>' + VIS.Msg.getMsg("VIS_NoDataFound") + '</span>'
+
+                            // '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>' +
+                            '<div class="VIS-noDocFound">' +
+                                '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/files-icon.png">' +
+                                '<span>' + VIS.Msg.getMsg("VIS_NoDataTemplateFound") + '</span>' +
+                            '</div>'
+
                         );
                         excelItemDiv.addClass('VIS-noExcelData');
                     }

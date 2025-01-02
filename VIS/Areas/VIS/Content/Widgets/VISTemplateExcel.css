@@ -78,6 +78,7 @@
 }
 .vis-downloadwidgetpopupiconsize {
     font-size: 29px;
+
 }
 
 .VIS-excelItem .excelFileName i {
@@ -100,6 +101,7 @@
     display: flex;
 }
 
+
 .VIS-excelItems-block .excelFileDesc {
     width: calc(100% - 40px);
     margin-top: 7px;
@@ -114,6 +116,27 @@
     font-size: 2em;
     margin-bottom: 3px;
 }
+
+
+.VIS-noDocFound {
+    align-items: center;
+    /*background: rgba(var(--v-c-on-secondary), .07);*/
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    width: 300px;
+}
+
+    .VIS-noDocFound img {
+        max-width: 100px;
+        margin-bottom: 15px;
+        opacity: 0.4;
+    }
+
 
 @media screen and (max-width: 1366px) {
     .vis-downloadFile-col {
