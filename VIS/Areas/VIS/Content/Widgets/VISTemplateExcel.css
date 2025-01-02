@@ -115,6 +115,25 @@
     margin-bottom: 3px;
 }
 
+.VIS-noDocFound {
+    align-items: center;
+    /*background: rgba(var(--v-c-on-secondary), .07);*/
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    width: 300px;
+}
+
+    .VIS-noDocFound img {
+        max-width: 100px;
+        margin-bottom: 15px;
+        opacity: 0.4;
+    }
+
 @media screen and (max-width: 1366px) {
     .vis-downloadFile-col {
         font-size: 13px;
