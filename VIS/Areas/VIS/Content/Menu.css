@@ -1,5 +1,6 @@
 ﻿/*New Menu Start*/
 
+@import url('menu.css');
 .VIS-nm-col-5 {
     grid-template-columns: repeat(5, 1fr);
     display: grid;
@@ -275,9 +276,10 @@
     text-align: left;
     white-space: nowrap;
     text-overflow: ellipsis;
-    align-content: center;
-    margin-left: .2rem;
-    margin-top: .1rem;
+    margin-left:.2rem;
+    align-content:center;
+    vertical-align:middle;
+    margin-top:.1rem;
 }
 
 /* Navigation Menu*/
