@@ -324,6 +324,7 @@ namespace VIS.Helpers
             return sb.ToString();
         }
 
+        bool subMenuCat = false;
         /// <summary>
         /// Recursive method to add items in Menu
         /// </summary>
@@ -332,6 +333,7 @@ namespace VIS.Helpers
         /// <param name="windowNo"></param>
         private void CreateNewTree(System.Windows.Forms.TreeNodeCollection treeNodeCollection, string baseUrl, string windowNo = "")
         {
+
             foreach (var item in treeNodeCollection)
             {
                 VTreeNode tn = new VTreeNode();
@@ -371,7 +373,10 @@ namespace VIS.Helpers
                         if (vt.Level == 3)
                         {
                             menu1HTML.Append("</div>"); // close vis-subnav-links
-                            menu1HTML.Append("<div class='vis-nav-heading mt-4'><i class='fa fa-folder-open' aria-hidden='true'></i>" + System.Net.WebUtility.HtmlEncode(vt.SetName) + "</div>");
+                            if (!subMenuCat)
+                                menu1HTML.Append("<div class='vis-nav-heading mt-4'><i class='fa fa-folder-open vis-nm-menuFolderIco' aria-hidden='true'></i>" + System.Net.WebUtility.HtmlEncode(vt.SetName) + "</div>");
+                            else
+                                menu1HTML.Append("<div class='vis-nav-heading'><i class='fa fa-folder-open vis-nm-menuFolderIco' aria-hidden='true'></i>" + System.Net.WebUtility.HtmlEncode(vt.SetName) + "</div>");
                             menu1HTML.Append("<div class='vis-subnav-links'>");
                         }
                         else
@@ -391,6 +396,7 @@ namespace VIS.Helpers
                                 menu1HTML.Append("<span class='vis-linkTxt vis-nm-subnav-content'>" + System.Net.WebUtility.HtmlEncode(vt.SetName) + "<span class='vis vis-arrow-down'></span></span>");
                                 menu1HTML.Append("<div class='vis-nav-horizontal-scroll-onhover-items vis-subnav-content' style='top: 55px;left: 0px;'>"
                                                     + "<div class='vis-subnav-links'>");
+                                subMenuCat = true;
                             }
                             else
                             {
@@ -470,6 +476,7 @@ namespace VIS.Helpers
                         continue;
                     // menu1HTML.Append("<a href='#company'><span class='vis vis-window'></span> " + System.Net.WebUtility.HtmlEncode(vt.SetName) + "</a>");
                     GetNewTreeItem(vt.Node_ID, System.Net.WebUtility.HtmlEncode(vt.SetName), vt.ImageKey, vt.GetAction(), vt.GetActionID(), baseUrl, windowNo, vt.OnBar, vt.SeqNo);
+                    subMenuCat = false;
                 }
             }
         }
@@ -903,7 +910,7 @@ namespace VIS.Helpers
             {
                 leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' " + action + " data-summary='Y' title='" + text + "'>" +
                                         "<img class='VIS-nm-favIconImg' " + imgStyle + " src=" + _ctx.GetContextUrl() + "'Images/Thumb32x32" + image.Substring(text.IndexOf("Images/") + 7) + "'/>" +
-                                            "<span>" + text + "</span>" +
+                                            "<span class='vis-nm-mainMenuImg'>" + text + "</span>" +
                                     "</a>");
             }
             else
@@ -911,7 +918,7 @@ namespace VIS.Helpers
                 leftMenuHTML.Append("<a href='javascript:void(0)' class='VIS-nm-opt-link' data-value='" + id + "' " + action + " data-image='" + image + "' data-summary='Y' title='" + text + "'>" +
                                     // "<i class='" + image + "' style='color:" + randColors[index] + "' aria-hidden='true''></i>" +
                                     "<i class='" + image + "' " + imgStyle + " aria-hidden='true''></i>" +
-                                        "<span>" + text + "</span>" +
+                                        "<span class='vis-nm-mainMenuImg'>" + text + "</span>" +
                                 "</a>");
             }
         }
