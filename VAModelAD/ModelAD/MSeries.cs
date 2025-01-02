@@ -662,9 +662,18 @@ namespace VAdvantage.Model
 
 
                 else //in case of identifier column, do not aggregate it (we will do it in top level query)
-                    sb.Append("NVL(")
-                        .Append(s_colY)
-                        .Append(",0) ").Append(s_colY);
+                {
+                    if (DB.IsPostgreSQL())
+                    {
+                        sb.Append(s_colY);
+                    }
+                    else
+                    {
+                        sb.Append("NVL(")
+                          .Append(s_colY)
+                          .Append(",0) ").Append(s_colY);
+                    }
+                }
                 //sb.Append(",'9,999.99')");
 
                 //give name to col Y
@@ -1263,7 +1272,18 @@ namespace VAdvantage.Model
             StringBuilder sb = new StringBuilder();
 
             if (!this.IsNone())
-                sb.Append("NVL(ROUND(");
+                sb.Append(DB.IsPostgreSQL() ? " ROUND (" : "NVL(ROUND(");
+
+            /* if ((DB.IsPostgreSQL())
+             {
+                 sb.Append(" ROUND ");
+             }
+             else
+             {
+                 sb.Append("NVL(ROUND(");
+             }*/
+
+            //   sb.Append(DB.IsPostgreSQL() ? " ROUND " : "NVL(ROUND(");
 
             if (this.IsSum())
             {
@@ -1273,7 +1293,8 @@ namespace VAdvantage.Model
                 }
                 else
                 {
-                    sb.Append("SUM(").Append(colName).Append(")");
+                    //  sb.Append("SUM(").Append(colName).Append(")");
+                    sb.Append("SUM(CAST(").Append(colName).Append(" AS NUMERIC))");
                 }
             }
             else if (IsAvg())
@@ -1284,7 +1305,8 @@ namespace VAdvantage.Model
                 }
                 else
                 {
-                    sb.Append("AVG(").Append(colName).Append(")");
+                    sb.Append("AVG(CAST(").Append(colName).Append(" AS NUMERIC))");
+                    // sb.Append("AVG(").Append(colName).Append(")");
                 }
             }
 
@@ -1322,7 +1344,8 @@ namespace VAdvantage.Model
 
             if (!this.IsNone())
             {
-                sb.Append(",3),0)");
+                //  sb.Append(",3),0)");
+                sb.Append(DB.IsPostgreSQL() ? ", 3) " : " ,3),0) ");
             }
 
 
