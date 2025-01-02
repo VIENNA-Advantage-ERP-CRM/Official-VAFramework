@@ -1,0 +1,267 @@
+﻿/*.vis-assigned-records-list {
+    display: flex;
+    text-align: center;
+    color: #fff;
+    gap: 10px;
+}*/
+
+/*.vis-list-item {
+    border-radius: 5px;
+    background-color: blue;
+    padding: 10px 0;
+    flex: 1;
+}
+
+    .vis-list-item.purple {
+        background-color: purple;
+    }
+
+    .vis-list-item.green {
+        background-color: green;
+    }
+
+.item-records {
+    padding: 5px 10px;
+    display: inline-block;
+    background-color: #fff;
+    color: #000;
+    border-radius: 13px;
+    margin-bottom: 8px;
+}*/
+
+/*.vis-assigned-records-block {
+    background-color: #0000ff54;
+    padding: 10px 10px;
+}*/
+
+/* .vis-assigned-records-block h4 {
+        margin: 0 0 10px;
+        color: #fff;
+    }*/
+
+/*.vis-pagination {
+    margin: 10px 0 0;
+    text-align: center;
+}
+
+    .vis-pagination i {
+        background-color: #fff;
+        border-radius: 50%;
+        font-size: 12px;
+        height: 20px;
+        width: 20px;
+        line-height: 20px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+.vis-page-numbers {
+    margin: 0 10px;
+}
+
+.vis-pagination i.disabled {
+    pointer-events: none;
+    opacity: 0.3;
+}*/
+
+.vis-maindiv {
+    background: linear-gradient(145deg, #93b5d6, #5e91c1);
+    height: 100%;
+    width: 100%;
+}
+
+
+.VIS_widget-container {
+    height: 100%
+}
+
+    .VIS_widget-container h4 {
+        color: #fff;
+        font-size: 17px;
+        padding: 10px 10px 0;
+    }
+
+
+.vis-assigned-records {
+    width: 100%;
+    height: calc(100% - 90px);
+    background: rgb(147,181,214);
+    background: linear-gradient(145deg, rgba(147,181,214,1) 0%, rgba(94,145,193,1) 100%);
+    padding: 0.75em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.vis-record-col {
+    display: flex;
+    gap: .75em;
+    cursor: pointer;
+}
+
+.vis-windowList {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.vis-blueColor {
+    background-color: #23569B;
+}
+
+
+.vis-record-box {
+    align-items: center;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: .75em;
+    padding: 20px 18px;
+    width: calc(33.333% - 6px);
+}
+
+.vis-record-count {
+    background-color: rgba(var(--v-c-common),1);
+    width: 3em;
+    height: 2em;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vis-record-box .record-name {
+    color: rgba(var(--v-c-common),1);
+    font-weight: 500;
+    font-size: 1.2em;
+    text-align: center;
+    line-height: normal;
+}
+
+.vis-tiles-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 1em;
+    margin-top: 1em;
+}
+
+    .vis-tiles-pagination .fa {
+        font-size: 1.9em;
+        color: rgba(var(--v-c-common),1);
+        cursor: pointer;
+    }
+
+        .vis-tiles-pagination .fa:hover {
+            color: rgba(var(--v-c-common),0.8);
+        }
+
+.vis-color-1 {
+    background-color: #23569B;
+}
+
+.vis-color-2 {
+    background-color: #4F3467;
+}
+
+.vis-color-3 {
+    background-color: #34675D;
+}
+
+.vis-noRecordFound {
+    text-align: center;
+    display: block;
+    font-size: 20px;
+    color: #fff;
+}
+
+.vis-total-count {
+    font-size: 1em;
+    color: rgba(var(--v-c-common),1);
+}
+
+@media screen and (max-width: 1366px) {
+    .vis-assigned-records {
+        font-size: 11px;
+    }
+
+    .vis-editModeWidget .vis-assigned-records {
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .vis-assigned-records {
+        font-size: 8px;
+    }
+
+    .vis-editModeWidget .vis-assigned-records {
+        font-size: 8px;
+    }
+}
+
+@media screen and (max-width:900px) {
+    .vis-assigned-records {
+        font-size: 11px;
+    }
+
+    .vis-editModeWidget .vis-assigned-records {
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .vis-assigned-records {
+        font-size: 9px;
+    }
+
+    .vis-editModeWidget .vis-assigned-records {
+        font-size: 9px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .vis-assigned-records {
+        font-size: 14px;
+    }
+
+    .vis-editModeWidget .vis-assigned-records {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .vis-assigned-records {
+        font-size: 12px;
+    }
+
+    .vis-editModeWidget .vis-assigned-records {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .vis-assigned-records {
+        font-size: 9px;
+    }
+
+    .vis-editModeWidget .vis-assigned-records {
+        font-size: 9px;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .vis-assigned-records {
+        font-size: 8px;
+    }
+
+    .vis-editModeWidget .vis-assigned-records {
+        font-size: 8px;
+    }
+}

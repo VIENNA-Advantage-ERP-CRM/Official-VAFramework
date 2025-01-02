@@ -78,6 +78,7 @@
 }
 .vis-downloadwidgetpopupiconsize {
     font-size: 29px;
+
 }
 
 .VIS-excelItem .excelFileName i {
@@ -100,6 +101,7 @@
     display: flex;
 }
 
+
 .VIS-excelItems-block .excelFileDesc {
     width: calc(100% - 40px);
     margin-top: 7px;
@@ -114,6 +116,7 @@
     font-size: 2em;
     margin-bottom: 3px;
 }
+
 
 .VIS-noDocFound {
     align-items: center;
@@ -133,6 +136,7 @@
         margin-bottom: 15px;
         opacity: 0.4;
     }
+
 
 @media screen and (max-width: 1366px) {
     .vis-downloadFile-col {

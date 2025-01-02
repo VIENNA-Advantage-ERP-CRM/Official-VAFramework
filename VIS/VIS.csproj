@@ -115,7 +115,52 @@
     <Reference Include="MarketSvc">
       <HintPath>..\ViennaAdvantageWeb\DLL\MarketSvc.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.4\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.4\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.3\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.3\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.5.3.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.5.3.0\lib\net461\Microsoft.IdentityModel.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.5.3.0\lib\net461\Microsoft.IdentityModel.Protocols.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.OpenIdConnect.5.3.0\lib\net461\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.3.0\lib\net461\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.2.2\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.2.2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.2.2\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.2.2\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OpenIdConnect, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OpenIdConnect.4.2.2\lib\net45\Microsoft.Owin.Security.OpenIdConnect.dll</HintPath>
+    </Reference>
     <Reference Include="ModelLibrary, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\ModelLibrary.dll</HintPath>
@@ -123,11 +168,20 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.3.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.8.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.8\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System" />
@@ -190,6 +244,7 @@
     <Content Include="Areas\VIS\Content\emailLinkStyle.css" />
     <Content Include="Areas\VIS\Content\F20\Color.css" />
     <Content Include="Areas\VIS\Content\F20\Controls.css" />
+    <Content Include="Areas\VIS\Content\F20\Controls_border.css" />
     <Content Include="Areas\VIS\Content\F20\Media.css" />
     <Content Include="Areas\VIS\Content\F20\site-rtl.css" />
     <Content Include="Areas\VIS\Content\F20\Site.css" />
@@ -213,12 +268,12 @@
     <Content Include="Areas\VIS\Content\RecordAccessDialog.css" />
     <Content Include="Areas\VIS\Content\ReportStyle.css" />
     <Content Include="Areas\VIS\Content\Site.css" />
-    <Content Include="Areas\VIS\Content\src\VISTemplateExcel.css" />
     <Content Include="Areas\VIS\Content\Style.css" />
     <Content Include="Areas\VIS\Content\SurveyTabPanel.css" />
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
     <Content Include="Areas\VIS\Content\VIS.all.min.css" />
     <Content Include="Areas\VIS\Content\VISAD.css" />
+    <Content Include="Areas\VIS\Content\Widgets\AssignRecordWidget.css" />
     <Content Include="Areas\VIS\Content\Widgets\VIS-Widget.css" />
     <Content Include="Areas\VIS\Content\Widgets\VISTemplateExcel.css" />
     <Content Include="Areas\VIS\Images\11.png" />
@@ -698,6 +753,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\vdocaction.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vimageform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\visimportfiles.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\visassignuser.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vpayment.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vsetup.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\wfactivity.js" />
@@ -762,15 +818,18 @@
     <Content Include="Areas\VIS\Scripts\processengine\processinfo.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processparameter.js" />
     <Content Include="Areas\VIS\Scripts\react\component\helloWord.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\component\WidgetLoader.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\CSS\Vis_AssignRecordWidget.css" />
+    <Content Include="Areas\VIS\Scripts\react\pages\AssignRecordWidget.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\HomePage.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\TestComponent.jsx" />
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\assignRecordWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\Checklist.js" />
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
-    <Content Include="Areas\VIS\Scripts\src\VISTemplateExcelFormByDialog.js" />
-    <Content Include="Areas\VIS\Scripts\src\VISTemplateExcel.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\bipanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\HistoryDetailsTabPanel.js" />
@@ -796,12 +855,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
+    <Compile Include="Areas\VIS\Classes\VISAuthConfig.cs" />
+    <Compile Include="Areas\VIS\Classes\VISGlobal.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountController.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountFormController.cs" />
     <Compile Include="Areas\VIS\Controllers\AddProductController.cs" />
     <Compile Include="Areas\VIS\Controllers\AmountDivisionController.cs" />
     <Compile Include="Areas\VIS\Controllers\ArchiveViewerController.cs" />
     <Compile Include="Areas\VIS\Controllers\ASearchController.cs" />
+    <Compile Include="Areas\VIS\Controllers\AssigendRecordToUserController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentHistoryController.cs" />
     <Compile Include="Areas\VIS\Controllers\BatchUpdateController.cs" />
@@ -860,6 +922,7 @@
     <Compile Include="Areas\VIS\Helpers\MenuHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\ProcessHelper.cs" />
     <Compile Include="Areas\VIS\Models\AddProductModel.cs" />
+    <Compile Include="Areas\VIS\Models\AssignedRecordToUser.cs" />
     <Compile Include="Areas\VIS\Models\BatchUpdateModel.cs" />
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />
     <Compile Include="Areas\VIS\Models\EmailModel.cs" />
@@ -942,6 +1005,7 @@
   <ItemGroup>
     <Folder Include="Areas\VIS\Scripts\app\processengine\" />
     <Folder Include="Areas\VIS\Scripts\dist\" />
+    <Folder Include="Areas\VIS\Scripts\widgets\NewFolder1\" />
     <Folder Include="Areas\VIS\Views\AmountDivision\" />
     <Folder Include="Areas\VIS\Views\ArchiveViewer\" />
     <Folder Include="Areas\VIS\Views\Channel\" />
