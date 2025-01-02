@@ -79,7 +79,7 @@ namespace VIS.Models
             //	Attrribute Set Instance Description
             //Column 1
             var label1 = Msg.Translate(ctx, "Description");
-            obj.tableStucture += "<td>";
+            obj.tableStucture += "<td colspan='2'>";
             obj.tableStucture += "<div class='input-group vis-input-wrap'>";
             obj.tableStucture += "<div class='vis-control-wrap'>";
             obj.tableStucture += "<input readonly data-placeholder='' placeholder=' '  id='txtDescription_" + windowNo + "' value='" + (_masi.GetDescription()) + "' class='VIS_Pref_pass' type='text'>";

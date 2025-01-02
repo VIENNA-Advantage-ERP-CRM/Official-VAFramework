@@ -607,7 +607,7 @@ button.vis-ev-col-img-ctrl:focus,
 
 .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup {
     background: rgb(0,152,247);
-    background: linear-gradient(90deg, rgba(0,152,247,0.1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(90deg, rgba(var(--v-c-primary),0.1) 0%, rgba(255,255,255,0) 100%);
 }
 
     .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup button {
