@@ -169,7 +169,7 @@
 }
 
     .vis-ad-w-p-vc-editview .vis-input-wrap .vis-ev-ctrlinfowrap {
-        display: none !important;
+        opacity:0 !important;
     }
 
     .vis-ad-w-p-vc-editview .vis-input-wrap:hover, .vis-ad-w-p-vc-editview .vis-input-wrap.focus, .vis-ad-w-p-vc-editview .vis-input-wrap.vis-ev-col-error, .vis-ad-w-p-vc-editview .vis-input-wrap:has(:focus) {
@@ -790,12 +790,13 @@ label.vis-ec-col-lblchkbox {
 .vis-ev-ctrlinfowrap {
     position: absolute;
     left: 10px;
-    top: 11px;
+    top: 1px;
     cursor: pointer;
     outline: none;
     z-index: 5;
     display: flex;
     align-items: center;
+    width:99%
 }
 
 label.vis-ec-col-lblchkbox + .vis-ev-ctrlinfowrap {

@@ -41,8 +41,8 @@
 
         function initComponent() {
             $table = $("<div class='vis-ad-w-p-vc-ev-grid'>"); //   $("<table class='vis-gc-vpanel-table'>");
-            $table.on("click", "label", onInfoClick);
-            $table.on("click", "span.vis-ev-ctrlinfowrap", onInfoClickold);
+            //$table.on("click", "label", onInfoClick);
+            $table.on("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
             $table.on("click", "span.vis-ev-fgbtn", onBtnFGClick);
         };
 
@@ -52,26 +52,23 @@
         }
 
         function onInfoClick(e) {
-            var lblTgt = $(e.currentTarget);
-            var curTgt = lblTgt.siblings('span.vis-ev-ctrlinfowrap');
+            var curTgt = $(e.currentTarget);
+            //var curTgt = lblTgt.siblings('span.vis-ev-ctrlinfowrap');
             if (!curTgt || curTgt.length == 0)
                 return;
-            showpopover(curTgt, lblTgt);
+            showpopover(curTgt);
         }
-        function showpopover(curTgt, lblTgt) {
+        function showpopover(curTgt) {
 
             var colName = curTgt.data('colname');
             if (colName != '') {
-
                 if (lastPopover) {
                     lastPopover.popover('dispose');
                     lastPopover = null;
                 }
-
                 curTgt.attr('data-content', colDescHelpList[colName].help);
                 //attr('title', colDescHelpList[colName].desc);
-                lastPopover = lblTgt.popover('show');
-
+                lastPopover = curTgt.popover('show');
             }
         }
 
@@ -824,7 +821,7 @@
         };
 
         this.dispose = function () {
-            $table.off("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
+            $table.off("click", "label", onInfoClick);
             $table.off();
             colDescHelpList = {};
             if (lastPopover) {
@@ -930,8 +927,12 @@
 
         
             if (!(editor && editor instanceof VIS.ActionGroup) && mField.getDisplayType() != VIS.DisplayType.Label && !mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.TelePhone) { // exclude Label display type
-            ctrlP.append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
-                "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+            //ctrlP.append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
+             //    "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+                if (label != null) {
+                    label.getControl().append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
+                        "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+                }
         }
 
         //if (editor && mField.getDisplayType() == VIS.DisplayType.ProgressBar) {
