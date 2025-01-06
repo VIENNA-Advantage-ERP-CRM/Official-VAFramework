@@ -481,6 +481,7 @@
     <Content Include="Areas\VIS\Images\clock.png" />
     <Content Include="Areas\VIS\Images\close-file.png" />
     <Content Include="Areas\VIS\Images\close-ico.png" />
+    <Content Include="Areas\VIS\Images\close-ico.svg" />
     <Content Include="Areas\VIS\Images\close.png" />
     <Content Include="Areas\VIS\Images\comment-icon.jpg" />
     <Content Include="Areas\VIS\Images\compresed.png" />
