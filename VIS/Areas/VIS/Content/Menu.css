@@ -1,6 +1,5 @@
 ﻿/*New Menu Start*/
 
-@import url('menu.css');
 .VIS-nm-col-5 {
     grid-template-columns: repeat(5, 1fr);
     display: grid;

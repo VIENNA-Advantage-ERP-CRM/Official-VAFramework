@@ -960,14 +960,10 @@ namespace VIS.Helpers
         public static List<ExternalLogin> GetExternalProvider()
         {
             List<ExternalLogin> list = new List<ExternalLogin>();
-            DataSet DS = DB.ExecuteDataset(@"SELECT sso_configuration.sso_configuration_ID, AD_Ref_List.value,ad_ref_list.name, 
+            DataSet DS = DB.ExecuteDataset(@"SELECT sso_configuration.sso_configuration_ID, sso_configuration.Provider,sso_configuration.name, 
 (SELECT COALESCE(FontName,ImageURL)||'|'|| NVL(FontStyle,'') FROM AD_Image 
 WHERE AD_Image_ID=sso_configuration.AD_Image_ID) AS ImageIco
-FROM sso_configuration 
-                        INNER JOIN AD_Ref_List  ON AD_Ref_List.Value=sso_configuration.Provider
-                        WHERE sso_configuration.IsActive='Y' AND AD_Reference_ID IN (
-                        SELECT ad_reference_ID FROM ad_reference WHERE NAme='VIS_ServiceProvider'
-                        )");
+FROM sso_configuration  WHERE sso_configuration.IsActive='Y' ");
             if (DS != null && DS.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < DS.Tables[0].Rows.Count; i++)
@@ -988,7 +984,7 @@ FROM sso_configuration
 
                     ExternalLogin obj = new ExternalLogin()
                     {
-                        Provider = Util.GetValueOfString(DS.Tables[0].Rows[i]["value"]).ToLower(),
+                        Provider = Util.GetValueOfString(DS.Tables[0].Rows[i]["Provider"]).ToLower(),
                         ProviderDisplayName = Util.GetValueOfString(DS.Tables[0].Rows[i]["name"]),
                         Configuration_ID = Util.GetValueOfInt(DS.Tables[0].Rows[i]["sso_configuration_ID"]),
                         ImageIcon = icon,
