@@ -85,7 +85,6 @@
             if (isCol3)
                 _curParent = $td3 = $("<div class='vis-ev-col vis-ev-col-start4'></div>");
         };
-
         function reset(col) {
             if (!col) {
                 col0 = { rSpan: 1, cSpan: 0, cSpace: 0, set: false };
@@ -135,7 +134,6 @@
                 reset(col3);
             }
         };
-
         function adjustLayout(mField, isNewRow) {
             var rowSpan = mField.getFieldBreadth();
             var colSpan = mField.getFieldColSpan();
@@ -988,7 +986,7 @@
                 + '<span class="dropdown-toggle btn vis-ev-col-ag-dropdown-btn" id="' + id + '"' + styl + '  data-toggle="dropdown">'
                 + '<i class="' + fontname + '"></i>'
                 + name + '</span>'
-                + '<div class="dropdown-menu vis-ev-col-ag-div" aria-labelledby="' + id + '">'
+                + '<div class="dropdown-menu dropdown-menu-right vis-ev-col-ag-div" aria-labelledby="' + id + '">'
                 + '<ul class="vis-ev-col-ag-btn-list">'
                 + '</ul>'
                 + '</div>'

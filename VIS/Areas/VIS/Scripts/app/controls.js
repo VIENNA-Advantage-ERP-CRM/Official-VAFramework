@@ -1452,14 +1452,14 @@
     VButton.prototype.setVisible = function (visible) {
         this.visible = visible;
         //Action group[]
-        var isag = this.ctrl.parent().length>0 && this.ctrl.parent()[0].tag == "LI";
+        var isag = this.ctrl && this.ctrl.parent().length > 0 && this.ctrl.parent().prop('tagName') == "LI";
         if (visible) {
             this.ctrl.show();
             if (isag)
                 this.ctrl.parent().show();
         } else {
             this.ctrl.hide();
-            if (isag);
+            if (isag)
             this.ctrl.parent().hide();
         }
     };
