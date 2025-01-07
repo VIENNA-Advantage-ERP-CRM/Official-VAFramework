@@ -24,8 +24,8 @@
 
         // Initialize UI Elements
         this.load = function () {
-            $root = $("<div>");
-            excelItemDiv = $("<div class='VIS-excelItemsBlock'>");
+            $root = $("<div class='h-100'>");
+            excelItemDiv = $("<div class='VIS-excelItemsBlock h-100'>");
             $root.append(excelItemDiv);
             createBusyIndicator();
             setBusy(true);
@@ -39,7 +39,7 @@
 
             $root.append('<div class="vis-downloadFile-col" id=' + widgetID +'>' +
                 '<span class="fa fa-download vis-downloadwidgeticonsize vis-color-primary"></span>' +
-                '<a href="#">' + VIS.Msg.getMsg("VIS_TemplateExcelDetails") +'</a>' +
+                '<a href="#">' + VIS.Msg.getMsg("VIS_DocDataLink") +'</a>' +
                 '</div>');
             //$root.append('<div class="VIS-template-excel-container" id=' + widgetID +'>' +
             //    '<div class="VIS-template-excel-block">' +
@@ -69,13 +69,34 @@
                 },
                 success: function (data) {
                     data = JSON.parse(data);
-                    // console.log(data);
                     if (data && data.length > 0) {
                         excelItemDiv.empty();
                         for (var i = 0; i < data.length; i++) {
-                            excelItem = $('<div class="VIS-excelItem" fileId="' + data[i].FileID + '" fileName="' + data[i].FileName + '" fileUrl="' + data[i].URL + '"><span class="excelFileName">' + data[i].FileName +'</span><button class="VIS-excelDownloadBtn"><i class="fa fa-download vis-downloadwidgetpopupiconsize vis-color-primary" aria-hidden="true"></i></button></div>');
+                            var fileName = data[i].FileName || '';
+                            var fileIcon = fileName.toLowerCase().includes('.pdf') ?
+                                '<i class="vis vis-doc-pdf VIS-excelItem-pdfIcon" aria-hidden="true"></i>' :
+                                fileName.toLowerCase().includes('.xls') ?  // Matches both .xls and .xlsx
+                                '<i class="vis vis-doc-excel VIS-excelItem-excelIcon" aria-hidden="true"></i>' :
+                                fileName.toLowerCase().includes('.txt') ?  // Matches .txt
+                                    '<i class="vis vis-file-text" aria-hidden="true"></i>' :
+                                    fileName.toLowerCase().includes('.csv') ?  // Matches .csv
+                                        '<i class="vis vis-doc-excel VIS-excelItem-excelIcon" aria-hidden="true"></i>' :
+                                        fileName.toLowerCase().includes('.doc') ?  // Matches .docx
+                                            '<i class="vis vis-doc-word" aria-hidden="true"></i>' :
+                                            '<i class="fa fa-file-image-o" aria-hidden="true"></i>';  // Default for other file types
+
+                            excelItem = $('<div class="VIS-excelItem" fileId="' + data[i].FileID + '" fileName="' + data[i].FileName + '" fileUrl="' + data[i].URL + '">' +
+                                '<div class="VIS-excelItems-block">' +
+                                '<span class="excelFileName">' + fileIcon + ' ' + data[i].FileName + '</span>' +
+                                '<span class="excelFileDesc d-block">' + data[i].Description + '</span>' +
+                                '</div>' +
+                                '<button class="VIS-excelDownloadBtn">' +
+                                '<i class="fa fa-download vis-downloadwidgetpopupiconsize vis-color-primary" aria-hidden="true"></i>' +
+                                '</button>' +
+                                '</div>');
                             excelItemDiv.append(excelItem);
                         }
+
                         excelItemDiv.find('button.VIS-excelDownloadBtn').off(VIS.Events.onTouchStartOrClick);
                         excelItemDiv.find('button.VIS-excelDownloadBtn').on(VIS.Events.onTouchStartOrClick, function () {
                             setBusy(true);
@@ -84,10 +105,21 @@
                             var url = $(this).parent('.VIS-excelItem').attr('fileUrl');
                             $self.downloadFile(fileId, fileName,url);
                         });
+                        excelItemDiv.removeClass('VIS-noExcelData');
                     }
                     else {
-                        VIS.ADialog.info("VIS_NoDataFound");
-                        formDialog.close();
+                        //VIS.ADialog.info("VIS_NoDataFound");
+                        //formDialog.close();
+                        excelItemDiv.html(
+
+                            // '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>' +
+                            '<div class="VIS-noDocFound">' +
+                                '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/files-icon.png">' +
+                                '<span>' + VIS.Msg.getMsg("VIS_NoDataTemplateFound") + '</span>' +
+                            '</div>'
+
+                        );
+                        excelItemDiv.addClass('VIS-noExcelData');
                     }
                     setBusy(false);
                 },
@@ -138,9 +170,9 @@
             $self.load();
             var ch = new VIS.ChildDialog(); //create object of child dialog
             formDialog = ch;
-            ch.setHeight(340);
-            ch.setWidth(500);
-            ch.setTitle(VIS.Msg.getMsg("VIS_TemplateExcelDetails"));
+            ch.setHeight(550);
+            ch.setWidth(750);
+            ch.setTitle(VIS.Msg.getMsg("VIS_DocDataTitle"));
             ch.setContent($root); //set the content
             ch.show();
             ch.hideButtons();
@@ -148,7 +180,6 @@
                 if ($self.onClose) $self.onClose();
                 $self.dispose("child");
             };
-
         }
 
         /*

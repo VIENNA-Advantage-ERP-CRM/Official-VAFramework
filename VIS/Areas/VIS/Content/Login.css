@@ -510,7 +510,7 @@ input::-webkit-input-placeholder {
     text-align: center;
     margin-bottom: 15px;
     font-size: 17px;
-    color: #fff;
+    color: rgba(102, 102, 102);
 }
 
 .vis-clsloginqr {
@@ -714,14 +714,14 @@ input::-webkit-input-placeholder {
     text-align: right;
     border: none;
     margin-bottom: 12px;
-    color: #fff;
+    color: rgba(102, 102, 102);
     font-size: 1.2rem;
     text-decoration: underline;
     float: right;
 }
 
     .vis-login-skipLink:hover, .vis-login-skipLink:focus {
-        color: #fff
+        color: rgba(102, 102, 102);
     }
 
 

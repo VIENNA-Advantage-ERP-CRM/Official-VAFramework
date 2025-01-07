@@ -402,6 +402,10 @@
         return this.vo.IsDependentInDetailView;
     }
 
+    GridWindow.prototype.getIsAssignRecord = function () {
+        return this.vo.IsAssignRecord;
+    }
+
     GridWindow.prototype.dispose = function () {
 
         originalLength = this.tabs.length;
@@ -2464,7 +2468,6 @@
     /// <author>Karan</author>
     GridTab.prototype.getCM_ChatID = function () {
 
-
         if (this.chats == null || this.chats.length == 0)
             this.loadChats();//call chat function
         if (this.chats == null)
@@ -2476,6 +2479,23 @@
         if (this.hasKey(this.chats, key)) {
             //get chat key value
             var value = VIS.Utility.Util.getValueOfInt(this.getKeyValue(this.chats, key));
+            return value;
+        }
+        return 0;
+    }
+
+    GridTab.prototype.getVIS_AssignedRecordToUser_ID = function () {
+        if (this.assignedRecord == null || this.assignedRecord.length == 0)
+            this.loadAssignedRecords();//call assign function
+        if (this.assignedRecord == null)
+            return 0;
+        //get AssignedRecordId
+        var key = this.getRecord_ID();// _gridTable.GetKeyID(CurrentRow);
+        //The given key was not present in the dictionary. Error
+       
+        if (this.hasKey(this.assignedRecord, key)) {
+            //get AssignedRecord key value
+            var value = VIS.Utility.Util.getValueOfInt(this.getKeyValue(this.assignedRecord, key));
             return value;
         }
         return 0;
@@ -2800,6 +2820,51 @@
 
     };
 
+    GridTab.prototype.loadAssignedRecords = function () {
+        //if doesn't have attachment
+        if (!this.canHaveAttachment())
+            return;//return nothing
+        //set query
+       
+        var sql = "VIS_160";
+        var param = [];
+        param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
+        var dr = null;
+        try {
+            this.assignedRecords = [];
+            if (this.assignedRecords == null)
+            //create new list for chat
+            {
+                this.assignedRecords = {};
+            }
+            else
+            //if contain chat then clear list
+            {
+                this.assignedRecords.length = 0;
+            }
+            dr = executeReader(sql, param);
+
+            var key, value, userId, createdBy;//for recordId and chatId
+            while (dr.read()) {
+                key = VIS.Utility.Util.getValueOfInt(dr.getString(1));
+                value = VIS.Utility.Util.getValueOfInt(dr.getString(0));
+                userId = VIS.Utility.Util.getValueOfInt(dr.getString(2));
+                createdBy = VIS.Utility.Util.getValueOfInt(dr.getString(3));
+                this.assignedRecords.push({
+                    ID: key, value: value, userId: userId, createdBy: createdBy
+                });
+            }
+
+            dr = null;
+        }
+        catch (e) {
+
+        };
+
+
+
+    };
+
     /// <summary>
     /// Can this tab have Attachments?.
     /// </summary>
@@ -2832,6 +2897,20 @@
 
 
         return this.hasKey(this.chats, key);//return chatId
+    };
+
+    /*assignedRecord by Rahul mittal*/
+    GridTab.prototype.hasAssignedRecord = function () {
+
+        if (this.isDataLoading)
+            return false;
+        if (this.assignedRecords == null)
+            this.loadAssignedRecords();//call load AssignRecord function
+        if (this.assignedRecords == null)
+            return false;
+       
+        var key = this.getRecord_ID();//ridTable.GetKeyID(CurrentRow);
+        return this.hasKey(this.assignedRecords, key);
     };
 
 
@@ -3052,6 +3131,9 @@
         this._subscribe = this.gTab._subscribe;
         this.viewDocument = this.gTab._documents;
         this.sharedRecords = this.gTab._sharedRec;
+
+       /* Assigned Record action panel by Rahul Mittal*/
+        this.assignedRecords = this.gTab.assignedRecords;
         //this.sharedRecordsWithLoginOrg = this.gTab._sharedWithLoginRec;
         //var tableIndex = {};
         //var ServerValues = {};
