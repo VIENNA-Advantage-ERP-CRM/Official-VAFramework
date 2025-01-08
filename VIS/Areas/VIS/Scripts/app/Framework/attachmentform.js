@@ -547,10 +547,10 @@
                         btnUpload.hide();
                     }
 
-                    var dArrange = $("<div class='vis-dropdown pull-left'>");
+                    var dArrange = $("<div class='vis-dropdown-div pull-left'>");
                     dHeaderRight.append(dArrange);
 
-                    var btnArrange = $("<a class='vis-btn vis-btn-arrange vis-dropdown-toggle' type='button' data-toggle='dropdown' style='color: #fff;display:none;'>");
+                    var btnArrange = $("<a class='vis-btn vis-btn-arrange vis-dropdown-div-toggle' type='button' data-toggle='dropdown' style='color: #fff;display:none;'>");
                     btnArrange.append(VIS.Msg.getMsg('Arrange'));
                     btnArrange.append($("<span class='vis-caret'>"));
                     dArrange.append(btnArrange);

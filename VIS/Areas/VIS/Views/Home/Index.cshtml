@@ -31,7 +31,7 @@
     </script>
 
 
-    @if (@User.Identity.IsAuthenticated)
+    @if (@User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
     {
 
         var lst = VAdvantage.ModuleBundles.GetStyleBundles(); //Get All Style Bundle
@@ -129,7 +129,7 @@
     }
 }
 
-@if (@User.Identity.IsAuthenticated)
+@if (@User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
 {
     <input id="vis_antiForgeryToken" type="hidden" value="@GetAntiForgeryToken()" />
 
@@ -310,7 +310,7 @@
             <!-- App Main Conatiner -->
             <div id="vis_mainConatiner" class="vis-app-section-main">
                 <div id="vis_busyGrid" class="full-height-div busy">
-                    <img src="~/Areas/VIS/Images/logo.jpg" />
+                    <img src="~/Areas/VIS/Images/onfinity-logo.png" />
                     <span>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Loading")</span>
                 </div>
                 <!-- App Home Div -->
@@ -388,11 +388,16 @@
 else //Login Page
 {
     <div class="loginConatiner">
-        <div id="loginPanel">
+        <div id="loginPanel" class="loginform">
             @Html.Partial("_Login")
         </div>
-        <div id="login2Panel">
+        <div id="login2Panel" class="loginform">
             @Html.Partial("_Login2")
+        </div>
+        <div class="logindyn">
+            <object style="width:100%;height:100%"  data="https://hrdemowservice.viennaadvantage.com/login-form/login-form.html">
+                no content
+                </object>
         </div>
     </div>
 

@@ -2290,6 +2290,8 @@ center {
     position: absolute;
     bottom: 2%;
     right: 1.5%;
+    left: 1.5%;
+    margin-left:20px;
 }
 
 .vis-cll-sy-p1 {
@@ -3458,6 +3460,7 @@ field, fieldvalue {
     display: inline-block;
     cursor: pointer;
     margin-right: 35px;
+    margin-left: 35px;
     font-weight: 500;
     position: absolute;
 }

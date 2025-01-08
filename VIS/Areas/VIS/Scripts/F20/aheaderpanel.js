@@ -666,7 +666,7 @@
 
             //if (!mField.getIsDisplayed())
             //    return "";
-            if (colValue) {
+            if (colValue || mField.getColumnName() == 'AD_Org_ID' || mField.getColumnName() == 'AD_Client_ID' || mField.getColumnName() == 'AD_Role_ID') {
                 var displayType = mField.getDisplayType();
 
 
@@ -1149,6 +1149,12 @@
 
             var self = this;
             this.curTab.getTableModel().getRowFromDB(this.curTab.getCurrentRow(), function (data) {
+
+                /*set processed value so window dont allow insertion*/
+                if (data && "processed" in data) {
+                    VIS.context.setWindowContext(self.windowNo, "Processed", data["processed"].toString().toLowerCase() == "true" || data["processed"].toString() == "Y" ? "Y" : "N");
+                }
+
                 self.pRowData = data;
                 self.setHeaderItems();
                 self.isChild = false;

@@ -285,81 +285,110 @@ html, body {
 
 .login-wrap {
     width: 100%;
-    height: 100%;
-    float: left;
-    position: absolute;
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding-top: 2rem;
+}
+
+.logindyn {
+    position:absolute;
+    left:0;
+    bottom:0;
+    top:0;
+    width:100%;
+    background-color:#fff;
+}
+
+.logindyn body {
+    overflow:hidden !important;
 }
 
 .loginConatiner {
     width: 100%;
     height: 100%;
     overflow: auto;
-}
+    background-color: #010814;
 
-.vienna-logo {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
 }
+.loginform {
+    height: 100%;
+    width: 100%;
+}
+    .loginform form {
+        margin-left: 60%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+
+    .vienna-logo {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+    }
 
 .login-content {
-    /*width: 527px;
-	height: 448px;
-	margin: 12% auto 0 auto;
-	background-image: url(../img/form-bg.png);*/
-    width: 30%;
-    max-width: 484px;
-    /*margin: 9% auto 0 auto;*/
-    border-radius: 5px;
-    background-color: rgba(255,253,235,.1);
-    border: 2px solid rgba(255,255,255,.2);
-    box-shadow: 4px 2px 7px rgba(0,0,0,0.3);
+    
+    width: 100%;
+    max-width: 450px;
+   
+    border-radius: 15px;
+    background-color: rgba(255,255,255);
+    /*border: 2px solid rgba(255,255,255);*/
+    /*box-shadow: 4px 2px 7px rgba(0,0,0,0.3);
     -webkit-box-shadow: 4px 2px 7px rgba(0,0,0,0.3);
-    -o-box-shadow: 4px 2px 7px rgba(0,0,0,0.3);
+    -o-box-shadow: 4px 2px 7px rgba(0,0,0,0.3);*/
     -moz-box-shadow: 4px 2px 7px rgba(0,0,0,0.3);
     position: relative;
     z-index: 2;
 }
 
 .lock {
-    width: 100%;
+    width: 0px;
     text-align: center;
     position: relative;
     top: -50px;
+    display:none;
+}
+
+.lock img {
+   visibility:hidden;
 }
 
 .login-form {
     width: 100%;
-    margin-top: -20px;
+    margin-top: 0px;
+    padding:30px;
 }
 
 .input-row {
-    border-bottom: 1px solid #FFF;
-    margin: 0px 30px 30px;
+    border-bottom: 1px solid rgba(238,238,238);
+    margin: 30px 0px;
     padding-bottom: 5px;
 }
 
 .input-icon {
-    width: 18px;
+    /* width: 18px; */
     float: left;
     margin-right: 10px;
+    /*background: linear-gradient(140deg, rgba(22, 175, 225, 1) 0%, rgba(192, 216, 71, 1) 95%, rgba(192, 216, 71, 1) 100%);*/
+    padding: 1px 2px;
+    border-radius: 5px;
 }
 
     .input-icon > img {
         float: left;
-        margin-right: 10px;
+        height:22px;
+        opacity:.5;
     }
 
 .input-row > input {
     font-size: 18px;
     border: medium none;
     background: transparent;
-    color: #FFF;
-    width: calc(100% - 30px);
+    color:  rgba(102, 102, 102);
+    width: calc(100% - 42px);
     outline: none;
 }
 
@@ -371,40 +400,41 @@ html, body {
 
 
 input::-moz-placeholder {
-    color: #fff;
+    color: #AFAFAF;
 }
 
 input::-webkit-input-placeholder {
-    color: #fff;
+    color: #AFAFAF;
 }
 
-.remember, .login-button {
+.login-button {
     margin: 0px 30px 20px 30px;
 }
+.remember{
+    margin:0 0 30px 0;
+}
 
-    .remember > label {
-        font-size: 18px;
-        color: #fff;
-    }
+.remember > label {
+    color: rgba(102, 102, 102);
+}
 
     .remember > img {
         float: right;
     }
 
 .btn-login {
-    background: #1aa0ed;
-    width: 100%;
-    text-align: center;
-    color: #fff;
-    font-size: 20px;
-    text-transform: uppercase;
-    padding: 16px 0;
-    cursor: pointer;
-    border: none;
+    background: linear-gradient(140deg, rgba(22, 175, 225, 1) 0%, rgba(192, 216, 71, 1) 95%, rgba(192, 216, 71, 1) 100%);
+    border: 0;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    height: 42px;
+    width:100%;
+    border-radius:21px;
 }
 
 .language {
-    width: calc(100% - 30px);
+    width: calc(100% - 42px);
     /*height: 17px;
    overflow: hidden;*/
     overflow: -moz-hidden-unscrollable;
@@ -421,8 +451,9 @@ input::-webkit-input-placeholder {
         width: 100%;
         font-size: 18px;
         border: 0;
-        color: #fff;
+        color: rgba(102, 102, 102);
         outline: none;
+        padding-left:2px;
     }
 
         .language > select > option {
@@ -431,8 +462,14 @@ input::-webkit-input-placeholder {
             border: none;
         }
 
+
+.validation-summary-valid{
+    min-height:30px;
+}
+
 .validation-summary-errors {
-    color: white;
+    color: rgba(102,102,102);
+    min-height: 30px;
 }
 
     .validation-summary-errors ul {
@@ -449,10 +486,11 @@ input::-webkit-input-placeholder {
 
 
 .login2PanelBtn {
-    background-color: #1aa0ed;
+    background: linear-gradient(140deg, rgba(22, 175, 225, 1) 0%, rgba(192, 216, 71, 1) 95%, rgba(192, 216, 71, 1) 100%);
+    border: 0;
     color: white;
     border: none;
-    padding: 5px;
+    padding: 5px 20px;
     font-size: 20px;
 }
 
@@ -472,7 +510,7 @@ input::-webkit-input-placeholder {
     text-align: center;
     margin-bottom: 15px;
     font-size: 17px;
-    color: #fff;
+    color: rgba(102, 102, 102);
 }
 
 .vis-clsloginqr {
@@ -490,14 +528,14 @@ input::-webkit-input-placeholder {
     display: none;
 }
 
-@media (max-width: 1366px) {
+/*@media (max-width: 1366px) {
     .login-content {
         width: 36%;
     }
 
-    .language, .input-row > input {
+    .language, .input-row > input {*/
         /*width: 92%;*/
-    }
+    /*}
 }
 
 @media (max-width: 1152px) {
@@ -505,10 +543,10 @@ input::-webkit-input-placeholder {
         width: 42%;
     }
 
-    .input-row > input {
+    .input-row > input {*/
         /*width: 85%;*/
-    }
-}
+    /*}
+}*/
 
 @media (max-width: 1024px) {
     .login-content {
@@ -676,12 +714,115 @@ input::-webkit-input-placeholder {
     text-align: right;
     border: none;
     margin-bottom: 12px;
-    color: #fff;
+    color: rgba(102, 102, 102);
     font-size: 1.2rem;
     text-decoration: underline;
     float: right;
 }
 
     .vis-login-skipLink:hover, .vis-login-skipLink:focus {
-        color: #fff
+        color: rgba(102, 102, 102);
     }
+
+
+
+
+.vis-sso-divider {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    /*color: #fff;*/
+}
+
+.vis-sso-login {
+    margin: 0 30px 30px;
+}
+
+.vis-sso-divider i {
+    flex: 1;
+    border-top: 1px solid;
+}
+
+.vis-sso-buttons {
+    display: flex;
+    flex-wrap: wrap; /* Allows buttons to wrap to a new line */
+    gap: 10px; /* Space between buttons */
+    justify-content: center;
+}
+
+.vis-sso-button {
+    flex: 1 1 calc(50% - 10px); /* Two buttons per line with gap adjustment */
+    max-width: calc(50% - 10px); /* Ensures no overflow */
+    text-align: center;
+    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.vis-sso-buttons:only-child .vis-sso-button {
+    flex: 0 0 100%; /* Full width if only one button */
+}
+
+.vis-sso-buttons .vis-sso-button:nth-child(1) {
+    margin-top: 0;
+}
+
+.vis-sso-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* When there's only one button, make it 100% width */
+.vis-sso-buttons:has(.vis-sso-button:nth-child(1):nth-last-child(1)) .vis-sso-button {
+    flex: 1 1 100%; /* Full width */
+    max-width: 100%;
+}
+
+/*logout alert*/
+.vis-logoutMsgWrp {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 10;
+    left:0;
+}
+
+.vis-logoutmsgAlert {
+    display: flex;
+    align-self: start;
+    background: #EBD5D5;
+    font-size: .875rem;
+    padding: .5rem 1rem;
+    border-radius: .3rem;
+    align-items: center;
+    gap: 1rem;
+}
+
+    .vis-logoutmsgAlert p {
+        margin: 0;
+    }
+
+    .vis-logoutmsgAlert span {
+        color: #DC0000;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+.vis-alertCloseIco {
+    background: none;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

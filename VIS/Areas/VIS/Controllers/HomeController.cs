@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -30,6 +33,7 @@ using VAdvantage.Common;
 using System.Diagnostics;
 using iTextSharp.text;
 using VIS.DataContracts;
+using System.Security.Claims;
 
 namespace VIS.Controllers
 {
@@ -52,6 +56,32 @@ namespace VIS.Controllers
         private static bool isBundleAdded = false;
         //private ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
+        public ActionResult SignIn(string provider)
+        {
+
+            if (!Request.IsAuthenticated)
+            {
+
+                HttpContext.GetOwinContext().Authentication.Challenge(
+                    new AuthenticationProperties { RedirectUri = "Account/ExternalLoginCallback?provider=" + provider },
+                    provider.Split('_')[1]);
+                return new HttpUnauthorizedResult();
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+        }
+
+        /// <summary>
+        /// Send an OpenID Connect sign-out request.
+        /// </summary>
+        public void SignOut()
+        {
+            HttpContext.GetOwinContext().Authentication.SignOut(
+                    OpenIdConnectAuthenticationDefaults.AuthenticationType,
+                    CookieAuthenticationDefaults.AuthenticationType);
+        }
 
 
         //public ActionResult Index(string param )
@@ -102,7 +132,12 @@ namespace VIS.Controllers
             Language.GetLanguages();
             LoginModel model = null;
             SecureEngine.Encrypt("test"); //init secure engine class
-            if (User.Identity.IsAuthenticated)
+
+            var ident = (ClaimsIdentity)User.Identity;
+            //string loginContextString = 
+            ViewBag.IsAuthorize = ident?.FindFirst("Authorization")?.Value;
+
+            if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
             {
 
 
@@ -123,12 +158,13 @@ namespace VIS.Controllers
                 //Stopwatch st = new Stopwatch();
                 //st.Start();
 
-                FormsIdentity ident = User.Identity as FormsIdentity;
+                //FormsIdentity ident = User.Identity as FormsIdentity;
                 Ctx ctx = null;
                 if (ident != null)
                 {
-                    FormsAuthenticationTicket ticket = ident.Ticket;
-                    string loginContextString = ticket.UserData; // get login context string from Form Ticket
+                    //FormsAuthenticationTicket ticket = ident.Ticket;
+                    string loginContextString = ident?.FindFirst(ClaimTypes.UserData)?.Value;
+                    //string loginContextString = ticket.UserData; // get login context string from Form Ticket
                     LoginContext lCtx = JsonHelper.Deserialize(loginContextString, typeof(LoginContext)) as LoginContext;
                     IDataReader dr = null;
                     bool createNew = false;
@@ -428,6 +464,7 @@ namespace VIS.Controllers
                 ViewBag.ClientList = new List<KeyNamePair>();
 
                 ViewBag.Languages = Language.GetLanguages();
+                ViewBag.ServiceProvider = LoginHelper.GetExternalProvider();
 
                 Session["ctx"] = null;
                 ViewBag.direction = "ltr";

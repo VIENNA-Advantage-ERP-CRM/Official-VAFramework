@@ -1141,6 +1141,8 @@
             this.oldValue = newValue;
             if (this.mField.getDisplayType() == VIS.DisplayType.TelePhone && newValue && newValue != "- -") {
                 this.ctrl.html(VIS.VTelePhoneInstance.getHtml(newValue));
+            } else if (this.mField.getDisplayType() == VIS.DisplayType.YesNo && newValue == "- -") {
+                this.ctrl.html('false');
             }
             else {
                 this.ctrl.text(VIS.Utility.decodeText(newValue));
@@ -1446,6 +1448,22 @@
         }
         this.setBackground(false);
     };
+
+    VButton.prototype.setVisible = function (visible) {
+        this.visible = visible;
+        //Action group[]
+        var isag = this.ctrl.parent().length>0 && this.ctrl.parent()[0].tag == "LI";
+        if (visible) {
+            this.ctrl.show();
+            if (isag)
+                this.ctrl.parent().show();
+        } else {
+            this.ctrl.hide();
+            if (isag);
+            this.ctrl.parent().hide();
+        }
+    };
+
 
     /**
      *	Return Value

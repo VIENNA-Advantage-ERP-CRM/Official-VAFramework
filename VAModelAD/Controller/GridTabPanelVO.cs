@@ -66,13 +66,13 @@ namespace VAdvantage.Controller
         public static String GetSQL(Ctx ctx)
         {
             //  View only returns IsActive='Y'
-            String sql = "SELECT panel.classname, panel.Name, panel.iconpath, panel.isdefault, panel.seqno, panel.ad_tabpanel_id, panel.ad_tab_id, panel.ExtraInfo, panel.TabPanelAlignment FROM AD_TabPanel panel WHERE panel.AD_Tab_ID =@tabID AND panel.IsActive='Y'";
+            String sql = "SELECT panel.classname, panel.Name, panel.iconpath, panel.isdefault, panel.seqno, panel.ad_tabpanel_id, panel.ad_tab_id, panel.ExtraInfo, panel.TabPanelAlignment FROM AD_TabPanel panel WHERE panel.AD_Tab_ID =@tabID ";
             if (!Env.IsBaseLanguage(ctx, "AD_Window"))
             {
                 sql = "SELECT panel.classname, trl.Name, panel.iconpath, panel.isdefault, panel.seqno, panel.ad_tabpanel_id, panel.ad_tab_id, panel.ExtraInfo,panel.TabPanelAlignment FROM AD_TabPanel panel JOIN AD_TabPanel_trl  trl ON panel.ad_tabpanel_id=trl.ad_tabpanel_id "
                     + " WHERE panel.AD_Tab_ID =@tabID AND trl.AD_Language='" + Env.GetAD_Language(ctx) + "'";
             }
-            sql += " ORDER BY panel.SeqNo, panel.ad_tabpanel_id asc";
+            sql += " AND panel.IsActive='Y' ORDER BY panel.SeqNo, panel.ad_tabpanel_id asc";
             return sql;
         }
 

@@ -5270,8 +5270,12 @@
       */
 
     GridTable.prototype.getRowFromDB = function (row, callback) {
-        if (row < 0 || this.getRowCount() == 0 || this.inserting)
+        if (row < 0 || this.getRowCount() == 0 || this.inserting) {
+            if (callback) {
+                callback(null);
+            }
             return null;
+        }
 
         var rData = this.getRow(row);
 

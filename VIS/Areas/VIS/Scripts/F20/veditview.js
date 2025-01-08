@@ -41,12 +41,25 @@
 
         function initComponent() {
             $table = $("<div class='vis-ad-w-p-vc-ev-grid'>"); //   $("<table class='vis-gc-vpanel-table'>");
-            $table.on("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
+            $table.on("click", "label", onInfoClick);
+            $table.on("click", "span.vis-ev-ctrlinfowrap", onInfoClickold);
             $table.on("click", "span.vis-ev-fgbtn", onBtnFGClick);
         };
 
-        function onInfoClick(e) {
+        function onInfoClickold(e) {
             var curTgt = $(e.currentTarget);
+            showpopover(curTgt, curTgt);
+        }
+
+        function onInfoClick(e) {
+            var lblTgt = $(e.currentTarget);
+            var curTgt = lblTgt.siblings('span.vis-ev-ctrlinfowrap');
+            if (!curTgt || curTgt.length == 0)
+                return;
+            showpopover(curTgt, lblTgt);
+        }
+        function showpopover(curTgt, lblTgt) {
+
             var colName = curTgt.data('colname');
             if (colName != '') {
 
@@ -57,7 +70,7 @@
 
                 curTgt.attr('data-content', colDescHelpList[colName].help);
                 //attr('title', colDescHelpList[colName].desc);
-                lastPopover = curTgt.popover('show');
+                lastPopover = lblTgt.popover('show');
 
             }
         }
@@ -135,6 +148,7 @@
 
             if (colCount - 1 ==0) {
                 cellSpace = 0;
+                rowSpan = 0;
             }
             if (colSpan > colCount - 1)
                 colSpan = colCount;
@@ -156,13 +170,16 @@
                     addRow();//add last row;
                     reset();
                     initCols(true);
-                    $td0.addClass("vis-ev-col-end4");
-                    columnIndex = colCount;
-                }
+                    if (colCount>1)
+                    $td0.addClass("vis-ev-col-end" + colCount);
+                    columnIndex = colCount+4; //outbound
+                } 
                 else {
                     // check for row span
                     if (col0.rSpan > 1) { //skip column 
                         columnIndex += col0.cSpan;
+                        if (columnIndex >= colCount)
+                            columnIndex = 6;//outbound
                         //--col0.rSpan;
                         //reset(col0);
                     }
@@ -216,6 +233,8 @@
                 // check for row span
                 if (col1.rSpan > 1) { //skip column 
                     columnIndex += col1.cSpan;
+                    if (columnIndex >= colCount)
+                        columnIndex = 6;//outbound
                     //--col1.rSpan;
                     //reset(col1);
                 }
@@ -260,6 +279,8 @@
                 // check for row span
                 if (col2.rSpan > 1) { //skip column 
                     columnIndex += col2.cSpan;
+                    if (columnIndex >= colCount)
+                        columnIndex = 6;//outbound
                     //--col2.rSpan;
                     //reset(col2);
                 }

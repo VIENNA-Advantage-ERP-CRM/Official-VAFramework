@@ -438,6 +438,8 @@
                 if ($(e.target).hasClass("vis-linkTxt") || $(e.target).hasClass("vis-nm-subMenuCat"))
                     return;
                 if (!$(e.target).is('i')) {
+                    if ($(e.target).hasClass("vis-subnav-links") || $(e.target).hasClass("vis-nav-heading"))
+                        return;
                     // remove active and show class to hide menu items
                     $($(e.target).parents(".vis-nav-show")[0]).removeClass("vis-nav-show");
                     $topHdrDiv.removeClass("vis-nm-active");
@@ -451,6 +453,8 @@
                 }
                 //if($target.data('isfavbtn') == 'yes') {
                 else if ($(e.target).is('i')) {
+                    if ($(e.target).hasClass("vis-nm-menuFolderIco"))
+                        return;
                     VIS.FavouriteHelper.addDelFav($(e.target)); // show menu item's options
                     return;
                 }
@@ -639,6 +643,14 @@
         function activateTaskBarItem(itm) {
             if (itm.length > 0) {
 
+
+
+                //select unselect taskbar items
+                if (curSelTaskBarItem) {
+                    //curSelTaskBarItem.css('background-color', '');
+                    curSelTaskBarItem.removeClass('vis-app-f-selected');
+                }
+
                 if (itm[0].id == "vis_lhome") {
                     if ($('#vis_home .vis-editModeWidget').length > 0) {
                         $('#vis_editHome').hide();
@@ -654,11 +666,7 @@
                 //if (itm[0].id == "vis_lhome")
                 //    return;
 
-                //select unselect taskbar items
-                if (curSelTaskBarItem) {
-                    //curSelTaskBarItem.css('background-color', '');
-                    curSelTaskBarItem.removeClass('vis-app-f-selected');
-                }
+                
                 //curSelTaskBarItem = itm.css('background-color', '#D7E3E7');
                 curSelTaskBarItem = itm.addClass('vis-app-f-selected');
                 itm = null;
@@ -852,6 +860,7 @@
             var $li = $(img.join(' '));
             $shortcutUL.append($li);
             activateTaskBarItem($li);
+            $li[0].scrollIntoView();
             $li = null;
         };
 

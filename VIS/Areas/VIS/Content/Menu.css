@@ -81,7 +81,7 @@
 
     .VIS-nm-opt-link span {
         color: #666666;
-        text-align: center;
+        text-align: center !important;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
         display: -webkit-box;
@@ -118,7 +118,7 @@
 
 /* Top Menu App*/
 .vis-nm-page-close {
-    padding: 0 0.5rem;
+    padding: 0 0.8rem;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -126,6 +126,7 @@
     font-weight: 600;
     color: rgba(var(--v-c-primary), 1);
     width: 230px;
+    justify-content: right;
 }
 
     .vis-nm-page-close a {
@@ -274,6 +275,10 @@
     text-align: left;
     white-space: nowrap;
     text-overflow: ellipsis;
+    margin-left:.2rem;
+    align-content:center;
+    vertical-align:middle;
+    margin-top:.1rem;
 }
 
 /* Navigation Menu*/
@@ -425,7 +430,7 @@ nav.vis-nav-horizontal-scroll {
     top: 42px !important;
     background-color: rgba(var(--v-c-on-secondary), 1);
     /*background-color: #95b7df;*/
-    z-index: 100;
+    z-index: 9999;
     padding: 1.5rem 1rem 1rem 1rem;
     min-width: auto;
     visibility: hidden;
@@ -517,6 +522,11 @@ nav.vis-nav-horizontal-scroll {
 .VIS-nm-favIconImg {
     height: 32px;
     width: 32px;
+}
+
+.vis-nm-mainMenuImg {
+    height: 100%;
+    align-content: center;
 }
 
 @media screen and (max-width: 1366px) {
