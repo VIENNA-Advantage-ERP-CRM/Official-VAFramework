@@ -119,12 +119,13 @@
             this.resetListners();
             this.headerTab = tab;
             $ulTabControl.empty();
-
+            //$divUlTabNav.show();
             if (tab.ChildTabsItems.length == 0) {
                 display(true);
                 return;
             }
             display();
+            var isShowIcon = false;
             for (var i = 0; i < tab.ChildTabsItems.length; i++) {
 
                 var childTab = tab.ChildTabsItems[i];
@@ -136,6 +137,7 @@
                     continue;
                 }
                 else {
+                    isShowIcon = true;
                     li.show();
                 }
 
@@ -164,7 +166,11 @@
                    // this.onTabChange(childTab.getAction());
                 }
             }
-            $divUlTabNav.show();
+
+            if (isShowIcon)
+                $divUlTabNav.show();
+            else
+                $divUlTabNav.hide();
             
             //  this.setTabNavigation();
         };
