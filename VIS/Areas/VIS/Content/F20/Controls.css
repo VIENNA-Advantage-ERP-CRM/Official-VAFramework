@@ -178,7 +178,7 @@
 
 .vis-ad-w-p-vc-editview .vis-input-wrap {
     position: relative;
-    margin-bottom: 22px;
+    margin-bottom: 26px;
     flex-wrap: nowrap;
     border-bottom: 1px solid #d2d2d2;
 }
@@ -367,6 +367,7 @@ select.vis-ev-col-mandatory {
     box-shadow: none;
 }
 
+
 .vis-input-wrap input:focus, .vis-input-wrap select:focus, .vis-input-wrap textarea:focus {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
@@ -396,6 +397,9 @@ select.vis-ev-col-mandatory {
     background: transparent;
 }
 
+.vis-ad-w-p-vc-editview .vis-ev-col .vis-input-wrap .vis-control-wrap .vis-ec-col-lblchkbox input:focus {
+    border-bottom: 1px solid rgba(var(--v-c-primary), 1) !important;
+}
 
 .vis-ev-col .vis-input-wrap .vis-control-wrap input:focus,
 .vis-ev-col .vis-input-wrap .vis-control-wrap select:focus,
@@ -411,8 +415,8 @@ button.vis-ev-col-img-ctrl:focus,
 .vis-ad-w-p-vc-editview .vis-ev-col .vis-input-wrap .vis-control-wrap select:focus,
 .vis-ad-w-p-vc-editview .vis-ev-col .vis-input-wrap .vis-control-wrap textarea:focus,
 .vis-ad-w-p-vc-editview .vis-control-wrap > button:focus,
-.vis-ad-w-p-vc-editview button.vis-ev-col-img-ctrl:focus,
-.vis-ec-col-lblchkbox input:focus {
+.vis-ad-w-p-vc-editview button.vis-ev-col-img-ctrl:focus
+ {
     border-bottom: 0px solid rgba(var(--v-c-primary), 1) !important;
     border: 0;
 }
@@ -454,7 +458,7 @@ button.vis-ev-col-img-ctrl:focus,
 .vis-input-wrap select:focus ~ label,
 .vis-input-wrap textarea:focus ~ label,
 .vis-input-wrap select ~ label {
-    top: -7px;
+    top: -12px;
     font-size: 12px;
     background: linear-gradient(rgba(var(--v-c-common), 1) 50%, transparent 50%);
     padding: 0 0.4rem;
@@ -477,7 +481,7 @@ button.vis-ev-col-img-ctrl:focus,
 .vis-ad-w-p-vc-editview .vis-input-wrap textarea ~ label,
 .vis-ad-w-p-vc-editview .vis-input-wrap select ~ label,
 .vis-ad-w-p-vc-editview .vis-input-wrap label {
-    top: -12px;
+    top: -16px;
     font-size: 12px;
     background: linear-gradient(rgba(var(--v-c-common), 1) 50%, transparent 50%);
     padding: 0 0.4rem;
@@ -690,8 +694,16 @@ button.vis-ev-col-img-ctrl:focus,
     /* padding: 0 10px; */
 }
 
-.vis-ev-col-fg-rotate {
+
+.vis-ev-fg-arrowBtn i {
+    display: inline-flex;
+    transform: rotate(0deg);
+    position: relative;
+}
+
+.vis-ev-fg-arrowBtn.vis-ev-col-fg-rotate i {
     transform: rotateX(180deg);
+    top: 2px;
 }
 
 .vis-ev-fgbtn {
@@ -821,6 +833,11 @@ label.vis-ec-col-lblchkbox {
     margin: 0 4px;
     padding: 0;
     border-radius: .15rem;
+}
+
+.vis-ad-w-p-vc-editview .vis-ec-col-lblchkbox input[type=checkbox] {
+    width: 16px;
+    height: 16px;
 }
 
     .vis-ec-col-lblchkbox input[type=checkbox]:focus {
