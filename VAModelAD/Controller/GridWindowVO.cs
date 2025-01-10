@@ -200,7 +200,7 @@ namespace VAdvantage.Controller
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
              + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared,IsHideTabLinks,"
-             + "IsHideToolbar,IsHideActionbar,IsLandingPage,IsDependentInDetailView , IsAssignRecord");
+             + "IsHideToolbar,IsHideActionbar,IsLandingPage,IsDependentInDetailView , IsAssignRecord ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
