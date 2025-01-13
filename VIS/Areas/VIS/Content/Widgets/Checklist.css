@@ -1,0 +1,291 @@
+﻿
+.vis-maindiv {
+    background: linear-gradient(135deg, #6b8ce3, #8dc7f8);
+    height: 100%;
+    width: 100%;
+}
+
+
+.VIS_widget-container {
+    height: 100%
+}
+
+    .VIS_widget-container h4 {
+        color: #fff;
+        font-size: 17px;
+        padding: 10px 10px 0;
+    }
+
+
+.VIS_checklist_records {
+    width: 100%;
+    height: calc(100% - 90px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 .75em;
+    width: 100%;
+    margin-top: 7px;
+    display: inline-block;
+}
+
+
+.vis-record-col {
+    gap: .75em;
+    cursor: pointer;
+}
+
+.vis-windowList {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.vis-blueColor {
+    background-color: #23569B;
+}
+
+
+.vis-record-box {
+    align-items: center;
+    border-radius: 8px;
+    display: flex;
+    gap: .75em;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 13px 10px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+
+.vis-tiles-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 1rem;
+    margin-top: 0.7rem;
+    margin-left: 11%;
+}
+
+    .vis-tiles-pagination .fa {
+        font-size: 1.9em;
+        color: rgba(var(--v-c-common),1);
+        cursor: pointer;
+    }
+
+        .vis-tiles-pagination .fa:hover {
+            color: rgba(var(--v-c-common),0.8);
+        }
+
+
+.vis-noRecordFound {
+    display: flex;
+    font-size: 20px;
+    color: #fff;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.vis-total-count {
+    font-size: 1em;
+    color: rgba(var(--v-c-common),1);
+}
+
+.vis-total-windows-icon {
+    margin-left: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+    .vis-total-windows-icon:hover {
+        color: #f0ad4e; /* Optional hover effect */
+    }
+
+.VIS_recordCount {
+    background: #fff;
+    color: #333;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.vis-show-more {
+    margin-left: 38px;
+    text-decoration: underline;
+    color: white;
+    font-size: 22px;
+}
+
+.VIS_allWindowRecord {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+
+
+.VIS_PopoverMaindiv {
+    border-radius: 12px;
+    padding: 20px;
+    border: none;
+    height: 100%;
+}
+
+.VIS_popupRecordCount {
+    font-weight: bold;
+    text-align: center;
+    line-height: 30px;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    color: #333;
+    background: #fff;
+}
+
+.VIS_WindowRecord {
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.VIS_popuptitle {
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    margin: 0;
+}
+
+.VIS_popupRecordDetail {
+    overflow-y: auto;
+    max-height: 400px;
+    margin-top: 15px;
+}
+
+
+@media screen and (max-width: 1366px) {
+    .VIS_checklist_records {
+        font-size: 11px;
+    }
+
+    .vis-editModeWidget .VIS_checklist_records {
+        font-size: 11px;
+    }
+}
+
+
+@media screen and (max-width: 1280px) {
+    .vis-record-box {
+        padding: 5px 10px;
+    }
+
+    .VIS_recordCount {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .VIS_checklist_records {
+        font-size: 8px;
+    }
+
+    .vis-editModeWidget .VIS_checklist_records {
+        font-size: 8px;
+    }
+}
+
+@media screen and (max-width:900px) {
+    .VIS_checklist_records {
+        font-size: 11px;
+    }
+
+    .vis-editModeWidget .VIS_checklist_records {
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .VIS_checklist_records {
+        font-size: 9px;
+    }
+
+    .vis-editModeWidget .VIS_checklist_records {
+        font-size: 9px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .VIS_checklist_records {
+        font-size: 14px;
+    }
+
+    .vis-editModeWidget .VIS_checklist_records {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .VIS_checklist_records {
+        font-size: 12px;
+    }
+
+    .vis-editModeWidget .VIS_checklist_records {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .VIS_checklist_records {
+        font-size: 9px;
+    }
+
+    .vis-editModeWidget .VIS_checklist_records {
+        font-size: 9px;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .VIS_checklist_records {
+        font-size: 8px;
+    }
+
+    .vis-editModeWidget .VIS_checklist_records {
+        font-size: 8px;
+    }
+}
+
+.vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-record-box {
+    padding: 2px 10px;
+}
+
+.vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-tiles-pagination i {
+    font-size: 1.7em;
+}
+
+    .vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-tiles-pagination i.vis-show-more {
+        margin-left: 0;
+        font-size: 1.3rem;
+    }
