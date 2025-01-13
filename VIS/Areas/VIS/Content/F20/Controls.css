@@ -130,9 +130,9 @@
     color: rgba(var(--v-c-primary), 1) !important;
 }
 
-.vis-ad-w-p-vc-editview .vis-ev-col-end3 .vis-input-wrap .vis-control-wrap label {
+/*.vis-ad-w-p-vc-editview .vis-ev-col-end3 .vis-input-wrap .vis-control-wrap label {
     color: #ffffff !important;
-}
+}*/
 
 .vis-ad-w-p-vc-editview .vis-input-wrap .vis-control-wrap label::after {
     display: inline-flex;

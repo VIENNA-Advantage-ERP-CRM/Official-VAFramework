@@ -34,6 +34,7 @@ using System.Diagnostics;
 using iTextSharp.text;
 using VIS.DataContracts;
 using System.Security.Claims;
+using static System.Net.WebRequestMethods;
 
 namespace VIS.Controllers
 {
@@ -412,6 +413,17 @@ namespace VIS.Controllers
 
             else
             {
+                /* Read Web config setting */
+                var loginPageUrl = System.Configuration.ConfigurationManager.AppSettings["LoginPageContentUrl"]; 
+
+                if(!string.IsNullOrEmpty(loginPageUrl))
+                {
+                    ViewBag.LoginPageUrl = loginPageUrl;
+                }
+                else
+                {
+                    ViewBag.LoginPageUrl = "https://html5.viennaadvantage.com/login-form/login-form.html";
+                }
 
                 model = new LoginModel();
                 model.Login1Model = new Login1Model();

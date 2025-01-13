@@ -395,9 +395,65 @@ else //Login Page
             @Html.Partial("_Login2")
         </div>
         <div class="logindyn">
-            <object style="width:100%;height:100%"  data="https://hrdemowservice.viennaadvantage.com/login-form/login-form.html">
-                no content
-                </object>
+            <object style="width:100%;height:100%" data="@ViewBag.LoginPageUrl">
+                <style>
+                    .prefix-login-container {
+                        height: 100%;
+                        width: 100%;
+                        display: flex;
+                        position: absolute;
+                        background-image: url('../Areas/VIS/WebPages/login-form/images/form-bg.png');
+                        background-size: cover;
+                    }
+
+                    .prefix-whitebox {
+                        background-color: rgba(var(--v-c-on-primary), 0.8);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width:100%;
+                    }
+
+                   
+
+                    .prefix-form-group-col {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.875rem;
+                    }
+
+                    .prefix-form-col {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        border-bottom: 1px solid rgba(var(--v-c-secondary), 1);
+                        padding: 0 0 0.5rem;
+                    }
+
+                   
+                    .prefix-poweredby-col {
+                        position: absolute;
+                        right: 1.5rem;
+                        bottom: 1.5rem;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.3rem;
+                    }
+
+                    .prefix-poweredbyTxt {
+                        font-size: 0.875rem;
+                    }
+                </style>
+                <div class="prefix-login-container">
+                    <div class="prefix-whitebox">
+                        <!--right pane-->
+                        <div class="prefix-poweredby-col">
+                            <div class="prefix-poweredbyTxt"></div>
+                            <img src="Areas/VIS/WebPages/login-form/images/onfinity-logo.png" alt="">
+                        </div>
+                    </div>
+                    </div>
+            </object>
         </div>
     </div>
 

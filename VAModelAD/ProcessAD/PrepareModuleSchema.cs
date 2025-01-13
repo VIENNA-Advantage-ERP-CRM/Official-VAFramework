@@ -273,6 +273,11 @@ namespace VAdvantage.Process
             List<Int32> ids = GetIDs("AD_ModuleMenuFolder", "AD_ModuleMenuFolder_ID", " AD_ModuleInfo_Id = " + AD_ModuleInfo_ID);
             for (int i = 0; i < ids.Count; i++)
             {
+                int ad_image_ID = Util.GetValueOfInt(DataBase.DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_ModuleMenuFolder WHERE AD_ModuleMenuFolder_ID =" + ids[i]));
+                if (ad_image_ID > 0)
+                {
+                    CheckImage(ad_image_ID);
+                }
                 InsertIntoDBSchema(X_AD_ModuleMenuFolder.Table_ID, ids[i], X_AD_ModuleMenuFolder.Table_Name, "_MenuFolder" + i, "AD_ModuleMenuFolder_ID = " + ids[i]);
             }
         }
