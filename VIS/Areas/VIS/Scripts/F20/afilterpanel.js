@@ -739,6 +739,12 @@
 
                 self.fireValChanged(currentColumnName);
             }
+
+            if (dsFilterData.length == 0) {
+                self.curGC.aPanel.setFilterActive(false);
+            } else {
+                self.curGC.aPanel.setFilterActive(true);
+            }
         });
 
         btnAdd.on("click", function (e) {
@@ -759,10 +765,18 @@
                 const popupHeight = bodyDiv.find('.vis-fp-popup').outerHeight();
                 const buttonWidth = $(this).outerWidth();
                 const popupWidth = bodyDiv.find('.vis-fp-popup').outerWidth();
-                bodyDiv.find('.vis-fp-popup').css({
-                    top: buttonOffset.top - (popupHeight + buttonHeight) - buttonHeight, // Position above the button
-                    left: buttonOffset.left - (buttonWidth / 2)+5// Center the popup horizontally relative to the button
-                }).fadeIn(200);
+               
+                let position = {
+                    top: buttonOffset.top - (popupHeight + buttonHeight) - buttonHeight
+                };
+
+                if (VIS.Application.isRTL) {
+                    position.right = $(window).width() - buttonOffset.left - buttonWidth / 2 - 15;
+                } else {
+                    position.left = buttonOffset.left - buttonWidth / 2 + 5;
+                }
+
+                bodyDiv.find('.vis-fp-popup').css(position).fadeIn(200);
                 txtFilterName.focus();
             }
         });
@@ -1771,6 +1785,17 @@
             if (divValue2) {
                 divValue2.find('Select option').remove();
             }
+
+            if (chkDynamic.is(':checked')) {
+                chkDynamic.trigger("change");
+            }
+        }
+
+        this.isConditionApply = function () {
+            if (dsFilterData.length > 0) {
+                return true;
+            }
+            return false;
         }
     };
 

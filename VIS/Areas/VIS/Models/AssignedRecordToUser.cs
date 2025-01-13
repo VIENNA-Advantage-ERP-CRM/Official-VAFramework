@@ -43,7 +43,7 @@ namespace VIS.Models
             try
             {
                 // SQL query to check for existing assignments
-                string sql = @"SELECT Record_ID,AD_Table_ID,AD_User_ID,AD_Window_ID 
+                string sql = @"SELECT Record_ID,AD_Table_ID,AD_User_ID,AD_Window_ID ,status
                        FROM VIS_AssignedRecordToUser 
                        WHERE Record_ID IN (" + recordIds + ")";
                 DataSet ds = DB.ExecuteDataset(sql, null, trx);
@@ -56,9 +56,10 @@ namespace VIS.Models
                     foreach (int recordId in Record_ID)
                     {
                         // Check if the record is already assigned to a user
-                        DataRow[] existingAssignments = dt.Select($"Record_ID = {recordId}");
+                        DataRow[] existingAssignments = dt.Select($"Record_ID = {recordId} ");
+                        var status = existingAssignments.Select(row => row.Field<string>("Status")).FirstOrDefault();
 
-                        if (existingAssignments.Length == 0) // If not assigned
+                        if (existingAssignments.Length == 0 || status == "DNE") // If not assigned
                         {
                             recordSaved = 1;
 
