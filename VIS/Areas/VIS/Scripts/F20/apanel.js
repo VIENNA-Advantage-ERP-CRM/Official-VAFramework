@@ -5871,9 +5871,7 @@
             this.gridWindow = null;
             this.ctx.setAutoCommit(this.$parentWindow.getWindowNo(), false);
             this.ctx.removeWindow(this.$parentWindow.getWindowNo());
-            VIS.MLo
-
-            upCache.cacheReset(this.$parentWindow.getWindowNo());
+            VIS.MLookupCache.cacheReset(this.$parentWindow.getWindowNo());
         }
 
 

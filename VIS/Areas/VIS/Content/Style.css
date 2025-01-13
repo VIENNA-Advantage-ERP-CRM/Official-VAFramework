@@ -2291,7 +2291,7 @@ center {
     bottom: 2%;
     right: 1.5%;
     left: 1.5%;
-    margin-left:20px;
+    margin-left: 20px;
 }
 
 .vis-cll-sy-p1 {
@@ -4096,16 +4096,16 @@ table.fixed-header thead tr {
     display: inline-flex;
     align-items: center;
     margin-bottom: 5px;
-    min-width:50px;
+    min-width: 50px;
 }
 
 .vis-BatchUpdateContentArea {
     height: auto;
 }
 
-    .vis-ctrfrm-btnwrp.vis-add-right-btns input[type="button"] {
-        float: none;
-    }
+.vis-ctrfrm-btnwrp.vis-add-right-btns input[type="button"] {
+    float: none;
+}
 
 .vis-Dialog-buttons button:focus,
 .vis-Dialog-buttons input[type="button"]:focus,
@@ -4116,8 +4116,9 @@ table.fixed-header thead tr {
 .VIS_Pref_btn-2:focus,
 .vis-group-btn:focus,
 .k-button:focus {
-    box-shadow: 0 0 10px rgb(0 0 0 / 50%) !important;
-    border: none !important;
+    box-shadow: 2px 4px 2px rgb(0 0 0 / 20%) !important;
+    border: 1px solid rgba(var(--v-c-primary), 1) !important;
+    border-radius: 0;
 }
 
 /* modify Ends */
@@ -4184,12 +4185,13 @@ table.fixed-header thead tr {
     background-size: 18px 18px;
     animation: viswidget_l 1.5s infinite cubic-bezier(0.3,1,0,1);
 }
+
 .multiselect-selected-text {
     font-size: 14px;
 }
 
-.multiselect-container{
-    width:100%;
+.multiselect-container {
+    width: 100%;
 }
 
 @keyframes viswidget_l {
