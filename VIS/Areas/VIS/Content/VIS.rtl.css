@@ -1012,4 +1012,21 @@ html[dir="rtl"] .vis-nm-fav-icon-float {
     float: left;
 }
 
+html[dir="rtl"] .VIS-winSearch-NonDefaultIcon {
+    margin-left: 5px;
+}
+
+html[dir="rtl"] .vis-fp-popup-arrow {
+    right: 10px !important;
+    left:unset !important;
+}
+
+html[dir="rtl"] .vis-fttrBtn button {
+    text-align: center;
+}
+
+html[dir="rtl"] .vis-clearFilter {
+    right: unset;
+    left: 5px !important;
+}
     /*rtl css End here*/

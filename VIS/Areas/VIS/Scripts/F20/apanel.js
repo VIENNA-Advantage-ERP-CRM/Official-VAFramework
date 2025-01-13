@@ -463,6 +463,7 @@
 
         //tabAction
         this.onTabChange = function (action) {
+            self.setFilterActive(false);
             self.tabActionPerformed(action);
         };
 
@@ -974,6 +975,12 @@
             else {
                 $fltrPanel.hide();
                 this.refresh();
+            }
+
+            if (self.curGC.aFilterPanel.isConditionApply()) {
+                self.setFilterActive(true);
+            } else {
+                self.setFilterActive(false);
             }
 
             this.curTab.isFPManualHide = hide;

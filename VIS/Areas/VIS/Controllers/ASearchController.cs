@@ -76,6 +76,8 @@ namespace VIS.Controllers
             //set query name
             if (name != null && name.Length > 0)
                 uq.SetName(name);
+
+            uq.SetAD_Org_ID(0);
             // set query code
             uq.SetCode(where);
             // set tab id

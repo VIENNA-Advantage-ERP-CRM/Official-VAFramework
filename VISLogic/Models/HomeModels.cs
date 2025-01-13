@@ -206,6 +206,7 @@ namespace VIS.Models
         /// <returns></returns>
         public List<HomeWidget> GetAnalyticalChart(Ctx ctx, int windowID)
         {
+            bool baseLanguage = Env.IsBaseLanguage(ctx, "");
             List<HomeWidget> list = null;
             try
             {
@@ -214,51 +215,93 @@ namespace VIS.Models
                     return list;
                 }
 
-                string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,D_Chart.Name,colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA,D_Chart.AD_Window_ID FROM D_Chart INNER JOIN 
+                string sql = @"SELECT D_Chart.chartType, D_Chart.d_chart_id,";
+                if (baseLanguage)
+                {
+                    sql += " D_Chart.Name,";
+                }
+                else
+                {
+                    sql += "D_Chart_Trl.Name,";
+                }
+                sql += @" colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA,D_Chart.AD_Window_ID FROM D_Chart INNER JOIN 
                             D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
-                            INNER JOIN AD_WidgetSize ON (D_Chart.D_Chart_ID=AD_WidgetSize.D_Chart_ID)
-                            LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                           
+                            INNER JOIN AD_WidgetSize ON (D_Chart.D_Chart_ID=AD_WidgetSize.D_Chart_ID)";
+                if (!baseLanguage)
+                {
+                    sql += " INNER JOIN D_Chart_Trl ON(D_Chart_Trl.D_Chart_ID=D_Chart.D_Chart_Id AND D_Chart_Trl.AD_Language='" + Env.GetAD_Language(ctx) + "')";
+                }
+                sql += @"LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                           
                             WHERE D_Chart.isActive='Y' AND AD_WidgetSize.isActive='Y' AND  D_ChartAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
-                            if (windowID > 0)
-                            {
-                                sql += " AND IsWindow='Y'";
-                            }
-                            else
-                            {
-                                sql += " AND Homepage='Y'";
-                            }
+                if (windowID > 0)
+                {
+                    sql += " AND IsWindow='Y'";
+                }
+                else
+                {
+                    sql += " AND Homepage='Y'";
+                }
 
                 sql += " UNION ALL ";
 
-                sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,RC_KPI.Name,colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA,RC_KPI.AD_Window_ID FROM RC_KPI INNER JOIN 
+                sql += @" SELECT RC_KPI.KPIType AS chartType, RC_KPI.RC_KPI_ID AS d_chart_id,";
+
+                if (baseLanguage)
+                {
+                    sql += "  RC_KPI.Name,";
+                }
+                else
+                {
+                    sql += "RC_KPI_Trl.Name,";
+                }
+
+                sql += @" colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA,RC_KPI.AD_Window_ID FROM RC_KPI INNER JOIN 
                             RC_KPIAccess ON (RC_KPI.RC_KPI_ID=RC_KPIAccess.RC_KPI_ID)
-                            INNER JOIN AD_WidgetSize ON (RC_KPI.RC_KPI_ID=AD_WidgetSize.RC_KPI_ID)
-                            LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
+                            INNER JOIN AD_WidgetSize ON (RC_KPI.RC_KPI_ID=AD_WidgetSize.RC_KPI_ID)";
+                if (!baseLanguage)
+                {
+                    sql += " INNER JOIN RC_KPI_Trl ON(RC_KPI_Trl.RC_KPI_ID=RC_KPI.RC_KPI_Id AND RC_KPI_Trl.AD_Language='" + Env.GetAD_Language(ctx) + "')";
+                }
+                sql += @" LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
                             WHERE RC_KPI.isActive='Y' AND AD_WidgetSize.isActive='Y' AND   RC_KPIAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
-                            if (windowID > 0)
-                            {
-                                sql += " AND IsWindow='Y'";
-                            }
-                            else
-                            {
-                                sql += " AND Homepage='Y'";
-                            }
+                if (windowID > 0)
+                {
+                    sql += " AND IsWindow='Y'";
+                }
+                else
+                {
+                    sql += " AND Homepage='Y'";
+                }
 
                 sql += " UNION ALL ";
 
-                sql += @" SELECT 'V' AS chartType, RC_View.RC_View_ID AS d_chart_id,RC_View.Name,colspan,rowspan,'V' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA, RC_View.AD_Window_ID FROM RC_View INNER JOIN 
+                sql += @" SELECT 'V' AS chartType, RC_View.RC_View_ID AS d_chart_id,";
+
+                if (baseLanguage)
+                {
+                    sql += " RC_View.Name,";
+                }
+                else
+                {
+                    sql += " RC_View_Trl.Name,";
+                }
+                sql += @" colspan,rowspan,'V' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA, RC_View.AD_Window_ID FROM RC_View INNER JOIN 
                             RC_ViewAccess ON (RC_View.RC_View_ID=RC_ViewAccess.RC_View_ID)
-                            INNER JOIN AD_WidgetSize ON (RC_View.RC_View_ID=AD_WidgetSize.RC_View_ID)
-                            LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
+                            INNER JOIN AD_WidgetSize ON (RC_View.RC_View_ID=AD_WidgetSize.RC_View_ID)";
+                if (!baseLanguage)
+                {
+                    sql += " INNER JOIN RC_View_Trl ON(RC_View_Trl.RC_View_ID=RC_View.RC_View_Id AND RC_View_Trl.AD_Language='" + Env.GetAD_Language(ctx) + "')";
+                }
+                sql += @" LEFT JOIN AD_IMAGE ON AD_IMAGE.AD_IMAGE_ID=AD_WidgetSize.AD_IMAGE_ID                            
                             WHERE RC_View.isActive='Y' AND AD_WidgetSize.isActive='Y' AND   RC_ViewAccess.AD_Role_ID=" + ctx.GetAD_Role_ID();
-                            if (windowID > 0)
-                            {
-                                sql += " AND IsWindow='Y'";
-                            }
-                            else
-                            {
-                                sql += " AND Homepage='Y'";
-                            }
+                if (windowID > 0)
+                {
+                    sql += " AND IsWindow='Y'";
+                }
+                else
+                {
+                    sql += " AND Homepage='Y'";
+                }
 
                 DataSet dataSet = DB.ExecuteDataset(sql);
                 if (dataSet != null && dataSet.Tables.Count > 0)
@@ -666,8 +709,8 @@ namespace VIS.Models
                 (SELECT TableName FROM AD_Table WHERE AD_Table_ID={tableID}) AS TableName,
                 (SELECT WhereClause FROM AD_Tab WHERE AD_Tab_ID={tabID}) AS TabWhere
                 FROM AD_UserQuery WHERE 
-                AD_Client_ID = { ctx.GetAD_Client_ID() } AND IsActive='Y' 
-                AND (AD_Tab_ID={ tabID } AND AD_Table_ID= { tableID }) 
+                AD_Client_ID = {ctx.GetAD_Client_ID()} AND IsActive='Y' 
+                AND (AD_Tab_ID={tabID} AND AD_Table_ID= {tableID}) 
                 ORDER BY Upper(Name), AD_UserQuery_ID";
 
                 DataSet ds = DB.ExecuteDataset(query);
@@ -847,8 +890,8 @@ namespace VIS.Models
                         + " ON " + keyCol + " = " + pTableName + "." + tblColName
 
                         + " ";// WHERE " + pTableName + ".IsActive='Y'";
-                   
-                    
+
+
                     sql = MRole.GetDefault(ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(""))
                         sql += " AND " + "";
@@ -863,8 +906,8 @@ namespace VIS.Models
             }
 
             //If DB is postgre, then append foo at end of subquery
-          /*  if (DB.IsPostgreSQL())
-                sql += " AS foo ";*/
+            /*  if (DB.IsPostgreSQL())
+                  sql += " AS foo ";*/
 
             List<DataSource> keyva = new List<DataSource>();
             DataSet ds = VIS.DBase.DB.ExecuteDatasetPaging(sql, 1, top);
