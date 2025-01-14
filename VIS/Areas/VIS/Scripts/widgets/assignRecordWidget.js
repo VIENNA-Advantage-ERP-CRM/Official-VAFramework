@@ -56,7 +56,7 @@
             widgetContainer.append(assignedRecWidget);
             $root.append(widgetContainer);
             AssignedRecords = widgetContainer.find('.vis-record-col');
-            createWindowUsers();
+            getWindowRecords();
         }
         //busy Indicator
         function createBusyIndicator() {
@@ -75,8 +75,7 @@
         };
 
         // Create Widget
-        function createWindowUsers() {
-            showBusy(true);
+        function getWindowRecords() {
             $.ajax({
                 url: VIS.Application.contextUrl + "AssignedRecordToUser/AssignRecordToUserWidget",
                 data: {
@@ -86,11 +85,13 @@
                 },
                 dataType: 'json',
                 success: function (result) {
-                    var result = result ? JSON.parse(result) : null;
-                    allRecords = result;
+                    showBusy(false);
+                    allRecords = result ? JSON.parse(result) : [];
                     updateUI();
+                },
+                error: function () {
+                    showBusy(false);
                 }
-
             });
         };
 
@@ -100,7 +101,6 @@
             if (allRecords == null || allRecords.length === 0) {
                 widgetContainer.find('h4').text('' + VIS.Msg.getMsg("VIS_AssignRecord") + ': 0');
                 AssignedRecords.text(VIS.Msg.getMsg('VIS_NoRecordFound')).addClass('vis-noRecordFound');
-                showBusy(false);
                 return;
             }
 
@@ -127,7 +127,7 @@
                 <span class="VIS_recordCount">${record.Count}</span>
                 </div>`;
                 AssignedRecords.append(AssignedItems);
-                showBusy(false);
+
             });
 
             // Add pagination UI
@@ -156,7 +156,7 @@
             widgetContainer.find('.vis-show-more').on('click', function () {
                 var popupContent = `                 
                        <div class="VIS_PopoverMaindiv">
-                       <button class="VIS_allWindowRecord" id="popup-close-btn">
+                       <button class="VIS_allWindowRecord" id="popup-close-btn" title="${VIS.Msg.getMsg('close')}">
                          <i class="fa fa-times" aria-hidden="true"></i>
                              </button>
                        <h3 class="VIS_popuptitle">${VIS.Msg.getMsg('VIS_AssignRecord')}:${allRecords[0].totalRecordCount}</h3>
