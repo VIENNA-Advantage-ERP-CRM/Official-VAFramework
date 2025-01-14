@@ -312,6 +312,9 @@
                         busyDiv(false);
                         VIS.ADialog.info(statusresult);
                     }
+                },
+                error: function () {
+                    busyDiv(false);
                 }
             });
         };
@@ -347,6 +350,9 @@
                         busyDiv(false);
                         VIS.ADialog.info(deleteresult);
                     }
+                },
+                error: function () {
+                    busyDiv(false);
                 }
             });
         };
@@ -414,6 +420,9 @@
                         }
 
                     };
+                },
+                error: function () {
+                    busyDiv(false);
                 }
 
             });
