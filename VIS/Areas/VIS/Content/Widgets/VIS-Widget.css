@@ -1344,5 +1344,5 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 
     .vis-a-closeBtnCls.close span {
         position: relative;
-        top: -2px;
+      /*  top: -2px;*/
     }

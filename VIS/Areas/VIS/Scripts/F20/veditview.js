@@ -724,11 +724,10 @@
                     if (agInstance.getIsNewIns()) { //only Once
                         insertCWrapper(label, agInstance, ctnr, mField);
                     }
-                    else { //apply style only
-                        var customStyle = mField.getHtmlStyle();
-                        if (editor != null && customStyle != "") {
-                            editor.getControl().attr('style', customStyle);
-                        }
+                    //apply style only
+                    var customStyle = mField.getHtmlStyle();
+                    if (editor != null && customStyle != "") {
+                        editor.getControl().attr('style', customStyle);
                     }
                 }
                 else {
