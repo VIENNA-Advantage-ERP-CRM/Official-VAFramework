@@ -256,8 +256,9 @@
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
     <Content Include="Areas\VIS\Content\Home.css" />
     <Content Include="Areas\VIS\Content\Images\bg-patt.svg" />
-    <Content Include="Areas\VIS\Content\Images\logo.png" />
+    <Content Include="Areas\VIS\Content\Images\logoold.png" />
     <Content Include="Areas\VIS\Content\Images\mail.svg" />
+    <Content Include="Areas\VIS\Content\Images\logo.png" />
     <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
     <Content Include="Areas\VIS\Content\Login.css" />
     <Content Include="Areas\VIS\Content\Menu.css" />
@@ -628,6 +629,7 @@
     <Content Include="Areas\VIS\Images\login\user-ico.png" />
     <Content Include="Areas\VIS\Images\login\warehouse.png" />
     <Content Include="Areas\VIS\Images\logo.jpg" />
+    <Content Include="Areas\VIS\Images\logo.png" />
     <Content Include="Areas\VIS\Images\main_screen.png" />
     <Content Include="Areas\VIS\Images\mDocAction.png" />
     <Content Include="Areas\VIS\Images\menuTree.PNG" />

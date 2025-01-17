@@ -1683,8 +1683,8 @@ namespace VIS.Helpers
                                 + " AND IsVersionApproved = 'Y' AND "
                                 + GlobalVariable.TO_DATE(inn.ValidFrom.Value, true) + @" < TRUNC(SysDate)
                                 AND (TRUNC(VersionValidFrom) > " + GlobalVariable.TO_DATE(inn.ValidFrom.Value, true) +
-                                @" AND TRUNC(VersionValidFrom) <= TRUNC(Sysdate))
-                                 ORDER BY VersionValidFrom DESC";
+                                @" AND TRUNC(VersionValidFrom) <= TRUNC(Sysdate))";
+                                 //ORDER BY VersionValidFrom DESC";
             if (Util.GetValueOfInt(DB.ExecuteScalar(sqlOldVer)) > 0)
                 return false;
             return true;
@@ -3841,7 +3841,8 @@ namespace VIS.Helpers
 
             for (int i = 0; i < lstFields.Count; i++)
             {
-                if (lstFields[i].lookupInfo != null && lstFields[i].displayType != DisplayType.Account)
+                if (lstFields[i].lookupInfo != null && lstFields[i].displayType != DisplayType.Account
+                    && lstFields[i].displayType != DisplayType.MultiKey)
                 {
                     var lInfo = lstFields[i].lookupInfo;
                     if (!string.IsNullOrEmpty(lInfo.displayColSubQ) && gt.TableName.ToLower() != lInfo.tableName.ToLower())

@@ -563,7 +563,8 @@ button.vis-ev-col-img-ctrl:focus,
     width: 35px;
     justify-content: center;
     cursor: pointer;
-    background-color: rgba(var(--v-c-secondary), 1);
+    /*  background-color: rgba(var(--v-c-secondary), 1);*/
+    background-color: transparent;
     z-index: 1;
     display: flex;
     align-items: center;
