@@ -2143,7 +2143,8 @@
         var field = this.getTargetMField(columnName);
         var columnSQL = field.getColumnSQL(); //
 
-        var isText = VIS.DisplayType.IsText(field.getDisplayType()) || VIS.DisplayType.List == field.getDisplayType() || VIS.DisplayType.YesNo == field.getDisplayType();
+        var isText = VIS.DisplayType.IsText(field.getDisplayType()) || VIS.DisplayType.List == field.getDisplayType() || VIS.DisplayType.YesNo == field.getDisplayType()
+                                            || VIS.DisplayType.MultiKey == field.getDisplayType();
         var isList = VIS.DisplayType.List == field.getDisplayType();
         if (value != null && value.length > 0 && isText) {
             if (optr == VIS.Query.prototype.LIKE || optr == VIS.Query.prototype.NOT_LIKE) {
