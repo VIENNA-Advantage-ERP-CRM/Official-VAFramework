@@ -41,6 +41,10 @@
         font-size: 14px;
     }
 
+        .VIS-nm-dasboard-search input:focus {
+            box-shadow: 0 0 0 .2rem rgba(var(--v-c-primary), .25);
+        }
+
     .VIS-nm-dasboard-search .fa-search {
         position: absolute;
         left: 12px;
@@ -338,6 +342,7 @@
         flex-shrink: 0;
         min-width: 100px;
         border-left: aliceblue 1px solid;
+        justify-items: center;
     }
 
 /*.vis-nav-horizontal-scroll ul li:nth-last-child(1) .vis-nav-horizontal-scroll-onhover-items {

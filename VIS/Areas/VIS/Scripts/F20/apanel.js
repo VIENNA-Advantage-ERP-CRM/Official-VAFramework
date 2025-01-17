@@ -1301,8 +1301,8 @@
                     else {
                         $txtSearch.val(text);
                     }
-                    $btnClrSearch.css('visibility', 'visible');
-                    $txtSearch.attr("readonly", "readonly");
+                    //$btnClrSearch.css('visibility', 'visible');
+                    //$txtSearch.attr("readonly", "readonly");
                     $selfpanel.defaultSearch = false;
                 }
                 else {

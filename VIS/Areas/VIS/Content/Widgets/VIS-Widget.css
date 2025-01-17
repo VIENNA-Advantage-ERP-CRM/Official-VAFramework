@@ -349,9 +349,16 @@
 .vis-w-workflow-homepage-activites .vis-w-feedDetails {
     cursor: pointer;
 }
-/*.vis-w-activityContainer:hover {
-    border: .0625em solid rgba(var(--v-c-primary),1);
-}*/
+
+.vis-w-activityContainer:hover {
+    border-color: rgba(var(--v-c-primary), 1);
+}
+
+    .vis-w-activityContainer .vis-w-feedDetails:hover p {
+        color: rgba(var(--v-c-primary), 1);
+    }
+
+
 .vis-secondary-clr {
     color: rgba(var(--v-c-on-secondary),.9) !important;
 }
