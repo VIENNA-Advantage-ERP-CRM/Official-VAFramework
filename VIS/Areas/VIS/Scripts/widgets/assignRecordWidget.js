@@ -156,7 +156,7 @@
             widgetContainer.find('.vis-show-more').on('click', function () {
                 var popupContent = `                 
                        <div class="VIS_PopoverMaindiv">
-                       <button class="VIS_allWindowRecord" id="popup-close-btn" title="${VIS.Msg.getMsg('close')}">
+                       <button class="VIS_popupClose" id="popup-close-btn" title="${VIS.Msg.getMsg('close')}">
                          <i class="fa fa-times" aria-hidden="true"></i>
                              </button>
                        <h3 class="VIS_popuptitle">${VIS.Msg.getMsg('VIS_AssignRecord')}:${allRecords[0].totalRecordCount}</h3>
