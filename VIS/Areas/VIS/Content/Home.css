@@ -3639,11 +3639,15 @@ ul.vis-userLinks-ListMenu li a i {
         background-color: rgba(var(--v-c-mandatory), 1);
         padding: 0.4rem;
         display: block;
-        color: rgba(var(--v-c-common), 1);
+        color: rgba(var(--v-c-common), 1) !important;
         font-size: 1rem;
         cursor: pointer;
+        border: 1px solid rgba(var(--v-c-mandatory), 1);
     }
 
+        .vis-widget-header .vis:focus {
+            border: 1px solid rgba(var(--v-c-primary), 1) !important;
+        }
 
 .vis-widgetDrag-container {
     display: flex;
