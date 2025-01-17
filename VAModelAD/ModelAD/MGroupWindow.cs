@@ -274,12 +274,14 @@ namespace VAdvantage.Model
         {
             try
             {
-                DataSet ds = DB.ExecuteDataset(@"SELECT DISTINCT WG.AD_Widget_ID, GW.AD_Widget_ID AS IsWidgetExist FROM AD_Widget WG 
-                                   INNER JOIN AD_Window WD ON (WD.AD_Window_ID=WG.AD_Window_ID)  
+
+                    string query=@"SELECT DISTINCT WG.AD_Widget_ID, GW.AD_Widget_ID AS IsWidgetExist FROM AD_Widget WG 
+                                   LEFT JOIN AD_Window WD ON (CAST(WD.AD_Window_ID AS NVARCHAR2(1000)) = WG.AD_Window_ID)  
                                    LEFT JOIN AD_Group_Widget GW ON(GW.AD_Widget_ID=WG.AD_Widget_ID) AND 
-                                   GW.AD_GroupInfo_ID= " + GetAD_GroupInfo_ID() + @" 
-                                   WHERE WD.AD_Window_ID=" + GetAD_Window_ID() + @" 
-                                   AND WG.IsActive='Y'");
+                                   GW.AD_GroupInfo_ID= " + GetAD_GroupInfo_ID() + @"
+                                   WHERE(WG.AD_Window_ID like '" + GetAD_Window_ID() + "' OR WG.AD_Window_ID like '" + GetAD_Window_ID() + ",%' OR WG.AD_Window_ID like '%," + GetAD_Window_ID() + "' OR WG.AD_Window_ID like '%," + GetAD_Window_ID() +@"
+                                   ,% ') AND WG.IsActive='Y'";
+                DataSet ds = DB.ExecuteDataset(query);
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
                     for (int i = 0, ln = ds.Tables[0].Rows.Count; i < ln; i++)
