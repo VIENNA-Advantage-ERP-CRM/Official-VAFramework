@@ -470,7 +470,7 @@ select {
 
 .vis-chatBoxInputWrap textarea {
     flex: 1;
-    border: none;
+    border: none !important;
     background: none;
     resize: none;
 }
