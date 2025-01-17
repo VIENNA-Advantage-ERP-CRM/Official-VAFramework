@@ -325,6 +325,9 @@ select {
     background-image: url(../Images/logo.png);
     background-position-y: center;
     background-size: contain;
+    background-color: white;
+    background-repeat: no-repeat;
+    background-position-y: 50%;
 }
 
 /*end footer*/
