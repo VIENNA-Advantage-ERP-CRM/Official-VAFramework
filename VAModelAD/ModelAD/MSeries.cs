@@ -850,7 +850,7 @@ namespace VAdvantage.Model
                             .Append(SPACE + "ColY");
 
                     unionTableQuery.Append(" FROM(");
-                    calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
+                    calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE IsActive='Y' AND D_Series_ID=" + GetD_Series_ID()));
                     string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE  D.IsActive='Y' AND  C.D_Chart_ID=" + GetD_Chart_ID();
                     DataSet dsw = DB.ExecuteDataset(Consolidated);
 
@@ -1104,7 +1104,7 @@ namespace VAdvantage.Model
             if (DB.IsPostgreSQL())
             {
 
-                sb.Append(@" SELECT " + colName + @", " + function + @" FROM GENERATE_SERIES(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), TO_DATE('" + m_date2 + "', 'MM/DD/YYYY'), INTERVAL '1 day') AS " + colName + @" WHERE " + colName + @" > DATE '0001-01-01'");
+                sb.Append(@" SELECT " + colName + @", " + function + @" FROM GENERATE_SERIES(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), TO_DATE('" + m_date2 + "', 'MM/DD/YYYY') - INTERVAL '1 day', INTERVAL '1 day') AS " + colName + @" WHERE " + colName + @" > DATE '0001-01-01'");
 
             }
             else
@@ -1721,7 +1721,6 @@ namespace VAdvantage.Model
                     {
                         if (this.GetLastNValue() == 0)
                         {
-                            //  m_date2 = "12/" + DateTime.DaysInMonth(dt_to.Year, 12) + "/" + dt_to.Year;
                             dt_to = dt_to.AddYears(1);
                             m_date2 = "1/1/" + dt_to.Year;
                         }
