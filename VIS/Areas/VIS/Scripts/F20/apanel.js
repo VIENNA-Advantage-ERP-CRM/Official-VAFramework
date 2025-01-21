@@ -481,7 +481,7 @@
         this.createToolBar = function () {
 
             //1. toolbar action
-            this.aHome = this.addActions("HOE", null, true, true, false, onAction, null, "Shct_Home", "home");
+            this.aHome = this.addActions("HOE", null, true, true, false, onAction, null, "Shct_Home", "parent-tab");
             this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh", "Refresh");
             this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete", "Delete");
             this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");

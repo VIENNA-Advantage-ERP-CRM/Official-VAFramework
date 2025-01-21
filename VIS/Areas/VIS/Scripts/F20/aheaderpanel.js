@@ -381,7 +381,12 @@
                                 } else if (mField.getDisplayType() == VIS.DisplayType.Image) {
                                     if (iControl != null) {
                                         this.imgCtrl.push(iControl);
-                                        iControl.setReadOnly(false);
+                                        if (mField.getIsEditable(true)) {
+                                            iControl.setReadOnly(false);
+                                        } else {
+                                            iControl.setReadOnly(true);
+                                        }
+                                       
                                         iControl.addVetoableChangeListener(this);
                                     }
                                 }

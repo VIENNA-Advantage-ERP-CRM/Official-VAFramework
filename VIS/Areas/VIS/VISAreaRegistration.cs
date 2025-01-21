@@ -210,7 +210,12 @@ namespace VIS
             //    "~/Areas/VIS/Content/F20/Window.css",
             //            "~/Areas/VIS/Content/F20/Controls.css",
             //             "~/Areas/VIS/Content/F20/Media.css",
-            //             "~/Areas/VIS/Content/F20/ThemeCnfgtr.css"
+            //             "~/Areas/VIS/Content/F20/ThemeCnfgtr.css",
+            //  "~/Areas/VIS/Content/F20/ThemeCnfgtr.css",
+            //             "~/Areas/VIS/Content/Menu.css",
+            //    "~/Areas/VIS/Content/Widgets/VIS-Widget.css",
+            //   "~/Areas/VIS/Content/Widgets/VISTemplateExcel.css",
+            //   "~/Areas/VIS/Content/Widgets/AssignRecordWidget.css"
             //    );
             //style.Include("~/Areas/VIS/Content/VIS.rtl.css");
 

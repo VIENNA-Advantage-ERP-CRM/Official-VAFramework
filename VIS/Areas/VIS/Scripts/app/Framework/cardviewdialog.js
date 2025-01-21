@@ -927,8 +927,14 @@
         function CardViewUI(temResult) {
             root.load(VIS.Application.contextUrl + 'CardViewWizard/Index/?windowno=' + WindowNo, function (event) {
                 /*step 1*/
+
                 root.append(isBusyRoot);
                 IsBusy(true);
+
+                if (VIS.Application.isRTL) {
+                    root.find('#Blank_Template').attr('transform', 'translate(450 292)');
+                }
+
                 DivCradStep1 = root.find('#DivCardStep1_' + WindowNo);
                 DivCradStep1.hide();
                 btnCardCustomization = root.find('#btnCardCustomization_' + WindowNo);
