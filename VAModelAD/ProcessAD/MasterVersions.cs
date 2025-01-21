@@ -28,7 +28,7 @@ namespace VAdvantage.Process
         private int _AD_Column_ID = 0;
         public List<String> listDefVerCols = new List<String> { "VersionValidFrom", "IsVersionApproved", "ProcessedVersion", "RecordVersion", "Processed", "Processing", "VersionLog", "OldVersion" };
         public List<int> listDefVerRef = new List<int> { 15, 20, 20, 11, 20, 20, 14, 11 };
-        public List<String> listDefVerValues = new List<String> { "Created", "'Y'", "'Y'", "1", "'Y'", "'N'", "''", "''" };
+        public List<String> listDefVerValues = new List<String> { "Created", "'Y'", "'Y'", "1", "'Y'", "'N'", "''", "NULL" };
         private List<int> _listDefVerElements = new List<int>();  //{ 617, 351, 1047, 524, 624 };
         private StringBuilder MKWhereClause = new StringBuilder("");
         private Trx _trx = null;

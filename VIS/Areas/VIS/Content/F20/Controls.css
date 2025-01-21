@@ -379,8 +379,15 @@ select.vis-ev-col-mandatory {
 }
 
 .vis-input-wrap .input-group-text:focus {
-    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
+    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1) !important;
     border-left-color: rgba(var(--v-c-primary), 1) !important;
+    position: relative;
+     
+}
+
+.vis-ad-w-p-vc-editview .vis-input-wrap .input-group-text:focus {
+    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1) !important;
+    border-left-color: rgba(var(--v-c-on-secondary), .2) !important;
     position: relative;
 }
 
@@ -523,6 +530,9 @@ button.vis-ev-col-img-ctrl:focus,
 .input-group:focus-within .input-group-append .input-group-text {
     border: 1px solid transparent;
     border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
+    border-left: 1px solid rgba(var(--v-c-primary), 1);
+    border: 1px solid rgba(var(--v-c-primary), 1);
+    border-left-color: rgba(var(--v-c-on-secondary), .2);
 }
 
 .vis-ad-w-p-vc-editview .input-group:focus-within .input-group-append .input-group-text {
@@ -744,6 +754,10 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label {
 .vis-input-wrap .vis-ev-col-mandatory {
     color: rgba(var(--v-c-mandatory),1);
     background-color: inherit !important;
+}
+
+.vis-input-wrap:has(input:focus) .vis-ev-col-mandatory {
+    color: rgba(var(--v-c-on-secondary), 1);
 }
     /*.vis-input-wrap input.vis-ev-col-mandatory:not(:focus), .vis-input-wrap select:not(:focus).vis-ev-col-mandatory {
     border: 1px solid #ec3f3f;
