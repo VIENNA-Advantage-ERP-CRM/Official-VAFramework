@@ -411,10 +411,10 @@ else //Login Page
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        width:100%;
+                        width: 100%;
                     }
 
-                   
+
 
                     .prefix-form-group-col {
                         display: flex;
@@ -430,7 +430,7 @@ else //Login Page
                         padding: 0 0 0.5rem;
                     }
 
-                   
+
                     .prefix-poweredby-col {
                         position: absolute;
                         right: 1.5rem;
@@ -452,12 +452,19 @@ else //Login Page
                             <img src="Areas/VIS/WebPages/login-form/images/onfinity-logo.png" alt="">
                         </div>
                     </div>
-                    </div>
+                </div>
             </object>
         </div>
     </div>
 
     @section scripts {
+        <script>
+             var isStep2Validate = @Html.Raw(Json.Encode(TempData["isStep2Validate"]));
+             var ModelData = @Html.Raw(Json.Encode(TempData["ModelData"]));
+             if (isStep2Validate) {
+                 $("#loginPanel").hide();
+             }
+        </script>
         <link type="text/css" href="~/Areas/VIS/Content/Login.css" rel="stylesheet" />
         <script type="text/javascript">  var contextUrl = '@Url.Content("~/")'  </script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/globalize.js"></script>
