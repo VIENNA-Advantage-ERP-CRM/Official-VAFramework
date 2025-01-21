@@ -262,7 +262,8 @@ namespace VIS.Controllers
             }
             //System.Threading.Thread.Sleep(10000);
             //FormsAuthentication.SetAuthCookie(model.Login1Model.UserName, false);
-            return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model });
+            HttpCookie cookie = this.Request.Cookies["ProviderType"];
+            return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model, provider = cookie?.Value });
         }
 
         [AllowAnonymous]
