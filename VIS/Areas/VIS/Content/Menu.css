@@ -90,6 +90,7 @@
         -webkit-line-clamp: 2;
         display: -webkit-box;
         overflow: hidden;
+        word-break: break-word;
     }
 
     .VIS-nm-opt-link:hover {
