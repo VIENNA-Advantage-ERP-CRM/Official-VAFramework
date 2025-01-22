@@ -3646,7 +3646,7 @@ ul.vis-userLinks-ListMenu li a i {
     }
 
         .vis-widget-header .vis:focus {
-            border: 1px solid rgba(var(--v-c-primary), 1) !important;
+            box-shadow: 0 0 10px rgba(var(--v-c-primary),.7) !important;
         }
 
 .vis-widgetDrag-container {
