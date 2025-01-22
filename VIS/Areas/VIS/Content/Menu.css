@@ -5,9 +5,9 @@
     display: grid;
     grid-column-gap: 6px;
     overflow-x: auto;
+    padding-left: 12px;
+    margin-left: -12px;
 }
-
-
 
 .VIS-nm-dashboard-flyout {
     /*background-color: #fff;*/
