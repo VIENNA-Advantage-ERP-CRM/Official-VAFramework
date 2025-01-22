@@ -600,6 +600,7 @@
     <Content Include="Areas\VIS\Images\link-del.png" />
     <Content Include="Areas\VIS\Images\LoadingCircle.gif" />
     <Content Include="Areas\VIS\Images\Location.png" />
+    <Content Include="Areas\VIS\Images\login\arrow-down.png" />
     <Content Include="Areas\VIS\Images\login\bg2.jpg" />
     <Content Include="Areas\VIS\Images\login\calender.png" />
     <Content Include="Areas\VIS\Images\login\client.png" />
