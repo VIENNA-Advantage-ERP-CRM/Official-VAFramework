@@ -637,6 +637,7 @@ button.vis-ev-col-img-ctrl:focus,
     height: auto;
     left: 0;
     display: flex;
+    white-space: unset
 }
 
 .vis-ad-w-p-vc-editview .vis-control-wrap > label:first-child::after {

@@ -1031,7 +1031,7 @@ html[dir="rtl"] .vis-fp-popup-arrow {
 }
 
 html[dir="rtl"] .vis-fttrBtn button {
-    text-align: center;
+    text-align: center !important;
 }
 
 html[dir="rtl"] .vis-clearFilter {

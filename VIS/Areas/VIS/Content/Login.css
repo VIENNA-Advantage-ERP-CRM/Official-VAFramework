@@ -362,11 +362,23 @@ html, body {
     padding:30px;
 }
 
+/*.input-row {
+    border-bottom: 1px solid rgba(238,238,238);
+    margin: 30px 0px;
+    padding-bottom: 5px;
+}*/
+
 .input-row {
     border-bottom: 1px solid rgba(238,238,238);
     margin: 30px 0px;
     padding-bottom: 5px;
+    display: flex;
+    align-items: center;
 }
+
+    .input-row:hover, .input-row:focus-within {
+        border-color: #0098f7;
+    }
 
 .input-icon {
     /* width: 18px; */
@@ -433,28 +445,48 @@ input::-webkit-input-placeholder {
     border-radius:21px;
 }
 
-.language {
-    width: calc(100% - 42px);
+/*.language {
+    width: calc(100% - 42px);*/
     /*height: 17px;
    overflow: hidden;*/
-    overflow: -moz-hidden-unscrollable;
+    /*overflow: -moz-hidden-unscrollable;
     background: url(../Images/login/combo-arrow.png) no-repeat right;
     display: inline-block;
     position: relative;
     padding-right: 12px;
+}*/
+.language {
+    position: relative;
+    width: calc(100% - 42px);
+}
+
+    .language::after {
+        content: " ";
+        background: url(../Images/login/arrow-down.png) no-repeat 0 0;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translate(0, -50%);
+        display: flex;
+        width: 12px;
+        height: 8px;
+    }
+html[dir="rtl"] .language::after {
+    right: unset;
+    left:0;
 }
 
     .language > select {
-        background: transparent;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        width: 100%;
-        font-size: 18px;
-        border: 0;
-        color: rgba(102, 102, 102);
-        outline: none;
-        padding-left:2px;
-    }
+    background: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    font-size: 18px;
+    border: 0;
+    color: rgba(102, 102, 102);
+    outline: none;
+    padding-left: 2px;
+}
 
         .language > select > option {
             background: rgba(255,255,255,.2);

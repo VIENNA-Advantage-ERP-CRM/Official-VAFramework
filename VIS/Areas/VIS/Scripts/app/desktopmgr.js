@@ -67,10 +67,10 @@
         * layout and events binding
         */
         function bindEvents() {
-
-            $vIcon.on('click', function () {
-                VIS.UserSession.show();
-            });
+            //User Session management and broadcast message
+            //$vIcon.on('click', function () {
+            //    VIS.UserSession.show();
+            //});
 
             $menuOverlay.on(VIS.Events.onTouchStartOrClick, function (event) {
                 event.preventDefault();
