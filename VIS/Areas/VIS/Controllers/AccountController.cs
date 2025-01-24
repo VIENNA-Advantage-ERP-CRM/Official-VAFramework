@@ -48,7 +48,7 @@ namespace VIS.Controllers
 
 
             var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
-            string sql = "SELECT ct.claimtype,ct.code FROM SSO_Mapping INNER JOIN claim_type ct ON SSO_Mapping.claimtype=ct.code WHERE SSO_Configuration_ID=" + provider.Split('_')[0];
+            string sql = "SELECT ct.claimtype,ct.code FROM SSO_Mapping INNER JOIN claimtype ct ON SSO_Mapping.claimtype=ct.code WHERE SSO_Configuration_ID=" + provider.Split('_')[0];
             DataSet DS = DB.ExecuteDataset(sql);
 
             if (DS != null && DS.Tables.Count > 0)

@@ -232,7 +232,7 @@ select {
 /*footer*/
 
 .vis-app-footer {
-    height: 23px;
+    height: 24px;
     grid-column-start: 1;
     grid-row-start: 3;
     background-color: rgba(var(--v-c-primary),0.12);
