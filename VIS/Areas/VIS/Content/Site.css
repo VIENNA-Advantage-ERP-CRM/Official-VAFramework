@@ -401,7 +401,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
     /*background: url('../images/home/mainMenu-BG.png') 0px 0px repeat;*/
     background: #fff;
     position: fixed;
-    z-index: 999;
+    z-index: 1000;
     top: 42px;
     left: 0px;
     /*bottom: 0px;*/

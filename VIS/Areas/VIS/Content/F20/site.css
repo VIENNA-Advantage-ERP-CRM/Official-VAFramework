@@ -232,7 +232,7 @@ select {
 /*footer*/
 
 .vis-app-footer {
-    height: 24px;
+    height: 23px;
     grid-column-start: 1;
     grid-row-start: 3;
     background-color: rgba(var(--v-c-primary),0.12);
@@ -263,7 +263,7 @@ select {
         padding: 0px 10px 0px 10px;
         color: rgba(var(--v-c-on-primary), 1);
         align-items: center;
-        min-height: 23px;
+        min-height: 22px;
     }
 
         .vis-app-footer li:first-child {
@@ -308,6 +308,7 @@ select {
     position: absolute;
     left: 0;
     bottom:0;
+    min-height:23px !important
 }
 
 .vis-app-footer-c-l {
