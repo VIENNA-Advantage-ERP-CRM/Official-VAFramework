@@ -601,7 +601,7 @@ namespace VAdvantage.Model
                 }
                 else
                 {
-                    sb.Append(ApplyAggregateFunction(s_colY, false));
+                    sb.Append(ApplyAggregateFunction(s_colY, true));
                 }
 
                 sb.Append(" ColY ");
