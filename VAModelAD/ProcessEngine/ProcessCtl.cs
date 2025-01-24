@@ -111,13 +111,16 @@ namespace VAdvantage.ProcessEngine
                     NpgsqlCommandBuilder.DeriveParameters(comm);
                     NpgsqlParameter[] param = new NpgsqlParameter[1];
 
+                    string sql = "select * from " + procedureName + "(";
                     foreach (NpgsqlParameter orp in comm.Parameters)
                     {
                         param[0] = new NpgsqlParameter(orp.ParameterName, _pi.GetAD_PInstance_ID());
+                        sql += "@" + orp.ParameterName;
                     }
+                    sql += ")";
 
                     //log.Fine("Executing " + procedureName + "(" + _pi.GetAD_PInstance_ID() + ")");
-                    int res = SqlExec.PostgreSql.PostgreHelper.ExecuteNonQuery(conn1, CommandType.StoredProcedure, procedureName, param);
+                    int res = SqlExec.PostgreSql.PostgreHelper.ExecuteNonQuery(conn1, CommandType.Text, sql, param);
                     conn1.Close();
                     if (res < 0)
                     {
@@ -270,8 +273,27 @@ namespace VAdvantage.ProcessEngine
                         i++;
                     }
 
+                    string sql = "select * from " + procedureName + "(";
+                    if (param != null)
+                    {
+                        for (int p = 0; p < param.Length; p++)
+                        {
+                            if (param[p].Direction == ParameterDirection.Output)
+                            {
+                                continue;
+                            }
+
+                            if (p > 0)
+                            {
+                                sql += ", @" + param[p].ParameterName;
+                                continue;
+                            }
+                            sql += "@" + param[p].ParameterName;
+                        }
+                    }
+                    sql += ")";
                     //log.Fine("Executing " + procedureName + "(" + _pi.GetAD_PInstance_ID() + ")");
-                    int res = SqlExec.PostgreSql.PostgreHelper.ExecuteNonQuery(conn1, CommandType.StoredProcedure, procedureName, param);
+                    int res = SqlExec.PostgreSql.PostgreHelper.ExecuteNonQuery(conn1, CommandType.Text, procedureName, param);
                     conn1.Close();
                     if (res < 0)
                     {
@@ -1574,7 +1596,7 @@ namespace VAdvantage.ProcessEngine
 
         #endregion
 
-       
+
     }
 }
 

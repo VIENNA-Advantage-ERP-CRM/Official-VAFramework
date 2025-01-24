@@ -468,7 +468,7 @@ namespace VAModelAD.Model
                 if (poMaster.Get_ColumnIndex(columnName) < 0)
                     continue;
 
-                if (poMaster.Get_Value(columnName) != po.Get_ValueOld(columnName))
+                if (!Util.IsEqual(poMaster.Get_Value(columnName), po.Get_ValueOld(columnName)))
                 {
                     poMaster.Set_ValueNoCheck(columnName, po.Get_Value(columnName));
                 }
