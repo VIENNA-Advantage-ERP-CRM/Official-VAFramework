@@ -338,6 +338,10 @@
                 var AD_Form_ID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetFormID",
                     { "formName": value.ActionName }, null);
                 if (AD_Form_ID > 0) {
+                    if (!VIS.MRole.getFormAccess(AD_Form_ID)) {
+                        VIS.ADialog.warn("AccessTableNoView");
+                        return;
+                    }
                     VIS.viewManager.startForm(AD_Form_ID, null);  // Open Form
                 }
             }
@@ -345,6 +349,10 @@
                 var Ad_Process_ID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetProcessID",
                     { "processName": value.ActionName }, null);
                 if (Ad_Process_ID > 0) {
+                    if (!VIS.MRole.getProcessAccess(Ad_Process_ID)) {
+                        VIS.ADialog.warn("AccessTableNoView");
+                        return;
+                    }
                     VIS.viewManager.startProcess(Ad_Process_ID, null); // Open Process
                 }
             }

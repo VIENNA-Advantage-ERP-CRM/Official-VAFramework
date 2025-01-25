@@ -18,7 +18,6 @@
         var $root = $('<div class="vis-maindiv">');
         var widgetContainer = null;
         var assignedRecWidget;
-        var welcomeAssignedDivId;
         var pageSize = 0;
         var pageNo = 0;
         var AssignedRecords = null;
@@ -40,11 +39,15 @@
 
         /* Initialize the form design */
         this.Initalize = function () {
-            widgetID = this.widgetInfo.AD_UserHomeWidgetID;
-            widgetContainer = $('<div class="VIS_widget-container" id="Vis_Widget-container_' + widgetID + '">');
+            widgetID = $self.widgetInfo.AD_UserHomeWidgetID;
             createBusyIndicator();
+            showBusy(true);
+            loadWidget();
+        };
+        function loadWidget() {
+            widgetContainer = $('<div class="VIS_widget-container" id="Vis_Widget-container_' + $self.widgetInfo.AD_UserHomeWidgetID + '">');
             assignedRecWidget = $('<div><h4></h4></div>' +
-                '<div class="vis-assigned-records" id ="VIS_assignRecords_' + widgetID + '">' +
+                '<div class="vis-assigned-records" id ="VIS_assignRecords_' + $self.widgetInfo.AD_UserHomeWidgetID + '">' +
                 '<div class="vis-record-col">' +
                 '<div class="vis-windowList">' +
                 '</div>' +
@@ -52,24 +55,27 @@
                 '</div>');
             widgetContainer.append(assignedRecWidget);
             $root.append(widgetContainer);
-            AssignedRecords = assignedRecWidget.find('.vis-record-col');
-            $bsyDiv[0].style.visibility = "visible";
-            createWindowUsers();
+            AssignedRecords = widgetContainer.find('.vis-record-col');
+            getWindowRecords();
+        }
+        //busy Indicator
+        function createBusyIndicator() {
+            $bsyDiv = $('<div id="busyDivId' + $self.widgetInfo.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.widgetInfo.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
+            $root.append($bsyDiv);
         };
 
 
-        /* busy Indicator*/
-        function createBusyIndicator() {
-            $bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis_widgetloader"></i></div></div>');
-            $bsyDiv.css({
-                "position": "absolute", "width": "98%", "height": "97%", 'text-align': 'center', 'z-index': '999'
-            });
-            $bsyDiv[0].style.visibility = "visible";
-            widgetContainer.append($bsyDiv);
+        function showBusy(show) {
+            if (show) {
+                $root.find("#busyDivId" + $self.widgetInfo.AD_UserHomeWidgetID).show();
+            }
+            else {
+                $root.find("#busyDivId" + $self.widgetInfo.AD_UserHomeWidgetID).hide();
+            }
         };
 
         // Create Widget
-        function createWindowUsers() {
+        function getWindowRecords() {
             $.ajax({
                 url: VIS.Application.contextUrl + "AssignedRecordToUser/AssignRecordToUserWidget",
                 data: {
@@ -79,21 +85,22 @@
                 },
                 dataType: 'json',
                 success: function (result) {
-                    var result = result ? JSON.parse(result) : null;
-                    allRecords = result;
+                    showBusy(false);
+                    allRecords = result ? JSON.parse(result) : [];
                     updateUI();
+                },
+                error: function () {
+                    showBusy(false);
                 }
-
             });
         };
 
-      /*  update UI*/
+        /*  update UI*/
         function updateUI() {
             AssignedRecords.empty(); // Clear existing records
-            if (allRecords.length === 0) {
-                widgetContainer.find('h4').text(''+ VIS.Msg.getMsg("VIS_AssignRecord") +': 0');
+            if (allRecords == null || allRecords.length === 0) {
+                widgetContainer.find('h4').text('' + VIS.Msg.getMsg("VIS_AssignRecord") + ': 0');
                 AssignedRecords.text(VIS.Msg.getMsg('VIS_NoRecordFound')).addClass('vis-noRecordFound');
-                $bsyDiv[0].style.visibility = "hidden";
                 return;
             }
 
@@ -120,7 +127,7 @@
                 <span class="VIS_recordCount">${record.Count}</span>
                 </div>`;
                 AssignedRecords.append(AssignedItems);
-                $bsyDiv[0].style.visibility = "hidden";
+
             });
 
             // Add pagination UI
@@ -129,7 +136,7 @@
             <i class="fa fa-arrow-circle-up vis_prevpage" aria-hidden="true"></i>
             <span class="vis-total-count" style="color: white;">${currentPage} / ${totalPages}</span>
             <i class="fa fa-arrow-circle-down  vis_NxtPage" aria-hidden="true"></i>             
-             <i class="fa fa-list vis-show-more" aria-hidden="true"></i>
+            <i class="fa fa-list vis-show-more" aria-hidden="true" title="${VIS.Msg.getMsg('ShowAll')}"></i>
             </div>`;
             widgetContainer.find('.vis-tiles-pagination').remove(); // Remove old pagination
             widgetContainer.append(paginationHtml);
@@ -147,17 +154,17 @@
             //Popover for showing all records
             widgetContainer.find('.vis-show-more').off('click')
             widgetContainer.find('.vis-show-more').on('click', function () {
-                   var popupContent = `                 
+                var popupContent = `                 
                        <div class="VIS_PopoverMaindiv">
-                       <button class="VIS_allWindowRecord" id="popup-close-btn">
+                       <button class="VIS_popupClose" id="popup-close-btn" title="${VIS.Msg.getMsg('close')}">
                          <i class="fa fa-times" aria-hidden="true"></i>
                              </button>
                        <h3 class="VIS_popuptitle">${VIS.Msg.getMsg('VIS_AssignRecord')}:${allRecords[0].totalRecordCount}</h3>
                        <div class="VIS_popupRecordDetail">
                                                `;
-                    // Loop through allRecords and dynamically add rows
-                    for (var i = 0; i < allRecords.length; i++) {
-                        popupContent += `
+                // Loop through allRecords and dynamically add rows
+                for (var i = 0; i < allRecords.length; i++) {
+                    popupContent += `
                    <div class="VIS_WindowRecord"  visWindowname="${allRecords[i].WindowName}"
                    visWindowId="${allRecords[i].WindowID}"
                    visTableName="${allRecords[i].TableName}"
@@ -165,45 +172,45 @@
                    <span>${allRecords[i].WindowName}</span>
                     <span class="VIS_popupRecordCount">${allRecords[i].Count}</span>
                   </div>`;
-                    }
-                    popupContent += `
+                }
+                popupContent += `
                    </div>
                    </div>`
 
-                    // Open the Popup
-                    w2popup.open({
-                        title: '', 
-                        body: popupContent,
-                        width: 500,
-                        height: 500,
-                        showMax: true, // Disable maximize option
-                        showClose: true, // Ensure close button is shown
-                        modal: false,    // Modal behavior to disable interaction outside the popup
-                        style: 'background: linear-gradient(135deg, #6b8ce3, #8dc7f8);', 
-                        buttons: '', 
-                        onOpen: function () {
-                            setTimeout(function () {
-                                $('#popup-close-btn').on('click', function () {
-                                    w2popup.close();
-                                });
-                                $('.w2ui-popup .VIS_WindowRecord').on('click', function () {
-                                    w2popup.close();
-                                    WindowName = $(this).attr('visWindowname');
-                                    WindowId = $(this).attr('visWindowId');
-                                    TableName = $(this).attr('visTableName');
-                                    Record_ID = $(this).attr('visRecordId');
-                                    // Call your zoomWindow function
-                                    zoomWindow();
-                                    
-                                });
-                            }, 1000);
-                        }
+                // Open the Popup
+                w2popup.open({
+                    title: '',
+                    body: popupContent,
+                    width: 500,
+                    height: 500,
+                    showMax: true, // Disable maximize option
+                    showClose: true, // Ensure close button is shown
+                    modal: false,    // Modal behavior to disable interaction outside the popup
+                    style: 'background: linear-gradient(135deg, #6b8ce3, #8dc7f8);',
+                    buttons: '',
+                    onOpen: function () {
+                        setTimeout(function () {
+                            $('#popup-close-btn').on('click', function () {
+                                w2popup.close();
+                            });
+                            $('.w2ui-popup .VIS_WindowRecord').on('click', function () {
+                                w2popup.close();
+                                WindowName = $(this).attr('visWindowname');
+                                WindowId = $(this).attr('visWindowId');
+                                TableName = $(this).attr('visTableName');
+                                Record_ID = $(this).attr('visRecordId');
+                                // Call your zoomWindow function
+                                zoomWindow();
 
-                    });
+                            });
+                        }, 1000);
+                    }
+
                 });
-           
+            });
 
-           // handling prev page
+
+            // handling prev page
             widgetContainer.find('.vis_prevpage').off('click')
             widgetContainer.find('.vis_prevpage').on('click', function () {
                 if (currentPage > 1) {
@@ -223,7 +230,7 @@
                 'opacity': currentPage <= 1 ? '0.6' : '1'
             });
 
-        /*    zooming window */
+            /*    zooming window */
             AssignedRecords.find('.vis-record-box').off('click')
             AssignedRecords.find('.vis-record-box').on('click', function () {
                 WindowName = $(this).attr('visWindowname');
@@ -234,7 +241,7 @@
             });
         };
 
-        
+
         function zoomWindow() {
             if (WindowId > 0) {
                 var windowParam = {
@@ -251,11 +258,16 @@
 
         /*this function is used to refresh the design and data of the widget*/
         this.refreshWidget = function () {
-            $bsyDiv[0].style.visibility = "visible";
-            $root.find('#Vis_Widget-container_' + widgetID).remove();
-            $self.Initalize();
-
-            // refresh the widget data here
+            showBusy(true);
+            const widgetContainerId = '#Vis_Widget-container_' + $self.widgetInfo.AD_UserHomeWidgetID;
+            // Safely remove existing widget container
+            if ($root.find(widgetContainerId).length > 0) {
+                $root.find(widgetContainerId).remove();
+            }
+            // Reset pagination and reinitialize the widget
+            currentPage = 1;
+            // refresh widget
+            loadWidget();
         };
 
         /* get design from root */

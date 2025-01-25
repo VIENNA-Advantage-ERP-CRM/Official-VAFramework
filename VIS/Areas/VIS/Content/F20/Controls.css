@@ -47,7 +47,7 @@
 
 .vis-ad-w-p-vc-editview .vis-control-wrap > button {
     /*border: 1px solid rgba(var(--v-c-on-secondary), .2);*/
-    border: 1px solid rgba(var(--v-c-primary), 1);
+    border: 1px solid rgba(var(--v-c-primary), 1) !important;
     /*border: 1px solid var(--input-border);*/
     border-radius: .25rem;
     color: rgba(var(--v-c-primary), 1);
@@ -68,6 +68,10 @@
     padding: 0 6px !important;
 }
 
+.vis-ad-w-p-vc-editview .vis-control-wrap .iti__selected-flag {
+    background-color: transparent !important;
+}
+
 .vis-input-wrap .iti__flag-container:focus-within {
     box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
     border-top-left-radius: 0.3rem;
@@ -75,9 +79,16 @@
     border-right: 1px solid rgba(var(--v-c-primary), 1);
 }
 
-    .vis-input-wrap .iti__flag-container:focus-within + input {
-        border-color: rgba(var(--v-c-primary), 1) !important;
-    }
+.vis-ad-w-p-vc-editview .vis-input-wrap .iti__flag-container:focus-within {
+    box-shadow: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-right: 0px solid rgba(var(--v-c-primary), 1);
+}
+
+.vis-input-wrap .iti__flag-container:focus-within + input {
+    border-color: rgba(var(--v-c-primary), 1) !important;
+}
 
 .vis-input-wrap .iti__country-list {
     z-index: 6;
@@ -118,6 +129,10 @@
 .vis-ad-w-p-vc-editview .vis-input-wrap .vis-control-wrap label:hover, .vis-ad-w-p-vc-editview .vis-input-wrap .vis-control-wrap label:hover span {
     color: rgba(var(--v-c-primary), 1) !important;
 }
+
+/*.vis-ad-w-p-vc-editview .vis-ev-col-end3 .vis-input-wrap .vis-control-wrap label {
+    color: #ffffff !important;
+}*/
 
 .vis-ad-w-p-vc-editview .vis-input-wrap .vis-control-wrap label::after {
     display: inline-flex;
@@ -163,13 +178,13 @@
 
 .vis-ad-w-p-vc-editview .vis-input-wrap {
     position: relative;
-    margin-bottom: 22px;
+    margin-bottom: 26px;
     flex-wrap: nowrap;
     border-bottom: 1px solid #d2d2d2;
 }
 
     .vis-ad-w-p-vc-editview .vis-input-wrap .vis-ev-ctrlinfowrap {
-        display: none !important;
+        opacity: 0 !important;
     }
 
     .vis-ad-w-p-vc-editview .vis-input-wrap:hover, .vis-ad-w-p-vc-editview .vis-input-wrap.focus, .vis-ad-w-p-vc-editview .vis-input-wrap.vis-ev-col-error, .vis-ad-w-p-vc-editview .vis-input-wrap:has(:focus) {
@@ -220,7 +235,25 @@ background-color: #F5A0AD !important;
         opacity: 0
     }
 
-    .vis-ad-w-p-vc-editview .vis-input-wrap:hover input[type="date"]::-webkit-calendar-picker-indicator, .vis-ad-w-p-vc-editview .vis-input-wrap.focus input[type="date"]::-webkit-calendar-picker-indicator {
+    .vis-ad-w-p-vc-editview .vis-input-wrap input[type="time"]::-webkit-calendar-picker-indicator {
+        opacity: 0
+    }
+
+    .vis-ad-w-p-vc-editview .vis-input-wrap input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+        opacity: 0
+    }
+
+    .vis-ad-w-p-vc-editview .vis-input-wrap:hover input[type="date"]::-webkit-calendar-picker-indicator,
+    .vis-ad-w-p-vc-editview .vis-input-wrap:hover input[type="time"]::-webkit-calendar-picker-indicator,
+    .vis-ad-w-p-vc-editview .vis-input-wrap:hover input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+    .vis-ad-w-p-vc-editview .vis-input-wrap.focus input[type="date"]::-webkit-calendar-picker-indicator,
+    .vis-ad-w-p-vc-editview .vis-input-wrap.focus input[type="time"]::-webkit-calendar-picker-indicator,
+    .vis-ad-w-p-vc-editview .vis-input-wrap.focus input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+    /*.vis-ad-w-p-vc-editview .vis-input-wrap:has(:focus) input[type="date"]::-webkit-calendar-picker-indicator,*/
+    .vis-ad-w-p-vc-editview .vis-input-wrap:has(:focus-within) input[type="date"]::-webkit-calendar-picker-indicator,
+    /*.vis-ad-w-p-vc-editview .vis-input-wrap:has(:focus) input[type="time"]::-webkit-calendar-picker-indicator,*/
+    .vis-ad-w-p-vc-editview .vis-input-wrap:has(:focus-within) input[type="time"]::-webkit-calendar-picker-indicator,
+    .vis-ad-w-p-vc-editview .vis-input-wrap:has(:focus-within) input[type="datetime-local"]::-webkit-calendar-picker-indicator {
         opacity: 1
     }
 
@@ -228,7 +261,7 @@ background-color: #F5A0AD !important;
         background-image: none;
     }
 
-    .vis-ad-w-p-vc-editview .vis-input-wrap:hover select, .vis-ad-w-p-vc-editview .vis-input-wrap.focus select {
+    .vis-ad-w-p-vc-editview .vis-input-wrap:has(:focus) select, .vis-ad-w-p-vc-editview .vis-input-wrap:hover select, .vis-ad-w-p-vc-editview .vis-input-wrap.focus select {
         background-image: linear-gradient(45deg, transparent 50%, rgba(var(--v-c-primary),1) 50%), linear-gradient(135deg, rgba(var(--v-c-primary),1) 50%, transparent 50%);
     }
 
@@ -336,6 +369,7 @@ select.vis-ev-col-mandatory {
     box-shadow: none;
 }
 
+
 .vis-input-wrap input:focus, .vis-input-wrap select:focus, .vis-input-wrap textarea:focus {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
@@ -345,8 +379,15 @@ select.vis-ev-col-mandatory {
 }
 
 .vis-input-wrap .input-group-text:focus {
-    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
+    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1) !important;
     border-left-color: rgba(var(--v-c-primary), 1) !important;
+    position: relative;
+     
+}
+
+.vis-ad-w-p-vc-editview .vis-input-wrap .input-group-text:focus {
+    box-shadow: 0 0 3px rgba(var(--v-c-primary), 1) !important;
+    border-left-color: rgba(var(--v-c-on-secondary), .2) !important;
     position: relative;
 }
 
@@ -365,6 +406,9 @@ select.vis-ev-col-mandatory {
     background: transparent;
 }
 
+.vis-ad-w-p-vc-editview .vis-ev-col .vis-input-wrap .vis-control-wrap .vis-ec-col-lblchkbox input:focus {
+    border-bottom: 1px solid rgba(var(--v-c-primary), 1) !important;
+}
 
 .vis-ev-col .vis-input-wrap .vis-control-wrap input:focus,
 .vis-ev-col .vis-input-wrap .vis-control-wrap select:focus,
@@ -380,10 +424,18 @@ button.vis-ev-col-img-ctrl:focus,
 .vis-ad-w-p-vc-editview .vis-ev-col .vis-input-wrap .vis-control-wrap select:focus,
 .vis-ad-w-p-vc-editview .vis-ev-col .vis-input-wrap .vis-control-wrap textarea:focus,
 .vis-ad-w-p-vc-editview .vis-control-wrap > button:focus,
-.vis-ad-w-p-vc-editview button.vis-ev-col-img-ctrl:focus,
-.vis-ec-col-lblchkbox input:focus {
+.vis-ad-w-p-vc-editview button.vis-ev-col-img-ctrl:focus {
     border-bottom: 0px solid rgba(var(--v-c-primary), 1) !important;
     border: 0;
+}
+
+.vis-ad-w-p-vc-editview .vis-control-wrap > button.vis-ev-col-wrap-button:hover {
+    border: 2px solid rgba(var(--v-c-on-secondary), 0.8) !important; /*06-01-2025*/
+    color: rgba(var(--v-c-on-secondary), 0.8) !important; /*06-01-2025*/
+}
+
+.vis-ad-w-p-vc-editview .vis-control-wrap > button.vis-ev-col-wrap-button:focus {
+    border: 1px solid rgba(var(--v-c-primary), 1) !important;
 }
 
 .vis-input-wrap *[data-hasBtn] {
@@ -424,7 +476,7 @@ button.vis-ev-col-img-ctrl:focus,
     color: rgba(var(--v-c-on-secondary), 1);
     max-width: 100%;
     white-space: nowrap;
-    overflow: hidden;
+    /*overflow: hidden;*/
     text-overflow: ellipsis;
     display: block;
 }
@@ -435,8 +487,9 @@ button.vis-ev-col-img-ctrl:focus,
 .vis-ad-w-p-vc-editview .vis-input-wrap textarea:not(:placeholder-shown) ~ label,
 .vis-ad-w-p-vc-editview .vis-input-wrap select ~ label,
 .vis-ad-w-p-vc-editview .vis-input-wrap textarea ~ label,
-.vis-ad-w-p-vc-editview .vis-input-wrap select ~ label {
-    top: -12px;
+.vis-ad-w-p-vc-editview .vis-input-wrap select ~ label,
+.vis-ad-w-p-vc-editview .vis-input-wrap label {
+    top: -16px;
     font-size: 12px;
     background: linear-gradient(rgba(var(--v-c-common), 1) 50%, transparent 50%);
     padding: 0 0.4rem;
@@ -446,7 +499,7 @@ button.vis-ev-col-img-ctrl:focus,
     /* color: rgba(var(--v-c-on-secondary), 1);*/
     max-width: 100%;
     white-space: nowrap;
-    overflow: hidden;
+    /*overflow: hidden;*/
     text-overflow: ellipsis;
     display: block;
 }
@@ -475,13 +528,16 @@ button.vis-ev-col-img-ctrl:focus,
 }
 
 .input-group:focus-within .input-group-append .input-group-text {
-    border: 1px solid rgba(var(--v-c-primary),1);
+    border: 1px solid transparent;
     border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
+    border-left: 1px solid rgba(var(--v-c-primary), 1);
+    border: 1px solid rgba(var(--v-c-primary), 1);
+    border-left-color: rgba(var(--v-c-on-secondary), .2);
 }
 
 .vis-ad-w-p-vc-editview .input-group:focus-within .input-group-append .input-group-text {
-    border: 0px solid rgba(var(--v-c-primary),1);
-    border-bottom: 0px solid rgba(var(--v-c-on-secondary), .2);
+    border: 1px solid transparent;
+    border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
 }
 
 .input-group:focus-within .input-group-prepend .input-group-text {
@@ -517,7 +573,8 @@ button.vis-ev-col-img-ctrl:focus,
     width: 35px;
     justify-content: center;
     cursor: pointer;
-    background-color: rgba(var(--v-c-secondary), 1);
+    /*  background-color: rgba(var(--v-c-secondary), 1);*/
+    background-color: transparent;
     z-index: 1;
     display: flex;
     align-items: center;
@@ -526,19 +583,18 @@ button.vis-ev-col-img-ctrl:focus,
 }
 
 .vis-ad-w-p-vc-editview .vis-input-wrap .input-group-text {
-    border: 0px solid rgba(var(--v-c-on-secondary), .2);
+    border: 1px solid transparent;
     background-color: transparent;
     box-shadow: none;
+    border-radius: 0;
 }
 
 .vis-ad-w-p-vc-editview .vis-input-wrap .input-group-append .input-group-text {
-    border-left-color: inherit !important;
-    padding-right: 0;
     width: auto;
 }
 
 .vis-ad-w-p-vc-editview .vis-input-wrap .input-group-prepend .input-group-text {
-    border: 1px solid #f0f0f0;
+    border: 1px solid #f0f0f0 !important;
     border-radius: 0;
     position: relative;
     top: -8px;
@@ -580,6 +636,8 @@ button.vis-ev-col-img-ctrl:focus,
     position: relative;
     height: auto;
     left: 0;
+    display: flex;
+    white-space: unset
 }
 
 .vis-ad-w-p-vc-editview .vis-control-wrap > label:first-child::after {
@@ -599,7 +657,7 @@ button.vis-ev-col-img-ctrl:focus,
 
 .vis-ev-col-fieldgroup {
     background: rgba(var(--v-c-primary), 0.04);
-    margin-bottom: 15px;
+    margin-bottom: 25px;
     /*padding: 5px 10px;*/
     display: flex;
     cursor: pointer;
@@ -607,12 +665,25 @@ button.vis-ev-col-img-ctrl:focus,
 
 .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup {
     background: rgb(0,152,247);
-    background: linear-gradient(90deg, rgba(0,152,247,0.1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(90deg, rgba(var(--v-c-primary),0.1) 0%, rgba(255,255,255,0) 100%);
 }
 
     .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup button {
         background: transparent;
-        border-color: transparent !important;
+        padding: 0px 10px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 5px 0;
+        border: 1px solid transparent;
+    }
+
+    .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup .vis-ev-col-fg-more { /*07-01-2025*/
+        border-right: 1px solid rgba(var(--v-c-on-secondary), 0.6);
+    }
+
+    .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup button:focus { /*06-01-2025*/
+        border: 1px solid rgba(var(--v-c-primary), 1);
     }
 
     .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup * {
@@ -637,8 +708,16 @@ button.vis-ev-col-img-ctrl:focus,
     /* padding: 0 10px; */
 }
 
-.vis-ev-col-fg-rotate {
+
+.vis-ev-fg-arrowBtn i {
+    display: inline-flex;
+    transform: rotate(0deg);
+    position: relative;
+}
+
+.vis-ev-fg-arrowBtn.vis-ev-col-fg-rotate i {
     transform: rotateX(180deg);
+    top: 2px;
 }
 
 .vis-ev-fgbtn {
@@ -668,7 +747,7 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label {
 
 /*mandatory*/
 .vis-ev-col-mandatory {
-    color: inherit !important;
+    /*color: inherit !important;*/
     background-color: rgba(var(--v-c-mandatory), .2);
     /*border: 1px solid rgba(var(--v-c-mandatory), 1) !important;*/
 }
@@ -676,6 +755,10 @@ input.vis-ev-col-readonly:not(:placeholder-shown) ~ label {
 .vis-input-wrap .vis-ev-col-mandatory {
     color: rgba(var(--v-c-mandatory),1);
     background-color: inherit !important;
+}
+
+.vis-input-wrap:has(input:focus) .vis-ev-col-mandatory {
+    color: rgba(var(--v-c-on-secondary), 1);
 }
     /*.vis-input-wrap input.vis-ev-col-mandatory:not(:focus), .vis-input-wrap select:not(:focus).vis-ev-col-mandatory {
     border: 1px solid #ec3f3f;
@@ -770,10 +853,15 @@ label.vis-ec-col-lblchkbox {
     border-radius: .15rem;
 }
 
-    .vis-ec-col-lblchkbox input[type=checkbox]:focus {
-        /* outline: auto; */
-        /* outline-color: rgba(var(--v-c-primary), 1); */
-    }
+.vis-ad-w-p-vc-editview .vis-ec-col-lblchkbox input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+}
+
+.vis-ec-col-lblchkbox input[type=checkbox]:focus {
+    /* outline: auto; */
+    /* outline-color: rgba(var(--v-c-primary), 1); */
+}
 
 .vis-ev-col input:-webkit-autofill {
     -webkit-box-shadow: inset 0 0 0px 9999px rgba(var(--v-c-common), 0.7);
@@ -790,12 +878,13 @@ label.vis-ec-col-lblchkbox {
 .vis-ev-ctrlinfowrap {
     position: absolute;
     left: 10px;
-    top: 11px;
+    top: 1px;
     cursor: pointer;
     outline: none;
     z-index: 5;
     display: flex;
     align-items: center;
+    width: 99%
 }
 
 label.vis-ec-col-lblchkbox + .vis-ev-ctrlinfowrap {
@@ -831,6 +920,13 @@ label.vis-ec-col-lblchkbox + .vis-ev-ctrlinfowrap {
     width: Calc(100% - 85px);
 }
 
+.vis-ad-w-p-vc-editview .vis-input-wrap .iti--allow-dropdown + label {
+    left: 67px;
+    background: transparent;
+    height: auto;
+    bottom: inherit;
+}
+
 .vis-input-wrap .iti--allow-dropdown:has(input:focus) + label,
 .vis-input-wrap .iti--allow-dropdown:has(input:not(:placeholder-shown)) ~ label {
     top: -7px;
@@ -843,6 +939,15 @@ label.vis-ec-col-lblchkbox + .vis-ev-ctrlinfowrap {
     color: rgba(var(--v-c-on-secondary), 1);
     width: auto;
     bottom: auto;
+}
+
+.vis-ad-w-p-vc-editview .vis-input-wrap .iti--allow-dropdown:has(input:focus) + label,
+.vis-ad-w-p-vc-editview .vis-input-wrap .iti--allow-dropdown:has(input:not(:placeholder-shown)) ~ label {
+    top: -12px;
+    background: transparent;
+    height: auto;
+    left: 67px;
+    bottom: inherit;
 }
 
 
@@ -1273,11 +1378,3 @@ input[type="radio"] {
             color: inherit;
         }
 /***************************** Control Prop End ****************************************/
-
-
-
-
-
-
-
-

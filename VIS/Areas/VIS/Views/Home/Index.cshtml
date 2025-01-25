@@ -110,6 +110,9 @@
 
     else //login
     {
+        <link type="text/css" href="~/Areas/ViennaBase/Content/fontlib/font-awesome.min.css" rel="stylesheet" />
+        <link type="text/css" href="~/Areas/ViennaBase/Content/fontlib/vis-fonts.css" rel="stylesheet" />
+
         if (ViewBag.LibSuffix != "_v3")
         {
             @Styles.Render("~/Areas/ViennaBase/bundles/boot" + ViewBag.LibSuffix);
@@ -309,7 +312,7 @@
 
             <!-- App Main Conatiner -->
             <div id="vis_mainConatiner" class="vis-app-section-main">
-                <div id="vis_busyGrid" class="full-height-div busy">
+                <div id="vis_busyGrid" class="full-height-div busy" style="width:100%;text-align:center !important;align-content:center">
                     <img src="~/Areas/VIS/Images/onfinity-logo.png" />
                     <span>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Loading")</span>
                 </div>
@@ -330,12 +333,12 @@
                     <ul id="vis_taskbar" class="vis-app-f-taskbar vis-footer-ui-fix">
                         <li id="vis_lhome" class="vis-footer-home-fix" style="display: none;">
                             @*<img src="~/Areas/VIS/Images/base/icon-home.png" style="vertical-align: text-top;" />*@
-                            <span class="vis vis-home"></span>
+                            <span class="vis vis-dashboard" style="transform:rotateX(30);"></span>
                             <a>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Home")</a>
                         </li>
                         <li id="vis_lhome2" style="display: none; position: absolute; left: 0;">
                             @*<img src="~/Areas/VIS/Images/base/icon-home.png" style="vertical-align: text-top;" />*@
-                            <span class="vis vis-home"></span>
+                            <span class="vis vis-dashboard"></span>
                             <a>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Home2")</a>
                         </li>
 
@@ -395,13 +398,76 @@ else //Login Page
             @Html.Partial("_Login2")
         </div>
         <div class="logindyn">
-            <object style="width:100%;height:100%"  data="https://hrdemowservice.viennaadvantage.com/login-form/login-form.html">
-                no content
-                </object>
+            <object style="width:100%;height:100%" data="@ViewBag.LoginPageUrl">
+                <style>
+                    .prefix-login-container {
+                        height: 100%;
+                        width: 100%;
+                        display: flex;
+                        position: absolute;
+                        background-image: url('../Areas/VIS/WebPages/login-form/images/form-bg.png');
+                        background-size: cover;
+                    }
+
+                    .prefix-whitebox {
+                        background-color: rgba(var(--v-c-on-primary), 0.8);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                    }
+
+
+
+                    .prefix-form-group-col {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.875rem;
+                    }
+
+                    .prefix-form-col {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        border-bottom: 1px solid rgba(var(--v-c-secondary), 1);
+                        padding: 0 0 0.5rem;
+                    }
+
+
+                    .prefix-poweredby-col {
+                        position: absolute;
+                        right: 1.5rem;
+                        bottom: 1.5rem;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.3rem;
+                    }
+
+                    .prefix-poweredbyTxt {
+                        font-size: 0.875rem;
+                    }
+                </style>
+                <div class="prefix-login-container">
+                    <div class="prefix-whitebox">
+                        <!--right pane-->
+                        <div class="prefix-poweredby-col">
+                            <div class="prefix-poweredbyTxt"></div>
+                            <img src="Areas/VIS/WebPages/login-form/images/onfinity-logo.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </object>
         </div>
     </div>
 
     @section scripts {
+        <script>
+             var isStep2Validate = @Html.Raw(Json.Encode(TempData["isStep2Validate"]));
+             var ModelData = @Html.Raw(Json.Encode(TempData["ModelData"]));
+             if (isStep2Validate) {
+                 $("#loginPanel").hide();
+             }
+        </script>
         <link type="text/css" href="~/Areas/VIS/Content/Login.css" rel="stylesheet" />
         <script type="text/javascript">  var contextUrl = '@Url.Content("~/")'  </script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/globalize.js"></script>

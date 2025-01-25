@@ -256,8 +256,9 @@
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
     <Content Include="Areas\VIS\Content\Home.css" />
     <Content Include="Areas\VIS\Content\Images\bg-patt.svg" />
-    <Content Include="Areas\VIS\Content\Images\logo.png" />
+    <Content Include="Areas\VIS\Content\Images\logoold.png" />
     <Content Include="Areas\VIS\Content\Images\mail.svg" />
+    <Content Include="Areas\VIS\Content\Images\logo.png" />
     <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
     <Content Include="Areas\VIS\Content\Login.css" />
     <Content Include="Areas\VIS\Content\Menu.css" />
@@ -481,6 +482,7 @@
     <Content Include="Areas\VIS\Images\clock.png" />
     <Content Include="Areas\VIS\Images\close-file.png" />
     <Content Include="Areas\VIS\Images\close-ico.png" />
+    <Content Include="Areas\VIS\Images\close-ico.svg" />
     <Content Include="Areas\VIS\Images\close.png" />
     <Content Include="Areas\VIS\Images\comment-icon.jpg" />
     <Content Include="Areas\VIS\Images\compresed.png" />
@@ -598,6 +600,7 @@
     <Content Include="Areas\VIS\Images\link-del.png" />
     <Content Include="Areas\VIS\Images\LoadingCircle.gif" />
     <Content Include="Areas\VIS\Images\Location.png" />
+    <Content Include="Areas\VIS\Images\login\arrow-down.png" />
     <Content Include="Areas\VIS\Images\login\bg2.jpg" />
     <Content Include="Areas\VIS\Images\login\calender.png" />
     <Content Include="Areas\VIS\Images\login\client.png" />
@@ -627,6 +630,7 @@
     <Content Include="Areas\VIS\Images\login\user-ico.png" />
     <Content Include="Areas\VIS\Images\login\warehouse.png" />
     <Content Include="Areas\VIS\Images\logo.jpg" />
+    <Content Include="Areas\VIS\Images\logo.png" />
     <Content Include="Areas\VIS\Images\main_screen.png" />
     <Content Include="Areas\VIS\Images\mDocAction.png" />
     <Content Include="Areas\VIS\Images\menuTree.PNG" />

@@ -48,7 +48,7 @@ namespace VIS.Controllers
 
 
             var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
-            string sql = "SELECT ct.claimtype,ct.code FROM SSO_Mapping INNER JOIN claim_type ct ON SSO_Mapping.claimtype=ct.code WHERE SSO_Configuration_ID=" + provider.Split('_')[0];
+            string sql = "SELECT ct.claimtype,ct.code FROM SSO_Mapping INNER JOIN claimtype ct ON SSO_Mapping.claimtype=ct.code WHERE SSO_Configuration_ID=" + provider.Split('_')[0];
             DataSet DS = DB.ExecuteDataset(sql);
 
             if (DS != null && DS.Tables.Count > 0)
@@ -149,7 +149,7 @@ namespace VIS.Controllers
                     // if user refresh page  while On reset pwd page, the system show login 1 page.
                     // In this case, reset pwd is true (picked from tempdata) but newpwd is null. 
                     //So user must try to login 1(processdToLogin = 1)
-                    if (resetPwd && model.Login1Model.NewPassword != null)
+                    if ( resetPwd && model.Login1Model.NewPassword != null)
                     {
                         string validated = LoginHelper.ValidatePassword(password, model.Login1Model.NewPassword, model.Login1Model.ConfirmNewPassword);
                         if (validated.Length > 0)
@@ -163,7 +163,7 @@ namespace VIS.Controllers
                         {
                             proceedToLogin2 = 2;
                         }
-                        if (TwoFAMethod != "" && !model.Login1Model.NoLoginSet)
+                        if (!isSSO && TwoFAMethod != "" && !model.Login1Model.NoLoginSet)
                         {
                             model.Login1Model.TwoFAMethod = TwoFAMethod;
                             model.Login1Model.ResetPwd = false;
@@ -178,7 +178,7 @@ namespace VIS.Controllers
                     }
 
                     // VIS0008 Changes done to handle VA 2FA from VA mobile app
-                    if (TwoFAMethod != "" && proceedToLogin2 != 1)
+                    if (!isSSO && TwoFAMethod != "" && proceedToLogin2 != 1)
                     {
                         if (!model.Login1Model.SkipNow)
                         {
@@ -262,7 +262,8 @@ namespace VIS.Controllers
             }
             //System.Threading.Thread.Sleep(10000);
             //FormsAuthentication.SetAuthCookie(model.Login1Model.UserName, false);
-            return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model });
+            HttpCookie cookie = this.Request.Cookies["ProviderType"];
+            return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model, provider = cookie?.Value });
         }
 
         [AllowAnonymous]

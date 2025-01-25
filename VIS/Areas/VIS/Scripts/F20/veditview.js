@@ -41,24 +41,34 @@
 
         function initComponent() {
             $table = $("<div class='vis-ad-w-p-vc-ev-grid'>"); //   $("<table class='vis-gc-vpanel-table'>");
+            //$table.on("click", "label", onInfoClick);
             $table.on("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
             $table.on("click", "span.vis-ev-fgbtn", onBtnFGClick);
         };
 
+        function onInfoClickold(e) {
+            var curTgt = $(e.currentTarget);
+            showpopover(curTgt, curTgt);
+        }
+
         function onInfoClick(e) {
             var curTgt = $(e.currentTarget);
+            //var curTgt = lblTgt.siblings('span.vis-ev-ctrlinfowrap');
+            if (!curTgt || curTgt.length == 0)
+                return;
+            showpopover(curTgt);
+        }
+        function showpopover(curTgt) {
+
             var colName = curTgt.data('colname');
             if (colName != '') {
-
                 if (lastPopover) {
                     lastPopover.popover('dispose');
                     lastPopover = null;
                 }
-
                 curTgt.attr('data-content', colDescHelpList[colName].help);
                 //attr('title', colDescHelpList[colName].desc);
                 lastPopover = curTgt.popover('show');
-
             }
         }
 
@@ -75,7 +85,6 @@
             if (isCol3)
                 _curParent = $td3 = $("<div class='vis-ev-col vis-ev-col-start4'></div>");
         };
-
         function reset(col) {
             if (!col) {
                 col0 = { rSpan: 1, cSpan: 0, cSpace: 0, set: false };
@@ -125,7 +134,6 @@
                 reset(col3);
             }
         };
-
         function adjustLayout(mField, isNewRow) {
             var rowSpan = mField.getFieldBreadth();
             var colSpan = mField.getFieldColSpan();
@@ -135,6 +143,7 @@
 
             if (colCount - 1 ==0) {
                 cellSpace = 0;
+                rowSpan = 0;
             }
             if (colSpan > colCount - 1)
                 colSpan = colCount;
@@ -156,13 +165,16 @@
                     addRow();//add last row;
                     reset();
                     initCols(true);
-                    $td0.addClass("vis-ev-col-end4");
+                    if (colCount>1)
+                    $td0.addClass("vis-ev-col-end" + colCount);
                     columnIndex = colCount+4; //outbound
                 } 
                 else {
                     // check for row span
                     if (col0.rSpan > 1) { //skip column 
                         columnIndex += col0.cSpan;
+                        if (columnIndex >= colCount)
+                            columnIndex = 6;//outbound
                         //--col0.rSpan;
                         //reset(col0);
                     }
@@ -216,6 +228,8 @@
                 // check for row span
                 if (col1.rSpan > 1) { //skip column 
                     columnIndex += col1.cSpan;
+                    if (columnIndex >= colCount)
+                        columnIndex = 6;//outbound
                     //--col1.rSpan;
                     //reset(col1);
                 }
@@ -260,6 +274,8 @@
                 // check for row span
                 if (col2.rSpan > 1) { //skip column 
                     columnIndex += col2.cSpan;
+                    if (columnIndex >= colCount)
+                        columnIndex = 6;//outbound
                     //--col2.rSpan;
                     //reset(col2);
                 }
@@ -708,11 +724,10 @@
                     if (agInstance.getIsNewIns()) { //only Once
                         insertCWrapper(label, agInstance, ctnr, mField);
                     }
-                    else { //apply style only
-                        var customStyle = mField.getHtmlStyle();
-                        if (editor != null && customStyle != "") {
-                            editor.getControl().attr('style', customStyle);
-                        }
+                    //apply style only
+                    var customStyle = mField.getHtmlStyle();
+                    if (editor != null && customStyle != "") {
+                        editor.getControl().attr('style', customStyle);
                     }
                 }
                 else {
@@ -803,7 +818,7 @@
         };
 
         this.dispose = function () {
-            $table.off("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
+            $table.off("click", "label", onInfoClick);
             $table.off();
             colDescHelpList = {};
             if (lastPopover) {
@@ -909,8 +924,12 @@
 
         
             if (!(editor && editor instanceof VIS.ActionGroup) && mField.getDisplayType() != VIS.DisplayType.Label && !mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.TelePhone) { // exclude Label display type
-            ctrlP.append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
-                "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+            //ctrlP.append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
+             //    "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+                if (label != null) {
+                    label.getControl().append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
+                        "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+                }
         }
 
         //if (editor && mField.getDisplayType() == VIS.DisplayType.ProgressBar) {
@@ -966,7 +985,7 @@
                 + '<span class="dropdown-toggle btn vis-ev-col-ag-dropdown-btn" id="' + id + '"' + styl + '  data-toggle="dropdown">'
                 + '<i class="' + fontname + '"></i>'
                 + name + '</span>'
-                + '<div class="dropdown-menu vis-ev-col-ag-div" aria-labelledby="' + id + '">'
+                + '<div class="dropdown-menu dropdown-menu-right vis-ev-col-ag-div" aria-labelledby="' + id + '">'
                 + '<ul class="vis-ev-col-ag-btn-list">'
                 + '</ul>'
                 + '</div>'

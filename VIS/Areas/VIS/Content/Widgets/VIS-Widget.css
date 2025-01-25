@@ -280,7 +280,7 @@
     }
 
 .vis-w-wfActivity-selectchk {
-    font-weight: normal;
+   /* font-weight: normal;*/
     text-align: left !important;
 }
 
@@ -349,9 +349,16 @@
 .vis-w-workflow-homepage-activites .vis-w-feedDetails {
     cursor: pointer;
 }
-/*.vis-w-activityContainer:hover {
-    border: .0625em solid rgba(var(--v-c-primary),1);
-}*/
+
+.vis-w-activityContainer:hover {
+    border-color: rgba(var(--v-c-primary), 1);
+}
+
+    .vis-w-activityContainer .vis-w-feedDetails:hover p {
+        color: rgba(var(--v-c-primary), 1);
+    }
+
+
 .vis-secondary-clr {
     color: rgba(var(--v-c-on-secondary),.9) !important;
 }
@@ -1344,5 +1351,5 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 
     .vis-a-closeBtnCls.close span {
         position: relative;
-        top: -2px;
+      /*  top: -2px;*/
     }

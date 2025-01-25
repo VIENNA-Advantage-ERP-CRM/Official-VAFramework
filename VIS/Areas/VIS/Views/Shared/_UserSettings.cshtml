@@ -145,7 +145,7 @@
             @*
                 <li id="vis_userTime"><span class="vis-icons-menuBar vis-icon-time"></span>@DateTime.Now.ToShortTimeString()*@
         </li>
-        <li id="vis_userDisplayName" class="vis-app-hdr-r-user">
+        <li id="vis_userDisplayName" class="vis-app-hdr-r-user" title="@ViewBag.DisplayName">
             <a href="javascript:;" id="vis_userName" style="display:none">@ViewBag.DisplayName</a>
             @*
                 <div class="vis-div-userAvatar">*@

@@ -592,7 +592,8 @@ namespace VAdvantage.Model
                 // sb.Append("p.Name AS ColX, ");
                 if (DB.IsPostgreSQL() && IsCount())
                 {
-                    sb.Append(ApplyAggregateFunction(m_colX, true));
+                    sb.Append(ApplyAggregateFunction(s_colY, true));
+                    // sb.Append(ApplyAggregateFunction(m_colX, true));
                 }
                 else if (DB.IsPostgreSQL() && IsSum() && IsAvg())
                 {
@@ -600,7 +601,7 @@ namespace VAdvantage.Model
                 }
                 else
                 {
-                    sb.Append(ApplyAggregateFunction(s_colY, false));
+                    sb.Append(ApplyAggregateFunction(s_colY, true));
                 }
 
                 sb.Append(" ColY ");
@@ -662,9 +663,18 @@ namespace VAdvantage.Model
 
 
                 else //in case of identifier column, do not aggregate it (we will do it in top level query)
-                    sb.Append("NVL(")
-                        .Append(s_colY)
-                        .Append(",0) ").Append(s_colY);
+                {
+                    if (DB.IsPostgreSQL())
+                    {
+                        sb.Append(s_colY);
+                    }
+                    else
+                    {
+                        sb.Append("NVL(")
+                          .Append(s_colY)
+                          .Append(",0) ").Append(s_colY);
+                    }
+                }
                 //sb.Append(",'9,999.99')");
 
                 //give name to col Y
@@ -793,10 +803,21 @@ namespace VAdvantage.Model
 
                 if (!IsSum() && !IsCount() && !IsAvg() && !IsNone())
                 {
-                    sb.Append(",");
-                    sb.Append("NVL(ROUND(");
-                    sb.Append(s_colY);
-                    sb.Append(",3),0)");
+                    if (DB.IsPostgreSQL())
+                    {
+                        sb.Append(",");
+                        sb.Append(" COALESCE(");
+                        sb.Append(s_colY);
+                        sb.Append(",0) ");
+                    }
+                    else
+                    {
+                        sb.Append(",");
+                        sb.Append("NVL(ROUND(");
+                        sb.Append(s_colY);
+                        sb.Append(",3),0)");
+                    }
+
 
                 }
 
@@ -829,8 +850,8 @@ namespace VAdvantage.Model
                             .Append(SPACE + "ColY");
 
                     unionTableQuery.Append(" FROM(");
-                    calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
-                    string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE C.D_Chart_ID=" + GetD_Chart_ID();
+                    calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE IsActive='Y' AND D_Series_ID=" + GetD_Series_ID()));
+                    string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE  D.IsActive='Y' AND  C.D_Chart_ID=" + GetD_Chart_ID();
                     DataSet dsw = DB.ExecuteDataset(Consolidated);
 
                     if (dsw != null && dsw.Tables.Count > 0 && dsw.Tables[0].Rows.Count > 0)
@@ -1083,7 +1104,7 @@ namespace VAdvantage.Model
             if (DB.IsPostgreSQL())
             {
 
-                sb.Append(@" SELECT " + colName + @", " + function + @" FROM GENERATE_SERIES(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), TO_DATE('" + m_date2 + "', 'MM/DD/YYYY'), INTERVAL '1 day') AS " + colName + @" WHERE " + colName + @" > DATE '0001-01-01'");
+                sb.Append(@" SELECT " + colName + @", " + function + @" FROM GENERATE_SERIES(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), TO_DATE('" + m_date2 + "', 'MM/DD/YYYY') - INTERVAL '1 day', INTERVAL '1 day') AS " + colName + @" WHERE " + colName + @" > DATE '0001-01-01'");
 
             }
             else
@@ -1170,7 +1191,7 @@ namespace VAdvantage.Model
         public string ApplyDateFunction(string colName)
         {
             calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
-            string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE C.D_Chart_ID=" + GetD_Chart_ID();
+            string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE D.IsActive='Y' AND C.D_Chart_ID=" + GetD_Chart_ID();
             DataSet dsw = DB.ExecuteDataset(Consolidated);
 
             if (dsw != null && dsw.Tables.Count > 0 && dsw.Tables[0].Rows.Count > 0)
@@ -1263,7 +1284,17 @@ namespace VAdvantage.Model
             StringBuilder sb = new StringBuilder();
 
             if (!this.IsNone())
-                sb.Append("NVL(ROUND(");
+                sb.Append(DB.IsPostgreSQL() ? " COALESCE (" : "NVL(ROUND(");
+
+            /* if ((DB.IsPostgreSQL())
+             {
+                 sb.Append(" ROUND ");
+             }
+             else
+             {
+                 sb.Append("NVL(ROUND(");
+             }*/
+
 
             if (this.IsSum())
             {
@@ -1273,7 +1304,8 @@ namespace VAdvantage.Model
                 }
                 else
                 {
-                    sb.Append("SUM(").Append(colName).Append(")");
+                    //  sb.Append("SUM(").Append(colName).Append(")");
+                    sb.Append("SUM(CAST(").Append(colName).Append(" AS NUMERIC))");
                 }
             }
             else if (IsAvg())
@@ -1284,7 +1316,8 @@ namespace VAdvantage.Model
                 }
                 else
                 {
-                    sb.Append("AVG(").Append(colName).Append(")");
+                    sb.Append("AVG(CAST(").Append(colName).Append(" AS NUMERIC))");
+                    // sb.Append("AVG(").Append(colName).Append(")");
                 }
             }
 
@@ -1295,7 +1328,8 @@ namespace VAdvantage.Model
                     //sb.Append("CASE WHEN MOD(" + ApplyDateFunction(m_colX) + ",4) = 0 AND (MOD(" + ApplyDateFunction(m_colX) + ",400) = 0 OR MOD(" + ApplyDateFunction(m_colX) + ",100) <> 0) THEN COUNT(").Append(colName).Append(") - 366 ELSE COUNT(").Append(colName).Append(") - 365 END");
                     if (DB.IsPostgreSQL() && checkCountIssue && calcBasis == "I")
                     {
-                        sb.Append("COUNT(DISTINCT ci. " + colName + ")");
+                        //  sb.Append("COUNT(DISTINCT ci. " + colName +")" );
+                        sb.Append("SUM(ci. " + colName + ")");
                     }
                     else
                     {
@@ -1322,7 +1356,8 @@ namespace VAdvantage.Model
 
             if (!this.IsNone())
             {
-                sb.Append(",3),0)");
+                //  sb.Append(",3),0)");
+                sb.Append(DB.IsPostgreSQL() ? ", 0) " : " ,3),0) ");
             }
 
 
@@ -1495,8 +1530,6 @@ namespace VAdvantage.Model
                     else
                     {
                         m_date_2 = (DateTime)GetDateTo().Value;
-                        //                        dt = GetDateTo().Value.AddYears(1);
-                        //m_date2 = "12/31/" + dt.Year;
                         dt = GetDateTo().Value;
 
                         int tDays = DateTime.DaysInMonth(dt.Year, dt.Month);
@@ -1643,6 +1676,7 @@ namespace VAdvantage.Model
                     else
                     {
                         dt_to = dt_to.AddDays(1);
+                        dt_to = dt_to.AddMonths(-1);
                         m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
                     }
                 }
@@ -1687,7 +1721,6 @@ namespace VAdvantage.Model
                     {
                         if (this.GetLastNValue() == 0)
                         {
-                            //  m_date2 = "12/" + DateTime.DaysInMonth(dt_to.Year, 12) + "/" + dt_to.Year;
                             dt_to = dt_to.AddYears(1);
                             m_date2 = "1/1/" + dt_to.Year;
                         }

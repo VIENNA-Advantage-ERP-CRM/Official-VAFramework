@@ -463,6 +463,7 @@
 
         //tabAction
         this.onTabChange = function (action) {
+            self.setFilterActive(false);
             self.tabActionPerformed(action);
         };
 
@@ -480,7 +481,7 @@
         this.createToolBar = function () {
 
             //1. toolbar action
-            this.aHome = this.addActions("HOE", null, true, true, false, onAction, null, "Shct_Home", "home");
+            this.aHome = this.addActions("HOE", null, true, true, false, onAction, null, "Shct_Home", "Home");
             this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh", "Refresh");
             this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete", "Delete");
             this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
@@ -976,6 +977,12 @@
                 this.refresh();
             }
 
+            if (self.curGC.aFilterPanel.isConditionApply()) {
+                self.setFilterActive(true);
+            } else {
+                self.setFilterActive(false);
+            }
+
             this.curTab.isFPManualHide = hide;
         };
 
@@ -1294,8 +1301,8 @@
                     else {
                         $txtSearch.val(text);
                     }
-                    $btnClrSearch.css('visibility', 'visible');
-                    $txtSearch.attr("readonly", "readonly");
+                    //$btnClrSearch.css('visibility', 'visible');
+                    //$txtSearch.attr("readonly", "readonly");
                     $selfpanel.defaultSearch = false;
                 }
                 else {
@@ -5871,9 +5878,7 @@
             this.gridWindow = null;
             this.ctx.setAutoCommit(this.$parentWindow.getWindowNo(), false);
             this.ctx.removeWindow(this.$parentWindow.getWindowNo());
-            VIS.MLo
-
-            upCache.cacheReset(this.$parentWindow.getWindowNo());
+            VIS.MLookupCache.cacheReset(this.$parentWindow.getWindowNo());
         }
 
 

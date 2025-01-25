@@ -5,9 +5,9 @@
     display: grid;
     grid-column-gap: 6px;
     overflow-x: auto;
+    padding-left: 12px;
+    margin-left: -12px;
 }
-
-
 
 .VIS-nm-dashboard-flyout {
     /*background-color: #fff;*/
@@ -40,6 +40,10 @@
         height: 36px;
         font-size: 14px;
     }
+
+        .VIS-nm-dasboard-search input:focus {
+            box-shadow: 0 0 0 .2rem rgba(var(--v-c-primary), .25);
+        }
 
     .VIS-nm-dasboard-search .fa-search {
         position: absolute;
@@ -86,6 +90,7 @@
         -webkit-line-clamp: 2;
         display: -webkit-box;
         overflow: hidden;
+        word-break: break-word;
     }
 
     .VIS-nm-opt-link:hover {
@@ -275,9 +280,10 @@
     text-align: left;
     white-space: nowrap;
     text-overflow: ellipsis;
-    align-content: center;
-    margin-left: .2rem;
-    margin-top: .1rem;
+    margin-left:.2rem;
+    align-content:center;
+    vertical-align:middle;
+    margin-top:.1rem;
 }
 
 /* Navigation Menu*/
@@ -337,6 +343,7 @@
         flex-shrink: 0;
         min-width: 100px;
         border-left: aliceblue 1px solid;
+        justify-items: center;
     }
 
 /*.vis-nav-horizontal-scroll ul li:nth-last-child(1) .vis-nav-horizontal-scroll-onhover-items {

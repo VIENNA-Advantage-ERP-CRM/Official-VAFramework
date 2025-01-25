@@ -275,6 +275,11 @@ html[dir="rtl"] .vis-ad-w-p-actionpanel-r li.vis-ad-w-p-ap-tp-o-li-selected:befo
     border-right: 5px solid rgba(var(--v-c-primary),1);
     right: 0;
 }
+html[dir="rtl"] .vis-ad-w-p-actionpanel-r-b li.vis-ad-w-p-ap-tp-o-li-selected:before {
+    border-left: none;
+    border-right: 5px solid rgba(var(--v-c-primary),1);
+    right: 0;
+}
 
 html[dir="rtl"] .vis-ad-w-p-ap-tp-o-icorbar li {
     border-right: 3px solid transparent;
@@ -283,6 +288,10 @@ html[dir="rtl"] .vis-ad-w-p-ap-tp-o-icorbar li {
 }
 
 html[dir="rtl"] .vis-ad-w-p-actionpanel-r li.vis-ad-w-p-ap-tp-o-li-selected {
+    border-right: 3px solid rgba(var(--v-c-primary),1);
+}
+
+html[dir="rtl"] .vis-ad-w-p-actionpanel-r-b li.vis-ad-w-p-ap-tp-o-li-selected {
     border-right: 3px solid rgba(var(--v-c-primary),1);
 }
 
@@ -1012,4 +1021,21 @@ html[dir="rtl"] .vis-nm-fav-icon-float {
     float: left;
 }
 
-    /*rtl css End here*/
+html[dir="rtl"] .VIS-winSearch-NonDefaultIcon {
+    margin-left: 5px;
+}
+
+html[dir="rtl"] .vis-fp-popup-arrow {
+    right: 10px !important;
+    left: unset !important;
+}
+
+html[dir="rtl"] .vis-fttrBtn button {
+    text-align: center !important;
+}
+
+html[dir="rtl"] .vis-clearFilter {
+    right: unset;
+    left: 5px !important;
+}
+ /*rtl css End here*/

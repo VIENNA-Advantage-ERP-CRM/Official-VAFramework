@@ -3639,11 +3639,15 @@ ul.vis-userLinks-ListMenu li a i {
         background-color: rgba(var(--v-c-mandatory), 1);
         padding: 0.4rem;
         display: block;
-        color: rgba(var(--v-c-common), 1);
+        color: rgba(var(--v-c-common), 1) !important;
         font-size: 1rem;
         cursor: pointer;
+        border: 1px solid rgba(var(--v-c-mandatory), 1);
     }
 
+        .vis-widget-header .vis:focus {
+            box-shadow: 0 0 10px rgba(var(--v-c-primary),.7) !important;
+        }
 
 .vis-widgetDrag-container {
     display: flex;
@@ -3948,7 +3952,7 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 .vis-nm-fav-tile {
-    display: inline-block;
+    display: flex;
     align-items: center;
     justify-content: space-between;
     background-color: rgba(var(--v-c-on-secondary),.03);

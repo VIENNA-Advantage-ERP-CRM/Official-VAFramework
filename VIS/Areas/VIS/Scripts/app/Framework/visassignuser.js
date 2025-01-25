@@ -8,7 +8,7 @@
 ***********************************************************/
 ;
 (function (VIS, $) {
-    //var $record_id, $chat_id, $table_id, $description, $chatclose;
+
     function userAssign(record_id, table_id, windowNo, WindowId, assignedRecords) {
         var ch = null;
         this.onClose = null;
@@ -32,15 +32,15 @@
         var PrimaryKey = null;
 
 
-       // design of popup
+        // design of popup
         var mainDiv = $('<div class="vis-forms-container"style="height:100%; display:inline-block; width:100%"></div>');
         $bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
         mainDiv.append($bsyDiv);
         busyDiv(false);
-        UpperDiv = $('<div class = "Vis_upperDiv" style=" height: calc(100% - 60px);"></div>')
-        recordInputDiv = $('<div style="display:flex">')    
+        UpperDiv = $('<div class = "Vis_upperDiv"></div>')
+        recordInputDiv = $('<div style="display:flex">')
         var $inputDiv = $(
-            '<div class="input-group vis-input-wrap mb-0" style="height:calc(100% - 60px)";>' +
+            '<div class="input-group vis-input-wrap mb-0";>' +
             '<div class="vis-control-wrap"></div><div class="input-group-append"></div>' +
             '</div>'
         );
@@ -51,17 +51,17 @@
         $inputDiv.find('.vis-control-wrap').append(colTableCtrl.getControl())
             .append('<label style="color: rgba(var(--v-c-mandatory),1);">' + VIS.Msg.getMsg('VIS_SearchUser') + '<sup>*</sup></label>');
         $userButtonWrap.append(colTableCtrl.getBtn(0));
-        $userButtonWrap.append(colTableCtrl.getBtn(1));
+        /* $userButtonWrap.append(colTableCtrl.getBtn(1));*/
         $inputDiv.append($userButtonWrap);
         var lowerDiv = $("<div class='vis-lowerDiv'>");
-        bottomDiv = $("<div style='width: 100%; float: left;'>");
+        bottomDiv = $("<div style='width: 100%;margin-top:10px'>");
 
 
         //Buttons
-        $deleteButton = $("<input class='VIS_Pref_btn-2 VIS_recordDelete' id='VIS_recordDltBtn" + windowNo + "' style='margin-left: 15px; width:70px;' type='button' value= " + VIS.Msg.getMsg('VIS_Delete') +">");
-        $doneButton = $("<input class='VIS_Pref_btn-2 VIS_Donebtn'id='VIS_assignDoneBtn" + windowNo + "' style='margin-left:15px; width:106px;' type='button' value=" + VIS.Msg.getMsg('Done') +">");
-        $cancelBtn = $("<input class='VIS_Pref_btn-2 VIS_Cancelbtn'id='VIS_assignCancelBtn" + windowNo + "' style='margin-left:15px; width:70px;' type='button' value= " + VIS.Msg.getMsg('Cancle') +">");
-        $okBtn = $("<input class='VIS_Pref_btn-2 VIS_OKbtn'id='VIS_AssignOkBtn" + windowNo + "' style='margin-left: 15px ;width: 70px;' type='button' value= " + VIS.Msg.getMsg('VIS_OK') + ">");
+        $deleteButton = $("<input class='VIS_Pref_btn-2 VIS_recordDelete mt-0' id='VIS_recordDltBtn" + windowNo + "' style='margin-left: 15px;' type='button' value= " + VIS.Msg.getMsg('VIS_Delete') + ">");
+        $doneButton = $("<input class='VIS_Pref_btn-2 VIS_Donebtn mt-0'id='VIS_assignDoneBtn" + windowNo + "' style='margin-left:15px;' type='button' value=" + VIS.Msg.getMsg('Done') + ">");
+        $cancelBtn = $("<input class='VIS_Pref_btn-2 VIS_Cancelbtn mt-0'id='VIS_assignCancelBtn" + windowNo + "' style='margin-left:15px;' type='button' value= " + VIS.Msg.getMsg('Cancle') + ">");
+        $okBtn = $("<input class='VIS_Pref_btn-2 VIS_OKbtn mt-0'id='VIS_AssignOkBtn" + windowNo + "' style='margin-left: 15px;' type='button' value= " + VIS.Msg.getMsg('VIS_OK') + ">");
 
 
         //appending design to main div
@@ -71,34 +71,34 @@
         mainDiv.append(UpperDiv).append(lowerDiv).append(bottomDiv);
 
 
-     
-       /* seperate the assigned and unassigned records from selected record*/
-            if (assignedRecords.length) {
-                record_id.forEach(id => {
-                    var matched = assignedRecords.find(record => record.ID === id);
-                    matched ? assignMatchRecord.push(matched) : unMatchRecords.push(id);
-                });
-        }
-            else {
-                unMatchRecords.push(...record_id);
-            }
 
-       // get assigned User and assigneby User
+        /* seperate the assigned and unassigned records from selected record*/
+        if (assignedRecords.length) {
+            record_id.forEach(id => {
+                var matched = assignedRecords.find(record => record.ID === id);
+                matched ? assignMatchRecord.push(matched) : unMatchRecords.push(id);
+            });
+        }
+        else {
+            unMatchRecords.push(...record_id);
+        }
+
+        // get assigned User and assigneby User
         if (assignMatchRecord.length > 0) {
             userId = assignMatchRecord[0].userId;
-            adminUser = assignMatchRecord[0].createdBy;        
+            adminUser = assignMatchRecord[0].createdBy;
         }
 
 
-       /* handling buttons according to assigned and unassigned records*/
+        /* handling buttons according to assigned and unassigned records*/
         if (record_id.length > 0) {
-         // if records selected more than 1
-            if (record_id.length > 1) {              
+            // if records selected more than 1
+            if (record_id.length > 1) {
                 // If more than one record is selected, only show OK and Cancel buttons
-                
+
                 mainDiv.find('#VIS_assignDoneBtn' + windowNo).hide();
                 mainDiv.find('#VIS_recordDltBtn' + windowNo).hide();
-             
+
                 mainDiv.find('#VIS_AssignOkBtn' + windowNo).attr('disabled', true).css({
                     'opacity': '0.5',
                     'pointer-events': 'none'
@@ -106,7 +106,7 @@
                 enableDone = false;
                 enableDelete = false;
 
-               //  one record selected
+                //  one record selected
             } else {
                 if (userId) {
                     if (loginUserID === adminUser) {
@@ -151,8 +151,14 @@
                     mainDiv.find('#VIS_assignDoneBtn' + windowNo).hide();
                     mainDiv.find('#VIS_recordDltBtn' + windowNo).hide();
                 }
-
             };
+
+            if (VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue()) > 0) {
+
+                colTableCtrl.getControl().parents('.vis-input-wrap')
+                    .find('label').css('color', 'rgba(var(--v-c-on-secondary), 1) !important');
+
+            }
         };
 
         InitEvents();
@@ -171,29 +177,30 @@
                         isMatch = false;
                         return;
                     }
-                   // check assign record userid match with selected user id from search controller
+                    // check assign record userid match with selected user id from search controller
                     assignMatchRecord.forEach((record) => {
                         if (record.userId != userNameId) {
                             VIS.ADialog.info("VIS_UserNotAssigned");
                             isMatch = false;
                             return;
-                            
+
                         };
                     });
 
                     // match user id than assign unassigned record
                     if (isMatch) {
+                        busyDiv(true);
                         assignedUser();
-                        busyDiv(false);
-                    }
-                    });
-            };
-            
 
-          // handling delete btn security
+                    }
+                });
+            };
+
+
+            // handling delete btn security
             if (enableDelete) {
 
-               // click event for delete
+                // click event for delete
                 mainDiv.find('.VIS_recordDelete').off('click')
                 mainDiv.find('#VIS_recordDltBtn' + windowNo).on('click', function () {
                     deleteRecord();
@@ -207,14 +214,15 @@
                         .val(VIS.Msg.getMsg('VIS_OK')) // Update the button text
                         .off('click') // Remove the existing click handler
                         .on('click', function () {
-                            userNameId = VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue());                          
+                            busyDiv(true);
+                            userNameId = VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue());
                             assignedUser();
-                            busyDiv(false);
+
                         });
 
 
                     mainDiv.find('#VIS_recordDltBtn').hide();
-                    
+
                     mainDiv.find('#VIS_AssignOkBtn_Modified').attr('disabled', true).css({
                         'opacity': '0.5',
                         'pointer-events': 'none'
@@ -222,12 +230,11 @@
                 });
             };
 
-           // handling done btn security
+            // handling done btn security
             if (enableDone) {
                 mainDiv.find('.VIS_Donebtn').off('click')
                 mainDiv.find('#VIS_assignDoneBtn' + windowNo).on('click', function () {
                     RecordStatus('DNE');
-                    
                 });
             }
             //cancel btn click
@@ -237,9 +244,14 @@
 
             });
 
-            
+
             colTableCtrl.fireValueChanged = function () {
+
                 if (VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue()) > 0) {
+
+                    colTableCtrl.getControl().parents('.vis-input-wrap')
+                        .find('label').css('color', 'rgba(var(--v-c-on-secondary), 1) !important');
+
                     if (enableDelete) {
                         mainDiv.find('#VIS_AssignOkBtn_Modified').attr('disabled', false).css({
                             'opacity': '1',
@@ -253,23 +265,26 @@
 
                 }
                 else {
+                    colTableCtrl.getControl().parents('.vis-input-wrap')
+                        .find('label').css('color', 'rgba(var(--v-c-mandatory), 1) !important');
+
                     if (enableDelete) {
                         mainDiv.find('#VIS_AssignOkBtn_Modified').attr('disabled', true).css({
                             'opacity': '0.6',
                             'pointer-events': 'none'
                         });
                     }
-                        mainDiv.find('#VIS_AssignOkBtn' + windowNo).attr('disabled', true).css({
-                            'opacity': '0.6',
-                            'pointer-events': 'none'
-                        });
-                    }
-                
+                    mainDiv.find('#VIS_AssignOkBtn' + windowNo).attr('disabled', true).css({
+                        'opacity': '0.6',
+                        'pointer-events': 'none'
+                    });
+                }
+
 
             }
         };
 
-       //status assign
+        //status assign
         function RecordStatus(status) {
             assignMatchRecord.forEach(record => {
                 unMatchRecords.push(record.ID)
@@ -297,12 +312,15 @@
                         busyDiv(false);
                         VIS.ADialog.info(statusresult);
                     }
+                },
+                error: function () {
+                    busyDiv(false);
                 }
             });
         };
 
 
-       // delete the record
+        // delete the record
         function deleteRecord() {
 
             assignMatchRecord.forEach(record => {
@@ -316,7 +334,7 @@
                     AD_Window_ID: WindowId,
                     AD_Table_ID: table_id,
                     Record_ID: unMatchRecords,
-                   
+
                 },
                 dataType: 'json',
                 success: function (response) {
@@ -324,23 +342,29 @@
                     if (!(deleteresult.toLowerCase().startsWith("error"))) {
                         removeAssignRecord();
                         busyDiv(false);
-                       
+                        colTableCtrl.getControl().parents('.vis-input-wrap')
+                            .find('label').css('color', 'rgba(var(--v-c-mandatory), 1) !important');
+
                     }
                     else {
                         busyDiv(false);
                         VIS.ADialog.info(deleteresult);
                     }
+                },
+                error: function () {
+                    busyDiv(false);
                 }
             });
         };
 
-       
-       // show function
+
+        // show function
         this.show = function () {
             ch = new VIS.ChildDialog();
             ch.setContent(mainDiv);
-            ch.setHeight(220);
+            ch.setHeight(195);
             ch.setWidth(450);
+            ch.setEnableResize(false);
             ch.setTitle(VIS.Msg.getMsg("VIS_AssignUser"));
             ch.setModal(true);
 
@@ -353,13 +377,12 @@
             ch.show();
             ch.hideButtons();
 
-           
+
         };
 
 
-       // assign the record
+        // assign the record
         function assignedUser() {
-            busyDiv(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "AssignedRecordToUser/AssignRecord",
                 type: "POST",
@@ -383,17 +406,23 @@
                             });
                         });
                         assignedRecords.push(...result);
+                        busyDiv(false);
                         ch.close();
                     }
                     if (assignedresult != '01') {
                         if (assignedresult === '02') {
                             VIS.ADialog.info("VIS_RecordAssigned");
+                            busyDiv(false);
                         }
                         else {
                             VIS.ADialog.info(assignedresult);
+                            busyDiv(false);
                         }
 
                     };
+                },
+                error: function () {
+                    busyDiv(false);
                 }
 
             });
@@ -406,20 +435,20 @@
                 if (index > -1) {
                     assignedRecords.splice(index, 1);
                 }
-            });        
+            });
         };
 
 
-         this.disposeComponent = function () {
-        $deleteButton, $doneButton, $cancelBtn, $okBtn = null;
-        ch = null;
-        UpperDiv = null;
-        bottom = null;
-        $inputDiv = null;
-        mainDiv.remove();
-    };
+        this.disposeComponent = function () {
+            $deleteButton, $doneButton, $cancelBtn, $okBtn = null;
+            ch = null;
+            UpperDiv = null;
+            bottom = null;
+            $inputDiv = null;
+            mainDiv.remove();
+        };
 
-};
+    };
 
     /* Get design from root */
     this.getRoot = function () {

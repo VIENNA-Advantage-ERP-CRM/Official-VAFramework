@@ -36,9 +36,11 @@ select {
     border: 1px solid rgba(var(--v-c-on-secondary), .2);
     color: rgba(var(--v-c-on-secondary), 1)
 }
-button:focus {
+
+button:focus, button:active {
     outline: none;
-    border: 1px solid rgba(var(--v-c-primary), 1);
+    box-shadow: 2px 4px 2px rgb(0 0 0 / 20%) !important; /*06-01-2025*/
+    border: 1px solid rgba(var(--v-c-primary), 1) !important; /*06-01-2025*/
 }
 /*html[dir="rtl"] select
 {
@@ -399,7 +401,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
     /*background: url('../images/home/mainMenu-BG.png') 0px 0px repeat;*/
     background: #fff;
     position: fixed;
-    z-index: 999;
+    z-index: 1000;
     top: 42px;
     left: 0px;
     /*bottom: 0px;*/
