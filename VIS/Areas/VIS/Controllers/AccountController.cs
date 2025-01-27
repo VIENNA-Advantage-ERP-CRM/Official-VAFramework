@@ -58,7 +58,7 @@ namespace VIS.Controllers
                 {
                     sql += " AND ";
                     var claimsVal = userClaims?.FindFirst(Util.GetValueOfString(DS.Tables[0].Rows[i]["claimtype"]))?.Value;
-                    sql += "claimtype=" + Util.GetValueOfInt(DS.Tables[0].Rows[i]["code"]) + " AND Claim_Value='" + claimsVal + "'";
+                    sql += "claimtype='" + Util.GetValueOfString(DS.Tables[0].Rows[i]["code"]) + "' AND Claim_Value='" + claimsVal + "'";
                 }
 
             }

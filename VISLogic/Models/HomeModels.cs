@@ -634,7 +634,7 @@ namespace VIS.Models
                                                     clk = JsonConvert.DeserializeObject<ActionParams>(clonedJson);
                                                 }
 
-                                                if (IsInteger(dsObj[j].ID))
+                                                if (IsInteger(dsObj[j].ID) && dsObj[j].DisplayType !=DisplayType.List)
                                                 {
                                                     where = tableName + "." + columnName + " = " + dsObj[j].ID;
                                                 }
@@ -921,6 +921,7 @@ namespace VIS.Models
                     val.ID = Convert.ToString(ds.Tables[0].Rows[i][0]);
                     val.Name = Convert.ToString(ds.Tables[0].Rows[i][1]);
                     val.Count = Convert.ToInt32(ds.Tables[0].Rows[i][2]);
+                    val.DisplayType = AD_Reference_ID;
                     keyva.Add(val);
                 }
             }
@@ -1069,6 +1070,7 @@ namespace VIS.Models
         public string ID { get; set; }
         public string Name { get; set; }
         public int Count { get; set; }
+        public int DisplayType { get; set; }
     }
 
 
