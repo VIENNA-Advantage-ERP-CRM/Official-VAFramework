@@ -372,6 +372,8 @@
         if (this.frame)
             this.frame.dispose();
         this.frame = null;
+
+
     };
 
 })(VIS, jQuery);
