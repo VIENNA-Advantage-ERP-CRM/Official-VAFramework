@@ -461,6 +461,7 @@ namespace VIS.Models
                     ProvideWindowAccessToRole(groups[i].AD_Group_ID, AD_Role_ID, groups[i].IsAssignedToUser);
                     ProvideFormAccessToRole(groups[i].AD_Group_ID, AD_Role_ID, groups[i].IsAssignedToUser);
                     ProvideProcessAccessToRole(groups[i].AD_Group_ID, AD_Role_ID, groups[i].IsAssignedToUser);
+                    ProvideWidgetAccessToRole(groups[i].AD_Group_ID, AD_Role_ID, groups[i].IsAssignedToUser);
                     ProvideWorkflowAccessToRole(groups[i].AD_Group_ID, AD_Role_ID, groups[i].IsAssignedToUser);
                 }
 
@@ -739,6 +740,81 @@ namespace VIS.Models
         }
 
         /// <summary>
+        /// Assign/UnAssign widget from group to role
+        /// </summary>
+        /// <param name="AD_Group_ID"></param>
+        /// <param name="AD_Role_ID"></param>
+        /// <param name="grantAccess"></param>
+        private void ProvideWidgetAccessToRole(int AD_Group_ID, int AD_Role_ID, bool grantAccess)
+        {
+            string sql = "SELECT AD_Widget_ID from AD_Group_Widget WHERE IsActive='Y' AND AD_GroupInfo_ID=" + AD_Group_ID;
+            DataSet ds = DB.ExecuteDataset(sql);
+            List<int> groupWidgetIDs = new List<int>();
+            Dictionary<int, bool> roleWidgetIDsDictinary = new Dictionary<int, bool>();
+            StringBuilder widIDs = new StringBuilder();
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    if (ds.Tables[0].Rows[i]["AD_Widget_ID"] != null && ds.Tables[0].Rows[i]["AD_Widget_ID"] != DBNull.Value)
+                    {
+                        if (widIDs.Length > 0)
+                        {
+                            widIDs.Append(",");
+                        }
+                        widIDs.Append(ds.Tables[0].Rows[i]["AD_Widget_ID"].ToString());
+                        groupWidgetIDs.Add(Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Widget_ID"]));
+                    }
+                }
+
+                groupWidgetIDs.Sort();
+
+                sql = "SELECT AD_Widget_ID,IsActive FROM AD_Widget_Access WHERE AD_Role_ID=" + AD_Role_ID + " AND AD_Widget_ID IN(" + widIDs.ToString() + ")";
+                ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        roleWidgetIDsDictinary[Convert.ToInt32(ds.Tables[0].Rows[i]["AD_Widget_ID"])] = ds.Tables[0].Rows[i]["IsActive"].ToString() == "Y" ? true : false;
+                    }
+                }
+
+                for (int i = 0; i < groupWidgetIDs.Count(); i++)
+                {
+                    MWidget wind = new MWidget(ctx, groupWidgetIDs[i], null);
+                    MWidgetAccess wAccess = new MWidgetAccess(wind, AD_Role_ID);
+                    if (roleWidgetIDsDictinary.ContainsKey(groupWidgetIDs[i]))
+                    {
+                        if (roleWidgetIDsDictinary[groupWidgetIDs[i]] != grantAccess)
+                        {
+                            //wAccess.SetIsReadWrite(grantAccess);
+                            //wAccess.Save();
+                            if (grantAccess)
+                            {
+                                sql = "UPDATE AD_Widget_Access Set IsActive='Y' WHERE AD_Widget_ID=" + groupWidgetIDs[i] + " AND AD_Role_ID=" + AD_Role_ID;
+                            }
+                            else
+                            {
+                                sql = "UPDATE AD_Widget_Access Set IsActive='N' WHERE AD_Widget_ID=" + groupWidgetIDs[i] + " AND AD_Role_ID=" + AD_Role_ID;
+                            }
+                            DB.ExecuteQuery(sql, null, null);
+                        }
+                    }
+                    else
+                    {
+
+                        wAccess.SetAD_Client_ID(ctx.GetAD_Client_ID());
+                        wAccess.SetAD_Org_ID(ctx.GetAD_Org_ID());
+                        wAccess.SetAD_Role_ID(AD_Role_ID);
+                        wAccess.SetAD_Widget_ID(groupWidgetIDs[i]);
+                        wAccess.SetIsActive(grantAccess);
+                        wAccess.Save();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Assign/UnAssign workflow from group to role
         /// </summary>
         /// <param name="AD_Group_ID"></param>
@@ -844,7 +920,7 @@ namespace VIS.Models
         }
 
         /// <summary>
-        /// Get Information of group like windows, forms, processes, workflows it contained.
+        /// Get Information of group like windows, forms, processes,Widgets, workflows it contained.
         /// </summary>
         /// <param name="groupID"></param>
         /// <returns></returns>
@@ -879,7 +955,7 @@ namespace VIS.Models
             StringBuilder windows = new StringBuilder();
             StringBuilder windowID = new StringBuilder();
 
-            if (ds == null || ds.Tables[0].Rows.Count > 0)
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
@@ -904,7 +980,7 @@ namespace VIS.Models
 
             StringBuilder forms = new StringBuilder();
             StringBuilder formID = new StringBuilder();
-            if (ds == null || ds.Tables[0].Rows.Count > 0)
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
@@ -928,7 +1004,7 @@ namespace VIS.Models
 
             StringBuilder processes = new StringBuilder();
             StringBuilder processID = new StringBuilder();
-            if (ds == null || ds.Tables[0].Rows.Count > 0)
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
@@ -943,6 +1019,29 @@ namespace VIS.Models
             }
             gInfo.ProcessName = processes.ToString();
 
+            sql = @"SELECT AD_Widget.Name,AD_Widget.AD_Widget_ID FROM AD_Group_Widget JOIN AD_Widget
+                     ON AD_Group_Widget.AD_Widget_ID=AD_Widget.AD_Widget_ID
+                     WHERE AD_Group_Widget.IsActive='Y' AND AD_Group_Widget.AD_GroupInfo_ID=" + groupID + " ORDER BY AD_Widget.Name";
+
+            ds = DB.ExecuteDataset(sql);
+
+            StringBuilder widgets = new StringBuilder();
+            StringBuilder widgetID = new StringBuilder();
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    if (widgets.Length > 0)
+                    {
+                        widgets.Append(",  ");
+                        widgetID.Append(",  ");
+                    }
+                    widgets.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    widgetID.Append(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Widget_ID"]));
+                }
+            }
+            gInfo.WidgetName = widgets.ToString();
+
 
             sql = @"SELECT AD_workflow.Name,AD_workflow.AD_workflow_ID FROM AD_Group_workflow  JOIN AD_workflow
                      ON AD_Group_workflow.AD_workflow_ID=AD_workflow.AD_workflow_ID
@@ -952,7 +1051,7 @@ namespace VIS.Models
 
             StringBuilder workflows = new StringBuilder();
             StringBuilder workflowsID = new StringBuilder();
-            if (ds == null || ds.Tables[0].Rows.Count > 0)
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
@@ -1013,13 +1112,14 @@ namespace VIS.Models
                 }
                 gInfo.processNotBinded = processNotBind.ToString();
 
-                sql=$@"SELECT DISTINCT FM.Name FROM AD_Form FM
+                sql = $@"SELECT DISTINCT FM.Name FROM AD_Form FM
                       INNER JOIN AD_Column CM ON(CM.AD_Form_ID = FM.AD_Form_ID)
                       INNER JOIN AD_Table TB ON(CM.AD_Table_ID = TB.AD_Table_ID)
                       INNER JOIN AD_Tab TL ON(TB.AD_Table_ID = TL.AD_Table_ID)
                       INNER JOIN AD_Window WD ON(TL.AD_Window_ID = WD.AD_Window_ID)
                       WHERE WD.AD_Window_ID IN ({ windowID }) AND CM.IsActive='Y'";
-                if (formID.Length > 0) {
+                if (formID.Length > 0)
+                {
                     sql += " AND CM.AD_Form_ID NOT IN (" + formID + ")";
                 }
 
@@ -1039,14 +1139,47 @@ namespace VIS.Models
                 }
                 gInfo.formNotBinded = fromNotBind.ToString();
 
+                string[] parts = windowID.ToString().Split(',');
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    parts[i] = parts[i].Trim();
+                }
+
+                string strWinID = string.Join("|", parts);
+
+                sql = $@"SELECT DISTINCT WG.Name FROM AD_Widget WG
+                       LEFT JOIN AD_Window WD ON (CAST(WD.AD_Window_ID AS NVARCHAR2(1000)) = WG.AD_Window_ID) 
+                      WHERE REGEXP_LIKE(WG.AD_Window_ID, '(^|,)({strWinID})(,|$)') AND WG.IsActive='Y'";
+                if (widgetID.Length > 0)
+                {
+                    sql += " AND WG.AD_Widget_ID NOT IN (" + widgetID + ")";
+                }
+
+                ds = DB.ExecuteDataset(sql);
+
+                StringBuilder widgetNotBind = new StringBuilder();
+                if (ds == null || ds.Tables[0].Rows.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        if (widgetNotBind.Length > 0)
+                        {
+                            widgetNotBind.Append(",  ");
+                        }
+                        widgetNotBind.Append(ds.Tables[0].Rows[i]["Name"].ToString());
+                    }
+                }
+                gInfo.WidgetNotBinded = widgetNotBind.ToString();
+
 
                 sql = $@"SELECT DISTINCT WF.Name FROM AD_Workflow WF
                       INNER JOIN AD_Table TL ON (TL.AD_Table_ID = WF.AD_Table_ID)
                       INNER JOIN AD_Tab TB ON (TB.AD_Table_ID = TL.AD_Table_ID)
                       INNER JOIN AD_Window WD ON (TL.AD_Window_ID = WD.AD_Window_ID)
                       WHERE WF.AD_Workflow_ID > 0 AND WD.IsActive ='Y'
-                      AND WD.AD_Window_ID IN ({ windowID })"; 
-                if (workflowsID.Length > 0) {
+                      AND WD.AD_Window_ID IN ({ windowID })";
+                if (workflowsID.Length > 0)
+                {
                     sql += " AND WF.AD_Workflow_ID NOT IN (" + workflowsID + ")";
                 }
 
@@ -1275,9 +1408,11 @@ namespace VIS.Models
         public string WindowName { get; set; }
         public string FormName { get; set; }
         public string ProcessName { get; set; }
+        public string WidgetName { get; set; }
         public string WorkflowName { get; set; }
         public string processNotBinded { get; set; }
         public string formNotBinded { get; set; }
+        public string WidgetNotBinded { get; set; }
         public string workflowNotBinded { get; set; }
     }
 
