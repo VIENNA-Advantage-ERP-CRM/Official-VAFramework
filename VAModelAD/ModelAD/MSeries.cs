@@ -1651,12 +1651,13 @@ namespace VAdvantage.Model
                     // }                     
                     //m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
                     int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
-
-                    if (tDays == dt_to.Day)
-                    {
-                        m_date2 = (dt_to.Month) + "/" + (dt_to.Day) + "/" + dt_to.Year;
-                    }
-                    else if (calcBasis.Equals("F"))
+                    /*
+                                        if (tDays == dt_to.Day)
+                                        {
+                                            m_date2 = (dt_to.Month) + "/" + (dt_to.Day) + "/" + dt_to.Year;
+                                        }
+                                        else*/
+                    if (calcBasis.Equals("F"))
                     {
                         if (this.GetLastNValue() == 0)
                         {
