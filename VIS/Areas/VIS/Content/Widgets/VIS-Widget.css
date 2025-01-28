@@ -67,7 +67,7 @@
 }
 
 .vis-w-welcomeScreenTab-notificationBubble {
-    background: url(../Images/home/welcomeScreen-AlertBubbles.png) 0 0 no-repeat;
+    /*background: url(../Images/home/welcomeScreen-AlertBubbles.png) 0 0 no-repeat;*/
     color: rgba(var(--v-c-common), 1);
     display: block;
     font-size: 81%;
@@ -84,17 +84,16 @@
 
     .vis-w-topSecndDivCls .vis-w-welcomeScreenTab-notificationBubble, .vis-w-welcomeScreenFeeds .vis-w-welcomeScreenTab-notificationBubble {
         align-items: center;
-        background: transparent;
-        background-color: #f3f3f3;
+        background-color: rgba(var(--v-c-on-secondary), 1);
         /*background-color: #fff;*/
         border-radius: 6px;
         /*color: rgba(var(--v-c-on-secondary), 1);*/
-        color: rgba(var(--v-c-primary), 1);
+        color: #ffff;
         display: flex;
         height: 1.8em !important;
         justify-content: center;
-        margin-left: .375em;
-        margin-right: .375em;
+        margin-left: .875em;
+        margin-right: .875em;
         max-width: 5em;
         font-weight: 600;
         min-width: 2em;
@@ -116,7 +115,7 @@
 
 .vis-w-welcomeScreenFeeds .vis-welcomeNoticeScreenFeedsListCls {
     padding: 0;
-    margin: 0 .625em;
+    margin: 0 .825em;
     width: calc(100% - 1.3em);
     position: relative;
     top: 0;
@@ -124,12 +123,13 @@
 }
 
 .vis-w-welcomeScreenFeeds > .vis-w-row h2 {
-    color: rgba(var(--v-c-primary), 1);
+    color: rgba(var(--v-c-on-secondary), 1);
     /*color: #ffffff;*/
     float: left;
     font-size: 1.125em;
-    margin-top: 0.625em;
-    background: rgba(var(--v-c-common), 1);
+    margin-top: 0.125em;
+    margin-bottom: 0;
+    /* background: rgba(var(--v-c-common), 1);*/
     /*background: rgba(var(--v-c-primary), 1);*/
     height: 2.375em;
     border-radius: 0.375em;
@@ -681,7 +681,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     font-size: 1em;
     color: rgba(var(--v-c-on-secondary),1);
     display: flex;
-    font-family: NoirPro-Regular !important;
+    font-family: Roboto-Regular !important;
     margin: 0;
     white-space: pre-line;
     width: 100%
@@ -766,7 +766,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     }
 
     .vis-w-welcomeScreenFeeds > .vis-w-row h2 {
-        font-size: .75em
+        font-size: 1.2em;
     }
 }
 
@@ -842,7 +842,7 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     }
 
     .vis-w-welcomeScreenFeeds > .vis-w-row h2 {
-        font-size: .75em
+        font-size: 1.2em;
     }
 
     .vis-editModeWidget .vis-w-workflow-homepage-parentdiv .vis-w-setSearchSize {
