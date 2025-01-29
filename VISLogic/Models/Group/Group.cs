@@ -1150,7 +1150,14 @@ namespace VIS.Models
                 sql = $@"SELECT DISTINCT WG.Name FROM AD_Widget WG
                        LEFT JOIN AD_Window WD ON (CAST(WD.AD_Window_ID AS NVARCHAR2(1000)) = WG.AD_Window_ID) 
                       WHERE REGEXP_LIKE(WG.AD_Window_ID, '(^|,)({strWinID})(,|$)') AND WG.IsActive='Y'";
-                if (widgetID.Length > 0)
+
+                if (VAdvantage.DataBase.DB.IsPostgreSQL())
+                {
+                    sql = $@"SELECT DISTINCT WG.Name FROM AD_Widget WG 
+                          LEFT JOIN AD_Window WD ON (CAST(WD.AD_Window_ID AS TEXT) = WG.AD_Window_ID)
+                           WHERE WG.AD_Window_ID ~ '(^|,)({strWinID})(,|$)'AND WG.IsActive = 'Y'";
+                }
+                    if (widgetID.Length > 0)
                 {
                     sql += " AND WG.AD_Widget_ID NOT IN (" + widgetID + ")";
                 }
