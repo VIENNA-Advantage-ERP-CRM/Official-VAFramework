@@ -64,13 +64,11 @@
 
 
 .vis-tiles-pagination {
-    display: flex;
     align-items: center;
-    justify-content: center;
-    width: 100%;
+    display: flex;
     gap: 1rem;
-    margin-top: 0.7rem;
-    margin-left: 11%;
+    justify-content: end;
+    padding: 10px;
 }
 
     .vis-tiles-pagination .fa {
@@ -121,7 +119,7 @@
 }
 
 .vis-show-more {
-    margin-left: 38px;
+    margin-left: 52px;
     text-decoration: underline;
     color: white;
     font-size: 22px;
