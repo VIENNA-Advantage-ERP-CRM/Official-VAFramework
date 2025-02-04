@@ -5,7 +5,7 @@
         this.onClose = null; //outer apanel close function
 
         var $maindiv = $('<div class="vis-forms-container"></div>'); //layout
-        var $div = $('<div class="vis-chatdetailouterwrap"></div>');
+        var $div = $('<div class="vis-chatdetailouterwrap" style="height:calc(100vh - 335px); overflow:auto"></div>');
         var $inputChat = $('<div class="d-flex flex-column vis-chatBoxInputWrap ">');
         var $textArea = $('<div><textarea  id="chatBox_textArea" rows="1" class="vis-chat-msgbox" /></textarea></div>');
         var $sendIconDiv = $('<div>');
@@ -115,7 +115,7 @@
             showBusy(true);
             $maindiv.parent().scrollTop(0);
             $maindiv.append($showMoreIcon);
-            $maindiv.addClass('p-2');
+            /*$maindiv.addClass('p-2');*/
             isBottomTapPanel();
             if (this.isBtmTapPanel) {
                 prop.pageSize = 4;
