@@ -482,6 +482,10 @@ select {
         padding: 10px;
     }
 
+.vis-ad-w-p-ap-tp-o-b-content .vis-forms-container {
+    padding: .5rem !important;
+}
+
 .vis-chatBoxInputWrap textarea {
     flex: 1;
     border: none !important;
