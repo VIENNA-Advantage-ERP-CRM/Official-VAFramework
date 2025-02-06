@@ -83,7 +83,7 @@ namespace VAdvantage.Model
             return Get(ctx, AD_Column_ID, null);
         }
 
-        public static MColumn Get(Ctx ctx, int AD_Column_ID,Trx trx)
+        public static MColumn Get(Ctx ctx, int AD_Column_ID, Trx trx)
         {
             int key = AD_Column_ID;
             MColumn retValue = null;
@@ -107,9 +107,9 @@ namespace VAdvantage.Model
             return GetColumnName(ctx, AD_Column_ID, null);
         }
 
-        public static string GetColumnName(Ctx ctx, int AD_Column_ID,Trx trx)
+        public static string GetColumnName(Ctx ctx, int AD_Column_ID, Trx trx)
         {
-            MColumn col = MColumn.Get(ctx, AD_Column_ID,trx);
+            MColumn col = MColumn.Get(ctx, AD_Column_ID, trx);
             if (col.Get_ID() == 0)
                 return null;
             return col.GetColumnName();
@@ -711,6 +711,16 @@ namespace VAdvantage.Model
                 int AD_Reference_ID = GetAD_Reference_Value_ID();
                 MRefTable rt = MRefTable.Get(GetCtx(), AD_Reference_ID);
                 return rt.GetKeyColumnName();
+            }
+            //Search
+            if (displayType == DisplayType.Search)
+            {
+                int AD_Reference_ID = GetAD_Reference_Value_ID();
+                if (AD_Reference_ID > 0)
+                {
+                    MRefTable rt = MRefTable.Get(GetCtx(), AD_Reference_ID);
+                    return rt.GetKeyColumnName();
+                }
             }
             return keyColumnName;
         }
