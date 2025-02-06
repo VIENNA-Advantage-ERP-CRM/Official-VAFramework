@@ -1304,8 +1304,8 @@ namespace VAdvantage.Model
                 }
                 else
                 {
-                    //  sb.Append("SUM(").Append(colName).Append(")");
-                    sb.Append("SUM(CAST(").Append(colName).Append(" AS NUMERIC))");
+                    sb.Append("SUM(").Append(colName).Append(")");
+                    //sb.Append("SUM(CAST(").Append(colName).Append(" AS NUMERIC))");
                 }
             }
             else if (IsAvg())
@@ -1727,8 +1727,8 @@ namespace VAdvantage.Model
                         }
                         else
                         {
-                            //m_date2 = "12/31/" + (lastNDate.Year - 1);
-                            m_date2 = "1/1/" + (lastNDate.Year);
+                            m_date2 = "12/31/" + (lastNDate.Year - 1);
+                            //  m_date2 = "1/1/" + (lastNDate.Year);
                         }
                     }
                     else if (calcBasis.Equals("I"))
