@@ -79,7 +79,7 @@ namespace VIS.Models
             //	Attrribute Set Instance Description
             //Column 1
             var label1 = Msg.Translate(ctx, "Description");
-            obj.tableStucture += "<td>";
+            obj.tableStucture += "<td colspan='2'>";
             obj.tableStucture += "<div class='input-group vis-input-wrap'>";
             obj.tableStucture += "<div class='vis-control-wrap'>";
             obj.tableStucture += "<input readonly data-placeholder='' placeholder=' '  id='txtDescription_" + windowNo + "' value='" + (_masi.GetDescription()) + "' class='VIS_Pref_pass' type='text'>";
@@ -99,8 +99,8 @@ namespace VIS.Models
             obj.tableStucture += "<tr>";
 
             obj.tableStucture += "<td style='text-align:right'  colspan='2'>";
-            obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right' type='button' class='VIS_Pref_btn-2' style='float: right;'  id='btnCancel_" + windowNo + "' role='button' aria-disabled='false'>" + Msg.GetMsg(ctx, "Cancel") + "</button>";
-            obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right; margin-right: 10px;' type='button' class='VIS_Pref_btn-2' style='float: right; margin-right: 10px;'   id='btnOk_" + windowNo + "' role='button' aria-disabled='false'>" + Msg.GetMsg(ctx, "ok") + "</button>";
+            obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right' type='button' class='VIS_Pref_btn-2' style='float: right;'  id='btnCancel_" + windowNo + "' role='button' aria-disabled='false'>" +  Msg.GetMsg(ctx, "VIS_DialogCancel") + "</button>";
+            obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right; margin-right: 10px;' type='button' class='VIS_Pref_btn-2' style='float: right; margin-right: 10px;'   id='btnOk_" + windowNo + "' role='button' aria-disabled='false'>" + Msg.GetMsg(ctx, "VIS_OK") + "</button>";
             obj.tableStucture += "</td>";
             obj.tableStucture += "</tr>";
 

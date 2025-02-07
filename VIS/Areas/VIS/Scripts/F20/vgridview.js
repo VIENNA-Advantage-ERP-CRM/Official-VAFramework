@@ -3,14 +3,14 @@
     //**             VTable                            **//
     //**************************************************//
 
-    
+
 
 
     function VTable() {
 
 
-    /*int Default */
-        
+        /*int Default */
+
 
 
         this.grid = null;
@@ -39,7 +39,7 @@
             caption: "",
             sortable: false,
             render: function (record) {
-                return '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/base/pencil.png"  />';
+                return '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/base/pencil.png"/>';
             },
             size: '25px'
         };
@@ -143,7 +143,7 @@
                 if (clickCount === 1) {
                     clickCount = 0;
                     onGridCellClick(evt);
-                } else if (clickCount === 2) {
+                } else if (clickCount >= 2) {
                     clearTimeout(singleClickTimer);
                     clickCount = 0;
                 }
@@ -250,7 +250,6 @@
             return null;
         };
 
-
         this.paintRow = function (index) {
 
             var rec = this.grid.records[index];
@@ -316,6 +315,23 @@
                 else if ("Y".equals(processed))
                     return false;
             }
+
+            if (self.indexProcessingColumn && self.indexProcessingColumn > 0)		//	&& m_TabNo != Find.s_TabNo)
+            {
+                //Object processed = GetCellValue(this.Rows[row], _indexProcessedColumn);
+                var processed = self.grid.getCellValue(row, self.indexProcessingColumn);
+                if (typeof processed == "boolean") {
+                    if (processed)
+                        return false;
+                }
+                else if ("True".equals(processed))// instanceof Boolean)
+                {
+                    return false;
+                }
+                else if ("Y".equals(processed))
+                    return false;
+            }
+
             //
             //int[] co = GetClientOrgRecordID(this.Rows[row]);
             var co = getClientOrgRecordID(row);
@@ -323,9 +339,17 @@
             var AD_Org_ID = co[1];
             var Record_ID = co[2];
 
-            return VIS.MRole.canUpdate
-                (AD_Client_ID, AD_Org_ID, self.AD_Table_ID, Record_ID, false);
+            if (!VIS.MRole.canUpdate
+                (AD_Client_ID, AD_Org_ID, self.AD_Table_ID, Record_ID, false))
+                return false;
 
+            //check for filter org
+            var fOrgs = VIS.context.getContext("#AD_FilteredOrg");
+            if (fOrgs && fOrgs != "") {
+                if (fOrgs.split(",").indexOf('0') < 0 && AD_Org_ID == 0)
+                    return false;
+            }
+            return true;
         };
 
         function getClientOrgRecordID(row) {
@@ -335,7 +359,8 @@
                 if (ii != null && ii !== "")
                     AD_Client_ID = VIS.Utility.Util.getValueOfInt(ii);
             }
-            var AD_Org_ID = 0;
+
+            var AD_Org_ID = -1;
             if (typeof self.indexOrgColumn != "undefined" && self.indexOrgColumn != -1) {
                 var ii = self.grid.getCellValue(row, self.indexOrgColumn);
                 if (ii != null && ii !== "")
@@ -347,7 +372,9 @@
                 if (ii != null && ii !== "")
                     Record_ID = VIS.Utility.Util.getValueOfInt(ii);
             }
-
+            if (AD_Client_ID == -1 && self.mTab.getTableName() == "AD_Client") {
+                AD_Client_ID = Record_ID;
+            }
             return [AD_Client_ID, AD_Org_ID, Record_ID];
         };
 
@@ -430,6 +457,11 @@
             mField = mFields[i];
             if (mField == null)
                 continue;
+
+            //  Not a Field
+            if (mField.getIsHeading())
+                continue;
+
             var columnName = mField.getColumnName();
             var displayType = mField.getDisplayType();
 
@@ -447,6 +479,8 @@
                 this.indexActiveColumn = j;
             else if (columnName.equals("Processed"))
                 this.indexProcessedColumn = j;
+            else if (columnName.equals("Processing"))
+                this.indexProcessingColumn = j;
             else if (columnName.equals("AD_Client_ID"))
                 this.indexClientColumn = j;
             else if (columnName.equals("AD_Org_ID"))
@@ -462,9 +496,7 @@
 
 
 
-            //  Not a Field
-            if (mField.getIsHeading())
-                continue;
+
 
             var oColumn = {
 
@@ -501,37 +533,42 @@
             }
             else if (mField.getDisplayType() == VIS.DisplayType.TelePhone) {
                 if (oColumn.hidden == false)
-                oColumn.style = 'text-decoration:underline; color:rgba(var(--v-c-primary), 1) !important; ';
+                    oColumn.style = 'text-decoration:underline; color:rgba(var(--v-c-primary), 1) !important; ';
             }
 
-            if (displayType == VIS.DisplayType.Amount) {
+            //if (displayType == VIS.DisplayType.Amount) {
+            //    oColumn.sortable = true;
+            //    oColumn.customFormat = VIS.DisplayType.GetNumberFormat(displayType);
+            //    oColumn.render = function (record, index, colIndex) {
+            //        var f = oColumns[colIndex].field;
+            //        var val = record[f];
+            //        if (!val) {
+            //            val = 0; // show zero if null
+            //        }
+
+            //        var lang = navigator.language;
+            //        if (!lang && lang.length < 3) {
+            //            lang = undefined;
+            //        }
+
+            //        //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
+            //        val = parseFloat(val).toLocaleString(lang, {
+            //            'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
+            //            'maximumFractionDigits': oColumns[colIndex].customFormat.getMaxFractionDigit()
+            //        });
+            //        return '<div data-type="int">' + val + '</div>';
+            //    };
+            //    //oColumn.caption = 'class="vis-control-wrap-int-amount"';
+            //}
+            if (displayType == VIS.DisplayType.Integer) {
                 oColumn.sortable = true;
                 oColumn.customFormat = VIS.DisplayType.GetNumberFormat(displayType);
                 oColumn.render = function (record, index, colIndex) {
                     var f = oColumns[colIndex].field;
                     var val = record[f];
-                    if (!val) {
-                        val = 0; // show zero if null
-                    }
-                    //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
-                    val = parseFloat(val).toLocaleString(undefined, {
-                        'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
-                        'maximumFractionDigits': oColumns[colIndex].customFormat.getMaxFractionDigit()
-                    });
-                    return '<div data-type="int">' + val + '</div>';
-                };
-                //oColumn.caption = 'class="vis-control-wrap-int-amount"';
-            }
-            else if (displayType == VIS.DisplayType.Integer) {
-                oColumn.sortable = true;
-                oColumn.customFormat = VIS.DisplayType.GetNumberFormat(displayType);
-                oColumn.render = function (record, index, colIndex) {
-                    var f = oColumns[colIndex].field;
-                    var val = record[f];
 
-                    if (!val)
+                    if (!val && val != 0)
                         return;
-
                     //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
                     //val = parseFloat(val).toLocaleString(undefined, {
                     //    'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
@@ -541,6 +578,7 @@
                 };
                 //oColumn.caption = 'class="vis-control-wrap-int-amount"';
             }
+
             else if (displayType == VIS.DisplayType.ProgressBar) {
                 oColumn.sortable = true;
                 oColumn.selfCellStyleRender = true;
@@ -566,17 +604,29 @@
                         '<div class="vis-progress-gridoutput" > ' + (val || '') + '</div></div >';
                 }
             }
+
             else if (VIS.DisplayType.IsNumeric(displayType)) {
                 oColumn.sortable = true;
                 oColumn.customFormat = VIS.DisplayType.GetNumberFormat(displayType);
                 oColumn.render = function (record, index, colIndex) {
                     var f = oColumns[colIndex].field;
                     var val = record[f];
-                    if (!val)
-                        return;
+                    if (!val) {
+                        if (displayType == VIS.DisplayType.Amount) {
+                            val = 0;
+                        }
+                        else if (val != 0) {
+                            return;
+                        }
+                    }
+                    var lang = navigator.language;
+                    if (!lang && lang.length < 3) {
+                        lang = undefined;
+                    }
+
                     //if (record.changes && typeof record.changes[f] != 'undefined') val = record.changes[f];
                     // return  Globalize.format(Number(oColumns[colIndex].customFormat.GetFormatedValue(val)));
-                    val = parseFloat(val).toLocaleString(undefined, {
+                    val = parseFloat(val).toLocaleString(lang, {
                         'minimumFractionDigits': oColumns[colIndex].customFormat.getMinFractionDigit(),
                         'maximumFractionDigits': oColumns[colIndex].customFormat.getMaxFractionDigit()
                     });
@@ -673,18 +723,22 @@
                     oColumn.render = function (record, index, colIndex) {
                         var l = oColumns[colIndex].lookup;
 
+                        var clrSource = oColumns[colIndex].clrSource || {};
+                        if (!oColumns[colIndex].clrSource)
+                            oColumns[colIndex].clrSource = clrSource;
                         var f = oColumns[colIndex].field;
                         var val = record[f];
 
                         var customStyle = oColumns[colIndex].gridField.getGridImageStyle();
                         var winNo = oColumns[colIndex].gridField.getWindowNo();
-                        oColumns[colIndex]['customClass'] = '';
+
+                        //oColumns[colIndex]['customClass'] = '';
                         var customClass;
                         if (customStyle) {
                             customClass = oColumns[colIndex]['customClass'];
                             if (!customClass) {
-                                oColumns[colIndex]['customClass'] = 'vis-grd-custom-' + oColumns[colIndex].gridField.getAD_Column_ID() + winNo;
-                                customClass = '.vis-grd-custom-' + oColumns[colIndex].gridField.getAD_Column_ID() + winNo + "{" + customStyle + "}";
+                                oColumns[colIndex]['customClass'] = 'vis-grd-custom-' + oColumns[colIndex].gridField.getAD_Column_ID() + name;
+                                customClass = '.vis-grd-custom-' + oColumns[colIndex].gridField.getAD_Column_ID() + name + "{" + customStyle + "}";
                                 var styleTag = document.createElement('style');
                                 styleTag.type = 'text/css';
                                 styleTag.innerHTML = customClass;
@@ -698,8 +752,7 @@
                         var d;
                         if (l) {
                             // In case of multisearch, show all names separated by commas in gridview.
-                            if (l.displayType == VIS.DisplayType.MultiKey)
-                            {
+                            if (l.displayType == VIS.DisplayType.MultiKey) {
                                 if (val) {
                                     var arr = val.toString().split(',');
                                     var sb = "";
@@ -721,7 +774,7 @@
                                     d = l.getDisplay(val, true, true);
                                 }
                             }
-                                else {
+                            else {
                                 d = l.getDisplay(val, true, true);
                             }
                             //if (d.startsWith("<"))
@@ -731,10 +784,20 @@
 
                         var strDiv = "";
                         if (l && VIS.DisplayType.List == l.displayType) {
+                            var pastel, pastelClr;
+                            if (d in clrSource) {
+                                pastel = clrSource[d]['pastel'];
+                                pastelClr = clrSource[d]['pastelClr'];
+                            }
+                            else {
+                                var hue = Math.floor(Math.random() * (360 - 0)) + 0;
+                                var v = Math.floor(Math.random() * 16) + 80; //Math.floor(Math.random() * (75 - 60 + 1)) + 60;
+                                pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
 
-                            var hue = Math.floor(Math.random() * (360 - 0)) + 0;
-                            var v = Math.floor(Math.random() * (75 - 60 + 1)) + 60; //Math.floor(Math.random() * 16) + 75;
-                            var pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
+                                pastelClr = 'hsl(' + hue + ', 100%,' + (v - 50) + '%)';
+                                clrSource[d] = { 'pastel': pastel, 'pastelClr': pastelClr };
+                            }
+
 
                             var lType = l.getLovIconType(val, true);
 
@@ -745,7 +808,7 @@
 
                                 if (highlightChar.length == 0)
                                     var txt = d.trim().split(' ');
-                                    highlightChar = txt[0].substring(0, 1).toUpper();
+                                highlightChar = txt[0].substring(0, 1).toUpper();
                                 if (txt.length > 1) {
                                     highlightChar += txt[txt.length - 1].substring(0, 1).toUpper();
                                 } else {
@@ -760,7 +823,7 @@
                                     strDiv += "<div class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'> " + listIcon + "</div> ";
                                 }
                                 else {
-                                    strDiv += "<div style='background-color:" + pastel +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
+                                    strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
                                 }
                                 strDiv += "<span> " + d + "</span ><div>";
                             }
@@ -775,7 +838,7 @@
                                     strDiv += "<div class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'> " + listIcon + "</div> ";
                                 }
                                 else {
-                                    strDiv += "<div style='background-color:" + pastel +"' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
+                                    strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'><span>" + highlightChar + "</span></div>";
                                 }
                                 strDiv += "<div>";
                             }
@@ -804,12 +867,29 @@
                                 strDiv = "<div class='vis-grid-td-icon-grp'>";
                                 var highlightChar = '';
 
+                                var pastel, pastelClr;
+
+                                //'d' array has empty string , genrate random color for new entry
+                                // for non-empty value
+                                for (var idx = 0; idx < d.length; idx++) {
+                                    if (d[idx].trim().length > 0) {
+                                        var trimTxt = d[idx].trim();
+                                        if (trimTxt in clrSource) {
+                                            pastel = clrSource[trimTxt]['pastel'];
+                                            pastelClr = clrSource[trimTxt]['pastelClr'];
+                                        }
+                                        else {
+                                            var hue = Math.floor(Math.random() * (360 - 0)) + 0;
+                                            var v = Math.floor(Math.random() * 16) + 80; //Math.floor(Math.random() * (75 - 60 + 1)) + 60;
+                                            pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
+                                            pastelClr = 'hsl(' + hue + ', 100%,' + (v - 50) + '%)';
+                                            clrSource[trimTxt] = { 'pastel': pastel, 'pastelClr': pastelClr };
+                                        }
+                                    }
+                                }
+
                                 //Now 'd' may contains identifier values to be displayed before and after image
                                 for (var c = 0; c < d.length; c++) {
-                                    //random pastel color generator 
-                                    var hue = Math.floor(Math.random() * (360 - 0)) + 0;
-                                    var v = Math.floor(Math.random() * (75 - 60 + 1)) + 60; //Math.floor(Math.random() * 16) + 75;
-                                    var pastel = 'hsl(' + hue + ', 100%,' + v + '%)';
 
                                     if (d[c].trim().length > 0) {
                                         //If highlightChar is not found, then get it from first item encounterd.
@@ -825,21 +905,21 @@
                                         //we will Display highlightChar
                                         if (c > 0 && img.indexOf("nothing.png") > -1 && highlightChar.length > 0) {
 
-                                            strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
+                                            strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
                                         }
                                         strDiv += "<span>" + d[c] + "</span>";
                                     } else if (img.indexOf("nothing.png") > -1 && highlightChar.length > 0) {
-                                        strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
+                                        strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon' ><span>" + highlightChar + "</span></div>";
                                     }
 
                                     //If image found, then display that image.
                                     if (c == 0 || img.indexOf("nothing.png") > -1) {
                                         if (img.indexOf("nothing.png") == -1) {
-                                            strDiv += "<div style='background-color:" + pastel + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'"
+                                            strDiv += "<div style='background-color:" + pastel + "; color:" + pastelClr + "' class='" + oColumns[colIndex]['customClass'] + " vis-grid-row-td-icon'"
                                                 + " > <img src='" + img +
                                                 "'></div > ";
                                             // "' onerror='this.style.display=\"none\"' ></img></div > ";
-                                        } 
+                                        }
 
                                     }
                                 }
@@ -847,16 +927,12 @@
 
                             }
 
-
                         if (strDiv == "")
                             return d;
-
-
 
                         return strDiv;
                         //return '<span>' + d + '</span>';
                     }
-
                 }
             }
             //Date /////////
@@ -873,8 +949,6 @@
                     if (record.changes && typeof record.changes[f] != 'undefined') {
                         val = record.changes[f];
                     }
-
-
 
                     if (val)
                         if (col.displayType == VIS.DisplayType.Date) {
@@ -1000,12 +1074,30 @@
             else if (displayType == VIS.DisplayType.Button) {
 
                 oColumn.sortable = true;
-
+                oColumn.style = 'text-decoration:none; color:rgba(var(--v-c-primary), 1); cursor:pointer;' + mField.getHtmlStyle();
                 oColumn.render = function (record, index, colIndex) {
                     var f = oColumns[colIndex].field;
                     var val = record[f];
-                    return '<span style="cursor:pointer" class="vis-ev-col-linkbutton">' + oColumns[colIndex].gridField.getHeader() + '</span>';
+                    var itm = "<div class='d-flex'>";
+                    if (oColumns[colIndex].gridField.getIsFieldOnly() && oColumns[colIndex].gridField.getShowIcon()) {
+                        if (oColumns[colIndex].gridField.getFontClass() != '') {
+                            itm += '<i style="cursor:pointer" class="' + oColumns[colIndex].gridField.getFontClass() + '"></i>';
+                        } else {
+                            itm += '<img style="cursor:pointer" src="' + VIS.Application.contextUrl + 'Images/Thumb16x16/' + oColumns[colIndex].gridField.getImageName() + '"></img>';
+                        }
 
+                    } else if (oColumns[colIndex].gridField.getShowIcon()) {
+                        if (oColumns[colIndex].gridField.getFontClass() != '') {
+                            itm += '<i style="cursor:pointer" class="' + oColumns[colIndex].gridField.getFontClass() + '"></i>'
+                        } else {
+                            itm += '<img style="cursor:pointer" src="' + VIS.Application.contextUrl + 'Images/Thumb16x16/' + oColumns[colIndex].gridField.getImageName() + '"></img>';
+                        }
+                        itm += '<span style="cursor:pointer" class="ml-1">' + oColumns[colIndex].gridField.getHeader() + '</span>';
+                    } else {
+                        itm += '<span style="cursor:pointer">' + oColumns[colIndex].gridField.getHeader() + '</span>';
+                    }
+                    itm += '</div>';
+                    return itm;
                 }
             }
 
@@ -1072,12 +1164,11 @@
                 }
             }
 
-            else if (VIS.DisplayType.TelePhone == displayType)
-            {
+            else if (VIS.DisplayType.TelePhone == displayType) {
                 oColumn.sortable = true;
 
                 oColumn.render = function (record, index, colIndex) {
-                    
+
                     var f = oColumns[colIndex].field;
                     var val = record[f];
                     if (record.changes && typeof record.changes[f] != 'undefined') {
@@ -1086,7 +1177,7 @@
 
                     if (val) {
 
-                        return VIS.VTelePhoneInstance.getHtml(val,true);
+                        return VIS.VTelePhoneInstance.getHtml(val, true);
                     }
                     return "";
                 }
@@ -1145,7 +1236,7 @@
 
             var iControl = VIS.VControlFactory.getControl(mTab, mField, false, false, false);
             iControl.setReadOnly(false);
-           
+
 
             if (!oColumn.editable) {
                 oColumn.editable = { type: 'custom', ctrl: iControl };
@@ -1260,11 +1351,22 @@
         return this.grid.get(recid, isIndex);
     };
 
-    VTable.prototype.activate = function (multiTabView) {
+    VTable.prototype.setUI = function (displayAsMultiview) {
+        // this.grid.show.selectColumn = !displayAsMultiview;
+        this.displayAsMultiview = displayAsMultiview;
+    };
+
+    VTable.prototype.activate = function (multiTabView, showMultiViewOnly) {
+        this.$container.closest('.vis-ad-w-p-vc').css('flex', '');
         if (this.grid && !this.rendred) {
             this.grid.fixedBody = true;
             if (multiTabView)
                 this.grid.fixedBody = false;
+            if (this.grid.fixedBody && showMultiViewOnly) {
+                // this.$container.height(this.$container.closest('.vis-ad-w-p-center').height());
+                this.$container.closest('.vis-ad-w-p-vc').css('flex', '1');
+                this.$container.height('');
+            }
             this.$container.w2render(this.grid['name']);
             this.rendred = true;
         }
@@ -1272,9 +1374,18 @@
             if (this.grid.fixedBody !== !multiTabView) {
                 this.grid.fixedBody = !multiTabView;
                 if (this.grid.fixedBody) {
-                    this.$container.height(this.$container.parent().height());
+                    //this.$container.height(this.$container.closest('.vis-ad-w-p-center').height());
+
+                    this.$container.closest('.vis-ad-w-p-vc').css('flex', '1');
+                    this.$container.height('');
                 }
             }
+            if (this.grid.fixedBody && showMultiViewOnly) {
+                // this.$container.height(this.$container.closest('.vis-ad-w-p-center').height());
+                this.$container.closest('.vis-ad-w-p-vc').css('flex', '1');
+                this.$container.height('');
+            }
+
             //this.grid.fixedBody = !multiTabView;
             //window.setTimeout(function (tht) {
             //    tht.grid.resize();
@@ -1437,7 +1548,7 @@
                 id = args.recid; // row to select
                 this.grid.refresh(); //refresh Grid
                 this.blockSelect = true; // forcefully block select changed event
-              
+
             }
 
             else if (action === VIS.VTable.prototype.ROW_DELETE) {
@@ -1474,7 +1585,7 @@
 
     //Set Default Focus for grid... Not in use Yet.
     VTable.prototype.setDefaultFocus = function (colName) {
-       
+
         if (!this.mTab.defaultFocusField)
             return;
         if (!colName)

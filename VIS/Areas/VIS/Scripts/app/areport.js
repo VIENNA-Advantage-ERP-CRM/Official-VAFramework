@@ -624,7 +624,7 @@
                 ulAction.append(btnArchive);
                 btnRequery = $("<li><a title='" + VIS.Utility.Util.cleanMnemonic(VIS.Msg.getMsg("Requery")) + "' class='vis vis-refresh'></a></li>");
                 ulAction.append(btnRequery);
-                btnSearch = $("<li><a title='" + VIS.Utility.Util.cleanMnemonic(VIS.Msg.getMsg("Search")) + "' class='vis vis-find'></a></li>");
+                btnSearch = $("<li style='display:none'><a title='" + VIS.Utility.Util.cleanMnemonic(VIS.Msg.getMsg("Search")) + "' class='vis vis-find'></a></li>");
                 ulAction.append(btnSearch);
                 btnCustomize = $("<li><a title='" + VIS.Utility.Util.cleanMnemonic(VIS.Msg.getMsg("PrintCustomize")) + "' class='vis vis-customize'></a></li>");
                 ulAction.append(btnCustomize);
@@ -805,7 +805,7 @@
                 });
             });
             btnSearch.on('click', function () {
-                var find = new VIS.Find(windowNo, curTab, 0);
+                var find = new VIS.Find(windowNo, curTab, 0,null);
                 find.onClose = function () {
                     if (find.getIsOKPressed()) {
                         var query = find.getQuery();

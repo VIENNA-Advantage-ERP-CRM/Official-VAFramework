@@ -2,9 +2,10 @@
 
     function favMgr() {
 
-        var favDiv;
+        var favDivList;
         var favContainer;
         var ul, atab;
+        var _homeFavCount;
 
         var mgr = {
             init: init,
@@ -14,28 +15,46 @@
 
         return mgr;
 
-        function init(_favDiv) {
-            favDiv = _favDiv;
-            favContainer = favDiv.find("#vis_favScroll");
+        function init(_favDivCont) {
+            favContainer = _favDivCont;
+            favDivList = favContainer.find(".vis-nm-fav-favourite-lising");
             getFavouriteNode();
-            atab = $('#userFav-Tab');
-            ul = $('<ul class="vis-userFavourites-ListMenu">');
-            ul.on("click", function (e) {
+            atab = $('#vis_home_favourites');
+            _homeFavCount = $(".vis_home-total-count");
+            favContainer.on("click", function (e) {
                 var $target = $(e.target);
-                if ($target.data('btn') == 'action') {
-                    VIS.viewManager.startAction($target.data("action"), $target.data("id"));
-                }
-                else if ($target.data('btn') == 'zoom') {
-                    VIS.viewManager.startActionInNewTab($target.data("action"), $target.data("id"));
-                   // alert($target.data("action") + " " + $target.data("id"));
-                }
-                else if ($target.data('btn') == 'remove') {
+                if ($target.data('btn') == 'remove') {
                     // e.stopPropagation()
                     removeFav($target.data("id"));
-                    var divCon = $($target).parent().parent();
-                    divCon.empty();
-                    divCon.remove();
-                    setCount(ul.find('li').length);
+                    $target.closest(".vis-nm-fav-tile").remove();
+                    setCount(favDivList.find(".vis-nm-fav-tile").length);
+                    var ele = $($(".vis-subnav-links > [data-value='" + $target.data("id") + "'] [data-action='" + $target.data("action") + "']")[0]);
+                    ele.attr("data-isfav", "no");
+                    ele.removeClass("vis-star-full").addClass("vis-star-empty");
+                }
+                else {
+                    var tgt = $target;
+                    if (!$target.hasClass("vis-nm-fav-tile")) {
+                        tgt = $target.closest(".vis-nm-fav-tile");
+                    }
+                    if (tgt.length > 0) {
+                        VIS.viewManager.startAction(tgt.data("action"), tgt.data("id"));
+                        atab.attr('style', 'display: none !important');
+                    }
+                    else {
+                        if ($target.hasClass("vis-grid-view") && !favDivList.hasClass("vis-nm-fav-grid-view")) {
+                            favDivList.addClass("vis-nm-fav-grid-view");
+                            favContainer.find(".vis-grid-view").hide();
+                            favContainer.find(".vis-list-view").show();
+                        }
+                        else {
+                            if ($target.hasClass("vis-list-view")) {
+                                favDivList.removeClass("vis-nm-fav-grid-view");
+                                favContainer.find(".vis-grid-view").show();
+                                favContainer.find(".vis-list-view").hide();
+                            }
+                        }
+                    }
                 }
             });
         };
@@ -48,93 +67,45 @@
                     alert(VIS.Msg.getMsg('ERRORGetFavouriteNode'));
                 },
                 success: function (data) {
-                    favContainer.empty();
+                    favDivList.empty();
                     if (data.result) {
                         for (var itm = 0, j = data.result.length; itm < j; itm++) {
                             addFavourite(data.result[itm]);
                         }
                     }
-                    setCount(ul.find('li').length);
-                    favContainer.append(ul);
+                    setCount(data.result.length);
                 }
             });
         };
 
         function addFavouriteMenu(barNode) {
             addFavourite(barNode);
-            setCount(ul.find('li').length);
-        }
+            setCount(favDivList.find(".vis-nm-fav-tile").length);
+        };
 
         function addFavourite(barNode) {
-            if (ul == null) return;
-
-            var li = $('<li data-nodeid="' + barNode.NodeID + '" >');
             var id = 0;
+            var clsWinProPg = "fa fa-window-maximize";
             if (barNode.Action == "W") {
                 id = barNode.WindowID;
             }
             else if (barNode.Action == "X") {
                 id = barNode.FormID;
+                clsWinProPg = "fa fa-list-alt";
             }
-            else if (barNode.Action == "P") {
+            else if (barNode.Action == "P" || barNode.Action == "R") {
                 id = barNode.ProcessID;
+                clsWinProPg = "fa fa-cog";
             }
-            else if (barNode.Action == "R") {
-                id = barNode.ProcessID;
-            }
-            var aNode = $('<a href="#" data-id="' + id + '" data-action="' + barNode.Action + '" data-nodeid="' + barNode.NodeID + '" data-btn="action" style="overflow: auto;" >');
-            //aNode.on('click', function () {
-            //    var id = $(this).data("id");
-            //    var action = $(this).data("action");
-            //    VIS.viewManager.startAction(action, id);
-            //});
-            var favboxtopicowrap = $('<div class="vis-favboxtopico">');
 
-            var btnRemove = $("<a href='javascript:void(0)' data-id='" + barNode.NodeID + "'  data-btn='remove' class='vis vis-removefav'>");
-            favboxtopicowrap.append(btnRemove);
 
-            var btnZoom = $("<a href='javascript:void(0)' data-id='" + id + "' data-action='" + barNode.Action + "' data-btn='zoom' class='vis vis-new-tab'>");
-            //btnZoom.on('click', function (e) {
+            var favItemDiv = $('<div title="' + barNode.Name + '" data-id="' + id + '" data-action="' + barNode.Action + '" data-nodeid="' + barNode.NodeID + '" data-btn="action" class="vis-nm-fav-tile"><div class="vis-nm-fav-ico-w-txt"><span class="' + clsWinProPg + '"></span><div class="vis-nm-fav-tile-txt">' + barNode.Name + '</div></div><span class="vis vis-star-empty" title="' + VIS.Msg.getMsg('RemoveFav') +'" data-action="' + barNode.Action + '" data-id=' + barNode.NodeID + '  data-btn="remove"></span></div>');
 
-            //});
-            favboxtopicowrap.append(btnZoom);            
-            li.append(favboxtopicowrap);
-
-            li.append(aNode);
-            //var btnRemove = $("<span data-id='" + barNode.NodeID + "' class='favouritesIcons icon-favourite-large vis-span-bottom'>");
-            //btnRemove.on('click', function (e) {
-            //    e.stopPropagation()
-            //    removeFav($(this).data("id"));
-            //    var divCon = $(this).parent();
-            //    divCon.empty();
-            //    divCon.remove();
-            //    setCount(ul.find('li').length);
-            //});
-            // aNode.append(btnRemove);
-           // aNode.append("<i>");
-            var name = barNode.Name;
-            if (name.length > 27) {
-                name = name.substr(0, 27);
-                aNode.append(name);
-                var aFName = $("<a href='#' class='VIS_Pref_tooltip' style='display: inline-block;'>").append('...');
-                var span = $("<span style='width: inherit;'>");
-                span.append($("<img class='VIS_Pref_callout'>").attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/ccc.png").append("ToolTip Text"));
-                span.append($("<label class='VIS_Pref_Label_Font'>").append(barNode.Name));
-                aFName.append(span);
-                aNode.append(aFName);
-            }
-            else {
-                aNode.append(barNode.Name);
-            }
-            ul.append(li);
-
+            favDivList.append(favItemDiv);
         };
 
         function removeFavourite(nodeID) {
-            if (ul == null) {
-                return;
-            }
-            var arr = ul.find('li');
+            var arr = favDivList.find('.vis-nm-fav-tile');
             var current = null;
             for (var itm = 0, len = arr.length; itm < len; itm++) {
                 current = $(arr[itm]);
@@ -143,7 +114,7 @@
                 }
             }
             arr = current = null;
-            setCount(ul.find('li').length);
+            setCount(favDivList.find(".vis-nm-fav-tile").length);
         };
 
         function removeFav(nodeID) {
@@ -155,8 +126,8 @@
         };
 
         function setCount(count) {
-            atab.empty();
-            atab.html("<span><i class='vis vis-favourite'></i></span><span class='favouriteTabLabel-Large'>" + VIS.Msg.getMsg('Favourites') + " - " + "</span><strong>" + count + "</strong>");
+            atab.find(".vis-nm-fav-FavouriteCount").text(VIS.Msg.getMsg('Favourites') + " (" + count + ")");
+            _homeFavCount.text(count);
         };
     };
 

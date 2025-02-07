@@ -195,7 +195,7 @@
         var $table, $contentGrid, $lblTitle, $btnClose;
         var $toolDiv = null;
         this.onLoad = null;
-
+       
         function initComponent() {
             // $contentGrid = $("<div class='vis-awindow-body'>");
 
@@ -378,7 +378,7 @@
      *  @param callback to add menu item for window
      *  @return true if loaded OK
      */
-    AWindow.prototype.initWindow = function (AD_Window_ID, query, callback, action, sel) {
+    AWindow.prototype.initWindow = function (AD_Window_ID, query, callback, action, sel,aParams) {
 
         this.cPanel = new VIS.APanel(); //initlize Apanel
         this.getContentGrid().css('display', 'flex'); // to support older design
@@ -404,10 +404,12 @@
 
             var jsonData = $.parseJSON(json.result); // widow json
 
+        
+
             VIS.context.setContextOfWindow($.parseJSON(json.wCtx), windowNo);// set window context
             //console.log(jsonData);
 
-            self.cPanel.initPanel(jsonData, query, self, false, sel); //initPanel
+            self.cPanel.initPanel(jsonData, query, self, false, sel,aParams); //initPanel
             self.sizeChanged();// set size and window
             self.cPanel.createSearchAutoComplete();
             //self.cPanel.selectFirstTab();
@@ -805,7 +807,8 @@
             var d = $("<div></div>");
             var fired = true;
             var mouseDown = false;
-            if (this.action == "Save" || this.action == "New") {
+            if (this.action == VIS.APanel.prototype.ACTION_NAME_SAVE || this.action == VIS.APanel.prototype.ACTION_NAME_NEW
+                || this.action == VIS.APanel.prototype.ACTION_NAME_SAVENEW) {
                // Handle case if user direct click on save button 
                 li.on("mousedown touchstart", function (e) {
 
@@ -819,7 +822,7 @@
 
             li.on(VIS.Events.onClick, function (e) {
                 mouseDown = false;
-                e.stopPropagation();
+                //e.stopPropagation();
                 if (fired && that.onAction && that.isEnabled) {
                     if (that.toggle) {
                         that.setPressed(!that.pressed);
@@ -1781,6 +1784,15 @@
         }
     };
 
+
+    VIS.VSortTab.prototype.setTabLevel = function (level) {
+        this.tabLevel = level;
+    }
+
+    VIS.VSortTab.prototype.getTabLevel = function () {
+        return this.tabLevel;
+    }
+
     VIS.VSortTab.prototype.notifyFireChanged = function (enable) {
         if (this.aContentPane)
             this.aContentPane.aSave.setEnabled(enable);
@@ -2100,6 +2112,11 @@
 
 
         VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetRecordInfo", { dse: dataIn }, function (data) {
+
+            data.Info=  data.Info.replace("@Created@", Globalize.format(new Date(data.Created), 'f') );
+            data.Info =  data.Info.replace("@Updated@", Globalize.format(new Date(data.Updated), 'f') );
+
+
             $root.html("<span>" + data.Info + "</span>");
             if (data.ShowGrid) {
 

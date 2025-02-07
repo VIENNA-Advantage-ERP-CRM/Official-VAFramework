@@ -318,14 +318,18 @@
         },
 
         getFunctionByName: function (functionName, context /*, args */) {
-
-            var args = [].slice.call(arguments).splice(2);
-            var namespaces = functionName.split(".");
-            var func = namespaces.pop();
-            for (var i = 0; i < namespaces.length; i++) {
-                context = context[namespaces[i]];
+            try {
+                var args = [].slice.call(arguments).splice(2);
+                var namespaces = functionName.split(".");
+                var func = namespaces.pop();
+                for (var i = 0; i < namespaces.length; i++) {
+                    context = context[namespaces[i]];
+                }
+                return context[func];
             }
-            return context[func];
+            catch {
+                return null;
+            }
         },
 
         utf8_to_b64: function (str) {
@@ -777,7 +781,7 @@
         function setScreenHeight(height) {
             window_height = height
         };
-
+      
         function getPreference(ctx, AD_Window_ID, context, system) {
             /**************************************************************************
          *	Get Preference.

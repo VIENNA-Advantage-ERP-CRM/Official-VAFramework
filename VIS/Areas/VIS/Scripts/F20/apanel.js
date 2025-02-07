@@ -104,6 +104,7 @@
         this.curTabIndex;
         /* Sort Tab */
         this.firstTabId = null;
+        this.masterTabId = null;
         this.DocActionVariables = {};
         this.DocActionVariables.STATUS_COMPLETED = "CO";
         this.DocActionVariables.STATUS_CLOSED = "CL";
@@ -119,10 +120,17 @@
 
         this.isSummaryVisible = false;
         this.lastView = "";
+
+        this.advanceWhere = "";
+        this.filterWhere = "";
+        this.advanceFlag = false;
+        this.filterFlag = false;
+        this.isAdvancesearch = false;
+        this.isFilter = false;
         //private 
         var $divContentArea, $ulNav, $ulToobar, $divStatus, $ulTabControl, $divTabControl, $divTabNav;
         var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter;
-        var $root, $busyDiv;
+        var $root, $busyDiv, $landingpage;
         var $ulRightBar2; //right bar
         var $btnlbToggle, $ulactionbar, $uldynactionbar, $divlbMain, $divlbNav; //right bar
         var $hdrPanel = "", $divIncludeTab, $divHeaderNav;
@@ -135,8 +143,14 @@
         var $spnTitle = null;
         var $spanSetting = null;
         var $divRightbar = null;
+        var $landingpage = null;
         this.excludeFromShare = ['ad_org', 'm_warehouse', 'ad_sharerecordorg'];
         /***END Tab panel**/
+
+        /* reserve pnl for right tab panel */
+        var $divReserveTabPanel = null;
+
+
 
         var tabItems = [], tabLIObj = {};
         this.defaultSearch = true;
@@ -146,12 +160,15 @@
 
         this.tabStack = []; // Maintain tab and view change history;
 
-        this.toolbarActionList = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT','BVW']; // ToolBar Action
+        this.toolbarActionList = ['UNO', 'NRD', 'SAR', 'DRD', 'RQY', 'RET', 'PRT', 'BVW', 'SAN', 'HOE']; // ToolBar Action
 
         function initComponenet() {
             var clone = document.importNode(tmpAPanel, true);
             $root = $(clone.querySelector(".vis-ad-w-p"));
             $busyDiv = $root.find(".vis-ad-w-p-busy"); // busy indicator
+            $landingpage = $root.find(".vis-landingpage");
+            $windowpage = $root.find(".vis-windowpage");
+            $root.find('.vis-ad-w-p-tb').attr('style', 'display:none');
 
             //tolbar and search 
             $ulToobar = $root.find(".vis-ad-w-p-tb-lc");// $("<ul class='vis-appsaction-ul'>"); //toolbar item list
@@ -187,6 +204,8 @@
             $divStatus = $root.find(".vis-ad-w-p-status");
 
             $tabPanel = $root.find('.vis-ad-w-p-actionpanel-r');
+
+            $divReserveTabPanel = $root.find('.vis-ad-w-p-actionpanel-r-b');
             /********* END Tab Panels **************/
 
             //Search 
@@ -232,12 +251,21 @@
                 }
             });
 
+            $landingpage.on('click', function () {
+                self.showLandingPage(true);
+            });
+
+            $windowpage.on('click', function () {
+                self.showLandingPage(false);
+            });
+
         };
 
         this.createSearchAutoComplete = function (text) {
             if ($txtSearch) {
 
                 var $selfpanel = this;
+                var isDel = false;
                 $txtSearch.autocomplete({
                     select: function (ev, ui) {
                         self.defaultSearch = false;
@@ -248,13 +276,14 @@
                             self.curTab.setShowSummaryNodes(false);
                         }
                         var query = new VIS.Query(self.curTab.getTableName(), false);
-
+                        self.curGC.aFilterPanel.hardRefreshFilterPanel();
                         self.curTab.searchText = ui.item.value;
                         self.curTab.userQueryID = ui.item.id;
 
                         if (ui.item.code != VIS.Msg.getMsg("All")) {
                             //query.addRestriction(ui.item.code);
                             self.curGC.searchCode = ui.item.code;
+                            self.curTab.searchCode = ui.item.code;
                         }
                         //	History
 
@@ -263,9 +292,11 @@
                         ////	Confirmed query
                         //self.curTab.setQuery(query);
                         //self.curGC.query(0, 0, false);   //  autoSize
-                        self.curGC.applyFilters(query);
+                        //self.curGC.applyFilters(query);
                         $btnClrSearch.css("visibility", "visible");
                         $imgdownSearch.css("visibility", "visible").css("transform", "rotate(360deg)");
+                        self.curGC.aFilterPanel.setFilterLineAdvance(self.curTab.userQueryID);
+                        $txtSearch.attr('readonly', 'readonly');
                         ev.stopPropagation();
                     },
                     minLength: 0,
@@ -287,6 +318,7 @@
                     if ($selfpanel.curTab.getTabLevel() == 0) {
                         if (item.defaultids && item.userid > 0) {
                             span = $("<span title='" + VIS.Msg.getMsg("DefaultSearch") + "'  data-id='" + item.id + "' class='VIS-winSearch-defaultIcon'></span>");
+
                         }
                         else {
                             span = $("<span title='" + VIS.Msg.getMsg("MakeDefaultSearch") + "' data-id='" + item.id + "' class='VIS-winSearch-NonDefaultIcon'></span>");
@@ -296,9 +328,13 @@
                         span = $("<span title='" + VIS.Msg.getMsg("DefaultSearch") + "'  data-id='" + item.id + "'></span>");
                     }
 
+                    var del = $("<span data-id='" + item.id + "' title='" + VIS.Msg.getMsg("Delete") + "'   class='fa fa-trash-o'></span>");
+
+                    var d = $('<div class="d-flex align-items-center justify-content-center">');
+                    d.append(span).append(del);
 
                     var li = $("<li>")
-                        .append($("<a style='display:block' title='" + item.title + "'>" + item.label + "</a>").append(span))
+                        .append($("<a style='display:block' title='" + item.title + "'>" + item.label + "</a>").append(d))
                         .appendTo(ul);
 
 
@@ -318,6 +354,27 @@
                             }
 
                         });
+                    });
+
+                    del.on("click", function (ev) {
+                        ev.stopPropagation();
+                        var $t = $(this);
+                        var uQueryID = $(this).data('id');
+                        var no = -1;
+                        self.setBusy(true);
+                        $.ajax({
+                            url: VIS.Application.contextUrl + 'ASearch/DeleteQuery',
+                            type: "POST",
+                            datatype: "json",
+                            async: false,
+                            data: { id: uQueryID }
+                        }).done(function (json) {
+                            self.setBusy(false);
+                            $t.closest('li').remove();
+                            no = parseInt(json);
+                            self.removeSearchOnDelete();
+                            toastr.success(VIS.Msg.getMsg('DeleteSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+                        })
                     });
 
                     return li;
@@ -341,7 +398,7 @@
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             }
 
-            
+
 
             setToolTipMessages();
         };
@@ -358,7 +415,7 @@
         };
 
         this.hideTabLinks = function (hide) {
-            if(hide)
+            if (hide)
                 $divHeaderNav.find('*').css('visibility', 'hidden');
             else
                 $divHeaderNav.find('*').css('visibility', 'visible');
@@ -378,6 +435,15 @@
         this.setSize = function (height, width) {
             return;
         };
+
+        this.setFilterActive = function (isActive) {
+            if (isActive) {
+                $btnFilter.find('i').addClass("vis-color-primary");
+            } else {
+                $btnFilter.find('i').removeClass("vis-color-primary");
+            }
+        }
+
         /**
          * Check given refrence is window action.
          * @param {any} refrenceValue
@@ -397,6 +463,7 @@
 
         //tabAction
         this.onTabChange = function (action) {
+            self.setFilterActive(false);
             self.tabActionPerformed(action);
         };
 
@@ -414,11 +481,13 @@
         this.createToolBar = function () {
 
             //1. toolbar action
+            this.aHome = this.addActions("HOE", null, true, true, false, onAction, null, "Shct_Home", "Home");
             this.aRefresh = this.addActions(this.ACTION_NAME_REFRESH, null, true, true, false, onAction, null, "Shct_Refresh", "Refresh");
             this.aDelete = this.addActions(this.ACTION_NAME_DELETE, null, true, true, false, onAction, null, "Shct_Delete", "Delete");
             this.aNew = this.addActions(this.ACTION_NAME_NEW, null, true, false, false, onAction, null, "Shct_New", "New");
             this.aIgnore = this.addActions("UNO", null, true, true, false, onAction, null, "Shct_Ignore", "Ignore");
-            this.aSave = this.addActions("SAR", null, true, true, false, onAction, null, "Shct_Save", "Save");
+            this.aSave = this.addActions(this.ACTION_NAME_SAVE, null, true, true, false, onAction, null, "Shct_Save", "Save");
+            this.aSaveNew = this.addActions(this.ACTION_NAME_SAVENEW, null, true, true, false, onAction, null, "Shct_SaveNew", "save-new");
             this.aFind = this.addActions("Find", null, true, true, false, onAction, null, "Shct_Find");
             this.aInfo = this.addActions("Info", null, true, true, false, onAction, null, "Shct_Info");
             this.aReport = this.addActions("RET", null, true, true, false, onAction, null, "Shct_Report", "Report");
@@ -428,17 +497,19 @@
             //Ndw Back button
             this.aBack = this.addActions("BVW", null, true, true, false, onAction, null, "Shct_Back", "back-arrow");
             //check toolbar
-           // if (!this.gridWindow.getIsHideToolbar()) {
-                $ulToobar.append(this.aBack.getListItm());
-                $ulToobar.append(this.aIgnore.getListItm());
-                $ulToobar.append(this.aNew.getListItm());
-                $ulToobar.append(this.aDelete.getListItm());
-                $ulToobar.append(this.aSave.getListItm());
-                $ulToobar.append(this.aRefresh.getListItm());
-                $ulToobar.append(this.aReport.getListItm());
-                $ulToobar.append(this.aPrint.getListItm());
-                // $ulToobar.append(this.aBatchUpdate.getListItm());
-           // }
+            // if (!this.gridWindow.getIsHideToolbar()) {
+            $ulToobar.append(this.aHome.getListItm());
+            $ulToobar.append(this.aBack.getListItm());
+            $ulToobar.append(this.aIgnore.getListItm());
+            $ulToobar.append(this.aNew.getListItm());
+            $ulToobar.append(this.aDelete.getListItm());
+            $ulToobar.append(this.aSave.getListItm());
+            $ulToobar.append(this.aSaveNew.getListItm());
+            $ulToobar.append(this.aRefresh.getListItm());
+            $ulToobar.append(this.aReport.getListItm());
+            $ulToobar.append(this.aPrint.getListItm());
+            // $ulToobar.append(this.aBatchUpdate.getListItm());
+            // }
 
             if (!this.gridWindow.getIsHideToolbar()) {
                 $ulToobar.find("LI").hide();
@@ -459,7 +530,7 @@
             this.aLast = this.addActions(this.ACTION_NAME_LAST, null, true, true, true, onAction, null, "Shct_LastRec");
             this.aNext = this.addActions(this.ACTION_NAME_NEXT, null, true, true, true, onAction, null, "Shct_NextRec");
             this.aMulti = this.addActions("Multi", null, false, true, true, onAction, false, "Shct_MultiRow", "Multix");
-            this.aSingle = this.addActions("Single", null, false, true, true, onAction, false, "Shct_MultiRow","Multi");
+            this.aSingle = this.addActions("Single", null, false, true, true, onAction, false, "Shct_MultiRow", "Multi");
             this.aCard = this.addActions("Card", null, false, true, true, onAction, false, "Shct_CardView", "card-o");
 
             this.aMap = this.addActions("Map", null, false, true, true, onAction);
@@ -622,6 +693,12 @@
                 //$ulactionbar.append(this.aRoleCenterView.getListItmIT());
             }
 
+            if (mWindow.getIsAssignRecord()) {
+                this.aAssignRecord = this.addActions("ASR", null, false, false, false, onAction, true); //1
+                this.aAssignRecord.setTextDirection("r");
+                $ulactionbar.append(this.aAssignRecord.getListItmIT());
+            }
+
             if (this.isPersonalLock) {
                 this.aLock = this.addActions("Lock", null, true, false, false, onAction, true);
                 this.aLock.setTextDirection("r");
@@ -705,9 +782,13 @@
         };
 
         //privilized function
-        this.getRoot = function () { return $root; };
+        this.getRoot = function () {
+            return $root;
+        };
 
-        this.getLayout = function () { return $divContentArea; };
+        this.getLayout = function () {
+            return $divContentArea;
+        };
 
         this.getIncludedEmptyArea = function () {
             return $divIncludeTab;
@@ -729,6 +810,7 @@
             self.defaultSearch = true;
             self.clearSearchText();
             $txtSearch.val("");
+            $txtSearch.removeAttr('readonly');
         }
 
         /**
@@ -736,37 +818,43 @@
         *   @param {boolean} show - show tab panel if true
         */
         this.showTabPanel = function (show) {
+            var clsName = 'vis-ad-w-p-center-flow-';
+            var cls2 = "vis-ad-w-p-actionpanel-";
             if (show) {
-                //$tabpanel.empty();
-                var clsName = 'vis-ad-w-p-center-flow-';
-                var cls2 = "vis-ad-w-p-actionpanel-";
-
-                //if (this.curTab.getIsTPBottomAligned()) {
-                //    clsName = "vis-ad-w-p-center-flow-b";
-                //    cls2 = "vis-ad-w-p-actionpanel-b";
-                //}
-
-                clsSuffix = this.curTab.getIsTPBottomAligned() ? 'b' : 'r';
-                var clsSuffixOld = this.curTab.getIsTPBottomAligned() ? 'r' : 'b';
+                var tpalign = this.curTab.getIsTPBottomAligned();// && !this.showMultiViewOnly; //only multiview
+                clsSuffix = tpalign ? 'b' : 'r';
+                var clsSuffixOld = tpalign ? 'r' : 'b';
 
                 if (!$tabPanel.hasClass(cls2 + clsSuffix)) {
-                    $tabPanel.parent().removeClass(clsName + clsSuffixOld).addClass(
-                        clsName + clsSuffix);
-
                     $tabPanel.removeClass();
                     $tabPanel.addClass(cls2 + clsSuffix);
-
                 }
-                if (this.curGC)
+                if (!$tabPanel.parent().hasClass(cls2 + clsSuffix)) {
+                    $tabPanel.parent().removeClass(clsName + clsSuffixOld).addClass(
+                        clsName + clsSuffix);
+                }
+                if (this.curGC) {
                     $tabPanel.append(this.curGC.getTabPanel());
+                    if (this.curTab.getIsShowBothTP()) {
+                        $divReserveTabPanel.append(this.curGC.getSpecialTabPanel());
+                        $divReserveTabPanel.css({ "display": "grid" });
+                    }
+                }
                 $tabPanel.css({ "display": "grid" });
-                //if (this.curGC.getIsSingleRow() && clsSuffix == 'b') {
-                //    this.getLayout().removeClass('vis-ad-w-p-center-view-height');
-                //    this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
-                //}
+                if (this.curGC) {
+                    this.curGC.onSizeChanged(true);
+                    if (this.curTab.getRecord_ID() > -1) {
+                        this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
+                    }
+                }
+
+
             }
             else {
                 $tabPanel.css({ "display": "none" });
+                $tabPanel.parent().removeClass(clsName + 'b').removeClass(
+                    clsName + 'r').addClass(clsName + 'r');
+                $divReserveTabPanel.css({ "display": "none" });
             }
         };
 
@@ -788,6 +876,14 @@
         this.setTabPanelclass = function (clss) {
 
         };
+
+        this.isHideFilterIcon = function (hide) {
+            if (hide) {
+                $btnFilter.hide();
+            } else {
+                $btnFilter.show();
+            }
+        }
 
 
 
@@ -833,10 +929,6 @@
         };
 
         this.navigateThroghtShortcut = function (forward) {
-
-
-
-
             var next = null;
             if (forward) {
                 next = $ulTabControl.find('.vis-apanel-tab-selected').nextAll("[style='opacity: 1;']:first");
@@ -871,6 +963,11 @@
         };
 
         this.startFilterPanel = function (hide) {
+
+            if (typeof hide == "undefined") {
+                hide = true;
+            }
+
             if (!hide) {
                 $fltrPanel.show();
                 this.refresh();
@@ -879,14 +976,54 @@
                 $fltrPanel.hide();
                 this.refresh();
             }
+
+            if (self.curGC.aFilterPanel.isConditionApply()) {
+                self.setFilterActive(true);
+            } else {
+                self.setFilterActive(false);
+            }
+
+            this.curTab.isFPManualHide = hide;
         };
 
         this.getTabSuffix = function () {
             return clsSuffix;
         }
 
+        /**
+         * Handle Landing page hide/show and manage event
+         * @param {any} show
+         * @param {any} actionParams
+         */
+        this.showLandingPage = function (show, actionParams) {
+            if (show) {
+                this.cmd_ignore();
+                this.landingPage.getRoot().show();
+                this.vTabbedPane.restoreTabChange(null);
+                this.curTabIndex = 0;
+                this.getRoot().hide();
+            } else {
+                this.landingPage.getRoot().hide();
+                this.getRoot().show();
+                //tab selection
+                if (actionParams && actionParams.TabIndex) {
+                    this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());
+                    this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", "", actionParams);
+                }
+                else {
+                    this.actionParams = {};
+                    if (!this.isFromSearch) {
+                        this.isFromSearch = false;
+                    }
+                    this.cmd_find('');
+                }
+                //this.setTabNavigation();
+                this.refresh();
+            }
+        }
+
         $btnFilter.on("click", function (e) {
-            self.startFilterPanel();
+            self.startFilterPanel(false);
         });
 
         $btnFPClose.on("click", function (e) {
@@ -995,27 +1132,44 @@
 
         //Search
         $imgSearch.on(VIS.Events.onTouchStartOrClick, function (e) {
-            self.cmd_find($txtSearch.val());
-            //self.curTab.searchText = "";
-            self.clearSearchText();
-            $txtSearch.val("");
+
+            if (self.curTab.userQueryID > 0) {
+                self.curGC.aFilterPanel.fireValChanged();
+            } else {
+                self.isFromSearch = true;
+                self.cmd_find($txtSearch.val());
+
+                //self.curTab.searchText = "";
+                //self.clearSearchText();
+                //$txtSearch.val("");
+            }
+
             e.stopPropagation();
         });
 
         if (!VIS.Application.isMobile) {
             $txtSearch.on("keyup", function (e) {
+                self.setAdvanceWhere("");
+                self.setFilterWhere("");
+                self.setAdvanceFlag(false);
+                self.setFilterFlag(false);
                 var code = e.charCode || e.keyCode;
                 if (code == 13) {
                     if (!self.defaultSearch) {
                         return;
                     }
+                    self.isFromSearch = true;
+
                     self.cmd_find($txtSearch.val());
-                    $txtSearch.val("");
+                    // $txtSearch.val("");
+
+                    $txtSearch.removeAttr('readonly');
                 }
                 else if (code == 8 && $btnClrSearch.css('visibility') == 'visible') {
                     e.preventDefault();
                     self.defaultSearch = true;
                     $txtSearch.val("");
+                    $txtSearch.removeAttr('readonly');
                     $btnClrSearch.css('visibility', 'hidden');
                     var query = new VIS.Query();
                     query.addRestriction(" 1 = 1 ");
@@ -1035,24 +1189,35 @@
         });
 
         $btnClrSearch.on("click", function () {
+            self.removeSearchOnDelete();
+        });
+
+        this.removeSearchOnDelete = function () {
             $btnClrSearch.css("visibility", "hidden");
             self.defaultSearch = true;
             //self.curTab.searchText = "";
             self.clearSearchText();
             $txtSearch.val("");
-            var query = new VIS.Query();
+            //var query = new VIS.Query();
             ////query.addRestriction(" 1 = 1 ");
             //self.findRecords(query);
-            self.findRecords(query);
+            //self.findRecords(query);
             $imgdownSearch.css("transform", "rotate(360deg)");
-        });
+            self.curTab.searchCode = "";
+            self.curTab.searchText = "";
+            self.curTab.userQueryID = 0;
+            $txtSearch.removeAttr('readonly');
+            self.curGC.aFilterPanel.removeAdvance();
+        };
 
         this.setAdvancedSerachText = function (hideicon, text) {
             if (hideicon) {
                 $btnClrSearch.css("visibility", "hidden");
+                $txtSearch.removeAttr("readonly");
             }
             else {
                 $btnClrSearch.css("visibility", "visible");
+                $txtSearch.attr('readonly', 'readonly');
                 $imgdownSearch.css("visibility", "visible");
             }
             $txtSearch.val(text);
@@ -1063,15 +1228,19 @@
             if (show && hasDefault) {
                 $btnClrSearch.css('visibility', 'visible');
                 $imgdownSearch.css('visibility', 'visible');
+                $txtSearch.attr('readonly', 'readonly');
             }
             else if (show && !hasDefault) {
                 $btnClrSearch.css('visibility', 'hidden');
+                $txtSearch.removeAttr("readonly");
                 $imgdownSearch.css('visibility', 'visible');
             }
             else {
                 $btnClrSearch.css('visibility', 'hidden');
-                $imgdownSearch.css('visibility', 'hidden');
+                $txtSearch.removeAttr("readonly");
+                $imgdownSearch.css('visibility', 'visible');
             }
+
         };
 
         this.setSearchFocus = function (focus) {
@@ -1102,7 +1271,7 @@
 
                     //$($txtSearch[1]).css("display", "inherit");
                     $imgdownSearch.css('visibility', 'visible');
-                    userQueries.push({ 'label': VIS.Msg.getMsg("All"), 'value': VIS.Msg.getMsg("All"), 'code': VIS.Msg.getMsg("All") });
+                    /* userQueries.push({ 'label': VIS.Msg.getMsg("All"), 'value': VIS.Msg.getMsg("All"), 'code': VIS.Msg.getMsg("All") });*/
                     var hasDefaultSearch = false;
                     for (var i = 0; i < data.tables[0].rows.length; i++) {
 
@@ -1116,6 +1285,7 @@
                     }
                 }
                 else {
+                    $imgdownSearch.css("transform", "rotate(360deg)");
                     $selfpanel.toggleASearchIcons(false, false);
                 }
 
@@ -1131,11 +1301,13 @@
                     else {
                         $txtSearch.val(text);
                     }
-                    $btnClrSearch.css('visibility', 'visible');
+                    //$btnClrSearch.css('visibility', 'visible');
+                    //$txtSearch.attr("readonly", "readonly");
                     $selfpanel.defaultSearch = false;
                 }
                 else {
                     $btnClrSearch.css('visibility', 'hidden');
+                    $txtSearch.removeAttr("readonly");
                 }
 
                 $txtSearch.autocomplete('option', 'source', userQueries);
@@ -1291,6 +1463,7 @@
                 this.aDelete.dispose();
                 this.aNew.dispose();
                 this.aSave.dispose();
+                this.aSaveNew.dispose();
                 this.aPrevious.dispose();
                 this.aFirst.dispose();
                 this.aLast.dispose();
@@ -1346,6 +1519,10 @@
                     this.aImportMap.dispose();
                 }
 
+                if (this.aAsssignRecord) {
+                    this.aAsssignRecord.dispose();
+                }
+
                 this.aRefresh = this.aDelete = this.aNew = this.aPrevious = this.aFirst = this.aLast = this.aNext = null;
                 this.aChat = this.aPageUp = this.aPageFirst = this.aPageLast = this.aPageDown = null;
                 this.aHelp = this.aSubscribe = this.aAttachment = null, this.toolbarCreated = null;
@@ -1375,6 +1552,7 @@
             this.curTabIndex = null;
             /* Sort Tab */
             this.firstTabId = null;
+            this.masterTabId = null;
 
 
 
@@ -1400,6 +1578,9 @@
     APanel.prototype.ACTION_NAME_PAGEUP = "PageUp";// "Next";
 
     APanel.prototype.ACTION_NAME_NEW = "NRD";
+    APanel.prototype.ACTION_NAME_SAVE = "SAR";
+    APanel.prototype.ACTION_NAME_SAVENEW = "SAN";
+
     APanel.prototype.ACTION_NAME_DELETE = "DRD";
     APanel.prototype.ACTION_NAME_REFRESH = "RQY";
     APanel.prototype.ACTION_NAME_FIND = "Find";
@@ -1407,6 +1588,7 @@
     APanel.prototype.ACTION_NAME_APPOINTMENT = "Appointment";
     APanel.prototype.ACTION_NAME_ARCHIVE = "Archive";
     APanel.prototype.ACTION_NAME_SHAREDREC = "RSD";
+    APanel.prototype.ACTION_NAME_AssignRecord = "ASR";
 
     var currentFocusClass = null;
     APanel.prototype.keyDown = function (evt) {
@@ -1469,7 +1651,7 @@
                     this.ShortcutNavigation(this.aLast.getAction());
                     break;
                 case 38:      // ArrowUP for preivious Record
-                    
+
                     this.ShortcutNavigation(this.aPrevious.getAction());
                     break;
                 case 40:      // Arrow Down for next record
@@ -1486,11 +1668,14 @@
                 case 86:      // Arrow Down for next record
                     this.actionPerformed(this.aCard.getAction());
                     break;
+                case 72: //H for Home
+                    this.cmd_home()
+                    break;
                 case 88:      // X for close
                     this.$parentWindow.dispose();
                     break;
-                case 79:
-                    this.startFilterPanel();
+                case 79: // O for close
+                    this.startFilterPanel(false);
                     break;
                 case 33:
                     if (evt.ctrlKey) {
@@ -1589,6 +1774,10 @@
         if (this.curGC) {
             this.curGC.onSizeChanged(true);
         }
+        if (this.curTab) {
+            this.setUI();
+        }
+        this.setTabNavigation();
         this.vTabbedPane.refresh();
     };
 
@@ -1707,17 +1896,17 @@
     APanel.prototype.showHideViewIcon = function (action) {
         if (this.curTab != null && this.curGC != null) {
             if (this.actionParams.IsHideGridToggle != null) {
-                if(this.actionParams.IsHideGridToggle)
+                if (this.actionParams.IsHideGridToggle)
                     this.aMulti.hide();
                 else this.aMulti.show();
             }
             else if (!this.curTab.getIsHideGridToggle()) {
                 this.aMulti.show();
-               
+
 
             } else {
                 this.aMulti.hide();
-               
+
             }
 
             if (this.actionParams.IsHideSingleToggle != null) {
@@ -1727,11 +1916,11 @@
                     this.aSingle.show();
             }
             else if (!this.curTab.getIsHideSingleToggle()) {
-                
+
                 this.aSingle.show();
 
             } else {
-                
+
                 this.aSingle.hide();
             }
 
@@ -1752,7 +1941,8 @@
             this.aSingle.hide();
             this.aCard.hide();
         }
-       
+
+
     }
 
     /** ************************************************************************
@@ -1768,12 +1958,14 @@
      *  @return true if Panel is initialized successfully
      */
 
-    APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel) {
+    APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel, aParams) {
 
         this.$parentWindow = $parent;
-        var gridWindow = new VIS.GridWindow(jsonData);
+        var gridWindow = new VIS.GridWindow(jsonData, this);
         this.gridWindow = gridWindow; //ref to call dispose
         //this.setWidth(gridWindow.getWindowWidth());
+        this.actionParams = aParams || {};
+
         this.createToolBar(); // Init ToolBar
 
         var curWindowNo = $parent.getWindowNo();
@@ -1789,9 +1981,10 @@
         if (!autoNew && gridWindow.getIsTransaction())
             this.ctx.setAutoNew(curWindowNo, true);
 
-        this.ctx.setContext(curWindowNo, "WindowName", gridWindow.getName());
+        this.ctx.setContext(curWindowNo, "ScreenName", gridWindow.getName());
 
         var multiTabview = gridWindow.getIsCompositeView();
+        this.showMultiViewOnly = gridWindow.getIsDependentInDetailView(); //new porp
         this.vTabbedPane.init(this, multiTabview);
 
 
@@ -1831,7 +2024,9 @@
             }
 
             tabActions[i] = new VIS.AppsAction(tObj); //Create Apps Action
-
+            if (i == 0) {
+                this.masterTabId = id;
+            }
             gTab = tabs[i];
             //if (i === 0) {
             //    this.curTab = gTab;
@@ -1869,6 +2064,8 @@
                     }
                 }//	query on first tab
             }
+
+
             var tabElement = null;
             //        //  GridController
             if (gTab.getIsSortTab())//     .IsSortTab())
@@ -1876,7 +2073,7 @@
                 //var st = new VIS.VSortTab(curWindowNo, id);
                 var st = new VIS.VSortTab(curWindowNo, gTab.getAD_Table_ID(),
                     gTab.getAD_ColumnSortOrder_ID(), gTab.getAD_ColumnSortYesNo_ID(), gTab.getIsReadOnly(), id);
-                //st.setTabLevel(gTab.getTabLevel());
+                st.setTabLevel(gTab.getTabLevel());
                 tabElement = st;
                 if (i == 0) {
                     firstTabId = id;
@@ -1885,7 +2082,7 @@
 
             else	//	normal tab
             {
-                var gc = new VIS.GridController(true, true, id,multiTabview);
+                var gc = new VIS.GridController(true, true, id, multiTabview, this.showMultiViewOnly);
                 gc.initGrid(false, curWindowNo, this, gTab);
 
                 //if (i === 0 && !setCurrent) {
@@ -1898,8 +2095,13 @@
 
                 // set current grid  controller
                 if (setCurrent) {
+                    //in case of zoom always swir=tch parent tab n single row
+                    if (this.vHeaderPanel) {
+                        this.switchRow(this.vHeaderPanel.curGC, "Y", true);
+                    }
                     this.curGC = gc;
                     setCurrent = false;
+                    //in case of zoom always swir=tch parent tab n single row
                 }
 
 
@@ -1909,29 +2111,20 @@
                     this.curTab = gTab;
                     this.curGC = gc;
                     this.firstTabId = id;
-                    //if (query != null) {
-                    //    gTab.setQuery(query);
-                    //}
-                    //}
-
-
-                    ////Set Title of Tab
-                    //if (i === 0) {
-                    //    this.curGC = gc;
-                    //    this.firstTabId = id;
-
+                }
+                if (i === 0) {
                     if (gTab.getIsHeaderPanel()) {
                         gc.initHeaderPanel(this.getParentDetailPane());
                         this.vHeaderPanel = gc.vHeaderPanel; // set in parent class , so it is accessible in all GC
-                       
                     }
                 }
                 gc.initFilterPanel(curWindowNo, this.getFilterPane());
 
                 tabElement = gc;
                 if (i === 0 && goSingleRow) {
-                    this.showHideViewIcon(this.aSingle);
-                    gc.switchSingleRow();
+                    this.switchRow(gc, "Y", true);
+                    //this.showHideViewIcon(this.aSingle);
+                    //gc.switchSingleRow();
                 }
                 //	Store GC if it has a included Tab
                 if (gTab.getIncluded_Tab_ID() != 0) {
@@ -1965,6 +2158,7 @@
         tabActions = null;
 
         this.ctx.setWindowContext(curWindowNo, "WindowName", jsonData._vo.DisplayName);
+        this.ctx.setWindowContext(curWindowNo, "AD_Window_ID", jsonData._vo.AD_Window_ID);
         $parent.setTitle(VIS.Env.getHeader(this.ctx, curWindowNo));
         this.setTitle(VIS.Env.getHeader(this.ctx, curWindowNo));
         $parent.setName(jsonData._vo.DisplayName);
@@ -1974,10 +2168,37 @@
             this.getLayout().removeClass('vis-ad-w-p-center-view-height');
             this.getLayout().find('.vis-ad-w-p-vc-editview').css("position", "unset");
             this.getLayout().find('.vis-ad-w-p-center-inctab').css("background", "rgba(var(--v-c-common), 1)");
-            //this.setIncTabReziable();
         }
         jsonData = null;
         $parent = null;
+
+        /**
+         * Handle Landing Page
+         */
+        var busy = $('<div class="vis-ad-w-p-busy"><i style="text-align:center" class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>');
+
+        if (gridWindow.getIsLandingPage()) {
+            this.getRoot().parent().append(busy);
+            //this.getRoot().hide();
+            var landingPage = new VIS.VLandingPage(this, curWindowNo);
+            this.landingPage = landingPage;
+            this.getRoot().parent().append(landingPage.getRoot().hide());
+            //$landingpage.show();
+            //$windowpage.show();
+            this.getRoot().find('.vis-ad-w-p-t-toolbar').css('visibility', 'visible');
+        }
+        //by pass for zoom query and action parameter
+        if (query != null || (this.actionParams != null && !$.isEmptyObject(this.actionParams))) {
+            this.getRoot().show();
+
+        } else if (this.landingPage) {
+            this.getRoot().hide();
+            this.landingPage.getRoot().show();
+        } else {
+            this.getRoot().show();
+        }
+        busy.remove();
+        this.getRoot().find('.vis-ad-w-p-tb').removeAttr('style');
         // this.curGC.setVisible(true);
     };
 
@@ -2010,7 +2231,7 @@
                         'top': '',
                         'width': ''
                     });
-                   
+
                     aPanel.refresh();
                 }
             });
@@ -2046,7 +2267,7 @@
                         'top': '',
                         'width': ''
                     });
-                    
+
                     aPanel.refresh();
                 }
             });
@@ -2080,16 +2301,26 @@
                     WhereValue: parentRecID
                 };
 
-                parentRecID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomParentRec", data);
+                var parentRecRowID = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomParentRec", data);
 
-                if (parentRecID) {
-                    VIS.context.setWindowContext(windowNo, parentDict[i].columnName, parentRecID.toString());
+                if (parentRecRowID) {
+                    VIS.context.setWindowContext(windowNo, parentDict[i].columnName, parentRecRowID.toString());
+
+                    if (i == parentDict.length - 1) {// last one
+
+                        var gTabPrnt = gTabs[parentDict[i].index];
+
+                        var query = new VIS.Query(gTabPrnt.getTableName(), false);
+                        query.addRestriction(parentDict[i].columnName + ' = ' + parentRecRowID.toString());
+                        gTabPrnt.setQuery(query, true);
+                        gTabPrnt.prepareQuery(0, 0, false, false);
+                    }
                 }
             }
         }
     }
 
-    //Updated by raghu 
+    //Updated by  
     //date:19-01-2016
     //Change/Update for:Zoom from workflow on home page
     APanel.prototype.selectFirstTab = function (isSelect) {
@@ -2097,7 +2328,11 @@
         this.curTab.setIsZoomAction(isSelect);
         setTimeout(function (that) {
             //that.curGC.isZoomAction = isSelect;
-            that.tabActionPerformed(that.firstTabId);
+            var tid = that.firstTabId;
+            if (that.actionParams && that.actionParams.TabIndex) {
+                tid = that.vTabbedPane.getNextTabId(that.actionParams.TabIndex)
+            }
+            that.tabActionPerformed(tid, "", "", that.actionParams);
             that.setTabNavigation();
             that = null;
         }, 10, this);
@@ -2133,8 +2368,15 @@
         //  Process Result
         if (notPrint)		//	refresh if not print
         {
-            //	Refresh data
-            this.curTab.dataRefresh();
+            if (!pi.getIsError()) {
+                if (this.isHdrBtn) { // if headr "docaction" button click on child tab 
+                    this.curGC.dataRefreshAll();
+                }
+                else {
+                    //	Refresh data
+                    this.curTab.dataRefresh();
+                }
+            }
             //	Timeout
             if (pi.getIsTimeout())		//	set temporarily to R/O
                 VIS.context.setWindowContext(this.curWindowNo, "Processed", "Y");
@@ -2203,7 +2445,7 @@
 
             if (action.source instanceof VIS.Controls.VButton) {
                 var btnactionName = action.source.getField().vo.DefaultValue;
-                if (selfPan.getIsWindowAction(action.source.mField.getAD_Reference_Value_ID()) && selfPan.toolbarActionList.indexOf(btnactionName)>-1) {
+                if (selfPan.getIsWindowAction(action.source.mField.getAD_Reference_Value_ID()) && selfPan.toolbarActionList.indexOf(btnactionName) > -1) {
                     // handle Toolbar action by Button
                     selfPan.actionPerformedCallback(selfPan, btnactionName);
                     return;
@@ -2225,12 +2467,13 @@
         }, 10);
     };
 
-    APanel.prototype.actionPerformedCallback = function (tis, action) {
-                /*Handle view change for back button */
+    APanel.prototype.setTabstackview = function (action) {
         if (action === "Multi" || action === "Card" || action === "Single") {
             var view = "Y";
             if (action === "Multi") {
                 view = "N";
+                this.isHideFilterIcon(false);
+                this.startFilterPanel(this.curTab.isFPManualHide);
                 //if (tis.curGC.getIsSingleRow()) {
                 //    view = "N";
                 //} else {
@@ -2238,10 +2481,17 @@
                 //}
             } else if (action === "Single") {
                 view = "Y";
+                var lastFP = this.curTab.isFPManualHide;
+                this.startFilterPanel(true);
+                this.isHideFilterIcon(true);
+                this.curTab.isFPManualHide = lastFP;
+
             }
 
             else if (action === "Card") {
                 view = "C";
+                this.isHideFilterIcon(false);
+                this.startFilterPanel(this.curTab.isFPManualHide);
                 //if (tis.curGC.getIsCardRow()) {
                 //    view = "N";
                 //}
@@ -2254,17 +2504,30 @@
             //Maintain stack for view change
             if (this.tabStack.length > 0) {
                 var currentTabSeq = this.curWinTab.getSelectedIndex();
+                if (currentTabSeq == -1) {
+                    currentTabSeq = this.curTabIndex;
+                }
                 var currentTab = this.tabStack.find(function (tab) {
                     return tab.tabSeq === currentTabSeq;
                 });
+
+                if (currentTab && !currentTab.tabView) {
+                    currentTab.tabView = [];
+                }
 
                 if (currentTab.tabView.includes(view)) {
                     currentTab.tabView = [];
                 }
                 currentTab.tabView.push(view);
+                //}
+                this.setBackEnable();
             }
-            this.setBackEnable();
         }
+    }
+
+    APanel.prototype.actionPerformedCallback = function (tis, action) {
+        /*Handle view change for back button */
+        this.setTabstackview(action);
 
         /*Naviagtion */
         if (tis.aFirst.getAction() === action) {
@@ -2280,20 +2543,26 @@
             tis.isDefaultFocusSet = false;
             tis.curGC.navigateRelative(+1);
         } else if (tis.aSingle.getAction() === action) {
-            tis.showHideViewIcon(tis.aSingle);
-            tis.curGC.switchSingleRow(true);
+            //tis.showHideViewIcon(tis.aSingle);
+            //tis.curGC.switchSingleRow(true);
+            tis.switchRow(tis.curGC, "Y", true);
         }
         else if (tis.aMulti.getAction() === action) {
-            tis.showHideViewIcon(tis.aMulti);
-            tis.curGC.switchMultiRow();
+            //tis.showHideViewIcon(tis.aMulti);
+            //tis.curGC.switchMultiRow();
+            tis.switchRow(tis.curGC, "N", true);
         } else if (tis.aCard.getAction() === action) {
-            tis.showHideViewIcon(tis.aCard);
-            tis.curGC.switchCardRow();            
+            //tis.showHideViewIcon(tis.aCard);
+            //tis.curGC.switchCardRow();    
+            tis.switchRow(tis.curGC, "C", true);
+
             // tis.aBack.setEnabled(!tis.curGC.getIsCardRow());
         } else if (tis.aMap.getAction() === action) {
             //tis.aMulti.setPressed(true);
             //tis.aCard.setPressed(false);
             tis.curGC.switchMapRow();
+        } else if (tis.aHome.getAction() === action) {
+            tis.cmd_home();
         } else if (tis.aBack.getAction() === action) {
             tis.cmd_back();
         } else if (tis.aPageUp.getAction() === action) {
@@ -2318,6 +2587,9 @@
         }
         else if (tis.aSave.getAction() === action) {
             tis.cmd_save(true);
+        }
+        else if (tis.aSaveNew.getAction() === action) {
+            tis.cmd_saveNew(true);
         }
         else if (tis.aNew.getAction() === action) {
             tis.cmd_new(false);
@@ -2399,6 +2671,10 @@
         }
         else if (tis.isShowSharedRecord && tis.aSharedRecord.getAction() === action) {
             tis.cmd_RecordShared();
+        }
+            //Rahul Mittal
+        else if (tis.aAssignRecord && tis.aAssignRecord.getAction() === action) {
+            tis.cmd_AssignRecord();
         }
 
         //	Tools
@@ -2497,11 +2773,11 @@
         //check action type
 
         //Undo  and tab change   
-        if (vButton.getField().getIsAction()&& vButton.getField().getAction() === "MTU") {
+        if (vButton.getField().getIsAction() && vButton.getField().getAction() === "MTU") {
             aPanel.cmd_ignore();
-                aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(), vButton.getField().getActionParams());
+            aPanel.tabActionPerformed(aPanel.vTabbedPane.getNextTabId(vButton.getField().getTabSeqNo()), vButton.getField().getAction(), "", vButton.getField().getActionParams());
             needExecute = false;
-        } 
+        }
 
         else if (curCtrller.curTab.needSave(true, false)) {
             needExecute = false;
@@ -2556,9 +2832,14 @@
         /*Special handling
           Move to next tab */
         if (mField.getIsAction()) {
-            this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(),
-                mField.getActionName(), mField.getActionParams());
-            return true;
+            /* is tab index in range (tab count) */
+            if (mField.getTabSeqNo() < this.vTabbedPane.getCount()) {
+                this.tabActionPerformed(this.vTabbedPane.getNextTabId(mField.getTabSeqNo()), mField.getAction(),
+                    mField.getActionName(), mField.getActionParams());
+                return true;
+            }
+            console.log(" Tab index is greater than total count ");
+            return;
         }
 
         //	Pop up Payment Rules
@@ -2603,6 +2884,7 @@
                     startWOasking = true;
 
                     aPanel.checkAndCallProcess(vButton, table_ID, record_ID, ctx, self, startWOasking, batch);
+
                     vda.dispose();
                     self = null;
                 }
@@ -2637,13 +2919,14 @@
                 if (vcf.isInitOK()) {
                     vcf.showDialog();
                     vcf.onClose = function (value) {
-                        vcf.dispose();
                         curTab.dataRefresh();//DataRefreshRow
-                    };
+                        vcf.dispose();
                     vcf = null;
+                    };
                 }
                 else {
                     vcf.dispose();
+                    vcf = null;
                 }
                 return;
             }
@@ -2800,9 +3083,10 @@
             return;
         }
         else if (columnName.equals("OpenCardDialog")) {
+
             aPanel.cmd_cardDialog(true);
         }
-        
+
 
         if (vButton.AD_Process_ID > 0) {
 
@@ -2877,6 +3161,9 @@
                 case 'SAR':
                     aPanel.cmd_save(false)
                     break;
+                case 'SAN':
+                    aPanel.cmd_saveNew(false)
+                    break;
                 case 'DRD':
                     aPanel.cmd_delete()
                     break;
@@ -2895,13 +3182,28 @@
                 case 'PRT':
                     aPanel.cmd_print();
                     break;
-
+                case 'HOE':
+                    aPanel.cmd_home();
+                    break;
+                case 'ASR':
+                    aPanel.cmd_AssignRecord();
+                    break;
                 default: actionVADMSDocument(aPanel, vButton.value)
             }
 
             curTab = curGC = aPanel = null;
 
         };
+    }
+
+    /**
+     * Handle widget Action
+     * @param {any} actionParams
+     */
+    APanel.prototype.landingPageActionPerformed = function (actionParams) {
+        this.vTabbedPane.restoreTabChange();
+        this.showLandingPage(false);
+        this.tabActionPerformed(this.vTabbedPane.getNextTabId(actionParams.TabIndex), "", "", actionParams);
     }
 
     function checkPostingByNewLogic(callback) {
@@ -3022,6 +3324,10 @@
         pi.setIsBackground(isbackground);
         //start process
 
+        /* Special flag to determine click event form header panel*/
+        aPanel.isHdrBtn = vButton.isHdrBtn;
+        /* */
+
         var pCtl = new VIS.ProcessCtl(aPanel, pi, null);
         //pCtl.setIsPdf(vButton.isPdf);
         //pCtl.setIsCsv(vButton.isCsv);
@@ -3125,7 +3431,7 @@
      *	tab change
      *  @param action tab item's id
      */
-        APanel.prototype.tabActionPerformed = function (action, actionType, actionName, actionParams) {
+    APanel.prototype.tabActionPerformed = function (action, actionType, actionName, actionParams) {
 
         /* Check for any window or form added in action*/
         if ((actionType == 'WIW' || actionType == 'FOM') && actionName != "") {
@@ -3174,6 +3480,8 @@
             return;
         }
 
+
+
         if (!this.vTabbedPane.getIsTabChanged(action)) {
             console.log("tabNotChange");
             this.setBusy(false, true);
@@ -3190,11 +3498,11 @@
         //Handle Open Tab in Dialog
         if (actionType == 'OTD') {
             VIS.TabMngr.show(tabEle, curEle.gTab.keyColumnName, curEle.gTab.getRecord_ID());
-            this.vTabbedPane.restoreTabChange();
+            this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());
             return;
         }
 
-        
+
 
         //// To Clear SearchText Box on Tab Change
         this.toggleASearchIcons(false, false);
@@ -3235,14 +3543,14 @@
                             var isCheckListRequire = this.curGC.IsCheckListRequire();
 
                             if (!isCheckListRequire) {
-                                this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
+                                this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());//m_curWinTab.setSelectedIndex(m_curTabIndex);
                                 this.setBusy(false, true);
                                 VIS.ADialog.error("CheckListRequired");
                                 return false;
                             }
 
                             if (!this.curTab.dataSave(true)) {	//  there is a problem, so we go back	
-                                this.vTabbedPane.restoreTabChange();//m_curWinTab.setSelectedIndex(m_curTabIndex);
+                                this.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());//m_curWinTab.setSelectedIndex(m_curTabIndex);
                                 this.setBusy(false, true);
                                 return false;
                             }
@@ -3265,7 +3573,7 @@
                                 if (results) {
                                     if (!selfPanel.curTab.dataSave(true)) {   //  there is a problem, so we go back
                                         //m_curWinTab.setSelectedIndex(m_curTabIndex);
-                                        selfPanel.vTabbedPane.restoreTabChange();
+                                        selfPanel.vTabbedPane.restoreTabChange(this.vTabbedPane.getSelectedOldIndex());
                                         selfPanel.setBusy(false, true);
                                         return false;
                                     }
@@ -3330,22 +3638,25 @@
             var winNo = this.curWindowNo;
 
             //Remove tab which sequence ias higher then ccurrent selected tab
-            this.tabStack = this.tabStack.filter(function (tab) {
-                return tab.tabSeq <= clickedTabSeq;
-            });
-
-            //Check Selected tab is exist or not
-            var clickedTab = undefined;
-            if (this.tabStack.length > 0) {
-                clickedTab = this.tabStack.find(function (tab) {
-                    return tab.tabSeq === clickedTabSeq ;
+            if (actionType != 'OTD') {
+                this.tabStack = this.tabStack.filter(function (tab) {
+                    return tab.tabSeq <= clickedTabSeq;
                 });
+                //Check Selected tab is exist or not
+                var clickedTab = undefined;
+                if (this.tabStack.length > 0) {
+                    clickedTab = this.tabStack.find(function (tab) {
+                        return tab.tabSeq === clickedTabSeq;
+                    });
+                }
+
+                if (!clickedTab) { // if selected tab not exist then add.
+                    this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
+                }
             }
 
-            if (!clickedTab) { // if selected tab not exist then add.
-                this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
-            }
-           
+
+
 
         }
         if (canExecute) {
@@ -3371,7 +3682,7 @@
         else {
             var mTab = gc.getMTab();
             tabEle.setVisible(true);
-            gc.activate(oldGC,this.actionParams);
+            gc.activate(oldGC, JSON.parse(JSON.stringify(this.actionParams)));
             if (oldGC)
                 oldGC.detachDynamicAction();
             this.curTab = gc.getMTab();
@@ -3384,9 +3695,9 @@
                 this.curTab.query = queryy;
                 keepFilters = false;
             }
-            var defaultTabLayout =   mTab.getTabLayout();
+            var defaultTabLayout = mTab.getTabLayout();
             if (back && this.curTab.getIsCurrent()) {
-                
+
 
                 if (this.curTab.getTabLevel() == 0) {
                     if (this.curTab.searchText) {
@@ -3404,7 +3715,10 @@
                         this.toggleASearchIcons(true, false);
                     }
                 }
+
                 gc.dataRefresh();
+
+                this.showFilterPanel(keepFilters);
 
                 if (this.tabStack.length > 0) {
                     var currentTabSeq = this.curWinTab.getSelectedIndex();
@@ -3426,17 +3740,21 @@
                     defaultTabLayout = this.actionParams.TabLayout;
                     resetLayout = true;
                 }
+
+
+
                 /* if reset tab is true then set default view which is set on tab */
                 if (resetLayout) {
-                    if (defaultTabLayout == 'N') {
-                        gc.switchMultiRow();
-                    }
-                    else if (defaultTabLayout == 'Y') {
-                        gc.switchSingleRow(true);
-                    }
-                    else if (defaultTabLayout == 'C') {
-                        gc.switchCardRow(true);
-                    }
+                    //if (defaultTabLayout == 'N') {
+                    //    gc.switchMultiRow();
+                    //}
+                    //else if (defaultTabLayout == 'Y') {
+                    //    gc.switchSingleRow(true);
+                    //}
+                    //else if (defaultTabLayout == 'C') {
+                    //    gc.switchCardRow(true);
+                    //}
+                    this.switchRow(gc, defaultTabLayout)
                 }
                 else {
                     if (gc.getIsSingleRow()) {
@@ -3449,36 +3767,51 @@
                 }
 
 
-                this.curTab.getTableModel().setCurrentPage(1);
-                if (!this.curGC.onDemandTree || gc.isZoomAction) {
-                    
-                    this.clearSearchText();
-                    
-                    this.setDefaultSearch(gc);
+                var AD_UserQuery_ID = 0;
+                if (this.actionParams && this.actionParams.AD_UserQuery_ID) {
+                    AD_UserQuery_ID = this.actionParams.AD_UserQuery_ID;
+                }
 
-                    if ((this.actionParams.TabWhereClause||'') != '') { // check if param has where clause or not
+                this.curTab.getTableModel().setCurrentPage(1);
+
+                this.showFilterPanel(keepFilters);
+
+                if (!this.curGC.onDemandTree || gc.isZoomAction) {
+
+                    this.clearSearchText();
+
+                    // this.setDefaultSearch(gc, AD_UserQuery_ID);                  
+
+                    if ((this.actionParams.TabWhereClause || '') != '') { // check if param has where clause or not
                         var query = new VIS.Query(this.curTab.getTableName(), false);
                         query.addRestriction(this.actionParams.TabWhereClause);
-                        this.curTab.setQuery(query,true);
+                        this.curTab.setQuery(query, true);
+                    } else {
+                        this.setDefaultSearch(gc, AD_UserQuery_ID);
                     }
-                    
+
                     gc.query(this.curTab.getOnlyCurrentDays(), 0, false);	//	updated
                 }
                 else {
-                    this.setDefaultSearch(gc);
+                    if ((this.actionParams.TabWhereClause || '') == '') {
+                        this.setDefaultSearch(gc, AD_UserQuery_ID);
+                    }
                 }
             }
-            
+
             //Change Icon
-            if (defaultTabLayout == 'N') {
-                this.showHideViewIcon(this.aMulti);
-            }
-            else if (defaultTabLayout == 'Y') {
-                this.showHideViewIcon(this.aSingle);
-            }
-            else if (defaultTabLayout == 'C') {
-                this.showHideViewIcon(this.aCard);
-            }
+            //if (defaultTabLayout == 'N') {
+            //    this.showHideViewIcon(this.aMulti);
+            //}
+            //else if (defaultTabLayout == 'Y') {
+            //    this.showHideViewIcon(this.aSingle);
+            //}
+            //else if (defaultTabLayout == 'C') {
+            //    this.showHideViewIcon(this.aCard);
+            //}
+
+            this.switchRow(null, defaultTabLayout, true);
+
 
             if (this.curGC.onDemandTree) {
                 this.aShowSummaryLevel.show();
@@ -3490,10 +3823,10 @@
 
         var gPanel = null;
         if (this.curGC) {
-            gPanel = this.curGC.vGridPanel;
+            gPanel = this.curGC;
         } else {
             gPanel = {};
-            gPanel.setEnabled = function (action,enable) {
+            gPanel.setToolbarBtnState = function (action, enable) {
                 ;
             }
         }
@@ -3506,16 +3839,16 @@
             this.aCardDialog.setEnabled(false);
 
             this.aNew.setEnabled(false);
-            //gPanel.setEnabled("NRD", false);
+            //gPanel.setToolbarBtnState("NRD", false);
 
             this.aDelete.setEnabled(false);
-           // gPanel.setEnabled("DRD", false);
+            // gPanel.setToolbarBtnState("DRD", false);
 
             this.aFind.setEnabled(false);
             this.aBatchUpdate.setEnabled(false);
 
             this.aRefresh.setEnabled(false);
-            //gPanel.setEnabled("RQY", false);
+            //gPanel.setToolbarBtnState("RQY", false);
 
             this.aNext.setEnabled(false);
             this.aLast.setEnabled(false);
@@ -3540,17 +3873,40 @@
             this.aFind.setEnabled(true);
             this.aBatchUpdate ? this.aBatchUpdate : '';
             this.aRefresh.setEnabled(true);
-            gPanel.setEnabled("RQY", true);
+            gPanel.setToolbarBtnState("RQY", true);
             //aAttachment.setEnabled(true);
             //aChat.setEnabled(true);
         }
-        
+
         this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
-        
-        this.showFilterPanel(keepFilters);
-        if (this.actionParams.IsShowFilterPanel != null) {//set
-            this.startFilterPanel(!this.actionParams.IsShowFilterPanel);
+
+        if (!isAPanelTab && this.showMultiViewOnly) { // in case of compiste and grid mode
+            this.curGC.refreshRowPresentation();
         }
+
+
+        if (this.actionParams.IsShowFilterPanel != null || this.curTab.getIsShowFilterPanel()) {//set
+            var lastFP = this.curTab.isFPManualHide;
+            if (lastFP == undefined || lastFP == 'undefined') {
+                lastFP = !this.curTab.getIsShowFilterPanel();
+            }
+
+            this.startFilterPanel(false);
+            this.curTab.isFPManualHide = lastFP;
+        } else {
+            this.startFilterPanel(this.curTab['isFPManualHide']);
+        }
+
+
+        if (!isAPanelTab && this.curGC.getIsSingleRow()) {
+            this.isHideFilterIcon(true);
+            var lastFP = this.curTab.isFPManualHide;
+            this.startFilterPanel(true);
+            this.curTab.isFPManualHide = lastFP;
+        } else {
+            this.isHideFilterIcon(false);
+        }
+
         //}
 
         this.refresh();
@@ -3566,11 +3922,43 @@
 
         if (this.curTab.getAD_Process_ID() == 0) {
             this.aPrint.setEnabled(false);
-            gPanel.setEnabled("PRT", false);
+            gPanel.setToolbarBtnState("PRT", false);
         }
         else {
             this.aPrint.setEnabled(true);
-            gPanel.setEnabled("PRT", true);
+            gPanel.setToolbarBtnState("PRT", true);
+        }
+
+        this.setUI();
+
+        if (this.actionParams.AD_UserQuery_ID) {
+            this.curGC.aFilterPanel.setFilterLineAdvance(this.actionParams.AD_UserQuery_ID, true);
+        }
+
+        var tbParams = {};
+        if (this.actionParams) {
+            //copy UI required prop
+            tbParams.IsHideGridToggle = this.actionParams.IsHideGridToggle;
+            tbParams.IsHideCardToggle = this.actionParams.IsHideCardToggle;
+            tbParams.IsHideSingleToggle = this.actionParams.IsHideSingleToggle;
+            tbParams.IsReadOnly = this.actionParams.IsReadOnly;
+            tbParams.IsDeleteDisabled = this.actionParams.IsDeleteDisabled;
+        }
+
+        this.actionParams = tbParams; //clear one time setting  properties not all
+
+        if (!isAPanelTab && this.curGC && this.curTab.getRecord_ID() > -1) {
+            this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
+        }
+
+    };
+
+    /**
+     * set UI 
+     */
+    APanel.prototype.setUI = function () {
+        if (!this.actionParams) {
+            this.actionParams = {};
         }
 
         if (!this.actionParams.IsHideMapToggle && this.curTab.getIsMapView()) {
@@ -3619,36 +4007,77 @@
         }
         else {
             this.hideActionbar(false);
-        };
-
-        var selff = this;
-        //if (this.isShowSharedRecord && this.aSharedRecord) {
-        //    window.setTimeout(function () {
-        //        selff.aSharedRecord.setEnabled(true);
-        //        selff.aSharedRecord.setPressed(selff.curTab.hasShared(true));
-        //    }, 200);
-        //}
+        }
     };
 
-   
+
+
+    /**
+     * 
+     * @param {any} gc    grid controller null if dont want to switch row
+     * @param {any} tabLayout  char for layout
+     * @param {any} updateViewIconState   true if want to show hide icon based on tablayout
+     */
+    APanel.prototype.switchRow = function (gc, tabLayout, updateViewIconState) {
+
+        if (gc) {
+            if (tabLayout == 'N') {
+                gc.switchMultiRow();
+            }
+            else if (tabLayout == 'Y') {
+                gc.switchSingleRow(true);
+            }
+            else if (tabLayout == 'C') {
+                gc.switchCardRow(true);
+            }
+        }
+
+        if (updateViewIconState) {
+            if (tabLayout == 'N') {
+                this.showHideViewIcon(this.aMulti);
+            }
+            else if (tabLayout == 'Y') {
+                this.showHideViewIcon(this.aSingle);
+            }
+            else if (tabLayout == 'C') {
+                this.showHideViewIcon(this.aCard);
+            }
+        }
+
+    }
+
+    APanel.prototype.displayIncArea = function (show) {
+        var tdArea = this.getIncludedEmptyArea();
+        if (show && tdArea.data('lasttab') != 'Y') {
+            tdArea.css('display', 'flex');
+        }
+        else
+            tdArea.css('display', 'none');
+    }
+
     APanel.prototype.onQueryCompleted = function () {
 
     };
 
-    APanel.prototype.setDefaultSearch = function (gc) {
+    APanel.prototype.setDefaultSearch = function (gc, AD_UserQuery_ID) {
 
         var $selfpanel = this;
 
         var sqlUserSearch = "VIS_117";
-
         var param = [];
-        param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", this.curTab.getAD_Tab_ID());
-        param[1] = new VIS.DB.SqlParam("@AD_User_ID", parseInt(this.ctx.getAD_User_ID()));
-        param[2] = new VIS.DB.SqlParam("@AD_Tab_ID1", this.curTab.getAD_Tab_ID());
-        param[3] = new VIS.DB.SqlParam("@AD_User_ID1", parseInt(this.ctx.getAD_User_ID()));
-        param[4] = new VIS.DB.SqlParam("@AD_Client_ID", parseInt(this.ctx.getAD_Client_ID()));
-        param[5] = new VIS.DB.SqlParam("@AD_Tab_ID2", this.curTab.getAD_Tab_ID());
-        param[6] = new VIS.DB.SqlParam("@AD_Table_ID", this.curTab.getAD_Table_ID());
+        if (AD_UserQuery_ID > 0) {
+            sqlUserSearch = "VIS_159";
+            param[0] = new VIS.DB.SqlParam("@AD_UserQuery_ID", AD_UserQuery_ID);
+
+        } else {
+            param[0] = new VIS.DB.SqlParam("@AD_Tab_ID", this.curTab.getAD_Tab_ID());
+            param[1] = new VIS.DB.SqlParam("@AD_User_ID", parseInt(this.ctx.getAD_User_ID()));
+            param[2] = new VIS.DB.SqlParam("@AD_Tab_ID1", this.curTab.getAD_Tab_ID());
+            param[3] = new VIS.DB.SqlParam("@AD_User_ID1", parseInt(this.ctx.getAD_User_ID()));
+            param[4] = new VIS.DB.SqlParam("@AD_Client_ID", parseInt(this.ctx.getAD_Client_ID()));
+            param[5] = new VIS.DB.SqlParam("@AD_Tab_ID2", this.curTab.getAD_Tab_ID());
+            param[6] = new VIS.DB.SqlParam("@AD_Table_ID", this.curTab.getAD_Table_ID());
+        }
 
         var data = executeDataSet(sqlUserSearch, param);
 
@@ -3665,9 +4094,16 @@
                         $selfpanel.curTab.setQuery(query);
                         $selfpanel.defaultSearch = false;
                         $selfpanel.curTab.searchText = data.tables[0].rows[i].cells["name"];
+                        var userquery_id = data.tables[0].rows[i].cells["ad_userquery_id"];
+                        setTimeout(function (id) {
+                            $selfpanel.curGC.aFilterPanel.setFilterLineAdvance(userquery_id, true);
+                        }, 1000, userquery_id);
+
                         toastr.success(VIS.Msg.getMsg("DefaultSerachExist"), '', { timeOut: 4000, "positionClass": "toast-top-center", "closeButton": true, });
+
                     }
                 }
+
                 if (!$selfpanel.curTab.hasSavedAdvancedSearch) {
                     //var query = new VIS.Query($selfpanel.curTab.getTableName(), true);
                     //$selfpanel.curTab.setQuery(query);
@@ -3701,10 +4137,10 @@
     APanel.prototype.dataStatusChanged = function (e) {
         var gPanel = null;
         if (this.curGC) {
-            gPanel = this.curGC.vGridPanel;
+            gPanel = this.curGC;
         } else {
             gPanel = {};
-            gPanel.setEnabled = function (action, enable) {
+            gPanel.setToolbarBtnState = function (action, enable) {
 
             }
         }
@@ -3783,22 +4219,25 @@
         if (insertRecord)
             insertRecord = this.curTab.getIsInsertRecord();
         this.aNew.setEnabled(!changed && insertRecord);
-        gPanel.setEnabled("NRD", !changed && insertRecord);
+        gPanel.setToolbarBtnState("NRD", !changed && insertRecord);
         if (this.aCopy) {
             this.aCopy.setEnabled(!changed && insertRecord);
         }
         this.aRefresh.setEnabled(!changed);
-        gPanel.setEnabled("RQY", !changed);
+        gPanel.setToolbarBtnState("RQY", !changed);
         this.aDelete.setEnabled(!changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
-        gPanel.setEnabled("DRD", !changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
+        gPanel.setToolbarBtnState("DRD", !changed && !readOnly && e.getCurrentRow() > -1 && !this.actionParams.IsDeleteDisabled);
         //
         if (readOnly && this.curTab.getIsAlwaysUpdateField())
             readOnly = false;
         this.aIgnore.setEnabled(changed && !readOnly);
-        gPanel.setEnabled("UNO", changed && !readOnly);
+        gPanel.setToolbarBtnState("UNO", changed && !readOnly);
 
         this.aSave.setEnabled(changed && !readOnly);
-        gPanel.setEnabled("SAR", changed && !readOnly);
+        gPanel.setToolbarBtnState("SAR", changed && !readOnly);
+
+        this.aSaveNew.setEnabled(changed && !readOnly);
+        gPanel.setToolbarBtnState("SAN", changed && !readOnly);
 
         this.aCardDialog.setEnabled(!changed);
 
@@ -3806,10 +4245,10 @@
         //	No Rows
         if (e.getTotalRows() == 0 && insertRecord) {
             this.aNew.setEnabled(true);
-            gPanel.setEnabled("NRD", true);
+            gPanel.setToolbarBtnState("NRD", true);
 
             this.aDelete.setEnabled(false);
-            gPanel.setEnabled("DRD", true);
+            gPanel.setToolbarBtnState("DRD", true);
 
             if (!this.curGC.isZoomAction) {
                 this.highlightButton(true, this.aNew);
@@ -3839,24 +4278,27 @@
             this.aSubscribe.setPressed(this.curTab.HasSubscribed());
         }
 
+        if (this.aAssignRecord) {
+            this.aAssignRecord.setPressed(this.curTab.hasAssignedRecord());
+        }
         //  this.aChat.setEnabled(true);
 
         if (this.isPersonalLock) {
             this.aLock.setEnabled(true);
-            gPanel.setEnabled(this.aLock.getAction(), true);
+            gPanel.setToolbarBtnState(this.aLock.getAction(), true);
             this.aLock.setPressed(this.curTab.getIsLocked());
             this.aRecAccess.setEnabled(true);
-            gPanel.setEnabled(this.aRecAccess.getAction(), true);
+            gPanel.setToolbarBtnState(this.aRecAccess.getAction(), true);
         }
 
         if (this.isShowSharedRecord && this.aSharedRecord) {
             if (this.curTab.getValue('AD_Org_ID') > 0 && this.excludeFromShare.indexOf(this.curTab.getTableName().toLowerCase()) == -1) {
                 this.aSharedRecord.setEnabled(true);
-                gPanel.setEnabled(this.aSharedRecord.getAction(), true);
+                gPanel.setToolbarBtnState(this.aSharedRecord.getAction(), true);
                 this.aSharedRecord.setPressed(this.curTab.hasShared());
             } else {
                 this.aSharedRecord.setEnabled(false);
-                gPanel.setEnabled(this.aSharedRecord.getAction(), false);
+                gPanel.setToolbarBtnState(this.aSharedRecord.getAction(), false);
             }
         }
 
@@ -3866,109 +4308,114 @@
             //this.aMulti.setEnabled(false);
             if (this.aChat) {
                 this.aChat.setEnabled(false);
-                gPanel.setEnabled(this.aChat.getAction(), false);
+                gPanel.setToolbarBtnState(this.aChat.getAction(), false);
             }
             if (this.aAttachment) {
                 this.aAttachment.setEnabled(false);
-                gPanel.setEnabled(this.aAttachment.getAction(), false);
+                gPanel.setToolbarBtnState(this.aAttachment.getAction(), false);
             }
             if (this.aSubscribe) {
                 this.aSubscribe.setEnabled(false);
-                gPanel.setEnabled(this.aSubscribe.getAction(), false);
+                gPanel.setToolbarBtnState(this.aSubscribe.getAction(), false);
             }
             //if (this.aImportMap) {
             //    this.aImportMap.setEnabled(false);
             //}
             if (this.aHistory) {
                 this.aHistory.setEnabled(false);
-                gPanel.setEnabled(this.aHistory.getAction(), false);
+                gPanel.setToolbarBtnState(this.aHistory.getAction(), false);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(false);
-                gPanel.setEnabled(this.aEmail.getAction(), false);
+                gPanel.setToolbarBtnState(this.aEmail.getAction(), false);
             }
             if (this.aLetter) {
                 this.aLetter.setEnabled(false);
-                gPanel.setEnabled(this.aLetter.getAction(), false);
+                gPanel.setToolbarBtnState(this.aLetter.getAction(), false);
             }
             if (this.aSms) {
                 this.aSms.setEnabled(false);
-                gPanel.setEnabled(this.aSms.getAction(), false);
+                gPanel.setToolbarBtnState(this.aSms.getAction(), false);
             }
             if (this.aFaxEmail) {
                 this.aFaxEmail.setEnabled(false);
-                gPanel.setEnabled(this.aFaxEmail.getAction(), false);
+                gPanel.setToolbarBtnState(this.aFaxEmail.getAction(), false);
             }
 
             if (this.aCreateDocument) {
                 this.aCreateDocument.setEnabled(false);
-                gPanel.setEnabled(this.aCreateDocument.getAction(), false);
+                gPanel.setToolbarBtnState(this.aCreateDocument.getAction(), false);
             }
             if (this.aUploadDocument) {
                 this.aUploadDocument.setEnabled(false);
-                gPanel.setEnabled(this.aUploadDocument.getAction(), false);
+                gPanel.setToolbarBtnState(this.aUploadDocument.getAction(), false);
             }
             if (this.aViewDocument) {
                 this.aViewDocument.setEnabled(false);
-                gPanel.setEnabled(this.aViewDocument.getAction(), false);
+                gPanel.setToolbarBtnState(this.aViewDocument.getAction(), false);
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(false);
-                gPanel.setEnabled(this.aAttachment.getAction(), false);
+                gPanel.setToolbarBtnState(this.aAttachment.getAction(), false);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(false);
-                gPanel.setEnabled(this.aZoomAcross.getAction(), false);
+                gPanel.setToolbarBtnState(this.aZoomAcross.getAction(), false);
             }
             if (this.aMarkToExport) {
                 this.aMarkToExport.setEnabled(false);
-                gPanel.setEnabled(this.aMarkToExport.getAction(), false);
+                gPanel.setToolbarBtnState(this.aMarkToExport.getAction(), false);
             }
             if (this.aArchive) {
                 this.aArchive.setEnabled(false);
-                gPanel.setEnabled(this.aArchive.getAction(), false);
+                gPanel.setToolbarBtnState(this.aArchive.getAction(), false);
             }
             if (this.aEmailAttach) {
                 this.aEmailAttach.setEnabled(false);
-                gPanel.setEnabled(this.aEmailAttach.getAction(), false);
+                gPanel.setToolbarBtnState(this.aEmailAttach.getAction(), false);
             }
             if (this.aAppointment) {
                 this.aAppointment.setEnabled(false);
-                gPanel.setEnabled(this.aAppointment.getAction(), false);
+                gPanel.setToolbarBtnState(this.aAppointment.getAction(), false);
             }
             if (this.aTask) {
                 this.aTask.setEnabled(false);
-                gPanel.setEnabled(this.aTask.getAction(), false);
+                gPanel.setToolbarBtnState(this.aTask.getAction(), false);
             }
             if (this.aRequest) {
                 this.aRequest.setEnabled(false);
-                gPanel.setEnabled(this.aRequest.getAction(), false);
+                gPanel.setToolbarBtnState(this.aRequest.getAction(), false);
             }
             if (this.aWorkflow) {
                 this.aWorkflow.setEnabled(false);
-                gPanel.setEnabled(this.aWorkflow.getAction(), false);
+                gPanel.setToolbarBtnState(this.aWorkflow.getAction(), false);
             }
             if (this.aCopy) {
                 this.aCopy.setEnabled(false);
-                gPanel.setEnabled(this.aCopy.getAction(), false);
+                gPanel.setToolbarBtnState(this.aCopy.getAction(), false);
             }
             if (this.aLock) {
                 this.aLock.setEnabled(false);
-                gPanel.setEnabled(this.aLock.getAction(), false);
+                gPanel.setToolbarBtnState(this.aLock.getAction(), false);
             }
             if (this.aRecAccess) {
                 this.aRecAccess.setEnabled(false);
-                gPanel.setEnabled(this.aRecAccess.getAction(), false);
+                gPanel.setToolbarBtnState(this.aRecAccess.getAction(), false);
             }
 
             if (this.aSharedRecord) {
                 this.aSharedRecord.setEnabled(false);
-                gPanel.setEnabled(this.aSharedRecord.getAction(), false);
+                gPanel.setToolbarBtnState(this.aSharedRecord.getAction(), false);
             }
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(false);
-                gPanel.setEnabled(this.aBatchUpdate.getAction(), false);
+
+                gPanel.setToolbarBtnState(this.aBatchUpdate.getAction(), false);
+            }
+            if (this.aAssignRecord) {
+                this.aAssignRecord.setEnabled(false);
+                gPanel.setToolbarBtnState(this.aAssignRecord.getAction(), false);
             }
 
             //if (this.aCall) {
@@ -3979,101 +4426,106 @@
 
             if (this.aChat) {
                 this.aChat.setEnabled(true);
-                gPanel.setEnabled(this.aChat.getAction(), true);
+                gPanel.setToolbarBtnState(this.aChat.getAction(), true);
             }
             if (this.aAttachment) {
                 this.aAttachment.setEnabled(true);
-                gPanel.setEnabled(this.aAttachment.getAction(), true);
+                gPanel.setToolbarBtnState(this.aAttachment.getAction(), true);
             }
             if (this.aSubscribe) {
                 this.aSubscribe.setEnabled(true);
-                gPanel.setEnabled(this.aSubscribe.getAction(), true);
+                gPanel.setToolbarBtnState(this.aSubscribe.getAction(), true);
             }
             if (this.aHistory) {
                 this.aHistory.setEnabled(true);
-                gPanel.setEnabled(this.aHistory.getAction(), true);
+                gPanel.setToolbarBtnState(this.aHistory.getAction(), true);
             }
             if (this.aEmail) {
                 this.aEmail.setEnabled(true);
-                gPanel.setEnabled(this.aEmail.getAction(), true);
+                gPanel.setToolbarBtnState(this.aEmail.getAction(), true);
             }
             if (this.aLetter) {
                 this.aLetter.setEnabled(true);
-                gPanel.setEnabled(this.aLetter.getAction(), true);
+                gPanel.setToolbarBtnState(this.aLetter.getAction(), true);
             }
             if (this.aSms) {
                 this.aSms.setEnabled(true);
-                gPanel.setEnabled(this.aSms.getAction(), true);
+                gPanel.setToolbarBtnState(this.aSms.getAction(), true);
             }
             if (this.aFaxEmail) {
                 this.aFaxEmail.setEnabled(true);
-                gPanel.setEnabled(this.aFaxEmail.getAction(), true);
+                gPanel.setToolbarBtnState(this.aFaxEmail.getAction(), true);
             }
             if (this.aImportMap) {
                 this.aImportMap.setEnabled(true);
-                gPanel.setEnabled(this.aImportMap.getAction(), true);
+                gPanel.setToolbarBtnState(this.aImportMap.getAction(), true);
             }
             if (this.aCreateDocument) {
                 this.aCreateDocument.setEnabled(true);
-                gPanel.setEnabled(this.aCreateDocument.getAction(), true);
+                gPanel.setToolbarBtnState(this.aCreateDocument.getAction(), true);
             }
             if (this.aUploadDocument) {
                 this.aUploadDocument.setEnabled(true);
-                gPanel.setEnabled(this.aUploadDocument.getAction(), true);
+                gPanel.setToolbarBtnState(this.aUploadDocument.getAction(), true);
             }
             if (this.aViewDocument) {
                 this.aViewDocument.setEnabled(true);
-                gPanel.setEnabled(this.aViewDocument.getAction(), true);
+                gPanel.setToolbarBtnState(this.aViewDocument.getAction(), true);
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(true);
-                gPanel.setEnabled(this.aAttachFrom.getAction(), true);
+                gPanel.setToolbarBtnState(this.aAttachFrom.getAction(), true);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(true);
-                gPanel.setEnabled(this.aZoomAcross.getAction(), true);
+                gPanel.setToolbarBtnState(this.aZoomAcross.getAction(), true);
             }
             if (this.aMarkToExport) {
                 this.aMarkToExport.setEnabled(true);
-                gPanel.setEnabled(this.aMarkToExport.getAction(), true);
+                gPanel.setToolbarBtnState(this.aMarkToExport.getAction(), true);
             }
             if (this.aArchive) {
                 this.aArchive.setEnabled(true);
-                gPanel.setEnabled(this.aArchive.getAction(), true);
+                gPanel.setToolbarBtnState(this.aArchive.getAction(), true);
             }
             if (this.aEmailAttach) {
                 this.aEmailAttach.setEnabled(true);
-                gPanel.setEnabled(this.aEmailAttach.getAction(), true);
+                gPanel.setToolbarBtnState(this.aEmailAttach.getAction(), true);
             }
             if (this.aAppointment) {
                 this.aAppointment.setEnabled(true);
-                gPanel.setEnabled(this.aAppointment.getAction(), true);
+                gPanel.setToolbarBtnState(this.aAppointment.getAction(), true);
             }
             if (this.aTask) {
                 this.aTask.setEnabled(true);
-                gPanel.setEnabled(this.aTask.getAction(), true);
+                gPanel.setToolbarBtnState(this.aTask.getAction(), true);
             }
             if (this.aRequest) {
                 this.aRequest.setEnabled(true);
-                gPanel.setEnabled(this.aRequest.getAction(), true);
+                gPanel.setToolbarBtnState(this.aRequest.getAction(), true);
             }
             if (this.aWorkflow) {
                 this.aWorkflow.setEnabled(true);
-                gPanel.setEnabled(this.aWorkflow.getAction(), true);
+                gPanel.setToolbarBtnState(this.aWorkflow.getAction(), true);
             }
             if (this.aCopy) {
                 this.aCopy.setEnabled(true);
-                gPanel.setEnabled(this.aCopy.getAction(), true);
+                gPanel.setToolbarBtnState(this.aCopy.getAction(), true);
             }
             if (this.aLock) {
                 this.aLock.setEnabled(true);
-                gPanel.setEnabled(this.aLock.getAction(), true);
+                gPanel.setToolbarBtnState(this.aLock.getAction(), true);
             }
 
             if (this.aBatchUpdate) {
                 this.aBatchUpdate.setEnabled(true);
-                gPanel.setEnabled(this.aBatchUpdate.getAction(), true);
+                gPanel.setToolbarBtnState(this.aBatchUpdate.getAction(), true);
             }
+            if (this.aAssignRecord) {
+                this.aAssignRecord.setEnabled(true);
+                gPanel.setToolbarBtnState(this.aAssignRecord.getAction(), true);
+            }
+
             //if (this.aCall) {
             //    this.aCall.setEnabled(true);
             //}
@@ -4119,7 +4571,9 @@
         if (this.curWinTab == this.vTabbedPane) {
             VIS.context.setContext(this.curWindowNo, "tb_Index", this.curTabIndex);
             this.curWinTab.evaluate(null);
-            this.curWinTab.notifyDataChanged(e);
+            if (e.getChangedColumn() < 0 || !e.getIsInserting()) {
+                this.curWinTab.notifyDataChanged(e);
+            }
         }
 
         if (this.curTab.getParentTab() && this.aSharedRecord) {
@@ -4133,7 +4587,7 @@
     };   //
 
     // Common function for set footer
-    APanel.prototype.setStatusInfo = function (record_ID) {
+    APanel.prototype.setStatusInfo = function (record_ID, action) {
         if (!record_ID && this.curTab) {
             record_ID = this.curTab.getRecord_ID();
         }
@@ -4146,7 +4600,14 @@
                 if (tht && tht.statusBar)
                     tht.statusBar.setInfo(err);
             });
+
+        // refesh current tab panel
+        if (action && action != '' && this.curGC) {
+            this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), action)
+        }
     }
+
+
 
     /**
      *	Set Status Line to text
@@ -4166,8 +4627,9 @@
 
     APanel.prototype.cmd_ignore = function () {
         //m_curGC.stopEditor(false);
-        this.curGC.dataIgnore();
-
+        if (this.curGC) {
+            this.curGC.dataIgnore();
+        }
     };//Undo
 
     APanel.prototype.cmd_help = function ()//sarab
@@ -4176,10 +4638,28 @@
     };
 
     APanel.prototype.cmd_cardDialog = function (fromCardDialogBtn) {
-
         var card = new VIS.CVDialog(this, fromCardDialogBtn);
         card.show();
     };
+
+    APanel.prototype.cmd_home = function () {
+        this.firstTabId = this.masterTabId;
+        this.selectFirstTab();
+        this.getRoot().find(".vis-ad-w-p-t-c").animate({ scrollLeft: 0 }, 500);
+    }
+
+    /**
+     * Save and new
+     * @param {any} manual
+     */
+    APanel.prototype.cmd_saveNew = function (manual) {
+        var $this = this;
+        this.cmd_save(true, function (result) {
+            if (result) {
+                $this.cmd_new(false);
+            }
+        });
+    }
 
     APanel.prototype.cmd_save = function (manual, callback) {
         //cmd_save(false);
@@ -4230,9 +4710,11 @@
                 if (manual && !retValue && !selfPanel.errorDisplayed) {
 
                 }
-                curGC.refreshTabPanelData(selfPanel.curTab.getRecord_ID());
-                if (manual)
+                curGC.refreshTabPanelData(selfPanel.curTab.getRecord_ID(), 'S');
+                if (manual) {
                     curGC.dynamicDisplay(-1);
+                    selfPanel.vTabbedPane.notifyDataChanged();
+                }
 
                 if (callback) {
                     callback(retValue);
@@ -4240,7 +4722,7 @@
 
             });
 
-           
+
         }
 
         if (needExecute) {
@@ -4251,14 +4733,16 @@
 
             }
 
-            if (manual)
+            if (manual) {
                 curGC.dynamicDisplay(-1);
+                selfPanel.vTabbedPane.notifyDataChanged();
+            }
 
             if (callback) {
                 callback(retValue);
             }
 
-            curGC.refreshTabPanelData(curTab.getRecord_ID());
+            curGC.refreshTabPanelData(curTab.getRecord_ID(), 'S');
 
             this.curTab.loadShared();
             if (this.aSharedRecord) {
@@ -4289,6 +4773,7 @@
 
         this.curGC.setNewRecordLayout();
         this.curGC.dataNew(copy);
+
     };// New
 
     APanel.prototype.cmd_batchUpdatedialog = function () {
@@ -4346,16 +4831,24 @@
                 if (defaultTabLayout == 'N') {
                     tis.showHideViewIcon(tis.aMulti);
                     tis.curGC.switchMultiRow();
+                    tis.isHideFilterIcon(false);
+                    this.startFilterPanel(this.curTab.isFPManualHide);
                 }
                 else if (defaultTabLayout == 'Y') {
                     tis.showHideViewIcon(tis.aSingle);
                     tis.curGC.switchSingleRow(true);
+
+                    var lastFP = tis.curTab.isFPManualHide;
+                    tis.startFilterPanel(true);
+                    tis.isHideFilterIcon(true);
+                    tis.curTab.isFPManualHide = lastFP;
                 }
                 else if (defaultTabLayout == 'C') {
                     tis.showHideViewIcon(tis.aCard);
                     tis.curGC.switchCardRow(true);
+                    tis.isHideFilterIcon(false);
+                    this.startFilterPanel(this.curTab.isFPManualHide);
                 }
-
             }
         }
 
@@ -4405,12 +4898,13 @@
         }
 
         this.setBusy(true);
+        if (this.isFromSearch) {
+            var query = null;
 
-        var query = null;
-
-        if (val && val.trim() !== "") {
-            val = "%" + val + "%";
-            query = this.curTab.getSearchQuery(val);
+            if (val && val.trim() !== "") {
+                val = "%" + val + "%";
+                query = this.curTab.getSearchQuery(val);
+            }
         }
 
         this.findRecords(query);
@@ -4838,9 +5332,9 @@
         }
         var self = this;
         var att = new VIS.attachmentForm(this.curTab.getWindowNo(), 0, this.curTab.getAD_Table_ID(),
-            this.curTab.getRecord_ID(), '', null, null, null,isViewOnly);
+            this.curTab.getRecord_ID(), '', null, null, null, isViewOnly);
         att.setIsWindowAction(true);
-        
+
         att.show();
         att.onClose = function () {
             self.curTab.loadAttachments();
@@ -4943,12 +5437,13 @@
         if (this.curGC) {
             this.curGC.searchCode = "";
             this.curTab.searchText = "";
+            this.curTab.userQueryID = "";
         }
     };
 
     APanel.prototype.cmd_finddialog = function () {
 
-        var find = new VIS.Find(this.curWindowNo, this.curTab, 0);
+        var find = new VIS.Find(this.curWindowNo, this.curTab, 0, this);
         var self = this;
         var savedSearchName = "";
         find.onClose = function () {
@@ -4970,7 +5465,9 @@
                 var onlyCurrentDays = find.getCurrentDays();
                 var created = find.getIsCreated();
                 savedSearchName = find.getSavedQueryName();
-                self.curTab.userQueryID = find.getSavedID() //find.getID();
+                self.curTab.userQueryID = find.getSavedID(); //find.getID();
+                self.curTab.searchCode = find.getSearchCode();
+                self.curTab.searchText = find.getSearchName();
                 find.dispose();
                 find = null;
 
@@ -4992,6 +5489,7 @@
                 var findPressed = self.curTab.getIsQueryActive() || self.curTab.getOnlyCurrentDays() > 0;
                 self.aFind.setPressed(findPressed);
 
+                self.curGC.aFilterPanel.setFilterLineAdvance(self.curTab.userQueryID);
 
             }
             ////Refresh everytime bcoz smtimes user create an ASearch and save it, 
@@ -5277,6 +5775,59 @@
         }
     };
 
+
+    //assign record action panel 
+    APanel.prototype.cmd_AssignRecord = function () {
+        var recordsids = [];
+        var self = this;
+       // get selected Rows 
+        var gridSelectedRows = this.curGC.getSelectedRows();
+        // not select any row 
+        if (gridSelectedRows.length == 0) {
+            return;
+        };
+
+        var recID = this.curTab.getRecord_ID();
+        if (recID == -1)//	No Key
+        {
+           // disable the action
+            this.aAssignRecord.setEnabled(false);
+            if (this.curGC) {
+                this.curGC.vGridPanel.setEnabled(this.aAssignRecord.getAction(), false);
+            }
+            return;
+        }
+
+       // get primary key of table
+        var data = {
+            AD_Table_ID: this.curTab.getAD_Table_ID()
+        };
+        var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetKeyColumns", data);
+        if (res == null) {
+            return;
+        }
+
+        //assigned Records
+        var assignedRecords = this.curTab.assignedRecords;
+        for (var i = 0; i < gridSelectedRows.length; i++) {
+
+            recID = gridSelectedRows[i][(this.curGC.gTab.getTableName() + '_id').toLower()];
+
+            //selected rows of record ID
+            recordsids.push(recID);
+        };
+
+       // Call the popup
+        var userAssign = new VIS.userAssign(recordsids, this.curTab.getAD_Table_ID(), this.curWindowNo, this.curTab.getAD_Window_ID(), assignedRecords);
+       // close popup
+        userAssign.onClose = function () {
+          
+            self.aAssignRecord.setPressed(self.curTab.hasAssignedRecord());
+            self = null;
+        }
+        userAssign.show();
+    }
+    
     /* END */
 
     /**
@@ -5291,7 +5842,7 @@
     /**
      * Set Enable disable Back button   
      */
-    APanel.prototype.setBackEnable = function () {       
+    APanel.prototype.setBackEnable = function () {
         if (this.tabStack.length == 1 && this.tabStack[0].tabView.length <= 1) {
             this.aBack.setEnabled(false);
             if (this.curGC) {
@@ -5341,6 +5892,54 @@
         this.curTab = null;
         this.disposeComponent();
 
+    };
+
+    APanel.prototype.setAdvanceWhere = function (advanceWhere) {
+        this.advanceWhere = advanceWhere;
+    };
+
+    APanel.prototype.getAdvanceWhere = function () {
+        return this.advanceWhere;
+    };
+
+    APanel.prototype.setFilterWhere = function (filterWhere) {
+        this.filterWhere = filterWhere;
+    };
+
+    APanel.prototype.getFilterWhere = function () {
+        return this.filterWhere;
+    };
+
+    APanel.prototype.setAdvanceFlag = function (advanceFlag) {
+        this.advanceFlag = advanceFlag;
+    };
+
+    APanel.prototype.getAdvanceFlag = function () {
+        return this.advanceFlag;
+    };
+
+    APanel.prototype.setFilterFlag = function (filterFlag) {
+        this.filterFlag = filterFlag;
+    };
+
+    APanel.prototype.getFilterFlag = function () {
+        return this.filterFlag;
+    };
+
+    APanel.prototype.setIsAdvanceSearch = function (isAdvancesearch) {
+        this.isAdvancesearch = isAdvancesearch;
+    };
+
+    APanel.prototype.getIsAdvanceSearch = function () {
+        return this.isAdvancesearch;
+    };
+
+    APanel.prototype.getIsFilter = function (isFilter) {
+        this.isFilter = isFilter;
+    };
+
+    APanel.prototype.setIsFilter = function () {
+        return this.isFilter;
     };
 
     //****************** APanel END ***********************//

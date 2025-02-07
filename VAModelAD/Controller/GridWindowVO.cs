@@ -121,6 +121,9 @@ namespace VAdvantage.Controller
         public bool IsHideToolbar = false;
         //Hide action bar
         public bool IsHideActionbar = false;
+        public bool IsLandingPage = false;
+        public bool IsDependentInDetailView = false;
+        public bool IsAssignRecord = false;
 
 
         public List<GridTabVO> GetTabs()
@@ -197,11 +200,11 @@ namespace VAdvantage.Controller
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
              + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared,IsHideTabLinks,"
-             + "IsHideToolbar,IsHideActionbar ");
+             + "IsHideToolbar,IsHideActionbar,IsLandingPage,IsDependentInDetailView , IsAssignRecord ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
-                sql01.Append("FROM AD_Window_v WHERE AD_Window_ID=" + vo.AD_Window_ID.ToString());
+                sql01.Append(" FROM AD_Window_v WHERE AD_Window_ID=" + vo.AD_Window_ID.ToString());
                 if (!skipRole)
                 {
                     sql01.Append(" AND AD_Role_ID=" + AD_Role_ID);
@@ -378,6 +381,9 @@ namespace VAdvantage.Controller
                             vo.IsHideTabLinks = dr[39].ToString() == "Y";
                             vo.IsHideToolbar = dr[40].ToString() == "Y";
                             vo.IsHideActionbar = dr[41].ToString() == "Y";
+                            vo.IsLandingPage = dr[42].ToString() == "Y";
+                            vo.IsDependentInDetailView = dr[43].ToString() == "Y";
+                            vo.IsAssignRecord = dr[44].ToString() == "Y";
 
                         }
                     }
@@ -897,7 +903,10 @@ namespace VAdvantage.Controller
                 clone.IsGenerateAttachmentCode = IsGenerateAttachmentCode;
                 clone.IsHideTabLinks = IsHideTabLinks;
                 clone.IsHideActionbar = IsHideActionbar;
+                clone.IsLandingPage = IsLandingPage;
                 clone.IsHideToolbar = IsHideToolbar;
+                clone.IsDependentInDetailView = IsDependentInDetailView;
+                clone.IsAssignRecord = IsAssignRecord;
 
                 //
                 clone.hasPanel = hasPanel;

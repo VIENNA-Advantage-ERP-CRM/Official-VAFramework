@@ -31,5 +31,11 @@ namespace VAdvantage.Controller
         public string TabWhereClause { get; set; }//15 T
         public string TabLayout { get; set; } //16 T { 'N'[Grid],'Y'[Single],'C'[Card]}
         public bool? IsShowFilterPanel { get; set; } //17
+        public string TabIndex { get; set; } //18
+        public string WindowName { get; set; } //19
+        public string ActionName { get; set; } //20
+        public string ActionType { get; set; } //21 {'W'[Window], 'X'[Form], 'P'[Process]}
+        public string TabPanelName { get; set; }
+        public int AD_UserQuery_ID { get; set; }
     }
 }

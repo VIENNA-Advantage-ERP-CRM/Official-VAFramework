@@ -96,7 +96,7 @@
         this.onCardEdit = null;
 
         this.cardViewData = null;
-
+        this.isFixedBody = true;
         var root;
         var body = null;
         var headerdiv;
@@ -750,7 +750,9 @@
         //this.getBody().empty();
 
     };
-
+    VCardView.prototype.setIsFixedBody = function (fixed) {
+        this.isFixedBody = fixed;
+    };
     VCardView.prototype.refresh = function (width) {
         var $this = this;
         window.setTimeout(function () {
@@ -951,6 +953,16 @@
             }
             $this.calculateWidth(width);
             $this.SyncScroll();
+
+            //check fixed height
+
+            var prnt = $this.getRoot().parent();
+            prnt.css('height', '100%'); //reset height
+            //card view
+            if (!$this.isFixedBody) {
+                prnt.height($this.getBody()[0].scrollHeight+52);
+            }
+
             $this.aPanel.setBusy(false);
         }, 10);
     }
@@ -1086,12 +1098,14 @@
     function VCard(fields, record, headerItems, headerStyle, headerPadding, windowNo, fieldStyles, aPanel) {
         this.record = record;
         this.aPanel = aPanel;
+        this.rIndex = record.recid;
         this.dynamicStyle = [];
         this.textAlignEnum = { "C": "Center", "R": "flex-end", "L": "flex-start" };
         this.alignItemEnum = { "C": "Center", "T": "flex-start", "B": "flex-end" };
         this.dynamicStyle = [];
         this.styleTag = document.createElement('style');
         this.windowNo = windowNo;
+        this.tabID = aPanel.curTab.getAD_Tab_ID()
         this.fieldStyles = fieldStyles;
         this.tabID = aPanel.curTab.getAD_Tab_ID();
 
@@ -1156,6 +1170,19 @@
                 var hideFieldText = headerItem.HideFieldText;
                 var fieldValueStyle = headerItem.FieldValueStyle;
                 var fieldLabelStyle = headerItem.FieldLabelStyle;
+                var fieldStyleLogic = headerItem.FieldStyleLogic;
+
+                if (fieldStyleLogic && fieldStyleLogic.toLower().indexOf("?") > -1) {
+                    fieldStyleLogic = this.evaluateStyleLogic(fieldStyleLogic);
+                    if (fieldStyleLogic) {
+                        fieldStyleLogic = " " + fieldStyleLogic + " ";
+                    }
+                    else {
+                        fieldStyleLogic = '';
+                    }
+                } else {
+                    fieldStyleLogic = '';
+                }
 
                 if (!backgroundColor) {
                     backgroundColor = '';
@@ -1192,7 +1219,11 @@
                 //If div not found, then create new one.
                 if ($div.length <= 0)
                     $div = $('<div class="vis-w-p-card-data-f ' + this.dynamicClassName + '">');
-
+                
+                if (fieldStyleLogic.length > 0) {
+                    $div.attr('style', fieldStyleLogic);
+                    fieldStyleLogic = '';
+                }
 
 
 
@@ -1259,9 +1290,10 @@
 
                         var fIdx = backgroundColor.indexOf('flex-direction');
                         var lblflxstyle = "";
+                      
                         if (fIdx > -1) {
                             var cIdx = backgroundColor.indexOf(";", fIdx + 'flex-direction'.length)
-                            lblflxstyle = 'display:flex; ' + backgroundColor.substring(fIdx, cIdx);
+                            lblflxstyle += ' display:flex; ' + backgroundColor.substring(fIdx, cIdx);
                         }
 
                         $divLabel = $('<div class="vis-w-p-card-Label-f" style="' + lblflxstyle + '"></div>');
@@ -1302,7 +1334,7 @@
 
                         this.dynamicLabelValue = this.fieldStyles[mField.getColumnName() + 'applyCustomUIForLabelValue']['applyCustomUIForLabelValue'];
                         if (!this.dynamicLabelValue) {
-                            this.dynamicLabelValue = this.applyCustomUIForLabelValue(headerSeqNo, startCol, startRow, mField, fieldLabelStyle);
+                            this.dynamicLabelValue = this.applyCustomUIForLabelValue(headerSeqNo, startCol, startRow, mField, fieldLabelStyle, fieldStyleLogic);
                             this.fieldStyles[mField.getColumnName() + 'applyCustomUIForLabelValue'] = { 'applyCustomUIForLabelValue': this.dynamicLabelValue };
                         }
                         if ($label)
@@ -1313,7 +1345,7 @@
 
                         this.dynamicFieldValue = this.fieldStyles[mField.getColumnName() + 'applyCustomUIForFieldValue']['applyCustomUIForFieldValue'];
                         if (!this.dynamicFieldValue) {
-                            this.dynamicFieldValue = this.applyCustomUIForFieldValue(headerSeqNo, startCol, startRow, mField, fieldValueStyle);
+                            this.dynamicFieldValue = this.applyCustomUIForFieldValue(headerSeqNo, startCol, startRow, mField, fieldValueStyle, fieldStyleLogic);
                             this.fieldStyles[mField.getColumnName() + 'applyCustomUIForFieldValue'] = { 'applyCustomUIForFieldValue': this.dynamicFieldValue };
                         }
                         iControl.getControl().addClass(this.dynamicFieldValue);
@@ -1443,6 +1475,7 @@
                                 //    $divDBIconSpan.append($imageSpan).append($image)
 
                                 setValue(colValue, iControl, mField);
+                                $divLabel.append(iControl.getControl());
                                 //    $divLabelValueContainer.append($divDBIconSpan);
                                 //    $divLabelValueContainer.append($divDBLevel);
                                 //}
@@ -1749,7 +1782,7 @@
             this.dc = null;
         };
 
-        
+
         var setValue = function (colValue, iControl, mField) {
             if (colValue) {
                 if (colValue.startsWith && colValue.startsWith("<") && colValue.endsWith(">")) {
@@ -2053,7 +2086,7 @@
     VCard.prototype.addStyleToDom = function () {
         $('head').find("[cardview='" + this.windowNo + "']").remove();
         this.styleTag.type = 'text/css';
-        $(this.styleTag).attr("cardview", this.windowNo)
+        $(this.styleTag).attr("cardview", this.windowNo);
         this.styleTag.innerHTML = this.dynamicStyle.join(" ");
         $($('head')[0]).append(this.styleTag);
     };
@@ -2066,12 +2099,14 @@
      * @param {any} mField
      * @param {any} fieldValueStyle
      */
-    VCard.prototype.applyCustomUIForFieldValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle) {
-        var style = fieldValueStyle;
+
+    VCard.prototype.applyCustomUIForFieldValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle, fieldStyleLogic) {
+        var style = fieldValueStyle + " " + fieldStyleLogic;
+
         var dynamicClassName = "vis-hp-card-FieldValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
         if (style && style.toLower().indexOf("@value::") > -1) {
             style = getStylefromCompositeValue(style, "@value::");
-        }
+        }      
 
         this.dynamicStyle.push("." + dynamicClassName + "  {" + style + "} ");
         return dynamicClassName;
@@ -2086,13 +2121,14 @@
      * @param {any} mField
      * @param {any} fieldValueStyle
      */
-    VCard.prototype.applyCustomUIForLabelValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle) {
-        var style = fieldValueStyle;
-        var dynamicClassName = "vis-hp-card-LabelValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID  + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
+
+    VCard.prototype.applyCustomUIForLabelValue = function (headerSeqNo, startCol, startRow, mField, fieldValueStyle, fieldStyleLogic) {
+        var style = fieldValueStyle + " "+fieldStyleLogic;
+        var dynamicClassName = "vis-hp-card-LabelValue_" + startRow + "_" + startCol + "_" + this.windowNo + "_" + this.tabID + "_" + headerSeqNo + "_" + mField.getAD_Column_ID();
+
         if (style && style.toLower().indexOf("@value::") > -1) {
             style = getStylefromCompositeValue(style, "@value::");
         }
-
         this.dynamicStyle.push("." + dynamicClassName + "  {" + style + "} ");
         return dynamicClassName;
     };
@@ -2125,6 +2161,24 @@
             }
         }
     }
+
+    VCard.prototype.evaluateStyleLogic = function (styleLogic) {
+        var arr = styleLogic.split(',');
+
+        //this.cellColumnName = col.field;
+        var ret = null;
+        for (var j = 0; j < arr.length; j++) {
+            var cArr = arr[j].split("?");
+            if (cArr.length != 2)
+                continue;
+            if (VIS.Evaluator.evaluateLogic(this, cArr[0])) {
+                ret = cArr[1];
+                break;
+            }
+        }
+        return ret;
+    };
+
 
     /**
      * Get  Custom Style of Parent of field

@@ -32,7 +32,7 @@ namespace VIS.Helpers
         /// <param name="roles">out roles , has role list of user</param>
         /// <param name="ctx" ></param>
         /// <returns>true if athenicated</returns>
-        public static bool Login(LoginModel model, out List<KeyNamePair> roles,string IP)
+        public static bool Login(LoginModel model, out List<KeyNamePair> roles, string IP, bool isSSO)
         {
             // loginModel = null;
             //bool isMatch = false;
@@ -57,6 +57,14 @@ namespace VIS.Helpers
 
                 isLDAP = true;
             }
+
+            if (isSSO)
+            {
+
+                authenticated = true;
+
+            }
+
             //Save Failed Login Count and Password validty in cache
             GetSysConfigForlogin();
 
@@ -84,7 +92,7 @@ namespace VIS.Helpers
                 {
                     throw new Exception(output);
                 }
-                
+
                 string ipAddress = Util.GetValueOfString(dsUserInfo.Tables[0].Rows[0]["IP_Address"]);
                 if (!string.IsNullOrEmpty(ipAddress))
                 {
@@ -161,8 +169,7 @@ namespace VIS.Helpers
                 throw new Exception("RoleNotDefined");
             }
 
-            // if user logged in successfully, then set failed login count to 0
-            DB.ExecuteQuery("UPDATE AD_User SET FailedLoginCount=0 WHERE Value=@username", param);
+
 
             int AD_User_ID = Util.GetValueOfInt(dr[0].ToString()); //User Id
 
@@ -198,7 +205,7 @@ namespace VIS.Helpers
                             Token2FAKey = userSKey + ADUserID.ToString() + decKey;
                         }
                         string url = Util.GetValueOfString(HttpContext.Current.Request.Url.AbsoluteUri).Replace("VIS/Account/JsonLogin", "").Replace("https://", "").Replace("http://", "");
-                        setupInfo = tfa.GenerateSetupCode("VA ", url + " " + userSKey, Token2FAKey, 150, 150);
+                        setupInfo = tfa.GenerateSetupCode("VA ", url + " " + userSKey, Token2FAKey, false, 3);
                         model.Login1Model.QRCodeURL = setupInfo.QrCodeSetupImageUrl;
                     }
                     else if (method2FA == X_AD_User.TWOFAMETHOD_VAMobileApp)
@@ -250,6 +257,10 @@ namespace VIS.Helpers
             while (dr.Read());
 
             dr.Close();
+
+            // if user logged in successfully, then set failed login count to 0
+            DB.ExecuteQuery("UPDATE AD_User SET FailedLoginCount=0 WHERE Value=@username", param);
+
             model.Login1Model.AD_User_ID = AD_User_ID;
             model.Login1Model.DisplayName = username;
 
@@ -275,14 +286,24 @@ namespace VIS.Helpers
                     if (drLogin.Read())
                     {
 
-
                         bool deleteRecord = false;
                         int roleId = VAdvantage.Utility.Util.GetValueOfInt(drLogin[0]);
                         deleteRecord = !usersRoles.Contains(roleId);
+                        if (!deleteRecord)
+                        {
+                            // check org 
+                            var orgId = drLogin[2].ToString();
+                            if (Convert.ToInt32(DB.ExecuteScalar("SELECT COUNT(AD_Org_ID) FROM AD_Org WHERE IsActive='Y' AND AD_Org_ID ="
+                                                  + orgId)) < 1)
+                            {
+                                deleteRecord = true;
+                            }
+                        }
 
                         //Delete Login Setting 
                         if (deleteRecord)
                         {
+                            drLogin.Close();
                             DB.ExecuteQuery("DELETE FROM AD_LoginSetting WHERE AD_User_ID = " + AD_User_ID);
                         }
                         else
@@ -297,11 +318,18 @@ namespace VIS.Helpers
                             model.Login2Model.Warehouse = drLogin[6].ToString();
                             model.Login2Model.WarehouseName = drLogin[7].ToString();
                             model.Login2Model.Date = System.DateTime.Now.Date;
+                            drLogin.Close();
                         }
                     }
-                    drLogin.Close();
                 }
                 catch
+                {
+                    if (drLogin != null)
+                    {
+                        drLogin.Close();
+                    }
+                }
+                finally
                 {
                     if (drLogin != null)
                     {
@@ -674,6 +702,7 @@ namespace VIS.Helpers
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);
             ctx.SetContext("#Date", model.Login2Model.Date.ToString());
             ctx.SetContext("#AD_ChangeLogBatch", "");
+            ctx.SetContext("#AD_FilteredOrg", model.Login2Model.Org);// first time set login org
 
 
             //{
@@ -726,8 +755,13 @@ namespace VIS.Helpers
             ctx.SetContext("#AD_Org_ID", model.Login2Model.Org);
             ctx.SetContext("#AD_Org_Name", model.Login2Model.OrgName);
 
+            //new entry commaseprated orgids
+            ctx.SetContext("#AD_FilteredOrg", model.Login2Model.FilteredOrg);
+
             ctx.SetContext("#M_Warehouse_ID", model.Login2Model.Warehouse);
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);
+
+            ctxLogIn.SetContext("NewSession", "Y");
             //ctx.SetContext("#Date", model.Login2Model.Date.ToString());
             return ctx;
         }
@@ -866,7 +900,7 @@ namespace VIS.Helpers
         public static bool IsDeviceLinked(Ctx ctx, int AD_User_ID)
         {
             bool isLinked = true;
-            if (X_AD_User.TWOFAMETHOD_VAMobileApp == MUser.Get(ctx,AD_User_ID).GetTwoFAMethod())
+            if (X_AD_User.TWOFAMETHOD_VAMobileApp == MUser.Get(ctx, AD_User_ID).GetTwoFAMethod())
             {
                 isLinked = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(VA074_MobileLinked_ID) FROM VA074_MobileLinked 
                             WHERE VA074_AD_User_ID = " + AD_User_ID + " AND VA074_PushNotiToken IS NOT NULL AND IsActive = 'Y'")) > 0;
@@ -922,5 +956,46 @@ namespace VIS.Helpers
             }
             return isUnderMaintenance;
         }
+
+        public static List<ExternalLogin> GetExternalProvider()
+        {
+            List<ExternalLogin> list = new List<ExternalLogin>();
+            DataSet DS = DB.ExecuteDataset(@"SELECT sso_configuration.sso_configuration_ID, sso_configuration.Provider,sso_configuration.name, 
+(SELECT COALESCE(FontName,ImageURL)||'|'|| NVL(FontStyle,'') FROM AD_Image 
+WHERE AD_Image_ID=sso_configuration.AD_Image_ID) AS ImageIco
+FROM sso_configuration  WHERE sso_configuration.IsActive='Y' ");
+            if (DS != null && DS.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < DS.Tables[0].Rows.Count; i++)
+                {
+                    string icon = Util.GetValueOfString(DS.Tables[0].Rows[i]["ImageIco"]);
+                    if (icon.StartsWith("fa fa-") || icon.StartsWith("vis vis-"))
+                    {
+                        icon = "<i class='" + icon.Split('|')[0] + "' style='" + icon.Split('|')[1] + "' ></i>";
+                    }
+                    else if (!string.IsNullOrEmpty(icon.Split('|')[0]))
+                    {
+                        icon = "<img src='" + icon.Split('|')[0] + "' style='" + icon.Split('|')[1] + "'/>";
+                    }
+                    else
+                    {
+                        icon = null;
+                    }
+
+                    ExternalLogin obj = new ExternalLogin()
+                    {
+                        Provider = Util.GetValueOfString(DS.Tables[0].Rows[i]["Provider"]).ToLower(),
+                        ProviderDisplayName = Util.GetValueOfString(DS.Tables[0].Rows[i]["name"]),
+                        Configuration_ID = Util.GetValueOfInt(DS.Tables[0].Rows[i]["sso_configuration_ID"]),
+                        ImageIcon = icon,
+                    };
+
+                    list.Add(obj);
+                }
+            }
+
+            return list;
+        }
+
     }
 }

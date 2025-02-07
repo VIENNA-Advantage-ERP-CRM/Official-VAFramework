@@ -1683,8 +1683,8 @@ namespace VIS.Helpers
                                 + " AND IsVersionApproved = 'Y' AND "
                                 + GlobalVariable.TO_DATE(inn.ValidFrom.Value, true) + @" < TRUNC(SysDate)
                                 AND (TRUNC(VersionValidFrom) > " + GlobalVariable.TO_DATE(inn.ValidFrom.Value, true) +
-                                @" AND TRUNC(VersionValidFrom) <= TRUNC(Sysdate))
-                                 ORDER BY VersionValidFrom DESC";
+                                @" AND TRUNC(VersionValidFrom) <= TRUNC(Sysdate))";
+                                 //ORDER BY VersionValidFrom DESC";
             if (Util.GetValueOfInt(DB.ExecuteScalar(sqlOldVer)) > 0)
                 return false;
             return true;
@@ -2084,6 +2084,10 @@ namespace VIS.Helpers
                     if (dr.IsDBNull(j))
                     {
                         rowData[colLower] = null;
+                        if (field.DisplayType == DisplayType.Image)
+                        {
+                            rowData["imgurlcolumn" + colLower] =null;
+                        }
                     }
                     else
                     {
@@ -2583,7 +2587,10 @@ namespace VIS.Helpers
                 if (!string.IsNullOrEmpty(condition))
                 {
                     sqlIn.sql = sqlIn.sql.Substring(0, sqlIn.sql.LastIndexOf("WHERE")) + " " + condition;
-                    sqlIn.sqlDirect = sqlIn.sqlDirect.Substring(0, sqlIn.sqlDirect.LastIndexOf("WHERE")) + " " + condition;
+                    if (sqlIn.sqlDirect != "")
+                    {
+                        sqlIn.sqlDirect = sqlIn.sqlDirect.Substring(0, sqlIn.sqlDirect.LastIndexOf("WHERE")) + " " + condition;
+                    }
                     sqlCount = sqlCount.Substring(0, sqlCount.LastIndexOf("WHERE")) + " " + condition;
                 }
             }
@@ -3132,7 +3139,7 @@ namespace VIS.Helpers
             _info.Append(" ")
                 .Append(Msg.Translate(ctx, "CreatedBy"))
                 .Append(": ").Append(user.GetName())
-                .Append(" - ").Append(String.Format("{0:D}", dse.Created)).Append("<br/>");
+                .Append(" - ").Append("@Created@").Append("<br/>");
 
             if (!dse.Created.Equals(dse.Updated)
                 || !dse.CreatedBy.Equals(dse.UpdatedBy))
@@ -3142,10 +3149,12 @@ namespace VIS.Helpers
                 _info.Append(" ")
                     .Append(Msg.Translate(ctx, "UpdatedBy"))
                     .Append(": ").Append(user.GetName())
-                    .Append(" - ").Append(String.Format("{0:D}", dse.Updated)).Append("<br/>");
+                    .Append(" - ").Append("@Updated@").Append("<br/>");
             }
             if (dse.Info != null && dse.Info.Length > 0)
                 _info.Append("<br/> (").Append(dse.Info).Append(")");
+            outt.Updated = new DateTime(Convert.ToDateTime(dse.Updated).Ticks, DateTimeKind.Utc);
+            outt.Created = new DateTime(Convert.ToDateTime(dse.Created).Ticks, DateTimeKind.Utc);
 
             outt.Info = _info.ToString();
             //	Only Client Preference can view Change Log
@@ -3575,6 +3584,16 @@ namespace VIS.Helpers
         public void InsertUpdateDefaultSearch(Ctx _ctx, int AD_Tab_ID, int AD_Table_ID, int AD_User_ID, int? AD_UserQuery_ID)
         {
 
+            #region remove default when
+                string sql1 = "SELECT AD_UserQuery_ID FROM AD_DefaultUserQuery WHERE AD_Tab_ID=" + AD_Tab_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_User_ID=" + AD_User_ID;
+                object id1 = DB.ExecuteScalar(sql1);
+
+                if(Convert.ToInt32(id1) == AD_UserQuery_ID)
+                {
+                    AD_UserQuery_ID = 0;
+                }
+            #endregion
+
             if (AD_UserQuery_ID == 0 || AD_UserQuery_ID == null)
             {
                 DB.ExecuteQuery("DELETE FROM AD_DefaultUserQuery WHERE AD_Tab_ID=" + AD_Tab_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_User_ID=" + AD_User_ID);
@@ -3589,6 +3608,9 @@ namespace VIS.Helpers
             {
                 AD_DefaultUserQuery_ID = Convert.ToInt32(id);
             }
+
+            sql = "SELECT AD_UserQuery_ID FROM AD_DefaultUserQuery WHERE AD_Tab_ID=" + AD_Tab_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_User_ID=" + AD_User_ID;
+            id = DB.ExecuteScalar(sql);
 
 
             X_AD_DefaultUserQuery userQuery = new X_AD_DefaultUserQuery(_ctx, AD_DefaultUserQuery_ID, null);
@@ -3760,7 +3782,7 @@ namespace VIS.Helpers
             string SQL_Count = "SELECT COUNT(*) FROM " + TableName + " " + WhereClause;
             string SQL_Direct = "";
 
-            SQL_Count = MRole.GetDefault(ctxp).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+            SQL_Count = MRole.GetDefault(ctxp).AddAccessSQL(SQL_Count, TableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO,MRole.SQL_ORGRO);
 
             int rCount = 0;
             if (sqlIn.tree_id > 0)
@@ -3819,7 +3841,8 @@ namespace VIS.Helpers
 
             for (int i = 0; i < lstFields.Count; i++)
             {
-                if (lstFields[i].lookupInfo != null && lstFields[i].displayType != DisplayType.Account)
+                if (lstFields[i].lookupInfo != null && lstFields[i].displayType != DisplayType.Account
+                    && lstFields[i].displayType != DisplayType.MultiKey)
                 {
                     var lInfo = lstFields[i].lookupInfo;
                     if (!string.IsNullOrEmpty(lInfo.displayColSubQ) && gt.TableName.ToLower() != lInfo.tableName.ToLower())
@@ -3899,12 +3922,15 @@ namespace VIS.Helpers
             if (!String.IsNullOrEmpty(gt.OrderByClause))
             {
                 SQL += " ORDER BY " + gt.OrderByClause;
-                SQL_Direct += " ORDER BY " + gt.OrderByClause;
+                if (SQL_Direct != "")
+                {
+                    SQL_Direct += " ORDER BY " + gt.OrderByClause;
+                }
             }
 
 
 
-            sqlIn.sql = MRole.GetDefault(ctxp).AddAccessSQL(SQL.ToString(), TableName, true, false);
+            sqlIn.sql = MRole.GetDefault(ctxp).AddAccessSQL(SQL.ToString(), TableName, true, false, MRole.SQL_ORGRO);
             sqlIn.sqlDirect = SQL_Direct;
 
             if (rCount > 0)

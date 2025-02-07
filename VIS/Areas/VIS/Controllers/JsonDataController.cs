@@ -1110,7 +1110,8 @@ namespace VIS.Controllers
                 return null;
 
             //Ctx _ctx = null;//(ctx) as Ctx;
-            MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
+            MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID),
+                Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
                 Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
 
             if (res == null)
@@ -1121,6 +1122,7 @@ namespace VIS.Controllers
             string pTableName = json.pTableName;
             string pColumnName = res.GetColumnName();
             string keyCol = lInfo.keyColumn;
+            string tblColName = Convert.ToString(json.columnName);
             if (pColumnName.IndexOf(".") > -1)
             {
                 pColumnName = pColumnName.Substring(pColumnName.IndexOf(".") + 1);
@@ -1170,22 +1172,23 @@ namespace VIS.Controllers
                 if (tableName.Equals("AD_Ref_List"))
                 {
                     //sql = "SELECT " + keyCol + ", " + displayCol + " || '('|| count(" + keyCol + ") || ')' FROM " + tableName + " WHERE IsActive='Y'";
-                    sql = "SELECT " + pColumnName + ", (Select Name from AD_REf_List where Value= " + pColumnName + " AND AD_Reference_ID=" + json.AD_Reference_Value_ID + ")  as name ,count(" + pColumnName + ")"
+                    sql = "SELECT " + tblColName + ", (Select Name from AD_REf_List where Value= " + tblColName + " AND AD_Reference_ID=" + json.AD_Reference_Value_ID + ")  as name ,count(" + tblColName + ")"
                         + " FROM " + pTableName;// + " WHERE " + pTableName + ".IsActive='Y'";
                     sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(validationCode))
                         sql += " AND " + validationCode;
                     if (!string.IsNullOrEmpty(whereClause))
                         sql += " AND " + whereClause;
-                    sql += " GROUP BY " + pColumnName +
-                             " ORDER BY COUNT(" + pColumnName + ") DESC)";
+                    sql += " GROUP BY " + tblColName +
+                             " ORDER BY COUNT(" + tblColName + ") DESC)";
+                    pColumnName = tblColName;
                 }
                 else
                 {
                     sql = "SELECT " + keyCol + ", " + displayCol + " , count(" + keyCol + ")  FROM " + pTableName + " " + pTableName + " JOIN " + tableName + " " + tableName
                         + " ON " + tableName + "." + tableName + "_ID =" + pTableName + "." + pColumnName
                         + " ";// WHERE " + pTableName + ".IsActive='Y'";
-                    sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, tableName, true, false);
+                    sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(validationCode))
                         sql += " AND " + validationCode;
                     if (!string.IsNullOrEmpty(whereClause))
@@ -1216,6 +1219,7 @@ namespace VIS.Controllers
                     keyva.Add(val);
                 }
             }
+            result["colName"] = json.columnName;
             result["keyCol"] = pColumnName;
             result["list"] = keyva;
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
@@ -1402,6 +1406,29 @@ namespace VIS.Controllers
             CommonModel cm = new CommonModel();
             Ctx ctx = Session["ctx"] as Ctx;
             return Json(JsonConvert.SerializeObject(cm.CheckTableMapWithAction(tableID, actionType, actionName, ctx)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Getting Ad_Form_ID 
+        /// </summary>
+        /// <param name="formName">Name</param>
+        /// <returns>Ad_Form_ID</returns>
+        public JsonResult GetFormID(string formName) {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.GetFormID(formName)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Getting Ad_Process_ID
+        /// </summary>
+        /// <param name="processName">Name</param>
+        /// <returns>Ad_Process_ID</returns>
+
+        public JsonResult GetProcessID(string processName) {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.GetProcessID(processName)), JsonRequestBehavior.AllowGet);
         }
     }
 

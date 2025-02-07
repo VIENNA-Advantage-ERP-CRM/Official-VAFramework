@@ -1,6 +1,6 @@
 {
   "name": "VIENNA Advantage Framework",
-  "version": "5.11.1.0",
+  "version": "6.0.5.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -25,9 +25,7 @@
     "del": "^7.1.0",
     "ignore-loader": "^0.1.2",
     "mini-css-extract-plugin": "^2.8.1",
-    "node-sass": "^9.0.0",
     "raw-loader": "^4.0.2",
-    "sass-loader": "^14.1.0",
     "style-loader": "^3.3.4",
     "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.90.3",

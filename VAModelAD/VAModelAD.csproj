@@ -116,13 +116,26 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="VAI01">
+      <HintPath>..\ViennaAdvantageWeb\DLL\VAI01.dll</HintPath>
+    </Reference>
+    <Reference Include="VAI01Svc">
+      <HintPath>..\ViennaAdvantageWeb\DLL\VAI01Svc.dll</HintPath>
+    </Reference>
     <Reference Include="VAPrintLib">
       <HintPath>..\ViennaAdvantageWeb\Dll\VAPrintLib.dll</HintPath>
     </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
     </Reference>
-    <Reference Include="XModel">
+    <Reference Include="WorkspaceSvc">
+      <HintPath>..\ViennaAdvantageWeb\DLL\WorkspaceSvc.dll</HintPath>
+    </Reference>
+    <Reference Include="WSP">
+      <HintPath>..\ViennaAdvantageWeb\DLL\WSP.dll</HintPath>
+    </Reference>
+    <Reference Include="XModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\XModel.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -203,6 +216,7 @@
     <Compile Include="ModelAD\MColumn.cs" />
     <Compile Include="ModelAD\MColumnAccess.cs" />
     <Compile Include="ModelAD\MDirectQueryLog.cs" />
+    <Compile Include="ModelAD\MGroupWidget.cs" />
     <Compile Include="ModelAD\MIndexColumn.cs" />
     <Compile Include="ModelAD\MExportToClient.cs" />
     <Compile Include="ModelAD\MField.cs" />
@@ -290,6 +304,10 @@
     <Compile Include="ModelAD\MUserRoles.cs" />
     <Compile Include="ModelAD\MViewColumn.cs" />
     <Compile Include="ModelAD\MViewComponent.cs" />
+    <Compile Include="ModelAD\MVISAssignedRecordToUser.cs" />
+    <Compile Include="ModelAD\MWidget.cs" />
+    <Compile Include="ModelAD\MWidgetAccess.cs" />
+    <Compile Include="ModelAD\MWidgetField.cs" />
     <Compile Include="ModelAD\MWindow.cs" />
     <Compile Include="ModelAD\MWindowAccess.cs" />
     <Compile Include="ModelAD\M_Element.cs" />
@@ -302,9 +320,14 @@
     <Compile Include="ModelAD\ViennaProcessorLog.cs" />
     <Compile Include="ModelAD\ViennatProcessor.cs" />
     <Compile Include="ModelAD\X_AD_DirectQueryLog.cs" />
+    <Compile Include="ModelAD\X_AD_Group_Widget.cs" />
     <Compile Include="ModelAD\X_AD_IndexColumn.cs" />
     <Compile Include="ModelAD\X_AD_TableIndex.cs" />
     <Compile Include="ModelAD\X_AD_UserHomeWidget.cs" />
+    <Compile Include="ModelAD\X_AD_Widget.cs" />
+    <Compile Include="ModelAD\X_AD_WidgetField.cs" />
+    <Compile Include="ModelAD\X_AD_Widget_Access.cs" />
+    <Compile Include="ModelAD\X_VIS_AssignedRecordToUser.cs" />
     <Compile Include="Model\Callout.cs" />
     <Compile Include="Model\CalloutEngine.cs" />
     <Compile Include="Model\MClient.cs" />

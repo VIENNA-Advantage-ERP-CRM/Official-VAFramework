@@ -112,7 +112,55 @@
     <Reference Include="itextsharp">
       <HintPath>..\ViennaAdvantageWeb\Dll\itextsharp.dll</HintPath>
     </Reference>
+    <Reference Include="MarketSvc">
+      <HintPath>..\ViennaAdvantageWeb\DLL\MarketSvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.4\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.4\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.3\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.3\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.5.3.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.5.3.0\lib\net461\Microsoft.IdentityModel.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.5.3.0\lib\net461\Microsoft.IdentityModel.Protocols.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Protocols.OpenIdConnect.5.3.0\lib\net461\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.3.0\lib\net461\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.2.2\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.2.2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.2.2\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.2.2\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OpenIdConnect, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OpenIdConnect.4.2.2\lib\net45\Microsoft.Owin.Security.OpenIdConnect.dll</HintPath>
+    </Reference>
     <Reference Include="ModelLibrary, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\ModelLibrary.dll</HintPath>
@@ -120,11 +168,20 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.3.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.8.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.8\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System" />
@@ -187,6 +244,7 @@
     <Content Include="Areas\VIS\Content\emailLinkStyle.css" />
     <Content Include="Areas\VIS\Content\F20\Color.css" />
     <Content Include="Areas\VIS\Content\F20\Controls.css" />
+    <Content Include="Areas\VIS\Content\F20\Controls_border.css" />
     <Content Include="Areas\VIS\Content\F20\Media.css" />
     <Content Include="Areas\VIS\Content\F20\site-rtl.css" />
     <Content Include="Areas\VIS\Content\F20\Site.css" />
@@ -198,10 +256,12 @@
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
     <Content Include="Areas\VIS\Content\Home.css" />
     <Content Include="Areas\VIS\Content\Images\bg-patt.svg" />
-    <Content Include="Areas\VIS\Content\Images\logo.png" />
+    <Content Include="Areas\VIS\Content\Images\logoold.png" />
     <Content Include="Areas\VIS\Content\Images\mail.svg" />
+    <Content Include="Areas\VIS\Content\Images\logo.png" />
     <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
     <Content Include="Areas\VIS\Content\Login.css" />
+    <Content Include="Areas\VIS\Content\Menu.css" />
     <Content Include="Areas\VIS\Content\notify.mp3" />
     <Content Include="Areas\VIS\Content\notify.wav" />
     <Content Include="Areas\VIS\Content\PrefStyle.css" />
@@ -214,6 +274,9 @@
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
     <Content Include="Areas\VIS\Content\VIS.all.min.css" />
     <Content Include="Areas\VIS\Content\VISAD.css" />
+    <Content Include="Areas\VIS\Content\Widgets\AssignRecordWidget.css" />
+    <Content Include="Areas\VIS\Content\Widgets\VIS-Widget.css" />
+    <Content Include="Areas\VIS\Content\Widgets\VISTemplateExcel.css" />
     <Content Include="Areas\VIS\Images\11.png" />
     <Content Include="Areas\VIS\Images\12.png" />
     <Content Include="Areas\VIS\Images\21.png" />
@@ -419,6 +482,7 @@
     <Content Include="Areas\VIS\Images\clock.png" />
     <Content Include="Areas\VIS\Images\close-file.png" />
     <Content Include="Areas\VIS\Images\close-ico.png" />
+    <Content Include="Areas\VIS\Images\close-ico.svg" />
     <Content Include="Areas\VIS\Images\close.png" />
     <Content Include="Areas\VIS\Images\comment-icon.jpg" />
     <Content Include="Areas\VIS\Images\compresed.png" />
@@ -457,6 +521,7 @@
     <Content Include="Areas\VIS\Images\excel.png" />
     <Content Include="Areas\VIS\Images\favicon.ico" />
     <Content Include="Areas\VIS\Images\favItem.png" />
+    <Content Include="Areas\VIS\Images\files-icon.png" />
     <Content Include="Areas\VIS\Images\folder-open.png" />
     <Content Include="Areas\VIS\Images\folder.png" />
     <Content Include="Areas\VIS\Images\forword.png" />
@@ -497,6 +562,7 @@
     <Content Include="Areas\VIS\Images\home\comments.png" />
     <Content Include="Areas\VIS\Images\home\defaultUser.png" />
     <Content Include="Areas\VIS\Images\home\defaultUser46X46.png" />
+    <Content Include="Areas\VIS\Images\home\defaultWidget.svg" />
     <Content Include="Areas\VIS\Images\home\done-ico.png" />
     <Content Include="Areas\VIS\Images\home\icons-favourites.png" />
     <Content Include="Areas\VIS\Images\home\icons-feeds.png" />
@@ -534,6 +600,7 @@
     <Content Include="Areas\VIS\Images\link-del.png" />
     <Content Include="Areas\VIS\Images\LoadingCircle.gif" />
     <Content Include="Areas\VIS\Images\Location.png" />
+    <Content Include="Areas\VIS\Images\login\arrow-down.png" />
     <Content Include="Areas\VIS\Images\login\bg2.jpg" />
     <Content Include="Areas\VIS\Images\login\calender.png" />
     <Content Include="Areas\VIS\Images\login\client.png" />
@@ -563,6 +630,7 @@
     <Content Include="Areas\VIS\Images\login\user-ico.png" />
     <Content Include="Areas\VIS\Images\login\warehouse.png" />
     <Content Include="Areas\VIS\Images\logo.jpg" />
+    <Content Include="Areas\VIS\Images\logo.png" />
     <Content Include="Areas\VIS\Images\main_screen.png" />
     <Content Include="Areas\VIS\Images\mDocAction.png" />
     <Content Include="Areas\VIS\Images\menuTree.PNG" />
@@ -574,6 +642,7 @@
     <Content Include="Areas\VIS\Images\mWorkFlow.png" />
     <Content Include="Areas\VIS\Images\nonfavItem.png" />
     <Content Include="Areas\VIS\Images\nonSummary.png" />
+    <Content Include="Areas\VIS\Images\onfinity-logo.png" />
     <Content Include="Areas\VIS\Images\orderedList0.png" />
     <Content Include="Areas\VIS\Images\orderedList1.png" />
     <Content Include="Areas\VIS\Images\orderedList2.png" />
@@ -617,6 +686,7 @@
     <Content Include="Areas\VIS\Images\valid.png" />
     <Content Include="Areas\VIS\Images\vis_home_fav1.png" />
     <Content Include="Areas\VIS\Images\vis_home_myLink1.png" />
+    <Content Include="Areas\VIS\Images\widgets.jpg" />
     <Content Include="Areas\VIS\Images\word.png" />
     <Content Include="Areas\VIS\Images\xml.png" />
     <Content Include="Areas\VIS\Images\zoom.png" />
@@ -687,6 +757,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\vdocaction.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vimageform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\visimportfiles.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\visassignuser.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vpayment.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vsetup.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\wfactivity.js" />
@@ -705,6 +776,7 @@
     <Content Include="Areas\VIS\Scripts\app\logger.js" />
     <Content Include="Areas\VIS\Scripts\app\lookup.js" />
     <Content Include="Areas\VIS\Scripts\app\masterdataversion.js" />
+    <Content Include="Areas\VIS\Scripts\app\menuScript.js" />
     <Content Include="Areas\VIS\Scripts\app\native-extension.js" />
     <Content Include="Areas\VIS\Scripts\app\processframe.js" />
     <Content Include="Areas\VIS\Scripts\app\processwrapper.js" />
@@ -730,6 +802,7 @@
     <Content Include="Areas\VIS\Scripts\F20\atabpanel.js" />
     <Content Include="Areas\VIS\Scripts\F20\aviewcontroller.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabbedpanemgr.js" />
+    <Content Include="Areas\VIS\Scripts\F20\vlandingpage.js" />
     <Content Include="Areas\VIS\Scripts\home\home.js" />
     <Content Include="Areas\VIS\Scripts\home\usersession.js" />
     <Content Include="Areas\VIS\Scripts\F20\themecnfgtr.js" />
@@ -749,11 +822,17 @@
     <Content Include="Areas\VIS\Scripts\processengine\processinfo.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processparameter.js" />
     <Content Include="Areas\VIS\Scripts\react\component\helloWord.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\component\WidgetLoader.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\CSS\Vis_AssignRecordWidget.css" />
+    <Content Include="Areas\VIS\Scripts\react\pages\AssignRecordWidget.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\HomePage.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\TestComponent.jsx" />
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\assignRecordWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\Checklist.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\bipanel.js" />
@@ -764,17 +843,31 @@
     <Content Include="Areas\VIS\Scripts\VIS.all.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS1_0.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS2_0.min.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\ActionsWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\dynamicWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\NoticeWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\RequestWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\WorkflowWidget.js" />
     <Content Include="Areas\VIS\Templates\VIS_Templates.html" />
+    <Content Include="Areas\VIS\WebPages\login-form\css\style.css" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.svg" />
+    <Content Include="Areas\VIS\WebPages\login-form\images\form-bg.png" />
+    <Content Include="Areas\VIS\WebPages\login-form\images\onfinity-logo.png" />
+    <Content Include="Areas\VIS\WebPages\login-form\login-form.html" />
+    <Content Include="Areas\VIS\WebPages\login-form\vis-fonts.css" />
     <Content Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
+    <Compile Include="Areas\VIS\Classes\VISAuthConfig.cs" />
+    <Compile Include="Areas\VIS\Classes\VISGlobal.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountController.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountFormController.cs" />
     <Compile Include="Areas\VIS\Controllers\AddProductController.cs" />
     <Compile Include="Areas\VIS\Controllers\AmountDivisionController.cs" />
     <Compile Include="Areas\VIS\Controllers\ArchiveViewerController.cs" />
     <Compile Include="Areas\VIS\Controllers\ASearchController.cs" />
+    <Compile Include="Areas\VIS\Controllers\AssigendRecordToUserController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentController.cs" />
     <Compile Include="Areas\VIS\Controllers\AttachmentHistoryController.cs" />
     <Compile Include="Areas\VIS\Controllers\BatchUpdateController.cs" />
@@ -797,6 +890,7 @@
     <Compile Include="Areas\VIS\Controllers\InfoProductController.cs" />
     <Compile Include="Areas\VIS\Controllers\InfoWindowController.cs" />
     <Compile Include="Areas\VIS\Controllers\JsonDataController.cs" />
+    <Compile Include="Areas\VIS\Controllers\LandingPageController.cs" />
     <Compile Include="Areas\VIS\Controllers\LocationController.cs" />
     <Compile Include="Areas\VIS\Controllers\LocatorController.cs" />
     <Compile Include="Areas\VIS\Controllers\LoginController.cs" />
@@ -812,6 +906,7 @@
     <Compile Include="Areas\VIS\Controllers\TabPanel\BiPanelController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\HistoryDetailsDataController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\SurveyPanelController.cs" />
+    <Compile Include="Areas\VIS\Controllers\TemplateExcelController.cs" />
     <Compile Include="Areas\VIS\Controllers\ThemeController.cs" />
     <Compile Include="Areas\VIS\Controllers\TreeMaintenanceController.cs" />
     <Compile Include="Areas\VIS\Controllers\UserPreferenceController.cs" />
@@ -831,12 +926,14 @@
     <Compile Include="Areas\VIS\Helpers\MenuHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\ProcessHelper.cs" />
     <Compile Include="Areas\VIS\Models\AddProductModel.cs" />
+    <Compile Include="Areas\VIS\Models\AssignedRecordToUser.cs" />
     <Compile Include="Areas\VIS\Models\BatchUpdateModel.cs" />
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />
     <Compile Include="Areas\VIS\Models\EmailModel.cs" />
     <Compile Include="Areas\VIS\Models\GmailContactsSettings.cs" />
     <Compile Include="Areas\VIS\Models\HistoryDetailsDataModel.cs" />
     <Compile Include="Areas\VIS\Models\SurveyPanelModel.cs" />
+    <Compile Include="Areas\VIS\Models\TemplateExcel.cs" />
     <Compile Include="Areas\VIS\Models\TreeMaintenanceModel.cs" />
     <Compile Include="Areas\VIS\Models\UserPreferenceModel.cs" />
     <Compile Include="Areas\VIS\Models\VImageModel.cs" />
@@ -880,6 +977,8 @@
     <Content Include="Areas\VIS\Views\AccountForm\Index.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Home.cshtml" />
+    <Content Include="Areas\VIS\Views\LandingPage.cshtml" />
+    <Content Include="Areas\VIS\Views\LandingPage\Index.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
@@ -910,6 +1009,7 @@
   <ItemGroup>
     <Folder Include="Areas\VIS\Scripts\app\processengine\" />
     <Folder Include="Areas\VIS\Scripts\dist\" />
+    <Folder Include="Areas\VIS\Scripts\widgets\NewFolder1\" />
     <Folder Include="Areas\VIS\Views\AmountDivision\" />
     <Folder Include="Areas\VIS\Views\ArchiveViewer\" />
     <Folder Include="Areas\VIS\Views\Channel\" />
@@ -942,6 +1042,17 @@
     <Content Include="Areas\VIS\Views\BiPanel\GetUserBILogin.cshtml" />
     <Content Include="babel.config.json" />
     <Content Include="package.json" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Bold.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Italic.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Light.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Medium.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-MediumItalic.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-Regular.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-SemiBold.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\NoirPro-SemiBoldItalic.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.eot" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.ttf" />
+    <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.woff" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

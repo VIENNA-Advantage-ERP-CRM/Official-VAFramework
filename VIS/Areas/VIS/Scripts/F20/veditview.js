@@ -8,13 +8,15 @@
         var allControls = [];
         var allLinkControls = [];
 
+        let colCount = 4;
+
         var toolbarButtonList = {};
 
         var $table;
 
         var $td0, $td1, $td2, $td3;
 
-        var $spndisplayFG = $('<span class="vis-ev-fgbtn" data-state="N">'+VIS.Msg.getMsg("More")+'</span>' );
+        var $spndisplayFG = $('<span class="vis-ev-fgbtn" data-state="N">' + VIS.Msg.getMsg("More") + '</span>');
 
         var _curParent = null;
 
@@ -25,7 +27,7 @@
 
         /** Map of group name to list of components in group. */
         //control = field array
-        var compToFieldMap = {}
+        var compToFieldMap = {};
 
         /** Map of group name to list of components in group. */
         var groupToCompsMap = {};
@@ -34,26 +36,39 @@
         var colDescHelpList = {};
 
         var lastPopover = null;
+
+        var agGroupToAGInsMap = {};
+
         function initComponent() {
             $table = $("<div class='vis-ad-w-p-vc-ev-grid'>"); //   $("<table class='vis-gc-vpanel-table'>");
+            //$table.on("click", "label", onInfoClick);
             $table.on("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
             $table.on("click", "span.vis-ev-fgbtn", onBtnFGClick);
         };
 
+        function onInfoClickold(e) {
+            var curTgt = $(e.currentTarget);
+            showpopover(curTgt, curTgt);
+        }
+
         function onInfoClick(e) {
             var curTgt = $(e.currentTarget);
+            //var curTgt = lblTgt.siblings('span.vis-ev-ctrlinfowrap');
+            if (!curTgt || curTgt.length == 0)
+                return;
+            showpopover(curTgt);
+        }
+        function showpopover(curTgt) {
+
             var colName = curTgt.data('colname');
             if (colName != '') {
-
                 if (lastPopover) {
                     lastPopover.popover('dispose');
                     lastPopover = null;
                 }
-
                 curTgt.attr('data-content', colDescHelpList[colName].help);
                 //attr('title', colDescHelpList[colName].desc);
                 lastPopover = curTgt.popover('show');
-
             }
         }
 
@@ -70,7 +85,6 @@
             if (isCol3)
                 _curParent = $td3 = $("<div class='vis-ev-col vis-ev-col-start4'></div>");
         };
-
         function reset(col) {
             if (!col) {
                 col0 = { rSpan: 1, cSpan: 0, cSpace: 0, set: false };
@@ -95,7 +109,7 @@
                 //    col0.set = false;
                 //}
                 //else
-                    --col0.rSpan;
+                --col0.rSpan;
 
                 reset(col0);
             }
@@ -104,7 +118,7 @@
                 //    col1.set = false;
                 //}
                 //else
-                    --col1.rSpan;
+                --col1.rSpan;
                 reset(col1);
             }
             if (col2.rSpan > 1) { //skip column 
@@ -112,7 +126,7 @@
                 //    col2.set = false;
                 //}
                 //else
-                    --col2.rSpan;
+                --col2.rSpan;
                 reset(col2);
             }
             if (col3.rSpan > 1) { //skip column 
@@ -120,13 +134,20 @@
                 reset(col3);
             }
         };
-
         function adjustLayout(mField, isNewRow) {
             var rowSpan = mField.getFieldBreadth();
             var colSpan = mField.getFieldColSpan();
             var cellSpace = mField.getCellSpace();
             var isLongFiled = mField.getIsLongField();
             var isLineBreak = mField.getIsLineBreak();
+
+            if (colCount - 1 ==0) {
+                cellSpace = 0;
+                rowSpan = 0;
+            }
+            if (colSpan > colCount - 1)
+                colSpan = colCount;
+
 
             if (isLineBreak) {
                 reset();
@@ -144,19 +165,22 @@
                     addRow();//add last row;
                     reset();
                     initCols(true);
-                    $td0.addClass("vis-ev-col-end4");
-                    columnIndex = 4;
-                }
+                    if (colCount>1)
+                    $td0.addClass("vis-ev-col-end" + colCount);
+                    columnIndex = colCount+4; //outbound
+                } 
                 else {
                     // check for row span
                     if (col0.rSpan > 1) { //skip column 
                         columnIndex += col0.cSpan;
+                        if (columnIndex >= colCount)
+                            columnIndex = 6;//outbound
                         //--col0.rSpan;
                         //reset(col0);
                     }
                     else if (cellSpace > 0) {
-                        if (cellSpace > 3)
-                            cellSpace = 3;
+                        if (cellSpace > colCount-1)
+                            cellSpace = colCount -1;
                         columnIndex += cellSpace;
                         cellSpace = 0; //reset
                     }
@@ -204,6 +228,8 @@
                 // check for row span
                 if (col1.rSpan > 1) { //skip column 
                     columnIndex += col1.cSpan;
+                    if (columnIndex >= colCount)
+                        columnIndex = 6;//outbound
                     //--col1.rSpan;
                     //reset(col1);
                 }
@@ -248,6 +274,8 @@
                 // check for row span
                 if (col2.rSpan > 1) { //skip column 
                     columnIndex += col2.cSpan;
+                    if (columnIndex >= colCount)
+                        columnIndex = 6;//outbound
                     //--col2.rSpan;
                     //reset(col2);
                 }
@@ -281,6 +309,7 @@
             }
 
             if (columnIndex == 3) {
+
                 // check for row span
                 if (col3.rSpan > 1) { //skip column 
                     //--col3.rSpan;
@@ -312,7 +341,7 @@
                 //columnIndex = 0;
                 adjustLayout(mField, isNewRow);
             }
-            else if (!isLongFiled && columnIndex > 3) {
+            else if (!isLongFiled && columnIndex > colCount-1) {
                 adjustLayout(mField, true);
             }
         };
@@ -337,14 +366,12 @@
             //}
         };
 
-       
-
         function onGroupClick(e) {
             e.stopPropagation();
             var divGroup = $(this);
             var target = $(e.target);
             var name = divGroup.data("name") + "_" + divGroup.data("seqno");
-           // var idx = div.Group.data("seqno");
+            // var idx = div.Group.data("seqno");
             var dis = divGroup.data("display");
             var viewMore = $(divGroup.find('.vis-ev-col-fg-more')[0]);
             //console.log(name);
@@ -385,8 +412,8 @@
                     $(divGroup.children()[2]).removeClass("vis-ev-col-fg-rotate");
                 }
             }
-            displayFieldGroupControls(name,show,showGroupFieldDefault)
-           
+            displayFieldGroupControls(name, show, showGroupFieldDefault)
+
         };
 
         /**
@@ -395,7 +422,7 @@
          * @param {any} show flag to show controls
          * @param {any} showGroupFieldDefault  default state of field gp controls
          */
-        function displayFieldGroupControls(name, show,showGroupFieldDefault) {
+        function displayFieldGroupControls(name, show, showGroupFieldDefault) {
             var list = groupToCompsMap[name];
 
             for (var i = 0; i < list.length; i++) {
@@ -418,10 +445,10 @@
                 //addTop();
                 oldFieldGroup = "";
             }
-            
+
             if (fieldGroup == null || fieldGroup.length == 0 || fieldGroup.equals(oldFieldGroup))
                 return false;
-           
+
             var seqSuffix = Object.keys(groupToCompsMap).length + 1;
             oldFieldGroup = fieldGroup;// + "_" + seqSuffix;
 
@@ -432,7 +459,7 @@
             initCols(true);
             //<i class="fa fa-ellipsis-h"></i>
             var gDiv = $('<div class="vis-ev-col-fieldgroup" data-showmore="Y" data-name="' + fieldGroup
-                +  '" data-display="show" data-seqno="' + seqSuffix + '">' +
+                + '" data-display="show" data-seqno="' + seqSuffix + '">' +
                 '<span class="vis-ev-col-fg-hdr"  >' + fieldGroup + ' </span> ' +
                 '<button class="vis-ev-col-fg-more">' + VIS.Msg.getMsg("ShowMore") + '</button>' +
                 '<button class="vis-ev-fg-arrowBtn"><i class= "fa fa-angle-up"></button>' +
@@ -441,7 +468,7 @@
 
 
             $td0.append(gDiv);
-            $td0.addClass("vis-ev-col-end4");
+            $td0.addClass("vis-ev-col-end"+colCount+"");
             columnIndex = 0;
 
             //VLine fp = new VLine(fieldGroup);
@@ -490,7 +517,7 @@
                 if (fieldList == null) {
                     //add unique entry
                     fieldList = [];
-                    groupToCompsMap[oldFieldGroup + "_" + (seqSuffix+1)] = fieldList;
+                    groupToCompsMap[oldFieldGroup + "_" + (seqSuffix + 1)] = fieldList;
                 }
                 fieldList.push(mField);
                 if (!mField.getIsFieldgroupDefault()) {
@@ -507,13 +534,14 @@
         function addFGDisplayBtn(hideFGFrom) {
             //addRow();
             reset();
-            initCols(false, false, false, true);
+            
+            initCols(colCount < 2,colCount==2,colCount == 3, colCount >3);
             $spndisplayFG.data('position', hideFGFrom);
             _curParent.append($spndisplayFG);
             //hide fg group
             addRow();
             displayFiledGroup(hideFGFrom, true);
-        }
+        };
 
         /**
          * show hide Field Group based on position
@@ -538,11 +566,11 @@
                 }
                 idx++;
             }
-        }
+        };
 
         function onBtnFGClick() {
 
-             
+
 
             var state = $spndisplayFG.data("state");
             var pos = $spndisplayFG.data("position");
@@ -561,6 +589,24 @@
                 $table.parent().scrollTop(sPos);
             }
             $spndisplayFG.data("state", state);
+        };
+
+        function addActionGroup(mField, editor) {
+
+            if (mField.getAGName() == "" || mField.getDisplayType() != VIS.DisplayType.Button || editor == null) {
+                return null;
+            }
+            var agName = mField.getAGName().replace(' ', '');
+            var agIns = null;
+            if (agName in agGroupToAGInsMap) {
+                agIns = agGroupToAGInsMap[agName];
+            }
+            else {
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(),mField.getAGStyle());
+                agGroupToAGInsMap[agName] = agIns;
+            }
+            agIns.addItem(editor);
+            return agIns;
         };
 
         this.addField = function (editor, mField) {
@@ -585,42 +631,43 @@
             if (label == null && editor == null)
                 return;
             var sameLine = mField.getIsSameLine();
-            if (addGroup(mField.getFieldGroup() , columnIndex)) {
-                sameLine = false;
-            }
 
+            var agInstance = addActionGroup(mField, editor);
+            //Check for Action Group
+            //var isAGNew = agInstance && agInstance.getItemCount() == 1;
 
-
-            if (sameLine) {
-                ++columnIndex;
-                if (columnIndex > 3) {
+            if (!agInstance) {
+                if (addGroup(mField.getFieldGroup(), columnIndex)) {
                     sameLine = false;
-                    insertRow = true;
-                    // columnIndex = 0;
                 }
-                else if (columnIndex < 0) {
-                    //addRow();
-                    insertRow = true;
+            }
+            if (!agInstance || agInstance.getIsNewIns()) {
+                if (sameLine) {
+                    ++columnIndex;
+                    if (columnIndex > colCount-1) {
+                        sameLine = false;
+                        insertRow = true;
+                        // columnIndex = 0;
+                    }
+                    else if (columnIndex < 0) {
+                        //addRow();
+                        insertRow = true;
+                        //columnIndex = 0;
+                    }
+                }
+                else {
                     //columnIndex = 0;
+                    insertRow = true;
+                    //addRow();
                 }
+                adjustLayout(mField, insertRow);
             }
-            else {
-                //columnIndex = 0;
-                insertRow = true;
-                //addRow();
-            }
-
-
-            adjustLayout(mField, insertRow);
-
 
             if (label != null) {
-
 
                 if (mField.getDescription().length > 0) {
                     //label.getControl().prop('title', mField.getDescription());
                 }
-
 
                 //addToCompList(label);
                 //compToFieldMap[label.getName()] = mField;
@@ -629,7 +676,6 @@
             }
 
             if (editor != null) {
-
 
                 var fieldVFormat = mField.getVFormat();
                 var formatErr = mField.getVFormatError();
@@ -662,22 +708,31 @@
 
                 var count = editor.getBtnCount();
 
-
                 //addToCompList(editor);
                 // compToFieldMap[editor.getName()] = mField;
                 addCompToFieldList(mField.getColumnName(), editor);
                 allControls[++allControlCount] = editor;
-
             }
-
 
             //new design container
             if (label != null || editor != null) {
 
                 var ctnr = _curParent;
 
-
-                insertCWrapper(label, editor, ctnr, mField);
+                //check for agGroup
+                if (agInstance) {
+                    if (agInstance.getIsNewIns()) { //only Once
+                        insertCWrapper(label, agInstance, ctnr, mField);
+                    }
+                    //apply style only
+                    var customStyle = mField.getHtmlStyle();
+                    if (editor != null && customStyle != "") {
+                        editor.getControl().attr('style', customStyle);
+                    }
+                }
+                else {
+                    insertCWrapper(label, editor, ctnr, mField);
+                }
 
 
                 fieldToCompParentMap[mField.getColumnName()] = ctnr;
@@ -702,11 +757,11 @@
 
         this.getComponents = function () {
             return allControls;
-        }
+        };
 
         this.getLinkComponents = function () {
             return allLinkControls;
-        }
+        };
 
         this.setEnabled = function (action, enable) {
             if (Object.keys(toolbarButtonList).length > 0 && toolbarButtonList[action]) {
@@ -716,15 +771,54 @@
                 //});
                 toolbarButtonList[action].setReadOnly(!enable);
             }
-        }
+        };
 
         this.setVisible = function (colName, show) {
             if (fieldToCompParentMap[colName])
                 show ? fieldToCompParentMap[colName].show() : fieldToCompParentMap[colName].hide();
         };
 
+        this.showAsPopUp = function (parent) {
+
+            var sPanel = parent;// this.getRoot();//.detach();
+
+            sPanel.addClass("vis-ad-w-p-vc-ev-grid-abs");
+            var img = $('<span class="vis-ad-w-p-vc-ev-grid-abs-close"><i class="vis vis-close"></span>');
+            sPanel.append(img);
+
+            img.on('click', function () {
+                sPanel.removeClass("vis-ad-w-p-vc-ev-grid-abs");
+                img.remove();
+            })
+
+            // var chDia = new VIS.ChildDialog();
+            // chDia.setTitle("");
+            // var wdth = window.innerWidth - 200;
+            // var hgt = window.innerHeight - 100;
+            //// var diaCtr = $('<div style="max-height: ' + hgt + 'px; max-width: ' + wdth + 'px; min-width: 150px; min-height: 60px;"></div>');
+            //// diaCtr.append(message);
+            // chDia.setContent(this.getRoot());
+
+
+
+            // chDia.close = function () {
+            //    // sPanel.detach();
+            //     parent.append(sPanel);
+            // }
+            // chDia.show();
+            // chDia.hidebuttons();
+        };
+
+        this.setColumnLayout = function (count) {
+            colCount = count;
+            if (colCount < 1 || colCount > 4) {
+                colCount = 4;
+            };
+            $table[0].style.gridTemplateColumns='repeat(' + colCount + ', 1fr)';
+        };
+
         this.dispose = function () {
-            $table.off("click", "span.vis-ev-ctrlinfowrap", onInfoClick);
+            $table.off("click", "label", onInfoClick);
             $table.off();
             colDescHelpList = {};
             if (lastPopover) {
@@ -764,7 +858,7 @@
             $table = null;
             this.addField = null;
             $spndisplayFG = null;
-           // addRow = null;
+            // addRow = null;
             //addToCompList = null;
         };
 
@@ -802,7 +896,7 @@
             }
         }
 
-        if (editor != null && customStyle != "") {
+        if (!(editor && editor instanceof VIS.ActionGroup) && editor != null && customStyle != "") {
             if (mField.getDisplayType() == VIS.DisplayType.ProgressBar) {
                 editor.setHtmlStyle(customStyle);
             } else {
@@ -813,7 +907,8 @@
         var ctrlP = $("<div class='vis-control-wrap'>");
 
         if (editor && (editor.getControl()[0].tagName == 'INPUT' || editor.getControl()[0].tagName == "SELECT" ||
-            editor.getControl()[0].tagName == 'TEXTAREA' || editor.getControl()[0].className == 'vis-progressCtrlWrap') && editor.getControl()[0].type != 'checkbox') {
+            editor.getControl()[0].tagName == 'TEXTAREA' || editor.getControl()[0].className == 'vis-progressCtrlWrap')
+            && editor.getControl()[0].type != 'checkbox') {
             //editor.getControl().addClass("custom-select");
             ctrlP.append(editor.getControl().attr("placeholder", " ").attr("data-placeholder", ""));
             if (label != null) { // && mField.getDisplayType() != VIS.DisplayType.TelePhone)
@@ -827,11 +922,14 @@
                 ctrlP.append(editor.getControl());
         }
 
-
-
-        if (mField.getDisplayType() != VIS.DisplayType.Label && !mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.TelePhone ) { // exclude Label display type
-            ctrlP.append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
-                "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+        
+            if (!(editor && editor instanceof VIS.ActionGroup) && mField.getDisplayType() != VIS.DisplayType.Label && !mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.TelePhone) { // exclude Label display type
+            //ctrlP.append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
+             //    "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+                if (label != null) {
+                    label.getControl().append("<span class='vis-ev-ctrlinfowrap' data-colname='" + mField.getColumnName() + "' title='" + mField.getDescription() + "'  tabindex='-1' data-toggle='popover' data-trigger='focus'>" +
+                        "<i class='vis vis-info' aria-hidden='true'></i></span'>");
+                }
         }
 
         //if (editor && mField.getDisplayType() == VIS.DisplayType.ProgressBar) {
@@ -867,6 +965,97 @@
             ctrlP.css("z-index", "auto");
         }
     }
+
+    function ActionGroup(name, fontname,style,isHdrItem) {
+        this.name = name;
+        this.vEditors = [];
+        var $root = null;
+        var $actionList = null;
+      
+        var id = "vis_ev_col_ag_btn" + Math.random();
+        var popup = null;
+        function InitUI() {
+
+            var styl = '';
+            if (style && style != '') {
+                styl = ' style=' + style;
+            }
+            
+            var html = '<div class="dropdown vis-ev-col-actiongroup" >' 
+                + '<span class="dropdown-toggle btn vis-ev-col-ag-dropdown-btn" id="' + id + '"' + styl + '  data-toggle="dropdown">'
+                + '<i class="' + fontname + '"></i>'
+                + name + '</span>'
+                + '<div class="dropdown-menu dropdown-menu-right vis-ev-col-ag-div" aria-labelledby="' + id + '">'
+                + '<ul class="vis-ev-col-ag-btn-list">'
+                + '</ul>'
+                + '</div>'
+                + '</div>';
+
+            
+
+           //var  html = '<div class="vis-ev-col-actiongroup">'
+           //                 + ' <div id="' + id + '" class="vis-ev-col-ag-dropdown-btn btn dropdown-toggle"  '+styl+'>'
+           //                  + '<span class="' + fontname + '"></span>'
+           //                      + name + '<span class="caret"></span>'
+           //           +'</div> '
+           //          //+ '<div class="dropdown-menu" aria-labelledby="' + id + '" > '
+           //          //  + '<ul class="vis-ev-col-ag-btn-list">'
+           //          //  + '</ul>'
+           //          //+ '</div>'
+           //    + '</div>';
+
+            $root = $(html);
+            if (!isHdrItem) {
+                $root.find(".vis-ev-col-ag-dropdown-btn").addClass("vis-ev-col-ag-dropdown-btn-color");
+            }   
+
+            //$actionList = $("<ul class='vis-apanel-rb-ul'>");
+
+            $actionList = $root.find('.vis-ev-col-ag-btn-list');
+
+            
+        };
+
+        InitUI();
+
+        function events() {
+            //$root.on('click', function (e) {
+            //    $root.w2overlay($actionList.clone(true));
+            //});
+        }
+        events();
+
+        this.getControl = function () {
+            return $root;
+        }
+        this.getActionList = function () {
+            return $actionList;
+        }
+        this.dispose = function () {
+            $actionList.remove();
+            $root.remove();
+        }
+
+    }
+    ActionGroup.prototype.addItem = function (veditor) {
+        this.vEditors.push(veditor);
+        var li = $('<li>');
+        li.append(veditor.getControl());
+        this.getActionList().append(li);
+    };
+    ActionGroup.prototype.getItemCount = function () {
+        return this.vEditors.length;
+    };
+
+    ActionGroup.prototype.getBtnCount = function () {
+        return 0;
+    }
+
+    ActionGroup.prototype.getIsNewIns = function () {
+        return this.getItemCount() == 1;
+    }
+
+    VIS.ActionGroup = ActionGroup;
 
 }(VIS, jQuery));
 

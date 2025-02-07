@@ -3205,6 +3205,154 @@ p.vis-maintain-customer-p span {
     position: relative;
     overflow: hidden;
 }
+
+.vis-widgetfield-margin {
+    margin: 0px 5px 5px 0px;
+}
+
+.vis-dynamicWidget-main {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+.vis-dynamicWidget-msg {
+    justify-content: center;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.vis-add-row {
+    display: block;
+    padding: 10px;
+    clear: both;
+}
+    .vis-add-row button {
+        display: flex;
+        align-items: center;
+        border: 0;
+        border-radius: 6px;
+        min-height: 40px;
+        width: auto;
+        float: left;
+        margin: 0px 15px 6px 6px;
+        gap: 8px;
+        padding: 0px 12px;
+        overflow: hidden;
+        justify-content: center;
+        cursor: pointer;
+    }
+    .vis-add-row label, .vis-add-row a {
+        display: flex;
+        align-items: center;
+        float: left;
+        margin: 0 15px 0px 6px;
+        gap: 8px;
+        padding: 0px 5px;
+        overflow: hidden;
+        justify-content: center;
+    }
+
+    .vis-add-row a {
+        cursor: pointer;
+    }
+        .vis-add-row span {
+            display: flex;
+            float: left;
+            gap: 5px;
+            overflow: hidden;
+            min-height: 15px;
+            padding: 5px;
+            margin: 0 6px 6px;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+    .vis-add-row label.default {
+        color: rgba(var(--v-c-on-secondary),1);
+    }
+    .vis-add-row a.default {
+        color: rgba(var(--v-c-primary), 1);
+        text-decoration: underline;
+    }
+    .vis-add-row button.default {
+        box-shadow: 2px 2px 4px #ccc;
+        color: rgba(var(--v-c-on-primary),1);
+        background-color: rgba(var(--v-c-primary), 1);
+    }
+
+    .vis-add-row button i.default,
+    .vis-add-row button img.default {
+        color: rgba(var(--v-on-c-primary), 1);
+    }
+
+
+
+    .vis-add-row button img, .vis-add-row label img, .vis-add-row a img {
+        width: 20px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        object-fit: cover;
+    }
+
+.vis-widget-field {
+    margin: 0px;
+}
+
+.vis-exclamation-icon {
+    color: #e92d2d;
+    padding-left:10px;
+}
+
+.vis-dynamicwidget-arrow {
+    position: absolute;
+    top: 40%;
+    text-align: center;
+    float: right;
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
+    padding-right: 10px;
+    right: 0;
+}
+
+.vis-bottomArrow-icon {
+    float: right;
+    color: rgba(var(--v-c-primary), 1);
+    cursor: pointer;
+    font-size:1.5rem;
+}
+
+.vis-topArrow-icon {
+    float: right;
+    color: rgba(var(--v-c-primary), 1);
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+        .vis-topArrow-icon:active, .vis-bottomArrow-icon:active {
+            box-shadow: 0 0 3px rgba(var(--v-c-primary), 1);
+        }
+
+.vis-add-row button .vis-widget-badge {
+    background: rgba(var(--v-c-on-primary), 1);
+    color: rgba(var(--v-c-primary), 1);
+}
+
+.vis-widget-badge {
+    background: rgba(var(--v-c-primary), 1);
+    color: rgba(var(--v-c-on-primary), 1);
+    font-weight: 600;
+    border-radius:15px;
+}
+
+.vis-add-row button .vis-widget-badge {
+    background: rgba(var(--v-c-on-primary), 1);
+    color: rgba(var(--v-c-primary), 1);
+}
+
 /* new Changes */
 
 .vis-feedDetails-cmnt i {
@@ -3366,7 +3514,7 @@ ul.vis-userLinks-ListMenu li a i {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     grid-auto-rows: var(--rowheight);
-    gap: 5px;
+    gap: 10px;
     padding: 5px;
     width: 100%;
     height: 100%;
@@ -3403,9 +3551,9 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 
-.ui-sortable-helper {
+/*.ui-sortable-helper {
     transform: scale(0.9);
-}
+}*/
 
 .vis-add-widgetContainer {
     align-items: center;
@@ -3414,7 +3562,7 @@ ul.vis-userLinks-ListMenu li a i {
     flex-direction: column;
     grid-area: span 1 / span 1;
     justify-content: center;
-    margin: 0 auto;
+    /*margin: 0 auto;*/
     text-align: center;
     padding: 5px;
 }
@@ -3470,7 +3618,7 @@ ul.vis-userLinks-ListMenu li a i {
     float: left;
     width: 30%;
     box-shadow: 0 0 7px 1px #cccccc;
-    height: 100%;
+    height: calc(100% - 3px);
 }
 
 .vis-widget-header {
@@ -3491,11 +3639,15 @@ ul.vis-userLinks-ListMenu li a i {
         background-color: rgba(var(--v-c-mandatory), 1);
         padding: 0.4rem;
         display: block;
-        color: rgba(var(--v-c-common), 1);
+        color: rgba(var(--v-c-common), 1) !important;
         font-size: 1rem;
         cursor: pointer;
+        border: 1px solid rgba(var(--v-c-mandatory), 1);
     }
 
+        .vis-widget-header .vis:focus {
+            box-shadow: 0 0 10px rgba(var(--v-c-primary),.7) !important;
+        }
 
 .vis-widgetDrag-container {
     display: flex;
@@ -3537,10 +3689,26 @@ ul.vis-userLinks-ListMenu li a i {
     background-color: rgba(var(--v-c-on-secondary), .08);
 }
 
+.vis-widgetSizeValue {
+    background-color: #000000;
+    color: #fff;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0px 5px;
+    border-radius: 0 5px 0 0;
+    font-size: 85%;
+}
+
 .vis-widgetImg {
-    width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: contain;
+    width: 100%;
+}
+
+.vis-widgetField-icon {
+    width: 10%;
+    height: auto;
 }
 
 .vis-widget-body {
@@ -3580,25 +3748,69 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 /* Sorting helper */
-.ui-sortable-helper {
+/*.ui-sortable-helper {
     background-color: rgba(255, 255, 255, 0.8);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s ease-in-out;
-}
+}*/
 
     /* Sorting helper while dragging */
-    .ui-sortable-helper.sorting {
+    /*.ui-sortable-helper.sorting {
         transform: scale(1.05);
+    }*/
+
+.vis-widgetDelete {
+    background: transparent;
+    position: absolute;
+    right: 0px;
+    top: 0;
+    z-index: 9;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+    .vis-widgetDelete:hover {
+        background: #ffff;
+        border: 1px solid #bababa;
     }
 
-    .vis-widgetDelete{
-        position:absolute;
-        top:2px;
-        right:2px;
-        color:black;
-        cursor:pointer;
-        z-index:99999;
-    }
+
+
+.vis-widget-container:not(.vis-editModeWidget) .vis-widget-item:not([data-type="W"]) .vis-widgetDelete {
+    display: none;
+}
+
+.vis-editModeWidget .vis-widgetDelete i{
+    display: block;
+}
+
+.vis-editModeWidget .vis-widgetDelete svg {
+    display: none;
+}
+
+.vis-widgetDelete svg{
+    fill:#777;
+}
+
+.vis-widgetDelete:hover svg{
+    fill:#000;
+}
+
+
+.vis-widget-container:not(.vis-editModeWidget) .vis-widgetDelete svg {
+    display: block;
+}
+
+.vis-widget-container:not(.vis-editModeWidget) .vis-widgetDelete i {
+    display: none;
+}
+
+
+
 
 .vis-linksWidget {
     width: 100%;
@@ -3608,12 +3820,21 @@ ul.vis-userLinks-ListMenu li a i {
     justify-content: center;
     height: 100%;
     cursor: pointer;
+    border: 1px solid rgba(var(--v-c-primary), 0.05);
 }
 
 .vis-linksWidget .linktitle{
     margin-top:10px;
     text-align:center;
 }
+
+    .vis-linksWidget img, .vis-imgsec img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+
 
 .vis-dotdot {
     display: block;
@@ -3623,9 +3844,19 @@ ul.vis-userLinks-ListMenu li a i {
     width: 100%;
 }
 
+.vis-dotdot2 {
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size:95%;
+}
+
 #vis_editHome{
     cursor:pointer;
-    display:none;
+    /*display:none;*/
 }
 
 .vis-editModeWidget .vis-widget-item, 
@@ -3637,6 +3868,175 @@ ul.vis-userLinks-ListMenu li a i {
     width:100%;
 }
 
-.vis-editModeWidget .vis-widget-item .vis-height-full {
+.vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) {
     pointer-events: none;
 }
+
+.droppable-placeholder {
+    border: 2px dashed #ccc;
+    background-color: #f9f9f9;
+}
+.vis-imgsec {
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow:hidden;
+}
+.vis-widgetdefault {
+    width: 35px;
+    height: 35px
+}
+
+
+/*Home Screen Favourites Start*/
+.vis_homeTopUsrIcon {
+    margin: 0px 5px 0px 0px !important;
+    font-size: x-large !important;
+    cursor: pointer;
+}
+
+.VIS-nm-favourites-flyout {
+    /*background-color: #fff;*/
+    /*background-color: #dfeaed !important;*/
+    min-width: 600px;
+    position: absolute;
+    top: 42px;
+    right: 16px;
+    z-index: 100;
+    border: 1px solid #e4e4e4;
+    padding: 0px 16px 16px;
+    border-radius: 8px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    max-width: 600px;
+    /*max-height: calc(100vh - 66px) !important;*/
+}
+
+/*New Favourites*/
+.vis-nm-fav-homeFavourite {
+    border: 1px solid #f2f2f2;
+    border-radius: 6px;
+    box-shadow: 0 0 12px 0 #cccccc;
+    padding: 10px;
+    width: 400px;
+    position: absolute;
+    right: 1rem;
+    top: 3rem;
+    z-index: 999;
+    background-color: white;
+}
+
+.vis-nm-fav-menu-heading h1 {
+    font-size: 0.875rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+.vis-nm-fav-menu-heading {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.vis-nm-fav-favourite-lising {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: .4rem;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.vis-nm-fav-grid-view {
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.vis-nm-fav-tile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(var(--v-c-on-secondary),.03);
+    padding: 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .vis-nm-fav-tile:hover {
+        background-color: rgba(var(--v-c-readonly), 0.7);
+    }
+
+.vis-nm-fav-ico-w-txt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .vis-nm-fav-ico-w-txt .prefix-tile-txt {
+        font-size: 0.875rem;
+        color: rgba(var(--v-c-primary), 1);
+        line-height: 0.875rem;
+    }
+
+.vis-nm-fav-tile .vis-star-empty {
+    color: rgba(var(--v-c-primary), 1);
+    font-size: 1.1rem;
+}
+
+.vis-nm-fav-grid-view .vis-nm-fav-ico-w-txt {
+    flex-direction: column;
+    align-items: start;
+    gap: 4px;
+}
+
+.vis-nm-fav-views {
+    display: flex;
+    align-items: center;
+}
+
+    .vis-nm-fav-views .vis {
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    .vis-nm-fav-views .vis-list-view {
+        display: none;
+    }
+
+.vis-nm-fav-gridView .vis-grid-view {
+    display: none;
+}
+
+.vis-nm-fav-gridView .vis-list-view {
+    display: block;
+}
+
+.vis_home-fav-count {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 1px;
+}
+
+    .vis_home-fav-count .vis {
+        font-size: 1.1rem;
+        color: rgba(var(--v-c-primary), 1);
+    }
+
+.vis-nm-fav-icon-float {
+    float:right;
+}
+.vis_home-total-count {
+    background-color: rgba(var(--v-c-on-secondary), 1);
+    border-radius: 10px;
+    color: rgba(var(--v-c-common), 1);
+    font-size: .65rem;
+    max-width: 30px;
+    min-width: 16px;
+    min-height: 16px;
+    position: absolute;
+    right: -10px;
+    text-align: center;
+    top: -8px;
+}
+/*Home Screen Favourites End*/

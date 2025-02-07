@@ -15,6 +15,7 @@ using VAdvantage.Logging;
 using VAdvantage.Utility;
 using VAdvantage.Classes;
 using VAModelAD.Model;
+using PdfSharp.Pdf;
 
 namespace VAdvantage.Controller
 {
@@ -109,6 +110,8 @@ namespace VAdvantage.Controller
         /****   Has tab Panels   ***/
         public bool HasPanels = false;
 
+        
+
         /****   Is Header Panel   ***/
         public bool IsHeaderPanel = false;
 
@@ -146,7 +149,7 @@ namespace VAdvantage.Controller
         /****   Header Items   ***/
         public List<HeaderPanelGrid> HeaderItems = null;
 
-        public string TabPanelAlignment = "V";
+        public string TabPanelAlignment = "V"; 
 
         // Maintain versions on approval // for Master data Versioning
         public bool MaintainVerOnApproval = false;
@@ -173,12 +176,15 @@ namespace VAdvantage.Controller
         public bool? IsHideSingleToggle = null;
         public bool? IsHideCardToggle = null;
         public bool? IsHideRecordNav = null;
+        public bool? IsShowFilterPanel = null;
 
         public bool? IsAutoNewRecord = null;
 
         //Hide field group from (number)
         public Int16 HideFieldGroupFrom = 0;
         public bool IsHideVerNewRecord = false;
+        //single view column layout
+        public Int16 DetailViewColCount = 4;
 
         public string SelectSQL
         {
@@ -368,11 +374,12 @@ namespace VAdvantage.Controller
         private static bool LoadTabDetails(GridTabVO vo, IDataReader dr)
         {
             MRole role = MRole.GetDefault(vo.ctx, false);
-            bool showTrl = "Y".Equals(vo.ctx.GetContext("#ShowTrl")) || DataBase.GlobalVariable.IsVisualEditor;
-            bool showAcct = "Y".Equals(vo.ctx.GetContext("#ShowAcct")) || DataBase.GlobalVariable.IsVisualEditor;
-            bool showAdvanced = "Y".Equals(vo.ctx.GetContext("#ShowAdvanced")) || DataBase.GlobalVariable.IsVisualEditor;
-            //	VLogger.get().warning("ShowTrl=" + showTrl + ", showAcct=" + showAcct);
             bool skipRole = vo.ctx.GetContext("skipRole") == "Y";
+            bool showTrl = "Y".Equals(vo.ctx.GetContext("#ShowTrl")) || skipRole;
+            bool showAcct = "Y".Equals(vo.ctx.GetContext("#ShowAcct")) || skipRole;
+            bool showAdvanced = "Y".Equals(vo.ctx.GetContext("#ShowAdvanced")) || skipRole;
+            //	VLogger.get().warning("ShowTrl=" + showTrl + ", showAcct=" + showAcct);
+            
             try
             {
                 vo.AD_Tab_ID = Utility.Util.GetValueOfInt(dr["AD_Tab_ID"]);
@@ -418,7 +425,7 @@ namespace VAdvantage.Controller
 
                 //	Access Level
                 vo.AccessLevel = Utility.Util.GetValueOfString(dr["AccessLevel"]);
-                if (!skipRole && !role.CanView(vo.ctx, vo.AccessLevel) && !DataBase.GlobalVariable.IsVisualEditor)	//	No Access
+                if (!skipRole && !role.CanView(vo.ctx, vo.AccessLevel))	//	No Access
                 {
                     VLogger.Get().Fine("No Role Access - AD_Tab_ID=" + vo.AD_Tab_ID + " " + vo.Name);
                     return false;
@@ -428,14 +435,14 @@ namespace VAdvantage.Controller
                 //	Table Access
                 vo.AD_Table_ID = Utility.Util.GetValueOfInt(dr["AD_Table_ID"]);
                 vo.ctx.SetContext(vo.windowNo, vo.tabNo, "AD_Table_ID", vo.AD_Table_ID.ToString());
-                if (!skipRole && !role.IsTableAccess(vo.AD_Table_ID, true) && !DataBase.GlobalVariable.IsVisualEditor)
+                if (!skipRole && !role.IsTableAccess(vo.AD_Table_ID, true) )
                 {
                     VLogger.Get().Config("No Table Access - AD_Tab_ID="
                         + vo.AD_Tab_ID + " " + vo.Name);
                     return false;
                 }
 
-                if (role.IsTableReadOnly(vo.AD_Table_ID) && !DataBase.GlobalVariable.IsVisualEditor)
+                if (role.IsTableReadOnly(vo.AD_Table_ID) && !skipRole)
                 {
                     vo.IsReadOnly = true;
                 }
@@ -549,7 +556,7 @@ namespace VAdvantage.Controller
 
                 vo.IsMaintainVersions = Utility.Util.GetValueOfString(dr["IsMaintainVersions"]).Equals("Y");
 
-                vo.TabLayout = Utility.Util.GetValueOfString(dr["TabLayout"]);
+                vo.TabLayout = Utility.Util.GetValueOfString(dr["TabLayout"]); 
 
                 if (string.IsNullOrEmpty(vo.TabLayout)) {
                     vo.TabLayout = "N";
@@ -565,6 +572,7 @@ namespace VAdvantage.Controller
                 vo.IsHideSingleToggle = Utility.Util.GetValueOfString(dr["IsHideSingleToggle"]).Equals("Y"); 
                 vo.IsHideCardToggle = Utility.Util.GetValueOfString(dr["ishidecardtoggle"]).Equals("Y");
                 vo.IsHideRecordNav = Utility.Util.GetValueOfString(dr["IsHideRecordNav"]).Equals("Y");
+                vo.IsShowFilterPanel = Utility.Util.GetValueOfString(dr["isShowFilterPanel"]).Equals("Y");
 
                 string isAuto = dr["IsAutoNewRecord"].ToString();
                 if (isAuto == "Y")
@@ -572,6 +580,7 @@ namespace VAdvantage.Controller
                 else if (isAuto == "N")
                     vo.IsAutoNewRecord = false;
                 vo.HideFieldGroupFrom = Convert.ToInt16(Util.GetValueOfInt(dr["HideFieldGroupFrom"]));
+                vo.DetailViewColCount =  Convert.ToInt16(Util.GetValueOfInt(dr["SingleViewLayout"])); //todo get from DB
             }
             catch (System.Exception ex)
             {
@@ -657,8 +666,8 @@ namespace VAdvantage.Controller
                         mTabVO.panels.Add(voF);
                     }
                 }
-
                 dr.Close();
+
                 param = null;
             }
             catch (Exception e)
@@ -790,8 +799,8 @@ namespace VAdvantage.Controller
                .Append(" c.ReadOnlyLogic                                                     AS ReadOnlyLogic        , ")
                .Append(" c.IsUpdateable                                                      AS IsUpdateable         , ")
                .Append(" c.IsEncrypted                                                       AS IsEncryptedColumn    , ")
-               .Append(" COALESCE(u.IsSelectionColumn,c.IsSelectionColumn)                   AS IsSelectionColumn    , ")
-               .Append(" COALESCE(u.SelectionSeqNo,c.SelectionSeqNo)                         AS SelectionSeqNo       , ")
+               .Append(" COALESCE(u.IsSelectionColumn,f.IsSelectionColumn)                   AS IsSelectionColumn    , ")
+               .Append(" COALESCE(u.SelectionSeqNo,f.SelectionSeqNo)                         AS SelectionSeqNo       , ")
                .Append(" COALESCE(u.IsSummaryColumn,c.IsSummaryColumn)                       AS IsSummaryColumn      , ")
                .Append(" COALESCE(u.SummarySeqNo,c.SummarySeqNo)                             AS SummarySeqNo         , ")
                .Append(" tbl.TableName                                                       AS TableName            , ")
@@ -988,6 +997,7 @@ namespace VAdvantage.Controller
             clone.panels = new List<GridTabPanelVO>();
             if (panels != null)
             {
+               
                 for (int i = 0; i < panels.Count; i++)
                 {
                     GridTabPanelVO tpo = panels[i];
@@ -995,6 +1005,7 @@ namespace VAdvantage.Controller
                     if (clonetp == null)
                         return null;
                     clone.panels.Add(clonetp);
+
                 }
             }
             if (clone.panels != null && clone.panels.Count > 0)
@@ -1033,6 +1044,8 @@ namespace VAdvantage.Controller
             clone.IsHideCardToggle = IsHideCardToggle;
             clone.HideFieldGroupFrom = HideFieldGroupFrom;
             clone.IsHideRecordNav = IsHideRecordNav;
+            clone.IsShowFilterPanel = IsShowFilterPanel;
+            clone.DetailViewColCount = DetailViewColCount;
 
             clone.fields = new List<GridFieldVO>();
             for (int i = 0; i < fields.Count; i++)

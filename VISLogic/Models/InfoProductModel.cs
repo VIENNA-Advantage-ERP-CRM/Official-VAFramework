@@ -34,6 +34,8 @@ namespace VIS.Models
             MaterialReceipt = 184,
             Package = 319,
             InternalUse = 341,
+            CustomerReturn = 409,
+            VendorReturn = 411
         }
 
         StringBuilder _sqlQuery = new StringBuilder();
@@ -190,8 +192,8 @@ namespace VIS.Models
             return s_productLayout;
         }
 
-        public InfoProductData GetData(string tableName, int pageNo, bool isMobile,
-            VAdvantage.Utility.Ctx ctx, bool requery, List<InfoSearchCol> srchCtrls, string Validation, int Window_ID)
+        public InfoProductData GetData(string tableName, int pageNo, bool isMobile, VAdvantage.Utility.Ctx ctx, bool requery, List<InfoSearchCol> srchCtrls,
+            string Validation, int Window_ID, string windowName)
         {
             InfoProductData _iData = new InfoProductData();
             try
@@ -399,7 +401,7 @@ namespace VIS.Models
                         LEFT OUTER JOIN C_UOM c ON (p.C_UOM_ID=c.C_UOM_ID)
                         LEFT OUTER JOIN M_Manufacturer mr ON (p.M_Product_ID = mr.M_Product_ID)
                         LEFT OUTER JOIN M_ProductAttributes patr ON (p.M_Product_ID = patr.M_Product_ID) AND patr.AD_Org_ID IN 
-                        (SELECT AD_Org_ID FROM AD_Role_OrgAccess WHERE AD_Role_ID=" + ctx.GetAD_Role_ID()+@" AND IsActive='Y')
+                        (SELECT AD_Org_ID FROM AD_Role_OrgAccess WHERE AD_Role_ID=" + ctx.GetAD_Role_ID() + @" AND IsActive='Y')
                         LEFT OUTER JOIN C_UOM_Conversion uc ON (p.M_Product_ID = uc.M_Product_ID)
                         , M_Warehouse w " + sqlWhere + " ORDER BY p.M_Product_ID, M_PriceList_Version_ID, M_AttriButeSetInstance_ID, C_UOM_ID";
                 sqlPaging = MRole.GetDefault(ctx).AddAccessSQL(sqlPaging, tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
@@ -442,8 +444,8 @@ namespace VIS.Models
             }
         }
 
-        public InfoCartData GetCart(int pageNo, bool isCart, int window_ID, int WarehouseID, int WarehouseToID,
-            int LocatorID, int LocatorToID, int BPartnerID, VAdvantage.Utility.Ctx ctx, List<InfoSearchCol> srchCtrls, bool requery)
+        public InfoCartData GetCart(int pageNo, bool isCart, int window_ID, string windowName, int WarehouseID, int WarehouseToID,
+            int LocatorID, int LocatorToID, int BPartnerID, VAdvantage.Utility.Ctx ctx, List<InfoSearchCol> srchCtrls, bool requery, int OrderId)
         {
             string query = "";
             int M_Warehouse_ID = 0;
@@ -491,15 +493,25 @@ namespace VIS.Models
                 }
                 if (isCart)
                 {
-                    query += " AND VAICNT_TransactionType = 'OT' ";
+                    //VIS0336-implement the check for delivery order screen
+                    if (windowName == "VAS_DeliveryOrder")
+                    {
+
+                        query += " AND VAICNT_TransactionType = 'SH' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM C_Order WHERE docstatus='CO' AND C_Order_ID= " + OrderId + ")";
+                    }
+                    else
+                    {
+                        query += " AND VAICNT_TransactionType = 'OT' ";
+
+                    }
                 }
                 else
                 {
-                    if (window_ID == 184)
+                    if (window_ID == 184 || windowName == "VAS_MaterialReceipt")
                     {   // JID_1026: System is not checking the document status of Order and requisition while loading cart on M_inout and internal use move line respectively
                         query += " AND VAICNT_TransactionType = 'MR' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE C_BPartner_ID = " + Util.GetValueOfInt(BPartnerID) + " AND DocStatus IN ('CO', 'CL'))";
                     }
-                    else if (window_ID == 319 || window_ID == 170)
+                    else if (window_ID == 319 || window_ID == 170 || windowName == "VAS_Package" || windowName == "VAS_InventoryMove")
                     {
                         query += " AND VAICNT_TransactionType = 'IM' ";
                         // extra parameters only for these windows
@@ -508,20 +520,23 @@ namespace VIS.Models
                         M_Warehouse_ID = WarehouseID;
                         M_WarehouseTo_ID = WarehouseToID;
                     }
-                    else if (window_ID == 168)
+                    else if (window_ID == 168 || windowName == "VAS_PhysicalInventory")
                     {
                         query += " AND VAICNT_TransactionType = 'PI' ";
                         M_Warehouse_ID = WarehouseID;
                     }
-                    else if (window_ID == 169)
-                    {
-                        query += " AND VAICNT_TransactionType = 'SH' and VAICNT_ReferenceNo in (SELECT DocumentNo from C_Order WHERE  C_BPartner_ID = " + BPartnerID + " AND DocStatus IN ('CO'))";
-                    }
-                    else if (window_ID == 341)
+
+                    else if (window_ID == 341 || windowName == "VAS_InternalUseInventory")
                     {
                         M_Warehouse_ID = WarehouseID;
-                        query += " AND VAICNT_TransactionType = 'IU' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE IsActive = 'Y' AND M_Warehouse_ID = " + M_Warehouse_ID + " AND DocStatus IN ('CO'))";
+                        query += " AND VAICNT_TransactionType = 'IU' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE IsActive = 'Y' AND  DTD001_MWarehouseSource_ID=" + M_Warehouse_ID + " AND   M_Warehouse_ID = " + M_Warehouse_ID + " AND DocStatus IN ('CO'))";
                     }
+                    //VIS0336-implement the check for delivery order screen
+                    else if (window_ID == 169 || windowName == "VAS_DeliveryOrder")
+                    {
+                        query += " AND VAICNT_TransactionType = 'SH' AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM C_Order WHERE DocStatus='CO' AND C_Order_ID= " + OrderId + ")";
+                    }
+
                     else
                     {
                         query += " AND VAICNT_TransactionType = 'OT' ";
@@ -542,7 +557,7 @@ namespace VIS.Models
             InfoCartData _iData = new InfoCartData();
             try
             {
-                if (!isCart && window_ID == 170)
+                if (!isCart && (window_ID == 170 || windowName == "VAS_InventoryMove"))
                 {
                     StringBuilder sqlWhere = new StringBuilder("");
                     if (WarehouseID > 0)
@@ -558,7 +573,7 @@ namespace VIS.Models
                     sql += " AND VAICNT_ReferenceNo IN (SELECT DocumentNo FROM M_Requisition WHERE AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND IsActive = 'Y' AND DocStatus IN ('CO') "
                         + sqlWhere.ToString() + ")";
                 }
-                else if (!isCart && window_ID == 168)  // JID_1030: on physical inventory system does not check that the locator is of selected warehouse on Physiacl inventory header or not.
+                else if (!isCart && (window_ID == 168 || windowName == "VAS_PhysicalInventory"))  // JID_1030: on physical inventory system does not check that the locator is of selected warehouse on Physiacl inventory header or not.
                 {
                     if (WarehouseID > 0)
                         sql += " AND VAICNT_ReferenceNo IN (SELECT Value FROM M_Locator WHERE IsActive = 'Y' AND M_Warehouse_ID = " + WarehouseID + ")";
@@ -629,7 +644,7 @@ namespace VIS.Models
         /// <returns>Status in the form of InfoSave class</returns>
         public InfoSave SetProductQty(int recordID, string keyColName, List<string> product, List<string> uoms, List<string> attribute,
             List<string> qty, int LocToID, int lineID, List<string> InvCountID, List<string> ReferenceNo,
-            int Locator_ID, int WindowID, int ContainerID, int ContainerToID, VAdvantage.Utility.Ctx ctx)
+            int Locator_ID, int WindowID, string windowName, int ContainerID, int ContainerToID, VAdvantage.Utility.Ctx ctx)
         {
             #region local Variables
             InfoSave info = new InfoSave();
@@ -915,14 +930,14 @@ namespace VIS.Models
                         _sqlQuery.Clear();
                         if (RefNo != "")
                         {
-                            if (WindowID == Util.GetValueOfInt(Windows.Shipment))
+                            if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
                                 _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
-                            else if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt))
+                            else if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt) || windowName == "VAS_MaterialReceipt")
                                 _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'N' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
                             else
                                 _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
                         }
-                        else if (WindowID == Util.GetValueOfInt(Windows.Shipment))
+                        else if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
                             _sqlQuery.Append("SELECT C_Order_ID FROM M_InOut WHERE IsActive = 'Y' AND IsSOTrx = 'Y' AND M_InOut_ID = " + recordID);
 
                         if (_sqlQuery.Length > 0)
@@ -974,16 +989,16 @@ namespace VIS.Models
                                 _sqlQuery.Clear();
                                 if (RefNo != "")
                                 {
-                                    if (WindowID == Util.GetValueOfInt(Windows.Shipment))
+                                    if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
                                         _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID()
                                             + " AND DocumentNo = '" + RefNo + "'");
-                                    else if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt))
+                                    else if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt) || windowName == "VAS_MaterialReceipt")
                                         _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'N' AND AD_Client_ID =" + ctx.GetAD_Client_ID()
                                             + " AND DocumentNo = '" + RefNo + "'");
                                     else
                                         _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
                                 }
-                                else if (WindowID == Util.GetValueOfInt(Windows.Shipment))
+                                else if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
                                     _sqlQuery.Append("SELECT C_Order_ID FROM M_InOut WHERE IsActive = 'Y' AND IsSOTrx = 'Y' AND M_InOut_ID = " + recordID);
 
                                 if (_sqlQuery.Length > 0)
@@ -1031,7 +1046,7 @@ namespace VIS.Models
                             if (hasOrderLines)
                             {
                                 DataRow[] drOL = null;
-                                if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt))
+                                if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt) || windowName == "VAS_MaterialReceipt")
                                 {
                                     if (Env.IsModuleInstalled("DTD001_"))
                                         drOL = dsOrderLines.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND M_AttributeSetInstance_ID = " + Util.GetValueOfInt(attribute[i])
@@ -1241,7 +1256,7 @@ namespace VIS.Models
                     // for Physical Inventory Window
                     int RefLocatorID = 0;
                     string RefNo = ReferenceNo[0];
-                    if (WindowID == Util.GetValueOfInt(Windows.PhysicalInventory))
+                    if (WindowID == Util.GetValueOfInt(Windows.PhysicalInventory) || windowName == "VAS_PhysicalInventory")
                     {
                         _sqlQuery.Clear();
                         if (RefNo != "")
@@ -1258,7 +1273,7 @@ namespace VIS.Models
                             hasStock = true;
                     }
                     // For Internal Use Inventory Window
-                    else if (WindowID == Util.GetValueOfInt(Windows.InternalUse))
+                    else if (WindowID == Util.GetValueOfInt(Windows.InternalUse) || windowName == "VAS_InternalUseInventory")
                     {
                         _sqlQuery.Clear();
                         _sqlQuery.Append("SELECT C_Charge_ID FROM C_Charge WHERE IsActive = 'Y' AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND DTD001_ChargeType = 'INV'");
@@ -1286,7 +1301,7 @@ namespace VIS.Models
                     {
                         lineID = 0;
                         // look for Inventory Line ID only in case of Physical Inventory Window
-                        if (WindowID == Util.GetValueOfInt(Windows.PhysicalInventory) && hasInvLines)
+                        if ((WindowID == Util.GetValueOfInt(Windows.PhysicalInventory) || windowName == "VAS_PhysicalInventory") && hasInvLines)
                         {
                             DataRow[] drInve = dsInvLine.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND M_AttributeSetInstance_ID = " + Util.GetValueOfInt(attribute[i]));
                             if (drInve != null && drInve.Length > 0)
@@ -1324,7 +1339,7 @@ namespace VIS.Models
                             // JID_1700: when saving Product from Cart, UOM Conversion was not working 
                             po.Set_Value("AdjustmentType", MInventoryLine.ADJUSTMENTTYPE_AsOnDateCount);
 
-                            if (WindowID == Util.GetValueOfInt(Windows.PhysicalInventory))
+                            if (WindowID == Util.GetValueOfInt(Windows.PhysicalInventory) || windowName == "VAS_PhysicalInventory")
                             {
                                 Decimal? qtyBook = 0;
                                 if (hasStock)
@@ -1340,7 +1355,7 @@ namespace VIS.Models
                                 if (po.Get_ColumnIndex("VAICNT_InventoryCountLine_ID") > 0 && Util.GetValueOfInt(InvCountID[i]) > 0)
                                     po.Set_Value("VAICNT_InventoryCountLine_ID", Util.GetValueOfInt(InvCountID[i]));
                             }
-                            else if (WindowID == Util.GetValueOfInt(Windows.InternalUse))
+                            else if (WindowID == Util.GetValueOfInt(Windows.InternalUse) || windowName == "VAS_InternalUseInventory")
                             {
                                 if (i > 0 && ReferenceNo[i - 1] != ReferenceNo[i])
                                 {
@@ -2416,45 +2431,58 @@ namespace VIS.Models
         }
 
         // Added by Bharat on 31 May 2017
-        public List<Dictionary<string, object>> GetCartData(string countID, int WindowID, Ctx ctx)
+        public List<Dictionary<string, object>> GetCartData(string countID, int WindowID, string windowName, Ctx ctx)
         {
             List<Dictionary<string, object>> retCart = null;
+            string allowNonItem = Util.GetValueOfString(ctx.GetContext("$AllowNonItem"));
             string sql = "SELECT cl.M_Product_ID,prd.Name,prd.Value,cl.VAICNT_Quantity,cl.M_AttributeSetInstance_ID,cl.C_UOM_ID,uom.Name as UOM,ic.VAICNT_ReferenceNo,cl.VAICNT_InventoryCountLine_ID,"
-                        + " ats.Description FROM VAICNT_InventoryCount ic INNER JOIN VAICNT_InventoryCountLine cl ON ic.VAICNT_InventoryCount_ID = cl.VAICNT_InventoryCount_ID"
-                        + " INNER JOIN M_Product prd ON cl.M_Product_ID = prd.M_Product_ID INNER JOIN C_UOM uom ON cl.C_UOM_ID = uom.C_UOM_ID LEFT JOIN M_AttributeSetInstance ats"
-                         + " ON cl.M_AttributeSetInstance_ID = ats.M_AttributeSetInstance_ID WHERE cl.IsActive = 'Y' AND ic.VAICNT_InventoryCount_ID IN (" + countID + ")";
+                                   + " ats.Description FROM VAICNT_InventoryCount ic INNER JOIN VAICNT_InventoryCountLine cl ON ic.VAICNT_InventoryCount_ID = cl.VAICNT_InventoryCount_ID"
+                                   + " INNER JOIN M_Product prd ON cl.M_Product_ID = prd.M_Product_ID INNER JOIN C_UOM uom ON cl.C_UOM_ID = uom.C_UOM_ID LEFT JOIN M_AttributeSetInstance ats"
+                                    + " ON cl.M_AttributeSetInstance_ID = ats.M_AttributeSetInstance_ID WHERE cl.IsActive = 'Y' AND ic.VAICNT_InventoryCount_ID IN (" + countID + ")";
             // JID_1700: When physical inventory showing only available stock
-            if (Util.GetValueOfInt(Windows.PhysicalInventory) == WindowID || Util.GetValueOfInt(Windows.InternalUse) == WindowID)
+            if (Util.GetValueOfInt(Windows.PhysicalInventory) == WindowID || Util.GetValueOfInt(Windows.InternalUse) == WindowID
+                || windowName == "VAS_PhysicalInventory" || windowName == "VAS_InternalUseInventory" || Util.GetValueOfInt(Windows.InventoryMove) == WindowID || windowName == "VAS_InventoryMove")
             {
                 sql += "AND prd.IsStocked='Y' AND prd.ProductType='I'";     // DevOps #329, only show product type 'Item' in cart of Product info
             }
+            //VIS0336-implement the check for screens for allowitem checkbox
+            else if (windowName == "VAS_CustomerReturn" || windowName == "VAS_VendorReturn" || windowName == "VAS_DeliveryOrder" || windowName == "VAS_MaterialReceipt" ||
+                           WindowID == Util.GetValueOfInt(Windows.Shipment) || WindowID == Util.GetValueOfInt(Windows.CustomerReturn) || WindowID == Util.GetValueOfInt(Windows.VendorReturn))
+            {
+                if (allowNonItem == "N")
+                {
+                    sql += " AND prd.ProductType='I' ";
+                }
+            }
             sql += " ORDER BY ic.VAICNT_ReferenceNo, cl.Line";
             DataSet ds = DB.ExecuteDataset(sql, null, null);
-
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 bool checkRefLine = false;
                 DataSet dsLines = null;
                 bool hasLines = false;
-                if (Util.GetValueOfInt(Windows.MaterialReceipt) == WindowID || Util.GetValueOfInt(Windows.Shipment) == WindowID || Util.GetValueOfInt(Windows.InternalUse) == WindowID || Util.GetValueOfInt(Windows.InventoryMove) == WindowID)
+                if (Util.GetValueOfInt(Windows.MaterialReceipt) == WindowID || Util.GetValueOfInt(Windows.Shipment) == WindowID || Util.GetValueOfInt(Windows.InternalUse) == WindowID
+                    || Util.GetValueOfInt(Windows.InventoryMove) == WindowID || windowName == "VAS_MaterialReceipt" || windowName == "VAS_DeliveryOrder"
+                    || windowName == "VAS_InternalUseInventory" || windowName == "VAS_InventoryMove")
                 {
                     StringBuilder sqlSB = new StringBuilder("");
                     checkRefLine = true;
-                    if (Util.GetValueOfInt(Windows.MaterialReceipt) == WindowID)
+                    if (Util.GetValueOfInt(Windows.MaterialReceipt) == WindowID || windowName == "VAS_MaterialReceipt")
                     {
                         sqlSB.Append(@"SELECT ol.M_Product_ID, ol.C_UOM_ID, ol.M_AttributeSetInstance_ID, o.DocumentNo, ol.c_OrderLine_ID AS LineID
                                     FROM C_Order o INNER JOIN C_OrderLine ol ON (ol.C_Order_ID = o.C_Order_ID) WHERE o.IsActive = 'Y' AND o.AD_Client_ID = " + ctx.GetAD_Client_ID()
                                     + @" AND o.IsSOTrx = 'N' AND o.DocStatus IN ('CO', 'CL') AND o.DocumentNo IN (
                                     SELECT VAICNT_ReferenceNo FROM VAICNT_InventoryCount WHERE VAICNT_InventoryCount_ID IN (" + countID + "))");
                     }
-                    else if (Util.GetValueOfInt(Windows.Shipment) == WindowID)
+                    else if (Util.GetValueOfInt(Windows.Shipment) == WindowID || windowName == "VAS_DeliveryOrder")
                     {
                         sqlSB.Append(@"SELECT ol.M_Product_ID, ol.C_UOM_ID, ol.M_AttributeSetInstance_ID, o.DocumentNo, ol.c_OrderLine_ID AS LineID
                                     FROM C_Order o INNER JOIN C_OrderLine ol ON (ol.C_Order_ID = o.C_Order_ID) WHERE o.IsActive = 'Y' AND o.AD_Client_ID = " + ctx.GetAD_Client_ID()
                                     + @" AND o.IsSOTrx = 'Y' AND o.DocStatus IN ('CO') AND o.DocumentNo IN (
                                     SELECT VAICNT_ReferenceNo FROM VAICNT_InventoryCount WHERE VAICNT_InventoryCount_ID IN (" + countID + "))");
                     }
-                    else if (Util.GetValueOfInt(Windows.InternalUse) == WindowID || Util.GetValueOfInt(Windows.InventoryMove) == WindowID)
+                    else if (Util.GetValueOfInt(Windows.InternalUse) == WindowID || Util.GetValueOfInt(Windows.InventoryMove) == WindowID
+                        || windowName == "VAS_InternalUseInventory" || windowName == "VAS_InventoryMove")
                     {
                         sqlSB.Append(@"SELECT ol.M_RequisitionLine_ID AS LineID, o.DocumentNo  ol.M_Product_ID, ol.M_AttributeSetInstance_ID, ol.C_UOM_ID FROM M_RequisitionLine ol INNER JOIN M_Requisition o
                                     ON ol.M_Requisition_ID =o.M_Requisition_ID WHERE o.IsActive = 'Y' AND o.AD_Client_ID = " + ctx.GetAD_Client_ID()

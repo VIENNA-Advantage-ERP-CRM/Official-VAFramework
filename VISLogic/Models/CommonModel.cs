@@ -402,5 +402,27 @@ namespace VISLogic.Models
             return DyObjectsList;
 
         }
+
+        /// <summary>
+        /// Getting Ad_Form_ID
+        /// </summary>
+        /// <param name="formName">Name</param>
+        /// <returns>Ad_Form_ID</returns>
+        public int GetFormID(string formName) {
+            string sql = "SELECT AD_Form_ID FROM AD_Form WHERE IsActive='Y' AND Name = '" + formName + "'";
+            int formID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            return formID;
+        }
+
+        /// <summary>
+        /// Getting AD_Process_ID
+        /// </summary>
+        /// <param name="processName">Name</param>
+        /// <returns>AD_Process_ID</returns>
+        public int GetProcessID(string processName) {
+            string sql = "SELECT AD_Process_ID FROM AD_Process WHERE IsActive='Y' AND Value = '" + processName + "'";
+            int processID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            return processID;
+        }
     }
 }

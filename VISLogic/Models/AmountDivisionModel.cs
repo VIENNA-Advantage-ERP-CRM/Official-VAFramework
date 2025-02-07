@@ -478,7 +478,7 @@ namespace VIS.Models
         public List<JTable> GetUserElement(Ctx ctx, string aid, string eType)
         {
             var sql = "SELECT adt.ad_column_id,adt.columnname,adtab.TableName FROM c_acctschema_element ac INNER JOIN ad_column ad ON (ac.ad_column_id=ad.ad_column_id) " +
-                " INNNER JOIN ad_column adt ON (ad.ad_table_ID=adt.ad_table_ID AND adt.isactive='Y') " +
+                " INNER JOIN ad_column adt ON (ad.ad_table_ID=adt.ad_table_ID AND adt.isactive='Y') " +
                 "  INNER JOIN ad_table adtab ON (adtab.ad_table_id=ad.ad_table_ID) " +
                 " WHERE ac.c_acctschema_id=" + aid + " AND ac.elementtype='" + eType + "' AND adt.isidentifier='Y' order by adt.ad_column_ID";
 

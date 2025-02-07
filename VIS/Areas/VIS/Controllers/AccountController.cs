@@ -16,12 +16,87 @@ using Newtonsoft.Json;
 using VAdvantage.Logging;
 using System.Net;
 using VAdvantage.Common;
+using System.Data;
+using CoreLibrary.DataBase;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security;
+using System.Security.Claims;
+using Microsoft.Owin.Security.OpenIdConnect;
+using Microsoft.Owin.Security.Cookies;
 
 namespace VIS.Controllers
 {
 
     public class AccountController : Controller
     {
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult ExternalLoginCallback(string provider)
+        {
+            //    var identity = HttpContext.GetOwinContext().Authentication.GetExternalIdentityAsync(DefaultAuthenticationTypes.ApplicationCookie);
+            //    if (identity == null)
+            //    {
+            //         RedirectToAction("Login");
+            //    }
+            if (!Request.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+
+            var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
+            string sql = "SELECT ct.claimtype,ct.code FROM SSO_Mapping INNER JOIN claimtype ct ON SSO_Mapping.claimtype=ct.code WHERE SSO_Configuration_ID=" + provider.Split('_')[0];
+            DataSet DS = DB.ExecuteDataset(sql);
+
+            if (DS != null && DS.Tables.Count > 0)
+            {
+                sql = "SELECT DISTINCT SSO_DataMapping.Ad_User_id,AD_User.value FROM SSO_DataMapping INNER JOIN AD_User ON SSO_DataMapping.Ad_User_id=AD_User.Ad_User_id  Where SSO_Configuration_ID=" + provider.Split('_')[0];
+                for (int i = 0; i < DS.Tables[0].Rows.Count; i++)
+                {
+                    sql += " AND ";
+                    var claimsVal = userClaims?.FindFirst(Util.GetValueOfString(DS.Tables[0].Rows[i]["claimtype"]))?.Value;
+                    sql += "claimtype='" + Util.GetValueOfString(DS.Tables[0].Rows[i]["code"]) + "' AND Claim_Value='" + claimsVal + "'";
+                }
+
+            }
+
+
+
+            //int cid = Util.GetValueOfInt(SecureEngine.Decrypt(provider));
+
+            // ClaimTypes
+            HttpCookie cookie = new HttpCookie("ProviderType");
+            cookie.Value = provider.Split('_')[1];
+            Response.Cookies.Add(cookie);
+
+            DS = DB.ExecuteDataset(sql);
+            if (DS != null && DS.Tables.Count > 0 && DS.Tables[0].Rows.Count == 1)
+            {
+                LoginModel model = new LoginModel();
+                model.Login1Model = new Login1Model();
+                model.Login1Model.UserValue = Util.GetValueOfString(DS.Tables[0].Rows[0]["value"]);
+                var result = CommonLogin(model, "/", true);
+                dynamic data = result.Data;
+                if (data != null && data.GetType().GetProperty("step2") != null && (bool)data.step2)
+                {
+                    TempData["LoginModel"] = model.Login1Model;
+                    TempData["ModelData"] = result;
+                    TempData["isStep2Validate"] = true;
+                    //return RedirectToAction("RoleSetup", "Home");
+                }
+            }
+            else
+            {
+
+
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
         //
         // POST: /Account/JsonLogin
 
@@ -29,6 +104,12 @@ namespace VIS.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public JsonResult JsonLogin(LoginModel model, string returnUrl)
+        {
+            return CommonLogin(model, returnUrl, false);
+        }
+
+
+        public JsonResult CommonLogin(LoginModel model, string returnUrl, bool isSSO)
         {
             if (ModelState.IsValid)
             {
@@ -68,7 +149,7 @@ namespace VIS.Controllers
                     // if user refresh page  while On reset pwd page, the system show login 1 page.
                     // In this case, reset pwd is true (picked from tempdata) but newpwd is null. 
                     //So user must try to login 1(processdToLogin = 1)
-                    if (resetPwd && model.Login1Model.NewPassword != null)
+                    if ( resetPwd && model.Login1Model.NewPassword != null)
                     {
                         string validated = LoginHelper.ValidatePassword(password, model.Login1Model.NewPassword, model.Login1Model.ConfirmNewPassword);
                         if (validated.Length > 0)
@@ -82,7 +163,7 @@ namespace VIS.Controllers
                         {
                             proceedToLogin2 = 2;
                         }
-                        if (TwoFAMethod != "" && !model.Login1Model.NoLoginSet)
+                        if (!isSSO && TwoFAMethod != "" && !model.Login1Model.NoLoginSet)
                         {
                             model.Login1Model.TwoFAMethod = TwoFAMethod;
                             model.Login1Model.ResetPwd = false;
@@ -97,7 +178,7 @@ namespace VIS.Controllers
                     }
 
                     // VIS0008 Changes done to handle VA 2FA from VA mobile app
-                    if (TwoFAMethod != "" && proceedToLogin2 != 1)
+                    if (!isSSO && TwoFAMethod != "" && proceedToLogin2 != 1)
                     {
                         if (!model.Login1Model.SkipNow)
                         {
@@ -132,8 +213,8 @@ namespace VIS.Controllers
                     //Pwd is assigned to tempdata, bcoz if user's passsword setting is encrypted, then code encrypt the pwd to use in query.
                     //But original pwd entered by user is required in reset pwd setup.. to match with new pwd.
                     TempData["Password"] = model.Login1Model.Password;
-                    string IP = Common.GetVisitorIPAddress(Request,false);
-                    if (LoginHelper.Login(model, out roles,IP))
+                    string IP = Common.GetVisitorIPAddress(Request, false);
+                    if (LoginHelper.Login(model, out roles, IP, isSSO))
                     {
                         // ViewBag.QRCodeURL = model.Login1Model.QRCodeURL;
                         TempData["roles"] = roles;
@@ -170,7 +251,7 @@ namespace VIS.Controllers
             return Json(new { errors = GetErrorsFromModelState() });
         }
 
-        [NonAction]
+            [NonAction]
         private JsonResult Login(LoginModel model, string returnUrl, List<KeyNamePair> roles)
         {
             if (model.Login2Model != null)
@@ -181,7 +262,8 @@ namespace VIS.Controllers
             }
             //System.Threading.Thread.Sleep(10000);
             //FormsAuthentication.SetAuthCookie(model.Login1Model.UserName, false);
-            return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model });
+            HttpCookie cookie = this.Request.Cookies["ProviderType"];
+            return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model, provider = cookie?.Value });
         }
 
         [AllowAnonymous]
@@ -250,27 +332,48 @@ namespace VIS.Controllers
         /// <param name="response">http response</param>
         internal void SetAuthCookie(LoginModel model, HttpResponseBase response)
         {
+            var claims = new List<Claim>();
             LoginContext lCtx = LoginHelper.GetLoginContext(model);
-            response.Cookies.Clear();
-
-            DateTime expiryDate = DateTime.Now.AddDays(30);
-
-            HttpCookie authCookie = FormsAuthentication.GetAuthCookie(model.Login1Model.UserValue, model.Login1Model.RememberMe);
-
-            if (model.Login1Model.RememberMe)
+            try
             {
-                authCookie.Expires = expiryDate;
+                // Setting
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Login1Model.UserValue));
+                claims.Add(new Claim(ClaimTypes.UserData, JsonHelper.Serialize(lCtx)));
+                claims.Add(new Claim(ClaimTypes.IsPersistent, model.Login1Model.RememberMe ? "true" : "false"));
+                claims.Add(new Claim("Authorization", "true"));
+                var claimIdenties = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+                var ctx = Request.GetOwinContext();
+                var authenticationManager = ctx.Authentication;
+                // Sign In.
+                authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = model.Login1Model.RememberMe }, claimIdenties);
             }
+            catch (Exception ex)
+            {
+                // Info
+                throw ex;
+            }
+            //LoginContext lCtx = LoginHelper.GetLoginContext(model);
+            //response.Cookies.Clear();
 
-            FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
+            //DateTime expiryDate = DateTime.Now.AddDays(30);
 
-            FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, model.Login1Model.RememberMe ? expiryDate : ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
+            //HttpCookie authCookie = FormsAuthentication.GetAuthCookie(model.Login1Model.UserValue, model.Login1Model.RememberMe);
 
-            // Update the authCookie's Value to use the encrypted version of newTicket
+            //if (model.Login1Model.RememberMe)
+            //{
+            //    authCookie.Expires = expiryDate;
+            //}
 
-            authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+            //FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
 
-            response.Cookies.Add(authCookie);
+            //FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, model.Login1Model.RememberMe ? expiryDate : ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
+
+            //// Update the authCookie's Value to use the encrypted version of newTicket
+
+            //authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+            //response.Cookies.Add(authCookie);
+
+
         }
 
         [AllowAnonymous]
@@ -286,46 +389,71 @@ namespace VIS.Controllers
                 //model.Login1Model = JsonHelper.Deserialize(model.Login2Model.Login1Data, typeof(Login1Model)) as Login1Model;
 
                 LoginContext lCtx = LoginHelper.GetLoginContext(model, Session["Ctx"] as VAdvantage.Utility.Ctx);
-
-
-                if (!string.IsNullOrEmpty(User.Identity.Name))
+                var userClaims = System.Security.Claims.ClaimsPrincipal.Current;
+                var UserData = userClaims?.FindFirst(ClaimTypes.UserData)?.Value;
+                if (!string.IsNullOrEmpty(UserData))
                 {
-                    //Response.Cookies.Clear();
-
-                    //DateTime expiryDate = DateTime.Now.AddDays(30);
-
-                    HttpCookie authCookie = FormsAuthentication.GetAuthCookie(User.Identity.Name, true);// , User.Identity. .Name);
-
-                    //if (model.Login1Model.RememberMe)
-                    //{
-                    //    authCookie.Expires = expiryDate;
-                    //}
-
-                    FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
-
-                    FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
-
-                    // Update the authCookie's Value to use the encrypted version of newTicket
-
-                    // authCookie.Value = FormsAuthentication.Encrypt(newTicket);
-
-                    //Response.Cookies.  .Add(authCookie);
-
-                    Response.Cookies[".ASPXAUTH"].Value = FormsAuthentication.Encrypt(newTicket);
-
-                    // Determine redirect URL and send user there
-
-                    //string redirUrl = FormsAuthentication.GetRedirectUrl(model.Login1Model.UserName, false);
-
-                    //RedirectToAction("Index", "Home");
-                    // return;
-                    //Response.Redirect(redirUrl);
-
-                    //FormsAuthentication.SetAuthCookie(login1Model.UserName, false);
-
-                    // TempData["LoginModel"] = model;
-                    return Json(new { success = true });
+                    var claims = new List<Claim>();
+                    //LoginContext lCtx = LoginHelper.GetLoginContext(model);
+                    try
+                    {
+                        // Setting
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, userClaims?.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+                        claims.Add(new Claim(ClaimTypes.UserData, JsonHelper.Serialize(lCtx)));
+                        claims.Add(new Claim("Authorization", "true"));
+                        var claimIdenties = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+                        var ctx = Request.GetOwinContext();
+                        var authenticationManager = ctx.Authentication;
+                        // Sign In.
+                        authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = Util.GetValueOfBool(userClaims?.FindFirst(ClaimTypes.IsPersistent)?.Value) }, claimIdenties);
+                        return Json(new { success = true });
+                    }
+                    catch (Exception ex)
+                    {
+                        // Info
+                        throw ex;
+                    }
                 }
+
+
+                //if (!string.IsNullOrEmpty(User.Identity.Name))
+                //{
+                //    //Response.Cookies.Clear();
+
+                //    //DateTime expiryDate = DateTime.Now.AddDays(30);
+
+                //    HttpCookie authCookie = FormsAuthentication.GetAuthCookie(User.Identity.Name, true);// , User.Identity. .Name);
+
+                //    //if (model.Login1Model.RememberMe)
+                //    //{
+                //    //    authCookie.Expires = expiryDate;
+                //    //}
+
+                //    FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
+
+                //    FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, ticket.Expiration, ticket.IsPersistent, JsonHelper.Serialize(lCtx));
+
+                //    // Update the authCookie's Value to use the encrypted version of newTicket
+
+                //    // authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+
+                //    //Response.Cookies.  .Add(authCookie);
+
+                //    Response.Cookies[".ASPXAUTH"].Value = FormsAuthentication.Encrypt(newTicket);
+
+                //    // Determine redirect URL and send user there
+
+                //    //string redirUrl = FormsAuthentication.GetRedirectUrl(model.Login1Model.UserName, false);
+
+                //    //RedirectToAction("Index", "Home");
+                //    // return;
+                //    //Response.Redirect(redirUrl);
+
+                //    //FormsAuthentication.SetAuthCookie(login1Model.UserName, false);
+
+                //    // TempData["LoginModel"] = model;
+                //    return Json(new { success = true });
+                //}
                 else
                 {
                     ModelState.AddModelError("", "FillMandatoryFields");
@@ -392,17 +520,50 @@ namespace VIS.Controllers
         {
           // if (ctx != null)
              VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx,webSessionId);
-            FormsAuthentication.SignOut();
-            Session.Clear();
+            //FormsAuthentication.SignOut();          
+            HttpCookie cookie = Request.Cookies["ProviderType"];
+            var userClaims = System.Security.Claims.ClaimsPrincipal.Current;
+            if (!string.IsNullOrEmpty(cookie?.Value))
+            {
+                HttpContext.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie, cookie.Value);
 
-            // Invalidate session
-            //Session.Abandon();
+            }
+            else
+            {
+                HttpContext.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            }
 
-            // Regenerate session ID
-            Response.Cookies.Add(new HttpCookie("ASP.NET_SessionId", ""));
+            HttpContext.GetOwinContext().Authentication.SignOut(
+                      OpenIdConnectAuthenticationDefaults.AuthenticationType,
+                       CookieAuthenticationDefaults.AuthenticationType
+                      );
 
-            // Redirect to login page or any other desired page
-           
+            //if (Request.IsAuthenticated)
+            //{
+
+
+            //    var UserData = userClaims?.FindFirst(ClaimTypes.UserData)?.Value;
+            //    if (!string.IsNullOrEmpty(UserData))
+            //    {
+
+            //    }
+            //}
+
+            if (Request.Cookies != null)
+            {
+                foreach (var cokie in Request.Cookies.AllKeys)
+                {
+                    HttpCookie httpCookie = new HttpCookie(cokie)
+                    {
+                        Expires = DateTime.Now.AddDays(-1) // Expire the cookie
+                    };
+                    Response.Cookies.Add(httpCookie);
+                }
+            }
+
+            if (Session != null)
+                Session.Abandon();
+
             return RedirectToAction("Index", "Home");
         }
 

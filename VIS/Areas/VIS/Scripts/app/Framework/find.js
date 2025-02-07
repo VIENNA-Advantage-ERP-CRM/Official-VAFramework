@@ -152,24 +152,28 @@
 
     };
 
-    function Find(windowNo, curTab, minRecord) {
+    function Find(windowNo, curTab, minRecord, aPanel) {
         var title = curTab.getName();
         var AD_Tab_ID = curTab.getAD_Tab_ID();
         var AD_Table_ID = curTab.getAD_Table_ID();
         var tableName = curTab.getTableName();
         var whereExtended = curTab.getWhereClause();
         var findFields = curTab.getFields();
+        var dsUserQuery = [];
+
         this.btnfields = [];
+        this.aPanel = aPanel;
 
         var $root = $("<div  class='vis-forms-container' style='height:100%'>");
+        var $landinPageRoot = $("<div class='vis-landingPage-root'>");
         var $busy = null;
-
         var $self = this;
         var ch = null;
-        var btnOk, btnCancel, btnDelete, btnSave, btnRefresh;
+        var btnOk, btnCancel, btnDelete, btnSave, btnRefresh, adsearchgroup1;
         var txtQryName, drpSavedQry, drpColumns, drpOp, drpDynamicOp, chkDynamic, txtYear, txtMonth, txtDay, txtStatus, chkFullDay, spanAddFilter, btnBack;
         var ulQryList, divDynamic, divYear, divMonth, divDay, divValue1, divValue2, tblGrid, tblBody, divFullDay, inputWarps, lblQryValue;
-
+        var lblBottomMsgLP = $('<label></label>');
+        var okBtnLP, closeBtnLP, mainAdvaceDiv, btnBackLP;      
         var FIELDLENGTH = 20, TABNO = 99;
 
         var total = 0, isLoadError = false, isSaveError = false, isBusy = false;
@@ -180,6 +184,8 @@
 
         var control1, control2, ulListStaticHtml = "";;
         this.saveQueryID = -1;
+        this.searchCode = "";
+        this.searchName = "";
         var saveChanges = false;
         var savedFiltersCount = 0;
 
@@ -205,12 +211,12 @@
             //}
 
 
-            var html = '<div class="vis-advancedSearch-contentWrap"> <div class="vis-advancedSearchContentArea vis-pull-left" style="' + dStyle + '">'
-                + ' <div class="vis-advancedSearchContentArea-up"> <div class="vis-advanedSearch-InputsWrap"><div class="vis-as-topfieldswrap">'
-                + '<div style="display:none" class="vis-form-group vis-advancedSearchInput vis-adsearchgroup1">'
+            var html = '<div id="mainAdvance_' + windowNo + '" class="vis-advancedSearch-contentWrap"> <div class="vis-advancedSearchContentArea vis-pull-left" style="' + dStyle + '">'
+                + '<div class="vis-advancedSearchContentArea-up" style="display:none !important"> <div class="vis-advanedSearch-InputsWrap"><div class="vis-as-topfieldswrap">'
+                + '<div id="adsearchgroup1_' + windowNo+'" style="display:none" class="vis-form-group vis-advancedSearchInput vis-adsearchgroup1">'
                 + '<input readonly id="txtQryName_' + windowNo + '" type="text" name="QueryName" maxlength="60">'
                 + '<label id="lblQryName_' + windowNo + '" for="QueryName">' + VIS.Msg.getMsg("AddNameToSaveSearch") + '</label>'
-                + '</div> <div  class="vis-form-group vis-advancedSearchInput vis-adsearchgroup2">'
+                + '</div> <div class="vis-form-group vis-advancedSearchInput vis-adsearchgroup2">'
                 + '<label id="lblSavedQry_' + windowNo + '" for="GetSavedQuery">' + VIS.Msg.getMsg("GetSavedSearch") + '</label>'
                 + '<select id="drpSavedQry_' + windowNo + '"></select>'
                 + '</div>'
@@ -223,6 +229,7 @@
                 + '</div></div>'
                 + '<div class="vis-advanedSearch-AddFilterWrap vis-pull-left">'
                 + '<a href="javascript:;" id="spnAddFilter_' + windowNo + '" class="vis-advancedSearch-AddFilter">' + VIS.Msg.getMsg("AddFilter") + '</a>'
+                + '<a href="javascript:;" id="landingPageSetting_' + windowNo + '" class="vis-advancedSearch-AddFilter">' + VIS.Msg.getMsg("LandingPageSetting") + '</a>'
                 + '</div>'
                 + '  <div class="vis-as-backbtn"><button id="btnArowBack_' + windowNo + '" class="vis-ads-icon"><i class="fa fa-arrow-left" aria-hidden="true"></i></button></div> '
                 + '</div>'
@@ -293,7 +300,7 @@
 
                 + '</div>'
 
-                + '<div class="vis-advancedSearchContentArea-down">'
+                + '<div class="vis-advancedSearchContentArea-down" style="display:none !important">'
                 + '<div class="vis-advancedSearchTableWrap vis-table-responsive vis-pull-left">'
 
                 + '<table id="tblQry_' + windowNo + '" class="vis-advancedSearchTable">'
@@ -321,7 +328,7 @@
                 + '</div>'
                 + '</div>'
 
-                + '<div class="vis-advancedSearchContentArea-button">'
+                + '<div class="vis-advancedSearchContentArea-button" style="display:none !important">'
                 + '<div class="vis-advcedfooterBtn">';
 
 
@@ -366,23 +373,47 @@
                 + '</div>'
                 + '</div>'
 
-                + '</div>'
+                + '</div>';
 
                 //<!-- end of advancedSearch-GrayWrap -->
 
-                + '<div class="vis-apanel-busy vis-advancedSearchbusy" id="divBusy_' + windowNo + '" >'
-                + '<p style="text-align:center"> ' + VIS.Msg.getMsg("Loading") + '</p>'
-                + '</div>'
+            var busyDiv = '<div class="vis-apanel-busy vis-advancedSearchbusy" id="divBusy_' + windowNo + '" >'
+                + '<p style="text-align:center"></p>'
+                + '</div>';
 
 
+            var $landinPageTable = $("<div class='vis-landingPage-main'> <div class='vis-landingPageSetting-Heading'>" + VIS.Msg.getMsg("landingPageSetting") + "</div><table class='vis-landingPage-table' id='LandingPage_" + windowNo + "'><thead><tr>"
+                + "<th style='display:none;'><div class='vis-landingpage-head'>userqueryID</div></th>"
+                + "<th><div class='vis-landingpage-head'>" + VIS.Msg.getMsg("VIS_Name") + " </div></th>"
+                + "<th><div class='vis-landingpage-head text-center'>" + VIS.Msg.getMsg("ShowOnLandingPage") + " </div></th>"
+                + "<th><div class='vis-landingpage-head'>" + VIS.Msg.getMsg("TargetView") + "  </div></th>"
+                + "<th><div class='vis-landingpage-head'>" + VIS.Msg.getMsg("CardViewID") + "  </div></th>"
+                + "</tr>"
+                + "</thead>"
+                + "<tbody class='vis-LandingPageTableBody'>"
+                + "</tbody>"
+                + "</table>"
+                + "<div class='vis-ctrfrm-btnwrp vis-landingPage-btn'>"
+                + "<input id='closeBtn_" + windowNo + "' class= 'VIS_Pref_btn-2' type = 'button' value = '" + VIS.Msg.getMsg('close') + "'>"
+                + "<input id='okBtn_" + windowNo + "' class='VIS_Pref_btn-2' type='button' value='" + VIS.Msg.getMsg('OK') + "'>"
+                + "<div class='vis-ad-w-p-s-main pull-left'>"
+                + "<div class='vis-as-backbtn pull-left'><button id='btnArowBackLP_" + windowNo + "' class='vis-ads-icon'><i class='fa fa-arrow-left'></i></button></div>"
+                + "<div class= 'vis-ad-w-p-s-infoline' ></div>"
+                + "<div class= 'vis-ad-w-p-s-msg vis-landingPage-lblmsg' id = 'lblBottomMsg_" + windowNo + "'></div></div> "
+                + "</div>");
+
+            //grid 
+            $landinPageRoot.append($landinPageTable);           
             $root.append(html);
-
+            $root.find('.vis-advancedSearchContentArea').append($landinPageRoot).append(busyDiv);
             initUI();
-            initFind();
+            //initFind();
             bindEvents();
-
-
-
+            getUserQuery(bindLandingGrid);
+            landingPage.hide();
+            $landinPageRoot.show();
+           // mainAdvaceDiv.hide();
+            //btnBackLP.show();
         };
 
         function initUI() {
@@ -415,8 +446,15 @@
             divDay = $root.find("#divDay_" + windowNo);
             chkFullDay = $root.find('#checkFullDay_' + windowNo);
             spanAddFilter = $root.find('#spnAddFilter_' + windowNo);
+            mainAdvaceDiv = $root.find('#mainAdvance_' + windowNo);
+            landingPage = $root.find('#landingPageSetting_' + windowNo);
             btnBack = $root.find('#btnArowBack_' + windowNo);
+            adsearchgroup1 = $root.find('#adsearchgroup1_' + windowNo);
             inputWarps = $($root.find('.vis-advs-inputwraps')[0]);
+            closeBtnLP = $landinPageRoot.find("#closeBtn_" + windowNo);
+            okBtnLP = $landinPageRoot.find("#okBtn_" + windowNo);
+            lblBottomMsgLP = $landinPageRoot.find("#lblBottomMsg_" + windowNo);
+            btnBackLP = $landinPageRoot.find("#btnArowBackLP_" + windowNo);
             divYear.hide();
             divMonth.hide();
             divDay.hide();
@@ -433,6 +471,8 @@
             tblBody = tblGrid.find("tbody");
             txtStatus = $root.find("#pstatus_" + windowNo);
             $busy = $root.find("#divBusy_" + windowNo);
+            tblGridLP = $landinPageRoot.find("#LandingPage_" + windowNo);
+            tbleBodyLP = tblGridLP.find("tbody");
         };
 
         function initFind() {
@@ -449,7 +489,7 @@
             for (var c = 0; c < findFields.length; c++) {
                 // get field
                 var field = findFields[c];
-                
+
                 if (field.getIsEncrypted())
                     continue;
                 // get field's column name
@@ -513,6 +553,22 @@
                 if (isBusy) return;
                 $self.okBtnPressed = false;
                 ch.close();
+                $self.aPanel.setIsAdvanceSearch(false);
+            });
+
+
+            okBtnLP.on("click", function () {
+                setBusy(true);
+                lblBottomMsgLP.text("");
+                var userQueryList = getAllRowData();
+                if (userQueryList.length > 0) {
+                    updateUserQuery(userQueryList);
+                }
+            });
+
+            closeBtnLP.on("click", function () {
+                ch.close();
+                lblBottomMsgLP.text("");
             });
 
             chkDynamic.on("change", function () {
@@ -546,7 +602,7 @@
                 divDynamic.hide();
 
                 // set control at value1 position according to the column selected
-               
+
                 var columnName = drpColumns.val();
                 var f = curTab.getField(columnName);
                 setControlNullValue(true);
@@ -558,23 +614,23 @@
                         // fill dataset with operators of type ID
                         dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_ID);
                     }
-                     if (columnName.startsWith("Is"))
-                     {
-                          // fill dataset with operators of type Yes No
+                    if (columnName.startsWith("Is"))
+                    {
+                        // fill dataset with operators of type Yes No
                         dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_YN);
                     }
-                   
+
                     else if (f.getDisplayType() == VIS.DisplayType.YesNo) {
-                            // fill dataset with operators of type Yes No
-                            dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_YN);
-                        }
-                     
+                        // fill dataset with operators of type Yes No
+                        dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_YN);
+                    }
+
                     else {
                         // fill dataset with all operators available
                         dsOp = $self.getOperatorsQuery(VIS.Query.prototype.OPERATORS);
                     }
 
-                  
+
                     $root.find('.vis-advancedSearchContentArea-down').css('height', 'calc(100% - 150px)');
                     if (f != null && VIS.DisplayType.IsDate(f.getDisplayType())) {
                         drpDynamicOp.html($self.getOperatorsQuery(VIS.Query.prototype.OPERATORS_DATE_DYNAMIC, true));
@@ -654,7 +710,7 @@
 
 
                         // enable the control at value2 position
-                         showValue2(true);
+                        showValue2(true);
                         setValue2Enabled(true);
                     }
                     else {
@@ -809,7 +865,7 @@
                                 fillList(drListQueries);
                                 drpSavedQry[0].selectedIndex = 0;
                                 //// show message to user
-                                VIS.ADialog.info("Deleted", true, name, "");
+                                //VIS.ADialog.info("Deleted", true, name, "");
                                 txtQryName.val("");
                                 txtQryName.prop("readony", true);
                                 setBusy(false);
@@ -834,7 +890,11 @@
                 $self.okPressed = true;
                 $self.okBtnPressed = true;
                 //	Save pending
+                if ($self.aPanel) {
+                    $self.aPanel.setAdvanceFlag(true);
+                }
                 saveAdvanced();
+                //VIS.Env.setIsAdvanceSearch(false);
             });
 
             btnRefresh.on("click", function () {
@@ -855,12 +915,27 @@
                 if (inputWarps && inputWarps.data('show') == "N") {
                     inputWarps.data('show', 'Y');
                     $(this).hide();
+                    landingPage.hide();
                     inputWarps.show();
                     btnBack.show();
                     $('.vis-adsearchgroup2').hide();
-                    $('.vis-adsearchgroup1').show();
+                    adsearchgroup1.show();
                     $('.vis-advancedSearchContentArea-down').css('height', 'calc(100% - 150px)');
                 }
+            });
+
+            landingPage.on("click", function () {
+                landingPage.hide();
+                $landinPageRoot.show();
+                mainAdvaceDiv.hide();
+                btnBackLP.show();
+            });
+
+            btnBackLP.on("click", function () {
+                mainAdvaceDiv.show();
+                $landinPageRoot.hide();
+                btnBackLP.hide();
+                landingPage.show();
             });
 
             btnBack.on("click", function () {
@@ -868,9 +943,10 @@
                 inputWarps.hide();
                 spanAddFilter.show();
                 btnBack.hide();
+                landingPage.show();
                 toggleDisplay();
                 //if (savedFiltersCount == 0) {
-                $('.vis-adsearchgroup1').hide();
+                adsearchgroup1.hide();
                 $('.vis-adsearchgroup2').show();
                 drpSavedQry[0].selectedIndex = 0;
                 tblBody.empty();
@@ -901,6 +977,58 @@
             chkFullDay.prop('checked', false);
             divDynamic.hide();
             $root.find('.vis-advancedSearchContentArea-down').css('height', 'calc(100% - 100px)');
+        }
+
+        function getAllRowData() {
+            var userQueryList = [];
+            tblGridLP.find('.vis-LandingPageTableBody tr').each(function () {
+                var row = $(this);
+                var rowData = {
+                    AD_CardView_ID: row.find('#cardID_' + windowNo).val(),
+                    AD_UserQuery_ID: row.find('#userqueryID_' + windowNo).val(),
+                    IsShowOnLandingPage: row.find('#isShowLandingPage_' + windowNo).is(':checked') ? 'Y' : 'N',
+                    Name: row.find('#txtName_' + windowNo).val(),
+                    TargetView: row.find('#gridView_' + windowNo).val(),
+                };
+                userQueryList.push(rowData);
+            });
+            setBusy(false);
+            return userQueryList;
+        }
+
+        function getUserQuery(callback) {
+            dsUserQuery = [];
+            $.ajax({
+                url: VIS.Application.contextUrl + "ASearch/GetUserQuery",
+                data: { tab_ID: AD_Tab_ID, table_ID: AD_Table_ID },
+                success: function (data) {
+                    data = JSON.parse(data);
+                    if (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            dsUserQuery.push(data[i]);
+                        }
+                    }
+                    if (callback)
+                        callback(dsUserQuery);
+                }
+            });
+        }
+
+
+        function updateUserQuery(data) {
+            setBusy(true);
+            if (data.length > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: VIS.Application.contextUrl + "ASearch/UpdateUserQuery",
+                    data: { userQueryList: data },
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        lblBottomMsgLP.text(data);
+                        setBusy(false);
+                    }
+                });
+            }
         }
 
         function unBindEvents() {
@@ -1282,6 +1410,79 @@
             tblBody.html(html);
         };
 
+        function bindLandingGrid(list) {         
+            tbleBodyLP.empty();
+            var html = "";
+            var htm = "", obj = null;
+
+            if (list) {
+                for (var i = 0; i < list.length; i++) {
+                    htm = "<tr>";
+                    obj = list[i];
+
+                    var isCardViewDisabled ='';
+                    var gridView = "<option value='Y'>" + VIS.Msg.getMsg("SingleView") + "</option>" +
+                        "<option value='N'>" + VIS.Msg.getMsg("GridView") + "</option>" +
+                        "<option value='C'>" + VIS.Msg.getMsg("CardView") + "</option>";
+
+                    switch (obj.TargetView) {
+                        case 'Y':
+                            gridView = gridView.replace("value='Y'", "value='Y' selected");
+                            break;
+                        case 'N':
+                            gridView = gridView.replace("value='N'", "value='N' selected");
+                            break;
+                        case 'C':
+                            gridView = gridView.replace("value='C'", "value='C' selected");
+                            break;
+                    }
+
+                    var cardView = "<option value='0' selected>NA</option>";
+                    if (obj.CardViewList != null) {
+                        for (var j = 0; j < obj.CardViewList.length; j++) {
+                            var selected = obj.CardViewList[j].AD_CardView_ID == obj.AD_CardView_ID ? 'selected' : '';
+                            if (!obj.TargetView == 'C') {
+                                selected = '';
+                                isCardViewDisabled = 'disabled';
+                            }
+                            cardView += "<option value='" + obj.CardViewList[j].AD_CardView_ID + "' " + selected + ">" + obj.CardViewList[j].Name + "</option>";
+                        }
+                    }
+
+                    htm += "<td class='vis-landingpage-row' style='display:none;'><div><input id='userqueryID_" + windowNo + "' value='" + obj.AD_UserQuery_ID + "' type='text'></div></td>"
+                        + "<td class='vis-landingpage-row'><div><label class='w-100' style='font-weight: normal;' id='txtName_" + windowNo + "' value='" + obj.Name + "'>" + obj.Name + "</label></div></td>"
+                        + "<td class='vis-landingpage-row text-center'><div><input id='isShowLandingPage_" + windowNo + "' value='" + obj.IsShowOnLandingPage + "' type='checkbox' " + (obj.IsShowOnLandingPage == 'Y' ? 'checked' : '') + "></div></td>"
+                        + "<td class='vis-landingpage-row'><div><select index='" + i + "' id='gridView_" + windowNo + "' class='vis-landingPage-tr-border'>" + gridView + "</select></div></td>"
+                        + "<td class='vis-landingpage-row'><div><select class='vis-landingPage-tr-border index_" + i + "' id='cardID_" + windowNo + "' " + isCardViewDisabled + ">" + cardView + "</select></div></td>";
+                    htm += "</tr>";
+                    html += htm;
+                }
+            }
+            tbleBodyLP.html(html);
+
+            tbleBodyLP.on('change', '#gridView_'+ windowNo, function () {
+                var index = $(this).attr('index');
+                var selectedValue = $(this).val();
+                var cardViewSelect = $('.index_' + index);
+                if (selectedValue == 'Y' || selectedValue == 'N') {
+                    cardViewSelect.val('0').prop('disabled', true);
+                } else if (selectedValue == 'C') {
+                    cardViewSelect.prop('disabled', false).show();
+                }
+            });
+        }
+
+       /* function setSelectedView(TargetView) {
+            gridView.each(function () {
+                if ($(this).val() == TargetView) {
+                    $(this).prop('selected', true);
+                } else {
+                    $(this).prop('selected', false);
+                }
+            });
+        }*/
+
+
         /* get total number of record */
         function getNoOfRecords(query, alertZeroRecords) {
             // make query
@@ -1351,7 +1552,7 @@
             if (total == 0 || total == null) {
                 total = 0;
                 if (alertZeroRecords) {
-                    VIS.ADialog.info("FindZeroRecords", true, "");
+                    //VIS.ADialog.info("FindZeroRecords", true, "");
                 }
             }
             //	More then allowed
@@ -1402,7 +1603,7 @@
                 colValue = -1;
                 return false;
             }
-                
+
 
             var colName = drpColumns.find("option:selected").text();
             var colValue = "";
@@ -1458,7 +1659,7 @@
                 spanAddFilter.show();
                 btnBack.hide();
                 $('.vis-adsearchgroup2').hide();
-                $('.vis-adsearchgroup1').show();
+                adsearchgroup1.show();
             }
             return true;
         };
@@ -1903,6 +2104,17 @@
 
             // get where clause
             var where = query.getWhereClause(true);
+            $self.searchCode = where;
+
+            //var fwc = $self.aPanel.curGC.aFilterPanel.getFilterClause();
+            //if (fwc != "") {
+            //    where += " AND " + fwc;
+            //}
+
+
+            //if ($self.aPanel) {
+            //    $self.aPanel.setAdvanceWhere(where);
+            //}
             // get query name entered by the user
             var name = VIS.Utility.encodeText(txtQryName.val());// vtxtQueryName.Text.Trim();
             if (name != null && name.trim().length == 0)
@@ -1910,6 +2122,7 @@
             else
                 $self.needRefreshWindow = true;
 
+            $self.searchName = name;
             // get the selected value
             var value = drpSavedQry.val();// vcmbQueryA.SelectedValue;
             var s = "";// vcmbQueryA.Text;//silverlight comment
@@ -1925,7 +2138,7 @@
                     if (MUserQuery.insertOrUpdate(value, name, where, AD_Tab_ID, AD_Table_ID, dsAdvanceData, $self.getID)) {
                         isSaveError = false;
                         //ShowMessage.Info("Updated", true, uq.GetName(), "");
-                        qMessage = (value > 0 ? "Updated" : "Saved");
+                        //qMessage = (value > 0 ? "Updated" : "Saved");
                         $self.saveQueryID = MUserQuery.id;
                     }
                     else {
@@ -1951,7 +2164,7 @@
                 setBusy(false);
                 if (qMessage != "") {
                     //MessageBox.Show(qMessage);
-                    VIS.ADialog.info("", true, VIS.Msg.getMsg(qMessage) + " " + name, null);
+                    //VIS.ADialog.info("", true, VIS.Msg.getMsg(qMessage) + " " + name, null);
                 }
                 if (result) {
                     ch.close();
@@ -1974,6 +2187,13 @@
         this.getSavedID = function (id) {
             return this.saveQueryID;
         };
+        this.getSearchCode = function () {
+            return this.searchCode;
+        }
+
+        this.getSearchName = function () {
+            return this.searchName;
+        }
 
         this.show = function () {
             ch = new VIS.ChildDialog();
@@ -2008,6 +2228,9 @@
             //}, 100);
 
             //  bindEvents();
+            if (this.aPanel) {
+                this.aPanel.setIsAdvanceSearch(true);
+            }
         };
 
         this.getSavedQueryName = function () {
@@ -2045,6 +2268,7 @@
             this.created = this.days = 0, this.okPressed = this.okBtnPressed = null;
             control1 = control2 = ulListStaticHtml = null;
             query = null;
+
         };
     };
 

@@ -18,9 +18,10 @@ namespace VAdvantage.Model
     /// </summary>
     public class MSeries : X_D_Series
     {
-
+        private string calcBasis = "V"; // defaulted to Variable
+        private string Consolidate = "N";
         private static VLogger s_log = VLogger.GetVLogger(typeof(MSeries).FullName);
-
+        int C_Year_ID = 0;
         /// <summary>
         /// Load Constructor
         /// </summary>
@@ -100,6 +101,7 @@ namespace VAdvantage.Model
 
         //Asix Names (X and Y)
         private static string m_colX;
+        private static string m_colXY;
         private static string m_colY;
 
         //Table Name
@@ -112,7 +114,8 @@ namespace VAdvantage.Model
         private const string IS_DATETIME = "(15,16)      ";
         private const string IS_STRING = "(10,14)      ";
         private const string IS_INTEGER = "(12,11,22,29)";
-        private const string IS_IDENTIFIER = "(19)         ";
+        private const string IS_IDENTIFIER = "(19,18,30)   ";
+        private const string IS_LIST = "(17)         ";
 
         /** String Constants for DateTime Types **/
         private const string IS_YEARLY = "Y";
@@ -234,7 +237,7 @@ namespace VAdvantage.Model
                 else if (GetDateTimeTypes() == IS_MONTHLY || GetDateTimeTypes() == IS_LAST_N_MONTHS)
                     sbGroupBy.Append(", ")
                         .Append(ApplyDateFunction(s_colX, "yyyy"))
-                        .Append(", ").Append(ApplyDateFunction(s_colX, "Mon-RRRR"));
+                        .Append(", ").Append(ApplyDateFunction(s_colX, "Mon-YYYY"));
 
                 s_groupby = sbGroupBy.ToString();   //set value into variable to be used later for group by clause (!important)
                 sb.Append(sbGroupBy.ToString());
@@ -320,7 +323,7 @@ namespace VAdvantage.Model
                     //put value
                     if (MColumn.Get(GetCtx(), filter[i].GetAD_Column_ID()).getSQLDataType() == "DATE")
                     {
-                        sqlFilter.Append("TO_DATE('").Append(filter[0].GetWhereValue()).Append("','dd/mm/RRRR'").Append(")");
+                        sqlFilter.Append("TO_DATE('").Append(filter[0].GetWhereValue()).Append("','dd/mm/YYYY'").Append(")");
                     }
                     else
                         sqlFilter.Append("'").Append(Env.ParseContext(GetCtx(), 0, filter[i].GetWhereValue(), false)).Append("'");
@@ -330,7 +333,7 @@ namespace VAdvantage.Model
                         {
                             //sqlFilter.Append("TO_DATE('").Append(colValue).Append("','dd/mm/yyyy'").Append(")");
                             sqlFilter.Append(" AND ");
-                            sqlFilter.Append("TO_DATE('").Append(filter[i].GetValueTo()).Append("','dd/mm/RRRR'").Append(")");
+                            sqlFilter.Append("TO_DATE('").Append(filter[i].GetValueTo()).Append("','dd/mm/YYYY'").Append(")");
                         }
                         else
                             sqlFilter.Append(" AND '").Append(filter[i].GetValueTo()).Append("'");
@@ -356,7 +359,7 @@ namespace VAdvantage.Model
                     unionTableQuery.Append(ApplyDateFunction(m_colX)).Append(", ")
                         .Append("TRIM(TO_CHAR(" + m_colX + ",'yyyy')), ")
                         .Append(ApplyAggregateFunction(m_colY, true)).Append(SPACE + "ColY");
-                    unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-RRRR')) as ColX");
+                    unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-YYYY')) as ColX");
                 }
                 else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
                 {
@@ -389,7 +392,7 @@ namespace VAdvantage.Model
 
                     if (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS)
                     {
-                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-RRRR'))")
+                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-YYYY'))")
                             .Append(", TRIM(TO_CHAR(" + m_colX + ",'yyyy'))");
                     }
                     else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
@@ -492,6 +495,7 @@ namespace VAdvantage.Model
 
         public string GetSql(bool isFiltered, string specialWhere, Ctx _Ctx)
         {
+            int FetchRowsCount = 0;
             StringBuilder sb = new StringBuilder("SELECT ");    //start the SELECT QUERY
             MTable m_Table = null;// MTable.Get(GetCtx(), GetAD_Table_ID());
             //get the table name
@@ -510,6 +514,15 @@ namespace VAdvantage.Model
             //get X Column Name
             MColumn column = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
             string s_colX = column.GetFKColumnName();
+            string x_colY = column.GetColumnName();
+            //  string sdl = "SELECT AD_REFERENCE_VALUE_ID FROM AD_COLUMN C INNER JOIN AD_TABLE T ON(T.AD_TABLE_ID=C.AD_TABLE_ID) WHERE T.AD_TABLE_ID=291 AND AD_COLUMN_ID=(SELECT AD_COLUMN_ID FROM AD_COLUMN WHERE COLUMNNAME = '" + x_colY + "' AND AD_TABLE_ID = " + GetAD_Table_ID() + ")";
+
+            int tableR = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_REFERENCE_VALUE_ID FROM AD_COLUMN C INNER JOIN AD_TABLE T ON(T.AD_TABLE_ID=C.AD_TABLE_ID) WHERE AD_COLUMN_ID=(
+                                        SELECT AD_COLUMN_ID FROM AD_COLUMN WHERE COLUMNNAME = '" + x_colY + "' AND AD_TABLE_ID = " + GetAD_Table_ID() + ")"));
+            if (tableR > 0)
+            {
+                s_colX = column.GetColumnName();
+            }
 
             column = MColumn.Get(_Ctx, this.GetAD_Column_Y_ID());
 
@@ -519,153 +532,292 @@ namespace VAdvantage.Model
             m_colX = s_colX;
             m_colY = s_colY;
             m_tableName = s_tableName;
-
+            calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
             string s_groupby = "";
             //Append X Axis to SQL Query
-
-            //if datatype = date and user want to see all the dates (including with no values)
-            if (IsDate_X() && (!isFiltered))
+            if (calcBasis == "I" & IsDate_X())
             {
-                StringBuilder sbGroupBy = new StringBuilder("");
-                sbGroupBy.Append(ApplyDateFunction(s_colX));
-                if (GetDateTimeTypes() == IS_DAILY || GetDateTimeTypes() == IS_LAST_N_DAYS)
-                    sbGroupBy.Append(", ")
-                        .Append(ApplyDateFunction(s_colX, "yyyy"))
-                        .Append(", ")
-                        .Append(ApplyDateFunction(s_colX, "mm"))
-                        .Append(", ").Append(ApplyFullDateFunction(s_colX, "dd/mm/yy"));
-                else if (GetDateTimeTypes() == IS_MONTHLY || GetDateTimeTypes() == IS_LAST_N_MONTHS)
-                    sbGroupBy.Append(", ")
-                        .Append(ApplyDateFunction(s_colX, "yyyy"))
-                        .Append(", ").Append(ApplyDateFunction(s_colX, "Mon-RRRR"));
-
-                s_groupby = sbGroupBy.ToString();   //set value into variable to be used later for group by clause (!important)
-                sb.Append(sbGroupBy.ToString());
-
-            }
-            else
-                sb.Append(s_colX);  //in case of other than date and (no filter)
-
-            //give name to col X (can be fetched from db too)
-            if (!IsIdentifier_X())
-                sb.Append(" ColX, ");
-            else
-                sb.Append(" , ");
-
-
-            if (!IsIdentifier_X())
+                string orderByColumn = GetOrderByColumn();
+                string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
+                string val = "";
+                sb.Clear();
+                sb.Append("SELECT " + m_colX + ", ");
                 sb.Append(ApplyAggregateFunction(s_colY, false));
-
-
-            else //in case of identifier column, do not aggregate it (we will do it in top level query)
-                sb.Append("NVL(")
-                    .Append(s_colY)
-                    .Append(",0) ").Append(s_colY);
-            //sb.Append(",'9,999.99')");
-
-            //give name to col Y
-            if (!IsIdentifier_X())
-                sb.Append(" ColY");
-
-            sb.Append(" From ").Append(s_tableName);    //append table name
-
-            string val = "";
-            if (!string.IsNullOrEmpty(GetSQLWhere(out val)))    //get the where clause (actually it fectches only date condition. However, it can be used for other where clause purposes)
-            {
-                sb.Append(val);
+                sb.Append(" AS " + s_colY);
+                sb.Append(" From ").Append(s_tableName);
                 string whereClause = GetWhereClause();
+                sb.Append(GetSQLWhere(out val));
+                if (!string.IsNullOrEmpty(specialWhere))
+                {
+                    string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(sb.ToString(), s_tableName, false, false);
+                    sb.Clear().Append(sbval);
+                }
                 if (!string.IsNullOrEmpty(whereClause))
                 {
                     whereClause = Env.ParseContext(_Ctx, 0, whereClause, false);
-                    if (val.Equals(" WHERE "))
-                        sb.Append("").Append(whereClause);
+                    sb.Append("").Append(" AND (" + whereClause + ")");
+                }
+                sb.Append("GROUP BY " + m_colX + " ");
+                string innerQuery = sb.ToString();/// inner query
+                sb.Clear();
+                sb.Append(GetUnionFinancial(m_date1, m_date2, m_colX, "0 " + m_colY, false));
+                if (DB.IsPostgreSQL())
+                {
+                    sb.Append(" AND " + m_colX + " IN (");
+                    StringBuilder insb = new StringBuilder();
+
+                    insb.Append("SELECT " + m_colX + " FROM " + s_tableName);
+                    insb.Append(GetSQLWhere(out val));
+                    if (!string.IsNullOrEmpty(specialWhere))
+                    {
+                        string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(insb.ToString(), s_tableName, false, false);
+                        insb.Clear().Append(sbval);
+                    }
+                    if (!string.IsNullOrEmpty(whereClause))
+                    {
+                        whereClause = Env.ParseContext(_Ctx, 0, whereClause, false);
+                        insb.Append("").Append(" AND (" + whereClause + "))");
+                    }
                     else
-                        sb.Append("").Append(" AND " + whereClause);
+                    {
+                        insb.Append(")");
+                    }
+                    sb.Append(insb);
+                }
+                sb.Append(" UNION ALL");
+                string createMonth = sb.ToString();////month create
+                sb.Clear();
+                sb.Append("SELECT ");
+                sb.Append(" TRIM(to_char(p.StartDate, 'MON yyyy')) AS colx, ");
+                // sb.Append("p.Name AS ColX, ");
+                if (DB.IsPostgreSQL() && IsCount())
+                {
+                    sb.Append(ApplyAggregateFunction(s_colY, true));
+                    // sb.Append(ApplyAggregateFunction(m_colX, true));
+                }
+                else if (DB.IsPostgreSQL() && IsSum() && IsAvg())
+                {
+                    sb.Append(ApplyAggregateFunction(s_colY, true));
                 }
                 else
                 {
-                    if (val.Equals(" WHERE "))
-                        sb.Append("1=1");
+                    sb.Append(ApplyAggregateFunction(s_colY, true));
                 }
 
-                //special where serves the purpose
-                //for alerts where user needs alerts
-                //for particular X value
-                if (!string.IsNullOrEmpty(specialWhere))
+                sb.Append(" ColY ");
+                //sb.Append(" TRIM(to_char(p.StartDate, 'MON yyyy')) AS colx ");
+                sb.Append("FROM C_Period p JOIN C_Year y ON (p.C_Year_ID = y.C_Year_ID) LEFT JOIN ( " + createMonth + " " + innerQuery + ") ci ON p.StartDate <= ci." + m_colX + " AND p.EndDate >= ci." + m_colX + " ");
+                sb.Append("WHERE y.C_Year_ID =" + C_Year_ID + " AND p.IsActive='Y' GROUP BY TRIM(to_char(p.StartDate, 'MON yyyy')), p.PeriodNo ");
+                // sb.Append("WHERE y.C_Year_ID ="+ C_Year_ID + " AND p.IsActive='Y' GROUP BY TRIM(to_char(p.StartDate, 'MON yyyy')), p.Name, p.PeriodNo ");
+                sb.Append("ORDER BY ");
+                if (orderByColumn.Equals("2"))
                 {
-                    sb.Append(" ").Append(" AND " + specialWhere);
+                    sb.Append(" p.PeriodNo ").Append(orderByMethod);
                 }
-
-
-                //Additional Filter
-                MSeriesFilter[] filter = MSeriesFilter.GetFilters(this.Get_ID());
-                StringBuilder sqlFilter = new StringBuilder();
-                bool ifBetween = false;
-                for (int i = 0; i <= filter.Length - 1; i++)
+                else
                 {
-                    if (filter[i] != null)
+                    sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
+                }
+                return sb.ToString();
+            }
+            else
+            {
+                //if datatype = date and user want to see all the dates (including with no values)
+                if (IsDate_X() && (!isFiltered))
+                {
+                    StringBuilder sbGroupBy = new StringBuilder("");
+                    sbGroupBy.Append(ApplyDateFunction(s_colX));
+                    if (GetDateTimeTypes() == IS_DAILY || GetDateTimeTypes() == IS_LAST_N_DAYS)
+                        sbGroupBy.Append(", ")
+                            .Append(ApplyDateFunction(s_colX, "yyyy"))
+                            .Append(", ")
+                            .Append(ApplyDateFunction(s_colX, "mm"))
+                            .Append(", ").Append(ApplyFullDateFunction(s_colX, "dd/mm/yy"));
+                    else if (GetDateTimeTypes() == IS_MONTHLY || GetDateTimeTypes() == IS_LAST_N_MONTHS)
+                        sbGroupBy.Append(", ")
+                            .Append(ApplyDateFunction(s_colX, "yyyy"))
+                            .Append(", ").Append(ApplyDateFunction(s_colX, "Mon-YYYY"));
+
+                    s_groupby = sbGroupBy.ToString();   //set value into variable to be used later for group by clause (!important)
+                    sb.Append(sbGroupBy.ToString());
+
+                }
+                else if (IsList_X())
+                {
+                    //  sb.Append("r.Name");
+                    // sb.Append("*");
+                    ////-----------------------------------------
+                }
+                else
+                    sb.Append(s_colX);  //in case of other than date and (no filter)
+
+                //give name to col X (can be fetched from db too)
+                if (!IsIdentifier_X())
+                    sb.Append(" ColX, ");
+                else
+                    sb.Append(" , ");
+
+
+                if (!IsIdentifier_X())
+                    sb.Append(ApplyAggregateFunction(s_colY, false));
+
+
+                else //in case of identifier column, do not aggregate it (we will do it in top level query)
+                {
+                    if (DB.IsPostgreSQL())
                     {
-                        continue;
-                    }
-
-
-                    if (!val.Equals(" WHERE "))
-                        sqlFilter.Append(" AND ");
-                    string colValue = MColumn.Get(_Ctx, filter[i].GetAD_Column_ID()).GetColumnName();
-                    sqlFilter.Append(colValue);
-
-                    if (filter[i].GetWhereCondition() == "1")
-                        sqlFilter.Append(" = ");
-                    else if (filter[i].GetWhereCondition() == "2")
-                        sqlFilter.Append(" != ");
-                    else if (filter[i].GetWhereCondition() == "3")
-                        sqlFilter.Append(" >= ");
-                    else if (filter[i].GetWhereCondition() == "4")
-                        sqlFilter.Append(" <= ");
-                    else if (filter[i].GetWhereCondition() == "5")
-                    {
-                        sqlFilter.Append(" BETWEEN ");
-                        ifBetween = true;
-                    }
-
-                    //put value
-                    if (MColumn.Get(_Ctx, filter[i].GetAD_Column_ID()).getSQLDataType() == "DATE")
-                    {
-                        sqlFilter.Append("TO_DATE('").Append(filter[0].GetWhereValue()).Append("','dd/mm/RRRR'").Append(")");
+                        sb.Append(s_colY);
                     }
                     else
-                        sqlFilter.Append("'").Append(Env.ParseContext(_Ctx, 0, filter[i].GetWhereValue(), false)).Append("'");
-                    if (ifBetween)
                     {
+                        sb.Append("NVL(")
+                          .Append(s_colY)
+                          .Append(",0) ").Append(s_colY);
+                    }
+                }
+                //sb.Append(",'9,999.99')");
+
+                //give name to col Y
+                if (!IsIdentifier_X())
+                    sb.Append(" ColY");
+
+
+                if (IsList_X())
+                {
+                    sb.Clear().Append("SELECT * ");
+                    MColumn Lcolumn = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
+                    //  sb.Append(" From ").Append(s_tableName).Append(" P JOIN ad_ref_list r ON P.").Append(Lcolumn.GetColumnName()).Append("=r.Value");    //append table name
+                    sb.Append(" From ").Append(s_tableName).Append(" OUTT ");
+                    ////-----------------------------------------
+                }
+
+                else
+                {
+                    sb.Append(" From ").Append(s_tableName);    //append table name
+                }
+                string val = "";
+                if (!string.IsNullOrEmpty(GetSQLWhere(out val)))    //get the where clause (actually it fectches only date condition. However, it can be used for other where clause purposes)
+                {
+                    sb.Append(val);
+                    string whereClause = GetWhereClause();
+                    if (!string.IsNullOrEmpty(whereClause))
+                    {
+                        whereClause = Env.ParseContext(_Ctx, 0, whereClause, false);
+                        if (val.Equals(" WHERE "))
+                            sb.Append("").Append(whereClause);
+                        else
+                            sb.Append("").Append(" AND " + whereClause);
+                    }
+                    else
+                    {
+                        if (val.Equals(" WHERE "))
+                            sb.Append("1=1");
+                    }
+
+                    //special where serves the purpose
+                    //for alerts where user needs alerts
+                    //for particular X value
+                    if (!string.IsNullOrEmpty(specialWhere))
+                    {
+                        //  sb.Append(" ").Append(" AND " + specialWhere);
+                        //string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(sb.ToString(), s_tableName, false, true);
+                        string sbval = MRole.GetDefault(_Ctx).AddAccessSQL(sb.ToString(), s_tableName, false, false);
+                        sb.Clear().Append(sbval);
+                        /*   if (IsList_X())
+                           {
+                               MColumn Lcolumn = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
+                               string refID = "SELECT c.AD_Reference_Value_ID FROM AD_Column c INNER JOIN ad_table t on(t.AD_Table_ID = c.AD_Table_id) WHERE c.ColumnName = '" + Lcolumn.GetColumnName() + "' AND t.TableName = '"+ m_tableName + "' ";
+                               int refVal =Util.GetValueOfInt(DB.ExecuteScalar(refID));
+                               sb.Append(" AND r.AD_Reference_ID =" + refVal);
+                           }*/
+                    }
+
+
+                    //Additional Filter
+                    MSeriesFilter[] filter = MSeriesFilter.GetFilters(this.Get_ID());
+                    StringBuilder sqlFilter = new StringBuilder();
+                    bool ifBetween = false;
+                    for (int i = 0; i <= filter.Length - 1; i++)
+                    {
+                        if (filter[i] != null)
+                        {
+                            continue;
+                        }
+
+
+                        if (!val.Equals(" WHERE "))
+                            sqlFilter.Append(" AND ");
+                        string colValue = MColumn.Get(_Ctx, filter[i].GetAD_Column_ID()).GetColumnName();
+                        sqlFilter.Append(colValue);
+
+                        if (filter[i].GetWhereCondition() == "1")
+                            sqlFilter.Append(" = ");
+                        else if (filter[i].GetWhereCondition() == "2")
+                            sqlFilter.Append(" != ");
+                        else if (filter[i].GetWhereCondition() == "3")
+                            sqlFilter.Append(" >= ");
+                        else if (filter[i].GetWhereCondition() == "4")
+                            sqlFilter.Append(" <= ");
+                        else if (filter[i].GetWhereCondition() == "5")
+                        {
+                            sqlFilter.Append(" BETWEEN ");
+                            ifBetween = true;
+                        }
+
+                        //put value
                         if (MColumn.Get(_Ctx, filter[i].GetAD_Column_ID()).getSQLDataType() == "DATE")
                         {
-                            //sqlFilter.Append("TO_DATE('").Append(colValue).Append("','dd/mm/yyyy'").Append(")");
-                            sqlFilter.Append(" AND ");
-                            sqlFilter.Append("TO_DATE('").Append(filter[i].GetValueTo()).Append("','dd/mm/RRRR'").Append(")");
+                            sqlFilter.Append("TO_DATE('").Append(filter[0].GetWhereValue()).Append("','dd/mm/YYYY'").Append(")");
                         }
                         else
-                            sqlFilter.Append(" AND '").Append(filter[i].GetValueTo()).Append("'");
+                            sqlFilter.Append("'").Append(Env.ParseContext(_Ctx, 0, filter[i].GetWhereValue(), false)).Append("'");
+                        if (ifBetween)
+                        {
+                            if (MColumn.Get(_Ctx, filter[i].GetAD_Column_ID()).getSQLDataType() == "DATE")
+                            {
+                                //sqlFilter.Append("TO_DATE('").Append(colValue).Append("','dd/mm/yyyy'").Append(")");
+                                sqlFilter.Append(" AND ");
+                                sqlFilter.Append("TO_DATE('").Append(filter[i].GetValueTo()).Append("','dd/mm/YYYY'").Append(")");
+                            }
+                            else
+                                sqlFilter.Append(" AND '").Append(filter[i].GetValueTo()).Append("'");
+                        }
+
+                        if (sb.ToString().IndexOf("WHERE") > 0)
+                            sb.Append(" ").Append(sqlFilter);
+
+                    }
+                }
+
+                //string datatype_Y = GetDataType_Y();
+                // if (datatype_Y.Equals(IS_STRING) || datatype_Y.Equals(IS_INTEGER) && !IsNone())
+                //Changes made on 5jul2011 to query view as we do with tables (req. by amardeep/done by jagmohan)
+                if (IsList_X())
+                {
+                    //  sb.Append(AddGroupByClause("r.Name "));
+                }
+                else if ((!IsIdentifier_X() && isFiltered) || IsString_X())
+                {
+                    sb.Append(AddGroupByClause(s_colX));
+                }
+
+                if (!IsSum() && !IsCount() && !IsAvg() && !IsNone())
+                {
+                    if (DB.IsPostgreSQL())
+                    {
+                        sb.Append(",");
+                        sb.Append(" COALESCE(");
+                        sb.Append(s_colY);
+                        sb.Append(",0) ");
+                    }
+                    else
+                    {
+                        sb.Append(",");
+                        sb.Append("NVL(ROUND(");
+                        sb.Append(s_colY);
+                        sb.Append(",3),0)");
                     }
 
-                    if (sb.ToString().IndexOf("WHERE") > 0)
-                        sb.Append(" ").Append(sqlFilter);
-
-                }
-            }
-
-            //string datatype_Y = GetDataType_Y();
-            // if (datatype_Y.Equals(IS_STRING) || datatype_Y.Equals(IS_INTEGER) && !IsNone())
-            //Changes made on 5jul2011 to query view as we do with tables (req. by amardeep/done by jagmohan)
-            if ((!IsIdentifier_X() && isFiltered) || IsString_X())
-                
-                    sb.Append(AddGroupByClause(s_colX));
-               
-                if(!IsSum() && !IsCount() && !IsAvg() && !IsNone())
-                {
-                sb.Append(",");
-                sb.Append("NVL(ROUND(");
-                sb.Append(s_colY);
-                sb.Append(",3),0)");
 
                 }
 
@@ -673,171 +825,304 @@ namespace VAdvantage.Model
 
 
 
-            if (IsDate_X() && isFiltered)
-            {
-                StringBuilder unionTableQuery = new StringBuilder("SELECT ");
-                if (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS)
+                if (IsDate_X() && isFiltered)
                 {
-                    unionTableQuery.Append(ApplyDateFunction(m_colX)).Append(", ")
-                        .Append("TRIM(TO_CHAR(" + m_colX + ",'yyyy')), ")
-                        .Append(ApplyAggregateFunction(m_colY, true)).Append(SPACE + "ColY");
-                    unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-RRRR')) as ColX");
-                }
-                else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
-                {
-                    unionTableQuery.Append(ApplyDateFunction(m_colX)).Append(", ")
-                        .Append("TRIM(TO_CHAR(" + m_colX + ",'yyyy')), ")
-                        .Append("TRIM(TO_CHAR(" + m_colX + ",'mm')), ")
-                        .Append(ApplyAggregateFunction(m_colY, true)).Append(SPACE + "ColY");
-                    unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'dd/mm/yy')) as ColX");
-                }
-                else
-                    unionTableQuery.Append(ApplyDateFunction(m_colX))
-                        .Append(" as ColX,")
-                        .Append(ApplyAggregateFunction(m_colY, true))
-                        .Append(SPACE + "ColY");
-
-                unionTableQuery.Append(" FROM(");
-                unionTableQuery.Append(GetUnionQuery(m_date_1, m_date_2, m_colX, "0 " + m_colY));
-                //UNION
-                unionTableQuery.Append(" UNION ALL ");
-
-                unionTableQuery.Append(sb.ToString());
-
-                unionTableQuery.Append(")");
-
-                //group by the whole query
-                if (!IsNone())
-                {
-                    unionTableQuery.Append(" GROUP BY ");
-                    unionTableQuery.Append(ApplyDateFunction(m_colX));
-
+                    StringBuilder unionTableQuery = new StringBuilder("SELECT ");
                     if (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS)
                     {
-                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-RRRR'))")
-                            .Append(", TRIM(TO_CHAR(" + m_colX + ",'yyyy'))");
+                        unionTableQuery.Append(ApplyDateFunction(m_colX)).Append(", ")
+                            .Append("TRIM(TO_CHAR(" + m_colX + ",'yyyy')), ")
+                            .Append(ApplyAggregateFunction(m_colY, true)).Append(SPACE + "ColY");
+                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-YYYY')) as ColX");
                     }
                     else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
                     {
-                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'dd/mm/yy'))")
-                            .Append(", TRIM(TO_CHAR(" + m_colX + ",'yyyy')),")
-                            .Append("TRIM(TO_CHAR(" + m_colX + ",'mm')) ");
+                        unionTableQuery.Append(ApplyDateFunction(m_colX)).Append(", ")
+                            .Append("TRIM(TO_CHAR(" + m_colX + ",'yyyy')), ")
+                            .Append("TRIM(TO_CHAR(" + m_colX + ",'mm')), ")
+                            .Append(ApplyAggregateFunction(m_colY, true)).Append(SPACE + "ColY");
+                        unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'dd/mm/yy')) as ColX");
                     }
-                }
+                    else
+                        unionTableQuery.Append(ApplyDateFunction(m_colX))
+                            .Append(" as ColX,")
+                            .Append(ApplyAggregateFunction(m_colY, true))
+                            .Append(SPACE + "ColY");
 
-                sb = unionTableQuery;
+                    unionTableQuery.Append(" FROM(");
+                    calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE IsActive='Y' AND D_Series_ID=" + GetD_Series_ID()));
+                    string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE  D.IsActive='Y' AND  C.D_Chart_ID=" + GetD_Chart_ID();
+                    DataSet dsw = DB.ExecuteDataset(Consolidated);
 
-                //SET ORDER
-            }
-            else if (IsIdentifier_X())     //in case of the identifier column
-            {
-                StringBuilder unionTableQuery = new StringBuilder("SELECT ");
-                string s_identifierCol = "";
-                string fkTableName = "";
-                if (s_colX.EndsWith("_ID"))
-                {
-                    MTable table = MColumn.Get(_Ctx, this.GetAD_Column_X_ID()).GetFKTable();
-                    fkTableName = table.GetTableName();
-                    MColumn[] columns = table.GetColumns(false);
-                    for (int i = 0; i <= columns.Length - 1; i++)
+                    if (dsw != null && dsw.Tables.Count > 0 && dsw.Tables[0].Rows.Count > 0)
                     {
-                        MColumn idn_column = MColumn.Get(_Ctx, columns[i].Get_ID());
-                        if (idn_column.IsIdentifier())
+                        Consolidate = dsw.Tables[0].Rows[0]["VADB_Consolidate"].ToString();
+                    }
+                    if (calcBasis == "I" || calcBasis == "F")
+                    {
+                        // unionTableQuery.Append(GetUnionFinancial(m_date1, m_date2, m_colX, "0 " + m_colY));
+                        if (Consolidate == "Y")
                         {
-                            s_identifierCol = idn_column.GetColumnName();
-                            break;
+                            unionTableQuery.Append(GetUnionFinancial(m_date1, m_date2, m_colX, "0 " + m_colY, true));
+                        }
+                        else
+                        {
+                            unionTableQuery.Append(GetUnionFinancial(m_date1, m_date2, m_colX, "0 " + m_colY, false));
                         }
                     }
+                    else
+                    {
+                        unionTableQuery.Append(GetUnionQuery(m_date_1, m_date_2, m_colX, "0 " + m_colY));
+                    }
+
+                    //UNION
+                    unionTableQuery.Append(" UNION ALL ");
+
+                    unionTableQuery.Append(sb.ToString());
+
+                    unionTableQuery.Append(")");
+
+                    //group by the whole query
+                    if (!IsNone())
+                    {
+                        if (DB.IsPostgreSQL())
+                            unionTableQuery.Append(" FOO ");
+                        unionTableQuery.Append(" GROUP BY ");
+                        unionTableQuery.Append(ApplyDateFunction(m_colX));
+
+                        if (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS)
+                        {
+                            unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'Mon-YYYY'))")
+                                .Append(", TRIM(TO_CHAR(" + m_colX + ",'yyyy'))");
+                        }
+                        else if (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK)
+                        {
+                            unionTableQuery.Append(", TRIM(TO_CHAR(" + m_colX + ",'dd/mm/yy'))")
+                                .Append(", TRIM(TO_CHAR(" + m_colX + ",'yyyy')),")
+                                .Append("TRIM(TO_CHAR(" + m_colX + ",'mm')) ");
+                        }
+                    }
+
+                    sb = unionTableQuery;
+
+                    //SET ORDER
                 }
-
-                //Building main query before union (if required)
-                unionTableQuery.Append(IDENTIFIER_COL).Append(m_colX)
-                    .Append(",");
-
-
-                if (IsCount())
+                else if (IsIdentifier_X() || IsList_X())     //in case of the identifier column
                 {
-                    unionTableQuery.Append(IDENTIFIER_COL).Append(s_identifierCol)
-                     .Append(" ColX,")
-                     .Append(ApplyAggregateFunction(m_colY, true))
-                     .Append(" ColY");
+                    MColumn columnt = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
+                    s_colX = columnt.GetFKColumnName();
+                    m_colX = s_colX;
+                    m_colXY = columnt.GetColumnName();
+                    StringBuilder unionTableQuery = new StringBuilder("SELECT ");
+                    string s_identifierCol = "";
+                    string fkTableName = "";
+                    if (s_colX.EndsWith("_ID"))
+                    {
+                        MTable table = MColumn.Get(_Ctx, this.GetAD_Column_X_ID()).GetFKTable();
+                        fkTableName = table.GetTableName();
+                        MColumn[] columns = table.GetColumns(false);
+                        for (int i = 0; i <= columns.Length - 1; i++)
+                        {
+                            MColumn idn_column = MColumn.Get(_Ctx, columns[i].Get_ID());
+                            if (idn_column.IsIdentifier())
+                            {
+                                if (!(idn_column.GetAD_Reference_ID() == 32))
+                                {
+                                    s_identifierCol = idn_column.GetColumnName();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (IsList_X())
+                    {
+                        unionTableQuery.Append("r.name AS colx,");
+                    }
+
+                    else
+                    {
+                        //Building main query before union (if required)
+                        unionTableQuery.Append(IDENTIFIER_COL).Append(m_colX)
+                            // unionTableQuery.Append(IDENTIFIER_COL).Append(m_colXY)
+                            .Append(",");
+                    }
+
+                    if (IsCount())
+                    {
+                        if (IsList_X())
+                        {
+                            unionTableQuery.Append(ApplyAggregateFunction(m_colY, true))
+                                               .Append(" ColY");
+                        }
+                        else
+                        {
+                            unionTableQuery.Append(IDENTIFIER_COL).Append(s_identifierCol)
+                                               .Append(" ColX,")
+                                               .Append(ApplyAggregateFunction(m_colY, true))
+                                               .Append(" ColY");
+                        }
+
+                    }
+                    else
+                    {
+                        if (IsList_X())
+                        {
+                            unionTableQuery.Append(ApplyAggregateFunction(m_colY, true))
+                                               .Append(" ColY");
+                        }
+                        else
+                        {
+                            unionTableQuery.Append(IDENTIFIER_COL).Append(s_identifierCol)
+                       .Append(" ColX,")
+                       .Append(ApplyAggregateFunction("OUTT." + m_colY, true))
+                       .Append(" ColY");
+                        }
+
+                    }
+
+                    unionTableQuery.Append(" FROM (");
+                    unionTableQuery.Append(sb.ToString());
+                    unionTableQuery.Append(") OUTT ");
+
+                    //JOIN WITH IDENTIFIER TABLE
+                    if (IsList_X())
+                    {
+                        MColumn Lcolumn = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
+                        unionTableQuery.Append(" JOIN ")
+                          .Append("ad_ref_list r ON OUTT." + Lcolumn.GetColumnName() + " = r.value");
+                        string refID = "SELECT c.AD_Reference_Value_ID FROM AD_Column c INNER JOIN ad_table t on(t.AD_Table_ID = c.AD_Table_id) WHERE c.ColumnName = '" + Lcolumn.GetColumnName() + "' AND t.TableName = '" + m_tableName + "' ";
+                        int refVal = Util.GetValueOfInt(DB.ExecuteScalar(refID));
+                        unionTableQuery.Append(" WHERE r.ad_reference_id = " + refVal);
+                    }
+                    else
+                    {
+                        unionTableQuery.Append("INNER JOIN ")
+                        .Append(fkTableName).Append(" idtnfr")
+                        .Append(" ON ")
+                        .Append(IDENTIFIER_COL).Append(m_colX);
+                        if (tableR > 0)
+                        {
+                            unionTableQuery.Append(" = OUTT.").Append(columnt.GetColumnName());
+                        }
+                        else
+                        {
+                            //  unionTableQuery.Append(" = OUTT.").Append(m_colX);
+                            unionTableQuery.Append(" = OUTT.").Append(m_colXY);
+                        }
+                        //.Append(" = OUTT.").Append(m_colX);
+                    }
+
+
+                    //group by the whole query
+                    if (!IsNone())
+                    {
+                        if (IsList_X())
+                        {
+                            unionTableQuery.Append(" GROUP BY r.Name");
+                        }
+                        else
+                        {
+                            unionTableQuery.Append(" GROUP BY ")
+                                                 .Append(IDENTIFIER_COL).Append(m_colX)
+                                                 .Append(",")
+                                                 .Append(IDENTIFIER_COL).Append(s_identifierCol);
+                        }
+
+                    }
+
+                    sb = unionTableQuery;
                 }
+
+                if (IsDate_X() && (!isFiltered))
+                {
+                    if (!IsNone())
+                    {
+                        sb.Append(" GROUP BY ")
+                            .Append(s_groupby);
+                    }
+                }
+
+                //add order by clause after group by clause
+
+
+                string orderByColumn = GetOrderByColumn();
+
+
+
+
+
+                //initially user had to select "asc". same field has now been set as ascending by default and
+                //user can choose to make it descending. (for user friendly purpose ! you needed it :))
+                string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
+                sb.Append(" ORDER BY ");
+
+                if (orderByColumn.Equals("2"))
+                    sb.Append("ColY ").Append(orderByMethod);
                 else
                 {
-
-                    unionTableQuery.Append(IDENTIFIER_COL).Append(s_identifierCol)
-                        .Append(" ColX,")
-                        .Append(ApplyAggregateFunction("OUTT." + m_colY, true))
-                        .Append(" ColY");
+                    if (IsDate_X() && (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS))
+                        sb.Append("2 " + orderByMethod + "," + orderByColumn).Append(" ").Append(orderByMethod);
+                    else if (IsDate_X() && (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK))
+                        sb.Append("2,3, " + orderByColumn).Append(" ").Append(orderByMethod);
+                    else
+                    {
+                        //if (IsDate_X())
+                        //{
+                        //    if (orderByColumn == "1")
+                        //    {
+                        //        orderByColumn = s_colX;
+                        //    }
+                        //}
+                        sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
+                    }
                 }
+                string FetchRows = @"SELECT
+                                   D.VADB_FetchRows
+                                FROM 
+                                  D_Series D
+                                   INNER JOIN D_Chart C ON(C.D_Chart_ID=D.D_Chart_ID)
+                                WHERE D.IsActive='Y' AND
+                                  C.D_Chart_ID=" + GetD_Chart_ID();
 
-                unionTableQuery.Append(" FROM (");
-                unionTableQuery.Append(sb.ToString());
-                unionTableQuery.Append(") OUTT ");
+                DataSet dsR = DB.ExecuteDataset(FetchRows);
 
-                //JOIN WITH IDENTIFIER TABLE
-                unionTableQuery.Append("INNER JOIN ")
-                    .Append(fkTableName).Append(" idtnfr")
-                    .Append(" ON ")
-                    .Append(IDENTIFIER_COL).Append(m_colX)
-                    .Append(" = OUTT.").Append(m_colX);
-
-                //group by the whole query
-                if (!IsNone())
+                if (dsR != null && dsR.Tables.Count > 0 && dsR.Tables[0].Rows.Count > 0)
                 {
-                    unionTableQuery.Append(" GROUP BY ")
-                        .Append(IDENTIFIER_COL).Append(m_colX)
-                        .Append(",")
-                        .Append(IDENTIFIER_COL).Append(s_identifierCol);
+                    FetchRowsCount = Util.GetValueOfInt(dsR.Tables[0].Rows[0]["VADB_FetchRows"]);
                 }
-
-                sb = unionTableQuery;
+                if (FetchRowsCount > 0)
+                {
+                    sb.Append(" FETCH FIRST " + FetchRowsCount + " ROWS ONLY ");
+                }
             }
+            return sb.ToString();
+        }
 
-            if (IsDate_X() && (!isFiltered))
+        private string GetUnionFinancial(string m_date1, string m_date2, string colName, string function, bool Consolidate)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (DB.IsPostgreSQL())
             {
-                if (!IsNone())
-                {
-                    sb.Append(" GROUP BY ")
-                        .Append(s_groupby);
-                }
+
+                sb.Append(@" SELECT " + colName + @", " + function + @" FROM GENERATE_SERIES(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), TO_DATE('" + m_date2 + "', 'MM/DD/YYYY') - INTERVAL '1 day', INTERVAL '1 day') AS " + colName + @" WHERE " + colName + @" > DATE '0001-01-01'");
+
             }
-
-            //add order by clause after group by clause
-
-
-            string orderByColumn = GetOrderByColumn();
-
-
-
-
-
-            //initially user had to select "asc". same field has now been set as ascending by default and
-            //user can choose to make it descending. (for user friendly purpose ! you needed it :))
-            string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
-            sb.Append(" ORDER BY ");
-
-            if (orderByColumn.Equals("2"))
-                sb.Append("ColY ").Append(orderByMethod);
             else
             {
-                if (IsDate_X() && (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS))
-                    sb.Append("2 " + orderByMethod + "," + orderByColumn).Append(" ").Append(orderByMethod);
-                else if (IsDate_X() && (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK))
-                    sb.Append("2,3, " + orderByColumn).Append(" ").Append(orderByMethod);
+                sb.Append(@" SELECT dates." + colName + "," + function + @" FROM (SELECT ADD_MONTHS(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), LEVEL - 1) AS " + colName + " FROM dual" +
+                " CONNECT BY  LEVEL <= MONTHS_BETWEEN(");
+                if (Consolidate)
+                {
+                    sb.Append(" TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), ");
+                }
                 else
                 {
-                    //if (IsDate_X())
-                    //{
-                    //    if (orderByColumn == "1")
-                    //    {
-                    //        orderByColumn = s_colX;
-                    //    }
-                    //}
-                    sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
+                    sb.Append(" TO_DATE('" + m_date2 + "', 'MM/DD/YYYY'),");
                 }
+                sb.Append("TO_DATE('" + m_date1 + "', 'MM/DD/YYYY')) + 1) dates" +
+                " WHERE dates ." + colName + " > TO_DATE('01/01/0001', 'MM/DD/YYYY')   " +
+                " GROUP BY   dates." + colName);
             }
-
             return sb.ToString();
         }
 
@@ -851,15 +1136,28 @@ namespace VAdvantage.Model
         private string GetUnionQuery(DateTime date1, DateTime date2, string colName, string function)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("SELECT dates." + colName + "," + function + " FROM");
-            sb.Append("(SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/RRRR') - 1 + rownum AS " + colName);
+            if (DB.IsPostgreSQL())
+            {
+                sb.Append(@" SELECT " + colName + @", " + function + @" FROM
+                    GENERATE_SERIES(TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY'), TO_DATE('" + date2.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY'), INTERVAL '1 day') AS " + colName + @"
+                    WHERE " + colName + @" > DATE '0001-01-01' GROUP BY " + colName);
+            }
+            else
+            {
+                sb.Append(@" SELECT dates." + colName + "," + function + @" FROM
+        (SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + LEVEL - 1 AS " + colName + @" FROM DUAL CONNECT BY
+            LEVEL <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') - TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + 1
+            ) dates WHERE dates." + colName + @" > TO_DATE('01/01/0001', 'MM/DD/YYYY') GROUP BY dates." + colName);
 
-            sb.Append(" FROM all_objects");
-            sb.Append(" WHERE TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/RRRR') - 1 + rownum <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + "', 'MM/DD/RRRR')) dates");
-            sb.Append(" WHERE dates.").Append(colName).Append(">TO_DATE('01/01/0001', 'MM/DD/RRRR')");
-            sb.Append(" GROUP BY dates." + colName);
-            //sb.Append(" ORDER BY " + colName + " ASC");
+                //sb.Append("SELECT dates." + colName + "," + function + " FROM");
+                //sb.Append("(SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum AS " + colName);
 
+                //sb.Append(" FROM all_objects");
+                //sb.Append(" WHERE TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY')) dates");
+                //sb.Append(" WHERE dates.").Append(colName).Append(">TO_DATE('01/01/0001', 'MM/DD/YYYY')");
+                //sb.Append(" GROUP BY dates." + colName);
+                //sb.Append(" ORDER BY " + colName + " ASC");
+            }
             return sb.ToString();
         }
 
@@ -871,7 +1169,7 @@ namespace VAdvantage.Model
         /// <returns>group by query</returns>
         private string AddGroupByClause(string colName)
         {
-           
+
             if (!IsNone())
             {
                 StringBuilder sb = new StringBuilder();
@@ -892,6 +1190,14 @@ namespace VAdvantage.Model
         /// <returns>SQL Query with date function</returns>
         public string ApplyDateFunction(string colName)
         {
+            calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
+            string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE D.IsActive='Y' AND C.D_Chart_ID=" + GetD_Chart_ID();
+            DataSet dsw = DB.ExecuteDataset(Consolidated);
+
+            if (dsw != null && dsw.Tables.Count > 0 && dsw.Tables[0].Rows.Count > 0)
+            {
+                Consolidate = dsw.Tables[0].Rows[0]["VADB_Consolidate"].ToString();
+            }
             //currently 3 types of date types are supported : daily, monthly, yearly
             string s_reportType = this.GetDateTimeTypes();
             StringBuilder sb = new StringBuilder("trim(to_char(").Append(colName);
@@ -899,12 +1205,31 @@ namespace VAdvantage.Model
             if (s_reportType.Equals("D") || s_reportType.Equals("A") || s_reportType.Equals("W"))
                 sb.Append(",").Append("'dd'").Append("))");
             else if (s_reportType.Equals("M") || s_reportType.Equals("B"))
+            {
                 sb.Append(",").Append("'mm'").Append("))");
+            }
+            //  else if (s_reportType.Equals("Y") || s_reportType.Equals("C"))
+            else if (s_reportType.Equals("C") && calcBasis == "F" || calcBasis == "I")
+            {
+                if (Consolidate == "N")
+                {
+                    sb.Append(",").Append("'MON yyyy'").Append("))");
+
+                }
+                else
+                {
+                    sb.Append(",").Append("'yyyy'").Append("))");
+                }
+
+            }
             else if (s_reportType.Equals("Y") || s_reportType.Equals("C"))
+            {
                 sb.Append(",").Append("'yyyy'").Append("))");
+            }
+
             else
             {
-                sb = new StringBuilder("TO_Date(").Append(colName).Append(",'DD-mm-RRRR')");
+                sb = new StringBuilder("TO_Date(").Append(colName).Append(",'DD-mm-YYYY')");
             }
 
             return sb.ToString();
@@ -959,34 +1284,84 @@ namespace VAdvantage.Model
             StringBuilder sb = new StringBuilder();
 
             if (!this.IsNone())
-                sb.Append("NVL(ROUND(");
+                sb.Append(DB.IsPostgreSQL() ? " COALESCE (" : "NVL(ROUND(");
+
+            /* if ((DB.IsPostgreSQL())
+             {
+                 sb.Append(" ROUND ");
+             }
+             else
+             {
+                 sb.Append("NVL(ROUND(");
+             }*/
+
 
             if (this.IsSum())
-                sb.Append("SUM(").Append(colName).Append(")");
+            {
+                if (DB.IsPostgreSQL() && checkCountIssue && calcBasis == "I")
+                {
+                    sb.Append("SUM(DISTINCT ci. " + colName + ")");
+                }
+                else
+                {
+                    sb.Append("SUM(").Append(colName).Append(")");
+                    //sb.Append("SUM(CAST(").Append(colName).Append(" AS NUMERIC))");
+                }
+            }
             else if (IsAvg())
-                sb.Append("AVG(").Append(colName).Append(")");
+            {
+                if (DB.IsPostgreSQL() && checkCountIssue && calcBasis == "I")
+                {
+                    sb.Append("AVG(DISTINCT ci. " + colName + ")");
+                }
+                else
+                {
+                    sb.Append("AVG(CAST(").Append(colName).Append(" AS NUMERIC))");
+                    // sb.Append("AVG(").Append(colName).Append(")");
+                }
+            }
+
             else if (IsCount())
             {
                 if (IsDate_X() && checkCountIssue && (this.GetDateTimeTypes() == IS_YEARLY || this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_LAST_N_MONTHS || this.GetDateTimeTypes() == IS_LAST_N_YEARS))
                 {
                     //sb.Append("CASE WHEN MOD(" + ApplyDateFunction(m_colX) + ",4) = 0 AND (MOD(" + ApplyDateFunction(m_colX) + ",400) = 0 OR MOD(" + ApplyDateFunction(m_colX) + ",100) <> 0) THEN COUNT(").Append(colName).Append(") - 366 ELSE COUNT(").Append(colName).Append(") - 365 END");
-                    sb.Append("SUM(").Append(colName).Append(")");
+                    if (DB.IsPostgreSQL() && checkCountIssue && calcBasis == "I")
+                    {
+                        //  sb.Append("COUNT(DISTINCT ci. " + colName +")" );
+                        sb.Append("SUM(ci. " + colName + ")");
+                    }
+                    else
+                    {
+                        sb.Append("SUM(").Append(colName).Append(")");
+                    }
+
                 }
                 else
+                    if (IsList_X())
+                {
+                    sb.Append("COUNT(OUTT.").Append(m_tableName + "_ID").Append(")");
+                }
+                else
+                {
                     sb.Append("COUNT(").Append("*").Append(")");
+
+                }
+
             }
             else
             {
                 sb.Append(colName);
             }
-            
-                if (!this.IsNone())
-                {
-                    sb.Append(",3),0)");
-                }
-               
-           
-            
+
+            if (!this.IsNone())
+            {
+                //  sb.Append(",3),0)");
+                sb.Append(DB.IsPostgreSQL() ? ", 0) " : " ,3),0) ");
+            }
+
+
+
             return sb.ToString();
         }
 
@@ -996,9 +1371,53 @@ namespace VAdvantage.Model
         /// <param name="sqlwhere">contains where clause (mind you! its an out variable)</param>
         private string GetSQLWhere(out string sqlwhere)
         {
+            DateTime earliestStartDate = DateTime.MaxValue;
+            DateTime latestEndDate = DateTime.MinValue;
+
+            StringBuilder sbSQL = new StringBuilder("SELECT AD_Column_ID FROM AD_Column WHERE AD_Table_ID = (SELECT AD_Table_ID FROM AD_Table WHERE TableName = 'D_Series') AND LOWER(ColumnName) = 'vadb_calculationbasis'");
+            if (Util.GetValueOfInt(DB.ExecuteScalar(sbSQL.ToString())) > 0)
+            {
+                calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID()));
+            }
+            if (calcBasis.Equals("I"))
+            {
+                DateTime sysdate = DateTime.Now;
+                sysdate = sysdate.AddYears(-this.GetLastNValue());
+                StringBuilder sqlyearCalender = new StringBuilder();
+                int calendarID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Calendar_ID FROM D_SERIES WHERE D_Series_ID = " + GetD_Series_ID()));
+                sqlyearCalender.Append("SELECT p.C_Year_ID, p.PeriodNo, MIN(p.StartDate) AS EarliestStartDate, MAX(p.EndDate) AS LatestEndDate FROM " +
+                    "C_Period p INNER JOIN C_Year cy ON p.C_Year_ID = cy.C_Year_ID INNER JOIN C_Calendar cal ON cy.C_Calendar_ID = cal.C_Calendar_ID" +
+                    " WHERE p.C_Year_ID IN(SELECT C_Year_ID FROM C_Period WHERE " + GlobalVariable.TO_DATE(sysdate, true) + " BETWEEN StartDate AND EndDate) AND cal.C_Calendar_ID = ");
+                if (calendarID > 0)
+                {
+                    sqlyearCalender.Append("(SELECT C_Calendar_ID FROM D_SERIES WHERE D_Series_ID = " + GetD_Series_ID() + ")");
+                }
+                else
+                {
+                    sqlyearCalender.Append(" (SELECT CI.c_calendar_id FROM AD_Client A" +
+                        " INNER JOIN AD_ClientInfo CI ON(A.AD_Client_ID = CI.AD_Client_ID) WHERE A.AD_Client_ID = " + GetAD_Client_ID() + ")");
+                }
+                sqlyearCalender.Append("AND p.IsActive = 'Y' GROUP By PeriodNo, p.C_Year_ID order by PeriodNo");
+                DataSet ds = DB.ExecuteDataset(sqlyearCalender.ToString());
+
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow yearID = ds.Tables[0].Rows[0];
+                    C_Year_ID = Util.GetValueOfInt(yearID["C_Year_ID"]);
+
+                    DataRow firstRow = ds.Tables[0].Rows[0];
+                    earliestStartDate = (DateTime)firstRow["EarliestStartDate"];
+
+                    DataRow lastRow = ds.Tables[0].Rows[ds.Tables[0].Rows.Count - 1];
+                    latestEndDate = (DateTime)lastRow["LatestEndDate"];
+
+                }
+
+            }
+
             StringBuilder sb = new StringBuilder();
             sb.Append(" WHERE ");
-            if ((IsDate_X() || IsIdentifier_X() || IsString_X()) && GetDateTimeTypes() != "N")     //if colx is datetime
+            if ((IsList_X() || IsDate_X() || IsIdentifier_X() || IsString_X()) && GetDateTimeTypes() != "N")     //if colx is datetime
             {
                 DateTime alternateDate = DateTime.Now;
                 if (GetDateFrom() == null && (GetDateTimeTypes() == IS_YEARLY || GetDateTimeTypes() == IS_MONTHLY || GetDateTimeTypes() == IS_DAILY))
@@ -1111,8 +1530,6 @@ namespace VAdvantage.Model
                     else
                     {
                         m_date_2 = (DateTime)GetDateTo().Value;
-                        //                        dt = GetDateTo().Value.AddYears(1);
-                        //m_date2 = "12/31/" + dt.Year;
                         dt = GetDateTo().Value;
 
                         int tDays = DateTime.DaysInMonth(dt.Year, dt.Month);
@@ -1188,7 +1605,21 @@ namespace VAdvantage.Model
                     //m_date1 = lastNDate.Month + "/" + (lastNDate.Day - 1) + "/" + lastNDate.Year;
 
                     m_date1 = lastNDate.Month + "/" + (lastNDate.Day) + "/" + lastNDate.Year;
-                    m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                    if (calcBasis.Equals("F"))
+                    {
+                        if (this.GetLastNValue() == 0)
+                        {
+                            m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                        }
+                        else
+                        {
+                            m_date2 = dt_to.Month + "/" + (dt_to.Day - 1) + "/" + dt_to.Year;
+                        }
+                    }
+                    else
+                    {
+                        m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                    }
 
                 }
                 else if (GetDateTimeTypes() == IS_LAST_N_MONTHS)
@@ -1208,18 +1639,46 @@ namespace VAdvantage.Model
                     //else
                     //{
                     //m_date1 = (lastNDate.Month - 1) + "/" + lastNDate.Day + "/" + lastNDate.Year;
-                    m_date1 = (lastNDate.Month) + "/" + lastNDate.Day + "/" + lastNDate.Year;
-                    // }                     
-                    //m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
-                    int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
-
-                    if (tDays == dt_to.Day)
+                    if (calcBasis.Equals("F"))
                     {
-                        m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day) + "/" + dt_to.Year;
+                        //  m_date1 = (lastNDate.Month) + "/1/" + lastNDate.Year;
+                        m_date1 = (lastNDate.Month) + "/1/" + lastNDate.Year;
                     }
                     else
                     {
-                        m_date2 = (dt_to.Month - 1) + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
+                        m_date1 = (lastNDate.Month) + "/" + lastNDate.Day + "/" + lastNDate.Year;
+                    }
+                    // }                     
+                    //m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
+                    int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
+                    /*
+                                        if (tDays == dt_to.Day)
+                                        {
+                                            m_date2 = (dt_to.Month) + "/" + (dt_to.Day) + "/" + dt_to.Year;
+                                        }
+                                        else*/
+                    if (calcBasis.Equals("F"))
+                    {
+                        if (this.GetLastNValue() == 0)
+                        {
+                            DateTime dt_toMon = DateTime.Now;
+                            m_date2 = DateTime.Now.Month + "/" + DateTime.DaysInMonth(dt_toMon.Year, DateTime.Now.Month) + "/" + dt_toMon.Year;
+
+                        }
+                        else
+                        {
+                            //   m_date2 = lastNDate.Month+ "/"+ DateTime.DaysInMonth(lastNDate.Year, lastNDate.Month) + "/"+ lastNDate.Year;
+                            // lastNDate = lastNDate.AddMonths();
+                            m_date2 = lastNDate.Month + "/" + DateTime.DaysInMonth(lastNDate.Year, lastNDate.Month) + "/" + lastNDate.Year;
+
+                        }
+
+                    }
+                    else
+                    {
+                        dt_to = dt_to.AddDays(1);
+                        dt_to = dt_to.AddMonths(-1);
+                        m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
                     }
                 }
                 else if (GetDateTimeTypes() == IS_LAST_N_YEARS)
@@ -1232,16 +1691,56 @@ namespace VAdvantage.Model
                     m_date_1 = (DateTime)lastNDate;
                     m_date_2 = DateTime.Now;
 
-                    m_date1 = lastNDate.Month + "/" + lastNDate.Day + "/" + (lastNDate.Year - 1);
+
+                    if (calcBasis.Equals("F"))
+                    {
+                        /* if (this.GetLastNValue() == 0)
+                         {
+                             m_date1 = "1/1/" + (lastNDate.Year - 1);
+                         }
+                         else
+                         {*/
+                        m_date1 = "1/1/" + (lastNDate.Year - 1);
+                        /* }*/
+
+                    }
+                    else if (calcBasis.Equals("I"))
+                    {
+                        m_date1 = earliestStartDate.Month + "/" + earliestStartDate.Day + "/" + earliestStartDate.Year;
+                    }
+                    else
+                    {
+                        m_date1 = lastNDate.Month + "/" + lastNDate.Day + "/" + (lastNDate.Year - 1);
+                    }
                     int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
 
                     if (tDays == dt_to.Day)
                     {
                         m_date2 = dt_to.Month + "/" + (dt_to.Day) + "/" + dt_to.Year;
                     }
+                    else if (calcBasis.Equals("F"))
+                    {
+                        if (this.GetLastNValue() == 0)
+                        {
+                            dt_to = dt_to.AddYears(1);
+                            m_date2 = "1/1/" + dt_to.Year;
+                        }
+                        else
+                        {
+                            m_date2 = "12/31/" + (lastNDate.Year - 1);
+                            //  m_date2 = "1/1/" + (lastNDate.Year);
+                        }
+                    }
+                    else if (calcBasis.Equals("I"))
+                    {
+                        latestEndDate = latestEndDate.AddDays(1);///for last day 
+                        m_date2 = latestEndDate.Month + "/" + latestEndDate.Day + "/" + latestEndDate.Year;
+
+                    }
                     else
                     {
-                        m_date2 = dt_to.Month + "/" + (dt_to.Day + 1) + "/" + dt_to.Year;
+                        // dt_to=dt_to.AddDays(1);
+                        m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
                     }
                 }
                 else if (GetDateTimeTypes() == IS_CURRENT_WEEK)
@@ -1261,11 +1760,16 @@ namespace VAdvantage.Model
                     MColumn dateCol = MColumn.Get(GetCtx(), GetAD_DateColumn_ID());
                     sb.Append(dateCol.GetFKColumnName()).Append(" BETWEEN ");
                 }
+                else if (IsList_X())
+                {
+                    MColumn dateCol = MColumn.Get(GetCtx(), GetAD_DateColumn_ID());
+                    sb.Append(dateCol.GetFKColumnName()).Append(" BETWEEN ");
+                }
                 else
                     sb.Append(m_colX).Append(" BETWEEN ");
 
-                sb.Append(GetFormattedDateColumn(m_date1, "mm/dd/RRRR")).Append(" AND ");
-                sb.Append(GetFormattedDateColumn(m_date2, "mm/dd/RRRR"));
+                sb.Append(GetFormattedDateColumn(m_date1, "mm/dd/YYYY")).Append(" AND ");
+                sb.Append(GetFormattedDateColumn(m_date2, "mm/dd/YYYY"));
 
             }
             sqlwhere = sb.ToString();
@@ -1424,12 +1928,12 @@ namespace VAdvantage.Model
                                 {
                                     if (series.GetAlertLastRun() != null)
                                     {
-                                        if (DateTime.Parse(series.GetAlertLastRun().ToString()).ToString("dd/MM/RRRR") == DateTime.Now.ToString("dd/MM/RRRR"))
+                                        if (DateTime.Parse(series.GetAlertLastRun().ToString()).ToString("dd/MM/YYYY") == DateTime.Now.ToString("dd/MM/YYYY"))
                                         {
                                             continue;
                                         }
                                     }
-                                    specialWhere = series.GetFormattedDateDBColumn(series.GetColumnName(series.GetAD_Column_X_ID()), "dd/mm/RRRR") + "=" + series.GetFormattedDateDBColumn("SYSDATE", "dd/mm/RRRR");
+                                    specialWhere = series.GetFormattedDateDBColumn(series.GetColumnName(series.GetAD_Column_X_ID()), "dd/mm/YYYY") + "=" + series.GetFormattedDateDBColumn("SYSDATE", "dd/mm/YYYY");
                                     sql = series.GetSql(false, specialWhere);
 
                                 }
@@ -1575,7 +2079,12 @@ namespace VAdvantage.Model
 
             return false;
         }
-
+        public bool IsList_X()
+        {
+            if (GetDataType_X() == IS_LIST)
+                return true;
+            return false;
+        }
         public bool IsDate_X()
         {
             if (GetDataType_X() == IS_DATETIME)

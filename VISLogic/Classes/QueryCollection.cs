@@ -572,6 +572,12 @@ namespace VIS.Classes
             queryList.VIS_157 = "SELECT record_Id FROM AD_ShareRecordOrg WHERE isActive = 'Y' AND AD_Table_ID = @AD_Table_ID";
             //Get Window ID of Auto Mark Config
             queryList.VIS_158 = "SELECT AD_Window_ID FROM AD_Window WHERE IsActive = 'Y' AND Name='VA093_AutoMarkingConfig'";
+
+            queryList.VIS_159 = "SELECT CASE WHEN length( ad_userquery.name ) > 25 THEN substr( ad_userquery.name, 0, 25 ) || '...' ELSE ad_userquery.name END AS name, ad_userquery.name AS title, ad_userquery.code, ad_userquery.ad_userquery_id, ad_userquery.ad_user_id, ad_userquery.ad_tab_id, ad_userquery.ad_userquery_id AS AD_DefaultUserQuery_ID FROM AD_UserQuery AD_UserQuery WHERE AD_UserQuery.ad_userquery_id=@AD_UserQuery_ID ORDER BY upper( ad_userquery.name ), ad_userquery.ad_userquery_id";
+
+            queryList.VIS_160 = "SELECT VIS_AssignedRecordToUser_ID, Record_ID, AD_User_ID, CreatedBy FROM VIS_AssignedRecordToUser WHERE AD_Table_ID=@AD_Table_ID AND UPPER(Status) !='DNE' AND AD_Client_ID=" + ctx.GetAD_Client_ID();
+          
+
         }
 
 

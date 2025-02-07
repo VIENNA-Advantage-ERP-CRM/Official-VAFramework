@@ -2290,6 +2290,8 @@ center {
     position: absolute;
     bottom: 2%;
     right: 1.5%;
+    left: 1.5%;
+    margin-left: 20px;
 }
 
 .vis-cll-sy-p1 {
@@ -3132,6 +3134,7 @@ border-top-left-radius:4px !important;
         display: none;
     }*/
 .vis-disable-event {
+    background-color: rgba(var(--v-c-secondary), 1);
     opacity: 0.6 !important;
     pointer-events: none !important;
 }
@@ -3457,6 +3460,7 @@ field, fieldvalue {
     display: inline-block;
     cursor: pointer;
     margin-right: 35px;
+    margin-left: 35px;
     font-weight: 500;
     position: absolute;
 }
@@ -3987,6 +3991,17 @@ table.fixed-header thead tr {
     background: rgba(var(--v-c-secondary), 1);
 }
 
+.vis-card-copy {
+    display: block;
+    margin-bottom: 5px;
+    height: 80px;
+}
+
+.vis-card-control {
+    position: absolute !important;
+    bottom: 0px;
+}
+
 .iconDelete {
     cursor: pointer;
 }
@@ -4081,16 +4096,16 @@ table.fixed-header thead tr {
     display: inline-flex;
     align-items: center;
     margin-bottom: 5px;
-    min-width:50px;
+    min-width: 50px;
 }
 
 .vis-BatchUpdateContentArea {
     height: auto;
 }
 
-    .vis-ctrfrm-btnwrp.vis-add-right-btns input[type="button"] {
-        float: none;
-    }
+.vis-ctrfrm-btnwrp.vis-add-right-btns input[type="button"] {
+    float: none;
+}
 
 .vis-Dialog-buttons button:focus,
 .vis-Dialog-buttons input[type="button"]:focus,
@@ -4101,8 +4116,9 @@ table.fixed-header thead tr {
 .VIS_Pref_btn-2:focus,
 .vis-group-btn:focus,
 .k-button:focus {
-    box-shadow: 0 0 10px rgb(0 0 0 / 50%) !important;
-    border: none !important;
+    box-shadow: 2px 4px 2px rgb(0 0 0 / 20%) !important;
+    border: 1px solid rgba(var(--v-c-primary), 1) !important;
+    border-radius: 0;
 }
 
 /* modify Ends */
@@ -4157,5 +4173,45 @@ table.fixed-header thead tr {
 
     .vis-two-sec-one {
         width: 200px;
+    }
+}
+
+/*Widget Loader*/
+.vis_widgetloader {
+    width: 35px;
+    height: 35px;
+    --c: no-repeat linear-gradient(rgba(var(--v-c-primary), 1) 0 0);
+    background: var(--c),var(--c),var(--c),var(--c);
+    background-size: 18px 18px;
+    animation: viswidget_l 1.5s infinite cubic-bezier(0.3,1,0,1);
+}
+
+.multiselect-selected-text {
+    font-size: 14px;
+}
+
+.multiselect-container {
+    width: 100%;
+}
+
+@keyframes viswidget_l {
+    0% {
+        background-position: 0 0,100% 0,100% 100%,0 100%
+    }
+
+    33% {
+        background-position: 0 0,100% 0,100% 100%,0 100%;
+        height: 45px;
+        width: 45px
+    }
+
+    66% {
+        background-position: 100% 0,100% 100%,0 100%,0 0;
+        height: 45px;
+        width: 45px
+    }
+
+    to {
+        background-position: 100% 0,100% 100%,0 100%,0 0
     }
 }

@@ -283,7 +283,12 @@ namespace VAdvantage.Controller
 
         public string ADActionName = ""; /*Action Name for Open window or form */
 
-        public ActionParams ADActionParams = null;
+        public ActionParams ADActionParams = null; /* Dynamic prop (Json String) */
+
+        public string AGName = ""; /* Action Group Name */
+        public string AGFontName = ""; /* Action Group Font Name */
+        public string AGStyle = "";
+
 
         /// <summary>
         /// calaculate MaxDisplayLength

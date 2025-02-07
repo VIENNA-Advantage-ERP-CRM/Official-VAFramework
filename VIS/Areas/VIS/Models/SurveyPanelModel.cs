@@ -486,7 +486,7 @@ namespace VIS.Models
                             FROM  AD_Column                           
                             INNER JOIN ad_surveyshowcondition ON (AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID)
                             INNER JOIN AD_SurveyAssignment ON (AD_SurveyAssignment.AD_SurveyAssignment_ID=AD_SurveyAssignment.ad_surveyassignment_ID)
-                            WHERE AD_SurveyAssignment.AD_Window_ID="+AD_Window_ID+ " AND AD_SurveyAssignment.AD_Table_ID=" + AD_Table_ID + " AND  ad_surveyshowcondition.isActive='Y' AND AD_Column.AD_Table_ID=" + AD_Table_ID +  @"
+                            WHERE AD_SurveyAssignment.AD_Window_ID="+AD_Window_ID+ " AND AD_SurveyAssignment.AD_Table_ID=" + AD_Table_ID + " AND  ad_surveyshowcondition.isActive='Y' AND  AD_SurveyAssignment.isActive='Y' AND AD_Column.AD_Table_ID=" + AD_Table_ID +  @"
                             ORDER BY ad_surveyshowcondition.seqno";
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
             //prepare where condition for filter

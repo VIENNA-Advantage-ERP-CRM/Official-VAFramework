@@ -31,7 +31,7 @@
     </script>
 
 
-    @if (@User.Identity.IsAuthenticated)
+    @if (@User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
     {
 
         var lst = VAdvantage.ModuleBundles.GetStyleBundles(); //Get All Style Bundle
@@ -110,6 +110,9 @@
 
     else //login
     {
+        <link type="text/css" href="~/Areas/ViennaBase/Content/fontlib/font-awesome.min.css" rel="stylesheet" />
+        <link type="text/css" href="~/Areas/ViennaBase/Content/fontlib/vis-fonts.css" rel="stylesheet" />
+
         if (ViewBag.LibSuffix != "_v3")
         {
             @Styles.Render("~/Areas/ViennaBase/bundles/boot" + ViewBag.LibSuffix);
@@ -122,14 +125,14 @@
         }
         else
         {
-    @Styles.Render("~/bundles/boot");
-    @Scripts.Render("~/bundles/jquery");
-            }
-
+            @Styles.Render("~/bundles/boot");
+            @Scripts.Render("~/bundles/jquery");
         }
-    }
 
-@if (@User.Identity.IsAuthenticated)
+    }
+}
+
+@if (@User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
 {
     <input id="vis_antiForgeryToken" type="hidden" value="@GetAntiForgeryToken()" />
 
@@ -145,101 +148,129 @@
 
         @if (ViewBag.IsMobile == true)
         {
-
-            <div id="vis_mainMenu" class="vis-mainMenu" style="display: none">
-                <div class="d-flex align-items-center vis-navHeadWrap" style="display: none">
-                    <h5 class="m-0 vis-menu-headerName">@ViewBag.Menu.GetRootNode().Text</h5>
-                    <div class="d-flex align-items-center vis-navHeadRight">
-                        <div class="vis-navSearchWrap">
-                            <div class="input-group">
-                                @*<input type="text" class="form-control" id="vis_menuSearch" name="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes">*@
-                                <datalist id="vis_leafNodes">
-                                    @foreach (var item in ViewBag.Menu.GetLeafNodes())
-                                    {
-                                        <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
-                                    }
-                                </datalist>
-                                @*<div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <i class="vis vis-search"></i>
-                                        </span>
-                                    </div>*@
-                            </div>
-                        </div>
-                        <div class="vis-navFilterIco">
-                            @*<i class="fa fa-filter"></i>*@
-                            <a href="javascript:void(0)" id="vis_filterMenu" title="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Filter")" class="fa fa-filter"></a>
-                            <span style="display:none" class="vis vis-cross vis-removeFilter"></span>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="vis-mbilemenu-search">
-                    <div class="vis-navSearchWrap" style="    background: no-repeat;">
-                        <div class="input-group">
-                            <input type="text" class="form-control ui-autocomplete-input" id="vis_menuSearch" name="vis_menuSearch" placeholder="Search" list="vis_leafNodes" autocomplete="off">
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    <i class="vis vis-search vis-mbilemenu-search-icon"></i>
-                                </span>
-                            </div>
-                        </div>
+            <div id="vis_mainMenu" class="VIS-nm-dashboard-flyout d-flex flex-column vis-navMainWrapMobile" style="display: none !important; width:160px;">
+                <div class="vis-nm-searchOuter">
+                    <div class="VIS-nm-dasboard-search">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <input type="text" class="form-control" id="vis_menuSearch" name="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes">
+                        <datalist id="vis_leafNodes">
+                            @foreach (var item in ViewBag.Menu.GetLeafNodes())
+                            {
+                                <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
+                            }
+                        </datalist>
                     </div>
                 </div>
-                <div class="vis-sidebarMenuWrapper">
-                    <div id="vis_divTree" class="vis-css-treeview vis-css-menu">
-                        @Html.Raw(@ViewBag.TreeHtml)
-                    </div>
+                <div id="vis_divTree" class="VIS-nm-menu-links mt-3 d-flex vis-navContentWrap">
+                    @Html.Raw(@ViewBag.TreeHtml)
                 </div>
             </div>
-        }
-        else
-        {
-            if (ViewBag.Menu != null)
-            {
-                <div id="vis_mainMenu" class="d-flex flex-column vis-navMainWrap" style="display: none !important">
+
+            // Old Mobile Menu
+
+
+            @*<div id="vis_mainMenu" class="vis-mainMenu" style="display: none">
                     <div class="d-flex align-items-center vis-navHeadWrap" style="display: none">
                         <h5 class="m-0 vis-menu-headerName">@ViewBag.Menu.GetRootNode().Text</h5>
                         <div class="d-flex align-items-center vis-navHeadRight">
                             <div class="vis-navSearchWrap">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="vis_menuSearch" name="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes">
                                     <datalist id="vis_leafNodes">
                                         @foreach (var item in ViewBag.Menu.GetLeafNodes())
                                         {
                                             <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
                                         }
                                     </datalist>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <i class="vis vis-search"></i>
-                                        </span>
-                                    </div>
                                 </div>
                             </div>
                             <div class="vis-navFilterIco">
-                                @*<i class="fa fa-filter"></i>*@
                                 <a href="javascript:void(0)" id="vis_filterMenu" title="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Filter")" class="fa fa-filter"></a>
                                 <span style="display:none" class="vis vis-cross vis-removeFilter"></span>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="vis_divTree" class="d-flex vis-navContentWrap">
+                    </div>
+                    <div class="vis-mbilemenu-search">
+                        <div class="vis-navSearchWrap" style="    background: no-repeat;">
+                            <div class="input-group">
+                                <input type="text" class="form-control ui-autocomplete-input" id="vis_menuSearch" name="vis_menuSearch" placeholder="Search" list="vis_leafNodes" autocomplete="off">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="vis vis-search vis-mbilemenu-search-icon"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vis-sidebarMenuWrapper">
+                        <div id="vis_divTree" class="vis-css-treeview vis-css-menu">
+                            @Html.Raw(@ViewBag.TreeHtml)
+                        </div>
+                    </div>
+                </div>*@
+            // Old Mobile Menu End
+        }
+        else
+        {
+            if (ViewBag.Menu != null)
+            {
+                <div id="vis_mainMenu" class="VIS-nm-dashboard-flyout d-flex flex-column vis-navMainWrap" style="display: none !important">
+                    <div class="vis-nm-searchOuter">
+                        <div class="VIS-nm-dasboard-search">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                            @*<input type="text" placeholder="Search">*@
+                            <input type="text" class="form-control" id="vis_menuSearch" name="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes">
+                            <datalist id="vis_leafNodes">
+                                @foreach (var item in ViewBag.Menu.GetLeafNodes())
+                                {
+                                    <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
+                                }
+                            </datalist>
+                        </div>
+                    </div>
+                    <div id="vis_divTree" class="VIS-nm-menu-links mt-3 d-flex vis-navContentWrap">
                         @Html.Raw(@ViewBag.TreeHtml)
                     </div>
-
-                    @*<datalist id="vis_leafNodes">
-                            @foreach (var item in ViewBag.Menu.GetLeafNodes())
-                            {
-                                <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
-                            }
-                        </datalist>*@
-
-
                 </div>
 
 
+                //Old Menu Start
+
+                @*<div id="vis_mainMenu" class="d-flex flex-column vis-navMainWrap" style="display: none !important">
+                        <div class="d-flex align-items-center vis-navHeadWrap" style="display: none">
+                            <h5 class="m-0 vis-menu-headerName">@ViewBag.Menu.GetRootNode().Text</h5>
+                            <div class="d-flex align-items-center vis-navHeadRight">
+                                <div class="vis-navSearchWrap">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="vis_menuSearch" name="vis_menuSearch" placeholder="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Search")" list="vis_leafNodes">
+                                        <datalist id="vis_leafNodes">
+                                            @foreach (var item in ViewBag.Menu.GetLeafNodes())
+                                            {
+                                                <option data-action='@item.ActionIndicator' data-actionid="@item.ActionID" title='@item.ID' value='@item.Name'></option>
+                                            }
+                                        </datalist>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="vis vis-search"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="vis-navFilterIco">
+                                    <a href="javascript:void(0)" id="vis_filterMenu" title="@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Filter")" class="fa fa-filter"></a>
+                                    <span style="display:none" class="vis vis-cross vis-removeFilter"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="vis_divTree" class="d-flex vis-navContentWrap">
+                            @Html.Raw(@ViewBag.TreeHtml)
+                        </div>
+
+
+                    </div>*@
+
+                //Old Menu END
 
                 @*<div id="vis_mainMenu" class="vis-mainMenu" style="display: none">
                         <div class="vis-menuTitle">
@@ -267,6 +298,7 @@
             }
         }
 
+
         <div id="vis_menuOverlay" class="vis-app-overlay" style="display:none">
         </div> <!-- App Main Menu END -->
         <!-- App Main Section -->
@@ -280,8 +312,8 @@
 
             <!-- App Main Conatiner -->
             <div id="vis_mainConatiner" class="vis-app-section-main">
-                <div id="vis_busyGrid" class="full-height-div busy">
-                    <img src="~/Areas/VIS/Images/logo.jpg" />
+                <div id="vis_busyGrid" class="full-height-div busy" style="width:100%;text-align:center !important;align-content:center">
+                    <img src="~/Areas/VIS/Images/onfinity-logo.png" />
                     <span>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Loading")</span>
                 </div>
                 <!-- App Home Div -->
@@ -298,19 +330,21 @@
             @*taskbar div*@
             <div class="vis-app-footer-c">
                 <div class="vis-app-footer-c-l">
-                    <ul id="vis_taskbar" class="vis-app-f-taskbar">
-                        <li id="vis_lhome" style="display: none">
+                    <ul id="vis_taskbar" class="vis-app-f-taskbar vis-footer-ui-fix">
+                        <li id="vis_lhome" class="vis-footer-home-fix" style="display: none;">
                             @*<img src="~/Areas/VIS/Images/base/icon-home.png" style="vertical-align: text-top;" />*@
-                            <span class="vis vis-home"></span>
+                            <span class="vis vis-dashboard"></span>
                             <a>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Home")</a>
                         </li>
-                        <li id="vis_lhome2" style="display: none">
+                        <li id="vis_lhome2" style="display: none; position: absolute; left: 0;">
                             @*<img src="~/Areas/VIS/Images/base/icon-home.png" style="vertical-align: text-top;" />*@
-                            <span class="vis vis-home"></span>
+                            <span class="vis vis-dashboard"></span>
                             <a>@VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "Home2")</a>
                         </li>
 
                     </ul>
+                </div>
+                <div class="vis-app-footer-c-r1">
                 </div>
                 <div class="vis-app-footer-c-r">
                 </div>
@@ -347,6 +381,8 @@
         <script src="http://www.geoplugin.net/javascript.gp" type="text/javascript"></script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/globalize.js"></script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/cultures/@String.Format("globalize.culture.{0}.js", ((String)ViewBag.culture).Replace("_", "-"))"></script>
+        <script src="~/Areas/ViennaBase/Scripts/chart.min.js"></script>
+        <script src="~/Areas/ViennaBase/Scripts/chartjs-plugin-datalabels.min.js"></script>
         <script>
             VIS.VApp.init(); //Initlize App ()
         </script>
@@ -355,15 +391,83 @@
 else //Login Page
 {
     <div class="loginConatiner">
-        <div id="loginPanel">
+        <div id="loginPanel" class="loginform">
             @Html.Partial("_Login")
         </div>
-        <div id="login2Panel">
+        <div id="login2Panel" class="loginform">
             @Html.Partial("_Login2")
+        </div>
+        <div class="logindyn">
+            <object style="width:100%;height:100%" data="@ViewBag.LoginPageUrl">
+                <style>
+                    .prefix-login-container {
+                        height: 100%;
+                        width: 100%;
+                        display: flex;
+                        position: absolute;
+                        background-image: url('../Areas/VIS/WebPages/login-form/images/form-bg.png');
+                        background-size: cover;
+                    }
+
+                    .prefix-whitebox {
+                        background-color: rgba(var(--v-c-on-primary), 0.8);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                    }
+
+
+
+                    .prefix-form-group-col {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.875rem;
+                    }
+
+                    .prefix-form-col {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        border-bottom: 1px solid rgba(var(--v-c-secondary), 1);
+                        padding: 0 0 0.5rem;
+                    }
+
+
+                    .prefix-poweredby-col {
+                        position: absolute;
+                        right: 1.5rem;
+                        bottom: 1.5rem;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.3rem;
+                    }
+
+                    .prefix-poweredbyTxt {
+                        font-size: 0.875rem;
+                    }
+                </style>
+                <div class="prefix-login-container">
+                    <div class="prefix-whitebox">
+                        <!--right pane-->
+                        <div class="prefix-poweredby-col">
+                            <div class="prefix-poweredbyTxt"></div>
+                            <img src="Areas/VIS/WebPages/login-form/images/onfinity-logo.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </object>
         </div>
     </div>
 
     @section scripts {
+        <script>
+             var isStep2Validate = @Html.Raw(Json.Encode(TempData["isStep2Validate"]));
+             var ModelData = @Html.Raw(Json.Encode(TempData["ModelData"]));
+             if (isStep2Validate) {
+                 $("#loginPanel").hide();
+             }
+        </script>
         <link type="text/css" href="~/Areas/VIS/Content/Login.css" rel="stylesheet" />
         <script type="text/javascript">  var contextUrl = '@Url.Content("~/")'  </script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/globalize.js"></script>

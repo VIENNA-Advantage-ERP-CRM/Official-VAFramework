@@ -71,6 +71,12 @@ namespace VIS.Models
             set;
         }
 
+        public String FontStyle
+        {
+            get;
+            set;
+        }
+
         public byte[] IconBytes
         {
             get;

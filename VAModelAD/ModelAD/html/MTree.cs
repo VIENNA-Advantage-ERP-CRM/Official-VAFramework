@@ -21,6 +21,7 @@ using VAdvantage.DataBase;
 using VAdvantage.Logging;
 using VAdvantage.Utility;
 using VAModelAD.Model;
+using System.Linq;
 //using VAdvantage.StartMenu;
 
 
@@ -779,11 +780,11 @@ namespace VAdvantage.Model
                     sqlNode.Append("SELECT AD_Menu.AD_Menu_ID, AD_Menu.Name,AD_Menu.Description,AD_Menu.IsSummary,AD_Menu.Action, "
                         + "AD_Menu.AD_Window_ID, AD_Menu.AD_Process_ID, AD_Menu.AD_Form_ID, AD_Menu.AD_Workflow_ID, AD_Menu.AD_Task_ID, AD_Menu.AD_Workbench_ID, "
 
-                        + " NVL(img.FontName,img.ImageURL) as Image, AD_Menu.IsSetting FROM AD_Menu AD_Menu");
+                        + " NVL(img.FontName,img.ImageURL) as Image, AD_Menu.IsSetting, img.FontStyle FROM AD_Menu AD_Menu");
                 else
                     sqlNode.Append("SELECT AD_Menu.AD_Menu_ID,  t.Name,t.Description,AD_Menu.IsSummary,AD_Menu.Action, "
                         + "AD_Menu.AD_Window_ID, AD_Menu.AD_Process_ID, AD_Menu.AD_Form_ID, AD_Menu.AD_Workflow_ID, AD_Menu.AD_Task_ID, AD_Menu.AD_Workbench_ID, "
-                        + " NVL(img.FontName,img.ImageURL) as Image, AD_Menu.IsSetting FROM AD_Menu AD_Menu JOIN  AD_Menu_Trl t ON AD_Menu.AD_Menu_ID=t.AD_Menu_ID ");
+                        + " NVL(img.FontName,img.ImageURL) as Image, AD_Menu.IsSetting, img.FontStyle FROM AD_Menu AD_Menu JOIN  AD_Menu_Trl t ON AD_Menu.AD_Menu_ID=t.AD_Menu_ID ");
 
                 if (!baseLang)
                 {
@@ -1036,8 +1037,10 @@ namespace VAdvantage.Model
             //sql.Append(" ORDER BY COALESCE(tn.Parent_ID, -1), tn.SeqNo");
             if (orderClause == "")
             {
-
-                sqls += " ORDER BY COALESCE(tn.Parent_ID, -1), tn.SeqNo, Upper(" + tblName + ".Name)";
+                if (tblName.ToLower() == "ad_menu")
+                    sqls += " ORDER BY COALESCE(tn.Parent_ID, -1), AD_Menu.IsSummary, tn.SeqNo, Upper(" + tblName + ".Name)";
+                else
+                    sqls += " ORDER BY COALESCE(tn.Parent_ID, -1), tn.SeqNo, Upper(" + tblName + ".Name)";
             }
             else
             {
@@ -1314,7 +1317,7 @@ namespace VAdvantage.Model
                     bool isSummary = "Y".Equals(dr[index++].ToString());
                     string actionColor = dr[index++].ToString().Trim();
                     //	Menu only
-                    if (GetTreeType().Equals(TREETYPE_Menu) && !isSummary)
+                    if (GetTreeType().Equals(TREETYPE_Menu))// && !isSummary)
                     {
                         AD_Window_ID = Utility.Util.GetValueOfInt(dr[index]);
                         index++;
@@ -1351,6 +1354,16 @@ namespace VAdvantage.Model
                                 name, description, Parent_ID, isSummary,
                                 actionColor, onBar);	//	menu has no color
                         }
+
+                        if (isSummary)
+                        {
+
+                            retValue.Image = Utility.Util.GetValueOfString(dr["Image"]);
+
+                            retValue.FontStyle = Utility.Util.GetValueOfString(dr["FontStyle"]);
+
+                            retValue.IsSetting = Utility.Util.GetValueOfString(dr["IsSetting"]) == "Y";
+                        }
                     }
                     else
                     {
@@ -1365,14 +1378,15 @@ namespace VAdvantage.Model
                         retValue = new VTreeNode(Node_ID, seqNo,
                                     name, description, Parent_ID, isSummary,
                                     actionColor, onBar);
-                        if (GetTreeType().Equals(TREETYPE_Menu))
-                        {
 
+                        if (GetTreeType().Equals(TREETYPE_Menu) && isSummary)
+                        {
                             retValue.Image = Utility.Util.GetValueOfString(dr["Image"]);
+
+                            retValue.FontStyle = Utility.Util.GetValueOfString(dr["FontStyle"]);
 
                             retValue.IsSetting = Utility.Util.GetValueOfString(dr["IsSetting"]) == "Y";
                         }
-
                     }
                     break;
                 }
@@ -1418,6 +1432,26 @@ namespace VAdvantage.Model
                     }
 
                     en = ((VTreeNode)tn).preorderEnumeration();
+                }
+                else
+                {
+                    // Check for first Level summary nodes if it doesn't contain any summary node then remove app from menu
+                    if (node.Level == 1 && node.IsSummary)
+                    {
+                        if (tn == node)
+                            continue;
+                        TreeNodeCollection nodeDetails = node.Nodes;
+                        var hasSummaryNode = nodeDetails.Cast<VTreeNode>().Any(nd => nd.IsSummary);
+                        if (!hasSummaryNode)
+                        {
+                            tn.Nodes.Remove(node);
+                        }
+                        //if (barNodes.Contains(node))
+                        //{
+                        //    barNodes.Remove(node);
+                        //}
+                        //en = ((VTreeNode)tn).preorderEnumeration();
+                    }
                 }
             }
 

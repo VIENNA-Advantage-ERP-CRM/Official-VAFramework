@@ -48,6 +48,10 @@ namespace VAdvantage.Model
         public const bool SQL_RW = true;
         //	Access SQL Read Only		*/
         public const bool SQL_RO = false;
+        //	Access SQL Read Only		*/
+        public const bool SQL_ORGRO = false;
+        //	Access SQL Read write		*/
+        public const bool SQL_ORGRW = true;
         //	Access SQL Fully Qualified	
         public const bool SQL_FULLYQUALIFIED = true;
         //	Access SQL Not Fully Qualified	
@@ -189,8 +193,8 @@ namespace VAdvantage.Model
             if (reload || role == null || role.GetAD_Role_ID() != AD_Role_ID
             || role.GetAD_User_ID() != AD_User_ID)
             {
-               if( s_cache.ContainsKey(AD_Role_ID))
-                s_cache.Remove(AD_Role_ID);
+                if (s_cache.ContainsKey(AD_Role_ID))
+                    s_cache.Remove(AD_Role_ID);
                 lock (_lock)
                 {
                     role = (MRole)s_cache.Get(AD_Role_ID);
@@ -742,7 +746,8 @@ namespace VAdvantage.Model
             string ADProcessAccessID = "";
             string ADFormAccessID = "";
             string ADWorkflowAccessID = "";
-
+            //Changes done to Assign Access to widget while creating/Updating Admin role
+            string ADWidgetAccessID = "";
             if (MSysConfig.IsNativeSequence(false))
             {
                 //Get Next sequence No
@@ -750,6 +755,8 @@ namespace VAdvantage.Model
                 ADProcessAccessID = DB.IsOracle() ? "AD_Process_Access_seq.nextval" : "nextval('AD_Process_Access_seq')";
                 ADFormAccessID = DB.IsOracle() ? "AD_Form_Access_seq.nextval" : "nextval('AD_Form_Access_seq')";
                 ADWorkflowAccessID = DB.IsOracle() ? "AD_Workflow_Access_seq.nextval" : "nextval('AD_Workflow_Access_seq')";
+                //Changes done to Assign Access to widget while creating/Updating Admin role
+                ADWidgetAccessID = DB.IsOracle() ? "AD_Widget_Access_seq.nextval" : "nextval('AD_Widget_Access_seq')";
             }
             else
             {
@@ -777,6 +784,12 @@ namespace VAdvantage.Model
                 count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
                 count = DB.GetNextID(GetCtx(), "AD_Workflow_Access", null, count) - 1;
                 ADWorkflowAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Workflow_ID) + " + count + ")";
+
+                //Changes done to Assign Access to widget while creating/Updating Admin role
+                qry = "SELECT COUNT(AD_Widget_ID) FROM AD_Widget WHERE AD_Client_ID=0";
+                count = Util.GetValueOfInt(DB.ExecuteScalar(qry));
+                count = DB.GetNextID(GetCtx(), "AD_Widget_Access", null, count) - 1;
+                ADWidgetAccessID = "(ROW_NUMBER() OVER (ORDER BY AD_Widget_ID) + " + count + ")";
             }
 
             String roleClientOrgUser = GetAD_Role_ID() + ","
@@ -815,6 +828,15 @@ namespace VAdvantage.Model
                 + "SELECT " + ADWorkflowAccessID + ", w.AD_Workflow_ID, " + roleClientOrgUser
                 + "FROM AD_Workflow w "
                 + "WHERE AccessLevel IN ";
+
+            //Changes done to Assign Access to widget while creating/Updating Admin role
+            String sqlWidget = "INSERT INTO AD_Widget_Access "
+                + "(AD_Widget_Access_ID,AD_Widget_ID, AD_Role_ID,"
+                + " AD_Client_ID,AD_Org_ID,IsActive,Created,CreatedBy,Updated,UpdatedBy) "
+                + "SELECT " + ADWidgetAccessID + ", w.AD_Widget_ID, " + GetAD_Role_ID() + ","
+                + GetAD_Client_ID() + "," + GetAD_Org_ID() + ",'Y', SysDate,"
+                + GetUpdatedBy() + ", SysDate," + GetUpdatedBy()
+                + " FROM AD_Widget w  WHERE AD_Client_ID=0";
 
             //String sqlWindow = "INSERT INTO AD_Window_Access "
             //    + "(AD_Window_ID, AD_Role_ID,"
@@ -861,6 +883,10 @@ namespace VAdvantage.Model
             int wfDel = DataBase.DB.ExecuteQuery("DELETE FROM AD_Workflow_Access" + whereDel, null, Get_TrxName());
             int wf = DataBase.DB.ExecuteQuery(sqlWorkflow + roleAccessLevel, null, Get_TrxName());
 
+            //Changes done to Assign Access to widget while creating/Updating Admin role
+            int widDel = DataBase.DB.ExecuteQuery("DELETE FROM AD_Widget_Access" + whereDel, null, Get_TrxName());
+            int widf = DataBase.DB.ExecuteQuery(sqlWidget, null, Get_TrxName());
+
             // called function to add Document action access
             string daAccess = AddDocActionAccess();
 
@@ -868,6 +894,7 @@ namespace VAdvantage.Model
                 + ", AD_Process_ID=" + procDel + "+" + proc
                 + ", AD_Form_ID=" + formDel + "+" + form
                 + ", AD_Workflow_ID=" + wfDel + "+" + wf
+                + ", AD_Widget_ID=" + widDel + "+" + widf
                 + daAccess);
 
             LoadAccess(true);
@@ -875,6 +902,7 @@ namespace VAdvantage.Model
                 + " -  @AD_Process_ID@ #" + proc
                 + " -  @AD_Form_ID@ #" + form
                 + " -  @AD_Workflow_ID@ #" + wf
+                + " -  @AD_Widget_ID@ #" + widf
                 + daAccess;
 
         }
@@ -1985,6 +2013,15 @@ namespace VAdvantage.Model
             return 0;
         }
 
+        public string AddAccessSQL(string inSql, string TableNameIn,
+                                   bool fullyQualified, bool rw)
+        {
+           return AddAccessSQL(inSql, TableNameIn,
+                                     fullyQualified, rw, rw);
+        }
+
+
+
         /// <summary>
         /// Add AccessSql Where Clause to sql query
         /// </summary>
@@ -1994,7 +2031,7 @@ namespace VAdvantage.Model
         /// <param name="rw">if false, includes System Data</param>
         /// <returns></returns>
         public string AddAccessSQL(string inSql, string TableNameIn,
-                                    bool fullyQualified, bool rw)
+                                    bool fullyQualified, bool rw,bool rwOrg)
         {
             if (fullyQualified && Util.IsEmpty(TableNameIn))
                 fullyQualified = false;
@@ -2053,14 +2090,36 @@ namespace VAdvantage.Model
                 retSQL.Append(tableName).Append(".");
             retSQL.Append(GetClientWhere(rw));
 
-            //	Org Access
-            if (!IsAccessAllOrgs())
+
+            ////new enhacement Filter data accroding to Filtered Org value in Context
+            //if (!string.IsNullOrEmpty(GetCtx().GetContext("AD_FilteredOrg")))
+            //{
+            //    retSQL.Append(" AND ");
+            //    retSQL.Append("COALESCE(");
+
+            //    if (fullyQualified && !Util.IsEmpty(tableName))
+            //        retSQL.Append(tableName + ".");
+            //    retSQL.Append("AD_Org_ID,0) IN(").Append(GetCtx().GetContext("AD_FilteredOrg")).Append(")");
+            //}
+            //else if (!IsAccessAllOrgs())
+            //{
+            //    retSQL.Append(" AND ");
+            //    if (fullyQualified && !Util.IsEmpty(tableName))
+            //        retSQL.Append(GetOrgWhere(tableName, rw, mainTableName));
+            //    else
+            //        retSQL.Append(GetOrgWhere(null, rw, mainTableName));
+            //}
+
+            //AppendOrg
+            string orgWhereSql = "";
+            if (fullyQualified && !Util.IsEmpty(tableName))
+                orgWhereSql = GetOrgWhere(tableName, rwOrg, mainTableName);
+            else
+                orgWhereSql = GetOrgWhere(null, rwOrg, mainTableName);
+
+            if(!string.IsNullOrEmpty(orgWhereSql))
             {
-                retSQL.Append(" AND ");
-                if (fullyQualified && !Util.IsEmpty(tableName))
-                    retSQL.Append(GetOrgWhere(tableName, rw, mainTableName));
-                else
-                    retSQL.Append(GetOrgWhere(null, rw, mainTableName));
+                retSQL.Append(" AND ").Append(orgWhereSql);
             }
 
             if (IsUseBPRestrictions())
@@ -2115,7 +2174,7 @@ namespace VAdvantage.Model
                 keyColumnName += TableName + "_ID";	//	derived from table
 
                 // log.Fine("addAccessSQL - " + TableName + "(" + AD_Table_ID + ") " + keyColumnName);
-                string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rw);
+                string recordWhere = GetRecordWhere(AD_Table_ID, keyColumnName, rwOrg);
                 if (recordWhere.Length > 0)
                 {
                     retSQL.Append(" AND ").Append(recordWhere);
@@ -2565,20 +2624,46 @@ namespace VAdvantage.Model
 	 */
         public String GetOrgWhere(String tableName, bool rw, string mainTableName)
         {
-            if (IsAccessAllOrgs())
+            //Check for filtered Org
+            bool isFiltredOrg = !string.IsNullOrEmpty(GetCtx().GetContext("#AD_FilteredOrg"));
+
+            if (IsAccessAllOrgs() && !isFiltredOrg)
                 return null;
-            LoadOrgAccess(false);
-            // Unique Strings
             List<String> set = new List<string>();
-            if (!rw)
-                set.Add("0");
-            // Positive List
-            for (int i = 0; i < _orgAccess.Length; i++)
+
+            if (!isFiltredOrg)
             {
+                LoadOrgAccess(false);
+                // Unique Strings
+
                 if (!rw)
-                    set.Add(_orgAccess[i].AD_Org_ID.ToString());
-                else if (!_orgAccess[i].readOnly) // rw
-                    set.Add(_orgAccess[i].AD_Org_ID.ToString());
+                    set.Add("0");
+                // Positive List
+                for (int i = 0; i < _orgAccess.Length; i++)
+                {
+                    if (!rw)
+                        set.Add(_orgAccess[i].AD_Org_ID.ToString());
+                    else if (!_orgAccess[i].readOnly) // rw
+                        set.Add(_orgAccess[i].AD_Org_ID.ToString());
+                }
+            }
+            else
+            {
+                 set = GetCtx().GetContext("#AD_FilteredOrg").Split(',').ToList();
+                if (!rw) //both 
+                {
+                    if (!set.Contains("0")) // add if rw false
+                    {
+                        set.Add("0");
+                    }
+                }
+                //else
+                //{
+                //    if (set.Contains("0") && Util.GetValueOfInt(GetCtx().GetContext("#AD_Org_ID"))>0)
+                //    {
+                //        set.Remove("0");
+                //    }
+                //}
             }
             //
             if (set.Count == 1)

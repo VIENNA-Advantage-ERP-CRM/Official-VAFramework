@@ -11,4 +11,5 @@ import "../F20/apanel.js";
 import "../F20/acontentpane.js";
 import "../F20/afilterpanel.js";
 import "../F20/themecnfgtr.js";
-import "../F20/atabdialog.js"
+import "../F20/atabdialog.js";
+import "../F20/vlandingpage.js";

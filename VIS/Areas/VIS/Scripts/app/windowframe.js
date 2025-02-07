@@ -2493,7 +2493,7 @@
     APanel.prototype.initPanel = function (jsonData, query, $parent, goSingleRow, sel) {
 
         this.$parentWindow = $parent;
-        var gridWindow = new VIS.GridWindow(jsonData);
+        var gridWindow = new VIS.GridWindow(jsonData,null);
         this.gridWindow = gridWindow; //ref to call dispose
         //this.setWidth(gridWindow.getWindowWidth());
         this.createToolBar(); // Init ToolBar
@@ -4824,7 +4824,7 @@
 
     APanel.prototype.cmd_finddialog = function () {
 
-        var find = new VIS.Find(this.curWindowNo, this.curTab, 0);
+        var find = new VIS.Find(this.curWindowNo, this.curTab, 0,null);
         var self = this;
         var savedSearchName = "";
         find.onClose = function () {
@@ -5257,8 +5257,14 @@
         return true;
     };
 
-    VIS.VTabbedPane.prototype.restoreTabChange = function () {
+    VIS.VTabbedPane.prototype.restoreTabChange = function (currentTabIndex) {
         this.oldTabIndex = -1;
+        if (currentTabIndex) {
+            this.oldLastTabIndex = currentTabIndex;
+        } else {
+            this.oldLastTabIndex = -1;
+        }
+        
     }
 
     /**
@@ -5272,6 +5278,9 @@
      */
     VIS.VTabbedPane.prototype.getSelectedIndex = function () {
         return this.oldTabIndex;
+    };
+    VIS.VTabbedPane.prototype.getSelectedOldIndex = function () {
+        return this.oldLastTabIndex;
     };
 
     VIS.VTabbedPane.prototype.sizeChanged = function (height, width) {

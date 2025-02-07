@@ -73,6 +73,8 @@
      *	@return true if started
      */
     AForm.prototype.openForm = function (json, $parent, windowNo, additionalInfo) {
+        this.log.info("Form Name= " + json.Name + ", Class=" + className);
+        this.ctx.setWindowContext(windowNo, "WindowName", json.DisplayName);
 
         if (json.IsReport) {
             VIS.ADialog.info("Form Report is not supported");
@@ -138,8 +140,10 @@
         return true;
     };
 
-    AForm.prototype.openWidget = function (className, windowNo, widgetInfo) {
+    AForm.prototype.openWidget = function (className, windowNo, widgetInfo) {      
+
         try {
+
             var type = "";
             this.widgetInfo = widgetInfo;
             var isReact = className.split('.');
@@ -187,8 +191,6 @@
             this.parent.hideHeader(hide);
     };
 
-
-
     AForm.prototype.hideCloseIcon = function (hide) {
         if (this.parent)
             this.parent.hideCloseIcon(hide);
@@ -198,6 +200,12 @@
         this.setSize(height);
         if (this.mPanel && this.mPanel.sizeChanged) {
             this.mPanel.sizeChanged(height, width);
+        }
+    };
+
+    AForm.prototype.refreshWidget = function () {
+        if (this.mPanel && this.mPanel.refreshWidget) {
+            this.mPanel.refreshWidget();
         }
     };
 
@@ -213,8 +221,6 @@
             this.mPanel.addChangeListener(e);
         }
     }
-
-
 
     /**
     * 	dispose
@@ -237,13 +243,6 @@
 
         this.disposeComponent();
     };
-
-
-
-
-
-
-
 
     // global assignment
     VIS.AForm = AForm;

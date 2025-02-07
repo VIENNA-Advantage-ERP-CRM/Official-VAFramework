@@ -75,9 +75,9 @@ namespace VIS.Helpers
 
             sql.Append(" WHERE o.AD_Client_ID = 0 AND o.IsActive ='Y' AND o.IsChild = 'N' ");
 
-            sql.Append(@"AND (o.AD_Window_ID IS NULL OR EXISTS (SELECT * FROM Ad_Window_Access w WHERE w.AD_Window_ID=o.AD_Window_ID AND w.IsReadWrite='Y' AND w.IsActive='Y' AND AD_Role_ID=" + ctx.GetAD_Role_ID() + @"))
-                        AND (o.AD_Form_ID IS NULL OR EXISTS (SELECT * FROM ad_Form_access f WHERE f.ad_form_id=o.AD_Form_ID AND f.isreadwrite='Y' AND f.IsActive='Y' AND AD_Role_ID=" + ctx.GetAD_Role_ID() + @"))
-                        AND (o.AD_Process_ID IS NULL OR EXISTS (SELECT * FROM ad_process_access p WHERE p.ad_process_id=o.AD_Process_ID AND p.isreadwrite='Y' AND p.IsActive='Y' and AD_Role_ID=" + ctx.GetAD_Role_ID() + @"))");
+            sql.Append(@"AND (o.AD_Window_ID IS NULL OR EXISTS (SELECT * FROM Ad_Window_Access w WHERE w.AD_Window_ID=o.AD_Window_ID AND w.IsReadWrite='Y' AND w.IsActive='Y' AND o.AD_Window_ID IS NOT NULL AND w.AD_Role_ID=" + ctx.GetAD_Role_ID() + @"))
+                        AND (o.AD_Form_ID IS NULL OR EXISTS (SELECT * FROM ad_Form_access f WHERE f.ad_form_id=o.AD_Form_ID AND f.isreadwrite='Y' AND f.IsActive='Y' AND o.AD_Form_ID IS NOT NULL AND f.AD_Role_ID=" + ctx.GetAD_Role_ID() + @"))
+                        AND (o.AD_Process_ID IS NULL OR EXISTS (SELECT * FROM ad_process_access p WHERE p.ad_process_id=o.AD_Process_ID AND p.isreadwrite='Y' AND p.IsActive='Y' AND o.AD_Process_ID IS NOT NULL and p.AD_Role_ID=" + ctx.GetAD_Role_ID() + @"))");
             sql.Append("  ORDER BY SeqNo");
 
             IDataReader dr = null;
@@ -250,6 +250,7 @@ namespace VIS.Helpers
                         itm.HasImage = true;
                         itm.IsImageByteArray = false;
                         itm.IconUrl = img.GetFontName();
+                        itm.FontStyle = Convert.ToString(img.Get_Value("FontStyle"));
                     }
                     else if (img.GetImageURL() != null && img.GetImageURL().Length > 0)
                     {

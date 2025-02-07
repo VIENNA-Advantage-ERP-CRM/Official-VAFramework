@@ -1,0 +1,219 @@
+﻿.VIS-template-excel-block {
+    padding: 10px;
+}
+
+    .VIS-template-excel-block h6 {
+        cursor: pointer;
+    }
+
+        .VIS-template-excel-block h6:hover {
+            text-decoration: underline;
+        }
+
+.VIS-excelItemsBlock {
+    padding: 5px 4px;
+}
+
+    .VIS-excelItemsBlock.VIS-noExcelData {
+        text-align: center;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3em;
+        letter-spacing: -0.3px;
+        flex-direction: column;
+    }
+
+    .VIS-excelItem {
+        align-items: center;
+        border: 2px solid #d3d3d3a1;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 14px 14px 10px;
+    }
+    .VIS-excelItem:last-child{
+        margin-bottom: 0px;
+    }
+    button.VIS-excelDownloadBtn {
+        background: none;
+        border: none;
+        padding: 0;
+        transition: all 0.3s ease-in-out;
+        margin-right: 10px;
+    }
+    button.VIS-excelDownloadBtn:hover {
+        color: rgba(var(--v-c-primary), 1);
+    }
+.ui-widget.ui-widget-content .VIS-excelItemsBlock button:focus {
+    box-shadow: none !important;
+}
+
+
+.vis-downloadFile-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.5em;
+}
+
+    .vis-downloadFile-col .vis {
+        font-size: 2.2em;
+        color: rgba(var(--v-c-primary), 1);
+    }
+
+    .vis-downloadFile-col a {
+        font-size: 0.875em;
+        color: rgba(var(--v-c-primary), 1);
+        text-decoration: underline;
+        text-align: center;
+    }
+
+.vis-downloadwidgeticonsize {
+    font-size: 30px;
+}
+.vis-downloadwidgetpopupiconsize {
+    font-size: 29px;
+
+}
+
+.VIS-excelItem .excelFileName i {
+    font-size: 24px;
+    margin-right: 13px;
+    color: rgba(var(--v-c-primary),1);
+}
+
+    .VIS-excelItem .excelFileName i.VIS-excelItem-pdfIcon {
+        color: #ff0000;
+    }
+
+    .VIS-excelItem .excelFileName i.VIS-excelItem-excelIcon {
+        color: #008000;
+    }
+
+.VIS-excelItem span.excelFileName {
+    font-size: 17px;
+    letter-spacing: -0.3px;
+    display: flex;
+}
+
+
+.VIS-excelItems-block .excelFileDesc {
+    width: calc(100% - 40px);
+    margin-top: 7px;
+    line-height: 20px;
+}
+
+.VIS-excelItem .excelFileName i.vis.vis-doc-word {
+    color: rgb(0, 0, 255);
+}
+
+.VIS-excelItemsBlock i.fa.fa-exclamation-triangle {
+    font-size: 2em;
+    margin-bottom: 3px;
+}
+
+
+.VIS-noDocFound {
+    align-items: center;
+    /*background: rgba(var(--v-c-on-secondary), .07);*/
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    width: 300px;
+}
+
+    .VIS-noDocFound img {
+        max-width: 100px;
+        margin-bottom: 15px;
+        opacity: 0.4;
+    }
+
+
+@media screen and (max-width: 1366px) {
+    .vis-downloadFile-col {
+        font-size: 13px;
+    }
+
+    .vis-editModeWidget .vis-downloadFile-col {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .vis-downloadFile-col {
+        font-size: 12px;
+    }
+
+    .vis-editModeWidget .vis-downloadFile-col {
+        font-size: 10px;
+    }
+}
+
+@media screen and (max-width:900px) {
+    .vis-downloadFile-col {
+        font-size: 14px;
+    }
+
+    .vis-editModeWidget .vis-downloadFile-col {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .vis-downloadFile-col {
+        font-size: 13px;
+    }
+
+    .vis-editModeWidget .vis-downloadFile-col {
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .vis-downloadFile-col {
+        font-size: 16px;
+    }
+
+    .vis-editModeWidget .vis-downloadFile-col {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .vis-downloadFile-col {
+        font-size: 15px;
+    }
+
+    .vis-editModeWidget .vis-downloadFile-col {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .vis-downloadFile-col {
+        font-size: 14px;
+    }
+
+    .vis-editModeWidget .vis-downloadFile-col {
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .vis-downloadFile-col {
+        font-size: 12px;
+    }
+
+    .vis-editModeWidget .vis-downloadFile-col {
+        font-size: 10px;
+    }
+}

@@ -199,13 +199,13 @@
     /**
      *	Window Model
      */
-    function GridWindow(json) {
-
+    function GridWindow(json,apanel) {
+        this.apanel = apanel;
         this.vo = json._vo;
 
         this.tabs = [];
         for (var i = 0; i < json._tabs.length; i++) {
-            var gridTab = new VIS.GridTab(json._tabs[i], this.vo);
+            var gridTab = new VIS.GridTab(json._tabs[i], this.vo, apanel);
             gridTab.setGridWindow(this);
             this.tabs.push(gridTab);
         }
@@ -394,6 +394,17 @@
     GridWindow.prototype.getIsHideActionbar = function () {
         return this.vo.IsHideActionbar;
     }
+    GridWindow.prototype.getIsLandingPage = function () {
+        return this.vo.IsLandingPage;
+    }
+
+    GridWindow.prototype.getIsDependentInDetailView = function () {
+        return this.vo.IsDependentInDetailView;
+    }
+
+    GridWindow.prototype.getIsAssignRecord = function () {
+        return this.vo.IsAssignRecord;
+    }
 
     GridWindow.prototype.dispose = function () {
 
@@ -434,10 +445,11 @@
  *          - Callout
  *  
  */
-    function GridTab(gTab, windowVo) {
+    function GridTab(gTab, windowVo, apanel) {
+        this.apanel = apanel;
         this.gTab = gTab;
         this.vo = gTab._vo;
-        this.gridTable = new VIS.GridTable(gTab._gridTable);
+        this.gridTable = new VIS.GridTable(gTab._gridTable,apanel);
         this.gridTable.onlyCurrentDays = this.vo.onlyCurrentDays;
         // Maintain version on approval property on tab
         this.gridTable.MaintainVerOnApproval = this.vo.MaintainVerOnApproval;
@@ -448,6 +460,8 @@
         this.depOnFieldColumn = [];
         this.depOnField = []; //Fields against columnname
         this.tabPanels = [];
+        this.tabPanelsRght = [];
+        this.tabPanelsBotm = []; //bottom aligned tab panels
         this.linkColumnName = gTab._linkColumnName;
         this.extendedWhere = gTab._extendedWhere;
         this.keyColumnName = "";
@@ -702,7 +716,17 @@
     };
 
     GridTab.prototype.getIsTPBottomAligned = function () {
-        return this.vo.TabPanelAlignment == "H";
+        // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+        return this.tabPanelsBotm.length>0;
+    };
+
+    GridTab.prototype.getIsShowBothTP = function () {
+        // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+        return this.tabPanelsBotm.length > 0 && this.tabPanelsRght.length > 0;            
+    };
+
+    GridTab.prototype.getIsTPBottomShowAll = function () {
+        return this.vo.TabPanelAlignment != "H";
     };
 
 
@@ -848,6 +872,13 @@
 
     GridTab.prototype.getIsHideRecordNav = function () {
         return this.vo.IsHideRecordNav;
+    };
+    GridTab.prototype.getIsShowFilterPanel = function () {
+        return this.vo.IsShowFilterPanel;
+    };
+
+    GridTab.prototype.getDetailViewColCount = function () {
+        return this.vo.DetailViewColCount;
     };
 
     GridTab.prototype.getIncluded_Tab_ID = function () {
@@ -1447,7 +1478,16 @@
             this.hasPanel = true;
             for (var i = 0; i < this.gTab._panels.length; i++) {
                 var gridTabPanel = new GridTabPanel(this.gTab._panels[i]);
-                this.tabPanels.push(gridTabPanel);
+                if (gridTabPanel.getIsTPBottomAligned()) {
+                    this.tabPanelsBotm.push(gridTabPanel);
+                    //if (gridTabPanel.getTabPanelAlignment() == "B") {
+                    //    this.IsTPBottomShowAll = true;
+                    //}
+                }
+                else {
+                    this.tabPanelsRght.push(gridTabPanel);
+                }
+                this.tabPanels.push(gridTabPanel); //all list
             }
         }
         else {
@@ -1514,6 +1554,12 @@
 
     GridTab.prototype.getTabPanels = function () {
         return this.tabPanels;
+    };
+    GridTab.prototype.getTabPanelsBotm = function () {
+        return this.tabPanelsBotm;
+    };
+    GridTab.prototype.getTabPanelsRght = function () {
+        return this.tabPanelsRght;
     };
 
     GridTab.prototype.validateQuery = function (query) {
@@ -1659,9 +1705,6 @@
         // return "";
     };
 
-
-
-
     GridTab.prototype.setTreeNodeID = function (nodeID) {
         this.treeNode_ID = nodeID;
         this.gridTable.treeNode_ID = nodeID;
@@ -1722,7 +1765,9 @@
 
         this.oldQuery = this.query.getWhereClause();
         this.vo.onlyCurrentDays = onlyCurrentDays;
-
+        if (this.apanel && this.apanel.getAdvanceWhere()== '') {
+            refresh = false;
+        }
         var where = "";
         if (!isVisualEdtr) //show all tab in visual editor
         {
@@ -1823,7 +1868,22 @@
             }
 
         }
-        this.extendedWhere = where.toString();
+        if (this.apanel) {
+            if (this.apanel.getFilterWhere().length > 0 && this.apanel.getAdvanceFlag()) {
+                if (where.length > 0)
+                    where += " AND ";
+                where += this.apanel.getFilterWhere();
+                this.apanel.setAdvanceFlag(false);
+            }
+            if (this.apanel.getAdvanceWhere().length > 0 && this.apanel.getFilterFlag()) {
+                if (where.length > 0)
+                    where += " AND ";
+                where += this.apanel.getAdvanceWhere();
+                this.apanel.setFilterFlag(false);
+                refresh = false;
+            }
+        }
+        this.extendedWhere = where.toString();    
         //if (this.oldCardQuery != this.cardWhereCondition) {
         //    refresh = false;
         //}
@@ -1874,6 +1934,11 @@
 
                     //var queryCode = VIS.DB.executeScalar(sqlDefaultSearch);
 
+
+                    if (this.apanel && (this.apanel.actionParams.TabWhereClause || '') != '') {
+                        queryCode = "";
+                    }
+
                     if (queryCode) {
                         if (where.length > 0) {
                             where = where + " AND " + queryCode;
@@ -1909,6 +1974,7 @@
         this.setCurrentRow(row, true);
         return record;
     };
+
     GridTab.prototype.dataRefreshAll = function () {
         /* Query */
         this.mDataStatusEvent = null; //reset 
@@ -1927,7 +1993,6 @@
 
         //log.fine("#" + m_vo.TabNo + "- fini");
     };   //  dataIgnore
-
 
     GridTab.prototype.getLinkWhereClause = function () {
         var where = "";
@@ -2051,9 +2116,6 @@
         this.IsSharedAccess();
         return retValue;
     };
-
-
-
 
     GridTab.prototype.findColumn = function (columnName) {
         return this.gridTable.findColumn(columnName);
@@ -2406,7 +2468,6 @@
     /// <author>Karan</author>
     GridTab.prototype.getCM_ChatID = function () {
 
-
         if (this.chats == null || this.chats.length == 0)
             this.loadChats();//call chat function
         if (this.chats == null)
@@ -2418,6 +2479,23 @@
         if (this.hasKey(this.chats, key)) {
             //get chat key value
             var value = VIS.Utility.Util.getValueOfInt(this.getKeyValue(this.chats, key));
+            return value;
+        }
+        return 0;
+    }
+
+    GridTab.prototype.getVIS_AssignedRecordToUser_ID = function () {
+        if (this.assignedRecord == null || this.assignedRecord.length == 0)
+            this.loadAssignedRecords();//call assign function
+        if (this.assignedRecord == null)
+            return 0;
+        //get AssignedRecordId
+        var key = this.getRecord_ID();// _gridTable.GetKeyID(CurrentRow);
+        //The given key was not present in the dictionary. Error
+       
+        if (this.hasKey(this.assignedRecord, key)) {
+            //get AssignedRecord key value
+            var value = VIS.Utility.Util.getValueOfInt(this.getKeyValue(this.assignedRecord, key));
             return value;
         }
         return 0;
@@ -2742,6 +2820,51 @@
 
     };
 
+    GridTab.prototype.loadAssignedRecords = function () {
+        //if doesn't have attachment
+        if (!this.canHaveAttachment())
+            return;//return nothing
+        //set query
+       
+        var sql = "VIS_160";
+        var param = [];
+        param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
+        var dr = null;
+        try {
+            this.assignedRecords = [];
+            if (this.assignedRecords == null)
+            //create new list for chat
+            {
+                this.assignedRecords = {};
+            }
+            else
+            //if contain chat then clear list
+            {
+                this.assignedRecords.length = 0;
+            }
+            dr = executeReader(sql, param);
+
+            var key, value, userId, createdBy;//for recordId and chatId
+            while (dr.read()) {
+                key = VIS.Utility.Util.getValueOfInt(dr.getString(1));
+                value = VIS.Utility.Util.getValueOfInt(dr.getString(0));
+                userId = VIS.Utility.Util.getValueOfInt(dr.getString(2));
+                createdBy = VIS.Utility.Util.getValueOfInt(dr.getString(3));
+                this.assignedRecords.push({
+                    ID: key, value: value, userId: userId, createdBy: createdBy
+                });
+            }
+
+            dr = null;
+        }
+        catch (e) {
+
+        };
+
+
+
+    };
+
     /// <summary>
     /// Can this tab have Attachments?.
     /// </summary>
@@ -2774,6 +2897,20 @@
 
 
         return this.hasKey(this.chats, key);//return chatId
+    };
+
+    /*assignedRecord by Rahul mittal*/
+    GridTab.prototype.hasAssignedRecord = function () {
+
+        if (this.isDataLoading)
+            return false;
+        if (this.assignedRecords == null)
+            this.loadAssignedRecords();//call load AssignRecord function
+        if (this.assignedRecords == null)
+            return false;
+       
+        var key = this.getRecord_ID();//ridTable.GetKeyID(CurrentRow);
+        return this.hasKey(this.assignedRecords, key);
     };
 
 
@@ -2994,6 +3131,9 @@
         this._subscribe = this.gTab._subscribe;
         this.viewDocument = this.gTab._documents;
         this.sharedRecords = this.gTab._sharedRec;
+
+       /* Assigned Record action panel by Rahul Mittal*/
+        this.assignedRecords = this.gTab.assignedRecords;
         //this.sharedRecordsWithLoginOrg = this.gTab._sharedWithLoginRec;
         //var tableIndex = {};
         //var ServerValues = {};
@@ -3242,7 +3382,8 @@
  *
  */
 
-    function GridTable(gTable) {
+    function GridTable(gTable, aPanel) {
+        this.aPanel = aPanel;
         this.gTable = gTable;
         this.readOnly = this.gTable._readOnly;
         this.AD_Table_ID = gTable._AD_Table_ID;
@@ -3983,6 +4124,20 @@
         var _whereClause = gt._whereClause;
 
         if (_whereClause.length > 0) {
+            if (this.aPanel) {
+
+                if (this.aPanel.getIsAdvanceSearch() && this.aPanel.getFilterWhere().length > 0 && this.aPanel.getAdvanceFlag()) {
+                    _whereClause += " AND " + this.aPanel.getFilterWhere();
+                    this.aPanel.setAdvanceFlag(false);
+
+                }
+
+                if (this.aPanel.getIsFilter() && this.aPanel.getAdvanceWhere().length > 0 && this.aPanel.getFilterFlag()) {
+                    _whereClause += " AND " + VIS.Env.getAdvanceWhere();
+                    this.aPanel.setFilterFlag(false);
+
+                }
+            }
             m_SQL_Where.append(" WHERE ");
             if (_whereClause.indexOf("@") == -1) {
                 m_SQL_Where.append(_whereClause);
@@ -4000,7 +4155,9 @@
                 this.log.Severe("Invalid NULL - " + _tableName + "=" + _whereClause);
             }
         }
+       
         this.whereClause = m_SQL_Where;
+
 
         this.SQL = this.SQL_Select + m_SQL_Where.toString();
         this.SQL_Count += m_SQL_Where.toString();
@@ -4157,7 +4314,7 @@
                     that.changed = false;
                     that.rowChanged = -1;
                     that.fillData(retObj);
-
+                   
                 }
                 else {
                     //console.log("clear");
@@ -4177,14 +4334,18 @@
                         that.fireQueryCompleted(true);//Inform GridController   
                     }, 300, that);
                 }
+                if (that.aPanel) {
+                    that.aPanel.setFilterFlag(false);
+                    that.aPanel.setAdvanceFlag(false);
+                }
             },
             error: function () {
 
-            }
-
+            } 
+            
         });
 
-
+        
         return true;
 
 
@@ -5109,8 +5270,12 @@
       */
 
     GridTable.prototype.getRowFromDB = function (row, callback) {
-        if (row < 0 || this.getRowCount() == 0 || this.inserting)
+        if (row < 0 || this.getRowCount() == 0 || this.inserting) {
+            if (callback) {
+                callback(null);
+            }
             return null;
+        }
 
         var rData = this.getRow(row);
 
@@ -5274,6 +5439,7 @@
                     this.ctx.setWindowContext(tempWindowNo, field.getColumnName(), oo.toString());
             }
         }
+        //check for default value for Org 
 
 
         //this.mQueryCompletedListener
@@ -6203,7 +6369,6 @@
      * @param {any} isMR
      */
     GridField.prototype.getIsEditable = function (checkContext, isMR) {
-        //TODO:
         var _vo = this.vo;
         if (this.getIsVirtualColumn())
             return false;
@@ -6263,6 +6428,8 @@
             if (Record_ID == "" && this.gridTab)
                 Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, this.gridTab.getTableName() + "_ID"); 
 
+
+
             if (Record_ID == "")
                 Record_ID = 0;
 
@@ -6278,6 +6445,13 @@
 
             if (this.gridTab && this.gridTab.IsSharedReadOnly)
                 return false;
+
+            //check for filter org
+            var fOrgs = ctx.getContext("#AD_FilteredOrg");
+            if (fOrgs && fOrgs != "") {
+                if (fOrgs.split(",").indexOf('0') < 0 && AD_Org_ID == 0 )
+                    return false;
+            }
         }
 
         //  Do we have a readonly rule
@@ -6298,7 +6472,7 @@
         if (checkContext
             && (ctx.getWindowContext(_vo.windowNo, _vo.tabNo, "Processed").equals("Y")
                 || ctx.getWindowContext(_vo.windowNo, _vo.tabNo, "Processing").equals("Y"))) {
-            if (!hasMRDisplayLogic)
+            //if (!hasMRDisplayLogic)
                 return false;
         }
 
@@ -6315,6 +6489,11 @@
         return this.getIsDisplayedMR(checkContext);
 
     };
+
+
+    GridField.prototype.hasReadonlyLogic = function () {
+        return this.vo.ReadOnlyLogic.length > 0; 
+    }
 
     /**
      * Evaluate Readonly and Display logic
@@ -6672,6 +6851,13 @@
         if (vo.ColumnName.equals("IsActive")) {
             this.log.fine("[IsActive] " + vo.ColumnName + "=Y");
             return true;
+        }
+
+
+        //check for filterd org , if filter applied then return login org only
+        var fOrgs = ctx.getContext("#AD_FilteredOrg");
+        if (vo.ColumnName.equals("AD_Org_ID") && fOrgs && fOrgs != "") {
+            return ctx.getAD_Org_ID();
         }
 
         //	Set Client & Org to System, if System access
@@ -7505,6 +7691,24 @@
     GridField.prototype.getActionParams = function () {
         return this.vo.ADActionParams;
     };
+    /**
+     * Get Action Group Name
+     * @returns action Group Name
+     */
+    GridField.prototype.getAGName = function () {
+        return this.vo.AGName;
+    };
+
+    /**
+     * Get Action Group Font Name
+     * @returns Action Group Font name
+     */
+    GridField.prototype.getAGFontName = function () {
+        return this.vo.AGFontName;
+    };
+    GridField.prototype.getAGStyle = function () {
+        return this.vo.AGStyle;
+    };
 
     /**
      *  Refresh Lookup if the lookup is unstable
@@ -7569,6 +7773,13 @@
         return this.vo.ExtraInfo;
     }
 
+    GridTabPanel.prototype.getTabPanelAlignment = function () {
+        return this.vo.TabPanelAlignment;
+    }
+   
+    GridTabPanel.prototype.getIsTPBottomAligned = function () {
+        return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+    };
 
     function DataStatusEvent(source1, totalRows, changed, autoSave, inserting) {
 
