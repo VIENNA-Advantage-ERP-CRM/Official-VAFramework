@@ -670,9 +670,11 @@ namespace VAdvantage.Model
                     }
                     else
                     {
-                        sb.Append("NVL(")
-                          .Append(s_colY)
-                          .Append(",0) ").Append(s_colY);
+                        //sb.Append("NVL(");
+                        //.Append(s_colY)
+                        //sb.Append(",0) ").Append(s_colY);
+                        sb.Append(ApplyAggregateFunction(s_colY, false));
+                        sb.Append(" AS " + s_colY);
                     }
                 }
                 //sb.Append(",'9,999.99')");
@@ -731,8 +733,11 @@ namespace VAdvantage.Model
                                sb.Append(" AND r.AD_Reference_ID =" + refVal);
                            }*/
                     }
-
-
+                    if (IsIdentifier_X())
+                    {
+                        sb.Append(" GROUP BY ")
+                           .Append(s_colX);
+                    }
                     //Additional Filter
                     MSeriesFilter[] filter = MSeriesFilter.GetFilters(this.Get_ID());
                     StringBuilder sqlFilter = new StringBuilder();
