@@ -9,6 +9,7 @@ using VAdvantage.Classes;
 using System.Data.SqlClient;
 using VAdvantage.Process;
 using VAdvantage.DataBase;
+using System.Globalization;
 //using VAdvantage.Apps;
 
 namespace VAdvantage.Model
@@ -265,7 +266,7 @@ namespace VAdvantage.Model
             if (!IsIdentifier_X())
                 sb.Append(" ColY");
 
-            sb.Append(" From ").Append(s_tableName);    //append table name
+            sb.Append(" FROM ").Append(s_tableName);    //append table name
 
             string val = "";
             if (!string.IsNullOrEmpty(GetSQLWhere(out val)))    //get the where clause (actually it fectches only date condition. However, it can be used for other where clause purposes)
@@ -495,7 +496,24 @@ namespace VAdvantage.Model
 
         public string GetSql(bool isFiltered, string specialWhere, Ctx _Ctx)
         {
+            string orderByColumn = GetOrderByColumn();
+            string Language = Env.GetAD_Language(_Ctx);
+            bool isRTL = IsRightToLeft(Language);
             int FetchRowsCount = 0;
+            string FetchRows = @"SELECT
+                                   D.VADB_FetchRows
+                                FROM 
+                                  D_Series D
+                                   INNER JOIN D_Chart C ON(C.D_Chart_ID=D.D_Chart_ID)
+                                WHERE D.IsActive='Y' AND
+                                  C.D_Chart_ID=" + GetD_Chart_ID();
+
+            DataSet dsR = DB.ExecuteDataset(FetchRows);
+
+            if (dsR != null && dsR.Tables.Count > 0 && dsR.Tables[0].Rows.Count > 0)
+            {
+                FetchRowsCount = Util.GetValueOfInt(dsR.Tables[0].Rows[0]["VADB_FetchRows"]);
+            }
             StringBuilder sb = new StringBuilder("SELECT ");    //start the SELECT QUERY
             MTable m_Table = null;// MTable.Get(GetCtx(), GetAD_Table_ID());
             //get the table name
@@ -537,14 +555,14 @@ namespace VAdvantage.Model
             //Append X Axis to SQL Query
             if (calcBasis == "I" & IsDate_X())
             {
-                string orderByColumn = GetOrderByColumn();
-                string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
+                // string orderByColumn = GetOrderByColumn();
+                string orderByMethod = (isRTL ? !IsOrderByAsc() : IsOrderByAsc()) ? "DESC" : "ASC";
                 string val = "";
                 sb.Clear();
                 sb.Append("SELECT " + m_colX + ", ");
                 sb.Append(ApplyAggregateFunction(s_colY, false));
                 sb.Append(" AS " + s_colY);
-                sb.Append(" From ").Append(s_tableName);
+                sb.Append(" FROM ").Append(s_tableName);
                 string whereClause = GetWhereClause();
                 sb.Append(GetSQLWhere(out val));
                 if (!string.IsNullOrEmpty(specialWhere))
@@ -610,13 +628,17 @@ namespace VAdvantage.Model
                 sb.Append("WHERE y.C_Year_ID =" + C_Year_ID + " AND p.IsActive='Y' GROUP BY TRIM(to_char(p.StartDate, 'MON yyyy')), p.PeriodNo ");
                 // sb.Append("WHERE y.C_Year_ID ="+ C_Year_ID + " AND p.IsActive='Y' GROUP BY TRIM(to_char(p.StartDate, 'MON yyyy')), p.Name, p.PeriodNo ");
                 sb.Append("ORDER BY ");
-                if (orderByColumn.Equals("2"))
+                /*if (orderByColumn.Equals("2"))
                 {
                     sb.Append(" p.PeriodNo ").Append(orderByMethod);
                 }
                 else
+                {*/
+                sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
+                /*  }*/
+                if (FetchRowsCount > 0)
                 {
-                    sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
+                    sb.Append(" FETCH FIRST " + FetchRowsCount + " ROWS ONLY ");
                 }
                 return sb.ToString();
             }
@@ -666,7 +688,9 @@ namespace VAdvantage.Model
                 {
                     if (DB.IsPostgreSQL())
                     {
-                        sb.Append(s_colY);
+                        //sb.Append(s_colY);
+                        sb.Append(ApplyAggregateFunction(s_colY, false));
+                        sb.Append(" AS " + s_colY);
                     }
                     else
                     {
@@ -689,13 +713,13 @@ namespace VAdvantage.Model
                     sb.Clear().Append("SELECT * ");
                     MColumn Lcolumn = MColumn.Get(_Ctx, this.GetAD_Column_X_ID());
                     //  sb.Append(" From ").Append(s_tableName).Append(" P JOIN ad_ref_list r ON P.").Append(Lcolumn.GetColumnName()).Append("=r.Value");    //append table name
-                    sb.Append(" From ").Append(s_tableName).Append(" OUTT ");
+                    sb.Append(" FROM ").Append(s_tableName).Append(" OUTT ");
                     ////-----------------------------------------
                 }
 
                 else
                 {
-                    sb.Append(" From ").Append(s_tableName);    //append table name
+                    sb.Append(" FROM ").Append(s_tableName);    //append table name
                 }
                 string val = "";
                 if (!string.IsNullOrEmpty(GetSQLWhere(out val)))    //get the where clause (actually it fectches only date condition. However, it can be used for other where clause purposes)
@@ -1050,15 +1074,18 @@ namespace VAdvantage.Model
                 //add order by clause after group by clause
 
 
-                string orderByColumn = GetOrderByColumn();
+                // string orderByColumn = GetOrderByColumn();
 
 
 
 
-
+                ///manish
                 //initially user had to select "asc". same field has now been set as ascending by default and
                 //user can choose to make it descending. (for user friendly purpose ! you needed it :))
-                string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
+                //if login with arabic language the reverse the order  (based on isRTL)
+                //   string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
+                string orderByMethod = (isRTL ? !IsOrderByAsc() : IsOrderByAsc()) ? "DESC" : "ASC";
+
                 sb.Append(" ORDER BY ");
 
                 if (orderByColumn.Equals("2"))
@@ -1081,20 +1108,7 @@ namespace VAdvantage.Model
                         sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
                     }
                 }
-                string FetchRows = @"SELECT
-                                   D.VADB_FetchRows
-                                FROM 
-                                  D_Series D
-                                   INNER JOIN D_Chart C ON(C.D_Chart_ID=D.D_Chart_ID)
-                                WHERE D.IsActive='Y' AND
-                                  C.D_Chart_ID=" + GetD_Chart_ID();
 
-                DataSet dsR = DB.ExecuteDataset(FetchRows);
-
-                if (dsR != null && dsR.Tables.Count > 0 && dsR.Tables[0].Rows.Count > 0)
-                {
-                    FetchRowsCount = Util.GetValueOfInt(dsR.Tables[0].Rows[0]["VADB_FetchRows"]);
-                }
                 if (FetchRowsCount > 0)
                 {
                     sb.Append(" FETCH FIRST " + FetchRowsCount + " ROWS ONLY ");
@@ -1102,6 +1116,20 @@ namespace VAdvantage.Model
             }
             return sb.ToString();
         }
+
+        static bool IsRightToLeft(string languageCode)
+        {
+            try
+            {
+                CultureInfo culture = new CultureInfo(languageCode);
+                return culture.TextInfo.IsRightToLeft;
+            }
+            catch (CultureNotFoundException)
+            {
+                return false; // Default to LTR if the language code is unknown
+            }
+        }
+
 
         private string GetUnionFinancial(string m_date1, string m_date2, string colName, string function, bool Consolidate)
         {
@@ -1328,7 +1356,7 @@ namespace VAdvantage.Model
 
             else if (IsCount())
             {
-                if (IsDate_X() && checkCountIssue && (this.GetDateTimeTypes() == IS_YEARLY || this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_LAST_N_MONTHS || this.GetDateTimeTypes() == IS_LAST_N_YEARS))
+                if (IsIdentifier_X() && checkCountIssue || (IsDate_X() && checkCountIssue && (this.GetDateTimeTypes() == IS_YEARLY || this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_LAST_N_MONTHS || this.GetDateTimeTypes() == IS_LAST_N_YEARS)))
                 {
                     //sb.Append("CASE WHEN MOD(" + ApplyDateFunction(m_colX) + ",4) = 0 AND (MOD(" + ApplyDateFunction(m_colX) + ",400) = 0 OR MOD(" + ApplyDateFunction(m_colX) + ",100) <> 0) THEN COUNT(").Append(colName).Append(") - 366 ELSE COUNT(").Append(colName).Append(") - 365 END");
                     if (DB.IsPostgreSQL() && checkCountIssue && calcBasis == "I")
