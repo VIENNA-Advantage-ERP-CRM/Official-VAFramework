@@ -306,10 +306,10 @@
 
                     //+ '<textarea readonly style="width:640px">' + data[chat].ChatData + '</textarea>'
                     if (VIS.Application.isRTL) {
-                        str += '<span style="font-size: .75rem;padding-right:5px">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        str += '<span style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
                     }
                     else {
-                        str += '<span style="font-size: .75rem;padding-right:5px">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        str += '<span style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
                     }
 
                     if (VIS.Application.isRTL) {
