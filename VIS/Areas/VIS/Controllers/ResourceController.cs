@@ -192,6 +192,7 @@ namespace VIS.Controllers
             _ctx.SetContext("#IsAdmin", VAdvantage.Model.MRole.GetDefault(_ctx, false).IsAdministrator() ? "Y" : "N");
 
             // m_ctx.SetContext("#User_Level", dr[0].ToString());  
+            _ctx.SetContext("#OrgCountryCode", GetOrgCountryCode(_ctx.GetAD_Org_ID()));
             process.LoadPreferences(_ctx.GetContext("#Date"), "");
 
 
@@ -207,6 +208,20 @@ namespace VIS.Controllers
             // Fetched DMS form id and set into context
             int AD_Form_ID = Util.GetValueOfInt(VAdvantage.DataBase.DB.ExecuteScalar("SELECT AD_Form_ID FROM AD_Form WHERE Name = 'VADMS_DMSWeb' AND IsActive = 'Y'"));
             _ctx.SetContext("DMS_Form_ID", AD_Form_ID);
+        }
+
+        /// <summary>
+        /// Get country code from organization
+        /// </summary>
+        /// <param name="orgID"></param>
+        /// <returns>country code</returns>
+
+        public string GetOrgCountryCode(int orgID)
+        {
+            string sql =@"SELECT CN.COUNTRYCODE FROM AD_OrgInfo OG INNER JOIN c_location LC ON (LC.C_LOCATION_ID=OG.C_LOCATION_ID)"
+                           +" INNER JOIN C_COUNTRY CN ON(LC.C_COUNTRY_ID = CN.C_COUNTRY_ID) WHERE OG.AD_ORG_ID = " + orgID + " AND OG.ISACTIVE = 'Y'";
+            string CountryCode = Util.GetValueOfString(VAdvantage.DataBase.DB.ExecuteScalar(sql));
+            return CountryCode;
         }
 
         public string GetThemeInfo(Ctx _ctx)

@@ -1038,4 +1038,8 @@ html[dir="rtl"] .vis-clearFilter {
     right: unset;
     left: 5px !important;
 }
+
+html[dir="rtl"] .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup {
+    background: linear-gradient(-90deg, rgba(var(--v-c-primary), .1) 0, hsla(0, 0%, 100%, 0) 100%);
+}
  /*rtl css End here*/
