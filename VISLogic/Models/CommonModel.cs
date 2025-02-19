@@ -361,17 +361,16 @@ namespace VISLogic.Models
             {
                 if (baseLanguage)
                 {
-                    sql = @"SELECT AD_Tab.AD_Window_ID AS ID,w.displayName AS Name FROM AD_Tab 
-                            INNER JOIN AD_Window w ON  AD_Tab.AD_Window_ID=w.ad_window_id";
+                    sql = @"SELECT w.AD_Window_ID AS ID,w.displayName AS Name FROM AD_Window w"; 
+                            //INNER JOIN AD_Window w ON  AD_Tab.AD_Window_ID=w.ad_window_id";
                     
                 }
                 else
                 {
-                    sql = @"SELECT AD_Tab.AD_Window_ID AS ID,wt.Name FROM AD_Tab
-                            INNER JOIN AD_Window w ON  AD_Tab.AD_Window_ID=w.ad_window_id
+                    sql = @"SELECT w.AD_Window_ID AS ID,wt.Name FROM AD_Window w                           
                             INNER JOIN AD_Window_Trl wt ON (w.AD_Window_ID=wt.AD_Window_ID AND wt.AD_Language='" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "')";
                 }
-                sql += " WHERE AD_Table_ID =" + tableID + @" AND w.Name IN (" + formattedString + ") ORDER BY w.Name";
+                sql += " WHERE w.Name IN (" + formattedString + ") ORDER BY w.Name";
                 action = "W";
 
 

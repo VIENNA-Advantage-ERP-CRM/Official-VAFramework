@@ -1213,7 +1213,8 @@
         this.values = null;
         this.isIconSet = true;
 
-        var $img = $("<i style='color:inherit' title='" + text + "'>");
+        var $img = $("<i style='color:inherit' title='" + text + "'>"); 
+        var $imgSrc = $("<img style='color:inherit;display:none' title='" + text + "' />");
 
         var $txt = $("<span style='color:inherit'>").text(text);
         var rootPath = VIS.Application.contextUrl + "Areas/VIS/Images/base/";
@@ -1223,24 +1224,31 @@
         if (!isLink) {
             $ctrl = $('<button class="vis-ev-col-wrap-button">', { type: 'button', name: columnName });
             $img.css("margin-right", "8px");
-            $ctrl.append($img).append($txt);
+            $imgSrc.css("margin-right", "8px");
+            $ctrl.append($img).append($imgSrc).append($txt);
         }
         else {
             if (isRightLink) {
                 $ctrl = $('<li>');
-                $ctrl.append($txt).append($img);
+                $ctrl.append($txt).append($img).append($imgSrc);
             }
             else {
                 $ctrl = $('<button type="button" class="vis-ev-col-wrap-button vis-ev-col-linkbutton"></button>');
-                $ctrl.append($img).append($txt);
+                $ctrl.append($img).append($imgSrc).append($txt);
             }
         }
 
         this.setIcon = function (img, isSrc) {
-            if (isSrc)
-                $img.src = img;
-            else
+            if (isSrc) {
+                $imgSrc.attr("src",img);
+                $img.hide();
+                $imgSrc.show();
+            }
+            else {
                 $img.addClass(img);
+                $imgSrc.hide();
+                $img.show();
+            }
         };
 
         //	Special Buttons
