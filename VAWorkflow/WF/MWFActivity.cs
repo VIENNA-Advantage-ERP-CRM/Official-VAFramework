@@ -858,14 +858,14 @@ namespace VAdvantage.WF
             if (MWFNode.ACTION_WaitSleep.Equals(action))
             {
                 log.Fine("Sleep:WaitTime=" + _node.GetWaitTime());
-                if (_node.GetWaitingTime() == 0)
+                if (_node.GetWaitTime() == 0)
                     return true;	//	done
 
                 //java.util.Calendar cal = java.util.Calendar.getInstance();
                 //cal.add(_node.GetDurationCalendarField(), _node.GetWaitTime());
                 //SetEndWaitTime(new Timestamp(cal.getTimeInMillis()));
-
-                DateTime dtTime = CommonFunctions.AddDate(_node.GetDurationCalendarField(), _node.GetWaitTime());
+                DateTime dtTime = System.DateTime.Now.AddMinutes(_node.GetWaitTime());
+                //DateTime dtTime = CommonFunctions.AddDate(_node.GetDurationCalendarField(), _node.GetWaitTime());
                 SetEndWaitTime(dtTime);
                 return false;		//	not done
             }

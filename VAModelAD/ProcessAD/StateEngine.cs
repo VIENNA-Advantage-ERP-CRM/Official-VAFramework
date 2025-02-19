@@ -433,7 +433,7 @@ namespace VAdvantage.Process
             if (IsRunning())
                 return new String[] { STATE_SUSPENDED, STATE_COMPLETED, STATE_ABORTED, STATE_TERMINATED };
             if (IsSuspended())
-                return new String[] { STATE_RUNNING, STATE_ABORTED, STATE_TERMINATED };
+                return new String[] { STATE_RUNNING, STATE_ABORTED, STATE_TERMINATED, STATE_COMPLETED };
             if (IsBackground())
                 return new String[] { STATE_BACKGROUND };
             //
