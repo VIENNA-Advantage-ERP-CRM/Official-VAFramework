@@ -1299,8 +1299,17 @@
                 text = Globalize.localize('SelectRole');
             }
             else if (combo === cmbClient) {
-                text = Globalize.localize('SelectClient');
-
+                //text = Globalize.localize('SelectClient');
+                $(data).each(function () {
+                    $("<option />", {
+                        val: this.Key,
+                        text: this.Name
+                    }).appendTo(combo);
+                });
+                setting = false;
+                cmbClient[0].selectedIndex = 0;
+                cmbClient.trigger("change");
+                return;
             }
             else if (combo === cmbOrg) {
                 text = Globalize.localize('SelectOrg');
@@ -1322,7 +1331,7 @@
                     text: this.Name
                 }).appendTo(combo);
             });
-            setting = false;
+            setting = false;          
         };
         function setHiddenOrgFilter() {
             var orgFilter = "";
