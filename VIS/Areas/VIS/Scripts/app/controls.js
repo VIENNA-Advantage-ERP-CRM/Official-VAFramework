@@ -7086,13 +7086,15 @@
     };
 
     VTelePhone.prototype.init = function () {
-
-        var lang = navigator.language;
-        if (lang.length > 2) {
-            lang = lang.split("-")[1]
-        }
-        else { //login language
-            lang = VIS.context.getAD_Language().split('_')[1];
+        var lang = VIS.context.getContext('#OrgCountryCode');
+        if (!lang && lang.length < 1) {
+            lang = navigator.language;
+            if (lang.length > 2) {
+                lang = lang.split("-")[1]
+            }
+            else { //login language
+                lang = VIS.context.getAD_Language().split('_')[1];
+            }
         }
         this.lang = lang;
 
