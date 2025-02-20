@@ -6,7 +6,7 @@
 
 
 .VIS_widget-container {
-    height: 100%
+    height: 100%;
 }
 
     .VIS_widget-container h4 {
@@ -16,7 +16,7 @@
     }
 
 
-.vis-assigned-records {
+.VIS_checklist_records {
     width: 100%;
     height: calc(100% - 90px);
     display: flex;
@@ -29,12 +29,19 @@
 }
 
 
-.vis-record-col {
-    gap: .75em;
+.vis-checklistrecord-col {
     cursor: pointer;
+    gap: .75em;
+    height: calc(100% - 91px);
+    padding: 0 10px;
+    margin-top: 15px;
 }
 
-.vis-windowList {
+.vis-checklistrecord-col .vis-checklistcard{
+    padding: 13px 10px;
+}
+
+/*.vis-windowList {
     display: flex;
     width: 100%;
     height: 100%;
@@ -42,40 +49,38 @@
     gap: 10px;
     flex-wrap: wrap;
     justify-content: center;
-}
-
+}*/
 .vis-blueColor {
     background-color: #23569B;
 }
 
 
-.vis-record-box {
-    align-items: center;
-    border-radius: 8px;
+.vis-checklistrecord-box {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3d4f71;
     display: flex;
-    gap: .75em;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 13px 10px;
     justify-content: space-between;
-    margin-bottom: 10px;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
 }
 
 
-.vis-tiles-pagination {
+.vis-tiles-checklistpage {
     align-items: center;
     display: flex;
     justify-content: space-between;
     padding: 10px;
 }
 
-    .vis-tiles-pagination .fa {
+    .vis-tiles-checklistpage .fa {
         font-size: 1.9em;
         color: rgba(var(--v-c-common),1);
         cursor: pointer;
     }
 
-        .vis-tiles-pagination .fa:hover {
+        .vis-tiles-checklistpage .fa:hover {
             color: rgba(var(--v-c-common),0.8);
         }
 
@@ -87,7 +92,6 @@
     height: 100%;
     justify-content: center;
     align-items: center;
-    cursor: default;
 }
 
 .vis-total-count {
@@ -105,18 +109,18 @@
         color: #f0ad4e; /* Optional hover effect */
     }
 
-.VIS_recordCount {
+.VIS_checklistCount {
     background: #fff;
     color: #333;
     border-radius: 50%;
     width: 20px;
     height: 20px;
     line-height: 20px;
-    text-align: center;
+    text-align: right;
     font-weight: bold;
 }
 
-.vis-show-more {
+.vis-show-checklist {
     text-decoration: underline;
     color: white;
     font-size: 22px;
@@ -129,7 +133,7 @@
     background: none;
     border: none;
     color: rgba(var(--v-c-common),1);
-    font-size: 20px;
+    font-size: 27px;
     cursor: pointer;
     transition: color 0.3s ease;
 }
@@ -164,8 +168,6 @@
     border-radius: 8px;
     padding: 10px;
     cursor: pointer;
-    max-height: 139px;
-    overflow: auto;
 }
 
 .VIS_popuptitle {
@@ -179,32 +181,130 @@
     overflow-y: auto;
     max-height: 400px;
     margin-top: 15px;
+    height: 90%;
+}
+/*.vis_checklistheader {
+    background: linear-gradient(135deg, #5886e1, #466dbf);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px 12px 0 0;
+    font-size: 18px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}*/
+.vis-checklistcard {
+    background-color: white;
+    border-radius: 12px;
+    padding: 10px;
+    margin: 8px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-.vis_assignpageControls {
-    display: flex;
+.visWindowTabs {
+    position: absolute;
+    top: 44px;
+    left: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    display: none;
+    z-index: 1000;
+    padding: 10px;
+    animation: fadeIn 0.2s ease-in-out;
+    max-height: 139px;
+    overflow: auto;
+}
+
+    .visWindowTabs .vis-subheading {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 14px;
+        color: #3d4f71;
+    }
+
+.vis_checklistpageControls {
     align-items: center;
+    display: flex;
     gap: 1rem;
+    width: calc(100% - 40px);
+    justify-content: center;
+}
+
+.vis-checklistrecord-col .vis-card-title.vis-checklistrecord-box {
+    padding: 0;
+    margin: 0;
+}
+
+.vis-checklistcard:hover .visWindowTabs {
+    display: block;
+    border-radius: 0px 0px 12px 12px;
+}
+
+.vis-checklistcard:hover {
+    border-radius: 12px 12px 0 0;
+}
+
+.VIS_popupRecordDetail .vis-checklistcard:hover .visWindowTabs {
+    top: 40px;
+}
+
+.VIS_popupRecordDetail .vis-checklistcard .vis-Tabdropdown.visWindowTabs {
+    max-height: unset;
+}
+
+.VIS_popupRecordDetail .vis-checklistcard {
+    margin-right: 10px;
+    padding: 13px 10px;
+}
+
+.vis-editModeWidget .VIS_widget-container h4 {
+    font-size: 14px;
+}
+
+.vis-editModeWidget .vis-card-title vis-checklistrecord-box {
+    font-size: 13px;
+    padding: -1px 12px
+}
+
+.vis-editModeWidget .vis-tiles-checklistpage {
+    padding: 20px 10px 0px;
+}
+
+.vis-editModeWidget .vis_checklistpageControls {
+    width: 100%;
+}
+
+.vis-editModeWidget .vis-checklistcard {
+    padding: 4px 5px;
+}
+
+html[dir=rtl] .VIS_popupClose {
+    left: 10px;
+    right: auto;
 }
 
 
 @media screen and (max-width: 1366px) {
-    .vis-assigned-records {
+    .VIS_checklist_records {
         font-size: 11px;
     }
 
-    .vis-editModeWidget .vis-assigned-records {
+    .vis-editModeWidget .VIS_checklist_records {
         font-size: 11px;
     }
 }
 
 
 @media screen and (max-width: 1280px) {
-    .vis-record-box {
+    .vis-checklistrecord-box {
         padding: 5px 10px;
     }
 
-    .VIS_recordCount {
+    .VIS_checklistCount {
         width: 20px;
         height: 20px;
         line-height: 20px;
@@ -212,84 +312,85 @@
 }
 
 @media screen and (max-width: 1024px) {
-    .vis-assigned-records {
+    .VIS_checklist_records {
         font-size: 8px;
     }
 
-    .vis-editModeWidget .vis-assigned-records {
+    .vis-editModeWidget .VIS_checklist_records {
         font-size: 8px;
     }
 }
 
 @media screen and (max-width:900px) {
-    .vis-assigned-records {
+    .VIS_checklist_records {
         font-size: 11px;
     }
 
-    .vis-editModeWidget .vis-assigned-records {
+    .vis-editModeWidget .VIS_checklist_records {
         font-size: 11px;
     }
 }
 
 @media screen and (max-width: 768px) {
-    .vis-assigned-records {
+    .VIS_checklist_records {
         font-size: 9px;
     }
 
-    .vis-editModeWidget .vis-assigned-records {
+    .vis-editModeWidget .VIS_checklist_records {
         font-size: 9px;
     }
 }
 
 @media screen and (max-width: 600px) {
-    .vis-assigned-records {
+    .VIS_checklist_records {
         font-size: 14px;
     }
 
-    .vis-editModeWidget .vis-assigned-records {
+    .vis-editModeWidget .VIS_checklist_records {
         font-size: 14px;
     }
 }
 
 @media screen and (max-width: 480px) {
-    .vis-assigned-records {
+    .VIS_checklist_records {
         font-size: 12px;
     }
 
-    .vis-editModeWidget .vis-assigned-records {
+    .vis-editModeWidget .VIS_checklist_records {
         font-size: 12px;
     }
 }
 
 @media screen and (max-width: 375px) {
-    .vis-assigned-records {
+    .VIS_checklist_records {
         font-size: 9px;
     }
 
-    .vis-editModeWidget .vis-assigned-records {
+    .vis-editModeWidget .VIS_checklist_records {
         font-size: 9px;
     }
 }
 
 @media screen and (max-width: 320px) {
-    .vis-assigned-records {
+    .VIS_checklist_records {
         font-size: 8px;
     }
 
-    .vis-editModeWidget .vis-assigned-records {
+    .vis-editModeWidget .VIS_checklist_records {
         font-size: 8px;
     }
 }
 
-.vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-record-box {
+.vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-checklistrecord-box {
     padding: 2px 10px;
+    font-size: 14px;
 }
 
-.vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-tiles-pagination i {
+.vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-tiles-checklistpage i {
     font-size: 1.7em;
 }
 
-    .vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-tiles-pagination i.vis-show-more {
+    .vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-tiles-checklistpage i.vis-show-more {
         margin-left: 0;
         font-size: 1.3rem;
     }
