@@ -1711,7 +1711,7 @@ namespace VAdvantage.Model
                 }
                 if (nextid < nextidTbl)
                 {
-                    nextid = nextidTbl; //Set max table id 
+                    nextid = nextidTbl+1; //Set max table id 
                 }
 
                 // Creeate sequence in respective DB.
