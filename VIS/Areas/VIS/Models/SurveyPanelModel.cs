@@ -82,7 +82,7 @@ namespace VIS.Models
                     //    }
                     //}
 
-                    if (!isvalidate && AD_WF_Activity_ID != 0)
+                    if (!isvalidate)
                     {
                         continue;
                     }
