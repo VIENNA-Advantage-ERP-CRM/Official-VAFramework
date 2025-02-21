@@ -401,7 +401,7 @@ VIS = window.VIS || {};
                                 dsg += '<sub style="color:red;font-size: 100%;bottom: unset;">*</sub>';
                             }
                             dsg += '</h6 > ' +
-                                '<textarea class="VIS_Answ_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-id=VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + '  cols="30" rows="10" placeholder="Enter your text here"></textarea> ' +
+                                '<textarea class="VIS_Answ_' + SurveyData[i].Item.AD_SurveyItem_ID + '" data-id=VIS_Quest_' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyitem=' + SurveyData[i].Item.AD_SurveyItem_ID + ' data-surveyvalue="0" data-survey=' + SurveyData[i].Item.AD_Survey_ID + '  cols="30" rows="4" placeholder="Enter your text here"></textarea> ' +
                                 /*'<small class="mb-3">Max 200 letters</small> ' +*/
                                 '</li > ';
                         }
