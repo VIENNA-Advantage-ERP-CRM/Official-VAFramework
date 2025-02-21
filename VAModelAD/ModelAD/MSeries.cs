@@ -556,7 +556,8 @@ namespace VAdvantage.Model
             if (calcBasis == "I" & IsDate_X())
             {
                 // string orderByColumn = GetOrderByColumn();
-                string orderByMethod = (isRTL ? !IsOrderByAsc() : IsOrderByAsc()) ? "DESC" : "ASC";
+                string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
+                //  string orderByMethod = (isRTL ? !IsOrderByAsc() : IsOrderByAsc()) ? "DESC" : "ASC";
                 string val = "";
                 sb.Clear();
                 sb.Append("SELECT " + m_colX + ", ");
@@ -1083,8 +1084,8 @@ namespace VAdvantage.Model
                 //initially user had to select "asc". same field has now been set as ascending by default and
                 //user can choose to make it descending. (for user friendly purpose ! you needed it :))
                 //if login with arabic language the reverse the order  (based on isRTL)
-                //   string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
-                string orderByMethod = (isRTL ? !IsOrderByAsc() : IsOrderByAsc()) ? "DESC" : "ASC";
+                string orderByMethod = IsOrderByAsc() ? "DESC" : "ASC";
+                //   string orderByMethod = (isRTL ? !IsOrderByAsc() : IsOrderByAsc()) ? "DESC" : "ASC";
 
                 sb.Append(" ORDER BY ");
 
