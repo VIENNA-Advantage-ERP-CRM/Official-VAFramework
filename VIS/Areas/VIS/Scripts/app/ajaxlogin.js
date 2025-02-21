@@ -326,7 +326,7 @@
         $.getScript(referencepath, function () {
             Globalize.culture(code);
             setText();
-            if (code.substring(0, 2) == "ar") { //right to left
+            if (code.substring(0, 2) == "ar" || (code.substring(0, 2) == "fa") { //right to left
                 $('html').attr("dir", "rtl");
             }
             else {

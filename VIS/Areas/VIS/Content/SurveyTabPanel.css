@@ -35,6 +35,10 @@
         background: rgba(var(--v-c-primary), 1);
     }
 
+    .vis-tp-orderListWrap li:has(textarea) {
+        border-bottom: none !important;
+    }
+
         .vis-tp-listItem input[type="checkbox"]:checked:before {
             position: absolute;
             content: '';
