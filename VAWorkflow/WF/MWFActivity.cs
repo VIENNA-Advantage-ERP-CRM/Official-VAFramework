@@ -864,6 +864,7 @@ namespace VAdvantage.WF
                 //java.util.Calendar cal = java.util.Calendar.getInstance();
                 //cal.add(_node.GetDurationCalendarField(), _node.GetWaitTime());
                 //SetEndWaitTime(new Timestamp(cal.getTimeInMillis()));
+                // Changes done to update end wait time 
                 DateTime dtTime = System.DateTime.Now.AddMinutes(_node.GetWaitTime());
                 //DateTime dtTime = CommonFunctions.AddDate(_node.GetDurationCalendarField(), _node.GetWaitTime());
                 SetEndWaitTime(dtTime);
