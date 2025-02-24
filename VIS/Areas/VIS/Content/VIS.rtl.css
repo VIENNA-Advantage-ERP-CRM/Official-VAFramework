@@ -1042,4 +1042,9 @@ html[dir="rtl"] .vis-clearFilter {
 html[dir="rtl"] .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup {
     background: linear-gradient(-90deg, rgba(var(--v-c-primary), .1) 0, hsla(0, 0%, 100%, 0) 100%);
 }
+
+    html[dir="rtl"] .vis-ad-w-p-vc-editview .vis-ev-col-fieldgroup .vis-ev-col-fg-more {
+        border-left: 1px solid rgba(var(--v-c-on-secondary), .6) !important;
+        border-right: unset;
+    }
  /*rtl css End here*/
