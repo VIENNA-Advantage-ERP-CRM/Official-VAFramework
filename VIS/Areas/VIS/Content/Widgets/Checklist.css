@@ -71,7 +71,7 @@
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
+    padding: 12px 10px 10px;
 }
 
     .vis-tiles-checklistpage .fa {
@@ -204,7 +204,7 @@
 
 .visWindowTabs {
     position: absolute;
-    top: 44px;
+    top: 100%;
     left: 0;
     background: white;
     border-radius: 12px;
@@ -287,6 +287,14 @@ html[dir=rtl] .VIS_popupClose {
     right: auto;
 }
 
+html[dir=rtl] .vis-checklistrecord-col .vis-checklistcard {
+    padding: 12px 10px;
+}
+
+html[dir=rtl] .VIS_popupRecordDetail .vis-checklistcard {
+    margin-right: 0;
+    margin-left: 10px;
+}
 
 @media screen and (max-width: 1366px) {
     .VIS_checklist_records {
@@ -309,6 +317,12 @@ html[dir=rtl] .VIS_popupClose {
         height: 20px;
         line-height: 20px;
     }
+    .vis-checklistrecord-col .vis-checklistcard {
+        padding: 8px 10px;
+    }
+    html[dir=rtl] .vis-checklistrecord-col .vis-checklistcard {
+        padding: 8px 10px;
+    }
 }
 
 @media screen and (max-width: 1024px) {
@@ -318,6 +332,18 @@ html[dir=rtl] .VIS_popupClose {
 
     .vis-editModeWidget .VIS_checklist_records {
         font-size: 8px;
+    }
+    .vis-checklistrecord-col .vis-checklistcard {
+        padding: 3px 10px;
+    }
+    html[dir=rtl] .vis-checklistrecord-col .vis-checklistcard {
+        padding: 3px 10px;
+    }
+    html[dir=rtl] .vis-checklistrecord-col .vis-card-title.vis-checklistrecord-box {
+        font-size: 12px;
+    }
+    html[dir=rtl] .visWindowTabs .vis-subheading {
+        font-size: 11px;
     }
 }
 

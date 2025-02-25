@@ -187,6 +187,17 @@
     gap: 1rem;
 }
 
+html[dir=rtl] .VIS_recordCount {
+    text-align: center !important;
+}
+
+html[dir=rtl] .VIS_checklistCount {
+    text-align: left !important;
+}
+
+html[dir=rtl] .VIS_popupRecordCount {
+    text-align: center !important;
+}
 
 @media screen and (max-width: 1366px) {
     .vis-assigned-records {
@@ -200,14 +211,13 @@
 
 
 @media screen and (max-width: 1280px) {
-    .vis-record-box {
-        padding: 5px 10px;
-    }
-
     .VIS_recordCount {
         width: 20px;
         height: 20px;
         line-height: 20px;
+    }
+    .vis-record-box{
+        padding: 9px 10px;
     }
 }
 
@@ -218,6 +228,9 @@
 
     .vis-editModeWidget .vis-assigned-records {
         font-size: 8px;
+    }
+    .vis-record-box {
+        padding: 4px 10px;
     }
 }
 
@@ -293,3 +306,4 @@
         margin-left: 0;
         font-size: 1.3rem;
     }
+
