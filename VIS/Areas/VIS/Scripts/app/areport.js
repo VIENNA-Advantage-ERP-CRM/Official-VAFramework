@@ -1329,7 +1329,11 @@
             process(false, null, filetype);
         });
         function loadFileTypes($btnInfo) {
-
+            if (window.VA112) {
+                var printViewer = new VA112.printViewer(WindowNo, AD_Process_ID, table_ID, record_ID, recIds, windowID);
+                printViewer.show();
+                return;
+            }
             $.ajax({
                 url: VIS.Application.contextUrl + "JsonData/GetReportFileTypes/",
                 dataType: "json",

@@ -1,0 +1,67 @@
+﻿.vis_AssignedRecwidget {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid rgba(var(--v-c-primary));
+}
+
+
+.vis_AssignedReclabel {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 0px;
+}
+
+
+.vis_AssignedReclogo {
+    font-size: 2.5rem;
+}
+
+    .vis_AssignedReclogo i.vis vis-asrx {
+        background: linear-gradient(90deg, #86b9ec 50%, #79aaece6 50%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-size: 60px;
+    }
+
+.vis_assignedRecCount {
+    font-size: 16px;
+    color: #000;
+    background-color: #FFD700;
+    padding: 5px 10px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 5px;
+    margin-right: 7px;
+}
+
+@media screen and (max-width: 1200px) {
+    .vis_AssignedReclabel {
+        font-size: 12px;
+    }
+
+    .vis_assignedRecCount {
+        font-size: 14px;
+        padding: 3px 10px;
+    }
+}
+
+@media screen and (min-width: 800px) and (max-width: 1024px) {
+    .vis_assignedRecCount {
+        font-size: 12px;
+    }
+
+    .vis_AssignedReclabel {
+        font-size: 11px;
+    }
+
+    .vis_AssignedReclogo {
+        font-size: 2.2rem;
+    }
+}

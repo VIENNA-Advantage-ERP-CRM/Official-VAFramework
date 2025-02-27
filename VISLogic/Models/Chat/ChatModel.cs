@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-
+using System.Data.SqlClient;
 using System.Linq;
 using System.Resources;
 using System.Text;
@@ -247,14 +247,18 @@ namespace VIS.Models
             cinfo.userimages = imgIds;
             cinfo.totalCount = totalCount;
             return cinfo;
-
         }
-
 
         #endregion
 
-        public bool Ok(string data)
+        public bool Ok(Ctx ctx, string data, int AD_Window_ID, int AD_Table_ID, int Record_ID)
         {
+            SqlParameter[] param = new SqlParameter[4];
+            param[0] = new SqlParameter("@AD_Table_ID", AD_Table_ID);
+            param[1] = new SqlParameter("@Record_ID", Record_ID);
+            param[2] = new SqlParameter("@AD_Window_ID", AD_Window_ID);
+            param[3] = new SqlParameter("@AD_User_ID", ctx.GetAD_User_ID());
+
             if (data.Trim() != "" && data.Trim() != null && data.Length > 0)
             {
                 if (_chat.Get_ID() == 0)
@@ -264,6 +268,12 @@ namespace VIS.Models
                 MChatEntry entry = new MChatEntry(_chat, data);
 
                 bool saved = entry.Save();
+
+                string sql1 = @"UPDATE CM_Subscribe 
+                                        SET UnReadMessageCount = COALESCE(UnReadMessageCount, 0) + 1 WHERE AD_Table_ID =  @AD_Table_ID 
+                                          AND Record_ID = @Record_ID
+                                          AND AD_Window_ID =  @AD_Window_ID  AND AD_User_ID = @AD_User_ID";
+                DB.ExecuteQuery(sql1, param, null);
 
                 return saved;
             }
@@ -347,6 +357,7 @@ namespace VIS.Models
         public string ChatText { get; set; }
         public int page { get; set; }
         public int pageSize { get; set; }
+        public int AD_Window_ID { get; set; }
     }
 
 

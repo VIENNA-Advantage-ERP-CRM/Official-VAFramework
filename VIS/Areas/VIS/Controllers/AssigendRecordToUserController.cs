@@ -1,5 +1,5 @@
 ﻿/************************************************************
-* Module Name    : VA114
+* Module Name    : VIS
 * Purpose        :  Assign Record To User
 * chronological  : Development
 * Created Date   : 12 December 2024
@@ -84,7 +84,7 @@ namespace VIS.Controllers
         /// <param name="AD_Table_ID"></param>
         /// <param name="Record_ID"></param>
         /// <returns></returns>
-        public JsonResult DeleteRecord(int AD_Window_ID, int AD_Table_ID, int Record_ID)
+        public JsonResult DeleteRecord(int AD_Window_ID, int AD_Table_ID, int[] Record_ID)
         {
             dynamic result = 0;
             if (Session["ctx"] != null)
@@ -92,6 +92,40 @@ namespace VIS.Controllers
                 var ctx = Session["ctx"] as Ctx;
                 AssignedRecordToUser obj = new AssignedRecordToUser();
                 result = obj.DeleteRecord(ctx, AD_Window_ID, AD_Table_ID, Record_ID);
+            }
+            return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get assigned records
+        /// </summary>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
+        public JsonResult GetAssignedRecord(int[] Record_ID)
+        {
+            dynamic result = 0;
+            if (Session["ctx"] != null)
+            {
+                var ctx = Session["ctx"] as Ctx;
+                AssignedRecordToUser obj = new AssignedRecordToUser();
+                result = obj.GetAssignedRecord(ctx, Record_ID);
+            }
+            return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// return count and recordIDs to ZoomAssignedRecordOnWindow
+        /// </summary>
+        /// <param name="AD_Window_ID"></param>
+        /// <returns></returns>
+        public JsonResult ZoomAssignedRecordOnWindow(int AD_Window_ID)
+        {
+            dynamic result = 0;
+            if (Session["ctx"] != null)
+            {
+                var ctx = Session["ctx"] as Ctx;
+                AssignedRecordToUser obj = new AssignedRecordToUser();
+                result = obj.ZoomAssignedRecordOnWindow(ctx, AD_Window_ID);
             }
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }

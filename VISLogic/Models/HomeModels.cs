@@ -35,7 +35,10 @@ namespace VIS.Models
         public string UsrImage { get; set; }
         public string UsrStatus { get; set; }
         public string Greeting { get; set; }
+        public int UnreadMessageCount { get; set; }
+
         public HomeFolloUpsInfo HomeFolloUpsInfo;
+
         //Save User Image
         public int SaveUserImage(Ctx ctx, byte[] buffer, string imageName, bool isSaveInDB)
         {

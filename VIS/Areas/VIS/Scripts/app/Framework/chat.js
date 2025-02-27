@@ -1,6 +1,6 @@
 ﻿; (function (VIS, $) {
     //var $record_id, $chat_id, $table_id, $description, $chatclose;
-    function Chat(record_id, chat_id, table_id, description, windowNo) {
+    function Chat(record_id, chat_id, table_id, description, windowNo, windowId) {
 
         this.onClose = null; //outer apanel close function
 
@@ -19,11 +19,12 @@
         $sendIconDiv.append($sendIconButton);
         $inputChat.append($textArea).append($sendIconDiv);
         $maindiv.append($inputChat).append($div).append($bsyDiv);//.append($buttonsdiv); //ui
-        this.windowNo = 0;
+        this.windowNo = windowNo;
         this.pageSize = 10;
         this.isBtmTapPanel = false;
         this.record_ID = record_id;
         this.AD_Table_ID = table_id;
+        this.AD_Window_ID = windowId;
         this.Description = description;
         this.ChatID = chat_id;
        // this.isLoading = false;
@@ -40,7 +41,7 @@
 
         var ch = null;
         if (record_id > 0 && table_id > 0) {
-            this.prop = { WindowNo: windowNo, ChatID: chat_id, AD_Table_ID: table_id, Record_ID: record_id, Description: description, TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+            this.prop = { WindowNo: windowNo, ChatID: chat_id, AD_Table_ID: table_id, Record_ID: record_id, Description: description, TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize, AD_Window_ID: this.AD_Window_ID };
             init($div, windowNo, this.prop);
         }
         var self = this;
@@ -380,9 +381,9 @@
             this.record_ID = recordID;
             this.selectedRow = selectedRow;
             if (this.curTab ) {
-                this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+                this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize, AD_Window_ID: this.AD_Window_ID };
             } else {
-                this.prop = { WindowNo: this.windowNo, ChatID: this.ChatID, AD_Table_ID: this.AD_Table_ID, Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+                this.prop = { WindowNo: this.windowNo, ChatID: this.ChatID, AD_Table_ID: this.AD_Table_ID, Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize, AD_Window_ID: this.AD_Window_ID };
             }
             this.initializeComponent(this.windowNo, this.prop);
         }

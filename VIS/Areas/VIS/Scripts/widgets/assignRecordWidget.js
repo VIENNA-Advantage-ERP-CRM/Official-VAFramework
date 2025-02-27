@@ -34,6 +34,7 @@
         var WindowId = null;
         var TableName = null;
         var Record_ID = null;
+        var totalPages, currentRecords = null;
 
 
 
@@ -53,6 +54,7 @@
                 '</div>' +
                 '</div>' +
                 '</div>');
+
             widgetContainer.append(assignedRecWidget);
             $root.append(widgetContainer);
             AssignedRecords = widgetContainer.find('.vis-record-col');
@@ -64,7 +66,7 @@
             $root.append($bsyDiv);
         };
 
-
+        /*  show and hide busy indicator*/
         function showBusy(show) {
             if (show) {
                 $root.find("#busyDivId" + $self.widgetInfo.AD_UserHomeWidgetID).show();
@@ -95,62 +97,7 @@
             });
         };
 
-        /*  update UI*/
-        function updateUI() {
-            AssignedRecords.empty(); // Clear existing records
-            if (allRecords == null || allRecords.length === 0) {
-                widgetContainer.find('h4').text('' + VIS.Msg.getMsg("VIS_AssignRecord") + ': 0');
-                AssignedRecords.text(VIS.Msg.getMsg('VIS_NoRecordFound')).addClass('vis-noRecordFound');
-                return;
-            }
-
-            // Calculate total pages
-            var totalPages = Math.ceil(allRecords.length / sizePage);
-            // Get records for the current page
-            var start = (currentPage - 1) * sizePage;
-            var end = Math.min(start + sizePage, allRecords.length);
-            var currentRecords = allRecords.slice(start, end);
-
-            // Update header
-            widgetContainer.find('h4').text(`${VIS.Msg.getMsg('VIS_AssignRecord')}: ${allRecords[0].totalRecordCount}`);
-
-            // Display records
-            currentRecords.forEach((record, i) => {
-                var colorClass = 'vis-color-' + ((i % 4) + 1);
-                var AssignedItems = `
-                <div class="vis-record-box ${colorClass}" 
-                 visWindowname="${record.WindowName}" 
-                 visWindowId="${record.WindowID}" 
-                 visTableName="${record.TableName}"
-                 visRecordId="${record.Record_ID}">
-                 <span>${record.WindowName}</span>
-                <span class="VIS_recordCount">${record.Count}</span>
-                </div>`;
-                AssignedRecords.append(AssignedItems);
-
-            });
-
-            // Add pagination UI
-            var paginationHtml = `
-            <div class="vis-tiles-pagination">
-            <i class="fa fa-arrow-circle-up vis_prevpage" aria-hidden="true"></i>
-            <span class="vis-total-count" style="color: white;">${currentPage} / ${totalPages}</span>
-            <i class="fa fa-arrow-circle-down  vis_NxtPage" aria-hidden="true"></i>             
-            <i class="fa fa-list vis-show-more" aria-hidden="true" title="${VIS.Msg.getMsg('ShowAll')}"></i>
-            </div>`;
-            widgetContainer.find('.vis-tiles-pagination').remove(); // Remove old pagination
-            widgetContainer.append(paginationHtml);
-
-            // Pagination button events
-            widgetContainer.find('.vis_NxtPage').off('click')
-            widgetContainer.find('.vis_NxtPage').on('click', function () {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    updateUI();
-                };
-            });
-
-
+        function eventsHandling() {
             //Popover for showing all records
             widgetContainer.find('.vis-show-more').off('click')
             widgetContainer.find('.vis-show-more').on('click', function () {
@@ -209,6 +156,15 @@
                 });
             });
 
+            // Pagination button events
+            widgetContainer.find('.vis_NxtPage').off('click')
+            widgetContainer.find('.vis_NxtPage').on('click', function () {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateUI();
+                };
+            });
+
 
             // handling prev page
             widgetContainer.find('.vis_prevpage').off('click')
@@ -230,6 +186,8 @@
                 'opacity': currentPage <= 1 ? '0.6' : '1'
             });
 
+
+
             /*    zooming window */
             AssignedRecords.find('.vis-record-box').off('click')
             AssignedRecords.find('.vis-record-box').on('click', function () {
@@ -241,7 +199,60 @@
             });
         };
 
+        /*  update UI*/
+        function updateUI() {
+            AssignedRecords.empty(); // Clear existing records
+            if (allRecords == null || allRecords.length === 0) {
+                widgetContainer.find('h4').text('' + VIS.Msg.getMsg("VIS_AssignRecord") + ': 0');
+                AssignedRecords.text(VIS.Msg.getMsg('VIS_NoRecordFound')).addClass('vis-noRecordFound');
+                return;
+            }
 
+            // Calculate total pages
+            totalPages = Math.ceil(allRecords.length / sizePage);
+            // Get records for the current page
+            var start = (currentPage - 1) * sizePage;
+            var end = Math.min(start + sizePage, allRecords.length);
+            currentRecords = allRecords.slice(start, end);
+
+            // Update header
+            widgetContainer.find('h4').text(`${VIS.Msg.getMsg('VIS_AssignRecord')}: ${allRecords[0].totalRecordCount}`);
+
+            // Display records
+            currentRecords.forEach((record, i) => {
+                var colorClass = 'vis-color-' + ((i % 4) + 1);
+                var AssignedItems = `
+                <div class="vis-record-box ${colorClass}" 
+                 visWindowname="${record.WindowName}" 
+                 visWindowId="${record.WindowID}" 
+                 visTableName="${record.TableName}"
+                 visRecordId="${record.Record_ID}">
+                 <span>${record.WindowName}</span>
+                <span class="VIS_recordCount">${record.Count}</span>
+                </div>`;
+                AssignedRecords.append(AssignedItems);
+
+            });
+
+            // Add pagination UI
+            var paginationHtml = `
+            <div class="vis-tiles-pagination">
+            <div style="width: 1.9em;"></div>
+             <div class="vis_assignpageControls">           
+            <i class="fa fa-arrow-circle-up vis_prevpage" aria-hidden="true" style="pointer-events: none; opacity: 0.6;"></i>
+            <span class="vis-total-count" style="color: white;">${currentPage} / ${totalPages}</span>
+            <i class="fa fa-arrow-circle-down  vis_NxtPage" aria-hidden="true" style="pointer-events: none; opacity: 0.6;"></i>
+            </div>
+            <i class="fa fa-list vis-show-more" aria-hidden="true" title="${VIS.Msg.getMsg('ShowAll')}"></i>
+            </div>`;
+            widgetContainer.find('.vis-tiles-pagination').remove(); // Remove old pagination
+            widgetContainer.append(paginationHtml);
+
+
+            eventsHandling();
+        };
+
+        /* zoom query to open the records */
         function zoomWindow() {
             if (WindowId > 0) {
                 var windowParam = {

@@ -12,11 +12,12 @@
         /* Variables*/
         this.frame;
         this.windowNo;
-        var $self = this; //scoped $self pointer
-        var $root = $('<div class="vis-group-assign-content" style="height:100% w-100">');
+        var $self = this; //scoped $self pointer 
+        var $root = $('<div class="vis-group-assign-content" style="height:100%">');
         var actionsWidget;
         var welcomeActionsDivId;
         var workflowDivId;
+        var followupsDivId;
         var noticeDivId;
         var requestsDivId;
         var popup;
@@ -32,6 +33,7 @@
             events();
             loadCounts(true);
         };
+
         /* Declare events */
         function events() {
             workflowDivId.on("click", opneWorkflow);
@@ -42,6 +44,11 @@
                 modelPopupId.hide();
                 wform.dispose();
                 $self.refreshWidget();
+            });
+            followupsDivId.on("click", function () {
+                var followupsObj = new VIS.VISFollowUps($self);
+                followupsObj.Initalize($self.AD_UserHomeWidgetID);
+                welcomeActionsDivId.find(".vis-followups-red-dot").hide();
             });
         };
 
@@ -62,7 +69,7 @@
 
         //Create Widget
         function createWidget() {
-            actionsWidget = ' <div id="welcomeActionsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-task-status-panel">  '
+            actionsWidget = ' <div id="welcomeActionsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-task-status-panel vis-ts-panel-twoByTwo">  '
                 // + '<div id="refreshDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-refreshIco"><span class="vis vis-refresh"></span></div>'
                 + ' <div class="vis-a-statusBox-container" >'
                 + '  <div id="workflowDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-status-box vis-a-green-box" style="cursor: pointer;">'
@@ -81,10 +88,17 @@
                 + '  </div>'
                 + '  <div id="requestsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-status-box vis-a-orange-box" style="cursor: pointer;">'
                 + '    <div class="vis-a-headWico">'
-                + '      <span class="fa fa-bell-o"></span>'
+                + '      <i class="fa fa-bell-o"></i>'
                 + '      <div class="vis-a-status-name">' + VIS.Msg.getMsg("Requests") + '</div>'
                 + '    </div>'
                 + '    <div id="requestsCntDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-status-count vis-a-orangebg"></div>'
+                + '  </div>'
+                + '  <div id="followupsDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-status-box vis-a-purple-box" style="cursor: pointer;">'
+                + '    <div class="vis-a-headWico">'
+                + '      <i class="fa fa-rss"></i>'
+                + '      <div class="vis-followups-label vis-a-status-name">' + VIS.Msg.getMsg("FollowUps") + '<div style="display:none;" class="vis-followups-red-dot"></div></div>'
+                + '    </div>'
+                + '    <div id="followupsCntDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-status-count vis-a-purplebg"></div>'
                 + '  </div>'
                 + '</div >'
                 + '</div> ';
@@ -94,6 +108,7 @@
             workflowDivId = welcomeActionsDivId.find("#workflowDivId" + $self.AD_UserHomeWidgetID);
             noticeDivId = welcomeActionsDivId.find("#noticeDivId" + $self.AD_UserHomeWidgetID);
             requestsDivId = welcomeActionsDivId.find("#requestsDivId" + $self.AD_UserHomeWidgetID);
+            followupsDivId = welcomeActionsDivId.find("#followupsDivId" + $self.AD_UserHomeWidgetID);
         };
         //Create Popup
         function widgetsPopup() {
@@ -138,6 +153,19 @@
                     else {
                         welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).append(0);
                     }
+                    if (WidgetsCnt.FollowUpCnt > 0) {
+                        welcomeActionsDivId.find("#followupsCntDivId" + $self.AD_UserHomeWidgetID).append(WidgetsCnt.FollowUpCnt);
+                    }
+                    else {
+                        welcomeActionsDivId.find("#followupsCntDivId" + $self.AD_UserHomeWidgetID).append(0);
+                    }
+                    
+                    if (WidgetsCnt.UnreadMessageCount > 0) {
+                        welcomeActionsDivId.find(".vis-followups-red-dot").show();
+
+                    } else {
+                        welcomeActionsDivId.find(".vis-followups-red-dot").hide();
+                    }
                     ShowBusy(false);
                 }
             });
@@ -170,12 +198,33 @@
             modelPopupId.show();
         };
 
+        // Function to show red dot if there is a new chat from subscribed record
+        this.unReadMsgCount = function () {
+            $.ajax({
+                url: VIS.Application.contextUrl + 'Subscribe/UnreadMessageCount',
+                type: 'GET',
+                datatype: 'json',
+                success: function (result) {
+                    if (result > 0) {
+                        welcomeActionsDivId.find(".vis-followups-red-dot").show();
+                    }
+                    else {
+                        welcomeActionsDivId.find(".vis-followups-red-dot").hide();
+                    }
+                },
+                error: function () {
+                    console.log("Error");
+                }
+            });
+        }
+
         //Refresh Widget 
         this.refreshWidget = function () {
             ShowBusy(true);
             welcomeActionsDivId.find("#workflowCntDivId" + $self.AD_UserHomeWidgetID).empty();
             welcomeActionsDivId.find("#noticeCntDivId" + $self.AD_UserHomeWidgetID).empty();
             welcomeActionsDivId.find("#requestsCntDivId" + $self.AD_UserHomeWidgetID).empty();
+            welcomeActionsDivId.find("#followupsCntDivId" + $self.AD_UserHomeWidgetID).empty();
             loadCounts(true);
         };
 
