@@ -199,7 +199,7 @@ namespace VIS.Models
                         adsr.AD_Table_ID,
                         adsr.Record_ID,
                         adsr.AD_Window_ID,
-                        aw.Name ORDER BY aw.Name");
+                        aw.DisplayName ORDER BY aw.DisplayName");
 
             // Step 3: Extract AD_Table_ID and Record_ID pairs from responseDs
             HashSet<(int AD_Table_ID, int Record_ID)> responseRecords = new HashSet<(int, int)>();
