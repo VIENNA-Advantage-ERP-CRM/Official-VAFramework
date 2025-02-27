@@ -284,7 +284,17 @@
             text = Globalize.localize('SelectRole');
         }
         else if (combo === $cmbClient) {
-            text = Globalize.localize('SelectClient');
+            //text = Globalize.localize('SelectClient');
+            $(data).each(function () {
+                $("<option />", {
+                    val: this.Key,
+                    text: this.Name
+                }).appendTo(combo);
+            });
+            setting = false;
+            $cmbClient[0].selectedIndex = 0;
+            $cmbClient.trigger("change");
+            return;
         }
         else if (combo === $cmbOrg) {
             text = Globalize.localize('SelectOrg');
@@ -316,7 +326,7 @@
         $.getScript(referencepath, function () {
             Globalize.culture(code);
             setText();
-            if (code.substring(0, 2) == "ar") { //right to left
+            if (code.substring(0, 2) == "ar" || code.substring(0, 2) == "fa") { //right to left
                 $('html').attr("dir", "rtl");
             }
             else {

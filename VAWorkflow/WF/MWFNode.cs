@@ -563,6 +563,7 @@ namespace VAdvantage.WF
             if (errorMsg != "" && Util.GetValueOfBool(Get_Value("VA102_IsSkipValidation")))
             {
                 Set_Value("VA102_IsSkipValidation", false);
+                UpdateWorkflowHandler();
                 return true;
             }
             else if (errorMsg != "")
@@ -572,6 +573,7 @@ namespace VAdvantage.WF
                 return false;
             }
 
+            UpdateWorkflowHandler();
             return true;
         }
 
@@ -663,6 +665,86 @@ namespace VAdvantage.WF
             if (!_nodeError.Save())
             {
                 return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Update workflow handler on workflow header for wait sleep node
+        /// </summary>
+        /// <returns>boolean</returns>
+        private bool UpdateWorkflowHandler()
+        {
+            if (GetWaitTime() != 0 && GetAction().Equals(X_AD_WF_Node.ACTION_WaitSleep))
+            {
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_WorkflowProcessor_ID FROM AD_Workflow WHERE AD_Workflow_ID = " + GetAD_Workflow_ID(), null, Get_Trx())) <= 0)
+                {
+                    int wfProcessor_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_WorkflowProcessor_ID FROM AD_WorkflowProcessor WHERE LOWER(Name) = 'standard wakeup node handler' AND AD_Client_ID = " + GetAD_Client_ID(), null, Get_Trx()));
+                    if (wfProcessor_ID <= 0)
+                    {
+                        int schedule_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Schedule_ID FROM AD_Schedule WHERE LOWER(Name) = 'standard wakeup node schedule' AND AD_Client_ID IN (0, " + GetAD_Client_ID() + ") ORDER BY AD_Client_ID", null, Get_Trx()));
+                        if (schedule_ID <= 0)
+                        {
+                            MSchedule schedule = new MSchedule(GetCtx(), 0, Get_Trx());
+                            schedule.SetAD_Org_ID(0);
+                            schedule.SetName("Standard Wakeup Node Schedule");
+                            schedule.SetScheduleType(X_AD_Schedule.SCHEDULETYPE_Frequency);
+                            schedule.SetFrequencyType(X_AD_Schedule.FREQUENCYTYPE_Minute);
+                            schedule.SetFrequency(5);
+                            schedule.SetOnSunday(true);
+                            schedule.SetOnMonday(true);
+                            schedule.SetOnTuesday(true);
+                            schedule.SetOnWednesday(true);
+                            schedule.SetOnThursday(true);
+                            schedule.SetOnFriday(true);
+                            schedule.SetOnSaturday(true);
+                            if (!schedule.Save())
+                            {
+                                ValueNamePair vp = VLogger.RetrieveError();
+                                if (vp != null)
+                                {
+                                    if (!string.IsNullOrEmpty(vp.Name))
+                                    {
+                                        log.SaveError("NotInserted:=" + vp.Name, "");
+                                    }
+                                    else if (vp.Key != null && vp.Key.ToString() != "")
+                                    {
+                                        log.SaveError("NotInserted:=" + vp.Key, "");
+                                    }
+                                }
+                                return false;
+                            }
+                            schedule_ID = schedule.Get_ID();
+                        }
+
+                        MWorkflowProcessor wfProc = new MWorkflowProcessor(GetCtx(), 0, Get_Trx());
+                        wfProc.SetAD_Org_ID(0);
+                        wfProc.SetName("Standard Wakeup Node Handler");
+                        wfProc.SetAD_Schedule_ID(schedule_ID);
+                        wfProc.Set_Value("InaRemFrequency", "D");
+                        wfProc.SetSupervisor_ID(100);
+                        if (!wfProc.Save())
+                        {
+                            ValueNamePair vp = VLogger.RetrieveError();
+                            if (vp != null)
+                            {
+                                if (!string.IsNullOrEmpty(vp.Name))
+                                {
+                                    log.SaveError("NotInserted:=" + vp.Name, "");
+                                }
+                                else if (vp.Key != null && vp.Key.ToString() != "")
+                                {
+                                    log.SaveError("NotInserted:=" + vp.Key, "");
+                                }
+                            }
+                            return false;
+                        }
+                        else
+                            wfProcessor_ID = wfProc.GetAD_WorkflowProcessor_ID();
+                    }
+                    int updCount = DB.ExecuteQuery("UPDATE AD_Workflow SET AD_WorkflowProcessor_ID = " + wfProcessor_ID + " WHERE AD_Workflow_ID = " + GetAD_Workflow_ID(), null, Get_Trx());
+                    return true;
+                }
             }
             return true;
         }
