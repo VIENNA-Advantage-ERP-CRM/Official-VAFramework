@@ -1430,6 +1430,31 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             return Json(JsonConvert.SerializeObject(cm.GetProcessID(processName)), JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Save HttpRequest data into requestdata column
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_WF_Node_ID"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public JsonResult SaveHttpRequest(int AD_WF_Node_ID, string result) {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.SaveHttpRequest(ctx, AD_WF_Node_ID,result)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get column names from the workflowflow table
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Workflow_ID"></param>
+        /// <returns>ColumnList</returns>
+        public JsonResult GetWorkflowColumn(int AD_Workflow_ID) {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.GetWorkflowColumn(ctx, AD_Workflow_ID)), JsonRequestBehavior.AllowGet);
+        }
     }
 
     public class FilterDataContract

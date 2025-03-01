@@ -4107,6 +4107,63 @@ table.fixed-header thead tr {
     float: none;
 }
 
+.vis-wf-httprequest-container {
+    height: 445px;
+    overflow: auto;
+    padding-top: 0.3rem;
+}
+
+.vis-wf-Descriptiontext {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 430px;
+    min-height: 90px;
+    cursor: text;
+    border-radius: 3px;
+}
+
+.vis-wf-columnlist {
+    display: inline-flex;
+    background: #007bff;
+    color: white;
+    padding: 5px;
+    margin: 2px;
+    border-radius: 5px;
+    align-items: center;
+    gap: 0.3rem;
+}
+.vis-wf-column-remove {
+    font-size: 10px;
+    display: flex;
+}
+
+.vis-wf-column-iconbtn {
+    font-size: 10px;
+    display: flex;
+    border: none;
+    background: white;
+    margin: 5px;
+}
+
+
+.vis-wf-columnlist .vis-wf-column-remove {
+    margin-left: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.vis-input-list {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 5px;
+    width: 100%;
+    box-shadow: 0 0 5px #cccccc;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1;
+}
+
 .vis-Dialog-buttons button:focus,
 .vis-Dialog-buttons input[type="button"]:focus,
 .vis-Dialog-buttons input[type="submit"]:focus,

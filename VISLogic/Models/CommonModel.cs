@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VAdvantage.Classes;
 using VAdvantage.DataBase;
+using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.DataContracts;
@@ -422,6 +423,47 @@ namespace VISLogic.Models
             string sql = "SELECT AD_Process_ID FROM AD_Process WHERE IsActive='Y' AND Value = '" + processName + "'";
             int processID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             return processID;
+        }
+
+        /// <summary>
+        /// Save HttpRequest data into requestdata column
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_WF_Node_ID"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public string SaveHttpRequest(Ctx ctx, int AD_WF_Node_ID, string result)
+        {
+
+            VAdvantage.WF.MWFNode obj = new VAdvantage.WF.MWFNode(ctx, AD_WF_Node_ID, null);
+            obj.Set_Value("RequestData", result);
+            if (!obj.Save())
+            {
+                {
+                    ValueNamePair vnp = VLogger.RetrieveError();
+                    if (vnp != null && vnp.GetName() != null)
+                    {
+                        string info = vnp.GetName();
+                        return info;
+                    }
+                }
+            }
+            return "OK";
+        }
+        
+        /// <summary>
+        /// Get column names from the workflowflow table
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Workflow_ID"></param>
+        /// <returns>ColumnList</returns>
+        public DataSet GetWorkflowColumn(Ctx ctx, int AD_Workflow_ID)
+        {
+            string sql = "SELECT COLUMNNAME FROM AD_COLUMN WHERE AD_TABLE_ID IN (SELECT AD_TABLE_ID FROM AD_WORKFLOW WHERE AD_WORKFLOW_ID="+ AD_Workflow_ID + ")";
+            DataSet ds = DB.ExecuteDataset(sql, null, null);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+                return ds;
+            return ds;
         }
     }
 }
