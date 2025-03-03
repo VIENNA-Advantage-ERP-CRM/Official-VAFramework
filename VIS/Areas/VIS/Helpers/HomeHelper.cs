@@ -13,6 +13,8 @@ using System.Globalization;
 using System.IO;
 using System.Web.Hosting;
 using VAdvantage.Classes;
+using System.Data.SqlClient;
+
 namespace VIS.Helpers
 {
 
@@ -530,8 +532,20 @@ namespace VIS.Helpers
                 dsData = VIS.DBase.DB.ExecuteDatasetPaging(objSP.sql, objSP.page, objSP.pageSize);
                 if (dsData != null)
                 {
+                    StringBuilder sql1 = new StringBuilder();
+                    sql1.Append("UPDATE CM_Subscribe SET UnReadMessageCount = 0 WHERE ");
                     for (int i = 0; i < dsData.Tables[0].Rows.Count; i++)
                     {
+                        sql1.Append("(AD_Table_ID = " + Util.GetValueOfInt(dsData.Tables[0].Rows[i]["AD_Table_ID"]) +
+                   " AND Record_ID = " + Util.GetValueOfInt(dsData.Tables[0].Rows[i]["Record_ID"]) +
+                   " AND AD_User_ID = " + ctx.GetAD_User_ID() +
+                   " AND AD_Window_ID = " + Util.GetValueOfInt(dsData.Tables[0].Rows[i]["AD_Window_ID"]) + " ) ");
+
+                        if (i < dsData.Tables[0].Rows.Count - 1)
+                        {
+                            sql1.Append(" OR ");
+                        }
+
                         var Fllps = new HomeFolloUps();
                         Fllps.ChatID = Util.GetValueOfInt(dsData.Tables[0].Rows[i]["ChatID"].ToString());
                         Fllps.ChatEntryID = Util.GetValueOfInt(dsData.Tables[0].Rows[i]["cm_chatentry_id"].ToString());
@@ -614,6 +628,9 @@ namespace VIS.Helpers
 
                         lstFollUps.Add(Fllps);
                     }
+
+                    //SET UnReadMessageCount = 0 
+                    DB.ExecuteQuery(sql1.ToString());
 
                 }
                 objFllupsInfo.lstUserImg = lstUImg;
@@ -845,6 +862,14 @@ namespace VIS.Helpers
             {
                 //strQuery = "  UPDATE cm_subscribe SET isRead='N' WHERE isRead='Y' AND cm_subscribe_id=" + SubscriberID;
                 //DB.ExecuteQuery(strQuery);
+                if (SubscriberID > 0)
+                {
+                    string sql1 = @"UPDATE CM_Subscribe 
+                                        SET UnReadMessageCount =  COALESCE(UnReadMessageCount, 0) + 1  WHERE CM_Subscribe_ID = @Value";
+                    SqlParameter[] param = new SqlParameter[1];
+                    param[0] = new SqlParameter("@Value", SubscriberID);
+                    DB.ExecuteQuery(sql1, param, null);
+                }
             }
 
         }
@@ -1502,10 +1527,19 @@ namespace VIS.Helpers
                 }
                 #endregion
 
+                #region Unread Message Count
+
+                string sql = @"SELECT SUM(UnReadMessageCount) FROM CM_Subscribe WHERE AD_User_ID =@Value ";
+                SqlParameter[] param = new SqlParameter[1];
+                param[0] = new SqlParameter("@Value", ctx.GetAD_User_ID());
+                int count = Util.GetValueOfInt(DB.ExecuteScalar(sql, param, null));
+
+                #endregion
                 objHome.RequestCnt = nRequest;
                 objHome.NoticeCnt = nNotice;
                 objHome.WorkFlowCnt = nWorkFlow;
-                return objHome;
+                objHome.UnreadMessageCount = count;
+                objHome.FollowUpCnt = getFllCnt(ctx);
             }
             catch (Exception)
             {

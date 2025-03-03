@@ -274,7 +274,10 @@
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
     <Content Include="Areas\VIS\Content\VIS.all.min.css" />
     <Content Include="Areas\VIS\Content\VISAD.css" />
+    <Content Include="Areas\VIS\Content\Widgets\AssignedWindowRec.css" />
     <Content Include="Areas\VIS\Content\Widgets\AssignRecordWidget.css" />
+    <Content Include="Areas\VIS\Content\Widgets\Checklist.css" />
+    <Content Include="Areas\VIS\Content\Widgets\FollowUpsWidget.css" />
     <Content Include="Areas\VIS\Content\Widgets\VIS-Widget.css" />
     <Content Include="Areas\VIS\Content\Widgets\VISTemplateExcel.css" />
     <Content Include="Areas\VIS\Images\11.png" />
@@ -756,6 +759,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\vbinaryform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vdocaction.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vimageform.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\subscribe.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\visimportfiles.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\visassignuser.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\vpayment.js" />
@@ -822,7 +826,6 @@
     <Content Include="Areas\VIS\Scripts\processengine\processinfo.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processparameter.js" />
     <Content Include="Areas\VIS\Scripts\react\component\helloWord.jsx" />
-    <Content Include="Areas\VIS\Scripts\react\component\WidgetLoader.jsx" />
     <Content Include="Areas\VIS\Scripts\react\CSS\Vis_AssignRecordWidget.css" />
     <Content Include="Areas\VIS\Scripts\react\pages\AssignRecordWidget.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\HomePage.jsx" />
@@ -830,8 +833,10 @@
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
-    <Content Include="Areas\VIS\Scripts\widgets\assignRecordWidget.js" />
-    <Content Include="Areas\VIS\Scripts\widgets\Checklist.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\assignedwindowrec.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\checklist.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\assignrecordwidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\followupswidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
@@ -843,7 +848,7 @@
     <Content Include="Areas\VIS\Scripts\VIS.all.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS1_0.min.js" />
     <Content Include="Areas\VIS\Scripts\VIS2_0.min.js" />
-    <Content Include="Areas\VIS\Scripts\widgets\ActionsWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\actionswidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\dynamicWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\NoticeWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\RequestWidget.js" />
@@ -877,6 +882,7 @@
     <Compile Include="Areas\VIS\Controllers\CardViewController.cs" />
     <Compile Include="Areas\VIS\Controllers\CardViewWizardController.cs" />
     <Compile Include="Areas\VIS\Controllers\Chat\ChatController.cs" />
+    <Compile Include="Areas\VIS\Controllers\ChecklistPending.cs" />
     <Compile Include="Areas\VIS\Controllers\DocActionController.cs" />
     <Compile Include="Areas\VIS\Controllers\EmailController.cs" />
     <Compile Include="Areas\VIS\Controllers\FormController.cs" />
@@ -929,6 +935,7 @@
     <Compile Include="Areas\VIS\Models\AssignedRecordToUser.cs" />
     <Compile Include="Areas\VIS\Models\BatchUpdateModel.cs" />
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />
+    <Compile Include="Areas\VIS\Models\PendingChecklist.cs" />
     <Compile Include="Areas\VIS\Models\EmailModel.cs" />
     <Compile Include="Areas\VIS\Models\GmailContactsSettings.cs" />
     <Compile Include="Areas\VIS\Models\HistoryDetailsDataModel.cs" />
@@ -1013,6 +1020,7 @@
     <Folder Include="Areas\VIS\Views\AmountDivision\" />
     <Folder Include="Areas\VIS\Views\ArchiveViewer\" />
     <Folder Include="Areas\VIS\Views\Channel\" />
+    <Folder Include="Areas\VIS\Views\ChecklistPending\" />
     <Folder Include="Areas\VIS\Views\GenerateXModel\" />
     <Folder Include="Areas\VIS\Views\GmailContacts\" />
     <Folder Include="Areas\VIS\Views\Group\" />

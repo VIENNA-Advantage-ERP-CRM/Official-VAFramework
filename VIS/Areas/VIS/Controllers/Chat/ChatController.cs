@@ -49,9 +49,10 @@ namespace VIS.Controllers
         {
             Ctx ct = Session["ctx"] as Ctx;
             ChatModel model = new ChatModel(ct, prop.ChatID, prop.AD_Table_ID, prop.Record_ID, prop.Description);
-            model.Ok(prop.ChatText);
+            model.Ok(ct, prop.ChatText, prop.AD_Window_ID, prop.AD_Table_ID, prop.Record_ID);
             return Json(true, JsonRequestBehavior.AllowGet);
         }
+
 
         public bool IsBottomTabPanel(int tabID)
         {
