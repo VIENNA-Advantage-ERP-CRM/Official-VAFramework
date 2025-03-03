@@ -274,6 +274,7 @@
     <Content Include="Areas\VIS\Content\VIS.rtl.css" />
     <Content Include="Areas\VIS\Content\VIS.all.min.css" />
     <Content Include="Areas\VIS\Content\VISAD.css" />
+    <Content Include="Areas\VIS\Content\wfManual.css" />
     <Content Include="Areas\VIS\Content\Widgets\AssignRecordWidget.css" />
     <Content Include="Areas\VIS\Content\Widgets\VIS-Widget.css" />
     <Content Include="Areas\VIS\Content\Widgets\VISTemplateExcel.css" />
@@ -830,6 +831,7 @@
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\tabpanels\wfPanel.js" />
     <Content Include="Areas\VIS\Scripts\widgets\assignRecordWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\Checklist.js" />
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
@@ -906,6 +908,7 @@
     <Compile Include="Areas\VIS\Controllers\TabPanel\BiPanelController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\HistoryDetailsDataController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\SurveyPanelController.cs" />
+    <Compile Include="Areas\VIS\Controllers\TabPanel\WFManualController.cs" />
     <Compile Include="Areas\VIS\Controllers\TemplateExcelController.cs" />
     <Compile Include="Areas\VIS\Controllers\ThemeController.cs" />
     <Compile Include="Areas\VIS\Controllers\TreeMaintenanceController.cs" />

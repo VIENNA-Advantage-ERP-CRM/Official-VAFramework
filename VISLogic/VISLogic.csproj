@@ -136,6 +136,7 @@
     <Compile Include="Models\SmsModel.cs" />
     <Compile Include="Models\Subscribe\SubscribeModel.cs" />
     <Compile Include="Models\TabPanels\BiPanelModel.cs" />
+    <Compile Include="Models\TabPanels\WFManualModel.cs" />
     <Compile Include="Models\ThemeModel.cs" />
     <Compile Include="Models\ValuePreferenceModel.cs" />
     <Compile Include="Models\VSetupModel.cs" />
