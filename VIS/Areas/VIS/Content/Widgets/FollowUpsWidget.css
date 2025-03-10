@@ -1,0 +1,99 @@
+﻿.vis-followuplayout {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background: #ffbfbf;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    transform: translate(0,-50%);
+}
+
+#openModal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.8rem;
+    color: white;
+}
+
+.vis-followups-cross {
+    font-size: 1.5rem;
+    position: absolute;
+    right: 1rem;
+}
+
+.vis-followUpsHeader {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(var(--v-c-common), 1);
+    border-radius: .375em;
+    color: rgba(var(--v-c-primary), 1);
+    float: left;
+    font-size: 1.125em;
+    height: 2.375em;
+    margin-top: .625em;
+    padding: 0 .625em;
+    width: 100%;
+}
+
+.vis-followups-record-box {
+    align-items: center;
+    border-radius: 8px;
+    display: flex;
+    gap: .75em;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 13px 10px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.vis-followups-windowList {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.vis-followups-record-col {
+    gap: .75em;
+    cursor: pointer;
+}
+
+.vis-followups-records {
+    width: 100%;
+    height: calc(100% - 90px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 .75em;
+    width: 100%;
+    margin-top: 7px;
+    display: inline-block;
+}
+
+.vis-followupsCount {
+    align-items: center;
+    background: transparent;
+    background-color: #f3f3f3;
+    border-radius: 6px;
+    color: rgba(var(--v-c-primary), 1);
+    display: flex;
+    font-weight: 600;
+    height: 1.8em !important;
+    justify-content: center;
+    margin-left: .375em;
+    margin-right: .375em;
+    max-width: 5em;
+    min-width: 2em;
+    padding: 0 4px;
+    width: auto;
+    font-size: 72%;
+}

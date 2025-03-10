@@ -957,6 +957,10 @@ span.vis-ad-w-p-tb-rc-action {
     height: 100%;
 }
 
+.ui-dialog-content.ui-widget-content .vis-ad-w-p-vc {
+    flex: 1 !important;
+}
+
 .vis-ad-w-p .vis-ad-w-p-vc {
     height: auto;
 }
