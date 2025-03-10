@@ -9,6 +9,8 @@ VIS = window.VIS || {};
         this.panelWidth;
         this.extraInfo = null;
         this.isCheckListFill = false;
+        this.selectdIdx = -1;
+        this.TabPanelName = "SurveyPanel";
         var self = this;
         var $root;
         var questionSection = null;
@@ -18,7 +20,7 @@ VIS = window.VIS || {};
         var _AD_Table_ID = 0;
         var _AD_WF_Activity_ID = 0;
         var iFrame;
-        var IsMandatoryAll = false;      
+        var IsMandatoryAll = false;
         var pageSize = 0;
         var Limit = 0;
         var AD_SurveyAssignment_ID = 0;
@@ -28,7 +30,7 @@ VIS = window.VIS || {};
         var userResIdx = 0;
         var isSelfShow = true;
         var surveyTab = null;
-        var $clickHere = ('<a href="javascript:;">' + VIS.Msg.getMsg("VIS_ClickHere")+'</a>');
+        var $clickHere = ('<a href="javascript:;">' + VIS.Msg.getMsg("VIS_ClickHere") + '</a>');
         var bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
         var setBusy = function (isBusy) {
             bsyDiv.css("display", isBusy ? 'block' : 'none');
@@ -39,11 +41,11 @@ VIS = window.VIS || {};
             setBusy(false);
             $root = $('<div class="vis-surveyTab-root"></div>').append(bsyDiv);
             // h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
-            h = height-4;
-           
+            h = height - 4;
+
             if (!h || h < 0) {
                 h = $('.divWorkflowActivity').height() - 19;
-            } 
+            }
 
             if (self.curTab && self.curTab.getIsTPBottomAligned()) {
                 h = null;
@@ -55,54 +57,54 @@ VIS = window.VIS || {};
             } else {
                 ht = (h - 38) + 'px';
                 h = h + 'px';
-                
+
             }
 
             var tab = $('<div class="vis-surveyTab">'
                 + '<div class="vis-tabPrimary">'
-                + '<ul class="nav vis-primarySection nav-tabs mb-1" id="surveyTab_' + self.windowNo+'" role="tablist">'
+                + '<ul class="nav vis-primarySection nav-tabs mb-1" id="surveyTab_' + self.windowNo + '" role="tablist">'
                 + '<li class="nav-item vis-firstResLink  text-center ">'
                 + '  <a'
                 + '    class="nav-link active quesTab text-center"'
                 + '    id="home-tab"'
                 + '    data-toggle="tab"'
-                + '    href="#quesSec_' + self.windowNo+'"'
-                + '    >' + VIS.Msg.getMsg("VIS_Questions")+'</a>'
+                + '    href="#quesSec_' + self.windowNo + '"'
+                + '    >' + VIS.Msg.getMsg("VIS_Questions") + '</a>'
                 + '</li>'
                 + '<li class="nav-item text-center" >'
                 + '  <a style="display:none"'
                 + '    class="nav-link respTab text-center"'
                 + '    id="profile-tab"'
                 + '    data-toggle="tab"'
-                + '    href="#resp_' + self.windowNo +'"'
-                + '    >' + VIS.Msg.getMsg("Response") + '<span class="badge badge-light responseCount' + (VIS.Application.isRTL ? " mr-1" : " ml-1")+'">0</span></a>'
+                + '    href="#resp_' + self.windowNo + '"'
+                + '    >' + VIS.Msg.getMsg("Response") + '<span class="badge badge-light responseCount' + (VIS.Application.isRTL ? " mr-1" : " ml-1") + '">0</span></a>'
                 + '</li>'
                 + '</ul>'
                 + '<div class="tab-content">'
-                + '<div class="tab-pane fade show active" style="width:100%;" id="quesSec_' + self.windowNo + '">'  
-                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:' + (ht)+'" id="quesMessage_' + self.windowNo +'"></div>'
-                + '<div style="height:' + (ht)+';overflow-y:auto !important;" id="ques_' + self.windowNo +'"></div>'
+                + '<div class="tab-pane fade show active" style="width:100%;" id="quesSec_' + self.windowNo + '">'
+                + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:' + (ht) + '" id="quesMessage_' + self.windowNo + '"></div>'
+                + '<div style="height:' + (ht) + ';overflow-y:auto !important;" id="ques_' + self.windowNo + '"></div>'
                 + '</div>'
-                + '<div class="tab-pane fade mt-2" style="height:'+(ht)+';width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
+                + '<div class="tab-pane fade mt-2" style="height:' + (ht) + ';width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
                 + '<div class="d-flex align-items-center justify-content-between mr-2 ml-2">'
-                + '<div class="d-flex align-items-center ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") +'">' 
-                + '<span class="d-inline-block ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") +'">' + VIS.Msg.getMsg("SelectUser")+'</span>'
+                + '<div class="d-flex align-items-center ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") + '">'
+                + '<span class="d-inline-block ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") + '">' + VIS.Msg.getMsg("SelectUser") + '</span>'
                 + '<select class="w-100"></select>'
                 + '</div> '
                 + '<div class="align-items-center d-flex"> '
-                + '<span class="' + (VIS.Application.isRTL ? "ml-1" : "mr-1") +' ">' + VIS.Msg.getMsg("Response") +':</span>'
+                + '<span class="' + (VIS.Application.isRTL ? "ml-1" : "mr-1") + ' ">' + VIS.Msg.getMsg("Response") + ':</span>'
                 + '<span class="align-items-center d-flex">'
                 + '<button class="vis-cusPagination prev">'
-                + '<i class="fa fa-chevron-circle-' + (VIS.Application.isRTL ? "right ml-1" : "left mr-1") +' " aria-hidden="true"></i>'
+                + '<i class="fa fa-chevron-circle-' + (VIS.Application.isRTL ? "right ml-1" : "left mr-1") + ' " aria-hidden="true"></i>'
                 + '</button>'
                 + '<span class="resStatus vis-surveyPagination">0/0</span class="d-flex align-items-center">'
                 + '<button class="vis-cusPagination next">'
-                + '<i class="fa fa-chevron-circle-' + (VIS.Application.isRTL ? "left mr-1" : "right ml-1") +'" aria-hidden="true"></i>'
+                + '<i class="fa fa-chevron-circle-' + (VIS.Application.isRTL ? "left mr-1" : "right ml-1") + '" aria-hidden="true"></i>'
                 + '</button>'
                 + '</span>'
-                + '</div>' 
+                + '</div>'
                 + '</div> '
-                + '<div class="' + (VIS.Application.isRTL ? "text-left ml-2" : "text-right mr-2") +' mt-2"  style="font-size: 12px;font-style: italic;" >' + VIS.Msg.getMsg("VIS_Submitted") + ': <span class="submittedDate"></span></div>'
+                + '<div class="' + (VIS.Application.isRTL ? "text-left ml-2" : "text-right mr-2") + ' mt-2"  style="font-size: 12px;font-style: italic;" >' + VIS.Msg.getMsg("VIS_Submitted") + ': <span class="submittedDate"></span></div>'
                 + '<div class="response"></div>'
                 + '</div > '
                 + '</div>'
@@ -132,7 +134,7 @@ VIS = window.VIS || {};
         this.setisCheckListFill = function (value) {
             this.isCheckListFill = value;
         }
-            
+
         this.panelDetails = function (AD_window_ID, AD_Tab_ID, AD_Table_ID, Record_ID, $root, AD_WF_Activity_ID) {
             self.isCheckListFill = false;
             self.record_ID = Record_ID;
@@ -140,47 +142,91 @@ VIS = window.VIS || {};
             _AD_Tab_ID = AD_Tab_ID;
             _AD_Table_ID = AD_Table_ID;
             _AD_WF_Activity_ID = AD_WF_Activity_ID;
-            questionSection.empty();
-            $root.find('.vis-surveyTab .vis-primarySection').show();
-            $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
-            responseSection.find('.response').empty();
+           
             IsMandatoryAll = false;
             pageSize = 0;
             userResIdx = 0;
             Limit = 0;
 
-
+            var uri = "GetSurveyAssignmentsClientSide";
+            if (_AD_WF_Activity_ID > 0) {
+                uri = "GetSurveyAssignments";
+            }
             setBusy(true);
-            $.ajax({
-                url: VIS.Application.contextUrl + "VIS/SurveyPanel/GetSurveyAssignments",
-                //async: false,
-                data: { AD_window_ID: AD_window_ID, AD_Tab_ID: AD_Tab_ID, AD_Table_ID: AD_Table_ID, AD_Record_ID: self.record_ID, AD_WF_Activity_ID: _AD_WF_Activity_ID},
-                success: function (data) {
-                    setBusy(false);
-                    var res = [];
-                    res = JSON.parse(data);
-                    if (res != null && res.length > 0) {
-                        IsMandatoryAll = res[0].IsMandatory;
-                        pageSize = res[0].QuestionsPerPage;
-                        isSelfShow = res[0].IsSelfshow;
-                        Limit = res[0].Limit;
-                        ResponseCount = res[0].ResponseCount;
-                        AD_SurveyAssignment_ID = res[0].SurveyAssignment_ID;
-                        AD_SurveyResponse_ID = res[0].SurveyResponse_ID;
-                        loadSurveyUI(res[0].Survey_ID, res[0].SurveyType, $root);
-                    } else {
-                        if (_AD_WF_Activity_ID > 0) {
-                            $root.find('.vis-surveyTab .vis-primarySection').hide();
-                            $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_NoCheckListFound"));
-                            $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+            function processAssignment(res) {
+                var indx = -1;
+                if (_AD_WF_Activity_ID == 0) {
+                    for (var i = 0; i < res.length; i++) {
+                        if (!res[i].ShowEverytime) {
+                            indx = 0;
+                            break;
+                        }
+                        var isValidate = VIS.Evaluator.evaluateLogicByRowData(self.curTab, res[i].ConditionStr);
+                        if (isValidate) {
+                            indx = i;
+                            break;
                         }
                     }
-                },
-                error: function (e) {
-                    setBusy(false);
+
+                    if (indx == -1) {
+                        return;
+                    }
+
+                } else {
+                    indx = 0;
                 }
-            });
-        };
+
+                IsMandatoryAll = res[indx].IsMandatory;
+                pageSize = res[indx].QuestionsPerPage;
+                isSelfShow = res[indx].IsSelfshow;
+                Limit = res[indx].Limit;
+                ResponseCount = res[indx].ResponseCount;
+                AD_SurveyAssignment_ID = res[indx].SurveyAssignment_ID;
+                AD_SurveyResponse_ID = res[indx].SurveyResponse_ID;
+
+                if (self.selectdIdx != indx) {
+                    questionSection.empty();
+                    $root.find('.vis-surveyTab .vis-primarySection').show();
+                    $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
+                    responseSection.find('.response').empty();
+                    loadSurveyUI(res[indx].Survey_ID, res[indx].SurveyType, $root);
+                } 
+                setBusy(false);
+                self.selectdIdx = indx;
+            }
+
+            if (self.ChecklistRes) {
+                processAssignment(self.ChecklistRes)
+            } else {               
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "VIS/SurveyPanel/" + uri,
+                    //async: false,
+                    data: { AD_window_ID: AD_window_ID, AD_Tab_ID: AD_Tab_ID, AD_Table_ID: AD_Table_ID, AD_Record_ID: self.record_ID, AD_WF_Activity_ID: _AD_WF_Activity_ID },
+                    success: function (data) {
+                        setBusy(false);
+                        var res = [];
+                        res = JSON.parse(data);
+                        if (res != null && res.length > 0) {
+                            self.ChecklistRes = res;
+                            processAssignment(res);
+
+                        } else {
+                            if (_AD_WF_Activity_ID > 0) {
+                                $root.find('.vis-surveyTab .vis-primarySection').hide();
+                                $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_NoCheckListFound"));
+                                $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+                            }
+                        }
+                    },
+                    error: function (e) {
+                        setBusy(false);
+                    }
+                });
+            }
+        }
+
+        
 
         this.getRoot = function () {
             return $root;
@@ -453,7 +499,7 @@ VIS = window.VIS || {};
 
                 if (ResponseCount > 0) {
                     questionSection.hide();
-                    $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere+'</span>');
+                    $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere + '</span>');
                     $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
 
                     $root.find("#quesMessage_" + self.windowNo + " a").click(function () {
@@ -463,6 +509,12 @@ VIS = window.VIS || {};
                         questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
                         showHideSubmit();
                     });
+                } else {
+                    questionSection.show();
+                    $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
+                    questionSection.find('.vis-tp-orderListWrap li').removeClass('hideQuestion');
+                    questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
+                    showHideSubmit();
                 }
             }
 

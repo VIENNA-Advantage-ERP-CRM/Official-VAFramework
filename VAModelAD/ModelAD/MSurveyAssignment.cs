@@ -143,7 +143,10 @@ namespace VAdvantage.Model
         /// <returns></returns>
         protected override bool BeforeDelete()
         {
-            DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
+            if (Util.GetValueOfInt(DB.ExecuteScalar("@SELECT COUNT(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE ad_window_id = " + GetAD_Window_ID() + " AND ad_tab_id = " + GetAD_Tab_ID() + " AND ad_table_id = " + GetAD_Table_ID())) == 1)
+            {
+                DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
+            }
             return true;
         }
     }

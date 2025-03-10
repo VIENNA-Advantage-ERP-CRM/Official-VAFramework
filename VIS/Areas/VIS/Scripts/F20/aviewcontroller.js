@@ -568,13 +568,19 @@
             isCheckListFill = this.vTabPanel.curTabPanel.isCheckListFill;
         }
 
+        var Survey_ID = 0;
+        if (this.vTabPanel.curTabPanel) {
+            Survey_ID = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].Survey_ID;
+        }
+
         $.ajax({
             async: false,
             url: VIS.Application.contextUrl + "SurveyPanel/IsCheckListRequire",
             data: {
                 AD_Window_ID: windowID,
                 AD_Table_ID: tableID,
-                Record_ID: recordID
+                Record_ID: recordID,
+                AD_Survey_ID: Survey_ID
             },
             success: function (data) {
                 data = JSON.parse(data);
@@ -1732,6 +1738,10 @@
         ////
         ////  modified to enforce validation even when the new value      null
         mTable.setValueAt(e.newValue, row, col);	//	-> dataStatusChanged -> dynamicDisplay
+
+        if (this.vTabPanel && this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.TabPanelName && this.vTabPanel.curTabPanel.TabPanelName == "SurveyPanel") {
+            this.vTabPanel.curTabPanel.update(this.gTab.getRecord_ID());
+        }
 
     };
 

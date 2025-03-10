@@ -171,7 +171,16 @@ namespace VIS.Models
                     string img = "";
                     try
                     {
-                        img = "<img class='vis-widgetImg' src='data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]) + "' />";
+                        byte[] imageData = (byte[])row[i]["BINARYDATA"];
+                        if (imageData.Length > 10 * 1024)
+                        {
+                            img = "<img class='vis-widgetImg vis-widgetdefault' src='Areas/VIS/Images/home/defaultWidget.svg' />";
+                        }
+                        else
+                        {
+                            img = "<img class='vis-widgetImg' src='data:image/jpg;base64," + Convert.ToBase64String(imageData) + "' />";
+                        }
+                        
                     }
                     catch (Exception ex)
                     {
