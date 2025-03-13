@@ -1398,9 +1398,9 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
         display: block;
     }
     .vis-ts-panel-twoByTwo .vis-a-statusBox-container .vis-a-status-count {
-        width: 40px;
-        min-width: unset;
         font-size: 1.2em;
+        min-width: 40px;
+        padding: 0 10px;
     }
     .vis-ts-panel-twoByTwo .vis-a-statusBox-container .vis-followups-red-dot {
         height: 8px;
