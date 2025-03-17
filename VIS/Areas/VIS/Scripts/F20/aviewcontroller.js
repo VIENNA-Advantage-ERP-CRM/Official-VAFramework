@@ -569,8 +569,16 @@
         }
 
         var Survey_ID = 0;
-        if (this.vTabPanel.curTabPanel) {
+        var IsMandatoryToFill = false;
+        if (this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.selectdIdx > -1) {
             Survey_ID = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].Survey_ID;
+            IsMandatoryToFill = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].IsMandatoryToFill;
+        } else {
+            return true;
+        }
+
+        if (!IsMandatoryToFill) {
+            return true;
         }
 
         $.ajax({

@@ -66,7 +66,7 @@ namespace VAdvantage.Model
             if (GetAD_SurveyAssignment_ID() > 0)
             {
                 int tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
-                if(tableID!= GetAD_Table_ID() && IsAD_ShowEverytime())
+                if(tableID!= GetAD_Table_ID() && IsConditionalChecklist())
                 {
                     int isExistCondition = Util.GetValueOfInt(DB.ExecuteScalar("SELECT Count(AD_SurveyShowCondition_ID) FROM AD_SurveyShowCondition WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
                     if (isExistCondition > 0)
@@ -75,7 +75,7 @@ namespace VAdvantage.Model
                         return false;
                     }
                 }
-                else if(!IsAD_ShowEverytime()) {
+                else if(!IsConditionalChecklist()) {
                     DB.ExecuteQuery("DELETE FROM AD_SurveyShowCondition WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID());
                 }
 
@@ -83,7 +83,7 @@ namespace VAdvantage.Model
             }
             DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Client_ID=" + GetAD_Client_ID() + " AND AD_Tab_ID IN (" + GetAD_Tab_ID() + ")");
 
-            string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND isActive='Y' AND AD_Client_ID="+GetAD_Client_ID();
+            string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND IsConditionalChecklist='N' AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
 
             if (!newRecord)
             {
@@ -95,9 +95,9 @@ namespace VAdvantage.Model
                 log.SaveError("Error", Msg.GetMsg(GetCtx(), "UniqueShowEveryTime"));
                 return false;
             }
-            else if (IsAD_ShowEverytime() == true)
+            else if (IsConditionalChecklist() == true)
             {
-                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
+                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND IsConditionalChecklist='N' AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
                 if (!newRecord)
                 {
                     sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
@@ -113,9 +113,9 @@ namespace VAdvantage.Model
                     return true;
                 }
             }
-            else if (IsAD_ShowEverytime() == false)
+            else if (IsConditionalChecklist() == false)
             {
-                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND ad_showeverytime='N' AND AD_Survey_ID=" + GetAD_Survey_ID() + " AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
+                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND IsConditionalChecklist='N' AND AD_Survey_ID=" + GetAD_Survey_ID() + " AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
                 if (!newRecord)
                 {
                     sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
@@ -143,7 +143,8 @@ namespace VAdvantage.Model
         /// <returns></returns>
         protected override bool BeforeDelete()
         {
-            if (Util.GetValueOfInt(DB.ExecuteScalar("@SELECT COUNT(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE ad_window_id = " + GetAD_Window_ID() + " AND ad_tab_id = " + GetAD_Tab_ID() + " AND ad_table_id = " + GetAD_Table_ID())) == 1)
+            string sql = "SELECT COUNT(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND IsConditionalChecklist='N' AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
+            if (Util.GetValueOfInt(DB.ExecuteScalar(sql)) == 1)
             {
                 DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
             }
