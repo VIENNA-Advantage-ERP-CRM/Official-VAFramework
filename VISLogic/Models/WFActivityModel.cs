@@ -1200,7 +1200,7 @@ OR
                 return false;
             }
 
-            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
+            string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
             bool result = false;
@@ -1210,9 +1210,9 @@ OR
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    //if (Util.GetValueOfString(dt["IsConditionalChecklist"]) == "N")
                     //{
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     //    if (isvalidate)
                     //    {
                     //        isvalidate = true;

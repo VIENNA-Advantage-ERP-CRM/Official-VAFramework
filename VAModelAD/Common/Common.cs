@@ -1662,9 +1662,9 @@ namespace VAdvantage.Common
         /// <param name="AD_Table_ID"></param>
         /// <param name="AD_Record_ID"></param>
         /// <param name="AD_SurveyAssignment_ID"></param>
-        /// <param name="ShowEverytime"></param>
+        /// <param name="IsConditionalChecklist"></param>
         /// <returns></returns>
-        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID, string ShowEverytime)
+        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID, string IsConditionalChecklist)
         {
             bool isExist = true;
             bool isConditionGiven = true;
@@ -1908,7 +1908,7 @@ namespace VAdvantage.Common
                 return true;
             }
 
-            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
+            string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
 
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
             bool result = true;
@@ -1918,9 +1918,9 @@ namespace VAdvantage.Common
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    //if (Util.GetValueOfString(dt["IsConditionalChecklist"]) == "N")
                     //{
-                        isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                         //if (isvalidate)
                         //{
                         //    isvalidate = true;

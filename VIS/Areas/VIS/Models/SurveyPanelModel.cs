@@ -25,7 +25,7 @@ namespace VIS.Models
             }
 
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
-                                                  sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
+                                                  sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.IsConditionalChecklist,sa.IsMandatoryToFill,
                                                   s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limits,0) AS Limit,RS.isSelfshow,");
             if (AD_Record_ID > 0)
             {
@@ -70,7 +70,8 @@ namespace VIS.Models
                         SurveyName = Util.GetValueOfString(dt["name"]),
                         QuestionsPerPage = Util.GetValueOfInt(dt["QuestionsPerPage"]),
                         IsDocActionActive = CheckDocActionColumn(AD_Tab_ID),
-                        ShowEverytime = Util.GetValueOfBool(Util.GetValueOfString(dt["AD_ShowEverytime"]).Equals("Y")),
+                        IsConditionalChecklist = Util.GetValueOfBool(Util.GetValueOfString(dt["IsConditionalChecklist"]).Equals("Y")),
+                        IsMandatoryToFill= Util.GetValueOfBool(Util.GetValueOfString(dt["IsMandatoryToFill"]).Equals("Y")),
                         IsSelfshow = Util.GetValueOfBool(Util.GetValueOfString(dt["isSelfshow"]).Equals("Y")),
                         Limit = Util.GetValueOfInt(dt["Limit"]),
                         ResponseCount = Util.GetValueOfInt(dt["responseCount"]),
@@ -239,7 +240,7 @@ namespace VIS.Models
             }
 
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
-                                                  sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
+                                                  sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.IsConditionalChecklist,sa.IsMandatoryToFill,
                                                   s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limits,0) AS Limit,RS.isSelfshow,");
             if (AD_Record_ID > 0)
             {
@@ -269,16 +270,16 @@ namespace VIS.Models
                 {
                     bool isvalidate = false;
                     string condition = "";
-                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"])=="N")
+                    //if (Util.GetValueOfString(dt["IsConditionalChecklist"])=="N")
                     //{
                     if (AD_Record_ID > 0)
                     {
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     }
                     else
                     {
                         isvalidate = true;
-                        //condition = CheckConditionForNewRecord(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                        //condition = CheckConditionForNewRecord(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     }
                     //    if (isvalidate)
                     //    {
@@ -305,7 +306,8 @@ namespace VIS.Models
                         SurveyName = Util.GetValueOfString(dt["name"]),
                         QuestionsPerPage = Util.GetValueOfInt(dt["QuestionsPerPage"]),
                         IsDocActionActive = CheckDocActionColumn(AD_Tab_ID),
-                        ShowEverytime = Util.GetValueOfBool(Util.GetValueOfString(dt["AD_ShowEverytime"]).Equals("Y")),
+                        IsConditionalChecklist = Util.GetValueOfBool(Util.GetValueOfString(dt["IsConditionalChecklist"]).Equals("Y")),
+                        IsMandatoryToFill = Util.GetValueOfBool(Util.GetValueOfString(dt["IsMandatoryToFill"]).Equals("Y")),
                         IsSelfshow = Util.GetValueOfBool(Util.GetValueOfString(dt["isSelfshow"]).Equals("Y")),
                         Limit = Util.GetValueOfInt(dt["Limit"]),
                         ResponseCount = Util.GetValueOfInt(dt["responseCount"]),
@@ -450,7 +452,7 @@ namespace VIS.Models
                 return false;
             }
 
-            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
+            string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
             if (DocAction != "RE")
             {
                 sql += " AND docaction='" + DocAction + "'";
@@ -463,9 +465,9 @@ namespace VIS.Models
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
                     bool isvalidate = false;
-                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    //if (Util.GetValueOfString(dt["IsConditionalChecklist"]) == "N")
                     //{
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     //    if (isvalidate)
                     //    {
                     //        isvalidate = true;
@@ -693,11 +695,11 @@ namespace VIS.Models
             
             sql = @"SELECT AD_Column.AD_column_ID,
                             ad_surveyshowcondition.seqno,AD_Column.ColumnName,ad_surveyshowcondition.operation,ad_surveyshowcondition.ad_equalto,ad_surveyshowcondition.Value2,
-                            ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID
+                            ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID,AD_SurveyAssignment.IsMandatoryToFill
                             FROM  AD_Column                           
                             INNER JOIN ad_surveyshowcondition ON (AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID)
                             INNER JOIN AD_SurveyAssignment ON (AD_SurveyAssignment.AD_SurveyAssignment_ID=AD_SurveyAssignment.ad_surveyassignment_ID)
-                            WHERE AD_SurveyAssignment.AD_Window_ID="+AD_Window_ID+ " AND AD_SurveyAssignment.AD_Table_ID=" + AD_Table_ID + " AND  ad_surveyshowcondition.isActive='Y' AND  AD_SurveyAssignment.isActive='Y' AND AD_Column.AD_Table_ID=" + AD_Table_ID +  @"
+                            WHERE AD_SurveyAssignment.AD_Window_ID=" + AD_Window_ID+ " AND AD_SurveyAssignment.AD_Table_ID=" + AD_Table_ID + " AND  ad_surveyshowcondition.isActive='Y' AND  AD_SurveyAssignment.isActive='Y' AND AD_Column.AD_Table_ID=" + AD_Table_ID +  @"
                             ORDER BY ad_surveyshowcondition.seqno";
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
             //prepare where condition for filter
@@ -842,7 +844,8 @@ namespace VIS.Models
         public string SurveyName { get; set; }
         public int QuestionsPerPage { get; set; }
         public bool IsDocActionActive { get; set; }
-        public bool ShowEverytime { get; set; }
+        public bool IsConditionalChecklist { get; set; }
+        public bool IsMandatoryToFill { get; set; }
         public int Limit { get; set; }
         public int ResponseCount { get; set; }
         public int SurveyResponse_ID { get; set; }
