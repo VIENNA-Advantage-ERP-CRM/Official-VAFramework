@@ -11,6 +11,7 @@ VIS = window.VIS || {};
         this.isCheckListFill = false;
         this.selectdIdx = -1;
         this.TabPanelName = "SurveyPanel";
+        this.IsMandatoryToFill = false;
         var self = this;
         var $root;
         var questionSection = null;
@@ -144,6 +145,7 @@ VIS = window.VIS || {};
             _AD_WF_Activity_ID = AD_WF_Activity_ID;
            
             IsMandatoryAll = false;
+            self.IsMandatoryToFill = false;
             pageSize = 0;
             userResIdx = 0;
             Limit = 0;
@@ -157,7 +159,7 @@ VIS = window.VIS || {};
                 var indx = -1;
                 if (_AD_WF_Activity_ID == 0) {
                     for (var i = 0; i < res.length; i++) {
-                        if (!res[i].ShowEverytime) {
+                        if (!res[i].IsConditionalChecklist) {
                             indx = 0;
                             break;
                         }
@@ -169,6 +171,13 @@ VIS = window.VIS || {};
                     }
 
                     if (indx == -1) {
+                        setBusy(false);
+                        questionSection.empty();
+                        $root.find('.vis-surveyTab .vis-primarySection').show();
+                        $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
+                        responseSection.find('.response').empty();
+                        self.ChecklistRes = undefined;
+                        self.selectdIdx = -1;
                         return;
                     }
 
@@ -177,6 +186,7 @@ VIS = window.VIS || {};
                 }
 
                 IsMandatoryAll = res[indx].IsMandatory;
+                self.IsMandatoryToFill = res[indx].IsMandatoryToFill;
                 pageSize = res[indx].QuestionsPerPage;
                 isSelfShow = res[indx].IsSelfshow;
                 Limit = res[indx].Limit;
