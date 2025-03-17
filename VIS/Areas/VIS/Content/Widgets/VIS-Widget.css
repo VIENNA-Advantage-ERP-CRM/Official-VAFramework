@@ -1427,6 +1427,9 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-ts-panel-twoByTwo.vis-ts-panel-oneByOne .vis-a-status-box {
     padding: .5em .625em;
 }
+.vis-apanel-rb-ul li.vis-subscribeoverlay-item {
+    width: 120px;
+}
 html[dir=rtl] .vis-feedIcons.vis-icon-viewMoreComments {
     margin: 4px 0px 0 4px;
     float: none;

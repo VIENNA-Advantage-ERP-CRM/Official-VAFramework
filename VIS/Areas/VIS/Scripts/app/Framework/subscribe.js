@@ -26,8 +26,8 @@
                 $root_subs = $(
                     '<div>' +
                         '<ul class="vis-apanel-rb-ul">' +
-                            '<li data-id="unsubscribe" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_Unsubscribe") + '</li>' +
-                            '<li data-id="allRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
+                            '<li class="vis-subscribeoverlay-item" data-id="unsubscribe">' + VIS.Msg.getMsg("VIS_Unsubscribe") + '</li>' +
+                            '<li class="vis-subscribeoverlay-item" data-id="allRecords">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
                         '</ul>' +
                     '</div>'
                 );
@@ -36,8 +36,8 @@
                 // If no matched items, show selectedRecords and allRecords options
                 $root_subs = $('<div>' +
                         '<ul class="vis-apanel-rb-ul">' +
-                            '<li data-id="selectedRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_SelectedRecords") + '</li>' +
-                            '<li data-id="allRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
+                            '<li class="vis-subscribeoverlay-item" data-id="selectedRecords">' + VIS.Msg.getMsg("VIS_SelectedRecords") + '</li>' +
+                            '<li class="vis-subscribeoverlay-item" data-id="allRecords">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
                         '</ul>' +
                     '</div>'
                 );
@@ -47,9 +47,9 @@
             // For cases where there are multiple records, show all options
             $root_subs = $('<div>' +
                     '<ul class="vis-apanel-rb-ul">' +
-                        '<li data-id="selectedRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_SelectedRecords") + '</li>' +
-                        '<li data-id="allRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
-                        '<li data-id="unsubscribe" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_Unsubscribe") + '</li>' +
+                        '<li class="vis-subscribeoverlay-item" data-id="selectedRecords">' + VIS.Msg.getMsg("VIS_SelectedRecords") + '</li>' +
+                        '<li class="vis-subscribeoverlay-item" data-id="allRecords">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
+                        '<li class="vis-subscribeoverlay-item" data-id="unsubscribe">' + VIS.Msg.getMsg("VIS_Unsubscribe") + '</li>' +
                     '</ul>' +
                 '</div>'
             );
@@ -116,7 +116,7 @@
         });
 
         // Show the overlay with the cloned content
-        self.aSubscribe.getListItmIT().w2overlay($root_subs.clone(true), { css: { height: '200px', width: '100px' } });
+        self.aSubscribe.getListItmIT().w2overlay($root_subs.clone(true));
 
         this.disposeComponent = function () {
             // Cleanup logic, if needed
