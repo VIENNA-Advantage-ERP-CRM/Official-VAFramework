@@ -121,21 +121,37 @@ namespace VIS.Helpers
             //if authenticated by LDAP or password is null(Means request from home page)
             if (!authenticated && model.Login1Model.Password != null)
             {
-                string sqlEnc = "SELECT isencrypted FROM ad_column WHERE ad_table_id=(SELECT ad_table_id FROM ad_table WHERE tablename='AD_User') AND columnname='Password'";
-                char isEncrypted = Convert.ToChar(DB.ExecuteScalar(sqlEnc));
+                string sqlEnc = "SELECT isencrypted,isHashed FROM ad_column WHERE ad_table_id=(SELECT ad_table_id FROM ad_table WHERE tablename='AD_User') AND columnname='Password'";
+                DataSet ds = DB.ExecuteDataset(sqlEnc);
+                char isEncrypted = Convert.ToChar(ds.Tables[0].Rows[0]["isencrypted"]);
+                char isHashed = Convert.ToChar(ds.Tables[0].Rows[0]["isHashed"]);
+
                 string originalpwd = model.Login1Model.Password;
-                if (isEncrypted == 'Y' && model.Login1Model.Password != null)
+                
+                if (model.Login1Model.Password != null)
                 {
+                    if(isEncrypted == 'Y')
                     model.Login1Model.Password = SecureEngine.Encrypt(model.Login1Model.Password);
+                    //else if(isHashed == 'Y')
+                    //    isHashVerified = model.Login1Model.Password);
                 }
 
                 //  DataSet dsUserInfo = DB.ExecuteDataset("SELECT AD_User_ID, Value, Password,IsLoginUser,FailedLoginCount FROM AD_User WHERE Value=@username", param);
                 if (dsUserInfo != null && dsUserInfo.Tables[0].Rows.Count > 0)
                 {
+
+                    bool isPasswordMatched = dsUserInfo.Tables[0].Rows[0]["Password"].Equals(model.Login1Model.Password);
+                    //check for hashing
+                    if (isHashed == 'Y')
+                    {
+                        isPasswordMatched = SecureEngine.VerifyHash(originalpwd, dsUserInfo.Tables[0].Rows[0]["Password"].ToString(), null);
+                    }
+
                     //if username or password is not matching
                     if ((!dsUserInfo.Tables[0].Rows[0]["Value"].Equals(model.Login1Model.UserValue) ||
-                        !dsUserInfo.Tables[0].Rows[0]["Password"].Equals(model.Login1Model.Password))
-                        || (originalpwd != null && SecureEngine.IsEncrypted(originalpwd)))
+                        !isPasswordMatched)
+                        || (originalpwd != null && ((isEncrypted == 'Y' && SecureEngine.IsEncrypted(originalpwd))
+                            || (isHashed == 'Y' && SecureEngine.IsLooksLikeHash(originalpwd)))))
                     {
                         //if current user is Not superuser, then increase failed login count
                         if (!cache["SuperUserVal"].Equals(model.Login1Model.UserValue))

@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
-using VAdvantage.ProcessEngine;
-using VAdvantage.Model;
+using System.Threading.Tasks;
 using VAdvantage.Classes;
-using VAdvantage.Utility;
 using VAdvantage.DataBase;
-using System.Data;
+using VAdvantage.Model;
+using VAdvantage.ProcessEngine;
+using VAdvantage.Utility;
 
 
 namespace VAdvantage.Process
 {
-    public class ColumnEncryption : SvrProcess
+    public class ColumnHashing : SvrProcess
     {
         /** Enable/Disable Encryption		*/
-        private bool p_IsEncrypted = false;
+        private bool p_IsHashed = false;
         /** Change Encryption Settings		*/
         private bool p_ChangeSetting = false;
         /** Maximum Length					*/
@@ -25,9 +26,9 @@ namespace VAdvantage.Process
         /** The Column						*/
         private int p_AD_Column_ID = 0;
 
-        /**
-         *  Prepare - e.g., get Parameters.
-         */
+        /// <summary>
+        /// Prepare - get Parameteres
+        /// </summary>
         protected override void Prepare()
         {
             ProcessInfoParameter[] para = GetParameter();
@@ -38,8 +39,8 @@ namespace VAdvantage.Process
                 {
                     ;
                 }
-                else if (name.Equals("IsEncrypted"))
-                    p_IsEncrypted = "Y".Equals(para[i].GetParameter());
+                else if (name.Equals("IsHashed"))
+                    p_IsHashed = "Y".Equals(para[i].GetParameter());
                 else if (name.Equals("ChangeSetting"))
                     p_ChangeSetting = "Y".Equals(para[i].GetParameter());
                 else if (name.Equals("MaxLength"))
@@ -52,17 +53,12 @@ namespace VAdvantage.Process
             p_AD_Column_ID = GetRecord_ID();
         }	//	prepare
 
-        /**
-         * 	Process
-         *	@return info
-         *	@throws Exception
-         */
-        protected override String DoIt()// throws Exception
+        protected override string DoIt()
         {
             log.Info("AD_Column_ID=" + p_AD_Column_ID
-                + ", IsEncrypted=" + p_IsEncrypted
-                + ", ChangeSetting=" + p_ChangeSetting
-                + ", MaxLength=" + p_MaxLength);
+               + ", IsHashed=" + p_IsHashed
+               + ", ChangeSetting=" + p_ChangeSetting
+               + ", MaxLength=" + p_MaxLength);
             MColumn column = new MColumn(GetCtx(), p_AD_Column_ID, Get_Trx());
             if (column.Get_ID() == 0 || column.Get_ID() != p_AD_Column_ID)
                 throw new Exception("@NotFound@ @AD_Column_ID@ - " + p_AD_Column_ID);
@@ -70,10 +66,9 @@ namespace VAdvantage.Process
             String columnName = column.GetColumnName();
             int dt = column.GetAD_Reference_ID();
 
-            //	Can it be enabled?
             if (column.IsKey()
+                || column.IsEncrypted()
                 || column.IsParent()
-                || column.IsHashed()
                 || column.IsStandardColumn()
                 || column.IsVirtualColumn()
                 || column.IsIdentifier()
@@ -84,41 +79,31 @@ namespace VAdvantage.Process
                 || "Value".Equals(column.GetColumnName(), StringComparison.OrdinalIgnoreCase)
                 || "Name".Equals(column.GetColumnName(), StringComparison.OrdinalIgnoreCase))
             {
-                if (column.IsEncrypted())
+                if (column.IsHashed())
                 {
-                    column.SetIsEncrypted(false);
+                    column.SetIsHashed(false);
                     column.Save(Get_Trx());
                 }
-                return columnName + ": cannot be encrypted";
+                return columnName + ": cannot be hashed";
             }
 
-            //	Start
-            AddLog(0, null, null, "Encryption Class = " + SecureEngine.GetClassName());
+
             bool error = false;
 
             //	Test Value
             if (p_TestValue != null && p_TestValue.Length > 0)
             {
-                String encString = SecureEngine.Encrypt(p_TestValue);
-                AddLog(0, null, null, "Encrypted Test Value=" + encString);
-                String clearString = SecureEngine.Decrypt(encString);
-                if (p_TestValue.Equals(clearString))
-                    AddLog(0, null, null, "Decrypted=" + clearString
-                        + " (same as test value)");
-                else
-                {
-                    AddLog(0, null, null, "Decrypted=" + clearString
-                        + " (NOT the same as test value - check algorithm)");
-                    error = true;
-                }
-                int encLength = encString.Length;
-                AddLog(0, null, null, "Test Length=" + p_TestValue.Length + " -> " + encLength);
-                if (encLength <= column.GetFieldLength())
-                    AddLog(0, null, null, "Encrypted Length (" + encLength
+                String hashString = SecureEngine.ComputeHash(p_TestValue);
+                AddLog(0, null, null, "Hashed Test Value=" + hashString);
+                
+                int hashLength = hashString.Length;
+                AddLog(0, null, null, "Test Length=" + p_TestValue.Length + " -> " + hashLength);
+                if (hashLength <= column.GetFieldLength())
+                    AddLog(0, null, null, "Hashed Length (" + hashLength
                         + ") fits into field (" + column.GetFieldLength() + ")");
                 else
                 {
-                    AddLog(0, null, null, "Encrypted Length (" + encLength
+                    AddLog(0, null, null, "Encrypted Length (" + hashLength
                         + ") does NOT fit into field (" + column.GetFieldLength() + ") - resize field");
                     error = true;
                 }
@@ -133,41 +118,42 @@ namespace VAdvantage.Process
                 testClear = testClear.Substring(0, p_MaxLength);
                 log.Config("Test=" + testClear + " (" + p_MaxLength + ")");
                 //
-                String encString = SecureEngine.Encrypt(testClear);
-                int encLength = encString.Length;
-                AddLog(0, null, null, "Test Max Length=" + testClear.Length + " -> " + encLength);
-                if (encLength <= column.GetFieldLength())
-                    AddLog(0, null, null, "Encrypted Max Length (" + encLength
+                String hashString = SecureEngine.ComputeHash(testClear);
+                int hashLength = hashString.Length;
+                AddLog(0, null, null, "Test Max Length=" + testClear.Length + " -> " + hashLength);
+                if (hashLength <= column.GetFieldLength())
+                    AddLog(0, null, null, "Hashed Max Length (" + hashLength
                         + ") fits into field (" + column.GetFieldLength() + ")");
                 else
                 {
-                    AddLog(0, null, null, "Encrypted Max Length (" + encLength
+                    AddLog(0, null, null, "Hashed Max Length (" + hashLength
                         + ") does NOT fit into field (" + column.GetFieldLength() + ") - resize field");
                     error = true;
                 }
             }
 
-            if (p_IsEncrypted != column.IsEncrypted())
+            if (p_IsHashed != column.IsHashed())
             {
                 if (error || !p_ChangeSetting)
-                    AddLog(0, null, null, "Encryption NOT changed - Encryption=" + column.IsEncrypted());
+                    AddLog(0, null, null, "Hashing NOT changed - Hashing=" + column.IsHashed());
                 else
                 {
-                    column.SetIsEncrypted(p_IsEncrypted);
+                    column.SetIsHashed(p_IsHashed);
                     if (column.Save(Get_Trx()))
-                        AddLog(0, null, null, "Encryption CHANGED - Encryption=" + column.IsEncrypted());
+                        AddLog(0, null, null, "Hashing CHANGED - Hashing=" + column.IsHashed());
                     else
                         AddLog(0, null, null, "Save Error");
                 }
             }
 
-            MTable table = new MTable(GetCtx(), column.GetAD_Table_ID(), Get_Trx());
-            string tableName = table.GetTableName();
-            string[] keyColumns = table.GetKeyColumns();
-            string keyCols = "";
 
-            if (p_IsEncrypted == column.IsEncrypted() && !error)      // Done By Karan on 10-nov-2016, to encrypt/decrypt passwords according to settings.
+            if (p_IsHashed == column.IsHashed() && !error)
             {
+                MTable table = new MTable(GetCtx(), column.GetAD_Table_ID(), Get_Trx());
+                string tableName = table.GetTableName();
+                string[] keyColumns = table.GetKeyColumns();
+                string keyCols = "";
+
                 DataSet ds = null;
                 if (table.HasPKColumn())
                 {
@@ -189,24 +175,24 @@ namespace VAdvantage.Process
 
                 if (ds != null && ds.Tables[0].Rows.Count > 0)
                 {
-                    if (p_IsEncrypted)
+                    if (p_IsHashed)
                     {
                         for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                         {
                             if (ds.Tables[0].Rows[i][column.GetColumnName()] != null && ds.Tables[0].Rows[i][column.GetColumnName()] != DBNull.Value
-                                && !SecureEngine.IsEncrypted(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()))
+                                && !SecureEngine.IsLooksLikeHash(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()))
                             {
 
-                                int encLength = SecureEngine.Encrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()).Length;
+                                string hashString = SecureEngine.ComputeHash(ds.Tables[0].Rows[i][column.GetColumnName()].ToString());
 
-                                if (encLength <= column.GetFieldLength())
+                                if (hashString.Length <= column.GetFieldLength())
                                 {
 
-                                    string p_NewPassword = SecureEngine.Encrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString());
+                                    //string p_NewPassword = SecureEngine.Encrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString());
                                     String sql = "UPDATE " + tableName + " SET Updated=SYSDATE, UpdatedBy=" + GetAD_User_ID();
-                                    if (!string.IsNullOrEmpty(p_NewPassword))
+                                    if (!string.IsNullOrEmpty(hashString))
                                     {
-                                        sql += ", " + column.GetColumnName() + "=" + GlobalVariable.TO_STRING(p_NewPassword);
+                                        sql += ", " + column.GetColumnName() + "=" + GlobalVariable.TO_STRING(hashString);
                                     }
 
                                     if (table.HasPKColumn())
@@ -227,7 +213,7 @@ namespace VAdvantage.Process
                                     if (iRes <= 0)
                                     {
                                         Rollback();
-                                        return "Encryption=" + false;
+                                        return "Hashed=" + false;
                                     }
                                 }
                                 else
@@ -243,15 +229,15 @@ namespace VAdvantage.Process
                         for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                         {
                             if (ds.Tables[0].Rows[i][column.GetColumnName()] != null && ds.Tables[0].Rows[i][column.GetColumnName()] != DBNull.Value
-                                && SecureEngine.IsEncrypted(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()))
+                                && SecureEngine.IsLooksLikeHash(ds.Tables[0].Rows[i][column.GetColumnName()].ToString()))
                             {
+                                //Hash is irreversible so we can't get the original value back
 
-
-                                string p_NewPassword = SecureEngine.Decrypt(ds.Tables[0].Rows[i][column.GetColumnName()].ToString());
+                                string plainString = "testHash"; 
                                 String sql = "UPDATE " + tableName + "  SET Updated=SYSDATE, UpdatedBy=" + GetAD_User_ID();
-                                if (!string.IsNullOrEmpty(p_NewPassword))
+                                if (!string.IsNullOrEmpty(plainString))
                                 {
-                                    sql += ", " + column.GetColumnName() + "=" + GlobalVariable.TO_STRING(p_NewPassword);
+                                    sql += ", " + column.GetColumnName() + "=" + GlobalVariable.TO_STRING(plainString);
                                 }
                                 if (table.HasPKColumn())
                                     sql += " WHERE " + tableName + "_ID=" + Util.GetValueOfInt(ds.Tables[0].Rows[i][tableName + "_ID"]);
@@ -271,17 +257,18 @@ namespace VAdvantage.Process
                                 if (iRes <= 0)
                                 {
                                     Rollback();
-                                    return "Encryption=" + false;
+                                    return "Hashed=" + false;
                                 }
 
                             }
                         }
                     }
                 }
-                //}
 
             }
-            return "Encryption=" + column.IsEncrypted();
+
+            return "Hashed= " + column.IsHashed();
+
         }
     }
 }

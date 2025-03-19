@@ -520,6 +520,10 @@ namespace VAdvantage.Common
             //Check if User's pwd is to be encrypted or not
             if (DB.ExecuteScalar("SELECT IsEncrypted from AD_Column WHERE AD_Column_ID=" + 417).ToString().Equals("Y"))
                 newPwd = SecureEngine.Encrypt(newPwd);
+            else if (DB.ExecuteScalar("SELECT IsHashed from AD_Column WHERE AD_Column_ID=" + 417).ToString().Equals("Y"))
+            {
+                newPwd = SecureEngine.ComputeHash(newPwd);
+            }
 
             string newpwdExpireDate = GlobalVariable.TO_DATE(DateTime.Now.AddMonths(passwordValidity), true);
 
