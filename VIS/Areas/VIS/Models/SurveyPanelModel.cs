@@ -678,6 +678,7 @@ namespace VIS.Models
         {
             string sql = "";
             int responseCount = 0;
+            bool isMandatoryTofill = false;
             string conditions = "";
             List<CheckListCondition> CList = new List<CheckListCondition>();
             if (Record_ID > 0)
@@ -685,10 +686,12 @@ namespace VIS.Models
                 if (AD_Survey_ID == 0)
                 {
                     sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=(SELECT AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + ") AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                    isMandatoryTofill = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=(SELECT AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + ") AND IsActive='Y'")).Equals("Y");
                 }
                 else
                 {
                     sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID="+ AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                    isMandatoryTofill= Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID+ " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND IsActive='Y'")).Equals("Y");
                 }
                     responseCount = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             }
@@ -823,7 +826,8 @@ namespace VIS.Models
             CList.Add(new CheckListCondition
             {
                 Condition=conditions,
-                ResponseCount= responseCount
+                ResponseCount= responseCount,
+                IsMandatoryTofill= isMandatoryTofill
             });
             return CList;
         }
@@ -908,6 +912,7 @@ namespace VIS.Models
     public class CheckListCondition {
         public string Condition { get; set; }
         public int ResponseCount { get; set; }
+        public bool IsMandatoryTofill {  get; set; }
     }
     
 }

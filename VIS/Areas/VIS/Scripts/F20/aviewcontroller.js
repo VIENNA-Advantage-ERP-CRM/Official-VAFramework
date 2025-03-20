@@ -570,16 +570,18 @@
 
         var Survey_ID = 0;
         var IsMandatoryToFill = false;
-        if (this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.selectdIdx > -1) {
-            Survey_ID = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].Survey_ID;
-            IsMandatoryToFill = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].IsMandatoryToFill;
-        } else {
-            return true;
-        }
+        if (this.vTabPanel.curTabPanel) {
+            if (this.vTabPanel.curTabPanel.selectdIdx > -1) {
+                Survey_ID = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].Survey_ID;
+                IsMandatoryToFill = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].IsMandatoryToFill;
+            } else {
+                return true;
+            }
+        } 
 
-        if (!IsMandatoryToFill) {
-            return true;
-        }
+        //if (!IsMandatoryToFill) {
+        //    return true;
+        //}
 
         $.ajax({
             async: false,
@@ -597,8 +599,10 @@
                 if (data.ResponseCount > 0) {
                     output = true;
                     //callback(true);
+                } else if (!data.IsMandatoryTofill && data.Condition=="") {
+                    return true;
                 }
-                else if (data.Condition != "") {
+                else if (data.IsMandatoryTofill && data.Condition != "") {
                     var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
                     if (isValidate && isCheckListFill) {
                         output = true;
