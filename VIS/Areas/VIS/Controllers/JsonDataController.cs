@@ -1390,9 +1390,10 @@ namespace VIS.Controllers
         /// <param name="columnName"></param>
         /// <param name="roleID"></param>
         /// <returns></returns>
-        public JsonResult CheckAccessForAction(string columnName,int roleID) {
+        public JsonResult CheckAccessForAction(string columnName, int roleID)
+        {
             CommonModel cm = new CommonModel();
-            return Json(JsonConvert.SerializeObject(cm.CheckAccessForAction(columnName, roleID)), JsonRequestBehavior.AllowGet); 
+            return Json(JsonConvert.SerializeObject(cm.CheckAccessForAction(columnName, roleID)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -1402,7 +1403,8 @@ namespace VIS.Controllers
         /// <param name="actionType"></param>
         /// <param name="actionName"></param>
         /// <returns></returns>
-        public JsonResult CheckTableMapWithAction(int tableID, string actionType, string actionName) {
+        public JsonResult CheckTableMapWithAction(int tableID, string actionType, string actionName)
+        {
             CommonModel cm = new CommonModel();
             Ctx ctx = Session["ctx"] as Ctx;
             return Json(JsonConvert.SerializeObject(cm.CheckTableMapWithAction(tableID, actionType, actionName, ctx)), JsonRequestBehavior.AllowGet);
@@ -1413,7 +1415,8 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="formName">Name</param>
         /// <returns>Ad_Form_ID</returns>
-        public JsonResult GetFormID(string formName) {
+        public JsonResult GetFormID(string formName)
+        {
             CommonModel cm = new CommonModel();
             Ctx ctx = Session["ctx"] as Ctx;
             return Json(JsonConvert.SerializeObject(cm.GetFormID(formName)), JsonRequestBehavior.AllowGet);
@@ -1425,10 +1428,50 @@ namespace VIS.Controllers
         /// <param name="processName">Name</param>
         /// <returns>Ad_Process_ID</returns>
 
-        public JsonResult GetProcessID(string processName) {
+        public JsonResult GetProcessID(string processName)
+        {
             CommonModel cm = new CommonModel();
             Ctx ctx = Session["ctx"] as Ctx;
             return Json(JsonConvert.SerializeObject(cm.GetProcessID(processName)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Save HttpRequest data into requestdata column
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_WF_Node_ID"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public JsonResult SaveHttpRequest(int AD_WF_Node_ID, string URL, string headers, string result)
+        {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.SaveHttpRequest(ctx, AD_WF_Node_ID, URL, headers, result)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get request data from workflow node
+        /// </summary>
+        /// <param name="AD_WF_Node_ID"></param>
+        /// <returns></returns>
+        public JsonResult GetRequestData(int AD_WF_Node_ID)
+        {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.GetRequestData(ctx, AD_WF_Node_ID)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get column names from the workflowflow table
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Workflow_ID"></param>
+        /// <returns>ColumnList</returns>
+        public JsonResult GetWorkflowColumn(int AD_Workflow_ID)
+        {
+            CommonModel cm = new CommonModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(JsonConvert.SerializeObject(cm.GetWorkflowColumn(ctx, AD_Workflow_ID)), JsonRequestBehavior.AllowGet);
         }
     }
 

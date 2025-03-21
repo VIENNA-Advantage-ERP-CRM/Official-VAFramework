@@ -387,6 +387,209 @@ OR
             }
         }
 
+        /// <summary>
+        /// Fetch all the workflow activities which are open
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="AD_User_ID">Login User ID</param>
+        /// <param name="AD_Client_ID"> Login Client ID </param>
+        /// <param name="refresh"> Refresh Data? </param>
+        /// <param name="AD_Window_ID"> Window ID based on which serach Activities </param>
+        /// <param name="Record_ID">Record ID based on which serach Activities</param>
+        /// <returns></returns>
+        public WFInfo GetRecordActivities(Ctx ctx, int AD_User_ID, int AD_Client_ID, int AD_Window_ID, int Record_ID)
+        {
+            string sql = "";
+            List<MTable> mtable = new List<MTable>();
+
+            if (Record_ID >= 0 && AD_Window_ID > 0)
+            {
+                whereClause = " WHERE ";
+                if (AD_Window_ID > 0)
+                {
+                    whereClause += " MyTable.AD_Window_ID=" + AD_Window_ID + " AND MyTable.Record_ID=" + Record_ID;
+                }
+            }
+            string dmsCheck = string.Empty;
+
+            if (Env.IsModuleInstalled("VADMS_"))
+            {
+                // Check if table id and record id in current activity has any document binded in VADMS_WindowDocLink table, or current table is VADMS_MetaData
+                dmsCheck = @",
+(SELECT 
+Name || VADMS_FileType || '_' || Value 
+FROM VADMS_Document 
+WHERE VADMS_Document_ID = 
+(SELECT VADMS_Document_ID FROM VADMS_MetaData WHERE VADMS_MetaData_ID = a.Record_ID AND 
+(
+(SELECT COUNT(VADMS_WindowDocLink_ID) FROM VADMS_WindowDocLink WHERE AD_Table_ID = a.AD_Table_ID AND Record_ID = a.Record_ID AND (SELECT TableName FROM AD_Table WHERE AD_Table_ID = a.AD_Table_ID) = 'VADMS_MetaData') > 0 
+OR
+(SELECT TableName FROM AD_Table WHERE AD_Table_ID = a.AD_Table_ID) = 'VADMS_MetaData'
+))
+) AS DocumentNameValue
+";
+            }
+
+
+            sql += @"SELECT a.*
+" + dmsCheck + @" 
+                            FROM AD_WF_Activity a
+                            WHERE a.Processed  ='N'
+                            AND a.WFState      ='OS'
+                            AND a.AD_Client_ID =" + AD_Client_ID + @" 
+                            AND ((a.AD_User_ID=" + AD_User_ID + @" 
+                            OR a.AD_User_ID   IN
+                              (SELECT AD_User_ID
+                              FROM AD_User_Substitute
+                              WHERE IsActive   ='Y'
+                              AND Substitute_ID=" + AD_User_ID + @" 
+                              AND (validfrom  <=sysdate)
+                              AND (sysdate    <=validto )
+                              ))
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND COALESCE(r.AD_User_ID,0)=0
+                              AND (a.AD_User_ID           =" + AD_User_ID + @" 
+                              OR a.AD_User_ID            IS NULL
+                              OR a.AD_User_ID            IN
+                                (SELECT AD_User_ID
+                                FROM AD_User_Substitute
+                                WHERE IsActive   ='Y'
+                                AND Substitute_ID=" + AD_User_ID + @" 
+                                AND (validfrom  <=sysdate)
+                                AND (sysdate    <=validto )
+                                ))
+                              )
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND a.AD_User_ID = " + AD_User_ID + @" AND r.ResponsibleType = 'H'
+                              AND (r.AD_User_ID           =" + AD_User_ID + @" 
+                              OR a.AD_User_ID            IN
+                                (SELECT AD_User_ID
+                                FROM AD_User_Substitute
+                                WHERE IsActive   ='Y'
+                                AND Substitute_ID=" + AD_User_ID + @" 
+                                AND (validfrom  <=sysdate)
+                                AND (sysdate    <=validto )
+                                ))
+                              )
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              INNER JOIN AD_User_Roles ur
+                              ON (r.AD_Role_ID            =ur.AD_Role_ID)
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND ur.IsActive = 'Y'
+                              AND (ur.AD_User_ID          =" + AD_User_ID + @" 
+                              OR a.AD_User_ID            IN
+                                (SELECT AD_User_ID
+                                FROM AD_User_Substitute
+                                WHERE IsActive   ='Y'
+                                AND Substitute_ID=" + AD_User_ID + @" 
+                                AND (validfrom  <=sysdate)
+                                AND (sysdate    <=validto )
+                                ))
+                             AND r.responsibletype NOT IN ('H','C', 'M')
+                              )
+                            OR EXISTS
+                              (SELECT *
+                              FROM AD_WF_Responsible r
+                              INNER JOIN AD_Role ro
+                              ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
+                              WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
+                              AND r.IsActive = 'Y'
+                              AND (CASE WHEN INSTR(r.Ref_Roles, '" + ctx.GetAD_Role_ID() + @"') > 0 THEN 'Y' ELSE 'N' END) = 'Y'
+                              AND r.responsibletype ='M'
+                              )
+                        ) ";
+
+            if (whereClause.Length > 7)
+            {
+                // Applied Role access on workflow Activities
+                sql = "SELECT mytable.* FROM (" + MRole.GetDefault(ctx).AddAccessSQL(sql, "a", true, true) + ") MyTable ";
+                sql += fromClause;
+                sql += whereClause;
+                sql += "  ORDER BY myTable.Priority DESC, myTable.Created DESC";
+            }
+            else
+            {
+                sql += " ORDER BY Priority DESC, Created DESC";
+                // Applied Role access on workflow Activities
+                sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "a", true, true);
+            }
+
+            try
+            {
+                DataSet ds = VIS.DBase.DB.ExecuteDatasetPaging(sql, 1, 100);
+                if (ds == null || ds.Tables[0].Rows.Count == 0)
+                {
+                    return null;
+                }
+                List<WFActivityInfo> lstInfo = new List<WFActivityInfo>();
+                WFActivityInfo itm = null;
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    itm = new WFActivityInfo();
+
+                    itm.AD_Table_ID = Util.GetValueOfInt(dr["AD_Table_ID"]);
+                    itm.AD_User_ID = Util.GetValueOfInt(dr["AD_User_ID"]);
+                    itm.AD_WF_Activity_ID = Util.GetValueOfInt(dr["AD_WF_Activity_ID"]);
+
+                    itm.AD_Node_ID = Util.GetValueOfInt(dr["AD_WF_Node_ID"]);
+                    itm.AD_WF_Process_ID = Util.GetValueOfInt(dr["AD_WF_Process_ID"]);
+                    itm.AD_WF_Responsible_ID = Util.GetValueOfInt(dr["AD_WF_Responsible_ID"]);
+                    itm.AD_Workflow_ID = Util.GetValueOfInt(dr["AD_Workflow_ID"]);
+                    itm.CreatedBy = Util.GetValueOfInt(dr["CreatedBy"]);
+                    itm.DynPriorityStart = Util.GetValueOfInt(dr["DynPriorityStart"]);
+                    itm.Record_ID = Util.GetValueOfInt(dr["Record_ID"]);
+
+                    itm.DocumentNameValue = "";
+
+                    if (Env.IsModuleInstalled("VADMS_"))
+                    {
+                        itm.DocumentNameValue = Util.GetValueOfString(dr["DocumentNameValue"]);
+                    }
+
+                    itm.TxtMsg = Util.GetValueOfString(dr["TextMsg"]);
+                    itm.WfState = Util.GetValueOfString(dr["WfState"]);
+                    itm.EndWaitTime = Util.GetValueOfDateTime(dr["EndWaitTime"]);
+                    //itm.Created = Util.GetValueOfString(dr["Created"]);
+                    DateTime _createdDate = new DateTime();
+                    if (dr["Created"].ToString() != null && dr["Created"].ToString() != "")
+                    {
+                        _createdDate = Convert.ToDateTime(dr["Created"].ToString());
+                        DateTime _format = DateTime.SpecifyKind(new DateTime(_createdDate.Year, _createdDate.Month, _createdDate.Day, _createdDate.Hour, _createdDate.Minute, _createdDate.Second), DateTimeKind.Utc);
+                        _createdDate = _format;
+                        itm.Created = _format;
+                    }
+                    else
+                        itm.Created = System.DateTime.Now;
+                    MWFActivity act = new MWFActivity(ctx, itm.AD_WF_Activity_ID, null);
+                    itm.NodeName = act.GetNodeName();
+                    itm.Summary = act.GetSummary();
+                    itm.Description = act.GetNodeDescription();
+                    itm.Help = act.GetNodeHelp();
+                    itm.History = act.GetHistoryHTML();
+                    itm.Priority = Util.GetValueOfInt(dr["Priority"]);
+                    itm.AD_Window_ID = Util.GetValueOfInt(dr["AD_Window_ID"]);
+                    lstInfo.Add(itm);
+
+                }
+
+                WFInfo info = new WFInfo();
+                info.LstInfo = lstInfo;
+                info.count = 1;
+                return info;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         /// <summary>
         /// Get the next synonym
@@ -657,7 +860,7 @@ OR
                               FROM ad_wf_eventaudit wfea
                                 INNER JOIN AD_WF_Node node
                                 ON (node.AD_Wf_node_ID=wfea.AD_Wf_Node_id)
-                                INNER JOIN AD_User usr
+                                LEFT JOIN AD_User usr
                                 ON (usr.AD_User_ID         =wfea.ad_User_ID)
                               WHERE wfea.AD_WF_Process_ID=" + wfProcessID + @"
                               Order By wfea.ad_wf_eventaudit_id desc";
@@ -666,7 +869,7 @@ OR
                 int attachmentCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT Count(AD_AttachmentLine.AD_Attachment_ID) FROM AD_Attachment 
                                         INNER JOIN AD_AttachmentLine ON AD_Attachment.AD_Attachment_ID = AD_AttachmentLine.AD_Attachment_ID
                                         INNER JOIN ad_wf_activity ON  ad_attachment.record_id = ad_wf_activity.record_id AND ad_attachment.ad_table_id = ad_wf_activity.ad_table_id
-                                        WHERE ad_wf_activity.ad_wf_activity_id ="+ activityID));
+                                        WHERE ad_wf_activity.ad_wf_activity_id =" + activityID));
 
                 info.AttachmentCount = attachmentCount;
 
@@ -788,7 +991,7 @@ OR
                         if (node.IsSurveyResponseRequired())
                         {
                             // check any survey response exist
-                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID(),Util.GetValueOfInt(activityID),false))
+                            if (!Common.CheckSurveyResponseExist(ctx, AD_Window_ID, activity.GetRecord_ID(), activity.GetAD_Table_ID(), Util.GetValueOfInt(activityID), false))
                             {
                                 return "CheckListRequired";
                             }
@@ -1243,6 +1446,7 @@ OR
         }
     }
 
+
     public class WorkflowWindowList
     {
         public int AD_Window_ID { get; set; }
@@ -1441,7 +1645,8 @@ OR
             get;
             set;
         }
-        public int AttachmentCount {
+        public int AttachmentCount
+        {
             get;
             set;
         }
@@ -1454,7 +1659,7 @@ OR
         {
             get;
             set;
-        } 
+        }
         public List<NodeHistory> History
         {
             get;

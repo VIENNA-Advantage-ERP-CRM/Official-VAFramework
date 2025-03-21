@@ -391,6 +391,7 @@ namespace VIS.Models
             }
             sbSql.Append("WHERE t.TableName ='" + targetTableName
                 + "' AND w.AD_Window_ID <>" + curWindow_ID
+                + " AND w.IsActive = 'Y'"
                 + " AND tt.SeqNo=10"
                 + " AND (wp.AD_Window_ID IS NOT NULL "
                         + "OR EXISTS (SELECT 1 FROM AD_Tab tt2 WHERE tt2.AD_Window_ID = ws.AD_Window_ID AND tt2.AD_Table_ID=t.AD_Table_ID AND tt2.SeqNo=10))"

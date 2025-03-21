@@ -96,8 +96,8 @@ namespace VAdvantage.Print
                 return;
             //
             //System.Drawing.SolidBrush g2Dpen = new System.Drawing.SolidBrush(m_color);
-            XSolidBrush g2Dpen = new XSolidBrush(XColor.FromArgb(m_color));
-            XPen pen = new XPen(XColor.FromArgb(m_color));
+            XSolidBrush g2Dpen = new XSolidBrush(XColor.FromArgb(m_color.ToArgb()));
+            XPen pen = new XPen(XColor.FromArgb(m_color.ToArgb()));
             pen.DashStyle = PdfSharp.Drawing.XDashStyle.Solid;
             //
             PointF location = GetAbsoluteLocation(pageStart);
