@@ -19,6 +19,7 @@ namespace VAdvantage.Model
     /// </summary>
     public class MSeries : X_D_Series
     {
+        string OrderByColumnALL = null;
         private string calcBasis = "V"; // defaulted to Variable
         private string Consolidate = "N";
         private static VLogger s_log = VLogger.GetVLogger(typeof(MSeries).FullName);
@@ -496,6 +497,7 @@ namespace VAdvantage.Model
 
         public string GetSql(bool isFiltered, string specialWhere, Ctx _Ctx)
         {
+            string byMINMAX = IsOrderByAsc() ? "MAX" : "MIN";
             string orderByColumn = GetOrderByColumn();
             string Language = Env.GetAD_Language(_Ctx);
             bool isRTL = IsRightToLeft(Language);
@@ -516,8 +518,8 @@ namespace VAdvantage.Model
             }
             StringBuilder sb = new StringBuilder("SELECT ");    //start the SELECT QUERY
             MTable m_Table = null;// MTable.Get(GetCtx(), GetAD_Table_ID());
-            //get the table name
-
+                                  //get the table name
+            OrderByColumnALL = Util.GetValueOfString(DB.ExecuteScalar("SELECT ColumnName FROM AD_Column WHERE AD_Column_ID=(SELECT OrderColumn_ID FROM D_Series WHERE D_Series_ID=" + GetD_Series_ID() + ")"));
             if (IsView())
             {
                 m_Table = MTable.Get(GetCtx(), GetTableView_ID());
@@ -563,6 +565,11 @@ namespace VAdvantage.Model
                 sb.Append("SELECT " + m_colX + ", ");
                 sb.Append(ApplyAggregateFunction(s_colY, false));
                 sb.Append(" AS " + s_colY);
+                if (!string.IsNullOrEmpty(OrderByColumnALL))
+                {
+                    sb.Append("," + byMINMAX + "( " + OrderByColumnALL + ") AS " + OrderByColumnALL);
+
+                }
                 sb.Append(" FROM ").Append(s_tableName);
                 string whereClause = GetWhereClause();
                 sb.Append(GetSQLWhere(out val));
@@ -622,19 +629,21 @@ namespace VAdvantage.Model
                 {
                     sb.Append(ApplyAggregateFunction(s_colY, true));
                 }
+                if (!string.IsNullOrEmpty(OrderByColumnALL))
+                {
+                    sb.Append("," + byMINMAX + "( " + OrderByColumnALL + ") AS " + OrderByColumnALL);
 
+                }
                 sb.Append(" ColY ");
                 //sb.Append(" TRIM(to_char(p.StartDate, 'MON yyyy')) AS colx ");
                 sb.Append("FROM C_Period p JOIN C_Year y ON (p.C_Year_ID = y.C_Year_ID) LEFT JOIN ( " + createMonth + " " + innerQuery + ") ci ON p.StartDate <= ci." + m_colX + " AND p.EndDate >= ci." + m_colX + " ");
                 sb.Append("WHERE y.C_Year_ID =" + C_Year_ID + " AND p.IsActive='Y' GROUP BY TRIM(to_char(p.StartDate, 'MON yyyy')), p.PeriodNo ");
                 // sb.Append("WHERE y.C_Year_ID ="+ C_Year_ID + " AND p.IsActive='Y' GROUP BY TRIM(to_char(p.StartDate, 'MON yyyy')), p.Name, p.PeriodNo ");
                 sb.Append("ORDER BY ");
-                /*if (orderByColumn.Equals("2"))
+                if (!string.IsNullOrEmpty(OrderByColumnALL))
                 {
-                    sb.Append(" p.PeriodNo ").Append(orderByMethod);
+                    sb.Append(OrderByColumnALL).Append(" " + orderByMethod);
                 }
-                else
-                {*/
                 sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
                 /*  }*/
                 if (FetchRowsCount > 0)
@@ -707,7 +716,22 @@ namespace VAdvantage.Model
                 //give name to col Y
                 if (!IsIdentifier_X())
                     sb.Append(" ColY");
+                ////Order By column code start ---------
 
+                if (!string.IsNullOrEmpty(OrderByColumnALL))
+                {
+                    if (!IsIdentifier_X())
+                    {
+                        sb.Append("," + byMINMAX + "(" + OrderByColumnALL + ") AS " + OrderByColumnALL);
+                    }
+                    else
+                    {
+                        sb.Append(", " + OrderByColumnALL);
+                    }
+
+                }
+
+                ////Order By column code end ---------
 
                 if (IsList_X())
                 {
@@ -761,7 +785,12 @@ namespace VAdvantage.Model
                     if (IsIdentifier_X())
                     {
                         sb.Append(" GROUP BY ")
-                           .Append(s_colX);
+                        .Append(s_colX);
+                        if (!string.IsNullOrEmpty(OrderByColumnALL))
+                        {
+                            sb.Append(", " + OrderByColumnALL);
+                        }
+
                     }
                     //Additional Filter
                     MSeriesFilter[] filter = MSeriesFilter.GetFilters(this.Get_ID());
@@ -878,7 +907,10 @@ namespace VAdvantage.Model
                             .Append(" as ColX,")
                             .Append(ApplyAggregateFunction(m_colY, true))
                             .Append(SPACE + "ColY");
-
+                    if (!string.IsNullOrEmpty(OrderByColumnALL))
+                    {
+                        unionTableQuery.Append("," + byMINMAX + "(" + OrderByColumnALL + ") AS " + OrderByColumnALL);
+                    }
                     unionTableQuery.Append(" FROM(");
                     calcBasis = Util.GetValueOfString(DB.ExecuteScalar("SELECT VADB_CalculationBasis FROM D_Series WHERE IsActive='Y' AND D_Series_ID=" + GetD_Series_ID()));
                     string Consolidated = "SELECT D.VADB_Consolidate FROM D_Series D INNER JOIN D_Chart C ON (C.D_Chart_ID=D.D_Chart_ID ) WHERE  D.IsActive='Y' AND  C.D_Chart_ID=" + GetD_Chart_ID();
@@ -1009,7 +1041,14 @@ namespace VAdvantage.Model
                         }
 
                     }
+                    ////Order By column code start ---------
+                    if (!string.IsNullOrEmpty(OrderByColumnALL))
+                    {
+                        unionTableQuery.Append("," + byMINMAX + "(OUTT." + OrderByColumnALL + ") AS " + OrderByColumnALL);
+                    }
 
+
+                    ////Order By column code end ---------
                     unionTableQuery.Append(" FROM (");
                     unionTableQuery.Append(sb.ToString());
                     unionTableQuery.Append(") OUTT ");
@@ -1088,25 +1127,24 @@ namespace VAdvantage.Model
                 //   string orderByMethod = (isRTL ? !IsOrderByAsc() : IsOrderByAsc()) ? "DESC" : "ASC";
 
                 sb.Append(" ORDER BY ");
-
-                if (orderByColumn.Equals("2"))
-                    sb.Append("ColY ").Append(orderByMethod);
+                if (!string.IsNullOrEmpty(OrderByColumnALL))
+                {
+                    sb.Append(OrderByColumnALL).Append(" ").Append(orderByMethod);
+                }
                 else
                 {
-                    if (IsDate_X() && (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS))
-                        sb.Append("2 " + orderByMethod + "," + orderByColumn).Append(" ").Append(orderByMethod);
-                    else if (IsDate_X() && (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK))
-                        sb.Append("2,3, " + orderByColumn).Append(" ").Append(orderByMethod);
+                    if (orderByColumn.Equals("2"))
+                        sb.Append("ColY ").Append(orderByMethod);
                     else
                     {
-                        //if (IsDate_X())
-                        //{
-                        //    if (orderByColumn == "1")
-                        //    {
-                        //        orderByColumn = s_colX;
-                        //    }
-                        //}
-                        sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
+                        if (IsDate_X() && (this.GetDateTimeTypes() == IS_MONTHLY || this.GetDateTimeTypes() == IS_LAST_N_MONTHS))
+                            sb.Append("2 " + orderByMethod + "," + orderByColumn).Append(" ").Append(orderByMethod);
+                        else if (IsDate_X() && (this.GetDateTimeTypes() == IS_DAILY || this.GetDateTimeTypes() == IS_LAST_N_DAYS || this.GetDateTimeTypes() == IS_CURRENT_WEEK))
+                            sb.Append("2,3, " + orderByColumn).Append(" ").Append(orderByMethod);
+                        else
+                        {
+                            sb.Append(orderByColumn).Append(" ").Append(orderByMethod);
+                        }
                     }
                 }
 
@@ -1134,6 +1172,7 @@ namespace VAdvantage.Model
 
         private string GetUnionFinancial(string m_date1, string m_date2, string colName, string function, bool Consolidate)
         {
+            string orderByColumn = GetOrderByColumn();
             StringBuilder sb = new StringBuilder();
             if (DB.IsPostgreSQL())
             {
@@ -1143,8 +1182,19 @@ namespace VAdvantage.Model
             }
             else
             {
-                sb.Append(@" SELECT dates." + colName + "," + function + @" FROM (SELECT ADD_MONTHS(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), LEVEL - 1) AS " + colName + " FROM dual" +
-                " CONNECT BY  LEVEL <= MONTHS_BETWEEN(");
+                if (!string.IsNullOrEmpty(OrderByColumnALL))
+                {
+                    //  sb.Append(@" SELECT dates." + colName + "," + function + @", NULL AS " + OrderByColumnALL + " FROM (SELECT ADD_MONTHS(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), LEVEL - 1) AS " + colName + " FROM dual");
+                    sb.Append(@" SELECT dates." + colName + "," + function + @", TO_DATE('01/01/1900', 'MM/DD/YYYY') AS " + OrderByColumnALL + " FROM (SELECT ADD_MONTHS(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), LEVEL - 1) AS " + colName + " FROM dual");
+                }
+                else
+                {
+                    sb.Append(@" SELECT dates." + colName + "," + function + @" FROM (SELECT ADD_MONTHS(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), LEVEL - 1) AS " + colName + " FROM dual");
+                }
+
+                //  sb.Append(@" SELECT dates." + colName + "," + function + @" FROM (SELECT ADD_MONTHS(TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), LEVEL - 1) AS " + colName + " FROM dual" +
+                //  " CONNECT BY  LEVEL <= MONTHS_BETWEEN(");
+                sb.Append(" CONNECT BY  LEVEL <= MONTHS_BETWEEN(");
                 if (Consolidate)
                 {
                     sb.Append(" TO_DATE('" + m_date1 + "', 'MM/DD/YYYY'), ");
@@ -1177,20 +1227,25 @@ namespace VAdvantage.Model
                     WHERE " + colName + @" > DATE '0001-01-01' GROUP BY " + colName);
             }
             else
-            {
-                sb.Append(@" SELECT dates." + colName + "," + function + @" FROM
-        (SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + LEVEL - 1 AS " + colName + @" FROM DUAL CONNECT BY
+            {// Build the SELECT columns string
+                string selectColumns = "dates." + colName + ", " + function;
+                if (!string.IsNullOrEmpty(OrderByColumnALL))
+                {
+                    selectColumns += ", NULL AS " + OrderByColumnALL;
+                }
+                sb.Append(@" SELECT " + selectColumns + @" FROM
+    (SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + LEVEL - 1 AS " + colName + @" FROM DUAL CONNECT BY
             LEVEL <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') - TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + 1
-            ) dates WHERE dates." + colName + @" > TO_DATE('01/01/0001', 'MM/DD/YYYY') GROUP BY dates." + colName);
+    ) dates 
+    WHERE dates." + colName + @" > TO_DATE('01/01/0001', 'MM/DD/YYYY') 
+    GROUP BY dates." + colName);
 
-                //sb.Append("SELECT dates." + colName + "," + function + " FROM");
-                //sb.Append("(SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum AS " + colName);
 
-                //sb.Append(" FROM all_objects");
-                //sb.Append(" WHERE TO_DATE('" + date1.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY') - 1 + rownum <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + "', 'MM/DD/YYYY')) dates");
-                //sb.Append(" WHERE dates.").Append(colName).Append(">TO_DATE('01/01/0001', 'MM/DD/YYYY')");
-                //sb.Append(" GROUP BY dates." + colName);
-                //sb.Append(" ORDER BY " + colName + " ASC");
+                /*    sb.Append(@" SELECT dates." + colName + "," + function + @", NULL AS " + OrderByColumnALL + @" FROM
+            (SELECT TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + LEVEL - 1 AS " + colName + @" FROM DUAL CONNECT BY
+                LEVEL <= TO_DATE('" + date2.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') - TO_DATE('" + date1.ToString("MM/dd/yyyy") + @"', 'MM/DD/YYYY') + 1
+                ) dates WHERE dates." + colName + @" > TO_DATE('01/01/0001', 'MM/DD/YYYY') GROUP BY dates." + colName);
+                  */
             }
             return sb.ToString();
         }
@@ -1710,7 +1765,7 @@ namespace VAdvantage.Model
                     }
                     else
                     {
-                        dt_to = dt_to.AddDays(1);
+                        //  dt_to = dt_to.AddDays(1);
                         dt_to = dt_to.AddMonths(-1);
                         m_date2 = dt_to.Month + "/" + dt_to.Day + "/" + dt_to.Year;
                     }

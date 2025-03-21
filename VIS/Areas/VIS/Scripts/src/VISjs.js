@@ -114,3 +114,5 @@ import "../widgets/followupswidget.js";
 import "../app/Framework/subscribe.js";
 import "../widgets/checklist.js";
 import "../widgets/assignedwindowrec.js";
+import "../tabpanels/wfPanel.js";
+import "../app/forms/WorkFlowHttpRequest.js";

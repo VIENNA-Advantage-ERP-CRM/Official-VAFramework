@@ -42,6 +42,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\DLL\ModelLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -61,6 +64,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WF\DocWorkflowManager.cs" />
     <Compile Include="WF\ManageSkippedWF.cs" />
+    <Compile Include="WF\MNodeAPICredential.cs" />
     <Compile Include="WF\MWFActivity.cs" />
     <Compile Include="WF\MWFBlock.cs" />
     <Compile Include="WF\MWFEventAudit.cs" />
@@ -75,6 +79,7 @@
     <Compile Include="WF\MWorkflowProcessor.cs" />
     <Compile Include="WF\MWorkflowProcessorLog.cs" />
     <Compile Include="WF\WFActivityManage.cs" />
+    <Compile Include="WF\WFCommon.cs" />
     <Compile Include="WF\WFProcessManage.cs" />
     <Compile Include="WF\WorkflowMoveToClient.cs" />
     <Compile Include="WF\WorkflowValidate.cs" />
@@ -87,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

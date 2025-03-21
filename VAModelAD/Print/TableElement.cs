@@ -14,6 +14,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using PdfSharp.Drawing;
 using PdfUnicodeGlyphsResharper;
+using System.IO;
 
 namespace VAdvantage.Print
 {
@@ -1360,6 +1361,8 @@ namespace VAdvantage.Print
                 int colWidth = (int)((float)m_columnWidths[col]);		//	includes 2*Gaps+Line
                 if (colWidth != 0)
                 {
+                    log.Info("calling PDF v1.5 a");
+
                     PrintColumnForPDF(g2D, col, startX, startY, firstColumnPrint, firstRow, nextPageRow, isView);
                     startX += colWidth;
                     firstColumnPrint = false;
@@ -1374,6 +1377,8 @@ namespace VAdvantage.Print
                 int colWidth = (int)((float)m_columnWidths[col]);		//	includes 2*Gaps+Line
                 if (colWidth != 0)
                 {
+                    log.Info("calling PDF v1.5 b");
+
                     PrintColumnForPDF(g2D, col, startX, startY, firstColumnPrint, firstRow, nextPageRow, isView);
                     startX += colWidth;
                     firstColumnPrint = false;
@@ -1384,6 +1389,8 @@ namespace VAdvantage.Print
 
         private void PrintColumnForPDF(XGraphics g2D, int col, int origX, int origY, bool leftVline, int firstRow, int nextPageRow, bool isView)
         {
+            log.Info("calling PDF v1.5 0");
+
             int curX = origX;
             int curY = origY;	//	start from top
 
@@ -1399,13 +1406,14 @@ namespace VAdvantage.Print
                 log.Finer("#" + col + " - x=" + curX + ", y=" + curY + ", width=" + colWidth + "/" + netWidth + ", HeaderHeight=" + rowHeight + "/" + netHeight);
             String alignment = m_columnJustification[col];
 
+            log.Info("calling PDF v1.5 1");
 
             XPen color = new XPen(XColors.White);
             XSolidBrush paint = new XSolidBrush(XColors.White);
             //	paint header	***************************************************
             if (leftVline)			//	draw left | line
             {
-                color.Color = XColor.FromArgb(m_tFormat.GetVLine_Color());
+                color.Color = XColor.FromArgb(m_tFormat.GetVLine_Color().ToArgb());
                 color.DashStyle = m_tFormat.GetVLine_StrokeForPdf();
                 color.Width = (float)m_tFormat.GetLineStroke() / 2;
 
@@ -1417,7 +1425,7 @@ namespace VAdvantage.Print
             //	X - start line
             if (m_tFormat.IsPaintHeaderLines())
             {
-                color.Color = XColor.FromArgb(m_tFormat.GetHeaderLine_Color());
+                color.Color = XColor.FromArgb(m_tFormat.GetHeaderLine_Color().ToArgb());
                 color.DashStyle = m_tFormat.GetHeader_StrokePdf();
                 color.Width = (float)m_tFormat.GetHdrStroke();
                 g2D.DrawLine(color, origX, origY, 							//	 -> - (top) 
@@ -1425,7 +1433,7 @@ namespace VAdvantage.Print
             }
             curY += (2 * (int)m_tFormat.GetLineStroke());	//	thick
             //	Background
-            XColor bg = XColor.FromArgb(GetBackground(HEADER_ROW, col));
+            XColor bg = XColor.FromArgb(GetBackground(HEADER_ROW, col).ToArgb());
             if (!bg.Equals(XColors.White))
             {
                 paint.Color = bg;
@@ -1436,6 +1444,8 @@ namespace VAdvantage.Print
             }
             curX += H_GAP;		//	upper left gap
             curY += V_GAP;
+
+            log.Info("calling PDF v1.5 2");
             //	Header
             AttributedString aString = null;
             AttributedCharacterIterator iter = null;
@@ -1479,9 +1489,9 @@ namespace VAdvantage.Print
                         {	//	Bug - set Font/Color explicitly 
                             //g2D.setFont(GetFont(HEADER_ROW, col));
                             //XFont drwFont = new XFont(GetFont(HEADER_ROW, col), new XPdfFontOptions(true)); // change to draw special char
-                            XFont drwFont = new XFont(GetFont(HEADER_ROW, col), new XPdfFontOptions(PdfSharp.Pdf.PdfFontEncoding.Unicode, PdfSharp.Pdf.PdfFontEmbedding.Always));
+                            XFont drwFont = new XFont(GetFont(HEADER_ROW, col), new XPdfFontOptions(PdfSharp.Pdf.PdfFontEncoding.Unicode));
                             
-                            paint.Color = XColor.FromArgb(GetColor(HEADER_ROW, col)); 
+                            paint.Color = XColor.FromArgb(GetColor(HEADER_ROW, col).ToArgb()); 
                             //g2D.setColor(GetColor(HEADER_ROW, col));
                             g2D.DrawString(iter.GetText(), drwFont, paint, penX, curY);
                         }
@@ -1498,7 +1508,7 @@ namespace VAdvantage.Print
             curY += V_GAP;
             //	Y end line
             //g2D.setPaint(m_tFormat.GetVLine_Color());
-            color.Color = m_tFormat.GetVLine_Color();
+            color.Color = XColor.FromArgb(m_tFormat.GetVLine_Color().ToArgb());
             color.DashStyle = m_tFormat.GetVLine_StrokeForPdf();
             //g2D.setStroke(m_tFormat.GetVLine_Stroke());
             if (m_tFormat.IsPaintVLines())					//	 -> | (right)
@@ -1508,13 +1518,15 @@ namespace VAdvantage.Print
             //	X end line
             if (m_tFormat.IsPaintHeaderLines())
             {
-                color.Color = m_tFormat.GetHeaderLine_Color();
+                color.Color = XColor.FromArgb(m_tFormat.GetHeaderLine_Color().ToArgb());
                 //color.DashStyle = m_tFormat.GetHeader_Stroke();
                 color.Width = (float)m_tFormat.GetHdrStroke();
                 g2D.DrawLine(color, origX, curY + 5, 					//	 -> - (button)
                     (int)((origX) + colWidth - (int)m_tFormat.GetVLineStroke() + 1), curY + 5);
             }
             curY += (2 * (int)m_tFormat.GetLineStroke());	//	thick
+
+            log.Info("calling PDF v1.5 3");
 
             //	paint Data		***************************************************
             for (int row = firstRow; row < nextPageRow; row++)
@@ -1526,7 +1538,7 @@ namespace VAdvantage.Print
                 curX = origX;
                 if (leftVline)			//	draw left | line
                 {
-                    color.Color = m_tFormat.GetVLine_Color();
+                    color.Color = XColor.FromArgb(m_tFormat.GetVLine_Color().ToArgb());
                     color.DashStyle = m_tFormat.GetVLine_StrokeForPdf();
                     //if (m_tFormat.IsPaintBoundaryLines())
                     //    g2D.DrawLine(color, curX, rowYstart, 				//	 -> | (left)
@@ -1534,7 +1546,7 @@ namespace VAdvantage.Print
                     curX += (int)m_tFormat.GetVLineStroke();
                 }
                 //	Background
-                bg = GetBackground(row, col);
+                bg = XColor.FromArgb(GetBackground(row, col).ToArgb());
                 if (!bg.Equals(Color.White))
                 {
                     paint.Color = bg;
@@ -1552,15 +1564,64 @@ namespace VAdvantage.Print
                     { }
                     else if (printItems[index] is ImageElement)
                     {
-                        g2D.DrawImage(((ImageElement)printItems[index]).GetImage(), curX, (int)penY);
+                        System.Drawing.Image systemImage = ((ImageElement)printItems[index]).GetImage();
+
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            // Save the System.Drawing.Image to the MemoryStream
+                            systemImage.Save(ms, systemImage.RawFormat);
+
+                            // Reset the stream position to 0 before reading from it
+                            ms.Position = 0;
+
+                            // Load the image into PdfSharp's XImage from the MemoryStream
+                            XImage xImage = XImage.FromStream(ms);
+
+                            // Now you can use xImage with PdfSharp
+                            g2D.DrawImage(xImage, curX, (int)penY);
+                        }
                     }
                     else if (printItems[index] is Boolean)
                     {
                         int penX = curX + (int)((netWidth - LayoutEngine.IMAGE_SIZE.width) / 2);	//	center
                         if (((Boolean)printItems[index]))
-                            g2D.DrawImage(LayoutEngine.IMAGE_TRUE, penX, (int)penY);
+                        {
+                            System.Drawing.Image systemImage = LayoutEngine.IMAGE_TRUE;
+
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                // Save the System.Drawing.Image to the MemoryStream
+                                systemImage.Save(ms, systemImage.RawFormat);
+
+                                // Reset the stream position to 0 before reading from it
+                                ms.Position = 0;
+
+                                // Load the image into PdfSharp's XImage from the MemoryStream
+                                XImage xImage = XImage.FromStream(ms);
+
+                                // Now you can use xImage with PdfSharp
+                                g2D.DrawImage(xImage, penX, (int)penY);
+                            }
+                        }
                         else
-                            g2D.DrawImage(LayoutEngine.IMAGE_FALSE, penX, (int)penY);
+                        {
+                            System.Drawing.Image systemImage = LayoutEngine.IMAGE_FALSE;
+
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                // Save the System.Drawing.Image to the MemoryStream
+                                systemImage.Save(ms, systemImage.RawFormat);
+
+                                // Reset the stream position to 0 before reading from it
+                                ms.Position = 0;
+
+                                // Load the image into PdfSharp's XImage from the MemoryStream
+                                XImage xImage = XImage.FromStream(ms);
+
+                                // Now you can use xImage with PdfSharp
+                                g2D.DrawImage(xImage, penX, (int)penY);
+                            }
+                        }
                         penY += LayoutEngine.IMAGE_SIZE.height;
                     }
                     else
@@ -1622,15 +1683,15 @@ namespace VAdvantage.Print
                                         {	//	Bug - set Font/Color explicitly
                                             //g2D.setFont(getFont(row, col));
                                             //XFont drwFont = new XFont(GetFont(row, col), new XPdfFontOptions(true); // change to draw special char
-                                            XFont drwFont = new XFont(GetFont(row, col), new XPdfFontOptions(PdfSharp.Pdf.PdfFontEncoding.Unicode,PdfSharp.Pdf.PdfFontEmbedding.Always));
+                                            XFont drwFont = new XFont(GetFont(row, col), new XPdfFontOptions(PdfSharp.Pdf.PdfFontEncoding.Unicode));
                                             
                                             if (isView && printItems[index] is NamePair)	//	ID
                                             {
-                                                paint.Color = XColor.FromArgb(LINK_COLOR);
+                                                paint.Color = XColor.FromArgb(LINK_COLOR.ToArgb());
                                                 //	TextAttribute.UNDERLINE
                                             }
                                             else
-                                                paint.Color = XColor.FromArgb(GetColor(row, col));
+                                                paint.Color = XColor.FromArgb(GetColor(row, col).ToArgb());
                                             string arabicConversion = iter.GetText().FontGlyphsToPfd();
                                             g2D.DrawString(arabicConversion, drwFont, paint, penX, penY );
                                         }
@@ -1653,7 +1714,7 @@ namespace VAdvantage.Print
                 curY += (int)netHeight + V_GAP;
                 curX += (int)netWidth + H_GAP;
                 //	Y end line
-                color.Color = XColor.FromArgb(m_tFormat.GetVLine_Color());
+                color.Color = XColor.FromArgb(m_tFormat.GetVLine_Color().ToArgb());
                 color.DashStyle = m_tFormat.GetVLine_StrokeForPdf();
                 if (m_tFormat.IsPaintVLines())
                     g2D.DrawLine(color, curX, rowYstart, 				//	 -> | (right)
@@ -1663,7 +1724,7 @@ namespace VAdvantage.Print
                 //	X end line
                 if (row == m_data.GetLength(0) - 1)			//	last Line
                 {
-                    color.Color = XColor.FromArgb(m_tFormat.GetHeaderLine_Color());
+                    color.Color = XColor.FromArgb(m_tFormat.GetHeaderLine_Color().ToArgb());
                     color.DashStyle = m_tFormat.GetHeader_StrokePdf();
                     color.Width = (float)m_tFormat.GetHdrStroke();
                     g2D.DrawLine(color, origX, curY,					//	 -> - (last line) 
@@ -1678,14 +1739,14 @@ namespace VAdvantage.Print
                         nextIsFunction = false;		//	this is a function line too
                     if (nextIsFunction)
                     {
-                        color.Color = XColor.FromArgb(m_tFormat.GetFunctFG_Color());
+                        color.Color = XColor.FromArgb(m_tFormat.GetFunctFG_Color().ToArgb());
                         color.DashStyle = m_tFormat.GetHLine_StrokePdf();
                         g2D.DrawLine(color, origX, curY, 				//	 -> - (bottom)
                             (int)(origX + (int)colWidth - (int)m_tFormat.GetVLineStroke()), curY);
                     }
                     else if (m_tFormat.IsPaintHLines())
                     {
-                        color.Color = XColor.FromArgb(m_tFormat.GetHLine_Color());
+                        color.Color = XColor.FromArgb(m_tFormat.GetHLine_Color().ToArgb());
                         color.DashStyle = m_tFormat.GetHLine_StrokePdf();
 
                         g2D.DrawLine(color, origX, curY, 				//	 -> - (bottom)
@@ -1696,6 +1757,8 @@ namespace VAdvantage.Print
             }
             //color.Dispose();
             //paint.Dispose();
+
+            log.Info("calling PDF v1.5 4");
         }
 
     }
