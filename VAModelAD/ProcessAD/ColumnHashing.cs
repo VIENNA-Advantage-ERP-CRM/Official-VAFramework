@@ -233,8 +233,8 @@ namespace VAdvantage.Process
                             {
                                 //Hash is irreversible so we can't get the original value back
 
-                                string plainString = "testHash"; 
-                                String sql = "UPDATE " + tableName + "  SET Updated=SYSDATE, UpdatedBy=" + GetAD_User_ID();
+                                string plainString = "Onfinity@123"; 
+                                String sql = "UPDATE " + tableName + "  SET Updated=SYSDATE, PasswordExpireOn = null, UpdatedBy=" + GetAD_User_ID();
                                 if (!string.IsNullOrEmpty(plainString))
                                 {
                                     sql += ", " + column.GetColumnName() + "=" + GlobalVariable.TO_STRING(plainString);
