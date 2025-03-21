@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Http;
@@ -21,6 +23,34 @@ namespace VIS.Areas.VIS.Classes
         public void Application_Start(object sender, EventArgs e)
         {           
             AntiForgeryConfig.UniqueClaimTypeIdentifier = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+
+            AppDomain.CurrentDomain.AssemblyResolve += (s, args) =>
+            {
+                var requested = new AssemblyName(args.Name);
+                // Step 1: Check if already loaded in current AppDomain (but different version)
+                var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                    .FirstOrDefault(a => a.GetName().Name == requested.Name);
+                if (loadedAssembly != null)
+                {
+                    return loadedAssembly;
+                }
+
+                // Step 2: Try loading from bin folder (even if version differs)
+                string binPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin");
+                string candidateDll = Path.Combine(binPath, requested.Name + ".dll");
+                if (File.Exists(candidateDll))
+                {
+                    try
+                    {
+                        return Assembly.LoadFrom(candidateDll);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Optional: Log this exception somewhere
+                    }
+                }
+                return null; // Let default behavior happen if not handled
+            };
         }
 
         public void Session_Start(object sender, EventArgs e)

@@ -25,6 +25,12 @@ using System.Net;
 using System.Threading;
 using System.Reflection;
 using VAdvantage.PushNotif;
+using System.Net.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace VAdvantage.WF
 {
@@ -61,6 +67,12 @@ namespace VAdvantage.WF
 
         // Last Workflow Activity ID
         private int _lastActivity = 0;
+
+        // Regex operator to match @ for fetching value from context
+        private static string pattern = @"@([^@]+)@";
+
+        // Create a regex object and find matches
+        private Regex regex = new Regex(pattern);
 
         /// <summary>
         /// Standard Constructor
@@ -986,7 +998,8 @@ namespace VAdvantage.WF
                     }
 
                 }
-                else {
+                else
+                {
                     invoiceReportID = _node.GetAD_Process_ID();
                 }
                 //	Process
@@ -1037,7 +1050,7 @@ namespace VAdvantage.WF
                 {
                     pi.SetIsCrystal(false);
                 }
-                
+
                 pi.SetAD_ReportFormat_ID(process.GetAD_ReportFormat_ID());
                 pi.SetAD_ReportMaster_ID(process.GetAD_ReportMaster_ID());
                 process.ProcessIt(pi, trx);
@@ -1180,7 +1193,7 @@ namespace VAdvantage.WF
                             SetAD_User_ID(nextAD_User_ID);
                         }
 
-                        if(autoApproval && _node.IsSurveyResponseRequired())
+                        if (autoApproval && _node.IsSurveyResponseRequired())
                         {
                             if (!VAdvantage.Common.Common.CheckSurveyResponseExist(GetCtx(), GetAD_Window_ID(), _process.GetRecord_ID(), _process.GetAD_Table_ID(), GetAD_WF_Activity_ID(), autoApproval))
                             {
@@ -1665,10 +1678,179 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 _process.SetProcessMsg(Msg.GetMsg(GetCtx(), res));
                 return true;
             }
+            // vis0008 Changes done to handle HTTP Request
+            else if (MWFNode.ACTION_HTTPRequest.Equals(action))
+            {
+                try
+                {
+                    GetPO(Get_TrxName());
+                    CallService();
+                }
+                catch (Exception ex)
+                {
+                    SetTextMsg(ex.Message);
+                    throw new Exception("Error while HTTPRequest - AD_Table_ID="
+                        + GetAD_Table_ID() + ", Record_ID=" + GetRecord_ID());
+                    // Handle any errors (e.g., network issues)
+                    //ViewBag.ErrorMessage = ex.Message;
+                    // return View("Error");
+                }
+                return true;
+            }
 
-            //
-            //
             throw new ArgumentException("Invalid Action (Not Implemented) =" + action);
+        }
+
+        /// <summary>
+        /// Call APIs linked with the node
+        /// </summary>
+        /// <param name="apiUrl"></param>
+        private void CallService()
+        {
+
+            string sqlHttp = @"SELECT
+                           WN.AD_WF_Node_ID, WN.RequestData,NC.Endpoints,NC.ApiKey,
+                           JSON_VALUE(WN.RequestData, '$.method') AS Method,
+                           JSON_VALUE(WN.RequestData, '$.url') AS URL,
+                           JSON_Query(WN.RequestData, '$.headers') AS Headers,
+                           JSON_VALUE(WN.RequestData, '$.bodyType') AS BodyType,
+                           JSON_Query(WN.RequestData, '$.bodyContent') AS BodyContent,
+                           JSON_Query(WN.RequestData, '$.queryString') AS QueryString
+                           FROM AD_WF_Node WN LEFT JOIN NodeAPICredential NC ON (NC.AD_WF_Node_ID=WN.AD_WF_Node_ID)
+                           WHERE WN.RequestData IS NOT NULL AND WN.AD_WF_Node_ID = " + _node.GetAD_WF_Node_ID() + " ORDER BY WN.Updated DESC";
+            if (DB.IsPostgreSQL())
+            {
+                sqlHttp = @"SELECT
+                           WN.AD_WF_Node_ID, WN.RequestData,NC.Endpoints,NC.ApiKey,
+                           jsonb_extract_path_text(WN.RequestData::jsonb, 'method') AS Method,
+                           jsonb_extract_path_text(WN.RequestData::jsonb, 'url') AS URL,
+                           jsonb_extract_path(WN.RequestData::jsonb, 'headers') AS Headers,
+                           jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') AS BodyType,
+                           jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent') AS BodyContent,
+                           jsonb_extract_path(WN.RequestData::jsonb, 'queryString') AS QueryString
+                           FROM AD_WF_Node WN LEFT JOIN NodeAPICredential NC ON (NC.AD_WF_Node_ID=WN.AD_WF_Node_ID)
+                           WHERE WN.RequestData IS NOT NULL AND WN.AD_WF_Node_ID = " + _node.GetAD_WF_Node_ID() + " ORDER BY WN.Updated DESC";
+            }
+            DataSet dsRequestData = null;
+            try
+            {
+                dsRequestData = DB.ExecuteDataset(sqlHttp);
+            }
+            catch (Exception ex)
+            {
+                log.SaveError("", ex.Message);
+            }
+
+            if (dsRequestData != null && dsRequestData.Tables[0].Rows.Count > 0)
+            {
+                string bodyContent = Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["BodyContent"]);
+                string queryString = "";
+
+                using (HttpClient _httpClient = new HttpClient())
+                {
+                    HttpRequestMessage reqMsg = new HttpRequestMessage();
+
+                    if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["Method"]).ToUpper() == "GET")
+                        reqMsg.Method = HttpMethod.Get;
+                    else if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["Method"]).ToUpper() == "PUT")
+                        reqMsg.Method = HttpMethod.Put;
+                    else if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["Method"]).ToUpper() == "DELETE")
+                        reqMsg.Method = HttpMethod.Delete;
+                    else
+                        reqMsg.Method = HttpMethod.Post;
+
+                    if (bodyContent != "")
+                    {
+                        if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["BodyType"]).ToLower() == "text")
+                        {
+                            reqMsg.Content = new StringContent(GetDynamicValues(bodyContent), null, "text/plain");
+                        }
+                        else
+                        {
+                            JObject jsonValue = JObject.Parse(bodyContent);
+                            if (jsonValue.HasValues)
+                            {
+                                reqMsg.Content = new StringContent(GetDynamicValues(bodyContent), Encoding.UTF8, "application/json");
+                            }
+                        }
+                    }
+                    if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["QueryString"]) != "")
+                    {
+                        Dictionary<string, string> queryParams = new Dictionary<string, string>();
+                        JObject jObjQryParam = JObject.Parse(Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["QueryString"]));
+
+                        if (jObjQryParam.Count > 0)
+                        {
+                            foreach (var property in jObjQryParam)
+                            {
+                                queryParams.Add(property.Key, GetDynamicValues(Util.GetValueOfString(property.Value)));
+                            }
+                            // Use NameValueCollection for query string construction
+                            var queryCollection = new NameValueCollection();
+                            foreach (var param in queryParams)
+                            {
+                                queryCollection.Add(param.Key, param.Value);
+                            }
+
+                            // Construct the query string using HttpUtility
+                            queryString = string.Join("&", queryCollection.AllKeys.Select(key => $"{WebUtility.UrlEncode(key)}={WebUtility.UrlEncode(queryCollection[key])}"));
+                            queryString = "?" + queryString;
+                        }
+                    }
+
+                    reqMsg.RequestUri = new Uri(Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["URL"]) + queryString);
+
+                    if (!string.IsNullOrEmpty(Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["ApiKey"])))
+                    {
+                        JObject jObj = JObject.Parse(SecureEngine.Decrypt(Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["ApiKey"])));
+                        if (jObj.Count > 0)
+                        {
+                            foreach (var property in jObj)
+                            {
+                                reqMsg.Headers.Add(property.Key, Util.GetValueOfString(property.Value));
+                            }
+                        }
+                    }
+
+                    // Send the request and get the response
+                    HttpResponseMessage response = _httpClient.SendAsync(reqMsg).Result;
+
+                    // Check the response status
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseContent = response.Content.ReadAsStringAsync().Result;
+                        SetTextMsg(responseContent);
+                    }
+                    else
+                    {
+                        SetTextMsg(response.StatusCode.ToString());
+                    }
+                }
+            }
+            else
+            {
+                log.SaveError("Fetch JSON Data : ", sqlHttp);
+            }
+        }
+
+        /// <summary>
+        /// Fetch dynamic values from the record
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private string GetDynamicValues(string input)
+        {
+            MatchCollection matches = regex.Matches(input);
+
+            // Loop through the matches
+            foreach (Match match in matches)
+            {
+                var extractedValue = match.Groups[1].Value;
+                string contextValue = Util.GetValueOfString(_po.Get_Value(extractedValue));
+                log.SaveInfo("Actual Context : " + extractedValue, contextValue);
+                input = input.Replace(match.Value, contextValue);
+            }
+            return input;
         }
 
         /// <summary>
@@ -2207,7 +2389,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             {
                 try
                 {
-                    string parentTblName = _po.GetTableName().Substring(0, _po.GetTableName().Length - 4); 
+                    string parentTblName = _po.GetTableName().Substring(0, _po.GetTableName().Length - 4);
                     StringBuilder sql = new StringBuilder("SELECT COUNT(" + _po.GetTableName() + "_ID) FROM " + _po.GetTableName() + " WHERE IsVersionApproved = 'Y' AND " + parentTblName + "_ID" + " = " + _po.Get_Value(parentTblName + "_ID"));
                     int _count = Util.GetValueOfInt(DB.ExecuteScalar(sql.ToString()));
 
@@ -2219,12 +2401,12 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 }
                 catch (Exception ex)
                 {
-                    log.SaveError("Error in updating Master record for versioning of table : " + _po.GetTableName()+"->"+ex.Message, "");
+                    log.SaveError("Error in updating Master record for versioning of table : " + _po.GetTableName() + "->" + ex.Message, "");
                 }
             }
-            
 
-                        Object dbValueNew = _po.Get_ValueOfColumn(GetNode().GetAD_Column_ID());
+
+            Object dbValueNew = _po.Get_ValueOfColumn(GetNode().GetAD_Column_ID());
             if (!dbValue.Equals(dbValueNew))
             {
                 if (!value.Equals(dbValueNew))
