@@ -16,10 +16,10 @@
         var $self = this;
         this.windowNo;
         this.onClose = null;
-        var IsPasswordScreen = true;
+        var isPasswordScreen = true;
         // HTML for saving the key after password confirmation
 
-        var SaveKeyHtml =
+        var saveKeyHtml =
             '<div class="">' +
             //'<h2>' + VIS.Msg.getMsg("VAAPI_SaveYourKey") + '</h2>' +
             '<p>' + VIS.Msg.getMsg("VAAPI_SaveYourKeyInfo") + '</p>' +
@@ -78,7 +78,7 @@
 
         $root.append(getPopupHTML());
         if (mode) {
-            GetProjects($root.find('#VIS_ProjectSelect_' + windowNo));
+            getProjects($root.find('#VIS_ProjectSelect_' + windowNo));
         }
 
         // Event listener for the Save or Confirm button based on mode
@@ -152,9 +152,9 @@
                     data: JSON.stringify(requestData),
                     success: function (response) {
                         if (response && response.success) {
-                            IsPasswordScreen = false;
+                            isPasswordScreen = false;
                             $root.find('#VIS_PasswordDiv_' + windowNo).hide(); // Hide password section
-                            $root.append(SaveKeyHtml); // Show Save Key UI
+                            $root.append(saveKeyHtml); // Show Save Key UI
                             $root.find('#VIS_SecretKeytxt_' + windowNo).val(response.sessionToken); // Set session token
                             $bsyDiv[0].style.visibility = 'hidden';
                             ch.changeHeight(260);
@@ -212,7 +212,7 @@
             $root.append($bsyDiv);
             busyDiv(false);
         }
-        function GetProjects(lstID) {
+        function getProjects(lstID) {
             lstID.empty();
             $.ajax({
                 url: VIS.Application.contextUrl + "UserPreference/GetProjects",
@@ -257,7 +257,7 @@
             setTimeout(this.display, 1000);
             ch.hideButtons();
             ch.onClose = function () {
-                if (IsPasswordScreen) {
+                if (isPasswordScreen) {
                     $self.dispose();
                 }
                 else {
