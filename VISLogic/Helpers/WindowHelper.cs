@@ -3719,7 +3719,10 @@ namespace VIS.Helpers
 
             WhereClause = SecureEngineBridge.DecryptByClientKey(WhereClause, ctxp.GetSecureKey());
             if (!QueryValidator.IsValid(WhereClause))
-                return null;
+            {
+                WhereClause = QueryValidator.TrimKeywordChar(WhereClause);
+            }
+                
 
             GridWindowVO vo = AEnv.GetMWindowVO(ctxp, WindowNo, AD_Window_ID, 0);
 

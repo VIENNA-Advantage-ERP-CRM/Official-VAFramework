@@ -304,7 +304,8 @@
                 //    return;
                 //}
 
-                if (event.target.nodeName === "I" || event.target.nodeName === "SPAN") {
+                if ((event.target.nodeName === "I" && event.target.className === "fa fa-times-circle-o")
+                    || event.target.nodeName === "SPAN") {
                     //close
                     closeFrame($(event.currentTarget));
                     return;
@@ -1364,6 +1365,7 @@
         function chkFilterChange() {
             if (chkFilter.prop('checked') == true) {
                 //apply
+                lstOrgs.multiselect('deselectAll');
                 lstOrgs.multiselect('select', [cmbOrg.val()]);
                 lstOrgs.multiselect('enable');
             }
