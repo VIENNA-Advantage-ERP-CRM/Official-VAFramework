@@ -35,5 +35,28 @@ namespace VIS.Classes
                 return true;
         }
 
+        public static string TrimKeywordChar(string sql)
+        {
+            if (string.IsNullOrEmpty(sql))
+                return sql;
+
+
+            sql = sql.ToUpper();
+
+
+            foreach (string key in Keyword)
+            {
+                if (Regex.IsMatch(sql, "\\b" + key + "\\b"))
+                {
+                    sql = sql.Replace(key, key.Substring(1));
+                }
+                   
+            }
+
+            
+
+            return sql;
+        }
+
     }
 }

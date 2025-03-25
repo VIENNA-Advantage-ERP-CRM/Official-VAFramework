@@ -2001,6 +2001,13 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
 
 /*actions popups css*/
+
+.vis-chat-container
+{
+    height:100%;
+    overflow:hidden;
+}
+
 .vis-chat-msgbox {
     font-size: 10pt;
     outline: none;
@@ -2030,7 +2037,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 .vis-chatimgwrap {
     height: 48px;
     width: 48px;
-    cursor: pointer;
+   /* cursor: pointer;*/
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2072,7 +2079,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 .vis-chatusername {
     color: rgba(var(--v-c-primary), 1);
     cursor: pointer;
-    flex: 1;
+   /* flex: 1;*/
 }
 
 .vis-chat-arrowdown {
@@ -2100,6 +2107,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
 .vis-chatdetailouterwrap {
     overflow-y: auto;
+    height:100%;
     /*      height: 260px;*/
 }
 

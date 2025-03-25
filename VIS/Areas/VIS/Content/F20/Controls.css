@@ -633,11 +633,13 @@ button.vis-ev-col-img-ctrl:focus,
 }
 
 .vis-control-wrap > label:first-child {
-    position: relative;
+    height: auto;
+    display: inline-flex;
     height: auto;
     left: 0;
-    display: flex;
-    white-space: unset
+    top: -8px;
+    position: relative;
+    white-space: unset;
 }
 
 .vis-ad-w-p-vc-editview .vis-control-wrap > label:first-child::after {

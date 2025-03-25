@@ -121,21 +121,37 @@ namespace VIS.Helpers
             //if authenticated by LDAP or password is null(Means request from home page)
             if (!authenticated && model.Login1Model.Password != null)
             {
-                string sqlEnc = "SELECT isencrypted FROM ad_column WHERE ad_table_id=(SELECT ad_table_id FROM ad_table WHERE tablename='AD_User') AND columnname='Password'";
-                char isEncrypted = Convert.ToChar(DB.ExecuteScalar(sqlEnc));
+                string sqlEnc = "SELECT isencrypted,isHashed FROM ad_column WHERE ad_table_id=(SELECT ad_table_id FROM ad_table WHERE tablename='AD_User') AND columnname='Password'";
+                DataSet ds = DB.ExecuteDataset(sqlEnc);
+                char isEncrypted = Convert.ToChar(ds.Tables[0].Rows[0]["isencrypted"]);
+                char isHashed = Convert.ToChar(ds.Tables[0].Rows[0]["isHashed"]);
+
                 string originalpwd = model.Login1Model.Password;
-                if (isEncrypted == 'Y' && model.Login1Model.Password != null)
+                
+                if (model.Login1Model.Password != null)
                 {
+                    if(isEncrypted == 'Y')
                     model.Login1Model.Password = SecureEngine.Encrypt(model.Login1Model.Password);
+                    //else if(isHashed == 'Y')
+                    //    isHashVerified = model.Login1Model.Password);
                 }
 
                 //  DataSet dsUserInfo = DB.ExecuteDataset("SELECT AD_User_ID, Value, Password,IsLoginUser,FailedLoginCount FROM AD_User WHERE Value=@username", param);
                 if (dsUserInfo != null && dsUserInfo.Tables[0].Rows.Count > 0)
                 {
+
+                    bool isPasswordMatched = dsUserInfo.Tables[0].Rows[0]["Password"].Equals(model.Login1Model.Password);
+                    //check for hashing
+                    if (isHashed == 'Y')
+                    {
+                        isPasswordMatched = SecureEngine.VerifyHash(originalpwd, dsUserInfo.Tables[0].Rows[0]["Password"].ToString(), null);
+                    }
+
                     //if username or password is not matching
                     if ((!dsUserInfo.Tables[0].Rows[0]["Value"].Equals(model.Login1Model.UserValue) ||
-                        !dsUserInfo.Tables[0].Rows[0]["Password"].Equals(model.Login1Model.Password))
-                        || (originalpwd != null && SecureEngine.IsEncrypted(originalpwd)))
+                        !isPasswordMatched)
+                        || (originalpwd != null && ((isEncrypted == 'Y' && SecureEngine.IsEncrypted(originalpwd))
+                            || (isHashed == 'Y' && SecureEngine.IsLooksLikeHash(originalpwd)))))
                     {
                         //if current user is Not superuser, then increase failed login count
                         if (!cache["SuperUserVal"].Equals(model.Login1Model.UserValue))
@@ -281,7 +297,8 @@ namespace VIS.Helpers
                                                " l.AD_Client_ID," +
                                                " (SELECT c.Name FROM AD_Client c WHERE c.AD_Client_ID=l.AD_Client_ID) as ClientName," +
                                                " l.M_Warehouse_ID," +
-                                               " (SELECT m.Name FROM M_Warehouse m WHERE m.M_Warehouse_Id = l.M_Warehouse_ID) as WarehouseName" +
+                                               " (SELECT m.Name FROM M_Warehouse m WHERE m.M_Warehouse_Id = l.M_Warehouse_ID) as WarehouseName," +
+                                               "l.FilteredOrg " +
                                                " FROM AD_LoginSetting l WHERE l.IsActive = 'Y' AND l.AD_User_ID=" + AD_User_ID);
                     if (drLogin.Read())
                     {
@@ -317,6 +334,7 @@ namespace VIS.Helpers
                             model.Login2Model.ClientName = drLogin[5].ToString();
                             model.Login2Model.Warehouse = drLogin[6].ToString();
                             model.Login2Model.WarehouseName = drLogin[7].ToString();
+                            model.Login2Model.FilteredOrg = drLogin[8].ToString();
                             model.Login2Model.Date = System.DateTime.Now.Date;
                             drLogin.Close();
                         }
@@ -702,7 +720,8 @@ namespace VIS.Helpers
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);
             ctx.SetContext("#Date", model.Login2Model.Date.ToString());
             ctx.SetContext("#AD_ChangeLogBatch", "");
-            ctx.SetContext("#AD_FilteredOrg", model.Login2Model.Org);// first time set login org
+            //ctx.SetContext("#AD_FilteredOrg", model.Login2Model.Org);// first time set login org
+            ctx.SetContext("#AD_FilteredOrg", model.Login2Model.FilteredOrg);// first time set login org
 
 
             //{
@@ -729,12 +748,12 @@ namespace VIS.Helpers
         }
 
         /// <summary>
-        /// Fetching Login Context
+        /// set login  Context on auth dialog changed 
         /// </summary>
         /// <param name="model">Login Model</param>
         /// <param name="ctxLogIn">Login Context</param>
         /// <returns>LoginContext</returns>
-        internal static LoginContext GetLoginContext(LoginModel model, Ctx ctxLogIn)
+        internal static LoginContext GetLoginContextForAuthDialog(LoginModel model, Ctx ctxLogIn)
         {
             LoginContext ctx = new LoginContext();
             ctx.SetContext("##AD_User_ID", ctxLogIn.GetAD_User_ID().ToString());
@@ -761,8 +780,17 @@ namespace VIS.Helpers
             ctx.SetContext("#M_Warehouse_ID", model.Login2Model.Warehouse);
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);
 
+            //Set Login Model Prop
+            if(model.Login1Model == null)
+            {
+                model.Login1Model = new Login1Model();
+                model.Login1Model.AD_User_ID = ctxLogIn.GetAD_User_ID();
+            }
+
             ctxLogIn.SetContext("NewSession", "Y");
             //ctx.SetContext("#Date", model.Login2Model.Date.ToString());
+
+            
             return ctx;
         }
 
@@ -774,12 +802,36 @@ namespace VIS.Helpers
         {
             try
             {
-                int id = MSequence.GetNextID(Convert.ToInt32(model.Login2Model.Client), "AD_LoginSetting", (Trx)null);
-                if (id > 0)
+                var id = DB.GetSQLValue(null, "SELECT AD_LoginSetting_ID FROM AD_LoginSetting WHERE AD_User_ID = " + model.Login1Model.AD_User_ID);
+
+                if (id < 1)
+                { //insert
+
+                    id = MSequence.GetNextID(Convert.ToInt32(model.Login2Model.Client), "AD_LoginSetting", (Trx)null);
+                    if (id > 0)
+                    {
+                        string sql = "INSERT INTO AD_LoginSetting " +
+                                     "(AD_Client_ID,AD_LoginSetting_ID,AD_Org_ID,AD_Role_ID,AD_User_ID,Created,CreatedBy,IsActive,M_WareHouse_ID,Updated,UpdatedBy) " +
+                              " VALUES (" + model.Login2Model.Client + "," + id + "," + model.Login2Model.Org + "," + model.Login2Model.Role + "," + model.Login1Model.AD_User_ID + ",sysdate," + model.Login1Model.AD_User_ID + ",'Y',";
+                        if (!String.IsNullOrEmpty(model.Login2Model.Warehouse) && model.Login2Model.Warehouse != "-1")
+                        {
+                            sql += model.Login2Model.Warehouse + ",";
+                        }
+                        else
+                        {
+                            sql += "null,";
+                        }
+                        sql += "sysdate," + model.Login1Model.AD_User_ID + ")";
+
+                        DB.ExecuteQuery(sql);
+                    }
+                }
+                else //update
                 {
-                    string sql = "INSERT INTO AD_LoginSetting " +
-                                 "(AD_Client_ID,AD_LoginSetting_ID,AD_Org_ID,AD_Role_ID,AD_User_ID,Created,CreatedBy,IsActive,M_WareHouse_ID,Updated,UpdatedBy) " +
-                          " VALUES (" + model.Login2Model.Client + "," + id + "," + model.Login2Model.Org + "," + model.Login2Model.Role + "," + model.Login1Model.AD_User_ID + ",sysdate," + model.Login1Model.AD_User_ID + ",'Y',";
+                    string sql = "UPDATE AD_LoginSetting SET " +
+                                     "AD_Client_ID = " + model.Login2Model.Client + ",AD_Org_ID=" + model.Login2Model.Org + ",AD_Role_ID=" + model.Login2Model.Role
+                                     + ",M_WareHouse_ID= ";
+                             
                     if (!String.IsNullOrEmpty(model.Login2Model.Warehouse) && model.Login2Model.Warehouse != "-1")
                     {
                         sql += model.Login2Model.Warehouse + ",";
@@ -788,7 +840,19 @@ namespace VIS.Helpers
                     {
                         sql += "null,";
                     }
-                    sql += "sysdate," + model.Login1Model.AD_User_ID + ")";
+
+                    sql+= " FilteredOrg=";
+
+                    if (!String.IsNullOrEmpty(model.Login2Model.FilteredOrg) && model.Login2Model.FilteredOrg != "")
+                    {
+                        sql += "'"+model.Login2Model.FilteredOrg + "',";
+                    }
+                    else
+                    {
+                        sql += "null,";
+                    }
+
+                    sql += "updated = sysdate WHERE AD_LoginSetting_ID = " + id;
 
                     DB.ExecuteQuery(sql);
                 }

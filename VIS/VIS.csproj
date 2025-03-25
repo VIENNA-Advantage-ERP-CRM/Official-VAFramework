@@ -541,7 +541,7 @@
     <Content Include="Areas\VIS\Images\group-save.png" />
     <Content Include="Areas\VIS\Images\group-search.png" />
     <Content Include="Areas\VIS\Images\group-sort-arrow.png" />
-    <Content Include="Areas\VIS\Images\group-tab-mob.png" />
+    <Content Include="Areas\VIS\Images\group-tab-mobold.png" />
     <Content Include="Areas\VIS\Images\group-tick.png" />
     <Content Include="Areas\VIS\Images\group-tittle-ico.png" />
     <Content Include="Areas\VIS\Images\heroAccent.png" />
@@ -594,6 +594,7 @@
     <Content Include="Areas\VIS\Images\icon.png" />
     <Content Include="Areas\VIS\Images\icons.png" />
     <Content Include="Areas\VIS\Images\Ignore22.png" />
+    <Content Include="Areas\VIS\Images\group-tab-mob.png" />
     <Content Include="Areas\VIS\Images\image.png" />
     <Content Include="Areas\VIS\Images\imaport-contacts.png" />
     <Content Include="Areas\VIS\Images\info-icon.png" />
