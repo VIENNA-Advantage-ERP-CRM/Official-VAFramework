@@ -25,11 +25,12 @@ namespace VIS.Controllers
         /// <param name="_AD_Table_ID">Table ID</param>
         /// <param name="CurrentPage">Page No</param>
         /// <returns>History Records</returns>
-        public JsonResult GetHistoryRecordDetails(string RecordId, string AD_Table_ID, string CurrentPage)
+        public JsonResult GetHistoryRecordDetails(string RecordId, string AD_Table_ID, string Type, string CurrentPage)
         {
+            Ctx ct = Session["ctx"] as Ctx;
             int LId = Util.GetValueOfInt(RecordId);
             HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
-            return Json(JsonConvert.SerializeObject(_model.GetHistoryDetails(LId, Util.GetValueOfInt(AD_Table_ID), CurrentPage)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(_model.GetHistoryDetails(ct, LId, Util.GetValueOfInt(AD_Table_ID), Type, CurrentPage)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -173,7 +174,31 @@ namespace VIS.Controllers
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
-            return Json(JsonConvert.SerializeObject(_model.GetAllAttachmentsZipName(ctx, ID, Server.HtmlDecode(Name), Server.MapPath("~/TempDownload"))), JsonRequestBehavior.AllowGet);            
+            return Json(JsonConvert.SerializeObject(_model.GetAllAttachmentsZipName(ctx, ID, Server.HtmlDecode(Name), Server.MapPath("~/TempDownload"))), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get API User Account
+        /// </summary>
+        /// <param name="Provider">Auth Provider</param>
+        /// <returns>json, object</returns>
+        public JsonResult GetUserAccount(string Provider)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
+            return Json(JsonConvert.SerializeObject(_model.GetUserAccount(ctx, Provider)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Download Transcript
+        /// </summary>
+        /// <param name="MeetingUrl">Join URL</param>       
+        /// <returns>json, object</returns>
+        public JsonResult DownloadTranscript(int AppointmentID, int UserAccountID, string MeetingUrl)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
+            return Json(JsonConvert.SerializeObject(_model.DownloadTranscript(ctx, AppointmentID, UserAccountID, MeetingUrl)), JsonRequestBehavior.AllowGet);
         }
     }
 }

@@ -6,10 +6,16 @@
   ******************************************************/
 
 using Ionic.Zip;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.IO;
+using System.Net.Http;
+using System.Reflection;
+using System.Text;
+using System.Web;
 using VAdvantage.DataBase;
 using VAdvantage.Model;
 using VAdvantage.Utility;
@@ -28,95 +34,163 @@ namespace VIS.Models
         /// <param name="_AD_Table_ID">Table ID</param>
         /// <param name="CurrentPage">Page No</param>
         /// <returns>History Records</returns>
-        public List<HistoryDetails> GetHistoryDetails(int RecordId, int _AD_Table_ID, string CurrentPage)
+        public List<HistoryDetails> GetHistoryDetails(Ctx ctx, int RecordId, int _AD_Table_ID, string type, string CurrentPage)
         {
-            string sql = string.Empty;
+            StringBuilder sql = new StringBuilder();
             HistoryDetails lst = new HistoryDetails();
             List<HistoryDetails> LstHistory = new List<HistoryDetails>();
 
-            sql = @"SELECT ID, AD_TABLE_ID, RECORD_ID, CREATED, FROMUSER, TYPE, SUBJECT, NAME, TO_CHAR(CREATED, 'DD/MM/YYYY HH12:MI:SS AM' ) AS CREATEDDATETIME, HASATTACHMENT, ISTASKCLOSED FROM "
-                        + " ( "
-                        + "   SELECT ma.MAILATTACHMENT1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'EMAIL' AS TYPE, ma.TITLE AS SUBJECT, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM MAILATTACHMENT1 ma "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY "
-                        + "   WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'M' "
-                        + "   AND ma.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ma.RECORD_ID = " + RecordId
+            sql.Append(@"SELECT ID, AD_TABLE_ID, RECORD_ID, CREATED, FROMUSER, TYPE, SUBJECT,  CharacterData, NAME, TO_CHAR(CREATED, 'DD/MM/YYYY HH12:MI:SS AM')
+                        AS CREATEDDATETIME, HASATTACHMENT, ISTASKCLOSED, MailAddress, MailAddressCc, StartDate, EndDate, AttendeeInfo, MeetingUrl FROM 
+                        (SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
+                        'EMAIL' AS TYPE, ma.TITLE AS SUBJECT, NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
+                        ma.MailAddress, ma.MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        FROM MailAttachment1 ma 
+                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY
+                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'M' 
+                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + "   AND ma.RECORD_ID = " + RecordId
 
-                        + "   UNION "
+                        + @" UNION ALL 
+                        SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
+                        'INBOX' AS TYPE, ma.TITLE AS SUBJECT, NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
+                        ma.MailAddress, ma.MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        FROM MailAttachment1 ma 
+                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY       
+                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'I'
+                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + " AND ma.RECORD_ID = " + RecordId
 
-                        + "   SELECT ma.MAILATTACHMENT1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'INBOX' AS TYPE, ma.TITLE AS SUBJECT, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM MAILATTACHMENT1 ma "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY "
-                        + "   WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'I' "
-                        + "   AND ma.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ma.RECORD_ID = " + RecordId
+                        + @" UNION ALL 
+                        SELECT ce.CM_ChatEntry_ID AS ID, ch.AD_TABLE_ID, ch.RECORD_ID, ce.CREATED, au.NAME AS FROMUSER, 'CHAT' AS TYPE, 
+                        CAST('Chat' AS NVARCHAR2(50)) AS SUBJECT, ce.CharacterData AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED,
+                        CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, 
+                        '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        FROM CM_ChatEntry ce JOIN CM_CHAT ch ON ce.CM_Chat_Id=ch.CM_Chat_Id
+                        JOIN AD_USER au ON au.AD_USER_ID=ce.CREATEDBY 
+                        WHERE ch.ISACTIVE = 'Y' AND ch.AD_TABLE_ID = " + _AD_Table_ID + " AND ch.RECORD_ID = " + RecordId
 
-                        + "   UNION "
+                        + @" UNION ALL 
+                        SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'LETTER' AS TYPE, 
+                        ma.TITLE AS SUBJECT,  NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
+                        ma.MailAddress, ma.MailAddressCc,  NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        FROM MailAttachment1 ma 
+                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
+                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'L' 
+                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + " AND ma.RECORD_ID = " + RecordId
 
-                        + "   SELECT ch.CM_CHAT_ID AS ID, ch.AD_TABLE_ID, ch.RECORD_ID, ch.CREATED, au.NAME AS FROMUSER, 'CHAT' AS TYPE, CAST('Chat' AS NVARCHAR2(50)) AS SUBJECT, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM CM_CHAT ch "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ch.CREATEDBY "
-                        + "   WHERE ch.ISACTIVE = 'Y' "
-                        + "   AND ch.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ch.RECORD_ID = " + RecordId
+                        + @" UNION ALL 
+                        SELECT ai.AppointmentsInfo_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'APPOINTMENT' AS TYPE, 
+                        ai.SUBJECT AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED, 
+                        CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, 
+                        ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, ai.MeetingUrl
+                        FROM AppointmentsInfo ai 
+                        JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY 
+                        WHERE (ai.AttendeeInfo IS NOT NULL OR ai.RefAppointmentsInfo_ID IS NULL) AND ai.ISACTIVE = 'Y' AND ai.ISTASK = 'N' 
+                        AND ai.AD_TABLE_ID = " + _AD_Table_ID + "   AND ai.RECORD_ID = " + RecordId
 
-                        + "   UNION "
+                        + @" UNION ALL 
+                        SELECT ai.AppointmentsInfo_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'TASK' AS TYPE, 
+                        ai.SUBJECT AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, ai.ISCLOSED AS ISTASKCLOSED, 
+                        CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, 
+                        ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        FROM AppointmentsInfo ai 
+                        JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY 
+                        WHERE ai.ISACTIVE = 'Y' AND ai.ISTASK = 'Y' 
+                        AND ai.AD_TABLE_ID = " + _AD_Table_ID + "   AND ai.RECORD_ID = " + RecordId
 
-                        + "   SELECT ma.MAILATTACHMENT1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'LETTER' AS TYPE, ma.TITLE AS SUBJECT, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM MAILATTACHMENT1 ma "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY "
-                        + "   WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'L' "
-                        + "   AND ma.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ma.RECORD_ID = " + RecordId
-
-                        + "   UNION "
-
-                        + "   SELECT ai.APPOINTMENTSINFO_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'APPOINTMENT' AS TYPE, ai.SUBJECT AS SUBJECT, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM APPOINTMENTSINFO ai "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY "
-                        + "   WHERE (ai.AttendeeInfo IS NOT NULL OR ai.RefAppointmentsInfo_ID IS NULL) AND ai.ISACTIVE = 'Y' AND ai.ISTASK = 'N' "
-                        + "   AND ai.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ai.RECORD_ID = " + RecordId
-
-                        + "   UNION "
-
-                        + "   SELECT ai.APPOINTMENTSINFO_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'TASK' AS TYPE, ai.SUBJECT AS SUBJECT, au.NAME, 'N' AS HASATTACHMENT, ai.ISCLOSED AS ISTASKCLOSED "
-                        + "   FROM APPOINTMENTSINFO ai "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY "
-                        + "   WHERE ai.ISACTIVE = 'Y' AND ai.ISTASK = 'Y' "
-                        + "   AND ai.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ai.RECORD_ID = " + RecordId
-
-                        + "   UNION"
-
-                        + "   SELECT aa.AD_ATTACHMENT_ID AS ID, aa.AD_TABLE_ID, aa.RECORD_ID, aa.CREATED, au.NAME AS FROMUSER, 'ATTACHMENT' AS TYPE, CAST('Attachment' AS NVARCHAR2(50)) AS SUBJECT, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM AD_ATTACHMENT aa "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY "
-                        + "   WHERE aa.ISACTIVE = 'Y' "
-                        + "   AND aa.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND aa.RECORD_ID = " + RecordId;
+                        + @" UNION ALL
+                        SELECT aa.AD_ATTACHMENT_ID AS ID, aa.AD_TABLE_ID, aa.RECORD_ID, aa.CREATED, au.NAME AS FROMUSER, 'ATTACHMENT' AS TYPE, 
+                        CAST('Attachment' AS NVARCHAR2(50)) AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED,
+                        CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, 
+                        '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        FROM AD_ATTACHMENT aa 
+                        JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY 
+                        WHERE aa.ISACTIVE = 'Y' 
+                        AND aa.AD_TABLE_ID = " + _AD_Table_ID + "   AND aa.RECORD_ID = " + RecordId);
 
             if (Env.IsModuleInstalled("VA048_"))
             {
-                sql += "   UNION "
-
-                + "   SELECT cd.VA048_CALLDETAILS_ID AS ID, cd.AD_TABLE_ID, cd.RECORD_ID, cd.CREATED, cd.VA048_FROM AS FROMUSER, 'CALL' AS TYPE, cd.VA048_TO AS SUBJECT, au.NAME, (CASE WHEN cd.VA048_RECORDINGS IS NOT NULL THEN 'Y' ELSE 'N' END) AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                + "   FROM VA048_CALLDETAILS cd "
-                + "   JOIN AD_USER au ON au.AD_USER_ID=cd.CREATEDBY "
-                + "   WHERE cd.VA048_TO IS NOT NULL AND cd.ISACTIVE = 'Y' "
-                + "   AND cd.AD_TABLE_ID = " + _AD_Table_ID
-                + "   AND cd.RECORD_ID = " + RecordId;
+                sql.Append(@" UNION ALL 
+                        SELECT cd.VA048_CALLDETAILS_ID AS ID, cd.AD_TABLE_ID, cd.RECORD_ID, cd.CREATED, cd.VA048_FROM AS FROMUSER, 'CALL' AS TYPE, 
+                        cd.VA048_Duration AS SUBJECT, NULL AS CharacterData, au.NAME, (CASE WHEN cd.VA048_RECORDINGS IS NOT NULL THEN 'Y' ELSE 'N' END) AS HASATTACHMENT, '' AS ISTASKCLOSED,
+                        NVL(cd.VA048_From, '-') AS MailAddress, NVL(cd.VA048_TO, '-') AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        FROM VA048_CALLDETAILS cd 
+                        JOIN AD_USER au ON au.AD_USER_ID=cd.CREATEDBY 
+                        WHERE cd.VA048_TO IS NOT NULL AND cd.ISACTIVE = 'Y' 
+                        AND cd.AD_TABLE_ID = " + _AD_Table_ID + "   AND cd.RECORD_ID = " + RecordId);
             }
+            sql.Append(") t");
 
-            sql += " ) t"
-                + " ORDER BY CREATED DESC";
+            if (!type.Equals("all"))
+            {
+                sql.Append(" WHERE type = " + DB.TO_STRING(type.ToUpper()));
+            }
+            sql.Append(" ORDER BY CREATED DESC");
 
-            DataSet _dsHistory = VIS.DBase.DB.ExecuteDatasetPaging(sql, (Util.GetValueOfInt(CurrentPage) > 0 ? Util.GetValueOfInt(CurrentPage) : 1), 10);
+            DataSet _dsHistory = VIS.DBase.DB.ExecuteDatasetPaging(sql.ToString(), (Util.GetValueOfInt(CurrentPage) > 0 ? Util.GetValueOfInt(CurrentPage) : 1), 10);
             if (_dsHistory != null && _dsHistory.Tables[0].Rows.Count > 0)
             {
+                string attendees;
+                int attchCount;
+                DateTime? startdate, enddate;
+                AttachmentInfos Attach = null;
                 foreach (DataRow dt in _dsHistory.Tables[0].Rows)
                 {
+                    attchCount = 0;
+                    if (Util.GetValueOfString(dt["TYPE"]).Equals("APPOINTMENT") && !string.IsNullOrEmpty(Util.GetValueOfString(dt["AttendeeInfo"])))
+                    {
+                        attendees = Util.GetValueOfString(DB.ExecuteScalar("SELECT LISTAGG(Name, ',') WITHIN GROUP (ORDER BY Name) AS Name FROM AD_User WHERE AD_User_ID IN ("
+                            + Util.GetValueOfString(dt["AttendeeInfo"]).Replace(';', ',') + ")"));
+                    }
+                    else
+                    {
+                        attendees = "";
+                    }
+
+                    if (dt["StartDate"] != DBNull.Value)
+                    {
+                        startdate = DateTime.SpecifyKind(Convert.ToDateTime(dt["StartDate"]), DateTimeKind.Utc);
+                    }
+                    else
+                    {
+                        startdate = null;
+                    }
+
+                    if (dt["EndDate"] != DBNull.Value)
+                    {
+                        enddate = DateTime.SpecifyKind(Convert.ToDateTime(dt["EndDate"]), DateTimeKind.Utc);
+                    }
+                    else
+                    {
+                        enddate = null;
+                    }
+
+                    if (Util.GetValueOfString(dt["TYPE"]).Equals("MAIL"))
+                    {
+                        MMailAttachment1 _mAttachment = new MMailAttachment1(ctx, Util.GetValueOfInt(dt["ID"]), null);
+                        attchCount = _mAttachment.GetEntryCount();
+                    }
+
+                    if (Util.GetValueOfString(dt["TYPE"]).Equals("CALL") && Util.GetValueOfString(dt["HASATTACHMENT"]).Equals("Y"))
+                    {
+                        string attachemntsql = @"SELECT att.AD_Attachment_ID, atl.AD_AttachmentLine_ID, atl.FileName
+                        FROM AD_Attachment att LEFT JOIN AD_AttachmentLine atl ON (att.AD_Attachment_ID = atl.AD_Attachment_ID)
+                        WHERE att.AD_table_ID = " + PO.Get_Table_ID("VA048_CallDetails") +
+                        " AND att.Record_ID = " + Util.GetValueOfInt(dt["ID"]);
+
+                        using (DataSet dsatt = DB.ExecuteDataset(attachemntsql))
+                        {
+                            if (dsatt != null && dsatt.Tables.Count > 0 && dsatt.Tables[0].Rows.Count > 0)
+                            {
+                                Attach = new AttachmentInfos
+                                {
+                                    Name = Util.GetValueOfString(dsatt.Tables[0].Rows[0]["FileName"]),
+                                    ID = Util.GetValueOfInt(dsatt.Tables[0].Rows[0]["AD_AttachmentLine_ID"]),
+                                    AttID = Util.GetValueOfInt(dsatt.Tables[0].Rows[0]["AD_Attachment_ID"])
+                                };
+                            }
+                        }
+                    }
+
                     LstHistory.Add(new HistoryDetails
                     {
                         ID = Util.GetValueOfInt(dt["ID"]),
@@ -125,17 +199,25 @@ namespace VIS.Models
                         FromUser = Util.GetValueOfString(dt["FROMUSER"]),
                         Type = Util.GetValueOfString(dt["TYPE"]),
                         Subject = Util.GetValueOfString(dt["SUBJECT"]),
+                        CharacterData = Util.GetValueOfString(dt["CharacterData"]),
                         Name = (Util.GetValueOfBool(Util.GetValueOfString(dt["HASATTACHMENT"]).Equals("Y")) ? "<img src='./Areas/VIS/Images/email-attachment.png' alt='Attachment'>" : string.Empty) + "</br></br><span style='font-size:smaller;'>By: " + Util.GetValueOfString(dt["NAME"]) + "</span>",
                         UserName = Util.GetValueOfString(dt["NAME"]),
                         //CreatedDateTime = "<span style='font-weight:bold' >" + Util.GetValueOfString(dt["CREATEDDATETIME"]) + "</span></br></br><span style='font-size:smaller;'>" + Util.GetValueOfString(dt["SUBJECT"]) + "</span>",
                         CreatedDateTime = Util.GetValueOfString(dt["CREATEDDATETIME"]),
                         RecordId = Util.GetValueOfInt(dt["RECORD_ID"]),
                         HasAttachment = Util.GetValueOfBool(Util.GetValueOfString(dt["HASATTACHMENT"]).Equals("Y")),
-                        IsTaskClosed = Util.GetValueOfBool(Util.GetValueOfString(dt["ISTASKCLOSED"]).Equals("Y"))
+                        IsTaskClosed = Util.GetValueOfBool(Util.GetValueOfString(dt["ISTASKCLOSED"]).Equals("Y")),
+                        MailTo = Util.GetValueOfString(dt["MailAddress"]),
+                        MailCC = Util.GetValueOfString(dt["MailAddressCc"]),
+                        StartDate = startdate,
+                        EndDate = enddate,
+                        Attendees = attendees,
+                        MeetingUrl = Util.GetValueOfString(dt["MeetingUrl"]),
+                        AttchCount = attchCount,
+                        Attachment = Attach
                     });
                 }
             }
-
             return LstHistory;
         }
 
@@ -145,88 +227,75 @@ namespace VIS.Models
         /// <param name="RecordId">Record ID</param> 
         /// <param name="_AD_Table_ID">Table ID</param>
         /// <returns>History Record count</returns>
-        public int GetHistoryRecordsCount(int RecordId, int _AD_Table_ID)
+        public List<dynamic> GetHistoryRecordsCount(int RecordId, int _AD_Table_ID)
         {
-            string sql = string.Empty;
-
-            sql = @"SELECT COUNT(1) FROM "
-                        + " ( "
-                        + "   SELECT ma.MAILATTACHMENT1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'EMAIL' AS TYPE, ma.TITLE AS SUBJECT, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM MAILATTACHMENT1 ma "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY "
-                        + "   WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'M' "
-                        + "   AND ma.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ma.RECORD_ID = " + RecordId
-
-                        + "   UNION "
-
-                        + "   SELECT ma.MAILATTACHMENT1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'INBOX' AS TYPE, ma.TITLE AS SUBJECT, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM MAILATTACHMENT1 ma "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY "
-                        + "   WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'I' "
-                        + "   AND ma.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ma.RECORD_ID = " + RecordId
-
-                        + "   UNION "
-
-                        + "   SELECT ch.CM_CHAT_ID AS ID, ch.AD_TABLE_ID, ch.RECORD_ID, ch.CREATED, au.NAME AS FROMUSER, 'CHAT' AS TYPE, CAST('Chat' AS NVARCHAR2(50)) AS SUBJECT, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM CM_CHAT ch "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ch.CREATEDBY "
-                        + "   WHERE ch.ISACTIVE = 'Y' "
-                        + "   AND ch.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ch.RECORD_ID = " + RecordId
-
-                        + "   UNION "
-
-                        + "   SELECT ma.MAILATTACHMENT1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'LETTER' AS TYPE, ma.TITLE AS SUBJECT, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM MAILATTACHMENT1 ma "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY "
-                        + "   WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'L' "
-                        + "   AND ma.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ma.RECORD_ID = " + RecordId
-
-                        + "   UNION "
-
-                        + "   SELECT ai.APPOINTMENTSINFO_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'APPOINTMENT' AS TYPE, ai.SUBJECT AS SUBJECT, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM APPOINTMENTSINFO ai "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY "
-                        + "   WHERE (ai.AttendeeInfo IS NOT NULL OR ai.RefAppointmentsInfo_ID IS NULL) AND ai.ISACTIVE = 'Y' AND ai.ISTASK = 'N' "
-                        + "   AND ai.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ai.RECORD_ID = " + RecordId
-
-                        + "   UNION "
-
-                        + "   SELECT ai.APPOINTMENTSINFO_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'TASK' AS TYPE, ai.SUBJECT AS SUBJECT, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM APPOINTMENTSINFO ai "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY "
-                        + "   WHERE ai.ISACTIVE = 'Y' AND ai.ISTASK = 'Y' "
-                        + "   AND ai.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND ai.RECORD_ID = " + RecordId
-
-                        + "   UNION"
-
-                        + "   SELECT aa.AD_ATTACHMENT_ID AS ID, aa.AD_TABLE_ID, aa.RECORD_ID, aa.CREATED, au.NAME AS FROMUSER, 'ATTACHMENT' AS TYPE, CAST('Attachment' AS NVARCHAR2(50)) AS SUBJECT, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                        + "   FROM AD_ATTACHMENT aa "
-                        + "   JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY "
-                        + "   WHERE aa.ISACTIVE = 'Y' "
-                        + "   AND aa.AD_TABLE_ID = " + _AD_Table_ID
-                        + "   AND aa.RECORD_ID = " + RecordId;
+            List<dynamic> res = null;
+            StringBuilder sql = new StringBuilder();
+            sql.Append(@"SELECT * FROM ( 
+                        SELECT COUNT(ma.MAILATTACHMENT1_ID) AS ID, 'EMAIL' AS TYPE
+                        FROM MAILATTACHMENT1 ma 
+                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
+                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'M' 
+                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + "   AND ma.RECORD_ID = " + RecordId
+                        + @" UNION ALL
+                        SELECT COUNT(ma.MAILATTACHMENT1_ID) AS ID, 'INBOX' AS TYPE
+                        FROM MAILATTACHMENT1 ma 
+                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
+                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'I' 
+                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + "   AND ma.RECORD_ID = " + RecordId
+                        + @" UNION ALL
+                        SELECT COUNT(ce.CM_ChatEntry_ID) AS ID, 'CHAT' AS TYPE
+                        FROM CM_ChatEntry ce JOIN CM_CHAT ch ON (ce.CM_CHAT_ID = ch.CM_CHAT_ID)
+                        JOIN AD_USER au ON au.AD_USER_ID=ch.CREATEDBY 
+                        WHERE ch.ISACTIVE = 'Y' AND ch.AD_TABLE_ID = " + _AD_Table_ID + "   AND ch.RECORD_ID = " + RecordId
+                        + @" UNION ALL
+                        SELECT COUNT(ma.MAILATTACHMENT1_ID) AS ID,'LETTER' AS TYPE
+                        FROM MAILATTACHMENT1 ma 
+                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
+                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'L' 
+                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + "   AND ma.RECORD_ID = " + RecordId
+                        + @" UNION ALL
+                        SELECT COUNT(ai.APPOINTMENTSINFO_ID) AS ID, 'APPOINTMENT' AS TYPE
+                        FROM APPOINTMENTSINFO ai 
+                        JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY 
+                        WHERE (ai.AttendeeInfo IS NOT NULL OR ai.RefAppointmentsInfo_ID IS NULL) AND ai.ISACTIVE = 'Y' AND ai.ISTASK = 'N' 
+                        AND ai.AD_TABLE_ID = " + _AD_Table_ID + "   AND ai.RECORD_ID = " + RecordId
+                        + @" UNION ALL
+                        SELECT COUNT(ai.APPOINTMENTSINFO_ID) AS ID, 'TASK' AS TYPE
+                        FROM APPOINTMENTSINFO ai 
+                        JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY 
+                        WHERE ai.ISACTIVE = 'Y' AND ai.ISTASK = 'Y' 
+                        AND ai.AD_TABLE_ID = " + _AD_Table_ID + "   AND ai.RECORD_ID = " + RecordId
+                        + @" UNION ALL
+                        SELECT COUNT(aa.AD_ATTACHMENT_ID) AS ID, 'ATTACHMENT' AS TYPE
+                        FROM AD_ATTACHMENT aa
+                        JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY 
+                        WHERE aa.ISACTIVE = 'Y' AND aa.AD_TABLE_ID = " + _AD_Table_ID + "   AND aa.RECORD_ID = " + RecordId);
 
             if (Env.IsModuleInstalled("VA048_"))
             {
-                sql += "   UNION "
-
-                 + "   SELECT cd.VA048_CALLDETAILS_ID AS ID, cd.AD_TABLE_ID, cd.RECORD_ID, cd.CREATED, cd.VA048_FROM AS FROMUSER, 'CALL' AS TYPE, cd.VA048_TO AS SUBJECT, au.NAME, (CASE WHEN cd.VA048_RECORDINGS IS NOT NULL THEN 'Y' ELSE 'N' END) AS HASATTACHMENT, '' AS ISTASKCLOSED "
-                 + "   FROM VA048_CALLDETAILS cd "
-                 + "   JOIN AD_USER au ON au.AD_USER_ID=cd.CREATEDBY "
-                 + "   WHERE cd.VA048_TO IS NOT NULL AND cd.ISACTIVE = 'Y' "
-                 + "   AND cd.AD_TABLE_ID = " + _AD_Table_ID
-                 + "   AND cd.RECORD_ID = " + RecordId;
+                sql.Append(@" UNION ALL
+                        SELECT COUNT(cd.VA048_CALLDETAILS_ID) AS ID, 'CALL' AS TYPE
+                        FROM VA048_CALLDETAILS cd 
+                        JOIN AD_USER au ON au.AD_USER_ID=cd.CREATEDBY 
+                        WHERE cd.VA048_TO IS NOT NULL AND cd.ISACTIVE = 'Y' 
+                        AND cd.AD_TABLE_ID = " + _AD_Table_ID + "   AND cd.RECORD_ID = " + RecordId);
             }
+            sql.Append(") t");
 
-            sql += " ) t";
-
-            return Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            DataSet ds = DB.ExecuteDataset(sql.ToString());
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                res = new List<dynamic>();
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    dynamic obj = new ExpandoObject();
+                    obj.type = Util.GetValueOfString(ds.Tables[0].Rows[i]["TYPE"]);
+                    obj.count = Util.GetValueOfInt(ds.Tables[0].Rows[i]["ID"]);
+                    res.Add(obj);
+                }
+            }
+            return res;
         }
 
         /// <summary>
@@ -258,6 +327,7 @@ namespace VIS.Models
                     info.AD_Table_ID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["ad_table_id"]);
                     info.Record_ID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["record_id"]);
                     info.ID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["mailattachment1_id"]);
+                    info.HasAttachment = Util.GetValueOfBool(Util.GetValueOfString(ds.Tables[0].Rows[0]["ISATTACHMENT"]).Equals("Y"));
                     info.IsMail = true;
                 };
             }
@@ -445,9 +515,9 @@ namespace VIS.Models
                 "       WHEN 'Y' " +
                 "       THEN '" + Msg.GetMsg(ctx, "Yes") + "' " +
                 "       ELSE '" + Msg.GetMsg(ctx, "No") + "' " +
-                "     END) AS IsPrivate,AI.comments ,ac.Name as caname" +
+                "     END) AS IsPrivate, AI.comments, ac.Name as caname, ai.TokenRef_ID, ai.MeetingUrl, ai.Transcript" +
                 "   FROM AppointmentsInfo ai LEFT OUTER JOIN appointmentcategory AC " +
-                " ON AI.appointmentcategory_id=ac.appointmentcategory_id WHERE ai.ISACTIVE='Y' AND AI.AppointmentsInfo_ID=" + appointmentId;
+                " ON AI.appointmentcategory_id=ac.appointmentcategory_id WHERE ai.IsActive='Y' AND AI.AppointmentsInfo_ID=" + appointmentId;
 
             Dictionary<string, object> obj = null;
             DataSet ds = DB.ExecuteDataset(_sql);
@@ -480,6 +550,9 @@ namespace VIS.Models
                 obj["IsPrivate"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["IsPrivate"]);
                 obj["comments"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["comments"]);
                 obj["caname"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["caname"]);
+                obj["TokenRef_ID"] = Util.GetValueOfInt(ds.Tables[0].Rows[0]["TokenRef_ID"]);
+                obj["MeetingUrl"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["MeetingUrl"]);
+                obj["Transcript"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["Transcript"]);
             }
             return obj;
         }
@@ -746,6 +819,167 @@ namespace VIS.Models
             }
             return Util.GetValueOfString(zipfileName);
         }
+
+        /// <summary>
+        /// Get API User Account
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="Provider">Auth Provider</param>
+        /// <returns>object</returns>
+        public dynamic GetUserAccount(Ctx ctx, string Provider)
+        {
+            dynamic retDic = new ExpandoObject();
+            retDic.UserAccount_ID = 0;
+            retDic.AuthCredentialID = 0;
+            retDic.ErrorMsg = "";
+
+            string sql = @"SELECT ut.VA101_AccessToken, ut.VA101_RefreshToken, ut.VA101_APIAuthCredential_ID, 
+            ut.VA101_AuthCrediential_ID
+            FROM VA101_AuthCrediential ac
+            INNER JOIN VA101_APIAuthCredential ut ON (ac.VA101_AuthCrediential_ID=ut.VA101_AuthCrediential_ID) 
+            INNER JOIN VA101_AuthProvider ap ON (ac.VA101_AuthProvider_ID=ap.VA101_AuthProvider_ID) 
+            INNER JOIN AD_User us ON (ut.AD_User_ID=us.AD_User_ID)
+            WHERE ut.IsActive='Y' AND ut.AD_User_ID=" + ctx.GetAD_User_ID();
+
+            if (!string.IsNullOrEmpty(Provider))
+            {
+                sql += "AND ap.VA101_Provider='" + Provider + "'";
+            }
+
+            DataSet ds = DB.ExecuteDataset(sql);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                retDic.UserAccount_ID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["VA101_APIAuthCredential_ID"]);
+                retDic.AuthCredentialID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["VA101_AuthCrediential_ID"]);
+
+                if (string.IsNullOrEmpty(Util.GetValueOfString(ds.Tables[0].Rows[0]["VA101_AccessToken"])))
+                {
+                    retDic.ErrorMsg = "TokenNotGenerated";
+                }
+            }
+            else
+            {
+                retDic.ErrorMsg = "UserAccountNotFound";
+            }
+            return retDic;
+        }
+
+        /// <summary>
+        /// Get Transcript from Meeting
+        /// </summary>
+        /// <param name="MeetingUrl"></param>
+        /// <returns></returns>
+        public dynamic DownloadTranscript(Ctx ctx, int AppointmentID, int UserAccountID, string MeetingUrl)
+        {
+            dynamic retObj = new ExpandoObject();
+            retObj.transcript = "";
+            retObj.ErrorMsg = "";
+            string baseUrl = HttpContext.Current.Request.Url.Scheme + "://" + HttpContext.Current.Request.Url.Authority + "/";
+
+            if (HttpContext.Current.Request.Url.Authority == "localhost" && (HttpContext.Current.Request.Url.Port == 80 || HttpContext.Current.Request.Url.Port == 443))
+            {
+                baseUrl += HttpContext.Current.Request.Url.Segments[1];
+            }
+            string authApiUrl = baseUrl + "api/VAAPI/Auth/InitSession";
+            string apiLibUrl = baseUrl + "api/VA101/Common/GetMeetingTranscript";
+
+            string accessKey = "";
+
+            //Assembly asm = Assembly.Load("MarketSvc");
+            //accessKey = asm.GetType("MarketSvc.Classes.Utility").GetMethod("GetCustomerAccessKey", BindingFlags.Public | BindingFlags.Static).Invoke(null, null).ToString();
+
+            if (string.IsNullOrEmpty(accessKey))
+            {
+                accessKey = "10013150-D5F4-4E31-959E-812531001315";
+            }
+            accessKey = SecureEngine.Encrypt(accessKey);
+
+            dynamic apiData = new ExpandoObject();
+            apiData.AD_Client_ID = ctx.GetAD_Client_ID();
+            apiData.AD_Org_ID = ctx.GetAD_Org_ID();
+            apiData.AD_Role_ID = ctx.GetAD_Role_ID();
+            apiData.AD_User_ID = ctx.GetAD_User_ID();
+            apiData.requestAddr = baseUrl;
+            apiData.tokenExpTimeInMinutes = 10;
+            apiData.idleTime = 5;
+
+            // Verify session token            
+            string token = "";
+            using (var client = new HttpClient())
+            {
+                // Prepare the HTTP request
+                var request = new HttpRequestMessage(HttpMethod.Post, authApiUrl)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(apiData), Encoding.UTF8, "application/json")
+                };
+                // Add the Authorization header with the Bearer token
+                request.Headers.Add("accessKey", $"{accessKey}");
+
+                // Send the request synchronously
+                HttpResponseMessage response = client.SendAsync(request).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var tokenData = JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
+                    if (tokenData != null && tokenData.code == 200)
+                    {
+                        token = tokenData.data;
+                    }
+                    else
+                    {
+                        retObj.ErrorMsg = tokenData.result;
+                    }
+                }
+                else
+                {
+                    retObj.ErrorMsg = response.StatusCode.ToString();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                apiData = new ExpandoObject();
+                apiData.sessionToken = token;
+                apiData.accessKey = accessKey;
+                apiData.userAccountID = UserAccountID;
+                apiData.joinUrl = MeetingUrl;
+
+                using (var client = new HttpClient())
+                {
+                    // Prepare the HTTP request
+                    var request = new HttpRequestMessage(HttpMethod.Post, apiLibUrl)
+                    {
+                        Content = new StringContent(JsonConvert.SerializeObject(apiData), Encoding.UTF8, "application/json")
+                    };
+                    // Add the Authorization header with the Bearer token
+                    request.Headers.Add("accessKey", $"{accessKey}");
+
+                    // Send the request synchronously
+                    HttpResponseMessage response = client.SendAsync(request).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var retData = JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
+                        if (retData != null && Util.GetValueOfInt(retData.code) == 200)
+                        {
+                            retObj.transcript = Util.GetValueOfString(retData.data);
+                        }
+                        else
+                        {
+                            retObj.ErrorMsg = Util.GetValueOfString(retData.result);
+                        }
+                    }
+                    else
+                    {
+                        retObj.ErrorMsg = response.StatusCode.ToString();
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(retObj.transcript))
+            {
+                int no = DB.ExecuteQuery("UPDATE AppointmentsInfo SET Transcript=" + DB.TO_STRING(retObj.transcript) + " WHERE AppointmentsInfo_ID = " + AppointmentID);
+            }
+            return retObj;
+        }
     }
 
     // Declare the History Properties
@@ -776,12 +1010,21 @@ namespace VIS.Models
         public string FromUser { get; set; }
         public string Type { get; set; }
         public string Subject { get; set; }
+        public string CharacterData { get; set; }
         public string Name { get; set; }
         public string UserName { get; set; }
         public string CreatedDateTime { get; set; }
         public int RecordId { get; set; }
         public bool HasAttachment { get; set; }
         public bool IsTaskClosed { get; set; }
+        public string MailTo { get; set; }
+        public string MailCC { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string Attendees { get; set; }
+        public string MeetingUrl { get; set; }
+        public int AttchCount { get; set; }
+        public AttachmentInfos Attachment { get; set; }
     }
 
     /// <summary>
@@ -812,6 +1055,7 @@ namespace VIS.Models
         public string Comments { get; set; }
         public bool IsMail { get; set; }
         public bool IsLetter { get; set; }
+        public bool HasAttachment { get; set; }
         public List<AttachmentInfos> Attach { get; set; }
         public int AD_Table_ID { get; set; }
         public int Record_ID { get; set; }
