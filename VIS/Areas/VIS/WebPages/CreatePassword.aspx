@@ -26,7 +26,7 @@
              <div class="VIS-sidebar-wrap">
                 <div class="VIS-sidebarInnerWrap">
                     <div class="VIS-SideTextWrap"> 
-                        <h2>Welcome to Vienna Advantage</h2>
+                        <h2>Welcome to Onfinity</h2>
                         <p>Please create your password to proceed.</p>
                     </div>
                     <div class="VIS-logo-wrap">

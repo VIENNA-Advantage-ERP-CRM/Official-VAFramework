@@ -4,8 +4,8 @@
 
         this.onClose = null; //outer apanel close function
 
-        var $maindiv = $('<div class="vis-forms-container"></div>'); //layout
-        var $div = $('<div class="vis-chatdetailouterwrap" style="height:calc(100vh - 335px); overflow:auto"></div>');
+        var $maindiv = $('<div class="vis-forms-container vis-chat-container"></div>'); //layout
+        var $div = $('<div class="vis-chatdetailouterwrap"></div>');
         var $inputChat = $('<div class="d-flex flex-column vis-chatBoxInputWrap ">');
         var $textArea = $('<div><textarea  id="chatBox_textArea" rows="1" class="vis-chat-msgbox" /></textarea></div>');
         var $sendIconDiv = $('<div>');
@@ -27,7 +27,7 @@
         this.AD_Window_ID = windowId;
         this.Description = description;
         this.ChatID = chat_id;
-       // this.isLoading = false;
+        // this.isLoading = false;
 
 
         function showBusy(show) {
@@ -70,9 +70,14 @@
 
         $textArea.find('#chatBox_textArea').on('keydown', function (e) {
             if (e.keyCode === 13) {
-                showBusy(true);
-                e.preventDefault();
-                triggerSave(e);
+                if (e.altKey) {
+                    this.value += "\r\n";
+                }
+                else {
+                    showBusy(true);
+                    e.preventDefault();
+                    triggerSave(e);
+                }
             }
         });
 
@@ -146,7 +151,7 @@
                 self.dispose();
             };
             ch.show();
-           // events();
+            // events();
             ch.hidebuttons();
         };
 
@@ -158,7 +163,7 @@
 
             ch = null;
             self = null;
-            
+
 
         };
 
@@ -380,7 +385,7 @@
         if (recordID > 0) {
             this.record_ID = recordID;
             this.selectedRow = selectedRow;
-            if (this.curTab ) {
+            if (this.curTab) {
                 this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize, AD_Window_ID: this.AD_Window_ID };
             } else {
                 this.prop = { WindowNo: this.windowNo, ChatID: this.ChatID, AD_Table_ID: this.AD_Table_ID, Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize, AD_Window_ID: this.AD_Window_ID };
