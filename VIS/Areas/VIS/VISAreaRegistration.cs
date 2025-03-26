@@ -83,6 +83,7 @@ namespace VIS
             //    "~/Areas/VIS/Scripts/app/Framework/UploadAmountDimension.js",
             //    "~/Areas/VIS/Scripts/app/Framework/infogeneral.js",
             //    "~/Areas/VIS/Scripts/app/Framework/infoproduct.js",
+            //    "~/Areas/VIS/Scripts/app/Framework/VAS_infoProductCharge.js",
             //    "~/Areas/VIS/Scripts/app/Framework/infoscanform.js",
             //    "~/Areas/VIS/Scripts/app/Framework/attachmentform.js",
             //    "~/Areas/VIS/Scripts/app/Framework/help.js",
@@ -170,6 +171,7 @@ namespace VIS
             //     "~/Areas/VIS/Scripts/F20/veditview.js",
             //     "~/Areas/VIS/Scripts/F20/vcardview.js",
             //     "~/Areas/VIS/Scripts/F20/vgridview.js",
+            //     "~/Areas/VIS/Scripts/F20/vlandingpage.js",
             //     "~/Areas/VIS/Scripts/F20/vmapview.js",
             //     "~/Areas/VIS/Scripts/F20/aviewcontroller.js",
             //     "~/Areas/VIS/Scripts/F20/apanel.js",
@@ -210,12 +212,7 @@ namespace VIS
             //    "~/Areas/VIS/Content/F20/Window.css",
             //            "~/Areas/VIS/Content/F20/Controls.css",
             //             "~/Areas/VIS/Content/F20/Media.css",
-            //             "~/Areas/VIS/Content/F20/ThemeCnfgtr.css",
-            //  "~/Areas/VIS/Content/F20/ThemeCnfgtr.css",
-            //             "~/Areas/VIS/Content/Menu.css",
-            //    "~/Areas/VIS/Content/Widgets/VIS-Widget.css",
-            //   "~/Areas/VIS/Content/Widgets/VISTemplateExcel.css",
-            //   "~/Areas/VIS/Content/Widgets/AssignRecordWidget.css"
+            //             "~/Areas/VIS/Content/F20/ThemeCnfgtr.css"
             //    );
             //style.Include("~/Areas/VIS/Content/VIS.rtl.css");
 

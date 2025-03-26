@@ -49,12 +49,11 @@
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="BaseLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\BaseLibrary.dll</HintPath>
+    <Reference Include="BaseLibrary">
+      <HintPath>..\..\Official-VABaseFiles\BaseLibrary\bin\Debug\BaseLibrary.dll</HintPath>
     </Reference>
     <Reference Include="CoreLibrary">
-      <HintPath>..\ViennaAdvantageWeb\Dll\CoreLibrary.dll</HintPath>
+      <HintPath>..\..\Official-VABaseFiles\CoreLibrary\bin\Debug\CoreLibrary.dll</HintPath>
     </Reference>
     <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -163,7 +162,7 @@
     </Reference>
     <Reference Include="ModelLibrary, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\Dll\ModelLibrary.dll</HintPath>
+      <HintPath>..\..\Official-VAStandard-ERP-CRM\ModelLibrary\bin\Debug\ModelLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -476,6 +475,7 @@
     <Content Include="Areas\VIS\Images\cancel22x22.png" />
     <Content Include="Areas\VIS\Images\cancelfiles.png" />
     <Content Include="Areas\VIS\Images\ccc.png" />
+    <Content Include="Areas\VIS\Images\chat-download-icon.svg" />
     <Content Include="Areas\VIS\Images\Clear16.png" />
     <Content Include="Areas\VIS\Images\clock-hover.png" />
     <Content Include="Areas\VIS\Images\clock-time.png" />
@@ -733,6 +733,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\importexcelwizard.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\infogeneral.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\infomenu.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\VAS_infoProductCharge.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\infoproduct.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\infoscanform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\infowindow.js" />

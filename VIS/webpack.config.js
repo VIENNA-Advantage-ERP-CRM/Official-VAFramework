@@ -62,15 +62,15 @@ module.exports = {
                         url: false,
                     }
                 }
-//                    ,
-                //{
-                //    loader: 'sass-loader',
-                //    options: {
-                //        sassOptions: {
-                //            url: false
-                //        }
-                //    }
-                //}
+                    //                    ,
+                    //{
+                    //    loader: 'sass-loader',
+                    //    options: {
+                    //        sassOptions: {
+                    //            url: false
+                    //        }
+                    //    }
+                    //}
                 ],
             }
         ]

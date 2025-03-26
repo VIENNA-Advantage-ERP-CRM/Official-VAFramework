@@ -33,14 +33,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BaseLibrary">
-      <HintPath>..\ViennaAdvantageWeb\Dll\BaseLibrary.dll</HintPath>
+      <HintPath>..\..\Official-VABaseFiles\BaseLibrary\bin\Debug\BaseLibrary.dll</HintPath>
     </Reference>
     <Reference Include="CoreLibrary">
-      <HintPath>..\ViennaAdvantageWeb\Dll\CoreLibrary.dll</HintPath>
+      <HintPath>..\..\Official-VABaseFiles\CoreLibrary\bin\Debug\CoreLibrary.dll</HintPath>
     </Reference>
     <Reference Include="ModelLibrary, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ViennaAdvantageWeb\DLL\ModelLibrary.dll</HintPath>
+      <HintPath>..\..\Official-VAStandard-ERP-CRM\ModelLibrary\bin\Debug\ModelLibrary.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
