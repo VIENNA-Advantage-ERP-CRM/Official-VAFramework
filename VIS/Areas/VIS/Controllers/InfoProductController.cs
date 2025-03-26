@@ -42,8 +42,36 @@ namespace VIS.Controllers
             return Json(null);
         }
 
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        public JsonResult GetColumnsInfo(string tableName)
+        {
+            VIS.Models.InfoProductModel model = new Models.InfoProductModel();
+            return Json(JsonConvert.SerializeObject(model.GetColumnsInfo(Session["ctx"] as Ctx)), JsonRequestBehavior.AllowGet);
+        }
+
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        [HttpPost]
+        [ValidateInput(false)]
+        public JsonResult GetColumnsData(string TableName, int PageNo, bool ForMobile, bool Requery, string SrchCtrl, string Validation, int Window_ID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            VIS.Models.InfoProductModel model = new Models.InfoProductModel();
+
+            Validation = SecureEngineBridge.DecryptByClientKey(Validation, ctx.GetSecureKey());
+            if (QueryValidator.IsValid(Validation))
+            {
+
+                List<InfoSearchCol> srchCtrl = JsonConvert.DeserializeObject<List<InfoSearchCol>>(SrchCtrl);
+
+                return Json(JsonConvert.SerializeObject(model.GetData(TableName, PageNo, ForMobile, ctx, Requery, srchCtrl, Validation, Window_ID)), JsonRequestBehavior.AllowGet);
+            }
+            return Json(null);
+        }
+
         public JsonResult GetCart(int pageNo, bool isCart, int windowID, string WindowName, int WarehouseID, int WarehouseToID, int LocatorID,
-            int LocatorToID, int BPartnerID, string srchCtrl, bool requery,int OrderId)
+            int LocatorToID, int BPartnerID, string srchCtrl, bool requery, int OrderId)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             List<InfoSearchCol> srchCtrls = JsonConvert.DeserializeObject<List<InfoSearchCol>>(srchCtrl);
@@ -88,6 +116,56 @@ namespace VIS.Controllers
             }
             VIS.Models.InfoProductModel model = new Models.InfoProductModel();
             var value = model.SetProductQty(id, keyColumn, prodID, uomID, Attributes, quantity, locatorTo, lineID, countID, RefNo, Locator_ID, WindowID,
+                WindowName, ContainerID, ContainerToID, Session["ctx"] as Ctx);
+            return Json(JsonConvert.SerializeObject(value), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult SaveData(int id, string keyColumn, string prodChrg, string prod, string prdType, string C_UOM_ID, string listAst, string qty, int locatorTo, int lineID, string InvCountID,
+            string ReferenceNo, int Locator_ID, int WindowID, string WindowName, int ContainerID, int ContainerToID)
+        {
+            List<string> prodVID = new List<string>();
+            if (prodChrg != null && prodChrg.Trim().Length > 0)
+            {
+                prodVID = JsonConvert.DeserializeObject<List<string>>(prodChrg);
+            }
+            List<string> prodID = new List<string>();
+            if (prod != null && prod.Trim().Length > 0)
+            {
+                prodID = JsonConvert.DeserializeObject<List<string>>(prod);
+            }
+            List<string> prodType = new List<string>();
+            if (prdType != null && prdType.Trim().Length > 0)
+            {
+                prodType = JsonConvert.DeserializeObject<List<string>>(prdType);
+            }
+            List<string> uomID = new List<string>();
+            if (C_UOM_ID != null && C_UOM_ID.Trim().Length > 0)
+            {
+                uomID = JsonConvert.DeserializeObject<List<string>>(C_UOM_ID);
+            }
+            List<string> Attributes = new List<string>();
+            if (listAst != null && listAst.Trim().Length > 0)
+            {
+                Attributes = JsonConvert.DeserializeObject<List<string>>(listAst);
+            }
+            List<string> quantity = new List<string>();
+            if (qty != null && qty.Trim().Length > 0)
+            {
+                quantity = JsonConvert.DeserializeObject<List<string>>(qty);
+            }
+            List<string> countID = new List<string>();
+            if (InvCountID != null && InvCountID.Trim().Length > 0)
+            {
+                countID = JsonConvert.DeserializeObject<List<string>>(InvCountID);
+            }
+            List<string> RefNo = new List<string>();
+            if (ReferenceNo != null && ReferenceNo.Trim().Length > 0)
+            {
+                RefNo = JsonConvert.DeserializeObject<List<string>>(ReferenceNo);
+            }
+            VIS.Models.InfoProductModel model = new Models.InfoProductModel();
+            var value = model.SaveLines(id, keyColumn, prodVID, prodID, prodType, uomID, Attributes, quantity, locatorTo, lineID, countID, RefNo, Locator_ID, WindowID,
                 WindowName, ContainerID, ContainerToID, Session["ctx"] as Ctx);
             return Json(JsonConvert.SerializeObject(value), JsonRequestBehavior.AllowGet);
         }

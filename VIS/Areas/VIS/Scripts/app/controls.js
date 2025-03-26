@@ -2501,7 +2501,7 @@
             this.isReadOnly = readOnly;
             $ctrl.prop('disabled', readOnly || this.isMultiKeyTextBox ? true : false);
             // this.$super.setReadOnly(readonly);
-           // this.setBackground(readOnly);
+            // this.setBackground(readOnly);
             if (readOnly) {
                 $btnSearch.css("opacity", .7);
             } else {
@@ -3244,6 +3244,7 @@
 
             }
             else {
+                var windowName = VIS.context.getContext(self.lookup.windowNo, "ScreenName");
                 var tableName = tableName;
                 var _keyColumnName = columnName;
                 var query = null;
@@ -3316,6 +3317,32 @@
                             ;
                     }
                     InfoWindow = new VIS.infoProduct(true, self.lookup.windowNo, M_Warehouse_ID, M_PriceList_ID,
+                        text, tableName, _keyColumnName, multipleSelection, wc, selectedIDs);
+                }
+                else if (_keyColumnName.equals("VAS_Product_V_ID") && window_ID) {
+                    if (window_ID == 170 || windowName == "VAS_InventoryMove") {
+                        M_Warehouse_ID = VIS.context.getContextAsInt(self.lookup.windowNo, "DTD001_MWarehouseSource_ID");
+                    }
+                    else {
+                        M_Warehouse_ID = VIS.context.getContextAsInt(self.lookup.windowNo, "M_Warehouse_ID");
+                    }
+                    M_PriceList_ID = VIS.context.getContextAsInt(self.lookup.windowNo, "M_PriceList_ID");
+                    var multipleSelection = false;
+                    if (self.lookup.windowNo > 0) {
+                        multipleSelection = (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "C_OrderLine_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "C_InvoiceLine_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "M_InOutLine_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "M_PackageLine_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "M_MovementLine_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "M_InventoryLine_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "M_ProductPrice_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "C_ProjectLine_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "M_RequisitionLine_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 0, "KeyColumnName") == "M_PriceList_ID") ||
+                            (VIS.context.getWindowTabContext(self.lookup.windowNo, 1, "KeyColumnName") == "SAP001_StockTransferLine_ID") //;
+                            ;
+                    }
+                    InfoWindow = new VIS.VAS_infoProductCharge(true, self.lookup.windowNo, M_Warehouse_ID, M_PriceList_ID,
                         text, tableName, _keyColumnName, multipleSelection, wc, selectedIDs);
                 }
                 else {
@@ -6898,8 +6925,8 @@
         var $ctrl = $('<input>', { type: 'tel', name: columnName, maxlength: fieldLength });
 
         var $btnSearch = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" /></button>');
-       // if (!isReadOnly)
-         //   $ctrl.append($btnSearch);
+        // if (!isReadOnly)
+        //   $ctrl.append($btnSearch);
 
         var telCtrl = $ctrl;
         //Call base class

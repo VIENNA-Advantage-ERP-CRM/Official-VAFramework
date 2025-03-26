@@ -444,6 +444,311 @@ namespace VIS.Models
             }
         }
 
+        public InfoColumn[] GetColumnsInfo(VAdvantage.Utility.Ctx ctx)
+        {
+            if (s_productLayout != null)
+                return s_productLayout;
+            //
+            s_headerPriceList = Msg.Translate(ctx, "M_PriceList_Version_ID");
+            s_headerWarehouse = Msg.Translate(ctx, "M_Warehouse_ID");
+
+            List<InfoColumn> list = new List<InfoColumn>();
+            list.Add(new InfoColumn(Msg.Translate(ctx, "VAS_Product_V_ID"), "VAS_Product_V_ID", true, "p.VAS_Product_V_ID", DisplayType.ID).Seq(10));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "VAS_ProductCharge_ID"), "VAS_ProductCharge_ID", true, "p.VAS_ProductCharge_ID", DisplayType.ID).Seq(20));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "ProductType"), "ProductType", true, "p.ProductType", DisplayType.String).Seq(30));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "C_UOM_ID"), "C_UOM_ID", true, "p.C_UOM_ID", DisplayType.ID).Seq(40));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "UOM"), "UOM", true, "c.Name AS UOM", DisplayType.ID).Seq(50));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "Value"), "Value", true, "p.Value", DisplayType.String).Seq(60));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "Name"), "Name", true, "p.Name", DisplayType.String).Seq(70));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "QtyEntered"), "QtyEntered", false, "1 AS QtyEntered", DisplayType.Quantity).Seq(80));
+            list.Add(new InfoColumn(s_headerWarehouse, "Warehouse", true, "w.Name as Warehouse", DisplayType.String).Seq(90));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "QtyAvailable"), "QtyAvailable", true,
+                "CASE WHEN p.ProductType <> 'C' THEN bomQtyAvailable(p.VAS_ProductCharge_ID,w.M_Warehouse_ID,0) ELSE 0 END AS QtyAvailable", DisplayType.Quantity).Seq(100));
+            list.Add(new InfoColumn(s_headerPriceList, "PriceListVersion", true, "plv.Name as PriceListVersion", DisplayType.String).Seq(110));
+
+            list.Add(new InfoColumn(Msg.Translate(ctx, "PriceList"), "PriceList", true,
+            "CASE WHEN p.ProductType <> 'C' THEN bomPriceListUom(p.VAS_ProductCharge_ID, pr.M_PriceList_Version_ID,pr.M_AttriButeSetInstance_ID,pr.C_UOM_ID) ELSE 0 END AS PriceList", DisplayType.Amount).Seq(120));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "PriceStd"), "PriceStd", true,
+            "CASE WHEN p.ProductType <> 'C' THEN bomPriceStdUom(p.VAS_ProductCharge_ID, pr.M_PriceList_Version_ID,pr.M_AttriButeSetInstance_ID,pr.C_UOM_ID) ELSE 0 END AS PriceStd", DisplayType.Amount).Seq(130));
+
+
+            list.Add(new InfoColumn(Msg.Translate(ctx, "QtyOnHand"), "QtyOnHand", true,
+                "CASE WHEN p.ProductType <> 'C' THEN bomQtyOnHand(p.VAS_ProductCharge_ID,w.M_Warehouse_ID,0) ELSE 0 END AS QtyOnHand", DisplayType.Quantity).Seq(140));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "QtyReserved"), "QtyReserved", true,
+                "CASE WHEN p.ProductType <> 'C' THEN bomQtyReserved(p.VAS_ProductCharge_ID,w.M_Warehouse_ID,0) ELSE 0 END AS QtyReserved", DisplayType.Quantity).Seq(150));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "QtyOrdered"), "QtyOrdered", true,
+                "CASE WHEN p.ProductType <> 'C' THEN bomQtyOrdered(p.VAS_ProductCharge_ID,w.M_Warehouse_ID,0) ELSE 0 END AS QtyOrdered", DisplayType.Quantity).Seq(160));
+
+            list.Add(new InfoColumn(Msg.Translate(ctx, "SalesMargin"), "SalesMargin", true,
+                "CASE WHEN p.ProductType <> 'C' THEN bomPriceStdUom(p.VAS_ProductCharge_ID, pr.M_PriceList_Version_ID,pr.M_AttriButeSetInstance_ID,pr.C_UOM_ID)-bomPriceLimitUom(p.VAS_ProductCharge_ID, pr.M_PriceList_Version_ID,pr.M_AttriButeSetInstance_ID,pr.C_UOM_ID) ELSE 0 END AS Margin",
+                DisplayType.Amount).Seq(190));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "PriceLimit"), "PriceLimit", true,
+                "CASE WHEN p.ProductType <> 'C' THEN bomPriceLimitUom(p.VAS_ProductCharge_ID, pr.M_PriceList_Version_ID,pr.M_AttriButeSetInstance_ID,pr.C_UOM_ID) ELSE 0 END AS PriceLimit", DisplayType.Amount).Seq(200));
+
+            list.Add(new InfoColumn(Msg.Translate(ctx, "IsInstanceAttribute"), "IsInstanceAttribute", true, "pa.IsInstanceAttribute", DisplayType.YesNo).Seq(210));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "GuranteeDays"), "GuranteeDays", true, "adddays(Sysdate, p.GuaranteeDays) as GuranteeDays", DisplayType.Date).Seq(220));
+            list.Add(new InfoColumn(Msg.Translate(ctx, "Discontinued"), "Discontinued", true, "p.Discontinued", DisplayType.YesNo).Seq(230));
+            list.Add(new InfoColumn(s_headerWarehouse, "M_Warehouse_ID", true, "w.M_Warehouse_ID", DisplayType.ID).Seq(240));
+            list.Add(new InfoColumn(s_headerPriceList, "M_PriceList_Version_ID", true, "plv.M_PriceList_Version_ID", DisplayType.ID).Seq(250));
+            s_productLayout = new InfoColumn[list.Count];
+            s_productLayout = list.ToArray();
+            INDEX_NAME = 3;
+            INDEX_PATTRIBUTE = s_productLayout.Length - 1;	//	last item
+            return s_productLayout;
+        }
+
+        public InfoProductData GetData(string tableName, int pageNo, bool isMobile, Ctx ctx, bool requery, List<InfoSearchCol> srchCtrls,
+            string Validation, int Window_ID)
+        {
+            InfoProductData _iData = new InfoProductData();
+            try
+            {
+                InfoColumn[] displayCols = GetColumnsInfo(ctx);
+
+                var sql = "SELECT ";
+                string keyCol = "";
+                var sqlWhere = "";
+                string s_productFrom = "";
+                //var cname = null;
+                var displayType = 0;
+                //var count = $.makeArray(displayCols).length;
+                //get Qry from InfoColumns
+                int count = displayCols.Count();
+                for (int item = 0; item < count; item++)
+                {
+                    displayType = displayCols[item].AD_Reference_ID;
+                    if (displayType == DisplayType.YesNo)
+                    {
+                        sql += " ( CASE " + displayCols[item].ColumnSQL + " WHEN 'Y' THEN  'True' ELSE 'False'  END ) " + displayCols[item].ColumnName;
+                    }
+                    else
+                    {
+                        sql += displayCols[item].ColumnSQL + " ";
+                    }
+
+                    if (displayType == DisplayType.ID && displayCols[item].ColumnName.ToUpper() == "VAS_PRODUCT_V_ID")
+                    {
+                        keyCol = displayCols[item].ColumnName.ToUpper();
+                    }
+
+                    if (!((count - 1) == item))
+                    {
+                        sql += ", ";
+                    }
+                }
+
+                if (requery == true)
+                {
+                    //var whereClause = " rownum <= " + (ismobile ? 50 : 100);
+                    var whereClause = " w.AD_Client_ID = " + ctx.GetAD_Client_ID();
+                    var name = "";
+                    var value = "";
+                    var upc = "";
+                    var sku = "";
+                    string srchValue = null;
+                    bool upcSearch = false;
+                    s_productFrom =
+                        "VAS_Product_V p"
+                        + " LEFT OUTER JOIN M_ProductPrice pr ON (p.ProductType <> 'C' AND p.VAS_ProductCharge_ID=pr.M_Product_ID AND pr.IsActive='Y')"
+                        + " LEFT OUTER JOIN M_PriceList_Version plv ON (pr.M_PriceList_Version_ID=plv.M_PriceList_Version_ID)"
+                        + " LEFT OUTER JOIN M_AttributeSet pa ON (p.M_AttributeSet_ID=pa.M_AttributeSet_ID)"
+                        + " LEFT OUTER JOIN C_UOM c ON (p.C_UOM_ID=c.C_UOM_ID)";
+                    for (var i = 0; i < srchCtrls.Count(); i++)
+                    {
+                        srchValue = Convert.ToString(srchCtrls[i].Value);
+                        if (srchValue == null || srchValue.Length == 0 || srchValue == "0")
+                        {
+                            continue;
+                        }
+                        //if (whereClause.length > 0) {
+                        //    whereClause += " AND ";
+                        //}
+
+                        if (srchCtrls[i].AD_Reference_ID == 10)
+                        {
+                            if (!((srchValue).IndexOf("%") == 0))
+                            {
+                                srchValue = "●" + srchValue;
+                            }
+                            else
+                            {
+                                srchValue = (srchValue).Replace("%", "●");
+                            }
+                            if (!(((srchValue).LastIndexOf("●")) == ((srchValue).Length)))
+                            {
+                                srchValue = srchValue + "●";
+                            }
+                            srchValue = DB.TO_STRING(srchValue);
+                        }
+
+                        if (srchCtrls[i].CtrlColumnName == "Value")
+                        {
+                            whereClause += " AND UPPER(p." + srchCtrls[i].ColumnName + ") LIKE Upper('%" + srchValue.ToUpper() + "%')";
+                        }
+
+                        else if (srchCtrls[i].CtrlColumnName == "Name")
+                        {
+                            whereClause += " AND UPPER(p." + srchCtrls[i].ColumnName + ") LIKE Upper('%" + srchValue.ToUpper() + "%')";
+                        }
+
+                        else if (srchCtrls[i].CtrlColumnName == "UPC")
+                        {
+                            upcSearch = true;
+                            whereClause += " AND (UPPER(patr.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%') OR UPPER(p.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%')"
+                                + " OR UPPER(mr.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%') OR UPPER(uc.UPC) LIKE Upper('%" + srchValue.ToUpper() + "%'))";
+                        }
+
+                        else if (srchCtrls[i].CtrlColumnName == "SKU")
+                        {
+                            whereClause += " AND UPPER(p." + srchCtrls[i].ColumnName + ") LIKE Upper('%" + srchValue.ToUpper() + "%')";
+                        }
+
+                        else if (srchCtrls[i].CtrlColumnName == "M_Warehouse_ID")
+                        {
+                            if (Util.GetValueOfInt(srchValue) != 0)
+                            {
+                                whereClause += " AND w.M_Warehouse_ID=" + Util.GetValueOfInt(srchValue);
+                            }
+                        }
+                        else if (srchCtrls[i].CtrlColumnName == "M_PriceList_Version_ID")
+                        {
+                            if (Util.GetValueOfInt(srchValue) != 0)
+                            {
+                                whereClause += " AND (p.ProductType = 'C' OR pr.M_PriceList_Version_ID=" + Util.GetValueOfInt(srchValue) + ")";
+                            }
+                        }
+                        else if (srchCtrls[i].CtrlColumnName == "M_AttributeSet_ID")
+                        {
+                            if (Util.GetValueOfInt(srchValue) != 0)
+                            {
+                                whereClause += " AND p.M_AttributeSet_ID=" + Util.GetValueOfInt(srchValue);
+                            }
+                        }
+                        else if (srchCtrls[i].CtrlColumnName == "AttributeCode")
+                        {
+                            whereClause += " AND p.ProductType <> 'C' AND p.VAS_ProductCharge_ID IN (SELECT DISTINCT M_Product_ID FROM M_ProductAttributes WHERE UPPER(UPC) LIKE '%" + srchValue.ToUpper() + "%')";
+                        }
+                    }
+
+                    if (upcSearch)
+                    {
+                        s_productFrom += " LEFT OUTER JOIN M_manufacturer mr ON (p.ProductType <> 'C' AND p.VAS_ProductCharge_ID=mr.M_Product_ID)" +
+                            " LEFT OUTER JOIN M_ProductAttributes patr ON (p.ProductType <> 'C' AND p.VAS_ProductCharge_ID=patr.M_Product_ID)" +
+                            " LEFT OUTER JOIN C_UOM_Conversion uc ON (p.ProductType <> 'C' AND p.VAS_ProductCharge_ID=uc.M_Product_ID)";
+                    }
+
+                    sql += " FROM " + s_productFrom + " JOIN M_Warehouse w ON (1=1)";
+
+                    if (Window_ID == 181)
+                    {
+                        if (Validation != null && Validation.Length > 0)
+                        {
+                            Validation += " AND (p.Discontinued = 'N' OR p.DiscontinuedBy > sysdate )";
+                        }
+                    }
+
+                    if (whereClause.Length > 1)
+                    {
+                        sqlWhere += " WHERE " + whereClause;
+                        if (Validation != null && Validation.Length > 0)
+                        {
+                            sqlWhere += " AND " + Validation.Replace("VAS_Product_V.", "p.");
+                            //sql += " AND " + validationCode;
+                        }
+                    }
+                    else if (Validation != null && Validation.Length > 0)
+                    {
+                        sqlWhere += " WHERE " + Validation.Replace("VAS_Product_V.", "p.");
+                    }
+
+                }
+                else
+                {
+                    sql += " FROM " + s_productFrom + " JOIN M_Warehouse w ON (1=1)";
+
+                    if (Validation != null && Validation.Length > 0 && Validation.Trim().ToUpper().StartsWith("WHERE"))
+                    {
+                        sqlWhere += " " + Validation.Replace("VAS_Product_V.", "p.") + " AND " + tableName + "_ID=-1";
+                    }
+                    else if (Validation != null && Validation.Length > 0)
+                    {
+                        sqlWhere += " WHERE p." + tableName + "_ID=-1 AND " + Validation.Replace("VAS_Product_V.", "p.");
+                    }
+                    else
+                    {
+                        sqlWhere += " WHERE p." + tableName + "_ID=-1";
+                    }
+                }
+
+
+                StringBuilder sbSql = new StringBuilder();
+                int noofRecords = isMobile ? 50 : 100;
+                sqlWhere = sqlWhere.Replace('●', '%');
+                string sqlWhere1 = sql + sqlWhere;
+                sqlWhere1 = MRole.GetDefault(ctx).AddAccessSQL(sqlWhere1, tableName,
+                                MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                //DataSet data = DBase.DB.ExecuteDataset(sql, null, null);
+                int totalRec = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(p.VAS_ProductCharge_ID) " + sqlWhere1.Substring(sqlWhere1.IndexOf("FROM")), null, null));
+                int pageSize = 50;
+                PageSetting pSetting = new PageSetting();
+                pSetting.CurrentPage = pageNo;
+                pSetting.TotalRecords = totalRec;
+                pSetting.PageSize = pageSize;
+                pSetting.TotalPage = (totalRec % pageSize) == 0 ? (totalRec / pageSize) : ((totalRec / pageSize) + 1);
+                _iData.pSetting = pSetting;
+
+                int startPage = ((pageNo - 1) * pageSize) + 1;
+                int endPage = pageNo * pageSize;
+                string sqlPaging = @"SELECT DISTINCT p.VAS_ProductCharge_ID, NVL(pr.M_AttriButeSetInstance_ID,0) AS M_AttriButeSetInstance_ID, NVL(pr.C_UOM_ID,0) AS C_UOM_ID, 
+                        NVL(pr.M_PriceList_Version_ID,0) AS M_PriceList_Version_ID, w.M_Warehouse_ID FROM VAS_Product_V p 
+                        LEFT OUTER JOIN M_ProductPrice pr  ON (p.VAS_ProductCharge_ID=pr.M_Product_ID AND pr.IsActive ='Y') 
+                        LEFT OUTER JOIN M_AttributeSet pa ON (p.M_AttributeSet_ID=pa.M_AttributeSet_ID) 
+                        LEFT OUTER JOIN C_UOM c ON (p.C_UOM_ID=c.C_UOM_ID)
+                        LEFT OUTER JOIN M_Manufacturer mr ON (p.VAS_ProductCharge_ID = mr.M_Product_ID)
+                        LEFT OUTER JOIN M_ProductAttributes patr ON (p.VAS_ProductCharge_ID = patr.M_Product_ID) AND patr.AD_Org_ID IN 
+                        (SELECT AD_Org_ID FROM AD_Role_OrgAccess WHERE AD_Role_ID=" + ctx.GetAD_Role_ID() + @" AND IsActive='Y')
+                        LEFT OUTER JOIN C_UOM_Conversion uc ON (p.VAS_ProductCharge_ID = uc.M_Product_ID)
+                        , M_Warehouse w " + sqlWhere + " ORDER BY p.VAS_ProductCharge_ID, M_PriceList_Version_ID, M_AttriButeSetInstance_ID, C_UOM_ID";
+                sqlPaging = MRole.GetDefault(ctx).AddAccessSQL(sqlPaging, tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                sqlPaging = @"JOIN (SELECT row_num, VAS_ProductCharge_ID, M_AttriButeSetInstance_ID, C_UOM_ID, M_PriceList_Version_ID, M_Warehouse_ID FROM (SELECT prd.*, row_number() over (order by prd.VAS_ProductCharge_ID) AS row_num FROM 
+                        (" + sqlPaging + @") prd) t WHERE row_num BETWEEN " + startPage + " AND " + endPage +
+                        @") pp ON pp.VAS_ProductCharge_ID = p.VAS_ProductCharge_ID AND pp.M_AttriButeSetInstance_ID = NVL(pr.M_AttriButeSetInstance_ID,0) AND pp.C_UOM_ID = NVL(pr.C_UOM_ID,0) 
+                        AND pp.M_Warehouse_ID = w.M_Warehouse_ID AND pp.M_PriceList_Version_ID = NVL(pr.M_PriceList_Version_ID,0) AND w.AD_Org_ID IN 
+                        (SELECT AD_Org_ID FROM AD_Role_OrgAccess WHERE AD_Role_ID=" + ctx.GetAD_Role_ID() + @" AND IsActive='Y')";
+                sql += sqlPaging;       // + where;
+                DataSet data = DB.ExecuteDataset(sql, null, null);
+                if (data == null)
+                {
+                    return null;
+                }
+
+                List<DataObject> dyndata = new List<DataObject>();
+                DataObject items = null;
+                List<object> values = null;
+                for (int i = 0; i < data.Tables[0].Columns.Count; i++)  //columns
+                {
+                    items = new DataObject();
+
+                    items.ColumnName = data.Tables[0].Columns[i].ColumnName;
+                    values = new List<object>();
+                    for (int j = 0; j < data.Tables[0].Rows.Count; j++)  //rows
+                    {
+                        values.Add(data.Tables[0].Rows[j][data.Tables[0].Columns[i].ColumnName]);
+                    }
+                    items.Values = values;
+                    items.RowCount = data.Tables[0].Rows.Count;
+                    dyndata.Add(items);
+                }
+                _iData.data = dyndata;
+                return _iData;
+            }
+            catch (Exception ex)
+            {
+                _iData.Error = ex.Message;
+                return _iData;
+            }
+        }
+
         public InfoCartData GetCart(int pageNo, bool isCart, int window_ID, string windowName, int WarehouseID, int WarehouseToID,
             int LocatorID, int LocatorToID, int BPartnerID, VAdvantage.Utility.Ctx ctx, List<InfoSearchCol> srchCtrls, bool requery, int OrderId)
         {
@@ -1757,6 +2062,1140 @@ namespace VIS.Models
         }
 
         /// <summary>
+        /// Function to save Products/Charges selected from either cart or scan form
+        /// </summary>
+        /// <param name="recordID"></param>
+        /// <param name="keyColName"></param>
+        /// <param name="product"></param>
+        /// <param name="productType"></param>
+        /// <param name="uoms"></param>
+        /// <param name="attribute"></param>
+        /// <param name="qty"></param>
+        /// <param name="LocToID"></param>
+        /// <param name="lineID"></param>
+        /// <param name="InvCountID"></param>
+        /// <param name="RefNo"></param>
+        /// <param name="Locator_ID"></param>
+        /// <param name="WindowID"></param>
+        /// <param name="ContainerID"></param>
+        /// <param name="ContainerToID"></param>
+        /// <param name="ctx"></param>
+        /// <returns>Status in the form of InfoSave class</returns>
+        public InfoSave SaveLines(int recordID, string keyColName, List<string> productV_ID, List<string> product, List<string> productType, List<string> uoms, List<string> attribute,
+            List<string> qty, int LocToID, int lineID, List<string> InvCountID, List<string> ReferenceNo,
+            int Locator_ID, int WindowID, string windowName, int ContainerID, int ContainerToID, VAdvantage.Utility.Ctx ctx)
+        {
+            #region local Variables
+            InfoSave info = new InfoSave();
+            string error = "";
+            MTable tbl = null;
+            PO po = null;
+            int count = 0;
+
+            DataSet dsProPO = null;
+            DataSet dsProPrice = null;
+            DataSet dsUOMConv = null;
+            DataSet dsProducts = null;
+            DataSet dsCharges = null;
+            DataSet dsOrderLines = null;
+
+            bool hasProdsPurch = false;
+            bool hasProducts = false;
+            bool hasCharges = false;
+            bool hasOrderLines = false;
+            bool hasConversions = false;
+
+            bool fetchedProPurchasing = false;
+            bool fetchedUOMConv = false;
+            bool fetchedRecords = false;
+
+            bool isSOTrx = true;
+            int _Version_ID = 0;
+
+            int AD_Client_ID = 0;
+            int AD_Org_ID = 0;
+            int C_BPartner_ID = 0;
+            int M_DiscountSchema_ID = 0;
+            Decimal? bpFlatDiscount = 0;
+            MBPartner bp = null;
+            StringBuilder prodName = new StringBuilder("");
+            List<string> errorKeys = new List<string>();
+            List<string> errorProdLines = new List<string>();
+            #endregion local Variables
+
+            // Evaluate only for these 4 tables
+            // get IDs like Client ID, Org ID, BP ID from parent
+            if (keyColName.ToUpper().Trim() == "C_ORDER_ID" || keyColName.ToUpper().Trim() == "C_INVOICE_ID"
+                || keyColName.ToUpper().Trim() == "M_REQUISITION_ID" || keyColName.ToUpper().Trim() == "C_PROJECT_ID")
+            {
+                if (keyColName.ToUpper().Trim() == "C_ORDER_ID")
+                {
+                    MOrder ord = new MOrder(ctx, recordID, null);
+                    _Version_ID = GetPLVID(ord.GetM_PriceList_ID());
+                    AD_Client_ID = ord.GetAD_Client_ID();
+                    AD_Org_ID = ord.GetAD_Org_ID();
+                    isSOTrx = ord.IsSOTrx();
+                    C_BPartner_ID = ord.GetC_BPartner_ID();
+                }
+                else if (keyColName.ToUpper().Trim() == "C_INVOICE_ID")
+                {
+                    MInvoice inv = new MInvoice(ctx, recordID, null);
+                    _Version_ID = GetPLVID(inv.GetM_PriceList_ID());
+                    AD_Client_ID = inv.GetAD_Client_ID();
+                    AD_Org_ID = inv.GetAD_Org_ID();
+                    isSOTrx = inv.IsSOTrx();
+                    C_BPartner_ID = inv.GetC_BPartner_ID();
+                }
+                else if (keyColName.ToUpper().Trim() == "M_REQUISITION_ID")
+                {
+                    MRequisition req = new MRequisition(ctx, recordID, null);
+                    _Version_ID = GetPLVID(req.GetM_PriceList_ID());
+                    AD_Client_ID = req.GetAD_Client_ID();
+                    AD_Org_ID = req.GetAD_Org_ID();
+                    if (req.Get_ColumnIndex("C_BPartner_ID") > 0 && Util.GetValueOfInt(req.Get_Value("C_BPartner_ID")) > 0)
+                    {
+                        C_BPartner_ID = Util.GetValueOfInt(req.Get_Value("C_BPartner_ID"));
+                    }
+                }
+                else if (keyColName.ToUpper().Trim() == "C_PROJECT_ID")
+                {
+                    MProject proj = new MProject(ctx, recordID, null);
+                    AD_Client_ID = proj.GetAD_Client_ID();
+                    _Version_ID = proj.GetM_PriceList_Version_ID();
+                    AD_Org_ID = proj.GetAD_Org_ID();
+                    C_BPartner_ID = proj.GetC_BPartner_ID();
+                }
+
+                // if business partner found on parent then get Discount Schema ID and Flat Discount amount
+                if (C_BPartner_ID > 0)
+                {
+                    bp = new MBPartner(ctx, C_BPartner_ID, null);
+                    M_DiscountSchema_ID = bp.GetM_DiscountSchema_ID();
+                    bpFlatDiscount = bp.GetFlatDiscount();
+                }
+
+                if (!isSOTrx)
+                {
+                    if (dsProPO == null && !fetchedProPurchasing)
+                    {
+                        dsProPO = GetPurchaingProduct(AD_Client_ID);
+                        fetchedProPurchasing = true;
+                        if (dsProPO != null && dsProPO.Tables[0].Rows.Count > 0)
+                            hasProdsPurch = true;
+                    }
+                }
+                // if UOM Pricing module is available then fetch UOM Conversions
+                if (Env.IsModuleInstalled("ED011_"))
+                {
+                    if (!fetchedUOMConv)
+                    {
+                        dsUOMConv = GetUOMConversions(AD_Client_ID);
+                        fetchedUOMConv = true;
+                    }
+                }
+            }
+
+            // Fetch Products and Product Prices 
+            if (!fetchedRecords)
+            {
+                if (AD_Client_ID == 0)
+                    AD_Client_ID = ctx.GetAD_Client_ID();
+                dsProducts = GetProducts(AD_Client_ID);
+                if (dsProducts != null && dsProducts.Tables.Count > 0 && dsProducts.Tables[0].Rows.Count > 0)
+                    hasProducts = true;
+
+                if (_Version_ID > 0)
+                    dsProPrice = GetProductsPrice(AD_Client_ID, _Version_ID);
+
+                dsCharges = GetCharges(AD_Client_ID);
+                if (dsCharges != null && dsCharges.Tables.Count > 0 && dsCharges.Tables[0].Rows.Count > 0)
+                    hasCharges = true;
+            }
+
+            #region Order Table
+            if (keyColName.ToUpper().Trim() == "C_ORDER_ID")
+            {
+                tbl = new MTable(ctx, 260, null);
+                for (int i = 0; i < product.Count; i++)
+                {
+                    int _m_Product_ID = Util.GetValueOfInt(product[i]);
+                    int _attribute_ID = Util.GetValueOfInt(attribute[i]);
+                    po = tbl.GetPO(ctx, lineID, null);
+                    po.Set_ValueNoCheck("AD_Client_ID", AD_Client_ID);
+                    po.Set_ValueNoCheck("AD_Org_ID", AD_Org_ID);
+                    po.Set_Value("VAS_Product_V_ID", Util.GetValueOfInt(productV_ID[i]));
+                    if (productType[i] != "C")
+                    {
+                        po.Set_Value("M_Product_ID", _m_Product_ID);
+                    }
+                    else
+                    {
+                        po.Set_Value("C_Charge_ID", _m_Product_ID);
+                    }
+                    po.Set_Value("QtyEntered", Util.GetValueOfDecimal(qty[i]));
+                    po.Set_Value("QtyOrdered", Util.GetValueOfDecimal(qty[i]));
+                    po.Set_ValueNoCheck("C_Order_ID", recordID);
+                    if (_attribute_ID != 0)
+                        po.Set_Value("M_AttributeSetInstance_ID", _attribute_ID);
+
+                    if (!isSOTrx && productType[i] != "C")
+                    {
+                        int uomID = Util.GetValueOfInt(uoms[i]);
+                        int uom = 0;
+
+                        if (hasProdsPurch)
+                        {
+                            DataRow[] dr = dsProPO.Tables[0].Select(" M_Product_ID = " + _m_Product_ID + " AND C_BPartner_ID = " + C_BPartner_ID);
+                            if (dr != null && dr.Length > 0)
+                                uom = Util.GetValueOfInt(dr[0]["C_UOM_ID"]);
+                        }
+
+                        if (uomID != 0)
+                        {
+                            if (uomID != uom && uom != 0)
+                                po.Set_ValueNoCheck("C_UOM_ID", uom);
+                            else
+                                po.Set_ValueNoCheck("C_UOM_ID", uomID);
+                        }
+                    }
+                    else
+                        po.Set_ValueNoCheck("C_UOM_ID", Util.GetValueOfInt(uoms[i]));
+
+                    if (productType[i] != "C")
+                    {
+                        SetPrices(po, GetPrices(dsProPrice, dsUOMConv, AD_Client_ID, _m_Product_ID,
+                            _attribute_ID, Util.GetValueOfInt(po.Get_Value("C_UOM_ID")), dsProducts,
+                            Util.GetValueOfDecimal(po.Get_Value("QtyEntered")), M_DiscountSchema_ID, bpFlatDiscount));
+                    }
+                    else if (hasCharges)
+                    {
+                        DataRow[] dr = dsCharges.Tables[0].Select("C_Charge_ID = " + _m_Product_ID);
+                        if (dr != null && dr.Length > 0)
+                        {
+                            po.Set_Value("PriceList", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_Value("PriceLimit", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_ValueNoCheck("PriceActual", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_Value("PriceEntered", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_Value("PrintDescription", Util.GetValueOfString(dr[0]["PrintDescription"]));
+                        }
+                    }
+                    //190- Set the print description.
+                    if (productType[i] != "C" && hasProducts)
+                    {
+                        DataRow[] dr = dsProducts.Tables[0].Select("M_Product_ID = " + _m_Product_ID);
+                        if (dr != null && dr.Length > 0 && po.Get_ColumnIndex("PrintDescription") >= 0)
+                            po.Set_Value("PrintDescription", Util.GetValueOfString(dr[0]["DocumentNote"]));
+                    }
+
+                    if (!po.Save())
+                    {
+                        count++;
+                        SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, _m_Product_ID, prodName);
+                    }
+                }
+            }
+            #endregion Order
+
+            #region Invoice
+            else if (keyColName.ToUpper().Trim() == "C_INVOICE_ID")
+            {
+                tbl = new MTable(ctx, 333, null);
+
+                for (int i = 0; i < product.Count; i++)
+                {
+                    int _m_Product_ID = Util.GetValueOfInt(product[i]);
+                    int _attribute_ID = Util.GetValueOfInt(attribute[i]);
+                    po = tbl.GetPO(ctx, lineID, null);
+                    po.Set_ValueNoCheck("AD_Client_ID", AD_Client_ID);
+                    po.Set_ValueNoCheck("AD_Org_ID", AD_Org_ID);
+                    po.Set_Value("VAS_Product_V_ID", Util.GetValueOfInt(productV_ID[i]));
+                    if (productType[i] != "C")
+                    {
+                        po.Set_Value("M_Product_ID", _m_Product_ID);
+                    }
+                    else
+                    {
+                        po.Set_Value("C_Charge_ID", _m_Product_ID);
+                    }
+                    po.Set_Value("QtyEntered", Util.GetValueOfDecimal(qty[i]));
+                    po.Set_Value("QtyInvoiced", Util.GetValueOfDecimal(qty[i]));
+                    po.Set_ValueNoCheck("C_Invoice_ID", recordID);
+                    if (_attribute_ID != 0)
+                        po.Set_Value("M_AttributeSetInstance_ID", _attribute_ID);
+
+                    if (!isSOTrx && productType[i] != "C")
+                    {
+                        int uomID = Util.GetValueOfInt(uoms[i]);
+                        int uom = 0;
+
+                        if (hasProdsPurch)
+                        {
+                            DataRow[] dr = dsProPO.Tables[0].Select(" M_Product_ID = " + _m_Product_ID + " AND C_BPartner_ID = " + C_BPartner_ID);
+                            if (dr != null && dr.Length > 0)
+                                uom = Util.GetValueOfInt(dr[0]["C_UOM_ID"]);
+                        }
+
+                        if (uomID != 0)
+                        {
+                            if (uomID != uom && uom != 0)
+                                po.Set_ValueNoCheck("C_UOM_ID", uom);
+                            else
+                                po.Set_ValueNoCheck("C_UOM_ID", uomID);
+                        }
+                    }
+                    else
+                        po.Set_ValueNoCheck("C_UOM_ID", Util.GetValueOfInt(uoms[i]));
+
+                    if (productType[i] != "C")
+                    {
+                        SetPrices(po, GetPrices(dsProPrice, dsUOMConv, AD_Client_ID, _m_Product_ID,
+                            _attribute_ID, Util.GetValueOfInt(po.Get_Value("C_UOM_ID")), dsProducts,
+                            Util.GetValueOfDecimal(po.Get_Value("QtyEntered")), M_DiscountSchema_ID, bpFlatDiscount));
+                    }
+                    else if (hasCharges)
+                    {
+                        DataRow[] dr = dsCharges.Tables[0].Select("C_Charge_ID = " + _m_Product_ID);
+                        if (dr != null && dr.Length > 0)
+                        {
+                            po.Set_Value("PriceList", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_Value("PriceLimit", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_ValueNoCheck("PriceActual", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_Value("PriceEntered", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_Value("PrintDescription", Util.GetValueOfString(dr[0]["PrintDescription"]));
+                        }
+                    }
+                    //190- Set the print description.
+                    if (productType[i] != "C" && hasProducts)
+                    {
+                        DataRow[] dr = dsProducts.Tables[0].Select(" M_Product_ID = " + _m_Product_ID);
+                        if (dr != null && dr.Length > 0 && po.Get_ColumnIndex("PrintDescription") >= 0)
+                            po.Set_Value("PrintDescription", Util.GetValueOfString(dr[0]["DocumentNote"]));
+                    }
+                    if (!po.Save())
+                    {
+                        count++;
+                        SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, _m_Product_ID, prodName);
+                    }
+                }
+            }
+            #endregion Invoice
+
+            #region MR/Shipment
+            else if (keyColName.ToUpper().Trim() == "M_INOUT_ID")
+            {
+                tbl = new MTable(ctx, 320, null);
+                int ordID = 0;
+                bool saved = true;
+                MInOut io = new MInOut(ctx, recordID, null);
+
+                if (Locator_ID <= 0)
+                {
+                    Locator_ID = hasDefaultLocator(io.GetM_Warehouse_ID());
+                    if (Locator_ID <= 0)
+                    {
+                        count = -1;
+                        error = Msg.GetMsg(ctx, "DefaultLocatorNotFound");
+                    }
+                }
+
+                // check applied for Locator 
+                if (Locator_ID > 0)
+                {
+                    if (product.Count > 0)
+                    {
+                        string RefNo = ReferenceNo[0];
+                        _sqlQuery.Clear();
+                        if (RefNo != "")
+                        {
+                            if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
+                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
+                            else if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt) || windowName == "VAS_MaterialReceipt")
+                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'N' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
+                            else
+                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
+                        }
+                        else if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
+                            _sqlQuery.Append("SELECT C_Order_ID FROM M_InOut WHERE IsActive = 'Y' AND IsSOTrx = 'Y' AND M_InOut_ID = " + recordID);
+
+                        if (_sqlQuery.Length > 0)
+                            ordID = Util.GetValueOfInt(DB.ExecuteScalar(_sqlQuery.ToString()));
+
+                        if (ordID > 0)
+                        {
+                            _sqlQuery.Clear();
+                            _sqlQuery.Append("SELECT ol.C_OrderLine_ID, ol.M_Product_ID, ol.M_AttributeSetInstance_ID, ol.C_UOM_ID, ol.DTD001_Org_ID, ol.PrintDescription FROM C_OrderLine ol WHERE ol.C_Order_ID = " + ordID);
+                            dsOrderLines = DB.ExecuteDataset(_sqlQuery.ToString());
+                            if (dsOrderLines != null && dsOrderLines.Tables[0].Rows.Count > 0)
+                            {
+                                hasOrderLines = true;
+                            }
+                        }
+
+                        if (ordID > 0 && !isSOTrx)
+                        {
+                            io.SetC_Order_ID(ordID);
+                            if (!io.Save())
+                                saved = false;
+                        }
+                    }
+
+                    if (saved)
+                    {
+                        for (int i = 0; i < product.Count; i++)
+                        {
+                            if (i > 0 && ReferenceNo[i - 1] != ReferenceNo[i])
+                            {
+                                hasOrderLines = true;
+                                saved = true;
+                                string RefNo = ReferenceNo[i];
+                                _sqlQuery.Clear();
+                                if (RefNo != "")
+                                {
+                                    if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
+                                        _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID()
+                                            + " AND DocumentNo = '" + RefNo + "'");
+                                    else if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt) || windowName == "VAS_MaterialReceipt")
+                                        _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'N' AND AD_Client_ID =" + ctx.GetAD_Client_ID()
+                                            + " AND DocumentNo = '" + RefNo + "'");
+                                    else
+                                        _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
+                                }
+                                else if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
+                                    _sqlQuery.Append("SELECT C_Order_ID FROM M_InOut WHERE IsActive = 'Y' AND IsSOTrx = 'Y' AND M_InOut_ID = " + recordID);
+
+                                if (_sqlQuery.Length > 0)
+                                    ordID = Util.GetValueOfInt(DB.ExecuteScalar(_sqlQuery.ToString()));
+
+                                if (ordID > 0)
+                                {
+                                    _sqlQuery.Clear();
+                                    _sqlQuery.Append(@"SELECT ol.C_OrderLine_ID, ol.M_Product_ID, ol.M_AttributeSetInstance_ID, ol.C_UOM_ID, ol.DTD001_Org_ID, ol.PrintDescription 
+                                            FROM C_OrderLine ol WHERE ol.C_Order_ID = " + ordID);
+                                    dsOrderLines = DB.ExecuteDataset(_sqlQuery.ToString());
+                                    if (dsOrderLines != null && dsOrderLines.Tables[0].Rows.Count > 0)
+                                        hasOrderLines = true;
+                                }
+
+                                if (ordID > 0 && !isSOTrx)
+                                {
+                                    io.SetC_Order_ID(ordID);
+                                    if (!io.Save())
+                                        saved = false;
+                                }
+                            }
+
+                            po = tbl.GetPO(ctx, lineID, null);
+                            po.Set_ValueNoCheck("AD_Client_ID", io.GetAD_Client_ID());
+                            po.Set_ValueNoCheck("AD_Org_ID", io.GetAD_Org_ID());
+                            po.Set_Value("VAS_Product_V_ID", Util.GetValueOfInt(productV_ID[i]));
+                            if (productType[i] != "C")
+                            {
+                                po.Set_Value("M_Product_ID", Util.GetValueOfInt(product[i]));
+                            }
+                            else
+                            {
+                                po.Set_Value("C_Charge_ID", Util.GetValueOfInt(product[i]));
+                            }
+                            po.Set_Value("QtyEntered", Util.GetValueOfDecimal(qty[i]));
+                            po.Set_Value("MovementQty", Util.GetValueOfDecimal(qty[i]));
+                            po.Set_ValueNoCheck("M_InOut_ID", recordID);
+
+                            if (productType[i] != "C" && hasProducts)
+                            {
+                                DataRow[] dr = dsProducts.Tables[0].Select("M_Product_ID = " + Util.GetValueOfInt(product[i]));
+                                if (dr != null && dr.Length > 0 && po.Get_ColumnIndex("PrintDescription") >= 0)
+                                    po.Set_Value("PrintDescription", Util.GetValueOfString(dr[0]["DocumentNote"]));
+                            }
+                            else if (hasCharges)
+                            {
+                                DataRow[] dr = dsCharges.Tables[0].Select("C_Charge_ID = " + Util.GetValueOfInt(product[i]));
+                                if (dr != null && dr.Length > 0 && po.Get_ColumnIndex("PrintDescription") >= 0)
+                                {
+                                    po.Set_Value("PrintDescription", Util.GetValueOfString(dr[0]["PrintDescription"]));
+                                }
+                            }
+                            if (hasOrderLines)
+                            {
+                                DataRow[] drOL = null;
+                                if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt) || windowName == "VAS_MaterialReceipt")
+                                {
+                                    if (Env.IsModuleInstalled("DTD001_"))
+                                        drOL = dsOrderLines.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND M_AttributeSetInstance_ID = " + Util.GetValueOfInt(attribute[i])
+                                            + "AND C_UOM_ID = " + Util.GetValueOfInt(uoms[i]) + " AND DTD001_Org_ID = " + ctx.GetAD_Org_ID());
+                                }
+                                if (!(drOL != null && drOL.Length > 0))
+                                {
+                                    drOL = dsOrderLines.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND M_AttributeSetInstance_ID = " + Util.GetValueOfInt(attribute[i])
+                                        + "AND C_UOM_ID = " + Util.GetValueOfInt(uoms[i]));
+                                    if (!(drOL != null && drOL.Length > 0))
+                                        drOL = dsOrderLines.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND M_AttributeSetInstance_ID = " + Util.GetValueOfInt(attribute[i])
+                                        + "AND C_UOM_ID <> " + Util.GetValueOfInt(uoms[i]));
+                                    if (!(drOL != null && drOL.Length > 0))
+                                        drOL = dsOrderLines.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND M_AttributeSetInstance_ID = " + Util.GetValueOfInt(attribute[i]));
+                                    if (!(drOL != null && drOL.Length > 0))
+                                        drOL = dsOrderLines.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]));
+                                }
+                                if (drOL != null && drOL.Length > 0)
+                                {
+                                    po.Set_ValueNoCheck("C_OrderLine_ID", Util.GetValueOfInt(drOL[0]["C_OrderLine_ID"]));
+                                    po.Set_Value("PrintDescription", Util.GetValueOfString(drOL[0]["PrintDescription"]));
+                                }
+                            }
+                            po.Set_Value("M_Locator_ID", Util.GetValueOfInt(Locator_ID));
+                            if (Util.GetValueOfInt(attribute[i]) != 0)
+                                po.Set_Value("M_AttributeSetInstance_ID", Util.GetValueOfInt(attribute[i]));
+
+                            if (!isSOTrx && productType[i] != "C")
+                            {
+                                if (dsProPO == null && !fetchedProPurchasing)
+                                {
+                                    dsProPO = GetPurchaingProduct(ctx.GetAD_Client_ID());
+                                    fetchedProPurchasing = true;
+                                    if (dsProPO != null && dsProPO.Tables[0].Rows.Count > 0)
+                                        hasProdsPurch = true;
+                                }
+
+                                int uomID = Util.GetValueOfInt(uoms[i]);
+                                int uom = 0;
+                                if (hasProdsPurch)
+                                {
+                                    DataRow[] dr = dsProPO.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND C_BPartner_ID = " + io.GetC_BPartner_ID());
+                                    if (dr != null && dr.Length > 0)
+                                        uom = Util.GetValueOfInt(dr[0]["C_UOM_ID"]);
+                                }
+
+                                if (uomID != 0)
+                                {
+                                    if (uomID != uom && uom != 0)
+                                    {
+                                        if (!fetchedUOMConv)
+                                        {
+                                            dsUOMConv = GetUOMConversions(ctx.GetAD_Client_ID());
+                                            fetchedUOMConv = true;
+                                            if (dsUOMConv != null && dsUOMConv.Tables[0].Rows.Count > 0)
+                                                hasConversions = true;
+                                        }
+
+                                        if (hasConversions)
+                                        {
+                                            Decimal? Res = 0;
+                                            DataRow[] drConv = dsUOMConv.Tables[0].Select(" C_UOM_ID = " + uomID + " AND C_UOM_To_ID = " + uom + " AND M_Product_ID= " + Util.GetValueOfInt(product[i]));
+                                            if (drConv != null && drConv.Length > 0)
+                                            {
+                                                Res = Util.GetValueOfDecimal(drConv[0]["MultiplyRate"]);
+                                                if (Res <= 0)
+                                                {
+                                                    drConv = dsUOMConv.Tables[0].Select(" C_UOM_ID = " + uomID + " AND C_UOM_To_ID = " + uom);
+                                                    if (drConv != null && drConv.Length > 0)
+                                                        Res = Util.GetValueOfDecimal(drConv[0]["MultiplyRate"]);
+                                                }
+                                            }
+
+                                            if (Res > 0)
+                                                po.Set_Value("QtyEntered", Util.GetValueOfDecimal(qty[i]) * Res);
+                                        }
+                                        po.Set_ValueNoCheck("C_UOM_ID", uom);
+                                    }
+                                    else
+                                        po.Set_ValueNoCheck("C_UOM_ID", uomID);
+                                }
+                            }
+                            else
+                                po.Set_ValueNoCheck("C_UOM_ID", Util.GetValueOfInt(uoms[i]));
+
+                            if (po.Get_ColumnIndex("M_ProductContainer_ID") > 0 && ContainerID > 0)
+                                po.Set_Value("M_ProductContainer_ID", ContainerID);
+
+                            if (!po.Save())
+                            {
+                                count++;
+                                SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, Util.GetValueOfInt(product[i]), prodName);
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion MR/Shipment
+
+            #region Package
+            else if (keyColName.ToUpper().Trim() == "M_PACKAGE_ID")
+            {
+                DataSet dsMoves = null;
+                bool hasMoveLines = false;
+
+                tbl = new MTable(ctx, 663, null);
+
+                MPackage pkg = new MPackage(ctx, recordID, null);
+                string RefNo = ReferenceNo[0];
+                if (Util.GetValueOfString(RefNo) != "")
+                {
+                    _sqlQuery.Clear();
+                    _sqlQuery.Append(@"SELECT ol.M_MovementLine_ID, ol.M_Product_ID, ol.MovementQty FROM M_MovementLine ol INNER JOIN M_Movement o ON ol.M_Movement_ID=o.M_Movement_ID
+                                        WHERE o.Documentno = '" + Util.GetValueOfString(RefNo) + @"' AND ol.M_MovementLine_ID NOT IN
+                                      (SELECT NVL(M_MovementLine_ID,0) FROM M_PackageLine WHERE M_Package_ID = " + recordID + ")");
+
+                    if (Util.GetValueOfString(RefNo) != "")
+                    {
+                        dsMoves = DB.ExecuteDataset(_sqlQuery.ToString());
+                        if (dsMoves != null && dsMoves.Tables[0].Rows.Count > 0)
+                            hasMoveLines = true;
+                    }
+                }
+
+                StringBuilder sbLine = new StringBuilder("");
+                StringBuilder sbWhereCond = new StringBuilder("");
+
+                for (int i = 0; i < product.Count; i++)
+                {
+                    po = tbl.GetPO(ctx, lineID, null);
+                    po.Set_ValueNoCheck("AD_Client_ID", pkg.GetAD_Client_ID());
+                    po.Set_ValueNoCheck("AD_Org_ID", pkg.GetAD_Org_ID());
+                    po.Set_Value("M_Product_ID", Util.GetValueOfInt(product[i]));
+                    po.Set_Value("Qty", Util.GetValueOfDecimal(qty[i]));
+                    po.Set_ValueNoCheck("M_Package_ID", recordID);
+
+                    if (hasMoveLines)
+                    {
+                        if (sbLine.Length > 0)
+                        {
+                            sbWhereCond.Clear();
+                            sbWhereCond.Append(" AND M_MovementLine_ID NOT IN ( " + sbLine + " ) ");
+                        }
+                        DataRow[] dr = dsMoves.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + sbWhereCond);
+                        if (dr != null && dr.Length > 0)
+                        {
+                            int MoveLineID = Util.GetValueOfInt(dr[0]["M_MovementLine_ID"]);
+                            if (MoveLineID > 0)
+                            {
+                                if (sbLine.Length > 0)
+                                    sbLine.Append(", " + dr[0]["M_MovementLine_ID"]);
+                                else
+                                    sbLine.Append(dr[0]["M_MovementLine_ID"]);
+                                po.Set_Value("M_MovementLine_ID", MoveLineID);
+                                po.Set_Value("DTD001_TotalQty", Util.GetValueOfInt(dr[0]["MovementQty"]));
+                            }
+                        }
+                    }
+                    if (Util.GetValueOfInt(attribute[i]) != 0)
+                    {
+                        po.Set_Value("M_AttributeSetInstance_ID", Util.GetValueOfInt(attribute[i]));
+                    }
+                    if (!po.Save())
+                    {
+                        count++;
+                        SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, Util.GetValueOfInt(product[i]), prodName);
+                    }
+                }
+            }
+            #endregion Package
+
+            #region Inventory
+            else if (keyColName.ToUpper().Trim() == "M_INVENTORY_ID")
+            {
+                tbl = new MTable(ctx, 322, null);
+                MInventory inv = new MInventory(ctx, recordID, null);
+
+                if (Locator_ID <= 0)
+                {
+                    Locator_ID = hasDefaultLocator(inv.GetM_Warehouse_ID());
+                    if (Locator_ID <= 0)
+                    {
+                        error = Msg.GetMsg(ctx, "DefaultLocatorNotFound");
+                    }
+                }
+
+                // check applied for Locator 
+                if (Locator_ID > 0)
+                {
+                    #region Internal Use Inventory
+                    DataSet dsReqs = null;
+                    bool hasReqLines = false;
+                    int Asset_ID = 0;
+                    #endregion Internal Use Inventory
+
+                    #region Physical Inventory
+                    bool hasInvLines = false;
+                    bool hasStock = false;
+                    DataSet dsStockedQty = null;
+                    DataSet dsInvLine = DB.ExecuteDataset("SELECT M_InventoryLine_ID, M_Product_ID, M_AttributeSetInstance_ID FROM M_InventoryLine WHERE IsActive ='Y' AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND M_Inventory_ID = " + recordID);
+                    if (dsInvLine != null && dsInvLine.Tables[0].Rows.Count > 0)
+                        hasInvLines = true;
+                    #endregion Physical Inventory
+
+                    // for Physical Inventory Window
+                    int RefLocatorID = 0;
+                    string RefNo = ReferenceNo[0];
+                    if (WindowID == Util.GetValueOfInt(Windows.PhysicalInventory) || windowName == "VAS_PhysicalInventory")
+                    {
+                        _sqlQuery.Clear();
+                        if (RefNo != "")
+                        {
+                            _sqlQuery.Append("SELECT M_Locator_ID FROM M_Locator WHERE IsActive = 'Y' AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND Value = '" + RefNo + "'");
+                            RefLocatorID = Util.GetValueOfInt(DB.ExecuteScalar(_sqlQuery.ToString()));
+                        }
+
+                        if (RefLocatorID > 0)
+                            Locator_ID = RefLocatorID;
+
+                        dsStockedQty = DB.ExecuteDataset("SELECT QtyOnHand, M_Product_ID, M_AttributeSetInstance_ID FROM M_Storage WHERE M_Locator_ID = " + Locator_ID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID());
+                        if (dsStockedQty != null && dsStockedQty.Tables[0].Rows.Count > 0)
+                            hasStock = true;
+                    }
+                    // For Internal Use Inventory Window
+                    else if (WindowID == Util.GetValueOfInt(Windows.InternalUse) || windowName == "VAS_InternalUseInventory")
+                    {
+                        _sqlQuery.Clear();
+                        _sqlQuery.Append("SELECT C_Charge_ID FROM C_Charge WHERE IsActive = 'Y' AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " AND DTD001_ChargeType = 'INV'");
+                        Asset_ID = Util.GetValueOfInt(DB.ExecuteScalar(_sqlQuery.ToString()));
+
+                        if (Util.GetValueOfString(RefNo) != "")
+                        {
+                            _sqlQuery.Clear();
+                            _sqlQuery.Append(@"SELECT ol.M_RequisitionLine_ID,  ol.M_Product_ID FROM M_RequisitionLine ol INNER JOIN M_Requisition o
+                                    ON ol.M_Requisition_ID =o.M_Requisition_ID WHERE o.Documentno = '" + Util.GetValueOfString(RefNo) + @"' AND ol.M_RequisitionLine_ID NOT IN
+                                      (SELECT NVL(M_Requisitionline_ID,0) FROM M_InventoryLine WHERE M_Inventory_ID = " + recordID + ")");
+
+                            if (Util.GetValueOfString(RefNo) != "")
+                            {
+                                dsReqs = DB.ExecuteDataset(_sqlQuery.ToString());
+                                if (dsReqs != null && dsReqs.Tables[0].Rows.Count > 0)
+                                    hasReqLines = true;
+                            }
+                        }
+                    }
+
+                    StringBuilder sbLine = new StringBuilder("");
+                    StringBuilder sbWhereCond = new StringBuilder("");
+                    for (int i = 0; i < product.Count; i++)
+                    {
+                        lineID = 0;
+                        // look for Inventory Line ID only in case of Physical Inventory Window
+                        if ((WindowID == Util.GetValueOfInt(Windows.PhysicalInventory) || windowName == "VAS_PhysicalInventory") && hasInvLines)
+                        {
+                            DataRow[] drInve = dsInvLine.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND M_AttributeSetInstance_ID = " + Util.GetValueOfInt(attribute[i]));
+                            if (drInve != null && drInve.Length > 0)
+                                lineID = Util.GetValueOfInt(drInve[0]["M_InventoryLine_ID"]);
+                        }
+
+                        po = tbl.GetPO(ctx, lineID, null);
+                        if (lineID > 0)
+                        {
+                            po.Set_Value("QtyCount", (Util.GetValueOfDecimal(po.Get_Value("QtyCount")) + Util.GetValueOfDecimal(qty[i])));
+                            po.Set_Value("AsOnDateCount", po.Get_Value("QtyCount"));
+                            po.Set_Value("QtyEntered", po.Get_Value("QtyCount"));
+                        }
+                        else
+                        {
+                            po.Set_ValueNoCheck("AD_Client_ID", inv.GetAD_Client_ID());
+                            po.Set_ValueNoCheck("AD_Org_ID", inv.GetAD_Org_ID());
+                            if (Util.GetValueOfInt(Locator_ID) > 0)
+                                po.Set_Value("M_Locator_ID", Util.GetValueOfInt(Locator_ID));
+                            else
+                                po.Set_Value("M_Locator_ID", Locator_ID);
+                            po.Set_Value("M_Product_ID", Util.GetValueOfInt(product[i]));
+                            po.Set_ValueNoCheck("M_Inventory_ID", recordID);
+                            if (Util.GetValueOfInt(attribute[i]) != 0)
+                                po.Set_Value("M_AttributeSetInstance_ID", Util.GetValueOfInt(attribute[i]));
+                            else
+                                po.Set_Value("M_AttributeSetInstance_ID", 0);
+                            // when column index found, then insert UOM on requisition line
+                            if (po.Get_ColumnIndex("C_UOM_ID") > 0)
+                                po.Set_Value("C_UOM_ID", Util.GetValueOfInt(uoms[i]));
+                            if (po.Get_ColumnIndex("M_ProductContainer_ID") > 0 && ContainerID > 0)
+                                po.Set_Value("M_ProductContainer_ID", ContainerID);
+                            po.Set_Value("QtyEntered", Util.GetValueOfDecimal(qty[i]));
+
+                            // JID_1700: when saving Product from Cart, UOM Conversion was not working 
+                            po.Set_Value("AdjustmentType", MInventoryLine.ADJUSTMENTTYPE_AsOnDateCount);
+
+                            if (WindowID == Util.GetValueOfInt(Windows.PhysicalInventory) || windowName == "VAS_PhysicalInventory")
+                            {
+                                Decimal? qtyBook = 0;
+                                if (hasStock)
+                                {
+                                    DataRow[] drStock = dsStockedQty.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + " AND M_AttributeSetInstance_ID = " + Util.GetValueOfInt(attribute[i]));
+                                    if (drStock != null && drStock.Length > 0)
+                                        qtyBook = Util.GetValueOfDecimal(drStock[0]["QtyOnHand"]);
+                                }
+                                po.Set_Value("QtyCount", Util.GetValueOfDecimal(qty[i]));
+                                po.Set_ValueNoCheck("QtyBook", qtyBook);
+                                po.Set_Value("AsOnDateCount", Util.GetValueOfDecimal(qty[i]));
+                                po.Set_Value("OpeningStock", qtyBook);
+                                if (po.Get_ColumnIndex("VAICNT_InventoryCountLine_ID") > 0 && Util.GetValueOfInt(InvCountID[i]) > 0)
+                                    po.Set_Value("VAICNT_InventoryCountLine_ID", Util.GetValueOfInt(InvCountID[i]));
+                            }
+                            else if (WindowID == Util.GetValueOfInt(Windows.InternalUse) || windowName == "VAS_InternalUseInventory")
+                            {
+                                if (i > 0 && ReferenceNo[i - 1] != ReferenceNo[i])
+                                {
+                                    hasReqLines = false;
+                                    RefNo = ReferenceNo[i];
+                                    if (Util.GetValueOfString(RefNo) != "")
+                                    {
+                                        _sqlQuery.Clear();
+                                        _sqlQuery.Append(@"SELECT ol.M_RequisitionLine_ID,  ol.M_Product_ID FROM M_RequisitionLine ol INNER JOIN M_Requisition o
+                                    ON ol.M_Requisition_ID =o.M_Requisition_ID WHERE o.Documentno = '" + Util.GetValueOfString(RefNo) + @"' AND ol.M_RequisitionLine_ID NOT IN
+                                      (SELECT NVL(M_Requisitionline_ID,0) FROM M_InventoryLine WHERE M_Inventory_ID = " + recordID + ")");
+
+                                        if (Util.GetValueOfString(RefNo) != "")
+                                        {
+                                            dsReqs = DB.ExecuteDataset(_sqlQuery.ToString());
+                                            if (dsReqs != null && dsReqs.Tables[0].Rows.Count > 0)
+                                                hasReqLines = true;
+                                        }
+                                    }
+                                }
+
+                                po.Set_Value("QtyInternalUse", Util.GetValueOfDecimal(qty[i]));
+                                if (Asset_ID > 0)
+                                    po.Set_Value("C_Charge_ID", Asset_ID);
+                                po.Set_Value("IsInternalUse", true);
+                                if (hasReqLines)
+                                {
+                                    if (sbLine.Length > 0)
+                                    {
+                                        sbWhereCond.Clear();
+                                        sbWhereCond.Append(" AND M_RequisitionLine_ID NOT IN ( " + sbLine + " ) ");
+                                    }
+                                    DataRow[] dr = dsReqs.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + sbWhereCond);
+                                    if (dr != null && dr.Length > 0)
+                                    {
+                                        int ReqLineID = Util.GetValueOfInt(dr[0]["M_RequisitionLine_ID"]);
+                                        if (ReqLineID > 0)
+                                        {
+                                            if (sbLine.Length > 0)
+                                                sbLine.Append(", " + dr[0]["M_RequisitionLine_ID"]);
+                                            else
+                                                sbLine.Append(dr[0]["M_RequisitionLine_ID"]);
+                                            po.Set_Value("M_RequisitionLine_ID", ReqLineID);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (!po.Save())
+                        {
+                            count++;
+                            SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, Util.GetValueOfInt(product[i]), prodName);
+                        }
+                    }
+                }
+            }
+            #endregion Inventory
+
+            #region Project
+            else if (keyColName.ToUpper().Trim() == "C_PROJECT_ID")
+            {
+                tbl = new MTable(ctx, 434, null);
+                MProject proj = new MProject(ctx, recordID, null);
+
+                for (int i = 0; i < product.Count; i++)
+                {
+                    int _m_Product_ID = Util.GetValueOfInt(product[i]);
+                    int _attribute_ID = 0;
+                    po = tbl.GetPO(ctx, lineID, null);
+                    po.Set_ValueNoCheck("AD_Client_ID", AD_Client_ID);
+                    po.Set_ValueNoCheck("AD_Org_ID", proj.GetAD_Org_ID());
+                    po.Set_Value("M_Product_ID", _m_Product_ID);
+                    po.Set_Value("PLANNEDQTY", Util.GetValueOfDecimal(qty[i]));
+                    po.Set_Value("INVOICEDQTY", Util.GetValueOfDecimal(qty[i]));
+                    po.Set_ValueNoCheck("C_Project_ID", recordID);
+
+                    Dictionary<string, Decimal?> pPrice = GetPrices(dsProPrice, dsUOMConv, AD_Client_ID, _m_Product_ID,
+                        _attribute_ID, Util.GetValueOfInt(po.Get_Value("C_UOM_ID")), dsProducts,
+                        Util.GetValueOfDecimal(po.Get_Value("QtyEntered")), M_DiscountSchema_ID, bpFlatDiscount);
+
+                    po.Set_Value("PriceList", pPrice["PriceList"]);
+                    po.Set_Value("PlannedPrice", pPrice["PriceEntered"]);
+                    decimal? discount = 0;
+                    if (pPrice["PriceList"] > 0)
+                    {
+                        discount = ((pPrice["PriceList"] - pPrice["PriceEntered"]) * 100) / pPrice["PriceList"];
+                    }
+
+                    po.Set_Value("Discount", discount);
+                    // oppLine.SetDiscount(Decimal.Subtract(PriceList ,PriceStd));
+                    po.Set_Value("PlannedMarginAmt", (pPrice["PriceEntered"] - pPrice["PriceLimit"]));
+
+                    if (!po.Save())
+                    {
+                        count++;
+                        SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, Util.GetValueOfInt(product[i]), prodName);
+                    }
+                }
+            }
+            #endregion Project
+
+            #region PriceList
+            else if (keyColName.ToUpper().Trim() == "M_PRICELIST_ID")
+            {
+                for (int i = 0; i < product.Count; i++)
+                {
+                    int _m_Product_ID = Util.GetValueOfInt(product[i]);
+                    int _attribute_ID = Util.GetValueOfInt(attribute[i]);
+                    int _uom_ID = Util.GetValueOfInt(uoms[i]);
+                    MProductPrice pr = null;
+                    string sql = @"SELECT COUNT(M_Product_ID) FROM M_ProductPrice WHERE M_PriceList_Version_ID=" + recordID
+                        + " AND M_Product_ID=" + _m_Product_ID + " AND M_AttributeSetInstance_ID = " + _attribute_ID
+                        + " AND C_UOM_ID = " + _uom_ID;
+                    if (Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null)) == 0)
+                    {
+                        pr = new MProductPrice(ctx, recordID, _m_Product_ID, null);
+                        if (Env.IsModuleInstalled("VAPRC_"))
+                        {
+                            pr.SetM_AttributeSetInstance_ID(_attribute_ID);
+                        }
+                        if (Env.IsModuleInstalled("ED011_"))
+                        {
+                            pr.SetC_UOM_ID(_uom_ID);
+                        }
+                        pr.SetPriceLimit(0);
+                        pr.SetPriceList(0);
+                        pr.SetPriceStd(0);
+                        if (!pr.Save())
+                        {
+                            count++;
+                            SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, Util.GetValueOfInt(product[i]), prodName);
+                        }
+                    }
+                }
+            }
+            #endregion PriceList
+
+            #region Requisition
+            else if (keyColName.ToUpper().Trim() == "M_REQUISITION_ID")
+            {
+                tbl = new MTable(ctx, 703, null);
+                for (int i = 0; i < product.Count; i++)
+                {
+                    po = tbl.GetPO(ctx, lineID, null);
+                    po.Set_ValueNoCheck("AD_Client_ID", AD_Client_ID);
+                    po.Set_ValueNoCheck("AD_Org_ID", AD_Org_ID);
+                    po.Set_Value("VAS_Product_V_ID", Util.GetValueOfInt(productV_ID[i]));
+                    if (productType[i] != "C")
+                    {
+                        po.Set_Value("M_Product_ID", Util.GetValueOfInt(product[i]));
+                    }
+                    else
+                    {
+                        po.Set_Value("C_Charge_ID", Util.GetValueOfInt(product[i]));
+                    }
+                    po.Set_Value("QtyEntered", Util.GetValueOfDecimal(qty[i]));
+                    po.Set_Value("Qty", Util.GetValueOfDecimal(qty[i]));
+
+                    if (Util.GetValueOfInt(attribute[i]) != 0)
+                    {
+                        po.Set_Value("M_AttributeSetInstance_ID", Util.GetValueOfInt(attribute[i]));
+                    }
+                    else
+                    {
+                        po.Set_Value("M_AttributeSetInstance_ID", 0);
+                    }
+                    po.Set_ValueNoCheck("C_UOM_ID", Util.GetValueOfInt(uoms[i]));
+                    po.Set_ValueNoCheck("M_Requisition_ID", recordID);
+
+                    if (productType[i] != "C")
+                    {
+                        Dictionary<string, decimal?> pPrice = GetPrices(dsProPrice, dsUOMConv, AD_Client_ID, Util.GetValueOfInt(product[i]),
+                            Util.GetValueOfInt(attribute[i]), Util.GetValueOfInt(po.Get_Value("C_UOM_ID")), dsProducts,
+                            Util.GetValueOfDecimal(po.Get_Value("QtyEntered")), M_DiscountSchema_ID, bpFlatDiscount);
+                        po.Set_ValueNoCheck("PriceActual", pPrice["PriceActual"]);
+                    }
+                    else if (hasCharges)
+                    {
+                        DataRow[] dr = dsCharges.Tables[0].Select("C_Charge_ID = " + Util.GetValueOfInt(product[i]));
+                        if (dr != null && dr.Length > 0)
+                        {
+                            po.Set_Value("PriceActual", Util.GetValueOfDecimal(dr[0]["ChargeAmt"]));
+                            po.Set_Value("PrintDescription", Util.GetValueOfString(dr[0]["PrintDescription"]));
+                        }
+                    }
+
+                    if (productType[i] != "C" && hasProducts)
+                    {
+                        DataRow[] dr = dsProducts.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]));
+                        if (dr != null && dr.Length > 0 && po.Get_ColumnIndex("PrintDescription") >= 0)
+                            po.Set_Value("PrintDescription", Util.GetValueOfString(dr[0]["DocumentNote"]));
+                    }
+                    if (!po.Save())
+                    {
+                        count++;
+                        SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, Util.GetValueOfInt(product[i]), prodName);
+                    }
+                }
+            }
+            #endregion Requisition
+
+            #region Inventory Move
+            if (keyColName.ToUpper().Trim() == "M_MOVEMENT_ID")
+            {
+                DataSet dsReqs = null;
+                bool hasReqLines = false;
+
+                DataSet dsAssets = null;
+                bool hasAssets = false;
+
+                tbl = new MTable(ctx, 324, null);
+                MMovement mov = new MMovement(ctx, recordID, null);
+
+                if (Locator_ID <= 0)
+                    error = Msg.GetMsg(ctx, "DefaultLocatorNotFound");
+
+                if (LocToID <= 0)
+                    error = Msg.GetMsg(ctx, "LocatorToNotFound");
+
+                string RefNo = ReferenceNo[0];
+
+                // check applied for Locator 
+                if (Locator_ID > 0 && LocToID > 0)
+                {
+                    if (Util.GetValueOfString(RefNo) != "")
+                    {
+                        _sqlQuery.Clear();
+                        _sqlQuery.Append("SELECT A_Asset_ID, M_Product_ID, NVL(M_AttributeSetInstance_ID,0) AS M_AttributeSetInstance_ID FROM A_Asset WHERE IsActive = 'Y' AND AD_Client_ID = "
+                            + ctx.GetAD_Client_ID());
+                        dsAssets = DB.ExecuteDataset(_sqlQuery.ToString());
+                        if (dsAssets != null && dsAssets.Tables[0].Rows.Count > 0)
+                            hasAssets = true;
+                    }
+
+                    if (Util.GetValueOfString(RefNo) != "")
+                    {
+                        _sqlQuery.Clear();
+                        _sqlQuery.Append(@"SELECT ol.M_RequisitionLine_ID, ol.M_Product_ID FROM M_RequisitionLine ol INNER JOIN M_Requisition o
+                                    ON ol.M_Requisition_ID =o.M_Requisition_ID WHERE o.Documentno = '" + Util.GetValueOfString(RefNo) + @"' AND ol.M_RequisitionLine_ID NOT IN
+                                      (SELECT NVL(M_Requisitionline_ID,0) FROM M_MovementLine WHERE M_Movement_ID = " + recordID + ")");
+
+                        if (Util.GetValueOfString(RefNo) != "")
+                        {
+                            dsReqs = DB.ExecuteDataset(_sqlQuery.ToString());
+                            if (dsReqs != null && dsReqs.Tables[0].Rows.Count > 0)
+                                hasReqLines = true;
+                        }
+                    }
+
+                    StringBuilder sbLine = new StringBuilder("");
+                    StringBuilder sbWhereCond = new StringBuilder("");
+
+                    for (int i = 0; i < product.Count; i++)
+                    {
+                        if (i > 0 && ReferenceNo[i - 1] != ReferenceNo[i])
+                        {
+                            hasReqLines = false;
+                            RefNo = ReferenceNo[i];
+                            if (Util.GetValueOfString(RefNo) != "")
+                            {
+                                _sqlQuery.Clear();
+                                _sqlQuery.Append(@"SELECT ol.M_RequisitionLine_ID, ol.M_Product_ID FROM M_RequisitionLine ol INNER JOIN M_Requisition o
+                                    ON ol.M_Requisition_ID =o.M_Requisition_ID WHERE o.Documentno = '" + Util.GetValueOfString(RefNo) + @"' AND ol.M_RequisitionLine_ID NOT IN
+                                      (SELECT NVL(M_Requisitionline_ID,0) FROM M_MovementLine WHERE M_Movement_ID = " + recordID + ")");
+
+                                dsReqs = DB.ExecuteDataset(_sqlQuery.ToString());
+                                if (dsReqs != null && dsReqs.Tables[0].Rows.Count > 0)
+                                    hasReqLines = true;
+                            }
+                        }
+
+                        po = tbl.GetPO(ctx, lineID, null);
+                        int M_AttributeSetInstance_ID = Util.GetValueOfInt(attribute[i]);
+                        int M_Product_ID = Util.GetValueOfInt(product[i]);
+
+                        po.Set_ValueNoCheck("AD_Client_ID", mov.GetAD_Client_ID());
+                        po.Set_ValueNoCheck("AD_Org_ID", mov.GetAD_Org_ID());
+                        po.Set_Value("M_Locator_ID", Locator_ID);
+                        po.Set_Value("M_LocatorTo_ID", LocToID);
+                        po.Set_Value("M_Product_ID", M_Product_ID);                        
+                        po.Set_Value("MovementQty", Util.GetValueOfDecimal(qty[i]));
+                        po.Set_ValueNoCheck("M_Movement_ID", recordID);
+                        if (po.Get_ColumnIndex("QtyEntered") > 0)
+                            po.Set_Value("QtyEntered", Util.GetValueOfDecimal(qty[i]));
+                        if (po.Get_ColumnIndex("C_UOM_ID") > 0)
+                            po.Set_Value("C_UOM_ID", Util.GetValueOfInt(uoms[i]));
+                        if (hasReqLines)
+                        {
+                            if (sbLine.Length > 0)
+                            {
+                                sbWhereCond.Clear();
+                                sbWhereCond.Append(" AND M_RequisitionLine_ID NOT IN ( " + sbLine + " ) ");
+                            }
+                            DataRow[] dr = dsReqs.Tables[0].Select(" M_Product_ID = " + Util.GetValueOfInt(product[i]) + sbWhereCond);
+                            if (dr != null && dr.Length > 0)
+                            {
+                                int ReqLineID = Util.GetValueOfInt(dr[0]["M_RequisitionLine_ID"]);
+                                if (ReqLineID > 0)
+                                {
+                                    if (sbLine.Length > 0)
+                                        sbLine.Append(", " + dr[0]["M_RequisitionLine_ID"]);
+                                    else
+                                        sbLine.Append(dr[0]["M_RequisitionLine_ID"]);
+                                    po.Set_Value("M_RequisitionLine_ID", ReqLineID);
+                                }
+                            }
+                        }
+                        if (M_AttributeSetInstance_ID != 0)
+                        {
+                            po.Set_Value("M_AttributeSetInstance_ID", M_AttributeSetInstance_ID);
+                            if (hasAssets)
+                            {
+                                DataRow[] drAst = dsAssets.Tables[0].Select(" M_Product_ID = " + M_Product_ID + " AND M_AttributeSetInstance_ID = " + M_AttributeSetInstance_ID);
+                                if (drAst != null && drAst.Length > 0)
+                                {
+                                    if (Util.GetValueOfInt(drAst[0]["A_Asset_ID"]) > 0)
+                                        po.Set_Value("A_Asset_ID", Util.GetValueOfInt(drAst[0]["A_Asset_ID"]));
+                                }
+                            }
+                        }
+
+                        if (po.Get_ColumnIndex("M_ProductContainer_ID") > 0 && ContainerID > 0)
+                            po.Set_Value("M_ProductContainer_ID", ContainerID);
+
+                        if (po.Get_ColumnIndex("Ref_M_ProductContainerTo_ID") > 0 && ContainerToID > 0)
+                            po.Set_Value("Ref_M_ProductContainerTo_ID", ContainerToID);
+
+                        if (!po.Save())
+                        {
+                            count++;
+                            SetErrorMessages(errorKeys, errorProdLines, hasProducts, dsProducts, Util.GetValueOfInt(product[i]), prodName);
+                        }
+                    }
+                }
+            }
+            #endregion Inventory Move
+
+            #region Dispose Datasets
+            if (dsProPO != null)
+            {
+                dsProPO.Dispose();
+                dsProPO = null;
+            }
+
+            if (dsProPrice != null)
+            {
+                dsProPrice.Dispose();
+                dsProPrice = null;
+            }
+
+            if (dsUOMConv != null)
+            {
+                dsUOMConv.Dispose();
+                dsUOMConv = null;
+            }
+
+            if (dsProducts != null)
+            {
+                dsProducts.Dispose();
+                dsProducts = null;
+            }
+            #endregion Dispose Datasets
+
+            info.count = count;
+            info.error = error;
+            info.errorKeys = errorKeys;
+            info.errorProds = errorProdLines;
+            return info;
+        }
+
+        /// <summary>
         /// Function to set Error Messages in the list 
         /// if same key already found then only add products in the values against the keys in separte list
         /// </summary>
@@ -2215,44 +3654,40 @@ namespace VIS.Models
         {
             List<VariantData> _Variants = new List<VariantData>();
             StringBuilder _Str = new StringBuilder();
-            string Sql = "";
             DataSet _DsVariants = null;
             _Str.Append("SELECT wh.M_warehouse_ID,"
                         + " wh.Name AS Warehouse,"
-                        + " asi.DESCRIPTION AS variant,"
-                        + " M_Storage.M_Product_id,"
-                        + " 1  AS Quantity,"
+                        + " asi.Description AS variant,"
+                        + " M_Storage.M_Product_ID,"
+                        + " 1 AS Quantity,"
                         + " BOMQTYONHANDATTR(M_Storage.M_Product_ID,M_Storage.M_AttributeSetInstance_ID,wh.M_warehouse_ID,0) AS QtyOnHand,"
                         + " (BOMQTYONHANDATTR(M_Storage.M_Product_ID,M_Storage.M_AttributeSetInstance_ID,wh.M_warehouse_ID,0)- "
                         + " BOMQTYRESERVEDATTR(M_Storage.M_Product_ID,M_Storage.M_AttributeSetInstance_ID,wh.M_warehouse_ID,0)) AS QtyAvailable,"
                         + " BOMQTYRESERVEDATTR(M_Storage.M_Product_ID,M_Storage.M_AttributeSetInstance_ID,wh.M_warehouse_ID,0) AS QtyReserved,"
                         + " BOMQTYORDEREDATTR (M_Storage.M_Product_ID,M_Storage.M_AttributeSetInstance_ID,wh.M_warehouse_ID,0) AS QtyOrdered,"
                         + " M_Storage.M_ATTRIBUTESETINSTANCE_ID"
-                        + " FROM m_storage M_Storage INNER JOIN m_locator loc ON (M_Storage.M_LOCATOR_ID=loc.M_Locator_ID)"
-                        + " INNER JOIN M_warehouse wh ON (loc.M_WAREHOUSE_ID=wh.M_warehouse_ID) LEFT JOIN M_ATTRIBUTESETINSTANCE asi"
-                        + " ON (M_Storage.M_ATTRIBUTESETINSTANCE_ID=asi.M_ATTRIBUTESETINSTANCE_ID) WHERE M_Storage.IsActive='Y' AND M_Storage.M_Product_ID =" + M_Product_ID + "");
+                        + " FROM M_Storage M_Storage INNER JOIN M_Locator loc ON (M_Storage.M_Locator_ID=loc.M_Locator_ID)"
+                        + " INNER JOIN M_Warehouse wh ON (loc.M_Warehouse_ID=wh.M_Warehouse_ID) LEFT JOIN M_AttributeSetInstance asi"
+                        + " ON (M_Storage.M_AttributeSetInstance_ID=asi.M_AttributeSetInstance_ID) WHERE M_Storage.IsActive='Y' AND M_Storage.M_Product_ID =" + M_Product_ID + "");
             if (M_warehouse_ID > 0)
             {
-                _Str.Append(" AND wh.M_WAREHOUSE_ID=" + M_warehouse_ID);
+                _Str.Append(" AND wh.M_Warehouse_ID=" + M_warehouse_ID);
             }
             if (M_AttributeSetInstance_ID > 0)
             {
-                _Str.Append(" AND M_Storage.M_ATTRIBUTESETINSTANCE_ID=" + M_AttributeSetInstance_ID);
+                _Str.Append(" AND M_Storage.M_AttributeSetInstance_ID=" + M_AttributeSetInstance_ID);
             }
             if (AttributeCode != "")
             {
-                _Str.Append("AND M_Storage.M_AttributeSetInstance_ID in (SELECT M_AttributeSetInstance_ID from M_ProductAttributes WHERE M_Product_ID=" + M_Product_ID + "" +
-                            " AND UPPER(UPC) like UPPER('%" + AttributeCode + "%'))");
+                _Str.Append("AND M_Storage.M_AttributeSetInstance_ID IN (SELECT M_AttributeSetInstance_ID FROM M_ProductAttributes WHERE M_Product_ID=" + M_Product_ID + "" +
+                            " AND UPPER(UPC) LIKE UPPER('%" + AttributeCode + "%'))");
             }
             _Str.Append(" ORDER BY Variant");
 
             try
             {
-                Sql = MRole.GetDefault(ctx).AddAccessSQL(_Str.ToString(), "M_Storage",
-                                            MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
+                string Sql = MRole.GetDefault(ctx).AddAccessSQL(_Str.ToString(), "M_Storage", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
                 _DsVariants = DB.ExecuteDataset(Sql, null, null);
-                _Str.Clear();
-                Sql = "";
                 if (_DsVariants != null && _DsVariants.Tables[0].Rows.Count > 0)
                 {
                     for (int i = 0; i < _DsVariants.Tables[0].Rows.Count; i++)
@@ -2266,7 +3701,7 @@ namespace VIS.Models
                         VData.OnHand = Util.GetValueOfDecimal(_DsVariants.Tables[0].Rows[i]["QtyOnHand"]);
                         VData.Reserved = Util.GetValueOfDecimal(_DsVariants.Tables[0].Rows[i]["QtyReserved"]);
                         VData.Ordered = Util.GetValueOfDecimal(_DsVariants.Tables[0].Rows[i]["QtyOrdered"]);
-                        VData.M_AttributeSetInstance_ID = Util.GetValueOfInt(_DsVariants.Tables[0].Rows[i]["M_ATTRIBUTESETINSTANCE_ID"]);
+                        VData.M_AttributeSetInstance_ID = Util.GetValueOfInt(_DsVariants.Tables[0].Rows[i]["M_AttributeSetInstance_ID"]);
                         VData.M_Product_ID = Util.GetValueOfInt(_DsVariants.Tables[0].Rows[i]["M_Product_id"]);
                         VData.M_Warehouse_ID = Util.GetValueOfInt(_DsVariants.Tables[0].Rows[i]["M_warehouse_ID"]);
                         VData.ParentRec_ID = ParentRec_ID;
@@ -2276,12 +3711,7 @@ namespace VIS.Models
             }
             catch (Exception e)
             {
-                if (_DsVariants != null && _DsVariants.Tables[0].Rows.Count > 0)
-                {
-                    _DsVariants.Dispose();
-                    _Str.Clear();
-                    Sql = "";
-                }
+
             }
             return _Variants;
         }
@@ -2289,11 +3719,8 @@ namespace VIS.Models
         // Added by Bharat on 31 May 2017
         public int GetWindowID(string fields, Ctx ctx)
         {
-            int window_ID = 0;
-            int tab_ID = Util.GetValueOfInt(fields);
-            string sql = "SELECT AD_Window_ID FROM AD_Tab WHERE AD_Tab_ID = " + Util.GetValueOfInt(tab_ID);
-            window_ID = Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
-            return window_ID;
+            string sql = "SELECT AD_Window_ID FROM AD_Tab WHERE AD_Tab_ID = " + Util.GetValueOfInt(fields);
+            return Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
         }
 
         // Added by Bharat on 31 May 2017
@@ -2372,8 +3799,7 @@ namespace VIS.Models
         public int GetDefaultPriceList(Ctx ctx)
         {
             string sql = "SELECT M_PriceList_ID FROM M_PriceList WHERE IsActive = 'Y' AND IsDefault = 'Y'";
-            int PriceList_ID = Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
-            return PriceList_ID;
+            return Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
         }
 
         // Added by Bharat on 31 May 2017
@@ -2534,12 +3960,10 @@ namespace VIS.Models
         /// <returns>Dataset</returns>
         public DataSet GetPurchaingProduct(int AD_Client_ID)
         {
-            DataSet dsProPurch = null;
             _sqlQuery.Clear();
             _sqlQuery.Append(@"SELECT vdr.C_UOM_ID, vdr.C_BPartner_ID, p.M_Product_ID FROM M_Product p LEFT JOIN 
                             M_Product_Po vdr ON p.M_Product_ID= vdr.M_Product_ID WHERE p.AD_Client_ID = " + AD_Client_ID);
-            dsProPurch = DB.ExecuteDataset(_sqlQuery.ToString());
-            return dsProPurch;
+            return DB.ExecuteDataset(_sqlQuery.ToString());
         }
 
         /// <summary>
@@ -2564,11 +3988,21 @@ namespace VIS.Models
         /// <returns>Dataset of Products with UOM</returns>
         public DataSet GetProducts(int AD_Client_ID)
         {
-            DataSet dsProds = null;
             _sqlQuery.Clear();
             _sqlQuery.Append(@"SELECT M_Product_ID, C_UOM_ID, Name, DocumentNote FROM M_Product WHERE AD_Client_ID = " + AD_Client_ID);
-            dsProds = DB.ExecuteDataset(_sqlQuery.ToString());
-            return dsProds;
+            return DB.ExecuteDataset(_sqlQuery.ToString());
+        }
+
+        /// <summary>
+        /// function to fetch Charges with Charge Amount for tenant
+        /// </summary>
+        /// <param name="AD_Client_ID"></param>
+        /// <returns>Dataset of Products with UOM</returns>
+        public DataSet GetCharges(int AD_Client_ID)
+        {
+            _sqlQuery.Clear();
+            _sqlQuery.Append(@"SELECT C_Charge_ID, Name, ChargeAmt, PrintDescription FROM C_Charge WHERE IsActive='Y' AND AD_Client_ID = " + AD_Client_ID);
+            return DB.ExecuteDataset(_sqlQuery.ToString());
         }
 
         /// <summary>
@@ -2579,13 +4013,10 @@ namespace VIS.Models
         /// <returns>Dataset of Product Prices</returns>
         public DataSet GetProductsPrice(int AD_Client_ID, int M_PriceList_Version_ID)
         {
-            DataSet dsProdPrices = null;
-
             _sqlQuery.Clear();
             _sqlQuery.Append(@"SELECT PriceList , PriceStd , PriceLimit, M_Product_ID, NVL(M_AttributeSetInstance_ID,0) AS M_AttributeSetInstance_ID, C_UOM_ID
                             FROM M_ProductPrice WHERE Isactive='Y' AND AD_Client_ID = " + AD_Client_ID + " AND M_PriceList_Version_ID = " + M_PriceList_Version_ID);
-            dsProdPrices = DB.ExecuteDataset(_sqlQuery.ToString());
-            return dsProdPrices;
+            return DB.ExecuteDataset(_sqlQuery.ToString());
         }
 
         /// <summary>
@@ -2595,11 +4026,9 @@ namespace VIS.Models
         /// <returns>Dataset of UOM Conversions</returns>
         public DataSet GetUOMConversions(int AD_Client_ID)
         {
-            DataSet dsConvs = null;
             _sqlQuery.Clear();
             _sqlQuery.Append(@"SELECT con.DivideRate, TRUNC(con.multiplyrate,4) AS MultiplyRate, con.C_UOM_ID, con.C_UOM_To_ID, con.M_Product_ID FROM C_UOM_Conversion con INNER JOIN C_UOM uom ON con.C_UOM_ID = uom.C_UOM_ID WHERE con.IsActive = 'Y' AND con.AD_Client_ID = " + AD_Client_ID);
-            dsConvs = DB.ExecuteDataset(_sqlQuery.ToString());
-            return dsConvs;
+            return DB.ExecuteDataset(_sqlQuery.ToString());
         }
 
         /// <summary>
