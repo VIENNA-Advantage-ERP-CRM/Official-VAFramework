@@ -515,9 +515,10 @@ namespace VIS.Models
                 "       WHEN 'Y' " +
                 "       THEN '" + Msg.GetMsg(ctx, "Yes") + "' " +
                 "       ELSE '" + Msg.GetMsg(ctx, "No") + "' " +
-                "     END) AS IsPrivate, AI.comments, ac.Name as caname, ai.TokenRef_ID, ai.MeetingUrl, ai.Transcript" +
-                "   FROM AppointmentsInfo ai LEFT OUTER JOIN appointmentcategory AC " +
-                " ON AI.appointmentcategory_id=ac.appointmentcategory_id WHERE ai.IsActive='Y' AND AI.AppointmentsInfo_ID=" + appointmentId;
+                @"     END) AS IsPrivate, ai.comments, ac.Name as caname, ai.TokenRef_ID, ai.MeetingUrl, at.Transcript
+                FROM AppointmentsInfo ai LEFT OUTER JOIN AppointmentCategory ac ON (ai.AppointmentCategory_ID=ac.AppointmentCategory_ID) 
+                LEFT JOIN AppointmentTranscript at ON (at.AppointmentsInfo_ID=ai.AppointmentsInfo_ID)
+                WHERE ai.IsActive='Y' AND AI.AppointmentsInfo_ID=" + appointmentId;
 
             Dictionary<string, object> obj = null;
             DataSet ds = DB.ExecuteDataset(_sql);
@@ -976,7 +977,12 @@ namespace VIS.Models
 
             if (!string.IsNullOrEmpty(retObj.transcript))
             {
-                int no = DB.ExecuteQuery("UPDATE AppointmentsInfo SET Transcript=" + DB.TO_STRING(retObj.transcript) + " WHERE AppointmentsInfo_ID = " + AppointmentID);
+                MTable table = MTable.Get(ctx, "AppointmentTranscript");
+                PO appTrans = table.GetPO(ctx, 0, null);
+                appTrans.Set_Value("AppointmentsInfo_ID", AppointmentID);
+                appTrans.Set_Value("Transcript", retObj.transcript);
+                appTrans.Save();
+                //int no = DB.ExecuteQuery("UPDATE AppointmentsInfo SET Transcript=" + DB.TO_STRING(retObj.transcript) + " WHERE AppointmentsInfo_ID = " + AppointmentID);
             }
             return retObj;
         }

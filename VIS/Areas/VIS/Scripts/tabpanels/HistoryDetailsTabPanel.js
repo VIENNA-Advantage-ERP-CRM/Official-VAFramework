@@ -1494,6 +1494,9 @@
                     setContentHeight();
                 });
             }
+            else {
+                $('#VIS_tabPanelDataLoader' + window_No).hide();
+            }
         };
 
         function GetorCreateAPIUserAccount() {
