@@ -8,6 +8,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Windows.Forms;
@@ -858,6 +859,23 @@ namespace VIS.Models
                 return collection.Count == 0;
             }
             return false;
+        }
+
+        /// <summary>
+        /// VAI050-Get access key 
+        /// </summary>
+        /// <returns> returns key</returns>
+        public string GetAccessKey()
+        {
+            try
+            {
+                System.Reflection.Assembly asm = System.Reflection.Assembly.Load("MarketSvc");
+                string AccessKey = Util.GetValueOfString(asm.GetType("MarketSvc.Classes.Utility").GetMethod("GetCustomerAccessKey", BindingFlags.Public | BindingFlags.Static).Invoke(null, null));
+                return AccessKey;
+            }
+            catch (Exception e)
+            { VAdvantage.Logging.VLogger.Get().Severe("ErrorToGetAccessKey=>" + e.Message); }
+            return null;
         }
 
     }

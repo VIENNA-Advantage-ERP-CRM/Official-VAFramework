@@ -112,9 +112,6 @@
     <Reference Include="itextsharp">
       <HintPath>..\ViennaAdvantageWeb\Dll\itextsharp.dll</HintPath>
     </Reference>
-    <Reference Include="MarketSvc">
-      <HintPath>..\ViennaAdvantageWeb\DLL\MarketSvc.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.4\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
     </Reference>
@@ -481,6 +478,7 @@
     <Content Include="Areas\VIS\Images\cancel22x22.png" />
     <Content Include="Areas\VIS\Images\cancelfiles.png" />
     <Content Include="Areas\VIS\Images\ccc.png" />
+    <Content Include="Areas\VIS\Images\chat-download-icon.svg" />
     <Content Include="Areas\VIS\Images\Clear16.png" />
     <Content Include="Areas\VIS\Images\clock-hover.png" />
     <Content Include="Areas\VIS\Images\clock-time.png" />
