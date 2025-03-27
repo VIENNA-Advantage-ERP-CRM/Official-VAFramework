@@ -481,6 +481,7 @@
     <Content Include="Areas\VIS\Images\cancel22x22.png" />
     <Content Include="Areas\VIS\Images\cancelfiles.png" />
     <Content Include="Areas\VIS\Images\ccc.png" />
+    <Content Include="Areas\VIS\Images\chat-download-icon.svg" />
     <Content Include="Areas\VIS\Images\Clear16.png" />
     <Content Include="Areas\VIS\Images\clock-hover.png" />
     <Content Include="Areas\VIS\Images\clock-time.png" />
