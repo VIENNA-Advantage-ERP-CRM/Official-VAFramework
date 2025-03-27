@@ -350,10 +350,16 @@ namespace VIS.Controllers
         public ActionResult LoginAndInitSession([System.Web.Http.FromBody] LoginAndInitSessionRequest value)
         {
             // Get the base URL
+            UserPreferenceModel obj = new UserPreferenceModel();
             var baseUrl = $"{Request.Url.Scheme}://{Request.Url.Authority}/";
             string loginApiUrl = $"{baseUrl}api/VAAPI/Auth/Login";
             string initSessionApiUrl = $"{baseUrl}api/VAAPI/Auth/InitSession";
-            string accessKey = MarketSvc.Classes.Utility.GetCustomerAccessKey();
+            string accessKey = obj.GetAccessKey();
+            Ctx ctx = Session["ctx"] as Ctx;
+            if (string.IsNullOrEmpty(accessKey))
+            {
+                return Json(new { success = false, message = Msg.GetMsg(ctx, "VAAPI_AccessKeyNotFound") });
+            }
             string userName = value.userName;
             string password = value.password;
             int AD_Client_ID = value.AD_Client_ID;
@@ -365,8 +371,6 @@ namespace VIS.Controllers
             string requestAddr = value.requestAddr;
             int tokenExpTimeInMinutes = value.tokenExpTimeInMinutes;
             int idleTime = value.idleTime;
-            Ctx ctx = Session["ctx"] as Ctx;
-            UserPreferenceModel obj = new UserPreferenceModel();
             var loginResult = obj.CallLoginApi(userName, password, accessKey, loginApiUrl);
             if (loginResult == null)
             {
