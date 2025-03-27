@@ -761,7 +761,6 @@
             } else {
                 overLay.show();
                 const buttonOffset =  $(this).offset();
- = $(this).offset();
                 const buttonHeight = $(this).outerHeight();
                 const popupHeight = bodyDiv.find('.vis-fp-popup').outerHeight();
                 const buttonWidth = $(this).outerWidth();
