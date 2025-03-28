@@ -150,6 +150,8 @@ namespace VAdvantage.Controller
         public bool IsEncryptedField = false;
         /**	Storage Encryption	*/
         public bool IsEncryptedColumn = false;
+        /**	Storage Hashing	*/
+        public bool IsHashedColumn = false;
         /**	Find Selection		*/
         public bool IsSelectionColumn = false;
         //public bool IsIncludedColumn = false;
