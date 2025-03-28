@@ -15,9 +15,9 @@ namespace VAdvantage.Process
 {
     public class ColumnHashing : SvrProcess
     {
-        /** Enable/Disable Encryption		*/
+        /** Enable/Disable Hashing		*/
         private bool p_IsHashed = false;
-        /** Change Encryption Settings		*/
+        /** Change hashing Settings		*/
         private bool p_ChangeSetting = false;
         /** Maximum Length					*/
         private int p_MaxLength = 0;
@@ -103,7 +103,7 @@ namespace VAdvantage.Process
                         + ") fits into field (" + column.GetFieldLength() + ")");
                 else
                 {
-                    AddLog(0, null, null, "Encrypted Length (" + hashLength
+                    AddLog(0, null, null, "Hashed Length (" + hashLength
                         + ") does NOT fit into field (" + column.GetFieldLength() + ") - resize field");
                     error = true;
                 }
@@ -219,7 +219,7 @@ namespace VAdvantage.Process
                                 else
                                 {
                                     Rollback();
-                                    return "After Encryption some values may exceed the value of column length. Please exceed column Length.";
+                                    return "After Hashing some values may exceed the value of column length. Please exceed column Length.";
                                 }
                             }
                         }
@@ -234,7 +234,12 @@ namespace VAdvantage.Process
                                 //Hash is irreversible so we can't get the original value back
 
                                 string plainString = "Onfinity@123"; 
-                                String sql = "UPDATE " + tableName + "  SET Updated=SYSDATE, PasswordExpireOn = null, UpdatedBy=" + GetAD_User_ID();
+                                String sql = "UPDATE " + tableName + "  SET Updated=SYSDATE, UpdatedBy=" + GetAD_User_ID();
+                                if (tableName.ToUpper() == "AD_USER")
+                                {
+                                    sql += ", PasswordExpireOn = null";
+                                }
+
                                 if (!string.IsNullOrEmpty(plainString))
                                 {
                                     sql += ", " + column.GetColumnName() + "=" + GlobalVariable.TO_STRING(plainString);
@@ -257,7 +262,7 @@ namespace VAdvantage.Process
                                 if (iRes <= 0)
                                 {
                                     Rollback();
-                                    return "Hashed=" + false;
+                                    return "Hashed(error)=" + false;
                                 }
 
                             }

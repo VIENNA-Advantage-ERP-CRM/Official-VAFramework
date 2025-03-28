@@ -7279,6 +7279,10 @@
         return this.vo.IsEncryptedColumn;
     };
 
+    GridField.prototype.getIsHashedColumn = function () {
+        return this.vo.IsEncryptedColumn;
+    };
+
     GridField.prototype.getZoomWindow_ID = function () {
         return this.vo.ZoomWindow_ID;
     };
