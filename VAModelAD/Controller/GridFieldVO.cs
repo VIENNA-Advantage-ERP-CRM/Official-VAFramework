@@ -129,6 +129,8 @@ namespace VAdvantage.Controller
                         vo.IsEncryptedField = "Y".Equals(dr[i].ToString());
                     else if (columnName.Equals("ISENCRYPTEDCOLUMN"))
                         vo.IsEncryptedColumn = "Y".Equals(dr[i].ToString());
+                    else if (columnName.Equals("ISHASHEDCOLUMN"))
+                        vo.IsHashedColumn = "Y".Equals(dr[i].ToString());
                     else if (columnName.Equals("ISSELECTIONCOLUMN"))
                         vo.IsSelectionColumn = "Y".Equals(dr[i].ToString());
                     //else if (columnName.Equals("ISINCLUDEDCOLUMN"))
@@ -907,6 +909,7 @@ namespace VAdvantage.Controller
             clone.IsFieldOnly = IsFieldOnly;
             clone.IsEncryptedField = IsEncryptedField;
             clone.IsEncryptedColumn = IsEncryptedColumn;
+            clone.IsHashedColumn = IsHashedColumn;
             clone.IsSelectionColumn = IsSelectionColumn;
             //clone.IsIncludedColumn = IsIncludedColumn;
             clone.SelectionSeqNo = SelectionSeqNo;
