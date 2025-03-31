@@ -721,7 +721,7 @@
 
 .VIS-activities-container {
     max-width: 100%;
-    min-height: 100vh;
+    /*min-height: 100vh;*/
     display: flex;
     flex-direction: column;
 }
@@ -758,6 +758,10 @@
     display: flex;
     gap: 1.5rem;
     border-bottom: 1px solid rgba(var(--v-c-on-secondary), 0.3);
+    position: sticky;
+    background-color: white;
+    z-index: 2;
+    top: 0;
 }
 
     .VIS-activities-nav .nav-tabs {
@@ -1132,13 +1136,13 @@
     border-radius: 8px;
     padding: 1rem;
     display: grid;
-    grid-template-columns: 2fr 30%;
+    grid-template-columns: 70% 30%;
     gap: 1rem;
 }
 
 .VIS-main-content {
     border-right: 1px solid #e0e0e0;
-    padding-right: 1rem;
+    /*padding-right: 1rem;*/
 }
 
 .VIS-top-row {
@@ -1175,13 +1179,20 @@
     line-height: 1.5;
 }
 
-.VIS-transcript-section pre {
-    font-size: 14px;
-    color: #333;
-    margin: 0;
-    line-height: 1.5;
-    font-family: var(--v-c-font-family);
+.VIS-transcript-section {
+    max-height: 200px;
+    overflow: auto;
 }
+
+    .VIS-transcript-section pre {
+        font-size: 14px;
+        color: #333;
+        margin: 0;
+        line-height: 1.5;
+        font-family: var(--v-c-font-family);
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
 
 .VIS-attachment-section img {
     object-fit: contain;
@@ -1253,7 +1264,6 @@
 .VIS-comments-section {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     height: 100%;
     gap: 0px;
 }
