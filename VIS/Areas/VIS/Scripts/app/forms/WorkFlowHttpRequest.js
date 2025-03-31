@@ -23,6 +23,9 @@
     var desCtrl = null;
     var _recordID = 0;
     var root = null;
+    var _divBodyType = null;
+    var _divBodyContent = null;
+    var listDiv = null;
 
     //*************Add New Product by using Popup box  ******************//
 
@@ -36,31 +39,29 @@
         });
         root.append(bsyDiv);
 
-        // OpenDialogPopup(root);
-
         this.Initialize = function () {
             setBusy(true);
             var mainDiv = $('<div class="vis-wf-httprequest-container">');
             mainDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv">'
-                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap" id="URL_' + windowNo + '"></div></div>'
+                + '<div class="VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-input-wrap" id="URL_' + windowNo + '"></div></div>'
                 + '</div>');
             mainDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv">'
-                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap" id="Method_' + windowNo + '"></div></div>'
+                + '<div class="VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-input-wrap" id="Method_' + windowNo + '"></div></div>'
                 + '</div>');
-            mainDiv.append('<div id="HeaderDiv_' + windowNo + '"><div class="VIS_Pref_show vis-formouterwrpdiv">'
-                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap" id="Headers_' + windowNo + '"></div></div>'
+            mainDiv.append('<div id="HeaderDiv_' + windowNo + '" style="margin-bottom: 10px;"><div class="VIS_Pref_show vis-formouterwrpdiv">'
+                + '<div class="VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-wf-req-input-wrap" id="Headers_' + windowNo + '" style="margin-bottom: 5px;"></div></div>'
                 + '</div></div>');
             mainDiv.append('<div id="QueryStringDiv_' + windowNo + '"><div class="VIS_Pref_show vis-formouterwrpdiv">'
-                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap" id="QueryString_' + windowNo + '"></div></div>'
+                + '<div class="VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-wf-req-input-wrap" id="QueryString_' + windowNo + '"></div></div>'
                 + '</div></div>');
-            mainDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv">'
-                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap" id="BodyType_' + windowNo + '"></div></div>'
+            mainDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv vis-wf-req-BodyType" style="margin-top: 8px;">'
+                + '<div class="VIS_Pref_dd vis-wf-req-marginBottomZero"><div style="margin-bottom: 0px;" class="input-group vis-input-wrap" id="BodyType_' + windowNo + '"></div></div>'
                 + '</div>');
-            mainDiv.append('<label class= " VIS_Pref_Label_Font"> ' + VIS.Msg.getMsg("VIS_BodyContent") + '</label><div class="VIS_Pref_show vis-formouterwrpdiv">'
-                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap vis-ev-full-h" id="Description_' + windowNo + '"></div></div>'
+            mainDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv vis-wf-req-BodyContent">'
+                + '<div class="VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-input-wrap vis-ev-full-h" id="Description_' + windowNo + '"></div></div>'
                 + '</div>');
             root.append(mainDiv);
-            root.append('<div class="vis-ctrfrm-btnwrp">'
+            root.append('<div class="vis-ctrfrm-btnwrp" style="padding-right: 10px;">'
                 + '<input id="closeBtn' + windowNo + '" class= "VIS_Pref_btn-2" type = "button" value = "' + VIS.Msg.getMsg("close") + '">'
                 + '<input id="okBtn_' + windowNo + '" class="VIS_Pref_btn-2" type="button" value="' + VIS.Msg.getMsg("OK") + '">'
                 + '<div class="vis-ad-w-p-s-main pull-left"><div class="vis-ad-w-p-s-infoline"></div><div class="vis-ad-w-p-s-msg" style="align-items:flex-end;" id="lblBottomMsg_' + windowNo + '"></div></div>'
@@ -85,30 +86,26 @@
             var bodyTypeCtrlWrap = $('<div class="vis-control-wrap">');
             var desCtrlWrap = $('<div class="vis-control-wrap">');
 
-
             txtURL = new VIS.Controls.VTextBox("URL", true, false, true);
             urlCtrl.append(urlCtrlWrap);
             urlCtrlWrap.append(txtURL.getControl().attr('placeholder', ' ').attr('data-placeholder', '').attr("autocomplete", "off")).append('<label class=" VIS_Pref_Label_Font">' + VIS.Msg.getMsg("Url") + '</label>');
 
             methodCtrl.append(methodCtrlWrap);
             txtMethod = $('<select>'
-                + '<option>GET</option>'
                 + '<option>POST</option>'
+                + '<option>GET</option>'
                 + '<option>PUT</option>'
                 + '<option>DELETE</option>'
                 + '</select>');
             methodCtrlWrap.append(txtMethod).append('<label class=" VIS_Pref_Label_Font">' + VIS.Msg.getMsg("VIS_Method") + '</label>');
 
-
             lblHeader = new VIS.Controls.VLabel("Headers", "Headers", true);
             headerCtrl.append(headerCtrlWrap);
-            headerCtrlWrap.append(lblHeader.getControl()).append('<a style="color:rgba(var(--v-c-primary), 1); cursor: pointer;">' + VIS.Msg.getMsg("VIS_Addheader") + '</a>');
-
+            headerCtrlWrap.append(lblHeader.getControl().css("display", "block")).append('<a style="color:rgba(var(--v-c-primary), 1); cursor: pointer;">' + VIS.Msg.getMsg("VIS_Addheader") + '</a>');
 
             lblQueryString = new VIS.Controls.VLabel("QueryString", "QueryString", true);
             queryStringCtrl.append(queryStringCtrlWrap);
-            queryStringCtrlWrap.append(lblQueryString.getControl()).append('<a style="color:rgba(var(--v-c-primary), 1); cursor: pointer;">' + VIS.Msg.getMsg("VIS_AddParameter") + '</a>');
-
+            queryStringCtrlWrap.append(lblQueryString.getControl().css("display", "block")).append('<a style="color:rgba(var(--v-c-primary), 1); cursor: pointer;">' + VIS.Msg.getMsg("VIS_AddParameter") + '</a>');
             txtBodyType = $('<select>'
                 + '<option>JSON</option>'
                 + '<option>Plain Text</option>'
@@ -117,8 +114,11 @@
             bodyTypeCtrlWrap.append(txtBodyType).append('<label class=" VIS_Pref_Label_Font">' + VIS.Msg.getMsg("VIS_BodyType") + '</label>');
 
             desCtrl.append(desCtrlWrap);
-            desCtrlWrap.append('<div contenteditable="true" class="vis-wf-Descriptiontext" style="width: 100% !important;" id ="descriptiontxt_' + windowNo + '"></div>');
+            desCtrlWrap.append('<label class= "VIS_wf_req_Pref_Label_Font"> ' + VIS.Msg.getMsg("VIS_BodyContent") + '</label><div contenteditable="true" class="vis-wf-Descriptiontext vis-wf-req-contentEdit" id ="descriptiontxt_' + windowNo + '"></div>');
             txtBodyContent = desCtrl.find('#descriptiontxt_' + windowNo);
+
+            _divBodyType = root.find(".vis-wf-req-BodyType");
+            _divBodyContent = root.find(".vis-wf-req-BodyContent");
 
             events();
             GetColumns();
@@ -127,8 +127,6 @@
         };
 
         //************* Is Busy Indicator ******************//
-
-
 
         function setBusy(isBusy) {
             if (isBusy) {
@@ -140,20 +138,23 @@
 
         function fillcombo(requestData) {
             if (requestData != null) {
+                let txtBodyContent = desCtrl.find('#descriptiontxt_' + windowNo);
+                let originalWidth = txtBodyContent.outerWidth();// find the widht of the div before insert body content
                 txtURL.setValue(requestData[0].URL);
                 txtMethod.val(requestData[0].Method);
                 txtBodyType.val(requestData[0].BodyType);
                 //txtBodyContent.text(requestData[0].BodyContent);
                 txtBodyContent.html(formatBodyContent(requestData[0].BodyContent));
+                txtBodyContent.css("width", originalWidth + "px"); // set manually width to the body content.
                 var queryString = requestData[0].QueryString;
                 if (queryString && typeof queryString === 'object') {
                     for (let key in queryString) {
                         if (queryString.hasOwnProperty(key)) {
                             var value = queryString[key];
-                            queryStringDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv">'
-                                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap"><div  style="margin-right:10px;" class="vis-control-wrap"><input type="text" id="queryStringNameCtrl_' + windowNo + '" placeholder=" Name" value="' + key + '"></div></div></div>'
-                                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap"><div  style="margin-right:10px;" class="vis-control-wrap"><input type="text" id="queryStringvalueCtrl_' + windowNo + '" placeholder=" Value" value="' + value + '"></div></div></div>'
-                                + '<button id="crossbtn_' + windowNo + '" class="vis vis-cross vis-wf-column-iconbtn"></button>'
+                            queryStringDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv vis-wf-req-centerRightPad">'
+                                + '<div class= "VIS_Pref_dd vis-wf-req-marginBottomZero" style="padding-right: 0px;"><div class="input-group vis-input-wrap"><div class="vis-control-wrap"><input type="text" id="queryStringNameCtrl_' + windowNo + '" placeholder=" Name" value="' + key + '"></div></div></div>'
+                                + '<div class= "VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-input-wrap"><div class="vis-control-wrap"><input type="text" id="queryStringvalueCtrl_' + windowNo + '" placeholder=" Value" value="' + value + '"></div></div></div>'
+                                + '<span id="crossbtn_' + windowNo + '" class="vis vis-cross vis-wf-column-iconbtn vis-wf-req-crossFont" style="margin-bottom: 25px;"></span>'
                                 + '</div>');
                         }
                     }
@@ -163,10 +164,10 @@
                     for (let key in headers) {
                         if (headers.hasOwnProperty(key)) {
                             var value = headers[key];
-                            headerDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv">'
-                                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap"><div style="margin-right:10px;" class="vis-control-wrap"><input type="text" id="headerNameCtrl_' + windowNo + '" placeholder="Header Name" value="' + key + '"></div></div></div>'
-                                + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap"><div  style="margin-right:10px;" class="vis-control-wrap"><input type="text" id="headerValueCtrl_' + windowNo + '" placeholder="Header Value" value="' + value + '"></div></div></div>'
-                                + '<button id="crossbtn_' + windowNo + '" class="vis vis-cross vis-wf-column-iconbtn"></button>'
+                            headerDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv vis-wf-req-centerRightPad">'
+                                + '<div class= "VIS_Pref_dd vis-wf-req-marginBottomZero" style="padding-right: 0px;"><div class="input-group vis-input-wrap"><div class="vis-control-wrap"><input type="text" id="headerNameCtrl_' + windowNo + '" placeholder="Header Name" value="' + key + '"></div></div></div>'
+                                + '<div class= "VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-input-wrap"><div class="vis-control-wrap"><input type="text" id="headerValueCtrl_' + windowNo + '" placeholder="Header Value" value="' + value + '"></div></div></div>'
+                                + '<span id="crossbtn_' + windowNo + '" class="vis vis-cross vis-wf-column-iconbtn vis-wf-req-crossFont" style="margin-bottom: 25px;"></span>'
                                 + '</div>');
                         }
                     }
@@ -177,17 +178,17 @@
 
         function formatBodyContent(bodyContent) {
             if (bodyContent) {
-                const placeholderRegex = /@([^@]+)@/g;
+                const placeholderRegex = /@([a-zA-Z_0-9]+)@/g; // Restrict to valid placeholder names
                 const formattedContent = bodyContent.replace(placeholderRegex, (match, column) => {
-                    return `<span class="vis-wf-columnlist" contenteditable="false">
-            @${column}@ <span class="vis-wf-column-remove vis vis-cross" onclick="this.parentElement.remove()"></span>
-                        </span>`;
+                    return `<span class="vis-wf-columnlist vis-wf-highlight" contenteditable="false">
+                @${column}@ <span class="vis-wf-column-remove vis vis-cross" onclick="this.parentElement.remove()"></span>
+</span>`;
                 });
 
                 return formattedContent;
             }
             return "";
-        }
+        };
 
         function getHttpRequestData() {
             var obj = {
@@ -204,6 +205,7 @@
                     if (result && result.length > 0) {
                         fillcombo(result);
                     }
+                    showhideBodySection();
                     setBusy(false);
                 },
                 error: function (error) {
@@ -213,7 +215,6 @@
                 }
             });
         }
-
 
         //*************All Event ******************//
         // Function to insert the selected column at the correct position
@@ -261,7 +262,7 @@
                 console.error("No valid node found at the specified position.");
             }
             const parentDiv = $(textbox).closest(".vis-control-wrap");
-            const listDiv = parentDiv.find(".vis-input-list");
+            listDiv = parentDiv.find(".vis-input-list");
             listDiv.remove();
         }
 
@@ -305,61 +306,33 @@
 
         // Modify the events function to bind to the relevant fields
         function events() {
-            okBtn.on(VIS.Events.onClick, function () {
+            okBtn.on('click', function () {
                 SavehttpReqDetails();
             });
 
-            closeBtn.on(VIS.Events.onClick, function () {
+            closeBtn.on('click', function () {
                 $self.frame.close();
             });
 
-            headerCtrl.find('a').on(VIS.Events.onClick, function () {
-                headerDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv">'
-                    + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap"><div style="margin-right:10px;" class="vis-control-wrap"><input type="text" id="headerNameCtrl_' + windowNo + '" placeholder="Header Name"></div></div></div>'
-                    + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap"><div  style="margin-right:10px;" class="vis-control-wrap"><input type="text" id="headerValueCtrl_' + windowNo + '" placeholder="Header Value"></div></div></div>'
-                    + '<button id="crossbtn_' + windowNo + '" class="vis vis-cross vis-wf-column-iconbtn"></button>'
+            headerCtrl.find('a').on('click', function () {
+                headerDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv vis-wf-req-centerRightPad">'
+                    + '<div class= "VIS_Pref_dd vis-wf-req-marginBottomZero" style="padding-right: 0px;"><div class="input-group vis-input-wrap"><div class="vis-control-wrap"><input type="text" id="headerNameCtrl_' + windowNo + '" placeholder="Header Name"></div></div></div>'
+                    + '<div class= "VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-input-wrap"><div class="vis-control-wrap"><input type="text" id="headerValueCtrl_' + windowNo + '" placeholder="Header Value"></div></div></div>'
+                    + '<span id="crossbtn_' + windowNo + '" class="vis vis-cross vis-wf-column-iconbtn vis-wf-req-crossFont" style="margin-bottom: 25px;"></span>'
                     + '</div>');
                 headerDiv.off('input', '#headerValueCtrl_' + windowNo, handleInputEvent);
                 headerDiv.on('input', '#headerValueCtrl_' + windowNo, handleInputEvent);
             });
 
-            queryStringCtrl.find('a').on(VIS.Events.onClick, function () {
-                queryStringDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv">'
-                    + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap"><div  style="margin-right:10px;" class="vis-control-wrap"><input type="text" id="queryStringNameCtrl_' + windowNo + '" placeholder=" Name"></div></div></div>'
-                    + '<div class= "VIS_Pref_dd"><div class="input-group vis-input-wrap"><div  style="margin-right:10px;" class="vis-control-wrap"><input type="text" id="queryStringvalueCtrl_' + windowNo + '" placeholder=" Value"></div></div></div>'
-                    + '<button id="crossbtn_' + windowNo + '" class="vis vis-cross vis-wf-column-iconbtn"></button>'
+            queryStringCtrl.find('a').on('click', function () {
+                queryStringDiv.append('<div class="VIS_Pref_show vis-formouterwrpdiv vis-wf-req-centerRightPad">'
+                    + '<div class= "VIS_Pref_dd vis-wf-req-marginBottomZero" style="padding-right: 0px;"><div class="input-group vis-input-wrap"><div class="vis-control-wrap"><input type="text" id="queryStringNameCtrl_' + windowNo + '" placeholder=" Name"></div></div></div>'
+                    + '<div class= "VIS_Pref_dd vis-wf-req-marginBottomZero"><div class="input-group vis-input-wrap"><div class="vis-control-wrap"><input type="text" id="queryStringvalueCtrl_' + windowNo + '" placeholder=" Value"></div></div></div>'
+                    + '<span id="crossbtn_' + windowNo + '" class="vis vis-cross vis-wf-column-iconbtn vis-wf-req-crossFont" style="margin-bottom: 25px;"></span>'
                     + '</div>');
                 queryStringDiv.off('input', '#queryStringvalueCtrl_' + windowNo, handleInputEvent);
                 queryStringDiv.on('input', '#queryStringvalueCtrl_' + windowNo, handleInputEvent);
             });
-
-            //desCtrl.find('#descriptiontxt_' + windowNo).on('keydown', function (event) {
-            //    if (event.key === '@') {
-            //        var inputField = $(event.target);
-            //        var parentDiv = inputField.closest(".vis-control-wrap");
-
-            //        var listDiv = parentDiv.find(".vis-input-list");
-
-            //        if (listDiv.length === 0) {
-            //            // Create the list
-            //            listDiv = $('<div class="vis-input-list">');
-            //            listDiv.append(columnList);
-            //            parentDiv.prepend(listDiv);
-            //        }
-
-            //        // Add the event listener using event delegation to handle clicks on dynamically added elements
-            //        parentDiv.off('click', '.column-item');
-            //        parentDiv.on('click', '.column-item', function () {
-            //            var column = $(this).data('column');
-            //            selectColumn(column);  // Call the selectColumn function with the correct column
-
-            //            // Close the list once a column is selected
-            //            listDiv.remove();
-            //        });
-            //        event.preventDefault();
-            //    }
-
-            //});
 
             let cursorPosition = 0; // Global variable to store the cursor position
             desCtrl.find('#descriptiontxt_' + windowNo).on('keydown', function (event) {
@@ -368,7 +341,7 @@
                     cursorPosition = getCursorPosition(event.target);
                     var inputField = $(event.target);
                     var parentDiv = inputField.closest(".vis-control-wrap");
-                    var listDiv = parentDiv.find(".vis-input-list");
+                    listDiv = parentDiv.find(".vis-input-list");
                     if (listDiv.length === 0) {
                         // Create the list
                         listDiv = $('<div class="vis-input-list">');
@@ -412,12 +385,30 @@
                 parentDiv.remove();
             });
 
-        }
+            txtMethod.on("change", function (e) {
+                showhideBodySection();
+            });
 
-        function removeCrossIcon(event) {
-            event.target.parentElement.remove();
+            root.on('click.hideList', function (e) {
+                // Check if the click target is outside the list and input field
+                if (!$(e.target).closest('.vis-input-list').length) {
+                    if (listDiv)
+                        listDiv.remove(); // Hide the list
+                    //root.off('click.hideList'); // Remove the event listener
+                }
+            });
+        };
 
-        }
+        function showhideBodySection() {
+            if (txtMethod.val() == "GET") {
+                _divBodyType.hide();
+                _divBodyContent.hide();
+            }
+            else {
+                _divBodyType.show();
+                _divBodyContent.show();
+            }
+        };
 
         function GetColumns() {
             columnList = $();
@@ -465,7 +456,7 @@
             // Check if '@' is typed in the input
             if (value.includes('@')) {
                 // Create or show the list below the input field
-                var listDiv = parentDiv.find(".vis-input-list");
+                listDiv = parentDiv.find(".vis-input-list");
 
                 if (listDiv.length === 0) {
                     // Create the list
@@ -486,28 +477,10 @@
 
             } else {
                 // If '@' is not present, remove the list
-                var listDiv = parentDiv.find(".vis-input-list");
+                listDiv = parentDiv.find(".vis-input-list");
                 listDiv.remove();
             }
         }
-
-        function OpenDialogPopup(firstRoot) {
-            HttpRequestDialog = new VIS.ChildDialog();
-            HttpRequestDialog.setContent(firstRoot);
-            var windowWidth = $(window).width();
-            if (windowWidth >= 1366) {
-                HttpRequestDialog.setWidth(470);
-            }
-            else {
-                HttpRequestDialog.setWidth(670);
-            }
-            HttpRequestDialog.setTitle(VIS.Msg.getMsg("HttpRequest"));
-            HttpRequestDialog.setEnableResize(true);
-            HttpRequestDialog.setModal(true);
-            HttpRequestDialog.show();
-            HttpRequestDialog.hideButtons();
-            HttpRequestDialog.getRoot().dialog({ position: [200, 130] });
-        };
 
         function getHeaders() {
             var headers = "";
@@ -545,46 +518,33 @@
             return queryStrings;
         }
 
-        //function convertBodyContentToJson(bodyContent) {
-        //    // This regex captures the key inside quotes and then either a quoted string value or a number.
-        //    var regex = /"([^"]+)"\s*:\s*(?:"([^"]+)"|(\d+))/g;
-        //    var result = {};
-        //    var match;
-        //    while ((match = regex.exec(bodyContent)) !== null) {
-        //        var key = match[1];
-        //        // Choose the quoted string value if available; otherwise, the numeric value.
-        //        var value = match[2] !== undefined ? match[2] : match[3];
-        //        result[key] = value;
-        //    }
-        //    return result;
-        //}
-
         function convertBodyContentToJson(bodyContent) {
-            var regex = /"([^"]+)"\s*:\s*(?:"([^"]+)"|(@[^@]+@)|(\d+)|({[^{}]*}))/g;
+            var regex = /"([^"]+)"\s*:\s*(?:"([\s\S]*?)"|(@[^@]+@)|(-?\d+(\.\d+)?)|({.*?}))/g;
             var result = {};
             var match;
 
             while ((match = regex.exec(bodyContent)) !== null) {
-                var key = match[1];
+                var key = match[1].trim(); // Trim key
                 var value;
+
                 if (match[3] !== undefined) {
-                    value = match[3];
+                    value = match[3].trim(); // Trim placeholders like @AD_Client_ID@
                 }
                 else if (match[2] !== undefined) {
-                    value = match[2];
+                    value = match[2].replace(/\s+/g, " ").trim(); // Normalize spaces in values
                 }
                 else if (match[4] !== undefined) {
-                    value = parseFloat(match[4]);
+                    value = parseFloat(match[4]); // Convert number values
                 }
                 else if (match[5] !== undefined) {
-                    value = convertBodyContentToJson(match[5]);
+                    value = convertBodyContentToJson(match[5]); // Handle nested objects
                 }
+
                 result[key] = value;
             }
 
             return result;
         }
-
 
         function SavehttpReqDetails() {
             var isRequired = false;
@@ -655,12 +615,9 @@
                     result = JSON.parse(result);
                     if (result == "OK") {
                         lblBottomMsg.text(VIS.Msg.getMsg("SavedSuccessfully")).css('color', 'green');
-                        //setTimeout(function () {
-                        //    dispose();
-                        //}, 1000);
                         setBusy(false);
-                        $self.frame.close();
                         $self.frame.gridDataRefreshAll();
+                        $self.frame.close();
                         return true;
                     }
                     else {
@@ -679,10 +636,9 @@
 
         };
 
-
         function clear() {
             txtURL.setValue('');
-            txtMethod.val('GET')
+            txtMethod.val('POST')
             headerDiv = null;
             queryStringDiv = null;
             txtBodyType.val('JSON')
@@ -718,19 +674,34 @@
         };
 
         this.disposeComponent = function () {
+            if (txtMethod) {
+                txtMethod.off("change");
+            }
+            if (okBtn) {
+                okBtn.off('click');
+            }
+            if (closeBtn) {
+                closeBtn.off('click');
+            }
+            if (headerCtrl) {
+                headerCtrl.find('a').off('click');
+            }
+            if (queryStringCtrl) {
+                queryStringCtrl.find('a').off('click');
+            }
+            root.off('click', '#crossbtn_' + windowNo);
+            desCtrl.find('#descriptiontxt_' + windowNo).off('keydown');
             setBusy(false);
             clear();
         };
     };
 
     httpRequest.prototype.init = function (windowNo, frame) {
-
         this.frame = frame;
         this._recordID = frame.getRecord_ID();
         this.windowNo = windowNo;
         var obj = this.Initialize();
         this.frame.getContentGrid().append(this.getRoot());
-
     };
 
 
