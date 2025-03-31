@@ -163,3 +163,75 @@
 		height: 40px;
 		font-size: xx-large;
 	}
+
+.vis-wf-req-marginBottomZero {
+	margin-bottom: 5px !important;
+}
+
+.vis-wf-req-crossFont {
+	margin-bottom: 15px !important;
+	font-size: 15px !important;
+	cursor: pointer;
+}
+
+.vis-wf-req-input-wrap {
+	flex-wrap: nowrap;
+	/*margin-bottom: 15px;*/
+	margin-bottom: 5px;
+	position: relative;
+}
+
+
+	.vis-wf-req-input-wrap label {
+		align-items: center;
+		color: rgba(var(--v-c-on-secondary), .6);
+		display: flex;
+		font-size: 14px;
+		font-weight: 400;
+		height: 100%;
+		left: 30px;
+		margin: 0;
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		transition: all .2s ease;
+		-moz-transition: all .2s ease;
+		-webkit-transition: all .2s ease;
+		z-index: 4;
+	}
+
+		.vis-wf-req-input-wrap label span {
+			max-width: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.vis-wf-req-input-wrap label span {
+			color: rgba(var(--v-c-on-secondary), .9);
+		}
+
+.vis-control-wrap .VIS_wf_req_Pref_Label_Font {
+	background: linear-gradient(rgba(var(--v-c-common), 1) 50%, transparent 50%);
+	color: rgba(var(--v-c-on-secondary), 1);
+	display: block;
+	font-size: 12px;
+	height: auto;
+	left: 5px !important;
+	max-width: fit-content;
+	opacity: 1;
+	padding: 0 .4rem;
+	text-overflow: ellipsis;
+	top: 11px !important;
+	white-space: nowrap;
+}
+
+.vis-wf-req-contentEdit {
+	width: 100% !important;
+	overflow: hidden !important;
+}
+
+.vis-wf-req-centerRightPad {
+	align-items: center !important;
+	padding-right: 10px !important;
+}

@@ -1714,7 +1714,9 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                            JSON_VALUE(WN.RequestData, '$.url') AS URL,
                            JSON_Query(WN.RequestData, '$.headers') AS Headers,
                            JSON_VALUE(WN.RequestData, '$.bodyType') AS BodyType,
-                           JSON_Query(WN.RequestData, '$.bodyContent') AS BodyContent,
+                           CASE WHEN JSON_VALUE(WN.RequestData, '$.bodyType') = 'Plain Text'
+                           THEN JSON_VALUE(WN.RequestData, '$.bodyContent')
+                           ELSE JSON_QUERY(WN.RequestData, '$.bodyContent') END AS BodyContent,
                            JSON_Query(WN.RequestData, '$.queryString') AS QueryString
                            FROM AD_WF_Node WN LEFT JOIN NodeAPICredential NC ON (NC.AD_WF_Node_ID=WN.AD_WF_Node_ID)
                            WHERE WN.RequestData IS NOT NULL AND WN.AD_WF_Node_ID = " + _node.GetAD_WF_Node_ID() + " ORDER BY WN.Updated DESC";
@@ -1726,7 +1728,9 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                            jsonb_extract_path_text(WN.RequestData::jsonb, 'url') AS URL,
                            jsonb_extract_path(WN.RequestData::jsonb, 'headers') AS Headers,
                            jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') AS BodyType,
-                           jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent') AS BodyContent,
+                           CASE WHEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') = 'Plain Text'
+                           THEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyContent')
+                           ELSE jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent') END AS BodyContent,
                            jsonb_extract_path(WN.RequestData::jsonb, 'queryString') AS QueryString
                            FROM AD_WF_Node WN LEFT JOIN NodeAPICredential NC ON (NC.AD_WF_Node_ID=WN.AD_WF_Node_ID)
                            WHERE WN.RequestData IS NOT NULL AND WN.AD_WF_Node_ID = " + _node.GetAD_WF_Node_ID() + " ORDER BY WN.Updated DESC";
@@ -1759,7 +1763,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                     else
                         reqMsg.Method = HttpMethod.Post;
 
-                    if (bodyContent != "")
+                    if (bodyContent != "" && reqMsg.Method != HttpMethod.Get)
                     {
                         if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["BodyType"]).ToLower() == "text")
                         {
@@ -1774,28 +1778,45 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                             }
                         }
                     }
+                    var queryCollection = new NameValueCollection();
+                    Dictionary<string, string> queryParams = new Dictionary<string, string>();
                     if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["QueryString"]) != "")
                     {
-                        Dictionary<string, string> queryParams = new Dictionary<string, string>();
                         JObject jObjQryParam = JObject.Parse(Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["QueryString"]));
-
                         if (jObjQryParam.Count > 0)
                         {
                             foreach (var property in jObjQryParam)
                             {
                                 queryParams.Add(property.Key, GetDynamicValues(Util.GetValueOfString(property.Value)));
                             }
-                            // Use NameValueCollection for query string construction
-                            var queryCollection = new NameValueCollection();
-                            foreach (var param in queryParams)
-                            {
-                                queryCollection.Add(param.Key, param.Value);
-                            }
-
-                            // Construct the query string using HttpUtility
-                            queryString = string.Join("&", queryCollection.AllKeys.Select(key => $"{WebUtility.UrlEncode(key)}={WebUtility.UrlEncode(queryCollection[key])}"));
-                            queryString = "?" + queryString;
                         }
+                    }
+
+                    if (bodyContent != "" && reqMsg.Method == HttpMethod.Get)
+                    {
+                        if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["BodyType"]).ToLower() == "json")
+                        {
+                            JObject jObjQryParam = JObject.Parse(bodyContent);
+                            if (jObjQryParam.Count > 0)
+                            {
+                                foreach (var property in jObjQryParam)
+                                {
+                                    queryParams.Add(property.Key, GetDynamicValues(Util.GetValueOfString(property.Value)));
+                                }
+                            }
+                        }
+                    }
+
+                    if (queryParams.Count > 0)
+                    {
+                        // Use NameValueCollection for query string construction
+                        foreach (var param in queryParams)
+                        {
+                            queryCollection.Add(param.Key, param.Value);
+                        }
+                        // Construct the query string using HttpUtility
+                        queryString = string.Join("&", queryCollection.AllKeys.Select(key => $"{WebUtility.UrlEncode(key)}={WebUtility.UrlEncode(queryCollection[key])}"));
+                        queryString = "?" + queryString;
                     }
 
                     reqMsg.RequestUri = new Uri(Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["URL"]) + queryString);
@@ -1846,7 +1867,59 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             foreach (Match match in matches)
             {
                 var extractedValue = match.Groups[1].Value;
-                string contextValue = Util.GetValueOfString(_po.Get_Value(extractedValue));
+                string contextValue = "";
+                string tableName = "";
+                if (extractedValue.Contains(".identifier"))
+                {
+                    string columnName = extractedValue.Replace(".identifier", "");
+                    tableName = columnName.Substring(0, columnName.Length - 3);
+                    int recID = Util.GetValueOfInt(_po.Get_Value(columnName));
+                    if (MTable.Get_Table_ID(tableName) > 0)
+                    {
+                        DataSet dsIdnCols = DB.ExecuteDataset("SELECT ColumnName FROM AD_Column WHERE AD_Table_ID = " + MTable.Get_Table_ID(tableName) + " AND IsActive = 'Y' AND IsIdentifier = 'Y' AND AD_Reference_ID != 32 ORDER BY SeqNo");
+                        StringBuilder colNames = new StringBuilder("");
+                        if (dsIdnCols != null && dsIdnCols.Tables[0] != null && dsIdnCols.Tables[0].Rows.Count > 0)
+                        {
+                            for (int i = 0; i < dsIdnCols.Tables[0].Rows.Count; i++)
+                            {
+                                if (colNames.ToString() == "")
+                                {
+                                    colNames.Append(dsIdnCols.Tables[0].Rows[i]["ColumnName"]);
+                                }
+                                else
+                                {
+                                    colNames.Append(" || '_' || " + dsIdnCols.Tables[0].Rows[i]["ColumnName"]);
+                                }
+                            }
+                        }
+                        if (colNames.ToString() != "")
+                        {
+                            contextValue = Util.GetValueOfString(DB.ExecuteScalar("SELECT " + colNames.ToString() + " FROM " + tableName + " WHERE " + tableName + "_ID = " + recID));
+                        }
+                    }
+                    else
+                    {
+                        log.Info("table ID not fetched against table name : " + tableName);
+                        contextValue = Util.GetValueOfString(_po.Get_Value(columnName));
+                    }
+                }
+                else
+                {
+                    MTable tbl = MTable.Get(GetCtx(), extractedValue.Substring(0, extractedValue.Length - 3));
+                    if (tbl == null)
+                    {
+                        tbl = MTable.Get(GetCtx(), _po.GetTableName());
+                    }
+                    // special check for Date column
+                    if (tbl.GetColumn(extractedValue).GetAD_Reference_ID() == 15)
+                    {
+                        var obj = _po.Get_Value(extractedValue);
+                        if (obj != null)
+                            contextValue = Util.GetValueOfDateTime(obj).Value.ToString("dd-MMM-yyyy");
+                    }
+                    else
+                        contextValue = Util.GetValueOfString(_po.Get_Value(extractedValue));
+                }
                 log.SaveInfo("Actual Context : " + extractedValue, contextValue);
                 input = input.Replace(match.Value, contextValue);
             }
