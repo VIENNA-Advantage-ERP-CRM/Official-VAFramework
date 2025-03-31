@@ -58,6 +58,7 @@
                 + '<a class="next btn" style="display: none;">' + VIS.Msg.getMsg('VIS_Next') + '<i class="fa fa-chevron-right" aria-hidden="true"></i></a>'
                 + '<a href="#" class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') + '</a>'
                 + '<a href="#" class="vis-wfm-btnBack btn" style="display:none;">' + VIS.Msg.getMsg('Back') + '</a>'
+                + '<a href="#" data-wfprocessid="0" class="vis-wfm-btnShowHistory btn" style="display:none; margin-right: 10px;">' + VIS.Msg.getMsg('ShowHistory') + '</a>'
                 + '<a href="#" data-wfprocessid="0" class="vis-wfm-btnAbort btn" style="display:none;">' + VIS.Msg.getMsg('Abort') + '</a>'
                 + '<a href="#" class="vis-wfm-btnAttExe btn" style="display:none; margin-left: 10px;">' + VIS.Msg.getMsg('VIS_AttachExecute') + '</a>'
                 + '</div>'
@@ -67,6 +68,7 @@
             _btnBack = bottomDiv.find(".vis-wfm-btnBack");
             _btnExecute = bottomDiv.find(".vis-wfm-btnAttExe");
             _btnAbort = bottomDiv.find(".vis-wfm-btnAbort");
+            _btnHistory = bottomDiv.find(".vis-wfm-btnShowHistory");
 
             // enable drag drop event on sequence workflows section section
             wfSequenceDiv.sortable({
@@ -463,8 +465,9 @@
                 if (activeActInfo) {
                     _btnAbort.attr("data-wfprocessid", activeActInfo.AD_WF_Process_ID);
                     _btnAbort.show();
+                    _btnHistory.show();
                 }
-                    //wfActStatusDiv.append('<button data-wfprocessid="' + activeActInfo.AD_WF_Process_ID + '" class="VIS_AbortBtn" style="height: 35px; width: 100px; border-radius: 10px; margin: 5px;">Abort</button>');
+                //wfActStatusDiv.append('<button data-wfprocessid="' + activeActInfo.AD_WF_Process_ID + '" class="VIS_AbortBtn" style="height: 35px; width: 100px; border-radius: 10px; margin: 5px;">Abort</button>');
 
                 //wfActStatusDiv.find(".VIS_AbortBtn").on("click", function (e) {
                 //    setBusy(true);
@@ -485,9 +488,15 @@
                 //        }
                 //    });
                 //});
-
+                var isInApproval = false;
+                var clsHistoryView = "";
                 for (var i = 0; i < wfActInfo.length; i++) {
-                    var divHistory = $("<div id='History_ID_'" + i + "' class='vis-history-wrap vis-wfm-wfHisCont' style='display: block;'></div>");
+                    clsHistoryView = "";
+                    var divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont " + clsHistoryView + "' style='display: block;'></div>");
+                    if (isInApproval) {
+                        clsHistoryView = "vis-wfm-historyRec";
+                        divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont " + clsHistoryView + "' style='display: none;'></div>");
+                    }
                     if (i == 0 && wfAppInfo) {
                         approvalContainer.append(divHistory);
                         divHistory.css("margin-bottom", "0px");
@@ -498,6 +507,9 @@
                     var nodeDet = wfActInfo[i].Node;
                     for (node in nodeDet) {
                         if (nodeDet[node].History != null) {
+                            if (!isInApproval && nodeDet[node].History[0].State == 'OS') {
+                                isInApproval = true;
+                            }
                             for (hNode in nodeDet[node].History) {
                                 if (nodeDet[node].History[hNode].State == 'CC' && node < (nodeDet.length - 1)) {
                                     divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='" + VIS.Application.contextUrl + "Areas/VIS/Images/home/4.jpg'>")));
@@ -611,6 +623,7 @@
                 _btnBack.css("display", "none");
                 _btnNext.css("display", "none");
                 _btnAbort.css("display", "none");
+                _btnHistory.css("display", "none");
                 _btnExecute.css("display", "none");
                 if (panelSec == "S") {
                     wfSequenceDiv.fadeOut(function () {
@@ -635,6 +648,7 @@
                 _btnNext.css("display", "none");
                 _btnExecute.css("display", "none");
                 _btnAbort.css("display", "none");
+                _btnHistory.css("display", "none");
                 if (panelSec == "S") {
                     wfSelectionDiv.css("display", "block");
                     _btnNext.css("display", "block");
@@ -651,6 +665,7 @@
                 else if (panelSec == "A") {
                     wfActStatusDiv.css("display", "block");
                     _btnAbort.css("display", "block");
+                    _btnHistory.css("display", "block");
                 }
             }
         };
@@ -671,6 +686,7 @@
             _btnBack.on("click", onBackClick);
             _btnExecute.on("click", onExecuteClick);
             _btnAbort.on("click", onAbortClick);
+            _btnHistory.on("click", onHistoryClick);
             wfSelectionDiv.on("click", onSelectionDivClick);
             wfSequenceDiv.on("click", onSequenceDivClick);
         };
@@ -745,6 +761,19 @@
          */
         function onBackClick(e) {
             showPanel("S", true);
+        };
+
+        function onHistoryClick(e) {
+            if ($root.find(".vis-wfm-historyRec").length > 0) {
+                if ($($root.find(".vis-wfm-historyRec")[0]).css("display") == "none") {
+                    $root.find(".vis-wfm-historyRec").show();
+                    _btnHistory.text(VIS.Msg.getMsg('HideHistory'));
+                }
+                else {
+                    $root.find(".vis-wfm-historyRec").hide();
+                    _btnHistory.text(VIS.Msg.getMsg('ShowHistory'));
+                }
+            }
         };
 
         function onAbortClick(e) {
@@ -844,6 +873,10 @@
                 wfSelectionDiv.off("click");
             if (wfSequenceDiv)
                 wfSequenceDiv.off("click");
+            if (_btnAbort)
+                _btnAbort.off("click");
+            if (_btnHistory)
+                _btnHistory.off("click");
             $root.remove();
             $root = null;
         };
