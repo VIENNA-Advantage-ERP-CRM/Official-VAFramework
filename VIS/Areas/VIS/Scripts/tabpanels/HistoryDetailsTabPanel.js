@@ -623,46 +623,29 @@
                             '</div>');
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="task" class="VIS-activity-container" style="display:none;"></div>');
                     }
-                    else if (res[i].Type.toLower() == 'attachment') {
-                        $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="attachment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
-                            '">' +
-                            '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" title="attachment">' +
-                            '<i data-recid="' + i + '" class="vis vis-attachmentx"></i>' +
-                            '</div >' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
-                            '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
-                            '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
-                            '<i data-recid="' + i + '" >&nbsp;</i>' +
-                            '<small data-recid="' + i + '" >By: ' + res[i].UserName + '</small>' +
-                            '</div>' +
-                            '</div>');
-
-                        $rechtml = $('<div class="VIS-timeline-item">' +
-                            '<div class="VIS-item-icon"><i class="vis vis-attachmentx"></i></div>' +
-                            '<div class="VIS-item-content">' +
-                            '<div class="VIS-item-header">' +
-                            '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">Attachment</span>' +
-                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
-                            '</div>' +
-                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
-                            '</div>' +
-                            '<div class="VIS-item-body">' +
-                            '<div class="VIS-content-section">' +
-                            '<p>' + res[i].Subject + '</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div class="VIS-status-container"></div>' +
-                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
-                            '" data-atype="attachment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
-                            '</div>');
-                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="attachment" class="VIS-activity-container" style="display:none;"></div>');
-                    }
+                    //else if (res[i].Type.toLower() == 'attachment') {
+                    //    $rechtml = $('<div class="VIS-timeline-item">' +
+                    //        '<div class="VIS-item-icon"><i class="vis vis-attachmentx"></i></div>' +
+                    //        '<div class="VIS-item-content">' +
+                    //        '<div class="VIS-item-header">' +
+                    //        '<div class="VIS-item-type-author">' +
+                    //        '<span class="VIS-item-type">Attachment</span>' +
+                    //        '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                    //        '</div>' +
+                    //        '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                    //        '</div>' +
+                    //        '<div class="VIS-item-body">' +
+                    //        '<div class="VIS-content-section">' +
+                    //        '<p>' + res[i].Subject + '</p>' +
+                    //        '</div>' +
+                    //        '</div>' +
+                    //        '</div>' +
+                    //        '<div class="VIS-status-container"></div>' +
+                    //        '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                    //        '" data-atype="attachment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                    //        '</div>');
+                    //    $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="attachment" class="VIS-activity-container" style="display:none;"></div>');
+                    //}
                     $recshtml.append($rechtml);
                     $recshtml.append($detHtml);
                 }

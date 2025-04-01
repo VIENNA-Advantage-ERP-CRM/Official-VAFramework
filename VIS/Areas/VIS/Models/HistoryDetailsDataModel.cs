@@ -979,6 +979,7 @@ namespace VIS.Models
             {
                 MTable table = MTable.Get(ctx, "AppointmentTranscript");
                 PO appTrans = table.GetPO(ctx, 0, null);
+                appTrans.Set_Value("AD_Client_ID", ctx.GetAD_Client_ID());
                 appTrans.Set_Value("AppointmentsInfo_ID", AppointmentID);
                 appTrans.Set_Value("Transcript", retObj.transcript);
                 appTrans.Save();
