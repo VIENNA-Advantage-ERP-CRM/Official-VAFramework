@@ -50,11 +50,11 @@
             var heading = $('<div class="row align-items-center vis-followUpsHeader" style="margin: 0px;padding-right: 0;">')
                 .append('<h2 style="margin-right: 5px;margin-bottom: 0px;font-size: 1.125rem;display:inline-flex;"><span class="mr-2"><i class="fa fa-rss" aria-hidden="true"></i></span> FollowUps - <strong id="follupsCount" class="vis-followupsCount">0</strong></h2>')
                 .append('<a id="hlnkFllupsRef" style="border: none;" href="javascript:void(0)" title="' + VIS.Msg.getMsg('Refresh') + '" class="vis-w-feedicon"><i class="vis vis-refresh"></i></a>');
-                
+
             fllupsScreen.append(heading);
 
             // FollowUps Data
-            var fllupsList = $('<div id="fllupsList" class="scrollerVertical" style="width:96%;height: 89%;top:58px;overflow: auto;">');
+            var fllupsList = $('<div id="fllupsList" class="scrollerVertical vis-followups-list" style="width:96%;height: calc(100% - 70px);top:58px;overflow: auto;">');
 
             /* if (result.HomeFolloUpsInfo && result.HomeFolloUpsInfo.lstFollowups.length > 0) {
                  $.each(result.HomeFolloUpsInfo.lstFollowups, function (index, item) {
@@ -121,13 +121,13 @@
                 header: '', // Empty header (will hide the header)
                 body: fllupsScreen.html() + '<button id="followupsCloseBtn' + widgetID + '" type="button" class="close vis-a-closeBtnCls" data-dismiss="modal" aria-label="Close"><span style="top: -2px;" aria-hidden="true">×</span></button>',
                 width: 500,
-                height:635,
                 modal: false,  // Makes the popup modal (blocks interaction with the rest of the page)
                 showMax: true,  // Optional: allows user to maximize the modal
-                style: 'padding:12px 11px;position: relative;overflow: visible;',
+                style: 'padding:12px 11px;  overflow: visible;', // This ensures centering and responsiveness
                 onOpen: function () {
                     setTimeout(function () {
                         $('.w2ui-box1').parent('.w2ui-popup').css('overflow', 'visible');
+                        $('.w2ui-box1').parent('.w2ui-popup').addClass('vis-custom-center-popup');
                         $('body').off('click', '#followupsCloseBtn' + widgetID);
                         $('body').on('click', '#followupsCloseBtn' + widgetID, function (e) {
                             $thisObj.unReadMsgCount();
@@ -149,6 +149,9 @@
                                 w2popup.close();
                                 $('body').find('#followupsCloseBtn' + widgetID).remove();
                             }
+                            //if (e.key === 'Enter') {
+                            //    FllUpsMain.find('span[data-fll="btncmntfll"]').trigger('click');
+                            //}
                         });
                     }, 1);
                 }
@@ -164,7 +167,7 @@
 
             FllUpsMain.empty();
             getFllUps(fllPageSize, fllPage, true);
-            
+
             //if (VIS.Application.isRTL) {
             //    $FllUpsRefresh.css("margin-right", "10px");
             //}
@@ -254,12 +257,12 @@
                         $(FllCmntTxt).val("");
                     }
                 }
-                else if (datafll == "UID") {
-                    var UID = $(evnt.target).data("uid");
-                    var windoNo = VIS.Env.getWindowNo();
-                    var contactInfo = new VIS.ContactInfo(UID, windoNo);
-                    contactInfo.show();
-                }
+                //else if (datafll == "UID") {
+                //    var UID = $(evnt.target).data("uid");
+                //    var windoNo = VIS.Env.getWindowNo();
+                //    var contactInfo = new VIS.ContactInfo(UID, windoNo);
+                //    contactInfo.show();
+                //}
             });
             FllUpsMain.off('keydown');
             //key down events for follups
@@ -276,7 +279,7 @@
                         var code = evnt.charCode || evnt.keyCode;
                         if (code === 13) {
                             //  BindFllCmnt(uname, uimage, Cdate, cmntTxt, FllupsData);
-                            SaveFllCmnt(cmntTxt, FllupsData,arr)
+                            SaveFllCmnt(cmntTxt, FllupsData, arr)
                             $(FllCmntTxt).val("");
                         }
                     }
@@ -288,7 +291,7 @@
                 //var thisscroll = this;
                 //clearTimeout($.data(this, 'scrollTimer'));//Clear scroll timer to wait next scroll event happens after 250 ms
                 //$.data(this, 'scrollTimer', setTimeout(function () {
-                if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight*0.99) && followUpScroll) {//Condition true when 75 scroll is done
+                if ($(this).scrollTop() + $(this).innerHeight() >= (this.scrollHeight * 0.99) && followUpScroll) {//Condition true when 75 scroll is done
                     isRef = false;
                     followUpScroll = false;
                     fllLastPage = $FllupsCnt.text();
@@ -373,8 +376,8 @@
                                     + "<li> <a href='javascript:void(0)'  data-fll='asubscribefllups'  title='" + VIS.Msg.getMsg("UnsubscribeFollowups") + "' class='fa fa-rss'></a></li></ul>"
                                     + " </div></div>"
 
-                                    + "<div id='divfllcmntdata" + data.lstFollowups[cnt].ChatID + "' data-fll='fll-cmnt' class='vis-feedDetails'>"
-                                    + "<div class='vis-feedDetails-cmnt' data-fll='fll-cmnt'>"
+                                    + "<div id='divfllcmntdata" + data.lstFollowups[cnt].ChatID + "' data-fll='fll-cmnt' class='vis-feedDetails vis-feedDetails-follup'>"
+                                    + "<div class='vis-feedDetails-cmnt vis-feedDetails-cmnt-followup' data-fll='fll-cmnt'>"
                                     + uimg
                                     + "<p>"
                                     + " <strong data-fll='UID' data-UID='" + data.lstFollowups[cnt].AD_User_ID + "'>";
@@ -394,7 +397,7 @@
                                     + "<a id='divfllvl_" + data.lstFollowups[cnt].ChatID + "' style='display:none;'  data-fll='viewlessfllupscmnt' href='javascript:void(0)' class='vis-viewMoreComments'><span class='vis-feedIcons vis-icon-viewMoreComments'></span>" + VIS.Msg.getMsg("ViewLessComments") + "...</a>"
                                     + " <div class='clearfix'></div> "
 
-                                    + "<div subscriberId = "+ data.lstFollowups[cnt].SubscriberID +" id=" + data.lstFollowups[cnt].ChatID + " class='vis-feedMessage'>"
+                                    + "<div subscriberId = " + data.lstFollowups[cnt].SubscriberID + " id=" + data.lstFollowups[cnt].ChatID + " class='vis-feedMessage'>"
                                     + " <input id='txtFllCmnt" + data.lstFollowups[cnt].ChatID + "' data-fll='txtcmntfll' placeholder='" + VIS.Msg.getMsg('TypeMessage') + "' type='text' value='' />"
                                     + " <span  id='btnFllCmnt" + data.lstFollowups[cnt].ChatID + "' data-fll='btncmntfll' title='" + VIS.Msg.getMsg('PostMessage') + "'  class='vis vis-sms' ></span>"
                                     + " <div class='clearfix'></div> "
@@ -463,7 +466,7 @@
                                     }
                                 }
                             }
-                            str += "<div class='vis-feedDetails-cmnt'  data-fll='fll-cmnt'>"
+                            str += "<div class='vis-feedDetails-cmnt vis-feedDetails-cmnt-followup'  data-fll='fll-cmnt'>"
                                 + uimg
                                 + "<p>"
                                 + " <strong  data-fll='UID' data-UID='" + data.lstFollowups[cnt].AD_User_ID + "'>";
@@ -521,7 +524,7 @@
                         else {
                             uimg = "<i data-fll='UID' data-UID='" + VIS.Env.getCtx().getAD_User_ID() + "' class='fa fa-user'></i>"
                         }
-                        var str = "<div class='vis-feedDetails-cmnt' data-fll='fll-cmnt'>"
+                        var str = "<div class='vis-feedDetails-cmnt vis-feedDetails-cmnt-followup' data-fll='fll-cmnt'>"
                             + uimg
                             + "<p>"
                             + " <strong  data-fll='UID' data-UID='" + VIS.Env.getCtx().getAD_User_ID() + "'>" + VIS.Msg.getMsg("Me") + "</strong><br />"
