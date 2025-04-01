@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -36,8 +37,9 @@ namespace VIS.Models
         /// <param name="Record_ID"></param>
         /// <param name="AD_Table_ID"></param>
         /// <returns></returns>
-        public string InsertMultipleSubscription(Ctx ctx, int AD_Window_ID, List<int> Record_ID, int AD_Table_ID)
+        public object InsertMultipleSubscription(Ctx ctx, int AD_Window_ID, List<int> Record_ID, int AD_Table_ID)
         {
+            dynamic obj = new ExpandoObject();
             VAdvantage.DataBase.Trx trx = VAdvantage.DataBase.Trx.Get("InsertMultipleSubscription" + DateTime.Now.Ticks);
             StringBuilder sql = new StringBuilder(@"SELECT Record_ID, AD_Table_ID, AD_Window_ID, AD_User_ID 
                     FROM CM_Subscribe
@@ -105,13 +107,29 @@ namespace VIS.Models
 
                         trx.Rollback();
                         _log.SaveError("VIS_RecordNotSubscribed", "");
-                        return error.ToString();
+                        obj.Count = 0;
+                        obj.Error = Msg.GetMsg(ctx, "VIS_RecordNotSubscribed");
+                        return obj;
                     }
                 }
                 trx.Commit();
-                return insertedCount.ToString(); // Returns the number of successfully inserted records
+                if (insertedCount > 0)               // Returns the number of successfully inserted records
+                {
+                    obj.Count = insertedCount;
+                    obj.Error = "";
+                    return obj;
+
+                }
+                else
+                {
+                    obj.Count = insertedCount;          //insertedCount=0
+                    obj.Error = Msg.GetMsg(ctx, "VIS_RecordAlreadySubscribed");
+                    return obj;
+                }
             }
-            return "0";
+            obj.Count = insertedCount;   //insertedCount=0
+            obj.Error = obj.Error = Msg.GetMsg(ctx, "VIS_DatasetIsNull");
+            return obj;
 
         }
 

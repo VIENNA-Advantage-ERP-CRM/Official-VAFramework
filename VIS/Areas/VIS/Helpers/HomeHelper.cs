@@ -474,8 +474,8 @@ namespace VIS.Helpers
                      .Append(" Join ad_user Au on (au.ad_user_id= CH.createdBy)")
                      .Append(" left outer JOIN ad_image AI on(ai.ad_image_id=au.ad_image_id)")
                      .Append("  join ad_window AW on(cs.ad_window_id= aw.ad_window_id) left outer  JOIN ad_image adi on(adi.ad_image_id= aw.ad_image_id)  where cs.createdby=" + ctx.GetAD_User_ID())
-                     .Append(" and ch.cm_chatentry_ID =(Select max(cm_chatentry_ID) from cm_chatentry where CM_Chat_ID= ch.cm_chat_id)")
-                     .Append("  order by inn.EntryID desc,ch.cm_chatentry_id asc");
+                     .Append(" and ch.cm_chatentry_ID =(Select max(cm_chatentry_ID) from cm_chatentry where CM_Chat_ID= ch.cm_chat_id)");
+            //.Append("  order by inn.EntryID desc,ch.cm_chatentry_id asc");
             try
             {
                 int nTotalFollow = Util.GetValueOfInt(DB.ExecuteScalar(SqlQuery.ToString()));
@@ -1442,7 +1442,7 @@ namespace VIS.Helpers
 
                 #region WorkFlow Count
                 //To Get Work flow Count
-                
+
                 strQuery = @"SELECT COUNT(*)
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'

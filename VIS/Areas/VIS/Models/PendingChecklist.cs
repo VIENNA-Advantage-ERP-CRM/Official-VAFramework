@@ -173,8 +173,10 @@ namespace VIS.Models
                         TableName = tableName,
                         AD_table_ID = AD_Table_ID,
                         RecordIds = recordIdList,
+                        AD_TAB_ID = AD_TAB_ID,
                         TabName = TabName,
-                        TabLevel = TabLevel
+                        TabLevel = TabLevel,
+                        AD_Window_ID = AD_Window_ID
                     });
 
                     sql.Clear();
@@ -235,6 +237,8 @@ namespace VIS.Models
                     filteredRecordIds.Add(new TableRecordId
                     {
                         AD_table_ID = record.AD_table_ID,
+                        AD_Window_ID = record.AD_Window_ID,
+                        AD_TAB_ID = record.AD_TAB_ID,
                         RecordIds = filteredIDs,
                         TableName = record.TableName,
                         TabName = record.TabName,
@@ -259,8 +263,8 @@ namespace VIS.Models
                         WindowID = Util.GetValueOfInt(row["AD_Window_ID"]),
                         TableName = Util.GetValueOfString(row["TableName"]),
                         TabName = Util.GetValueOfString(row["TabName"]),
-                        TabLevel = Util.GetValueOfString(row["TabLevel"])
-
+                        TabLevel = Util.GetValueOfString(row["TabLevel"]),
+                        AD_TAB_ID = Util.GetValueOfInt(row["AD_Tab_ID"])
                     })
                     .ToList();
 
@@ -269,7 +273,7 @@ namespace VIS.Models
                     int windowID = row.WindowID;
                     int tableID = record.AD_table_ID;
                     string tableName = row.TableName;
-
+                    int AD_TAB_ID = row.AD_TAB_ID;
                     if (windowID == 0) continue;
 
                     // Ensure WindowID exists
@@ -279,15 +283,18 @@ namespace VIS.Models
                     }
 
                     // Ensure TableID exists in WindowID
-                    if (!windowToTableMap[windowID].ContainsKey(tableID))
+                    if (!windowToTableMap[windowID].ContainsKey(AD_TAB_ID))
                     {
-                        windowToTableMap[windowID][tableID] = new HashSet<int>();
+                        windowToTableMap[windowID][AD_TAB_ID] = new HashSet<int>();
                     }
 
                     // Add Unique Record IDs
                     foreach (var recordId in record.RecordIds)
                     {
-                        windowToTableMap[windowID][tableID].Add(recordId);
+                        if (windowID == record.AD_Window_ID)
+                        {
+                            windowToTableMap[windowID][AD_TAB_ID].Add(recordId);
+                        }
                     }
                 }
             }
@@ -311,7 +318,7 @@ namespace VIS.Models
 
                 foreach (var tableEntry in entry.Value)
                 {
-                    var tableInfo = recordIds.FirstOrDefault(r => r.AD_table_ID == tableEntry.Key);
+                    var tableInfo = recordIds.FirstOrDefault(r => r.AD_TAB_ID == tableEntry.Key);//r => r.AD_Window_ID == windowID && r.AD_table_ID == tableEntry.Key
                     tableRecordIds.Add(new TableRecordId
                     {
                         TabLevel = (int)(tableInfo?.TabLevel),
@@ -322,15 +329,18 @@ namespace VIS.Models
                     });
                     totalCount += tableEntry.Value.Count;
                 }
-
-                //  Add to final list
-                finallist.Add(new PendingCheckListCount
+                if (totalCount > 0)
                 {
-                    WindowID = windowID,
-                    windowname = windowName,
-                    count = totalCount, // Correct count using unique records
-                    TableRecordIds = tableRecordIds
-                });
+                    //  Add to final list
+                    finallist.Add(new PendingCheckListCount
+                    {
+                        WindowID = windowID,
+                        windowname = windowName,
+                        count = totalCount, // Correct count using unique records
+                        TableRecordIds = tableRecordIds
+                    });
+                }
+
             }
 
             // Return final list
@@ -445,7 +455,10 @@ namespace VIS.Models
         public string TabName { get; set; }
         public int TabLevel { get; set; }
         public int AD_table_ID { get; set; }
+
+        public int AD_TAB_ID { get; set; }
         public List<int> RecordIds { get; set; }
+        public int AD_Window_ID { get; set; }
     }
 
     public class PendingCheckListCount

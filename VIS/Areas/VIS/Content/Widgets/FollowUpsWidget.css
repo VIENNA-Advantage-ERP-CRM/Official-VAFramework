@@ -1,4 +1,4 @@
-﻿.vis-followuplayout {
+﻿﻿.vis-followuplayout {
     position: absolute;
     width: 50%;
     height: 50%;
@@ -96,4 +96,39 @@
     padding: 0 4px;
     width: auto;
     font-size: 72%;
+}
+
+.vis-custom-center-popup {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    height: calc(100vh - 80px) !important;
+    transition: none !important;
+}
+
+.vis-feedDetails-follup p strong {
+    color: rgba(var(--v-c-primary), 1);
+    font-weight: normal;
+    cursor: default;
+    padding-bottom: 2px;
+}
+
+.vis-feedDetails-cmnt-followup i {
+    color: rgba(var(--v-c-primary), 1);
+    background: rgba(var(--v-c-primary),.3);
+    padding: 10px;
+    font-size: 1.75rem;
+    border-radius: .25rem;
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    float: left;
+    margin-right: 10px;
+}
+.vis-followups-list .vis-viewMoreComments:hover {
+    color: rgba(var(--v-c-primary),1);
 }

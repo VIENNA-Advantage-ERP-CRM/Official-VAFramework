@@ -25,20 +25,20 @@
                 // If there are matched items, show unsubscribe and allRecords options
                 $root_subs = $(
                     '<div>' +
-                        '<ul class="vis-apanel-rb-ul">' +
-                            '<li data-id="unsubscribe" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_Unsubscribe") + '</li>' +
-                            '<li data-id="allRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
-                        '</ul>' +
+                    '<ul class="vis-apanel-rb-ul">' +
+                    '<li class="vis-subscribeoverlay-item" data-id="unsubscribe">' + VIS.Msg.getMsg("VIS_Unsubscribe") + '</li>' +
+                    '<li class="vis-subscribeoverlay-item" data-id="allRecords">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
+                    '</ul>' +
                     '</div>'
                 );
             }
             else {
                 // If no matched items, show selectedRecords and allRecords options
                 $root_subs = $('<div>' +
-                        '<ul class="vis-apanel-rb-ul">' +
-                            '<li data-id="selectedRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_SelectedRecords") + '</li>' +
-                            '<li data-id="allRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
-                        '</ul>' +
+                    '<ul class="vis-apanel-rb-ul">' +
+                    '<li class="vis-subscribeoverlay-item" data-id="selectedRecords">' + VIS.Msg.getMsg("VIS_SelectedRecords") + '</li>' +
+                    '<li class="vis-subscribeoverlay-item" data-id="allRecords">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
+                    '</ul>' +
                     '</div>'
                 );
             }
@@ -46,11 +46,14 @@
         else {
             // For cases where there are multiple records, show all options
             $root_subs = $('<div>' +
-                    '<ul class="vis-apanel-rb-ul">' +
-                        '<li data-id="selectedRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_SelectedRecords") + '</li>' +
-                        '<li data-id="allRecords" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
-                        '<li data-id="unsubscribe" style="margin-right: 10px;">' + VIS.Msg.getMsg("VIS_Unsubscribe") + '</li>' +
-                    '</ul>' +
+                '<ul class="vis-apanel-rb-ul">' +
+                '<li class="vis-subscribeoverlay-item" data-id="selectedRecords">' + VIS.Msg.getMsg("VIS_SelectedRecords") + '</li>' +
+                '<li class="vis-subscribeoverlay-item" data-id="allRecords">' + VIS.Msg.getMsg("VIS_AllRecords") + '</li>' +
+                // Show "Unsubscribe" option only if at least one record is subscribed
+                (matchedItems.length > 0 ?
+                    '<li class="vis-subscribeoverlay-item" data-id="unsubscribe">' + VIS.Msg.getMsg("VIS_Unsubscribe") + '</li>' : ''
+                ) +
+                '</ul>' +
                 '</div>'
             );
         }
@@ -89,24 +92,28 @@
                 dataType: 'JSON',
                 data: data,
                 success: function (result) {
+                    self.setBusy(false);
                     if (result) {
-                        self.setBusy(false);
-                        if (typeof result === 'string') {
-                            result = JSON.parse(result);
+                        result = JSON.parse(result);
+                        if ((url == VIS.Application.contextUrl + 'Subscribe/SubscribeAll' && (result == 1 || result == 2)) ||
+                            (url == VIS.Application.contextUrl + 'Subscribe/UnSubscribeMultiple' && result > 0) ||
+                            (url == VIS.Application.contextUrl + 'Subscribe/MultipleSubscribe' && result.Error == '')) {
+                            reloadSubscribe();
                         }
-                        if (url == VIS.Application.contextUrl + 'Subscribe/UnSubscribeMultiple' && result < 1) {
+                        if (result.Error != '' && url == VIS.Application.contextUrl + 'Subscribe/MultipleSubscribe') {
+                            VIS.ADialog.info("", "", result.Error);
+                        }
+                    }
+                    else {
+                        if (url == VIS.Application.contextUrl + 'Subscribe/UnSubscribeMultiple') {
                             VIS.ADialog.error("VIS_RecordNotUnSubscribed");
                             return;
                         }
-                        if ((url == VIS.Application.contextUrl + 'Subscribe/SubscribeAll' && (result == 1 || result == 2)) ||
-                            (url == VIS.Application.contextUrl + 'Subscribe/UnSubscribeMultiple' && result > 0) ||
-                            (url == VIS.Application.contextUrl + 'Subscribe/MultipleSubscribe' && result > 0)) {
-                            reloadSubscribe();
-                        }
-                        else {
+                        else if ((url == VIS.Application.contextUrl + 'Subscribe/MultipleSubscribe') || (url == VIS.Application.contextUrl + 'Subscribe/SubscribeAll')) {
                             VIS.ADialog.error("VIS_RecordNotSubscribed");
+                            return;
                         }
-                    } 
+                    }
                 },
                 error: function (r) {
                     VIS.ADialog.error(VIS.Msg.getMsg("Error") + r.statusText);
@@ -116,7 +123,7 @@
         });
 
         // Show the overlay with the cloned content
-        self.aSubscribe.getListItmIT().w2overlay($root_subs.clone(true), { css: { height: '200px', width: '100px' } });
+        self.aSubscribe.getListItmIT().w2overlay($root_subs.clone(true));
 
         this.disposeComponent = function () {
             // Cleanup logic, if needed
