@@ -503,6 +503,9 @@
                     }
                     else
                         wfActStatusDiv.append(divHistory);
+
+                    divHistory.append('<div class="vis-wfm-wfName">' + wfActInfo[i].WFName + '</div>');
+
                     var divHistoryNode = $("<div class='vis-workflow-historyCls'>");
                     var nodeDet = wfActInfo[i].Node;
                     for (node in nodeDet) {
