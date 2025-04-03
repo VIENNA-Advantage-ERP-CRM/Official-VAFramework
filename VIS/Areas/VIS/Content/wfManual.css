@@ -235,3 +235,12 @@
 	align-items: center !important;
 	padding-right: 10px !important;
 }
+
+.vis-wfm-wfName {
+	border-bottom: 1px solid;
+	font-weight: 700;
+	padding-bottom: 5px;
+	margin-bottom: 15px;
+	text-align: left;
+	border-bottom-style: inset;
+}

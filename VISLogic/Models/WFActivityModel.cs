@@ -828,6 +828,7 @@ OR
             try
             {
                 MWFNode node = new MWFNode(ctx, nodeID, null);
+                info.WFName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Workflow WHERE AD_Workflow_ID = " + node.GetAD_Workflow_ID()));
                 info.NodeAction = node.GetAction();
                 info.NodeName = node.GetName();
                 info.IsSurveyResponseRequired = node.IsSurveyResponseRequired();
@@ -1650,7 +1651,11 @@ OR
             get;
             set;
         }
-
+        public string WFName
+        {
+            get;
+            set;
+        }
     }
 
     public class NodeInfo
