@@ -488,7 +488,7 @@
                 headerDiv.find('.VIS_Pref_show').each(function () {
                     var nameInput = $(this).find('#headerNameCtrl_' + windowNo);
                     var valueInput = $(this).find('#headerValueCtrl_' + windowNo);
-                    if (nameInput.val() && nameInput.val().length > 1 && valueInput.val() && valueInput.val().length > 1) {
+                    if (nameInput.val() && nameInput.val().length >= 1 && valueInput.val() && valueInput.val().length >= 1) {
                         if (headers == "")
                             headers = {};
                         var headerName = nameInput.val().trim();
@@ -507,7 +507,7 @@
             queryStringDiv.find('.VIS_Pref_show').each(function () {
                 var nameInput = $(this).find('#queryStringNameCtrl_' + windowNo);
                 var valueInput = $(this).find('#queryStringvalueCtrl_' + windowNo);
-                if (nameInput.val() && nameInput.val().length > 1 && valueInput.val() && valueInput.val().length > 1) {
+                if (nameInput.val() && nameInput.val().length >= 1 && valueInput.val() && valueInput.val().length >= 1) {
                     var queryName = nameInput.val().trim();
                     var queryValue = valueInput.val().trim();
                     if (queryName && queryValue) {
@@ -616,7 +616,7 @@
                     if (result == "OK") {
                         lblBottomMsg.text(VIS.Msg.getMsg("SavedSuccessfully")).css('color', 'green');
                         setBusy(false);
-                        $self.frame.gridDataRefreshAll();
+                        //$self.frame.gridDataRefreshAll();
                         $self.frame.close();
                         return true;
                     }
