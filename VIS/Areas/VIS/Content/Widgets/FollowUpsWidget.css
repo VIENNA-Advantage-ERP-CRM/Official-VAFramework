@@ -132,3 +132,23 @@
 .vis-followups-list .vis-viewMoreComments:hover {
     color: rgba(var(--v-c-primary),1);
 }
+
+.vis-followUpsHeader h2, .vis-followUpsHeader .vis-followupsCount {
+    color: rgba(var(--v-c-on-secondary), 1);
+}
+.vis-followups-list .vis-feedTitleBar {
+    background-color: rgba(var(--v-c-primary), .1);
+}
+.vis-followups-list .vis-feedTitleBar-buttons ul li a {
+    color: rgba(var(--v-c-primary), 1);
+}
+.vis-followups-list .vis-feedTitleBar-buttons ul li{
+    background: none;
+    border-left: 0px;
+}
+.vis-followups-list .vis-feedTitleBar-buttons ul li a:focus {
+    border: none;
+}
+    .vis-followups-list .vis-feedTitleBar h3 {
+        color: rgba(var(--v-c-on-secondary), 1);
+    }
