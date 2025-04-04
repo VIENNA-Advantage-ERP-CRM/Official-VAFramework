@@ -157,7 +157,18 @@ namespace VAdvantage.Install
                     }
 
                     _sql.Append(_TableName).Append("_ID=").Append("(").Append(" SELECT ").Append(_TableName).Append("_ID ")
-                        .Append(" FROM ").Append(_TableName).Append(" WHERE Export_ID = '").Append(_curExportID).Append("' )");
+                        .Append(" FROM ").Append(_TableName).Append(" WHERE Export_ID = '").Append(_curExportID).Append("'");
+
+                    // vis0008 Handled case for tenant level translation
+                    if (_AD_Client_ID > 0)
+                    {
+                        _sql.Append(" AND AD_Client_ID = " + _AD_Client_ID + " )");
+                    }
+                    else
+                    {
+                        _sql.Append(" )");
+                    }
+
                 }
 
                 if (!_isBaseLanguage)
