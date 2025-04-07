@@ -149,9 +149,6 @@
                                 w2popup.close();
                                 $('body').find('#followupsCloseBtn' + widgetID).remove();
                             }
-                            //if (e.key === 'Enter') {
-                            //    FllUpsMain.find('span[data-fll="btncmntfll"]').trigger('click');
-                            //}
                         });
                     }, 1);
                 }
@@ -255,6 +252,7 @@
                         var Cdate = Globalize.format(cd, "F", Globalize.cultureSelector);
                         SaveFllCmnt(cmntTxt, FllupsData, arr, subscriberID);
                         $(FllCmntTxt).val("");
+                        $(FllCmntTxt).css('height', 'auto');
                     }
                 }
                 //else if (datafll == "UID") {
@@ -264,6 +262,21 @@
                 //    contactInfo.show();
                 //}
             });
+
+            // Attach the 'input' event listener to the textarea only once
+            $(document).on('input', '.vis-followups-list .vis-feedContainer textarea', function () {
+                // Adjust height based on content
+                var textareaValue = $(this).val().trim();
+                if (textareaValue !== "") {
+                    this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+                    this.style.overflowY = this.scrollHeight > 150 ? 'auto' : 'hidden';
+                }
+                else {
+                    this.style.height = '';
+                    this.style.overflowY = '';
+                }
+            });
+
             FllUpsMain.off('keydown');
             //key down events for follups
             FllUpsMain.on("keydown", function (evnt) {
@@ -275,16 +288,37 @@
                     FllupsData = $("#" + evnt.target.parentNode.parentNode.children[1].id);
                     FllCmntTxt = $("#" + evnt.target.id);
                     var cmntTxt = $(FllCmntTxt).val();
+                    var subscriberID = evnt.target.parentNode.getAttribute('subscriberid');
                     if (cmntTxt !== "" && cmntTxt !== null) {
                         var code = evnt.charCode || evnt.keyCode;
                         if (code === 13) {
+                            evnt.preventDefault(); // Prevent default Enter action
                             //  BindFllCmnt(uname, uimage, Cdate, cmntTxt, FllupsData);
-                            SaveFllCmnt(cmntTxt, FllupsData, arr)
-                            $(FllCmntTxt).val("");
+                            if (evnt.altKey) {
+                                var textarea = $(evnt.target)[0];
+                                var cursorPos = textarea.selectionStart; // Get the current cursor position
+                                var value = textarea.value; // Get the current value of the textarea
+
+                                // Insert a newline at the cursor position and update the textarea value
+                                textarea.value = value.substring(0, cursorPos) + "\r\n" + value.substring(cursorPos);
+
+                                // Move the cursor to the position after the new line
+                                textarea.setSelectionRange(cursorPos + 2, cursorPos + 2);
+                            }
+                            else {
+                                var cmntTxt = $(FllCmntTxt).val(); // Get the current value of the textarea
+                                // Check if there is text in the textarea before calling SaveFllCmnt
+                                if (cmntTxt.trim() !== "") { // Use trim() to ignore leading/trailing spaces
+                                    SaveFllCmnt(cmntTxt, FllupsData, arr, subscriberID);
+                                    $(FllCmntTxt).val(""); // Clear the textarea after saving the comment
+                                    $(FllCmntTxt).css('height', 'auto');
+                                }
+                            }
                         }
                     }
                 }
             });
+
             var followUpScroll = true;
             //Bind Scroll evnt on Follups
             FllUpsMain.bind('scroll', function () {
@@ -379,7 +413,7 @@
                                     + "<div id='divfllcmntdata" + data.lstFollowups[cnt].ChatID + "' data-fll='fll-cmnt' class='vis-feedDetails vis-feedDetails-follup'>"
                                     + "<div class='vis-feedDetails-cmnt vis-feedDetails-cmnt-followup' data-fll='fll-cmnt'>"
                                     + uimg
-                                    + "<p>"
+                                    + "<p class='vis-comment-desc'>"
                                     + " <strong data-fll='UID' data-UID='" + data.lstFollowups[cnt].AD_User_ID + "'>";
                                 if (data.lstFollowups[cnt].AD_User_ID == VIS.Env.getCtx().getAD_User_ID()) {
                                     str += VIS.Msg.getMsg("Me") + " </strong> <br />"
@@ -398,7 +432,7 @@
                                     + " <div class='clearfix'></div> "
 
                                     + "<div subscriberId = " + data.lstFollowups[cnt].SubscriberID + " id=" + data.lstFollowups[cnt].ChatID + " class='vis-feedMessage'>"
-                                    + " <input id='txtFllCmnt" + data.lstFollowups[cnt].ChatID + "' data-fll='txtcmntfll' placeholder='" + VIS.Msg.getMsg('TypeMessage') + "' type='text' value='' />"
+                                    + " <textarea class='w-100 vis-txtFllCmnt' id='txtFllCmnt" + data.lstFollowups[cnt].ChatID + "' data-fll='txtcmntfll' placeholder='" + VIS.Msg.getMsg('TypeMessage') + "' rows='1' /></textarea>"
                                     + " <span  id='btnFllCmnt" + data.lstFollowups[cnt].ChatID + "' data-fll='btncmntfll' title='" + VIS.Msg.getMsg('PostMessage') + "'  class='vis vis-sms' ></span>"
                                     + " <div class='clearfix'></div> "
                                     + "</div></div> ";
@@ -468,7 +502,7 @@
                             }
                             str += "<div class='vis-feedDetails-cmnt vis-feedDetails-cmnt-followup'  data-fll='fll-cmnt'>"
                                 + uimg
-                                + "<p>"
+                                + "<p class='vis-comment-desc'>"
                                 + " <strong  data-fll='UID' data-UID='" + data.lstFollowups[cnt].AD_User_ID + "'>";
 
                             if (data.lstFollowups[cnt].AD_User_ID == VIS.Env.getCtx().getAD_User_ID()) {
@@ -526,7 +560,7 @@
                         }
                         var str = "<div class='vis-feedDetails-cmnt vis-feedDetails-cmnt-followup' data-fll='fll-cmnt'>"
                             + uimg
-                            + "<p>"
+                            + "<p class='vis-comment-desc'>"
                             + " <strong  data-fll='UID' data-UID='" + VIS.Env.getCtx().getAD_User_ID() + "'>" + VIS.Msg.getMsg("Me") + "</strong><br />"
                             + VIS.Utility.encodeText(cmntTxt)
                             + "</p>"
