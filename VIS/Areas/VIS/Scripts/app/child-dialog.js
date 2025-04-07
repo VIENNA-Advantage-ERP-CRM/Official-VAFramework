@@ -32,7 +32,10 @@
             $($a.dialog('widget').find(".ui-dialog-content")).height(t);
 
         }
-
+        //VAI050-This method used to change the width of popup
+        this.changeWidth = function (t) {
+            $a.dialog('widget').width(t)
+        }
         //this.removeCloseBtn = function (remove) {
         //    removeClose = remove;
         //}

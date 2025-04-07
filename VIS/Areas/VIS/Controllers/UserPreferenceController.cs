@@ -352,6 +352,7 @@ namespace VIS.Controllers
             // Get the base URL
             UserPreferenceModel obj = new UserPreferenceModel();
             var baseUrl = $"{Request.Url.Scheme}://{Request.Url.Authority}/";
+            var fullUrl = Request.Url.AbsoluteUri;
             string loginApiUrl = $"{baseUrl}api/VAAPI/Auth/Login";
             string initSessionApiUrl = $"{baseUrl}api/VAAPI/Auth/InitSession";
             string accessKey = obj.GetAccessKey();
@@ -368,9 +369,9 @@ namespace VIS.Controllers
             int AD_Role_ID = value.AD_Role_ID;
             int Project_ID = value.Project_ID;
             string keyName = value.keyName;
-            string requestAddr = value.requestAddr;
-            int tokenExpTimeInMinutes = value.tokenExpTimeInMinutes;
-            int idleTime = value.idleTime;
+            string requestAddr = fullUrl;
+            int tokenExpTimeInMinutes = 129600;
+            int idleTime = 129600;
             var loginResult = obj.CallLoginApi(userName, password, accessKey, loginApiUrl);
             if (loginResult == null)
             {
