@@ -2107,7 +2107,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
 .vis-chatdetailouterwrap {
     overflow-y: auto;
-    height:100%;
+    height: calc(100% - 70px);
     /*      height: 260px;*/
 }
 

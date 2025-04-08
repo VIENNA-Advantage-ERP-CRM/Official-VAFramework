@@ -1884,7 +1884,7 @@
                 dataType: "json",
                 success: function (data) {
                     $self.projectList = JSON.parse(data);
-                    var cmbProjectContent = "<option value=\"\"></option>";
+                    var cmbProjectContent = "";
                     for (var itm in $self.projectList) {
                         cmbProjectContent += "<option value=" + $self.projectList[itm].RecKey + ">" + $self.projectList[itm].Name + "</option>";
                     }
@@ -1914,8 +1914,12 @@
                             '</tr></thead>';
                         tableHtml += '<tbody>';
                         response.forEach(function (item) {
+                            var statusDot = item.IsActive === 'Y'
+                                ? '<span class="VIS-key-status-dot VIS-key-green-dot"></span>' // Green dot for active
+                                : '<span class="VIS-key-status-dot VIS-key-grey-dot"></span>'; // Grey dot for inactive
+
                             tableHtml += '<tr>' +
-                                '<td>' + item.KeyName + '</td>' +
+                                '<td>' + statusDot + ' ' + item.KeyName + '</td>' +
                                 '<td>' + item.SessionToken + '</td>' +
                                 '<td>' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '</td>' +
                                 '<td>' + item.CreatedBy + '</td>' +
@@ -1928,6 +1932,7 @@
                                 '</td>' +
                                 '</tr>';
                         });
+
                         tableHtml += '</tbody></table></div>';
                         listDiv.html(tableHtml);
 
@@ -1949,7 +1954,11 @@
                 var $rowToDelete = $(this).closest('tr');
                 var $table = $rowToDelete.closest('table'); // Find the table
                 var $tbody = $table.find('tbody'); // Get the table body
-
+                // Confirmation Prompt
+                if (!confirm(VIS.Msg.getMsg("VAAPI_AreYouSureDelete"))) {
+                    $busyDiv[0].style.visibility = 'hidden';
+                    return; // Exit if user cancels
+                }
                 $.ajax({
                     url: VIS.Application.contextUrl + "UserPreference/DeleteSecretKey",
                     dataType: "json",

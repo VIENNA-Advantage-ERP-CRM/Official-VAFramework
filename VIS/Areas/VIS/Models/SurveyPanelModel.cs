@@ -690,10 +690,22 @@ namespace VIS.Models
                 }
                 else
                 {
-                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID="+ AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    isMandatoryTofill= Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID+ " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND IsActive='Y'")).Equals("Y");
+                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                    isMandatoryTofill = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND IsActive='Y'")).Equals("Y");
                 }
-                    responseCount = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+                responseCount = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            }
+            else
+            {
+                responseCount = 0;
+                if (AD_Survey_ID == 0)
+                {
+                    isMandatoryTofill = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID IN (SELECT AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + ") AND IsActive='Y'")).Equals("Y");
+                }
+                else
+                {
+                    isMandatoryTofill = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND IsActive='Y'")).Equals("Y");
+                }
             }
             
             sql = @"SELECT AD_Column.AD_column_ID,

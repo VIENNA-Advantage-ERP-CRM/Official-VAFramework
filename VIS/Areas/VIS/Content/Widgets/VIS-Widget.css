@@ -1430,6 +1430,15 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 .vis-apanel-rb-ul li.vis-subscribeoverlay-item{
     min-width: 120px;
 }
+.vis-feedDetails p.vis-comment-desc {
+    white-space: pre-line;
+    display: inline-block;
+    width: calc(100% - 58px);
+}
+.vis-feedContainer .vis-txtFllCmnt {
+    overflow-y: hidden;
+    min-height: 30px;
+}
 html[dir=rtl] .vis-feedIcons.vis-icon-viewMoreComments {
     margin: 4px 0px 0 4px;
     float: none;
