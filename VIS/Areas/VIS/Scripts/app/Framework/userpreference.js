@@ -1919,15 +1919,15 @@
                                 : '<span class="VIS-key-status-dot VIS-key-grey-dot"></span>'; // Grey dot for inactive
 
                             tableHtml += '<tr>' +
-                                '<td>' + statusDot + ' ' + item.KeyName + '</td>' +
-                                '<td>' + item.SessionToken + '</td>' +
-                                '<td>' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '</td>' +
-                                '<td>' + item.CreatedBy + '</td>' +
-                                '<td>' + item.ProjectName + '</td>' +
+                                '<td><span title="' + item.KeyName + '" class="VIS-Key-ellipse-text">' + statusDot + ' ' + item.KeyName + '</span></td>' +
+                                '<td><span title="' + item.SessionToken + '" class="VIS-Key-ellipse-text">' + item.SessionToken + '</span></td>' +
+                                '<td><span title="' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '" class="VIS-Key-ellipse-text">' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '</span></td>' +
+                                '<td><span title="' + item.CreatedBy + '" class="VIS-Key-ellipse-text">' + item.CreatedBy + '</span></td>' +
+                                '<td><span title="' + item.ProjectName + '"  class="VIS-Key-ellipse-text">' + item.ProjectName + '</span></td>' +
                                 '<td>' +
-                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '">' +
+                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '" title="Edit">' +
                                 '<i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>' +
-                                '<button class="VIS-key-delete-btn VIS-delete-btn" data-id="' + item.RecordID + '">' +
+                                '<button class="VIS-key-delete-btn VIS-delete-btn" data-id="' + item.RecordID + '" title="Delete">' +
                                 '<i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
                                 '</td>' +
                                 '</tr>';
@@ -1955,34 +1955,40 @@
                 var $table = $rowToDelete.closest('table'); // Find the table
                 var $tbody = $table.find('tbody'); // Get the table body
                 // Confirmation Prompt
-                if (!confirm(VIS.Msg.getMsg("VAAPI_AreYouSureDelete"))) {
-                    $busyDiv[0].style.visibility = 'hidden';
-                    return; // Exit if user cancels
-                }
-                $.ajax({
-                    url: VIS.Application.contextUrl + "UserPreference/DeleteSecretKey",
-                    dataType: "json",
-                    data: { RecID: recID },
-                    success: function (data) {
-                        var response = JSON.parse(data);
-                        if (response) {
-                            $rowToDelete.remove();
-                            if ($tbody.find('tr').length === 0) {
-                                $table.remove();
+                VIS.ADialog.confirm("VAAPI_AreYouSureDelete", true, "", "Confirm", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: VIS.Application.contextUrl + "UserPreference/DeleteSecretKey",
+                            dataType: "json",
+                            data: { RecID: recID },
+                            success: function (data) {
+                                var response = JSON.parse(data);
+                                if (response) {
+                                    $rowToDelete.remove();
+                                    if ($tbody.find('tr').length === 0) {
+                                        $table.remove();
+                                    }
+                                    $busyDiv[0].style.visibility = 'hidden';
+                                    //VIS.ADialog.info("Secret Key Deleted");
+                                } else {
+                                    $busyDiv[0].style.visibility = 'hidden';
+                                    VIS.ADialog.error("Record not deleted");
+                                }
+                            },
+                            error: function () {
+                                alert("Error occurred while deleting.");
+                                $busyDiv[0].style.visibility = 'hidden';
+
                             }
-                            $busyDiv[0].style.visibility = 'hidden';
-                            //VIS.ADialog.info("Secret Key Deleted");
-                        } else {
-                            $busyDiv[0].style.visibility = 'hidden';
-                            VIS.ADialog.error("Record not deleted");
-                        }
-                    },
-                    error: function () {
-                        alert("Error occurred while deleting.");
+                        });
+                    }
+                    else {
                         $busyDiv[0].style.visibility = 'hidden';
+                        return; // Exit if user cancels
 
                     }
                 });
+
             });
 
             /*  This method used to update the secret key row*/
