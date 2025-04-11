@@ -36,7 +36,7 @@
             if (mode) {
                 return (
                     '<div class="VIS_edit-secret-key-dialog">' +
-                    '<div class="VIS_container">' +
+                    '<div class="VIS_container-key">' +
                     '<div class="key-details">' +
                     //'<h2>' + VIS.Msg.getMsg("VAAPI_EditSecretKey") + '</h2>' +
                     '<label for="keyName">' + VIS.Msg.getMsg("VAAPI_KeyName") + ' </label>' +
@@ -55,7 +55,7 @@
                     '</div>' +
                     '<div class="VIS_buttons">' +
                     '<button id="VIS_EditedCancel_' + windowNo + '"  class="VIS_cancel">' + VIS.Msg.getMsg("VAAPI_Cancel") + '</button>' +
-                    '<button  id="VIS_SaveEditedSecretKey_' + windowNo + '" class="VIS_save">' + VIS.Msg.getMsg("VAAPI_Save") + '</button>' +
+                    '<button  id="VIS_SaveEditedSecretKey_' + windowNo + '" class="VIS_save">' + VIS.Msg.getMsg("VIS_OK") + '</button>' +
                     '<div id="VIS_EditKeyError_' + windowNo + '" class="error-message" style="display:none; color: red; font-size: 14px;"></div>' +
                     '</div>' +
                     '</div>' +
@@ -264,7 +264,7 @@
             load();
             ch = new VIS.ChildDialog();
             if (mode) {
-                ch.setHeight(405);
+                ch.setHeight(341);
             }
             else {
                 setTimeout(function () {
@@ -273,7 +273,7 @@
                 }, 50);
             }
             if (mode) {
-                windowWidth -= 10;
+                windowWidth -= 4;
             }
             var finalWidth = windowWidth + '%';
             ch.setWidth(finalWidth);
