@@ -41,7 +41,7 @@
                     //'<h2>' + VIS.Msg.getMsg("VAAPI_EditSecretKey") + '</h2>' +
                     '<label for="keyName">' + VIS.Msg.getMsg("VAAPI_KeyName") + ' </label>' +
                     '<input type="text" id="VIS_EditSecretKeytxt_' + windowNo + '" placeholder="My Test Key"  value="' + keyName + '">' +
-                    '<div id="VIS_PasswordError_' + windowNo + '" class="VIS-key-error-message"></div>' +
+                    //'<div id="VIS_PasswordError_' + windowNo + '" class="VIS-key-error-message"></div>' +
 
                     '<label for="project">' + VIS.Msg.getMsg("VAAPI_Project") + '</label>' +
                     '<select id="VIS_ProjectSelect_' + windowNo + '">' +
@@ -226,7 +226,18 @@
                 });
             });
         }
+      
 
+        $root.find('#VIS_EditSecretKeytxt_' + windowNo).on('input', function () {
+            const value = $(this).val().trim();
+            const okButton = $root.find('#VIS_SaveEditedSecretKey_' + windowNo);
+            if (value == '') {
+                $root.find('#VIS_EditSecretKeytxt_' + windowNo).addClass('VIS-editkey-input-border');
+            } else {
+                $root.find('#VIS_EditSecretKeytxt_' + windowNo).removeClass('VIS-editkey-input-border');
+            }
+            okButton.prop('disabled', value == '');
+        });
         function load() {
             $root.append($bsyDiv);
             busyDiv(false);
