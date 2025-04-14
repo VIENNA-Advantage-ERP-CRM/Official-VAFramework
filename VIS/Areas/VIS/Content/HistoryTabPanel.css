@@ -918,6 +918,17 @@
         font-size: 1rem;
     }
 
+.VIS-item-body .VIS-btn-edit {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+    .VIS-item-body .VIS-btn-edit i {
+        font-size: 1rem;
+    }
 .VIS-item-content .VIS-item-body {
     width: 70%;
     display: flex;
@@ -1090,7 +1101,7 @@
         text-overflow: ellipsis;
     }
 
-.VIS-btn-copy {
+.VIS-btn-copy, .VIS-btn-edit {
     background: none;
     border: none;
     padding: 0;
@@ -1151,6 +1162,7 @@
     align-items: flex-start;
     gap: 12px;
     margin-bottom: 12px;
+    margin-right: 12px;
 }
 
     .VIS-top-row .VIS-agenda-section {
