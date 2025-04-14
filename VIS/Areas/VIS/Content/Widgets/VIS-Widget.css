@@ -1436,8 +1436,8 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     width: calc(100% - 58px);
 }
 .vis-feedContainer .vis-txtFllCmnt {
-    overflow-y: hidden;
-    min-height: 30px;
+    /*overflow-y: hidden;*/
+    min-height: 26px;
 }
 html[dir=rtl] .vis-feedIcons.vis-icon-viewMoreComments {
     margin: 4px 0px 0 4px;
