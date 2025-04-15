@@ -59,13 +59,13 @@
                 //'</header>' +
                 '<nav class="VIS-activities-nav">' +
                 '<div class="nav nav-tabs" id="nav-tab" role="tablist">' +
-                '<a class="VIS-nav-item active" id="all" data-toggle="tab" href="#VIS-all_' + this.windowNo + '" role="tab" aria-controls="all" aria-selected="true">' + VIS.Msg.getMsg("All") + '</a>' +
-                '<a class="VIS-nav-item" id="appointment" data-toggle="tab" href="#VIS-appointment_' + this.windowNo + '" role="tab" aria-controls="appointment" aria-selected="false"><i class="fa fa-calendar-o"></i>' + VIS.Msg.getMsg("Appointments") + '<span class="badge">1</span></a>' +
-                '<a class="VIS-nav-item" id="email" data-toggle="tab" href="#VIS-emails_' + this.windowNo + '" role="tab" aria-controls="emails" aria-selected="false"><i class="vis vis-email"></i>' + VIS.Msg.getMsg("Emails") + '<span class="badge">1</span></a>' +
-                '<a class="VIS-nav-item" id="call" data-toggle="tab" href="#VIS-calls_' + this.windowNo + '" role="tab" aria-controls="calls" aria-selected="false"> <i class="fa fa-phone"></i>' + VIS.Msg.getMsg("Calls") + '<span class="badge">2</span></a>' +
-                '<a class="VIS-nav-item" id="chat" data-toggle="tab" href="#VIS-notes_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="fa fa-sticky-note-o"></i>' + VIS.Msg.getMsg("Notes") + '<span class="badge">2</span></a>' +
-                '<a class="VIS-nav-item" id="task" data-toggle="tab" href="#VIS-tasks_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="vis vis-task"></i>' + VIS.Msg.getMsg("Tasks") + '<span class="badge">2</span></a>' +
-                '<a class="VIS-nav-item" id="letter" data-toggle="tab" href="#VIS-letters_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="vis vis-letter"></i>' + VIS.Msg.getMsg("Letters") + '<span class="badge">2</span></a>' +
+                '<a class="VIS-nav-item active" id="all" data-toggle="tab" href="#VIS-all_' + this.windowNo + '" role="tab" aria-controls="all" aria-selected="true">All</a>' +
+                '<a class="VIS-nav-item" id="appointment" data-toggle="tab" href="#VIS-appointment_' + this.windowNo + '" role="tab" aria-controls="appointment" aria-selected="false"><i class="fa fa-calendar-o"></i> Appointments <span class="badge">1</span></a>' +
+                '<a class="VIS-nav-item" id="email" data-toggle="tab" href="#VIS-emails_' + this.windowNo + '" role="tab" aria-controls="emails" aria-selected="false"><i class="vis vis-email"></i> Emails<span class="badge">1</span></a>' +
+                '<a class="VIS-nav-item" id="call" data-toggle="tab" href="#VIS-calls_' + this.windowNo + '" role="tab" aria-controls="calls" aria-selected="false"> <i class="fa fa-phone"></i>Calls<span class="badge">2</span></a>' +
+                '<a class="VIS-nav-item" id="chat" data-toggle="tab" href="#VIS-notes_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="fa fa-sticky-note-o"></i> Notes<span class="badge">2</span></a>' +
+                '<a class="VIS-nav-item" id="task" data-toggle="tab" href="#VIS-tasks_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="vis vis-task"></i> Tasks<span class="badge">2</span></a>' +
+                '<a class="VIS-nav-item" id="letter" data-toggle="tab" href="#VIS-letters_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="vis vis-letter"></i> Letters<span class="badge">2</span></a>' +
                 '</div>' +
                 '</nav>' +
                 '<div class="tab-content" id="nav-tabContent">' +
@@ -288,7 +288,7 @@
                             '<div class="VIS-item-content">' +
                             '<div class="VIS-item-header">' +
                             '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("EMail") + '</span>' +
+                            '<span class="VIS-item-type">Email</span>' +
                             '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
                             '</div>' +
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
@@ -340,7 +340,7 @@
                             '<div class="VIS-item-content">' +
                             '<div class="VIS-item-header">' +
                             '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("InboxMail") + '</span>' +
+                            '<span class="VIS-item-type">Inbox</span>' +
                             '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
                             '</div>' +
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
@@ -389,7 +389,7 @@
                             '<div class="VIS-item-content">' +
                             '<div class="VIS-item-header">' +
                             '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("VA048_CallType") + '</span>' +
+                            '<span class="VIS-item-type">Call</span>' +
                             '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
                             '</div>' +
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
@@ -449,7 +449,7 @@
                             '<div class="VIS-item-content">' +
                             '<div class="VIS-item-header">' +
                             '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Note") + '</span>' +
+                            '<span class="VIS-item-type">Note</span>' +
                             '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
                             '</div>' +
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
@@ -486,7 +486,7 @@
                             '<div class="VIS-item-content">' +
                             '<div class="VIS-item-header">' +
                             '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Letter") + '</span>' +
+                            '<span class="VIS-item-type">Letter</span>' +
                             '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
                             '</div>' +
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
@@ -548,7 +548,7 @@
                             '<div class="VIS-item-content">' +
                             '<div class="VIS-item-header">' +
                             '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Appointment") + '</span>' +
+                            '<span class="VIS-item-type">Appointment</span>' +
                             '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
                             '</div>' +
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
@@ -559,12 +559,8 @@
                             '<h6>' + res[i].Subject + '</h6>' +
                             '<div class="VIS-item-timing">' + time + '</div>' +
                             '</div>' +
-                            '<div class="VIS-meeting-section">' +
-                            (res[i].MeetingUrl != "" ? '<a class="VIS-meeting-url" href="#" data-joinurl="' + res[i].MeetingUrl + '">' + res[i].MeetingUrl +
-                                '</a><span data-joinurl="' + res[i].MeetingUrl + '" class="VIS-btn-copy" title="' + VIS.Msg.getMsg("CopyUrl") + '"><i class="fa fa-clone"></i></span>' : "") +
-                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-uid="' + res[i].UID + '" data-joinurl="' + res[i].MeetingUrl +
-                            '" class="VIS-btn-edit" title="' + VIS.Msg.getMsg("EditAppointment") + '"><i class="fa fa-pencil-square-o"></i></span>' +
-                            '</div>' +
+                            (res[i].MeetingUrl != "" ? '<div class="VIS-meeting-section"><a class="VIS-meeting-url" href="#" data-joinurl="' + res[i].MeetingUrl + '">' + res[i].MeetingUrl +
+                                '</a><span data-joinurl="' + res[i].MeetingUrl + '" class="VIS-btn-copy" title="' + VIS.Msg.getMsg("CopyUrl") + '"><i class="fa fa-clone"></i></span></div>' : "") +
                             '</div>' +
                             '</div>' +
                             '</div>' +
@@ -610,7 +606,7 @@
                             '<div class="VIS-item-content">' +
                             '<div class="VIS-item-header">' +
                             '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Task") + '</span>' +
+                            '<span class="VIS-item-type">Task</span>' +
                             '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
                             '</div>' +
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
@@ -730,23 +726,6 @@
                             msg.fadeOut(300, function () { $(this).remove(); }); // Fade & remove message
                         }, 2000);
                     }).catch(err => console.error("Failed to copy:", err));
-                });
-
-                $html.find(".VIS-btn-edit").click(function () {
-                    if (window.WSP) {
-                        const btn = $(this);
-                        var rid = $(this).data('rid');
-                        var uid = $(this).data('uid');
-                        var url = $(this).data('joinurl');
-
-                        var divaptbusy = $("<div id='divAptBusy' class='wsp-busy-indicater'></div>");
-                        $root.append(divaptbusy);
-                        divaptbusy.show();
-                        WSP.WSP_AppointmentsForm.init(divaptbusy, tableID, _selectedId, rid, uid, url);
-                    }
-                    else {
-                        VIS.ADialog.info("PleaseInstallWSPModule");
-                    }
                 });
 
                 $('#VIS_txtSearch' + window_No).keyup(function (e) {
