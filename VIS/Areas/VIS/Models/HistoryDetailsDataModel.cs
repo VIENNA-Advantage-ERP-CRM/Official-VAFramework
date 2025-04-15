@@ -41,10 +41,12 @@ namespace VIS.Models
             List<HistoryDetails> LstHistory = new List<HistoryDetails>();
 
             sql.Append(@"SELECT ID, AD_TABLE_ID, RECORD_ID, CREATED, FROMUSER, TYPE, SUBJECT,  CharacterData, NAME, TO_CHAR(CREATED, 'DD/MM/YYYY HH12:MI:SS AM')
-                        AS CREATEDDATETIME, HASATTACHMENT, ISTASKCLOSED, MailAddress, MailAddressCc, StartDate, EndDate, AttendeeInfo, MeetingUrl FROM 
-                        (SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
+                        AS CREATEDDATETIME, HASATTACHMENT, ISTASKCLOSED, MailAddress, MailAddressCc, StartDate, EndDate, AttendeeInfo, MeetingUrl, 
+                        Appointment_UID, DateLastUpdated FROM (
+                        SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
                         'EMAIL' AS TYPE, ma.TITLE AS SUBJECT, NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        ma.MailAddress, ma.MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        ma.MailAddress, ma.MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl,
+                        CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
                         FROM MailAttachment1 ma 
                         JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY
                         WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'M' 
@@ -53,7 +55,8 @@ namespace VIS.Models
                         + @" UNION ALL 
                         SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
                         'INBOX' AS TYPE, ma.TITLE AS SUBJECT, NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        ma.MailAddress, ma.MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        ma.MailAddress, ma.MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl,
+                        CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
                         FROM MailAttachment1 ma 
                         JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY       
                         WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'I'
@@ -63,7 +66,7 @@ namespace VIS.Models
                         SELECT ce.CM_ChatEntry_ID AS ID, ch.AD_TABLE_ID, ch.RECORD_ID, ce.CREATED, au.NAME AS FROMUSER, 'CHAT' AS TYPE, 
                         CAST('Chat' AS NVARCHAR2(50)) AS SUBJECT, ce.CharacterData AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED,
                         CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, 
-                        '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl, CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
                         FROM CM_ChatEntry ce JOIN CM_CHAT ch ON ce.CM_Chat_Id=ch.CM_Chat_Id
                         JOIN AD_USER au ON au.AD_USER_ID=ce.CREATEDBY 
                         WHERE ch.ISACTIVE = 'Y' AND ch.AD_TABLE_ID = " + _AD_Table_ID + " AND ch.RECORD_ID = " + RecordId
@@ -71,7 +74,8 @@ namespace VIS.Models
                         + @" UNION ALL 
                         SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'LETTER' AS TYPE, 
                         ma.TITLE AS SUBJECT,  NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        ma.MailAddress, ma.MailAddressCc,  NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        ma.MailAddress, ma.MailAddressCc,  NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl,
+                        CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
                         FROM MailAttachment1 ma 
                         JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
                         WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'L' 
@@ -81,7 +85,8 @@ namespace VIS.Models
                         SELECT ai.AppointmentsInfo_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'APPOINTMENT' AS TYPE, 
                         ai.SUBJECT AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED, 
                         CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, 
-                        ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, ai.MeetingUrl
+                        ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, ai.MeetingUrl,
+                        ai.Appointment_UID, ai.DateLastUpdated
                         FROM AppointmentsInfo ai 
                         JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY 
                         WHERE (ai.AttendeeInfo IS NOT NULL OR ai.RefAppointmentsInfo_ID IS NULL) AND ai.ISACTIVE = 'Y' AND ai.ISTASK = 'N' 
@@ -91,7 +96,8 @@ namespace VIS.Models
                         SELECT ai.AppointmentsInfo_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'TASK' AS TYPE, 
                         ai.SUBJECT AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, ai.ISCLOSED AS ISTASKCLOSED, 
                         CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, 
-                        ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, ai.MeetingUrl,
+                        ai.Appointment_UID, ai.DateLastUpdated
                         FROM AppointmentsInfo ai 
                         JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY 
                         WHERE ai.ISACTIVE = 'Y' AND ai.ISTASK = 'Y' 
@@ -101,7 +107,7 @@ namespace VIS.Models
                         SELECT aa.AD_ATTACHMENT_ID AS ID, aa.AD_TABLE_ID, aa.RECORD_ID, aa.CREATED, au.NAME AS FROMUSER, 'ATTACHMENT' AS TYPE, 
                         CAST('Attachment' AS NVARCHAR2(50)) AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED,
                         CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, 
-                        '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl, CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
                         FROM AD_ATTACHMENT aa 
                         JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY 
                         WHERE aa.ISACTIVE = 'Y' 
@@ -112,7 +118,8 @@ namespace VIS.Models
                 sql.Append(@" UNION ALL 
                         SELECT cd.VA048_CALLDETAILS_ID AS ID, cd.AD_TABLE_ID, cd.RECORD_ID, cd.CREATED, cd.VA048_FROM AS FROMUSER, 'CALL' AS TYPE, 
                         cd.VA048_Duration AS SUBJECT, NULL AS CharacterData, au.NAME, (CASE WHEN cd.VA048_RECORDINGS IS NOT NULL THEN 'Y' ELSE 'N' END) AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        NVL(cd.VA048_From, '-') AS MailAddress, NVL(cd.VA048_TO, '-') AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl
+                        NVL(cd.VA048_From, '-') AS MailAddress, NVL(cd.VA048_TO, '-') AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl,
+                        CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
                         FROM VA048_CALLDETAILS cd 
                         JOIN AD_USER au ON au.AD_USER_ID=cd.CREATEDBY 
                         WHERE cd.VA048_TO IS NOT NULL AND cd.ISACTIVE = 'Y' 
@@ -131,7 +138,7 @@ namespace VIS.Models
             {
                 string attendees;
                 int attchCount;
-                DateTime? startdate, enddate;
+                DateTime? startdate, enddate, lastupdated;
                 AttachmentInfos Attach = null;
                 foreach (DataRow dt in _dsHistory.Tables[0].Rows)
                 {
@@ -162,6 +169,15 @@ namespace VIS.Models
                     else
                     {
                         enddate = null;
+                    }
+
+                    if (dt["DateLastUpdated"] != DBNull.Value)
+                    {
+                        lastupdated = DateTime.SpecifyKind(Convert.ToDateTime(dt["DateLastUpdated"]), DateTimeKind.Utc);
+                    }
+                    else
+                    {
+                        lastupdated = null;
                     }
 
                     if (Util.GetValueOfString(dt["TYPE"]).Equals("MAIL"))
@@ -213,6 +229,8 @@ namespace VIS.Models
                         EndDate = enddate,
                         Attendees = attendees,
                         MeetingUrl = Util.GetValueOfString(dt["MeetingUrl"]),
+                        UID = Util.GetValueOfString(dt["Appointment_UID"]),
+                        LastUpdated = lastupdated,
                         AttchCount = attchCount,
                         Attachment = Attach
                     });
@@ -1030,6 +1048,8 @@ namespace VIS.Models
         public DateTime? EndDate { get; set; }
         public string Attendees { get; set; }
         public string MeetingUrl { get; set; }
+        public string UID { get; set; }
+        public DateTime? LastUpdated { get; set; }
         public int AttchCount { get; set; }
         public AttachmentInfos Attachment { get; set; }
     }

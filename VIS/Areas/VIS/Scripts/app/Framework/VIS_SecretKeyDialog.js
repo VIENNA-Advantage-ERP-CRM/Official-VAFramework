@@ -36,12 +36,12 @@
             if (mode) {
                 return (
                     '<div class="VIS_edit-secret-key-dialog">' +
-                    '<div class="VIS_container">' +
+                    '<div class="VIS_container-key">' +
                     '<div class="key-details">' +
                     //'<h2>' + VIS.Msg.getMsg("VAAPI_EditSecretKey") + '</h2>' +
                     '<label for="keyName">' + VIS.Msg.getMsg("VAAPI_KeyName") + ' </label>' +
                     '<input type="text" id="VIS_EditSecretKeytxt_' + windowNo + '" placeholder="My Test Key"  value="' + keyName + '">' +
-                    '<div id="VIS_PasswordError_' + windowNo + '" class="VIS-key-error-message"></div>' +
+                    //'<div id="VIS_PasswordError_' + windowNo + '" class="VIS-key-error-message"></div>' +
 
                     '<label for="project">' + VIS.Msg.getMsg("VAAPI_Project") + '</label>' +
                     '<select id="VIS_ProjectSelect_' + windowNo + '">' +
@@ -55,7 +55,7 @@
                     '</div>' +
                     '<div class="VIS_buttons">' +
                     '<button id="VIS_EditedCancel_' + windowNo + '"  class="VIS_cancel">' + VIS.Msg.getMsg("VAAPI_Cancel") + '</button>' +
-                    '<button  id="VIS_SaveEditedSecretKey_' + windowNo + '" class="VIS_save">' + VIS.Msg.getMsg("VAAPI_Save") + '</button>' +
+                    '<button  id="VIS_SaveEditedSecretKey_' + windowNo + '" class="VIS_save">' + VIS.Msg.getMsg("VIS_OK") + '</button>' +
                     '<div id="VIS_EditKeyError_' + windowNo + '" class="error-message" style="display:none; color: red; font-size: 14px;"></div>' +
                     '</div>' +
                     '</div>' +
@@ -226,7 +226,18 @@
                 });
             });
         }
+      
 
+        $root.find('#VIS_EditSecretKeytxt_' + windowNo).on('input', function () {
+            const value = $(this).val().trim();
+            const okButton = $root.find('#VIS_SaveEditedSecretKey_' + windowNo);
+            if (value == '') {
+                $root.find('#VIS_EditSecretKeytxt_' + windowNo).addClass('VIS-editkey-input-border');
+            } else {
+                $root.find('#VIS_EditSecretKeytxt_' + windowNo).removeClass('VIS-editkey-input-border');
+            }
+            okButton.prop('disabled', value == '');
+        });
         function load() {
             $root.append($bsyDiv);
             busyDiv(false);
@@ -264,7 +275,7 @@
             load();
             ch = new VIS.ChildDialog();
             if (mode) {
-                ch.setHeight(405);
+                ch.setHeight(341);
             }
             else {
                 setTimeout(function () {
@@ -273,7 +284,7 @@
                 }, 50);
             }
             if (mode) {
-                windowWidth -= 10;
+                windowWidth -= 4;
             }
             var finalWidth = windowWidth + '%';
             ch.setWidth(finalWidth);
