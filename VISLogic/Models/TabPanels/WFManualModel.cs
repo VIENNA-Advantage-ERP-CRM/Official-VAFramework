@@ -63,6 +63,44 @@ namespace VIS.Models
         }
 
         /// <summary>
+        /// Get ManuallyAttached Workflows and Sequence
+        /// </summary>
+        /// <param name="_ctx"></param>
+        /// <param name="AD_Window_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <returns></returns>
+        public List<WFDetails> GetManuallyAttachedWFDetails(Ctx _ctx, int AD_Window_ID, int Record_ID, int AD_Table_ID)
+        {
+            List<WFDetails> _wfDet = new List<WFDetails>();
+            // Fetch all workflows of type document process linked with table passed in parameter, which are not linked with any button on this table
+            sbQuery.Clear().Append(@"SELECT w.Name, ma.SeqNo, w.Description, w.Value, ma.AD_Workflow_ID
+                                    FROM ad_wf_manualattached ma INNER JOIN AD_Workflow w ON (w.AD_Workflow_ID = ma.AD_Workflow_ID)
+                                    WHERE ma.AD_Table_ID = " + AD_Table_ID + @" AND ma.Record_ID = " + Record_ID + @"
+                                    ORDER BY ma.created DESC, ma.SeqNo DESC");
+            DataSet dsRes = DB.ExecuteDataset(sbQuery.ToString(), null, null);
+            if (dsRes != null && dsRes.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < dsRes.Tables[0].Rows.Count; i++)
+                {
+                    WFDetails wf = new WFDetails();
+                    wf.Name = Util.GetValueOfString(dsRes.Tables[0].Rows[i]["Name"]);
+                    wf.Value = Util.GetValueOfString(dsRes.Tables[0].Rows[i]["Value"]);
+                    wf.Description = Util.GetValueOfString(dsRes.Tables[0].Rows[i]["Description"]);
+                    wf.AD_Workflow_ID = Util.GetValueOfInt(dsRes.Tables[0].Rows[i]["AD_Workflow_ID"]);
+                    wf.SeqNo = Util.GetValueOfInt(dsRes.Tables[0].Rows[i]["SeqNo"]);                    
+                    _wfDet.Add(wf);
+                    if (wf.SeqNo <= 10)
+                        break;
+                }
+
+                _wfDet = _wfDet.OrderBy(c => c.SeqNo).ToList();
+            }
+
+            return _wfDet;
+        }
+
+        /// <summary>
         /// Save workflows in AD_WF_ManualAttached table passed in the parameter and execute workflows in sequence after that
         /// </summary>
         /// <param name="_ctx">Context</param>
@@ -239,7 +277,7 @@ namespace VIS.Models
                     curr_AD_WF_Process_ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Process_ID"]);
                     if (i == 0 || (curr_AD_WF_Process_ID != prev_AD_WF_Process_ID))
                     {
-                        ActivityInfo itm = actModel.GetActivityInfo(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Activity_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Node_ID"]), curr_AD_WF_Process_ID, ctx);
+                        ActivityInfo itm = actModel.GetActivityInfoPanel(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Activity_ID"]), Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Node_ID"]), curr_AD_WF_Process_ID, ctx);
                         actInfo.Add(itm);
                         prev_AD_WF_Process_ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Process_ID"]);
                     }
@@ -306,6 +344,31 @@ namespace VIS.Models
             }
             return msg;
         }
+
+        public bool SetNodeTime(Ctx ctx, int activityId)
+        {
+            try
+            {
+                // Example: Load activity from DB using activityId
+                MWFActivity activity = new MWFActivity(ctx, activityId, null);
+                if (activity == null || activity.Get_ID() == 0)
+                {
+                    return false; // Activity not found
+                }
+
+                // Example: Update node timestamp
+                activity.SetEndWaitTime(DateTime.Now);
+                return activity.Save();
+            }
+            catch (Exception ex)
+            {
+                // Optional: log the exception
+                VLogger.Get().Severe("WFManualModel.SetNodeTime Error: " + ex.Message);
+                return false;
+            }
+        }
+
+
     }
 
     /// <summary>
@@ -317,6 +380,8 @@ namespace VIS.Models
         public string Value { get; set; }
         public string Description { get; set; }
         public int AD_Workflow_ID { get; set; }
+        public DateTime? LastTriggered { get; set; }
+        public int SeqNo { get; set; }
 
     }
 

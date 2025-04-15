@@ -831,6 +831,7 @@ OR
                 info.WFName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Workflow WHERE AD_Workflow_ID = " + node.GetAD_Workflow_ID()));
                 info.NodeAction = node.GetAction();
                 info.NodeName = node.GetName();
+                info.AD_Workflow_ID = node.GetAD_Workflow_ID();
                 info.IsSurveyResponseRequired = node.IsSurveyResponseRequired();
                 if (MWFNode.ACTION_UserChoice.Equals(node.GetAction()))
                 {
@@ -933,6 +934,139 @@ OR
                 return info;
             }
         }
+
+        /// <summary>
+        /// Get workflow activity details for workflow panel
+        /// </summary>
+        /// <param name="activityID"></param>
+        /// <param name="nodeID"></param>
+        /// <param name="wfProcessID"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public ActivityInfo GetActivityInfoPanel(int activityID, int nodeID, int wfProcessID, Ctx ctx)
+        {
+            ActivityInfo info = new ActivityInfo();
+            try
+            {
+                MWFNode node = new MWFNode(ctx, nodeID, null);
+                info.WFName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name FROM AD_Workflow WHERE AD_Workflow_ID = " + node.GetAD_Workflow_ID()));
+                info.NodeAction = node.GetAction();
+                info.NodeName = node.GetName();
+                info.AD_Workflow_ID = node.GetAD_Workflow_ID();
+                info.IsSurveyResponseRequired = node.IsSurveyResponseRequired();
+                if (MWFNode.ACTION_UserChoice.Equals(node.GetAction()))
+                {
+                    MColumn col = node.GetColumn();
+                    info.ColID = col.GetAD_Column_ID();
+                    info.ColReference = col.GetAD_Reference_ID();
+                    info.ColReferenceValue = col.GetAD_Reference_Value_ID();
+                    info.ColName = col.GetColumnName();
+                }
+                else if (MWFNode.ACTION_UserWindow.Equals(node.GetAction()))
+                {
+                    info.AD_Window_ID = node.GetAD_Window_ID();
+                    MWFActivity activity = new MWFActivity(ctx, activityID, null);
+                    info.KeyCol = activity.GetPO().Get_TableName() + "_ID";
+                }
+                else if (MWFNode.ACTION_UserForm.Equals(node.GetAction()))
+                {
+                    info.AD_Form_ID = node.GetAD_Form_ID();
+                }
+
+
+
+                string sql = @"SELECT node.AD_WF_Node_ID, node.Name AS NodeName, usr.Name AS UserName, wfea.WFState, wfea.TextMsg,
+                                act.AD_WF_Activity_ID, act.EndWaitTime, act.Updated AS LastUpdated, node.Action FROM AD_WF_EventAudit wfea
+                            INNER JOIN AD_WF_Node node 
+                                ON (node.AD_WF_Node_ID = wfea.AD_WF_Node_ID)
+                            LEFT JOIN AD_User usr 
+                                ON (usr.AD_User_ID = wfea.AD_User_ID)
+                            LEFT JOIN (
+                                SELECT * FROM AD_WF_Activity a1 WHERE (a1.AD_WF_Process_ID, a1.AD_WF_Node_ID, a1.Updated) IN (
+                                    SELECT AD_WF_Process_ID, AD_WF_Node_ID, MAX(Updated) FROM AD_WF_Activity GROUP BY AD_WF_Process_ID, AD_WF_Node_ID)) act
+                                ON (act.AD_WF_Process_ID = wfea.AD_WF_Process_ID
+                               AND act.AD_WF_Node_ID = wfea.AD_WF_Node_ID) WHERE wfea.AD_WF_Process_ID = " + wfProcessID + @"
+                            ORDER BY act.Updated DESC";
+
+                int attachmentCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT Count(AD_AttachmentLine.AD_Attachment_ID) FROM AD_Attachment 
+                                        INNER JOIN AD_AttachmentLine ON (AD_Attachment.AD_Attachment_ID = AD_AttachmentLine.AD_Attachment_ID)
+                                        INNER JOIN AD_WF_Activity ON (AD_Attachment.Record_ID = AD_WF_Activity.Record_ID AND AD_Attachment.AD_Table_ID = AD_WF_Activity.AD_Table_ID)
+                                        WHERE AD_WF_Activity.AD_WF_Activity_ID =" + activityID));
+
+                info.AttachmentCount = attachmentCount;
+
+                DataSet ds = DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    List<NodeInfo> nodeInfo = new List<NodeInfo>();
+                    List<int> nodes = new List<int>();
+                    NodeInfo ni = null;
+                    NodeHistory nh = null;
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        if (!nodes.Contains(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Node_ID"])))
+                        {
+                            ni = new NodeInfo();
+                            ni.Name = Util.GetValueOfString(ds.Tables[0].Rows[i]["NodeName"]);
+                            nh = new NodeHistory();
+                            nh.State = Util.GetValueOfString(ds.Tables[0].Rows[i]["WFState"]);
+                            nh.ApprovedBy = Util.GetValueOfString(ds.Tables[0].Rows[i]["UserName"]);
+                            ni.History = new List<NodeHistory>();
+                            ni.LastUpdated = Util.GetValueOfDateTime(ds.Tables[0].Rows[i]["LastUpdated"]).Value.ToLocalTime().ToUniversalTime();
+                            ni.Action = Util.GetValueOfString(ds.Tables[0].Rows[i]["Action"]);
+                            ni.ADWFActivityID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Activity_ID"]);
+                            var endWaitTime = Util.GetValueOfDateTime(ds.Tables[0].Rows[i]["EndWaitTime"]);
+                            if (endWaitTime.HasValue)
+                            {
+                                ni.EndWaitTimeN = endWaitTime.Value.ToLocalTime().ToUniversalTime();
+                            }
+                            else
+                            {
+                                // Treat as "no end time"
+                                ni.EndWaitTimeN = null; // if EndWaitTimeN is nullable
+                            }
+                            if (ds.Tables[0].Rows[i]["TextMsg"] == null || ds.Tables[0].Rows[i]["TextMsg"] == DBNull.Value)
+                            {
+                                nh.TextMsg = string.Empty;
+                            }
+                            else
+                            {
+                                nh.TextMsg = ds.Tables[0].Rows[i]["TextMsg"].ToString();
+                            }
+                            ni.History.Add(nh);
+                            nodes.Add(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Node_ID"]));
+                            nodeInfo.Add(ni);
+                        }
+                        else
+                        {
+                            int index = nodes.IndexOf(Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Node_ID"]));
+                            nh = new NodeHistory();
+                            nh.State = Util.GetValueOfString(ds.Tables[0].Rows[i]["WFState"]);
+                            nh.ApprovedBy = Util.GetValueOfString(ds.Tables[0].Rows[i]["UserName"]);
+                            if (ds.Tables[0].Rows[i]["TextMsg"] == null || ds.Tables[0].Rows[i]["TextMsg"] == DBNull.Value)
+                            {
+                                nh.TextMsg = string.Empty;
+                            }
+                            else
+                            {
+                                nh.TextMsg = ds.Tables[0].Rows[i]["TextMsg"].ToString();
+                            }
+                            nodeInfo[index].History.Add(nh);
+                        }
+                    }
+                    info.Node = nodeInfo;
+
+                }
+
+                return info;
+
+            }
+            catch
+            {
+                return info;
+            }
+        }
+
         /// <summary>
         /// Approve Activities
         /// </summary>
@@ -1656,6 +1790,12 @@ OR
             get;
             set;
         }
+
+        public int AD_Workflow_ID
+        {
+            get;
+            set;
+        }
     }
 
     public class NodeInfo
@@ -1671,6 +1811,28 @@ OR
             set;
         }
 
+        public DateTime? LastUpdated
+        {
+            get;
+            set;
+        }
+        public string Action
+        {
+            get;
+            set;
+        }
+
+        public int ADWFActivityID
+        {
+            get;
+            set;
+        }
+
+        public DateTime? EndWaitTimeN
+        {
+            get;
+            set;
+        }
     }
 
     public class NodeHistory
