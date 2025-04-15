@@ -133,8 +133,15 @@
     color: rgba(var(--v-c-primary),1);
 }
 
-.vis-followUpsHeader h2, .vis-followUpsHeader .vis-followupsCount {
+.vis-followUpsHeader h2 {
     color: rgba(var(--v-c-on-secondary), 1);
+}
+.vis-followUpsHeader .vis-followupsCount {
+    background-color: rgba(var(--v-c-on-secondary), 1);
+    color: rgba(var(--v-c-on-primary), 1);
+    padding: 4px 9px;
+    font-size: 81%;
+    font-weight: 400;
 }
 .vis-followups-list .vis-feedTitleBar {
     background-color: rgba(var(--v-c-primary), .1);
@@ -151,4 +158,29 @@
 }
     .vis-followups-list .vis-feedTitleBar h3 {
         color: rgba(var(--v-c-on-secondary), 1);
+    }
+
+.vis-followups-list .vis-feedMessage {
+    border: 1px solid rgba(var(--v-c-on-secondary), .3);
+    border-radius: .3rem;
+    padding: 0 .2rem;
+}
+.vis-feedContainer .vis-txtFllCmnt {
+    border: none;
+    resize: none;
+    padding: 8px 4px;
+}
+.vis-followups-list .vis-feedMessage .vis-sms {
+    padding: 10px 7px 9px;
+    text-align: right;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+    .vis-followups-list .vis-feedMessage .vis-sms::before {
+        content: "\f1d8";
+        font-family: 'FontAwesome';
+        font-size: 1rem;
+        color: rgba(var(--v-c-primary), 1);
+        cursor: pointer;
     }

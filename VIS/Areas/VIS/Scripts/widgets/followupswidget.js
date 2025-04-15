@@ -41,6 +41,65 @@
             setBusy(false);
         };
 
+        // Scrolls the textarea so that the caret (cursor) stays in view
+        function scrollTextareaToCaret(textarea) {
+            // Make sure textarea exists and selection is available
+            if (!textarea || textarea.selectionStart == null) return;
+
+            // Get the text up to the caret position
+            const preText = textarea.value.substring(0, textarea.selectionStart);
+
+            // Create a hidden "mirror" div to mimic the textarea's content and style
+            const div = document.createElement('div');
+            const span = document.createElement('span'); // Will act as caret marker
+            const computed = window.getComputedStyle(textarea); // Get computed styles
+
+            // List of essential styles to copy for accurate rendering
+            const props = [
+                'font', 'fontSize', 'fontFamily', 'lineHeight',
+                'padding', 'border', 'boxSizing',
+                'whiteSpace', 'letterSpacing', 'wordBreak', 'overflowWrap',
+                'textAlign', 'direction'
+            ];
+
+            // Copy selected styles from textarea to mirror div
+            props.forEach(prop => {
+                div.style[prop] = computed.getPropertyValue(prop);
+            });
+
+            // Set mirror div positioning and layout
+            Object.assign(div.style, {
+                position: 'absolute',      // Take out of normal flow
+                top: '0',                  // Place at top left of body
+                left: '0',
+                visibility: 'hidden',     // Don't show on screen
+                whiteSpace: 'pre-wrap',   // Match textarea's line wrapping
+                wordWrap: 'break-word',
+                width: textarea.offsetWidth + 'px', // Same width as textarea
+                height: 'auto',
+                overflow: 'auto'
+            });
+
+            // Fill mirror div with text up to caret
+            div.textContent = preText;
+
+            // Add invisible span to mark the caret position
+            span.textContent = '\u200b'; // Zero-width space
+            div.appendChild(span);
+
+            // Add mirror div to document for layout calculation
+            document.body.appendChild(div);
+
+            // Get vertical position of the caret marker
+            const caretTop = span.offsetTop;
+
+            // Adjust textarea's scroll so caret is roughly centered vertically
+            textarea.scrollTop = caretTop - textarea.clientHeight / 2;
+
+            // Clean up: remove the mirror div from the DOM
+            document.body.removeChild(div);
+        }
+
         /* Function used to open the FollowUp Modal */
         function createFollowUpsModal() {
             // Start building the dynamic HTML
@@ -48,7 +107,7 @@
 
             // App FollowUps Heading
             var heading = $('<div class="row align-items-center vis-followUpsHeader" style="margin: 0px;padding-right: 0;">')
-                .append('<h2 style="margin-right: 5px;margin-bottom: 0px;font-size: 1.125rem;display:inline-flex;"><span class="mr-2"><i class="fa fa-rss" aria-hidden="true"></i></span> FollowUps - <strong id="follupsCount" class="vis-followupsCount">0</strong></h2>')
+                .append('<h2 style="margin-right: 5px;margin-bottom: 0px;letter-spacing: -0.4px;font-size: 1.1em;display:inline-flex;"><span class="mr-2"><i class="fa fa-rss" aria-hidden="true"></i></span> FollowUps - <strong id="follupsCount" class="vis-followupsCount">0</strong></h2>')
                 .append('<a id="hlnkFllupsRef" style="border: none;" href="javascript:void(0)" title="' + VIS.Msg.getMsg('Refresh') + '" class="vis-w-feedicon"><i class="vis vis-refresh"></i></a>');
 
             fllupsScreen.append(heading);
@@ -137,6 +196,7 @@
 
                         $('#w2ui-lock').on('click', function () {
                             $('body').find('#followupsCloseBtn' + widgetID).trigger('click');
+                            $(document).off('input', '.vis-followups-list .vis-feedContainer textarea');
                             w2popup.close();
                         });
                         $('#w2ui-lock').on('contextmenu', function (event) {
@@ -146,6 +206,7 @@
                         // Detect the Esc key press
                         $(document).on('keydown', function (e) {
                             if (e.key === 'Escape') {
+                                $(document).off('input', '.vis-followups-list .vis-feedContainer textarea');
                                 w2popup.close();
                                 $('body').find('#followupsCloseBtn' + widgetID).remove();
                             }
@@ -253,6 +314,10 @@
                         SaveFllCmnt(cmntTxt, FllupsData, arr, subscriberID);
                         $(FllCmntTxt).val("");
                         $(FllCmntTxt).css('height', 'auto');
+                        $(FllCmntTxt).parent('.vis-feedMessage').css('flex-direction', '');
+                    }
+                    else {
+                        VIS.ADialog.info("EnterData");
                     }
                 }
                 //else if (datafll == "UID") {
@@ -261,20 +326,6 @@
                 //    var contactInfo = new VIS.ContactInfo(UID, windoNo);
                 //    contactInfo.show();
                 //}
-            });
-
-            // Attach the 'input' event listener to the textarea only once
-            $(document).on('input', '.vis-followups-list .vis-feedContainer textarea', function () {
-                // Adjust height based on content
-                var textareaValue = $(this).val().trim();
-                if (textareaValue !== "") {
-                    this.style.height = Math.min(this.scrollHeight, 150) + 'px';
-                    this.style.overflowY = this.scrollHeight > 150 ? 'auto' : 'hidden';
-                }
-                else {
-                    this.style.height = '';
-                    this.style.overflowY = '';
-                }
             });
 
             FllUpsMain.off('keydown');
@@ -289,30 +340,45 @@
                     FllCmntTxt = $("#" + evnt.target.id);
                     var cmntTxt = $(FllCmntTxt).val();
                     var subscriberID = evnt.target.parentNode.getAttribute('subscriberid');
-                    if (cmntTxt !== "" && cmntTxt !== null) {
-                        var code = evnt.charCode || evnt.keyCode;
-                        if (code === 13) {
-                            evnt.preventDefault(); // Prevent default Enter action
-                            //  BindFllCmnt(uname, uimage, Cdate, cmntTxt, FllupsData);
-                            if (evnt.altKey) {
-                                var textarea = $(evnt.target)[0];
-                                var cursorPos = textarea.selectionStart; // Get the current cursor position
-                                var value = textarea.value; // Get the current value of the textarea
 
-                                // Insert a newline at the cursor position and update the textarea value
-                                textarea.value = value.substring(0, cursorPos) + "\r\n" + value.substring(cursorPos);
+                    var code = evnt.charCode || evnt.keyCode;
+                    // Display the error message when there is no data in textarea
+                    if (code === 13 && cmntTxt.trim() == "" && !evnt.altKey) {
+                        evnt.preventDefault();
+                        VIS.ADialog.info("EnterData");
+                    }
+                    // Check whether the enter key is pressed
+                    if (code === 13) {
+                        evnt.preventDefault();
+                        //  BindFllCmnt(uname, uimage, Cdate, cmntTxt, FllupsData);
+                        if (evnt.altKey) {
+                            var textarea = $(evnt.target)[0];
+                            var cursorPos = textarea.selectionStart; // Get the current cursor position
+                            var value = textarea.value; // Get the current value of the textarea
 
-                                // Move the cursor to the position after the new line
-                                textarea.setSelectionRange(cursorPos + 2, cursorPos + 2);
-                            }
-                            else {
-                                var cmntTxt = $(FllCmntTxt).val(); // Get the current value of the textarea
-                                // Check if there is text in the textarea before calling SaveFllCmnt
-                                if (cmntTxt.trim() !== "") { // Use trim() to ignore leading/trailing spaces
-                                    SaveFllCmnt(cmntTxt, FllupsData, arr, subscriberID);
-                                    $(FllCmntTxt).val(""); // Clear the textarea after saving the comment
-                                    $(FllCmntTxt).css('height', 'auto');
-                                }
+                            // Insert a newline at the cursor position and update the textarea value
+                            textarea.value = value.substring(0, cursorPos) + "\r\n" + value.substring(cursorPos);
+
+                            // Move the cursor to the position after the new line
+                            textarea.setSelectionRange(cursorPos + 2, cursorPos + 2);
+
+                            var newHeight = Math.min(textarea.scrollHeight, 150);
+                            $(textarea).css('height', newHeight + 'px');
+                            $(textarea).css('overflowY', textarea.scrollHeight > 150 ? 'auto' : '');
+
+                            // Ensure caret is visible (even when textarea is scrollable)
+                            scrollTextareaToCaret(textarea);
+
+                            $(FllCmntTxt).parent('.vis-feedMessage').css('flex-direction', 'column');
+                        }
+                        else {
+                            var cmntTxt = $(FllCmntTxt).val(); // Get the current value of the textarea
+                            // Check if there is text in the textarea before calling SaveFllCmnt
+                            if (cmntTxt.trim() !== "" && cmntTxt !== null) { 
+                                SaveFllCmnt(cmntTxt, FllupsData, arr, subscriberID);
+                                $(FllCmntTxt).val(""); 
+                                $(FllCmntTxt).css('height', 'auto');
+                                $(FllCmntTxt).parent('.vis-feedMessage').css('flex-direction', '');
                             }
                         }
                     }
@@ -433,12 +499,31 @@
 
                                     + "<div subscriberId = " + data.lstFollowups[cnt].SubscriberID + " id=" + data.lstFollowups[cnt].ChatID + " class='vis-feedMessage'>"
                                     + " <textarea class='w-100 vis-txtFllCmnt' id='txtFllCmnt" + data.lstFollowups[cnt].ChatID + "' data-fll='txtcmntfll' placeholder='" + VIS.Msg.getMsg('TypeMessage') + "' rows='1' /></textarea>"
-                                    + " <span  id='btnFllCmnt" + data.lstFollowups[cnt].ChatID + "' data-fll='btncmntfll' title='" + VIS.Msg.getMsg('PostMessage') + "'  class='vis vis-sms' ></span>"
+                                    + " <div  id='btnFllCmnt" + data.lstFollowups[cnt].ChatID + "' data-fll='btncmntfll' title='" + VIS.Msg.getMsg('PostMessage') + "'  class='vis vis-sms' ></div>"
+
                                     + " <div class='clearfix'></div> "
                                     + "</div></div> ";
                                 cnt++;
                             }
                             FllUpsMain.append(str);
+                            // Attach the 'input' event listener to the textarea only once
+                            var textAreaHeight = FllUpsMain.find('textarea').outerHeight();
+                            $(document).off('input', '.vis-followups-list .vis-feedContainer textarea');
+                            $(document).on('input', '.vis-followups-list .vis-feedContainer textarea', function () {
+                                // Adjust height based on content
+                                var textareaValue = $(this).val().trim();
+                                if (textareaValue !== "") {
+                                    this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+                                    this.style.overflowY = this.scrollHeight > 150 ? 'auto' : '';
+                                    this.parentNode.style.flexDirection = 'column';
+                                }
+                                else {
+                                    this.style.height = '';
+                                    this.style.overflowY = '';
+                                    this.parentNode.style.flexDirection = '';
+                                }
+                                this.parentNode.style.flexDirection = this.scrollHeight > textAreaHeight ? 'column' : 'row';
+                            });
                         }
                         else {
                             if (isFllScroll == false) {
@@ -533,6 +618,7 @@
 
             //Save follups Comment in DB
             function SaveFllCmnt(cmntTxt, FllupsData, arr, subscriberID) {
+                $FllMainLoder.show();
                 var url = VIS.Application.contextUrl + 'Home/PostFllupsCmnt/';
                 $.ajax({
                     url: url,
@@ -566,7 +652,7 @@
                             + "</p>"
                             + "<p class='vis-feedDateTime'>" + cdate + "</p></div>";
                         FllupsData.append(str);
-
+                        $FllMainLoder.hide();
                     },
                     error: function () {
                         console.log("Error");
