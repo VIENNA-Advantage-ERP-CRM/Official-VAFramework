@@ -113,7 +113,7 @@
             });
             $txtSearch.on("keydown", function (e) {
                 if (e.keyCode == 13) {
-                    showBusy(true);
+                    //showBusy(true);
                     searchFunction();
                 }
             });
@@ -813,7 +813,7 @@
                 else {
                     var id = $(aOk).data("id");
                     approveIt(id, aOk);
-                    //showBusy(false);
+                    showBusy(false);
                 }
             };
             //Given Approve
@@ -864,6 +864,7 @@
                                 });
                             break;
                         }
+                        showBusy(false);
                     }
                     catch (e) {
                         showBusy(false);
@@ -1016,9 +1017,9 @@
 
 
                                     var divLeft = $("<div class='vis-left-part'>");
-                                    if (info.Node[node].History[hNode].TextMsg.length > 0) {                                      
+                                    if (info.Node[node].History[hNode].TextMsg.length > 0) {
                                         var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg) + "'></i>");
-                                        //var span = $("<span>");
+                                          //var span = $("<span>");
                                         //span.append($("<img class='VIS_Pref_callout'>").attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/ccc.png").append("ToolTip Text"));
                                         //span.append($("<label class='VIS_Pref_Label_Font'>").append(VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg)));
                                         //btnDetail.append(span);
@@ -1030,24 +1031,21 @@
                                     divRight.append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(info.Node[node].History[hNode].ApprovedBy));
                                     divAppBy.append(divRight);
                                     divHistoryNode.append(divAppBy);
-
-                                }
-                                else if ((node < (info.Node.length - 1)) || info.Node.length == 1) {
+                                } else if (info.Node[node].History[hNode].State == 'BK') {
+                                    continue;
+                                } else if ((node < (info.Node.length - 1)) || info.Node.length == 1) {
                                     var divAppBy = $("<div class='vis-pending_wrap' >");
                                     divAppBy.append($("<div class='vis-left-part'>").append(info.Node[node].Name));
                                     divAppBy.append($("<div class='vis-right-part'>").append(VIS.Msg.getMsg('Pending')));
                                     divHistoryNode.append(divAppBy);
-                                    //divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='/ViennaAdvantageWeb/Areas/VIS/Images/home/4.jpg'>")));
-                                }
-                                else {
+                                     //divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='/ViennaAdvantageWeb/Areas/VIS/Images/home/4.jpg'>")));
+                                } else {
                                     divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='" + VIS.Application.contextUrl + "Areas/VIS/Images/home/4.jpg'>")));
                                     var divStart = $("<div class='vis-start_wrap vis-workflow-startCls'>");
-
-
                                     var divLeft = $("<div class='vis-left-part'>");
                                     if (info.Node[node].History[hNode].TextMsg.length > 0) {
                                         var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg) + "'></i>");
-                                        //var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip' style='margin-right:5px'>").append($("<img class='VIS_Pref_img-i'>").attr("src", VIS.Application.contextUrl + "Areas/VIS/Images/i.png"));
+                                         //var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip' style='margin-right:5px'>").append($("<img class='VIS_Pref_img-i'>").attr("src", VIS.Application.contextUrl + "Areas/VIS/Images/i.png"));
                                         //var span = $("<span >");
                                         //span.append($("<img class='VIS_Pref_callout'>").attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/ccc.png").append("ToolTip Text"));
                                         //span.append($("<label class='VIS_Pref_Label_Font'>").append(VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg)))
@@ -1056,20 +1054,17 @@
                                         divLeft.append(btnDetail);
                                     }
                                     divLeft.append(info.Node[node].Name);
-
                                     divStart.append(divLeft);
                                     var divRight = $("<div class='vis-right-part'>");
                                     divRight.append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(info.Node[node].History[hNode].ApprovedBy));
                                     //divRight.append(btnDetail);
                                     divStart.append(divRight);
-                                    // divStart.append($("<div class='vis-right-part'>").append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(info.Node[node].History[hNode].ApprovedBy)));
+                                     // divStart.append($("<div class='vis-right-part'>").append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(info.Node[node].History[hNode].ApprovedBy)));
                                     divHistoryNode.append(divStart);
                                 }
                             }
                             divHistory.append(divHistoryNode);
                         }
-
-
                     }
                 }
             }
@@ -1209,6 +1204,7 @@
                 $row.css('display', 'block');
             });
             $workflowWidgetDtls_ID.scrollTop(0);
+            showBusy(false);
         };
 
         var ansBtnClick = function (index, AD_Window_ID, columnName) {
