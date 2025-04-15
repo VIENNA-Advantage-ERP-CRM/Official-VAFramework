@@ -775,8 +775,7 @@ namespace VIS.Models
                              p.Name AS ProjectName,p.VAAPI_Project_ID FROM VAAPI_SessionToken s
                              INNER JOIN VAAPI_Project p ON (s.VAAPI_Project_ID = p.VAAPI_Project_ID)
                              INNER JOIN AD_User u ON (u.AD_User_ID=s.CreatedBy)";
-            //DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(query, "s", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO) + " ORDER BY VAAPI_SessionToken_ID");
-            DataSet ds = DB.ExecuteDataset(query + " ORDER BY VAAPI_SessionToken_ID");
+            DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(query, "s", true, true) + " ORDER BY VAAPI_SessionToken_ID");
 
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
