@@ -71,55 +71,55 @@ namespace VAdvantage.WF
         /// </summary>
         /// <param name="wf">workflow</param>
         /// <param name="pi">Process Info (Record_ID)</param>
-        public MWFProcess (MWorkflow wf, ProcessInfo pi)
+        public MWFProcess(MWorkflow wf, ProcessInfo pi)
             : base(wf.GetCtx(), 0, wf.Get_TrxName())
-	    {
+        {
 
             if (!Utility.TimeUtil.IsValid(wf.GetValidFrom(), wf.GetValidTo())) // make this class or this function
             {
-			    //throw new IllegalStateException("Workflow not valid");
+                //throw new IllegalStateException("Workflow not valid");
                 throw new Exception("Workflow not valid");
             }
-		    _wf = wf;
-		    _pi = pi;
+            _wf = wf;
+            _pi = pi;
             SetAD_Client_ID(wf.GetAD_Client_ID());
-		    SetAD_Workflow_ID (wf.GetAD_Workflow_ID());
-		    SetPriority(wf.GetPriority());
-		    base.SetWFState (WFSTATE_NotStarted);
-    		
+            SetAD_Workflow_ID(wf.GetAD_Workflow_ID());
+            SetPriority(wf.GetPriority());
+            base.SetWFState(WFSTATE_NotStarted);
+
             // vinay bhatt for window id
             SetAD_Window_ID(pi.GetAD_Window_ID());
             //
 
-		    //	Document
-		    SetAD_Table_ID(wf.GetAD_Table_ID());
-		    SetRecord_ID(pi.GetRecord_ID());
-		    if (GetPO() == null)
-		    {
-			    SetTextMsg("No PO with ID=" + pi.GetRecord_ID());
-			    base.SetWFState (WFSTATE_Terminated);
-		    }
+            //	Document
+            SetAD_Table_ID(wf.GetAD_Table_ID());
+            SetRecord_ID(pi.GetRecord_ID());
+            if (GetPO() == null)
+            {
+                SetTextMsg("No PO with ID=" + pi.GetRecord_ID());
+                base.SetWFState(WFSTATE_Terminated);
+            }
             else
                 SetTextMsg(GetPO());
-		    //	Responsible/User
+            //	Responsible/User
             if (wf.GetAD_WF_Responsible_ID() == 0)
                 SetAD_WF_Responsible_ID();
             else
                 SetAD_WF_Responsible_ID(wf.GetAD_WF_Responsible_ID());
-            SetUser_ID((int)pi.GetAD_User_ID());		//	user starting
-		    //
-		    _state = new StateEngine (GetWFState());
+            SetUser_ID((int)pi.GetAD_User_ID());        //	user starting
+                                                        //
+            _state = new StateEngine(GetWFState());
             _state.SetCtx(GetCtx());
-		    SetProcessed (false);
-		    //	Lock Entity
-		    GetPO();
+            SetProcessed(false);
+            //	Lock Entity
+            GetPO();
             if (_po != null)
             {
                 // Set transaction organization on workflow process
                 SetAD_Org_ID(_po.GetAD_Org_ID());
                 _po.Lock();
             }
-	    }
+        }
 
         /// <summary>
         /// Get active Activities of Process
@@ -180,7 +180,7 @@ namespace VAdvantage.WF
         /// Set Process State and update Actions
         /// </summary>
         /// <param name="WFState">WFState</param>
-        public new void   SetWFState(String WFState)
+        public new void SetWFState(String WFState)
         {
             if (_state == null)
             {
@@ -297,10 +297,13 @@ namespace VAdvantage.WF
                 {
                     _po.Unlock(Get_TrxName());
                     // VIS0008 Changes done to execute next workflow in case if executed manually from the record
-                    int nextWF_ID = GetNextManualWFID(GetAD_Table_ID(), GetRecord_ID(), GetAD_Workflow_ID());
-                    if (nextWF_ID > 0)
+                    if (IsManualWorkflow(_po.GetAD_Client_ID(), GetAD_Workflow_ID(), GetAD_Table_ID()))
                     {
-                        WFCommon.StartWFExecution(GetCtx(), nextWF_ID, GetAD_Table_ID(), GetRecord_ID(), GetAD_Window_ID());
+                        int nextWF_ID = GetNextManualWFID(GetAD_Table_ID(), GetRecord_ID(), GetAD_Workflow_ID());
+                        if (nextWF_ID > 0)
+                        {
+                            WFCommon.StartWFExecution(GetCtx(), nextWF_ID, GetAD_Table_ID(), GetRecord_ID(), GetAD_Window_ID());
+                        }
                     }
                 }
             }
@@ -308,6 +311,21 @@ namespace VAdvantage.WF
                 SetWFState(WFSTATE_Suspended);
             else if (running)
                 SetWFState(WFSTATE_Running);
+        }
+
+        /// <summary>
+        /// Check if the workflow passed in the parameter is to be executed manually from tab panel
+        /// </summary>
+        /// <param name="AD_Client_ID"></param>
+        /// <param name="AD_Workflow_ID"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <returns>True/False</returns>
+        private bool IsManualWorkflow(int AD_Client_ID, int AD_Workflow_ID, int AD_Table_ID)
+        {
+            return Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(AD_Workflow_ID) FROM AD_Workflow WHERE WorkflowType = 'P' AND IsActive = 'Y' AND AD_Workflow_ID = " + AD_Workflow_ID + @"
+            AND AD_Workflow_ID NOT IN (SELECT COALESCE(AD_Workflow_ID,0) FROM AD_Process WHERE AD_Process_ID IN
+            (SELECT AD_Process_ID FROM AD_Column WHERE AD_Table_ID = " + AD_Table_ID + @"))
+            AND AD_Client_ID IN (0," + AD_Client_ID + @") AND AD_Table_ID = " + AD_Table_ID)) > 0;
         }
 
         /// <summary>
@@ -356,7 +374,7 @@ namespace VAdvantage.WF
                 //thred.CurrentCulture = Utility.Env.GetLanguage(Utility.Env.GetContext()).GetCulture(Utility.Env.GetLoginLanguage(Utility.Env.GetContext()).GetAD_Language());
                 //thred.CurrentUICulture = Utility.Env.GetLanguage(Utility.Env.GetContext()).GetCulture(Utility.Env.GetLoginLanguage(Utility.Env.GetContext()).GetAD_Language());
                 activity.Run();
-               // thred.Start();
+                // thred.Start();
 
                 //	only the first valid if XOR
                 if (MWFNode.SPLITELEMENT_XOR.Equals(split))
@@ -387,45 +405,45 @@ namespace VAdvantage.WF
         /// - (4) Process invoker
         /// </summary>
         /// <param name="User_ID">process invoker</param>
-        private void SetUser_ID (int User_ID)
-	    {
-		    //	Responsible
-		    MWFResponsible resp = MWFResponsible.Get(GetCtx(), GetAD_WF_Responsible_ID());
-		    //	(1) User - Directly responsible
-		    int AD_User_ID = resp.GetAD_User_ID();
-    		
-		    //	Invoker - get Sales Rep or last updater of Document
-		    if (AD_User_ID == 0 && resp.IsInvoker())
-		    {
-			    GetPO();
-			    //	(2) Doc Owner
-			    //if (_po != null && _po instanceof DocAction)
+        private void SetUser_ID(int User_ID)
+        {
+            //	Responsible
+            MWFResponsible resp = MWFResponsible.Get(GetCtx(), GetAD_WF_Responsible_ID());
+            //	(1) User - Directly responsible
+            int AD_User_ID = resp.GetAD_User_ID();
+
+            //	Invoker - get Sales Rep or last updater of Document
+            if (AD_User_ID == 0 && resp.IsInvoker())
+            {
+                GetPO();
+                //	(2) Doc Owner
+                //if (_po != null && _po instanceof DocAction)
                 if (_po != null && (_po.GetType() == typeof(DocAction) || _po.GetType().GetInterface("DocAction") == typeof(DocAction)))
-			    {
-				    DocAction da = (DocAction)_po;
-				    AD_User_ID = da.GetDoc_User_ID();
-			    }
-			    //	(2) Sales Rep
-			    if (AD_User_ID == 0 && _po != null && _po.Get_ColumnIndex("SalesRep_ID") != -1)
-			    {
-				    Object sr = _po.Get_Value("SalesRep_ID");
-				    if (sr != null && sr.GetType() == typeof(int))
-					    AD_User_ID = int.Parse(sr.ToString());
-			    }
-			    //	(3) UpdatedBy
-			    if (AD_User_ID == 0 && _po != null)
-				    AD_User_ID = _po.GetUpdatedBy();
-		    }
-    		
-		    //	(4) Process Owner
-		    if (AD_User_ID == 0 )
-			    AD_User_ID = User_ID;
-		    //	Fallback 
-		    if (AD_User_ID == 0)
-			    AD_User_ID = GetCtx().GetAD_User_ID();
-		    //
-		    SetAD_User_ID(AD_User_ID);
-	    }
+                {
+                    DocAction da = (DocAction)_po;
+                    AD_User_ID = da.GetDoc_User_ID();
+                }
+                //	(2) Sales Rep
+                if (AD_User_ID == 0 && _po != null && _po.Get_ColumnIndex("SalesRep_ID") != -1)
+                {
+                    Object sr = _po.Get_Value("SalesRep_ID");
+                    if (sr != null && sr.GetType() == typeof(int))
+                        AD_User_ID = int.Parse(sr.ToString());
+                }
+                //	(3) UpdatedBy
+                if (AD_User_ID == 0 && _po != null)
+                    AD_User_ID = _po.GetUpdatedBy();
+            }
+
+            //	(4) Process Owner
+            if (AD_User_ID == 0)
+                AD_User_ID = User_ID;
+            //	Fallback 
+            if (AD_User_ID == 0)
+                AD_User_ID = GetCtx().GetAD_User_ID();
+            //
+            SetAD_User_ID(AD_User_ID);
+        }
 
         /// <summary>
         /// Get Workflow
@@ -528,11 +546,11 @@ namespace VAdvantage.WF
         /// Set Text Msg (add to existing)
         /// </summary>
         /// <param name="po">po base object</param>
-        public void SetTextMsg (PO po)
-	    {
+        public void SetTextMsg(PO po)
+        {
             if (po != null && (po.GetType() == typeof(DocAction) || po.GetType().GetInterface("DocAction") == typeof(DocAction)))
-			    SetTextMsg(((DocAction)po).GetSummary());
-	    }
+                SetTextMsg(((DocAction)po).GetSummary());
+        }
 
         /// <summary>
         /// Set Text Msg (add to existing)

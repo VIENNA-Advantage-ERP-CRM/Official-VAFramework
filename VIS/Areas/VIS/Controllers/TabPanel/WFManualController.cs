@@ -32,7 +32,8 @@ namespace VIS.Controllers
             bool _processing = obj.IsWFInExecution(ctx, AD_Table_ID, Record_ID);
             WFInfo _wfInfo = obj.GetAppActivities(ctx, AD_Window_ID, Record_ID);
             int wfCompID = obj.GetWFComposerPageID(ctx);
-            return Json(JsonConvert.SerializeObject(new { wfDetails = _wfDet, processing = _processing, wfActInfo = _wfActInfo, wfAppInfo = _wfInfo, composerID = wfCompID }), JsonRequestBehavior.AllowGet);
+            List<WFDetails> manualAttach = obj.GetManuallyAttachedWFDetails(ctx, AD_Window_ID, Record_ID, AD_Table_ID);
+            return Json(JsonConvert.SerializeObject(new { wfDetails = _wfDet, processing = _processing, wfActInfo = _wfActInfo, wfAppInfo = _wfInfo, composerID = wfCompID, manualWF = manualAttach }), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -62,7 +63,25 @@ namespace VIS.Controllers
             bool _processing = obj.IsWFInExecution(ctx, AD_Table_ID, Record_ID);
             WFInfo _wfInfo = obj.GetAppActivities(ctx, AD_Window_ID, Record_ID);
             int wfCompID = obj.GetWFComposerPageID(ctx);
-            return Json(JsonConvert.SerializeObject(new { wfDetails = _wfDet, processing = _processing, wfActInfo = _wfActInfo, wfAppInfo = _wfInfo, composerID = wfCompID, abortMsg = msg }), JsonRequestBehavior.AllowGet);
+            List<WFDetails> manualAttach = obj.GetManuallyAttachedWFDetails(ctx, AD_Window_ID, Record_ID, AD_Table_ID);
+            return Json(JsonConvert.SerializeObject(new { wfDetails = _wfDet, processing = _processing, wfActInfo = _wfActInfo, wfAppInfo = _wfInfo, composerID = wfCompID, manualWF = manualAttach, abortMsg = msg }), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult setNodeTime(int activityId)
+        {
+            try
+            {
+                WFManualModel obj = new WFManualModel();
+                Ctx ctx = Session["ctx"] as Ctx;
+
+                bool result = obj.SetNodeTime(ctx, activityId);
+
+                return Json(new { success = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

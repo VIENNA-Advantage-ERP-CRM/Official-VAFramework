@@ -24,6 +24,20 @@
         var _ad_window_id = 0;
         var _arrowEle = null;
         var _wfCompPageID = 0;
+        var _activeWFSec = null;
+        var _seqactiveWFSec = null;
+        var _activeStatusWFSec = null;
+        var _inactiveWFSec = null;
+        var _historyWFSec = null;
+        var _activeWFBadge = null;
+        var _inactiveWFBadge = null;
+        var _historyWFBadge = null;
+        var _ulList = null;
+        var _liActive = null;
+        var _liHistory = null;
+        var _liInActive = null;
+        var _btnClose = null;
+
 
         /**
          * init function to initialize design
@@ -34,64 +48,167 @@
             setBusy(true);
             _ad_table_id = this.curTab.getAD_Table_ID();
             _ad_window_id = this.curTab.getAD_Window_ID();
+
             _arrowEle = $('<div class="vis-wfm-arrowEle"><i class="fa fa-long-arrow-down"></i></div>');
 
-            // No records section
-            wfNoRecDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfNoRec p-3" style="display:none;">' + VIS.Msg.getMsg('NoRecords') + '</div>');
-            $root.append(wfNoRecDiv);
+            //// No records section
+            //wfNoRecDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfNoRec p-3" style="display:none;">' + VIS.Msg.getMsg('NoRecords') + '</div>');
+            //$root.append(wfNoRecDiv);
 
-            // Activity status section
-            wfActStatusDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfActStatus p-3" style="display:none; height: 100% !important; text-align: right;"></div>');
-            $root.append(wfActStatusDiv);
+            //// Activity status section
+            //wfActStatusDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfActStatus p-3" style="display:none; height: 100% !important; text-align: right;"></div>');
+            //$root.append(wfActStatusDiv);
 
-            // Selection workflow section
-            wfSelectionDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfSelction p-3" style="display:none;"></div>');
-            $root.append(wfSelectionDiv);
+            //// Selection workflow section
+            //wfSelectionDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfSelction p-3" style="display:none;"></div>');
+            //$root.append(wfSelectionDiv);
 
-            // Sequence workflow section
-            wfSequenceDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfSequence p-3" style="display:none;"></div>');
-            $root.append(wfSequenceDiv);
+            //// Sequence workflow section
+            //wfSequenceDiv = $('<div class="vis-wfm-mainCont vis-wfm-wfSequence p-3" style="display:none;"></div>');
+            //$root.append(wfSequenceDiv);
 
-            // Bottom buttons section
-            bottomDiv = $('<div class="vis-wfm-bottomCont" style="display:none;">'
+            //// Bottom buttons section
+            //bottomDiv = $('<div class="vis-wfm-bottomCont" style="display:none;">'
+            //    + '<div class="vis-tp-btnWrap float-right" style="margin-right: 10px; display: flex;">'
+            //    + '<a class="next btn" style="display: none;">' + VIS.Msg.getMsg('VIS_Next') + '<i class="fa fa-chevron-right" aria-hidden="true"></i></a>'
+            //    + '<a href="#" class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') + '</a>'
+            //    + '<a href="#" class="vis-wfm-btnBack btn" style="display:none;">' + VIS.Msg.getMsg('Back') + '</a>'
+            //    + '<a href="#" data-wfprocessid="0" class="vis-wfm-btnShowHistory btn" style="display:none; margin-right: 10px;">' + VIS.Msg.getMsg('ShowHistory') + '</a>'
+            //    + '<a href="#" data-wfprocessid="0" class="vis-wfm-btnAbort btn" style="display:none;">' + VIS.Msg.getMsg('Abort') + '</a>'
+            //    + '<a href="#" class="vis-wfm-btnAttExe btn" style="display:none; margin-left: 10px;">' + VIS.Msg.getMsg('VIS_AttachExecute') + '</a>'
+            //    + '</div>'
+            //    + '</div>');
+            //$root.append(bottomDiv);
+            //_btnNext = bottomDiv.find(".vis-wfm-btnNext");
+            //_btnBack = bottomDiv.find(".vis-wfm-btnBack");
+            //_btnExecute = bottomDiv.find(".vis-wfm-btnAttExe");
+            //_btnAbort = bottomDiv.find(".vis-wfm-btnAbort");
+            //_btnHistory = bottomDiv.find(".vis-wfm-btnShowHistory");
+
+            //// enable drag drop event on sequence workflows section section
+            //wfSequenceDiv.sortable({
+            //    items: ".draggable-div",
+            //    cursor: "move",
+            //    placeholder: "ui-state-highlight",
+            //    opacity: 0.8,
+            //    update: function (event, ui) {
+            //        // reset arrows for sequence in sequence div
+            //        wfSequenceDiv.find(".vis-wfm-arrowEle").remove();
+            //        for (var i = 0; i < wfSequenceDiv.find(".vis-wfm-wfSingleCard").length; i++) {
+            //            if (i != (wfSequenceDiv.find(".vis-wfm-wfSingleCard").length - 1)) {
+            //                _arrowEle.clone().insertAfter($(wfSequenceDiv.find(".vis-wfm-wfSingleCard")[i]));
+            //            }
+            //        }
+            //        //// Optional: Code to run after rearrangement (e.g., save order)
+            //        //console.log("New order:", $(this).sortable("toArray"));
+            //    }
+            //});
+
+            //// call bind events function
+            //bindEvents();
+            ////getWFDetails(true);
+
+
+            var divele = $('<div class="vis-wfm-workflows-flyout" style="right: 0; top: 0; width:calc(100% - 10px); padding-bottom: 0rem; height: 100%;">'
+                + '<div class= "vis-wfm-flyout-header" style="display:none;">'
+                + '<h1>' + VIS.Msg.getMsg('Workflows') + '</h1> <a href=""><span class="vis vis-cross"></span></a>'
+                + '</div >'
+                + '<!-- Flyout Body -->'
+                + '<div class="vis-wfm-flyout-body">'
+                + '<!-- Workflow Tabs -->'
+                + '<div class="vis-wfm-workflows-tabs">'
+                + '<div class="vis-wfm-tablink-col">'
+                + '<ul class="nav nav-tabs vis-wfm-tabList" id="myTab" role="tablist">'
+                + '<li class="nav-item vis-wfm-liTabActive">'
+                + '<a class="nav-link active show" id="active-tab" data-toggle="tab" href="#active" role="tab" aria-controls="active" aria-selected="true"><i class="fa fa-check-circle" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('Active') + ' </span><span class="vis-wfm-badge vis-wfm-activeBadge">0</span> </a>'
+                + '</li>'
+                + '<li class="nav-item vis-wfm-liTabInActive" style="display:none;">'
+                + '<a class="nav-link" id="inactive-tab" data-toggle="tab" href="#inactive" role="tab" aria-controls="in-active" aria-selected="false"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('InActive') + ' </span><span class="vis-wfm-badge vis-wfm-inactiveBadge">0</span></a>'
+                + '</li>'
+                + '<li class="nav-item vis-wfm-liTabHistory">'
+                + '<a class="nav-link" id="history-tab" data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false"><i class="fa fa-history" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('History') + ' </span><span class="vis-wfm-badge vis-wfm-historyBadge">0</span></a>'
+                + '</li>'
+                + '</ul>'
+                + '<div class="vis-wfm-tab-action-link">'
+                + '<a href="#" class="vis-wfm-ClosePnl"><span class="vis vis-cross"></span></a>'
+                //+ '<a href="#"><i class="fa fa-trash-o" aria-hidden="true"></i> ' + VIS.Msg.getMsg('Delete') + '</a>'
+                //+ '<a href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i> ' + VIS.Msg.getMsg('AddWorkflow') + '</a>'
+                + '</div>'
+                + '</div>'
+                + '<!-- Tab Content -->'
+                + '<div class="tab-content" style="height: calc(100vh - 315px); overflow: auto;" id="myTabContent">'
+                + '<!-- New Workflow Section -->'
+                + '<div class="tab-pane fade active show" id="active" role="tabpanel" aria-labelledby="home-tab" style="width: calc(100% - 15px);">'
+                + '<div class="vis-wfm-workflowNewActive vis-wfm-workflow-list vis-wfm-activeWFSection">'
+
+                + '</div>'
+                + '<div class="vis-wfm-workflow-list vis-wfm-seqActiveWFSection" style="display:none">'
+
+                + '</div>'
+                + '<div class="vis-wfm-workflow-list vis-wfm-activeStatusWFSection" style="display:none">'
+
+                + '</div>'
+                + '<div class="vis-wfm-mainCont vis-wfm-wfNoRec p-3" style="display:none;">' + VIS.Msg.getMsg('NoRecords') + '</div>'
+                + '</div>'
+                + '<!-- End New Workflow Section -->'
+
+                + '<!-- InActive Section -->'
+                + '<div class="tab-pane fade" id="inactive" role="tabpanel" aria-labelledby="home-tab">'
+                + '<div class="vis-wfm-workflow-list vis-wfm-inactiveWFSection">'
+
+                + '</div>'
+                + '</div>'
+                + '<!-- End InActive Section -->'
+
+                + '<!-- History Section -->'
+                + '<div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="home-tab">'
+                + '<div class="vis-wfm-workflow-list vis-wfm-historyWFSection">'
+
+                + '</div>'
+                + '</div>'
+                + '<!-- End History Section -->'
+                + '</div>'
+                + '<!-- End Tab Content -->'
+                + '</div>'
+                + '<!-- End Workflow Tabs -->'
+                + '</div>'
+                + '<!-- End Flyout Body -->'
+
+                + '<div class="vis-wfm-bottomCont" style="display: block;">'
                 + '<div class="vis-tp-btnWrap float-right" style="margin-right: 10px; display: flex;">'
-                + '<a class="next btn" style="display: none;">' + VIS.Msg.getMsg('VIS_Next') + '<i class="fa fa-chevron-right" aria-hidden="true"></i></a>'
-                + '<a href="#" class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') + '</a>'
-                + '<a href="#" class="vis-wfm-btnBack btn" style="display:none;">' + VIS.Msg.getMsg('Back') + '</a>'
-                + '<a href="#" data-wfprocessid="0" class="vis-wfm-btnShowHistory btn" style="display:none; margin-right: 10px;">' + VIS.Msg.getMsg('ShowHistory') + '</a>'
-                + '<a href="#" data-wfprocessid="0" class="vis-wfm-btnAbort btn" style="display:none;">' + VIS.Msg.getMsg('Abort') + '</a>'
-                + '<a href="#" class="vis-wfm-btnAttExe btn" style="display:none; margin-left: 10px;">' + VIS.Msg.getMsg('VIS_AttachExecute') + '</a>'
+                + '<a href="#" class="fa fa-arrow-circle-right vis-wfm-btnNext btn" style="display: block;"></a>'
+                + '<a href="#" class="fa fa-arrow-circle-left vis-wfm-btnBack btn" style="display: none; margin-right: 10px;"></a>'
+                + '<a href="#" class="fa fa-play-circle-o vis-wfm-btnAttExe btn" style="display: none;"></a>'
+                + '<a href="#" class="fa fa-stop-circle-o vis-wfm-btnAbort btn" style="display: none;"></a>'
+                + '</div>'
                 + '</div>'
                 + '</div>');
-            $root.append(bottomDiv);
-            _btnNext = bottomDiv.find(".vis-wfm-btnNext");
-            _btnBack = bottomDiv.find(".vis-wfm-btnBack");
-            _btnExecute = bottomDiv.find(".vis-wfm-btnAttExe");
-            _btnAbort = bottomDiv.find(".vis-wfm-btnAbort");
-            _btnHistory = bottomDiv.find(".vis-wfm-btnShowHistory");
+            $root.append(divele);
 
-            // enable drag drop event on sequence workflows section section
-            wfSequenceDiv.sortable({
-                items: ".draggable-div",
-                cursor: "move",
-                placeholder: "ui-state-highlight",
-                opacity: 0.8,
-                update: function (event, ui) {
-                    // reset arrows for sequence in sequence div
-                    wfSequenceDiv.find(".vis-wfm-arrowEle").remove();
-                    for (var i = 0; i < wfSequenceDiv.find(".vis-wfm-wfSingleCard").length; i++) {
-                        if (i != (wfSequenceDiv.find(".vis-wfm-wfSingleCard").length - 1)) {
-                            _arrowEle.clone().insertAfter($(wfSequenceDiv.find(".vis-wfm-wfSingleCard")[i]));
-                        }
-                    }
-                    //// Optional: Code to run after rearrangement (e.g., save order)
-                    //console.log("New order:", $(this).sortable("toArray"));
-                }
-            });
+            _activeWFSec = divele.find(".vis-wfm-activeWFSection");
+            _seqactiveWFSec = divele.find(".vis-wfm-seqActiveWFSection");
+            _activeStatusWFSec = divele.find(".vis-wfm-activeStatusWFSection");
+            _inactiveWFSec = divele.find(".vis-wfm-inactiveWFSection");
+            _historyWFSec = divele.find(".vis-wfm-historyWFSection");
+            _ulList = divele.find(".vis-wfm-tabList");
+            _liActive = divele.find(".vis-wfm-liTabActive");
+            _liInActive = divele.find(".vis-wfm-liTabInActive");
+            _liHistory = divele.find(".vis-wfm-liTabHistory");
+            _btnClose = divele.find(".vis-wfm-ClosePnl");
 
-            // call bind events function
+            _btnNext = divele.find(".vis-wfm-btnNext");
+            _btnBack = divele.find(".vis-wfm-btnBack");
+            _btnExecute = divele.find(".vis-wfm-btnAttExe");
+            _btnAbort = divele.find(".vis-wfm-btnAbort");
+            bottomDiv = divele.find(".vis-wfm-bottomCont");
+            wfNoRecDiv = divele.find(".vis-wfm-wfNoRec");
+
+            _activeWFBadge = divele.find(".vis-wfm-activeBadge");
+            _inactiveWFBadge = divele.find(".vis-wfm-inactiveBadge");
+            _historyWFBadge = divele.find(".vis-wfm-historyBadge");
+
             bindEvents();
-            //getWFDetails(true);
+            setBusy(false);
         };
 
         /**
@@ -127,12 +244,74 @@
             if (_wfCompPageID <= 0) {
                 _wfCompPageID = resData.composerID;
             }
+
+            if (resData) {
+                if (resData.wfDetails)
+                    _activeWFBadge.text(resData.wfDetails.length);
+                if (resData.wfActInfo && resData.wfActInfo.actInfo)
+                    _historyWFBadge.text(resData.wfActInfo.actInfo.length);
+            }
+
+            _activeWFSec.empty();
+            _activeStatusWFSec.empty();
+            _historyWFSec.empty();
+            if (resData.processing) {
+                createHistoryPanel(resData.wfActInfo.actInfo, resData.wfAppInfo, resData.wfActInfo.wfActInf, resData.manualWF);
+                showPanel("A");
+                _btnAbort.show();
+                setBusy(false);
+            }
+            else {
+                if (resData.wfDetails && resData.wfDetails.length > 0) {
+                    for (var i = 0; i < resData.wfDetails.length; i++) {
+                        _activeWFSec.append('<div class="vis-wfm-workflow-item vis-wfm-workflowSelDiv" data-selection="n" data-workflowid="' + resData.wfDetails[i].AD_Workflow_ID + '">'
+                            + '<div class="vis-wfm-drag-items" style="display: none;"><span class="vis vis-drag-circle"></span></div>'
+                            + '<div class="vis-wfm-workflow-item-left vis-wfm-activeWFList">'
+                            + '<input class="vis-wfm-activeChkSelection" type="checkbox" style="margin: 10px; padding: 10px;">'
+                            + '<div class="vis-wfm-workflow-icon check" style="display: none;">'
+                            + '<i class="fa fa-check"></i>'
+                            + '</div>'
+                            + '<div class="vis-wfm-workflow-details">'
+                            + '<h5>' + resData.wfDetails[i].Name + '</h5>'
+                            + '<p>' + resData.wfDetails[i].Description + '</p>'
+                            + '</div>'
+                            + '</div>'
+                            + '<div class="vis-wfm-workflow-item-right" style="display: none;">'
+                            + '<div class="vis-wfm-workflow-step">'
+                            + '<div class="vis-wfm-step-icon">'
+                            + '<i class="fa fa-history" aria-hidden="true"></i>'
+                            + '</div>'
+                            + '<div class="vis-wfm-step-box">'
+                            + '<h6>Scheduled Email</h6>'
+                            + '<p>On 27-Jan-2025 8:03 am</p>'
+                            + '</div>'
+                            + '</div>'
+                            + '<div class="vis-wfm-toggle-switch" style="display:none;">'
+                            + '<input type="checkbox" id="toggle1" checked="">'
+                            + '<span class="vis-wfm-toggle-slider"></span>'
+                            + '</div>'
+                            + '<div class="vis-wfm-menu-dots">'
+                            + '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>'
+                            + '</div>'
+                            + '</div>'
+                            + '</div>');
+                    }
+                    createHistoryPanel(resData.wfActInfo.actInfo, resData.wfAppInfo, resData.wfActInfo.wfActInf, resData.manualWF);
+                    showPanel("S");
+                }
+                else {
+                    showPanel("N");
+                }
+            }
+            setBusy(false);
+            return;
+
             // clear workflow selection div
             wfSelectionDiv.empty();
             // check if workflow is in processing (e.g. in approval) then display workflow history tree
             if (resData.processing) {
                 showPanel("A");
-                createHistoryPanel(resData.wfActInfo.actInfo, resData.wfAppInfo, resData.wfActInfo.wfActInf);
+                createHistoryPanel(resData.wfActInfo.actInfo, resData.wfAppInfo, resData.wfActInfo.wfActInf, resData.manualWF);
                 setBusy(false);
             }
             // else show linked document process type of workflows with this table
@@ -202,13 +381,14 @@
          * @param {object} wfActInfo - workflow activity details returned in response
          * @param {object} wfAppInfo - workflow approval details returned in response based on which design will be created
          */
-        function createHistoryPanel(wfActInfo, wfAppInfo, activeActInfo) {
-            wfActStatusDiv.empty();
+        function createHistoryPanel(wfActInfo, wfAppInfo, activeActInfo, manualWF) {
+            _activeStatusWFSec.empty();
+            _historyWFSec.empty();
 
             var approvalContainer = $('<div class="vis-wfm-ApprovalCont"></div>');
             // display approval requests for the login user here
-            if (wfAppInfo) {
-                wfActStatusDiv.append(approvalContainer);
+            if (1 == 2 && wfAppInfo) {
+                _activeStatusWFSec.append(approvalContainer);
                 var detailCtrl = {};
                 detailCtrl.Index = 0;
                 lstDetailCtrls = [];
@@ -459,35 +639,230 @@
                 lstDetailCtrls.push(detailCtrl);
             }
 
+            if (activeActInfo) {
+                _btnAbort.attr("data-wfprocessid", activeActInfo.AD_WF_Process_ID);
+                _btnAbort.show();
+                //_btnHistory.show();
+            }
+
             // display activity history for the nodes executed in past
             if (wfActInfo.length > 0) {
+                var clsWFStatus = 'check';
+                var iconClass = 'fa fa-check'
+                var inExecution = false;
+                var statusText = 'vis-wfm-status-completed';
+                var statusTextMsg = VIS.Msg.getMsg("Completed");
+                for (var a = 0; a < manualWF.length; a++) {
+                    var currWFID = manualWF[a].AD_Workflow_ID;
+                    clsWFStatus = 'check';
+                    for (var i = 0; i < wfActInfo.length; i++) {
+                        if (currWFID != wfActInfo[i].AD_Workflow_ID) {
+                            if (inExecution) {
+                                clsWFStatus = 'waiting';
+                                iconClass = 'fa fa-hourglass-start';
+                                statusText = 'vis-wfm-status-inQueue';
+                                statusTextMsg = VIS.Msg.getMsg("InQueue");
+                            }
+                            break;
+                        }
+                        var nodeDet = wfActInfo[i].Node;
+                        for (node in nodeDet) {
+                            if (nodeDet[node].History != null) {
+                                if (nodeDet[node].History[0].State == 'OS') {
+                                    clsWFStatus = 'running';
+                                    iconClass = 'vis-wfm-runningStatus';
+                                    statusText = 'vis-wfm-status-running';
+                                    statusTextMsg = VIS.Msg.getMsg("Running");
+                                    inExecution = true;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+
+                    var stepBoxHtml = null;
+                    var triggerTime = null;
+                    var sendNowBtn = "";
+                    if (clsWFStatus === 'waiting') {
+                        stepBoxHtml = '<h6>' + VIS.Msg.getMsg('VIS-wfm-InQueue') + '</h6><p></p>';
+                        triggerTime = '<p>' + manualWF[a].Description + '</p>';
+
+                    } else {
+                        for (var h = 0; h < wfActInfo.length; h++) {
+                            var nodes = wfActInfo[h].Node || [];
+                            // var activityId = nodes[0].ADWFActivityID;
+                            if (clsWFStatus === 'running' && new Date(nodes[0].EndWaitTimeN) > new Date()) {
+                                sendNowBtn = '<button class="vis-wfm-custom-btn vis-wfm-custom-btn-filled vis-wfm-btn-disabled" data-activityid="' + nodes[0].ADWFActivityID + '">Send Now</button>';
+                            }
+
+                            if (currWFID == wfActInfo[h].AD_Workflow_ID) {
+                                var allZ = nodes.every(n => n.Action === 'Z');
+
+                                if (nodes.length === 0) {
+                                    stepBoxHtml = '';
+                                    NodeN = '';
+                                    NodeLU = '';
+                                } else if (allZ) {
+                                    NodeN = nodes[0].Name;
+                                    NodeLU = new Date(nodes[0].LastUpdated).toLocaleString();
+                                    stepBoxHtml = '<h6>' + NodeN + '</h6><p>On ' + NodeLU + '</p>';
+                                } else {
+                                    var nonZNode = nodes.find(n => n.Action !== 'Z');
+                                    if (nonZNode) {
+                                        NodeN = nonZNode.Name;
+                                        NodeLU = new Date(nonZNode.LastUpdated).toLocaleString();
+                                        stepBoxHtml = '<h6>' + NodeN + '</h6><p>On ' + NodeLU + '</p>';
+                                    }
+                                }
+                                break;
+                            }
+
+                        }
+                        triggerTime = '<p>' + VIS.Msg.getMsg('VIS-wfm-lastTrigger') + " " + NodeLU + '</p>'
+                    }
+
+
+                    _activeStatusWFSec.append('<div class="vis-wfm-workflow-item vis-wfm-workflowSelDiv" data-selection="n" data-workflowid="' + manualWF[a].AD_Workflow_ID + '">'
+                        + '<div class="vis-wfm-drag-items" style="display: none;"><span class="vis vis-drag-circle"></span></div>'
+                        + '<div class="vis-wfm-workflow-item-left">'
+                        + '<div class="vis-wfm-workflow-left-items">'
+                        + '<div class="vis-wfm-workflow-icon ' + clsWFStatus + '">'
+                        + '<i class="' + iconClass + '"></i>'
+                        + '</div>'
+                        + '<div class="vis-wfm-workflow-details">'
+                        + '<h5>' + manualWF[a].Name + '</h5>'
+                        + '</div>'
+                        + '</div>'
+                        + '<div class="vis-wfm-workflow-sub-items">'
+                        + '<div class="vis-wfm-status-msg ' + statusText + '">' + statusTextMsg + '</div>'
+                        + triggerTime
+                        + '</div>'
+                        + '</div>'
+                        + '<div class="vis-wfm-workflow-item-right">'
+                        + '<div class="vis-wfm-workflow-step">'
+                        + '<div class="vis-wfm-step-col">'
+                        + '<div class="vis-wfm-step-dot"></div><div class="vis-wfm-step-line"></div>'
+                        + '</div>'
+                        + '<div class="vis-wfm-step-box">' +
+                        stepBoxHtml +
+                        '</div>'
+                        + sendNowBtn
+                        + '</div>'
+                        + '<div class="vis-wfm-toggle-switch" style="display:none;">'
+                        + '<input type="checkbox" id="toggle1" checked="">'
+                        + '<span class="vis-wfm-toggle-slider"></span>'
+                        + '</div>'
+                        + '<div class="vis-wfm-menu-dots">'
+                        + '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>'
+                        + '</div>'
+                        + '</div>'
+                        + '</div>');
+                }
+
+                var isInApproval = false;
+                var clsHistoryView = "";
+                for (var i = 0; i < wfActInfo.length; i++) {
+                    clsHistoryView = "";
+                    var nodeDet = wfActInfo[i].Node;
+                    var divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont item-flex-start" + clsHistoryView + "' style='display: flex;'></div>");
+                    if (isInApproval) {
+                        clsHistoryView = "vis-wfm-historyRec";
+                        //divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont " + clsHistoryView + "' style='display: none;'></div>");
+                    }
+                    if (i == 0 && wfAppInfo) {
+                        approvalContainer.append(divHistory);
+                        divHistory.css("margin-bottom", "0px");
+                    }
+                    else
+                        //  _activeStatusWFSec.append(divHistory);
+                        _historyWFSec.append(divHistory);
+                    var itemHeader = $('<div class="vis-wfm-workflow-item-header">');
+                    itemHeader.append('<div class="vis-wfm-workflow-icon check"><i class="fa fa-check"></i></div>');
+                    itemHeader.append(
+                        '<div class="vis-wfm-wfName" style="color: #333;">' +
+                        '<h5>' + wfActInfo[i].WFName + '</h5>' +
+                        '<p>' + new Date(nodeDet[0].LastUpdated).toLocaleString() + '</p>' +
+                        '</div>'
+                    );
+                    divHistory.append(itemHeader);
+
+                    var divHistoryNode = $("<div class='vis-wfm-timeline'>");
+
+                    for (node in nodeDet) {
+                        if (nodeDet[node].History != null) {
+                            if (!isInApproval && nodeDet[node].History[0].State == 'OS') {
+                                isInApproval = true;
+                            }
+                            var nodename = nodeDet[node].Name;
+
+                            let state = nodeDet[node].History[0].State;
+                            let displayText = '';
+
+                            switch (state) {
+                                case 'BK':
+                                    displayText = VIS.Msg.getMsg('Background');
+                                    break;
+                                case 'CA':
+                                    displayText = VIS.Msg.getMsg('Aborted');
+                                    break;
+                                case 'CT':
+                                    displayText = VIS.Msg.getMsg('Terminated');
+                                    break;
+                                case 'ON':
+                                    displayText = VIS.Msg.getMsg('NotStarted');
+                                    break;
+                                case 'OR':
+                                    displayText = VIS.Msg.getMsg('Background');
+                                    break;
+                                case 'OS':
+                                    displayText = VIS.Msg.getMsg('Suspended');
+                                    break;
+                                case 'CC':
+                                    displayText = VIS.Msg.getMsg('CompletedBy');
+                                    break;
+                                default:
+                                    displayText = state;
+                            }
+
+                            let userBlock = (state === 'CC')
+                                ? `<p>${displayText}</p><p>${nodeDet[node].History[0].ApprovedBy}</p>`
+                                : `<p></p><p>${displayText}</p>`;
+
+
+                            var divNode = $(`
+                                            <div class="vis-wfm-timeline-line"></div>
+        
+                                          <!-- End Step -->
+                                           <div class="vis-wfm-timeline-item">
+                                          <div class="vis-wfm-timeline-box">
+                                         <h6>${nodename}</h6>
+                                             <p>On ${new Date(nodeDet[node].LastUpdated).toLocaleString()}</p>
+                                          </div>
+                                       <div class="vis-wfm-timeline-marker">
+                                       <i class="fa fa-check"></i>
+                                           </div>
+                                     <div class="vis-wfm-timeline-user">
+                                         ${userBlock}
+                                      </div>
+                                   </div>
+                                `);
+                            divHistoryNode.append(divNode);
+
+                            divHistory.append(divHistoryNode);
+                        }
+                    }
+                }
+
+                return;
 
                 if (activeActInfo) {
                     _btnAbort.attr("data-wfprocessid", activeActInfo.AD_WF_Process_ID);
                     _btnAbort.show();
-                    _btnHistory.show();
+                    //_btnHistory.show();
                 }
                 //wfActStatusDiv.append('<button data-wfprocessid="' + activeActInfo.AD_WF_Process_ID + '" class="VIS_AbortBtn" style="height: 35px; width: 100px; border-radius: 10px; margin: 5px;">Abort</button>');
 
-                //wfActStatusDiv.find(".VIS_AbortBtn").on("click", function (e) {
-                //    setBusy(true);
-                //    $.ajax({
-                //        url: VIS.Application.contextUrl + "VIS/WFManual/AbortWorkflow",
-                //        data: {
-                //            AD_Table_ID: _ad_table_id,
-                //            Record_ID: _record_id,
-                //            AD_Window_ID: _ad_window_id,
-                //            AD_WF_Process_ID: $(e.target).attr("data-wfprocessid")
-                //        },
-                //        success: function (data) {
-                //            var resData = JSON.parse(data);
-                //            wfDetailResponse(resData);
-                //        },
-                //        error: function (evt) {
-                //            setBusy(false);
-                //        }
-                //    });
-                //});
                 var isInApproval = false;
                 var clsHistoryView = "";
                 for (var i = 0; i < wfActInfo.length; i++) {
@@ -502,7 +877,7 @@
                         divHistory.css("margin-bottom", "0px");
                     }
                     else
-                        wfActStatusDiv.append(divHistory);
+                        _activeStatusWFSec.append(divHistory);
 
                     divHistory.append('<div class="vis-wfm-wfName">' + wfActInfo[i].WFName + '</div>');
 
@@ -621,6 +996,47 @@
          * @param {boolean} fromNextBack - parameter whether clicked from Next or Back button
          */
         function showPanel(panelSec, fromNextBack) {
+            _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('Active'));
+            _liHistory.show();
+            _btnBack.hide();
+            _btnNext.hide();
+            _btnAbort.hide();
+            _btnExecute.hide();
+            _activeWFSec.hide();
+            _seqactiveWFSec.hide();
+            _activeStatusWFSec.hide();
+            wfNoRecDiv.hide();
+            bottomDiv.show();
+            _activeWFBadge.text(_activeWFSec.find(".vis-wfm-workflow-item").length);
+            _historyWFBadge.text(_historyWFSec.find(".vis-history-wrap").length);
+            _ulList.find("li .nav-link").removeClass("active");
+            _liActive.find(".nav-link").addClass("active");
+            $root.find(".tab-content .tab-pane").removeClass("active").removeClass("show");
+            _activeWFSec.closest(".tab-pane").addClass("active").addClass("show");
+            if (panelSec == "S") {
+                _btnNext.show();
+                _activeWFSec.show();
+            }
+            else if (panelSec == "Q") {
+                _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('ArrangeSequence'));
+                _activeWFBadge.text(_seqactiveWFSec.find(".vis-wfm-workflow-item").length);
+                _liHistory.hide();
+                _btnBack.show();
+                _btnExecute.show();
+                _seqactiveWFSec.show();
+            }
+            else if (panelSec == "A") {
+                _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('Running'));
+                _activeWFBadge.text(_activeStatusWFSec.find(".vis-wfm-workflow-item").length);
+                _activeStatusWFSec.show();
+            }
+            else if (panelSec == "N") {
+                bottomDiv.hide();
+                _activeWFBadge.text(0);
+                wfNoRecDiv.show();
+            }
+            return;
+
             bottomDiv.css("display", "block");
             if (fromNextBack && (panelSec == "S" || panelSec == "Q")) {
                 _btnBack.css("display", "none");
@@ -689,9 +1105,83 @@
             _btnBack.on("click", onBackClick);
             _btnExecute.on("click", onExecuteClick);
             _btnAbort.on("click", onAbortClick);
-            _btnHistory.on("click", onHistoryClick);
-            wfSelectionDiv.on("click", onSelectionDivClick);
-            wfSequenceDiv.on("click", onSequenceDivClick);
+            _ulList.on("click", onTabClick);
+            _btnClose.on("click", onCloseClick);
+            $root.find(".vis-wfm-workflowNewActive").on("click", onSelectionWFClick);
+
+            // enable drag drop event on sequence workflows section section
+            _seqactiveWFSec.sortable({
+                items: ".draggable-div",
+                cursor: "move",
+                placeholder: "ui-state-highlight",
+                opacity: 0.8,
+                update: function (event, ui) {
+                    // reset arrows for sequence in sequence div
+                    _seqactiveWFSec.find(".vis-wfm-arrowEle").remove();
+                    for (var i = 0; i < _seqactiveWFSec.find(".vis-wfm-workflow-item").length; i++) {
+                        if (i != (_seqactiveWFSec.find(".vis-wfm-workflow-item").length - 1)) {
+                            $(_seqactiveWFSec.find(".vis-wfm-workflow-item")[i]).append(_arrowEle.clone());
+                            //_arrowEle.clone().insertAfter($(_seqactiveWFSec.find(".vis-wfm-workflow-item")[i]));
+                        }
+                        if (i == 0) {
+                            $(_seqactiveWFSec.find(".vis-wfm-workflow-item")[i]).css("margin-top", "10px");
+                        }
+                    }
+                    //// Optional: Code to run after rearrangement (e.g., save order)
+                    //console.log("New order:", $(this).sortable("toArray"));
+                }
+            });
+
+            _activeStatusWFSec.off('click', '.vis-wfm-custom-btn-filled');
+            _activeStatusWFSec.on('click', '.vis-wfm-custom-btn-filled', function (e) {
+                setBusy(true);
+                var activityId = $(this).data('activityid');
+                var _btnSendNow = $(e.target);
+                // AJAX call to send the workflow
+                $.ajax({
+                    url: VIS.Application.contextUrl + "VIS/WFManual/setNodeTime",
+                    type: "POST",
+                    data: {
+                        activityId: activityId
+                    },
+                    success: function (response) {
+                        if (response && response.success) {
+                            _btnSendNow.hide();
+                        } else {
+                            VIS.ADialog.error("", true, VIS.Msg.getMsg("VIS_FailedToSend") + (response.message || "Unknown error"), null);
+                        }
+                        setBusy(false);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error sending workflow:", error);
+                        VIS.ADialog.error("", true, VIS.Msg.getMsg("VIS_ErrorUpdatingWorkflow") + ", " + error, null);
+                        setBusy(false);
+                    }
+                });
+            });
+
+            //_btnHistory.on("click", onHistoryClick);
+            //wfSelectionDiv.on("click", onSelectionDivClick);
+            //wfSequenceDiv.on("click", onSequenceDivClick);
+        };
+
+        function onSelectionWFClick(e) {
+            var item = $(e.target);
+            if (!item.hasClass("vis-wfm-workflowSelDiv")) {
+                item = $(e.target).closest(".vis-wfm-workflowSelDiv");
+            }
+            if (item.length > 0) {
+                if (item.attr("data-selection") == "y") {
+                    //item.css("background-color", "unset");
+                    item.find(".vis-wfm-activeChkSelection").prop("checked", false);
+                    item.attr("data-selection", "n");
+                }
+                else {
+                    //item.css("background-color", "rgb(207 255 222)");
+                    item.find(".vis-wfm-activeChkSelection").prop("checked", true);
+                    item.attr("data-selection", "y");
+                }
+            }
         };
 
         /**
@@ -732,23 +1222,31 @@
          * @param {Event} e - event
          */
         function onNextClick(e) {
-            var totalWF = wfSelectionDiv.find(".vis-wfm-wfSingleCard");
+            var totalWF = _activeWFSec.find(".vis-wfm-workflowSelDiv");
             if (totalWF.length > 0) {
                 var hasSelWF = false;
-                wfSequenceDiv.empty();
+                _seqactiveWFSec.empty();
                 for (var j = 0; j < totalWF.length; j++) {
-                    if ($(totalWF.find(".vis-wfm-chkSelection")[j]).prop("checked")) {
+                    if ($(totalWF[j]).attr("data-selection") == "y") {
                         hasSelWF = true;
-                        if (wfSequenceDiv.find(".vis-wfm-wfSingleCard").length > 0)
-                            wfSequenceDiv.append(_arrowEle.clone());
-                        wfSequenceDiv.append($(totalWF[j]).clone());
+                        var apndEle = $(totalWF[j]).clone();
+                        if (j == 0) {
+                            apndEle.css("margin-top", "10px");
+                        }
+                        apndEle.css("margin-bottom", "10px");
+                        _seqactiveWFSec.append(apndEle);
                     }
                 }
-                // if there are any records selected from the selection div
-                // then display sequence div else display message to the user
                 if (hasSelWF) {
-                    wfSequenceDiv.find(".vis-wfm-wfSingleCard").addClass("draggable-div").css("background-color", "#f5f5f5");
-                    wfSequenceDiv.find(".vis-wfm-chkSelection").css("display", "none");
+                    _seqactiveWFSec.find(".vis-wfm-workflow-item").addClass("draggable-div").css("background-color", "#f5f5f5");
+                    _liActive.find(".vis-wfm-tabName").text("ArrangeSequence");
+                    //_seqactiveWFSec.find(".vis-wfm-chkSelection").css("display", "none");
+                    _seqactiveWFSec.find(".vis-wfm-drag-items").show();
+                    _seqactiveWFSec.find(".vis-wfm-activeChkSelection").hide();
+                    for (var i = 0; i < _seqactiveWFSec.find(".vis-wfm-workflow-item").length; i++) {
+                        if (i < (_seqactiveWFSec.find(".vis-wfm-workflow-item").length - 1))
+                            $(_seqactiveWFSec.find(".vis-wfm-workflow-item")[i]).append(_arrowEle.clone());
+                    }
                     showPanel("Q", true);
                 }
                 else {
@@ -756,6 +1254,7 @@
                     return;
                 }
             }
+            return;
         };
 
         /**
@@ -791,6 +1290,7 @@
                 },
                 success: function (data) {
                     var resData = JSON.parse(data);
+                    showPanel("S");
                     wfDetailResponse(resData);
                 },
                 error: function (evt) {
@@ -809,7 +1309,7 @@
                 if (result) {
                     setBusy(true);
                     var workflowIDs = "";
-                    var selectedWfs = wfSequenceDiv.find(".vis-wfm-wfSingleCard");
+                    var selectedWfs = _seqactiveWFSec.find(".vis-wfm-workflow-item");
                     for (var i = 0; i < selectedWfs.length; i++) {
                         if (workflowIDs == "")
                             workflowIDs = $(selectedWfs[i]).attr("data-workflowid");
@@ -828,6 +1328,7 @@
                         success: function (data) {
                             var resData = JSON.parse(data);
                             wfDetailResponse(resData);
+                            //showPanel("S");
                         },
                         error: function (evt) {
                             setBusy(false);
@@ -835,6 +1336,20 @@
                     });
                 }
             });
+        };
+
+        function onTabClick(e) {
+            var currItem = $(e.target);
+            if (!currItem.hasClass("nav-item"))
+                currItem = currItem.closest(".nav-item");
+            if (currItem.find(".nav-link").attr("aria-controls").toLower().equals('history'))
+                bottomDiv.hide();
+            else
+                bottomDiv.show();
+        };
+
+        function onCloseClick(e) {
+            $(e.target).closest(".vis-ad-w-p-ap-tp-o-body").find(".glyphicon-remove").trigger('click');
         };
 
         /*
@@ -850,6 +1365,8 @@
         this.update = function (record_ID) {
             // Get Value from Context
             try {
+                $root.closest(".vis-ad-w-p-ap-tp-o-body").find(".vis-ad-w-p-ap-tp-o-b-head").hide();
+                $root.closest(".vis-ad-w-p-ap-tp-o-b-content").css("height", "100%");
                 _record_id = record_ID;
                 getWFDetails(false);
             }
@@ -878,8 +1395,8 @@
                 wfSequenceDiv.off("click");
             if (_btnAbort)
                 _btnAbort.off("click");
-            if (_btnHistory)
-                _btnHistory.off("click");
+            //if (_btnHistory)
+            //    _btnHistory.off("click");
             $root.remove();
             $root = null;
         };
