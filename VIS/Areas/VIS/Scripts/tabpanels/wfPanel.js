@@ -646,7 +646,7 @@
             }
 
             // display activity history for the nodes executed in past
-            if (wfActInfo.length > 0) {
+            if (wfActInfo && wfActInfo.length > 0) {
                 var clsWFStatus = 'check';
                 var iconClass = 'fa fa-check'
                 var inExecution = false;
@@ -685,7 +685,7 @@
                     var triggerTime = null;
                     var sendNowBtn = "";
                     if (clsWFStatus === 'waiting') {
-                        stepBoxHtml = '<h6>' + VIS.Msg.getMsg('VIS-wfm-InQueue') + '</h6><p></p>';
+                        stepBoxHtml = '<h6>' + VIS.Msg.getMsg('InQueue') + '</h6><p></p>';
                         triggerTime = '<p>' + manualWF[a].Description + '</p>';
 
                     } else {
@@ -719,7 +719,7 @@
                             }
 
                         }
-                        triggerTime = '<p>' + VIS.Msg.getMsg('VIS-wfm-lastTrigger') + " " + NodeLU + '</p>'
+                        triggerTime = '<p>' + VIS.Msg.getMsg('VIS_LastTrigger') + " " + NodeLU + '</p>'
                     }
 
 
