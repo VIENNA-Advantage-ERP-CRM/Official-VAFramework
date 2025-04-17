@@ -440,7 +440,7 @@ namespace VIS.Models
             if (Util.GetValueOfString(po.Get_Value("DocStatus")).Equals("CO"))
             {
                 //add your date column here
-                string[] columnArray = { "MovementDate", "DateAcct", "DateTrx", "StatementDate", "VA073_TrxDate" };
+                string[] columnArray = { "MovementDate", "DateAcct", "DateTrx", "StatementDate", "VA073_TrxDate", "VAMFG_DateAcct" };
                 action.Error = GetPeriodStatus(po, columnArray, C_DocType_ID);
             }
             if (C_DocType_ID > 0)
