@@ -308,7 +308,7 @@
                     FllCmntBtn = $("#" + evnt.target.id);
                     var cmntTxt = $(FllCmntTxt).val();
                     var subscriberID = evnt.target.parentNode.getAttribute('subscriberid');
-                    if (cmntTxt !== "") {
+                    if (cmntTxt.trim() !== "" && cmntTxt !== null) {
                         var cd = new Date();
                         var Cdate = Globalize.format(cd, "F", Globalize.cultureSelector);
                         SaveFllCmnt(cmntTxt, FllupsData, arr, subscriberID);
@@ -361,7 +361,6 @@
 
                             // Move the cursor to the position after the new line
                             textarea.setSelectionRange(cursorPos + 2, cursorPos + 2);
-
                             var newHeight = Math.min(textarea.scrollHeight, 150);
                             $(textarea).css('height', newHeight + 'px');
                             $(textarea).css('overflowY', textarea.scrollHeight > 150 ? 'auto' : '');
@@ -521,6 +520,7 @@
                                     this.style.height = '';
                                     this.style.overflowY = '';
                                     this.parentNode.style.flexDirection = '';
+                                    $(this).val(textareaValue);
                                 }
                                 this.parentNode.style.flexDirection = this.scrollHeight > textAreaHeight ? 'column' : 'row';
                             });
