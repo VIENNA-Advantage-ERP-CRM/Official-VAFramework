@@ -407,6 +407,7 @@
                 $maindiv.append(ReverseDatediv);
                 if (isPeriodOpen) {
                     for (i = 0; i < columnArray.length; i++) {
+                        //if value of date column is not null then set in reverse date and break the loop
                         if (tabObj.getValue(columnArray[i]) != null && tabObj.getValue(columnArray[i]) != undefined) {
                             $ReverseDate.setValue(tabObj.getValue(columnArray[i]));
                             break;
