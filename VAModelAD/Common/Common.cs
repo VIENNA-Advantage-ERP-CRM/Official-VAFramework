@@ -1946,13 +1946,14 @@ namespace VAdvantage.Common
                     if (count > 0)
                     {
                         result = true;
+                        break;
                     }
                     else
                     {
                         result = false;
                     }
 
-                    break;
+                    
                 }
             }
 
