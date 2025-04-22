@@ -255,15 +255,7 @@
                 _curPageRecords = res.length;
                 $('#VIS_pageIndx' + window_No).text('1/' + _curPageRecords);
                 for (var i = 0; i < res.length; i++) {
-                    //if (i == 0) {
-                    //    $rechtml = $('<div class="VIS-timeline-header">' +
-                    //        '<i class="fa fa-clock-o"></i>January 2025 (4)</div>' +
-                    //        '<div class="VIS-timeline-items"></div></div>');
-                    //}
-                    //else {
-                    //    $rechtml = $('<div class="VIS-timeline-items"></div>');
-                    //}
-
+                    
                     if (res[i].Type.toLower() == 'email') {
                         $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
                             '">' +
@@ -298,8 +290,8 @@
                             '<div class="VIS-content-section VIS-group-item-flex">' +
                             '<div class="VIS-item-content-group">' +
                             '<h6>' + res[i].Subject + '</h6>' +
-                            '<div class="emailTo">To: ' + res[i].MailTo + '</div>' +
-                            '<div class="emailCC">CC: ' + res[i].MailCC + '</div>' +
+                            '<div class="emailTo">' + VIS.Msg.getMsg("To") + ':&nbsp; ' + res[i].MailTo + '</div>' +
+                            '<div class="emailCC">' + VIS.Msg.getMsg("Cc") + ':&nbsp; ' + res[i].MailCC + '</div>' +
                             '</div>' +
                             '<div class="VIS-action-group">' +
                             ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ?
@@ -308,9 +300,7 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '<div class="VIS-status-container">' +
-                            //'<span class="VIS-status-badge completed">Completed</span>' +
-                            '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
@@ -351,7 +341,7 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '<div class="VIS-status-container"></div>' +
+                            //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="inbox" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
@@ -411,9 +401,7 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '<div class="VIS-status-container">' +
-                            //'<span class="VIS-status-badge completed">Completed</span>' +
-                            '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="call" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
@@ -460,7 +448,7 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '<div class="VIS-status-container"></div>' +
+                            //'<div class="VIS-status-container"></div>' +
                             '</div>');
                         $detHtml = "";
                     }
@@ -500,7 +488,7 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '<div class="VIS-status-container"></div>' +
+                            //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="letter" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
@@ -554,7 +542,8 @@
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
                             '</div>' +
                             '<div class="VIS-item-body">' +
-                            '<div class="VIS-content-section VIS-group-item-flex">' +
+                            '<div class="VIS-content-section">' +
+                            '<div class="VIS-item-content">' +
                             '<div class="VIS-item-content-group">' +
                             '<h6>' + res[i].Subject + '</h6>' +
                             '<div class="VIS-item-timing">' + time + '</div>' +
@@ -568,22 +557,30 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '<div class="VIS-status-container"></div>' +
+                            '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="appointment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
 
-                        if (res[i].Attendees != null && res[i].Attendees.length > 0) {
-                            var divAtt = $('<div class="VIS-items-status-group"></div>');
+                        var divAtt = $('<div class="VIS-items-status-group"></div>');
+                        if (res[i].Attendees != null && res[i].Attendees.length > 0) {                            
                             var array = res[i].Attendees.split(",");
                             if (array != null && array.length > 0) {
                                 for (var k = 0; k < array.length; k++) {
                                     divAtt.append('<div class="VIS-item-status VIS-item-green">' + array[k] + '</div>');
-                                }
-                                $rechtml.find('.VIS-item-content-group').append(divAtt);
+                                }                                
                             }
                         }
-
+                        if (res[i].EmailToInfo != "") {
+                            var array = res[i].EmailToInfo.split(",");
+                            if (array != null && array.length > 0) {
+                                for (var k = 0; k < array.length; k++) {
+                                    divAtt.append('<div class="VIS-item-status VIS-item-green">' + array[k] + '</div>');
+                                }
+                            }
+                        }
+                        $rechtml.find('.VIS-content-section').append(divAtt);
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="appointment" class="VIS-activity-container" style="display:none;"></div>');
                     }
                     else if (res[i].Type.toLower() == 'task') {
@@ -624,7 +621,7 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '<div class="VIS-status-container"></div>' +
+                            //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="task" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
@@ -721,15 +718,38 @@
                 $html.find(".VIS-btn-copy").click(function () {
                     const btn = $(this);
                     var url = $(this).data('joinurl');
-                    navigator.clipboard.writeText(url).then(() => {
-                        btn.html('<i class="fa fa-check"></i>'); // Change to check icon
-                        let msg = $('<span class="VIS-copy-msg">' + VIS.Msg.getMsg("CopyClipboard") + '</span>');
-                        btn.after(msg);
-                        setTimeout(() => {
-                            btn.html('<i class="fa fa-clone"></i>'); // Revert back after 2s
-                            msg.fadeOut(300, function () { $(this).remove(); }); // Fade & remove message
-                        }, 2000);
-                    }).catch(err => console.error("Failed to copy:", err));
+                    const $tempInput = $('<input>');
+                    $root.append($tempInput);
+                    $tempInput.val(url).select();                   
+                    try {
+                        const success = document.execCommand('copy');
+                        if (success) {
+                            btn.html('<i class="fa fa-check"></i>');
+                            let msg = $('<span class="VIS-copy-msg">' + VIS.Msg.getMsg("CopyClipboard") + '</span>');
+                            btn.after(msg);
+                            btn.prop('disabled', true); // Disable the button
+                            setTimeout(() => {
+                                btn.html('<i class="fa fa-clone"></i>'); // Revert back after 5s
+                                msg.fadeOut(300, function () { $(this).remove(); }); // Fade & remove message
+                                btn.prop('disabled', false); // Disable the button
+                            }, 5000);
+                        } else {
+                            console.error("Copy command was unsuccessful.");
+                        }
+                    } catch (err) {
+                        console.error("Failed to copy:", err);
+                    }
+                    $tempInput.remove();
+
+                    //navigator.clipboard.writeText(url).then(() => {
+                    //    btn.html('<i class="fa fa-check"></i>'); // Change to check icon
+                    //    let msg = $('<span class="VIS-copy-msg">' + VIS.Msg.getMsg("CopyClipboard") + '</span>');
+                    //    btn.after(msg);
+                    //    setTimeout(() => {
+                    //        btn.html('<i class="fa fa-clone"></i>'); // Revert back after 2s
+                    //        msg.fadeOut(300, function () { $(this).remove(); }); // Fade & remove message
+                    //    }, 2000);
+                    //}).catch(err => console.error("Failed to copy:", err));
                 });
 
                 $html.find(".VIS-btn-edit").click(function () {
