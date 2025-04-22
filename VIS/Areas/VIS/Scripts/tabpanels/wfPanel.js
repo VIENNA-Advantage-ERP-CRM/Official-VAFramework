@@ -646,7 +646,7 @@
             }
 
             // display activity history for the nodes executed in past
-            if (wfActInfo.length > 0) {
+            if (wfActInfo && wfActInfo.length > 0) {
                 var clsWFStatus = 'check';
                 var iconClass = 'fa fa-check'
                 var inExecution = false;
