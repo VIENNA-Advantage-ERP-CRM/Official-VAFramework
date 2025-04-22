@@ -677,170 +677,168 @@ namespace VIS.Models
         public List<CheckListCondition> IsCheckListRequire(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int Record_ID,int AD_Survey_ID=0)
         {
             string sql = "";
-            int responseCount = 0;
-            bool isMandatoryTofill = false;
-            string conditions = "";
+           
             List<CheckListCondition> CList = new List<CheckListCondition>();
-            if (Record_ID > 0)
+
+            sql = @"SELECT
+                    ad_surveyassignment_ID, IsMandatorytofill,isConditionalChecklist,AD_Survey_ID,
+                    (SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=ad_surveyassignment.ad_table_id AND AD_Survey_ID=AD_Survey_ID AND record_ID=" + Record_ID + @" AND IsActive='Y') as ResponseCount
+                FROM
+                    ad_surveyassignment
+                WHERE
+                    ad_window_id = " + AD_Window_ID + @"
+                    AND ad_table_id = " + AD_Table_ID + @"
+                    AND isactive = 'Y'";
+
+            DataSet _dsSurvey = DB.ExecuteDataset(sql);
+
+            if (_dsSurvey != null && _dsSurvey.Tables[0].Rows.Count > 0)
             {
-                if (AD_Survey_ID == 0)
+                foreach (DataRow dts in _dsSurvey.Tables[0].Rows)
                 {
-                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID IN (SELECT AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + ") AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    isMandatoryTofill = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID IN (SELECT AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + ") AND IsActive='Y'")).Equals("Y");
-                }
-                else
-                {
-                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    isMandatoryTofill = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND IsActive='Y'")).Equals("Y");
-                }
-                responseCount = Util.GetValueOfInt(DB.ExecuteScalar(sql));
-            }
-            else
-            {
-                responseCount = 0;
-                if (AD_Survey_ID == 0)
-                {
-                    isMandatoryTofill = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID IN (SELECT AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + ") AND IsActive='Y'")).Equals("Y");
-                }
-                else
-                {
-                    isMandatoryTofill = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsMandatoryToFill FROM AD_SurveyAssignment WHERE AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND IsActive='Y'")).Equals("Y");
-                }
-            }
-            
-            sql = @"SELECT AD_Column.AD_column_ID,
+                    string conditions = "";
+                    sql = @"SELECT AD_Column.AD_column_ID,
                             ad_surveyshowcondition.seqno,AD_Column.ColumnName,ad_surveyshowcondition.operation,ad_surveyshowcondition.ad_equalto,ad_surveyshowcondition.Value2,
-                            ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID,AD_SurveyAssignment.IsMandatoryToFill
+                            ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID
                             FROM  AD_Column                           
-                            INNER JOIN ad_surveyshowcondition ON (AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID)
-                            INNER JOIN AD_SurveyAssignment ON (AD_SurveyAssignment.AD_SurveyAssignment_ID=AD_SurveyAssignment.ad_surveyassignment_ID)
-                            WHERE AD_SurveyAssignment.AD_Window_ID=" + AD_Window_ID+ " AND AD_SurveyAssignment.AD_Table_ID=" + AD_Table_ID + " AND  ad_surveyshowcondition.isActive='Y' AND  AD_SurveyAssignment.isActive='Y' AND AD_Column.AD_Table_ID=" + AD_Table_ID +  @"
+                            INNER JOIN ad_surveyshowcondition ON (AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID)                            
+                            WHERE ad_surveyshowcondition.ad_surveyassignment_ID=" + Util.GetValueOfInt(dts["ad_surveyassignment_ID"]) + " AND  ad_surveyshowcondition.isActive='Y' AND AD_Column.AD_Table_ID=" + AD_Table_ID + @"
                             ORDER BY ad_surveyshowcondition.seqno";
-            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
-            //prepare where condition for filter
-            if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
-            {
-                int idx = 0;
-                foreach (DataRow dt in _dsDetails.Tables[0].Rows)
-                {
-                    string type = "";
-                    string value = Util.GetValueOfString(dt["ad_equalto"]);
-                    string columnName = Util.GetValueOfString(dt["ColumnName"]);
-                    int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
-                    string oprtr = Util.GetValueOfString(dt["operation"]);
+
+                    DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
 
 
-                    //Checking data type of column
-                    if (columnName.Equals("AD_Language") || columnName.Equals("EntityType") || columnName.Equals("DocBaseType"))
+                    if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
                     {
-                        type = typeof(System.String).Name;
-                    }
-                    else if (columnName.Equals("Posted") || columnName.Equals("Processed") || columnName.Equals("Processing"))
-                    {
-                        type = typeof(System.Boolean).Name;
-                    }
-                    else if (columnName.Equals("Record_ID"))
-                    {
-                        type = typeof(System.Int32).Name;
-                    }
-                    else
-                    {
-                        type = VAdvantage.Classes.DisplayType.GetClass(displayType, true).Name;
-                    }
-
-                    
-
-                    if (oprtr == "==")
-                    {
-                        oprtr = "=";
-                    }
-                    else if (oprtr == "!=")
-                    {
-                        oprtr = "!";
-                    }
-                    else if (oprtr == "<=")
-                    {
-                        oprtr = "<=";
-                    }
-                    else if (oprtr == "<<")
-                    {
-                        oprtr = "<";
-                    }
-                    else if (oprtr == ">>")
-                    {
-                        oprtr = ">";
-                    }
-                    else if (oprtr == ">=")
-                    {
-                        oprtr = ">=";
-                    }
-                    //else if (oprtr == "~~")
-                    //{
-                    //    oprtr = " LIKE ";
-                    //    value = "%" + value + "%";
-                    //}
-                    //else if (oprtr == "AB")
-                    //{
-                    //    oprtr = ">";
-                    //}
-
-                    string andOR = " & ";
-                    if (Util.GetValueOfString(dt["andor"]) == "O")
-                    {
-                        andOR = " | ";
-                    }
-
-
-                    if (type == "String")
-                    {
-                        value = "'" + value + "'";
-                    }else if(type.ToLower()=="date" || type.ToLower() == "datetime")
-                    {
-                        value ="'"+ Convert.ToDateTime(value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")+"'";
-                    }
-
-                    
-
-                    if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
-                    {
-                        idx++;
-                        if (oprtr.Length == 2)
+                        int idx = 0;
+                        foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                         {
-                            char[] charArray = oprtr.ToCharArray();
-                            conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
-                            conditions += " | ";
-                            conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                            string type = "";
+                            string value = Util.GetValueOfString(dt["ad_equalto"]);
+                            string columnName = Util.GetValueOfString(dt["ColumnName"]);
+                            int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
+                            string oprtr = Util.GetValueOfString(dt["operation"]);
+
+
+                            //Checking data type of column
+                            if (columnName.Equals("AD_Language") || columnName.Equals("EntityType") || columnName.Equals("DocBaseType"))
+                            {
+                                type = typeof(System.String).Name;
+                            }
+                            else if (columnName.Equals("Posted") || columnName.Equals("Processed") || columnName.Equals("Processing"))
+                            {
+                                type = typeof(System.Boolean).Name;
+                            }
+                            else if (columnName.Equals("Record_ID"))
+                            {
+                                type = typeof(System.Int32).Name;
+                            }
+                            else
+                            {
+                                type = VAdvantage.Classes.DisplayType.GetClass(displayType, true).Name;
+                            }
+
+
+
+                            if (oprtr == "==")
+                            {
+                                oprtr = "=";
+                            }
+                            else if (oprtr == "!=")
+                            {
+                                oprtr = "!";
+                            }
+                            else if (oprtr == "<=")
+                            {
+                                oprtr = "<=";
+                            }
+                            else if (oprtr == "<<")
+                            {
+                                oprtr = "<";
+                            }
+                            else if (oprtr == ">>")
+                            {
+                                oprtr = ">";
+                            }
+                            else if (oprtr == ">=")
+                            {
+                                oprtr = ">=";
+                            }
+                            //else if (oprtr == "~~")
+                            //{
+                            //    oprtr = " LIKE ";
+                            //    value = "%" + value + "%";
+                            //}
+                            //else if (oprtr == "AB")
+                            //{
+                            //    oprtr = ">";
+                            //}
+
+                            string andOR = " & ";
+                            if (Util.GetValueOfString(dt["andor"]) == "O")
+                            {
+                                andOR = " | ";
+                            }
+
+
+                            if (type == "String")
+                            {
+                                value = "'" + value + "'";
+                            }
+                            else if (type.ToLower() == "date" || type.ToLower() == "datetime")
+                            {
+                                value = "'" + Convert.ToDateTime(value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") + "'";
+                            }
+
+
+
+                            if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
+                            {
+                                idx++;
+                                if (oprtr.Length == 2)
+                                {
+                                    char[] charArray = oprtr.ToCharArray();
+                                    conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
+                                    conditions += " | ";
+                                    conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                                }
+                                else
+                                {
+                                    conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                                }
+                            }
+                            else
+                            {
+                                conditions += andOR;
+                                if (oprtr.Length == 2)
+                                {
+                                    char[] charArray = oprtr.ToCharArray();
+                                    conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
+                                    conditions += " | ";
+                                    conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                                }
+                                else
+                                {
+                                    conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                                }
+                            }
+
                         }
-                        else
-                        {
-                            conditions += "@" + columnName + "@ " + oprtr + " " + value;
-                        }
+
                     }
-                    else
+
+                    CList.Add(new CheckListCondition
                     {
-                        conditions += andOR;
-                        if (oprtr.Length == 2)
-                        {
-                            char[] charArray = oprtr.ToCharArray();
-                            conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
-                            conditions += " | ";
-                            conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
-                        }
-                        else
-                        {
-                            conditions += "@" + columnName + "@ " + oprtr + " " + value;
-                        }
-                    }
+                        Condition = conditions,
+                        ResponseCount = Util.GetValueOfInt(dts["ResponseCount"]),
+                        IsMandatoryTofill = Util.GetValueOfString(dts["IsMandatorytofill"]).Equals("Y"),
+                   IsConditionalCheckList= Util.GetValueOfString(dts["isConditionalChecklist"]).Equals("Y")
+                    });
+
 
                 }
-
             }
-            CList.Add(new CheckListCondition
-            {
-                Condition=conditions,
-                ResponseCount= responseCount,
-                IsMandatoryTofill= isMandatoryTofill
-            });
+
             return CList;
         }
 
@@ -925,6 +923,7 @@ namespace VIS.Models
         public string Condition { get; set; }
         public int ResponseCount { get; set; }
         public bool IsMandatoryTofill {  get; set; }
+        public bool IsConditionalCheckList {  get; set; }
     }
     
 }

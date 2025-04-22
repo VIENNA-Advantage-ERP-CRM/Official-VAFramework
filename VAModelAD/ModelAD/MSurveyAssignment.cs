@@ -39,6 +39,10 @@ namespace VAdvantage.Model
         {
             //if (newRecord)
             //{
+
+            int cnt = Util.GetValueOfInt(DB.ExecuteScalar("SELECT Count(AD_TAB_ID) FROM AD_TABPANEL WHERE AD_TAB_ID=" + GetAD_Tab_ID() + " AND Classname='VIS.SurveyPanel'"));
+            if (cnt == 0)
+            {
                 MTabPanel tp = new MTabPanel(GetCtx(), 0, null);
                 tp.SetName(Msg.GetMsg(GetCtx(), "SurveyPanelName"));
                 tp.SetClassname("VIS.SurveyPanel");
@@ -46,12 +50,14 @@ namespace VAdvantage.Model
                 tp.SetAD_Org_ID(0);
                 tp.SetAD_Client_ID(0);
                 tp.SetSeqNo(10);
-                if (!tp.Save()) {
+                if (!tp.Save())
+                {
                     log.SaveError("Error", Msg.GetMsg(GetCtx(), "TabPanelNotSaved"));
                     return false;
                 }
+            }
 
-           //}
+            //}
             return true;
         }
 
@@ -66,7 +72,7 @@ namespace VAdvantage.Model
             if (GetAD_SurveyAssignment_ID() > 0)
             {
                 int tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
-                if(tableID!= GetAD_Table_ID() && IsConditionalChecklist())
+                if (tableID != GetAD_Table_ID() && IsConditionalChecklist())
                 {
                     int isExistCondition = Util.GetValueOfInt(DB.ExecuteScalar("SELECT Count(AD_SurveyShowCondition_ID) FROM AD_SurveyShowCondition WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
                     if (isExistCondition > 0)
@@ -75,11 +81,12 @@ namespace VAdvantage.Model
                         return false;
                     }
                 }
-                else if(!IsConditionalChecklist()) {
+                else if (!IsConditionalChecklist())
+                {
                     DB.ExecuteQuery("DELETE FROM AD_SurveyShowCondition WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID());
                 }
 
-                DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");  
+                DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
             }
             DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Client_ID=" + GetAD_Client_ID() + " AND AD_Tab_ID IN (" + GetAD_Tab_ID() + ")");
 

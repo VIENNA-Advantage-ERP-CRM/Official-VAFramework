@@ -19,6 +19,7 @@ using VAdvantage.Logging;
 using VAdvantage.Utility;
 using VAdvantage.ProcessEngine;
 using VAdvantage.Process;
+using System.Web.ModelBinding;
 
 namespace VAdvantage.ProcessEngine
 {
@@ -82,6 +83,17 @@ namespace VAdvantage.ProcessEngine
                 Lock();
                 Prepare();
                 msg = DoIt();
+            }
+            catch (AggregateException ex)
+            {
+                string msg1 = "";
+                foreach (var inner in ex.InnerExceptions)
+                {
+                    // Log this or debug
+                    msg1 += " -> " + inner.Message; // or use logging
+                }
+                log.Log(Level.SEVERE, msg1);
+                success = false;
             }
             catch (Exception e)
             {
