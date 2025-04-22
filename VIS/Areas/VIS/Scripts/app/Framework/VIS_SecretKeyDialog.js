@@ -171,7 +171,7 @@
                                 var contentHeight = $root.find('.VIS-key-popup-container')[0].offsetHeight + 6;
                                 ch.changeHeight(contentHeight);
                             }, 50);
-                            ch.changeWidth(657);
+                            ch.changeWidth(557);
                             ch.changeTitle(VIS.Msg.getMsg("VAAPI_SaveYourKey"));
                             // Add event listener to "Copy" button
                             $root.find('#VIS_SaveSecretKey_' + windowNo).on("click", function () {

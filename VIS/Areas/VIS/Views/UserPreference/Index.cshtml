@@ -181,7 +181,7 @@
                         <i class="vis vis-mark VIS_Pref_close-btn" style=" float: right; position: relative;"></i>
                     </div>
                     <div class="VIS_Pref_pass-line">
-                        <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName")</span><input id="@("txtKeyName_" + ViewBag.WindowNumber)" required pattern="[A-Za-z0-9]+" class="VIS_Pref_pass " placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName") type="text" /></h4>
+                        <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName")</span><input id="@("txtKeyName_" + ViewBag.WindowNumber)" required pattern="[A-Za-z0-9]+" class="VIS_Pref_pass VIS_Key-text-input" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName") type="text" /></h4>
                     </div>@*required pattern="\w+"*@
 
                     <div class="VIS_Pref_pass-line">
