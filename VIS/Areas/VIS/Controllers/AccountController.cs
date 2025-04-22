@@ -251,6 +251,10 @@ namespace VIS.Controllers
                     }
                     ModelState.AddModelError("", msg);
                 }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("", e.Message);
+                }
             }
 
             // If we got this far, something failed
