@@ -241,6 +241,16 @@ namespace VIS.Controllers
                         ModelState.AddModelError("", "UserPwdError");
                     }
                 }
+                catch (AggregateException ex)
+                {
+                    string msg = "";
+                    foreach (var inner in ex.InnerExceptions)
+                    {
+                        // Log this or debug
+                        msg += " -> " + inner.Message; // or use logging
+                    }
+                    ModelState.AddModelError("", msg);
+                }
                 catch (Exception e)
                 {
                     ModelState.AddModelError("", e.Message);

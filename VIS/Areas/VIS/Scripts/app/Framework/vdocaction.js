@@ -37,7 +37,7 @@
         var isPeriodOpen = false;
         /*This array store the column whose value is used to set as reversal date
          and we can add our columns here*/
-        var columnArray = ["MovementDate", "DateAcct", "DateTrx", "StatementDate", "VA073_TrxDate"];
+        var columnArray = ["MovementDate", "DateAcct", "DateTrx", "StatementDate", "VA073_TrxDate", "VAMFG_DateAcct"];
 
         if (VIS.Application.isRTL) {
             //$cmbAction.css({ "margin-left": "0px", "margin-right": "10px" });
@@ -409,6 +409,7 @@
                     for (i = 0; i < columnArray.length; i++) {
                         if (tabObj.getValue(columnArray[i]) != null && tabObj.getValue(columnArray[i]) != undefined) {
                             $ReverseDate.setValue(tabObj.getValue(columnArray[i]));
+                            break;
                         }
                     }
                 }

@@ -593,33 +593,48 @@
                 AD_Survey_ID: Survey_ID
             },
             success: function (data) {
-                data = JSON.parse(data);
-                data = data[0];
+                var result = JSON.parse(data);
+                output = true; // default
 
-                if (data.ResponseCount > 0) {
-                    output = true;
-                    //callback(true);
-                } else if (!data.IsMandatoryTofill && data.Condition=="") {
-                    return true;
-                }
-                else if (data.IsMandatoryTofill && data.Condition != "") {
-                    var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
-                    if (isValidate && isCheckListFill) {
-                        output = true;
-                        //callback(true);
-                    } else if (!isValidate) {
-                        output = true;
-                        // callback(true);
-                    } else {
-                        output = false;
-                        //callback(false);
+                for (var i = 0; i < result.length; i++) {
+                    var data = result[i];
+                   
+                    // Rule 2: Conditional Checklist
+                    if (data.IsConditionalCheckList) {
+                        var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
+
+                        if (isValidate) {
+                            if (data.IsMandatoryTofill) {
+                                if (data.ResponseCount > 0 || isCheckListFill === true) {
+                                    output = true;
+                                    continue;
+                                } else {
+                                    output = false;
+                                    break;
+                                }
+                            } else {
+                                output = true;
+                                continue;
+                            }
+                        } else {
+                            // condition not met, so skip validation
+                            output = true;
+                            continue;
+                        }
                     }
 
-
-                } else {
-                    output = true;
-                    //callback(true);
+                    // Rule 3: Non-Conditional Checklist
+                    if (!data.IsConditionalCheckList && data.IsMandatoryTofill) {
+                        if (data.ResponseCount > 0 || isCheckListFill === true) {
+                            output = true;
+                            continue;
+                        } else {
+                            output = false;
+                            break;
+                        }
+                    }
                 }
+
             },
             error: function (err) {
                 console.log(err);
