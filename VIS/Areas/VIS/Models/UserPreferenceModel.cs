@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -875,6 +876,55 @@ namespace VIS.Models
             catch (Exception e)
             { VAdvantage.Logging.VLogger.Get().Severe("ErrorToGetAccessKey=>" + e.Message); }
             return null;
+        }
+
+        /// <summary>
+        /// VAI050-This method used to verify password
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        public bool VerifyPassword(string password, string userName)
+        {
+            try
+            {
+                // Get encryption info
+                string sqlEnc = @"SELECT IsEncrypted, IsHashed  FROM AD_Column WHERE AD_Table_ID = (SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_User') 
+                                  AND ColumnName='Password'";
+                DataSet dsLoginDS = DB.ExecuteDataset(sqlEnc);
+                char isEncrypted = Convert.ToChar(dsLoginDS.Tables[0].Rows[0]["IsEncrypted"]);
+                char isHashed = Convert.ToChar(dsLoginDS.Tables[0].Rows[0]["IsHashed"]);
+                // Fetch actual password from the user record
+                string fetchPasswordSql = "SELECT Password FROM AD_User WHERE Value=@username";
+                SqlParameter[] param = new SqlParameter[]
+                {
+                  new SqlParameter("@username", userName)
+                };
+                string storedPassword = Util.GetValueOfString(DB.ExecuteScalar(fetchPasswordSql, param, null));
+
+                if (string.IsNullOrEmpty(storedPassword))
+                {
+                    return false; // User not found or no password
+                }
+
+                if (isHashed == 'Y')
+                {
+                    return SecureEngine.VerifyHash(password, storedPassword, null);
+                }
+                else if (isEncrypted == 'Y')
+                {
+                    return storedPassword == VAdvantage.Utility.SecureEngine.Encrypt(password);
+                }
+                else
+                {
+                    return storedPassword == password;
+                }
+            }
+            catch (Exception e)
+            {
+                VAdvantage.Logging.VLogger.Get().Severe("ErrorToVerifyPassword=>" + e.Message);
+                return false;
+            }
         }
 
     }
