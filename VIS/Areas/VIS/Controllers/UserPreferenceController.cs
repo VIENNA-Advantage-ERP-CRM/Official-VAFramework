@@ -372,12 +372,11 @@ namespace VIS.Controllers
             string requestAddr = fullUrl;
             int tokenExpTimeInMinutes = 129600;
             int idleTime = 129600;
-            var loginResult = obj.CallLoginApi(userName, password, accessKey, loginApiUrl);
-            if (loginResult == null)
+           
+            if (!obj.VerifyPassword(password, userName))
             {
                 return Json(new { success = false, message = Msg.GetMsg(ctx, "VAAPI_LoginFailed") });
             }
-
             var initSessionResult = obj.CallInitSessionApi(AD_Client_ID, AD_Org_ID, AD_User_ID, AD_Role_ID, accessKey, requestAddr, tokenExpTimeInMinutes, idleTime, Project_ID, keyName, initSessionApiUrl);
             if (initSessionResult == null)
             {
