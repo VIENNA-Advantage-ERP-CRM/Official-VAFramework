@@ -37,6 +37,8 @@
         var _liHistory = null;
         var _liInActive = null;
         var _btnClose = null;
+        var _tabContentArea = null;
+        var _iconWFConfig = null;
 
 
         /**
@@ -46,6 +48,10 @@
             bsyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
             $root.append(bsyDiv);
             setBusy(true);
+            _iconWFConfig = '<svg id="workflow-diagram" xmlns = "http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">'
+                + '<path fill="rgb(var(--v-c-primary), 1)" id="Path_3665" data-name="Path 3665" d="M26.071,22.272V17.205H19.683l-3.747-3.747v-2.65a4.434,4.434,0,1,0-1.267,0v2.627l-3.77,3.77H4.534v5.067H2v6.334H8.334V22.272H5.8v-3.8h5.014l4.475,4.476,4.477-4.476H24.8v3.8H22.27v6.334H28.6V22.272Zm-19,5.067h-3.8v-3.8h3.8Zm5.068-20.9A3.167,3.167,0,1,1,15.3,9.6a3.167,3.167,0,0,1-3.167-3.167Zm3.148,14.737-3.294-3.294,3.167-3.167h.253l3.167,3.167ZM27.338,27.34h-3.8v-3.8h3.8Z" transform = "translate(0.264 0.262)" />'
+                + '<path id="Path_3666" data-name="Path 3666" d="M0,0H30V30H0Z" fill="none" />'
+                + '</svg >';
             _ad_table_id = this.curTab.getAD_Table_ID();
             _ad_window_id = this.curTab.getAD_Window_ID();
 
@@ -109,7 +115,7 @@
             ////getWFDetails(true);
 
 
-            var divele = $('<div class="vis-wfm-workflows-flyout" style="right: 0; top: 0; width:calc(100% - 10px); padding-bottom: 0rem; height: 100%;">'
+            var divele = $('<div class="vis-wfm-workflows-flyout" style="right: 0; top: 0; width:calc(100% - 10px); padding-bottom: 0rem; height: calc(100% - 0px);">'
                 + '<div class= "vis-wfm-flyout-header" style="display:none;">'
                 + '<h1>' + VIS.Msg.getMsg('Workflows') + '</h1> <a href=""><span class="vis vis-cross"></span></a>'
                 + '</div >'
@@ -120,23 +126,23 @@
                 + '<div class="vis-wfm-tablink-col">'
                 + '<ul class="nav nav-tabs vis-wfm-tabList" id="myTab" role="tablist">'
                 + '<li class="nav-item vis-wfm-liTabActive">'
-                + '<a class="nav-link active show" id="active-tab" data-toggle="tab" href="#active" role="tab" aria-controls="active" aria-selected="true"><i class="fa fa-check-circle" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('Active') + ' </span><span class="vis-wfm-badge vis-wfm-activeBadge">0</span> </a>'
+                + '<a class="nav-link active show" id="active-tab" data-toggle="tab" href="#active" role="tab" aria-controls="active" aria-selected="true"><i class="fa fa-check-circle" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('VIS_ActiveWorkflows') + ' </span><span class="vis-wfm-badge vis-wfm-activeBadge">0</span> </a>'
                 + '</li>'
                 + '<li class="nav-item vis-wfm-liTabInActive" style="display:none;">'
-                + '<a class="nav-link" id="inactive-tab" data-toggle="tab" href="#inactive" role="tab" aria-controls="in-active" aria-selected="false"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('InActive') + ' </span><span class="vis-wfm-badge vis-wfm-inactiveBadge">0</span></a>'
+                + '<a class="nav-link" id="inactive-tab" data-toggle="tab" href="#inactive" role="tab" aria-controls="in-active" aria-selected="false"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('VIS_InActiveWorkflows') + ' </span><span class="vis-wfm-badge vis-wfm-inactiveBadge">0</span></a>'
                 + '</li>'
                 + '<li class="nav-item vis-wfm-liTabHistory">'
-                + '<a class="nav-link" id="history-tab" data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false"><i class="fa fa-history" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('History') + ' </span><span class="vis-wfm-badge vis-wfm-historyBadge">0</span></a>'
+                + '<a class="nav-link" id="history-tab" data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false"><i class="fa fa-history" aria-hidden="true"></i><span class="vis-wfm-tabName"> ' + VIS.Msg.getMsg('VIS_WorkflowHistory') + ' </span><span class="vis-wfm-badge vis-wfm-historyBadge">0</span></a>'
                 + '</li>'
                 + '</ul>'
-                + '<div class="vis-wfm-tab-action-link">'
-                + '<a href="#" class="vis-wfm-ClosePnl"><span class="vis vis-cross"></span></a>'
+                + '<div class="vis-wfm-tab-action-link" style="display: none;">'
+                + '<a href="#" title="' + VIS.Msg.getMsg('VIS_ClosePanel') + '" class="vis-wfm-ClosePnl"><span class="vis vis-cross"></span></a>'
                 //+ '<a href="#"><i class="fa fa-trash-o" aria-hidden="true"></i> ' + VIS.Msg.getMsg('Delete') + '</a>'
                 //+ '<a href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i> ' + VIS.Msg.getMsg('AddWorkflow') + '</a>'
                 + '</div>'
                 + '</div>'
                 + '<!-- Tab Content -->'
-                + '<div class="tab-content" style="height: calc(100vh - 315px); overflow: auto;" id="myTabContent">'
+                + '<div class="tab-content vis-wfm-tabContentArea" style="height: calc(100vh - 350px); overflow: auto;" id="myTabContent">'
                 + '<!-- New Workflow Section -->'
                 + '<div class="tab-pane fade active show" id="active" role="tabpanel" aria-labelledby="home-tab" style="width: calc(100% - 15px);">'
                 + '<div class="vis-wfm-workflowNewActive vis-wfm-workflow-list vis-wfm-activeWFSection">'
@@ -176,10 +182,14 @@
 
                 + '<div class="vis-wfm-bottomCont" style="display: block;">'
                 + '<div class="vis-tp-btnWrap float-right" style="margin-right: 10px; display: flex;">'
-                + '<a href="#" class="fa fa-arrow-circle-right vis-wfm-btnNext btn" style="display: block;"></a>'
-                + '<a href="#" class="fa fa-arrow-circle-left vis-wfm-btnBack btn" style="display: none; margin-right: 10px;"></a>'
-                + '<a href="#" class="fa fa-play-circle-o vis-wfm-btnAttExe btn" style="display: none;"></a>'
-                + '<a href="#" class="fa fa-stop-circle-o vis-wfm-btnAbort btn" style="display: none;"></a>'
+                + '<a class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') + '<i class="fa fa-chevron-right" style="margin-left: 10px;" aria-hidden="true"></i></a>'
+                + '<a class="vis-wfm-btnBack btn" style="display:none; margin-right: 10px;"><i class="fa fa-chevron-left" style="margin-right: 10px;" aria-hidden="true"></i>' + VIS.Msg.getMsg('Back') + '</a>'
+                + '<a class="vis-wfm-btnAttExe btn" style="display:none;">' + VIS.Msg.getMsg('VIS_AttachExecute') + '<i class="fa fa-play-circle-o" style="margin-left: 10px;" aria-hidden="true"></i></a>'
+                + '<a class="vis-wfm-btnAbort btn" style="display:none;">' + VIS.Msg.getMsg('Abort') + '<i class="fa fa-stop-circle-o" style="margin-left: 10px;" aria-hidden="true"></i></a>'
+                //+ '<a href="#" title="' + VIS.Msg.getMsg('VIS_Next') + '" class="fa fa-arrow-circle-right vis-wfm-btnNext btn" style="display: block;"></a>'
+                //+ '<a href="#" title="' + VIS.Msg.getMsg('Back') + '" class="fa fa-arrow-circle-left vis-wfm-btnBack btn" style="display: none; margin-right: 10px;"></a>'
+                //+ '<a href="#" title="' + VIS.Msg.getMsg('VIS_AttachExecute') + '" class="fa fa-play-circle-o vis-wfm-btnAttExe btn" style="display: none;"></a>'
+                //+ '<a href="#" title="' + VIS.Msg.getMsg('Abort') + '" class="fa fa-stop-circle-o vis-wfm-btnAbort btn" style="display: none;"></a>'
                 + '</div>'
                 + '</div>'
                 + '</div>');
@@ -206,6 +216,7 @@
             _activeWFBadge = divele.find(".vis-wfm-activeBadge");
             _inactiveWFBadge = divele.find(".vis-wfm-inactiveBadge");
             _historyWFBadge = divele.find(".vis-wfm-historyBadge");
+            _tabContentArea = divele.find(".vis-wfm-tabContentArea");
 
             bindEvents();
             setBusy(false);
@@ -264,7 +275,7 @@
             else {
                 if (resData.wfDetails && resData.wfDetails.length > 0) {
                     for (var i = 0; i < resData.wfDetails.length; i++) {
-                        _activeWFSec.append('<div class="vis-wfm-workflow-item vis-wfm-workflowSelDiv" data-selection="n" data-workflowid="' + resData.wfDetails[i].AD_Workflow_ID + '">'
+                        _activeWFSec.append('<div class="vis-wfm-workflow-item vis-wfm-workflowSelDiv" data-selection="n" data-workflowid="' + resData.wfDetails[i].AD_Workflow_ID + '" style="padding: 6px 0;">'
                             + '<div class="vis-wfm-drag-items" style="display: none;"><span class="vis vis-drag-circle"></span></div>'
                             + '<div class="vis-wfm-workflow-item-left vis-wfm-activeWFList">'
                             + '<input class="vis-wfm-activeChkSelection" type="checkbox" style="margin: 10px; padding: 10px;">'
@@ -276,8 +287,8 @@
                             + '<p>' + resData.wfDetails[i].Description + '</p>'
                             + '</div>'
                             + '</div>'
-                            + '<div class="vis-wfm-workflow-item-right" style="display: none;">'
-                            + '<div class="vis-wfm-workflow-step">'
+                            + '<div class="vis-wfm-workflow-item-right">'
+                            + '<div class="vis-wfm-workflow-step" style="visibility: hidden;">'
                             + '<div class="vis-wfm-step-icon">'
                             + '<i class="fa fa-history" aria-hidden="true"></i>'
                             + '</div>'
@@ -290,8 +301,10 @@
                             + '<input type="checkbox" id="toggle1" checked="">'
                             + '<span class="vis-wfm-toggle-slider"></span>'
                             + '</div>'
-                            + '<div class="vis-wfm-menu-dots">'
-                            + '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>'
+                            + '<div title="' + VIS.Msg.getMsg('VIS_ViewDetail') + '" class="vis-wfm-menu-dots" >'
+                            //+ '<a href="#" class="vis-wfm-btnViewDetail" style="margin-left: 10px;">' + VIS.Msg.getMsg('VIS_ViewDetail') + '</a>'
+                            //+ '<i class="vis-wfm-wfConfigImg" aria-hidden="true"></i>'
+                            + _iconWFConfig
                             + '</div>'
                             + '</div>'
                             + '</div>');
@@ -303,76 +316,12 @@
                     showPanel("N");
                 }
             }
+            if ($root.find(".vis-wfm-menu-dots").length > 0) {
+                $root.find(".vis-wfm-menu-dots").off("click");
+                $root.find(".vis-wfm-menu-dots").on("click", onViewDetailClick);
+            }
             setBusy(false);
             return;
-
-            // clear workflow selection div
-            wfSelectionDiv.empty();
-            // check if workflow is in processing (e.g. in approval) then display workflow history tree
-            if (resData.processing) {
-                showPanel("A");
-                createHistoryPanel(resData.wfActInfo.actInfo, resData.wfAppInfo, resData.wfActInfo.wfActInf, resData.manualWF);
-                setBusy(false);
-            }
-            // else show linked document process type of workflows with this table
-            else {
-                if (resData.wfDetails && resData.wfDetails.length > 0) {
-                    //if (onInit) {
-                    for (var i = 0; i < resData.wfDetails.length; i++) {
-                        wfSelectionDiv.append('<div data-workflowid="' + resData.wfDetails[i].AD_Workflow_ID + '" class="vis-wfm-wfSingleCard">'
-                            + '<div class="vis-wfm-wf-cardTextWrap">'
-                            + '<div class="d-flex justify-content-between mb-1" style="align-items: center;">'
-                            + '<input class="vis-wfm-chkSelection" type="checkbox" style="height: 18px;width: 18px;">'
-                            + '<div class="d-flex align-items-center vis-wfm-wf-Cardheader">'
-                            + '<span class="vis-wfm-wfCardTtl vis-wfm-textOverflow-ellipsis d-block vis-wfm-wfCardTtl" title="' + resData.wfDetails[i].Name + '">' + resData.wfDetails[i].Name + '</span>'
-                            + '</div>'
-                            + '</div>'
-                            + '<div class="vis-wfm-wfCardTtl"><div class="vis-wfm-wfCardDesc vis-wfm-textOverflow-ellipsis mb-1" style="margin-bottom: 0 !important;">'
-                            + '<span class="vis-wfm-wfCardDescTtl mr-1" style="font-size: 0.800rem;">' + VIS.Msg.getMsg('SearchKeyValue') + ' : </span>'
-                            + '</div>'
-                            + '<span class="vis-wfm-wfCardDescValue vis-wfm-wfSearchKey" style="font-size: 0.850rem;" title="' + resData.wfDetails[i].Value + '">' + resData.wfDetails[i].Value + '</span>'
-                            + '</div>'
-                            + '</div>'
-                            + '<div class="justify-content-between align-items-center vis-wfm-wf-cardBottom" style="text-align:right;">'
-                            + '<span class="vis-wfm-viewDetail" style="text-decoration: underline; cursor: pointer;">' + VIS.Msg.getMsg('VIS_ViewDetail') + '</span>'
-                            + '</div>'
-                            + '</div>');
-                    }
-                    //}
-                    //else {
-                    //    var totalWF = wfSelectionDiv.find(".vis-wfm-wfSingleCard");
-                    //    if (totalWF.length > 0) {
-                    //        for (var i = 0; i < totalWF.length; i++) {
-                    //            if ($(totalWF.find("input")[i]).prop("checked")) {
-                    //                $(totalWF.find("input")[i]).prop("checked", false);
-                    //            }
-                    //        }
-                    //    }
-                    //}
-                    wfSelectionDiv.find(".vis-wfm-wf-cardTextWrap").off("click");
-                    wfSelectionDiv.find(".vis-wfm-wf-cardTextWrap").on("click", function (e) {
-                        var chkWFSel = null;
-                        e.stopPropagation();
-                        if (!$(e.target).hasClass("vis-wfm-chkSelection")) {
-                            if ($(e.target).hasClass(".vis-wfm-wfSingleCard")) {
-                                chkWFSel = $(e.target).find(".vis-wfm-chkSelection");
-                            }
-                            else {
-                                chkWFSel = $(e.target.closest(".vis-wfm-wfSingleCard")).find(".vis-wfm-chkSelection");
-                            }
-                            if (chkWFSel.prop("checked"))
-                                chkWFSel.prop("checked", false);
-                            else
-                                chkWFSel.prop("checked", true);
-                        }
-                    });
-                    showPanel("S");
-                }
-                else {
-                    showPanel("N");
-                }
-                setBusy(false);
-            }
         };
 
         /**
@@ -642,7 +591,6 @@
             if (activeActInfo) {
                 _btnAbort.attr("data-wfprocessid", activeActInfo.AD_WF_Process_ID);
                 _btnAbort.show();
-                //_btnHistory.show();
             }
 
             // display activity history for the nodes executed in past
@@ -652,9 +600,19 @@
                 var inExecution = false;
                 var statusText = 'vis-wfm-status-completed';
                 var statusTextMsg = VIS.Msg.getMsg("Completed");
+                var firstNodeOnly = '';
+                var clsActionIcon = 'fa fa-history';
+                var clsHistoryClass = '';
+                var currWFProcessID = 0;
+                var title = VIS.Msg.getMsg("ShowHistory");
                 for (var a = 0; a < manualWF.length; a++) {
                     var currWFID = manualWF[a].AD_Workflow_ID;
+                    clsHistoryClass = '';
+                    firstNodeOnly = '';
                     clsWFStatus = 'check';
+                    clsActionIcon = 'fa fa-history';
+                    currWFProcessID = 0;
+                    title = VIS.Msg.getMsg("ShowHistory");
                     for (var i = 0; i < wfActInfo.length; i++) {
                         if (currWFID != wfActInfo[i].AD_Workflow_ID) {
                             if (inExecution) {
@@ -681,10 +639,19 @@
                         break;
                     }
 
+                    if (clsWFStatus === 'check')
+                        clsHistoryClass = 'vis-wfm-showHistoryTimer';
+
                     var stepBoxHtml = null;
                     var triggerTime = null;
                     var sendNowBtn = "";
+                    var isWaitingTime = false;
+                    var waitTime = '';
+
                     if (clsWFStatus === 'waiting') {
+                        firstNodeOnly = 'style="visibility:hidden;"';
+                        clsActionIcon = 'fa fa-hourglass';
+                        title = VIS.Msg.getMsg("InQueue");
                         stepBoxHtml = '<h6>' + VIS.Msg.getMsg('InQueue') + '</h6><p></p>';
                         triggerTime = '<p>' + manualWF[a].Description + '</p>';
 
@@ -693,22 +660,38 @@
                             var nodes = wfActInfo[h].Node || [];
                             // var activityId = nodes[0].ADWFActivityID;
                             if (clsWFStatus === 'running' && new Date(nodes[0].EndWaitTimeN) > new Date()) {
-                                sendNowBtn = '<button class="vis-wfm-custom-btn vis-wfm-custom-btn-filled vis-wfm-btn-disabled" data-activityid="' + nodes[0].ADWFActivityID + '">Send Now</button>';
+                                isWaitingTime = true;
+                                waitTime = new Date(nodes[0].EndWaitTimeN).toLocaleString();
+                                sendNowBtn = '<button class="vis-wfm-custom-btn vis-wfm-custom-btn-filled vis-wfm-btn-disabled" data-activityid="' + nodes[0].ADWFActivityID + '">' + VIS.Msg.getMsg("VIS_ExecuteNow") + '</button>';
                             }
 
                             if (currWFID == wfActInfo[h].AD_Workflow_ID) {
                                 var allZ = nodes.every(n => n.Action === 'Z');
 
+                                if (nodes.length > 0) {
+                                    currWFProcessID = nodes[0].AD_WF_Process_ID;
+                                }
+
+                                if (nodes.length == 1) {
+                                    firstNodeOnly = 'style="visibility:hidden;"';
+                                }
+                                if (clsWFStatus === 'running' && nodes.length > 0)
+                                    clsHistoryClass = 'vis-wfm-showHistoryTimer';
+
                                 if (nodes.length === 0) {
                                     stepBoxHtml = '';
                                     NodeN = '';
                                     NodeLU = '';
-                                } else if (allZ) {
-                                    NodeN = nodes[0].Name;
-                                    NodeLU = new Date(nodes[0].LastUpdated).toLocaleString();
-                                    stepBoxHtml = '<h6>' + NodeN + '</h6><p>On ' + NodeLU + '</p>';
-                                } else {
-                                    var nonZNode = nodes.find(n => n.Action !== 'Z');
+                                }
+                                //else if (allZ) {
+                                //    NodeN = nodes[0].Name;
+                                //    NodeLU = new Date(nodes[0].LastUpdated).toLocaleString();
+                                //    stepBoxHtml = '<h6>' + NodeN + '</h6><p>On ' + NodeLU + '</p>';
+                                //}
+                                else {
+                                    // vis0008 Changes done to show last node only
+                                    //var nonZNode = nodes.find(n => n.Action !== 'Z');
+                                    var nonZNode = nodes[0];
                                     if (nonZNode) {
                                         NodeN = nonZNode.Name;
                                         NodeLU = new Date(nonZNode.LastUpdated).toLocaleString();
@@ -717,13 +700,14 @@
                                 }
                                 break;
                             }
-
                         }
-                        triggerTime = '<p>' + VIS.Msg.getMsg('VIS_LastTrigger') + " " + NodeLU + '</p>'
+                        if (isWaitingTime)
+                            triggerTime = '<p>' + VIS.Msg.getMsg('VIS_NextExecuteOn') + " " + waitTime + '</p>'
+                        else
+                            triggerTime = '<p>' + VIS.Msg.getMsg('VIS_LastTrigger') + " " + NodeLU + '</p>';
                     }
 
-
-                    _activeStatusWFSec.append('<div class="vis-wfm-workflow-item vis-wfm-workflowSelDiv" data-selection="n" data-workflowid="' + manualWF[a].AD_Workflow_ID + '">'
+                    _activeStatusWFSec.append('<div data-wfprocessid="' + currWFProcessID + '" style="cursor: default;" class="vis-wfm-workflow-item vis-wfm-workflowSelDiv" data-selection="n" data-workflowid="' + manualWF[a].AD_Workflow_ID + '">'
                         + '<div class="vis-wfm-drag-items" style="display: none;"><span class="vis vis-drag-circle"></span></div>'
                         + '<div class="vis-wfm-workflow-item-left">'
                         + '<div class="vis-wfm-workflow-left-items">'
@@ -741,7 +725,8 @@
                         + '</div>'
                         + '<div class="vis-wfm-workflow-item-right">'
                         + '<div class="vis-wfm-workflow-step">'
-                        + '<div class="vis-wfm-step-col">'
+                        + '<div title="' + title + '" class="vis-wfm-step-icon ' + clsHistoryClass + '" ' + ((clsWFStatus === 'waiting') ? '' : firstNodeOnly) + '><i class="' + clsActionIcon + '" aria-hidden="true"></i></div>'
+                        + '<div class="vis-wfm-step-col" ' + firstNodeOnly + '>'
                         + '<div class="vis-wfm-step-dot"></div><div class="vis-wfm-step-line"></div>'
                         + '</div>'
                         + '<div class="vis-wfm-step-box">' +
@@ -753,8 +738,10 @@
                         + '<input type="checkbox" id="toggle1" checked="">'
                         + '<span class="vis-wfm-toggle-slider"></span>'
                         + '</div>'
-                        + '<div class="vis-wfm-menu-dots">'
-                        + '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>'
+                        + '<div title="' + VIS.Msg.getMsg('VIS_ViewDetail') + '" class="vis-wfm-menu-dots">'
+                        //+ '<a href="#" class="vis-wfm-btnViewDetail" style="margin-left: 10px;">' + VIS.Msg.getMsg('VIS_ViewDetail') + '</a>'
+                        //+ '<i class="vis-wfm-wfConfigImg" aria-hidden="true"></i>'
+                        + _iconWFConfig
                         + '</div>'
                         + '</div>'
                         + '</div>');
@@ -765,7 +752,7 @@
                 for (var i = 0; i < wfActInfo.length; i++) {
                     clsHistoryView = "";
                     var nodeDet = wfActInfo[i].Node;
-                    var divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont item-flex-start" + clsHistoryView + "' style='display: flex;'></div>");
+                    var divHistory = $("<div data-wfprocessid='" + nodeDet[0].AD_WF_Process_ID + "' id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont item-flex-start" + clsHistoryView + "' style='display: flex;'></div>");
                     if (isInApproval) {
                         clsHistoryView = "vis-wfm-historyRec";
                         //divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont " + clsHistoryView + "' style='display: none;'></div>");
@@ -831,18 +818,17 @@
 
 
                             var divNode = $(`
-                                            <div class="vis-wfm-timeline-line"></div>
-        
+                                            <div class="vis-wfm-timeline-line" style="margin-left: 35px;"></div>        
                                           <!-- End Step -->
                                            <div class="vis-wfm-timeline-item">
                                           <div class="vis-wfm-timeline-box">
                                          <h6>${nodename}</h6>
                                              <p>On ${new Date(nodeDet[node].LastUpdated).toLocaleString()}</p>
                                           </div>
-                                       <div class="vis-wfm-timeline-marker">
+                                       <div class="vis-wfm-timeline-marker" style="margin-left: 35px;">
                                        <i class="fa fa-check"></i>
                                            </div>
-                                     <div class="vis-wfm-timeline-user">
+                                     <div class="vis-wfm-timeline-user" style="text-align: center;">
                                          ${userBlock}
                                       </div>
                                    </div>
@@ -854,84 +840,32 @@
                     }
                 }
 
+                _activeStatusWFSec.find(".vis-wfm-showHistoryTimer").off("click");
+                _activeStatusWFSec.find(".vis-wfm-showHistoryTimer").on("click", function (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    var procID = $(e.target).closest(".vis-wfm-workflow-item").attr("data-wfprocessid");
+                    var mainDiv = _historyWFSec.find("[data-wfprocessid='" + procID + "']").find(".vis-wfm-timeline").clone();
+                    var ch = new VIS.ChildDialog();
+                    ch.setContent(mainDiv);
+                    //ch.setHeight(450);
+                    ch.setWidth(525);
+                    ch.setTitle(VIS.Msg.getMsg("History"));
+                    ch.setModal(true);
+                    //Ok Button Click
+                    //  ch.onOkClick =
+
+                    //Disposing Everything on Close
+                    ch.onClose = function () {
+                        //if (self.onClose) self.onClose();
+                        //self.dispose();
+                    };
+                    ch.show();
+                    // events();
+                    ch.hidebuttons();
+                });
+
                 return;
-
-                if (activeActInfo) {
-                    _btnAbort.attr("data-wfprocessid", activeActInfo.AD_WF_Process_ID);
-                    _btnAbort.show();
-                    //_btnHistory.show();
-                }
-                //wfActStatusDiv.append('<button data-wfprocessid="' + activeActInfo.AD_WF_Process_ID + '" class="VIS_AbortBtn" style="height: 35px; width: 100px; border-radius: 10px; margin: 5px;">Abort</button>');
-
-                var isInApproval = false;
-                var clsHistoryView = "";
-                for (var i = 0; i < wfActInfo.length; i++) {
-                    clsHistoryView = "";
-                    var divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont " + clsHistoryView + "' style='display: block;'></div>");
-                    if (isInApproval) {
-                        clsHistoryView = "vis-wfm-historyRec";
-                        divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont " + clsHistoryView + "' style='display: none;'></div>");
-                    }
-                    if (i == 0 && wfAppInfo) {
-                        approvalContainer.append(divHistory);
-                        divHistory.css("margin-bottom", "0px");
-                    }
-                    else
-                        _activeStatusWFSec.append(divHistory);
-
-                    divHistory.append('<div class="vis-wfm-wfName">' + wfActInfo[i].WFName + '</div>');
-
-                    var divHistoryNode = $("<div class='vis-workflow-historyCls'>");
-                    var nodeDet = wfActInfo[i].Node;
-                    for (node in nodeDet) {
-                        if (nodeDet[node].History != null) {
-                            if (!isInApproval && nodeDet[node].History[0].State == 'OS') {
-                                isInApproval = true;
-                            }
-                            for (hNode in nodeDet[node].History) {
-                                if (nodeDet[node].History[hNode].State == 'CC' && node < (nodeDet.length - 1)) {
-                                    divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='" + VIS.Application.contextUrl + "Areas/VIS/Images/home/4.jpg'>")));
-                                    var divAppBy = $("<div class='vis-approved_wrap'>");
-                                    divAppBy.append("<div class='vis-ApproveCircleCls'><i class='vis vis-markx' ></i></div>");
-                                    var nodename = nodeDet[node].Name;
-                                    var divLeft = $("<div class='vis-left-part'>");
-                                    if (nodeDet[node].History[hNode].TextMsg.length > 0) {
-                                        var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(nodeDet[node].History[hNode].TextMsg) + "'></i>");
-                                        divLeft.append(btnDetail);
-                                    }
-                                    divLeft.append(nodename);
-                                    divAppBy.append(divLeft);
-                                    var divRight = $("<div class='vis-right-part'>");
-                                    divRight.append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(nodeDet[node].History[hNode].ApprovedBy));
-                                    divAppBy.append(divRight);
-                                    divHistoryNode.append(divAppBy);
-                                }
-                                else if ((node < (nodeDet.length - 1)) || nodeDet.length == 1) {
-                                    var divAppBy = $("<div class='vis-pending_wrap' >");
-                                    divAppBy.append($("<div class='vis-left-part'>").append(nodeDet[node].Name));
-                                    divAppBy.append($("<div class='vis-right-part'>").append(VIS.Msg.getMsg('Pending')));
-                                    divHistoryNode.append(divAppBy);
-                                }
-                                else {
-                                    divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='" + VIS.Application.contextUrl + "Areas/VIS/Images/home/4.jpg'>")));
-                                    var divStart = $("<div class='vis-start_wrap vis-workflow-startCls'>");
-                                    var divLeft = $("<div class='vis-left-part'>");
-                                    if (nodeDet[node].History[hNode].TextMsg.length > 0) {
-                                        var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(nodeDet[node].History[hNode].TextMsg) + "'></i>");
-                                        divLeft.append(btnDetail);
-                                    }
-                                    divLeft.append(nodeDet[node].Name);
-                                    divStart.append(divLeft);
-                                    var divRight = $("<div class='vis-right-part'>");
-                                    divRight.append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(nodeDet[node].History[hNode].ApprovedBy));
-                                    divStart.append(divRight);
-                                    divHistoryNode.append(divStart);
-                                }
-                            }
-                            divHistory.append(divHistoryNode);
-                        }
-                    }
-                }
             }
         };
 
@@ -996,7 +930,8 @@
          * @param {boolean} fromNextBack - parameter whether clicked from Next or Back button
          */
         function showPanel(panelSec, fromNextBack) {
-            _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('Active'));
+            _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('VIS_ActiveWorkflows'));
+            _tabContentArea.css("height", "calc(100vh - 350px)");
             _liHistory.show();
             _btnBack.hide();
             _btnNext.hide();
@@ -1018,7 +953,7 @@
                 _activeWFSec.show();
             }
             else if (panelSec == "Q") {
-                _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('ArrangeSequence'));
+                _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('VIS_ArrangeWFSequence'));
                 _activeWFBadge.text(_seqactiveWFSec.find(".vis-wfm-workflow-item").length);
                 _liHistory.hide();
                 _btnBack.show();
@@ -1026,7 +961,7 @@
                 _seqactiveWFSec.show();
             }
             else if (panelSec == "A") {
-                _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('Running'));
+                _liActive.find(".vis-wfm-tabName").text(VIS.Msg.getMsg('VIS_RunningWF'));
                 _activeWFBadge.text(_activeStatusWFSec.find(".vis-wfm-workflow-item").length);
                 _activeStatusWFSec.show();
             }
@@ -1036,57 +971,6 @@
                 wfNoRecDiv.show();
             }
             return;
-
-            bottomDiv.css("display", "block");
-            if (fromNextBack && (panelSec == "S" || panelSec == "Q")) {
-                _btnBack.css("display", "none");
-                _btnNext.css("display", "none");
-                _btnAbort.css("display", "none");
-                _btnHistory.css("display", "none");
-                _btnExecute.css("display", "none");
-                if (panelSec == "S") {
-                    wfSequenceDiv.fadeOut(function () {
-                        _btnNext.css("display", "block");
-                        wfSelectionDiv.fadeIn();
-                    });
-                }
-                else if (panelSec == "Q") {
-                    wfSelectionDiv.fadeOut(function () {
-                        _btnBack.css("display", "block");
-                        _btnExecute.css("display", "block");
-                        wfSequenceDiv.fadeIn();
-                    });
-                }
-            }
-            else {
-                wfNoRecDiv.css("display", "none");
-                wfSelectionDiv.css("display", "none");
-                wfSequenceDiv.css("display", "none");
-                wfActStatusDiv.css("display", "none");
-                _btnBack.css("display", "none");
-                _btnNext.css("display", "none");
-                _btnExecute.css("display", "none");
-                _btnAbort.css("display", "none");
-                _btnHistory.css("display", "none");
-                if (panelSec == "S") {
-                    wfSelectionDiv.css("display", "block");
-                    _btnNext.css("display", "block");
-                }
-                else if (panelSec == "Q") {
-                    wfSequenceDiv.css("display", "block");
-                    _btnBack.css("display", "block");
-                    _btnExecute.css("display", "block");
-                }
-                else if (panelSec == "N") {
-                    bottomDiv.css("display", "none");
-                    wfNoRecDiv.css("display", "block");
-                }
-                else if (panelSec == "A") {
-                    wfActStatusDiv.css("display", "block");
-                    _btnAbort.css("display", "block");
-                    _btnHistory.css("display", "block");
-                }
-            }
         };
 
         /**
@@ -1127,8 +1011,6 @@
                             $(_seqactiveWFSec.find(".vis-wfm-workflow-item")[i]).css("margin-top", "10px");
                         }
                     }
-                    //// Optional: Code to run after rearrangement (e.g., save order)
-                    //console.log("New order:", $(this).sortable("toArray"));
                 }
             });
 
@@ -1142,15 +1024,15 @@
                     url: VIS.Application.contextUrl + "VIS/WFManual/setNodeTime",
                     type: "POST",
                     data: {
-                        activityId: activityId
+                        activityId: activityId,
+                        AD_Table_ID: _ad_table_id,
+                        Record_ID: _record_id,
+                        AD_Window_ID: _ad_window_id
                     },
                     success: function (response) {
-                        if (response && response.success) {
-                            _btnSendNow.hide();
-                        } else {
-                            VIS.ADialog.error("", true, VIS.Msg.getMsg("VIS_FailedToSend") + (response.message || "Unknown error"), null);
-                        }
-                        setBusy(false);
+                        var resData = JSON.parse(response);
+                        showPanel("S");
+                        wfDetailResponse(resData);
                     },
                     error: function (xhr, status, error) {
                         console.error("Error sending workflow:", error);
@@ -1159,10 +1041,20 @@
                     }
                 });
             });
+        };
 
-            //_btnHistory.on("click", onHistoryClick);
-            //wfSelectionDiv.on("click", onSelectionDivClick);
-            //wfSequenceDiv.on("click", onSequenceDivClick);
+        function onViewDetailClick(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var wfrow = $(e.target).closest(".vis-wfm-workflow-item");
+            if (wfrow.length > 0) {
+                if (_wfCompPageID > 0) {
+                    VIS.viewManager.startForm(_wfCompPageID, wfrow.attr("data-workflowid"));
+                }
+                else {
+                    VIS.ADialog.info("VIS_WFCompNotInstalled");
+                }
+            }
         };
 
         function onSelectionWFClick(e) {
@@ -1239,7 +1131,7 @@
                 }
                 if (hasSelWF) {
                     _seqactiveWFSec.find(".vis-wfm-workflow-item").addClass("draggable-div").css("background-color", "#f5f5f5");
-                    _liActive.find(".vis-wfm-tabName").text("ArrangeSequence");
+                    _liActive.find(".vis-wfm-tabName").text("VIS_ArrangeWFSequence");
                     //_seqactiveWFSec.find(".vis-wfm-chkSelection").css("display", "none");
                     _seqactiveWFSec.find(".vis-wfm-drag-items").show();
                     _seqactiveWFSec.find(".vis-wfm-activeChkSelection").hide();
@@ -1248,6 +1140,7 @@
                             $(_seqactiveWFSec.find(".vis-wfm-workflow-item")[i]).append(_arrowEle.clone());
                     }
                     showPanel("Q", true);
+                    _seqactiveWFSec.find(".vis-wfm-workflow-item-right").css("visibility", "hidden");
                 }
                 else {
                     VIS.ADialog.info("VIS_PleaseSelectWF");
@@ -1342,10 +1235,14 @@
             var currItem = $(e.target);
             if (!currItem.hasClass("nav-item"))
                 currItem = currItem.closest(".nav-item");
-            if (currItem.find(".nav-link").attr("aria-controls").toLower().equals('history'))
+            if (currItem.find(".nav-link").attr("aria-controls").toLower().equals('history')) {
                 bottomDiv.hide();
-            else
+                _tabContentArea.css("height", "calc(100vh - 300px)");
+            }
+            else {
                 bottomDiv.show();
+                _tabContentArea.css("height", "calc(100vh - 350px)");
+            }
         };
 
         function onCloseClick(e) {
@@ -1365,8 +1262,11 @@
         this.update = function (record_ID) {
             // Get Value from Context
             try {
-                $root.closest(".vis-ad-w-p-ap-tp-o-body").find(".vis-ad-w-p-ap-tp-o-b-head").hide();
-                $root.closest(".vis-ad-w-p-ap-tp-o-b-content").css("height", "100%");
+                var headWFPanel = $root.closest(".vis-ad-w-p-ap-tp-o-body").find(".vis-ad-w-p-ap-tp-o-b-head");
+                headWFPanel.css("background", "unset").css("padding-bottom", "0px");
+                headWFPanel.find("h6").css("font-size", "x-large").css("color", "rgba(var(--v-c-on-secondary), 1)");
+                headWFPanel.find("span").css("color", "rgba(var(--v-c-on-secondary)").css("font-size", "20px").css("margin-right", "10px").css("margin-top", "5px");
+                //$root.closest(".vis-ad-w-p-ap-tp-o-b-content").css("height", "100%");
                 _record_id = record_ID;
                 getWFDetails(false);
             }

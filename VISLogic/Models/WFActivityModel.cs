@@ -976,7 +976,7 @@ OR
 
 
                 string sql = @"SELECT node.AD_WF_Node_ID, node.Name AS NodeName, usr.Name AS UserName, wfea.WFState, wfea.TextMsg,
-                                act.AD_WF_Activity_ID, act.EndWaitTime, act.Updated AS LastUpdated, node.Action FROM AD_WF_EventAudit wfea
+                                act.AD_WF_Activity_ID, act.EndWaitTime, act.Updated AS LastUpdated, node.Action, wfea.AD_WF_Process_ID FROM AD_WF_EventAudit wfea
                             INNER JOIN AD_WF_Node node 
                                 ON (node.AD_WF_Node_ID = wfea.AD_WF_Node_ID)
                             LEFT JOIN AD_User usr 
@@ -1015,6 +1015,7 @@ OR
                             ni.LastUpdated = Util.GetValueOfDateTime(ds.Tables[0].Rows[i]["LastUpdated"]).Value.ToLocalTime().ToUniversalTime();
                             ni.Action = Util.GetValueOfString(ds.Tables[0].Rows[i]["Action"]);
                             ni.ADWFActivityID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Activity_ID"]);
+                            ni.AD_WF_Process_ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Process_ID"]);
                             var endWaitTime = Util.GetValueOfDateTime(ds.Tables[0].Rows[i]["EndWaitTime"]);
                             if (endWaitTime.HasValue)
                             {
@@ -1823,6 +1824,12 @@ OR
         }
 
         public int ADWFActivityID
+        {
+            get;
+            set;
+        }
+
+        public int AD_WF_Process_ID
         {
             get;
             set;

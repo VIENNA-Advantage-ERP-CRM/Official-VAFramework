@@ -358,7 +358,8 @@ namespace VIS.Models
 
                 // Example: Update node timestamp
                 activity.SetEndWaitTime(DateTime.Now);
-                return activity.Save();
+                activity.SetWFState(StateEngine.STATE_COMPLETED);
+                return true;
             }
             catch (Exception ex)
             {
