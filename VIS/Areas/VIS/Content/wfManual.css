@@ -112,7 +112,7 @@
         border-radius: 0.50rem;
         color: rgba(var(--v-c-on-primary), 1) !important;
         cursor: pointer;
-        font-size: xx-large;
+        /*font-size: xx-large;*/
     }
 
 .vis-wfm-mainCont {
@@ -383,6 +383,7 @@
     flex: 1;
     flex-direction: column;
     gap: 0.5rem;
+    margin-left: 20px;
 }
 
 .vis-wfm-workflow-icon.check {
@@ -438,7 +439,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
+    /*margin-right: 10px;*/
     background-color: #e3f2fd;
     color: #0d6efd;
     border: 1px solid #0d6efd;
@@ -467,13 +468,16 @@
     }
 
 .vis-wfm-menu-dots {
-    width: 36px;
+    width: 100%;
+    text-align: center;
     height: 36px;
     display: flex;
+    /*display: none;*/
     align-items: center;
     justify-content: center;
     cursor: pointer;
     color: rgba(var(--v-c-primary), 1);
+    margin-left: 15px;
 }
 
 .vis-wfm-workflow-icon.running {
@@ -536,6 +540,7 @@ input:checked + .vis-wfm-toggle-slider:before {
     background-color: rgba(var(--v-c-primary), 1);
     color: rgba(var(--v-c-common), 1);
     transition: box-shadow 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
 }
 
 .vis-wfm-custom-btn {
@@ -753,6 +758,23 @@ input:checked + .vis-wfm-toggle-slider:before {
     margin: 0;
 }
 
+.vis-wfm-ClosePnl {
+    font-weight: 500;
+    font-size: 25px;
+    margin-right: 5px;
+}
+
+.vis-wfm-showHistoryTimer {
+    cursor: pointer;
+}
+
+
+.vis-wfm-wfConfigImg {
+    background: url(../images/workflow-diagram.svg);
+    background-repeat: no-repeat;
+    height: 30px;
+    width: 30px;
+}
     /* New Design css*/
     /*.workflow-icon {
     width: 36px;
