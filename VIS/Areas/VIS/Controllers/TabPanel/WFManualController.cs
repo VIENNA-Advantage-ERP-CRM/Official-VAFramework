@@ -67,16 +67,20 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(new { wfDetails = _wfDet, processing = _processing, wfActInfo = _wfActInfo, wfAppInfo = _wfInfo, composerID = wfCompID, manualWF = manualAttach, abortMsg = msg }), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult setNodeTime(int activityId)
+        public JsonResult setNodeTime(int activityId, int AD_Table_ID, int Record_ID, int AD_Window_ID)
         {
             try
             {
                 WFManualModel obj = new WFManualModel();
                 Ctx ctx = Session["ctx"] as Ctx;
-
                 bool result = obj.SetNodeTime(ctx, activityId);
-
-                return Json(new { success = result });
+                List<WFDetails> _wfDet = obj.GetWFDetails(ctx, AD_Table_ID);
+                WFActivityDetails _wfActInfo = obj.GetWFActivity(ctx, AD_Table_ID, Record_ID);
+                bool _processing = obj.IsWFInExecution(ctx, AD_Table_ID, Record_ID);
+                WFInfo _wfInfo = obj.GetAppActivities(ctx, AD_Window_ID, Record_ID);
+                int wfCompID = obj.GetWFComposerPageID(ctx);
+                List<WFDetails> manualAttach = obj.GetManuallyAttachedWFDetails(ctx, AD_Window_ID, Record_ID, AD_Table_ID);
+                return Json(JsonConvert.SerializeObject(new { success = result, wfDetails = _wfDet, processing = _processing, wfActInfo = _wfActInfo, wfAppInfo = _wfInfo, composerID = wfCompID, manualWF = manualAttach }), JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
