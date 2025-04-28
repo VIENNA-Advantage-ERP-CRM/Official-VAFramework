@@ -612,6 +612,7 @@ input:checked + .vis-wfm-toggle-slider:before {
     width: 2px;
     background-color: #000;
     transform: translateX(-50%);
+    margin-left: 35px;
 }
 
 .vis-wfm-timeline-item {
@@ -656,6 +657,7 @@ input:checked + .vis-wfm-toggle-slider:before {
     align-items: center;
     justify-content: center;
     z-index: 2;
+    margin-left: 35px;
 }
 
 .vis-wfm-timeline-user {
@@ -775,6 +777,19 @@ input:checked + .vis-wfm-toggle-slider:before {
     height: 30px;
     width: 30px;
 }
+
+.vis-wfm-btnIconCls {
+    margin-left: 10px;
+}
+
+.vis-wfm-btnIconClsRight {
+    margin-right: 10px;
+}
+
+.vis-wfm-btnBack{
+    margin-right: 10px;
+}
+
     /* New Design css*/
     /*.workflow-icon {
     width: 36px;
