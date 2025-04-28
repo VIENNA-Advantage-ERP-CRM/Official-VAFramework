@@ -101,11 +101,11 @@
 
             lblHeader = new VIS.Controls.VLabel("Headers", "Headers", true);
             headerCtrl.append(headerCtrlWrap);
-            headerCtrlWrap.append(lblHeader.getControl().css("display", "block")).append('<a style="color:rgba(var(--v-c-primary), 1); cursor: pointer;">' + VIS.Msg.getMsg("VIS_Addheader") + '</a>');
+            headerCtrlWrap.append(lblHeader.getControl().css("display", "block")).append('<a style="color:rgba(var(--v-c-primary), 1); cursor: pointer;">+ ' + VIS.Msg.getMsg("VIS_Addheader") + '</a>');
 
             lblQueryString = new VIS.Controls.VLabel("QueryString", "QueryString", true);
             queryStringCtrl.append(queryStringCtrlWrap);
-            queryStringCtrlWrap.append(lblQueryString.getControl().css("display", "block")).append('<a style="color:rgba(var(--v-c-primary), 1); cursor: pointer;">' + VIS.Msg.getMsg("VIS_AddParameter") + '</a>');
+            queryStringCtrlWrap.append(lblQueryString.getControl().css("display", "block")).append('<a style="color:rgba(var(--v-c-primary), 1); cursor: pointer;">+ ' + VIS.Msg.getMsg("VIS_AddParameter") + '</a>');
             txtBodyType = $('<select>'
                 + '<option>JSON</option>'
                 + '<option>Plain Text</option>'
