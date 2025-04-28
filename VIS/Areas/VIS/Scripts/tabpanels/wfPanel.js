@@ -182,10 +182,10 @@
 
                 + '<div class="vis-wfm-bottomCont" style="display: block;">'
                 + '<div class="vis-tp-btnWrap float-right" style="margin-right: 10px; display: flex;">'
-                + '<a class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') + '<i class="fa fa-chevron-right" style="margin-left: 10px;" aria-hidden="true"></i></a>'
-                + '<a class="vis-wfm-btnBack btn" style="display:none; margin-right: 10px;"><i class="fa fa-chevron-left" style="margin-right: 10px;" aria-hidden="true"></i>' + VIS.Msg.getMsg('Back') + '</a>'
-                + '<a class="vis-wfm-btnAttExe btn" style="display:none;">' + VIS.Msg.getMsg('VIS_AttachExecute') + '<i class="fa fa-play-circle-o" style="margin-left: 10px;" aria-hidden="true"></i></a>'
-                + '<a class="vis-wfm-btnAbort btn" style="display:none;">' + VIS.Msg.getMsg('Abort') + '<i class="fa fa-stop-circle-o" style="margin-left: 10px;" aria-hidden="true"></i></a>'
+                + '<a class="vis-wfm-btnNext btn">' + VIS.Msg.getMsg('VIS_Next') + '<i class="fa fa-chevron-right vis-wfm-btnIconCls" aria-hidden="true"></i></a>'
+                + '<a class="vis-wfm-btnBack btn" style="display:none;"><i class="fa fa-chevron-left vis-wfm-btnIconClsRight" aria-hidden="true"></i>' + VIS.Msg.getMsg('Back') + '</a>'
+                + '<a class="vis-wfm-btnAttExe btn" style="display:none;">' + VIS.Msg.getMsg('VIS_AttachExecute') + '<i class="fa fa-play-circle-o vis-wfm-btnIconCls" aria-hidden="true"></i></a>'
+                + '<a class="vis-wfm-btnAbort btn" style="display:none;">' + VIS.Msg.getMsg('Abort') + '<i class="fa fa-stop-circle-o vis-wfm-btnIconCls" aria-hidden="true"></i></a>'
                 //+ '<a href="#" title="' + VIS.Msg.getMsg('VIS_Next') + '" class="fa fa-arrow-circle-right vis-wfm-btnNext btn" style="display: block;"></a>'
                 //+ '<a href="#" title="' + VIS.Msg.getMsg('Back') + '" class="fa fa-arrow-circle-left vis-wfm-btnBack btn" style="display: none; margin-right: 10px;"></a>'
                 //+ '<a href="#" title="' + VIS.Msg.getMsg('VIS_AttachExecute') + '" class="fa fa-play-circle-o vis-wfm-btnAttExe btn" style="display: none;"></a>'
@@ -757,13 +757,13 @@
                         clsHistoryView = "vis-wfm-historyRec";
                         //divHistory = $("<div id='History_ID_" + i + "' class='vis-history-wrap vis-wfm-wfHisCont " + clsHistoryView + "' style='display: none;'></div>");
                     }
-                    if (i == 0 && wfAppInfo) {
-                        approvalContainer.append(divHistory);
-                        divHistory.css("margin-bottom", "0px");
-                    }
-                    else
-                        //  _activeStatusWFSec.append(divHistory);
-                        _historyWFSec.append(divHistory);
+                    //if (i == 0 && wfAppInfo) {
+                    //    approvalContainer.append(divHistory);
+                    //    divHistory.css("margin-bottom", "0px");
+                    //}
+                    //else
+                    //  _activeStatusWFSec.append(divHistory);
+                    _historyWFSec.append(divHistory);
                     var itemHeader = $('<div class="vis-wfm-workflow-item-header">');
                     itemHeader.append('<div class="vis-wfm-workflow-icon check"><i class="fa fa-check"></i></div>');
                     itemHeader.append(
@@ -818,14 +818,14 @@
 
 
                             var divNode = $(`
-                                            <div class="vis-wfm-timeline-line" style="margin-left: 35px;"></div>        
+                                            <div class="vis-wfm-timeline-line"></div>        
                                           <!-- End Step -->
                                            <div class="vis-wfm-timeline-item">
                                           <div class="vis-wfm-timeline-box">
                                          <h6>${nodename}</h6>
                                              <p>On ${new Date(nodeDet[node].LastUpdated).toLocaleString()}</p>
                                           </div>
-                                       <div class="vis-wfm-timeline-marker" style="margin-left: 35px;">
+                                       <div class="vis-wfm-timeline-marker">
                                        <i class="fa fa-check"></i>
                                            </div>
                                      <div class="vis-wfm-timeline-user" style="text-align: center;">
@@ -1267,6 +1267,7 @@
                 headWFPanel.find("h6").css("font-size", "x-large").css("color", "rgba(var(--v-c-on-secondary), 1)");
                 headWFPanel.find("span").css("color", "rgba(var(--v-c-on-secondary)").css("font-size", "20px").css("margin-right", "10px").css("margin-top", "5px");
                 //$root.closest(".vis-ad-w-p-ap-tp-o-b-content").css("height", "100%");
+                $root.closest(".vis-ad-w-p-ap-tp-o-b-content").css("overflow", "unset");
                 _record_id = record_ID;
                 getWFDetails(false);
             }
