@@ -1729,7 +1729,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                            jsonb_extract_path(WN.RequestData::jsonb, 'headers') AS Headers,
                            jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') AS BodyType,
                            CASE WHEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') = 'Plain Text'
-                           THEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyContent')
+                           THEN jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent')
                            ELSE jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent') END AS BodyContent,
                            jsonb_extract_path(WN.RequestData::jsonb, 'queryString') AS QueryString
                            FROM AD_WF_Node WN LEFT JOIN NodeAPICredential NC ON (NC.AD_WF_Node_ID=WN.AD_WF_Node_ID)

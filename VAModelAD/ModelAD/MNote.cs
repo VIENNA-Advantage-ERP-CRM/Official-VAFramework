@@ -259,7 +259,9 @@ namespace VAdvantage.Model
                     dayName = " (" + Msg.GetMsg(GetCtx(), "Yesterday") + ")"; ;
                 }
 
-                string msgBody = Msg.GetMsg(GetCtx(), "Received") + " " + localTime + dayName;
+                // vis0008 change in Notification message body, send text message instead of date time
+                //string msgBody = Msg.GetMsg(GetCtx(), "Received") + " " + localTime + dayName;
+                string msgBody = Msg.GetMsg(GetCtx(), "Received") + " : " + GetTextMsg();
 
                 PushNotification.SendNotificationToUser(GetAD_User_ID(), GetAD_Window_ID(), GetRecord_ID(), Msg.GetMsg(GetCtx(), "Notice"), msgBody , "N");
             }
