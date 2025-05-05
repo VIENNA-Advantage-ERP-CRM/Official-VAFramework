@@ -1803,11 +1803,12 @@ namespace VAdvantage.Model
                     }
                     int tDays = DateTime.DaysInMonth(dt_to.Year, dt_to.Month);
 
-                    if (tDays == dt_to.Day)
+                    /*if (tDays == dt_to.Day)
                     {
                         m_date2 = dt_to.Month + "/" + (dt_to.Day) + "/" + dt_to.Year;
                     }
-                    else if (calcBasis.Equals("F"))
+                    else */ 
+                    if (calcBasis.Equals("F"))
                     {
                         if (this.GetLastNValue() == 0)
                         {
