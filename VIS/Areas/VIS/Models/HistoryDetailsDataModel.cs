@@ -45,8 +45,11 @@ namespace VIS.Models
                         Appointment_UID, DateLastUpdated FROM (
                         SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
                         'EMAIL' AS TYPE, ma.TITLE AS SUBJECT, NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        ma.MailAddress, ma.MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl,
-                        CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
+                        ma.MailAddress, ma.MailAddressCc, NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS StartDate, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo, "
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
                         FROM MailAttachment1 ma 
                         JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY
                         WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'M' 
@@ -55,18 +58,25 @@ namespace VIS.Models
                         + @" UNION ALL 
                         SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
                         'INBOX' AS TYPE, ma.TITLE AS SUBJECT, NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        ma.MailAddress, ma.MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl,
-                        CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
+                        ma.MailAddress, ma.MailAddressCc, NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS StartDate , NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
                         FROM MailAttachment1 ma 
                         JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY       
                         WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'I'
                         AND ma.AD_TABLE_ID = " + _AD_Table_ID + " AND ma.RECORD_ID = " + RecordId
 
                         + @" UNION ALL 
-                        SELECT ce.CM_ChatEntry_ID AS ID, ch.AD_TABLE_ID, ch.RECORD_ID, ce.CREATED, au.NAME AS FROMUSER, 'CHAT' AS TYPE, 
-                        CAST('Chat' AS NVARCHAR2(50)) AS SUBJECT, ce.CharacterData AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, 
-                        '' AS AttendeeInfo, '' AS EmailToInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl, CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
+                        SELECT ce.CM_ChatEntry_ID AS ID, ch.AD_TABLE_ID, ch.RECORD_ID, ce.CREATED, au.NAME AS FROMUSER, 'CHAT' AS TYPE,
+                        CAST('Chat'" + (DB.IsPostgreSQL() ? " AS VARCHAR " : " AS NVARCHAR2") + "(50)) AS SUBJECT, ce.CharacterData AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MailAddress,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS MailAddressCc, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS StartDate , NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS EndDate, 
+                        '' AS AttendeeInfo, '' AS EmailToInfo," + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
                         FROM CM_ChatEntry ce JOIN CM_CHAT ch ON ce.CM_Chat_Id=ch.CM_Chat_Id
                         JOIN AD_USER au ON au.AD_USER_ID=ce.CREATEDBY 
                         WHERE ch.ISACTIVE = 'Y' AND ch.AD_TABLE_ID = " + _AD_Table_ID + " AND ch.RECORD_ID = " + RecordId
@@ -74,8 +84,11 @@ namespace VIS.Models
                         + @" UNION ALL 
                         SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 'LETTER' AS TYPE, 
                         ma.TITLE AS SUBJECT,  NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        ma.MailAddress, ma.MailAddressCc,  NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl,
-                        CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
+                        ma.MailAddress, ma.MailAddressCc,  NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS StartDate , NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
                         FROM MailAttachment1 ma 
                         JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
                         WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'L' 
@@ -83,8 +96,9 @@ namespace VIS.Models
 
                         + @" UNION ALL 
                         SELECT ai.AppointmentsInfo_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'APPOINTMENT' AS TYPE, 
-                        ai.SUBJECT AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED, 
-                        CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, 
+                        ai.SUBJECT AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED, "
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MailAddress,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS MailAddressCc, 
                         ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, ai.EmailToInfo, ai.MeetingUrl,
                         ai.Appointment_UID, ai.DateLastUpdated
                         FROM AppointmentsInfo ai 
@@ -94,8 +108,9 @@ namespace VIS.Models
 
                         + @" UNION ALL 
                         SELECT ai.AppointmentsInfo_ID AS ID, ai.AD_TABLE_ID, ai.RECORD_ID, ai.CREATED, au.NAME AS FROMUSER, 'TASK' AS TYPE, 
-                        ai.SUBJECT AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, ai.ISCLOSED AS ISTASKCLOSED, 
-                        CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, 
+                        ai.SUBJECT AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, ai.ISCLOSED AS ISTASKCLOSED, "
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MailAddress,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS MailAddressCc, 
                         ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, '' AS EmailToInfo, ai.MeetingUrl,
                         ai.Appointment_UID, ai.DateLastUpdated
                         FROM AppointmentsInfo ai 
@@ -105,9 +120,13 @@ namespace VIS.Models
 
                         + @" UNION ALL
                         SELECT aa.AD_ATTACHMENT_ID AS ID, aa.AD_TABLE_ID, aa.RECORD_ID, aa.CREATED, au.NAME AS FROMUSER, 'ATTACHMENT' AS TYPE, 
-                        CAST('Attachment' AS NVARCHAR2(50)) AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        CAST('' AS NVARCHAR2(255)) AS MailAddress, CAST('' AS NVARCHAR2(255)) AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, 
-                        '' AS AttendeeInfo, '' AS EmailToInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl, CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
+                        CAST('Attachment' AS NVARCHAR2(50)) AS SUBJECT, NULL AS CharacterData, au.NAME, 'N' AS HASATTACHMENT, '' AS ISTASKCLOSED,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MailAddress,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS MailAddressCc, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS StartDate , NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS EndDate, 
+                        '' AS AttendeeInfo, '' AS EmailToInfo," + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
                         FROM AD_ATTACHMENT aa 
                         JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY 
                         WHERE aa.ISACTIVE = 'Y' 
@@ -118,8 +137,11 @@ namespace VIS.Models
                 sql.Append(@" UNION ALL 
                         SELECT cd.VA048_CALLDETAILS_ID AS ID, cd.AD_TABLE_ID, cd.RECORD_ID, cd.CREATED, cd.VA048_FROM AS FROMUSER, 'CALL' AS TYPE, 
                         cd.VA048_Duration AS SUBJECT, NULL AS CharacterData, au.NAME, (CASE WHEN cd.VA048_RECORDINGS IS NOT NULL THEN 'Y' ELSE 'N' END) AS HASATTACHMENT, '' AS ISTASKCLOSED,
-                        NVL(cd.VA048_From, '-') AS MailAddress, NVL(cd.VA048_TO, '-') AS MailAddressCc, NULL AS StartDate , NULL AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo, CAST('' AS NVARCHAR2(255)) AS MeetingUrl,
-                        CAST('' AS NVARCHAR2(255)) AS Appointment_UID, NULL AS DateLastUpdated
+                        NVL(cd.VA048_From, '-') AS MailAddress, NVL(cd.VA048_TO, '-') AS MailAddressCc, NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") 
+                        + " AS StartDate , NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
+                        + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL" 
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
                         FROM VA048_CALLDETAILS cd 
                         JOIN AD_USER au ON au.AD_USER_ID=cd.CREATEDBY 
                         WHERE cd.VA048_TO IS NOT NULL AND cd.ISACTIVE = 'Y' 
