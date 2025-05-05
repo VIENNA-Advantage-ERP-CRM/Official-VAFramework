@@ -241,29 +241,35 @@ namespace VAdvantage.Model
             {
                 // VIS264 - Send push notification
 
-                DateTime now = DateTime.Now;
-                DateTime localTime = GetCreated().ToLocalTime();
-
-                string dayName = null;
-
-                if (now.ToShortDateString() == localTime.ToShortDateString())
-                {
-                    dayName = " (" + Msg.GetMsg(GetCtx(), "Today") + ")";
-                }
-                else if(now.AddDays(1).ToShortDateString() == localTime.ToShortDateString())
-                {
-                    dayName = " (" + Msg.GetMsg(GetCtx(), "Tomorrow") + ")";
-                }
-                else if (now.AddDays(-1).ToShortDateString() == localTime.ToShortDateString())
-                {
-                    dayName = " (" + Msg.GetMsg(GetCtx(), "Yesterday") + ")"; ;
-                }
-
                 // vis0008 change in Notification message body, send text message instead of date time
                 //string msgBody = Msg.GetMsg(GetCtx(), "Received") + " " + localTime + dayName;
-                string msgBody = Msg.GetMsg(GetCtx(), "Received") + " : " + GetTextMsg();
 
-                PushNotification.SendNotificationToUser(GetAD_User_ID(), GetAD_Window_ID(), GetRecord_ID(), Msg.GetMsg(GetCtx(), "Notice"), msgBody , "N");
+                string msgBody = "";
+                if (GetTextMsg() != "")
+                    msgBody = GetTextMsg();
+                else
+                {
+                    DateTime now = DateTime.Now;
+                    DateTime localTime = GetCreated().ToLocalTime();
+
+                    string dayName = null;
+
+                    if (now.ToShortDateString() == localTime.ToShortDateString())
+                    {
+                        dayName = " (" + Msg.GetMsg(GetCtx(), "Today") + ")";
+                    }
+                    else if (now.AddDays(1).ToShortDateString() == localTime.ToShortDateString())
+                    {
+                        dayName = " (" + Msg.GetMsg(GetCtx(), "Tomorrow") + ")";
+                    }
+                    else if (now.AddDays(-1).ToShortDateString() == localTime.ToShortDateString())
+                    {
+                        dayName = " (" + Msg.GetMsg(GetCtx(), "Yesterday") + ")"; ;
+                    }
+                    msgBody = Msg.GetMsg(GetCtx(), "Received") + " " + localTime + dayName;
+                }
+
+                PushNotification.SendNotificationToUser(GetAD_User_ID(), GetAD_Window_ID(), GetRecord_ID(), Msg.GetMsg(GetCtx(), "Notice"), msgBody, "N");
             }
 
             return true;
