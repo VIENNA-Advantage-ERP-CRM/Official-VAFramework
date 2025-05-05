@@ -60,12 +60,12 @@
                 '<nav class="VIS-activities-nav">' +
                 '<div class="nav nav-tabs" id="nav-tab" role="tablist">' +
                 '<a class="VIS-nav-item active" id="all" data-toggle="tab" href="#VIS-all_' + this.windowNo + '" role="tab" aria-controls="all" aria-selected="true">' + VIS.Msg.getMsg("All") + '</a>' +
-                '<a class="VIS-nav-item" id="appointment" data-toggle="tab" href="#VIS-appointment_' + this.windowNo + '" role="tab" aria-controls="appointment" aria-selected="false"><i class="fa fa-calendar-o"></i>' + VIS.Msg.getMsg("Appointments") + '<span class="badge">1</span></a>' +
-                '<a class="VIS-nav-item" id="email" data-toggle="tab" href="#VIS-emails_' + this.windowNo + '" role="tab" aria-controls="emails" aria-selected="false"><i class="vis vis-email"></i>' + VIS.Msg.getMsg("Emails") + '<span class="badge">1</span></a>' +
-                '<a class="VIS-nav-item" id="call" data-toggle="tab" href="#VIS-calls_' + this.windowNo + '" role="tab" aria-controls="calls" aria-selected="false"> <i class="fa fa-phone"></i>' + VIS.Msg.getMsg("Calls") + '<span class="badge">2</span></a>' +
-                '<a class="VIS-nav-item" id="chat" data-toggle="tab" href="#VIS-notes_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="fa fa-sticky-note-o"></i>' + VIS.Msg.getMsg("Notes") + '<span class="badge">2</span></a>' +
-                '<a class="VIS-nav-item" id="task" data-toggle="tab" href="#VIS-tasks_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="vis vis-task"></i>' + VIS.Msg.getMsg("Tasks") + '<span class="badge">2</span></a>' +
-                '<a class="VIS-nav-item" id="letter" data-toggle="tab" href="#VIS-letters_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="vis vis-letter"></i>' + VIS.Msg.getMsg("Letters") + '<span class="badge">2</span></a>' +
+                '<a class="VIS-nav-item" id="appointment" data-toggle="tab" href="#VIS-appointment_' + this.windowNo + '" role="tab" aria-controls="appointment" aria-selected="false"><i class="fa fa-calendar-o"></i>' + VIS.Msg.getMsg("Appointments") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="email" data-toggle="tab" href="#VIS-emails_' + this.windowNo + '" role="tab" aria-controls="emails" aria-selected="false"><i class="vis vis-email"></i>' + VIS.Msg.getMsg("Emails") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="call" data-toggle="tab" href="#VIS-calls_' + this.windowNo + '" role="tab" aria-controls="calls" aria-selected="false"> <i class="fa fa-phone"></i>' + VIS.Msg.getMsg("Calls") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="chat" data-toggle="tab" href="#VIS-notes_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="fa fa-sticky-note-o"></i>' + VIS.Msg.getMsg("Notes") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="task" data-toggle="tab" href="#VIS-tasks_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="vis vis-task"></i>' + VIS.Msg.getMsg("Tasks") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="letter" data-toggle="tab" href="#VIS-letters_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="vis vis-letter"></i>' + VIS.Msg.getMsg("Letters") + '<span class="badge">0</span></a>' +
                 '</div>' +
                 '</nav>' +
                 '<div class="tab-content" id="nav-tabContent">' +
