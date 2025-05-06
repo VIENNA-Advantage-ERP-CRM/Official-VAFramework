@@ -240,8 +240,8 @@
             btnSearch = $("<button class='VIS_Pref_btn-2'>").append(searchtxt);
             //}
 
-            divbtnRight.append(btnCancel);
             divbtnRight.append(btnOK);
+            divbtnRight.append(btnCancel);
             divbtnRight.append($('<div><input type="checkbox" id="chkDelCart_' + windowNo + '" ><span>' + VIS.Msg.getMsg("DeleteCart") + '</span>'));
             divbtnsec.append(btnSearch);
             searchTab.append(divbtnsec);
@@ -259,8 +259,8 @@
             //    searchTab.append(divbtnsec);
             //}
             //else {
-            divbtnRight.append(btnCancel);
             divbtnRight.append(btnOK);
+            divbtnRight.append(btnCancel);
             divbtnsec.append(btnSearch);
             searchTab.append(divbtnsec);
             //}

@@ -1,7 +1,7 @@
 VIS = window.VIS || {};
 (function () {
 
-    function surveyPanel(height) {
+    function surveyPanel(height, isHorizontalAligned) {
         this.record_ID = 0;
         this.windowNo = 99999;
         this.curTab = null;
@@ -40,6 +40,11 @@ VIS = window.VIS || {};
         var ht = null;
         this.init = function () {
             setBusy(false);
+
+            if (self.curTab && self.curTab.getIsShowBothTP() && !isHorizontalAligned) {
+                height = height - 44;
+            }
+
             $root = $('<div class="vis-surveyTab-root"></div>').append(bsyDiv);
             // h = $('.vis-ad-w-p-ap-tp-o-b-content').height() - 19;
             h = height - 4;
@@ -48,7 +53,7 @@ VIS = window.VIS || {};
                 h = $('.divWorkflowActivity').height() - 19;
             }
 
-            if (self.curTab && self.curTab.getIsTPBottomAligned()) {
+            if (self.curTab && isHorizontalAligned) {
                 h = null;
             }
 
@@ -321,7 +326,11 @@ VIS = window.VIS || {};
                     questionSection.find('input').prop('checked', false);
                     questionSection.find('textarea').val('');
                     toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
-                    self.isCheckListFill = false;
+                    self.isCheckListFill = false;                   
+                    self.ChecklistRes = undefined;
+                    self.selectdIdx = -1;
+
+
                     //loadAccessData(AD_Survey_ID);                        
                     if (_AD_WF_Activity_ID == 0) {
                         self.update(self.record_ID);
@@ -836,6 +845,9 @@ VIS = window.VIS || {};
     surveyPanel.prototype.refreshPanelData = function (recordID, selectedRow) {
         this.record_ID = recordID;
         this.selectedRow = selectedRow;
+        this.isCheckListFill = false;
+        this.ChecklistRes = undefined;
+        this.selectdIdx = -1;
         this.update(recordID);
 
     };

@@ -113,7 +113,7 @@
             });
             $txtSearch.on("keydown", function (e) {
                 if (e.keyCode == 13) {
-                    showBusy(true);
+                   // showBusy(true);
                     searchFunction();
                 }
             });
@@ -813,7 +813,7 @@
                 else {
                     var id = $(aOk).data("id");
                     approveIt(id, aOk);
-                    //showBusy(false);
+                    showBusy(false);
                 }
             };
             //Given Approve
@@ -864,6 +864,7 @@
                                 });
                             break;
                         }
+                        showBusy(false);
                     }
                     catch (e) {
                         showBusy(false);
@@ -1031,6 +1032,9 @@
                                     divAppBy.append(divRight);
                                     divHistoryNode.append(divAppBy);
 
+                                }
+                                else if (info.Node[node].History[hNode].State == 'BK') {
+                                    continue;
                                 }
                                 else if ((node < (info.Node.length - 1)) || info.Node.length == 1) {
                                     var divAppBy = $("<div class='vis-pending_wrap' >");
@@ -1209,6 +1213,7 @@
                 $row.css('display', 'block');
             });
             $workflowWidgetDtls_ID.scrollTop(0);
+            showBusy(false);
         };
 
         var ansBtnClick = function (index, AD_Window_ID, columnName) {
