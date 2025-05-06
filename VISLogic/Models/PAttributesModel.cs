@@ -153,7 +153,7 @@ namespace VIS.Models
                 var label = Msg.Translate(ctx, "AttrCode");
                 obj.tableStucture += "<tr>";
                 obj.tableStucture += "<td>";
-                obj.tableStucture += "<div class='input-group vis-input-wrap'>";
+                obj.tableStucture += "<div class='input-group vis-input-wrap' style='padding-top: 2px'>";
                 obj.tableStucture += "<div class='vis-control-wrap'>";
                 obj.tableStucture += "<input id='txtAttrCode_" + windowNo + "' value='' type='text'  placeholder=' ' data-placeholder=''>";
                 obj.tableStucture += "<label id=lot_" + windowNo + "' class='VIS_Pref_Label_Font'>" + label + "</label></div></div>";

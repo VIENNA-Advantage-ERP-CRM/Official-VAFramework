@@ -84,8 +84,8 @@
             //    divbtnRight.append(btnRequery);
             //}
             //else {
-            divbtnRight.append(btnCancel);
             divbtnRight.append(btnOK);
+            divbtnRight.append(btnCancel);
             divbtnLeft.append(btnRequery);
             //}
 
