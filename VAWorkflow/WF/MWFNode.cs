@@ -682,7 +682,7 @@ namespace VAdvantage.WF
                     int wfProcessor_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_WorkflowProcessor_ID FROM AD_WorkflowProcessor WHERE LOWER(Name) = 'standard wakeup node handler' AND AD_Client_ID = 0", null, Get_Trx()));
                     if (wfProcessor_ID <= 0)
                     {
-                        int schedule_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Schedule_ID FROM AD_Schedule WHERE LOWER(Name) = 'standard wakeup node schedule' AND AD_Client_ID IN (0)", null, Get_Trx()));
+                        int schedule_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Schedule_ID FROM AD_Schedule WHERE LOWER(Name) = 'standard wakeup node schedule' AND AD_Client_ID = 0", null, Get_Trx()));
                         if (schedule_ID <= 0)
                         {
                             MSchedule schedule = new MSchedule(GetCtx(), 0, Get_Trx());
