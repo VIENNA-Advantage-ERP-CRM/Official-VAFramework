@@ -986,7 +986,7 @@ OR
                                     SELECT AD_WF_Process_ID, AD_WF_Node_ID, MAX(Updated) FROM AD_WF_Activity GROUP BY AD_WF_Process_ID, AD_WF_Node_ID)) act
                                 ON (act.AD_WF_Process_ID = wfea.AD_WF_Process_ID
                                AND act.AD_WF_Node_ID = wfea.AD_WF_Node_ID) WHERE wfea.AD_WF_Process_ID = " + wfProcessID + @"
-                            ORDER BY act.Updated DESC";
+                            ORDER BY act.AD_WF_Activity_ID DESC, act.Updated DESC";
 
                 int attachmentCount = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT Count(AD_AttachmentLine.AD_Attachment_ID) FROM AD_Attachment 
                                         INNER JOIN AD_AttachmentLine ON (AD_Attachment.AD_Attachment_ID = AD_AttachmentLine.AD_Attachment_ID)

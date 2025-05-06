@@ -217,7 +217,7 @@ namespace VIS.Models
         {
             VIS.Models.WFActivityModel actModel = new WFActivityModel();
             WFActivityDetails _wfActDet = new WFActivityDetails();
-            DataSet ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " AND Processed = 'N' ORDER BY Created DESC");
+            DataSet ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " AND Processed = 'N' ORDER BY AD_WF_Activity_ID DESC");
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
