@@ -1912,7 +1912,7 @@ namespace VAdvantage.Common
                 return true;
             }
 
-            string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
+            string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID = "+ AD_Window_ID + " AND ad_table_id=" + AD_Table_ID;
 
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
             bool result = true;
