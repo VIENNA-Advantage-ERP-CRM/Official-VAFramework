@@ -753,7 +753,7 @@
                 });
 
                 $html.find(".VIS-btn-edit").click(function () {
-                    if (window.WSP) {
+                    if (window.WSP && WSP.WSP_AppointmentsForm) {
                         const btn = $(this);
                         var rid = $(this).data('rid');
                         var uid = $(this).data('uid');
@@ -765,7 +765,7 @@
                         WSP.WSP_AppointmentsForm.init(divaptbusy, tableID, _selectedId, rid, uid, url);
                     }
                     else {
-                        VIS.ADialog.info("PleaseInstallWSPModule");
+                        VIS.ADialog.info("PleaseUpdateWSPModule");
                     }
                 });
 
