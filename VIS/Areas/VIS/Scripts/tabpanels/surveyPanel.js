@@ -38,6 +38,7 @@ VIS = window.VIS || {};
         };
         var h = null;
         var ht = null;
+        var htr = null;
         this.init = function () {
             setBusy(false);
 
@@ -60,8 +61,11 @@ VIS = window.VIS || {};
             if (!h) {
                 h = 100 + '%';
                 ht = 100 + '%';
+                htr = 100 + '%';
             } else {
                 ht = (h - 38) + 'px';
+                htr = (h - 42) + 'px';
+
                 h = h + 'px';
 
             }
@@ -91,7 +95,7 @@ VIS = window.VIS || {};
                 + '<div class="align-items-center d-flex justify-content-center vis-displayNone" style="height:' + (ht) + '" id="quesMessage_' + self.windowNo + '"></div>'
                 + '<div style="height:' + (ht) + ';overflow-y:auto !important;" id="ques_' + self.windowNo + '"></div>'
                 + '</div>'
-                + '<div class="tab-pane fade mt-2" style="height:' + (ht) + ';width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
+                + '<div class="tab-pane fade mt-2" style="height:' + (htr) + ';width:100%;overflow:auto !important;" id="resp_' + self.windowNo + '">'
                 + '<div class="d-flex align-items-center justify-content-between mr-2 ml-2">'
                 + '<div class="d-flex align-items-center ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") + '">'
                 + '<span class="d-inline-block ' + (VIS.Application.isRTL ? " ml-1" : " mr-1") + '">' + VIS.Msg.getMsg("SelectUser") + '</span>'
@@ -148,7 +152,7 @@ VIS = window.VIS || {};
             _AD_Tab_ID = AD_Tab_ID;
             _AD_Table_ID = AD_Table_ID;
             _AD_WF_Activity_ID = AD_WF_Activity_ID;
-           
+
             IsMandatoryAll = false;
             self.IsMandatoryToFill = false;
             pageSize = 0;
@@ -205,14 +209,14 @@ VIS = window.VIS || {};
                     $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
                     responseSection.find('.response').empty();
                     loadSurveyUI(res[indx].Survey_ID, res[indx].SurveyType, $root);
-                } 
+                }
                 setBusy(false);
                 self.selectdIdx = indx;
             }
 
             if (self.ChecklistRes) {
                 processAssignment(self.ChecklistRes)
-            } else {               
+            } else {
 
                 $.ajax({
                     url: VIS.Application.contextUrl + "VIS/SurveyPanel/" + uri,
@@ -241,7 +245,7 @@ VIS = window.VIS || {};
             }
         }
 
-        
+
 
         this.getRoot = function () {
             return $root;
@@ -298,7 +302,7 @@ VIS = window.VIS || {};
                 }
             }
 
-            if (_AD_WF_Activity_ID == 0 && recordID <= 0 && Final_Data.Questions.length > 0) {
+            if (_AD_WF_Activity_ID == 0 && recordID <= 0) {
                 self.isCheckListFill = true;
                 toastr.success(VIS.Msg.getMsg("CheckWillAutoSaveAfterNewRecordSave"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
                 setBusy(false);
@@ -326,11 +330,9 @@ VIS = window.VIS || {};
                     questionSection.find('input').prop('checked', false);
                     questionSection.find('textarea').val('');
                     toastr.success(VIS.Msg.getMsg("CheckListSaved"), '', { timeOut: 3000, "positionClass": "toast-top-right", "closeButton": true, });
-                    self.isCheckListFill = false;                   
+                    self.isCheckListFill = false;
                     self.ChecklistRes = undefined;
                     self.selectdIdx = -1;
-
-
                     //loadAccessData(AD_Survey_ID);                        
                     if (_AD_WF_Activity_ID == 0) {
                         self.update(self.record_ID);
@@ -344,7 +346,7 @@ VIS = window.VIS || {};
                     setBusy(false);
                 }
             });
-        }       
+        }
 
         this.disposeComponent = function () {
             if (iFrame)
@@ -393,7 +395,7 @@ VIS = window.VIS || {};
             if (self.curTab && self.curTab.getIsTPBottomAligned()) {
                 stl = "";
             }
-            var dsg = '<div class="VIS_SI_Main' + self.windowNo + '" style="' + stl+'">' +
+            var dsg = '<div class="VIS_SI_Main' + self.windowNo + '" style="' + stl + '">' +
                 '<div class="vis-tp-mainContainer"> ' +
                 '<ol class="list-unstyled vis-tp-orderListWrap"> ';
             if (SurveyType == "CL") //if survey type is Checklist.
@@ -485,27 +487,27 @@ VIS = window.VIS || {};
                 responseSection.find('input,textarea').attr('disabled', 'disabled');
             }
             if (Limit > 0 && ResponseCount >= Limit) {
-                questionSection.hide();               
-                $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_AlreadySubmittedResponse"));                
+                questionSection.hide();
+                $root.find("#quesMessage_" + self.windowNo).html(VIS.Msg.getMsg("VIS_AlreadySubmittedResponse"));
                 $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
             } else {
                 questionSection.append($dsgn);
                 var main = questionSection.find('.VIS_SI_Main' + self.windowNo);
-                var stl1 ="bottom: 0px;position: absolute;width: calc(100% - 1px);"
+                var stl1 = "bottom: 0px;position: absolute;width: calc(100% - 1px);"
                 if (self.curTab && self.curTab.getIsTPBottomAligned()) {
                     stl1 = "bottom: 0px;position: absolute;width: calc(100% - 10px);";
                 }
-                var btns = '<div class="vis-survey" style="'+stl1+'">';
+                var btns = '<div class="vis-survey" style="' + stl1 + '">';
                 var totalQues = main.find('[class^=VIS_Quest_]').length;
 
                 //show pagging button according to page size and question length.
                 if (pageSize > 0 && totalQues > pageSize) {
-                    btns += '<div class="' + (VIS.Application.isRTL ? " float-right" : " float-left") + '"><a class="prev btn mr-2"><i class="fa fa-chevron-' + (VIS.Application.isRTL ? "right" : "left") +'" aria-hidden="true"></i> ' + VIS.Msg.getMsg('VIS_Prev') + '</a></div>';
+                    btns += '<div class="' + (VIS.Application.isRTL ? " float-right" : " float-left") + '"><a class="prev btn mr-2"><i class="fa fa-chevron-' + (VIS.Application.isRTL ? "right" : "left") + '" aria-hidden="true"></i> ' + VIS.Msg.getMsg('VIS_Prev') + '</a></div>';
                 }
 
                 btns += '<div style="padding-bottom: 10px;" class="vis-tp-btnWrap' + (VIS.Application.isRTL ? " float-left" : " float-right") + '" > ' +
-                    '<a class="next btn">' + VIS.Msg.getMsg('VIS_Next') + ' <i class="fa fa-chevron-' + (VIS.Application.isRTL ? "left" : "right") +'" aria-hidden="true"></i></a>' +
-                    '<a href="#" id="VIS_SI_BtnSubmit_' + self.windowNo + '" class="btn" >' + VIS.Msg.getMsg("VIS_Submit") +'</a> ' +
+                    '<a class="next btn">' + VIS.Msg.getMsg('VIS_Next') + ' <i class="fa fa-chevron-' + (VIS.Application.isRTL ? "left" : "right") + '" aria-hidden="true"></i></a>' +
+                    '<a href="#" id="VIS_SI_BtnSubmit_' + self.windowNo + '" class="btn" >' + VIS.Msg.getMsg("VIS_Submit") + '</a> ' +
                     '</div >';
 
                 btns += '<div>';
@@ -537,9 +539,9 @@ VIS = window.VIS || {};
                 }
             }
 
-           
+
             //if (!isSelfShow) {
-               // responseSection.hide();
+            // responseSection.hide();
             //} 
             if (_AD_WF_Activity_ID == 0) {
                 loadAccessData(AD_Survey_ID);
@@ -554,8 +556,8 @@ VIS = window.VIS || {};
                 surveyTab.find('.quesTab').hide();
                 return;
             }
-           
-           
+
+
         };
 
         function loadAccessData(AD_Survey_ID) {
@@ -579,8 +581,8 @@ VIS = window.VIS || {};
                     setBusy(false);
                     var res = [];
                     res = JSON.parse(data);
-                    
-                   
+
+
                     if (res != null && res.length > 0) {
                         var count = 0;
                         //responseSection.show();
@@ -630,15 +632,15 @@ VIS = window.VIS || {};
                     if (!userResponse['U' + uID]) {
                         responseSection.find('select option:selected').change();
                         return;
-                    } 
+                    }
 
                     AD_SurveyResponse_ID = userResponse['U' + uID][0].id;
                     if (userResponse['U' + uID].length > 1) {
                         responseSection.find('.next').removeAttr('disabled');
-                        responseSection.find('.prev').attr('disabled','disabled');
+                        responseSection.find('.prev').attr('disabled', 'disabled');
                     } else {
-                        responseSection.find('.prev').attr('disabled','disabled');
-                        responseSection.find('.next').attr('disabled','disabled');
+                        responseSection.find('.prev').attr('disabled', 'disabled');
+                        responseSection.find('.next').attr('disabled', 'disabled');
                     }
 
                     responseSection.find('.resStatus').text((1) + '/' + userResponse['U' + uID].length);
@@ -654,20 +656,20 @@ VIS = window.VIS || {};
                     if (notLimitExpaire && userResponse['U' + uID].length > 0) {
                         questionSection.hide();
                         $root.find("#quesMessage_" + self.windowNo).html('<span class="d-block px-2 text-center w-100">' + VIS.Msg.getMsg('VIS_SubmitAgain') + ' ' + $clickHere + '</span>');
-                            $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
-                            $root.find("#quesMessage_" + self.windowNo+" a").click(function () {
-                                questionSection.show();
-                                $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
-                                questionSection.find('.vis-tp-orderListWrap li').removeClass('hideQuestion');
-                                questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
-                                showHideSubmit();
-                            });                       
-                    }   
+                        $root.find("#quesMessage_" + self.windowNo).removeClass('vis-displayNone');
+                        $root.find("#quesMessage_" + self.windowNo + " a").click(function () {
+                            questionSection.show();
+                            $root.find("#quesMessage_" + self.windowNo).addClass('vis-displayNone');
+                            questionSection.find('.vis-tp-orderListWrap li').removeClass('hideQuestion');
+                            questionSection.find('.vis-tp-orderListWrap li:gt(' + (pageSize - 1) + ')').addClass('hideQuestion');
+                            showHideSubmit();
+                        });
+                    }
 
                     if (_AD_WF_Activity_ID == 0) {
                         loadSurveyResponse(uID);
                     }
-                                 
+
                 },
                 error: function (e) {
                     setBusy(false);
@@ -712,10 +714,10 @@ VIS = window.VIS || {};
         }
 
         //control setup
-        function findControls() {           
+        function findControls() {
             $mainDiv = questionSection.find('.VIS_SI_Main' + self.windowNo);
             $btnSubmit = questionSection.find('#VIS_SI_BtnSubmit_' + self.windowNo);
-            eventHandling(); 
+            eventHandling();
             showHideSubmit();
         };
 
@@ -738,12 +740,12 @@ VIS = window.VIS || {};
                 }
                 questionSection.find('.vis-tp-orderListWrap').scrollTop(0);
             }, 200);
-           
+
         }
 
         function eventHandling() {
             // Save response
-            
+
 
             $btnSubmit.off().on("click", function (e) {
                 self.SaveData(self.record_ID);
@@ -772,7 +774,7 @@ VIS = window.VIS || {};
             });
 
             responseSection.find('select').off().change(function () {
-                userResIdx = 0;              
+                userResIdx = 0;
                 var userID = responseSection.find('select option:selected').val();
                 AD_SurveyResponse_ID = userResponse['U' + userID][0].id;
                 responseSection.find('.submittedDate').text(userResponse['U' + userID][0].Created);
@@ -792,8 +794,8 @@ VIS = window.VIS || {};
                 var userID = responseSection.find('select option:selected').val();
                 AD_SurveyResponse_ID = userResponse['U' + userID][userResIdx].id;
                 responseSection.find('.submittedDate').text(userResponse['U' + userID][userResIdx].Created);
-                if (userResIdx >=userResponse['U' + userID].length - 1){
-                    $(this).attr('disabled','disabled');
+                if (userResIdx >= userResponse['U' + userID].length - 1) {
+                    $(this).attr('disabled', 'disabled');
                 }
                 responseSection.find('.prev').removeAttr('disabled');
                 responseSection.find('.resStatus').text((userResIdx + 1) + '/' + userResponse['U' + userID].length);
@@ -813,7 +815,7 @@ VIS = window.VIS || {};
                 loadSurveyResponse(userID);
             });
 
-            
+
         };
 
         //Single selection of checkbox
@@ -845,7 +847,7 @@ VIS = window.VIS || {};
     surveyPanel.prototype.refreshPanelData = function (recordID, selectedRow) {
         this.record_ID = recordID;
         this.selectedRow = selectedRow;
-        this.isCheckListFill = false;
+        //this.isCheckListFill = false;
         this.ChecklistRes = undefined;
         this.selectdIdx = -1;
         this.update(recordID);

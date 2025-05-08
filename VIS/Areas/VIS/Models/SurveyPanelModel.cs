@@ -272,7 +272,7 @@ namespace VIS.Models
                     string condition = "";
                     //if (Util.GetValueOfString(dt["IsConditionalChecklist"])=="N")
                     //{
-                    if (AD_Record_ID > 0)
+                    if (AD_Record_ID > 0 && Util.GetValueOfString(dt["IsConditionalChecklist"]) == "Y")
                     {
                         isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     }
