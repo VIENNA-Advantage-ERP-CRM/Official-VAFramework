@@ -317,7 +317,7 @@
                         $(FllCmntTxt).parent('.vis-feedMessage').css('flex-direction', '');
                     }
                     else {
-                        VIS.ADialog.info("EnterData");
+                        VIS.ADialogCallback.info("EnterData", '', '', lastFocus);
                     }
                 }
                 //else if (datafll == "UID") {
@@ -345,7 +345,7 @@
                     // Display the error message when there is no data in textarea
                     if (code === 13 && cmntTxt.trim() == "" && !evnt.altKey) {
                         evnt.preventDefault();
-                        VIS.ADialog.info("EnterData");
+                        VIS.ADialogCallback.info("EnterData", '', '', lastFocus);
                     }
                     // Check whether the enter key is pressed
                     if (code === 13) {
@@ -524,7 +524,7 @@
                                 }
                                 this.parentNode.style.flexDirection = this.scrollHeight > textAreaHeight ? 'column' : 'row';
                             });
-                        }
+                        } 
                         else {
                             if (isFllScroll == false) {
                                 if (VIS.Application.isRTL) {
@@ -544,6 +544,12 @@
                     }
                 });
             }
+
+            // Sets focus back to the comment text box after the info popup is closed
+            function lastFocus() {
+                $(FllCmntTxt).focus();
+            }
+
             //get fllups comment from Controller
             function getFllUpsCmnt(FllupsID, fllCmntPageSize, fllCmntPage) {
                 var url = VIS.Application.contextUrl + 'Home/GetJSONFllupsCmnt/';
