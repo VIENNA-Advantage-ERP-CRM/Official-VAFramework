@@ -172,10 +172,14 @@ VIS = window.VIS || {};
                             indx = 0;
                             break;
                         }
-                        var isValidate = VIS.Evaluator.evaluateLogicByRowData(self.curTab, res[i].ConditionStr);
-                        if (isValidate) {
-                            indx = i;
-                            break;
+                        if (res[i].ConditionStr != "") {
+                            var isValidate = VIS.Evaluator.evaluateLogicByRowData(self.curTab, res[i].ConditionStr);
+                            if (isValidate) {
+                                indx = i;
+                                break;
+                            }
+                        } else {
+                            continue;
                         }
                     }
 
