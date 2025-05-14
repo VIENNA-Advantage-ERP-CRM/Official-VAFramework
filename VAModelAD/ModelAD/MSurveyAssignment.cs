@@ -71,6 +71,12 @@ namespace VAdvantage.Model
         {
             if (GetAD_SurveyAssignment_ID() > 0)
             {
+                if(!string.IsNullOrEmpty(GetDocAction()))
+                {
+                    SetIsConditionalChecklist(false);
+                    Set_Value("IsMandatoryToFill", false);
+                }
+
                 int tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
                 if (tableID != GetAD_Table_ID() && IsConditionalChecklist())
                 {

@@ -164,6 +164,7 @@
     border: 1px solid rgba(var(--v-c-on-secondary), .3);
     border-radius: .3rem;
     padding: 0 .2rem;
+    align-items: flex-end;
 }
 .vis-feedContainer .vis-txtFllCmnt {
     border: none;

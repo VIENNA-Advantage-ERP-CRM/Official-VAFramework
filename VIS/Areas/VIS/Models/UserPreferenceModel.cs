@@ -790,7 +790,7 @@ namespace VIS.Models
                     {
                         string firstTwo = sessionToken.Substring(0, 2);
                         string lastTwo = sessionToken.Substring(sessionToken.Length - 2, 2);
-                        maskedToken = firstTwo + new string('*', 16) + lastTwo;
+                        maskedToken = firstTwo + new string('*', 12) + lastTwo;
                     }
 
                     Dictionary<string, object> obj = new Dictionary<string, object>();

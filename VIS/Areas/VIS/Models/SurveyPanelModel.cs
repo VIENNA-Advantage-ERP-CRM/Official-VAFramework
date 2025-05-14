@@ -464,20 +464,20 @@ namespace VIS.Models
             {
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
-                    bool isvalidate = false;
+                    //bool isvalidate = false;
                     //if (Util.GetValueOfString(dt["IsConditionalChecklist"]) == "N")
                     //{
-                    isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
+                    //isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     //    if (isvalidate)
                     //    {
                     //        isvalidate = true;
                     //    }
                     //}
 
-                    if (!isvalidate)
-                    {
-                        continue;
-                    }
+                    //if (!isvalidate)
+                    //{
+                    //    continue;
+                    //}
 
                     // sql = "SELECT AD_Survey_ID FROM AD_SurveyAssignment WHERE ad_window_id=" + AD_Window_ID + " AND AD_TAb_ID=" + AD_Tab_ID;
 
