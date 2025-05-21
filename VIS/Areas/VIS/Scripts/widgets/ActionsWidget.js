@@ -32,6 +32,9 @@
             widgetsPopup();
             events();
             loadCounts(true);
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
         };
 
         /* Declare events */

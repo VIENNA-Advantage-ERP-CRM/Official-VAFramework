@@ -72,6 +72,9 @@
             createBusyIndicator();
             showBusy(true);
             getworkflowWidget(true, true);
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
         };
         /* Get controls from root */
         function getControls() {
