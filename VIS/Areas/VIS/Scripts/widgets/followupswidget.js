@@ -191,6 +191,7 @@
                         $('body').off('click', '#followupsCloseBtn' + widgetID);
                         $('body').on('click', '#followupsCloseBtn' + widgetID, function (e) {
                             $thisObj.unReadMsgCount();
+                            $thisObj.refreshWidget();
                             w2popup.close();
                             $(this).remove();
                         });
