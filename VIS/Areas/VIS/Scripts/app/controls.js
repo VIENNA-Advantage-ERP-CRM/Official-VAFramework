@@ -6970,6 +6970,7 @@
 
         $ctrl.on("countrychange", function (e, countryData) {
             e.stopPropagation();
+            setZeroFormattedPlaceholder($ctrl[0]);
             if (!self.settingVal) {
                 setChangeValue(e);
             }
@@ -7035,6 +7036,12 @@
 
 
     };
+
+    function setZeroFormattedPlaceholder(input) {
+        const original = input.getAttribute("placeholder") || "";
+        const masked = original.replace(/\d/g, "0"); // replace digits only
+        input.setAttribute("placeholder", masked);
+    }
 
     VIS.Utility.inheritPrototype(VTelePhone, IControl);//Inherit from IControl
 
@@ -7128,7 +7135,10 @@
             },
             utilsScript: baseUrl + "Areas/ViennaBase/Scripts/tel_Input/utils.js?1638200991544"
         });
-
+        setTimeout(function () {
+            if (this.ctrl)
+            setZeroFormattedPlaceholder(this.ctrl[0]);
+        }, 200);
     };
 
     VTelePhone.prototype.getControl = function (parent) {
