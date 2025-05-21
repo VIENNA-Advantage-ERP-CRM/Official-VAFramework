@@ -38,6 +38,9 @@
             createBusyIndicator();
             showBusy(true);
             loadHomeNotice(true, true, true);
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
         };
         /* Declare events */
         function events() {
