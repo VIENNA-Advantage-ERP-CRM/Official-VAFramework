@@ -256,7 +256,22 @@ namespace VIS.Helpers
                     {
                         itm.HasImage = true;
                         itm.IsImageByteArray = false;
-                        itm.IconUrl = img.GetImageURL();
+                        if (!string.IsNullOrEmpty(img.GetImageExtension()))
+                        {
+                            string[] url = img.GetImageURL().Split('/');
+                            if (url.Length > 0)
+                            {
+                                itm.IconUrl = img.GetImageURL().Split('/')[0] + "/" + AD_Image_ID + "" + img.GetImageExtension(); //img.GetImageURL(); 
+                            }
+                            else
+                            {
+                                itm.IconUrl = img.GetImageURL();
+                            }
+                        }
+                        else
+                        {
+                            itm.IconUrl = img.GetImageURL();
+                        }
                     }
                     else if (img.GetBinaryData() != null)
                     {

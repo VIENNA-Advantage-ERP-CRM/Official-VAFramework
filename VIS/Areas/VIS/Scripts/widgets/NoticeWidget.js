@@ -30,7 +30,7 @@
 
         var elements = [
             "SelectWindow"];
-        var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
+       // var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
 
         /* Initialize the form design*/
         this.Initalize = function () {
@@ -97,7 +97,7 @@
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeNotice',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabAjaxBusy },
-                async: async,
+               // async: async,
                 type: 'GET',
                 datatype: 'json',
                 success: function (result) {
