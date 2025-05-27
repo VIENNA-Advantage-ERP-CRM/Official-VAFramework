@@ -1443,10 +1443,11 @@ namespace VIS.Helpers
                 #region WorkFlow Count
                 //To Get Work flow Count
 
-                strQuery = @"SELECT COUNT(*)
+                strQuery = @"SELECT COUNT(AD_WF_Activity_ID)
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'
-                            AND a.WFState      ='OS'
+                            AND a.WFState      ='OS' 
+                            AND a.EndWaitTime IS NULL 
                             AND a.AD_Client_ID =" + ctx.GetAD_Client_ID() + @"
                             AND ( (a.AD_User_ID=" + ctx.GetAD_User_ID() + @"
                             OR a.AD_User_ID   IN
@@ -1458,7 +1459,7 @@ namespace VIS.Helpers
                               AND (sysdate    <=validto )
                               ))
                             OR EXISTS
-                              (SELECT *
+                              (SELECT AD_WF_Responsible_ID
                               FROM AD_WF_Responsible r
                               WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
                               AND COALESCE(r.AD_User_ID,0)=0
@@ -1474,7 +1475,7 @@ namespace VIS.Helpers
                                 ))
                               )
                             OR EXISTS
-                              (SELECT *
+                              (SELECT AD_WF_Responsible_ID
                               FROM AD_WF_Responsible r
                               WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
                               AND a.AD_User_ID = " + ctx.GetAD_User_ID() + @" AND r.ResponsibleType = 'H'
@@ -1489,7 +1490,7 @@ namespace VIS.Helpers
                                 ))
                               )
                             OR EXISTS
-                              (SELECT *
+                              (SELECT AD_WF_Responsible_ID
                               FROM AD_WF_Responsible r
                               INNER JOIN AD_User_Roles ur
                               ON (r.AD_Role_ID            =ur.AD_Role_ID)
@@ -1506,7 +1507,7 @@ namespace VIS.Helpers
                               AND r.responsibletype NOT IN ('H','C', 'M')
                               ) 
                             OR EXISTS
-                              (SELECT *
+                              (SELECT AD_WF_Responsible_ID
                               FROM AD_WF_Responsible r
                               INNER JOIN AD_Role ro
                               ON (r.AD_Role_ID            =ro.AD_Role_ID)                              

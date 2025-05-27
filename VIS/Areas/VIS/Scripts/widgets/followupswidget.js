@@ -17,12 +17,13 @@
         var $self = this;
         var $root = $('<div class="vis-maindiv">');
         var widgetID = null;
+        var FllUpsMain;
         var $bsyDiv = null;
 
 
         /* Initialize the form design */
         this.Initalize = function (widgetId) {
-            createBusyIndicator();
+            createBusyIndicator();          
             if ((this.widgetInfo && this.widgetInfo.AD_UserHomeWidgetID)) {
                 widgetID = this.widgetInfo.AD_UserHomeWidgetID;
                 var followUpContainer = $('<div id="openModal">' +
@@ -190,6 +191,7 @@
                         $('body').off('click', '#followupsCloseBtn' + widgetID);
                         $('body').on('click', '#followupsCloseBtn' + widgetID, function (e) {
                             $thisObj.unReadMsgCount();
+                            $thisObj.refreshWidget();
                             w2popup.close();
                             $(this).remove();
                         });
@@ -221,7 +223,11 @@
             var fllpcount = 0, fllPageSize = 10, fllPage = 1, fllLastPage = 0, fllcntpage = 0;
             var fllCmntPageSize = 10, fllCmntPage = 0, fllCmntLastPage = 0, fllCmntcntpage = 0;
             var fllChatID = 0, fllSubscriberID = 0, isFllScroll = false, isRef = false, isfllBusy = false;
-            var FllUpsMain = $("#fllupsList");
+            FllUpsMain = $("#fllupsList");
+            setInterval(function () {
+                FllUpsMain.empty();
+                getFllUps(fllPageSize, fllPage, true);
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
 
             FllUpsMain.empty();
             getFllUps(fllPageSize, fllPage, true);

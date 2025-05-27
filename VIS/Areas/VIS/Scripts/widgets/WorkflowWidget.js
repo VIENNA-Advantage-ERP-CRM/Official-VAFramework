@@ -64,7 +64,7 @@
 
         var elements = [
             "SelectWindow"];
-        var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
+       // var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
 
         /* Initialize the form design*/
         this.Initalize = function () {
@@ -72,6 +72,9 @@
             createBusyIndicator();
             showBusy(true);
             getworkflowWidget(true, true);
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
         };
         /* Get controls from root */
         function getControls() {
@@ -263,7 +266,7 @@
             $.ajax({
                 url: VIS.Application.contextUrl + "WFActivity/GetActivities",
                 data: { pageNo: pageNo, pageSize: PageSize, refresh: refresh, searchText: searchText, "AD_Window_ID": windowID, "dateFrom": fromDate, "dateTo": toDate, "AD_Node_ID": nodeID },//$self.windowNo
-                async: async,
+                //async: async,
                 dataType: "json",
                 type: "POST",
                 error: function () {
@@ -535,7 +538,7 @@
                 $addDetails_ID.empty();
                 $.ajax({
                     url: VIS.Application.contextUrl + "WFActivity/GetActivityInfo",
-                    async: false,
+                    async: true,
                     dataType: "json",
                     type: "POST",
                     data: {
@@ -1133,7 +1136,7 @@
                 var lookupCur = new VIS.MGAttributeLookup(VIS.context, 0);
                 $.ajax({
                     url: VIS.Application.contextUrl + "WFActivity/GetRelativeData",
-                    async: false,
+                    async: true,
                     data: { activityID: wfActivityID },
                     dataType: "json",
                     success: function (dyndata) {

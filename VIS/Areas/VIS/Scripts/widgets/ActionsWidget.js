@@ -32,6 +32,9 @@
             widgetsPopup();
             events();
             loadCounts(true);
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
         };
 
         /* Declare events */
@@ -130,7 +133,7 @@
         function loadCounts(async) {
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/getWidgetsCount',
-                async: async,
+              // async: async,
                 type: 'GET',
                 datatype: 'json',
                 success: function (result) {

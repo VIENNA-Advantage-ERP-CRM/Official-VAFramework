@@ -30,7 +30,7 @@
 
         var elements = [
             "SelectWindow"];
-        var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
+       // var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
 
         /* Initialize the form design*/
         this.Initalize = function () {
@@ -38,6 +38,9 @@
             createBusyIndicator();
             showBusy(true);
             loadHomeNotice(true, true, true);
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
         };
         /* Declare events */
         function events() {
@@ -94,7 +97,7 @@
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeNotice',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabAjaxBusy },
-                async: async,
+               // async: async,
                 type: 'GET',
                 datatype: 'json',
                 success: function (result) {

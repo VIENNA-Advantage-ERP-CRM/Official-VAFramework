@@ -112,7 +112,8 @@ OR
 " + dmsCheck + @" 
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'
-                            AND a.WFState      ='OS'
+                            AND a.WFState      ='OS' 
+                            AND a.EndWaitTime IS NULL 
                             AND a.AD_Client_ID =" + AD_Client_ID + @" 
                             AND ((a.AD_User_ID=" + AD_User_ID + @" 
                             OR a.AD_User_ID   IN
@@ -288,6 +289,7 @@ OR
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'
                             AND a.WFState      ='OS'
+                            AND a.EndWaitTime IS NULL 
                             AND a.AD_Client_ID =" + ctx.GetAD_Client_ID() + @"
                             AND ((a.AD_User_ID=" + ctx.GetAD_User_ID() + @"
                             OR a.AD_User_ID   IN
