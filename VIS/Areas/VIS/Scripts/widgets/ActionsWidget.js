@@ -133,7 +133,7 @@
         function loadCounts(async) {
             $.ajax({
                 url: VIS.Application.contextUrl + 'Home/getWidgetsCount',
-                async: async,
+              // async: async,
                 type: 'GET',
                 datatype: 'json',
                 success: function (result) {

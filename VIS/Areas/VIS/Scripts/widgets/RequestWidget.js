@@ -33,7 +33,7 @@
 
         var elements = [
             "SelectWindow"];
-        var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
+        //var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
 
         /* Initialize the form design*/
         this.Initalize = function () {
@@ -111,7 +111,7 @@
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeRequest',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabDataRef },
                 type: 'GET',
-                async: async,
+               // async: async,
                 datatype: 'json',
                 cache: false,
                 success: function (result) {
@@ -274,7 +274,7 @@
                 type: "POST",
                 datatype: "json",
                 contentType: "application/json; charset=utf-8",
-                async: async,
+               // async: async,
                 data: JSON.stringify(data)
             }).done(function (json) {
                 result = json;
