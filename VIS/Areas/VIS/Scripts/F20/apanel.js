@@ -977,7 +977,7 @@
                 this.refresh();
             }
 
-            if (self.curGC.aFilterPanel.isConditionApply()) {
+            if (self.curGC && self.curGC.aFilterPanel.isConditionApply()) {
                 self.setFilterActive(true);
             } else {
                 self.setFilterActive(false);
