@@ -5240,7 +5240,7 @@
         }
         catch (e) {
             console.log(e);
-            sql = VIS.secureEngine.decrypt(sql);
+            sql = "RefreshRow";
             this.log.log(Level.SEVERE, sql, e);
             this.fireDataStatusEEvent("RefreshError", sql, true);
             return null;
