@@ -19,8 +19,8 @@ deleteFilesByPattern(path.resolve(__dirname, 'Areas/VIS/Content'), /^VIS\.all\.m
 
 
 const versions = {
-    'VIS.all': '3.1.30.0',
-    'VIS2_0': '3.1.30.0',
+    'VIS.all': '3.1.31.0',
+    'VIS2_0': '3.1.31.0',
     'React': '1.0.0.1',
     'VIS': '3.1.27.0' // CSS Version
 };
