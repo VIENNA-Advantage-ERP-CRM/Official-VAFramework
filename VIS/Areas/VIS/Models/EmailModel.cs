@@ -68,7 +68,7 @@ namespace VIS.Models
             VAdvantage.Utility.EMail sendmail = new VAdvantage.Utility.EMail(ctx, "", "", "", "", "", "",
                   true, false);
             string isConfigExist = sendmail.IsConfigurationExist(ctx);
-            if (isConfigExist != "OK")
+            if (isConfigExist != "OK" && isConfigExist == "ConfigurationIncompleteOrNotFound")
             {
                 return isConfigExist;
             }

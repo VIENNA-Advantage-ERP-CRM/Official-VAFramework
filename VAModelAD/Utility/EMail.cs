@@ -29,6 +29,8 @@ using System.Text.RegularExpressions;
 using VAdvantage.Logging;
 using VAdvantage.DataBase;
 using System.Data;
+using System.Linq;
+using System.Reflection;
 
 namespace VAdvantage.Utility
 {
@@ -326,10 +328,6 @@ namespace VAdvantage.Utility
             names = toName.Split(';');
             for (int i = 0; i < emailList.Length; i++)
                 AddTo(emailList[i].Trim(), names[i]);
-
-
-
-
 
             _ctx = ctx;
             if (subject == null || subject.Length == 0)
@@ -1247,76 +1245,148 @@ namespace VAdvantage.Utility
             log.Log(Level.INFO, "Start Executing send Mail function");
 
             string configMessage = IsConfigurationExist(_ctx);
-            if (configMessage != "OK")
-            {
-                return configMessage;
-            }
 
-            SmtpClient smtpClient = new SmtpClient();
-            //smtpClient.
-            smtpClient.Host = _smtpHost;
-            smtpClient.Port = _smtpPort;
-            smtpClient.Timeout = 200000;
-            //if(_isSmtpTLS)
-            smtpClient.EnableSsl = _isSmtpTLS;
-            try
-            {
-
-                if (_smtpConfig != null)
-                {
-                    if (_smtpConfig.SmtpAuthentication)
-                    {
-                        smtpClient.Credentials = new System.Net.NetworkCredential(_smtpConfig.UserName, _smtpConfig.Password);
-                        // smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                    }
-                    else
-                    {
-                        smtpClient.UseDefaultCredentials = true;
-
-                    }
-                    smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                }
-                else
-                {
-                    if (_auth != null)		//	createAuthenticator was called
-                    {
-                        smtpClient.Credentials = _auth;
-                    }
-                    else
-                    {
-
-                        //  smtpClient.Credentials = new System.Net.NetworkCredential("veena.pandey@viennasolutions.com", "veena");
-                        // smtpClient.DeliveryMethod = mailSettings.Smtp.DeliveryMethod;
-                        smtpClient.UseDefaultCredentials = true;
-                    }
-                }
-
-
-            }
-            catch (SecurityException se)
-            {
-                log.Log(Level.WARNING, "Auth=" + _auth + " - " + se.ToString());
-                _sentMsg = se.ToString();
-                return se.ToString();
-            }
-            catch (Exception e)
-            {
-                log.Log(Level.SEVERE, "Auth=" + _auth, e);
-                _sentMsg = e.ToString();
-                return e.ToString();
-            }
-
-            log.Info("(" + _smtpHost + ") " + _from + " -> " + _to);
-            _sentMsg = null;
-            //
             if (!IsValid(true))
             {
                 _sentMsg = "Invalid Data";
                 return _sentMsg;
             }
+           
 
-            try
+            if (configMessage != "OK")
             {
+                // Handle OAuth path
+                if (int.TryParse(configMessage, out int credentialId))
+                {
+                    try
+                    {
+
+
+                        //	_msg = new MimeMessage(session);
+                        _msg = new MailMessage();
+                        //	Addresses
+                        _msg.From = _from;
+
+                        MailAddress[] rec = GetTos();
+                        if (rec != null && rec.Length > 0)
+                        {
+                            //    //_msg.setRecipient(Message.RecipientType.TO, rec[0]);
+                            //    _msg.To.Add(rec[0]);
+                            //}
+                            //else
+                            //{
+                            //_msg.setRecipients(Message.RecipientType.TO, rec);
+                            //_msg.To = rec;
+                            foreach (MailAddress ma in rec)
+                            {
+                                _msg.To.Add(ma);
+                            }
+                        }
+                        rec = GetCcs();
+                        if (rec != null && rec.Length > 0)
+                        {
+                            //_msg.setRecipients(Message.RecipientType.CC, rec);
+                            //_msg.CC = rec;
+                            foreach (MailAddress ma in rec)
+                            {
+                                _msg.CC.Add(ma);
+                            }
+                        }
+                        rec = GetBccs();
+                        if (rec != null && rec.Length > 0)
+                        {
+                            //_msg.setRecipients(Message.RecipientType.BCC, rec);
+                            //_msg.Bcc = rec;
+                            foreach (MailAddress ma in rec)
+                            {
+                                _msg.Bcc.Add(ma);
+                            }
+                        }
+                        if (_replyTo != null)
+                        {
+                            //_msg.setReplyTo(new Address[] { _replyTo });
+                            //_msg.ReplyTo = _replyTo;
+                            _msg.ReplyToList.Add(_replyTo);
+                        }
+                        //
+                        //_msg.setSentDate(new java.util.Date());
+
+                        _msg.Headers.Add("Comments", "FrameworkMail");
+
+                        //_msg.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure | DeliveryNotificationOptions.OnSuccess;
+                        _msg.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure;
+
+                        SetContent();
+                        log.Fine("message =" + _msg);
+
+                        ///////////
+                        if (ISHTML)
+                        {
+                            _msg.IsBodyHtml = true;
+                        }
+            
+                        //****************************//
+                        string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin");
+                        string dllPath = Path.Combine(basePath, "VA101Svc.dll");
+                        Assembly assembly = Assembly.LoadFrom(dllPath);
+                        //****************************//
+                        // Load type VA101.Common.EmailServices
+                        Type emailServiceType = assembly.GetType("VA101.Common.EmailServices");
+                        if (emailServiceType == null)
+                        {
+                            return "Type 'VA101.Common.EmailServices' not found.";
+
+                        }
+
+                        // Create an instance of EmailServices
+                        object emailServiceInstance = Activator.CreateInstance(emailServiceType);
+                        // Get the SendEmail method with proper parameter types
+                        // Get the method with matching parameter types
+                        MethodInfo sendEmailMethod = emailServiceType.GetMethod("SendEmail", new Type[] {
+            typeof(Ctx), typeof(int), typeof(MailMessage)
+            });
+
+                        if (sendEmailMethod == null)
+                        {
+                            return "SendEmail method not found.";
+                        }
+
+                        // Prepare arguments
+                        object[] parameters = new object[]
+                        {
+                    _ctx,
+                    credentialId ,
+                    _msg
+                        };
+
+                        object result = sendEmailMethod.Invoke(emailServiceInstance, parameters);
+
+                        return Util.GetValueOfString(result);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Log(Level.SEVERE, "OAuth Mail send failed", ex);
+                        return "OAuthSendFailed: " + ex.Message;
+                    }
+                }
+                else
+                {
+                    return configMessage;
+                }
+                
+            }
+
+                SmtpClient smtpClient = null;            
+                smtpClient = new SmtpClient();
+                //smtpClient.
+                smtpClient.Host = _smtpHost;
+                smtpClient.Port = _smtpPort;
+                smtpClient.Timeout = 200000;
+                //if(_isSmtpTLS)
+                smtpClient.EnableSsl = _isSmtpTLS;
+                try
+                {
                 //	_msg = new MimeMessage(session);
                 _msg = new MailMessage();
                 //	Addresses
@@ -1381,7 +1451,64 @@ namespace VAdvantage.Utility
                 }
                 //////////
 
-                smtpClient.Send(_msg);
+
+
+                if (_smtpConfig != null)
+                    {
+                        if (_smtpConfig.SmtpAuthentication)
+                        {
+                            smtpClient.Credentials = new System.Net.NetworkCredential(_smtpConfig.UserName, _smtpConfig.Password);
+                            // smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        }
+                        else
+                        {
+                            smtpClient.UseDefaultCredentials = true;
+
+                        }
+                        smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    }
+                    else
+                    {
+                        if (_auth != null)      //	createAuthenticator was called
+                        {
+                            smtpClient.Credentials = _auth;
+                        }
+                        else
+                        {
+
+                            //  smtpClient.Credentials = new System.Net.NetworkCredential("veena.pandey@viennasolutions.com", "veena");
+                            // smtpClient.DeliveryMethod = mailSettings.Smtp.DeliveryMethod;
+                            smtpClient.UseDefaultCredentials = true;
+                        }
+                    }
+
+
+                }
+                catch (SecurityException se)
+                {
+                    log.Log(Level.WARNING, "Auth=" + _auth + " - " + se.ToString());
+                    _sentMsg = se.ToString();
+                    return se.ToString();
+                }
+                catch (Exception e)
+                {
+                    log.Log(Level.SEVERE, "Auth=" + _auth, e);
+                    _sentMsg = e.ToString();
+                    return e.ToString();
+                }
+
+                log.Info("(" + _smtpHost + ") " + _from + " -> " + _to);
+                _sentMsg = null;
+                //
+               
+
+            try
+            {                
+
+                if (smtpClient != null)
+                {
+                    smtpClient.Send(_msg);
+                }
                 log.Fine("Success - MessageID=" + GetMessageID());
 
                 log.Log(Level.INFO, "End Executing send Mail function");
@@ -1412,6 +1539,43 @@ namespace VAdvantage.Utility
             _sentMsg = SENT_OK;
             return _sentMsg;
         }
+
+
+        private MailMessage BuildMailMessage()
+        {
+            var message = new MailMessage
+            {
+                From = _from,
+                IsBodyHtml = ISHTML,
+                DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure
+            };
+
+            MailAddress[] rec;
+
+            rec = GetTos();
+            if (rec?.Length > 0)
+                foreach (var ma in rec) message.To.Add(ma);
+
+            rec = GetCcs();
+            if (rec?.Length > 0)
+                foreach (var ma in rec) message.CC.Add(ma);
+
+            rec = GetBccs();
+            if (rec?.Length > 0)
+                foreach (var ma in rec) message.Bcc.Add(ma);
+
+            if (_replyTo != null)
+                message.ReplyToList.Add(_replyTo);
+
+            message.Headers.Add("Comments", "FrameworkMail");
+
+            SetContent(); // this modifies _msg.Subject and _msg.Body internally
+            message.Subject = _msg.Subject;
+            message.Body = _msg.Body;
+
+            return message;
+        }
+
 
         /// <summary>
         /// Get Email and Name from a string
@@ -1623,42 +1787,91 @@ namespace VAdvantage.Utility
         public string IsConfigurationExist(Ctx ctx)
         {
             int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID()));
-            MUserMailConfigration userConfig = new MUserMailConfigration(ctx, mailConfigID, null);
-            string username = userConfig.GetSmtpUsername();
-            string password = userConfig.GetSmtpPassword();
-            string host = userConfig.GetSmtpHost();
+          
+            string username =null;
+            string password = null;
+            string host = null;
             bool isSmtpAuthorization = false;
-            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(host) || IsSendFromClient)
+            string protocol = "SM"; // default
+
+            if (mailConfigID > 0)
             {
-                X_AD_Client client = new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
+                MUserMailConfigration userConfig = new MUserMailConfigration(ctx, mailConfigID, null);
+
+                if (Env.IsModuleInstalled("VA101_"))
+                {
+                    protocol = Util.GetValueOfString(userConfig.Get_Value("VA101_Protocol"));
+                }
+
+                if (protocol == "SM")
+                {
+                    username = userConfig.GetSmtpUsername();
+                    password = userConfig.GetSmtpPassword();
+                    host = userConfig.GetSmtpHost();
+                    if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(host))
+                        return "ConfigurationIncompleteOrNotFound";
+
+                    CreateAuthenticator(username, password);
+                    return "OK";
+                }
+                else
+                {
+                    if (Util.GetValueOfInt(userConfig.Get_Value("VA101_APIAuthCredential_ID"))>0)
+                    {
+                        return Util.GetValueOfString(userConfig.Get_Value("VA101_APIAuthCredential_ID"));
+                    }
+
+                    return "ConfigurationIncompleteOrNotFound";
+                }
+
+            }
+
+
+            X_AD_Client client = new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
+            if (Env.IsModuleInstalled("VA101_"))
+            {
+                protocol = Util.GetValueOfString(client.Get_Value("VA101_Protocol"));
+            }            
+
+            if (protocol == "SM")
+            {
                 host = client.GetSmtpHost();
                 int smtpport = client.GetSmtpPort();
                 isSmtpAuthorization = client.IsSmtpAuthorization();
+
                 if (!IsSendFromClient)
                 {
                     MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
                     username = user.GetEMailUser();
                     password = user.GetEMailUserPW();
                 }
+
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || IsSendFromClient)
                 {
                     username = client.GetRequestUser();
                     password = client.GetRequestUserPW();
                 }
-            }
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(host))
-            {
+                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(host))
+                    return "ConfigurationIncompleteOrNotFound";
+
+                if (isSmtpAuthorization)
+                    CreateAuthenticator(username, password);
+
+                return "OK";
+            }
+            else{
+                if (Util.GetValueOfInt(client.Get_Value("VA101_APIAuthCredential_ID")) > 0)
+                {
+                    return Util.GetValueOfString(client.Get_Value("VA101_APIAuthCredential_ID"));
+                }
+
                 return "ConfigurationIncompleteOrNotFound";
             }
-            if (isSmtpAuthorization)
-                CreateAuthenticator(username, password);
-            return "OK";
+
+            return "ConfigurationIncompleteOrNotFound";
+           
         }
-
-
-
-
 
     }
 
