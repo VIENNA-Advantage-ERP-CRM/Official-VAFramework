@@ -171,7 +171,7 @@ namespace VIS.Models
 
             EMail objMail = new EMail(ctx, "", "", "", "", "", "", true, false);
             string isConfigExist = objMail.IsConfigurationExist(ctx);
-            if (isConfigExist != "OK" && isConfigExist == "ConfigurationIncompleteOrNotFound")
+            if (isConfigExist != "OK")
             {
                 return isConfigExist;
             }
