@@ -60,7 +60,7 @@
         var selectedItems = [];
         var lstDetailCtrls = [];
         var historyDivShow = false;
-
+        var attachIconHtml = null;
 
         var elements = [
             "SelectWindow"];
@@ -180,6 +180,13 @@
         };
         //Create Widget
         function createWidget() {
+            attachIconHtml = `
+  <div class="vis-wfw-attachment-wrapper" style="position: relative; display: inline-block;">
+    <i class="fa fa-paperclip vis-wfw-attachClip" style="font-size: 20px; color: rgba(var(--v-c-primary), 1); cursor: pointer;" aria-hidden="true"></i>
+    <div id="ListContainer" class="vis-wfw-attachment-dropdown" style="display: none; position: absolute; top: 30px; right: 0; background: white; border: 1px solid #ccc; z-index: 999; padding: 5px; min-width: 200px;"></div>
+  </div>
+`;
+
             $workflowWidget = ' <div id="FstMainDiv' + $self.AD_UserHomeWidgetID + '" class="vis-cardCls w-100">'// style="background-color:#f3f3f3"
                 + '     <div class="vis-w-welcomeScreenFeeds h-100">'
                 + ' <div class="vis-w-row vis-w-rowDiv">'
@@ -669,6 +676,7 @@
 
             if (info.AttachmentCount > 0) {
                 li1.append("<pre class='vis-preCls'>" + VIS.Msg.getMsg('Attachment') + " : " + VIS.Msg.getMsg('Yes') + "</pre>");
+                divHeader.append(attachIconHtml);
             }
 
             // if  any checkbox is checked, then don't show summary in middle panel.
@@ -1104,6 +1112,114 @@
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
                 $welcomeScreenFeedsLists.css('display', 'block');
                 $row.css('display', 'block');
+            });
+
+            $workflowActivitys.find('.vis-wfw-attachClip').on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var $listContainer = $('#ListContainer');
+
+                // Toggle dropdown visibility
+                if ($listContainer.is(':visible')) {
+                    $listContainer.hide();
+                    return;
+                }
+
+                showBusy(true);
+                // Fetch attachments
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Attachment/GetAttachment",
+                    dataType: "json",
+                    data: {
+                        AD_Table_ID: fulldata[index].AD_Table_ID,
+                        Record_ID: fulldata[index].Record_ID
+                    },
+                    error: function () {
+                        VIS.ADialog.info('ERRORGettingAttachment');
+                        $listContainer.hide();
+                    },
+                    success: function (data) {
+                        showBusy(false);
+                        var locations = data.result.FLocation;
+                        var attachments = data.result.Attachment;
+
+                        // Get actual attachment records
+                        if (attachments && attachments._lines) {
+                            attachments = attachments._lines;
+                        } else {
+                            attachments = [];
+                        }
+
+                        if (!locations || attachments.length === 0) {
+                            VIS.ADialog.info('ERRORGettingAttachment');
+                            $listContainer.hide();
+                            return;
+                        }
+
+                        var $ul = $('<ul class="attachment-list" style="list-style: none; padding-left: 0; margin: 0;"></ul>');
+
+                        attachments.forEach(function (attachment, i) {
+                            var fileName = attachment.FileName || 'Attachment ' + (i + 1); // <- Correctly use FileName here
+                            var fileUrl = locations[i]; // Match by index
+                            var $li = $(`
+    <li style="padding: 8px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid white;">
+        <a href="${fileUrl}" target="_blank" title="${fileName}" style="text-decoration: none; color: inherit; flex-grow: 1;">
+            ${fileName}
+        </a>
+        <i class="fa fa-long-arrow-down vis-wfw-download-icon" style="cursor: pointer;" title="Download" data-url="${fileUrl}" data-filename="${fileName}" aria-hidden="true"></i>
+    </li>
+`);
+                            $ul.append($li);
+                        });
+
+                        $listContainer.html($ul).show();
+                        // 🔽 Download click event
+                        $listContainer.find('.vis-wfw-download-icon').on('click', function () {
+                            var $icon = $(this);
+                            var fileUrl = $icon.data('url');
+                            var fileName = $icon.data('filename');
+                            var idx = $icon.closest('li').index(); // Get the index of the clicked item
+
+                            var actionOrigin = VIS.ProcessCtl.prototype.ORIGIN_WINDOW;
+                            if (!$self.isWindowAction) {
+                                actionOrigin = VIS.ProcessCtl.prototype.ORIGIN_FORM;
+                            }
+
+                            showBusy(true);
+                            $.ajax({
+                                url: VIS.Application.contextUrl + "Attachment/DownloadAttachment",
+                                dataType: "json",
+                                data: {
+                                    fileName: data.result.Attachment._lines[idx].FileName,
+                                    AD_Attachment_ID: data.result.Attachment.AD_Attachment_ID,
+                                    AD_AttachmentLine_ID: data.result.Attachment._lines[idx].Line_ID,
+                                    actionOrigin: actionOrigin,
+                                    originName: VIS.context.getWindowContext($self.windowNo, "WindowName"),
+                                    AD_Table_ID: fulldata[index].AD_Table_ID,
+                                    recordID: fulldata[index].Record_ID
+                                },
+                                error: function () {
+                                    VIS.ADialog.info('ERRORGettingFile');
+                                    showBusy(false);
+                                },
+                                success: function (res) {
+                                    var d = new Date();
+                                    var filePath = res.result;
+                                    var fileName = data.result.Attachment._lines[idx].FileName;
+                                    var url = VIS.Application.contextUrl + "TempDownload/" + filePath + "/" + fileName + "?" + d.getTime();
+                                    showBusy(false);
+                                    var a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = fileName; // This forces the browser to download the file
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                }
+                            });
+                        });
+                    }
+                });
             });
         };
         //Create Controls based on data

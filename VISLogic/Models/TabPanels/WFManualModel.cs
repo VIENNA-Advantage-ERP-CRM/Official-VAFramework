@@ -76,7 +76,7 @@ namespace VIS.Models
             // Fetch all workflows of type document process linked with table passed in parameter, which are not linked with any button on this table
             sbQuery.Clear().Append(@"SELECT w.Name, ma.SeqNo, w.Description, w.Value, ma.AD_Workflow_ID
                                     FROM ad_wf_manualattached ma INNER JOIN AD_Workflow w ON (w.AD_Workflow_ID = ma.AD_Workflow_ID)
-                                    WHERE ma.AD_Table_ID = " + AD_Table_ID + @" AND ma.Record_ID = " + Record_ID + @"
+                                    WHERE ma.AD_Table_ID = " + AD_Table_ID + @" AND CAST(ma.Record_ID AS INTEGER) = " + Record_ID + @"
                                     ORDER BY ma.created DESC, ma.SeqNo DESC");
             DataSet dsRes = DB.ExecuteDataset(sbQuery.ToString(), null, null);
             if (dsRes != null && dsRes.Tables[0].Rows.Count > 0)
