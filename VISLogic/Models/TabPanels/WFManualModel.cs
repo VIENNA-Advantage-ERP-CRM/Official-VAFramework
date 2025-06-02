@@ -265,7 +265,7 @@ namespace VIS.Models
                 }
             }
 
-            ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID, AD_WF_Process_ID, AD_WF_Node_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " ORDER BY Created DESC");
+            ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID, AD_WF_Process_ID, AD_WF_Node_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " ORDER BY AD_WF_Process_ID DESC, Created DESC");
 
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
