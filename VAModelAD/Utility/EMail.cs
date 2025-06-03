@@ -1246,13 +1246,8 @@ namespace VAdvantage.Utility
 
             int configMessage = IsConfigurationExistAOuth(_ctx);
 
-            if (!IsValid(true))
-            {
-                _sentMsg = "Invalid Data";
-                return _sentMsg;
-            }
-           
-            if(configMessage == -1)
+
+            if (configMessage == -1)
             {
                 return "ConfigurationIncompleteOrNotFound";
             }
@@ -1269,7 +1264,7 @@ namespace VAdvantage.Utility
                     //	_msg = new MimeMessage(session);
                     _msg = new MailMessage();
                     //	Addresses
-                    _msg.From = _from;
+                    //_msg.From = _from;
 
                     MailAddress[] rec = GetTos();
                     if (rec != null && rec.Length > 0)
@@ -1375,16 +1370,22 @@ namespace VAdvantage.Utility
                 }
             }
 
-                SmtpClient smtpClient = null;            
-                smtpClient = new SmtpClient();
-                //smtpClient.
-                smtpClient.Host = _smtpHost;
-                smtpClient.Port = _smtpPort;
-                smtpClient.Timeout = 200000;
-                //if(_isSmtpTLS)
-                smtpClient.EnableSsl = _isSmtpTLS;
-                try
-                {
+            if (!IsValid(true))
+            {
+                _sentMsg = "Invalid Data";
+                return _sentMsg;
+            }
+
+            SmtpClient smtpClient = null;
+            smtpClient = new SmtpClient();
+            //smtpClient.
+            smtpClient.Host = _smtpHost;
+            smtpClient.Port = _smtpPort;
+            smtpClient.Timeout = 200000;
+            //if(_isSmtpTLS)
+            smtpClient.EnableSsl = _isSmtpTLS;
+            try
+            {
                 //	_msg = new MimeMessage(session);
                 _msg = new MailMessage();
                 //	Addresses
@@ -1452,56 +1453,56 @@ namespace VAdvantage.Utility
 
 
                 if (_smtpConfig != null)
+                {
+                    if (_smtpConfig.SmtpAuthentication)
                     {
-                        if (_smtpConfig.SmtpAuthentication)
-                        {
-                            smtpClient.Credentials = new System.Net.NetworkCredential(_smtpConfig.UserName, _smtpConfig.Password);
-                            // smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                        }
-                        else
-                        {
-                            smtpClient.UseDefaultCredentials = true;
-
-                        }
-                        smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        smtpClient.Credentials = new System.Net.NetworkCredential(_smtpConfig.UserName, _smtpConfig.Password);
+                        // smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
                     }
                     else
                     {
-                        if (_auth != null)      //	createAuthenticator was called
-                        {
-                            smtpClient.Credentials = _auth;
-                        }
-                        else
-                        {
+                        smtpClient.UseDefaultCredentials = true;
 
-                            //  smtpClient.Credentials = new System.Net.NetworkCredential("veena.pandey@viennasolutions.com", "veena");
-                            // smtpClient.DeliveryMethod = mailSettings.Smtp.DeliveryMethod;
-                            smtpClient.UseDefaultCredentials = true;
-                        }
                     }
-
-
+                    smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
                 }
-                catch (SecurityException se)
+                else
                 {
-                    log.Log(Level.WARNING, "Auth=" + _auth + " - " + se.ToString());
-                    _sentMsg = se.ToString();
-                    return se.ToString();
-                }
-                catch (Exception e)
-                {
-                    log.Log(Level.SEVERE, "Auth=" + _auth, e);
-                    _sentMsg = e.ToString();
-                    return e.ToString();
+                    if (_auth != null)      //	createAuthenticator was called
+                    {
+                        smtpClient.Credentials = _auth;
+                    }
+                    else
+                    {
+
+                        //  smtpClient.Credentials = new System.Net.NetworkCredential("veena.pandey@viennasolutions.com", "veena");
+                        // smtpClient.DeliveryMethod = mailSettings.Smtp.DeliveryMethod;
+                        smtpClient.UseDefaultCredentials = true;
+                    }
                 }
 
-                log.Info("(" + _smtpHost + ") " + _from + " -> " + _to);
-                _sentMsg = null;
-                //
-               
+
+            }
+            catch (SecurityException se)
+            {
+                log.Log(Level.WARNING, "Auth=" + _auth + " - " + se.ToString());
+                _sentMsg = se.ToString();
+                return se.ToString();
+            }
+            catch (Exception e)
+            {
+                log.Log(Level.SEVERE, "Auth=" + _auth, e);
+                _sentMsg = e.ToString();
+                return e.ToString();
+            }
+
+            log.Info("(" + _smtpHost + ") " + _from + " -> " + _to);
+            _sentMsg = null;
+            //
+
 
             try
-            {                
+            {
 
                 if (smtpClient != null)
                 {
@@ -1784,9 +1785,9 @@ namespace VAdvantage.Utility
 
         public string IsConfigurationExist(Ctx ctx)
         {
-            int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID()+" ORDER BY Updated DESC"));
-          
-            string username =null;
+            int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
+
+            string username = null;
             string password = null;
             string host = null;
             bool isSmtpAuthorization = false;
@@ -1801,7 +1802,7 @@ namespace VAdvantage.Utility
                     protocol = Util.GetValueOfString(userConfig.Get_Value("VA101_Protocol"));
                 }
 
-                if (protocol == "SM")
+                if (protocol == "SM" || protocol == "SI")
                 {
                     username = userConfig.GetSmtpUsername();
                     password = userConfig.GetSmtpPassword();
@@ -1824,9 +1825,9 @@ namespace VAdvantage.Utility
             if (Env.IsModuleInstalled("VA101_"))
             {
                 protocol = Util.GetValueOfString(client.Get_Value("VA101_Protocol"));
-            }            
+            }
 
-            if (protocol == "SM")
+            if (protocol == "SM" || protocol == "SI")
             {
                 host = client.GetSmtpHost();
                 int smtpport = client.GetSmtpPort();
@@ -1853,12 +1854,13 @@ namespace VAdvantage.Utility
 
                 return "OK";
             }
-            else{
+            else
+            {
                 return "OK";
             }
 
-           
-           
+
+
         }
 
         /// <summary>
@@ -1888,7 +1890,7 @@ namespace VAdvantage.Utility
                         protocol = Util.GetValueOfString(userConfig.Get_Value("VA101_Protocol"));
                     }
 
-                    if (protocol == "SM")
+                    if (protocol == "SM" || protocol == "SI")
                     {
                         username = userConfig.GetSmtpUsername();
                         password = userConfig.GetSmtpPassword();
@@ -1918,7 +1920,7 @@ namespace VAdvantage.Utility
                     protocol = Util.GetValueOfString(client.Get_Value("VA101_Protocol"));
                 }
 
-                if (protocol == "SM")
+                if (protocol == "SM" || protocol == "SI")
                 {
                     host = client.GetSmtpHost();
                     int smtpport = client.GetSmtpPort();
@@ -1956,7 +1958,8 @@ namespace VAdvantage.Utility
                 }
 
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 return -1;//"ConfigurationIncompleteOrNotFound"
             }
 
