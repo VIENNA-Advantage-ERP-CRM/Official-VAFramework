@@ -7087,6 +7087,7 @@
             this.oldValue = newValue;
             //this.setBackground("white");
         }
+        setZeroFormattedPlaceholder(this.ctrl[0]);
     };
 
     /** 

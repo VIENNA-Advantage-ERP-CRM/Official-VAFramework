@@ -614,6 +614,11 @@
                     currWFProcessID = 0;
                     title = VIS.Msg.getMsg("ShowHistory");
                     for (var i = 0; i < wfActInfo.length; i++) {
+                        if (!manualWF.some(function (item) {
+                            return item.AD_Workflow_ID == wfActInfo[i].AD_Workflow_ID;
+                        })) {
+                            continue;
+                        }
                         if (currWFID != wfActInfo[i].AD_Workflow_ID) {
                             if (inExecution) {
                                 clsWFStatus = 'waiting';
