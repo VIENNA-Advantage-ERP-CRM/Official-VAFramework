@@ -64,7 +64,7 @@
 
         var elements = [
             "SelectWindow"];
-       // var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
+        var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
 
         /* Initialize the form design*/
         this.Initalize = function () {
