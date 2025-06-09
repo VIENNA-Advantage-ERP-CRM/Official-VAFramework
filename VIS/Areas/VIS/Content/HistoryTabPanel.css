@@ -896,6 +896,7 @@
         padding-left: 0.5rem;
         color: #666;
         font-size: 0.875rem;
+        word-break: break-all;
     }
 
 .VIS-item-type {

@@ -66,6 +66,7 @@
                 '<a class="VIS-nav-item" id="chat" data-toggle="tab" href="#VIS-notes_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="fa fa-sticky-note-o"></i>' + VIS.Msg.getMsg("Notes") + '<span class="badge">0</span></a>' +
                 '<a class="VIS-nav-item" id="task" data-toggle="tab" href="#VIS-tasks_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="vis vis-task"></i>' + VIS.Msg.getMsg("Tasks") + '<span class="badge">0</span></a>' +
                 '<a class="VIS-nav-item" id="letter" data-toggle="tab" href="#VIS-letters_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="vis vis-letter"></i>' + VIS.Msg.getMsg("Letters") + '<span class="badge">0</span></a>' +
+                //'<a class="VIS-nav-item" id="inbox" data-toggle="tab" href="#VIS-inbox_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="fa fa-inbox"></i>' + VIS.Msg.getMsg("Inbox") + '<span class="badge">0</span></a>' +
                 '</div>' +
                 '</nav>' +
                 '<div class="tab-content" id="nav-tabContent">' +
@@ -76,6 +77,7 @@
                 '<div class="tab-pane fade" id="VIS-notes_' + this.windowNo + '" role="tabpanel" aria-labelledby="notes-tab"></div>' +
                 '<div class="tab-pane fade" id="VIS-tasks_' + this.windowNo + '" role="tabpanel" aria-labelledby="tasks-tab"></div>' +
                 '<div class="tab-pane fade" id="VIS-letters_' + this.windowNo + '" role="tabpanel" aria-labelledby="latters-tab"></div>' +
+                //'<div class="tab-pane fade" id="VIS-inbox_' + this.windowNo + '" role="tabpanel" aria-labelledby="inbox-tab"></div>' +
                 '</div></div>');
 
             //$rootcontent = $('<div id="VIS_recordDetail' + this.windowNo + '" style="display:none;" class="VIS-tp-detailsPanel"></div>');
@@ -255,33 +257,36 @@
                 _curPageRecords = res.length;
                 $('#VIS_pageIndx' + window_No).text('1/' + _curPageRecords);
                 for (var i = 0; i < res.length; i++) {
-                    
-                    if (res[i].Type.toLower() == 'email') {
-                        $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
-                            '">' +
-                            '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
-                            '<i data-recid="' + i + '" class="vis vis-email"></i>' +
-                            '</div >' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
-                            '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
-                            '<i data-recid="' + i + '" class="fa fa-arrow-up"></i>' +
-                            '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
-                            '<i data-recid="' + i + ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ? '" class="vis vis-attachment1"></i>' : '"></i>') +
-                            '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
-                            '</div>' +
-                            '</div>');
+
+                    if (res[i].Type.toLower() == 'email' || res[i].Type.toLower() == 'inbox') {
+                        //$rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
+                        //    '">' +
+                        //    '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
+                        //    '<i data-recid="' + i + '" class="vis vis-email"></i>' +
+                        //    '</div >' +
+                        //    '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
+                        //    '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
+                        //    '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
+                        //    '<i data-recid="' + i + '" class="fa fa-arrow-up"></i>' +
+                        //    '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
+                        //    '</div>' +
+                        //    '</div>' +
+                        //    '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
+                        //    '<i data-recid="' + i + ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ? '" class="vis vis-attachment1"></i>' : '"></i>') +
+                        //    '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
+                        //    '</div>' +
+                        //    '</div>');
 
                         $rechtml = $('<div class="VIS-timeline-item">' +
-                            '<div class="VIS-item-icon"><i class="vis vis-email"></i></div>' +
+                            '<div class="VIS-item-icon">' + (res[i].Type.toLower() == 'email' ? '<i class="vis vis-email">'
+                                : '<i class="fa fa-inbox">') + '</i></div > ' +
                             '<div class="VIS-item-content">' +
                             '<div class="VIS-item-header">' +
                             '<div class="VIS-item-type-author">' +
-                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("EMail") + '</span>' +
-                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '<span class="VIS-item-type">' + (res[i].Type.toLower() == 'email' ? VIS.Msg.getMsg("EMail")
+                                : VIS.Msg.getMsg("Inbox")) + '</span>' +
+                            '<span class="VIS-item-author">By: ' + (res[i].Type.toLower() == 'email' ? res[i].UserName
+                                : res[i].FromUser) + '</span>' +
                             '</div>' +
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
                             '</div>' +
@@ -289,8 +294,8 @@
                             '<div class="VIS-item-body">' +
                             '<div class="VIS-content-section VIS-group-item-flex">' +
                             '<div class="VIS-item-content-group">' +
-                            '<h6>' + res[i].Subject + '</h6>' +
-                            '<div class="emailTo">' + VIS.Msg.getMsg("To") + ':&nbsp; ' + res[i].MailTo + '</div>' +
+                            '<h6>' + res[i].Subject + '</h6>' + (res[i].Type.toLower() == 'email' ?
+                                '<div class="emailTo">' + VIS.Msg.getMsg("To") + ':&nbsp; ' + res[i].MailTo + '</div>' : '') +
                             '<div class="emailCC">' + VIS.Msg.getMsg("Cc") + ':&nbsp; ' + res[i].MailCC + '</div>' +
                             '</div>' +
                             '<div class="VIS-action-group">' +
@@ -307,24 +312,6 @@
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="email" class="VIS-activity-container" style="display:none;"></div>');
                     }
                     else if (res[i].Type.toLower() == 'inbox') {
-                        $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
-                            '">' +
-                            '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
-                            '<i data-recid="' + i + '" class="vis vis-email"></i>' +
-                            '</div >' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
-                            '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
-                            '<i data-recid="' + i + '" class="fa fa-arrow-down"></i>' +
-                            '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
-                            '<i data-recid="' + i + ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ? '" class="vis vis-attachment1"></i>' : '"></i>') +
-                            '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
-                            '</div>' +
-                            '</div>');
-
                         $rechtml = $('<div class="VIS-timeline-item">' +
                             '<div class="VIS-item-icon"><i class="vis vis-email"></i></div>' +
                             '<div class="VIS-item-content">' +
@@ -564,12 +551,12 @@
                             '</div>');
 
                         var divAtt = $('<div class="VIS-items-status-group"></div>');
-                        if (res[i].Attendees != null && res[i].Attendees.length > 0) {                            
+                        if (res[i].Attendees != null && res[i].Attendees.length > 0) {
                             var array = res[i].Attendees.split(",");
                             if (array != null && array.length > 0) {
                                 for (var k = 0; k < array.length; k++) {
                                     divAtt.append('<div class="VIS-item-status VIS-item-green">' + array[k] + '</div>');
-                                }                                
+                                }
                             }
                         }
                         if (res[i].EmailToInfo != "") {
@@ -627,29 +614,28 @@
                             '</div>');
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="task" class="VIS-activity-container" style="display:none;"></div>');
                     }
-                    //else if (res[i].Type.toLower() == 'attachment') {
-                    //    $rechtml = $('<div class="VIS-timeline-item">' +
-                    //        '<div class="VIS-item-icon"><i class="vis vis-attachmentx"></i></div>' +
-                    //        '<div class="VIS-item-content">' +
-                    //        '<div class="VIS-item-header">' +
-                    //        '<div class="VIS-item-type-author">' +
-                    //        '<span class="VIS-item-type">Attachment</span>' +
-                    //        '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
-                    //        '</div>' +
-                    //        '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
-                    //        '</div>' +
-                    //        '<div class="VIS-item-body">' +
-                    //        '<div class="VIS-content-section">' +
-                    //        '<p>' + res[i].Subject + '</p>' +
-                    //        '</div>' +
-                    //        '</div>' +
-                    //        '</div>' +
-                    //        '<div class="VIS-status-container"></div>' +
-                    //        '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
-                    //        '" data-atype="attachment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
-                    //        '</div>');
-                    //    $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="attachment" class="VIS-activity-container" style="display:none;"></div>');
-                    //}
+                    else if (res[i].Type.toLower() == 'attachment') {
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon"><i class="vis vis-attachmentx"></i></div>' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Attachment") + '</span>' +
+                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section">' +
+                            '<p>' + res[i].Subject + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                            '" data-atype="attachment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '</div>');
+                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="attachment" class="VIS-activity-container" style="display:none;"></div>');
+                    }
                     $recshtml.append($rechtml);
                     $recshtml.append($detHtml);
                 }
@@ -704,7 +690,7 @@
                     else if (record_Type == "TASK")
                         showTask(rID, detDiv, window_No);
                     else if (record_Type == "ATTACHMENT")
-                        showAttachment(rID, userName, window_No);
+                        showAttachment(detDiv, rID, userName, window_No);
                     else if (record_Type == "CHAT")
                         showChat(rID, userName, window_No);
                     setContentHeight();
@@ -720,7 +706,7 @@
                     var url = $(this).data('joinurl');
                     const $tempInput = $('<input>');
                     $root.append($tempInput);
-                    $tempInput.val(url).select();                   
+                    $tempInput.val(url).select();
                     try {
                         const success = document.execCommand('copy');
                         if (success) {
@@ -956,7 +942,7 @@
                         '<span class="VIS-email-link"><i class="fa fa-share" aria-hidden="true"data-mailto="' + result.To +
                         '" data-mailcc="' + result.Cc + '" data-mailbcc="' + result.Bcc + '" id="VIS_imgForward' + window_No + '"></i></span>' +
                         '</div></section>' +
-                        '<section class="VIS-attachment-section"><h2>Attachment</h2>' +
+                        '<section class="VIS-attachment-section"><h2>' + VIS.Msg.getMsg("Attachment") + '</h2>' +
                         '<div class="VIS-attachment-content">' +
                         '<div class="VIS-downloadAll-link"><i id="dwnldAllAttach' + window_No + '" class="vis vis-import" title="Download All" style="opacity: 1;"></i>' +
                         '<span id="dwnldAllAttach' + window_No + '">' + VIS.Msg.getMsg("VIS_DownloadAll") + (noOfAttchs > 0 ? ' (' + noOfAttchs + ')' : '') +
@@ -1847,7 +1833,7 @@
             });
         };
 
-        function showAttachment(ID, UserName, window_No) {
+        function showAttachment(target, ID, UserName, window_No) {
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedAttachmentDetails",
                 datatype: "json",
@@ -1859,7 +1845,6 @@
                     var attchFile = '', attachments = '';
 
                     if (result != null && result.length > 0) {
-
                         for (var i = 0; i < result.length; i++) {
                             var imgTag = '';
                             if (VIS.Utility.Util.getValueOfString(result[i].FileType).toString().toLower() == '.doc' || VIS.Utility.Util.getValueOfString(result[i].FileType).toString().toLower() == '.docx') {
@@ -1889,12 +1874,36 @@
                         }
                     }
 
-                    if ($rootcontent.length < 1) {
-                        $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
-                    }
-                    $rootcontent.empty();
+                    $htmlcontent = $('<div class="VIS-main-content"><div class="VIS-top-row">' +
+                        '<section class="VIS-attachment-section"><h2>' + VIS.Msg.getMsg("Attachment") + '</h2>' +
+                        attachments +
+                        //'<div class="VIS-attachment-content">' +
+                        //'<div class="VIS-downloadAll-link"><i id="dwnldAllAttach' + window_No + '" class="vis vis-import" title="Download All" style="opacity: 1;"></i>' +
+                        //'<span id="dwnldAllAttach' + window_No + '">' + VIS.Msg.getMsg("VIS_DownloadAll") + (noOfAttchs > 0 ? ' (' + noOfAttchs + ')' : '') +
+                        //'</span><span id="showAttachment' + window_No + '" class="vis vis-arrow-down"></span></div>' +
+                        //'<div class="VIS-attachment-list" style="display:none;"></div>' +
+                        '</div></section></div></div >' +
 
-                    $htmlcontent = $('<div class="VIS-contentHeadOuter VIS-tp-borderBott"><div class= "VIS-tp-recordIcon" ><i class="vis vis-attachmentx"></i></div><div class="VIS-contentHead"><span class="VIS-letter-header">' + VIS.Msg.getMsg('Attachment') + '</span></div><div class="align-items-center d-flex VIS-tp-rightIcons" ><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span><span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div>');
+                        '<section class="VIS-comments-section">' +
+                        '<div class="VIS-comment-header"><h2>Comments</h2></div>' +
+                        '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>' +
+                        '<div id="VIS_commentsdata' + window_No + '" class="vis-attachhistory-comments-container"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100">' +
+                        '<p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments"> ' + VIS.Msg.getMsg('ViewMoreComments') + '</p>' +
+                        '<div class="VIS-comment-input">' +
+                        '<input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '" class="VIS-comment-field">' +
+                        '<button class="VIS-send-button" id="VIS_btnComments' + window_No + '">➤</button>' +
+                        '</div></div>' +
+                        '</section>');
+
+                    target.append($htmlcontent);
+                    target.show();
+
+                    //if ($rootcontent.length < 1) {
+                    //    $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
+                    //}
+                    //$rootcontent.empty();
+
+                    //$htmlcontent = $('<div class="VIS-contentHeadOuter VIS-tp-borderBott"><div class= "VIS-tp-recordIcon" ><i class="vis vis-attachmentx"></i></div><div class="VIS-contentHead"><span class="VIS-letter-header">' + VIS.Msg.getMsg('Attachment') + '</span></div><div class="align-items-center d-flex VIS-tp-rightIcons" ><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span><span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div>');
                     $printhtml = $('<div class="VIS-tp-contentdiv">'
                         + '<div class="VIS-tp-contentWrap VIS-tp-attachmentContent">'
                         + attachments
@@ -1903,12 +1912,11 @@
 
                     var $contenthtml = $('<div class="VIS-mail-header VIS-tp-recordDetail"></div>');
                     $contenthtml.append($printhtml);
-                    $rootcontent.append($htmlcontent).append($contenthtml);
+                    //$rootcontent.append($htmlcontent).append($contenthtml);
 
-                    if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
-                        $root.append($rootcontent);
-                    //if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
-                    //    $root.append($paginghtml);
+                    //if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
+                    //    $root.append($rootcontent);
+
                     $('#VIS_tabPanelDataLoader' + window_No).hide();
                     attdInfo = "";
                     $('#VIS_recordDetail' + window_No).show();
