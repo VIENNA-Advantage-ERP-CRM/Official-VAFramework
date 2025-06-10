@@ -1235,23 +1235,34 @@ namespace VAdvantage.Utility
             _ctx = ctx;
         }
 
-        /// <summary>
-        /// To Send Mail
-        /// </summary>
-        /// <returns>OK or error message</returns>
-        public string Send()
+        public string SendTestMail()
         {
-
-            log.Log(Level.INFO, "Start Executing send Mail function");
-
-            int configMessage = IsConfigurationExistAOuth(_ctx);
-
-
+            int configMessage = IsConfigurationExistAOuth(_ctx,true);
             if (configMessage == -1)
             {
                 return "ConfigurationIncompleteOrNotFound";
             }
+            return Send(configMessage);
+        }
 
+        public string Send()
+        {
+            int configMessage = IsConfigurationExistAOuth(_ctx,false);
+            if (configMessage == -1)
+            {
+                return "ConfigurationIncompleteOrNotFound";
+            }
+           return Send(configMessage);
+        }
+
+        /// <summary>
+        /// To Send Mail
+        /// </summary>
+        /// <returns>OK or error message</returns>
+        private string Send(int configMessage)
+        {
+
+            log.Log(Level.INFO, "Start Executing send Mail function");
             // Here 1 for SMTP;
 
             if (configMessage > 1)
@@ -1869,11 +1880,15 @@ namespace VAdvantage.Utility
         /// </summary>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        private int IsConfigurationExistAOuth(Ctx ctx)
+        private int IsConfigurationExistAOuth(Ctx ctx, bool isTenantTestMail)
         {
             try
             {
-                int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
+                int mailConfigID = 0;
+                if (!isTenantTestMail)
+                {
+                    mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
+                }
 
                 string username = null;
                 string password = null;
@@ -1892,8 +1907,19 @@ namespace VAdvantage.Utility
 
                     if (protocol == "SM" || protocol == "SI")
                     {
-                        username = userConfig.GetSmtpUsername();
-                        password = userConfig.GetSmtpPassword();
+                        if (!IsSendFromClient)
+                        {
+                            MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+                            username = user.GetEMailUser();
+                            password = user.GetEMailUserPW();
+                        }
+
+                        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || IsSendFromClient)
+                        {
+                            username = userConfig.GetSmtpUsername();
+                            password = userConfig.GetSmtpPassword();
+                        }
+
                         host = userConfig.GetSmtpHost();
                         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(host))
                             return -1; //"ConfigurationIncompleteOrNotFound"
@@ -1903,7 +1929,7 @@ namespace VAdvantage.Utility
                     }
                     else
                     {
-                        if (Util.GetValueOfInt(userConfig.Get_Value("VA101_APIAuthCredential_ID")) > 0)
+                        if (Util.GetValueOfInt(userConfig.Get_Value("VA101_APIAuthCredential_ID")) > 0 && Util.GetValueOfBool(userConfig.Get_Value("VA101_IsAllowAccessEmail")))
                         {
                             return Util.GetValueOfInt(userConfig.Get_Value("VA101_APIAuthCredential_ID"));
                         }
@@ -1926,7 +1952,7 @@ namespace VAdvantage.Utility
                     int smtpport = client.GetSmtpPort();
                     isSmtpAuthorization = client.IsSmtpAuthorization();
 
-                    if (!IsSendFromClient)
+                    if (!IsSendFromClient && !isTenantTestMail)
                     {
                         MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
                         username = user.GetEMailUser();
