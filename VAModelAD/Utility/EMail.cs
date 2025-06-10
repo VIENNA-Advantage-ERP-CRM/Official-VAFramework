@@ -1929,7 +1929,7 @@ namespace VAdvantage.Utility
                     }
                     else
                     {
-                        if (Util.GetValueOfInt(userConfig.Get_Value("VA101_APIAuthCredential_ID")) > 0)
+                        if (Util.GetValueOfInt(userConfig.Get_Value("VA101_APIAuthCredential_ID")) > 0 && Util.GetValueOfBool(userConfig.Get_Value("VA101_IsAllowAccessEmail")))
                         {
                             return Util.GetValueOfInt(userConfig.Get_Value("VA101_APIAuthCredential_ID"));
                         }
