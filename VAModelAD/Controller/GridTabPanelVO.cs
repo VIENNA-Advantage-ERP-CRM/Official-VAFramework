@@ -66,13 +66,14 @@ namespace VAdvantage.Controller
         public static String GetSQL(Ctx ctx)
         {
             //  View only returns IsActive='Y'
-            String sql = "SELECT panel.classname, panel.Name, panel.iconpath, panel.isdefault, panel.seqno, panel.ad_tabpanel_id, panel.ad_tab_id, panel.ExtraInfo, panel.TabPanelAlignment FROM AD_TabPanel panel WHERE panel.AD_Tab_ID =@tabID ";
+            String sql = "SELECT panel.ClassName, panel.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment FROM AD_TabPanel panel WHERE panel.AD_Tab_ID =@tabID ";
             if (!Env.IsBaseLanguage(ctx, "AD_Window"))
             {
-                sql = "SELECT panel.classname, trl.Name, panel.iconpath, panel.isdefault, panel.seqno, panel.ad_tabpanel_id, panel.ad_tab_id, panel.ExtraInfo,panel.TabPanelAlignment FROM AD_TabPanel panel JOIN AD_TabPanel_trl  trl ON panel.ad_tabpanel_id=trl.ad_tabpanel_id "
+                sql = "SELECT panel.ClassName, trl.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment FROM AD_TabPanel panel JOIN AD_TabPanel_Trl  trl ON panel.AD_TabPanel_ID=trl.AD_TabPanel_ID "
                     + " WHERE panel.AD_Tab_ID =@tabID AND trl.AD_Language='" + Env.GetAD_Language(ctx) + "'";
             }
-            sql += " AND panel.IsActive='Y' ORDER BY panel.SeqNo, panel.ad_tabpanel_id asc";
+            // vis0008 change done to show tab panles created in System and login tenant only
+            sql += " AND panel.AD_Client_ID IN (0, " + ctx.GetAD_Client_ID() + ") AND panel.IsActive='Y' ORDER BY panel.SeqNo, panel.AD_TabPanel_ID ASC";
             return sql;
         }
 

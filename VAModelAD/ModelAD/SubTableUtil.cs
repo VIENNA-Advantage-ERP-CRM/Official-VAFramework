@@ -420,17 +420,21 @@ namespace VAdvantage.Model
             table.GetColumns(true);		//	get new columns
             //	Key Column
             String colName = table.GetTableName() + "_ID";
-            if (table.GetColumn(colName) == null)
+            // vis0008 check added to not add Primary Key column in Translation tables ending with _Trl
+            if (!table.GetTableName().ToLower().EndsWith("_trl", StringComparison.OrdinalIgnoreCase))
             {
-                MColumn col = new MColumn(table);
-                col.SetColumnName(colName);
-                col.SetAD_Reference_ID(DisplayType.ID);
-                col.SetIsKey(true);
-                col.SetIsUpdateable(false);
-                col.SetIsMandatory(true);
-                col.SetEntityType(EntityType);
-                col.SetIsCopy(false);           // By Default isCopy check box should be False on this Column.
-                CreateColumn(col, table, true);
+                if (table.GetColumn(colName) == null)
+                {
+                    MColumn col = new MColumn(table);
+                    col.SetColumnName(colName);
+                    col.SetAD_Reference_ID(DisplayType.ID);
+                    col.SetIsKey(true);
+                    col.SetIsUpdateable(false);
+                    col.SetIsMandatory(true);
+                    col.SetEntityType(EntityType);
+                    col.SetIsCopy(false);           // By Default isCopy check box should be False on this Column.
+                    CreateColumn(col, table, true);
+                }
             }
             colName = "AD_Client_ID";
             if (table.GetColumn(colName) == null)
