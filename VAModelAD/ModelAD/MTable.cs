@@ -675,6 +675,26 @@ namespace VAdvantage.Model
             if (IsView() && IsDeleteable())
                 SetIsDeleteable(false);
 
+            // vis0008 check applied for restriction of duplicate table names in AD
+            string sqlCheckTableExists = "";
+            if (newRecord)
+            {
+                sqlCheckTableExists = $"SELECT AD_Table_ID FROM AD_Table WHERE UPPER(TableName) = '{GetTableName().ToUpper()}'";
+            }
+            else if (Is_ValueChanged("TableName"))
+            {
+                sqlCheckTableExists = $"SELECT AD_Table_ID FROM AD_Table WHERE UPPER(TableName) = '{GetTableName().ToUpper()}' AND AD_Table_ID != " + GetAD_Table_ID();
+            }
+            if (sqlCheckTableExists != "")
+            {
+                int tableExists = Util.GetValueOfInt(DB.ExecuteScalar(sqlCheckTableExists));
+                if (tableExists > 0)
+                {
+                    log.SaveError("Error", Msg.GetMsg(GetCtx(), "AlreadyExists"));
+                    return false;
+                }
+            }
+
             // check applied for maintain Versions 
             // if there is change in maintain Versions checkbox, then before unchecking need to check if
             // any other column is not marked as maintainversions and data is there in Version table then do not allow to uncheck maintain version on Table
