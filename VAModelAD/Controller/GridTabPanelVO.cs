@@ -72,7 +72,8 @@ namespace VAdvantage.Controller
                 sql = "SELECT panel.classname, trl.Name, panel.iconpath, panel.isdefault, panel.seqno, panel.ad_tabpanel_id, panel.ad_tab_id, panel.ExtraInfo,panel.TabPanelAlignment FROM AD_TabPanel panel JOIN AD_TabPanel_trl  trl ON panel.ad_tabpanel_id=trl.ad_tabpanel_id "
                     + " WHERE panel.AD_Tab_ID =@tabID AND trl.AD_Language='" + Env.GetAD_Language(ctx) + "'";
             }
-            sql += " AND panel.IsActive='Y' ORDER BY panel.SeqNo, panel.ad_tabpanel_id asc";
+            // vis0008 change done to show tab panles created in System and login tenant only
+            sql += " AND panel.AD_Client_ID IN (0, " + ctx.GetAD_Client_ID() + ") AND panel.IsActive='Y' ORDER BY panel.SeqNo, panel.ad_tabpanel_id asc";
             return sql;
         }
 
