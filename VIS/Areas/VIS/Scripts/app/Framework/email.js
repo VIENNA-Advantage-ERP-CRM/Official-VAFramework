@@ -2185,7 +2185,7 @@
             }
 
             var mails = JSON.stringify(mail);
-            var wantNotification = false;
+            var wantNotification = true;
 
             var pfFiletype = 'X';// no Action
             if ($chkBSendPFasAtt.prop("checked")) {
@@ -2193,10 +2193,10 @@
             }
 
 
-            VIS.ADialog.confirm("WantAlertMessage", true, "", "Confirm", function (result) {
-                if (result) {
-                    wantNotification = true;
-                }
+            //VIS.ADialog.confirm("WantAlertMessage", true, "", "Confirm", function (result) {
+            //    if (result) {
+            //        wantNotification = true;
+            //    }
 
 
                 $bsyDiv[0].style.visibility = "visible";
@@ -2239,7 +2239,7 @@
                 });
 
 
-            });
+            //});
 
 
 
