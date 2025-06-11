@@ -1726,8 +1726,19 @@ namespace VAdvantage.Utility
             _ctx = ctx;
             int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID()));
             MUserMailConfigration userConfig = new MUserMailConfigration(ctx, mailConfigID, null);
-            username = userConfig.GetSmtpUsername();
-            password = userConfig.GetSmtpPassword();
+
+            if (!sendFromClient)
+            {
+                MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+                username = user.GetEMailUser();
+                password = user.GetEMailUserPW();
+            }
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || sendFromClient)
+            {
+                username = userConfig.GetSmtpUsername();
+                password = userConfig.GetSmtpPassword();
+            }
 
 
             //By Sukhwinder on 3rd Jan, 2018, for getting FromName.
