@@ -99,6 +99,7 @@
 
             $html.find('a').on('click', function (e) {
                 e.preventDefault();
+                getGridDataRecordCount(_selectedId, tableID);
                 loadHistoryData(_selectedId, 0, window_No, tableID, $(this));
             });
         };
