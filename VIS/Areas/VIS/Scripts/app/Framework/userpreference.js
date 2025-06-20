@@ -880,10 +880,31 @@
                 var AD_Client_ID = $cmdClient.val();
                 var AD_Org_ID = $cmdOrg.val();
                 var AD_WH_ID = $cmdWareHouse.val();
-                if (AD_Role_ID == undefined || AD_Client_ID == undefined || AD_Org_ID == undefined) {
-                    lblRecordSave.text(VIS.Msg.getMsg("VIS_FillLogin"));
+
+                //if (AD_Role_ID == undefined || AD_Client_ID == undefined || AD_Org_ID == undefined) {
+                //    lblRecordSave.text(VIS.Msg.getMsg("VIS_FillLogin"));
+                //    return;
+                //}
+
+                if (AD_Role_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectRole"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
                     return;
+                } else if (AD_Client_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectClient"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
+                    return;
+                } else if (AD_Org_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectOrganization"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
+                    return;
+                } else {
+                    lblRecordSave.hide();
                 }
+
                 if (AD_WH_ID == undefined) {
                     AD_WH_ID = 0;
                 }

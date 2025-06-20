@@ -200,7 +200,7 @@
                     }
                     <img id="vis_imguserImage" src="@ViewBag.UserPic" alt="profile image">
                 </div>
-                <h1>@ViewBag.DisplayName <span>@Model.Login2Model.RoleName</span><a onclick=" var uf = new VIS.Framework.UserPreference(); uf.load(); uf.showDialog(); uf = null;" href="javascript:;">@GetMsg((string)ViewBag.culture, "Preferences")</a> </h1>
+                <h1>@ViewBag.DisplayName <span>@Model.Login2Model.RoleName</span> </h1>
             </div>
             <div class="vis-setting-form">
                 @using (Html.BeginForm("JsonChangeAuthentication", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "vis_changeAuthForm" }))
@@ -243,7 +243,7 @@
                             @Html.LabelFor(m => m.Login2Model.Warehouse)
                         </div>
                     </div>
-                    <div class="input-group vis-input-wrap">
+                    <div class="input-group vis-input-wrap" style=" margin-bottom: 5px; ">
                         <div class="vis-control-wrap">
                             <label class="vis-ec-col-lblchkbox" style="opacity: 1;">
                                 @Html.CheckBox("vis-home-isfilter", false, new { id = "vis_home_isfilter" })
@@ -268,13 +268,21 @@
                 }
             </div>
 
+            <div class="vis-setting-link" style="border-bottom: 1px solid rgba(var(--v-c-on-secondary),.5) ">
+                <a onclick="var uf = new VIS.Framework.UserPreference(); uf.load(); uf.showDialog(); uf = null;" href="javascript:;">
+                    <i class="fa fa-gears"></i>
+                    @GetMsg((string)ViewBag.culture, "Preferences")
+                </a>
+            </div>
+
             <div class="vis-setting-link">
                 @using (Html.BeginForm("LogOff", "Account", new { area = "VIS" }, FormMethod.Post, new { id = "logoutForm" }))
                 {
                     @Html.AntiForgeryToken()
                     <a href="javascript:document.getElementById('logoutForm').submit()"
                        title="@GetMsg((string)ViewBag.culture, "Shct_LogOut")">
-                        <img src="~/Areas/VIS/Images/power-off.svg" alt="">
+                        @*<img src="~/Areas/VIS/Images/power-off.svg" alt="">*@
+                        <i class="fa fa-sign-out"></i>
                         @GetMsg((string)ViewBag.culture, "Logout")
                     </a>
                     @*<a href="javascript:void(0);"><img src="images/power-off.svg" alt=""> Logout</a>*@

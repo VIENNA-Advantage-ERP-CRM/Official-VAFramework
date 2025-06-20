@@ -3654,6 +3654,13 @@
 
                 if (!clickedTab) { // if selected tab not exist then add.
                     this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
+
+                }
+
+                if (clickedTabSeq == 0) {
+                    this.aHome.setEnabled(false);
+                } else {
+                    this.aHome.setEnabled(true);
                 }
             }
 
