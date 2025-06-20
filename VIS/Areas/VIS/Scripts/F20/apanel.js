@@ -839,6 +839,8 @@
                         $divReserveTabPanel.append(this.curGC.getSpecialTabPanel());
                         $divReserveTabPanel.css({ "display": "grid" });
                     }
+
+                    
                 }
                 $tabPanel.css({ "display": "grid" });
                 if (this.curGC) {

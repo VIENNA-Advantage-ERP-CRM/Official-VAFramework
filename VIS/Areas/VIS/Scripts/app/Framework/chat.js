@@ -30,6 +30,8 @@
         // this.isLoading = false;
 
 
+        var scrollDiv = $div;
+        
         function showBusy(show) {
             if (show) {
                 $maindiv.find("#chatBusyDiv").show();
@@ -74,7 +76,7 @@
                     this.value += "\r\n";
                 }
                 else {
-                    showBusy(true);
+                    
                     e.preventDefault();
                     triggerSave(e);
                 }
@@ -82,9 +84,9 @@
         });
 
         setTimeout(function () {
-            const onScroll = throttle(function () {
-                if ($maindiv != null) {
-                    if ($maindiv.parent().scrollTop() + $maindiv.parent().height() >= $maindiv.height() - 50) {
+            function onScroll() {
+                if (scrollDiv != null) {
+                    if (scrollDiv.height() + scrollDiv.scrollTop() >= scrollDiv[0].scrollHeight - 1) {
                         if (self.prop) {
                             self.prop.pageSize += 10;
                             showBusy(true);
@@ -92,9 +94,11 @@
                         }
                     }
                 }
-            }, 200); // adjust the wait time as needed
-
-            $maindiv.parent().on('scroll', onScroll);
+            }
+            //}, 200); // adjust the wait time as needed
+            if (scrollDiv == null)
+                scrollDiv = $maindiv.parent(); //reset scroll div to main div
+            scrollDiv.on('scroll', onScroll);
         }, 100);
 
         function throttle(fn, wait) {
@@ -110,10 +114,27 @@
 
 
         function triggerSave(e) {
-            saveMsg(e);
-            $textArea.find('#chatBox_textArea').val('');
-            $textArea.find('#chatBox_textArea').css('height', 'auto');
-            self.refreshPanelData(self.record_ID, 0);
+            showBusy(true);
+            var text = $textArea.find('#chatBox_textArea').val();
+            if ($.trim(text) == "" || text == "" || text == null) {
+                VIS.ADialog.info("EnterData");
+                /* if (e != undefined) {
+                     e.preventDefault();
+                 }*/
+                showBusy(false);
+                return false;
+            }
+            self.prop.ChatText = text;
+            VIS.dataContext.saveChatAsync(self.prop, function (saved) {
+                if (!saved) {
+                    showBusy(false);
+                    return;
+                };
+
+                $textArea.find('#chatBox_textArea').val('');
+                $textArea.find('#chatBox_textArea').css('height', 'auto');
+                self.refreshPanelData(self.record_ID, 0);
+            });
         }
 
 
@@ -122,7 +143,7 @@
             $maindiv.parent().scrollTop(0);
             $maindiv.append($showMoreIcon);
             /*$maindiv.addClass('p-2');*/
-            isBottomTapPanel();
+            //isBottomTapPanel();
             if (this.isBtmTapPanel) {
                 prop.pageSize = 4;
             }
@@ -134,6 +155,8 @@
         };
 
         this.show = function () {
+
+            scrollDiv = $div; //reset scroll div to main div
 
             ch = new VIS.ChildDialog();
             ch.setContent($maindiv);
@@ -168,16 +191,7 @@
         };
 
         function isBottomTapPanel() {
-            $.ajax({
-                url: VIS.Application.contextUrl + "Chat/IsBottomTabPanel",
-                async: false,
-                data: {
-                    tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
-                },
-                success: function (data) {
-                    self.isBtmTapPanel = VIS.Utility.Util.getValueOfBoolean(data);;
-                }
-            });
+            
         }
 
         function createButtons() {
@@ -375,7 +389,17 @@
         this.windowNo = windowNo;
         this.curTab = curTab;
         this.extraInfo = extraInfo;
-
+        var self = this;
+        $.ajax({
+            url: VIS.Application.contextUrl + "Chat/IsBottomTabPanel",
+            async: false,
+            data: {
+                tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
+            },
+            success: function (data) {
+                self.isBtmTapPanel = VIS.Utility.Util.getValueOfBoolean(data);;
+            }
+        });
     };
 
     /**
