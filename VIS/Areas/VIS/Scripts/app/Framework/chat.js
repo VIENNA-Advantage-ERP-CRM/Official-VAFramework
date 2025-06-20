@@ -390,16 +390,16 @@
         this.curTab = curTab;
         this.extraInfo = extraInfo;
         var self = this;
-        $.ajax({
-            url: VIS.Application.contextUrl + "Chat/IsBottomTabPanel",
-            async: false,
-            data: {
-                tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
-            },
-            success: function (data) {
-                self.isBtmTapPanel = VIS.Utility.Util.getValueOfBoolean(data);;
-            }
-        });
+        //$.ajax({
+        //    url: VIS.Application.contextUrl + "Chat/IsBottomTabPanel",
+        //    async: false,
+        //    data: {
+        //        tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
+        //    },
+        //    success: function (data) {
+        //        self.isBtmTapPanel = VIS.Utility.Util.getValueOfBoolean(data);;
+        //    }
+        //});
     };
 
     /**
