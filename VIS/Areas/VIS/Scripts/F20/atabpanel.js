@@ -389,6 +389,58 @@
         else {
             this.appedAllPanel(panels);
         }
+
+        if (!this.isHorizontalAligned) {
+            var incTab = this.getRoot();
+            var contectDiv = this.getContentDiv();
+            var body = this.getBody();
+            if (!body.is('.ui-resizable')) {
+                //window.setTimeout(function () {
+                body.resizable({
+                        handles: 'w',
+                    ghost: true,
+                    //animation: true,
+                        minWidth: 300,
+                        maxWidth: 1000,
+                        //width: 'auto',
+
+                        resize: function (event, ui) {
+                            //self.panelWidth = ui.size.width;
+                            //incTab.css({ 'position': 'absolute', "left": "", "z-index": "99" });
+                            //incTab.css('flex-basis', ui.size.width + 'px');
+                            //incTab.css('width', ui.size.width + 'px');
+                            //contectDiv.css({
+                            //    // 'flex-basis': ui.size.width + 'px',
+                            //    'width': ui.size.width - 35 + 'px',
+                            //});
+                        },
+                        start: function (event, ui) {
+                            // incTab.css({ 'position': 'absolute', "z-index": "99" });
+                            //windowWidth=
+                        },
+                        stop: function (event, ui) {
+                            incTab.css({
+                                // 'flex-basis': ui.size.width + 'px',
+                                'width': ui.size.width + 'px',
+                            });
+
+                            body.css({
+                                // 'flex-basis': ui.size.width + 'px',
+                                'width': '',
+                                'left': '',
+                                'height': ''
+                            });
+
+                            contectDiv.css({
+                                // 'flex-basis': ui.size.width + 'px',
+                                'width': ui.size.width - 35 + 'px',
+                            });
+
+                        }
+                    })
+               // }, 1000); //wait for dom to be ready
+            }
+        }
     };
 
   /**

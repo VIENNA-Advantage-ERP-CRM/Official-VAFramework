@@ -303,8 +303,8 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
         }
 
 .vis-thumb-img {
-    width: 90px;
-    height: 90px;
+    width: 60px;
+    height: 60px;
     border-radius: 100%;
     padding: 4px;
     box-shadow: 2px 4px 7px -1px #cccccc;
@@ -353,7 +353,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
 }
 
     .vis-setting-form .vis-input-wrap {
-        margin-bottom: 20px;
+        margin-bottom: 1rem;
     }
 
 .vis-changeBtn {
@@ -372,7 +372,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
 
 .vis-setting-link {
     /*border-bottom: 1px solid rgba(var(--v-c-on-secondary), .5);*/
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     width: 100%;
 }
 
@@ -391,7 +391,7 @@ html[dir="rtl"] .vis-icons-menuBar.vis-icon-Info-Home
     }
         .vis-setting-link a:focus {
             /* font-size: 1rem; */
-            text-shadow: 1px 1px 1px rgba(var(--v-c-primary), 1);
+           /* text-shadow: 1px 1px 1px rgba(var(--v-c-primary), 1);*/
         }
 
 /*------------------------------------------*/

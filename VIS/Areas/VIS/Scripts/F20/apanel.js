@@ -839,6 +839,8 @@
                         $divReserveTabPanel.append(this.curGC.getSpecialTabPanel());
                         $divReserveTabPanel.css({ "display": "grid" });
                     }
+
+                    
                 }
                 $tabPanel.css({ "display": "grid" });
                 if (this.curGC) {
@@ -2672,7 +2674,7 @@
         else if (tis.isShowSharedRecord && tis.aSharedRecord.getAction() === action) {
             tis.cmd_RecordShared();
         }
-            //Rahul Mittal
+        //Rahul Mittal
         else if (tis.aAssignRecord && tis.aAssignRecord.getAction() === action) {
             tis.cmd_AssignRecord();
         }
@@ -3352,7 +3354,7 @@
         if (window.VADMS) {
             if (action == 'CDT') {
                 var frame = new VIS.CFrame();
-                var editDoc = new window.VADMS.editDocument(0, "", 0, "", 0, null, "", aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID());
+                var editDoc = new window.VADMS.editDocument(0, "", 0, "", 0, null, "", aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.curTab.getAD_Tab_ID());
                 frame.setName(VIS.Msg.getMsg("VADMS_CreateDocument"));
                 frame.setTitle(VIS.Msg.getMsg("VADMS_CreateDocument"));
                 frame.hideHeader(true);
@@ -3414,10 +3416,10 @@
                 frame.show();
             }
             else if (action == 'UDT') {
-                window.VADMS.uploaddocument(0, aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.$parentWindow.name, aPanel.curTab.getName());
+                window.VADMS.uploaddocument(0, aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.$parentWindow.name, aPanel.curTab.getName(), aPanel.curTab.getAD_Tab_ID());
             }
             else if (action == 'CAC') {
-                var wtrid = aPanel.curTab.getAD_Window_ID() + "|" + aPanel.curTab.getAD_Table_ID() + "|" + aPanel.curTab.getRecord_ID() + "|" + aPanel.$parentWindow.name + "|" + aPanel.curTab.getName();
+                var wtrid = aPanel.curTab.getAD_Window_ID() + "|" + aPanel.curTab.getAD_Table_ID() + "|" + aPanel.curTab.getRecord_ID() + "|" + aPanel.$parentWindow.name + "|" + aPanel.curTab.getName() + "|" + aPanel.curTab.getAD_Tab_ID();
                 VIS.context.setContext("VADMS_WinTableRecID", wtrid);
                 VIS.ADialog.info('VADMS_CodeSetIntoContext', true, "");
             }
@@ -3652,6 +3654,13 @@
 
                 if (!clickedTab) { // if selected tab not exist then add.
                     this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
+
+                }
+
+                if (clickedTabSeq == 0) {
+                    this.aHome.setEnabled(false);
+                } else {
+                    this.aHome.setEnabled(true);
                 }
             }
 
@@ -5828,7 +5837,7 @@
         }
         userAssign.show();
     }
-    
+
     /* END */
 
     /**

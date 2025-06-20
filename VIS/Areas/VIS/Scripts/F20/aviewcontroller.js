@@ -2187,7 +2187,7 @@
             if(!this.displayAsIncludedGC && this.vIncludedGC !=null) {
                 this.vIncludedGC.vTable.resize();
             }
-            if (this.gTab.getIsTPBottomAligned())
+           // if (this.gTab.getIsTPBottomAligned())
                 this.aPanel.showTabPanel(true);
         }
 
@@ -2230,7 +2230,7 @@
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
                 this.vTable.activate(false, this.showMultiViewOnly); 
-                if (this.gTab.getIsTPBottomAligned())
+                //if (this.gTab.getIsTPBottomAligned())
                 this.aPanel.showTabPanel(false);
             }
 
@@ -2281,7 +2281,7 @@
 
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
-                if (this.gTab.getIsTPBottomAligned())
+                //if (this.gTab.getIsTPBottomAligned())
                     this.aPanel.showTabPanel(false);
             }
 
@@ -2331,7 +2331,7 @@
 
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
-                if (this.gTab.getIsTPBottomAligned())
+               // if (this.gTab.getIsTPBottomAligned())
                     this.aPanel.showTabPanel(false);
             }
 

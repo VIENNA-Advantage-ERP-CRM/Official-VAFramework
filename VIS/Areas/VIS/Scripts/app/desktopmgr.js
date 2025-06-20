@@ -1238,7 +1238,7 @@
                 })
                     .fail(function (result) {
 
-                        alert(result);
+                        alert("deskMgrErr "+ result);
                     });
             }
         };

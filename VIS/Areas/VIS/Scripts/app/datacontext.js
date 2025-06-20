@@ -252,7 +252,7 @@
                 if (jString)
                     result = JSON.parse(jString);
             }).fail(function (jqXHR, textStatus, et) {
-                alert(et);
+                alert("dataError" +et);
             });
             return result;
         };
@@ -492,6 +492,31 @@
             });
         };
 
+        function saveChatAsync(prop,callback) {
+            $.ajax({
+
+                url: VIS.Application.contextUrl + 'Chat/SaveChat',
+                type: 'POST',
+                asyc: true,
+                dataType: 'Json',
+                data: prop,
+                success: function (data) {
+                    if (data) {
+                        console.log("Chat Saved");
+                    }
+                    else
+                        console.log("Chat Not Saved");
+                    callback(true);
+                },
+                error: function (data) {
+                    console.log("Chat Not Saved");
+                    callback(false);
+                }
+
+
+            });
+        };
+
         function getTreeAsString(data, callback) {
             var result = null;
             var async = callback ? true : false;
@@ -577,7 +602,7 @@
             subscribeUnsubscribeRecords: subscribeUnsubscribeRecords,
             getChatRecords: getChatRecords,
             saveChat: saveChat,
-
+            saveChatAsync: saveChatAsync,
             getTreeAsString: getTreeAsString,
             getCardViewInfo: getCardViewInfo,
             postJSONData: postJSONData
