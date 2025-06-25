@@ -226,6 +226,11 @@ namespace VIS.Models
 
             //Search where clause
             string WhereClause = Util.GetValueOfString(DB.ExecuteScalar(sql.ToString()));
+            //VIS_427 Added this check in order to parse the context value in whereclause
+            if (WhereClause.Contains("@"))
+            {
+                WhereClause = Env.ParseContext(ctx, -1, WhereClause, false);
+            }
 
             MTable table = MTable.Get(ctx, AD_Table_ID);
             string[] KeyColumns = table.GetKeyColumns();
@@ -239,7 +244,8 @@ namespace VIS.Models
             if (!string.IsNullOrEmpty(WhereClause))
             {
                 //Get records that are not present in cm_subscribe
-                WhereClause = VAdvantage.Common.Common.ParseContextByPO(WhereClause, _po);
+                //VIS_427 Commented this code as it don't parse the context value with @#, @$ 
+               // WhereClause = VAdvantage.Common.Common.ParseContextByPO(WhereClause, _po);
                 sql.Append(@" WHERE " + WhereClause + " ");
                 sql.Append(@" AND NOT EXISTS (SELECT 1 
                                 FROM CM_Subscribe cs
