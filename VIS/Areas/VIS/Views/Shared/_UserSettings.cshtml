@@ -269,7 +269,7 @@
             </div>
 
             <div class="vis-setting-link" style="border-bottom: 1px solid rgba(var(--v-c-on-secondary),.5) ">
-                <a onclick="var uf = new VIS.Framework.UserPreference(); uf.load(); uf.showDialog(); uf = null;" href="javascript:;">
+                <a onclick="var uf = new VIS.Framework.UserPreference(); uf.load(); uf.showDialog(); uf = null; var $authDialog = $('#vis_home_ca'); $authDialog.hide(); $authDialog.prev('.vis-wakeup-main').hide(); " href="javascript:;">
                     <i class="fa fa-gears"></i>
                     @GetMsg((string)ViewBag.culture, "Preferences")
                 </a>
