@@ -332,6 +332,7 @@
     VTabPanel.prototype.init = function (gTab, isSpecial) {
         this.gTab = gTab;
         var panels = null;  
+        var self = this;
         if (isSpecial) {
             var panels = this.gTab.getTabPanelsRght();
             this.isHorizontalAligned = false;
@@ -435,6 +436,8 @@
                                 // 'flex-basis': ui.size.width + 'px',
                                 'width': ui.size.width - 35 + 'px',
                             });
+                            if (self.sizeChangedListner && self.sizeChangedListner.onSizeChanged)
+                                self.sizeChangedListner.onSizeChanged();
 
                         }
                     })
