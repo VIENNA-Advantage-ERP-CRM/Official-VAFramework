@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Hosting;
+using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.DBase;
 using VIS.Models;
@@ -261,7 +264,17 @@ namespace VIS.Helpers
                             string[] url = img.GetImageURL().Split('/');
                             if (url.Length > 0)
                             {
-                                itm.IconUrl = img.GetImageURL().Split('/')[0] + "/" + AD_Image_ID + "" + img.GetImageExtension(); //img.GetImageURL(); 
+                                string strImg = img.GetImageURL().Split('/')[0] + "/" + AD_Image_ID + "" + img.GetImageExtension(); //img.GetImageURL(); 
+                                if (!File.Exists(HostingEnvironment.MapPath(@"~/" + strImg))) //Check Image exist or not in Image folder
+                                {
+                                    // only for call After save logic. temporary update the column
+                                    MImage mimg = new MImage(ctx, AD_Image_ID, null);
+                                    mimg.SetImageURL(strImg);
+                                    mimg.Save();
+                                }
+
+                                itm.IconUrl = @"Images/Thumb140x120/" + AD_Image_ID + "" + img.GetImageExtension();
+
                             }
                             else
                             {
