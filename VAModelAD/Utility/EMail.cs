@@ -1276,6 +1276,8 @@ namespace VAdvantage.Utility
                     _msg = new MailMessage();
                     //	Addresses
                     //_msg.From = _from;
+                    string mailFrom = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Email FROM VA101_APIAuthCredential WHERE VA101_APIAuthCredential_ID = " + credentialId));
+                    _msg.From = new MailAddress(mailFrom, mailFrom);
 
                     MailAddress[] rec = GetTos();
                     if (rec != null && rec.Length > 0)
