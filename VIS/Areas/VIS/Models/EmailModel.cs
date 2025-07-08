@@ -393,6 +393,51 @@ namespace VIS.Models
                         }
                     }
                 }
+                else
+                {
+                    if (res1 != "OK")
+                    {
+                        _mAttachment.SetIsMailSent(false);
+                    }
+                    else
+                    {
+                        _mAttachment.SetIsMailSent(true);
+                    }
+                    int AD_Client_Id = ctx.GetAD_Client_ID();
+                    int iOrgid = ctx.GetAD_Org_ID();
+
+                    _mAttachment.SetAD_Client_ID(AD_Client_Id);
+                    _mAttachment.SetAD_Org_ID(iOrgid);
+                    _mAttachment.SetAD_Table_ID(_table_id);
+                    _mAttachment.IsActive();
+                    _mAttachment.SetMailAddress(bcctext.ToString());
+                    _mAttachment.SetAttachmentType("M");
+
+                    _mAttachment.SetRecord_ID(Convert.ToInt32(0));
+
+                    _mAttachment.SetTextMsg(message);
+                    _mAttachment.SetTitle(sub);
+
+                    _mAttachment.SetMailAddressBcc(bcctext.ToString());
+                    _mAttachment.SetMailAddress(mails[j].To);
+                    _mAttachment.SetMailAddressCc(mails[j].Cc);
+                    _mAttachment.SetMailAddressFrom(userinfo.Email);
+                    if (_mAttachment.GetEntries().Length > 0)
+                    {
+                        _mAttachment.SetIsAttachment(true);
+                    }
+                    else
+                    {
+                        _mAttachment.SetIsAttachment(false);
+                    }
+                    _mAttachment.NewRecord();
+                    if (_mAttachment.Save())
+                    { }
+                    else
+                    {
+                        // log.SaveError(Msg.GetMsg(Env.GetCtx(), "RecordNotSaved"), "");
+                    }
+                }
 
                 if (res1 != "OK")           // if mail not sent....
                 {
@@ -445,6 +490,10 @@ namespace VIS.Models
             records = null;
             return res.ToString();
         }
+
+
+        
+
 
         /// <summary>
         /// Get Attachment Id From Metadata Table When DMS Module Is Installed
