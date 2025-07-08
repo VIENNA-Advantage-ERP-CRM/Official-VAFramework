@@ -833,7 +833,7 @@
                     $tabPanel.parent().removeClass(clsName + clsSuffixOld).addClass(
                         clsName + clsSuffix);
                 }
-                if (this.curGC) {
+                if (this.curGC && this.curGC.vTabPanel) {
                     $tabPanel.append(this.curGC.getTabPanel());
                     if (this.curTab.getIsShowBothTP()) {
                         $divReserveTabPanel.append(this.curGC.getSpecialTabPanel());
