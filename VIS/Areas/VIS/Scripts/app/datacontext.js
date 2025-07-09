@@ -469,9 +469,8 @@
             });
         };
 
-        function saveChat(prop) {
+        function saveChat(prop, callbackChat) {
             $.ajax({
-
                 url: VIS.Application.contextUrl + 'Chat/SaveChat',
                 type: 'POST',
                 asyc:false,
@@ -483,6 +482,7 @@
                     }
                     else
                         console.log("Chat Not Saved");
+                    callbackChat();
                 },
                 error: function (data) {
                     console.log("Chat Not Saved");

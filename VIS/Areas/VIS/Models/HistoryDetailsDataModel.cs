@@ -176,8 +176,10 @@ namespace VIS.Models
                     attchCount = 0;
                     if (Util.GetValueOfString(dt["TYPE"]).Equals("APPOINTMENT") && !string.IsNullOrEmpty(Util.GetValueOfString(dt["AttendeeInfo"])))
                     {
-                        attendees = Util.GetValueOfString(DB.ExecuteScalar("SELECT LISTAGG(Name, ',') WITHIN GROUP (ORDER BY Name) AS Name FROM AD_User WHERE AD_User_ID IN ("
-                            + Util.GetValueOfString(dt["AttendeeInfo"]).Replace(';', ',') + ")"));
+                        attendees = Util.GetValueOfString(DB.ExecuteScalar("SELECT " +
+                        (DatabaseType.IsOracle ? " LISTAGG(Name, ',') WITHIN GROUP (ORDER BY Name) " :
+                        " STRING_AGG(Name, ',' ORDER BY Name)") + " AS Name FROM AD_User WHERE AD_User_ID IN ("
+                        + Util.GetValueOfString(dt["AttendeeInfo"]).Replace(';', ',') + ")"));
                     }
                     else
                     {

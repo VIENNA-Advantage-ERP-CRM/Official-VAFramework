@@ -684,7 +684,7 @@ namespace VAdvantage.Common
 
             if (string.IsNullOrEmpty(visitorIPAddress) || visitorIPAddress.Trim() == "::1")
             {
-               // GetLan = true;
+                // GetLan = true;
                 visitorIPAddress = string.Empty;
             }
 
@@ -905,8 +905,8 @@ namespace VAdvantage.Common
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
 
-            
-           
+
+
 
 
 
@@ -1668,7 +1668,7 @@ namespace VAdvantage.Common
         /// <param name="AD_SurveyAssignment_ID"></param>
         /// <param name="IsConditionalChecklist"></param>
         /// <returns></returns>
-        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID, string IsConditionalChecklist)
+        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID, int AD_SurveyAssignment_ID, string IsConditionalChecklist)
         {
             bool isExist = true;
             bool isConditionGiven = true;
@@ -1693,7 +1693,7 @@ namespace VAdvantage.Common
                 DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
                 //prepare where condition for filter
                 if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
-                {                    
+                {
                     int idx = 0;
                     foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                     {
@@ -1765,8 +1765,8 @@ namespace VAdvantage.Common
                                 WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                             }
                             else if (type == "DateTime")
-                            {                               
-                                WhereCondition += columnName +" " + oprtr;
+                            {
+                                WhereCondition += columnName + " " + oprtr;
                             }
                             else
                             {
@@ -1859,9 +1859,9 @@ namespace VAdvantage.Common
                     isConditionGiven = false;
                 }
             }
-          
 
-            if (!string.IsNullOrEmpty(sqlWhere)|| !string.IsNullOrEmpty(WhereCondition))
+
+            if (!string.IsNullOrEmpty(sqlWhere) || !string.IsNullOrEmpty(WhereCondition))
             {
                 string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID=" + AD_Table_ID));
 
@@ -1891,7 +1891,7 @@ namespace VAdvantage.Common
                     isExist = false;
                 }
             }
-            
+
 
             return isExist;
 
@@ -1956,7 +1956,7 @@ namespace VAdvantage.Common
                             result = false;
                         }
                     }
-                    
+
                 }
             }
 
@@ -1982,6 +1982,25 @@ namespace VAdvantage.Common
             else
                 _approvalStatusCols[TableName] = false;
             return false;
+        }
+
+        /// <summary>
+        /// Get Thread ID for the record based on the Table ID and Record ID if AI Chat Bot module is installed
+        /// </summary>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
+        public static string GetThreadID(int AD_Table_ID, int Record_ID)
+        {
+            if (Env.IsModuleInstalled("VAI01_"))
+            {
+                return Util.GetValueOfString(DB.ExecuteScalar(@"SELECT asth.VAI01_ThreadID, llm.VAI01_APIKey, asst.VAI01_AssistantID FROM VAI01_AIAssistant asst
+                                    INNER JOIN VAI01_AssistantScreen ascrn ON (ascrn.VAI01_AIAssistant_ID = asst.VAI01_AIAssistant_ID)
+                                    INNER JOIN VAI01_LLMConfiguration llm ON (llm.VAI01_LLMConfiguration_ID = asst.VAI01_LLMConfiguration_ID)
+                                    INNER JOIN VAI01_AssistantThread asth ON (ascrn.VAI01_AssistantScreen_ID = asth.VAI01_AssistantScreen_ID) WHERE asth.IsActive = 'Y' 
+                                    AND asst.IsActive = 'Y' AND ascrn.AD_Table_ID = " + AD_Table_ID + " AND CAST(asth.VAI01_RecordID AS INTEGER) = " + Record_ID));
+            }
+            return "";
         }
     }
 
