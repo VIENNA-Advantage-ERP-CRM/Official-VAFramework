@@ -121,7 +121,7 @@ namespace VAModelAD.AIHelper
                     }
                     catch (JsonException ex)
                     {
-                        Console.WriteLine("JSON parsing error: " + ex.Message);
+                        Console.WriteLine("JSON parsing error : " + ex.Message);
                         msgPayload.Message = "Error parsing response from AI.";
                     }
                 }
