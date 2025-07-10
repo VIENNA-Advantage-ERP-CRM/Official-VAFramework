@@ -149,7 +149,7 @@ namespace VIS.Models
             sql += " ORDER BY AD_ModuleInfo.name";
 
             
-            DataSet dataSet = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "AD_Widget", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO));
+            DataSet dataSet = DB.ExecuteDataset(sql);
             if (dataSet != null && dataSet.Tables.Count > 0)
             {
 
