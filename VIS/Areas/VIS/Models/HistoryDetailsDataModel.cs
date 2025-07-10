@@ -42,7 +42,7 @@ namespace VIS.Models
 
             sql.Append(@"SELECT ID, AD_TABLE_ID, RECORD_ID, CREATED, FROMUSER, TYPE, SUBJECT,  CharacterData, NAME, TO_CHAR(CREATED, 'DD/MM/YYYY HH12:MI:SS AM')
                         AS CREATEDDATETIME, HASATTACHMENT, ISTASKCLOSED, MailAddress, MailAddressCc, StartDate, EndDate, AttendeeInfo, EmailToInfo, MeetingUrl, 
-                        Appointment_UID, DateLastUpdated FROM (
+                        Appointment_UID, DateLastUpdated, SentimentAnalysis, SentimentAnaylsisReason FROM (
                         SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
                         CASE WHEN ma.ATTACHMENTTYPE = 'M' THEN 'EMAIL' ELSE 'INBOX' END AS TYPE, ma.TITLE AS SUBJECT, 
                         NULL AS CharacterData, au.NAME, ma.ISATTACHMENT AS HASATTACHMENT, '' AS ISTASKCLOSED,
@@ -50,7 +50,7 @@ namespace VIS.Models
                         + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo, "
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL"
-                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated, ma.SentimentAnalysis, ma.SentimentAnaylsisReason
                         FROM MailAttachment1 ma 
                         JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY
                         WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE IN ('M', 'I')
@@ -77,7 +77,7 @@ namespace VIS.Models
                         + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS StartDate , NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS EndDate, 
                         '' AS AttendeeInfo, '' AS EmailToInfo," + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL"
-                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated, null AS SentimentAnalysis, CAST('' AS NVARCHAR2(255)) AS SentimentAnaylsisReason
                         FROM CM_ChatEntry ce JOIN CM_CHAT ch ON ce.CM_Chat_Id=ch.CM_Chat_Id
                         JOIN AD_USER au ON au.AD_USER_ID=ce.CREATEDBY 
                         WHERE ch.ISACTIVE = 'Y' AND ch.AD_TABLE_ID = " + _AD_Table_ID + " AND ch.RECORD_ID = " + RecordId
@@ -89,7 +89,7 @@ namespace VIS.Models
                         + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL"
-                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated, ma.SentimentAnalysis, ma.SentimentAnaylsisReason
                         FROM MailAttachment1 ma 
                         JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
                         WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'L' 
@@ -101,9 +101,9 @@ namespace VIS.Models
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MailAddress,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS MailAddressCc, 
                         ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, ai.EmailToInfo, ai.MeetingUrl,
-                        ai.Appointment_UID, ai.DateLastUpdated
-                        FROM AppointmentsInfo ai 
-                        JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY 
+                        ai.Appointment_UID, ai.DateLastUpdated, at.SentimentAnalysis, at.SentimentAnaylsisReason
+                        FROM AppointmentsInfo ai JOIN AD_USER au ON (au.AD_USER_ID=ai.CREATEDBY)
+                        LEFT JOIN AppointmentTranscript at ON (ai.AppointmentsInfo_ID=at.AppointmentsInfo_ID)
                         WHERE (ai.AttendeeInfo IS NOT NULL OR ai.RefAppointmentsInfo_ID IS NULL) AND ai.ISACTIVE = 'Y' AND ai.ISTASK = 'N' 
                         AND ai.AD_TABLE_ID = " + _AD_Table_ID + "   AND ai.RECORD_ID = " + RecordId
 
@@ -113,7 +113,7 @@ namespace VIS.Models
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MailAddress,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS MailAddressCc, 
                         ai.StartDate , ai.EndDate, COALESCE(ai.AttendeeInfo, CAST(ai.Ad_User_ID AS VARCHAR(10))) AS AttendeeInfo, '' AS EmailToInfo, ai.MeetingUrl,
-                        ai.Appointment_UID, ai.DateLastUpdated
+                        ai.Appointment_UID, ai.DateLastUpdated, null AS SentimentAnalysis, CAST('' AS NVARCHAR2(255)) AS SentimentAnaylsisReason
                         FROM AppointmentsInfo ai 
                         JOIN AD_USER au ON au.AD_USER_ID=ai.CREATEDBY 
                         WHERE ai.ISACTIVE = 'Y' AND ai.ISTASK = 'Y' 
@@ -127,7 +127,7 @@ namespace VIS.Models
                         + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS StartDate , NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS EndDate, 
                         '' AS AttendeeInfo, '' AS EmailToInfo," + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL"
-                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated, null AS SentimentAnalysis, CAST('' AS NVARCHAR2(255)) AS SentimentAnaylsisReason
                         FROM AD_ATTACHMENT aa 
                         JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY 
                         WHERE aa.ISACTIVE = 'Y' 
@@ -142,7 +142,7 @@ namespace VIS.Models
                         + " AS StartDate , NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS EndDate, '' AS AttendeeInfo, '' AS EmailToInfo,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL"
-                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated, null AS SentimentAnalysis, CAST('' AS NVARCHAR2(255)) AS SentimentAnaylsisReason
                         FROM VA048_CALLDETAILS cd 
                         JOIN AD_USER au ON au.AD_USER_ID=cd.CREATEDBY 
                         WHERE cd.VA048_TO IS NOT NULL AND cd.ISACTIVE = 'Y' 
@@ -265,6 +265,8 @@ namespace VIS.Models
                         MeetingUrl = Util.GetValueOfString(dt["MeetingUrl"]),
                         UID = Util.GetValueOfString(dt["Appointment_UID"]),
                         LastUpdated = lastupdated,
+                        SentimentAnalysis = Util.GetValueOfString(dt["SentimentAnalysis"]),
+                        SentimentAnaylsisReason = Util.GetValueOfString(dt["SentimentAnaylsisReason"]),
                         AttchCount = attchCount,
                         Attachment = Attach
                     });
@@ -1085,6 +1087,8 @@ namespace VIS.Models
         public string MeetingUrl { get; set; }
         public string UID { get; set; }
         public DateTime? LastUpdated { get; set; }
+        public string SentimentAnalysis { get; set; }
+        public string SentimentAnaylsisReason { get; set; }
         public int AttchCount { get; set; }
         public AttachmentInfos Attachment { get; set; }
     }

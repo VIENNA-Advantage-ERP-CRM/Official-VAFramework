@@ -61,6 +61,39 @@ namespace VIS.Controllers
             return model.IsBottomTabPanel(tabID);
         }
 
-
+        [HttpPost]
+        public JsonResult DeleteChatEntry(int chatID)
+        {
+            try
+            {
+                Ctx ct = Session["ctx"] as Ctx;
+                if (ChatModel.DeleteChatEntry(ct, chatID))
+                {
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false, message = "Delete failed or Chat entry not found" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public JsonResult EditChatEntry(int chatID, string content)
+        {
+            try
+            {
+                Ctx ct = Session["ctx"] as Ctx;
+                if (ChatModel.EditChatEntry(ct, chatID, content))
+                {
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false, message = "Chat entry not found" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

@@ -4180,6 +4180,47 @@ table.fixed-header thead tr {
     border-radius: 0;
 }
 
+/*chat*/
+.vis-chat-edit-wrapper {
+    position: relative;
+    width: 100%;
+    display: inline-block;
+}
+
+.vis-chat-edit-input {
+    width: 100%;
+    padding: 5px 60px 5px 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.vis-chat-send-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #007bff;
+    font-size: 20px;
+}
+/*.vis-chat-send-update {
+    right: 10px;
+}
+.vis-chat-send-undo {
+    right: 35px;
+}
+*/
+.edit_chat {
+    position: absolute;
+    top: 0;
+    cursor: pointer;
+}
+
+.del_chat {
+    position: absolute;
+    top: 0;
+    cursor: pointer;
+}
+
 /* modify Ends */
 /*Media query*/
 @media screen and (max-width: 1500px) and (min-width: 1360px) {

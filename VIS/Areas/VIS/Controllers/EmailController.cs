@@ -258,8 +258,14 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(model.GetMailFormat(Window_ID, ct)), JsonRequestBehavior.AllowGet);
         }
 
-      
-        
+        [HttpPost]
+        public JsonResult EmailAPI(string Subject, string Message, int recordId, int tableID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            EmailModel model = new EmailModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetEmailResponse(Subject, Message, recordId, tableID, ctx)), JsonRequestBehavior.AllowGet);
+        }
+
 
 
 

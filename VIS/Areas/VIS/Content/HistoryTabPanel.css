@@ -875,14 +875,15 @@
     display: flex;
     align-items: start;
     flex-direction: column;
-    width: 270px;
+    width: 170px;
     padding-top: 0.5rem;
 }
 
 .VIS-item-type-author {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    flex-direction: column;
+    /*align-items: center;*/
+    /*gap: 0.5rem;*/
 }
 
     .VIS-item-type-author .VIS-item-type {
@@ -892,11 +893,15 @@
     }
 
     .VIS-item-type-author .VIS-item-author {
-        border-left: 1px solid rgba(var(--v-c-on-secondary), 0.5);
-        padding-left: 0.5rem;
+        /*border-left: 1px solid rgba(var(--v-c-on-secondary), 0.5);*/
+        /*padding-left: 0.5rem;*/
         color: #666;
         font-size: 0.875rem;
         word-break: break-all;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
     }
 
 .VIS-item-type {
@@ -933,7 +938,7 @@
     }
 
 .VIS-item-content .VIS-item-body {
-    width: 70%;
+    width: 80%;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -998,6 +1003,28 @@
     text-decoration: none;
     font-size: 2rem;
 }
+
+.VIS-Reaction {
+    display: flex;
+    align-items: center;
+    gap: .2rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+}
+
+.VIS-Positive {
+    background: #D7F4CD;
+}
+
+.VIS-Negative {
+    background: #F4CDCD;
+}
+
+.VIS-Neutral {
+    background: #FFC59C;
+}
+
 
 .VIS-play-link i {
     pointer-events: none;

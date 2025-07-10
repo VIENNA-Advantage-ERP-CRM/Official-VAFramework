@@ -145,6 +145,7 @@
         //send printformats as attachment Dynamically
         var $chkBSendPFasAtt = null;
         var $cmbPfFiletype = null;
+        var $btnSend = null;
 
         /** Tab panel-adding cc & bcc emails ** Dt: 28/06/2021 ** Modified By: Kumar **/
         var ccmail = '';
@@ -313,6 +314,7 @@
 
             $chkBSendPFasAtt = $root.find('#' + self.windowNo + "_dynPF");
             $cmbPfFiletype = $root.find('#' + self.windowNo + "_dynPFType");
+            $btnSend = $root.find('#' + self.windowNo + "_sendBtn");
 
             $root.find('.vis-email-attachmentContainer').hide();
 
@@ -1012,6 +1014,51 @@
                     }
                 });
             }
+
+            $btnSend.on("click", function () {
+                var subject = $subject.val();
+                var message = $txtArea.val();
+                var recordId = Record_ID;
+                var tableID = _curtab.gridTable.AD_Table_ID;
+                self.IsBusy(true);
+                $.ajax({
+                    type: 'POST',
+                    url: VIS.Application.contextUrl + "Email/EmailAPI",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        Subject: subject,
+                        Message: message,
+                        recordId: recordId,
+                        tableID: tableID,
+                    }),
+                    success: function (response) {
+                        self.IsBusy(false);
+                        //  console.log("Success:", response);
+                        if (typeof response === "string") {
+                            response = JSON.parse(response);
+                        }
+                        // Store values in variables
+                        var subject = response.Subject;
+                        var message = response.Message;
+                        var success = response.success;
+                        var error = response.error;
+                        $subject.val(response.Subject);
+
+                        let editor = $txtArea.data("kendoEditor");
+                        if (editor) {
+                            let formattedMessage = "<p>" + response.Message.split(/\n{2,}/).join("</p><p>") + "</p>";
+                            editor.value(formattedMessage); // Set content in the rich text editor
+                        } else {
+                            $txtArea.val(response.Message); // Fallback if editor not initialized
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        self.IsBusy(false);
+                        console.error("Error:", error);
+                        // Optionally show error message to user
+                    }
+                });
+            });
 
         };
 

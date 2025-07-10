@@ -29,6 +29,10 @@ using iTextSharp.text.html.simpleparser;
 using VAdvantage.Classes;
 using VIS.DataContracts;
 using VIS.Helpers;
+using VAdvantage.Logging;
+using static VAModelAD.AIHelper.AIHelperDataContracts;
+using VAModelAD.AIHelper;
+using VAdvantage.Common;
 
 namespace VIS.Models
 {
@@ -38,6 +42,8 @@ namespace VIS.Models
 
         string AttachmentsUploadFolderName = "TempDownload";
         // UserInformation userinfo = null;
+
+        private static VLogger _log = VLogger.GetVLogger(typeof(EmailModel).FullName);
 
         public EmailModel(Ctx ctx)
         {
@@ -341,14 +347,16 @@ namespace VIS.Models
 
                 string res1 = sendmail.Send();
 
+
                 if (records != null && records.Length > 0)//save entery in MailAttachment......
                 {
                     for (int k = 0; k < records.Length; k++)
                     {
-                        if (records[k] == null || records[k] == "" || records[k] == "0")
-                        {
-                            continue;
-                        }
+                        //if (records[k] == null || records[k] == "")
+                        //{
+                        //    _log.SaveError("MAIL LOG", "Continue : " + k + " " + records[k]);
+                        //    continue;
+                        //}
                         if (res1 != "OK")
                         {
                             _mAttachment.SetIsMailSent(false);
@@ -359,7 +367,6 @@ namespace VIS.Models
                         }
                         int AD_Client_Id = ctx.GetAD_Client_ID();
                         int iOrgid = ctx.GetAD_Org_ID();
-
                         _mAttachment.SetAD_Client_ID(AD_Client_Id);
                         _mAttachment.SetAD_Org_ID(iOrgid);
                         _mAttachment.SetAD_Table_ID(_table_id);
@@ -367,11 +374,9 @@ namespace VIS.Models
                         _mAttachment.SetMailAddress(bcctext.ToString());
                         _mAttachment.SetAttachmentType("M");
 
-                        _mAttachment.SetRecord_ID(Convert.ToInt32(records[k]));
-
+                        _mAttachment.SetRecord_ID(Util.GetValueOfInt(records[k]));
                         _mAttachment.SetTextMsg(message);
                         _mAttachment.SetTitle(sub);
-
                         _mAttachment.SetMailAddressBcc(bcctext.ToString());
                         _mAttachment.SetMailAddress(mails[j].To);
                         _mAttachment.SetMailAddressCc(mails[j].Cc);
@@ -386,7 +391,8 @@ namespace VIS.Models
                         }
                         _mAttachment.NewRecord();
                         if (_mAttachment.Save())
-                        { }
+                        {
+                        }
                         else
                         {
                             // log.SaveError(Msg.GetMsg(Env.GetCtx(), "RecordNotSaved"), "");
@@ -432,9 +438,12 @@ namespace VIS.Models
                     }
                     _mAttachment.NewRecord();
                     if (_mAttachment.Save())
-                    { }
+                    {
+                        _log.SaveError("MAIL LOG", "Saved");
+                    }
                     else
                     {
+                        _log.SaveError("MAIL LOG", "NOT Saved");
                         // log.SaveError(Msg.GetMsg(Env.GetCtx(), "RecordNotSaved"), "");
                     }
                 }
@@ -1068,7 +1077,16 @@ namespace VIS.Models
             #endregion
         }
 
-
+        public MessagePayload GetEmailResponse(string subject, string message, int recordId, int tableID, Ctx ctx)
+        {
+            MessagePayload payload = new MessagePayload();
+            string threadID = Common.GetThreadID(tableID, recordId);
+            if (!string.IsNullOrEmpty(threadID))
+            {
+                payload = AIPayload.SendEmailReplyRequestAsync(threadID, subject, message, ctx);
+            }
+            return payload;
+        }
     }
 
 
