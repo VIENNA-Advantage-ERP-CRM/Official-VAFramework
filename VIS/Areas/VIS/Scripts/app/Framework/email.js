@@ -1016,10 +1016,16 @@
             }
 
             $btnSend.on("click", function () {
+                if (!window.VAI01) {
+                    VIS.ADialog.info('VAI01_InstallChatBot');
+                    return;
+                }
+
                 var subject = $subject.val();
                 var message = $txtArea.val();
                 var recordId = Record_ID;
                 var tableID = _curtab.gridTable.AD_Table_ID;
+                var prompt = $root.find('#' + self.windowNo + "_emailPrompt").val();
                 self.IsBusy(true);
                 $.ajax({
                     type: 'POST',
@@ -1030,9 +1036,11 @@
                         Message: message,
                         recordId: recordId,
                         tableID: tableID,
+                        prompt: prompt,
                     }),
                     success: function (response) {
                         self.IsBusy(false);
+                        $root.find('#' + self.windowNo + "_emailPrompt").val('');
                         //  console.log("Success:", response);
                         if (typeof response === "string") {
                             response = JSON.parse(response);
@@ -1055,6 +1063,7 @@
                     error: function (xhr, status, error) {
                         self.IsBusy(false);
                         console.error("Error:", error);
+                        $root.find('#' + self.windowNo + "_emailPrompt").val('');
                         // Optionally show error message to user
                     }
                 });
@@ -2246,44 +2255,44 @@
             //    }
 
 
-                $bsyDiv[0].style.visibility = "visible";
-                var datainit = {
-                    mails: VIS.Utility.encodeText(mails), AD_User_ID: ctx.getAD_User_ID(), AD_Client_ID: ctx.getAD_Client_ID(),
-                    AD_Org_ID: ctx.getAD_Org_ID(), attachment_ID: attachmentID, fileNamesFornNewAttach: JSON.stringify(filesforAttachmentforNewAttachment),
-                    fileNamesForopenFormat: JSON.stringify(filesforAttachmentforOpenFormat), mailFormat: VIS.Utility.encodeText($textAreakeno.value()),
-                    notify: wantNotification, strDocAttach: VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo),
-                    /** tab panel- null check ** Dt: 05/07/2021 ** Modified By: Kumar **/
-                    AD_Process_ID: ((_curtab != null) ? _curtab.getAD_Process_ID() : 0), printformatfileType: pfFiletype
-                };
-                $.ajax({
-                    url: VIS.Application.contextUrl + "Email/SendMail",
-                    data: datainit,
-                    datatype: "json",
-                    type: "post",
-                    cache: false,
-                    async: true,
-                    success: function (data) {
-                        $bsyDiv[0].style.visibility = "hidden";
-                        var res = JSON.parse(data);
-                        if (res == "") {
-                            self.dispose();
-                            self = null;
-                            if (doc != null) {
-                                doc.dispose();
-                            }
-                            doc = null;
+            $bsyDiv[0].style.visibility = "visible";
+            var datainit = {
+                mails: VIS.Utility.encodeText(mails), AD_User_ID: ctx.getAD_User_ID(), AD_Client_ID: ctx.getAD_Client_ID(),
+                AD_Org_ID: ctx.getAD_Org_ID(), attachment_ID: attachmentID, fileNamesFornNewAttach: JSON.stringify(filesforAttachmentforNewAttachment),
+                fileNamesForopenFormat: JSON.stringify(filesforAttachmentforOpenFormat), mailFormat: VIS.Utility.encodeText($textAreakeno.value()),
+                notify: wantNotification, strDocAttach: VIS.context.getContext("DocumentAttachViaEmail_" + self.windowNo),
+                /** tab panel- null check ** Dt: 05/07/2021 ** Modified By: Kumar **/
+                AD_Process_ID: ((_curtab != null) ? _curtab.getAD_Process_ID() : 0), printformatfileType: pfFiletype
+            };
+            $.ajax({
+                url: VIS.Application.contextUrl + "Email/SendMail",
+                data: datainit,
+                datatype: "json",
+                type: "post",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    $bsyDiv[0].style.visibility = "hidden";
+                    var res = JSON.parse(data);
+                    if (res == "") {
+                        self.dispose();
+                        self = null;
+                        if (doc != null) {
+                            doc.dispose();
                         }
-                        else {
-                            window.setTimeout(function () {
-
-                                VIS.ADialog.info(res);
-                                if (res.contains("MailSent")) {
-                                    VIS.context.setContext("DocumentAttachViaEmail_" + self.windowNo, "");
-                                }
-                            }, 2);
-                        }
+                        doc = null;
                     }
-                });
+                    else {
+                        window.setTimeout(function () {
+
+                            VIS.ADialog.info(res);
+                            if (res.contains("MailSent")) {
+                                VIS.context.setContext("DocumentAttachViaEmail_" + self.windowNo, "");
+                            }
+                        }, 2);
+                    }
+                }
+            });
 
 
             //});
@@ -3013,7 +3022,7 @@
                     else {
                         //$root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 50));
 
-                        $root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 70));
+                        $root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 95));
 
 
 

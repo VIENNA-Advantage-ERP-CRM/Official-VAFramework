@@ -1077,13 +1077,13 @@ namespace VIS.Models
             #endregion
         }
 
-        public MessagePayload GetEmailResponse(string subject, string message, int recordId, int tableID, Ctx ctx)
+        public MessagePayload GetEmailResponse(string subject, string message, int recordId, int tableID, Ctx ctx, string prompt)
         {
             MessagePayload payload = new MessagePayload();
             string threadID = Common.GetThreadID(tableID, recordId);
             if (!string.IsNullOrEmpty(threadID))
             {
-                payload = AIPayload.SendEmailReplyRequestAsync(threadID, subject, message, ctx);
+                payload = AIPayload.SendEmailReplyRequestAsync(threadID, subject, message, ctx, prompt);
             }
             return payload;
         }

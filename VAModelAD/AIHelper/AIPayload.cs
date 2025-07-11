@@ -85,7 +85,7 @@ namespace VAModelAD.AIHelper
             }
         }
 
-        public static MessagePayload SendEmailReplyRequestAsync(string threadID, string subject, string message, Ctx ctx)
+        public static MessagePayload SendEmailReplyRequestAsync(string threadID, string subject, string message, Ctx ctx, string prompt)
         {
             MessagePayload msgPayload = new MessagePayload();
             EmailReplyRequest emailReplyRequest = new EmailReplyRequest();
@@ -93,6 +93,7 @@ namespace VAModelAD.AIHelper
             AIApiService.InitAIEndPoint(ctx.GetContext("#AppFullUrl"));
             RequestPayload.Get().SetDefaultParameters(emailReplyRequest);
 
+            emailReplyRequest.prompt = prompt;
             emailReplyRequest.threadID = threadID;
             emailReplyRequest.sessionID = ctx.GetAD_Session_ID();
             emailReplyRequest.endPoints = ctx.GetContext("#AppFullUrl");
