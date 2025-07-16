@@ -35,6 +35,18 @@
         var TableName = null;
         var Record_ID = null;
         var totalPages, currentRecords = null;
+        /*VIS_427 Defined varaibles for pop*/
+        var windowRecords = [];
+        var winRecPageSize = 15;
+        var winRecPageNo = 1;
+        var TotalPages = 1;
+        var content = null;
+        var IsZoomClicked = false;
+        var SrchTxt = null;
+        var IsItemSearched = false;
+        var popup = null;
+        var modelPopupId = null;
+        var IsDataFetching = false;
 
 
 
@@ -193,11 +205,258 @@
             AssignedRecords.find('.vis-record-box').on('click', function () {
                 WindowName = $(this).attr('visWindowname');
                 WindowId = $(this).attr('visWindowId');
-                TableName = $(this).attr('visTableName');
+                TableID = $(this).attr('visTableID');
                 Record_ID = $(this).attr('visRecordId');
-                zoomWindow()
+                TableName = $(this).attr('visTableName');
+                winRecPageNo = 1;
+                //VIS_427 Getting window Data
+                GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize)
+            });
+            /*Defined zoom event for tab*/
+            AssignedRecords.find('.vis-exinv-zoom').off('click')
+            AssignedRecords.find('.vis-exinv-zoom').on('click', function () {
+                IsZoomClicked = true;
+                WindowName = $(this).parent().attr('visWindowname');
+                WindowId = $(this).attr('data-windowId');
+                TableID = $(this).parent().attr('visTableID');
+                TableName = $(this).parent().attr('visTableName');
+                Record_ID = $(this).attr('data-Record_ID');
+                zoomWindow();
+            });
+            /*Defined zoom event for single record*/
+            AssignedRecords.children().find('.vis-singlerec-zoom').off('click')
+            AssignedRecords.find('.vis-singlerec-zoom').on('click', function () {
+                WindowName = $(this).parent().attr('visWindowname');
+                WindowId = $(this).attr('data-windowId');
+                TableID = $(this).parent().attr('visTableID');
+                Record_ID = $(this).attr('data-Record_ID');
+                zoomWindow();
             });
         };
+        /*This function used to open popup*/
+        function widgetsPopup() {
+            popup = "";
+            popup = ' <div class="modal vis-a-actionsModelMain" id="widgetsModalId' + $self.AD_UserHomeWidgetID + '" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">'
+                + ' <div class="modal-dialog modal-lg vis-a-actionsMdialog" role="document">'
+                + '     <div class="modal-content vis-a-actionsMcontent">'
+                + '             <button id="closeBtnId' + $self.AD_UserHomeWidgetID + '" type="button" class="close vis-a-closeBtnCls" data-dismiss="modal" aria-label="Close">'
+                + '                 <span aria-hidden="true">&times;</span>'
+                + '             </button>'
+                + '         <div id="appendWidgetDivId' + $self.AD_UserHomeWidgetID + '" class="vis-a-actionsWidgetCls">'
+                + '         </div>'
+                + '      </div>'
+                + '   </div>'
+                + '</div>'
+            $root.append(popup);
+            modelPopupId = $root.find("#widgetsModalId" + $self.AD_UserHomeWidgetID);
+            modelPopupId.find("#closeBtnId" + $self.AD_UserHomeWidgetID).on("click", function () {
+                modelPopupId.hide();
+            });
+        };
+        /**
+         * This function is used to get the window records which are assigned
+         * @param {any} TableID
+         * @param {any} Record_ID
+         * @param {any} winPageNo
+         * @param {any} winPageSize
+         * @param {any} searchText
+         */
+        function GetWindowData(WindowId, TableID, Record_ID, winPageNo, winPageSize, searchText) {
+            var isPopupOpen = modelPopupId && modelPopupId.is(':visible');
+
+            if (isPopupOpen) {
+                showPopupBusy(true);
+            } else {
+                showBusy(true);
+            }
+            $.ajax({
+                url: VIS.Application.contextUrl + "AssignedRecordToUser/GeWindowRecords",
+                data: {
+                    WindowId: WindowId,
+                    TableID: TableID,
+                    Record_ID: Record_ID,
+                    pageNo: winPageNo,
+                    pageSize: winPageSize,
+                    SrchTxt: searchText
+
+                },
+                dataType: 'json',
+                success: function (result) {
+                    showBusy(true);
+                    windowRecords = result ? JSON.parse(result) : [];
+                    CreateList(windowRecords);
+                },
+                error: function () {
+                    if (isPopupOpen) {
+                        showPopupBusy(false);
+                    } else {
+                        showBusy(false);
+                    }
+                }
+            });
+        }
+        /**
+         * This function used to create list of records in popup
+         * @param {any} windowRecords
+         */
+        function CreateList(windowRecords) {
+            $('#vis-asrec-popup-scroll_' + $self.AD_UserHomeWidgetID).off('scroll');
+            if (winRecPageNo === 1 && windowRecords.length > 0) {
+                TotalRecords = windowRecords[0].countRecords;
+                TotalPages = Math.ceil(TotalRecords / winRecPageSize);
+            }
+            widgetsPopup();
+            var ListContent = "";
+            //for no data
+            if (windowRecords.length === 0) {
+
+                $('.vis-assrec-data').empty();
+                ListContent = '<tr><td colspan="4" style="text-align:center; padding: 20px;">' + VIS.Msg.getMsg('NoDataFound') + '</td></tr>';
+            }
+            //creating td here
+            else {
+                for (let i = 0; i < windowRecords.length; i++) {
+                    ListContent +=
+                        '<tr>' +
+                        '<td class="VIS-assrec-lalign">' + windowRecords[i].ColValue + '</td>' +
+                        '<td>' + windowRecords[i].UpdatedBy + '</td>' +
+                        '<td>' + VIS.Utility.Util.getValueOfDate(windowRecords[i].AssignedDate).toLocaleDateString() + '</td>' +
+                        '<td><i class="glyphicon glyphicon-zoom-in vis-singlerec-zoom" ' +
+                        'data-Record_ID="' + windowRecords[i].Record_ID + '" ' +
+                        'id="VIS-unAllocatedZoom_' + $self.windowNo + '" ' +
+                        'title="' + VIS.Msg.getMsg("VIS_Zoom") + '">' +
+                        '</i></td>' +
+                        '</tr>';
+                }
+            }
+
+            var isFirstLoad = (winRecPageNo === 1 && !IsZoomClicked && !IsItemSearched);
+            /*Here handled to contenett in popup*/
+            if (isFirstLoad) {
+                content =
+                    '<div id="VIS-assrec-wrapper">' +
+                    '<div class="vis-header-bar">' +
+                    '<h1 class="vis-header-title">' + WindowName + '</h1>' +
+                    '<div class="VIS-search-wrap">' +
+                    '<input value="" placeholder="Search..." type="text" id="VIS_SrchTxtbx_' + $self.windowNo + '" class="VIS-srchtext">' +
+                    '<a class="VIS-search-icon" id="VIS_SrchBtn_' + $self.windowNo + '">' +
+                    '<span class="vis vis-search"></span>' +
+                    '</a>' +
+                    '</div>' +
+                    '<button id ="popup-close-btn1" type="button" class="close vis-a-closeBtnCls" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>' +
+                    '</div>' +
+                    '<div id="vis-asrec-popup-busyDivId_' + $self.widgetInfo.AD_UserHomeWidgetID + '" class="vis-busyindicatorouterwrap"><div id="busyDiv2Id' + $self.widgetInfo.AD_UserHomeWidgetID + '" class="vis-busyindicatorinnerwrap">'+
+                    '<i class= "vis_widgetloader"></i></div></div>'+
+                    '<div id="vis-asrec-popup-scroll_' + $self.AD_UserHomeWidgetID + '" class="vis-asrec-popup-scroll-container vis-table-wrapper">' +
+                    '<table id="VIS-assrec-keywords" cellspacing="0" cellpadding="0">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th><span>' + VIS.Msg.getMsg('VIS_RecordName') + '</span></th>' +
+                    '<th><span>' + VIS.Msg.getMsg('VIS_AssignedFrom') + '</span></th>' +
+                    '<th><span>' + VIS.Msg.getMsg('VIS_AssignedDate') + '</span></th>' +
+                    '<th><span></span></th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '<tbody class="vis-assrec-data">' +
+                    ListContent +
+                    '</tbody>' +
+                    '</table>' +
+                    '</div>' +
+                    '</div>';
+
+                modelPopupId.find("#appendWidgetDivId" + $self.AD_UserHomeWidgetID).empty();
+                modelPopupId.find("#appendWidgetDivId" + $self.AD_UserHomeWidgetID).append(content);
+                modelPopupId.show(); // Show modal
+
+                // Event Bindings (Delegated)
+                bindSearchEvents();
+                bindPopupScroll();
+
+                // Close button event
+                $(document).on('click', '#popup-close-btn1', function () {
+                    modelPopupId.hide();  // Close modal
+                    IsZoomClicked = false;
+                    IsItemSearched = false;
+                });
+
+                // Zoom button event
+                $(document).on('click', '.vis-singlerec-zoom', function () {
+                    Record_ID = $(this).attr('data-Record_ID');
+                    zoomWindow();  // Your zoom function
+                    modelPopupId.hide();  // Close modal
+                });
+
+            } else if (!IsZoomClicked || IsItemSearched) {
+                // Clear old content if it's the first page or a new search
+                if (winRecPageNo === 1 || IsItemSearched) {
+                    $('.vis-assrec-data').html(ListContent); // Replace all content
+                } else {
+                    $('.vis-assrec-data').append(ListContent); // Append more records during scroll
+                }
+
+                // Reset the search flag after handling
+                IsItemSearched = false;
+                bindPopupScroll();
+            } else {
+                IsZoomClicked = false;
+                IsItemSearched = false;
+            }
+            showPopupBusy(false);
+            showBusy(false);
+            IsDataFetching = false;
+        }
+        /**
+         * This function is used to show busy indicator on popup
+         * @param {any} show
+         */
+        function showPopupBusy(show) {
+            if (show) {
+                $root.find("#vis-asrec-popup-busyDivId_" + $self.widgetInfo.AD_UserHomeWidgetID).show();
+            }
+            else {
+                $root.find("#vis-asrec-popup-busyDivId_" + $self.widgetInfo.AD_UserHomeWidgetID).hide();
+            }
+        }
+        // Search Event Binding (Delegated)
+        function bindSearchEvents() {
+            // First unbind
+            $(document).off("keypress", "#VIS_SrchTxtbx_" + $self.windowNo);
+            $(document).off("click", ".VIS-search-icon");
+            $(document).on("keypress", "#VIS_SrchTxtbx_" + $self.windowNo, function (e) {
+                if (e.keyCode === 13) {  // When user presses Enter
+                    SrchTxt = $(this).val();
+                    IsDataFetching = false;
+                    $('.vis-assrec-data').empty();
+                    $('#vis-asrec-popup-scroll_' + $self.AD_UserHomeWidgetID).off('scroll');
+                    winRecPageNo = 1;
+                    IsItemSearched = true;
+                    GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, SrchTxt);  // Call your data fetching function
+                }
+            });
+
+            $(document).on("click", ".VIS-search-icon", function () {
+                SrchTxt = $("#VIS_SrchTxtbx_" + $self.windowNo).val();  // Get search input value
+                winRecPageNo = 1;
+                IsDataFetching = false;
+                $('.vis-assrec-data').empty();
+                $('#vis-asrec-popup-scroll_' + $self.AD_UserHomeWidgetID).off('scroll');
+                IsItemSearched = true;
+                GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, SrchTxt);  // Call your data fetching function
+            });
+        }
+
+        // Popup Scroll Binding (Infinite Scroll)
+        function bindPopupScroll() {
+            $('#vis-asrec-popup-scroll_' + $self.AD_UserHomeWidgetID).off('scroll').on('scroll', function () {
+                if ($(this).scrollTop() + $(this).innerHeight() + 20 >= this.scrollHeight) {
+                    if (winRecPageNo < TotalPages && !IsDataFetching) {
+                        IsDataFetching = true;
+                        winRecPageNo++;
+                        GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, SrchTxt);
+                    }
+                }
+            });
+        }
 
         /*  update UI*/
         function updateUI() {
@@ -226,9 +485,12 @@
                  visWindowname="${record.WindowName}" 
                  visWindowId="${record.WindowID}" 
                  visTableName="${record.TableName}"
-                 visRecordId="${record.Record_ID}">
+                 visRecordId="${record.Record_ID}"
+                 visTableId="${record.TableID}">
                  <span>${record.WindowName}</span>
                 <span class="VIS_recordCount">${record.Count}</span>
+                <i class="glyphicon glyphicon-zoom-in vis-exinv-zoom" data-Record_ID="${record.Record_ID}" data-windowId="${record.WindowID}"
+                 data-Primary_ID="${record.TableName}"_ID id="VIS-unAllocatedZoom_"${$self.windowNo}'" title="${VIS.Msg.getMsg("VIS_Zoom")}"></i>
                 </div>`;
                 AssignedRecords.append(AssignedItems);
 
@@ -296,6 +558,7 @@
         this.frame = frame;
         this.widgetInfo = frame.widgetInfo
         this.windowNo = windowNo;
+        this.AD_UserHomeWidgetID = frame.widgetInfo.AD_UserHomeWidgetID;
         this.Initalize();
         this.frame.getContentGrid().append(this.getRoot());
     };

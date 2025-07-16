@@ -370,6 +370,120 @@ namespace VIS.Models
             return obj;
 
         }
+        /// <summary>
+        /// This fucntion is used to get window records which is clicked
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="WindowId">WindowId</param>
+        /// <param name="TableID">TableID</param>
+        /// <param name="Record_ID">Record_ID</param>
+        /// <param name="pageNo">pageNo</param>
+        /// <param name="pageSize">pageSize</param>
+        /// <param name="SrchTxt">SrchTxt</param>
+        /// <returns>List of data</returns>
+        /// <author>VIS_427</author>
+
+        public List<dynamic> GeWindowRecords(Ctx ctx, int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt)
+        {
+            string sql = "";
+            List<dynamic> results = new List<dynamic>();
+
+            // Step 1: Get identifier column(s) for the given TableID
+            if (DB.IsPostgreSQL())
+            {
+                // PostgreSQL: Concatenate identifier columns using STRING_AGG
+                sql = @"SELECT 
+                    tab.TableName,
+                    tab.AD_Table_ID,
+                    STRING_AGG('at.' || col.ColumnName, ' || ''_'' || ' ORDER BY col.SeqNo) AS IdentifierColumns
+                FROM 
+                    AD_Column col
+                INNER JOIN 
+                    AD_Table tab ON col.AD_Table_ID = tab.AD_Table_ID
+                WHERE 
+                    col.IsIdentifier = 'Y'
+                    AND col.IsActive = 'Y'
+                    AND col.AD_Reference_ID NOT IN (32)
+                    AND tab.AD_Table_ID = " + TableID +
+                       @" GROUP BY 
+                    tab.TableName, tab.AD_Table_ID";
+            }
+            else
+            {
+                // Oracle: Concatenate identifier columns using LISTAGG
+                sql = @"SELECT 
+                    tab.TableName,
+                    tab.AD_Table_ID,
+                    LISTAGG('at.' || col.ColumnName, ' || ''_'' || ') 
+                        WITHIN GROUP (ORDER BY col.SeqNo) AS IdentifierColumns
+                FROM 
+                    AD_Column col
+                INNER JOIN 
+                    AD_Table tab ON col.AD_Table_ID = tab.AD_Table_ID
+                WHERE 
+                    col.IsIdentifier = 'Y'
+                    AND col.IsActive = 'Y'
+                    AND col.AD_Reference_ID NOT IN (32)
+                    AND tab.AD_Table_ID = " + TableID +
+                       @" GROUP BY 
+                    tab.TableName, tab.AD_Table_ID";
+            }
+
+            // Execute the query to fetch identifier column info
+            DataSet ds = DB.ExecuteDataset(sql);
+
+            // Step 2: Build main SELECT statement only if identifier info is fetched
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                string columnNames = Util.GetValueOfString(ds.Tables[0].Rows[0]["IdentifierColumns"]);  // Final concatenated identifier columns
+
+                // Build SQL to get assigned records with identifier, user info, and updated date
+                sql = @"SELECT " + columnNames + @" AS IdentiFierVal, au.Name, var.Record_ID, var.Updated 
+                FROM " + ds.Tables[0].Rows[0]["TableName"] + @" at 
+                INNER JOIN VIS_AssignedRecordToUser var ON (var.Record_ID = at." + ds.Tables[0].Rows[0]["TableName"] + @"_ID)
+                INNER JOIN AD_User au ON (au.AD_User_ID = var.Updatedby)
+                WHERE at." + ds.Tables[0].Rows[0]["TableName"] + "_ID IN (" + Record_ID + ")";
+
+                // Step 3: Apply search filter if provided
+                if (!string.IsNullOrEmpty(SrchTxt))
+                {
+                    sql += " AND ((UPPER(" + columnNames + ") LIKE UPPER('%" + SrchTxt + "%')) OR (UPPER(au.name) LIKE UPPER('%" + SrchTxt + "%')))";
+                }
+
+                // Order by most recently updated
+                sql += " ORDER BY var.Updated DESC";
+
+                // Step 4: Execute final paged result query
+                ds = DB.ExecuteDataset(sql.ToString(), null, null, pageSize, pageNo);
+            }
+
+            // Step 5: Read data and add to result list
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                int countRecords = 0;
+
+                // Get total record count only for first page
+                if (pageNo == 1)
+                {
+                    countRecords = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sql + " ) t"));
+                }
+
+                // Read each row and map to dynamic object
+                foreach (DataRow row in ds.Tables[0].Rows)
+                {
+                    dynamic obj = new ExpandoObject();
+                    obj.ColValue = Util.GetValueOfString(row["IdentiFierVal"]);
+                    obj.UpdatedBy = Util.GetValueOfString(row["Name"]);
+                    obj.Record_ID = Util.GetValueOfInt(row["Record_ID"]);
+                    obj.AssignedDate = Util.GetValueOfDateTime(row["Updated"]);
+                    obj.countRecords = countRecords;
+                    results.Add(obj);
+                }
+            }
+
+            return results;
+        }
+
 
         /// <summary>
         /// Get assigned records

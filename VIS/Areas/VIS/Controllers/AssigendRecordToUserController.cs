@@ -129,5 +129,28 @@ namespace VIS.Controllers
             }
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
+        /// <summary>
+        /// This fucntion is used to get window records which is clicked
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="WindowId">WindowId</param>
+        /// <param name="TableID">TableID</param>
+        /// <param name="Record_ID">Record_ID</param>
+        /// <param name="pageNo">pageNo</param>
+        /// <param name="pageSize">pageSize</param>
+        /// <param name="SrchTxt">SrchTxt</param>
+        /// <returns>List of data</returns>
+        /// <author>VIS_427</author>
+        public JsonResult GeWindowRecords(int WindowId,int TableID,string Record_ID,int pageNo,int pageSize,string SrchTxt)
+        {
+            dynamic result = 0;
+            if (Session["ctx"] != null)
+            {
+                var ctx = Session["ctx"] as Ctx;
+                AssignedRecordToUser obj = new AssignedRecordToUser();
+                result = obj.GeWindowRecords(ctx, WindowId, TableID, Record_ID, pageNo, pageSize, SrchTxt);
+            }
+            return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+        }
     }
 }
