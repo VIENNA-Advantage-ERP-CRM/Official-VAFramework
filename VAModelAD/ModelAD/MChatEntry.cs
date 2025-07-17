@@ -143,6 +143,7 @@ namespace VAdvantage.Model
         {
             if (!success)
                 return false;
+
             int recordID = 0;
             int tableID = 0;
             DataSet dsTableDetails = DB.ExecuteDataset("SELECT Record_ID, AD_Table_ID FROM CM_Chat WHERE CM_Chat_ID = " + GetCM_Chat_ID());
@@ -151,6 +152,21 @@ namespace VAdvantage.Model
                 recordID = Util.GetValueOfInt(dsTableDetails.Tables[0].Rows[0]["Record_ID"]);
                 tableID = Util.GetValueOfInt(dsTableDetails.Tables[0].Rows[0]["AD_Table_ID"]);
             }
+
+            //string tableName = MTable.GetTableName(GetCtx(), tableID);
+            //if (tableName.ToLower() == "AppointmentsInfo" || tableName.ToLower() == "MailAttachment1")
+            //{
+            //    DataSet ds = DB.ExecuteDataset("SELECT AD_Table_ID, Record_ID FROM " + tableName + " WHERE " + tableName + "_ID = " + recordID);
+            //    if (ds != null && ds.Tables[0].Rows.Count > 0)
+            //    {
+            //        if (Util.GetValueOfInt(ds.Tables[0].Rows[0]["AD_Table_ID"]) > 0)
+            //        {
+            //            tableID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["AD_Table_ID"]);
+            //            recordID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["Record_ID"]);
+            //        }
+            //    }
+            //}
+
             string threadID = Common.Common.GetThreadID(tableID, recordID);
             if (!string.IsNullOrEmpty(threadID))
             {

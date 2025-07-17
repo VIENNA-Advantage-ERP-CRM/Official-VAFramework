@@ -1054,6 +1054,7 @@
 
                         let editor = $txtArea.data("kendoEditor");
                         if (editor) {
+                            editor.value(""); // Set content in the rich text editor
                             let formattedMessage = "<p>" + response.Message.split(/\n{2,}/).join("</p><p>") + "</p>";
                             editor.value(formattedMessage); // Set content in the rich text editor
                         } else {

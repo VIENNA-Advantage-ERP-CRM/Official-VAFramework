@@ -1415,7 +1415,7 @@
                     '</section>' +
                     '<section class="VIS-attachment-section">' +
                     (ds["MeetingUrl"] != "" && ds["Transcript"] == "" ? '<div class="VIS-attachment-content">' +
-                        '<span data-tid="' + ds["TokenRef_ID"] + '" data-joinurl="' + ds["MeetingUrl"] + '" data-rid="' + ID + '" data-joinurl="'
+                        '<span data-tid="' + ds["MailConfig_ID"] + '" data-joinurl="' + ds["MeetingUrl"] + '" data-rid="' + ID + '" data-joinurl="'
                         + ds["MeetingUrl"] + '" class="VIS-btn-Transcript">' +
                         '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/chat-download-icon.svg" alt="Download Transcript" title="' + VIS.Msg.getMsg('DownloadTranscript') + '">' +
                         //'<i class="fa fa-clone"></i></span>' +
@@ -1474,11 +1474,11 @@
                 target.find('.VIS-btn-Transcript').click(function (e) {
                     var url = $(this).data('joinurl');
                     var rID = $(this).data('rid');
-                    userAccountID = $(this).data('tid');
+                    var mailConfigID = $(this).data('tid');
 
                     if (window.VA101 && url != "") {
                         if (userAccountID == 0) {
-                            userAccountID = GetorCreateAPIUserAccount();
+                            userAccountID = GetorCreateAPIUserAccount(mailConfigID);
                             if (userAccountID > 0) {
                                 $('#VIS_tabPanelDataLoader' + window_No).show();
                                 downloadTranscript(rID, url, target.find(".VIS-transcript-section"));
@@ -1530,8 +1530,8 @@
             }
         };
 
-        function GetorCreateAPIUserAccount() {
-            var dr = VIS.dataContext.getJSONRecord("VIS/HistoryDetailsData/GetUserAccount", { Provider: "" });
+        function GetorCreateAPIUserAccount(mailConfigID) {
+            var dr = VIS.dataContext.getJSONRecord("VIS/HistoryDetailsData/GetUserAccount", { MailConfigID: mailConfigID });
             if (dr != null) {
                 userAccountID = dr.UserAccount_ID;
                 if (dr.ErrorMsg != "") {

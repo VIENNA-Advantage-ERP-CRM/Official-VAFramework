@@ -569,7 +569,7 @@ namespace VIS.Models
                 "       WHEN 'Y' " +
                 "       THEN '" + Msg.GetMsg(ctx, "Yes") + "' " +
                 "       ELSE '" + Msg.GetMsg(ctx, "No") + "' " +
-                @"     END) AS IsPrivate, ai.comments, ac.Name as caname, ai.TokenRef_ID, ai.MeetingUrl, at.Transcript
+                @"     END) AS IsPrivate, ai.comments, ac.Name as caname, ai.TokenRef_ID, ai.AD_UserMailConfigration_ID, ai.MeetingUrl, at.Transcript
                 FROM AppointmentsInfo ai LEFT OUTER JOIN AppointmentCategory ac ON (ai.AppointmentCategory_ID=ac.AppointmentCategory_ID) 
                 LEFT JOIN AppointmentTranscript at ON (at.AppointmentsInfo_ID=ai.AppointmentsInfo_ID)
                 WHERE ai.IsActive='Y' AND AI.AppointmentsInfo_ID=" + appointmentId;
@@ -606,6 +606,7 @@ namespace VIS.Models
                 obj["comments"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["comments"]);
                 obj["caname"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["caname"]);
                 obj["TokenRef_ID"] = Util.GetValueOfInt(ds.Tables[0].Rows[0]["TokenRef_ID"]);
+                obj["MailConfig_ID"] = Util.GetValueOfInt(ds.Tables[0].Rows[0]["AD_UserMailConfigration_ID"]);
                 obj["MeetingUrl"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["MeetingUrl"]);
                 obj["Transcript"] = Util.GetValueOfString(ds.Tables[0].Rows[0]["Transcript"]);
             }
@@ -881,25 +882,20 @@ namespace VIS.Models
         /// <param name="ctx">Context</param>
         /// <param name="Provider">Auth Provider</param>
         /// <returns>object</returns>
-        public dynamic GetUserAccount(Ctx ctx, string Provider)
+        public dynamic GetUserAccount(Ctx ctx, int mailconfigID)
         {
             dynamic retDic = new ExpandoObject();
             retDic.UserAccount_ID = 0;
             retDic.AuthCredentialID = 0;
             retDic.ErrorMsg = "";
 
-            string sql = @"SELECT ut.VA101_AccessToken, ut.VA101_RefreshToken, ut.VA101_APIAuthCredential_ID, 
-            ut.VA101_AuthCrediential_ID
-            FROM VA101_AuthCrediential ac
-            INNER JOIN VA101_APIAuthCredential ut ON (ac.VA101_AuthCrediential_ID=ut.VA101_AuthCrediential_ID) 
-            INNER JOIN VA101_AuthProvider ap ON (ac.VA101_AuthProvider_ID=ap.VA101_AuthProvider_ID) 
-            INNER JOIN AD_User us ON (ut.AD_User_ID=us.AD_User_ID)
-            WHERE ut.IsActive='Y' AND ut.AD_User_ID=" + ctx.GetAD_User_ID();
-
-            if (!string.IsNullOrEmpty(Provider))
-            {
-                sql += "AND ap.VA101_Provider='" + Provider + "'";
-            }
+            string sql = @"SELECT ut.VA101_AccessToken, ut.VA101_RefreshToken, um.VA101_APIAuthCredential_ID, 
+            ut.VA101_AuthCrediential_ID, ut.VA101_Email, us.Name
+            FROM AD_UserMailConfigration um
+            INNER JOIN VA101_APIAuthCredential ut ON (um.VA101_APIAuthCredential_ID=ut.VA101_APIAuthCredential_ID)            
+            INNER JOIN AD_User us ON (um.AD_User_ID=us.AD_User_ID)
+            WHERE um.IsActive='Y' AND ut.IsActive='Y' AND ut.VA101_IsAuthorized='Y' AND um.VA101_IsAllowAccessCalendar='Y'
+            AND um.AD_UserMailConfigration_ID = " + mailconfigID;
 
             DataSet ds = DB.ExecuteDataset(sql);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
@@ -938,16 +934,8 @@ namespace VIS.Models
             string authApiUrl = baseUrl + "api/VAAPI/Auth/InitSession";
             string apiLibUrl = baseUrl + "api/VA101/Common/GetMeetingTranscript";
 
-            string accessKey = "";
-
-            //Assembly asm = Assembly.Load("MarketSvc");
-            //accessKey = asm.GetType("MarketSvc.Classes.Utility").GetMethod("GetCustomerAccessKey", BindingFlags.Public | BindingFlags.Static).Invoke(null, null).ToString();
-
-            if (string.IsNullOrEmpty(accessKey))
-            {
-                accessKey = "10013150-D5F4-4E31-959E-812531001315";
-            }
-            accessKey = SecureEngine.Encrypt(accessKey);
+            Assembly asm = Assembly.Load("MarketSvc");
+            string accessKey = asm.GetType("MarketSvc.Classes.Utility").GetMethod("GetCustomerAccessKey", BindingFlags.Public | BindingFlags.Static).Invoke(null, null).ToString();
 
             dynamic apiData = new ExpandoObject();
             apiData.AD_Client_ID = ctx.GetAD_Client_ID();
