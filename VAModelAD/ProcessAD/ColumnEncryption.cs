@@ -73,6 +73,7 @@ namespace VAdvantage.Process
             //	Can it be enabled?
             if (column.IsKey()
                 || column.IsParent()
+                || column.IsHashed()
                 || column.IsStandardColumn()
                 || column.IsVirtualColumn()
                 || column.IsIdentifier()

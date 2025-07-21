@@ -545,6 +545,11 @@ namespace VAdvantage.Model
             SetIsEncrypted(isEncrypted ? "Y" : "N");
         }
 
+        public void SetIsHashed(bool isHashed)
+        {
+            SetIsHashed(isHashed ? "Y" : "N");
+        }
+
         /// <summary>
         /// Is the Column Encrypted?
         /// </summary>
@@ -552,6 +557,12 @@ namespace VAdvantage.Model
         public bool IsEncrypted()
         {
             String s = GetIsEncrypted();
+            return "Y".Equals(s);
+        }
+
+        public bool IsHashed()
+        {
+            String s = GetIsHashed();
             return "Y".Equals(s);
         }
 

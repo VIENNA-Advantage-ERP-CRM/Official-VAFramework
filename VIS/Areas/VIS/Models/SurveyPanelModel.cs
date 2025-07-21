@@ -12,7 +12,212 @@ using VAdvantage.Utility;
 namespace VIS.Models
 {
     public class SurveyPanelModel
-    {   
+    {
+
+        public List<SurveyAssignmentsDetails> GetSurveyAssignmentsClientSide(Ctx ctx, int AD_Window_ID, int AD_Tab_ID, int AD_Table_ID, int AD_Record_ID, int AD_WF_Activity_ID)
+        {
+            SurveyAssignmentsDetails lst = new SurveyAssignmentsDetails();
+            List<SurveyAssignmentsDetails> LsDetails = new List<SurveyAssignmentsDetails>();
+
+            if (AD_Window_ID == 0)
+            {
+                return LsDetails;
+            }
+
+            StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
+                                                  sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.IsConditionalChecklist,sa.IsMandatoryToFill,
+                                                  s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limits,0) AS Limit,RS.isSelfshow,");
+            if (AD_Record_ID > 0)
+            {
+                if (AD_WF_Activity_ID == 0)
+                {
+                    sql.Append(@" (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @") AS responseCount,");
+                }
+                else
+                {
+                    sql.Append(@" (SELECT count(AD_SurveyResponse_ID) FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @") AS responseCount,");
+                }
+
+                sql.Append(@" (SELECT AD_SurveyResponse_ID FROM AD_SurveyResponse WHERE AD_Survey_ID=s.ad_survey_ID AND AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_window_id=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + AD_Record_ID + @" ORDER BY Created FETCH FIRST 1 ROWS ONLY) AS SurveyResponse_ID");
+            }
+            else
+            {
+                sql.Append(@" 0 AS responseCount, null AS SurveyResponse_ID");
+            }
+            sql.Append(@" FROM ad_surveyassignment sa INNER JOIN AD_Survey s ON 
+                                                  s.ad_survey_ID= sa.ad_survey_id 
+                                                  LEFT JOIN AD_ResponseSetting RS ON (RS.ad_surveyassignment_ID=sa.ad_surveyassignment_ID) AND RS.IsActive='Y'
+                                                  WHERE sa.IsActive='Y' AND sa.AD_Window_ID=" + AD_Window_ID + " AND sa.AD_Table_ID=" + AD_Table_ID + " ORDER BY s.name");
+            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql.ToString(), "sa", true, false), null);
+            if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow dt in _dsDetails.Tables[0].Rows)
+                {                   
+                    string condition = "";                   
+                    condition = GetConditionByCheckList(ctx, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), AD_Table_ID);
+
+                    LsDetails.Add(new SurveyAssignmentsDetails
+                    {
+                        Window_ID = Util.GetValueOfInt(dt["AD_Window_ID"]),
+                        Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]),
+                        DocType_ID = Util.GetValueOfInt(dt["C_DocType_ID"]),
+                        SurveyListFor = Util.GetValueOfString(dt["SurveyListFor"]),
+                        DocAction = Util.GetValueOfString(dt["DocAction"]),
+                        ShowAllQuestion = Util.GetValueOfBool(Util.GetValueOfString(dt["ShowAllQuestions"]).Equals("Y")),
+                        SurveyAssignment_ID = Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]),
+                        SurveyType = Util.GetValueOfString(dt["surveytype"]),
+                        IsMandatory = Util.GetValueOfBool(Util.GetValueOfString(dt["ismandatory"]).Equals("Y")),
+                        SurveyName = Util.GetValueOfString(dt["name"]),
+                        QuestionsPerPage = Util.GetValueOfInt(dt["QuestionsPerPage"]),
+                        IsDocActionActive = CheckDocActionColumn(AD_Tab_ID),
+                        IsConditionalChecklist = Util.GetValueOfBool(Util.GetValueOfString(dt["IsConditionalChecklist"]).Equals("Y")),
+                        IsMandatoryToFill= Util.GetValueOfBool(Util.GetValueOfString(dt["IsMandatoryToFill"]).Equals("Y")),
+                        IsSelfshow = Util.GetValueOfBool(Util.GetValueOfString(dt["isSelfshow"]).Equals("Y")),
+                        Limit = Util.GetValueOfInt(dt["Limit"]),
+                        ResponseCount = Util.GetValueOfInt(dt["responseCount"]),
+                        SurveyResponse_ID = Util.GetValueOfInt(dt["SurveyResponse_ID"]),
+                        ConditionStr = condition
+                    });
+                }
+            }
+            return LsDetails;
+        }
+
+        public string GetConditionByCheckList(Ctx ctx, int AD_SurveyAssignment_ID, int AD_Table_ID)
+        {
+            string conditions = "";
+            string sql = @"SELECT AD_Column.AD_column_ID,
+                            ad_surveyshowcondition.seqno,AD_Column.ColumnName,ad_surveyshowcondition.operation,ad_surveyshowcondition.ad_equalto,ad_surveyshowcondition.Value2,
+                            ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID
+                            FROM  AD_Column                           
+                            INNER JOIN ad_surveyshowcondition ON AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID
+                            WHERE ad_surveyshowcondition.isActive='Y' AND  ad_surveyshowcondition.AD_SurveyAssignment_ID=" + AD_SurveyAssignment_ID + " AND AD_Column.AD_Table_ID=" + AD_Table_ID + @"
+                            ORDER BY ad_surveyshowcondition.seqno";
+            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
+            //prepare where condition for filter
+            if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
+            {
+                int idx = 0;
+                foreach (DataRow dt in _dsDetails.Tables[0].Rows)
+                {
+                    string type = "";
+                    string value = Util.GetValueOfString(dt["ad_equalto"]);
+                    string columnName = Util.GetValueOfString(dt["ColumnName"]);
+                    int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
+                    string oprtr = Util.GetValueOfString(dt["operation"]);
+
+
+                    //Checking data type of column
+                    if (columnName.Equals("AD_Language") || columnName.Equals("EntityType") || columnName.Equals("DocBaseType"))
+                    {
+                        type = typeof(System.String).Name;
+                    }
+                    else if (columnName.Equals("Posted") || columnName.Equals("Processed") || columnName.Equals("Processing"))
+                    {
+                        type = typeof(System.Boolean).Name;
+                    }
+                    else if (columnName.Equals("Record_ID"))
+                    {
+                        type = typeof(System.Int32).Name;
+                    }
+                    else
+                    {
+                        type = VAdvantage.Classes.DisplayType.GetClass(displayType, true).Name;
+                    }
+
+
+
+                    if (oprtr == "==")
+                    {
+                        oprtr = "=";
+                    }
+                    else if (oprtr == "!=")
+                    {
+                        oprtr = "!";
+                    }
+                    else if (oprtr == "<=")
+                    {
+                        oprtr = "<=";
+                    }
+                    else if (oprtr == "<<")
+                    {
+                        oprtr = "<";
+                    }
+                    else if (oprtr == ">>")
+                    {
+                        oprtr = ">";
+                    }
+                    else if (oprtr == ">=")
+                    {
+                        oprtr = ">=";
+                    }
+                    //else if (oprtr == "~~")
+                    //{
+                    //    oprtr = " LIKE ";
+                    //    value = "%" + value + "%";
+                    //}
+                    //else if (oprtr == "AB")
+                    //{
+                    //    oprtr = ">";
+                    //}
+
+                    string andOR = " & ";
+                    if (Util.GetValueOfString(dt["andor"]) == "O")
+                    {
+                        andOR = " | ";
+                    }
+
+
+                    if (type == "String")
+                    {
+                        value = "'" + value + "'";
+                    }
+                    else if (type.ToLower() == "date" || type.ToLower() == "datetime")
+                    {
+                        value = "'" + Convert.ToDateTime(value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") + "'";
+                    }
+
+
+
+                    if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
+                    {
+                        idx++;
+                        if (oprtr.Length == 2)
+                        {
+                            char[] charArray = oprtr.ToCharArray();
+                            conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
+                            conditions += " | ";
+                            conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                        }
+                        else
+                        {
+                            conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                        }
+                    }
+                    else
+                    {
+                        conditions += andOR;
+                        if (oprtr.Length == 2)
+                        {
+                            char[] charArray = oprtr.ToCharArray();
+                            conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
+                            conditions += " | ";
+                            conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                        }
+                        else
+                        {
+                            conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                        }
+                    }
+
+                }
+
+            }
+           
+            return conditions;
+        }
+
+
         /// <summary>
         /// Get Survey Assignment
         /// </summary>
@@ -35,7 +240,7 @@ namespace VIS.Models
             }
 
             StringBuilder sql = new StringBuilder(@"SELECT sa.AD_Window_ID, sa.AD_Survey_ID, sa.C_DocType_ID, sa.SurveyListFor,
-                                                  sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.AD_ShowEverytime,
+                                                  sa.DocAction, sa.ShowAllQuestions, sa.AD_SurveyAssignment_ID, s.surveytype,sa.IsConditionalChecklist,sa.IsMandatoryToFill,
                                                   s.ismandatory, s.name,sa.QuestionsPerPage,NVL(RS.Limits,0) AS Limit,RS.isSelfshow,");
             if (AD_Record_ID > 0)
             {
@@ -65,16 +270,16 @@ namespace VIS.Models
                 {
                     bool isvalidate = false;
                     string condition = "";
-                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"])=="N")
+                    //if (Util.GetValueOfString(dt["IsConditionalChecklist"])=="N")
                     //{
-                    if (AD_Record_ID > 0)
+                    if (AD_Record_ID > 0 && Util.GetValueOfString(dt["IsConditionalChecklist"]) == "Y")
                     {
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     }
                     else
                     {
                         isvalidate = true;
-                        //condition = CheckConditionForNewRecord(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                        //condition = CheckConditionForNewRecord(ctx, AD_Window_ID, AD_Table_ID, AD_Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     }
                     //    if (isvalidate)
                     //    {
@@ -101,7 +306,8 @@ namespace VIS.Models
                         SurveyName = Util.GetValueOfString(dt["name"]),
                         QuestionsPerPage = Util.GetValueOfInt(dt["QuestionsPerPage"]),
                         IsDocActionActive = CheckDocActionColumn(AD_Tab_ID),
-                        ShowEverytime = Util.GetValueOfBool(Util.GetValueOfString(dt["AD_ShowEverytime"]).Equals("Y")),
+                        IsConditionalChecklist = Util.GetValueOfBool(Util.GetValueOfString(dt["IsConditionalChecklist"]).Equals("Y")),
+                        IsMandatoryToFill = Util.GetValueOfBool(Util.GetValueOfString(dt["IsMandatoryToFill"]).Equals("Y")),
                         IsSelfshow = Util.GetValueOfBool(Util.GetValueOfString(dt["isSelfshow"]).Equals("Y")),
                         Limit = Util.GetValueOfInt(dt["Limit"]),
                         ResponseCount = Util.GetValueOfInt(dt["responseCount"]),
@@ -246,7 +452,7 @@ namespace VIS.Models
                 return false;
             }
 
-            string sql = "SELECT ad_surveyassignment_ID,AD_ShowEverytime,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
+            string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
             if (DocAction != "RE")
             {
                 sql += " AND docaction='" + DocAction + "'";
@@ -258,20 +464,20 @@ namespace VIS.Models
             {
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
-                    bool isvalidate = false;
-                    //if (Util.GetValueOfString(dt["AD_ShowEverytime"]) == "N")
+                    //bool isvalidate = false;
+                    //if (Util.GetValueOfString(dt["IsConditionalChecklist"]) == "N")
                     //{
-                        isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["AD_ShowEverytime"]));
+                    //isvalidate = Common.checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                     //    if (isvalidate)
                     //    {
                     //        isvalidate = true;
                     //    }
                     //}
 
-                    if (!isvalidate)
-                    {
-                        continue;
-                    }
+                    //if (!isvalidate)
+                    //{
+                    //    continue;
+                    //}
 
                     // sql = "SELECT AD_Survey_ID FROM AD_SurveyAssignment WHERE ad_window_id=" + AD_Window_ID + " AND AD_TAb_ID=" + AD_Tab_ID;
 
@@ -468,150 +674,171 @@ namespace VIS.Models
         /// <param name="AD_Table_ID"></param>
         /// <param name="Record_ID"></param>
         /// <returns></returns>
-        public List<CheckListCondition> IsCheckListRequire(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int Record_ID)
+        public List<CheckListCondition> IsCheckListRequire(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int Record_ID,int AD_Survey_ID=0)
         {
             string sql = "";
-            int responseCount = 0;
-            string conditions = "";
+           
             List<CheckListCondition> CList = new List<CheckListCondition>();
-            if (Record_ID > 0)
+
+            sql = @"SELECT
+                    ad_surveyassignment_ID, IsMandatorytofill,isConditionalChecklist,AD_Survey_ID,
+                    (SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=ad_surveyassignment.ad_table_id AND AD_Survey_ID=AD_Survey_ID AND record_ID=" + Record_ID + @" AND IsActive='Y') as ResponseCount
+                FROM
+                    ad_surveyassignment
+                WHERE
+                    ad_window_id = " + AD_Window_ID + @"
+                    AND ad_table_id = " + AD_Table_ID + @"
+                    AND isactive = 'Y'";
+
+            DataSet _dsSurvey = DB.ExecuteDataset(sql);
+
+            if (_dsSurvey != null && _dsSurvey.Tables[0].Rows.Count > 0)
             {
-                sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_Table_ID=" + AD_Table_ID + " AND AD_Survey_ID=(SELECT AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID + ") AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                responseCount = Util.GetValueOfInt(DB.ExecuteScalar(sql));
-            }
-            
-            sql = @"SELECT AD_Column.AD_column_ID,
+                foreach (DataRow dts in _dsSurvey.Tables[0].Rows)
+                {
+                    string conditions = "";
+                    sql = @"SELECT AD_Column.AD_column_ID,
                             ad_surveyshowcondition.seqno,AD_Column.ColumnName,ad_surveyshowcondition.operation,ad_surveyshowcondition.ad_equalto,ad_surveyshowcondition.Value2,
                             ad_surveyshowcondition.andor,AD_Column.AD_Reference_ID
                             FROM  AD_Column                           
-                            INNER JOIN ad_surveyshowcondition ON (AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID)
-                            INNER JOIN AD_SurveyAssignment ON (AD_SurveyAssignment.AD_SurveyAssignment_ID=AD_SurveyAssignment.ad_surveyassignment_ID)
-                            WHERE AD_SurveyAssignment.AD_Window_ID="+AD_Window_ID+ " AND AD_SurveyAssignment.AD_Table_ID=" + AD_Table_ID + " AND  ad_surveyshowcondition.isActive='Y' AND  AD_SurveyAssignment.isActive='Y' AND AD_Column.AD_Table_ID=" + AD_Table_ID +  @"
+                            INNER JOIN ad_surveyshowcondition ON (AD_Column.AD_column_ID=ad_surveyshowcondition.AD_column_ID)                            
+                            WHERE ad_surveyshowcondition.ad_surveyassignment_ID=" + Util.GetValueOfInt(dts["ad_surveyassignment_ID"]) + " AND  ad_surveyshowcondition.isActive='Y' AND AD_Column.AD_Table_ID=" + AD_Table_ID + @"
                             ORDER BY ad_surveyshowcondition.seqno";
-            DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
-            //prepare where condition for filter
-            if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
-            {
-                int idx = 0;
-                foreach (DataRow dt in _dsDetails.Tables[0].Rows)
-                {
-                    string type = "";
-                    string value = Util.GetValueOfString(dt["ad_equalto"]);
-                    string columnName = Util.GetValueOfString(dt["ColumnName"]);
-                    int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
-                    string oprtr = Util.GetValueOfString(dt["operation"]);
+
+                    DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
 
 
-                    //Checking data type of column
-                    if (columnName.Equals("AD_Language") || columnName.Equals("EntityType") || columnName.Equals("DocBaseType"))
+                    if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
                     {
-                        type = typeof(System.String).Name;
-                    }
-                    else if (columnName.Equals("Posted") || columnName.Equals("Processed") || columnName.Equals("Processing"))
-                    {
-                        type = typeof(System.Boolean).Name;
-                    }
-                    else if (columnName.Equals("Record_ID"))
-                    {
-                        type = typeof(System.Int32).Name;
-                    }
-                    else
-                    {
-                        type = VAdvantage.Classes.DisplayType.GetClass(displayType, true).Name;
-                    }
-
-                    
-
-                    if (oprtr == "==")
-                    {
-                        oprtr = "=";
-                    }
-                    else if (oprtr == "!=")
-                    {
-                        oprtr = "!";
-                    }
-                    else if (oprtr == "<=")
-                    {
-                        oprtr = "<=";
-                    }
-                    else if (oprtr == "<<")
-                    {
-                        oprtr = "<";
-                    }
-                    else if (oprtr == ">>")
-                    {
-                        oprtr = ">";
-                    }
-                    else if (oprtr == ">=")
-                    {
-                        oprtr = ">=";
-                    }
-                    //else if (oprtr == "~~")
-                    //{
-                    //    oprtr = " LIKE ";
-                    //    value = "%" + value + "%";
-                    //}
-                    //else if (oprtr == "AB")
-                    //{
-                    //    oprtr = ">";
-                    //}
-
-                    string andOR = " & ";
-                    if (Util.GetValueOfString(dt["andor"]) == "O")
-                    {
-                        andOR = " | ";
-                    }
-
-
-                    if (type == "String")
-                    {
-                        value = "'" + value + "'";
-                    }else if(type.ToLower()=="date" || type.ToLower() == "datetime")
-                    {
-                        value ="'"+ Convert.ToDateTime(value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")+"'";
-                    }
-
-                    
-
-                    if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
-                    {
-                        idx++;
-                        if (oprtr.Length == 2)
+                        int idx = 0;
+                        foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                         {
-                            char[] charArray = oprtr.ToCharArray();
-                            conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
-                            conditions += " | ";
-                            conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                            string type = "";
+                            string value = Util.GetValueOfString(dt["ad_equalto"]);
+                            string columnName = Util.GetValueOfString(dt["ColumnName"]);
+                            int displayType = Util.GetValueOfInt(dt["AD_Reference_ID"]);
+                            string oprtr = Util.GetValueOfString(dt["operation"]);
+
+
+                            //Checking data type of column
+                            if (columnName.Equals("AD_Language") || columnName.Equals("EntityType") || columnName.Equals("DocBaseType"))
+                            {
+                                type = typeof(System.String).Name;
+                            }
+                            else if (columnName.Equals("Posted") || columnName.Equals("Processed") || columnName.Equals("Processing"))
+                            {
+                                type = typeof(System.Boolean).Name;
+                            }
+                            else if (columnName.Equals("Record_ID"))
+                            {
+                                type = typeof(System.Int32).Name;
+                            }
+                            else
+                            {
+                                type = VAdvantage.Classes.DisplayType.GetClass(displayType, true).Name;
+                            }
+
+
+
+                            if (oprtr == "==")
+                            {
+                                oprtr = "=";
+                            }
+                            else if (oprtr == "!=")
+                            {
+                                oprtr = "!";
+                            }
+                            else if (oprtr == "<=")
+                            {
+                                oprtr = "<=";
+                            }
+                            else if (oprtr == "<<")
+                            {
+                                oprtr = "<";
+                            }
+                            else if (oprtr == ">>")
+                            {
+                                oprtr = ">";
+                            }
+                            else if (oprtr == ">=")
+                            {
+                                oprtr = ">=";
+                            }
+                            //else if (oprtr == "~~")
+                            //{
+                            //    oprtr = " LIKE ";
+                            //    value = "%" + value + "%";
+                            //}
+                            //else if (oprtr == "AB")
+                            //{
+                            //    oprtr = ">";
+                            //}
+
+                            string andOR = " & ";
+                            if (Util.GetValueOfString(dt["andor"]) == "O")
+                            {
+                                andOR = " | ";
+                            }
+
+
+                            if (type == "String")
+                            {
+                                value = "'" + value + "'";
+                            }
+                            else if (type.ToLower() == "date" || type.ToLower() == "datetime")
+                            {
+                                value = "'" + Convert.ToDateTime(value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") + "'";
+                            }
+
+
+
+                            if (idx == 0) // Util.GetValueOfInt(dt["seqno"]) == 10
+                            {
+                                idx++;
+                                if (oprtr.Length == 2)
+                                {
+                                    char[] charArray = oprtr.ToCharArray();
+                                    conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
+                                    conditions += " | ";
+                                    conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                                }
+                                else
+                                {
+                                    conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                                }
+                            }
+                            else
+                            {
+                                conditions += andOR;
+                                if (oprtr.Length == 2)
+                                {
+                                    char[] charArray = oprtr.ToCharArray();
+                                    conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
+                                    conditions += " | ";
+                                    conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
+                                }
+                                else
+                                {
+                                    conditions += "@" + columnName + "@ " + oprtr + " " + value;
+                                }
+                            }
+
                         }
-                        else
-                        {
-                            conditions += "@" + columnName + "@ " + oprtr + " " + value;
-                        }
+
                     }
-                    else
+
+                    CList.Add(new CheckListCondition
                     {
-                        conditions += andOR;
-                        if (oprtr.Length == 2)
-                        {
-                            char[] charArray = oprtr.ToCharArray();
-                            conditions += "@" + columnName + "@ " + charArray[0] + " " + value;
-                            conditions += " | ";
-                            conditions += "@" + columnName + "@ " + charArray[1] + " " + value;
-                        }
-                        else
-                        {
-                            conditions += "@" + columnName + "@ " + oprtr + " " + value;
-                        }
-                    }
+                        Condition = conditions,
+                        ResponseCount = Util.GetValueOfInt(dts["ResponseCount"]),
+                        IsMandatoryTofill = Util.GetValueOfString(dts["IsMandatorytofill"]).Equals("Y"),
+                   IsConditionalCheckList= Util.GetValueOfString(dts["isConditionalChecklist"]).Equals("Y")
+                    });
+
 
                 }
-
             }
-            CList.Add(new CheckListCondition
-            {
-                Condition=conditions,
-                ResponseCount= responseCount
-            });
+
             return CList;
         }
 
@@ -631,7 +858,8 @@ namespace VIS.Models
         public string SurveyName { get; set; }
         public int QuestionsPerPage { get; set; }
         public bool IsDocActionActive { get; set; }
-        public bool ShowEverytime { get; set; }
+        public bool IsConditionalChecklist { get; set; }
+        public bool IsMandatoryToFill { get; set; }
         public int Limit { get; set; }
         public int ResponseCount { get; set; }
         public int SurveyResponse_ID { get; set; }
@@ -694,6 +922,8 @@ namespace VIS.Models
     public class CheckListCondition {
         public string Condition { get; set; }
         public int ResponseCount { get; set; }
+        public bool IsMandatoryTofill {  get; set; }
+        public bool IsConditionalCheckList {  get; set; }
     }
     
 }

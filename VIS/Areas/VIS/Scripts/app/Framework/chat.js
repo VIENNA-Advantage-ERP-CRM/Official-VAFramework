@@ -1,11 +1,11 @@
 ﻿; (function (VIS, $) {
     //var $record_id, $chat_id, $table_id, $description, $chatclose;
-    function Chat(record_id, chat_id, table_id, description, windowNo) {
+    function Chat(record_id, chat_id, table_id, description, windowNo, windowId) {
 
         this.onClose = null; //outer apanel close function
 
-        var $maindiv = $('<div class="vis-forms-container"></div>'); //layout
-        var $div = $('<div class="vis-chatdetailouterwrap" style="height:calc(100vh - 335px); overflow:auto"></div>');
+        var $maindiv = $('<div class="vis-forms-container vis-chat-container"></div>'); //layout
+        var $div = $('<div class="vis-chatdetailouterwrap"></div>');
         var $inputChat = $('<div class="d-flex flex-column vis-chatBoxInputWrap ">');
         var $textArea = $('<div><textarea  id="chatBox_textArea" rows="1" class="vis-chat-msgbox" /></textarea></div>');
         var $sendIconDiv = $('<div>');
@@ -19,16 +19,19 @@
         $sendIconDiv.append($sendIconButton);
         $inputChat.append($textArea).append($sendIconDiv);
         $maindiv.append($inputChat).append($div).append($bsyDiv);//.append($buttonsdiv); //ui
-        this.windowNo = 0;
+        this.windowNo = windowNo;
         this.pageSize = 10;
         this.isBtmTapPanel = false;
         this.record_ID = record_id;
         this.AD_Table_ID = table_id;
+        this.AD_Window_ID = windowId;
         this.Description = description;
         this.ChatID = chat_id;
-       // this.isLoading = false;
+        // this.isLoading = false;
 
 
+        var scrollDiv = $div;
+        
         function showBusy(show) {
             if (show) {
                 $maindiv.find("#chatBusyDiv").show();
@@ -40,7 +43,7 @@
 
         var ch = null;
         if (record_id > 0 && table_id > 0) {
-            this.prop = { WindowNo: windowNo, ChatID: chat_id, AD_Table_ID: table_id, Record_ID: record_id, Description: description, TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+            this.prop = { WindowNo: windowNo, ChatID: chat_id, AD_Table_ID: table_id, Record_ID: record_id, Description: description, TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize, AD_Window_ID: this.AD_Window_ID };
             init($div, windowNo, this.prop);
         }
         var self = this;
@@ -69,16 +72,21 @@
 
         $textArea.find('#chatBox_textArea').on('keydown', function (e) {
             if (e.keyCode === 13) {
-                showBusy(true);
-                e.preventDefault();
-                triggerSave(e);
+                if (e.altKey) {
+                    this.value += "\r\n";
+                }
+                else {
+                    
+                    e.preventDefault();
+                    triggerSave(e);
+                }
             }
         });
 
         setTimeout(function () {
-            const onScroll = throttle(function () {
-                if ($maindiv != null) {
-                    if ($maindiv.parent().scrollTop() + $maindiv.parent().height() >= $maindiv.height() - 50) {
+            function onScroll() {
+                if (scrollDiv != null) {
+                    if (scrollDiv.height() + scrollDiv.scrollTop() >= scrollDiv[0].scrollHeight - 1) {
                         if (self.prop) {
                             self.prop.pageSize += 10;
                             showBusy(true);
@@ -86,9 +94,11 @@
                         }
                     }
                 }
-            }, 200); // adjust the wait time as needed
-
-            $maindiv.parent().on('scroll', onScroll);
+            }
+            //}, 200); // adjust the wait time as needed
+            if (scrollDiv == null)
+                scrollDiv = $maindiv.parent(); //reset scroll div to main div
+            scrollDiv.on('scroll', onScroll);
         }, 100);
 
         function throttle(fn, wait) {
@@ -104,10 +114,27 @@
 
 
         function triggerSave(e) {
-            saveMsg(e);
-            $textArea.find('#chatBox_textArea').val('');
-            $textArea.find('#chatBox_textArea').css('height', 'auto');
-            self.refreshPanelData(self.record_ID, 0);
+            showBusy(true);
+            var text = $textArea.find('#chatBox_textArea').val();
+            if ($.trim(text) == "" || text == "" || text == null) {
+                VIS.ADialog.info("EnterData");
+                /* if (e != undefined) {
+                     e.preventDefault();
+                 }*/
+                showBusy(false);
+                return false;
+            }
+            self.prop.ChatText = text;
+            VIS.dataContext.saveChatAsync(self.prop, function (saved) {
+                if (!saved) {
+                    showBusy(false);
+                    return;
+                };
+
+                $textArea.find('#chatBox_textArea').val('');
+                $textArea.find('#chatBox_textArea').css('height', 'auto');
+                self.refreshPanelData(self.record_ID, 0);
+            });
         }
 
 
@@ -116,7 +143,7 @@
             $maindiv.parent().scrollTop(0);
             $maindiv.append($showMoreIcon);
             /*$maindiv.addClass('p-2');*/
-            isBottomTapPanel();
+            //isBottomTapPanel();
             if (this.isBtmTapPanel) {
                 prop.pageSize = 4;
             }
@@ -128,6 +155,8 @@
         };
 
         this.show = function () {
+
+            scrollDiv = $div; //reset scroll div to main div
 
             ch = new VIS.ChildDialog();
             ch.setContent($maindiv);
@@ -145,7 +174,7 @@
                 self.dispose();
             };
             ch.show();
-           // events();
+            // events();
             ch.hidebuttons();
         };
 
@@ -157,21 +186,12 @@
 
             ch = null;
             self = null;
-            
+
 
         };
 
         function isBottomTapPanel() {
-            $.ajax({
-                url: VIS.Application.contextUrl + "Chat/IsBottomTabPanel",
-                async: false,
-                data: {
-                    tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
-                },
-                success: function (data) {
-                    self.isBtmTapPanel = VIS.Utility.Util.getValueOfBoolean(data);;
-                }
-            });
+            
         }
 
         function createButtons() {
@@ -369,7 +389,17 @@
         this.windowNo = windowNo;
         this.curTab = curTab;
         this.extraInfo = extraInfo;
-
+        var self = this;
+        //$.ajax({
+        //    url: VIS.Application.contextUrl + "Chat/IsBottomTabPanel",
+        //    async: false,
+        //    data: {
+        //        tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
+        //    },
+        //    success: function (data) {
+        //        self.isBtmTapPanel = VIS.Utility.Util.getValueOfBoolean(data);;
+        //    }
+        //});
     };
 
     /**
@@ -379,10 +409,10 @@
         if (recordID > 0) {
             this.record_ID = recordID;
             this.selectedRow = selectedRow;
-            if (this.curTab ) {
-                this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+            if (this.curTab) {
+                this.prop = { WindowNo: this.windowNo, ChatID: this.curTab.getCM_ChatID(), AD_Table_ID: this.curTab.getAD_Table_ID(), Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize, AD_Window_ID: this.AD_Window_ID };
             } else {
-                this.prop = { WindowNo: this.windowNo, ChatID: this.ChatID, AD_Table_ID: this.AD_Table_ID, Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize };
+                this.prop = { WindowNo: this.windowNo, ChatID: this.ChatID, AD_Table_ID: this.AD_Table_ID, Record_ID: recordID, Description: "", TrxName: null, ChatText: "", page: 1, pageSize: this.pageSize, AD_Window_ID: this.AD_Window_ID };
             }
             this.initializeComponent(this.windowNo, this.prop);
         }

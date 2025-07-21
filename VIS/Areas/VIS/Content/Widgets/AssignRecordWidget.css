@@ -1,5 +1,4 @@
-﻿
-.vis-maindiv {
+﻿.vis-maindiv {
     background: linear-gradient(135deg, #6b8ce3, #8dc7f8);
     height: 100%;
     width: 100%;
@@ -64,13 +63,10 @@
 
 
 .vis-tiles-pagination {
-    display: flex;
     align-items: center;
-    justify-content: center;
-    width: 100%;
-    gap: 1rem;
-    margin-top: 0.7rem;
-    margin-left: 11%;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
 }
 
     .vis-tiles-pagination .fa {
@@ -121,7 +117,6 @@
 }
 
 .vis-show-more {
-    margin-left: 38px;
     text-decoration: underline;
     color: white;
     font-size: 22px;
@@ -169,6 +164,8 @@
     border-radius: 8px;
     padding: 10px;
     cursor: pointer;
+    max-height: 139px;
+    overflow: auto;
 }
 
 .VIS_popuptitle {
@@ -184,6 +181,23 @@
     margin-top: 15px;
 }
 
+.vis_assignpageControls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+html[dir=rtl] .VIS_recordCount {
+    text-align: center !important;
+}
+
+html[dir=rtl] .VIS_checklistCount {
+    text-align: left !important;
+}
+
+html[dir=rtl] .VIS_popupRecordCount {
+    text-align: center !important;
+}
 
 @media screen and (max-width: 1366px) {
     .vis-assigned-records {
@@ -197,14 +211,13 @@
 
 
 @media screen and (max-width: 1280px) {
-    .vis-record-box {
-        padding: 5px 10px;
-    }
-
     .VIS_recordCount {
         width: 20px;
         height: 20px;
         line-height: 20px;
+    }
+    .vis-record-box{
+        padding: 9px 10px;
     }
 }
 
@@ -215,6 +228,9 @@
 
     .vis-editModeWidget .vis-assigned-records {
         font-size: 8px;
+    }
+    .vis-record-box {
+        padding: 4px 10px;
     }
 }
 
@@ -279,7 +295,7 @@
 }
 
 .vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-record-box {
-    padding: 2px 10px;
+    padding: 5px 10px;
 }
 
 .vis-editModeWidget .vis-widget-item :not(.vis-widgetDelete) .vis-tiles-pagination i {
@@ -290,3 +306,6 @@
         margin-left: 0;
         font-size: 1.3rem;
     }
+.vis-editModeWidget .vis-tiles-pagination {
+    padding: 20px 10px 0;
+}

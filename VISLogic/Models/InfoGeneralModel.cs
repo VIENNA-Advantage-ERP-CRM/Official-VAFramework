@@ -49,15 +49,16 @@ namespace VIS.Models
                           t.AD_Table_ID,
                           t.TableName,
                           C.IsTranslated,
-                          t.Name AS TableDisplayName
+                          tbltrl.Name AS TableDisplayName
                         FROM AD_Table t
                         INNER JOIN AD_Column c
                         ON (t.AD_Table_ID      =c.AD_Table_ID)
                         INNER JOIN AD_Column_Trl trl
-                        ON (c.AD_Column_ID=trl.AD_Column_ID)
+                        ON (c.AD_Column_ID=trl.AD_Column_ID AND trl.AD_Language='" + ad_Language + @"')
+                        INNER JOIN AD_Table_Trl tbltrl
+                        ON (t.AD_Table_ID=tbltrl.AD_Table_ID AND tbltrl.AD_Language='" + ad_Language + @"')
                         WHERE c.AD_Reference_ID=10
                         AND t.TableName        ='" + tableName + @"'
-                        AND trl.AD_Language='" + ad_Language + @"'
                         AND EXISTS(SELECT * FROM AD_Field f
                           WHERE f.AD_Column_ID=c.AD_Column_ID
                           AND f.IsDisplayed   ='Y' AND f.IsEncrypted   ='N' AND f.ObscureType  IS NULL)

@@ -35,7 +35,10 @@ namespace VIS.Models
         public string UsrImage { get; set; }
         public string UsrStatus { get; set; }
         public string Greeting { get; set; }
+        public int UnreadMessageCount { get; set; }
+
         public HomeFolloUpsInfo HomeFolloUpsInfo;
+
         //Save User Image
         public int SaveUserImage(Ctx ctx, byte[] buffer, string imageName, bool isSaveInDB)
         {
@@ -145,6 +148,7 @@ namespace VIS.Models
 
             sql += " ORDER BY AD_ModuleInfo.name";
 
+            
             DataSet dataSet = DB.ExecuteDataset(sql);
             if (dataSet != null && dataSet.Tables.Count > 0)
             {
@@ -168,7 +172,16 @@ namespace VIS.Models
                     string img = "";
                     try
                     {
-                        img = "<img class='vis-widgetImg' src='data:image/jpg;base64," + Convert.ToBase64String((byte[])row[i]["BINARYDATA"]) + "' />";
+                        byte[] imageData = (byte[])row[i]["BINARYDATA"];
+                        if (imageData.Length > 10 * 1024)
+                        {
+                            img = "<img class='vis-widgetImg vis-widgetdefault' src='Areas/VIS/Images/home/defaultWidget.svg' />";
+                        }
+                        else
+                        {
+                            img = "<img class='vis-widgetImg' src='data:image/jpg;base64," + Convert.ToBase64String(imageData) + "' />";
+                        }
+                        
                     }
                     catch (Exception ex)
                     {

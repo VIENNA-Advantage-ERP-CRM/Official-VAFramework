@@ -232,7 +232,20 @@ namespace VAdvantage.Print
             // 	map a scaled and shifted version of the image to device space
             //g2D.ScaleTransform(m_scaleFactor, m_scaleFactor);
 
-            g2D.DrawImage(ResizeImage(m_image, (int)p_width, (int)p_height), (double)x, (double)y);
+            Bitmap resizedImage = ResizeImage(m_image, (int)p_width, (int)p_height);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                // Save the Bitmap to the MemoryStream in the desired image format (e.g., PNG)
+                resizedImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+
+                // Create a PdfSharp image from the MemoryStream
+                ms.Position = 0;  // Reset the stream position to the beginning
+                XImage pdfImage = XImage.FromStream(ms);
+
+                // Draw the image at the specified coordinates (x, y)
+                g2D.DrawImage(pdfImage, (double)x, (double)y);
+            }
             //g2D.ResetTransform();
         }	//	paint
 

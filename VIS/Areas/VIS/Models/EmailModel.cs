@@ -116,19 +116,52 @@ namespace VIS.Models
             }
 
 
-            UserInformation userinfo = new UserInformation();
-            SMTPConfig config = null;
-            config = MailConfigMethod.GetUSmtpConfig(AD_User_ID, ctx);
-            // var config = "";
-            if (config == null)
+            int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
+            string protocol = "SM";
+            int credentialId = 0;
+            if (Env.IsModuleInstalled("VA101_"))
             {
-                MClient client = new MClient(ctx, AD_Client_ID, null);
-                userinfo.Email = client.GetRequestEMail();
+                protocol = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Protocol FROM AD_UserMailConfigration WHERE AD_UserMailConfigration_ID=" + mailConfigID));
+
+                if (string.IsNullOrEmpty(protocol))
+                {
+                    protocol = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Protocol FROM AD_Client WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID()));
+                    if (!string.IsNullOrEmpty(protocol) && protocol != "SM" && protocol != "SI")
+                    {
+                        credentialId = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA101_APIAuthCredential_ID FROM AD_Client WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID()));
+                    }
+                }
+                else if (protocol != "SM" && protocol != "SI")
+                {
+                    credentialId = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA101_APIAuthCredential_ID FROM AD_UserMailConfigration WHERE AD_UserMailConfigration_ID=" + mailConfigID));
+                }
+                
             }
-            else
+
+            SMTPConfig config = null;
+            UserInformation userinfo = new UserInformation();
+            if (protocol == "SM" || protocol == "SI")
             {
-                //Add user info to list..
-                userinfo.Email = config.Email;
+                config = MailConfigMethod.GetUSmtpConfig(AD_User_ID, ctx);
+                // var config = "";
+                if (config == null)
+                {
+                    MClient client = new MClient(ctx, AD_Client_ID, null);
+                    userinfo.Email = client.GetRequestEMail();
+                }
+                else
+                {
+                    //Add user info to list..
+                    userinfo.Email = config.Email;
+                }
+            }
+            else if (credentialId > 0)
+            {
+                userinfo.Email = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Email FROM VA101_APIAuthCredential WHERE VA101_APIAuthCredential_ID = " + credentialId));
+            }
+            else {
+               
+                return "ConfigurationIncompleteOrNotFound";
             }
 
             string[] to = null;
@@ -360,6 +393,51 @@ namespace VIS.Models
                         }
                     }
                 }
+                else
+                {
+                    if (res1 != "OK")
+                    {
+                        _mAttachment.SetIsMailSent(false);
+                    }
+                    else
+                    {
+                        _mAttachment.SetIsMailSent(true);
+                    }
+                    int AD_Client_Id = ctx.GetAD_Client_ID();
+                    int iOrgid = ctx.GetAD_Org_ID();
+
+                    _mAttachment.SetAD_Client_ID(AD_Client_Id);
+                    _mAttachment.SetAD_Org_ID(iOrgid);
+                    _mAttachment.SetAD_Table_ID(_table_id);
+                    _mAttachment.IsActive();
+                    _mAttachment.SetMailAddress(bcctext.ToString());
+                    _mAttachment.SetAttachmentType("M");
+
+                    _mAttachment.SetRecord_ID(Convert.ToInt32(0));
+
+                    _mAttachment.SetTextMsg(message);
+                    _mAttachment.SetTitle(sub);
+
+                    _mAttachment.SetMailAddressBcc(bcctext.ToString());
+                    _mAttachment.SetMailAddress(mails[j].To);
+                    _mAttachment.SetMailAddressCc(mails[j].Cc);
+                    _mAttachment.SetMailAddressFrom(userinfo.Email);
+                    if (_mAttachment.GetEntries().Length > 0)
+                    {
+                        _mAttachment.SetIsAttachment(true);
+                    }
+                    else
+                    {
+                        _mAttachment.SetIsAttachment(false);
+                    }
+                    _mAttachment.NewRecord();
+                    if (_mAttachment.Save())
+                    { }
+                    else
+                    {
+                        // log.SaveError(Msg.GetMsg(Env.GetCtx(), "RecordNotSaved"), "");
+                    }
+                }
 
                 if (res1 != "OK")           // if mail not sent....
                 {
@@ -412,6 +490,10 @@ namespace VIS.Models
             records = null;
             return res.ToString();
         }
+
+
+        
+
 
         /// <summary>
         /// Get Attachment Id From Metadata Table When DMS Module Is Installed

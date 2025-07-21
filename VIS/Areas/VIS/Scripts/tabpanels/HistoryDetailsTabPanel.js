@@ -12,6 +12,7 @@
 
         var $root = $('<div class="VIS-root-div"></div>');
         var $html, $rootcontent, $htmlcontent, $printhtml, $footerhtml, $paginghtml, $commentshtml;
+        var $tpdataloader;
         var PAGESIZE = 10;
         var currentPage = 0;
         var prevPage = 0;
@@ -27,6 +28,7 @@
         var window_No = 0;
         var $lblTaskMsg = null;
         var taskClosed;
+        var userAccountID = 0;
 
         function setContentHeight(fromRoot) {
             var $outerwrap = $root.closest(".vis-ad-w-p-ap-tp-outerwrap");
@@ -46,10 +48,39 @@
                 $('#VIS_HistoryGrd' + window_No).css("height", (outerwrapheight - (divHeadheight + pagingHtmlheight)));
             }
         }
+
         /**   Intialize UI Elements  */
         this.init = function () {
-            $html = $('<div class="VIS-testPanel VIS-HistGrd-data" id="VIS_HistoryGrd' + this.windowNo + '" ></div>');
-            $rootcontent = $('<div id="VIS_recordDetail' + this.windowNo + '" style="display:none;" class="VIS-tp-detailsPanel"></div>');
+            //$html = $('<div class="VIS-testPanel VIS-HistGrd-data" id="VIS_HistoryGrd' + this.windowNo + '" ></div>');
+            $html = $('<div class="VIS-activities-container" id="VIS_HistoryGrd' + this.windowNo + '">' +
+                //'<header class="VIS-activities-header">' +
+                //'<h5>Activities</h5>' +
+                //'<button class="VIS-btn-close"><span class="vis vis-cross"></span></button>' +
+                //'</header>' +
+                '<nav class="VIS-activities-nav">' +
+                '<div class="nav nav-tabs" id="nav-tab" role="tablist">' +
+                '<a class="VIS-nav-item active" id="all" data-toggle="tab" href="#VIS-all_' + this.windowNo + '" role="tab" aria-controls="all" aria-selected="true">' + VIS.Msg.getMsg("All") + '</a>' +
+                '<a class="VIS-nav-item" id="appointment" data-toggle="tab" href="#VIS-appointment_' + this.windowNo + '" role="tab" aria-controls="appointment" aria-selected="false"><i class="fa fa-calendar-o"></i>' + VIS.Msg.getMsg("Appointments") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="email" data-toggle="tab" href="#VIS-emails_' + this.windowNo + '" role="tab" aria-controls="emails" aria-selected="false"><i class="vis vis-email"></i>' + VIS.Msg.getMsg("Emails") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="call" data-toggle="tab" href="#VIS-calls_' + this.windowNo + '" role="tab" aria-controls="calls" aria-selected="false"> <i class="fa fa-phone"></i>' + VIS.Msg.getMsg("Calls") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="chat" data-toggle="tab" href="#VIS-notes_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="fa fa-sticky-note-o"></i>' + VIS.Msg.getMsg("Notes") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="task" data-toggle="tab" href="#VIS-tasks_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="vis vis-task"></i>' + VIS.Msg.getMsg("Tasks") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="letter" data-toggle="tab" href="#VIS-letters_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="vis vis-letter"></i>' + VIS.Msg.getMsg("Letters") + '<span class="badge">0</span></a>' +
+                //'<a class="VIS-nav-item" id="inbox" data-toggle="tab" href="#VIS-inbox_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="fa fa-inbox"></i>' + VIS.Msg.getMsg("Inbox") + '<span class="badge">0</span></a>' +
+                '</div>' +
+                '</nav>' +
+                '<div class="tab-content" id="nav-tabContent">' +
+                '<div class="tab-pane fade show active" id="VIS-all_' + this.windowNo + '" role="tabpanel" aria-labelledby="nav-home-tab"></div>' +
+                '<div class="tab-pane fade" id="VIS-appointment_' + this.windowNo + '" role="tabpanel" aria-labelledby="appointment-tab"></div>' +
+                '<div class="tab-pane fade" id="VIS-emails_' + this.windowNo + '" role="tabpanel" aria-labelledby="emails-tab"></div>' +
+                '<div class="tab-pane fade" id="VIS-calls_' + this.windowNo + '" role="tabpanel" aria-labelledby="calls-tab"></div>' +
+                '<div class="tab-pane fade" id="VIS-notes_' + this.windowNo + '" role="tabpanel" aria-labelledby="notes-tab"></div>' +
+                '<div class="tab-pane fade" id="VIS-tasks_' + this.windowNo + '" role="tabpanel" aria-labelledby="tasks-tab"></div>' +
+                '<div class="tab-pane fade" id="VIS-letters_' + this.windowNo + '" role="tabpanel" aria-labelledby="latters-tab"></div>' +
+                //'<div class="tab-pane fade" id="VIS-inbox_' + this.windowNo + '" role="tabpanel" aria-labelledby="inbox-tab"></div>' +
+                '</div></div>');
+
+            //$rootcontent = $('<div id="VIS_recordDetail' + this.windowNo + '" style="display:none;" class="VIS-tp-detailsPanel"></div>');
             $root.prepend($html);
 
             $paginghtml = $('<div id="VIS_pagingHtml' + this.windowNo + '" class="vis-ad-w-p-s-pages VIS-root-pagingHtml"><ul class="vis-ad-w-p-s-plst w-100">' +
@@ -59,10 +90,18 @@
                 '<li id="VIS_nextPage' + this.windowNo + '" style="opacity: 1;"><div ><i class="vis vis-pagedown" title="Page Down(Alt+ Pg Dn)" })="" style="opacity: 1;"></i></div></li></div>' +
                 '</ul></div>');
             $commentshtml = $('<div id="VIS_viewMoreComments' + this.windowNo + '" style="display:none;" class="VIS-tp-commentsPanel"></div>');
-            $root.append($paginghtml);
-            $root.append($rootcontent);
+            $tpdataloader = $('<div class="VIS-tabPanelDataLoader" id="VIS_tabPanelDataLoader' + window_No + '"><div class="vis-busyindicatorinnerwrap"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div>');
+            //$root.append($paginghtml);
+            //$root.append($rootcontent);
+            $root.append($tpdataloader);
             window_No = this.windowNo;
             setContentHeight();
+
+            $html.find('a').on('click', function (e) {
+                e.preventDefault();
+                getGridDataRecordCount(_selectedId, tableID);
+                loadHistoryData(_selectedId, 0, window_No, tableID, $(this));
+            });
         };
 
         /** Return container of panel's Design  */
@@ -72,14 +111,10 @@
         this.update = function (record_ID) {
             _selectedId = record_ID;
             tableID = this.table_ID;
+            $root.empty();
+            this.init();
             getGridDataRecordCount(record_ID, tableID);
-
-            //var Email = VIS.context.getWindowContext(this.windowNo, "EMail");
-            //var Mobile = VIS.context.getWindowContext(this.windowNo, "Mobile");
-            //var RecordId = VIS.context.getWindowContext(this.windowNo, "C_Lead_ID");
-            //var Phone = VIS.context.getWindowContext(this.windowNo, "Phone");
-
-            loadGridData(record_ID, 0, this.windowNo, tableID);
+            loadHistoryData(record_ID, 0, this.windowNo, tableID, null);
         };
 
         function setPages(RecordId, selPage) {
@@ -129,12 +164,14 @@
                 //async: false,
                 data: { RecordId: RecordId, AD_Table_ID: TableId },
                 success: function (data) {
-                    var res = [];
-                    res = JSON.parse(data);
+                    var res = JSON.parse(data);
                     if (res != null) {
-                        totalRecords = res;
-                        $('#VIS_ddlPages' + window_No).empty();
-                        setPages(RecordId, 0);
+                        //totalRecords = res;
+                        //$('#VIS_ddlPages' + window_No).empty();
+                        //setPages(RecordId, 0);
+                        for (var i = 0; i < res.length; i++) {
+                            $($html.find("a[id=" + res[i].type.toLower() + "]")).find('span').text(res[i].count);
+                        }
                     };
                 },
                 error: function (e) {
@@ -144,24 +181,23 @@
 
         function ddlpagesOnChange(e) {
             selectedPage = $('#VIS_ddlPages' + window_No).find(":selected").val();
-            loadGridData(_selectedId, VIS.Utility.Util.getValueOfInt(selectedPage), window_No, tableID);
+            loadHistoryData(_selectedId, VIS.Utility.Util.getValueOfInt(selectedPage), window_No, tableID);
             currentPage = selectedPage;
         };
 
         /* Loading the data in to Grid*/
-        function loadGridData(RecordId, selPage, window_No, TableId) {
+        function loadHistoryData(RecordId, selPage, window_No, TableId, target) {
             $('#VIS_tabPanelDataLoader' + window_No).show();
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetHistoryRecordDetails",
-                //async: false,
-                data: { RecordId: RecordId, AD_Table_ID: TableId, CurrentPage: selPage },
+                data: { RecordId: RecordId, AD_Table_ID: TableId, Type: (target === null ? 'all' : target.attr('id')), CurrentPage: selPage },
                 success: function (data) {
                     var res = [];
                     var tp_con
                     res = JSON.parse(data);
                     if (res != null) {
                         historyRecords = res;
-                        renderHistoryData(res, window_No, false);
+                        renderHistoryData(res, window_No, target);
                         $('#VIS_recordDetail' + window_No).hide();
                         setContentHeight();
                         //setTimeout($('#tabPanelDataLoader').hide(), 10000);
@@ -180,7 +216,7 @@
                                 $('#VIS_prevPage' + window_No).off("click");
                                 $('#VIS_ddlPages' + window_No).off("change");
 
-                                loadGridData(_selectedId, (VIS.Utility.Util.getValueOfInt(selectedPage) - 1), window_No, TableId);
+                                loadHistoryData(_selectedId, (VIS.Utility.Util.getValueOfInt(selectedPage) - 1), window_No, TableId);
                                 currentPage = selectedPage;
 
                                 $('#VIS_ddlPages' + window_No).val((VIS.Utility.Util.getValueOfInt(selectedPage) - 1));
@@ -196,7 +232,7 @@
                                 $('#VIS_nextPage' + window_No).off("click");
                                 $('#VIS_ddlPages' + window_No).off("change");
 
-                                loadGridData(_selectedId, (VIS.Utility.Util.getValueOfInt(selectedPage) + 1), window_No, TableId);
+                                loadHistoryData(_selectedId, (VIS.Utility.Util.getValueOfInt(selectedPage) + 1), window_No, TableId);
                                 currentPage = selectedPage;
 
                                 $('#VIS_ddlPages' + window_No).val((VIS.Utility.Util.getValueOfInt(selectedPage) + 1));
@@ -211,63 +247,95 @@
             });
         };
 
-        function renderHistoryData(res, window_No, isSearch) {
-            var $tpdataloader = $('<div class="VIS-tabPanelDataLoader" id="VIS_tabPanelDataLoader' + window_No + '"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>');
-
-            var $maindatadivhtml = $('<div class="VIS-tp-mainContainer"></div>');
-            var $searchhtml = $('<div class="VIS-tp-topSearchWrp">' +
-                '<button id="VIS_btnRefresh' + window_No + '" class="VIS-tp-refreshIcon" >' +
-                '<i class="vis vis-refresh"></i>' +
-                '</button>' +
-                '<div class="VIS-tp-searchControl">' +
-                '<input id="VIS_txtSearch' + window_No + '" type="text" placeholder="Search">' +
-                '<i id="VIS_faSearch' + window_No + '" class="fa fa-search"></i>' +
-                '</div>' +
-                '</div>');
+        function renderHistoryData(res, window_No, target) {
+            $html.find('.tab-pane').empty();
             if (res.length > 0) {
-                var $recshtml = $('<div class="VIS-tp-recordswrap"></div>');
+                var $recshtml = $('<div class="VIS-timeline-section">' +
+                    '</div>');
+
                 var $rechtml;
+                var $detHtml;
                 _curPageRecords = res.length;
                 $('#VIS_pageIndx' + window_No).text('1/' + _curPageRecords);
-
                 for (var i = 0; i < res.length; i++) {
-                    if (res[i].Type.toLower() == 'email')
-                        $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
-                            '">' +
-                            '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
-                            '<i data-recid="' + i + '" class="vis vis-email"></i>' +
-                            '</div >' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
-                            '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
-                            '<i data-recid="' + i + '" class="fa fa-arrow-up"></i>' +
-                            '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
+
+                    if (res[i].Type.toLower() == 'email' || res[i].Type.toLower() == 'inbox') {
+                        //$rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
+                        //    '">' +
+                        //    '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
+                        //    '<i data-recid="' + i + '" class="vis vis-email"></i>' +
+                        //    '</div >' +
+                        //    '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
+                        //    '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
+                        //    '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
+                        //    '<i data-recid="' + i + '" class="fa fa-arrow-up"></i>' +
+                        //    '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
+                        //    '</div>' +
+                        //    '</div>' +
+                        //    '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
+                        //    '<i data-recid="' + i + ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ? '" class="vis vis-attachment1"></i>' : '"></i>') +
+                        //    '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
+                        //    '</div>' +
+                        //    '</div>');
+
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon">' + (res[i].Type.toLower() == 'email' ? '<i class="vis vis-email">'
+                                : '<i class="fa fa-inbox">') + '</i></div > ' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + (res[i].Type.toLower() == 'email' ? VIS.Msg.getMsg("EMail")
+                                : VIS.Msg.getMsg("Inbox")) + '</span>' +
+                            '<span class="VIS-item-author">By: ' + (res[i].Type.toLower() == 'email' ? res[i].UserName
+                                : res[i].FromUser) + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section VIS-group-item-flex">' +
+                            '<div class="VIS-item-content-group">' +
+                            '<h6>' + res[i].Subject + '</h6>' + (res[i].Type.toLower() == 'email' ?
+                                '<div class="emailTo">' + VIS.Msg.getMsg("To") + ':&nbsp; ' + res[i].MailTo + '</div>' : '') +
+                            '<div class="emailCC">' + VIS.Msg.getMsg("Cc") + ':&nbsp; ' + res[i].MailCC + '</div>' +
+                            '</div>' +
+                            '<div class="VIS-action-group">' +
+                            ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ?
+                                '<a href="javascript:void(0)"><span class="vis vis-attachment1"></span></a><div class="VIS-attach-count">' + res[i].AttchCount + '</div>' : '') +
                             '</div>' +
                             '</div>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
-                            '<i data-recid="' + i + ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ? '" class="vis vis-attachment1"></i>' : '"></i>') +
-                            '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
                             '</div>' +
+                            '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                            '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
-                    else if (res[i].Type.toLower() == 'inbox')
-                        $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
-                            '">' +
-                            '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
-                            '<i data-recid="' + i + '" class="vis vis-email"></i>' +
-                            '</div >' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
-                            '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
-                            '<i data-recid="' + i + '" class="fa fa-arrow-down"></i>' +
-                            '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
+                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="email" class="VIS-activity-container" style="display:none;"></div>');
+                    }
+                    else if (res[i].Type.toLower() == 'inbox') {
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon"><i class="vis vis-email"></i></div>' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("InboxMail") + '</span>' +
+                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section">' +
+                            '<p>' + res[i].Subject + '</p>' +
                             '</div>' +
                             '</div>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
-                            '<i data-recid="' + i + ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ? '" class="vis vis-attachment1"></i>' : '"></i>') +
-                            '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
                             '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                            '" data-atype="inbox" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
-                    else if (res[i].Type.toLower() == 'call')
+                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="inbox" class="VIS-activity-container" style="display:none;"></div>');
+                    }
+                    else if (res[i].Type.toLower() == 'call') {
                         $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="call" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap  ' +
                             '">' +
                             '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
@@ -284,7 +352,57 @@
                             '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
                             '</div>' +
                             '</div>');
-                    else if (res[i].Type.toLower() == 'chat')
+
+                        var duration = res[i].Subject >= 60 ? DurationCalculator(res[i].Subject) : res[i].Subject + ' ' + VIS.Msg.getMsg('VA048_Seconds');
+
+                        var attchFile = ''; attach_ID = 0; attachLine_ID = 0;
+                        if (res[i].Attachment != null) {
+                            attchFile = res[i].Attachment.Name;
+                            attach_ID = res[i].Attachment.AttID;
+                            attachLine_ID = res[i].Attachment.ID;
+                        }
+
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon"><i class="fa fa-phone"></i></div>' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("VA048_CallType") + '</span>' +
+                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section VIS-group-item-flex">' +
+                            '<div class="VIS-item-content-group">' +
+                            '<h6>From: ' + res[i].MailTo + ' To: ' + res[i].MailCC + '</h6>' +
+                            ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ?
+                                '<div class="VIS-transcript-available">Transcript Available</div>' : '') +
+                            '</div>' +
+                            '<div class="VIS-action-group">' +
+                            '<div class="VIS-item-duration">' +
+                            '<div class="VIS-mintxt">' + duration + '</div>' +
+                            '</div>' +
+                            '<a href="javascript:void(0)" class="VIS-play-link" data-aid="' + attach_ID + '" data-atlid="' + attachLine_ID +
+                            '" data-aname="' + attchFile + '"><i class="fa fa-play-circle-o" aria-hidden="true"></i></a>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                            '" data-atype="call" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '</div>');
+                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="call" class="VIS-activity-container" style="display:none;"></div>');
+
+                        $rechtml.find('.VIS-play-link').click(function (e) {
+                            var attLine_ID = $(this).data('atlid');
+                            var att_ID = $(this).data('aid');
+                            var attFile = $(this).data('aname');
+                            downLoadAttachCall(attLine_ID, att_ID, attFile);
+                        });
+                    }
+                    else if (res[i].Type.toLower() == 'chat') {
                         $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="chat" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap  ' +
                             '">' +
                             '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
@@ -301,7 +419,28 @@
                             '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
                             '</div>' +
                             '</div>');
-                    else if (res[i].Type.toLower() == 'letter')
+
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon"><i class="fa fa-sticky-note-o"></i></div>' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Note") + '</span>' +
+                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section">' +
+                            '<p>' + res[i].CharacterData + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
+                            '</div>');
+                        $detHtml = "";
+                    }
+                    else if (res[i].Type.toLower() == 'letter') {
                         $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="letter" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
                             '">' +
                             '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
@@ -318,7 +457,32 @@
                             '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
                             '</div>' +
                             '</div>');
-                    else if (res[i].Type.toLower() == 'appointment')
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon"><i class="vis vis-letter"></i></div>' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Letter") + '</span>' +
+                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section VIS-group-item-flex">' +
+                            '<div class="VIS-item-content-group">' +
+                            '<h6>' + res[i].Subject + '</h6>' +
+                            '</div>' +
+                            //'<button class="VIS-btn-copy"><i class="fa fa-clone"></i></button>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                            '" data-atype="letter" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '</div>');
+                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="letter" class="VIS-activity-container" style="display:none;"></div>');
+                    }
+                    else if (res[i].Type.toLower() == 'appointment') {
                         $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="appointment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
                             '">' +
                             '<div data-recid="' + i + '" class="VIS-tp-recordIcon">' +
@@ -335,7 +499,79 @@
                             '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
                             '</div>' +
                             '</div>');
-                    else if (res[i].Type.toLower() == 'task')
+
+                        var hours = new Date(res[i].StartDate).getHours();
+                        var minutes = new Date(res[i].StartDate).getMinutes();
+                        var ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12 || 12; // Convert 24-hour time to 12-hour format
+                        minutes = minutes < 10 ? '0' + minutes : minutes; // Ensure two-digit minutes
+
+                        var time = "Time: " + new Date(res[i].StartDate).toDateString() + " " + hours + ":" + minutes + " " + ampm;
+                        time += " - ";
+                        if (new Date(res[i].StartDate).setHours(0, 0, 0, 0) != new Date(res[i].EndDate).setHours(0, 0, 0, 0)) {
+                            time += new Date(res[i].EndDate).toDateString();
+                        }
+
+                        hours = new Date(res[i].EndDate).getHours();
+                        minutes = new Date(res[i].EndDate).getMinutes();
+                        ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12 || 12; // Convert 24-hour time to 12-hour format
+                        minutes = minutes < 10 ? '0' + minutes : minutes; // Ensure two-digit minutes
+                        time += " " + hours + ":" + minutes + " " + ampm;
+
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon"><i class="fa fa-calendar-o"></i></div>' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Appointment") + '</span>' +
+                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section">' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-content-group">' +
+                            '<h6>' + res[i].Subject + '</h6>' +
+                            '<div class="VIS-item-timing">' + time + '</div>' +
+                            '</div>' +
+                            '<div class="VIS-meeting-section">' +
+                            (res[i].MeetingUrl != "" ? '<a class="VIS-meeting-url" href="#" data-joinurl="' + res[i].MeetingUrl + '">' + res[i].MeetingUrl +
+                                '</a><span data-joinurl="' + res[i].MeetingUrl + '" class="VIS-btn-copy" title="' + VIS.Msg.getMsg("CopyUrl") + '"><i class="fa fa-clone"></i></span>' : "") +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-uid="' + res[i].UID + '" data-joinurl="' + res[i].MeetingUrl +
+                            '" class="VIS-btn-edit" title="' + VIS.Msg.getMsg("EditAppointment") + '"><i class="fa fa-pencil-square-o"></i></span>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                            '" data-atype="appointment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '</div>');
+
+                        var divAtt = $('<div class="VIS-items-status-group"></div>');
+                        if (res[i].Attendees != null && res[i].Attendees.length > 0) {
+                            var array = res[i].Attendees.split(",");
+                            if (array != null && array.length > 0) {
+                                for (var k = 0; k < array.length; k++) {
+                                    divAtt.append('<div class="VIS-item-status VIS-item-green">' + array[k] + '</div>');
+                                }
+                            }
+                        }
+                        if (res[i].EmailToInfo != "") {
+                            var array = res[i].EmailToInfo.split(",");
+                            if (array != null && array.length > 0) {
+                                for (var k = 0; k < array.length; k++) {
+                                    divAtt.append('<div class="VIS-item-status VIS-item-green">' + array[k] + '</div>');
+                                }
+                            }
+                        }
+                        $rechtml.find('.VIS-content-section').append(divAtt);
+                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="appointment" class="VIS-activity-container" style="display:none;"></div>');
+                    }
+                    else if (res[i].Type.toLower() == 'task') {
                         $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="task" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
                             '">' +
                             '<div data-recid="' + i + '" class="VIS-tp-recordIcon">' +
@@ -353,68 +589,171 @@
                             '<small data-recid="' + i + '" >By: ' + res[i].UserName + '</small>' +
                             '</div>' +
                             '</div>');
-                    else if (res[i].Type.toLower() == 'attachment')
-                        $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="attachment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
-                            '">' +
-                            '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" title="attachment">' +
-                            '<i data-recid="' + i + '" class="vis vis-attachmentx"></i>' +
-                            '</div >' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
-                            '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
-                            '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
+
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon"><i class="fa fa-tasks"></i></div>' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Task") + '</span>' +
+                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section VIS-group-item-flex">' +
+                            '<div class="VIS-item-content-group">' +
+                            '<h6>' + res[i].Subject + '</h6>' +
+                            '</div>' +
+                            //'<button class="VIS-btn-copy"><i class="fa fa-clone"></i></button>' +
                             '</div>' +
                             '</div>' +
-                            '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
-                            '<i data-recid="' + i + '" >&nbsp;</i>' +
-                            '<small data-recid="' + i + '" >By: ' + res[i].UserName + '</small>' +
                             '</div>' +
+                            //'<div class="VIS-status-container"></div>' +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                            '" data-atype="task" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
                             '</div>');
+                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="task" class="VIS-activity-container" style="display:none;"></div>');
+                    }
+                    else if (res[i].Type.toLower() == 'attachment') {
+                        $rechtml = $('<div class="VIS-timeline-item">' +
+                            '<div class="VIS-item-icon"><i class="vis vis-attachmentx"></i></div>' +
+                            '<div class="VIS-item-content">' +
+                            '<div class="VIS-item-header">' +
+                            '<div class="VIS-item-type-author">' +
+                            '<span class="VIS-item-type">' + VIS.Msg.getMsg("Attachment") + '</span>' +
+                            '<span class="VIS-item-author">By: ' + res[i].UserName + '</span>' +
+                            '</div>' +
+                            '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
+                            '</div>' +
+                            '<div class="VIS-item-body">' +
+                            '<div class="VIS-content-section">' +
+                            '<p>' + res[i].Subject + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
+                            '" data-atype="attachment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '</div>');
+                        $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="attachment" class="VIS-activity-container" style="display:none;"></div>');
+                    }
                     $recshtml.append($rechtml);
+                    $recshtml.append($detHtml);
                 }
 
-                if (isSearch) {
-                    $root.find('.VIS-tp-recordswrap').empty();
-                    $root.find('.VIS-tp-recordswrap').append($recshtml.html());
+                if (target != null) {
+                    target = $html.find(target.attr('href'));
                 }
                 else {
-                    $maindatadivhtml.append($tpdataloader).append($searchhtml).append($recshtml);
-                    $html.empty();
-                    $html.append($maindatadivhtml);
+                    target = $($html.find('.tab-pane')[0]);
                 }
+                target.append($recshtml);
 
-                $root.find(".VIS-tp-recordWrap").click(function (e) {
-                    var target = e.target;
-                    var recId = '';
-
-                    recId = VIS.Utility.Util.getValueOfInt($(target).data('recid'));
-                    $root.find('#rowId' + recId).addClass('VIS-tp-selectedRecord');
-                    if (VIS.Utility.Util.getValueOfInt(_selectedRecId) >= 0 && (recId != VIS.Utility.Util.getValueOfInt(_selectedRecId)) && $root.find('#rowId' + _selectedRecId).hasClass('VIS-tp-selectedRecord'))
-                        $root.find('#rowId' + _selectedRecId).removeClass('VIS-tp-selectedRecord');
+                $html.find(".VIS-btn-expand").click(function (e) {
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    var target = $(e.target);
+                    var recId = VIS.Utility.Util.getValueOfInt(target.data('recid'));
                     _selectedRecId = recId;
+                    var record_Type = target.data('atype').toString().toUpper();
+                    var rID = target.data('rid');
+                    var userName = target.data('username');
+                    var detDiv = $($html.find(".VIS-activity-container[data-rid='" + rID + "']"));
+                    detDiv.empty();
 
-                    $('#VIS_pageIndx' + window_No).text((VIS.Utility.Util.getValueOfInt(_selectedRecId) + 1) + '/' + _curPageRecords);
-                    var record_Type = $root.find('#rowId' + recId).data('atype').toString().toUpper();
-                    var rID = $root.find('#rowId' + recId).data('rid');
-                    var userName = $root.find('#rowId' + recId).data('username');
+                    if (target.find('i').hasClass('fa-angle-right')) {
+                        target.find('i').removeClass('fa-angle-right');
+                        target.find('i').addClass('fa-angle-down');
+                        $('#VIS_tabPanelDataLoader' + window_No).show();
+                    }
+                    else {
+                        target.find('i').removeClass('fa-angle-down');
+                        target.find('i').addClass('fa-angle-right');
+                        detDiv.hide();
+                        return;
+                    }
 
-                    $('#VIS_recordDetail' + window_No).show();
+                    //$root.find('#rowId' + recId).addClass('VIS-tp-selectedRecord');
+                    //if (VIS.Utility.Util.getValueOfInt(_selectedRecId) >= 0 && (recId != VIS.Utility.Util.getValueOfInt(_selectedRecId)) && $root.find('#rowId' + _selectedRecId).hasClass('VIS-tp-selectedRecord'))
+                    //    $root.find('#rowId' + _selectedRecId).removeClass('VIS-tp-selectedRecord');                    
+
+                    //$('#VIS_pageIndx' + window_No).text((VIS.Utility.Util.getValueOfInt(_selectedRecId) + 1) + '/' + _curPageRecords);
+                    //$('#VIS_recordDetail' + window_No).show();
 
                     if (record_Type == "EMAIL" || record_Type == "INBOX")
-                        showMail(rID, userName, window_No);
+                        showMail(detDiv, rID, userName, window_No);
                     else if (record_Type == "CALL")
-                        showCallInfo(rID, userName, window_No);
+                        showCallInfo(rID, detDiv, window_No);
                     else if (record_Type == "APPOINTMENT")
-                        showAppointmentInfo(rID, userName, window_No);
+                        showAppointmentInfo(rID, detDiv, window_No);
                     else if (record_Type == "LETTER")
-                        showLetter(rID, userName, window_No);
+                        showLetter(detDiv, rID, userName, window_No);
                     else if (record_Type == "TASK")
-                        showTask(rID, userName, window_No);
+                        showTask(rID, detDiv, window_No);
                     else if (record_Type == "ATTACHMENT")
-                        showAttachment(rID, userName, window_No);
+                        showAttachment(detDiv, rID, userName, window_No);
                     else if (record_Type == "CHAT")
                         showChat(rID, userName, window_No);
                     setContentHeight();
+                });
+
+                $html.find(".VIS-meeting-url").click(function () {
+                    var url = $(this).data('joinurl');
+                    window.open(url);
+                });
+
+                $html.find(".VIS-btn-copy").click(function () {
+                    const btn = $(this);
+                    var url = $(this).data('joinurl');
+                    const $tempInput = $('<input>');
+                    $root.append($tempInput);
+                    $tempInput.val(url).select();
+                    try {
+                        const success = document.execCommand('copy');
+                        if (success) {
+                            btn.html('<i class="fa fa-check"></i>');
+                            let msg = $('<span class="VIS-copy-msg">' + VIS.Msg.getMsg("CopyClipboard") + '</span>');
+                            btn.after(msg);
+                            btn.prop('disabled', true); // Disable the button
+                            setTimeout(() => {
+                                btn.html('<i class="fa fa-clone"></i>'); // Revert back after 5s
+                                msg.fadeOut(300, function () { $(this).remove(); }); // Fade & remove message
+                                btn.prop('disabled', false); // Disable the button
+                            }, 5000);
+                        } else {
+                            console.error("Copy command was unsuccessful.");
+                        }
+                    } catch (err) {
+                        console.error("Failed to copy:", err);
+                    }
+                    $tempInput.remove();
+
+                    //navigator.clipboard.writeText(url).then(() => {
+                    //    btn.html('<i class="fa fa-check"></i>'); // Change to check icon
+                    //    let msg = $('<span class="VIS-copy-msg">' + VIS.Msg.getMsg("CopyClipboard") + '</span>');
+                    //    btn.after(msg);
+                    //    setTimeout(() => {
+                    //        btn.html('<i class="fa fa-clone"></i>'); // Revert back after 2s
+                    //        msg.fadeOut(300, function () { $(this).remove(); }); // Fade & remove message
+                    //    }, 2000);
+                    //}).catch(err => console.error("Failed to copy:", err));
+                });
+
+                $html.find(".VIS-btn-edit").click(function () {
+                    if (window.WSP && WSP.WSP_AppointmentsForm) {
+                        const btn = $(this);
+                        var rid = $(this).data('rid');
+                        var uid = $(this).data('uid');
+                        var url = $(this).data('joinurl');
+
+                        var divaptbusy = $("<div id='divAptBusy' class='wsp-busy-indicater'></div>");
+                        $root.append(divaptbusy);
+                        divaptbusy.show();
+                        WSP.WSP_AppointmentsForm.init(divaptbusy, tableID, _selectedId, rid, uid, url);
+                    }
+                    else {
+                        VIS.ADialog.info("PleaseUpdateWSPModule");
+                    }
                 });
 
                 $('#VIS_txtSearch' + window_No).keyup(function (e) {
@@ -449,7 +788,7 @@
                 $('#VIS_btnRefresh' + window_No).click(function () {
                     if (VIS.Utility.Util.getValueOfInt(_selectedId) > 0) {
                         getGridDataRecordCount(_selectedId, tableID);
-                        loadGridData(_selectedId, 0, window_No, tableID);
+                        loadHistoryData(_selectedId, 0, window_No, tableID);
                     }
                     $('#VIS_recordDetail' + window_No).hide();
                     $('#VIS_pagingHtml' + window_No).show();
@@ -460,7 +799,7 @@
                     if (searchField === '') {
                         if (VIS.Utility.Util.getValueOfInt(_selectedId) > 0) {
                             getGridDataRecordCount(_selectedId, tableID);
-                            loadGridData(_selectedId, 0, window_No, tableID);
+                            loadHistoryData(_selectedId, 0, window_No, tableID);
                         }
                         $('#VIS_recordDetail' + window_No).hide();
                         $('#VIS_pagingHtml' + window_No).show();
@@ -481,11 +820,6 @@
                         $('#VIS_pagingHtml' + window_No).hide();
                     }
                 });
-            }
-            else {
-                $maindatadivhtml.append($searchhtml);
-                $html.empty();
-                $html.append($maindatadivhtml);
             }
         }
 
@@ -523,8 +857,7 @@
                 showChat(historyrID, historyuserName, window_No);
         }
 
-        function showMail(ID, UserName, window_No) {
-
+        function showMail(target, ID, UserName, window_No) {
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedMailDetails",
                 datatype: "json",
@@ -552,7 +885,7 @@
 
                     if (VIS.Utility.Util.getValueOfString(result.Cc) != '' || VIS.Utility.Util.getValueOfString(result.Bcc) != '') {
                         mailtoddlhtml = '<div class="dropdown show VIS-tp-dropdownWrap">' + result.To +
-                            '<a class="btn dropdown-toggle" style="font-size:.75rem;" href = "#" role = "button" id="dropdownMenuLink" ' +
+                            '<a class="btn dropdown-toggle" style="font-size:.75rem;" href="javascript:void(0)" role = "button" id="dropdownMenuLink" ' +
                             'data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >' +
                             '&nbsp;<i class="fa fa-angle-down VIS-tp-recordLabels"></i></a>' +
                             '<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">';
@@ -563,9 +896,9 @@
                                 if (mailaddresscc[i] != 'undefined' && mailaddresscc[i] != '') {
                                     if (i == 0)
                                         mailtoddlhtml += '<span class="VIS-tp-recordLabels VIS-mail-to">' + VIS.Msg.getMsg("Cc") + ':&nbsp; </span>' +
-                                            '<a class="dropdown-item VIS-mail-to" href = "#">' + mailaddresscc[i] + '</a>';
+                                            '<a class="dropdown-item VIS-mail-to" href = "javascript:void(0)">' + mailaddresscc[i] + '</a>';
                                     else
-                                        mailtoddlhtml += '<a class="dropdown-item VIS-mail-to" href="#">' + mailaddresscc[i] + '</a>';
+                                        mailtoddlhtml += '<a class="dropdown-item VIS-mail-to" href="javascript:void(0)">' + mailaddresscc[i] + '</a>';
                                 }
                             }
                         }
@@ -574,9 +907,9 @@
                             for (var j = 0; j < mailaddressbcc.length; j++) {
                                 if (mailaddressbcc[j] != 'undefined' && mailaddressbcc[j] != '') {
                                     if (j == 0)
-                                        mailtoddlhtml += '<span class="VIS-tp-recordLabels VIS-mail-to">' + VIS.Msg.getMsg("Bcc") + ':&nbsp; </span><a class="dropdown-item VIS-mail-to" href="#">' + mailaddressbcc[j] + '</a>';
+                                        mailtoddlhtml += '<span class="VIS-tp-recordLabels VIS-mail-to">' + VIS.Msg.getMsg("Bcc") + ':&nbsp; </span><a class="dropdown-item VIS-mail-to" href="javascript:void(0)">' + mailaddressbcc[j] + '</a>';
                                     else
-                                        mailtoddlhtml += '<a class="dropdown-item VIS-mail-to" href="#">' + mailaddressbcc[j] + '</a>';
+                                        mailtoddlhtml += '<a class="dropdown-item VIS-mail-to" href="javascript:void(0)">' + mailaddressbcc[j] + '</a>';
                                 }
                             }
                         }
@@ -590,23 +923,72 @@
                         attachID = result.ID;
                     }
 
-                    if ($rootcontent.length < 1) {
-                        $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailPanel"></div>');
+                    //$htmlcontent = $('<div class="VIS-testPanel VIS-tp-borderBott" ><div class="d-flex align-items-center VIS-tp-leftIcons">' +
+                    //    '<span><i class="fa fa-reply" data-mailto="' + result.To + '" data-mailcc="' + result.Cc + '" data-mailbcc="' + result.Bcc +
+                    //    '" id="VIS_imgReply' + window_No + '"></i></span><span><i class="fa fa-reply-all" data-mailto="' + result.To + '" data-mailcc="'
+                    //    + result.Cc + '" data-mailbcc="' + result.Bcc + '" id="VIS_imgReplyAll' + window_No + '"></i></span><span>' +
+                    //    '<i class="fa fa-share" id="VIS_imgForward' + window_No + '"></i></span></div>'
+                    //    + '<div class= "align-items-center d-flex VIS-tp-rightIcons" ><span id="VIS_prtHistory' + window_No +
+                    //    '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No +
+                    //    '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No +
+                    //    '" class="fa fa-arrow-right"></i></span><span class="VIS-close-btn" id="VIS_btnClose' + window_No +
+                    //    '"><i class="vis vis-cross"></i></span></div ></div > ');
+
+                    $htmlcontent = $('<div class="VIS-main-content"><div class="VIS-top-row">' +
+                        '<section class="VIS-agenda-section"><h2>Actions</h2><div class="VIS-mail-action-links">' +
+                        '<span class="VIS-email-link"><i class="fa fa-reply" aria-hidden="true" data-mailto="' + result.To +
+                        '" data-mailcc="' + result.Cc + '" data-mailbcc="' + result.Bcc + '" id="VIS_imgReply' + window_No + '"></i></span>' +
+                        '<span class="VIS-email-link"><i class="fa fa-reply-all" aria-hidden="true" data-mailto="' + result.To +
+                        '" data-mailcc="' + result.Cc + '" data-mailbcc="' + result.Bcc + '" id="VIS_imgReplyAll' + window_No + '"></i></span>' +
+                        '<span class="VIS-email-link"><i class="fa fa-share" aria-hidden="true"data-mailto="' + result.To +
+                        '" data-mailcc="' + result.Cc + '" data-mailbcc="' + result.Bcc + '" id="VIS_imgForward' + window_No + '"></i></span>' +
+                        '</div></section>' +
+                        '<section class="VIS-attachment-section"><h2>' + VIS.Msg.getMsg("Attachment") + '</h2>' +
+                        '<div class="VIS-attachment-content">' +
+                        '<div class="VIS-downloadAll-link"><i id="dwnldAllAttach' + window_No + '" class="vis vis-import" title="Download All" style="opacity: 1;"></i>' +
+                        '<span id="dwnldAllAttach' + window_No + '">' + VIS.Msg.getMsg("VIS_DownloadAll") + (noOfAttchs > 0 ? ' (' + noOfAttchs + ')' : '') +
+                        '</span><span id="showAttachment' + window_No + '" class="vis vis-arrow-down"></span></div>' +
+                        '<div class="VIS-attachment-list" style="display:none;"></div>' +
+                        '</div></section></div>' +
+
+                        '<section class="VIS-transcript-section">' +
+                        /*'<h2>Hello David,</h2>' +*/
+                        '<p id="VIS_mailSubject' + window_No + '" style="display:none;">' + result.Title + '</p>' +
+                        '<div class="VIS-conversation"><div class="VIS-message">' +
+                        '<p id="VIS_mailBody' + window_No + '">' + result.Detail + '</p>' +
+                        '</div></div></section></div >' +
+
+                        '<section class="VIS-comments-section">' +
+                        '<div class="VIS-comment-header"><h2>Comments</h2></div>' +
+                        '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>' +
+                        '<div id="VIS_commentsdata' + window_No + '" class="vis-attachhistory-comments-container"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100">' +
+                        '<p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments"> ' + VIS.Msg.getMsg('ViewMoreComments') + '</p>' +
+                        '<div class="VIS-comment-input">' +
+                        '<input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '" class="VIS-comment-field">' +
+                        '<button class="VIS-send-button" id="VIS_btnComments' + window_No + '">➤</button>' +
+                        '</div></div>' +
+                        '</section>');
+
+                    target.append($htmlcontent);
+                    target.show();
+
+                    if (noOfAttchs > 0) {
+                        for (var k = 0; k < noOfAttchs; k++) {
+                            $($htmlcontent.find('.VIS-attachment-list')).
+                                append('<a href="javascript:void(0)" data-attid="' + result.Attach[k].ID + '">' + result.Attach[k].Name + '</a>');
+                        }
                     }
 
-                    $rootcontent.empty();
-                    $htmlcontent = $('<div class="VIS-testPanel VIS-tp-borderBott" ><div class="d-flex align-items-center VIS-tp-leftIcons"><span><i class="fa fa-reply" data-mailto="' + result.To + '" data-mailcc="' + result.Cc + '" data-mailbcc="' + result.Bcc + '" id="VIS_imgReply' + window_No + '"></i></span><span><i class="fa fa-reply-all" data-mailto="' + result.To + '" data-mailcc="' + result.Cc + '" data-mailbcc="' + result.Bcc + '" id="VIS_imgReplyAll' + window_No + '"></i></span><span><i class="fa fa-share" id="VIS_imgForward' + window_No + '"></i></span></div>'
-                        + '<div class= "align-items-center d-flex VIS-tp-rightIcons" ><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span><span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div ></div > ');
-                    $mailbodyhtml = $('<div class="VIS-tp-contentdiv" >'
-                        + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input"><div class="vis-tp-emailDetailWrap"><div class="VIS-mail-user-div"><span class="VIS-mail-user-span">' + userInitials + '</span></div>'
-                        + '<div class="VIS-contentTitile"><span class="VIS-mail-username">' + UserName + '</span><span id="VIS_mailSubject' + window_No + '" class="VIS-mail-subject VIS-tp-recordLabels">' + result.Title
-                        + '</span><div class="VIS-mail-content"><div class="VIS-mail-from"><span class="VIS-tp-recordLabels">' + VIS.Msg.getMsg("From") + ':&nbsp;</span><span style="word-break: break-word;">'
-                        + result.From + '</span></div><small>' + new Date(result.Date).toLocaleString() + '</small></div><span class="VIS-mail-to"><span class="VIS-tp-recordLabels">' + VIS.Msg.getMsg("To") + ':&nbsp; </span>' + mailtoddlhtml + '</span></div></div>'
-                        + '<div id="VIS_mailBody' + window_No + '" class="VIS-mail-body" >' + result.Detail + '</div></div >'
-                        + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>'
-                        + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments')
-                        + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments'
-                        + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div></div>');
+                    //$mailbodyhtml = $('<div class="VIS-tp-contentdiv">'
+                    //    + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input"><div class="vis-tp-emailDetailWrap"><div class="VIS-mail-user-div"><span class="VIS-mail-user-span">' + userInitials + '</span></div>'
+                    //    + '<div class="VIS-contentTitile"><span class="VIS-mail-username">' + UserName + '</span><span id="VIS_mailSubject' + window_No + '" class="VIS-mail-subject VIS-tp-recordLabels">' + result.Title
+                    //    + '</span><div class="VIS-mail-content"><div class="VIS-mail-from"><span class="VIS-tp-recordLabels">' + VIS.Msg.getMsg("From") + ':&nbsp;</span><span style="word-break: break-word;">'
+                    //    + result.From + '</span></div><small>' + new Date(result.Date).toLocaleString() + '</small></div><span class="VIS-mail-to"><span class="VIS-tp-recordLabels">' + VIS.Msg.getMsg("To") + ':&nbsp; </span>' + mailtoddlhtml + '</span></div></div>'
+                    //    + '<div id="VIS_mailBody' + window_No + '" class="VIS-mail-body" >' + result.Detail + '</div></div >'
+                    //    + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>'
+                    //    + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments')
+                    //    + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments'
+                    //    + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div></div>');
 
                     $printhtml = $('<div class="VIS-tp-contentdiv" >'
                         + '<div class="VIS-tp-comments-input' + window_No + '" ><div class="vis-tp-emailDetailWrap"<div class="VIS-mail-user-div"><span class="VIS-mail-user-span">' + userInitials + '</span></div>'
@@ -616,22 +998,33 @@
                         + '<div class="VIS-mail-body" >' + result.Detail + '</div></div>');
 
 
-                    $footerhtml = $('<div class="VIS-tp-downloadAttachment"><div class="VIS-tp-attachments"><i class="vis vis-attachment1" ></i><span> ' + noOfAttchs + ' ' + VIS.Msg.getMsg("Attachments") + '</span></div><div class="VIS-tp-attchDownload" id="dwnldAllAttach"><i class="vis vis-import" title="Download All" style="opacity: 1;"></i><span> ' + VIS.Msg.getMsg("VIS_DownloadAll") + '</span></div></div>'
-                        + '</div>');
-                    var $contenthtml = $('<div class="VIS-tp-emailDetailOuterPanel VIS-tp-recordDetail"></div>');
-                    $contenthtml.append($mailbodyhtml).append($footerhtml);
-                    $rootcontent.append($htmlcontent).append($contenthtml);
+                    //$footerhtml = $('<div class="VIS-tp-downloadAttachment"><div class="VIS-tp-attachments"><i class="vis vis-attachment1"></i>' +
+                    //    '<span> ' + noOfAttchs + ' ' + VIS.Msg.getMsg("Attachments") + '</span></div>' +
+                    //    '<div class="VIS-tp-attchDownload" id="dwnldAllAttach"><i class="vis vis-import" title="Download All" style="opacity: 1;"></i><span>'
+                    //    + VIS.Msg.getMsg("VIS_DownloadAll") + '</span></div></div>'
+                    //    + '</div>');
 
-                    if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
-                        $root.append($rootcontent);
-                    if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
-                        $root.append($paginghtml);
+                    //var $contenthtml = $('<div class="VIS-tp-emailDetailOuterPanel VIS-tp-recordDetail"></div>');
+                    //$contenthtml.append($mailbodyhtml).append($footerhtml);
+                    //$rootcontent.append($htmlcontent).append($contenthtml);
+
+                    //if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
+                    //    $root.append($rootcontent);
+                    //if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
+                    //    $root.append($paginghtml);
                     lastHistoryComment(VIS.Utility.Util.getValueOfInt(_mattachID), false, false);
 
+                    //$('#VIS_recordDetail' + window_No).show();
 
-                    $('#VIS_recordDetail' + window_No).show();
-                    $('#dwnldAllAttach').click(function () {
+                    $($htmlcontent.find('.VIS-attachment-list a')).click(function () {
+                        downLoadAttach(ID, $(this).text());
+                    });
+
+                    $('#dwnldAllAttach' + window_No).click(function () {
                         downLoadAllAttach(ID);
+                    });
+                    $('#showAttachment' + window_No).click(function () {
+                        $htmlcontent.find('.VIS-attachment-list').toggle();
                     });
                     $('#VIS_btnComments' + window_No).click(function (e) {
                         saveComments(false, false, e);
@@ -647,7 +1040,6 @@
                             $('#VIS_commentsMsg' + window_No).show();
                             $('#VIS_viewAllComments' + window_No).text(VIS.Msg.getMsg('ViewMoreComments'));
                             lastHistoryComment(VIS.Utility.Util.getValueOfInt(_mattachID), false, false);
-
                         }
                         else
                             viewAll(VIS.Utility.Util.getValueOfInt(_mattachID), false, false);
@@ -686,7 +1078,7 @@
             });
         };
 
-        function showLetter(ID, UserName, window_No) {
+        function showLetter(target, ID, UserName, window_No) {
 
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedLetterDetails",
@@ -712,39 +1104,80 @@
                     if (result.Attach != null && result.Attach.length > 0)
                         attchFile = result.Attach[0].Name;
 
-                    if ($rootcontent.length < 1) {
-                        $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
-                    }
-                    $rootcontent.empty();
+                    //if ($rootcontent.length < 1) {
+                    //    $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
+                    //}
+                    //$rootcontent.empty();
 
-                    $htmlcontent = $('<div class="VIS-contentHeadOuter VIS-tp-borderBott" ><div class="VIS-tp-recordIcon" ><i class="vis vis-letter"></i></div><div class="VIS-contentHead"><span class="VIS-letter-header" >' + VIS.Msg.getMsg("Letter") + '</span></div><div class="align-items-center d-flex VIS-tp-rightIcons" ><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span><span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div>');
+                    //$htmlcontent = $('<div class="VIS-contentHeadOuter VIS-tp-borderBott" ><div class="VIS-tp-recordIcon" ><i class="vis vis-letter"></i></div><div class="VIS-contentHead"><span class="VIS-letter-header" >' + VIS.Msg.getMsg("Letter") + '</span></div><div class="align-items-center d-flex VIS-tp-rightIcons" ><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span><span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div>');
 
 
-                    $mailbodyhtml = $('<div class="VIS-tp-contentdiv" >'
-                        + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input"><div style="width: 100%"><table height="50px" width="100%"><tr height="50px"><td style="width:60px"><div class="VIS-mail-user-div"><span class="VIS-mail-user-span">' + userInitials + '</span></div></td>'
-                        + '<td height="50px"><span class="VIS-mail-username">' + UserName + '</span><span id="mailSubject" class="VIS-mail-subject VIS-tp-recordLabels">' + result.Title + '</span><span class="VIS-mail-to">&nbsp;</span><span class="VIS-mail-from">&nbsp;</span></td><td height="50px" class="VIS-mail-date">' + new Date(result.Date).toLocaleString() + '</td></tr></table></div>'
-                        + '<div id="mailBody" class="VIS-mail-body" >' + result.Detail + '</div></div>'
-                        + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>'
-                        + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div></div> ');
+                    //$mailbodyhtml = $('<div class="VIS-tp-contentdiv" >'
+                    //    + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input"><div style="width: 100%">' +
+                    //    '<table height="50px" width="100%"><tr height="50px"><td style="width:60px"><div class="VIS-mail-user-div">' +
+                    //    '<span class="VIS-mail-user-span">' + userInitials + '</span></div></td>'
+                    //    + '<td height="50px"><span class="VIS-mail-username">' + UserName + '</span><span id="mailSubject" ' +
+                    //    'class="VIS-mail-subject VIS-tp-recordLabels">' + result.Title + '</span><span class="VIS-mail-to">&nbsp;</span>' +
+                    //    '<span class="VIS-mail-from">&nbsp;</span></td><td height="50px" class="VIS-mail-date">' + new Date(result.Date).toLocaleString() +
+                    //    '</td></tr></table></div>'
+                    //    + '<div id="mailBody" class="VIS-mail-body" >' + result.Detail + '</div></div>'
+                    //    + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>'
+                    //    + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100">' +
+                    //    '<p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') +
+                    //    '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') +
+                    //    '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div></div> ');
+
+                    $mailbodyhtml = $('<div class="VIS-main-content">' +
+                        '<div class="VIS-top-row">' +
+                        '<section class="VIS-agenda-section">' +
+                        '<h2>' + UserName + '</h2>' +
+                        '<p>' + result.Title + '</p>' +
+                        '</section>' +
+                        '<section class="VIS-attachment-section"><h2>Attachment</h2>' +
+                        '<div class="VIS-tp-attchDownload" id="dwnldLetterAttach' + window_No + '"><i class="vis vis-import" title="Download" style="opacity: 1;"></i><span>'
+                        + VIS.Msg.getMsg("VIS_Download") + '</span></div>' +
+                        '<div class="VIS-attachment-content">' +
+                        '<span>' + attchFile + '</span>' +
+                        '</div></section></div>' +
+                        '<section class="VIS-transcript-section">' +
+                        '<div class="VIS-conversation"><div class="VIS-message">' +
+                        '<p id="VIS_mailBody' + window_No + '">' + result.Detail + '</p>' +
+                        '</div></div></section></div>' +
+                        '<section class="VIS-comments-section">' +
+                        '<div class="VIS-comment-header">' +
+                        '<h2>Comments</h2></div>' +
+                        '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>' +
+                        '<div id="VIS_commentsdata' + window_No + '" class="vis-attachhistory-comments-container"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100">' +
+                        '<p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments"> ' + VIS.Msg.getMsg('ViewMoreComments') + '</p>' +
+                        '<div class="VIS-comment-input">' +
+                        '<input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '" class="VIS-comment-field">' +
+                        '<button class="VIS-send-button" id="VIS_btnComments' + window_No + '">➤</button>' +
+                        '</div></div>' +
+                        '</section>');
 
                     $printhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
                         + '<div class="" ><div style="width:100%" ><table height="50px" width="100%"><tr height="50px"><td><div class="VIS-mail-user-div"><span class="VIS-mail-user-span">' + userInitials + '</span></div></td>'
                         + '<td height="50px"><span class="VIS-mail-username">' + UserName + '</span><span id="mailSubject" class="VIS-mail-subject VIS-tp-recordLabels">' + result.Title + '</span><span class="VIS-mail-to">&nbsp;</span><span class="VIS-mail-from">&nbsp;</span></td><td height="50px" class="VIS-mail-date">' + result.Date + '</td></tr></table></div>'
                         + '<div id="mailBody" class="VIS-mail-body" >' + result.Detail + '</div></div>');
 
+                    target.append($mailbodyhtml);
+                    target.show();
 
-                    $footerhtml = $('<div class="VIS-tp-downloadAttachment"><div class="VIS-tp-attachments"><i class="vis vis-attachment1" ></i><span> ' + attchFile + '</span></div><div class="VIS-tp-attchDownload" id="dwnldLetterAttach"><i class="vis vis-import" title="Download" style="opacity: 1;"></i><span> ' + VIS.Msg.getMsg("VIS_Download") + '</span></div></div>'
-                        + '</div>');
-                    var $contenthtml = $('<div class="VIS-tp-emailDetailOuterPanel VIS-tp-recordDetail"></div>');
+                    $footerhtml = $('<div class="VIS-tp-downloadAttachment"><div class="VIS-tp-attachments"><i class="vis vis-attachment1" ></i>' +
+                        '<span> ' + attchFile + '</span></div><div class="VIS-tp-attchDownload" id="dwnldLetterAttach">' +
+                        '<i class="vis vis-import" title="Download" style="opacity: 1;"></i><span> ' + VIS.Msg.getMsg("VIS_Download") +
+                        '</span></div></div></div>');
+                    //var $contenthtml = $('<div class="VIS-tp-emailDetailOuterPanel VIS-tp-recordDetail"></div>');
 
-                    $contenthtml.append($mailbodyhtml).append($footerhtml);
-                    $rootcontent.append($htmlcontent).append($contenthtml);
+                    //$contenthtml.append($mailbodyhtml).append($footerhtml);
+                    //$rootcontent.append($htmlcontent).append($contenthtml);
 
-                    if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
-                        $root.append($rootcontent);
-                    if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
-                        $root.append($paginghtml);
-                    //}
+                    //if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
+                    //    $root.append($rootcontent);
+
+                    //if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
+                    //    $root.append($paginghtml);
+
                     lastHistoryComment(VIS.Utility.Util.getValueOfInt(_mattachID), false, false);
 
                     $('#VIS_recordDetail' + window_No).show();
@@ -766,7 +1199,7 @@
                         else
                             viewAll(VIS.Utility.Util.getValueOfInt(_mattachID), false, false);
                     });
-                    $('#dwnldLetterAttach').click(function () {
+                    $('#dwnldLetterAttach' + window_No).click(function () {
                         downLoadAttach(ID, attchFile);
                     });
                     $('#VIS_prtHistory' + window_No).find('i').click(function () {
@@ -788,7 +1221,7 @@
             });
         };
 
-        function showCallInfo(ID, UserName, window_No) {
+        function showCallInfo(ID, target, window_No) {
             var CallDetails_ID = VIS.Utility.Util.getValueOfInt(ID);
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedCallDetails",
@@ -816,35 +1249,62 @@
                     if (VIS.Utility.Util.getValueOfString(result.VA048_Status).toLower() == 'completed')
                         statusColor = 'style = "color: #42d819;"';
 
-                    if ($rootcontent.length < 1) {
-                        $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
-                    }
-                    $rootcontent.empty();
+                    //if ($rootcontent.length < 1) {
+                    //    $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
+                    //}
+                    //$rootcontent.empty();
 
-                    $htmlcontent = $('<div class="VIS-tp-borderBott"><div class="VIS-contentHeadOuter">' +
-                        '<div class= "VIS-tp-recordIcon" ><i class="fa fa-phone" aria-hidden="true" title="Call"></i></div >' +
-                        '<div class="VIS-contentHead"><div class="VIS-contentTitile"><h6 class="mb-0">' + UserName + '</h6><small>' + result.VA048_From + '</small></div>' +
-                        '<div class="align-items-center d-flex VIS-tp-rightIcons"><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span>' +
-                        '<span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div></div></div>');
+                    //$htmlcontent = $('<div class="VIS-tp-borderBott"><div class="VIS-contentHeadOuter">' +
+                    //    '<div class= "VIS-tp-recordIcon" ><i class="fa fa-phone" aria-hidden="true" title="Call"></i></div >' +
+                    //    '<div class="VIS-contentHead"><div class="VIS-contentTitile"><h6 class="mb-0">' + UserName + '</h6><small>' + result.VA048_From + '</small></div>' +
+                    //    '<div class="align-items-center d-flex VIS-tp-rightIcons"><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span>' +
+                    //    '<span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div></div></div>');
 
-                    $callhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
-                        + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
-                        + '<div class="" >'
-                        + '<table height="50px" width="100%">'
-                        + '<tr class="VIS-call-col-header" ><td>' + VIS.Msg.getMsg("VA048_To") + '</td><td>' + VIS.Msg.getMsg("VA048_Duration") + '</td></tr>'
-                        + '<tr class="VIS-call-col-data " ><td>' + result.VA048_To + '</td><td>' + duration + '</td></tr>'
-                        + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("Created") + '</td><td>' + VIS.Msg.getMsg("VA048_Status") + '</td></tr>'
-                        + '<tr class="VIS-call-col-data"><td>' + new Date(result.Created).toLocaleString() + '</td><td ' + statusColor + ' >' + result.VA048_Status + '</td></tr>'
-                        + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("VA048_Price") + '</td><td>' + VIS.Msg.getMsg("VA048_PriceUnit") + '</td></tr>'
-                        + '<tr class="VIS-call-col-data"><td>' + result.VA048_Price + '</td><td>' + result.VA048_Price_Unit + '</td></tr>'
-                        + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("Category") + '</td><td>' + VIS.Msg.getMsg("Attachments") + '</td></tr>'
-                        + '<tr class="VIS-call-col-data"><td>' + VIS.Msg.getMsg("VA048_CallType") + '</td><td class="VIS-tp-attchDownload" id="dwnldCallAttach">' + attchFile + '</td></tr>'
-                        + '</table>'
-                        + '</div>'
-                        + '</div>'
-                        + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel" ></div>'
-                        + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
-                        + '</div>');
+                    //$callhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
+                    //    + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
+                    //    + '<div class="" >'
+                    //    + '<table height="50px" width="100%">'
+                    //    + '<tr class="VIS-call-col-header" ><td>' + VIS.Msg.getMsg("VA048_To") + '</td><td>' + VIS.Msg.getMsg("VA048_Duration") + '</td></tr>'
+                    //    + '<tr class="VIS-call-col-data " ><td>' + result.VA048_To + '</td><td>' + duration + '</td></tr>'
+                    //    + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("Created") + '</td><td>' + VIS.Msg.getMsg("VA048_Status") + '</td></tr>'
+                    //    + '<tr class="VIS-call-col-data"><td>' + new Date(result.Created).toLocaleString() + '</td><td ' + statusColor + ' >' + result.VA048_Status + '</td></tr>'
+                    //    + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("VA048_Price") + '</td><td>' + VIS.Msg.getMsg("VA048_PriceUnit") + '</td></tr>'
+                    //    + '<tr class="VIS-call-col-data"><td>' + result.VA048_Price + '</td><td>' + result.VA048_Price_Unit + '</td></tr>'
+                    //    + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("Category") + '</td><td>' + VIS.Msg.getMsg("Attachments") + '</td></tr>'
+                    //    + '<tr class="VIS-call-col-data"><td>' + VIS.Msg.getMsg("VA048_CallType") + '</td><td class="VIS-tp-attchDownload" id="dwnldCallAttach">' + attchFile + '</td></tr>'
+                    //    + '</table>'
+                    //    + '</div>'
+                    //    + '</div>'
+                    //    + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel" ></div>'
+                    //    + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
+                    //    + '</div>');
+
+                    $callhtml = $('<div class="VIS-main-content">' +
+                        '<div class="VIS-top-row">' +
+                        '<section class="VIS-agenda-section VIS-column-2-layout w-100">' +
+                        '<div class="VIS-column-item"><h2>' + VIS.Msg.getMsg("Category") + '</h2><p>' + VIS.Msg.getMsg("VA048_CallType") + '</p></div>' +
+                        '<div class="VIS-column-item"><h2>' + VIS.Msg.getMsg("VA048_Duration") + '</h2><p>' + duration + '</p></div>' +
+                        '</section>' +
+                        '</div>' +
+                        '<section class="VIS-agenda-section">' +
+                        '<h2>' + VIS.Msg.getMsg("VA048_Notes") + '</h2>' +
+                        '<p>' + result.VA048_CallNotes + '</p>' +
+                        '</section>' +
+                        '<section class="VIS-transcript-section">' +
+                        '<h2>Transcript</h2>' +
+                        '</section>' +
+                        '</div>' +
+                        '<section class="VIS-comments-section">' +
+                        '<div class="VIS-comment-header">' +
+                        '<h2>Comments</h2></div>' +
+                        '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>' +
+                        '<div id="VIS_commentsdata' + window_No + '" class="vis-attachhistory-comments-container"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100">' +
+                        '<p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments"> ' + VIS.Msg.getMsg('ViewMoreComments') + '</p>' +
+                        '<div class="VIS-comment-input">' +
+                        '<input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '" class="VIS-comment-field">' +
+                        '<button class="VIS-send-button" id="VIS_btnComments' + window_No + '">➤</button>' +
+                        '</div></div>' +
+                        '</section>');
 
                     $printhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
                         + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
@@ -862,17 +1322,22 @@
                         + '</div>'
                         + '</div>');
 
-                    $footerhtml = $('<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
-                        + '</div>');
+                    target.append($callhtml);
+                    target.show();
 
-                    var $contenthtml = $('<div class="VIS-mail-header VIS-tp-recordDetail"></div>');
-                    $contenthtml.append($callhtml); //.append($footerhtml);
-                    $rootcontent.append($htmlcontent).append($contenthtml);
+                    //$footerhtml = $('<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
+                    //    + '</div>');
 
-                    if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
-                        $root.append($rootcontent);
-                    if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
-                        $root.append($paginghtml);
+                    //var $contenthtml = $('<div class="VIS-mail-header VIS-tp-recordDetail"></div>');
+                    //$contenthtml.append($callhtml); //.append($footerhtml);
+                    //$rootcontent.append($htmlcontent).append($contenthtml);
+
+                    //if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
+                    //    $root.append($rootcontent);
+
+                    //if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
+                    //    $root.append($paginghtml);
+
                     lastHistoryComment(VIS.Utility.Util.getValueOfInt(_mattachID), false, true);
 
                     $('#VIS_recordDetail' + window_No).show();
@@ -916,7 +1381,7 @@
             });
         };
 
-        function showAppointmentInfo(ID, UserName, window_No) {
+        function showAppointmentInfo(ID, target, window_No) {
             var attdInfo = "";
             var $appthtml;
             var ds = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedAppointmentDetails", { "record_ID": ID }, null);
@@ -924,48 +1389,40 @@
             if (ds != null) {
                 strApp = "";
                 _mattachID = VIS.Utility.Util.getValueOfString(ds["AppointmentsInfo_ID"]);
-                var attInfo = ds["AttendeeInfo"];
-                if (attInfo != null && attInfo != "") {
-                    names = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AttachmentHistory/GetUser", { "UserQry": attInfo }, null);
-                    if (names != null && names.length > 0) {
-                        strApp = "";
-                        for (var k = 0; k < names.length; k++) {
-                            strApp += names[k] + ", ";
-                        }
-                        strApp = strApp.substring(0, strApp.length - 2);
-                        attdInfo = strApp;
-                    }
-                }
 
-                if ($rootcontent.length < 1) {
-                    $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
-                }
-                $rootcontent.empty();
+                $appthtml = $('<div class="VIS-main-content">' +
+                    '<div class="VIS-top-row">' +
+                    '<section class="VIS-agenda-section">' +
+                    '<h2>' + VIS.Msg.getMsg("Description") + '</h2>' +
+                    '<p>' + ds["Description"] + '</p>' +
+                    '</section>' +
+                    '<section class="VIS-attachment-section">' +
+                    (ds["MeetingUrl"] != "" && ds["Transcript"] == "" ? '<div class="VIS-attachment-content">' +
+                        '<span data-tid="' + ds["TokenRef_ID"] + '" data-joinurl="' + ds["MeetingUrl"] + '" data-rid="' + ID + '" data-joinurl="'
+                        + ds["MeetingUrl"] + '" class="VIS-btn-Transcript">' +
+                        '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/chat-download-icon.svg" alt="Download Transcript" title="' + VIS.Msg.getMsg('DownloadTranscript') + '">' +
+                        //'<i class="fa fa-clone"></i></span>' +
+                        '</div>' : "") +
+                    '</section>' +
+                    '</div>' +
+                    '<section class="VIS-transcript-section">' +
+                    '<h2>' + VIS.Msg.getMsg("Transcript") + '</h2>' +
+                    '<pre>' + ds["Transcript"] + '</pre>' +
+                    '</section>' +
+                    '</div>' +
 
-                $htmlcontent = $('<div class="VIS-tp-borderBott"><div class="VIS-contentHeadOuter">' +
-                    '<div class= "VIS-tp-recordIcon" ><i class="vis vis-task" title="task"></i></div >' +
-                    '<div class="VIS-contentHead"><div class="VIS-contentTitile"><h6 class="mb-0">' + VIS.Msg.getMsg("Appointment") + '</h6><small>' + ds["Subject"] + '</small></div>' +
-                    '<div class="align-items-center d-flex VIS-tp-rightIcons"><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span>' +
-                    '<span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div></div></div>');
-
-                $appthtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
-                    + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
-                    + '<div >'
-                    + '<table height="50px" width="100%">'
-                    + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("Location") + '</td><td>' + VIS.Msg.getMsg("AllDay") + '</td></tr>'
-                    + '<tr class="VIS-call-col-data"><td>' + ds["Location"] + '</td><td>' + ds["Allday"] + '</td></tr>'
-                    + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("StartDate") + '</td><td>' + VIS.Msg.getMsg("EndDate") + '</td></tr>'
-                    + '<tr class="VIS-call-col-data"><td>' + new Date(ds["StartDate"]).toLocaleString() + '</td><td>' + new Date(ds["EndDate"]).toLocaleString() + '</td></tr>'
-                    + '<tr class="VIS-call-col-header"><td colspan="2">' + VIS.Msg.getMsg("Contacts") + '</td></tr>'
-                    + '<tr class="VIS-call-col-data"><td colspan="2">' + attdInfo + '</td></tr>'
-                    + '<tr class="VIS-call-col-header"><td colspan="2">' + VIS.Msg.getMsg("Description") + '</td></tr>'
-                    + '<tr class="VIS-call-col-data"><td colspan="2">' + ds["Description"] + '</td></tr>'
-                    + '</table>'
-                    + '</div>'
-                    + '</div>'
-                    + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>'
-                    + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
-                    + '</div>');
+                    '<section class="VIS-comments-section">' +
+                    '<div class="VIS-comment-header">' +
+                    '<h2>Comments</h2>' +
+                    '</div>' +
+                    '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>' +
+                    '<div id="VIS_commentsdata' + window_No + '" class="vis-attachhistory-comments-container"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100">' +
+                    '<p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments"> ' + VIS.Msg.getMsg('ViewMoreComments') + '</p>' +
+                    '<div class="VIS-comment-input">' +
+                    '<input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '" class="VIS-comment-field">' +
+                    '<button class="VIS-send-button" id="VIS_btnComments' + window_No + '">➤</button>' +
+                    '</div></div>' +
+                    '</section>');
 
                 $printhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
                     + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
@@ -983,21 +1440,39 @@
                     + '</div>'
                     + '</div>');
 
-                $footerhtml = $('<div id="ViewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div><div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
-                    + '</div>');
+                target.append($appthtml);
+                target.show();
 
-                var $contenthtml = $('<div class="VIS-mail-header VIS-tp-recordDetail"></div>');
-                $contenthtml.append($appthtml); //.append($footerhtml);
-                $rootcontent.append($htmlcontent).append($contenthtml);
+                //var $contenthtml = $('<div class="VIS-mail-header VIS-tp-recordDetail"></div>');
+                //$contenthtml.append($appthtml); //.append($footerhtml);
+                //$rootcontent.append($htmlcontent).append($contenthtml);
 
-                if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
-                    $root.append($rootcontent);
-                if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
-                    $root.append($paginghtml);
+                //if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
+                //    $root.append($rootcontent);
+
+                //if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
+                //    $root.append($paginghtml);
                 lastHistoryComment(VIS.Utility.Util.getValueOfInt(_mattachID), true, false);
 
-                attdInfo = "";
-                $('#VIS_recordDetail' + window_No).show();
+                target.find('.VIS-btn-Transcript').click(function (e) {
+                    var url = $(this).data('joinurl');
+                    var rID = $(this).data('rid');
+                    userAccountID = $(this).data('tid');
+
+                    if (window.VA101 && url != "") {
+                        if (userAccountID == 0) {
+                            userAccountID = GetorCreateAPIUserAccount();
+                            if (userAccountID > 0) {
+                                $('#VIS_tabPanelDataLoader' + window_No).show();
+                                downloadTranscript(rID, url, target.find(".VIS-transcript-section"));
+                            }
+                        }
+                        else {
+                            $('#VIS_tabPanelDataLoader' + window_No).show();
+                            downloadTranscript(rID, url, target.find(".VIS-transcript-section"));
+                        }
+                    }
+                });
                 $('#VIS_btnComments' + window_No).click(function (e) {
                     saveComments(true, false, e);
                 });
@@ -1016,6 +1491,7 @@
                     else
                         viewAll(VIS.Utility.Util.getValueOfInt(_mattachID), true, false);
                 });
+
                 $('#VIS_prtHistory' + window_No).find('i').click(function () {
                     finalPrint($printhtml.html());
                 });
@@ -1032,10 +1508,49 @@
                     setContentHeight();
                 });
             }
+            else {
+                $('#VIS_tabPanelDataLoader' + window_No).hide();
+            }
         };
 
-        function showTask(rID, UserName, window_No) {
+        function GetorCreateAPIUserAccount() {
+            var dr = VIS.dataContext.getJSONRecord("VIS/HistoryDetailsData/GetUserAccount", { Provider: "" });
+            if (dr != null) {
+                userAccountID = dr.UserAccount_ID;
+                if (dr.ErrorMsg != "") {
+                    var param = {
+                        UserAccountID: userAccountID,
+                        AuthCredentialID: dr.AuthCredentialID,
+                        AuthProviderID: $(this).data('id')
+                    }
+                    obj = new VA101.VA101_GetAuthToken(window_No, param);
+                    obj.show();
+                    obj.onClose = function (userAccountID) {
+                        userAccountID = userAccountID;
+                    }
+                }
+            }
+            return userAccountID;
+        }
 
+        function downloadTranscript(ID, joinUrl, target) {
+            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "VIS/HistoryDetailsData/DownloadTranscript",
+                { "AppointmentID": ID, "UserAccountID": userAccountID, "MeetingUrl": joinUrl }, function (dr) {
+                    if (dr != null) {
+                        //target.empty();
+                        if (dr.ErrorMsg != "") {
+                            VIS.ADialog.info("", "", dr.ErrorMsg);
+                        }
+                        else if (dr["transcript"]) {
+                            //'<pre>' + dr["transcript"] + '</pre>'
+                            target.find('pre').text(dr["transcript"]);
+                        }
+                        $('#VIS_tabPanelDataLoader' + window_No).hide();
+                    }
+                });
+        }
+
+        function showTask(rID, target, window_No) {
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedTaskDetails",
                 datatype: "json",
@@ -1088,44 +1603,90 @@
                             }
                         }
 
-                        if ($rootcontent.length < 1) {
-                            $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
-                        }
-                        $rootcontent.empty();
+                        //if ($rootcontent.length < 1) {
+                        //    $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
+                        //}
+                        //$rootcontent.empty();
 
-                        $htmlcontent = $('<div class="VIS-tp-borderBott"><div class="VIS-contentHeadOuter">' +
-                            '<div class= "VIS-tp-recordIcon" ><i class="vis vis-task" title="task"></i></div >' +
-                            '<div class="VIS-contentHead"><div class="VIS-contentTitile"><h6 class="mb-0">' + VIS.Msg.getMsg("Task") + '</h6><small>' + result.Subject + '</small></div>' +
-                            '<div class="align-items-center d-flex VIS-tp-rightIcons"><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span>' +
-                            '<span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div></div></div>');
+                        //$htmlcontent = $('<div class="VIS-tp-borderBott"><div class="VIS-contentHeadOuter">' +
+                        //    '<div class= "VIS-tp-recordIcon" ><i class="vis vis-task" title="task"></i></div >' +
+                        //    '<div class="VIS-contentHead"><div class="VIS-contentTitile"><h6 class="mb-0">' + VIS.Msg.getMsg("Task") + '</h6><small>' + result.Subject + '</small></div>' +
+                        //    '<div class="align-items-center d-flex VIS-tp-rightIcons"><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span>' +
+                        //    '<span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div></div></div>');
 
-                        $taskhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
-                            + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
-                            + '<div class="VIS-tp-taskcontTag" >'
-                            + (result.IsTaskClosed ? '<span class="VIS-tp-taskTag">' + VIS.Msg.getMsg("Closed") + '</span>' : '')
-                            + '<table height="50px" width="100%">'
-                            + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("Priority") + '</td><td>' + VIS.Msg.getMsg("Status") + '</td></tr>'
-                            + '<tr class="VIS-call-col-data"><td style="' + prtyTextColor + '">' + prtyText + '</td><td>' + (VIS.Utility.Util.getValueOfInt(result.TaskStatus) * 10) + '%</td></tr>'
-                            + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("StartDate") + '</td><td>' + VIS.Msg.getMsg("EndDate") + '</td></tr>'
-                            + '<tr class="VIS-call-col-data"><td>' + new Date(result.StartDate).toLocaleString() + '</td><td>' + new Date(result.EndDate).toLocaleString() + '</td></tr>'
-                            + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("ASSIGNEDTO") + '</td><td>' + VIS.Msg.getMsg("Category") + '</td></tr>'
-                            + '<tr class="VIS-call-col-data"><td>' + result.AssignedTo + '</td><td>' + result.CategoryName + '</td></tr>'
-                            + '<tr class="VIS-call-col-header"><td colspan="2">' + VIS.Msg.getMsg("Result") + '</td></tr>'
-                            + '<tr class="VIS-call-col-data"><td colspan="2">' + result.Result + '</td></tr>'
-                            + '<tr class="VIS-call-col-header"><td colspan="2">' + VIS.Msg.getMsg("Description") + '</td></tr>'
-                            + '<tr class="VIS-call-col-data"><td colspan="2">' + result.Description + '</td></tr>'
-                            + '<tr><td><div class="vis-float-left vis-frm-ls-top"><input id="VIS_chkTaskComplete' + window_No
+                        //$taskhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
+                        //    + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
+                        //    + '<div class="VIS-tp-taskcontTag" >'
+                        //    + (result.IsTaskClosed ? '<span class="VIS-tp-taskTag">' + VIS.Msg.getMsg("Closed") + '</span>' : '')
+                        //    + '<table height="50px" width="100%">'
+                        //    + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("Priority") + '</td><td>' + VIS.Msg.getMsg("Status") + '</td></tr>'
+                        //    + '<tr class="VIS-call-col-data"><td style="' + prtyTextColor + '">' + prtyText + '</td><td>' + (VIS.Utility.Util.getValueOfInt(result.TaskStatus) * 10) + '%</td></tr>'
+                        //    + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("StartDate") + '</td><td>' + VIS.Msg.getMsg("EndDate") + '</td></tr>'
+                        //    + '<tr class="VIS-call-col-data"><td>' + new Date(result.StartDate).toLocaleString() + '</td><td>' + new Date(result.EndDate).toLocaleString() + '</td></tr>'
+                        //    + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("ASSIGNEDTO") + '</td><td>' + VIS.Msg.getMsg("Category") + '</td></tr>'
+                        //    + '<tr class="VIS-call-col-data"><td>' + result.AssignedTo + '</td><td>' + result.CategoryName + '</td></tr>'
+                        //    + '<tr class="VIS-call-col-header"><td colspan="2">' + VIS.Msg.getMsg("Result") + '</td></tr>'
+                        //    + '<tr class="VIS-call-col-data"><td colspan="2">' + result.Result + '</td></tr>'
+                        //    + '<tr class="VIS-call-col-header"><td colspan="2">' + VIS.Msg.getMsg("Description") + '</td></tr>'
+                        //    + '<tr class="VIS-call-col-data"><td colspan="2">' + result.Description + '</td></tr>'
+                        //    + '<tr><td><div class="vis-float-left vis-frm-ls-top"><input id="VIS_chkTaskComplete' + window_No
+                        //    + '" value="1" type="checkbox" class="vis-float-left"><label id="VIS_lblTaskComplete' + window_No
+                        //    + '" for="chkTaskComplete" class="wsp-task-from-inputLabel vis-float-left" style="margin:0 0 0 5px;">' + VIS.Msg.getMsg("Closed")
+                        //    + '</label></div></td><td><div class="vis-float-right"><a href="javascript:void(0)" id="VIS_hlnktaskdone' + window_No
+                        //    + '" class="vis-btn vis-btn-done vis-icon-doneButton vis-float-right vis-btnOk"> <span class="vis-btn-ico vis-btn-done-bg vis-btn-done-border"></span>'
+                        //    + VIS.Msg.getMsg("Done") + '</a></div></td></tr>'
+                        //    + '</table>'
+                        //    + '</div>'
+                        //    + '</div>'
+                        //    + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>'
+                        //    + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
+                        //    + '</div>');
+
+                        $taskhtml = $('<div class="VIS-main-content">' +
+                            '<div class="VIS-top-row">' + (result.IsTaskClosed ? '<span class="VIS-tp-taskTag">' + VIS.Msg.getMsg("Closed") + '</span>' : '') +
+                            '<section class="VIS-agenda-section VIS-column-2-layout w-75">' +
+                            '<div class="VIS-column-item"><h2>' + VIS.Msg.getMsg("Category") + '</h2><p>' + result.CategoryName + '</p></div>' +
+                            '<div class="VIS-column-item"><h2>' + VIS.Msg.getMsg("ASSIGNEDTO") + '</h2><p>' + result.AssignedTo + '</p></div>' +
+                            '<div class="VIS-column-item"><h2>' + VIS.Msg.getMsg("StartDate") + '</h2><p>' + new Date(result.StartDate).toLocaleString() + '</p></div>' +
+                            '<div class="VIS-column-item"><h2>' + VIS.Msg.getMsg("EndDate") + '</h2><p>' + new Date(result.EndDate).toLocaleString() + '</p></div>' +
+                            '</section>' +
+                            '<section class="VIS-column-2-layout">' +
+                            '<div class="VIS-column-item" style="width: 80px;">' +
+                            '<h2>' + VIS.Msg.getMsg("Priority") + '</h2><p style="VIS-' + prtyTextColor + '">' + prtyText + '</p></div>' +
+                            '<div class="VIS-column-item"><h2>' + VIS.Msg.getMsg("Status") + '</h2><p>' + (VIS.Utility.Util.getValueOfInt(result.TaskStatus) * 10) + '%</p></div>' +
+                            '</section></div> ' +
+                            '<div class="VIS-top-row"><div class="vis-float-left vis-frm-ls-top"><input id="VIS_chkTaskComplete' + window_No
                             + '" value="1" type="checkbox" class="vis-float-left"><label id="VIS_lblTaskComplete' + window_No
                             + '" for="chkTaskComplete" class="wsp-task-from-inputLabel vis-float-left" style="margin:0 0 0 5px;">' + VIS.Msg.getMsg("Closed")
                             + '</label></div></td><td><div class="vis-float-right"><a href="javascript:void(0)" id="VIS_hlnktaskdone' + window_No
                             + '" class="vis-btn vis-btn-done vis-icon-doneButton vis-float-right vis-btnOk"> <span class="vis-btn-ico vis-btn-done-bg vis-btn-done-border"></span>'
-                            + VIS.Msg.getMsg("Done") + '</a></div></td></tr>'
-                            + '</table>'
-                            + '</div>'
-                            + '</div>'
-                            + '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>'
-                            + '<div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
-                            + '</div>');
+                            + VIS.Msg.getMsg("Done") + '</a></div></div>' +
+                            '<section class="VIS-agenda-section">' +
+                            '<h2>' + VIS.Msg.getMsg("Result") + '</h2>' +
+                            '<div class="VIS-conversation"><div class="VIS-message">' +
+                            '<p>' + result.Result + '</p>' +
+                            '</div></section>' +
+                            '<section class="VIS-agenda-section">' +
+                            '<h2>' + VIS.Msg.getMsg("Description") + '</h2>' +
+                            '<div class="VIS-conversation"><div class="VIS-message">' +
+                            '<p>' + result.Description + '</p>' +
+                            '</div>' +
+                            '</section>' +
+                            '<section class="VIS-transcript-section">' +
+                            '<h2>Transcript</h2>' +
+                            '</section>' +
+                            '</div>' +
+                            '<section class="VIS-comments-section">' +
+                            '<div class="VIS-comment-header">' +
+                            '<h2>Comments</h2></div>' +
+                            '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>' +
+                            '<div id="VIS_commentsdata' + window_No + '" class="vis-attachhistory-comments-container"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100">' +
+                            '<p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments"> ' + VIS.Msg.getMsg('ViewMoreComments') + '</p>' +
+                            '<div class="VIS-comment-input">' +
+                            '<input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '" class="VIS-comment-field">' +
+                            '<button class="VIS-send-button" id="VIS_btnComments' + window_No + '">➤</button>' +
+                            '</div></div>' +
+                            '</section>');
 
                         $printhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
                             + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
@@ -1146,21 +1707,26 @@
                             + '</div>'
                             + '</div>');
 
-                        $footerhtml = $('<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div><div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
-                            + '</div>');
+                        target.append($taskhtml);
+                        target.show();
 
-                        var $contenthtml = $('<div class="VIS-mail-header VIS-tp-recordDetail"></div>');
-                        $contenthtml.append($taskhtml); //.append($footerhtml);
-                        $rootcontent.append($htmlcontent).append($contenthtml);
+                        //$footerhtml = $('<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div><div id="VIS_commentsdata' + window_No + '"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100"><p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments" > ' + VIS.Msg.getMsg('ViewMoreComments') + '</p><div class="vis-attachhistory-comments vis-feedMessage m-0"><input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '"></input><span id="VIS_btnComments' + window_No + '" class="vis-attachhistory-comment-icon vis vis-sms"></span></div></div>'
+                        //    + '</div>');
 
-                        if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
-                            $root.append($rootcontent);
-                        if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
-                            $root.append($paginghtml);
+                        //var $contenthtml = $('<div class="VIS-mail-header VIS-tp-recordDetail"></div>');
+                        //$contenthtml.append($taskhtml); //.append($footerhtml);
+                        //$rootcontent.append($htmlcontent).append($contenthtml);
+
+                        //if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
+                        //    $root.append($rootcontent);
+
+                        //if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
+                        //    $root.append($paginghtml);
+
                         lastHistoryComment(VIS.Utility.Util.getValueOfInt(_mattachID), true, false);
-
                         attdInfo = "";
-                        $('#VIS_recordDetail' + window_No).show();
+
+                        // $('#VIS_recordDetail' + window_No).show();
                         $('#VIS_btnComments' + window_No).click(function (e) {
                             saveComments(true, false, e);
                         });
@@ -1201,11 +1767,10 @@
                             $taskhtml.find("#VIS_chkTaskComplete" + window_No).hide();
                             $taskhtml.find("#VIS_hlnktaskdone" + window_No).hide();
                             $taskhtml.find("#VIS_lblTaskComplete" + window_No).hide();
-
                         }
+
                         // Task is updated when task is closed from tab panel
                         $taskhtml.find("#VIS_hlnktaskdone" + window_No).on("click", function (e) {
-
                             if ($lblTaskMsg != null)
                                 $lblTaskMsg.empty();
                             var t_title = result.Subject;
@@ -1269,8 +1834,7 @@
             });
         };
 
-        function showAttachment(ID, UserName, window_No) {
-
+        function showAttachment(target, ID, UserName, window_No) {
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedAttachmentDetails",
                 datatype: "json",
@@ -1282,7 +1846,6 @@
                     var attchFile = '', attachments = '';
 
                     if (result != null && result.length > 0) {
-
                         for (var i = 0; i < result.length; i++) {
                             var imgTag = '';
                             if (VIS.Utility.Util.getValueOfString(result[i].FileType).toString().toLower() == '.doc' || VIS.Utility.Util.getValueOfString(result[i].FileType).toString().toLower() == '.docx') {
@@ -1312,12 +1875,36 @@
                         }
                     }
 
-                    if ($rootcontent.length < 1) {
-                        $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
-                    }
-                    $rootcontent.empty();
+                    $htmlcontent = $('<div class="VIS-main-content"><div class="VIS-top-row">' +
+                        '<section class="VIS-attachment-section"><h2>' + VIS.Msg.getMsg("Attachment") + '</h2>' +
+                        attachments +
+                        //'<div class="VIS-attachment-content">' +
+                        //'<div class="VIS-downloadAll-link"><i id="dwnldAllAttach' + window_No + '" class="vis vis-import" title="Download All" style="opacity: 1;"></i>' +
+                        //'<span id="dwnldAllAttach' + window_No + '">' + VIS.Msg.getMsg("VIS_DownloadAll") + (noOfAttchs > 0 ? ' (' + noOfAttchs + ')' : '') +
+                        //'</span><span id="showAttachment' + window_No + '" class="vis vis-arrow-down"></span></div>' +
+                        //'<div class="VIS-attachment-list" style="display:none;"></div>' +
+                        '</div></section></div></div >' +
 
-                    $htmlcontent = $('<div class="VIS-contentHeadOuter VIS-tp-borderBott"><div class= "VIS-tp-recordIcon" ><i class="vis vis-attachmentx"></i></div><div class="VIS-contentHead"><span class="VIS-letter-header">' + VIS.Msg.getMsg('Attachment') + '</span></div><div class="align-items-center d-flex VIS-tp-rightIcons" ><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span><span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div>');
+                        '<section class="VIS-comments-section">' +
+                        '<div class="VIS-comment-header"><h2>Comments</h2></div>' +
+                        '<div id="VIS_viewMoreComments' + window_No + '" style="display:none;" class="VIS-tp-commentsPanel"></div>' +
+                        '<div id="VIS_commentsdata' + window_No + '" class="vis-attachhistory-comments-container"><div class="pr-0 m-0 VIS-tp-commentsField d-flex flex-column w-100">' +
+                        '<p id="VIS_viewAllComments' + window_No + '" class="vis-attachhistory-view-comments"> ' + VIS.Msg.getMsg('ViewMoreComments') + '</p>' +
+                        '<div class="VIS-comment-input">' +
+                        '<input id="VIS_txtComments' + window_No + '" type="text" placeholder="' + VIS.Msg.getMsg('TypeComment') + '" class="VIS-comment-field">' +
+                        '<button class="VIS-send-button" id="VIS_btnComments' + window_No + '">➤</button>' +
+                        '</div></div>' +
+                        '</section>');
+
+                    target.append($htmlcontent);
+                    target.show();
+
+                    //if ($rootcontent.length < 1) {
+                    //    $rootcontent = $('<div id="VIS_recordDetail' + window_No + '" class="VIS-tp-detailsPanel"></div>');
+                    //}
+                    //$rootcontent.empty();
+
+                    //$htmlcontent = $('<div class="VIS-contentHeadOuter VIS-tp-borderBott"><div class= "VIS-tp-recordIcon" ><i class="vis vis-attachmentx"></i></div><div class="VIS-contentHead"><span class="VIS-letter-header">' + VIS.Msg.getMsg('Attachment') + '</span></div><div class="align-items-center d-flex VIS-tp-rightIcons" ><span id="VIS_prtHistory' + window_No + '"><i class="vis vis-print" title="Print"></i></span><span><i id="VIS_prevRecord' + window_No + '" class="fa fa-arrow-left"></i></span><span><i id="VIS_nextRecord' + window_No + '" class="fa fa-arrow-right"></i></span><span class="VIS-close-btn" id="VIS_btnClose' + window_No + '"><i class="vis vis-cross"></i></span></div></div>');
                     $printhtml = $('<div class="VIS-tp-contentdiv">'
                         + '<div class="VIS-tp-contentWrap VIS-tp-attachmentContent">'
                         + attachments
@@ -1326,13 +1913,12 @@
 
                     var $contenthtml = $('<div class="VIS-mail-header VIS-tp-recordDetail"></div>');
                     $contenthtml.append($printhtml);
-                    $rootcontent.append($htmlcontent).append($contenthtml);
+                    //$rootcontent.append($htmlcontent).append($contenthtml);
 
-                    if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
-                        $root.append($rootcontent);
-                    if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
-                        $root.append($paginghtml);
+                    //if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
+                    //    $root.append($rootcontent);
 
+                    $('#VIS_tabPanelDataLoader' + window_No).hide();
                     attdInfo = "";
                     $('#VIS_recordDetail' + window_No).show();
                     $(".VIS-tp-attachInfo").click(function (e) {
@@ -1359,7 +1945,6 @@
         };
 
         function showChat(ID, UserName, window_No) {
-
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedChatDetails",
                 datatype: "json",
@@ -1459,8 +2044,8 @@
 
                     if (!$root.html().toString().contains('VIS_recordDetail' + window_No))
                         $root.append($rootcontent);
-                    if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
-                        $root.append($paginghtml);
+                    //if (!$root.html().toString().contains('VIS_pagingHtml' + window_No))
+                    //    $root.append($paginghtml);
 
                     attdInfo = "";
                     $('#VIS_recordDetail' + window_No).show();
@@ -1581,11 +2166,9 @@
         };
 
         function downLoadAttach(ID, name) {
-
             if (ID == null || ID == 0) {
                 return;
             }
-
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/DownloadAttachment",
                 datatype: "json",
@@ -1713,7 +2296,7 @@
                     return;
                 }
             }
-            if (e.keyCode == undefined && !$(target).hasClass("vis-attachhistory-comment-icon")) {
+            if (e.keyCode == undefined && !$(target).hasClass("VIS-send-button")) {
                 return;
             }
             var ID = 0;
@@ -1727,7 +2310,7 @@
             if (comme.length == 0) {
                 return;
             }
-
+            $('#VIS_tabPanelDataLoader' + window_No).show();
             $.ajax({
                 url: VIS.Application.contextUrl + "AttachmentHistory/SaveComment",
                 datatype: "json",
@@ -1785,9 +2368,10 @@
                             $('#VIS_viewMoreComments' + window_No).append($commenthtml);
                         }
                     }
-
+                    $('#VIS_tabPanelDataLoader' + window_No).hide();
                 },
                 error: function (data) {
+                    $('#VIS_tabPanelDataLoader' + window_No).hide();
                     VIS.ADialog.error("RecordNotSaved");
                 }
             });
@@ -1862,7 +2446,6 @@
                 ' <p class="VIS-attachhistory-comment-text">' + result.CharacterData + '</p>' +
                 '</div></div > ';
             if (!$('#VIS_commentsdata' + window_No).html().contains("VIS_commentsMsg")) {
-
                 str = '<div id="VIS_commentsMsg' + window_No + '" class="vis-attachhistory-comment-data  mb-0 VIS-tp-commentData">' + str + "</div >";
             }
             return str;
@@ -1888,6 +2471,7 @@
                             $('#VIS_commentsdata' + window_No).prepend(cmt);
 
                     }
+                    $('#VIS_tabPanelDataLoader' + window_No).hide();
                 },
             });
         };

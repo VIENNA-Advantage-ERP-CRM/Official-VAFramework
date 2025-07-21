@@ -131,6 +131,7 @@ namespace VIS
             //     "~/Areas/VIS/Scripts/app/Framework/jquery-touch.js",
 
             //     "~/Areas/VIS/Scripts/app/Framework/bulkdownload.js",
+            //      "~/Areas/VIS/Scripts/app/Framework/VIS_SecretKeyDialog.js",
 
             //     "~/Areas/VIS/Scripts/app/forms/productContainer.js",
             //     "~/Areas/VIS/Scripts/app/forms/productContainerMove.js",
@@ -201,7 +202,8 @@ namespace VIS
             //    "~/Areas/VIS/Content/BudgetControl.css",
             //    "~/Areas/VIS/Content/HistoryTabPanel.css",
             //    "~/Areas/VIS/Content/SurveyTabPanel.css",
-            //    "~/Areas/VIS/Content/emailLinkStyle.css"
+            //    "~/Areas/VIS/Content/emailLinkStyle.css",
+            //    "~/Areas/VIS/Content/VIS_SecretKey.css"
             //   );
 
 

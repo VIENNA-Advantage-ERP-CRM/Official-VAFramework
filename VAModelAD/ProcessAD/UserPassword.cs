@@ -19,6 +19,8 @@ using VAdvantage.Utility;
 using VAdvantage.ProcessEngine;
 using System.Reflection;
 using VAdvantage.Logging;
+using System.Data;
+using System.Dynamic;
 
 
 namespace VAdvantage.Process
@@ -69,6 +71,12 @@ namespace VAdvantage.Process
 
             MUser user = MUser.Get(GetCtx(), p_AD_User_ID);
             MUser current = MUser.Get(GetCtx(), GetAD_User_ID());
+             
+            //Get Uncashed value of IsEncrypted and IsHashed pf password column
+            DataSet ds = DB.ExecuteDataset("SELECT IsEncrypted,IsHashed from AD_Column WHERE AD_Column_ID=" + 417);
+            dynamic column = new ExpandoObject();
+            column.IsEncrypted = Util.GetValueOfString(ds.Tables[0].Rows[0]["IsEncrypted"]) == "Y";
+            column.IsHashed = Util.GetValueOfString(ds.Tables[0].Rows[0]["IsHashed"]) == "Y";
 
 
             if (!current.IsAdministrator() && p_AD_User_ID != GetAD_User_ID() && user.HasRole())
@@ -85,7 +93,12 @@ namespace VAdvantage.Process
                     throw new ArgumentException("@OldPasswordMandatory@");
                 else if (!p_OldPassword.Equals(user.GetPassword()))
                 {
-                    if (!SecureEngine.Encrypt(p_OldPassword).Equals(user.GetPassword()))
+                    if (column.IsEncrypted && !SecureEngine.Encrypt(p_OldPassword).Equals(user.GetPassword()))
+                    {
+                        throw new ArgumentException("@OldPasswordNoMatch@");
+                    }
+
+                    else if (column.IsHashed && !SecureEngine.VerifyHash(p_OldPassword, user.GetPassword(), null))
                     {
                         throw new ArgumentException("@OldPasswordNoMatch@");
                     }
@@ -93,7 +106,15 @@ namespace VAdvantage.Process
             }
 
             else if (!p_CurrentPassword.Equals(current.GetPassword()))
-                throw new ArgumentException("@OldPasswordNoMatch@");
+            {
+                if (column.IsHashed && SecureEngine.VerifyHash(p_CurrentPassword, current.GetPassword(), null))
+                {
+                    ;
+                }
+                else
+                    throw new ArgumentException("@OldPasswordNoMatch@");
+            }
+                
 
             string validatePwd = Common.Common.ValidatePassword(null, p_NewPassword, p_NewPassword);
             if (validatePwd.Length > 0)
@@ -109,18 +130,19 @@ namespace VAdvantage.Process
                 Common.Common.UpdatePasswordAndValidity(p_NewPassword, p_AD_User_ID, GetAD_User_ID(), -1, GetCtx());
             }
             else
-            {
+            { //reset other user password
                 sql += ", PasswordExpireOn = null";
-            }
+                if (!string.IsNullOrEmpty(p_NewPassword))
+                {
+                    if (column.IsEncrypted)
+                        p_NewPassword = SecureEngine.Encrypt(p_NewPassword);
+                    else if(column.IsHashed)
+                        p_NewPassword = SecureEngine.ComputeHash(p_NewPassword);
 
-
-            if (!string.IsNullOrEmpty(p_NewPassword))
-            {
-                MColumn column = MColumn.Get(GetCtx(), 417); // Password Column 
-                if (column.IsEncrypted())
-                    p_NewPassword = SecureEngine.Encrypt(p_NewPassword);
-                sql += ", Password=" + GlobalVariable.TO_STRING(p_NewPassword);
+                    sql += ", Password=" + GlobalVariable.TO_STRING(p_NewPassword);
+                }
             }
+            
             if (!string.IsNullOrEmpty(p_NewEMail))
                 sql += ", Email=" + GlobalVariable.TO_STRING(p_NewEMail);
             if (!string.IsNullOrEmpty(p_NewEMailUser))

@@ -72,6 +72,9 @@
             createBusyIndicator();
             showBusy(true);
             getworkflowWidget(true, true);
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
         };
         /* Get controls from root */
         function getControls() {
@@ -113,7 +116,7 @@
             });
             $txtSearch.on("keydown", function (e) {
                 if (e.keyCode == 13) {
-                    showBusy(true);
+                   // showBusy(true);
                     searchFunction();
                 }
             });
@@ -263,7 +266,7 @@
             $.ajax({
                 url: VIS.Application.contextUrl + "WFActivity/GetActivities",
                 data: { pageNo: pageNo, pageSize: PageSize, refresh: refresh, searchText: searchText, "AD_Window_ID": windowID, "dateFrom": fromDate, "dateTo": toDate, "AD_Node_ID": nodeID },//$self.windowNo
-                async: async,
+                //async: async,
                 dataType: "json",
                 type: "POST",
                 error: function () {
@@ -535,7 +538,7 @@
                 $addDetails_ID.empty();
                 $.ajax({
                     url: VIS.Application.contextUrl + "WFActivity/GetActivityInfo",
-                    async: false,
+                    async: true,
                     dataType: "json",
                     type: "POST",
                     data: {
@@ -813,7 +816,7 @@
                 else {
                     var id = $(aOk).data("id");
                     approveIt(id, aOk);
-                    //showBusy(false);
+                    showBusy(false);
                 }
             };
             //Given Approve
@@ -864,6 +867,7 @@
                                 });
                             break;
                         }
+                        showBusy(false);
                     }
                     catch (e) {
                         showBusy(false);
@@ -1032,6 +1036,9 @@
                                     divHistoryNode.append(divAppBy);
 
                                 }
+                                else if (info.Node[node].History[hNode].State == 'BK') {
+                                    continue;
+                                }
                                 else if ((node < (info.Node.length - 1)) || info.Node.length == 1) {
                                     var divAppBy = $("<div class='vis-pending_wrap' >");
                                     divAppBy.append($("<div class='vis-left-part'>").append(info.Node[node].Name));
@@ -1129,7 +1136,7 @@
                 var lookupCur = new VIS.MGAttributeLookup(VIS.context, 0);
                 $.ajax({
                     url: VIS.Application.contextUrl + "WFActivity/GetRelativeData",
-                    async: false,
+                    async: true,
                     data: { activityID: wfActivityID },
                     dataType: "json",
                     success: function (dyndata) {
@@ -1209,6 +1216,7 @@
                 $row.css('display', 'block');
             });
             $workflowWidgetDtls_ID.scrollTop(0);
+            showBusy(false);
         };
 
         var ansBtnClick = function (index, AD_Window_ID, columnName) {

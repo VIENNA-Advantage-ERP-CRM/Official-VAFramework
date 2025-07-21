@@ -241,6 +241,16 @@ namespace VIS.Controllers
                         ModelState.AddModelError("", "UserPwdError");
                     }
                 }
+                catch (AggregateException ex)
+                {
+                    string msg = "";
+                    foreach (var inner in ex.InnerExceptions)
+                    {
+                        // Log this or debug
+                        msg += " -> " + inner.Message; // or use logging
+                    }
+                    ModelState.AddModelError("", msg);
+                }
                 catch (Exception e)
                 {
                     ModelState.AddModelError("", e.Message);
@@ -376,6 +386,13 @@ namespace VIS.Controllers
 
         }
 
+        /// <summary>
+        /// action to handle auth dialog change event
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
+
         [AllowAnonymous]
         [HttpPost]
         [AjaxAuthorizeAttribute]
@@ -388,7 +405,7 @@ namespace VIS.Controllers
                 //System.Threading.Thread.Sleep(10000);
                 //model.Login1Model = JsonHelper.Deserialize(model.Login2Model.Login1Data, typeof(Login1Model)) as Login1Model;
 
-                LoginContext lCtx = LoginHelper.GetLoginContext(model, Session["Ctx"] as VAdvantage.Utility.Ctx);
+                LoginContext lCtx = LoginHelper.GetLoginContextForAuthDialog(model, Session["Ctx"] as VAdvantage.Utility.Ctx);
                 var userClaims = System.Security.Claims.ClaimsPrincipal.Current;
                 var UserData = userClaims?.FindFirst(ClaimTypes.UserData)?.Value;
                 if (!string.IsNullOrEmpty(UserData))
@@ -406,6 +423,12 @@ namespace VIS.Controllers
                         var authenticationManager = ctx.Authentication;
                         // Sign In.
                         authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = Util.GetValueOfBool(userClaims?.FindFirst(ClaimTypes.IsPersistent)?.Value) }, claimIdenties);
+                        
+                        //Save in login setting
+                        var actMgr = new AccountManager(model);
+                        actMgr.RunAsync();
+                        actMgr = null;
+
                         return Json(new { success = true });
                     }
                     catch (Exception ex)

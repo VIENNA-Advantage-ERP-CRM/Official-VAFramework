@@ -568,40 +568,73 @@
             isCheckListFill = this.vTabPanel.curTabPanel.isCheckListFill;
         }
 
+        var Survey_ID = 0;
+        var IsMandatoryToFill = false;
+        if (this.vTabPanel.curTabPanel) {
+            if (this.vTabPanel.curTabPanel.selectdIdx > -1) {
+                Survey_ID = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].Survey_ID;
+                IsMandatoryToFill = this.vTabPanel.curTabPanel.ChecklistRes[this.vTabPanel.curTabPanel.selectdIdx].IsMandatoryToFill;
+            } else {
+                return true;
+            }
+        } 
+
+        //if (!IsMandatoryToFill) {
+        //    return true;
+        //}
+
         $.ajax({
             async: false,
             url: VIS.Application.contextUrl + "SurveyPanel/IsCheckListRequire",
             data: {
                 AD_Window_ID: windowID,
                 AD_Table_ID: tableID,
-                Record_ID: recordID
+                Record_ID: recordID,
+                AD_Survey_ID: Survey_ID
             },
             success: function (data) {
-                data = JSON.parse(data);
-                data = data[0];
+                var result = JSON.parse(data);
+                output = true; // default
 
-                if (data.ResponseCount > 0) {
-                    output = true;
-                    //callback(true);
-                }
-                else if (data.Condition != "") {
-                    var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
-                    if (isValidate && isCheckListFill) {
-                        output = true;
-                        //callback(true);
-                    } else if (!isValidate) {
-                        output = true;
-                        // callback(true);
-                    } else {
-                        output = false;
-                        //callback(false);
+                for (var i = 0; i < result.length; i++) {
+                    var data = result[i];
+                   
+                    // Rule 2: Conditional Checklist
+                    if (data.IsConditionalCheckList) {
+                        var isValidate = VIS.Evaluator.evaluateLogicByRowData(rowData, data.Condition);
+
+                        if (isValidate) {
+                            if (data.IsMandatoryTofill) {
+                                if (data.ResponseCount > 0 || isCheckListFill === true) {
+                                    output = true;
+                                    continue;
+                                } else {
+                                    output = false;
+                                    break;
+                                }
+                            } else {
+                                output = true;
+                                continue;
+                            }
+                        } else {
+                            // condition not met, so skip validation
+                            output = true;
+                            continue;
+                        }
                     }
 
-
-                } else {
-                    output = true;
-                    //callback(true);
+                    // Rule 3: Non-Conditional Checklist
+                    if (!data.IsConditionalCheckList && data.IsMandatoryTofill) {
+                        if (data.ResponseCount > 0 || isCheckListFill === true) {
+                            output = true;
+                            continue;
+                        } else {
+                            output = false;
+                            break;
+                        }
+                    }
                 }
+
             },
             error: function (err) {
                 console.log(err);
@@ -1733,6 +1766,10 @@
         ////  modified to enforce validation even when the new value      null
         mTable.setValueAt(e.newValue, row, col);	//	-> dataStatusChanged -> dynamicDisplay
 
+        if (this.vTabPanel && this.vTabPanel.curTabPanel && this.vTabPanel.curTabPanel.TabPanelName && this.vTabPanel.curTabPanel.TabPanelName == "SurveyPanel") {
+            this.vTabPanel.curTabPanel.update(this.gTab.getRecord_ID());
+        }
+
     };
 
     VIS.GridController.prototype.actionPerformed = function (evt) {
@@ -2150,7 +2187,7 @@
             if(!this.displayAsIncludedGC && this.vIncludedGC !=null) {
                 this.vIncludedGC.vTable.resize();
             }
-            if (this.gTab.getIsTPBottomAligned())
+           // if (this.gTab.getIsTPBottomAligned())
                 this.aPanel.showTabPanel(true);
         }
 
@@ -2193,7 +2230,7 @@
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
                 this.vTable.activate(false, this.showMultiViewOnly); 
-                if (this.gTab.getIsTPBottomAligned())
+                //if (this.gTab.getIsTPBottomAligned())
                 this.aPanel.showTabPanel(false);
             }
 
@@ -2244,7 +2281,7 @@
 
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
-                if (this.gTab.getIsTPBottomAligned())
+                //if (this.gTab.getIsTPBottomAligned())
                     this.aPanel.showTabPanel(false);
             }
 
@@ -2294,7 +2331,7 @@
 
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
-                if (this.gTab.getIsTPBottomAligned())
+               // if (this.gTab.getIsTPBottomAligned())
                     this.aPanel.showTabPanel(false);
             }
 

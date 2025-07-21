@@ -1,0 +1,187 @@
+﻿﻿.vis-followuplayout {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background: #ffbfbf;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    transform: translate(0,-50%);
+}
+
+#openModal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.8rem;
+    color: white;
+}
+
+.vis-followups-cross {
+    font-size: 1.5rem;
+    position: absolute;
+    right: 1rem;
+}
+
+.vis-followUpsHeader {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(var(--v-c-common), 1);
+    border-radius: .375em;
+    color: rgba(var(--v-c-primary), 1);
+    float: left;
+    font-size: 1.125em;
+    height: 2.375em;
+    margin-top: .625em;
+    padding: 0 .625em;
+    width: 100%;
+}
+
+.vis-followups-record-box {
+    align-items: center;
+    border-radius: 8px;
+    display: flex;
+    gap: .75em;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 13px 10px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.vis-followups-windowList {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.vis-followups-record-col {
+    gap: .75em;
+    cursor: pointer;
+}
+
+.vis-followups-records {
+    width: 100%;
+    height: calc(100% - 90px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 .75em;
+    width: 100%;
+    margin-top: 7px;
+    display: inline-block;
+}
+
+.vis-followupsCount {
+    align-items: center;
+    background: transparent;
+    background-color: #f3f3f3;
+    border-radius: 6px;
+    color: rgba(var(--v-c-primary), 1);
+    display: flex;
+    font-weight: 600;
+    height: 1.8em !important;
+    justify-content: center;
+    margin-left: .375em;
+    margin-right: .375em;
+    max-width: 5em;
+    min-width: 2em;
+    padding: 0 4px;
+    width: auto;
+    font-size: 72%;
+}
+
+.vis-custom-center-popup {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    height: calc(100vh - 80px) !important;
+    transition: none !important;
+}
+
+.vis-feedDetails-follup p strong {
+    color: rgba(var(--v-c-primary), 1);
+    font-weight: normal;
+    cursor: default;
+    padding-bottom: 2px;
+}
+
+.vis-feedDetails-cmnt-followup i {
+    color: rgba(var(--v-c-primary), 1);
+    background: rgba(var(--v-c-primary),.3);
+    padding: 10px;
+    font-size: 1.75rem;
+    border-radius: .25rem;
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    float: left;
+    margin-right: 10px;
+}
+.vis-followups-list .vis-viewMoreComments:hover {
+    color: rgba(var(--v-c-primary),1);
+}
+
+.vis-followUpsHeader h2 {
+    color: rgba(var(--v-c-on-secondary), 1);
+}
+.vis-followUpsHeader .vis-followupsCount {
+    background-color: rgba(var(--v-c-on-secondary), 1);
+    color: rgba(var(--v-c-on-primary), 1);
+    padding: 4px 9px;
+    font-size: 81%;
+    font-weight: 400;
+}
+.vis-followups-list .vis-feedTitleBar {
+    background-color: rgba(var(--v-c-primary), .1);
+}
+.vis-followups-list .vis-feedTitleBar-buttons ul li a {
+    color: rgba(var(--v-c-primary), 1);
+}
+.vis-followups-list .vis-feedTitleBar-buttons ul li{
+    background: none;
+    border-left: 0px;
+}
+.vis-followups-list .vis-feedTitleBar-buttons ul li a:focus {
+    border: none;
+}
+    .vis-followups-list .vis-feedTitleBar h3 {
+        color: rgba(var(--v-c-on-secondary), 1);
+    }
+
+.vis-followups-list .vis-feedMessage {
+    border: 1px solid rgba(var(--v-c-on-secondary), .3);
+    border-radius: .3rem;
+    padding: 0 .2rem;
+    align-items: flex-end;
+}
+.vis-feedContainer .vis-txtFllCmnt {
+    border: none;
+    resize: none;
+    padding: 8px 4px;
+}
+.vis-followups-list .vis-feedMessage .vis-sms {
+    padding: 10px 7px 9px;
+    text-align: right;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+    .vis-followups-list .vis-feedMessage .vis-sms::before {
+        content: "\f1d8";
+        font-family: 'FontAwesome';
+        font-size: 1rem;
+        color: rgba(var(--v-c-primary), 1);
+        cursor: pointer;
+    }

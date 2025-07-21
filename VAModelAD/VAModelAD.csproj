@@ -423,6 +423,7 @@
     <Compile Include="ProcessAD\CacheReset.cs" />
     <Compile Include="ProcessAD\ChangeLogProcess.cs" />
     <Compile Include="ProcessAD\ColumnEncryption.cs" />
+    <Compile Include="ProcessAD\ColumnHashing.cs" />
     <Compile Include="ProcessAD\ColumnSync.cs" />
     <Compile Include="ProcessAD\CopyImportFormat.cs" />
     <Compile Include="ProcessAD\CreateModuleFields.cs" />

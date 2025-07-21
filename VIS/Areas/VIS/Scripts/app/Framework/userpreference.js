@@ -111,6 +111,20 @@
         var $cmdWareHouse = null;
         var defaultLogin = null;
         //*********************************
+
+        //******** VAI050-API Key Settings***********
+        var $txtkeyName = null;
+        var $cmdRoleforKey = null;
+        var $cmdClientforKey = null;
+        var $cmdOrgforKey = null;
+        var $cmdWareHouseforKey = null;
+        var $btnCreateKey = null;
+        var $btnSaveKey = null;
+        var $cmdProject = null;
+        var $listOfKey = null;
+        this.projectList = []; //store the list of projects
+        //*********************************
+
         var drpTheme = null;
         var ulTheme = null;
 
@@ -255,13 +269,28 @@
             $cmdWareHouse = root.find("#cmbWareHouse_" + windowNo);
 
             $btnTheme = root.find("#btnTheme_" + windowNo)
-
+            //*********** VAI050-ApiKey Settings**********************
+            $txtkeyName = root.find("#txtKeyName_" + windowNo);
+            $txtProjectName = root.find("#txtProjectName_" + windowNo);
+            $cmdRoleforKey = root.find("#cmbRoleForKey_" + windowNo);
+            $cmdRoleforKey.on("change", function () { loadClientForKey() });
+            $cmdClientforKey = root.find("#cmbClientForKey_" + windowNo);
+            $cmdClientforKey.on("change", function () { loadOrgForKey() });
+            $cmdOrgforKey = root.find("#cmbOrgForKey_" + windowNo);
+            $cmdWareHouseforKey = root.find("#cmbWareHouseForKey_" + windowNo);
+            $cmdProject = root.find("#cmbProject" + windowNo);
+            $btnCreateKey = root.find('#btnCreateKey_' + windowNo);
+            $btnApiDivClose = root.find('#CreateApiDivClose_' + windowNo);
+            $btnSaveKey = root.find('#btnSaveKey_' + windowNo);
+            $listOfKey = root.find('#VIS_SecretKeyList_' + windowNo);
+            //*******************
             defaultLogin = {};
             loadDefault();
             //loadRoles();
             getThemes();
-            //*********************************
 
+
+            //
 
             //Display message from MSG class on Menu
             var lblUserSetMenu = root.find("#lblUserSetMenu_" + windowNo);
@@ -851,10 +880,31 @@
                 var AD_Client_ID = $cmdClient.val();
                 var AD_Org_ID = $cmdOrg.val();
                 var AD_WH_ID = $cmdWareHouse.val();
-                if (AD_Role_ID == undefined || AD_Client_ID == undefined || AD_Org_ID == undefined) {
-                    lblRecordSave.text(VIS.Msg.getMsg("VIS_FillLogin"));
+
+                //if (AD_Role_ID == undefined || AD_Client_ID == undefined || AD_Org_ID == undefined) {
+                //    lblRecordSave.text(VIS.Msg.getMsg("VIS_FillLogin"));
+                //    return;
+                //}
+
+                if (AD_Role_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectRole"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
                     return;
+                } else if (AD_Client_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectClient"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
+                    return;
+                } else if (AD_Org_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectOrganization"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
+                    return;
+                } else {
+                    lblRecordSave.hide();
                 }
+
                 if (AD_WH_ID == undefined) {
                     AD_WH_ID = 0;
                 }
@@ -1021,6 +1071,50 @@
                 }, 500);
             });
 
+            /* VAI050-  Events for Create Seceret key Section*/
+            //CreateApiKey btn click
+            $btnCreateKey.on("click", function () {
+                $txtkeyName.val(VIS.Msg.getMsg("VAAPI_SecretKeyTxt"));
+                $cmdClientforKey.val(null);
+                $cmdOrgforKey.val(null);
+                loadRolesForKey();
+                loadProjects();
+                $(".VIS-Create-Api-Section").css("display", "block");
+                $listOfKey.css("display", "none");
+            });
+
+
+
+            $btnApiDivClose.on("click", function () {
+                $(".VIS-Create-Api-Section").css("display", "none");
+                $listOfKey.css("display", "block");
+                $txtkeyName.val("");
+                $cmdClientforKey.val(null);
+                $cmdOrgforKey.val(null);
+
+            });
+            $btnSaveKey.on("click", function () {
+                var ad_ClientID = $cmdClientforKey.val();
+                var ad_OrgID = $cmdOrgforKey.val();
+                var adRoleID = $cmdRoleforKey.val();
+                var ad_UserID = VIS.context.getAD_User_ID();
+                var projectID = $cmdProject.val();
+                var keyName = $txtkeyName.val();
+                var listDiv = root.find('#VIS_SecretKeyList_' + windowNo);
+                if (!ad_ClientID || !ad_OrgID || !adRoleID || !projectID || !keyName) {
+                    VIS.ADialog.info("VAAPI_AllFieldMandatory");
+                    return;
+                }
+                dialog = new VIS.Framework.VIS_SecretKeyDialog(windowNo, ad_ClientID, ad_OrgID, adRoleID, ad_UserID, projectID, keyName, listDiv, false, false, 0);
+                dialog.show();
+                dialog.onClose = function () {
+                    listOfSecretKey(listDiv);
+                    $root.find('#CreateApiDiv_' + windowNo).css("display", "none");
+                    $root.find('#VIS_SecretKeyList_' + windowNo).css("display", "block");
+                };
+            });
+
+            /* End for  Events for Create Seceret key Section*/
             function setBusy(isBusy) {
                 if (isBusy)
                     $busyDiv[0].style.visibility = 'visible';
@@ -1087,7 +1181,6 @@
                 });
 
             };
-
             function getThemes() {
 
                 var url = VIS.Application.contextUrl + "JsonData/GetThemes";
@@ -1522,14 +1615,13 @@
             };
 
             function setValuePref() {
-                if (VIS.MRole.getIsShowAcct())
-                {
-                $acctab.prop("checked", VIS.Env.getCtx().ctx["#ShowAcct"] == "Y" ? true : false);
+                if (VIS.MRole.getIsShowAcct()) {
+                    $acctab.prop("checked", VIS.Env.getCtx().ctx["#ShowAcct"] == "Y" ? true : false);
                 }
                 else {
                     //$acctab.prop("checked", false);
                     $acctab.prop("enabled", false);
-                    
+
                     $acctab.parent().remove();
                 }
 
@@ -1559,6 +1651,8 @@
                     $root.dialog('close');
                 });
             }
+
+
         };
 
         var loadDefault = function () {
@@ -1574,6 +1668,9 @@
                     defaultLogin.AD_Org_ID = di.AD_Org_ID;
                     defaultLogin.M_Warehouse_ID = di.M_Warehouse_ID;
                     loadRoles();
+                    if ($btnCreateKey != null) {
+                        listOfSecretKey($listOfKey);
+                    }
                 }
             });
         };
@@ -1593,6 +1690,7 @@
                     }
                     $cmdRole.append(cmbRoleContent);
                     $cmdRole.val(defaultLogin.AD_Role_ID);
+
                     cmbRoleContent = null;
                     dic = null;
                     loadClient();
@@ -1624,6 +1722,7 @@
                     }
                     $cmdClient.append(cmbClientContent);
                     $cmdClient.val(defaultLogin.AD_Client_ID);
+
                     cmbClientContent = null;
                     dic = null;
                     sql = null;
@@ -1677,9 +1776,6 @@
 
             }
 
-
-
-
             $.ajax({
                 url: VIS.Application.contextUrl + "UserPreference/GetWarehouseData",
                 dataType: "json",
@@ -1702,6 +1798,244 @@
 
         };
 
+        /* VAI050 For APIKey Section*/
+        var loadRolesForKey = function () {
+            var sql = "";
+            $cmdRoleforKey.empty();
+
+            $.ajax({
+                url: VIS.Application.contextUrl + "UserPreference/GetUserRoles",
+                dataType: "json",
+                data: { sql: sql },
+                success: function (data) {
+                    var dic = JSON.parse(data);
+                    var cmbRoleContent = "<option value=\"\"></option>";
+                    for (var itm in dic) {
+                        cmbRoleContent += "<option value=" + dic[itm].RecKey + ">" + dic[itm].Name + "</option>";
+                    }
+                    $cmdRoleforKey.append(cmbRoleContent);
+                    //------
+                    cmbRoleContent = null;
+                    dic = null;
+                }
+            });
+
+        };
+
+        /*   VAI050-Get client for api section*/
+        var loadClientForKey = function () {
+            var roleID = $cmdRoleforKey.val();
+            $cmdClientforKey.empty();
+            $cmdOrgforKey.empty();
+            $cmdWareHouseforKey.empty();
+            if (roleID == undefined) {
+                return;
+
+            }
+            var sql = roleID;
+            roleID = null;
+
+            $.ajax({
+                url: VIS.Application.contextUrl + "UserPreference/GetLoginData",
+                dataType: "json",
+                data: { sql: sql },
+                success: function (data) {
+                    var dic = JSON.parse(data);
+                    var cmbClientContent = "";
+                    for (var itm in dic) {
+                        cmbClientContent += "<option value=" + dic[itm].RecKey + ">" + dic[itm].Name + "</option>";
+                    }
+
+                    $cmdClientforKey.append(cmbClientContent);
+                    cmbClientContent = null;
+                    dic = null;
+                    sql = null;
+                    loadOrgForKey();
+                }
+            });
+
+
+        };
+
+        /*   VAI050-Get Org for api section*/
+
+        var loadOrgForKey = function () {
+            var AD_Role_ID = $cmdRoleforKey.val();
+            var AD_Client_ID = $cmdClientforKey.val();
+
+            $cmdOrgforKey.empty();
+            $cmdWareHouseforKey.empty(); if (AD_Role_ID == undefined || AD_Client_ID == undefined) {
+
+                return;
+
+            }
+            var sql = "";
+
+
+            $.ajax({
+                url: VIS.Application.contextUrl + "UserPreference/GetOrgData",
+                dataType: "json",
+                data: { "roleId": AD_Role_ID, "clientId": AD_Client_ID },
+                success: function (data) {
+                    var dic = JSON.parse(data);
+                    var cmbOrgContent = "<option value=\"\"></option>";
+                    for (var itm in dic) {
+                        cmbOrgContent += "<option value=" + dic[itm].RecKey + ">" + dic[itm].Name + "</option>";
+                    }
+
+                    $cmdOrgforKey.append(cmbOrgContent);
+                    cmbOrgContent = null;
+                    dic = null;
+                    sql = null;
+                    AD_Role_ID = null;
+                    AD_Client_ID = null;
+                }
+            });
+
+
+        };
+
+        /*   VAI050-Get Projects for api section*/
+        var loadProjects = function () {
+            var sql = "";
+            $cmdProject.empty();
+
+            $.ajax({
+                url: VIS.Application.contextUrl + "UserPreference/GetProjects",
+                dataType: "json",
+                success: function (data) {
+                    $self.projectList = JSON.parse(data);
+                    var cmbProjectContent = "";
+                    for (var itm in $self.projectList) {
+                        cmbProjectContent += "<option value=" + $self.projectList[itm].RecKey + ">" + $self.projectList[itm].Name + "</option>";
+                    }
+                    $cmdProject.append(cmbProjectContent);
+                    cmbProjectContent = null;
+                }
+            });
+
+        };
+
+        /*   VAI050-Get list of for api section*/
+        var listOfSecretKey = function (listDiv) {
+            $.ajax({
+                url: VIS.Application.contextUrl + "UserPreference/GetSecretKeyData",
+                dataType: "json",
+                success: function (data) {
+                    var response = JSON.parse(data);
+                    if (response != null && response.length > 0) {
+                        var tableHtml = '<div class="VIS-table-container"><table class="VIS-key-table">';
+                        tableHtml += '<thead><tr>' +
+                            '<th>' + VIS.Msg.getMsg("VAAPI_KeyName") + '</th>' +
+                            '<th>' + VIS.Msg.getMsg("VAAPI_SecretKey") + '</th>' +
+                            '<th>' + VIS.Msg.getMsg("Created") + '</th>' +
+                            '<th>' + VIS.Msg.getMsg("CreatedBy") + '</th>' +
+                            '<th>' + VIS.Msg.getMsg("VAAPI_ProjectAccess") + '</th>' +
+                            '<th>' + VIS.Msg.getMsg("Actions") + '</th>' +
+                            '</tr></thead>';
+                        tableHtml += '<tbody>';
+                        response.forEach(function (item) {
+                            var statusDot = item.IsActive === 'Y'
+                                ? '<span class="VIS-key-status-dot VIS-key-green-dot"></span>' // Green dot for active
+                                : '<span class="VIS-key-status-dot VIS-key-grey-dot"></span>'; // Grey dot for inactive
+
+                            tableHtml += '<tr>' +
+                                '<td><span title="' + item.KeyName + '" class="VIS-Key-ellipse-text">' + statusDot + ' ' + item.KeyName + '</span></td>' +
+                                '<td><span title="' + item.SessionToken + '" class="VIS-Key-ellipse-text">' + item.SessionToken + '</span></td>' +
+                                '<td><span title="' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '" class="VIS-Key-ellipse-text">' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '</span></td>' +
+                                '<td><span title="' + item.CreatedBy + '" class="VIS-Key-ellipse-text">' + item.CreatedBy + '</span></td>' +
+                                '<td><span title="' + item.ProjectName + '"  class="VIS-Key-ellipse-text">' + item.ProjectName + '</span></td>' +
+                                '<td>' +
+                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '" title="Edit">' +
+                                '<i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>' +
+                                '<button class="VIS-key-delete-btn VIS-delete-btn" data-id="' + item.RecordID + '" title="Delete">' +
+                                '<i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
+                                '</td>' +
+                                '</tr>';
+                        });
+
+                        tableHtml += '</tbody></table></div>';
+                        listDiv.html(tableHtml);
+
+                    } else {
+                        //// If no data, display a message
+                        //$listOfKey.html('<p>No data available.</p>');
+                    }
+                },
+                error: function () {
+                    /*   $selistdiv.html('<p>Error loading data.</p>');*/
+                }
+            });
+
+            /*  This method used to delete the secret key row*/
+            listDiv.off('click', '.VIS-key-delete-btn').on('click', '.VIS-key-delete-btn', function () {
+                $root.append($busyDiv);
+                $busyDiv[0].style.visibility = 'visible';
+                var recID = $(this).data('id');
+                var $rowToDelete = $(this).closest('tr');
+                var $table = $rowToDelete.closest('table'); // Find the table
+                var $tbody = $table.find('tbody'); // Get the table body
+                // Confirmation Prompt
+                VIS.ADialog.confirm("VAAPI_AreYouSureDelete", true, "", "Confirm", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: VIS.Application.contextUrl + "UserPreference/DeleteSecretKey",
+                            dataType: "json",
+                            data: { RecID: recID },
+                            success: function (data) {
+                                var response = JSON.parse(data);
+                                if (response) {
+                                    $rowToDelete.remove();
+                                    if ($tbody.find('tr').length === 0) {
+                                        $table.remove();
+                                    }
+                                    $busyDiv[0].style.visibility = 'hidden';
+                                    //VIS.ADialog.info("Secret Key Deleted");
+                                } else {
+                                    $busyDiv[0].style.visibility = 'hidden';
+                                    VIS.ADialog.error("Record not deleted");
+                                }
+                            },
+                            error: function () {
+                                alert("Error occurred while deleting.");
+                                $busyDiv[0].style.visibility = 'hidden';
+
+                            }
+                        });
+                    }
+                    else {
+                        $busyDiv[0].style.visibility = 'hidden';
+                        return; // Exit if user cancels
+
+                    }
+                });
+
+            });
+
+            /*  This method used to update the secret key row*/
+            listDiv.off('click', '.VIS-key-edit-btn').on('click', '.VIS-key-edit-btn', function () {
+                $busyDiv[0].style.visibility = 'visible';
+                var recID = $(this).data('id');
+                var projectID = $(this).data('project-id');
+                var keyName = $(this).data('key-name');
+                var isActive = $(this).data('is-active') === 'Y' ? true : false;
+                //var listDiv = root.find('#VIS_SecretKeyList_' + windowNo);
+                dialog = new VIS.Framework.VIS_SecretKeyDialog(windowNo, 0, 0, 0, 0, projectID, keyName, listDiv, isActive, true, recID);
+                dialog.show();
+                dialog.onClose = function () {
+
+                    listOfSecretKey(listDiv);
+                    $root.find('#CreateApiDiv_' + windowNo).css("display", "none");
+                    $root.find('#VIS_SecretKeyList_' + windowNo).css("display", "block");
+                };
+                $busyDiv[0].style.visibility = 'hidden';
+            });
+
+        };
+
+
+
+        /* End APIKey Section*/
         this.showDialog = function () {
             var w = $(window).width() - 150;
             var h = $(window).height() - 40;
@@ -1847,7 +2181,6 @@
             loadOrg = null;
             loadClient = null;
             loadWH = null;
-
 
 
             this.disposeComponent = null;

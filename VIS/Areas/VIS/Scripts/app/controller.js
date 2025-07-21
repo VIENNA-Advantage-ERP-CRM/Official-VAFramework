@@ -5240,7 +5240,7 @@
         }
         catch (e) {
             console.log(e);
-            sql = VIS.secureEngine.decrypt(sql);
+            sql = "RefreshRow";
             this.log.log(Level.SEVERE, sql, e);
             this.fireDataStatusEEvent("RefreshError", sql, true);
             return null;
@@ -7276,6 +7276,10 @@
     };	//	getDefault
 
     GridField.prototype.getIsEncryptedColumn = function () {
+        return this.vo.IsEncryptedColumn;
+    };
+
+    GridField.prototype.getIsHashedColumn = function () {
         return this.vo.IsEncryptedColumn;
     };
 

@@ -1,9 +1,15 @@
 ﻿using Ionic.Zip;
+using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Windows.Forms;
@@ -60,9 +66,12 @@ namespace VIS.Models
         public string EmailUserName { get; set; }
         public string EmailPws { get; set; }
 
+        public bool IsVAAPIModuleInstall { get; set; } = false;
+
 
         public UserPreferenceModel GetUserSettings(Ctx ctx, int ad_User_Id)
         {
+
             MUser user = new MUser(ctx, ad_User_Id, null);
             UserPreferenceModel obj = new UserPreferenceModel();
             obj.EmailUserName = user.GetEMailUser();
@@ -102,6 +111,10 @@ namespace VIS.Models
             else if (type == X_AD_User.NOTIFICATIONTYPE_EMail)
             {
                 obj.Email = true;
+            }
+            if (Env.IsModuleInstalled("VAAPI_"))
+            {
+                obj.IsVAAPIModuleInstall = true;
             }
             return obj;
         }
@@ -493,21 +506,21 @@ namespace VIS.Models
             }
         }
 
-        public List<LoginData> GetOrgData(string roleId,string clientId,string userId)
+        public List<LoginData> GetOrgData(string roleId, string clientId, string userId)
         {
-          string sql =  "SELECT o.Name,o.AD_Org_ID "	//	1..3
-                + "FROM AD_Role r, AD_Client c"
-                + " INNER JOIN AD_Org o ON (c.AD_Client_ID=o.AD_Client_ID OR o.AD_Org_ID=0) "
-                + "WHERE r.AD_Role_ID='" + roleId + "'" 	//	#1
-                + " AND c.AD_Client_ID='" + clientId + "'"	//	#2
-                + " AND o.IsActive='Y' AND o.IsSummary='N'  AND o.IsCostCenter='N' AND o.IsProfitCenter='N' "
-                + " AND (r.IsAccessAllOrgs='Y' "
-                    + "OR (r.IsUseUserOrgAccess='N' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_Role_OrgAccess ra "
-                        + "WHERE ra.AD_Role_ID=r.AD_Role_ID AND ra.IsActive='Y')) "
-                    + "OR (r.IsUseUserOrgAccess='Y' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_User_OrgAccess ua "
-                        + "WHERE ua.AD_User_ID='" + userId + "' AND ua.IsActive='Y'))"		//	#3
-                    + ") "
-                + "ORDER BY o.Name";
+            string sql = "SELECT o.Name,o.AD_Org_ID "   //	1..3
+                  + "FROM AD_Role r, AD_Client c"
+                  + " INNER JOIN AD_Org o ON (c.AD_Client_ID=o.AD_Client_ID OR o.AD_Org_ID=0) "
+                  + "WHERE r.AD_Role_ID='" + roleId + "'"   //	#1
+                  + " AND c.AD_Client_ID='" + clientId + "'"    //	#2
+                  + " AND o.IsActive='Y' AND o.IsSummary='N'  AND o.IsCostCenter='N' AND o.IsProfitCenter='N' "
+                  + " AND (r.IsAccessAllOrgs='Y' "
+                      + "OR (r.IsUseUserOrgAccess='N' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_Role_OrgAccess ra "
+                          + "WHERE ra.AD_Role_ID=r.AD_Role_ID AND ra.IsActive='Y')) "
+                      + "OR (r.IsUseUserOrgAccess='Y' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_User_OrgAccess ua "
+                          + "WHERE ua.AD_User_ID='" + userId + "' AND ua.IsActive='Y'))"        //	#3
+                      + ") "
+                  + "ORDER BY o.Name";
 
             try
             {
@@ -529,8 +542,8 @@ namespace VIS.Models
                 return null;
             }
         }
-        
-            public List<LoginData> GetWareHouseData(string orgId)
+
+        public List<LoginData> GetWareHouseData(string orgId)
         {
             var sql = "SELECT Name,M_Warehouse_ID  FROM M_Warehouse "
                + "WHERE AD_Org_ID=" + orgId + " AND IsActive='Y' "
@@ -622,5 +635,331 @@ namespace VIS.Models
 
             return zipfileName;
         }
+
+        /// <summary>
+        /// VAI050-Get List of Projects
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<LoginData> GetProjects(Ctx ctx)
+        {
+            string sql = "SELECT Name,VAAPI_Project_ID FROM VAAPI_Project";
+            try
+            {
+                List<LoginData> ld = null;
+                DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "VAAPI_Project", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO));
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    ld = new List<LoginData>();
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        ld.Add(new LoginData() { Name = VAdvantage.Utility.Util.GetValueOfString(ds.Tables[0].Rows[i][0]), RecKey = VAdvantage.Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i][1]) });
+                    }
+
+                }
+                return ld;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// VAI050-This method used to call Login API
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        /// <param name="accessKey"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public dynamic CallLoginApi(string userName, string password, string accessKey, string url)
+        {
+
+            using (HttpClient client = new HttpClient())
+            {
+                // Add the access key to the request headers
+                client.DefaultRequestHeaders.Add("accessKey", accessKey);
+
+                var loginData = new
+                {
+                    userName = userName,
+                    password = password
+                };
+
+                string jsonData = JsonConvert.SerializeObject(loginData);
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = client.PostAsync(url, content).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = response.Content.ReadAsStringAsync().Result;
+                    ApiResponse apiResponse = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
+                    if (apiResponse.code == 200 && !IsEmptyObject(apiResponse.data))
+                    {
+                        return apiResponse.data;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// VAI050-This method used create session token via calling api
+        /// </summary>
+        /// <param name="AD_Client_ID"></param>
+        /// <param name="AD_Org_ID"></param>
+        /// <param name="AD_User_ID"></param>
+        /// <param name="AD_Role_ID"></param>
+        /// <param name="accessKey"></param>
+        /// <param name="requestAddr"></param>
+        /// <param name="tokenExpTimeInMinutes"></param>
+        /// <param name="idleTime"></param>
+        /// <param name="Project_ID"></param>
+        /// <param name="keyName"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public dynamic CallInitSessionApi(int AD_Client_ID, int AD_Org_ID, int AD_User_ID, int AD_Role_ID, string accessKey, string requestAddr, int tokenExpTimeInMinutes, int idleTime, int Project_ID, string keyName, string url)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+
+                // Add the access key to the request headers
+                client.DefaultRequestHeaders.Add("accessKey", accessKey);
+                var sessionData = new
+                {
+                    AD_Client_ID = AD_Client_ID,
+                    AD_Org_ID = AD_Org_ID,
+                    AD_User_ID = AD_User_ID,
+                    AD_Role_ID = AD_Role_ID,
+                    requestAddr = requestAddr,
+                    tokenExpTimeInMinutes = tokenExpTimeInMinutes,
+                    idleTime = idleTime,
+                    project_ID = Project_ID,
+                    keyName = keyName,
+                    manualGeneration = true
+                };
+                string jsonData = JsonConvert.SerializeObject(sessionData);
+                var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = client.PostAsync(url, content).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = response.Content.ReadAsStringAsync().Result;
+                    ApiResponse apiResponse = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
+                    if (apiResponse.code == 200)
+                    {
+                        if (!string.IsNullOrEmpty(apiResponse.result))
+                            return apiResponse.data;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// VAI050-This method used get secret key data
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<Dictionary<string, object>> GetSecretKeyData(Ctx ctx)
+        {
+            List<Dictionary<string, object>> keyList = null;
+            string query = @"SELECT s.VAAPI_SessionToken_ID, s.VAAPI_KeyName, s.Created,s.IsActive, u.Name AS CreatedBy,
+                             s.VAAPI_HintSessionToken,
+                             p.Name AS ProjectName,p.VAAPI_Project_ID FROM VAAPI_SessionToken s
+                             INNER JOIN VAAPI_Project p ON (s.VAAPI_Project_ID = p.VAAPI_Project_ID)
+                             INNER JOIN AD_User u ON (u.AD_User_ID=s.CreatedBy)";
+            DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(query, "s", true, true) + " ORDER BY VAAPI_SessionToken_ID");
+
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                keyList = new List<Dictionary<string, object>>();
+
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    string maskedToken = "";
+                    string sessionToken = Util.GetValueOfString(ds.Tables[0].Rows[i]["VAAPI_HintSessionToken"]);
+                    if (!string.IsNullOrEmpty(sessionToken))
+                    {
+                        string firstTwo = sessionToken.Substring(0, 2);
+                        string lastTwo = sessionToken.Substring(sessionToken.Length - 2, 2);
+                        maskedToken = firstTwo + new string('*', 12) + lastTwo;
+                    }
+
+                    Dictionary<string, object> obj = new Dictionary<string, object>();
+                    obj.Add("KeyName", Util.GetValueOfString(ds.Tables[0].Rows[i]["VAAPI_KeyName"]));
+                    obj.Add("SessionToken", maskedToken);
+                    obj.Add("Created", Util.GetValueOfDateTime(ds.Tables[0].Rows[i]["Created"]));
+                    obj.Add("CreatedBy", Util.GetValueOfString(ds.Tables[0].Rows[i]["CreatedBy"]));
+                    obj.Add("ProjectName", Util.GetValueOfString(ds.Tables[0].Rows[i]["ProjectName"]));
+                    obj.Add("RecordID", Util.GetValueOfInt(ds.Tables[0].Rows[i]["VAAPI_SessionToken_ID"]));
+                    obj.Add("ProjectID", Util.GetValueOfInt(ds.Tables[0].Rows[i]["VAAPI_Project_ID"]));
+                    obj.Add("IsActive", Util.GetValueOfString(ds.Tables[0].Rows[i]["IsActive"]));
+                    keyList.Add(obj);
+                }
+            }
+
+            return keyList;
+        }
+
+        /// <summary>
+        /// VAI050-This method used to delete secret key
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="RecID"></param>
+        /// <returns></returns>
+        public bool DeleteSecretKey(Ctx ctx, int RecID)
+        {
+            MTable tbl = new MTable(ctx, MTable.Get_Table_ID("VAAPI_SessionToken"), null);
+            PO obj = tbl.GetPO(ctx, RecID, null);
+            bool IsDeleted = obj.Delete(true);
+            return IsDeleted;
+        }
+
+        /// <summary>
+        /// VAI050-This method used to update secret key data
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool UpdateSecretKey(Ctx ctx, SecretKeyModel value)
+        {
+            MTable tbl = new MTable(ctx, MTable.Get_Table_ID("VAAPI_SessionToken"), null);
+            int ProjectID = value.ProjectID;
+            int RecordID = value.RecordID;
+            string KeyName = value.KeyName;
+            PO obj = tbl.GetPO(ctx, RecordID, null);
+            obj.Set_Value("VAAPI_KeyName", KeyName);
+            obj.Set_Value("IsActive", value.IsActive);
+            obj.Set_Value("VAAPI_Project_ID", ProjectID);
+            if (!obj.Save())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// VAi050-This method used to check object empty or nul
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private bool IsEmptyObject(object obj)
+        {
+            // Check if it's an array or a list and if it's empty
+            if (obj is ICollection collection)
+            {
+                return collection.Count == 0;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// VAI050-Get access key 
+        /// </summary>
+        /// <returns> returns key</returns>
+        public string GetAccessKey()
+        {
+            try
+            {
+                System.Reflection.Assembly asm = System.Reflection.Assembly.Load("MarketSvc");
+                string AccessKey = Util.GetValueOfString(asm.GetType("MarketSvc.Classes.Utility").GetMethod("GetCustomerAccessKey", BindingFlags.Public | BindingFlags.Static).Invoke(null, null));
+                return AccessKey;
+            }
+            catch (Exception e)
+            { VAdvantage.Logging.VLogger.Get().Severe("ErrorToGetAccessKey=>" + e.Message); }
+            return null;
+        }
+
+        /// <summary>
+        /// VAI050-This method used to verify password
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="userName"></param>
+        /// <returns></returns>
+        public bool VerifyPassword(string password, string userName)
+        {
+            try
+            {
+                // Get encryption info
+                string sqlEnc = @"SELECT IsEncrypted, IsHashed  FROM AD_Column WHERE AD_Table_ID = (SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_User') 
+                                  AND ColumnName='Password'";
+                DataSet dsLoginDS = DB.ExecuteDataset(sqlEnc);
+                char isEncrypted = Convert.ToChar(dsLoginDS.Tables[0].Rows[0]["IsEncrypted"]);
+                char isHashed = Convert.ToChar(dsLoginDS.Tables[0].Rows[0]["IsHashed"]);
+                // Fetch actual password from the user record
+                string fetchPasswordSql = "SELECT Password FROM AD_User WHERE Value=@username";
+                SqlParameter[] param = new SqlParameter[]
+                {
+                  new SqlParameter("@username", userName)
+                };
+                string storedPassword = Util.GetValueOfString(DB.ExecuteScalar(fetchPasswordSql, param, null));
+
+                if (string.IsNullOrEmpty(storedPassword))
+                {
+                    return false; // User not found or no password
+                }
+
+                if (isHashed == 'Y')
+                {
+                    return SecureEngine.VerifyHash(password, storedPassword, null);
+                }
+                else if (isEncrypted == 'Y')
+                {
+                    return storedPassword == VAdvantage.Utility.SecureEngine.Encrypt(password);
+                }
+                else
+                {
+                    return storedPassword == password;
+                }
+            }
+            catch (Exception e)
+            {
+                VAdvantage.Logging.VLogger.Get().Severe("ErrorToVerifyPassword=>" + e.Message);
+                return false;
+            }
+        }
+
     }
+
+    public class SecretKeyModel
+    {
+        public string KeyName { get; set; }
+        public int ProjectID { get; set; }
+        public int RecordID { get; set; }
+        public bool IsActive { get; set; }
+
+    }
+
+    public class LoginAndInitSessionRequest
+    {
+        public string userName { get; set; }
+        public string password { get; set; }
+        public int AD_Client_ID { get; set; }
+        public int AD_Org_ID { get; set; }
+        public int AD_User_ID { get; set; }
+        public int AD_Role_ID { get; set; }
+        public string requestAddr { get; set; }
+        public int tokenExpTimeInMinutes { get; set; }
+        public int idleTime { get; set; }
+        public int Project_ID { get; set; }
+        public string keyName { get; set; }
+
+
+    }
+
+    public class ApiResponse
+    {
+        public int code { get; set; }
+        public string result { get; set; }
+        public object data { get; set; }
+    }
+
 }

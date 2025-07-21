@@ -27,7 +27,15 @@
         this.changeTitle = function (t) {
             $a.dialog('widget').find(".ui-dialog-title").text(t);
         }
+        //VAI050-This method used to change the height of popup
+        this.changeHeight = function (t) {
+            $($a.dialog('widget').find(".ui-dialog-content")).height(t);
 
+        }
+        //VAI050-This method used to change the width of popup
+        this.changeWidth = function (t) {
+            $a.dialog('widget').width(t)
+        }
         //this.removeCloseBtn = function (remove) {
         //    removeClose = remove;
         //}
@@ -104,36 +112,36 @@
                 closeOnEscape: !removeClose,
                 closeText: VIS.Msg.getMsg("close"),
                 //zIndex: 999999,
-                 position: position ,
+                position: position,
                 buttons: [
-                                {
-                                    text: VIS.Msg.getMsg("Ok"),
-                                    click: function (evt) {
-                                        var buttonDomElement = evt.target;
-                                        // Disable the button 
-                                        //$(buttonDomElement).css('background-color', 'red');
-                                        //$(buttonDomElement).css('color', 'blue');
-                                        $(buttonDomElement).attr('disabled', true);
+                    {
+                        text: VIS.Msg.getMsg("Ok"),
+                        click: function (evt) {
+                            var buttonDomElement = evt.target;
+                            // Disable the button 
+                            //$(buttonDomElement).css('background-color', 'red');
+                            //$(buttonDomElement).css('color', 'blue');
+                            $(buttonDomElement).attr('disabled', true);
 
-                                        var res = true;
-                                        if (self.onOkClick) {
-                                            res = self.onOkClick(evt);
-                                        }
-                                        if (res == true || res == undefined) {
-                                            if ($a != null)
-                                                $a.dialog("close");
-                                        }
-                                        else {
-                                            $(buttonDomElement).attr('disabled', false);
-                                        }
-                                    },
-                                    style: styleOK
-                                },
-                {
-                    text: VIS.Msg.getMsg("Cancel"),
-                    click: function () { if (self.onCancelClick) self.onCancelClick(); if ($a) $a.dialog("close"); },
-                    style: styleCancel
-                }
+                            var res = true;
+                            if (self.onOkClick) {
+                                res = self.onOkClick(evt);
+                            }
+                            if (res == true || res == undefined) {
+                                if ($a != null)
+                                    $a.dialog("close");
+                            }
+                            else {
+                                $(buttonDomElement).attr('disabled', false);
+                            }
+                        },
+                        style: styleOK
+                    },
+                    {
+                        text: VIS.Msg.getMsg("Cancel"),
+                        click: function () { if (self.onCancelClick) self.onCancelClick(); if ($a) $a.dialog("close"); },
+                        style: styleCancel
+                    }
                 ]
                 ,
                 close: onClosing

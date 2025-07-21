@@ -1,5 +1,4 @@
-﻿
-/************************************************************
+﻿/************************************************************
 * Module Name    : VIS
 * Purpose        : Assign Record To User
 * chronological  : Development
@@ -12,21 +11,16 @@
     function userAssign(record_id, table_id, windowNo, WindowId, assignedRecords) {
         var ch = null;
         this.onClose = null;
-        var data = [];
         var $self = this;
-        var dGrid = null;
-        var arrListColumns = [];
-        var data = [];
         var userNameId = null;
         var UpperDiv = null;
         var recordInputDiv = null;
         var loginUserID = VIS.context.getAD_User_ID();
-        var $deleteButton, $doneButton, $cancelBtn, $okBtn;
-        var enableDelete = true;
-        var enableOk = true;
-        var enableDone = true;
+        var $cancelBtn, $okBtn;
         var assignMatchRecord = [];
         var unMatchRecords = [];
+        var unAssignedArray = [];
+
         var userId = null;
         var adminUser = null;
         var PrimaryKey = null;
@@ -44,22 +38,20 @@
             '<div class="vis-control-wrap"></div><div class="input-group-append"></div>' +
             '</div>'
         );
+
         //users control
         var lookup = VIS.MLookupFactory.get(VIS.Env.getCtx(), windowNo, 212, VIS.DisplayType.Search, "AD_User_ID", 0, false, "AD_Client_ID=" + VIS.Env.getCtx().getAD_Client_ID());
-        colTableCtrl = new VIS.Controls.VTextBoxButton("AD_User_ID", true, false, true, VIS.DisplayType.Search, lookup);
+        colTableCtrl = new VIS.Controls.VTextBoxButton("AD_User_ID", false, false, true, VIS.DisplayType.Search, lookup);
         var $userButtonWrap = $('<div class="input-group-append">');
         $inputDiv.find('.vis-control-wrap').append(colTableCtrl.getControl())
-            .append('<label style="color: rgba(var(--v-c-mandatory),1);">' + VIS.Msg.getMsg('VIS_SearchUser') + '<sup>*</sup></label>');
+            .append('<label>' + VIS.Msg.getMsg('VIS_SearchUser') + '</label>');
         $userButtonWrap.append(colTableCtrl.getBtn(0));
-        /* $userButtonWrap.append(colTableCtrl.getBtn(1));*/
         $inputDiv.append($userButtonWrap);
         var lowerDiv = $("<div class='vis-lowerDiv'>");
         bottomDiv = $("<div style='width: 100%;margin-top:10px'>");
 
 
-        //Buttons
-        $deleteButton = $("<input class='VIS_Pref_btn-2 VIS_recordDelete mt-0' id='VIS_recordDltBtn" + windowNo + "' style='margin-left: 15px;' type='button' value= " + VIS.Msg.getMsg('VIS_Delete') + ">");
-        $doneButton = $("<input class='VIS_Pref_btn-2 VIS_Donebtn mt-0'id='VIS_assignDoneBtn" + windowNo + "' style='margin-left:15px;' type='button' value=" + VIS.Msg.getMsg('Done') + ">");
+        //Buttons      
         $cancelBtn = $("<input class='VIS_Pref_btn-2 VIS_Cancelbtn mt-0'id='VIS_assignCancelBtn" + windowNo + "' style='margin-left:15px;' type='button' value= " + VIS.Msg.getMsg('Cancle') + ">");
         $okBtn = $("<input class='VIS_Pref_btn-2 VIS_OKbtn mt-0'id='VIS_AssignOkBtn" + windowNo + "' style='margin-left: 15px;' type='button' value= " + VIS.Msg.getMsg('VIS_OK') + ">");
 
@@ -67,176 +59,82 @@
         //appending design to main div
         recordInputDiv.append($inputDiv);
         UpperDiv.append(recordInputDiv);
-        bottomDiv.append($cancelBtn).append($okBtn).append($deleteButton).append($doneButton);
+        bottomDiv.append($cancelBtn).append($okBtn);
         mainDiv.append(UpperDiv).append(lowerDiv).append(bottomDiv);
-
-
-
-        /* seperate the assigned and unassigned records from selected record*/
-        if (assignedRecords.length) {
-            record_id.forEach(id => {
-                var matched = assignedRecords.find(record => record.ID === id);
-                matched ? assignMatchRecord.push(matched) : unMatchRecords.push(id);
-            });
-        }
-        else {
-            unMatchRecords.push(...record_id);
-        }
-
-        // get assigned User and assigneby User
-        if (assignMatchRecord.length > 0) {
-            userId = assignMatchRecord[0].userId;
-            adminUser = assignMatchRecord[0].createdBy;
-        }
-
-
-        /* handling buttons according to assigned and unassigned records*/
-        if (record_id.length > 0) {
-            // if records selected more than 1
-            if (record_id.length > 1) {
-                // If more than one record is selected, only show OK and Cancel buttons
-
-                mainDiv.find('#VIS_assignDoneBtn' + windowNo).hide();
-                mainDiv.find('#VIS_recordDltBtn' + windowNo).hide();
-
-                mainDiv.find('#VIS_AssignOkBtn' + windowNo).attr('disabled', true).css({
-                    'opacity': '0.5',
-                    'pointer-events': 'none'
-                });
-                enableDone = false;
-                enableDelete = false;
-
-                //  one record selected
-            } else {
-                if (userId) {
-                    if (loginUserID === adminUser) {
-                        if (userId === adminUser) {
-                            colTableCtrl.setValue(userId);
-                            colTableCtrl.setReadOnly(true);
-                            enableOk = false;
-                            mainDiv.find('#VIS_AssignOkBtn' + windowNo).hide();
-                        } else if (userId !== adminUser) {
-                            colTableCtrl.setValue(userId);
-                            colTableCtrl.setReadOnly(true);
-                            enableDone = false;
-                            enableOk = false;
-                            mainDiv.find('#VIS_AssignOkBtn' + windowNo).hide();
-                            mainDiv.find('#VIS_assignDoneBtn' + windowNo).hide();
-                        }
-                    } else if (loginUserID !== adminUser && userId !== loginUserID) {
-                        colTableCtrl.setValue(userId);
-                        colTableCtrl.setReadOnly(true);
-                        mainDiv.find('#VIS_assignDoneBtn' + windowNo).hide();
-                        mainDiv.find('#VIS_recordDltBtn' + windowNo).hide();
-                        enableDelete = false;
-                        enableOk = false;
-                        enableDone = false;
-                        mainDiv.find('#VIS_AssignOkBtn' + windowNo).attr('disabled', true).css({
-                            'opacity': '0.5',
-                            'pointer-events': 'none'
-                        });
-                    } else {
-                        colTableCtrl.setValue(userId);
-                        colTableCtrl.setReadOnly(true);
-                        mainDiv.find('#VIS_AssignOkBtn' + windowNo).hide();
-                        mainDiv.find('#VIS_recordDltBtn' + windowNo).hide();
-                        enableDelete = false;
-                        enableOk = false;
-                    }
-                } else {
-                    mainDiv.find('#VIS_AssignOkBtn' + windowNo).attr('disabled', true).css({
-                        'opacity': '0.5',
-                        'pointer-events': 'none'
-                    });
-                    mainDiv.find('#VIS_assignDoneBtn' + windowNo).hide();
-                    mainDiv.find('#VIS_recordDltBtn' + windowNo).hide();
-                }
-            };
-
-            if (VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue()) > 0) {
-
-                colTableCtrl.getControl().parents('.vis-input-wrap')
-                    .find('label').css('color', 'rgba(var(--v-c-on-secondary), 1) !important');
-
-            }
-        };
-
         InitEvents();
+
 
         //calling init events 
         function InitEvents() {
-            //handling ok btn security
-            if (enableOk) {
-                //click event for ok btn
-                mainDiv.find('.VIS_OKbtn').off('click')
-                mainDiv.find('#VIS_AssignOkBtn' + windowNo).on('click', function () {
-                    userNameId = VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue());
-                    var isMatch = true;
-                    if (unMatchRecords.length == 0) {
-                        VIS.ADialog.info("VIS_RecordNotAssigned");
-                        isMatch = false;
-                        return;
+            //click event for ok btn
+            mainDiv.find('.VIS_OKbtn').off('click')
+            mainDiv.find('#VIS_AssignOkBtn' + windowNo).on('click', function () {
+                userNameId = VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue());
+                var isMatch = false
+
+                /* if only assigned record selected*/
+                if (unMatchRecords.length == 0) {
+                    isMatch = false;
+                    if (userNameId <= 0) {
+                        /* multiple records selected than confirmation popup for delete*/
+                        handleDeleteOrConfirm(assignMatchRecord.length > 1, deleteRecord);
                     }
-                    // check assign record userid match with selected user id from search controller
-                    assignMatchRecord.forEach((record) => {
-                        if (record.userId != userNameId) {
-                            VIS.ADialog.info("VIS_UserNotAssigned");
-                            isMatch = false;
+                    else {
+                        /*  multiple records selected for assigning */
+                        assignMatchRecord.forEach((record) => {
+                            if (record.AD_User_ID != userNameId) {
+                                unMatchRecords.push(record.ID);
+                                isMatch = true;
+                            }
+                        });
+                        if (isMatch) {
+                            if (unMatchRecords.length > 1) {
+                                /*confirmation popup to assign records*/
+                                confirmRecordsAssign();
+                            }
+                            else {
+                                busyDiv(true);
+                                assignedUser();
+                                return;
+                            }
+                        }
+                        else {
+                            ch.close();
                             return;
-
-                        };
-                    });
-
-                    // match user id than assign unassigned record
-                    if (isMatch) {
-                        busyDiv(true);
-                        assignedUser();
-
+                        }
                     }
-                });
-            };
+                }
+                else {
+                    if (VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue()) > 0) {
 
-
-            // handling delete btn security
-            if (enableDelete) {
-
-                // click event for delete
-                mainDiv.find('.VIS_recordDelete').off('click')
-                mainDiv.find('#VIS_recordDltBtn' + windowNo).on('click', function () {
-                    deleteRecord();
-                    mainDiv.find('#VIS_assignDoneBtn' + windowNo).hide();
-                    colTableCtrl.setValue(null);
-                    colTableCtrl.setReadOnly(false);
-                    enableDone = false;
-                    //clone the delete btn 
-                    $deleteButton
-                        .attr('id', 'VIS_AssignOkBtn_Modified') // Change the ID for clarity
-                        .val(VIS.Msg.getMsg('VIS_OK')) // Update the button text
-                        .off('click') // Remove the existing click handler
-                        .on('click', function () {
-                            busyDiv(true);
-                            userNameId = VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue());
-                            assignedUser();
-
+                        /*  multiple records selected including unassigned records */
+                        assignMatchRecord.forEach((record) => {
+                            if (record.AD_User_ID != userNameId) {
+                                unMatchRecords.push(record.ID);
+                                isMatch = true;
+                            };
                         });
 
+                        if (isMatch) {
+                            /*confirmation popup to assign records*/
+                            confirmRecordsAssign();
+                        }
 
-                    mainDiv.find('#VIS_recordDltBtn').hide();
+                        else {
+                            busyDiv(true);
+                            assignedUser();
+                            return;
+                        };
+                    }
+                    else {
+                        VIS.ADialog.info("SelectUser");
+                        ch.close();
+                        return;
+                    }
+                };
+            });
 
-                    mainDiv.find('#VIS_AssignOkBtn_Modified').attr('disabled', true).css({
-                        'opacity': '0.5',
-                        'pointer-events': 'none'
-                    });
-                });
-            };
 
-            // handling done btn security
-            if (enableDone) {
-                mainDiv.find('.VIS_Donebtn').off('click')
-                mainDiv.find('#VIS_assignDoneBtn' + windowNo).on('click', function () {
-                    RecordStatus('DNE');
-                });
-            }
             //cancel btn click
             mainDiv.find('.VIS_Cancelbtn').off('click')
             mainDiv.find('#VIS_assignCancelBtn' + windowNo).on('click', function () {
@@ -244,85 +142,35 @@
 
             });
 
-
-            colTableCtrl.fireValueChanged = function () {
-
-                if (VIS.Utility.Util.getValueOfInt(colTableCtrl.getValue()) > 0) {
-
-                    colTableCtrl.getControl().parents('.vis-input-wrap')
-                        .find('label').css('color', 'rgba(var(--v-c-on-secondary), 1) !important');
-
-                    if (enableDelete) {
-                        mainDiv.find('#VIS_AssignOkBtn_Modified').attr('disabled', false).css({
-                            'opacity': '1',
-                            'pointer-events': 'all'
-                        });
-                    }
-                    mainDiv.find('#VIS_AssignOkBtn' + windowNo).attr('disabled', false).css({
-                        'opacity': '1',
-                        'pointer-events': 'all'
-                    });
-
-                }
-                else {
-                    colTableCtrl.getControl().parents('.vis-input-wrap')
-                        .find('label').css('color', 'rgba(var(--v-c-mandatory), 1) !important');
-
-                    if (enableDelete) {
-                        mainDiv.find('#VIS_AssignOkBtn_Modified').attr('disabled', true).css({
-                            'opacity': '0.6',
-                            'pointer-events': 'none'
-                        });
-                    }
-                    mainDiv.find('#VIS_AssignOkBtn' + windowNo).attr('disabled', true).css({
-                        'opacity': '0.6',
-                        'pointer-events': 'none'
-                    });
-                }
-
-
+            // get primary key of table in order to show the Popup
+            var data = {
+                AD_Table_ID: table_id
+            };
+            var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetKeyColumns", data);
+            if (res == null) {
+                return;
             }
         };
 
-        //status assign
-        function RecordStatus(status) {
-            assignMatchRecord.forEach(record => {
-                unMatchRecords.push(record.ID)
-            });
-            busyDiv(true);
-            $.ajax({
-                url: VIS.Application.contextUrl + "AssignedRecordToUser/SetStatus",
-                type: "POST",
-                data: {
-                    status: status,
-                    AD_Window_ID: WindowId,
-                    AD_Table_ID: table_id,
-                    Record_ID: unMatchRecords,
-                },
-                dataType: 'json',
-                success: function (response) {
-                    var statusresult = JSON.parse(response)
-                    if (!(statusresult.toLowerCase().startsWith("error"))) {
-                        removeAssignRecord();
-                        ch.close();
-                        busyDiv(false);
-
+        /**
+         * Function used to delete the multiple records
+         * @param {any} isMultiple
+         * @param {any} deleteFn
+         */
+        function handleDeleteOrConfirm(isMultiple, deleteFn) {
+            if (isMultiple) {
+                VIS.ADialog.confirm("VIS_DeleteRecord", true, "", "Confirm", function (response) {
+                    if (response) {
+                        deleteFn();
                     }
-                    else {
-                        busyDiv(false);
-                        VIS.ADialog.info(statusresult);
-                    }
-                },
-                error: function () {
-                    busyDiv(false);
-                }
-            });
+                });
+            } else {
+                deleteFn();
+            }
         };
 
-
-        // delete the record
+        /*  delete record*/
         function deleteRecord() {
-
             assignMatchRecord.forEach(record => {
                 unMatchRecords.push(record.ID)
             });
@@ -338,16 +186,14 @@
                 },
                 dataType: 'json',
                 success: function (response) {
+                    busyDiv(false);
                     var deleteresult = JSON.parse(response);
                     if (!(deleteresult.toLowerCase().startsWith("error"))) {
+                        /*remove the deleted record from assigrecord array*/
                         removeAssignRecord();
-                        busyDiv(false);
-                        colTableCtrl.getControl().parents('.vis-input-wrap')
-                            .find('label').css('color', 'rgba(var(--v-c-mandatory), 1) !important');
-
+                        ch.close();
                     }
                     else {
-                        busyDiv(false);
                         VIS.ADialog.info(deleteresult);
                     }
                 },
@@ -357,6 +203,65 @@
             });
         };
 
+        // Function used to handle User ID
+        function handleuserId() {
+            // get assigned User and assigneby User
+            if (assignMatchRecord.length > 0) {
+                userId = assignMatchRecord[0].AD_User_ID;
+                adminUser = assignMatchRecord[0].CreatedBy;
+            };
+            /*  set the value of userid if record is already assigned*/
+            if (record_id.length == 1 && userId) {
+                colTableCtrl.setValue(userId);
+            }
+        };
+
+        /*  confirmation popup*/
+        function confirmRecordsAssign() {
+            VIS.ADialog.confirm("VIS_MultipleRecords", true, "", "Confirm", function (response) {
+                if (response) {
+                    busyDiv(true);
+                    assignedUser();
+                    return;
+                }
+            });
+        };
+
+        /* get the data of selected record if they are already assigned*/
+        function getSelectedAssignRec() {
+            $.ajax({
+                url: VIS.Application.contextUrl + "AssignedRecordToUser/GetAssignedRecord",
+                type: "POST",
+                data: {
+                    Record_ID: record_id
+                },
+                dataType: 'json',
+                success: function (response) {
+                    var result = JSON.parse(response);
+                    unAssignedArray = record_id.filter(id => {
+                        return !result.find(record => record.ID === id);
+                    });
+                    uAssignedRecords();
+
+                    if (result.length > 0) {
+                        record_id.forEach(id => {
+                            var matched = result.find(record => record.ID === id);
+                            matched ? assignMatchRecord.push(matched) : unMatchRecords.push(id);
+                        });
+                        result.forEach(record => {
+                            var matched = assignedRecords.find(existingRecord => existingRecord.ID === record.ID);
+                            if (!matched) {
+                                assignedRecords.push(record);
+                            }
+                        });
+                    }
+                    else {
+                        unMatchRecords.push(...record_id);
+                    }
+                    handleuserId();
+                }
+            });
+        }
 
         // show function
         this.show = function () {
@@ -367,7 +272,7 @@
             ch.setEnableResize(false);
             ch.setTitle(VIS.Msg.getMsg("VIS_AssignUser"));
             ch.setModal(true);
-
+            getSelectedAssignRec();
             //Disposing Everything on Close
             ch.onClose = function () {
                 if ($self.onClose) $self.onClose();
@@ -379,7 +284,14 @@
 
 
         };
-
+        function uAssignedRecords() {
+            unAssignedArray.forEach(id => {
+                var matchedIndex = assignedRecords.findIndex(existingRecord => existingRecord.ID === id);
+                if (matchedIndex !== -1) {
+                    assignedRecords.splice(matchedIndex, 1);
+                }
+            });
+        }
 
         // assign the record
         function assignedUser() {
@@ -394,6 +306,7 @@
                 },
                 dataType: 'json',
                 success: function (response) {
+                    busyDiv(false);
                     var assignedresult = JSON.parse(response)
                     if (assignedresult == '01') {
                         var result = [];
@@ -406,20 +319,37 @@
                             });
                         });
                         assignedRecords.push(...result);
-                        busyDiv(false);
                         ch.close();
                     }
-                    if (assignedresult != '01') {
-                        if (assignedresult === '02') {
-                            VIS.ADialog.info("VIS_RecordAssigned");
-                            busyDiv(false);
-                        }
-                        else {
-                            VIS.ADialog.info(assignedresult);
-                            busyDiv(false);
-                        }
+                    else if (assignedresult == '02') {
+                        VIS.ADialog.info("VIS_RecordAssigned");
+                    }
+                    else if (assignedresult == '03') {
+                        // Function to update records using map
 
-                    };
+                        unMatchRecords.forEach(id => {
+                            var matched = assignedRecords.find(record => record.ID === id);
+                            if (matched) {
+                                matched.userId = userNameId;
+                                matched.createdBy = loginUserID;
+                            }
+                            else {
+                                assignedRecords.push({
+                                    ID: id,
+                                    userId: userNameId,
+                                    createdBy: loginUserID
+                                });
+                            }
+                        });
+
+
+
+                        ch.close();
+                    }
+                    else {
+                        VIS.ADialog.info("assignedresult");
+
+                    }
                 },
                 error: function () {
                     busyDiv(false);
@@ -429,6 +359,7 @@
 
         };
 
+        /*remove the record from assign record array*/
         function removeAssignRecord() {
             assignMatchRecord.forEach((record) => {
                 const index = assignedRecords.findIndex(match => match.ID === record.ID);
@@ -438,9 +369,9 @@
             });
         };
 
-
+        /* dispose elements*/
         this.disposeComponent = function () {
-            $deleteButton, $doneButton, $cancelBtn, $okBtn = null;
+            $cancelBtn, $okBtn = null;
             ch = null;
             UpperDiv = null;
             bottom = null;

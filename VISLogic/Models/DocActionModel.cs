@@ -436,7 +436,13 @@ namespace VIS.Models
                 C_DocTypeTarget_ID = Util.GetValueOfInt(po.Get_Value("C_DocTypeTarget_ID"));
                 C_DocType_ID = C_DocTypeTarget_ID;
             }
-
+            //VIS_427 If document is completed then check the period status
+            if (Util.GetValueOfString(po.Get_Value("DocStatus")).Equals("CO"))
+            {
+                //add your date column here
+                string[] columnArray = { "MovementDate", "DateAcct", "DateTrx", "StatementDate", "VA073_TrxDate", "VAMFG_DateAcct" };
+                action.Error = GetPeriodStatus(po, columnArray, C_DocType_ID);
+            }
             if (C_DocType_ID > 0)
             {
                 String[] docActionHolder = new String[] { docAction };
@@ -663,7 +669,39 @@ namespace VIS.Models
             }
             return retDic;
         }
+        /// <summary>
+        /// 04/04/2025 this function is use to get the period status i.e. whether period is closed or not
+        /// </summary>
+        /// <param name="po">PO Class</param>
+        /// <param name="columnArray">Array of Columns</param>
+        /// <param name="C_DocType_ID">C_DocType_ID</param>
+        /// <returns>Return Message whether period is closed or not</returns>
+        /// <author>VIS_427</author>
+        public string GetPeriodStatus(PO po, string[] columnArray, int C_DocType_ID)
+        {
+            string columnName = "";
+            DateTime? columnDateVal = null;
+            //if column name exist in po object then get its name and break the loop
+            for (int i = 0; i < columnArray.Length; i++)
+            {
+                if (po.Get_ColumnIndex(columnArray[i]) >= 0 && 
+                    Util.GetValueOfDateTime(po.Get_Value(columnArray[i])) != null)
+                {
+                    columnName = columnArray[i];
+                    columnDateVal = Util.GetValueOfDateTime(po.Get_Value(columnName));
+                    break;
 
+                }
+            }
+            //checking for period close or not
+            if (columnName != "" && MPeriod.IsOpen(ctx, columnDateVal,
+             Util.GetValueOfString(DB.ExecuteScalar("SELECT DocBaseType FROM C_DocType WHERE C_DocType_ID=" + C_DocType_ID, null, null))
+            , Util.GetValueOfInt(po.Get_Value("AD_Org_ID"))))
+            {
+                return "@PeriodOpen@";
+            }
+            return "@PeriodClosed@";
+        }
     }
 
     public interface ModuleDocAction

@@ -1353,3 +1353,93 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
         position: relative;
       /*  top: -2px;*/
     }
+
+
+
+.vis-a-purple-box {
+    border-color: #7f46f061;
+    background-color: #7f46f029;
+}
+
+    .vis-a-purple-box .vis, .vis-a-purple-box .fa {
+        color: #7F46F0;
+    }
+
+.vis-followups-red-dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 10px; /* Size of the dot */
+    height: 10px; /* Size of the dot */
+    background-color: red; /* Red color */
+    border-radius: 50%; /* Makes it circular */
+}
+
+.vis-followups-label {
+    position: relative;
+}
+
+.vis-a-purplebg {
+    background-color: #7F46F0;
+}
+
+
+
+.vis-ts-panel-twoByTwo .vis-a-statusBox-container {
+    grid-template-columns: repeat(2,1fr);
+    padding: 0;
+}
+
+    .vis-ts-panel-twoByTwo .vis-a-statusBox-container .vis-a-status-box {
+        flex-direction: column;
+        justify-content: center;
+    }
+    .vis-ts-panel-twoByTwo .vis-a-statusBox-container .vis-a-headWico {
+        display: block;
+    }
+    .vis-ts-panel-twoByTwo .vis-a-statusBox-container .vis-a-status-count {
+        font-size: 1.2em;
+        min-width: 40px;
+        padding: 0 10px;
+    }
+    .vis-ts-panel-twoByTwo .vis-a-statusBox-container .vis-followups-red-dot {
+        height: 8px;
+        right: 30px;
+        top: 30px;
+        width: 8px;
+    }
+    .vis-ts-panel-twoByTwo .vis-a-statusBox-container .vis-a-status-name {
+        font-size: 1.5em;
+        margin: 2px 0;
+    }
+    .vis-ts-panel-twoByTwo .vis-a-statusBox-container .vis-a-headWico i {
+        font-size: 2.5em;
+    }
+.vis-ts-panel-twoByTwo.vis-ts-panel-oneByOne .vis-a-statusBox-container .vis-a-headWico i {
+    font-size: 1.5em;
+}
+.vis-ts-panel-twoByTwo.vis-ts-panel-oneByOne .vis-a-statusBox-container .vis-a-status-count {
+    font-size: 1em;
+}
+.vis-ts-panel-twoByTwo.vis-ts-panel-oneByOne .vis-a-statusBox-container .vis-a-status-name {
+    font-size: 1em;
+}
+.vis-ts-panel-twoByTwo.vis-ts-panel-oneByOne .vis-a-status-box {
+    padding: .5em .625em;
+}
+.vis-apanel-rb-ul li.vis-subscribeoverlay-item{
+    min-width: 120px;
+}
+.vis-feedDetails p.vis-comment-desc {
+    white-space: pre-line;
+    display: inline-block;
+    width: calc(100% - 58px);
+}
+.vis-feedContainer .vis-txtFllCmnt {
+    /*overflow-y: hidden;*/
+    min-height: 35px;
+}
+html[dir=rtl] .vis-feedIcons.vis-icon-viewMoreComments {
+    margin: 4px 0px 0 4px;
+    float: none;
+}

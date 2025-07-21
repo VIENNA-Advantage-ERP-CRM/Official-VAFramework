@@ -139,6 +139,10 @@
     background-position: center center;*/
 }
 
+    .vis-ad-w-p-busy i {
+        width: auto;
+    }
+
 .vis-ad-w-p-filterpnl {
     grid-column: 1/1;
     grid-row: 1/8;
@@ -955,6 +959,10 @@ span.vis-ad-w-p-tb-rc-action {
     color: rgba(var(--v-c-on-secondary), 1);
     background: rgba(var(--v-c-common), 1);
     height: 100%;
+}
+
+.ui-dialog-content.ui-widget-content .vis-ad-w-p-vc {
+    flex: 1 !important;
 }
 
 .vis-ad-w-p .vis-ad-w-p-vc {
@@ -1997,6 +2005,13 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
 
 /*actions popups css*/
+
+.vis-chat-container
+{
+    height:100%;
+    overflow:hidden;
+}
+
 .vis-chat-msgbox {
     font-size: 10pt;
     outline: none;
@@ -2026,7 +2041,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 .vis-chatimgwrap {
     height: 48px;
     width: 48px;
-    cursor: pointer;
+   /* cursor: pointer;*/
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2068,7 +2083,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 .vis-chatusername {
     color: rgba(var(--v-c-primary), 1);
     cursor: pointer;
-    flex: 1;
+   /* flex: 1;*/
 }
 
 .vis-chat-arrowdown {
@@ -2096,6 +2111,7 @@ li.vis-ad-w-p-ap-tp-o-li-selected {
 
 .vis-chatdetailouterwrap {
     overflow-y: auto;
+    height: calc(100% - 70px);
     /*      height: 260px;*/
 }
 

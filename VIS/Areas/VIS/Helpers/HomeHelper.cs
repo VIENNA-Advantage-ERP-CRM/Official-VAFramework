@@ -13,6 +13,8 @@ using System.Globalization;
 using System.IO;
 using System.Web.Hosting;
 using VAdvantage.Classes;
+using System.Data.SqlClient;
+
 namespace VIS.Helpers
 {
 
@@ -472,8 +474,14 @@ namespace VIS.Helpers
                      .Append(" Join ad_user Au on (au.ad_user_id= CH.createdBy)")
                      .Append(" left outer JOIN ad_image AI on(ai.ad_image_id=au.ad_image_id)")
                      .Append("  join ad_window AW on(cs.ad_window_id= aw.ad_window_id) left outer  JOIN ad_image adi on(adi.ad_image_id= aw.ad_image_id)  where cs.createdby=" + ctx.GetAD_User_ID())
-                     .Append(" and ch.cm_chatentry_ID =(Select max(cm_chatentry_ID) from cm_chatentry where CM_Chat_ID= ch.cm_chat_id)")
-                     .Append("  order by inn.EntryID desc,ch.cm_chatentry_id asc");
+                     .Append(" and ch.cm_chatentry_ID =(Select max(cm_chatentry_ID) from cm_chatentry where CM_Chat_ID= ch.cm_chat_id)");
+            //VIS_427 show only count of those chats whose records are not restricted to any role
+            if (!MRole.GetDefault(ctx).IsAdministrator())
+            {
+                SqlQuery.Append(@"  and CMH.Record_ID NOT IN (Select Record_ID from AD_Record_Access WHERE IsExclude='Y'
+                                AND AD_Table_ID = CMH.AD_Table_ID AND AD_Role_ID = " + MRole.GetDefault(ctx).GetAD_Role_ID() + ")");
+            }
+            //.Append("  order by inn.EntryID desc,ch.cm_chatentry_id asc");
             try
             {
                 int nTotalFollow = Util.GetValueOfInt(DB.ExecuteScalar(SqlQuery.ToString()));
@@ -519,9 +527,14 @@ namespace VIS.Helpers
                         .Append("  left outer JOIN ad_image AI on(ai.ad_image_id=au.ad_image_id)")
                         .Append("  join ad_window AW on(cs.ad_window_id= aw.ad_window_id) left outer  JOIN ad_image adi on(adi.ad_image_id= aw.ad_image_id)")
                         .Append("  where cs.createdby=" + ctx.GetAD_User_ID())
-                        .Append("  and ch.cm_chatentry_ID =(Select max(cm_chatentry_ID) from cm_chatentry where CM_Chat_ID= ch.cm_chat_id)")
-                        .Append("  order by inn.EntryID desc,ch.cm_chatentry_id asc");
-
+                        .Append("  and ch.cm_chatentry_ID =(Select max(cm_chatentry_ID) from cm_chatentry where CM_Chat_ID= ch.cm_chat_id)");
+                //VIS_427 show olny those records which are not restricted to any role
+                if (!MRole.GetDefault(ctx).IsAdministrator())
+                {
+                    SqlQuery.Append(@"  and CS.Record_ID NOT IN (Select Record_ID from AD_Record_Access WHERE IsExclude='Y'
+                                AND AD_Table_ID=At.AD_Table_ID AND AD_Role_ID = " + MRole.GetDefault(ctx).GetAD_Role_ID() + ")");
+                }
+                SqlQuery.Append("  order by inn.EntryID desc,ch.cm_chatentry_id asc");
                 SqlParamsIn objSP = new SqlParamsIn();
                 dsData = new DataSet();
                 objSP.page = page;
@@ -530,8 +543,20 @@ namespace VIS.Helpers
                 dsData = VIS.DBase.DB.ExecuteDatasetPaging(objSP.sql, objSP.page, objSP.pageSize);
                 if (dsData != null)
                 {
+                    StringBuilder sql1 = new StringBuilder();
+                    sql1.Append("UPDATE CM_Subscribe SET UnReadMessageCount = 0 WHERE ");
                     for (int i = 0; i < dsData.Tables[0].Rows.Count; i++)
                     {
+                        sql1.Append("(AD_Table_ID = " + Util.GetValueOfInt(dsData.Tables[0].Rows[i]["AD_Table_ID"]) +
+                   " AND Record_ID = " + Util.GetValueOfInt(dsData.Tables[0].Rows[i]["Record_ID"]) +
+                   " AND AD_User_ID = " + ctx.GetAD_User_ID() +
+                   " AND AD_Window_ID = " + Util.GetValueOfInt(dsData.Tables[0].Rows[i]["AD_Window_ID"]) + " ) ");
+
+                        if (i < dsData.Tables[0].Rows.Count - 1)
+                        {
+                            sql1.Append(" OR ");
+                        }
+
                         var Fllps = new HomeFolloUps();
                         Fllps.ChatID = Util.GetValueOfInt(dsData.Tables[0].Rows[i]["ChatID"].ToString());
                         Fllps.ChatEntryID = Util.GetValueOfInt(dsData.Tables[0].Rows[i]["cm_chatentry_id"].ToString());
@@ -614,6 +639,9 @@ namespace VIS.Helpers
 
                         lstFollUps.Add(Fllps);
                     }
+
+                    //SET UnReadMessageCount = 0 
+                    DB.ExecuteQuery(sql1.ToString());
 
                 }
                 objFllupsInfo.lstUserImg = lstUImg;
@@ -845,6 +873,14 @@ namespace VIS.Helpers
             {
                 //strQuery = "  UPDATE cm_subscribe SET isRead='N' WHERE isRead='Y' AND cm_subscribe_id=" + SubscriberID;
                 //DB.ExecuteQuery(strQuery);
+                if (SubscriberID > 0)
+                {
+                    string sql1 = @"UPDATE CM_Subscribe 
+                                        SET UnReadMessageCount =  COALESCE(UnReadMessageCount, 0) + 1  WHERE CM_Subscribe_ID = @Value";
+                    SqlParameter[] param = new SqlParameter[1];
+                    param[0] = new SqlParameter("@Value", SubscriberID);
+                    DB.ExecuteQuery(sql1, param, null);
+                }
             }
 
         }
@@ -1417,11 +1453,12 @@ namespace VIS.Helpers
 
                 #region WorkFlow Count
                 //To Get Work flow Count
-                
-                strQuery = @"SELECT COUNT(*)
+
+                strQuery = @"SELECT COUNT(AD_WF_Activity_ID)
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'
-                            AND a.WFState      ='OS'
+                            AND a.WFState      ='OS' 
+                            AND a.EndWaitTime IS NULL 
                             AND a.AD_Client_ID =" + ctx.GetAD_Client_ID() + @"
                             AND ( (a.AD_User_ID=" + ctx.GetAD_User_ID() + @"
                             OR a.AD_User_ID   IN
@@ -1433,7 +1470,7 @@ namespace VIS.Helpers
                               AND (sysdate    <=validto )
                               ))
                             OR EXISTS
-                              (SELECT *
+                              (SELECT AD_WF_Responsible_ID
                               FROM AD_WF_Responsible r
                               WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
                               AND COALESCE(r.AD_User_ID,0)=0
@@ -1449,7 +1486,7 @@ namespace VIS.Helpers
                                 ))
                               )
                             OR EXISTS
-                              (SELECT *
+                              (SELECT AD_WF_Responsible_ID
                               FROM AD_WF_Responsible r
                               WHERE a.AD_WF_Responsible_ID=r.AD_WF_Responsible_ID
                               AND a.AD_User_ID = " + ctx.GetAD_User_ID() + @" AND r.ResponsibleType = 'H'
@@ -1464,7 +1501,7 @@ namespace VIS.Helpers
                                 ))
                               )
                             OR EXISTS
-                              (SELECT *
+                              (SELECT AD_WF_Responsible_ID
                               FROM AD_WF_Responsible r
                               INNER JOIN AD_User_Roles ur
                               ON (r.AD_Role_ID            =ur.AD_Role_ID)
@@ -1481,7 +1518,7 @@ namespace VIS.Helpers
                               AND r.responsibletype NOT IN ('H','C', 'M')
                               ) 
                             OR EXISTS
-                              (SELECT *
+                              (SELECT AD_WF_Responsible_ID
                               FROM AD_WF_Responsible r
                               INNER JOIN AD_Role ro
                               ON (r.AD_Role_ID            =ro.AD_Role_ID)                              
@@ -1502,10 +1539,19 @@ namespace VIS.Helpers
                 }
                 #endregion
 
+                #region Unread Message Count
+
+                string sql = @"SELECT SUM(UnReadMessageCount) FROM CM_Subscribe WHERE AD_User_ID =@Value ";
+                SqlParameter[] param = new SqlParameter[1];
+                param[0] = new SqlParameter("@Value", ctx.GetAD_User_ID());
+                int count = Util.GetValueOfInt(DB.ExecuteScalar(sql, param, null));
+
+                #endregion
                 objHome.RequestCnt = nRequest;
                 objHome.NoticeCnt = nNotice;
                 objHome.WorkFlowCnt = nWorkFlow;
-                return objHome;
+                objHome.UnreadMessageCount = count;
+                objHome.FollowUpCnt = getFllCnt(ctx);
             }
             catch (Exception)
             {

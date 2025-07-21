@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VAdvantage.Classes;
 using VAdvantage.DataBase;
+using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.DataContracts;
@@ -348,22 +350,22 @@ namespace VISLogic.Models
         /// <param name="actionName"></param>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public List<dynamic> CheckTableMapWithAction(int tableID, string actionType, string actionName,Ctx ctx)
+        public List<dynamic> CheckTableMapWithAction(int tableID, string actionType, string actionName, Ctx ctx)
         {
             var DyObjectsList = new List<dynamic>();
             string[] actions = actionName.Split(';');
             string formattedString = "'" + string.Join("','", actions) + "'";
             string sql = "";
             string action = "";
-             bool baseLanguage = Env.IsBaseLanguage(ctx, "");// GlobalVariable.IsBaseLanguage();
-           
+            bool baseLanguage = Env.IsBaseLanguage(ctx, "");// GlobalVariable.IsBaseLanguage();
+
             if (actionType == "WIW")
             {
                 if (baseLanguage)
                 {
-                    sql = @"SELECT w.AD_Window_ID AS ID,w.displayName AS Name FROM AD_Window w"; 
-                            //INNER JOIN AD_Window w ON  AD_Tab.AD_Window_ID=w.ad_window_id";
-                    
+                    sql = @"SELECT w.AD_Window_ID AS ID,w.displayName AS Name FROM AD_Window w";
+                    //INNER JOIN AD_Window w ON  AD_Tab.AD_Window_ID=w.ad_window_id";
+
                 }
                 else
                 {
@@ -381,7 +383,8 @@ namespace VISLogic.Models
                 {
                     sql = "SELECT DisplayName AS NAME, AD_Form_ID AS ID FROM AD_Form WHERE NAME IN (" + formattedString + ") ORDER BY DisplayName ";
                 }
-                else {
+                else
+                {
                     sql = "SELECT AD_Form_Trl.NAME, AD_Form.AD_Form_ID AS ID FROM AD_Form INNER JOIN AD_Form_Trl ON (AD_Form.AD_Form_ID=AD_Form_Trl.AD_FORM_ID AND AD_Form_Trl.AD_Language='" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "')  WHERE AD_Form.NAME IN (" + formattedString + ") ORDER BY AD_Form_Trl.NAME ";
                 }
                 action = "X";
@@ -407,7 +410,8 @@ namespace VISLogic.Models
         /// </summary>
         /// <param name="formName">Name</param>
         /// <returns>Ad_Form_ID</returns>
-        public int GetFormID(string formName) {
+        public int GetFormID(string formName)
+        {
             string sql = "SELECT AD_Form_ID FROM AD_Form WHERE IsActive='Y' AND Name = '" + formName + "'";
             int formID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             return formID;
@@ -418,10 +422,208 @@ namespace VISLogic.Models
         /// </summary>
         /// <param name="processName">Name</param>
         /// <returns>AD_Process_ID</returns>
-        public int GetProcessID(string processName) {
+        public int GetProcessID(string processName)
+        {
             string sql = "SELECT AD_Process_ID FROM AD_Process WHERE IsActive='Y' AND Value = '" + processName + "'";
             int processID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             return processID;
         }
+
+        /// <summary>
+        /// Save HttpRequest data into requestdata column
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_WF_Node_ID"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public string SaveHttpRequest(Ctx ctx, int AD_WF_Node_ID, string URL, string headers, string result)
+        {
+            int NodeAPICredential_ID = 0;
+            string sql = "SELECT NodeAPICredential_ID FROM NodeAPICredential WHERE AD_WF_Node_ID = " + AD_WF_Node_ID;
+            int ID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            if (ID > 0)
+            {
+                NodeAPICredential_ID = ID;
+            }
+
+            MNodeAPICredential nodeAPIObj = new MNodeAPICredential(ctx, NodeAPICredential_ID, null);
+            if (headers == "")
+                nodeAPIObj.SetApiKey(null);
+            else
+                nodeAPIObj.SetApiKey(headers);
+            nodeAPIObj.SetEndpoints(URL);
+            if (NodeAPICredential_ID == 0)
+            {
+                nodeAPIObj.SetAD_WF_Node_ID(AD_WF_Node_ID);
+            }
+            if (!nodeAPIObj.Save())
+            {
+                ValueNamePair vnp = VLogger.RetrieveError();
+                if (vnp != null && vnp.GetName() != null)
+                {
+                    string info = vnp.GetName();
+                    return info;
+                }
+            }
+
+
+            VAdvantage.WF.MWFNode obj = new VAdvantage.WF.MWFNode(ctx, AD_WF_Node_ID, null);
+            obj.Set_Value("RequestData", result);
+            if (!obj.Save())
+            {
+                {
+                    ValueNamePair vnp = VLogger.RetrieveError();
+                    if (vnp != null && vnp.GetName() != null)
+                    {
+                        string info = vnp.GetName();
+                        return info;
+                    }
+                }
+            }
+            return "OK";
+        }
+
+
+        /// <summary>
+        /// Get column names from the workflowflow table
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_WF_Node_ID"></param>
+        /// <returns>ColumnList</returns>
+        public List<ColumnInfo> GetWorkflowColumn(Ctx ctx, int AD_WF_Node_ID)
+        {
+            List<ColumnInfo> columns = new List<ColumnInfo>();
+            string sql = "SELECT ColumnName,AD_Reference_ID FROM AD_Column WHERE AD_Table_ID IN (SELECT AD_Table_ID FROM AD_Workflow WHERE AD_Workflow_ID=(SELECT AD_Workflow_ID FROM AD_WF_Node WHERE AD_WF_Node_ID =" + AD_WF_Node_ID + "))";
+            DataSet ds = DB.ExecuteDataset(sql, null, null);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    int displayType = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_Reference_ID"]);
+                    ColumnInfo obj = new ColumnInfo();
+                    obj.ColumnName = Util.GetValueOfString(ds.Tables[0].Rows[i]["ColumnName"]);
+                    columns.Add(obj);
+                    if (displayType == DisplayType.Table || displayType == DisplayType.TableDir || displayType == DisplayType.Search)
+                    {
+                        ColumnInfo obj1 = new ColumnInfo();
+                        obj1.ColumnName = Util.GetValueOfString(ds.Tables[0].Rows[i]["ColumnName"] + ".identifier");
+                        columns.Add(obj1);
+                    }
+                }
+            }
+            return columns;
+        }
+
+
+        /// <summary>
+        /// Fetch request data from workflow node
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_WF_Node_ID"></param>
+        /// <returns></returns>
+        public List<HttpReqdata> GetRequestData(Ctx ctx, int AD_WF_Node_ID)
+        {
+            List<HttpReqdata> objList = new List<HttpReqdata>();
+
+            string sql = @"SELECT
+                           WN.AD_WF_Node_ID, WN.RequestData,NC.Endpoints,NC.ApiKey,
+                           JSON_VALUE(WN.RequestData, '$.method') AS Method,
+                           JSON_VALUE(WN.RequestData, '$.url') AS URL,
+                           JSON_Query(WN.RequestData, '$.headers') AS Headers,
+                           JSON_VALUE(WN.RequestData, '$.bodyType') AS BodyType,
+                           CASE WHEN JSON_VALUE(WN.RequestData, '$.bodyType') = 'Plain Text'
+                           THEN JSON_VALUE(WN.RequestData, '$.bodyContent')
+                           ELSE JSON_QUERY(WN.RequestData, '$.bodyContent') END AS BodyContent,
+                           JSON_Query(WN.RequestData, '$.queryString') AS QueryString
+                           FROM AD_WF_Node WN LEFT JOIN NodeAPICredential NC ON (NC.AD_WF_Node_ID=WN.AD_WF_Node_ID)
+                           WHERE WN.RequestData IS NOT NULL AND WN.AD_WF_Node_ID = " + AD_WF_Node_ID + " ORDER BY WN.Updated DESC";
+
+            if (DB.IsPostgreSQL())
+            {
+                sql = @"SELECT
+                           WN.AD_WF_Node_ID, WN.RequestData,NC.Endpoints,NC.ApiKey,
+                           jsonb_extract_path_text(WN.RequestData::jsonb, 'method') AS Method,
+                           jsonb_extract_path_text(WN.RequestData::jsonb, 'url') AS URL,
+                           jsonb_extract_path(WN.RequestData::jsonb, 'headers') AS Headers,
+                           jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') AS BodyType,
+                           CASE WHEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') = 'Plain Text'
+                           THEN jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent')
+                           ELSE jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent') END AS BodyContent,
+                           jsonb_extract_path(WN.RequestData::jsonb, 'queryString') AS QueryString
+                           FROM AD_WF_Node WN LEFT JOIN NodeAPICredential NC ON (NC.AD_WF_Node_ID=WN.AD_WF_Node_ID)
+                           WHERE WN.RequestData IS NOT NULL AND WN.AD_WF_Node_ID = " + AD_WF_Node_ID + " ORDER BY WN.Updated DESC";
+            }
+            DataSet ds = DB.ExecuteDataset(sql, null, null);
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                JObject jObj = null;
+                StringBuilder sbFetchedRes = new StringBuilder("");
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    jObj = null;
+                    HttpReqdata obj = new HttpReqdata();
+                    obj.AD_WF_Node_ID = Util.GetValueOfInt(ds.Tables[0].Rows[i]["AD_WF_Node_ID"]);
+                    obj.URL = Util.GetValueOfString(ds.Tables[0].Rows[i]["URL"]);
+                    obj.BodyType = Util.GetValueOfString(ds.Tables[0].Rows[i]["BodyType"]);
+                    obj.Method = Util.GetValueOfString(ds.Tables[0].Rows[i]["Method"]);
+                    sbFetchedRes.Clear().Append(Util.GetValueOfString(ds.Tables[0].Rows[i]["ApiKey"]));
+                    if (!string.IsNullOrEmpty(sbFetchedRes.ToString()))
+                    {
+                        jObj = JObject.Parse(SecureEngine.Decrypt(sbFetchedRes.ToString()));
+                        if (jObj.Count > 0)
+                        {
+                            foreach (var property in jObj)
+                            {
+                                obj.Headers.Add(property.Key, Util.GetValueOfString(property.Value));
+                            }
+                        }
+                    }
+                    sbFetchedRes.Clear().Append(Util.GetValueOfString(ds.Tables[0].Rows[i]["QueryString"]));
+                    if (!string.IsNullOrEmpty(sbFetchedRes.ToString()))
+                    {
+                        jObj = JObject.Parse(sbFetchedRes.ToString());
+                        if (jObj.Count > 0)
+                        {
+                            foreach (var property in jObj)
+                            {
+                                obj.QueryString.Add(property.Key, Util.GetValueOfString(property.Value));
+                            }
+                        }
+                    }
+                    sbFetchedRes.Clear().Append(Util.GetValueOfString(ds.Tables[0].Rows[i]["BodyContent"]));
+                    if ((Util.GetValueOfString(obj.BodyType).ToUpper() == "JSON") && !string.IsNullOrEmpty(sbFetchedRes.ToString()))
+                    {
+                        jObj = JObject.Parse(sbFetchedRes.ToString());
+                        if (jObj.Count > 0)
+                        {
+                            obj.BodyContent = sbFetchedRes.ToString();
+                        }
+                    }
+                    else
+                        obj.BodyContent = sbFetchedRes.ToString();
+                    objList.Add(obj);
+                }
+            }
+            return objList;
+        }
     }
+
+    public class HttpReqdata
+    {
+        public string URL { get; set; }
+        public string BodyType { get; set; }
+        public int AD_WF_Node_ID { get; set; }
+        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> QueryString { get; set; } = new Dictionary<string, string>();
+        public string Method { get; set; }
+        public string BodyContent { get; set; }
+    }
+
+    public class ColumnInfo
+    {
+
+        public int AD_Reference_ID { get; set; }
+        public string ColumnName { get; set; }
+    }
+
 }

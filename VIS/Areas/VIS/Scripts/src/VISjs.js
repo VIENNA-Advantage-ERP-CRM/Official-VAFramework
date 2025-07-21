@@ -106,7 +106,15 @@ import "../home/usersession.js"
 import "../widgets/WorkflowWidget";
 import "../widgets/NoticeWidget";
 import "../widgets/RequestWidget";
-import "../widgets/ActionsWidget";
+import "../widgets/actionswidget";
 import "../widgets/dynamicWidget.js";
 import "../widgets/VISDownloadFile.js";
-import "../widgets/assignRecordWidget.js";
+import "../widgets/assignrecordwidget.js";
+import "../widgets/followupswidget.js";
+import "../app/Framework/subscribe.js";
+import "../widgets/checklist.js";
+import "../widgets/assignedwindowrec.js";
+import "../tabpanels/wfPanel.js";
+import "../app/forms/WorkFlowHttpRequest.js";
+import "../app/Framework/VIS_SecretKeyDialog.js";
+

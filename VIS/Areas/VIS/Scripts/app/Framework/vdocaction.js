@@ -31,6 +31,13 @@
         this.onClose = null;
         var tabmenubusy = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>');
         var loadLabel = $('<label>' + VIS.Msg.getMsg("Loading") + '</label>');
+        //VIS_427 03/04/2025 Defined variable for reverse date
+        var ReverseDatediv = null;
+        var $ReverseDate = null;
+        var isPeriodOpen = false;
+        /*This array store the column whose value is used to set as reversal date
+         and we can add our columns here*/
+        var columnArray = ["MovementDate", "DateAcct", "DateTrx", "StatementDate", "VA073_TrxDate", "VAMFG_DateAcct"];
 
         if (VIS.Application.isRTL) {
             //$cmbAction.css({ "margin-left": "0px", "margin-right": "10px" });
@@ -141,7 +148,7 @@
 
             setVisibility(false);
             docStatus = result.DocStatus;
-            if (result.Error != null && result.Error != "" && result.Error != 'undefined') {
+            if (result.Error != "@PeriodOpen@" && result.Error != "@PeriodClosed@" && result.Error != null && result.Error != "" && result.Error != 'undefined') {
                 VIS.ADialog.error(result.Error);
                 return;
             }
@@ -150,6 +157,10 @@
                 $message.text("*** ERROR ***");
                 //SetBusy(false);
                 return;
+            }
+            //if period is open then made boolean value true
+            if (result.Error == "@PeriodOpen@") {
+                isPeriodOpen = true;
             }
             //createDesign();
 
@@ -167,7 +178,7 @@
                 for (var j = 0; j < _values.length && !added; j++)
                     if (result.Options[i] && result.Options[i].equals(_values[j])) {
                         //actionCombo.addItem(_names[j]);
-                        $cmbAction.append('<option >' + _names[j] + '</option>');
+                        $cmbAction.append('<option data-actionkey="' + _values[j] + '">' + _names[j] + '</option>');
                         added = true;
                     }
             }
@@ -184,6 +195,11 @@
                 ch.close();
 
                 return;
+            }
+            /*VIS_427 03/04/2025 if document is completed and docAction 
+             is Reverse correct or Void then append reversed date field in docaction*/
+            if (tabObj.getValue("DocStatus") == "CO") {
+                setReversalDate(false);
             }
         };
 
@@ -272,6 +288,16 @@
             $table.append($tr1).append($tr2).append($tr3);
 
             $maindiv.append($table);
+            //VIS_427 Initialised date control
+            ReverseDatediv = $('<div class="vis-ReversedateDiv" id="vis_ReverseDate_' + windowNo + '" style="margin-top:12px;">');
+            var $ReverseDatewrapDiv = $('<div class="input-group vis-input-wrap">');
+            var $ReverseDateCalenderIcon = $('<div class="input-group-prepend"><span class="input-group-text vis-color-primary"> <i class="fa fa-calendar"></i> </span>');
+            $ReverseDate = new VIS.Controls.VDate("DateAcct", true, false, true, VIS.DisplayType.Date, "DateAcct");
+            var $ReverseDateWrap = $('<div class="vis-control-wrap">');
+            $ReverseDatewrapDiv.append($ReverseDateCalenderIcon).append($ReverseDateWrap);
+            $ReverseDateWrap.append($ReverseDate.getControl().attr('placeholder', ' ').attr('data-placeholder', '')).append('<label>' + VIS.Msg.getMsg("VIS_ReversalDate") + '</label>');
+            ReverseDatediv.append($ReverseDatewrapDiv);
+
             setVisibility(true);
             $maindiv.append(tabmenubusy).append(loadLabel);
             //  $maindiv.prop("disable", true);
@@ -290,6 +316,11 @@
                 //	Display descriprion
                 if (index != -1 && _descriptions.length > 0) {
                     $message.text(_descriptions[index]);
+                }
+                /*VIS_427 03/04/2025 if document is completed and docAction
+                  is Reverse correct or Void then append reversed date field in docaction*/
+                if (tabObj.getValue("DocStatus") == "CO") {
+                    setReversalDate(true);
                 }
             });
 
@@ -310,6 +341,26 @@
                 //if ($btnok.prop("disabled") == true) {
                 //    return;
                 //}
+                //VIS_427 Checked whether the reverse date exist or not
+                var dateVal = null;
+                var ReverseDateExistOrNo = $maindiv.find("#vis_ReverseDate_" + windowNo).length;
+                if (ReverseDateExistOrNo > 0) {
+                    /*here we are getting value of those date whose values to be saved as the
+                      value of reversed date in reversal document*/
+                    dateVal = getDateForComparision();
+                }
+                //if Reverse date is null then return message on ok click
+                if (ReverseDateExistOrNo > 0
+                    && $ReverseDate.getValue() == null && $ReverseDate.getValue() == undefined) {
+                    VIS.ADialog.info("VIS_ReverseDateCantBeNull");
+                    return false;
+                }
+
+                if (ReverseDateExistOrNo > 0
+                    && dateVal != null && dateVal > $ReverseDate.getValue()) {
+                    VIS.ADialog.info("VIS_ReversalDateCantBeSmall");
+                    return false;
+                }
                 if (save()) {
                     self.isOKPressed = true;
 
@@ -333,6 +384,42 @@
             };
         };
 
+        /* this function is used to compare the date fields which exist in window which
+         can be compared with reverse date*/
+        function getDateForComparision() {
+            var dateVal = null;
+            for (i = 0; i < columnArray.length; i++) {
+                if (tabObj.getValue(columnArray[i]) != null && tabObj.getValue(columnArray[i]) != undefined) {
+                    dateVal = tabObj.getValue(columnArray[i]);
+                    break;
+                }
+            }
+            return dateVal;
+        }
+
+        /**
+         * this function is used to append thee reverse date if docaction is ReverseCorrect
+         * or void and used to set the reverse date using its date fields
+         * @param {any} isReverseDateToRemove
+         */
+        function setReversalDate(isReverseDateToRemove) {
+            if (($cmbAction.find('option:selected').data("actionkey") == 'RC' || $cmbAction.find('option:selected').data("actionkey") == 'VO')) {
+                $maindiv.append(ReverseDatediv);
+                if (isPeriodOpen) {
+                    for (i = 0; i < columnArray.length; i++) {
+                        if (tabObj.getValue(columnArray[i]) != null && tabObj.getValue(columnArray[i]) != undefined) {
+                            $ReverseDate.setValue(tabObj.getValue(columnArray[i]));
+                            break;
+                        }
+                    }
+                }
+            }
+            //here if true then remove the reverse div else not
+            else if (isReverseDateToRemove) {
+                $ReverseDate.setValue(null);
+                $maindiv.find("#vis_ReverseDate_" + windowNo).remove();
+            }
+        }
         this.show = function () {
             ch.setContent($maindiv);
             ch.setTitle(VIS.Msg.getMsg("DocAction"));
@@ -385,7 +472,11 @@
                 setVisibility(false);
                 return false;
             }
-
+            
+            //set the value of reversed date so that it can be used on the time of reversal
+            if ($ReverseDate.getValue() != null && $ReverseDate.getValue() != undefined) {
+                tabObj.setValue("VAS_ReversedDate", $ReverseDate.getValue())
+            }
             //	Save Selection
             // thi.log.Config("DocAction=" + _values[selectedindex]);
             var windowID = tabObj.getAD_Window_ID();
