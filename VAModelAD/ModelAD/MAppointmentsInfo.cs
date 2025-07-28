@@ -7,6 +7,7 @@ using VAdvantage.Utility;
 using System.Data;
 using VAdvantage.DataBase;
 using VAdvantage.PushNotif;
+using static VAModelAD.AIHelper.AIPayload;
 
 namespace VAdvantage.Model
 {
@@ -107,6 +108,16 @@ namespace VAdvantage.Model
             }
 
             #endregion
+
+            string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID());
+            if (!string.IsNullOrEmpty(threadID))
+            {
+                if (!ExecuteThreadAction(actionType: newRecord ? ActionType.New : ActionType.Update, tableID: Util.GetValueOfInt(GetAD_Table_ID()), recordID: Util.GetValueOfInt(GetRecord_ID()),
+                    attachmentID: Util.GetValueOfInt(GetAppointmentsInfo_ID()), userID: GetAD_User_ID(), ctx: GetCtx(), threadID: threadID, attachmentType: type))
+                {
+                    log.SaveError("", "Error in execution of insert/update data against appointment thread : " + GetAppointmentsInfo_ID());
+                }
+            }
 
             return true;
         }

@@ -189,6 +189,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIHelper\AIApiService.cs" />
+    <Compile Include="AIHelper\AIHelperDataContracts.cs" />
+    <Compile Include="AIHelper\AIPayload.cs" />
+    <Compile Include="AIHelper\RequestPayload.cs" />
     <Compile Include="AzureBlob\AzureBlobStorage.cs" />
     <Compile Include="BundleCollection\ModuleBundles.cs" />
     <Compile Include="Classes\AEnv.cs" />
@@ -202,6 +206,7 @@
     <Compile Include="Classes\SessionEventHandler.cs" />
     <Compile Include="Classes\TableSQL.cs" />
     <Compile Include="Classes\ThreadInstance.cs" />
+    <Compile Include="Classes\TokenManager.cs" />
     <Compile Include="Classes\WindowCtx.cs" />
     <Compile Include="Classes\ZoomTarget.cs" />
     <Compile Include="Common\Common.cs" />
