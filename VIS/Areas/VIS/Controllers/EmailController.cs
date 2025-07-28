@@ -11,6 +11,7 @@ using VAdvantage.Utility;
 using VIS.Filters;
 using System.Web.SessionState;
 using VIS.DataContracts;
+using VAdvantage.Common;
 
 namespace VIS.Controllers
 {
@@ -264,6 +265,14 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             EmailModel model = new EmailModel(ctx);
             return Json(JsonConvert.SerializeObject(model.GetEmailResponse(Subject, Message, recordId, tableID, ctx, prompt)), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult GetRecordThread(int recordId, int tableID, int windowID, int tabID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            EmailModel model = new EmailModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetRecordThread(ctx, recordId, tableID, windowID, tabID)), JsonRequestBehavior.AllowGet);
         }
 
 

@@ -104,6 +104,7 @@
         var $scrollIcon;
         var flagImg = false;
 
+        var $genReply = null;
 
 
         var divReadOnly = $("<div style='width: 100%;height: 100%;background:black;opacity: .1;display:none'>");//table-cell
@@ -139,6 +140,7 @@
         // var $divlbNav;
 
         var $SubjectTextChange = 0;
+        var currThreadID = "";
 
 
         //Lakhwinder
@@ -243,7 +245,7 @@
                 addPrintOption();
             }
             //  loadTextArea();
-            //createDesign();
+            //createDesign();           
 
             eventhandlers();
         };
@@ -348,6 +350,7 @@
                 $root.find(".vis-Email-textarea-div").css({ 'overflow': 'auto' });
             }
 
+            $genReply = $root.find(".vis-Email-inputWrap");
 
             $root.find('.vis-email-leftDiv').height($root.find('.contentArea').height());
             if (callingFromOutsideofWindow) {
@@ -426,8 +429,6 @@
 
             }
 
-
-
             if (window.VADMS) {
                 $root.find('.vis-Email-BccList').height(($root.find('.vis-Email-rytContent').height() - ($root.find('.vis-Email-rytForm').height() + 70)) - 520);
             }
@@ -452,6 +453,29 @@
                 $chkBSendPFasAtt.hide();
                 $chkBSendPFasAtt.next().hide();
             }
+
+            var _windowID = 0;
+            var _tabID = 0;
+            if (_curtab != null) {
+                _windowID = _curtab.getAD_Window_ID();
+                _tabID = _curtab.getAD_Tab_ID();
+            }
+            
+            $.ajax({
+                type: 'POST',
+                async: false,
+                url: VIS.Application.contextUrl + "Email/GetRecordThread",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    recordId: Record_ID,
+                    tableID: currentTable_ID,
+                    windowID: _windowID,
+                    tabID: _tabID
+                }),
+                success: function (data) {
+                    currThreadID = JSON.parse(data);
+                },
+            });
         };
 
 
@@ -1023,8 +1047,8 @@
 
                 var subject = $subject.val();
                 var message = $txtArea.val();
-                var recordId = Record_ID;
-                var tableID = _curtab.gridTable.AD_Table_ID;
+                var _rec_ID = Record_ID;
+                var _tbl_ID = currentTable_ID;
                 var prompt = $root.find('#' + self.windowNo + "_emailPrompt").val();
                 self.IsBusy(true);
                 $.ajax({
@@ -1034,8 +1058,8 @@
                     data: JSON.stringify({
                         Subject: subject,
                         Message: message,
-                        recordId: recordId,
-                        tableID: tableID,
+                        recordId: _rec_ID,
+                        tableID: _tbl_ID,
                         prompt: prompt,
                     }),
                     success: function (response) {
@@ -1056,6 +1080,9 @@
                         if (editor) {
                             editor.value(""); // Set content in the rich text editor
                             let formattedMessage = "<p>" + response.Message.split(/\n{2,}/).join("</p><p>") + "</p>";
+                            if ( body != undefined && body != null) {
+                                formattedMessage = formattedMessage + "<br/> <br/>" + body;
+                            }
                             editor.value(formattedMessage); // Set content in the rich text editor
                         } else {
                             $txtArea.val(response.Message); // Fallback if editor not initialized

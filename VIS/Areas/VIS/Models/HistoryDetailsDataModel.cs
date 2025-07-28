@@ -77,7 +77,7 @@ namespace VIS.Models
                         + (DB.IsPostgreSQL() ? "::timestamp" : "") + " AS StartDate , NULL" + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS EndDate, 
                         '' AS AttendeeInfo, '' AS EmailToInfo," + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL"
-                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated, null AS SentimentAnalysis, CAST('' AS NVARCHAR2(255)) AS SentimentAnaylsisReason
+                        + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated, ce.SentimentAnalysis, ce.SentimentAnaylsisReason
                         FROM CM_ChatEntry ce JOIN CM_CHAT ch ON ce.CM_Chat_Id=ch.CM_Chat_Id
                         JOIN AD_USER au ON au.AD_USER_ID=ce.CREATEDBY 
                         WHERE ch.ISACTIVE = 'Y' AND ch.AD_TABLE_ID = " + _AD_Table_ID + " AND ch.RECORD_ID = " + RecordId
@@ -882,24 +882,28 @@ namespace VIS.Models
         /// <param name="ctx">Context</param>
         /// <param name="Provider">Auth Provider</param>
         /// <returns>object</returns>
-        public dynamic GetUserAccount(Ctx ctx, int mailconfigID)
+        public dynamic GetUserAccount(Ctx ctx, int authproviderID, int mailconfigID)
         {
             dynamic retDic = new ExpandoObject();
+            retDic.MailConfigID = 0;
             retDic.UserAccount_ID = 0;
             retDic.AuthCredentialID = 0;
             retDic.ErrorMsg = "";
 
             string sql = @"SELECT ut.VA101_AccessToken, ut.VA101_RefreshToken, um.VA101_APIAuthCredential_ID, 
-            ut.VA101_AuthCrediential_ID, ut.VA101_Email, us.Name
+            um.AD_UserMailConfigration_ID, ut.VA101_AuthCrediential_ID, ut.VA101_Email, us.Name
             FROM AD_UserMailConfigration um
-            INNER JOIN VA101_APIAuthCredential ut ON (um.VA101_APIAuthCredential_ID=ut.VA101_APIAuthCredential_ID)            
+            INNER JOIN VA101_APIAuthCredential ut ON (um.VA101_APIAuthCredential_ID=ut.VA101_APIAuthCredential_ID) 
+            INNER JOIN VA101_AuthCrediential ac ON (ut.VA101_AuthCrediential_ID=ac.VA101_AuthCrediential_ID)
             INNER JOIN AD_User us ON (um.AD_User_ID=us.AD_User_ID)
-            WHERE um.IsActive='Y' AND ut.IsActive='Y' AND ut.VA101_IsAuthorized='Y' AND um.VA101_IsAllowAccessCalendar='Y'
-            AND um.AD_UserMailConfigration_ID = " + mailconfigID;
+            WHERE um.IsActive='Y' AND ut.IsActive='Y' AND um.VA101_IsAllowAccessCalendar='Y'" +
+            (mailconfigID > 0 ? " AND um.AD_UserMailConfigration_ID = " + mailconfigID :
+            " AND ac.VA101_AuthProvider_ID = " + authproviderID + " AND um.AD_User_ID=" + ctx.GetAD_User_ID());
 
             DataSet ds = DB.ExecuteDataset(sql);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
+                retDic.MailConfigID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["AD_UserMailConfigration_ID"]);
                 retDic.UserAccount_ID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["VA101_APIAuthCredential_ID"]);
                 retDic.AuthCredentialID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["VA101_AuthCrediential_ID"]);
 
@@ -933,10 +937,8 @@ namespace VIS.Models
             }
             string authApiUrl = baseUrl + "api/VAAPI/Auth/InitSession";
             string apiLibUrl = baseUrl + "api/VA101/Common/GetMeetingTranscript";
-
             Assembly asm = Assembly.Load("MarketSvc");
             string accessKey = asm.GetType("MarketSvc.Classes.Utility").GetMethod("GetCustomerAccessKey", BindingFlags.Public | BindingFlags.Static).Invoke(null, null).ToString();
-
             dynamic apiData = new ExpandoObject();
             apiData.AD_Client_ID = ctx.GetAD_Client_ID();
             apiData.AD_Org_ID = ctx.GetAD_Org_ID();
