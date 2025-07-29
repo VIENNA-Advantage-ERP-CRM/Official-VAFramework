@@ -16,17 +16,23 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Web;
+using VAdvantage.Common;
 using VAdvantage.DataBase;
+using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
+using static VAModelAD.AIHelper.AIPayload;
 
 namespace VIS.Models
 {
+
     /// <summary>
     /// 
     /// </summary>
     public class HistoryDetailsDataModel
     {
+        private static VLogger _log = VLogger.GetVLogger(typeof(HistoryDetailsDataModel).FullName);
+
         /// <summary>
         /// Getting History Records by passing parameters
         /// </summary>
@@ -1021,12 +1027,28 @@ namespace VIS.Models
 
             if (!string.IsNullOrEmpty(retObj.transcript))
             {
+                _log.SaveError("Appointment Transcript : ", "Has Transcript");
                 MTable table = MTable.Get(ctx, "AppointmentTranscript");
                 PO appTrans = table.GetPO(ctx, 0, null);
                 appTrans.Set_Value("AD_Client_ID", ctx.GetAD_Client_ID());
                 appTrans.Set_Value("AppointmentsInfo_ID", AppointmentID);
                 appTrans.Set_Value("Transcript", retObj.transcript);
-                appTrans.Save();
+                if (appTrans.Save())
+                {
+                    _log.SaveError("Appointment Transcript : ", "Transcript Saved");
+                    MAppointmentsInfo appointmentsInfo = new MAppointmentsInfo(ctx, AppointmentID, null);
+                    int AD_Table_ID = Util.GetValueOfInt(appointmentsInfo.GetAD_Table_ID());
+                    string threadID = Common.GetThreadID(AD_Table_ID, appointmentsInfo.GetRecord_ID());
+                    _log.SaveError("Appointment Transcript : ", "Table ID : " + AD_Table_ID + ", Record ID : " + appointmentsInfo.GetRecord_ID() + ", threadID : " + threadID);
+                    if (!string.IsNullOrEmpty(threadID))
+                    {
+                        if (!ExecuteThreadAction(actionType: ActionType.Update, tableID: AD_Table_ID, recordID: appointmentsInfo.GetRecord_ID(),
+                            attachmentID: AppointmentID, userID: ctx.GetAD_User_ID(), ctx: ctx, threadID: threadID, attachmentType: "A"))
+                        {
+                            _log.SaveError("", "Error in execution of insert/update data against appointment transcript thread : " + AppointmentID);
+                        }
+                    }
+                }
                 //int no = DB.ExecuteQuery("UPDATE AppointmentsInfo SET Transcript=" + DB.TO_STRING(retObj.transcript) + " WHERE AppointmentsInfo_ID = " + AppointmentID);
             }
             return retObj;
