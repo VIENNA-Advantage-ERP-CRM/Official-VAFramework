@@ -11,6 +11,7 @@ using VAdvantage.Utility;
 using VIS.Filters;
 using System.Web.SessionState;
 using VIS.DataContracts;
+using VAdvantage.Common;
 
 namespace VIS.Controllers
 {
@@ -258,8 +259,40 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(model.GetMailFormat(Window_ID, ct)), JsonRequestBehavior.AllowGet);
         }
 
-      
-        
+        /// <summary>
+        /// Get message against email and other parameters passed
+        /// </summary>
+        /// <param name="Subject"></param>
+        /// <param name="Message"></param>
+        /// <param name="recordId"></param>
+        /// <param name="tableID"></param>
+        /// <param name="prompt"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult EmailAPI(string Subject, string Message, int recordId, int tableID, string prompt)
+        {
+
+            Ctx ctx = Session["ctx"] as Ctx;
+            EmailModel model = new EmailModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetEmailResponse(Subject, Message, recordId, tableID, ctx, prompt)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Fetch record thread against table and record
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <param name="tableID"></param>
+        /// <param name="windowID"></param>
+        /// <param name="tabID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRecordThread(int recordId, int tableID, int windowID, int tabID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            EmailModel model = new EmailModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetRecordThread(ctx, recordId, tableID, windowID, tabID)), JsonRequestBehavior.AllowGet);
+        }
+
 
 
 

@@ -30,7 +30,7 @@
         var Table_ID = null;
         var headerTab;
         var totalPages, currentRecords = null;
-
+        var $popupContent;
 
 
         /* Initialize the form design */
@@ -119,7 +119,7 @@
             //Popover for showing all records
             widgetContainer.find('.vis-show-checklist').off('click')
             widgetContainer.find('.vis-show-checklist').on('click', function () {
-                var $popupContent = $(`
+                $popupContent = $(`
                 <div class="VIS_PopoverMaindiv">
                 <button class="VIS_popupClose" id="popup-close-btn" title="${VIS.Msg.getMsg('close')}">
                 <i class="fa fa-times" aria-hidden="true"></i>
@@ -136,8 +136,10 @@
                    <div class="vis-checklistcard">
                      <div class="vis-card-title vis-checklistrecord-box">
                     <span>${allRecords[i].windowname}</span>
+                    <div class="vis-count-zoom-wrap">
+                    <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" data-windowid="${allRecords[i].WindowID}"></i>
                     <span class="VIS_checklistCount">${allRecords[i].count}</span>
-                    
+                     </div>
                    </div>
                     <div class="vis-Tabdropdown visWindowTabs"></div>
                    </div>
@@ -146,6 +148,9 @@
                     var $dropdown = $checklistCard.find('.vis-Tabdropdown');
                     console.log(allRecords)
                     for (var k = 0; k < allRecords[i].TableRecordIds.length; k++) {
+                        var recordItem = allRecords[i].TableRecordIds[k];
+                        var parentIdAttr = recordItem.ParentIds ? `visParentId="${recordItem.ParentIds}"` : '';
+                        var headTableAttr = allRecords[i].HeadTable ? `vis_headTable="${allRecords[i].HeadTable}"` : '';
                         $dropdown.append(`
                       <div class="vis-subheading" 
                       visRecordId="${allRecords[i].TableRecordIds[k].RecordIds}"  
@@ -153,7 +158,7 @@
                       visWindowname="${allRecords[i].windowname}"   
                       visWindowId="${allRecords[i].WindowID}" 
                       visTableId ="${allRecords[i].TableRecordIds[k].AD_table_ID}"
-                      visHeaderTab="${allRecords[i].TableRecordIds[k].TabLevel}">
+                      visHeaderTab="${allRecords[i].TableRecordIds[k].TabLevel}"${parentIdAttr}" ${headTableAttr}>
                     <span>${allRecords[i].TableRecordIds[k].TabName}</span>
                     <span>${allRecords[i].TableRecordIds[k].RecordIds.length}</span>
                 </div>
@@ -195,10 +200,107 @@
                                     zoomWindow();
                                 }
                             });
+                            // ✅ Zoom button handler (your full logic here)
+                            $('.w2ui-popup .vis-rec-zoom').off('click').on('click', function () {
+                                let allParentIds = [];
+                                const $card = $(this).closest('.vis-checklistcard');
+                                $card.find('.vis-subheading').each(function () {
+                                    const parentIdAttr = $(this).attr('visParentId');
+                                    if (parentIdAttr) {
+                                        const parentIds = parentIdAttr.split(',').map(id => id.trim());
+                                        allParentIds.push(...parentIds);
+                                    }
+                                });
+                                const uniqueParentIds = [...new Set(allParentIds)];
+
+                                // Find the first .vis-subheading inside this card
+                                const $subheading = $card.find('.vis-subheading').first();
+                                if (!$subheading.length) return;
+
+                                // Extract required values
+                                const windowId = parseInt($subheading.attr('viswindowid'));
+                                const recordIds = $subheading.attr('visrecordid');
+                                const windowName = $subheading.attr('viswindowname');
+                                const tableName = $subheading.attr('vistablename');
+                                const tablabel = parseInt($subheading.attr('visheadertab'));
+                                const headTable = $subheading.attr('vis_headTable');
+                                WindowId = windowId;
+                                Record_ID = recordIds;
+                                Table_ID = $subheading.attr('vistableid');
+
+                                if (!windowId || !recordIds || !tableName) return;
+
+                                // Derive primary key from table name
+                                const primaryKey = tableName + "_ID";
+                                const idsToUse = (tablabel === 0) ? recordIds : uniqueParentIds.join(',');
+                                const pKeyUse = (tablabel === 0) ? primaryKey : headTable;
+
+                                // Build window parameter object
+                                const windowParam = {
+                                    "TabWhereClause": `(${pKeyUse}) IN (${idsToUse})`,
+                                    "TabLayout": "N",
+                                    "TabIndex": "0",
+                                    "ActionName": windowName,
+                                    "ActionType": "W"
+                                };
+                                w2popup.close();
+                                // Open the window
+                                VIS.viewManager.startWindow(windowId, null, windowParam);
+                            });
+
+
                         }, 1000);
                     }
 
                 });
+            });
+
+            pendingRecords.off('click', '.vis-rec-zoom').on('click', '.vis-rec-zoom', function () {
+                let allParentIds = [];
+                const $card = $(this).closest('.vis-checklistcard');
+                $card.find('.vis-subheading').each(function () {
+                    const parentIdAttr = $(this).attr('visParentId');
+                    if (parentIdAttr) {
+                        const parentIds = parentIdAttr.split(',').map(id => id.trim());
+                        allParentIds.push(...parentIds);
+                    }
+                });
+                const uniqueParentIds = [...new Set(allParentIds)];
+
+
+                // Find the first .vis-subheading inside this card
+                const $subheading = $card.find('.vis-subheading').first();
+
+                if (!$subheading.length) return;
+
+                // Extract required values
+                const windowId = parseInt($subheading.attr('viswindowid'));
+                const recordIds = $subheading.attr('visrecordid');
+                const windowName = $subheading.attr('viswindowname');
+                const tableName = $subheading.attr('vistablename');
+                const tablabel = parseInt($subheading.attr('visheadertab'));
+                const headTable = $subheading.attr('vis_headTable');
+                WindowId = windowId
+                Record_ID = recordIds
+                Table_ID = $subheading.attr('vistableid');
+                // getHeaderIDs();
+                if (!windowId || !recordIds || !tableName) return;
+
+                // Derive primary key from table name
+                const primaryKey = tableName + "_ID";
+                const idsToUse = (tablabel === 0) ? recordIds : uniqueParentIds.join(',');
+                const pKeyUse = (tablabel === 0) ? primaryKey : headTable;
+                // Build window parameter object
+                const windowParam = {
+                    "TabWhereClause": `(${pKeyUse}) IN (${idsToUse})`,
+                    "TabLayout": "N",
+                    "TabIndex": "0",
+                    "ActionName": windowName,
+                    "ActionType": "W"
+                };
+
+                // Open the window
+                VIS.viewManager.startWindow(windowId, null, windowParam);
             });
         };
 
@@ -249,8 +351,10 @@
                <div class="vis-checklistcard">
                <div class="vis-card-title vis-checklistrecord-box"
                 <span>${record.windowname}</span>
+                <div class="vis-count-zoom-wrap">
+                <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" ></i>
                 <span class="VIS_checklistCount">${record.count}</span>
-                
+                </div>
                </div>
                 <div class="vis-Tabdropdown visWindowTabs"></div>
                 </div>
@@ -258,8 +362,16 @@
                 pendingRecords.append($pendingChecklistItem);
                 var $dropdown = $pendingChecklistItem.find('.vis-Tabdropdown');
                 for (var k = 0; k < record.TableRecordIds.length; k++) {
-                    $dropdown.append(`<div class="vis-subheading" visRecordId="${record.TableRecordIds[k].RecordIds}"  visTableName="${record.TableRecordIds[k].TableName}"  visWindowname="${record.windowname}"   visWindowId="${record.WindowID}" visTableId ="${record.TableRecordIds[k].AD_table_ID}" visHeaderTab="${record.TableRecordIds[k].TabLevel}"><span>${record.TableRecordIds[k].TabName}</span><span>${record.TableRecordIds[k].RecordIds.length}</span></div>`);
+                    var recordItem = record.TableRecordIds[k];
+                    var parentIdAttr = recordItem.ParentIds ? ` visParentId="${recordItem.ParentIds}"` : '';
+                    var headTableAttr = record.HeadTable ? ` vis_headTable="${record.HeadTable}"` : '';
+
+                    $dropdown.append(`<div class="vis-subheading" visRecordId="${record.TableRecordIds[k].RecordIds}"  visTableName="${record.TableRecordIds[k].TableName}" 
+                    visWindowname="${record.windowname}"   visWindowId="${record.WindowID}" visTableId ="${record.TableRecordIds[k].AD_table_ID}"
+                     visHeaderTab="${recordItem.TabLevel}"${parentIdAttr}" ${headTableAttr}>
+                    <span>${record.TableRecordIds[k].TabName}</span><span>${record.TableRecordIds[k].RecordIds.length}</span></div>`);
                 }
+                //visHeaderTab="${record.TableRecordIds[k].TabLevel}">
             });
 
 

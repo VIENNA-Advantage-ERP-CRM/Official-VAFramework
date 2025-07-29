@@ -14,6 +14,7 @@ using VAdvantage.Classes;
 using System.Data;
 using VAdvantage.Utility;
 using VAdvantage.DataBase;
+using static VAModelAD.AIHelper.AIPayload;
 
 namespace VAdvantage.Model
 {
@@ -137,5 +138,66 @@ namespace VAdvantage.Model
             return false;
         }
         #endregion
+
+        protected override bool AfterSave(bool newRecord, bool success)
+        {
+            if (!success)
+                return false;
+            int recordID = 0;
+            int tableID = 0;
+            DataSet dsTableDetails = DB.ExecuteDataset("SELECT Record_ID, AD_Table_ID FROM CM_Chat WHERE CM_Chat_ID = " + GetCM_Chat_ID());
+            if (dsTableDetails != null && dsTableDetails.Tables[0].Rows.Count > 0)
+            {
+                recordID = Util.GetValueOfInt(dsTableDetails.Tables[0].Rows[0]["Record_ID"]);
+                tableID = Util.GetValueOfInt(dsTableDetails.Tables[0].Rows[0]["AD_Table_ID"]);
+            }
+            //string tableName = MTable.GetTableName(GetCtx(), tableID);
+            //if (tableName.ToLower() == "AppointmentsInfo" || tableName.ToLower() == "MailAttachment1")
+            //{
+            //    DataSet ds = DB.ExecuteDataset("SELECT AD_Table_ID, Record_ID FROM " + tableName + " WHERE " + tableName + "_ID = " + recordID);
+            //    if (ds != null && ds.Tables[0].Rows.Count > 0)
+            //    {
+            //        if (Util.GetValueOfInt(ds.Tables[0].Rows[0]["AD_Table_ID"]) > 0)
+            //        {
+            //            tableID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["AD_Table_ID"]);
+            //            recordID = Util.GetValueOfInt(ds.Tables[0].Rows[0]["Record_ID"]);
+            //        }
+            //    }
+            //}
+            string threadID = Common.Common.GetThreadID(tableID, recordID);
+            if (!string.IsNullOrEmpty(threadID))
+            {
+                if (!ExecuteThreadAction(actionType: newRecord ? ActionType.New : ActionType.Update, tableID: tableID, recordID: recordID,
+                    attachmentID: GetCM_ChatEntry_ID(), userID: GetAD_User_ID(), ctx: GetCtx(), threadID: threadID, attachmentType: "c"))
+                {
+                    log.SaveError("", "Error in execution of insert/update data against Chat Entry thread : " + GetCM_ChatEntry_ID());
+                }
+            }
+            return true;
+        }
+
+        protected override bool AfterDelete(bool success)
+        {
+            if (!success)
+                return false;
+            int recordID = 0;
+            int tableID = 0;
+            DataSet dsTableDetails = DB.ExecuteDataset("SELECT Record_ID, AD_Table_ID FROM CM_Chat WHERE CM_Chat_ID = " + GetCM_Chat_ID());
+            if (dsTableDetails != null && dsTableDetails.Tables[0].Rows.Count > 0)
+            {
+                recordID = Util.GetValueOfInt(dsTableDetails.Tables[0].Rows[0]["Record_ID"]);
+                tableID = Util.GetValueOfInt(dsTableDetails.Tables[0].Rows[0]["AD_Table_ID"]);
+            }
+            string threadID = Common.Common.GetThreadID(tableID, recordID);
+            if (!string.IsNullOrEmpty(threadID))
+            {
+                if (!ExecuteThreadAction(actionType: ActionType.Delete, tableID: tableID, recordID: recordID,
+                    attachmentID: GetCM_ChatEntry_ID(), userID: GetAD_User_ID(), ctx: GetCtx(), threadID: threadID, attachmentType: "c"))
+                {
+                    log.SaveError("", "Error in execution of delete data against Chat Entry thread : " + GetCM_ChatEntry_ID());
+                }
+            }
+            return true;
+        }
     }
 }
