@@ -165,7 +165,7 @@ div.VIS_Pref_slide-show.pp {
 .VIS_Pref_content-right,
 .VIS_Pref_content-right-5 {
     overflow-y: auto;
-    height: 100%;
+    height:calc(100% - 50px);
 }
 
 .VIS_Pref_new-password {

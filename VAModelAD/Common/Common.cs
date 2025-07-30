@@ -1983,6 +1983,25 @@ namespace VAdvantage.Common
                 _approvalStatusCols[TableName] = false;
             return false;
         }
+
+        /// <summary>
+        /// Get Thread ID for the record based on the Table ID and Record ID if AI Chat Bot module is installed
+        /// </summary>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
+        public static string GetThreadID(int AD_Table_ID, int Record_ID)
+        {
+            if (Env.IsModuleInstalled("VAI01_"))
+            {
+                return Util.GetValueOfString(DB.ExecuteScalar(@"SELECT asth.VAI01_ThreadID, llm.VAI01_APIKey, asst.VAI01_AssistantID FROM VAI01_AIAssistant asst
+                                    INNER JOIN VAI01_AssistantScreen ascrn ON (ascrn.VAI01_AIAssistant_ID = asst.VAI01_AIAssistant_ID)
+                                    INNER JOIN VAI01_LLMConfiguration llm ON (llm.VAI01_LLMConfiguration_ID = asst.VAI01_LLMConfiguration_ID)
+                                    INNER JOIN VAI01_AssistantThread asth ON (ascrn.VAI01_AssistantScreen_ID = asth.VAI01_AssistantScreen_ID) WHERE asth.IsActive = 'Y'
+                                    AND asst.IsActive = 'Y' AND ascrn.AD_Table_ID = " + AD_Table_ID + " AND CAST(asth.VAI01_RecordID AS INTEGER) = " + Record_ID));
+            }
+            return "";
+        }
     }
 
 }

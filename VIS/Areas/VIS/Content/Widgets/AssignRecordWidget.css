@@ -114,6 +114,7 @@
     line-height: 20px;
     text-align: center;
     font-weight: bold;
+    margin-right: auto;
 }
 
 .vis-show-more {
@@ -216,7 +217,8 @@ html[dir=rtl] .VIS_popupRecordCount {
         height: 20px;
         line-height: 20px;
     }
-    .vis-record-box{
+
+    .vis-record-box {
         padding: 9px 10px;
     }
 }
@@ -229,6 +231,7 @@ html[dir=rtl] .VIS_popupRecordCount {
     .vis-editModeWidget .vis-assigned-records {
         font-size: 8px;
     }
+
     .vis-record-box {
         padding: 4px 10px;
     }
@@ -306,6 +309,281 @@ html[dir=rtl] .VIS_popupRecordCount {
         margin-left: 0;
         font-size: 1.3rem;
     }
+
 .vis-editModeWidget .vis-tiles-pagination {
     padding: 20px 10px 0;
+}
+
+.vis-asrec-fontsize {
+    font-size: 11px
+}
+
+.vis-singlerec-zoom {
+    margin-bottom: 6px;
+}
+
+.vis-asrec-checklistcard {
+    background-color: white;
+    border-radius: 12px;
+    padding: 10px;
+    margin: 8px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.vis-asrec-card-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3d4f71;
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(3, auto);
+}
+
+.vis-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.vis-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%; /* Show above the element */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(60, 60, 60, 0.9);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    font-size: 12px;
+    width: max-content;
+    max-width: 200px;
+}
+
+.vis-tooltip:hover::after {
+    opacity: 1;
+}
+
+
+#VIS-assrec-wrapper br {
+    display: block;
+    line-height: 1.6em;
+}
+
+#VIS-assrec-wrapper article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+#VIS-assrec-wrapper ol, ul {
+    list-style: none;
+}
+
+#VIS-assrec-wrapper input, textarea {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    outline: none;
+}
+
+/*blockquote, q {
+    quotes: none;
+}
+
+    blockquote:before, blockquote:after, q:before, q:after {
+        content: '';
+        content: none;
+    }*/
+
+#VIS-assrec-wrapperstrong, b {
+    font-weight: bold;
+}
+
+#VIS-assrec-wrapper table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%
+}
+
+
+#VIS-assrec-wrapper h1 {
+    font-family: 'Amarante', Tahoma, sans-serif;
+    font-weight: bold;
+    font-size: 1.6em;
+    margin-bottom: 6px;
+}
+
+
+/** page structure **/
+#VIS-assrec-wrapper {
+    display: block;
+    width: auto;
+    /*height:100%;*/
+    background: #fff;
+    margin: 0 auto;
+    padding: 10px 17px;
+    position: relative;
+    /* -webkit-box-shadow: 2px 2px 3px -1px rgba(0,0,0,0.35);*/
+}
+
+#VIS-assrec-keywords {
+    /*  margin: 0 auto;*/
+    font-size: 1.2em;
+    margin-bottom: 15px;
+}
+
+
+    #VIS-assrec-keywords thead {
+        cursor: pointer;
+        background: #c9dff0;
+    }
+
+        #VIS-assrec-keywords thead tr th {
+            padding: 15px 8px;
+        }
+
+            #VIS-assrec-keywords thead tr th span {
+                /* padding-right: 20px;*/
+                background-repeat: no-repeat;
+                background-position: 100% 100%;
+            }
+
+            #VIS-assrec-keywords thead tr th.headerSortUp, #VIS-assrec-keywords thead tr th.headerSortDown {
+                background: #acc8dd;
+            }
+
+                #VIS-assrec-keywords thead tr th.headerSortUp span {
+                    background-image: url('https://i.imgur.com/SP99ZPJ.png');
+                }
+
+                #VIS-assrec-keywords thead tr th.headerSortDown span {
+                    background-image: url('https://i.imgur.com/RkA9MBo.png');
+                }
+
+
+    #VIS-assrec-keywords tbody tr {
+        color: #555;
+    }
+
+        #VIS-assrec-keywords tbody tr td {
+            width: 31%;
+            text-align: left;
+            padding: 5px 5px;
+        }
+
+            #VIS-assrec-keywords tbody tr td.VIS-assrec-lalign {
+                text-align: left;
+            }
+
+
+.VIS-search-wrap {
+    width: 45%;
+    display: flex;
+}
+
+    .VIS-search-wrap > input {
+        /* border: 1px solid #CCC; */
+        height: 31px;
+        padding-left: 5px;
+        float: left;
+        /* outline: medium none; */
+        border-radius: 0px;
+        width: calc(100% - 31px);
+    }
+
+.VIS-search-icon {
+    float: left;
+    width: 31px;
+    height: 31px;
+    background: rgba(var(--v-c-secondary), 1);
+    border: 1px solid rgba(var(--v-c-on-secondary), .2);
+    /*color: #999;
+    text-align: center;*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .VIS-search-icon > span {
+        /* line-height: 28px; */
+        font-size: 1rem;
+    }
+
+.vis-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 10px 0;
+}
+
+.vis-header-title {
+    margin: 0;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.VIS-search-wrap {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.VIS-srchtext {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.VIS-search-icon {
+    cursor: pointer;
+}
+
+.VIS-arsec-popupClose {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.vis-table-wrapper {
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.vis-asrec-popup-scroll-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+    .vis-asrec-popup-scroll-container table {
+        width: 100%;
+    }
+
+html[dir="rtl"] .VIS-search-wrap {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+.VIS-asrec-popDiv {
+    position: absolute;
+    right: -8px;
+    top: 2px;
+}
+
+html[dir="rtl"] .vis-a-closeBtnCls.close {
+    left: -12px;
+    right: inherit;
+}
+
+.vis-table-wrapper table thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }

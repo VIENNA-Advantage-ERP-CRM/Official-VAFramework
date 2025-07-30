@@ -258,26 +258,23 @@
                 _curPageRecords = res.length;
                 $('#VIS_pageIndx' + window_No).text('1/' + _curPageRecords);
                 for (var i = 0; i < res.length; i++) {
-
+                    var sentimentCls = "";
+                    var sentimentIcon = "";
                     if (res[i].Type.toLower() == 'email' || res[i].Type.toLower() == 'inbox') {
-                        //$rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap ' +
-                        //    '">' +
-                        //    '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
-                        //    '<i data-recid="' + i + '" class="vis vis-email"></i>' +
-                        //    '</div >' +
-                        //    '<div data-recid="' + i + '" class="VIS-tp-recordInfo">' +
-                        //    '<h6 data-recid="' + i + '">' + new Date(res[i].Created).toLocaleString() + '</h6>' +
-                        //    '<div data-recid="' + i + '" class="VIS-tp-recordSubject">' +
-                        //    '<i data-recid="' + i + '" class="fa fa-arrow-up"></i>' +
-                        //    '<p data-recid="' + i + '">' + res[i].Subject + '</p>' +
-                        //    '</div>' +
-                        //    '</div>' +
-                        //    '<div data-recid="' + i + '" class="VIS-tp-recordInfoRight">' +
-                        //    '<i data-recid="' + i + ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ? '" class="vis vis-attachment1"></i>' : '"></i>') +
-                        //    '<small data-recid="' + i + '">By: ' + res[i].UserName + '</small>' +
-                        //    '</div>' +
-                        //    '</div>');
-
+                        if (res[i].SentimentAnalysis) {
+                            if (VIS.Utility.Util.getValueOfInt(res[i].SentimentAnalysis) > 0) {
+                                sentimentCls = "VIS-Positive";
+                                sentimentIcon = "fa fa-smile-o";
+                            }
+                            else if (VIS.Utility.Util.getValueOfInt(res[i].SentimentAnalysis) < 0) {
+                                sentimentCls = "VIS-Negative";
+                                sentimentIcon = "fa fa-frown-o";
+                            }
+                            else {
+                                sentimentCls = "VIS-Neutral";
+                                sentimentIcon = "fa fa-meh-o";
+                            }
+                        }
                         $rechtml = $('<div class="VIS-timeline-item">' +
                             '<div class="VIS-item-icon">' + (res[i].Type.toLower() == 'email' ? '<i class="vis vis-email">'
                                 : '<i class="fa fa-inbox">') + '</i></div > ' +
@@ -302,6 +299,8 @@
                             '<div class="VIS-action-group">' +
                             ((VIS.Utility.Util.getValueOfString(res[i].HasAttachment) == 'true') ?
                                 '<a href="javascript:void(0)"><span class="vis vis-attachment1"></span></a><div class="VIS-attach-count">' + res[i].AttchCount + '</div>' : '') +
+                            (res[i].SentimentAnalysis ? '<div class="VIS-Reaction ' + sentimentCls + '"><i class="' + sentimentIcon + '" aria-hidden="true" title="'
+                                + res[i].SentimentAnaylsisReason + '"></i></div>' : '') +
                             '</div>' +
                             '</div>' +
                             '</div>' +
@@ -403,6 +402,20 @@
                         });
                     }
                     else if (res[i].Type.toLower() == 'chat') {
+                        if (res[i].SentimentAnalysis) {
+                            if (VIS.Utility.Util.getValueOfInt(res[i].SentimentAnalysis) > 0) {
+                                sentimentCls = "VIS-Positive";
+                                sentimentIcon = "fa fa-smile-o";
+                            }
+                            else if (VIS.Utility.Util.getValueOfInt(res[i].SentimentAnalysis) < 0) {
+                                sentimentCls = "VIS-Negative";
+                                sentimentIcon = "fa fa-frown-o";
+                            }
+                            else {
+                                sentimentCls = "VIS-Neutral";
+                                sentimentIcon = "fa fa-meh-o";
+                            }
+                        }
                         $rechtml = $('<div data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No + '" data-atype="chat" data-recid="' + i + '" id="rowId' + i + '" class="VIS-tp-recordWrap  ' +
                             '">' +
                             '<div data-recid="' + i + '" class= "VIS-tp-recordIcon" >' +
@@ -431,8 +444,10 @@
                             '<span class="VIS-item-time">' + new Date(res[i].Created).toLocaleString() + '</span>' +
                             '</div>' +
                             '<div class="VIS-item-body">' +
-                            '<div class="VIS-content-section">' +
+                            '<div class="VIS-content-section VIS-group-item-flex">' +
                             '<p>' + res[i].CharacterData + '</p>' +
+                            (res[i].SentimentAnalysis ? '<div class="VIS-Reaction ' + sentimentCls + '"><i class="' + sentimentIcon + '" aria-hidden="true" title="'
+                                + res[i].SentimentAnaylsisReason + '"></i></div>' : '') +
                             '</div>' +
                             '</div>' +
                             '</div>' +
@@ -518,7 +533,20 @@
                         hours = hours % 12 || 12; // Convert 24-hour time to 12-hour format
                         minutes = minutes < 10 ? '0' + minutes : minutes; // Ensure two-digit minutes
                         time += " " + hours + ":" + minutes + " " + ampm;
-
+                        if (res[i].SentimentAnalysis) {
+                            if (VIS.Utility.Util.getValueOfInt(res[i].SentimentAnalysis) > 0) {
+                                sentimentCls = "VIS-Positive";
+                                sentimentIcon = "fa fa-smile-o";
+                            }
+                            else if (VIS.Utility.Util.getValueOfInt(res[i].SentimentAnalysis) < 0) {
+                                sentimentCls = "VIS-Negative";
+                                sentimentIcon = "fa fa-frown-o";
+                            }
+                            else {
+                                sentimentCls = "VIS-Neutral";
+                                sentimentIcon = "fa fa-meh-o";
+                            }
+                        }
                         $rechtml = $('<div class="VIS-timeline-item">' +
                             '<div class="VIS-item-icon"><i class="fa fa-calendar-o"></i></div>' +
                             '<div class="VIS-item-content">' +
@@ -542,6 +570,8 @@
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-uid="' + res[i].UID + '" data-joinurl="' + res[i].MeetingUrl +
                             '" class="VIS-btn-edit" title="' + VIS.Msg.getMsg("EditAppointment") + '"><i class="fa fa-pencil-square-o"></i></span>' +
                             '</div>' +
+                            (res[i].SentimentAnalysis ? '<div class="VIS-Reaction ' + sentimentCls + '"><i class="' + sentimentIcon + '" aria-hidden="true" title="'
+                                + res[i].SentimentAnaylsisReason + '"></i></div>' : '') +
                             '</div>' +
                             '</div>' +
                             '</div>' +
@@ -1398,7 +1428,8 @@
                     '</section>' +
                     '<section class="VIS-attachment-section">' +
                     (ds["MeetingUrl"] != "" && ds["Transcript"] == "" ? '<div class="VIS-attachment-content">' +
-                        '<span data-tid="' + ds["TokenRef_ID"] + '" data-joinurl="' + ds["MeetingUrl"] + '" data-rid="' + ID + '" data-joinurl="'
+                        '<span data-tid="' + ds["TokenRef_ID"] + '" data-mid="' + ds["MailConfig_ID"] +
+                        '" data-joinurl="' + ds["MeetingUrl"] + '" data-rid="' + ID + '" data-joinurl="'
                         + ds["MeetingUrl"] + '" class="VIS-btn-Transcript">' +
                         '<img src="' + VIS.Application.contextUrl + 'Areas/VIS/Images/chat-download-icon.svg" alt="Download Transcript" title="' + VIS.Msg.getMsg('DownloadTranscript') + '">' +
                         //'<i class="fa fa-clone"></i></span>' +
@@ -1426,7 +1457,7 @@
 
                 $printhtml = $('<div class="VIS-tp-contentdiv VIS-tp-contentPanel">'
                     + '<div id="VIS-tp-comments-input' + window_No + '" class="VIS-tp-comments-input">'
-                    + '<div >'
+                    + '<div>'
                     + '<table height="50px" width="100%">'
                     + '<tr class="VIS-call-col-header"><td>' + VIS.Msg.getMsg("Location") + '</td><td>' + VIS.Msg.getMsg("AllDay") + '</td></tr>'
                     + '<tr class="VIS-call-col-data"><td>' + ds["Location"] + '</td><td>' + ds["Allday"] + '</td></tr>'
@@ -1457,19 +1488,19 @@
                 target.find('.VIS-btn-Transcript').click(function (e) {
                     var url = $(this).data('joinurl');
                     var rID = $(this).data('rid');
-                    userAccountID = $(this).data('tid');
-
+                    var authProviderID = $(this).data('tid');
+                    var mailConfigID = $(this).data('mid');
                     if (window.VA101 && url != "") {
                         if (userAccountID == 0) {
-                            userAccountID = GetorCreateAPIUserAccount();
+                            userAccountID = GetorCreateAPIUserAccount(authProviderID, mailConfigID);
                             if (userAccountID > 0) {
                                 $('#VIS_tabPanelDataLoader' + window_No).show();
-                                downloadTranscript(rID, url, target.find(".VIS-transcript-section"));
+                                downloadTranscript(rID, url, target);
                             }
                         }
                         else {
                             $('#VIS_tabPanelDataLoader' + window_No).show();
-                            downloadTranscript(rID, url, target.find(".VIS-transcript-section"));
+                            downloadTranscript(rID, url, target);
                         }
                     }
                 });
@@ -1513,8 +1544,9 @@
             }
         };
 
-        function GetorCreateAPIUserAccount() {
-            var dr = VIS.dataContext.getJSONRecord("VIS/HistoryDetailsData/GetUserAccount", { Provider: "" });
+        function GetorCreateAPIUserAccount(authProviderID, mailConfigID) {
+            var dr = VIS.dataContext.getJSONRecord("VIS/HistoryDetailsData/GetUserAccount",
+                { AuthProviderID: authProviderID, MailConfigID: mailConfigID });
             if (dr != null) {
                 userAccountID = dr.UserAccount_ID;
                 if (dr.ErrorMsg != "") {
@@ -1543,7 +1575,8 @@
                         }
                         else if (dr["transcript"]) {
                             //'<pre>' + dr["transcript"] + '</pre>'
-                            target.find('pre').text(dr["transcript"]);
+                            target.find(".VIS-transcript-section").find('pre').text(dr["transcript"]);
+                            target.find('.VIS-btn-Transcript').hide();
                         }
                         $('#VIS_tabPanelDataLoader' + window_No).hide();
                     }

@@ -713,6 +713,7 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $btnSaveChanges.show();
             });
             $(".VIS_Pref_link-2").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -720,6 +721,7 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $btnSaveChanges.hide();
             });
             $(".VIS_Pref_link-3").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -727,6 +729,7 @@
                 $(".VIS_Pref_content-right-3").css("display", "block");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $btnSaveChanges.hide();
             });
             $(".VIS_Pref_link-4").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -734,6 +737,7 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "flex");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $btnSaveChanges.hide();
             });
             //**************************************
             //Added By Sarab for the purpose of Gmail Settings to Import Gmail Tasks
@@ -744,6 +748,7 @@
                     $(".VIS_Pref_content-right-3").css("display", "none");
                     $(".VIS_Pref_content-right-4").css("display", "none");
                     $(".VIS_Pref_content-right-5").css("display", "block");
+                    $btnSaveChanges.hide();
                 }
                 else {
                     alert("please download WSP !!!");
