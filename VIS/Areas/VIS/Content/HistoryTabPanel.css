@@ -806,7 +806,7 @@
 /* Timeline Section */
 .VIS-timeline-section {
     flex: 1;
-    padding: .75rem;
+    padding: .5rem;
 }
 
 .VIS-timeline-header {
@@ -827,7 +827,7 @@
 
 .VIS-group-item-flex {
     display: flex;
-    align-items: center;
+    /*align-items: center;*/
     gap: 0.5rem;
     justify-content: space-between;
 }
@@ -835,8 +835,8 @@
 .VIS-timeline-item {
     display: grid;
     grid-template-columns: 30px calc(100% - 70px) 30px;
-    gap: 1rem;
-    padding: 0.75rem;
+    gap: .75rem;
+    padding: 0.5rem;
     align-items: start;
     border-bottom: 1px solid #e5e5e5;
 }
@@ -875,14 +875,15 @@
     display: flex;
     align-items: start;
     flex-direction: column;
-    width: 270px;
+    width: 170px;
     padding-top: 0.5rem;
 }
 
 .VIS-item-type-author {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    flex-direction: column;
+    /*align-items: center;*/
+    /*gap: 0.5rem;*/
 }
 
     .VIS-item-type-author .VIS-item-type {
@@ -892,11 +893,15 @@
     }
 
     .VIS-item-type-author .VIS-item-author {
-        border-left: 1px solid rgba(var(--v-c-on-secondary), 0.5);
-        padding-left: 0.5rem;
+        /*border-left: 1px solid rgba(var(--v-c-on-secondary), 0.5);*/
+        /*padding-left: 0.5rem;*/
         color: #666;
         font-size: 0.875rem;
         word-break: break-all;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
     }
 
 .VIS-item-type {
@@ -933,7 +938,7 @@
     }
 
 .VIS-item-content .VIS-item-body {
-    width: 70%;
+    width: 80%;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -998,6 +1003,30 @@
     text-decoration: none;
     font-size: 2rem;
 }
+
+.VIS-Reaction {
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    display: flex;
+    font-size: 1.5rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0.2rem;
+}
+
+.VIS-Positive {
+    background: #b7f1a3;
+}
+
+.VIS-Negative {
+    background: #eea7a7;
+}
+
+.VIS-Neutral {
+    background: #FFC59C;
+}
+
 
 .VIS-play-link i {
     pointer-events: none;
