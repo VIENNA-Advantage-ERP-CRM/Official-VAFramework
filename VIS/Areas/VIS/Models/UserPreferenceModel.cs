@@ -927,6 +927,59 @@ namespace VIS.Models
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<dynamic> GetTwoFAMethod(Ctx ctx)
+        {
+            string sql = @"SELECT
+                            ad_ref_list.value,
+                            ad_ref_list.name,
+                            AD_User.TWOFAMETHOD
+                        FROM
+                            ad_ref_list ad_ref_list
+                            LEFT JOIN  AD_User ON (ad_ref_list.value=AD_User.TWOFAMETHOD AND AD_User_ID="+ctx.GetAD_User_ID()+ @")
+                        WHERE
+                            ad_ref_list.ad_reference_id IN (SELECT ad_reference_id FROM ad_reference WHERE name = 'TwoFAMethod')";
+            DataSet dataSet = DB.ExecuteDataset(sql);
+            List<dynamic> result = new List<dynamic>();
+
+            if (dataSet != null && dataSet.Tables.Count > 0)
+            {
+                foreach (DataRow dr in dataSet.Tables[0].Rows)
+                {
+                    dynamic item = new ExpandoObject();
+                    item.value =Util.GetValueOfString(dr["value"]);
+                    item.name = Util.GetValueOfString(dr["name"]);
+                    item.TWOFAMETHOD = Util.GetValueOfString(dr["TWOFAMETHOD"]);
+                    result.Add(item);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public bool UpdateTwoFAMethod(Ctx ctx, string method)
+        {
+            string sql = "Update AD_User SET TWOFAMETHOD='" + method + "' WHERE AD_User_ID=" + ctx.GetAD_User_ID();
+            if (DB.ExecuteQuery(sql) > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 
     public class SecretKeyModel
