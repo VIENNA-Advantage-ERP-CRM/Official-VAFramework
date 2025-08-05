@@ -4189,9 +4189,13 @@ table.fixed-header thead tr {
 
 .vis-chat-edit-input {
     width: 100%;
-    padding: 5px 60px 5px 10px;
+    padding: 5px 18px 5px 10px;
     border-radius: 10px;
     border: 1px solid #ccc;
+    overflow: auto;
+    resize: none;
+    outline-width: 1.2em;
+    max-height: 6em;
 }
 
 .vis-chat-send-icon {
@@ -4202,6 +4206,7 @@ table.fixed-header thead tr {
     color: #007bff;
     font-size: 20px;
 }
+
 /*.vis-chat-send-update {
     right: 10px;
 }
@@ -4218,6 +4223,17 @@ table.fixed-header thead tr {
 .vis_del_chat {
     position: absolute;
     top: 0;
+    cursor: pointer;
+}
+
+.vis-chat-edit-icon,
+.vis-chat-delete-icon {
+    display: none;
+}
+
+.vis-chatdetailwrap:hover:not(.is-editing) .vis-chat-edit-icon,
+.vis-chatdetailwrap:hover:not(.is-editing) .vis-chat-delete-icon {
+    display: inline-block;
     cursor: pointer;
 }
 
