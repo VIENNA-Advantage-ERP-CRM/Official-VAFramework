@@ -99,7 +99,7 @@
 
 
             /*events for getting HeaderIDs*/
-            pendingRecords.find('.vis-subheading').off('click')
+          /*  pendingRecords.find('.vis-subheading').off('click')
             pendingRecords.find('.vis-subheading').on('click', function () {
                 WindowName = $(this).attr('visWindowname');
                 WindowId = $(this).attr('visWindowId');
@@ -114,7 +114,7 @@
                     primaryKey = TableName + '_ID';
                     zoomWindow();
                 }
-            });
+            });*/
 
             //Popover for showing all records
             widgetContainer.find('.vis-show-checklist').off('click')
@@ -184,7 +184,7 @@
                             $('#popup-close-btn').on('click', function () {
                                 w2popup.close();
                             });
-                            $('.w2ui-popup .vis-subheading').on('click', function () {
+                           /* $('.w2ui-popup .vis-subheading').on('click', function () {
                                 w2popup.close();
                                 WindowName = $(this).attr('visWindowname');
                                 WindowId = $(this).attr('visWindowId');
@@ -199,7 +199,7 @@
                                     primaryKey = TableName + '_ID';
                                     zoomWindow();
                                 }
-                            });
+                            });*/
                             // ✅ Zoom button handler (your full logic here)
                             $('.w2ui-popup .vis-rec-zoom').off('click').on('click', function () {
                                 let allParentIds = [];

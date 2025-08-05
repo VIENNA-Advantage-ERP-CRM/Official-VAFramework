@@ -332,14 +332,14 @@
                     if (VIS.Application.isRTL) {
                         if (data.isDelete == 'Y') {
                             //str += '</span></div><div class="vis-chat-textwrap" style="overflow:auto">';
-                            str += '<span class="vis vis-delete vis_del_chat vis-chat-delete-icon" style="left:6%;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Delete Chat"></span>';
+                            str += '<span class="vis vis-delete vis_del_chat vis-chat-delete-icon" style="left:30px;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Delete Chat"></span>';
                         }
                         str += '<span class="vis vis-pencil vis_edit_chat vis-chat-edit-icon" style="left:1%;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Edit Chat"></span>';
                     }
                     else {
                         if (data.isDelete == 'Y') {
                         //str += '</span></div><div class="vis-chat-textwrap">';
-                            str += '<span class="vis vis-delete vis_del_chat vis-chat-delete-icon" style="right:6%;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Delete Chat"></span>';
+                            str += '<span class="vis vis-delete vis_del_chat vis-chat-delete-icon" style="right:28px;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Delete Chat"></span>';
                         }
                         str += '<span class="vis vis-pencil vis_edit_chat vis-chat-edit-icon" style="right:1%;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Edit Chat"></span>';
                     }
@@ -354,12 +354,13 @@
 
                     //+ '<textarea readonly style="width:640px">' + data[chat].ChatData + '</textarea>'
                     if (VIS.Application.isRTL) {
-                        str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
-                        //str += '<span style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        //str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + safeHtml(data.subChat[chat].ChatData);
                     }
                     else {
                         //str += '<span style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
-                        str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        //str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + safeHtml(data.subChat[chat].ChatData);
                     }
 
                     if (VIS.Application.isRTL) {
@@ -409,20 +410,30 @@
                  var $undoIcon = $('<i class="fa fa-times vis-chat-send-icon" title="Undo" style="position: absolute; right: 35px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #007bff; font-size:20px;"></i>');
  */
                 var $wrapper = $('<div class="vis-chat-edit-wrapper"></div>');
-                var $input = $('<input type="text" class="vis-chat-edit-input">');
+                var $input = $('<textarea class="vis-chat-edit-input" rows="1"></textarea>');
+                // Auto-resize textarea on input
+                $input.on('input', function () {
+                    this.style.height = 'auto'; // Reset height
+                    this.style.height = this.scrollHeight + 'px'; // Adjust height to fit content
+                });
+                // Icons for update and undo
+                var $sendIcon, $undoIcon;
                 if (VIS.Application.isRTL) {
-                    $sendIcon = $('<i class="fa fa-check vis-chat-send-icon vis-chat-send-update" style="left: 35px;" title="Update"></i>');
-                    $undoIcon = $('<i class="fa fa-times vis-chat-send-icon vis-chat-send-undo" style="left: 10px;" title="Undo"></i>');
+                    $sendIcon = $('<i class="fa fa-check vis-chat-send-icon vis-chat-send-update" style="left: 35px; top:6px;" title="Update"></i>');
+                    $undoIcon = $('<i class="fa fa-times vis-chat-send-icon vis-chat-send-undo" style="left: 10px; top:6px" title="Undo"></i>');
                 }
                 else {
-                    $sendIcon = $('<i class="fa fa-check vis-chat-send-icon vis-chat-send-update" style=" right: 10px;" title="Update"></i>');
-                    $undoIcon = $('<i class="fa fa-times vis-chat-send-icon vis-chat-send-undo" style="right: 35px;" title="Undo"></i>');
+                    $sendIcon = $('<i class="fa fa-check vis-chat-send-icon vis-chat-send-update" style="right: 10px; top:6px" title="Update"></i>');
+                    $undoIcon = $('<i class="fa fa-times vis-chat-send-icon vis-chat-send-undo" style="right: 35px; top:6px" title="Undo"></i>');
                 }
                 $wrapper.append($input, $undoIcon, $sendIcon);
                 $input.val(originalText);
                 $wrapper.append($input).append($sendIcon).append($undoIcon);
                 $chatTextSpan.replaceWith($wrapper);
                 $input.focus();
+                $editIcon.after($sendIcon).after($undoIcon);
+                $editIcon.hide();
+                $delIcon.hide();
                 function sendUpdate() {
                     var newText = $input.val().trim();
                     if (newText.length === 0) return;
@@ -456,10 +467,17 @@
                 }
                 // Handle Enter key
                 $input.on("keydown", function (e) {
-                    if (e.key === "Enter") {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault(); // Prevent newline on Enter
                         sendUpdate();
                         $editIcon.show();
                         $delIcon.show();
+                        $sendIcon.remove();
+                        $undoIcon.remove();
+                    }
+                    // If Shift+Enter OR Alt+Enter → allow newline
+                    else if (e.key === "Enter" && (e.shiftKey || e.altKey)) {
+                        // Let it behave normally (insert newline)
                     }
                 });
                 // Handle click on paper plane icon
@@ -467,12 +485,16 @@
                     sendUpdate();
                     $editIcon.show();
                     $delIcon.show();
+                    $sendIcon.remove();
+                    $undoIcon.remove();
                 });
                 $undoIcon.off("click").on("click", function () {
                     var $originalSpan = $('<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">').text(originalText);
                     $wrapper.replaceWith($originalSpan);
                     $editIcon.show();
                     $delIcon.show();
+                    $sendIcon.remove();
+                    $undoIcon.remove();
                 });
             });
 
@@ -509,6 +531,12 @@
 
         };
 
+        function safeHtml(text) {
+            return text
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+        }
+
         function saveMsg(e) {
             var text = $textArea.find('#chatBox_textArea').val();
             if ($.trim(text) == "" || text == "" || text == null) {
@@ -520,6 +548,12 @@
                 return false;
             }
             self.prop.ChatText = text;
+            prop.ChatText = $('<div>').text(prop.ChatText).html();
+            function busyCallback() {
+                $textArea.find('#chatBox_textArea').val('');
+                $textArea.find('#chatBox_textArea').css('height', 'auto');
+                self.refreshPanelData(self.record_ID, 0);
+            }
             VIS.dataContext.saveChat(self.prop);
             /*if (ch != null) {
                 ch.close();
