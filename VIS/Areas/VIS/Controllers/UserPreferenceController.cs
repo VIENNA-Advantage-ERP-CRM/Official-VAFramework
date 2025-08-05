@@ -8,6 +8,7 @@ using Google.Contacts;
 using Google.GData.Client;
 using Google.GData.Contacts;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using VAdvantage.Classes;
 using VAdvantage.DataBase;
 using VAdvantage.Logging;
@@ -426,7 +427,29 @@ namespace VIS.Controllers
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult GetTwoFAMethod()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            UserPreferenceModel objUPModel = new UserPreferenceModel();
+            return Json(JsonConvert.SerializeObject(objUPModel.GetTwoFAMethod(ctx)), JsonRequestBehavior.AllowGet);
 
+        } 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public JsonResult UpdateTwoFAMethod(string method)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            UserPreferenceModel objUPModel = new UserPreferenceModel();
+            return Json(JsonConvert.SerializeObject(objUPModel.UpdateTwoFAMethod(ctx, method)), JsonRequestBehavior.AllowGet);
+
+        }
 
     }
 }
