@@ -1043,11 +1043,20 @@
                     VIS.ADialog.info('VAI01_InstallChatBot');
                     return;
                 }
+
+                
+
                 var subject = $subject.val();
                 var message = $txtArea.val();
                 var _rec_ID = Record_ID;
                 var _tbl_ID = currentTable_ID;
                 var prompt = $root.find('#' + self.windowNo + "_emailPrompt").val();
+
+                if (currThreadID == "" && prompt == "") {
+                    VIS.ADialog.info('VIS_NoThreadEnterPrompt');
+                    return;
+                }
+
                 self.IsBusy(true);
                 $.ajax({
                     type: 'POST',
