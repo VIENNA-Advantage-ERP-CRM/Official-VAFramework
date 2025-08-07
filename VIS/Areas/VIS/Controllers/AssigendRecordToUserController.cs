@@ -48,15 +48,17 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="pageSize"></param>
         /// <param name="pageNo"></param>
+        /// <param name="getAll"></param>
+        /// <param name="IsAssignedByMe"></param>
         /// <returns></returns>
-        public JsonResult AssignRecordToUserWidget(int pageSize, int pageNo, bool getAll)
+        public JsonResult AssignRecordToUserWidget(int pageSize, int pageNo, bool getAll, string IsAssignedByMe)
         {
             dynamic result = 0;
             if (Session["ctx"] != null)
             {
                 var ctx = Session["ctx"] as Ctx;
                 AssignedRecordToUser obj = new AssignedRecordToUser();
-                result = obj.AssignRecordToUserWidget(ctx, pageSize, pageNo, getAll);
+                result = obj.AssignRecordToUserWidget(ctx, pageSize, pageNo, getAll, IsAssignedByMe);
             }
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
@@ -139,16 +141,17 @@ namespace VIS.Controllers
         /// <param name="pageNo">pageNo</param>
         /// <param name="pageSize">pageSize</param>
         /// <param name="SrchTxt">SrchTxt</param>
+        /// <param name="AssignedByOrTo"></param>
         /// <returns>List of data</returns>
         /// <author>VIS_427</author>
-        public JsonResult GeWindowRecords(int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt)
+        public JsonResult GeWindowRecords(int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt,string AssignedByOrTo)
         {
             dynamic result = 0;
             if (Session["ctx"] != null)
             {
                 var ctx = Session["ctx"] as Ctx;
                 AssignedRecordToUser obj = new AssignedRecordToUser();
-                result = obj.GeWindowRecords(ctx, WindowId, TableID, Record_ID, pageNo, pageSize, SrchTxt);
+                result = obj.GeWindowRecords(ctx, WindowId, TableID, Record_ID, pageNo, pageSize, SrchTxt, AssignedByOrTo);
             }
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
