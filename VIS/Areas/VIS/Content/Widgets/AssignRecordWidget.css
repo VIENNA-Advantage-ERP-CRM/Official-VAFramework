@@ -1,18 +1,19 @@
-﻿.vis-maindiv {
+﻿.vis-asrec-maindiv {
     background: linear-gradient(135deg, #6b8ce3, #8dc7f8);
     height: 100%;
     width: 100%;
 }
 
 
-.VIS_widget-container {
+.VIS-asrec-widget-container {
     height: 100%
 }
 
-    .VIS_widget-container h4 {
+    .VIS-asrec-widget-container h4 {
         color: #fff;
-        font-size: 17px;
+        font-size: 15px;
         padding: 10px 10px 0;
+        margin: 0
     }
 
 
@@ -115,6 +116,7 @@
     text-align: center;
     font-weight: bold;
     margin-right: auto;
+    font-size: 11px;
 }
 
 .vis-show-more {
@@ -319,7 +321,18 @@ html[dir=rtl] .VIS_popupRecordCount {
 }
 
 .vis-singlerec-zoom {
-    margin-bottom: 6px;
+    padding-right: 8px;
+    color: rgba(var(--v-c-primary), 0.5);
+    cursor: pointer;
+}
+
+.vis-asrec-assigned {
+    width: 30%;
+}
+
+.vis-asrec-date {
+    width: 20%;
+    padding-left: 35px;
 }
 
 .vis-asrec-checklistcard {
@@ -414,28 +427,28 @@ html[dir=rtl] .VIS_popupRecordCount {
 
 
 #VIS-assrec-wrapper h1 {
-    font-family: 'Amarante', Tahoma, sans-serif;
-    font-weight: bold;
-    font-size: 1.6em;
-    margin-bottom: 6px;
+    font-family: var(--v-c-font-family) !important;
+    font-weight: 600;
+    color: rgba(var(--v-c-on-secondary), 1);
+    /* font-size: 1.6em;*/
+    /* margin-bottom: 6px;*/
 }
 
 
 /** page structure **/
 #VIS-assrec-wrapper {
+    /* background-color: #f3f3f385;*/
     display: block;
-    width: auto;
-    /*height:100%;*/
-    background: #fff;
     margin: 0 auto;
-    padding: 10px 17px;
+    padding: 8px 10px;
     position: relative;
-    /* -webkit-box-shadow: 2px 2px 3px -1px rgba(0,0,0,0.35);*/
+    width: auto;
+    border-radius: 6px;
 }
 
 #VIS-assrec-keywords {
     /*  margin: 0 auto;*/
-    font-size: 1.2em;
+    font-size: 1em;
     margin-bottom: 15px;
 }
 
@@ -447,6 +460,10 @@ html[dir=rtl] .VIS_popupRecordCount {
 
         #VIS-assrec-keywords thead tr th {
             padding: 15px 8px;
+            padding: 10px 5px;
+            color: rgba(var(--v-c-on-secondary), 1);
+            font-family: Roboto-Regular !important;
+            font-size: 1em;
         }
 
             #VIS-assrec-keywords thead tr th span {
@@ -473,19 +490,22 @@ html[dir=rtl] .VIS_popupRecordCount {
     }
 
         #VIS-assrec-keywords tbody tr td {
-            width: 31%;
             text-align: left;
             padding: 5px 5px;
+            border-bottom: 1px solid #dcdcdc;
         }
 
             #VIS-assrec-keywords tbody tr td.VIS-assrec-lalign {
                 text-align: left;
+                width: 40%;
             }
 
 
 .VIS-search-wrap {
     width: 45%;
     display: flex;
+    border-radius: 6px;
+    border: 1px solid #dcdcdc;
 }
 
     .VIS-search-wrap > input {
@@ -494,26 +514,30 @@ html[dir=rtl] .VIS_popupRecordCount {
         padding-left: 5px;
         float: left;
         /* outline: medium none; */
-        border-radius: 0px;
+        border-radius: 6px;
         width: calc(100% - 31px);
+        border: none;
     }
 
 .VIS-search-icon {
     float: left;
     width: 31px;
     height: 31px;
-    background: rgba(var(--v-c-secondary), 1);
+    background: #fff;
     border: 1px solid rgba(var(--v-c-on-secondary), .2);
     /*color: #999;
     text-align: center;*/
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 6px;
+    border: none;
 }
 
     .VIS-search-icon > span {
         /* line-height: 28px; */
         font-size: 1rem;
+        color: rgba(var(--v-c-primary), 0.5)
     }
 
 .vis-header-bar {
@@ -521,12 +545,12 @@ html[dir=rtl] .VIS_popupRecordCount {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 10px 0;
+    padding: 8px 0;
 }
 
 .vis-header-title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.125rem;
     flex-shrink: 0;
 }
 
@@ -586,4 +610,109 @@ html[dir="rtl"] .vis-a-closeBtnCls.close {
     position: sticky;
     top: 0;
     z-index: 2;
+}
+
+.vis-asrec-maindiv .modal-content {
+    width: 70%;
+}
+
+.VIS-AssignRecordDiv .vis-input-wrap {
+    margin-bottom: 0;
+}
+
+    .VIS-AssignRecordDiv .vis-input-wrap input:not([type="checkbox"]):not([type="radio"]), .vis-input-wrap select, .vis-control-wrap > button {
+        height: 26px;
+    }
+
+.vis-asrec-control-div {
+    float: left;
+    width: 50%;
+    padding-left: 10px;
+    margin-top: 8px;
+}
+
+.vis-asrec-btn {
+    background-color: rgba(var(--v-c-primary), 1);
+    border-radius: 7px;
+    color: #ffffff;
+}
+
+.vis-asrec-popupdiv {
+    background: #f3f3f3b3;
+}
+
+.vis-asrec-flyout-footer {
+    padding-left: 8px;
+    gap: 1em;
+    float: right;
+    width: fit-content;
+    margin-bottom: 8px;
+}
+
+.VIS-AssignRecordDiv .vis-input-wrap select {
+    color: #fff;
+    border: none;
+    background-image: linear-gradient(45deg, transparent 50%, #ffffff 50%), linear-gradient(135deg, #ffffff 50%, transparent 50%);
+}
+
+.VIS-asrec-popupRecordCount {
+    background: #fff;
+    border-radius: 50%;
+    color: #333;
+    font-weight: 700;
+    height: 20px;
+    line-height: 20px;
+    margin-left: 16px;
+    margin-right: auto;
+    text-align: center;
+    font-size: 11px;
+    width: 20px;
+}
+
+.VIS-AssignRecordDiv .vis-input-wrap select option {
+    color: black;
+}
+
+.vis-asrec-count-circle {
+    background: #fff;
+    border-radius: 50%;
+    color: #333;
+    font-size: 11px;
+    font-weight: 700;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    width: 20px;
+    display: inline-block;
+}
+
+.vis-asrec-dropdown {
+    background: #f3f3f314;
+    border: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%23333' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+    color: #333;
+    height: 30px;
+    appearance: none;
+}
+
+.vis-asrec-poprecord-count {
+    background: #F7C802;
+    border-radius: 50%;
+    color: #333;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    width: 22px;
+}
+
+.vis-asrec-dropdown-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
