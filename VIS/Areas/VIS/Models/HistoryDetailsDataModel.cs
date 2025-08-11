@@ -57,10 +57,12 @@ namespace VIS.Models
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + " AS MeetingUrl,"
                         + (DB.IsPostgreSQL() ? "' ' :: VARCHAR " : "CAST('' AS NVARCHAR2(255))") + @" AS Appointment_UID, NULL"
                         + (DB.IsPostgreSQL() ? "::timestamp" : "") + @" AS DateLastUpdated, ma.SentimentAnalysis, ma.SentimentAnaylsisReason
-                        FROM MailAttachment1 ma 
-                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY
-                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE IN ('M', 'I')
-                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + "   AND ma.RECORD_ID = " + RecordId
+                        FROM MailAttachment1 ma LEFT JOIN MailAttachmentRelatedTo mr
+                        ON (mr.MailAttachment1_ID=ma.MailAttachment1_ID)
+                        JOIN AD_USER au ON (au.AD_USER_ID=ma.CREATEDBY)
+                        WHERE ma.ISACTIVE='Y' AND ma.ATTACHMENTTYPE IN ('M', 'I')
+                        AND ((ma.AD_TABLE_ID=" + _AD_Table_ID + " AND ma.RECORD_ID=" + RecordId +
+                        ") OR (mr.AD_TABLE_ID=" + _AD_Table_ID + " AND mr.RECORD_ID=" + RecordId + "))"
 
                         //+ @" UNION ALL 
                         //SELECT ma.MailAttachment1_ID AS ID, ma.AD_TABLE_ID, ma.RECORD_ID, ma.CREATED, ma.MAILADDRESSFROM AS FROMUSER, 
@@ -292,11 +294,13 @@ namespace VIS.Models
             List<dynamic> res = null;
             StringBuilder sql = new StringBuilder();
             sql.Append(@"SELECT * FROM ( 
-                        SELECT COUNT(ma.MAILATTACHMENT1_ID) AS ID, 'EMAIL' AS TYPE
-                        FROM MAILATTACHMENT1 ma 
-                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
-                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE IN ('M', 'I')
-                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + "   AND ma.RECORD_ID = " + RecordId
+                        SELECT COUNT(ma.MailAttachment1_ID) AS ID, 'EMAIL' AS TYPE
+                        FROM MailAttachment1 ma LEFT JOIN MailAttachmentRelatedTo mr
+                        ON (mr.MailAttachment1_ID=ma.MailAttachment1_ID)
+                        JOIN AD_USER au ON (au.AD_USER_ID=ma.CREATEDBY) 
+                        WHERE ma.IsActive='Y' AND ma.ATTACHMENTTYPE IN ('M', 'I')
+                        AND ((ma.AD_TABLE_ID=" + _AD_Table_ID + " AND ma.RECORD_ID=" + RecordId +
+                        ") OR (mr.AD_TABLE_ID=" + _AD_Table_ID + " AND mr.RECORD_ID=" + RecordId + "))"
                         //+ @" UNION ALL
                         //SELECT COUNT(ma.MAILATTACHMENT1_ID) AS ID, 'INBOX' AS TYPE
                         //FROM MAILATTACHMENT1 ma 
@@ -311,9 +315,9 @@ namespace VIS.Models
                         + @" UNION ALL
                         SELECT COUNT(ma.MAILATTACHMENT1_ID) AS ID,'LETTER' AS TYPE
                         FROM MAILATTACHMENT1 ma 
-                        JOIN AD_USER au ON au.AD_USER_ID=ma.CREATEDBY 
-                        WHERE ma.ISACTIVE = 'Y' AND ma.ATTACHMENTTYPE = 'L' 
-                        AND ma.AD_TABLE_ID = " + _AD_Table_ID + "   AND ma.RECORD_ID = " + RecordId
+                        JOIN AD_USER au ON (au.AD_USER_ID=ma.CREATEDBY)
+                        WHERE ma.ISACTIVE='Y' AND ma.ATTACHMENTTYPE='L' 
+                        AND ma.AD_TABLE_ID=" + _AD_Table_ID + " AND ma.RECORD_ID=" + RecordId
                         + @" UNION ALL
                         SELECT COUNT(ai.APPOINTMENTSINFO_ID) AS ID, 'APPOINTMENT' AS TYPE
                         FROM APPOINTMENTSINFO ai 
