@@ -246,7 +246,8 @@ namespace VIS.Models
                 {
                     //Get first created tab if we have multiple tabs linked with same table on same window.
                     sql += @" AND tab.IsSortTab='N' 
-                                AND tab.Ad_Tab_ID=(SELECT MIN(mt.AD_Tab_ID) FROM AD_tab mt WHERE mt.AD_Window_ID=" + AD_Window_ID + @" AND mt.AD_Table_ID=t.AD_Table_ID AND mt.IsActive='Y')
+                                AND tab.Ad_Tab_ID=(SELECT mt.AD_Tab_ID FROM AD_tab mt WHERE mt.AD_Window_ID=" + AD_Window_ID +
+                                @" AND mt.AD_Table_ID=t.AD_Table_ID AND mt.IsActive='Y' ORDER BY mt.Seqno FETCH FIRST ROW ONLY)
                                 AND (c.IsKey='Y' OR (f.IsEncrypted='N' AND f.ObscureType IS NULL))";
                 }
                 else
