@@ -212,7 +212,7 @@ namespace VAdvantage.Model
 
                 retValue = true;
             }
-            catch 
+            catch
             { }
             log.Fine(item.ToString());
             AddTextMsg(" ");	//	otherwise not saved
@@ -598,13 +598,12 @@ namespace VAdvantage.Model
 
         protected override bool AfterSave(bool newRecord, bool success)
         {
-            log.SaveError("MAILAttachment1 : ", "Record ID : " + GetMailAttachment1_ID() + " -> " + success + " -> " + newRecord);
             if (!success)
                 return false;
             if (newRecord)
             {
                 string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID());
-                log.SaveError("MAILAttachment1 : ", "Thread ID : " + threadID);
+                log.SaveInfo("MAILAttachment1 : ", "Thread ID : " + threadID);
                 if (!string.IsNullOrEmpty(threadID))
                 {
                     if (!ExecuteThreadAction(actionType: newRecord ? ActionType.New : ActionType.Update, tableID: GetAD_Table_ID(), recordID: GetRecord_ID(),
@@ -612,11 +611,11 @@ namespace VAdvantage.Model
                     {
                         log.SaveError("", "Error in execution of insert/update data against Mail Attachment thread : " + GetMailAttachment1_ID());
                     }
-                    log.SaveError("MAILAttachment1 : ", "Thread ID : " + threadID);
                 }
             }
             return true;
         }
+
         protected override bool AfterDelete(bool success)
         {
             if (!success)
@@ -634,6 +633,6 @@ namespace VAdvantage.Model
         }
     }
 
- 
+
 
 }
