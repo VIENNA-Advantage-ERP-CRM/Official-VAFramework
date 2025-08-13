@@ -23,6 +23,7 @@ using Microsoft.Owin.Security;
 using System.Security.Claims;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Microsoft.Owin.Security.Cookies;
+using VAdvantage.Classes;
 
 namespace VIS.Controllers
 {
@@ -234,6 +235,7 @@ namespace VIS.Controllers
                         {
                             return Json(new { step2 = false, redirect = returnUrl, ctx = model.Login1Model });
                         }
+
                         return Login(model, returnUrl, roles);
                     }
                     else

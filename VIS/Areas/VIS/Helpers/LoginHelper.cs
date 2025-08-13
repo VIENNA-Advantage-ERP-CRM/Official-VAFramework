@@ -723,6 +723,7 @@ namespace VIS.Helpers
             //ctx.SetContext("#AD_FilteredOrg", model.Login2Model.Org);// first time set login org
             ctx.SetContext("#AD_FilteredOrg", model.Login2Model.FilteredOrg);// first time set login org
 
+            ctx.SetContext("##HTTPSessionID", System.Web.HttpContext.Current.Session.SessionID);
 
             //{
             //    ____AD_User_ID = model.Login1Model.AD_User_ID.ToString(),

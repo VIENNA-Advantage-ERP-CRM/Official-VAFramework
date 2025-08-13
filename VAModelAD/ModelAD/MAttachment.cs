@@ -141,7 +141,7 @@ namespace VAdvantage.Model
             {
                 if (GetAD_Attachment_ID() > 0)
                 {
-                    FolderKey = DateTime.Now.Ticks.ToString();
+                    FolderKey =p_ctx.GetContext("##HTTPSessionID") +"\\"+ DateTime.Now.Ticks.ToString();
                     LoadLOBData();
                     SetIsFromHTML(true);
                     Save();
@@ -1331,14 +1331,15 @@ namespace VAdvantage.Model
             try
             {
 
-                string filePath = System.IO.Path.Combine(GetServerLocation(), "TempDownload");
+                string filePath = System.IO.Path.Combine(GetServerLocation(), "TempDownload\\"+p_ctx.GetContext("##HTTPSessionID"));
                 string zipinput = filePath + "\\" + folderKey + "\\zipInput";
                 string zipfileName = System.IO.Path.Combine(filePath, folderKey, DateTime.Now.Ticks.ToString());
 
                 if (!Directory.Exists(filePath))
                 {
-                    error.Append("PathNotFound:" + filePath);
-                    return false;
+                    Directory.CreateDirectory(filePath);
+                    //error.Append("PathNotFound:" + filePath);
+                    //return false;
                 }
 
                 X_AD_ClientInfo cInfo = null;
@@ -1854,8 +1855,10 @@ namespace VAdvantage.Model
                     res = CreateAttachmentLine(attachmentFiles[i].Name, attachmentFiles[i].Size, FolderKey);
                     if (res.Equals("False"))
                     {
-
-                        Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload", FolderKey));
+                        if (Directory.Exists(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\" + p_ctx.GetContext("##HTTPSessionID"), FolderKey)))
+                        {
+                            Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\" + p_ctx.GetContext("##HTTPSessionID"), FolderKey));
+                        }
                         return false;
                     }
                 }
@@ -1876,7 +1879,7 @@ namespace VAdvantage.Model
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
                     string fileLocation = GetFileLocation();
-                    string folder = DateTime.Now.Ticks.ToString();
+                    string folder =p_ctx.GetContext("##HTTPSessionID")+"\\"+DateTime.Now.Ticks.ToString();
 
                     string filePath = System.IO.Path.Combine(GetServerLocation());
                     Directory.CreateDirectory(Path.Combine(filePath, "TempDownload", folder));

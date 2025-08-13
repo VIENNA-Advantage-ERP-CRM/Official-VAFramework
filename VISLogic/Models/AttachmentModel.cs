@@ -131,10 +131,13 @@ namespace ViennaAdvantageWeb.Areas.VIS.Models
 
             for (int i = 0; i < _files.Count; i++)
             {
-                System.IO.File.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload") + "\\" + folderKey + "\\" + _files[i].Name);
+                if (System.IO.File.Exists(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\" + ctx.GetContext("##HTTPSessionID")) + "\\" + folderKey + "\\" + _files[i].Name))
+                {
+                    System.IO.File.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\" + ctx.GetContext("##HTTPSessionID")) + "\\" + folderKey + "\\" + _files[i].Name);
+                }
             }
-            if (folderKey != "" && Directory.Exists(System.IO.Path.Combine(GetServerLocation(), "TempDownload", folderKey)))
-                Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload", folderKey));
+            if (folderKey != "" && Directory.Exists(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\"+ctx.GetContext("##HTTPSessionID"), folderKey)))
+                Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\" + ctx.GetContext("##HTTPSessionID"), folderKey));
 
             info.AD_attachment_ID = att.GetAD_Attachment_ID();
             info.Error = att.Error;

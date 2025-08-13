@@ -11,6 +11,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.SessionState;
 using VAdvantage.Classes;
+using VAdvantage.DataBase;
 using VAdvantage.Utility;
 
 namespace VIS.Areas.VIS.Classes
@@ -75,6 +76,29 @@ namespace VIS.Areas.VIS.Classes
 
         public void Session_End(object sender, EventArgs e)
         {
+          string  FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload" + "\\" + _session.SessionID;
+           
+            try
+            {
+                if (Directory.Exists(FILE_PATH))
+                {
+                    Directory.Delete(FILE_PATH, true);
+                }
+            }
+            catch (IOException)
+            {
+                try
+                {
+                    // Try renaming instead
+                    string temp = FILE_PATH + "_delete_" + Guid.NewGuid().ToString();
+                    Directory.Move(FILE_PATH, temp);
+                    Directory.Delete(temp, true);
+                }
+                catch (Exception ex) { 
+                }
+                // Then try deleting the renamed one in a background task / on next app start
+            }
+
             SessionEventHandler.SessionEnd(_session["ctx"] as Ctx, _session.SessionID);
         }
 

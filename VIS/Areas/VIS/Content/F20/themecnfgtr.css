@@ -222,8 +222,8 @@ ul.vis-thed-hdr-r li.vis-app-hdr-r-user{
     background-color: rgba(var(--v-c-th-secondary), 0.5);
 }
 .vis-thed-hdr-r .vis-app-user-img-wrap {
-    width: 16px;
-    height: 16px;
+    width: 32px;
+    height: 32px;
     background: rgba(var(--v-c-th-primary),.3);
 }
 .vis-thed-previewsec * {

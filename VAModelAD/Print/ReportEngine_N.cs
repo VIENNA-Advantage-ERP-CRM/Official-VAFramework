@@ -69,7 +69,7 @@ namespace VAdvantage.Print
             m_printFormat = pf;
             m_info = info;
 
-
+            sessionID = ctx.GetContext("##HTTPSessionID");
 
             SetQuery(query);		//	loads Data
         }	//	ReportEngine
@@ -97,6 +97,7 @@ namespace VAdvantage.Print
 
         //******************//
         private int _ad_org_id = -1;
+        private string sessionID;
 
         public void SetPrintFormat(MPrintFormat pf)
         {
@@ -252,7 +253,7 @@ namespace VAdvantage.Print
         public byte[] CreateCSV(Ctx ctx)
         {
             //added by jagmohan
-            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload";
+            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload" + "\\" + sessionID;
 
             if (!Directory.Exists(FILE_PATH))
                 Directory.CreateDirectory(FILE_PATH);
@@ -281,7 +282,7 @@ namespace VAdvantage.Print
         public string GetCSVPath(Ctx ctx)
         {
             //added by jagmohan
-            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload";
+            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload" + "\\" + sessionID;
 
             if (!Directory.Exists(FILE_PATH))
                 Directory.CreateDirectory(FILE_PATH);
@@ -320,7 +321,7 @@ namespace VAdvantage.Print
         public byte[] CreatePDF()
         {
             //added by jagmohan
-            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload";
+            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload" +"\\"+ sessionID;
 
             if (!Directory.Exists(FILE_PATH))
                 Directory.CreateDirectory(FILE_PATH);
@@ -382,7 +383,7 @@ namespace VAdvantage.Print
         public string CreatePDF(bool fetchBytes, byte[] bytes)
         {
             //added by jagmohan
-            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload";
+            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload" + "\\" + sessionID;
             if (!Directory.Exists(FILE_PATH))
                 Directory.CreateDirectory(FILE_PATH);
 
@@ -493,9 +494,9 @@ namespace VAdvantage.Print
             try
             {
                 //First check for diretory if not exits then Craete
-                if (!Directory.Exists(Path.Combine(GlobalVariable.PhysicalPath, "TempDownload")))
+                if (!Directory.Exists(Path.Combine(GlobalVariable.PhysicalPath, "TempDownload\\" + sessionID)))
                 {
-                    Directory.CreateDirectory(Path.Combine(GlobalVariable.PhysicalPath, "TempDownload"));
+                    Directory.CreateDirectory(Path.Combine(GlobalVariable.PhysicalPath, "TempDownload\\"+ sessionID));
                 }
 
 
@@ -531,7 +532,7 @@ namespace VAdvantage.Print
         public byte[] CreatePDF(string table_ID, string Record_ID)
         {
             string path = table_ID + "_" + Record_ID;
-            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload";
+            FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload" + "\\" + sessionID;
 
             if (!Directory.Exists(FILE_PATH))
                 Directory.CreateDirectory(FILE_PATH);

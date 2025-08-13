@@ -76,19 +76,19 @@ namespace VIS.Controllers
                     }
                 }
 
-                if (!Directory.Exists(Path.Combine(Server.MapPath("~/TempDownload"), folderKey)))
+                if (!Directory.Exists(Path.Combine(Server.MapPath("~/TempDownload/"+ctx.GetContext("##HTTPSessionID")), folderKey)))
                 {
-                    Directory.CreateDirectory(Path.Combine(Server.MapPath("~/TempDownload"), folderKey));
+                    Directory.CreateDirectory(Path.Combine(Server.MapPath("~/TempDownload/"+ctx.GetContext("##HTTPSessionID")), folderKey));
                 }
 
 
                 HttpPostedFileBase hpf = file as HttpPostedFileBase;
-                string savedFileName = Path.Combine(Server.MapPath("~/TempDownload/" + folderKey), Path.GetFileName(fileName));
+                string savedFileName = Path.Combine(Server.MapPath("~/TempDownload/"+ctx.GetContext("##HTTPSessionID")+"/" + folderKey), Path.GetFileName(fileName));
                 MemoryStream ms = new MemoryStream();
                 hpf.InputStream.CopyTo(ms);
                 byte[] byteArray = ms.ToArray();
 
-                if (Directory.GetFiles(Path.Combine(Server.MapPath("~/TempDownload"), folderKey)).Contains(Path.Combine(Server.MapPath("~/TempDownload"), folderKey, fileName)))//Append Content In File
+                if (Directory.GetFiles(Path.Combine(Server.MapPath("~/TempDownload/" + ctx.GetContext("##HTTPSessionID")), folderKey)).Contains(Path.Combine(Server.MapPath("~/TempDownload/" + ctx.GetContext("##HTTPSessionID")), folderKey, fileName)))//Append Content In File
                 {
                     using (FileStream fs = new FileStream(savedFileName, FileMode.Append, System.IO.FileAccess.Write))
                     {
