@@ -176,6 +176,7 @@ namespace VAdvantage.Model
         //Added By Sarab
         protected override bool AfterSave(bool newRecord, bool success)
         {
+            Guid newGuid = Guid.NewGuid();
             if (byteArray != null)
             {
                 String imageExt = GetImageExtension();
@@ -190,11 +191,11 @@ namespace VAdvantage.Model
                 if (!string.IsNullOrEmpty(imageExt))
                 {
                     //imageUrl = imageUrl.Insert(imageUrl.Length, "/" + GetAD_Image_ID() + ImageFormat);
-                    imageUrl = "Images/" + GetAD_Image_ID() + imageFormat;
+                    imageUrl = "Images/" + newGuid + imageFormat;
                     int count = DB.ExecuteQuery("UPDATE AD_IMAGE SET IMAGEURL='" + imageUrl + "' WHERE AD_IMAGE_ID=" + GetAD_Image_ID(),null, Get_TrxName());
                 }
 
-                ConvertByteArrayToThumbnail(byteArray, GetAD_Image_ID().ToString() + imageExt);
+                ConvertByteArrayToThumbnail(byteArray, newGuid.ToString() + imageExt);
             }
             else if (GetBinaryData() != null)
             {
@@ -203,10 +204,10 @@ namespace VAdvantage.Model
                 if (!string.IsNullOrEmpty(imageExt) && imageExt.Contains("."))
                 {
                    // imageFormat = imageUrl.Substring(imageUrl.LastIndexOf("."));
-                    imageUrl = "Images/" + GetAD_Image_ID() + imageExt;
+                    imageUrl = "Images/" + newGuid + imageExt;
                     int count = DB.ExecuteQuery("UPDATE AD_IMAGE SET IMAGEURL='" + imageUrl + "' WHERE AD_IMAGE_ID=" + GetAD_Image_ID(),null, Get_TrxName());
                 }
-                ConvertByteArrayToThumbnail(GetBinaryData(), GetAD_Image_ID().ToString() + imageExt);
+                ConvertByteArrayToThumbnail(GetBinaryData(), newGuid.ToString() + imageExt);
             }
             return success;
         }
