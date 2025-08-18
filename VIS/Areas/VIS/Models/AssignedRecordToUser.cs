@@ -173,7 +173,12 @@ namespace VIS.Models
             string sqlcount = null;
             int totalWindowcount = 0;
             //handled where condition based on user selection
-            string UserCond = IsAssignedByMe == "01" ? " asr.UpdatedBy = " : "asr.AD_User_ID = ";
+            string UserCond = IsAssignedByMe == "01" ? " asr.UpdatedBy = " + ctx.GetAD_User_ID() +" AND" : "asr.AD_User_ID = " + ctx.GetAD_User_ID() + " AND";
+            /*Here if 00 means that we need to show allo window in dropdown of popup*/
+            if (IsAssignedByMe == "00")
+            {
+                UserCond = "";
+            }
             bool baseLanguage = Env.IsBaseLanguage(ctx, "");
             if (DB.IsOracle())
             {
@@ -183,8 +188,8 @@ namespace VIS.Models
                             LISTAGG(asr.Record_ID, ',') WITHIN GROUP (ORDER BY asr.Record_ID) AS RecordIDs
                             FROM VIS_AssignedRecordToUser asr
                             INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
-                            INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + ctx.GetAD_User_ID() + " AND asr.IsActive = 'Y'  AND asr.Status = 'PDN' GROUP BY tab.TableName, adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
-                
+                            INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + " asr.IsActive = 'Y'  AND asr.Status = 'PDN' GROUP BY tab.TableName, adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
+
                 }
                 else
                 {
@@ -193,7 +198,7 @@ namespace VIS.Models
                             FROM VIS_AssignedRecordToUser asr
                             INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
                             INNER JOIN AD_Window adw ON (asr.AD_Window_ID = adw.AD_Window_ID) 
-                            INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + + ctx.GetAD_User_ID() + " AND asr.IsActive = 'Y'  AND asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name, adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
+                            INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + " asr.IsActive = 'Y'  AND asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name, adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
                 }
 
                 if (pageNo == 1)
@@ -210,7 +215,7 @@ namespace VIS.Models
                         STRING_AGG(asr.Record_ID::TEXT, ',') AS RecordIDs
                         FROM VIS_AssignedRecordToUser asr
                          INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
-                        INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + + ctx.GetAD_User_ID() + " AND asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                        INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
                 }
                 else
                 {
@@ -219,7 +224,7 @@ namespace VIS.Models
                         FROM VIS_AssignedRecordToUser asr
                          INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
                         INNER JOIN AD_Window adw ON (asr.AD_Window_ID = adw.AD_Window_ID)
-                        INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + ctx.GetAD_User_ID() + " AND asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                        INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
                 }
 
                 if (pageNo == 1)
@@ -387,11 +392,11 @@ namespace VIS.Models
         /// <returns>List of data</returns>
         /// <author>VIS_427</author>
 
-        public List<dynamic> GeWindowRecords(Ctx ctx, int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt,string AssignedByOrTo)
+        public List<dynamic> GeWindowRecords(Ctx ctx, int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt, string AssignedByOrTo)
         {
             string sql = "";
             List<dynamic> results = new List<dynamic>();
-            string UserCond = AssignedByOrTo == "01" ? " var.AD_User_ID": " var.UpdatedBy";
+            string UserCond = AssignedByOrTo == "01" ? " var.AD_User_ID" : " var.UpdatedBy";
             // Step 1: Get identifier column(s) for the given TableID
             if (DB.IsPostgreSQL())
             {
@@ -451,9 +456,9 @@ namespace VIS.Models
                           INNER JOIN VIS_AssignedRecordToUser var 
                               ON var.Record_ID = at.{ds.Tables[0].Rows[0]["TableName"]}_ID
                           INNER JOIN AD_User au 
-                              ON au.AD_User_ID =" +UserCond+$@"
-                          WHERE at.{ds.Tables[0].Rows[0]["TableName"]}_ID IN ({Record_ID}) AND var.AD_Window_ID={WindowId}
-                      )
+                              ON au.AD_User_ID =" + UserCond + $@"
+                          WHERE " + (!string.IsNullOrEmpty(Record_ID) ? $@"at.{ds.Tables[0].Rows[0]["TableName"]}_ID IN ({Record_ID}) AND " : " ") + $@" var.AD_Window_ID={WindowId}
+                      AND var.Status = 'PDN')
                       SELECT IdentiFierVal, UserName, Record_ID, Updated
                       FROM LatestUpdates
                       WHERE rn = 1";
@@ -469,8 +474,6 @@ namespace VIS.Models
 
                 // Order by most recently updated
                 sql += " ORDER BY Updated DESC";
-
-
                 // Step 4: Execute final paged result query
                 ds = DB.ExecuteDataset(sql.ToString(), null, null, pageSize, pageNo);
             }
@@ -507,7 +510,7 @@ namespace VIS.Models
             return results;
         }
 
-       
+
         /// <summary>
         /// Get assigned records
         /// </summary>
