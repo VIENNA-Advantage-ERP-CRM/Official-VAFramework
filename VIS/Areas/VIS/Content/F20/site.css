@@ -329,7 +329,12 @@ select {
 .vis-app-footer-c-r1 {
     flex: 0;
 }
-
+.vis-app-footer-c-r2 {
+    flex: 0;
+    flex-basis: 27px;
+    background-color: white;
+    color:black;
+}
 .vis-app-footer-c-r {
     flex: 0;
     flex-basis: 27px;
