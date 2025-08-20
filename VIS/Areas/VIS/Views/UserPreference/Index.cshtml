@@ -32,7 +32,7 @@
     <!-- menu -->
 
     <div class="VIS_Pref_content-right" style="display: block;" id="@("content1_" + ViewBag.WindowNumber)">
-       
+
         <div class="VIS_Pref_clear-both"></div>
         <div class="VIS_Pref_notification">
             <h3>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_Notification")</h3>
@@ -40,52 +40,52 @@
 
             @if (Model.Email)
             {
-            <input id="@("chkIsEmail_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" checked type="checkbox" /><h4 class="VIS-Lavel-float">
-                <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsEmail")</label>
-            </h4>
+                <input id="@("chkIsEmail_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" checked type="checkbox" /><h4 class="VIS-Lavel-float">
+                    <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsEmail")</label>
+                </h4>
             }
             else
             {
-            <input id="@("chkIsEmail_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" type="checkbox" /><h4 class="VIS-Lavel-float">
-                <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsEmail")</label>
-            </h4>
+                <input id="@("chkIsEmail_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" type="checkbox" /><h4 class="VIS-Lavel-float">
+                    <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsEmail")</label>
+                </h4>
             }
             @if (Model.Notice)
             {
-            <input id="@("chkIsNotice_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" checked type="checkbox" /><h4 class="VIS-Lavel-float">
-                <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsNotice")</label>
-            </h4>
+                <input id="@("chkIsNotice_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" checked type="checkbox" /><h4 class="VIS-Lavel-float">
+                    <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsNotice")</label>
+                </h4>
             }
             else
             {
-            <input id="@("chkIsNotice_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" type="checkbox" /><h4 class="VIS-Lavel-float">
-                <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsNotice")</label>
-            </h4>
+                <input id="@("chkIsNotice_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" type="checkbox" /><h4 class="VIS-Lavel-float">
+                    <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsNotice")</label>
+                </h4>
             }
             @if (Model.SMS)
             {
-            <input id="@("chkIsSMS_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" checked type="checkbox" /><h4 class="VIS-Lavel-float">
-                <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsSMS")</label>
-            </h4>
+                <input id="@("chkIsSMS_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" checked type="checkbox" /><h4 class="VIS-Lavel-float">
+                    <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsSMS")</label>
+                </h4>
             }
             else
             {
-            <input id="@("chkIsSMS_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" type="checkbox" /><h4 class="VIS-Lavel-float">
-                <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsSMS")</label>
-            </h4>
+                <input id="@("chkIsSMS_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" type="checkbox" /><h4 class="VIS-Lavel-float">
+                    <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsSMS")</label>
+                </h4>
             }
 
             @if (Model.Fax)
             {
-            <input id="@("chkIsFax_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" checked type="checkbox" style="display:none" /><h4 class="VIS-Lavel-float" style="display:none">
-                <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsFax")</label>
-            </h4>
+                <input id="@("chkIsFax_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" checked type="checkbox" style="display:none" /><h4 class="VIS-Lavel-float" style="display:none">
+                    <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsFax")</label>
+                </h4>
             }
             else
             {
-            <input id="@("chkIsFax_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" type="checkbox" style="display:none" /><h4 style="display:none" class="VIS-Lavel-float">
-                <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsFax")</label>
-            </h4>
+                <input id="@("chkIsFax_" + ViewBag.WindowNumber)" class="VIS_Pref_notification-check" type="checkbox" style="display:none" /><h4 style="display:none" class="VIS-Lavel-float">
+                    <label class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_IsFax")</label>
+                </h4>
             }
 
             <div class="VIS_Pref_clear-both"></div>
@@ -96,10 +96,10 @@
             <p id="@("pEmailConfig_" + ViewBag.WindowNumber)">If you are using same tenant mail domain settings. Inturyi integer ornare vulputate justo, at vehicula leo lobortis consequat.</p>
             <div class="VIS_Pref_log-width">
                 <div class="VIS_Pref_pass-line">
-                    <h4><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_UserName") </span><input id="@("txtUserName_" + ViewBag.WindowNumber)" value="@Model.EmailUserName" maxlength="60" type="text" class="VIS_Pref_pass"></h4>
+                    <h4><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Email") </span><input id="@("txtUserName_" + ViewBag.WindowNumber)" value="@Model.EmailUserName" maxlength="60" type="text" class="VIS_Pref_pass"></h4>
                 </div>@*required pattern="\w+"*@
                 <div class="VIS_Pref_pass-line">
-                    <h4><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_NewPassword") </span><input id="@("txtPws_" + ViewBag.WindowNumber)" value="@Model.EmailPws" maxlength="60" type="password" class="VIS_Pref_pass"></h4>
+                    <h4><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Password") </span><input id="@("txtPws_" + ViewBag.WindowNumber)" value="@Model.EmailPws" maxlength="60" type="password" class="VIS_Pref_pass"></h4>
                 </div>@*required pattern="\w+"*@
                 <div class="VIS_Pref_clear-both"></div>
             </div>
@@ -138,11 +138,12 @@
             </div>
         </div>
         <!-- End Login Setting Section-->
-        
-        <label class="VIS_Pref_Label_Font" id="@("lblRecordSave_" + ViewBag.WindowNumber)">test</label>
+
+
 
 
     </div>
+    <label class="VIS_Pref_Label_Font" style="margin-left:22%; margin-top:25px" id="@("lblRecordSave_" + ViewBag.WindowNumber)">test</label>
     <button id="@("btnSaveChanges_" + ViewBag.WindowNumber)" class="VIS_Pref_btn-2">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_SaveChanges")  </button>
     <!-- end of UserSettings -->
 
@@ -383,9 +384,9 @@
                     </a>
                     @if (ViewBag.IsAdmin)
                     {
-                    <div class="vis-prefthemeconfigbtnwrap">
-                        <span id="@("btnTheme_" + ViewBag.WindowNumber)" class="vis-prefthemeconfigbtn"><i class="vis vis-cog"></i>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ThemeConfig")</span>
-                    </div>
+                        <div class="vis-prefthemeconfigbtnwrap">
+                            <span id="@("btnTheme_" + ViewBag.WindowNumber)" class="vis-prefthemeconfigbtn"><i class="vis vis-cog"></i>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ThemeConfig")</span>
+                        </div>
                     }
                 </div>
                 @*<br>*@
@@ -604,7 +605,7 @@
     <div class="VIS_Pref_content-right-6" style="display: none;" id="@("content6_" + ViewBag.WindowNumber)">
         <div class="">
             <h3 class="VIS_Pref_change-pass">
-                <label id="@("lblchangePwsHeader_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font"></label>
+                <div id="@("lblchangePwsHeader_" + ViewBag.WindowNumber)" class=""></div>
             </h3>
             <p id="@("pchangePws_" + ViewBag.WindowNumber)" class="VIS_Pref_nam">Nam vulputate vitae libero sed gravida. Integer ornare vulputate justo, at vehicula leo lobortis consequat. Vivamus purus neque.</p>
             <button id="@("btnChangePws_" + ViewBag.WindowNumber)" class="VIS_Pref_pass-btn VIS_Pref_btn-pass-click">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_ChangePassword")</button>
@@ -635,7 +636,7 @@
                 <div class="VIS_Pref_clear-both"></div>
             </div>
 
-           
+
             <!-- end of new-password -->
             <div class="VIS_Pref_notification">
                 <h3>Two-factor authentication</h3>
@@ -649,56 +650,56 @@
     <div class="VIS_Pref_content-right-7" style="display: none;" id="@("content7_" + ViewBag.WindowNumber)">
         <!-- API Key Section-->
         @if (Model.IsVAAPIModuleInstall)
-{
-        <div class="VIS_Pref_notification" style="border-top:none; margin-top:0px">
-            <h3> @VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_ApiKeys")</h3>
-            <div class="info">
-                @VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_ApiKeysDescription")
+        {
+            <div class="VIS_Pref_notification" style="border-top:none; margin-top:0px">
+                <h3> @VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_ApiKeys")</h3>
+                <div class="info">
+                    @VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_ApiKeysDescription")
 
-            </div>
-            <button id="@("btnCreateKey_" + ViewBag.WindowNumber)" class="VIS_Pref_pass-btn">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_CreateKey")</button>
-            <div id="@("CreateApiDiv_" + ViewBag.WindowNumber)" class="VIS-Create-Api-Section" style="display:none">
+                </div>
+                <button id="@("btnCreateKey_" + ViewBag.WindowNumber)" class="VIS_Pref_pass-btn">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_CreateKey")</button>
+                <div id="@("CreateApiDiv_" + ViewBag.WindowNumber)" class="VIS-Create-Api-Section" style="display:none">
 
-                <div class="VIS_Pref_log-width">
-                    <div id="@("CreateApiDivClose_" + ViewBag.WindowNumber)">
-                        <i class="vis vis-mark VIS_Pref_close-btn" style=" float: right; position: relative;"></i>
+                    <div class="VIS_Pref_log-width">
+                        <div id="@("CreateApiDivClose_" + ViewBag.WindowNumber)">
+                            <i class="vis vis-mark VIS_Pref_close-btn" style=" float: right; position: relative;"></i>
+                        </div>
+                        <div class="VIS_Pref_pass-line">
+                            <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName")</span><input id="@("txtKeyName_" + ViewBag.WindowNumber)" required pattern="[A-Za-z0-9]+" class="VIS_Pref_pass VIS_Key-text-input" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName") type="text" /></h4>
+                        </div>@*required pattern="\w+"*@
+
+                        <div class="VIS_Pref_pass-line">
+                            <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Project")</span><select class="VIS_Pref_pass" id="@("cmbProject" + ViewBag.WindowNumber)" /></h4>
+                        </div>@*required pattern="\w+"*@
+
+                        <div class="VIS_Pref_pass-line">
+                            <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Role")</span><select class="VIS_Pref_pass" id="@("cmbRoleForKey_" + ViewBag.WindowNumber)" /></h4>
+                        </div>@*required pattern="\w+"*@
+                        <div class="VIS_Pref_pass-line">
+                            <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Client")</span><select class="VIS_Pref_pass" id="@("cmbClientForKey_" + ViewBag.WindowNumber)" disabled="disabled" /></h4>
+                        </div>@*required pattern="\w+"*@
+                        <div class="VIS_Pref_pass-line">
+                            <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Org")</span><select class="VIS_Pref_pass" id="@("cmbOrgForKey_" + ViewBag.WindowNumber)" /></h4>
+                        </div>@*required pattern="\w+"*@
+
+                        <div class="VIS_Pref_clear-both"></div>
+                        <div class="">
+                            <button id="@("btnSaveKey_" + ViewBag.WindowNumber)" class="VIS_Pref_btn-2">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_CreateSecretKey") </button>
+                        </div>
                     </div>
-                    <div class="VIS_Pref_pass-line">
-                        <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName")</span><input id="@("txtKeyName_" + ViewBag.WindowNumber)" required pattern="[A-Za-z0-9]+" class="VIS_Pref_pass VIS_Key-text-input" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName") type="text" /></h4>
-                    </div>@*required pattern="\w+"*@
 
-                    <div class="VIS_Pref_pass-line">
-                        <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Project")</span><select class="VIS_Pref_pass" id="@("cmbProject" + ViewBag.WindowNumber)" /></h4>
-                    </div>@*required pattern="\w+"*@
 
-                    <div class="VIS_Pref_pass-line">
-                        <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Role")</span><select class="VIS_Pref_pass" id="@("cmbRoleForKey_" + ViewBag.WindowNumber)" /></h4>
-                    </div>@*required pattern="\w+"*@
-                    <div class="VIS_Pref_pass-line">
-                        <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Client")</span><select class="VIS_Pref_pass" id="@("cmbClientForKey_" + ViewBag.WindowNumber)" disabled="disabled" /></h4>
-                    </div>@*required pattern="\w+"*@
-                    <div class="VIS_Pref_pass-line">
-                        <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Org")</span><select class="VIS_Pref_pass" id="@("cmbOrgForKey_" + ViewBag.WindowNumber)" /></h4>
-                    </div>@*required pattern="\w+"*@
 
-                    <div class="VIS_Pref_clear-both"></div>
-                    <div class="">
-                        <button id="@("btnSaveKey_" + ViewBag.WindowNumber)" class="VIS_Pref_btn-2">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_CreateSecretKey") </button>
-                    </div>
                 </div>
 
 
-
             </div>
 
+            <div id="@("VIS_SecretKeyList_" + ViewBag.WindowNumber)" class="">
+            </div>
 
-        </div>
-
-        <div id="@("VIS_SecretKeyList_" + ViewBag.WindowNumber)" class="">
-        </div>
-
-        <div class="VIS_Pref_clear-both"></div>
-}
+            <div class="VIS_Pref_clear-both"></div>
+        }
         <!-- End API Setting Section-->
     </div>
 
