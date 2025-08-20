@@ -577,6 +577,8 @@ div.VIS_Pref_slide-show.pp {
     width: 50%;
     margin-top: 5px;
     float: left;
+    display: flex;
+    align-items: center;
 }
 
 .VIS_Pref_show .VIS_Pref_dd {
