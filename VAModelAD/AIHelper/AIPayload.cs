@@ -92,7 +92,7 @@ namespace VAModelAD.AIHelper
 
             using (AIApiService service = new AIApiService(thrdChtDIn.token))
             {
-                var outp = service.ExecuteRequest(thrdChtDIn, "updateInsertInformationInThread");
+                var outp = service.ExecuteRequest(thrdChtDIn, "UpdateInsertInformationInThread");
                 if (!outp.isError)
                 {
                     try
