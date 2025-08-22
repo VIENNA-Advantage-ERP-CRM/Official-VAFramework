@@ -71,7 +71,7 @@ namespace VAModelAD.AIHelper
             else
             {
                 string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-                var configPath = Path.Combine(Path.GetFullPath(Path.Combine(exeDir, "..")), "Areas", "VAI01", "Views", "web.config");
+                var configPath = Path.Combine(Path.GetFullPath(Path.Combine(exeDir, "..")), "web.config");
                 try
                 {
                     var xdoc = XDocument.Load(configPath);
@@ -83,6 +83,8 @@ namespace VAModelAD.AIHelper
                     url = appSettingData?.Attribute("value")?.Value ?? "";
                     RequestPayload.Get().SetEndPoints(url);
 
+                    configPath = Path.Combine(Path.GetFullPath(Path.Combine(exeDir, "..")), "Areas", "VAI01", "Views", "web.config");
+                    xdoc = XDocument.Load(configPath);
                     // Fetch AI Endpoints from the web config
                     appSettingData = xdoc.Descendants("appSettings")
                                           .Descendants("add")
