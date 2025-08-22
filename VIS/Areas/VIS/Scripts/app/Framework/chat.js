@@ -145,6 +145,7 @@
                 $textArea.find('#chatBox_textArea').val('');
                 $textArea.find('#chatBox_textArea').css('height', 'auto');
                 self.refreshPanelData(self.record_ID, 0);
+                $maindiv.find(".vis-chatdetailouterwrap").scrollTop(0);
             });
         }
 
@@ -339,9 +340,9 @@
                     else {
                         if (data.isDelete == 'Y') {
                         //str += '</span></div><div class="vis-chat-textwrap">';
-                            str += '<span class="vis vis-delete vis_del_chat vis-chat-delete-icon" style="right:28px;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Delete Chat"></span>';
+                            str += '<span class="vis vis-delete vis_del_chat vis-chat-delete-icon" style="right:5px; margin-right: 28px;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Delete Chat"></span>';
                         }
-                        str += '<span class="vis vis-pencil vis_edit_chat vis-chat-edit-icon" style="right:1%;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Edit Chat"></span>';
+                        str += '<span class="vis vis-pencil vis_edit_chat vis-chat-edit-icon" style="right:5px;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Edit Chat"></span>';
                     }
 
                     if (VIS.Application.isRTL) {
@@ -426,10 +427,10 @@
                     $sendIcon = $('<i class="fa fa-check vis-chat-send-icon vis-chat-send-update" style="right: 10px; top:6px" title="Update"></i>');
                     $undoIcon = $('<i class="fa fa-times vis-chat-send-icon vis-chat-send-undo" style="right: 35px; top:6px" title="Undo"></i>');
                 }
-                $wrapper.append($input, $undoIcon, $sendIcon);
-                $input.val(originalText);
-                $wrapper.append($input).append($sendIcon).append($undoIcon);
+                $wrapper.append($input);
+                //  $input.val(originalText).trigger('input'); // Set value and auto-resize
                 $chatTextSpan.replaceWith($wrapper);
+                $input.val(originalText).trigger('input');
                 $input.focus();
                 $editIcon.after($sendIcon).after($undoIcon);
                 $editIcon.hide();
@@ -470,31 +471,35 @@
                     if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault(); // Prevent newline on Enter
                         sendUpdate();
-                        $editIcon.show();
-                        $delIcon.show();
-                        $sendIcon.remove();
-                        $undoIcon.remove();
+                        let $inside = $(this).closest(".vis-chatboxwrap"); // current chat row
+                        $inside.find(".vis-chat-send-update").hide();
+                        $inside.find(".vis-chat-send-undo").hide();
+                        $inside.find(".vis_edit_chat").show();
+                        $inside.find(".vis_del_chat").show();
                     }
                     // If Shift+Enter OR Alt+Enter → allow newline
                     else if (e.key === "Enter" && (e.shiftKey || e.altKey)) {
                         // Let it behave normally (insert newline)
                     }
                 });
-                // Handle click on paper plane icon
-                $sendIcon.on("click", function () {
-                    sendUpdate();
-                    $editIcon.show();
-                    $delIcon.show();
-                    $sendIcon.remove();
-                    $undoIcon.remove();
-                });
-                $undoIcon.off("click").on("click", function () {
+                $undoIcon.on("click", function () {
+                    let $thisUndo = $(this);
+                    let $inside = $thisUndo.closest(".vis-chatboxwrap");
                     var $originalSpan = $('<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">').text(originalText);
                     $wrapper.replaceWith($originalSpan);
+                    $inside.find(".vis-chat-send-undo").remove();
+                    $inside.find(".vis-chat-send-update").remove();
                     $editIcon.show();
                     $delIcon.show();
-                    $sendIcon.remove();
-                    $undoIcon.remove();
+                });
+                $sendIcon.on("click", function () {
+                    let $thisSend = $(this);                     // the clicked send icon
+                    let $wrapper = $thisSend.closest(".vis-chatboxwrap");
+                    sendUpdate();
+                    $wrapper.find(".vis-chat-send-update").hide();   // remove the clicked send icon
+                    $wrapper.find(".vis-chat-send-undo").hide();         // remove undo inside same row
+                    $editIcon.show();
+                    $delIcon.show();
                 });
             });
 
@@ -513,7 +518,7 @@
                             success: function (response) {
                                 showBusy(false);
                                 if (response.success) {
-                                    $("#" + chatId).remove();
+                                    $maindiv.find("#" + CSS.escape(chatId)).remove();
                                     //  var message = VIS.Msg.getMsg("VIS_Chatdeleted");
                                     //    VIS.ADialog.info("", "", message);
                                 } else {
