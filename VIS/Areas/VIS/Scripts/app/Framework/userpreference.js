@@ -1707,6 +1707,7 @@
                     data: JSON.stringify({ pref: data })
                 }).done(function (json) {
                     result = json;
+                    toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
                     //$root.dialog('close');
                 });
             }
