@@ -1708,6 +1708,7 @@
                 }).done(function (json) {
                     result = json;
                     //$root.dialog('close');
+                    toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
                 });
             }
 
