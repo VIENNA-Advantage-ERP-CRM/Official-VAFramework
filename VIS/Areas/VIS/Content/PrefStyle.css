@@ -1239,6 +1239,11 @@ html[dir="rtl"] .input-group-addon {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
+.VIS-pref-lblmsg {
+    margin-left: 22%;
+    margin-top: 25px
+}
+
 @media (max-width:679px) {
     .VIS_Pref_close {
         /*width: 8%;*/
