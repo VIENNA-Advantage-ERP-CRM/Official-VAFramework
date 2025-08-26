@@ -155,5 +155,18 @@ namespace VIS.Controllers
             }
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
+        /// <summary>
+        /// This function is used to get the reference id of list
+        /// </summary>
+        /// <param name="refernceName"></param>
+        /// <returns>AD_Reference_ID</returns>
+        /// <author>VIS_427</author>
+        public JsonResult GetRefIdForAssList(string refernceName)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            AssignedRecordToUser refernceId = new AssignedRecordToUser();
+            int columnData = refernceId.GetRefIdForAssList(ctx, refernceName);
+            return Json(JsonConvert.SerializeObject(columnData), JsonRequestBehavior.AllowGet);
+        }
     }
 }
