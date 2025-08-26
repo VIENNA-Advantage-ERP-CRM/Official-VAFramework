@@ -684,7 +684,7 @@ namespace VAdvantage.Common
 
             if (string.IsNullOrEmpty(visitorIPAddress) || visitorIPAddress.Trim() == "::1")
             {
-               // GetLan = true;
+                // GetLan = true;
                 visitorIPAddress = string.Empty;
             }
 
@@ -905,8 +905,8 @@ namespace VAdvantage.Common
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
 
-            
-           
+
+
 
 
 
@@ -1668,7 +1668,7 @@ namespace VAdvantage.Common
         /// <param name="AD_SurveyAssignment_ID"></param>
         /// <param name="IsConditionalChecklist"></param>
         /// <returns></returns>
-        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID, string IsConditionalChecklist)
+        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID, int AD_SurveyAssignment_ID, string IsConditionalChecklist)
         {
             bool isExist = true;
             bool isConditionGiven = true;
@@ -1693,7 +1693,7 @@ namespace VAdvantage.Common
                 DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
                 //prepare where condition for filter
                 if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
-                {                    
+                {
                     int idx = 0;
                     foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                     {
@@ -1765,8 +1765,8 @@ namespace VAdvantage.Common
                                 WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                             }
                             else if (type == "DateTime")
-                            {                               
-                                WhereCondition += columnName +" " + oprtr;
+                            {
+                                WhereCondition += columnName + " " + oprtr;
                             }
                             else
                             {
@@ -1859,9 +1859,9 @@ namespace VAdvantage.Common
                     isConditionGiven = false;
                 }
             }
-          
 
-            if (!string.IsNullOrEmpty(sqlWhere)|| !string.IsNullOrEmpty(WhereCondition))
+
+            if (!string.IsNullOrEmpty(sqlWhere) || !string.IsNullOrEmpty(WhereCondition))
             {
                 string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID=" + AD_Table_ID));
 
@@ -1891,7 +1891,7 @@ namespace VAdvantage.Common
                     isExist = false;
                 }
             }
-            
+
 
             return isExist;
 
@@ -1956,7 +1956,7 @@ namespace VAdvantage.Common
                             result = false;
                         }
                     }
-                    
+
                 }
             }
 
@@ -1987,20 +1987,138 @@ namespace VAdvantage.Common
         /// <summary>
         /// Get Thread ID for the record based on the Table ID and Record ID if AI Chat Bot module is installed
         /// </summary>
-        /// <param name="AD_Table_ID"></param>
-        /// <param name="Record_ID"></param>
+        /// <param name="AD_Table_ID">Table ID</param>
+        /// <param name="Record_ID">Record ID</param>
         /// <returns></returns>
         public static string GetThreadID(int AD_Table_ID, int Record_ID)
         {
+            // Check applied if module installed
             if (Env.IsModuleInstalled("VAI01_"))
             {
-                return Util.GetValueOfString(DB.ExecuteScalar(@"SELECT asth.VAI01_ThreadID, llm.VAI01_APIKey, asst.VAI01_AssistantID FROM VAI01_AIAssistant asst
+                return Util.GetValueOfString(DB.ExecuteScalar(@"SELECT asth.VAI01_ThreadID FROM VAI01_AIAssistant asst
                                     INNER JOIN VAI01_AssistantScreen ascrn ON (ascrn.VAI01_AIAssistant_ID = asst.VAI01_AIAssistant_ID)
                                     INNER JOIN VAI01_LLMConfiguration llm ON (llm.VAI01_LLMConfiguration_ID = asst.VAI01_LLMConfiguration_ID)
                                     INNER JOIN VAI01_AssistantThread asth ON (ascrn.VAI01_AssistantScreen_ID = asth.VAI01_AssistantScreen_ID) WHERE asth.IsActive = 'Y'
                                     AND asst.IsActive = 'Y' AND ascrn.AD_Table_ID = " + AD_Table_ID + " AND CAST(asth.VAI01_RecordID AS INTEGER) = " + Record_ID));
             }
             return "";
+        }
+
+        /// <summary>
+        /// Fetch thread ID against table and record ID, also create or update data
+        /// against record in AI knowledge base
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="recordId">Record ID (Primary key)</param>
+        /// <param name="tableID">Table ID</param>
+        /// <param name="windowID">Window ID</param>
+        /// <param name="tabID">Tab ID</param>
+        /// <returns>Thread ID in string format if created or updated else returns blank string</returns>
+        public static string CreateRecordThread(Ctx ctx, int recordId, int tableID, int windowID, int tabID, bool isUpdate, VLogger _log)
+        {
+            string threadID = "";
+            // fetch tabID against table id if window id and tab id is not passed in the parameter
+            if (tabID == 0 && windowID == 0 && tableID != 0)
+            {
+                windowID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COALESCE(AD_Window_ID,0) FROM AD_Table WHERE AD_Table_ID = " + tableID));
+                if (windowID > 0)
+                {
+                    tabID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Tab_ID FROM AD_Tab WHERE AD_Window_ID = " + windowID + " AND AD_Table_ID = " + tableID + " ORDER BY SeqNo"));
+                }
+            }
+            // Create or Update thread against record if tab ID found
+            if (tabID != 0)
+            {
+                int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID()));
+                // Check applied if Assistant screen is linked against the tab, if found then only create or update data against thread
+                if (asstScreenID > 0)
+                {
+                    // Process fixed for thread data update in case AI Chat Bot module is there
+                    int Process_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Process_ID FROM AD_Process WHERE ISActive='Y' AND Value='VAI01_CreateUpdateRecordThread'"));
+                    MPInstance pin = new MPInstance(ctx, Process_ID, 0); // create object of MPInstance
+                    if (!pin.Save())
+                    {
+                        ValueNamePair vnp = VLogger.RetrieveError();
+                        string errorMsg = "";
+                        if (vnp != null)
+                        {
+                            errorMsg = vnp.GetName();
+                            if (errorMsg == "")
+                                errorMsg = vnp.GetValue();
+                        }
+                        //if (errorMsg == "")
+                        //    result = errorMsg = Msg.GetMsg(ctx, "DocNotCompleted");
+                        return "";
+                    }
+                    VAdvantage.ProcessEngine.ProcessInfo pi = new VAdvantage.ProcessEngine.ProcessInfo("WF", Process_ID);
+                    pi.SetAD_User_ID(ctx.GetAD_User_ID());
+                    pi.SetAD_Client_ID(ctx.GetAD_Client_ID());
+                    pi.SetAD_PInstance_ID(pin.GetAD_PInstance_ID());
+                    pi.SetRecord_ID(recordId);
+                    pi.SetTable_ID(tableID);
+                    MPInstancePara para = new MPInstancePara(pin, 10);
+                    para.setParameter("AD_Table_ID", tableID);
+                    if (!para.Save())
+                    {
+                        String msg = "No AD_Table_ID Parameter added";  //  not translated
+                        if(_log != null)
+                        _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    para = new MPInstancePara(pin, 20);
+                    para.setParameter("AD_Tab_ID", tabID);
+                    if (!para.Save())
+                    {
+                        String msg = "No AD_Tab_ID Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    para = new MPInstancePara(pin, 30);
+                    para.setParameter("record_ID", recordId);
+                    if (!para.Save())
+                    {
+                        String msg = "No record_ID Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    para = new MPInstancePara(pin, 40);
+                    para.setParameter("IsUpdate", Util.GetValueOfString(isUpdate));
+                    if (!para.Save())
+                    {
+                        String msg = "No IsUpdate Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    ProcessCtl worker = new ProcessCtl(ctx, null, pi, null);
+                    worker.Run();
+                    if (pi.IsError())
+                    {
+                        ValueNamePair vnp = VLogger.RetrieveError();
+                        string errorMsg = "";
+                        if (vnp != null)
+                        {
+                            errorMsg = vnp.GetName();
+                            if (errorMsg == "")
+                                errorMsg = vnp.GetValue();
+                        }
+                        if (errorMsg == "")
+                            errorMsg = pi.GetSummary();
+                        if (errorMsg == "")
+                            errorMsg = Msg.GetMsg(ctx, "DocNotCompleted");
+                        if (_log != null)
+                            _log.SaveError("", errorMsg);
+                        return "";
+                    }
+                    else
+                    {
+                        threadID = Common.GetThreadID(tableID, recordId);
+                    }
+                }
+            }
+            return threadID;
         }
     }
 

@@ -169,7 +169,7 @@
       <HintPath>..\ViennaAdvantageWeb\DLL\VAI01.dll</HintPath>
     </Reference>
     <Reference Include="VAI01Svc">
-      <HintPath>..\ViennaAdvantageWeb\DLL\VAI01Svc.dll</HintPath>
+      <HintPath>..\..\..\Github Private\VIENNA-Advantage\AIChatBot\ViennaAdvantageSvc\bin\Debug\VAI01Svc.dll</HintPath>
     </Reference>
     <Reference Include="VAPrintLib">
       <HintPath>..\ViennaAdvantageWeb\Dll\VAPrintLib.dll</HintPath>
@@ -192,6 +192,7 @@
     <Compile Include="AIHelper\AIApiService.cs" />
     <Compile Include="AIHelper\AIHelperDataContracts.cs" />
     <Compile Include="AIHelper\AIPayload.cs" />
+    <Compile Include="AIHelper\AssistantRecordThread.cs" />
     <Compile Include="AIHelper\RequestPayload.cs" />
     <Compile Include="AzureBlob\AzureBlobStorage.cs" />
     <Compile Include="BundleCollection\ModuleBundles.cs" />

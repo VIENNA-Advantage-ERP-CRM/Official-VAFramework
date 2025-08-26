@@ -221,6 +221,10 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="VAI01Svc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Github Private\VIENNA-Advantage\AIChatBot\ViennaAdvantageSvc\bin\Debug\VAI01Svc.dll</HintPath>
+    </Reference>
     <Reference Include="ViennaBase">
       <HintPath>Dll\ViennaBase.dll</HintPath>
     </Reference>
