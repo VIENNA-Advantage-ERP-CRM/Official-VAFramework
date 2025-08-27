@@ -99,22 +99,22 @@
 
 
             /*events for getting HeaderIDs*/
-          /*  pendingRecords.find('.vis-subheading').off('click')
-            pendingRecords.find('.vis-subheading').on('click', function () {
-                WindowName = $(this).attr('visWindowname');
-                WindowId = $(this).attr('visWindowId');
-                TableName = $(this).attr('visTableName');
-                Table_ID = $(this).attr('visTableId');
-                Record_ID = $(this).attr('visRecordId');
-                headerTab = $(this).attr('visHeaderTab');
-                if (headerTab > 0) {
-                    getHeaderIDs();
-                }
-                else {
-                    primaryKey = TableName + '_ID';
-                    zoomWindow();
-                }
-            });*/
+            /*  pendingRecords.find('.vis-subheading').off('click')
+              pendingRecords.find('.vis-subheading').on('click', function () {
+                  WindowName = $(this).attr('visWindowname');
+                  WindowId = $(this).attr('visWindowId');
+                  TableName = $(this).attr('visTableName');
+                  Table_ID = $(this).attr('visTableId');
+                  Record_ID = $(this).attr('visRecordId');
+                  headerTab = $(this).attr('visHeaderTab');
+                  if (headerTab > 0) {
+                      getHeaderIDs();
+                  }
+                  else {
+                      primaryKey = TableName + '_ID';
+                      zoomWindow();
+                  }
+              });*/
 
             //Popover for showing all records
             widgetContainer.find('.vis-show-checklist').off('click')
@@ -136,9 +136,9 @@
                    <div class="vis-checklistcard">
                      <div class="vis-card-title vis-checklistrecord-box">
                     <span>${allRecords[i].windowname}</span>
-                    <div class="vis-count-zoom-wrap">
-                    <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" data-windowid="${allRecords[i].WindowID}"></i>
+                    <div class="vis-count-zoom-wrap">                   
                     <span class="VIS_checklistCount">${allRecords[i].count}</span>
+                     <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" data-windowid="${allRecords[i].WindowID}"></i>
                      </div>
                    </div>
                     <div class="vis-Tabdropdown visWindowTabs"></div>
@@ -184,22 +184,22 @@
                             $('#popup-close-btn').on('click', function () {
                                 w2popup.close();
                             });
-                           /* $('.w2ui-popup .vis-subheading').on('click', function () {
-                                w2popup.close();
-                                WindowName = $(this).attr('visWindowname');
-                                WindowId = $(this).attr('visWindowId');
-                                TableName = $(this).attr('visTableName');
-                                Record_ID = $(this).attr('visRecordId');
-                                Table_ID = $(this).attr('visTableId');
-                                headerTab = $(this).attr('visHeaderTab');
-                                if (headerTab > 0) {
-                                    getHeaderIDs();
-                                }
-                                else {
-                                    primaryKey = TableName + '_ID';
-                                    zoomWindow();
-                                }
-                            });*/
+                            /* $('.w2ui-popup .vis-subheading').on('click', function () {
+                                 w2popup.close();
+                                 WindowName = $(this).attr('visWindowname');
+                                 WindowId = $(this).attr('visWindowId');
+                                 TableName = $(this).attr('visTableName');
+                                 Record_ID = $(this).attr('visRecordId');
+                                 Table_ID = $(this).attr('visTableId');
+                                 headerTab = $(this).attr('visHeaderTab');
+                                 if (headerTab > 0) {
+                                     getHeaderIDs();
+                                 }
+                                 else {
+                                     primaryKey = TableName + '_ID';
+                                     zoomWindow();
+                                 }
+                             });*/
                             // ✅ Zoom button handler (your full logic here)
                             $('.w2ui-popup .vis-rec-zoom').off('click').on('click', function () {
                                 let allParentIds = [];
@@ -351,9 +351,9 @@
                <div class="vis-checklistcard">
                <div class="vis-card-title vis-checklistrecord-box"
                 <span>${record.windowname}</span>
-                <div class="vis-count-zoom-wrap">
-                <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" ></i>
+                <div class="vis-count-zoom-wrap">                
                 <span class="VIS_checklistCount">${record.count}</span>
+                <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" ></i>
                 </div>
                </div>
                 <div class="vis-Tabdropdown visWindowTabs"></div>
