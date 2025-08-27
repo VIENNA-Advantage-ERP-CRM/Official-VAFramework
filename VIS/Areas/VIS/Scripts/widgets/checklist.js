@@ -136,9 +136,9 @@
                    <div class="vis-checklistcard">
                      <div class="vis-card-title vis-checklistrecord-box">
                     <span>${allRecords[i].windowname}</span>
-                    <div class="vis-count-zoom-wrap">
-                    <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" data-windowid="${allRecords[i].WindowID}"></i>
+                    <div class="vis-count-zoom-wrap">                   
                     <span class="VIS_checklistCount">${allRecords[i].count}</span>
+                     <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" data-windowid="${allRecords[i].WindowID}"></i>
                      </div>
                    </div>
                     <div class="vis-Tabdropdown visWindowTabs"></div>
@@ -351,9 +351,9 @@
                <div class="vis-checklistcard">
                <div class="vis-card-title vis-checklistrecord-box"
                 <span>${record.windowname}</span>
-                <div class="vis-count-zoom-wrap">
-                <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" ></i>
+                <div class="vis-count-zoom-wrap">                
                 <span class="VIS_checklistCount">${record.count}</span>
+                <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}" ></i>
                 </div>
                </div>
                 <div class="vis-Tabdropdown visWindowTabs"></div>

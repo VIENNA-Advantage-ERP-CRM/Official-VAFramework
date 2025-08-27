@@ -381,7 +381,7 @@ namespace VAModelAD.Model
                 // vis0008 Check and update changes for AI Assistant
                 if (Env.IsModuleInstalled("VAI01_"))
                 {
-                    AssistantRecordThread.Get().CreateUpdateThread(p_ctx, po);
+                    AssistantRecordThread.Get().CreateUpdateThread(p_ctx, po, newRecord);
                 }
             }
             return success;
