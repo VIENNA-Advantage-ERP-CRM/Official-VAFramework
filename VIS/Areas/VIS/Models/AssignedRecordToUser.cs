@@ -158,6 +158,21 @@ namespace VIS.Models
                 trx.Close();
             }
         }
+        /// <summary>
+        /// This function is used to get the reference id of list
+        /// </summary>
+        /// <param name="refernceName"></param>
+        /// <returns>AD_Reference_ID</returns>
+        /// <author>VIS_427</author>
+        public int GetRefIdForAssList(Ctx ct, string refernceName)
+        {
+            int refId = 0;
+            if (!String.IsNullOrEmpty(refernceName))
+            {
+                refId = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_Reference_ID FROM AD_Reference WHERE Name='" + refernceName + "'", null, null));
+            }
+            return refId;
+        }
 
         /// <summary>
         /// Get Count of Assigned Record To User 

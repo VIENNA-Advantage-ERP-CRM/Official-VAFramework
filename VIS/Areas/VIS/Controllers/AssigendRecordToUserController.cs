@@ -144,7 +144,7 @@ namespace VIS.Controllers
         /// <param name="AssignedByOrTo"></param>
         /// <returns>List of data</returns>
         /// <author>VIS_427</author>
-        public JsonResult GeWindowRecords(int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt,string AssignedByOrTo)
+        public JsonResult GeWindowRecords(int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt, string AssignedByOrTo)
         {
             dynamic result = 0;
             if (Session["ctx"] != null)
@@ -154,6 +154,19 @@ namespace VIS.Controllers
                 result = obj.GeWindowRecords(ctx, WindowId, TableID, Record_ID, pageNo, pageSize, SrchTxt, AssignedByOrTo);
             }
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+        }
+        /// <summary>
+        /// This function is used to get the reference id of list
+        /// </summary>
+        /// <param name="refernceName"></param>
+        /// <returns>AD_Reference_ID</returns>
+        /// <author>VIS_427</author>
+        public JsonResult GetRefIdForAssList(string refernceName)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            AssignedRecordToUser refernceId = new AssignedRecordToUser();
+            int columnData = refernceId.GetRefIdForAssList(ctx, refernceName);
+            return Json(JsonConvert.SerializeObject(columnData), JsonRequestBehavior.AllowGet);
         }
     }
 }
