@@ -44,13 +44,13 @@ namespace VAModelAD.AIHelper
         /// </summary>
         /// <param name="p_ctx">Context</param>
         /// <param name="_po">Object of PO</param>
-        public void CreateUpdateThread(Ctx p_ctx, PO _po)
+        public void CreateUpdateThread(Ctx p_ctx, PO _po, bool newRecord)
         {
             try
             {
-                System.Threading.Tasks.Task.Run(() => CreateUpdateRecordThread(p_ctx, _po));
+                System.Threading.Tasks.Task.Run(() => CreateUpdateRecordThread(p_ctx, _po, newRecord));
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _log.SaveError("Error Thread", ex.Message);
             };
@@ -61,9 +61,9 @@ namespace VAModelAD.AIHelper
         /// </summary>
         /// <param name="ctx">Context</param>
         /// <param name="_po">PO object</param>
-        protected void CreateUpdateRecordThread(Ctx ctx, PO _po)
+        protected void CreateUpdateRecordThread(Ctx ctx, PO _po, bool newRecord)
         {
-            Common.CreateRecordThread(ctx, _po.Get_ID(), _po.Get_Table_ID(), _po.GetAD_Window_ID(), _po.GetWindowTabID(), !(_po.Is_New()), null);
+            Common.CreateRecordThread(ctx, _po.Get_ID(), _po.Get_Table_ID(), _po.GetAD_Window_ID(), _po.GetWindowTabID(), !newRecord, null);
         }
     }
 }
