@@ -44,6 +44,7 @@
         var TotalPages = 1;
         var content = null;
         var IsZoomClicked = false;
+        var ColumnId = null;
         var SrchTxt = null;
         var IsItemSearched = false;
         var popup = null;
@@ -61,6 +62,8 @@
         /* Initialize the form design */
         this.Initalize = function () {
             widgetID = $self.widgetInfo.AD_UserHomeWidgetID;
+            //this function returns refernece id
+            GetColumnID("VIS_AssignRecordWidgetList");
             createBusyIndicator();
             widgetsPopup();
             showBusy(true);
@@ -72,7 +75,7 @@
             var AssignRecordDiv = $('<div class="VIS-AssignRecordDiv vis-asrec-control-div">');
             var $AssignRecordDiv = $('<div class="input-group vis-input-wrap">');
             /* parameters are: context, windowno., coloumn id, display type, DB coloumn name, Reference key, Is parent, Validation Code*/
-            var $AssignRecordLookUp = VIS.MLookupFactory.get(VIS.Env.getCtx(), $self.windowNo, 0, VIS.DisplayType.List, "VIS_AssignRecordWidgetList", 1000787, false);
+            var $AssignRecordLookUp = VIS.MLookupFactory.get(VIS.Env.getCtx(), $self.windowNo, 0, VIS.DisplayType.List, "VIS_AssignRecordWidgetList", ColumnId, false);
             // Parameters are: columnName, mandatory, isReadOnly, isUpdateable, lookup,display length
             vAssignRecord = new VIS.Controls.VComboBox("VIS_AssignRecordWidgetList", true, false, true, $AssignRecordLookUp, 100);
             vAssignRecord.setValue('02');
@@ -223,7 +226,7 @@
                                 TableID = $(this).attr('visTableID');
                                 winRecPageNo = 1;
                                 RecordCount = $(this).find('.VIS-asrec-popupRecordCount').text();
-                                $self.GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, "", IsFromPopUp, IsPopButAll);
+                                $self.GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, "", IsFromPopUp, IsPopButAll, modelPopupId);
 
                             });
                             //Handled zoom event
@@ -377,7 +380,7 @@
             if (res) {
                 showBusy(true);
                 windowRecords = res ? res : [];
-                CreateList(windowRecords, IsFromPopUp, IsPopButAll, modelPopupId, WindowId);
+                CreateList(windowRecords, IsFromPopUp, IsPopButAll, modelPopupId, WindowId, TableID);
             } else {
                 if (isPopupOpen) {
                     showPopupBusy(false);
@@ -390,7 +393,7 @@
          * This function used to create list of records in popup
          * @param {any} windowRecords
          */
-        function CreateList(windowRecords, IsFromPopUp, IsPopButAll, modelPopupId, WindowId) {
+        function CreateList(windowRecords, IsFromPopUp, IsPopButAll, modelPopupId, WindowId, TableID) {
             $('#vis-asrec-popup-scroll_' + widgetID).off('scroll');
             if (winRecPageNo === 1 && windowRecords.length > 0) {
                 TotalRecords = windowRecords[0].countRecords;
@@ -492,7 +495,7 @@
                 // Event Bindings (Delegated)
                 $self.bindSearchEvents(modelPopupId, WindowId);
                 $self.bindPopupScroll(modelPopupId, WindowId);
-                $self.bindPopupEvents(modelPopupId, WindowId);
+                $self.bindPopupEvents(modelPopupId, WindowId, TableID);
                 if (ListVal == "01") {
                     modelPopupId.find('.modal-content').css("width", "80%");
                 }
@@ -535,7 +538,7 @@
             IsDataFetching = false;
         }
         /**This function is used to unassign the record if user click the ok button */
-        function UnAssignRecord(modelPopupId, WindowId) {
+        function UnAssignRecord(modelPopupId, WindowId, TableID) {
             showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "AssignedRecordToUser/DeleteRecord",
@@ -565,7 +568,7 @@
         };
         /**Binded pop events  */
         /**Binded pop events  */
-        this.bindPopupEvents = function (modelPopupId, WindowId) {
+        this.bindPopupEvents = function (modelPopupId, WindowId, TableID) {
             // Close button event
             modelPopupId.off('click', '#popup-close-btn1')
                 .on('click', '#popup-close-btn1', function () {
@@ -600,7 +603,7 @@
             modelPopupId.off('click', '.vis-asrec-ok')
                 .on('click', '.vis-asrec-ok', function () {
                     if (uncheckedIDs.length > 0) {
-                        UnAssignRecord(modelPopupId, WindowId);
+                        UnAssignRecord(modelPopupId, WindowId, TableID);
                     }
                 });
 
@@ -626,8 +629,13 @@
                     $self.GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, "", IsFromPopUp, IsPopButAll, modelPopupId);
                 });
         }
-
-
+        /**
+         * This function is used to get the reference id
+         * @param {any} ColumnData
+         */
+        var GetColumnID = function (ColumnData) {
+            ColumnId = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AssignedRecordToUser/GetRefIdForAssList", { "refernceName": ColumnData }, null);
+        }
         /**
          * This function is used to show busy indicator on popup
          * @param {any} show

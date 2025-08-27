@@ -125,6 +125,8 @@
         this.projectList = []; //store the list of projects
         //*********************************
 
+        var divBottom = null;
+
         var cmbTwoFactor = null;
 
         var drpTheme = null;
@@ -291,6 +293,7 @@
             $btnSaveKey = root.find('#btnSaveKey_' + windowNo);
             $listOfKey = root.find('#VIS_SecretKeyList_' + windowNo);
             //*******************
+            divBottom = root.find('#divBottom_' + windowNo);
 
             cmbTwoFactor = root.find('#cmbTwoFactor_' + windowNo);
 
@@ -728,8 +731,8 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
-                $btnSaveChanges.show();
-                lblRecordSave.show();
+                divBottom.css("display", "inline-block");
+                
             });
             $(".VIS_Pref_link-2").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -739,8 +742,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
-                $btnSaveChanges.hide();
-                lblRecordSave.hide();
+                divBottom.css("display", "none");
             });
             $(".VIS_Pref_link-3").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -750,8 +752,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
-                $btnSaveChanges.hide();
-                lblRecordSave.hide();
+                divBottom.css("display", "none");
             });
             $(".VIS_Pref_link-4").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -761,8 +762,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
-                $btnSaveChanges.hide();
-                lblRecordSave.hide();
+                divBottom.css("display", "none");
             });
             //**************************************
             //Added By Sarab for the purpose of Gmail Settings to Import Gmail Tasks
@@ -775,8 +775,7 @@
                     $(".VIS_Pref_content-right-6").css("display", "none");
                     $(".VIS_Pref_content-right-7").css("display", "none");
                     $(".VIS_Pref_content-right-5").css("display", "block");
-                    $btnSaveChanges.hide();
-                    lblRecordSave.hide();
+                    divBottom.css("display", "none");
                 }
                 else {
                     alert("please download WSP !!!");
@@ -791,8 +790,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "block");
-                $btnSaveChanges.hide();
-                lblRecordSave.hide();
+                divBottom.css("display", "none");
             });
 
             $(".VIS_Pref_link-7").click(function () {
@@ -803,8 +801,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "block");
-                $btnSaveChanges.hide();
-                lblRecordSave.hide();
+                divBottom.css("display", "none");
             })
 
 

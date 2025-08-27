@@ -301,6 +301,8 @@ namespace VAdvantage.Process
         /// <param name="sp">server process or null</param>
         private void CheckTableID(Ctx ctx, SvrProcess sp)
         {
+            StringBuilder tableName = new StringBuilder("");
+            int clientId = GetAD_Client_ID();
             if (MSysConfig.IsNativeSequence(false))
             {
                 String sql = "SELECT * FROM AD_Sequence "
@@ -340,6 +342,9 @@ namespace VAdvantage.Process
                         {
                             _log.Severe("Sequence Not Updated For :" + ds.Tables[0].Rows[i]["Name"].ToString());
                         }
+                        tableName.Clear().Append(ds.Tables[0].Rows[i]["Name"]);
+
+                        UpdateADSequence(ctx, tableName.ToString(), clientId, trxName);
                     }
                 }
                 catch (Exception ex)
@@ -376,11 +381,7 @@ namespace VAdvantage.Process
                     //pstmt = DataBase.prepareStatement(sql, trxName);
                     //idr = DataBase.DB.ExecuteReader(sql, null, trxName);
                     ds = DataBase.DB.ExecuteDataset(sql, null, trxName);
-                    StringBuilder tableName = new StringBuilder("");
-                    StringBuilder updDocVal = new StringBuilder("");
-                    int maxTableValue = 0;
-                    int currNextVal = 0;
-                    int clientId = GetAD_Client_ID();
+
                     //while (idr.Read())
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
@@ -429,34 +430,8 @@ namespace VAdvantage.Process
 
                         // Changes done to handle/update value or document no for tables
                         tableName.Clear().Append(ds.Tables[0].Rows[i]["Name"]);
-                        MTable tbl = MTable.Get(ctx, tableName.ToString());
-                        if (tbl != null && tbl.GetColumn("Value") != null)
-                        {
-                            if (DB.IsPostgreSQL())
-                            {
-                                maxTableValue = Util.GetValueOfInt(DB.ExecuteScalar($@"SELECT MAX(CAST(TRIM(Value) AS INTEGER)) 
-                                    FROM {tableName.ToString()} WHERE TRIM(Value) ~ '^\d+$' AND AD_Client_ID = { clientId }"));
-                            }
-                            else
-                            {
-                                maxTableValue = Util.GetValueOfInt(DB.ExecuteScalar($@"SELECT MAX(TO_NUMBER(TRIM(Value))) 
-                                    FROM {tableName.ToString()} WHERE REGEXP_LIKE(TRIM(Value), '^\d+$') AND AD_Client_ID = { clientId }"));
-                            }
 
-                            currNextVal = Util.GetValueOfInt(DB.ExecuteScalar($@"SELECT CurrentNext
-                                    FROM AD_Sequence WHERE Name = 'DocumentNo_{tableName.ToString()}' AND AD_Client_ID = {clientId}"));
-
-                            if (currNextVal <= maxTableValue)
-                                currNextVal = maxTableValue + 1;
-                            else
-                                currNextVal = -1;
-
-                            if (currNextVal > 0)
-                            {
-                                updDocVal.Clear().Append($@"UPDATE AD_Sequence SET CurrentNext = {currNextVal} WHERE Name = 'DocumentNo_{tableName.ToString()}' AND AD_Client_ID = {clientId}");
-                                int uVal = DB.ExecuteQuery(updDocVal.ToString(), null, trxName);
-                            }
-                        }
+                        UpdateADSequence(ctx, tableName.ToString(), clientId, trxName);
                     }
                     // idr.Close();
                 }
@@ -471,7 +446,59 @@ namespace VAdvantage.Process
 
                 _log.Fine("#" + counter);
             }
-        }	//	checkTableID
+        }   //	checkTableID
+        public static void UpdateADSequence(Ctx ctx, string tableName, int clientId, Trx trxName = null)
+        {
+            if (string.IsNullOrWhiteSpace(tableName))
+                return;
+
+            // Get table info   
+            MTable tbl = MTable.Get(ctx, tableName);
+            if (tbl == null || tbl.GetColumn("Value") == null)
+                return;
+
+            int maxTableValue = 0;
+            int currNextVal = 0;
+
+            // Directly get maxTableValue
+            maxTableValue = Util.GetValueOfInt(DB.ExecuteScalar(
+                DB.IsPostgreSQL()
+                    ? $@"SELECT MAX(CAST(TRIM(Value) AS INTEGER))
+                 FROM {tableName}
+                 WHERE TRIM(Value) ~ '^\d+$'
+                   AND AD_Client_ID = {clientId}"
+                    : $@"SELECT MAX(TO_NUMBER(TRIM(Value)))
+                 FROM {tableName}
+                 WHERE REGEXP_LIKE(TRIM(Value), '^\d+$')
+                   AND AD_Client_ID = {clientId}"
+            ));
+
+            // Directly get CurrentNext value
+            currNextVal = Util.GetValueOfInt(DB.ExecuteScalar(
+                $@"SELECT CurrentNext
+           FROM AD_Sequence
+           WHERE Name = 'DocumentNo_{tableName}'
+             AND AD_Client_ID = {clientId}"
+            ));
+
+            // Adjust CurrentNext
+            if (currNextVal <= maxTableValue)
+                currNextVal = maxTableValue + 1;
+            else
+                currNextVal = -1;
+
+            // Update AD_Sequence if valid
+            if (currNextVal > 0)
+            {
+                int uVal = DB.ExecuteQuery($@"
+            UPDATE AD_Sequence
+            SET CurrentNext = {currNextVal}
+            WHERE Name = 'DocumentNo_{tableName}'
+              AND AD_Client_ID = {clientId}",
+                    null, trxName
+                );
+            }
+        }
 
 
         /// <summary>

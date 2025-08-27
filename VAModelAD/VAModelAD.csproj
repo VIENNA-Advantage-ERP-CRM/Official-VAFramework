@@ -192,6 +192,7 @@
     <Compile Include="AIHelper\AIApiService.cs" />
     <Compile Include="AIHelper\AIHelperDataContracts.cs" />
     <Compile Include="AIHelper\AIPayload.cs" />
+    <Compile Include="AIHelper\AssistantRecordThread.cs" />
     <Compile Include="AIHelper\RequestPayload.cs" />
     <Compile Include="AzureBlob\AzureBlobStorage.cs" />
     <Compile Include="BundleCollection\ModuleBundles.cs" />

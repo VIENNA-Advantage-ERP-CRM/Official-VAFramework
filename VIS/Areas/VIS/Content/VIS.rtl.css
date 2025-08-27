@@ -1099,4 +1099,9 @@ html[dir="rtl"] .vis-wfm-timeline-line {
     margin-right: 35px;
 }
 
+html[dir="rtl"] .VIS-pref-lblmsg {
+    margin-right: 22%;
+    margin-top: 25px;
+}
+
  /*rtl css End here*/
