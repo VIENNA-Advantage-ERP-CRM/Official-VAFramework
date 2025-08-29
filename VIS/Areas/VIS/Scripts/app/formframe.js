@@ -230,7 +230,7 @@
             return;
         this.disposed = true;
         if (this.mPanel) {
-            if (this.mPanel.disposeComponent)
+            if (this.mPanel.dispose)
                 this.mPanel.dispose();
             this.mPanel = null;
         }
