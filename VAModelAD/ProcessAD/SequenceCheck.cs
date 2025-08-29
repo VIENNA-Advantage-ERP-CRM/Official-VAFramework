@@ -320,29 +320,27 @@ namespace VAdvantage.Process
                     ds = DataBase.DB.ExecuteDataset(sql, null, trxName);
                     for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                     {
-
+                        tableName.Clear().Append(ds.Tables[0].Rows[i]["Name"]);
                         //Get Max value from Table_ID or AD_Sequence and update.
-                        sql = @"Update AD_Sequence set updatedby=" + ctx.GetAD_User_ID() + ", updated=getdate(), CurrentNext=(SELECT max(maximum) FROM ( SELECT max(" + ds.Tables[0].Rows[i]["Name"].ToString() + @"_ID)+1 as maximum from " + ds.Tables[0].Rows[i]["Name"].ToString() +
+                        sql = @"Update AD_Sequence set updatedby=" + ctx.GetAD_User_ID() + ", updated=getdate(), CurrentNext=(SELECT max(maximum) FROM ( SELECT max(" + tableName.ToString() + @"_ID)+1 as maximum from " + tableName.ToString() +
                          @" Union
-                         SELECT currentnext AS maximum FROM AD_Sequence WHERE Name = '" + ds.Tables[0].Rows[i]["Name"].ToString() + "') ";
+                         SELECT currentnext AS maximum FROM AD_Sequence WHERE Name = '" + tableName.ToString() + "') ";
                         if (DB.IsPostgreSQL())
                             sql += " foo ";
 
-                        sql += ") WHERE Name = '" + ds.Tables[0].Rows[i]["Name"].ToString() + "'";
+                        sql += ") WHERE Name = '" + tableName.ToString() + "'";
 
                         int curVal = DB.ExecuteQuery(sql, null, trxName);
 
                         if (curVal > 0)
                         {
-                            sp.AddLog(0, null, null, "Sequence Updated For :" + ds.Tables[0].Rows[i]["Name"].ToString());
-
+                            sp.AddLog(0, null, null, "Sequence Updated For :" + tableName.ToString());
                             counter++;
                         }
                         else
                         {
-                            _log.Severe("Sequence Not Updated For :" + ds.Tables[0].Rows[i]["Name"].ToString());
+                            _log.Severe("Sequence Not Updated For :" + tableName.ToString());
                         }
-                        tableName.Clear().Append(ds.Tables[0].Rows[i]["Name"]);
 
                         UpdateADSequence(ctx, tableName.ToString(), clientId, trxName);
                     }
@@ -428,10 +426,8 @@ namespace VAdvantage.Process
                         //	else if (CLogMgt.isLevel(6)) 
                         //		log.fine("OK - " + tableName);
 
-                        // Changes done to handle/update value or document no for tables
-                        tableName.Clear().Append(ds.Tables[0].Rows[i]["Name"]);
-
-                        UpdateADSequence(ctx, tableName.ToString(), clientId, trxName);
+                        // Changes done to handle/update value for tables
+                        UpdateADSequence(ctx, Util.GetValueOfString(ds.Tables[0].Rows[i]["Name"]), clientId, trxName);
                     }
                     // idr.Close();
                 }
@@ -447,7 +443,7 @@ namespace VAdvantage.Process
                 _log.Fine("#" + counter);
             }
         }   //	checkTableID
-        public static void UpdateADSequence(Ctx ctx, string tableName, int clientId, Trx trxName = null)
+        public static void UpdateADSequence(Ctx ctx, string tableName, int clientId, Trx trxName)
         {
             if (string.IsNullOrWhiteSpace(tableName))
                 return;
@@ -457,46 +453,53 @@ namespace VAdvantage.Process
             if (tbl == null || tbl.GetColumn("Value") == null)
                 return;
 
-            int maxTableValue = 0;
-            int currNextVal = 0;
+            try
+            {
+                Decimal maxTableValue = 0;
+                Decimal currNextVal = 0;
 
-            // Directly get maxTableValue
-            maxTableValue = Util.GetValueOfInt(DB.ExecuteScalar(
-                DB.IsPostgreSQL()
-                    ? $@"SELECT MAX(CAST(TRIM(Value) AS INTEGER))
+                // Directly get maxTableValue
+                maxTableValue = Util.GetValueOfDecimal(DB.ExecuteScalar(
+                    DB.IsPostgreSQL()
+                        ? $@"SELECT MAX(CAST(TRIM(Value) AS INTEGER))
                  FROM {tableName}
                  WHERE TRIM(Value) ~ '^\d+$'
                    AND AD_Client_ID = {clientId}"
-                    : $@"SELECT MAX(TO_NUMBER(TRIM(Value)))
+                        : $@"SELECT MAX(TO_NUMBER(TRIM(Value)))
                  FROM {tableName}
                  WHERE REGEXP_LIKE(TRIM(Value), '^\d+$')
                    AND AD_Client_ID = {clientId}"
-            ));
+                ));
 
-            // Directly get CurrentNext value
-            currNextVal = Util.GetValueOfInt(DB.ExecuteScalar(
-                $@"SELECT CurrentNext
+                // Directly get CurrentNext value
+                currNextVal = Util.GetValueOfDecimal(DB.ExecuteScalar(
+                    $@"SELECT CurrentNext
            FROM AD_Sequence
            WHERE Name = 'DocumentNo_{tableName}'
              AND AD_Client_ID = {clientId}"
-            ));
+                ));
 
-            // Adjust CurrentNext
-            if (currNextVal <= maxTableValue)
-                currNextVal = maxTableValue + 1;
-            else
-                currNextVal = -1;
+                // Adjust CurrentNext
+                if (currNextVal <= maxTableValue)
+                    currNextVal = maxTableValue + 1;
+                else
+                    currNextVal = -1;
 
-            // Update AD_Sequence if valid
-            if (currNextVal > 0)
-            {
-                int uVal = DB.ExecuteQuery($@"
+                // Update AD_Sequence if valid
+                if (currNextVal > 0)
+                {
+                    int uVal = DB.ExecuteQuery($@"
             UPDATE AD_Sequence
             SET CurrentNext = {currNextVal}
             WHERE Name = 'DocumentNo_{tableName}'
               AND AD_Client_ID = {clientId}",
-                    null, trxName
-                );
+                        null, trxName
+                    );
+                }
+            }
+            catch (Exception exp)
+            {
+                _log.SaveError("Seq Update for Value", "Error in updating value for table : " + tableName + " -> " + exp.Message);
             }
         }
 
