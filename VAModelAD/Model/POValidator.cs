@@ -9,7 +9,7 @@ using VAdvantage.Common;
 using VAdvantage.DataBase;
 using VAdvantage.Model;
 using VAdvantage.Utility;
-
+using VAModelAD.AIHelper;
 using VAModelAD.Model;
 
 namespace VAModelAD.Model
@@ -185,109 +185,108 @@ namespace VAModelAD.Model
 
         public bool AfterSave(bool newRecord, bool success, PO po)
         {
+            if (!success)
+                return success;
 
-            MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
-            //VIS323 Insert Record in ExportData for marking on Save records.
-
-            //DO not mark record created from backend
-            //Do not Check Config on Role Window
-
-            //DO not save Record if window ID tab ID not exist
-            if (po.GetAD_Window_ID()>0 &&
-                po.GetWindowTabID()>0 &&
-                Env.IsModuleInstalled("VA093_") && 
-                success
-                //&& MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
-                && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M"
-               )
+            if (Env.IsModuleInstalled("VA093_"))
             {
+                MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
+                //VIS323 Insert Record in ExportData for marking on Save records.
 
-                //Pick ModuleID from AutoMarking Configuration window
-
-                int curRefModID = DB.GetSQLValue(po.Get_Trx(),
-                    "SELECT VA093_RefModule_ID FROM  VA093_AutoMarkingConfig WHERE Processed='N' AND IsActive='Y' AND AD_Role_ID="
-                    + po.GetCtx().GetAD_Role_ID());
-
-                if (curRefModID > 0)
+                //DO not mark record created from backend
+                //Do not Check Config on Role Window
+                //DO not save Record if window ID tab ID not exist
+                if (po.GetAD_Window_ID() > 0 &&
+                    po.GetWindowTabID() > 0 &&
+                    success
+                    //&& MRole.GetDefault(po.GetCtx()).IsAutoDataMarking()
+                    && Util.GetValueOfString(tblMasTrx.Get_Value("TableType")) == "M"
+                   )
                 {
-                    //Check and proceed marking with new module
 
-                    //do not proceed recording in VA093 module
-                    //if (curRefModID > 0)
-                    //{                    
-                    //curRefModID= MModuleInfo.Get("VA093_");
-                    //}
-                    if (_expModuleID == 0)
+                    //Pick ModuleID from AutoMarking Configuration window
+
+                    int curRefModID = DB.GetSQLValue(po.Get_Trx(),
+                        "SELECT VA093_RefModule_ID FROM  VA093_AutoMarkingConfig WHERE Processed='N' AND IsActive='Y' AND AD_Role_ID="
+                        + po.GetCtx().GetAD_Role_ID());
+
+                    if (curRefModID > 0)
                     {
-                        _expModuleID = curRefModID;
-                    }
-                    else if (_expModuleID != curRefModID)
-                    {
-                        _expModuleID = curRefModID;
-                        _exportDataChecked = false;
-                    }
+                        //Check and proceed marking with new module
 
-                    if (!_exportTableAccessed)
-                    {
-                        _ExportCheckTableNames = GetExportTableNames();
-                    }
-
-                    if (!_ExportCheckTableNames.Contains(po.GetTableName()))
-                    {
-                        if (!_exportDataChecked)
-                        {
-                            GetExportedData();
-                        }
-                        #region Commented Code
-
-                        //string[] ModulInfo = po.GetCtx().Get("#ENABLE_DATA_MARKING_ON_SAVE").Split('@');
-
-                        //if (ModulInfo.Length == 1)
-
-                        //{
-
-                        //    ModulInfo = new string[] { ModulInfo[0], "VA093_" };
-
+                        //do not proceed recording in VA093 module
+                        //if (curRefModID > 0)
+                        //{                    
+                        //curRefModID= MModuleInfo.Get("VA093_");
                         //}
-
-                        //if (MRole.GetDefault(po.GetCtx()).IsAutoDataMarking() && Env.IsModuleInstalled(ModulInfo[1])
-
-                        #endregion Commented Code
-                        if (po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
+                        if (_expModuleID == 0)
                         {
-                            int expRecord_ID = 0;
-                            if (po.GetKeyLength() > 1)
+                            _expModuleID = curRefModID;
+                        }
+                        else if (_expModuleID != curRefModID)
+                        {
+                            _expModuleID = curRefModID;
+                            _exportDataChecked = false;
+                        }
+
+                        if (!_exportTableAccessed)
+                        {
+                            _ExportCheckTableNames = GetExportTableNames();
+                        }
+
+                        if (!_ExportCheckTableNames.Contains(po.GetTableName()))
+                        {
+                            if (!_exportDataChecked)
                             {
-                                if (po.Get_ColumnIndex(po.Get_TableName() + "_ID") >= 0)
-                                    expRecord_ID = Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID"));
+                                GetExportedData();
                             }
-                            else
+                            #region Commented Code
 
-                                expRecord_ID = po.Get_ID();
+                            //string[] ModulInfo = po.GetCtx().Get("#ENABLE_DATA_MARKING_ON_SAVE").Split('@');
 
+                            //if (ModulInfo.Length == 1)
 
+                            //{
 
-                            // if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
-                            if (!_alreadyExpData.Contains(_expModuleID + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
+                            //    ModulInfo = new string[] { ModulInfo[0], "VA093_" };
+
+                            //}
+
+                            //if (MRole.GetDefault(po.GetCtx()).IsAutoDataMarking() && Env.IsModuleInstalled(ModulInfo[1])
+
+                            #endregion Commented Code
+                            if (po.Get_ColumnIndex(po.GetTableName() + "_ID") >= 0)
                             {
+                                int expRecord_ID = 0;
+                                if (po.GetKeyLength() > 1)
+                                {
+                                    if (po.Get_ColumnIndex(po.Get_TableName() + "_ID") >= 0)
+                                        expRecord_ID = Util.GetValueOfInt(po.Get_Value(po.Get_TableName() + "_ID"));
+                                }
+                                else
 
-                                if (!SaveExportData(po, _expModuleID))
+                                    expRecord_ID = po.Get_ID();
 
-                                    return false;
+
+
+                                // if (!_alreadyExpData.Contains(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
+                                if (!_alreadyExpData.Contains(_expModuleID + "_" + po.Get_Table_ID() + "_" + expRecord_ID))
+                                {
+
+                                    if (!SaveExportData(po, _expModuleID))
+
+                                        return false;
+
+                                }
 
                             }
 
                         }
-
                     }
                 }
             }
 
-            if (success && newRecord)
-                InsertTreeNode(po);
-
             // Case for Master Data Versioning, check if the record being saved is in Version table
-
             string tableName = GetTable(po.Get_TableName());
             Ctx p_ctx = po.GetCtx();
             Trx trx = po.Get_Trx();
@@ -371,10 +370,19 @@ namespace VAModelAD.Model
                 }
             }
 
+            if (success && newRecord)
+                InsertTreeNode(po);
+
             // MRole.GetDefault(p_ctx).IsShowSharedRecords()
             if (!_ExportCheckTableNames.Contains(po.GetTableName()))
             {
                 ShareRecordManager.Get(p_ctx).ShareChild(p_ctx, po);
+
+                // vis0008 Check and update changes for AI Assistant
+                if (Env.IsModuleInstalled("VAI01_"))
+                {
+                    AssistantRecordThread.Get().CreateUpdateThread(p_ctx, po, newRecord);
+                }
             }
             return success;
         }
@@ -670,7 +678,7 @@ namespace VAModelAD.Model
             //Update Current module instead of VA093_
             //_alreadyExpData.Add(MModuleInfo.Get("VA093_") + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
             _alreadyExpData.Add(expModID + "_" + po.Get_Table_ID() + "_" + po.Get_ID());
-            
+
             return true;
         }
     }

@@ -182,11 +182,11 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="Provider">Auth Provider</param>
         /// <returns>json, object</returns>
-        public JsonResult GetUserAccount(string Provider)
+        public JsonResult GetUserAccount(int AuthProviderID, int MailConfigID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
-            return Json(JsonConvert.SerializeObject(_model.GetUserAccount(ctx, Provider)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(_model.GetUserAccount(ctx, AuthProviderID, MailConfigID)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>

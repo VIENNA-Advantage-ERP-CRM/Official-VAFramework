@@ -282,6 +282,12 @@
     padding: 4px 5px;
 }
 
+.vis-count-zoom-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 html[dir=rtl] .VIS_popupClose {
     left: 10px;
     right: auto;

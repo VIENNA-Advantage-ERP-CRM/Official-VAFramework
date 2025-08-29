@@ -104,7 +104,7 @@
         var $scrollIcon;
         var flagImg = false;
 
-
+        var $genReply = null;
 
         var divReadOnly = $("<div style='width: 100%;height: 100%;background:black;opacity: .1;display:none'>");//table-cell
         var divProgress = null;
@@ -313,6 +313,7 @@
 
             $chkBSendPFasAtt = $root.find('#' + self.windowNo + "_dynPF");
             $cmbPfFiletype = $root.find('#' + self.windowNo + "_dynPFType");
+            $btnSend = $root.find('#' + self.windowNo + "_sendBtn");
 
             $root.find('.vis-email-attachmentContainer').hide();
 
@@ -346,6 +347,7 @@
                 $root.find(".vis-Email-textarea-div").css({ 'overflow': 'auto' });
             }
 
+            $genReply = $root.find(".vis-Email-inputWrap");
 
             $root.find('.vis-email-leftDiv').height($root.find('.contentArea').height());
             if (callingFromOutsideofWindow) {
@@ -450,6 +452,29 @@
                 $chkBSendPFasAtt.hide();
                 $chkBSendPFasAtt.next().hide();
             }
+
+            var _windowID = 0;
+            var _tabID = 0;
+            if (_curtab != null) {
+                _windowID = _curtab.getAD_Window_ID();
+                _tabID = _curtab.getAD_Tab_ID();
+            }
+
+            $.ajax({
+                type: 'POST',
+                async: false,
+                url: VIS.Application.contextUrl + "Email/GetRecordThread",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    recordId: Record_ID,
+                    tableID: currentTable_ID,
+                    windowID: _windowID,
+                    tabID: _tabID
+                }),
+                success: function (data) {
+                    currThreadID = JSON.parse(data);
+                },
+            });
         };
 
 
@@ -1012,6 +1037,71 @@
                     }
                 });
             }
+
+            $btnSend.on("click", function () {
+                if (!window.VAI01) {
+                    VIS.ADialog.info('VAI01_InstallChatBot');
+                    return;
+                }
+
+                
+
+                var subject = $subject.val();
+                var message = $txtArea.val();
+                var _rec_ID = Record_ID;
+                var _tbl_ID = currentTable_ID;
+                var prompt = $root.find('#' + self.windowNo + "_emailPrompt").val();
+
+                if (currThreadID == "" && prompt == "") {
+                    VIS.ADialog.info('VIS_NoThreadEnterPrompt');
+                    return;
+                }
+
+                self.IsBusy(true);
+                $.ajax({
+                    type: 'POST',
+                    url: VIS.Application.contextUrl + "Email/EmailAPI",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        Subject: subject,
+                        Message: message,
+                        recordId: _rec_ID,
+                        tableID: _tbl_ID,
+                        prompt: prompt,
+                    }),
+                    success: function (response) {
+                        self.IsBusy(false);
+                        $root.find('#' + self.windowNo + "_emailPrompt").val('');
+                        //  console.log("Success:", response);
+                        if (typeof response === "string") {
+                            response = JSON.parse(response);
+                        }
+                        // Store values in variables
+                        var subject = response.Subject;
+                        var message = response.Message;
+                        var success = response.success;
+                        var error = response.error;
+                        $subject.val(response.Subject);
+                        let editor = $txtArea.data("kendoEditor");
+                        if (editor) {
+                            editor.value(""); // Set content in the rich text editor
+                            let formattedMessage = "<p>" + response.Message.split(/\n{2,}/).join("</p><p>") + "</p>";
+                            if (body != undefined && body != null) {
+                                formattedMessage = formattedMessage + "<br/> <br/>" + body;
+                            }
+                            editor.value(formattedMessage); // Set content in the rich text editor
+                        } else {
+                            $txtArea.val(response.Message); // Fallback if editor not initialized
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        self.IsBusy(false);
+                        console.error("Error:", error);
+                        $root.find('#' + self.windowNo + "_emailPrompt").val('');
+                        // Optionally show error message to user
+                    }
+                });
+            });
 
         };
 
@@ -2966,7 +3056,7 @@
                     else {
                         //$root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 50));
 
-                        $root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 70));
+                        $root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 95));
 
 
 

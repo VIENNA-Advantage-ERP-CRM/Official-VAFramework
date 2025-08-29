@@ -776,7 +776,7 @@ namespace VIS.Models
                              p.Name AS ProjectName,p.VAAPI_Project_ID FROM VAAPI_SessionToken s
                              INNER JOIN VAAPI_Project p ON (s.VAAPI_Project_ID = p.VAAPI_Project_ID)
                              INNER JOIN AD_User u ON (u.AD_User_ID=s.CreatedBy)";
-            DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(query, "s", true, true) + " ORDER BY VAAPI_SessionToken_ID");
+            DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(query, "s", true, true) + " AND s.CreatedBy=" + ctx.GetAD_User_ID() + " ORDER BY s.VAAPI_SessionToken_ID");
 
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
@@ -923,6 +923,59 @@ namespace VIS.Models
             catch (Exception e)
             {
                 VAdvantage.Logging.VLogger.Get().Severe("ErrorToVerifyPassword=>" + e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<dynamic> GetTwoFAMethod(Ctx ctx)
+        {
+            string sql = @"SELECT
+                            ad_ref_list.value,
+                            ad_ref_list.name,
+                            AD_User.TWOFAMETHOD
+                        FROM
+                            ad_ref_list ad_ref_list
+                            LEFT JOIN  AD_User ON (ad_ref_list.value=AD_User.TWOFAMETHOD AND AD_User_ID="+ctx.GetAD_User_ID()+ @")
+                        WHERE
+                            ad_ref_list.ad_reference_id IN (SELECT ad_reference_id FROM ad_reference WHERE name = 'TwoFAMethod')";
+            DataSet dataSet = DB.ExecuteDataset(sql);
+            List<dynamic> result = new List<dynamic>();
+
+            if (dataSet != null && dataSet.Tables.Count > 0)
+            {
+                foreach (DataRow dr in dataSet.Tables[0].Rows)
+                {
+                    dynamic item = new ExpandoObject();
+                    item.value =Util.GetValueOfString(dr["value"]);
+                    item.name = Util.GetValueOfString(dr["name"]);
+                    item.TWOFAMETHOD = Util.GetValueOfString(dr["TWOFAMETHOD"]);
+                    result.Add(item);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public bool UpdateTwoFAMethod(Ctx ctx, string method)
+        {
+            string sql = "Update AD_User SET TWOFAMETHOD='" + method + "' WHERE AD_User_ID=" + ctx.GetAD_User_ID();
+            if (DB.ExecuteQuery(sql) > 0)
+            {
+                return true;
+            }
+            else
+            {
                 return false;
             }
         }

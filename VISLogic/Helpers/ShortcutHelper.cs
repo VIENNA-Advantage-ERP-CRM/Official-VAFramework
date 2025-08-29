@@ -259,32 +259,36 @@ namespace VIS.Helpers
                     {
                         itm.HasImage = true;
                         itm.IsImageByteArray = false;
-                        if (!string.IsNullOrEmpty(img.GetImageExtension()))
+                        //if (!string.IsNullOrEmpty(img.GetImageExtension()))
+                        //{
+                        //    string[] url = img.GetImageURL().Split('/');
+                        //    if (url.Length > 0)
+                        //    {
+                        //        //string strImg = img.GetImageURL().Split('/')[0] + "/" + AD_Image_ID + "" + img.GetImageExtension(); //img.GetImageURL(); 
+                        //        string strImg = img.GetImageURL(); 
+                        if (!File.Exists(HostingEnvironment.MapPath(@"~/" + img.GetImageURL()))) //Check Image exist or not in Image folder
                         {
-                            string[] url = img.GetImageURL().Split('/');
-                            if (url.Length > 0)
-                            {
-                                string strImg = img.GetImageURL().Split('/')[0] + "/" + AD_Image_ID + "" + img.GetImageExtension(); //img.GetImageURL(); 
-                                if (!File.Exists(HostingEnvironment.MapPath(@"~/" + strImg))) //Check Image exist or not in Image folder
-                                {
-                                    // only for call After save logic. temporary update the column
-                                    MImage mimg = new MImage(ctx, AD_Image_ID, null);
-                                    mimg.SetImageURL(strImg);
-                                    mimg.Save();
-                                }
+                            // only for call After save logic. temporary update the column
+                            MImage mimg = new MImage(ctx, AD_Image_ID, null);
+                            mimg.SetImageURL("");
+                            mimg.Save();
 
-                                itm.IconUrl = @"Images/Thumb140x120/" + AD_Image_ID + "" + img.GetImageExtension();
+                            img = new VAdvantage.Model.MImage(ctx, AD_Image_ID, null);
+                        }
 
-                            }
-                            else
-                            {
-                                itm.IconUrl = img.GetImageURL();
-                            }
-                        }
-                        else
-                        {
-                            itm.IconUrl = img.GetImageURL();
-                        }
+                        //        itm.IconUrl = @"Images/Thumb140x120/" + AD_Image_ID + "" + img.GetImageExtension();
+
+                        //    }
+                        //    else
+                        //    {
+                        //        itm.IconUrl = img.GetImageURL();
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    itm.IconUrl = img.GetImageURL();
+                        //}
+                        itm.IconUrl = img.GetImageURL();
                     }
                     else if (img.GetBinaryData() != null)
                     {

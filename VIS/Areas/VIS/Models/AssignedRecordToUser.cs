@@ -158,6 +158,21 @@ namespace VIS.Models
                 trx.Close();
             }
         }
+        /// <summary>
+        /// This function is used to get the reference id of list
+        /// </summary>
+        /// <param name="refernceName"></param>
+        /// <returns>AD_Reference_ID</returns>
+        /// <author>VIS_427</author>
+        public int GetRefIdForAssList(Ctx ct, string refernceName)
+        {
+            int refId = 0;
+            if (!String.IsNullOrEmpty(refernceName))
+            {
+                refId = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_Reference_ID FROM AD_Reference WHERE Name='" + refernceName + "'", null, null));
+            }
+            return refId;
+        }
 
         /// <summary>
         /// Get Count of Assigned Record To User 
@@ -166,31 +181,39 @@ namespace VIS.Models
         /// <param name="pageSize"></param>
         /// <param name="pageNo"></param>
         /// <returns></returns>
-        public List<AssignRecordDetail> AssignRecordToUserWidget(Ctx ctx, int pageSize, int pageNo, bool getAll)
+        public List<AssignRecordDetail> AssignRecordToUserWidget(Ctx ctx, int pageSize, int pageNo, bool getAll, string IsAssignedByMe)
         {
             List<AssignRecordDetail> list = new List<AssignRecordDetail>();
             string sql = null;
             string sqlcount = null;
             int totalWindowcount = 0;
+            //handled where condition based on user selection
+            string UserCond = IsAssignedByMe == "01" ? " asr.UpdatedBy = " + ctx.GetAD_User_ID() + " AND" : "asr.AD_User_ID = " + ctx.GetAD_User_ID() + " AND";
+            /*Here if 00 means that we need to show allo window in dropdown of popup*/
+            if (IsAssignedByMe == "00")
+            {
+                UserCond = "";
+            }
             bool baseLanguage = Env.IsBaseLanguage(ctx, "");
             if (DB.IsOracle())
             {
                 if (baseLanguage)
                 {
-                    sql = @"SELECT adw.DisplayName AS Name,adw.AD_Window_ID,asr.AD_Table_ID,asr.AD_User_ID, COUNT(*) AS RecordCount,tab.TableName,
-                            LISTAGG(asr.Record_ID, ',') WITHIN GROUP (ORDER BY asr.Record_ID) AS RecordIDs,SUM(COUNT(*)) OVER (PARTITION BY asr.AD_User_ID) AS total_recordcount
+                    sql = @"SELECT adw.DisplayName AS Name,adw.AD_Window_ID,asr.AD_Table_ID, COUNT(*) AS RecordCount,tab.TableName,
+                            LISTAGG(asr.Record_ID, ',') WITHIN GROUP (ORDER BY asr.Record_ID) AS RecordIDs
                             FROM VIS_AssignedRecordToUser asr
                             INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
-                            INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE asr.AD_User_ID = " + ctx.GetAD_User_ID() + " AND asr.IsActive = 'Y'  AND asr.Status = 'PDN' GROUP BY tab.TableName, adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                            INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + " asr.IsActive = 'Y'  AND asr.Status = 'PDN' GROUP BY tab.TableName, adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
+
                 }
                 else
                 {
-                    sql = @"SELECT wt.Name,adw.AD_Window_ID,asr.AD_Table_ID,asr.AD_User_ID, COUNT(*) AS RecordCount,tab.TableName,
-                            LISTAGG(asr.Record_ID, ',') WITHIN GROUP (ORDER BY asr.Record_ID) AS RecordIDs,SUM(COUNT(*)) OVER (PARTITION BY asr.AD_User_ID) AS total_recordcount
+                    sql = @"SELECT wt.Name,adw.AD_Window_ID,asr.AD_Table_ID, COUNT(*) AS RecordCount,tab.TableName,
+                            LISTAGG(asr.Record_ID, ',') WITHIN GROUP (ORDER BY asr.Record_ID) AS RecordIDs
                             FROM VIS_AssignedRecordToUser asr
                             INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
                             INNER JOIN AD_Window adw ON (asr.AD_Window_ID = adw.AD_Window_ID) 
-                            INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE asr.AD_User_ID = " + ctx.GetAD_User_ID() + " AND asr.IsActive = 'Y'  AND asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name, adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                            INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + " asr.IsActive = 'Y'  AND asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name, adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
                 }
 
                 if (pageNo == 1)
@@ -203,20 +226,20 @@ namespace VIS.Models
             {
                 if (baseLanguage)
                 {
-                    sql = @"SELECT adw.DisplayName AS Name,adw.AD_Window_ID,asr.AD_Table_ID,asr.AD_User_ID,COUNT(*) AS RecordCount,tab.TableName,
-                        STRING_AGG(asr.Record_ID::TEXT, ',') AS RecordIDs,SUM(COUNT(*)) OVER (PARTITION BY asr.AD_User_ID) AS total_recordcount
+                    sql = @"SELECT adw.DisplayName AS Name,adw.AD_Window_ID,asr.AD_Table_ID,COUNT(*) AS RecordCount,tab.TableName,
+                        STRING_AGG(asr.Record_ID::TEXT, ',') AS RecordIDs
                         FROM VIS_AssignedRecordToUser asr
                          INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
-                        INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE asr.AD_User_ID = " + ctx.GetAD_User_ID() + " AND asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                        INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
                 }
                 else
                 {
-                    sql = $@"SELECT wt.Name,adw.AD_Window_ID,asr.AD_Table_ID,asr.AD_User_ID,COUNT(*) AS RecordCount,tab.TableName,
-                        STRING_AGG(asr.Record_ID::TEXT, ',') AS RecordIDs,SUM(COUNT(*)) OVER (PARTITION BY asr.AD_User_ID) AS total_recordcount
+                    sql = $@"SELECT wt.Name,adw.AD_Window_ID,asr.AD_Table_ID,COUNT(*) AS RecordCount,tab.TableName,
+                        STRING_AGG(asr.Record_ID::TEXT, ',') AS RecordIDs
                         FROM VIS_AssignedRecordToUser asr
                          INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
                         INNER JOIN AD_Window adw ON (asr.AD_Window_ID = adw.AD_Window_ID)
-                        INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE asr.AD_User_ID = " + ctx.GetAD_User_ID() + " AND asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                        INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
                 }
 
                 if (pageNo == 1)
@@ -236,8 +259,10 @@ namespace VIS.Models
             }
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
+                int totalCount = 0;
                 foreach (DataRow row in ds.Tables[0].Rows)
                 {
+                    totalCount = totalCount + Util.GetValueOfInt(row["RecordCount"]);
                     AssignRecordDetail obj = new AssignRecordDetail
                     {
                         WindowName = Util.GetValueOfString(row["Name"]),
@@ -246,9 +271,8 @@ namespace VIS.Models
                         TableID = Util.GetValueOfInt(row["AD_Table_ID"]),
                         TableName = Util.GetValueOfString(row["TableName"]),
                         Record_ID = Util.GetValueOfString(row["RecordIDs"]),
-                        AD_User_ID = Util.GetValueOfInt(row["AD_User_ID"]),
                         TotalWindowcount = totalWindowcount,
-                        totalRecordCount = Util.GetValueOfInt(row["total_recordcount"]),
+                        totalRecordCount = totalCount
                     };
                     list.Add(obj); // Add to the list
                 }
@@ -370,6 +394,137 @@ namespace VIS.Models
             return obj;
 
         }
+        /// <summary>
+        /// This fucntion is used to get window records which is clicked
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="WindowId">WindowId</param>
+        /// <param name="TableID">TableID</param>
+        /// <param name="Record_ID">Record_ID</param>
+        /// <param name="pageNo">pageNo</param>
+        /// <param name="pageSize">pageSize</param>
+        /// <param name="SrchTxt">SrchTxt</param>
+        /// <returns>List of data</returns>
+        /// <author>VIS_427</author>
+
+        public List<dynamic> GeWindowRecords(Ctx ctx, int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt, string AssignedByOrTo)
+        {
+            string sql = "";
+            List<dynamic> results = new List<dynamic>();
+            string UserCond = AssignedByOrTo == "01" ? " var.AD_User_ID" : " var.UpdatedBy";
+            // Step 1: Get identifier column(s) for the given TableID
+            if (DB.IsPostgreSQL())
+            {
+                // PostgreSQL: Concatenate identifier columns using STRING_AGG
+                sql = @"SELECT 
+                    tab.TableName,
+                    tab.AD_Table_ID,
+                    STRING_AGG('at.' || col.ColumnName, ' || ''_'' || ' ORDER BY col.SeqNo) AS IdentifierColumns
+                FROM 
+                    AD_Column col
+                INNER JOIN 
+                    AD_Table tab ON col.AD_Table_ID = tab.AD_Table_ID
+                WHERE 
+                    col.IsIdentifier = 'Y'
+                    AND col.IsActive = 'Y'
+                    AND col.AD_Reference_ID NOT IN (32)
+                    AND tab.AD_Table_ID = " + TableID +
+                       @" GROUP BY 
+                    tab.TableName, tab.AD_Table_ID";
+            }
+            else
+            {
+                // Oracle: Concatenate identifier columns using LISTAGG
+                sql = @"SELECT 
+                    tab.TableName,
+                    tab.AD_Table_ID,
+                    LISTAGG('at.' || col.ColumnName, ' || ''_'' || ') 
+                        WITHIN GROUP (ORDER BY col.SeqNo) AS IdentifierColumns
+                FROM 
+                    AD_Column col
+                INNER JOIN 
+                    AD_Table tab ON col.AD_Table_ID = tab.AD_Table_ID
+                WHERE 
+                    col.IsIdentifier = 'Y'
+                    AND col.IsActive = 'Y'
+                    AND col.AD_Reference_ID NOT IN (32)
+                    AND tab.AD_Table_ID = " + TableID +
+                       @" GROUP BY 
+                    tab.TableName, tab.AD_Table_ID";
+            }
+
+            // Execute the query to fetch identifier column info
+            DataSet ds = DB.ExecuteDataset(sql);
+
+            // Step 2: Build main SELECT statement only if identifier info is fetched
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                string columnNames = Util.GetValueOfString(ds.Tables[0].Rows[0]["IdentifierColumns"]);  // Final concatenated identifier columns
+
+                sql = $@"WITH LatestUpdates AS (SELECT 
+                              {columnNames} AS IdentiFierVal,
+                              au.Name AS UserName,
+                              var.Record_ID,
+                              var.Updated,
+                              ROW_NUMBER() OVER (PARTITION BY var.Record_ID ORDER BY var.Updated DESC) AS rn
+                          FROM {ds.Tables[0].Rows[0]["TableName"]} at
+                          INNER JOIN VIS_AssignedRecordToUser var 
+                              ON var.Record_ID = at.{ds.Tables[0].Rows[0]["TableName"]}_ID
+                          INNER JOIN AD_User au 
+                              ON au.AD_User_ID =" + UserCond + $@"
+                          WHERE " + (!string.IsNullOrEmpty(Record_ID) ? $@"at.{ds.Tables[0].Rows[0]["TableName"]}_ID IN ({Record_ID}) AND " : " ") + $@" var.AD_Window_ID={WindowId}
+                      AND var.Status = 'PDN')
+                      SELECT IdentiFierVal, UserName, Record_ID, Updated
+                      FROM LatestUpdates
+                      WHERE rn = 1";
+
+                // Apply optional search text filter
+                if (!string.IsNullOrEmpty(SrchTxt))
+                {
+                    sql += $@" AND (
+                          UPPER(IdentiFierVal) LIKE UPPER('%{SrchTxt}%') 
+                          OR UPPER(UserName) LIKE UPPER('%{SrchTxt}%')
+                      )";
+                }
+
+                // Order by most recently updated
+                sql += " ORDER BY Updated DESC";
+                // Step 4: Execute final paged result query
+                ds = DB.ExecuteDataset(sql.ToString(), null, null, pageSize, pageNo);
+            }
+
+            // Step 5: Read data and add to result list
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                int countRecords = 0;
+
+                // Get total record count only for first page
+                if (pageNo == 1)
+                {
+                    countRecords = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sql + " ) t"));
+                }
+
+                // Read each row and map to dynamic object
+                foreach (DataRow row in ds.Tables[0].Rows)
+                {
+                    dynamic obj = new ExpandoObject();
+                    obj.ColValue = Util.GetValueOfString(row["IdentiFierVal"]);
+                    obj.UpdatedBy = Util.GetValueOfString(row["UserName"]);
+                    obj.Record_ID = Util.GetValueOfInt(row["Record_ID"]);
+                    obj.AssignedDate = Util.GetValueOfDateTime(row["Updated"]);
+                    obj.countRecords = countRecords;
+                    //if user has selected assigned by me then send value true
+                    if (AssignedByOrTo == "01")
+                    {
+                        obj.IsRecordAssigned = true;
+                    }
+                    results.Add(obj);
+                }
+            }
+
+            return results;
+        }
+
 
         /// <summary>
         /// Get assigned records

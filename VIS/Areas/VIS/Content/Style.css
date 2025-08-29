@@ -4180,6 +4180,196 @@ table.fixed-header thead tr {
     border-radius: 0;
 }
 
+/*chat*/
+.vis-chat-edit-wrapper {
+    position: relative;
+    width: 100%;
+    display: inline-block;
+}
+
+.vis-chat-edit-input {
+    width: 100%;
+    padding: 5px 18px 5px 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    overflow: auto;
+    resize: none;
+    outline-width: 1.2em;
+    max-height: 6em;
+}
+
+.vis-chat-send-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #007bff;
+    font-size: 20px;
+}
+
+/*.vis-chat-send-update {
+    right: 10px;
+}
+.vis-chat-send-undo {
+    right: 35px;
+}
+*/
+.vis_edit_chat {
+    position: absolute;
+    top: 0;
+    cursor: pointer;
+}
+
+.vis_del_chat {
+    position: absolute;
+    top: 0;
+    cursor: pointer;
+}
+
+.vis-chat-edit-icon,
+.vis-chat-delete-icon {
+    display: none;
+}
+
+.vis-chatdetailwrap:hover:not(.is-editing) .vis-chat-edit-icon,
+.vis-chatdetailwrap:hover:not(.is-editing) .vis-chat-delete-icon {
+    display: inline-block;
+    cursor: pointer;
+}
+
+/*.vis-wfw-download-icon {
+    background: rgba(var(--v-c-primary), .15);
+    color: rgba(var(--v-c-primary), 1) !important;
+    cursor: pointer;
+    margin-left: 10px;
+    padding: 5px 10px;
+    transition: transform 0.2s ease, color 0.2s ease;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+    .vis-wfw-download-icon:hover {
+        color: #0056b3;
+        transform: scale(1.2);*/ /* slight zoom on hover */
+/*}
+
+
+
+
+    .vis-wfw-attachment-dropdown li {
+        border-bottom: 2px solid #ffffff;
+        padding: 10px 0;
+        margin-bottom: 4px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .vis-wfw-attachment-dropdown li a {
+            text-decoration: none;
+            color: #007bff;*/ /* light blue text */
+/*font-weight: 500;
+            flex-grow: 1;
+            margin-right: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            max-width: 150px;*/ /* adjust based on your layout */
+/*}
+
+.vis-wfw-attachment-wrapper {
+    position: relative;
+    display: inline-block;
+}
+*/
+
+.vis-wfw-attachment-dropdown {
+    border: 1px solid rgba(var(--v-c-secondary), 1);
+    border-radius: 6px;
+    width: 16rem;
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    box-shadow: 0 4px 8px #ccc;
+    position: absolute;
+    right: -50px;
+    top: 98%;
+    flex-direction: column;
+    gap: 0.2rem;
+    background: white;
+    display: none;
+}
+
+.vis-wfw-attachClip-active {
+    box-shadow: 0 0 8px #ccc;
+    background-color: rgba(var(--v-c-on-primary), 1);
+}
+
+.vis-wfw-attachClip {
+    /* background-color: rgba(var(--v-c-on-primary), 1);*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 33px;
+    /*box-shadow: 0 0px 8px #ccc;*/
+    border-bottom: 0;
+    position: relative;
+    text-decoration: none !important;
+}
+
+.vis-wfw-attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    /*background: #f9f9f9;*/
+    background: #d7e9eb42 !important;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+    .vis-wfw-attachment-item:last-child {
+        margin-bottom: 0px;
+    }
+
+.vis-wfw-pdf-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.vis-wfw-attachment-link {
+    color: #333;
+    text-decoration: none;
+    flex-grow: 1;
+    font-weight: 500;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+    max-width: 140px;
+}
+
+.vis-wfw-download-icon {
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 50%;
+    /*background-color: #e3f2fd;*/
+    color: #007bff;
+    transition: background 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+
+    .vis-wfw-download-icon:hover {
+        /* background-color: #cce4f6;*/
+        transform: scale(1.20);
+    }
+
+
 /* modify Ends */
 /*Media query*/
 @media screen and (max-width: 1500px) and (min-width: 1360px) {
