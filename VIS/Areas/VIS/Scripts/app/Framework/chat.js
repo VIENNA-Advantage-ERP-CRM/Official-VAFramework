@@ -135,7 +135,8 @@
                 showBusy(false);
                 return false;
             }
-            self.prop.ChatText = text;
+            //self.prop.ChatText = text;
+            self.prop.ChatText = VIS.Utility.encodeText(text);
             VIS.dataContext.saveChatAsync(self.prop, function (saved) {
                 if (!saved) {
                     showBusy(false);
