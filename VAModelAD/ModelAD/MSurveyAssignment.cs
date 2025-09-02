@@ -48,7 +48,7 @@ namespace VAdvantage.Model
                 tp.SetClassname("VIS.SurveyPanel");
                 tp.SetAD_Tab_ID(GetAD_Tab_ID());
                 tp.SetAD_Org_ID(0);
-                tp.SetAD_Client_ID(GetAD_Client_ID());
+                //tp.SetAD_Client_ID(GetAD_Client_ID());
                 tp.SetSeqNo(10);
                 if (!tp.Save())
                 {

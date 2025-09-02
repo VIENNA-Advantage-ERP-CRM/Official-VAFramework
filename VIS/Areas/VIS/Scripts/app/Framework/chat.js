@@ -441,10 +441,11 @@
                     if (newText.length === 0) return;
                     showBusy(true);
                     // AJAX to update chat
+                    var encText = VIS.Utility.encodeText(newText);
                     $.ajax({
                         url: VIS.Application.contextUrl + "Chat/EditChatEntry",
                         type: "POST",
-                        data: { chatID: chatId, content: newText },
+                        data: { chatID: chatId, content: encText },
                         success: function (response) {
                             if (response.success) {
                                 var $newSpan = $('<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">').text(newText);
