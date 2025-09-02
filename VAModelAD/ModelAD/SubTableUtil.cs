@@ -545,6 +545,20 @@ namespace VAdvantage.Model
                 col.SetIsCopy(false);           // By Default isCopy check box should be False on this Column.
                 CreateColumn(col, table, true);
             }
+            // vis0008 Create Record GUID Column
+            colName = "Record_GUID";
+            if (table.GetColumn(colName) == null)
+            {
+                MColumn col = new MColumn(table);
+                col.SetColumnName(colName);
+                col.SetAD_Reference_ID(DisplayType.String);
+                col.SetIsUpdateable(true);
+                col.SetIsMandatory(true);
+                col.SetEntityType(EntityType);
+                col.SetFieldLength(500);
+                col.SetIsCopy(false);           // By Default isCopy check box should be False on this Column.
+                CreateColumn(col, table, true);
+            }
         }	//	checkStandardColumns
 
  

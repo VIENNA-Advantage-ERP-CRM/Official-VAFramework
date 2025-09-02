@@ -455,6 +455,17 @@ namespace VAdvantage.Model
             }
             else if (columnName.Equals("IsActive"))
                 sql = "'Y'";
+            else if (columnName.ToLower().Equals("record_guid"))
+            {
+                if (DatabaseType.IsOracle)
+                {
+                    sql = "SYS_GUID()";
+                }
+                else if (DatabaseType.IsPostgre)
+                {
+
+                }
+            }
             //	NO default value - set Data Type
             else
             {
@@ -479,6 +490,10 @@ namespace VAdvantage.Model
         public string getSQLDataType()
         {
             string columnName = GetColumnName();
+            if (columnName.ToLower().Equals("record_guid"))
+            {
+                return "RAW(16)";
+            }
             int dt = GetAD_Reference_ID();
             return DisplayType.GetSQLDataType(dt, columnName, GetFieldLength());
         }
