@@ -71,7 +71,7 @@ namespace ViennaAdvantage.Model{
 @param AD_User_ID User within the system - Internal or Customer/Prospect Contact. */
         public void SetAD_User_ID(int AD_User_ID)
         {
-            if (AD_User_ID <= 0) Set_Value("AD_User_ID", null);
+            if (AD_User_ID < 0) Set_Value("AD_User_ID", null);
             else
                 Set_Value("AD_User_ID", AD_User_ID);
         }/** Get User/Contact.
