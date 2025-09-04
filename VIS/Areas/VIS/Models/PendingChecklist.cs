@@ -122,8 +122,8 @@ namespace VIS.Models
                         {
                             if (LinkColumn.Tables[0].Rows.Count > 0)
                             {
-                                sql.Append(@"SELECT DISTINCT " + tableName + "_ID AS Record_ID FROM " + tableName + " WHERE IsActive='Y' AND " + Util.GetValueOfString(LinkColumn.Tables[0].Rows[0]["ColumnName"]) + " IS NOT NULL ");
-
+                                //sql.Append(@"SELECT DISTINCT " + tableName + "_ID AS Record_ID FROM " + tableName + " WHERE IsActive='Y' AND " + Util.GetValueOfString(LinkColumn.Tables[0].Rows[0]["ColumnName"]) + " IS NOT NULL ");
+                                sql.Append(@"SELECT DISTINCT " + tableName + "_ID AS Record_ID," + Util.GetValueOfString(LinkColumn.Tables[0].Rows[0]["ColumnName"]) + " AS parentID FROM " + tableName + " WHERE IsActive='Y' AND " + Util.GetValueOfString(LinkColumn.Tables[0].Rows[0]["ColumnName"]) + " IS NOT NULL ");
                             }
                             else
                             {
@@ -159,11 +159,18 @@ namespace VIS.Models
                     DataSet dsresponseTableRecordID = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql.ToString(), tableName, MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO));
 
                     List<int> recordIdList = new List<int>();
+                    List<int> parentIdList = new List<int>();
                     if (dsresponseTableRecordID != null && dsresponseTableRecordID.Tables.Count > 0)
                     {
                         foreach (DataRow row in dsresponseTableRecordID.Tables[0].Rows)
                         {
                             int recordId = Util.GetValueOfInt(row[$"Record_ID"]);
+                            int parentId;
+                            if (LinkColumn.Tables[0].Rows.Count > 0)
+                            {
+                                parentId = Util.GetValueOfInt(row[$"parentID"]);
+                                parentIdList.Add(parentId);
+                            }
                             recordIdList.Add(recordId);
                         }
                     }
@@ -176,7 +183,8 @@ namespace VIS.Models
                         AD_TAB_ID = AD_TAB_ID,
                         TabName = TabName,
                         TabLevel = TabLevel,
-                        AD_Window_ID = AD_Window_ID
+                        AD_Window_ID = AD_Window_ID,
+                        ParentIds = parentIdList,
                     });
 
                     sql.Clear();
@@ -232,6 +240,9 @@ namespace VIS.Models
                     .Where(recordId => !responseRecords.Contains((record.AD_table_ID, recordId)))
                     .ToList();
 
+                List<int> filteredParentIDs = record.ParentIds != null ? record.ParentIds
+               .Where(parentId => !responseRecords.Contains((record.AD_table_ID, parentId))).ToList() : new List<int>();
+
                 if (filteredIDs.Count > 0)
                 {
                     filteredRecordIds.Add(new TableRecordId
@@ -242,8 +253,8 @@ namespace VIS.Models
                         RecordIds = filteredIDs,
                         TableName = record.TableName,
                         TabName = record.TabName,
-                        TabLevel = record.TabLevel
-
+                        TabLevel = record.TabLevel,
+                        ParentIds = filteredParentIDs
                     });
                 }
             }
@@ -304,13 +315,30 @@ namespace VIS.Models
             {
                 int windowID = entry.Key;
                 string windowName = "";
-
+                string linkColumn = "";
+                /*     var dsWindowName = ds.Tables[0].AsEnumerable()
+                              .Where(row => Util.GetValueOfInt(row["AD_Window_ID"]) == windowID)
+                              .Select(row => Util.GetValueOfString(row["windowname"]))
+                              .FirstOrDefault();
+                     windowName = !string.IsNullOrEmpty(dsWindowName) ? dsWindowName : "Unknown";*/
                 var dsWindowName = ds.Tables[0].AsEnumerable()
-                         .Where(row => Util.GetValueOfInt(row["AD_Window_ID"]) == windowID)
-                         .Select(row => Util.GetValueOfString(row["windowname"]))
-                         .FirstOrDefault();
+                    .FirstOrDefault(row => Util.GetValueOfInt(row["AD_Window_ID"]) == windowID);
+                //.Where(row => Util.GetValueOfInt(row["AD_Window_ID"]) == windowID)
+                //.Select(row => Util.GetValueOfString(row["windowname"]))
+                //.FirstOrDefault();
 
-                windowName = !string.IsNullOrEmpty(dsWindowName) ? dsWindowName : "Unknown";
+                if (dsWindowName != null)
+                {
+                    windowName = Util.GetValueOfString(dsWindowName["windowname"]);
+                    int tableId = Util.GetValueOfInt(dsWindowName["AD_Table_ID"]);
+                    int tabId = Util.GetValueOfInt(dsWindowName["AD_Tab_ID"]);
+                    LinkColumn = GetLinkColumn(tableId, tabId);
+                    if (LinkColumn != null && LinkColumn.Tables.Count > 0 && LinkColumn.Tables[0].Rows.Count > 0)
+                    {
+                        linkColumn = Util.GetValueOfString(LinkColumn.Tables[0].Rows[0]["ColumnName"]); // or whatever the actual column name is
+                    }
+                    // Use windowName, linkColumn, etc.
+                }
 
                 //  Generate Final TableRecordIds List
                 List<TableRecordId> tableRecordIds = new List<TableRecordId>();
@@ -325,7 +353,8 @@ namespace VIS.Models
                         TabName = tableInfo?.TabName ?? "Unknown",
                         TableName = tableInfo?.TableName ?? "Unknown",
                         AD_table_ID = tableEntry.Key,
-                        RecordIds = tableEntry.Value.ToList()
+                        RecordIds = tableEntry.Value.ToList(),
+                        ParentIds = tableInfo.ParentIds,
                     });
                     totalCount += tableEntry.Value.Count;
                 }
@@ -337,7 +366,8 @@ namespace VIS.Models
                         WindowID = windowID,
                         windowname = windowName,
                         count = totalCount, // Correct count using unique records
-                        TableRecordIds = tableRecordIds
+                        TableRecordIds = tableRecordIds,
+                        HeadTable = linkColumn
                     });
                 }
 
@@ -458,6 +488,7 @@ namespace VIS.Models
 
         public int AD_TAB_ID { get; set; }
         public List<int> RecordIds { get; set; }
+        public List<int> ParentIds { get; set; }
         public int AD_Window_ID { get; set; }
     }
 
@@ -467,5 +498,6 @@ namespace VIS.Models
         public string windowname { get; set; }
         public int count { get; set; }
         public List<TableRecordId> TableRecordIds { get; set; }
+        public string HeadTable { get; set; }
     }
 }

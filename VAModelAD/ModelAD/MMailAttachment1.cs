@@ -15,6 +15,7 @@ using java.io;
 using VAdvantage.DataBase;
 using VAdvantage.Logging;
 using VAdvantage.Utility;
+using static VAModelAD.AIHelper.AIPayload;
 
 namespace VAdvantage.Model
 {
@@ -211,7 +212,7 @@ namespace VAdvantage.Model
 
                 retValue = true;
             }
-            catch 
+            catch
             { }
             log.Fine(item.ToString());
             AddTextMsg(" ");	//	otherwise not saved
@@ -595,9 +596,43 @@ namespace VAdvantage.Model
         //}
 
 
+        protected override bool AfterSave(bool newRecord, bool success)
+        {
+            if (!success)
+                return false;
+            if (newRecord)
+            {
+                string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID());
+                log.SaveInfo("MAILAttachment1 : ", "Thread ID : " + threadID);
+                if (!string.IsNullOrEmpty(threadID))
+                {
+                    if (!ExecuteThreadAction(actionType: newRecord ? ActionType.New : ActionType.Update, tableID: GetAD_Table_ID(), recordID: GetRecord_ID(),
+                        attachmentID: GetMailAttachment1_ID(), userID: GetCtx().GetAD_User_ID(), ctx: GetCtx(), threadID: threadID, attachmentType: "e"))
+                    {
+                        log.SaveError("", "Error in execution of insert/update data against Mail Attachment thread : " + GetMailAttachment1_ID());
+                    }
+                }
+            }
+            return true;
+        }
 
+        protected override bool AfterDelete(bool success)
+        {
+            if (!success)
+                return success;
+            string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID());
+            if (!string.IsNullOrEmpty(threadID))
+            {
+                if (!ExecuteThreadAction(actionType: ActionType.Delete, tableID: GetAD_Table_ID(), recordID: GetRecord_ID(),
+                    attachmentID: GetMailAttachment1_ID(), userID: GetCtx().GetAD_User_ID(), ctx: GetCtx(), threadID: threadID, attachmentType: "e"))
+                {
+                    log.SaveError("", "Error in execution of delete data against Mail Attachment thread : " + GetMailAttachment1_ID());
+                }
+            }
+            return true;
+        }
     }
 
- 
+
 
 }

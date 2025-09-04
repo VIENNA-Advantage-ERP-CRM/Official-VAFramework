@@ -125,6 +125,10 @@
         this.projectList = []; //store the list of projects
         //*********************************
 
+        var divBottom = null;
+
+        var cmbTwoFactor = null;
+
         var drpTheme = null;
         var ulTheme = null;
 
@@ -134,6 +138,7 @@
         var $root = $("<div class='vis-forms-container'>");
         var $busyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>')
         var windowNo = VIS.Env.getWindowNo();
+        var ctrltwoFactor = null;
         this.log = VIS.Logging.VLogger.getVLogger("UserPreference");
 
         this.load = function () {
@@ -143,6 +148,10 @@
             //this.log.log(VIS.Logging.Level.WARNING, "WARNING");
             //this.log.log(VIS.Logging.Level.OFF, "OFF");
             $busyDiv[0].style.visibility = 'visible';
+
+            //var lookup = VIS.MLookupFactory.get(VIS.Env.getCtx(), 0, 0, VIS.DisplayType.List, "Value", 1000579, false, null);
+            //ctrltwoFactor = new VIS.Controls.VComboBox("TwoFAMethod", false, false, true, lookup, 50);
+
 
             $root.load(VIS.Application.contextUrl + 'UserPreference/Index/?windowno=' + windowNo + '&adUserId=' + VIS.context.getAD_User_ID(), function (event) {
 
@@ -284,6 +293,13 @@
             $btnSaveKey = root.find('#btnSaveKey_' + windowNo);
             $listOfKey = root.find('#VIS_SecretKeyList_' + windowNo);
             //*******************
+            divBottom = root.find('#divBottom_' + windowNo);
+
+            cmbTwoFactor = root.find('#cmbTwoFactor_' + windowNo);
+
+            cmbTwoFactor.append($('<select>'));
+            getTwoFAMethod();
+
             defaultLogin = {};
             loadDefault();
             //loadRoles();
@@ -713,6 +729,10 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                divBottom.css("display", "inline-block");
+                
             });
             $(".VIS_Pref_link-2").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -720,6 +740,9 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                divBottom.css("display", "none");
             });
             $(".VIS_Pref_link-3").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -727,6 +750,9 @@
                 $(".VIS_Pref_content-right-3").css("display", "block");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                divBottom.css("display", "none");
             });
             $(".VIS_Pref_link-4").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -734,6 +760,9 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "flex");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                divBottom.css("display", "none");
             });
             //**************************************
             //Added By Sarab for the purpose of Gmail Settings to Import Gmail Tasks
@@ -743,12 +772,39 @@
                     $(".VIS_Pref_content-right-2").css("display", "none");
                     $(".VIS_Pref_content-right-3").css("display", "none");
                     $(".VIS_Pref_content-right-4").css("display", "none");
+                    $(".VIS_Pref_content-right-6").css("display", "none");
+                    $(".VIS_Pref_content-right-7").css("display", "none");
                     $(".VIS_Pref_content-right-5").css("display", "block");
+                    divBottom.css("display", "none");
                 }
                 else {
                     alert("please download WSP !!!");
                 }
             });
+
+            $(".VIS_Pref_link-6").click(function () {
+                $(".VIS_Pref_content-right").css("display", "none");
+                $(".VIS_Pref_content-right-2").css("display", "none");
+                $(".VIS_Pref_content-right-3").css("display", "none");
+                $(".VIS_Pref_content-right-4").css("display", "none");
+                $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "block");
+                divBottom.css("display", "none");
+            });
+
+            $(".VIS_Pref_link-7").click(function () {
+                $(".VIS_Pref_content-right").css("display", "none");
+                $(".VIS_Pref_content-right-2").css("display", "none");
+                $(".VIS_Pref_content-right-3").css("display", "none");
+                $(".VIS_Pref_content-right-4").css("display", "none");
+                $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "block");
+                divBottom.css("display", "none");
+            })
+
+
             if (isGmailSettings) {
                 $(".VIS_Pref_link-5").trigger("click");
             }
@@ -1648,9 +1704,29 @@
                     data: JSON.stringify({ pref: data })
                 }).done(function (json) {
                     result = json;
-                    $root.dialog('close');
+                    //$root.dialog('close');
+                    toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
                 });
             }
+
+
+            cmbTwoFactor.find('select').on('change', function () {
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "UserPreference/UpdateTwoFAMethod",
+                    type: "POST",
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    data: JSON.stringify({ method: $(this).val() })
+                }).done(function (json) {
+                    if (json) {
+                        toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+                    } else {
+                        toastr.error(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+                    }
+                });
+            })
 
 
         };
@@ -2033,7 +2109,38 @@
 
         };
 
+        var getTwoFAMethod = function () {
 
+            $.ajax({
+                url: VIS.Application.contextUrl + "UserPreference/GetTwoFAMethod",
+                dataType: "json",
+                success: function (data) {
+                    var response = JSON.parse(data);
+                    if (response != null && response.length > 0) {
+
+                        var optn = "<option></option>";
+                        for (var i = 0; i < response.length; i++) {
+                            if (response[i].TWOFAMETHOD == "") {
+                                optn += "<option value='" + response[i].value + "'>" + response[i].name + "</option>";
+                            } else {
+                                optn += "<option Selected value='" + response[i].value + "'>" + response[i].name + "</option>";
+                            }
+                            
+                        }
+                        cmbTwoFactor.find('select').empty();
+                        cmbTwoFactor.find('select').append(optn);
+
+                    } else {
+                        //// If no data, display a message
+                        //$listOfKey.html('<p>No data available.</p>');
+                    }
+                },
+                error: function () {
+                    /*   $selistdiv.html('<p>Error loading data.</p>');*/
+                }
+            });
+
+        }
 
         /* End APIKey Section*/
         this.showDialog = function () {

@@ -1213,7 +1213,7 @@
         this.values = null;
         this.isIconSet = true;
 
-        var $img = $("<i style='color:inherit' title='" + text + "'>"); 
+        var $img = $("<i style='color:inherit' title='" + text + "'>");
         var $imgSrc = $("<img style='color:inherit;display:none' title='" + text + "' />");
 
         var $txt = $("<span style='color:inherit'>").text(text);
@@ -1240,7 +1240,7 @@
 
         this.setIcon = function (img, isSrc) {
             if (isSrc) {
-                $imgSrc.attr("src",img);
+                $imgSrc.attr("src", img);
                 $img.hide();
                 $imgSrc.show();
             }
@@ -1468,7 +1468,7 @@
         } else {
             this.ctrl.hide();
             if (isag)
-            this.ctrl.parent().hide();
+                this.ctrl.parent().hide();
         }
     };
 
@@ -2390,6 +2390,7 @@
         this.value = null;
         // Variable for setting custom info window while creating search control.- added by Mohit.
         this.custInfoWin = null;
+        this.isGenInfo = false;
         var _TableName = null;
         var _KeyColumnName = null;
         this.infoMultipleIds = null;
@@ -2509,7 +2510,7 @@
             this.isReadOnly = readOnly;
             $ctrl.prop('disabled', readOnly || this.isMultiKeyTextBox ? true : false);
             // this.$super.setReadOnly(readonly);
-           // this.setBackground(readOnly);
+            // this.setBackground(readOnly);
             if (readOnly) {
                 $btnSearch.css("opacity", .7);
             } else {
@@ -3326,6 +3327,10 @@
                     InfoWindow = new VIS.infoProduct(true, self.lookup.windowNo, M_Warehouse_ID, M_PriceList_ID,
                         text, tableName, _keyColumnName, multipleSelection, wc, selectedIDs);
                 }
+                else if (self.isGenInfo) {
+                    InfoWindow = new VIS.infoGeneral(true, self.lookup.windowNo, text,
+                        tableName, _keyColumnName, self.isMultiKeyTextBox, wc, selectedIDs);
+                }
                 else {
                     //try get dynamic window
                     // Change by mohit - to change the logic of getting dynamic window. Date - 17 october 2017
@@ -3754,6 +3759,10 @@
         }
     }
 
+    // Added by Bharat - To Open general info window while creating search control.
+    VTextBoxButton.prototype.setIsGenInfo = function (IsGenInfo) {
+        this.isGenInfo = IsGenInfo;
+    }
 
     //7. 
     function VTextArea(columnName, isMandatory, isReadOnly, isUpdateable, displayLength, fieldLength, displayType) {
@@ -6904,9 +6913,10 @@
         //Init Control
 
         var $ctrl = $('<input>', { type: 'tel', name: columnName, maxlength: fieldLength });
-        var $btnSearch = $('<button class="input-group-text"><i class="' + src + '" /></button>');
-       // if (!isReadOnly)
-         //   $ctrl.append($btnSearch);
+
+        var $btnSearch = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" /></button>');
+        // if (!isReadOnly)
+        //   $ctrl.append($btnSearch);
 
         var telCtrl = $ctrl;
         //Call base class
@@ -7137,7 +7147,7 @@
         });
         setTimeout(function () {
             if (this.ctrl)
-            setZeroFormattedPlaceholder(this.ctrl[0]);
+                setZeroFormattedPlaceholder(this.ctrl[0]);
         }, 200);
     };
 

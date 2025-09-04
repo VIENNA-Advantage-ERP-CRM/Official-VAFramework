@@ -60,7 +60,7 @@
         var selectedItems = [];
         var lstDetailCtrls = [];
         var historyDivShow = false;
-
+        var attachIconHtml = null;
 
         var elements = [
             "SelectWindow"];
@@ -183,6 +183,16 @@
         };
         //Create Widget
         function createWidget() {
+            attachIconHtml = `
+  <div class="vis-wfw-attachment-wrapper" style="position: relative; display: inline-block;">
+    <i class="fa fa-paperclip vis-wfw-attachClip" style="font-size: 20px; color: rgba(var(--v-c-primary), 1); cursor: pointer;" aria-hidden="true"></i>
+    
+ <div id="ListContainer" class="vis-wfw-attachment-dropdown" ></div>
+  </div>
+`;
+           /* <div id="ListContainer" class="vis-wfw-attachment-dropdown" style="display: none; position: absolute; top: 30px; right: -25px; background: white; border: 0px solid #ccc; z-index: 999; padding: 5px; min-width: 200px;"></div>
+ */
+
             $workflowWidget = ' <div id="FstMainDiv' + $self.AD_UserHomeWidgetID + '" class="vis-cardCls w-100">'// style="background-color:#f3f3f3"
                 + '     <div class="vis-w-welcomeScreenFeeds h-100">'
                 + ' <div class="vis-w-row vis-w-rowDiv">'
@@ -574,6 +584,11 @@
             var hHeader = $("<div id='VIS_backBtn_ID" + $self.AD_UserHomeWidgetID + "' style='cursor: pointer;' title='Back Window' class='vis vis-arrow-left'></div><h3 class='vis-workflow-h2-cls vis-w-txtBold ml-2 mb-0'>" + VIS.Msg.getMsg('Detail') + "</h3>");
             divHeader.append(hHeader);
 
+            if (info.AttachmentCount > 0) {
+                //  li1.append("<pre class='vis-preCls'>" + VIS.Msg.getMsg('Attachment') + " : " + VIS.Msg.getMsg('Yes') + "</pre>");
+                divHeader.append(attachIconHtml);
+            }
+
             // if  any checkbox is checked, then don't show History in middle panel.
             if (selectedItems.length <= 1) {
                 btnCheckList = $("<a href='javascript:void(0)' class='vis-btn-widgetzoom mr-1' data-id='" + index + "'>" + VIS.Msg.getMsg('CheckList') + "</a>");// style='padding-left: 0.625em;padding-right: 0.625em;padding-top: 0.125em;padding-bottom: 0.125em;'
@@ -670,9 +685,9 @@
             ul.append(li1);
 
 
-            if (info.AttachmentCount > 0) {
-                li1.append("<pre class='vis-preCls'>" + VIS.Msg.getMsg('Attachment') + " : " + VIS.Msg.getMsg('Yes') + "</pre>");
-            }
+            //if (info.AttachmentCount > 0) {
+            //    li1.append("<pre class='vis-preCls'>" + VIS.Msg.getMsg('Attachment') + " : " + VIS.Msg.getMsg('Yes') + "</pre>");
+            //}
 
             // if  any checkbox is checked, then don't show summary in middle panel.
             if (selectedItems.length <= 1) {
@@ -1111,6 +1126,156 @@
                 $workflowActivitys.css('display', 'none').css('zindex', '2');
                 $welcomeScreenFeedsLists.css('display', 'block');
                 $row.css('display', 'block');
+            });
+
+            $workflowActivitys.on('click', function (e) {
+                // Check if the click is outside the workflow activity and dropdown
+                if (/*!$(e.target).closest($workflowActivitys).length  &&*/ !$(e.target).closest('#ListContainer').length) {
+                    $('#ListContainer').hide();
+                    $workflowActivitys.find('.vis-wfw-attachClip').removeClass('vis-wfw-attachClip-active');
+                }
+            });
+            $workflowActivitys.find('.vis-wfw-attachClip').on("click", function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+                let activeEle = $(this);
+
+                /*  $workflowActivitys.find('.vis-wfw-attachment-dropdown').show();*/
+                var $listContainer = $('#ListContainer');
+                // Toggle dropdown visibility
+                if ($listContainer.is(':visible')) {
+                    activeEle.removeClass('vis-wfw-attachClip-active');
+                    $listContainer.hide();
+                    return;
+                }
+                showBusy(true);
+                // Fetch attachments
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Attachment/GetAttachment",
+                    dataType: "json",
+                    data: {
+                        AD_Table_ID: fulldata[index].AD_Table_ID,
+                        Record_ID: fulldata[index].Record_ID
+                    },
+                    error: function () {
+                        VIS.ADialog.info('ERRORGettingAttachment');
+                        $listContainer.hide();
+                    },
+                    success: function (data) {
+                        showBusy(false);
+                        var locations = data.result.FLocation;
+                        var attachments = data.result.Attachment;
+                        // Get actual attachment records
+                        if (attachments && attachments._lines) {
+                            attachments = attachments._lines;
+                        } else {
+                            attachments = [];
+                        }
+                        if (!locations || attachments.length === 0) {
+                            VIS.ADialog.info('ERRORGettingAttachment');
+                            $listContainer.hide();
+                            return;
+                        }
+                        var $ul = $('<ul class="attachment-list" style="list-style: none; padding-left: 0; margin: 0;"></ul>');
+
+                        attachments.forEach(function (attachment, i) {
+                            var fileName = attachment.FileName || 'Attachment ' + (i + 1);
+                            var fileUrl = locations[i];
+                            var docFileType = (attachment.Filetype || '').replace(/^\./, '').toUpperCase();
+                            // Default icon class and color
+                            var docExtClass = 'vis-doc-blank';
+                            var docExtColor = 'rgba(var(--v-c-primary), 1)';
+                            // Set icon class and color based on file type
+                            if (['DOCX', 'DOC'].includes(docFileType)) {
+                                docExtClass = 'vis vis-doc-word';
+                                docExtColor = '#0069a8';
+                            } else if (docFileType === 'PDF') {
+                                docExtClass = 'vis vis-doc-pdf';
+                                docExtColor = '#c1272d';
+                            } else if (['PPT', 'PPTX'].includes(docFileType)) {
+                                docExtClass = 'vis vis-doc-pp';
+                                docExtColor = 'orange';
+                            } else if (['XLS', 'XLSX', 'CSV'].includes(docFileType)) {
+                                docExtClass = 'vis vis-doc-excel';
+                                docExtColor = '#39b54a';
+                            } else if (['ODP', 'ODS', 'ODT'].includes(docFileType)) {
+                                docExtClass = 'vis vis-doc-blank';
+                                docExtColor = 'rgba(var(--v-c-primary), 1)';
+                            } else if (docFileType === 'TEXT' || docFileType === 'TXT') {
+                                docExtClass = 'vis vis-doc-text';
+                                docExtColor = '#a9abae';
+                            } else if (['PNG', 'JPG', 'JPEG'].includes(docFileType)) {
+                                docExtClass = 'vis vis-doc-img';
+                                docExtColor = '#00afef';
+                            }
+                            // HTML element
+                            /*  var $li = $(`
+        <li class="vis-wfw-attachment-item">
+          <i class="${docExtClass}" style="color: ${docExtColor}; font-size: 20px; margin-right: 8px;" aria-hidden="true"></i>
+          <a href="${fileUrl}" target="_blank" title="${fileName}" class="vis-wfw-attachment-link">
+            ${fileName}
+          </a>
+          <i class="vis vis-download vis-wfw-download-icon" title="Download" data-url="${fileUrl}" data-filename="${fileName}" aria-hidden="true"></i>
+        </li>
+      `);*/
+                            var $li = $(`
+  <li class="vis-wfw-attachment-item">
+    <i class="${docExtClass}" style="color: ${docExtColor}; font-size: 20px; margin-right: 8px;" aria-hidden="true"></i>
+    <span title="${fileName}" class="vis-wfw-attachment-link">
+      ${fileName}
+    </span>
+    <i class="vis vis-download vis-wfw-download-icon" title="Download" data-url="${fileUrl}" data-filename="${fileName}" aria-hidden="true"></i>
+  </li>
+`);
+                            activeEle.addClass('vis-wfw-attachClip-active');
+                            $ul.append($li);
+                        });
+                        $listContainer.html($ul).show();
+                        // 🔽 Download click event
+                        $listContainer.find('.vis-wfw-download-icon').on('click', function () {
+                            var $icon = $(this);
+                            var fileUrl = $icon.data('url');
+                            var fileName = $icon.data('filename');
+                            var idx = $icon.closest('li').index(); // Get the index of the clicked item
+                            var actionOrigin = VIS.ProcessCtl.prototype.ORIGIN_WINDOW;
+                            if (!$self.isWindowAction) {
+                                actionOrigin = VIS.ProcessCtl.prototype.ORIGIN_FORM;
+                            }
+                            showBusy(true);
+                            $.ajax({
+                                url: VIS.Application.contextUrl + "Attachment/DownloadAttachment",
+                                dataType: "json",
+                                data: {
+                                    fileName: data.result.Attachment._lines[idx].FileName,
+                                    AD_Attachment_ID: data.result.Attachment.AD_Attachment_ID,
+                                    AD_AttachmentLine_ID: data.result.Attachment._lines[idx].Line_ID,
+                                    actionOrigin: actionOrigin,
+                                    originName: VIS.context.getWindowContext($self.windowNo, "WindowName"),
+                                    AD_Table_ID: fulldata[index].AD_Table_ID,
+                                    recordID: fulldata[index].Record_ID
+                                },
+                                error: function () {
+                                    VIS.ADialog.info('ERRORGettingFile');
+                                    showBusy(false);
+                                },
+                                success: function (res) {
+                                    var d = new Date();
+                                    var filePath = res.result;
+                                    var fileName = data.result.Attachment._lines[idx].FileName;
+                                    var url = VIS.Application.contextUrl + "TempDownload/" + filePath + "/" + fileName + "?" + d.getTime();
+                                    showBusy(false);
+                                    var a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = fileName; // This forces the browser to download the file
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                }
+                            });
+                        });
+                    }
+                });
             });
         };
         //Create Controls based on data
