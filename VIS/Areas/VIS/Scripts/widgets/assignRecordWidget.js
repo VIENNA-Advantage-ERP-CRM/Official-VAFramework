@@ -68,6 +68,10 @@
             widgetsPopup();
             showBusy(true);
             loadWidget();
+            //auto refresh widget after interval of 5 minutes
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);
         };
         function loadWidget() {
             widgetContainer = $('<div class="VIS-asrec-widget-container" id="Vis_Widget-container_' + widgetID + '">');
@@ -399,6 +403,13 @@
                 TotalRecords = windowRecords[0].countRecords;
                 TotalPages = Math.ceil(TotalRecords / winRecPageSize);
             }
+            var message = "";
+            if (IsPopButAll) {
+                message = VIS.Msg.getMsg('VIS_To');
+            }
+            else {
+                message = VIS.Msg.getMsg('VIS_AssignedTo');
+            }
             var ListContent = "";
             //for no data
             if (windowRecords.length === 0) {
@@ -416,9 +427,14 @@
                         'data-Record_ID="' + windowRecords[i].Record_ID + '" ' +
                         'id="VIS-unAllocatedZoom_' + widgetID + '" ' +
                         'title="' + VIS.Msg.getMsg("VIS_Zoom") + '">' +
-                        '</i>' + windowRecords[i].ColValue + '</td>' +
-                        '<td class="vis-asrec-assigned vis-widpop-tooltip" title="' + windowRecords[i].UpdatedBy + '">' + windowRecords[i].UpdatedBy + '</td>' +
-                        '<td class="vis-asrec-date" style="padding-left:12px;">'
+                        '</i>' + windowRecords[i].ColValue + '</td>';
+                    /*if user has clicked see all assigned user link then show assigned by also*/
+                    if (windowRecords[i].AssignedBy != "") {
+                        ListContent += '<td class="vis-asrec-assigned vis-widpop-tooltip" title="' + windowRecords[i].AssignedBy + '">' + windowRecords[i].AssignedBy + '</td>';
+                    }
+                       
+                    ListContent += '<td class="vis-asrec-assigned vis-widpop-tooltip" title="' + windowRecords[i].UpdatedBy + '">' + windowRecords[i].UpdatedBy + '</td>'+
+                        '<td class="vis-asrec-date">'
                         + VIS.Utility.Util.getValueOfDate(windowRecords[i].AssignedDate).toLocaleDateString(window.navigator.language, {
                             year: 'numeric',
                             month: '2-digit',
@@ -446,8 +462,18 @@
                         '" data-windowid="' + allRecords[i].WindowID +
                         '" data-recordid="' + allRecords[i].Record_ID + '"' + isSelected + '>' + allRecords[i].WindowName + '</option>';
                 }
-                windowDropdownHtml += '</select>';
+                windowDropdownHtml += '</select>';           
                 content = '<div id="VIS-assrec-wrapper">';
+                /*Added title of popup according to from where popup opened*/
+                if (IsPopButAll) {
+                    content += '<div class="vis-asrec-popup-title">' + VIS.Msg.getMsg("VIS_AssignedUsers") + '</div>'
+                }
+                else if (ListVal == "02") {
+                    content += '<div class="vis-asrec-popup-title">' + VIS.Msg.getMsg('VIS_AssignRecordToMe') + '</div>'
+                }
+                else if (ListVal == "01") {
+                    content += '<div class="vis-asrec-popup-title">' + VIS.Msg.getMsg('VIS_AssignRecordByMe') + '</div>'
+                }
                 content += '<div class="vis-header-bar">' +
                     '<h1 class="vis-header-title"><span class="vis-asrec-dropdown-container">' + windowDropdownHtml +
                     '<span class="vis-asrec-poprecord-count">' + VIS.Utility.Util.getValueOfDecimal(windowRecords[0].countRecords) + '</span>' +
@@ -468,11 +494,15 @@
                     '<table id="VIS-assrec-keywords" cellspacing="0" cellpadding="0">' +
                     '<thead>' +
                     '<tr>' +
-                    '<th><span>' + VIS.Msg.getMsg('VIS_RecordName') + '</span></th>' +
-                    '<th><span>' + (ListVal == "01" ? VIS.Msg.getMsg('VIS_AssignedTo') : VIS.Msg.getMsg('VIS_AssignedFrom')) + '</span></th>' +
-                    '<th><span>' + VIS.Msg.getMsg('VIS_AssignedDate') + '</span></th>';
+                    '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_RecordName') + '"><span>' + VIS.Msg.getMsg('VIS_RecordName') + '</span></th>';
+                if (IsPopButAll) {
+                    content += '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_AssignedBy') + '"><span>' + VIS.Msg.getMsg('VIS_AssignedBy') + '</span></th>';
+                }
+                content += '<th class="vis-widpop-tooltip" title="' + (ListVal == "01" ? message : VIS.Msg.getMsg('VIS_AssignedFrom')) + '"><span>' + (ListVal == "01" ? message : VIS.Msg.getMsg('VIS_AssignedFrom')) + '</span></th>' +
+                    '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_OnDate') + '"><span>' + VIS.Msg.getMsg('VIS_OnDate') + '</span></th>';
                 if (ListVal == "01") {
-                    content += '<th><span>' + VIS.Msg.getMsg('VIS_Assigned') + '</span></th>';
+                    content += '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_Assigned') + '"><span>' + VIS.Msg.getMsg('VIS_Assigned') + '</span></th>';
+                    content += '<th></th>';
                 }
                 content += '</tr>' +
                     '</thead>' +
@@ -556,6 +586,7 @@
                     if (!(deleteresult.toLowerCase().startsWith("error"))) {
                         modelPopupId.hide();
                         $self.getWindowRecords(getAll, ListVal);
+                        uncheckedIDs = [];
                     }
                     else {
                         VIS.ADialog.info(deleteresult);
@@ -694,6 +725,8 @@
             AssignedRecords.empty(); // Clear existing records
             AssignedRecords.removeClass('vis-noRecordFound');
             if (allRecords == null || allRecords.length === 0) {
+                /*remove pagination if no data found*/
+                widgetContainer.find('.vis-tiles-pagination').remove();
                 widgetContainer.find('h4').text('' + ' 0');
                 AssignedRecords.text(VIS.Msg.getMsg('VIS_NoRecordFound')).addClass('vis-noRecordFound');
                 return;

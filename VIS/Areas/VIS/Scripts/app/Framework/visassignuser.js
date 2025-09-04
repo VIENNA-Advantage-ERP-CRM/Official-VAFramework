@@ -81,15 +81,13 @@
         function createTabularDesign(data) {
             result = data ? data : [];
             if (result.length > 0) {
-                contentHtml = '<div class="vis-assr-table-header">' +
-                    '<span>' + VIS.Msg.getMsg("VIS_SelectedAssignedRecords") + '</span>' +
-                    '</div>' +
+                contentHtml =
                     '<div class="vis-assr-tablediv">' +
                     '<table class="vis-assr-table">' +
                     '<tr>' +
-                    '<th>' + VIS.Msg.getMsg('VIS_RecordName') + '</th>' +
+                    '<th>' + VIS.Msg.getMsg('VIS_SelectedRecord') + '</th>' +
                     '<th>' + VIS.Msg.getMsg('VIS_AssignedTo') + '</th>' +
-                    '<th>' + VIS.Msg.getMsg('VIS_AssignedDate') + '</th>' +
+                    '<th>' + VIS.Msg.getMsg('VIS_OnDate') + '</th>' +
                     /*'<th>' + VIS.Msg.getMsg('VIS_Action') + '</th>' +*/
                     '</tr>';
                 for (i = 0; i < result.length; i++) {

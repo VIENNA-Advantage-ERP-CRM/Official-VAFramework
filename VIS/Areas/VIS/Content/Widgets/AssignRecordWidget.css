@@ -435,6 +435,7 @@ html[dir=rtl] .VIS_popupRecordCount {
     font-family: var(--v-c-font-family) !important;
     font-weight: 600;
     color: rgba(var(--v-c-on-secondary), 1);
+    width:48%;
     /* font-size: 1.6em;*/
     /* margin-bottom: 6px;*/
 }
@@ -464,8 +465,8 @@ html[dir=rtl] .VIS_popupRecordCount {
     }
 
         #VIS-assrec-keywords thead tr th {
-            padding: 15px 8px;
-            padding: 10px 5px;
+            /*padding: 15px 8px;*/
+            padding: 5px 5px;
             color: rgba(var(--v-c-on-secondary), 1);
             font-family: Roboto-Regular !important;
             font-size: 1em;
@@ -555,7 +556,7 @@ html[dir=rtl] .VIS_popupRecordCount {
 
 .vis-header-title {
     margin: 0;
-    font-size: 1.125rem;
+    font-size: 1rem;
     flex-shrink: 0;
 }
 
@@ -589,6 +590,7 @@ html[dir=rtl] .VIS_popupRecordCount {
 .vis-asrec-popup-scroll-container {
     max-height: 400px;
     overflow-y: auto;
+    margin-bottom:12px
 }
 
     .vis-asrec-popup-scroll-container table {
@@ -693,14 +695,16 @@ html[dir="rtl"] .vis-a-closeBtnCls.close {
 }
 
 .vis-asrec-dropdown {
-    background: #f3f3f314;
-    border: none;
+    background: #fff;
+    /*border: none;*/
     background-image: url("data:image/svg+xml;utf8,<svg fill='%23333' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
     background-repeat: no-repeat;
     background-position: right 10px center;
     padding-right: 30px;
     color: #333;
     height: 30px;
+    font-size:0.900em !important;
+    border-radius:5px;
     appearance: none;
 }
 
@@ -721,6 +725,7 @@ html[dir="rtl"] .vis-a-closeBtnCls.close {
     display: flex;
     align-items: center;
     gap: 6px;
+    font-size:0.9em;
 }
 
 .vis-assr-modal {
@@ -799,7 +804,7 @@ html[dir="rtl"] .vis-a-closeBtnCls.close {
 
     .vis-assr-table th, .vis-assr-table td {
         padding: 6px;
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
         text-align: left;
     }
 
@@ -883,11 +888,7 @@ html[dir="rtl"] .vis-a-closeBtnCls.close {
 }
 
 .vis-assr-modal-body .vis-asrec-flyout-footer {
-    padding-right: 8px;
-}
-
-.vis-assr-modal-body .vis-asrec-flyout-footer {
-    padding-right: 8px;
+   /* padding-right: 8px;*/
 }
 
 .vis-assr-modal-body .modal-content {
@@ -911,4 +912,16 @@ html[dir="rtl"] .vis-a-closeBtnCls.close {
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+.vis-assr-modal-body .close{
+    font-size:1.5rem;
+}
+.vis-asrec-maindiv .VIS-AssignRecordDiv .vis-input-wrap [data-hasBtn]:focus{
+    border-right:0;
+}
+.vis-asrec-popup-title {
+    font-size: 1.125em;
+    font-weight: 600;
+    margin-bottom: -6px;
+    margin-left: 3px;
 }
