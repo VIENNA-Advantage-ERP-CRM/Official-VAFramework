@@ -6857,7 +6857,9 @@
         //check for filterd org , if filter applied then return login org only
         var fOrgs = ctx.getContext("#AD_FilteredOrg");
         if (vo.ColumnName.equals("AD_Org_ID") && fOrgs && fOrgs != "") {
-            return ctx.getAD_Org_ID();
+            if (VIS.MRole.getIsOrgAccess(ctx.getAD_Org_ID(), true))
+                return ctx.getAD_Org_ID();
+            return null;
         }
 
         //	Set Client & Org to System, if System access
@@ -6954,7 +6956,7 @@
                     defStr = ctx.getWindowContext(vo.windowNo, variable.replaceAll('@', ' ').trim());
 
                     // Check Role have Org Access. 
-                    if (vo.ColumnName == 'AD_Org_ID' && !VIS.MRole.getIsOrgAccess(Number(defStr), false)) {
+                    if (vo.ColumnName == 'AD_Org_ID' && !VIS.MRole.getIsOrgAccess(Number(defStr), true)) {
                         defStr = variable;
                     }
                 }

@@ -7082,7 +7082,7 @@
             this.settingVal = true;
             //else
             //his.ctrl.val(newValue);
-            if (!newValue) {
+            if (!newValue && newValue !='') {
                 this.iti ? this.iti.setNumber('') : this.ctrl.val('');
                 this.setCountry();
             } else {
