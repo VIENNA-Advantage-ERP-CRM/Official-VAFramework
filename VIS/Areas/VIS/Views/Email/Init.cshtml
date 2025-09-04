@@ -12,22 +12,6 @@
         <div class="vis-Email-ContentArea">
             <div class="vis-Email-leftWrap">
                 <div class="vis-form-horizontal">
-                    <div class="vis-Email-topinputWrap">
-                        <a class="vis-Email-CcBcc">@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Cc") &amp; @VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Bcc")</a>
-
-                        <div class="vis-form-data">
-                            <input type="text" id="@(ViewBag.windowNo + "_emailToTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "To")>
-                        </div>
-
-                        <div class="vis-form-data">
-                            <input type="text" id="@(ViewBag.windowNo + "_eamilCcTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Cc")>
-                        </div>
-                        <div class="vis-form-data">
-                            <input type="text" id="@(ViewBag.windowNo + "_emailBccTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Bcc")>
-                        </div>
-                    </div>
-                    <!-- end of Email-topinputWrap -->
-
                     <div class="vis-Email-inputWrap" style="display: flex; margin: 0 -20px; width: calc(100% - -39px); padding: 3px 20px; background-color: rgba(var(--v-c-primary), .1); ">
                         <div class="vis-ai-mail-container">
                             <div class="vis-ai-mail-inner-card">
@@ -112,6 +96,24 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="vis-Email-topinputWrap">
+                        <a class="vis-Email-CcBcc">@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Cc") &amp; @VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Bcc")</a>
+
+                        <div class="vis-form-data">
+                            <input type="text" id="@(ViewBag.windowNo + "_emailToTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "To")>
+                        </div>
+
+                        <div class="vis-form-data">
+                            <input type="text" id="@(ViewBag.windowNo + "_eamilCcTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Cc")>
+                        </div>
+                        <div class="vis-form-data">
+                            <input type="text" id="@(ViewBag.windowNo + "_emailBccTop")" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.language, "Bcc")>
+                        </div>
+                    </div>
+                    <!-- end of Email-topinputWrap -->
+
+
 
                     <div class="vis-Email-inputWrap">
                         <div class="vis-form-data-sub">

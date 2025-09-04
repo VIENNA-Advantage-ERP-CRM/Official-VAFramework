@@ -75,9 +75,9 @@ namespace VAdvantage.Process
                     + " AND c.AD_Table_ID=@AD_Table_Id"	//	#1
                     + " AND f.AD_Tab_ID=@AD_Tab_Id)"		//	#2
                 + " AND AD_Table_ID=@AD_Table_Id1"			//	#3
-                + " AND NOT (Name LIKE 'Created%' OR Name LIKE 'Updated%')"
+                + " AND NOT (Name LIKE 'Created%' OR Name LIKE 'Updated%' OR LOWER(Name) = 'record_guid')"
                 + " AND IsActive='Y' "
-                + "ORDER BY Name desc";
+                + "ORDER BY Name DESC";
 
            
             try
@@ -121,7 +121,11 @@ namespace VAdvantage.Process
                         field.SetIsDisplayed(false);
                         field.SetMRIsDisplayed("N");
                     }
-
+                    if (column.GetColumnName().ToLower().ToString() == "record_guid")
+                    {
+                        field.SetIsDisplayed(false);
+                        field.SetMRIsDisplayed("N");
+                    }
                     if (field.Save())
                     {
                         AddLog(0, DateTime.MinValue, Decimal.Parse(count.ToString()), column.GetName());

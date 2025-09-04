@@ -3071,7 +3071,7 @@
                 }
                 else {
 
-                    $root.find(".vis-Email-textarea-div").height($root.height() - (125 + 30));
+                    $root.find(".vis-Email-textarea-div").height($root.height() - (125 + 60));
 
                     if ($textAreakeno != null && $textAreakeno != undefined) {
                         //if ($textAreakeno != null && $textAreakeno != undefined) {
