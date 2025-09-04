@@ -3033,10 +3033,10 @@
             if (callingFromOutsideofWindow) {
                 if (!$root.find('.vis-email-attachmentContainer').is(":visible")) {
 
-                    $root.find(".vis-Email-textarea-div").height($root.height() - 180);
+                    $root.find(".vis-Email-textarea-div").height($root.height() - 220);
                 }
                 else {
-                    $root.find(".vis-Email-textarea-div").height($root.height() - 345);
+                    $root.find(".vis-Email-textarea-div").height($root.height() - 385);
                 }
 
                 $root.find('.vis-form-data-sub').width($root.find('.vis-Email-leftWrap').width() - 85);
@@ -3071,7 +3071,7 @@
                 }
                 else {
 
-                    $root.find(".vis-Email-textarea-div").height($root.height() - (125 + 30));
+                    $root.find(".vis-Email-textarea-div").height($root.height() - (125 + 60));
 
                     if ($textAreakeno != null && $textAreakeno != undefined) {
                         //if ($textAreakeno != null && $textAreakeno != undefined) {

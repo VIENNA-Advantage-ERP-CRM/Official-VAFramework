@@ -211,7 +211,8 @@ namespace VIS.Models
 
                 if (mails[j].Recordids != null)          //in case of static mail
                 {
-                    records = mails[j].Recordids.Split(',');
+                    string recID = mails[j].Recordids.TrimEnd(',');
+                    records = recID.Split(',');
                 }
 
                 _table_id = Convert.ToInt32(mail[j].TableID);
