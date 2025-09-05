@@ -119,6 +119,7 @@
         var $cmdOrgforKey = null;
         var $cmdWareHouseforKey = null;
         var $btnCreateKey = null;
+        var $btnProjectZoom = null;
         var $btnSaveKey = null;
         var $cmdProject = null;
         var $listOfKey = null;
@@ -288,6 +289,7 @@
             $cmdOrgforKey = root.find("#cmbOrgForKey_" + windowNo);
             $cmdWareHouseforKey = root.find("#cmbWareHouseForKey_" + windowNo);
             $cmdProject = root.find("#cmbProject" + windowNo);
+            $btnProjectZoom = root.find("#btnProjectZoom_" + windowNo);
             $btnCreateKey = root.find('#btnCreateKey_' + windowNo);
             $btnApiDivClose = root.find('#CreateApiDivClose_' + windowNo);
             $btnSaveKey = root.find('#btnSaveKey_' + windowNo);
@@ -732,7 +734,7 @@
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
                 divBottom.css("display", "inline-block");
-                
+
             });
             $(".VIS_Pref_link-2").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -1126,7 +1128,7 @@
                     SaveGmailContactSettings($txtGmailUsername.val(), $txtGmailPassword.val(), $cmbGmailRole.val(), chkIsUpdateExisting);
                 }, 500);
             });
-
+         
             /* VAI050-  Events for Create Seceret key Section*/
             //CreateApiKey btn click
             $btnCreateKey.on("click", function () {
@@ -1139,7 +1141,25 @@
                 $listOfKey.css("display", "none");
             });
 
-
+            $btnProjectZoom.on("click", function () {
+                ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "VAAPI_Project" }, null); 
+                if (ad_window_Id > 0) {
+                    const windowParam = {
+                        "TabLayout": "N",
+                        "TabIndex": "0",
+                        "ActionName": "VAAPI_Project",
+                        "ActionType": "W"
+                    };
+                    VIS.viewManager.startWindow(ad_window_Id, null, windowParam);
+                    $self.dispose();
+                    $root.dialog("destroy");
+                    $("#ui-datepicker-div").remove()
+                    $root = null;
+                    $self = null;
+                }
+               
+             
+            });
 
             $btnApiDivClose.on("click", function () {
                 $(".VIS-Create-Api-Section").css("display", "none");
@@ -2004,6 +2024,7 @@
                         tableHtml += '<thead><tr>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_KeyName") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_SecretKey") + '</th>' +
+                            '<th>' + VIS.Msg.getMsg("VAAPI_Role") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("Created") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("CreatedBy") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_ProjectAccess") + '</th>' +
@@ -2018,6 +2039,7 @@
                             tableHtml += '<tr>' +
                                 '<td><span title="' + item.KeyName + '" class="VIS-Key-ellipse-text">' + statusDot + ' ' + item.KeyName + '</span></td>' +
                                 '<td><span title="' + item.SessionToken + '" class="VIS-Key-ellipse-text">' + item.SessionToken + '</span></td>' +
+                                '<td><span title="' + item.Role + '" class="VIS-Key-ellipse-text">' + item.Role + '</span></td>' +
                                 '<td><span title="' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '" class="VIS-Key-ellipse-text">' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '</span></td>' +
                                 '<td><span title="' + item.CreatedBy + '" class="VIS-Key-ellipse-text">' + item.CreatedBy + '</span></td>' +
                                 '<td><span title="' + item.ProjectName + '"  class="VIS-Key-ellipse-text">' + item.ProjectName + '</span></td>' +
@@ -2125,7 +2147,7 @@
                             } else {
                                 optn += "<option Selected value='" + response[i].value + "'>" + response[i].name + "</option>";
                             }
-                            
+
                         }
                         cmbTwoFactor.find('select').empty();
                         cmbTwoFactor.find('select').append(optn);
