@@ -63,7 +63,7 @@ namespace VAModelAD.AIHelper
         /// <param name="_po">PO object</param>
         protected void CreateUpdateRecordThread(Ctx ctx, PO _po, bool newRecord)
         {
-            Common.CreateRecordThread(ctx, _po.Get_ID(), _po.Get_Table_ID(), _po.GetAD_Window_ID(), _po.GetWindowTabID(), !newRecord, null);
+            Common.CreateRecordThread(ctx, _po.Get_ID(), _po.Get_Table_ID(), _po.GetAD_Window_ID(), _po.GetWindowTabID(), !newRecord, _po.Get_TrxName(), null);
         }
     }
 }

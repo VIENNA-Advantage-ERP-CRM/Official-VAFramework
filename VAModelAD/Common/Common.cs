@@ -1993,7 +1993,7 @@ namespace VAdvantage.Common
         public static string GetThreadID(int AD_Table_ID, int Record_ID)
         {
             // Check applied if module installed
-            if (Env.IsModuleInstalled("VAI01_"))
+            if (Env.IsModuleInstalled("VAI01_") && MTable.Get_Table_ID("VAI01_AIAssistant") > 0)
             {
                 return Util.GetValueOfString(DB.ExecuteScalar(@"SELECT asth.VAI01_ThreadID FROM VAI01_AIAssistant asst
                                     INNER JOIN VAI01_AssistantScreen ascrn ON (ascrn.VAI01_AIAssistant_ID = asst.VAI01_AIAssistant_ID)
@@ -2014,7 +2014,7 @@ namespace VAdvantage.Common
         /// <param name="windowID">Window ID</param>
         /// <param name="tabID">Tab ID</param>
         /// <returns>Thread ID in string format if created or updated else returns blank string</returns>
-        public static string CreateRecordThread(Ctx ctx, int recordId, int tableID, int windowID, int tabID, bool isUpdate, VLogger _log)
+        public static string CreateRecordThread(Ctx ctx, int recordId, int tableID, int windowID, int tabID, bool isUpdate, Trx recTrx, VLogger _log)
         {
             string threadID = "";
             // fetch tabID against table id if window id and tab id is not passed in the parameter
@@ -2088,6 +2088,15 @@ namespace VAdvantage.Common
                     if (!para.Save())
                     {
                         String msg = "No IsUpdate Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    para = new MPInstancePara(pin, 50);
+                    para.setParameter("HasRecordTrx", recTrx != null ? "true" : "false");
+                    if (!para.Save())
+                    {
+                        String msg = "No HasRecordTrx Parameter added";  //  not translated
                         if (_log != null)
                             _log.Log(Level.SEVERE, msg);
                         return "";
