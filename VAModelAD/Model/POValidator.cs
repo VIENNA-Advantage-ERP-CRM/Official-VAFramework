@@ -379,7 +379,7 @@ namespace VAModelAD.Model
                 ShareRecordManager.Get(p_ctx).ShareChild(p_ctx, po);
 
                 // vis0008 Check and update changes for AI Assistant
-                if (Env.IsModuleInstalled("VAI01_"))
+                if (Env.IsModuleInstalled("VAI01_") && (MTable.Get_Table_ID("VAI01_AIAssistant") > 0) && !po.SkipAIThreadCreate)
                 {
                     AssistantRecordThread.Get().CreateUpdateThread(p_ctx, po, newRecord);
                 }
@@ -484,7 +484,8 @@ namespace VAModelAD.Model
                 }
             }
 
-            if (Util.GetValueOfInt(poMaster.Get_ID()) == 0)
+            // check applied for tables not having key column
+            if (Util.GetValueOfInt(poMaster.Get_ID()) == 0 || (poMaster.CreateNewRecord && poMaster.Get_KeyColumns().Length > 1))
             {
                 if (HasDocValueWF)
                     poMaster.SetIsActive(false);
