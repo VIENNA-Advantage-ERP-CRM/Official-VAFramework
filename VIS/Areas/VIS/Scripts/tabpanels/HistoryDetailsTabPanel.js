@@ -1116,9 +1116,9 @@
                         '<section class="VIS-transcript-section">' +
                         /*'<h2>Hello David,</h2>' +*/
                         '<p id="VIS_mailSubject' + window_No + '" style="display:none;">' + result.Title + '</p>' +
-                        '<div class="VIS-conversation"><div class="VIS-message" id="VIS_mailBody' + window_No + '">' + result.Detail +
+                        '<div class="VIS-conversation"><pre class="VIS-message" id="VIS_mailBody' + window_No + '">' + result.Detail +
                         //'<p id="VIS_mailBody' + window_No + '">' + result.Detail + '</p>' +
-                        '</div></div></section></div >' +
+                        '</pre></div></section></div >' +
 
                         '<section class="VIS-comments-section">' +
                         '<div class="VIS-comment-header"><h2>Comments</h2></div>' +
