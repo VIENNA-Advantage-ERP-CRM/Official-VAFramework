@@ -379,7 +379,7 @@ namespace VAModelAD.Model
                 ShareRecordManager.Get(p_ctx).ShareChild(p_ctx, po);
 
                 // vis0008 Check and update changes for AI Assistant
-                if (Env.IsModuleInstalled("VAI01_"))
+                if (Env.IsModuleInstalled("VAI01_") && (MTable.Get_Table_ID("VAI01_AIAssistant") > 0) && !po.SkipAIAssistantThreadUpdate)
                 {
                     AssistantRecordThread.Get().CreateUpdateThread(p_ctx, po, newRecord);
                 }
