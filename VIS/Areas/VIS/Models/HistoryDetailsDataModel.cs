@@ -140,7 +140,7 @@ namespace VIS.Models
                         JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY 
                         WHERE aa.ISACTIVE = 'Y' 
                         AND aa.AD_TABLE_ID = " + _AD_Table_ID + "   AND aa.RECORD_ID = " + RecordId);
-
+                        
             if (Env.IsModuleInstalled("VA048_"))
             {
                 sql.Append(@" UNION ALL 
@@ -336,6 +336,14 @@ namespace VIS.Models
                         JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY 
                         WHERE aa.ISACTIVE = 'Y' AND aa.AD_TABLE_ID = " + _AD_Table_ID + "   AND aa.RECORD_ID = " + RecordId);
 
+            if (Env.IsModuleInstalled("WSP_"))
+            {
+                sql.Append(@" UNION ALL
+                        SELECT COUNT(ct.WSP_SMChatTopic_ID) AS ID, 'SOCIALINBOX' AS TYPE
+                        FROM WSP_SMChatIdentifier ci 
+                        INNER JOIN WSP_SMChatTopic ct ON (ci.WSP_SMChatIdentifier_ID=ct.WSP_SMChatIdentifier_ID)
+                        WHERE ci.IsActive='Y' AND ct.AD_Table_ID=" + _AD_Table_ID + "   AND ct.Record_ID=" + RecordId);
+            }
             if (Env.IsModuleInstalled("VA048_"))
             {
                 sql.Append(@" UNION ALL
@@ -780,6 +788,14 @@ namespace VIS.Models
             }
 
             return lstChat;
+        }
+
+        public string GetUserImage(int user_id)
+        {
+            string sql = @"SELECT i.ImageUrl FROM AD_User u
+            INNER JOIN AD_Image i ON (u.AD_Image_ID=i.AD_Image_ID)
+            WHERE u.AD_User_ID=" + user_id;
+            return Util.GetValueOfString(DB.ExecuteScalar(sql));
         }
 
         /// <summary>

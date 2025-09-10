@@ -5,7 +5,7 @@
 
     function VTabPanel(windowNo, wWidth) {
 
-       // this.defaultObj = null; // it sontain obj if all tab panel is aligned to bootom or right old
+        // this.defaultObj = null; // it sontain obj if all tab panel is aligned to bootom or right old
         this.specialObj = null; // it contain right aligmed tab panels ( deafault obj conatin bootom aligned TP)
 
 
@@ -15,7 +15,7 @@
         this.isShowAll = false;
         this.curTabPanel = null;
         this.windowNo = windowNo;
-      
+
 
         var clone = document.importNode(tmpTabPnl, true);
 
@@ -29,7 +29,7 @@
 
         this.isClosed = true;
 
-        
+
         if (wWidth <= 25) {
             if (wWidth <= 0)
                 wWidth = 75;
@@ -39,13 +39,13 @@
         else if (wWidth > 75)
             wWidth = 75
 
-       
-            wWidth = 100 - wWidth;
+
+        wWidth = 100 - wWidth;
         wWidth = ($(document).width() * wWidth) / 100;
         this.width = wWidth;
-        
 
-    /********************************* END Tab Panels ***********************************/
+
+        /********************************* END Tab Panels ***********************************/
         var self = this;
         var selLI = null;
 
@@ -61,12 +61,12 @@
             $divContent.empty();
 
             if ($target) {
-                selLI= $target.addClass('vis-ad-w-p-ap-tp-o-li-selected');
+                selLI = $target.addClass('vis-ad-w-p-ap-tp-o-li-selected');
                 $spnName.text($target.data('name'));
                 var pnl = self.initalizeTabPanel($target.data('cname'), windowNo, $target.data('extrainfo'));
                 self.resetTabPanel(pnl);
             }
-            else 
+            else
                 self.resetTabPanel(null);
             if (self.curTabPanel) {
                 $divContent.append(self.curTabPanel.getRoot());
@@ -78,7 +78,7 @@
 
         $spnClose.on("click", function () {
             setContent(null);
-            
+
         });
         this.getBody = function () {
             return $divBody;
@@ -168,7 +168,7 @@
                         });
 
                         $divContent.css({
-                            'height': $outerwrap.height()-35 +'px',
+                            'height': $outerwrap.height() - 35 + 'px',
                             'width': size - 35 + 'px',
                             'overflow': 'auto'
                         });
@@ -223,7 +223,7 @@
             if (this.isClosed) {
                 return;
             }
-                var    size = this.width;
+            var size = this.width;
             var tWidth = $outerwrap.closest('.vis-ad-w-p-center').width() - 25;
             var height = $outerwrap.closest('.vis-ad-w-p-center').height() - 40;
             //if (this.isSpecial) {
@@ -275,7 +275,7 @@
                     //    'width': size + 'px'
                     //});
 
-                    $outerwrap.attr('style', 'height:calc(100% - ' + hHgt + 'px) ; width:'+size+'px');
+                    $outerwrap.attr('style', 'height:calc(100% - ' + hHgt + 'px) ; width:' + size + 'px');
 
                     $divContent.css({
                         'height': $outerwrap.height() - 35 + 'px',
@@ -331,7 +331,7 @@
      */
     VTabPanel.prototype.init = function (gTab, isSpecial) {
         this.gTab = gTab;
-        var panels = null;  
+        var panels = null;
         var self = this;
         if (isSpecial) {
             var panels = this.gTab.getTabPanelsRght();
@@ -345,7 +345,7 @@
             this.specialObj.addSizeChangeListner(this.sizeChangedListner);
             this.specialObj.parent = this;
             this.specialObj.init(gTab, true);
-            
+
             this.isHorizontalAligned = true;
             this.isShowAll = this.gTab.getIsTPBottomShowAll();
             panels = this.gTab.getTabPanelsBotm();
@@ -398,58 +398,60 @@
             if (!body.is('.ui-resizable')) {
                 //window.setTimeout(function () {
                 body.resizable({
-                        handles: 'w',
+                    handles: 'w',
                     ghost: true,
                     //animation: true,
-                        minWidth: 300,
-                        maxWidth: 1000,
-                        //width: 'auto',
+                    minWidth: 300,
+                    maxWidth: 1000,
+                    //width: 'auto',
 
-                        resize: function (event, ui) {
-                            //self.panelWidth = ui.size.width;
-                            //incTab.css({ 'position': 'absolute', "left": "", "z-index": "99" });
-                            //incTab.css('flex-basis', ui.size.width + 'px');
-                            //incTab.css('width', ui.size.width + 'px');
-                            //contectDiv.css({
-                            //    // 'flex-basis': ui.size.width + 'px',
-                            //    'width': ui.size.width - 35 + 'px',
-                            //});
-                        },
-                        start: function (event, ui) {
-                            // incTab.css({ 'position': 'absolute', "z-index": "99" });
-                            //windowWidth=
-                        },
-                        stop: function (event, ui) {
-                            incTab.css({
-                                // 'flex-basis': ui.size.width + 'px',
-                                'width': ui.size.width + 'px',
-                            });
+                    resize: function (event, ui) {
+                        //self.panelWidth = ui.size.width;
+                        //incTab.css({ 'position': 'absolute', "left": "", "z-index": "99" });
+                        //incTab.css('flex-basis', ui.size.width + 'px');
+                        //incTab.css('width', ui.size.width + 'px');
+                        //contectDiv.css({
+                        //    // 'flex-basis': ui.size.width + 'px',
+                        //    'width': ui.size.width - 35 + 'px',
+                        //});
+                    },
+                    start: function (event, ui) {
+                        // incTab.css({ 'position': 'absolute', "z-index": "99" });
+                        //windowWidth=
+                    },
+                    stop: function (event, ui) {
+                        incTab.css({
+                            // 'flex-basis': ui.size.width + 'px',
+                            'width': ui.size.width + 'px',
+                        });
 
-                            body.css({
-                                // 'flex-basis': ui.size.width + 'px',
-                                'width': '',
-                                'left': '',
-                                'height': ''
-                            });
+                        body.css({
+                            // 'flex-basis': ui.size.width + 'px',
+                            'width': '',
+                            'left': '',
+                            'height': ''
+                        });
 
-                            contectDiv.css({
-                                // 'flex-basis': ui.size.width + 'px',
-                                'width': ui.size.width - 35 + 'px',
-                            });
-                            if (self.sizeChangedListner && self.sizeChangedListner.onSizeChanged)
-                                self.sizeChangedListner.onSizeChanged();
-
+                        contectDiv.css({
+                            // 'flex-basis': ui.size.width + 'px',
+                            'width': ui.size.width - 35 + 'px',
+                        });
+                        if (self.sizeChangedListner && self.sizeChangedListner.onSizeChanged)
+                            self.sizeChangedListner.onSizeChanged();
+                        if (self.curTabPanel.sizeChanged) {
+                            self.curTabPanel.sizeChanged(ui.size.width - 35);
                         }
-                    })
-               // }, 1000); //wait for dom to be ready
+                    }
+                })
+                // }, 1000); //wait for dom to be ready
             }
         }
     };
 
-  /**
-   * append all tab panel in conatiner
-   * @param {any} panels
-   */
+    /**
+     * append all tab panel in conatiner
+     * @param {any} panels
+     */
     VTabPanel.prototype.appedAllPanel = function (panels) {
         //remove border
 
@@ -473,7 +475,7 @@
                         html += "<span class='vis-ad-w-p-ap-tp-body-head-img'>" +
                             "<i class='" + iconPath + "'></i></span>";
                     }
-                     html+="<span class='vis-ad-w-p-ap-tp-body-head-txt'> "
+                    html += "<span class='vis-ad-w-p-ap-tp-body-head-txt'> "
                         + panels[i].getName()
                         + "</span></div>";
                     contectDiv.append(html).append(panel.getRoot());
@@ -491,7 +493,7 @@
 
     VTabPanel.prototype.addSizeChangeListner = function (lsner) {
         this.sizeChangedListner = lsner;
-        
+
     };
 
     VTabPanel.prototype.selectTabPanelByName = function (name) {
@@ -516,7 +518,7 @@
      * @param {any} extrainfo  additional info if any
      */
     VTabPanel.prototype.initalizeTabPanel = function (className, windowNo, extrainfo) {
-            
+
         var panel = null;
         if (className) {
             var type = VIS.Utility.getFunctionByName(className, window);
@@ -528,7 +530,7 @@
                 }
             }
         }
-       
+
         return panel;
     };
 
@@ -540,16 +542,16 @@
      */
 
 
-    VTabPanel.prototype.refreshPanelData = function (rec_Id,dataRow,action) {
+    VTabPanel.prototype.refreshPanelData = function (rec_Id, dataRow, action) {
 
 
         if (this.curTabPanel) {
-            this.curTabPanel.refreshPanelData(rec_Id, dataRow,action);
+            this.curTabPanel.refreshPanelData(rec_Id, dataRow, action);
         }
         else {
             for (var i = 0; i < this.tabPanels.length; i++) {
 
-                this.tabPanels[i].refreshPanelData(rec_Id, dataRow,action);
+                this.tabPanels[i].refreshPanelData(rec_Id, dataRow, action);
 
             }
         }
