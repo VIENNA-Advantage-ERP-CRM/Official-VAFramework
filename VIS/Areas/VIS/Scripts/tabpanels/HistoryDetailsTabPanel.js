@@ -9,7 +9,7 @@
         this.curTab = null;
         this.selectedRow = null;
         this.panelWidth;
-
+        var $self = this;
         var $root = $('<div class="VIS-root-div"></div>');
         var $html, $rootcontent, $htmlcontent, $printhtml, $footerhtml, $paginghtml, $commentshtml;
         var $tpdataloader;
@@ -47,6 +47,13 @@
             else {
                 $('#VIS_HistoryGrd' + window_No).css("height", (outerwrapheight - (divHeadheight + pagingHtmlheight)));
             }
+
+            if ($root.width() <= 500) {
+                $html.find('#VIS_HistoryTabs' + window_No).addClass('VIS-hide-tabs');
+            }
+            else {
+                $html.find('#VIS_HistoryTabs' + window_No).removeClass('VIS-hide-tabs');
+            }
         }
 
         /**   Intialize UI Elements  */
@@ -58,15 +65,15 @@
                 //'<button class="VIS-btn-close"><span class="vis vis-cross"></span></button>' +
                 //'</header>' +
                 '<nav class="VIS-activities-nav">' +
-                '<div class="nav nav-tabs" id="nav-tab" role="tablist">' +
+                '<div class="nav nav-tabs" id="VIS_HistoryTabs' + this.windowNo + '" role="tablist">' +
                 '<a class="VIS-nav-item active" id="all" data-toggle="tab" href="#VIS-all_' + this.windowNo + '" role="tab" aria-controls="all" aria-selected="true">' + VIS.Msg.getMsg("All") + '</a>' +
-                '<a class="VIS-nav-item" id="appointment" data-toggle="tab" href="#VIS-appointment_' + this.windowNo + '" role="tab" aria-controls="appointment" aria-selected="false"><i class="fa fa-calendar-o"></i>' + VIS.Msg.getMsg("Appointments") + '<span class="badge">0</span></a>' +
-                '<a class="VIS-nav-item" id="email" data-toggle="tab" href="#VIS-emails_' + this.windowNo + '" role="tab" aria-controls="emails" aria-selected="false"><i class="vis vis-email"></i>' + VIS.Msg.getMsg("Emails") + '<span class="badge">0</span></a>' +
-                '<a class="VIS-nav-item" id="call" data-toggle="tab" href="#VIS-calls_' + this.windowNo + '" role="tab" aria-controls="calls" aria-selected="false"> <i class="fa fa-phone"></i>' + VIS.Msg.getMsg("Calls") + '<span class="badge">0</span></a>' +
-                '<a class="VIS-nav-item" id="chat" data-toggle="tab" href="#VIS-notes_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="fa fa-sticky-note-o"></i>' + VIS.Msg.getMsg("Notes") + '<span class="badge">0</span></a>' +
-                '<a class="VIS-nav-item" id="task" data-toggle="tab" href="#VIS-tasks_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="vis vis-task"></i>' + VIS.Msg.getMsg("Tasks") + '<span class="badge">0</span></a>' +
-                '<a class="VIS-nav-item" id="letter" data-toggle="tab" href="#VIS-letters_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="vis vis-letter"></i>' + VIS.Msg.getMsg("Letters") + '<span class="badge">0</span></a>' +
-                //'<a class="VIS-nav-item" id="inbox" data-toggle="tab" href="#VIS-inbox_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="fa fa-inbox"></i>' + VIS.Msg.getMsg("Inbox") + '<span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="appointment" data-toggle="tab" href="#VIS-appointment_' + this.windowNo + '" role="tab" aria-controls="appointment" aria-selected="false"><i class="fa fa-calendar-o"></i><span class="VIS-tab-names">' + VIS.Msg.getMsg("Appointments") + '</span><span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="email" data-toggle="tab" href="#VIS-emails_' + this.windowNo + '" role="tab" aria-controls="emails" aria-selected="false"><i class="vis vis-email"></i><span class="VIS-tab-names">' + VIS.Msg.getMsg("Emails") + '</span><span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="call" data-toggle="tab" href="#VIS-calls_' + this.windowNo + '" role="tab" aria-controls="calls" aria-selected="false"> <i class="fa fa-phone"></i><span class="VIS-tab-names">' + VIS.Msg.getMsg("Calls") + '</span><span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="chat" data-toggle="tab" href="#VIS-notes_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="fa fa-sticky-note-o"></i><span class="VIS-tab-names">' + VIS.Msg.getMsg("Notes") + '</span><span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="task" data-toggle="tab" href="#VIS-tasks_' + this.windowNo + '" role="tab" aria-controls="notes" aria-selected="false"> <i class="vis vis-task"></i><span class="VIS-tab-names">' + VIS.Msg.getMsg("Tasks") + '</span><span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="letter" data-toggle="tab" href="#VIS-letters_' + this.windowNo + '" role="tab" aria-controls="letters" aria-selected="false"> <i class="vis vis-letter"></i><span class="VIS-tab-names">' + VIS.Msg.getMsg("Letters") + '</span><span class="badge">0</span></a>' +
+                '<a class="VIS-nav-item" id="socialinbox" data-toggle="tab" href="#VIS-socialinbox_' + this.windowNo + '" role="tab" aria-controls="socials" aria-selected="false"><i class="vis vis-users-o"></i><span class="VIS-tab-names">' + VIS.Msg.getMsg("WSP_SocialInbox") + '</span><span class="badge">0</span></a>' +
                 '</div>' +
                 '</nav>' +
                 '<div class="tab-content" id="nav-tabContent">' +
@@ -77,7 +84,7 @@
                 '<div class="tab-pane fade" id="VIS-notes_' + this.windowNo + '" role="tabpanel" aria-labelledby="notes-tab"></div>' +
                 '<div class="tab-pane fade" id="VIS-tasks_' + this.windowNo + '" role="tabpanel" aria-labelledby="tasks-tab"></div>' +
                 '<div class="tab-pane fade" id="VIS-letters_' + this.windowNo + '" role="tabpanel" aria-labelledby="latters-tab"></div>' +
-                //'<div class="tab-pane fade" id="VIS-inbox_' + this.windowNo + '" role="tabpanel" aria-labelledby="inbox-tab"></div>' +
+                '<div class="tab-pane fade" id="VIS-socialinbox_' + this.windowNo + '" role="tabpanel" aria-labelledby="socialinbox-tab"></div>' +
                 '</div></div>');
 
             //$rootcontent = $('<div id="VIS_recordDetail' + this.windowNo + '" style="display:none;" class="VIS-tp-detailsPanel"></div>');
@@ -100,7 +107,11 @@
             $html.find('a').on('click', function (e) {
                 e.preventDefault();
                 getGridDataRecordCount(_selectedId, tableID);
-                loadHistoryData(_selectedId, 0, window_No, tableID, $(this));
+                if ($(this).attr('id') == "socialinbox") {
+                    renderSocialInbox(_selectedId, 0, window_No, tableID, $(this));
+                } else {
+                    loadHistoryData(_selectedId, 0, window_No, tableID, $(this));
+                }
             });
         };
 
@@ -170,7 +181,7 @@
                         //$('#VIS_ddlPages' + window_No).empty();
                         //setPages(RecordId, 0);
                         for (var i = 0; i < res.length; i++) {
-                            $($html.find("a[id=" + res[i].type.toLower() + "]")).find('span').text(res[i].count);
+                            $($html.find("a[id=" + res[i].type.toLower() + "]")).find('span.badge').text(res[i].count);
                         }
                     };
                 },
@@ -250,8 +261,7 @@
         function renderHistoryData(res, window_No, target) {
             $html.find('.tab-pane').empty();
             if (res.length > 0) {
-                var $recshtml = $('<div class="VIS-timeline-section">' +
-                    '</div>');
+                var $recshtml = $('<div class="VIS-timeline-section"></div>');
 
                 var $rechtml;
                 var $detHtml;
@@ -836,6 +846,190 @@
             }
         }
 
+        function renderSocialInbox(RecordId, selPage, window_No, TableId, target) {
+            $html.find('.tab-pane').empty();
+            $('#VIS_tabPanelDataLoader' + window_No).show();
+            var $recshtml = $('<div class="VIS-timeline-section"></div>');
+            var $rechtml = $('<div class="VIS-social-inbox" id="VIS_socialinbox' + window_No + '">' +
+                '<div class="VIS-social-tab-content">' +
+                '<div class="VIS-social-tabs">' +
+                '<ul class="nav nav-tabs" id="myTab" role="tablist">' +
+                '<li class="nav-item">' +
+                '<a class="nav-link WSP-whatsapp-link WSP-active-link active show" id="whatsapp_' + window_No + '" data-toggle="tab" ' +
+                'data-provider="WHATSAPP" href="#whatsapp" role="tab" aria-controls="tab" aria-selected="false">' +
+                '<i class="fa fa-whatsapp" aria-hidden="true"></i></a>' +
+                '</li>' +
+                '<li class="nav-item">' +
+                '<a class="nav-link WSP-linkedin-link WSP-active-link" id="linkedin_' + window_No + '" data-toggle="tab" href="#linkedin" ' +
+                'data-provider="LINKEDIN" role="tab" aria-controls="tab" aria-selected="true"><i class="fa fa-linkedin" aria-hidden="true"></i></a>' +
+                '</li>' +
+                //'<li class="nav-item">' +
+                //'<a class="nav-link WSP-instagram-link" id="instagram-tab" data-toggle="tab" href="#instagram" role="tab" aria-controls="tab" aria-selected="false"><i class="fa fa-instagram" aria-hidden="true"></i></a>' +
+                //'</li>' +
+                //'<li class="nav-item">' +
+                //'<a class="nav-link WSP-share-link" id="share-tab" data-toggle="tab" href="#share" role="tab" aria-controls="tab" aria-selected="false"><i class="fa fa-paper-plane" aria-hidden="true"></i></a>' +
+                //'</li>' +
+                '</ul>' +
+                '<div class="VIS-tab-content fade show" id="whatsapp" role="tabpanel" aria-labelledby="all-tab">' +
+                //'<div class="WSP-num-dropdown">' +
+                //'<select name="" id="WSP_AccountList_' + window_No + '"></select >' +
+                //'</div>' +
+                '<ul class="VIS-user-list-items">' +
+                '</ul>' +
+                '</div>' +
+                '</div>' +
+                '<div class="VIS-chat-message">' +
+                '<div class="WSP-chatbox-header">' +
+                '<a href="#" id="VIS_btnBack_' + window_No + '" class="VIS-back-link">' +
+                '<span class="vis vis-back"></a>' +
+                '<h6></h6 > ' +
+                '</div>' +
+                '<div class="VIS-chat-content">' +
+                '</div>' +
+                '</div>' +
+                '</div>');
+            $recshtml.append($rechtml);
+            target = $html.find(target.attr('href'));
+            target.append($recshtml);
+            ShowChatIdentifier(target, RecordId, TableId, "", selPage);
+
+            $rechtml.find('li a').click(function () {
+                $('#VIS_tabPanelDataLoader' + window_No).show();
+                ShowChatIdentifier(target, RecordId, TableId, $(this).data('provider'), selPage);
+            });
+
+            $html.find('#VIS_btnBack_' + window_No).on(VIS.Events.onTouchStartOrClick, function () {
+                $rechtml.find('.VIS-social-tab-content').removeClass('active');
+            });
+        }
+
+        function ShowChatIdentifier(target, RecordId, TableId, type, selPage) {
+            var divSMChats = target.find('.VIS-user-list-items');
+            target.find('.WSP-chatbox-header h6').text("");
+            target.find('.VIS-chat-content').empty();
+            var acctImg = "", chatImg = "", chatName = "";
+            divSMChats.empty();
+            if ($root.width() <= 500) {
+                $html.find('.VIS-social-tab-content').addClass('VIS-hide-chat');
+            }
+            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetChatHistoryDetails",
+                { UserId: VIS.context.getAD_User_ID(), RecordId: RecordId, AD_Table_ID: TableId, Type: type, CurrentPage: selPage },
+                function (dr) {
+                    if (dr != null && dr.length > 0) {
+                        VIS.dataContext.getJSONData(VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetUserImage",
+                            { User_ID: VIS.context.getAD_User_ID() }, function (data) {
+                                acctImg = VIS.Application.contextUrl + (data != "" ? data : "Areas/WSP/Images/dummy.jpg");
+                            });
+                        for (var i = 0; i < dr.length; i++) {
+                            divSMChats.append('<li data-chatid="' + dr[i].ChatID + '" data-chatident_id="' +
+                                dr[i].SMIdentifierID + '" data-chattopicid="' + dr[i].SMTopicID +
+                                '" data-mobile="' + dr[i].Mobile + '" data-name="' + dr[i].Name +
+                                '" data-userid="' + dr[i].AD_User_ID + '" data-date="' +
+                                new Date(dr[i].ChatDate).toLocaleDateString() + '">' +
+                                '<div class="WSP-left-user-content">' +
+                                '<img src="' + VIS.Application.contextUrl + (dr[i].ImageUrl != "" ? dr[i].ImageUrl
+                                    : "Areas/WSP/Images/dummy.jpg") + '" alt="">' +
+                                '<div class="WSP-group-text">' +
+                                '<h1>' + dr[i].Name + '</h1>' +
+                                //'<p>Ok Thanks</p>' +
+                                '</div>' +
+                                '</div>' +
+                                '<div class="WSP-right-content">' +
+                                //'<a href="#" class="WSP-outline-link" data-windowid="' + dr[i].AD_Window_ID +
+                                //'" data-table="' + dr[i].TableName + '" data-tableid="' + dr[i].AD_Table_ID +
+                                //'" data-recordid="' + dr[i].Record_ID + '">' + dr[i].Description + '</a>' +
+                                '<div class="WSP-msg-date">' + new Date(dr[i].ChatDate).toLocaleDateString() + '</div>' +
+                                '</div>' +
+                                '</li>');
+                        }
+
+                        divSMChats.find('li').on(VIS.Events.onTouchStartOrClick, function () {
+                            $('#VIS_tabPanelDataLoader' + window_No).show();
+                            $(this).find('.WSP-msg-count').remove();
+                            divSMChats.find('li').removeClass('WSP-selected-chat');
+                            $(this).addClass('WSP-selected-chat');
+                            $(this).removeClass('WSP-unread-chat');
+                            var chatID = $(this).data("chatid");
+                            var mobile = $(this).data("mobile");
+                            var chatTopicID = $(this).data("chattopicid");
+                            chatName = $(this).data("name");
+                            chatImg = $(this).find('img').attr("src");
+                            target.find('.WSP-chatbox-header h6').text(chatName);
+                            if ($root.width() <= 500) {
+                                $html.find('#VIS_btnBack_' + window_No).show();
+                                $html.find('.VIS-social-tab-content').addClass('active');
+                            }
+                            ShowChatMessages(target, chatTopicID, acctImg, chatImg, chatName);
+                        });
+
+                        //$(divSMChats.find('li')[0]).trigger('click');
+                    }
+                    $('#VIS_tabPanelDataLoader' + window_No).hide();
+                });
+        }
+
+        function ShowChatMessages(target, chatTopicID, acctImg, chatImg, chatName) {
+            var divSMMessages = target.find('.VIS-chat-content');
+            $('#VIS_tabPanelDataLoader' + window_No).show();
+            VIS.dataContext.getJSONData(VIS.Application.contextUrl + "WSP/Inbox/GetChatMessage",
+                { ChatTopicID: chatTopicID }, function (dr) {
+                    divSMMessages.empty();
+                    if (dr != null && dr.length > 0) {
+                        for (var i = 0; i < dr.length; i++) {
+                            var msgContent = "";
+                            var filetype = "";
+                            if (dr[i].TextMsg != "") {
+                                msgContent = '<div class="WSP-chat-items"><p>' + dr[i].TextMsg + '</p></div>';
+                            }
+                            if (dr[i].IsAttachment == "Y") {
+                                filetype = dr[i].FileType;
+                                if (filetype.toLower() == '.doc' || filetype.toLower() == '.docx') {
+                                    filetype = "vis vis-doc-word";
+                                }
+                                else if (filetype.toLower() == '.xls' || filetype.toLower() == '.xlsx') {
+                                    filetype = "vis vis-doc-excel";
+                                }
+                                else if (filetype.toLower() == '.ppt' || filetype.toLower() == '.pptx') {
+                                    filetype = "vis vis-doc-pp";
+                                }
+                                else if (filetype.toLower() == '.pdf') {
+                                    filetype = "vis vis-doc-pdf";
+                                }
+                                else if (filetype.toLower() == '.txt') {
+                                    filetype = "vis vis-doc-text";
+                                }
+                                else if (filetype.toLower() == '.png' || filetype.toLower() == '.jpg'
+                                    || filetype.toLower() == '.jpeg' || filetype.toLower() == '.gif') {
+                                    filetype = "vis vis-doc-img";
+                                }
+                                else {
+                                    filetype = "vis vis-doc-img";
+                                }
+                                msgContent += '<div class="WSP-chat-items"><div class="WSP-file-attachment">' +
+                                    '<i class="' + filetype + '" aria-hidden="true"></i>' + dr[i].FileName +
+                                    '<i data-attid="' + dr[i].AD_Attachment_ID + '" data-name="' + dr[i].FileName +
+                                    '" data-id="' + dr[i].ID + '" class="fa fa-download" aria-hidden="true"></i></div></div>';
+                            }
+                            divSMMessages.append('<div class="WSP-userchat-col' + (dr[i].IsSender == "Y" ?
+                                " WSP-chat-alignright" : "") + '">' +
+                                '<div class="WSP-userchat-header">' +
+                                '<img src="' + (dr[i].IsSender == "Y" ? acctImg : chatImg) + '" alt="">' +
+                                '<div class="WSP-chat-user-name">' + (dr[i].IsSender == "Y" ? VIS.Msg.getMsg("Me") : chatName) +
+                                '<span>' + getFormattedDate(dr[i].MessageDate) + '</span></div>' +
+                                '</div>' + msgContent +
+                                '</div>');
+                        }
+                        divSMMessages.find('.fa-download').click(function () {
+                            var attid = $(this).data('attid');
+                            var alineid = $(this).data('id');
+                            var name = $(this).data('name');
+                            downLoadAttachCall(alineid, attid, name);
+                        });
+                    }
+                    $('#VIS_tabPanelDataLoader' + window_No).hide();
+                });
+        }
+
         function showMail(target, ID, UserName, window_No) {
             $.ajax({
                 url: VIS.Application.contextUrl + "VIS/HistoryDetailsData/GetSelectedMailDetails",
@@ -922,9 +1116,9 @@
                         '<section class="VIS-transcript-section">' +
                         /*'<h2>Hello David,</h2>' +*/
                         '<p id="VIS_mailSubject' + window_No + '" style="display:none;">' + result.Title + '</p>' +
-                        '<div class="VIS-conversation"><div class="VIS-message" id="VIS_mailBody' + window_No + '">' + result.Detail +
+                        '<div class="VIS-conversation"><pre class="VIS-message" id="VIS_mailBody' + window_No + '">' + result.Detail +
                         //'<p id="VIS_mailBody' + window_No + '">' + result.Detail + '</p>' +
-                        '</div></div></section></div >' +
+                        '</pre></div></section></div >' +
 
                         '<section class="VIS-comments-section">' +
                         '<div class="VIS-comment-header"><h2>Comments</h2></div>' +
@@ -1779,6 +1973,29 @@
 
         };
 
+        function getFormattedDate(date) {
+            //if (date instanceof Date) {
+            if (date.indexOf('Z') > 0) {
+                date = new Date(date);
+            } else {
+                date = new Date(date + "Z");
+            }
+            date = new Date(date);
+            //}
+            let options = {
+                weekday: 'short',     // "Wed"
+                year: 'numeric',
+                month: 'numeric',     // "6"
+                day: 'numeric',       // "18"
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true          // "4:40 PM"
+            };
+
+            // Format the date
+            return date.toLocaleString(undefined, options);
+        }
+
         function downLoadAllAttach(ID) {
             if (ID == null || ID == 0) {
                 return;
@@ -2162,6 +2379,23 @@
             });
         };
 
+        this.sizeChanged = function (width) {
+            if (width <= 500) {
+                $html.find('#VIS_HistoryTabs' + window_No).addClass('VIS-hide-tabs');
+                if ($html.find('a.active').attr('id') == "socialinbox") {
+                    $html.find('.VIS-social-tab-content').addClass('VIS-hide-chat');
+                    $html.find('#VIS_btnBack_' + window_No).show();
+                }
+            }
+            else {
+                $html.find('#VIS_HistoryTabs' + window_No).removeClass('VIS-hide-tabs');
+                if ($html.find('a.active').attr('id') == "socialinbox") {
+                    $html.find('.VIS-social-tab-content').removeClass('VIS-hide-chat');
+                    $html.find('#VIS_btnBack_' + window_No).hide();
+                }
+            }
+        };
+
         this.disposeComponent = function () {
             this.record_ID = 0;
             this.windowNo = 0;
@@ -2188,6 +2422,7 @@
     /**      * Fired When Size of panel Changed      */
     HistoryDetailsTabPanel.prototype.sizeChanged = function (width) {
         this.panelWidth = width;
+        this.sizeChanged(width);
     };
 
     /**      * Dispose Component      */
