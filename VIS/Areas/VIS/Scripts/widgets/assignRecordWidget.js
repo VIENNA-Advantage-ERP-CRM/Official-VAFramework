@@ -496,12 +496,12 @@
                     '<tr>' +
                     '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_RecordName') + '"><span>' + VIS.Msg.getMsg('VIS_RecordName') + '</span></th>';
                 if (IsPopButAll) {
-                    content += '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_AssignedBy') + '"><span>' + VIS.Msg.getMsg('VIS_AssignedBy') + '</span></th>';
+                    content += '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_AssignedFrom') + '"><span>' + VIS.Msg.getMsg('VIS_AssignedFrom') + '</span></th>';
                 }
                 content += '<th class="vis-widpop-tooltip" title="' + (ListVal == "01" ? message : VIS.Msg.getMsg('VIS_AssignedFrom')) + '"><span>' + (ListVal == "01" ? message : VIS.Msg.getMsg('VIS_AssignedFrom')) + '</span></th>' +
                     '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_OnDate') + '"><span>' + VIS.Msg.getMsg('VIS_OnDate') + '</span></th>';
                 if (ListVal == "01") {
-                    content += '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_Assigned') + '"><span>' + VIS.Msg.getMsg('VIS_Assigned') + '</span></th>';
+                    /*content += '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_Assigned') + '"><span>' + VIS.Msg.getMsg('VIS_Assigned') + '</span></th>';*/
                     content += '<th></th>';
                 }
                 content += '</tr>' +
@@ -523,9 +523,9 @@
                 modelPopupId.find("#appendWidgetDivId" + widgetID).empty().append(content);
                 modelPopupId.show();
                 // Event Bindings (Delegated)
-                $self.bindSearchEvents(modelPopupId, WindowId);
-                $self.bindPopupScroll(modelPopupId, WindowId);
-                $self.bindPopupEvents(modelPopupId, WindowId, TableID);
+                $self.bindSearchEvents(modelPopupId, WindowId, TableID);
+                $self.bindPopupScroll(modelPopupId, WindowId, TableID);
+                $self.bindPopupEvents(modelPopupId, WindowId, TableID, IsPopButAll);
                 if (ListVal == "01") {
                     modelPopupId.find('.modal-content').css("width", "80%");
                 }
@@ -599,7 +599,7 @@
         };
         /**Binded pop events  */
         /**Binded pop events  */
-        this.bindPopupEvents = function (modelPopupId, WindowId, TableID) {
+        this.bindPopupEvents = function (modelPopupId, WindowId, TableID, IsPopButAll) {
             // Close button event
             modelPopupId.off('click', '#popup-close-btn1')
                 .on('click', '#popup-close-btn1', function () {
@@ -653,7 +653,12 @@
                     WindowId = $(this).val();
                     winRecPageNo = 1;
                     TableID = $(this).find('option:selected').data('tableid');
-                    Record_ID = $(this).find('option:selected').data('recordid');
+                    if (IsPopButAll) {
+                        Record_ID = "";
+                    }
+                    else {
+                        Record_ID = $(this).find('option:selected').data('recordid');
+                    }
                     TableName = $(this).find('option:selected').data('tablename');
                     WindowName = $(this).find('option:selected').data('windowname');
                     WindowId = $(this).find('option:selected').data('windowid');
@@ -680,13 +685,14 @@
             }
         }
         // Search Event Binding (Delegated)
-        this.bindSearchEvents = function (modelPopupId, WindowId) {
+        this.bindSearchEvents = function (modelPopupId, WindowId, TableID) {
             // Search button
             modelPopupId.off('click', '#VIS_SrchBtn_' + widgetID)
                 .on('click', '#VIS_SrchBtn_' + widgetID, function () {
                     SrchTxt = modelPopupId.find('#VIS_SrchTxtbx_' + widgetID).val();
                     IsItemSearched = true;
                     winRecPageNo = 1;
+                    TableID = modelPopupId.find("#vis-asrec-windowDropdown").find('option:selected').data("tableid");
                     WindowId = modelPopupId.find('.vis-header-title').find('#vis-asrec-windowDropdown').val();
                     $self.GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, SrchTxt, IsFromPopUp, IsPopButAll, modelPopupId);
                 });
@@ -703,7 +709,7 @@
 
 
         // Popup Scroll Binding (Infinite Scroll)
-        this.bindPopupScroll = function (modelPopupId, WindowId) {
+        this.bindPopupScroll = function (modelPopupId, WindowId, TableID) {
             /*            var scrollContainerSelector = '#vis-asrec-popup-scroll_' + widgetID;*/
 
             modelPopupId.find('#vis-asrec-popup-scroll_' + widgetID).off('scroll').on('scroll', function () {
@@ -713,6 +719,7 @@
                 if ($this[0].scrollHeight - $this.scrollTop() - $this.outerHeight() < 20) {
                     IsDataFetching = true;
                     winRecPageNo += 1;
+                    TableID = modelPopupId.find("#vis-asrec-windowDropdown").find('option:selected').data("tableid");
                     WindowId = modelPopupId.find('.vis-header-title').find('#vis-asrec-windowDropdown').val();
                     $self.GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, SrchTxt, IsFromPopUp, IsPopButAll, modelPopupId);
                 }
