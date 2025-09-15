@@ -246,6 +246,7 @@
     <Compile Include="ModelAD\html\MRole.cs" />
     <Compile Include="ModelAD\html\MTableAccess.cs" />
     <Compile Include="ModelAD\MAccessLog.cs" />
+    <Compile Include="ModelAD\MAdditionalInformation.cs" />
     <Compile Include="ModelAD\MAppointment.cs" />
     <Compile Include="ModelAD\MAppointmentsInfo.cs" />
     <Compile Include="ModelAD\MArchive.cs" />
@@ -382,6 +383,7 @@
     <Compile Include="ModelAD\X_AD_Widget.cs" />
     <Compile Include="ModelAD\X_AD_WidgetField.cs" />
     <Compile Include="ModelAD\X_AD_Widget_Access.cs" />
+    <Compile Include="ModelAD\X_VIS_AdditionalInformation.cs" />
     <Compile Include="ModelAD\X_VIS_AssignedRecordToUser.cs" />
     <Compile Include="Model\Callout.cs" />
     <Compile Include="Model\CalloutEngine.cs" />
