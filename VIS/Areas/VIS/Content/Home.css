@@ -4040,3 +4040,102 @@ ul.vis-userLinks-ListMenu li a i {
     top: -8px;
 }
 /*Home Screen Favourites End*/
+
+
+/* Tray area at bottom right */
+.vis-tray-container {
+    position: fixed;
+    bottom: 5px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    z-index: 1200;
+}
+
+/* Up arrow button */
+.vis-tray-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: white;
+    padding: 4px;
+}
+
+/* Popup container */
+.vis-tray-popup {
+    position: absolute;
+    bottom: 20px; /* just above the button */
+    right: 0;
+    background: #fff;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px;
+    display: none;
+    box-shadow: 0px 6px 15px rgba(0,0,0,0.5);
+    min-width: 150px;
+    /* Grid layout */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+    .vis-tray-popup.vis-tray-show {
+        display: grid;
+    }
+
+/* Icon style */
+.vis-tray-icon {
+    width: 32px;
+    height: 32px;
+    background: #555;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .vis-tray-icon:hover {
+        background: #666;
+    }
+
+/* Toast container bottom-right */
+.vis-toast-container {
+    bottom: 65px;
+    position: fixed;
+    right: 50px;
+    z-index: 1000;
+}
+
+/* Custom system-like toast style */
+.system-toast {
+    background-color: #fff !important;
+    color: #000 !important;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+    padding: 12px;
+    position: relative;
+    min-width: 280px;
+    max-width: 360px;
+    max-height:250px;
+    overflow:auto;
+}
+
+    .system-toast .close {
+        position: absolute;
+        right: 3px;
+        top: 0px;
+        color: #666;
+        font-size: 16px;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .system-toast:hover .close {
+        cursor:pointer;
+        opacity: 1;
+    }

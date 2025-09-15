@@ -824,6 +824,7 @@
     <Content Include="Areas\VIS\Scripts\home\favourite.js" />
     <Content Include="Areas\VIS\Scripts\home\home1.js" />
     <Content Include="Areas\VIS\Scripts\home\shortcut.js" />
+    <Content Include="Areas\VIS\Scripts\home\visTrayModule.js" />
     <Content Include="Areas\VIS\Scripts\model\calloutColumn.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processctl.js" />
     <Content Include="Areas\VIS\Scripts\processengine\processinfo.js" />
