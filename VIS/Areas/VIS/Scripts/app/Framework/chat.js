@@ -438,7 +438,17 @@
                 $delIcon.hide();
                 function sendUpdate() {
                     var newText = $input.val().trim();
-                    if (newText.length === 0) return;
+                    //if (newText.length === 0) return;
+                    if (newText.length === 0) {
+                        if ($wrapper.find(".vis-chat-error").length === 0) {
+                            var $errorMsg = $(`<div class="vis-chat-error" style="font-size:0.7rem;margin-bottom:3px;">${VIS.Msg.getMsg("EnterData")}</div>`);
+                            $wrapper.prepend($errorMsg);
+                            setTimeout(() => {
+                                $errorMsg.fadeOut(300, function () { $(this).remove(); });
+                            }, 5000);
+                        }
+                        return false; // 👈 important: signal nothing was updated
+                    }
                     showBusy(true);
                     // AJAX to update chat
                     var encText = VIS.Utility.encodeText(newText);
@@ -467,23 +477,29 @@
                               $ignoreIcon.hide(); // Hide ignore icon*/
                         }
                     });
+                    return true;
                 }
                 // Handle Enter key
                 $input.on("keydown", function (e) {
                     if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault(); // Prevent newline on Enter
-                        sendUpdate();
-                        let $inside = $(this).closest(".vis-chatboxwrap"); // current chat row
-                        $inside.find(".vis-chat-send-update").hide();
-                        $inside.find(".vis-chat-send-undo").hide();
-                        $inside.find(".vis_edit_chat").show();
-                        $inside.find(".vis_del_chat").show();
+                        //   sendUpdate();
+                        let updated = sendUpdate(); // you can make sendUpdate return true/false
+
+                        if (updated) {
+                            $editIcon.show();
+                            $delIcon.show();
+                            $sendIcon.remove();
+                            $undoIcon.remove();
+                        }
+
                     }
                     // If Shift+Enter OR Alt+Enter → allow newline
                     else if (e.key === "Enter" && (e.shiftKey || e.altKey)) {
                         // Let it behave normally (insert newline)
                     }
                 });
+
                 $undoIcon.on("click", function () {
                     let $thisUndo = $(this);
                     let $inside = $thisUndo.closest(".vis-chatboxwrap");
@@ -494,14 +510,17 @@
                     $editIcon.show();
                     $delIcon.show();
                 });
+
                 $sendIcon.on("click", function () {
                     let $thisSend = $(this);                     // the clicked send icon
                     let $wrapper = $thisSend.closest(".vis-chatboxwrap");
-                    sendUpdate();
-                    $wrapper.find(".vis-chat-send-update").hide();   // remove the clicked send icon
-                    $wrapper.find(".vis-chat-send-undo").hide();         // remove undo inside same row
-                    $editIcon.show();
-                    $delIcon.show();
+                    let updated = sendUpdate();
+                    if (updated) {
+                        $wrapper.find(".vis-chat-send-update").hide();   // remove the clicked send icon
+                        $wrapper.find(".vis-chat-send-undo").hide();         // remove undo inside same row
+                        $editIcon.show();
+                        $delIcon.show();
+                    }
                 });
             });
 
