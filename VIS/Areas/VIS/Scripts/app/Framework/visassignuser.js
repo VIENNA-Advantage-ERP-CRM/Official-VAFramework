@@ -28,11 +28,13 @@
         var content = "";
         var contentHtml = null;
         var KeyColumn = null;
+        var RecordCount = 0;
         //Get the object of assigned record widget 
         var assignRecWidgObj = new VIS.VISAssignedRecord;
         //called the function in order to get data
         var result = assignRecWidgObj.GetWindowData(WindowId, table_id, record_id.toString(), 1, windowNo, "", true, false, null)
         if (result != null && result.length > 0) {
+            RecordCount = result[0].countRecords;
             createTabularDesign(result);
         }
 
@@ -72,7 +74,14 @@
         recordInputDiv.append($inputDiv);
         UpperDiv.append(recordInputDiv).append($AssignBtn);
         // bottomDiv.append($cancelBtn).append($okBtn);
-        mainDiv.append($SeeAllRecLink).append(UpperDiv).append(lowerDiv).append(contentHtml);
+        //If no record is their then not show all user link
+        if (RecordCount > 0) {
+            mainDiv.append($SeeAllRecLink).append(UpperDiv).append(lowerDiv).append(contentHtml);
+        }
+        else {
+            
+            mainDiv.append(UpperDiv).append(lowerDiv).append(contentHtml);
+        }
         InitEvents();
         /**
          * This function is used to create the tabular structure
