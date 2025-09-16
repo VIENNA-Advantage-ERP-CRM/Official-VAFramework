@@ -627,7 +627,9 @@ html[dir="rtl"] .vis-a-closeBtnCls.close {
     margin-bottom: 0;
 }
 
-    .VIS-AssignRecordDiv .vis-input-wrap input:not([type="checkbox"]):not([type="radio"]), .vis-input-wrap select, .vis-control-wrap > button {
+    .VIS-AssignRecordDiv .vis-input-wrap input:not([type="checkbox"]):not([type="radio"]),
+    .VIS-AssignRecordDiv .vis-input-wrap select,
+    .VIS-AssignRecordDiv .vis-control-wrap > button {
         height: 26px;
     }
 
