@@ -50,5 +50,22 @@ namespace VAdvantage.Model
             }
             return true;
         }
+
+        protected override bool AfterDelete(bool success)
+        {
+            if (!success)
+                return false;
+
+            string threadID = Common.Common.GetThreadID(GetAD_Table_ID(), GetRecord_ID());
+            if (!string.IsNullOrEmpty(threadID))
+            {
+                if (!ExecuteThreadAction(actionType: ActionType.Delete, tableID: GetAD_Table_ID(), recordID: GetRecord_ID(),
+                    attachmentID: GetVIS_AdditionalInformation_ID(), userID: GetUpdatedBy(), ctx: GetCtx(), threadID: threadID, attachmentType: "i"))
+                {
+                    log.SaveError("", "Error in execution of delete data against Additional Information thread : " + GetVIS_AdditionalInformation_ID());
+                }
+            }
+            return true;
+        }
     }
 }
