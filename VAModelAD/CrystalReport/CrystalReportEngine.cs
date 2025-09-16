@@ -966,6 +966,10 @@ namespace VAdvantage.CrystalReport
                 }
 
                 string FILE_PATH = GlobalVariable.PhysicalPath + "TempDownload";
+                if (Env.IsModuleInstalled("VA112_"))
+                {
+                    FILE_PATH = FILE_PATH +"\\"+ _ctx.GetContext("##HTTPSessionID");
+                }
 
                 if (!Directory.Exists(FILE_PATH))
                     Directory.CreateDirectory(FILE_PATH);

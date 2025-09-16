@@ -1857,7 +1857,7 @@ namespace VAdvantage.Model
                     {
                         if (Directory.Exists(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\" + p_ctx.GetContext("##HTTPSessionID"), FolderKey)))
                         {
-                            Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\" + p_ctx.GetContext("##HTTPSessionID"), FolderKey));
+                            Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload\\" + p_ctx.GetContext("##HTTPSessionID"), FolderKey),true);
                         }
                         return false;
                     }
