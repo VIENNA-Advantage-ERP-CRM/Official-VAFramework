@@ -11,18 +11,18 @@ using static VAModelAD.AIHelper.AIPayload;
 
 namespace VAdvantage.Model
 {
-    public class MAdditionalInformation : X_VIS_AdditionalInformation
+    public class MVISAdditionalInformation : X_VIS_AdditionalInformation
     {
         /**	Logger			*/
-        private static VLogger s_log = VLogger.GetVLogger(typeof(MAdditionalInformation).FullName);
+        private static VLogger s_log = VLogger.GetVLogger(typeof(MVISAdditionalInformation).FullName);
 
-        public MAdditionalInformation(Ctx ctx, DataRow rs, Trx trx)
+        public MVISAdditionalInformation(Ctx ctx, DataRow rs, Trx trx)
            : base(ctx, rs, trx)
         {
 
         }	//	MAdditionalInformation
 
-        public MAdditionalInformation(Ctx ctx, int VIS_AdditionalInformation_ID, Trx trx)
+        public MVISAdditionalInformation(Ctx ctx, int VIS_AdditionalInformation_ID, Trx trx)
             : base(ctx, VIS_AdditionalInformation_ID, trx)
         {
 
@@ -51,6 +51,11 @@ namespace VAdvantage.Model
             return true;
         }
 
+        /// <summary>
+        /// After delete function for the deletion of record
+        /// </summary>
+        /// <param name="success"></param>
+        /// <returns></returns>
         protected override bool AfterDelete(bool success)
         {
             if (!success)
