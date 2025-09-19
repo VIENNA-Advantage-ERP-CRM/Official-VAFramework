@@ -58,6 +58,10 @@ namespace VAModelAD.AIHelper
                 {
                     TableName = "CM_ChatEntry";
                 }
+                else if (attachmentType.ToLower() == "r")
+                {
+                    TableName = MTable.GetTableName(ctx, tableID);
+                }
 
                 int AD_Client_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Client_ID FROM " + TableName + " WHERE " + TableName + "_ID = " + attachmentID));
                 int AD_Role_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Role_ID FROM AD_Role WHERE AD_Client_ID = " + AD_Client_ID + " AND IsAdministrator = 'Y' ORDER BY Created"));

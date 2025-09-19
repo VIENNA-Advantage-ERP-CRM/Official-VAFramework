@@ -409,6 +409,20 @@ namespace VAModelAD.Model
                 if (recordID == 0)
                     recordID = po.Get_IDOld();
                 VAdvantage.Common.ShareRecordManager.DeleteRecordFromWindow(po, recordID);
+
+                // vis0008 Check and update changes for AI Assistant
+                if (Env.IsModuleInstalled("VAI01_") && (MTable.Get_Table_ID("VAI01_AIAssistant") > 0))
+                {
+                    string threadID = Common.GetThreadID(po.Get_Table_ID(), po.Get_ID());
+                    if (!string.IsNullOrEmpty(threadID))
+                    {
+                        if (!VAModelAD.AIHelper.AIPayload.ExecuteThreadAction(actionType: VAModelAD.AIHelper.AIPayload.ActionType.Delete, tableID: po.Get_Table_ID(), recordID: po.Get_ID(),
+                            attachmentID: -1, userID: po.GetUpdatedBy(), ctx: po.GetCtx(), threadID: threadID, attachmentType: "r"))
+                        {
+                            po.GetLog().SaveError("", "Error in execution of delete data against record : " + po.Get_ID() + " for table : " + po.GetTableName());
+                        }
+                    }
+                }
             }
             return success;
         }
