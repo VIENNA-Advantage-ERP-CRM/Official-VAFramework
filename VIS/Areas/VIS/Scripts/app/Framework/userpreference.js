@@ -1128,7 +1128,7 @@
                     SaveGmailContactSettings($txtGmailUsername.val(), $txtGmailPassword.val(), $cmbGmailRole.val(), chkIsUpdateExisting);
                 }, 500);
             });
-         
+
             /* VAI050-  Events for Create Seceret key Section*/
             //CreateApiKey btn click
             $btnCreateKey.on("click", function () {
@@ -1142,9 +1142,10 @@
             });
 
             $btnProjectZoom.on("click", function () {
-                ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "VAAPI_Project" }, null); 
+                ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "VAAPI_Project" }, null);
                 if (ad_window_Id > 0) {
                     const windowParam = {
+                        "TabWhereClause": "VAAPI_Project_ID IN (" + ($cmdProject.val() || 0) + ")",
                         "TabLayout": "N",
                         "TabIndex": "0",
                         "ActionName": "VAAPI_Project",
@@ -1157,8 +1158,8 @@
                     $root = null;
                     $self = null;
                 }
-               
-             
+
+
             });
 
             $btnApiDivClose.on("click", function () {
