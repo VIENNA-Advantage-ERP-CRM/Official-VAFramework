@@ -643,7 +643,7 @@ namespace VIS.Models
         /// <returns></returns>
         public List<LoginData> GetProjects(Ctx ctx)
         {
-            string sql = "SELECT Name,VAAPI_Project_ID FROM VAAPI_Project";
+            string sql = "SELECT Name,VAAPI_Project_ID FROM VAAPI_Project WHERE IsActive='Y' ORDER BY Name";
             try
             {
                 List<LoginData> ld = null;
