@@ -858,7 +858,12 @@
     padding: 0.5rem;
     align-items: start;
     border-bottom: 1px solid #e5e5e5;
+    position: relative;
 }
+
+    .VIS-timeline-item:hover .vis-more-item-col {
+        display: flex;
+    }
 
 .VIS-item-body .VIS-item-content-group h6 {
     font-weight: normal;
@@ -1122,6 +1127,8 @@
     align-items: center;
     margin: auto;
     width: 30px;
+    position: relative;
+    right: 6px;
 }
 
     .VIS-btn-expand:focus {
@@ -1130,6 +1137,9 @@
 
     .VIS-btn-expand i {
         pointer-events: none;
+        font-size: 1.2rem;
+        position: relative;
+        top: -2px;
     }
 
 .VIS-meeting-section {
@@ -1619,3 +1629,70 @@
     .VIS-back-link span {
         pointer-events: none;
     }
+
+.vis-more-item-col {
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translate(0, -50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    display: none;
+}
+
+.vis-more-items {
+    display: flex;
+    padding: 0 4px;
+    text-decoration: none !important;
+}
+
+.vis-more-item-col:hover .vis-more-items ~ .vis-more-dropdown {
+    display: flex;
+}
+
+.vis-more-dropdown {
+    position: absolute;
+    right: 100%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    display: none;
+}
+
+.vis-links-items {
+    background-color: rgba(var(--v-c-on-primary), 1);
+    border-radius: 6px;
+    box-shadow: 0 0px 16px 1px #ccc;
+}
+
+    .vis-links-items a {
+        display: flex;
+        width: 100%;
+        padding: 4px 12px;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.875rem;
+        text-decoration: none !important;
+        white-space: nowrap;
+    }
+
+        .vis-links-items a:hover {
+            background-color: rgba(var(--v-c-primary), 0.1);
+        }
+
+.vis-arrow-tip {
+    width: 0px;
+    height: 0px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid rgba(var(--v-c-on-primary), 1);
+}
+
+.vis-links-items .vis-delete-link {
+    color: rgba(var(--v-c-mandatory), 1);
+}
+
+.vis-delete-link i {
+    pointer-events: none;
+}

@@ -171,6 +171,32 @@
         this.setBusy(false);
     }
 
+    AForm.prototype.openSystemTray = function (className, windowNo) {
+
+        try {
+            var type = "";
+            var isReact = className.split('.');
+            if (isReact[1].toLowerCase() == 'react') {
+                this.componentName = isReact[2];
+                className = isReact[0] + '.' + isReact[1];
+            }           
+            type = VIS.Utility.getFunctionByName(className, window);           
+            var o = new type(windowNo);
+            o.init(windowNo, this);
+            this.mPanel = o;
+            o = null;
+        }
+        catch (e) {
+
+            this.log.log(VIS.Logging.Level.WARNING, "Class=" + className, e)
+            return false;
+
+
+        }
+        this.setBusy(false);
+    }
+
+
     AForm.prototype.widgetSizeChange = function (size) {
         if (this.mPanel && this.mPanel.widgetSizeChange) {
             this.mPanel.widgetSizeChange(size);

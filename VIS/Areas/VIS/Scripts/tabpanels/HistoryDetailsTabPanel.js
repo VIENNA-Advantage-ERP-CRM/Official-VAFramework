@@ -318,6 +318,16 @@
                             //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="email" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '<div class="vis-more-item-col">' +
+                            '<a href="#" class="vis-more-items"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>' +
+                            '<div class="vis-more-dropdown">' +
+                            '<div class="vis-links-items">' +
+                            '<a href="#" data-rid="' + res[i].ID + '" class="vis-delete-link" data-type="' + res[i].Type.toLower() +
+                            '"><i class="fa fa-trash-o" aria-hidden="true"></i>' + VIS.Msg.getMsg('Delete') + '</a>' +
+                            '</div>' +
+                            '<div class="vis-arrow-tip"></div>' +
+                            '</div>' +
+                            '</div>' +
                             '</div>');
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="email" class="VIS-activity-container" style="display:none;"></div>');
                     }
@@ -401,6 +411,16 @@
                             //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="call" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '<div class="vis-more-item-col">' +
+                            '<a href="#" class="vis-more-items"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>' +
+                            '<div class="vis-more-dropdown">' +
+                            '<div class="vis-links-items">' +
+                            '<a href="#" data-rid="' + res[i].ID + '" class="vis-delete-link" data-type="' + res[i].Type.toLower() +
+                            '"><i class="fa fa-trash-o" aria-hidden="true"></i>' + VIS.Msg.getMsg('Delete') + '</a>' +
+                            '</div>' +
+                            '<div class="vis-arrow-tip"></div>' +
+                            '</div>' +
+                            '</div>' +
                             '</div>');
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="call" class="VIS-activity-container" style="display:none;"></div>');
 
@@ -461,7 +481,16 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            //'<div class="VIS-status-container"></div>' +
+                            '<div class="vis-more-item-col">' +
+                            '<a href="#" class="vis-more-items"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>' +
+                            '<div class="vis-more-dropdown">' +
+                            '<div class="vis-links-items">' +
+                            '<a href="#" data-rid="' + res[i].ID + '" class="vis-delete-link" data-type="' + res[i].Type.toLower() +
+                            '"><i class="fa fa-trash-o" aria-hidden="true"></i>' + VIS.Msg.getMsg('Delete') + '</a>' +
+                            '</div>' +
+                            '<div class="vis-arrow-tip"></div>' +
+                            '</div>' +
+                            '</div>' +
                             '</div>');
                         $detHtml = "";
                     }
@@ -504,6 +533,16 @@
                             //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="letter" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '<div class="vis-more-item-col">' +
+                            '<a href="#" class="vis-more-items"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>' +
+                            '<div class="vis-more-dropdown">' +
+                            '<div class="vis-links-items">' +
+                            '<a href="#" data-rid="' + res[i].ID + '" class="vis-delete-link" data-type="' + res[i].Type.toLower() +
+                            '"><i class="fa fa-trash-o" aria-hidden="true"></i>' + VIS.Msg.getMsg('Delete') + '</a>' +
+                            '</div>' +
+                            '<div class="vis-arrow-tip"></div>' +
+                            '</div>' +
+                            '</div>' +
                             '</div>');
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="letter" class="VIS-activity-container" style="display:none;"></div>');
                     }
@@ -577,8 +616,8 @@
                             '<div class="VIS-meeting-section">' +
                             (res[i].MeetingUrl != "" ? '<a class="VIS-meeting-url" href="#" data-joinurl="' + res[i].MeetingUrl + '">' + res[i].MeetingUrl +
                                 '</a><span data-joinurl="' + res[i].MeetingUrl + '" class="VIS-btn-copy" title="' + VIS.Msg.getMsg("CopyUrl") + '"><i class="fa fa-clone"></i></span>' : "") +
-                            '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-uid="' + res[i].UID + '" data-joinurl="' + res[i].MeetingUrl +
-                            '" class="VIS-btn-edit" title="' + VIS.Msg.getMsg("EditAppointment") + '"><i class="fa fa-pencil-square-o"></i></span>' +
+                            //'<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-uid="' + res[i].UID + '" data-joinurl="' + res[i].MeetingUrl +
+                            //'" class="VIS-btn-edit" title="' + VIS.Msg.getMsg("EditAppointment") + '"><i class="fa fa-pencil-square-o"></i></span>' +
                             '</div>' +
                             (res[i].SentimentAnalysis ? '<div class="VIS-Reaction ' + sentimentCls + '"><i class="' + sentimentIcon + '" aria-hidden="true" title="'
                                 + res[i].SentimentAnaylsisReason + '"></i></div>' : '') +
@@ -589,6 +628,19 @@
                             //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="appointment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '<div class="vis-more-item-col">' +
+                            '<a href="#" class="vis-more-items"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>' +
+                            '<div class="vis-more-dropdown">' +
+                            '<div class="vis-links-items">' +
+                            '<a href="#" data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-uid="' + res[i].UID +
+                            '" data-joinurl="' + res[i].MeetingUrl + '" data-type="' + res[i].Type.toLower() +
+                            '" class="VIS-btn-edit"><i class="fa fa-pencil-square-o"></i>' + VIS.Msg.getMsg('EditAppointment') + '</a>' +
+                            '<a href="#" data-rid="' + res[i].ID + '" class="vis-delete-link" data-type="' + res[i].Type.toLower() +
+                            '"><i class="fa fa-trash-o" aria-hidden="true"></i>' + VIS.Msg.getMsg('Delete') + '</a>' +
+                            '</div>' +
+                            '<div class="vis-arrow-tip"></div>' +
+                            '</div>' +
+                            '</div>' +
                             '</div>');
 
                         var divAtt = $('<div class="VIS-items-status-group"></div>');
@@ -652,6 +704,16 @@
                             //'<div class="VIS-status-container"></div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="task" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '<div class="vis-more-item-col">' +
+                            '<a href="#" class="vis-more-items"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>' +
+                            '<div class="vis-more-dropdown">' +
+                            '<div class="vis-links-items">' +
+                            '<a href="#" data-rid="' + res[i].ID + '" class="vis-delete-link" data-type="' + res[i].Type.toLower() +
+                            '"><i class="fa fa-trash-o" aria-hidden="true"></i>' + VIS.Msg.getMsg('Delete') + '</a>' +
+                            '</div>' +
+                            '<div class="vis-arrow-tip"></div>' +
+                            '</div>' +
+                            '</div>' +
                             '</div>');
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="task" class="VIS-activity-container" style="display:none;"></div>');
                     }
@@ -674,6 +736,16 @@
                             '</div>' +
                             '<span data-rid="' + res[i].ID + '" data-username="' + res[i].UserName + '" data-winno="' + window_No +
                             '" data-atype="attachment" data-recid="' + i + '" id="rowId' + i + '" class="VIS-btn-expand"><i class="fa fa-angle-right"></i></span>' +
+                            '<div class="vis-more-item-col">' +
+                            '<a href="#" class="vis-more-items"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>' +
+                            '<div class="vis-more-dropdown">' +
+                            '<div class="vis-links-items">' +
+                            '<a href="#" data-rid="' + res[i].ID + '" class="vis-delete-link" data-type="' + res[i].Type.toLower() +
+                            '"><i class="fa fa-trash-o" aria-hidden="true"></i>' + VIS.Msg.getMsg('Delete') + '</a>' +
+                            '</div>' +
+                            '<div class="vis-arrow-tip"></div>' +
+                            '</div>' +
+                            '</div>' +
                             '</div>');
                         $detHtml = $('<div data-rid="' + res[i].ID + '" data-atype="attachment" class="VIS-activity-container" style="display:none;"></div>');
                     }
@@ -728,6 +800,23 @@
                     else if (record_Type == "CHAT")
                         showChat(rID, userName, window_No);
                     setContentHeight();
+                });
+
+                $html.find(".vis-delete-link").click(function (e) {
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    var target = $(e.target);
+                    $('#VIS_tabPanelDataLoader' + window_No).show();
+                    VIS.dataContext.getJSONData(VIS.Application.contextUrl + "VIS/HistoryDetailsData/DeleteHistoryRecord",
+                        { RecordId: target.data('rid'), Type: target.data('type') }, function (data) {
+                            if (data != "") {
+                                VIS.ADialog.info("", "", data);
+                            }
+                            else {
+                                $(target.parents('.VIS-timeline-item')).remove();
+                            }
+                            $('#VIS_tabPanelDataLoader' + window_No).hide();
+                        });
                 });
 
                 $html.find(".VIS-meeting-url").click(function () {
