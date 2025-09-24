@@ -371,6 +371,48 @@ namespace VIS.Models
         }
 
         /// <summary>
+        /// Delete History Record by passing parameters
+        /// </summary>       
+        /// <param name="RecordId">Record ID</param> 
+        /// <param name="Type">Type ID</param>
+        /// <returns>History Record count</returns>
+        public string DeleteHistoryRecord(Ctx ctx, int RecordId, string Type)
+        {
+            string msg = "";
+            PO att = null;
+            if (Type == "email" || Type == "inbox" || Type == "letter")
+            {
+                att = new MMailAttachment1(ctx, RecordId, null);
+            }
+            else if (Type == "appointment" || Type == "task")
+            {
+                att = new MAppointmentsInfo(ctx, RecordId, null);
+            }
+            else if (Type == "chat")
+            {
+                att = new MChatEntry(ctx, RecordId, null);
+            }
+            else if (Type == "call")
+            {
+                MTable table = MTable.Get(ctx, "VA048_CallDetails");
+                att = table.GetPO(ctx, RecordId, null);
+            }
+            else if (Type == "attachment")
+            {
+                att = new MAttachment(ctx, RecordId, null);
+            }
+            if (att != null)
+            {
+                if (!att.Delete(true))
+                {
+                    ValueNamePair pp = VLogger.RetrieveError();
+                    msg = pp.ToString();
+                }
+            }
+            return msg;
+        }
+
+        /// <summary>
         /// when user click on sent mail record from histort form's Grid, then fetch its information like attachment, to , bccc etc...
         /// </summary>
         /// <param name="ID">ID</param>
