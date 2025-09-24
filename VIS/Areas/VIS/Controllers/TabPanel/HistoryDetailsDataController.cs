@@ -48,6 +48,19 @@ namespace VIS.Controllers
         }
 
         /// <summary>
+        /// Delete History record by passing parameters
+        /// </summary>
+        /// <param name="RecordId">Record ID</param> 
+        /// <param name="Type">Table ID</param>
+        /// <returns>History Record count</returns>
+        public JsonResult DeleteHistoryRecord(string RecordId, string Type)
+        {
+            Ctx ct = Session["ctx"] as Ctx;
+            HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
+            return Json(JsonConvert.SerializeObject(_model.DeleteHistoryRecord(ct, Util.GetValueOfInt(RecordId), Type)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// email details
         /// </summary>
         /// <param name="ID">id</param>
@@ -148,7 +161,7 @@ namespace VIS.Controllers
             Assembly asm = Assembly.Load("WorkspaceSvc");
             Type type = asm.GetType("WorkspaceSvc.Classes.UtilUnipileServices");
             object[] param = new object[4];
-            param[0] = UserId;
+            param[0] = 0;
             param[1] = AD_Table_ID;
             param[2] = RecordId;
             param[3] = Type;
