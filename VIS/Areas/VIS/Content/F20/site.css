@@ -340,6 +340,13 @@ select {
     background-repeat: no-repeat;
     background-position-y: 50%;
 }
+.vis-app-footer-c-r2 {
+    flex: 0;
+    flex-basis: 27px;
+    text-align: center;
+    cursor:pointer;
+    /*background-image: url(../Images/logo.png);*/
+}
 
 /*end footer*/
 

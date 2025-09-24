@@ -1063,9 +1063,17 @@ namespace VIS.Controllers
             return Json(new { count = count,error = error }, JsonRequestBehavior.AllowGet);
         }
         #endregion
+
+
+        public JsonResult GetAppTray()
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            ShortcutHelper shortcutHelper = new ShortcutHelper();
+            var data = shortcutHelper.GetAppTray(ctx);
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
     }
-
-
 
 
 }
