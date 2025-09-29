@@ -412,7 +412,7 @@
             }
             var ListContent = "";
             //for no data
-            if (windowRecords.length === 0) {
+            if (windowRecords.length === 0 || windowRecords[0].IsNoRecFound) {
 
                 $('.vis-assrec-data').empty();
                 ListContent = '<tr><td colspan="4" style="text-align:center; padding: 20px;">' + VIS.Msg.getMsg('NoDataFound') + '</td></tr>';
@@ -516,7 +516,7 @@
                         '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-cancel vis-asrec-btn" id="VIS_Cancel_' + widgetID + '">' + VIS.Msg.getMsg('Cancel') + '</button>' +
                         '</div>' +
                         '<div class="vis-asrec-flyout-footer">' +
-                        '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-ok vis-asrec-btn" id="VIS_Ok_' + widgetID + '">' + VIS.Msg.getMsg('Ok') + '</button>' +
+                        '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-ok vis-asrec-btn vis-disabled-btn" id="VIS_Ok_' + widgetID + '">' + VIS.Msg.getMsg('Ok') + '</button>' +
                         '</div>';
                 }
                 content += '</div>';
@@ -622,11 +622,21 @@
             modelPopupId.off('change', '.vis-asrec-me-row-check')
                 .on('change', '.vis-asrec-me-row-check', function () {
                     var recordID = $(this).data('record_id');
-
                     if ($(this).is(':checked')) {
                         uncheckedIDs = uncheckedIDs.filter(id => id !== recordID);
                     } else if (!uncheckedIDs.includes(recordID)) {
                         uncheckedIDs.push(recordID);
+                    }
+                    /*disable/enable the ok button if user check or uncheck the checkbox */
+                    var totalCheckboxes = modelPopupId.find('.vis-asrec-me-row-check').length;
+                    var checkedCheckboxes = modelPopupId.find('.vis-asrec-me-row-check:checked').length;
+
+                    var $okBtn = modelPopupId.find("#VIS_Ok_" + widgetID);
+
+                    if (checkedCheckboxes < totalCheckboxes) {
+                        $okBtn.prop("disabled", false).removeClass('vis-disabled-btn');
+                    } else {
+                        $okBtn.prop("disabled", true).addClass('vis-disabled-btn');
                     }
                 });
 

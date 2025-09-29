@@ -463,8 +463,11 @@ namespace VIS.Models
         public List<dynamic> GeWindowRecords(Ctx ctx, int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt, string AssignedByOrTo)
         {
             string sql = "";
+            string sqlCTE = "";
             List<dynamic> results = new List<dynamic>();
             string UserCond = AssignedByOrTo == "01" ? " var.AD_User_ID" : " var.UpdatedBy";
+            int countRecords = 0;
+
             // Step 1: Get identifier column(s) for the given TableID
             if (DB.IsPostgreSQL())
             {
@@ -513,15 +516,15 @@ namespace VIS.Models
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 string columnNames = Util.GetValueOfString(ds.Tables[0].Rows[0]["IdentifierColumns"]);  // Final concatenated identifier columns
-
-                sql = $@"WITH LatestUpdates AS (SELECT 
-                              {columnNames} AS IdentiFierVal,
-                              au.Name AS UserName,";
+                 sqlCTE = $@"SELECT
+                              { columnNames}
+                AS IdentiFierVal,
+                 au.Name AS UserName,";
                 if (string.IsNullOrEmpty(Record_ID))
                 {
-                    sql += $@"au1.Name AS AssignedBy, ";
+                    sqlCTE += $@"au1.Name AS AssignedBy, ";
                 }
-                sql += $@" var.Record_ID,
+                sqlCTE += $@" var.Record_ID,
                               var.Updated,
                               ROW_NUMBER() OVER (PARTITION BY var.Record_ID ORDER BY var.Updated DESC) AS rn
                           FROM {ds.Tables[0].Rows[0]["TableName"]} at
@@ -530,20 +533,22 @@ namespace VIS.Models
                 /*Record_ID null means that this is for see all assign user*/
                 if (string.IsNullOrEmpty(Record_ID))
                 {
-                    sql += $@"INNER JOIN AD_User au1 
+                    sqlCTE += $@"INNER JOIN AD_User au1 
                               ON au1.AD_User_ID =var.UpdatedBy ";
                 }
-                sql += $@"INNER JOIN AD_User au 
+                sqlCTE += $@"INNER JOIN AD_User au 
                               ON au.AD_User_ID =" + UserCond + $@"
-                          WHERE " + (!string.IsNullOrEmpty(Record_ID) ? $@"at.{ds.Tables[0].Rows[0]["TableName"]}_ID IN ({Record_ID}) AND " : " ") + $@" var.AD_Window_ID={WindowId}
-                      AND var.Status = 'PDN')
+                          WHERE " + $@" var.AD_Window_ID={WindowId}
+                      AND var.Status = 'PDN'";
+
+                sql = $@"WITH LatestUpdates AS ("+ sqlCTE+@")
                       SELECT IdentiFierVal, UserName, Record_ID, Updated";
                 if (string.IsNullOrEmpty(Record_ID))
                 {
                     sql += $@",AssignedBy ";
                 }
                 sql += @" FROM LatestUpdates
-                      WHERE rn = 1";
+                      WHERE rn = 1 " + (!string.IsNullOrEmpty(Record_ID) ? $@" AND Record_ID IN ({ Record_ID})" : "");
 
                 // Apply optional search text filters
                 if (!string.IsNullOrEmpty(SrchTxt))
@@ -563,16 +568,19 @@ namespace VIS.Models
                 // Step 4: Execute final paged result query
                 ds = DB.ExecuteDataset(sql.ToString(), null, null, pageSize, pageNo);
             }
-
+            if (pageNo == 1)
+            {
+                /*Stored the count of records in order to show see all assigned user link*/
+                countRecords = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sqlCTE + " ) t"));
+            }
             // Step 5: Read data and add to result list
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
-                int countRecords = 0;
 
                 // Get total record count only for first page
                 if (pageNo == 1)
                 {
-                    countRecords = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sql + " ) t"));
+                    countRecords = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sqlCTE + " ) t"));
                 }
 
                 // Read each row and map to dynamic object
@@ -599,6 +607,14 @@ namespace VIS.Models
                     }
                     results.Add(obj);
                 }
+            }
+            /*This code is used to show all assigned user link so that based on count of records*/
+            else
+            {
+                dynamic obj = new ExpandoObject();
+                obj.countRecords = countRecords;
+                obj.IsNoRecFound = true;
+                results.Add(obj);
             }
 
             return results;
