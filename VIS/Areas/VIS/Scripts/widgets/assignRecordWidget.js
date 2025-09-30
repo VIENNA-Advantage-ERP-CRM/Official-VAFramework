@@ -53,6 +53,9 @@
         var RecordCount = 0;
         var uncheckedIDs = [];
         var IsWindowValueChanged = false;
+        /*these variable are used to store value at refresh */
+        var ListValAtRefresh = null;
+        var IsRefreshWid = false;
         /*This variable is defined if function is called from assign user popup */
         var IsFromPopUp = false;
         /*This variable is defined if function is called from assign  user popup and when user 
@@ -70,6 +73,8 @@
             loadWidget();
             //auto refresh widget after interval of 5 minutes
             setInterval(function () {
+                IsRefreshWid = true;
+                ListValAtRefresh = ListVal;
                 $self.refreshWidget();
             }, 1000 * 60 * 5);
         };
@@ -82,8 +87,15 @@
             var $AssignRecordLookUp = VIS.MLookupFactory.get(VIS.Env.getCtx(), $self.windowNo, 0, VIS.DisplayType.List, "VIS_AssignRecordWidgetList", ColumnId, false);
             // Parameters are: columnName, mandatory, isReadOnly, isUpdateable, lookup,display length
             vAssignRecord = new VIS.Controls.VComboBox("VIS_AssignRecordWidgetList", true, false, true, $AssignRecordLookUp, 100);
-            vAssignRecord.setValue('02');
-            ListVal = "02";
+            //if widget is not auto refreshed then keep its value as it is other wise change which was at refresh
+            if (!IsRefreshWid) {
+                ListVal = "02"
+            }
+            else {
+                ListVal = ListValAtRefresh;
+                IsRefreshWid = false;
+            }
+            vAssignRecord.setValue(ListVal);
             var $AssignRecordControlWrap = $('<div class="vis-control-wrap">');
             $AssignRecordDiv.append($AssignRecordControlWrap);
             $AssignRecordControlWrap.append(vAssignRecord.getControl().attr('placeholder', ' ').attr('data-placeholder', '').attr('data-hasbtn', ' '));
@@ -560,7 +572,7 @@
             } else {
                 IsZoomClicked = false;
                 IsItemSearched = false;
-                IsWindowValueChanged = false
+                IsWindowValueChanged = false;
             }
 
             showPopupBusy(false);
