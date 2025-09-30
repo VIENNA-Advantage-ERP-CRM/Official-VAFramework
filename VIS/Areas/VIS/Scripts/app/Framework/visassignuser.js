@@ -89,7 +89,7 @@
          */
         function createTabularDesign(data) {
             result = data ? data : [];
-            if (result.length > 0) {
+            if (result.length > 0 && !result[0].IsNoRecFound) {
                 contentHtml =
                     '<div class="vis-assr-tablediv">' +
                     '<table class="vis-assr-table">' +
@@ -403,7 +403,7 @@
                 data: {
                     AD_User_ID: userNameId,
                     AD_Table_ID: table_id,
-                    Record_ID: unMatchRecords,
+                    Record_ID: record_id,
                     AD_Window_ID: WindowId
                 },
                 dataType: 'json',
@@ -421,6 +421,7 @@
                             });
                         });
                         assignedRecords.push(...result);
+                        VIS.ADialog.info("VIS_RecordIsAssigned");
                         ch.close();
                     }
                     else if (assignedresult == '02') {
@@ -444,7 +445,7 @@
                             }
                         });
 
-
+                        VIS.ADialog.info("VIS_RecordIsAssigned");
 
                         ch.close();
                     }

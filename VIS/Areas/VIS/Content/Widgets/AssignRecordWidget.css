@@ -930,3 +930,7 @@ html[dir="rtl"] .vis-a-closeBtnCls.close {
     margin-bottom: -6px;
     margin-left: 3px;
 }
+.vis-disabled-btn {
+    opacity: 0.5;
+    pointer-events: none;
+}
