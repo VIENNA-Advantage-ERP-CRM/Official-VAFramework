@@ -230,7 +230,7 @@ namespace VIS.Models
                         STRING_AGG(asr.Record_ID::TEXT, ',') AS RecordIDs
                         FROM VIS_AssignedRecordToUser asr
                          INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
-                        INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                        INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
                 }
                 else
                 {
@@ -239,7 +239,7 @@ namespace VIS.Models
                         FROM VIS_AssignedRecordToUser asr
                          INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
                         INNER JOIN AD_Window adw ON (asr.AD_Window_ID = adw.AD_Window_ID)
-                        INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                        INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
                 }
 
                 if (pageNo == 1)
@@ -580,7 +580,7 @@ namespace VIS.Models
                 // Get total record count only for first page
                 if (pageNo == 1)
                 {
-                    countRecords = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sqlCTE + " ) t"));
+                    countRecords = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sql + " ) t"));
                 }
 
                 // Read each row and map to dynamic object

@@ -88,7 +88,13 @@
             // Parameters are: columnName, mandatory, isReadOnly, isUpdateable, lookup,display length
             vAssignRecord = new VIS.Controls.VComboBox("VIS_AssignRecordWidgetList", true, false, true, $AssignRecordLookUp, 100);
             //if widget is not auto refreshed then keep its value as it is other wise change which was at refresh
-            ListVal = !IsRefreshWid ? "02" : ListValAtRefresh;
+            if (!IsRefreshWid) {
+                ListVal = "02"
+            }
+            else {
+                ListVal = ListValAtRefresh;
+                IsRefreshWid = false;
+            }
             vAssignRecord.setValue(ListVal);
             var $AssignRecordControlWrap = $('<div class="vis-control-wrap">');
             $AssignRecordDiv.append($AssignRecordControlWrap);
