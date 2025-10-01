@@ -3756,7 +3756,7 @@ namespace VIS.Helpers
                 //}
 
                 if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
-                    && Columns[i] != "Created" && Columns[i] != "CreatedBy")
+                    && Columns[i] != "Created" && Columns[i] != "CreatedBy" && Columns[i] != TableName+"_GUID")
                 {
                     return null;
                 }
@@ -3895,8 +3895,21 @@ namespace VIS.Helpers
                 SQL_Direct = "";
 
 
+            var formattedColumns = Columns.Select(c =>
+            {
+                if (c.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (DatabaseType.IsOracle)
+                        return $"RAWTOHEX({c}) AS {c}";
+                    else if (DatabaseType.IsPostgre)
+                        return $"{c}::text AS {c}";
+                }
+                return c;
+            });
 
-            SQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName + WhereClause;
+
+
+            SQL = "SELECT " + String.Join(",", formattedColumns) + " FROM " + TableName + WhereClause;
 
             //If Login org is not * , then fetch records of * org which are shared with current org and ignore records of * which are shared 
             // with other orgs and not with current org
