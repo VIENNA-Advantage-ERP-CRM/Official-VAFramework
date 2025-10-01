@@ -400,6 +400,7 @@ namespace VAdvantage.Model
             string defaultValue = GetDefaultValue();
             string columnName = GetColumnName();
             int dt = GetAD_Reference_ID();
+            string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + GetAD_Table_ID(), null, null));
             //
             string sql = "";
             if (columnName.Equals("CreatedBy") || columnName.Equals("UpdatedBy"))
@@ -455,6 +456,17 @@ namespace VAdvantage.Model
             }
             else if (columnName.Equals("IsActive"))
                 sql = "'Y'";
+            else if (columnName.ToLower().Equals(tableName.ToLower()+"_guid")) 
+            {
+                if (DatabaseType.IsOracle)
+                {
+                    sql = "SYS_GUID()";
+                }
+                else if (DatabaseType.IsPostgre)
+                {
+                    sql = "GEN_RANDOM_UUID()";
+                }
+            }
             //	NO default value - set Data Type
             else
             {
@@ -479,6 +491,19 @@ namespace VAdvantage.Model
         public string getSQLDataType()
         {
             string columnName = GetColumnName();
+            string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + GetAD_Table_ID(), null, null));
+
+            if (columnName.ToLower().Equals(tableName.ToLower()+"_guid"))
+            {
+                if (DatabaseType.IsOracle)
+                {
+                    return "RAW(16)";
+                }
+                else if (DatabaseType.IsPostgre)
+                {
+                    return "UUID";
+                }
+            }
             int dt = GetAD_Reference_ID();
             return DisplayType.GetSQLDataType(dt, columnName, GetFieldLength());
         }
