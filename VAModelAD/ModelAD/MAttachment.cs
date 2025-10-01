@@ -52,7 +52,11 @@ namespace VAdvantage.Model
             get;
             set;
         }
-
+        public bool IsSaveInShareFiles
+        {
+            get;
+            set;
+        }
         public bool Force
         {
             get
@@ -1330,8 +1334,18 @@ namespace VAdvantage.Model
         {
             try
             {
-
-                string filePath = System.IO.Path.Combine(GetServerLocation(), "TempDownload");
+                string filePath = "";
+                /*VIS_427 01/10/2025 if bool value is true then folder name will 
+                  be sharefiles else tempdownload*/
+                if (IsSaveInShareFiles)
+                {
+                     filePath = System.IO.Path.Combine(GetServerLocation(), "ShareFiles");
+                }
+                else
+                {
+                    filePath = System.IO.Path.Combine(GetServerLocation(), "TempDownload");
+                }
+                
                 string zipinput = filePath + "\\" + folderKey + "\\zipInput";
                 string zipfileName = System.IO.Path.Combine(filePath, folderKey, DateTime.Now.Ticks.ToString());
 
@@ -1871,6 +1885,17 @@ namespace VAdvantage.Model
         {
             try
             {
+                /*VIS_427 01/10/2025 if bool value is true then folder name will 
+                be sharefiles else tempdownload*/
+                string FolderName = "";
+                if (IsSaveInShareFiles)
+                {
+                    FolderName = "ShareFiles";
+                }
+                else
+                {
+                    FolderName = "TempDownload";
+                }
                 DataSet ds = DB.ExecuteDataset("SELECT FileName, FileType FROM AD_AttachmentLine WHERE AD_AttachmentLine_ID=" + AD_AttachmentLine_ID);
 
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
@@ -1879,7 +1904,7 @@ namespace VAdvantage.Model
                     string folder = DateTime.Now.Ticks.ToString();
 
                     string filePath = System.IO.Path.Combine(GetServerLocation());
-                    Directory.CreateDirectory(Path.Combine(filePath, "TempDownload", folder));
+                    Directory.CreateDirectory(Path.Combine(filePath, FolderName, folder));
                     string filename = GetAD_Table_ID() + "_" + GetRecord_ID() + "_" + AD_AttachmentLine_ID;
                     string zipFileName = "zip" + DateTime.Now.Ticks.ToString();
                     if (fileLocation == X_AD_Attachment.FILELOCATION_Database)
@@ -1889,30 +1914,30 @@ namespace VAdvantage.Model
                         if (d != null && d != DBNull.Value)
                         {
                             data = (byte[])d;
-                            System.IO.File.WriteAllBytes(Path.Combine(filePath, "TempDownload", folder, filename), data);
-                            SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                            System.IO.File.WriteAllBytes(Path.Combine(filePath, FolderName, folder, filename), data);
+                            SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
                             //Delete fle from temp
-                            System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, filename));
+                            System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, filename));
                         }
                     }
                     else if (fileLocation == X_AD_Attachment.FILELOCATION_FTPLocation)
                     {
 
-                        DownloadFtpFileWithoutRAM(filename, Path.Combine(filePath, "TempDownload", folder));
-                        SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                        DownloadFtpFileWithoutRAM(filename, Path.Combine(filePath, FolderName, folder));
+                        SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
                         //Delete fle from temp
-                        System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, filename));
+                        System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, filename));
 
                     }
                     else if (fileLocation == X_AD_Attachment.FILELOCATION_ServerFileSystem)
                     {
                         //Copy to temp
-                        System.IO.File.Copy(Path.Combine(filePath, "Attachments", filename), Path.Combine(filePath, "TempDownload", folder, filename));
+                        System.IO.File.Copy(Path.Combine(filePath, "Attachments", filename), Path.Combine(filePath, FolderName, folder, filename));
                         //Decrypt File
 
-                        SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                        SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, filename), Password, Path.Combine(filePath, FolderName, folder, zipFileName));
                         //Delete fle from temp
-                        System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, filename));
+                        System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, filename));
 
                     }
                     else if (fileLocation == X_AD_Attachment.FILELOCATION_WebService)
@@ -1951,7 +1976,7 @@ namespace VAdvantage.Model
 
                             byte[] byteData = Convert.FromBase64String(resFile);
 
-                            string savedFile = Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            string savedFile = Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
 
                             using (FileStream fs = new FileStream(savedFile, FileMode.Create, FileAccess.Write))
                             {
@@ -2001,7 +2026,7 @@ namespace VAdvantage.Model
 
                             byte[] byteData = Convert.FromBase64String(resFile);
 
-                            string savedFile = Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            string savedFile = Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
 
                             using (FileStream fs = new FileStream(savedFile, FileMode.Create, FileAccess.Write))
                             {
@@ -2030,16 +2055,16 @@ namespace VAdvantage.Model
 
                         if (!string.IsNullOrEmpty(containerUri))
                         {
-                            string downloadFullPath = Path.Combine(Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            string downloadFullPath = Path.Combine(Path.Combine(filePath, FolderName, folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
 
                             string res = AzureBlobStorage.DownloadFile(GetCtx(), containerUri, downloadFullPath, filename);
 
                             if (res == null)
                             {
                                 //Decrypt File
-                                SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                                SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, FolderName, folder, zipFileName));
                                 //Delete file from temp folder
-                                System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
+                                System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
                             }
                             else
                             {
@@ -2068,13 +2093,13 @@ namespace VAdvantage.Model
 
                         if (!string.IsNullOrEmpty(containerUri))
                         {
-                            string downloadFullPath = Path.Combine(Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            string downloadFullPath = Path.Combine(Path.Combine(filePath, FolderName, folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
                             var result = System.Threading.Tasks.Task.Run(async () => await DownloadFilesFromOCI(containerUri, downloadFullPath, filename)).ConfigureAwait(false).GetAwaiter().GetResult();
-                            if (Directory.GetFiles(Path.Combine(filePath, "TempDownload", folder)).Length > 0)
+                            if (Directory.GetFiles(Path.Combine(filePath, FolderName, folder)).Length > 0)
                             {
-                                SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                                SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, FolderName, folder, zipFileName));
                                 //Delete file from temp folder
-                                System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
+                                System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
                             }
                             else
                                 return Msg.GetMsg(GetCtx(), "VIS_OCIErrorOccurred");
@@ -2088,10 +2113,10 @@ namespace VAdvantage.Model
                     ICSharpCode.SharpZipLib.Zip.FastZip z = new ICSharpCode.SharpZipLib.Zip.FastZip();
                     ICSharpCode.SharpZipLib.Zip.ZipConstants.DefaultCodePage = 720;
 
-                    z.ExtractZip(Path.Combine(filePath, "TempDownload", folder, zipFileName), Path.Combine(filePath, "TempDownload", folder), null);
-                    System.IO.File.Copy(Path.Combine(filePath, "TempDownload", folder) + "\\" + AD_AttachmentLine_ID + ds.Tables[0].Rows[0][1], Path.Combine(filePath, "TempDownload", folder) + "\\" + ds.Tables[0].Rows[0][0]);
-                    System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder) + "\\" + AD_AttachmentLine_ID + ds.Tables[0].Rows[0][1]);
-                    System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                    z.ExtractZip(Path.Combine(filePath, FolderName, folder, zipFileName), Path.Combine(filePath, FolderName, folder), null);
+                    System.IO.File.Copy(Path.Combine(filePath, FolderName, folder) + "\\" + AD_AttachmentLine_ID + ds.Tables[0].Rows[0][1], Path.Combine(filePath, FolderName, folder) + "\\" + ds.Tables[0].Rows[0][0]);
+                    System.IO.File.Delete(Path.Combine(filePath, FolderName, folder) + "\\" + AD_AttachmentLine_ID + ds.Tables[0].Rows[0][1]);
+                    System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, zipFileName));
 
                     return folder;
                 }
