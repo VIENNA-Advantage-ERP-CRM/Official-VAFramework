@@ -19,10 +19,10 @@ deleteFilesByPattern(path.resolve(__dirname, 'Areas/VIS/Content'), /^VIS\.all\.m
 
 
 const versions = {
-    'VIS.all': '3.1.49.0',
-    'VIS2_0': '3.1.49.0',
+    'VIS.all': '3.1.50.0',
+    'VIS2_0': '3.1.50.0',
     'React': '1.0.0.1',
-    'VIS': '3.1.40.0' // CSS Version
+    'VIS': '3.1.41.0' // CSS Version
 };
 
 module.exports = {
