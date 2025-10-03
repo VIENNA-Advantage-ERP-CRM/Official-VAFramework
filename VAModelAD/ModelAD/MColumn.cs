@@ -21,6 +21,8 @@ namespace VAdvantage.Model
         private static CCache<int, MColumn> s_cache = new CCache<int, MColumn>("AD_Column", 20);
         private static Logging.VLogger s_log = Logging.VLogger.GetVLogger(typeof(MColumn).FullName);
 
+        private static CCache<int, string> _tableNameCache = new CCache<int, string>("AD_Table", 50);
+
         public MColumn(MTable parent)
             : this(parent.GetCtx(), 0, parent.Get_TrxName())
         {
@@ -113,6 +115,27 @@ namespace VAdvantage.Model
             if (col.Get_ID() == 0)
                 return null;
             return col.GetColumnName();
+        }
+
+        /// <summary>
+        /// Get Table Name by ID
+        /// </summary>
+        /// <param name="adTableId"></param>
+        /// <returns></returns>
+        public static string GetTableName(int adTableId)
+        {
+            string tableName = _tableNameCache[adTableId];
+            if (!string.IsNullOrEmpty(tableName))
+                return tableName.ToLower();
+
+            // Fallback to DB lookup if not cached
+            tableName = Util.GetValueOfString(
+                DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + adTableId, null, null));
+
+            if (!string.IsNullOrEmpty(tableName))
+                _tableNameCache.Add(adTableId, tableName);
+
+            return tableName.ToLower();
         }
 
         /// <summary>
@@ -400,7 +423,7 @@ namespace VAdvantage.Model
             string defaultValue = GetDefaultValue();
             string columnName = GetColumnName();
             int dt = GetAD_Reference_ID();
-            string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + GetAD_Table_ID(), null, null));
+            string tableName = GetTableName(GetAD_Table_ID()); //Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + GetAD_Table_ID(), null, null));
             //
             string sql = "";
             if (columnName.Equals("CreatedBy") || columnName.Equals("UpdatedBy"))
@@ -456,7 +479,7 @@ namespace VAdvantage.Model
             }
             else if (columnName.Equals("IsActive"))
                 sql = "'Y'";
-            else if (columnName.ToLower().Equals(tableName.ToLower()+"_guid")) 
+            else if (columnName.ToLower().Equals(tableName+"_guid")) 
             {
                 if (DatabaseType.IsOracle)
                 {
@@ -491,9 +514,9 @@ namespace VAdvantage.Model
         public string getSQLDataType()
         {
             string columnName = GetColumnName();
-            string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + GetAD_Table_ID(), null, null));
+            string tableName = GetTableName(GetAD_Table_ID());
 
-            if (columnName.ToLower().Equals(tableName.ToLower()+"_guid"))
+            if (columnName.ToLower().Equals(tableName+"_guid"))
             {
                 if (DatabaseType.IsOracle)
                 {
