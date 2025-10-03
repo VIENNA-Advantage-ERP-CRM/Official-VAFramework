@@ -51,7 +51,7 @@ namespace VAdvantage.Process
             //    }
             //}
             p_AD_Tab_ID = GetRecord_ID();
-            
+
         }
         /// <summary>
         /// Process
@@ -68,6 +68,8 @@ namespace VAdvantage.Process
                 throw new Exception("@NotFound@: @AD_Tab_ID@ " + p_AD_Tab_ID);
             }
             //log.info(tab.toString());
+            string tableName = DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + tab.GetAD_Table_ID()).ToString();
+
             int count = 0;
             string sql = "SELECT * FROM AD_Column c "
                 + "WHERE NOT EXISTS (SELECT * FROM AD_Field f "
@@ -75,11 +77,11 @@ namespace VAdvantage.Process
                     + " AND c.AD_Table_ID=@AD_Table_Id"	//	#1
                     + " AND f.AD_Tab_ID=@AD_Tab_Id)"		//	#2
                 + " AND AD_Table_ID=@AD_Table_Id1"			//	#3
-                + " AND NOT (Name LIKE 'Created%' OR Name LIKE 'Updated%')"
+                + " AND NOT (Name LIKE 'Created%' OR Name LIKE 'Updated%' OR LOWER(Name) = '"+ tableName.ToLower().ToString() + "_guid')"
                 + " AND IsActive='Y' "
-                + "ORDER BY Name desc";
+                + "ORDER BY Name DESC";
 
-           
+
             try
             {
 
@@ -87,7 +89,8 @@ namespace VAdvantage.Process
                 param[0] = new SqlParameter("@AD_Table_Id", tab.GetAD_Table_ID());
                 param[1] = new SqlParameter("@AD_Tab_Id", tab.GetAD_Tab_ID());
                 param[2] = new SqlParameter("@AD_Table_Id1", tab.GetAD_Table_ID());
-                DataSet ds = DataBase.DB.ExecuteDataset(sql, param,Get_Trx());
+                DataSet ds = DataBase.DB.ExecuteDataset(sql, param, Get_Trx());
+                
                 //DataSet ds1 = ExecuteQuery.ExecuteDataset(sql);
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
@@ -109,7 +112,7 @@ namespace VAdvantage.Process
                         field.SetSeqNo(10);
                         field.SetMRSeqNo(10);
                     }
-                    if (column.GetColumnName().ToString()=="AD_Org_ID")
+                    if (column.GetColumnName().ToString() == "AD_Org_ID")
                     {
                         field.SetIsSameLine(true);
                         field.SetSeqNo(20);
@@ -121,28 +124,32 @@ namespace VAdvantage.Process
                         field.SetIsDisplayed(false);
                         field.SetMRIsDisplayed("N");
                     }
-
+                    if (column.GetColumnName().ToLower().ToString() == tableName.ToLower().ToString()+ "_guid")
+                    {
+                        field.SetIsDisplayed(false);
+                        field.SetMRIsDisplayed("N");
+                    }
                     if (field.Save())
                     {
                         AddLog(0, DateTime.MinValue, Decimal.Parse(count.ToString()), column.GetName());
                         //AddLog(0, DateTime.MinValue, null, );
                         count++;
-                        
+
                     }
                 }
-              
+
                 ds = null;
-               
-               
-                
+
+
+
             }
             catch (Exception e)
             {
                 log.Log(Level.SEVERE, sql, e);
             }
-          
+
             return "@Created@ #" + count;
-        }	
+        }
 
     }
 }

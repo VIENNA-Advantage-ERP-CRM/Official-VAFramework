@@ -630,6 +630,33 @@ namespace VAdvantage.Controller
             return vo;
         }   //  initStdField
 
+        /// <summary>
+        /// Default Column GUID
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="windowNo"></param>
+        /// <param name="tabNo"></param>
+        /// <param name="AD_Window_ID"></param>
+        /// <param name="AD_Tab_ID"></param>
+        /// <param name="tabReadOnly"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public static GridFieldVO CreateStdFieldGUID(Ctx ctx, int windowNo, int tabNo,
+            int AD_Window_ID, int AD_Tab_ID, bool tabReadOnly,
+             string tableName)
+        {
+            GridFieldVO vo = new GridFieldVO(ctx, windowNo, tabNo,
+                AD_Window_ID, AD_Tab_ID, tabReadOnly);
+            vo.ColumnName = tableName + "_GUID";
+           
+            vo.displayType =DisplayType.String;            
+            vo.IsDisplayedf = false;
+            vo.IsMandatoryUI = false;
+            vo.IsReadOnly = false;
+            vo.IsUpdateable = false;
+            vo.InitFinish();
+            return vo;
+        }   //  initStdField
 
         /// <summary>
         /// 

@@ -114,7 +114,7 @@ namespace VAdvantage.Model
                 if (!m_history)
                     GenerateView();
             }
-            catch 
+            catch
             {
                 //e.StackTrace;
                 return false;
@@ -150,7 +150,7 @@ namespace VAdvantage.Model
                 list.Add(element);
             Trx trx = Trx.Get("getDatabaseMetaData");
             //
-            
+
             String catalog = "";
             String schema = DataBase.DB.GetSchema();
             String tableName = m_dTableName;
@@ -160,7 +160,7 @@ namespace VAdvantage.Model
             DataSet rs = null;
             using (DatabaseMetaData md = new DatabaseMetaData())
             {
-                 rs = md.GetColumns(catalog, schema, tableName);
+                rs = md.GetColumns(catalog, schema, tableName);
             }
             for (int rscount = 0; rscount <= rs.Tables[0].Rows.Count - 1; rscount++)
             {
@@ -392,9 +392,9 @@ namespace VAdvantage.Model
                 }
             }
             return tCols;
-        }	//	SyncMColumns
+        }   //	SyncMColumns
 
-        
+
         /// <summary>
         /// Check Existence of Std columns and create them in AD and DB
         /// </summary>
@@ -545,9 +545,23 @@ namespace VAdvantage.Model
                 col.SetIsCopy(false);           // By Default isCopy check box should be False on this Column.
                 CreateColumn(col, table, true);
             }
-        }	//	checkStandardColumns
+            // vis0008 Create Record GUID Column
+            colName = table.GetTableName() + "_GUID";
+            if (table.GetColumn(colName) == null)
+            {
+                MColumn col = new MColumn(table);
+                col.SetColumnName(colName);
+                col.SetAD_Reference_ID(DisplayType.String);
+                col.SetIsUpdateable(true);
+                col.SetIsMandatory(true);
+                col.SetEntityType(EntityType);
+                col.SetFieldLength(500);
+                col.SetIsCopy(false);           // By Default isCopy check box should be False on this Column.
+                CreateColumn(col, table, true);
+            }
+        }   //	checkStandardColumns
 
- 
+
         /// <summary>
         /// Create Column in AD and DB
         /// </summary>

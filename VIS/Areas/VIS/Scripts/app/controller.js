@@ -2271,6 +2271,7 @@
             if (this.keyColumnName != null && this.keyColumnName.length > 0) {
                 info.append(" - ")
                     .append(this.keyColumnName).append("=").append(e.Record_ID);
+                
             }
             else    //  we have multiple parents
             {
@@ -2280,6 +2281,7 @@
                         .append(keyCol).append("=").append(this.getValue(keyCol));
                 }
             }
+            info.append(")<br/>(").append(this.getTableName() + "_GUID =").append(this.getValue(this.getTableName() + "_GUID"));
             e.Info = info.toString();
         }
         e.setInserting(this.gridTable.getIsInserting());
