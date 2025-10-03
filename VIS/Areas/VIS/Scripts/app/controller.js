@@ -6448,6 +6448,10 @@
             if (this.gridTab && this.gridTab.IsSharedReadOnly)
                 return false;
 
+            // render readonly ORG as readonly
+            if (!VIS.MRole.getIsOrgAccess(AD_Org_ID, true)) {
+                return false;
+            }
             //check for filter org
             var fOrgs = ctx.getContext("#AD_FilteredOrg");
             if (fOrgs && fOrgs != "") {
