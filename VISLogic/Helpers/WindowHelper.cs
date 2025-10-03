@@ -3681,7 +3681,7 @@ namespace VIS.Helpers
                 }
 
                 if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
-                    && Columns[i] != "Created" && Columns[i] != "CreatedBy")
+                    && Columns[i] != "Created" && Columns[i] != "CreatedBy" && Columns[i] != TableName + "_GUID")
                 {
                     return null;
                 }
