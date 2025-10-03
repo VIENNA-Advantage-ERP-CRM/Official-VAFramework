@@ -53,6 +53,9 @@
         var RecordCount = 0;
         var uncheckedIDs = [];
         var IsWindowValueChanged = false;
+        /*these variable are used to store value at refresh */
+        var ListValAtRefresh = null;
+        var IsRefreshWid = false;
         /*This variable is defined if function is called from assign user popup */
         var IsFromPopUp = false;
         /*This variable is defined if function is called from assign  user popup and when user 
@@ -70,6 +73,8 @@
             loadWidget();
             //auto refresh widget after interval of 5 minutes
             setInterval(function () {
+                IsRefreshWid = true;
+                ListValAtRefresh = ListVal;
                 $self.refreshWidget();
             }, 1000 * 60 * 5);
         };
@@ -82,8 +87,15 @@
             var $AssignRecordLookUp = VIS.MLookupFactory.get(VIS.Env.getCtx(), $self.windowNo, 0, VIS.DisplayType.List, "VIS_AssignRecordWidgetList", ColumnId, false);
             // Parameters are: columnName, mandatory, isReadOnly, isUpdateable, lookup,display length
             vAssignRecord = new VIS.Controls.VComboBox("VIS_AssignRecordWidgetList", true, false, true, $AssignRecordLookUp, 100);
-            vAssignRecord.setValue('02');
-            ListVal = "02";
+            //if widget is not auto refreshed then keep its value as it is other wise change which was at refresh
+            if (!IsRefreshWid) {
+                ListVal = "02"
+            }
+            else {
+                ListVal = ListValAtRefresh;
+                IsRefreshWid = false;
+            }
+            vAssignRecord.setValue(ListVal);
             var $AssignRecordControlWrap = $('<div class="vis-control-wrap">');
             $AssignRecordDiv.append($AssignRecordControlWrap);
             $AssignRecordControlWrap.append(vAssignRecord.getControl().attr('placeholder', ' ').attr('data-placeholder', '').attr('data-hasbtn', ' '));
@@ -412,7 +424,7 @@
             }
             var ListContent = "";
             //for no data
-            if (windowRecords.length === 0) {
+            if (windowRecords.length === 0 || windowRecords[0].IsNoRecFound) {
 
                 $('.vis-assrec-data').empty();
                 ListContent = '<tr><td colspan="4" style="text-align:center; padding: 20px;">' + VIS.Msg.getMsg('NoDataFound') + '</td></tr>';
@@ -516,7 +528,7 @@
                         '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-cancel vis-asrec-btn" id="VIS_Cancel_' + widgetID + '">' + VIS.Msg.getMsg('Cancel') + '</button>' +
                         '</div>' +
                         '<div class="vis-asrec-flyout-footer">' +
-                        '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-ok vis-asrec-btn" id="VIS_Ok_' + widgetID + '">' + VIS.Msg.getMsg('Ok') + '</button>' +
+                        '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-ok vis-asrec-btn vis-disabled-btn" id="VIS_Ok_' + widgetID + '">' + VIS.Msg.getMsg('Ok') + '</button>' +
                         '</div>';
                 }
                 content += '</div>';
@@ -560,7 +572,7 @@
             } else {
                 IsZoomClicked = false;
                 IsItemSearched = false;
-                IsWindowValueChanged = false
+                IsWindowValueChanged = false;
             }
 
             showPopupBusy(false);
@@ -622,11 +634,21 @@
             modelPopupId.off('change', '.vis-asrec-me-row-check')
                 .on('change', '.vis-asrec-me-row-check', function () {
                     var recordID = $(this).data('record_id');
-
                     if ($(this).is(':checked')) {
                         uncheckedIDs = uncheckedIDs.filter(id => id !== recordID);
                     } else if (!uncheckedIDs.includes(recordID)) {
                         uncheckedIDs.push(recordID);
+                    }
+                    /*disable/enable the ok button if user check or uncheck the checkbox */
+                    var totalCheckboxes = modelPopupId.find('.vis-asrec-me-row-check').length;
+                    var checkedCheckboxes = modelPopupId.find('.vis-asrec-me-row-check:checked').length;
+
+                    var $okBtn = modelPopupId.find("#VIS_Ok_" + widgetID);
+
+                    if (checkedCheckboxes < totalCheckboxes) {
+                        $okBtn.prop("disabled", false).removeClass('vis-disabled-btn');
+                    } else {
+                        $okBtn.prop("disabled", true).addClass('vis-disabled-btn');
                     }
                 });
 

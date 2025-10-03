@@ -408,6 +408,15 @@ namespace VAdvantage.Model
                     _vo.AD_Window_ID, _vo.AD_Tab_ID, false, false, false));
                 _gridTable.AddField(updatedBy);
             }
+
+            if (_gridTable.GetField(this.GetTableName() + "_GUID") == null)
+            {
+                GridField guid = new GridField(GridFieldVO.CreateStdFieldGUID(_vo.GetCtx(),
+                    _vo.windowNo, _vo.tabNo,
+                    _vo.AD_Window_ID, _vo.AD_Tab_ID, false, this.GetTableName()));
+                _gridTable.AddField(guid);
+            }
+
             return true;
         }
 

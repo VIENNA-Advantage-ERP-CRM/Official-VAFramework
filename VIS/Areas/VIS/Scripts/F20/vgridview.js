@@ -343,6 +343,11 @@
                 (AD_Client_ID, AD_Org_ID, self.AD_Table_ID, Record_ID, false))
                 return false;
 
+            // render row readonly ORG as disable effect
+            if (!VIS.MRole.getIsOrgAccess(AD_Org_ID, true)) {
+                return false;
+            }
+
             //check for filter org
             var fOrgs = VIS.context.getContext("#AD_FilteredOrg");
             if (fOrgs && fOrgs != "") {

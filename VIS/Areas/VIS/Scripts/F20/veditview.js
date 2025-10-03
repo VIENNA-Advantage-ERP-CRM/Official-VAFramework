@@ -723,7 +723,11 @@
                 if (agInstance) {
                     if (agInstance.getIsNewIns()) { //only Once
                         insertCWrapper(label, agInstance, ctnr, mField);
+                        agInstance.setContainer(ctnr);
                     }
+                    //set action group conatiner
+                    ctnr = agInstance.getContainer();
+
                     //apply style only
                     var customStyle = mField.getHtmlStyle();
                     if (editor != null && customStyle != "") {
@@ -1054,6 +1058,13 @@
     ActionGroup.prototype.getIsNewIns = function () {
         return this.getItemCount() == 1;
     }
+    ActionGroup.prototype.setContainer = function (ctnr) {
+        return this.ctnr = ctnr;
+    }
+    ActionGroup.prototype.getContainer = function () {
+        return this.ctnr;
+    }
+
 
     VIS.ActionGroup = ActionGroup;
 
