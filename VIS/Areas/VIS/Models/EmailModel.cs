@@ -1094,7 +1094,7 @@ namespace VIS.Models
         public MessagePayload GetEmailResponse(string subject, string message, int recordId, int tableID, Ctx ctx, string prompt)
         {
             MessagePayload payload = new MessagePayload();
-            string threadID = Common.GetThreadID(tableID, recordId);
+            string threadID = Common.GetThreadID(tableID, recordId, Common.GetRecordOrg(ctx, tableID, recordId));
             if (!string.IsNullOrEmpty(threadID))
             {
                 payload = AIPayload.SendEmailReplyRequestAsync(threadID, subject, message, ctx, prompt);
@@ -1115,7 +1115,8 @@ namespace VIS.Models
         /// <returns></returns>
         public string GetRecordThread(Ctx ctx, int recordId, int tableID, int windowID, int tabID)
         {
-            string threadID = Common.GetThreadID(tableID, recordId);
+            int AD_Org_ID = Common.GetRecordOrg(ctx, tableID, recordId);
+            string threadID = Common.GetThreadID(tableID, recordId, AD_Org_ID);
             if (!string.IsNullOrEmpty(threadID))
             {
                 return threadID;
@@ -1132,7 +1133,7 @@ namespace VIS.Models
                 }
                 if (tabID != 0)
                 {
-                    int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID()));
+                    int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " ORDER BY AD_Org_ID DESC"));
                     if (asstScreenID > 0)
                     {
                         int Process_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Process_ID FROM AD_Process WHERE ISActive='Y' AND Value='VAI01_CreateUpdateRecordThread'"));
@@ -1210,7 +1211,7 @@ namespace VIS.Models
                         }
                         else
                         {
-                            threadID = Common.GetThreadID(tableID, recordId);
+                            threadID = Common.GetThreadID(tableID, recordId, Common.GetRecordOrg(ctx, tableID, recordId));
                         }
                     }
                 }

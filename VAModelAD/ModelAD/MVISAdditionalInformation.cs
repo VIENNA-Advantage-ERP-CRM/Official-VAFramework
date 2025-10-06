@@ -39,7 +39,7 @@ namespace VAdvantage.Model
             if (!success)
                 return success;
             
-            string threadID = Common.Common.GetThreadID(GetAD_Table_ID(), GetRecord_ID());
+            string threadID = Common.Common.GetThreadID(GetAD_Table_ID(), GetRecord_ID(), GetAD_Org_ID());
             if (!string.IsNullOrEmpty(threadID))
             {
                 if (!ExecuteThreadAction(actionType: newRecord ? ActionType.New : ActionType.Update, tableID: GetAD_Table_ID(), recordID: GetRecord_ID(),
@@ -61,7 +61,7 @@ namespace VAdvantage.Model
             if (!success)
                 return false;
 
-            string threadID = Common.Common.GetThreadID(GetAD_Table_ID(), GetRecord_ID());
+            string threadID = Common.Common.GetThreadID(GetAD_Table_ID(), GetRecord_ID(), GetAD_Org_ID());
             if (!string.IsNullOrEmpty(threadID))
             {
                 if (!ExecuteThreadAction(actionType: ActionType.Delete, tableID: GetAD_Table_ID(), recordID: GetRecord_ID(),
