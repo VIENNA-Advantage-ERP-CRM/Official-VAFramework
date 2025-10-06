@@ -1991,24 +1991,10 @@ namespace VAdvantage.Common
         /// </summary>
         /// <param name="AD_Table_ID">Table ID</param>
         /// <param name="Record_ID">Record ID</param>
+        /// <param name="AD_Org_ID">Org ID</param>
         /// <returns></returns>
-        public static string GetThreadID(int AD_Table_ID, int Record_ID, int AD_Org_ID = -1)
+        public static string GetThreadID(int AD_Table_ID, int Record_ID, int AD_Org_ID)
         {
-            if (AD_Org_ID < 0)
-            {
-                string tableName = "";
-                if (tableNameIDs.ContainsKey(AD_Table_ID))
-                {
-                    tableName = tableNameIDs[AD_Table_ID];
-                }
-                else
-                {
-                    tableNameIDs[AD_Table_ID] = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + AD_Table_ID));
-                    tableName = tableNameIDs[AD_Table_ID];
-                }
-                AD_Org_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + tableName + " WHERE " + tableName + "_ID = " + Record_ID));
-            }
-
             // Check applied if module installed
             string threadID = "";
             if (Env.IsModuleInstalled("VAI01_") && MTable.Get_Table_ID("VAI01_AIAssistant") > 0)
@@ -2031,6 +2017,29 @@ namespace VAdvantage.Common
                 }
             }
             return threadID;
+        }
+
+        /// <summary>
+        /// Get Thread ID for the record based on the Table ID and Record ID if AI Chat Bot module is installed
+        /// </summary>
+        /// <param name="AD_Table_ID">Table ID</param>
+        /// <param name="Record_ID">Record ID</param>
+        /// <returns></returns>
+        public static string GetThreadID(int AD_Table_ID, int Record_ID)
+        {
+            string tableName = "";
+            if (tableNameIDs.ContainsKey(AD_Table_ID))
+            {
+                tableName = tableNameIDs[AD_Table_ID];
+            }
+            else
+            {
+                tableNameIDs[AD_Table_ID] = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + AD_Table_ID));
+                tableName = tableNameIDs[AD_Table_ID];
+            }
+            int AD_Org_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + tableName + " WHERE " + tableName + "_ID = " + Record_ID));
+
+            return GetThreadID(AD_Table_ID, Record_ID, AD_Org_ID);
         }
 
         /// <summary>
