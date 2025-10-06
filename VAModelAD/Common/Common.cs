@@ -2135,7 +2135,7 @@ namespace VAdvantage.Common
                     }
                     else
                     {
-                        threadID = Common.GetThreadID(tableID, recordId);
+                        threadID = Common.GetThreadID(tableID, recordId, GetRecordOrg(ctx, tableID, recordId));
                     }
                 }
             }

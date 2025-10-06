@@ -109,7 +109,7 @@ namespace VAdvantage.Model
 
             #endregion
 
-            string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID());
+            string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID(), GetAD_Org_ID());
             if (!string.IsNullOrEmpty(threadID))
             {
                 if (!ExecuteThreadAction(actionType: newRecord ? ActionType.New : ActionType.Update, tableID: Util.GetValueOfInt(GetAD_Table_ID()), recordID: Util.GetValueOfInt(GetRecord_ID()),
@@ -152,7 +152,7 @@ namespace VAdvantage.Model
                 PushNotification.SendNotificationToUser(creatorUserId, GetAD_Window_ID(), GetRecord_ID(), title, body, type);
             }
 
-            string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID());
+            string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID(), GetAD_Org_ID());
             if (!string.IsNullOrEmpty(threadID))
             {
                 if (!ExecuteThreadAction(actionType: ActionType.Delete, tableID: Util.GetValueOfInt(GetAD_Table_ID()), recordID: Util.GetValueOfInt(GetRecord_ID()),

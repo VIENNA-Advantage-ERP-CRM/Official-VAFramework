@@ -1211,7 +1211,7 @@ namespace VIS.Models
                         }
                         else
                         {
-                            threadID = Common.GetThreadID(tableID, recordId);
+                            threadID = Common.GetThreadID(tableID, recordId, Common.GetRecordOrg(ctx, tableID, recordId));
                         }
                     }
                 }
