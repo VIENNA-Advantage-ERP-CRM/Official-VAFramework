@@ -1098,7 +1098,7 @@ namespace VIS.Models
                 {
                     MAppointmentsInfo appointmentsInfo = new MAppointmentsInfo(ctx, AppointmentID, null);
                     int AD_Table_ID = Util.GetValueOfInt(appointmentsInfo.GetAD_Table_ID());
-                    string threadID = Common.GetThreadID(AD_Table_ID, appointmentsInfo.GetRecord_ID());
+                    string threadID = Common.GetThreadID(AD_Table_ID, appointmentsInfo.GetRecord_ID(), appointmentsInfo.GetAD_Org_ID());
                     if (!string.IsNullOrEmpty(threadID))
                     {
                         if (!ExecuteThreadAction(actionType: ActionType.Update, tableID: AD_Table_ID, recordID: appointmentsInfo.GetRecord_ID(),

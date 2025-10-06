@@ -4104,9 +4104,9 @@ ul.vis-userLinks-ListMenu li a i {
 
 /* Toast container bottom-right */
 .vis-toast-container {
-    bottom: 65px;
+    bottom: 33px;
     position: fixed;
-    right: 50px;
+    right: 10px;
     z-index: 1000;
 }
 
@@ -4117,7 +4117,7 @@ ul.vis-userLinks-ListMenu li a i {
     border-radius: 4px;
     border: 1px solid #ddd;
     box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
-    padding: 12px;
+    padding: 22px 0 0 0;
     position: relative;
     min-width: 280px;
     max-width: 360px;

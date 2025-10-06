@@ -33,6 +33,8 @@ namespace VAdvantage.Common
 
         // approvalstatus columns table wise
         public static Dictionary<string, bool> _approvalStatusCols = new Dictionary<string, bool>();
+
+        public static Dictionary<int, string> tableNameIDs = new Dictionary<int, string>();
         public static string transportEnvironment
         {
             get
@@ -1992,6 +1994,21 @@ namespace VAdvantage.Common
         /// <returns></returns>
         public static string GetThreadID(int AD_Table_ID, int Record_ID, int AD_Org_ID = -1)
         {
+            if (AD_Org_ID < 0)
+            {
+                string tableName = "";
+                if (tableNameIDs.ContainsKey(AD_Table_ID))
+                {
+                    tableName = tableNameIDs[AD_Table_ID];
+                }
+                else
+                {
+                    tableNameIDs[AD_Table_ID] = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + AD_Table_ID));
+                    tableName = tableNameIDs[AD_Table_ID];
+                }
+                AD_Org_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + tableName + " WHERE " + tableName + "_ID = " + Record_ID));
+            }
+
             // Check applied if module installed
             string threadID = "";
             if (Env.IsModuleInstalled("VAI01_") && MTable.Get_Table_ID("VAI01_AIAssistant") > 0)
@@ -2041,7 +2058,7 @@ namespace VAdvantage.Common
             // Create or Update thread against record if tab ID found
             if (tabID != 0)
             {
-                int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID()));
+                int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " ORDER BY AD_Org_ID DESC"));
                 // Check applied if Assistant screen is linked against the tab, if found then only create or update data against thread
                 if (asstScreenID > 0)
                 {
@@ -2135,11 +2152,24 @@ namespace VAdvantage.Common
                     }
                     else
                     {
-                        threadID = Common.GetThreadID(tableID, recordId);
+                        threadID = Common.GetThreadID(tableID, recordId, GetRecordOrg(ctx, tableID, recordId));
                     }
                 }
             }
             return threadID;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
+        public static int GetRecordOrg(Ctx ctx, int AD_Table_ID, int Record_ID)
+        {
+            string TableName = MTable.GetTableName(ctx, AD_Table_ID);
+            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + TableName + " WHERE " + TableName + "_ID = " + Record_ID));
         }
     }
 
