@@ -149,6 +149,7 @@
         /** Tab panel-adding cc & bcc emails ** Dt: 28/06/2021 ** Modified By: Kumar **/
         var ccmail = '';
         var bccmail = '';
+        var currThreadID = '';
 
         initEmail();
 

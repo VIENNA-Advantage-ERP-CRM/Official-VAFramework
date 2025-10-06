@@ -2041,7 +2041,7 @@ namespace VAdvantage.Common
             // Create or Update thread against record if tab ID found
             if (tabID != 0)
             {
-                int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID()));
+                int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " ORDER BY AD_Org_ID DESC"));
                 // Check applied if Assistant screen is linked against the tab, if found then only create or update data against thread
                 if (asstScreenID > 0)
                 {
@@ -2140,6 +2140,19 @@ namespace VAdvantage.Common
                 }
             }
             return threadID;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
+        public static int GetRecordOrg(Ctx ctx, int AD_Table_ID, int Record_ID)
+        {
+            string TableName = MTable.GetTableName(ctx, AD_Table_ID);
+            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + TableName + " WHERE " + TableName + "_ID = " + Record_ID));
         }
     }
 
