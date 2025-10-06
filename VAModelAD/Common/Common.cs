@@ -33,6 +33,8 @@ namespace VAdvantage.Common
 
         // approvalstatus columns table wise
         public static Dictionary<string, bool> _approvalStatusCols = new Dictionary<string, bool>();
+
+        public static Dictionary<int, string> tableNameIDs = new Dictionary<int, string>();
         public static string transportEnvironment
         {
             get
@@ -1992,6 +1994,21 @@ namespace VAdvantage.Common
         /// <returns></returns>
         public static string GetThreadID(int AD_Table_ID, int Record_ID, int AD_Org_ID = -1)
         {
+            if (AD_Org_ID < 0)
+            {
+                string tableName = "";
+                if (tableNameIDs.ContainsKey(AD_Table_ID))
+                {
+                    tableName = tableNameIDs[AD_Table_ID];
+                }
+                else
+                {
+                    tableNameIDs[AD_Table_ID] = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + AD_Table_ID));
+                    tableName = tableNameIDs[AD_Table_ID];
+                }
+                AD_Org_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + tableName + " WHERE " + tableName + "_ID = " + Record_ID));
+            }
+
             // Check applied if module installed
             string threadID = "";
             if (Env.IsModuleInstalled("VAI01_") && MTable.Get_Table_ID("VAI01_AIAssistant") > 0)
