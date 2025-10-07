@@ -1217,6 +1217,8 @@
                 continue;
             if (f.getColumnName().toLowerCase() == "export_id")
                 continue;
+            if (f.getColumnName().toLowerCase() == this.getTableName().toLowerCase()+ "_guid")
+                continue;
 
             if (VIS.DisplayType.IsText(f.getDisplayType())) {
                 if (!query)
