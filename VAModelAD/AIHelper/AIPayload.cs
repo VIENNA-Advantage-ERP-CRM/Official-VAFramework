@@ -58,7 +58,7 @@ namespace VAModelAD.AIHelper
                 {
                     TableName = "CM_ChatEntry";
                 }
-                else if (attachmentType.ToLower() == "r")
+                else
                 {
                     TableName = MTable.GetTableName(ctx, tableID);
                 }
