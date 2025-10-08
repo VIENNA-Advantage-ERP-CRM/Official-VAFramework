@@ -67,11 +67,11 @@ namespace VAModelAD.AIHelper
                 RequestPayload.Get().SetEndPoints(url);
             }
             // If url not found, then check in the web.config of VAI01 module
-            // Case handled for checking Chat Bot details if service is called from VServer
+            // Case handled for checking Chat Bot details if service is called from POSTMAN or third Party APIs
             else
             {
                 string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-                var configPath = Path.Combine(Path.GetFullPath(Path.Combine(exeDir, "..")), "web.config");
+                var configPath = Path.Combine(exeDir, "web.config");
                 try
                 {
                     var xdoc = XDocument.Load(configPath);
@@ -83,7 +83,7 @@ namespace VAModelAD.AIHelper
                     url = appSettingData?.Attribute("value")?.Value ?? "";
                     RequestPayload.Get().SetEndPoints(url);
 
-                    configPath = Path.Combine(Path.GetFullPath(Path.Combine(exeDir, "..")), "Areas", "VAI01", "Views", "web.config");
+                    configPath = Path.Combine(exeDir, "Areas", "VAI01", "Views", "web.config");
                     xdoc = XDocument.Load(configPath);
                     // Fetch AI Endpoints from the web config
                     appSettingData = xdoc.Descendants("appSettings")
@@ -95,6 +95,37 @@ namespace VAModelAD.AIHelper
                 catch (Exception exptn)
                 {
                     _log.SaveError("URL Not Found Error : ", exptn.Message);
+                }
+
+                if (url == "")
+                {
+                    try
+                    {
+                        // Case handled for checking Chat Bot details if service is called from VServer
+                        // check exe directory path
+                        configPath = Path.Combine(Path.GetFullPath(Path.Combine(exeDir, "..")), "web.config");
+                        var xdoc = XDocument.Load(configPath);
+                        var appSettingData = xdoc.Descendants("appSettings")
+                                              .Descendants("add")
+                                              .FirstOrDefault(x => x.Attribute("key")?.Value == "AIRedirectURL");
+
+                        // Fetch Redirect URL from the web config
+                        url = appSettingData?.Attribute("value")?.Value ?? "";
+                        RequestPayload.Get().SetEndPoints(url);
+
+                        configPath = Path.Combine(Path.GetFullPath(Path.Combine(exeDir, "..")), "Areas", "VAI01", "Views", "web.config");
+                        xdoc = XDocument.Load(configPath);
+                        // Fetch AI Endpoints from the web config
+                        appSettingData = xdoc.Descendants("appSettings")
+                                              .Descendants("add")
+                                              .FirstOrDefault(x => x.Attribute("key")?.Value == "AIEndPoint");
+
+                        _aiEndpoint = appSettingData?.Attribute("value")?.Value ?? "";
+                    }
+                    catch (Exception excptn)
+                    {
+                        _log.SaveError("URL Not Found Error FROM exe Directory : ", excptn.Message);
+                    }
                 }
             }
 
