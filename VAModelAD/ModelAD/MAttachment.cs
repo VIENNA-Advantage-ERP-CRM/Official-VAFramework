@@ -861,7 +861,13 @@ namespace VAdvantage.Model
 
 
 
-
+        /// <summary>
+        /// Upload file on sftp server
+        /// </summary>
+        /// <param name="fileName">File Name</param>
+        /// <param name="localFile">Local path folder</param>
+        /// <param name="cInfo">ftp info</param>
+        /// <returns>true if success</returns>
 
         private bool UploadFileSFTP(string fileName, String localFile, X_AD_ClientInfo cInfo)
         {
@@ -903,6 +909,14 @@ namespace VAdvantage.Model
             }
         }
 
+
+        /// <summary>
+        /// Upload file in sftp server
+        /// </summary>
+        /// <param name="fileName">ftp server file name</param>
+        /// <param name="file">local files' byte array</param>
+        /// <param name="cInfo">ftp info</param>
+        /// <returns>true if success</returns>
         private bool UploadFtpFile(string fileName, byte[] file, X_AD_ClientInfo cInfo)
         {
 
