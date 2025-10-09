@@ -26,6 +26,9 @@ using System.Web;
 using VAdvantage.AzureBlob;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Renci.SshNet;
+using System.Linq.Expressions;
+using System.Web.UI.WebControls;
 
 namespace VAdvantage.Model
 {
@@ -856,6 +859,64 @@ namespace VAdvantage.Model
             return false;
         }
 
+
+
+        /// <summary>
+        /// Upload file on sftp server
+        /// </summary>
+        /// <param name="fileName">File Name</param>
+        /// <param name="localFile">Local path folder</param>
+        /// <param name="cInfo">ftp info</param>
+        /// <returns>true if success</returns>
+
+        private bool UploadFileSFTP(string fileName, String localFile, X_AD_ClientInfo cInfo)
+        {
+
+            try
+            {
+                if (cInfo == null)
+                {
+                    // X_AD_ClientInfo cInfo = null;
+                    if (AD_Client_ID > 0)
+                    {
+                        cInfo = new X_AD_ClientInfo(GetCtx(), AD_Client_ID, Get_Trx());
+                    }
+                    else
+                    {
+                        cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
+                    }
+                }
+
+
+                using (var sftp = new SftpClient(cInfo.GetFTPUrl(), 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+
+                    using (var fileStream = new FileStream(localFile, FileMode.Open))
+                    {
+                        sftp.UploadFile(fileStream, cInfo.GetFTPFolder() + "//" + fileName);
+                        //Console.WriteLine($"Uploaded: {remotePath}");
+                    }
+
+                    sftp.Disconnect();
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Upload file in sftp server
+        /// </summary>
+        /// <param name="fileName">ftp server file name</param>
+        /// <param name="file">local files' byte array</param>
+        /// <param name="cInfo">ftp info</param>
+        /// <returns>true if success</returns>
         private bool UploadFtpFile(string fileName, byte[] file, X_AD_ClientInfo cInfo)
         {
 
@@ -874,6 +935,25 @@ namespace VAdvantage.Model
                         cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
                     }
                 }
+
+
+                using (var sftp = new SftpClient(cInfo.GetFTPUrl(), 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+
+                    using (var fileStream = new MemoryStream(file))
+                    {
+                        sftp.UploadFile(fileStream, cInfo.GetFTPFolder() + "//" + fileName);
+                        //Console.WriteLine($"Uploaded: {remotePath}");
+                    }
+
+                    sftp.Disconnect();
+                    return true;
+                }
+
+                /*
+
                 request = WebRequest.Create(new Uri(string.Format(@"{0}/{1}/{2}", cInfo.GetFTPUrl(), cInfo.GetFTPFolder(), fileName))) as FtpWebRequest;
                 request.Method = WebRequestMethods.Ftp.UploadFile;
                 request.UseBinary = true;
@@ -885,7 +965,10 @@ namespace VAdvantage.Model
                 requestStream.Write(file, 0, file.Length);
                 requestStream.Close();
                 requestStream.Flush();
-                return true;
+
+                           
+
+                return true; */
             }
             catch (Exception ex)
             {
@@ -897,7 +980,6 @@ namespace VAdvantage.Model
         private byte[] DownloadFtpFile(string fileName)
         {
 
-            WebClient request = new WebClient();
             byte[] retVal = null;
 
             try
@@ -911,18 +993,35 @@ namespace VAdvantage.Model
                 {
                     cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
                 }
+
+                using (var sftp = new SftpClient(cInfo.GetFTPUrl(), 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+                    using (var fileStream = new MemoryStream())
+                    {
+                        sftp.DownloadFile(cInfo.GetFTPFolder() + "//" + fileName, fileStream);
+                        retVal = fileStream.ToArray();
+                    }
+
+                    sftp.Disconnect();
+
+                    
+                }
+
+                /*
+
                 request.Credentials = new NetworkCredential(cInfo.GetFTPUsername(), cInfo.GetFTPPwd());
                 retVal = request.DownloadData(new Uri(string.Format(@"{0}/{1}/{2}", cInfo.GetFTPUrl(), cInfo.GetFTPFolder(), fileName)));
                 request.Dispose();
-                return retVal;
+                
                 //string fileString = System.Text.Encoding.UTF8.GetString(newFileData);
-
+                */
+                return retVal;
             }
             catch (WebException e)
             {
                 error.Append("ErrorWhileDownloadingFileFromFTP:" + e.Message);
-                if (request != null)
-                    request.Dispose();
                 return null;
             }
         }
@@ -1546,8 +1645,9 @@ namespace VAdvantage.Model
                 {
                     try
                     {
-                        if (!UploadFtpFileWithoutRAM(filePath + "\\" + outputfileName, cInfo, outputfileName))
-                        {
+                        //if (!UploadFtpFileWithoutRAM(filePath + "\\" + outputfileName, cInfo, outputfileName))
+                            if (!UploadFileSFTP(outputfileName,filePath + "\\" + outputfileName, cInfo))
+                            {
                             if (!Force)
                             {
                                 CleanUp(filePath + "\\" + folderKey + "\\" + fileName, zipfileName, filePath + "\\" + outputfileName, zipinput);
@@ -1798,6 +1898,9 @@ namespace VAdvantage.Model
         private bool UploadFtpFileWithoutRAM(string fullname, X_AD_ClientInfo cInfo, string fNameFTP)
         {
 
+
+            return UploadFileSFTP(fNameFTP, fullname, cInfo);
+
             FtpWebRequest request;
             try
             {
@@ -1922,8 +2025,9 @@ namespace VAdvantage.Model
                     }
                     else if (fileLocation == X_AD_Attachment.FILELOCATION_FTPLocation)
                     {
+                        DownloadFileSFTP(filename, Path.Combine(filePath, FolderName, folder));
 
-                        DownloadFtpFileWithoutRAM(filename, Path.Combine(filePath, FolderName, folder));
+                        //DownloadFtpFileWithoutRAM(filename, Path.Combine(filePath, FolderName, folder));
                         SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
                         //Delete fle from temp
                         System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, filename));
@@ -2131,6 +2235,46 @@ namespace VAdvantage.Model
             }
         }
 
+        private bool DownloadFileSFTP(string filename, string saveFilePath)
+        {
+
+            try
+            {
+
+
+                X_AD_ClientInfo cInfo = null;
+                if (AD_Client_ID > 0)
+                {
+                    cInfo = new X_AD_ClientInfo(GetCtx(), AD_Client_ID, Get_Trx());
+                }
+                else
+                {
+                    cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
+                }
+
+                var url = cInfo.GetFTPUrl();
+                if (url != null && url.Contains(":"))
+                {
+                    url = url.Substring(0,url.IndexOf(":"));
+                }
+                using (var sftp = new SftpClient(url, 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+                    using (var fileStream = new FileStream(saveFilePath + "//" + filename, FileMode.Create))
+                    {
+                        sftp.DownloadFile(cInfo.GetFTPFolder() + "//" + filename, fileStream);
+                    }
+
+                    sftp.Disconnect();
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
 
 
         private bool DownloadFtpFileWithoutRAM(string filename, string saveFilePath)
@@ -2270,6 +2414,23 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
                     cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
                 }
 
+                using (var sftp = new SftpClient(cInfo.GetFTPUrl(), 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+                    var remoteFilePath = cInfo.GetFTPFolder() + "//" + fileName;
+                    if (sftp.Exists(remoteFilePath))
+                    {
+                        sftp.DeleteFile(remoteFilePath);
+                       
+                    }
+                    sftp.Disconnect();
+                }
+
+                /*
+
+
+
                 FtpWebRequest request = (FtpWebRequest)WebRequest.Create(cInfo.GetFTPUrl() + "//" + cInfo.GetFTPFolder() + "//" + filename);
                 request.Credentials = new NetworkCredential(cInfo.GetFTPUsername(), cInfo.GetFTPPwd());
                 request.Method = WebRequestMethods.Ftp.DeleteFile;
@@ -2277,6 +2438,7 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
                 FtpWebResponse response = (FtpWebResponse)request.GetResponse();
 
                 response.Close();
+                */
             }
             catch (Exception ex)
             {
