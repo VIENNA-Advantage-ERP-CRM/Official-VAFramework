@@ -2388,7 +2388,7 @@
                 data: { subject: subj, AD_Table_ID: currentTable_ID, html: VIS.Utility.encodeText(html), values: JSON.stringify(values) },
                 success: function (data) {
                     $bsyDiv[0].style.visibility = "hidden";
-                    VIS.ADialog.info("Saved");
+                    VIS.ADialog.info("LetterAttached");
                     //var result = JSON.parse(data);
                     //htt = result;
                     //var datauri = 'data:application/pdf;base64,' + htt;
