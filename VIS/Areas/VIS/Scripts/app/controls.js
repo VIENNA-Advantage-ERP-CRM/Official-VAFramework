@@ -1460,7 +1460,7 @@
     VButton.prototype.setVisible = function (visible) {
         this.visible = visible;
         //Action group[]
-        var isag = this.ctrl && this.ctrl.parent().length > 0 && this.ctrl.parent().prop('tagName') == "LI";
+        var isag = false;// this.ctrl && this.ctrl.parent().length > 0 && this.ctrl.parent().prop('tagName') == "LI";
         if (visible) {
             this.ctrl.show();
             if (isag)
