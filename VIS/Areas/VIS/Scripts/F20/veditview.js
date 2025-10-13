@@ -730,8 +730,13 @@
 
                     //apply style only
                     var customStyle = mField.getHtmlStyle();
-                    if (editor != null && customStyle != "") {
-                        editor.getControl().attr('style', customStyle);
+                    if (editor != null) {
+                        if (customStyle != "") {
+                            editor.getControl().attr('style', customStyle);
+                        }
+
+                        //set ctnr as action group instance's current item 
+                        ctnr = editor.getControl().parent(); // li parent of action item 
                     }
                 }
                 else {
@@ -1041,12 +1046,14 @@
         }
 
     }
+
     ActionGroup.prototype.addItem = function (veditor) {
         this.vEditors.push(veditor);
         var li = $('<li>');
         li.append(veditor.getControl());
         this.getActionList().append(li);
     };
+
     ActionGroup.prototype.getItemCount = function () {
         return this.vEditors.length;
     };
