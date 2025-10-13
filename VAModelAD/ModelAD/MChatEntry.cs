@@ -164,7 +164,7 @@ namespace VAdvantage.Model
             //        }
             //    }
             //}
-            string threadID = Common.Common.GetThreadID(tableID, recordID, GetAD_Org_ID());
+            string threadID = Common.Common.GetThreadID(tableID, recordID, Common.Common.GetRecordOrg(GetCtx(), tableID, recordID));
             if (!string.IsNullOrEmpty(threadID))
             {
                 if (!ExecuteThreadAction(actionType: newRecord ? ActionType.New : ActionType.Update, tableID: tableID, recordID: recordID,
@@ -188,7 +188,7 @@ namespace VAdvantage.Model
                 recordID = Util.GetValueOfInt(dsTableDetails.Tables[0].Rows[0]["Record_ID"]);
                 tableID = Util.GetValueOfInt(dsTableDetails.Tables[0].Rows[0]["AD_Table_ID"]);
             }
-            string threadID = Common.Common.GetThreadID(tableID, recordID, GetAD_Org_ID());
+            string threadID = Common.Common.GetThreadID(tableID, recordID, Common.Common.GetRecordOrg(GetCtx(), tableID, recordID));
             if (!string.IsNullOrEmpty(threadID))
             {
                 if (!ExecuteThreadAction(actionType: ActionType.Delete, tableID: tableID, recordID: recordID,

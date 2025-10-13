@@ -602,7 +602,7 @@ namespace VAdvantage.Model
                 return false;
             if (newRecord)
             {
-                string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID(), GetAD_Org_ID());
+                string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID(), Common.Common.GetRecordOrg(GetCtx(), GetAD_Table_ID(), GetRecord_ID()));
                 log.SaveInfo("MAILAttachment1 : ", "Thread ID : " + threadID);
                 if (!string.IsNullOrEmpty(threadID))
                 {
@@ -620,7 +620,7 @@ namespace VAdvantage.Model
         {
             if (!success)
                 return success;
-            string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID(), GetAD_Org_ID());
+            string threadID = Common.Common.GetThreadID(Util.GetValueOfInt(GetAD_Table_ID()), GetRecord_ID(), Common.Common.GetRecordOrg(GetCtx(), GetAD_Table_ID(), GetRecord_ID()));
             if (!string.IsNullOrEmpty(threadID))
             {
                 if (!ExecuteThreadAction(actionType: ActionType.Delete, tableID: GetAD_Table_ID(), recordID: GetRecord_ID(),
