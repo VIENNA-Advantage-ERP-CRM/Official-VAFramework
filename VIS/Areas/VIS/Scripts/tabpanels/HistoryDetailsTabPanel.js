@@ -477,9 +477,9 @@
                             '<div class="VIS-content-section VIS-group-item-flex">' +
                             '<div class="VIS-item-content-group">' +
                             '<p>' + res[i].CharacterData + '</p>' +
+                            '</div>' +
                             (res[i].SentimentAnalysis ? '<div class="VIS-Reaction ' + sentimentCls + '"><i class="' + sentimentIcon + '" aria-hidden="true" title="'
                                 + res[i].SentimentAnaylsisReason + '"></i></div>' : '') +
-                            '</div>' +
                             '</div>' +
                             '</div>' +
                             '</div>' +
