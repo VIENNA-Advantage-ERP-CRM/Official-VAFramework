@@ -938,6 +938,10 @@
         return this.gridTable.getKeyID(row);
     };   //  get
 
+    GridTab.prototype.getValueOfCol = function (row,colName) {
+        return this.gridTable.getValueAt(row,colName);
+    }; 
+
     /**
      *  Get addition info message for status for for seleted tables
      * @param {any} tableName 
@@ -2283,7 +2287,9 @@
                         .append(keyCol).append("=").append(this.getValue(keyCol));
                 }
             }
-            info.append(")<br/>(").append(this.getTableName() + "_GUID =").append(this.getValue(this.getTableName() + "_GUID"));
+            var guidColName = this.getTableName() + "_GUID";
+
+            info.append(")<br/>(").append(guidColName +" =").append(this.getValueOfCol(e.getCurrentRow(), guidColName.toLowerCase()));
             e.Info = info.toString();
         }
         e.setInserting(this.gridTable.getIsInserting());
@@ -3098,7 +3104,7 @@
         if (this._attachments == null)
             return false;
         //
-        var key = this.getRecord_ID();// _gridTable.GetKeyID(CurrentRow);
+        var key = this.getRecord_ID();// 
         return this.hasKey(this._attachments, key);
     };
     GridTab.prototype.hasMarked = function () {
@@ -3109,7 +3115,7 @@
         if (this._marking == null)
             return false;
         //
-        var key = this.getRecord_ID();// _gridTable.GetKeyID(CurrentRow);
+        var key = this.getRecord_ID();
         return this.hasKey(this._marking, key);
     };
 
