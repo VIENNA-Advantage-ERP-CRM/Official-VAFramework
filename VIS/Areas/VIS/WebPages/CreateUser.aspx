@@ -64,7 +64,7 @@
             </div>
             <div class="vis-group-content-wrap">
                 <div class="vis-group-left-wrap">
-                    <img src="../Images/group-tab-mob.png" alt="" />
+                    <img src="../Images/group-tab-mob-new.png" alt="" />
                     <p runat="server" id="lblurl">After save check here: </p>
                     <a runat="server" id="parentUrl"></a>
                 </div>
