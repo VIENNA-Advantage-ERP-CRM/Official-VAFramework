@@ -357,7 +357,7 @@ namespace VIS.Models
             int successCount = 0;
             StringBuilder error = new StringBuilder();
             //get all data
-            DataSet ds = DB.ExecuteDataset($@"SELECT * FROM VIS_AssignedRecordToUser WHERE Record_ID IN ({string.Join(", ", Record_ID)})");
+            DataSet ds = DB.ExecuteDataset($@"SELECT * FROM VIS_AssignedRecordToUser WHERE Record_ID IN ({string.Join(", ", Record_ID)}) AND AD_Table_ID ={AD_Table_ID}");
             ValueNamePair vp = VLogger.RetrieveError();
             string val = "";
             for (int i = 0; i < Record_ID.Length; i++)

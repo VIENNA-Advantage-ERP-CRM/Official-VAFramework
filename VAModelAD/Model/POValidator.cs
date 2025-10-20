@@ -11,6 +11,7 @@ using VAdvantage.Model;
 using VAdvantage.Utility;
 using VAModelAD.AIHelper;
 using VAModelAD.Model;
+using ViennaAdvantage.Model;
 
 namespace VAModelAD.Model
 {
@@ -402,7 +403,14 @@ namespace VAModelAD.Model
             {
                 MAttachment.DeleteFileData(po.Get_Table_ID().ToString() + "_" + po.Get_ID().ToString());
             }
-
+            //VIS_427 Get the record id
+            int record_ID = po.Get_ID() != 0 ? po.Get_ID() : po.Get_IDOld();
+            /*VIS_427 hanlded delete of records from assigned user table if any record is assigned from
+            Different screens*/
+            if (po.Get_Table_ID() != 0 && record_ID !=0 && po.Get_Table_ID() != X_VIS_AssignedRecordToUser.Table_ID)
+            {
+                DeleteAssignRecord(po.Get_Table_ID(), record_ID);
+            }
             if (!_ExportCheckTableNames.Contains(po.GetTableName()) && success)
             {
                 int recordID = po.Get_ID();
@@ -426,7 +434,16 @@ namespace VAModelAD.Model
             }
             return success;
         }
-
+        /// <summary>
+        /// This function delete from VIS_AssignedRecordToUser table
+        /// </summary>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <author>VIS_427</author>
+        public void DeleteAssignRecord(int AD_Table_ID,int Record_ID)
+        {
+            int count = Util.GetValueOfInt(DB.ExecuteQuery(@"DELETE FROM VIS_AssignedRecordToUser WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID));
+        }
         public bool IsAutoUpdateTrl(Ctx ctx, string tableName)
         {
             MClient client = MClient.Get(ctx);
