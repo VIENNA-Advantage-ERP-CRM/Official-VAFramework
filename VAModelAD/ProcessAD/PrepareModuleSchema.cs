@@ -907,7 +907,7 @@ namespace VAdvantage.Process
             string tableName = DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + sAD_Table_ID).ToString();
 
             string stdWhere = " ColumnName IN ('IsActive','AD_Client_ID', 'AD_Org_ID','Created','CreatedBy','Updated','UpdatedBy','"
-                              + tableName + "_ID','Export_ID')";
+                              + tableName + "_ID','Export_ID','"+ tableName + "_GUID')";
 
             IDataReader dr = DB.ExecuteReader("SELECT AD_Column_ID,Name,ColumnName,AD_Val_Rule_ID FROM AD_Column WHERE AD_Table_ID = " + sAD_Table_ID + " AND  " + stdWhere);
             int id = 0;
