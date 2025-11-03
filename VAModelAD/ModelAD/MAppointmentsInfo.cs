@@ -59,6 +59,59 @@ namespace VAdvantage.Model
             : base(ctx, dr, trxName)
         {
         }
+
+        /// <summary>
+        /// This function is called before final saving of records
+        /// </summary>
+        /// <returns>bool type true if can be saved</returns>
+        protected override bool BeforeSave(bool newRecord)
+        {
+            if (!string.IsNullOrEmpty(GetEmailToInfo()))
+            {
+                string emails = GetEmailToInfo();
+                List<string> emailList = emails.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+               .Select(e => e.Trim().ToLower()).ToList();
+
+                if (emailList.Count > 0)
+                {
+                    string contacts = GetAttendeeInfo();
+                    StringBuilder sql = new StringBuilder("SELECT AD_User_ID, LOWER(Email) AS Email FROM AD_User WHERE LOWER(Email) IN (");
+                    sql.Append(string.Join(",", emailList.Select(e => $"'{e.Replace("'", "''")}'")));
+                    sql.Append(")");
+                    DataSet ds1 = DB.ExecuteDataset(sql.ToString());
+                    if (ds1 != null && ds1.Tables.Count > 0 && ds1.Tables[0].Rows.Count > 0)
+                    {
+                        var userDict = ds1.Tables[0].AsEnumerable()
+                            .ToDictionary(r => Util.GetValueOfString(r["Email"]), r => Util.GetValueOfInt(r["AD_User_ID"]));
+                        List<int> contactList = new List<int>();
+                        for (int i = emailList.Count - 1; i >= 0; i--)
+                        {
+                            string email = emailList[i];
+                            if (userDict.TryGetValue(email, out int userId))
+                            {
+                                contactList.Add(userId);
+                                emailList.RemoveAt(i);
+                            }
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(contacts))
+                        {
+                            var ids = contacts.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var idStr in ids.Reverse()) // Reverse if you want the first ID to remain first
+                            {
+                                contactList.Insert(0, Util.GetValueOfInt(idStr));
+                            }
+                        }
+
+                        // Update info
+                        SetAttendeeInfo(string.Join(";", contactList));
+                        SetEmailToInfo(string.Join(",", emailList));
+                    }
+                }
+            }
+            return true;
+        }
+
         /* 	After Save
          *	@param newRecord new
          *	@param success success
@@ -101,7 +154,7 @@ namespace VAdvantage.Model
 
                 string name = GetUserNameFromUserID(GetAD_User_ID());
 
-                body = GetSubject() + " (" + Msg.GetMsg(GetCtx(), "AcceptedBy") + " " + name + ")" + 
+                body = GetSubject() + " (" + Msg.GetMsg(GetCtx(), "AcceptedBy") + " " + name + ")" +
                     " (" + GetStartDate().Value.ToLocalTime() + ")";
 
                 PushNotification.SendNotificationToUser(creatorUserId, GetAD_Window_ID(), GetRecord_ID(), title, body, type);
