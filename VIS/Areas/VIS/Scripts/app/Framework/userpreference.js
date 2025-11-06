@@ -2004,8 +2004,12 @@
                     $self.projectList = JSON.parse(data);
                     var cmbProjectContent = "";
                     for (var itm in $self.projectList) {
-                        cmbProjectContent += "<option value=" + $self.projectList[itm].RecKey + ">" + $self.projectList[itm].Name + "</option>";
+                        var project = $self.projectList[itm];
+                        if (project.IsActive === 'Y') {
+                            cmbProjectContent += "<option value='" + project.RecKey + "'>" + project.Name + "</option>";
+                        }
                     }
+
                     $cmdProject.append(cmbProjectContent);
                     cmbProjectContent = null;
                 }
@@ -2045,7 +2049,7 @@
                                 '<td><span title="' + item.CreatedBy + '" class="VIS-Key-ellipse-text">' + item.CreatedBy + '</span></td>' +
                                 '<td><span title="' + item.ProjectName + '"  class="VIS-Key-ellipse-text">' + item.ProjectName + '</span></td>' +
                                 '<td>' +
-                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '" title="Edit">' +
+                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-project-name="' + item.ProjectName + '" data-is-project-active="' + item.IsActive + '"  data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '" title="Edit">' +
                                 '<i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>' +
                                 '<button class="VIS-key-delete-btn VIS-delete-btn" data-id="' + item.RecordID + '" title="Delete">' +
                                 '<i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
@@ -2140,7 +2144,6 @@
                 success: function (data) {
                     var response = JSON.parse(data);
                     if (response != null && response.length > 0) {
-
                         var optn = "<option></option>";
                         for (var i = 0; i < response.length; i++) {
                             if (response[i].TWOFAMETHOD == "") {

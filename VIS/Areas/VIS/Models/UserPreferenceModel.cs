@@ -641,29 +641,37 @@ namespace VIS.Models
         /// </summary>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public List<LoginData> GetProjects(Ctx ctx)
+        public List<dynamic> GetProjects(Ctx ctx)
         {
-            string sql = "SELECT Name,VAAPI_Project_ID FROM VAAPI_Project WHERE IsActive='Y' ORDER BY Name";
+            string sql = "SELECT Name, VAAPI_Project_ID, IsActive FROM VAAPI_Project ORDER BY Name";
             try
             {
-                List<LoginData> ld = null;
+                List<dynamic> projects = null;
                 DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "VAAPI_Project", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO));
-                if (ds != null && ds.Tables[0].Rows.Count > 0)
-                {
-                    ld = new List<LoginData>();
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                    {
-                        ld.Add(new LoginData() { Name = VAdvantage.Utility.Util.GetValueOfString(ds.Tables[0].Rows[i][0]), RecKey = VAdvantage.Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i][1]) });
-                    }
 
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    projects = new List<dynamic>();
+
+                    foreach (DataRow row in ds.Tables[0].Rows)
+                    {
+                        projects.Add(new
+                        {
+                            Name = Util.GetValueOfString(row["Name"]),
+                            RecKey = Util.GetValueOfInt(row["VAAPI_Project_ID"]),
+                            IsActive = Util.GetValueOfString(row["IsActive"])
+                        });
+                    }
                 }
-                return ld;
+
+                return projects;
             }
             catch
             {
                 return null;
             }
         }
+
 
         /// <summary>
         /// VAI050-This method used to call Login API
