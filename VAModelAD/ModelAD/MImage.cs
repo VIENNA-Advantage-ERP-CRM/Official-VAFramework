@@ -176,7 +176,14 @@ namespace VAdvantage.Model
         //Added By Sarab
         protected override bool AfterSave(bool newRecord, bool success)
         {
-            Guid newGuid = Guid.NewGuid();
+            var newGuid = Guid.NewGuid().ToString();
+
+            if (!string.IsNullOrEmpty(GetImageURL()) && GetImageURL().Split('/')[1].Length > 7)
+            {
+                newGuid = GetImageURL().Split('/')[1].ToString();
+                newGuid = newGuid.Split('.')[0];
+            }
+
             if (byteArray != null)
             {
                 String imageExt = GetImageExtension();
@@ -203,6 +210,7 @@ namespace VAdvantage.Model
                 String imageUrl = GetImageURL();
                 if (!string.IsNullOrEmpty(imageExt) && imageExt.Contains("."))
                 {
+
                    // imageFormat = imageUrl.Substring(imageUrl.LastIndexOf("."));
                     imageUrl = "Images/" + newGuid + imageExt;
                     int count = DB.ExecuteQuery("UPDATE AD_IMAGE SET IMAGEURL='" + imageUrl + "' WHERE AD_IMAGE_ID=" + GetAD_Image_ID(),null, Get_TrxName());
