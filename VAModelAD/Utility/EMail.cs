@@ -1734,7 +1734,7 @@ namespace VAdvantage.Utility
                 MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
                 username = user.GetEMailUser();
                 password = user.GetEMailUserPW();
-                if (!username.Contains('@'))
+                if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
                 {
                     fromEMail = user.GetEMail();
                 }
@@ -1744,7 +1744,7 @@ namespace VAdvantage.Utility
             {
                 username = userConfig.GetSmtpUsername();
                 password = userConfig.GetSmtpPassword();
-                if (!username.Contains('@'))
+                if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
                 {
                     fromEMail = userConfig.GetEMail();
                 }
@@ -1788,7 +1788,7 @@ namespace VAdvantage.Utility
                     MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
                     username = user.GetEMailUser();
                     password = user.GetEMailUserPW();
-                    if (!username.Contains('@'))
+                    if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
                     {
                         fromEMail = user.GetEMail(); ;
                     }
@@ -1803,7 +1803,7 @@ namespace VAdvantage.Utility
                 {
                     username = client.GetRequestUser();
                     password = client.GetRequestUserPW();
-                    if (!username.Contains('@'))
+                    if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
                     {
                         fromEMail = client.GetRequestEMail();
                     }
