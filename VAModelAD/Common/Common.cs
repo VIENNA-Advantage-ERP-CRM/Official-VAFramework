@@ -279,7 +279,7 @@ namespace VAdvantage.Common
             System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(langu);
 
             IReportEngine rpe = null;
-            bool isDocxFile = false;
+            bool isDocxFile;
             int AD_ReportFormat_ID = _pi.GetAD_ReportFormat_ID();
 
             //if("Y".Equals(DB.ExecuteScalar("SELECT IsCrystalReport FROM AD_Process WHERE AD_Process_ID = "+_pi.GetAD_Process_ID())))
@@ -1208,7 +1208,7 @@ namespace VAdvantage.Common
                         return Report_ID;
                     }
                 }
-                catch (Exception e)
+                catch 
                 {
                 }
             }
@@ -1230,7 +1230,7 @@ namespace VAdvantage.Common
             {
                 lang = Util.GetValueOfString(DB.ExecuteScalar("SELECT AD_Language FROM C_BPartner WHERE C_BPartner_ID=(SELECT C_BPartner_ID FROM " + tableName + " WHERE " + tableName + "_ID=" + record_ID + ")"));
             }
-            catch (Exception ex)
+            catch 
             {
 
             }

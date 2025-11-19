@@ -1,0 +1,516 @@
+
+/*
+css from framework do not copy anything from this file
+*/
+:root {
+  --v-c-primary: 0, 152, 247; /* blue */
+  --v-c-on-primary: 255, 255, 255; /* white */
+  --v-c-secondary: 238,238,238; /* grey */
+  --v-c-on-secondary: 102,102,102; /* dark grey */
+  --v-c-common: 255,255,255; /* white */
+  --v-c-on-common: 0,0,0; /* black */
+  --v-c-mandatory: 236,63,63; /* red */
+  --v-c-readonly: 241,241,241; /* light grey */
+  --v-c-font-family: 'NoirPro-Regular', sans-serif;
+}
+html, body {
+  /* height: 100%; */
+  width: 100%;
+  margin: 0;
+  font-weight: 400;
+  /* overflow: hidden; */
+  font-family: var(--v-c-font-family) !important;
+  color: rgba(var(--v-c-on-secondary), 1);
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* background: transparent; */
+  background-image: linear-gradient(
+45deg
+, transparent 50%, rgba(var(--v-c-primary),1) 50%), linear-gradient(
+135deg
+, rgba(var(--v-c-primary),1) 50%, transparent 50%);
+  background-position: calc(100% - 14px), calc(100% - 10px);
+  background-size: 5px 4px, 5px 4px, 1px 1.5em;
+  background-repeat: no-repeat;
+  flex: 1;
+}
+select {
+  /* background: url(../Images/select.png) no-repeat 97% 50%; */
+  min-width: 30px;
+  background-color: white;
+  padding-right: 25px;
+  padding-left: 10px;
+  border: 1px solid rgba(var(--v-c-on-secondary), .2);
+  color: rgba(var(--v-c-on-secondary), 1);
+}
+/*Scroll bar*/
+::-webkit-scrollbar {
+  width: 0.4rem;
+  height: 0.4rem;
+}
+
+::-webkit-scrollbar-track {
+  /*-webkit-box-shadow: inset 0 0 6px rgba(var(--v-c-on-secondary),0.3);*/
+  border-radius: 5px;
+  background: rgba(var(--v-c-primary),.11);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--v-c-primary),.8);
+  outline: none;
+  border-radius: 5px;
+}
+
+  ::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(var(--v-c-primary),1);
+  }
+
+  ::-webkit-scrollbar-thumb:window-inactive {
+      background-color: rgba(var(--v-c-primary),.4);
+  }
+
+input:not([type=button]), input:not([type=submit]), select, textarea {
+    padding: 4px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    color: #000;
+    background-color: #fff;
+    line-height: normal;
+}
+.vis-app-aform-root {
+  position: relative;
+  overflow: hidden;
+}
+.vis-height-full {
+  height: 100%;
+}
+  .vis-app-aform-root input:not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+  .vis-app-aform-root select {
+      min-height: 30px;
+  }
+
+  .vis-app-aform-root input:not([type="button"]):not([type="checkbox"]):not([type="radio"]) {
+      padding: 5px 10px;
+  }
+
+  .vis-app-aform-root input:focus,
+  .vis-app-aform-root select:focus {
+      border: 1px solid rgba(var(--v-c-primary), 1);
+  }
+
+.vis-app-aform-root .input-group-text,
+.vis-info-l-s-wrap button.input-group-text {
+  border: 1px solid rgba(var(--v-c-on-secondary), .2);
+  background-color: rgba(var(--v-c-secondary), 1);
+}
+.vis-app-aform-root input,
+.vis-app-aform-root select,
+.VIS_Pref_content input:not([type="button"]) {
+    border: 1px solid rgba(var(--v-c-on-secondary), .2);
+    color: rgba(var(--v-c-on-secondary), 1);
+    outline: none;
+}
+
+.vis-input-wrap .input-group-text {
+  padding: .375rem .55rem;
+  border: 1px solid rgba(var(--v-c-on-secondary), .2);
+  width: 35px;
+  justify-content: center;
+  cursor: pointer;
+  background-color: rgba(var(--v-c-secondary), 1);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+}
+.vis-input-wrap input:not([type="checkbox"]):not([type="radio"]), .vis-input-wrap select, .vis-control-wrap > button {
+  height: 35px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.vis-input-wrap *[data-hasBtn] {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.vis-attachhistory-search-wrap {
+  padding-bottom: 10px;
+  float: right;
+  /* width: 300px; */
+  /* height: 45px; */
+  /* background-color: white; */
+  display: flex;
+  align-items: center;
+  color: rgba(var(--v-c-on-secondary), 1);
+}
+.prthistory {
+  font-size: 1rem;
+  padding: 0 10px;
+  cursor: pointer;
+}
+.vis-attachhistory-search {
+  /* float: right; */
+  /* width: 220px; */
+  border: 1px solid rgba(var(--v-c-on-secondary), .2);
+  border-radius: 3px;
+  /* overflow: auto; */
+  /* margin-top: 10px; */
+  flex: 1;
+  display: inline-flex;
+  padding: 0 10px;
+  align-items: center;
+}
+.vis-attachhistory-search > input {
+  border: none;
+  outline: none;
+  /* float: left; */
+  /* width: 90%; */
+  height: 30px;
+  padding: 0;
+}
+.vis-attachhistory-search-icon {
+  /* width: 10%; */
+  height: 30px;
+  /* background-image: url(../Images/history-search.png); */
+  /* background-repeat: no-repeat; */
+  /* background-position: center; */
+  cursor: pointer;
+  /* padding-right: 5px; */
+  /* float: left; */
+  /* color: rgba(var(--v-c-on-secondary), 1); */
+  display: inline-flex;
+  align-items: center;
+}
+
+.vis-ad-w-p-s-plst {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  list-style: none;
+}
+.vis-ad-w-p-s-plst li {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(var(--v-c-on-secondary), 1);
+}
+.vis-ad-w-p-s-plst li div {
+  display: flex;
+  align-items: center;
+}
+.vis-ad-w-p-s-plst li:nth-child(2) {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  margin-right: -1px;
+  margin-left: 10px;
+}
+.vis-ad-w-p-s-plst li:not(:first-child) {
+  padding: 3px 5px;
+  background: rgba(var(--v-c-common), 1);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+.vis-ad-w-p-s-plst li:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  margin-left: -1px;
+}
+.vis-ad-w-p-s-plst li select {
+  border: none;
+  background-color: transparent;
+}
+.vis-mainContainer {
+  /* position: absolute; */
+  width: 100%;
+  height: 100%;
+}
+.vis-pSelectInfo {
+  width: 320px;
+  float: left;
+  /* padding: 12px; */
+  background: rgba(var(--v-c-secondary), 1);
+  position: relative;
+  height: 100%;
+}
+.vis-pSelectInner {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 60px);
+  margin-bottom: 10px;
+  overflow: auto;
+  padding: 12px 5px;
+}
+.vis-leftsidebarouterwrap .vis-paymentselect-field:first-child {
+  margin-top: 6px;
+}
+.vis-paymentselect-field {
+  width: 100%;
+}
+.vis-paymentselect-field, .vis-paymentPrint-field {
+  float: left;
+  /* margin-bottom: 5px; */
+  padding: 0 7px;
+}
+.vis-app-aform-root label {
+  font-weight: normal;
+  margin-bottom: 0;
+}
+.vis-paymentselect-field label, .vis-paymentPrint-field label, .vis-paymentPrintChk-field label {
+  font-weight: normal;
+  color: rgba(var(--v-c-on-secondary), 1);
+  margin-bottom: 0;
+}
+.vis-input-wrap label {
+  color: rgba(var(--v-c-on-secondary), .6);
+  font-size: 14px;
+  font-weight: normal;
+  position: absolute;
+  pointer-events: none;
+  left: 30px;
+  top: 0;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+  z-index: 4;
+  margin: 0;
+  height: 100%;
+  align-items: center;
+  display: flex;
+}
+.vis-input-wrap {
+  position: relative;
+  margin-bottom: 15px;
+}
+.vis-control-wrap {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+.vis-input-wrap input:focus ~ label, .vis-input-wrap input:not(:placeholder-shown) ~ label, .vis-input-wrap textarea:not(:placeholder-shown) ~ label, .vis-input-wrap select:focus ~ label, .vis-input-wrap textarea:focus ~ label, .vis-input-wrap select ~ label {
+  top: -7px;
+  font-size: 12px;
+  background: linear-gradient(#fff 50%, transparent 50%);
+  padding: 0 0.4rem;
+  height: auto;
+  left: 5px;
+  opacity: 1;
+  color: rgba(var(--v-c-on-secondary), 1);
+}
+
+
+.vis-leftsidebarouterwrap .vis-input-wrap label {
+  color: rgba(var(--v-c-on-secondary), .8);
+}
+
+.vis-leftsidebarouterwrap .vis-input-wrap select ~ label, .vis-leftsidebarouterwrap .vis-input-wrap select:focus ~ label, .vis-leftsidebarouterwrap .vis-input-wrap input:focus ~ label, .vis-leftsidebarouterwrap .vis-input-wrap input:not(:placeholder-shown) ~ label {
+  background: linear-gradient(rgba(var(--v-c-secondary), 1) 50%, transparent 50%);
+  left: 5px;
+}
+.vis-leftsidebarouterwrap .vis-input-wrap input:not(:focus):placeholder-shown ~ label, .vis-emailsavewrap .vis-input-wrap input:not(:focus):placeholder-shown ~ label, .vis-valpreferencedatawrp .vis-input-wrap input:not(:focus):placeholder-shown ~ label, .vis-formouterwrpdiv .vis-input-wrap input:not(:focus):placeholder-shown ~ label, .vis-formouterwrpdiv .vis-input-wrap textarea:not(:focus):placeholder-shown ~ label {
+  left: 10px;
+}
+.vis-input-wrap input:not([type="checkbox"]):not([type="radio"]), .vis-input-wrap select, .vis-control-wrap > button {
+  height: 35px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.vis-input-wrap input, .vis-input-wrap textarea, .vis-input-wrap select, .vis-input-wrap > button {
+  width: 100%;
+  font-size: 14px;
+}
+.vis-leftsidebarouterwrap .vis-input-wrap select, .vis-leftsidebarouterwrap .vis-input-wrap input {
+  background-color: transparent;
+}
+.vis-leftsidebarouterwrap .vis-input-wrap select, .vis-leftsidebarouterwrap .vis-input-wrap input, .vis-leftsidebarouterwrap .vis-input-wrap .input-group-text {
+  border: 1px solid rgba(var(--v-c-on-secondary), .4);
+}
+.VIS_Pref_btn-2, .VIS_Pref_Savebtn {
+  padding: 10px 12px;
+  background: rgba(var(--v-c-primary), 1);
+  color: rgba(var(--v-c-on-primary), 1) !important;
+  font-size: 14px;
+  border: 0px;
+  float: right;
+  border-radius: .25rem;
+  font-weight: 200;
+  /* font-family: helvetica; */
+  cursor: pointer;
+  margin-bottom: 0px !important;
+  margin-top: 15px;
+  /* text-align: center; */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 40px;
+}
+.ui-button {
+  background: rgba(var(--v-c-primary), 1) !important;
+  color: #fff !important;
+  padding: 0.5rem 1.5rem !important;
+  border: 1px solid rgba(var(--v-c-primary), 1);
+}
+.ui-button-outline{
+  border: 1px solid rgba(var(--v-c-primary), 1);
+  background: #ffffff ;
+  padding: 0.5rem 1.5rem ;
+  color: rgba(var(--v-c-primary), 1) ;
+}
+.ui-widget {
+  font-family: var(--v-c-font-family) !important;
+  font-size: 1em;
+}
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover, .ui-button:hover, .ui-button {
+  border: 1px solid rgba(var(--v-c-primary), 1);
+  background: rgba(var(--v-c-primary), 1);
+}
+.ui-widget input:not([type="checkbox"]):not([type="radio"]), .ui-widget select, .ui-widget textarea, .ui-widget button {
+  font-family: var(--v-c-font-family);
+  outline: none;
+  min-height: 30px;
+}
+.ui-widget-content .ui-corner-all {
+  border-top-right-radius: 0.1rem;
+  border-top-left-radius: 0.1rem;
+}
+
+/* DMS CSS */
+.vadms-leftSideTreeUl {
+  height: 100%;
+  overflow: auto;
+  margin: 0 !important;
+  padding: 0;
+}
+.vadms-leftTreeNode {
+  padding: 0.3rem 0;
+}
+.vadms-leftTreeNode, .vadms-leftTreeNode a, .vadms-leftTreeNode a span, .vadms-folderInfo, .vadms-folderFoot, .vadms-driveTblFirstCol, .vadms-driveDownloadBtn {
+  align-items: center;
+}
+.vadms-leftTreeNode, .vadms-leftTreeNode a, .vadms-leftTreeNode a span, .vadms-folderBox, .vadms-folderInfo, .vadms-folderFoot, .vadms-folderStatusDoc, .vadms-driveTblFirstCol, .vadms-driveDownloadBtn {
+  display: flex;
+}
+.vadms-headerWrap h6, .vadms-leftSideSearch input, .vadms-leftSideTree, .vadms-leftTreeNode a, .vadms-leftTreeNode a span, .vadms-mainContentSection, .vadms-breadCrumbWrap, .vadms-folderInfo, .vadms-contentFolderText, .vadms-activityUser {
+  flex: 1;
+}
+.vadms-leftSideHeader, .vadms-leftTreeNode a, .vadms-leftTreeNode a span, .vadms-folderFoot {
+  justify-content: space-between;
+}
+.vadms-leftTreeNode a {
+  color: inherit;
+  font-size: .875rem;
+}
+
+.vadms-leftTreeNode a > i {
+  font-size: 1.2rem;
+}
+.vadms-headerWrap, .vadms-leftSideHeader, .vadms-leftTreeNode a > i, .vadms-ListViewIco, .vadms-contentFilesWrap .vadms-contentFolderText h6, .vadms-rightFileInfoBox .vadms-folderFoot i, .vadms-detailFileMeta > i, .vadms-detailFileMeta label i, .vadms-detailFileMeta p i, .vadms-detailFileMeta .card-header, .vadms-detailFileMeta .btn-link, .vadms-detailFileMeta .btn-link:hover {
+  color: rgba(var(--v-c-primary), 1);
+}
+.vadms-leftTreeNode a span {
+  padding-left: 0.5rem;
+  word-break: break-word;
+}
+.vadms-leftTreeNode a span i {
+  font-size: .7rem;
+  transition: -webkit-transform .2s ease-in-out;
+}
+.vadms-selectedTreeNode span i {
+  color: rgba(var(--v-c-on-secondary), 1);
+  transform: rotate(90deg);
+}
+.vadms-leftSideSubTreeUl {
+  padding-left: 1rem;
+}
+
+.vis-formouterwrpdiv input, .vis-formouterwrpdiv select, .VIS_Pref_content input:not([type="button"]) {
+  border: 1px solid rgba(var(--v-c-on-secondary), .2);
+  color: rgba(var(--v-c-on-secondary), 1);
+  outline: none;
+}
+
+.vis-input-wrap input:focus, .vis-input-wrap select:focus, .vis-input-wrap textarea:focus, .vis-control-wrap > button:focus {
+  outline: none;
+  box-shadow: none;
+}
+.vis-input-wrap input:focus, .vis-input-wrap select:focus, .vis-input-wrap textarea:focus {
+  border: 1px solid rgba(var(--v-c-primary), 1);
+}
+.vis-input-wrap input:focus ~ label, .vis-input-wrap select:focus ~ label, .vis-input-wrap input:focus ~ label sup, .vis-input-wrap select:focus ~ label sup, .vis-input-wrap textarea:focus ~ label {
+  color: rgba(var(--v-c-primary),1);
+}
+.vis-ctrl-switch {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+.vis-ctrl-switchSlider {
+  cursor: pointer;
+  text-indent: -9999px;
+  width: 3.4rem;
+  height: 0.5rem;
+  background: rgba(var(--v-c-on-secondary), 0.1);
+  display: inline-block;
+  border-radius: 2rem;
+  line-height: 1;
+  padding: 0.1666rem;
+  position: relative;
+  left: -15px;
+}
+.vis-ctrl-switch:checked + .vis-ctrl-switchSlider:after {
+  left: calc(100% - 0rem);
+  transform: translateX(-100%);
+  background: rgba(var(--v-c-primary), 1);
+}
+.vis-ctrl-switchSlider:after {
+  content: "";
+  position: absolute;
+  top: -0.5rem;
+  left: 0rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: rgba(var(--v-c-on-secondary), 1);
+  border-radius: 2rem;
+  transition: 0.3s;
+}
+.vis-control-wrap > label:first-child {
+  position: relative;
+  height: auto;
+  left: 0;
+}
+label.vis-ec-col-lblchkbox {
+  position: relative;
+  pointer-events: auto;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  font-weight: normal;
+  color: rgba(var(--v-c-on-secondary), 1);
+  align-items: center;
+  font-size: .875rem;
+}
+
+
+.vis-ev-ctrlinfowrap {
+  position: absolute;
+  left: 10px;
+  top: 11px;
+  cursor: pointer;
+  outline: none;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+}
+.vis-control-wrap input:not([type=button]):not([type="checkbox"]):not([type="radio"]), .vis-ev-col textarea{
+  padding: 5px 16px 5px 30px;
+}
+.vis-control-wrap textarea{height:85px ; resize: none; padding: 8px 16px;}
+.vis-control-wrap.no-info-icon input:not([type=button]):not([type="checkbox"]):not([type="radio"]), .vis-ev-col.no-info-icon textarea {
+  padding: 5px 16px 5px;
+}
+.vis-input-wrap select{padding: 5px 16px 5px;}
+.vis-ev-col select { padding: 5px 30px 5px 30px !important;}

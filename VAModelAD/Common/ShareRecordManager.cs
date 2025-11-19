@@ -332,7 +332,7 @@ namespace VAdvantage.Common
                         SROV.SetAD_Table_ID(po.Get_Table_ID());
                         SROV.Set_ValueNoCheck("AD_OrgShared_ID", dsV.Tables[0].Rows[v]["AD_OrgShared_ID"]);
                         SROV.Set_ValueNoCheck("IsChildShare", dsV.Tables[0].Rows[v]["IsChildShare"]);
-                        SROV.SetIsReadOnly(dsV.Tables[0].Rows[v]["isReadonly"] == "Y");
+                        SROV.SetIsReadOnly(dsV.Tables[0].Rows[v]["isReadonly"].ToString() == "Y");
                         SROV.SetRecord_ID(po.Get_ID());
                         if (!SROV.Save())
                         {
@@ -341,8 +341,8 @@ namespace VAdvantage.Common
                         VAdvantage.Common.ShareOrg OrgV = new VAdvantage.Common.ShareOrg();
                         OrgV.RecordID = Util.GetValueOfInt(po.Get_ID());
                         OrgV.OrgID = Util.GetValueOfInt(dsV.Tables[0].Rows[v]["AD_OrgShared_ID"]);
-                        OrgV.ChildShare = dsV.Tables[0].Rows[v]["IsChildShare"] == "Y";
-                        OrgV.Readonly = dsV.Tables[0].Rows[v]["isReadonly"] == "Y";
+                        OrgV.ChildShare = dsV.Tables[0].Rows[v]["IsChildShare"].ToString() == "Y";
+                        OrgV.Readonly = dsV.Tables[0].Rows[v]["isReadonly"].ToString() == "Y";
                         VAdvantage.Common.ShareRecordManager.AddRecordToTable(po.Get_Table_ID(), OrgV);
                     }
                 }

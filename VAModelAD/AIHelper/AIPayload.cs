@@ -178,7 +178,7 @@ namespace VAModelAD.AIHelper
                             msgPayload.Message = jObj.Value<string>("error") ?? "AI response indicates failure.";
                         }
                     }
-                    catch (Newtonsoft.Json.JsonException ex)
+                    catch 
                     {
                         msgPayload.Message = "Error parsing response from AI.";
                     }

@@ -35,7 +35,7 @@ namespace VIS.Controllers
                 }
             }
             JavaScriptSerializer se1r = new JavaScriptSerializer();
-            serializedObject = se1r.Serialize(new { item = 1, message = "" });
+            serializedObject = se1r.Serialize(new { Item = 1, message = "",type="ping" });
             return Content(string.Format("data: {0}\n\n", serializedObject), "text/event-stream");
         }
 

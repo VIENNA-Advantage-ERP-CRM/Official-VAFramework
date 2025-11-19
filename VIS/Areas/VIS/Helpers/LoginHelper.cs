@@ -140,7 +140,8 @@ namespace VIS.Helpers
                 if (dsUserInfo != null && dsUserInfo.Tables[0].Rows.Count > 0)
                 {
 
-                    bool isPasswordMatched = dsUserInfo.Tables[0].Rows[0]["Password"].Equals(model.Login1Model.Password);
+                    //bool isPasswordMatched = dsUserInfo.Tables[0].Rows[0]["Password"].Equals(model.Login1Model.Password);
+                    bool isPasswordMatched = SecureEngine.Decrypt(dsUserInfo.Tables[0].Rows[0]["Password"]).Equals(originalpwd);
                     //check for hashing
                     if (isHashed == 'Y')
                     {

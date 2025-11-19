@@ -12,7 +12,7 @@ namespace VAModelAD.Classes
     /// </summary>
     public class TokenManager
     {
-        private static string _tokenKey = "PASSCODEONE";
+        //private static string _tokenKey = "PASSCODEONE";
         public static string jwttokenpath = "https://aitamgmtapi.viennaadvantage.com/api/auth/";
 
         public static bool VerifyToken(string tkn)

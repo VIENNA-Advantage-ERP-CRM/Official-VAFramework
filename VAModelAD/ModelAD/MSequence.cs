@@ -527,7 +527,7 @@ namespace VAdvantage.Model
             return retValue;
         }
 
-        public int GetCurrentNext()
+        public new int GetCurrentNext()
         {
             if (MSysConfig.IsNativeSequence(false) && IsTableID())
             {
@@ -539,7 +539,7 @@ namespace VAdvantage.Model
             }
         }
 
-        public void SetCurrentNext(int CurrentNext)
+        public new void SetCurrentNext(int CurrentNext)
         {
             if (MSysConfig.IsNativeSequence(false) && IsTableID())
             {
@@ -641,7 +641,7 @@ namespace VAdvantage.Model
                     s_log.Finest("DocType_ID=" + C_DocType_ID + " [" + trxName + "]");
                 return GetDocumentNoFromSeq(seq, trxName, po);
             }
-            return null;
+            //return null;
         }
 
         public static String GetDocumentNoFromSeq(MSequence seq, Trx trxName, PO po)

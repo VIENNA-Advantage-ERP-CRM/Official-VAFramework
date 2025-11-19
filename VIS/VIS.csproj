@@ -168,6 +168,9 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="SecureEngineUtility">
+      <HintPath>..\..\GitSource\Market\SecureEngineUtility\bin\Debug\SecureEngineUtility.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.3.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
@@ -257,6 +260,11 @@
     <Content Include="Areas\VIS\Content\Images\mail.svg" />
     <Content Include="Areas\VIS\Content\Images\logo.png" />
     <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
+    <Content Include="Areas\VIS\Content\KeyManager\css\framework.css" />
+    <Content Include="Areas\VIS\Content\KeyManager\css\styles.css" />
+    <Content Include="Areas\VIS\Content\KeyManager\images\credit-report.png" />
+    <Content Include="Areas\VIS\Content\KeyManager\images\flag.png" />
+    <Content Include="Areas\VIS\Content\KeyManager\images\payment-reminder.png" />
     <Content Include="Areas\VIS\Content\Login.css" />
     <Content Include="Areas\VIS\Content\Menu.css" />
     <Content Include="Areas\VIS\Content\notify.mp3" />
@@ -859,6 +867,11 @@
     <Content Include="Areas\VIS\Scripts\widgets\RequestWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\WorkflowWidget.js" />
     <Content Include="Areas\VIS\Templates\VIS_Templates.html" />
+    <Content Include="Areas\VIS\Views\KeyManager\css\framework.css" />
+    <Content Include="Areas\VIS\Views\KeyManager\css\styles.css" />
+    <Content Include="Areas\VIS\Views\KeyManager\images\credit-report.png" />
+    <Content Include="Areas\VIS\Views\KeyManager\images\flag.png" />
+    <Content Include="Areas\VIS\Views\KeyManager\images\payment-reminder.png" />
     <Content Include="Areas\VIS\WebPages\login-form\css\style.css" />
     <Content Include="Areas\VIS\WebPages\login-form\fonts\vis-fonts.svg" />
     <Content Include="Areas\VIS\WebPages\login-form\images\form-bg.png" />
@@ -901,6 +914,7 @@
     <Compile Include="Areas\VIS\Controllers\InfoProductController.cs" />
     <Compile Include="Areas\VIS\Controllers\InfoWindowController.cs" />
     <Compile Include="Areas\VIS\Controllers\JsonDataController.cs" />
+    <Compile Include="Areas\VIS\Controllers\KeyManagerController.cs" />
     <Compile Include="Areas\VIS\Controllers\LandingPageController.cs" />
     <Compile Include="Areas\VIS\Controllers\LocationController.cs" />
     <Compile Include="Areas\VIS\Controllers\LocatorController.cs" />
@@ -992,6 +1006,7 @@
     <Content Include="Areas\VIS\Views\Home\Home.cshtml" />
     <Content Include="Areas\VIS\Views\LandingPage.cshtml" />
     <Content Include="Areas\VIS\Views\LandingPage\Index.cshtml" />
+    <Content Include="Areas\VIS\Views\KeyManager\Index.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />

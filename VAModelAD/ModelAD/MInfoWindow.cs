@@ -109,7 +109,7 @@ namespace VAdvantage.Model
         /// Get Table Name
         /// </summary>
         /// <returns>table name</returns>
-        protected String GetTableName()
+        protected new String GetTableName()
         {
             if (_tableName == null)
             {

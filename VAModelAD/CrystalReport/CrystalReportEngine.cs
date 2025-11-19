@@ -726,7 +726,7 @@ namespace VAdvantage.CrystalReport
                     //    }
                     //}
 
-                    int k = 1;
+                  //  int k = 1;
                     foreach (ReportObject repOp in rptBurndown.ReportDefinition.ReportObjects)
                     {
                         if (repOp.Kind == ReportObjectKind.SubreportObject)

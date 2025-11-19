@@ -1,0 +1,239 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model VIS.Controllers.KeyModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Manager</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="http://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/Areas/VIS/Content/KeyManager/css/framework.css" />
+    <link rel="stylesheet" href="~/Areas/VIS/Content/KeyManager/css/styles.css">
+</head>
+<body>
+    <div>
+        <h1 class="prefix-page-heading">Encryption Keys Settings</h1>
+        <a href="@Url.Content("~")" style="position:absolute;top:10px;right:25px;">Home</a>
+    </div>
+    <div class="prefix-panel-items">
+        <div class="prefix-left-panel">
+            <h2><i class="fa fa-key" aria-hidden="true"></i>Master Keys</h2>
+            <div class="prefix-panel-message @(Model.IsError ? "prefix-panel-error" : "")">
+                @if (!String.IsNullOrEmpty(Model.Message))
+                {
+                    <p id="divError">@Model.Message</p>
+                }
+            </div>
+            @{
+
+                if (Model.IsLegecy)
+                {
+
+                    <div class="prefix-message-box prefix-important-msg">
+
+                        <div class="prefix-msg-left-section">
+                            <div class="prefix-msg-heading"><span class="vis vis-warning"></span>Important</div>
+                            <p id="AppliedKeyText" runat="server">Your system is currently using the default encrption key. Using the <span>default key may pose a potential security risk,</span> as it is not unique to your environment.</p>
+                        </div>
+                        <div class="prefix-msg-right-section">
+                            <div class="prefix-key-heading"><i class="fa fa-shield" aria-hidden="true"></i>Applied Default Key <i class="fa fa-check-circle-o" aria-hidden="true"></i></div>
+                            <div class="prefix-input-field-col">
+                                <label for="">Common Key By System</label>
+                                <div class="prefix-input-group-item">
+                                    <input id="txtAppliedKey" value="@Model.DKey" readonly type="text">
+                                    @*<i class="fa fa-eye" aria-hidden="true"></i>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+
+                    <div class="prefix-message-box prefix-applied-msg">
+
+                        <div class="prefix-msg-left-section">
+                            <div class="prefix-msg-heading"><span class="vis vis-warning"></span>Important</div>
+                            <p id="AppliedKeyText">
+                                The system is using a unique, custom encryption key. Using a dedicated key enhances
+                                security, as it is specific to your environment and not shared by default configurations.
+                            </p>
+                        </div>
+                        <div class="prefix-msg-right-section">
+                            <div class="prefix-key-heading"><i class="fa fa-shield" aria-hidden="true"></i>Applied Key <i class="fa fa-check-circle-o" aria-hidden="true"></i></div>
+                            <div class="prefix-input-field-col">
+                                <label for="">Customized Key</label>
+                                <div class="prefix-input-group-item">
+                                    <input id="txtAppliedKey" value="@Model.DKey" readonly type="text">
+                                    @*<i class="fa fa-eye" aria-hidden="true"></i>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            <div class="prefix-message-box prefix-master-config">
+                <div class="prefix-msg-left-section">
+                    <div class="prefix-msg-heading"><i class="fa fa-key" aria-hidden="true"></i>Master Key Configuration</div>
+                    @{
+
+                        if (Model.IsLegecy)
+                        {
+                            <p>To ensure optimal security of your encrypted data, we recommend generating and applying your own master key.</p>
+                            <ul>
+                                <li>Use <span>the right-side panel to generate a new key.</span></li>
+                                <li>Your unique master key will strengthen system protection and prevent unauthorised access to sensitive information.</li>
+                            </ul>
+
+                        }
+                        else
+                        {
+                            <p>
+                                The generated master key file is stored at the designated master key path and is securely maintained in a protected shared folder with appropriate access controls.
+                                This ensures the key remains safeguarded while supporting encrypted operations within the application.
+                            </p>
+                        }
+                    }
+
+                </div>
+                <div class="prefix-msg-right-section">
+                    <div class="prefix-key-heading"><i class="fa fa-shield" aria-hidden="true"></i>File Path</div>
+                    <div class="prefix-input-field-col">
+
+                        @* Form starts here to include both inputs *@
+                        <form method="post" action="@Url.Action("Index", "KeyManager")">
+
+                            @*@Html.DropDownList("Type",
+                                    new List<SelectListItem> {
+                                        new SelectListItem { Text = "FilePath", Selected = true, Value = "SF" }
+                                    },
+                                    new { style = "width:0px;" }
+                                )*@
+                            <div class="prefix-input-group-item">
+                                @if (Model.IsLegecy)
+                                {
+                                    <input type="text" name="Path" id="txtPath" placeholder="MasterKey (Shared) path" value="@Model.Path" />
+                                }
+                                else
+                                {
+                                    <span type="text" name="Path" id="txtPath">@Model.Path</span>
+                                }
+                            </div>
+
+                            <div class="prefix-group-btn">
+                                @if (!Model.IsSave)
+                                {
+                                    if (Model.IsLegecy)
+                                    {
+                                        <button type="submit" class="prefix-custom-btn prefix-outline-btn" id="btnGenerateKey" name="action" value="Generate">Generate Key</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="prefix-custom-btn" id="btnRotateKey" name="action" value="Rotate">Rotate Key</button>
+                                    }
+                                }
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            <div class="prefix-message-box prefix-apply-key" style="display:none">
+                <div class="prefix-msg-left-section">
+                    <div class="prefix-msg-heading"><i class="fa fa-lock" aria-hidden="true"></i>Apply Key To Existing Data</div>
+                    <p>Once your master key is configured:</p>
+                    <ul>
+                        <li>Use <span>the right-side panel to generate a new key.</span></li>
+                        <li>Your unique master key will strengthen system protection and prevent unauthorised access to sensitive information.</li>
+                    </ul>
+                </div>
+                <div class="prefix-msg-right-section">
+                    <div class="prefix-group-btn">
+                        <input type="button" class="prefix-custom-btn prefix-grey-outline-btn" value="Apply to Existing Data">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prefix-right-panel">
+            <h2><i class="fa fa-key" aria-hidden="true"></i>Data Encryption Applied</h2>
+            <div class="prefix-data-encryp-items">
+                <div class="prefix-data-table">
+                    <div class="prefix-data-thead"><span>Table</span> <span>Columns</span></div>
+                    <div class="prefix-data-tbody">
+                        <div class="prefix-data-tr">
+                            <div class="prefix-data-td"><i class="fa fa-database" aria-hidden="true"></i>AD_Users</div>
+                            <div class="prefix-data-td">
+                                <div class="prefix-data-counts"><i class="fa fa-lock" aria-hidden="true"></i>2</div>
+                            </div>
+                        </div>
+                        <div class="prefix-data-tr">
+                            <div class="prefix-data-td"><i class="fa fa-database" aria-hidden="true"></i>AD_Users</div>
+                            <div class="prefix-data-td">
+                                <div class="prefix-data-counts"><i class="fa fa-lock" aria-hidden="true"></i>2</div>
+                            </div>
+                        </div>
+                        <div class="prefix-data-tr">
+                            <div class="prefix-data-td"><i class="fa fa-database" aria-hidden="true"></i>AD_Users</div>
+                            <div class="prefix-data-td">
+                                <div class="prefix-data-counts"><i class="fa fa-lock" aria-hidden="true"></i>2</div>
+                            </div>
+                        </div>
+                        <div class="prefix-data-tr">
+                            <div class="prefix-data-td"><i class="fa fa-database" aria-hidden="true"></i>AD_Users</div>
+                            <div class="prefix-data-td">
+                                <div class="prefix-data-counts"><i class="fa fa-lock" aria-hidden="true"></i>2</div>
+                            </div>
+                        </div>
+                        <div class="prefix-data-tr">
+                            <div class="prefix-data-td"><i class="fa fa-database" aria-hidden="true"></i>AD_Users</div>
+                            <div class="prefix-data-td">
+                                <div class="prefix-data-counts"><i class="fa fa-lock" aria-hidden="true"></i>2</div>
+                            </div>
+                        </div>
+                        <div class="prefix-data-tr">
+                            <div class="prefix-data-td"><i class="fa fa-database" aria-hidden="true"></i>AD_Users</div>
+                            <div class="prefix-data-td">
+                                <div class="prefix-data-counts"><i class="fa fa-lock" aria-hidden="true"></i>2</div>
+                            </div>
+                        </div>
+                        <div class="prefix-data-tr">
+                            <div class="prefix-data-td"><i class="fa fa-database" aria-hidden="true"></i>AD_Users</div>
+                            <div class="prefix-data-td">
+                                <div class="prefix-data-counts"><i class="fa fa-lock" aria-hidden="true"></i>2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+</body>
+</html>

@@ -588,6 +588,9 @@ html[dir="rtl"] .language::after {
     .input-row, .remember, .login-button {
         /*margin: 0px 30px 30px;*/
     }
+    .loginform form {
+        margin-left: 0;
+    }
 }
 
 @media (max-width: 999px) {
@@ -653,6 +656,7 @@ html[dir="rtl"] .language::after {
         opacity: 0.3;
     }
 }
+
 
 /* SLIDE TWO */
 .slideTwo {

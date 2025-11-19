@@ -35,6 +35,7 @@ using iTextSharp.text;
 using VIS.DataContracts;
 using System.Security.Claims;
 using static System.Net.WebRequestMethods;
+using SecureEngineUtility.Classes.KeyStore;
 
 namespace VIS.Controllers
 {
@@ -105,7 +106,7 @@ namespace VIS.Controllers
         /// <param name="form"></param>
         /// <returns></returns>
         public ActionResult Index(FormCollection form)
-        {
+      {
 
             if (Request.QueryString.Count > 0)
             {
@@ -131,12 +132,31 @@ namespace VIS.Controllers
 
             VAdvantage.DataBase.DBConn.SetConnectionString();//Init database conection
             Language.GetLanguages();
-            LoginModel model = null;
-            SecureEngine.Encrypt("test"); //init secure engine class
 
-            var ident = (ClaimsIdentity)User.Identity;
-            //string loginContextString = 
-            ViewBag.IsAuthorize = ident?.FindFirst("Authorization")?.Value;
+            bool isKeyValidated = true;
+            //Check key pair is valid or not
+            try
+            {
+                KeyProviderFactory.CreateFromConfig();
+               // throw new Exception("testing redirect url");
+            }
+            catch (Exception ex)
+            {
+
+                
+
+                // ViewBag.IsAuthorize = null; //intentially set to force show login page
+                isKeyValidated = false;
+
+
+                // RedirectPermanent(@Url.Content("~/") + "Areas/VIS/WebPages/KeyManager/Index.aspx?error="+ex.Message);
+            }
+
+            LoginModel model = null;
+
+                var ident = (ClaimsIdentity)User.Identity;
+                //string loginContextString = 
+                ViewBag.IsAuthorize = ident?.FindFirst("Authorization")?.Value;
 
             if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
             {
@@ -175,10 +195,9 @@ namespace VIS.Controllers
 
                     /* fix for User Value Null value */
 
-                    if (string.IsNullOrEmpty(ctx.GetContext("##AD_User_Value")))
+                    if (string.IsNullOrEmpty(ctx.GetContext("##AD_User_Value")) || !isKeyValidated)
                     {
                         return new AccountController().SignOff(ctx, Session.SessionID);
-
                     }
 
 
@@ -188,6 +207,12 @@ namespace VIS.Controllers
                     {
                         return View("Maintenance");
                     }
+
+
+                    SecureEngine.Encrypt("test"); //init secure engine class
+
+
+
 
                     string username = "";
                     IDataReader drRoles = LoginHelper.GetRoles(ctx.GetContext("##AD_User_Value"), false, false);
@@ -230,7 +255,7 @@ namespace VIS.Controllers
 
                         return RedirectToAction("SignOff", "Account", new
                         {
-                            ctx=ctx,
+                            ctx = ctx,
                             webSessionId = Session.SessionID
                         });
                         //return new AccountController().SignOff(ctx, Session.SessionID);
@@ -248,7 +273,7 @@ namespace VIS.Controllers
                         ctx.SetApplicationUrl(oldctx.GetApplicationUrl());
                         Session.Timeout = 17;
                         if (oldctx.GetContext("NewSession") == "Y") // logout previous session if user chnage 
-                            // authorization form auth dialog
+                                                                    // authorization form auth dialog
                         {
                             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx, Session.SessionID);
                             createNew = true;
@@ -292,14 +317,14 @@ namespace VIS.Controllers
                     model.Login2Model.Org = ctx.GetAD_Org_ID().ToString();
                     model.Login2Model.Warehouse = ctx.GetAD_Warehouse_ID().ToString();
                     model.Login2Model.FilteredOrg = ctx.GetContext("#AD_FilteredOrg");
-                    
 
 
-                   
+
+
                     var ClientList = new List<KeyNamePair>();
                     var OrgList = new List<KeyNamePair>();
                     var WareHouseList = new List<KeyNamePair>();
-                   
+
 
                     model.Login1Model.AD_User_ID = AD_User_ID;
                     model.Login1Model.DisplayName = username;
@@ -414,9 +439,9 @@ namespace VIS.Controllers
             else
             {
                 /* Read Web config setting */
-                var loginPageUrl = System.Configuration.ConfigurationManager.AppSettings["LoginPageContentUrl"]; 
+                var loginPageUrl = System.Configuration.ConfigurationManager.AppSettings["LoginPageContentUrl"];
 
-                if(!string.IsNullOrEmpty(loginPageUrl))
+                if (!string.IsNullOrEmpty(loginPageUrl))
                 {
                     ViewBag.LoginPageUrl = loginPageUrl;
                 }
@@ -425,78 +450,76 @@ namespace VIS.Controllers
                     ViewBag.LoginPageUrl = "https://html5.viennaadvantage.com/login-form/login-form.html";
                 }
 
-                model = new LoginModel();
-                model.Login1Model = new Login1Model();
-                if (Request.QueryString.Count > 0) /* if query has values*/
+                if (isKeyValidated)
                 {
-                    try
+
+                    model = new LoginModel();
+                    model.Login1Model = new Login1Model();
+                    if (Request.QueryString.Count > 0) /* if query has values*/
                     {
-                        // VIS0008
-                        // Changes done to handle TOKEN in querystring
-                        string TokenKey = "";
-                        foreach (string key in Request.QueryString.AllKeys)
+                        try
                         {
-                            if (key.ToLower() == "token")
-                                TokenKey = Request.QueryString[key];
-                        }
-                        if (TokenKey != "")
-                        {
-                            Dictionary<string, object> tokDetails = LoginHelper.GetTokenDetails(TokenKey);
-                            if (Util.GetValueOfBool(tokDetails["Success"]))
+                            // VIS0008
+                            // Changes done to handle TOKEN in querystring
+                            string TokenKey = "";
+                            foreach (string key in Request.QueryString.AllKeys)
                             {
-                                TempData["user"] = tokDetails["User"]; //get uservalue
-                                TempData["pwd"] = SecureEngine.Decrypt(tokDetails["Password"]);//get userpwd
+                                if (key.ToLower() == "token")
+                                    TokenKey = Request.QueryString[key];
+                            }
+                            if (TokenKey != "")
+                            {
+                                Dictionary<string, object> tokDetails = LoginHelper.GetTokenDetails(TokenKey);
+                                if (Util.GetValueOfBool(tokDetails["Success"]))
+                                {
+                                    TempData["user"] = tokDetails["User"]; //get uservalue
+                                    TempData["pwd"] = SecureEngine.Decrypt(tokDetails["Password"]);//get userpwd
+                                }
+                            }
+                            else
+                            {
+                                TempData["user"] = SecureEngine.Decrypt(Request.QueryString["U"]); //get uservalue
+                                TempData["pwd"] = SecureEngine.Decrypt(Request.QueryString["P"]);//get userpwd
                             }
                         }
-                        else
+                        catch
                         {
-                            TempData["user"] = SecureEngine.Decrypt(Request.QueryString["U"]); //get uservalue
-                            TempData["pwd"] = SecureEngine.Decrypt(Request.QueryString["P"]);//get userpwd
+                            TempData.Clear();
                         }
+                        return RedirectToAction("Index"); // redirect to same url to remove cookie
                     }
-                    catch
+
+                    if (TempData.ContainsKey("user"))
                     {
-                        TempData.Clear();
+                        model.Login1Model.UserValue = TempData["user"].ToString() + "^Y^" + TempData["pwd"].ToString();
+                        // model.Login1Model.Password = TempData.Peek("pwd").ToString();
                     }
-                    return RedirectToAction("Index"); // redirect to same url to remove cookie
-                }
 
-                if (TempData.ContainsKey("user"))
+                    model.Login1Model.LoginLanguage = "en_US";
+                    model.Login2Model = new Login2Model();
+
+                    ViewBag.RoleList = new List<KeyNamePair>();
+                    ViewBag.OrgList = new List<KeyNamePair>();
+                    ViewBag.WarehouseList = new List<KeyNamePair>();
+                    ViewBag.ClientList = new List<KeyNamePair>();
+
+                    ViewBag.Languages = Language.GetLanguages();
+                    ViewBag.ServiceProvider = LoginHelper.GetExternalProvider();
+
+                    Session["ctx"] = null;
+                    ViewBag.direction = "ltr";
+
+                    ViewBag.LibSuffix = "_v3";
+                }
+                else
                 {
-                    model.Login1Model.UserValue = TempData["user"].ToString() + "^Y^" + TempData["pwd"].ToString();
-                    // model.Login1Model.Password = TempData.Peek("pwd").ToString();
+                    ViewBag.KeyErrorMessage = "Error Occured. Key file path is missing in web config, Please conatct System Admin to insert the Key.";
                 }
-
-                model.Login1Model.LoginLanguage = "en_US";
-                model.Login2Model = new Login2Model();
-
-                ViewBag.RoleList = new List<KeyNamePair>();
-                ViewBag.OrgList = new List<KeyNamePair>();
-                ViewBag.WarehouseList = new List<KeyNamePair>();
-                ViewBag.ClientList = new List<KeyNamePair>();
-
-                ViewBag.Languages = Language.GetLanguages();
-                ViewBag.ServiceProvider = LoginHelper.GetExternalProvider();
-
-                Session["ctx"] = null;
-                ViewBag.direction = "ltr";
-
-                ViewBag.LibSuffix = "_v3";
-                //foreach (Bundle b in BundleTable.Bundles)
-                //{
-                //    if (b.Path.Contains("ViennaBase") && b.Path.Contains("_v"))
-                //    {
-                //        ViewBag.LibSuffix = "_v2";
-                //        break;
-                //    }
-                //}
+                ViewBag.IsKeyError = !isKeyValidated;
+                
             }
             return View(model);
-
         }
-
-
-
 
         /* Main Screen */
 

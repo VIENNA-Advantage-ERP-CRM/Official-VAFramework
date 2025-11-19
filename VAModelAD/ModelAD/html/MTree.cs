@@ -164,7 +164,7 @@ namespace VAdvantage.Model
         public MTree(Ctx ctx, int AD_Tree_ID, bool editable, bool clientTree, Trx trxName, bool onDemand)
             : this(ctx, AD_Tree_ID, trxName)
         {
-            this.AD_Tab_ID = AD_Tab_ID;
+            //this.AD_Tab_ID = AD_Tab_ID;
             this.onDemand = onDemand;
             m_editable = editable;
             int AD_User_ID = ctx.GetAD_User_ID();
@@ -187,7 +187,7 @@ namespace VAdvantage.Model
         public MTree(Ctx ctx, int AD_Tree_ID, bool editable, bool clientTree, Trx trxName, int nodeid)
             : this(ctx, AD_Tree_ID, trxName)
         {
-            this.AD_Tab_ID = AD_Tab_ID;
+            //this.AD_Tab_ID = AD_Tab_ID;
             m_editable = editable;
             currentNodeID = nodeid;
             int AD_User_ID = ctx.GetAD_User_ID();

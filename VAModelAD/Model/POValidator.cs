@@ -413,7 +413,7 @@ namespace VAModelAD.Model
                 // vis0008 Check and update changes for AI Assistant
                 if (Env.IsModuleInstalled("VAI01_") && (MTable.Get_Table_ID("VAI01_AIAssistant") > 0))
                 {
-                    string threadID = Common.GetThreadID(po.Get_Table_ID(), po.Get_ID(), po.GetAD_Org_ID());
+                    string threadID = VAdvantage.Common.Common.GetThreadID(po.Get_Table_ID(), po.Get_ID(), po.GetAD_Org_ID());
                     if (!string.IsNullOrEmpty(threadID))
                     {
                         if (!VAModelAD.AIHelper.AIPayload.ExecuteThreadAction(actionType: VAModelAD.AIHelper.AIPayload.ActionType.Delete, tableID: po.Get_Table_ID(), recordID: po.Get_ID(),
@@ -505,7 +505,7 @@ namespace VAModelAD.Model
                     poMaster.SetIsActive(false);
                 else
                 {
-                    if (Common.HasApprovalStatusColumn(poMaster.GetTableName()))
+                    if ( VAdvantage.Common.Common.HasApprovalStatusColumn(poMaster.GetTableName()))
                     {
                         poMaster.Set_Value("ApprovalStatus", "A");
                     }
@@ -602,7 +602,7 @@ namespace VAModelAD.Model
 
         public Lookup GetLookup(Ctx ctx, POInfoColumn colInfo)
         {
-            return Common.GetColumnLookup(ctx, colInfo);
+            return VAdvantage.Common.Common.GetColumnLookup(ctx, colInfo);
         }
 
         public dynamic GetAttachment(Ctx ctx, int aD_Table_ID, int id)

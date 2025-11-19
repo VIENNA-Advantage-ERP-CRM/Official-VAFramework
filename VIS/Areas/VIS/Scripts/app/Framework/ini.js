@@ -67,11 +67,12 @@
             for (var i = 0; i < iniarray.length; i++) {
                 if (iniarray[i] == "AutoNew") {
                     VIS.context.setContext(iniarray[i], VIS.Ini.getLocalStorage(iniarray[i]) == null ? "N" : VIS.Ini.getLocalStorage(iniarray[i]));
+                    obj[iniarray[i]] = VIS.Ini.getLocalStorage(iniarray[i]);
                 }
                 else {
                     VIS.context.setContext('#' + iniarray[i], VIS.Ini.getLocalStorage(iniarray[i]));
+                    obj['#'+iniarray[i]] = VIS.Ini.getLocalStorage(iniarray[i]);
                 }
-                obj[iniarray[i]] = VIS.Ini.getLocalStorage(iniarray[i]);
             }
 
             obj['#TimezoneOffset'] = new Date().getTimezoneOffset().toString();

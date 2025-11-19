@@ -920,7 +920,7 @@ namespace VAdvantage.Model
         private bool UploadFtpFile(string fileName, byte[] file, X_AD_ClientInfo cInfo)
         {
 
-            FtpWebRequest request;
+           // FtpWebRequest request;
             try
             {
                 if (cInfo == null)
@@ -1901,7 +1901,7 @@ namespace VAdvantage.Model
 
             return UploadFileSFTP(fNameFTP, fullname, cInfo);
 
-            FtpWebRequest request;
+           /* FtpWebRequest request;
             try
             {
                 if (cInfo == null)
@@ -1951,7 +1951,7 @@ namespace VAdvantage.Model
             {
                 error.Append("ErrorWhileUploadingFileOnFTP:" + ex.Message);
                 return false;
-            }
+            }*/
         }
 
         List<AttFileInfo> attachmentFiles = null;
@@ -2507,9 +2507,9 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
                     return "";
                 }
             }
-            catch (Exception e)
+            catch 
             {
-                System.Console.WriteLine("Error while downloading File");
+            //    System.Console.WriteLine("Error while downloading File");
                 return "DownloadingError";
             }           
         }

@@ -177,7 +177,7 @@ namespace VAdvantage.Model
     /// Get Table Name
 	/// </summary>
 	/// <returns>table name</returns>
-	public String GetTableName()
+	public new String GetTableName()
 	{
 		return GetTable().GetTableName();
 	}	//	getTableName

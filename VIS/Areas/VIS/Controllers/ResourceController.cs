@@ -48,6 +48,8 @@ namespace VIS.Controllers
                 if (ctx.GetSecureKey() == "")
                     ctx.SetSecureKey(SecureEngineBridge.GetRandomKey());
 
+                //set Encryption legecy
+                ctx.SetContext("#IsLegecyKey", SecureEngine.IsLegecy());
                 //  ctx.SetApplicationUrl(@Url.Content("~/"));
                 ctx.SetIsSSL(Request.Url.Scheme == Uri.UriSchemeHttps);
 

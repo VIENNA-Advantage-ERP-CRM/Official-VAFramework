@@ -205,9 +205,13 @@
                 $root.dialog('close');
             });
 
-            $('[id^=vch]').click(function () {
-                $self.setExplanation();
-            });
+            this.chkOrg.on("change", function(e){ $self.setExplanation() });
+            this.chkUser.on("change", function (e) { $self.setExplanation() });
+            this.chkWindow.on("change", function(e){ $self.setExplanation() });
+
+            //$('[id^=vch]').click(function () {
+            //    $self.setExplanation();
+            //});
 
         };
 
@@ -237,8 +241,14 @@
                 this.cancelbtn.off("click");
             if (this.deletebtn)
                 this.deletebtn.off("click");
-            if ($('[id^=vch]'))
-                $('[id^=vch]').off("click");
+            //if ($('[id^=vch]'))
+            //    $('[id^=vch]').off("click");
+            if(this.chkOrg)
+                this.chkOrg.off("change");
+            if(this.chkUser)
+                this.chkUser.off("change");
+            if(this.chkWindow)
+            this.chkWindow.off("change");
 
             this.Okbtn = null;
             this.cancelbtn = null;
