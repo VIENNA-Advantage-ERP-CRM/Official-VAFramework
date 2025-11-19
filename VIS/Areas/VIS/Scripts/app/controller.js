@@ -5542,7 +5542,9 @@
                 RecIds: recIds,
                 HasKeyColumn: hasKeyColumn,
                 TableName: this.gTable._tableName,
-                AD_Table_ID: AD_Table_ID
+                AD_Table_ID: AD_Table_ID,
+                AD_Window_ID: this.gridFields[0].getAD_Window_ID(),
+                AD_Tab_ID: this.AD_Tab_ID
             }
             if (hasKeyColumn)
                 inn.SingleKeyWhere = singleKeyWhere;
@@ -5674,7 +5676,9 @@
                     RecIds: recIds,
                     HasKeyColumn: hasKeyColumn,
                     TableName: localthis.gTable._tableName,
-                    AD_Table_ID: AD_Table_ID
+                    AD_Table_ID: AD_Table_ID,
+                    AD_Window_ID: localthis.gridFields[0].getAD_Window_ID(),
+                    AD_Tab_ID: localthis.AD_Tab_ID
                 }
                 if (hasKeyColumn)
                     inn.SingleKeyWhere = singleKeyWhere;

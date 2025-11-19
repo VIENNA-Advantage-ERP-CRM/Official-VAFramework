@@ -117,6 +117,10 @@ namespace VIS.DataContracts
         public bool HasKeyColumn { get; set; }
         public int AD_Table_ID { get; set; }
         public String TableName { get; set; }
+        public int AD_Window_ID { get; set; }
+        public int AD_Tab_ID {  get; set; }
+
+
     }
 
     public class DeleteRecordOut
