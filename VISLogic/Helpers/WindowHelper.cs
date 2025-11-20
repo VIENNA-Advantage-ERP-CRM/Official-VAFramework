@@ -2396,6 +2396,8 @@ namespace VIS.Helpers
                         else
                         {
                             p_trx.Commit();
+                            po.SetAD_Window_ID(dInn.AD_Window_ID);
+                            po.SetWindowTabID(dInn.AD_Tab_ID);
                             deletedRecordIds.Add(dInn.RecIds[i]);
                             unDeletedRecIds.Remove(dInn.RecIds[i]);
                             if (haskeyColumn)
@@ -2403,7 +2405,7 @@ namespace VIS.Helpers
                                 if (outt.RecIds == null)
                                     outt.RecIds = new List<int>();
                                 outt.RecIds.Add(singleKeyWhere[i]);
-                            }
+                            }                          
                         }
                     }
                     else	//	Delete via SQL
