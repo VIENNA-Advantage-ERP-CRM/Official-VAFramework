@@ -2369,6 +2369,8 @@ namespace VIS.Helpers
                         bool ok = false;
                         try
                         {
+                            po.SetAD_Window_ID(dInn.AD_Window_ID);
+                            po.SetWindowTabID(dInn.AD_Tab_ID);
                             ok = po.Delete(false);
                         }
                         catch (Exception t)
@@ -2396,8 +2398,6 @@ namespace VIS.Helpers
                         else
                         {
                             p_trx.Commit();
-                            po.SetAD_Window_ID(dInn.AD_Window_ID);
-                            po.SetWindowTabID(dInn.AD_Tab_ID);
                             deletedRecordIds.Add(dInn.RecIds[i]);
                             unDeletedRecIds.Remove(dInn.RecIds[i]);
                             if (haskeyColumn)
