@@ -105,6 +105,7 @@
         var flagImg = false;
 
         var $genReply = null;
+        var $syncfusionEditorContainer = null;
 
         var divReadOnly = $("<div style='width: 100%;height: 100%;background:black;opacity: .1;display:none'>");//table-cell
         var divProgress = null;
@@ -150,7 +151,7 @@
         var ccmail = '';
         var bccmail = '';
         var currThreadID = '';
-
+        var rteObj;
         initEmail();
 
         function initEmail() {
@@ -337,6 +338,7 @@
             $attachment = $root.find('#' + self.windowNo + "_vis-email-attacImg");
             $txtArea = $root.find('#' + self.windowNo + "_vis-Email-textarea");
             $leftfootArea = $root.find(".vis-Email-leftFooter");
+            $syncfusionEditorContainer = $root.find('#' + self.windowNo + "_syncfusionEditorContainer");
 
 
             //$root.find('.vis-form-data-sub').css('margin-top', '10px');
@@ -482,70 +484,96 @@
 
         function loadTextArea() {
             try {
-                $txtArea.kendoEditor({
-                    tools: [
-                        "bold",
-                        "italic",
-                        "underline",
-                        "strikethrough",
-                        "justifyLeft",
-                        "justifyCenter",
-                        "justifyRight",
-                        "justifyFull",
-                        "insertUnorderedList",
-                        "insertOrderedList",
-                        "indent",
-                        "outdent",
-                        "createLink",
-                        "unlink",
-                        "insertImage",
-                        "insertFile",
-                        "subscript",
-                        "superscript",
-                        "createTable",
-                        "addRowAbove",
-                        "addRowBelow",
-                        "addColumnLeft",
-                        "addColumnRight",
-                        "deleteRow",
-                        "deleteColumn",
-                        "viewHtml",
-                        "formatting",
-                        "cleanFormatting",
-                        "fontName",
-                        {
-                            name: "fontSize",
-                            items: [].concat(
-                                [{ text: "8px", value: "8px" }],
-                                [{ text: "12px", value: "12px" }],
-                                [{ text: "16px", value: "16px" }],
-                                [{ text: "20px", value: "20px" }],
-                                [{ text: "24px", value: "24px" }]
-                            )
-                        },
-                        "foreColor",
-                        "backColor"
-                    ],
-                    keyup: getTextChange,
-                    encoded: false
-                });
 
-                $textAreakeno = $txtArea.data("kendoEditor");
-                $textAreakeno.value("");
+                if (isEmail) {
+                    $txtArea.kendoEditor({
+                        tools: [
+                            "bold",
+                            "italic",
+                            "underline",
+                            "strikethrough",
+                            "justifyLeft",
+                            "justifyCenter",
+                            "justifyRight",
+                            "justifyFull",
+                            "insertUnorderedList",
+                            "insertOrderedList",
+                            "indent",
+                            "outdent",
+                            "createLink",
+                            "unlink",
+                            "insertImage",
+                            "insertFile",
+                            "subscript",
+                            "superscript",
+                            "createTable",
+                            "addRowAbove",
+                            "addRowBelow",
+                            "addColumnLeft",
+                            "addColumnRight",
+                            "deleteRow",
+                            "deleteColumn",
+                            "viewHtml",
+                            "formatting",
+                            "cleanFormatting",
+                            "fontName",
+                            {
+                                name: "fontSize",
+                                items: [].concat(
+                                    [{ text: "8px", value: "8px" }],
+                                    [{ text: "12px", value: "12px" }],
+                                    [{ text: "16px", value: "16px" }],
+                                    [{ text: "20px", value: "20px" }],
+                                    [{ text: "24px", value: "24px" }]
+                                )
+                            },
+                            "foreColor",
+                            "backColor"
+                        ],
+                        keyup: getTextChange,
+                        encoded: false
+                    });
 
-                if (body != undefined && body != null) {
-                    $textAreakeno.value(body);
+                    $textAreakeno = $txtArea.data("kendoEditor");
+                    $textAreakeno.value("");
+
+                    if (body != undefined && body != null) {
+                        $textAreakeno.value(body);
+                    }
                 }
-            }
-            catch (ex) {
-                console.log(ex);
-                VIS.ADialog.error("PleaseInstallKendoUIModule");
-                self.dispose();
-                self = null;
-                return false;
-            }
+                catch (ex) {
+                    console.log(ex);
+                    VIS.ADialog.error("PleaseInstallKendoUIModule");
+                    self.dispose();
+                    self = null;
+                    return false;
+                }
+            }else {
 
-
+                var str = $("<div style='width:100%; height:100%'>");
+                try {
+                    rteObj = new ej.documenteditor.DocumentEditorContainer({
+                        enableToolbar: true,
+                        height: "100%",
+                        enablePrint: true,
+                        enableSelection: true,
+                        enableEditor: true,
+                        enableSfdtExport: true
+                        // serviceUrl: VIS.Application.contextUrl + "api/documenteditor/" // if you use service features
+                    });
+                } catch (ex) {
+                    console.error("Syncfusion initialization failed:", ex);
+                    VIS.ADialog.error("Document editor not available. Make sure Syncfusion scripts are loaded.");
+                }
+                setTimeout(function () {
+                    // IMPORTANT
+                    $syncfusionEditorContainer.append(str);
+                    rteObj.appendTo(str[0]);
+                    // Load empty or existing document
+                    rteObj.documentEditor.openBlank();
+                }, 500);
+            }
+           
 
             return true;
 
@@ -1897,7 +1925,28 @@
         };
 
         function preview(e) {
-            var html = $textAreakeno.value();
+
+            var sfdtData = rteObj.documentEditor.serialize();
+            var obj = {
+                sfdtContent: sfdtData
+            }
+            $.ajax({
+                url: VIS.Application.contextUrl + "Email/ConvertSfdtToHtml",
+                type: "POST",
+                data: JSON.stringify(obj),
+                contentType: "application/json",
+                success: function (html) {                    
+                    previewContent(html.htmlContent)
+                }
+            });
+
+            //var html = $textAreakeno.value();
+            
+            
+
+        };
+
+        function previewContent(html) {
             var finalhtmls = '';
             if (_curGC.singleRow == false || rowsSource.length > 0) {
                 finalhtmls = parseHtml1(html, 0);
@@ -1919,11 +1968,7 @@
             chp.setContent($preDiv);
             chp.show();
             chp.hidebuttons();
-            //var $preDiv = $('<div></div>');
-            //$preDiv.append(finalhtmls);
-            //$preDiv.dialog();
-
-        };
+        }
 
         function send(e) {
             var subj = $subject.val();
@@ -2975,6 +3020,8 @@
                 var fieldname = copyhtml.substring(0, copyhtml.indexOf("@@"));
                 var fieldValue = null;
                 var columnName = Object.keys(_curGC.getColumnNames()).filter(function (key) { return _curGC.getColumnNames()[key] === fieldname })[0];
+
+
                 if (columnName != undefined && columnName != null) {
                     if (VIS.DisplayType.IsLookup(_curtab.getField(columnName).getDisplayType()) || VIS.DisplayType.Location == _curtab.getField(columnName).getDisplayType()) {
                         if (rowsSingleView[columnName.toLower()] != null && rowsSingleView[columnName.toLower()] != undefined) {

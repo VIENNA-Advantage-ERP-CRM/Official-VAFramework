@@ -131,7 +131,7 @@
 
                 @{if ((Session["ctx"] as VAdvantage.Utility.Ctx).GetIsRightToLeft())
                     {
-                        <div class="k-rtl vis-Email-textarea-div" style="width: 100%; float: left;">
+                        <div class="k-rtl vis-Email-textarea-div" style="width: 100%; float: left; display:@(ViewBag.IsDocEditor =="" ? "block" : "none")">
                             <textarea ondrop="return false;" id="@(ViewBag.windowNo + "_vis-Email-textarea")" style="width: 100%; height:100%;">
                 
                 </textarea>
@@ -139,17 +139,17 @@
                     }
                     else
                     {
-                        <div class="vis-Email-textarea-div" style="width: 100%; float: left;">
-                            <textarea ondrop="return false;" id="@(ViewBag.windowNo + "_vis-Email-textarea")" style="width: 100%; height:100%;">
+            <div class="vis-Email-textarea-div" style="width: 100%; float: left;display:@(string.IsNullOrEmpty(ViewBag.IsDocEditor) ? "block" : "none")">
+                <textarea ondrop="return false;" id="@(ViewBag.windowNo + "_vis-Email-textarea")" style="width: 100%; height:100%;">
                 
                 </textarea>
-                        </div>
+            </div>
                     }
 
 
                 }
 
-
+            <div id="@(ViewBag.windowNo +"_syncfusionEditorContainer")" style="width: 100%; height: 100%;display:@(string.IsNullOrEmpty(ViewBag.IsDocEditor) ? "none" : "block")"></div>
 
                 <div class="vis-Email-leftFooter">
                     <div>

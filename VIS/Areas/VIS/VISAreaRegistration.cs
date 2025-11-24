@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Web.Mvc;
 using System.Web.Optimization;
+using VIS.Areas.VIS.Classes;
 namespace VIS
 {
     public class VISAreaRegistration : AreaRegistration
@@ -16,7 +17,7 @@ namespace VIS
 
         public override void RegisterArea(AreaRegistrationContext context)
         {
-
+            SyncfusionLicenseConfig.RegisterSyncfusionLicense();
             context.MapRoute(
                                "VIS_default",
                                "VIS/{controller}/{action}/{id}",

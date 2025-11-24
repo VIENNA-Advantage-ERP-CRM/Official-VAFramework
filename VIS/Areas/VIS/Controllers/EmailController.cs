@@ -12,6 +12,11 @@ using VIS.Filters;
 using System.Web.SessionState;
 using VIS.DataContracts;
 using VAdvantage.Common;
+using System.Configuration;
+using Syncfusion.EJ2.DocumentEditor;
+using System.Text;
+using System.Text.RegularExpressions;
+
 
 namespace VIS.Controllers
 {
@@ -32,14 +37,15 @@ namespace VIS.Controllers
         {
             ViewBag.windowNo = windowNo;
             ViewBag.language = language;
+            ViewBag.IsDocEditor = ConfigurationManager.AppSettings["SyncfusionLicense"];
             return PartialView();
         }
 
 
 
         [HttpPost]
-        public JsonResult SendMail(string mails, int AD_User_ID, int AD_Client_ID, int AD_Org_ID, int attachment_ID, string fileNamesFornNewAttach, 
-            string fileNamesForopenFormat, string mailFormat, bool notify, string strDocAttach, int AD_Process_ID,  string printformatfileType)
+        public JsonResult SendMail(string mails, int AD_User_ID, int AD_Client_ID, int AD_Org_ID, int attachment_ID, string fileNamesFornNewAttach,
+            string fileNamesForopenFormat, string mailFormat, bool notify, string strDocAttach, int AD_Process_ID, string printformatfileType)
         {
             List<int> lstDoc = new List<int>();
             Ctx ct = Session["ctx"] as Ctx;
@@ -73,7 +79,7 @@ namespace VIS.Controllers
             }
 
             string result = model.SendMails(lstMails, AD_User_ID, AD_Client_ID, AD_Org_ID, attachment_ID, filesNamesFornNewAttach,
-                filesNamesForopenFormat, Server.HtmlDecode(mailFormat), notify, lstDoc, AD_Process_ID,  printformatfileType);
+                filesNamesForopenFormat, Server.HtmlDecode(mailFormat), notify, lstDoc, AD_Process_ID, printformatfileType);
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
 
@@ -176,7 +182,7 @@ namespace VIS.Controllers
         {
             IsShareFiles = false;
             return SaveAttachmentinShareFiles(file, fileName, folderKey);
-            
+
         }
 
 
@@ -364,6 +370,58 @@ namespace VIS.Controllers
         //    string aaa = am.HtmlToPdf(newLetter);
         //    return Json(JsonConvert.SerializeObject(aaa), JsonRequestBehavior.AllowGet);
         //}
+
+        [HttpPost]
+        public ActionResult ConvertHtmlToSfdt(string htmlContent)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(htmlContent))
+                {
+                    return Json(new { success = false, error = "HTML content is required" }, JsonRequestBehavior.AllowGet);
+                }
+
+                // Method 1: Using WordDocument directly
+                WordDocument document = WordDocument.LoadString(htmlContent, FormatType.Html);
+
+                // Serialize the entire document to JSON (SFDT)
+                string sfdtContent = JsonConvert.SerializeObject(document);
+
+                document.Dispose();
+
+                return Json(new { success = true, sfdtContent = sfdtContent }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ConvertSfdtToHtml(string sfdtContent)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(sfdtContent))
+                    return Json(new { success = false, error = "SFDT content is required" }, JsonRequestBehavior.AllowGet);
+
+                using (var stream = WordDocument.Save(sfdtContent, FormatType.Html))
+                {
+                    stream.Position = 0;
+
+                    string html = new StreamReader(stream).ReadToEnd();
+                    var bodyMatch = Regex.Match(html, @"<body[^>]*>([\s\S]*?)<\/body>", RegexOptions.IgnoreCase);
+
+                    string cleanHtml = bodyMatch.Success ? bodyMatch.Groups[1].Value : html;
+
+                    return Json(new { success = true, htmlContent = cleanHtml.Trim() });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
 
     }
 }
