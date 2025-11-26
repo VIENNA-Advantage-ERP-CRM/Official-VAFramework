@@ -2369,6 +2369,8 @@ namespace VIS.Helpers
                         bool ok = false;
                         try
                         {
+                            po.SetAD_Window_ID(dInn.AD_Window_ID);
+                            po.SetWindowTabID(dInn.AD_Tab_ID);
                             ok = po.Delete(false);
                         }
                         catch (Exception t)
@@ -2403,7 +2405,7 @@ namespace VIS.Helpers
                                 if (outt.RecIds == null)
                                     outt.RecIds = new List<int>();
                                 outt.RecIds.Add(singleKeyWhere[i]);
-                            }
+                            }                          
                         }
                     }
                     else	//	Delete via SQL
