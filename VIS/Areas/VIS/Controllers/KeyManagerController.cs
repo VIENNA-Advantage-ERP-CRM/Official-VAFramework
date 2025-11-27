@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Http.ModelBinding.Binders;
 using System.Web.Mvc;
+using VAdvantage.Utility;
 
 namespace VIS.Controllers
 {
@@ -64,8 +65,18 @@ namespace VIS.Controllers
                     km.Message = Session["error"].ToString();
                 }
 
-                GetKeyInfo();
-                UpdateText();
+                if (Session["Ctx"] == null)
+                {
+                    km.IsError = true;
+                    km.Message = "Login context not found";
+                }
+                else
+                {
+                    Ctx ctx = Session["Ctx"] as Ctx;
+                    km.IsAdmin = ctx.GetAD_Role_ID() == 0 && (ctx.GetAD_User_ID() == 100 || ctx.GetAD_User_ID() ==0);
+                    GetKeyInfo();
+                    UpdateText();
+                }
             }
 
                 return View(km);
@@ -155,10 +166,11 @@ namespace VIS.Controllers
         {
             if (_profile != null)
             {
-                km.DKey = Convert.ToBase64String(_profile.Dek);
+                var input = Convert.ToBase64String(_profile.Dek);
+                km.DKey = input.Length > 4 ? new string('*', input.Length - 4) + input.Substring(input.Length - 4): input;
                 km.IsLegecy = _profile.IsLegacy ;
                
-                km.Path =  _profile.IsLegacy ? "" : ConfigurationManager.AppSettings["KeyProvider:KekSource"];
+                km.Path =  _profile.IsLegacy ? "" : km.IsAdmin? ConfigurationManager.AppSettings["KeyProvider:KekSource"]: new string('*', input.Length - 4);
             }
             else
             {
@@ -204,5 +216,6 @@ namespace VIS.Controllers
 
        public bool IsSave { get; set; }
         public String DKey { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

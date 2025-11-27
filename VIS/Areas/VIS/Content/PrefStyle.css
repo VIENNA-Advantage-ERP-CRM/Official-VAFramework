@@ -149,7 +149,8 @@ div.VIS_Pref_slide-show.pp {
 .VIS_Pref_content-right-4,
 .VIS_Pref_content-right-5,
 .VIS_Pref_content-right-6,
-.VIS_Pref_content-right-7 {
+.VIS_Pref_content-right-7,
+.VIS_Pref_content-right-8 {
     float: left;
     width: 80%;
     padding-left: 20px;

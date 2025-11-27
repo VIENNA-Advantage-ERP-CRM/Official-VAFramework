@@ -3,8 +3,14 @@
     <div id="@("content_" + ViewBag.WindowNumber)" class="VIS_Pref_menu">
         <ul class="VIS_Pref_meni">
             <li class="VIS_Pref_li VIS_Pref_link-1 active">
-                <label id="@("lblUserSetMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">User Setting</label>
+                <label id="@("lblUserSetMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_UserSetting")</label>
             </li>
+            @if (ViewBag.IsAdmin)
+            {
+                <li class="VIS_Pref_li VIS_Pref_link-8">
+                    <label id="@("lblSystemSetMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_SystemSetting")</label>
+                </li>
+            }
             <li class="VIS_Pref_li VIS_Pref_link-6">
                 <label id="@("lblChangePassword_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_PasswordAuth")</label>
             </li>
@@ -115,7 +121,6 @@
         </div>
         <!-- end of Substitute -->
 
-
         <div class="VIS_Pref_clear-both"></div>
         <!-- Login Setting Section-->
         <div class="VIS_Pref_notification">
@@ -138,9 +143,6 @@
             </div>
         </div>
         <!-- End Login Setting Section-->
-
-
-
 
     </div>
     <div style="width:100%; display:inline-block" id="@("divBottom_" + ViewBag.WindowNumber)">
@@ -384,12 +386,7 @@
                             </label>
                         </span>
                     </a>
-                    @if (ViewBag.IsAdmin)
-                    {
-                        <div class="vis-prefthemeconfigbtnwrap">
-                            <span id="@("btnTheme_" + ViewBag.WindowNumber)" class="vis-prefthemeconfigbtn"><i class="vis vis-cog"></i>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ThemeConfig")</span>
-                        </div>
-                    }
+
                 </div>
                 @*<br>*@
                 <div class="VIS_Pref_sett-1" style="display: none">
@@ -721,7 +718,35 @@
         <!-- End API Setting Section-->
     </div>
 
-    <!-- end of Gmail Settings -->
+    @if (ViewBag.IsAdmin)
+    {
+        <div class="VIS_Pref_content-right-8" style="display: block;" id="@("content8_" + ViewBag.WindowNumber)">
+
+            <div class="VIS_Pref_clear-both"></div>
+            <div class="VIS_Pref_notification">
+                <h3>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "SystemSetting")</h3>
+                <p id="@("pSystemSetting_" + ViewBag.WindowNumber)">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_SystemSettingMsg")</p>
+
+                <div class="VIS_Pref_log-width">
+                    <div class="VIS_Pref_pass-line">
+                        <h4>
+                            <span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Theme") </span>
+                            <input id="@("btnTheme_" + ViewBag.WindowNumber)" type="button" value=@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ThemeConfig") class="VIS_Pref_pass">
+                        </h4>
+                        @*<div class="vis-prefthemeconfigbtnwrap">
+                            <span id="@("btnTheme_" + ViewBag.WindowNumber)" class="vis-prefthemeconfigbtn"><i class="vis vis-cog"></i>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ThemeConfig")</span>
+                        </div>*@
+
+                    </div>@*required pattern="\w+"*@
+                    <div class="VIS_Pref_pass-line">
+                        <h4><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "SecurityKey") </span><input id="@("btnSecurityKey" + ViewBag.WindowNumber)" type="button" value="SecurityKey" class="VIS_Pref_pass"></h4>
+                    </div>@*required pattern="\w+"*@
+                    <div class="VIS_Pref_clear-both"></div>
+                </div>
+                <!-- end of log-width -->
+            </div>
+        </div>
+    }
     <!-- end of content -->
     <div class="VIS_Pref_clear-both"></div>
 

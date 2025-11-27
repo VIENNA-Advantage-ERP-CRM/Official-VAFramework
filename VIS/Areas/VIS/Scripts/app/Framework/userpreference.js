@@ -126,6 +126,16 @@
         this.projectList = []; //store the list of projects
         //*********************************
 
+        /************** System Setting *********************** */
+
+
+        var btnTheme = null;
+        var btnSecureKey = null;
+
+        /************* End System Setting********************* */
+
+
+
         var divBottom = null;
 
         var cmbTwoFactor = null;
@@ -278,7 +288,7 @@
             $cmdOrg.on("change", function () { loadWH() });
             $cmdWareHouse = root.find("#cmbWareHouse_" + windowNo);
 
-            $btnTheme = root.find("#btnTheme_" + windowNo)
+            
             //*********** VAI050-ApiKey Settings**********************
             $txtkeyName = root.find("#txtKeyName_" + windowNo);
             $txtProjectName = root.find("#txtProjectName_" + windowNo);
@@ -300,6 +310,13 @@
             cmbTwoFactor = root.find('#cmbTwoFactor_' + windowNo);
 
             cmbTwoFactor.append($('<select>'));
+
+
+            /*System Setting */
+            $btnTheme = root.find("#btnTheme_" + windowNo);
+            btnSecureKey = root.find("#btnSecurityKey" + windowNo);
+
+
             getTwoFAMethod();
 
             defaultLogin = {};
@@ -648,6 +665,10 @@
 
             });
 
+            btnSecureKey.on("click", function () {
+                window.location = VIS.Application.contextFullUrl + 'KeyManager';
+            });
+
 
             //Error get error list on click
             $savetofile.on('click', function () {
@@ -733,6 +754,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
+                $(".VIS_Pref_content-right-8").css("display", "none");
                 divBottom.css("display", "inline-block");
 
             });
@@ -744,6 +766,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
+                $(".VIS_Pref_content-right-8").css("display", "none");
                 divBottom.css("display", "none");
             });
             $(".VIS_Pref_link-3").click(function () {
@@ -754,6 +777,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
+                $(".VIS_Pref_content-right-8").css("display", "none");
                 divBottom.css("display", "none");
             });
             $(".VIS_Pref_link-4").click(function () {
@@ -763,6 +787,7 @@
                 $(".VIS_Pref_content-right-4").css("display", "flex");
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-8").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
                 divBottom.css("display", "none");
             });
@@ -776,6 +801,7 @@
                     $(".VIS_Pref_content-right-4").css("display", "none");
                     $(".VIS_Pref_content-right-6").css("display", "none");
                     $(".VIS_Pref_content-right-7").css("display", "none");
+                    $(".VIS_Pref_content-right-8").css("display", "none");
                     $(".VIS_Pref_content-right-5").css("display", "block");
                     divBottom.css("display", "none");
                 }
@@ -792,6 +818,7 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "block");
+                $(".VIS_Pref_content-right-8").css("display", "none");
                 divBottom.css("display", "none");
             });
 
@@ -803,8 +830,21 @@
                 $(".VIS_Pref_content-right-5").css("display", "none");
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "block");
+                $(".VIS_Pref_content-right-8").css("display", "none");
                 divBottom.css("display", "none");
-            })
+            });
+            $(".VIS_Pref_link-8").click(function () {
+                $(".VIS_Pref_content-right").css("display", "none");
+                $(".VIS_Pref_content-right-2").css("display", "none");
+                $(".VIS_Pref_content-right-3").css("display", "none");
+                $(".VIS_Pref_content-right-4").css("display", "none");
+                $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                $(".VIS_Pref_content-right-8").css("display", "block");
+                divBottom.css("display", "none");
+            });
+                
 
 
             if (isGmailSettings) {

@@ -114,11 +114,11 @@
                         <form method="post" action="@Url.Action("Index", "KeyManager")">
 
                             @*@Html.DropDownList("Type",
-                                    new List<SelectListItem> {
-                                        new SelectListItem { Text = "FilePath", Selected = true, Value = "SF" }
-                                    },
-                                    new { style = "width:0px;" }
-                                )*@
+                            new List<SelectListItem> {
+                                new SelectListItem { Text = "FilePath", Selected = true, Value = "SF" }
+                            },
+                            new { style = "width:0px;" }
+                        )*@
                             <div class="prefix-input-group-item">
                                 @if (Model.IsLegecy)
                                 {
@@ -131,7 +131,7 @@
                             </div>
 
                             <div class="prefix-group-btn">
-                                @if (!Model.IsSave)
+                                @if (!Model.IsSave && Model.IsAdmin)
                                 {
                                     if (Model.IsLegecy)
                                     {
@@ -150,7 +150,28 @@
                 </div>
             </div>
 
+            @if (Model.IsLegecy && !Model.IsAdmin)
+                { 
 
+                    <div class="prefix-message-box prefix-important-msg">
+
+                        <div class="prefix-msg-left-section">
+                            <div class="prefix-msg-heading"><span class="vis vis-warning"></span>Contact System Admin</div>
+                            <p id="AppliedKeyText" runat="server">You can contact to System Admin to apply customized unique key. Unique master key will strengthen system protection and prevent unauthorised access to sensitive information</p>
+                        </div>
+                        <!--<div class="prefix-msg-right-section">
+                    <div class="prefix-key-heading"><i class="fa fa-shield" aria-hidden="true"></i>Applied Default Key <i class="fa fa-check-circle-o" aria-hidden="true"></i></div>
+                    <div class="prefix-input-field-col">
+                        <label for="">Common Key By System</label>
+                        <div class="prefix-input-group-item">
+                            <input id="txtAppliedKey" value="@Model.DKey" readonly type="text">-->
+                        @*<i class="fa fa-eye" aria-hidden="true"></i>*@
+                        <!--</div>
+                    </div>
+                </div>-->
+                    </div>
+
+            }
 
             <div class="prefix-message-box prefix-apply-key" style="display:none">
                 <div class="prefix-msg-left-section">
