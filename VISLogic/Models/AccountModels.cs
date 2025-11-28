@@ -70,6 +70,8 @@ namespace VIS.Models
 
         public bool SkipNow { get; set; }
 
+        public bool Refresh { get; set; }
+
         public bool ResendOTP { get; set; }
 
         public string QRCodeURL { get; set; }
