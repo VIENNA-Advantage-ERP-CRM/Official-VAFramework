@@ -174,6 +174,12 @@ new SelectList(ViewBag.Languages, "Key", "Name"), new { id = "cmbLang" })
             <div id="login-form-3" class="login-form">
                 <div class="vis-loginQRSec vis-firstLoginAuth">
                     <div class="vis-loginQRLabel"><label id="lblScanQRCode"></label></div>
+                    <div style="display:none" class="vis-qrtext-div">
+                        <span Id="vis-qrtxt-spn1"></span>
+                        <a href="#" id="lblRefresh" class="click-here-link"></a>
+                        <span Id="vis-qrtxt-spn2"></span>
+                        @Html.HiddenFor(m => m.Login1Model.Refresh, new { id = "Refresh" })
+                    </div>
                     <div id="vis-loginqrcode" class="vis-clsloginqr">
                         <img id="QRCdeimg" src="" alt="QR CODE HERE" />
                     </div>
