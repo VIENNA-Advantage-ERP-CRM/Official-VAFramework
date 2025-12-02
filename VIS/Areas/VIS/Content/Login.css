@@ -858,3 +858,8 @@ html[dir="rtl"] .language::after {
     align-items: center;
     justify-content: center;
 }
+.vis-qrtext-div{
+    display:none;
+    text-align:center;
+    margin-top:-7px;
+}
