@@ -178,7 +178,7 @@ namespace VAdvantage.Model
         {
             var newGuid = Guid.NewGuid().ToString();
 
-            if (!string.IsNullOrEmpty(GetImageURL()) && GetImageURL().Split('/')[1].Length > 7)
+            if (!string.IsNullOrEmpty(GetImageURL()) && GetImageURL().Contains('/') && GetImageURL().Split('/')[1].Length > 7)
             {
                 newGuid = GetImageURL().Split('/')[1].ToString();
                 newGuid = newGuid.Split('.')[0];
