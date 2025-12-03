@@ -531,7 +531,7 @@ namespace VISLogic.Models
                            JSON_VALUE(WN.RequestData, '$.url') AS URL,
                            JSON_Query(WN.RequestData, '$.headers') AS Headers,
                            JSON_VALUE(WN.RequestData, '$.bodyType') AS BodyType,
-                           CASE WHEN JSON_VALUE(WN.RequestData, '$.bodyType') = 'Plain Text'
+                           CASE WHEN JSON_VALUE(WN.RequestData, '$.bodyType') IN ('Plain Text', 'XML')
                            THEN JSON_VALUE(WN.RequestData, '$.bodyContent')
                            ELSE JSON_QUERY(WN.RequestData, '$.bodyContent') END AS BodyContent,
                            JSON_Query(WN.RequestData, '$.queryString') AS QueryString
@@ -546,7 +546,7 @@ namespace VISLogic.Models
                            jsonb_extract_path_text(WN.RequestData::jsonb, 'url') AS URL,
                            jsonb_extract_path(WN.RequestData::jsonb, 'headers') AS Headers,
                            jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') AS BodyType,
-                           CASE WHEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') = 'Plain Text'
+                           CASE WHEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') IN ('Plain Text', 'XML')
                            THEN jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent')
                            ELSE jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent') END AS BodyContent,
                            jsonb_extract_path(WN.RequestData::jsonb, 'queryString') AS QueryString
