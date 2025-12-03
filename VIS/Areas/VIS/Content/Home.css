@@ -4141,3 +4141,8 @@ ul.vis-userLinks-ListMenu li a i {
         cursor:pointer;
         opacity: 1;
     }
+
+.vis-toast-defDiv {
+    min-height: 20px;
+    padding: 2px;
+}

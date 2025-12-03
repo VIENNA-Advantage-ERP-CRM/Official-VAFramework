@@ -109,6 +109,7 @@
             txtBodyType = $('<select>'
                 + '<option>JSON</option>'
                 + '<option>Plain Text</option>'
+                + '<option>XML</option>'
                 + '</select>');
             bodyTypeCtrl.append(bodyTypeCtrlWrap);
             bodyTypeCtrlWrap.append(txtBodyType).append('<label class=" VIS_Pref_Label_Font">' + VIS.Msg.getMsg("VIS_BodyType") + '</label>');
@@ -546,6 +547,11 @@
             return result;
         }
 
+        function escapeXml(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/</g, '&l;').replace(/>/g, '&g;');
+        }
+
         function SavehttpReqDetails() {
             var isRequired = false;
             var msg = VIS.Msg.getMsg("FillMandatory") + " ";
@@ -590,7 +596,17 @@
 "bodyType":"${BodyType}",
 "bodyContent": ${JSON.stringify(convertBodyContentToJson(description))}
 }`;
-            } else {
+            }
+            else if (BodyType == 'XML') {
+                text = `{
+"url":  "${URL}",
+"method":"${method}",
+"queryString": ${JSON.stringify(queryStrings)},
+"bodyType":"${BodyType}",
+"bodyContent": ${JSON.stringify(escapeXml(description))}
+}`;
+            }
+            else {
                 text = `{
 "url":  "${URL}",
 "method":"${method}",
