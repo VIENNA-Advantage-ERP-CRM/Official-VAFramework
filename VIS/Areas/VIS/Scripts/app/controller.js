@@ -7367,7 +7367,7 @@
                     }
                     d.setMilliseconds(0);
                     d.setSeconds(0);
-                    return d.toISOString();
+                    return d.toISOString().replace('.000Z', 'Z');
                 }
                 catch (ex) {
                 }
@@ -7383,7 +7383,7 @@
                 var d = new Date();
                 d.setMilliseconds(0);
                 d.setSeconds(0);
-                return d.toISOString();
+                return d.toISOString().replace('.000Z', 'Z');
             }
 
             //	Boolean

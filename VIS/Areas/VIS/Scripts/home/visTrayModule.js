@@ -71,8 +71,8 @@
 
             // Build toast HTML
             const toastHtml = `
-                <div id="${toastId}" class="toast system-toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
-                  <button type="button" class="close" data-dismiss="toast" aria-label="Close">
+                <div id="${toastId}" class="vis-toast-defDiv toast system-toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+                  <button type="button" class="close" data-dismiss="toast" aria-label="Close" style="transition: none;">
                     <span aria-hidden="true">&times;</span>
                   </button>
                   <div class='vis-divMessage'></div>
