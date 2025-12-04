@@ -128,7 +128,7 @@
             showBusy(true);
             var text = $textArea.find('#chatBox_textArea').val();
             if ($.trim(text) == "" || text == "" || text == null) {
-                VIS.ADialog.info("EnterData");
+                VIS.ADialog.info("VIS_TypeSomething");
                 /* if (e != undefined) {
                      e.preventDefault();
                  }*/
@@ -227,7 +227,7 @@
                 saveMsg(e);
                 /* var text = $inputChat.val();
                  if ($.trim(text) == "" || text == "" || text == null) {
-                     VIS.ADialog.info("EnterData");
+                     VIS.ADialog.info("VIS_TypeSomething");
                      if (e != undefined) {
                          e.preventDefault();
                      }
@@ -441,7 +441,7 @@
                     //if (newText.length === 0) return;
                     if (newText.length === 0) {
                         if ($wrapper.find(".vis-chat-error").length === 0) {
-                            var $errorMsg = $(`<div class="vis-chat-error" style="font-size:0.7rem;margin-bottom:3px;">${VIS.Msg.getMsg("EnterData")}</div>`);
+                            var $errorMsg = $(`<div class="vis-chat-error" style="font-size:0.7rem;margin-bottom:3px;">${VIS.Msg.getMsg("VIS_TypeSomething")}</div>`);
                             $wrapper.prepend($errorMsg);
                             setTimeout(() => {
                                 $errorMsg.fadeOut(300, function () { $(this).remove(); });
@@ -566,7 +566,7 @@
         function saveMsg(e) {
             var text = $textArea.find('#chatBox_textArea').val();
             if ($.trim(text) == "" || text == "" || text == null) {
-                VIS.ADialog.info("EnterData");
+                VIS.ADialog.info("VIS_TypeSomething");
                 /* if (e != undefined) {
                      e.preventDefault();
                  }*/
