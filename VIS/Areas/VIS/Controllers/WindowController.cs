@@ -295,7 +295,8 @@ namespace VIS.Areas.VIS.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetWindowRecord(Ctx ctxp, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
+        public JsonResult GetWindowRecord(Ctx ctxp, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID,
+            int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields,string action)
         {
             object data = null;
             Ctx ctx = new Ctx(ctxp);
@@ -303,10 +304,16 @@ namespace VIS.Areas.VIS.Controllers
 
             using (var w = new WindowHelper())
             {
-                data = w.GetWindowRecord(ctx, Columns, TableName, AD_Window_ID, AD_Tab_ID, WindowNo, WhereClause, Encryptedfields, ObscureFields);
+                data = w.GetWindowRecord(ctx, Columns, TableName, AD_Window_ID, AD_Tab_ID, WindowNo, WhereClause, Encryptedfields, ObscureFields,action);
             }
             return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
         }
+
+
+
+        
+
+
 
 
         [HttpPost]

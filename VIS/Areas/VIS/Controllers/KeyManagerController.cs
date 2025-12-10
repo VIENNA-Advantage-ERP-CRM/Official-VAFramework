@@ -86,7 +86,8 @@ namespace VIS.Controllers
 
         private KeyModel Generate(KeyModel kmodel)
         {
-
+            Ctx ctx = Session["Ctx"] as Ctx;
+            kmodel.IsAdmin = ctx.GetAD_Role_ID() == 0 && (ctx.GetAD_User_ID() == 100 || ctx.GetAD_User_ID() == 0);
             string path = kmodel.Path;
             if (path != null && path != "" && (path.StartsWith("\\") || path.Contains(":")))
             {
@@ -114,8 +115,11 @@ namespace VIS.Controllers
                     // Save and refresh
                     config.Save(ConfigurationSaveMode.Modified);
                     ConfigurationManager.RefreshSection("appSettings");
+                    kmodel.Message = "Key Generated";
+                    
                     GetKeyInfo();
                     UpdateText();
+                    Session["Ctx"] = ctx;
                 }
                 else
                 {
@@ -141,6 +145,10 @@ namespace VIS.Controllers
         private KeyModel  Rotate()
         {
             km = new KeyModel();
+
+
+            km.IsAdmin = true;
+
             GetKeyInfo();
             string retValue = KeyRotationHelper.RotateKek(_keyProvider);
 

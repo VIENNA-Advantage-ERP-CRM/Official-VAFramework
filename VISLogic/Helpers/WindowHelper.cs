@@ -3642,7 +3642,7 @@ namespace VIS.Helpers
         }
 
 
-        public object GetWindowRecord(Ctx ctx, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)
+        public object GetWindowRecord(Ctx ctx, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields,string action)
         {
             object data = null;
             if (!string.IsNullOrEmpty(WhereClause))
@@ -3653,6 +3653,25 @@ namespace VIS.Helpers
             }
             else
                 WhereClause = "1=2";
+
+            if (!string.IsNullOrEmpty(action)) //Update wizard strep
+            {
+                //var CurrentWizardStep = DB.ExecuteQuery("SELECT CurrentWizardStep FROM " + TableName + " WHERE" + WhereClause);
+                int tabIndex = ctx.GetContextAsInt(WindowNo, "tb_Index");
+                int _curWizardStep = ctx.GetContextAsInt(WindowNo, "CurrentWizardStep");
+                if (action == "SAR" || action == "DRD")
+                {
+                    if (action == "SAR" && _curWizardStep < tabIndex)
+                    {
+                        DB.ExecuteQuery("UPDATE " + TableName + " SET CurrentWizardStep = " + tabIndex + " WHERE " + WhereClause);
+                    }
+                    else if (action == "DRD")
+                    {
+                        DB.ExecuteQuery("UPDATE " + TableName + " SET CurrentWizardStep = " + (tabIndex - 1) + " WHERE " + WhereClause);
+                    }
+                }
+            }
+
 
             GridWindowVO vo = AEnv.GetMWindowVO(ctx, WindowNo, AD_Window_ID, 0);
 
@@ -3711,6 +3730,8 @@ namespace VIS.Helpers
             }
             return data;
         }
+
+        
 
         public object GetWindowRecords(Ctx ctxp, List<string> Columns, string TableName, string WhereClause, List<string> Fields, SqlParamsIn sqlIn, int AD_Window_ID,
        int AD_Tab_ID, int WindowNo, int AD_Table_ID, List<string> ObscureFields, bool summaryOnly, int MaxRows, bool DoPaging)

@@ -905,6 +905,16 @@
         //Action evt listnder
         this.aPanel = gc.getAPanel();
         this.curTab = gc.getMTab();
+
+        this.isWizard = false;
+
+        for (var f = 0; f < this.curTab.getFields().length; f++) {
+            if (this.curTab.getFields()[f].getColumnName() == "CurrentWizardStep") {
+                this.isWizard = true;
+            }
+        }
+
+
         this.curGC = gc;
         var backColor = this.curTab.getHeaderBackColor();
         this.setHeaderLayout(this.curTab, backColor);
@@ -977,6 +987,9 @@
 
     HeaderPanel.prototype.evaluateStyleLogic = function (styleLogic) {
         var arr = styleLogic.split(',');
+        if (styleLogic.indexOf(',,') > -1) {
+             arr = styleLogic.split(',,');
+        }
         var ret = null;
         for (var j = 0; j < arr.length; j++) {
             var cArr = arr[j].split("?");
@@ -1147,17 +1160,25 @@
     /**
      * This method will be invoked on record change in window.
      * */
-    HeaderPanel.prototype.navigate = function (isChild) {
+    HeaderPanel.prototype.navigate = function (isChild, winAction) {
         this.isChild = isChild;
         this.pRowData = null;
         if (this.isChild) {
 
+            var action = "";
+            if (this.isWizard && (winAction == "SAR" || winAction == "DRD")) {
+                action = winAction;
+            }
             var self = this;
-            this.curTab.getTableModel().getRowFromDB(this.curTab.getCurrentRow(), function (data) {
+            this.curTab.getTableModel().getRowFromDB(this.curTab.getCurrentRow(), action, function (data) {
 
                 /*set processed value so window dont allow insertion*/
                 if (data && "processed" in data) {
                     VIS.context.setWindowContext(self.windowNo, "Processed", data["processed"].toString().toLowerCase() == "true" || data["processed"].toString() == "Y" ? "Y" : "N");
+                }
+
+                if (data && "currentwizardstep" in data) {
+                    VIS.context.setWindowContext(self.windowNo, "CurrentWizardStep", data["currentwizardstep"]);
                 }
 
                 self.pRowData = data;
@@ -1166,6 +1187,11 @@
             });
         }
         else {
+            if (this.isWizard && (winAction == "SAR")) {
+                var contxt = VIS.context.getWindowContext(this.windowNo, "CurrentWizardStep");
+                if (contxt < 0)
+                    return this.navigate(true, winAction);
+            }
             this.setHeaderItems();
             this.isChild = false;
         }

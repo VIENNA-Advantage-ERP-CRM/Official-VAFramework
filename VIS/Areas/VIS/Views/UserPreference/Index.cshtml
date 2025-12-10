@@ -5,12 +5,7 @@
             <li class="VIS_Pref_li VIS_Pref_link-1 active">
                 <label id="@("lblUserSetMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_UserSetting")</label>
             </li>
-            @if (ViewBag.IsAdmin)
-            {
-                <li class="VIS_Pref_li VIS_Pref_link-8">
-                    <label id="@("lblSystemSetMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_SystemSetting")</label>
-                </li>
-            }
+
             <li class="VIS_Pref_li VIS_Pref_link-6">
                 <label id="@("lblChangePassword_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_PasswordAuth")</label>
             </li>
@@ -31,6 +26,12 @@
             <li class="VIS_Pref_li VIS_Pref_link-7">
                 <label id="@("lblAPI_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">API</label>
             </li>
+            @if (ViewBag.IsAdmin)
+            {
+                <li class="VIS_Pref_li VIS_Pref_link-8">
+                    <label id="@("lblSystemSetMenu_" + ViewBag.WindowNumber)" class="VIS_Pref_Label_Font">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_SystemSetting")</label>
+                </li>
+            }
 
         </ul>
         <div class="VIS_Pref_clear-both"></div>
@@ -453,8 +454,7 @@
 
         <div class="VIS_Pref_err_mgntop">
             <div class="VIS_Pref_err_btnLeft">
-                <input id="@("vbtnLogDate_" + ViewBag.WindowNumber)" type="date" style="width:40%;">
-                <button id="@("vbtnDownLog_" + ViewBag.WindowNumber)" class="VIS_Pref_pass-btn VIS_Pref_err_btnDwnload">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_DownloadServerLog") </button>
+
             </div>
             <div class="VIS_Pref_err_btnRight">
                 <input style="margin-top:0px;" id="@("vchkErrorOnly_" + ViewBag.WindowNumber)" type="checkbox">
@@ -729,18 +729,17 @@
 
                 <div class="VIS_Pref_log-width">
                     <div class="VIS_Pref_pass-line">
-                        <h4>
-                            <span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Theme") </span>
-                            <input id="@("btnTheme_" + ViewBag.WindowNumber)" type="button" value=@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ThemeConfig") class="VIS_Pref_pass">
-                        </h4>
-                        @*<div class="vis-prefthemeconfigbtnwrap">
-                            <span id="@("btnTheme_" + ViewBag.WindowNumber)" class="vis-prefthemeconfigbtn"><i class="vis vis-cog"></i>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ThemeConfig")</span>
-                        </div>*@
-
-                    </div>@*required pattern="\w+"*@
+                        <span style="width:150px">@*@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Theme")*@ </span>
+                        <input id="@("btnTheme_" + ViewBag.WindowNumber)" type="button" value="@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "ThemeConfig")" class="VIS_Pref_pass-btn">
+                        <span style="width:150px">@*@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "SecurityKey")*@ </span>
+                        <input id="@("btnSecurityKey" + ViewBag.WindowNumber)" type="button" value="@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_SecurityKey")" class="VIS_Pref_pass-btn">
+                    </div>
+                    <div class="VIS_Pref_notification" style="padding-top:20px"></div>
                     <div class="VIS_Pref_pass-line">
-                        <h4><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "SecurityKey") </span><input id="@("btnSecurityKey" + ViewBag.WindowNumber)" type="button" value="SecurityKey" class="VIS_Pref_pass"></h4>
-                    </div>@*required pattern="\w+"*@
+                        @*<span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "SecurityKey") </span>*@
+                        <input id="@("vbtnLogDate_" + ViewBag.WindowNumber)" type="date" style="width:150px">
+                        <button id="@("vbtnDownLog_" + ViewBag.WindowNumber)" class="VIS_Pref_pass-btn VIS_Pref_err_btnDwnload">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_DownloadServerLog") </button>
+                    </div>
                     <div class="VIS_Pref_clear-both"></div>
                 </div>
                 <!-- end of log-width -->

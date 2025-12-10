@@ -63,6 +63,10 @@ VIS.context.getWindowContext = function (windowNo, context, onlyWindow,val2) {
         value = this.m_map[windowNo][key];
     }
 
+    if (value === 0) {
+        value = "0";
+    }
+
     if (!value || value == "") {
         //	Explicit Base Values
         if (context.startsWith("#") || context.startsWith("$"))

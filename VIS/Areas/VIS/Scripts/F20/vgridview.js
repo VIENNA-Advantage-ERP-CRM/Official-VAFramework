@@ -418,7 +418,9 @@
     VTable.prototype.evaluateStyleLogic = function (rIndex, styleLogic) {
         this.cellRowIndex = rIndex;
         var arr = styleLogic.split(',');
-
+        if (styleLogic.indexOf(',,') > -1) {
+            arr = styleLogic.split(',,');
+        }
         //this.cellColumnName = col.field;
         var ret = null;
         for (var j = 0; j < arr.length; j++) {

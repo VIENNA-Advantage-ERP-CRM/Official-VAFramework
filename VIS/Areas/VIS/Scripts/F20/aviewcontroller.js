@@ -1924,8 +1924,13 @@
 
         var retVal = $this.gTab.dataSave(manualCmd);
         if (retVal) {
-            if (manualCmd && $this.vHeaderPanel) {
-                $this.vHeaderPanel.navigate();
+            if (manualCmd) {
+                if($this.vHeaderPanel != null) {
+                    $this.vHeaderPanel.navigate(false,'SAR');
+                }
+                else if ($this.aPanel.vHeaderPanel != null) {
+                    $this.aPanel.vHeaderPanel.navigate(true, 'SAR');
+                }
                 //refresh Grid Row
                 // this.vTable.refreshRow();
             }
@@ -2010,6 +2015,12 @@
             else {
                 that.refreshTabPanelData(that.gTab.getRecord_ID(), 'D');
             }
+            if (info) {
+                if (that.vHeaderPanel == null && that.aPanel.vHeaderPanel != null) {
+                    that.aPanel.vHeaderPanel.navigate(true, 'DRD');
+                }
+            }
+
             that.dynamicDisplay(-1);
             that.aPanel.setBusy(false);
         });
@@ -2102,6 +2113,9 @@
             this.gTab.setCurrentRow(e.m_currentRow);
             this.dynamicDisplay(col);
         }
+
+        VIS.context.setContext(this.curWindowNo, "win_Action", null);
+
 
         if (!e.getIsChanged() || col < 0)
             return;

@@ -5273,7 +5273,7 @@
       *  @return row Object
       */
 
-    GridTable.prototype.getRowFromDB = function (row, callback) {
+    GridTable.prototype.getRowFromDB = function (row,action, callback) {
         if (row < 0 || this.getRowCount() == 0 || this.inserting) {
             if (callback) {
                 callback(null);
@@ -5316,6 +5316,8 @@
                     WhereClause: VIS.secureEngine.encrypt(where),
                     Encryptedfields: this.createGridFieldArr(this.gridFields, true),
                     ObscureFields: this.createObsecureFields(this.gridFields),
+                    action:action
+
                 },
                 success: function (jData) {
                     dr = new VIS.DB.DataReader().toJson(jData);

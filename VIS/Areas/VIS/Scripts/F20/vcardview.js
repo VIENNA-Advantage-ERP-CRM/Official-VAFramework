@@ -2164,6 +2164,9 @@
 
     VCard.prototype.evaluateStyleLogic = function (styleLogic) {
         var arr = styleLogic.split(',');
+        if (styleLogic.indexOf(',,') > -1) {
+            arr = styleLogic.split(',,');
+        }
 
         //this.cellColumnName = col.field;
         var ret = null;
