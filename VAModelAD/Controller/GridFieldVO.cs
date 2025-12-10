@@ -654,6 +654,7 @@ namespace VAdvantage.Controller
             vo.IsMandatoryUI = false;
             vo.IsReadOnly = false;
             vo.IsUpdateable = false;
+            vo.IsCopy = false;
             vo.InitFinish();
             return vo;
         }   //  initStdField

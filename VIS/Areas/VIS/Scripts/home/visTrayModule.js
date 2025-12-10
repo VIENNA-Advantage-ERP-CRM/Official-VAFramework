@@ -58,8 +58,11 @@
             if (!icon) return;
 
             const className = icon.dataset.class;
-            const title = icon.getAttribute('title');
 
+            showOnToast(className);
+        }
+
+        function showOnToast(className) {
             const wform = new VIS.AForm();
             wform.openSystemTray(className, -9999);
             const $item = wform.getContentGrid();
@@ -118,7 +121,7 @@
         }
 
         // Only expose init()
-        return { init };
+        return { init, showOnToast };
     }
 
     VIS.VisTrayModule = VisTrayModule();
