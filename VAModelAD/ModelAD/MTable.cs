@@ -15,6 +15,7 @@ using System.Reflection;
 using VAdvantage.Logging;
 using VAdvantage.Utility;
 using BaseLibrary.Model;
+using System.Linq.Expressions;
 
 namespace VAdvantage.Model
 {
@@ -728,15 +729,22 @@ namespace VAdvantage.Model
         /// <returns>True/False</returns>
         public bool HasVersionData(string TblName)
         {
-            if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Table_ID) FROM AD_Table WHERE TableName = '" + TblName + "'", null, Get_Trx())) > 0)
+            try
             {
-                int countRec = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Client_ID) FROM " + TblName, null, Get_TrxName()));
-                if (countRec > 0)
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Table_ID) FROM AD_Table WHERE TableName = '" + TblName + "'", null, Get_Trx())) > 0)
                 {
-                    log.SaveError("VersionDataExists", Utility.Msg.GetElement(GetCtx(), "VersionDataExists"));
-                    return true;
+                    int countRec = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Client_ID) FROM " + TblName, null, Get_TrxName()));
+                    if (countRec > 0)
+                    {
+                        log.SaveError("VersionDataExists", Utility.Msg.GetElement(GetCtx(), "VersionDataExists"));
+                        return true;
+                    }
                 }
             }
+            catch {
+                log.SaveError("DBError","version table not exists");
+            }
+               
             return false;
         }
 

@@ -1354,9 +1354,21 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
+            var formattedColumns = lstColumns.Select(c =>
+            {
+                if (c.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (DatabaseType.IsOracle)
+                        return $"RAWTOHEX({c}) AS {c}";
+                    else if (DatabaseType.IsPostgre)
+                        return $"{c}::text AS {c}";
+                }
+                return c;
+            });
 
 
-            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+
+            string SQL_Select = "SELECT " + String.Join(",", formattedColumns);
 
             String refreshSQL = SQL_Select + " FROM " + inn.TableName + " WHERE " + whereC;
 
