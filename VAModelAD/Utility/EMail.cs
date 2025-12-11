@@ -1047,8 +1047,14 @@ namespace VAdvantage.Utility
             //	Host
             if (_smtpHost == null || _smtpHost.Length == 0)
             {
-                //log.warning("SMTP Host is invalid" + _smtpHost);
-                return false;
+                //check for protocol
+                int credentialId;
+                string protocol = MUserMailConfigration.GetMailProtocol(_ctx, out credentialId);
+                if (protocol == "SM" || protocol == "SI")
+                {
+                    //log.warning("SMTP Host is invalid" + _smtpHost);
+                    return false;
+                }
             }
 
             //	Subject

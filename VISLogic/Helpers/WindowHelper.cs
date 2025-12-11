@@ -143,7 +143,17 @@ namespace VIS.Helpers
                 if (field.ColumnSQL != null)
                     select.Append(field.ColumnSQL);	//	ColumnName or Virtual Column
                 else
-                    select.Append(field.ColumnName);
+                {
+                    if (field.ColumnName.ToUpper().EndsWith("_GUID"))
+                    {
+                        if (DatabaseType.IsOracle)
+                            select.Append($"RAWTOHEX({field.ColumnName}) AS {field.ColumnName}");
+                        else if (DatabaseType.IsPostgre)
+                            select.Append($"{field.ColumnName}::text AS {field.ColumnName}");
+                    }
+                    else
+                        select.Append(field.ColumnName);
+                }
             }
 
             select.Append(" FROM ").Append(tableName);
