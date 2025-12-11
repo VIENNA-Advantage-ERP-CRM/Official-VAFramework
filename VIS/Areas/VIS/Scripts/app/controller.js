@@ -6883,7 +6883,7 @@
         if (vo.ColumnName.equals("AD_Org_ID") && fOrgs && fOrgs != "") {
             if (VIS.MRole.getIsOrgAccess(ctx.getAD_Org_ID(), true))
                 return ctx.getAD_Org_ID();
-            if (fOrgs.indexOf('0' > -1)) {
+            if (fOrgs.indexOf('0') > -1) {
                 if (VIS.MRole.getIsOrgAccess(0, true))
                     return 0;
             }
