@@ -126,6 +126,7 @@ namespace VAdvantage.Process
                 // if not present then create table 
                 MTable tblVer = null;
                 if (Ver_AD_Table_ID <= 0)
+                if (Ver_AD_Table_ID <= 0)
                 {
                     string tableName = tbl.GetTableName();
                     // create new Version table for parent table
@@ -331,6 +332,9 @@ namespace VAdvantage.Process
             // check if Primary key column is present in Columns list, if not present then add Primary Key column
             if (!listDefVerCols.Contains(VerTblName + "_ID"))
                 listDefVerCols.Add(VerTblName + "_ID");
+            // check if Primary key column is present in Columns list, if not present then add Primary Key column
+            if (!listDefVerCols.Contains(VerTblName + "_GUID"))
+                listDefVerCols.Add(VerTblName + "_GUID");
 
             // Create comma separated string of all default version columns
             string DefSysEle = string.Join(",", listDefVerCols
@@ -353,6 +357,10 @@ namespace VAdvantage.Process
                         if (listDefVerCols[i] == VerTblName + "_ID")
                         {
                             listDefVerRef.Add(13);
+                        }
+                        if (listDefVerCols[i] == VerTblName + "_GUID")
+                        {
+                            listDefVerRef.Add(10);//string
                         }
                     }
                     else
@@ -386,6 +394,10 @@ namespace VAdvantage.Process
                             if (ele.GetColumnName() == VerTblName + "_ID")
                             {
                                 listDefVerRef.Add(13);
+                            }
+                            if (listDefVerCols[i] == VerTblName + "_GUID")
+                            {
+                                listDefVerRef.Add(10);//string
                             }
                         }
                     }
@@ -509,6 +521,7 @@ namespace VAdvantage.Process
                 {
                     if (defColStringVal[i].Trim().ToLower() == (TableName + "_ID").ToLower())
                         sbVals.Append("," + baseTableName + "_ID");
+
                     else
                         sbVals.Append("," + listDefVerValues[indDefVerCol]);
                 }
@@ -626,7 +639,7 @@ namespace VAdvantage.Process
                 //if (listDefVerCols[i] == "VersionValidFrom")
                 //    colVer.SetIsParent(true);
                 if (listDefVerRef[i] == 10)
-                    colVer.SetFieldLength(10);
+                    colVer.SetFieldLength(50);
                 if (listDefVerRef[i] == 14)
                     colVer.SetFieldLength(2000);
                 if (listDefVerRef[i] == 13)
@@ -701,7 +714,7 @@ namespace VAdvantage.Process
             string[] colNames = colString.ToLower().Split(',');
             for (int i = 0; i < listDefVerCols.Count; i++)
             {
-                if (!colNames.Contains(listDefVerCols[i].ToLower()))
+                if (!colNames.Contains(listDefVerCols[i].ToLower()) && !listDefVerCols[i].ToLower().Contains("_guid"))
                     defColString.Append("," + listDefVerCols[i]);
             }
             return defColString.ToString();
