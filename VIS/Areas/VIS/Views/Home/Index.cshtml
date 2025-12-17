@@ -412,7 +412,9 @@ else //Login Page
                 <form id="loginForm">
                     <div class="login-wrap">
                         <div class="login-content" style="padding:15px 15px;color:red;min-height:200px;">
-                          @ViewBag.KeyErrorMessage
+                            @*@ViewBag.KeyErrorMessage*@
+                            An error has occurred. The application is configured to use a private secure key, but the key path is missing from the web.config file.
+                            Please contact the system administrator to add the required key.
                         </div>
                     </div>
                 </form>

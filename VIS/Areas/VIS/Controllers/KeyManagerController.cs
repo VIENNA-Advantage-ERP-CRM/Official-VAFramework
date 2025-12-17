@@ -68,7 +68,7 @@ namespace VIS.Controllers
                 if (Session["Ctx"] == null)
                 {
                     km.IsError = true;
-                    km.Message = "Login context not found";
+                    km.Message = "Login context not found, Login again";
                 }
                 else
                 {
@@ -115,7 +115,7 @@ namespace VIS.Controllers
                     // Save and refresh
                     config.Save(ConfigurationSaveMode.Modified);
                     ConfigurationManager.RefreshSection("appSettings");
-                    kmodel.Message = "Key Generated";
+                    kmodel.Message = "Key Generated Succesfully";
                     
                     GetKeyInfo();
                     UpdateText();
@@ -133,7 +133,7 @@ namespace VIS.Controllers
             {
                 GetKeyInfo();
                 UpdateText();
-                kmodel.Message = "Invalid file path or empty";
+                kmodel.Message = "File path is invalid or empty(extension)";
                 kmodel.IsError = true;
             }
 
@@ -157,7 +157,7 @@ namespace VIS.Controllers
                 //ConfigurationManager.AppSettings["KeyProvider:KekSource"] = txtPath.Value;//kek path
                 GetKeyInfo();
                 UpdateText();
-                km.Message = "Successfully rotated";
+                km.Message = "Successfully Rotated";
                 
             }
             else

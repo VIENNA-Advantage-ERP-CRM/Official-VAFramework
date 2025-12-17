@@ -48,7 +48,7 @@
 .prefix-data-counts .fa{color: rgba(4, 201, 4, 1) ;}
 .prefix-panel-message {background-color:forestgreen; height:auto; border-radius:50px;padding:0px 15px;}
 .prefix-panel-error {background-color:palevioletred}
-.prefix-panel-message p { color: white; }
+.prefix-panel-message p { color: white; padding:4px; }
 
 
 

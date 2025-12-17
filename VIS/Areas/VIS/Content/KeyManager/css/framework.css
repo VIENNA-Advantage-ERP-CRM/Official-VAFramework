@@ -78,7 +78,7 @@ input:not([type=button]), input:not([type=submit]), select, textarea {
     border: 1px solid #bbb;
     border-radius: 3px;
     color: #000;
-    background-color: #fff;
+    background-color: #fff !important;
     line-height: normal;
 }
 .vis-app-aform-root {
