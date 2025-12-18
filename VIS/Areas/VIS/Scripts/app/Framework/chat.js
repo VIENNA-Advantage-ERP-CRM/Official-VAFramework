@@ -483,15 +483,16 @@
                 $input.on("keydown", function (e) {
                     if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault(); // Prevent newline on Enter
+                        $sendIcon.trigger("click");
                         //   sendUpdate();
-                        let updated = sendUpdate(); // you can make sendUpdate return true/false
+                        //let updated = sendUpdate(); // you can make sendUpdate return true/false
 
-                        if (updated) {
-                            $editIcon.show();
-                            $delIcon.show();
-                            $sendIcon.remove();
-                            $undoIcon.remove();
-                        }
+                        //if (updated) {
+                        //    $editIcon.show();
+                        //    $delIcon.show();
+                        //    $sendIcon.remove();
+                        //    $undoIcon.remove();
+                        //}
 
                     }
                     // If Shift+Enter OR Alt+Enter → allow newline
