@@ -137,19 +137,12 @@ namespace VIS.Controllers
             //Check key pair is valid or not
             try
             {
-                KeyProviderFactory.CreateFromConfig();
+                KeyProviderFactory.ValidateSecureKeyProfile();
                // throw new Exception("testing redirect url");
             }
             catch (Exception ex)
             {
-
-                
-
-                // ViewBag.IsAuthorize = null; //intentially set to force show login page
                 isKeyValidated = false;
-
-
-                // RedirectPermanent(@Url.Content("~/") + "Areas/VIS/WebPages/KeyManager/Index.aspx?error="+ex.Message);
             }
 
             LoginModel model = null;

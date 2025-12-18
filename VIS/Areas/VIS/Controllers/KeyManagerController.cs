@@ -191,10 +191,9 @@ namespace VIS.Controllers
         {
             try
             {
-                _keyProvider = KeyProviderFactory.CreateFromConfig();
-
-                _profile = KeyProviderFactory.GetKeyProfile(_keyProvider);
-
+                KeyProfile profile;
+                _keyProvider = KeyProviderFactory.CreateFromConfig(out profile);
+                _profile = profile;
                 return true;
             }
             catch (Exception ex)

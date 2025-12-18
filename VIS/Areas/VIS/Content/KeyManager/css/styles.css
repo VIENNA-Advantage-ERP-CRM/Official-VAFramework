@@ -12,7 +12,7 @@
 .prefix-key-heading{display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;}
 .prefix-key-heading .fa-check-circle-o{margin-left: auto; font-size: 1.4rem !important;}
 .prefix-key-heading .fa{font-size: 1.2rem;}
-.prefix-input-field-col label{font-size: 0.75rem; text-transform: uppercase;}
+.prefix-input-field-col label{font-size: 0.75rem;}
 .prefix-input-group-item{border-radius: 6px; display: flex; align-items: center; background-color: rgba(var(--v-c-on-primary), 1); padding-right:0.75rem ;}
 .prefix-input-group-item input{border: 0; outline: 0; padding: 0.6rem 0.75rem; width: 100%; font-size: 0.875rem; }
 .prefix-input-group-item .fa{color: rgba(var(--v-c-primary), 1); cursor: pointer;}
@@ -48,7 +48,7 @@
 .prefix-data-counts .fa{color: rgba(4, 201, 4, 1) ;}
 .prefix-panel-message {background-color:forestgreen; height:auto; border-radius:50px;padding:0px 15px;}
 .prefix-panel-error {background-color:palevioletred}
-.prefix-panel-message p { color: white; padding:4px; }
+.prefix-panel-message p { color: white; padding:4px; text-align:center }
 
 
 
