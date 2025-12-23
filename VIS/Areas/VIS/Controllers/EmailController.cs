@@ -20,6 +20,8 @@ namespace VIS.Controllers
     [SessionState(SessionStateBehavior.ReadOnly)]
     public class EmailController : Controller
     {
+        /*This will indiacte whenther the folder is of sharefiles*/
+        bool IsShareFiles = true;
         //
         // GET: /VACOM/Email/
         public ActionResult Index()
@@ -83,8 +85,15 @@ namespace VIS.Controllers
             int result = model.SaveFormats(id, AD_Client_ID, AD_Org_ID, Server.HtmlDecode(name), isDynamic, Server.HtmlDecode(subject), Server.HtmlDecode(text), saveforAll, AD_Window_ID, folderName, attachmentID);
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
-
-        public string SaveAttachmentinTemp(HttpPostedFileBase file, string fileName, string folderKey)
+        /// <summary>
+        /// This Function is used to store file in ShareFiles folder
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="fileName"></param>
+        /// <param name="folderKey"></param>
+        /// <returns></returns>
+        /// <author>VIS_427</author>
+        public string SaveAttachmentinShareFiles(HttpPostedFileBase file, string fileName, string folderKey)
         {
             try
             {
@@ -108,20 +117,30 @@ namespace VIS.Controllers
                     }
                 }
 
-
-
-                if (!Directory.Exists(Path.Combine(Server.MapPath("~/TempDownload"), folderKey)))
+                /*VIS_427 01/10/2025 if bool value is true then folder name will 
+                 be sharefiles else tempdownload*/
+                string folderName = "";
+                if (IsShareFiles)
                 {
-                    Directory.CreateDirectory(Path.Combine(Server.MapPath("~/TempDownload"), folderKey));
+                    folderName = "ShareFiles";
+                }
+                else
+                {
+                    folderName = "TempDownload";
+                }
+
+                if (!Directory.Exists(Path.Combine(Server.MapPath("~/" + folderName), folderKey)))
+                {
+                    Directory.CreateDirectory(Path.Combine(Server.MapPath("~/" + folderName), folderKey));
                 }
 
                 HttpPostedFileBase hpf = file as HttpPostedFileBase;
-                string savedFileName = Path.Combine(Server.MapPath("~/TempDownload/" + folderKey), Path.GetFileName(fileName));
+                string savedFileName = Path.Combine(Server.MapPath("~/" + folderName + "/" + folderKey), Path.GetFileName(fileName));
                 MemoryStream ms = new MemoryStream();
                 hpf.InputStream.CopyTo(ms);
                 byte[] byteArray = ms.ToArray();
 
-                if (Directory.GetFiles(Path.Combine(Server.MapPath("~/TempDownload"), folderKey)).Contains(Path.Combine(Server.MapPath("~/TempDownload"), folderKey, fileName)))//Append Content In File
+                if (Directory.GetFiles(Path.Combine(Server.MapPath("~/" + folderName), folderKey)).Contains(Path.Combine(Server.MapPath("~/" + folderName), folderKey, fileName)))//Append Content In File
                 {
                     using (FileStream fs = new FileStream(savedFileName, FileMode.Append, System.IO.FileAccess.Write))
                     {
@@ -145,6 +164,19 @@ namespace VIS.Controllers
             {
                 return "ERROR:" + ex.Message;
             }
+        }
+        /// <summary>
+        /// This function is used to store files in tempdownload folder
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="fileName"></param>
+        /// <param name="folderKey"></param>
+        /// <returns></returns>
+        public string SaveAttachmentinTemp(HttpPostedFileBase file, string fileName, string folderKey)
+        {
+            IsShareFiles = false;
+            return SaveAttachmentinShareFiles(file, fileName, folderKey);
+            
         }
 
 

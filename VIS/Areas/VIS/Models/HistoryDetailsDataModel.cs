@@ -336,6 +336,14 @@ namespace VIS.Models
                         JOIN AD_USER au ON au.AD_USER_ID=aa.CREATEDBY 
                         WHERE aa.ISACTIVE = 'Y' AND aa.AD_TABLE_ID = " + _AD_Table_ID + "   AND aa.RECORD_ID = " + RecordId);
 
+            if (Env.IsModuleInstalled("WSP_"))
+            {
+                sql.Append(@" UNION ALL
+                        SELECT COUNT(ct.WSP_SMChatTopic_ID) AS ID, 'SOCIALINBOX' AS TYPE
+                        FROM WSP_SMChatIdentifier ci 
+                        INNER JOIN WSP_SMChatTopic ct ON (ci.WSP_SMChatIdentifier_ID=ct.WSP_SMChatIdentifier_ID)
+                        WHERE ci.IsActive='Y' AND ct.AD_Table_ID=" + _AD_Table_ID + "   AND ct.Record_ID=" + RecordId);
+            }
             if (Env.IsModuleInstalled("VA048_"))
             {
                 sql.Append(@" UNION ALL
@@ -360,6 +368,48 @@ namespace VIS.Models
                 }
             }
             return res;
+        }
+
+        /// <summary>
+        /// Delete History Record by passing parameters
+        /// </summary>       
+        /// <param name="RecordId">Record ID</param> 
+        /// <param name="Type">Type ID</param>
+        /// <returns>History Record count</returns>
+        public string DeleteHistoryRecord(Ctx ctx, int RecordId, string Type)
+        {
+            string msg = "";
+            PO att = null;
+            if (Type == "email" || Type == "inbox" || Type == "letter")
+            {
+                att = new MMailAttachment1(ctx, RecordId, null);
+            }
+            else if (Type == "appointment" || Type == "task")
+            {
+                att = new MAppointmentsInfo(ctx, RecordId, null);
+            }
+            else if (Type == "chat")
+            {
+                att = new MChatEntry(ctx, RecordId, null);
+            }
+            else if (Type == "call")
+            {
+                MTable table = MTable.Get(ctx, "VA048_CallDetails");
+                att = table.GetPO(ctx, RecordId, null);
+            }
+            else if (Type == "attachment")
+            {
+                att = new MAttachment(ctx, RecordId, null);
+            }
+            if (att != null)
+            {
+                if (!att.Delete(true))
+                {
+                    ValueNamePair pp = VLogger.RetrieveError();
+                    msg = pp.ToString();
+                }
+            }
+            return msg;
         }
 
         /// <summary>
@@ -782,6 +832,14 @@ namespace VIS.Models
             return lstChat;
         }
 
+        public string GetUserImage(int user_id)
+        {
+            string sql = @"SELECT i.ImageUrl FROM AD_User u
+            INNER JOIN AD_Image i ON (u.AD_Image_ID=i.AD_Image_ID)
+            WHERE u.AD_User_ID=" + user_id;
+            return Util.GetValueOfString(DB.ExecuteScalar(sql));
+        }
+
         /// <summary>
         /// history attachment download
         /// </summary>
@@ -1040,7 +1098,7 @@ namespace VIS.Models
                 {
                     MAppointmentsInfo appointmentsInfo = new MAppointmentsInfo(ctx, AppointmentID, null);
                     int AD_Table_ID = Util.GetValueOfInt(appointmentsInfo.GetAD_Table_ID());
-                    string threadID = Common.GetThreadID(AD_Table_ID, appointmentsInfo.GetRecord_ID());
+                    string threadID = Common.GetThreadID(AD_Table_ID, appointmentsInfo.GetRecord_ID(), appointmentsInfo.GetAD_Org_ID());
                     if (!string.IsNullOrEmpty(threadID))
                     {
                         if (!ExecuteThreadAction(actionType: ActionType.Update, tableID: AD_Table_ID, recordID: appointmentsInfo.GetRecord_ID(),

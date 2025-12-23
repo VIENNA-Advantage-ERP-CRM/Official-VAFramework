@@ -1971,6 +1971,15 @@
                     added = true;
                 }
             }
+
+            //check for org access
+            if (!added && "ad_org_id" in record) {
+                if (!VIS.MRole.getIsOrgAccess(record.ad_org_id, true)) {
+                    retIndices.push(selIndices[i]);
+                    added = true;
+                }
+            }
+
             //check for filter org
             if (!added) {
                 var fOrgs = VIS.context.getContext("#AD_FilteredOrg");

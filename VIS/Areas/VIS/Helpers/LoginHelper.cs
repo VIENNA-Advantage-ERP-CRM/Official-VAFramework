@@ -25,6 +25,68 @@ namespace VIS.Helpers
 
         /**	Cache					*/
         private static CCache<string, object> cache = new CCache<string, object>("LoginHelper", 30, 60);
+
+        /// <summary>
+        /// This fucntion used to get QR
+        /// </summary>
+        /// <param name="userValue"></param>
+        /// <param name="tokenKey2FA"></param>
+        /// <param name="password"></param>
+        /// <returns>QR Image url</returns>
+        /// <author>VIS_427</author>
+        public string GetQROnRefresh(string UserValue,string tokenKey2FA, string Password)
+        {
+            bool authenticated = false;
+            bool isLDAP = false;
+            MSystem system = MSystem.Get(new Ctx());
+            string output = ""; string QRCodeURL = "";
+            if (system != null && system.IsLDAP())
+            {
+
+                authenticated = system.IsLDAP(UserValue, Password, out output);
+
+                isLDAP = true;
+            }
+            IDataReader dr = GetRoles(UserValue, authenticated, isLDAP);
+            if (dr != null && dr.Read()) // Add this check
+            {
+                if (!cache["SuperUserVal"].Equals(UserValue))
+                {
+                    String Token2FAKey = Util.GetValueOfString(dr["TokenKey2FA"]);
+                    // Change done to handle VA 2FA alongwith Google Authenticator
+                    string method2FA = Util.GetValueOfString(dr["TwoFAMethod"]);
+                    if (method2FA != "")
+                    {
+                        string userSKey = Util.GetValueOfString(dr["Value"]);
+                        int ADUserID = Util.GetValueOfInt(dr["AD_User_ID"]);
+                        if (method2FA == X_AD_User.TWOFAMETHOD_GoogleAuthenticator)
+                        {
+                            TwoFactorAuthenticator tfa = new TwoFactorAuthenticator();
+                            SetupCode setupInfo = null;
+                            // if token key don't exist for user, then create new
+                            if (Token2FAKey.Trim() == "")
+                            {
+                                string TokenKey2FA = tokenKey2FA;
+                                // create Token key based on Value, UserID and Random Number
+                                Token2FAKey = userSKey + ADUserID.ToString() + TokenKey2FA;
+                            }
+                            else
+                            {
+                                // Decrypt token key saved in database
+                                string decKey = SecureEngine.Decrypt(Token2FAKey);
+                                Token2FAKey = userSKey + ADUserID.ToString() + decKey;
+                            }
+                            string url = Util.GetValueOfString(HttpContext.Current.Request.Url.AbsoluteUri).Replace("VIS/Account/JsonLogin", "").Replace("https://", "").Replace("http://", "");
+                            setupInfo = tfa.GenerateSetupCode("VA ", url + " " + userSKey, Token2FAKey, false, 3);
+                            QRCodeURL = setupInfo.QrCodeSetupImageUrl;
+                        }
+                    }
+                    dr.Close();
+
+                }
+            }
+            return QRCodeURL;
+        }
         /// <summary>
         /// return is credential provide by user is right or not
         /// </summary>

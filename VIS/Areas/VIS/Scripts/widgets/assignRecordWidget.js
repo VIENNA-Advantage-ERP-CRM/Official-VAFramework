@@ -53,6 +53,9 @@
         var RecordCount = 0;
         var uncheckedIDs = [];
         var IsWindowValueChanged = false;
+        /*these variable are used to store value at refresh */
+        var ListValAtRefresh = null;
+        var IsRefreshWid = false;
         /*This variable is defined if function is called from assign user popup */
         var IsFromPopUp = false;
         /*This variable is defined if function is called from assign  user popup and when user 
@@ -68,6 +71,12 @@
             widgetsPopup();
             showBusy(true);
             loadWidget();
+            //auto refresh widget after interval of 5 minutes
+            setInterval(function () {
+                IsRefreshWid = true;
+                ListValAtRefresh = ListVal;
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);
         };
         function loadWidget() {
             widgetContainer = $('<div class="VIS-asrec-widget-container" id="Vis_Widget-container_' + widgetID + '">');
@@ -78,8 +87,15 @@
             var $AssignRecordLookUp = VIS.MLookupFactory.get(VIS.Env.getCtx(), $self.windowNo, 0, VIS.DisplayType.List, "VIS_AssignRecordWidgetList", ColumnId, false);
             // Parameters are: columnName, mandatory, isReadOnly, isUpdateable, lookup,display length
             vAssignRecord = new VIS.Controls.VComboBox("VIS_AssignRecordWidgetList", true, false, true, $AssignRecordLookUp, 100);
-            vAssignRecord.setValue('02');
-            ListVal = "02";
+            //if widget is not auto refreshed then keep its value as it is other wise change which was at refresh
+            if (!IsRefreshWid) {
+                ListVal = "02"
+            }
+            else {
+                ListVal = ListValAtRefresh;
+                IsRefreshWid = false;
+            }
+            vAssignRecord.setValue(ListVal);
             var $AssignRecordControlWrap = $('<div class="vis-control-wrap">');
             $AssignRecordDiv.append($AssignRecordControlWrap);
             $AssignRecordControlWrap.append(vAssignRecord.getControl().attr('placeholder', ' ').attr('data-placeholder', '').attr('data-hasbtn', ' '));
@@ -399,9 +415,16 @@
                 TotalRecords = windowRecords[0].countRecords;
                 TotalPages = Math.ceil(TotalRecords / winRecPageSize);
             }
+            var message = "";
+            if (IsPopButAll) {
+                message = VIS.Msg.getMsg('VIS_To');
+            }
+            else {
+                message = VIS.Msg.getMsg('VIS_AssignedTo');
+            }
             var ListContent = "";
             //for no data
-            if (windowRecords.length === 0) {
+            if (windowRecords.length === 0 || windowRecords[0].IsNoRecFound) {
 
                 $('.vis-assrec-data').empty();
                 ListContent = '<tr><td colspan="4" style="text-align:center; padding: 20px;">' + VIS.Msg.getMsg('NoDataFound') + '</td></tr>';
@@ -416,9 +439,14 @@
                         'data-Record_ID="' + windowRecords[i].Record_ID + '" ' +
                         'id="VIS-unAllocatedZoom_' + widgetID + '" ' +
                         'title="' + VIS.Msg.getMsg("VIS_Zoom") + '">' +
-                        '</i>' + windowRecords[i].ColValue + '</td>' +
-                        '<td class="vis-asrec-assigned vis-widpop-tooltip" title="' + windowRecords[i].UpdatedBy + '">' + windowRecords[i].UpdatedBy + '</td>' +
-                        '<td class="vis-asrec-date" style="padding-left:12px;">'
+                        '</i>' + windowRecords[i].ColValue + '</td>';
+                    /*if user has clicked see all assigned user link then show assigned by also*/
+                    if (windowRecords[i].AssignedBy != "") {
+                        ListContent += '<td class="vis-asrec-assigned vis-widpop-tooltip" title="' + windowRecords[i].AssignedBy + '">' + windowRecords[i].AssignedBy + '</td>';
+                    }
+
+                    ListContent += '<td class="vis-asrec-assigned vis-widpop-tooltip" title="' + windowRecords[i].UpdatedBy + '">' + windowRecords[i].UpdatedBy + '</td>' +
+                        '<td class="vis-asrec-date">'
                         + VIS.Utility.Util.getValueOfDate(windowRecords[i].AssignedDate).toLocaleDateString(window.navigator.language, {
                             year: 'numeric',
                             month: '2-digit',
@@ -448,6 +476,16 @@
                 }
                 windowDropdownHtml += '</select>';
                 content = '<div id="VIS-assrec-wrapper">';
+                /*Added title of popup according to from where popup opened*/
+                if (IsPopButAll) {
+                    content += '<div class="vis-asrec-popup-title">' + VIS.Msg.getMsg("VIS_AssignedUsers") + '</div>'
+                }
+                else if (ListVal == "02") {
+                    content += '<div class="vis-asrec-popup-title">' + VIS.Msg.getMsg('VIS_AssignRecordToMe') + '</div>'
+                }
+                else if (ListVal == "01") {
+                    content += '<div class="vis-asrec-popup-title">' + VIS.Msg.getMsg('VIS_AssignRecordByMe') + '</div>'
+                }
                 content += '<div class="vis-header-bar">' +
                     '<h1 class="vis-header-title"><span class="vis-asrec-dropdown-container">' + windowDropdownHtml +
                     '<span class="vis-asrec-poprecord-count">' + VIS.Utility.Util.getValueOfDecimal(windowRecords[0].countRecords) + '</span>' +
@@ -468,11 +506,15 @@
                     '<table id="VIS-assrec-keywords" cellspacing="0" cellpadding="0">' +
                     '<thead>' +
                     '<tr>' +
-                    '<th><span>' + VIS.Msg.getMsg('VIS_RecordName') + '</span></th>' +
-                    '<th><span>' + (ListVal == "01" ? VIS.Msg.getMsg('VIS_AssignedTo') : VIS.Msg.getMsg('VIS_AssignedFrom')) + '</span></th>' +
-                    '<th><span>' + VIS.Msg.getMsg('VIS_AssignedDate') + '</span></th>';
+                    '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_RecordName') + '"><span>' + VIS.Msg.getMsg('VIS_RecordName') + '</span></th>';
+                if (IsPopButAll) {
+                    content += '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_AssignedFrom') + '"><span>' + VIS.Msg.getMsg('VIS_AssignedFrom') + '</span></th>';
+                }
+                content += '<th class="vis-widpop-tooltip" title="' + (ListVal == "01" ? message : VIS.Msg.getMsg('VIS_AssignedFrom')) + '"><span>' + (ListVal == "01" ? message : VIS.Msg.getMsg('VIS_AssignedFrom')) + '</span></th>' +
+                    '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_OnDate') + '"><span>' + VIS.Msg.getMsg('VIS_OnDate') + '</span></th>';
                 if (ListVal == "01") {
-                    content += '<th><span>' + VIS.Msg.getMsg('VIS_Assigned') + '</span></th>';
+                    /*content += '<th class="vis-widpop-tooltip" title="' + VIS.Msg.getMsg('VIS_Assigned') + '"><span>' + VIS.Msg.getMsg('VIS_Assigned') + '</span></th>';*/
+                    content += '<th></th>';
                 }
                 content += '</tr>' +
                     '</thead>' +
@@ -486,16 +528,16 @@
                         '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-cancel vis-asrec-btn" id="VIS_Cancel_' + widgetID + '">' + VIS.Msg.getMsg('Cancel') + '</button>' +
                         '</div>' +
                         '<div class="vis-asrec-flyout-footer">' +
-                        '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-ok vis-asrec-btn" id="VIS_Ok_' + widgetID + '">' + VIS.Msg.getMsg('Ok') + '</button>' +
+                        '<button class="VIS_Pref_btn-2 w-100 mt-0 vis-asrec-ok vis-asrec-btn vis-disabled-btn" id="VIS_Ok_' + widgetID + '">' + VIS.Msg.getMsg('Ok') + '</button>' +
                         '</div>';
                 }
                 content += '</div>';
                 modelPopupId.find("#appendWidgetDivId" + widgetID).empty().append(content);
                 modelPopupId.show();
                 // Event Bindings (Delegated)
-                $self.bindSearchEvents(modelPopupId, WindowId);
-                $self.bindPopupScroll(modelPopupId, WindowId);
-                $self.bindPopupEvents(modelPopupId, WindowId, TableID);
+                $self.bindSearchEvents(modelPopupId, WindowId, TableID);
+                $self.bindPopupScroll(modelPopupId, WindowId, TableID);
+                $self.bindPopupEvents(modelPopupId, WindowId, TableID, IsPopButAll);
                 if (ListVal == "01") {
                     modelPopupId.find('.modal-content').css("width", "80%");
                 }
@@ -530,7 +572,7 @@
             } else {
                 IsZoomClicked = false;
                 IsItemSearched = false;
-                IsWindowValueChanged = false
+                IsWindowValueChanged = false;
             }
 
             showPopupBusy(false);
@@ -556,6 +598,7 @@
                     if (!(deleteresult.toLowerCase().startsWith("error"))) {
                         modelPopupId.hide();
                         $self.getWindowRecords(getAll, ListVal);
+                        uncheckedIDs = [];
                     }
                     else {
                         VIS.ADialog.info(deleteresult);
@@ -568,7 +611,7 @@
         };
         /**Binded pop events  */
         /**Binded pop events  */
-        this.bindPopupEvents = function (modelPopupId, WindowId, TableID) {
+        this.bindPopupEvents = function (modelPopupId, WindowId, TableID, IsPopButAll) {
             // Close button event
             modelPopupId.off('click', '#popup-close-btn1')
                 .on('click', '#popup-close-btn1', function () {
@@ -591,11 +634,21 @@
             modelPopupId.off('change', '.vis-asrec-me-row-check')
                 .on('change', '.vis-asrec-me-row-check', function () {
                     var recordID = $(this).data('record_id');
-
                     if ($(this).is(':checked')) {
                         uncheckedIDs = uncheckedIDs.filter(id => id !== recordID);
                     } else if (!uncheckedIDs.includes(recordID)) {
                         uncheckedIDs.push(recordID);
+                    }
+                    /*disable/enable the ok button if user check or uncheck the checkbox */
+                    var totalCheckboxes = modelPopupId.find('.vis-asrec-me-row-check').length;
+                    var checkedCheckboxes = modelPopupId.find('.vis-asrec-me-row-check:checked').length;
+
+                    var $okBtn = modelPopupId.find("#VIS_Ok_" + widgetID);
+
+                    if (checkedCheckboxes < totalCheckboxes) {
+                        $okBtn.prop("disabled", false).removeClass('vis-disabled-btn');
+                    } else {
+                        $okBtn.prop("disabled", true).addClass('vis-disabled-btn');
                     }
                 });
 
@@ -622,7 +675,12 @@
                     WindowId = $(this).val();
                     winRecPageNo = 1;
                     TableID = $(this).find('option:selected').data('tableid');
-                    Record_ID = $(this).find('option:selected').data('recordid');
+                    if (IsPopButAll) {
+                        Record_ID = "";
+                    }
+                    else {
+                        Record_ID = $(this).find('option:selected').data('recordid');
+                    }
                     TableName = $(this).find('option:selected').data('tablename');
                     WindowName = $(this).find('option:selected').data('windowname');
                     WindowId = $(this).find('option:selected').data('windowid');
@@ -649,13 +707,14 @@
             }
         }
         // Search Event Binding (Delegated)
-        this.bindSearchEvents = function (modelPopupId, WindowId) {
+        this.bindSearchEvents = function (modelPopupId, WindowId, TableID) {
             // Search button
             modelPopupId.off('click', '#VIS_SrchBtn_' + widgetID)
                 .on('click', '#VIS_SrchBtn_' + widgetID, function () {
                     SrchTxt = modelPopupId.find('#VIS_SrchTxtbx_' + widgetID).val();
                     IsItemSearched = true;
                     winRecPageNo = 1;
+                    TableID = modelPopupId.find("#vis-asrec-windowDropdown").find('option:selected').data("tableid");
                     WindowId = modelPopupId.find('.vis-header-title').find('#vis-asrec-windowDropdown').val();
                     $self.GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, SrchTxt, IsFromPopUp, IsPopButAll, modelPopupId);
                 });
@@ -672,7 +731,7 @@
 
 
         // Popup Scroll Binding (Infinite Scroll)
-        this.bindPopupScroll = function (modelPopupId, WindowId) {
+        this.bindPopupScroll = function (modelPopupId, WindowId, TableID) {
             /*            var scrollContainerSelector = '#vis-asrec-popup-scroll_' + widgetID;*/
 
             modelPopupId.find('#vis-asrec-popup-scroll_' + widgetID).off('scroll').on('scroll', function () {
@@ -682,6 +741,7 @@
                 if ($this[0].scrollHeight - $this.scrollTop() - $this.outerHeight() < 20) {
                     IsDataFetching = true;
                     winRecPageNo += 1;
+                    TableID = modelPopupId.find("#vis-asrec-windowDropdown").find('option:selected').data("tableid");
                     WindowId = modelPopupId.find('.vis-header-title').find('#vis-asrec-windowDropdown').val();
                     $self.GetWindowData(WindowId, TableID, Record_ID, winRecPageNo, winRecPageSize, SrchTxt, IsFromPopUp, IsPopButAll, modelPopupId);
                 }
@@ -694,6 +754,8 @@
             AssignedRecords.empty(); // Clear existing records
             AssignedRecords.removeClass('vis-noRecordFound');
             if (allRecords == null || allRecords.length === 0) {
+                /*remove pagination if no data found*/
+                widgetContainer.find('.vis-tiles-pagination').remove();
                 widgetContainer.find('h4').text('' + ' 0');
                 AssignedRecords.text(VIS.Msg.getMsg('VIS_NoRecordFound')).addClass('vis-noRecordFound');
                 return;

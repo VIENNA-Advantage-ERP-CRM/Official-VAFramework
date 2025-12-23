@@ -15,6 +15,7 @@ using System.Reflection;
 using VAdvantage.Logging;
 using VAdvantage.Utility;
 using BaseLibrary.Model;
+using System.Linq.Expressions;
 
 namespace VAdvantage.Model
 {
@@ -513,17 +514,17 @@ namespace VAdvantage.Model
             string tableName = GetTableName();
             if (Record_ID != 0 && !IsSingleKey())
             {
-               int id= Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Column_ID FROM AD_Column WHERE ColumnName='"+ tableName + "_ID' AND AD_Table_ID=" + GetAD_Table_ID()));
+                int id = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Column_ID FROM AD_Column WHERE ColumnName='" + tableName + "_ID' AND AD_Table_ID=" + GetAD_Table_ID()));
                 if (id > 0)
                 {
-                    return GetPO(ctx, tableName+"_ID=" + Record_ID, trxName);
+                    return GetPO(ctx, tableName + "_ID=" + Record_ID, trxName);
                 }
                 else
                 {
                     log.Log(Level.WARNING, "(id) - Multi-Key " + tableName);
                     return null;
                 }
-                
+
             }
             PO po = null;
             List<IModelFactory> factoryList = VAModelAD.Classes.ModelFactoryLoader.GetList();
@@ -728,15 +729,22 @@ namespace VAdvantage.Model
         /// <returns>True/False</returns>
         public bool HasVersionData(string TblName)
         {
-            if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Table_ID) FROM AD_Table WHERE TableName = '" + TblName + "'", null, Get_Trx())) > 0)
+            try
             {
-                int countRec = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Client_ID) FROM " + TblName, null, Get_TrxName()));
-                if (countRec > 0)
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Table_ID) FROM AD_Table WHERE TableName = '" + TblName + "'", null, Get_Trx())) > 0)
                 {
-                    log.SaveError("VersionDataExists", Utility.Msg.GetElement(GetCtx(), "VersionDataExists"));
-                    return true;
+                    int countRec = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Client_ID) FROM " + TblName, null, Get_TrxName()));
+                    if (countRec > 0)
+                    {
+                        log.SaveError("VersionDataExists", Utility.Msg.GetElement(GetCtx(), "VersionDataExists"));
+                        return true;
+                    }
                 }
             }
+            catch {
+                log.SaveError("DBError","version table not exists");
+            }
+               
             return false;
         }
 
@@ -968,7 +976,7 @@ namespace VAdvantage.Model
             return Util.GetValueOfInt(DB.ExecuteScalar("SELECT a.AD_Window_ID FROM AD_Window a "
                     + "INNER JOIN AD_Tab b ON (a.AD_Window_ID=b.AD_Window_ID) "
                     + "INNER JOIN AD_Menu m ON (a.AD_Window_ID=m.AD_Window_ID AND m.IsActive='Y' AND m.Action='W') "
-                    + "WHERE a.IsActive='Y' AND b.IsActive='Y' AND b.AD_Table_ID="+GetAD_Table_ID()+" ORDER BY b.TabLevel, a.AD_Window_ID"));
+                    + "WHERE a.IsActive='Y' AND b.IsActive='Y' AND b.AD_Table_ID=" + GetAD_Table_ID() + " ORDER BY b.TabLevel, a.AD_Window_ID"));
         }
     }
 }

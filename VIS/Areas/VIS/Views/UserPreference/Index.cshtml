@@ -143,11 +143,11 @@
 
 
     </div>
-    <div style="width:100%; display:inline-block" id="@("divBottom_" + ViewBag.WindowNumber)" >
-        <label class="VIS_Pref_Label_Font VIS-pref-lblmsg"  id="@("lblRecordSave_" + ViewBag.WindowNumber)"></label>
+    <div style="width:100%; display:inline-block" id="@("divBottom_" + ViewBag.WindowNumber)">
+        <label class="VIS_Pref_Label_Font VIS-pref-lblmsg" id="@("lblRecordSave_" + ViewBag.WindowNumber)"></label>
         <button id="@("btnSaveChanges_" + ViewBag.WindowNumber)" class="VIS_Pref_btn-2">@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VIS_SaveChanges")  </button>
     </div>
-        <!-- end of UserSettings -->
+    <!-- end of UserSettings -->
 
 
 
@@ -669,10 +669,26 @@
                         <div class="VIS_Pref_pass-line">
                             <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName")</span><input id="@("txtKeyName_" + ViewBag.WindowNumber)" required pattern="[A-Za-z0-9]+" class="VIS_Pref_pass VIS_Key-text-input" placeholder=@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_KeyName") type="text" /></h4>
                         </div>@*required pattern="\w+"*@
-
                         <div class="VIS_Pref_pass-line">
-                            <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Project")</span><select class="VIS_Pref_pass" id="@("cmbProject" + ViewBag.WindowNumber)" /></h4>
-                        </div>@*required pattern="\w+"*@
+                            <h4>
+                                <span>
+                                    @VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Project")
+                                </span>
+                                <div class="VIS_Pref_pass vis-project-pass">
+                                    <div class="vis-project-select">
+                                        <select id="@("cmbProject" + ViewBag.WindowNumber)"></select>
+                                        <button type="button"
+                                                class="vis-zoom-btn"
+                                                id="@("btnProjectZoom_" + ViewBag.WindowNumber)"
+                                                title=" @VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "VAAPI_ToOpenProjectWindow")">
+                                            <i class="fa fa-search-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </h4>
+                        </div>
+
+
 
                         <div class="VIS_Pref_pass-line">
                             <h4 style="width:100%"><span>@VAdvantage.Utility.Msg.GetMsg(ViewBag.lang, "Role")</span><select class="VIS_Pref_pass" id="@("cmbRoleForKey_" + ViewBag.WindowNumber)" /></h4>

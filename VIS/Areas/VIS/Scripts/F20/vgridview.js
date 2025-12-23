@@ -343,6 +343,11 @@
                 (AD_Client_ID, AD_Org_ID, self.AD_Table_ID, Record_ID, false))
                 return false;
 
+            // render row readonly ORG as disable effect
+            if (!VIS.MRole.getIsOrgAccess(AD_Org_ID, true)) {
+                return false;
+            }
+
             //check for filter org
             var fOrgs = VIS.context.getContext("#AD_FilteredOrg");
             if (fOrgs && fOrgs != "") {
@@ -354,6 +359,7 @@
 
         function getClientOrgRecordID(row) {
             var AD_Client_ID = -1;
+            var tblName = self.mTab.getTableName();
             if (typeof self.indexClientColumn != "undefined" && self.indexClientColumn != -1) {
                 var ii = self.grid.getCellValue(row, self.indexClientColumn);//].Value;
                 if (ii != null && ii !== "")
@@ -363,6 +369,11 @@
             var AD_Org_ID = -1;
             if (typeof self.indexOrgColumn != "undefined" && self.indexOrgColumn != -1) {
                 var ii = self.grid.getCellValue(row, self.indexOrgColumn);
+                if (ii != null && ii !== "")
+                    AD_Org_ID = VIS.Utility.Util.getValueOfInt(ii);
+            }
+            else if (tblName == "AD_Org") {
+                var ii = self.grid.getCellValue(row, self.indexKeyColumn);
                 if (ii != null && ii !== "")
                     AD_Org_ID = VIS.Utility.Util.getValueOfInt(ii);
             }

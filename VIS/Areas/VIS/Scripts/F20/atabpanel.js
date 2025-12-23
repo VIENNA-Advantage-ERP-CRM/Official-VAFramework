@@ -439,6 +439,9 @@
                             if (self.sizeChangedListner && self.sizeChangedListner.onSizeChanged)
                                 self.sizeChangedListner.onSizeChanged();
 
+                            if (self.curTabPanel.sizeChanged) {
+                                self.curTabPanel.sizeChanged(ui.size.width - 35);
+                            }
                         }
                     })
                // }, 1000); //wait for dom to be ready

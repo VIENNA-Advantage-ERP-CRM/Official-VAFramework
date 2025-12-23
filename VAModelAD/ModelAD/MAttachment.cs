@@ -26,6 +26,9 @@ using System.Web;
 using VAdvantage.AzureBlob;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Renci.SshNet;
+using System.Linq.Expressions;
+using System.Web.UI.WebControls;
 
 namespace VAdvantage.Model
 {
@@ -52,7 +55,11 @@ namespace VAdvantage.Model
             get;
             set;
         }
-
+        public bool IsSaveInShareFiles
+        {
+            get;
+            set;
+        }
         public bool Force
         {
             get
@@ -852,6 +859,64 @@ namespace VAdvantage.Model
             return false;
         }
 
+
+
+        /// <summary>
+        /// Upload file on sftp server
+        /// </summary>
+        /// <param name="fileName">File Name</param>
+        /// <param name="localFile">Local path folder</param>
+        /// <param name="cInfo">ftp info</param>
+        /// <returns>true if success</returns>
+
+        private bool UploadFileSFTP(string fileName, String localFile, X_AD_ClientInfo cInfo)
+        {
+
+            try
+            {
+                if (cInfo == null)
+                {
+                    // X_AD_ClientInfo cInfo = null;
+                    if (AD_Client_ID > 0)
+                    {
+                        cInfo = new X_AD_ClientInfo(GetCtx(), AD_Client_ID, Get_Trx());
+                    }
+                    else
+                    {
+                        cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
+                    }
+                }
+
+
+                using (var sftp = new SftpClient(cInfo.GetFTPUrl(), 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+
+                    using (var fileStream = new FileStream(localFile, FileMode.Open))
+                    {
+                        sftp.UploadFile(fileStream, cInfo.GetFTPFolder() + "//" + fileName);
+                        //Console.WriteLine($"Uploaded: {remotePath}");
+                    }
+
+                    sftp.Disconnect();
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Upload file in sftp server
+        /// </summary>
+        /// <param name="fileName">ftp server file name</param>
+        /// <param name="file">local files' byte array</param>
+        /// <param name="cInfo">ftp info</param>
+        /// <returns>true if success</returns>
         private bool UploadFtpFile(string fileName, byte[] file, X_AD_ClientInfo cInfo)
         {
 
@@ -870,6 +935,25 @@ namespace VAdvantage.Model
                         cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
                     }
                 }
+
+
+                using (var sftp = new SftpClient(cInfo.GetFTPUrl(), 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+
+                    using (var fileStream = new MemoryStream(file))
+                    {
+                        sftp.UploadFile(fileStream, cInfo.GetFTPFolder() + "//" + fileName);
+                        //Console.WriteLine($"Uploaded: {remotePath}");
+                    }
+
+                    sftp.Disconnect();
+                    return true;
+                }
+
+                /*
+
                 request = WebRequest.Create(new Uri(string.Format(@"{0}/{1}/{2}", cInfo.GetFTPUrl(), cInfo.GetFTPFolder(), fileName))) as FtpWebRequest;
                 request.Method = WebRequestMethods.Ftp.UploadFile;
                 request.UseBinary = true;
@@ -881,7 +965,10 @@ namespace VAdvantage.Model
                 requestStream.Write(file, 0, file.Length);
                 requestStream.Close();
                 requestStream.Flush();
-                return true;
+
+                           
+
+                return true; */
             }
             catch (Exception ex)
             {
@@ -893,7 +980,6 @@ namespace VAdvantage.Model
         private byte[] DownloadFtpFile(string fileName)
         {
 
-            WebClient request = new WebClient();
             byte[] retVal = null;
 
             try
@@ -907,18 +993,35 @@ namespace VAdvantage.Model
                 {
                     cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
                 }
+
+                using (var sftp = new SftpClient(cInfo.GetFTPUrl(), 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+                    using (var fileStream = new MemoryStream())
+                    {
+                        sftp.DownloadFile(cInfo.GetFTPFolder() + "//" + fileName, fileStream);
+                        retVal = fileStream.ToArray();
+                    }
+
+                    sftp.Disconnect();
+
+                    
+                }
+
+                /*
+
                 request.Credentials = new NetworkCredential(cInfo.GetFTPUsername(), cInfo.GetFTPPwd());
                 retVal = request.DownloadData(new Uri(string.Format(@"{0}/{1}/{2}", cInfo.GetFTPUrl(), cInfo.GetFTPFolder(), fileName)));
                 request.Dispose();
-                return retVal;
+                
                 //string fileString = System.Text.Encoding.UTF8.GetString(newFileData);
-
+                */
+                return retVal;
             }
             catch (WebException e)
             {
                 error.Append("ErrorWhileDownloadingFileFromFTP:" + e.Message);
-                if (request != null)
-                    request.Dispose();
                 return null;
             }
         }
@@ -1330,8 +1433,18 @@ namespace VAdvantage.Model
         {
             try
             {
-
-                string filePath = System.IO.Path.Combine(GetServerLocation(), "TempDownload");
+                string filePath = "";
+                /*VIS_427 01/10/2025 if bool value is true then folder name will 
+                  be sharefiles else tempdownload*/
+                if (IsSaveInShareFiles)
+                {
+                     filePath = System.IO.Path.Combine(GetServerLocation(), "ShareFiles");
+                }
+                else
+                {
+                    filePath = System.IO.Path.Combine(GetServerLocation(), "TempDownload");
+                }
+                
                 string zipinput = filePath + "\\" + folderKey + "\\zipInput";
                 string zipfileName = System.IO.Path.Combine(filePath, folderKey, DateTime.Now.Ticks.ToString());
 
@@ -1532,8 +1645,9 @@ namespace VAdvantage.Model
                 {
                     try
                     {
-                        if (!UploadFtpFileWithoutRAM(filePath + "\\" + outputfileName, cInfo, outputfileName))
-                        {
+                        //if (!UploadFtpFileWithoutRAM(filePath + "\\" + outputfileName, cInfo, outputfileName))
+                            if (!UploadFileSFTP(outputfileName,filePath + "\\" + outputfileName, cInfo))
+                            {
                             if (!Force)
                             {
                                 CleanUp(filePath + "\\" + folderKey + "\\" + fileName, zipfileName, filePath + "\\" + outputfileName, zipinput);
@@ -1784,6 +1898,9 @@ namespace VAdvantage.Model
         private bool UploadFtpFileWithoutRAM(string fullname, X_AD_ClientInfo cInfo, string fNameFTP)
         {
 
+
+            return UploadFileSFTP(fNameFTP, fullname, cInfo);
+
             FtpWebRequest request;
             try
             {
@@ -1871,6 +1988,17 @@ namespace VAdvantage.Model
         {
             try
             {
+                /*VIS_427 01/10/2025 if bool value is true then folder name will 
+                be sharefiles else tempdownload*/
+                string FolderName = "";
+                if (IsSaveInShareFiles)
+                {
+                    FolderName = "ShareFiles";
+                }
+                else
+                {
+                    FolderName = "TempDownload";
+                }
                 DataSet ds = DB.ExecuteDataset("SELECT FileName, FileType FROM AD_AttachmentLine WHERE AD_AttachmentLine_ID=" + AD_AttachmentLine_ID);
 
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
@@ -1879,7 +2007,7 @@ namespace VAdvantage.Model
                     string folder = DateTime.Now.Ticks.ToString();
 
                     string filePath = System.IO.Path.Combine(GetServerLocation());
-                    Directory.CreateDirectory(Path.Combine(filePath, "TempDownload", folder));
+                    Directory.CreateDirectory(Path.Combine(filePath, FolderName, folder));
                     string filename = GetAD_Table_ID() + "_" + GetRecord_ID() + "_" + AD_AttachmentLine_ID;
                     string zipFileName = "zip" + DateTime.Now.Ticks.ToString();
                     if (fileLocation == X_AD_Attachment.FILELOCATION_Database)
@@ -1889,30 +2017,31 @@ namespace VAdvantage.Model
                         if (d != null && d != DBNull.Value)
                         {
                             data = (byte[])d;
-                            System.IO.File.WriteAllBytes(Path.Combine(filePath, "TempDownload", folder, filename), data);
-                            SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                            System.IO.File.WriteAllBytes(Path.Combine(filePath, FolderName, folder, filename), data);
+                            SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
                             //Delete fle from temp
-                            System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, filename));
+                            System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, filename));
                         }
                     }
                     else if (fileLocation == X_AD_Attachment.FILELOCATION_FTPLocation)
                     {
+                        DownloadFileSFTP(filename, Path.Combine(filePath, FolderName, folder));
 
-                        DownloadFtpFileWithoutRAM(filename, Path.Combine(filePath, "TempDownload", folder));
-                        SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                        //DownloadFtpFileWithoutRAM(filename, Path.Combine(filePath, FolderName, folder));
+                        SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
                         //Delete fle from temp
-                        System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, filename));
+                        System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, filename));
 
                     }
                     else if (fileLocation == X_AD_Attachment.FILELOCATION_ServerFileSystem)
                     {
                         //Copy to temp
-                        System.IO.File.Copy(Path.Combine(filePath, "Attachments", filename), Path.Combine(filePath, "TempDownload", folder, filename));
+                        System.IO.File.Copy(Path.Combine(filePath, "Attachments", filename), Path.Combine(filePath, FolderName, folder, filename));
                         //Decrypt File
 
-                        SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, filename), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                        SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, filename), Password, Path.Combine(filePath, FolderName, folder, zipFileName));
                         //Delete fle from temp
-                        System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, filename));
+                        System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, filename));
 
                     }
                     else if (fileLocation == X_AD_Attachment.FILELOCATION_WebService)
@@ -1951,7 +2080,7 @@ namespace VAdvantage.Model
 
                             byte[] byteData = Convert.FromBase64String(resFile);
 
-                            string savedFile = Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            string savedFile = Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
 
                             using (FileStream fs = new FileStream(savedFile, FileMode.Create, FileAccess.Write))
                             {
@@ -2001,7 +2130,7 @@ namespace VAdvantage.Model
 
                             byte[] byteData = Convert.FromBase64String(resFile);
 
-                            string savedFile = Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            string savedFile = Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
 
                             using (FileStream fs = new FileStream(savedFile, FileMode.Create, FileAccess.Write))
                             {
@@ -2030,16 +2159,16 @@ namespace VAdvantage.Model
 
                         if (!string.IsNullOrEmpty(containerUri))
                         {
-                            string downloadFullPath = Path.Combine(Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            string downloadFullPath = Path.Combine(Path.Combine(filePath, FolderName, folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
 
                             string res = AzureBlobStorage.DownloadFile(GetCtx(), containerUri, downloadFullPath, filename);
 
                             if (res == null)
                             {
                                 //Decrypt File
-                                SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                                SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, FolderName, folder, zipFileName));
                                 //Delete file from temp folder
-                                System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
+                                System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
                             }
                             else
                             {
@@ -2068,15 +2197,13 @@ namespace VAdvantage.Model
 
                         if (!string.IsNullOrEmpty(containerUri))
                         {
-                            string downloadFullPath = Path.Combine(Path.Combine(filePath, "TempDownload", folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
+                            string downloadFullPath = Path.Combine(Path.Combine(filePath, FolderName, folder), Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"]));
                             var result = System.Threading.Tasks.Task.Run(async () => await DownloadFilesFromOCI(containerUri, downloadFullPath, filename)).ConfigureAwait(false).GetAwaiter().GetResult();
-                            if (Directory.GetFiles(Path.Combine(filePath, "TempDownload", folder)).Length > 0)
+                            if (Directory.GetFiles(Path.Combine(filePath, FolderName, folder)).Length > 0)
                             {
-                                //Decrypt File
-                                SecureEngine.DecryptFile(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                                SecureEngine.DecryptFile(Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])), Password, Path.Combine(filePath, FolderName, folder, zipFileName));
                                 //Delete file from temp folder
-                                System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
-                                //return folder;
+                                System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, Util.GetValueOfString(ds.Tables[0].Rows[0]["FileName"])));
                             }
                             else
                                 return Msg.GetMsg(GetCtx(), "VIS_OCIErrorOccurred");
@@ -2090,10 +2217,10 @@ namespace VAdvantage.Model
                     ICSharpCode.SharpZipLib.Zip.FastZip z = new ICSharpCode.SharpZipLib.Zip.FastZip();
                     ICSharpCode.SharpZipLib.Zip.ZipConstants.DefaultCodePage = 720;
 
-                    z.ExtractZip(Path.Combine(filePath, "TempDownload", folder, zipFileName), Path.Combine(filePath, "TempDownload", folder), null);
-                    System.IO.File.Copy(Path.Combine(filePath, "TempDownload", folder) + "\\" + AD_AttachmentLine_ID + ds.Tables[0].Rows[0][1], Path.Combine(filePath, "TempDownload", folder) + "\\" + ds.Tables[0].Rows[0][0]);
-                    System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder) + "\\" + AD_AttachmentLine_ID + ds.Tables[0].Rows[0][1]);
-                    System.IO.File.Delete(Path.Combine(filePath, "TempDownload", folder, zipFileName));
+                    z.ExtractZip(Path.Combine(filePath, FolderName, folder, zipFileName), Path.Combine(filePath, FolderName, folder), null);
+                    System.IO.File.Copy(Path.Combine(filePath, FolderName, folder) + "\\" + AD_AttachmentLine_ID + ds.Tables[0].Rows[0][1], Path.Combine(filePath, FolderName, folder) + "\\" + ds.Tables[0].Rows[0][0]);
+                    System.IO.File.Delete(Path.Combine(filePath, FolderName, folder) + "\\" + AD_AttachmentLine_ID + ds.Tables[0].Rows[0][1]);
+                    System.IO.File.Delete(Path.Combine(filePath, FolderName, folder, zipFileName));
 
                     return folder;
                 }
@@ -2108,6 +2235,46 @@ namespace VAdvantage.Model
             }
         }
 
+        private bool DownloadFileSFTP(string filename, string saveFilePath)
+        {
+
+            try
+            {
+
+
+                X_AD_ClientInfo cInfo = null;
+                if (AD_Client_ID > 0)
+                {
+                    cInfo = new X_AD_ClientInfo(GetCtx(), AD_Client_ID, Get_Trx());
+                }
+                else
+                {
+                    cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
+                }
+
+                var url = cInfo.GetFTPUrl();
+                if (url != null && url.Contains(":"))
+                {
+                    url = url.Substring(0,url.IndexOf(":"));
+                }
+                using (var sftp = new SftpClient(url, 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+                    using (var fileStream = new FileStream(saveFilePath + "//" + filename, FileMode.Create))
+                    {
+                        sftp.DownloadFile(cInfo.GetFTPFolder() + "//" + filename, fileStream);
+                    }
+
+                    sftp.Disconnect();
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
 
 
         private bool DownloadFtpFileWithoutRAM(string filename, string saveFilePath)
@@ -2247,6 +2414,23 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
                     cInfo = new X_AD_ClientInfo(GetCtx(), GetCtx().GetAD_Client_ID(), Get_Trx());
                 }
 
+                using (var sftp = new SftpClient(cInfo.GetFTPUrl(), 22, cInfo.GetFTPUsername(), cInfo.GetFTPPwd()))
+                {
+                    sftp.Connect();
+
+                    var remoteFilePath = cInfo.GetFTPFolder() + "//" + fileName;
+                    if (sftp.Exists(remoteFilePath))
+                    {
+                        sftp.DeleteFile(remoteFilePath);
+                       
+                    }
+                    sftp.Disconnect();
+                }
+
+                /*
+
+
+
                 FtpWebRequest request = (FtpWebRequest)WebRequest.Create(cInfo.GetFTPUrl() + "//" + cInfo.GetFTPFolder() + "//" + filename);
                 request.Credentials = new NetworkCredential(cInfo.GetFTPUsername(), cInfo.GetFTPPwd());
                 request.Method = WebRequestMethods.Ftp.DeleteFile;
@@ -2254,6 +2438,7 @@ WHERE att.IsActive = 'Y' AND al.IsActive = 'Y' AND ar.IsActive = 'Y' AND att.AD_
                 FtpWebResponse response = (FtpWebResponse)request.GetResponse();
 
                 response.Close();
+                */
             }
             catch (Exception ex)
             {

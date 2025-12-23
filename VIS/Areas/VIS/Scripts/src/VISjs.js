@@ -3,6 +3,7 @@ import "../app/utility.js";
 import "../app/logger.js";
 import "../app/controls.js";
 import "../app/classes.js";
+import "../home/visTrayModule.js";
 import "../app/desktopmgr.js";
 import "../app/viewmanager.js";
 import "../app/context.js";
@@ -117,4 +118,5 @@ import "../widgets/assignedwindowrec.js";
 import "../tabpanels/wfPanel.js";
 import "../app/forms/WorkFlowHttpRequest.js";
 import "../app/Framework/VIS_SecretKeyDialog.js";
+
 

@@ -199,7 +199,7 @@
     /**
      *	Window Model
      */
-    function GridWindow(json,apanel) {
+    function GridWindow(json, apanel) {
         this.apanel = apanel;
         this.vo = json._vo;
 
@@ -272,7 +272,7 @@
     GridWindow.prototype.getWindowType = function () {
         return this.vo.WindowType;
     };
-    
+
 
 
     GridWindow.prototype.getIsCheckRequest = function () {
@@ -449,7 +449,7 @@
         this.apanel = apanel;
         this.gTab = gTab;
         this.vo = gTab._vo;
-        this.gridTable = new VIS.GridTable(gTab._gridTable,apanel);
+        this.gridTable = new VIS.GridTable(gTab._gridTable, apanel);
         this.gridTable.onlyCurrentDays = this.vo.onlyCurrentDays;
         // Maintain version on approval property on tab
         this.gridTable.MaintainVerOnApproval = this.vo.MaintainVerOnApproval;
@@ -625,14 +625,14 @@
     };	//	i
 
     GridTab.prototype.getValueAsString = function (variableName) {
-        var curTabIndex = VIS.context.getContext(this.vo.windowNo, "tb_Index",true);
+        var curTabIndex = VIS.context.getContext(this.vo.windowNo, "tb_Index", true);
 
         if (curTabIndex == this.vo.tabNo) {// 1 && this.vo.windowNo + "|" + variableName in VIS.context.m_map[this.vo.windowNo])
             value = VIS.context.getWindowContext(this.vo.windowNo, this.vo.tabNo, variableName, true);
         }
         else
-           value = VIS.context.getWindowContext(this.vo.windowNo, variableName, true);
-       
+            value = VIS.context.getWindowContext(this.vo.windowNo, variableName, true);
+
         if (!value) {
             return '';
         }
@@ -717,12 +717,12 @@
 
     GridTab.prototype.getIsTPBottomAligned = function () {
         // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
-        return this.tabPanelsBotm.length>0;
+        return this.tabPanelsBotm.length > 0;
     };
 
     GridTab.prototype.getIsShowBothTP = function () {
         // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
-        return this.tabPanelsBotm.length > 0 && this.tabPanelsRght.length > 0;            
+        return this.tabPanelsBotm.length > 0 && this.tabPanelsRght.length > 0;
     };
 
     GridTab.prototype.getIsTPBottomShowAll = function () {
@@ -937,6 +937,16 @@
     GridTab.prototype.getKeyID = function (row) {
         return this.gridTable.getKeyID(row);
     };   //  get
+
+    /**
+     * Get Value of column
+     * @param {any} row
+     * @param {any} colName
+     * @returns
+     */
+    GridTab.prototype.getValueOfCol = function (row, colName) {
+        return this.gridTable.getValueAt(row, colName);
+    };
 
     /**
      *  Get addition info message for status for for seleted tables
@@ -1217,6 +1227,8 @@
                 continue;
             if (f.getColumnName().toLowerCase() == "export_id")
                 continue;
+            if (f.getColumnName().toLowerCase() == this.getTableName().toLowerCase() + "_guid")
+                continue;
 
             if (VIS.DisplayType.IsText(f.getDisplayType())) {
                 if (!query)
@@ -1334,7 +1346,7 @@
     }
 
     //Set Query Object
-    GridTab.prototype.setQuery = function (query,requery) {
+    GridTab.prototype.setQuery = function (query, requery) {
         if (query == null)
             this.query = new VIS.Query();
         else {
@@ -1765,7 +1777,7 @@
 
         this.oldQuery = this.query.getWhereClause();
         this.vo.onlyCurrentDays = onlyCurrentDays;
-        if (this.apanel && this.apanel.getAdvanceWhere()== '') {
+        if (this.apanel && this.apanel.getAdvanceWhere() == '') {
             refresh = false;
         }
         var where = "";
@@ -1883,7 +1895,7 @@
                 refresh = false;
             }
         }
-        this.extendedWhere = where.toString();    
+        this.extendedWhere = where.toString();
         //if (this.oldCardQuery != this.cardWhereCondition) {
         //    refresh = false;
         //}
@@ -2150,7 +2162,7 @@
      * get shared record is readonly or not and set status on tab level.
      * 
      * */
-    GridTab.prototype.IsSharedAccess = function () {       
+    GridTab.prototype.IsSharedAccess = function () {
 
         // Handle new record Case
         if (this.gridTable.getIsInserting()) {
@@ -2169,7 +2181,7 @@
         if (!recordID || recordID < 0) {
             return;
         }
-        
+
         var that = this;
         $.ajax({
             async: false,
@@ -2195,7 +2207,7 @@
                 console.log(err);
             }
         });
-    };    
+    };
 
     GridTab.prototype.verifyRow = function (targetRow) {
 
@@ -2271,6 +2283,7 @@
             if (this.keyColumnName != null && this.keyColumnName.length > 0) {
                 info.append(" - ")
                     .append(this.keyColumnName).append("=").append(e.Record_ID);
+
             }
             else    //  we have multiple parents
             {
@@ -2280,6 +2293,9 @@
                         .append(keyCol).append("=").append(this.getValue(keyCol));
                 }
             }
+            var guidColName = this.getTableName() + "_GUID";
+
+            info.append(")<br/>(").append(guidColName + " =").append(this.getValueOfCol(e.getCurrentRow(), guidColName.toLowerCase()));
             e.Info = info.toString();
         }
         e.setInserting(this.gridTable.getIsInserting());
@@ -2492,7 +2508,7 @@
         //get AssignedRecordId
         var key = this.getRecord_ID();// _gridTable.GetKeyID(CurrentRow);
         //The given key was not present in the dictionary. Error
-       
+
         if (this.hasKey(this.assignedRecord, key)) {
             //get AssignedRecord key value
             var value = VIS.Utility.Util.getValueOfInt(this.getKeyValue(this.assignedRecord, key));
@@ -2825,7 +2841,7 @@
         if (!this.canHaveAttachment())
             return;//return nothing
         //set query
-       
+
         var sql = "VIS_160";
         var param = [];
         param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
@@ -2908,7 +2924,7 @@
             this.loadAssignedRecords();//call load AssignRecord function
         if (this.assignedRecords == null)
             return false;
-       
+
         var key = this.getRecord_ID();//ridTable.GetKeyID(CurrentRow);
         return this.hasKey(this.assignedRecords, key);
     };
@@ -2937,7 +2953,7 @@
 
         if (this.isDataLoading)
             return false;
-        if (this.sharedRecords == null || reload==true)
+        if (this.sharedRecords == null || reload == true)
             this.loadShared();//call load shared record function
         if (this.sharedRecords == null)
             return false;
@@ -2949,7 +2965,7 @@
         return this.hasKey(this.sharedRecords, key);//return chatId
     };
 
-  
+
     /// <summary>
     /// Returns true, if current row has a Subscribe
     /// </summary>
@@ -2978,7 +2994,7 @@
         if (VIS.MRole.getIsShowSharedRecord() == true) {
             var sqlQry = "VIS_157";
             var param = [];
-           // param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
+            // param[0] = new VIS.DB.SqlParam("@Org_ID", VIS.context.getAD_Org_ID());
             param[0] = new VIS.DB.SqlParam("@AD_Table_ID", this.getAD_Table_ID());
 
             var dr = null;
@@ -2989,7 +3005,7 @@
                 var key;
                 while (dr.read()) {
                     key = VIS.Utility.Util.getValueOfInt(dr.getString(0));
-                    this.sharedRecords.push({ ID: key});
+                    this.sharedRecords.push({ ID: key });
                 }
 
                 dr = null;
@@ -3132,7 +3148,7 @@
         this.viewDocument = this.gTab._documents;
         this.sharedRecords = this.gTab._sharedRec;
 
-       /* Assigned Record action panel by Rahul Mittal*/
+        /* Assigned Record action panel by Rahul Mittal*/
         this.assignedRecords = this.gTab.assignedRecords;
         //this.sharedRecordsWithLoginOrg = this.gTab._sharedWithLoginRec;
         //var tableIndex = {};
@@ -4155,7 +4171,7 @@
                 this.log.Severe("Invalid NULL - " + _tableName + "=" + _whereClause);
             }
         }
-       
+
         this.whereClause = m_SQL_Where;
 
 
@@ -4314,7 +4330,7 @@
                     that.changed = false;
                     that.rowChanged = -1;
                     that.fillData(retObj);
-                   
+
                 }
                 else {
                     //console.log("clear");
@@ -4341,11 +4357,11 @@
             },
             error: function () {
 
-            } 
-            
+            }
+
         });
 
-        
+
         return true;
 
 
@@ -4862,7 +4878,7 @@
             UnqFields: this.gFieldUnique,
             Ctx: VIS.context.getWindowCtx(this.gTable._windowNo),
             WindowNo: this.gTable._windowNo,
-            AD_Tab_ID:this.AD_Tab_ID
+            AD_Tab_ID: this.AD_Tab_ID
             //ImmediateSave: true,
             //ValidFrom: new Date().toISOString(),
         };
@@ -4981,56 +4997,56 @@
             var rowChg = slf.rowChanged;
             var out = slf.dataSaveDB(gTblIn, rdNew);
             // if Stauts is not OK
-           // if (out.Status != "O") {
-                // if there is any error then display error message
-                if (out.Status == "E") {
-                    if (!(out.FireEEvent || out.FireIEvent))
-                        VIS.ADialog.info(out.ErrorMsg);
-                }
-                else {
-                    if (out.VersionResult) {
-                        slf.rowChanged = rowChg;
-                        out.RowData = gTblIn.RowData;
-                        if (out.VersionResult.KeyColName != "") {
-                            // out.RowData[out.KeyColName.toLower()] = out.Record_ID;
-                            rdNew[out.VersionResult.KeyColName.toLower()] = out.VersionResult.Record_ID;
-                            rdNew["isactive"] = out.VersionResult.IsActive;
-                        }
-
-                        slf.fireTableModelChanged(VIS.VTable.prototype.ROW_REFRESH, rdNew, slf.rowChanged);
-                        slf.fireRowChanged(true, slf.getKeyID(slf.rowChanged));
-
-                        //	everything ok
-                        slf.rowData = null;
-                        slf.changed = false;
-                        slf.compareDB = true;
-                        slf.rowChanged = -1;
-                        slf.newRow = -1;
-                        slf.inserting = false;
-
-                        if (out.ErrorMsg != null) {
-                            slf.log.log(VIS.Logging.Level.SEVERE, out.ErrorMsg);
-                        }
-
-                        if (out.FireEEvent) {
-                            slf.fireDataStatusEEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError, out.IsWarning);
-                        }
-                        else if (out.FireIEvent) {
-                            out.EventParam.Info = "VER";
-                            slf.fireDataStatusIEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError);
-                        }
-
-                        // if sent for WF Approval then display Message
-                        if (out.Status == "W")
-                            VIS.ADialog.info("SentForApproval");
-                        // if saved for future then display Message and refresh UI
-                        else if (out.Status == "F")
-                            VIS.ADialog.info("SavedForFuture");
-                        else if (out.Status == "B")
-                            VIS.ADialog.info("SavedForBackDate");
-                        // }
+            // if (out.Status != "O") {
+            // if there is any error then display error message
+            if (out.Status == "E") {
+                if (!(out.FireEEvent || out.FireIEvent))
+                    VIS.ADialog.info(out.ErrorMsg);
+            }
+            else {
+                if (out.VersionResult) {
+                    slf.rowChanged = rowChg;
+                    out.RowData = gTblIn.RowData;
+                    if (out.VersionResult.KeyColName != "") {
+                        // out.RowData[out.KeyColName.toLower()] = out.Record_ID;
+                        rdNew[out.VersionResult.KeyColName.toLower()] = out.VersionResult.Record_ID;
+                        rdNew["isactive"] = out.VersionResult.IsActive;
                     }
+
+                    slf.fireTableModelChanged(VIS.VTable.prototype.ROW_REFRESH, rdNew, slf.rowChanged);
+                    slf.fireRowChanged(true, slf.getKeyID(slf.rowChanged));
+
+                    //	everything ok
+                    slf.rowData = null;
+                    slf.changed = false;
+                    slf.compareDB = true;
+                    slf.rowChanged = -1;
+                    slf.newRow = -1;
+                    slf.inserting = false;
+
+                    if (out.ErrorMsg != null) {
+                        slf.log.log(VIS.Logging.Level.SEVERE, out.ErrorMsg);
+                    }
+
+                    if (out.FireEEvent) {
+                        slf.fireDataStatusEEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError, out.IsWarning);
+                    }
+                    else if (out.FireIEvent) {
+                        out.EventParam.Info = "VER";
+                        slf.fireDataStatusIEvent(out.EventParam.Msg, out.EventParam.Info, out.EventParam.IsError);
+                    }
+
+                    // if sent for WF Approval then display Message
+                    if (out.Status == "W")
+                        VIS.ADialog.info("SentForApproval");
+                    // if saved for future then display Message and refresh UI
+                    else if (out.Status == "F")
+                        VIS.ADialog.info("SavedForFuture");
+                    else if (out.Status == "B")
+                        VIS.ADialog.info("SavedForBackDate");
+                    // }
                 }
+            }
             //}
             return out.Status;
         });
@@ -5538,7 +5554,9 @@
                 RecIds: recIds,
                 HasKeyColumn: hasKeyColumn,
                 TableName: this.gTable._tableName,
-                AD_Table_ID: AD_Table_ID
+                AD_Table_ID: AD_Table_ID,
+                AD_Window_ID: this.gridFields[0].getAD_Window_ID(),
+                AD_Tab_ID: this.AD_Tab_ID
             }
             if (hasKeyColumn)
                 inn.SingleKeyWhere = singleKeyWhere;
@@ -5670,7 +5688,9 @@
                     RecIds: recIds,
                     HasKeyColumn: hasKeyColumn,
                     TableName: localthis.gTable._tableName,
-                    AD_Table_ID: AD_Table_ID
+                    AD_Table_ID: AD_Table_ID,
+                    AD_Window_ID: localthis.gridFields[0].getAD_Window_ID(),
+                    AD_Tab_ID: localthis.AD_Tab_ID
                 }
                 if (hasKeyColumn)
                     inn.SingleKeyWhere = singleKeyWhere;
@@ -6426,7 +6446,7 @@
                 keyColumn += "_ID";			//	AD_Language_ID
             var Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, keyColumn);
             if (Record_ID == "" && this.gridTab)
-                Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, this.gridTab.getTableName() + "_ID"); 
+                Record_ID = ctx.getWindowTabContext(_vo.windowNo, _vo.tabNo, this.gridTab.getTableName() + "_ID");
 
 
 
@@ -6446,10 +6466,14 @@
             if (this.gridTab && this.gridTab.IsSharedReadOnly)
                 return false;
 
+            // render readonly ORG as readonly
+            if (!VIS.MRole.getIsOrgAccess(AD_Org_ID, true)) {
+                return false;
+            }
             //check for filter org
             var fOrgs = ctx.getContext("#AD_FilteredOrg");
             if (fOrgs && fOrgs != "") {
-                if (fOrgs.split(",").indexOf('0') < 0 && AD_Org_ID == 0 )
+                if (fOrgs.split(",").indexOf('0') < 0 && AD_Org_ID == 0)
                     return false;
             }
         }
@@ -6473,7 +6497,7 @@
             && (ctx.getWindowContext(_vo.windowNo, _vo.tabNo, "Processed").equals("Y")
                 || ctx.getWindowContext(_vo.windowNo, _vo.tabNo, "Processing").equals("Y"))) {
             //if (!hasMRDisplayLogic)
-                return false;
+            return false;
         }
 
         //  IsActive field is editable, if record not processed
@@ -6492,7 +6516,7 @@
 
 
     GridField.prototype.hasReadonlyLogic = function () {
-        return this.vo.ReadOnlyLogic.length > 0; 
+        return this.vo.ReadOnlyLogic.length > 0;
     }
 
     /**
@@ -6857,7 +6881,13 @@
         //check for filterd org , if filter applied then return login org only
         var fOrgs = ctx.getContext("#AD_FilteredOrg");
         if (vo.ColumnName.equals("AD_Org_ID") && fOrgs && fOrgs != "") {
-            return ctx.getAD_Org_ID();
+            if (VIS.MRole.getIsOrgAccess(ctx.getAD_Org_ID(), true))
+                return ctx.getAD_Org_ID();
+            if (fOrgs.indexOf('0') > -1) {
+                if (VIS.MRole.getIsOrgAccess(0, true))
+                    return 0;
+            }
+            return null;
         }
 
         //	Set Client & Org to System, if System access
@@ -6883,7 +6913,7 @@
             return this.createDefault("", defStr);
         }
 
-        
+
 
         /**
          *  (b) SQL Statement (for data integity & consistency)
@@ -6954,8 +6984,10 @@
                     defStr = ctx.getWindowContext(vo.windowNo, variable.replaceAll('@', ' ').trim());
 
                     // Check Role have Org Access. 
-                    if (vo.ColumnName == 'AD_Org_ID' && !VIS.MRole.getIsOrgAccess(Number(defStr), false)) {
-                        defStr = variable;
+                    if (vo.ColumnName == 'AD_Org_ID' && !VIS.MRole.getIsOrgAccess(Number(defStr), true)) {
+                        if (VIS.MRole.getIsOrgAccess(0, true))
+                            return 0;
+                        return null;
                     }
                 }
                 else if (variable.startsWith("'") && variable.endsWith("'"))	//	it is a 'String'
@@ -7117,7 +7149,7 @@
 
         /**
          *  (b) SQL Statement (for data integity & consistency)
-         */      
+         */
         if (vo.DefaultValue2.startsWith("@SQL=")) {
             var sql0 = vo.DefaultValue2.substring(5);			//	w/o tag
             var sql = VIS.Env.parseContext(ctx, vo.windowNo, sql0, false, true);	//	replace variables
@@ -7353,7 +7385,7 @@
                     }
                     d.setMilliseconds(0);
                     d.setSeconds(0);
-                    return d.toISOString();
+                    return d.toISOString().replace('.000Z', 'Z');
                 }
                 catch (ex) {
                 }
@@ -7369,7 +7401,7 @@
                 var d = new Date();
                 d.setMilliseconds(0);
                 d.setSeconds(0);
-                return d.toISOString();
+                return d.toISOString().replace('.000Z', 'Z');
             }
 
             //	Boolean
@@ -7780,7 +7812,7 @@
     GridTabPanel.prototype.getTabPanelAlignment = function () {
         return this.vo.TabPanelAlignment;
     }
-   
+
     GridTabPanel.prototype.getIsTPBottomAligned = function () {
         return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
     };

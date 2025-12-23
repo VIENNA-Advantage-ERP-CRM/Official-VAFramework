@@ -36,16 +36,20 @@ namespace VAdvantage.Classes
                 MSession s = null;
                 if (ctx != null)
                 {
-                     s = MSession.Get(ctx);
+                    int sessionId = ctx.GetAD_Session_ID();
+                    if (sessionId > 0)
+                    {
+                        s =  new MSession(ctx,sessionId,null);
+                    }
                 }
                 else
                 {
                     s = MSession.GetByWebSessionID(webSessionId);
                 }
-                if (s != null)
+                if (s != null && !s.IsProcessed())
                 {
-                    s.Logout();
-                    ModelLibrary.PushNotif.SessionManager.Get().RemoveSession(s.GetAD_Session_ID());
+                        s.Logout();
+                        ModelLibrary.PushNotif.SessionManager.Get().RemoveSession(s.GetAD_Session_ID());
                 }
             }
             catch (Exception ex)

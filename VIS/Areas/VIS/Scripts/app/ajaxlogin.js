@@ -85,6 +85,10 @@
                         else
                             $(".vis-loginVALbl").css('display', 'block');
                         $("#QRCdeimg").attr('src', json.ctx.QRCodeURL);
+                        /*if QR is empty then display the Text to reload QR image*/
+                        if (json.ctx.QRCodeURL == "") {
+                            $(".vis-qrtext-div").css("display", "block");
+                        }
                         if (json.ctx.QRFirstTime)
                             $(".vis-firstLoginAuth").css("display", "block");
                         else {
@@ -191,6 +195,54 @@
     var skipClick = function (e) {
         $("#login3Data1").val(true);
         $btnLogin1.submit();
+    }
+    /*This function refresh the QR Scanner on click here hyperlink click */
+    var refreshClick = function () {
+        var jsonStr = $('#login3Data').val();
+        var userValue = null;
+        var tokenKey2FA = null;
+        var password = null;
+        var obj;
+        try {
+            obj = (typeof jsonStr === 'string') ? JSON.parse(jsonStr) : jsonStr;
+        } catch (e) {
+            console.error('Invalid JSON:', e);
+            obj = null;
+        }
+
+        if (obj) {
+             userValue = obj.UserValue;    
+            tokenKey2FA = obj.TokenKey2FA;
+            password = obj.Password;
+        }
+        /*implementing ajax request in order to bring QR scanner*/
+        $.ajax({
+            url: contextUrl + "Account/GetQROnRefresh",
+            type: "POST",
+            data: JSON.stringify({
+                userValue: userValue,
+                tokenKey2FA: tokenKey2FA,
+                password: password
+            }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                try {
+                    //Update the QRCodeURL
+                    obj.QRCodeURL = response;
+                    //Set updated JSON string back into #login3Data and #login1Data
+                    $('#login3Data').val(JSON.stringify(obj));
+                    $('#login1Data').val(JSON.stringify(obj));
+                    $("#QRCdeimg").attr('src', response);
+                    $(".vis-qrtext-div").css("display", "none")
+                } catch (e) {
+                    console.error('JSON parse/update failed:', e);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
     }
 
     var resendClick = function (e) {
@@ -362,7 +414,10 @@
         $lblEnterVAOTP.text(Globalize.localize("EnterVAVerCode"));
         $lblSkip.text(Globalize.localize("SkipThisTime"));
         $lblResend.text(Globalize.localize("ResendOTP"));
-
+        /*implementing to show text which will be avaialbale on base file*/
+        $lblRefresh.text(Globalize.localize("VIS_ClickHere"));
+        $("#vis-qrtxt-spn1").text(Globalize.localize("VIS_QRText"));
+        $("#vis-qrtxt-spn2").text(Globalize.localize("VIS_QRText_Sub"));
         $lblRole.text(Globalize.localize("Role"));
         $lblClient.text(Globalize.localize("Client"));
         $lblOrg.text(Globalize.localize("Organization"));
@@ -395,9 +450,11 @@
 
     var $lblSkip = $("#lblSkip");
     var $lblResend = $("#lblResend");
+    var $lblRefresh = $("#lblRefresh");
 
     $lblSkip.click(skipClick);
     $lblResend.click(resendClick);
+    $lblRefresh.click(refreshClick);
 
     var $loginForm = $("#loginForm");
 

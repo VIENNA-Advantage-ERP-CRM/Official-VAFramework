@@ -230,7 +230,7 @@ namespace VIS.Models
                         STRING_AGG(asr.Record_ID::TEXT, ',') AS RecordIDs
                         FROM VIS_AssignedRecordToUser asr
                          INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
-                        INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                        INNER JOIN AD_Window adw ON asr.AD_Window_ID = adw.AD_Window_ID WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
                 }
                 else
                 {
@@ -239,7 +239,7 @@ namespace VIS.Models
                         FROM VIS_AssignedRecordToUser asr
                          INNER JOIN AD_Table tab ON (tab.AD_Table_ID = asr.AD_Table_ID)
                         INNER JOIN AD_Window adw ON (asr.AD_Window_ID = adw.AD_Window_ID)
-                        INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID, asr.AD_User_ID";
+                        INNER JOIN AD_Window_Trl wt ON (asr.AD_Window_ID = wt.AD_Window_ID AND wt.AD_Language = '" + VAdvantage.Utility.Env.GetAD_Language(ctx) + "') WHERE " + UserCond + " asr.IsActive = 'Y'  AND  asr.Status = 'PDN' GROUP BY tab.TableName,wt.Name,adw.DisplayName, adw.AD_Window_ID, asr.AD_Table_ID";
                 }
 
                 if (pageNo == 1)
@@ -320,38 +320,91 @@ namespace VIS.Models
         /// <returns></returns>
         public string DeleteRecord(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int[] Record_ID)
         {
-            StringBuilder sql = new StringBuilder("DELETE FROM VIS_AssignedRecordToUser WHERE Record_ID IN ( ");
+            /*Commented this code because delete should be done from Mclass*/
 
-            List<SqlParameter> parameters = new List<SqlParameter>();
+            //List<SqlParameter> parameters = new List<SqlParameter>();
+            //for (int i = 0; i < Record_ID.Length; i++)
+            //{
+            //    sql.Append("@recordId" + i + ",");
+            //    parameters.Add(new SqlParameter("@recordId" + i, Record_ID[i]));
+            //}
+
+            //sql.Remove(sql.Length - 1, 1); // Removes the last character (comma)
+
+            //sql.Append(") AND AD_Window_ID=@AD_Window_ID AND AD_Table_ID=@AD_Table_ID");
+
+            //parameters.Add(new SqlParameter("@AD_Window_ID", AD_Window_ID));
+            //parameters.Add(new SqlParameter("@AD_Table_ID", AD_Table_ID));
+
+            //int count = DB.ExecuteQuery(sql.ToString(), parameters.ToArray());
+            //if (count > 0)
+            //{
+            //    return Msg.GetMsg(ctx, "RecordDeleted");
+            //}
+            //else
+            //{
+            //    StringBuilder error = new StringBuilder("Error:");
+            //    ValueNamePair vp = VLogger.RetrieveError();
+            //    if (vp != null && !string.IsNullOrEmpty(vp.GetName()))
+            //    {
+            //        error.Append("Error:Record Not Delete" + vp.GetName());
+            //    }
+            //    _log.SaveError("RecordNotDelete", error.ToString());
+            //    return error.ToString();
+            //}
+
+            //store the increment of count on each success delete
+            int successCount = 0;
+            StringBuilder error = new StringBuilder();
+            //get all data
+            DataSet ds = DB.ExecuteDataset($@"SELECT * FROM VIS_AssignedRecordToUser WHERE Record_ID IN ({string.Join(", ", Record_ID)}) AND AD_Table_ID ={AD_Table_ID}");
+            ValueNamePair vp = VLogger.RetrieveError();
+            string val = "";
             for (int i = 0; i < Record_ID.Length; i++)
             {
-                sql.Append("@recordId" + i + ",");
-                parameters.Add(new SqlParameter("@recordId" + i, Record_ID[i]));
-            }
-
-            sql.Remove(sql.Length - 1, 1); // Removes the last character (comma)
-
-            sql.Append(") AND AD_Window_ID=@AD_Window_ID AND AD_Table_ID=@AD_Table_ID");
-
-            parameters.Add(new SqlParameter("@AD_Window_ID", AD_Window_ID));
-            parameters.Add(new SqlParameter("@AD_Table_ID", AD_Table_ID));
-
-            int count = DB.ExecuteQuery(sql.ToString(), parameters.ToArray());
-            if (count > 0)
-            {
-                return Msg.GetMsg(ctx, "RecordDeleted");
-            }
-            else
-            {
-                StringBuilder error = new StringBuilder("Error:");
-                ValueNamePair vp = VLogger.RetrieveError();
-                if (vp != null && !string.IsNullOrEmpty(vp.GetName()))
+                //selects data based on record id
+                DataRow[] dr = ds.Tables[0].Select($@"Record_ID = {Util.GetValueOfInt(Record_ID[i])}");
+                if (dr != null && dr.Length > 0)
                 {
-                    error.Append("Error:Record Not Delete" + vp.GetName());
+                    /*created object of mclass using dr*/
+                    MVISAssignedRecordToUser mclass = new MVISAssignedRecordToUser(ctx, dr[0], null);
+                    if (mclass.Delete(true))
+                    {
+                        successCount++;
+
+                    }
+                    else
+                    {
+                        if (vp != null)
+                        {
+                            val = vp.GetName();
+                            if (String.IsNullOrEmpty(val))
+                            {
+                                val = vp.GetValue();
+                            }
+                            error.Append(val + ",");
+                        }
+                        _log.Severe("RecordNotDelete" + error.ToString());
+                    }
                 }
-                _log.SaveError("RecordNotDelete", error.ToString());
-                return error.ToString();
             }
+            //if their is error then append message
+            if (!string.IsNullOrEmpty(val))
+            {
+                error.Append(Msg.GetMsg(ctx, "Error") + ": " + Msg.GetMsg(ctx, "RecordNotDeleted") + ": " + val.TrimEnd(','));
+            }
+            //if no error is found on delete this means all records deleted
+            if (string.IsNullOrEmpty(error.ToString()))
+            {
+                error.Append(Msg.GetMsg(ctx, "RecordDeleted"));
+            }
+            /*if some records deleted and some has error on 
+             delete then show message with some records deleted*/
+            else if (successCount > 0 && !string.IsNullOrEmpty(error.ToString()))
+            {
+                error.Append(Msg.GetMsg(ctx, "SomeRecordDeleted"));
+            }
+            return error.ToString();
         }
 
         /// <summary>
@@ -410,8 +463,11 @@ namespace VIS.Models
         public List<dynamic> GeWindowRecords(Ctx ctx, int WindowId, int TableID, string Record_ID, int pageNo, int pageSize, string SrchTxt, string AssignedByOrTo)
         {
             string sql = "";
+            string sqlCTE = "";
             List<dynamic> results = new List<dynamic>();
             string UserCond = AssignedByOrTo == "01" ? " var.AD_User_ID" : " var.UpdatedBy";
+            int countRecords = 0;
+
             // Step 1: Get identifier column(s) for the given TableID
             if (DB.IsPostgreSQL())
             {
@@ -460,31 +516,51 @@ namespace VIS.Models
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 string columnNames = Util.GetValueOfString(ds.Tables[0].Rows[0]["IdentifierColumns"]);  // Final concatenated identifier columns
-
-                sql = $@"WITH LatestUpdates AS (SELECT 
-                              {columnNames} AS IdentiFierVal,
-                              au.Name AS UserName,
-                              var.Record_ID,
+                 sqlCTE = $@"SELECT
+                              { columnNames}
+                AS IdentiFierVal,
+                 au.Name AS UserName,";
+                if (string.IsNullOrEmpty(Record_ID))
+                {
+                    sqlCTE += $@"au1.Name AS AssignedBy, ";
+                }
+                sqlCTE += $@" var.Record_ID,
                               var.Updated,
                               ROW_NUMBER() OVER (PARTITION BY var.Record_ID ORDER BY var.Updated DESC) AS rn
                           FROM {ds.Tables[0].Rows[0]["TableName"]} at
                           INNER JOIN VIS_AssignedRecordToUser var 
-                              ON var.Record_ID = at.{ds.Tables[0].Rows[0]["TableName"]}_ID
-                          INNER JOIN AD_User au 
+                              ON var.Record_ID = at.{ds.Tables[0].Rows[0]["TableName"]}_ID ";
+                /*Record_ID null means that this is for see all assign user*/
+                if (string.IsNullOrEmpty(Record_ID))
+                {
+                    sqlCTE += $@"INNER JOIN AD_User au1 
+                              ON au1.AD_User_ID =var.UpdatedBy ";
+                }
+                sqlCTE += $@"INNER JOIN AD_User au 
                               ON au.AD_User_ID =" + UserCond + $@"
-                          WHERE " + (!string.IsNullOrEmpty(Record_ID) ? $@"at.{ds.Tables[0].Rows[0]["TableName"]}_ID IN ({Record_ID}) AND " : " ") + $@" var.AD_Window_ID={WindowId}
-                      AND var.Status = 'PDN')
-                      SELECT IdentiFierVal, UserName, Record_ID, Updated
-                      FROM LatestUpdates
-                      WHERE rn = 1";
+                          WHERE " + $@" var.AD_Window_ID={WindowId}
+                      AND var.Status = 'PDN'";
 
-                // Apply optional search text filter
+                sql = $@"WITH LatestUpdates AS ("+ sqlCTE+@")
+                      SELECT IdentiFierVal, UserName, Record_ID, Updated";
+                if (string.IsNullOrEmpty(Record_ID))
+                {
+                    sql += $@",AssignedBy ";
+                }
+                sql += @" FROM LatestUpdates
+                      WHERE rn = 1 " + (!string.IsNullOrEmpty(Record_ID) ? $@" AND Record_ID IN ({ Record_ID})" : "");
+
+                // Apply optional search text filters
                 if (!string.IsNullOrEmpty(SrchTxt))
                 {
                     sql += $@" AND (
                           UPPER(IdentiFierVal) LIKE UPPER('%{SrchTxt}%') 
-                          OR UPPER(UserName) LIKE UPPER('%{SrchTxt}%')
-                      )";
+                          OR UPPER(UserName) LIKE UPPER('%{SrchTxt}%')";
+                    if (string.IsNullOrEmpty(Record_ID))
+                    {
+                        sql += $" OR UPPER(AssignedBy) LIKE UPPER('%{SrchTxt}%')";
+                    }
+                    sql += " )";
                 }
 
                 // Order by most recently updated
@@ -492,11 +568,14 @@ namespace VIS.Models
                 // Step 4: Execute final paged result query
                 ds = DB.ExecuteDataset(sql.ToString(), null, null, pageSize, pageNo);
             }
-
+            if (pageNo == 1)
+            {
+                /*Stored the count of records in order to show see all assigned user link*/
+                countRecords = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(*) FROM ( " + sqlCTE + " ) t"));
+            }
             // Step 5: Read data and add to result list
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
-                int countRecords = 0;
 
                 // Get total record count only for first page
                 if (pageNo == 1)
@@ -510,6 +589,14 @@ namespace VIS.Models
                     dynamic obj = new ExpandoObject();
                     obj.ColValue = Util.GetValueOfString(row["IdentiFierVal"]);
                     obj.UpdatedBy = Util.GetValueOfString(row["UserName"]);
+                    if (string.IsNullOrEmpty(Record_ID))
+                    {
+                        obj.AssignedBy = Util.GetValueOfString(row["AssignedBy"]);
+                    }
+                    else
+                    {
+                        obj.AssignedBy = "";
+                    }
                     obj.Record_ID = Util.GetValueOfInt(row["Record_ID"]);
                     obj.AssignedDate = Util.GetValueOfDateTime(row["Updated"]);
                     obj.countRecords = countRecords;
@@ -520,6 +607,14 @@ namespace VIS.Models
                     }
                     results.Add(obj);
                 }
+            }
+            /*This code is used to show all assigned user link so that based on count of records*/
+            else
+            {
+                dynamic obj = new ExpandoObject();
+                obj.countRecords = countRecords;
+                obj.IsNoRecFound = true;
+                results.Add(obj);
             }
 
             return results;

@@ -27,6 +27,9 @@ namespace VAdvantage.Model
         private static CCache<int, MTab> s_cache = new CCache<int, MTab>("AD_Tab", 20);
         //The Fields						
         private MField[] _fields = null;
+
+        //The Fields						
+        private MTabPanel[] _tabPanel = null;
         //Map of ColumnName and AD_Field_ID	
         //The ListDictionary class implements the IDictionary 
         ///interface using a single-linked array. It behaves like a Hashtable
@@ -299,5 +302,33 @@ namespace VAdvantage.Model
             }
             return true;
         }
+
+        public MTabPanel[] GetTabPanel(bool reload, Trx trxName)
+        {
+            if (_tabPanel != null && !reload)
+                return _tabPanel;
+            String sql = "SELECT * FROM AD_TabPanel WHERE AD_Tab_ID=" + GetAD_Tab_ID() + " ORDER BY SeqNo";
+            List<MTabPanel> list = new List<MTabPanel>();
+            DataSet pstmt = null;
+            try
+            {
+                pstmt = DataBase.DB.ExecuteDataset(sql, null, trxName);
+                for (int i = 0; i < pstmt.Tables[0].Rows.Count; i++)
+                {
+                    DataRow rs = pstmt.Tables[0].Rows[i];
+                    list.Add(new MTabPanel(GetCtx(), rs, trxName));
+
+                }
+                pstmt = null;
+            }
+            catch (Exception e)
+            {
+                log.Log(VAdvantage.Logging.Level.SEVERE, sql, e);
+            }
+            _tabPanel = new MTabPanel[list.Count];
+            _tabPanel = list.ToArray();
+            return _tabPanel;
+        }
+
     }
 }

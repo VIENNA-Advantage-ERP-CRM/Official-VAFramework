@@ -54,8 +54,8 @@
                     '<span>Active</span>' +
                     '</div>' +
                     '<div class="VIS_buttons">' +
-                    '<button id="VIS_EditedCancel_' + windowNo + '"  class="VIS_cancel">' + VIS.Msg.getMsg("VAAPI_Cancel") + '</button>' +
                     '<button  id="VIS_SaveEditedSecretKey_' + windowNo + '" class="VIS_save">' + VIS.Msg.getMsg("VIS_OK") + '</button>' +
+                    '<button id="VIS_EditedCancel_' + windowNo + '"  class="VIS_cancel">' + VIS.Msg.getMsg("VAAPI_Cancel") + '</button>' +
                     '<div id="VIS_EditKeyError_' + windowNo + '" class="error-message" style="display:none; color: red; font-size: 14px;"></div>' +
                     '</div>' +
                     '</div>' +
@@ -242,6 +242,42 @@
             $root.append($bsyDiv);
             busyDiv(false);
         }
+
+        //function getProjects(lstID) {
+        //    lstID.empty();
+        //    $.ajax({
+        //        url: VIS.Application.contextUrl + "UserPreference/GetProjects",
+        //        dataType: "json",
+        //        success: function (data) {
+        //            $self.projectList = JSON.parse(data);
+        //            var cmbProjectContent = "";
+
+        //            for (var itm in $self.projectList) {
+        //                var project = $self.projectList[itm];
+        //                var name = project.Name;
+        //                var isActive = project.IsActive === 'Y';
+        //                var isSelected = project.RecKey === projectID;
+
+        //                // Add ~ prefix if inactive but currently selected
+        //                if (!isActive && isSelected) {
+        //                    name = "~ " + name + "~";
+        //                }
+
+        //                // Show all active projects, and also the selected inactive one
+        //                if (isActive || isSelected) {
+        //                    cmbProjectContent += "<option value='" + project.RecKey + "'>" + name + "</option>";
+        //                }
+        //            }
+
+                    
+
+        //            lstID.append(cmbProjectContent);
+        //            lstID.val(projectID);
+        //            cmbProjectContent = null;
+        //        }
+        //    });
+        //}
+
         function getProjects(lstID) {
             lstID.empty();
             $.ajax({
@@ -249,18 +285,30 @@
                 dataType: "json",
                 success: function (data) {
                     $self.projectList = JSON.parse(data);
-                    $root.find();
                     var cmbProjectContent = "";
+
                     for (var itm in $self.projectList) {
-                        cmbProjectContent += "<option value=" + $self.projectList[itm].RecKey + ">" + $self.projectList[itm].Name + "</option>";
+                        var project = $self.projectList[itm];
+                        var name = project.Name;
+                        var isActive = project.IsActive === 'Y';
+                        var isSelected = project.RecKey === projectID;
+
+                        // If inactive but selected, prefix with ~ and disable it
+                        if (!isActive && isSelected) {
+                            name = "~ " + name + " ~";
+                            cmbProjectContent += "<option value='" + project.RecKey + "' selected disabled>" + name + "</option>";
+                        }
+                        // Otherwise, include only active projects
+                        else if (isActive) {
+                            cmbProjectContent += "<option value='" + project.RecKey + "'>" + name + "</option>";
+                        }
                     }
+
                     lstID.append(cmbProjectContent);
                     lstID.val(projectID);
-                    cmbProjectContent = null;
                 }
             });
-
-        };
+        }
 
 
         this.show = function () {

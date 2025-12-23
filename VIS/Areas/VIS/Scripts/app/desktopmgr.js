@@ -47,11 +47,11 @@
 
         var $showFav = $('#vis_favHomeScreen');
         var $favContainer = $('#vis_home_favourites');
-
-        // button for opening calling interface  
+        
+        // button for opening calling interface
         //var $vis_appCall = $("#vis_appCall");
 
-        /* main viewable area 
+        /* main viewable area
         */
         function getMainConatiner() {
             return $mainConatiner;
@@ -399,7 +399,7 @@
                 $vis_menuSearch.bind('input', function () {
                     searchAndStartAction($vis_menuSearch.val(), this.list);
                 });
-            }
+            }           
 
             //$('#visMarket').click(function () {
             //    var type = VIS.Utility.getFunctionByName('Market.ImpModule.Market_', window);
@@ -948,6 +948,9 @@
         function getMenuDiv() {
             return $vis_appMenu;
         }
+
+        // Initialize system tray module
+        VIS.VisTrayModule.init('#VISSystemTray', '#visTrayPopup', '#toastContainer');
 
         /* public object */
         var desktopMgr = {

@@ -124,27 +124,13 @@ namespace VIS.Models
             }
 
 
-            int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
-            string protocol = "SM";
-            int credentialId = 0;
-            if (Env.IsModuleInstalled("VA101_"))
-            {
-                protocol = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Protocol FROM AD_UserMailConfigration WHERE AD_UserMailConfigration_ID=" + mailConfigID));
 
-                if (string.IsNullOrEmpty(protocol))
-                {
-                    protocol = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Protocol FROM AD_Client WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID()));
-                    if (!string.IsNullOrEmpty(protocol) && protocol != "SM" && protocol != "SI")
-                    {
-                        credentialId = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA101_APIAuthCredential_ID FROM AD_Client WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID()));
-                    }
-                }
-                else if (protocol != "SM" && protocol != "SI")
-                {
-                    credentialId = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA101_APIAuthCredential_ID FROM AD_UserMailConfigration WHERE AD_UserMailConfigration_ID=" + mailConfigID));
-                }
 
-            }
+
+
+            //int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
+            int credentialId;
+            string protocol = MUserMailConfigration.GetMailProtocol(ctx,out credentialId);
 
             SMTPConfig config = null;
             UserInformation userinfo = new UserInformation();
@@ -1094,7 +1080,7 @@ namespace VIS.Models
         public MessagePayload GetEmailResponse(string subject, string message, int recordId, int tableID, Ctx ctx, string prompt)
         {
             MessagePayload payload = new MessagePayload();
-            string threadID = Common.GetThreadID(tableID, recordId);
+            string threadID = Common.GetThreadID(tableID, recordId, Common.GetRecordOrg(ctx, tableID, recordId));
             if (!string.IsNullOrEmpty(threadID))
             {
                 payload = AIPayload.SendEmailReplyRequestAsync(threadID, subject, message, ctx, prompt);
@@ -1115,7 +1101,8 @@ namespace VIS.Models
         /// <returns></returns>
         public string GetRecordThread(Ctx ctx, int recordId, int tableID, int windowID, int tabID)
         {
-            string threadID = Common.GetThreadID(tableID, recordId);
+            int AD_Org_ID = Common.GetRecordOrg(ctx, tableID, recordId);
+            string threadID = Common.GetThreadID(tableID, recordId, AD_Org_ID);
             if (!string.IsNullOrEmpty(threadID))
             {
                 return threadID;
@@ -1132,7 +1119,7 @@ namespace VIS.Models
                 }
                 if (tabID != 0)
                 {
-                    int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID()));
+                    int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " ORDER BY AD_Org_ID DESC"));
                     if (asstScreenID > 0)
                     {
                         int Process_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Process_ID FROM AD_Process WHERE ISActive='Y' AND Value='VAI01_CreateUpdateRecordThread'"));
@@ -1210,7 +1197,7 @@ namespace VIS.Models
                         }
                         else
                         {
-                            threadID = Common.GetThreadID(tableID, recordId);
+                            threadID = Common.GetThreadID(tableID, recordId, Common.GetRecordOrg(ctx, tableID, recordId));
                         }
                     }
                 }

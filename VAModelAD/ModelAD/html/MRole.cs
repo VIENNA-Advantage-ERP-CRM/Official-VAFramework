@@ -2657,6 +2657,21 @@ namespace VAdvantage.Model
                         set.Add("0");
                     }
                 }
+                else //if exclude zero , then check for filtered org readonly status
+                {
+                    for(int o = 0; o<set.Count; o++)
+                    {
+                        for (int i = 0; i < _orgAccess.Length; i++)
+                        {
+                            if (_orgAccess[i].AD_Org_ID.ToString() == set[o] && _orgAccess[i].readOnly) // rw
+                            {
+                                set.Remove(set[o]); // remove if read only
+                                o--;
+                                break;
+                            }
+                        }
+                    }
+                }
                 //else
                 //{
                 //    if (set.Contains("0") && Util.GetValueOfInt(GetCtx().GetContext("#AD_Org_ID"))>0)

@@ -119,6 +119,7 @@
         var $cmdOrgforKey = null;
         var $cmdWareHouseforKey = null;
         var $btnCreateKey = null;
+        var $btnProjectZoom = null;
         var $btnSaveKey = null;
         var $cmdProject = null;
         var $listOfKey = null;
@@ -288,6 +289,7 @@
             $cmdOrgforKey = root.find("#cmbOrgForKey_" + windowNo);
             $cmdWareHouseforKey = root.find("#cmbWareHouseForKey_" + windowNo);
             $cmdProject = root.find("#cmbProject" + windowNo);
+            $btnProjectZoom = root.find("#btnProjectZoom_" + windowNo);
             $btnCreateKey = root.find('#btnCreateKey_' + windowNo);
             $btnApiDivClose = root.find('#CreateApiDivClose_' + windowNo);
             $btnSaveKey = root.find('#btnSaveKey_' + windowNo);
@@ -732,7 +734,7 @@
                 $(".VIS_Pref_content-right-6").css("display", "none");
                 $(".VIS_Pref_content-right-7").css("display", "none");
                 divBottom.css("display", "inline-block");
-                
+
             });
             $(".VIS_Pref_link-2").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -1139,7 +1141,26 @@
                 $listOfKey.css("display", "none");
             });
 
+            $btnProjectZoom.on("click", function () {
+                ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "VAAPI_Project" }, null);
+                if (ad_window_Id > 0) {
+                    const windowParam = {
+                        "TabWhereClause": "VAAPI_Project_ID IN (" + ($cmdProject.val() || 0) + ")",
+                        "TabLayout": "N",
+                        "TabIndex": "0",
+                        "ActionName": "VAAPI_Project",
+                        "ActionType": "W"
+                    };
+                    VIS.viewManager.startWindow(ad_window_Id, null, windowParam);
+                    $self.dispose();
+                    $root.dialog("destroy");
+                    $("#ui-datepicker-div").remove()
+                    $root = null;
+                    $self = null;
+                }
 
+
+            });
 
             $btnApiDivClose.on("click", function () {
                 $(".VIS-Create-Api-Section").css("display", "none");
@@ -1983,8 +2004,12 @@
                     $self.projectList = JSON.parse(data);
                     var cmbProjectContent = "";
                     for (var itm in $self.projectList) {
-                        cmbProjectContent += "<option value=" + $self.projectList[itm].RecKey + ">" + $self.projectList[itm].Name + "</option>";
+                        var project = $self.projectList[itm];
+                        if (project.IsActive === 'Y') {
+                            cmbProjectContent += "<option value='" + project.RecKey + "'>" + project.Name + "</option>";
+                        }
                     }
+
                     $cmdProject.append(cmbProjectContent);
                     cmbProjectContent = null;
                 }
@@ -2004,6 +2029,7 @@
                         tableHtml += '<thead><tr>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_KeyName") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_SecretKey") + '</th>' +
+                            '<th>' + VIS.Msg.getMsg("VAAPI_Role") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("Created") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("CreatedBy") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_ProjectAccess") + '</th>' +
@@ -2018,11 +2044,12 @@
                             tableHtml += '<tr>' +
                                 '<td><span title="' + item.KeyName + '" class="VIS-Key-ellipse-text">' + statusDot + ' ' + item.KeyName + '</span></td>' +
                                 '<td><span title="' + item.SessionToken + '" class="VIS-Key-ellipse-text">' + item.SessionToken + '</span></td>' +
+                                '<td><span title="' + item.Role + '" class="VIS-Key-ellipse-text">' + item.Role + '</span></td>' +
                                 '<td><span title="' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '" class="VIS-Key-ellipse-text">' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '</span></td>' +
                                 '<td><span title="' + item.CreatedBy + '" class="VIS-Key-ellipse-text">' + item.CreatedBy + '</span></td>' +
                                 '<td><span title="' + item.ProjectName + '"  class="VIS-Key-ellipse-text">' + item.ProjectName + '</span></td>' +
                                 '<td>' +
-                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '" title="Edit">' +
+                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-project-name="' + item.ProjectName + '" data-is-project-active="' + item.IsActive + '"  data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '" title="Edit">' +
                                 '<i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>' +
                                 '<button class="VIS-key-delete-btn VIS-delete-btn" data-id="' + item.RecordID + '" title="Delete">' +
                                 '<i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
@@ -2117,7 +2144,6 @@
                 success: function (data) {
                     var response = JSON.parse(data);
                     if (response != null && response.length > 0) {
-
                         var optn = "<option></option>";
                         for (var i = 0; i < response.length; i++) {
                             if (response[i].TWOFAMETHOD == "") {
@@ -2125,7 +2151,7 @@
                             } else {
                                 optn += "<option Selected value='" + response[i].value + "'>" + response[i].name + "</option>";
                             }
-                            
+
                         }
                         cmbTwoFactor.find('select').empty();
                         cmbTwoFactor.find('select').append(optn);

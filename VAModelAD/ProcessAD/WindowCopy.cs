@@ -67,6 +67,7 @@ namespace VAdvantage.Process
 
             int tabCount = 0;
             int fieldCount = 0;
+            int tabPanelCount = 0;
             MTab[] oldTabs = from.GetTabs(false, Get_TrxName());
             for (int i = 0; i < oldTabs.Length; i++)
             {
@@ -74,6 +75,22 @@ namespace VAdvantage.Process
                 MTab newTab = new MTab(to, oldTab);
                 if (newTab.Save())
                 {
+
+                    //copy tab panel also
+                    MTabPanel[]  oldTabPanels = oldTab.GetTabPanel(false, Get_TrxName());
+                    for (int j = 0; j < oldTabPanels.Length; j++)
+                    {
+                        MTabPanel oldTabPanel = oldTabPanels[j];
+                        MTabPanel newTabPanel = new MTabPanel(newTab, oldTabPanel);
+                        if (newTabPanel.Save())
+                            tabPanelCount++;
+                        else
+                        {
+                            log.SaveError("Error saving new TabPanel", "");
+                            return Msg.GetMsg(GetCtx(), "TabPanelSaveError") + " : " + oldTabPanel.GetName();
+                        }
+                    }
+
                     tabCount++;
                     //	Copy Fields
                     MField[] oldFields = oldTab.GetFields(false, Get_TrxName());

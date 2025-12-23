@@ -121,4 +121,14 @@ namespace VIS.Models
         public string ParameterValue { get; set; }
         public bool IsEncrypted { get; set; }
     }
+
+    public class AppTrayModel
+    {
+        public int AD_Shortcut_ID { get; set; }
+        public string ClassName { get; set; }
+        public string DisplayName { get; set; }
+        public string ImgPath { get; set; }
+        public bool IsImage { get; set; }
+        public string FontStyle { get; set; }
+    }
 }

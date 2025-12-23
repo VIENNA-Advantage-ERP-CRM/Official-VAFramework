@@ -37,9 +37,9 @@
     margin-top: 15px;
 }
 
-.vis-checklistrecord-col .vis-checklistcard{
-    padding: 13px 10px;
-}
+    .vis-checklistrecord-col .vis-checklistcard {
+        padding: 13px 10px;
+    }
 
 /*.vis-windowList {
     display: flex;
@@ -56,8 +56,7 @@
 
 
 .vis-checklistrecord-box {
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 15px;
     color: #3d4f71;
     display: flex;
     justify-content: space-between;
@@ -71,7 +70,7 @@
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: 12px 10px 10px;
+    padding: 5px 10px 10px;
 }
 
     .vis-tiles-checklistpage .fa {
@@ -110,14 +109,19 @@
     }
 
 .VIS_checklistCount {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
     background: #fff;
-    color: #333;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    text-align: right;
+    border-radius: 20px;
+    /* color: #333;*/
+    color: white;
+    width: 44px;
+    height: 26px;
+    font-size: 14px;
     font-weight: bold;
+    text-align: center;
+    background: linear-gradient(135deg, #6b8ce3a6, #8dc7f8);
 }
 
 .vis-show-checklist {
@@ -172,7 +176,7 @@
 
 .VIS_popuptitle {
     color: #fff;
-    font-weight: bold;
+    font-weight: 500 !important;
     font-size: 18px;
     margin: 0;
 }
@@ -183,16 +187,7 @@
     margin-top: 15px;
     height: 90%;
 }
-/*.vis_checklistheader {
-    background: linear-gradient(135deg, #5886e1, #466dbf);
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    padding: 12px;
-    border-radius: 12px 12px 0 0;
-    font-size: 18px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}*/
+
 .vis-checklistcard {
     background-color: white;
     border-radius: 12px;
@@ -200,6 +195,7 @@
     margin: 8px 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
+    /* background: hsla(0,0%,100%,.2);*/
 }
 
 .visWindowTabs {
@@ -239,15 +235,14 @@
     margin: 0;
 }
 
-.vis-checklistcard:hover .visWindowTabs {
-    display: block;
-    border-radius: 0px 0px 12px 12px;
-}
+/*.vis-checklistcard:hover .visWindowTabs {*/
+/* display: block;*/
+/*border-radius: 0px 0px 12px 12px;
+}*/
 
-.vis-checklistcard:hover {
+/*.vis-checklistcard:hover {
     border-radius: 12px 12px 0 0;
-}
-
+}*/
 .VIS_popupRecordDetail .vis-checklistcard:hover .visWindowTabs {
     top: 40px;
 }
@@ -280,12 +275,6 @@
 
 .vis-editModeWidget .vis-checklistcard {
     padding: 4px 5px;
-}
-
-.vis-count-zoom-wrap {
-    display: flex;
-    align-items: center;
-    gap: 5px;
 }
 
 html[dir=rtl] .VIS_popupClose {
@@ -323,9 +312,11 @@ html[dir=rtl] .VIS_popupRecordDetail .vis-checklistcard {
         height: 20px;
         line-height: 20px;
     }
+
     .vis-checklistrecord-col .vis-checklistcard {
         padding: 8px 10px;
     }
+
     html[dir=rtl] .vis-checklistrecord-col .vis-checklistcard {
         padding: 8px 10px;
     }
@@ -339,15 +330,19 @@ html[dir=rtl] .VIS_popupRecordDetail .vis-checklistcard {
     .vis-editModeWidget .VIS_checklist_records {
         font-size: 8px;
     }
+
     .vis-checklistrecord-col .vis-checklistcard {
         padding: 3px 10px;
     }
+
     html[dir=rtl] .vis-checklistrecord-col .vis-checklistcard {
         padding: 3px 10px;
     }
+
     html[dir=rtl] .vis-checklistrecord-col .vis-card-title.vis-checklistrecord-box {
         font-size: 12px;
     }
+
     html[dir=rtl] .visWindowTabs .vis-subheading {
         font-size: 11px;
     }
@@ -426,3 +421,49 @@ html[dir=rtl] .VIS_popupRecordDetail .vis-checklistcard {
         margin-left: 0;
         font-size: 1.3rem;
     }
+
+.vis-count-zoom-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px;
+}
+
+.vis-rec-zoom {
+    font-size: 16px;
+    margin-right: 3px;
+}
+
+.hoverable-text {
+    margin-right: 10px;
+}
+
+.total-count {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    color: #333;
+    width: 44px;
+    height: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    background: white;
+    color: black;
+}
+
+.vis_innertabcount {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    color: #333;
+    width: 44px;
+    height: 26px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    background: linear-gradient(135deg,#6b8ce3a6,#8dc7f8);
+    color: white;
+}

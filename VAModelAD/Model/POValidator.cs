@@ -1,4 +1,5 @@
-﻿using BaseLibrary.Engine;
+﻿using BaseLibrary.Common;
+using BaseLibrary.Engine;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,6 +12,7 @@ using VAdvantage.Model;
 using VAdvantage.Utility;
 using VAModelAD.AIHelper;
 using VAModelAD.Model;
+using ViennaAdvantage.Model;
 
 namespace VAModelAD.Model
 {
@@ -402,17 +404,47 @@ namespace VAModelAD.Model
             {
                 MAttachment.DeleteFileData(po.Get_Table_ID().ToString() + "_" + po.Get_ID().ToString());
             }
-
+            //VIS_427 Get the record id
+            int record_ID = po.Get_ID() != 0 ? po.Get_ID() : po.Get_IDOld();
+            /*VIS_427 hanlded delete of records from assigned user table if any record is assigned from
+            Different screens*/
+            if (po.Get_Table_ID() != 0 && record_ID !=0 && po.Get_Table_ID() != X_VIS_AssignedRecordToUser.Table_ID)
+            {
+                DeleteAssignRecord(po.Get_Table_ID(), record_ID);
+            }
             if (!_ExportCheckTableNames.Contains(po.GetTableName()) && success)
             {
                 int recordID = po.Get_ID();
                 if (recordID == 0)
                     recordID = po.Get_IDOld();
                 VAdvantage.Common.ShareRecordManager.DeleteRecordFromWindow(po, recordID);
+
+                // vis0008 Check and update changes for AI Assistant
+                if (Env.IsModuleInstalled("VAI01_") && (MTable.Get_Table_ID("VAI01_AIAssistant") > 0))
+                {
+                    string threadID = VAdvantage.Common.Common.GetThreadID(po.Get_Table_ID(), po.Get_ID(), po.GetAD_Org_ID());
+                    if (!string.IsNullOrEmpty(threadID))
+                    {
+                        if (!VAModelAD.AIHelper.AIPayload.ExecuteThreadAction(actionType: VAModelAD.AIHelper.AIPayload.ActionType.Delete, tableID: po.Get_Table_ID(), recordID: po.Get_ID(),
+                            attachmentID: -1, userID: po.GetUpdatedBy(), ctx: po.GetCtx(), threadID: threadID, attachmentType: "r"))
+                        {
+                            po.GetLog().SaveError("", "Error in execution of delete data against record : " + po.Get_ID() + " for table : " + po.GetTableName());
+                        }
+                    }
+                }
             }
             return success;
         }
-
+        /// <summary>
+        /// This function delete from VIS_AssignedRecordToUser table
+        /// </summary>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <author>VIS_427</author>
+        public void DeleteAssignRecord(int AD_Table_ID,int Record_ID)
+        {
+            int count = Util.GetValueOfInt(DB.ExecuteQuery(@"DELETE FROM VIS_AssignedRecordToUser WHERE AD_Table_ID=" + AD_Table_ID + " AND Record_ID=" + Record_ID));
+        }
         public bool IsAutoUpdateTrl(Ctx ctx, string tableName)
         {
             MClient client = MClient.Get(ctx);
@@ -483,15 +515,15 @@ namespace VAModelAD.Model
                     poMaster.Set_ValueNoCheck(columnName, po.Get_Value(columnName));
                 }
             }
-
+              
             // check applied for tables not having key column
-            if (Util.GetValueOfInt(poMaster.Get_ID()) == 0 || (poMaster.CreateNewRecord && poMaster.Get_KeyColumns().Length > 1))
+            if ((Util.GetValueOfInt(poMaster.Get_ID()) == 0) || (poMaster.CreateNewRecord && poMaster.Get_KeyColumns().Length > 1))
             {
                 if (HasDocValueWF)
                     poMaster.SetIsActive(false);
                 else
                 {
-                    if (Common.HasApprovalStatusColumn(poMaster.GetTableName()))
+                    if (VAdvantage.Common.Common.HasApprovalStatusColumn(poMaster.GetTableName()))
                     {
                         poMaster.Set_Value("ApprovalStatus", "A");
                     }
@@ -588,7 +620,7 @@ namespace VAModelAD.Model
 
         public Lookup GetLookup(Ctx ctx, POInfoColumn colInfo)
         {
-            return Common.GetColumnLookup(ctx, colInfo);
+            return VAdvantage.Common.Common.GetColumnLookup(ctx, colInfo);
         }
 
         public dynamic GetAttachment(Ctx ctx, int aD_Table_ID, int id)

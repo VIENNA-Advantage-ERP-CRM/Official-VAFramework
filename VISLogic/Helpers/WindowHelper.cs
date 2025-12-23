@@ -143,7 +143,17 @@ namespace VIS.Helpers
                 if (field.ColumnSQL != null)
                     select.Append(field.ColumnSQL);	//	ColumnName or Virtual Column
                 else
-                    select.Append(field.ColumnName);
+                {
+                    if (field.ColumnName.ToUpper().EndsWith("_GUID"))
+                    {
+                        if (DatabaseType.IsOracle)
+                            select.Append($"RAWTOHEX({field.ColumnName}) AS {field.ColumnName}");
+                        else if (DatabaseType.IsPostgre)
+                            select.Append($"{field.ColumnName}::text AS {field.ColumnName}");
+                    }
+                    else
+                        select.Append(field.ColumnName);
+                }
             }
 
             select.Append(" FROM ").Append(tableName);
@@ -1344,9 +1354,21 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
+            var formattedColumns = lstColumns.Select(c =>
+            {
+                if (c.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (DatabaseType.IsOracle)
+                        return $"RAWTOHEX({c}) AS {c}";
+                    else if (DatabaseType.IsPostgre)
+                        return $"{c}::text AS {c}";
+                }
+                return c;
+            });
 
 
-            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+
+            string SQL_Select = "SELECT " + String.Join(",", formattedColumns);
 
             String refreshSQL = SQL_Select + " FROM " + inn.TableName + " WHERE " + whereC;
 
@@ -2369,6 +2391,8 @@ namespace VIS.Helpers
                         bool ok = false;
                         try
                         {
+                            po.SetAD_Window_ID(dInn.AD_Window_ID);
+                            po.SetWindowTabID(dInn.AD_Tab_ID);
                             ok = po.Delete(false);
                         }
                         catch (Exception t)
@@ -2403,7 +2427,7 @@ namespace VIS.Helpers
                                 if (outt.RecIds == null)
                                     outt.RecIds = new List<int>();
                                 outt.RecIds.Add(singleKeyWhere[i]);
-                            }
+                            }                          
                         }
                     }
                     else	//	Delete via SQL
@@ -3681,7 +3705,7 @@ namespace VIS.Helpers
                 }
 
                 if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
-                    && Columns[i] != "Created" && Columns[i] != "CreatedBy")
+                    && Columns[i] != "Created" && Columns[i] != "CreatedBy" && Columns[i] != TableName + "_GUID")
                 {
                     return null;
                 }
@@ -3756,7 +3780,7 @@ namespace VIS.Helpers
                 //}
 
                 if (gField == null && Columns[i] != "Updated" && Columns[i] != "UpdatedBy"
-                    && Columns[i] != "Created" && Columns[i] != "CreatedBy")
+                    && Columns[i] != "Created" && Columns[i] != "CreatedBy" && Columns[i] != TableName+"_GUID")
                 {
                     return null;
                 }
@@ -3895,8 +3919,21 @@ namespace VIS.Helpers
                 SQL_Direct = "";
 
 
+            var formattedColumns = Columns.Select(c =>
+            {
+                if (c.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (DatabaseType.IsOracle)
+                        return $"RAWTOHEX({c}) AS {c}";
+                    else if (DatabaseType.IsPostgre)
+                        return $"{c}::text AS {c}";
+                }
+                return c;
+            });
 
-            SQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName + WhereClause;
+
+
+            SQL = "SELECT " + String.Join(",", formattedColumns) + " FROM " + TableName + WhereClause;
 
             //If Login org is not * , then fetch records of * org which are shared with current org and ignore records of * which are shared 
             // with other orgs and not with current org

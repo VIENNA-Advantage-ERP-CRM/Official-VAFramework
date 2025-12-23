@@ -28,11 +28,13 @@
         var content = "";
         var contentHtml = null;
         var KeyColumn = null;
+        var RecordCount = 0;
         //Get the object of assigned record widget 
         var assignRecWidgObj = new VIS.VISAssignedRecord;
         //called the function in order to get data
         var result = assignRecWidgObj.GetWindowData(WindowId, table_id, record_id.toString(), 1, windowNo, "", true, false, null)
         if (result != null && result.length > 0) {
+            RecordCount = result[0].countRecords;
             createTabularDesign(result);
         }
 
@@ -72,7 +74,14 @@
         recordInputDiv.append($inputDiv);
         UpperDiv.append(recordInputDiv).append($AssignBtn);
         // bottomDiv.append($cancelBtn).append($okBtn);
-        mainDiv.append($SeeAllRecLink).append(UpperDiv).append(lowerDiv).append(contentHtml);
+        //If no record is their then not show all user link
+        if (RecordCount > 0) {
+            mainDiv.append($SeeAllRecLink).append(UpperDiv).append(lowerDiv).append(contentHtml);
+        }
+        else {
+            
+            mainDiv.append(UpperDiv).append(lowerDiv).append(contentHtml);
+        }
         InitEvents();
         /**
          * This function is used to create the tabular structure
@@ -80,16 +89,14 @@
          */
         function createTabularDesign(data) {
             result = data ? data : [];
-            if (result.length > 0) {
-                contentHtml = '<div class="vis-assr-table-header">' +
-                    '<span>' + VIS.Msg.getMsg("VIS_SelectedAssignedRecords") + '</span>' +
-                    '</div>' +
+            if (result.length > 0 && !result[0].IsNoRecFound) {
+                contentHtml =
                     '<div class="vis-assr-tablediv">' +
                     '<table class="vis-assr-table">' +
                     '<tr>' +
-                    '<th>' + VIS.Msg.getMsg('VIS_RecordName') + '</th>' +
+                    '<th>' + VIS.Msg.getMsg('VIS_SelectedRecord') + '</th>' +
                     '<th>' + VIS.Msg.getMsg('VIS_AssignedTo') + '</th>' +
-                    '<th>' + VIS.Msg.getMsg('VIS_AssignedDate') + '</th>' +
+                    '<th>' + VIS.Msg.getMsg('VIS_OnDate') + '</th>' +
                     /*'<th>' + VIS.Msg.getMsg('VIS_Action') + '</th>' +*/
                     '</tr>';
                 for (i = 0; i < result.length; i++) {
@@ -396,7 +403,7 @@
                 data: {
                     AD_User_ID: userNameId,
                     AD_Table_ID: table_id,
-                    Record_ID: unMatchRecords,
+                    Record_ID: record_id,
                     AD_Window_ID: WindowId
                 },
                 dataType: 'json',
@@ -414,6 +421,7 @@
                             });
                         });
                         assignedRecords.push(...result);
+                        VIS.ADialog.info("VIS_RecordIsAssigned");
                         ch.close();
                     }
                     else if (assignedresult == '02') {
@@ -437,7 +445,7 @@
                             }
                         });
 
-
+                        VIS.ADialog.info("VIS_RecordIsAssigned");
 
                         ch.close();
                     }
