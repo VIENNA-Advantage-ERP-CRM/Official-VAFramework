@@ -16,6 +16,10 @@ using System.Configuration;
 using Syncfusion.EJ2.DocumentEditor;
 using System.Text;
 using System.Text.RegularExpressions;
+using Syncfusion.Pdf;
+using Syncfusion.DocToPDFConverter;
+using CrystalDecisions.Web;
+using System.Net.Http;
 
 
 namespace VIS.Controllers
@@ -33,10 +37,11 @@ namespace VIS.Controllers
         {
             return PartialView();
         }
-        public ActionResult Init(int windowNo, string language)
+        public ActionResult Init(int windowNo, string language,bool isEmail)
         {
             ViewBag.windowNo = windowNo;
             ViewBag.language = language;
+            ViewBag.isEmail = isEmail;
             ViewBag.IsDocEditor = ConfigurationManager.AppSettings["SyncfusionLicense"];
             return PartialView();
         }
@@ -251,7 +256,7 @@ namespace VIS.Controllers
         /// <param name="values"></param>
         /// <returns></returns>
         [HttpPost]
-        public JsonResult InsertAttachmentText(string html, string values)
+        public JsonResult InsertAttachmentText(string html, string values, bool isSyncDoc=false)
         {
             string res = "";
             Ctx ct = Session["ctx"] as Ctx;
@@ -259,7 +264,7 @@ namespace VIS.Controllers
             List<Dictionary<string, string>> value = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(values);
 
             EmailModel model = new EmailModel(ct);
-            res = model.HtmlToPdf(Server.HtmlDecode(html), value);
+            res = model.HtmlToPdf(Server.HtmlDecode(html), value, isSyncDoc);
             return Json(JsonConvert.SerializeObject(res), JsonRequestBehavior.AllowGet);
         }
 
@@ -376,6 +381,7 @@ namespace VIS.Controllers
         {
             try
             {
+                htmlContent = Uri.UnescapeDataString(htmlContent);
                 if (string.IsNullOrEmpty(htmlContent))
                 {
                     return Json(new { success = false, error = "HTML content is required" }, JsonRequestBehavior.AllowGet);
@@ -414,13 +420,42 @@ namespace VIS.Controllers
 
                     string cleanHtml = bodyMatch.Success ? bodyMatch.Groups[1].Value : html;
 
-                    return Json(new { success = true, htmlContent = cleanHtml.Trim() });
+                    return Content(cleanHtml.Trim(), "text/plain");
                 }
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+                return Content("ERROR: " + ex.Message, "text/plain");
             }
+        }
+
+        [HttpPost]
+        public FileContentResult ExportPdf(string sfdtContent)
+        {
+            sfdtContent = Uri.UnescapeDataString(sfdtContent);
+
+            // Method 1: Using WordDocument directly
+            WordDocument doch = WordDocument.LoadString(sfdtContent, FormatType.Html);
+
+            // Serialize the entire document to JSON (SFDT)
+             sfdtContent = JsonConvert.SerializeObject(doch);
+            // Converts the sfdt to stream
+            Stream document = WordDocument.Save(sfdtContent, Syncfusion.EJ2.DocumentEditor.FormatType.Docx);
+            Syncfusion.DocIO.DLS.WordDocument doc = new Syncfusion.DocIO.DLS.WordDocument(document, Syncfusion.DocIO.FormatType.Docx);
+            //Instantiation of DocIORenderer for Word to PDF conversion
+            DocToPDFConverter render = new DocToPDFConverter();
+            //Converts Word document into PDF document
+            PdfDocument pdfDocument = render.ConvertToPDF(doc);           
+
+            MemoryStream outputStream = new MemoryStream();
+            pdfDocument.Save(outputStream);
+            outputStream.Position = 0;
+
+            pdfDocument.Close(true);
+            document.Close();
+
+            return File(outputStream.ToArray(), "application/pdf", "Document.pdf");
+
         }
 
     }

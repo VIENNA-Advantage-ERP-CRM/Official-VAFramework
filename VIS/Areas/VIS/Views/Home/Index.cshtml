@@ -106,6 +106,16 @@
         }
 
         ViewBag.ScriptsPath = paths;
+
+
+        // ===============================
+        // RENDER CDN CSS (MODULE BASED)
+        // ===============================
+        foreach (var css in VAModelAD.ModuleBundles.GetAllCDNStyles())
+        {
+            <link rel="stylesheet" href="@css" />
+        }
+
     }
 
     else //login
@@ -395,13 +405,15 @@
         <script src="~/Areas/ViennaBase/Scripts/globalize/cultures/@String.Format("globalize.culture.{0}.js", ((String)ViewBag.culture).Replace("_", "-"))"></script>
         <script src="~/Areas/ViennaBase/Scripts/chart.min.js"></script>
         <script src="~/Areas/ViennaBase/Scripts/chartjs-plugin-datalabels.min.js"></script>
-        <!-- Syncfusion CSS -->
-        <link href="https://cdn.syncfusion.com/ej2/31.1.17/material.css" rel="stylesheet">
 
-        <!-- Syncfusion JS -->
-        <script src="https://cdn.syncfusion.com/ej2/31.1.17/dist/ej2.min.js"></script>
+        // ===============================
+        // RENDER CDN SCRIPTS (MODULE BASED)
+        // ===============================
+        @foreach (var js in VAModelAD.ModuleBundles.GetAllCDNScripts())
+        {
+          <script src="@js"></script>
+        }
 
-        <script src="https://cdn.syncfusion.com/ej2/25.2.3/dist/ej2-documenteditor.min.js"></script>
         <script>
             VIS.VApp.init(); //Initlize App ()
         </script>

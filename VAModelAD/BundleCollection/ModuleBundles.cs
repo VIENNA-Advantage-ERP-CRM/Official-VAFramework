@@ -154,6 +154,93 @@ namespace VAModelAD
                 modRTLStyleList[order] = lst;
             }
         }
+
+
+
+
+        public class CDNBundler
+        {
+            internal readonly List<string> Paths = new List<string>();
+
+            public CDNBundler Include(params string[] urls)
+            {
+                foreach (var url in urls)
+                {
+                    if (!string.IsNullOrWhiteSpace(url))
+                        Paths.Add(url);
+                }
+                return this;
+            }
+        }
+
+
+        // ===========================
+        // STORAGE (ORDERED)
+        // ===========================
+        private static readonly SortedDictionary<int, Dictionary<string, CDNBundler>> _cdnStyles
+            = new SortedDictionary<int, Dictionary<string, CDNBundler>>();
+
+        private static readonly SortedDictionary<int, Dictionary<string, CDNBundler>> _cdnScripts
+            = new SortedDictionary<int, Dictionary<string, CDNBundler>>();
+
+        // ===========================
+        // FACTORY METHOD
+        // ===========================
+        public static CDNBundler CreateStyleBundle()
+        {
+            return new CDNBundler();
+        }
+
+        public static CDNBundler CreateScriptBundle()
+        {
+            return new CDNBundler();
+        }
+
+
+        // ===========================
+        // REGISTER METHODS
+        // ===========================
+        public static void RegisterCDNStyleBundle(CDNBundler bundle, string prefix, int order)
+        {
+            if (!_cdnStyles.ContainsKey(order))
+                _cdnStyles[order] = new Dictionary<string, CDNBundler>();
+
+            _cdnStyles[order][prefix] = bundle;
+        }
+
+        public static void RegisterCDNScriptBundle(CDNBundler bundle, string prefix, int order)
+        {
+            if (!_cdnScripts.ContainsKey(order))
+                _cdnScripts[order] = new Dictionary<string, CDNBundler>();
+
+            _cdnScripts[order][prefix] = bundle;
+        }
+
+        // ===========================
+        // RENDER HELPERS
+        // ===========================
+        public static List<string> GetAllCDNStyles()
+        {
+            var list = new List<string>();
+
+            foreach (var order in _cdnStyles)
+                foreach (var mod in order.Value)
+                    list.AddRange(mod.Value.Paths);
+
+            return list;
+        }
+
+        public static List<string> GetAllCDNScripts()
+        {
+            var list = new List<string>();
+
+            foreach (var order in _cdnScripts)
+                foreach (var mod in order.Value)
+                    list.AddRange(mod.Value.Paths);
+
+            return list;
+        }
+
     }
 
     public class CustomBundleOrderer : IBundleOrderer
