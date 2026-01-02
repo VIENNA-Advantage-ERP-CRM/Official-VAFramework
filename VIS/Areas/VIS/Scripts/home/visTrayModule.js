@@ -58,8 +58,11 @@
             if (!icon) return;
 
             const className = icon.dataset.class;
-            const title = icon.getAttribute('title');
 
+            showOnToast(className);
+        }
+
+        function showOnToast(className) {
             const wform = new VIS.AForm();
             wform.openSystemTray(className, -9999);
             const $item = wform.getContentGrid();
@@ -71,8 +74,8 @@
 
             // Build toast HTML
             const toastHtml = `
-                <div id="${toastId}" class="toast system-toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
-                  <button type="button" class="close" data-dismiss="toast" aria-label="Close">
+                <div id="${toastId}" class="vis-toast-defDiv toast system-toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+                  <button type="button" class="close" data-dismiss="toast" aria-label="Close" style="transition: none;">
                     <span aria-hidden="true">&times;</span>
                   </button>
                   <div class='vis-divMessage'></div>
@@ -118,7 +121,7 @@
         }
 
         // Only expose init()
-        return { init };
+        return { init, showOnToast };
     }
 
     VIS.VisTrayModule = VisTrayModule();
