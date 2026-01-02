@@ -1277,7 +1277,7 @@ html[dir="rtl"] .input-group-addon {
     }
 
     .VIS_Pref_li .VIS_Pref_link-5{
-        display:none !important
+        display:none !important;
     }
 
     .VIS_Pref_slide-show {
