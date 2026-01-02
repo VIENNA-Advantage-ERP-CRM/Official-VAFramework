@@ -1031,6 +1031,10 @@ input:required:valid {
     width: 100%;
 }
 
+li.VIS_Pref_li.VIS_Pref_link-5 {
+    display: none !important;
+}
+
 /*RTL*/
 /*Location*/
 
