@@ -1280,6 +1280,10 @@ html[dir="rtl"] .input-group-addon {
         text-align: center;
     }
 
+    .VIS_Pref_li .VIS_Pref_link-5{
+        display:none !important;
+    }
+
     .VIS_Pref_slide-show {
         width: 42%;
         overflow: hidden;

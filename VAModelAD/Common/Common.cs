@@ -2037,6 +2037,8 @@ namespace VAdvantage.Common
                 tableNameIDs[AD_Table_ID] = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + AD_Table_ID));
                 tableName = tableNameIDs[AD_Table_ID];
             }
+            if (string.IsNullOrEmpty(tableName))
+                return "";
             int AD_Org_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + tableName + " WHERE " + tableName + "_ID = " + Record_ID));
 
             return GetThreadID(AD_Table_ID, Record_ID, AD_Org_ID);
@@ -2178,7 +2180,10 @@ namespace VAdvantage.Common
         public static int GetRecordOrg(Ctx ctx, int AD_Table_ID, int Record_ID)
         {
             string TableName = MTable.GetTableName(ctx, AD_Table_ID);
-            return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + TableName + " WHERE " + TableName + "_ID = " + Record_ID));
+            if (!string.IsNullOrEmpty(TableName))
+                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + TableName + " WHERE " + TableName + "_ID = " + Record_ID));
+            else
+                return -1;
         }
     }
 
