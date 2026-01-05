@@ -1031,6 +1031,10 @@ input:required:valid {
     width: 100%;
 }
 
+li.VIS_Pref_li.VIS_Pref_link-5 {
+    display: none !important;
+}
+
 /*RTL*/
 /*Location*/
 
@@ -1274,6 +1278,10 @@ html[dir="rtl"] .input-group-addon {
         float: left;
         width: 100%;
         text-align: center;
+    }
+
+    .VIS_Pref_li .VIS_Pref_link-5{
+        display:none !important;
     }
 
     .VIS_Pref_slide-show {
