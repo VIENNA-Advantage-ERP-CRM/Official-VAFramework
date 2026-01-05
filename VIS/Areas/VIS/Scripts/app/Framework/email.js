@@ -152,6 +152,9 @@
         var ccmail = '';
         var bccmail = '';
         var currThreadID = '';
+        // DMS
+        var $btnUploadToDMS = null;
+
         var rteObj;
         initEmail();
 
@@ -260,6 +263,18 @@
                 $toolbarDiv.append($btnHdrSend);
             }
             else {
+                if (window.VADMS) {
+                    var hideDMSIcon = 'd-none';
+                    if (window.VADMS.uploadfromotherform != undefined) {
+                        hideDMSIcon = '';
+                    }
+
+                    $btnUploadToDMS = $('<i class="vis-email-saveAttachbtn vis vis-uploaddocument ' + hideDMSIcon + '" title="' + VIS.Msg.getMsg("Upload").replace('&', '') + '" ></i>');
+
+                    $toolbarDiv.append($btnUploadToDMS);
+
+                }
+
                 $btnHdrSend = $('<i class="vis-email-saveAttachbtn vis vis-save-attach"  title="' + VIS.Msg.getMsg("SaveAttachment").replace('&', '') + '" ></i>');
                 $toolbarDiv.append($btnHdrSend);
             }
@@ -1077,6 +1092,10 @@
             }
             else {
                 $btnHdrSend.on("click", saveAttachment);
+                if (window.VADMS) {
+                    $btnUploadToDMS.off("click");
+                    $btnUploadToDMS.on("click", uploadToDMS);
+                }
             }
             if (!isEmail) {
                 $btnSavePdf.on("click", pdf);
@@ -2680,6 +2699,78 @@
                 }
             });
         };
+
+        function uploadToDMS(e) {
+
+            var subj = $subject.val();
+            if (subj == null || subj == "" || subj.trim().length == 0) {
+                VIS.ADialog.info("PleaseAddSubject");
+                return;
+            }
+
+            var html = "";
+            if (IsSyncEditor) {
+                var sfdtData = rteObj.documentEditor.serialize();
+
+                var obj = {
+                    sfdtContent: sfdtData
+                };
+
+                var formData = new FormData();
+                formData.append("sfdtContent", sfdtData);
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Email/ConvertSfdtToHtml",
+                    type: "POST",
+                    async: false,
+                    data: formData,
+                    processData: false,   // IMPORTANT for FormData
+                    contentType: false,
+                    success: function (res) {
+                        html = res;
+                    }
+                });
+
+            } else {
+
+                html = $textAreakeno.value();
+            }
+            if (html == null || html == "" || html == undefined || html.trim().length < 1) {
+                return;
+            }
+
+            $bsyDiv[0].style.visibility = "visible";
+
+            var values = [];
+
+            rowsSource = _curGC.getSelectedRows();
+
+            // This is data source for single View Records
+            rowsSingleView = _curtab.getRecords()[_curtab.getCurrentRow()];
+
+            var recordIds = [];
+
+            for (var i = 0; i < rowsSource.length; i++) {
+                recordIds.push(rowsSource[i][(_curtab.gridTable.gTable._tableName + '_ID').toLower()]);
+            }
+
+            if (_curGC.singleRow == false || rowsSource.length > 0) {
+
+                for (var r = 0; r < rowsSource.length; r++) {
+
+                    values.push(listofSelectedItems1(html, r));
+                }
+            }
+            else {
+
+                values.push(listofSelectedItems2(html));
+            }
+
+            window.VADMS.uploadfromotherform(0, _curtab.getAD_Window_ID(), currentTable_ID, recordIds, _curGC.aPanel.$parentWindow.getName(), _curtab.getName(),
+                self.windowNo, _curtab.getAD_Tab_ID(), subj, VIS.Utility.encodeText(html), JSON.stringify(values), $bsyDiv);
+        }
+
+
         var isCallNew = 0;
         function createNewLetter(e) {
             onOkOpentn = false;
@@ -3537,6 +3628,14 @@
             if ($cmbPfFiletype != null) {
                 $cmbPfFiletype = null;
             }
+
+            if (window.VADMS) {
+                if ($btnUploadToDMS != null) {
+                    $btnUploadToDMS.off('click');
+                }
+                $btnUploadToDMS = null
+            }
+
             //self = null;
         };
 

@@ -181,20 +181,7 @@ namespace VAModelAD
             = new SortedDictionary<int, Dictionary<string, CDNBundler>>();
 
         private static readonly SortedDictionary<int, Dictionary<string, CDNBundler>> _cdnScripts
-            = new SortedDictionary<int, Dictionary<string, CDNBundler>>();
-
-        // ===========================
-        // FACTORY METHOD
-        // ===========================
-        public static CDNBundler CreateStyleBundle()
-        {
-            return new CDNBundler();
-        }
-
-        public static CDNBundler CreateScriptBundle()
-        {
-            return new CDNBundler();
-        }
+            = new SortedDictionary<int, Dictionary<string, CDNBundler>>();      
 
 
         // ===========================
