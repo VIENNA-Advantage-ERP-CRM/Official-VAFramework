@@ -118,5 +118,5 @@ import "../widgets/assignedwindowrec.js";
 import "../tabpanels/wfPanel.js";
 import "../app/forms/WorkFlowHttpRequest.js";
 import "../app/Framework/VIS_SecretKeyDialog.js";
-
+import "../app/Framework/advanceTask.js";
 
