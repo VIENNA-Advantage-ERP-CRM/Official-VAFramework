@@ -360,7 +360,7 @@
     };
 
     GridWindow.prototype.getDisplayName = function () {
-        return this.vo.Name2;
+        return this.vo.DisplayName;
     };
 
     //GridWindow.prototype.getIsCall = function () {
