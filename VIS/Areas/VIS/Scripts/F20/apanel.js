@@ -5108,10 +5108,15 @@
         }
         //var rquery = this.curTab.query; //new VIS.Query(this.curTab.getTableName());
         var rquery = null;
-        if (this.curTab.query && this.curTab.query.list.length > 0)
+        var strWhere = "";
+        if (this.curTab.query && this.curTab.query.list.length > 0 && !this.curTab.query.isORcondition)
             rquery = this.curTab.query;
-        else
+        else {
             rquery = new VIS.Query(this.curTab.getTableName());
+            if (this.curTab.query.getWhereClause().length > 0) {
+                strWhere = rquery.addRestriction(this.curTab.query.getWhereClause());
+            }
+        }
 
 
         rquery.tableName = this.curTab.getTableName();
