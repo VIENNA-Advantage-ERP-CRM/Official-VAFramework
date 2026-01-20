@@ -15,6 +15,7 @@ using VAdvantage.Logging;
 using VIS.DataContracts;
 using VIS.Classes;
 using VAdvantage.Controller;
+using System.Security.Cryptography;
 
 namespace VIS.Helpers
 {
@@ -3177,8 +3178,10 @@ namespace VIS.Helpers
             }
             if (dse.Info != null && dse.Info.Length > 0)
                 _info.Append("<br/> (").Append(dse.Info).Append(")");
-            outt.Updated = new DateTime(Convert.ToDateTime(dse.Updated).Ticks, DateTimeKind.Utc);
-            outt.Created = new DateTime(Convert.ToDateTime(dse.Created).Ticks, DateTimeKind.Utc);
+            //outt.Updated = new DateTime(Convert.ToDateTime(dse.Updated).Ticks, DateTimeKind.Utc);
+            //outt.Created = new DateTime(Convert.ToDateTime(dse.Created).Ticks, DateTimeKind.Utc);
+            outt.Updated = dse.Updated != null ? dse.Updated.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime();
+            outt.Created = dse.Updated != null ? dse.Created.Value.ToUniversalTime(): DateTime.Now.ToUniversalTime();
 
             outt.Info = _info.ToString();
             //	Only Client Preference can view Change Log

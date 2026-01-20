@@ -724,10 +724,13 @@
     };
 
     ContentPane.prototype.cmd_saveNew = function (manual) {
-        var $this = this;
+        var tis = this;
         this.cmd_save(true, function (result) {
             if (result) {
-                $this.cmd_new(false);
+                if (!tis.curTab.getIsInsertRecord()) {
+                    return;
+                }
+                tis.curGC.dataNew(false);
             }
         });
     }
