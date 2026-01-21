@@ -2145,10 +2145,10 @@
 
         var isText = VIS.DisplayType.IsText(field.getDisplayType()) || VIS.DisplayType.List == field.getDisplayType()
             || VIS.DisplayType.YesNo == field.getDisplayType() || VIS.DisplayType.MultiKey == field.getDisplayType()
-            || (value != null && value.length > 0 && VIS.DisplayType.IsID(field.getDisplayType()) && typeof value == "string");
+            || (value != null && typeof value == "string" && value.length > 0 && VIS.DisplayType.IsLookup(field.getDisplayType())); //case for key column of string type
         
         var isList = VIS.DisplayType.List == field.getDisplayType()
-            || (value != null && value.length > 0 && VIS.DisplayType.IsID(field.getDisplayType()) && typeof value == "string");
+            || (value != null && typeof value == "string" && value.length > 0 && VIS.DisplayType.IsLookup(field.getDisplayType()));
 
         if (value != null && value.length > 0 && isText) {
             if (optr == VIS.Query.prototype.LIKE || optr == VIS.Query.prototype.NOT_LIKE) {
