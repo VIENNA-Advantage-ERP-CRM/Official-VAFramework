@@ -8,7 +8,7 @@
 ; VIS = window.VIS || {};
 
 (function (VIS, $) {
-
+    
     //Form Class function
     VIS.VISAssignedRecord = function () {
         /* Variables */
@@ -61,6 +61,7 @@
         /*This variable is defined if function is called from assign  user popup and when user 
         click the see all assign user link*/
         var IsPopButAll = false;
+        var assignUserChlidDialog = null;
 
         /* Initialize the form design */
         this.Initalize = function () {
@@ -141,7 +142,7 @@
         };
 
         // Create Widget
-        this.getWindowRecords = function (getAllData, ListVal) {
+        this.getWindowRecords = function (getAllData, ListVal,IsFromAssignUser=false) {
             /*Commented code in order to handle request without ajax*/
             showBusy(true);
             //$.ajax({
@@ -172,8 +173,9 @@
             var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AssignedRecordToUser/AssignRecordToUserWidget", getDataParams);
             if (res) {
                 allRecords = res ? res : [];
-                /*here listval 00 means that fucntion is called from assi*/
-                if (ListVal != "00") {
+                /*here listval 00 means that fucntion is called from assined user and the boolean value is used so that
+                 also indicates the same*/
+                if (ListVal != "00" && !IsFromAssignUser) {
                     updateUI();
                 }
                 showBusy(false);
@@ -358,7 +360,7 @@
          * @param {any} winPageSize
          * @param {any} searchText
          */
-        this.GetWindowData = function (WindowId, TableID, Record_ID, winPageNo, winPageSize, searchText, IsFromPopUp, IsPopButAll, modelPopupId, tableName) {
+        this.GetWindowData = function (WindowId, TableID, Record_ID, winPageNo, winPageSize, searchText, IsFromPopUp, IsPopButAll, modelPopupId, tableName,ch=null) {
             var isPopupOpen = modelPopupId && modelPopupId.is(':visible');
             /*Assigned the value to variable if function is called from assigned user popup*/
             if (IsFromPopUp) {
@@ -397,6 +399,8 @@
                 showBusy(true);
                 windowRecords = res ? res : [];
                 CreateList(windowRecords, IsFromPopUp, IsPopButAll, modelPopupId, WindowId, TableID);
+                //here assigned the child dialog to variable
+                assignUserChlidDialog = ch;
             } else {
                 if (isPopupOpen) {
                     showPopupBusy(false);
@@ -597,7 +601,7 @@
                     var deleteresult = JSON.parse(response);
                     if (!(deleteresult.toLowerCase().startsWith("error"))) {
                         modelPopupId.hide();
-                        $self.getWindowRecords(getAll, ListVal);
+                        $self.getWindowRecords(getAll, ListVal,true);
                         uncheckedIDs = [];
                     }
                     else {
@@ -628,6 +632,10 @@
                     Record_ID = $(this).attr('data-Record_ID');
                     $self.zoomWindow(WindowId);
                     modelPopupId.hide();
+                    //closed the assign user dialog after zoom of record
+                    if (assignUserChlidDialog != null) {
+                        assignUserChlidDialog.close();
+                    }
                 });
 
             // Checkbox check/uncheck
