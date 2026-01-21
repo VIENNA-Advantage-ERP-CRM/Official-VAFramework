@@ -97,11 +97,12 @@
             $hlnkTabDataRef_ID.on("click", $self.refreshWidget);
             $welcomeNewRecord.on("click", function () {
                 var sql = "VIS_129";
-                var n_win = executeScalar(sql);
+                executeScalar(sql, null, function (n_win) {
 
-                var zoomQuery = new VIS.Query();
-                zoomQuery.addRestriction("R_Request_ID", VIS.Query.prototype.EQUAL, 0);
-                VIS.viewManager.startWindow(n_win, zoomQuery);
+                    var zoomQuery = new VIS.Query();
+                    zoomQuery.addRestriction("R_Request_ID", VIS.Query.prototype.EQUAL, 0);
+                    VIS.viewManager.startWindow(n_win, zoomQuery);
+                });
             });
         };
         /* Start Request */
