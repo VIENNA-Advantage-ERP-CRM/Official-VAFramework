@@ -142,7 +142,7 @@
         };
 
         // Create Widget
-        this.getWindowRecords = function (getAllData, ListVal, IsFromAssignUser = false) {
+        this.getWindowRecords = function (getAllData, ListVal, IsFromAssignUser=false) {
             /*Commented code in order to handle request without ajax*/
             showBusy(true);
             //$.ajax({
@@ -541,7 +541,7 @@
                 // Event Bindings (Delegated)
                 $self.bindSearchEvents(modelPopupId, WindowId, TableID);
                 $self.bindPopupScroll(modelPopupId, WindowId, TableID);
-                $self.bindPopupEvents(modelPopupId, WindowId, TableID, IsPopButAll);
+                $self.bindPopupEvents(modelPopupId, WindowId, TableID, IsPopButAll, IsFromPopUp);
                 if (ListVal == "01") {
                     modelPopupId.find('.modal-content').css("width", "80%");
                 }
@@ -584,7 +584,7 @@
             IsDataFetching = false;
         }
         /**This function is used to unassign the record if user click the ok button */
-        function UnAssignRecord(modelPopupId, WindowId, TableID) {
+        function UnAssignRecord(modelPopupId, WindowId, TableID, IsFromPopUp) {
             showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "AssignedRecordToUser/DeleteRecord",
@@ -601,7 +601,7 @@
                     var deleteresult = JSON.parse(response);
                     if (!(deleteresult.toLowerCase().startsWith("error"))) {
                         modelPopupId.hide();
-                        $self.getWindowRecords(getAll, ListVal, true);
+                        $self.getWindowRecords(getAll, ListVal, IsFromPopUp ? true : false);
                         uncheckedIDs = [];
                     }
                     else {
@@ -615,7 +615,7 @@
         };
         /**Binded pop events  */
         /**Binded pop events  */
-        this.bindPopupEvents = function (modelPopupId, WindowId, TableID, IsPopButAll) {
+        this.bindPopupEvents = function (modelPopupId, WindowId, TableID, IsPopButAll, IsFromPopUp) {
             // Close button event
             modelPopupId.off('click', '#popup-close-btn1')
                 .on('click', '#popup-close-btn1', function () {
@@ -664,7 +664,7 @@
             modelPopupId.off('click', '.vis-asrec-ok')
                 .on('click', '.vis-asrec-ok', function () {
                     if (uncheckedIDs.length > 0) {
-                        UnAssignRecord(modelPopupId, WindowId, TableID);
+                        UnAssignRecord(modelPopupId, WindowId, TableID, IsFromPopUp);
                     }
                 });
 
