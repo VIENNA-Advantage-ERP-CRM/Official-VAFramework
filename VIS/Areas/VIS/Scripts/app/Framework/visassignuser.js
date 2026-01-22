@@ -79,7 +79,7 @@
             mainDiv.append($SeeAllRecLink).append(UpperDiv).append(lowerDiv).append(contentHtml);
         }
         else {
-            
+
             mainDiv.append(UpperDiv).append(lowerDiv).append(contentHtml);
         }
         InitEvents();
@@ -207,8 +207,9 @@
             //this function is used to create the popup design
             mainDiv.find('#VIS_AllAssigned_' + windowNo).off('click')
             mainDiv.find('#VIS_AllAssigned_' + windowNo).on('click', function () {
-                assignRecWidgObj.getWindowRecords(true, "00");
-                content = assignRecWidgObj.GetWindowData(WindowId, table_id, "", 1, windowNo, "", true, true, modelPopupId, KeyColumn)
+                assignRecWidgObj.getWindowRecords(true, "00", true);
+                content = assignRecWidgObj.GetWindowData(WindowId, table_id, "", 1, windowNo, "", true, true, modelPopupId, KeyColumn, ch);
+
             });
             // get primary key of table in order to show the Popup
             var data = {
