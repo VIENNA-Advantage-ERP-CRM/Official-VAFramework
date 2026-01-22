@@ -61,6 +61,7 @@
         /*This variable is defined if function is called from assign  user popup and when user 
         click the see all assign user link*/
         var IsPopButAll = false;
+        var assignUserChlidDialog = null;
 
         /* Initialize the form design */
         this.Initalize = function () {
@@ -141,7 +142,7 @@
         };
 
         // Create Widget
-        this.getWindowRecords = function (getAllData, ListVal) {
+        this.getWindowRecords = function (getAllData, ListVal, IsFromAssignUser=false) {
             /*Commented code in order to handle request without ajax*/
             showBusy(true);
             //$.ajax({
@@ -172,8 +173,9 @@
             var res = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "AssignedRecordToUser/AssignRecordToUserWidget", getDataParams);
             if (res) {
                 allRecords = res ? res : [];
-                /*here listval 00 means that fucntion is called from assi*/
-                if (ListVal != "00") {
+                /*here listval 00 means that fucntion is called from assined user and the boolean value is used so that
+                 also indicates the same*/
+                if (ListVal != "00" && !IsFromAssignUser) {
                     updateUI();
                 }
                 showBusy(false);
@@ -358,7 +360,7 @@
          * @param {any} winPageSize
          * @param {any} searchText
          */
-        this.GetWindowData = function (WindowId, TableID, Record_ID, winPageNo, winPageSize, searchText, IsFromPopUp, IsPopButAll, modelPopupId, tableName) {
+        this.GetWindowData = function (WindowId, TableID, Record_ID, winPageNo, winPageSize, searchText, IsFromPopUp, IsPopButAll, modelPopupId, tableName, ch = null) {
             var isPopupOpen = modelPopupId && modelPopupId.is(':visible');
             /*Assigned the value to variable if function is called from assigned user popup*/
             if (IsFromPopUp) {
@@ -397,6 +399,8 @@
                 showBusy(true);
                 windowRecords = res ? res : [];
                 CreateList(windowRecords, IsFromPopUp, IsPopButAll, modelPopupId, WindowId, TableID);
+                //here assigned the child dialog to variable
+                assignUserChlidDialog = ch;
             } else {
                 if (isPopupOpen) {
                     showPopupBusy(false);
@@ -537,7 +541,7 @@
                 // Event Bindings (Delegated)
                 $self.bindSearchEvents(modelPopupId, WindowId, TableID);
                 $self.bindPopupScroll(modelPopupId, WindowId, TableID);
-                $self.bindPopupEvents(modelPopupId, WindowId, TableID, IsPopButAll);
+                $self.bindPopupEvents(modelPopupId, WindowId, TableID, IsPopButAll, IsFromPopUp);
                 if (ListVal == "01") {
                     modelPopupId.find('.modal-content').css("width", "80%");
                 }
@@ -580,7 +584,7 @@
             IsDataFetching = false;
         }
         /**This function is used to unassign the record if user click the ok button */
-        function UnAssignRecord(modelPopupId, WindowId, TableID) {
+        function UnAssignRecord(modelPopupId, WindowId, TableID, IsFromPopUp) {
             showBusy(true);
             $.ajax({
                 url: VIS.Application.contextUrl + "AssignedRecordToUser/DeleteRecord",
@@ -597,7 +601,7 @@
                     var deleteresult = JSON.parse(response);
                     if (!(deleteresult.toLowerCase().startsWith("error"))) {
                         modelPopupId.hide();
-                        $self.getWindowRecords(getAll, ListVal);
+                        $self.getWindowRecords(getAll, ListVal, IsFromPopUp ? true : false);
                         uncheckedIDs = [];
                     }
                     else {
@@ -611,7 +615,7 @@
         };
         /**Binded pop events  */
         /**Binded pop events  */
-        this.bindPopupEvents = function (modelPopupId, WindowId, TableID, IsPopButAll) {
+        this.bindPopupEvents = function (modelPopupId, WindowId, TableID, IsPopButAll, IsFromPopUp) {
             // Close button event
             modelPopupId.off('click', '#popup-close-btn1')
                 .on('click', '#popup-close-btn1', function () {
@@ -628,6 +632,10 @@
                     Record_ID = $(this).attr('data-Record_ID');
                     $self.zoomWindow(WindowId);
                     modelPopupId.hide();
+                    //closed the assign user dialog after zoom of record
+                    if (assignUserChlidDialog != null) {
+                        assignUserChlidDialog.close();
+                    }
                 });
 
             // Checkbox check/uncheck
@@ -656,7 +664,7 @@
             modelPopupId.off('click', '.vis-asrec-ok')
                 .on('click', '.vis-asrec-ok', function () {
                     if (uncheckedIDs.length > 0) {
-                        UnAssignRecord(modelPopupId, WindowId, TableID);
+                        UnAssignRecord(modelPopupId, WindowId, TableID, IsFromPopUp);
                     }
                 });
 
