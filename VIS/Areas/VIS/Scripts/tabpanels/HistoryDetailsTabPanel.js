@@ -479,8 +479,7 @@
                             '<p>' + res[i].CharacterData + '</p>' +
                             '</div>' +
                             (res[i].SentimentAnalysis ? '<div class="VIS-Reaction ' + sentimentCls + '"><i class="' + sentimentIcon + '" aria-hidden="true" title="'
-                                + res[i].SentimentAnaylsisReason + '"></i></div>' : '') +
-                            '</div>' +
+                                + res[i].SentimentAnaylsisReason + '"></i></div>' : '') +                            
                             '</div>' +
                             '</div>' +
                             '</div>' +
