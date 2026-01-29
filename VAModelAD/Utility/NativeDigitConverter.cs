@@ -10,7 +10,7 @@ namespace VAdvantage.Utility
     {
         public static String ConvertToNativeNumerals(object oIn, Ctx ctx, CultureInfo cultureInfo = null)
         {
-            return ConvertToNativeNumerals(oIn, (ctx.GetContext("#PrintNativeDigits") == "Y"), cultureInfo);
+            return ConvertToNativeNumerals(oIn, (ctx.GetContext("PrintNativeDigits") == "Y"), cultureInfo);
         }
 
         public static String ConvertToNativeNumerals(object oIn, bool ShowNative, CultureInfo cultureInfo = null)
