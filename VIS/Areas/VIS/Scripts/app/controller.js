@@ -241,6 +241,10 @@
         return this.vo.IsTask;
     };
 
+    GridWindow.prototype.getIsAdvanceTask = function () {
+        return this.vo.IsAdvanceTask;
+    };
+
     GridWindow.prototype.getIsEmail = function () {
         return this.vo.IsEmail;
     };
@@ -353,6 +357,10 @@
 
     GridWindow.prototype.getName = function () {
         return this.vo.Name;
+    };
+
+    GridWindow.prototype.getDisplayName = function () {
+        return this.vo.DisplayName;
     };
 
     //GridWindow.prototype.getIsCall = function () {

@@ -1730,8 +1730,7 @@
         if (newRecordView == NEWRECORDVIEW_SingleRowLayout) {
             this.switchSingleRow();
             this.aPanel.showHideViewIcon(this.aPanel.aSingle);
-            action = this.aPanel.aSingle.action;
-
+            action = this.aPanel.aSingle.action;           
         }
         else if (newRecordView == NEWRECORDVIEW_GridLayout) {
             this.isNewClick = true; // use for stop requery data
@@ -1750,6 +1749,9 @@
         
         if (type != newRecordView) {
             this.aPanel.setTabstackview(action);
+        } else {
+            this.aPanel.startFilterPanel(true);
+            this.aPanel.isHideFilterIcon(true);
         }
        
     };

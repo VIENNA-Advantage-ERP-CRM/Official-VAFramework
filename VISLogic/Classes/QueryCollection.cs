@@ -471,7 +471,7 @@ namespace VIS.Classes
 
             queryList.VIS_128 = "UPDATE C_ValidCombination SET Alias=@f_alies WHERE C_ValidCombination_ID=@IDvalue";
 
-            queryList.VIS_129 = "SELECT AD_Window_ID FROM AD_Window WHERE Name='All Requests'";
+            queryList.VIS_129 = "SELECT AD_Window_ID FROM AD_Window WHERE Name='VAS_AllRequests'";
 
             queryList.VIS_130 = "select ad_entitytype_id, entitytype, name from ad_entitytype";
 
