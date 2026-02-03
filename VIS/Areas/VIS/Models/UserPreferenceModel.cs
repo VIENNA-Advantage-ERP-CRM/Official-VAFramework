@@ -141,6 +141,11 @@ namespace VIS.Models
             //	Show Advanced Tab
             preference.SetIsShowAdvanced(pref["IsShowAdvanced"].Equals("Y") ? true : false);
             ctx.SetContext("#ShowAdvanced", pref["IsShowAdvanced"].Equals("Y") ? true : false);
+            //Handle PrintNative digit
+            if (pref.ContainsKey("PrintNativeDigits"))
+            {
+                ctx.SetContext("PrintNativeDigits", (string)pref["PrintNativeDigits"]??"N");
+            }
             return preference.Save();
         }
         public UserSetting SaveChangePassword(Ctx ctx, int AD_User_ID, string currentPws, string newPws)

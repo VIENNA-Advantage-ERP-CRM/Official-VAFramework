@@ -205,13 +205,18 @@ namespace VAdvantage.Model
                     }
                 }
             }
-            //else if (role.GetAD_Role_ID() != AD_Role_ID
-            //|| role.GetAD_User_ID() != AD_User_ID)
-            //{
-            //    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
-            //    s_cache[AD_Role_ID] = role;
-            //}
-            return role;
+            else if(role!=null)
+            {
+                //Update the context so current context become Model context
+                role.p_ctx = ctx;
+            }
+                //else if (role.GetAD_Role_ID() != AD_Role_ID
+                //|| role.GetAD_User_ID() != AD_User_ID)
+                //{
+                //    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
+                //    s_cache[AD_Role_ID] = role;
+                //}
+                return role;
 
 
             //if (reload || _defaultRole == null)
