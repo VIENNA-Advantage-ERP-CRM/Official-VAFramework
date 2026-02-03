@@ -939,7 +939,7 @@ namespace VIS.Helpers
                     else
                     {
                         sb.Append(str).Append(" = ");
-                        if (DisplayType.IsID(displayType))
+                        if (DisplayType.IsID(displayType) && colval.GetType() != typeof(string))
                         {
                             sb.Append(colval);
                         }
