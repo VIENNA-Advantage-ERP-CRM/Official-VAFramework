@@ -202,7 +202,7 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.8.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.8\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http.WebRequest" />    
+    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
@@ -862,6 +862,8 @@
     <Content Include="Areas\VIS\Scripts\react\pages\TestComponent.jsx" />
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
+    <Content Include="Areas\VIS\Scripts\react\shared\VISReactControlsBridge\index.js" />
+    <Content Include="Areas\VIS\Scripts\react\shared\VISReactControlsBridge\VISReactControlsBridge.js" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\wfPanel.js" />
     <Content Include="Areas\VIS\Scripts\widgets\assignedwindowrec.js" />
@@ -895,6 +897,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
+    <Compile Include="Areas\VIS\Classes\SyncfusionCommon.cs" />
     <Compile Include="Areas\VIS\Classes\SyncfusionLicenseConfig.cs" />
     <Compile Include="Areas\VIS\Classes\VISAuthConfig.cs" />
     <Compile Include="Areas\VIS\Classes\VISGlobal.cs" />
@@ -1018,7 +1021,7 @@
     <Content Include="Areas\VIS\Views\Home\Maintenance.cshtml" />
     <Content Include="Areas\VIS\Views\Home\Home.cshtml" />
     <Content Include="Areas\VIS\Views\LandingPage.cshtml" />
-    <Content Include="Areas\VIS\Views\LandingPage\Index.cshtml" />    
+    <Content Include="Areas\VIS\Views\LandingPage\Index.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />
