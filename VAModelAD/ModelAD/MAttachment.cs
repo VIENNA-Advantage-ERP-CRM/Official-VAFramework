@@ -903,8 +903,10 @@ namespace VAdvantage.Model
                     return true;
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                error.Append("Sftp error=> " + ex.Message);
+                log.Severe("Sftp error =>" + ex.Message);
                 return false;
             }
         }
