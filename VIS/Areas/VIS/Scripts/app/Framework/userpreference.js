@@ -1030,7 +1030,7 @@
                 try {
 
                     // Added by Bharat on 12 June 2017 to remove client side queries
-                    ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "User Substitute" }, null); // spelling corrected by vinay bhatt on 18 oct 2018
+                    ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "VAS_UserSubstitute" }, null); // spelling corrected by vinay bhatt on 18 oct 2018
                     if (ad_window_Id > 0) {
                         var zoomQuery = new VIS.Query();
                         zoomQuery.addRestriction("AD_User_ID", VIS.Query.prototype.EQUAL, VIS.context.getAD_User_ID());
@@ -1628,7 +1628,8 @@
                     IsAutoCommit: $autocommit.prop("checked") ? "Y" : "N",
                     IsShowAcct: $acctab.prop("checked") ? "Y" : "N",
                     IsShowTrl: $transtab.prop("checked") ? "Y" : "N",
-                    IsShowAdvanced: $advanstab.prop("checked") ? "Y" : "N"
+                    IsShowAdvanced: $advanstab.prop("checked") ? "Y" : "N",
+                    PrintNativeDigits: $printnative.prop("checked") ? "Y" : "N"
                 });
             };
 

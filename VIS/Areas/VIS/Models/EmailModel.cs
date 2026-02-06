@@ -126,27 +126,13 @@ namespace VIS.Models
             }
 
 
-            int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
-            string protocol = "SM";
-            int credentialId = 0;
-            if (Env.IsModuleInstalled("VA101_"))
-            {
-                protocol = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Protocol FROM AD_UserMailConfigration WHERE AD_UserMailConfigration_ID=" + mailConfigID));
 
-                if (string.IsNullOrEmpty(protocol))
-                {
-                    protocol = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Protocol FROM AD_Client WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID()));
-                    if (!string.IsNullOrEmpty(protocol) && protocol != "SM" && protocol != "SI")
-                    {
-                        credentialId = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA101_APIAuthCredential_ID FROM AD_Client WHERE IsActive='Y' AND AD_Client_ID=" + ctx.GetAD_Client_ID()));
-                    }
-                }
-                else if (protocol != "SM" && protocol != "SI")
-                {
-                    credentialId = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VA101_APIAuthCredential_ID FROM AD_UserMailConfigration WHERE AD_UserMailConfigration_ID=" + mailConfigID));
-                }
 
-            }
+
+
+            //int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
+            int credentialId;
+            string protocol = MUserMailConfigration.GetMailProtocol(ctx,out credentialId);
 
             SMTPConfig config = null;
             UserInformation userinfo = new UserInformation();

@@ -578,6 +578,11 @@
                 this.aTask.setTextDirection("r");
                 $ulactionbar.append(this.aTask.getListItmIT());
             }
+            if (mWindow.getIsAdvanceTask()) {
+                this.aAdvanceTask = this.addActions("ATK", null, false, false, false, onAction); //1
+                this.aAdvanceTask.setTextDirection("r");
+                $ulactionbar.append(this.aAdvanceTask.getListItmIT());
+            }
             if (mWindow.getIsEmail()) {
                 this.aEmail = this.addActions("EML", null, false, false, false, onAction); //1
                 this.aEmail.setTextDirection("r");
@@ -840,7 +845,7 @@
                         $divReserveTabPanel.css({ "display": "grid" });
                     }
 
-                    
+
                 }
                 $tabPanel.css({ "display": "grid" });
                 if (this.curGC) {
@@ -2633,6 +2638,10 @@
         }
         else if (tis.aTask && tis.aTask.getAction() === action) {
             tis.cmd_task();
+        }
+
+        else if (tis.aAdvanceTask && tis.aAdvanceTask.getAction() === action) {
+            tis.cmd_advanceTask();
         }
 
         else if (tis.aSubscribe && tis.aSubscribe.getAction() === action) {
@@ -4983,6 +4992,17 @@
         VIS.AppointmentsForm.init(AD_Table_ID, record_ID, 0, 0, true);
     };
 
+    APanel.prototype.cmd_advanceTask = function () {
+        var record_ID = this.curTab.getRecord_ID();
+        var AD_Table_ID = this.curTab.getAD_Table_ID();
+        var windowName = this.gridWindow.getDisplayName();
+        if (record_ID == -1)	//	No Key
+        {
+            return;
+        }
+        VIS.AdvanceTask.init(windowName, AD_Table_ID, record_ID);
+    };
+
     APanel.prototype.cmd_letter = function () {
         var record_ID = this.curTab.getRecord_ID();
         if (record_ID == -1)	//	No Key
@@ -5088,10 +5108,15 @@
         }
         //var rquery = this.curTab.query; //new VIS.Query(this.curTab.getTableName());
         var rquery = null;
-        if (this.curTab.query && this.curTab.query.list.length > 0)
+        var strWhere = "";
+        if (this.curTab.query && this.curTab.query.list.length > 0 && !this.curTab.query.isORcondition)
             rquery = this.curTab.query;
-        else
+        else {
             rquery = new VIS.Query(this.curTab.getTableName());
+            if (this.curTab.query.getWhereClause().length > 0) {
+                strWhere = rquery.addRestriction(this.curTab.query.getWhereClause());
+            }
+        }
 
 
         rquery.tableName = this.curTab.getTableName();

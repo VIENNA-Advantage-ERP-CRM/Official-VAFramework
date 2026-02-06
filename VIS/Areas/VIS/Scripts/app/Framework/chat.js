@@ -128,7 +128,7 @@
             showBusy(true);
             var text = $textArea.find('#chatBox_textArea').val();
             if ($.trim(text) == "" || text == "" || text == null) {
-                VIS.ADialog.info("EnterData");
+                VIS.ADialog.info("VIS_TypeSomething");
                 /* if (e != undefined) {
                      e.preventDefault();
                  }*/
@@ -227,7 +227,7 @@
                 saveMsg(e);
                 /* var text = $inputChat.val();
                  if ($.trim(text) == "" || text == "" || text == null) {
-                     VIS.ADialog.info("EnterData");
+                     VIS.ADialog.info("VIS_TypeSomething");
                      if (e != undefined) {
                          e.preventDefault();
                      }
@@ -441,7 +441,7 @@
                     //if (newText.length === 0) return;
                     if (newText.length === 0) {
                         if ($wrapper.find(".vis-chat-error").length === 0) {
-                            var $errorMsg = $(`<div class="vis-chat-error" style="font-size:0.7rem;margin-bottom:3px;">${VIS.Msg.getMsg("EnterData")}</div>`);
+                            var $errorMsg = $(`<div class="vis-chat-error" style="font-size:0.7rem;margin-bottom:3px;">${VIS.Msg.getMsg("VIS_TypeSomething")}</div>`);
                             $wrapper.prepend($errorMsg);
                             setTimeout(() => {
                                 $errorMsg.fadeOut(300, function () { $(this).remove(); });
@@ -483,15 +483,16 @@
                 $input.on("keydown", function (e) {
                     if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault(); // Prevent newline on Enter
+                        $sendIcon.trigger("click");
                         //   sendUpdate();
-                        let updated = sendUpdate(); // you can make sendUpdate return true/false
+                        //let updated = sendUpdate(); // you can make sendUpdate return true/false
 
-                        if (updated) {
-                            $editIcon.show();
-                            $delIcon.show();
-                            $sendIcon.remove();
-                            $undoIcon.remove();
-                        }
+                        //if (updated) {
+                        //    $editIcon.show();
+                        //    $delIcon.show();
+                        //    $sendIcon.remove();
+                        //    $undoIcon.remove();
+                        //}
 
                     }
                     // If Shift+Enter OR Alt+Enter → allow newline
@@ -566,7 +567,7 @@
         function saveMsg(e) {
             var text = $textArea.find('#chatBox_textArea').val();
             if ($.trim(text) == "" || text == "" || text == null) {
-                VIS.ADialog.info("EnterData");
+                VIS.ADialog.info("VIS_TypeSomething");
                 /* if (e != undefined) {
                      e.preventDefault();
                  }*/

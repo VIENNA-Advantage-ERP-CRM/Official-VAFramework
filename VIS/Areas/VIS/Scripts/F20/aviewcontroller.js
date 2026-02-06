@@ -1730,8 +1730,7 @@
         if (newRecordView == NEWRECORDVIEW_SingleRowLayout) {
             this.switchSingleRow();
             this.aPanel.showHideViewIcon(this.aPanel.aSingle);
-            action = this.aPanel.aSingle.action;
-
+            action = this.aPanel.aSingle.action;           
         }
         else if (newRecordView == NEWRECORDVIEW_GridLayout) {
             this.isNewClick = true; // use for stop requery data
@@ -1750,6 +1749,9 @@
         
         if (type != newRecordView) {
             this.aPanel.setTabstackview(action);
+        } else {
+            this.aPanel.startFilterPanel(true);
+            this.aPanel.isHideFilterIcon(true);
         }
        
     };
@@ -1971,6 +1973,15 @@
                     added = true;
                 }
             }
+
+            //check for org access
+            if (!added && "ad_org_id" in record) {
+                if (!VIS.MRole.getIsOrgAccess(record.ad_org_id, true)) {
+                    retIndices.push(selIndices[i]);
+                    added = true;
+                }
+            }
+
             //check for filter org
             if (!added) {
                 var fOrgs = VIS.context.getContext("#AD_FilteredOrg");

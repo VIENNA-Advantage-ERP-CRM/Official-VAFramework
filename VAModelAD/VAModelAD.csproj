@@ -470,6 +470,7 @@
     <Compile Include="ProcessAD\TranslationImportExport.cs" />
     <Compile Include="ProcessAD\TranslationMgr.cs" />
     <Compile Include="ProcessAD\TreeMaintenance.cs" />
+    <Compile Include="ProcessAD\UpdateGuid.cs" />
     <Compile Include="ProcessAD\UserPassword.cs" />
     <Compile Include="ProcessAD\ValidateTableColumns.cs" />
     <Compile Include="ProcessAD\VerifyQueryForAlert.cs" />

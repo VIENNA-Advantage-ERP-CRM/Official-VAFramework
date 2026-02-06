@@ -205,6 +205,10 @@
                 $root.dialog('close');
             });
 
+            this.chkOrg.on("change", function () { $self.setExplanation(); });
+            this.chkUser.on("change", function () { $self.setExplanation(); });
+            this.chkWindow.on("change", function () { $self.setExplanation(); });
+
             $('[id^=vch]').click(function () {
                 $self.setExplanation();
             });

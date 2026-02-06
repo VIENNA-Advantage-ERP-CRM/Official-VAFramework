@@ -409,7 +409,7 @@ namespace VAdvantage.Model
                 _gridTable.AddField(updatedBy);
             }
 
-            if (_gridTable.GetField(this.GetTableName() + "_GUID") == null)
+            if (_gridTable.GetField(this.GetTableName() + "_GUID") == null && !_vo.IsView )
             {
                 GridField guid = new GridField(GridFieldVO.CreateStdFieldGUID(_vo.GetCtx(),
                     _vo.windowNo, _vo.tabNo,

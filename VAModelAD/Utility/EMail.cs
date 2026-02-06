@@ -1047,8 +1047,14 @@ namespace VAdvantage.Utility
             //	Host
             if (_smtpHost == null || _smtpHost.Length == 0)
             {
-                //log.warning("SMTP Host is invalid" + _smtpHost);
-                return false;
+                //check for protocol
+                int credentialId;
+                string protocol = MUserMailConfigration.GetMailProtocol(_ctx, out credentialId);
+                if (protocol == "SM" || protocol == "SI")
+                {
+                    //log.warning("SMTP Host is invalid" + _smtpHost);
+                    return false;
+                }
             }
 
             //	Subject
@@ -1734,12 +1740,20 @@ namespace VAdvantage.Utility
                 MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
                 username = user.GetEMailUser();
                 password = user.GetEMailUserPW();
+                if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
+                {
+                    fromEMail = user.GetEMail();
+                }
             }
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || sendFromClient)
             {
                 username = userConfig.GetSmtpUsername();
                 password = userConfig.GetSmtpPassword();
+                if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
+                {
+                    fromEMail = userConfig.GetEMail();
+                }
             }
 
 
@@ -1780,14 +1794,29 @@ namespace VAdvantage.Utility
                     MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
                     username = user.GetEMailUser();
                     password = user.GetEMailUserPW();
-                    fromEMail = username;
+                    if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
+                    {
+                        fromEMail = user.GetEMail(); ;
+                    }
+                    else
+                    {
+                        fromEMail = username;
+                    }
+                       
                     fromName = user.GetName();
                 }
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || sendFromClient)
                 {
                     username = client.GetRequestUser();
                     password = client.GetRequestUserPW();
-                    fromEMail = username;
+                    if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
+                    {
+                        fromEMail = client.GetRequestEMail();
+                    }
+                    else
+                    {
+                        fromEMail = username;
+                    }
                     fromName = client.GetName();   //username to client.GetName()
                 }
             }

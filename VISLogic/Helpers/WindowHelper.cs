@@ -15,6 +15,7 @@ using VAdvantage.Logging;
 using VIS.DataContracts;
 using VIS.Classes;
 using VAdvantage.Controller;
+using System.Security.Cryptography;
 
 namespace VIS.Helpers
 {
@@ -143,7 +144,17 @@ namespace VIS.Helpers
                 if (field.ColumnSQL != null)
                     select.Append(field.ColumnSQL);	//	ColumnName or Virtual Column
                 else
-                    select.Append(field.ColumnName);
+                {
+                    if (field.ColumnName.ToUpper().EndsWith("_GUID"))
+                    {
+                        if (DatabaseType.IsOracle)
+                            select.Append($"RAWTOHEX({field.ColumnName}) AS {field.ColumnName}");
+                        else if (DatabaseType.IsPostgre)
+                            select.Append($"{field.ColumnName}::text AS {field.ColumnName}");
+                    }
+                    else
+                        select.Append(field.ColumnName);
+                }
             }
 
             select.Append(" FROM ").Append(tableName);
@@ -928,7 +939,7 @@ namespace VIS.Helpers
                     else
                     {
                         sb.Append(str).Append(" = ");
-                        if (DisplayType.IsID(displayType))
+                        if (DisplayType.IsID(displayType) && colval.GetType() != typeof(string))
                         {
                             sb.Append(colval);
                         }
@@ -1344,9 +1355,21 @@ namespace VIS.Helpers
 
             //ErrorLog.FillErrorLog("Table Object", whereClause, "information", VAdvantage.Framework.Message.MessageType.INFORMATION);
 
+            var formattedColumns = lstColumns.Select(c =>
+            {
+                if (c.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (DatabaseType.IsOracle)
+                        return $"RAWTOHEX({c}) AS {c}";
+                    else if (DatabaseType.IsPostgre)
+                        return $"{c}::text AS {c}";
+                }
+                return c;
+            });
 
 
-            string SQL_Select = "SELECT " + String.Join(",", lstColumns);
+
+            string SQL_Select = "SELECT " + String.Join(",", formattedColumns);
 
             String refreshSQL = SQL_Select + " FROM " + inn.TableName + " WHERE " + whereC;
 
@@ -2369,6 +2392,8 @@ namespace VIS.Helpers
                         bool ok = false;
                         try
                         {
+                            po.SetAD_Window_ID(dInn.AD_Window_ID);
+                            po.SetWindowTabID(dInn.AD_Tab_ID);
                             ok = po.Delete(false);
                         }
                         catch (Exception t)
@@ -2403,7 +2428,7 @@ namespace VIS.Helpers
                                 if (outt.RecIds == null)
                                     outt.RecIds = new List<int>();
                                 outt.RecIds.Add(singleKeyWhere[i]);
-                            }
+                            }                          
                         }
                     }
                     else	//	Delete via SQL
@@ -3153,8 +3178,10 @@ namespace VIS.Helpers
             }
             if (dse.Info != null && dse.Info.Length > 0)
                 _info.Append("<br/> (").Append(dse.Info).Append(")");
-            outt.Updated = new DateTime(Convert.ToDateTime(dse.Updated).Ticks, DateTimeKind.Utc);
-            outt.Created = new DateTime(Convert.ToDateTime(dse.Created).Ticks, DateTimeKind.Utc);
+            //outt.Updated = new DateTime(Convert.ToDateTime(dse.Updated).Ticks, DateTimeKind.Utc);
+            //outt.Created = new DateTime(Convert.ToDateTime(dse.Created).Ticks, DateTimeKind.Utc);
+            outt.Updated = dse.Updated != null ? dse.Updated.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime();
+            outt.Created = dse.Updated != null ? dse.Created.Value.ToUniversalTime(): DateTime.Now.ToUniversalTime();
 
             outt.Info = _info.ToString();
             //	Only Client Preference can view Change Log

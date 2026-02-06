@@ -112,7 +112,8 @@ namespace VIS.Models
                         ai.Appointment_UID, ai.DateLastUpdated, at.SentimentAnalysis, at.SentimentAnaylsisReason
                         FROM AppointmentsInfo ai JOIN AD_USER au ON (au.AD_USER_ID=ai.CREATEDBY)
                         LEFT JOIN AppointmentTranscript at ON (ai.AppointmentsInfo_ID=at.AppointmentsInfo_ID)
-                        WHERE (ai.AttendeeInfo IS NOT NULL OR ai.RefAppointmentsInfo_ID IS NULL) AND ai.ISACTIVE = 'Y' AND ai.ISTASK = 'N' 
+                        WHERE (ai.AttendeeInfo IS NOT NULL OR ai.EmailToInfo IS NOT NULL) 
+                        AND ai.RefAppointmentsInfo_ID IS NULL AND ai.ISACTIVE = 'Y' AND ai.ISTASK = 'N' 
                         AND ai.AD_TABLE_ID = " + _AD_Table_ID + "   AND ai.RECORD_ID = " + RecordId
 
                         + @" UNION ALL 
