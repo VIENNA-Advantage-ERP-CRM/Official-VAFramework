@@ -27,6 +27,8 @@
     <Use64BitIISExpress />
     <UseGlobalApplicationHostFile />
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -163,10 +165,34 @@
       <HintPath>..\ViennaAdvantageWeb\Dll\ModelLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Compression.Base">
+      <HintPath>..\ViennaAdvantageWeb\Dll\Syncfusion.Compression.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.DocIO.Base">
+      <HintPath>..\ViennaAdvantageWeb\Dll\Syncfusion.DocIO.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.DocToPdfConverter.Base">
+      <HintPath>..\ViennaAdvantageWeb\Dll\Syncfusion.DocToPdfConverter.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.EJ2.DocumentEditor">
+      <HintPath>..\ViennaAdvantageWeb\Dll\Syncfusion.EJ2.DocumentEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Licensing">
+      <HintPath>..\ViennaAdvantageWeb\Dll\Syncfusion.Licensing.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Markdown">
+      <HintPath>..\ViennaAdvantageWeb\Dll\Syncfusion.Markdown.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.OfficeChart.Base">
+      <HintPath>..\ViennaAdvantageWeb\Dll\Syncfusion.OfficeChart.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Pdf.Base">
+      <HintPath>..\ViennaAdvantageWeb\Dll\Syncfusion.Pdf.Base.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -837,6 +863,8 @@
     <Content Include="Areas\VIS\Scripts\react\pages\TestComponent.jsx" />
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
+    <Content Include="Areas\VIS\Scripts\react\shared\VISReactControlsBridge\index.js" />
+    <Content Include="Areas\VIS\Scripts\react\shared\VISReactControlsBridge\VISReactControlsBridge.js" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\wfPanel.js" />
     <Content Include="Areas\VIS\Scripts\widgets\assignedwindowrec.js" />
@@ -870,6 +898,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\VIS\Classes\GmailConfig.cs" />
+    <Compile Include="Areas\VIS\Classes\SyncfusionCommon.cs" />
+    <Compile Include="Areas\VIS\Classes\SyncfusionLicenseConfig.cs" />
     <Compile Include="Areas\VIS\Classes\VISAuthConfig.cs" />
     <Compile Include="Areas\VIS\Classes\VISGlobal.cs" />
     <Compile Include="Areas\VIS\Controllers\AccountController.cs" />
@@ -1087,6 +1117,9 @@
       <Project>{ae558aa6-c414-462f-935e-cd705baf2db8}</Project>
       <Name>VISLogic</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

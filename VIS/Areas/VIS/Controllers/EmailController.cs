@@ -12,6 +12,15 @@ using VIS.Filters;
 using System.Web.SessionState;
 using VIS.DataContracts;
 using VAdvantage.Common;
+using System.Configuration;
+using Syncfusion.EJ2.DocumentEditor;
+using System.Text;
+using System.Text.RegularExpressions;
+using Syncfusion.Pdf;
+using Syncfusion.DocToPDFConverter;
+using CrystalDecisions.Web;
+using System.Net.Http;
+
 
 namespace VIS.Controllers
 {
@@ -28,18 +37,20 @@ namespace VIS.Controllers
         {
             return PartialView();
         }
-        public ActionResult Init(int windowNo, string language)
+        public ActionResult Init(int windowNo, string language,bool isEmail)
         {
             ViewBag.windowNo = windowNo;
             ViewBag.language = language;
+            ViewBag.isEmail = isEmail;
+            ViewBag.IsDocEditor = ConfigurationManager.AppSettings["SyncfusionLicense"];
             return PartialView();
         }
 
 
 
         [HttpPost]
-        public JsonResult SendMail(string mails, int AD_User_ID, int AD_Client_ID, int AD_Org_ID, int attachment_ID, string fileNamesFornNewAttach, 
-            string fileNamesForopenFormat, string mailFormat, bool notify, string strDocAttach, int AD_Process_ID,  string printformatfileType)
+        public JsonResult SendMail(string mails, int AD_User_ID, int AD_Client_ID, int AD_Org_ID, int attachment_ID, string fileNamesFornNewAttach,
+            string fileNamesForopenFormat, string mailFormat, bool notify, string strDocAttach, int AD_Process_ID, string printformatfileType)
         {
             List<int> lstDoc = new List<int>();
             Ctx ct = Session["ctx"] as Ctx;
@@ -73,7 +84,7 @@ namespace VIS.Controllers
             }
 
             string result = model.SendMails(lstMails, AD_User_ID, AD_Client_ID, AD_Org_ID, attachment_ID, filesNamesFornNewAttach,
-                filesNamesForopenFormat, Server.HtmlDecode(mailFormat), notify, lstDoc, AD_Process_ID,  printformatfileType);
+                filesNamesForopenFormat, Server.HtmlDecode(mailFormat), notify, lstDoc, AD_Process_ID, printformatfileType);
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
 
@@ -176,7 +187,7 @@ namespace VIS.Controllers
         {
             IsShareFiles = false;
             return SaveAttachmentinShareFiles(file, fileName, folderKey);
-            
+
         }
 
 
@@ -245,7 +256,7 @@ namespace VIS.Controllers
         /// <param name="values"></param>
         /// <returns></returns>
         [HttpPost]
-        public JsonResult InsertAttachmentText(string html, string values)
+        public JsonResult InsertAttachmentText(string html, string values, bool isSyncDoc=false)
         {
             string res = "";
             Ctx ct = Session["ctx"] as Ctx;
@@ -253,7 +264,7 @@ namespace VIS.Controllers
             List<Dictionary<string, string>> value = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(values);
 
             EmailModel model = new EmailModel(ct);
-            res = model.HtmlToPdf(Server.HtmlDecode(html), value);
+            res = model.HtmlToPdf(Server.HtmlDecode(html), value, isSyncDoc);
             return Json(JsonConvert.SerializeObject(res), JsonRequestBehavior.AllowGet);
         }
 
@@ -364,6 +375,88 @@ namespace VIS.Controllers
         //    string aaa = am.HtmlToPdf(newLetter);
         //    return Json(JsonConvert.SerializeObject(aaa), JsonRequestBehavior.AllowGet);
         //}
+
+        [HttpPost]
+        public ActionResult ConvertHtmlToSfdt(string htmlContent)
+        {
+            try
+            {
+                htmlContent = Uri.UnescapeDataString(htmlContent);
+                if (string.IsNullOrEmpty(htmlContent))
+                {
+                    return Json(new { success = false, error = "HTML content is required" }, JsonRequestBehavior.AllowGet);
+                }
+
+                // Method 1: Using WordDocument directly
+                WordDocument document = WordDocument.LoadString(htmlContent, FormatType.Html);
+
+                // Serialize the entire document to JSON (SFDT)
+                string sfdtContent = JsonConvert.SerializeObject(document);
+
+                document.Dispose();
+
+                return Json(new { success = true, sfdtContent = sfdtContent }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ConvertSfdtToHtml(string sfdtContent)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(sfdtContent))
+                    return Json(new { success = false, error = "SFDT content is required" }, JsonRequestBehavior.AllowGet);
+
+                using (var stream = WordDocument.Save(sfdtContent, FormatType.Html))
+                {
+                    stream.Position = 0;
+
+                    string html = new StreamReader(stream).ReadToEnd();
+                    var bodyMatch = Regex.Match(html, @"<body[^>]*>([\s\S]*?)<\/body>", RegexOptions.IgnoreCase);
+
+                    string cleanHtml = bodyMatch.Success ? bodyMatch.Groups[1].Value : html;
+
+                    return Content(cleanHtml.Trim(), "text/plain");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Content("ERROR: " + ex.Message, "text/plain");
+            }
+        }
+
+        [HttpPost]
+        public FileContentResult ExportPdf(string sfdtContent)
+        {
+            sfdtContent = Uri.UnescapeDataString(sfdtContent);
+
+            // Method 1: Using WordDocument directly
+            WordDocument doch = WordDocument.LoadString(sfdtContent, FormatType.Html);
+
+            // Serialize the entire document to JSON (SFDT)
+             sfdtContent = JsonConvert.SerializeObject(doch);
+            // Converts the sfdt to stream
+            Stream document = WordDocument.Save(sfdtContent, Syncfusion.EJ2.DocumentEditor.FormatType.Docx);
+            Syncfusion.DocIO.DLS.WordDocument doc = new Syncfusion.DocIO.DLS.WordDocument(document, Syncfusion.DocIO.FormatType.Docx);
+            //Instantiation of DocIORenderer for Word to PDF conversion
+            DocToPDFConverter render = new DocToPDFConverter();
+            //Converts Word document into PDF document
+            PdfDocument pdfDocument = render.ConvertToPDF(doc);           
+
+            MemoryStream outputStream = new MemoryStream();
+            pdfDocument.Save(outputStream);
+            outputStream.Position = 0;
+
+            pdfDocument.Close(true);
+            document.Close();
+
+            return File(outputStream.ToArray(), "application/pdf", "Document.pdf");
+
+        }
 
     }
 }

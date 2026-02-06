@@ -4443,6 +4443,11 @@ table.fixed-header thead tr {
     width: 100%;
 }
 
+
+.syncfusion-license-error{
+    display:none !important;
+}
+
 @keyframes viswidget_l {
     0% {
         background-position: 0 0,100% 0,100% 100%,0 100%

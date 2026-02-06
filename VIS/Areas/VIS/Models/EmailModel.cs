@@ -35,6 +35,8 @@ using VAModelAD.AIHelper;
 using VAdvantage.Common;
 using System.Dynamic;
 using VAdvantage.ProcessEngine;
+using Syncfusion.DocIO.DLS;
+//using Syncfusion.DocIO.DLS;
 
 namespace VIS.Models
 {
@@ -681,7 +683,7 @@ namespace VIS.Models
         /// <param name="html"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public string HtmlToPdf(string html, List<Dictionary<string, string>> values)
+        public string HtmlToPdf(string html, List<Dictionary<string, string>> values, bool isSyncDoc)
         {
             //string html = System.IO.File.ReadAllText(path);
 
@@ -699,8 +701,16 @@ namespace VIS.Models
 
             //byte[] arrays = HtmlToPdfbytes(sHtml.ToString());
             //return Convert.ToBase64String(arrays);
+            string filePath = "";
+            if (!isSyncDoc)
+            {
+                filePath = HtmlToPdfbytes(sHtml.ToString(), false);
+            }
+            else
+            {
+                filePath = HtmlToPdfBytes_Syncfusion(sHtml.ToString(), false);
 
-            string filePath = HtmlToPdfbytes(sHtml.ToString(), false);
+            }
             return filePath;
         }
 
@@ -826,6 +836,66 @@ namespace VIS.Models
                 return "";
             }
 
+        }
+
+
+        public dynamic HtmlToPdfBytes_Syncfusion(string html, bool loadByte)
+        {
+            // Split HTML by ~ if needed
+            string[] htmlSegments = html.Split('~');
+
+            // Create a WordDocument (in-memory)
+            Syncfusion.DocIO.DLS.WordDocument wordDoc = new Syncfusion.DocIO.DLS.WordDocument();
+
+            foreach (var segment in htmlSegments)
+            {
+                // Add a new section for each HTML segment
+                IWSection section = wordDoc.AddSection();
+
+                // Add paragraph
+                IWParagraph paragraph = section.AddParagraph();
+
+                // Insert HTML content
+                // Supports RTL if needed
+                bool isRtl = ctx.GetIsRightToLeft();
+                paragraph.AppendHTML(segment);
+
+                if (isRtl)
+                {
+                    //section.PageSetup.RightToLeft = true;
+                }
+
+                // Add page break after each segment except the last
+                if (segment != htmlSegments.Last())
+                {
+                    paragraph.AppendBreak(BreakType.PageBreak);
+                }
+            }
+
+            // Convert WordDocument to PDF
+            Syncfusion.DocToPDFConverter.DocToPDFConverter renderer = new Syncfusion.DocToPDFConverter.DocToPDFConverter();
+            Syncfusion.Pdf.PdfDocument pdfDocument = renderer.ConvertToPDF(wordDoc);
+
+            MemoryStream outputStream = new MemoryStream();
+            pdfDocument.Save(outputStream);
+            pdfDocument.Close(true);
+            wordDoc.Close();
+
+            if (loadByte)
+            {
+                return outputStream.ToArray();
+            }
+            else
+            {
+                string filePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + "TempDownload";
+                if (!Directory.Exists(filePath))
+                    Directory.CreateDirectory(filePath);
+
+                filePath = Path.Combine(filePath, "temp_" + CommonFunctions.CurrentTimeMillis() + ".pdf");
+                File.WriteAllBytes(filePath, outputStream.ToArray());
+                filePath = filePath.Substring(filePath.IndexOf("TempDownload"));
+                return filePath;
+            }
         }
 
         private static void SetDirection(PdfPTable tbl)
