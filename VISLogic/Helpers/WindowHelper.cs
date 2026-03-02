@@ -16,6 +16,7 @@ using VIS.DataContracts;
 using VIS.Classes;
 using VAdvantage.Controller;
 using System.Security.Cryptography;
+using System.Dynamic;
 
 namespace VIS.Helpers
 {
@@ -3667,6 +3668,61 @@ namespace VIS.Helpers
             recordID = Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
             return recordID;
         }
+
+        /// <summary>
+        /// Get Zoom query for table reference 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="refId"></param>
+        /// <param name="colName"></param>
+        /// <returns></returns>
+        public dynamic GetZoomWhereClause(string value, int refId,string colName)
+        {
+            dynamic data = new ExpandoObject();
+
+            string sql = "SELECT kc.ColumnName, tt.TableName"
+                            + " FROM AD_Ref_Table rt"
+                            + " INNER JOIN AD_Column kc ON (rt.Column_Key_ID=kc.AD_Column_ID)"
+                            + " INNER JOIN AD_Table tt ON (tt.AD_Table_ID=rt.AD_Table_ID) "
+                            + " WHERE rt.AD_Reference_ID=" + refId;
+
+            string tblName = "",keyColName= colName;
+
+            IDataReader dr = DB.ExecuteReader(sql, null, null);
+            if (dr.Read())
+            {
+
+                keyColName = dr[0].ToString();
+                tblName = dr[1].ToString();
+            }
+            dr.Close();
+
+            //check for table name key col name asre same
+            if (keyColName == tblName + "_ID")
+            {
+                data.colName = keyColName;
+                data.value = value;
+            }
+            else
+            {
+                data.colName = tblName + "_ID";
+                string sql1 = "SELECT MAX(" + tblName + "_ID) FROM " + tblName + " WHERE " + keyColName
+                             + " = ";
+                int outInt;
+                if(int.TryParse(value,out outInt))
+                {
+                    sql1 += outInt;
+                }
+                else
+                {
+                    sql1 += DB.TO_STRING(value);
+                }
+                data.value = DB.ExecuteScalar(sql1);
+            }
+            return data;
+        }
+
+
 
 
         public object GetWindowRecord(Ctx ctx, List<string> Columns, string TableName, int AD_Window_ID, int AD_Tab_ID, int WindowNo, string WhereClause, List<string> Encryptedfields, List<string> ObscureFields)

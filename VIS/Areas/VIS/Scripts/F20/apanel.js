@@ -3899,7 +3899,7 @@
         this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
 
         if (!isAPanelTab && this.showMultiViewOnly) { // in case of compiste and grid mode
-            this.curGC.refreshRowPresentation();
+            this.curGC.refreshRowPresentation(true);
         }
 
 
