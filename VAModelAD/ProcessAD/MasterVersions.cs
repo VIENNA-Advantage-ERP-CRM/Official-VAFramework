@@ -126,7 +126,6 @@ namespace VAdvantage.Process
                 // if not present then create table 
                 MTable tblVer = null;
                 if (Ver_AD_Table_ID <= 0)
-                if (Ver_AD_Table_ID <= 0)
                 {
                     string tableName = tbl.GetTableName();
                     // create new Version table for parent table
