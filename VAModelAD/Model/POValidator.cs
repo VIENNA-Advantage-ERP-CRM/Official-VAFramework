@@ -460,9 +460,16 @@ namespace VAModelAD.Model
             if (value == null)  //	not overwritten by DocType and not manually entered
             {
                 if (masDet != null && masDet.TableName != null && masDet.TableName != "")
-                    value = MSequence.GetDocumentNo(po.GetAD_Client_ID(), masDet.TableName, po.Get_Trx(), po.GetCtx());
+                {
+                    //   value = MSequence.GetDocumentNo(po.GetAD_Client_ID(), masDet.TableName, po.Get_Trx(), po.GetCtx());
+                    value = MSequence.GetDocumentNo(masDet.TableName, po.Get_Trx(), po.GetCtx(), po);
+                }
                 else
-                    value = MSequence.GetDocumentNo(po.GetAD_Client_ID(), po.GetTableName(), po.Get_Trx(), po.GetCtx());
+                {
+                    // Handled to get Search Key based on Organization same as Document No.
+                    value = MSequence.GetDocumentNo(GetTable(po.Get_TableName()), po.Get_Trx(), po.GetCtx(), po);
+                    //value = MSequence.GetDocumentNo(po.GetAD_Client_ID(), po.GetTableName(), po.Get_Trx(), po.GetCtx());
+                }
             }
             return value;
         }
