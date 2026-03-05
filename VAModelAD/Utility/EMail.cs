@@ -31,6 +31,7 @@ using VAdvantage.DataBase;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using VAModelAD.Model;
 
 namespace VAdvantage.Utility
 {
@@ -1737,7 +1738,7 @@ namespace VAdvantage.Utility
 
             if (!sendFromClient)
             {
-                MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+                MUser user = MUser.Get(ctx);
                 username = user.GetEMailUser();
                 password = user.GetEMailUserPW();
                 if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
@@ -1758,7 +1759,7 @@ namespace VAdvantage.Utility
 
 
             //By Sukhwinder on 3rd Jan, 2018, for getting FromName.
-            MUser user1 = new MUser(ctx, userConfig.GetAD_User_ID(), null);
+            MUser user1 = MUser.Get(ctx, userConfig.GetAD_User_ID());// new MUser(ctx, userConfig.GetAD_User_ID(), null);
             uName = user1.GetName();
             //
 
@@ -1780,7 +1781,7 @@ namespace VAdvantage.Utility
             }
             if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(GetSmtpHost()) || sendFromClient)
             {
-                X_AD_Client client = new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
+                X_AD_Client client = MClient.Get(ctx); // fix issue for 0 client id new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
                 SetSmtpHost(client.GetSmtpHost());
                 smtpport = client.GetSmtpPort();
                 if (smtpport != 0)
@@ -1791,7 +1792,7 @@ namespace VAdvantage.Utility
                 IsSmtpAuthorization = client.IsSmtpAuthorization();
                 if (!sendFromClient)
                 {
-                    MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+                    MUser user = MUser.Get(ctx);
                     username = user.GetEMailUser();
                     password = user.GetEMailUserPW();
                     if (!String.IsNullOrEmpty(username) && !username.Contains('@'))
@@ -1874,7 +1875,7 @@ namespace VAdvantage.Utility
             }
 
 
-            X_AD_Client client = new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
+            X_AD_Client client = MClient.Get(ctx); //fix for zero client id new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
             if (Env.IsModuleInstalled("VA101_"))
             {
                 protocol = Util.GetValueOfString(client.Get_Value("VA101_Protocol"));
@@ -1888,7 +1889,7 @@ namespace VAdvantage.Utility
 
                 if (!IsSendFromClient)
                 {
-                    MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+                    MUser user = MUser.Get(ctx);//  fix for system user, ctx.GetAD_User_ID(), null);
                     username = user.GetEMailUser();
                     password = user.GetEMailUserPW();
                 }
@@ -1951,7 +1952,7 @@ namespace VAdvantage.Utility
                     {
                         if (!IsSendFromClient)
                         {
-                            MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+                            MUser user = MUser.Get(ctx); // fix for system user new MUser(ctx, ctx.GetAD_User_ID(), null);
                             username = user.GetEMailUser();
                             password = user.GetEMailUserPW();
                         }
@@ -1982,7 +1983,7 @@ namespace VAdvantage.Utility
                 }
 
 
-                X_AD_Client client = new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
+                X_AD_Client client = MClient.Get(ctx);// fix for 0 client id new X_AD_Client(ctx, ctx.GetAD_Client_ID(), null);
                 if (Env.IsModuleInstalled("VA101_"))
                 {
                     protocol = Util.GetValueOfString(client.Get_Value("VA101_Protocol"));
@@ -1996,7 +1997,7 @@ namespace VAdvantage.Utility
 
                     if (!IsSendFromClient && !isTenantTestMail)
                     {
-                        MUser user = new MUser(ctx, ctx.GetAD_User_ID(), null);
+                        MUser user = MUser.Get(ctx);//   new MUser(ctx, ctx.GetAD_User_ID(), null);
                         username = user.GetEMailUser();
                         password = user.GetEMailUserPW();
                     }

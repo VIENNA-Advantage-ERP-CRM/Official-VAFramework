@@ -128,6 +128,7 @@ namespace VAdvantage.Model
                 }
                 cache.Add(key, retValue);
             }
+            retValue.p_ctx = ctx; 
             return retValue;
         }
 

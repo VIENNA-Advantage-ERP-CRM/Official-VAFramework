@@ -4469,3 +4469,16 @@ table.fixed-header thead tr {
         background-position: 100% 0,100% 100%,0 100%,0 0
     }
 }
+
+/** Attribute Set Instance Control */
+
+.vis-attribute-popup {
+    height: 290px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding-right: 4px;
+    padding-top: 4px;
+}
+ 
+

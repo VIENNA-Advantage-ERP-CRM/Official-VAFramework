@@ -745,8 +745,9 @@ namespace VAdvantage.WF
                             }
                         }
                     }
-                }	//	No Supervisor
-
+                }   //	No Supervisor
+                //ownDocument should always be false for the next user
+                ownDocument = false;
             }	//	while there is a user to approve
 
             log.Fine("No user found");
@@ -2863,31 +2864,37 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             //	Check if user approves own document when a role is responsible
             //if (GetNode().IsUserApproval() && (GetPO().GetType() == typeof(DocAction) || GetPO().GetType().GetInterface("DocAction") == typeof(DocAction)))
             //{
-            GetPO();
+
+
+            /*If the document to approve really IS his own document
+               this will be respected when trying to find an approval user in
+               the call to GetApprovalUser(...) */
+
+            //GetPO();
             // Check applied if the approver is the user who created the document
-            if (_po != null && AD_User_ID == _po.GetCreatedBy())
-            {
-                //DocAction doc = (DocAction)_po;
-                MUser user = new MUser(GetCtx(), AD_User_ID, null);
-                MRole[] roles = user.GetRoles(_po.GetAD_Org_ID());
-                bool canApproveOwnDoc = false;
-                for (int r = 0; r < roles.Length; r++)
-                {
-                    if (roles[r].IsCanApproveOwnDoc())
-                    {
-                        canApproveOwnDoc = true;
-                        break;
-                    }	//	found a role which allows to approve own document
-                }
-                if (!canApproveOwnDoc)
-                {
-                    //String info = user.GetName() + " cannot approve own document " + doc;
-                    String info = user.GetName() + " cannot approve own document ";
-                    AddTextMsg(info);
-                    log.Fine(info);
-                    return false;		//	ignore
-                }
-            }
+            //if (_po != null && AD_User_ID == _po.GetCreatedBy())
+            //{
+            //    //DocAction doc = (DocAction)_po;
+            //    MUser user = new MUser(GetCtx(), AD_User_ID, null);
+            //    MRole[] roles = user.GetRoles(_po.GetAD_Org_ID());
+            //    bool canApproveOwnDoc = false;
+            //    for (int r = 0; r < roles.Length; r++)
+            //    {
+            //        if (roles[r].IsCanApproveOwnDoc())
+            //        {
+            //            canApproveOwnDoc = true;
+            //            break;
+            //        }	//	found a role which allows to approve own document
+            //    }
+            //    if (!canApproveOwnDoc)
+            //    {
+            //        //String info = user.GetName() + " cannot approve own document " + doc;
+            //        String info = user.GetName() + " cannot approve own document ";
+            //        AddTextMsg(info);
+            //        log.Fine(info);
+            //        return false;		//	ignore
+            //    }
+            //}
 
             SetWFState(StateEngine.STATE_RUNNING);
             SetAD_User_ID(AD_User_ID);

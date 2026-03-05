@@ -680,9 +680,11 @@
 
                     if (colValue.startsWith && colValue.startsWith("<") && colValue.endsWith(">")) {
                         colValue = colValue.replace("<", "").replace(">", "");
-                        var colValueTemp = mField.lookup.getDirect(colValue, true, true)
-                        if (colValueTemp && colValueTemp.Name) {
-                            colValue = colValueTemp.Name;
+                        if (mField.lookup.getDirect) {
+                            var colValueTemp = mField.lookup.getDirect(colValue, true, true)
+                            if (colValueTemp && colValueTemp.Name) {
+                                colValue = colValueTemp.Name;
+                            }
                         }
                     }
 
