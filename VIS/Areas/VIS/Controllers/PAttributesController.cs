@@ -117,7 +117,9 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             Sq1Atribute = SecureEngineBridge.DecryptByClientKey(Sq1Atribute, ctx.GetSecureKey());
             PAttributesModel model = new PAttributesModel();
-            return Json(JsonConvert.SerializeObject(model.GetAttributeData(Sq1Atribute, Product_ID, ctx)), JsonRequestBehavior.AllowGet);
+            var jRes = Json(JsonConvert.SerializeObject(model.GetAttributeData(Sq1Atribute, Product_ID, ctx)), JsonRequestBehavior.AllowGet);
+            jRes.MaxJsonLength = int.MaxValue;
+            return jRes;
         }
 
         // Added by Bharat on 01 june 2017
