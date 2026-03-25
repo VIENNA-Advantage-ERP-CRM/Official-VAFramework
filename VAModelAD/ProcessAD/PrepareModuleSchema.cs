@@ -922,6 +922,12 @@ namespace VAdvantage.Process
                 {
                     GetColumn(id, false, false);
                 }
+
+                if (dr[2].ToString() == tableName + "_GUID")
+                {
+                    GetColumn(id, false, false);
+                }
+
                 if (Util.GetValueOfInt(dr["AD_Val_Rule_ID"]) != 0)
                 {
                     GetValRule(Util.GetValueOfInt(dr["AD_Val_Rule_ID"]));
