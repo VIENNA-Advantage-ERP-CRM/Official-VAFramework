@@ -139,6 +139,10 @@
     background-position: center center;*/
 }
 
+    .vis-ad-w-p-busy i {
+        width: auto;
+    }
+
 .vis-ad-w-p-filterpnl {
     grid-column: 1/1;
     grid-row: 1/8;

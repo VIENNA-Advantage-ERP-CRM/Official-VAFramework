@@ -105,9 +105,22 @@ namespace VIS.Controllers
         [ValidateAntiForgeryToken]
         public JsonResult JsonLogin(LoginModel model, string returnUrl)
         {
-            return CommonLogin(model, returnUrl, false);
+            return CommonLogin(model, returnUrl, false);        
         }
-
+        /// <summary>
+        /// This fucntion used to get QR
+        /// </summary>
+        /// <param name="userValue"></param>
+        /// <param name="tokenKey2FA"></param>
+        /// <param name="password"></param>
+        /// <returns>QR Image url</returns>
+        /// <author>VIS_427</author>
+        public JsonResult GetQROnRefresh(string userValue,string tokenKey2FA, string password)
+        {
+            LoginHelper obj = new LoginHelper();
+            var result = obj.GetQROnRefresh(userValue, tokenKey2FA,password);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
 
         public JsonResult CommonLogin(LoginModel model, string returnUrl, bool isSSO)
         {
@@ -149,7 +162,7 @@ namespace VIS.Controllers
                     // if user refresh page  while On reset pwd page, the system show login 1 page.
                     // In this case, reset pwd is true (picked from tempdata) but newpwd is null. 
                     //So user must try to login 1(processdToLogin = 1)
-                    if ( resetPwd && model.Login1Model.NewPassword != null)
+                    if (resetPwd && model.Login1Model.NewPassword != null)
                     {
                         string validated = LoginHelper.ValidatePassword(password, model.Login1Model.NewPassword, model.Login1Model.ConfirmNewPassword);
                         if (validated.Length > 0)
@@ -261,7 +274,7 @@ namespace VIS.Controllers
             return Json(new { errors = GetErrorsFromModelState() });
         }
 
-            [NonAction]
+        [NonAction]
         private JsonResult Login(LoginModel model, string returnUrl, List<KeyNamePair> roles)
         {
             if (model.Login2Model != null)
@@ -423,7 +436,7 @@ namespace VIS.Controllers
                         var authenticationManager = ctx.Authentication;
                         // Sign In.
                         authenticationManager.SignIn(new AuthenticationProperties() { IsPersistent = Util.GetValueOfBool(userClaims?.FindFirst(ClaimTypes.IsPersistent)?.Value) }, claimIdenties);
-                        
+
                         //Save in login setting
                         var actMgr = new AccountManager(model);
                         actMgr.RunAsync();
@@ -529,20 +542,20 @@ namespace VIS.Controllers
                 //VAdvantage.Logging.VLogMgt.Shutdown(ctx);
                 // MSession s = MSession.Get(ctx);
                 // s.Logout();
-               
+
             }
             catch
             {
 
             }
-            return SignOff(ctx,Session.SessionID);
+            return SignOff(ctx, Session.SessionID);
 
         }
 
-        public ActionResult SignOff(Ctx  ctx, string webSessionId)
+        public ActionResult SignOff(Ctx ctx, string webSessionId)
         {
-          // if (ctx != null)
-             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx,webSessionId);
+            // if (ctx != null)
+            VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx, webSessionId);
             //FormsAuthentication.SignOut();          
             HttpCookie cookie = Request.Cookies["ProviderType"];
             var userClaims = System.Security.Claims.ClaimsPrincipal.Current;

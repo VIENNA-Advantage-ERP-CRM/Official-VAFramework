@@ -485,8 +485,8 @@
             //    divbtnRight.append(btnRequery);
             //}
             //else {
-            divbtnRight.append(btnCancel);
             divbtnRight.append(btnOK);
+            divbtnRight.append(btnCancel);
             divbtnRight.append(btnShowSaved);
             divbtnRight.append(btnAddCart);
             divbtnsec.append(btnScanFile);

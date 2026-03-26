@@ -56,7 +56,11 @@ namespace VAModelAD.Model
             int key = AD_Client_ID;
             MClient client = (MClient)s_cache[key];
             if (client != null)
+            {
+                client.p_ctx = ctx; //update context
                 return client;
+            }
+                
             client = new MClient(ctx, AD_Client_ID, null);
             if (AD_Client_ID == 0)
                 client.Load((Trx)null);
@@ -594,7 +598,7 @@ namespace VAModelAD.Model
                 return "Could not create EMail: " + GetName();
             try
             {
-                String msg = email.Send();
+                String msg = email.SendTestMail();
                 if (EMail.SENT_OK.Equals(msg))
                 {
                     log.Info("Sent Test EMail to " + GetRequestEMail());

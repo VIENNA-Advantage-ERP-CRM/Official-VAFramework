@@ -29,6 +29,12 @@ using iTextSharp.text.html.simpleparser;
 using VAdvantage.Classes;
 using VIS.DataContracts;
 using VIS.Helpers;
+using VAdvantage.Logging;
+using static VAModelAD.AIHelper.AIHelperDataContracts;
+using VAModelAD.AIHelper;
+using VAdvantage.Common;
+using System.Dynamic;
+using VAdvantage.ProcessEngine;
 
 namespace VIS.Models
 {
@@ -38,6 +44,8 @@ namespace VIS.Models
 
         string AttachmentsUploadFolderName = "TempDownload";
         // UserInformation userinfo = null;
+
+        private static VLogger _log = VLogger.GetVLogger(typeof(EmailModel).FullName);
 
         public EmailModel(Ctx ctx)
         {
@@ -105,7 +113,7 @@ namespace VIS.Models
         /// <returns></returns>
         public string SendMailstart(List<NewMailMessage> mails, int AD_User_ID, int AD_Client_ID, int AD_Org_ID, int attachment_ID,
             List<string> fileNames, List<string> fileNameForOpenFormat, string mailFormat, bool notify, VAdvantage.Utility.EMail sendmails,
-            List<int> documentID, int Ad_Process_ID,  string printformatfileType)
+            List<int> documentID, int Ad_Process_ID, string printformatfileType)
         {
 
 
@@ -116,19 +124,41 @@ namespace VIS.Models
             }
 
 
-            UserInformation userinfo = new UserInformation();
+
+
+
+
+            //int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
+            int credentialId;
+            string protocol = MUserMailConfigration.GetMailProtocol(ctx, out credentialId);
+
             SMTPConfig config = null;
-            config = MailConfigMethod.GetUSmtpConfig(AD_User_ID, ctx);
-            // var config = "";
-            if (config == null)
+            UserInformation userinfo = new UserInformation();
+            if (protocol == "SM" || protocol == "SI")
             {
-                MClient client = new MClient(ctx, AD_Client_ID, null);
-                userinfo.Email = client.GetRequestEMail();
+                config = MailConfigMethod.GetUSmtpConfig(AD_User_ID, ctx);
+                // var config = "";
+                if (config == null)
+                {
+                    //fix for zero client id
+                    //MClient client = new MClient(ctx, AD_Client_ID, null);
+                    MClient client = MClient.Get(ctx,AD_Client_ID);
+                    userinfo.Email = client.GetRequestEMail();
+                }
+                else
+                {
+                    //Add user info to list..
+                    userinfo.Email = config.Email;
+                }
+            }
+            else if (credentialId > 0)
+            {
+                userinfo.Email = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA101_Email FROM VA101_APIAuthCredential WHERE VA101_APIAuthCredential_ID = " + credentialId));
             }
             else
             {
-                //Add user info to list..
-                userinfo.Email = config.Email;
+
+                return "ConfigurationIncompleteOrNotFound";
             }
 
             string[] to = null;
@@ -169,7 +199,8 @@ namespace VIS.Models
 
                 if (mails[j].Recordids != null)          //in case of static mail
                 {
-                    records = mails[j].Recordids.Split(',');
+                    string recID = mails[j].Recordids.TrimEnd(',');
+                    records = recID.Split(',');
                 }
 
                 _table_id = Convert.ToInt32(mail[j].TableID);
@@ -312,10 +343,10 @@ namespace VIS.Models
                 {
                     for (int k = 0; k < records.Length; k++)
                     {
-                        if (records[k] == null || records[k] == "" || records[k] == "0")
-                        {
-                            continue;
-                        }
+                        //if (records[k] == null || records[k] == "" || records[k] == "0")
+                        //{
+                        //    continue;
+                        //}
                         if (res1 != "OK")
                         {
                             _mAttachment.SetIsMailSent(false);
@@ -334,7 +365,7 @@ namespace VIS.Models
                         _mAttachment.SetMailAddress(bcctext.ToString());
                         _mAttachment.SetAttachmentType("M");
 
-                        _mAttachment.SetRecord_ID(Convert.ToInt32(records[k]));
+                        _mAttachment.SetRecord_ID(Util.GetValueOfInt(records[k]));
 
                         _mAttachment.SetTextMsg(message);
                         _mAttachment.SetTitle(sub);
@@ -358,6 +389,54 @@ namespace VIS.Models
                         {
                             // log.SaveError(Msg.GetMsg(Env.GetCtx(), "RecordNotSaved"), "");
                         }
+                    }
+                }
+                else
+                {
+                    if (res1 != "OK")
+                    {
+                        _mAttachment.SetIsMailSent(false);
+                    }
+                    else
+                    {
+                        _mAttachment.SetIsMailSent(true);
+                    }
+                    int AD_Client_Id = ctx.GetAD_Client_ID();
+                    int iOrgid = ctx.GetAD_Org_ID();
+
+                    _mAttachment.SetAD_Client_ID(AD_Client_Id);
+                    _mAttachment.SetAD_Org_ID(iOrgid);
+                    _mAttachment.SetAD_Table_ID(_table_id);
+                    _mAttachment.IsActive();
+                    _mAttachment.SetMailAddress(bcctext.ToString());
+                    _mAttachment.SetAttachmentType("M");
+
+                    _mAttachment.SetRecord_ID(Convert.ToInt32(0));
+
+                    _mAttachment.SetTextMsg(message);
+                    _mAttachment.SetTitle(sub);
+
+                    _mAttachment.SetMailAddressBcc(bcctext.ToString());
+                    _mAttachment.SetMailAddress(mails[j].To);
+                    _mAttachment.SetMailAddressCc(mails[j].Cc);
+                    _mAttachment.SetMailAddressFrom(userinfo.Email);
+                    if (_mAttachment.GetEntries().Length > 0)
+                    {
+                        _mAttachment.SetIsAttachment(true);
+                    }
+                    else
+                    {
+                        _mAttachment.SetIsAttachment(false);
+                    }
+                    _mAttachment.NewRecord();
+                    if (_mAttachment.Save())
+                    {
+                        _log.SaveInfo("MAIL LOG", "Saved");
+                    }
+                    else
+                    {
+                        _log.SaveError("MAIL LOG", "NOT Saved");
+                        // log.SaveError(Msg.GetMsg(Env.GetCtx(), "RecordNotSaved"), "");
                     }
                 }
 
@@ -412,6 +491,10 @@ namespace VIS.Models
             records = null;
             return res.ToString();
         }
+
+
+
+
 
         /// <summary>
         /// Get Attachment Id From Metadata Table When DMS Module Is Installed
@@ -986,10 +1069,144 @@ namespace VIS.Models
             #endregion
         }
 
+        /// <summary>
+        /// Get response of an email based on the paramters passed
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <param name="message"></param>
+        /// <param name="recordId"></param>
+        /// <param name="tableID"></param>
+        /// <param name="ctx"></param>
+        /// <param name="prompt"></param>
+        /// <returns></returns>
+        public MessagePayload GetEmailResponse(string subject, string message, int recordId, int tableID, Ctx ctx, string prompt)
+        {
+            MessagePayload payload = new MessagePayload();
+            string threadID = Common.GetThreadID(tableID, recordId, Common.GetRecordOrg(ctx, tableID, recordId));
+            if (!string.IsNullOrEmpty(threadID))
+            {
+                payload = AIPayload.SendEmailReplyRequestAsync(threadID, subject, message, ctx, prompt);
+            }
+            else
+                payload = AIPayload.SendEmailReplyRequestAsync(threadID, subject, message, ctx, prompt);
+            return payload;
+        }
 
+        /// <summary>
+        /// Fetch thread ID against table and record ID
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="recordId"></param>
+        /// <param name="tableID"></param>
+        /// <param name="windowID"></param>
+        /// <param name="tabID"></param>
+        /// <returns></returns>
+        public string GetRecordThread(Ctx ctx, int recordId, int tableID, int windowID, int tabID)
+        {
+            int AD_Org_ID = Common.GetRecordOrg(ctx, tableID, recordId);
+            string threadID = Common.GetThreadID(tableID, recordId, AD_Org_ID);
+            if (!string.IsNullOrEmpty(threadID))
+            {
+                return threadID;
+            }
+            else
+            {
+                if (tabID == 0 && windowID == 0 && tableID != 0)
+                {
+                    windowID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COALESCE(AD_Window_ID,0) FROM AD_Table WHERE AD_Table_ID = " + tableID));
+                    if (windowID > 0)
+                    {
+                        tabID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Tab_ID FROM AD_Tab WHERE AD_Window_ID = " + windowID + " AND AD_Table_ID = " + tableID + " ORDER BY SeqNo"));
+                    }
+                }
+                if (tabID != 0)
+                {
+                    int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " ORDER BY AD_Org_ID DESC"));
+                    if (asstScreenID > 0)
+                    {
+                        int Process_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Process_ID FROM AD_Process WHERE ISActive='Y' AND Value='VAI01_CreateUpdateRecordThread'"));
+                        MPInstance pin = new MPInstance(ctx, Process_ID, 0); // create object of MPInstance
+                        if (!pin.Save())
+                        {
+                            ValueNamePair vnp = VLogger.RetrieveError();
+                            string errorMsg = "";
+                            if (vnp != null)
+                            {
+                                errorMsg = vnp.GetName();
+                                if (errorMsg == "")
+                                    errorMsg = vnp.GetValue();
+                            }
+                            //if (errorMsg == "")
+                            //    result = errorMsg = Msg.GetMsg(ctx, "DocNotCompleted");
+                            return "";
+                        }
+                        VAdvantage.ProcessEngine.ProcessInfo pi = new VAdvantage.ProcessEngine.ProcessInfo("WF", Process_ID);
+                        pi.SetAD_User_ID(ctx.GetAD_User_ID());
+                        pi.SetAD_Client_ID(ctx.GetAD_Client_ID());
+                        pi.SetAD_PInstance_ID(pin.GetAD_PInstance_ID());
+                        pi.SetRecord_ID(recordId);
+                        pi.SetTable_ID(tableID);
+                        MPInstancePara para = new MPInstancePara(pin, 10);
+                        para.setParameter("AD_Table_ID", tableID);
+                        if (!para.Save())
+                        {
+                            String msg = "No AD_Table_ID Parameter added";  //  not translated
+                            _log.Log(Level.SEVERE, msg);
+                            return "";
+                        }
+                        para = new MPInstancePara(pin, 20);
+                        para.setParameter("AD_Tab_ID", tabID);
+                        if (!para.Save())
+                        {
+                            String msg = "No AD_Tab_ID Parameter added";  //  not translated
+                            _log.Log(Level.SEVERE, msg);
+                            return "";
+                        }
+                        para = new MPInstancePara(pin, 30);
+                        para.setParameter("record_ID", recordId);
+                        if (!para.Save())
+                        {
+                            String msg = "No record_ID Parameter added";  //  not translated
+                            _log.Log(Level.SEVERE, msg);
+                            return "";
+                        }
+                        para = new MPInstancePara(pin, 40);
+                        para.setParameter("IsUpdate", "false");
+                        if (!para.Save())
+                        {
+                            String msg = "No IsUpdate Parameter added";  //  not translated
+                            _log.Log(Level.SEVERE, msg);
+                            return "";
+                        }
+                        ProcessCtl worker = new ProcessCtl(ctx, null, pi, null);
+                        worker.Run();
+                        if (pi.IsError())
+                        {
+                            ValueNamePair vnp = VLogger.RetrieveError();
+                            string errorMsg = "";
+                            if (vnp != null)
+                            {
+                                errorMsg = vnp.GetName();
+                                if (errorMsg == "")
+                                    errorMsg = vnp.GetValue();
+                            }
+                            if (errorMsg == "")
+                                errorMsg = pi.GetSummary();
+                            if (errorMsg == "")
+                                errorMsg = Msg.GetMsg(ctx, "DocNotCompleted");
+                            _log.SaveError("", errorMsg);
+                            return "";
+                        }
+                        else
+                        {
+                            threadID = Common.GetThreadID(tableID, recordId, Common.GetRecordOrg(ctx, tableID, recordId));
+                        }
+                    }
+                }
+                return threadID;
+            }
+        }
     }
-
-
 
     public class NewMailMessage
     {
@@ -1020,15 +1237,11 @@ namespace VIS.Models
         public string AttachmentFolder { get; set; }
     }
 
-
-
     public class KeyValues
     {
         public string Key { get; set; }
         public string Name { get; set; }
     }
-
-
 
     public class SavedAttachmentInfo
     {

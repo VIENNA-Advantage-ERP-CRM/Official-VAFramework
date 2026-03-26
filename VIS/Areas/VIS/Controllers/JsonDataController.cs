@@ -1091,6 +1091,12 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(obj.GetZoomParentRecord(SelectColumn, SelectTable, WhereColumn, WhereValue)), JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult GetZoomWhereClause(String value, int refId, string colName)
+        {
+            WindowHelper obj = new WindowHelper();
+            return Json(JsonConvert.SerializeObject(obj.GetZoomWhereClause(value, refId, colName)), JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPost]
         public ActionResult GetRecordForFilter(string data)
         {

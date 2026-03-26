@@ -17,12 +17,13 @@
         var $self = this;
         var $root = $('<div class="vis-maindiv">');
         var widgetID = null;
+        var FllUpsMain;
         var $bsyDiv = null;
 
 
         /* Initialize the form design */
         this.Initalize = function (widgetId) {
-            createBusyIndicator();
+            createBusyIndicator();          
             if ((this.widgetInfo && this.widgetInfo.AD_UserHomeWidgetID)) {
                 widgetID = this.widgetInfo.AD_UserHomeWidgetID;
                 var followUpContainer = $('<div id="openModal">' +
@@ -190,6 +191,7 @@
                         $('body').off('click', '#followupsCloseBtn' + widgetID);
                         $('body').on('click', '#followupsCloseBtn' + widgetID, function (e) {
                             $thisObj.unReadMsgCount();
+                            $thisObj.refreshWidget();
                             w2popup.close();
                             $(this).remove();
                         });
@@ -221,7 +223,11 @@
             var fllpcount = 0, fllPageSize = 10, fllPage = 1, fllLastPage = 0, fllcntpage = 0;
             var fllCmntPageSize = 10, fllCmntPage = 0, fllCmntLastPage = 0, fllCmntcntpage = 0;
             var fllChatID = 0, fllSubscriberID = 0, isFllScroll = false, isRef = false, isfllBusy = false;
-            var FllUpsMain = $("#fllupsList");
+            FllUpsMain = $("#fllupsList");
+            setInterval(function () {
+                FllUpsMain.empty();
+                getFllUps(fllPageSize, fllPage, true);
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
 
             FllUpsMain.empty();
             getFllUps(fllPageSize, fllPage, true);
@@ -317,7 +323,7 @@
                         $(FllCmntTxt).parent('.vis-feedMessage').css('flex-direction', '');
                     }
                     else {
-                        VIS.ADialog.info("EnterData");
+                        VIS.ADialogCallback.info("EnterData", '', '', lastFocus);
                     }
                 }
                 //else if (datafll == "UID") {
@@ -345,7 +351,7 @@
                     // Display the error message when there is no data in textarea
                     if (code === 13 && cmntTxt.trim() == "" && !evnt.altKey) {
                         evnt.preventDefault();
-                        VIS.ADialog.info("EnterData");
+                        VIS.ADialogCallback.info("EnterData", '', '', lastFocus);
                     }
                     // Check whether the enter key is pressed
                     if (code === 13) {
@@ -524,7 +530,7 @@
                                 }
                                 this.parentNode.style.flexDirection = this.scrollHeight > textAreaHeight ? 'column' : 'row';
                             });
-                        }
+                        } 
                         else {
                             if (isFllScroll == false) {
                                 if (VIS.Application.isRTL) {
@@ -544,6 +550,12 @@
                     }
                 });
             }
+
+            // Sets focus back to the comment text box after the info popup is closed
+            function lastFocus() {
+                $(FllCmntTxt).focus();
+            }
+
             //get fllups comment from Controller
             function getFllUpsCmnt(FllupsID, fllCmntPageSize, fllCmntPage) {
                 var url = VIS.Application.contextUrl + 'Home/GetJSONFllupsCmnt/';

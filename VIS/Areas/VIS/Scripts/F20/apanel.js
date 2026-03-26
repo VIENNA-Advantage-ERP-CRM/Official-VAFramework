@@ -578,6 +578,11 @@
                 this.aTask.setTextDirection("r");
                 $ulactionbar.append(this.aTask.getListItmIT());
             }
+            if (mWindow.getIsAdvanceTask()) {
+                this.aAdvanceTask = this.addActions("ATK", null, false, false, false, onAction); //1
+                this.aAdvanceTask.setTextDirection("r");
+                $ulactionbar.append(this.aAdvanceTask.getListItmIT());
+            }
             if (mWindow.getIsEmail()) {
                 this.aEmail = this.addActions("EML", null, false, false, false, onAction); //1
                 this.aEmail.setTextDirection("r");
@@ -833,12 +838,14 @@
                     $tabPanel.parent().removeClass(clsName + clsSuffixOld).addClass(
                         clsName + clsSuffix);
                 }
-                if (this.curGC) {
+                if (this.curGC && this.curGC.vTabPanel) {
                     $tabPanel.append(this.curGC.getTabPanel());
                     if (this.curTab.getIsShowBothTP()) {
                         $divReserveTabPanel.append(this.curGC.getSpecialTabPanel());
                         $divReserveTabPanel.css({ "display": "grid" });
                     }
+
+
                 }
                 $tabPanel.css({ "display": "grid" });
                 if (this.curGC) {
@@ -977,7 +984,7 @@
                 this.refresh();
             }
 
-            if (self.curGC.aFilterPanel.isConditionApply()) {
+            if (self.curGC && self.curGC.aFilterPanel.isConditionApply()) {
                 self.setFilterActive(true);
             } else {
                 self.setFilterActive(false);
@@ -2633,6 +2640,10 @@
             tis.cmd_task();
         }
 
+        else if (tis.aAdvanceTask && tis.aAdvanceTask.getAction() === action) {
+            tis.cmd_advanceTask();
+        }
+
         else if (tis.aSubscribe && tis.aSubscribe.getAction() === action) {
             tis.cmd_subscribe();
         }
@@ -2672,7 +2683,7 @@
         else if (tis.isShowSharedRecord && tis.aSharedRecord.getAction() === action) {
             tis.cmd_RecordShared();
         }
-            //Rahul Mittal
+        //Rahul Mittal
         else if (tis.aAssignRecord && tis.aAssignRecord.getAction() === action) {
             tis.cmd_AssignRecord();
         }
@@ -3352,7 +3363,7 @@
         if (window.VADMS) {
             if (action == 'CDT') {
                 var frame = new VIS.CFrame();
-                var editDoc = new window.VADMS.editDocument(0, "", 0, "", 0, null, "", aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID());
+                var editDoc = new window.VADMS.editDocument(0, "", 0, "", 0, null, "", aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.curWindowNo, aPanel.curTab.getAD_Tab_ID());
                 frame.setName(VIS.Msg.getMsg("VADMS_CreateDocument"));
                 frame.setTitle(VIS.Msg.getMsg("VADMS_CreateDocument"));
                 frame.hideHeader(true);
@@ -3414,10 +3425,10 @@
                 frame.show();
             }
             else if (action == 'UDT') {
-                window.VADMS.uploaddocument(0, aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.$parentWindow.name, aPanel.curTab.getName());
+                window.VADMS.uploaddocument(0, aPanel.curTab.getAD_Window_ID(), aPanel.curTab.getAD_Table_ID(), aPanel.curTab.getRecord_ID(), aPanel.$parentWindow.name, aPanel.curTab.getName(), aPanel.curWindowNo, aPanel.curTab.getAD_Tab_ID());
             }
             else if (action == 'CAC') {
-                var wtrid = aPanel.curTab.getAD_Window_ID() + "|" + aPanel.curTab.getAD_Table_ID() + "|" + aPanel.curTab.getRecord_ID() + "|" + aPanel.$parentWindow.name + "|" + aPanel.curTab.getName();
+                var wtrid = aPanel.curTab.getAD_Window_ID() + "|" + aPanel.curTab.getAD_Table_ID() + "|" + aPanel.curTab.getRecord_ID() + "|" + aPanel.$parentWindow.name + "|" + aPanel.curTab.getName() + "|" + aPanel.curTab.getAD_Tab_ID();
                 VIS.context.setContext("VADMS_WinTableRecID", wtrid);
                 VIS.ADialog.info('VADMS_CodeSetIntoContext', true, "");
             }
@@ -3652,6 +3663,13 @@
 
                 if (!clickedTab) { // if selected tab not exist then add.
                     this.tabStack.push({ tabSeq: clickedTabSeq, tabID: clickedTabID, tabView: [(isAPanelTab ? '' : gc.getMTab().getTabLayout())] });
+
+                }
+
+                if (clickedTabSeq == 0) {
+                    this.aHome.setEnabled(false);
+                } else {
+                    this.aHome.setEnabled(true);
                 }
             }
 
@@ -3881,7 +3899,7 @@
         this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
 
         if (!isAPanelTab && this.showMultiViewOnly) { // in case of compiste and grid mode
-            this.curGC.refreshRowPresentation();
+            this.curGC.refreshRowPresentation(true);
         }
 
 
@@ -4974,6 +4992,17 @@
         VIS.AppointmentsForm.init(AD_Table_ID, record_ID, 0, 0, true);
     };
 
+    APanel.prototype.cmd_advanceTask = function () {
+        var record_ID = this.curTab.getRecord_ID();
+        var AD_Table_ID = this.curTab.getAD_Table_ID();
+        var windowName = this.gridWindow.getDisplayName();
+        if (record_ID == -1)	//	No Key
+        {
+            return;
+        }
+        VIS.AdvanceTask.init(windowName, AD_Table_ID, record_ID);
+    };
+
     APanel.prototype.cmd_letter = function () {
         var record_ID = this.curTab.getRecord_ID();
         if (record_ID == -1)	//	No Key
@@ -5079,10 +5108,15 @@
         }
         //var rquery = this.curTab.query; //new VIS.Query(this.curTab.getTableName());
         var rquery = null;
-        if (this.curTab.query && this.curTab.query.list.length > 0)
+        var strWhere = "";
+        if (this.curTab.query && this.curTab.query.list.length > 0 && !this.curTab.query.isORcondition)
             rquery = this.curTab.query;
-        else
+        else {
             rquery = new VIS.Query(this.curTab.getTableName());
+            if (this.curTab.query.getWhereClause().length > 0) {
+                strWhere = rquery.addRestriction(this.curTab.query.getWhereClause());
+            }
+        }
 
 
         rquery.tableName = this.curTab.getTableName();
@@ -5828,7 +5862,7 @@
         }
         userAssign.show();
     }
-    
+
     /* END */
 
     /**

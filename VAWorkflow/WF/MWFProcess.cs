@@ -609,7 +609,7 @@ namespace VAdvantage.WF
         public int GetNextManualWFID(int AD_Table_ID, int Record_ID, int curr_WF_ID)
         {
             int nextWF_ID = 0;
-            DataSet dsWF = DB.ExecuteDataset("SELECT AD_WorkFlow_ID FROM AD_WF_ManualAttached WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " ORDER BY Created DESC, SeqNo DESC");
+            DataSet dsWF = DB.ExecuteDataset("SELECT AD_WorkFlow_ID FROM AD_WF_ManualAttached WHERE AD_Table_ID = " + AD_Table_ID + " AND CAST(Record_ID AS INTEGER) = " + Record_ID + " ORDER BY Created DESC, SeqNo DESC");
             if (dsWF != null && dsWF.Tables[0].Rows.Count > 0)
             {
                 for (int i = 0; i < dsWF.Tables[0].Rows.Count; i++)

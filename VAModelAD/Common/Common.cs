@@ -33,6 +33,8 @@ namespace VAdvantage.Common
 
         // approvalstatus columns table wise
         public static Dictionary<string, bool> _approvalStatusCols = new Dictionary<string, bool>();
+
+        public static Dictionary<int, string> tableNameIDs = new Dictionary<int, string>();
         public static string transportEnvironment
         {
             get
@@ -684,7 +686,7 @@ namespace VAdvantage.Common
 
             if (string.IsNullOrEmpty(visitorIPAddress) || visitorIPAddress.Trim() == "::1")
             {
-               // GetLan = true;
+                // GetLan = true;
                 visitorIPAddress = string.Empty;
             }
 
@@ -905,8 +907,8 @@ namespace VAdvantage.Common
                 return DisplayType.GetNumberFormat(column.GetAD_Reference_ID()).GetFormatAmount(value, po.GetCtx().GetContext("#ClientLanguage"));
             }
 
-            
-           
+
+
 
 
 
@@ -1668,7 +1670,7 @@ namespace VAdvantage.Common
         /// <param name="AD_SurveyAssignment_ID"></param>
         /// <param name="IsConditionalChecklist"></param>
         /// <returns></returns>
-        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID,int AD_SurveyAssignment_ID, string IsConditionalChecklist)
+        public static bool checkConditions(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int AD_Record_ID, int AD_SurveyAssignment_ID, string IsConditionalChecklist)
         {
             bool isExist = true;
             bool isConditionGiven = true;
@@ -1693,7 +1695,7 @@ namespace VAdvantage.Common
                 DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyshowcondition", true, false), null);
                 //prepare where condition for filter
                 if (_dsDetails != null && _dsDetails.Tables[0].Rows.Count > 0)
-                {                    
+                {
                     int idx = 0;
                     foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                     {
@@ -1765,8 +1767,8 @@ namespace VAdvantage.Common
                                 WhereCondition += "NVL(" + columnName + ",0) " + oprtr;
                             }
                             else if (type == "DateTime")
-                            {                               
-                                WhereCondition += columnName +" " + oprtr;
+                            {
+                                WhereCondition += columnName + " " + oprtr;
                             }
                             else
                             {
@@ -1859,9 +1861,9 @@ namespace VAdvantage.Common
                     isConditionGiven = false;
                 }
             }
-          
 
-            if (!string.IsNullOrEmpty(sqlWhere)|| !string.IsNullOrEmpty(WhereCondition))
+
+            if (!string.IsNullOrEmpty(sqlWhere) || !string.IsNullOrEmpty(WhereCondition))
             {
                 string tableName = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID=" + AD_Table_ID));
 
@@ -1891,7 +1893,7 @@ namespace VAdvantage.Common
                     isExist = false;
                 }
             }
-            
+
 
             return isExist;
 
@@ -1912,7 +1914,7 @@ namespace VAdvantage.Common
                 return true;
             }
 
-            string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID FROM  ad_surveyassignment WHERE IsActive='Y' AND ad_table_id=" + AD_Table_ID;
+            string sql = "SELECT ad_surveyassignment_ID,IsConditionalChecklist,AD_Survey_ID,IsMandatoryToFill FROM  ad_surveyassignment WHERE IsActive='Y' AND AD_Window_ID = " + AD_Window_ID + " AND ad_table_id=" + AD_Table_ID;
 
             DataSet _dsDetails = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "ad_surveyassignment", true, false), null);
             bool result = true;
@@ -1921,39 +1923,42 @@ namespace VAdvantage.Common
             {
                 foreach (DataRow dt in _dsDetails.Tables[0].Rows)
                 {
-                    bool isvalidate = false;
-                    //if (Util.GetValueOfString(dt["IsConditionalChecklist"]) == "N")
-                    //{
-                    isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
+                    bool isvalidate = true;
+                    if (Util.GetValueOfString(dt["IsConditionalChecklist"]) == "Y")
+                    {
+                        isvalidate = checkConditions(ctx, AD_Window_ID, AD_Table_ID, Record_ID, Util.GetValueOfInt(dt["AD_SurveyAssignment_ID"]), Util.GetValueOfString(dt["IsConditionalChecklist"]));
                         //if (isvalidate)
                         //{
                         //    isvalidate = true;
                         //}
-                    //}
-
-                    if (!isvalidate)
-                    {
-                        continue;
-                    }
-                    int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
-
-                    sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
-                    if(!autoApproval && AD_WF_Activity_ID > 0)
-                    {
-                        sql += " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID;
-                    }
-                    int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
-                    if (count > 0)
-                    {
-                        result = true;
-                        break;
-                    }
-                    else
-                    {
-                        result = false;
+                        if (!isvalidate)
+                        {
+                            continue;
+                        }
                     }
 
-                    
+                    if (Util.GetValueOfString(dt["IsMandatoryToFill"]) == "Y")
+                    {
+
+                        int AD_Survey_ID = Util.GetValueOfInt(dt["AD_Survey_ID"]);
+
+                        sql = "SELECT count(AD_SurveyResponse_id) FROM AD_SurveyResponse WHERE AD_User_ID=" + ctx.GetAD_User_ID() + " AND ad_table_id=" + AD_Table_ID + " AND AD_Survey_ID=" + AD_Survey_ID + " AND record_ID=" + Record_ID + " AND IsActive='Y'";
+                        if (!autoApproval && AD_WF_Activity_ID > 0)
+                        {
+                            sql += " AND AD_WF_Activity_ID=" + AD_WF_Activity_ID;
+                        }
+                        int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+                        if (count > 0)
+                        {
+                            result = true;
+                            break;
+                        }
+                        else
+                        {
+                            result = false;
+                        }
+                    }
+
                 }
             }
 
@@ -1979,6 +1984,206 @@ namespace VAdvantage.Common
             else
                 _approvalStatusCols[TableName] = false;
             return false;
+        }
+
+        /// <summary>
+        /// Get Thread ID for the record based on the Table ID and Record ID if AI Chat Bot module is installed
+        /// </summary>
+        /// <param name="AD_Table_ID">Table ID</param>
+        /// <param name="Record_ID">Record ID</param>
+        /// <param name="AD_Org_ID">Org ID</param>
+        /// <returns></returns>
+        public static string GetThreadID(int AD_Table_ID, int Record_ID, int AD_Org_ID)
+        {
+            // Check applied if module installed
+            string threadID = "";
+            if (Env.IsModuleInstalled("VAI01_") && MTable.Get_Table_ID("VAI01_AIAssistant") > 0)
+            {
+                if (AD_Org_ID > 0)
+                {
+                    threadID = Util.GetValueOfString(DB.ExecuteScalar(@"SELECT asth.VAI01_ThreadID FROM VAI01_AIAssistant asst
+                                    INNER JOIN VAI01_AssistantScreen ascrn ON (ascrn.VAI01_AIAssistant_ID = asst.VAI01_AIAssistant_ID)
+                                    INNER JOIN VAI01_LLMConfiguration llm ON (llm.VAI01_LLMConfiguration_ID = asst.VAI01_LLMConfiguration_ID)
+                                    INNER JOIN VAI01_AssistantThread asth ON (ascrn.VAI01_AssistantScreen_ID = asth.VAI01_AssistantScreen_ID) WHERE asst.AD_Org_ID = " + AD_Org_ID + @" AND asth.IsActive = 'Y'
+                                    AND asst.IsActive = 'Y' AND ascrn.AD_Table_ID = " + AD_Table_ID + " AND CAST(asth.VAI01_RecordID AS INTEGER) = " + Record_ID));
+                }
+                if (threadID == "")
+                {
+                    threadID = Util.GetValueOfString(DB.ExecuteScalar(@"SELECT asth.VAI01_ThreadID FROM VAI01_AIAssistant asst
+                                    INNER JOIN VAI01_AssistantScreen ascrn ON (ascrn.VAI01_AIAssistant_ID = asst.VAI01_AIAssistant_ID)
+                                    INNER JOIN VAI01_LLMConfiguration llm ON (llm.VAI01_LLMConfiguration_ID = asst.VAI01_LLMConfiguration_ID)
+                                    INNER JOIN VAI01_AssistantThread asth ON (ascrn.VAI01_AssistantScreen_ID = asth.VAI01_AssistantScreen_ID) WHERE asst.AD_Org_ID = 0 AND asth.IsActive = 'Y'
+                                    AND asst.IsActive = 'Y' AND ascrn.AD_Table_ID = " + AD_Table_ID + " AND CAST(asth.VAI01_RecordID AS INTEGER) = " + Record_ID));
+                }
+            }
+            return threadID;
+        }
+
+        /// <summary>
+        /// Get Thread ID for the record based on the Table ID and Record ID if AI Chat Bot module is installed
+        /// </summary>
+        /// <param name="AD_Table_ID">Table ID</param>
+        /// <param name="Record_ID">Record ID</param>
+        /// <returns></returns>
+        public static string GetThreadID(int AD_Table_ID, int Record_ID)
+        {
+            string tableName = "";
+            if (tableNameIDs.ContainsKey(AD_Table_ID))
+            {
+                tableName = tableNameIDs[AD_Table_ID];
+            }
+            else
+            {
+                tableNameIDs[AD_Table_ID] = Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + AD_Table_ID));
+                tableName = tableNameIDs[AD_Table_ID];
+            }
+            if (string.IsNullOrEmpty(tableName))
+                return "";
+            int AD_Org_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + tableName + " WHERE " + tableName + "_ID = " + Record_ID));
+
+            return GetThreadID(AD_Table_ID, Record_ID, AD_Org_ID);
+        }
+
+        /// <summary>
+        /// Fetch thread ID against table and record ID, also create or update data
+        /// against record in AI knowledge base
+        /// </summary>
+        /// <param name="ctx">Context</param>
+        /// <param name="recordId">Record ID (Primary key)</param>
+        /// <param name="tableID">Table ID</param>
+        /// <param name="windowID">Window ID</param>
+        /// <param name="tabID">Tab ID</param>
+        /// <returns>Thread ID in string format if created or updated else returns blank string</returns>
+        public static string CreateRecordThread(Ctx ctx, int recordId, int tableID, int windowID, int tabID, bool isUpdate, Trx recTrx, VLogger _log)
+        {
+            string threadID = "";
+            // fetch tabID against table id if window id and tab id is not passed in the parameter
+            if (tabID == 0 && windowID == 0 && tableID != 0)
+            {
+                windowID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COALESCE(AD_Window_ID,0) FROM AD_Table WHERE AD_Table_ID = " + tableID));
+                if (windowID > 0)
+                {
+                    tabID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Tab_ID FROM AD_Tab WHERE AD_Window_ID = " + windowID + " AND AD_Table_ID = " + tableID + " ORDER BY SeqNo"));
+                }
+            }
+            // Create or Update thread against record if tab ID found
+            if (tabID != 0)
+            {
+                int asstScreenID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT VAI01_AssistantScreen_ID FROM VAI01_AssistantScreen WHERE AD_Tab_ID = " + tabID + " AND AD_Table_ID = " + tableID + " AND AD_Client_ID = " + ctx.GetAD_Client_ID() + " ORDER BY AD_Org_ID DESC"));
+                // Check applied if Assistant screen is linked against the tab, if found then only create or update data against thread
+                if (asstScreenID > 0)
+                {
+                    // Process fixed for thread data update in case AI Chat Bot module is there
+                    int Process_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Process_ID FROM AD_Process WHERE ISActive='Y' AND Value='VAI01_CreateUpdateRecordThread'"));
+                    MPInstance pin = new MPInstance(ctx, Process_ID, 0); // create object of MPInstance
+                    if (!pin.Save())
+                    {
+                        ValueNamePair vnp = VLogger.RetrieveError();
+                        string errorMsg = "";
+                        if (vnp != null)
+                        {
+                            errorMsg = vnp.GetName();
+                            if (errorMsg == "")
+                                errorMsg = vnp.GetValue();
+                        }
+                        //if (errorMsg == "")
+                        //    result = errorMsg = Msg.GetMsg(ctx, "DocNotCompleted");
+                        return "";
+                    }
+                    VAdvantage.ProcessEngine.ProcessInfo pi = new VAdvantage.ProcessEngine.ProcessInfo("WF", Process_ID);
+                    pi.SetAD_User_ID(ctx.GetAD_User_ID());
+                    pi.SetAD_Client_ID(ctx.GetAD_Client_ID());
+                    pi.SetAD_PInstance_ID(pin.GetAD_PInstance_ID());
+                    pi.SetRecord_ID(recordId);
+                    pi.SetTable_ID(tableID);
+                    MPInstancePara para = new MPInstancePara(pin, 10);
+                    para.setParameter("AD_Table_ID", tableID);
+                    if (!para.Save())
+                    {
+                        String msg = "No AD_Table_ID Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    para = new MPInstancePara(pin, 20);
+                    para.setParameter("AD_Tab_ID", tabID);
+                    if (!para.Save())
+                    {
+                        String msg = "No AD_Tab_ID Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    para = new MPInstancePara(pin, 30);
+                    para.setParameter("record_ID", recordId);
+                    if (!para.Save())
+                    {
+                        String msg = "No record_ID Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    para = new MPInstancePara(pin, 40);
+                    para.setParameter("IsUpdate", Util.GetValueOfString(isUpdate));
+                    if (!para.Save())
+                    {
+                        String msg = "No IsUpdate Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    para = new MPInstancePara(pin, 50);
+                    para.setParameter("HasRecordTrx", recTrx != null ? "true" : "false");
+                    if (!para.Save())
+                    {
+                        String msg = "No HasRecordTrx Parameter added";  //  not translated
+                        if (_log != null)
+                            _log.Log(Level.SEVERE, msg);
+                        return "";
+                    }
+                    ProcessCtl worker = new ProcessCtl(ctx, null, pi, null);
+                    worker.Run();
+                    if (pi.IsError())
+                    {
+                        ValueNamePair vnp = VLogger.RetrieveError();
+                        string errorMsg = "";
+                        if (vnp != null)
+                        {
+                            errorMsg = vnp.GetName();
+                            if (errorMsg == "")
+                                errorMsg = vnp.GetValue();
+                        }
+                        if (errorMsg == "")
+                            errorMsg = pi.GetSummary();
+                        if (errorMsg == "")
+                            errorMsg = Msg.GetMsg(ctx, "DocNotCompleted");
+                        if (_log != null)
+                            _log.SaveError("", errorMsg);
+                        return "";
+                    }
+                    else
+                    {
+                        threadID = Common.GetThreadID(tableID, recordId, GetRecordOrg(ctx, tableID, recordId));
+                    }
+                }
+            }
+            return threadID;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="AD_Table_ID"></param>
+        /// <param name="Record_ID"></param>
+        /// <returns></returns>
+        public static int GetRecordOrg(Ctx ctx, int AD_Table_ID, int Record_ID)
+        {
+            string TableName = MTable.GetTableName(ctx, AD_Table_ID);
+            if (!string.IsNullOrEmpty(TableName))
+                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Org_ID FROM " + TableName + " WHERE " + TableName + "_ID = " + Record_ID));
+            else
+                return -1;
         }
     }
 

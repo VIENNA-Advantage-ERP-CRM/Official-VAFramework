@@ -11,6 +11,7 @@ using VAdvantage.Utility;
 using VIS.Filters;
 using System.Web.SessionState;
 using VIS.DataContracts;
+using VAdvantage.Common;
 
 namespace VIS.Controllers
 {
@@ -19,6 +20,8 @@ namespace VIS.Controllers
     [SessionState(SessionStateBehavior.ReadOnly)]
     public class EmailController : Controller
     {
+        /*This will indiacte whenther the folder is of sharefiles*/
+        bool IsShareFiles = true;
         //
         // GET: /VACOM/Email/
         public ActionResult Index()
@@ -35,8 +38,8 @@ namespace VIS.Controllers
 
 
         [HttpPost]
-        public JsonResult SendMail(string mails, int AD_User_ID, int AD_Client_ID, int AD_Org_ID, int attachment_ID, string fileNamesFornNewAttach, 
-            string fileNamesForopenFormat, string mailFormat, bool notify, string strDocAttach, int AD_Process_ID,  string printformatfileType)
+        public JsonResult SendMail(string mails, int AD_User_ID, int AD_Client_ID, int AD_Org_ID, int attachment_ID, string fileNamesFornNewAttach,
+            string fileNamesForopenFormat, string mailFormat, bool notify, string strDocAttach, int AD_Process_ID, string printformatfileType)
         {
             List<int> lstDoc = new List<int>();
             Ctx ct = Session["ctx"] as Ctx;
@@ -70,7 +73,7 @@ namespace VIS.Controllers
             }
 
             string result = model.SendMails(lstMails, AD_User_ID, AD_Client_ID, AD_Org_ID, attachment_ID, filesNamesFornNewAttach,
-                filesNamesForopenFormat, Server.HtmlDecode(mailFormat), notify, lstDoc, AD_Process_ID,  printformatfileType);
+                filesNamesForopenFormat, Server.HtmlDecode(mailFormat), notify, lstDoc, AD_Process_ID, printformatfileType);
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
 
@@ -82,8 +85,15 @@ namespace VIS.Controllers
             int result = model.SaveFormats(id, AD_Client_ID, AD_Org_ID, Server.HtmlDecode(name), isDynamic, Server.HtmlDecode(subject), Server.HtmlDecode(text), saveforAll, AD_Window_ID, folderName, attachmentID);
             return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
-
-        public string SaveAttachmentinTemp(HttpPostedFileBase file, string fileName, string folderKey)
+        /// <summary>
+        /// This Function is used to store file in ShareFiles folder
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="fileName"></param>
+        /// <param name="folderKey"></param>
+        /// <returns></returns>
+        /// <author>VIS_427</author>
+        public string SaveAttachmentinShareFiles(HttpPostedFileBase file, string fileName, string folderKey)
         {
             try
             {
@@ -107,20 +117,30 @@ namespace VIS.Controllers
                     }
                 }
 
-
-
-                if (!Directory.Exists(Path.Combine(Server.MapPath("~/TempDownload"), folderKey)))
+                /*VIS_427 01/10/2025 if bool value is true then folder name will 
+                 be sharefiles else tempdownload*/
+                string folderName = "";
+                if (IsShareFiles)
                 {
-                    Directory.CreateDirectory(Path.Combine(Server.MapPath("~/TempDownload"), folderKey));
+                    folderName = "ShareFiles";
+                }
+                else
+                {
+                    folderName = "TempDownload";
+                }
+
+                if (!Directory.Exists(Path.Combine(Server.MapPath("~/" + folderName), folderKey)))
+                {
+                    Directory.CreateDirectory(Path.Combine(Server.MapPath("~/" + folderName), folderKey));
                 }
 
                 HttpPostedFileBase hpf = file as HttpPostedFileBase;
-                string savedFileName = Path.Combine(Server.MapPath("~/TempDownload/" + folderKey), Path.GetFileName(fileName));
+                string savedFileName = Path.Combine(Server.MapPath("~/" + folderName + "/" + folderKey), Path.GetFileName(fileName));
                 MemoryStream ms = new MemoryStream();
                 hpf.InputStream.CopyTo(ms);
                 byte[] byteArray = ms.ToArray();
 
-                if (Directory.GetFiles(Path.Combine(Server.MapPath("~/TempDownload"), folderKey)).Contains(Path.Combine(Server.MapPath("~/TempDownload"), folderKey, fileName)))//Append Content In File
+                if (Directory.GetFiles(Path.Combine(Server.MapPath("~/" + folderName), folderKey)).Contains(Path.Combine(Server.MapPath("~/" + folderName), folderKey, fileName)))//Append Content In File
                 {
                     using (FileStream fs = new FileStream(savedFileName, FileMode.Append, System.IO.FileAccess.Write))
                     {
@@ -144,6 +164,19 @@ namespace VIS.Controllers
             {
                 return "ERROR:" + ex.Message;
             }
+        }
+        /// <summary>
+        /// This function is used to store files in tempdownload folder
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="fileName"></param>
+        /// <param name="folderKey"></param>
+        /// <returns></returns>
+        public string SaveAttachmentinTemp(HttpPostedFileBase file, string fileName, string folderKey)
+        {
+            IsShareFiles = false;
+            return SaveAttachmentinShareFiles(file, fileName, folderKey);
+
         }
 
 
@@ -258,8 +291,40 @@ namespace VIS.Controllers
             return Json(JsonConvert.SerializeObject(model.GetMailFormat(Window_ID, ct)), JsonRequestBehavior.AllowGet);
         }
 
-      
-        
+        /// <summary>
+        /// Get message against email and other parameters passed
+        /// </summary>
+        /// <param name="Subject"></param>
+        /// <param name="Message"></param>
+        /// <param name="recordId"></param>
+        /// <param name="tableID"></param>
+        /// <param name="prompt"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult EmailAPI(string Subject, string Message, int recordId, int tableID, string prompt)
+        {
+
+            Ctx ctx = Session["ctx"] as Ctx;
+            EmailModel model = new EmailModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetEmailResponse(Subject, Message, recordId, tableID, ctx, prompt)), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Fetch record thread against table and record
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <param name="tableID"></param>
+        /// <param name="windowID"></param>
+        /// <param name="tabID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetRecordThread(int recordId, int tableID, int windowID, int tabID)
+        {
+            Ctx ctx = Session["ctx"] as Ctx;
+            EmailModel model = new EmailModel(ctx);
+            return Json(JsonConvert.SerializeObject(model.GetRecordThread(ctx, recordId, tableID, windowID, tabID)), JsonRequestBehavior.AllowGet);
+        }
+
 
 
 

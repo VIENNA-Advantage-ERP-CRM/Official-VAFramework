@@ -102,8 +102,8 @@
             btnOK = $("<button disabled='true' style='cursor:default;opacity:.5' class='VIS_Pref_btn-2'>").append(Oktxt);
             //}
 
-            divbtnRight.append(btnCancel);
             divbtnRight.append(btnOK);
+            divbtnRight.append(btnCancel);
             btnsec.append(divbtnRight);
 
 
@@ -122,8 +122,8 @@
             //    divbtnRight.append(btnRequery);
             //}
             //else {
-            divbtnRight.append(btnCancel);
             divbtnRight.append(btnOK);
+            divbtnRight.append(btnCancel);
             divbtnLeft.append(btnRequery);
             //}
 

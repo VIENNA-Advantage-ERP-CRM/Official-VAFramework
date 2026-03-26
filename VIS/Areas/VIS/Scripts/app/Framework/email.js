@@ -104,7 +104,9 @@
         var $scrollIcon;
         var flagImg = false;
 
-
+        var $genReply = null;
+        var $syncfusionEditorContainer = null;
+        var IsSyncEditor = false;
 
         var divReadOnly = $("<div style='width: 100%;height: 100%;background:black;opacity: .1;display:none'>");//table-cell
         var divProgress = null;
@@ -149,7 +151,11 @@
         /** Tab panel-adding cc & bcc emails ** Dt: 28/06/2021 ** Modified By: Kumar **/
         var ccmail = '';
         var bccmail = '';
+        var currThreadID = '';
+        // DMS
+        var $btnUploadToDMS = null;
 
+        var rteObj;
         initEmail();
 
         function initEmail() {
@@ -257,6 +263,18 @@
                 $toolbarDiv.append($btnHdrSend);
             }
             else {
+                if (window.VADMS) {
+                    var hideDMSIcon = 'd-none';
+                    if (window.VADMS.uploadfromotherform != undefined) {
+                        hideDMSIcon = '';
+                    }
+
+                    $btnUploadToDMS = $('<i class="vis-email-saveAttachbtn vis vis-uploaddocument ' + hideDMSIcon + '" title="' + VIS.Msg.getMsg("Upload").replace('&', '') + '" ></i>');
+
+                    $toolbarDiv.append($btnUploadToDMS);
+
+                }
+
                 $btnHdrSend = $('<i class="vis-email-saveAttachbtn vis vis-save-attach"  title="' + VIS.Msg.getMsg("SaveAttachment").replace('&', '') + '" ></i>');
                 $toolbarDiv.append($btnHdrSend);
             }
@@ -291,7 +309,8 @@
         function loadView() {
             var datainit = {
                 windowNo: self.windowNo,
-                language: VIS.Env.getAD_Language(VIS.Env.getCtx())
+                language: VIS.Env.getAD_Language(VIS.Env.getCtx()),
+                isEmail: isEmail
             };
 
             $.ajax({
@@ -313,6 +332,7 @@
 
             $chkBSendPFasAtt = $root.find('#' + self.windowNo + "_dynPF");
             $cmbPfFiletype = $root.find('#' + self.windowNo + "_dynPFType");
+            $btnSend = $root.find('#' + self.windowNo + "_sendBtn");
 
             $root.find('.vis-email-attachmentContainer').hide();
 
@@ -335,7 +355,13 @@
             $attachment = $root.find('#' + self.windowNo + "_vis-email-attacImg");
             $txtArea = $root.find('#' + self.windowNo + "_vis-Email-textarea");
             $leftfootArea = $root.find(".vis-Email-leftFooter");
-
+            $syncfusionEditorContainer = $root.find('#' + self.windowNo + "_syncfusionEditorContainer");
+            if ($syncfusionEditorContainer.is(":visible") && !isEmail) {
+                IsSyncEditor = true;
+            }
+            else {
+                IsSyncEditor = false;
+            }
 
             //$root.find('.vis-form-data-sub').css('margin-top', '10px');
             $root.find('.contentArea').css('height', $root.height() - 44);
@@ -346,6 +372,7 @@
                 $root.find(".vis-Email-textarea-div").css({ 'overflow': 'auto' });
             }
 
+            $genReply = $root.find(".vis-Email-inputWrap");
 
             $root.find('.vis-email-leftDiv').height($root.find('.contentArea').height());
             if (callingFromOutsideofWindow) {
@@ -450,76 +477,184 @@
                 $chkBSendPFasAtt.hide();
                 $chkBSendPFasAtt.next().hide();
             }
+
+            var _windowID = 0;
+            var _tabID = 0;
+            if (_curtab != null) {
+                _windowID = _curtab.getAD_Window_ID();
+                _tabID = _curtab.getAD_Tab_ID();
+            }
+
+            $.ajax({
+                type: 'POST',
+                async: false,
+                url: VIS.Application.contextUrl + "Email/GetRecordThread",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    recordId: Record_ID,
+                    tableID: currentTable_ID,
+                    windowID: _windowID,
+                    tabID: _tabID
+                }),
+                success: function (data) {
+                    currThreadID = JSON.parse(data);
+                },
+            });
         };
 
+        function loadLocale(language, callback) {
+            let primary = language.split('-')[0];   // ar_IQ → ar
 
+            // Try full locale first (ar-IQ.json)
+            $.getJSON(VIS.Application.contextUrl+`Areas/KJS/Scripts/SyncfusionLocale/${language}.json`)
+                .done(function (data) {
+                    ej.base.L10n.load(data);
+                    ej.base.setCulture(language);
+                    callback(language); // success with full code
+                })
+                .fail(function () {
+                    // If full locale not found, try the primary one (ar.json)
+                    $.getJSON(VIS.Application.contextUrl +`Areas/KJS/Scripts/SyncfusionLocale/${primary}.json`)
+                        .done(function (data) {
+                            ej.base.L10n.load(data);
+                            ej.base.setCulture(primary);
+                            callback(primary); // fallback success
+                        })
+                        .fail(function () {
+                            console.error("Localization not found for:", language, "or", primary);
+                            callback("en-US"); // or set default language
+                        });
+                });
+        }
+
+
+      
 
         function loadTextArea() {
-            try {
-                $txtArea.kendoEditor({
-                    tools: [
-                        "bold",
-                        "italic",
-                        "underline",
-                        "strikethrough",
-                        "justifyLeft",
-                        "justifyCenter",
-                        "justifyRight",
-                        "justifyFull",
-                        "insertUnorderedList",
-                        "insertOrderedList",
-                        "indent",
-                        "outdent",
-                        "createLink",
-                        "unlink",
-                        "insertImage",
-                        "insertFile",
-                        "subscript",
-                        "superscript",
-                        "createTable",
-                        "addRowAbove",
-                        "addRowBelow",
-                        "addColumnLeft",
-                        "addColumnRight",
-                        "deleteRow",
-                        "deleteColumn",
-                        "viewHtml",
-                        "formatting",
-                        "cleanFormatting",
-                        "fontName",
-                        {
-                            name: "fontSize",
-                            items: [].concat(
-                                [{ text: "8px", value: "8px" }],
-                                [{ text: "12px", value: "12px" }],
-                                [{ text: "16px", value: "16px" }],
-                                [{ text: "20px", value: "20px" }],
-                                [{ text: "24px", value: "24px" }]
-                            )
-                        },
-                        "foreColor",
-                        "backColor"
-                    ],
-                    keyup: getTextChange,
-                    encoded: false
+            if (isEmail || !IsSyncEditor) {
+                try {
+
+
+                    $txtArea.kendoEditor({
+                        tools: [
+                            "bold",
+                            "italic",
+                            "underline",
+                            "strikethrough",
+                            "justifyLeft",
+                            "justifyCenter",
+                            "justifyRight",
+                            "justifyFull",
+                            "insertUnorderedList",
+                            "insertOrderedList",
+                            "indent",
+                            "outdent",
+                            "createLink",
+                            "unlink",
+                            "insertImage",
+                            "insertFile",
+                            "subscript",
+                            "superscript",
+                            "createTable",
+                            "addRowAbove",
+                            "addRowBelow",
+                            "addColumnLeft",
+                            "addColumnRight",
+                            "deleteRow",
+                            "deleteColumn",
+                            "viewHtml",
+                            "formatting",
+                            "cleanFormatting",
+                            "fontName",
+                            {
+                                name: "fontSize",
+                                items: [].concat(
+                                    [{ text: "8px", value: "8px" }],
+                                    [{ text: "12px", value: "12px" }],
+                                    [{ text: "16px", value: "16px" }],
+                                    [{ text: "20px", value: "20px" }],
+                                    [{ text: "24px", value: "24px" }]
+                                )
+                            },
+                            "foreColor",
+                            "backColor"
+                        ],
+                        keyup: getTextChange,
+                        encoded: false
+                    });
+
+                    $textAreakeno = $txtArea.data("kendoEditor");
+                    $textAreakeno.value("");
+
+                    if (body != undefined && body != null) {
+                        $textAreakeno.value(body);
+                    }
+                }
+                catch (ex) {
+                    console.log(ex);
+                    VIS.ADialog.error("PleaseInstallKendoUIModule");
+                    self.dispose();
+                    self = null;
+                    return false;
+                }
+
+            } else if (isEmail === false && IsSyncEditor === true) {
+
+                var str = $("<div style='width:100%; height:100%'>");
+                $syncfusionEditorContainer.append(str);
+                var langCode = VIS.context.getAD_Language();
+                langCode = langCode.replace('_', '-');
+                loadLocale(langCode, function (appliedLocale) {
+
+                    console.log("Using locale:", appliedLocale);
+
+                    try {
+                        rteObj = new ej.documenteditor.DocumentEditorContainer({
+                            enableToolbar: true,
+                            height: $root.height() - (180) + "px",
+                            width: '100%',
+                            enablePrint: true,
+                            enableSelection: true,
+                            enableEditor: true,
+                            enableSfdtExport: true,
+                            enableLocalPaste: true,
+                            locale: appliedLocale,
+                            enableRtl: VIS.Application.isRTL ? true : false
+
+                            // serviceUrl: VIS.Application.contextUrl + "api/documenteditor/" // if you use service features
+                        });
+                    } catch (ex) {
+                        console.error("Syncfusion initialization failed:", ex);
+                        VIS.ADialog.error("Document editor not available. Make sure Syncfusion scripts are loaded.");
+                    }
+
+                    //setTimeout(function () {
+                    // IMPORTANT
+
+                    rteObj.appendTo(str[0]);                 
+
+                    if (VIS.Application.isRTL) {
+                        rteObj.documentEditor.documentEditorSettings = { rtl: true };
+
+                        rteObj.documentEditor.contentChanged = function () {
+                            rteObj.documentEditor.selection.paragraphFormat = {
+                                bidirectional: true,
+                                textAlignment: 'Right'
+                            };
+                        };
+                    }
+
+
+                    rteObj.documentEditor.keyDown = function (args) {
+                        // run after editor processes the key
+                        setTimeout(function () {
+                            $SubjectTextChange = 1;
+                        }, 0);
+                    };
                 });
 
-                $textAreakeno = $txtArea.data("kendoEditor");
-                $textAreakeno.value("");
-
-                if (body != undefined && body != null) {
-                    $textAreakeno.value(body);
-                }
+                //}, 500);
             }
-            catch (ex) {
-                console.log(ex);
-                VIS.ADialog.error("PleaseInstallKendoUIModule");
-                self.dispose();
-                self = null;
-                return false;
-            }
-
-
 
             return true;
 
@@ -541,6 +676,7 @@
             //else {
             //    $SubjectTextChange = 0;
             //}
+
             if ($textAreakeno.value() != "" || $subject.val() != "") {
                 $SubjectTextChange = 1;
             }
@@ -956,6 +1092,10 @@
             }
             else {
                 $btnHdrSend.on("click", saveAttachment);
+                if (window.VADMS) {
+                    $btnUploadToDMS.off("click");
+                    $btnUploadToDMS.on("click", uploadToDMS);
+                }
             }
             if (!isEmail) {
                 $btnSavePdf.on("click", pdf);
@@ -1012,6 +1152,71 @@
                     }
                 });
             }
+
+            $btnSend.on("click", function () {
+                if (!window.VAI01) {
+                    VIS.ADialog.info('VAI01_InstallChatBot');
+                    return;
+                }
+
+                
+
+                var subject = $subject.val();
+                var message = $txtArea.val();
+                var _rec_ID = Record_ID;
+                var _tbl_ID = currentTable_ID;
+                var prompt = $root.find('#' + self.windowNo + "_emailPrompt").val();
+
+                if (currThreadID == "" && prompt == "") {
+                    VIS.ADialog.info('VIS_NoThreadEnterPrompt');
+                    return;
+                }
+
+                self.IsBusy(true);
+                $.ajax({
+                    type: 'POST',
+                    url: VIS.Application.contextUrl + "Email/EmailAPI",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        Subject: subject,
+                        Message: message,
+                        recordId: _rec_ID,
+                        tableID: _tbl_ID,
+                        prompt: prompt,
+                    }),
+                    success: function (response) {
+                        self.IsBusy(false);
+                        $root.find('#' + self.windowNo + "_emailPrompt").val('');
+                        //  console.log("Success:", response);
+                        if (typeof response === "string") {
+                            response = JSON.parse(response);
+                        }
+                        // Store values in variables
+                        var subject = response.Subject;
+                        var message = response.Message;
+                        var success = response.success;
+                        var error = response.error;
+                        $subject.val(response.Subject);
+                        let editor = $txtArea.data("kendoEditor");
+                        if (editor) {
+                            editor.value(""); // Set content in the rich text editor
+                            let formattedMessage = "<p>" + response.Message.split(/\n{2,}/).join("</p><p>") + "</p>";
+                            if (body != undefined && body != null) {
+                                formattedMessage = formattedMessage + "<br/> <br/>" + body;
+                            }
+                            editor.value(formattedMessage); // Set content in the rich text editor
+                        } else {
+                            $txtArea.val(response.Message); // Fallback if editor not initialized
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        self.IsBusy(false);
+                        console.error("Error:", error);
+                        $root.find('#' + self.windowNo + "_emailPrompt").val('');
+                        // Optionally show error message to user
+                    }
+                });
+            });
 
         };
 
@@ -1802,11 +2007,57 @@
         };
 
         function insertSelectedField(e) {
-            $textAreakeno.paste('@@' + $(this).text() + '@@');
+            var fieldText = '@@' + $(this).text() + '@@';
+
+            if (IsSyncEditor) {
+                // Insert inside Syncfusion DocumentEditor
+                try {
+                    rteObj.documentEditor.editor.insertText(fieldText);
+                }
+                catch (ex) {
+                    console.log("Syncfusion insertSelectedField error:", ex);
+                }
+                return;
+            }
+
+            // ---- Existing Kendo logic ----
+            $textAreakeno.paste(fieldText);
         };
 
         function preview(e) {
+
+            if (IsSyncEditor) {
+
+                // Get SFDT from Syncfusion
+                var sfdtData = rteObj.documentEditor.serialize();
+
+                var obj = {
+                    sfdtContent: sfdtData
+                };
+
+                var formData = new FormData();
+                formData.append("sfdtContent", sfdtData);
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Email/ConvertSfdtToHtml",
+                    type: "POST",
+                    data: formData,
+                    processData: false,   // IMPORTANT for FormData
+                    contentType: false,
+                    success: function (html) {
+                        previewContent(html);   
+                    }
+                });
+
+                return;  
+            }
+
             var html = $textAreakeno.value();
+            previewContent(html);
+        }
+
+
+        function previewContent(html) {
             var finalhtmls = '';
             if (_curGC.singleRow == false || rowsSource.length > 0) {
                 finalhtmls = parseHtml1(html, 0);
@@ -1828,11 +2079,7 @@
             chp.setContent($preDiv);
             chp.show();
             chp.hidebuttons();
-            //var $preDiv = $('<div></div>');
-            //$preDiv.append(finalhtmls);
-            //$preDiv.dialog();
-
-        };
+        }
 
         function send(e) {
             var subj = $subject.val();
@@ -2185,7 +2432,7 @@
             }
 
             var mails = JSON.stringify(mail);
-            var wantNotification = false;
+            var wantNotification = true;
 
             var pfFiletype = 'X';// no Action
             if ($chkBSendPFasAtt.prop("checked")) {
@@ -2193,10 +2440,10 @@
             }
 
 
-            VIS.ADialog.confirm("WantAlertMessage", true, "", "Confirm", function (result) {
-                if (result) {
-                    wantNotification = true;
-                }
+            //VIS.ADialog.confirm("WantAlertMessage", true, "", "Confirm", function (result) {
+            //    if (result) {
+            //        wantNotification = true;
+            //    }
 
 
                 $bsyDiv[0].style.visibility = "visible";
@@ -2239,7 +2486,7 @@
                 });
 
 
-            });
+            //});
 
 
 
@@ -2259,8 +2506,31 @@
                 VIS.ADialog.info("PleaseAddSubject");
                 return;
             }
+            var html = "";
+            if (IsSyncEditor) {
 
-            var html = $textAreakeno.value();
+                var sfdt = rteObj.documentEditor.serialize();
+
+                var formData = new FormData();
+                formData.append("sfdtContent", sfdt);
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Email/ConvertSfdtToHtml",
+                    type: "POST",
+                    async: false,
+                    data: formData,
+                    processData: false,   // IMPORTANT for FormData
+                    contentType: false,
+                    success: function (result) {
+                        html = result;
+                    }
+                });
+
+            } else {
+                html = $textAreakeno.value();
+            }
+
+          
             if (html == null || html == "" || html == undefined || html.trim().length < 1) {
                 return;
             }
@@ -2297,7 +2567,7 @@
                 data: { subject: subj, AD_Table_ID: currentTable_ID, html: VIS.Utility.encodeText(html), values: JSON.stringify(values) },
                 success: function (data) {
                     $bsyDiv[0].style.visibility = "hidden";
-                    VIS.ADialog.info("Saved");
+                    VIS.ADialog.info("LetterAttached");
                     //var result = JSON.parse(data);
                     //htt = result;
                     //var datauri = 'data:application/pdf;base64,' + htt;
@@ -2315,8 +2585,34 @@
         };
 
         function pdf(e) {
-            var html = $textAreakeno.value();
-            if (html == null || html == "" || html == undefined || html.trim().length < 1) {
+            var html = "";
+            if (IsSyncEditor) {
+                var sfdtData = rteObj.documentEditor.serialize();
+
+                var obj = {
+                    sfdtContent: sfdtData
+                };
+
+                var formData = new FormData();
+                formData.append("sfdtContent", sfdtData);
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Email/ConvertSfdtToHtml",
+                    type: "POST",
+                    async: false,
+                    data: formData,
+                    processData: false,   // IMPORTANT for FormData
+                    contentType: false,
+                    success: function (res) {
+                        html = res;
+                    }
+                });
+
+            } else {
+
+                html = $textAreakeno.value();
+            }
+            if (html == null || html == "" || html ==  undefined || html.trim().length < 1) {
                 return;
             }
             var finalhtmls = '';
@@ -2374,7 +2670,7 @@
                 datatype: "json",
                 type: "post",
                 cache: false,
-                data: { html: VIS.Utility.encodeText(html), values: JSON.stringify(values) },
+                data: { html: VIS.Utility.encodeText(html), values: JSON.stringify(values), isSyncDoc: IsSyncEditor },
                 success: function (data) {
                     $bsyDiv[0].style.visibility = "hidden";
                     var result = JSON.parse(data);
@@ -2403,36 +2699,148 @@
                 }
             });
         };
+
+        function uploadToDMS(e) {
+
+            var subj = $subject.val();
+            if (subj == null || subj == "" || subj.trim().length == 0) {
+                VIS.ADialog.info("PleaseAddSubject");
+                return;
+            }
+
+            var html = "";
+            if (IsSyncEditor) {
+                var sfdtData = rteObj.documentEditor.serialize();
+
+                var obj = {
+                    sfdtContent: sfdtData
+                };
+
+                var formData = new FormData();
+                formData.append("sfdtContent", sfdtData);
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Email/ConvertSfdtToHtml",
+                    type: "POST",
+                    async: false,
+                    data: formData,
+                    processData: false,   // IMPORTANT for FormData
+                    contentType: false,
+                    success: function (res) {
+                        html = res;
+                    }
+                });
+
+            } else {
+
+                html = $textAreakeno.value();
+            }
+            if (html == null || html == "" || html == undefined || html.trim().length < 1) {
+                return;
+            }
+
+            $bsyDiv[0].style.visibility = "visible";
+
+            var values = [];
+
+            rowsSource = _curGC.getSelectedRows();
+
+            // This is data source for single View Records
+            rowsSingleView = _curtab.getRecords()[_curtab.getCurrentRow()];
+
+            var recordIds = [];
+
+            for (var i = 0; i < rowsSource.length; i++) {
+                recordIds.push(rowsSource[i][(_curtab.gridTable.gTable._tableName + '_ID').toLower()]);
+            }
+
+            if (_curGC.singleRow == false || rowsSource.length > 0) {
+
+                for (var r = 0; r < rowsSource.length; r++) {
+
+                    values.push(listofSelectedItems1(html, r));
+                }
+            }
+            else {
+
+                values.push(listofSelectedItems2(html));
+            }
+
+            window.VADMS.uploadfromotherform(0, _curtab.getAD_Window_ID(), currentTable_ID, recordIds, _curGC.aPanel.$parentWindow.getName(), _curtab.getName(),
+                self.windowNo, _curtab.getAD_Tab_ID(), subj, VIS.Utility.encodeText(html), JSON.stringify(values), $bsyDiv);
+        }
+
+
         var isCallNew = 0;
         function createNewLetter(e) {
             onOkOpentn = false;
             isCallNew = 0;
+
+            // ---------------------------
+            // WHEN SUBJECT OR BODY CHANGED
+            // ---------------------------
             if ($SubjectTextChange == 1) {
-                if ($textAreakeno.value() != "" || $subject.val() != "") {
+
+                var hasContent = false;
+
+                if (IsSyncEditor) {
+                    // Syncfusion content check
+                    var sfdt = rteObj.documentEditor.serialize();
+                    hasContent = sfdt && sfdt.length > 50;  // SFDT blank doc is very small
+                }
+                else {
+                    // Kendo content check
+                    hasContent = ($textAreakeno.value() != "" || $subject.val() != "");
+                }
+
+                if (hasContent) {
                     VIS.ADialog.confirm("DoYouWantToSave", true, "", "Confirm", function (result) {
+
                         if (!result) {
+
+                            // ---------- DISCARD CHANGES ----------
                             $subject.val("");
-                            $textAreakeno.value('');
+
+                            if (IsSyncEditor) {
+                                // Clear Syncfusion document
+                                rteObj.documentEditor.openBlank();
+                            } else {
+                                // Clear Kendo
+                                $textAreakeno.value('');
+                            }
+
                             selectedTemplateID = 0;
                             $btnHdrSave.css("opacity", "1");
                             $SubjectTextChange = 0;
                         }
                         else {
+                            // ---------- SAVE THEN CREATE NEW ----------
                             save(e);
                             $SubjectTextChange = 0;
                             isCallNew = 1;
                         }
                     });
+
+                    return; // stop here — callback continues the flow
                 }
             }
-            else {
-                $subject.val("");
+
+          
+            $subject.val("");
+
+            if (IsSyncEditor) {
+                // Syncfusion blank document
+                rteObj.documentEditor.openBlank();
+            } else {
+                // Kendo blank document
                 $textAreakeno.value('');
-                selectedTemplateID = 0;
-                $btnHdrSave.css("opacity", "1");
-                $SubjectTextChange = 0;
             }
-        };
+
+            selectedTemplateID = 0;
+            $btnHdrSave.css("opacity", "1");
+            $SubjectTextChange = 0;
+        }
+
 
 
 
@@ -2446,9 +2854,21 @@
             var mailformat = new VIS.Openmailformat(_curGC.gTab.getAD_Window_ID(), isEmail);
             getMailFormat = mailformat;
 
+            var hasContent = false;
+
+            if (IsSyncEditor) {
+                // Syncfusion content check
+                var sfdt = rteObj.documentEditor.serialize();
+                hasContent = sfdt && sfdt.length > 50 && $subject.val() != "" // SFDT blank doc is very small
+            } else {
+                // Kendo content check
+                hasContent = $textAreakeno.value() != "" && $subject.val() != "" && $SubjectTextChange == 1
+            }
+
+
             if (!isEmail) {
                 isCallNew = 0;
-                if ($textAreakeno.value() != "" && $subject.val() != "" && $SubjectTextChange == 1) {
+                if (hasContent) {
                     VIS.ADialog.confirm("DoYouWantToSave", true, "", "Confirm", function (result) {
                         if (!result) {
                             //$subject.val("");
@@ -2507,14 +2927,51 @@
                     }
 
                     formatName = selectedRow.NAME;
-                    $textAreakeno.value(selectedRow.MAILTEXT);
+
+                    if (IsSyncEditor) {
+                        $.ajax({
+                            url: VIS.Application.contextUrl + "Email/ConvertHtmlToSfdt",
+                            type: "POST",
+                            async: false,
+                            data: { htmlContent: encodeURIComponent(selectedRow.MAILTEXT) },
+                            success: function (sfdt) {
+                                rteObj.documentEditor.open(sfdt.sfdtContent);
+                            }
+                        });
+                    }
+                    else {
+                        $textAreakeno.value(selectedRow.MAILTEXT);
+                    }
                 }
                 onOkOpentn = false;
             };
         };
 
         function saveAs(e) {
-            var text = $textAreakeno.value();
+            var text = "";
+
+            if (IsSyncEditor) {
+                var sfdt = rteObj.documentEditor.serialize();
+
+                var formData = new FormData();
+                formData.append("sfdtContent", sfdt);
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Email/ConvertSfdtToHtml",
+                    type: "POST",
+                    async: false,
+                    data: formData,
+                    processData: false,   // IMPORTANT for FormData
+                    contentType: false,
+                    success: function (result) {                        
+                        text = result;
+                    }
+                });
+            }
+            else {
+                text = $textAreakeno.value();
+            }
+
             if (text != null && text.trim() != "" && text != undefined) {
                 var newformat = new VIS.Newmailformat(isEmail);
                 newformat.show();
@@ -2524,7 +2981,7 @@
                     formatName = newformat.getName();
                     saveForAllWindows = newformat.saveForAll();
 
-                    saveFormat(0);
+                    saveFormat(0, text);
                 };
             }
         };
@@ -2535,10 +2992,32 @@
                 return;
             }
 
-            var text = $textAreakeno.value();
+            var text = "";
+
+            if (IsSyncEditor) {
+                var sfdt = rteObj.documentEditor.serialize();
+                var formData = new FormData();
+                formData.append("sfdtContent", sfdt);
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "Email/ConvertSfdtToHtml",
+                    type: "POST",
+                    async: false,
+                    data: formData,
+                    processData: false,   // IMPORTANT for FormData
+                    contentType: false,
+                    success: function (result) {                        
+                        text = result;    // HTML returned
+                    }
+                });
+            }
+            else {
+                text = $textAreakeno.value();  // existing kendo
+            }
+
             if (text != null && text != "" && text != undefined) {
                 if (selectedTemplateID > 0) {
-                    saveFormat(selectedTemplateID);
+                    saveFormat(selectedTemplateID, text);
                 }
                 else {
                     saveAs();
@@ -2562,7 +3041,7 @@
             self = null;
         };
 
-        function saveFormat(id) {
+        function saveFormat(id,text) {
             var inputData = {
                 id: id,
                 AD_Client_ID: ctx.getAD_Client_ID(),
@@ -2570,7 +3049,7 @@
                 name: VIS.Utility.encodeText(formatName),
                 isDynamic: $dynamicDisplay.prop("checked"),
                 subject: VIS.Utility.encodeText($subject.val()),
-                text: VIS.Utility.encodeText($textAreakeno.value()),
+                text: VIS.Utility.encodeText(text),
                 saveforAll: saveForAllWindows,
                 AD_Window_ID: _curtab.getAD_Window_ID(),
                 folderName: folder,
@@ -2617,14 +3096,12 @@
 
 
                 if (!$root.find('.vis-email-attachmentContainer').is(":visible")) {
-
                     $root.find(".vis-Email-textarea-div").height($root.height() - 180);
+                   
                 }
                 else {
-                    $root.find(".vis-Email-textarea-div").height($root.height() - 365);
+                    $root.find(".vis-Email-textarea-div").height($root.height() - 365);                    
                 }
-
-
 
 
             }
@@ -2884,6 +3361,8 @@
                 var fieldname = copyhtml.substring(0, copyhtml.indexOf("@@"));
                 var fieldValue = null;
                 var columnName = Object.keys(_curGC.getColumnNames()).filter(function (key) { return _curGC.getColumnNames()[key] === fieldname })[0];
+
+
                 if (columnName != undefined && columnName != null) {
                     if (VIS.DisplayType.IsLookup(_curtab.getField(columnName).getDisplayType()) || VIS.DisplayType.Location == _curtab.getField(columnName).getDisplayType()) {
                         if (rowsSingleView[columnName.toLower()] != null && rowsSingleView[columnName.toLower()] != undefined) {
@@ -2943,10 +3422,10 @@
             if (callingFromOutsideofWindow) {
                 if (!$root.find('.vis-email-attachmentContainer').is(":visible")) {
 
-                    $root.find(".vis-Email-textarea-div").height($root.height() - 180);
+                    $root.find(".vis-Email-textarea-div").height($root.height() - 220);
                 }
                 else {
-                    $root.find(".vis-Email-textarea-div").height($root.height() - 345);
+                    $root.find(".vis-Email-textarea-div").height($root.height() - 385);
                 }
 
                 $root.find('.vis-form-data-sub').width($root.find('.vis-Email-leftWrap').width() - 85);
@@ -2966,9 +3445,7 @@
                     else {
                         //$root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 50));
 
-                        $root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 70));
-
-
+                        $root.find(".vis-Email-textarea-div").height($root.height() - ($root.find('.vis-email-attachmentContainer').height() + 95));
 
                         //if ($textAreakeno != null && $textAreakeno != undefined) {
                         //    $textAreakeno.body.style.height = ($root.find(".vis-Email-textarea-div").height() - 80) + "px";
@@ -2981,7 +3458,11 @@
                 }
                 else {
 
-                    $root.find(".vis-Email-textarea-div").height($root.height() - (125 + 30));
+                    $root.find(".vis-Email-textarea-div").height($root.height() - (125 + 60));
+                    if (rteObj) {
+                        rteObj.height = ($root.height() - (125 + 60)) + "px";   // apply
+                        rteObj.dataBind();
+                    }
 
                     if ($textAreakeno != null && $textAreakeno != undefined) {
                         //if ($textAreakeno != null && $textAreakeno != undefined) {
@@ -3147,6 +3628,14 @@
             if ($cmbPfFiletype != null) {
                 $cmbPfFiletype = null;
             }
+
+            if (window.VADMS) {
+                if ($btnUploadToDMS != null) {
+                    $btnUploadToDMS.off('click');
+                }
+                $btnUploadToDMS = null
+            }
+
             //self = null;
         };
 

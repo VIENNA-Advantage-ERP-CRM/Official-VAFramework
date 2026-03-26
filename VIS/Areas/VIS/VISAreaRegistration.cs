@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Web.Mvc;
 using System.Web.Optimization;
+
 namespace VIS
 {
     public class VISAreaRegistration : AreaRegistration
@@ -16,7 +17,8 @@ namespace VIS
 
         public override void RegisterArea(AreaRegistrationContext context)
         {
-
+            //move to KJS
+            /*SyncfusionLicenseConfig.RegisterSyncfusionLicense();*/
             context.MapRoute(
                                "VIS_default",
                                "VIS/{controller}/{action}/{id}",
@@ -32,6 +34,9 @@ namespace VIS
             ScriptBundle modScript_v1 = new ScriptBundle("~/Areas/VIS/Scripts/VIS_v1");
 
             ScriptBundle modScript_v2 = new ScriptBundle("~/Areas/VIS/Scripts/VIS_v2");
+
+
+
 
 
             //modScript.Include(
@@ -238,16 +243,14 @@ namespace VIS
             modScript_v1.Include("~/Areas/VIS/Scripts/VIS1_0.min.js");
             modScript_v2.Include("~/Areas/VIS/Scripts/dist/VIS2_0.min{version}.js");
 
-
-
-
-            VAdvantage.ModuleBundles.RegisterScriptBundle(modScript, "VIS", -1);
+            VAModelAD.ModuleBundles.RegisterScriptBundle(modScript, "VIS", -1);
             //VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v1, "VIS1_0", -2);
-            VAdvantage.ModuleBundles.RegisterScriptBundle(modScript_v2, "VIS2_0", -3);
+            VAModelAD.ModuleBundles.RegisterScriptBundle(modScript_v2, "VIS2_0", -3);
 
-            VAdvantage.ModuleBundles.RegisterStyleBundle(style, "VIS", -1);
-            ////VAdvantage.ModuleBundles.RegisterRTLStyleBundle(styleRTL, "VIS", -1);
+            VAModelAD.ModuleBundles.RegisterStyleBundle(style, "VIS", -1);
+            ////VAdvantage.ModuleBundles.RegisterRTLStyleBundle(styleRTL, "VIS", -1);            
 
+           
         }
     }
 }

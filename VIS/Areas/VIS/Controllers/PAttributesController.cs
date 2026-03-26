@@ -28,7 +28,10 @@ namespace VIS.Controllers
             {
                 var ctx = Session["ctx"] as Ctx;
                 var value = obj.LoadInit(mAttributeSetInstanceId, mProductId, productWindow, windowNo, ctx, AD_Column_ID, window_ID, IsSOTrx, IsInternalUse);
-                return Json(new { result = value }, JsonRequestBehavior.AllowGet);
+                var jRes = Json(new { result = value }, JsonRequestBehavior.AllowGet);
+                jRes.MaxJsonLength = int.MaxValue;
+                return jRes;
+
             }
             return Json(new { result = false }, JsonRequestBehavior.AllowGet);
         }
@@ -114,7 +117,9 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             Sq1Atribute = SecureEngineBridge.DecryptByClientKey(Sq1Atribute, ctx.GetSecureKey());
             PAttributesModel model = new PAttributesModel();
-            return Json(JsonConvert.SerializeObject(model.GetAttributeData(Sq1Atribute, Product_ID, ctx)), JsonRequestBehavior.AllowGet);
+            var jRes = Json(JsonConvert.SerializeObject(model.GetAttributeData(Sq1Atribute, Product_ID, ctx)), JsonRequestBehavior.AllowGet);
+            jRes.MaxJsonLength = int.MaxValue;
+            return jRes;
         }
 
         // Added by Bharat on 01 june 2017

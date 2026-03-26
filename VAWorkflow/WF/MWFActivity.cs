@@ -31,6 +31,8 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
+using System.Net.Http.Headers;
 
 namespace VAdvantage.WF
 {
@@ -743,8 +745,9 @@ namespace VAdvantage.WF
                             }
                         }
                     }
-                }	//	No Supervisor
-
+                }   //	No Supervisor
+                //ownDocument should always be false for the next user
+                ownDocument = false;
             }	//	while there is a user to approve
 
             log.Fine("No user found");
@@ -1714,7 +1717,7 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                            JSON_VALUE(WN.RequestData, '$.url') AS URL,
                            JSON_Query(WN.RequestData, '$.headers') AS Headers,
                            JSON_VALUE(WN.RequestData, '$.bodyType') AS BodyType,
-                           CASE WHEN JSON_VALUE(WN.RequestData, '$.bodyType') = 'Plain Text'
+                           CASE WHEN JSON_VALUE(WN.RequestData, '$.bodyType') IN ('Plain Text', 'XML')
                            THEN JSON_VALUE(WN.RequestData, '$.bodyContent')
                            ELSE JSON_QUERY(WN.RequestData, '$.bodyContent') END AS BodyContent,
                            JSON_Query(WN.RequestData, '$.queryString') AS QueryString
@@ -1728,8 +1731,8 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                            jsonb_extract_path_text(WN.RequestData::jsonb, 'url') AS URL,
                            jsonb_extract_path(WN.RequestData::jsonb, 'headers') AS Headers,
                            jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') AS BodyType,
-                           CASE WHEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') = 'Plain Text'
-                           THEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyContent')
+                           CASE WHEN jsonb_extract_path_text(WN.RequestData::jsonb, 'bodyType') IN ('Plain Text', 'XML')
+                           THEN jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent')
                            ELSE jsonb_extract_path(WN.RequestData::jsonb, 'bodyContent') END AS BodyContent,
                            jsonb_extract_path(WN.RequestData::jsonb, 'queryString') AS QueryString
                            FROM AD_WF_Node WN LEFT JOIN NodeAPICredential NC ON (NC.AD_WF_Node_ID=WN.AD_WF_Node_ID)
@@ -1768,6 +1771,17 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                         if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["BodyType"]).ToLower() == "text")
                         {
                             reqMsg.Content = new StringContent(GetDynamicValues(bodyContent), null, "text/plain");
+                        }
+                        else if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["BodyType"]).ToLower() == "xml")
+                        {
+                            string cleanContent = bodyContent.Replace('\u00A0', ' ').Trim();
+                            cleanContent = cleanContent.Normalize(NormalizationForm.FormC);
+                            // Apply dynamic values first
+                            cleanContent = GetDynamicValues(cleanContent);
+                            // Convert escaped tags → valid XML
+                            cleanContent = cleanContent.Replace("&l;", "<").Replace("&g;", ">");
+                            // Finally assign content to request
+                            reqMsg.Content = new StringContent(cleanContent, Encoding.UTF8, "text/xml");
                         }
                         else
                         {
@@ -1824,11 +1838,39 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                     if (!string.IsNullOrEmpty(Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["ApiKey"])))
                     {
                         JObject jObj = JObject.Parse(SecureEngine.Decrypt(Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["ApiKey"])));
-                        if (jObj.Count > 0)
+                        if (Util.GetValueOfString(dsRequestData.Tables[0].Rows[0]["BodyType"]).ToLower() == "xml")
                         {
-                            foreach (var property in jObj)
+                            if (jObj.Count > 0)
                             {
-                                reqMsg.Headers.Add(property.Key, Util.GetValueOfString(property.Value));
+                                foreach (var property in jObj)
+                                {
+                                    string key = property.Key;
+                                    string value = property.Value?.ToString();
+
+                                    if (string.IsNullOrWhiteSpace(value))
+                                        continue;
+
+                                    // Ensure Content is initialized before setting Content-Type
+                                    if (reqMsg.Content != null)
+                                    {
+                                        reqMsg.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(value);
+                                    }
+                                    else
+                                    {
+                                        // For general headers
+                                        reqMsg.Headers.TryAddWithoutValidation(key, value);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (jObj.Count > 0)
+                            {
+                                foreach (var property in jObj)
+                                {
+                                    reqMsg.Headers.Add(property.Key, Util.GetValueOfString(property.Value));
+                                }
                             }
                         }
                     }
@@ -1851,6 +1893,38 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             else
             {
                 log.SaveError("Fetch JSON Data : ", sqlHttp);
+            }
+        }
+
+        /// <summary>
+        /// formated xml
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public static string FormatXml(string xml)
+        {
+            try
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(xml);
+                var stringBuilder = new StringBuilder();
+                var settings = new XmlWriterSettings
+                {
+                    Indent = true,
+                    IndentChars = "  ",
+                    NewLineChars = "\r\n",
+                    NewLineHandling = NewLineHandling.Replace
+                };
+                using (var stringWriter = new StringWriter(stringBuilder))
+                using (var xmlWriter = XmlWriter.Create(stringWriter, settings))
+                {
+                    doc.Save(xmlWriter);
+                }
+                return stringBuilder.ToString();
+            }
+            catch (Exception ex)
+            {
+                return $"Error formatting XML: {ex.Message}";
             }
         }
 
@@ -2790,31 +2864,37 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             //	Check if user approves own document when a role is responsible
             //if (GetNode().IsUserApproval() && (GetPO().GetType() == typeof(DocAction) || GetPO().GetType().GetInterface("DocAction") == typeof(DocAction)))
             //{
-            GetPO();
+
+
+            /*If the document to approve really IS his own document
+               this will be respected when trying to find an approval user in
+               the call to GetApprovalUser(...) */
+
+            //GetPO();
             // Check applied if the approver is the user who created the document
-            if (_po != null && AD_User_ID == _po.GetCreatedBy())
-            {
-                //DocAction doc = (DocAction)_po;
-                MUser user = new MUser(GetCtx(), AD_User_ID, null);
-                MRole[] roles = user.GetRoles(_po.GetAD_Org_ID());
-                bool canApproveOwnDoc = false;
-                for (int r = 0; r < roles.Length; r++)
-                {
-                    if (roles[r].IsCanApproveOwnDoc())
-                    {
-                        canApproveOwnDoc = true;
-                        break;
-                    }	//	found a role which allows to approve own document
-                }
-                if (!canApproveOwnDoc)
-                {
-                    //String info = user.GetName() + " cannot approve own document " + doc;
-                    String info = user.GetName() + " cannot approve own document ";
-                    AddTextMsg(info);
-                    log.Fine(info);
-                    return false;		//	ignore
-                }
-            }
+            //if (_po != null && AD_User_ID == _po.GetCreatedBy())
+            //{
+            //    //DocAction doc = (DocAction)_po;
+            //    MUser user = new MUser(GetCtx(), AD_User_ID, null);
+            //    MRole[] roles = user.GetRoles(_po.GetAD_Org_ID());
+            //    bool canApproveOwnDoc = false;
+            //    for (int r = 0; r < roles.Length; r++)
+            //    {
+            //        if (roles[r].IsCanApproveOwnDoc())
+            //        {
+            //            canApproveOwnDoc = true;
+            //            break;
+            //        }	//	found a role which allows to approve own document
+            //    }
+            //    if (!canApproveOwnDoc)
+            //    {
+            //        //String info = user.GetName() + " cannot approve own document " + doc;
+            //        String info = user.GetName() + " cannot approve own document ";
+            //        AddTextMsg(info);
+            //        log.Fine(info);
+            //        return false;		//	ignore
+            //    }
+            //}
 
             SetWFState(StateEngine.STATE_RUNNING);
             SetAD_User_ID(AD_User_ID);

@@ -141,6 +141,11 @@ namespace VIS.Models
             //	Show Advanced Tab
             preference.SetIsShowAdvanced(pref["IsShowAdvanced"].Equals("Y") ? true : false);
             ctx.SetContext("#ShowAdvanced", pref["IsShowAdvanced"].Equals("Y") ? true : false);
+            //Handle PrintNative digit
+            if (pref.ContainsKey("PrintNativeDigits"))
+            {
+                ctx.SetContext("PrintNativeDigits", (string)pref["PrintNativeDigits"]??"N");
+            }
             return preference.Save();
         }
         public UserSetting SaveChangePassword(Ctx ctx, int AD_User_ID, string currentPws, string newPws)
@@ -641,29 +646,37 @@ namespace VIS.Models
         /// </summary>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        public List<LoginData> GetProjects(Ctx ctx)
+        public List<dynamic> GetProjects(Ctx ctx)
         {
-            string sql = "SELECT Name,VAAPI_Project_ID FROM VAAPI_Project";
+            string sql = "SELECT Name, VAAPI_Project_ID, IsActive FROM VAAPI_Project ORDER BY Name";
             try
             {
-                List<LoginData> ld = null;
+                List<dynamic> projects = null;
                 DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(sql, "VAAPI_Project", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO));
-                if (ds != null && ds.Tables[0].Rows.Count > 0)
-                {
-                    ld = new List<LoginData>();
-                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
-                    {
-                        ld.Add(new LoginData() { Name = VAdvantage.Utility.Util.GetValueOfString(ds.Tables[0].Rows[i][0]), RecKey = VAdvantage.Utility.Util.GetValueOfInt(ds.Tables[0].Rows[i][1]) });
-                    }
 
+                if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    projects = new List<dynamic>();
+
+                    foreach (DataRow row in ds.Tables[0].Rows)
+                    {
+                        projects.Add(new
+                        {
+                            Name = Util.GetValueOfString(row["Name"]),
+                            RecKey = Util.GetValueOfInt(row["VAAPI_Project_ID"]),
+                            IsActive = Util.GetValueOfString(row["IsActive"])
+                        });
+                    }
                 }
-                return ld;
+
+                return projects;
             }
             catch
             {
                 return null;
             }
         }
+
 
         /// <summary>
         /// VAI050-This method used to call Login API
@@ -771,12 +784,16 @@ namespace VIS.Models
         public List<Dictionary<string, object>> GetSecretKeyData(Ctx ctx)
         {
             List<Dictionary<string, object>> keyList = null;
-            string query = @"SELECT s.VAAPI_SessionToken_ID, s.VAAPI_KeyName, s.Created,s.IsActive, u.Name AS CreatedBy,
+            string query = @" SELECT s.VAAPI_SessionToken_ID, s.VAAPI_KeyName, s.Created,s.IsActive, u.Name AS CreatedBy,
                              s.VAAPI_HintSessionToken,
-                             p.Name AS ProjectName,p.VAAPI_Project_ID FROM VAAPI_SessionToken s
+                             p.Name AS ProjectName,p.VAAPI_Project_ID 
+                             ,r.Name AS Role
+                             FROM VAAPI_SessionToken s
                              INNER JOIN VAAPI_Project p ON (s.VAAPI_Project_ID = p.VAAPI_Project_ID)
-                             INNER JOIN AD_User u ON (u.AD_User_ID=s.CreatedBy)";
-            DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(query, "s", true, true) + " ORDER BY VAAPI_SessionToken_ID");
+                             INNER JOIN AD_User u ON (u.AD_User_ID=s.CreatedBy)
+                             INNER JOIN AD_Session ss ON(ss.AD_Session_ID=s.AD_Session_ID)
+                            INNER JOIN AD_Role r ON(r.AD_Role_ID=ss.AD_Role_ID)";
+            DataSet ds = DB.ExecuteDataset(MRole.GetDefault(ctx).AddAccessSQL(query, "s", true, true) + " AND s.CreatedBy=" + ctx.GetAD_User_ID() + " ORDER BY s.VAAPI_SessionToken_ID");
 
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
             {
@@ -790,7 +807,7 @@ namespace VIS.Models
                     {
                         string firstTwo = sessionToken.Substring(0, 2);
                         string lastTwo = sessionToken.Substring(sessionToken.Length - 2, 2);
-                        maskedToken = firstTwo + new string('*', 16) + lastTwo;
+                        maskedToken = firstTwo + new string('*', 12) + lastTwo;
                     }
 
                     Dictionary<string, object> obj = new Dictionary<string, object>();
@@ -802,6 +819,7 @@ namespace VIS.Models
                     obj.Add("RecordID", Util.GetValueOfInt(ds.Tables[0].Rows[i]["VAAPI_SessionToken_ID"]));
                     obj.Add("ProjectID", Util.GetValueOfInt(ds.Tables[0].Rows[i]["VAAPI_Project_ID"]));
                     obj.Add("IsActive", Util.GetValueOfString(ds.Tables[0].Rows[i]["IsActive"]));
+                    obj.Add("Role", Util.GetValueOfString(ds.Tables[0].Rows[i]["Role"]));
                     keyList.Add(obj);
                 }
             }
@@ -923,6 +941,59 @@ namespace VIS.Models
             catch (Exception e)
             {
                 VAdvantage.Logging.VLogger.Get().Severe("ErrorToVerifyPassword=>" + e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public List<dynamic> GetTwoFAMethod(Ctx ctx)
+        {
+            string sql = @"SELECT
+                            ad_ref_list.value,
+                            ad_ref_list.name,
+                            AD_User.TWOFAMETHOD
+                        FROM
+                            ad_ref_list ad_ref_list
+                            LEFT JOIN  AD_User ON (ad_ref_list.value=AD_User.TWOFAMETHOD AND AD_User_ID=" + ctx.GetAD_User_ID() + @")
+                        WHERE
+                            ad_ref_list.ad_reference_id IN (SELECT ad_reference_id FROM ad_reference WHERE name = 'TwoFAMethod')";
+            DataSet dataSet = DB.ExecuteDataset(sql);
+            List<dynamic> result = new List<dynamic>();
+
+            if (dataSet != null && dataSet.Tables.Count > 0)
+            {
+                foreach (DataRow dr in dataSet.Tables[0].Rows)
+                {
+                    dynamic item = new ExpandoObject();
+                    item.value = Util.GetValueOfString(dr["value"]);
+                    item.name = Util.GetValueOfString(dr["name"]);
+                    item.TWOFAMETHOD = Util.GetValueOfString(dr["TWOFAMETHOD"]);
+                    result.Add(item);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public bool UpdateTwoFAMethod(Ctx ctx, string method)
+        {
+            string sql = "Update AD_User SET TWOFAMETHOD='" + method + "' WHERE AD_User_ID=" + ctx.GetAD_User_ID();
+            if (DB.ExecuteQuery(sql) > 0)
+            {
+                return true;
+            }
+            else
+            {
                 return false;
             }
         }

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Hosting;
+using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.DBase;
 using VIS.Models;
@@ -51,7 +54,7 @@ namespace VIS.Helpers
                                     WHEN
                                      (SELECT COUNT(*)
                                        FROM AD_Shortcut i
-                                      WHERE i.Parent_ID = o.AD_Shortcut_ID and IsChild = 'Y') >0
+                                      WHERE i.ShowInAppTray='N' AND i.Parent_ID = o.AD_Shortcut_ID and IsChild = 'Y') >0
                                     THEN 'Y'
                                     ELSE 'N'
                                   END) AS HasChild, o.AD_Shortcut_ID as ID,  o.Url as Url,
@@ -73,7 +76,7 @@ namespace VIS.Helpers
                 .Append("'").Append(Env.GetAD_Language(ctx)).Append("'");
             }
 
-            sql.Append(" WHERE o.AD_Client_ID = 0 AND o.IsActive ='Y' AND o.IsChild = 'N' ");
+            sql.Append(" WHERE o.AD_Client_ID = 0 AND o.IsActive ='Y' AND o.IsChild = 'N' AND o.ShowInAppTray='N' ");
 
             sql.Append(@"AND (o.AD_Window_ID IS NULL OR EXISTS (SELECT * FROM Ad_Window_Access w WHERE w.AD_Window_ID=o.AD_Window_ID AND w.IsReadWrite='Y' AND w.IsActive='Y' AND o.AD_Window_ID IS NOT NULL AND w.AD_Role_ID=" + ctx.GetAD_Role_ID() + @"))
                         AND (o.AD_Form_ID IS NULL OR EXISTS (SELECT * FROM ad_Form_access f WHERE f.ad_form_id=o.AD_Form_ID AND f.isreadwrite='Y' AND f.IsActive='Y' AND o.AD_Form_ID IS NOT NULL AND f.AD_Role_ID=" + ctx.GetAD_Role_ID() + @"))
@@ -256,6 +259,35 @@ namespace VIS.Helpers
                     {
                         itm.HasImage = true;
                         itm.IsImageByteArray = false;
+                        //if (!string.IsNullOrEmpty(img.GetImageExtension()))
+                        //{
+                        //    string[] url = img.GetImageURL().Split('/');
+                        //    if (url.Length > 0)
+                        //    {
+                        //        //string strImg = img.GetImageURL().Split('/')[0] + "/" + AD_Image_ID + "" + img.GetImageExtension(); //img.GetImageURL(); 
+                        //        string strImg = img.GetImageURL(); 
+                        if (!File.Exists(HostingEnvironment.MapPath(@"~/" + img.GetImageURL()))) //Check Image exist or not in Image folder
+                        {
+                            // only for call After save logic. temporary update the column
+                            MImage mimg = new MImage(ctx, AD_Image_ID, null);
+                            mimg.SetImageURL("");
+                            mimg.Save();
+
+                            img = new VAdvantage.Model.MImage(ctx, AD_Image_ID, null);
+                        }
+
+                        //        itm.IconUrl = @"Images/Thumb140x120/" + AD_Image_ID + "" + img.GetImageExtension();
+
+                        //    }
+                        //    else
+                        //    {
+                        //        itm.IconUrl = img.GetImageURL();
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    itm.IconUrl = img.GetImageURL();
+                        //}
                         itm.IconUrl = img.GetImageURL();
                     }
                     else if (img.GetBinaryData() != null)
@@ -310,7 +342,7 @@ namespace VIS.Helpers
                 sql += " trl.Name as Name2 FROM AD_Shortcut o INNER JOIN AD_Shortcut_Trl trl ON o.AD_Shortcut_ID = trl.AD_Shortcut_ID "
                          + " AND trl.AD_Language =  '" + Env.GetAD_Language(ctx) + "' ";
             }
-            sql += @" WHERE o.AD_Client_ID = 0
+            sql += @" WHERE o.ShowInAppTray='N' AND o.AD_Client_ID = 0
                                   AND o.IsActive         ='Y'
                                   AND o.IsChild          = 'Y'
                                  AND o.Parent_ID =  " + AD_Shortcut_ID + @"
@@ -335,5 +367,66 @@ namespace VIS.Helpers
             CreateShortcut(dr, lst, ctx,true);
             return lst;
         }
+
+        public List<AppTrayModel> GetAppTray(Ctx ctx)
+        {
+            string sql = @"SELECT 
+                            s.AD_Shortcut_ID,
+                            s.DisplayName,
+                            CASE 
+                                WHEN (s.Classname IS NOT NULL) 
+                                    THEN s.Classname
+                                WHEN (s.Classname IS NULL) AND s.Action = 'X' 
+                                    THEN f.Classname
+                                ELSE NULL
+                            END AS Classname,
+                            s.AD_Image_ID
+                        FROM AD_Shortcut s
+                        LEFT JOIN AD_Form f 
+                            ON (s.AD_Form_ID = f.AD_Form_ID)
+                        WHERE s.ShowInAppTray = 'Y' 
+                          AND s.IsActive = 'Y'";
+
+            IDataReader dr = null;
+            List<AppTrayModel> lst = new List<AppTrayModel>();
+            try
+            {
+                dr = DB.ExecuteReader(sql.ToString(), null);
+                while (dr.Read())
+                {
+                    AppTrayModel itm = new AppTrayModel();
+                    int AD_Image_ID = Util.GetValueOfInt(dr["AD_Image_ID"]);
+                    var img = new VAdvantage.Model.MImage(ctx, AD_Image_ID, null);
+                    itm.DisplayName = Util.GetValueOfString(dr["DisplayName"]);
+                    itm.ClassName = Util.GetValueOfString(dr["Classname"]);
+                    itm.AD_Shortcut_ID = Util.GetValueOfInt(dr["AD_Shortcut_ID"]);
+                    if (img.GetFontName() != null && img.GetFontName().Length > 0)
+                    {
+                        itm.IsImage = false;
+                        itm.ImgPath = img.GetFontName();
+                        itm.FontStyle = Convert.ToString(img.Get_Value("FontStyle"));
+                    }
+                    else if (img.GetImageURL() != null && img.GetImageURL().Length > 0)
+                    {
+                        itm.IsImage = true;
+                        string modified = img.GetImageURL().Replace("Images/", "Images/Thumb32x32/");
+                        itm.ImgPath = modified;
+
+                    }
+                    lst.Add(itm);
+                }
+                dr.Close();
+            }
+            catch
+            {
+                if (dr != null)
+                    dr.Close();
+
+            }
+
+            return lst;
+        }
+           
+
     }
 }

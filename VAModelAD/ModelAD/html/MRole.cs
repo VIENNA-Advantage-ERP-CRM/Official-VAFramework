@@ -205,13 +205,18 @@ namespace VAdvantage.Model
                     }
                 }
             }
-            //else if (role.GetAD_Role_ID() != AD_Role_ID
-            //|| role.GetAD_User_ID() != AD_User_ID)
-            //{
-            //    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
-            //    s_cache[AD_Role_ID] = role;
-            //}
-            return role;
+            else if(role!=null)
+            {
+                //Update the context so current context become Model context
+                role.p_ctx = ctx;
+            }
+                //else if (role.GetAD_Role_ID() != AD_Role_ID
+                //|| role.GetAD_User_ID() != AD_User_ID)
+                //{
+                //    role = Get(ctx, AD_Role_ID, AD_User_ID, true);
+                //    s_cache[AD_Role_ID] = role;
+                //}
+                return role;
 
 
             //if (reload || _defaultRole == null)
@@ -2655,6 +2660,21 @@ namespace VAdvantage.Model
                     if (!set.Contains("0")) // add if rw false
                     {
                         set.Add("0");
+                    }
+                }
+                else //if exclude zero , then check for filtered org readonly status
+                {
+                    for(int o = 0; o<set.Count; o++)
+                    {
+                        for (int i = 0; i < _orgAccess.Length; i++)
+                        {
+                            if (_orgAccess[i].AD_Org_ID.ToString() == set[o] && _orgAccess[i].readOnly) // rw
+                            {
+                                set.Remove(set[o]); // remove if read only
+                                o--;
+                                break;
+                            }
+                        }
                     }
                 }
                 //else

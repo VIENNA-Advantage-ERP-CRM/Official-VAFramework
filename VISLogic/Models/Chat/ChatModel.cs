@@ -231,6 +231,7 @@ namespace VIS.Models
                 {
 
                     //UserImg = img,
+                    ChatEntry_ID = entry.GetCM_ChatEntry_ID(),
                     UserName = strName.ToString(),
                     ChatData = entry.GetCharacterData(),
                     ChatDate = _createdDate,
@@ -246,6 +247,8 @@ namespace VIS.Models
             cinfo.subChat = subscribedChat;
             cinfo.userimages = imgIds;
             cinfo.totalCount = totalCount;
+            string isDeleteable = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsDeleteable FROM AD_Table WHERE TableName='CM_ChatEntry'"));
+            cinfo.isDelete = isDeleteable;
             return cinfo;
         }
 
@@ -304,6 +307,27 @@ namespace VIS.Models
             }
             return false;
 
+        }
+
+        public static bool DeleteChatEntry(Ctx ctx, int chatEntryID)
+        {
+            if (chatEntryID <= 0)
+                return false;
+            MChatEntry entry = new MChatEntry(ctx, chatEntryID, null);
+            if (entry == null || entry.Get_ID() <= 0)
+                return false;
+            return entry.Delete(true); // true = force delete
+        }
+        public static bool EditChatEntry(Ctx ctx, int chatEntryID, string newContent)
+        {
+            if (chatEntryID <= 0 || string.IsNullOrWhiteSpace(newContent))
+                return false;
+            MChatEntry entry = new MChatEntry(ctx, chatEntryID, null);
+            if (entry == null || entry.Get_ID() <= 0)
+                return false;
+            entry.SetCharacterData(newContent);
+            // entry.Set_Value("IsEdited", true); // Optional flag
+            return entry.Save();
         }
 
         //public DataSet ExecuteDataSetPaging(SqlParamsIn sqlIn)
@@ -369,6 +393,7 @@ namespace VIS.Models
         public string UserName { get; set; }
         public int AD_Image_ID { get; set; }
         public int AD_User_ID { get; set; }
+        public int ChatEntry_ID { get; set; }    ////new addd
     }
 
     public class UserImages
@@ -384,6 +409,7 @@ namespace VIS.Models
         public int totalCount { get; set; }
         public List<UserImages> userimages { get; set; }
         public List<LatestSubscribedRecordChat> subChat { get; set; }
+        public string isDelete { get; set; }
     }
 
 

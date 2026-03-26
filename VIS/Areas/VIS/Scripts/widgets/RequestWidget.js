@@ -33,7 +33,7 @@
 
         var elements = [
             "SelectWindow"];
-        var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
+        //var msgs = VIS.Msg.translate(VIS.Env.getCtx(), elements, true);
 
         /* Initialize the form design*/
         this.Initalize = function () {
@@ -41,6 +41,9 @@
             createBusyIndicator();
             showBusy(true);
             loadHomeRequest(true, true);
+            setInterval(function () {
+                $self.refreshWidget();
+            }, 1000 * 60 * 5);  // refresh every 5 minutes
         };
         /* Declare events */
         function events() {
@@ -94,11 +97,12 @@
             $hlnkTabDataRef_ID.on("click", $self.refreshWidget);
             $welcomeNewRecord.on("click", function () {
                 var sql = "VIS_129";
-                var n_win = executeScalar(sql);
+                executeScalar(sql, null, function (n_win) {
 
-                var zoomQuery = new VIS.Query();
-                zoomQuery.addRestriction("R_Request_ID", VIS.Query.prototype.EQUAL, 0);
-                VIS.viewManager.startWindow(n_win, zoomQuery);
+                    var zoomQuery = new VIS.Query();
+                    zoomQuery.addRestriction("R_Request_ID", VIS.Query.prototype.EQUAL, 0);
+                    VIS.viewManager.startWindow(n_win, zoomQuery);
+                });
             });
         };
         /* Start Request */
@@ -108,7 +112,7 @@
                 url: VIS.Application.contextUrl + 'Home/GetJSONHomeRequest',
                 data: { "pageSize": pageSize, "page": pageNo, "isTabDataRef": isTabDataRef },
                 type: 'GET',
-                async: async,
+               // async: async,
                 datatype: 'json',
                 cache: false,
                 success: function (result) {
@@ -271,7 +275,7 @@
                 type: "POST",
                 datatype: "json",
                 contentType: "application/json; charset=utf-8",
-                async: async,
+               // async: async,
                 data: JSON.stringify(data)
             }).done(function (json) {
                 result = json;

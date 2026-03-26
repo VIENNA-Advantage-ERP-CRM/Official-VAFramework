@@ -1213,7 +1213,7 @@
         this.values = null;
         this.isIconSet = true;
 
-        var $img = $("<i style='color:inherit' title='" + text + "'>"); 
+        var $img = $("<i style='color:inherit' title='" + text + "'>");
         var $imgSrc = $("<img style='color:inherit;display:none' title='" + text + "' />");
 
         var $txt = $("<span style='color:inherit'>").text(text);
@@ -1240,7 +1240,7 @@
 
         this.setIcon = function (img, isSrc) {
             if (isSrc) {
-                $imgSrc.attr("src",img);
+                $imgSrc.attr("src", img);
                 $img.hide();
                 $imgSrc.show();
             }
@@ -1460,7 +1460,7 @@
     VButton.prototype.setVisible = function (visible) {
         this.visible = visible;
         //Action group[]
-        var isag = this.ctrl && this.ctrl.parent().length > 0 && this.ctrl.parent().prop('tagName') == "LI";
+        var isag = false;// this.ctrl && this.ctrl.parent().length > 0 && this.ctrl.parent().prop('tagName') == "LI";
         if (visible) {
             this.ctrl.show();
             if (isag)
@@ -1468,7 +1468,7 @@
         } else {
             this.ctrl.hide();
             if (isag)
-            this.ctrl.parent().hide();
+                this.ctrl.parent().hide();
         }
     };
 
@@ -1908,19 +1908,26 @@
                 if ((self.lookup != null) && (self.lookup instanceof VIS.MLookup)) {
                     var AD_Reference_ID = self.lookup.getAD_Reference_Value_ID();
                     if (AD_Reference_ID != 0) {
-                        var query = "VIS_83";
-                        var param = [];
-                        param[0] = new VIS.DB.SqlParam("@AD_Reference_ID", AD_Reference_ID);
-                        try {
-                            var dr = executeReader(query, param);
-                            if (dr.read()) {
-                                keyColumnName = dr.getString(0);
-                            }
-                            dr.dispose();
-                        }
-                        catch (e) {
-                            this.log.log(VIS.Logging.Level.SEVERE, query, e);
-                        }
+                        //var query = "VIS_83";
+                        //var param = [];
+                        //param[0] = new VIS.DB.SqlParam("@AD_Reference_ID", AD_Reference_ID);
+                        //try {
+                        //    var dr = executeReader(query, param);
+                        //    if (dr.read()) {
+                        //        keyColumnName = dr.getString(0);
+                        //    }
+                        //    dr.dispose();
+                        //}
+                        //catch (e) {
+                        //    this.log.log(VIS.Logging.Level.SEVERE, query, e);
+                        //}
+                        var data = {};
+                        data.value = value;
+                        data.refId = AD_Reference_ID;
+                        data.colName = self.getColumnName();
+                        var retData = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomWhereClause", data);
+                        keyColumnName = retData.colName;
+                        value = retData.value;
                     }	//	Table Reference
                 }	//	MLookup
 
@@ -2390,6 +2397,7 @@
         this.value = null;
         // Variable for setting custom info window while creating search control.- added by Mohit.
         this.custInfoWin = null;
+        this.isGenInfo = false;
         var _TableName = null;
         var _KeyColumnName = null;
         this.infoMultipleIds = null;
@@ -2509,7 +2517,7 @@
             this.isReadOnly = readOnly;
             $ctrl.prop('disabled', readOnly || this.isMultiKeyTextBox ? true : false);
             // this.$super.setReadOnly(readonly);
-           // this.setBackground(readOnly);
+            // this.setBackground(readOnly);
             if (readOnly) {
                 $btnSearch.css("opacity", .7);
             } else {
@@ -3326,6 +3334,10 @@
                     InfoWindow = new VIS.infoProduct(true, self.lookup.windowNo, M_Warehouse_ID, M_PriceList_ID,
                         text, tableName, _keyColumnName, multipleSelection, wc, selectedIDs);
                 }
+                else if (self.isGenInfo) {
+                    InfoWindow = new VIS.infoGeneral(true, self.lookup.windowNo, text,
+                        tableName, _keyColumnName, self.isMultiKeyTextBox, wc, selectedIDs);
+                }
                 else {
                     //try get dynamic window
                     // Change by mohit - to change the logic of getting dynamic window. Date - 17 october 2017
@@ -3754,6 +3766,10 @@
         }
     }
 
+    // Added by Bharat - To Open general info window while creating search control.
+    VTextBoxButton.prototype.setIsGenInfo = function (IsGenInfo) {
+        this.isGenInfo = IsGenInfo;
+    }
 
     //7. 
     function VTextArea(columnName, isMandatory, isReadOnly, isUpdateable, displayLength, fieldLength, displayType) {
@@ -6906,8 +6922,8 @@
         var $ctrl = $('<input>', { type: 'tel', name: columnName, maxlength: fieldLength });
 
         var $btnSearch = $('<button tabindex="-1" class="input-group-text"><i class="' + src + '" /></button>');
-       // if (!isReadOnly)
-         //   $ctrl.append($btnSearch);
+        // if (!isReadOnly)
+        //   $ctrl.append($btnSearch);
 
         var telCtrl = $ctrl;
         //Call base class
@@ -6970,6 +6986,7 @@
 
         $ctrl.on("countrychange", function (e, countryData) {
             e.stopPropagation();
+            setZeroFormattedPlaceholder($ctrl[0]);
             if (!self.settingVal) {
                 setChangeValue(e);
             }
@@ -7036,6 +7053,12 @@
 
     };
 
+    function setZeroFormattedPlaceholder(input) {
+        const original = input.getAttribute("placeholder") || "";
+        const masked = original.replace(/\d/g, "0"); // replace digits only
+        input.setAttribute("placeholder", masked);
+    }
+
     VIS.Utility.inheritPrototype(VTelePhone, IControl);//Inherit from IControl
 
     VTelePhone.prototype.setReadOnly = function (readOnly, forceWritable) {
@@ -7066,7 +7089,7 @@
             this.settingVal = true;
             //else
             //his.ctrl.val(newValue);
-            if (!newValue) {
+            if (!newValue && newValue !='') {
                 this.iti ? this.iti.setNumber('') : this.ctrl.val('');
                 this.setCountry();
             } else {
@@ -7080,6 +7103,7 @@
             this.oldValue = newValue;
             //this.setBackground("white");
         }
+        setZeroFormattedPlaceholder(this.ctrl[0]);
     };
 
     /** 
@@ -7128,7 +7152,10 @@
             },
             utilsScript: baseUrl + "Areas/ViennaBase/Scripts/tel_Input/utils.js?1638200991544"
         });
-
+        setTimeout(function () {
+            if (this.ctrl)
+                setZeroFormattedPlaceholder(this.ctrl[0]);
+        }, 200);
     };
 
     VTelePhone.prototype.getControl = function (parent) {

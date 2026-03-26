@@ -902,10 +902,10 @@
     /**
      * refresh row presentation
      */
-    VIS.GridController.prototype.refreshRowPresentation = function () {
+    VIS.GridController.prototype.refreshRowPresentation = function (avoidRequery) {
         if (this.isCardRow) {
             this.isCardRow = false;
-            this.switchCardRow();
+            this.switchCardRow(avoidRequery);
         }
         else if (this.isMapRow) {
             this.isMapRow = false;
@@ -1730,8 +1730,7 @@
         if (newRecordView == NEWRECORDVIEW_SingleRowLayout) {
             this.switchSingleRow();
             this.aPanel.showHideViewIcon(this.aPanel.aSingle);
-            action = this.aPanel.aSingle.action;
-
+            action = this.aPanel.aSingle.action;           
         }
         else if (newRecordView == NEWRECORDVIEW_GridLayout) {
             this.isNewClick = true; // use for stop requery data
@@ -1750,6 +1749,9 @@
         
         if (type != newRecordView) {
             this.aPanel.setTabstackview(action);
+        } else {
+            this.aPanel.startFilterPanel(true);
+            this.aPanel.isHideFilterIcon(true);
         }
        
     };
@@ -1971,6 +1973,15 @@
                     added = true;
                 }
             }
+
+            //check for org access
+            if (!added && "ad_org_id" in record) {
+                if (!VIS.MRole.getIsOrgAccess(record.ad_org_id, true)) {
+                    retIndices.push(selIndices[i]);
+                    added = true;
+                }
+            }
+
             //check for filter org
             if (!added) {
                 var fOrgs = VIS.context.getContext("#AD_FilteredOrg");
@@ -2187,7 +2198,7 @@
             if(!this.displayAsIncludedGC && this.vIncludedGC !=null) {
                 this.vIncludedGC.vTable.resize();
             }
-            if (this.gTab.getIsTPBottomAligned())
+           // if (this.gTab.getIsTPBottomAligned())
                 this.aPanel.showTabPanel(true);
         }
 
@@ -2230,7 +2241,7 @@
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
                 this.vTable.activate(false, this.showMultiViewOnly); 
-                if (this.gTab.getIsTPBottomAligned())
+                //if (this.gTab.getIsTPBottomAligned())
                 this.aPanel.showTabPanel(false);
             }
 
@@ -2281,7 +2292,7 @@
 
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
-                if (this.gTab.getIsTPBottomAligned())
+                //if (this.gTab.getIsTPBottomAligned())
                     this.aPanel.showTabPanel(false);
             }
 
@@ -2331,7 +2342,7 @@
 
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
-                if (this.gTab.getIsTPBottomAligned())
+               // if (this.gTab.getIsTPBottomAligned())
                     this.aPanel.showTabPanel(false);
             }
 

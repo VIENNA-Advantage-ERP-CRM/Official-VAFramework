@@ -15,6 +15,7 @@ using System.Reflection;
 using VAdvantage.Logging;
 using VAdvantage.Utility;
 using BaseLibrary.Model;
+using System.Linq.Expressions;
 
 namespace VAdvantage.Model
 {
@@ -513,17 +514,17 @@ namespace VAdvantage.Model
             string tableName = GetTableName();
             if (Record_ID != 0 && !IsSingleKey())
             {
-               int id= Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Column_ID FROM AD_Column WHERE ColumnName='"+ tableName + "_ID' AND AD_Table_ID=" + GetAD_Table_ID()));
+                int id = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Column_ID FROM AD_Column WHERE ColumnName='" + tableName + "_ID' AND AD_Table_ID=" + GetAD_Table_ID()));
                 if (id > 0)
                 {
-                    return GetPO(ctx, tableName+"_ID=" + Record_ID, trxName);
+                    return GetPO(ctx, tableName + "_ID=" + Record_ID, trxName);
                 }
                 else
                 {
                     log.Log(Level.WARNING, "(id) - Multi-Key " + tableName);
                     return null;
                 }
-                
+
             }
             PO po = null;
             List<IModelFactory> factoryList = VAModelAD.Classes.ModelFactoryLoader.GetList();
@@ -675,6 +676,26 @@ namespace VAdvantage.Model
             if (IsView() && IsDeleteable())
                 SetIsDeleteable(false);
 
+            // vis0008 check applied for restriction of duplicate table names in AD
+            string sqlCheckTableExists = "";
+            if (newRecord)
+            {
+                sqlCheckTableExists = $"SELECT AD_Table_ID FROM AD_Table WHERE UPPER(TableName) = '{GetTableName().ToUpper()}'";
+            }
+            else if (Is_ValueChanged("TableName"))
+            {
+                sqlCheckTableExists = $"SELECT AD_Table_ID FROM AD_Table WHERE UPPER(TableName) = '{GetTableName().ToUpper()}' AND AD_Table_ID != " + GetAD_Table_ID();
+            }
+            if (sqlCheckTableExists != "")
+            {
+                int tableExists = Util.GetValueOfInt(DB.ExecuteScalar(sqlCheckTableExists));
+                if (tableExists > 0)
+                {
+                    log.SaveError("Error", Msg.GetMsg(GetCtx(), "AlreadyExists"));
+                    return false;
+                }
+            }
+
             // check applied for maintain Versions 
             // if there is change in maintain Versions checkbox, then before unchecking need to check if
             // any other column is not marked as maintainversions and data is there in Version table then do not allow to uncheck maintain version on Table
@@ -708,15 +729,22 @@ namespace VAdvantage.Model
         /// <returns>True/False</returns>
         public bool HasVersionData(string TblName)
         {
-            if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Table_ID) FROM AD_Table WHERE TableName = '" + TblName + "'", null, Get_Trx())) > 0)
+            try
             {
-                int countRec = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Client_ID) FROM " + TblName, null, Get_TrxName()));
-                if (countRec > 0)
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Table_ID) FROM AD_Table WHERE TableName = '" + TblName + "'", null, Get_Trx())) > 0)
                 {
-                    log.SaveError("VersionDataExists", Utility.Msg.GetElement(GetCtx(), "VersionDataExists"));
-                    return true;
+                    int countRec = Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(AD_Client_ID) FROM " + TblName, null, Get_TrxName()));
+                    if (countRec > 0)
+                    {
+                        log.SaveError("VersionDataExists", Utility.Msg.GetElement(GetCtx(), "VersionDataExists"));
+                        return true;
+                    }
                 }
             }
+            catch {
+                log.SaveError("DBError","version table not exists");
+            }
+               
             return false;
         }
 
@@ -948,7 +976,7 @@ namespace VAdvantage.Model
             return Util.GetValueOfInt(DB.ExecuteScalar("SELECT a.AD_Window_ID FROM AD_Window a "
                     + "INNER JOIN AD_Tab b ON (a.AD_Window_ID=b.AD_Window_ID) "
                     + "INNER JOIN AD_Menu m ON (a.AD_Window_ID=m.AD_Window_ID AND m.IsActive='Y' AND m.Action='W') "
-                    + "WHERE a.IsActive='Y' AND b.IsActive='Y' AND b.AD_Table_ID="+GetAD_Table_ID()+" ORDER BY b.TabLevel, a.AD_Window_ID"));
+                    + "WHERE a.IsActive='Y' AND b.IsActive='Y' AND b.AD_Table_ID=" + GetAD_Table_ID() + " ORDER BY b.TabLevel, a.AD_Window_ID"));
         }
     }
 }

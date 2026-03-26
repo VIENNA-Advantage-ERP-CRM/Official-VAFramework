@@ -9,6 +9,7 @@ using Ionic.Zip;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Web.Mvc;
 using VAdvantage.Model;
 using VAdvantage.Utility;
@@ -44,6 +45,19 @@ namespace VIS.Controllers
             int LId = Util.GetValueOfInt(RecordId);
             HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
             return Json(JsonConvert.SerializeObject(_model.GetHistoryRecordsCount(LId, Util.GetValueOfInt(AD_Table_ID))), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Delete History record by passing parameters
+        /// </summary>
+        /// <param name="RecordId">Record ID</param> 
+        /// <param name="Type">Table ID</param>
+        /// <returns>History Record count</returns>
+        public JsonResult DeleteHistoryRecord(string RecordId, string Type)
+        {
+            Ctx ct = Session["ctx"] as Ctx;
+            HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
+            return Json(JsonConvert.SerializeObject(_model.DeleteHistoryRecord(ct, Util.GetValueOfInt(RecordId), Type)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -136,6 +150,54 @@ namespace VIS.Controllers
         }
 
         /// <summary>
+        /// Getting Chat History Records by passing parameters
+        /// </summary>
+        /// <param name="RecordId">Record ID</param>
+        /// <param name="_AD_Table_ID">Table ID</param>
+        /// <param name="CurrentPage">Page No</param>
+        /// <returns>History Records</returns>
+        public JsonResult GetChatHistoryDetails(int UserId, int RecordId, int AD_Table_ID, string Type)
+        {
+            Assembly asm = Assembly.Load("WorkspaceSvc");
+            Type type = asm.GetType("WorkspaceSvc.Classes.UtilUnipileServices");
+            object[] param = new object[4];
+            param[0] = 0;
+            param[1] = AD_Table_ID;
+            param[2] = RecordId;
+            param[3] = Type;
+            var resultObj = type.GetMethod("GetChatHistory").Invoke(null, param);
+            return Json(JsonConvert.SerializeObject(resultObj), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Getting selected Chat Message Details by passing parameters
+        /// </summary>
+        /// <param name="record_ID"></param>
+        /// <returns>History details</returns>
+        public JsonResult GetSelectedChatMessage(string record_ID)
+        {
+            int chatId = Util.GetValueOfInt(record_ID);
+            Assembly asm = Assembly.Load("WorkspaceSvc");
+            Type type = asm.GetType("WorkspaceSvc.Classes.UtilUnipileServices");
+            object[] param = new object[1];
+            param[0] = chatId;
+            var resultObj = type.GetMethod("GetChatMessage").Invoke(null, param);
+            return Json(JsonConvert.SerializeObject(resultObj), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get User Image
+        /// </summary>
+        /// <param name="User_ID"> User ID</param>          
+        /// <returns>Image Url</returns>
+        public JsonResult GetUserImage(int User_ID)
+        {
+            HistoryDetailsDataModel obj = new HistoryDetailsDataModel();
+            var result = obj.GetUserImage(User_ID);
+            return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// history attachment download
         /// </summary>
         /// <param name="AttID">Attachment ID</param>
@@ -182,11 +244,11 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="Provider">Auth Provider</param>
         /// <returns>json, object</returns>
-        public JsonResult GetUserAccount(string Provider)
+        public JsonResult GetUserAccount(int AuthProviderID, int MailConfigID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HistoryDetailsDataModel _model = new HistoryDetailsDataModel();
-            return Json(JsonConvert.SerializeObject(_model.GetUserAccount(ctx, Provider)), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(_model.GetUserAccount(ctx, AuthProviderID, MailConfigID)), JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>

@@ -30,7 +30,7 @@
         var Table_ID = null;
         var headerTab;
         var totalPages, currentRecords = null;
-
+        var $popupContent;
 
 
         /* Initialize the form design */
@@ -99,53 +99,60 @@
 
 
             /*events for getting HeaderIDs*/
-            pendingRecords.find('.vis-subheading').off('click')
-            pendingRecords.find('.vis-subheading').on('click', function () {
-                WindowName = $(this).attr('visWindowname');
-                WindowId = $(this).attr('visWindowId');
-                TableName = $(this).attr('visTableName');
-                Table_ID = $(this).attr('visTableId');
-                Record_ID = $(this).attr('visRecordId');
-                headerTab = $(this).attr('visHeaderTab');
-                if (headerTab > 0) {
-                    getHeaderIDs();
-                }
-                else {
-                    primaryKey = TableName + '_ID';
-                    zoomWindow();
-                }
-            });
+            /*   pendingRecords.find('.vis-subheading').off('click')
+               pendingRecords.find('.vis-subheading').on('click', function () {
+                   WindowName = $(this).attr('visWindowname');
+                   WindowId = $(this).attr('visWindowId');
+                   TableName = $(this).attr('visTableName');
+                   Table_ID = $(this).attr('visTableId');
+                   Record_ID = $(this).attr('visRecordId');
+                   headerTab = $(this).attr('visHeaderTab');
+                   if (headerTab > 0) {
+                       getHeaderIDs();
+                   }
+                   else {
+                       primaryKey = TableName + '_ID';
+                       zoomWindow();
+                   }
+               });*/
 
             //Popover for showing all records
             widgetContainer.find('.vis-show-checklist').off('click')
             widgetContainer.find('.vis-show-checklist').on('click', function () {
-                var $popupContent = $(`
+                $popupContent = $(`
                 <div class="VIS_PopoverMaindiv">
                 <button class="VIS_popupClose" id="popup-close-btn" title="${VIS.Msg.getMsg('close')}">
                 <i class="fa fa-times" aria-hidden="true"></i>
                </button>
-               <h3 class="VIS_popuptitle">${VIS.Msg.getMsg('VIS_PendingChecklist')}:${totalRecCount}</h3>
+               <h3 class="VIS_popuptitle">${VIS.Msg.getMsg('VIS_PendingChecklist')} <span class="total-count">${totalRecCount}</span></h3>
                <div class="VIS_popupRecordDetail"></div>
                </div>
              `);
 
                 var $recordDetail = $popupContent.find('.VIS_popupRecordDetail');
-
                 for (var i = 0; i < allRecords.length; i++) {
+
                     var $checklistCard = $(`
-                   <div class="vis-checklistcard">
-                     <div class="vis-card-title vis-checklistrecord-box">
-                    <span>${allRecords[i].windowname}</span>
-                    <span class="VIS_checklistCount">${allRecords[i].count}</span>
-                    
-                   </div>
-                    <div class="vis-Tabdropdown visWindowTabs"></div>
-                   </div>
-                `);
+    <div class="vis-checklistcard">
+        <div class="vis-card-title vis-checklistrecord-box">
+            <div class="vis-title-count">
+                <span class="hoverable-text">${allRecords[i].windowname}</span>
+                <span class="VIS_checklistCount">${allRecords[i].count}</span>
+            </div>
+            <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" 
+               title="${VIS.Msg.getMsg("VIS_Zoom")}" 
+               data-windowid="${allRecords[i].WindowID}"></i>
+        </div>
+        <div class="vis-Tabdropdown visWindowTabs"></div>
+    </div>
+`);
 
                     var $dropdown = $checklistCard.find('.vis-Tabdropdown');
                     console.log(allRecords)
                     for (var k = 0; k < allRecords[i].TableRecordIds.length; k++) {
+                        var recordItem = allRecords[i].TableRecordIds[k];
+                        var parentIdAttr = recordItem.ParentIds ? `visParentId="${recordItem.ParentIds}"` : '';
+                        var headTableAttr = allRecords[i].HeadTable ? `vis_headTable="${allRecords[i].HeadTable}"` : '';
                         $dropdown.append(`
                       <div class="vis-subheading" 
                       visRecordId="${allRecords[i].TableRecordIds[k].RecordIds}"  
@@ -153,9 +160,9 @@
                       visWindowname="${allRecords[i].windowname}"   
                       visWindowId="${allRecords[i].WindowID}" 
                       visTableId ="${allRecords[i].TableRecordIds[k].AD_table_ID}"
-                      visHeaderTab="${allRecords[i].TableRecordIds[k].TabLevel}">
+                      visHeaderTab="${allRecords[i].TableRecordIds[k].TabLevel}"${parentIdAttr}" ${headTableAttr}>
                     <span>${allRecords[i].TableRecordIds[k].TabName}</span>
-                    <span>${allRecords[i].TableRecordIds[k].RecordIds.length}</span>
+                    <span class="vis_innertabcount">${allRecords[i].TableRecordIds[k].RecordIds.length}</span>
                 </div>
             `);
                     }
@@ -179,27 +186,152 @@
                             $('#popup-close-btn').on('click', function () {
                                 w2popup.close();
                             });
-                            $('.w2ui-popup .vis-subheading').on('click', function () {
+                            /* $('.w2ui-popup .vis-subheading').on('click', function () {
+                                 w2popup.close();
+                                 WindowName = $(this).attr('visWindowname');
+                                 WindowId = $(this).attr('visWindowId');
+                                 TableName = $(this).attr('visTableName');
+                                 Record_ID = $(this).attr('visRecordId');
+                                 Table_ID = $(this).attr('visTableId');
+                                 headerTab = $(this).attr('visHeaderTab');
+                                 if (headerTab > 0) {
+                                     getHeaderIDs();
+                                 }
+                                 else {
+                                     primaryKey = TableName + '_ID';
+                                     zoomWindow();
+                                 }
+                             });*/
+                            // ✅ Zoom button handler (your full logic here)
+                            $('.w2ui-popup .vis-rec-zoom').off('click').on('click', function () {
+                                let allParentIds = [];
+                                const $card = $(this).closest('.vis-checklistcard');
+                                $card.find('.vis-subheading').each(function () {
+                                    const parentIdAttr = $(this).attr('visParentId');
+                                    if (parentIdAttr) {
+                                        const parentIds = parentIdAttr.split(',').map(id => id.trim());
+                                        allParentIds.push(...parentIds);
+                                    }
+                                });
+                                const uniqueParentIds = [...new Set(allParentIds)];
+
+                                // Find the first .vis-subheading inside this card
+                                const $subheading = $card.find('.vis-subheading').first();
+                                if (!$subheading.length) return;
+
+                                // Extract required values
+                                const windowId = parseInt($subheading.attr('viswindowid'));
+                                const recordIds = $subheading.attr('visrecordid');
+                                const windowName = $subheading.attr('viswindowname');
+                                const tableName = $subheading.attr('vistablename');
+                                const tablabel = parseInt($subheading.attr('visheadertab'));
+                                const headTable = $subheading.attr('vis_headTable');
+                                WindowId = windowId;
+                                Record_ID = recordIds;
+                                Table_ID = $subheading.attr('vistableid');
+
+                                if (!windowId || !recordIds || !tableName) return;
+
+                                // Derive primary key from table name
+                                const primaryKey = tableName + "_ID";
+                                const idsToUse = (tablabel === 0) ? recordIds : uniqueParentIds.join(',');
+                                const pKeyUse = (tablabel === 0) ? primaryKey : headTable;
+
+                                // Build window parameter object
+                                const windowParam = {
+                                    "TabWhereClause": `(${pKeyUse}) IN (${idsToUse})`,
+                                    "TabLayout": "N",
+                                    "TabIndex": "0",
+                                    "ActionName": windowName,
+                                    "ActionType": "W"
+                                };
                                 w2popup.close();
-                                WindowName = $(this).attr('visWindowname');
-                                WindowId = $(this).attr('visWindowId');
-                                TableName = $(this).attr('visTableName');
-                                Record_ID = $(this).attr('visRecordId');
-                                Table_ID = $(this).attr('visTableId');
-                                headerTab = $(this).attr('visHeaderTab');
-                                if (headerTab > 0) {
-                                    getHeaderIDs();
-                                }
-                                else {
-                                    primaryKey = TableName + '_ID';
-                                    zoomWindow();
-                                }
+                                // Open the window
+                                VIS.viewManager.startWindow(windowId, null, windowParam);
                             });
+
+
                         }, 1000);
                     }
 
                 });
             });
+
+            pendingRecords.off('click', '.vis-rec-zoom').on('click', '.vis-rec-zoom', function () {
+                let allParentIds = [];
+                const $card = $(this).closest('.vis-checklistcard');
+                $card.find('.vis-subheading').each(function () {
+                    const parentIdAttr = $(this).attr('visParentId');
+                    if (parentIdAttr) {
+                        const parentIds = parentIdAttr.split(',').map(id => id.trim());
+                        allParentIds.push(...parentIds);
+                    }
+                });
+                const uniqueParentIds = [...new Set(allParentIds)];
+
+
+                // Find the first .vis-subheading inside this card
+                const $subheading = $card.find('.vis-subheading').first();
+
+                if (!$subheading.length) return;
+
+                // Extract required values
+                const windowId = parseInt($subheading.attr('viswindowid'));
+                const recordIds = $subheading.attr('visrecordid');
+                const windowName = $subheading.attr('viswindowname');
+                const tableName = $subheading.attr('vistablename');
+                const tablabel = parseInt($subheading.attr('visheadertab'));
+                const headTable = $subheading.attr('vis_headTable');
+                WindowId = windowId
+                Record_ID = recordIds
+                Table_ID = $subheading.attr('vistableid');
+                // getHeaderIDs();
+                if (!windowId || !recordIds || !tableName) return;
+
+                // Derive primary key from table name
+                const primaryKey = tableName + "_ID";
+                const idsToUse = (tablabel === 0) ? recordIds : uniqueParentIds.join(',');
+                const pKeyUse = (tablabel === 0) ? primaryKey : headTable;
+                // Build window parameter object
+                const windowParam = {
+                    "TabWhereClause": `(${pKeyUse}) IN (${idsToUse})`,
+                    "TabLayout": "N",
+                    "TabIndex": "0",
+                    "ActionName": windowName,
+                    "ActionType": "W"
+                };
+
+                // Open the window
+                VIS.viewManager.startWindow(windowId, null, windowParam);
+            });
+            $(document).on('mouseenter', '.hoverable-text, .visWindowTabs', function () {
+                const $card = $(this).closest('.vis-checklistcard');
+                const $tabs = $card.find('.visWindowTabs');
+
+                // Show tabs and add border-radius to both elements
+                $tabs.css({
+                    display: 'block',
+                    'border-radius': '0 0 12px 12px',
+                    /*'background': 'hsl(217, 79%, 76%)'*/
+                });
+                $card.css('border-radius', '12px 12px 0 0');
+            }).on('mouseleave', '.hoverable-text, .visWindowTabs', function () {
+                const $card = $(this).closest('.vis-checklistcard');
+
+                setTimeout(function () {
+                    if (
+                        !$card.find('.hoverable-text:hover').length &&
+                        !$card.find('.visWindowTabs:hover').length
+                    ) {
+                        $card.find('.visWindowTabs')
+                            .hide()
+                            .css('border-radius', '');
+                        $card.css('border-radius', ''); // Reset card border-radius
+                    }
+                }, 10);
+            });
+
+
         };
 
 
@@ -211,8 +343,12 @@
                 success: function (result) {
                     showBusy(false);
                     allRecords = result ? JSON.parse(result) : [];
+                    allRecords.sort(function (a, b) {
+                        return a.windowname.localeCompare(b.windowname);
+                    });
                     totalRecCount = allRecords.reduce((sum, record) => sum + record.count, 0);
-                    widgetContainer.find('h4').text(`${VIS.Msg.getMsg('VIS_PendingChecklist')}: ${totalRecCount}`);
+                    // widgetContainer.find('h4').text(`${VIS.Msg.getMsg('VIS_PendingChecklist')}: ${totalRecCount}`);
+                    widgetContainer.find('h4').html(`${VIS.Msg.getMsg('VIS_PendingChecklist')}&nbsp; <span class="total-count">${totalRecCount}</span>`);
                     updateUI();
                 },
                 error: function () {
@@ -243,23 +379,32 @@
 
             currentRecords.forEach((record, i) => {
 
-
-                // Create jQuery object from HTML string
                 var $pendingChecklistItem = $(`
-               <div class="vis-checklistcard">
-               <div class="vis-card-title vis-checklistrecord-box"
-                <span>${record.windowname}</span>
-                <span class="VIS_checklistCount">${record.count}</span>
-                
-               </div>
-                <div class="vis-Tabdropdown visWindowTabs"></div>
-                </div>
-                       `);
+  <div class="vis-checklistcard">
+    <div class="vis-card-title vis-checklistrecord-box">
+      <div class="vis-title-count">
+        <span class="hoverable-text">${record.windowname}</span>
+        <span class="VIS_checklistCount">${record.count}</span>
+      </div>
+      <i class="glyphicon glyphicon-zoom-in vis-rec-zoom" title="${VIS.Msg.getMsg("VIS_Zoom")}"></i>
+    </div>
+    <div class="vis-Tabdropdown visWindowTabs"></div>
+  </div>
+`);
+
                 pendingRecords.append($pendingChecklistItem);
                 var $dropdown = $pendingChecklistItem.find('.vis-Tabdropdown');
                 for (var k = 0; k < record.TableRecordIds.length; k++) {
-                    $dropdown.append(`<div class="vis-subheading" visRecordId="${record.TableRecordIds[k].RecordIds}"  visTableName="${record.TableRecordIds[k].TableName}"  visWindowname="${record.windowname}"   visWindowId="${record.WindowID}" visTableId ="${record.TableRecordIds[k].AD_table_ID}" visHeaderTab="${record.TableRecordIds[k].TabLevel}"><span>${record.TableRecordIds[k].TabName}</span><span>${record.TableRecordIds[k].RecordIds.length}</span></div>`);
+                    var recordItem = record.TableRecordIds[k];
+                    var parentIdAttr = recordItem.ParentIds ? ` visParentId="${recordItem.ParentIds}"` : '';
+                    var headTableAttr = record.HeadTable ? ` vis_headTable="${record.HeadTable}"` : '';
+
+                    $dropdown.append(`<div class="vis-subheading" visRecordId="${record.TableRecordIds[k].RecordIds}"  visTableName="${record.TableRecordIds[k].TableName}" 
+                    visWindowname="${record.windowname}"   visWindowId="${record.WindowID}" visTableId ="${record.TableRecordIds[k].AD_table_ID}"
+                     visHeaderTab="${recordItem.TabLevel}"${parentIdAttr}" ${headTableAttr}>
+                    <span>${record.TableRecordIds[k].TabName}</span><span class="vis_innertabcount">${record.TableRecordIds[k].RecordIds.length}</span></div>`);
                 }
+                //visHeaderTab="${record.TableRecordIds[k].TabLevel}">
             });
 
 

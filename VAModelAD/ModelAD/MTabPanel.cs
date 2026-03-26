@@ -44,13 +44,11 @@ namespace VAdvantage.Model
         ///	Parent Constructor
         /// </summary>
         /// <param name="parent">parent parent</param>
-       public MTabPanel(MTab parent)
+       public MTabPanel(MTab parent, MTabPanel from)
             : base(parent.GetCtx(), 0, parent.Get_TrxName())
         {
-            //this(parent.GetCtx(), 0, parent.Get_TrxName());
+            CopyValues(from, this);
             SetClientOrg(parent);
-            SetAD_Tab_ID(parent.GetAD_Tab_ID());
         }
-
     }
 } 

@@ -48,7 +48,7 @@ namespace VAdvantage.Model
                 tp.SetClassname("VIS.SurveyPanel");
                 tp.SetAD_Tab_ID(GetAD_Tab_ID());
                 tp.SetAD_Org_ID(0);
-                tp.SetAD_Client_ID(0);
+                //tp.SetAD_Client_ID(GetAD_Client_ID());
                 tp.SetSeqNo(10);
                 if (!tp.Save())
                 {
@@ -69,12 +69,21 @@ namespace VAdvantage.Model
         /// <returns></returns>
         protected override bool BeforeSave(bool newRecord)
         {
+            if (!string.IsNullOrEmpty(GetDocAction()))
+            {
+                SetIsConditionalChecklist(false);
+                Set_Value("IsMandatoryToFill", false);
+            }
+
             if (GetAD_SurveyAssignment_ID() > 0)
             {
-                int tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
+                int tableID = Util.GetValueOfInt(DB.ExecuteScalar(
+                    "SELECT AD_Table_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
+
                 if (tableID != GetAD_Table_ID() && IsConditionalChecklist())
                 {
-                    int isExistCondition = Util.GetValueOfInt(DB.ExecuteScalar("SELECT Count(AD_SurveyShowCondition_ID) FROM AD_SurveyShowCondition WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
+                    int isExistCondition = Util.GetValueOfInt(DB.ExecuteScalar(
+                        "SELECT COUNT(*) FROM AD_SurveyShowCondition WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID()));
                     if (isExistCondition > 0)
                     {
                         log.SaveError("Error", Msg.GetMsg(GetCtx(), "FirstDeleteConditionForUpdate"));
@@ -88,62 +97,82 @@ namespace VAdvantage.Model
 
                 DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Tab_ID IN (SELECT AD_Tab_ID FROM AD_SurveyAssignment WHERE AD_SurveyAssignment_ID=" + GetAD_SurveyAssignment_ID() + ")");
             }
+
             DB.ExecuteQuery("DELETE FROM AD_TabPanel WHERE Classname='VIS.SurveyPanel' AND AD_Client_ID=" + GetAD_Client_ID() + " AND AD_Tab_ID IN (" + GetAD_Tab_ID() + ")");
 
-            string sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND IsConditionalChecklist='N' AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
+            string sql = "";
+            int count = 0;
 
-            if (!newRecord)
-            {
-                sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
-            }
-            int count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            int clientId = GetAD_Client_ID();
+            int windowId = GetAD_Window_ID();
+            int tabId = GetAD_Tab_ID();
+            int tableIdMain = GetAD_Table_ID();
+            int surveyId = GetAD_Survey_ID();
+            int currentId = GetAD_SurveyAssignment_ID();
+
+            // Prevent mixing of ShowBasedOnCondition
+            string sqlMixCheck = $@"
+        SELECT COUNT(*) FROM AD_SurveyAssignment 
+        WHERE AD_Window_ID={windowId}
+          AND AD_Table_ID={tableIdMain}
+          AND AD_Tab_ID={tabId}
+          AND IsConditionalChecklist {(IsConditionalChecklist() ? "='N'" : "='Y'")}
+          AND IsActive='Y'
+          AND AD_Client_ID={clientId}
+          {(newRecord ? "" : $"AND AD_SurveyAssignment_ID!={currentId}")}";
+
+            count = Util.GetValueOfInt(DB.ExecuteScalar(sqlMixCheck));
             if (count > 0)
             {
-                log.SaveError("Error", Msg.GetMsg(GetCtx(), "UniqueShowEveryTime"));
+                log.SaveError("Error", Msg.GetMsg(GetCtx(), "CannotMixShowAndConditional"));
                 return false;
             }
-            else if (IsConditionalChecklist() == true)
-            {
-                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND IsConditionalChecklist='N' AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
-                if (!newRecord)
-                {
-                    sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
-                }
-                count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
-                if (count > 0)
-                {
-                    log.SaveError("Error", Msg.GetMsg(GetCtx(), "ShowEveryTimeNotbeTrue"));
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else if (IsConditionalChecklist() == false)
-            {
-                sql = "SELECT count(AD_SurveyAssignment_ID) FROM AD_SurveyAssignment WHERE AD_Window_ID=" + GetAD_Window_ID() + " AND ad_table_id=" + GetAD_Table_ID() + " AND IsConditionalChecklist='N' AND AD_Survey_ID=" + GetAD_Survey_ID() + " AND isActive='Y' AND AD_Client_ID=" + GetAD_Client_ID();
-                if (!newRecord)
-                {
-                    sql += " AND AD_SurveyAssignment_ID !=" + GetAD_SurveyAssignment_ID();
-                }
-                count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
-                if (count > 0)
-                {
-                    log.SaveError("Error", Msg.GetMsg(GetCtx(), "shouldNotbeSameSurvey"));
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return true;
-            }
-        }
 
+            // Case 1: ShowBasedOnCondition = false → screen + tab unique
+            if (!IsConditionalChecklist())
+            {
+                sql = $@"
+            SELECT COUNT(*) FROM AD_SurveyAssignment
+            WHERE AD_Window_ID={windowId}
+              AND AD_Table_ID={tableIdMain}
+              AND AD_Tab_ID={tabId}
+              AND IsConditionalChecklist='N'
+              AND IsActive='Y'
+              AND AD_Client_ID={clientId}
+              {(newRecord ? "" : $"AND AD_SurveyAssignment_ID!={currentId}")}";
+
+                count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+                if (count > 0)
+                {
+                    log.SaveError("Error", Msg.GetMsg(GetCtx(), "UniqueShowEveryTime"));
+                    return false;
+                }
+            }
+
+            // Case 2 + 4: ShowBasedOnCondition = true → checklist + screen + tab unique
+            if (IsConditionalChecklist())
+            {
+                sql = $@"
+            SELECT COUNT(*) FROM AD_SurveyAssignment
+            WHERE AD_Window_ID={windowId}
+              AND AD_Table_ID={tableIdMain}
+              AND AD_Tab_ID={tabId}
+              AND AD_Survey_ID={surveyId}
+              AND IsConditionalChecklist='Y'
+              AND IsActive='Y'
+              AND AD_Client_ID={clientId}
+              {(newRecord ? "" : $"AND AD_SurveyAssignment_ID!={currentId}")}";
+
+                count = Util.GetValueOfInt(DB.ExecuteScalar(sql));
+                if (count > 0)
+                {
+                    log.SaveError("Error", Msg.GetMsg(GetCtx(), "ChecklistScreenTabMustBeUnique"));
+                    return false;
+                }
+            }
+
+            return true;
+        }
         /// <summary>
         /// Before Delete Logic
         /// </summary>

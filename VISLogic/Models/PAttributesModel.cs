@@ -94,7 +94,8 @@ namespace VIS.Models
             obj.IsCanEdit = MRole.GetDefault(ctx).IsCanEditAttribute();
 
             //Row 0
-            obj.tableStucture = "<table class='vis-formouterwrpdiv' style='width: 100%;'><tr>";
+            //VIS383-Add div for apply scroll in table
+            obj.tableStucture = "<div class='vis-attribute-popup'><table class='vis-formouterwrpdiv' style='width: 100%;'><tr>";
             if (_productWindow)
             {
                 for (int i = 0; i < attributes.Length; i++)
@@ -153,7 +154,7 @@ namespace VIS.Models
                 var label = Msg.Translate(ctx, "AttrCode");
                 obj.tableStucture += "<tr>";
                 obj.tableStucture += "<td>";
-                obj.tableStucture += "<div class='input-group vis-input-wrap'>";
+                obj.tableStucture += "<div class='input-group vis-input-wrap' style='padding-top: 2px'>";
                 obj.tableStucture += "<div class='vis-control-wrap'>";
                 obj.tableStucture += "<input id='txtAttrCode_" + windowNo + "' value='' type='text'  placeholder=' ' data-placeholder=''>";
                 obj.tableStucture += "<label id=lot_" + windowNo + "' class='VIS_Pref_Label_Font'>" + label + "</label></div></div>";
@@ -193,6 +194,8 @@ namespace VIS.Models
                 //Row 1
                 if (!IsSOTrx || IsInternalUse == "N" || window_ID == 191 || window_ID == 140)
                 {
+                    /// Below code commented by Mukesh Vishwakarma @20230615 has been depreciated as not required Lots number in Drop=down list due to performance.
+                    /**
                     obj.tableStucture += "<tr>";
                     //column 1
                     label = Msg.Translate(ctx, "M_Lot_ID");
@@ -200,14 +203,14 @@ namespace VIS.Models
                     obj.tableStucture += "<div class='input-group vis-input-wrap'>";
                     obj.tableStucture += "<div class='vis-control-wrap'>";
                     //obj.tableStucture += "</td>";
-
-
+ 
+ 
                     String sql = "SELECT M_Lot_ID, Name "
                         + "FROM M_Lot l "
                         + "WHERE EXISTS (SELECT M_Product_ID FROM M_Product p "
                             + "WHERE p.M_AttributeSet_ID=" + _masi.GetM_AttributeSet_ID()
                             + " AND p.M_Product_ID=l.M_Product_ID)";
-
+ 
                     KeyNamePair[] data = DB.GetKeyNamePairs(sql, true);
                     //column 2
                     //obj.tableStucture += "<td>";
@@ -224,12 +227,20 @@ namespace VIS.Models
                             obj.tableStucture += " <option value='" + data[i].Key + "' >" + data[i].Name + "</option>";
                         }
                     }
-
+ 
                     obj.tableStucture += "</select>";
                     obj.tableStucture += "<label id=M_Lot_ID_" + windowNo + "' class='VIS_Pref_Label_Font'>" + label + "</label></div></div>";
                     obj.tableStucture += "</td>";
                     obj.tableStucture += "</tr>";
+                    */
 
+                    obj.tableStucture += "<tr>";
+                    obj.tableStucture += "<td>";
+
+                    /// this code transfer to concern js file
+                    obj.tableStucture += "<div id= LotDivControl_" + windowNo + " style='width:102%'>";
+                    obj.tableStucture += "</td>";
+                    obj.tableStucture += "</tr>";
 
                     //Row 2
                     obj.tableStucture += "<tr>";
@@ -305,7 +316,7 @@ namespace VIS.Models
                         obj.tableStucture += "<tr>";
                     }
                 }
-            }	//	SerNo
+            }   //	SerNo
 
             ////	GuaranteeDate
             if (!_productWindow && aset.IsGuaranteeDate())
@@ -371,15 +382,14 @@ namespace VIS.Models
 
             //Add Ok and Cancel button 
             //Last row
-            obj.tableStucture += "<tr>";
-
-            obj.tableStucture += "<td style='text-align:right'>";
+            //obj.tableStucture += "<tr>";
+            obj.tableStucture += "</table></div>";
+            //VIS383-Fixed the "ok" and "Cancel" button div on Set Attribute Instance popup
+            obj.tableStucture += "<div style='text-align:right;width:100%'>";
             obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right' type='button' class='VIS_Pref_btn-2' style='float: right;'  id='btnCancel_" + windowNo + "' role='button' aria-disabled='false'>" + VAdvantage.Utility.Util.CleanMnemonic(Msg.GetMsg(ctx, "Cancel")) + "</button>";
             obj.tableStucture += "<button style='margin-bottom:0px;margin-top:0px; float:right; margin-right: 10px;' type='button' class='VIS_Pref_btn-2' style='float: right; margin-right: 10px;' id='btnOk_" + windowNo + "' role='button' aria-disabled='false'>" + VAdvantage.Utility.Util.CleanMnemonic(Msg.GetMsg(ctx, "OK")) + "</button>";
-            obj.tableStucture += "</td>";
-            obj.tableStucture += "</tr>";
+            obj.tableStucture += "</div>";
 
-            obj.tableStucture += "</table>";
             if (obj.ControlList != null)
             {
                 if (obj.ControlList.Length > 1)

@@ -30,6 +30,8 @@
         // this.isLoading = false;
 
 
+        var scrollDiv = $div;
+        
         function showBusy(show) {
             if (show) {
                 $maindiv.find("#chatBusyDiv").show();
@@ -50,6 +52,7 @@
 
 
         $sendIconButton.on(VIS.Events.onTouchStartOrClick, function (e) {
+            showBusy(true);
             triggerSave(e);
         });
 
@@ -70,8 +73,18 @@
 
         $textArea.find('#chatBox_textArea').on('keydown', function (e) {
             if (e.keyCode === 13) {
-                if (e.altKey) {
-                    this.value += "\r\n";
+                //if (e.altKey) {
+                //    this.value += "\r\n";
+                if (e.altKey || e.shiftKey) {
+                    e.preventDefault(); // Prevent default newline behavior
+                    const textarea = this;
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const value = textarea.value;
+                    // Insert \r\n at the cursor position
+                    textarea.value = value.substring(0, start) + "\r\n" + value.substring(end);
+                    // Move cursor to just after the inserted newline
+                    textarea.selectionStart = textarea.selectionEnd = start + 2;
                 }
                 else {
                     showBusy(true);
@@ -82,9 +95,9 @@
         });
 
         setTimeout(function () {
-            const onScroll = throttle(function () {
-                if ($maindiv != null) {
-                    if ($maindiv.parent().scrollTop() + $maindiv.parent().height() >= $maindiv.height() - 50) {
+            function onScroll() {
+                if (scrollDiv != null) {
+                    if (scrollDiv.height() + scrollDiv.scrollTop() >= scrollDiv[0].scrollHeight - 1) {
                         if (self.prop) {
                             self.prop.pageSize += 10;
                             showBusy(true);
@@ -92,9 +105,11 @@
                         }
                     }
                 }
-            }, 200); // adjust the wait time as needed
-
-            $maindiv.parent().on('scroll', onScroll);
+            }
+            //}, 200); // adjust the wait time as needed
+            if (scrollDiv == null)
+                scrollDiv = $maindiv.parent(); //reset scroll div to main div
+            scrollDiv.on('scroll', onScroll);
         }, 100);
 
         function throttle(fn, wait) {
@@ -110,10 +125,29 @@
 
 
         function triggerSave(e) {
-            saveMsg(e);
-            $textArea.find('#chatBox_textArea').val('');
-            $textArea.find('#chatBox_textArea').css('height', 'auto');
-            self.refreshPanelData(self.record_ID, 0);
+            showBusy(true);
+            var text = $textArea.find('#chatBox_textArea').val();
+            if ($.trim(text) == "" || text == "" || text == null) {
+                VIS.ADialog.info("VIS_TypeSomething");
+                /* if (e != undefined) {
+                     e.preventDefault();
+                 }*/
+                showBusy(false);
+                return false;
+            }
+            //self.prop.ChatText = text;
+            self.prop.ChatText = VIS.Utility.encodeText(text);
+            VIS.dataContext.saveChatAsync(self.prop, function (saved) {
+                if (!saved) {
+                    showBusy(false);
+                    return;
+                };
+
+                $textArea.find('#chatBox_textArea').val('');
+                $textArea.find('#chatBox_textArea').css('height', 'auto');
+                self.refreshPanelData(self.record_ID, 0);
+                $maindiv.find(".vis-chatdetailouterwrap").scrollTop(0);
+            });
         }
 
 
@@ -122,7 +156,7 @@
             $maindiv.parent().scrollTop(0);
             $maindiv.append($showMoreIcon);
             /*$maindiv.addClass('p-2');*/
-            isBottomTapPanel();
+            //isBottomTapPanel();
             if (this.isBtmTapPanel) {
                 prop.pageSize = 4;
             }
@@ -134,6 +168,8 @@
         };
 
         this.show = function () {
+
+            scrollDiv = $div; //reset scroll div to main div
 
             ch = new VIS.ChildDialog();
             ch.setContent($maindiv);
@@ -168,16 +204,7 @@
         };
 
         function isBottomTapPanel() {
-            $.ajax({
-                url: VIS.Application.contextUrl + "Chat/IsBottomTabPanel",
-                async: false,
-                data: {
-                    tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
-                },
-                success: function (data) {
-                    self.isBtmTapPanel = VIS.Utility.Util.getValueOfBoolean(data);;
-                }
-            });
+            
         }
 
         function createButtons() {
@@ -200,7 +227,7 @@
                 saveMsg(e);
                 /* var text = $inputChat.val();
                  if ($.trim(text) == "" || text == "" || text == null) {
-                     VIS.ADialog.info("EnterData");
+                     VIS.ADialog.info("VIS_TypeSomething");
                      if (e != undefined) {
                          e.preventDefault();
                      }
@@ -245,7 +272,8 @@
                     //     (Globalize.format(date, 'G', Globalize.cultureSelector));
 
 
-                    var str = '   <div style="border:none;" class="vis-chatboxwrap">';
+                    //var str = '   <div style="border:none;" class="vis-chatboxwrap">';
+                    var str = '   <div style="border:none;" class="vis-chatboxwrap" id="' + data.subChat[chat].ChatEntry_ID + '">';
 
                     /*if (VIS.Application.isRTL) {
                         str += '<div style="border-radius: 1.75rem; min-width: 48px;" class="vis-chatimgwrap">';
@@ -286,7 +314,7 @@
                         str += "<i class='fa fa-user' data-uID='" + data.subChat[chat].AD_User_ID + "'></i>";
                     }
 
-                    str += '</div><div class="vis-chatdetailwrap"><div style="display: flex;">';
+                    str += '</div><div class="vis-chatdetailwrap"><div style="display: flex; position:relative;">';
 
 
                     if (VIS.Application.isRTL) {
@@ -304,18 +332,37 @@
                     }
 
                     if (VIS.Application.isRTL) {
-                        str += '</span></div><div class="vis-chat-textwrap" style="overflow:auto">';
+                        if (data.isDelete == 'Y') {
+                            //str += '</span></div><div class="vis-chat-textwrap" style="overflow:auto">';
+                            str += '<span class="vis vis-delete vis_del_chat vis-chat-delete-icon" style="left:30px;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Delete Chat"></span>';
+                        }
+                        str += '<span class="vis vis-pencil vis_edit_chat vis-chat-edit-icon" style="left:1%;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Edit Chat"></span>';
                     }
                     else {
-                        str += '</span></div><div class="vis-chat-textwrap">';
+                        if (data.isDelete == 'Y') {
+                        //str += '</span></div><div class="vis-chat-textwrap">';
+                            str += '<span class="vis vis-delete vis_del_chat vis-chat-delete-icon" style="right:5px; margin-right: 28px;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Delete Chat"></span>';
+                        }
+                        str += '<span class="vis vis-pencil vis_edit_chat vis-chat-edit-icon" style="right:5px;" data-chatid="' + data.subChat[chat].ChatEntry_ID + '" title="Edit Chat"></span>';
+                    }
+
+                    if (VIS.Application.isRTL) {
+                        // str += '</span></div><div class="vis-chat-textwrap" style="overflow:auto; background: rgba(var(--v-c-primary), 1; border-radius:5px;">';
+                        str += '</span></div><div class="vis-chat-textwrap" style="overflow:auto; background: background: rgb(0 152 247 / 6%); border-radius:7px;">';
+                    }
+                    else {
+                        str += '</span></div><div class="vis-chat-textwrap" style="background: rgb(0 152 247 / 6%); border-radius:7px;">';
                     }
 
                     //+ '<textarea readonly style="width:640px">' + data[chat].ChatData + '</textarea>'
                     if (VIS.Application.isRTL) {
-                        str += '<span style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        //str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + safeHtml(data.subChat[chat].ChatData);
                     }
                     else {
-                        str += '<span style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        //str += '<span style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        //str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + VIS.Utility.encodeText(data.subChat[chat].ChatData);
+                        str += '<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">' + safeHtml(data.subChat[chat].ChatData);
                     }
 
                     if (VIS.Application.isRTL) {
@@ -347,12 +394,180 @@
                 }
             });
 
+            $container.on("click", ".vis_edit_chat", function () {
+                var $chatBox = $(this).closest(".vis-chatboxwrap");
+                var chatId = $(this).data("chatid");
+                var $chatTextSpan = $chatBox.find(".vis-chat-msg");
+                var $editIcon = $chatBox.find(".vis_edit_chat");
+                var $delIcon = $chatBox.find(".vis_del_chat");
+                var $sendIcon = null;
+                var $undoIcon = null;
+                $editIcon.hide();          // Hide the pencil icon
+                $delIcon.hide();        // Show the ignore icon
+                var originalText = $chatTextSpan.text();
+                // Create wrapper to simulate icon inside input
+                /* var $wrapper = $('<div class="vis-chat-edit-wrapper" style="position: relative; width: 90%; display: inline-block;"></div>');
+                 var $input = $('<input type="text" class="vis-chat-edit-input" style="width: 100%; padding: 5px 60px 5px 10px; border-radius: 10px; border: 1px solid #ccc;">');
+                 var $sendIcon = $('<i class="fa fa-check vis-chat-send-icon" title="Update" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #007bff; font-size:20px;"></i>');
+                 var $undoIcon = $('<i class="fa fa-times vis-chat-send-icon" title="Undo" style="position: absolute; right: 35px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #007bff; font-size:20px;"></i>');
+ */
+                var $wrapper = $('<div class="vis-chat-edit-wrapper"></div>');
+                var $input = $('<textarea class="vis-chat-edit-input" rows="1"></textarea>');
+                // Auto-resize textarea on input
+                $input.on('input', function () {
+                    this.style.height = 'auto'; // Reset height
+                    this.style.height = this.scrollHeight + 'px'; // Adjust height to fit content
+                });
+                // Icons for update and undo
+                var $sendIcon, $undoIcon;
+                if (VIS.Application.isRTL) {
+                    $sendIcon = $('<i class="fa fa-check vis-chat-send-icon vis-chat-send-update" style="left: 35px; top:6px;" title="Update"></i>');
+                    $undoIcon = $('<i class="fa fa-times vis-chat-send-icon vis-chat-send-undo" style="left: 10px; top:6px" title="Undo"></i>');
+                }
+                else {
+                    $sendIcon = $('<i class="fa fa-check vis-chat-send-icon vis-chat-send-update" style="right: 10px; top:6px" title="Update"></i>');
+                    $undoIcon = $('<i class="fa fa-times vis-chat-send-icon vis-chat-send-undo" style="right: 35px; top:6px" title="Undo"></i>');
+                }
+                $wrapper.append($input);
+                //  $input.val(originalText).trigger('input'); // Set value and auto-resize
+                $chatTextSpan.replaceWith($wrapper);
+                $input.val(originalText).trigger('input');
+                $input.focus();
+                $editIcon.after($sendIcon).after($undoIcon);
+                $editIcon.hide();
+                $delIcon.hide();
+                function sendUpdate() {
+                    var newText = $input.val().trim();
+                    //if (newText.length === 0) return;
+                    if (newText.length === 0) {
+                        if ($wrapper.find(".vis-chat-error").length === 0) {
+                            var $errorMsg = $(`<div class="vis-chat-error" style="font-size:0.7rem;margin-bottom:3px;">${VIS.Msg.getMsg("VIS_TypeSomething")}</div>`);
+                            $wrapper.prepend($errorMsg);
+                            setTimeout(() => {
+                                $errorMsg.fadeOut(300, function () { $(this).remove(); });
+                            }, 5000);
+                        }
+                        return false; // 👈 important: signal nothing was updated
+                    }
+                    showBusy(true);
+                    // AJAX to update chat
+                    var encText = VIS.Utility.encodeText(newText);
+                    $.ajax({
+                        url: VIS.Application.contextUrl + "Chat/EditChatEntry",
+                        type: "POST",
+                        data: { chatID: chatId, content: encText },
+                        success: function (response) {
+                            if (response.success) {
+                                var $newSpan = $('<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">').text(newText);
+                                $wrapper.replaceWith($newSpan);
+                                showBusy(false);
+                                // message = VIS.Msg.getMsg("VIS_Chatupdated");
+                                //VIS.ADialog.info("", "", message);
+                            } else {
+                                showBusy(false);
+                                VIS.ADialog.error(response.message || "Update failed.");
+                            }
+                            /* $editIcon.show();   // Restore pencil icon
+                             $ignoreIcon.hide(); // Hide ignore icon*/
+                        },
+                        error: function () {
+                            showBusy(false);
+                            VIS.ADialog.error("Something went wrong.");
+                            /*  $editIcon.show();   // Restore pencil icon
+                              $ignoreIcon.hide(); // Hide ignore icon*/
+                        }
+                    });
+                    return true;
+                }
+                // Handle Enter key
+                $input.on("keydown", function (e) {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault(); // Prevent newline on Enter
+                        $sendIcon.trigger("click");
+                        //   sendUpdate();
+                        //let updated = sendUpdate(); // you can make sendUpdate return true/false
+
+                        //if (updated) {
+                        //    $editIcon.show();
+                        //    $delIcon.show();
+                        //    $sendIcon.remove();
+                        //    $undoIcon.remove();
+                        //}
+
+                    }
+                    // If Shift+Enter OR Alt+Enter → allow newline
+                    else if (e.key === "Enter" && (e.shiftKey || e.altKey)) {
+                        // Let it behave normally (insert newline)
+                    }
+                });
+
+                $undoIcon.on("click", function () {
+                    let $thisUndo = $(this);
+                    let $inside = $thisUndo.closest(".vis-chatboxwrap");
+                    var $originalSpan = $('<span class="vis-chat-msg" style="font-size: .75rem;padding-right:5px;white-space: pre-line;">').text(originalText);
+                    $wrapper.replaceWith($originalSpan);
+                    $inside.find(".vis-chat-send-undo").remove();
+                    $inside.find(".vis-chat-send-update").remove();
+                    $editIcon.show();
+                    $delIcon.show();
+                });
+
+                $sendIcon.on("click", function () {
+                    let $thisSend = $(this);                     // the clicked send icon
+                    let $wrapper = $thisSend.closest(".vis-chatboxwrap");
+                    let updated = sendUpdate();
+                    if (updated) {
+                        $wrapper.find(".vis-chat-send-update").hide();   // remove the clicked send icon
+                        $wrapper.find(".vis-chat-send-undo").hide();         // remove undo inside same row
+                        $editIcon.show();
+                        $delIcon.show();
+                    }
+                });
+            });
+
+            $container.off("click", ".vis_del_chat").on("click", ".vis_del_chat", function (e) {
+                e.stopPropagation(); // Prevent other click handlers
+                var chatId = $(this).data("chatid");
+                if (!chatId) return;
+                // Show confirmation dialog
+                VIS.ADialog.confirm("DeleteChat?", true, "", "Confirm", function (result) {
+                    if (result) {
+                        showBusy(true);
+                        $.ajax({
+                            url: VIS.Application.contextUrl + "Chat/DeleteChatEntry",
+                            type: "POST",
+                            data: { chatID: chatId },
+                            success: function (response) {
+                                showBusy(false);
+                                if (response.success) {
+                                    $maindiv.find("#" + CSS.escape(chatId)).remove();
+                                    //  var message = VIS.Msg.getMsg("VIS_Chatdeleted");
+                                    //    VIS.ADialog.info("", "", message);
+                                } else {
+                                    VIS.ADialog.error(response.message || "Failed to delete chat.");
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                showBusy(false);
+                                VIS.ADialog.error("Error: " + error);
+                            }
+                        });
+                    }
+                });
+            });
+
         };
+
+        function safeHtml(text) {
+            return text
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+        }
 
         function saveMsg(e) {
             var text = $textArea.find('#chatBox_textArea').val();
             if ($.trim(text) == "" || text == "" || text == null) {
-                VIS.ADialog.info("EnterData");
+                VIS.ADialog.info("VIS_TypeSomething");
                 /* if (e != undefined) {
                      e.preventDefault();
                  }*/
@@ -360,6 +575,12 @@
                 return false;
             }
             self.prop.ChatText = text;
+            prop.ChatText = $('<div>').text(prop.ChatText).html();
+            function busyCallback() {
+                $textArea.find('#chatBox_textArea').val('');
+                $textArea.find('#chatBox_textArea').css('height', 'auto');
+                self.refreshPanelData(self.record_ID, 0);
+            }
             VIS.dataContext.saveChat(self.prop);
             /*if (ch != null) {
                 ch.close();
@@ -375,7 +596,17 @@
         this.windowNo = windowNo;
         this.curTab = curTab;
         this.extraInfo = extraInfo;
-
+        var self = this;
+        //$.ajax({
+        //    url: VIS.Application.contextUrl + "Chat/IsBottomTabPanel",
+        //    async: false,
+        //    data: {
+        //        tabID: VIS.context.getContextAsInt(self.windowNo, "0|AD_Tab_ID"),
+        //    },
+        //    success: function (data) {
+        //        self.isBtmTapPanel = VIS.Utility.Util.getValueOfBoolean(data);;
+        //    }
+        //});
     };
 
     /**

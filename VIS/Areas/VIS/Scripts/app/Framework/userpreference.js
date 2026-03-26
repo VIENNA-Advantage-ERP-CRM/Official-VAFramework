@@ -119,11 +119,16 @@
         var $cmdOrgforKey = null;
         var $cmdWareHouseforKey = null;
         var $btnCreateKey = null;
+        var $btnProjectZoom = null;
         var $btnSaveKey = null;
         var $cmdProject = null;
         var $listOfKey = null;
         this.projectList = []; //store the list of projects
         //*********************************
+
+        var divBottom = null;
+
+        var cmbTwoFactor = null;
 
         var drpTheme = null;
         var ulTheme = null;
@@ -134,6 +139,7 @@
         var $root = $("<div class='vis-forms-container'>");
         var $busyDiv = $('<div class="vis-busyindicatorouterwrap"><div class="vis-busyindicatorinnerwrap"><i class="vis-busyindicatordiv"></i></div></div>')
         var windowNo = VIS.Env.getWindowNo();
+        var ctrltwoFactor = null;
         this.log = VIS.Logging.VLogger.getVLogger("UserPreference");
 
         this.load = function () {
@@ -143,6 +149,10 @@
             //this.log.log(VIS.Logging.Level.WARNING, "WARNING");
             //this.log.log(VIS.Logging.Level.OFF, "OFF");
             $busyDiv[0].style.visibility = 'visible';
+
+            //var lookup = VIS.MLookupFactory.get(VIS.Env.getCtx(), 0, 0, VIS.DisplayType.List, "Value", 1000579, false, null);
+            //ctrltwoFactor = new VIS.Controls.VComboBox("TwoFAMethod", false, false, true, lookup, 50);
+
 
             $root.load(VIS.Application.contextUrl + 'UserPreference/Index/?windowno=' + windowNo + '&adUserId=' + VIS.context.getAD_User_ID(), function (event) {
 
@@ -279,11 +289,19 @@
             $cmdOrgforKey = root.find("#cmbOrgForKey_" + windowNo);
             $cmdWareHouseforKey = root.find("#cmbWareHouseForKey_" + windowNo);
             $cmdProject = root.find("#cmbProject" + windowNo);
+            $btnProjectZoom = root.find("#btnProjectZoom_" + windowNo);
             $btnCreateKey = root.find('#btnCreateKey_' + windowNo);
             $btnApiDivClose = root.find('#CreateApiDivClose_' + windowNo);
             $btnSaveKey = root.find('#btnSaveKey_' + windowNo);
             $listOfKey = root.find('#VIS_SecretKeyList_' + windowNo);
             //*******************
+            divBottom = root.find('#divBottom_' + windowNo);
+
+            cmbTwoFactor = root.find('#cmbTwoFactor_' + windowNo);
+
+            cmbTwoFactor.append($('<select>'));
+            getTwoFAMethod();
+
             defaultLogin = {};
             loadDefault();
             //loadRoles();
@@ -713,6 +731,10 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                divBottom.css("display", "inline-block");
+
             });
             $(".VIS_Pref_link-2").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -720,6 +742,9 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                divBottom.css("display", "none");
             });
             $(".VIS_Pref_link-3").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -727,6 +752,9 @@
                 $(".VIS_Pref_content-right-3").css("display", "block");
                 $(".VIS_Pref_content-right-4").css("display", "none");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                divBottom.css("display", "none");
             });
             $(".VIS_Pref_link-4").click(function () {
                 $(".VIS_Pref_content-right").css("display", "none");
@@ -734,6 +762,9 @@
                 $(".VIS_Pref_content-right-3").css("display", "none");
                 $(".VIS_Pref_content-right-4").css("display", "flex");
                 $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                divBottom.css("display", "none");
             });
             //**************************************
             //Added By Sarab for the purpose of Gmail Settings to Import Gmail Tasks
@@ -743,12 +774,39 @@
                     $(".VIS_Pref_content-right-2").css("display", "none");
                     $(".VIS_Pref_content-right-3").css("display", "none");
                     $(".VIS_Pref_content-right-4").css("display", "none");
+                    $(".VIS_Pref_content-right-6").css("display", "none");
+                    $(".VIS_Pref_content-right-7").css("display", "none");
                     $(".VIS_Pref_content-right-5").css("display", "block");
+                    divBottom.css("display", "none");
                 }
                 else {
                     alert("please download WSP !!!");
                 }
             });
+
+            $(".VIS_Pref_link-6").click(function () {
+                $(".VIS_Pref_content-right").css("display", "none");
+                $(".VIS_Pref_content-right-2").css("display", "none");
+                $(".VIS_Pref_content-right-3").css("display", "none");
+                $(".VIS_Pref_content-right-4").css("display", "none");
+                $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "block");
+                divBottom.css("display", "none");
+            });
+
+            $(".VIS_Pref_link-7").click(function () {
+                $(".VIS_Pref_content-right").css("display", "none");
+                $(".VIS_Pref_content-right-2").css("display", "none");
+                $(".VIS_Pref_content-right-3").css("display", "none");
+                $(".VIS_Pref_content-right-4").css("display", "none");
+                $(".VIS_Pref_content-right-5").css("display", "none");
+                $(".VIS_Pref_content-right-6").css("display", "none");
+                $(".VIS_Pref_content-right-7").css("display", "block");
+                divBottom.css("display", "none");
+            })
+
+
             if (isGmailSettings) {
                 $(".VIS_Pref_link-5").trigger("click");
             }
@@ -880,10 +938,31 @@
                 var AD_Client_ID = $cmdClient.val();
                 var AD_Org_ID = $cmdOrg.val();
                 var AD_WH_ID = $cmdWareHouse.val();
-                if (AD_Role_ID == undefined || AD_Client_ID == undefined || AD_Org_ID == undefined) {
-                    lblRecordSave.text(VIS.Msg.getMsg("VIS_FillLogin"));
+
+                //if (AD_Role_ID == undefined || AD_Client_ID == undefined || AD_Org_ID == undefined) {
+                //    lblRecordSave.text(VIS.Msg.getMsg("VIS_FillLogin"));
+                //    return;
+                //}
+
+                if (AD_Role_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectRole"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
                     return;
+                } else if (AD_Client_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectClient"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
+                    return;
+                } else if (AD_Org_ID == undefined) {
+                    lblRecordSave.text(VIS.Msg.getMsg("SelectOrganization"));
+                    lblRecordSave.show();
+                    lblRecordSave.css('color', 'red');
+                    return;
+                } else {
+                    lblRecordSave.hide();
                 }
+
                 if (AD_WH_ID == undefined) {
                     AD_WH_ID = 0;
                 }
@@ -951,7 +1030,7 @@
                 try {
 
                     // Added by Bharat on 12 June 2017 to remove client side queries
-                    ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "User Substitute" }, null); // spelling corrected by vinay bhatt on 18 oct 2018
+                    ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "VAS_UserSubstitute" }, null); // spelling corrected by vinay bhatt on 18 oct 2018
                     if (ad_window_Id > 0) {
                         var zoomQuery = new VIS.Query();
                         zoomQuery.addRestriction("AD_User_ID", VIS.Query.prototype.EQUAL, VIS.context.getAD_User_ID());
@@ -1062,7 +1141,26 @@
                 $listOfKey.css("display", "none");
             });
 
+            $btnProjectZoom.on("click", function () {
+                ad_window_Id = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "UserPreference/GetWindowID", { "WindowName": "VAAPI_Project" }, null);
+                if (ad_window_Id > 0) {
+                    const windowParam = {
+                        "TabWhereClause": "VAAPI_Project_ID IN (" + ($cmdProject.val() || 0) + ")",
+                        "TabLayout": "N",
+                        "TabIndex": "0",
+                        "ActionName": "VAAPI_Project",
+                        "ActionType": "W"
+                    };
+                    VIS.viewManager.startWindow(ad_window_Id, null, windowParam);
+                    $self.dispose();
+                    $root.dialog("destroy");
+                    $("#ui-datepicker-div").remove()
+                    $root = null;
+                    $self = null;
+                }
 
+
+            });
 
             $btnApiDivClose.on("click", function () {
                 $(".VIS-Create-Api-Section").css("display", "none");
@@ -1530,7 +1628,8 @@
                     IsAutoCommit: $autocommit.prop("checked") ? "Y" : "N",
                     IsShowAcct: $acctab.prop("checked") ? "Y" : "N",
                     IsShowTrl: $transtab.prop("checked") ? "Y" : "N",
-                    IsShowAdvanced: $advanstab.prop("checked") ? "Y" : "N"
+                    IsShowAdvanced: $advanstab.prop("checked") ? "Y" : "N",
+                    PrintNativeDigits: $printnative.prop("checked") ? "Y" : "N"
                 });
             };
 
@@ -1627,9 +1726,29 @@
                     data: JSON.stringify({ pref: data })
                 }).done(function (json) {
                     result = json;
-                    $root.dialog('close');
+                    //$root.dialog('close');
+                    toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
                 });
             }
+
+
+            cmbTwoFactor.find('select').on('change', function () {
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "UserPreference/UpdateTwoFAMethod",
+                    type: "POST",
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    data: JSON.stringify({ method: $(this).val() })
+                }).done(function (json) {
+                    if (json) {
+                        toastr.success(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+                    } else {
+                        toastr.error(VIS.Msg.getMsg('SavedSuccessfully'), '', { timeOut: 3000, "positionClass": "toast-top-center", "closeButton": true, });
+                    }
+                });
+            })
 
 
         };
@@ -1886,8 +2005,12 @@
                     $self.projectList = JSON.parse(data);
                     var cmbProjectContent = "";
                     for (var itm in $self.projectList) {
-                        cmbProjectContent += "<option value=" + $self.projectList[itm].RecKey + ">" + $self.projectList[itm].Name + "</option>";
+                        var project = $self.projectList[itm];
+                        if (project.IsActive === 'Y') {
+                            cmbProjectContent += "<option value='" + project.RecKey + "'>" + project.Name + "</option>";
+                        }
                     }
+
                     $cmdProject.append(cmbProjectContent);
                     cmbProjectContent = null;
                 }
@@ -1907,6 +2030,7 @@
                         tableHtml += '<thead><tr>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_KeyName") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_SecretKey") + '</th>' +
+                            '<th>' + VIS.Msg.getMsg("VAAPI_Role") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("Created") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("CreatedBy") + '</th>' +
                             '<th>' + VIS.Msg.getMsg("VAAPI_ProjectAccess") + '</th>' +
@@ -1921,11 +2045,12 @@
                             tableHtml += '<tr>' +
                                 '<td><span title="' + item.KeyName + '" class="VIS-Key-ellipse-text">' + statusDot + ' ' + item.KeyName + '</span></td>' +
                                 '<td><span title="' + item.SessionToken + '" class="VIS-Key-ellipse-text">' + item.SessionToken + '</span></td>' +
+                                '<td><span title="' + item.Role + '" class="VIS-Key-ellipse-text">' + item.Role + '</span></td>' +
                                 '<td><span title="' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '" class="VIS-Key-ellipse-text">' + VIS.Utility.Util.getValueOfDate(item.Created).toLocaleDateString() + '</span></td>' +
                                 '<td><span title="' + item.CreatedBy + '" class="VIS-Key-ellipse-text">' + item.CreatedBy + '</span></td>' +
                                 '<td><span title="' + item.ProjectName + '"  class="VIS-Key-ellipse-text">' + item.ProjectName + '</span></td>' +
                                 '<td>' +
-                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '" title="Edit">' +
+                                '<button class="VIS-key-edit-btn VIS-edit-btn" data-project-name="' + item.ProjectName + '" data-is-project-active="' + item.IsActive + '"  data-id="' + item.RecordID + '" data-project-id="' + item.ProjectID + '" data-key-name="' + item.KeyName + '" data-is-active="' + item.IsActive + '" title="Edit">' +
                                 '<i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>' +
                                 '<button class="VIS-key-delete-btn VIS-delete-btn" data-id="' + item.RecordID + '" title="Delete">' +
                                 '<i class="fa fa-trash-o" aria-hidden="true"></i></button>' +
@@ -2012,7 +2137,37 @@
 
         };
 
+        var getTwoFAMethod = function () {
 
+            $.ajax({
+                url: VIS.Application.contextUrl + "UserPreference/GetTwoFAMethod",
+                dataType: "json",
+                success: function (data) {
+                    var response = JSON.parse(data);
+                    if (response != null && response.length > 0) {
+                        var optn = "<option></option>";
+                        for (var i = 0; i < response.length; i++) {
+                            if (response[i].TWOFAMETHOD == "") {
+                                optn += "<option value='" + response[i].value + "'>" + response[i].name + "</option>";
+                            } else {
+                                optn += "<option Selected value='" + response[i].value + "'>" + response[i].name + "</option>";
+                            }
+
+                        }
+                        cmbTwoFactor.find('select').empty();
+                        cmbTwoFactor.find('select').append(optn);
+
+                    } else {
+                        //// If no data, display a message
+                        //$listOfKey.html('<p>No data available.</p>');
+                    }
+                },
+                error: function () {
+                    /*   $selistdiv.html('<p>Error loading data.</p>');*/
+                }
+            });
+
+        }
 
         /* End APIKey Section*/
         this.showDialog = function () {

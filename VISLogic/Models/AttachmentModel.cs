@@ -13,7 +13,9 @@ namespace ViennaAdvantageWeb.Areas.VIS.Models
 {
     public class AttachmentModel
     {
-
+        /*VIS_427 01/10/2025 defined this property if we want to store
+         in files ShareFiles folder*/
+        public bool IsSaveInShareFiles { get; set; }
         public InitAttachment GetAttachment(int AD_Table_ID, int Record_ID, VAdvantage.Utility.Ctx ctx)
         {
             InitAttachment initialData = new InitAttachment();
@@ -60,6 +62,17 @@ namespace ViennaAdvantageWeb.Areas.VIS.Models
             {
                 att = new MAttachment(ctx, AD_Attachment_ID, null);
                 att.SetRecord_ID(Record_ID);
+            }
+            /*VIS_427 01/10/2025 if bool value is true then folder name will 
+             be sharefiles else tempdownload*/
+            string FolderName = "";
+            if (IsSaveInShareFiles) {
+                FolderName = "ShareFiles";
+                att.IsSaveInShareFiles = true;
+            }
+            else
+            {
+                FolderName = "TempDownload";
             }
 
             if (IsDMSAttachment && newRecord_ID == 0 && AD_Attachment_ID > 0)
@@ -131,10 +144,10 @@ namespace ViennaAdvantageWeb.Areas.VIS.Models
 
             for (int i = 0; i < _files.Count; i++)
             {
-                System.IO.File.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload") + "\\" + folderKey + "\\" + _files[i].Name);
+                System.IO.File.Delete(System.IO.Path.Combine(GetServerLocation(), FolderName) + "\\" + folderKey + "\\" + _files[i].Name);
             }
-            if (folderKey != "" && Directory.Exists(System.IO.Path.Combine(GetServerLocation(), "TempDownload", folderKey)))
-                Directory.Delete(System.IO.Path.Combine(GetServerLocation(), "TempDownload", folderKey));
+            if (folderKey != "" && Directory.Exists(System.IO.Path.Combine(GetServerLocation(), FolderName, folderKey)))
+                Directory.Delete(System.IO.Path.Combine(GetServerLocation(), FolderName, folderKey));
 
             info.AD_attachment_ID = att.GetAD_Attachment_ID();
             info.Error = att.Error;

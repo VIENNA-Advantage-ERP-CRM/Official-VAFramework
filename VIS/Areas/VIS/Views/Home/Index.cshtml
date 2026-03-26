@@ -106,6 +106,16 @@
         }
 
         ViewBag.ScriptsPath = paths;
+
+
+        // ===============================
+        // RENDER CDN CSS (MODULE BASED)
+        // ===============================
+        foreach (var css in VAModelAD.ModuleBundles.GetAllCDNStyles())
+        {
+            <link rel="stylesheet" href="@css" />
+        }
+
     }
 
     else //login
@@ -129,6 +139,7 @@
             @Scripts.Render("~/bundles/jquery");
         }
 
+        <link type="text/css" href="~/Areas/VIS/Content/Login.css" rel="stylesheet" />
     }
 }
 
@@ -346,6 +357,9 @@
                 </div>
                 <div class="vis-app-footer-c-r1">
                 </div>
+                <div class="vis-app-footer-c-r2" id="VISSystemTray">
+                    <i class="fa fa-angle-up" aria-hidden="true"></i>
+                </div>
                 <div class="vis-app-footer-c-r">
                 </div>
             </div>
@@ -353,6 +367,14 @@
         <audio id="vis_buzzer" style="display: none">
             <source src="~/Areas/VIS/Content/notify.wav" type="audio/wav" />
         </audio>
+
+        <div class="vis-tray-container">
+            <div class="vis-tray-popup" id="visTrayPopup">
+            </div>
+        </div>
+
+        <!-- Toast container (holds dynamic toasts) -->
+        <div class="vis-toast-container" id="toastContainer"></div>
     </div>
     @section scripts {
 
@@ -383,6 +405,15 @@
         <script src="~/Areas/ViennaBase/Scripts/globalize/cultures/@String.Format("globalize.culture.{0}.js", ((String)ViewBag.culture).Replace("_", "-"))"></script>
         <script src="~/Areas/ViennaBase/Scripts/chart.min.js"></script>
         <script src="~/Areas/ViennaBase/Scripts/chartjs-plugin-datalabels.min.js"></script>
+
+        @*// ===============================
+        // RENDER CDN SCRIPTS (MODULE BASED)
+        // ===============================*@
+        @foreach (var js in VAModelAD.ModuleBundles.GetAllCDNScripts())
+        {
+          <script src="@js"></script>
+        }
+
         <script>
             VIS.VApp.init(); //Initlize App ()
         </script>
@@ -468,7 +499,7 @@ else //Login Page
                  $("#loginPanel").hide();
              }
         </script>
-        <link type="text/css" href="~/Areas/VIS/Content/Login.css" rel="stylesheet" />
+
         <script type="text/javascript">  var contextUrl = '@Url.Content("~/")'  </script>
         <script src="~/Areas/ViennaBase/Scripts/globalize/globalize.js"></script>
         <script src="~/Areas/VIS/Scripts/app/ajaxlogin.js"></script>

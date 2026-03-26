@@ -123,7 +123,18 @@ namespace VAdvantage.Process
                 sw = new StreamWriter(pathFolder + "\\" + tableName + ".xml");
                 if (ds.Tables.Count > 0)
                 {
-                    ds.Tables[0].TableName = tableName;
+                    DataTable dt = ds.Tables[0];
+
+                    // Remove the _GUID column if it exists (directly from the DataSet)
+                    var guidCol = dt.Columns
+                                    .Cast<DataColumn>()
+                                    .FirstOrDefault(c => c.ColumnName.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase));
+
+                    if (guidCol != null)
+                        dt.Columns.Remove(guidCol);
+
+                    // Set the table name
+                    dt.TableName = tableName;
                 }
                 ds.WriteXml(sw, XmlWriteMode.WriteSchema);
                 sw.Close();
@@ -151,7 +162,19 @@ namespace VAdvantage.Process
             sw = new StreamWriter(pathFolder + "\\" + "AD_Module_DBScript.xml");
             if (ds.Tables.Count > 0)
             {
-                ds.Tables[0].TableName = "AD_Module_DBScript";
+                DataTable dt = ds.Tables[0];
+
+                // Remove the _GUID column if it exists (directly from the DataSet)
+                var guidCol = dt.Columns
+                                .Cast<DataColumn>()
+                                .FirstOrDefault(c => c.ColumnName.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase));
+
+                if (guidCol != null)
+                    dt.Columns.Remove(guidCol);
+
+                // Set the table name
+                dt.TableName = "AD_Module_DBScript";
+
             }
             ds.WriteXml(sw, XmlWriteMode.WriteSchema);
             sw.Close();

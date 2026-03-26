@@ -76,7 +76,7 @@ namespace VIS.Models
             // Fetch all workflows of type document process linked with table passed in parameter, which are not linked with any button on this table
             sbQuery.Clear().Append(@"SELECT w.Name, ma.SeqNo, w.Description, w.Value, ma.AD_Workflow_ID
                                     FROM ad_wf_manualattached ma INNER JOIN AD_Workflow w ON (w.AD_Workflow_ID = ma.AD_Workflow_ID)
-                                    WHERE ma.AD_Table_ID = " + AD_Table_ID + @" AND ma.Record_ID = " + Record_ID + @"
+                                    WHERE ma.AD_Table_ID = " + AD_Table_ID + @" AND CAST(ma.Record_ID AS INTEGER) = " + Record_ID + @"
                                     ORDER BY ma.created DESC, ma.SeqNo DESC");
             DataSet dsRes = DB.ExecuteDataset(sbQuery.ToString(), null, null);
             if (dsRes != null && dsRes.Tables[0].Rows.Count > 0)
@@ -217,7 +217,7 @@ namespace VIS.Models
         {
             VIS.Models.WFActivityModel actModel = new WFActivityModel();
             WFActivityDetails _wfActDet = new WFActivityDetails();
-            DataSet ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " AND Processed = 'N' ORDER BY Created DESC");
+            DataSet ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " AND Processed = 'N' ORDER BY AD_WF_Activity_ID DESC");
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
@@ -265,7 +265,7 @@ namespace VIS.Models
                 }
             }
 
-            ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID, AD_WF_Process_ID, AD_WF_Node_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " ORDER BY Created DESC");
+            ds = DB.ExecuteDataset("SELECT AD_WF_Activity_ID, AD_WF_Process_ID, AD_WF_Node_ID FROM AD_WF_Activity WHERE AD_Table_ID = " + AD_Table_ID + " AND Record_ID = " + Record_ID + " ORDER BY AD_WF_Process_ID DESC, Created DESC");
 
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
