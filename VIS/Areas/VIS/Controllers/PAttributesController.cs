@@ -147,5 +147,16 @@ namespace VIS.Controllers
             PAttributesModel model = new PAttributesModel();
             return Json(JsonConvert.SerializeObject(model.GetTitle(Warehouse_ID, Product_ID, ctx)), JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Get standard screen name from client screen
+        /// </summary>
+        /// <param name="fields">Client Screen Name</param>
+        /// <returns>Standard Screen Name</returns>
+        public JsonResult GetOldScreen(string fields)
+        {
+            PAttributesModel model = new PAttributesModel();
+            return Json(JsonConvert.SerializeObject(model.GetOldScreen(fields)), JsonRequestBehavior.AllowGet);
+        }
     }
 }
