@@ -114,6 +114,9 @@ namespace VAdvantage.WF
             SetWFState(activity.GetWFState());
             SetEventType(EVENTTYPE_ProcessCreated);
             SetElapsedTimeMS(Utility.Env.ZERO);
+            Set_ValueNoCheck("AD_WF_Activity_ID", activity.GetAD_WF_Activity_ID());
+            Set_ValueNoCheck("VA137_Action", activity.Get_Value("VA137_Action"));
+            Set_ValueNoCheck("VA137_LastAction", activity.Get_Value("VA137_LastAction"));
             MWFNode node = activity.GetNode();
             if (node != null && node.Get_ID() != 0)
             {
@@ -140,6 +143,37 @@ namespace VAdvantage.WF
             if (node.Get_ID() == 0)
                 return "?";
             return node.GetName(true);
+        }
+
+        public bool SaveUserTeam(int AD_User_ID, int C_Team_ID)
+        {
+            PO _poWFUserTeam = null;
+            if (AD_User_ID > 0)
+            {
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(VA137_WF_Event_User_ID) FROM VA137_WF_Event_User WHERE IsActive = 'Y' AND AD_User_ID = " + AD_User_ID + " AND AD_WF_EventAudit_ID = " + GetAD_WF_EventAudit_ID())) > 0)
+                    return true;
+                _poWFUserTeam = MTable.GetPO(GetCtx(), "VA137_WF_Event_User", 0, null);
+                _poWFUserTeam.Set_ValueNoCheck("AD_User_ID", AD_User_ID);
+                _poWFUserTeam.Set_ValueNoCheck("AD_WF_EventAudit_ID", GetAD_WF_EventAudit_ID());
+                if (!_poWFUserTeam.Save())
+                {
+                    return false;
+                }
+            }
+            if (C_Team_ID > 0)
+            {
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(VA137_WF_Event_Team_ID) FROM VA137_WF_Event_Team WHERE IsActive = 'Y' AND C_Team_ID = " + C_Team_ID + " AND AD_WF_EventAudit_ID = " + GetAD_WF_EventAudit_ID())) > 0)
+                    return true;
+                _poWFUserTeam = MTable.GetPO(GetCtx(), "VA137_WF_Event_Team", 0, null);
+                _poWFUserTeam.Set_ValueNoCheck("C_Team_ID", C_Team_ID);
+                _poWFUserTeam.Set_ValueNoCheck("AD_WF_EventAudit_ID", GetAD_WF_EventAudit_ID());
+                if (!_poWFUserTeam.Save())
+                {
+                    return false;
+                }
+            }
+            
+            return true;
         }
     }
 }

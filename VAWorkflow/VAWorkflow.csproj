@@ -54,7 +54,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="XModel">
+    <Reference Include="XModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\XModel.dll</HintPath>
     </Reference>
   </ItemGroup>
