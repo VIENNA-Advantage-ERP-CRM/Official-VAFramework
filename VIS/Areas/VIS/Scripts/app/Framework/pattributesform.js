@@ -30,6 +30,8 @@
         var winQry = "";
         var window_ID = 0;
         var windowName = "";
+        var screenName = "";
+        var oldScreen = "";
         var IsSOTrx = false;
         var IsInternalUse = false;
         var canCreate = false;
@@ -47,12 +49,12 @@
         windowNoParent = pwindowNo;
         mLocatorId = M_Locator_ID;
         if (windowNoParent != -1) {
-
-
             // Added by Bharat on 01 May 2017 to remove client side queries
             var AD_tab_ID = VIS.context.getWindowTabContext(windowNoParent, 0, "AD_Tab_ID");
             window_ID = VIS.dataContext.getJSONRecord("InfoProduct/GetWindowID", AD_tab_ID.toString());
             windowName = VIS.context.getContext(windowNoParent, "WindowName");
+            screenName = VIS.context.getContext(windowNoParent, "ScreenName");
+            oldScreen = VIS.dataContext.getJSONRecord("PAttributes/GetOldScreen", screenName);
             IsSOTrx = VIS.context.isSOTrx(windowNoParent);
             IsInternalUse = VIS.context.getWindowTabContext(windowNoParent, 0, "IsInternalUse");
         }
@@ -395,22 +397,22 @@
             $self.log.config("");
             var M_Warehouse_ID = 0;
             if (windowNoParent != -1) {
-                if (window.DTD001 && window_ID == 170) {
+                if (window.DTD001 && (window_ID == 170 || screenName == "VAS_InventoryMove" || oldScreen == "VAS_InventoryMove")) {
                     M_Warehouse_ID = VIS.Env.getCtx().getContextAsInt(windowNoParent, "DTD001_MWarehouseSource_ID");
                 }
-                else if (window_ID == 143 || windowName == "Blanket Sales Order" || window_ID == 169 || window_ID == 168 || window_ID == 341) {
+                else if (window_ID == 143 || screenName == "VAS_SalesOrder" || oldScreen == "VAS_SalesOrder"
+                    || windowName == "Blanket Sales Order" || screenName == "VAS_BlanketSalesOrder" || oldScreen == "VAS_BlanketSalesOrder"
+                    || window_ID == 168 || screenName == "VAS_DeliveryOrder" || oldScreen == "VAS_DeliveryOrder"
+                    || window_ID == 169 || screenName == "VAS_PhysicalInventory" || oldScreen == "VAS_PhysicalInventory"
+                    || window_ID == 341 || screenName == "VAS_InternalUseInventory" || oldScreen == "VAS_InternalUseInventory") {
                     M_Warehouse_ID = VIS.Env.getCtx().getContextAsInt(windowNoParent, "M_Warehouse_ID");
                 }
             }
             var title = "";
-
-
             try {
-
                 title = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "PAttributes/GetTitle", { "Warehouse_ID": M_Warehouse_ID, "Product_ID": mProductId }, null);
             }
             catch (e) {
-
                 console.log(e);
             }
 
