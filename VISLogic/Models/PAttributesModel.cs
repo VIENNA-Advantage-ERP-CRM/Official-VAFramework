@@ -2057,5 +2057,20 @@ namespace VIS.Models
             string title = Util.GetValueOfString(DB.ExecuteScalar(sql, null, null));
             return title;
         }
+
+        /// <summary>
+        /// Get standard screen name from client screen
+        /// </summary>
+        /// <param name="screenName">Client Screen Name</param>
+        /// <returns>Standard Screen Name</returns>
+        public string GetOldScreen(string screenName)
+        {
+            if (MTable.Get_Table_ID("VAS_ZoomScreenConfig") > 0)
+            {
+                string sql = "SELECT Value FROM VAS_ZoomScreenConfig WHERE UPPER(Name)=" + DB.TO_STRING(screenName.ToUpper());
+                return Util.GetValueOfString(DB.ExecuteScalar(sql, null, null));
+            }
+            return "";
+        }
     }
 }
