@@ -1,0 +1,128 @@
+﻿﻿@if (Request.IsAuthenticated && !string.IsNullOrEmpty(ViewBag.IsAuthorize))
+{
+    @model VIS.Models.LoginModel
+
+    @functions{
+
+
+        public string GetMsg(string lang, string key)
+        {
+            return VAdvantage.Utility.Msg.GetMsg(lang, key);
+        }
+
+
+    }
+
+
+
+
+    <div id="vis_home_ca" class="vis-dialog vis-auth-dialog">
+        <div class="vis-setting-submenu">
+            <div class="vis-user-detail">
+                <div class="vis-thumb-img">
+
+                    <div class="vis-edit-icon">
+                        <label for="vis-file-inputUI" class="vis-file-labelUI">
+                            <span class="vis vis-pencil"></span>
+                        </label>
+                        <input id="vis-file-inputUI" title="@GetMsg((string)ViewBag.culture, "ChangeImage")" class="vis-change-pic-inputUI" style="display:none" type="file" accept="image/*">
+                    </div><!-- user-img-wrap -->
+                    @if (ViewBag.UserPic == null || ViewBag.UserPic == "NoRecordFound" || ViewBag.UserPic == "FileDoesn'tExist")
+                    {
+                        ViewBag.UserPic = "Areas/VIS/Images/home/userAvatar.png";
+                    }
+                    <img id="vis_imguserImage" src="@ViewBag.UserPic" alt="profile image">
+                </div>
+                <h1>@ViewBag.DisplayName <span>@Model.Login2Model.RoleName</span> </h1>
+            </div>
+            <div class="vis-setting-form">
+                @using (Html.BeginForm("JsonChangeAuthentication", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { id = "vis_changeAuthForm" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    var sty = "width: auto; text-align: left; padding-right: 5px;";
+                    if (ViewBag.direction == "rtl")
+                    {
+                        sty = "width: auto; text-align: right; padding-left: 5px;";
+                    }
+
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownListFor(m => m.Login2Model.Role, new SelectList(ViewBag.RoleList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Role)), new { id = "vis_home_role" })
+                            @Html.HiddenFor(m => m.Login2Model.RoleName, new { id = "vis_home_roleName" })
+                            @Html.LabelFor(m => m.Login2Model.Role)
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownListFor(m => m.Login2Model.Client, new SelectList(ViewBag.ClientList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Client)), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectClient"), new { id = "vis_home_client" })
+                            @Html.HiddenFor(m => m.Login2Model.ClientName, new { id = "vis_home_clientName" })
+                            @Html.LabelFor(m => m.Login2Model.Client)
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownListFor(m => m.Login2Model.Org, new SelectList(ViewBag.OrgList, "Key", "Name", Convert.ToInt32(Model.Login2Model.Org)), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectOrganization"), new { id = "vis_home_org" })
+                            @Html.HiddenFor(m => m.Login2Model.OrgName, new { id = "vis_home_orgName" })
+                            @Html.LabelFor(m => m.Login2Model.Org)
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownListFor(m => m.Login2Model.Warehouse, new SelectList(ViewBag.WareHouseList, "Key", "Name"), @VAdvantage.Utility.Msg.GetMsg((string)ViewBag.culture, "SelectWarehouse"), new { id = "vis_home_warehouse" })
+                            @Html.HiddenFor(m => m.Login2Model.WarehouseName, new { id = "vis_home_warehouseName" })
+                            @Html.HiddenFor(m => m.Login2Model.Warehouse, new { id = "vis_home_warehouseId" })
+                            @Html.HiddenFor(m => m.Login2Model.LoginLanguage, new { id = "vis_home_langugage" })
+                            @Html.LabelFor(m => m.Login2Model.Warehouse)
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap" style=" margin-bottom: 5px; ">
+                        <div class="vis-control-wrap">
+                            <label class="vis-ec-col-lblchkbox" style="opacity: 1;">
+                                @Html.CheckBox("vis-home-isfilter", false, new { id = "vis_home_isfilter" })
+                                @GetMsg((string)ViewBag.culture, "ApplyFilter")
+                            </label>
+                        </div>
+                    </div>
+                    <div class="input-group vis-input-wrap">
+                        <div class="vis-control-wrap">
+                            @Html.DropDownList("vis-home-filterorgs", new SelectList(ViewBag.OrgList, "Key", "Name", ""), null, new { id = "vis_home_filterorgs", multiple = "multiple" })
+                            @Html.HiddenFor(m => m.Login2Model.FilteredOrg, new { id = "vis_home_filterorgval" })
+                            @Html.Label("vis-home-filterorgs", @GetMsg((string)ViewBag.culture, "FilterOrganization"))
+                        </div>
+                    </div>
+
+
+                    <div class="vis-changeBtn">
+                        <input id="vis-auth-change" type="submit" value="Change" class="ui-button ui-widget" disabled />
+                    </div>
+                    @Html.ValidationSummary()
+
+                }
+            </div>
+
+            <div class="vis-setting-link" style="border-bottom: 1px solid rgba(var(--v-c-on-secondary),.5) ">
+                <a onclick="var uf = new VIS.Framework.UserPreference(); uf.load(); uf.showDialog(); uf = null; var $authDialog = $('#vis_home_ca'); $authDialog.hide(); $authDialog.prev('.vis-wakeup-main').hide(); " href="javascript:;">
+                    <i class="fa fa-gears"></i>
+                    @GetMsg((string)ViewBag.culture, "Preferences")
+                </a>
+            </div>
+
+            <div class="vis-setting-link">
+                @using (Html.BeginForm("LogOff", "Account", new { area = "VIS" }, FormMethod.Post, new { id = "logoutForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <a href="javascript:document.getElementById('logoutForm').submit()"
+                       title="@GetMsg((string)ViewBag.culture, "Shct_LogOut")">
+                        @*<img src="~/Areas/VIS/Images/power-off.svg" alt="">*@
+                        <i class="fa fa-sign-out"></i>
+                        @GetMsg((string)ViewBag.culture, "Logout")
+                    </a>
+                    @*<a href="javascript:void(0);"><img src="images/power-off.svg" alt=""> Logout</a>*@
+                }
+            </div>
+        </div>
+    </div>
+    <!-- App Top Header END -->
+   
+}
