@@ -22,6 +22,33 @@
         return VAdvantage.Utility.Msg.GetMsg(lang, key);
     }
 
+    public string GetSStyle(dynamic ms)
+    {
+        if (ms == null)
+        {
+            return "";
+        }
+        else
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            if (ms.Background != null)
+            {
+
+                sb.Append("background:").Append(ms.Background).Append(";"); ;
+            }
+            if (ms.Color != null)
+            {
+
+                sb.Append("color:").Append(ms.Color).Append(";");
+            }
+            if (ms.Style != null)
+            {
+                sb.Append(ms.Style);
+            }
+            return sb.ToString();
+        }
+    }
+
 }
 
 @section heads{
@@ -147,12 +174,17 @@
 {
     <input id="vis_antiForgeryToken" type="hidden" value="@GetAntiForgeryToken()" />
 
-    <div class="vis-app-body">
 
+    <div style="display:none">
+        @Html.Partial("_Template")
+        @Html.Partial("_Dialogs")
+    </div>
+
+
+    <div class="vis-app-body" style="@GetSStyle(ViewBag.PageSection.PS)">
         <!-- App Header START -->
-        <header class="vis-app-hdr">
+        <header class="vis-app-header" >
             @Html.Partial("_UserSettings", Model)
-            @Html.Partial("_Template")
         </header>
 
         <!-- App Main Menu START -->
@@ -313,7 +345,7 @@
         <div id="vis_menuOverlay" class="vis-app-overlay" style="display:none">
         </div> <!-- App Main Menu END -->
         <!-- App Main Section -->
-        <section id="vis_mainSection" class="vis-app-section">
+        <section id="vis_mainSection" class="vis-app-section"  style="@GetSStyle(ViewBag.PageSection.MS)" >
 
             @*action navigation*@
             <div class="vis-app-action-nav">
@@ -407,11 +439,11 @@
         <script src="~/Areas/ViennaBase/Scripts/chartjs-plugin-datalabels.min.js"></script>
 
         @*// ===============================
-        // RENDER CDN SCRIPTS (MODULE BASED)
-        // ===============================*@
+            // RENDER CDN SCRIPTS (MODULE BASED)
+            // ===============================*@
         @foreach (var js in VAModelAD.ModuleBundles.GetAllCDNScripts())
         {
-          <script src="@js"></script>
+            <script src="@js"></script>
         }
 
         <script>
