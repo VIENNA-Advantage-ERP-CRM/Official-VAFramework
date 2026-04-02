@@ -1044,7 +1044,8 @@
             this.dynamicStyle.push("flex:1;flex-direction:row;height: " + height + "; ");
         }
         else {
-            this.dynamicStyle.push("flex-direction:column;width: " + width + ";height:calc(100vh - 94px); ");
+            var h = 23 + 28 + VIS.Env.getMenuHeaderHeight() +1;
+            this.dynamicStyle.push("flex-direction:column;width: " + width + ";height:calc(100vh - "+h+"px); ");
         }
         this.dynamicStyle.push("padding:" + padding + ";" + backcolor);
 

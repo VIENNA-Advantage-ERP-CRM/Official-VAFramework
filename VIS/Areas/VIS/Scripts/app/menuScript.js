@@ -59,12 +59,16 @@
                 submenu.classList.add(self.options.submenu.show);
                 submenu.style.top = item.scrollHeight + 10 + "px";
 
+                var left = 0;
                 if (item.getBoundingClientRect().left < (window.innerWidth / 2)) {
-                    submenu.style.left = item.offsetLeft - item.parentNode.scrollLeft - 270 + "px";
+                    left = item.offsetLeft - item.parentNode.scrollLeft - 270 ;
                 }
                 else {
-                    submenu.style.left = item.offsetLeft - item.parentNode.scrollLeft - 620 + "px";
+                    left = item.offsetLeft - item.parentNode.scrollLeft - 620 ;
                 }
+                if (left < 0)
+                    left = 0;
+                submenu.style.left = left + "px";
                 //if (item.dataset.page >= 5) {
                 //    submenu.style.left =
                 //        item.offsetLeft - item.parentNode.scrollLeft - 620 + "px";
