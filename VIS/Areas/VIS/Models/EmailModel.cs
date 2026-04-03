@@ -130,7 +130,7 @@ namespace VIS.Models
 
             //int mailConfigID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_UserMailConfigration_ID FROM AD_UserMailConfigration WHERE IsActive='Y' AND AD_User_ID=" + ctx.GetAD_User_ID() + " ORDER BY Updated DESC"));
             int credentialId;
-            string protocol = MUserMailConfigration.GetMailProtocol(ctx,out credentialId);
+            string protocol = MUserMailConfigration.GetMailProtocol(ctx, out credentialId);
 
             SMTPConfig config = null;
             UserInformation userinfo = new UserInformation();
@@ -140,7 +140,9 @@ namespace VIS.Models
                 // var config = "";
                 if (config == null)
                 {
-                    MClient client = new MClient(ctx, AD_Client_ID, null);
+                    //fix for zero client id
+                    //MClient client = new MClient(ctx, AD_Client_ID, null);
+                    MClient client = MClient.Get(ctx,AD_Client_ID);
                     userinfo.Email = client.GetRequestEMail();
                 }
                 else

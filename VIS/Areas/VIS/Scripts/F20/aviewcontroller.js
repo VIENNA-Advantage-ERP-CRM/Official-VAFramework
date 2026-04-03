@@ -902,10 +902,10 @@
     /**
      * refresh row presentation
      */
-    VIS.GridController.prototype.refreshRowPresentation = function () {
+    VIS.GridController.prototype.refreshRowPresentation = function (avoidRequery) {
         if (this.isCardRow) {
             this.isCardRow = false;
-            this.switchCardRow();
+            this.switchCardRow(avoidRequery);
         }
         else if (this.isMapRow) {
             this.isMapRow = false;

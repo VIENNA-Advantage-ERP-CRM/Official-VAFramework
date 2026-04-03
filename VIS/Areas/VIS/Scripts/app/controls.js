@@ -1908,19 +1908,26 @@
                 if ((self.lookup != null) && (self.lookup instanceof VIS.MLookup)) {
                     var AD_Reference_ID = self.lookup.getAD_Reference_Value_ID();
                     if (AD_Reference_ID != 0) {
-                        var query = "VIS_83";
-                        var param = [];
-                        param[0] = new VIS.DB.SqlParam("@AD_Reference_ID", AD_Reference_ID);
-                        try {
-                            var dr = executeReader(query, param);
-                            if (dr.read()) {
-                                keyColumnName = dr.getString(0);
-                            }
-                            dr.dispose();
-                        }
-                        catch (e) {
-                            this.log.log(VIS.Logging.Level.SEVERE, query, e);
-                        }
+                        //var query = "VIS_83";
+                        //var param = [];
+                        //param[0] = new VIS.DB.SqlParam("@AD_Reference_ID", AD_Reference_ID);
+                        //try {
+                        //    var dr = executeReader(query, param);
+                        //    if (dr.read()) {
+                        //        keyColumnName = dr.getString(0);
+                        //    }
+                        //    dr.dispose();
+                        //}
+                        //catch (e) {
+                        //    this.log.log(VIS.Logging.Level.SEVERE, query, e);
+                        //}
+                        var data = {};
+                        data.value = value;
+                        data.refId = AD_Reference_ID;
+                        data.colName = self.getColumnName();
+                        var retData = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetZoomWhereClause", data);
+                        keyColumnName = retData.colName;
+                        value = retData.value;
                     }	//	Table Reference
                 }	//	MLookup
 

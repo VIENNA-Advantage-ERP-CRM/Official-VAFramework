@@ -1628,7 +1628,8 @@
                     IsAutoCommit: $autocommit.prop("checked") ? "Y" : "N",
                     IsShowAcct: $acctab.prop("checked") ? "Y" : "N",
                     IsShowTrl: $transtab.prop("checked") ? "Y" : "N",
-                    IsShowAdvanced: $advanstab.prop("checked") ? "Y" : "N"
+                    IsShowAdvanced: $advanstab.prop("checked") ? "Y" : "N",
+                    PrintNativeDigits: $printnative.prop("checked") ? "Y" : "N"
                 });
             };
 

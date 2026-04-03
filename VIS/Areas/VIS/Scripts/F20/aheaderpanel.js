@@ -668,7 +668,7 @@
             if ($self.pRowData) {
                 colValue = $self.pRowData[mField.getColumnName().toLower()];
             }
-
+           
             //if (!mField.getIsDisplayed())
             //    return "";
             if (colValue || mField.getColumnName() == 'AD_Org_ID' || mField.getColumnName() == 'AD_Client_ID' || mField.getColumnName() == 'AD_Role_ID') {
@@ -676,13 +676,19 @@
 
 
                 if (mField.lookup) {
+                    // Temporary fix: handles incorrect organization name display due to lookup inconsistency
+                    var oldValue = colValue;
                     colValue = mField.lookup.getDisplay(colValue, true, true);
-
+                    if (oldValue == 0 && mField.getColumnName() == 'AD_Org_ID' && colValue!="*" ) {
+                        return "";
+                    }
                     if (colValue.startsWith && colValue.startsWith("<") && colValue.endsWith(">")) {
                         colValue = colValue.replace("<", "").replace(">", "");
-                        var colValueTemp = mField.lookup.getDirect(colValue, true, true)
-                        if (colValueTemp && colValueTemp.Name) {
-                            colValue = colValueTemp.Name;
+                        if (mField.lookup.getDirect) {
+                            var colValueTemp = mField.lookup.getDirect(colValue, true, true)
+                            if (colValueTemp && colValueTemp.Name) {
+                                colValue = colValueTemp.Name;
+                            }
                         }
                     }
 
