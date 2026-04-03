@@ -3925,7 +3925,8 @@ ul.vis-userLinks-ListMenu li a i {
     right: 1rem;
     top: 3rem;
     z-index: 999;
-    background-color: white;
+    background-color: rgba(var(--v-c-on-secondary), 1);
+    color: inherit;
 }
 
 .vis-nm-fav-menu-heading h1 {
@@ -3980,7 +3981,7 @@ ul.vis-userLinks-ListMenu li a i {
     }
 
 .vis-nm-fav-tile .vis-star-empty {
-    color: rgba(var(--v-c-primary), 1);
+    /*color: rgba(var(--v-c-primary), 1);*/
     font-size: 1.1rem;
 }
 

@@ -1139,11 +1139,22 @@ FROM sso_configuration  WHERE sso_configuration.IsActive='Y' ");
             ret.PS = null;
             try
             {
-                DataSet ds = DB.ExecuteDataset("SELECT * FROM AD_HomePageConfig WHERE IsActive='Y' AND AD_Client_ID=" + ad_Client_ID);
+                DataSet ds = DB.ExecuteDataset("SELECT * FROM AD_HomePageConfig WHERE IsActive='Y' AND AD_Client_ID IN (0," + ad_Client_ID
+                                                +") ORDER BY AD_Client_ID Desc");
                 if (ds != null && ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
                 {
+                    int ad_client = -1;
                     foreach (DataRow dr in ds.Tables[0].Rows)
                     {
+                        if (ad_client < 0)
+                        {
+                            ad_client = Convert.ToInt32(dr["AD_Client_ID"]);
+                        }
+
+                        if (ad_client > -1 && ad_client != Convert.ToInt32(dr["AD_Client_ID"])) {
+                            break;
+                        }
+
                         if (dr["PageSection"].ToString() == "H")
                         {
                             ret.HS = new ExpandoObject();

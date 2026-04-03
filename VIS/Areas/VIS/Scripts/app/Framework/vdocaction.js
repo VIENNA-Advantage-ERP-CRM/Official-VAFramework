@@ -198,7 +198,8 @@
             }
             /*VIS_427 03/04/2025 if document is completed and docAction 
              is Reverse correct or Void then append reversed date field in docaction*/
-            if (tabObj.getValue("DocStatus") == "CO") {
+            if (tabObj.getValue("DocStatus") == "CO" &&
+                (!ctx.getContext("#REVERSAL_DATE_DOCACTION") || ctx.getContext("#REVERSAL_DATE_DOCACTION").equals("Y"))) {
                 setReversalDate(false);
             }
         };
@@ -319,7 +320,8 @@
                 }
                 /*VIS_427 03/04/2025 if document is completed and docAction
                   is Reverse correct or Void then append reversed date field in docaction*/
-                if (tabObj.getValue("DocStatus") == "CO") {
+                if (tabObj.getValue("DocStatus") == "CO" &&
+                    (!ctx.getContext("#REVERSAL_DATE_DOCACTION") || ctx.getContext("#REVERSAL_DATE_DOCACTION").equals("Y"))) {
                     setReversalDate(true);
                 }
             });
