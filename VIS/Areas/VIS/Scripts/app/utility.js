@@ -517,6 +517,9 @@
         var windowNo = 1;
         var WINDOW_PAGE_SIZE = 50;
         var window_height = 400;
+
+        var menuHeader_Height = 43;
+
         var NULLString = "NULLValue";
         var obscureTypes = { DigitButLast4: "904", DigitButFirstLast4: "944", AlphanumButLast4: "A04", AlphaNumButFirstLast4: "A44" };
 
@@ -781,6 +784,13 @@
         function setScreenHeight(height) {
             window_height = height
         };
+
+        function getMenuHeaderHeight() {
+            return menuHeader_Height;
+        }
+        function setMenuHeaderHeight(mHeight) {
+            menuHeader_Height = mHeight;
+        }
       
         function getPreference(ctx, AD_Window_ID, context, system) {
             /**************************************************************************
@@ -1023,7 +1033,9 @@
             HIDE_CLIENT_ORG: 3,
             NULLString: NULLString,
             approveCol: "IsApproved",
-            getObscureValue: getObscureValue
+            getObscureValue: getObscureValue,
+            setMenuHeaderHeight: setMenuHeaderHeight,
+            getMenuHeaderHeight: getMenuHeaderHeight,
         }
     }();
     // ******************** END ENV *********************//
