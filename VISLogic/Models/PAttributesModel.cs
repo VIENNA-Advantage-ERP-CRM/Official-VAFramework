@@ -2067,7 +2067,7 @@ namespace VIS.Models
         {
             if (MTable.Get_Table_ID("VAS_ZoomScreenConfig") > 0)
             {
-                string sql = "SELECT Value FROM VAS_ZoomScreenConfig WHERE UPPER(Name)=" + DB.TO_STRING(screenName.ToUpper());
+                string sql = "SELECT Name FROM VAS_ZoomScreenConfig WHERE UPPER(Value)=" + DB.TO_STRING(screenName.ToUpper());
                 return Util.GetValueOfString(DB.ExecuteScalar(sql, null, null));
             }
             return "";
