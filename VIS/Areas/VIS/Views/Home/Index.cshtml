@@ -140,7 +140,8 @@
         // ===============================
         foreach (var css in VAModelAD.ModuleBundles.GetAllCDNStyles())
         {
-            <link rel="stylesheet" href="@css" />
+            var href = css.StartsWith("~") ? Url.Content(css) : css;
+            <link rel="stylesheet" href="@href" />
         }
 
     }
@@ -183,7 +184,7 @@
 
     <div class="vis-app-body" style="@GetSStyle(ViewBag.PageSection.PS)">
         <!-- App Header START -->
-        <header class="vis-app-header" >
+        <header class="vis-app-header">
             @Html.Partial("_UserSettings", Model)
         </header>
 
@@ -345,7 +346,7 @@
         <div id="vis_menuOverlay" class="vis-app-overlay" style="display:none">
         </div> <!-- App Main Menu END -->
         <!-- App Main Section -->
-        <section id="vis_mainSection" class="vis-app-section"  style="@GetSStyle(ViewBag.PageSection.MS)" >
+        <section id="vis_mainSection" class="vis-app-section" style="@GetSStyle(ViewBag.PageSection.MS)">
 
             @*action navigation*@
             <div class="vis-app-action-nav">
@@ -443,8 +444,11 @@
             // ===============================*@
         @foreach (var js in VAModelAD.ModuleBundles.GetAllCDNScripts())
         {
-            <script src="@js"></script>
+            var src = js.StartsWith("~") ? Url.Content(js) : js;
+            <script src="@src"></script>
         }
+
+
 
         <script>
             VIS.VApp.init(); //Initlize App ()
