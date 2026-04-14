@@ -1786,6 +1786,14 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                             SaveUserTeam(0, C_Team_ID);
                         }
                     }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "_AP" && (Util.GetValueOfString(_po.Get_Value("VA137_DocTypeCategory")) == "PL") && (Util.GetValueOfString(_po.Get_Value("VA137_Status")) == "STA_AP"))
+                    {
+                        int AD_User_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM VA137_CorrespRecepient WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created"));// GetReceipientTeam();
+                        if (AD_User_ID > 0)
+                        {
+                            SaveUser(AD_User_ID);
+                        }
+                    }
                     else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "RSD" && Util.GetValueOfString(_po.Get_Value("VA137_Status")) == "STA_RA")
                     {
                         int C_Team_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_Correspondence WHERE VA137_Correspondence_ID = " + _po.Get_ID()));// GetReceipientTeam();
