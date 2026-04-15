@@ -190,9 +190,11 @@ namespace VIS.Models
                 obj.tableStucture += "</td>";
 
                 obj.tableStucture += "</tr>";
-
+                string screenName = Util.GetValueOfString(DB.ExecuteScalar(@"SELECT Name FROM AD_Window WHERE AD_Window_ID=" + window_ID));
+                string oldScreen = GetOldScreen(screenName);
                 //Row 1
-                if (!IsSOTrx || IsInternalUse == "N" || window_ID == 191 || window_ID == 140)
+                if (!IsSOTrx || IsInternalUse == "N" || window_ID == 191 || window_ID == 140 || screenName == "VAS_Production"
+                    || screenName == "VAS_ProductMaster" || oldScreen == "VAS_Production" || oldScreen == "VAS_ProductMaster")
                 {
                     /// Below code commented by Mukesh Vishwakarma @20230615 has been depreciated as not required Lots number in Drop=down list due to performance.
                     /**
@@ -1956,7 +1958,7 @@ namespace VIS.Models
             sql = sqlSelect + " FROM " + msqlFrom + " WHERE " + sql;
             sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "patr", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
 
-            List <Dictionary<string, object>> retAttr = null;
+            List<Dictionary<string, object>> retAttr = null;
             SqlParameter[] param = new SqlParameter[1];
             param[0] = new SqlParameter("@M_Product_ID", product_ID);
             DataSet ds = DB.ExecuteDataset(sql, param, null);
