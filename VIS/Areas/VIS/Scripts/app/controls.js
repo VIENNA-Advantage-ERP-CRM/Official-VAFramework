@@ -2639,9 +2639,9 @@
                     } else {
                         self.setValue(item.id, true, true);
 
-                        if (columnName.toUpperCase() == 'M_PRODUCT_ID') {
-                            VIS.context.setContext(self.lookup.windowNo, "AttrCode", item.id);
-                        }
+                        //if (columnName.toUpperCase() == 'M_PRODUCT_ID') {
+                        //    VIS.context.setContext(self.lookup.windowNo, "AttrCode", item.id);
+                        //}
 
                         if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
                             setTimeout(function () {
