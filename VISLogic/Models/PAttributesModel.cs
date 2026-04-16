@@ -98,15 +98,13 @@ namespace VIS.Models
             obj.tableStucture = "<div class='vis-attribute-popup'><table class='vis-formouterwrpdiv' style='width: 100%;'><tr>";
             if (_productWindow)
             {
-                obj.tableStucture = "<div class='vis-formouterwrpdiv' style='width:100%; max-height:400px; overflow-x:auto;'>";
-                obj.tableStucture += "<table style='width: 100%;'><tr>";
                 for (int i = 0; i < attributes.Length; i++)
                 {
                     obj.tableStucture = AddAttributeLine(attributes[i], _M_AttributeSetInstance_ID, true, false, windowNo, obj, i);
                 }
             }
             else
-            {                
+            {
                 var newEditContent = VAdvantage.Utility.Util.CleanMnemonic(Msg.GetMsg(ctx, "NewRecord"));
                 // JID_1070: Enabled Create new checkbox on Attribute set Instance
                 //if (_M_AttributeSetInstance_ID > 0)
@@ -123,8 +121,8 @@ namespace VIS.Models
                 //obj.tableStucture += "<input type='checkbox' id='chkEdit_" + windowNo + "' ><label  class='VIS_Pref_Label_Font'>" + Msg.GetMsg(ctx, "EditRecord") + "</label>";
                 //obj.tableStucture += "</td>";
 
-                //obj.tableStucture += "<td>";
-                obj.tableStucture = "<div style='display: flex'>";
+                obj.tableStucture += "<td>";
+                obj.tableStucture += "<div style='display: flex'>";
                 obj.tableStucture += "<div id=cmdNew_" + windowNo + " class='input-group vis-input-wrap' style='width: 50%; float: left;'>";
                 obj.tableStucture += "<div class='vis-control-wrap'>";
                 obj.tableStucture += "<label class='vis-ec-col-lblchkbox'><input type='checkbox' style='float:left;' id=chkNewEdit_" + windowNo
@@ -135,22 +133,24 @@ namespace VIS.Models
                     + ">" + Msg.GetMsg(ctx, "EditRecord") + "</label></div></div>";
                 //obj.tableStucture += "<input type='checkbox' style='height: 31px;' id=chkEdit_" + windowNo + " >";
                 obj.tableStucture += "</div>";
-                //obj.tableStucture += "</td>";
-                //obj.tableStucture += "</tr>";
+                obj.tableStucture += "</td>";
+                obj.tableStucture += "</tr>";
 
-                //column 2                                
-                //obj.tableStucture += "<tr'>";
-                //obj.tableStucture += "<td>";
+                //column 2
+                obj.tableStucture += "<tr'>";
+                //obj.tableStucture += "<td></td>";
+
+                //column 2
+                obj.tableStucture += "<td>";
                 obj.tableStucture += "<div class='input-group vis-input-wrap'>";
                 obj.tableStucture += "<div class='vis-control-wrap'>";
                 obj.tableStucture += "<button type='button' id='btnSelect_" + windowNo + "' role='button' aria-disabled='false'>"
                     + "<i class='vis vis-locator' style='padding: 0 6px'></i><span>"
                     + VAdvantage.Utility.Util.CleanMnemonic(Msg.GetMsg(ctx, "SelectExisting")) + "</span></button></div></div>";
-                //obj.tableStucture += "</td>";
-                //obj.tableStucture += "</tr>";
+                obj.tableStucture += "</td>";
+                obj.tableStucture += "</tr>";
 
-                obj.tableStucture += "<div class='vis-formouterwrpdiv' style='width:100%; max-height:400px; overflow-x:auto;'>";
-                obj.tableStucture += "<table style='width: 100%;'>";
+                //Change 20-May-2015 Bharat
                 var label = Msg.Translate(ctx, "AttrCode");
                 obj.tableStucture += "<tr>";
                 obj.tableStucture += "<td>";
@@ -380,7 +380,7 @@ namespace VIS.Models
             obj.tableStucture += "</td>";
 
             obj.tableStucture += "</tr>";
-            obj.tableStucture += "</table></div>";
+
 
             //Add Ok and Cancel button 
             //Last row
