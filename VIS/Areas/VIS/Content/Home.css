@@ -3931,7 +3931,7 @@ ul.vis-userLinks-ListMenu li a i {
     right: 1rem;
     top: 3rem;
     z-index: 999;
-    background-color: rgba(var(--v-c-on-secondary), 1);
+    background-color: rgba(var(--v-c-secondary), 1);
     color: inherit;
 }
 
