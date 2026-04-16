@@ -268,7 +268,7 @@
                 type: "GET",
                 datatype: "json",
                 contentType: "application/json; charset=utf-8",
-                data: ({ warehouse: warehouseId, locator: locatorId, container: 0, validation: validation }),
+                data: ({ warehouse: warehouseId, locator: locatorId, container: 0, validation: VIS.secureEngine.encrypt(validation) }),
                 success: function (data) {
                     callback(data);
                 },
