@@ -125,6 +125,7 @@ namespace VAdvantage.Controller
         public bool IsDependentInDetailView = false;
         public bool IsAssignRecord = false;
         public bool IsAdvanceTask = false;
+        public bool IsRiskRegister = false;
 
         public List<GridTabVO> GetTabs()
         {
@@ -200,7 +201,7 @@ namespace VAdvantage.Controller
              + "IsSOTrx, AD_UserDef_Win_ID,IsAppointment,IsTask,IsEmail,IsLetter,IsSms,IsFaxEmail,Name2, "
              + "ISCHAT, ISATTACHMENT,ISHISTORY,ISCHECKREQUEST,ISCOPYRECORD,ISSUBSCRIBERECORD,ISZOOMACROSS,ISCREATEDOCUMENT,ISUPLOADDOCUMENT,ISVIEWDOCUMENT,IsAttachDocumentFrom, "
              + " ISIMPORTMAP,ISMARKTOEXPORT,ISARCHIVE,ISATTACHEMAIL,ISROLECENTERVIEW , FontName, ImageUrl, IsCompositeView, IsGenerateAttachmentCode,IsRecordShared,IsHideTabLinks,"
-             + "IsHideToolbar,IsHideActionbar,IsLandingPage,IsDependentInDetailView, IsAssignRecord, IsAdvanceTask ");
+             + "IsHideToolbar,IsHideActionbar,IsLandingPage,IsDependentInDetailView, IsAssignRecord, IsAdvanceTask,IsRiskRegister ");
 
             if (Utility.Env.IsBaseLanguage(vo.ctx, "AD_Window"))
             {
@@ -385,6 +386,7 @@ namespace VAdvantage.Controller
                             vo.IsDependentInDetailView = dr[43].ToString() == "Y";
                             vo.IsAssignRecord = dr[44].ToString() == "Y";
                             vo.IsAdvanceTask = dr[45].ToString() == "Y";
+                            vo.IsRiskRegister = dr[45].ToString() == "Y";
                         }
                     }
                 }
@@ -908,6 +910,7 @@ namespace VAdvantage.Controller
                 clone.IsDependentInDetailView = IsDependentInDetailView;
                 clone.IsAssignRecord = IsAssignRecord;
                 clone.IsAdvanceTask = IsAdvanceTask;
+                clone.IsRiskRegister = IsRiskRegister;
 
                 //
                 clone.hasPanel = hasPanel;

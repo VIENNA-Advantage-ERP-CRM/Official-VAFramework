@@ -276,7 +276,9 @@
     GridWindow.prototype.getWindowType = function () {
         return this.vo.WindowType;
     };
-
+    GridWindow.prototype.getIsRiskRegister = function () {
+        return this.vo.IsRiskRegister;
+    };
 
 
     GridWindow.prototype.getIsCheckRequest = function () {

@@ -583,6 +583,11 @@
                 this.aAdvanceTask.setTextDirection("r");
                 $ulactionbar.append(this.aAdvanceTask.getListItmIT());
             }
+            if (mWindow.getIsAdvanceTask()) {
+                this.aAdvanceTask = this.addActions("ATK", null, false, false, false, onAction); //1
+                this.aAdvanceTask.setTextDirection("r");
+                $ulactionbar.append(this.aAdvanceTask.getListItmIT());
+            }
             if (mWindow.getIsEmail()) {
                 this.aEmail = this.addActions("EML", null, false, false, false, onAction); //1
                 this.aEmail.setTextDirection("r");
@@ -2643,7 +2648,9 @@
         else if (tis.aAdvanceTask && tis.aAdvanceTask.getAction() === action) {
             tis.cmd_advanceTask();
         }
-
+        else if (tis.aRiskRegister && tis.aRiskRegister.getAction() === action) {
+            tis.cmd_RiskRegister();
+        }
         else if (tis.aSubscribe && tis.aSubscribe.getAction() === action) {
             tis.cmd_subscribe();
         }
@@ -4993,6 +5000,16 @@
     };
 
     APanel.prototype.cmd_advanceTask = function () {
+        var record_ID = this.curTab.getRecord_ID();
+        var AD_Table_ID = this.curTab.getAD_Table_ID();
+        var windowName = this.gridWindow.getDisplayName();
+        if (record_ID == -1)	//	No Key
+        {
+            return;
+        }
+        VIS.AdvanceTask.init(windowName, AD_Table_ID, record_ID);
+    };
+    APanel.prototype.cmd_RiskRegister = function () {
         var record_ID = this.curTab.getRecord_ID();
         var AD_Table_ID = this.curTab.getAD_Table_ID();
         var windowName = this.gridWindow.getDisplayName();
