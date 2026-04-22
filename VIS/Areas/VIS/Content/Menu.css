@@ -444,6 +444,7 @@ nav.vis-nav-horizontal-scroll {
     opacity: 0;
     max-height: 490px;
     overflow-y: auto;
+    
 }
 
     .vis-subnav-content a {
