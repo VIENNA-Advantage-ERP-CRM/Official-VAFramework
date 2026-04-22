@@ -121,4 +121,4 @@ import "../app/Framework/VIS_SecretKeyDialog.js";
 import "../react/shared/VISReactControlsBridge/VISReactControlsBridge.js";
 
 import "../app/Framework/advanceTask.js";
-
+import "../app/Framework/ariskregister.js";
