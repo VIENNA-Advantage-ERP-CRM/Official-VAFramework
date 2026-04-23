@@ -6424,7 +6424,7 @@
             else {
                 $.ajax({
                     url: baseUrl + 'productContainer/GetProductContainer',
-                    data: { text: text, validation: validated },
+                    data: { text: text, validation: VIS.secureEngine.encrypt(validated) },
                     success: function (result) {
                         result = JSON.parse(result);
                         if (result == "null" || result == null || result == "" || result == 0) {
@@ -7089,7 +7089,7 @@
             this.settingVal = true;
             //else
             //his.ctrl.val(newValue);
-            if (!newValue && newValue !='') {
+            if (!newValue && newValue != '') {
                 this.iti ? this.iti.setNumber('') : this.ctrl.val('');
                 this.setCountry();
             } else {
