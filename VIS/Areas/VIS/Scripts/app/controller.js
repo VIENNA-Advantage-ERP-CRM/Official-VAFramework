@@ -245,6 +245,10 @@
         return this.vo.IsAdvanceTask;
     };
 
+    GridWindow.prototype.getIsRiskRegister = function () {
+        return this.vo.IsRiskRegister;
+    };
+
     GridWindow.prototype.getIsEmail = function () {
         return this.vo.IsEmail;
     };

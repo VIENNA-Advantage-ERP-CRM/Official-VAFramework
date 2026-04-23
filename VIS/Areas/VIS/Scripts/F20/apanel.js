@@ -593,6 +593,11 @@
                 this.aLetter.setTextDirection("r");
                 $ulactionbar.append(this.aLetter.getListItmIT());
             }
+            if (mWindow.getIsRiskRegister()) {
+                this.aRiskRegister = this.addActions("RSK", null, false, false, false, onAction); //1
+                this.aRiskRegister.setTextDirection("r");
+                $ulactionbar.append(this.aRiskRegister.getListItmIT());
+            }
             if (mWindow.getIsSms()) {
                 this.aSms = this.addActions("SMS", null, false, false, false, onAction); //1
                 this.aSms.setTextDirection("r");
@@ -2643,7 +2648,9 @@
         else if (tis.aAdvanceTask && tis.aAdvanceTask.getAction() === action) {
             tis.cmd_advanceTask();
         }
-
+        else if (tis.aRiskRegister && tis.aRiskRegister.getAction() === action) {
+            tis.cmd_riskRegister();
+        }
         else if (tis.aSubscribe && tis.aSubscribe.getAction() === action) {
             tis.cmd_subscribe();
         }
@@ -5001,6 +5008,17 @@
             return;
         }
         VIS.AdvanceTask.init(windowName, AD_Table_ID, record_ID);
+    };
+
+    APanel.prototype.cmd_riskRegister = function () {
+        var record_ID = this.curTab.getRecord_ID();
+        if (record_ID > 0) {
+            var AD_Table_ID = this.curTab.getAD_Table_ID();
+            var user_ID = this.curTab.getValue("AD_User_ID");
+            var req = new VIS.ARiskRegister(this.aRiskRegister, AD_Table_ID, record_ID, user_ID, null, this.aRiskRegister.getListItmIT());
+            req.getRiskRegister();
+            req = null;
+        }
     };
 
     APanel.prototype.cmd_letter = function () {
