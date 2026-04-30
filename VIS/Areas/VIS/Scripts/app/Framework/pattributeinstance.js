@@ -44,7 +44,7 @@
         var btnCancel = $("<input id='" + "btnCancel_" + windowNo + "' class='VIS_Pref_btn-2' style='float: right;margin-right: 0px;' type='button' value='" + VIS.Msg.getMsg("Cancel") + "'>");
 
         var topdiv = $("<div id='" + "topdiv_" + windowNo + "' style='float: left; width: 100%; height: 7%; text-align: right;'>");
-        var middeldiv = $("<div id='" + "middeldiv_" + windowNo + "' style='float: left; width: 100%; height: 79%;'>");
+        var middeldiv = $("<div id='" + "middeldiv_" + windowNo + "' style='float: left; width: 100%; height: 79%; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch;'>");
         var bottomdiv = $("<div id='" + "bottomdiv_" + windowNo + "' style='float: left; width: 100%; height: 14%;'>");
 
         var disableSearch = false;
@@ -139,7 +139,6 @@
             if (msql == null) {
                 msql = "";
             }
-            var data = [];
 
             var sql = msql;
             var pos = msql.lastIndexOf(" ORDER BY ");
@@ -150,45 +149,63 @@
                 }
                 sql += msql.substring(pos);
             }
-            //
             $self.log.finest(sql);
 
-            try {
-                var _sql = VIS.secureEngine.encrypt(sql);
-                dr = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "PAttributes/GetAttributeData", { "Sq1Atribute": _sql, "Product_ID": mProductID }, null);
-                if (dr != null && dr.length > 0) {
-                    var count = 1;
-                    for (var i in dr) {
-                        var line = {};
-                        line['M_AttributeSetInstance_ID'] = dr[i]["M_AttributeSetInstance_ID"];
-                        line['Description'] = dr[i]["Description"];
-                        line['Lot'] = dr[i]["Lot"];
-                        line['SerNo'] = dr[i]["SerNo"];
-                        line['GuaranteeDate'] = dr[i]["GuaranteeDate"];
-                        line['Value'] = dr[i]["Value"];
-                        line['QtyReserved'] = dr[i]["QtyReserved"];
-                        line['QtyOrdered'] = dr[i]["QtyOrdered"];
-                        line['QtyOnHand'] = dr[i]["QtyOnHand"];
-                        line['GoodForDays'] = dr[i]["GoodForDays"];
-                        line['ShelfLifeDays'] = dr[i]["ShelfLifeDays"];
-                        line['ShelfLifeRemainingPct'] = dr[i]["ShelfLifeRemainingPct"];
-                        line['M_Locator_ID'] = dr[i]["M_Locator_ID"];
-                        line['AttrCode'] = dr[i]["AttrCode"];
-                        line['recid'] = count;
-                        count++;
-                        data.push(line);
-                    }
-                }
+            $busyDiv.css("display", 'block');
 
-               
-                enableButtons();
+            var _sql;
+            try {
+                _sql = VIS.secureEngine.encrypt(sql);
             }
             catch (e) {
-                //$self.log.Log(Level.SEVERE, sql, e);
                 console.log(e);
+                $busyDiv.css("display", 'none');
+                loadGrid([]);
+                return;
             }
 
-            loadGrid(data);
+            // Async fetch so the UI thread stays free — sync XHR was freezing
+            // the grid mid-touch on tablets.
+            $.ajax({
+                url: VIS.Application.contextUrl + "PAttributes/GetAttributeData",
+                type: "GET",
+                dataType: "json",
+                data: { "Sq1Atribute": _sql, "Product_ID": mProductID },
+                success: function (dr) {
+                    dr = JSON.parse(dr);
+                    var data = [];
+                    if (dr != null && dr.length > 0) {
+                        var count = 1;
+                        for (var i in dr) {
+                            var line = {};
+                            line['M_AttributeSetInstance_ID'] = dr[i]["M_AttributeSetInstance_ID"];
+                            line['Description'] = dr[i]["Description"];
+                            line['Lot'] = dr[i]["Lot"];
+                            line['SerNo'] = dr[i]["SerNo"];
+                            line['GuaranteeDate'] = dr[i]["GuaranteeDate"];
+                            line['Value'] = dr[i]["Value"];
+                            line['QtyReserved'] = dr[i]["QtyReserved"];
+                            line['QtyOrdered'] = dr[i]["QtyOrdered"];
+                            line['QtyOnHand'] = dr[i]["QtyOnHand"];
+                            line['GoodForDays'] = dr[i]["GoodForDays"];
+                            line['ShelfLifeDays'] = dr[i]["ShelfLifeDays"];
+                            line['ShelfLifeRemainingPct'] = dr[i]["ShelfLifeRemainingPct"];
+                            line['M_Locator_ID'] = dr[i]["M_Locator_ID"];
+                            line['AttrCode'] = dr[i]["AttrCode"];
+                            line['recid'] = count;
+                            count++;
+                            data.push(line);
+                        }
+                    }
+                    enableButtons();
+                    loadGrid(data);
+                },
+                error: function (jqXHR, textStatus) {
+                    console.log(textStatus);
+                    $busyDiv.css("display", 'none');
+                    loadGrid([]);
+                }
+            });
         }
 
         function loadGrid(data) {
@@ -243,7 +260,7 @@
                 },
             });
             //Added by Manjot To implement Search Functionality on Grid 10 May 2018 google Sheet ID SI_0607
-            // 
+            //
             if (!disableSearch) {
                 if (SerNo)
                     $self.dGrid.search('all', SerNo);
@@ -251,6 +268,20 @@
                     $self.dGrid.search('all', lotNo);
             }
             //$self.dGrid.hideColumn('M_Locator_ID');
+
+            // Touch-friendly scroll for tablets: let w2grid's internal scroll panes
+            // handle horizontal/vertical swipes natively, and stop the parent jQuery-UI
+            // modal dialog from intercepting touchmove on the grid records area.
+            var $gridRoot = $(middeldiv);
+            $gridRoot.find('.w2ui-grid-body, .w2ui-grid-records, .w2ui-grid-columns, .w2ui-grid-data')
+                .css({
+                    'touch-action': 'pan-x pan-y',
+                    '-webkit-overflow-scrolling': 'touch'
+                });
+            $gridRoot.off('touchmove.pattrgrid').on('touchmove.pattrgrid', function (e) {
+                e.stopPropagation();
+            });
+
             $busyDiv.css("display", 'none');
         }
 
@@ -312,12 +343,17 @@
         }
 
         this.showDialog = function () {
+            // Responsive size: fit the device viewport so tablets don't have to
+            // swipe several screens of grid horizontally. Min keeps desktop usable.
+            var dlgWidth = Math.max(600, Math.min(window.innerWidth - 40, 1200));
+            var dlgHeight = Math.max(400, Math.min(window.innerHeight - 80, 600));
+
             $root.dialog({
                 modal: true,
                 title: mtitle, // VIS.Msg.translate(VIS.Env.getCtx(), mtitle),
-                width: 600,
-                height: 450,
-                resizable: false,
+                width: dlgWidth,
+                height: dlgHeight,
+                resizable: true,
                 close: function () {
                     $self.dispose();
                     $self = null;
