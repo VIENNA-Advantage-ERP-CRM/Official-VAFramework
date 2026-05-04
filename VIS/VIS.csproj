@@ -836,6 +836,7 @@
     <Content Include="Areas\VIS\Scripts\react\CSS\Vis_AssignRecordWidget.css" />
     <Content Include="Areas\VIS\Scripts\react\pages\AssignRecordWidget.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\HomePage.jsx" />
+    <Content Include="Areas\VIS\Scripts\react\pages\InvoicesPage.jsx" />
     <Content Include="Areas\VIS\Scripts\react\pages\TestComponent.jsx" />
     <Content Include="Areas\VIS\Scripts\react\index.jsx" />
     <Content Include="Areas\VIS\Content\src\css-style.css" />
@@ -847,6 +848,7 @@
     <Content Include="Areas\VIS\Scripts\widgets\checklist.js" />
     <Content Include="Areas\VIS\Scripts\widgets\assignrecordwidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\followupswidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\InvoicesWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
