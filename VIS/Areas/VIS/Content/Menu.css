@@ -653,3 +653,421 @@ nav.vis-nav-horizontal-scroll {
 }
 
 /*New menu 2 End*/
+
+/*Side Menu Start*/
+
+/* ================================
+   Main section anchor
+================================ */
+
+/* ================================
+   Main section anchor
+================================ */
+#vis_mainSection {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+/* Main content stays full width */
+#vis_mainConatiner {
+    flex: 1;
+    overflow: auto;
+}
+
+
+/* ================================
+   New Side Menu Root
+================================ */
+.vis-NewSideMenu-Container {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 70px;
+    min-width: 70px;
+    height: 100%;
+    background-color: rgb(244 244 244);
+    box-sizing: border-box;
+    padding: 4px 10px 10px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-family: inherit;
+    transition: width 0.3s ease, min-width 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+    /* ================================
+   Collapsed State
+   Default close state
+================================ */
+    .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed {
+        position: relative;
+        width: 54px;
+        min-width: 54px;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        box-shadow: none;
+    }
+
+
+        /* ================================
+   Open State by Button / JS
+   Works on Desktop + Mobile
+================================ */
+        .vis-NewSideMenu-Container.vis-NewSideMenu-Expanded,
+        .vis-NewSideMenu-Container.vis-NewSideMenu-HoverOpen,
+        .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded,
+        .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen {
+            position: absolute !important;
+            width: 342px;
+            min-width: 342px;
+            overflow-y: auto;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+
+/* ================================
+   Header
+================================ */
+.vis-NewSideMenu-Header {
+    height: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between !important;
+    margin-bottom: 8px;
+    padding: 0;
+    color: #35518b;
+    border-bottom: 1px solid rgba(53, 81, 139, 0.12);
+}
+
+.vis-NewSideMenu-Title {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(var(--v-c-on-secondary), 1);
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    max-width: 0;
+    transition: opacity 0.25s ease 0.08s, max-width 0.3s ease, visibility 0.2s ease;
+}
+
+/* Header centered when collapsed */
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed .vis-NewSideMenu-Header {
+    justify-content: center !important;
+}
+
+/* Header normal when opened by button / JS */
+.vis-NewSideMenu-Container.vis-NewSideMenu-Expanded .vis-NewSideMenu-Header,
+.vis-NewSideMenu-Container.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Header,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded .vis-NewSideMenu-Header,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Header {
+    justify-content: space-between !important;
+}
+
+/* Show title when opened by button / JS */
+.vis-NewSideMenu-Container.vis-NewSideMenu-Expanded .vis-NewSideMenu-Title,
+.vis-NewSideMenu-Container.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Title,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded .vis-NewSideMenu-Title,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Title {
+    opacity: 1;
+    visibility: visible;
+    max-width: 220px;
+}
+
+
+/* ================================
+   Close / Collapse Button
+================================ */
+.vis-NewSideMenu-Close {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    background: #ffffff;
+    border-radius: 8px;
+    color: rgba(var(--v-c-on-secondary), 1);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.3s ease, background 0.2s ease, color 0.2s ease;
+}
+
+    .vis-NewSideMenu-Close:hover {
+        background: #f0f5ff;
+        color: #3b82f6;
+    }
+
+/* Arrow flip when collapsed */
+/*.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed .vis-NewSideMenu-Close {
+    transform: rotate(180deg);
+}*/
+
+/* Arrow restore when opened by button / JS */
+/*.vis-NewSideMenu-Container.vis-NewSideMenu-Expanded .vis-NewSideMenu-Close,
+.vis-NewSideMenu-Container.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Close,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded .vis-NewSideMenu-Close,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Close {
+    transform: rotate(0deg);
+}*/
+
+
+/* ================================
+   List
+================================ */
+.vis-NewSideMenu-List {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+    overflow-y: visible;
+}
+
+
+/* ================================
+   Item
+================================ */
+.vis-NewSideMenu-Item {
+    width: 100%;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #35518b;
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 24px;
+    transition: background 0.2s ease, color 0.2s ease, padding 0.2s ease;
+}
+
+    .vis-NewSideMenu-Item:hover {
+        background: #f0f5ff;
+        color: #3b82f6;
+        text-decoration: none;
+    }
+
+/* Center item when collapsed */
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed .vis-NewSideMenu-Item {
+    justify-content: center;
+    padding: 8px 0;
+}
+
+/* Restore item layout when opened by button / JS */
+.vis-NewSideMenu-Container.vis-NewSideMenu-Expanded .vis-NewSideMenu-Item,
+.vis-NewSideMenu-Container.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Item,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded .vis-NewSideMenu-Item,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Item {
+    justify-content: flex-start;
+    padding: 8px 10px;
+}
+
+
+/* ================================
+   Icon
+================================ */
+.vis-NewSideMenu-Icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 6px;
+    color: #1f3f8f;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+    .vis-NewSideMenu-Icon i {
+        font-size: 16px;
+        width: 18px;
+        text-align: center;
+        color: inherit;
+    }
+
+.vis-NewSideMenu-Item:hover .vis-NewSideMenu-Icon {
+    background: #ffffff;
+    color: #3b82f6;
+}
+
+
+/* ================================
+   Text
+================================ */
+.vis-NewSideMenu-Text {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #35518b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    visibility: hidden;
+    max-width: 0;
+    display: none;
+    transition: opacity 0.25s ease 0.08s, max-width 0.3s ease, visibility 0.2s ease;
+}
+
+.vis-NewSideMenu-Item:hover .vis-NewSideMenu-Text {
+    color: #3b82f6;
+}
+
+/* Show text when opened by button / JS */
+.vis-NewSideMenu-Container.vis-NewSideMenu-Expanded .vis-NewSideMenu-Text,
+.vis-NewSideMenu-Container.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Text,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded .vis-NewSideMenu-Text,
+.vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Text {
+    opacity: 1;
+    visibility: visible;
+    max-width: 240px;
+    display: block;
+}
+
+
+/* ================================
+   Active Item
+================================ */
+.vis-NewSideMenu-Item.active {
+    background: #ffffff;
+    color: #1f3f8f;
+    box-shadow: inset 3px 0 0 #1f3f8f;
+}
+
+    .vis-NewSideMenu-Item.active .vis-NewSideMenu-Text {
+        color: #1f3f8f;
+    }
+
+    .vis-NewSideMenu-Item.active .vis-NewSideMenu-Icon {
+        color: #1f3f8f;
+    }
+
+
+/* ================================
+   Desktop Hover Only
+================================ */
+@media (hover: hover) and (pointer: fine) {
+    .vis-NewSideMenu-Container:hover,
+    .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed:hover {
+        position: absolute !important;
+        width: 342px;
+        min-width: 342px;
+        overflow-y: auto;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+        .vis-NewSideMenu-Container:hover .vis-NewSideMenu-Title,
+        .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed:hover .vis-NewSideMenu-Title {
+            opacity: 1;
+            visibility: visible;
+            max-width: 220px;
+        }
+
+        .vis-NewSideMenu-Container:hover .vis-NewSideMenu-Header,
+        .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed:hover .vis-NewSideMenu-Header {
+            justify-content: space-between !important;
+        }
+
+        .vis-NewSideMenu-Container:hover .vis-NewSideMenu-Close,
+        .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed:hover .vis-NewSideMenu-Close {
+            transform: rotate(0deg);
+        }
+
+        .vis-NewSideMenu-Container:hover .vis-NewSideMenu-Item,
+        .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed:hover .vis-NewSideMenu-Item {
+            justify-content: flex-start;
+            padding: 8px 10px;
+        }
+
+        .vis-NewSideMenu-Container:hover .vis-NewSideMenu-Text,
+        .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed:hover .vis-NewSideMenu-Text {
+            opacity: 1;
+            visibility: visible;
+            max-width: 240px;
+            display: block;
+        }
+}
+
+
+/* ================================
+   Mobile , Touch Devices
+================================ */
+@media (hover: none), (pointer: coarse) {
+    .vis-NewSideMenu-Container:hover {
+        box-shadow: none;
+    }
+
+    .vis-NewSideMenu-Container.vis-NewSideMenu-Expanded,
+    .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded {
+        position: absolute !important;
+        width: 85vw;
+        min-width: 85vw;
+        max-width: 342px;
+        overflow-y: auto;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed {
+        position: relative;
+        width: 54px;
+        min-width: 54px;
+    }
+
+    .vis-NewSideMenu-Close {
+        touch-action: manipulation;
+    }
+}
+
+
+/* ================================
+   Scrollbar
+================================ */
+.vis-NewSideMenu-Container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.vis-NewSideMenu-Container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.vis-NewSideMenu-Container::-webkit-scrollbar-thumb {
+    background: #9fb3d1;
+    border-radius: 10px;
+}
+
+    .vis-NewSideMenu-Container::-webkit-scrollbar-thumb:hover {
+        background: #7f96bd;
+    }
+
+/* ================================
+   RTL Support
+================================ */
+html[dir="rtl"] .vis-NewSideMenu-Container,
+html[dir="rtl"] .vis-NewSideMenu-Container:hover,
+html[dir="rtl"] .vis-NewSideMenu-Container.vis-NewSideMenu-HoverOpen,
+html[dir="rtl"] .vis-NewSideMenu-Container.vis-NewSideMenu-Expanded {
+    left: auto !important;
+    right: 0 !important;
+}
+
+html[dir="rtl"] .vis-NewSideMenu-Item.active {
+    box-shadow: inset -3px 0 0 #1f3f8f;
+}
+
+html[dir="rtl"] .vis-NewSideMenu-Close {
+    transform: scaleX(-1) !important;
+}
+
