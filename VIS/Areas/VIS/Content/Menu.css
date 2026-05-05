@@ -747,8 +747,8 @@ nav.vis-nav-horizontal-scroll {
     justify-content: space-between !important;
     margin-bottom: 8px;
     padding: 0;
-    color: #35518b;
-    border-bottom: 1px solid rgba(53, 81, 139, 0.12);
+    color: rgba(var(--v-c-primary), 1);
+    border-bottom: 1px solid rgba(var(--v-c-primary), 0.12);
 }
 
 .vis-NewSideMenu-Title {
@@ -851,7 +851,7 @@ nav.vis-nav-horizontal-scroll {
     box-sizing: border-box;
     padding: 8px 10px;
     border-radius: 8px;
-    color: #35518b;
+    color: rgba(var(--v-c-primary), 1);
     text-decoration: none;
     font-size: 16px;
     line-height: 24px;
@@ -917,7 +917,7 @@ nav.vis-nav-horizontal-scroll {
     flex: 1;
     font-size: 1rem;
     font-weight: 600;
-    color: #35518b;
+    color: rgba(var(--v-c-primary), 1);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

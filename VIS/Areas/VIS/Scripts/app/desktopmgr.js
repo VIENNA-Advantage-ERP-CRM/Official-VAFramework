@@ -1955,6 +1955,8 @@
 
 
 
+    var $menuItems = $('.vis-NewSideMenu-Item[data-folder]');
+
     $('#vis_divTree').on('click', function (e) {
         var $target = $(e.target);
         if (!$target.hasClass("VIS-nm-opt-link")) {
@@ -1963,8 +1965,10 @@
         if (!$target || $target.length === 0) return;
 
         var folderId = $target.attr("data-value");
-        $('.vis-NewSideMenu-Item[data-folder]').hide();
-        $('.vis-NewSideMenu-Item[data-folder="' + folderId + '"]').show();
+        $menuItems.hide();
+        $menuItems.filter(function () {
+            return $(this).attr('data-folder') === folderId;
+        }).show();
     });
 
     $(document).on("click", ".vis-NewSideMenu-Item", function (e) {
