@@ -1039,6 +1039,7 @@ namespace VIS.Helpers
                 versionInfo.AD_Table_ID = AD_Table_ID;
                 versionInfo.Record_ID = Record_ID;
                 versionInfo.AD_Window_ID = inn.AD_WIndow_ID;
+                versionInfo.AD_Tab_ID = inn.AD_Tab_ID;
                 versionInfo.ImmediateSave = inn.ImmediateSave;
                 versionInfo.TableName = inn.TableName;
 
