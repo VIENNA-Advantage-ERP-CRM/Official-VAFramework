@@ -615,6 +615,7 @@
                 height = height - 43;
 
             VIS.Env.setScreenHeight(height);
+            VIS.Env.setMenuHeaderHeight($('body').find('.vis-app-header').height());
             document.documentElement.style.setProperty('--vis-screen-height', (height * 0.01) + 'px');
             if (VIS.viewManager)
                 VIS.viewManager.sizeChanged(height, window.innerwidth);

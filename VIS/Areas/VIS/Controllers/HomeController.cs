@@ -385,6 +385,12 @@ namespace VIS.Controllers
                     ViewBag.FrameSuffix = "_v2";
 
 
+                    /* get System Layout 
+                     */
+                    ViewBag.PageSection = LoginHelper.GetPageSection(ctx.GetAD_Client_ID());
+
+
+
                     /// VIS0008
                     /// Check applied for adding message to toastr if 2FA method is VA and VA App is not linked with device
                     if (!LoginHelper.IsDeviceLinked(ctx, AD_User_ID))

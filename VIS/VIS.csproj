@@ -258,6 +258,7 @@
     <Content Include="Areas\VIS\Content\Images\logoold.png" />
     <Content Include="Areas\VIS\Content\Images\mail.svg" />
     <Content Include="Areas\VIS\Content\Images\logo.png" />
+    <Content Include="Areas\VIS\Content\Images\menu-bg.png" />
     <Content Include="Areas\VIS\Content\Images\set-pass.svg" />
     <Content Include="Areas\VIS\Content\Login.css" />
     <Content Include="Areas\VIS\Content\Menu.css" />
@@ -556,6 +557,7 @@
     <Content Include="Areas\VIS\Images\history-sms.png" />
     <Content Include="Areas\VIS\Images\history-zoom.png" />
     <Content Include="Areas\VIS\Images\History24.png" />
+    <Content Include="Areas\VIS\Images\home-bg.png" />
     <Content Include="Areas\VIS\Images\home.png" />
     <Content Include="Areas\VIS\Images\homePage.PNG" />
     <Content Include="Areas\VIS\Images\home\1.jpg" />
@@ -725,6 +727,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\amountdivision.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\appointments.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\archiveviewer.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\ariskregister.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentform.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\attachmentHistory.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\batchUpdate.js" />
@@ -997,6 +1000,7 @@
     <Content Include="Areas\VIS\Views\Home\Home.cshtml" />
     <Content Include="Areas\VIS\Views\LandingPage.cshtml" />
     <Content Include="Areas\VIS\Views\LandingPage\Index.cshtml" />
+    <Content Include="Areas\VIS\Views\Shared\_Dialogs.cshtml" />
     <None Include="Areas\VIS\Views\Theme\ThemeCnfgtr.cshtml" />
     <Content Include="Areas\VIS\WebPages\CreatePassword.aspx" />
     <Content Include="Areas\VIS\WebPages\CreateUser.aspx" />

@@ -195,7 +195,7 @@
         var $table, $contentGrid, $lblTitle, $btnClose;
         var $toolDiv = null;
         this.onLoad = null;
-       
+
         function initComponent() {
             // $contentGrid = $("<div class='vis-awindow-body'>");
 
@@ -333,7 +333,8 @@
         if (!width)
             width = window.innerWidth;
         // this.setSize(height);
-        var hHeight = this.isHeaderVisible ? 85 : 43;
+        var vHeight = VIS.Env.getMenuHeaderHeight();
+        var hHeight = this.isHeaderVisible ? vHeight + 42 : vHeight + 1;
         try {
             this.cPanel.sizeChanged(height - hHeight, width);
         }
@@ -378,7 +379,7 @@
      *  @param callback to add menu item for window
      *  @return true if loaded OK
      */
-    AWindow.prototype.initWindow = function (AD_Window_ID, query, callback, action, sel,aParams) {
+    AWindow.prototype.initWindow = function (AD_Window_ID, query, callback, action, sel, aParams) {
 
         this.cPanel = new VIS.APanel(); //initlize Apanel
         this.getContentGrid().css('display', 'flex'); // to support older design
@@ -404,12 +405,12 @@
 
             var jsonData = $.parseJSON(json.result); // widow json
 
-        
+
 
             VIS.context.setContextOfWindow($.parseJSON(json.wCtx), windowNo);// set window context
             //console.log(jsonData);
 
-            self.cPanel.initPanel(jsonData, query, self, false, sel,aParams); //initPanel
+            self.cPanel.initPanel(jsonData, query, self, false, sel, aParams); //initPanel
             self.sizeChanged();// set size and window
             self.cPanel.createSearchAutoComplete();
             //self.cPanel.selectFirstTab();
@@ -472,8 +473,8 @@
      *	Dynamic Initialization form
      *  @param AD_Form_ID form
      *  @param callback to add menu item for form
-  	 *  @return true if loaded OK
-	 */
+         *  @return true if loaded OK
+     */
     AWindow.prototype.initForm = function (AD_Form_ID, callback, action, additionalInfo) {
 
 
@@ -809,7 +810,7 @@
             var mouseDown = false;
             if (this.action == VIS.APanel.prototype.ACTION_NAME_SAVE || this.action == VIS.APanel.prototype.ACTION_NAME_NEW
                 || this.action == VIS.APanel.prototype.ACTION_NAME_SAVENEW) {
-               // Handle case if user direct click on save button 
+                // Handle case if user direct click on save button 
                 li.on("mousedown touchstart", function (e) {
 
                     mouseDown = true;
@@ -865,30 +866,30 @@
         this.getListItmIT = function (listId) {
             if (this.$li)
                 return this.$li;
-          
+
 
 
             var li = $("<li>");
             var d = $("<div></div>");
             var fired = true;
             //Handle special case for Save action 
-                li.on(VIS.Events.onClick, function (e) {
+            li.on(VIS.Events.onClick, function (e) {
 
-                    e.stopPropagation();
-                    if (fired && that.onAction && that.isEnabled) {
-                        if (that.toggle) {
-                            that.setPressed(!that.pressed);
-                        }
-                        fired = false;
-                        d.css('background-color', 'red')
-                        setTimeout(function () {
-                            d.css('background-color', 'transparent');
-                            that.onAction(that.action);
-                            fired = true;
-                        }, 10);
-
+                e.stopPropagation();
+                if (fired && that.onAction && that.isEnabled) {
+                    if (that.toggle) {
+                        that.setPressed(!that.pressed);
                     }
-                });
+                    fired = false;
+                    d.css('background-color', 'red')
+                    setTimeout(function () {
+                        d.css('background-color', 'transparent');
+                        that.onAction(that.action);
+                        fired = true;
+                    }, 10);
+
+                }
+            });
 
 
             if (this.textOnly) {
@@ -985,7 +986,7 @@
         }
     };
 
-    
+
     AppsAction.prototype.highlightNewButton = function (highlight) {
         if (highlight) {
             if (this.$li.instructionPopRemoved)
@@ -1761,7 +1762,7 @@
             this.seletedTab = null;
             $tblRoot.remove();
             $tblRoot = null;
-          
+
             self = null;
 
             this.winNumber = null;
@@ -1811,7 +1812,7 @@
         param[2] = new VIS.DB.SqlParam("@AD_ColumnSortYesNo_ID", AD_ColumnSortYesNo_ID);
 
         if (trl) {
-            
+
             sql = "VIS_123";
             param = [];
             param[0] = new VIS.DB.SqlParam("@AD_Table_ID", AD_Table_ID);
@@ -1888,8 +1889,9 @@
         var data = VIS.dataContext.getJSONData(VIS.Application.contextUrl + "Form/LoadSortData",
             {
                 "AD_Table_ID": this.AD_Table_ID, "AD_ColumnSortOrder_ID": this.AD_ColumnSortOrder_ID, "AD_ColumnSortYesNo_ID": this.AD_ColumnSortYesNo_ID,
-                "AD_Language": VIS.Env.getAD_Language(VIS.Env.getCtx()), "ID": ID, "isTrl": !VIS.Env.isBaseLanguage(VIS.Env.getCtx(), "")}, null); // spelling corrected by vinay bhatt on 18 oct 2018
-        
+                "AD_Language": VIS.Env.getAD_Language(VIS.Env.getCtx()), "ID": ID, "isTrl": !VIS.Env.isBaseLanguage(VIS.Env.getCtx(), "")
+            }, null); // spelling corrected by vinay bhatt on 18 oct 2018
+
         var dr = new VIS.DB.DataReader().toJson(JSON.stringify(data));//   executeDReader(sql, [new VIS.DB.SqlParam("@ID", ID)]);
         var yesHtml = "";
         var noHtml = "";
@@ -2113,8 +2115,8 @@
 
         VIS.dataContext.getJSONData(VIS.Application.contextUrl + "JsonData/GetRecordInfo", { dse: dataIn }, function (data) {
 
-            data.Info=  data.Info.replace("@Created@", Globalize.format(new Date(data.Created), 'f') );
-            data.Info =  data.Info.replace("@Updated@", Globalize.format(new Date(data.Updated), 'f') );
+            data.Info = data.Info.replace("@Created@", Globalize.format(new Date(data.Created), 'f'));
+            data.Info = data.Info.replace("@Updated@", Globalize.format(new Date(data.Updated), 'f'));
 
 
             $root.html("<span>" + data.Info + "</span>");

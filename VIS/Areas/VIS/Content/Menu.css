@@ -335,14 +335,15 @@
     }
 
     .vis-nav-horizontal-scroll ul li {
-        padding: 0.6em 0.9em;
+        padding: 0.4em 0.9em;
         text-align: center;
-        color: rgba(var(--v-c-primary), 1);
+        /*color: rgba(var(--v-c-primary), 1);*/
+        color:inherit;
         width: fit-content;
         word-break: keep-all;
         flex-shrink: 0;
         min-width: 100px;
-        border-left: aliceblue 1px solid;
+        border-left: aliceblue 0px solid;
         justify-items: center;
     }
 
@@ -353,8 +354,8 @@
 
 nav.vis-nav-horizontal-scroll {
     overflow: visible;
-    background-color: var(--grey-color);
-    height: 45px;
+    /*background-color: var(--grey-color);*/
+    /*height: 45px;*/
     display: flex;
 }
 
@@ -379,7 +380,7 @@ nav.vis-nav-horizontal-scroll {
 
 .vis-nav-horizontal-scroll-onhover-items {
     position: absolute;
-    top: 41px !important;
+    top: 32px !important;
     background-color: #2A2F35;
     z-index: 1;
     padding: 1rem;
@@ -433,7 +434,7 @@ nav.vis-nav-horizontal-scroll {
 
 .vis-subnav-content {
     position: absolute;
-    top: 42px !important;
+    top: 32px !important;
     background-color: rgba(var(--v-c-on-secondary), 1);
     /*background-color: #95b7df;*/
     z-index: 9999;
@@ -443,6 +444,7 @@ nav.vis-nav-horizontal-scroll {
     opacity: 0;
     max-height: 490px;
     overflow-y: auto;
+    
 }
 
     .vis-subnav-content a {
@@ -534,6 +536,10 @@ nav.vis-nav-horizontal-scroll {
     height: 100%;
     align-content: center;
 }
+.vis-nm-navbar-container
+{
+    display:flex;
+}
 
 @media screen and (max-width: 1366px) {
     .vis-subnav-links {
@@ -606,7 +612,7 @@ nav.vis-nav-horizontal-scroll {
 
     .vis-nm-navbar-container {
         position: absolute !important;
-        top: 45px;
+        top: 36px;
         z-index: 999;
         width: 100%;
         margin: 0 !important;

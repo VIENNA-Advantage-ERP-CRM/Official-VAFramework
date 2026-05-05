@@ -50,14 +50,28 @@ select {
     grid-template-columns: 1fr;
 }
 
+.vis-app-header{
+    display:flex;
+}
+
 .vis-app-hdr {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: rgba(var(--v-c-primary),1);
+    background-color: rgba(var(--v-c-on-secondary),.03);
+   
+}
+
+.vis-app-hdr-main {
     /*flex-basis: 42px;*/
     height: 42px;
     display: flex;
     border-bottom: 1px solid rgba(var(--v-c-primary),0.07);
     padding-right: 5px;
-    color: rgba(var(--v-c-primary),1);
-    background-color: rgba(var(--v-c-on-secondary),.03);
+    padding-left:5px;
+    width: 100%;
+   
 }
 
     .vis-app-hdr ul {
@@ -102,8 +116,9 @@ select {
 }
 
 .vis-app-hdr-l-menu {
-    background-color: rgba(var(--v-c-secondary), 0.5);
-    color: rgba(var(--v-c-on-secondary), 0.6);
+    /*background-color: rgba(var(--v-c-secondary), 0.5);*/
+    
+    color:inherit;
     height: 100%;
     font-size: 1.3rem;
     display: flex;
@@ -188,6 +203,15 @@ select {
     color: rgba(var(--v-c-on-secondary), 0.5);
     border: 1px solid transparent;
 }
+
+.vis-app-hdr-submenu{
+    display:flex;
+    flex:1;
+    min-height:32px;
+    color:inherit;
+    background:inherit;
+}
+
 
 .vis-app-overlay {
     height: 100%;
