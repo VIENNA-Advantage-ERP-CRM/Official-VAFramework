@@ -1776,14 +1776,22 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                         if (Util.GetValueOfString(_po.Get_Value("VA137_OutboundType")) == "OBT_EX")
                         {
                             C_Team_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_Correspondence WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created"));
+                            if (C_Team_ID > 0)
+                            {
+                                SaveUserTeam(0, C_Team_ID);
+                            }
                         }
                         else
                         {
-                            C_Team_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_CorrespRecepient WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created"));// GetReceipientTeam();
-                        }
-                        if (C_Team_ID > 0)
-                        {
-                            SaveUserTeam(0, C_Team_ID);
+                            DataSet dsTeams = DB.ExecuteDataset("SELECT C_Team_ID FROM VA137_CorrespRecepient WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created");
+                            if (dsTeams != null && dsTeams.Tables.Count > 0 && dsTeams.Tables[0].Rows.Count > 0)
+                            {
+                                for (int i = 0; i < dsTeams.Tables[0].Rows.Count; i++)
+                                {
+                                    C_Team_ID = Util.GetValueOfInt(dsTeams.Tables[0].Rows[i]["C_Team_ID"]);
+                                    SaveUserTeam(0, C_Team_ID);
+                                }
+                            }
                         }
                     }
                     else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "_AP" && (Util.GetValueOfString(_po.Get_Value("VA137_DocTypeCategory")) == "PL") && (Util.GetValueOfString(_po.Get_Value("VA137_Status")) == "STA_AP"))
