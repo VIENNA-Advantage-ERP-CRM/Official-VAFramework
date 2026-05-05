@@ -1,3 +1,30 @@
+/**
+ * Aging Receivables Widget
+ * Purpose - Table showing outstanding sales orders with delivery/invoice status and aging.
+ *
+ * ── Labels / Message Keys ──────────────────────────────────────────────────────────────
+ *  #  | Current Text                                    | Message Key                      | MsgText
+ * ----+-------------------------------------------------+----------------------------------+-------------------------------------------------
+ *  1  | Aging Receivables                               | VIS_AgingReceivables             | Aging Receivables
+ *  2  | Who owes, how old                               | VIS_WhoOwesHowOld                | Who owes, how old
+ *  3  | #                                               | VIS_ColNo                        | #
+ *  4  | Order No                                        | VIS_ColOrderNo                   | Order No
+ *  5  | Customer                                        | VIS_Customer                     | Customer
+ *  6  | Delivery                                        | VIS_ColDelivery                  | Delivery
+ *  7  | Invoice                                         | VIS_Invoice                      | Invoice
+ *  8  | Value                                           | VIS_ColValue                     | Value
+ *  9  | Pending                                         | VIS_ColPending                   | Pending
+ * 10  | Loading…                                        | VIS_Loading                      | Loading…
+ * 11  | No data                                         | VIS_NoData                       | No data
+ * 12  | WHY                                             | VIS_Why                          | WHY
+ * 13  | Older invoices are harder to collect...         | VIS_AgingWhyText                 | Older invoices are harder to collect. Focus on the 61+ buckets.
+ * 14  | Full                                            | VIS_StatusFull                   | Full
+ * 15  | Partial                                         | VIS_StatusPartial                | Partial
+ * 16  | Partial Raised                                  | VIS_StatusPartialRaised          | Partial Raised
+ * 17  | Not Delivered                                   | VIS_StatusNotDelivered           | Not Delivered
+ * 18  | Not Raised                                      | VIS_StatusNotRaised              | Not Raised
+ * ──────────────────────────────────────────────────────────────────────────────────────
+ */
 ; VIS = window.VIS || {};
 
 ; (function (VIS, $) {
@@ -45,24 +72,26 @@
 
         /* ── Status chip ── */
         function statusChip(text) {
-            var bg, color;
+            var bg, color, label;
             switch (text) {
                 case 'Full':
-                    bg = '#CCEFDD'; color = '#0C5D38'; break;
+                    bg = '#CCEFDD'; color = '#0C5D38'; label = VIS.Msg.getMsg("VIS_StatusFull")          || text; break;
                 case 'Partial':
+                    bg = '#FFF3CD'; color = '#7A5000'; label = VIS.Msg.getMsg("VIS_StatusPartial")       || text; break;
                 case 'Partial Raised':
-                    bg = '#FFF3CD'; color = '#7A5000'; break;
+                    bg = '#FFF3CD'; color = '#7A5000'; label = VIS.Msg.getMsg("VIS_StatusPartialRaised") || text; break;
                 case 'Not Delivered':
+                    bg = '#FAD7D7'; color = '#8F2D2D'; label = VIS.Msg.getMsg("VIS_StatusNotDelivered")  || text; break;
                 case 'Not Raised':
-                    bg = '#FAD7D7'; color = '#8F2D2D'; break;
+                    bg = '#FAD7D7'; color = '#8F2D2D'; label = VIS.Msg.getMsg("VIS_StatusNotRaised")     || text; break;
                 default:
-                    bg = '#E1E1E1'; color = '#505050';
+                    bg = '#E1E1E1'; color = '#505050';  label = text;
             }
             return '<span style="' +
                 'display:inline-block;padding:2px 8px;border-radius:999px;' +
                 'font-size:10px;font-weight:600;white-space:nowrap;' +
                 'background:' + bg + ';color:' + color + ';' +
-            '">' + text + '</span>';
+            '">' + label + '</span>';
         }
 
         /* ── Render table rows ── */
@@ -72,7 +101,7 @@
 
             if (rows.length === 0) {
                 $tbody.append(
-                    '<tr><td colspan="7" style="text-align:center;padding:16px;color:#748494;font-size:12px;">No data</td></tr>'
+                    '<tr><td colspan="7" style="text-align:center;padding:16px;color:#748494;font-size:12px;">' + (VIS.Msg.getMsg("VIS_NoData") || 'No data') + '</td></tr>'
                 );
                 return;
             }
@@ -125,8 +154,8 @@
                         '</svg>' +
                     '</div>' +
                     '<div>' +
-                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">Aging Receivables</div>' +
-                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">Who owes, how old</div>' +
+                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">' + (VIS.Msg.getMsg("VIS_AgingReceivables") || 'Aging Receivables') + '</div>' +
+                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">' + (VIS.Msg.getMsg("VIS_WhoOwesHowOld") || 'Who owes, how old') + '</div>' +
                     '</div>' +
                 '</div>'
             );
@@ -143,18 +172,18 @@
             var $thead = $(
                 '<thead>' +
                     '<tr style="border-bottom:1px solid #E4EDF4;">' +
-                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">#</th>' +
-                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">Order No</th>' +
-                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">Customer</th>' +
-                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">Delivery</th>' +
-                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">Invoice</th>' +
-                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:right;">Value</th>' +
-                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:right;">Pending</th>' +
+                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">'  + (VIS.Msg.getMsg("VIS_ColNo")       || '#')        + '</th>' +
+                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">'  + (VIS.Msg.getMsg("VIS_ColOrderNo")  || 'Order No') + '</th>' +
+                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">'  + (VIS.Msg.getMsg("VIS_Customer")    || 'Customer') + '</th>' +
+                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">'  + (VIS.Msg.getMsg("VIS_ColDelivery") || 'Delivery') + '</th>' +
+                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:left;">'  + (VIS.Msg.getMsg("VIS_Invoice")     || 'Invoice')  + '</th>' +
+                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:right;">' + (VIS.Msg.getMsg("VIS_ColValue")    || 'Value')    + '</th>' +
+                        '<th style="padding:6px 10px;font-size:11px;font-weight:400;color:#748494;text-align:right;">' + (VIS.Msg.getMsg("VIS_ColPending")  || 'Pending')  + '</th>' +
                     '</tr>' +
                 '</thead>'
             );
 
-            $tbody = $('<tbody><tr><td colspan="7" style="text-align:center;padding:16px;color:#748494;font-size:12px;">Loading…</td></tr></tbody>');
+            $tbody = $('<tbody><tr><td colspan="7" style="text-align:center;padding:16px;color:#748494;font-size:12px;">' + (VIS.Msg.getMsg("VIS_Loading") || 'Loading…') + '</td></tr></tbody>');
 
             $table.append($thead).append($tbody);
             $scroll.append($table);
@@ -169,12 +198,12 @@
                     'padding:1px 7px;border-radius:999px;flex-shrink:0;margin-top:2px;' +
                     'font-size:9px;font-weight:700;letter-spacing:0.08em;' +
                     'color:oklch(0.45 0.15 220);font-family:Roboto,monospace;' +
-                '">WHY</span>'
+                '">' + (VIS.Msg.getMsg("VIS_Why") || 'WHY') + '</span>'
             );
 
             var $whyText = $(
                 '<span style="font-size:11px;color:#748494;line-height:1.45;">' +
-                    'Older invoices are harder to collect. Focus on the 61+ buckets.' +
+                    (VIS.Msg.getMsg("VIS_AgingWhyText") || 'Older invoices are harder to collect. Focus on the 61+ buckets.') +
                 '</span>'
             );
 

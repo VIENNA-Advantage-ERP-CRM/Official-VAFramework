@@ -3,6 +3,19 @@
  * Purpose - KPI card showing total overdue (past due date, unpaid) sales invoice amount.
  * Design   - Matches design2.md KPI/Summary widget: glass surface, tinted danger icon,
  *            large bold metric in danger red, WHY pill with count + explanatory copy.
+ *
+ * ── Labels / Message Keys ──────────────────────────────────────────────────────────────
+ *  #  | Current Text                  | Message Key              | MsgText
+ * ----+-------------------------------+--------------------------+------------------------
+ *  1  | Overdue                       | VIS_OverDue              | Overdue
+ *  2  | Past due date                 | VIS_PastDueDate          | Past Due Date
+ *  3  | WHY                           | VIS_Why                  | WHY
+ *  4  | Past due date · loading…      | VIS_PastDueDateLoading   | Past due date · loading…
+ *  5  | chase these first.            | VIS_ChaseFirst           | chase these first.
+ *  6  | No overdue invoices.          | VIS_NoOverdueInvoices    | No overdue invoices.
+ *  7  | Past due date ·               | VIS_PastDueDatePrefix    | Past due date ·
+ *  8  | invoice / invoices            | VIS_Invoice / VIS_Invoices | invoice / invoices
+ * ──────────────────────────────────────────────────────────────────────────────────────
  */
 ; VIS = window.VIS || {};
 
@@ -58,10 +71,13 @@
                 $metricEl.text(formatCurrency(total));
             }
             if ($whyText) {
+                var invoiceLabel = count !== 1
+                    ? (VIS.Msg.getMsg("VIS_Invoices") || 'invoices')
+                    : (VIS.Msg.getMsg("VIS_Invoice") || 'invoice');
                 var countStr = count > 0
-                    ? count + ' invoice' + (count !== 1 ? 's' : '') + ' · chase these first.'
-                    : 'No overdue invoices.';
-                $whyText.text('Past due date · ' + countStr);
+                    ? count + ' ' + invoiceLabel + ' · ' + (VIS.Msg.getMsg("VIS_ChaseFirst") || 'chase these first.')
+                    : (VIS.Msg.getMsg("VIS_NoOverdueInvoices") || 'No overdue invoices.');
+                $whyText.text((VIS.Msg.getMsg("VIS_PastDueDatePrefix") || 'Past due date ·') + ' ' + countStr);
             }
         }
 
@@ -102,8 +118,8 @@
                     '</div>' +
 
                     '<div>' +
-                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">Overdue</div>' +
-                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">Past due date</div>' +
+                        '<div id="VIS_Overdue" style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">' + (VIS.Msg.getMsg("VIS_OverDue") || 'Overdue') + '</div>' +
+                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">' + (VIS.Msg.getMsg("VIS_PastDueDate") || 'Past due date') + '</div>' +
                     '</div>' +
                 '</div>'
             );
@@ -128,12 +144,12 @@
                     'padding:1px 7px;border-radius:999px;flex-shrink:0;margin-top:2px;' +
                     'font-size:9px;font-weight:700;letter-spacing:0.08em;' +
                     'color:oklch(0.45 0.15 220);font-family:Roboto,monospace;' +
-                '">WHY</span>'
+                '">' + (VIS.Msg.getMsg("VIS_Why") || 'WHY') + '</span>'
             );
 
             $whyText = $(
                 '<span id="vis-ovd-why-' + uid + '" style="font-size:11px;color:#748494;line-height:1.45;">' +
-                    'Past due date · loading…' +
+                    (VIS.Msg.getMsg("VIS_PastDueDateLoading") || 'Past due date · loading…') +
                 '</span>'
             );
 

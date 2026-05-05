@@ -3,6 +3,19 @@
  * Purpose - KPI card showing total payments received from customers in the current calendar month.
  * Design   - Matches design2.md KPI/Summary widget: glass surface, tinted success icon,
  *            large bold metric in success green, WHY pill with customer count + explanatory copy.
+ *
+ * ── Labels / Message Keys ──────────────────────────────────────────────────────────────
+ *  #  | Current Text                                        | Message Key                  | MsgText
+ * ----+-----------------------------------------------------+------------------------------+-----------------------------------------------------
+ *  1  | Paid this month                                     | VIS_PaidThisMonth            | Paid this month
+ *  2  | Cash received                                       | VIS_CashReceived             | Cash received
+ *  3  | WHY                                                 | VIS_Why                      | WHY
+ *  4  | Loading…                                            | VIS_Loading                  | Loading…
+ *  5  | Received from ... customer/s so far this month.     | VIS_ReceivedFromCustomers    | Received from
+ *  6  | customer / customers                                | VIS_Customer / VIS_Customers | customer / customers
+ *  7  | so far this month.                                  | VIS_SoFarThisMonth           | so far this month.
+ *  8  | No payments received this month.                    | VIS_NoPaymentsThisMonth      | No payments received this month.
+ * ──────────────────────────────────────────────────────────────────────────────────────
  */
 ; VIS = window.VIS || {};
 
@@ -58,9 +71,12 @@
                 $metricEl.text(formatCurrency(total));
             }
             if ($whyText) {
+                var customerLabel = count !== 1
+                    ? (VIS.Msg.getMsg("VIS_Customers") || 'customers')
+                    : (VIS.Msg.getMsg("VIS_Customer")  || 'customer');
                 var countStr = count > 0
-                    ? 'Received from ' + count + ' customer' + (count !== 1 ? 's' : '') + ' so far this month.'
-                    : 'No payments received this month.';
+                    ? (VIS.Msg.getMsg("VIS_ReceivedFromCustomers") || 'Received from') + ' ' + count + ' ' + customerLabel + ' ' + (VIS.Msg.getMsg("VIS_SoFarThisMonth") || 'so far this month.')
+                    : (VIS.Msg.getMsg("VIS_NoPaymentsThisMonth") || 'No payments received this month.');
                 $whyText.text(countStr);
             }
         }
@@ -101,8 +117,8 @@
                     '</div>' +
 
                     '<div>' +
-                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">Paid this month</div>' +
-                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">Cash received</div>' +
+                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">' + (VIS.Msg.getMsg("VIS_PaidThisMonth") || 'Paid this month') + '</div>' +
+                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">' + (VIS.Msg.getMsg("VIS_CashReceived") || 'Cash received') + '</div>' +
                     '</div>' +
                 '</div>'
             );
@@ -127,12 +143,12 @@
                     'padding:1px 7px;border-radius:999px;flex-shrink:0;margin-top:2px;' +
                     'font-size:9px;font-weight:700;letter-spacing:0.08em;' +
                     'color:oklch(0.45 0.15 220);font-family:Roboto,monospace;' +
-                '">WHY</span>'
+                '">' + (VIS.Msg.getMsg("VIS_Why") || 'WHY') + '</span>'
             );
 
             $whyText = $(
                 '<span id="vis-ptm-why-' + uid + '" style="font-size:11px;color:#748494;line-height:1.45;">' +
-                    'Loading…' +
+                    (VIS.Msg.getMsg("VIS_Loading") || 'Loading…') +
                 '</span>'
             );
 

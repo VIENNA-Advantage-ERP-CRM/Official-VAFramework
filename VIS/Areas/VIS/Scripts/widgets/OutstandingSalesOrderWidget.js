@@ -3,6 +3,18 @@
  * Purpose - KPI card showing total unpaid (outstanding) sales order value owed to the company.
  * Design   - Matches design2.md KPI/Summary widget: glass surface, tinted pale-blue icon,
  *            large bold metric, WHY pill with explanatory copy.
+ *
+ * ── Labels / Message Keys ──────────────────────────────────────────────────────────────
+ *  #  | Current Text                                   | Message Key              | MsgText
+ * ----+------------------------------------------------+--------------------------+-----------------------------------------------
+ *  1  | Outstanding                                    | VIS_Outstanding          | Outstanding
+ *  2  | Money owed to you                              | VIS_MoneyOwedToYou       | Money owed to you
+ *  3  | WHY                                            | VIS_Why                  | WHY
+ *  4  | Total unpaid invoices across all customers.    | VIS_TotalUnpaidInvoices  | Total unpaid invoices across all customers.
+ *  5  | unpaid order / unpaid orders                   | VIS_UnpaidOrder / VIS_UnpaidOrders | unpaid order / unpaid orders
+ *  6  | across all customers.                          | VIS_AcrossAllCustomers   | across all customers.
+ *  7  | Largest:                                       | VIS_Largest              | Largest:
+ * ──────────────────────────────────────────────────────────────────────────────────────
  */
 ; VIS = window.VIS || {};
 
@@ -59,12 +71,15 @@
                 $metricEl.text(formatCurrency(total));
             }
             if ($whyText) {
-                var why = 'Total unpaid invoices across all customers.';
+                var orderLabel = count !== 1
+                    ? (VIS.Msg.getMsg("VIS_UnpaidOrders") || 'unpaid orders')
+                    : (VIS.Msg.getMsg("VIS_UnpaidOrder") || 'unpaid order');
+                var why = VIS.Msg.getMsg("VIS_TotalUnpaidInvoices") || 'Total unpaid invoices across all customers.';
                 if (count > 0) {
-                    why = count + ' unpaid order' + (count !== 1 ? 's' : '') + ' across all customers.';
+                    why = count + ' ' + orderLabel + ' ' + (VIS.Msg.getMsg("VIS_AcrossAllCustomers") || 'across all customers.');
                 }
                 if (topCustomer) {
-                    why += ' Largest: ' + topCustomer + '.';
+                    why += ' ' + (VIS.Msg.getMsg("VIS_Largest") || 'Largest:') + ' ' + topCustomer + '.';
                 }
                 $whyText.text(why);
             }
@@ -107,8 +122,8 @@
                     '</div>' +
 
                     '<div>' +
-                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">Outstanding</div>' +
-                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">Money owed to you</div>' +
+                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">' + (VIS.Msg.getMsg("VIS_Outstanding") || 'Outstanding') + '</div>' +
+                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">' + (VIS.Msg.getMsg("VIS_MoneyOwedToYou") || 'Money owed to you') + '</div>' +
                     '</div>' +
                 '</div>'
             );
@@ -133,12 +148,12 @@
                     'padding:1px 7px;border-radius:999px;flex-shrink:0;margin-top:2px;' +
                     'font-size:9px;font-weight:700;letter-spacing:0.08em;' +
                     'color:oklch(0.45 0.15 220);font-family:Roboto,monospace;' +
-                '">WHY</span>'
+                '">' + (VIS.Msg.getMsg("VIS_Why") || 'WHY') + '</span>'
             );
 
             $whyText = $(
                 '<span style="font-size:11px;color:#748494;line-height:1.45;">' +
-                    'Total unpaid invoices across all customers.' +
+                    (VIS.Msg.getMsg("VIS_TotalUnpaidInvoices") || 'Total unpaid invoices across all customers.') +
                 '</span>'
             );
 
