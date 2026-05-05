@@ -17,27 +17,79 @@
         var $alertBanner;
         var selectedRows = {};
 
-        var INVOICES = [
-            { id: 'INV-1042', customer: 'Northwind Logistics', due: 'Today',   status: 'overdue',  amount: 12400 },
-            { id: 'INV-1041', customer: 'Ember RetailCo',      due: 'Apr 20',  status: 'due_soon', amount: 8200  },
-            { id: 'INV-1040', customer: 'Harbor Medical',      due: 'Apr 24',  status: 'sent',     amount: 6100  },
-            { id: 'INV-1039', customer: 'Aerial Robotics',     due: 'Apr 26',  status: 'draft',    amount: 4400  },
-            { id: 'INV-1038', customer: 'Brick+Mortar Inc.',   due: 'May 02',  status: 'approved', amount: 9800  }
-        ];
+        var INVOICES = [];
 
         var STATUS_CONFIG = {
-            overdue:  { label: 'Overdue 3d', bg: '#FFE8E8', color: '#C0392B' },
-            due_soon: { label: 'Due soon',   bg: '#FFF3CD', color: '#9A6500' },
-            sent:     { label: 'Sent',       bg: '#DFF1FF', color: '#0E5DA8' },
-            draft:    { label: 'Draft',      bg: '#EDEDED', color: '#505050' },
-            approved: { label: 'Approved',   bg: '#CCEFDD', color: '#0C5D38' }
+            DR: { label: 'Draft',           bg: '#EDEDED', color: '#505050' },
+            IP: { label: 'In Progress',     bg: '#FFF3CD', color: '#9A6500' },
+            CO: { label: 'Completed',       bg: '#CCEFDD', color: '#0C5D38' },
+            CL: { label: 'Closed',          bg: '#DFF1FF', color: '#0E5DA8' },
+            AP: { label: 'Approved',        bg: '#CCEFDD', color: '#0C5D38' },
+            NA: { label: 'Not Approved',    bg: '#FFE8E8', color: '#C0392B' },
+            WP: { label: 'Waiting Payment', bg: '#FFF3CD', color: '#9A6500' },
+            WC: { label: 'Waiting Confirm', bg: '#FFF3CD', color: '#9A6500' },
+            RE: { label: 'Reversed',        bg: '#FFE8E8', color: '#C0392B' },
+            VO: { label: 'Voided',          bg: '#FFE8E8', color: '#C0392B' },
+            IN: { label: 'Invalid',         bg: '#FFE8E8', color: '#C0392B' }
         };
 
         /* ── Initialize ── */
         this.Initalize = function () {
             createWidget();
             bindEvents();
+            loadData();
         };
+
+        /* ── Load data from backend ── */
+        function loadData() {
+            $.ajax({
+                url: VIS.Application.contextUrl + 'Invoices/GetDuplicates',
+                type: 'GET',
+                success: function (res) {
+                    var data = typeof res === 'string' ? JSON.parse(res) : res;
+                    if (data && data.length > 0) {
+                        /* Flatten pairs into rows */
+                        INVOICES = [];
+                        $.each(data, function (i, dup) {
+                            INVOICES.push({
+                                id:       dup.invoiceA,
+                                customer: dup.customer,
+                                due:      dup.dateA || '—',
+                                status:   dup.docStatusA,
+                                amount:   parseFloat(dup.amount)
+                            });
+                            INVOICES.push({
+                                id:       dup.invoiceB,
+                                customer: dup.customer,
+                                due:      dup.dateB || '—',
+                                status:   dup.docStatusB,
+                                amount:   parseFloat(dup.amount)
+                            });
+                        });
+                        /* Banner — summary of all pairs */
+                        var total = data.length;
+                        var first = data[0];
+                        var amt   = '$' + parseFloat(first.amount).toLocaleString('en-US');
+                        var title = total === 1
+                            ? 'Duplicate suspected: ' + first.invoiceA + ' matches ' + first.invoiceB + ' amount + customer'
+                            : total + ' duplicate pairs suspected — ' + total + ' customers affected';
+                        var sub   = total === 1
+                            ? 'Same customer, same ' + amt + ' amount, issued ' + first.daysApart + ' days apart'
+                            : 'Same customer and amount ordered within 7 days — review the list below';
+                        $alertBanner.find('.vis-inv-dup-title').text(title);
+                        $alertBanner.find('.vis-inv-dup-sub').text(sub);
+                        $alertBanner.css('display', 'flex');
+                    } else {
+                        $alertBanner.hide();
+                    }
+                    renderRows();
+                },
+                error: function () {
+                    $alertBanner.hide();
+                    renderRows();
+                }
+            });
+        }
 
         /* ── Build DOM ── */
         function createWidget() {
@@ -68,37 +120,32 @@
                         '</div>' +
                         '<span style="font-size:16px;font-weight:700;color:#102C3F;">Invoices needing your attention</span>' +
                     '</div>' +
-                    '<a href="javascript:void(0)" id="vis-inv-newbtn-' + $self.AD_UserHomeWidgetID + '" ' +
-                        'style="font-size:13px;font-weight:600;color:#0083DA;text-decoration:none;">+ New invoice</a>' +
                 '</div>'
             );
 
             /* Duplicate alert banner */
             $alertBanner = $(
                 '<div id="vis-inv-alert-' + $self.AD_UserHomeWidgetID + '" ' +
-                    'style="margin:0 16px 12px;background:#FFF8E6;border:1px solid #F5C94E;border-radius:10px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px;">' +
+                    'style="display:none;margin:0 16px 12px;background:#FFF8E6;border:1px solid #F5C94E;border-radius:10px;padding:10px 14px;align-items:flex-start;gap:10px;">' +
                     '<svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D78B10" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
                         '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>' +
                         '<line x1="4" y1="22" x2="4" y2="15"/>' +
                     '</svg>' +
                     '<div style="flex:1;">' +
-                        '<div style="font-size:13px;font-weight:700;color:#7A4F00;margin-bottom:2px;">Duplicate suspected: INV-1042 matches INV-1029 amount + customer</div>' +
-                        '<div style="font-size:12px;color:#9A6500;">Same customer, same $12,400 amount, issued 6 days apart</div>' +
+                        '<div class="vis-inv-dup-title" style="font-size:13px;font-weight:700;color:#7A4F00;margin-bottom:2px;"></div>' +
+                        '<div class="vis-inv-dup-sub"   style="font-size:12px;color:#9A6500;"></div>' +
                     '</div>' +
-                    '<a href="javascript:void(0)" id="vis-inv-review-' + $self.AD_UserHomeWidgetID + '" ' +
-                        'style="background:#fff;border:1px solid #E4C87A;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;color:#7A4F00;text-decoration:none;white-space:nowrap;align-self:center;">Review</a>' +
                 '</div>'
             );
 
             /* Table wrapper */
-            var $tableWrap = $('<div style="padding:0 4px 4px;flex:1;overflow:auto;">');
+            var $tableWrap = $('<div style="padding:0 4px 4px;flex:1;overflow-y:auto;overflow-x:hidden;">');
 
             /* Table header row */
             var $tableHead = $(
-                '<div style="display:grid;grid-template-columns:36px 1fr 1.4fr 100px 140px 110px;align-items:center;padding:6px 16px;border-bottom:1px solid #EDF2F6;">' +
-                    '<input type="checkbox" id="vis-inv-chk-all-' + $self.AD_UserHomeWidgetID + '" style="accent-color:#0083DA;cursor:pointer;">' +
+                '<div style="display:grid;grid-template-columns:1fr 1.4fr 100px 140px 110px;align-items:center;padding:6px 16px;border-bottom:1px solid #EDF2F6;">' +
                     '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">INVOICE</span>' +
-                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">CUSTOMER</span>' +
+                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;padding-left:16px;">CUSTOMER</span>' +
                     '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">DUE</span>' +
                     '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">STATUS</span>' +
                     '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">AMOUNT</span>' +
@@ -118,20 +165,18 @@
         function renderRows() {
             $tableBody.empty();
             $.each(INVOICES, function (i, inv) {
-                var cfg     = STATUS_CONFIG[inv.status];
-                var isLast  = (i === INVOICES.length - 1);
-                var isChk   = !!selectedRows[inv.id];
-                var rowBg   = isChk ? '#F0F8FF' : 'transparent';
+                var cfg    = STATUS_CONFIG[inv.status] || { label: inv.status, bg: '#EDEDED', color: '#505050' };
+                var isLast = (i === INVOICES.length - 1);
+                var isChk  = !!selectedRows[inv.id];
+                var rowBg  = isChk ? '#F0F8FF' : 'transparent';
 
                 var $row = $(
                     '<div data-invid="' + inv.id + '" ' +
-                        'style="display:grid;grid-template-columns:36px 1fr 1.4fr 100px 140px 110px;align-items:center;' +
+                        'style="display:grid;grid-template-columns:1fr 1.4fr 100px 140px 110px;align-items:center;' +
                         'padding:13px 16px;cursor:pointer;background:' + rowBg + ';transition:background 0.15s;' +
                         (isLast ? '' : 'border-bottom:1px solid #EDF2F6;') + '">' +
-                        '<input type="checkbox" data-rowinvid="' + inv.id + '" ' + (isChk ? 'checked' : '') + ' ' +
-                            'style="accent-color:#0083DA;cursor:pointer;">' +
                         '<span style="font-size:13px;font-weight:700;color:#102C3F;">' + inv.id + '</span>' +
-                        '<span style="font-size:13px;color:#3D5166;">'  + inv.customer + '</span>' +
+                        '<span style="font-size:13px;color:#3D5166;padding-left:16px;">'  + inv.customer + '</span>' +
                         '<span style="font-size:13px;color:#5F7283;">'  + inv.due      + '</span>' +
                         '<span>' +
                             '<span style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;' +
@@ -190,18 +235,15 @@
             } else {
                 selectedRows[id] = true;
             }
-            /* Update just the affected row without full re-render */
-            var $row = $tableBody.find('[data-invid="' + id + '"]');
+            var $row  = $tableBody.find('[data-invid="' + id + '"]');
             var isChk = !!selectedRows[id];
             $row.css('background', isChk ? '#F0F8FF' : 'transparent');
             $row.find('input[type=checkbox]').prop('checked', isChk);
 
-            /* Sync select-all */
             var allChk = Object.keys(selectedRows).length === INVOICES.length;
             $root.find('#vis-inv-chk-all-' + $self.AD_UserHomeWidgetID).prop('checked', allChk);
         }
 
-        /* ── Public hook — override in integration to open new invoice window ── */
         function onNewInvoice() {
             // TODO: wire to VIS.viewManager.startWindow(...) when backend is ready
         }
@@ -209,7 +251,8 @@
         /* ── Refresh ── */
         this.refreshWidget = function () {
             selectedRows = {};
-            renderRows();
+            INVOICES = [];
+            loadData();
         };
 
         /* ── Root accessor ── */

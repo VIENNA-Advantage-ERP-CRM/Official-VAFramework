@@ -849,6 +849,8 @@
     <Content Include="Areas\VIS\Scripts\widgets\assignrecordwidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\followupswidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\InvoicesWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\OutstandingSalesOrderWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\OverdueWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
@@ -907,6 +909,9 @@
     <Compile Include="Areas\VIS\Controllers\InfoMenuController.cs" />
     <Compile Include="Areas\VIS\Controllers\InfoProductController.cs" />
     <Compile Include="Areas\VIS\Controllers\InfoWindowController.cs" />
+    <Compile Include="Areas\VIS\Controllers\InvoicesController.cs" />
+    <Compile Include="Areas\VIS\Controllers\OutstandingSalesOrderController.cs" />
+    <Compile Include="Areas\VIS\Controllers\OverdueController.cs" />
     <Compile Include="Areas\VIS\Controllers\JsonDataController.cs" />
     <Compile Include="Areas\VIS\Controllers\LandingPageController.cs" />
     <Compile Include="Areas\VIS\Controllers\LocationController.cs" />
