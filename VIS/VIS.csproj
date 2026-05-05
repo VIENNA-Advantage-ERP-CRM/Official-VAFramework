@@ -851,6 +851,9 @@
     <Content Include="Areas\VIS\Scripts\widgets\InvoicesWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\OutstandingSalesOrderWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\OverdueWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\AgingReceivablesWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\PaidthismonthWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\SalesInvoiceCustomerSearchWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
@@ -920,6 +923,8 @@
     <Compile Include="Areas\VIS\Controllers\LookupController.cs" />
     <Compile Include="Areas\VIS\Controllers\MarkModuleController.cs" />
     <Compile Include="Areas\VIS\Controllers\MessageController.cs" />
+    <Compile Include="Areas\VIS\Controllers\AgingReceivablesController.cs" />
+    <Compile Include="Areas\VIS\Controllers\PaidThisMonthController.cs" />
     <Compile Include="Areas\VIS\Controllers\PAttributesController.cs" />
     <Compile Include="Areas\VIS\Controllers\RecordAccessController.cs" />
     <Compile Include="Areas\VIS\Controllers\RecordSharedController.cs" />

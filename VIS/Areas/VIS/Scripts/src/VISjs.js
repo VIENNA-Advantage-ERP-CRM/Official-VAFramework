@@ -123,3 +123,5 @@ import "../app/Framework/advanceTask.js";
 import "../widgets/InvoicesWidget.js";
 import "../widgets/OutstandingSalesOrderWidget.js";
 import "../widgets/OverdueWidget.js";
+import "../widgets/PaidthismonthWidget.js";
+import "../widgets/AgingReceivablesWidget.js";
