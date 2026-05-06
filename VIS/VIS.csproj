@@ -854,6 +854,7 @@
     <Content Include="Areas\VIS\Scripts\widgets\AgingReceivablesWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\PaidthismonthWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\SalesInvoiceCustomerSearchWidget.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\TopDebtorsWidget.js" />
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
@@ -937,6 +938,7 @@
     <Compile Include="Areas\VIS\Controllers\TabPanel\WFManualController.cs" />
     <Compile Include="Areas\VIS\Controllers\TemplateExcelController.cs" />
     <Compile Include="Areas\VIS\Controllers\ThemeController.cs" />
+    <Compile Include="Areas\VIS\Controllers\TopDebtorsController.cs" />
     <Compile Include="Areas\VIS\Controllers\TreeMaintenanceController.cs" />
     <Compile Include="Areas\VIS\Controllers\UserPreferenceController.cs" />
     <Compile Include="Areas\VIS\Controllers\ValuePreferenceController.cs" />

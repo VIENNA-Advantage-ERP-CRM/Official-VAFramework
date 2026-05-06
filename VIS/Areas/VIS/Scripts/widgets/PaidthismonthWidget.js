@@ -26,10 +26,15 @@
         this.frame;
         this.windowNo;
         var $self = this;
-        var $root = $('<div style="height:100%;font-family:Roboto,sans-serif;">');
+        var $root = $('<div style="height:100%;width:100%;font-family:Roboto,sans-serif;">');
 
         var $metricEl;
         var $whyText;
+
+        function lbl(key, fallback) {
+            var t = VIS.Msg.getMsg(key);
+            return (t && t.charAt(0) !== '[') ? t : fallback;
+        }
 
         /* ── Initialize ── */
         this.Initalize = function () {
@@ -72,11 +77,11 @@
             }
             if ($whyText) {
                 var customerLabel = count !== 1
-                    ? (VIS.Msg.getMsg("VIS_Customers") || 'customers')
-                    : (VIS.Msg.getMsg("VIS_Customer")  || 'customer');
+                    ? lbl("VIS_Customers", 'customers')
+                    : lbl("VIS_Customer",  'customer');
                 var countStr = count > 0
-                    ? (VIS.Msg.getMsg("VIS_ReceivedFromCustomers") || 'Received from') + ' ' + count + ' ' + customerLabel + ' ' + (VIS.Msg.getMsg("VIS_SoFarThisMonth") || 'so far this month.')
-                    : (VIS.Msg.getMsg("VIS_NoPaymentsThisMonth") || 'No payments received this month.');
+                    ? lbl("VIS_ReceivedFromCustomers", 'Received from') + ' ' + count + ' ' + customerLabel + ' ' + lbl("VIS_SoFarThisMonth", 'so far this month.')
+                    : lbl("VIS_NoPaymentsThisMonth", 'No payments received this month.');
                 $whyText.text(countStr);
             }
         }
@@ -117,8 +122,8 @@
                     '</div>' +
 
                     '<div>' +
-                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">' + (VIS.Msg.getMsg("VIS_PaidThisMonth") || 'Paid this month') + '</div>' +
-                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">' + (VIS.Msg.getMsg("VIS_CashReceived") || 'Cash received') + '</div>' +
+                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">' + lbl("VIS_PaidThisMonth", 'Paid this month') + '</div>' +
+                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">' + lbl("VIS_CashReceived", 'Cash received') + '</div>' +
                     '</div>' +
                 '</div>'
             );
@@ -143,12 +148,12 @@
                     'padding:1px 7px;border-radius:999px;flex-shrink:0;margin-top:2px;' +
                     'font-size:9px;font-weight:700;letter-spacing:0.08em;' +
                     'color:oklch(0.45 0.15 220);font-family:Roboto,monospace;' +
-                '">' + (VIS.Msg.getMsg("VIS_Why") || 'WHY') + '</span>'
+                '">' + lbl("VIS_Why", 'WHY') + '</span>'
             );
 
             $whyText = $(
                 '<span id="vis-ptm-why-' + uid + '" style="font-size:11px;color:#748494;line-height:1.45;">' +
-                    (VIS.Msg.getMsg("VIS_Loading") || 'Loading…') +
+                    lbl("VIS_Loading", 'Loading…') +
                 '</span>'
             );
 

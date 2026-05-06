@@ -125,3 +125,5 @@ import "../widgets/OutstandingSalesOrderWidget.js";
 import "../widgets/OverdueWidget.js";
 import "../widgets/PaidthismonthWidget.js";
 import "../widgets/AgingReceivablesWidget.js";
+import "../widgets/TopDebtorsWidget.js";
+

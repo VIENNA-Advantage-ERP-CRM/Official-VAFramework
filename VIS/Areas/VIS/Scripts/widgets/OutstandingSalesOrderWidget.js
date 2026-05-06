@@ -31,6 +31,11 @@
         var $whyText;
         var $trendEl;
 
+        function lbl(key, fallback) {
+            var t = VIS.Msg.getMsg(key);
+            return (t && t.charAt(0) !== '[') ? t : fallback;
+        }
+
         /* ── Initialize ── */
         this.Initalize = function () {
             createWidget();
@@ -72,14 +77,14 @@
             }
             if ($whyText) {
                 var orderLabel = count !== 1
-                    ? (VIS.Msg.getMsg("VIS_UnpaidOrders") || 'unpaid orders')
-                    : (VIS.Msg.getMsg("VIS_UnpaidOrder") || 'unpaid order');
-                var why = VIS.Msg.getMsg("VIS_TotalUnpaidInvoices") || 'Total unpaid invoices across all customers.';
+                    ? lbl("VIS_UnpaidOrders", 'unpaid orders')
+                    : lbl("VIS_UnpaidOrder",  'unpaid order');
+                var why = lbl("VIS_TotalUnpaidInvoices", 'Total unpaid invoices across all customers.');
                 if (count > 0) {
-                    why = count + ' ' + orderLabel + ' ' + (VIS.Msg.getMsg("VIS_AcrossAllCustomers") || 'across all customers.');
+                    why = count + ' ' + orderLabel + ' ' + lbl("VIS_AcrossAllCustomers", 'across all customers.');
                 }
                 if (topCustomer) {
-                    why += ' ' + (VIS.Msg.getMsg("VIS_Largest") || 'Largest:') + ' ' + topCustomer + '.';
+                    why += ' ' + lbl("VIS_Largest", 'Largest:') + ' ' + topCustomer + '.';
                 }
                 $whyText.text(why);
             }
@@ -122,8 +127,8 @@
                     '</div>' +
 
                     '<div>' +
-                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">' + (VIS.Msg.getMsg("VIS_Outstanding") || 'Outstanding') + '</div>' +
-                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">' + (VIS.Msg.getMsg("VIS_MoneyOwedToYou") || 'Money owed to you') + '</div>' +
+                        '<div style="font-size:13px;font-weight:600;color:#102C3F;line-height:1.2;">' + lbl("VIS_Outstanding", 'Outstanding') + '</div>' +
+                        '<div style="font-size:11px;color:#748494;letter-spacing:0.3px;text-transform:uppercase;margin-top:1px;">' + lbl("VIS_MoneyOwedToYou", 'Money owed to you') + '</div>' +
                     '</div>' +
                 '</div>'
             );
@@ -148,12 +153,12 @@
                     'padding:1px 7px;border-radius:999px;flex-shrink:0;margin-top:2px;' +
                     'font-size:9px;font-weight:700;letter-spacing:0.08em;' +
                     'color:oklch(0.45 0.15 220);font-family:Roboto,monospace;' +
-                '">' + (VIS.Msg.getMsg("VIS_Why") || 'WHY') + '</span>'
+                '">' + lbl("VIS_Why", 'WHY') + '</span>'
             );
 
             $whyText = $(
                 '<span style="font-size:11px;color:#748494;line-height:1.45;">' +
-                    (VIS.Msg.getMsg("VIS_TotalUnpaidInvoices") || 'Total unpaid invoices across all customers.') +
+                    lbl("VIS_TotalUnpaidInvoices", 'Total unpaid invoices across all customers.') +
                 '</span>'
             );
 

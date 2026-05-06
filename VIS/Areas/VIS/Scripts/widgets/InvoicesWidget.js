@@ -38,18 +38,23 @@
         var INVOICES = [];
         var COL_TMPL = '1fr 1.4fr minmax(60px,0.8fr) minmax(80px,1.1fr) minmax(70px,0.9fr)';
 
+        function lbl(key, fallback) {
+            var t = VIS.Msg.getMsg(key);
+            return (t && t.charAt(0) !== '[') ? t : fallback;
+        }
+
         var STATUS_CONFIG = {
-            DR: { label: VIS.Msg.getMsg("VIS_StatusDraft")          || 'Draft',           bg: '#EDEDED', color: '#505050' },
-            IP: { label: VIS.Msg.getMsg("VIS_StatusInProgress")     || 'In Progress',     bg: '#FFF3CD', color: '#9A6500' },
-            CO: { label: VIS.Msg.getMsg("VIS_StatusCompleted")      || 'Completed',       bg: '#CCEFDD', color: '#0C5D38' },
-            CL: { label: VIS.Msg.getMsg("VIS_StatusClosed")         || 'Closed',          bg: '#DFF1FF', color: '#0E5DA8' },
-            AP: { label: VIS.Msg.getMsg("VIS_StatusApproved")       || 'Approved',        bg: '#CCEFDD', color: '#0C5D38' },
-            NA: { label: VIS.Msg.getMsg("VIS_StatusNotApproved")    || 'Not Approved',    bg: '#FFE8E8', color: '#C0392B' },
-            WP: { label: VIS.Msg.getMsg("VIS_StatusWaitingPayment") || 'Waiting Payment', bg: '#FFF3CD', color: '#9A6500' },
-            WC: { label: VIS.Msg.getMsg("VIS_StatusWaitingConfirm") || 'Waiting Confirm', bg: '#FFF3CD', color: '#9A6500' },
-            RE: { label: VIS.Msg.getMsg("VIS_StatusReversed")       || 'Reversed',        bg: '#FFE8E8', color: '#C0392B' },
-            VO: { label: VIS.Msg.getMsg("VIS_StatusVoided")         || 'Voided',          bg: '#FFE8E8', color: '#C0392B' },
-            IN: { label: VIS.Msg.getMsg("VIS_StatusInvalid")        || 'Invalid',         bg: '#FFE8E8', color: '#C0392B' }
+            DR: { label: lbl("VIS_StatusDraft",          'Draft'),           bg: '#EDEDED', color: '#505050' },
+            IP: { label: lbl("VIS_StatusInProgress",     'In Progress'),     bg: '#FFF3CD', color: '#9A6500' },
+            CO: { label: lbl("VIS_StatusCompleted",      'Completed'),       bg: '#CCEFDD', color: '#0C5D38' },
+            CL: { label: lbl("VIS_StatusClosed",         'Closed'),          bg: '#DFF1FF', color: '#0E5DA8' },
+            AP: { label: lbl("VIS_StatusApproved",       'Approved'),        bg: '#CCEFDD', color: '#0C5D38' },
+            NA: { label: lbl("VIS_StatusNotApproved",    'Not Approved'),    bg: '#FFE8E8', color: '#C0392B' },
+            WP: { label: lbl("VIS_StatusWaitingPayment", 'Waiting Payment'), bg: '#FFF3CD', color: '#9A6500' },
+            WC: { label: lbl("VIS_StatusWaitingConfirm", 'Waiting Confirm'), bg: '#FFF3CD', color: '#9A6500' },
+            RE: { label: lbl("VIS_StatusReversed",       'Reversed'),        bg: '#FFE8E8', color: '#C0392B' },
+            VO: { label: lbl("VIS_StatusVoided",         'Voided'),          bg: '#FFE8E8', color: '#C0392B' },
+            IN: { label: lbl("VIS_StatusInvalid",        'Invalid'),         bg: '#FFE8E8', color: '#C0392B' }
         };
 
         /* ── Initialize ── */
@@ -90,11 +95,11 @@
                         var first = data[0];
                         var amt   = '$' + parseFloat(first.amount).toLocaleString('en-US');
                         var title = total === 1
-                            ? (VIS.Msg.getMsg("VIS_DuplicateSuspected") || 'Duplicate suspected:') + ' ' + first.invoiceA + ' ' + (VIS.Msg.getMsg("VIS_MatchesAmountCustomer") || 'matches') + ' ' + first.invoiceB + ' amount + customer'
-                            : total + ' ' + (VIS.Msg.getMsg("VIS_DuplicatePairsSuspected") || 'duplicate pairs suspected') + ' — ' + total + ' ' + (VIS.Msg.getMsg("VIS_CustomersAffected") || 'customers affected');
+                            ? lbl("VIS_DuplicateSuspected", 'Duplicate suspected:') + ' ' + first.invoiceA + ' ' + lbl("VIS_MatchesAmountCustomer", 'matches') + ' ' + first.invoiceB + ' amount + customer'
+                            : total + ' ' + lbl("VIS_DuplicatePairsSuspected", 'duplicate pairs suspected') + ' — ' + total + ' ' + lbl("VIS_CustomersAffected", 'customers affected');
                         var sub   = total === 1
-                            ? (VIS.Msg.getMsg("VIS_SameCustomerSameAmount") || 'Same customer, same') + ' ' + amt + ' amount, issued ' + first.daysApart + ' days apart'
-                            : (VIS.Msg.getMsg("VIS_SameCustomerWithin7Days") || 'Same customer and amount ordered within 7 days — review the list below');
+                            ? lbl("VIS_SameCustomerSameAmount", 'Same customer, same') + ' ' + amt + ' amount, issued ' + first.daysApart + ' days apart'
+                            : lbl("VIS_SameCustomerWithin7Days", 'Same customer and amount ordered within 7 days — review the list below');
                         $alertBanner.find('.vis-inv-dup-title').text(title);
                         $alertBanner.find('.vis-inv-dup-sub').text(sub);
                         $alertBanner.css('display', 'flex');
@@ -137,7 +142,7 @@
                                 '<polyline points="10 9 9 9 8 9"/>' +
                             '</svg>' +
                         '</div>' +
-                        '<span style="font-size:16px;font-weight:700;color:#102C3F;">' + (VIS.Msg.getMsg("VIS_InvoicesNeedingAttention") || 'Invoices needing your attention') + '</span>' +
+                        '<span style="font-size:16px;font-weight:700;color:#102C3F;">' + lbl("VIS_InvoicesNeedingAttention", 'Invoices needing your attention') + '</span>' +
                     '</div>' +
                 '</div>'
             );
@@ -163,11 +168,11 @@
             /* Table header row */
             var $tableHead = $(
                 '<div style="display:grid;grid-template-columns:' + COL_TMPL + ';align-items:center;padding:6px 16px;border-bottom:1px solid #EDF2F6;">' +
-                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">' + (VIS.Msg.getMsg("VIS_Invoice")  || 'INVOICE')  + '</span>' +
-                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;padding-left:16px;">' + (VIS.Msg.getMsg("VIS_Customer") || 'CUSTOMER') + '</span>' +
-                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">' + (VIS.Msg.getMsg("VIS_Due")      || 'DUE')      + '</span>' +
-                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">' + (VIS.Msg.getMsg("VIS_Status")   || 'STATUS')   + '</span>' +
-                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">' + (VIS.Msg.getMsg("VIS_Amount")   || 'AMOUNT')   + '</span>' +
+                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">' + lbl("VIS_Invoice",  'INVOICE')  + '</span>' +
+                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;padding-left:16px;">' + lbl("VIS_Customer", 'CUSTOMER') + '</span>' +
+                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">' + lbl("VIS_Due",      'DUE')      + '</span>' +
+                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">' + lbl("VIS_Status",   'STATUS')   + '</span>' +
+                    '<span style="font-size:11px;font-weight:600;color:#748494;letter-spacing:0.6px;text-transform:uppercase;">' + lbl("VIS_Amount",   'AMOUNT')   + '</span>' +
                 '</div>'
             );
 
