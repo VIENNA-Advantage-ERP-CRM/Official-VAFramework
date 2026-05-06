@@ -22,101 +22,86 @@ namespace VIS.Controllers
 
             string sql = @"
                 WITH schema_currency AS (
+                    SELECT ci.ad_client_id,
+                           cs.c_currency_id AS acct_currency_id,
+                           cur.StdPrecision
+                    FROM ad_clientinfo ci
+                    JOIN c_acctschema cs
+                      ON cs.c_acctschema_id = ci.c_acctschema1_id
+                    JOIN c_currency cur
+                      ON cur.c_currency_id = cs.c_currency_id
+                ),
+                bucketed AS (
                     SELECT
-                        ci.AD_Client_ID,
-                        acc.C_Currency_ID AS acct_currency_id
-                    FROM AD_ClientInfo ci
-                    JOIN C_AcctSchema acc
-                        ON ci.C_AcctSchema1_ID = acc.C_AcctSchema_ID
+                        i.ad_client_id,
+                        CASE
+                            WHEN ips.DueDate >= CURRENT_DATE THEN 'Not_Due'
+                            WHEN TRUNC(CURRENT_DATE) - TRUNC(ips.DueDate) BETWEEN 1  AND 30  THEN 'Days_1_30'
+                            WHEN TRUNC(CURRENT_DATE) - TRUNC(ips.DueDate) BETWEEN 31 AND 60  THEN 'Days_31_60'
+                            WHEN TRUNC(CURRENT_DATE) - TRUNC(ips.DueDate) BETWEEN 61 AND 90  THEN 'Days_61_90'
+                            WHEN TRUNC(CURRENT_DATE) - TRUNC(ips.DueDate) BETWEEN 91 AND 120 THEN 'Days_91_120'
+                            WHEN TRUNC(CURRENT_DATE) - TRUNC(ips.DueDate) > 120              THEN 'Days_Over_120'
+                        END AS bucket,
+                        CASE
+                            WHEN i.IsSoTrx = 'Y' AND i.IsReturnTrx = 'N'
+                                THEN CurrencyConvert(
+                                        ips.DueAmt,
+                                        i.C_Currency_ID,
+                                        sc.acct_currency_id,
+                                        i.DateAcct,
+                                        i.C_ConversionType_ID,
+                                        i.ad_client_id,
+                                        i.ad_org_id
+                                     )
+                            WHEN i.IsSoTrx = 'Y' AND i.IsReturnTrx = 'Y'
+                                THEN -CurrencyConvert(
+                                        ips.DueAmt,
+                                        i.C_Currency_ID,
+                                        sc.acct_currency_id,
+                                        i.DateAcct,
+                                        i.C_ConversionType_ID,
+                                        i.ad_client_id,
+                                        i.ad_org_id
+                                     )
+                            ELSE 0
+                        END AS amt
+                    FROM C_InvoicePaySchedule ips
+                    JOIN C_Invoice i
+                      ON ips.C_Invoice_ID = i.C_Invoice_ID
+                    JOIN schema_currency sc
+                      ON sc.ad_client_id = i.ad_client_id
+                    WHERE ips.VA009_IsPaid = 'N'
+                      AND i.DocStatus IN ('CO','CL')
+                      AND i.IsSoTrx = 'Y'
                 )
                 SELECT
-                    ROW_NUMBER() OVER (
-                        ORDER BY
-                            COALESCE(
-                                CASE
-                                    WHEN o.C_Currency_ID = sc.acct_currency_id THEN o.GrandTotal
-                                    ELSE CurrencyConvert(
-                                        o.GrandTotal,
-                                        o.C_Currency_ID,
-                                        sc.acct_currency_id,
-                                        o.DateOrdered,
-                                        o.C_ConversionType_ID,
-                                        o.AD_Client_ID,
-                                        o.AD_Org_ID
-                                    )
-                                END,
-                                0
-                            ) DESC
-                    ) AS Sr_No,
-
-                    o.DocumentNo AS Order_No,
-                    bp.Name AS Customer_Name,
-                    o.DocStatus AS Document_Status,
-
-                    CASE
-                        WHEN o.VAS_OrderStatus IN ('DE', 'FP') THEN 'Full'
-                        WHEN o.VAS_OrderStatus IN ('PD', 'PF', 'PI') THEN 'Partial'
-                        WHEN o.VAS_OrderStatus = 'OP' THEN 'Not Delivered'
-                        ELSE 'Unknown'
-                    END AS Delivery_Status,
-
-                    CASE
-                        WHEN o.VAS_OrderStatus IN ('OP', 'PD', 'DE') THEN 'Not Raised'
-                        WHEN o.VAS_OrderStatus IN ('FP', 'PI') THEN 'Partial Raised'
-                        ELSE 'Unknown'
-                    END AS Invoice_Status,
-
-                    COALESCE(
-                        CASE
-                            WHEN o.C_Currency_ID = sc.acct_currency_id THEN o.GrandTotal
-                            ELSE CurrencyConvert(
-                                o.GrandTotal,
-                                o.C_Currency_ID,
-                                sc.acct_currency_id,
-                                o.DateOrdered,
-                                o.C_ConversionType_ID,
-                                o.AD_Client_ID,
-                                o.AD_Org_ID
-                            )
-                        END,
-                        0
-                    ) AS Order_Value,
-
-                    TO_CHAR(TRUNC(SYSDATE) - TRUNC(o.DateOrdered)) || 'd' AS Days_Pending
-
-                FROM C_Order o
-                JOIN C_BPartner bp
-                    ON o.C_BPartner_ID = bp.C_BPartner_ID
+                    ROUND(COALESCE(SUM(CASE WHEN bucket = 'Not_Due'       THEN amt END), 0), MAX(sc.StdPrecision)) AS Not_Due_Amount,
+                    ROUND(COALESCE(SUM(CASE WHEN bucket = 'Days_1_30'     THEN amt END), 0), MAX(sc.StdPrecision)) AS Days_1_30_Amount,
+                    ROUND(COALESCE(SUM(CASE WHEN bucket = 'Days_31_60'    THEN amt END), 0), MAX(sc.StdPrecision)) AS Days_31_60_Amount,
+                    ROUND(COALESCE(SUM(CASE WHEN bucket = 'Days_61_90'    THEN amt END), 0), MAX(sc.StdPrecision)) AS Days_61_90_Amount,
+                    ROUND(COALESCE(SUM(CASE WHEN bucket = 'Days_91_120'   THEN amt END), 0), MAX(sc.StdPrecision)) AS Days_91_120_Amount,
+                    ROUND(COALESCE(SUM(CASE WHEN bucket = 'Days_Over_120' THEN amt END), 0), MAX(sc.StdPrecision)) AS Days_Over_120_Amount
+                FROM bucketed b
                 JOIN schema_currency sc
-                    ON sc.AD_Client_ID = o.AD_Client_ID
+                  ON sc.ad_client_id = b.ad_client_id";
 
-                WHERE o.IsSoTrx = 'Y'
-                  AND o.VAS_OrderStatus NOT IN ('DI', 'IN')
-                  AND o.DocStatus IN ('CO', 'CL')
-                  AND o.AD_Client_ID = " + ctx.GetAD_Client_ID() + @"
-
-                ORDER BY Order_Value DESC
-                FETCH FIRST 20 ROWS ONLY";
-
-            var rows = new List<object>();
+            object result = null;
 
             IDataReader dr = null;
             try
             {
                 dr = DB.ExecuteReader(sql);
-                while (dr != null && dr.Read())
+                if (dr != null && dr.Read())
                 {
-                    rows.Add(new
+                    result = new
                     {
-                        srNo             = Util.GetValueOfInt(dr["Sr_No"]),
-                        orderNo          = dr["Order_No"]?.ToString(),
-                        customerName     = dr["Customer_Name"]?.ToString(),
-                        documentStatus   = dr["Document_Status"]?.ToString(),
-                        deliveryStatus   = dr["Delivery_Status"]?.ToString(),
-                        invoiceStatus    = dr["Invoice_Status"]?.ToString(),
-                        orderValue       = Util.GetValueOfDecimal(dr["Order_Value"]),
-                        daysPending      = dr["Days_Pending"]?.ToString()
-                    });
+                        notDueAmount      = Util.GetValueOfDecimal(dr["Not_Due_Amount"]),
+                        days1To30Amount   = Util.GetValueOfDecimal(dr["Days_1_30_Amount"]),
+                        days31To60Amount  = Util.GetValueOfDecimal(dr["Days_31_60_Amount"]),
+                        days61To90Amount  = Util.GetValueOfDecimal(dr["Days_61_90_Amount"]),
+                        days91To120Amount = Util.GetValueOfDecimal(dr["Days_91_120_Amount"]),
+                        daysOver120Amount = Util.GetValueOfDecimal(dr["Days_Over_120_Amount"])
+                    };
                 }
             }
             finally
@@ -124,7 +109,7 @@ namespace VIS.Controllers
                 dr?.Close();
             }
 
-            return Json(JsonConvert.SerializeObject(rows), JsonRequestBehavior.AllowGet);
+            return Json(JsonConvert.SerializeObject(result), JsonRequestBehavior.AllowGet);
         }
     }
 }

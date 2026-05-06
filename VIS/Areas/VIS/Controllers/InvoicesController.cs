@@ -32,26 +32,28 @@ namespace VIS.Controllers
                     bp.Name                                                    AS Customer,
                     a.GrandTotal                                               AS Amount,
                     org.Name                                                   AS OrgName,
-                    a.DateOrdered                                              AS DateA,
-                    b.DateOrdered                                              AS DateB,
+                    a.DateInvoiced                                             AS DateA,
+                    b.DateInvoiced                                             AS DateB,
                     a.DocStatus                                                AS DocStatusA,
                     b.DocStatus                                                AS DocStatusB,
-                    TRUNC(a.DateOrdered) - TRUNC(b.DateOrdered)               AS DaysApart
-                FROM C_Order a
-                JOIN C_Order b
-                    ON  a.C_BPartner_ID = b.C_BPartner_ID
-                    AND a.GrandTotal    = b.GrandTotal
-                    AND a.C_Order_ID    < b.C_Order_ID
-                    AND b.DateOrdered   BETWEEN a.DateOrdered - 7 AND a.DateOrdered + 7
+                    TRUNC(a.DateInvoiced) - TRUNC(b.DateInvoiced)             AS DaysApart
+                FROM C_Invoice a
+                JOIN C_Invoice b
+                    ON  a.C_BPartner_ID  = b.C_BPartner_ID
+                    AND a.GrandTotal     = b.GrandTotal
+                    AND a.C_Invoice_ID   < b.C_Invoice_ID
+                    AND b.DateInvoiced   BETWEEN a.DateInvoiced - 7 AND a.DateInvoiced + 7
                 JOIN C_BPartner bp ON a.C_BPartner_ID = bp.C_BPartner_ID
                 JOIN AD_Org org    ON a.AD_Org_ID     = org.AD_Org_ID
                 WHERE a.DocStatus IS NOT NULL
                   AND b.DocStatus IS NOT NULL
                   AND a.IsSOTrx      = 'Y'
                   AND b.IsSOTrx      = 'Y'
+                  AND a.IsActive     = 'Y'
+                  AND b.IsActive     = 'Y'
                  -- AND a.AD_Client_ID = " + ctx.GetAD_Client_ID() + @"
                  -- AND a.AD_Org_ID    = " + ctx.GetAD_Org_ID() + @"
-                ORDER BY ABS(TRUNC(a.DateOrdered) - TRUNC(b.DateOrdered)), a.GrandTotal DESC";
+                ORDER BY ABS(TRUNC(a.DateInvoiced) - TRUNC(b.DateInvoiced)), a.GrandTotal DESC";
 
             IDataReader dr = null;
             try
