@@ -342,6 +342,7 @@ namespace VAModelAD.Model
                             if (_po != null)
                             {
                                 _po.SetAD_Window_ID(MasterDetails.AD_Window_ID);
+                                _po.SetWindowTabID(MasterDetails.AD_Tab_ID);
                                 // copy date from Version table to Master table
                                 bool saveSuccess = CopyVersionToMaster(_po, po, MasterDetails.HasDocValWF);
                                 if (!saveSuccess)

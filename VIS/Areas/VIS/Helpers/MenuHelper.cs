@@ -324,6 +324,53 @@ namespace VIS.Helpers
             return sb.ToString();
         }
 
+
+        public List<ScreenItem> GetScreenList(System.Windows.Forms.TreeNodeCollection treeNodeCollection)
+        {
+            List<ScreenItem> screens = new List<ScreenItem>();
+
+            var matchedNodes = FlattenNodesWithRoot(treeNodeCollection)
+                                  .Where(n => n.Item1.ShowInSideMenu != null &&
+                                         n.Item1.ShowInSideMenu.Trim().Equals("Y", StringComparison.OrdinalIgnoreCase))
+                                  .OrderBy(n => n.Item1.SeqInSideMenu);
+
+            foreach (var pair in matchedNodes)
+            {
+                VTreeNode vt = pair.Item1;
+                int rootFolderID = pair.Item2;
+                string action = vt.GetAction().Trim();
+                if (action == "") action = "W";
+                screens.Add(new ScreenItem
+                {
+                    NodeID = vt.Node_ID,
+                    Name = vt.SetName,
+                    Action = action,
+                    ActionID = vt.GetActionID(),
+                    SeqNo = vt.SeqNo,
+                    IsFav = vt.OnBar,
+                    IconClass = menuIcons.ContainsKey(action) ? menuIcons[action] : "fa fa-window-maximize",
+                    Image = vt.Image,
+                    RootFolderID = rootFolderID   // <-- set it
+                });
+            }
+
+            return screens;
+        }
+
+        private IEnumerable<Tuple<VTreeNode, int>> FlattenNodesWithRoot(System.Windows.Forms.TreeNodeCollection nodes, int rootID = 0)
+        {
+            foreach (var item in nodes)
+            {
+                VTreeNode vt = (VTreeNode)item;
+                int currentRoot = vt.Parent_ID == 0 ? vt.Node_ID : rootID;
+                yield return Tuple.Create(vt, currentRoot);
+                foreach (var child in FlattenNodesWithRoot(vt.Nodes, currentRoot))
+                    yield return child;
+            }
+        }
+
+
+
         bool subMenuCat = false;
         /// <summary>
         /// Recursive method to add items in Menu
@@ -1034,4 +1081,20 @@ namespace VIS.Helpers
             return isBase;
         }
     }
+
+    public class ScreenItem
+    {
+        public int NodeID { get; set; }
+        public string Name { get; set; }
+        public string Action { get; set; }
+        public int ActionID { get; set; }
+        public int SeqNo { get; set; }
+        public bool IsFav { get; set; }
+        public string IconClass { get; set; }
+        public string Image { get; set; }
+        public int RootFolderID { get; set; }  // <-- add this
+
+
+    }
+
 }

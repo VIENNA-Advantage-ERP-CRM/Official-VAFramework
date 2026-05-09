@@ -22,6 +22,33 @@
         return VAdvantage.Utility.Msg.GetMsg(lang, key);
     }
 
+    public string GetSStyle(dynamic ms)
+    {
+        if (ms == null)
+        {
+            return "";
+        }
+        else
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            if (ms.Background != null)
+            {
+
+                sb.Append("background:").Append(ms.Background).Append(";"); ;
+            }
+            if (ms.Color != null)
+            {
+
+                sb.Append("color:").Append(ms.Color).Append(";");
+            }
+            if (ms.Style != null)
+            {
+                sb.Append(ms.Style);
+            }
+            return sb.ToString();
+        }
+    }
+
 }
 
 @section heads{
@@ -113,7 +140,8 @@
         // ===============================
         foreach (var css in VAModelAD.ModuleBundles.GetAllCDNStyles())
         {
-            <link rel="stylesheet" href="@css" />
+            var href = css.StartsWith("~") ? Url.Content(css) : css;
+            <link rel="stylesheet" href="@href" />
         }
 
     }
@@ -147,12 +175,17 @@
 {
     <input id="vis_antiForgeryToken" type="hidden" value="@GetAntiForgeryToken()" />
 
-    <div class="vis-app-body">
 
+    <div style="display:none">
+        @Html.Partial("_Template")
+        @Html.Partial("_Dialogs")
+    </div>
+
+
+    <div class="vis-app-body" style="@GetSStyle(ViewBag.PageSection.PS)">
         <!-- App Header START -->
-        <header class="vis-app-hdr">
+        <header class="vis-app-header">
             @Html.Partial("_UserSettings", Model)
-            @Html.Partial("_Template")
         </header>
 
         <!-- App Main Menu START -->
@@ -313,13 +346,66 @@
         <div id="vis_menuOverlay" class="vis-app-overlay" style="display:none">
         </div> <!-- App Main Menu END -->
         <!-- App Main Section -->
-        <section id="vis_mainSection" class="vis-app-section">
+        <section id="vis_mainSection" class="vis-app-section" style="@GetSStyle(ViewBag.PageSection.MS)">
 
             @*action navigation*@
             <div class="vis-app-action-nav">
                 <div class="vis-app-action-nav-inner">
                 </div>
             </div>
+
+
+            <!-- NEW SIDEBAR — place it here -->
+            @{
+                var screenList = Session["screenList"] as List<VIS.Helpers.ScreenItem>;
+            }
+
+            @if (screenList != null && screenList.Count > 0)
+            {
+                <!-- NEW SIDEBAR — place it here -->
+                <div class="vis-NewSideMenu-Container vis-NewSideMenu-Collapsed">
+                    <div class="vis-NewSideMenu-Header">
+                        <span class="vis-NewSideMenu-Title">Menu</span>
+                        @if (ViewBag.direction == "rtl")
+                        {
+                            <span class="vis-NewSideMenu-Close">&#8249;</span>
+                        }
+                        else
+                        {
+                            <span class="vis-NewSideMenu-Close">&#8250;</span>
+                        }
+                    </div>
+                    <div class="vis-NewSideMenu-List">
+
+                        <a class="vis-NewSideMenu-Item" title="Module Dashboard" href="javascript:void(0)">
+                            <span class="vis-NewSideMenu-Icon">
+                                <i class="fa fa-th-large"></i>
+                            </span>
+                            <span class="vis-NewSideMenu-Text">Module Dashboard</span>
+                        </a>
+
+
+                        @foreach (var screen in screenList)
+                        {
+
+                            <a class="vis-NewSideMenu-Item" title="@screen.Name" href="javascript:void(0)"
+                               data-seqno="@screen.SeqNo" data-value="@screen.NodeID"
+                               data-action="@screen.Action" data-actionid="@screen.ActionID"
+                               data-folder="@screen.RootFolderID"
+                               style="display:none">
+                                @*<a class="vis-NewSideMenu-Item" title="@screen.Name" href="javascript:void(0)"
+                            data-seqno="@screen.SeqNo" data-value="@screen.NodeID"
+                            data-action="@screen.Action" data-actionid="@screen.ActionID">*@
+                                <span class="vis-NewSideMenu-Icon">
+                                    <i class="@(!string.IsNullOrEmpty(screen.Image) ? screen.Image : screen.IconClass)"></i>
+                                </span>
+                                <span class="vis-NewSideMenu-Text">@screen.Name</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+
 
             <!-- App Main Conatiner -->
             <div id="vis_mainConatiner" class="vis-app-section-main">
@@ -407,12 +493,15 @@
         <script src="~/Areas/ViennaBase/Scripts/chartjs-plugin-datalabels.min.js"></script>
 
         @*// ===============================
-        // RENDER CDN SCRIPTS (MODULE BASED)
-        // ===============================*@
+            // RENDER CDN SCRIPTS (MODULE BASED)
+            // ===============================*@
         @foreach (var js in VAModelAD.ModuleBundles.GetAllCDNScripts())
         {
-          <script src="@js"></script>
+            var src = js.StartsWith("~") ? Url.Content(js) : js;
+            <script src="@src"></script>
         }
+
+
 
         <script>
             VIS.VApp.init(); //Initlize App ()

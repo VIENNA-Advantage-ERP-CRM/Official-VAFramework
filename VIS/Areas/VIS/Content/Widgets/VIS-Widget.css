@@ -1089,12 +1089,18 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 }
 
 .vis-a-statusBox-container {
-    grid-template-columns: repeat(1, 1fr);
+    /*grid-template-columns: repeat(1, 1fr);
     display: grid;
     gap: 0.4em;
     height: 100%;
     background-color: #ffffff;
-    padding: 0.3rem;
+    padding: 0.3rem;*/
+    /*VAI154 Applied new widget changes*/
+    display: grid;
+    gap: 0.4em;
+    height: 100%;
+    border-radius: 0.875em;
+    background-color: unset !important;
 }
 
 .vis-a-status-box {
@@ -1138,8 +1144,12 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 }
 
 .vis-a-green-box {
-    border-color: #B1FFEF;
-    background-color: #E6FFFA;
+    /*  border-color: #B1FFEF;
+    background-color: #E6FFFA;*/
+    /*VAI154 Applied new widget changes*/
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 1) 100%) !important;
+    border: 2px solid #FFFFFF;
+    border-radius: 0.875em;
 }
 
     .vis-a-green-box .vis, .vis-a-green-box .fa {
@@ -1147,8 +1157,12 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     }
 
 .vis-a-orange-box {
-    border-color: #FFE6B3;
-    background-color: #FFF1D4;
+    /*VAI154 Applied new widget changes*/
+    /*border-color: #FFE6B3;
+    background-color: #FFF1D4;*/
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 1) 100%) !important;
+    border: 2px solid #FFFFFF;
+    border-radius: 0.875em;
 }
 
     .vis-a-orange-box .vis, .vis-a-orange-box .fa {
@@ -1156,8 +1170,12 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
     }
 
 .vis-a-blue-box {
-    border-color: #C3DDFF;
-    background-color: #EBF3FE;
+    /*VAI154 Applied new widget changes*/
+    /* border-color: #C3DDFF;
+    background-color: #EBF3FE;*/
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 1) 100%) !important;
+    border: 2px solid #FFFFFF;
+    border-radius: 0.875em;
 }
 
     .vis-a-blue-box .vis, .vis-a-blue-box .fa {
@@ -1357,8 +1375,12 @@ ul.vis-w-IIColumnContent li .vis-w-home-wf-forwardInput {
 
 
 .vis-a-purple-box {
-    border-color: #7f46f061;
-    background-color: #7f46f029;
+    /*VAI154 Applied new widget changes*/
+    /*  border-color: #7f46f061;
+    background-color: #7f46f029;*/
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 1) 100%) !important;
+    border: 2px solid #FFFFFF;
+    border-radius: 0.875em;
 }
 
     .vis-a-purple-box .vis, .vis-a-purple-box .fa {

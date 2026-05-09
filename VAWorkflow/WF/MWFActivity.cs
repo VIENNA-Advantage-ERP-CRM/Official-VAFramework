@@ -255,6 +255,10 @@ namespace VAdvantage.WF
                 base.SetWFState(WFState);
                 _state = new StateEngine(GetWFState());
                 _state.SetCtx(GetCtx());
+                if (WFState.Equals(StateEngine.STATE_COMPLETED))
+                {
+                    Set_ValueNoCheck("VA137_ActionUser_ID", GetCtx().GetContextAsInt("#AD_User_ID"));
+                }
                 Save();			//	closed in MWFProcess.checkActivities()
                 UpdateEventAudit();
 
@@ -305,6 +309,33 @@ namespace VAdvantage.WF
             }
             else
                 _audit.SetEventType(MWFEventAudit.EVENTTYPE_StateChanged);
+            if (Env.IsModuleInstalled("VA137_"))
+            {
+                _audit.Set_ValueNoCheck("VA137_Action", Get_Value("VA137_Action"));
+                _audit.Set_ValueNoCheck("VA137_LastAction", Get_Value("VA137_LastAction"));
+                _audit.Set_ValueNoCheck("VA137_ActionUser_ID", Get_Value("VA137_ActionUser_ID"));
+                _audit.Set_ValueNoCheck("VA137_IsAllTeams", Get_Value("VA137_IsAllTeams"));
+                //_audit.Set_ValueNoCheck("VA137_Corresp_User_ID", Get_Value("VA137_Corresp_User_ID"));
+                //_audit.Set_ValueNoCheck("C_Team_ID", Get_Value("C_Team_ID"));
+                DataSet dsUsers = DB.ExecuteDataset("SELECT AD_User_ID FROM VA137_WF_Activity_User WHERE AD_WF_Activity_ID =  " + GetAD_WF_Activity_ID());
+                if (dsUsers != null && dsUsers.Tables[0].Rows.Count > 0)
+                {
+                    //string[] UserIDs = Util.GetValueOfString(Get_Value("VA137_Corresp_User_ID")).Split(',');
+                    for (int u = 0; u < dsUsers.Tables[0].Rows.Count; u++)
+                    {
+                        _audit.SaveUserTeam(Util.GetValueOfInt(dsUsers.Tables[0].Rows[u]["AD_User_ID"]), 0);
+                    }
+                }
+                DataSet dsTeams = DB.ExecuteDataset("SELECT C_Team_ID FROM VA137_WF_Activity_Team WHERE AD_WF_Activity_ID =  " + GetAD_WF_Activity_ID());
+                if (dsTeams != null && dsTeams.Tables[0].Rows.Count > 0)
+                {
+                    //string[] TeamIDs = Util.GetValueOfString(Get_Value("C_Team_ID")).Split(',');
+                    for (int t = 0; t < dsTeams.Tables[0].Rows.Count; t++)
+                    {
+                        _audit.SaveUserTeam(0, Util.GetValueOfInt(dsTeams.Tables[0].Rows[t]["C_Team_ID"]));
+                    }
+                }
+            }
             _audit.Save();
         }
 
@@ -1700,8 +1731,353 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 }
                 return true;
             }
+            // vis0008 For correspondence actions
+            else if (MWFNode.ACTION_CorrespondenceAction.Equals(action))
+            {
+                try
+                {
+                    PO _po = GetPO(Get_TrxName());
+                    bool AllTeams = Util.GetValueOfBool(_po.Get_Value("VA137_IsAllTeams"));
+                    if (AllTeams)
+                    {
+                        Set_ValueNoCheck("VA137_IsAllTeams", true);
+                        _po.Set_ValueNoCheck("VA137_IsAllTeams", false);
+                        _po.Save();
+                    }
+                    Set_ValueNoCheck("VA137_LastAction", _po.Get_Value("VA137_Action"));
+                    if (Util.GetValueOfString(Get_Value("VA137_LastAction")) == "RVD")
+                    {
+                        string TeamIDs = Util.GetValueOfString(DB.ExecuteScalar("SELECT VA137_WFApprovalTeam_ID FROM VA137_Correspondence WHERE VA137_Correspondence_ID = " + _po.Get_ID()));// GetReceipientTeam();
+                        if (TeamIDs.Contains(","))
+                        {
+                            string[] TeamID = TeamIDs.Split(',');
+                            for (int i = 0; i < TeamID.Length; i++)
+                            {
+                                SaveUserTeam(0, Util.GetValueOfInt(TeamID[i]));
+                            }
+                        }
+                        else
+                        {
+                            SaveUserTeam(0, Util.GetValueOfInt(TeamIDs));
+                        }
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "_RJ" || Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "RFA" || Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "RJA" || Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "RJR")
+                    {
+                        Dictionary<string, int> UserTeamIDs = GetActionUser();
+                        if (Util.GetValueOfInt(UserTeamIDs["AD_User_ID"]) > 0)
+                        {
+                            int C_Team_ID = Util.GetValueOfInt(UserTeamIDs["C_Team_ID"]);
+                            SaveUserTeam(Util.GetValueOfInt(UserTeamIDs["AD_User_ID"]), C_Team_ID);
+                        }
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "_AP" && (Util.GetValueOfString(_po.Get_Value("VA137_DocTypeCategory")) != "PL"))
+                    {
+                        int C_Team_ID = 0;
+                        if (Util.GetValueOfString(_po.Get_Value("VA137_OutboundType")) == "OBT_EX")
+                        {
+                            C_Team_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_Correspondence WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created"));
+                            if (C_Team_ID > 0)
+                            {
+                                SaveUserTeam(0, C_Team_ID);
+                            }
+                        }
+                        else
+                        {
+                            DataSet dsTeams = DB.ExecuteDataset("SELECT C_Team_ID FROM VA137_CorrespRecepient WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created");
+                            if (dsTeams != null && dsTeams.Tables.Count > 0 && dsTeams.Tables[0].Rows.Count > 0)
+                            {
+                                for (int i = 0; i < dsTeams.Tables[0].Rows.Count; i++)
+                                {
+                                    C_Team_ID = Util.GetValueOfInt(dsTeams.Tables[0].Rows[i]["C_Team_ID"]);
+                                    SaveUserTeam(0, C_Team_ID);
+                                }
+                            }
+                        }
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "_AP" && (Util.GetValueOfString(_po.Get_Value("VA137_DocTypeCategory")) == "PL") && (Util.GetValueOfString(_po.Get_Value("VA137_Status")) == "STA_AP"))
+                    {
+                        int AD_User_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM VA137_CorrespRecepient WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created"));// GetReceipientTeam();
+                        if (AD_User_ID > 0)
+                        {
+                            SaveUser(AD_User_ID);
+                        }
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "_AP" && (Util.GetValueOfString(_po.Get_Value("VA137_DocTypeCategory")) == "PL") && (Util.GetValueOfString(_po.Get_Value("VA137_Status")) == "STA_AP"))
+                    {
+                        int AD_User_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_User_ID FROM VA137_CorrespRecepient WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created"));// GetReceipientTeam();
+                        if (AD_User_ID > 0)
+                        {
+                            SaveUser(AD_User_ID);
+                        }
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "RSD" && Util.GetValueOfString(_po.Get_Value("VA137_Status")) == "STA_RA")
+                    {
+                        int C_Team_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_Correspondence WHERE VA137_Correspondence_ID = " + _po.Get_ID()));// GetReceipientTeam();
+                        if (C_Team_ID > 0)
+                        {
+                            SaveUserTeam(0, C_Team_ID);
+                        }
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "RSD")
+                    {
+                        Dictionary<string, int> UserTeamIDs = GetResendUser();
+                        if (Util.GetValueOfInt(UserTeamIDs["AD_User_ID"]) > 0)
+                        {
+                            int C_Team_ID = Util.GetValueOfInt(UserTeamIDs["C_Team_ID"]);
+                            SaveUserTeam(Util.GetValueOfInt(UserTeamIDs["AD_User_ID"]), C_Team_ID);
+                        }
+                        //int AD_User_ID = GetResendUser();
+                        //if (AD_User_ID > 0)
+                        //{
+                        //    SaveUserTeam(AD_User_ID, 0);
+                        //    //Set_ValueNoCheck("VA137_Corresp_User_ID", AD_User_ID);
+                        //}
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "STR")
+                    {
+                        int count = DB.ExecuteQuery("DELETE FROM VA137_WF_Activity_Team WHERE AD_WF_Activity_ID = " + GetAD_WF_Activity_ID());
+                        int C_Team_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_Correspondence WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created"));
+                        if (C_Team_ID > 0)
+                        {
+                            SaveUserTeam(0, C_Team_ID);
+                        }
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "SUG")
+                    {
+                        int C_Team_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_CorrespRecepient WHERE VA137_Correspondence_ID = " + _po.Get_ID() + " ORDER BY Created"));// GetReceipientTeam();
+                        if (C_Team_ID > 0)
+                        {
+                            int AD_User_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT Supervisor_ID FROM C_Team WHERE C_Team_ID = " + C_Team_ID));// GetReceipientTeam();
+                            SaveUserTeam(AD_User_ID, C_Team_ID);
+                        }
+                    }
+                    else if (Util.GetValueOfString(_po.Get_Value("VA137_Action")) == "RTS")
+                    {
+                        Dictionary<string, int> UserTeamIDs = GetReturnToSenderUser();
+                        if (Util.GetValueOfInt(UserTeamIDs["AD_User_ID"]) > 0)
+                        {
+                            int C_Team_ID = Util.GetValueOfInt(UserTeamIDs["C_Team_ID"]);
+                            SaveUserTeam(Util.GetValueOfInt(UserTeamIDs["AD_User_ID"]), C_Team_ID);
+                        }
+                    }
+                    else
+                    {
+                        if (Util.GetValueOfString(_po.Get_Value("VA137_Corresp_User_ID")) != "")
+                        {
+                            int countDel = DB.ExecuteQuery("DELETE FROM VA137_WF_Activity_User WHERE AD_WF_Activity_ID = " + GetAD_WF_Activity_ID());
+                            string[] UserIDs = Util.GetValueOfString(_po.Get_Value("VA137_Corresp_User_ID")).Split(',');
+                            for (int i = 0; i < UserIDs.Length; i++)
+                            {
+                                SaveUser(Util.GetValueOfInt(UserIDs[i]));
+                            }
+                        }
+                        if (Util.GetValueOfString(_po.Get_Value("VA137_WFApprovalTeam_ID")) != "")
+                        {
+                            int countDel = DB.ExecuteQuery("DELETE FROM VA137_WF_Activity_Team WHERE AD_WF_Activity_ID = " + GetAD_WF_Activity_ID());
+                            string[] TeamIDs = Util.GetValueOfString(_po.Get_Value("VA137_WFApprovalTeam_ID")).Split(',');
+                            for (int i = 0; i < TeamIDs.Length; i++)
+                            {
+                                SaveUserTeam(0, Util.GetValueOfInt(TeamIDs[i]));
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SetTextMsg(ex.Message);
+                    throw new Exception("Error while HTTPRequest - AD_Table_ID="
+                        + GetAD_Table_ID() + ", Record_ID=" + GetRecord_ID());
+                }
+                return false;
+            }
 
             throw new ArgumentException("Invalid Action (Not Implemented) =" + action);
+        }
+
+        /// <summary>
+        /// function to save User and team on WF Activity User and WF Activity Team respectively
+        /// </summary>
+        /// <param name="AD_User_ID"></param>
+        /// <param name="C_Team_ID"></param>
+        /// <returns>Success (True/False)</returns>
+        public bool SaveUserTeam(int AD_User_ID, int C_Team_ID)
+        {
+            _log.SaveError("VA137CopyCorresp", " User " + AD_User_ID + ", Team : " + C_Team_ID);
+            if (AD_User_ID > 0)
+            {
+                if (!SaveUser(AD_User_ID))
+                    return false;
+            }
+            if (C_Team_ID <= 0)
+            {
+                C_Team_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM C_TeamMember WHERE AD_User_ID = " + AD_User_ID + " AND IsActive = 'Y'"));
+            }
+            if (C_Team_ID > 0)
+            {
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(VA137_WF_Activity_Team_ID) FROM VA137_WF_Activity_Team WHERE IsActive = 'Y' AND C_Team_ID = " + C_Team_ID + " AND AD_WF_Activity_ID = " + GetAD_WF_Activity_ID())) > 0)
+                    return true;
+                PO _poWFUserTeam = _poWFUserTeam = MTable.GetPO(GetCtx(), "VA137_WF_Activity_Team", 0, null);
+                _poWFUserTeam.Set_ValueNoCheck("C_Team_ID", C_Team_ID);
+                _poWFUserTeam.Set_ValueNoCheck("AD_WF_Activity_ID", GetAD_WF_Activity_ID());
+                if (!_poWFUserTeam.Save())
+                {
+                    ValueNamePair vnp = VLogger.RetrieveError();
+                    StringBuilder errorMsg = new StringBuilder("");
+                    if (vnp != null)
+                    {
+                        errorMsg.Append(Util.GetValueOfString(vnp.GetName()));
+                        if (errorMsg.ToString() == "")
+                            errorMsg.Append(vnp.GetValue());
+                    }
+                    if (errorMsg.ToString() == "")
+                        errorMsg.Append("Error in saving WF Activity Team ");
+
+                    log.SaveError("VA137ActivityTeamError", errorMsg.ToString());
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Function to save User on Activity user for correspondence
+        /// </summary>
+        /// <param name="AD_User_ID"></param>
+        /// <returns>true or false</returns>
+        public bool SaveUser(int AD_User_ID)
+        {
+            _log.SaveError("VA137CopyCorresp", "Save User Only " + AD_User_ID);
+            PO _poWFUserTeam = null;
+            if (AD_User_ID > 0)
+            {
+                if (Util.GetValueOfInt(DB.ExecuteScalar("SELECT COUNT(VA137_WF_Activity_User_ID) FROM VA137_WF_Activity_User WHERE IsActive = 'Y' AND AD_User_ID = " + AD_User_ID + " AND AD_WF_Activity_ID = " + GetAD_WF_Activity_ID())) > 0)
+                    return true;
+                _poWFUserTeam = MTable.GetPO(GetCtx(), "VA137_WF_Activity_User", 0, null);
+                _poWFUserTeam.Set_ValueNoCheck("AD_User_ID", AD_User_ID);
+                _poWFUserTeam.Set_ValueNoCheck("AD_WF_Activity_ID", GetAD_WF_Activity_ID());
+                if (!_poWFUserTeam.Save())
+                {
+                    ValueNamePair vnp = VLogger.RetrieveError();
+                    StringBuilder errorMsg = new StringBuilder("");
+                    if (vnp != null)
+                    {
+                        errorMsg.Append(Util.GetValueOfString(vnp.GetName()));
+                        if (errorMsg.ToString() == "")
+                            errorMsg.Append(vnp.GetValue());
+                    }
+                    if (errorMsg.ToString() == "")
+                        errorMsg.Append("Error in saving WF Activity User ");
+
+                    log.SaveError("VA137ActivityUserError", errorMsg.ToString());
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Function to get resend user from workflow activity
+        /// </summary>
+        /// <returns>User and Team Dictionary</returns>
+        public Dictionary<string, int> GetResendUser()
+        {
+            Dictionary<string, int> userTeams = new Dictionary<string, int>();
+            userTeams["AD_User_ID"] = 0;
+            userTeams["C_Team_ID"] = 0;
+            DataSet dsEventAuditData = DB.ExecuteDataset("SELECT VA137_Action, VA137_ActionUser_ID, AD_User_ID, AD_WF_Activity_ID FROM AD_WF_Activity WHERE AD_WF_Process_ID = " + GetAD_WF_Process_ID() + " ORDER BY Created DESC");
+            if (dsEventAuditData != null && dsEventAuditData.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < dsEventAuditData.Tables[0].Rows.Count; i++)
+                {
+                    if (Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_WF_Activity_ID"]) == GetAD_WF_Activity_ID())
+                        continue;
+                    userTeams["C_Team_ID"] = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_WF_Activity_Team WHERE AD_WF_Activity_ID = " + Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_WF_Activity_ID"])));
+                    if ((Util.GetValueOfString(dsEventAuditData.Tables[0].Rows[i]["VA137_Action"]) == "_RJ")
+                        || (Util.GetValueOfString(dsEventAuditData.Tables[0].Rows[i]["VA137_Action"]) == "RFA")
+                        || (Util.GetValueOfString(dsEventAuditData.Tables[0].Rows[i]["VA137_Action"]) == "RJA")
+                        || (Util.GetValueOfString(dsEventAuditData.Tables[0].Rows[i]["VA137_Action"]) == "RJR"))
+                    {
+                        userTeams["AD_User_ID"] = Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["VA137_ActionUser_ID"]);
+                        return userTeams;
+                    }
+                    if (i == (dsEventAuditData.Tables[0].Rows.Count - 1))
+                    {
+                        userTeams["AD_User_ID"] = Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_User_ID"]);
+                        return userTeams;
+                    }
+                }
+            }
+            return userTeams;
+        }
+
+        /// <summary>
+        /// Function to get Sending user from WF Activity
+        /// </summary>
+        /// <returns>User and Team Dictionary</returns>
+        public Dictionary<string, int> GetReturnToSenderUser()
+        {
+            Dictionary<string, int> userTeams = new Dictionary<string, int>();
+            userTeams["AD_User_ID"] = 0;
+            userTeams["C_Team_ID"] = 0;
+            DataSet dsEventAuditData = DB.ExecuteDataset("SELECT VA137_Action, VA137_ActionUser_ID, AD_User_ID, AD_WF_Activity_ID FROM AD_WF_Activity WHERE AD_WF_Process_ID = " + GetAD_WF_Process_ID() + " ORDER BY Created DESC");
+            if (dsEventAuditData != null && dsEventAuditData.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < dsEventAuditData.Tables[0].Rows.Count; i++)
+                {
+                    if (Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_WF_Activity_ID"]) == GetAD_WF_Activity_ID())
+                        continue;
+                    userTeams["C_Team_ID"] = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_WF_Activity_Team WHERE AD_WF_Activity_ID = " + Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_WF_Activity_ID"])));
+                    if ((Util.GetValueOfString(dsEventAuditData.Tables[0].Rows[i]["VA137_Action"]) == "RCL"))
+                    {
+                        userTeams["AD_User_ID"] = Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["VA137_ActionUser_ID"]);
+                        return userTeams;
+                    }
+                    if (i == (dsEventAuditData.Tables[0].Rows.Count - 1))
+                    {
+                        userTeams["AD_User_ID"] = Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_User_ID"]);
+                        return userTeams;
+                    }
+                }
+            }
+            return userTeams;
+        }
+
+        /// <summary>
+        /// Function to get action user from event
+        /// </summary>
+        /// <returns>User and Team Dictionary</returns>
+        public Dictionary<string, int> GetActionUser()
+        {
+            Dictionary<string, int> userTeams = new Dictionary<string, int>();
+            userTeams["AD_User_ID"] = 0;
+            userTeams["C_Team_ID"] = 0;
+            //int UserID = -1;
+            DataSet dsEventAuditData = DB.ExecuteDataset("SELECT VA137_Action, VA137_ActionUser_ID, AD_User_ID, AD_WF_Activity_ID, AD_WF_EventAudit_ID FROM AD_WF_EventAudit WHERE AD_WF_Process_ID = " + GetAD_WF_Process_ID() + " ORDER BY Created DESC");
+            //DataSet dsEventAuditData = DB.ExecuteDataset("SELECT VA137_Action, VA137_ActionUser_ID, AD_User_ID, AD_WF_Activity_ID FROM AD_WF_Activity WHERE AD_WF_Process_ID = " + GetAD_WF_Process_ID() + " ORDER BY Created DESC");
+            if (dsEventAuditData != null && dsEventAuditData.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < dsEventAuditData.Tables[0].Rows.Count; i++)
+                {
+                    //if (Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_WF_Activity_ID"]) == GetAD_WF_Activity_ID())
+                    if (i == 0 || Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["VA137_ActionUser_ID"]) <= 0)
+                        continue;
+                    userTeams["C_Team_ID"] = Util.GetValueOfInt(DB.ExecuteScalar("SELECT C_Team_ID FROM VA137_WF_Event_Team WHERE AD_WF_EventAudit_ID = " + Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_WF_EventAudit_ID"])));
+                    if ((Util.GetValueOfString(dsEventAuditData.Tables[0].Rows[i]["VA137_Action"]) == "RVD")
+                        || (Util.GetValueOfString(dsEventAuditData.Tables[0].Rows[i]["VA137_Action"]) == "_AP"))
+                    {
+                        userTeams["AD_User_ID"] = Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["VA137_ActionUser_ID"]);
+                        return userTeams;
+                        //return Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["VA137_ActionUser_ID"]);
+                    }
+                    if (i == (dsEventAuditData.Tables[0].Rows.Count - 1))
+                    {
+                        userTeams["AD_User_ID"] = Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_User_ID"]);
+                        return userTeams;
+                        //return Util.GetValueOfInt(dsEventAuditData.Tables[0].Rows[i]["AD_User_ID"]);
+                    }
+                }
+            }
+            return userTeams;
         }
 
         /// <summary>

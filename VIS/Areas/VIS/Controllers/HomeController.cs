@@ -330,6 +330,7 @@ namespace VIS.Controllers
                         ViewBag.Menu = mnuHelper.GetMenuTree(); // create tree
                         Session["barNodes"] = ViewBag.Menu.GetBarNodes(); /* add is session to get it in favourite call */
                         ViewBag.IsMobile = Request.Browser.IsMobileDevice;
+                        Session["screenList"] = mnuHelper.GetScreenList(ViewBag.Menu.GetRootNode().Nodes);
                         if (Request.Browser.IsMobileDevice)
                         {
                             ViewBag.TreeHtml = mnuHelper.GetMobileMenuTreeUI(ViewBag.Menu.GetRootNode(), @Url.Content("~/"));
@@ -382,6 +383,12 @@ namespace VIS.Controllers
 
                     ViewBag.LibSuffix = "_v3";
                     ViewBag.FrameSuffix = "_v2";
+
+
+                    /* get System Layout 
+                     */
+                    ViewBag.PageSection = LoginHelper.GetPageSection(ctx.GetAD_Client_ID());
+
 
 
                     /// VIS0008

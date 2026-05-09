@@ -2639,9 +2639,9 @@
                     } else {
                         self.setValue(item.id, true, true);
 
-                        if (columnName.toUpperCase() == 'M_PRODUCT_ID') {
-                            VIS.context.setContext(self.lookup.windowNo, "AttrCode", item.id);
-                        }
+                        //if (columnName.toUpperCase() == 'M_PRODUCT_ID') {
+                        //    VIS.context.setContext(self.lookup.windowNo, "AttrCode", item.id);
+                        //}
 
                         if (self.editingGrid) { // bring back to edit mode(grid view) after value selection
                             setTimeout(function () {
@@ -6424,7 +6424,7 @@
             else {
                 $.ajax({
                     url: baseUrl + 'productContainer/GetProductContainer',
-                    data: { text: text, validation: validated },
+                    data: { text: text, validation: VIS.secureEngine.encrypt(validated) },
                     success: function (result) {
                         result = JSON.parse(result);
                         if (result == "null" || result == null || result == "" || result == 0) {
@@ -7089,7 +7089,7 @@
             this.settingVal = true;
             //else
             //his.ctrl.val(newValue);
-            if (!newValue && newValue !='') {
+            if (!newValue && newValue != '') {
                 this.iti ? this.iti.setNumber('') : this.ctrl.val('');
                 this.setCountry();
             } else {

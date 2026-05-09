@@ -1,8 +1,10 @@
 ﻿using Google.Authenticator;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -11,6 +13,7 @@ using System.Web;
 using VAdvantage.Classes;
 using VAdvantage.Common;
 using VAdvantage.DataBase;
+using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
 using VIS.Models;
@@ -34,7 +37,7 @@ namespace VIS.Helpers
         /// <param name="password"></param>
         /// <returns>QR Image url</returns>
         /// <author>VIS_427</author>
-        public string GetQROnRefresh(string UserValue,string tokenKey2FA, string Password)
+        public string GetQROnRefresh(string UserValue, string tokenKey2FA, string Password)
         {
             bool authenticated = false;
             bool isLDAP = false;
@@ -189,11 +192,11 @@ namespace VIS.Helpers
                 char isHashed = Convert.ToChar(ds.Tables[0].Rows[0]["isHashed"]);
 
                 string originalpwd = model.Login1Model.Password;
-                
+
                 if (model.Login1Model.Password != null)
                 {
-                    if(isEncrypted == 'Y')
-                    model.Login1Model.Password = SecureEngine.Encrypt(model.Login1Model.Password);
+                    if (isEncrypted == 'Y')
+                        model.Login1Model.Password = SecureEngine.Encrypt(model.Login1Model.Password);
                     //else if(isHashed == 'Y')
                     //    isHashVerified = model.Login1Model.Password);
                 }
@@ -843,7 +846,7 @@ namespace VIS.Helpers
             ctx.SetContext("#M_Warehouse_Name", model.Login2Model.WarehouseName);
 
             //Set Login Model Prop
-            if(model.Login1Model == null)
+            if (model.Login1Model == null)
             {
                 model.Login1Model = new Login1Model();
                 model.Login1Model.AD_User_ID = ctxLogIn.GetAD_User_ID();
@@ -852,7 +855,7 @@ namespace VIS.Helpers
             ctxLogIn.SetContext("NewSession", "Y");
             //ctx.SetContext("#Date", model.Login2Model.Date.ToString());
 
-            
+
             return ctx;
         }
 
@@ -893,7 +896,7 @@ namespace VIS.Helpers
                     string sql = "UPDATE AD_LoginSetting SET " +
                                      "AD_Client_ID = " + model.Login2Model.Client + ",AD_Org_ID=" + model.Login2Model.Org + ",AD_Role_ID=" + model.Login2Model.Role
                                      + ",M_WareHouse_ID= ";
-                             
+
                     if (!String.IsNullOrEmpty(model.Login2Model.Warehouse) && model.Login2Model.Warehouse != "-1")
                     {
                         sql += model.Login2Model.Warehouse + ",";
@@ -903,11 +906,11 @@ namespace VIS.Helpers
                         sql += "null,";
                     }
 
-                    sql+= " FilteredOrg=";
+                    sql += " FilteredOrg=";
 
                     if (!String.IsNullOrEmpty(model.Login2Model.FilteredOrg) && model.Login2Model.FilteredOrg != "")
                     {
-                        sql += "'"+model.Login2Model.FilteredOrg + "',";
+                        sql += "'" + model.Login2Model.FilteredOrg + "',";
                     }
                     else
                     {
@@ -1123,5 +1126,72 @@ FROM sso_configuration  WHERE sso_configuration.IsActive='Y' ");
             return list;
         }
 
+
+        public static dynamic GetPageSection(int ad_Client_ID)
+        {
+            dynamic ret = new ExpandoObject();
+
+           
+
+            ret.HS = null;
+            ret.SM = null;
+            ret.MS = null;
+            ret.PS = null;
+            try
+            {
+                DataSet ds = DB.ExecuteDataset("SELECT * FROM AD_HomePageConfig WHERE IsActive='Y' AND AD_Client_ID IN (0," + ad_Client_ID
+                                                +") ORDER BY AD_Client_ID Desc");
+                if (ds != null && ds.Tables[0] != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    int ad_client = -1;
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    {
+                        if (ad_client < 0)
+                        {
+                            ad_client = Convert.ToInt32(dr["AD_Client_ID"]);
+                        }
+
+                        if (ad_client > -1 && ad_client != Convert.ToInt32(dr["AD_Client_ID"])) {
+                            break;
+                        }
+
+                        if (dr["PageSection"].ToString() == "H")
+                        {
+                            ret.HS = new ExpandoObject();
+                            ret.HS.Background = dr["Background"].ToString();
+                            ret.HS.Color = dr["Color"].ToString();
+                            ret.HS.Height = Util.GetValueOfInt(dr["Height"]);
+                            ret.HS.IsHorzonatlSplitMenu = dr["IsHorizontalSplit"].ToString() == "Y";
+                            ret.HS.Style = dr["HtmlStyle"].ToString();
+                        }
+                        else if (dr["PageSection"].ToString() == "S")
+                        {
+                            ret.SM = new ExpandoObject();
+                            ret.SM.Background = dr["Background"].ToString();
+                            ret.SM.Color = dr["Color"].ToString();
+                            ret.SM.Height = Util.GetValueOfInt(dr["Height"]);
+                            ret.SM.Style = dr["HtmlStyle"].ToString();
+                        }
+                        else if (dr["PageSection"].ToString() == "M")
+                        {
+                            ret.MS = new ExpandoObject();
+                            ret.MS.Background = dr["Background"].ToString();
+                            ret.MS.Color = dr["Color"].ToString();
+                            ret.MS.Style = dr["HtmlStyle"].ToString();
+                        }
+                        else if (dr["PageSection"].ToString() == "P")
+                        {
+                            ret.PS = new ExpandoObject();
+                            ret.PS.Background = dr["Background"].ToString();
+                            ret.PS.Color = dr["Color"].ToString();
+                            ret.PS.Style = dr["HtmlStyle"].ToString();
+                        }
+                    }
+                }
+            }
+            catch(Exception ex) { VLogger.Get().Severe("Home page config error=>" + ex.Message); }
+
+            return ret;
+        }
     }
 }

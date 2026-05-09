@@ -614,6 +614,9 @@
                 events();
                 $(window).resize(adjustWidgetDivSize);
 
+                /*Set Top Property*/
+                $home.find("#dataContainer").css('top', $('body').find('.vis-app-header').height() + 'px');
+
             });
 
 
