@@ -1987,6 +1987,7 @@
             .addClass('vis-NewSideMenu-Collapsed')
             .css('position', 'relative');
         setSideMenuArrow($btn, false);
+        resizeHomeAfterSideMenuChange();
     });
 
 
@@ -2004,6 +2005,14 @@
         }
     }
 
+    function resizeHomeAfterSideMenuChange() {
+        // Added with the new side menu: opening/closing changes whether it affects layout or overlays it.
+        // Re-run home widget sizing after the menu width transition finishes.
+        window.setTimeout(function () {
+            $(window).trigger("resize");
+        }, 310);
+    }
+
     $(document).on("click", ".vis-NewSideMenu-Close", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -2019,6 +2028,7 @@
                 .css("position", "relative");
 
             setSideMenuArrow($btn, false);
+            resizeHomeAfterSideMenuChange();
         } else {
             $container
                 .removeClass("vis-NewSideMenu-Collapsed vis-NewSideMenu-HoverOpen")
@@ -2026,6 +2036,7 @@
                 .css("position", "absolute");
 
             setSideMenuArrow($btn, true);
+            resizeHomeAfterSideMenuChange();
         }
     });
 

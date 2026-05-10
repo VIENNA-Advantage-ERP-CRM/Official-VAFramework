@@ -3589,6 +3589,8 @@ ul.vis-userLinks-ListMenu li a i {
     transition: transform 0.2s;
     float: left;
     height: 100%;
+    /* Added with the new side menu so percentage widths include borders/padding in the available space. */
+    box-sizing: border-box;
 }
 
 .vis-drag-info {
@@ -3624,6 +3626,9 @@ ul.vis-userLinks-ListMenu li a i {
     width: 30%;
     box-shadow: 0 0 7px 1px #cccccc;
     height: calc(100% - 3px);
+    /* Added with the new side menu to keep the Mosaic panel inside the resized home area. */
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 .vis-widget-header {
@@ -3638,7 +3643,26 @@ ul.vis-userLinks-ListMenu li a i {
         color: rgba(var(--v-c-on-common), 1);
         font-size: 1.5rem;
         margin: 0;
+        /* Added after the side menu introduced narrower Mosaic widths; let controls stay visible. */
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
+
+    .vis-widget-header > .d-flex {
+        /* Added after the side menu so search can shrink while refresh/close keep their space. */
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        min-width: 0;
+        flex-wrap: nowrap;
+    }
+
+        .vis-widget-header > .d-flex input {
+            flex: 1 1 auto;
+            min-width: 0;
+            max-width: 160px;
+        }
 
     .vis-widget-header .vis {
         background-color: rgba(var(--v-c-mandatory), 1);
@@ -3648,6 +3672,7 @@ ul.vis-userLinks-ListMenu li a i {
         font-size: 1rem;
         cursor: pointer;
         border: 1px solid rgba(var(--v-c-mandatory), 1);
+        flex: 0 0 auto;
     }
 
         .vis-widget-header .vis:focus {
