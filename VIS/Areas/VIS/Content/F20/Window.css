@@ -480,8 +480,13 @@
     align-items: center;
 }
 
+.vis-ad-w-p-tb-rc-nav
+{
+
+}
+
 .vis-ad-w-p-tb-rc-action {
-    margin: 0 10px;
+    margin: 0 10px 0 5px;
     font-size: 1.2rem;
     color: rgba(var(--v-c-on-secondary), 1);
     cursor: pointer;
@@ -786,7 +791,7 @@ span.vis-ad-w-p-tb-rc-action {
     margin: 0;
     padding: 0;
     list-style: none;
-    padding-right: 5px;
+  /*  padding-right: 5px;*/
 }
 
     .vis-ad-w-p-nav-btns li {
@@ -913,11 +918,12 @@ span.vis-ad-w-p-tb-rc-action {
     display: none;
     /*margin-left: 5px;*/
     background:rgba(var(--v-c-common),.6);
+    margin-left:4px;
 }
 
 .vis-ad-w-p-actionpanel-r {
     grid-column: 2 / 2;
-    margin-left: 5px;
+    margin-left: 2px;
 }
 
 /*.vis-ad-w-p-actionpanel-b {
@@ -1325,18 +1331,21 @@ label.vis-css-treewindow-selected, label.vis-css-treewindow-selected:before {
 /* action end */
 
 
-.vis-ad-w-p-s-plst li:not(:first-child) {
+/*.vis-ad-w-p-s-plst li:not(:first-child) {
     padding: 3px 5px;
     background: rgba(var(--v-c-common), 1);
     border: 1px solid rgba(0, 0, 0, 0.18);
     cursor: pointer;
     font-size: 0.8rem;
-}
+}*/
 
 .vis-ad-w-p-s-plst li {
     display: inline-flex;
     align-items: center;
     color: rgba(var(--v-c-on-secondary), 1);
+    padding: 3px 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
 }
 
     .vis-ad-w-p-s-plst li div {
@@ -1344,12 +1353,12 @@ label.vis-css-treewindow-selected, label.vis-css-treewindow-selected:before {
         align-items: center;
     }
 
-    .vis-ad-w-p-s-plst li:nth-child(2) {
+  /*  .vis-ad-w-p-s-plst li:nth-child(2) {
         border-top-left-radius: 5px;
         border-bottom-left-radius: 5px;
         margin-right: -1px;
         margin-left: 10px;
-    }
+    }*/
 
     .vis-ad-w-p-s-plst li:last-child {
         border-top-right-radius: 5px;
@@ -1879,8 +1888,8 @@ li.vis-page-item-select {
 
 .vis-ad-w-p-ap-tp-o-b-head {
     display: flex;
-    background: rgba(var(--v-c-primary),1);
-    color: rgba(var(--v-c-on-primary),1);
+    color: rgba(var(--v-c-primary),1);
+    /*color: rgba(var(--v-c-on-primary),1);*/
     padding: 7px 10px;
     border-top-left-radius: .50rem;
 }

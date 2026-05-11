@@ -523,6 +523,21 @@
         }
         if (this.aPanel.vTabbedPane)
             this.aPanel.vTabbedPane.refresh();
+
+        // List view toggles between card and list layout based on whether the
+        // right tab panel is open — re-evaluate when the tab panel size
+        // notification fires (open/close, manual resize, etc.).
+        if (gc.isCardRow && gc.vCardView && VIS.VListView
+            && gc.vCardView instanceof VIS.VListView
+            && gc.vCardView.calculateWidth) {
+            gc.vCardView.calculateWidth();
+        }
+
+        else if (gc.isCardRow && gc.vCardView 
+            && gc.vCardView.calculateWidth) {
+            gc.vCardView.calculateWidth();
+        }
+        
     };
 
     VIS.GridController.prototype.refreshTabPanelData = function (record_ID, action) {
@@ -666,6 +681,26 @@
     @name mTab
     <returns></returns>*/
     VIS.GridController.prototype.initGrid = function (onlyMultiRow, curWindowNo, aPanel, mTab) {
+
+        //mTab.vo.IsListView = true;// fix it
+        // Card view ↔ List view selection: a single DB flag on the tab decides
+        // which renderer occupies this.vCardView. Both views share AD_CardView
+        // metadata, conditions, the same toolbar button, and the isCardRow
+        // state; only the rendering differs. The constructor already created a
+        // default VCardView; swap it for VListView when the flag is set.
+        if (mTab.vo && mTab.vo.IsListView && VIS.VListView && !(this.vCardView instanceof VIS.VListView)) {
+            if (this.vCardView && this.vCardView.dispose) {
+                this.vCardView.dispose();
+            }
+            this.vCardView = new VIS.VListView();
+            var self = this;
+            this.vCardView.onCardEdit = function (event, onlySelect) {
+                self.onTableRowSelect(event);
+                if (!onlySelect) {
+                    self.aPanel.actionPerformedCallback(self.aPanel, "Single");
+                }
+            };
+        }
 
         var fields = mTab.gridTable.gridFields;
         var mField = null;
