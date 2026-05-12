@@ -3629,17 +3629,21 @@ ul.vis-userLinks-ListMenu li a i {
     /* Added with the new side menu to keep the Mosaic panel inside the resized home area. */
     box-sizing: border-box;
     min-width: 0;
+    overflow: hidden;
 }
 
 .vis-widget-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 6px;
+    overflow: hidden;
     padding: 0.4rem;
     border-bottom: 1px solid rgba(var(--v-c-secondary), 1);
 }
 
     .vis-widget-header h4 {
+        flex: 1 1 auto;
         color: rgba(var(--v-c-on-common), 1);
         font-size: 1.5rem;
         margin: 0;
@@ -3652,27 +3656,37 @@ ul.vis-userLinks-ListMenu li a i {
 
     .vis-widget-header > .d-flex {
         /* Added after the side menu so search can shrink while refresh/close keep their space. */
-        flex: 1 1 auto;
+        flex: 0 1 235px;
+        gap: 4px;
         justify-content: flex-end;
         min-width: 0;
+        max-width: calc(100% - 85px);
         flex-wrap: nowrap;
     }
 
         .vis-widget-header > .d-flex input {
             flex: 1 1 auto;
+            width: calc(100% - 68px);
             min-width: 0;
             max-width: 160px;
         }
 
     .vis-widget-header .vis {
         background-color: rgba(var(--v-c-mandatory), 1);
-        padding: 0.4rem;
-        display: block;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         color: rgba(var(--v-c-common), 1) !important;
         font-size: 1rem;
         cursor: pointer;
         border: 1px solid rgba(var(--v-c-mandatory), 1);
         flex: 0 0 auto;
+    }
+
+    .vis-widget-header .vis.mr-1 {
+        margin-right: 0 !important;
     }
 
         .vis-widget-header .vis:focus {

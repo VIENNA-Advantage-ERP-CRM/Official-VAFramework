@@ -159,7 +159,7 @@
         }
 
         function adjustWidgetDivSize() {
-            var rootWidth = $root.innerWidth() || $root.closest('#vis_mainConatiner').innerWidth() || $(window).width();
+            var rootWidth = $root.closest('#vis_mainConatiner').innerWidth() || $root.innerWidth() || $(window).width();
             $root.find('.scrollerHorizontalWidget').width(rootWidth);
             resizeWidgetContainer();
         }
