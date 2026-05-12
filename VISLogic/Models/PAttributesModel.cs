@@ -53,7 +53,7 @@ namespace VIS.Models
             MAttribute[] attributes = null;
             //	Get Model
             MAttributeSetInstance _masi = MAttributeSetInstance.Get(ctx, _M_AttributeSetInstance_ID, _M_Product_ID);
-            MProduct _prd = new MProduct(ctx, _M_Product_ID, null);
+            //MProduct _prd = new MProduct(ctx, _M_Product_ID, null);
             if (_masi == null)
             {
                 obj.IsReturnNull = true;
@@ -323,7 +323,8 @@ namespace VIS.Models
             ////	GuaranteeDate
             if (!_productWindow && aset.IsGuaranteeDate())
             {
-                DateTime? dtpicGuaranteeDate = TimeUtil.AddDays(DateTime.Now, _prd.GetGuaranteeDays());
+                int guaranteeDays = Util.GetValueOfInt(DB.ExecuteScalar("SELECT GuaranteeDays FROM M_Product WHERE M_Product_ID=" + _M_Product_ID));
+                DateTime? dtpicGuaranteeDate = TimeUtil.AddDays(DateTime.Now, guaranteeDays);   // _prd.GetGuaranteeDays());
                 if (_M_AttributeSetInstance_ID > 0)
                 {
                     dtpicGuaranteeDate = _masi.GetGuaranteeDate();
@@ -1315,15 +1316,30 @@ namespace VIS.Models
                         {
                             MProductAttributes pAttr = new MProductAttributes(ctx, 0, trx);
                             pAttr.SetAD_Org_ID(product.GetAD_Org_ID());
-                            pAttr.SetUPC("");
                             pAttr.SetM_Product_ID(mProductId);
                             pAttr.SetM_AttributeSetInstance_ID(mAttributeSetInstanceId);
+
+                            // UPC: prefer Lot, then SerNo. If neither is available, save first so
+                            // the DB-generated M_ProductAttributes_ID can be used as UPC.
+                            string upc = !string.IsNullOrEmpty(strLotString) ? strLotString
+                                       : !string.IsNullOrEmpty(strSerNo) ? strSerNo
+                                       : "";
+                            pAttr.SetUPC(upc);
+
                             if (!pAttr.Save())
                             {
                                 obj.Error = Msg.GetMsg(ctx, "NotSaved") + " - " + MProductAttributes.Table_Name;
                                 trx.Rollback();
                             }
-
+                            else if (string.IsNullOrEmpty(upc))
+                            {
+                                pAttr.SetUPC(pAttr.Get_ID().ToString());
+                                if (!pAttr.Save())
+                                {
+                                    obj.Error = Msg.GetMsg(ctx, "NotSaved") + " - " + MProductAttributes.Table_Name;
+                                    trx.Rollback();
+                                }
+                            }
                         }
 
                         sql.Clear();
