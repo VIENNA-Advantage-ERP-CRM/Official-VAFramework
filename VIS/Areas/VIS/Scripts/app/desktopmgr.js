@@ -1984,8 +1984,7 @@
         var $btn = $container.find('.vis-NewSideMenu-Close');
         $container
             .removeClass('vis-NewSideMenu-Expanded vis-NewSideMenu-HoverOpen')
-            .addClass('vis-NewSideMenu-Collapsed')
-            .css('position', 'relative');
+            .addClass('vis-NewSideMenu-Collapsed');
         setSideMenuArrow($btn, false);
         resizeHomeAfterSideMenuChange();
     });
@@ -2006,11 +2005,7 @@
     }
 
     function resizeHomeAfterSideMenuChange() {
-        // Added with the new side menu: opening/closing changes whether it affects layout or overlays it.
-        // Re-run home widget sizing after the menu width transition finishes.
-        window.setTimeout(function () {
-            $(window).trigger("resize");
-        }, 310);
+        // The side menu always keeps the collapsed 54px layout footprint, so opening it should not resize screens.
     }
 
     $(document).on("click", ".vis-NewSideMenu-Close", function (e) {
@@ -2024,16 +2019,14 @@
         if (isOpen) {
             $container
                 .removeClass("vis-NewSideMenu-Expanded vis-NewSideMenu-HoverOpen")
-                .addClass("vis-NewSideMenu-Collapsed")
-                .css("position", "relative");
+                .addClass("vis-NewSideMenu-Collapsed");
 
             setSideMenuArrow($btn, false);
             resizeHomeAfterSideMenuChange();
         } else {
             $container
                 .removeClass("vis-NewSideMenu-Collapsed vis-NewSideMenu-HoverOpen")
-                .addClass("vis-NewSideMenu-Expanded")
-                .css("position", "absolute");
+                .addClass("vis-NewSideMenu-Expanded");
 
             setSideMenuArrow($btn, true);
             resizeHomeAfterSideMenuChange();

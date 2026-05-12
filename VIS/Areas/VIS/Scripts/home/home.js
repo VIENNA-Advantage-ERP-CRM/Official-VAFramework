@@ -125,13 +125,7 @@
              * Adjust Size
              */
             function adjustWidgetDivSize() {
-                // Added for the new side menu: collapsed menu takes layout width, opened menu is absolute overlay.
-                // Size the home scroller from the matching available width so Mosaic close/search do not move off-screen.
-                var isSideMenuOverlay = $('.vis-NewSideMenu-Container').hasClass('vis-NewSideMenu-Expanded') ||
-                    $('.vis-NewSideMenu-Container').hasClass('vis-NewSideMenu-HoverOpen');
-                var homeWidth = isSideMenuOverlay
-                    ? $(window).width()
-                    : ($home.innerWidth() || $home.closest('#vis_mainConatiner').innerWidth() || $(window).width());
+                var homeWidth = $home.innerWidth() || $home.closest('#vis_mainConatiner').innerWidth() || $(window).width();
                 $home.find('.scrollerHorizontalWidget').width(homeWidth);
                 resizeWidgetContainer();
             }

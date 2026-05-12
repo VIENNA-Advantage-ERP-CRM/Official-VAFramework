@@ -159,13 +159,7 @@
         }
 
         function adjustWidgetDivSize() {
-            // Added for the new side menu: collapsed menu takes layout width, opened menu is absolute overlay.
-            // Size the landing page scroller from the matching available width to avoid right-side blank space.
-            var isSideMenuOverlay = $('.vis-NewSideMenu-Container').hasClass('vis-NewSideMenu-Expanded') ||
-                $('.vis-NewSideMenu-Container').hasClass('vis-NewSideMenu-HoverOpen');
-            var rootWidth = isSideMenuOverlay
-                ? $(window).width()
-                : ($root.innerWidth() || $root.closest('#vis_mainConatiner').innerWidth() || $(window).width());
+            var rootWidth = $root.innerWidth() || $root.closest('#vis_mainConatiner').innerWidth() || $(window).width();
             $root.find('.scrollerHorizontalWidget').width(rootWidth);
             resizeWidgetContainer();
         }
