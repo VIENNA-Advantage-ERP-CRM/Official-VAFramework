@@ -2700,19 +2700,16 @@ findImg {
 
 .vis-cv-card {
     margin-bottom: 15px;
-    background-color: #fff;
+    background-color: rgba(var(--v-c-primary),.03);
     border: 1px solid transparent;
     border-radius: 4px;
-    /*-webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);*/
-    /*box-shadow: 0 1px 1px rgba(0,0,0,.05);*/
-    /*-moz-box-shadow: 0 1px 1px rgba(0,0,0,.05);*/
-    box-shadow: 0 8px 10px 1px rgba(var(--v-c-on-secondary), .2);
-    -webkit-box-shadow: 0 8px 10px 1px rgba(var(--v-c-on-secondary), .2);
-    -moz-box-shadow: 0 8px 10px 1px rgba(var(--v-c-on-secondary), .2);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
     border-color: #ddd;
     /*background-color: whitesmoke;
     background-color: lightgoldenrodyellow;*/
-    background-color: #F7F7EB;
+
     padding: 14px 5px 0 5px;
     font-size: 12px;
     min-height: 85px;
@@ -2838,8 +2835,169 @@ findImg {
 
 /*************************************** End Card View ********************************/
 
-/****    Map View       */
+/****    List View       */
+/*
+   List view — alternate renderer for AD_CardView. The same toolbar button and
+   GridController state drive both views; AD_Tab.IsListView decides which
+   instance lives in this.vCardView. The list view is rendered into the same
+   .vis-gc-vcard container as the card view; it has no separate panel.
 
+   Layout mode is JS-driven via the .vis-lv-listmode class on .vis-lv-body:
+   - Without the class (default): cards stack vertically, each keeping its
+     multi-row card-template grid — the original card-view appearance. Used
+     when the right tab panel is open so columns don't collide.
+   - With the class: each card collapses to a single horizontal row. The
+     template's inner grid wrappers are forced into a horizontal flex row so
+     each leaf cell takes an equal share of the available width and clips
+     overflowing content with an ellipsis instead of overlapping neighbors.
+*/
+
+.vis-lv-body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.vis-lv-main {
+    flex: 1;
+    width: 100%;
+    overflow: auto;
+    background: #fff;
+    /*padding: 8px 12px;*/
+    box-sizing: border-box;
+}
+
+/* Default (card mode): cards are full-width and stacked vertically. Their
+   inner template grid is preserved as-is. */
+.vis-lv-main .vis-cv-card {
+    width: 100% !important;
+    max-width: 100% !important;
+   
+    float: none !important;
+    box-sizing: border-box;
+}
+
+/* JS-toggled list mode: single horizontal row per card.
+
+   The card template normally lays its cells out via a dynamic
+   .vis-ad-w-p-fg_card-container_R_C_W_I class that uses display:grid with
+   explicit grid-template-columns/rows and per-cell grid-column/grid-row
+   placement (vis-hp-card-FieldGroup_*). For a single-row list, we replace
+   that grid with a horizontal flex row so cells can't be placed on top of
+   each other.
+
+   Visible cells get an equal share of the row (flex: 1 1 0), so a few wide
+   cells stretch to fill empty space instead of leaving large gaps. Content
+   inside each cell is left-aligned. VListView.pruneOverflowingCells
+   measures every cell's natural content width (using the .vis-lv-measuring
+   helper class to override the equal-share rule) and hides whole cells
+   from the right end until each remaining cell's content fits its share. */
+
+.vis-lv-listmode .vis-lv-main .vis-cv-card {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 36px;
+    padding: 4px 32px 4px 12px;
+    margin-bottom: 1px !important;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* `.vis-ad-w-p-card_root_common` is created by VCard but nothing is ever
+   appended to it (the field-group containers are appended to the outer card
+   root instead — see vcardview.js setHeader). With flex: 1 1 auto it would
+   claim a full grow share of the row and push the real content sideways.
+   Hide it whenever it's empty. The :empty selector still lets it render
+   normally if a future change starts populating it. */
+.vis-lv-listmode .vis-lv-main .vis-cv-card .vis-ad-w-p-card_root_common:empty {
+    display: none !important;
+}
+
+.vis-lv-listmode .vis-lv-main .vis-cv-card [class*="vis-ad-w-p-fg_card-container_"] {
+    display: flex !important;
+    flex: 1 1 auto;
+    flex-direction: row !important;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    grid-auto-flow: row !important;
+    padding: 0 !important;
+    gap: 12px;
+    justify-content: flex-start !important;
+}
+
+/* Reset any per-cell grid placement carried over from template styles. */
+.vis-lv-listmode .vis-lv-main .vis-cv-card [class*="vis-ad-w-p-fg_card-container_"] > * {
+    grid-column: auto !important;
+    grid-row: auto !important;
+}
+
+/* Visible leaf cells share the row's available width equally and align
+   their content to the start (left). Specificity-bumped + !important to
+   beat the template's per-cell dynamic styles. */
+.vis-lv-listmode .vis-lv-main .vis-cv-card .vis-w-p-card-data-f {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 4px 8px !important;
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+/* Cells inside a card carrying .vis-lv-measuring temporarily revert to
+   their natural content width so JS can read offsetWidth. The class lives
+   only between adjacent style writes inside pruneCard, so users never see
+   the natural-width state. */
+.vis-lv-listmode .vis-lv-main .vis-cv-card.vis-lv-measuring .vis-w-p-card-data-f {
+    flex: 0 0 auto !important;
+    width: auto !important;
+}
+
+/* Keep every line of text on a single line so each cell measures its real
+   content width; the JS prune pass hides whole cells when they can't fit. */
+.vis-lv-listmode .vis-lv-main .vis-cv-card p,
+.vis-lv-listmode .vis-lv-main .vis-cv-card span,
+.vis-lv-listmode .vis-lv-main .vis-cv-card label,
+.vis-lv-listmode .vis-lv-main .vis-cv-card h3 {
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* Pin the edit pencil to the right edge of the row regardless of cell flow. */
+.vis-lv-listmode .vis-lv-main .vis-cv-card .vis-cv-card-edit {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.vis-lv-main .vis-cv-card {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    border-left: 4px solid transparent;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 0;
+   
+}
+
+.vis-lv-main .vis-cv-card-selected {
+    box-shadow: none;
+    border-left: 4px solid rgba(var(--v-c-primary),1);
+}
+/****    Map View       */
 .vis-gc-vmap {
     padding: 0;
     margin: 0 auto;
