@@ -292,7 +292,7 @@
         var queryInfo = null;
         var code = null;
         var height = VIS.Env.getScreenHeight() - 50;
-        var width = $(window).width();
+        var width = $(window).width() - 54;
         var self = this;
         cFrame = new VIS.CFrame();
         cFrame.setName(VIS.Msg.getMsg("Report"));
