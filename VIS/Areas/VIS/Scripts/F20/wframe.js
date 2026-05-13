@@ -1147,8 +1147,13 @@
             // $root.append($("<tr class='vis-height-auto'>").append(r1Col1)).append($("<tr class='vis-height-full'>").append(r2Col1).append(r2Col2).append(r2Col3));
         };
 
-        this.setPageItem = function (item) {
-            $ulPages.append(item);
+        this.setPageItem = function (item, pre) {
+            if (pre) {
+                $ulPages.prepend(item);
+            }
+            else {
+                $ulPages.append(item);
+            }
         };
 
         this.setComboPage = function () {

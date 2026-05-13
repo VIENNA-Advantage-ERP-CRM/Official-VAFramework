@@ -783,10 +783,11 @@
 
             if (btnLot != null) {
                 btnLot.on("click", function () {
+                    setBusy(true);
+                    btnLot.prop("disabled", true);
                     $.ajax({
                         url: VIS.Application.contextUrl + "PAttributes/CreateLot",
                         dataType: "json",
-                        async: false,
                         data: {
                             mAttributeSetInstanceId: mAttributeSetInstanceId,
                             mProductId: mProductId
@@ -794,6 +795,10 @@
                         success: function (data) {
                             returnValue = data.result;
                             lotChange(returnValue);
+                        },
+                        complete: function () {
+                            btnLot.prop("disabled", false);
+                            setBusy(false);
                         }
                     });
                 });
@@ -801,10 +806,11 @@
 
             if (btnSerNo != null) {
                 btnSerNo.on("click", function () {
+                    setBusy(true);
+                    btnSerNo.prop("disabled", true);
                     $.ajax({
                         url: VIS.Application.contextUrl + "PAttributes/GetSerNo",
                         dataType: "json",
-                        async: false,
                         data: {
                             mAttributeSetInstanceId: mAttributeSetInstanceId,
                             mProductId: mProductId
@@ -812,6 +818,10 @@
                         success: function (data) {
                             returnValue = data.result;
                             txtSerNo.val(returnValue);
+                        },
+                        complete: function () {
+                            btnSerNo.prop("disabled", false);
+                            setBusy(false);
                         }
                     });
                 });

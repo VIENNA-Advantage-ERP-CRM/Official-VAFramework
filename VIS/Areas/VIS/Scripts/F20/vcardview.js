@@ -300,6 +300,14 @@
             //}
             //else
             //    body.width(body.parent().width() * (grpCtrlC));
+            //check fixed height
+
+            var prnt = this.getRoot().parent();
+            prnt.css('height', '100%'); //reset height
+            //card view
+            if (!this.isFixedBody) {
+                prnt.height(this.getBody()[0].scrollHeight + 52);
+            }
             this.navigate();
         };
 
@@ -954,14 +962,7 @@
             $this.calculateWidth(width);
             $this.SyncScroll();
 
-            //check fixed height
-
-            var prnt = $this.getRoot().parent();
-            prnt.css('height', '100%'); //reset height
-            //card view
-            if (!$this.isFixedBody) {
-                prnt.height($this.getBody()[0].scrollHeight+52);
-            }
+          
 
             $this.aPanel.setBusy(false);
         }, 10);
@@ -1122,7 +1123,7 @@
         //createview
 
         var $root = $('<div class="vis-ad-w-p-card_root_common">');
-        root.append($root);
+        //root.append($root);
 
         if (!this.fieldStyles["vis-ad-w-p-card-Custom_" + windowNo])
             this.fieldStyles["vis-ad-w-p-card-Custom_" + windowNo] = {};
@@ -1140,7 +1141,7 @@
             this.rootCustomStyle = this.headerUISettings("", headerPadding);
             this.fieldStyles["root_" + windowNo]['headerUISettings'] = this.rootCustomStyle;
         }
-        $root.addClass(this.rootCustomStyle);
+        root.addClass(this.rootCustomStyle);
 
 
 
@@ -2200,7 +2201,7 @@
      */
     VCard.prototype.headerUISettings = function (backcolor, padding) {
         var dynamicClassName = "vis-ad-w-p-card_root_" + this.windowNo;
-        this.dynamicStyle.push(" ." + dynamicClassName + " {display:flex;overflow:auto;");
+        this.dynamicStyle.push(" ." + dynamicClassName + " {overflow:auto;");
         this.dynamicStyle.push("padding:" + padding + ";" + backcolor);
         this.dynamicStyle.push("} ");
         return dynamicClassName;
@@ -2316,5 +2317,6 @@
     };
 
     VIS.VCardView = VCardView;
+    VIS.VCard = VCard;
 
 }(VIS, jQuery));

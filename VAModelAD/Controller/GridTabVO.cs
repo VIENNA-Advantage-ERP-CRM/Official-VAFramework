@@ -186,6 +186,8 @@ namespace VAdvantage.Controller
         //single view column layout
         public Int16 DetailViewColCount = 4;
 
+        public bool IsListView = false;
+
         public string SelectSQL
         {
             get;
@@ -580,7 +582,8 @@ namespace VAdvantage.Controller
                 else if (isAuto == "N")
                     vo.IsAutoNewRecord = false;
                 vo.HideFieldGroupFrom = Convert.ToInt16(Util.GetValueOfInt(dr["HideFieldGroupFrom"]));
-                vo.DetailViewColCount =  Convert.ToInt16(Util.GetValueOfInt(dr["SingleViewLayout"])); //todo get from DB
+                vo.DetailViewColCount = Convert.ToInt16(Util.GetValueOfInt(dr["SingleViewLayout"])); 
+                vo.IsListView = Utility.Util.GetValueOfString(dr["IsShowCardsAsListView"]).Equals("Y");
             }
             catch (System.Exception ex)
             {
@@ -1046,6 +1049,7 @@ namespace VAdvantage.Controller
             clone.IsHideRecordNav = IsHideRecordNav;
             clone.IsShowFilterPanel = IsShowFilterPanel;
             clone.DetailViewColCount = DetailViewColCount;
+            clone.IsListView = IsListView;
 
             clone.fields = new List<GridFieldVO>();
             for (int i = 0; i < fields.Count; i++)
