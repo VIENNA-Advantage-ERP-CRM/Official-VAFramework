@@ -1955,6 +1955,99 @@
 
 
 
+    var $menuItems = $('.vis-NewSideMenu-Item[data-folder]');
+
+    $('#vis_divTree').on('click', function (e) {
+        var $target = $(e.target);
+        if (!$target.hasClass("VIS-nm-opt-link")) {
+            $target = $target.closest(".VIS-nm-opt-link");
+        }
+        if (!$target || $target.length === 0) return;
+
+        var folderId = $target.attr("data-value");
+        $menuItems.hide();
+        $menuItems.filter(function () {
+            return $(this).attr('data-folder') === folderId;
+        }).show();
+    });
+
+    $(document).on("click", ".vis-NewSideMenu-Item", function (e) {
+        if ($(e.target).is('i')) {
+            VIS.FavouriteHelper.addDelFav($(e.target));
+            return;
+        }
+        var $el = $(e.target).closest('.vis-NewSideMenu-Item');
+        VIS.viewManager.startAction($el.data('action'), $el.data('actionid')); // same as startSideMenuAction
+    });
+
+
+    function isRtlMode() {
+        return ($("html").attr("dir") || "").toLowerCase() === "rtl";
+    }
+
+    function setSideMenuArrow($btn, isOpen) {
+        var isRtl = isRtlMode();
+
+        if (isOpen) {
+            $btn.html(isRtl ? "&#8250;" : "&#8249;");
+        } else {
+            $btn.html(isRtl ? "&#8249;" : "&#8250;");
+        }
+    }
+
+    $(document).on("click", ".vis-NewSideMenu-Close", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var $btn = $(this);
+        var $container = $btn.closest(".vis-NewSideMenu-Container");
+        var isOpen = $container.hasClass("vis-NewSideMenu-Expanded");
+
+        if (isOpen) {
+            $container
+                .removeClass("vis-NewSideMenu-Expanded vis-NewSideMenu-HoverOpen")
+                .addClass("vis-NewSideMenu-Collapsed")
+                .css("position", "relative");
+
+            setSideMenuArrow($btn, false);
+        } else {
+            $container
+                .removeClass("vis-NewSideMenu-Collapsed vis-NewSideMenu-HoverOpen")
+                .addClass("vis-NewSideMenu-Expanded")
+                .css("position", "absolute");
+
+            setSideMenuArrow($btn, true);
+        }
+    });
+
+    $(document).on("mouseleave", ".vis-NewSideMenu-Container", function () {
+        var $container = $(this);
+        var $btn = $container.find(".vis-NewSideMenu-Close");
+
+        if ($container.hasClass("vis-NewSideMenu-Collapsed")) {
+            $container
+                .removeClass("vis-NewSideMenu-HoverOpen")
+                .css("position", "relative");
+
+            setSideMenuArrow($btn, false);
+        }
+    });
+
+    $(document).on("mouseenter", ".vis-NewSideMenu-Container", function () {
+        var $container = $(this);
+        var $btn = $container.find(".vis-NewSideMenu-Close");
+
+        if ($container.hasClass("vis-NewSideMenu-Collapsed")) {
+            $container
+                .addClass("vis-NewSideMenu-HoverOpen")
+                .css("position", "absolute");
+
+            setSideMenuArrow($btn, true);
+        }
+    });
+
+
+
 
 })(VIS);
 
