@@ -707,9 +707,10 @@ nav.vis-nav-horizontal-scroll {
     width: 54px;
     min-width: 54px;
     height: 100%;
-    background-color: #f9f9f9;
+    background-color: transparent;
     box-sizing: border-box;
     padding: 4px 10px 10px;
+    border-radius: 0;
     z-index: 100;
     display: flex;
     flex-direction: column;
@@ -744,10 +745,13 @@ nav.vis-nav-horizontal-scroll {
         .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded,
         .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen {
             position: absolute !important;
-            width: 342px;
-            min-width: 342px;
+            width: 240px;
+            min-width: 240px;
+            background-color: #ffffff;
+            border-radius: 8px 8px 0 0;
+            padding: 18px 20px 16px;
             overflow-y: auto;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
         }
 
 
@@ -956,7 +960,7 @@ nav.vis-nav-horizontal-scroll {
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Text {
     opacity: 1;
     visibility: visible;
-    max-width: 240px;
+    max-width: 15ch;
     display: block;
 }
 
@@ -991,11 +995,14 @@ nav.vis-nav-horizontal-scroll {
     .vis-NewSideMenu-Container.vis-NewSideMenu-Expanded,
     .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded {
         position: absolute !important;
-        width: min(85vw, 342px);
-        min-width: min(85vw, 342px);
-        max-width: 342px;
+        width: min(85vw, 240px);
+        min-width: min(85vw, 240px);
+        max-width: 240px;
+        background-color: #ffffff;
+        border-radius: 8px 8px 0 0;
+        padding: 18px 20px 16px;
         overflow-y: auto;
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
     }
 
     .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed {
