@@ -17,6 +17,7 @@
         var $root = $('<div class="vis-group-assign-content" style="height:100%">');
         var $workflowWidget;
         var $wFSearchshow_ID;
+        var $wFShowDetails_ID;
         var $fromDate_ID;
         var $toDate_ID;
         var $flipCard_ID;
@@ -69,6 +70,8 @@
         /* Initialize the form design*/
         this.Initalize = function () {
             createWidget();
+            getControls();
+            events();
             createBusyIndicator();
             showBusy(true);
             getworkflowWidget(true, true);
@@ -84,6 +87,833 @@
             $btnSearch = $fstMainDiv_ID.find('#btnWorkflowSearch' + $self.AD_UserHomeWidgetID);
             $addDetails_ID = $fstMainDiv_ID.find("#VIS_AddDetails_ID" + $self.AD_UserHomeWidgetID);
             divDetail = $fstMainDiv_ID.find("#workflowActivityDetails" + $self.AD_UserHomeWidgetID);
+        };
+        function openDummyModel() {
+            var modalId = 'WFDummyModel' + $self.AD_UserHomeWidgetID;
+            var $modal = $('#' + modalId);
+            var isRTL = VIS.Application.isRTL || $('html').attr('dir') == 'rtl';
+            var modalDir = isRTL ? 'rtl' : 'ltr';
+
+            function syncDummyWindowSelect() {
+                var $popupSelect = $('#' + modalId + 'WindowSelect');
+                if ($popupSelect.length == 0 || !$cmbWindows || $cmbWindows.length == 0) {
+                    return;
+                }
+
+                $popupSelect.empty();
+                $cmbWindows.find('option').each(function () {
+                    $popupSelect.append($(this).clone());
+                });
+                $popupSelect.val($cmbWindows.val());
+            };
+
+            function syncDummyActivityList() {
+                var $activityContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
+                var $dummyList = $modal.find('.vis-wf-dummy-list');
+
+                if ($dummyList.length == 0) {
+                    return;
+                }
+
+                $dummyList.empty();
+                if ($activityContainers.length == 0) {
+                    $dummyList.append('<div class="vis-wf-dummy-group">Activities - 0</div><div class="vis-wf-dummy-empty">No activities found</div>');
+                    return;
+                }
+
+                $dummyList.append('<div class="vis-wf-dummy-group">Activities - ' + $activityContainers.length + '</div>');
+                $activityContainers.each(function (index) {
+                    var activityTitle = $(this).find('.vis-w-wfActivity-selectchk').text();
+                    activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : 'Workflow Activity';
+                    $dummyList.append(
+                        '<div class="vis-wf-dummy-card' + (index == 0 ? ' vis-wf-dummy-card-selected' : '') + '" role="button" tabindex="0">'
+                        + '  <div class="vis-wf-dummy-card-top">'
+                        + '    <span class="vis-wf-dummy-pill vis-wf-dummy-pill-info"><span class="vis-wf-dummy-dot"></span>Workflow</span>'
+                        + '    <span class="vis-wf-dummy-id">WF-' + (index + 1) + '</span>'
+                        + '  </div>'
+                        + '  <div class="vis-wf-dummy-card-title">' + VIS.Utility.encodeText(activityTitle) + '</div>'
+                        + '  <div class="vis-wf-dummy-card-meta">'
+                        + '    <span class="vis-wf-dummy-avatar" style="background:linear-gradient(135deg,#06b6d4,#0083DA);">WF</span>'
+                        + '    <span>Pending item</span>'
+                        + '    <span>Not mapped yet</span>'
+                        + '  </div>'
+                        + '</div>'
+                    );
+                });
+            };
+
+            function syncDummyPendingCount() {
+                var $pendingCount = $('#' + modalId + 'PendingCount');
+                if ($pendingCount.length == 0) {
+                    return;
+                }
+                $pendingCount.text($modal.find('.vis-wf-dummy-card').length + ' pending');
+            };
+
+            function syncDummyDetailTitle(index) {
+                var activityTitle = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-wfActivity-selectchk').text();
+                activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : 'Workflow Activity';
+                $modal.find('.vis-wf-dummy-record-title').text(activityTitle);
+            };
+
+            function syncDummyCardTitles() {
+                var $activityContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
+                $modal.find('.vis-wf-dummy-card-title').each(function (index) {
+                    var activityTitle = $activityContainers.eq(index).find('.vis-w-wfActivity-selectchk').text();
+                    if (activityTitle && activityTitle.trim().length > 0) {
+                        $(this).text(activityTitle.trim());
+                    }
+                });
+            };
+
+            if ($modal.length === 0) {
+                $modal = $(`
+                    <div id="${modalId}" class="vis-wf-dummy-modal" dir="${modalDir}" style="display:none;">
+                        <style>
+                            #${modalId}.vis-wf-dummy-modal {
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                z-index: 99999;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 16px;
+                                background: rgba(0,0,0,0.35);
+                                font-family: Roboto, Arial, sans-serif;
+                                font-size: 14px;
+                                color: #141414;
+                            }
+                            #${modalId} .vis-wf-dummy-shell {
+                                width: min(1320px, calc(100vw - 32px));
+                                max-width: calc(100% - 12px);
+                                height: min(820px, calc(100vh - 32px));
+                                max-height: calc(100% - 12px);
+                                display: flex;
+                                flex-direction: column;
+                                overflow: hidden;
+                                background: #FFFFFF;
+                                border: 2px solid #FFFFFF;
+                                border-radius: 14px;
+                                box-shadow: 0 18px 42px rgba(15,61,97,0.22);
+                            }
+                            #${modalId} .vis-wf-dummy-titlebar {
+                                min-height: 56px;
+                                display: flex;
+                                align-items: center;
+                                padding: 0 18px;
+                                background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.58));
+                                border-bottom: 1px solid #1F83FF;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-title {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                min-width: 0;
+                                font-size: 16px;
+                                color: #000000;
+                            }
+                            #${modalId} .vis-wf-dummy-title strong {
+                                font-weight: 700;
+                            }
+                            #${modalId} .vis-wf-dummy-module-icon {
+                                width: 28px;
+                                height: 28px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                border-radius: 8px;
+                                color: #0083DA;
+                                background: #DFF1FF;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-meta {
+                                margin-left: 12px;
+                                padding-left: 12px;
+                                border-left: 1px solid #E4EDF4;
+                                font-size: 13px;
+                                color: #5F7283;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+                            #${modalId} .vis-wf-dummy-main {
+                                flex: 1;
+                                display: flex;
+                                min-height: 0;
+                                background: #FFFFFF;
+                            }
+                            #${modalId} .vis-wf-dummy-master {
+                                width: 330px;
+                                flex-shrink: 0;
+                                display: flex;
+                                flex-direction: column;
+                                border-right: 1px solid #E4EDF4;
+                                background: #FBFDFF;
+                            }
+                            #${modalId} .vis-wf-dummy-tools {
+                                padding: 12px 14px;
+                                border-bottom: 1px solid #E4EDF4;
+                                background: #FFFFFF;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-search {
+                                height: 38px;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                padding: 0 12px;
+                                margin-bottom: 10px;
+                                border: 1px solid #E4EDF4;
+                                border-radius: 999px;
+                                color: #5F7283;
+                                background: #FFFFFF;
+                                box-shadow: 0 6px 14px rgba(16,47,74,0.06);
+                            }
+                            #${modalId} .vis-wf-dummy-search input {
+                                flex: 1;
+                                min-width: 0;
+                                border: 0;
+                                outline: 0;
+                                background: transparent;
+                                font-family: Roboto, Arial, sans-serif;
+                                color: #9F9F9F;
+                                font-size: 12px;
+                            }
+                            #${modalId} .vis-wf-dummy-search input::placeholder {
+                                color: #9F9F9F;
+                            }
+                            #${modalId} .vis-wf-dummy-filters {
+                                position: relative;
+                            }
+                            #${modalId} .vis-wf-dummy-window-select {
+                                width: 100%;
+                                height: 28px;
+                                padding: 0 30px 0 10px;
+                                border: 1px solid #E4EDF4;
+                                border-radius: 999px;
+                                background: #FFFFFF;
+                                color: #5F7283;
+                                font-size: 12px;
+                                font-weight: 500;
+                                outline: 0;
+                                cursor: pointer;
+                                box-shadow: 0 6px 14px rgba(16,47,74,0.04);
+                                appearance: auto;
+                                -webkit-appearance: menulist;
+                            }
+                            #${modalId} .vis-wf-dummy-list {
+                                flex: 1;
+                                overflow: auto;
+                            }
+                            #${modalId} .vis-wf-dummy-group {
+                                padding: 12px 16px 6px;
+                                color: #748494;
+                                font-size: 11px;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                letter-spacing: 0.06em;
+                            }
+                            #${modalId} .vis-wf-dummy-card {
+                                padding: 14px 16px;
+                                border-bottom: 1px solid #EBEBEB;
+                                cursor: pointer;
+                                background: #FFFFFF;
+                            }
+                            #${modalId} .vis-wf-dummy-card:focus {
+                                outline: 2px solid #BFE4FF;
+                                outline-offset: -2px;
+                            }
+                            #${modalId} .vis-wf-dummy-card-selected {
+                                background: linear-gradient(109deg, #EAF8FF 0%, #CAEDFF 100%);
+                                box-shadow: inset 4px 0 0 #0083DA, 0 12px 24px rgba(31,131,255,0.10);
+                            }
+                            #${modalId} .vis-wf-dummy-empty {
+                                padding: 16px;
+                                color: #748494;
+                                font-size: 13px;
+                            }
+                            #${modalId} .vis-wf-dummy-card-top {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                margin-bottom: 7px;
+                            }
+                            #${modalId} .vis-wf-dummy-pill {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 5px;
+                                padding: 3px 8px;
+                                border-radius: 999px;
+                                font-size: 10.5px;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                letter-spacing: 0.04em;
+                            }
+                            #${modalId} .vis-wf-dummy-dot {
+                                width: 5px;
+                                height: 5px;
+                                border-radius: 50%;
+                                background: currentColor;
+                            }
+                            #${modalId} .vis-wf-dummy-pill-info {
+                                background: #DFF1FF;
+                                color: #106AB0;
+                            }
+                            #${modalId} .vis-wf-dummy-pill-violet {
+                                background: #E9E5FF;
+                                color: #5F4AA6;
+                            }
+                            #${modalId} .vis-wf-dummy-pill-warning {
+                                background: #FFE9C2;
+                                color: #8B5A00;
+                            }
+                            #${modalId} .vis-wf-dummy-pill-success {
+                                background: #CCEFDD;
+                                color: #0C5D38;
+                            }
+                            #${modalId} .vis-wf-dummy-id {
+                                margin-left: auto;
+                                color: #748494;
+                                font-size: 11px;
+                            }
+                            #${modalId} .vis-wf-dummy-card-title {
+                                color: #102C3F;
+                                font-size: 13.5px;
+                                font-weight: 700;
+                                line-height: 1.35;
+                            }
+                            #${modalId} .vis-wf-dummy-card-meta {
+                                display: flex;
+                                align-items: center;
+                                gap: 7px;
+                                margin-top: 7px;
+                                color: #748494;
+                                font-size: 11.5px;
+                            }
+                            #${modalId} .vis-wf-dummy-avatar {
+                                width: 18px;
+                                height: 18px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                border-radius: 50%;
+                                color: #FFFFFF;
+                                font-size: 9px;
+                                font-weight: 700;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-time {
+                                display: block;
+                                margin-top: 10px;
+                                text-align: right;
+                                color: #9F9F9F;
+                                font-size: 11px;
+                            }
+                            #${modalId} .vis-wf-dummy-detail {
+                                flex: 1;
+                                min-width: 0;
+                                display: flex;
+                                flex-direction: column;
+                                background: rgba(255,255,255,0.94);
+                            }
+                            #${modalId} .vis-wf-dummy-detail-header {
+                                min-height: 56px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                gap: 14px;
+                                padding: 0 18px;
+                                border-bottom: 1px solid #E4EDF4;
+                                background: #FFFFFF;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-detail-left {
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                min-width: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-record-title {
+                                color: #141414;
+                                font-size: 16px;
+                                font-weight: 700;
+                                white-space: nowrap;
+                            }
+                            #${modalId} .vis-wf-dummy-status {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 6px;
+                                height: 24px;
+                                padding: 0 10px;
+                                border-radius: 999px;
+                                background: #FFE9C2;
+                                color: #8B5A00;
+                                font-size: 11.5px;
+                                font-weight: 700;
+                                white-space: nowrap;
+                            }
+                            #${modalId} .vis-wf-dummy-detail-right {
+                                display: flex;
+                                align-items: center;
+                                gap: 6px;
+                                min-width: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-submitted {
+                                color: #5F7283;
+                                font-size: 12px;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+                            #${modalId} .vis-wf-dummy-icon-btn {
+                                width: 32px;
+                                height: 32px;
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 0;
+                                border: 1px solid transparent;
+                                border-radius: 8px;
+                                background: transparent;
+                                color: #141414;
+                                cursor: pointer;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-icon-btn:hover {
+                                background: #E5F3FB;
+                            }
+                            #${modalId} .vis-wf-dummy-body {
+                                flex: 1;
+                                overflow: auto;
+                                padding: 18px;
+                                background: #FFFFFF;
+                            }
+                            #${modalId} .vis-wf-dummy-section {
+                                margin-bottom: 18px;
+                            }
+                            #${modalId} .vis-wf-dummy-section-title {
+                                margin: 0 0 10px;
+                                color: #748494;
+                                font-size: 11px;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                letter-spacing: 0.07em;
+                            }
+                            #${modalId} .vis-wf-dummy-kv {
+                                overflow: hidden;
+                                border: 1px solid #E4EDF4;
+                                border-radius: 10px;
+                            }
+                            #${modalId} .vis-wf-dummy-kv-row {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                gap: 16px;
+                                padding: 9px 14px;
+                                border-bottom: 1px solid #EDF2F6;
+                                background: #FFFFFF;
+                            }
+                            #${modalId} .vis-wf-dummy-kv-row:last-child {
+                                border-bottom: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-kv-key {
+                                color: #5F7283;
+                                font-size: 12.5px;
+                            }
+                            #${modalId} .vis-wf-dummy-kv-val {
+                                color: #102C3F;
+                                font-size: 13px;
+                                font-weight: 700;
+                                text-align: right;
+                            }
+                            #${modalId} .vis-wf-dummy-description {
+                                padding: 12px 14px;
+                                border: 1px solid #EDF2F6;
+                                border-radius: 10px;
+                                background: #FAFCFE;
+                                color: #102C3F;
+                                font-size: 13px;
+                                line-height: 1.5;
+                            }
+                            #${modalId} .vis-wf-dummy-requester {
+                                display: flex;
+                                align-items: center;
+                                gap: 14px;
+                                padding: 12px 14px;
+                                border: 1px solid #E4EDF4;
+                                border-radius: 10px;
+                                background: #FAFCFE;
+                            }
+                            #${modalId} .vis-wf-dummy-requester-avatar {
+                                width: 44px;
+                                height: 44px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                border-radius: 50%;
+                                background: linear-gradient(135deg,#06b6d4,#0083DA);
+                                color: #FFFFFF;
+                                font-size: 15px;
+                                font-weight: 700;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-requester-name {
+                                flex: 1;
+                                min-width: 0;
+                                color: #102C3F;
+                                font-size: 14.5px;
+                                font-weight: 700;
+                            }
+                            #${modalId} .vis-wf-dummy-requester-extra {
+                                text-align: right;
+                                color: #748494;
+                                font-size: 12px;
+                                line-height: 1.35;
+                            }
+                            #${modalId} .vis-wf-dummy-requester-extra strong {
+                                color: #102C3F;
+                                font-weight: 700;
+                            }
+                            #${modalId} .vis-wf-dummy-footer {
+                                padding: 14px 18px;
+                                border-top: 1px solid #E4EDF4;
+                                background: #FFFFFF;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-footer-row {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                            }
+                            #${modalId} .vis-wf-dummy-note {
+                                flex: 1;
+                                height: 40px;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                min-width: 180px;
+                                padding: 0 14px;
+                                border: 1px solid #E4EDF4;
+                                border-radius: 10px;
+                                background: #FBFDFF;
+                                color: #9F9F9F;
+                                font-size: 13px;
+                            }
+                            #${modalId} .vis-wf-dummy-actions {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-action {
+                                height: 40px;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 7px;
+                                padding: 0 16px;
+                                border-radius: 999px;
+                                font-size: 13.5px;
+                                font-weight: 700;
+                                font-family: Roboto, Arial, sans-serif;
+                                cursor: pointer;
+                            }
+                            #${modalId} .vis-wf-dummy-action-primary {
+                                border: 1px solid #0083DA;
+                                background: #0083DA;
+                                color: #FFFFFF;
+                                box-shadow: 0 6px 14px rgba(0,131,218,0.25);
+                            }
+                            #${modalId} .vis-wf-dummy-action-secondary {
+                                border: 1px solid #0083DA;
+                                background: #FFFFFF;
+                                color: #0083DA;
+                            }
+                            #${modalId} .vis-wf-dummy-action-danger {
+                                border: 1px solid #F4C5C5;
+                                background: #FFFFFF;
+                                color: #8F2D2D;
+                            }
+                            #${modalId} .vis-wf-dummy-key {
+                                padding: 1px 5px;
+                                border-radius: 4px;
+                                background: rgba(255,255,255,0.24);
+                                font-size: 10.5px;
+                                font-weight: 700;
+                            }
+                            #${modalId} .vis-wf-dummy-action-secondary .vis-wf-dummy-key {
+                                background: #DFF1FF;
+                                color: #106AB0;
+                            }
+                            #${modalId} .vis-wf-dummy-action-danger .vis-wf-dummy-key {
+                                background: #FAD7D7;
+                                color: #8F2D2D;
+                            }
+                            #${modalId}[dir="rtl"] {
+                                direction: rtl;
+                                text-align: right;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-main {
+                                flex-direction: row;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-master {
+                                border-right: 0;
+                                border-left: 1px solid #E4EDF4;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-meta {
+                                margin-left: 0;
+                                margin-right: 12px;
+                                padding-left: 0;
+                                padding-right: 12px;
+                                border-left: 0;
+                                border-right: 1px solid #E4EDF4;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-id {
+                                margin-left: 0;
+                                margin-right: auto;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-time {
+                                text-align: left;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-kv-val,
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-requester-extra {
+                                text-align: left;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-search input {
+                                text-align: right;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-window-select {
+                                padding: 0 10px 0 30px;
+                            }
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-action-secondary .vis-arrow-right,
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-action-secondary .fa-arrow-right {
+                                transform: scaleX(-1);
+                            }
+                            @media (max-width: 900px) {
+                                #${modalId} .vis-wf-dummy-shell {
+                                    width: calc(100% - 8px);
+                                    height: calc(100% - 8px);
+                                }
+                                #${modalId} .vis-wf-dummy-main {
+                                    flex-direction: column;
+                                    overflow: hidden;
+                                }
+                                #${modalId} .vis-wf-dummy-master {
+                                    width: 100%;
+                                    height: 42%;
+                                    min-height: 240px;
+                                    border-right: 0;
+                                    border-left: 0;
+                                    border-bottom: 1px solid #E4EDF4;
+                                }
+                                #${modalId} .vis-wf-dummy-detail {
+                                    min-height: 0;
+                                }
+                                #${modalId} .vis-wf-dummy-titlebar {
+                                    padding: 0 12px;
+                                }
+                                #${modalId} .vis-wf-dummy-title {
+                                    width: 100%;
+                                }
+                                #${modalId} .vis-wf-dummy-meta {
+                                    margin-left: auto;
+                                    padding-left: 10px;
+                                }
+                                #${modalId} .vis-wf-dummy-detail-header {
+                                    align-items: flex-start;
+                                    flex-direction: column;
+                                    padding: 10px 14px;
+                                    gap: 8px;
+                                }
+                                #${modalId} .vis-wf-dummy-detail-left,
+                                #${modalId} .vis-wf-dummy-detail-right {
+                                    width: 100%;
+                                    justify-content: space-between;
+                                }
+                                #${modalId} .vis-wf-dummy-submitted {
+                                    flex: 1;
+                                }
+                                #${modalId} .vis-wf-dummy-footer-row {
+                                    align-items: stretch;
+                                    flex-direction: column;
+                                }
+                                #${modalId} .vis-wf-dummy-actions {
+                                    justify-content: flex-end;
+                                    flex-wrap: wrap;
+                                }
+                                #${modalId}[dir="rtl"] .vis-wf-dummy-main {
+                                    flex-direction: column;
+                                }
+                                #${modalId}[dir="rtl"] .vis-wf-dummy-master {
+                                    border-left: 0;
+                                    border-bottom: 1px solid #E4EDF4;
+                                }
+                                #${modalId}[dir="rtl"] .vis-wf-dummy-meta {
+                                    margin-right: auto;
+                                    padding-right: 10px;
+                                    border-right: 1px solid #E4EDF4;
+                                }
+                            }
+                            @media (max-width: 560px) {
+                                #${modalId}.vis-wf-dummy-modal {
+                                    padding: 8px;
+                                }
+                                #${modalId} .vis-wf-dummy-shell {
+                                    width: 100%;
+                                    height: 100%;
+                                    max-width: 100%;
+                                    max-height: 100%;
+                                    border-radius: 10px;
+                                }
+                                #${modalId} .vis-wf-dummy-title {
+                                    gap: 8px;
+                                }
+                                #${modalId} .vis-wf-dummy-meta {
+                                    font-size: 12px;
+                                }
+                                #${modalId} .vis-wf-dummy-master {
+                                    height: 46%;
+                                    min-height: 250px;
+                                }
+                                #${modalId} .vis-wf-dummy-tools {
+                                    padding: 10px;
+                                }
+                                #${modalId} .vis-wf-dummy-body {
+                                    padding: 12px;
+                                }
+                                #${modalId} .vis-wf-dummy-kv-row,
+                                #${modalId} .vis-wf-dummy-requester {
+                                    align-items: flex-start;
+                                    flex-direction: column;
+                                    gap: 6px;
+                                }
+                                #${modalId} .vis-wf-dummy-kv-val,
+                                #${modalId} .vis-wf-dummy-requester-extra {
+                                    text-align: left;
+                                }
+                                #${modalId}[dir="rtl"] .vis-wf-dummy-kv-val,
+                                #${modalId}[dir="rtl"] .vis-wf-dummy-requester-extra {
+                                    text-align: right;
+                                }
+                                #${modalId} .vis-wf-dummy-footer {
+                                    padding: 10px;
+                                }
+                                #${modalId} .vis-wf-dummy-action {
+                                    flex: 1;
+                                    justify-content: center;
+                                    min-width: 0;
+                                    padding: 0 10px;
+                                }
+                            }
+                        </style>
+                        <div class="vis-wf-dummy-shell" role="dialog" aria-modal="true" aria-label="Approvals preview">
+                            <div class="vis-wf-dummy-titlebar">
+                                <div class="vis-wf-dummy-title">
+                                    <span class="vis-wf-dummy-module-icon"><i class="vis vis-info"></i></span>
+                                    <span><strong>Approvals</strong></span>
+                                    <span id="${modalId}PendingCount" class="vis-wf-dummy-meta"></span>
+                                </div>
+                            </div>
+                            <div class="vis-wf-dummy-main">
+                                <aside class="vis-wf-dummy-master">
+                                    <div class="vis-wf-dummy-tools">
+                                        <div class="vis-wf-dummy-search">
+                                            <i class="fa fa-search" aria-hidden="true"></i>
+                                            <input type="text" placeholder="Search by requester, type, ID...">
+                                        </div>
+                                        <div class="vis-wf-dummy-filters">
+                                            <select id="${modalId}WindowSelect" class="vis-wf-dummy-window-select vis-custom-select vis-selectworkflow-fontsize"></select>
+                                        </div>
+                                    </div>
+                                    <div class="vis-wf-dummy-list"></div>
+                                </aside>
+                                <section class="vis-wf-dummy-detail">
+                                    <div class="vis-wf-dummy-detail-header">
+                                        <div class="vis-wf-dummy-detail-left">
+                                            <div class="vis-wf-dummy-record-title">NewOrder</div>
+                                            <span class="vis-wf-dummy-status"><span class="vis-wf-dummy-dot"></span>Awaiting your approval</span>
+                                        </div>
+                                        <div class="vis-wf-dummy-detail-right">
+                                            <span class="vis-wf-dummy-submitted">Submitted Wed, Apr 22 - 3:56 PM</span>
+                                            <button type="button" class="vis-wf-dummy-icon-btn" title="Watch"><i class="vis vis-eye"></i></button>
+                                            <button type="button" id="${modalId}Close" class="vis-wf-dummy-icon-btn" title="Close"><i class="vis vis-close"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="vis-wf-dummy-body">
+                                        <section class="vis-wf-dummy-section">
+                                            <h3 class="vis-wf-dummy-section-title">Transaction details</h3>
+                                            <div class="vis-wf-dummy-kv">
+                                                <div class="vis-wf-dummy-kv-row"><span class="vis-wf-dummy-kv-key">Request from app</span><span class="vis-wf-dummy-kv-val">60641</span></div>
+                                                <div class="vis-wf-dummy-kv-row"><span class="vis-wf-dummy-kv-key">Representative</span><span class="vis-wf-dummy-kv-val">Mostafa Hesham</span></div>
+                                                <div class="vis-wf-dummy-kv-row"><span class="vis-wf-dummy-kv-key">Customer</span><span class="vis-wf-dummy-kv-val">Adwiya Pharmacy</span></div>
+                                            </div>
+                                        </section>
+                                        <section class="vis-wf-dummy-section">
+                                            <h3 class="vis-wf-dummy-section-title">Desc</h3>
+                                            <div class="vis-wf-dummy-description">
+                                                Order request for monthly pharmacy stock replenishment. Items include 12 SKUs across antibiotics, analgesics, and OTC categories. Requested delivery within 3 business days to the main branch. Payment terms: 30 days net, as per existing supplier agreement.
+                                            </div>
+                                        </section>
+                                        <section class="vis-wf-dummy-section">
+                                            <h3 class="vis-wf-dummy-section-title">Requester</h3>
+                                            <div class="vis-wf-dummy-requester">
+                                                <div class="vis-wf-dummy-requester-avatar">AS</div>
+                                                <div class="vis-wf-dummy-requester-name">Aditya Sharma</div>
+                                                <div class="vis-wf-dummy-requester-extra">Annual leave used<br><strong>11 of 25 days</strong></div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="vis-wf-dummy-footer">
+                                        <div class="vis-wf-dummy-footer-row">
+                                            <div class="vis-wf-dummy-note"><i class="vis vis-chat"></i><span>Add an optional note for Aditya...</span></div>
+                                            <div class="vis-wf-dummy-actions">
+                                                <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-secondary"><i class="vis vis-arrow-right"></i>Forward <span class="vis-wf-dummy-key">F</span></button>
+                                                <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-danger"><i class="vis vis-close"></i>Reject <span class="vis-wf-dummy-key">R</span></button>
+                                                <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-primary"><i class="vis vis-check"></i>Approve <span class="vis-wf-dummy-key">A</span></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                $('body').append($modal);
+                $modal.on('click', function (e) {
+                    if ($(e.target).is($modal)) {
+                        $modal.css('display', 'none');
+                    }
+                });
+                $modal.find('#' + modalId + 'Close').on('click', function () {
+                    $modal.css('display', 'none');
+                });
+                $modal.on('click', '.vis-wf-dummy-card', function () {
+                    $modal.find('.vis-wf-dummy-card').removeClass('vis-wf-dummy-card-selected');
+                    $(this).addClass('vis-wf-dummy-card-selected');
+                    syncDummyDetailTitle($(this).index() - 1);
+                });
+                $modal.on('keydown', '.vis-wf-dummy-card', function (e) {
+                    if (e.keyCode == 13 || e.keyCode == 32) {
+                        e.preventDefault();
+                        $(this).trigger('click');
+                    }
+                });
+                $modal.on('change', '#' + modalId + 'WindowSelect', function () {
+                    if ($cmbWindows && $cmbWindows.length > 0) {
+                        $cmbWindows.val($(this).val()).trigger('change');
+                    }
+                });
+            }
+
+            $modal.attr('dir', modalDir);
+            syncDummyWindowSelect();
+            syncDummyActivityList();
+            syncDummyCardTitles();
+            syncDummyPendingCount();
+            syncDummyDetailTitle(0);
+            $modal.css('display', 'flex');
         };
         /* Declare events */
         function events() {
@@ -107,6 +937,12 @@
                     $welcomeScreenFeedsLists.removeClass('VIS-ActiveCls')
                     showToAndFromDate = true;
                 }
+            });
+            $fstMainDiv_ID.off('click', '#WFShowDetails' + $self.AD_UserHomeWidgetID);
+            $fstMainDiv_ID.on('click', '#WFShowDetails' + $self.AD_UserHomeWidgetID, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openDummyModel();
             });
             $hlnkTabDataRef_ID.on('click', $self.refreshWidget);
             //$txtSearch.on('change', searchFunction);
@@ -206,6 +1042,7 @@
                 + '         <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="' + VIS.Msg.getMsg("Requery") + '" class="vis-w-feedicon" style="display:none;"><i class="vis vis-refresh"></i></a>'// style="float: right; margin-top: 0px; cursor: pointer; "
                 //+ '         <span id="sNewNts" style="display: none; float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;" class="vis-feedicon border-0" title="New Record"><i class="vis vis-plus"></i></span>'
                 + '         <span id="WFSearchshow' + $self.AD_UserHomeWidgetID + '"  class="vis-w-feedicon vis vis-eye-plus border-0" title="Show Search"></span>'//style="float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;"
+                + '         <span id="WFShowDetails' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis vis-info border-0" title="Open Dummy Model" style="cursor:pointer;min-width:20px;display:inline-block;"></span>'
                 + ' </div>'
                 + '     </h2></div>'
                 + ' <div id = "welcomeScreenFeedsLists' + $self.AD_UserHomeWidgetID + '" class="vis-w-scrollerVerticalNewCls ml-0 vis-w-workflow-welcomfeed-cls"><div class="vis-w-workflow-homepage-parentdiv">'
@@ -239,6 +1076,7 @@
             $row = $fstMainDiv_ID.find(".vis-w-welcomeScreenFeeds");
             $hlnkTabDataRef_ID = $fstMainDiv_ID.find("#hlnkTabDataRef" + $self.AD_UserHomeWidgetID);
             $wFSearchshow_ID = $fstMainDiv_ID.find("#WFSearchshow" + $self.AD_UserHomeWidgetID);
+            $wFShowDetails_ID = $fstMainDiv_ID.find("#WFShowDetails" + $self.AD_UserHomeWidgetID);
             $fromDate_ID = $fstMainDiv_ID.find("#VIS_FromDate_ID" + $self.AD_UserHomeWidgetID);
             $toDate_ID = $fstMainDiv_ID.find("#VIS_ToDate_ID" + $self.AD_UserHomeWidgetID);
             $fromDateInput_ID = $fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID);
@@ -295,9 +1133,7 @@
                             appendRecords(data, item);
                         }
                         if (async == true) {
-                            getControls();
                             loadWindows();
-                            events();
                         }
                         setTimeout(function () {
                             showBusy(false);
@@ -404,6 +1240,11 @@
                             winNideID = "0_0";
                             $cmbWindows.val("0_0");
                         }
+                        $('#WFDummyModel' + $self.AD_UserHomeWidgetID + 'WindowSelect').empty();
+                        $cmbWindows.find('option').each(function () {
+                            $('#WFDummyModel' + $self.AD_UserHomeWidgetID + 'WindowSelect').append($(this).clone());
+                        });
+                        $('#WFDummyModel' + $self.AD_UserHomeWidgetID + 'WindowSelect').val($cmbWindows.val());
                     }
                 }
             });
@@ -1415,6 +2256,7 @@
         };
         //Dispose function
         this.disposeComponent = function () {
+            $('#WFDummyModel' + $self.AD_UserHomeWidgetID).remove();
             $root.remove();
         };
     }
