@@ -717,7 +717,7 @@ nav.vis-nav-horizontal-scroll {
     overflow-x: hidden;
     overflow-y: hidden;
     font-family: inherit;
-    transition: width 0.3s ease, min-width 0.3s ease, box-shadow 0.3s ease;
+    transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease, border-radius 0.3s ease, background-color 0.2s ease, box-shadow 0.3s ease;
     flex-shrink: 0;
 }
 
@@ -763,7 +763,7 @@ nav.vis-nav-horizontal-scroll {
     min-height: 44px;
     display: flex;
     align-items: center;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
     margin-bottom: 8px;
     padding: 0;
     color: rgba(var(--v-c-primary), 1);
@@ -784,7 +784,7 @@ nav.vis-nav-horizontal-scroll {
 
 /* Header centered when collapsed */
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed .vis-NewSideMenu-Header {
-    justify-content: center !important;
+    justify-content: flex-start !important;
 }
 
 /* Header normal when opened by button / JS */
@@ -792,7 +792,7 @@ nav.vis-nav-horizontal-scroll {
 .vis-NewSideMenu-Container.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Header,
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded .vis-NewSideMenu-Header,
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Header {
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
 }
 
 /* Show title when opened by button / JS */
@@ -817,14 +817,16 @@ nav.vis-nav-horizontal-scroll {
     align-items: center;
     justify-content: center;
     align-content: center;
+    margin-left: auto;
     background: #ffffff;
-    border-radius: 8px;
-    color: rgba(var(--v-c-on-secondary), 1);
+    border-radius: 6px;
+    color: #1f3f8f;
     font-size: 28px;
     line-height: 1;
     cursor: pointer;
     padding: 0;
-    transition: transform 0.3s ease, background 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+    transition: margin 0.3s ease, transform 0.3s ease, background 0.2s ease, color 0.2s ease;
 }
 
     .vis-NewSideMenu-Close:hover {
@@ -887,8 +889,8 @@ nav.vis-nav-horizontal-scroll {
 
 /* Center item when collapsed */
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed .vis-NewSideMenu-Item {
-    justify-content: center;
-    padding: 8px 0;
+    justify-content: flex-start;
+    padding: 8px 1px;
 }
 
 /* Restore item layout when opened by button / JS */
@@ -897,7 +899,7 @@ nav.vis-nav-horizontal-scroll {
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-Expanded .vis-NewSideMenu-Item,
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Item {
     justify-content: flex-start;
-    padding: 8px 10px;
+    padding: 8px;
 }
 
 
@@ -935,13 +937,15 @@ nav.vis-nav-horizontal-scroll {
    Text
 ================================ */
 .vis-NewSideMenu-Text {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
     font-size: 1rem;
     font-weight: 600;
     color: rgba(var(--v-c-primary), 1);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
     opacity: 0;
     visibility: hidden;
     max-width: 0;
@@ -960,8 +964,14 @@ nav.vis-nav-horizontal-scroll {
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed.vis-NewSideMenu-HoverOpen .vis-NewSideMenu-Text {
     opacity: 1;
     visibility: visible;
+    /*    max-width: 100%;*/
     max-width: 15ch;
     display: block;
+
+    max-width: 15ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
