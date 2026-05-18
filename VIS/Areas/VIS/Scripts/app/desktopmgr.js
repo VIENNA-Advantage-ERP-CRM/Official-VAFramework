@@ -1985,7 +1985,7 @@
         $container
             .removeClass('vis-NewSideMenu-Expanded vis-NewSideMenu-HoverOpen')
             .addClass('vis-NewSideMenu-Collapsed');
-        setSideMenuArrow($btn, false);
+        setSideMenuArrowAfterTransition($container, $btn, false);
         resizeHomeAfterSideMenuChange();
     });
 
@@ -2002,6 +2002,20 @@
         } else {
             $btn.html(isRtl ? "&#8249;" : "&#8250;");
         }
+    }
+
+    function setSideMenuArrowAfterTransition($container, $btn, isOpen) {
+        var timer = $container.data("visSideMenuArrowTimer");
+        if (timer) {
+            clearTimeout(timer);
+        }
+
+        timer = setTimeout(function () {
+            setSideMenuArrow($btn, isOpen);
+            $container.removeData("visSideMenuArrowTimer");
+        }, 320);
+
+        $container.data("visSideMenuArrowTimer", timer);
     }
 
     function resizeHomeAfterSideMenuChange() {
@@ -2021,14 +2035,14 @@
                 .removeClass("vis-NewSideMenu-Expanded vis-NewSideMenu-HoverOpen")
                 .addClass("vis-NewSideMenu-Collapsed");
 
-            setSideMenuArrow($btn, false);
+            setSideMenuArrowAfterTransition($container, $btn, false);
             resizeHomeAfterSideMenuChange();
         } else {
             $container
                 .removeClass("vis-NewSideMenu-Collapsed vis-NewSideMenu-HoverOpen")
                 .addClass("vis-NewSideMenu-Expanded");
 
-            setSideMenuArrow($btn, true);
+            setSideMenuArrowAfterTransition($container, $btn, true);
             resizeHomeAfterSideMenuChange();
         }
     });

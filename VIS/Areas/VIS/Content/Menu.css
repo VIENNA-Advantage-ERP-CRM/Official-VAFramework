@@ -1063,6 +1063,8 @@ html[dir="rtl"] .vis-NewSideMenu-Item.active {
 }
 
 html[dir="rtl"] .vis-NewSideMenu-Close {
+    margin-left: 0;
+    margin-right: auto;
     transform: scaleX(-1) !important;
 }
 
