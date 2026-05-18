@@ -1972,12 +1972,21 @@
     });
 
     $(document).on("click", ".vis-NewSideMenu-Item", function (e) {
-        if ($(e.target).is('i')) {
-            VIS.FavouriteHelper.addDelFav($(e.target));
+        var $target = $(e.target);
+        if ($target.is('i') && ($target.hasClass('vis-star-empty') || $target.hasClass('vis-star-filled') || $target.hasClass('vis-nm-MenuFav'))) {
+            VIS.FavouriteHelper.addDelFav($target);
             return;
         }
-        var $el = $(e.target).closest('.vis-NewSideMenu-Item');
-        VIS.viewManager.startAction($el.data('action'), $el.data('actionid')); // same as startSideMenuAction
+        var $el = $target.closest('.vis-NewSideMenu-Item');
+        VIS.viewManager.startAction($el.data('action'), $el.data('actionid'));
+
+        var $container = $el.closest('.vis-NewSideMenu-Container');
+        var $btn = $container.find('.vis-NewSideMenu-Close');
+        $container
+            .removeClass('vis-NewSideMenu-Expanded vis-NewSideMenu-HoverOpen')
+            .addClass('vis-NewSideMenu-Collapsed');
+        setSideMenuArrow($btn, false);
+        resizeHomeAfterSideMenuChange();
     });
 
 
@@ -1995,6 +2004,10 @@
         }
     }
 
+    function resizeHomeAfterSideMenuChange() {
+        // The side menu always keeps the collapsed 54px layout footprint, so opening it should not resize screens.
+    }
+
     $(document).on("click", ".vis-NewSideMenu-Close", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -2006,45 +2019,20 @@
         if (isOpen) {
             $container
                 .removeClass("vis-NewSideMenu-Expanded vis-NewSideMenu-HoverOpen")
-                .addClass("vis-NewSideMenu-Collapsed")
-                .css("position", "relative");
+                .addClass("vis-NewSideMenu-Collapsed");
 
             setSideMenuArrow($btn, false);
+            resizeHomeAfterSideMenuChange();
         } else {
             $container
                 .removeClass("vis-NewSideMenu-Collapsed vis-NewSideMenu-HoverOpen")
-                .addClass("vis-NewSideMenu-Expanded")
-                .css("position", "absolute");
+                .addClass("vis-NewSideMenu-Expanded");
 
             setSideMenuArrow($btn, true);
+            resizeHomeAfterSideMenuChange();
         }
     });
 
-    $(document).on("mouseleave", ".vis-NewSideMenu-Container", function () {
-        var $container = $(this);
-        var $btn = $container.find(".vis-NewSideMenu-Close");
-
-        if ($container.hasClass("vis-NewSideMenu-Collapsed")) {
-            $container
-                .removeClass("vis-NewSideMenu-HoverOpen")
-                .css("position", "relative");
-
-            setSideMenuArrow($btn, false);
-        }
-    });
-
-    $(document).on("mouseenter", ".vis-NewSideMenu-Container", function () {
-        var $container = $(this);
-        var $btn = $container.find(".vis-NewSideMenu-Close");
-
-        if ($container.hasClass("vis-NewSideMenu-Collapsed")) {
-            $container
-                .addClass("vis-NewSideMenu-HoverOpen")
-                .css("position", "absolute");
-
-            setSideMenuArrow($btn, true);
-        }
-    });
 
 
 

@@ -363,45 +363,47 @@
             @if (screenList != null && screenList.Count > 0)
             {
                 <!-- NEW SIDEBAR — place it here -->
-                <div class="vis-NewSideMenu-Container vis-NewSideMenu-Collapsed">
-                    <div class="vis-NewSideMenu-Header">
-                        <span class="vis-NewSideMenu-Title">Menu</span>
-                        @if (ViewBag.direction == "rtl")
-                        {
-                            <span class="vis-NewSideMenu-Close">&#8249;</span>
-                        }
-                        else
-                        {
-                            <span class="vis-NewSideMenu-Close">&#8250;</span>
-                        }
-                    </div>
-                    <div class="vis-NewSideMenu-List">
+                <div class="vis-NewSideMenu-Slot">
+                    <div class="vis-NewSideMenu-Container vis-NewSideMenu-Collapsed">
+                        <div class="vis-NewSideMenu-Header">
+                            <span class="vis-NewSideMenu-Title">Menu</span>
+                            @if (ViewBag.direction == "rtl")
+                            {
+                                <span class="vis-NewSideMenu-Close">&#8249;</span>
+                            }
+                            else
+                            {
+                                <span class="vis-NewSideMenu-Close">&#8250;</span>
+                            }
+                        </div>
+                        <div class="vis-NewSideMenu-List">
 
-                        <a class="vis-NewSideMenu-Item" title="Module Dashboard" href="javascript:void(0)">
-                            <span class="vis-NewSideMenu-Icon">
-                                <i class="fa fa-th-large"></i>
-                            </span>
-                            <span class="vis-NewSideMenu-Text">Module Dashboard</span>
-                        </a>
+                            <a class="vis-NewSideMenu-Item" title="Module Dashboard" href="javascript:void(0)">
+                                <span class="vis-NewSideMenu-Icon">
+                                    <i class="fa fa-th-large"></i>
+                                </span>
+                                <span class="vis-NewSideMenu-Text">Module Dashboard</span>
+                            </a>
 
 
-                        @foreach (var screen in screenList)
-                        {
+                            @foreach (var screen in screenList)
+                            {
 
-                            <a class="vis-NewSideMenu-Item" title="@screen.Name" href="javascript:void(0)"
-                               data-seqno="@screen.SeqNo" data-value="@screen.NodeID"
-                               data-action="@screen.Action" data-actionid="@screen.ActionID"
-                               data-folder="@screen.RootFolderID"
-                               style="display:none">
-                                @*<a class="vis-NewSideMenu-Item" title="@screen.Name" href="javascript:void(0)"
+                                <a class="vis-NewSideMenu-Item" title="@screen.Name" href="javascript:void(0)"
+                                   data-seqno="@screen.SeqNo" data-value="@screen.NodeID"
+                                   data-action="@screen.Action" data-actionid="@screen.ActionID"
+                                   data-folder="@screen.RootFolderID"
+                                   style="display:none">
+                                    @*<a class="vis-NewSideMenu-Item" title="@screen.Name" href="javascript:void(0)"
                             data-seqno="@screen.SeqNo" data-value="@screen.NodeID"
                             data-action="@screen.Action" data-actionid="@screen.ActionID">*@
-                                <span class="vis-NewSideMenu-Icon">
-                                    <i class="@(!string.IsNullOrEmpty(screen.Image) ? screen.Image : screen.IconClass)"></i>
-                                </span>
-                                <span class="vis-NewSideMenu-Text">@screen.Name</span>
-                            </a>
-                        }
+                                    <span class="vis-NewSideMenu-Icon">
+                                        <i class="@(!string.IsNullOrEmpty(screen.Image) ? screen.Image : screen.IconClass)"></i>
+                                    </span>
+                                    <span class="vis-NewSideMenu-Text">@screen.Name</span>
+                                </a>
+                            }
+                        </div>
                     </div>
                 </div>
             }

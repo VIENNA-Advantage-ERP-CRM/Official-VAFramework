@@ -125,8 +125,8 @@
              * Adjust Size
              */
             function adjustWidgetDivSize() {
-                var windowWidth = $(window).width();
-                $home.find('.scrollerHorizontalWidget').width(windowWidth);
+                var homeWidth = $home.closest('#vis_mainConatiner').innerWidth() || $home.innerWidth() || $(window).width();
+                $home.find('.scrollerHorizontalWidget').width(homeWidth);
                 resizeWidgetContainer();
             }
 
