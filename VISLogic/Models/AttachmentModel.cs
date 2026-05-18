@@ -142,12 +142,12 @@ namespace ViennaAdvantageWeb.Areas.VIS.Models
 
             }
 
-            for (int i = 0; i < _files.Count; i++)
-            {
-                System.IO.File.Delete(System.IO.Path.Combine(GetServerLocation(), FolderName) + "\\" + folderKey + "\\" + _files[i].Name);
-            }
-            if (folderKey != "" && Directory.Exists(System.IO.Path.Combine(GetServerLocation(), FolderName, folderKey)))
-                Directory.Delete(System.IO.Path.Combine(GetServerLocation(), FolderName, folderKey));
+            //for (int i = 0; i < _files.Count; i++)
+            //{
+            //    System.IO.File.Delete(System.IO.Path.Combine(GetServerLocation(), FolderName) + "\\" + folderKey + "\\" + _files[i].Name);
+            //}
+            //if (folderKey != "" && Directory.Exists(System.IO.Path.Combine(GetServerLocation(), FolderName, folderKey)))
+            //    Directory.Delete(System.IO.Path.Combine(GetServerLocation(), FolderName, folderKey));
 
             info.AD_attachment_ID = att.GetAD_Attachment_ID();
             info.Error = att.Error;
