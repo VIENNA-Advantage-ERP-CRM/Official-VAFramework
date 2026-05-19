@@ -819,7 +819,6 @@ nav.vis-nav-horizontal-scroll {
     justify-content: center;
     align-content: center;
     margin-left: auto;
-    /* background: #ffffff;*/
     border-radius: 6px;
     color: #1f3f8f;
     font-size: 28px;
@@ -867,7 +866,26 @@ nav.vis-nav-horizontal-scroll {
    Item
 ================================ */
 .vis-NewSideMenu-Item {
+    transform: translateY(-1px);
     width: 100%;
+    height: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: rgba(var(--v-c-primary), 1);
+    border-radius: 6px;
+    color: #1f3f8f;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background 0.2s ease, color 0.2s ease, padding 0.2s ease;
+
+    /*    width: 100%;
     min-height: 42px;
     display: flex;
     align-items: center;
@@ -879,14 +897,12 @@ nav.vis-nav-horizontal-scroll {
     text-decoration: none;
     font-size: 16px;
     line-height: 24px;
-    transition: background 0.2s ease, color 0.2s ease, padding 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, padding 0.2s ease;*/
 }
 
     .vis-NewSideMenu-Item:hover {
         background: #f0f5ff;
         color: #3b82f6;
-        text-decoration: none;
-        border-radius:0 !important;
     }
 
 /* Center item when collapsed */
