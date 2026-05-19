@@ -764,11 +764,11 @@ nav.vis-nav-horizontal-scroll {
     display: flex;
     align-items: center;
     justify-content: flex-start !important;
-    margin-bottom: 8px;
-    padding: 0;
+/*    margin-bottom: 8px;
+*/    padding: 0;:
     color: rgba(var(--v-c-primary), 1);
-    border-bottom: 1px solid rgba(var(--v-c-primary), 0.12);
-}
+/*    border-bottom: 1px solid rgba(var(--v-c-primary), 0.12);
+*/}
 
 .vis-NewSideMenu-Title {
     font-size: 18px;
@@ -810,6 +810,7 @@ nav.vis-nav-horizontal-scroll {
    Close / Collapse Button
 ================================ */
 .vis-NewSideMenu-Close {
+    transform: translateY(-1px);
     width: 32px;
     height: 32px;
     min-width: 32px;
@@ -818,7 +819,7 @@ nav.vis-nav-horizontal-scroll {
     justify-content: center;
     align-content: center;
     margin-left: auto;
-    background: #ffffff;
+    /* background: #ffffff;*/
     border-radius: 6px;
     color: #1f3f8f;
     font-size: 28px;
@@ -885,11 +886,12 @@ nav.vis-nav-horizontal-scroll {
         background: #f0f5ff;
         color: #3b82f6;
         text-decoration: none;
+        border-radius:0 !important;
     }
 
 /* Center item when collapsed */
 .vis-NewSideMenu-Container.vis-NewSideMenu-Collapsed .vis-NewSideMenu-Item {
-    justify-content: flex-start;
+    justify-content: center;
     padding: 8px 1px;
 }
 
@@ -907,13 +909,13 @@ nav.vis-nav-horizontal-scroll {
    Icon
 ================================ */
 .vis-NewSideMenu-Icon {
-    width: 32px;
+/*    width: 32px;
     height: 32px;
-    min-width: 32px;
+    min-width: 32px;*/
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
+ /*   background: #ffffff;*/
     border-radius: 6px;
     color: #1f3f8f;
     font-size: 14px;
@@ -928,7 +930,7 @@ nav.vis-nav-horizontal-scroll {
     }
 
 .vis-NewSideMenu-Item:hover .vis-NewSideMenu-Icon {
-    background: #ffffff;
+/*    background: #ffffff;*/
     color: #3b82f6;
 }
 
@@ -1010,7 +1012,7 @@ nav.vis-nav-horizontal-scroll {
         max-width: 240px;
         background-color: #ffffff;
         border-radius: 8px 8px 0 0;
-        padding: 18px 20px 16px;
+        padding: 18px 20px 16px 20px;
         overflow-y: auto;
         box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
     }
