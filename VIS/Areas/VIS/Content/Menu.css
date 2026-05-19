@@ -764,8 +764,8 @@ nav.vis-nav-horizontal-scroll {
     display: flex;
     align-items: center;
     justify-content: flex-start !important;
-/*    margin-bottom: 8px;
-*/    padding: 0;:
+    margin-bottom: 8px;
+    padding: 0;
     color: rgba(var(--v-c-primary), 1);
 /*    border-bottom: 1px solid rgba(var(--v-c-primary), 0.12);
 */}
