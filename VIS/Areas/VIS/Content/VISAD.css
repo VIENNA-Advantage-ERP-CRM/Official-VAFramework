@@ -2888,12 +2888,12 @@ findImg {
    that grid with a horizontal flex row so cells can't be placed on top of
    each other.
 
-   Visible cells get an equal share of the row (flex: 1 1 0), so a few wide
-   cells stretch to fill empty space instead of leaving large gaps. Content
-   inside each cell is left-aligned. VListView.pruneOverflowingCells
-   measures every cell's natural content width (using the .vis-lv-measuring
-   helper class to override the equal-share rule) and hides whole cells
-   from the right end until each remaining cell's content fits its share. */
+   Visible cells get an equal share of the row (flex: 1 1 0), so columns
+   line up across rows regardless of content length. Content inside each
+   cell is left-aligned and truncates with an ellipsis when it exceeds the
+   cell's share. VListView.pruneOverflowingCells hides cells beyond
+   VListView.MAX_VISIBLE_CELLS (uniform across every card) so all rows
+   show the same set of columns. */
 
 .vis-lv-listmode .vis-lv-main .vis-cv-card {
     position: relative;
@@ -2955,22 +2955,35 @@ findImg {
     overflow: hidden;
 }
 
-/* Cells inside a card carrying .vis-lv-measuring temporarily revert to
-   their natural content width so JS can read offsetWidth. The class lives
-   only between adjacent style writes inside pruneCard, so users never see
-   the natural-width state. */
-.vis-lv-listmode .vis-lv-main .vis-cv-card.vis-lv-measuring .vis-w-p-card-data-f {
-    flex: 0 0 auto !important;
-    width: auto !important;
+/* Make the label wrapper a block-flow truncating box. The template paints it
+   as `display:flex` with no width constraint, so an inline <span> inside
+   never honors text-overflow:ellipsis and a block child's max-width:100%
+   resolves against a parent that already grew to fit the content. Forcing
+   block + nowrap + overflow:hidden + text-overflow:ellipsis here anchors the
+   ellipsis to the cell's flex share. */
+.vis-lv-listmode .vis-lv-main .vis-cv-card .vis-w-p-card-Label-f {
+    display: block !important;
+    min-width: 0 !important;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Keep every line of text on a single line so each cell measures its real
-   content width; the JS prune pass hides whole cells when they can't fit. */
+/* Keep every line of text on a single line and truncate with an ellipsis
+   when it exceeds the cell's equal-share width, so over-wide content
+   never overlaps neighbours or pushes columns out of alignment. inline-block
+   (not inline) is required so <span>/<label> honor max-width and ellipsis. */
 .vis-lv-listmode .vis-lv-main .vis-cv-card p,
 .vis-lv-listmode .vis-lv-main .vis-cv-card span,
 .vis-lv-listmode .vis-lv-main .vis-cv-card label,
 .vis-lv-listmode .vis-lv-main .vis-cv-card h3 {
+    display: inline-block;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    vertical-align: middle;
     margin: 0;
 }
 
