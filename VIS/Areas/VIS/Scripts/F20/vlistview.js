@@ -70,14 +70,16 @@
         // state: when it's open the cards revert to the original stacked
         // multi-row card layout (so they fit the narrowed area without text
         // collisions); when it's closed they collapse to single-row list mode.
-        // Width is used only as a fallback when no tab panel exists.
+        // When the tab has no right tab panel at all, list mode is the
+        // default presentation (there's no card-friendly narrow area to
+        // worry about, and list mode is the requested out-of-the-box look).
         this.calculateWidth = function (width) {
             var w = width || body.width();
             var listMode;
             if (this.hasRightTabPanel()) {
                 listMode = !this.isRightTabPanelOpen();
             } else {
-                listMode = w >= VListView.LIST_MODE_THRESHOLD;
+                listMode = true;
             }
             root.toggleClass('vis-lv-listmode', listMode);
             this.navigate();
@@ -91,14 +93,12 @@
             }
         };
 
-        // Hide whole cells that don't fully fit in the row. CSS gives every
-        // cell its natural content width; this pass walks each card's leaf
-        // cells left-to-right and toggles display:none on the first cell
-        // whose right edge would extend past the row's usable area (and on
-        // every cell after it). When list mode is off, any prior hides are
-        // restored so the multi-row card template renders normally.
-        // Coalesce repeated calls (resize, tab toggle, refresh) into a single
-        // rAF tick so the work stays smooth.
+        // Cap every card at the same MAX_VISIBLE_CELLS so columns line up
+        // across rows. Visible cells share the row equally (flex: 1 1 0 in
+        // CSS); over-wide content truncates with an ellipsis. When list
+        // mode is off, prior hides are reset so the multi-row card
+        // template renders normally. Coalesce repeated calls (resize, tab
+        // toggle, refresh) into a single rAF tick so the work stays smooth.
         var prunePending = false;
         this.scheduleOverflowPrune = function () {
             if (prunePending || !root || !body) return;
@@ -120,56 +120,22 @@
             }
         };
 
-        // Reserved on the right edge of each row for the absolutely-positioned
-        // edit pencil so a cell never tucks underneath it. Includes a small
-        // safety margin.
-        var PENCIL_RESERVE_PX = 40;
-        // Must match the gap declared on the inner template wrapper in
-        // VISAD.css (.vis-lv-listmode ... [class*="...fg_card-container_"]).
-        var CELL_GAP_PX = 12;
-
         function pruneCard(card, listMode) {
             var cells = card.querySelectorAll('.vis-w-p-card-data-f');
             if (!cells.length) return;
-            // Always reset visibility before measuring (and before bailing in
-            // card mode) so card mode never inherits a stale display:none.
+            // Reset visibility first so card mode never inherits a stale
+            // display:none from a previous list-mode pass, and fewer-than-cap
+            // templates show every cell unchanged.
             for (var i = 0; i < cells.length; i++) {
                 cells[i].style.display = '';
             }
             if (!listMode) return;
 
-            var cardRect = card.getBoundingClientRect();
-            if (cardRect.width <= 0) return;
-            var available = cardRect.width - PENCIL_RESERVE_PX;
-
-            // Read each cell's natural content width. The .vis-lv-measuring
-            // class on the card makes cells revert from `flex: 1 1 0` (equal
-            // share) to `flex: 0 0 auto` (natural). The browser doesn't paint
-            // mid-function, so users never see the intermediate layout.
-            card.classList.add('vis-lv-measuring');
-            var natWidths = new Array(cells.length);
-            for (var m = 0; m < cells.length; m++) {
-                natWidths[m] = cells[m].offsetWidth;
-            }
-            card.classList.remove('vis-lv-measuring');
-
-            // Largest N where the widest cell among cells[0..N-1] still fits
-            // in (available - gaps) / N. Visible cells share width equally
-            // because of flex: 1 1 0, so all cells must fit the same share.
-            var visible = cells.length;
-            while (visible > 1) {
-                var perCell = (available - (visible - 1) * CELL_GAP_PX) / visible;
-                var maxNat = 0;
-                for (var i = 0; i < visible; i++) {
-                    if (natWidths[i] > maxNat) maxNat = natWidths[i];
-                }
-                if (maxNat <= perCell) break;
-                visible--;
-            }
-
-            // Hide trailing cells that can't fit. The first cell is always
-            // kept — an empty row is worse than a wide first cell.
-            for (var h = visible; h < cells.length; h++) {
+            // Uniform across every card: hide cells beyond the cap so the
+            // same N columns are visible in every row. Equal flex share
+            // gives the visible cells the same width and the inner text
+            // truncates with an ellipsis when it doesn't fit.
+            for (var h = VListView.MAX_VISIBLE_CELLS; h < cells.length; h++) {
                 cells[h].style.display = 'none';
             }
         }
@@ -287,6 +253,15 @@
      * single horizontal row. Below this, cards keep their multi-row template.
      */
     VListView.LIST_MODE_THRESHOLD = 720;
+
+    /**
+     * Maximum number of leaf cells shown per row in list mode. Visible cells
+     * share the row equally (flex: 1 1 0 in CSS); over-wide content truncates
+     * with an ellipsis. Capping uniformly across cards keeps columns aligned
+     * regardless of per-row content length. Templates with fewer cells than
+     * the cap render unchanged.
+     */
+    VListView.MAX_VISIBLE_CELLS = 6;
 
     VListView.prototype.tableModelChanged = function (action, args, actionIndexOrId) {
         var id = null;
