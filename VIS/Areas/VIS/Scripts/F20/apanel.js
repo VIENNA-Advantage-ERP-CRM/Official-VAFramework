@@ -129,7 +129,7 @@
         this.isFilter = false;
         //private 
         var $divContentArea, $ulNav, $ulToobar, $divStatus, $ulTabControl, $divTabControl, $divTabNav;
-        var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter;
+        var $txtSearch, $imgSearch, $btnClrSearch, $imgdownSearch, $btnFilter, $divTabRightNav;
         var $root, $busyDiv, $landingpage;
         var $ulRightBar2; //right bar
         var $btnlbToggle, $ulactionbar, $uldynactionbar, $divlbMain, $divlbNav; //right bar
@@ -223,6 +223,8 @@
             //close 
             $btnClose = $root.find(".vis-ad-w-p-t-close");
             $spnTitle = $root.find('.vis-ad-w-p-t-name h5');
+
+            $divTabRightNav = $root.find(".vis-ad-w-p-tb-rc-nav");
 
             //Filter Panel
             $btnFilter = $root.find("span.vis-ad-w-p-tb-rc-action");
@@ -395,7 +397,7 @@
             self.vTabbedPane.finishLayout(VIS.Application.isMobile);
 
             if (self.gridWindow.getIsHideTabLinks()) {
-                $divHeaderNav.find('*').css('visibility', 'hidden');
+                $divHeaderNav.find('*').css('display', 'none');
             }
 
 
@@ -416,9 +418,9 @@
 
         this.hideTabLinks = function (hide) {
             if (hide)
-                $divHeaderNav.find('*').css('visibility', 'hidden');
+                $divHeaderNav.find('*').css('display', 'none');
             else
-                $divHeaderNav.find('*').css('visibility', 'visible');
+                $divHeaderNav.find('*').css('display', '');
         };
 
         this.hideActionbar = function (hide) {
@@ -535,15 +537,17 @@
 
             this.aMap = this.addActions("Map", null, false, true, true, onAction);
 
-            $ulNav
+            //$ulNav
                 //.append(this.aFirst.getListItm())
-                .append(this.aPrevious.getListItm())
-                .append(this.aNext.getListItm())
+             //   .append(this.aPrevious.getListItm())
+               // .append(this.aNext.getListItm())
             //.append(this.aLast.getListItm());
             $ulNav.append(this.aMulti.getListItm());
             $ulNav.append(this.aSingle.getListItm());
             $ulNav.append(this.aCard.getListItm());
             $ulNav.append(this.aMap.getListItm().hide());
+
+            $divTabRightNav.append($ulNav);
 
             // Mohit - Shortcut as title.
             ///3. bottom toolbar 
@@ -745,7 +749,9 @@
             $ulRightBar2.append(this.aShowSummaryLevel.getListItmIT());
 
             mWindow = null;
-
+            
+            this.statusBar.setPageItem(this.aNext.getListItm(), true);
+            this.statusBar.setPageItem(this.aPrevious.getListItm(), true);
             //this.statusBar.setPageItem(this.aPageFirst.getListItm());
             this.statusBar.setPageItem(this.aPageUp.getListItm());
             this.statusBar.setComboPage();
