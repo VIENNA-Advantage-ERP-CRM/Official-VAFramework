@@ -405,6 +405,11 @@
                 width = $this.getBody().width();
             }
 
+            // Preserve the previously-edited recid across resetCard. resetCard
+            // zeroes editID, which would otherwise cause refresh (e.g. on
+            // return from single-row view) to fall through to the auto-select-
+            // first branch and lose the row the user actually came from.
+            var preservedEditID = $this.editID;
             $this.resetCard();
 
             var records = $this.mTab.getTableModel().mSortList;
@@ -423,7 +428,17 @@
                     card.evaluate($this.cConditions);
                 }
 
-                if ($this.editID == 0 && $this.onCardEdit) {
+                // Returning from single-row view: re-select the same card the
+                // user opened via the pencil icon, and scroll it into view in
+                // case it sat below the fold. The table model is already on
+                // that row from the pencil click, so navigate directly (sets
+                // crid + applies selection class) without re-firing
+                // onCardEdit/onTableRowSelect.
+                var hasPreserved = preservedEditID
+                    && body.find('div.vis-cv-card[name~=vc_' + preservedEditID + ']').length > 0;
+                if (hasPreserved) {
+                    $this.navigate(preservedEditID);
+                } else if ($this.onCardEdit) {
                     $this.onCardEdit({ 'recid': body.find(".vis-cv-card:first").attr('data-recid') }, true);
                 }
                 $this.editID = 0;

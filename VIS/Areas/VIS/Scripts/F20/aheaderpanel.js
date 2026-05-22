@@ -607,16 +607,17 @@
             if (mField.getAGName() == "" || mField.getDisplayType() != VIS.DisplayType.Button || editor == null) {
                 return null;
             }
+            //header panel uses popover/dropdown mode only; container AGType is honored in edit view
             var agName = mField.getAGName().replace(' ', '');
             var agIns = null;
             if (agName in this.agGroupToAGInsMap) {
                 agIns = this.agGroupToAGInsMap[agName];
             }
             else {
-                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle(),true);
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle(), true, "P");
                 this.agGroupToAGInsMap[agName] = agIns;
             }
-            agIns.addItem(editor);
+            agIns.addItem(editor, mField);
             return agIns;
         }
 

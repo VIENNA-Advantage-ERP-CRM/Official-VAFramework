@@ -593,7 +593,13 @@
 
         function addActionGroup(mField, editor) {
 
-            if (mField.getAGName() == "" || mField.getDisplayType() != VIS.DisplayType.Button || editor == null) {
+            if (mField.getAGName() == "" || editor == null) {
+                return null;
+            }
+            //popover (default) only supports buttons; container types accept any control
+            var agType = (mField.getAGType && mField.getAGType()) || "";
+            var isPopover = (agType === "" || agType === "P");
+            if (isPopover && mField.getDisplayType() != VIS.DisplayType.Button) {
                 return null;
             }
             var agName = mField.getAGName().replace(' ', '');
@@ -602,10 +608,10 @@
                 agIns = agGroupToAGInsMap[agName];
             }
             else {
-                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(),mField.getAGStyle());
+                agIns = new VIS.ActionGroup(agName, mField.getAGFontName(), mField.getAGStyle(), false, agType);
                 agGroupToAGInsMap[agName] = agIns;
             }
-            agIns.addItem(editor);
+            agIns.addItem(editor, mField);
             return agIns;
         };
 
@@ -636,7 +642,12 @@
             //Check for Action Group
             //var isAGNew = agInstance && agInstance.getItemCount() == 1;
 
-            if (!agInstance) {
+            //Field group + layout placement: for AG fields, only the FIRST field
+            //drives this (subsequent fields share the AG cell). The AG therefore
+            //inherits FieldGroup, ColSpan, RowSpan etc. from the first field of
+            //the group, keeping it inside the right group section and respecting
+            //its display length.
+            if (!agInstance || agInstance.getIsNewIns()) {
                 if (addGroup(mField.getFieldGroup(), columnIndex)) {
                     sameLine = false;
                 }
@@ -721,22 +732,32 @@
 
                 //check for agGroup
                 if (agInstance) {
-                    if (agInstance.getIsNewIns()) { //only Once
-                        insertCWrapper(label, agInstance, ctnr, mField);
+                    if (agInstance.getIsNewIns()) { //only Once - place AG shell in the column cell
+                        //pass null label so first field's label does not become the AG cell label
+                        insertCWrapper(null, agInstance, ctnr, mField);
                         agInstance.setContainer(ctnr);
                     }
-                    //set action group conatiner
-                    ctnr = agInstance.getContainer();
 
-                    //apply style only
-                    var customStyle = mField.getHtmlStyle();
-                    if (editor != null) {
-                        if (customStyle != "") {
-                            editor.getControl().attr('style', customStyle);
+                    if (agInstance.getIsContainerMode()) {
+                        //container modes (Toggle / Parent): render each field's label+editor wrapper inside the AG body.
+                        //per-field wrapper becomes the toggleable unit for display logic via setVisible.
+                        insertCWrapper(label, editor, agInstance.getActionList(), mField);
+                        ctnr = agInstance.getActionList().children().last();
+                    }
+                    else {
+                        //popover mode (existing): editor already placed inside <li> via addItem
+                        ctnr = agInstance.getContainer();
+
+                        //apply style only
+                        var customStyle = mField.getHtmlStyle();
+                        if (editor != null) {
+                            if (customStyle != "") {
+                                editor.getControl().attr('style', customStyle);
+                            }
+
+                            //set ctnr as action group instance's current item
+                            ctnr = editor.getControl().parent(); // li parent of action item
                         }
-
-                        //set ctnr as action group instance's current item 
-                        ctnr = editor.getControl().parent(); // li parent of action item 
                     }
                 }
                 else {
@@ -891,7 +912,12 @@
 
         var ctrl = $(wraper);
 
-        if (!mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.Button) {
+        //skip the prepend icon when this wrapper is the AG shell itself — the icon belongs
+        //to the field, not the container. Popover already bypasses via the Button check
+        //(its fields are always Button); container/toggle reach here with non-button fields
+        //and would otherwise pick up the first field's icon at the container level.
+        var isAGShell = editor && editor instanceof VIS.ActionGroup;
+        if (!isAGShell && !mField.getIsLink() && mField.getDisplayType() != VIS.DisplayType.Button) {
             if (mField.getShowIcon() && (mField.getFontClass() != '' || mField.getImageName() != '')) {
 
                 var btns = ['<div class="input-group-prepend"><span class="input-group-text vis-color-primary">'];
@@ -975,54 +1001,61 @@
         }
     }
 
-    function ActionGroup(name, fontname,style,isHdrItem) {
+    function ActionGroup(name, fontname, style, isHdrItem, agType) {
         this.name = name;
+        //normalize: "" / "P" = popover; "T" = toggle container; "C" = parent container
+        this.agType = (agType === "T" || agType === "C") ? agType : "P";
+        this.isContainer = (this.agType === "T" || this.agType === "C");
         this.vEditors = [];
         var $root = null;
         var $actionList = null;
-      
+
         var id = "vis_ev_col_ag_btn" + Math.random();
         var popup = null;
+        var localType = this.agType;
         function InitUI() {
 
             var styl = '';
             if (style && style != '') {
                 styl = ' style=' + style;
             }
-            
-            var html = '<div class="dropdown vis-ev-col-actiongroup" >' 
-                + '<span class="dropdown-toggle btn vis-ev-col-ag-dropdown-btn" id="' + id + '"' + styl + '  data-toggle="dropdown">'
-                + '<i class="' + fontname + '"></i>'
-                + name + '</span>'
-                + '<div class="dropdown-menu dropdown-menu-right vis-ev-col-ag-div" aria-labelledby="' + id + '">'
-                + '<ul class="vis-ev-col-ag-btn-list">'
-                + '</ul>'
-                + '</div>'
-                + '</div>';
 
-            
-
-           //var  html = '<div class="vis-ev-col-actiongroup">'
-           //                 + ' <div id="' + id + '" class="vis-ev-col-ag-dropdown-btn btn dropdown-toggle"  '+styl+'>'
-           //                  + '<span class="' + fontname + '"></span>'
-           //                      + name + '<span class="caret"></span>'
-           //           +'</div> '
-           //          //+ '<div class="dropdown-menu" aria-labelledby="' + id + '" > '
-           //          //  + '<ul class="vis-ev-col-ag-btn-list">'
-           //          //  + '</ul>'
-           //          //+ '</div>'
-           //    + '</div>';
+            var html;
+            if (localType === "T" || localType === "C") {
+                //inline div container. Variant class drives layout:
+                //  --toggle: column stacking (one field visible at a time via display logic)
+                //  --parent: row flow (all fields visible, each sized by its natural width)
+                //Container only holds fields/controls — no header, no icon, no title.
+                var variantCls = (localType === "T")
+                    ? "vis-ev-col-ag-container--toggle"
+                    : "vis-ev-col-ag-container--parent";
+                html = '<div class="vis-ev-col-ag-container ' + variantCls + '" data-agname="' + name + '"' + styl + '>'
+                    + '<div class="vis-ev-col-ag-body"></div>'
+                    + '</div>';
+            }
+            else {
+                html = '<div class="dropdown vis-ev-col-actiongroup" >'
+                    + '<span class="dropdown-toggle btn vis-ev-col-ag-dropdown-btn" id="' + id + '"' + styl + '  data-toggle="dropdown">'
+                    + '<i class="' + fontname + '"></i>'
+                    + name + '</span>'
+                    + '<div class="dropdown-menu dropdown-menu-right vis-ev-col-ag-div" aria-labelledby="' + id + '">'
+                    + '<ul class="vis-ev-col-ag-btn-list">'
+                    + '</ul>'
+                    + '</div>'
+                    + '</div>';
+            }
 
             $root = $(html);
-            if (!isHdrItem) {
+            if (localType === "P" && !isHdrItem) {
                 $root.find(".vis-ev-col-ag-dropdown-btn").addClass("vis-ev-col-ag-dropdown-btn-color");
-            }   
+            }
 
-            //$actionList = $("<ul class='vis-apanel-rb-ul'>");
-
-            $actionList = $root.find('.vis-ev-col-ag-btn-list');
-
-            
+            if (localType === "T" || localType === "C") {
+                $actionList = $root.find('.vis-ev-col-ag-body');
+            }
+            else {
+                $actionList = $root.find('.vis-ev-col-ag-btn-list');
+            }
         };
 
         InitUI();
@@ -1047,11 +1080,20 @@
 
     }
 
-    ActionGroup.prototype.addItem = function (veditor) {
+    ActionGroup.prototype.addItem = function (veditor, mField) {
         this.vEditors.push(veditor);
+        //container mode: addField builds the per-field wrapper inside the AG body via insertCWrapper.
+        //popover mode (existing): each editor goes in a bare <li> inside the dropdown <ul>.
+        if (this.isContainer) {
+            return;
+        }
         var li = $('<li>');
         li.append(veditor.getControl());
         this.getActionList().append(li);
+    };
+
+    ActionGroup.prototype.getIsContainerMode = function () {
+        return this.isContainer === true;
     };
 
     ActionGroup.prototype.getItemCount = function () {
