@@ -820,7 +820,7 @@ nav.vis-nav-horizontal-scroll {
     align-content: center;
     margin-left: auto;
     border-radius: 6px;
-    color: #1f3f8f;
+  /*  color: #1f3f8f;*/
     font-size: 28px;
     line-height: 1;
     cursor: pointer;
@@ -830,8 +830,7 @@ nav.vis-nav-horizontal-scroll {
 }
 
     .vis-NewSideMenu-Close:hover {
-        background: #f0f5ff;
-        color: #3b82f6;
+        background: rgba(var(--v-c-primary), 0.08);
     }
 
 /* Arrow flip when collapsed */
@@ -878,7 +877,7 @@ nav.vis-nav-horizontal-scroll {
     text-decoration: none;
     color: rgba(var(--v-c-primary), 1);
     border-radius: 6px;
-    color: #1f3f8f;
+ /*   color: #1f3f8f;*/
     font-size: 16px;
     cursor: pointer;
     padding: 0;
@@ -901,8 +900,7 @@ nav.vis-nav-horizontal-scroll {
 }
 
     .vis-NewSideMenu-Item:hover {
-        background: #f0f5ff;
-        color: #3b82f6;
+        background: rgba(var(--v-c-primary), 0.08);
     }
 
 /* Center item when collapsed */
@@ -933,7 +931,7 @@ nav.vis-nav-horizontal-scroll {
     justify-content: center;
  /*   background: #ffffff;*/
     border-radius: 6px;
-    color: #1f3f8f;
+   /* color: #1f3f8f;*/
     font-size: 14px;
     flex-shrink: 0;
 }
@@ -945,10 +943,6 @@ nav.vis-nav-horizontal-scroll {
         color: inherit;
     }
 
-.vis-NewSideMenu-Item:hover .vis-NewSideMenu-Icon {
-/*    background: #ffffff;*/
-    color: #3b82f6;
-}
 
 
 /* ================================
@@ -959,7 +953,6 @@ nav.vis-nav-horizontal-scroll {
     min-width: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: rgba(var(--v-c-primary), 1);
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
@@ -971,9 +964,6 @@ nav.vis-nav-horizontal-scroll {
     transition: opacity 0.25s ease 0.08s, max-width 0.3s ease, visibility 0.2s ease;
 }
 
-.vis-NewSideMenu-Item:hover .vis-NewSideMenu-Text {
-    color: #3b82f6;
-}
 
 /* Show text when opened by button / JS */
 .vis-NewSideMenu-Container.vis-NewSideMenu-Expanded .vis-NewSideMenu-Text,
@@ -998,17 +988,10 @@ nav.vis-nav-horizontal-scroll {
 ================================ */
 .vis-NewSideMenu-Item.active {
     background: #ffffff;
-    color: #1f3f8f;
+/*    color: #1f3f8f;*/
     box-shadow: inset 3px 0 0 #1f3f8f;
 }
 
-    .vis-NewSideMenu-Item.active .vis-NewSideMenu-Text {
-        color: #1f3f8f;
-    }
-
-    .vis-NewSideMenu-Item.active .vis-NewSideMenu-Icon {
-        color: #1f3f8f;
-    }
 
 
 
