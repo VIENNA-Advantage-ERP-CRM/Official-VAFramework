@@ -2996,6 +2996,7 @@ findImg {
 .vis-lv-main .vis-cv-card-selected {
     box-shadow: none;
     border-left: 4px solid rgba(var(--v-c-primary),1);
+    background: linear-gradient(90deg, rgba(var(--v-c-primary), 0.15) 0%, rgba(193, 231, 255, 0.22) 30%, rgba(235, 248, 255, 0.08) 100%);
 }
 /****    Map View       */
 .vis-gc-vmap {

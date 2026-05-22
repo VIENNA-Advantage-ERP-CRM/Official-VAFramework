@@ -466,6 +466,11 @@ namespace VAdvantage.Controller
                     else if (columnName.Equals("AGStyle", StringComparison.OrdinalIgnoreCase))
                     {
                         vo.AGStyle = Util.GetValueOfString(dr[i].ToString());
+                        
+                    }
+                    else if (columnName.Equals("AGType", StringComparison.OrdinalIgnoreCase))
+                    {
+                        vo.AGType =  Util.GetValueOfString(dr[i].ToString());
                     }
                 }
                 if (vo.Header == null)
@@ -1013,6 +1018,7 @@ namespace VAdvantage.Controller
             clone.AGName = AGName;
             clone.AGFontName = AGFontName;
             clone.AGStyle= AGStyle;
+            clone.AGType = AGType;
             return clone;
         }
 

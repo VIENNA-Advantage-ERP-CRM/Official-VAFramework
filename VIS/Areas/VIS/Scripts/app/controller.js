@@ -7759,6 +7759,17 @@
     };
 
     /**
+     * Action Group render type.
+     *   "" or "P" -> Popover (existing dropdown of buttons)
+     *   "T"       -> Toggle container (one field visible at a time, full width)
+     *   "C"       -> Parent container (fields laid out inline by their natural size)
+     * @returns string
+     */
+    GridField.prototype.getAGType = function () {
+        return this.vo.AGType || "";
+    };
+
+    /**
      *  Refresh Lookup if the lookup is unstable
      *  @return true if lookup is validated
      */
