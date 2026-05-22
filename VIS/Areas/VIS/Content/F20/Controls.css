@@ -1332,6 +1332,50 @@ input[type="radio"] {
         text-align: left;
     }
 
+/* Inline Action Group container (AGType = T or C).
+   Groups multiple controls inside one edit-view cell.
+     --toggle: column stacking; display logic typically leaves one visible at a time, taking full width.
+     --parent: row flow; all controls visible, each sized by its natural render width. */
+.vis-ev-col-ag-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+    .vis-ev-col-ag-container .vis-ev-col-ag-body {
+        display: flex;
+        width: 100%;
+    }
+
+    /* Drop the per-field bottom margin inherited from .vis-input-wrap on inner
+       controls. The container's own outer wrapper already provides cell spacing,
+       so the inner wrappers would otherwise push fields out of alignment. */
+    .vis-ev-col-ag-container .vis-ev-col-ag-body > .input-group {
+        margin-bottom: 0;
+    }
+
+/* Toggle: column stacking, each visible wrapper spans full width */
+.vis-ev-col-ag-container--toggle .vis-ev-col-ag-body {
+    flex-direction: column;
+}
+
+    .vis-ev-col-ag-container--toggle .vis-ev-col-ag-body > .input-group {
+        width: 100%;
+    }
+
+/* Parent: row flow, each control takes its own natural width and wraps if needed */
+.vis-ev-col-ag-container--parent .vis-ev-col-ag-body {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+    .vis-ev-col-ag-container--parent .vis-ev-col-ag-body > .input-group {
+        width: auto;
+        flex: 0 1 auto;
+    }
+
 /*.vis-apanel-rb-ul .vis-ev-col-linkbutton {
     color: inherit;
     
