@@ -93,6 +93,7 @@
             var $modal = $('#' + modalId);
             var isRTL = VIS.Application.isRTL || $('html').attr('dir') == 'rtl';
             var modalDir = isRTL ? 'rtl' : 'ltr';
+            var currentModalCardIdx = 0; // tracks which card is currently selected in the modal
 
             function syncDummyWindowSelect() {
                 var $popupSelect = $('#' + modalId + 'WindowSelect');
@@ -125,8 +126,14 @@
                 $activityContainers.each(function (index) {
                     var activityTitle = $(this).find('.vis-w-wfActivity-selectchk').text();
                     activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : 'Workflow Activity';
+
+                    // Read window/node key from the pre's data-ids (format: AD_Window_ID_AD_Node_ID_AD_WF_Activity_ID_index)
+                    var dataIds = $(this).find('pre[data-ids]').attr('data-ids') || '';
+                    var parts = dataIds.split('_');
+                    var winNodeKey = (parts.length >= 2) ? parts[0] + '_' + parts[1] : '0_0';
+
                     $dummyList.append(
-                        '<div class="vis-wf-dummy-card' + (index == 0 ? ' vis-wf-dummy-card-selected' : '') + '" role="button" tabindex="0">'
+                        '<div class="vis-wf-dummy-card' + (index == 0 ? ' vis-wf-dummy-card-selected' : '') + '" role="button" tabindex="0" data-winnode="' + winNodeKey + '">'
                         + '  <div class="vis-wf-dummy-card-top">'
                         + '    <span class="vis-wf-dummy-pill vis-wf-dummy-pill-info"><span class="vis-wf-dummy-dot"></span>Workflow</span>'
                         + '    <span class="vis-wf-dummy-id">WF-' + (index + 1) + '</span>'
@@ -142,6 +149,44 @@
                 });
             };
 
+            function filterDummyCards(winNodeVal) {
+                var $dummyList = $modal.find('.vis-wf-dummy-list');
+                var $cards = $dummyList.find('.vis-wf-dummy-card');
+                var $group = $dummyList.find('.vis-wf-dummy-group');
+
+                if (!winNodeVal || winNodeVal === '0_0') {
+                    // Show all
+                    $cards.show();
+                    $group.text('Activities - ' + $cards.length);
+                } else {
+                    // Show only matching window/node
+                    $cards.each(function () {
+                        $(this).toggle($(this).data('winnode') === winNodeVal);
+                    });
+                    var visibleCount = $cards.filter(':visible').length;
+                    $group.text('Activities - ' + visibleCount);
+                }
+
+                // Re-select first visible card and update detail panel
+                $cards.removeClass('vis-wf-dummy-card-selected');
+                var $first = $cards.filter(':visible').first();
+                $first.addClass('vis-wf-dummy-card-selected');
+                // Hide history panel when filter changes
+                $modal.find('.vis-wf-dummy-history-panel').hide();
+                if ($first.length) {
+                    var firstIdx = $cards.index($first); // 0-based index within cards, matches activity container order
+                    currentModalCardIdx = firstIdx;
+                    var firstDataIds = $workflowWidgetDtls_ID.find('.vis-w-activityContainer')
+                        .eq(firstIdx).find('.vis-w-wfActivity-selectchk').text();
+                    $modal.find('.vis-wf-dummy-record-title').text(
+                        firstDataIds && firstDataIds.trim() ? firstDataIds.trim() : 'Workflow Activity'
+                    );
+                    syncDummyDetailKV(firstIdx);
+                    syncDummySubmitted(firstIdx);
+                    syncDummyDescription(firstIdx);
+                }
+            };
+
             function syncDummyPendingCount() {
                 var $pendingCount = $('#' + modalId + 'PendingCount');
                 if ($pendingCount.length == 0) {
@@ -154,6 +199,61 @@
                 var activityTitle = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-wfActivity-selectchk').text();
                 activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : 'Workflow Activity';
                 $modal.find('.vis-wf-dummy-record-title').text(activityTitle);
+            };
+
+            // Populate the description section from fulldata — hide entire section if empty
+            function syncDummyDescription(index) {
+                var desc = (fulldata && fulldata[index || 0]) ? (fulldata[index || 0].Description || '').trim() : '';
+                var $section = $modal.find('.vis-wf-dummy-description').closest('section');
+                if (desc) {
+                    $modal.find('.vis-wf-dummy-description').text(desc);
+                    $section.show();
+                } else {
+                    $section.hide();
+                }
+            };
+
+            // Populate the submitted date from the activity's feedDateTime element
+            function syncDummySubmitted(index) {
+                var $dateDiv = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-feedDateTime');
+                var dateText = $dateDiv.text().trim();
+                $modal.find('.vis-wf-dummy-submitted').text(dateText ? 'Submitted ' + dateText : '');
+            };
+
+            // Populate the KV table from the <pre> summary lines of the selected activity
+            function syncDummyDetailKV(index) {
+                var $kvContainer = $modal.find('.vis-wf-dummy-kv');
+                if ($kvContainer.length == 0) return;
+
+                var $pre = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('pre.vis-workflow-pre-cls');
+                var preText = $pre.text().trim();
+
+                $kvContainer.empty();
+
+                if (!preText) return;
+
+                var lines = preText.split('\n');
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i].trim();
+                    if (!line) continue;
+                    var colonIdx = line.indexOf(':');
+                    if (colonIdx > 0) {
+                        var key = line.substring(0, colonIdx).trim();
+                        var val = line.substring(colonIdx + 1).trim();
+                        $kvContainer.append(
+                            '<div class="vis-wf-dummy-kv-row">'
+                            + '<span class="vis-wf-dummy-kv-key">' + VIS.Utility.encodeText(key) + '</span>'
+                            + '<span class="vis-wf-dummy-kv-val">' + VIS.Utility.encodeText(val) + '</span>'
+                            + '</div>'
+                        );
+                    } else {
+                        $kvContainer.append(
+                            '<div class="vis-wf-dummy-kv-row">'
+                            + '<span class="vis-wf-dummy-kv-key" style="width:100%">' + VIS.Utility.encodeText(line) + '</span>'
+                            + '</div>'
+                        );
+                    }
+                }
             };
 
             function syncDummyCardTitles() {
@@ -577,6 +677,163 @@
                                 color: #102C3F;
                                 font-weight: 700;
                             }
+                            #${modalId} .vis-wf-dummy-forward-panel {
+                                padding: 14px 18px 10px;
+                                border-top: 2px solid #DFF1FF;
+                                background: linear-gradient(135deg, #F0F9FF 0%, #E8F4FF 100%);
+                                border-radius: 0 0 0 0;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-header {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                margin-bottom: 12px;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-header-icon {
+                                width: 28px;
+                                height: 28px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                border-radius: 50%;
+                                background: #0083DA;
+                                color: #FFFFFF;
+                                font-size: 13px;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-header-title {
+                                font-size: 13px;
+                                font-weight: 700;
+                                color: #102C3F;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-fields {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 10px;
+                                margin-bottom: 12px;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-field {
+                                position: relative;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-field-icon {
+                                position: absolute;
+                                left: 12px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                color: #0083DA;
+                                font-size: 13px;
+                                pointer-events: none;
+                                z-index: 1;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-field-search-btn {
+                                position: absolute;
+                                right: 6px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                width: 28px;
+                                height: 28px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                border: none;
+                                border-radius: 7px;
+                                background: #EAF4FF;
+                                color: #0083DA;
+                                font-size: 13px;
+                                cursor: pointer;
+                                z-index: 2;
+                                transition: background 0.15s;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-field-search-btn:hover {
+                                background: #BFE4FF;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-field input[type="text"],
+                            #${modalId} .vis-wf-dummy-fwd-field input[name="AD_User_ID"] {
+                                width: 100% !important;
+                                height: 40px !important;
+                                padding: 0 40px 0 36px !important;
+                                border: 1.5px solid #BFE4FF !important;
+                                border-radius: 10px !important;
+                                font-family: Roboto, Arial, sans-serif !important;
+                                font-size: 13.5px !important;
+                                color: #102C3F !important;
+                                background: #FFFFFF !important;
+                                outline: 0 !important;
+                                box-shadow: 0 2px 8px rgba(0,131,218,0.08) !important;
+                                box-sizing: border-box !important;
+                                transition: border-color 0.15s;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-field input[type="text"]:focus,
+                            #${modalId} .vis-wf-dummy-fwd-field input[name="AD_User_ID"]:focus {
+                                border-color: #0083DA !important;
+                                box-shadow: 0 0 0 3px rgba(0,131,218,0.12) !important;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-msg-field {
+                                position: relative;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-msg-icon {
+                                position: absolute;
+                                left: 12px;
+                                top: 12px;
+                                color: #5F7283;
+                                font-size: 13px;
+                                pointer-events: none;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-msg {
+                                width: 100%;
+                                min-height: 56px;
+                                padding: 10px 14px 10px 36px;
+                                border: 1.5px solid #E4EDF4;
+                                border-radius: 10px;
+                                font-family: Roboto, Arial, sans-serif;
+                                font-size: 13px;
+                                color: #102C3F;
+                                background: #FFFFFF;
+                                resize: vertical;
+                                outline: 0;
+                                box-sizing: border-box;
+                                transition: border-color 0.15s;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-msg:focus {
+                                border-color: #0083DA;
+                                box-shadow: 0 0 0 3px rgba(0,131,218,0.08);
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-actions {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                justify-content: flex-end;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-confirm {
+                                height: 36px;
+                                padding: 0 20px;
+                                border: none;
+                                border-radius: 999px;
+                                background: linear-gradient(135deg, #0083DA, #0065B0);
+                                color: #FFFFFF;
+                                font-family: Roboto, Arial, sans-serif;
+                                font-size: 13px;
+                                font-weight: 700;
+                                cursor: pointer;
+                                box-shadow: 0 4px 10px rgba(0,131,218,0.28);
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 6px;
+                            }
+                            #${modalId} .vis-wf-dummy-fwd-cancel {
+                                height: 36px;
+                                padding: 0 16px;
+                                border: 1.5px solid #E4EDF4;
+                                border-radius: 999px;
+                                background: #FFFFFF;
+                                color: #5F7283;
+                                font-family: Roboto, Arial, sans-serif;
+                                font-size: 13px;
+                                cursor: pointer;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 6px;
+                            }
                             #${modalId} .vis-wf-dummy-footer {
                                 padding: 14px 18px;
                                 border-top: 1px solid #E4EDF4;
@@ -836,8 +1093,9 @@
                                             <span class="vis-wf-dummy-status"><span class="vis-wf-dummy-dot"></span>Awaiting your approval</span>
                                         </div>
                                         <div class="vis-wf-dummy-detail-right">
-                                            <span class="vis-wf-dummy-submitted">Submitted Wed, Apr 22 - 3:56 PM</span>
+                                            <span class="vis-wf-dummy-submitted"></span>
                                             <button type="button" class="vis-wf-dummy-icon-btn" title="Watch"><i class="vis vis-eye"></i></button>
+                                            <button type="button" class="vis-wf-dummy-icon-btn" title="History"><i class="vis vis-history"></i></button>
                                             <button type="button" id="${modalId}Close" class="vis-wf-dummy-icon-btn" title="Close"><i class="vis vis-close"></i></button>
                                         </div>
                                     </div>
@@ -845,15 +1103,13 @@
                                         <section class="vis-wf-dummy-section">
                                             <h3 class="vis-wf-dummy-section-title">Transaction details</h3>
                                             <div class="vis-wf-dummy-kv">
-                                                <div class="vis-wf-dummy-kv-row"><span class="vis-wf-dummy-kv-key">Request from app</span><span class="vis-wf-dummy-kv-val">60641</span></div>
-                                                <div class="vis-wf-dummy-kv-row"><span class="vis-wf-dummy-kv-key">Representative</span><span class="vis-wf-dummy-kv-val">Mostafa Hesham</span></div>
-                                                <div class="vis-wf-dummy-kv-row"><span class="vis-wf-dummy-kv-key">Customer</span><span class="vis-wf-dummy-kv-val">Adwiya Pharmacy</span></div>
+                                                <!-- populated dynamically from activity summary -->
                                             </div>
                                         </section>
                                         <section class="vis-wf-dummy-section">
                                             <h3 class="vis-wf-dummy-section-title">Desc</h3>
                                             <div class="vis-wf-dummy-description">
-                                                Order request for monthly pharmacy stock replenishment. Items include 12 SKUs across antibiotics, analgesics, and OTC categories. Requested delivery within 3 business days to the main branch. Payment terms: 30 days net, as per existing supplier agreement.
+                                                <!-- populated dynamically from activity description -->
                                             </div>
                                         </section>
                                         <section class="vis-wf-dummy-section">
@@ -864,8 +1120,13 @@
                                                 <div class="vis-wf-dummy-requester-extra">Annual leave used<br><strong>11 of 25 days</strong></div>
                                             </div>
                                         </section>
+                                        <section class="vis-wf-dummy-section vis-wf-dummy-history-panel" style="display:none;">
+                                            <h3 class="vis-wf-dummy-section-title">History</h3>
+                                            <div class="vis-wf-dummy-history-content"></div>
+                                        </section>
                                     </div>
                                     <div class="vis-wf-dummy-footer">
+                                        <div class="vis-wf-dummy-forward-panel" style="display:none;"></div>
                                         <div class="vis-wf-dummy-footer-row">
                                             <div class="vis-wf-dummy-note"><i class="vis vis-chat"></i><span>Add an optional note for Aditya...</span></div>
                                             <div class="vis-wf-dummy-actions">
@@ -883,16 +1144,28 @@
                 $('body').append($modal);
                 $modal.on('click', function (e) {
                     if ($(e.target).is($modal)) {
+                        $modal.trigger('modalClose');
                         $modal.css('display', 'none');
                     }
                 });
                 $modal.find('#' + modalId + 'Close').on('click', function () {
+                    $modal.trigger('modalClose');
                     $modal.css('display', 'none');
                 });
                 $modal.on('click', '.vis-wf-dummy-card', function () {
                     $modal.find('.vis-wf-dummy-card').removeClass('vis-wf-dummy-card-selected');
                     $(this).addClass('vis-wf-dummy-card-selected');
-                    syncDummyDetailTitle($(this).index() - 1);
+                    var cardIdx = $(this).index() - 1; // -1 to skip the group header div
+                    currentModalCardIdx = cardIdx;
+                    // Hide history panel when switching cards
+                    $modal.find('.vis-wf-dummy-history-panel').hide();
+                    // Collapse and clear the forward panel when switching cards
+                    var $fwdPanel = $modal.find('.vis-wf-dummy-forward-panel');
+                    $fwdPanel.hide().empty();
+                    syncDummyDetailTitle(cardIdx);
+                    syncDummyDetailKV(cardIdx);
+                    syncDummySubmitted(cardIdx);
+                    syncDummyDescription(cardIdx);
                 });
                 $modal.on('keydown', '.vis-wf-dummy-card', function (e) {
                     if (e.keyCode == 13 || e.keyCode == 32) {
@@ -901,9 +1174,210 @@
                     }
                 });
                 $modal.on('change', '#' + modalId + 'WindowSelect', function () {
+                    // Filter cards inside the modal without reloading from server
+                    filterDummyCards($(this).val());
+                    // Keep the main widget combo in sync (value only, no reload)
                     if ($cmbWindows && $cmbWindows.length > 0) {
-                        $cmbWindows.val($(this).val()).trigger('change');
+                        $cmbWindows.val($(this).val());
                     }
+                });
+
+                // Watch (eye) button — open the record screen, same as the vis-find zoom button
+                $modal.on('click', '[title="Watch"]', function () {
+                    zoom(currentModalCardIdx);
+                });
+
+                // Forward button — show forward panel with the user input directly (no extra button click)
+                $modal.on('click', '.vis-wf-dummy-action-secondary', function () {
+                    var $fwdPanel = $modal.find('.vis-wf-dummy-forward-panel');
+                    if ($fwdPanel.is(':visible')) {
+                        $fwdPanel.hide().empty();
+                        return;
+                    }
+
+                    $fwdPanel.empty();
+
+                    // ── Header ─────────────────────────────────────────────────────────
+                    var $header = $('<div class="vis-wf-dummy-fwd-header">');
+                    $header.append('<div class="vis-wf-dummy-fwd-header-icon"><i class="vis vis-arrow-right"></i></div>');
+                    $header.append($('<div class="vis-wf-dummy-fwd-header-title">').text(VIS.Msg.getMsg('Forward') || 'Forward to'));
+                    $fwdPanel.append($header);
+
+                    // ── Fields ─────────────────────────────────────────────────────────
+                    var $fields = $('<div class="vis-wf-dummy-fwd-fields">');
+
+                    // Build the lookup control — we only use getControl() (the raw input),
+                    // no buttons are added to the DOM so no extra click is needed.
+                    var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, "AD_User.IsLoginUser='Y' AND AD_User.IsActive='Y'");
+                    var txtb = new VIS.Controls.VTextBoxButton("AD_User_ID", false, false, true, VIS.DisplayType.Search, lookup);
+                    txtb.getBtn(); // initialise internal state (required), but we won't append the btns
+
+                    var $userField = $('<div class="vis-wf-dummy-fwd-field">');
+                    $userField.append('<i class="fa fa-user vis-wf-dummy-fwd-field-icon"></i>');
+                    var $userCtrl = txtb.getControl();
+                    $userCtrl.attr('placeholder', VIS.Msg.getMsg('Forward') || 'Search user…');
+                    $userField.append($userCtrl);
+
+                    // Search icon — clicking it opens the VIS user lookup popup
+                    var $searchBtn = $('<button type="button" class="vis-wf-dummy-fwd-field-search-btn" title="Search user">');
+                    $searchBtn.append('<i class="vis vis-find"></i>');
+                    $searchBtn.on('click', function (e) {
+                        e.stopPropagation();
+                        // getBtn(0) is the caret-down button — opens the user lookup dropdown
+                        txtb.getBtn(0).trigger('click');
+                    });
+                    $userField.append($searchBtn);
+
+                    $fields.append($userField);
+
+                    // Message textarea
+                    var $msgField = $('<div class="vis-wf-dummy-fwd-msg-field">');
+                    $msgField.append('<i class="vis vis-chat vis-wf-dummy-fwd-msg-icon"></i>');
+                    var $msgInput = $('<textarea class="vis-wf-dummy-fwd-msg">').attr('placeholder', VIS.Msg.getMsg('Message') || 'Add an optional note…');
+                    $msgField.append($msgInput);
+                    $fields.append($msgField);
+
+                    $fwdPanel.append($fields);
+
+                    // ── Action buttons ─────────────────────────────────────────────────
+                    var $actions = $('<div class="vis-wf-dummy-fwd-actions">');
+                    var $cancelBtn  = $('<button class="vis-wf-dummy-fwd-cancel">').html('<i class="vis vis-close"></i> ' + (VIS.Msg.getMsg('Cancel') || 'Cancel'));
+                    var $confirmBtn = $('<button class="vis-wf-dummy-fwd-confirm">').html('<i class="vis vis-arrow-right"></i> ' + (VIS.Msg.getMsg('Forward') || 'Forward'));
+                    $actions.append($cancelBtn).append($confirmBtn);
+                    $fwdPanel.append($actions);
+
+                    // ── Events ────────────────────────────────────────────────────────
+                    $cancelBtn.on('click', function () {
+                        $fwdPanel.hide().empty();
+                    });
+
+                    $confirmBtn.on('click', function () {
+                        var fwdTo = txtb.getValue();
+                        if (!fwdTo || fwdTo <= 0) {
+                            VIS.ADialog.error('FillMandatory', true, VIS.Msg.getMsg('Forward'));
+                            return;
+                        }
+                        var msg = VIS.Utility.encodeText($msgInput.val());
+                        var activityID = fulldata[currentModalCardIdx].AD_WF_Activity_ID;
+                        var nID        = fulldata[currentModalCardIdx].AD_Node_ID;
+                        var winID      = fulldata[currentModalCardIdx].AD_Window_ID;
+
+                        showBusy(true);
+                        VIS.dataContext.getJSONData(
+                            VIS.Application.contextUrl + 'WFActivity/ApproveIt',
+                            { activityID: activityID, nodeID: nID, txtMsg: msg, fwd: fwdTo, answer: null, AD_Window_ID: winID },
+                            function (info) {
+                                showBusy(false);
+                                if (info.result == '') {
+                                    $modal.css('display', 'none');
+                                    lstDetailCtrls = [];
+                                    selectedItems = [];
+                                    adjust_size();
+                                } else {
+                                    VIS.ADialog.error(info.result);
+                                }
+                            }
+                        );
+                    });
+
+                    $fwdPanel.show();
+
+                    // Focus the user input immediately so the user can start typing
+                    setTimeout(function () { $userCtrl.trigger('focus'); }, 80);
+                });
+
+                // History button — toggle history panel, load data on first show
+                $modal.on('click', '[title="History"]', function () {
+                    var $historyPanel = $modal.find('.vis-wf-dummy-history-panel');
+                    if ($historyPanel.is(':visible')) {
+                        $historyPanel.hide();
+                        return;
+                    }
+
+                    // Get the activity info for the currently selected card
+                    var $actContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
+                    var $actContainer = $actContainers.eq(currentModalCardIdx);
+                    var $pre = $actContainer.find('pre.vis-workflow-pre-cls');
+                    var dataIds = $pre.attr('data-ids') || '';
+                    var parts = dataIds.split('_');
+                    var wfActivityID = parts[2] || '';
+                    var nodeID = parts[1] || '0';
+                    var idx = parts[3] !== undefined ? parseInt(parts[3]) : currentModalCardIdx;
+                    var wfProcessID = (fulldata && fulldata[idx]) ? fulldata[idx].AD_WF_Process_ID : null;
+
+                    if (!wfActivityID) {
+                        $historyPanel.show();
+                        return;
+                    }
+
+                    var $historyContent = $historyPanel.find('.vis-wf-dummy-history-content');
+                    $historyContent.html('<div style="padding:10px;color:#748494;">Loading...</div>');
+                    $historyPanel.show();
+
+                    $.ajax({
+                        url: VIS.Application.contextUrl + 'WFActivity/GetActivityInfo',
+                        async: true,
+                        dataType: 'json',
+                        type: 'POST',
+                        data: { activityID: wfActivityID, nodeID: nodeID, wfProcessID: wfProcessID },
+                        error: function () {
+                            $historyContent.html('<div style="padding:10px;color:#e74c3c;">Failed to load history.</div>');
+                        },
+                        success: function (res) {
+                            var info = res && res.result ? res.result : null;
+                            $historyContent.empty();
+
+                            if (!info || !info.Node) {
+                                $historyContent.html('<div style="padding:10px;color:#748494;">No history available.</div>');
+                                return;
+                            }
+
+                            var $divHistoryNode = $('<div class="vis-workflow-historyCls">');
+                            for (var node in info.Node) {
+                                if (info.Node[node].History == null) continue;
+                                for (var hNode in info.Node[node].History) {
+                                    var h = info.Node[node].History[hNode];
+                                    var nodeName = info.Node[node].Name || '';
+                                    if (h.State == 'CC' && node < (info.Node.length - 1)) {
+                                        $divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='" + VIS.Application.contextUrl + "Areas/VIS/Images/home/4.jpg'>")));
+                                        var $divAppBy = $("<div class='vis-approved_wrap'>");
+                                        $divAppBy.append("<div class='vis-ApproveCircleCls'><i class='vis vis-markx'></i></div>");
+                                        var $divLeft = $("<div class='vis-left-part'>");
+                                        if (h.TextMsg && h.TextMsg.length > 0) {
+                                            $divLeft.append($("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(h.TextMsg) + "'></i>"));
+                                        }
+                                        $divLeft.append(nodeName);
+                                        $divAppBy.append($divLeft);
+                                        var $divRight = $("<div class='vis-right-part'>");
+                                        $divRight.append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(h.ApprovedBy));
+                                        $divAppBy.append($divRight);
+                                        $divHistoryNode.append($divAppBy);
+                                    } else if (h.State == 'BK') {
+                                        continue;
+                                    } else if ((node < (info.Node.length - 1)) || info.Node.length == 1) {
+                                        var $divPending = $("<div class='vis-pending_wrap'>");
+                                        $divPending.append($("<div class='vis-left-part'>").append(nodeName));
+                                        $divPending.append($("<div class='vis-right-part'>").append(VIS.Msg.getMsg('Pending')));
+                                        $divHistoryNode.append($divPending);
+                                    } else {
+                                        $divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='" + VIS.Application.contextUrl + "Areas/VIS/Images/home/4.jpg'>")));
+                                        var $divStart = $("<div class='vis-start_wrap vis-workflow-startCls'>");
+                                        var $divLeft = $("<div class='vis-left-part'>");
+                                        if (h.TextMsg && h.TextMsg.length > 0) {
+                                            $divLeft.append($("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(h.TextMsg) + "'></i>"));
+                                        }
+                                        $divLeft.append(nodeName);
+                                        $divStart.append($divLeft);
+                                        var $divRight = $("<div class='vis-right-part'>");
+                                        $divRight.append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(h.ApprovedBy));
+                                        $divStart.append($divRight);
+                                        $divHistoryNode.append($divStart);
+                                    }
+                                }
+                            }
+                            $historyContent.append($divHistoryNode);
+                        }
+                    });
                 });
             }
 
@@ -913,6 +1387,37 @@
             syncDummyCardTitles();
             syncDummyPendingCount();
             syncDummyDetailTitle(0);
+            syncDummyDetailKV(0);
+            syncDummySubmitted(0);
+            syncDummyDescription(0);
+
+            // ── Global z-index guard ──────────────────────────────────────────────
+            // Any dialog/popup appended to <body> while this modal is open must sit
+            // above our modal (z-index 99999).  We only skip pure dimming backdrops.
+            if (!$modal.data('bodyObserver')) {
+                var modalBodyObserver = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (m) {
+                        m.addedNodes.forEach(function (node) {
+                            if (node.nodeType !== 1) return;
+                            var $node = $(node);
+                            if ($node.hasClass('ui-widget-overlay') ||
+                                $node.hasClass('modal-backdrop')) return;
+                            $node.css('z-index', 100002);
+                            $node.find('.ui-dialog').css('z-index', 100002);
+                        });
+                    });
+                });
+                modalBodyObserver.observe(document.body, { childList: true, subtree: false });
+                $modal.data('bodyObserver', modalBodyObserver);
+
+                // Stop observing when the modal is hidden
+                var origHide = $modal.hide;
+                $modal.on('modalClose', function () {
+                    modalBodyObserver.disconnect();
+                    $modal.removeData('bodyObserver');
+                });
+            }
+
             $modal.css('display', 'flex');
         };
         /* Declare events */
@@ -1042,7 +1547,7 @@
                 + '         <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="' + VIS.Msg.getMsg("Requery") + '" class="vis-w-feedicon" style="display:none;"><i class="vis vis-refresh"></i></a>'// style="float: right; margin-top: 0px; cursor: pointer; "
                 //+ '         <span id="sNewNts" style="display: none; float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;" class="vis-feedicon border-0" title="New Record"><i class="vis vis-plus"></i></span>'
                 + '         <span id="WFSearchshow' + $self.AD_UserHomeWidgetID + '"  class="vis-w-feedicon vis vis-eye-plus border-0" title="Show Search"></span>'//style="float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;"
-                + '         <span id="WFShowDetails' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis vis-info border-0" title="Open Dummy Model" style="cursor:pointer;min-width:20px;display:inline-block;"></span>'
+                + '         <span id="WFShowDetails' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis vis-info border-0" title="Open Dummy Model" style="cursor:pointer;min-width:20px;display:none;"></span>'
                 + ' </div>'
                 + '     </h2></div>'
                 + ' <div id = "welcomeScreenFeedsLists' + $self.AD_UserHomeWidgetID + '" class="vis-w-scrollerVerticalNewCls ml-0 vis-w-workflow-welcomfeed-cls"><div class="vis-w-workflow-homepage-parentdiv">'
@@ -1135,15 +1640,19 @@
                         if (async == true) {
                             loadWindows();
                         }
+                        // Show the details icon only when there are workflow records
+                        $wFShowDetails_ID.css('display', data.length > 0 ? 'inline-block' : 'none');
                         setTimeout(function () {
                             showBusy(false);
                         }, 200);
-                        
+
                     }
                     else {
                         data = null;
                         $countDiv_ID.append(0);
                         $workflowWidgetDtls_ID.append('<p id="pnorecFound' + $self.AD_UserHomeWidgetID + '" class="vis-NoRecordCls vis-a-pTagSetHeight">' + VIS.Msg.getMsg("NoRecordFound") + '</p>');// style="margin-top:12.5em; text-align:center; display:block;"
+                        // Hide the details icon when there are no workflow records
+                        $wFShowDetails_ID.css('display', 'none');
                         showBusy(false);
                     }
                 }
