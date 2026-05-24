@@ -139,11 +139,6 @@
                         + '    <span class="vis-wf-dummy-id">WF-' + (index + 1) + '</span>'
                         + '  </div>'
                         + '  <div class="vis-wf-dummy-card-title">' + VIS.Utility.encodeText(activityTitle) + '</div>'
-                        + '  <div class="vis-wf-dummy-card-meta">'
-                        + '    <span class="vis-wf-dummy-avatar" style="background:linear-gradient(135deg,#06b6d4,#0083DA);">WF</span>'
-                        + '    <span>Pending item</span>'
-                        + '    <span>Not mapped yet</span>'
-                        + '  </div>'
                         + '</div>'
                     );
                 });
@@ -153,19 +148,21 @@
                 var $dummyList = $modal.find('.vis-wf-dummy-list');
                 var $cards = $dummyList.find('.vis-wf-dummy-card');
                 var $group = $dummyList.find('.vis-wf-dummy-group');
+                var searchText = ($modal.find('.vis-wf-dummy-search input').val() || '').toLowerCase().trim();
+                var visibleCount = 0;
 
-                if (!winNodeVal || winNodeVal === '0_0') {
-                    // Show all
-                    $cards.show();
-                    $group.text('Activities - ' + $cards.length);
-                } else {
-                    // Show only matching window/node
-                    $cards.each(function () {
-                        $(this).toggle($(this).data('winnode') === winNodeVal);
-                    });
-                    var visibleCount = $cards.filter(':visible').length;
-                    $group.text('Activities - ' + visibleCount);
-                }
+                $dummyList.find('.vis-wf-dummy-search-empty').remove();
+                $cards.each(function (index) {
+                    var windowMatch = !winNodeVal || winNodeVal === '0_0' || $(this).data('winnode') === winNodeVal;
+                    var searchMatch = !searchText || getDummyCardSearchText($(this), index).indexOf(searchText) > -1;
+                    var isVisible = windowMatch && searchMatch;
+
+                    $(this).toggle(isVisible);
+                    if (isVisible) {
+                        visibleCount++;
+                    }
+                });
+                $group.text('Activities - ' + visibleCount);
 
                 // Re-select first visible card and update detail panel
                 $cards.removeClass('vis-wf-dummy-card-selected');
@@ -184,7 +181,30 @@
                     syncDummyDetailKV(firstIdx);
                     syncDummySubmitted(firstIdx);
                     syncDummyDescription(firstIdx);
+                    syncDummyRequester(firstIdx);
+                    clearDummyMessage();
+                    syncDummyAnswer(firstIdx);
                 }
+                else {
+                    currentModalCardIdx = -1;
+                    $modal.find('.vis-wf-dummy-record-title').text(VIS.Msg.getMsg('NoRecordFound') || 'No records found');
+                    $modal.find('.vis-wf-dummy-kv').empty();
+                    $modal.find('.vis-wf-dummy-description').closest('section').hide();
+                    $modal.find('.vis-wf-dummy-actions .vis-wf-dummy-answer-dynamic').remove();
+                    $dummyList.append('<div class="vis-wf-dummy-empty vis-wf-dummy-search-empty">' + (VIS.Msg.getMsg('NoRecordFound') || 'No records found') + '</div>');
+                }
+            };
+
+            function getDummyCardSearchText($card, index) {
+                var activity = (fulldata && fulldata[index]) ? fulldata[index] : {};
+                return [
+                    $card.text(),
+                    activity.NodeName,
+                    activity.DocumentNameValue,
+                    activity.Summary,
+                    activity.Description,
+                    getDummyRequesterName(index)
+                ].join(' ').toLowerCase();
             };
 
             function syncDummyPendingCount() {
@@ -201,6 +221,60 @@
                 $modal.find('.vis-wf-dummy-record-title').text(activityTitle);
             };
 
+            function getDummyRequesterName(index, info) {
+                var activity = (fulldata && fulldata[index]) ? fulldata[index] : {};
+                var sources = [info || {}, activity];
+                var fields = [
+                    'WorkflowIssuer', 'WorkflowIssuerName', 'Issuer', 'IssuerName', 'IssuedBy',
+                    'Requester', 'RequesterName', 'AD_User_Name', 'UserName', 'CreatedByName',
+                    'CreatedByUserName', 'CreatedByUser', 'OwnerName', 'ResponsibleName'
+                ];
+
+                for (var sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+                    for (var fieldIndex = 0; fieldIndex < fields.length; fieldIndex++) {
+                        var value = sources[sourceIndex][fields[fieldIndex]];
+                        if (typeof value == 'string' && value.trim().length > 0) {
+                            return value.trim();
+                        }
+                    }
+                }
+
+                var summary = activity.Summary || '';
+                var lines = summary.split('\n');
+                for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                    var line = lines[lineIndex];
+                    var colonIdx = line.indexOf(':');
+                    if (colonIdx <= 0) {
+                        continue;
+                    }
+                    var key = line.substring(0, colonIdx).trim().toLowerCase();
+                    var valueText = line.substring(colonIdx + 1).trim();
+                    if (valueText && (key == 'workflow issuer' || key == 'issuer' || key == 'requester' || key == 'created by' || key == 'submitted by')) {
+                        return valueText;
+                    }
+                }
+
+                return 'Workflow Issuer';
+            };
+
+            function getDummyRequesterInitials(name) {
+                if (!name) {
+                    return 'WF';
+                }
+
+                var words = name.trim().split(/\s+/);
+                if (words.length == 1) {
+                    return words[0].substring(0, 2).toUpperCase();
+                }
+                return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+            };
+
+            function syncDummyRequester(index, info) {
+                var requesterName = getDummyRequesterName(index || 0, info);
+                $modal.find('.vis-wf-dummy-requester-name').text(requesterName);
+                $modal.find('.vis-wf-dummy-requester-avatar').text(getDummyRequesterInitials(requesterName));
+            };
+
             // Populate the description section from fulldata — hide entire section if empty
             function syncDummyDescription(index) {
                 var desc = (fulldata && fulldata[index || 0]) ? (fulldata[index || 0].Description || '').trim() : '';
@@ -211,6 +285,130 @@
                 } else {
                     $section.hide();
                 }
+            };
+
+            function clearDummyMessage() {
+                $modal.find('.vis-wf-dummy-note textarea').val('');
+            };
+
+            function approveDummyAnswer(index, ctrl, $okBtn) {
+                if ($okBtn.data('clicked') == 'Y') {
+                    return;
+                }
+                $okBtn.data('clicked', 'Y');
+
+                var answer = ctrl && ctrl.getValue ? ctrl.getValue() : null;
+                if (answer == '' || answer == null) {
+                    $okBtn.data('clicked', 'N');
+                    VIS.ADialog.error('FillMandatory', true, VIS.Msg.getMsg('Answer'));
+                    return;
+                }
+
+                var msg = VIS.Utility.encodeText($modal.find('.vis-wf-dummy-note textarea').val());
+                showBusy(true);
+                VIS.dataContext.getJSONData(
+                    VIS.Application.contextUrl + 'WFActivity/ApproveIt',
+                    {
+                        activityID: fulldata[index].AD_WF_Activity_ID,
+                        nodeID: fulldata[index].AD_Node_ID,
+                        txtMsg: msg,
+                        fwd: null,
+                        answer: answer,
+                        AD_Window_ID: fulldata[index].AD_Window_ID
+                    },
+                    function (info) {
+                        $okBtn.data('clicked', 'N');
+                        showBusy(false);
+                        if (info.result == '') {
+                            $modal.css('display', 'none');
+                            lstDetailCtrls = [];
+                            selectedItems = [];
+                            adjust_size();
+                        } else {
+                            VIS.ADialog.error(info.result);
+                        }
+                    }
+                );
+            };
+
+            function buildDummyAnswer(index, info) {
+                var $actions = $modal.find('.vis-wf-dummy-actions');
+                $actions.find('.vis-wf-dummy-answer-dynamic').remove();
+
+                if (!info || info.NodeAction != 'C') {
+                    return;
+                }
+
+                var ctrl = getControl(info, fulldata[index].AD_WF_Activity_ID);
+                if (ctrl == null) {
+                    return;
+                }
+
+                var $answerWrap = $('<div class="vis-w-home-wf-answerWrap vis-wf-dummy-answer-dynamic">');
+                var $answerInput = $('<div class="input-group vis-w-home-wf-answerInput vis-w-input-widgetswrap">');
+                $answerWrap.append($answerInput);
+
+                if (ctrl.getBtnCount && ctrl.getBtnCount() > 0) {
+                    var $ctrlWrap = $("<div class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0'>");
+                    $ctrlWrap.append(ctrl.getControl());
+                    $ctrlWrap.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
+
+                    var $ctrlBtnWrap = $("<div class='input-group-append'>");
+                    $ctrlBtnWrap.append(ctrl.getBtn(0));
+                    $answerInput.append($ctrlWrap).append($ctrlBtnWrap);
+                }
+                else {
+                    $answerInput.append(ctrl.getControl());
+                }
+
+                var $okBtn = $("<a href='javascript:void(0)' style='display:none' id='vis-home-wf-ansOK-" + modalId + "' class='vis-btn vis-btn-done vis-w-icon-doneButton vis-w-workflowActivityIcons' data-clicked='N' data-id='" + index + "'>");
+                $okBtn.append($("<span class='vis vis-markx'>"));
+                $answerWrap.append($('<div class="vis-w-home-wf-answerBtn">').append($okBtn));
+                $actions.append($answerWrap);
+
+                var toggleDummyAnswerOk = function () {
+                    if (ctrl.getValue() == '' || ctrl.getValue() == null) {
+                        $okBtn.css('display', 'none');
+                    }
+                    else {
+                        $okBtn.css('display', '');
+                    }
+                };
+
+                ctrl.fireValueChanged = toggleDummyAnswerOk;
+                $answerWrap.find(':input').on('change keyup input', toggleDummyAnswerOk);
+                toggleDummyAnswerOk();
+
+                $okBtn.on(VIS.Events.onTouchStartOrClick, function () {
+                    approveDummyAnswer(index, ctrl, $okBtn);
+                });
+            };
+
+            function syncDummyAnswer(index) {
+                var $actions = $modal.find('.vis-wf-dummy-actions');
+                $actions.find('.vis-wf-dummy-answer-dynamic').remove();
+
+                if (!fulldata || !fulldata[index]) {
+                    return;
+                }
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "WFActivity/GetActivityInfo",
+                    async: true,
+                    dataType: "json",
+                    type: "POST",
+                    data: {
+                        activityID: fulldata[index].AD_WF_Activity_ID,
+                        nodeID: fulldata[index].AD_Node_ID,
+                        wfProcessID: fulldata[index].AD_WF_Process_ID
+                    },
+                    success: function (res) {
+                        if (index === currentModalCardIdx) {
+                            syncDummyRequester(index, res.result);
+                            buildDummyAnswer(index, res.result);
+                        }
+                    }
+                });
             };
 
             // Populate the submitted date from the activity's feedDateTime element
@@ -667,16 +865,6 @@
                                 font-size: 14.5px;
                                 font-weight: 700;
                             }
-                            #${modalId} .vis-wf-dummy-requester-extra {
-                                text-align: right;
-                                color: #748494;
-                                font-size: 12px;
-                                line-height: 1.35;
-                            }
-                            #${modalId} .vis-wf-dummy-requester-extra strong {
-                                color: #102C3F;
-                                font-weight: 700;
-                            }
                             #${modalId} .vis-wf-dummy-forward-panel {
                                 padding: 14px 18px 10px;
                                 border-top: 2px solid #DFF1FF;
@@ -847,23 +1035,50 @@
                             }
                             #${modalId} .vis-wf-dummy-note {
                                 flex: 1;
-                                height: 40px;
+                                min-height: 40px;
                                 display: flex;
-                                align-items: center;
+                                align-items: flex-start;
                                 gap: 8px;
                                 min-width: 180px;
-                                padding: 0 14px;
+                                padding: 8px 12px;
                                 border: 1px solid #E4EDF4;
                                 border-radius: 10px;
                                 background: #FBFDFF;
                                 color: #9F9F9F;
                                 font-size: 13px;
                             }
+                            #${modalId} .vis-wf-dummy-note i {
+                                margin-top: 4px;
+                                flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-note .vis-w-workflow-textarea {
+                                width: 100%;
+                                min-height: 24px;
+                                height: 24px;
+                                padding: 0;
+                                border: 0;
+                                background: transparent;
+                                resize: none;
+                                outline: 0;
+                                color: #102C3F;
+                                font-size: 13px;
+                                line-height: 20px;
+                                box-shadow: none;
+                            }
                             #${modalId} .vis-wf-dummy-actions {
                                 display: flex;
                                 align-items: center;
                                 gap: 8px;
                                 flex-shrink: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-answer-dynamic {
+                                display: flex;
+                                align-items: center;
+                                min-width: 260px;
+                                margin: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-answer-dynamic .vis-w-home-wf-answerInput {
+                                min-width: 220px;
                             }
                             #${modalId} .vis-wf-dummy-action {
                                 height: 40px;
@@ -877,21 +1092,10 @@
                                 font-family: Roboto, Arial, sans-serif;
                                 cursor: pointer;
                             }
-                            #${modalId} .vis-wf-dummy-action-primary {
-                                border: 1px solid #0083DA;
-                                background: #0083DA;
-                                color: #FFFFFF;
-                                box-shadow: 0 6px 14px rgba(0,131,218,0.25);
-                            }
                             #${modalId} .vis-wf-dummy-action-secondary {
                                 border: 1px solid #0083DA;
                                 background: #FFFFFF;
                                 color: #0083DA;
-                            }
-                            #${modalId} .vis-wf-dummy-action-danger {
-                                border: 1px solid #F4C5C5;
-                                background: #FFFFFF;
-                                color: #8F2D2D;
                             }
                             #${modalId} .vis-wf-dummy-key {
                                 padding: 1px 5px;
@@ -903,10 +1107,6 @@
                             #${modalId} .vis-wf-dummy-action-secondary .vis-wf-dummy-key {
                                 background: #DFF1FF;
                                 color: #106AB0;
-                            }
-                            #${modalId} .vis-wf-dummy-action-danger .vis-wf-dummy-key {
-                                background: #FAD7D7;
-                                color: #8F2D2D;
                             }
                             #${modalId}[dir="rtl"] {
                                 direction: rtl;
@@ -934,8 +1134,7 @@
                             #${modalId}[dir="rtl"] .vis-wf-dummy-time {
                                 text-align: left;
                             }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-kv-val,
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-requester-extra {
+                            #${modalId}[dir="rtl"] .vis-wf-dummy-kv-val {
                                 text-align: left;
                             }
                             #${modalId}[dir="rtl"] .vis-wf-dummy-search input {
@@ -1046,12 +1245,10 @@
                                     flex-direction: column;
                                     gap: 6px;
                                 }
-                                #${modalId} .vis-wf-dummy-kv-val,
-                                #${modalId} .vis-wf-dummy-requester-extra {
+                                #${modalId} .vis-wf-dummy-kv-val {
                                     text-align: left;
                                 }
-                                #${modalId}[dir="rtl"] .vis-wf-dummy-kv-val,
-                                #${modalId}[dir="rtl"] .vis-wf-dummy-requester-extra {
+                                #${modalId}[dir="rtl"] .vis-wf-dummy-kv-val {
                                     text-align: right;
                                 }
                                 #${modalId} .vis-wf-dummy-footer {
@@ -1115,9 +1312,8 @@
                                         <section class="vis-wf-dummy-section">
                                             <h3 class="vis-wf-dummy-section-title">Requester</h3>
                                             <div class="vis-wf-dummy-requester">
-                                                <div class="vis-wf-dummy-requester-avatar">AS</div>
-                                                <div class="vis-wf-dummy-requester-name">Aditya Sharma</div>
-                                                <div class="vis-wf-dummy-requester-extra">Annual leave used<br><strong>11 of 25 days</strong></div>
+                                                <div class="vis-wf-dummy-requester-avatar">WF</div>
+                                                <div class="vis-wf-dummy-requester-name"></div>
                                             </div>
                                         </section>
                                         <section class="vis-wf-dummy-section vis-wf-dummy-history-panel" style="display:none;">
@@ -1128,11 +1324,9 @@
                                     <div class="vis-wf-dummy-footer">
                                         <div class="vis-wf-dummy-forward-panel" style="display:none;"></div>
                                         <div class="vis-wf-dummy-footer-row">
-                                            <div class="vis-wf-dummy-note"><i class="vis vis-chat"></i><span>Add an optional note for Aditya...</span></div>
+                                            <div class="vis-wf-dummy-note"><i class="vis vis-chat"></i><textarea class="vis-w-workflow-textarea" placeholder="${VIS.Msg.getMsg('TypeMessage')}...." spellcheck="false"></textarea></div>
                                             <div class="vis-wf-dummy-actions">
                                                 <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-secondary"><i class="vis vis-arrow-right"></i>Forward <span class="vis-wf-dummy-key">F</span></button>
-                                                <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-danger"><i class="vis vis-close"></i>Reject <span class="vis-wf-dummy-key">R</span></button>
-                                                <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-primary"><i class="vis vis-check"></i>Approve <span class="vis-wf-dummy-key">A</span></button>
                                             </div>
                                         </div>
                                     </div>
@@ -1155,7 +1349,7 @@
                 $modal.on('click', '.vis-wf-dummy-card', function () {
                     $modal.find('.vis-wf-dummy-card').removeClass('vis-wf-dummy-card-selected');
                     $(this).addClass('vis-wf-dummy-card-selected');
-                    var cardIdx = $(this).index() - 1; // -1 to skip the group header div
+                    var cardIdx = $modal.find('.vis-wf-dummy-card').index(this);
                     currentModalCardIdx = cardIdx;
                     // Hide history panel when switching cards
                     $modal.find('.vis-wf-dummy-history-panel').hide();
@@ -1166,6 +1360,9 @@
                     syncDummyDetailKV(cardIdx);
                     syncDummySubmitted(cardIdx);
                     syncDummyDescription(cardIdx);
+                    syncDummyRequester(cardIdx);
+                    clearDummyMessage();
+                    syncDummyAnswer(cardIdx);
                 });
                 $modal.on('keydown', '.vis-wf-dummy-card', function (e) {
                     if (e.keyCode == 13 || e.keyCode == 32) {
@@ -1181,10 +1378,27 @@
                         $cmbWindows.val($(this).val());
                     }
                 });
+                $modal.on('input', '.vis-wf-dummy-search input', function () {
+                    filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
+                });
+                $modal.on('keydown', '.vis-wf-dummy-search input', function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                        filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
+                    }
+                });
+                $modal.on('click', '.vis-wf-dummy-search i', function () {
+                    filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
+                });
 
                 // Watch (eye) button — open the record screen, same as the vis-find zoom button
                 $modal.on('click', '[title="Watch"]', function () {
+                    if (currentModalCardIdx < 0) {
+                        return;
+                    }
                     zoom(currentModalCardIdx);
+                    $modal.trigger('modalClose');
+                    $modal.css('display', 'none');
                 });
 
                 // Forward button — show forward panel with the user input directly (no extra button click)
@@ -1390,6 +1604,8 @@
             syncDummyDetailKV(0);
             syncDummySubmitted(0);
             syncDummyDescription(0);
+            syncDummyRequester(0);
+            syncDummyAnswer(0);
 
             // ── Global z-index guard ──────────────────────────────────────────────
             // Any dialog/popup appended to <body> while this modal is open must sit
