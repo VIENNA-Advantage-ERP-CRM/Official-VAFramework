@@ -1029,9 +1029,7 @@
                 var variantCls = (localType === "T")
                     ? "vis-ev-col-ag-container--toggle"
                     : "vis-ev-col-ag-container--parent";
-                html = '<div class="vis-ev-col-ag-container ' + variantCls + '" data-agname="' + name + '"' + styl + '>'
-                    + '<div class="vis-ev-col-ag-body"></div>'
-                    + '</div>';
+                html = '<div class="vis-ev-col-ag-container ' + variantCls + '" data-agname="' + name + '"' + styl + '></div>';
             }
             else {
                 html = '<div class="dropdown vis-ev-col-actiongroup" >'
@@ -1051,7 +1049,8 @@
             }
 
             if (localType === "T" || localType === "C") {
-                $actionList = $root.find('.vis-ev-col-ag-body');
+                //fields are appended directly to the container; no separate body wrapper.
+                $actionList = $root;
             }
             else {
                 $actionList = $root.find('.vis-ev-col-ag-btn-list');
@@ -1082,7 +1081,7 @@
 
     ActionGroup.prototype.addItem = function (veditor, mField) {
         this.vEditors.push(veditor);
-        //container mode: addField builds the per-field wrapper inside the AG body via insertCWrapper.
+        //container mode: addField builds the per-field wrapper inside the AG container via insertCWrapper.
         //popover mode (existing): each editor goes in a bare <li> inside the dropdown <ul>.
         if (this.isContainer) {
             return;

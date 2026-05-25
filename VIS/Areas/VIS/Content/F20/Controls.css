@@ -215,6 +215,12 @@
         border-bottom: 1px solid transparent;
     }
 
+    /* AG container's own outer wrapper duplicates the per-field bottom border —
+       each inner field wrapper already draws it, so suppress it on the shell. */
+    .vis-ad-w-p-vc-editview .vis-input-wrap:has(.vis-ev-col-ag-container) {
+        border-bottom: 1px solid transparent !important;
+    }
+
     .vis-ad-w-p-vc-editview .vis-input-wrap:has(.vis-ev-col-mandatory) .vis-ev-col-msign {
         display: none;
     }
@@ -1342,36 +1348,27 @@ input[type="radio"] {
     width: 100%;
 }
 
-    .vis-ev-col-ag-container .vis-ev-col-ag-body {
-        display: flex;
-        width: 100%;
-    }
-
     /* Drop the per-field bottom margin inherited from .vis-input-wrap on inner
        controls. The container's own outer wrapper already provides cell spacing,
        so the inner wrappers would otherwise push fields out of alignment. */
-    .vis-ev-col-ag-container .vis-ev-col-ag-body > .input-group {
+    .vis-ev-col-ag-container > .input-group {
         margin-bottom: 0;
     }
 
-/* Toggle: column stacking, each visible wrapper spans full width */
-.vis-ev-col-ag-container--toggle .vis-ev-col-ag-body {
-    flex-direction: column;
-}
-
-    .vis-ev-col-ag-container--toggle .vis-ev-col-ag-body > .input-group {
+/* Toggle: column stacking (container's base direction), each visible wrapper spans full width */
+    .vis-ev-col-ag-container--toggle > .input-group {
         width: 100%;
     }
 
 /* Parent: row flow, each control takes its own natural width and wraps if needed */
-.vis-ev-col-ag-container--parent .vis-ev-col-ag-body {
+.vis-ev-col-ag-container--parent {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 6px;
 }
 
-    .vis-ev-col-ag-container--parent .vis-ev-col-ag-body > .input-group {
+    .vis-ev-col-ag-container--parent > .input-group {
         width: auto;
         flex: 0 1 auto;
     }
