@@ -582,7 +582,8 @@ namespace VAdvantage.Controller
                 else if (isAuto == "N")
                     vo.IsAutoNewRecord = false;
                 vo.HideFieldGroupFrom = Convert.ToInt16(Util.GetValueOfInt(dr["HideFieldGroupFrom"]));
-                vo.DetailViewColCount = Convert.ToInt16(Util.GetValueOfInt(dr["SingleViewLayout"])); 
+                vo.DetailViewColCount = Convert.ToInt16(Util.GetValueOfInt(dr["SingleViewLayout"]));
+                vo.IsListView = Utility.Util.GetValueOfString(dr["IsShowCardsAsListView"]).Equals("Y");
             }
             catch (System.Exception ex)
             {
