@@ -788,6 +788,15 @@
         function getMenuHeaderHeight() {
             return menuHeader_Height;
         }
+
+        function getSideMenuWidth() {
+            var $sm = $('.vis-NewSideMenu-Container');
+            if (!$sm.length || !$sm.is(':visible')) {
+                return 0;                       // no menu → full width
+            }
+            return 54;//fix width
+        }
+
         function setMenuHeaderHeight(mHeight) {
             menuHeader_Height = mHeight;
         }
@@ -1036,6 +1045,7 @@
             getObscureValue: getObscureValue,
             setMenuHeaderHeight: setMenuHeaderHeight,
             getMenuHeaderHeight: getMenuHeaderHeight,
+            getSideMenuWidth: getSideMenuWidth
         }
     }();
     // ******************** END ENV *********************//

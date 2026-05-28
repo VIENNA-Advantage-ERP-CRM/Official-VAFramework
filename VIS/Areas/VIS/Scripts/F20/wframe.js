@@ -335,6 +335,7 @@
         // this.setSize(height);
         var vHeight = VIS.Env.getMenuHeaderHeight();
         var hHeight = this.isHeaderVisible ? vHeight + 42 : vHeight + 1;
+        width = width - VIS.Env.getSideMenuWidth();
         try {
             this.cPanel.sizeChanged(height - hHeight, width);
         }
