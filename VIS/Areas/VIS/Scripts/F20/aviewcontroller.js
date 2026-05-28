@@ -682,13 +682,19 @@
     <returns></returns>*/
     VIS.GridController.prototype.initGrid = function (onlyMultiRow, curWindowNo, aPanel, mTab) {
 
-        //mTab.vo.IsListView = true;// fix it
+        //check list view flag from action params
+        var isCardAsListview = false;
+        if (aPanel.actionParams && aPanel.actionParams.ShowCardsAsListView) {
+            isCardAsListview = true;
+        }
+
         // Card view ↔ List view selection: a single DB flag on the tab decides
         // which renderer occupies this.vCardView. Both views share AD_CardView
         // metadata, conditions, the same toolbar button, and the isCardRow
         // state; only the rendering differs. The constructor already created a
         // default VCardView; swap it for VListView when the flag is set.
-        if (mTab.vo && mTab.vo.IsListView && VIS.VListView && !(this.vCardView instanceof VIS.VListView)) {
+        if (mTab.vo && (mTab.vo.IsListView || isCardAsListview)
+            && VIS.VListView && !(this.vCardView instanceof VIS.VListView)) {
             if (this.vCardView && this.vCardView.dispose) {
                 this.vCardView.dispose();
             }
