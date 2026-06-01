@@ -95,6 +95,44 @@
             var modalDir = isRTL ? 'rtl' : 'ltr';
             var currentModalCardIdx = 0; // tracks which card is currently selected in the modal
 
+            /*
+             * wf-dummy labels
+             * Old message                  | Message key                         | Fallback
+             * Activities                   | VIS_Activities                      | Activities
+             * No activities found          | VIS_NoActivitiesFound               | No activities found
+             * Workflow                     | VIS_Workflow                        | Workflow
+             * Workflow Activity            | VIS_WorkflowActivity                | Workflow Activity
+             * No records found             | VIS_NoRecordsFound                  | No records found
+             * Approvals                    | VIS_Approvals                       | Approvals
+             * Approvals preview            | VIS_ApprovalsPreview                | Approvals preview
+             * Search by requester, type... | VIS_SearchByRequesterTypeID         | Search by requester, type, ID...
+             * From Date                    | VIS_FromDate                        | From Date
+             * To Date                      | VIS_ToDate                          | To Date
+             * Awaiting your approval       | VIS_AwaitingYourApproval            | Awaiting your approval
+             * Watch                        | VIS_Watch                           | Watch
+             * History                      | VIS_History                         | History
+             * Close                        | VIS_Close                           | Close
+             * Transaction details          | VIS_TransactionDetails              | Transaction details
+             * Desc                         | VIS_Desc                            | Desc
+             * Requester                    | VIS_Requester                       | Requester
+             * Workflow Issuer              | VIS_WorkflowIssuer                  | Workflow Issuer
+             * Submitted                    | VIS_Submitted                       | Submitted
+             * pending                      | VIS_Pending                         | pending
+             * Forward                      | VIS_Forward                         | Forward
+             * Forward to                   | VIS_ForwardTo                       | Forward to
+             * Search user                  | VIS_SearchUser                      | Search user
+             * Add an optional note         | VIS_Message                         | Add an optional note
+             * Cancel                       | VIS_Cancel                          | Cancel
+             * TypeMessage                  | VIS_TypeMessage                     | Please write message
+             * Loading                      | VIS_Loading                         | Loading...
+             * Failed to load history.      | VIS_FailedToLoadHistory             | Failed to load history.
+             * No history available.        | VIS_NoHistoryAvailable              | No history available.
+             */
+            function lbl(key, fallback) {
+                var text = VIS.Msg.getMsg(key);
+                return text && text !== '[' + key + ']' ? text : fallback;
+            }
+
             function syncDummyWindowSelect() {
                 var $popupSelect = $('#' + modalId + 'WindowSelect');
                 if ($popupSelect.length == 0 || !$cmbWindows || $cmbWindows.length == 0) {
@@ -108,6 +146,11 @@
                 $popupSelect.val($cmbWindows.val());
             };
 
+            function syncDummyDateInputs() {
+                $modal.find('#' + modalId + 'FromDateInput').val($fromDateInput_ID && $fromDateInput_ID.length ? $fromDateInput_ID.val() : '');
+                $modal.find('#' + modalId + 'ToDateInput').val($toDateInput_ID && $toDateInput_ID.length ? $toDateInput_ID.val() : '');
+            };
+
             function syncDummyActivityList() {
                 var $activityContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
                 var $dummyList = $modal.find('.vis-wf-dummy-list');
@@ -118,14 +161,14 @@
 
                 $dummyList.empty();
                 if ($activityContainers.length == 0) {
-                    $dummyList.append('<div class="vis-wf-dummy-group">Activities - 0</div><div class="vis-wf-dummy-empty">No activities found</div>');
+                    $dummyList.append('<div class="vis-wf-dummy-group">' + lbl('VIS_Activities', 'Activities') + ' - 0</div><div class="vis-wf-dummy-empty">' + lbl('VIS_NoActivitiesFound', 'No activities found') + '</div>');
                     return;
                 }
 
-                $dummyList.append('<div class="vis-wf-dummy-group">Activities - ' + $activityContainers.length + '</div>');
+                $dummyList.append('<div class="vis-wf-dummy-group">' + lbl('VIS_Activities', 'Activities') + ' - ' + $activityContainers.length + '</div>');
                 $activityContainers.each(function (index) {
                     var activityTitle = $(this).find('.vis-w-wfActivity-selectchk').text();
-                    activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : 'Workflow Activity';
+                    activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity');
 
                     // Read window/node key from the pre's data-ids (format: AD_Window_ID_AD_Node_ID_AD_WF_Activity_ID_index)
                     var dataIds = $(this).find('pre[data-ids]').attr('data-ids') || '';
@@ -135,7 +178,7 @@
                     $dummyList.append(
                         '<div class="vis-wf-dummy-card' + (index == 0 ? ' vis-wf-dummy-card-selected' : '') + '" role="button" tabindex="0" data-winnode="' + winNodeKey + '">'
                         + '  <div class="vis-wf-dummy-card-top">'
-                        + '    <span class="vis-wf-dummy-pill vis-wf-dummy-pill-info"><span class="vis-wf-dummy-dot"></span>Workflow</span>'
+                        + '    <span class="vis-wf-dummy-pill vis-wf-dummy-pill-info"><span class="vis-wf-dummy-dot"></span>' + lbl('VIS_Workflow', 'Workflow') + '</span>'
                         + '    <span class="vis-wf-dummy-id">WF-' + (index + 1) + '</span>'
                         + '  </div>'
                         + '  <div class="vis-wf-dummy-card-title">' + VIS.Utility.encodeText(activityTitle) + '</div>'
@@ -149,20 +192,23 @@
                 var $cards = $dummyList.find('.vis-wf-dummy-card');
                 var $group = $dummyList.find('.vis-wf-dummy-group');
                 var searchText = ($modal.find('.vis-wf-dummy-search input').val() || '').toLowerCase().trim();
+                var fromDateVal = $modal.find('#' + modalId + 'FromDateInput').val();
+                var toDateVal = $modal.find('#' + modalId + 'ToDateInput').val();
                 var visibleCount = 0;
 
                 $dummyList.find('.vis-wf-dummy-search-empty').remove();
                 $cards.each(function (index) {
                     var windowMatch = !winNodeVal || winNodeVal === '0_0' || $(this).data('winnode') === winNodeVal;
                     var searchMatch = !searchText || getDummyCardSearchText($(this), index).indexOf(searchText) > -1;
-                    var isVisible = windowMatch && searchMatch;
+                    var dateMatch = isDummyDateMatch(index, fromDateVal, toDateVal);
+                    var isVisible = windowMatch && searchMatch && dateMatch;
 
                     $(this).toggle(isVisible);
                     if (isVisible) {
                         visibleCount++;
                     }
                 });
-                $group.text('Activities - ' + visibleCount);
+                $group.text(lbl('VIS_Activities', 'Activities') + ' - ' + visibleCount);
 
                 // Re-select first visible card and update detail panel
                 $cards.removeClass('vis-wf-dummy-card-selected');
@@ -176,7 +222,7 @@
                     var firstDataIds = $workflowWidgetDtls_ID.find('.vis-w-activityContainer')
                         .eq(firstIdx).find('.vis-w-wfActivity-selectchk').text();
                     $modal.find('.vis-wf-dummy-record-title').text(
-                        firstDataIds && firstDataIds.trim() ? firstDataIds.trim() : 'Workflow Activity'
+                        firstDataIds && firstDataIds.trim() ? firstDataIds.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity')
                     );
                     syncDummyDetailKV(firstIdx);
                     syncDummySubmitted(firstIdx);
@@ -187,12 +233,63 @@
                 }
                 else {
                     currentModalCardIdx = -1;
-                    $modal.find('.vis-wf-dummy-record-title').text(VIS.Msg.getMsg('NoRecordFound') || 'No records found');
+                    $modal.find('.vis-wf-dummy-record-title').text(lbl('VIS_NoRecordsFound', 'No records found'));
                     $modal.find('.vis-wf-dummy-kv').empty();
                     $modal.find('.vis-wf-dummy-description').closest('section').hide();
                     $modal.find('.vis-wf-dummy-actions .vis-wf-dummy-answer-dynamic').remove();
-                    $dummyList.append('<div class="vis-wf-dummy-empty vis-wf-dummy-search-empty">' + (VIS.Msg.getMsg('NoRecordFound') || 'No records found') + '</div>');
+                    $dummyList.append('<div class="vis-wf-dummy-empty vis-wf-dummy-search-empty">' + lbl('VIS_NoRecordsFound', 'No records found') + '</div>');
                 }
+            };
+
+            function getDummyDate(dateValue, endOfDay) {
+                if (!dateValue) {
+                    return null;
+                }
+
+                var parts = dateValue.split('-');
+                if (parts.length != 3) {
+                    return null;
+                }
+
+                var date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                if (isNaN(date.getTime())) {
+                    return null;
+                }
+
+                if (endOfDay) {
+                    date.setHours(23, 59, 59, 999);
+                }
+                else {
+                    date.setHours(0, 0, 0, 0);
+                }
+                return date;
+            };
+
+            function isDummyDateMatch(index, fromDateVal, toDateVal) {
+                if (!fromDateVal && !toDateVal) {
+                    return true;
+                }
+
+                var activity = (fulldata && fulldata[index]) ? fulldata[index] : null;
+                if (!activity || !activity.Created) {
+                    return false;
+                }
+
+                var activityDate = new Date(activity.Created);
+                if (isNaN(activityDate.getTime())) {
+                    return false;
+                }
+
+                var fromDate = getDummyDate(fromDateVal, false);
+                var toDate = getDummyDate(toDateVal, true);
+
+                if (fromDate && activityDate < fromDate) {
+                    return false;
+                }
+                if (toDate && activityDate > toDate) {
+                    return false;
+                }
+                return true;
             };
 
             function getDummyCardSearchText($card, index) {
@@ -212,12 +309,12 @@
                 if ($pendingCount.length == 0) {
                     return;
                 }
-                $pendingCount.text($modal.find('.vis-wf-dummy-card').length + ' pending');
+                $pendingCount.text($modal.find('.vis-wf-dummy-card').length + ' ' + lbl('VIS_Pending', 'pending'));
             };
 
             function syncDummyDetailTitle(index) {
                 var activityTitle = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-wfActivity-selectchk').text();
-                activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : 'Workflow Activity';
+                activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity');
                 $modal.find('.vis-wf-dummy-record-title').text(activityTitle);
             };
 
@@ -254,7 +351,7 @@
                     }
                 }
 
-                return 'Workflow Issuer';
+                return lbl('VIS_WorkflowIssuer', 'Workflow Issuer');
             };
 
             function getDummyRequesterInitials(name) {
@@ -415,7 +512,7 @@
             function syncDummySubmitted(index) {
                 var $dateDiv = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-feedDateTime');
                 var dateText = $dateDiv.text().trim();
-                $modal.find('.vis-wf-dummy-submitted').text(dateText ? 'Submitted ' + dateText : '');
+                $modal.find('.vis-wf-dummy-submitted').text(dateText ? lbl('VIS_Submitted', 'Submitted') + ' ' + dateText : '');
             };
 
             // Populate the KV table from the <pre> summary lines of the selected activity
@@ -585,6 +682,38 @@
                             }
                             #${modalId} .vis-wf-dummy-filters {
                                 position: relative;
+                            }
+                            #${modalId} .vis-wf-dummy-date-filters {
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 8px;
+                                margin-bottom: 10px;
+                            }
+                            #${modalId} .vis-wf-dummy-date-filter {
+                                min-width: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-date-filter label {
+                                display: block;
+                                margin: 0 0 4px;
+                                color: #5F7283;
+                                font-size: 11px;
+                                font-weight: 600;
+                            }
+                            #${modalId} .vis-wf-dummy-date-filter input {
+                                width: 100%;
+                                height: 30px;
+                                padding: 0 8px;
+                                border: 1px solid #E4EDF4;
+                                border-radius: 8px;
+                                background: #FFFFFF;
+                                color: #102C3F;
+                                font-size: 12px;
+                                box-sizing: border-box;
+                                outline: 0;
+                            }
+                            #${modalId} .vis-wf-dummy-date-filter input:focus {
+                                border-color: #0083DA;
+                                box-shadow: 0 0 0 3px rgba(0,131,218,0.08);
                             }
                             #${modalId} .vis-wf-dummy-window-select {
                                 width: 100%;
@@ -1262,11 +1391,11 @@
                                 }
                             }
                         </style>
-                        <div class="vis-wf-dummy-shell" role="dialog" aria-modal="true" aria-label="Approvals preview">
+                        <div class="vis-wf-dummy-shell" role="dialog" aria-modal="true" aria-label="${lbl('VIS_ApprovalsPreview', 'Approvals preview')}">
                             <div class="vis-wf-dummy-titlebar">
                                 <div class="vis-wf-dummy-title">
                                     <span class="vis-wf-dummy-module-icon"><i class="vis vis-info"></i></span>
-                                    <span><strong>Approvals</strong></span>
+                                    <span><strong>${lbl('VIS_Approvals', 'Approvals')}</strong></span>
                                     <span id="${modalId}PendingCount" class="vis-wf-dummy-meta"></span>
                                 </div>
                             </div>
@@ -1275,7 +1404,17 @@
                                     <div class="vis-wf-dummy-tools">
                                         <div class="vis-wf-dummy-search">
                                             <i class="fa fa-search" aria-hidden="true"></i>
-                                            <input type="text" placeholder="Search by requester, type, ID...">
+                                            <input type="text" placeholder="${lbl('VIS_SearchByRequesterTypeID', 'Search by requester, type, ID...')}">
+                                        </div>
+                                        <div class="vis-wf-dummy-date-filters">
+                                            <div class="vis-wf-dummy-date-filter">
+                                                <label for="${modalId}FromDateInput">${lbl('VIS_FromDate', 'From Date')}</label>
+                                                <input id="${modalId}FromDateInput" class="vis-wf-dummy-date-input" type="date" placeholder="date">
+                                            </div>
+                                            <div class="vis-wf-dummy-date-filter">
+                                                <label for="${modalId}ToDateInput">${lbl('VIS_ToDate', 'To Date')}</label>
+                                                <input id="${modalId}ToDateInput" class="vis-wf-dummy-date-input" type="date" placeholder="date">
+                                            </div>
                                         </div>
                                         <div class="vis-wf-dummy-filters">
                                             <select id="${modalId}WindowSelect" class="vis-wf-dummy-window-select vis-custom-select vis-selectworkflow-fontsize"></select>
@@ -1286,47 +1425,47 @@
                                 <section class="vis-wf-dummy-detail">
                                     <div class="vis-wf-dummy-detail-header">
                                         <div class="vis-wf-dummy-detail-left">
-                                            <div class="vis-wf-dummy-record-title">NewOrder</div>
-                                            <span class="vis-wf-dummy-status"><span class="vis-wf-dummy-dot"></span>Awaiting your approval</span>
+                                            <div class="vis-wf-dummy-record-title">${lbl('VIS_WorkflowActivity', 'Workflow Activity')}</div>
+                                            <span class="vis-wf-dummy-status"><span class="vis-wf-dummy-dot"></span>${lbl('VIS_AwaitingYourApproval', 'Awaiting your approval')}</span>
                                         </div>
                                         <div class="vis-wf-dummy-detail-right">
                                             <span class="vis-wf-dummy-submitted"></span>
-                                            <button type="button" class="vis-wf-dummy-icon-btn" title="Watch"><i class="vis vis-eye"></i></button>
-                                            <button type="button" class="vis-wf-dummy-icon-btn" title="History"><i class="vis vis-history"></i></button>
-                                            <button type="button" id="${modalId}Close" class="vis-wf-dummy-icon-btn" title="Close"><i class="vis vis-close"></i></button>
+                                            <button type="button" class="vis-wf-dummy-icon-btn vis-wf-dummy-watch" title="${lbl('VIS_Watch', 'Watch')}"><i class="vis vis-eye"></i></button>
+                                            <button type="button" class="vis-wf-dummy-icon-btn vis-wf-dummy-history" title="${lbl('VIS_History', 'History')}"><i class="vis vis-history"></i></button>
+                                            <button type="button" id="${modalId}Close" class="vis-wf-dummy-icon-btn" title="${lbl('VIS_Close', 'Close')}"><i class="vis vis-close"></i></button>
                                         </div>
                                     </div>
                                     <div class="vis-wf-dummy-body">
                                         <section class="vis-wf-dummy-section">
-                                            <h3 class="vis-wf-dummy-section-title">Transaction details</h3>
+                                            <h3 class="vis-wf-dummy-section-title">${lbl('VIS_TransactionDetails', 'Transaction details')}</h3>
                                             <div class="vis-wf-dummy-kv">
                                                 <!-- populated dynamically from activity summary -->
                                             </div>
                                         </section>
                                         <section class="vis-wf-dummy-section">
-                                            <h3 class="vis-wf-dummy-section-title">Desc</h3>
+                                            <h3 class="vis-wf-dummy-section-title">${lbl('VIS_Desc', 'Desc')}</h3>
                                             <div class="vis-wf-dummy-description">
                                                 <!-- populated dynamically from activity description -->
                                             </div>
                                         </section>
                                         <section class="vis-wf-dummy-section">
-                                            <h3 class="vis-wf-dummy-section-title">Requester</h3>
+                                            <h3 class="vis-wf-dummy-section-title">${lbl('VIS_Requester', 'Requester')}</h3>
                                             <div class="vis-wf-dummy-requester">
                                                 <div class="vis-wf-dummy-requester-avatar">WF</div>
                                                 <div class="vis-wf-dummy-requester-name"></div>
                                             </div>
                                         </section>
                                         <section class="vis-wf-dummy-section vis-wf-dummy-history-panel" style="display:none;">
-                                            <h3 class="vis-wf-dummy-section-title">History</h3>
+                                            <h3 class="vis-wf-dummy-section-title">${lbl('VIS_History', 'History')}</h3>
                                             <div class="vis-wf-dummy-history-content"></div>
                                         </section>
                                     </div>
                                     <div class="vis-wf-dummy-footer">
                                         <div class="vis-wf-dummy-forward-panel" style="display:none;"></div>
                                         <div class="vis-wf-dummy-footer-row">
-                                            <div class="vis-wf-dummy-note"><i class="vis vis-chat"></i><textarea class="vis-w-workflow-textarea" placeholder="${VIS.Msg.getMsg('TypeMessage')}...." spellcheck="false"></textarea></div>
+                                            <div class="vis-wf-dummy-note"><i class="vis vis-chat"></i><textarea class="vis-w-workflow-textarea" placeholder="${lbl('VIS_TypeMessage', 'Please write message')}...." spellcheck="false"></textarea></div>
                                             <div class="vis-wf-dummy-actions">
-                                                <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-secondary"><i class="vis vis-arrow-right"></i>Forward <span class="vis-wf-dummy-key">F</span></button>
+                                                <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-secondary"><i class="vis vis-arrow-right"></i>${lbl('VIS_Forward', 'Forward')} <span class="vis-wf-dummy-key">F</span></button>
                                             </div>
                                         </div>
                                     </div>
@@ -1390,9 +1529,12 @@
                 $modal.on('click', '.vis-wf-dummy-search i', function () {
                     filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
                 });
+                $modal.on('change', '.vis-wf-dummy-date-input', function () {
+                    filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
+                });
 
                 // Watch (eye) button — open the record screen, same as the vis-find zoom button
-                $modal.on('click', '[title="Watch"]', function () {
+                $modal.on('click', '.vis-wf-dummy-watch', function () {
                     if (currentModalCardIdx < 0) {
                         return;
                     }
@@ -1414,7 +1556,7 @@
                     // ── Header ─────────────────────────────────────────────────────────
                     var $header = $('<div class="vis-wf-dummy-fwd-header">');
                     $header.append('<div class="vis-wf-dummy-fwd-header-icon"><i class="vis vis-arrow-right"></i></div>');
-                    $header.append($('<div class="vis-wf-dummy-fwd-header-title">').text(VIS.Msg.getMsg('Forward') || 'Forward to'));
+                    $header.append($('<div class="vis-wf-dummy-fwd-header-title">').text(lbl('VIS_ForwardTo', 'Forward to')));
                     $fwdPanel.append($header);
 
                     // ── Fields ─────────────────────────────────────────────────────────
@@ -1429,11 +1571,11 @@
                     var $userField = $('<div class="vis-wf-dummy-fwd-field">');
                     $userField.append('<i class="fa fa-user vis-wf-dummy-fwd-field-icon"></i>');
                     var $userCtrl = txtb.getControl();
-                    $userCtrl.attr('placeholder', VIS.Msg.getMsg('Forward') || 'Search user…');
+                    $userCtrl.attr('placeholder', lbl('VIS_SearchUser', 'Search user'));
                     $userField.append($userCtrl);
 
                     // Search icon — clicking it opens the VIS user lookup popup
-                    var $searchBtn = $('<button type="button" class="vis-wf-dummy-fwd-field-search-btn" title="Search user">');
+                    var $searchBtn = $('<button type="button" class="vis-wf-dummy-fwd-field-search-btn" title="' + lbl('VIS_SearchUser', 'Search user') + '">');
                     $searchBtn.append('<i class="vis vis-find"></i>');
                     $searchBtn.on('click', function (e) {
                         e.stopPropagation();
@@ -1447,7 +1589,7 @@
                     // Message textarea
                     var $msgField = $('<div class="vis-wf-dummy-fwd-msg-field">');
                     $msgField.append('<i class="vis vis-chat vis-wf-dummy-fwd-msg-icon"></i>');
-                    var $msgInput = $('<textarea class="vis-wf-dummy-fwd-msg">').attr('placeholder', VIS.Msg.getMsg('Message') || 'Add an optional note…');
+                    var $msgInput = $('<textarea class="vis-wf-dummy-fwd-msg">').attr('placeholder', lbl('VIS_Message', 'Add an optional note'));
                     $msgField.append($msgInput);
                     $fields.append($msgField);
 
@@ -1455,8 +1597,8 @@
 
                     // ── Action buttons ─────────────────────────────────────────────────
                     var $actions = $('<div class="vis-wf-dummy-fwd-actions">');
-                    var $cancelBtn  = $('<button class="vis-wf-dummy-fwd-cancel">').html('<i class="vis vis-close"></i> ' + (VIS.Msg.getMsg('Cancel') || 'Cancel'));
-                    var $confirmBtn = $('<button class="vis-wf-dummy-fwd-confirm">').html('<i class="vis vis-arrow-right"></i> ' + (VIS.Msg.getMsg('Forward') || 'Forward'));
+                    var $cancelBtn  = $('<button class="vis-wf-dummy-fwd-cancel">').html('<i class="vis vis-close"></i> ' + lbl('VIS_Cancel', 'Cancel'));
+                    var $confirmBtn = $('<button class="vis-wf-dummy-fwd-confirm">').html('<i class="vis vis-arrow-right"></i> ' + lbl('VIS_Forward', 'Forward'));
                     $actions.append($cancelBtn).append($confirmBtn);
                     $fwdPanel.append($actions);
 
@@ -1468,7 +1610,7 @@
                     $confirmBtn.on('click', function () {
                         var fwdTo = txtb.getValue();
                         if (!fwdTo || fwdTo <= 0) {
-                            VIS.ADialog.error('FillMandatory', true, VIS.Msg.getMsg('Forward'));
+                            VIS.ADialog.error('FillMandatory', true, lbl('VIS_Forward', 'Forward'));
                             return;
                         }
                         var msg = VIS.Utility.encodeText($msgInput.val());
@@ -1501,7 +1643,7 @@
                 });
 
                 // History button — toggle history panel, load data on first show
-                $modal.on('click', '[title="History"]', function () {
+                $modal.on('click', '.vis-wf-dummy-history', function () {
                     var $historyPanel = $modal.find('.vis-wf-dummy-history-panel');
                     if ($historyPanel.is(':visible')) {
                         $historyPanel.hide();
@@ -1525,7 +1667,7 @@
                     }
 
                     var $historyContent = $historyPanel.find('.vis-wf-dummy-history-content');
-                    $historyContent.html('<div style="padding:10px;color:#748494;">Loading...</div>');
+                    $historyContent.html('<div style="padding:10px;color:#748494;">' + lbl('VIS_Loading', 'Loading...') + '</div>');
                     $historyPanel.show();
 
                     $.ajax({
@@ -1535,14 +1677,14 @@
                         type: 'POST',
                         data: { activityID: wfActivityID, nodeID: nodeID, wfProcessID: wfProcessID },
                         error: function () {
-                            $historyContent.html('<div style="padding:10px;color:#e74c3c;">Failed to load history.</div>');
+                            $historyContent.html('<div style="padding:10px;color:#e74c3c;">' + lbl('VIS_FailedToLoadHistory', 'Failed to load history.') + '</div>');
                         },
                         success: function (res) {
                             var info = res && res.result ? res.result : null;
                             $historyContent.empty();
 
                             if (!info || !info.Node) {
-                                $historyContent.html('<div style="padding:10px;color:#748494;">No history available.</div>');
+                                $historyContent.html('<div style="padding:10px;color:#748494;">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
                                 return;
                             }
 
@@ -1597,6 +1739,7 @@
 
             $modal.attr('dir', modalDir);
             syncDummyWindowSelect();
+            syncDummyDateInputs();
             syncDummyActivityList();
             syncDummyCardTitles();
             syncDummyPendingCount();
@@ -1606,6 +1749,7 @@
             syncDummyDescription(0);
             syncDummyRequester(0);
             syncDummyAnswer(0);
+            filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
 
             // ── Global z-index guard ──────────────────────────────────────────────
             // Any dialog/popup appended to <body> while this modal is open must sit
