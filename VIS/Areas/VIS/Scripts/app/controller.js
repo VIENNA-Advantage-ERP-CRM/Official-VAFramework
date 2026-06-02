@@ -474,6 +474,7 @@
         this.tabPanels = [];
         this.tabPanelsRght = [];
         this.tabPanelsBotm = []; //bottom aligned tab panels
+        this.activeView = 'G'; //current view for view-wise tab panel filtering (G/S/C); meaningful only when IsViewWisePanel
         this.linkColumnName = gTab._linkColumnName;
         this.extendedWhere = gTab._extendedWhere;
         this.keyColumnName = "";
@@ -1498,6 +1499,7 @@
     };
 
     GridTab.prototype.loadTabPanels = function () {
+        this._isViewWise = false;
         if (this.gTab._panels && this.gTab._panels.length > 0) {
             this.hasPanel = true;
             for (var i = 0; i < this.gTab._panels.length; i++) {
@@ -1512,6 +1514,12 @@
                     this.tabPanelsRght.push(gridTabPanel);
                 }
                 this.tabPanels.push(gridTabPanel); //all list
+                // view-wise mode is auto-derived: any panel carrying a ViewType
+                // (G/S/C) flips this tab into view-wise rendering. Panels with
+                // empty ViewType still render as legacy/shared across views.
+                if (gridTabPanel.getViewType()) {
+                    this._isViewWise = true;
+                }
             }
         }
         else {
@@ -1577,14 +1585,51 @@
     }
 
     GridTab.prototype.getTabPanels = function () {
-        return this.tabPanels;
+        return this.isViewWisePanel() ? filterPanelsByView(this.tabPanels, this.activeView) : this.tabPanels;
     };
     GridTab.prototype.getTabPanelsBotm = function () {
-        return this.tabPanelsBotm;
+        return this.isViewWisePanel() ? filterPanelsByView(this.tabPanelsBotm, this.activeView) : this.tabPanelsBotm;
     };
     GridTab.prototype.getTabPanelsRght = function () {
-        return this.tabPanelsRght;
+        return this.isViewWisePanel() ? filterPanelsByView(this.tabPanelsRght, this.activeView) : this.tabPanelsRght;
     };
+
+    GridTab.prototype.isViewWisePanel = function () {
+        return this._isViewWise === true;
+    };
+
+    GridTab.prototype.setActiveView = function (v) {
+        // v: 'G' (grid), 'S' (single), 'C' (card)
+        this.activeView = v;
+    };
+
+    GridTab.prototype.getActiveView = function () {
+        return this.activeView;
+    };
+
+    // Resolve per-view panel width override (percentage). Returns the first non-zero
+    // PanelWidth among panels matching the view; 0 means "no override — caller falls back".
+    GridTab.prototype.getPanelWidthForView = function (v) {
+        if (!this.isViewWisePanel()) return 0;
+        for (var i = 0; i < this.tabPanels.length; i++) {
+            if (this.tabPanels[i].getViewType() === v) {
+                var w = this.tabPanels[i].getPanelWidth();
+                if (w && w > 0) return w;
+            }
+        }
+        return 0;
+    };
+
+    // Per-view filter: panels with ViewType === v, plus legacy panels (ViewType empty/null)
+    // which act as shared/visible-on-all-views.
+    function filterPanelsByView(list, v) {
+        var out = [];
+        for (var i = 0; i < list.length; i++) {
+            var vt = list[i].getViewType();
+            if (vt === v || !vt) out.push(list[i]);
+        }
+        return out;
+    }
 
     GridTab.prototype.validateQuery = function (query) {
         if (query == null || query.getRestrictionCount() == 0)
@@ -7838,6 +7883,14 @@
 
     GridTabPanel.prototype.getIsTPBottomAligned = function () {
         return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
+    };
+
+    GridTabPanel.prototype.getViewType = function () {
+        return this.vo.ViewType || "";
+    };
+
+    GridTabPanel.prototype.getPanelWidth = function () {
+        return this.vo.PanelWidth || 0;
     };
 
     function DataStatusEvent(source1, totalRows, changed, autoSave, inserting) {

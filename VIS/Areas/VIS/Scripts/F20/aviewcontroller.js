@@ -488,6 +488,30 @@
         this.vTabPanel.init(this.getMTab());
     };
 
+    // View-wise tab panel: rebuild the panel for the given view (G/S/C).
+    // The view filter is applied via gTab.setActiveView, which is read by the
+    // view-aware getTabPanels/Rght/Botm getters used inside VTabPanel.init.
+    VIS.GridController.prototype.reloadTabPanelForView = function (view) {
+        if (!this.gTab.isViewWisePanel()) return;
+
+        this.gTab.setActiveView(view);
+
+        if (this.vTabPanel) {
+            this.vTabPanel.dispose();
+            this.vTabPanel = null;
+        }
+
+        var panels = this.gTab.getTabPanels(); // view-filtered now
+        if (panels.length > 0) {
+            var w = this.gTab.getPanelWidthForView(view);
+            if (!w || w <= 0) w = this.aPanel.gridWindow.getWindowWidth();
+            this.initTabPanel(w, this.windowNo);
+        }
+
+        var hideTP = this.aPanel.actionParams && this.aPanel.actionParams.IsHideTabPanel;
+        this.aPanel.showTabPanel(!hideTP && panels.length > 0);
+    };
+
    
     VIS.GridController.prototype.initFilterPanel = function (winNo) {
         this.aFilterPanel = new VIS.FilterPanel(winNo, this);
@@ -513,13 +537,14 @@
     VIS.GridController.prototype.onSizeChanged = function (resize) {
 
         var gc = this.aPanel.curGC;
-
-        if (resize && gc.vTabPanel) {
-            gc.vTabPanel.setSize(0, resize);
-        }
-        gc.multiRowResize();
-        if (gc.vIncludedGC) {
-            gc.vIncludedGC.multiRowResize();
+        if (gc) {
+            if (resize && gc.vTabPanel) {
+                gc.vTabPanel.setSize(0, resize);
+            }
+            gc.multiRowResize();
+            if (gc.vIncludedGC) {
+                gc.vIncludedGC.multiRowResize();
+            }
         }
         if (this.aPanel.vTabbedPane)
             this.aPanel.vTabbedPane.refresh();
@@ -527,15 +552,17 @@
         // List view toggles between card and list layout based on whether the
         // right tab panel is open — re-evaluate when the tab panel size
         // notification fires (open/close, manual resize, etc.).
-        if (gc.isCardRow && gc.vCardView && VIS.VListView
-            && gc.vCardView instanceof VIS.VListView
-            && gc.vCardView.calculateWidth) {
-            gc.vCardView.calculateWidth();
-        }
+        if (gc) {
+            if (gc.isCardRow && gc.vCardView && VIS.VListView
+                && gc.vCardView instanceof VIS.VListView
+                && gc.vCardView.calculateWidth) {
+                gc.vCardView.calculateWidth();
+            }
 
-        else if (gc.isCardRow && gc.vCardView 
-            && gc.vCardView.calculateWidth) {
-            gc.vCardView.calculateWidth();
+            else if (gc.isCardRow && gc.vCardView
+                && gc.vCardView.calculateWidth) {
+                gc.vCardView.calculateWidth();
+            }
         }
         
     };
@@ -2254,7 +2281,9 @@
         //chnage to popup
        // this.vGridPanel.showAsPopUp(p);
 
-        
+        if (this.gTab.isViewWisePanel()) {
+            this.reloadTabPanelForView('S');
+        }
     };
 
     VIS.GridController.prototype.switchMultiRow = function (avoidRequery) {
@@ -2305,6 +2334,9 @@
             //}
             this.isNewClick = false;
 
+            if (this.gTab.isViewWisePanel()) {
+                this.reloadTabPanelForView('G');
+            }
         }
 
     };
@@ -2358,6 +2390,10 @@
             }
 
             p1 = null;
+
+            if (this.gTab.isViewWisePanel()) {
+                this.reloadTabPanelForView('C');
+            }
         }
     };
 
