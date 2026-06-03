@@ -488,7 +488,7 @@
         this.vTabPanel.init(this.getMTab());
     };
 
-    // View-wise tab panel: rebuild the panel for the given view (G/S/C).
+    // View-wise tab panel: rebuild the panel for the given view (Y/N/C).
     // The view filter is applied via gTab.setActiveView, which is read by the
     // view-aware getTabPanels/Rght/Botm getters used inside VTabPanel.init.
     VIS.GridController.prototype.reloadTabPanelForView = function (view) {
@@ -2282,7 +2282,7 @@
        // this.vGridPanel.showAsPopUp(p);
 
         if (this.gTab.isViewWisePanel()) {
-            this.reloadTabPanelForView('S');
+            this.reloadTabPanelForView('Y');
         }
     };
 
@@ -2312,7 +2312,7 @@
                 this.aPanel.displayIncArea(false);
                 this.vTable.activate(false, this.showMultiViewOnly); 
                 //if (this.gTab.getIsTPBottomAligned())
-                this.aPanel.showTabPanel(false);
+                //this.aPanel.showTabPanel(false);
             }
 
             this.vTable.resize();
@@ -2335,7 +2335,7 @@
             this.isNewClick = false;
 
             if (this.gTab.isViewWisePanel()) {
-                this.reloadTabPanelForView('G');
+                this.reloadTabPanelForView('N');
             }
         }
 
@@ -2366,7 +2366,7 @@
             if (!this.displayAsMultiView && this.showMultiViewOnly && !this.displayAsIncludedGC) { //show fixed height grid
                 this.aPanel.displayIncArea(false);
                 //if (this.gTab.getIsTPBottomAligned())
-                    this.aPanel.showTabPanel(false);
+                    //this.aPanel.showTabPanel(false);
             }
 
             this.gTab.getTableModel().setCardID(this.vCardView.cardID);

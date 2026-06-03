@@ -11,6 +11,7 @@
 
 
         this.width = wWidth;
+        this.rawWidth = wWidth; // original percentage as received; this.width gets converted to px below
         this.tabPanels = []; //All object
         this.isShowAll = false;
         this.curTabPanel = null;
@@ -341,7 +342,7 @@
         }
         else if (gTab.getIsShowBothTP()) {
             //special
-            this.specialObj = new VTabPanel(this.windowNo, this.width);
+            this.specialObj = new VTabPanel(this.windowNo, this.rawWidth);
             this.specialObj.addSizeChangeListner(this.sizeChangedListner);
             this.specialObj.parent = this;
             this.specialObj.init(gTab, true);
