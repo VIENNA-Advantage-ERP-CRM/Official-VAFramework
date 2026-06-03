@@ -107,7 +107,7 @@ namespace VAdvantage.Controller
                 vo.ExtraInfo = dr["ExtraInfo"].ToString();
                 vo.TabPanelAlignment = dr["TabPanelAlignment"].ToString();
                 vo.ViewType = Util.GetValueOfString(dr["ViewType"]);
-                vo.PanelWidth = Util.GetValueOfInt(dr["Width"]);
+                vo.PanelWidth = Util.GetValueOfInt(dr["WinWidth"]);
             }
             catch (Exception ex)
             {
