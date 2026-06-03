@@ -72,10 +72,10 @@ namespace VAdvantage.Controller
         public static String GetSQL(Ctx ctx)
         {
             //  View only returns IsActive='Y'
-            String sql = "SELECT panel.ClassName, panel.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment, panel.ViewType, panel.Width FROM AD_TabPanel panel WHERE panel.AD_Tab_ID =@tabID ";
+            String sql = "SELECT panel.ClassName, panel.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment, panel.ViewType, panel.WinWidth FROM AD_TabPanel panel WHERE panel.AD_Tab_ID =@tabID ";
             if (!Env.IsBaseLanguage(ctx, "AD_Window"))
             {
-                sql = "SELECT panel.ClassName, trl.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment, panel.ViewType, panel.Width FROM AD_TabPanel panel JOIN AD_TabPanel_Trl  trl ON panel.AD_TabPanel_ID=trl.AD_TabPanel_ID "
+                sql = "SELECT panel.ClassName, trl.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment, panel.ViewType, panel.WinWidth FROM AD_TabPanel panel JOIN AD_TabPanel_Trl  trl ON panel.AD_TabPanel_ID=trl.AD_TabPanel_ID "
                     + " WHERE panel.AD_Tab_ID =@tabID AND trl.AD_Language='" + Env.GetAD_Language(ctx) + "'";
             }
             // vis0008 change done to show tab panles created in System and login tenant only
@@ -107,7 +107,7 @@ namespace VAdvantage.Controller
                 vo.ExtraInfo = dr["ExtraInfo"].ToString();
                 vo.TabPanelAlignment = dr["TabPanelAlignment"].ToString();
                 vo.ViewType = Util.GetValueOfString(dr["ViewType"]);
-                vo.PanelWidth = Util.GetValueOfInt(dr["Width"]);
+                vo.PanelWidth = Util.GetValueOfInt(dr["WinWidth"]);
             }
             catch (Exception ex)
             {
