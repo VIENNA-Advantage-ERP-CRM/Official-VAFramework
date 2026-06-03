@@ -35,6 +35,12 @@ namespace VAdvantage.Controller
 
         public string TabPanelAlignment = "V";
 
+        /** View this panel belongs to: G=Grid, S=Single, C=Card. Empty/null = legacy (visible on all views). */
+        public string ViewType = "";
+
+        /** Per-view tab panel width override (%). 0 = no override (fall back to AD_Window.WinWidth). */
+        public int PanelWidth = 0;
+
 
 
 
@@ -66,10 +72,10 @@ namespace VAdvantage.Controller
         public static String GetSQL(Ctx ctx)
         {
             //  View only returns IsActive='Y'
-            String sql = "SELECT panel.ClassName, panel.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment FROM AD_TabPanel panel WHERE panel.AD_Tab_ID =@tabID ";
+            String sql = "SELECT panel.ClassName, panel.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment, panel.ViewType, panel.Width FROM AD_TabPanel panel WHERE panel.AD_Tab_ID =@tabID ";
             if (!Env.IsBaseLanguage(ctx, "AD_Window"))
             {
-                sql = "SELECT panel.ClassName, trl.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment FROM AD_TabPanel panel JOIN AD_TabPanel_Trl  trl ON panel.AD_TabPanel_ID=trl.AD_TabPanel_ID "
+                sql = "SELECT panel.ClassName, trl.Name, panel.IconPath, panel.IsDefault, panel.SeqNo, panel.AD_TabPanel_ID, panel.AD_Tab_ID, panel.ExtraInfo, panel.TabPanelAlignment, panel.ViewType, panel.Width FROM AD_TabPanel panel JOIN AD_TabPanel_Trl  trl ON panel.AD_TabPanel_ID=trl.AD_TabPanel_ID "
                     + " WHERE panel.AD_Tab_ID =@tabID AND trl.AD_Language='" + Env.GetAD_Language(ctx) + "'";
             }
             // vis0008 change done to show tab panles created in System and login tenant only
@@ -100,6 +106,8 @@ namespace VAdvantage.Controller
                 vo.SeqNo = Convert.ToInt32(dr["Seqno"]);
                 vo.ExtraInfo = dr["ExtraInfo"].ToString();
                 vo.TabPanelAlignment = dr["TabPanelAlignment"].ToString();
+                vo.ViewType = Util.GetValueOfString(dr["ViewType"]);
+                vo.PanelWidth = Util.GetValueOfInt(dr["Width"]);
             }
             catch (Exception ex)
             {
@@ -121,6 +129,8 @@ namespace VAdvantage.Controller
             clone.SeqNo = SeqNo;
             clone.ExtraInfo = ExtraInfo;
             clone.TabPanelAlignment = TabPanelAlignment;
+            clone.ViewType = ViewType;
+            clone.PanelWidth = PanelWidth;
             return clone;
         }
     }
