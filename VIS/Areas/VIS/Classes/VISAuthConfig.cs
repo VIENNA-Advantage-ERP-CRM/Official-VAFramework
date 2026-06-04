@@ -21,40 +21,103 @@ namespace VIS.Areas.VIS.Classes
     {
         public static void RegisterAuth(IAppBuilder app)
         {
-            DataSet dataSet = DB.ExecuteDataset("SELECT CLIENT_ID AS clientID,authorityurl,tenantoptional,redirecturi,Provider,AD_Ref_List.value,ad_ref_list.name FROM sso_configuration INNER JOIN AD_Ref_List  ON AD_Ref_List.Value=sso_configuration.Provider WHERE sso_configuration.IsActive='Y' AND AD_Reference_ID IN (SELECT ad_reference_ID FROM ad_reference WHERE Name='VIS_ServiceProvider')");
+
             AppBuilderSecurityExtensions.SetDefaultSignInAsAuthenticationType(app, "Cookies");
-            CookieAuthenticationExtensions.UseCookieAuthentication(app, new CookieAuthenticationOptions()
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
-                CookieManager = (ICookieManager)new SystemWebCookieManager(),
+                CookieManager = new SystemWebCookieManager(),
+                AuthenticationType = "ApplicationCookie",
                 LoginPath = new PathString("/Account/JsonLogin"),
                 LogoutPath = new PathString("/")
             });
-            IAppBuilder iappBuilder1 = app;
-            CookieAuthenticationOptions authenticationOptions1 = new CookieAuthenticationOptions();
-            ((AuthenticationOptions)authenticationOptions1).AuthenticationType = "ApplicationCookie";
-            authenticationOptions1.LoginPath = new PathString("/Account/JsonLogin");
-            authenticationOptions1.LogoutPath = new PathString("/");
-            CookieAuthenticationExtensions.UseCookieAuthentication(iappBuilder1, authenticationOptions1);
-            if (dataSet == null || dataSet.Tables[0].Rows.Count <= 0)
+
+            DataSet ds = DB.ExecuteDataset(@"
+                SELECT CLIENT_ID AS clientID,
+                       authorityurl,
+                       tenantoptional,
+                       redirecturi,
+                       Provider,
+                       AD_Ref_List.Value,
+                       AD_Ref_List.Name
+                FROM sso_configuration
+                INNER JOIN AD_Ref_List
+                    ON AD_Ref_List.Value = sso_configuration.Provider
+                WHERE sso_configuration.IsActive='Y'
+                  AND AD_Reference_ID IN
+                    (
+                        SELECT AD_Reference_ID
+                        FROM AD_Reference
+                        WHERE Name='VIS_ServiceProvider'
+                    )");
+
+            if (ds == null || ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
                 return;
-            for (int index = 0; index < dataSet.Tables[0].Rows.Count; ++index)
+
+            foreach (DataRow row in ds.Tables[0].Rows)
             {
-                string str = string.Format((IFormatProvider)CultureInfo.InvariantCulture, Util.GetValueOfString(dataSet.Tables[0].Rows[index]["authorityurl"]), (object)Util.GetValueOfString(dataSet.Tables[0].Rows[index]["tenantoptional"]));
-                IAppBuilder iappBuilder2 = app;
-                OpenIdConnectAuthenticationOptions authenticationOptions2 = new OpenIdConnectAuthenticationOptions();
-                ((AuthenticationOptions)authenticationOptions2).AuthenticationType = Util.GetValueOfString(dataSet.Tables[0].Rows[index]["value"]).ToLower();
-                authenticationOptions2.ClientId = Util.GetValueOfString(dataSet.Tables[0].Rows[index]["clientID"]);
-                authenticationOptions2.Authority = str;
-                authenticationOptions2.RedirectUri = Util.GetValueOfString(dataSet.Tables[0].Rows[index]["redirecturi"]);
-                authenticationOptions2.PostLogoutRedirectUri = Util.GetValueOfString(dataSet.Tables[0].Rows[index]["redirecturi"]);
-                authenticationOptions2.Scope = "openid profile";
-                authenticationOptions2.ResponseType = "code id_token";
-                authenticationOptions2.TokenValidationParameters = new TokenValidationParameters()
+                try
                 {
-                    ValidateIssuer = false
-                };
-                authenticationOptions2.Notifications = new OpenIdConnectAuthenticationNotifications();
-                OpenIdConnectAuthenticationExtensions.UseOpenIdConnectAuthentication(iappBuilder2, authenticationOptions2);
+                    string provider = Util.GetValueOfString(row["value"]).ToLower();
+                    string clientId = Util.GetValueOfString(row["clientID"]);
+                    string authorityUrl = Util.GetValueOfString(row["authorityurl"]);
+                    string tenant = Util.GetValueOfString(row["tenantoptional"]);
+                    string redirectUri = Util.GetValueOfString(row["redirecturi"]);
+
+                    // Skip invalid configuration
+                    if (string.IsNullOrWhiteSpace(clientId) ||
+                        string.IsNullOrWhiteSpace(authorityUrl) ||
+                        string.IsNullOrWhiteSpace(redirectUri))
+                    {
+                        continue;
+                    }
+
+                    string authority;
+
+                    if (authorityUrl.Contains("{0}"))
+                    {
+                        authority = string.Format(
+                            CultureInfo.InvariantCulture,
+                            authorityUrl,
+                            tenant);
+                    }
+                    else
+                    {
+                        authority = authorityUrl;
+                    }
+
+                    if (!Uri.IsWellFormedUriString(authority, UriKind.Absolute))
+                    {
+                        continue;
+                    }
+
+                    app.UseOpenIdConnectAuthentication(
+                        new OpenIdConnectAuthenticationOptions
+                        {
+                            AuthenticationType = provider,
+                            ClientId = clientId,
+                            Authority = authority,
+                            RedirectUri = redirectUri,
+                            PostLogoutRedirectUri = redirectUri,
+                            Scope = "openid profile",
+                            ResponseType = "code id_token",
+
+                            TokenValidationParameters =
+                                new TokenValidationParameters
+                                {
+                                    ValidateIssuer = false
+                                },
+
+                            Notifications =
+                                new OpenIdConnectAuthenticationNotifications()
+                        });
+                }
+                catch (Exception ex)
+                {
+                    // Log and continue with next provider
+                    System.Diagnostics.Trace.WriteLine(
+                        "SSO Provider Registration Error: " + ex);
+                }
             }
         }
     }

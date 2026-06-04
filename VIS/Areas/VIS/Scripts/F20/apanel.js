@@ -2150,7 +2150,12 @@
                 }
 
                 if (gTab.getHasPanel()) {
-                    gc.initTabPanel(gridWindow.getWindowWidth(), curWindowNo);
+                    var initPnlW = gridWindow.getWindowWidth();
+                    if (gTab.isViewWisePanel()) {
+                        var viewW = gTab.getPanelWidthForView(gTab.getActiveView());
+                        if (viewW > 0) initPnlW = viewW;
+                    }
+                    gc.initTabPanel(initPnlW, curWindowNo);
                 }
 
                 //	Is this tab included?
@@ -3909,7 +3914,12 @@
             //aChat.setEnabled(true);
         }
 
-        this.showTabPanel(!this.actionParams.IsHideTabPanel && this.curTab.getHasPanel());
+        var hasPanelToShow = this.curTab.getHasPanel();
+        if (hasPanelToShow && this.curTab.isViewWisePanel()) {
+            // view-filtered list — may be empty for the active view even though the tab has panels overall
+            hasPanelToShow = this.curTab.getTabPanels().length > 0;
+        }
+        this.showTabPanel(!this.actionParams.IsHideTabPanel && hasPanelToShow);
 
         if (!isAPanelTab && this.showMultiViewOnly) { // in case of compiste and grid mode
             this.curGC.refreshRowPresentation(true);

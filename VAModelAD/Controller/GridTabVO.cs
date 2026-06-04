@@ -110,7 +110,7 @@ namespace VAdvantage.Controller
         /****   Has tab Panels   ***/
         public bool HasPanels = false;
 
-        
+
 
         /****   Is Header Panel   ***/
         public bool IsHeaderPanel = false;

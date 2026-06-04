@@ -56,7 +56,15 @@ namespace VAdvantage.Model
             return _vo.ExtraInfo;
         }
 
+        public string GetViewType()
+        {
+            return _vo.ViewType;
+        }
 
+        public int GetPanelWidth()
+        {
+            return _vo.PanelWidth;
+        }
 
     }
 }

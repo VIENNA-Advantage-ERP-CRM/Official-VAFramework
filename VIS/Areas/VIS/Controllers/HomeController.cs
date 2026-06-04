@@ -230,7 +230,7 @@ namespace VIS.Controllers
 
                         return RedirectToAction("SignOff", "Account", new
                         {
-                            ctx=ctx,
+                            ctx = ctx,
                             webSessionId = Session.SessionID
                         });
                         //return new AccountController().SignOff(ctx, Session.SessionID);
@@ -248,7 +248,7 @@ namespace VIS.Controllers
                         ctx.SetApplicationUrl(oldctx.GetApplicationUrl());
                         Session.Timeout = 17;
                         if (oldctx.GetContext("NewSession") == "Y") // logout previous session if user chnage 
-                            // authorization form auth dialog
+                                                                    // authorization form auth dialog
                         {
                             VAdvantage.Classes.SessionEventHandler.SessionEnd(ctx, Session.SessionID);
                             createNew = true;
@@ -292,14 +292,14 @@ namespace VIS.Controllers
                     model.Login2Model.Org = ctx.GetAD_Org_ID().ToString();
                     model.Login2Model.Warehouse = ctx.GetAD_Warehouse_ID().ToString();
                     model.Login2Model.FilteredOrg = ctx.GetContext("#AD_FilteredOrg");
-                    
 
 
-                   
+
+
                     var ClientList = new List<KeyNamePair>();
                     var OrgList = new List<KeyNamePair>();
                     var WareHouseList = new List<KeyNamePair>();
-                   
+
 
                     model.Login1Model.AD_User_ID = AD_User_ID;
                     model.Login1Model.DisplayName = username;
@@ -368,9 +368,10 @@ namespace VIS.Controllers
                     if (createNew)
                     {
                         //Cretae new Sessin
-
                         MSession sessionNew = MSession.Get(ctx, Session.SessionID, true, Common.GetVisitorIPAddress(Request, true));
                         // sessionNew.SetWebSession(Session.SessionID);
+                        // Set Session GUID in context to identify get session in other requests.
+                        ctx.SetContext("#AD_Session_GUID", DB.GetRecordGUID("AD_Session", sessionNew.GetAD_Session_ID()));
                         ModelLibrary.PushNotif.SessionData sessionData = new ModelLibrary.PushNotif.SessionData();
                         sessionData.UserId = ctx.GetAD_User_ID();
                         sessionData.Name = ctx.GetAD_User_Name();
@@ -421,9 +422,9 @@ namespace VIS.Controllers
             else
             {
                 /* Read Web config setting */
-                var loginPageUrl = System.Configuration.ConfigurationManager.AppSettings["LoginPageContentUrl"]; 
+                var loginPageUrl = System.Configuration.ConfigurationManager.AppSettings["LoginPageContentUrl"];
 
-                if(!string.IsNullOrEmpty(loginPageUrl))
+                if (!string.IsNullOrEmpty(loginPageUrl))
                 {
                     ViewBag.LoginPageUrl = loginPageUrl;
                 }
@@ -971,7 +972,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="widgetSize_ID">AD_WidgetSize_ID</param>
         /// <returns>Field Details</returns>
-        public JsonResult GetDynamicWidget( int widgetID,int windowNo, int tabID, int tableID)
+        public JsonResult GetDynamicWidget(int widgetID, int windowNo, int tabID, int tableID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
@@ -984,7 +985,7 @@ namespace VIS.Controllers
         /// </summary>
         /// <param name="AD_UserHomeWidget_ID">AD_UserHomeWidget_ID</param>
         /// <returns>AD_UserHomeWidget_ID and Htmlstyle</returns>
-        public JsonResult GetWidgetID( int userHomeWidgetID)
+        public JsonResult GetWidgetID(int userHomeWidgetID)
         {
             Ctx ctx = Session["ctx"] as Ctx;
             HomeModels homeModels = new HomeModels();
@@ -1067,7 +1068,7 @@ namespace VIS.Controllers
             {
                 error = "Session Expired";
             }
-            return Json(new { count = count,error = error }, JsonRequestBehavior.AllowGet);
+            return Json(new { count = count, error = error }, JsonRequestBehavior.AllowGet);
         }
         #endregion
 
