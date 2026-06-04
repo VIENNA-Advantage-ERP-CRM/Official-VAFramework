@@ -38,6 +38,7 @@ namespace VAModelAD.AIHelper
             thrdChtDIn.action = GetActionCode(actionType);
             thrdChtDIn.record_id = recordID;
             thrdChtDIn.sessionID = ctx.GetAD_Session_ID();
+            thrdChtDIn.sessionGUID = ctx.GetContext("#AD_Session_GUID");
             thrdChtDIn.attachmentType = attachmentType;
             thrdChtDIn.attachmentTypeID = attachmentID;
             thrdChtDIn.userID = userID;
@@ -78,6 +79,7 @@ namespace VAModelAD.AIHelper
                 if (s.Save())
                 {
                     thrdChtDIn.sessionID = s.GetAD_Session_ID();
+                    thrdChtDIn.sessionGUID = DB.GetRecordGUID("AD_Session", s.GetAD_Session_ID());
                 }
                 else
                 {
@@ -154,6 +156,7 @@ namespace VAModelAD.AIHelper
             emailReplyRequest.prompt = prompt;
             emailReplyRequest.threadID = threadID;
             emailReplyRequest.sessionID = ctx.GetAD_Session_ID();
+            emailReplyRequest.sessionGUID = ctx.GetContext("#AD_Session_GUID");
             emailReplyRequest.endPoints = ctx.GetContext("#AppFullUrl");
             emailReplyRequest.email_subject = subject;
             emailReplyRequest.email_content = message;
