@@ -244,6 +244,8 @@ namespace VIS.Controllers
                     {
                         var oldctx = Session["ctx"] as Ctx;
                         ctx.SetAD_Session_ID(oldctx.GetAD_Session_ID());
+                        // Set Session GUID in context to identify get session in other requests.
+                        ctx.SetContext("#AD_Session_GUID", DB.GetRecordGUID("AD_Session", oldctx.GetAD_Session_ID()));
                         ctx.SetSecureKey(oldctx.GetSecureKey());
                         ctx.SetApplicationUrl(oldctx.GetApplicationUrl());
                         Session.Timeout = 17;
