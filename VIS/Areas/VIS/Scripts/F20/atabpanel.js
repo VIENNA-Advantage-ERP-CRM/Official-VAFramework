@@ -207,6 +207,10 @@
                 $divContent.hide();
             }
 
+            // show/hide resize handle based on panel open/closed state
+            if ($divBody.is('.ui-resizable'))
+                $divBody.children('.ui-resizable-handle').toggle(!this.isClosed);
+
             if (this.sizeChangedListner && this.sizeChangedListner.onSizeChanged)
                 this.sizeChangedListner.onSizeChanged();
 
@@ -445,6 +449,8 @@
                             }
                         }
                     })
+                // hide resize handle if panel is closed initially (no default panel)
+                body.children('.ui-resizable-handle').toggle(!this.isClosed);
                // }, 1000); //wait for dom to be ready
             }
         }
