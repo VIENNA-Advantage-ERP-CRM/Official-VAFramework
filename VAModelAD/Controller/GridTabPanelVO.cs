@@ -35,7 +35,7 @@ namespace VAdvantage.Controller
 
         public string TabPanelAlignment = "V";
 
-        /** View this panel belongs to: G=Grid, S=Single, C=Card. Empty/null = legacy (visible on all views). */
+        /** View this panel belongs to (AD_Tab.TabLayout codes): Y=Single, N=Grid, C=Card. Empty/null = legacy (visible on all views). */
         public string ViewType = "";
 
         /** Per-view tab panel width override (%). 0 = no override (fall back to AD_Window.WinWidth). */

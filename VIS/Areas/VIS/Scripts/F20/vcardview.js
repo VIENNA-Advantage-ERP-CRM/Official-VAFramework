@@ -306,7 +306,7 @@
             prnt.css('height', '100%'); //reset height
             //card view
             if (!this.isFixedBody) {
-                prnt.height(this.getBody()[0].scrollHeight + 52);
+                prnt.height(this.getBody()[0].scrollHeight + 100);
             }
             this.navigate();
         };
