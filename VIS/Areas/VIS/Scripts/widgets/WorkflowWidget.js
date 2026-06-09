@@ -94,6 +94,8 @@
             var isRTL = VIS.Application.isRTL || $('html').attr('dir') == 'rtl';
             var modalDir = isRTL ? 'rtl' : 'ltr';
             var currentModalCardIdx = 0; // tracks which card is currently selected in the modal
+            var activityInfoCache = {};
+            var activityInfoPending = {};
 
             /*
              * wf labels
@@ -322,6 +324,90 @@
                 $modal.find('.vis-wf-record-title').text(activityTitle);
             };
 
+            function getActivityInfoRequest(cardIdx) {
+                var activity = (fulldata && fulldata[cardIdx]) ? fulldata[cardIdx] : null;
+                if (activity && activity.AD_WF_Activity_ID) {
+                    return {
+                        key: activity.AD_WF_Activity_ID,
+                        activityID: activity.AD_WF_Activity_ID,
+                        nodeID: activity.AD_Node_ID,
+                        wfProcessID: activity.AD_WF_Process_ID
+                    };
+                }
+
+                var $actContainer = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(cardIdx);
+                var dataIds = $actContainer.find('pre.vis-workflow-pre-cls').attr('data-ids') || '';
+                var parts = dataIds.split('_');
+                var idx = parts[3] !== undefined ? parseInt(parts[3]) : cardIdx;
+
+                return {
+                    key: parts[2] || '',
+                    activityID: parts[2] || '',
+                    nodeID: parts[1] || '0',
+                    wfProcessID: (fulldata && fulldata[idx]) ? fulldata[idx].AD_WF_Process_ID : null
+                };
+            };
+
+            function getActivityInfo(cardIdx, success, error) {
+                var request = getActivityInfoRequest(cardIdx);
+                if (!request.activityID) {
+                    if (error) {
+                        error();
+                    }
+                    return;
+                }
+
+                if (Object.prototype.hasOwnProperty.call(activityInfoCache, request.key)) {
+                    success(activityInfoCache[request.key]);
+                    return;
+                }
+
+                if (activityInfoPending[request.key]) {
+                    activityInfoPending[request.key].push({ success: success, error: error });
+                    return;
+                }
+
+                activityInfoPending[request.key] = [{ success: success, error: error }];
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "WFActivity/GetActivityInfo",
+                    async: true,
+                    dataType: "json",
+                    type: "POST",
+                    data: {
+                        activityID: request.activityID,
+                        nodeID: request.nodeID,
+                        wfProcessID: request.wfProcessID
+                    },
+                    error: function () {
+                        var waiting = activityInfoPending[request.key] || [];
+                        delete activityInfoPending[request.key];
+                        for (var i = 0; i < waiting.length; i++) {
+                            if (waiting[i].error) {
+                                waiting[i].error();
+                            }
+                        }
+                    },
+                    success: function (res) {
+                        var info = res && res.result ? res.result : null;
+                        activityInfoCache[request.key] = info;
+
+                        var waiting = activityInfoPending[request.key] || [];
+                        delete activityInfoPending[request.key];
+                        for (var i = 0; i < waiting.length; i++) {
+                            waiting[i].success(info);
+                        }
+                    }
+                });
+            };
+
+            function clearActivityInfoCache(activityID) {
+                if (activityID) {
+                    delete activityInfoCache[activityID];
+                    delete activityInfoPending[activityID];
+                }
+            };
+
             function getRequesterNameFromHistory(info) {
                 if (!info || !info.Node) {
                     return null;
@@ -432,6 +518,7 @@
                         $okBtn.data('clicked', 'N');
                         showBusy(false);
                         if (info.result == '') {
+                            clearActivityInfoCache(fulldata[index].AD_WF_Activity_ID);
                             $modal.css('display', 'none');
                             lstDetailCtrls = [];
                             selectedItems = [];
@@ -468,7 +555,7 @@
 
                 $answerInput.append($ctrlWrap);
 
-                var $okBtn = $("<a href='javascript:void(0)' id='vis-home-wf-ansOK-" + modalId + "' class='vis-wf-submit-btn vis-wf-submit-disabled' role='button' aria-disabled='true' data-clicked='N' data-id='" + index + "'>");
+                var $okBtn = $("<a href='javascript:void(0)' id='vis-home-wf-ansOK-" + modalId + "' class='vis-wf-submit-btn vis-wf-submit-disabled' role='button' aria-disabled='true' tabindex='-1' data-clicked='N' data-id='" + index + "'>");
                 $okBtn.append($("<span>").text(VIS.Msg.getMsg('Submit') || 'Submit'));
                 $okBtn.append($("<i class='fa fa-check'></i>"));
                 $answerWrap.append($('<div class="vis-w-home-wf-answerBtn">').append($okBtn));
@@ -481,7 +568,8 @@
                     $okBtn
                         .toggleClass('vis-wf-submit-disabled', !hasValue)
                         .toggleClass('vis-wf-submit-ready', hasValue)
-                        .attr('aria-disabled', hasValue ? 'false' : 'true');
+                        .attr('aria-disabled', hasValue ? 'false' : 'true')
+                        .attr('tabindex', hasValue ? '0' : '-1');
                     $forwardBtn
                         .toggleClass('vis-wf-forward-disabled', hasValue)
                         .attr('aria-disabled', hasValue ? 'true' : 'false');
@@ -507,21 +595,10 @@
                     return;
                 }
 
-                $.ajax({
-                    url: VIS.Application.contextUrl + "WFActivity/GetActivityInfo",
-                    async: true,
-                    dataType: "json",
-                    type: "POST",
-                    data: {
-                        activityID: fulldata[index].AD_WF_Activity_ID,
-                        nodeID: fulldata[index].AD_Node_ID,
-                        wfProcessID: fulldata[index].AD_WF_Process_ID
-                    },
-                    success: function (res) {
-                        if (index === currentModalCardIdx) {
-                            syncRequester(index, res.result);
-                            buildAnswer(index, res.result);
-                        }
+                getActivityInfo(index, function (info) {
+                    if (index === currentModalCardIdx) {
+                        syncRequester(index, info);
+                        buildAnswer(index, info);
                     }
                 });
             };
@@ -691,6 +768,10 @@
                         $modal.css('display', 'none');
                     }
                 });
+                $modal.on('modalClose', function () {
+                    $modal.find('.vis-wf-forward-panel').hide().empty();
+                    $modal.find('.vis-wf-footer-row').show();
+                });
                 $modal.find('#' + modalId + 'Close').on('click', function () {
                     $modal.trigger('modalClose');
                     $modal.css('display', 'none');
@@ -707,6 +788,7 @@
                     // Collapse and clear the forward panel when switching cards
                     var $fwdPanel = $modal.find('.vis-wf-forward-panel');
                     $fwdPanel.hide().empty();
+                    $modal.find('.vis-wf-footer-row').show();
                     syncDetailTitle(cardIdx);
                     syncDetailKV(cardIdx);
                     syncSubmitted(cardIdx);
@@ -759,18 +841,23 @@
                     }
 
                     var $fwdPanel = $modal.find('.vis-wf-forward-panel');
-                    if ($fwdPanel.is(':visible')) {
+                    var $footerRow = $modal.find('.vis-wf-footer-row');
+                    var closeForwardPanel = function () {
+                        $fwdPanel.find('input[name="AD_User_ID"]').val('');
+                        $fwdPanel.find('.vis-wf-fwd-note').val('');
                         $fwdPanel.hide().empty();
+                        $footerRow.show();
+                    };
+
+                    if ($fwdPanel.is(':visible')) {
+                        closeForwardPanel();
                         return;
                     }
 
                     $fwdPanel.empty();
+                    $footerRow.hide();
 
-                    // ── Header ─────────────────────────────────────────────────────────
-                    var $header = $('<div class="vis-wf-fwd-header">');
-                    $header.append('<div class="vis-wf-fwd-header-icon"><i class="vis vis-arrow-right"></i></div>');
-                    $header.append($('<div class="vis-wf-fwd-header-title">').text(lbl('VIS_ForwardTo', 'Forward to')));
-                    $fwdPanel.append($header);
+                    $fwdPanel.append($('<div class="vis-wf-fwd-header-title">').text(lbl('VIS_ForwardTo', 'Forward to')));
 
                     // ── Fields ─────────────────────────────────────────────────────────
                     var $fields = $('<div class="vis-wf-fwd-fields">');
@@ -782,14 +869,13 @@
                     txtb.getBtn(); // initialise internal state (required), but we won't append the btns
 
                     var $userField = $('<div class="vis-wf-fwd-field">');
-                    $userField.append('<i class="fa fa-user vis-wf-fwd-field-icon"></i>');
                     var $userCtrl = txtb.getControl();
-                    $userCtrl.attr('placeholder', lbl('VIS_SearchUser', 'Search user'));
+                    $userCtrl.attr('placeholder', lbl('VIS_User', 'User'));
                     $userField.append($userCtrl);
 
                     // Search icon — clicking it opens the VIS user lookup popup
                     var $searchBtn = $('<button type="button" class="vis-wf-fwd-field-search-btn" title="' + lbl('VIS_SearchUser', 'Search user') + '">');
-                    $searchBtn.append('<i class="vis vis-find"></i>');
+                    $searchBtn.append('<i class="fa fa-user"></i>');
                     $searchBtn.on('click', function (e) {
                         e.stopPropagation();
                         // getBtn(0) is the caret-down button — opens the user lookup dropdown
@@ -799,18 +885,25 @@
 
                     $fields.append($userField);
 
+                    var $noteField = $('<div class="vis-wf-fwd-field">');
+                    var $noteInput = $('<textarea class="vis-wf-fwd-note vis-w-workflow-textarea" spellcheck="false"></textarea>');
+                    $noteInput.attr('placeholder', lbl('VIS_TypeMessage', 'Please write message') + '....');
+                    $noteField.append($noteInput);
+                    $noteField.append('<i class="fa fa-sticky-note-o vis-wf-fwd-note-icon"></i>');
+                    $fields.append($noteField);
+
                     $fwdPanel.append($fields);
 
                     // ── Action buttons ─────────────────────────────────────────────────
                     var $actions = $('<div class="vis-wf-fwd-actions">');
-                    var $cancelBtn  = $('<button class="vis-wf-fwd-cancel">').html('<i class="vis vis-close"></i> ' + lbl('VIS_Cancel', 'Cancel'));
-                    var $confirmBtn = $('<button class="vis-wf-fwd-confirm">').html('<i class="vis vis-arrow-right"></i> ' + lbl('VIS_Forward', 'Forward'));
+                    var $cancelBtn  = $('<button class="vis-wf-fwd-cancel">').text(lbl('VIS_Close', 'Close'));
+                    var $confirmBtn = $('<button class="vis-wf-fwd-confirm">').html('<span>' + lbl('VIS_Done', 'Done') + '</span><i class="fa fa-check"></i>');
                     $actions.append($cancelBtn).append($confirmBtn);
                     $fwdPanel.append($actions);
 
                     // ── Events ────────────────────────────────────────────────────────
                     $cancelBtn.on('click', function () {
-                        $fwdPanel.hide().empty();
+                        closeForwardPanel();
                     });
 
                     $confirmBtn.on('click', function () {
@@ -819,7 +912,7 @@
                             VIS.ADialog.error('FillMandatory', true, lbl('VIS_Forward', 'Forward'));
                             return;
                         }
-                        var msg = '';
+                        var msg = VIS.Utility.encodeText($noteInput.val() || '');
                         var activityID = fulldata[currentModalCardIdx].AD_WF_Activity_ID;
                         var nID        = fulldata[currentModalCardIdx].AD_Node_ID;
                         var winID      = fulldata[currentModalCardIdx].AD_Window_ID;
@@ -831,6 +924,7 @@
                             function (info) {
                                 showBusy(false);
                                 if (info.result == '') {
+                                    clearActivityInfoCache(activityID);
                                     $modal.css('display', 'none');
                                     lstDetailCtrls = [];
                                     selectedItems = [];
@@ -852,36 +946,23 @@
                 function loadHistory(cardIdx) {
                     var $historySide = $modal.find('.vis-wf-history-side');
                     var $historyContent = $historySide.find('.vis-wf-history-content');
-
-                    var $actContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
-                    var $actContainer = $actContainers.eq(cardIdx);
-                    var $pre = $actContainer.find('pre.vis-workflow-pre-cls');
-                    var dataIds = $pre.attr('data-ids') || '';
-                    var parts = dataIds.split('_');
-                    var wfActivityID = parts[2] || '';
-                    var nodeID = parts[1] || '0';
-                    var idx = parts[3] !== undefined ? parseInt(parts[3]) : cardIdx;
-                    var wfProcessID = (fulldata && fulldata[idx]) ? fulldata[idx].AD_WF_Process_ID : null;
+                    var request = getActivityInfoRequest(cardIdx);
 
                     var flowTitle = '<div class="vis-wf-ht-flow-title">' + lbl('VIS_ViewHistoryRecord', 'View History Record') + '</div>';
                     $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading">' + lbl('VIS_Loading', 'Loading...') + '</div>');
 
-                    if (!wfActivityID) {
+                    if (!request.activityID) {
                         $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
                         return;
                     }
 
-                    $.ajax({
-                        url: VIS.Application.contextUrl + 'WFActivity/GetActivityInfo',
-                        async: true,
-                        dataType: 'json',
-                        type: 'POST',
-                        data: { activityID: wfActivityID, nodeID: nodeID, wfProcessID: wfProcessID },
-                        error: function () {
-                            $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading" style="color:#e74c3c;">' + lbl('VIS_FailedToLoadHistory', 'Failed to load history.') + '</div>');
-                        },
-                        success: function (res) {
-                            var info = res && res.result ? res.result : null;
+                    getActivityInfo(
+                        cardIdx,
+                        function (info) {
+                            if (cardIdx !== currentModalCardIdx) {
+                                return;
+                            }
+
                             $historyContent.empty();
                             $historyContent.append(flowTitle);
                             syncRequester(cardIdx, info);
@@ -933,8 +1014,11 @@
                                 }
                             }
                             $historyContent.append($timeline);
+                        },
+                        function () {
+                            $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading" style="color:#e74c3c;">' + lbl('VIS_FailedToLoadHistory', 'Failed to load history.') + '</div>');
                         }
-                    });
+                    );
                 }
             }
 

@@ -412,7 +412,6 @@
     font-size: 14px;
     font-weight: 700;
     line-height: 1.3;
-    text-decoration: underline;
     text-underline-offset: 2px;
 }
 
@@ -759,149 +758,147 @@
 }
 
 .vis-wf-modal .vis-wf-forward-panel {
-    padding: 14px 18px 10px;
-    border-top: 2px solid #DFF1FF;
-    background: linear-gradient(135deg, #F0F9FF 0%, #E8F4FF 100%);
-}
-
-.vis-wf-modal .vis-wf-fwd-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.vis-wf-modal .vis-wf-fwd-header-icon {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: #0083DA;
-    color: #FFFFFF;
-    font-size: 13px;
-    flex-shrink: 0;
+    width: 100%;
+    margin: 0;
+    padding: 18px 18px 10px;
+    box-sizing: border-box;
+    background: #D1E1EB;
 }
 
 .vis-wf-modal .vis-wf-fwd-header-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #102C3F;
+    margin: 0 0 10px;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 400;
 }
 
 .vis-wf-modal .vis-wf-fwd-fields {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 0;
+    margin-bottom: 10px;
 }
 
 .vis-wf-modal .vis-wf-fwd-field {
     position: relative;
-}
-
-.vis-wf-modal .vis-wf-fwd-field-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #0083DA;
-    font-size: 13px;
-    pointer-events: none;
-    z-index: 1;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+    padding: 0 14px 0 28px;
+    border: 1px solid #c9ddec;
+    border-radius: 10px;
+    background: #FFFFFF;
+    box-sizing: border-box;
 }
 
 .vis-wf-modal .vis-wf-fwd-field-search-btn {
-    position: absolute;
-    right: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
-    border-radius: 7px;
-    background: #EAF4FF;
-    color: #0083DA;
-    font-size: 13px;
+    background: transparent;
+    color: #b5b5b5;
+    font-size: 14px;
     cursor: pointer;
-    z-index: 2;
-    transition: background 0.15s;
+    padding: 0;
 }
 
 .vis-wf-modal .vis-wf-fwd-field-search-btn:hover {
-    background: #BFE4FF;
+    color: #1f93fd;
 }
 
 .vis-wf-modal .vis-wf-fwd-field input[type="text"],
-.vis-wf-modal .vis-wf-fwd-field input[name="AD_User_ID"] {
+.vis-wf-modal .vis-wf-fwd-field input[name="AD_User_ID"],
+.vis-wf-modal .vis-wf-fwd-field textarea,
+.vis-wf-modal .vis-wf-fwd-field .vis-wf-fwd-note {
     width: 100% !important;
-    height: 40px !important;
-    padding: 0 40px 0 36px !important;
-    border: 1.5px solid #BFE4FF !important;
-    border-radius: 10px !important;
+    height: 100% !important;
+    flex: 1;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
     font-family: Roboto, Arial, sans-serif !important;
-    font-size: 13.5px !important;
-    color: #102C3F !important;
-    background: #FFFFFF !important;
+    font-size: 13px !important;
+    color: #334155 !important;
+    background: transparent !important;
     outline: 0 !important;
-    box-shadow: 0 2px 8px rgba(0,131,218,0.08) !important;
+    box-shadow: none !important;
     box-sizing: border-box !important;
-    transition: border-color 0.15s;
 }
 
 .vis-wf-modal .vis-wf-fwd-field input[type="text"]:focus,
-.vis-wf-modal .vis-wf-fwd-field input[name="AD_User_ID"]:focus {
-    border-color: #0083DA !important;
-    box-shadow: 0 0 0 3px rgba(0,131,218,0.12) !important;
+.vis-wf-modal .vis-wf-fwd-field input[name="AD_User_ID"]:focus,
+.vis-wf-modal .vis-wf-fwd-field textarea:focus,
+.vis-wf-modal .vis-wf-fwd-field .vis-wf-fwd-note:focus {
+    box-shadow: none !important;
 }
 
+.vis-wf-modal .vis-wf-fwd-field input::placeholder {
+    color: #9e9e9e;
+}
+
+.vis-wf-modal .vis-wf-fwd-field textarea {
+    overflow: hidden !important;
+    resize: none;
+    line-height: 52px;
+}
+
+.vis-wf-modal .vis-wf-fwd-field textarea::placeholder {
+    color: #9e9e9e;
+}
+
+.vis-wf-modal .vis-wf-fwd-note-icon {
+    color: #b5b5b5;
+    font-size: 14px;
+    pointer-events: none;
+}
 
 .vis-wf-modal .vis-wf-fwd-actions {
     display: flex;
     align-items: center;
     gap: 8px;
     justify-content: flex-end;
+    margin-top: 4px;
 }
 
 .vis-wf-modal .vis-wf-fwd-confirm {
-    height: 36px;
-    padding: 0 20px;
+    height: 34px;
+    padding: 0 14px;
     border: none;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #0083DA, #0065B0);
+    border-radius: 10px;
+    background: #2fc49f;
     color: #FFFFFF;
     font-family: Roboto, Arial, sans-serif;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 400;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,131,218,0.28);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+}
+
+.vis-wf-modal .vis-wf-fwd-confirm i {
+    font-size: 12px;
 }
 
 .vis-wf-modal .vis-wf-fwd-cancel {
-    height: 36px;
-    padding: 0 16px;
-    border: 1.5px solid #E4EDF4;
-    border-radius: 999px;
+    height: 34px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 10px;
     background: #FFFFFF;
-    color: #5F7283;
+    color: #334155;
     font-family: Roboto, Arial, sans-serif;
     font-size: 13px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
 }
 
 .vis-wf-modal .vis-wf-footer {
-    padding: 14px 18px;
-    border-top: 1px solid #E4EDF4;
     background: #FFFFFF;
     flex-shrink: 0;
 }
@@ -911,6 +908,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
+    margin-bottom: 0.7rem;
 }
 
 .vis-wf-modal .vis-wf-actions {
@@ -1042,6 +1040,10 @@
 .vis-wf-modal .vis-wf-submit-btn i {
     color: #8f8f8f;
     font-size: 13px;
+}
+
+.vis-wf-modal .vis-wf-submit-btn.vis-wf-submit-disabled {
+    pointer-events: none;
 }
 
 .vis-wf-modal .vis-wf-submit-btn.vis-wf-submit-ready {
@@ -1327,6 +1329,22 @@
     .vis-wf-modal .vis-wf-master {
         height: 46%;
         min-height: 250px;
+    }
+
+    .vis-wf-modal .vis-wf-content-area {
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .vis-wf-modal .vis-wf-content-body {
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+
+    .vis-wf-modal .vis-wf-detail,
+    .vis-wf-modal .vis-wf-body {
+        overflow: visible;
     }
 
     .vis-wf-modal .vis-wf-history-side {
