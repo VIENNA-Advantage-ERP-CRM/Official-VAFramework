@@ -1,0 +1,1194 @@
+/* ============================================================
+   WorkflowWidget Modal — VIS Workflow Approvals Panel
+   Scoped to .vis-wf-modal
+   ============================================================ */
+
+.vis-wf-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0,0,0,0.35);
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    color: #141414;
+}
+
+.vis-wf-modal .vis-wf-shell {
+    width: min(1320px, calc(100vw - 32px));
+    max-width: calc(100% - 12px);
+    height: min(820px, calc(100vh - 32px));
+    max-height: calc(100% - 12px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #FFFFFF;
+    border: 2px solid #FFFFFF;
+    border-radius: 14px;
+    box-shadow: 0 18px 42px rgba(15,61,97,0.22);
+}
+
+.vis-wf-modal .vis-wf-titlebar {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.58));
+    border-bottom: 1px solid #1F83FF;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    font-size: 16px;
+    color: #000000;
+}
+
+.vis-wf-modal .vis-wf-title strong {
+    font-weight: 700;
+}
+
+.vis-wf-modal .vis-wf-module-icon {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #0083DA;
+    background: #DFF1FF;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-meta {
+    margin-left: 12px;
+    padding-left: 12px;
+    border-left: 1px solid #E4EDF4;
+    font-size: 13px;
+    color: #5F7283;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vis-wf-modal .vis-wf-main {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    background: #FFFFFF;
+}
+
+.vis-wf-modal .vis-wf-master {
+    width: 330px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #E4EDF4;
+    background: #FBFDFF;
+}
+
+.vis-wf-modal .vis-wf-tools {
+    padding: 12px 14px;
+    border-bottom: 1px solid #E4EDF4;
+    background: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-search {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    margin-bottom: 10px;
+    border: 1px solid #E4EDF4;
+    border-radius: 999px;
+    color: #5F7283;
+    background: #FFFFFF;
+    box-shadow: 0 6px 14px rgba(16,47,74,0.06);
+}
+
+.vis-wf-modal .vis-wf-search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-family: Roboto, Arial, sans-serif;
+    color: #9F9F9F;
+    font-size: 12px;
+}
+
+.vis-wf-modal .vis-wf-search input::placeholder {
+    color: #9F9F9F;
+}
+
+.vis-wf-modal .vis-wf-filters {
+    position: relative;
+}
+
+.vis-wf-modal .vis-wf-date-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.vis-wf-modal .vis-wf-date-filter {
+    min-width: 0;
+}
+
+.vis-wf-modal .vis-wf-date-filter label {
+    display: block;
+    margin: 0 0 4px;
+    color: #5F7283;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.vis-wf-modal .vis-wf-date-filter input {
+    width: 100%;
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid #E4EDF4;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #102C3F;
+    font-size: 12px;
+    box-sizing: border-box;
+    outline: 0;
+}
+
+.vis-wf-modal .vis-wf-date-filter input:focus {
+    border-color: #0083DA;
+    box-shadow: 0 0 0 3px rgba(0,131,218,0.08);
+}
+
+.vis-wf-modal .vis-wf-window-select {
+    width: 100%;
+    height: 28px;
+    padding: 0 30px 0 10px;
+    border: 1px solid #E4EDF4;
+    border-radius: 999px;
+    background: #FFFFFF;
+    color: #5F7283;
+    font-size: 12px;
+    font-weight: 500;
+    outline: 0;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(16,47,74,0.04);
+    appearance: auto;
+    -webkit-appearance: menulist;
+}
+
+.vis-wf-modal .vis-wf-list {
+    flex: 1;
+    overflow: auto;
+}
+
+.vis-wf-modal .vis-wf-group {
+    padding: 12px 16px 6px;
+    color: #748494;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.vis-wf-modal .vis-wf-card {
+    padding: 14px 16px;
+    border-bottom: 1px solid #EBEBEB;
+    cursor: pointer;
+    background: #FFFFFF;
+}
+
+.vis-wf-modal .vis-wf-card:focus {
+    outline: 2px solid #BFE4FF;
+    outline-offset: -2px;
+}
+
+.vis-wf-modal .vis-wf-card-selected {
+    background: linear-gradient(109deg, #EAF8FF 0%, #CAEDFF 100%);
+    box-shadow: inset 4px 0 0 #0083DA, 0 12px 24px rgba(31,131,255,0.10);
+}
+
+.vis-wf-modal .vis-wf-empty {
+    padding: 16px;
+    color: #748494;
+    font-size: 13px;
+}
+
+.vis-wf-modal .vis-wf-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.vis-wf-modal .vis-wf-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.vis-wf-modal .vis-wf-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.vis-wf-modal .vis-wf-pill-info {
+    background: #DFF1FF;
+    color: #106AB0;
+}
+
+.vis-wf-modal .vis-wf-pill-violet {
+    background: #E9E5FF;
+    color: #5F4AA6;
+}
+
+.vis-wf-modal .vis-wf-pill-warning {
+    background: #FFE9C2;
+    color: #8B5A00;
+}
+
+.vis-wf-modal .vis-wf-pill-success {
+    background: #CCEFDD;
+    color: #0C5D38;
+}
+
+.vis-wf-modal .vis-wf-id {
+    margin-left: auto;
+    color: #748494;
+    font-size: 11px;
+}
+
+.vis-wf-modal .vis-wf-card-top .vis-wf-card-title {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vis-wf-modal .vis-wf-card-kv {
+    margin-top: 8px;
+    border-radius: 6px;
+    font-size: 11.5px;
+}
+
+.vis-wf-modal .vis-wf-card-kv .vis-wf-kv-row {
+    padding: 5px 10px;
+}
+
+.vis-wf-modal .vis-wf-card-kv .vis-wf-kv-key {
+    font-size: 11px;
+    color: #748494;
+}
+
+.vis-wf-modal .vis-wf-card-kv .vis-wf-kv-val {
+    font-size: 11px;
+}
+
+.vis-wf-modal .vis-wf-card-title {
+    color: #102C3F;
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.vis-wf-modal .vis-wf-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 7px;
+    color: #748494;
+    font-size: 11.5px;
+}
+
+.vis-wf-modal .vis-wf-avatar {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #FFFFFF;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-time {
+    display: block;
+    margin-top: 10px;
+    text-align: right;
+    color: #9F9F9F;
+    font-size: 11px;
+}
+
+.vis-wf-modal .vis-wf-no-selection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: #A0B0BF;
+    font-size: 14px;
+    text-align: center;
+    padding: 40px 20px;
+    user-select: none;
+}
+
+.vis-wf-modal .vis-wf-no-selection i {
+    font-size: 40px;
+    color: #C8D8E4;
+}
+
+.vis-wf-modal .vis-wf-no-selection p {
+    margin: 0;
+}
+
+.vis-wf-modal .vis-wf-content-area {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255,255,255,0.94);
+}
+
+.vis-wf-modal .vis-wf-content-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+
+.vis-wf-modal .vis-wf-detail {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vis-wf-modal .vis-wf-detail-header {
+    min-height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 0 18px;
+    border-bottom: 1px solid #E4EDF4;
+    background: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-detail-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.vis-wf-modal .vis-wf-record-title {
+    color: #141414;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.vis-wf-modal .vis-wf-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #FFE9C2;
+    color: #8B5A00;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.vis-wf-modal .vis-wf-detail-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.vis-wf-modal .vis-wf-submitted {
+    color: #5F7283;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vis-wf-modal .vis-wf-icon-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #141414;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-icon-btn:hover {
+    background: #E5F3FB;
+}
+
+/* ── Header buttons (Watch / Close) ─────────────────────────── */
+
+.vis-wf-modal .vis-wf-hdr-btn {
+    border: none;
+    outline: none;
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-hdr-btn-blue {
+    background: #edf5fb;
+}
+
+.vis-wf-modal .vis-wf-hdr-btn-blue .vis-wf-hdr-btn-circle {
+    width: 42px;
+    height: 42px;
+    background: #1f93fd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vis-wf-modal .vis-wf-hdr-btn-blue .vis-wf-hdr-btn-circle i {
+    color: #FFFFFF;
+    font-size: 20px;
+}
+
+.vis-wf-modal .vis-wf-body {
+    flex: 1;
+    overflow: auto;
+    padding: 18px;
+    background: #FFFFFF;
+}
+
+.vis-wf-modal .vis-wf-section {
+    margin-bottom: 18px;
+}
+
+.vis-wf-modal .vis-wf-section-title {
+    margin: 0 0 10px;
+    color: #748494;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.vis-wf-modal .vis-wf-kv {
+    overflow: hidden;
+    border: 1px solid #E4EDF4;
+    border-radius: 10px;
+}
+
+.vis-wf-modal .vis-wf-kv-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 9px 14px;
+    border-bottom: 1px solid #EDF2F6;
+    background: #FFFFFF;
+}
+
+.vis-wf-modal .vis-wf-kv-row:last-child {
+    border-bottom: 0;
+}
+
+.vis-wf-modal .vis-wf-kv-key {
+    color: #5F7283;
+    font-size: 12.5px;
+}
+
+.vis-wf-modal .vis-wf-kv-val {
+    color: #102C3F;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: right;
+}
+
+.vis-wf-modal .vis-wf-description {
+    padding: 12px 14px;
+    border: 1px solid #EDF2F6;
+    border-radius: 10px;
+    background: #FAFCFE;
+    color: #102C3F;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.vis-wf-modal .vis-wf-requester {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border: 1px solid #E4EDF4;
+    border-radius: 10px;
+    background: #FAFCFE;
+}
+
+.vis-wf-modal .vis-wf-requester-avatar {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#06b6d4,#0083DA);
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-requester-name {
+    flex: 1;
+    min-width: 0;
+    color: #102C3F;
+    font-size: 14.5px;
+    font-weight: 700;
+}
+
+/* ── History side panel (permanent 3rd column) ──────────────── */
+
+.vis-wf-modal .vis-wf-history-side {
+    width: 360px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #E4EDF4;
+    background: #FBFDFF;
+    overflow: hidden;
+}
+
+.vis-wf-modal .vis-wf-history-side .vis-wf-history-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* ── History timeline items ─────────────────────────────────── */
+
+.vis-wf-modal .vis-wf-ht-flow-title {
+    padding: 14px 16px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #102C3F;
+    border-bottom: 1px solid #E4EDF4;
+    margin-bottom: 2px;
+}
+
+.vis-wf-modal .vis-wf-ht-loading {
+    padding: 14px 16px;
+    font-size: 12px;
+    color: #748494;
+}
+
+.vis-wf-modal .vis-wf-ht-timeline {
+    padding: 10px 0 4px;
+}
+
+.vis-wf-modal .vis-wf-ht-item {
+    display: flex;
+    align-items: stretch;
+    padding: 0 12px;
+    min-height: 48px;
+}
+
+.vis-wf-modal .vis-wf-ht-node {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 8px 18px 0;
+    font-size: 12px;
+    color: #102C3F;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.vis-wf-modal .vis-wf-ht-step {
+    width: 30px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2px;
+}
+
+.vis-wf-modal .vis-wf-ht-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #C0392B;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-ht-dot-check {
+    width: 22px;
+    height: 22px;
+    background: #C0392B;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}
+
+/* vertical connector line between items */
+.vis-wf-modal .vis-wf-ht-item:not(:last-child) .vis-wf-ht-step::after {
+    content: '';
+    flex: 1;
+    width: 2px;
+    background: #C0392B;
+    margin-top: 4px;
+    min-height: 16px;
+}
+
+.vis-wf-modal .vis-wf-ht-status {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 0 18px 8px;
+    font-size: 12px;
+    color: #748494;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.vis-wf-modal .vis-wf-ht-pending {
+    color: #C0392B;
+    font-weight: 700;
+}
+
+.vis-wf-modal .vis-wf-ht-label {
+    display: block;
+    color: #748494;
+    font-size: 11px;
+}
+
+.vis-wf-modal .vis-wf-ht-by {
+    display: block;
+    color: #102C3F;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.vis-wf-modal .vis-wf-forward-panel {
+    padding: 14px 18px 10px;
+    border-top: 2px solid #DFF1FF;
+    background: linear-gradient(135deg, #F0F9FF 0%, #E8F4FF 100%);
+}
+
+.vis-wf-modal .vis-wf-fwd-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.vis-wf-modal .vis-wf-fwd-header-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #0083DA;
+    color: #FFFFFF;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-fwd-header-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #102C3F;
+}
+
+.vis-wf-modal .vis-wf-fwd-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.vis-wf-modal .vis-wf-fwd-field {
+    position: relative;
+}
+
+.vis-wf-modal .vis-wf-fwd-field-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0083DA;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.vis-wf-modal .vis-wf-fwd-field-search-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 7px;
+    background: #EAF4FF;
+    color: #0083DA;
+    font-size: 13px;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.15s;
+}
+
+.vis-wf-modal .vis-wf-fwd-field-search-btn:hover {
+    background: #BFE4FF;
+}
+
+.vis-wf-modal .vis-wf-fwd-field input[type="text"],
+.vis-wf-modal .vis-wf-fwd-field input[name="AD_User_ID"] {
+    width: 100% !important;
+    height: 40px !important;
+    padding: 0 40px 0 36px !important;
+    border: 1.5px solid #BFE4FF !important;
+    border-radius: 10px !important;
+    font-family: Roboto, Arial, sans-serif !important;
+    font-size: 13.5px !important;
+    color: #102C3F !important;
+    background: #FFFFFF !important;
+    outline: 0 !important;
+    box-shadow: 0 2px 8px rgba(0,131,218,0.08) !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.15s;
+}
+
+.vis-wf-modal .vis-wf-fwd-field input[type="text"]:focus,
+.vis-wf-modal .vis-wf-fwd-field input[name="AD_User_ID"]:focus {
+    border-color: #0083DA !important;
+    box-shadow: 0 0 0 3px rgba(0,131,218,0.12) !important;
+}
+
+
+.vis-wf-modal .vis-wf-fwd-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.vis-wf-modal .vis-wf-fwd-confirm {
+    height: 36px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0083DA, #0065B0);
+    color: #FFFFFF;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,131,218,0.28);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vis-wf-modal .vis-wf-fwd-cancel {
+    height: 36px;
+    padding: 0 16px;
+    border: 1.5px solid #E4EDF4;
+    border-radius: 999px;
+    background: #FFFFFF;
+    color: #5F7283;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vis-wf-modal .vis-wf-footer {
+    padding: 14px 18px;
+    border-top: 1px solid #E4EDF4;
+    background: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-footer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vis-wf-modal .vis-wf-note {
+    flex: 1;
+    min-height: 40px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 180px;
+    padding: 8px 12px;
+    border: 1px solid #E4EDF4;
+    border-radius: 10px;
+    background: #FBFDFF;
+    color: #9F9F9F;
+    font-size: 13px;
+}
+
+.vis-wf-modal .vis-wf-note i {
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-note .vis-w-workflow-textarea {
+    width: 100%;
+    min-height: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    resize: none;
+    outline: 0;
+    color: #102C3F;
+    font-size: 13px;
+    line-height: 20px;
+    box-shadow: none;
+}
+
+.vis-wf-modal .vis-wf-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.vis-wf-modal .vis-wf-answer-dynamic {
+    display: flex;
+    align-items: center;
+    min-width: 260px;
+    margin: 0;
+}
+
+.vis-wf-modal .vis-wf-answer-dynamic .vis-w-home-wf-answerInput {
+    min-width: 220px;
+}
+
+.vis-wf-modal .vis-wf-action {
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 700;
+    font-family: Roboto, Arial, sans-serif;
+    cursor: pointer;
+}
+
+.vis-wf-modal .vis-wf-action-primary {
+    border: 1px solid #0083DA;
+    background: #0083DA;
+    color: #FFFFFF;
+    box-shadow: 0 6px 14px rgba(0,131,218,0.25);
+}
+
+.vis-wf-modal .vis-wf-action-secondary {
+    border: 1px solid #0083DA;
+    background: #FFFFFF;
+    color: #0083DA;
+}
+
+.vis-wf-modal .vis-wf-action-danger {
+    border: 1px solid #F4C5C5;
+    background: #FFFFFF;
+    color: #8F2D2D;
+}
+
+.vis-wf-modal .vis-wf-key {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.24);
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+.vis-wf-modal .vis-wf-action-primary .vis-wf-key {
+    background: rgba(255,255,255,0.24);
+}
+
+.vis-wf-modal .vis-wf-action-secondary .vis-wf-key {
+    background: #DFF1FF;
+    color: #106AB0;
+}
+
+.vis-wf-modal .vis-wf-action-danger .vis-wf-key {
+    background: #FAD7D7;
+    color: #8F2D2D;
+}
+
+/* ── RTL ──────────────────────────────────────────────────── */
+
+.vis-wf-modal[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-main {
+    flex-direction: row;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-master {
+    border-right: 0;
+    border-left: 1px solid #E4EDF4;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-meta {
+    margin-left: 0;
+    margin-right: 12px;
+    padding-left: 0;
+    padding-right: 12px;
+    border-left: 0;
+    border-right: 1px solid #E4EDF4;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-id {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-time {
+    text-align: left;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-kv-val {
+    text-align: left;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-search input {
+    text-align: right;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-window-select {
+    padding: 0 10px 0 30px;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-action-secondary .vis-arrow-right,
+.vis-wf-modal[dir="rtl"] .vis-wf-action-secondary .fa-arrow-right {
+    transform: scaleX(-1);
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-history-side {
+    border-left: 0;
+    border-right: 1px solid #E4EDF4;
+}
+
+/* ── Responsive — tablet ──────────────────────────────────── */
+
+@media (max-width: 900px) {
+    .vis-wf-modal .vis-wf-shell {
+        width: calc(100% - 8px);
+        height: calc(100% - 8px);
+    }
+
+    .vis-wf-modal .vis-wf-main {
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .vis-wf-modal .vis-wf-master {
+        width: 100%;
+        height: 42%;
+        min-height: 240px;
+        border-right: 0;
+        border-left: 0;
+        border-bottom: 1px solid #E4EDF4;
+    }
+
+    .vis-wf-modal .vis-wf-content-body {
+        flex-direction: column;
+    }
+
+    .vis-wf-modal .vis-wf-detail {
+        min-height: 0;
+    }
+
+    .vis-wf-modal .vis-wf-history-side {
+        width: 100%;
+        height: 200px;
+        flex-shrink: 0;
+        border-left: 0;
+        border-top: 1px solid #E4EDF4;
+    }
+
+    .vis-wf-modal .vis-wf-titlebar {
+        padding: 0 12px;
+    }
+
+    .vis-wf-modal .vis-wf-title {
+        width: 100%;
+    }
+
+    .vis-wf-modal .vis-wf-meta {
+        margin-left: auto;
+        padding-left: 10px;
+    }
+
+    .vis-wf-modal .vis-wf-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .vis-wf-modal .vis-wf-detail-left,
+    .vis-wf-modal .vis-wf-detail-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .vis-wf-modal .vis-wf-submitted {
+        flex: 1;
+    }
+
+    .vis-wf-modal .vis-wf-footer-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .vis-wf-modal .vis-wf-actions {
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .vis-wf-modal[dir="rtl"] .vis-wf-main {
+        flex-direction: column;
+    }
+
+    .vis-wf-modal[dir="rtl"] .vis-wf-master {
+        border-left: 0;
+        border-bottom: 1px solid #E4EDF4;
+    }
+
+    .vis-wf-modal[dir="rtl"] .vis-wf-history-side {
+        border-right: 0;
+        border-top: 1px solid #E4EDF4;
+    }
+
+    .vis-wf-modal[dir="rtl"] .vis-wf-meta {
+        margin-right: auto;
+        padding-right: 10px;
+        border-right: 1px solid #E4EDF4;
+    }
+}
+
+/* ── Responsive — mobile ──────────────────────────────────── */
+
+@media (max-width: 560px) {
+    .vis-wf-modal {
+        padding: 8px;
+    }
+
+    .vis-wf-modal .vis-wf-shell {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 10px;
+    }
+
+    .vis-wf-modal .vis-wf-title {
+        gap: 8px;
+    }
+
+    .vis-wf-modal .vis-wf-meta {
+        font-size: 12px;
+    }
+
+    .vis-wf-modal .vis-wf-master {
+        height: 46%;
+        min-height: 250px;
+    }
+
+    .vis-wf-modal .vis-wf-history-side {
+        height: 160px;
+    }
+
+    .vis-wf-modal .vis-wf-tools {
+        padding: 10px;
+    }
+
+    .vis-wf-modal .vis-wf-body {
+        padding: 12px;
+    }
+
+    .vis-wf-modal .vis-wf-kv-row,
+    .vis-wf-modal .vis-wf-requester {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .vis-wf-modal .vis-wf-kv-val {
+        text-align: left;
+    }
+
+    .vis-wf-modal[dir="rtl"] .vis-wf-kv-val {
+        text-align: right;
+    }
+
+    .vis-wf-modal .vis-wf-footer {
+        padding: 10px;
+    }
+
+    .vis-wf-modal .vis-wf-action {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+        padding: 0 10px;
+    }
+}

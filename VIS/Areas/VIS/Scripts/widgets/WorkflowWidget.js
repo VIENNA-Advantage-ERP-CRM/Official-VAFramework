@@ -88,15 +88,15 @@
             $addDetails_ID = $fstMainDiv_ID.find("#VIS_AddDetails_ID" + $self.AD_UserHomeWidgetID);
             divDetail = $fstMainDiv_ID.find("#workflowActivityDetails" + $self.AD_UserHomeWidgetID);
         };
-        function openDummyModel() {
-            var modalId = 'WFDummyModel' + $self.AD_UserHomeWidgetID;
+        function openWorkflowModal() {
+            var modalId = 'WFWorkflowModal' + $self.AD_UserHomeWidgetID;
             var $modal = $('#' + modalId);
             var isRTL = VIS.Application.isRTL || $('html').attr('dir') == 'rtl';
             var modalDir = isRTL ? 'rtl' : 'ltr';
             var currentModalCardIdx = 0; // tracks which card is currently selected in the modal
 
             /*
-             * wf-dummy labels
+             * wf labels
              * Old message                  | Message key                         | Fallback
              * Activities                   | VIS_Activities                      | Activities
              * No activities found          | VIS_NoActivitiesFound               | No activities found
@@ -133,7 +133,7 @@
                 return text && text !== '[' + key + ']' ? text : fallback;
             }
 
-            function syncDummyWindowSelect() {
+            function syncWindowSelect() {
                 var $popupSelect = $('#' + modalId + 'WindowSelect');
                 if ($popupSelect.length == 0 || !$cmbWindows || $cmbWindows.length == 0) {
                     return;
@@ -146,26 +146,26 @@
                 $popupSelect.val($cmbWindows.val());
             };
 
-            function syncDummyDateInputs() {
+            function syncDateInputs() {
                 $modal.find('#' + modalId + 'FromDateInput').val($fromDateInput_ID && $fromDateInput_ID.length ? $fromDateInput_ID.val() : '');
                 $modal.find('#' + modalId + 'ToDateInput').val($toDateInput_ID && $toDateInput_ID.length ? $toDateInput_ID.val() : '');
             };
 
-            function syncDummyActivityList() {
+            function syncActivityList() {
                 var $activityContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
-                var $dummyList = $modal.find('.vis-wf-dummy-list');
+                var $wfList = $modal.find('.vis-wf-list');
 
-                if ($dummyList.length == 0) {
+                if ($wfList.length == 0) {
                     return;
                 }
 
-                $dummyList.empty();
+                $wfList.empty();
                 if ($activityContainers.length == 0) {
-                    $dummyList.append('<div class="vis-wf-dummy-group">' + lbl('VIS_Activities', 'Activities') + ' - 0</div><div class="vis-wf-dummy-empty">' + lbl('VIS_NoActivitiesFound', 'No activities found') + '</div>');
+                    $wfList.append('<div class="vis-wf-group">' + lbl('VIS_Activities', 'Activities') + ' - 0</div><div class="vis-wf-empty">' + lbl('VIS_NoActivitiesFound', 'No activities found') + '</div>');
                     return;
                 }
 
-                $dummyList.append('<div class="vis-wf-dummy-group">' + lbl('VIS_Activities', 'Activities') + ' - ' + $activityContainers.length + '</div>');
+                $wfList.append('<div class="vis-wf-group">' + lbl('VIS_Activities', 'Activities') + ' - ' + $activityContainers.length + '</div>');
                 $activityContainers.each(function (index) {
                     var activityTitle = $(this).find('.vis-w-wfActivity-selectchk').text();
                     activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity');
@@ -175,32 +175,39 @@
                     var parts = dataIds.split('_');
                     var winNodeKey = (parts.length >= 2) ? parts[0] + '_' + parts[1] : '0_0';
 
-                    $dummyList.append(
-                        '<div class="vis-wf-dummy-card' + (index == 0 ? ' vis-wf-dummy-card-selected' : '') + '" role="button" tabindex="0" data-winnode="' + winNodeKey + '">'
-                        + '  <div class="vis-wf-dummy-card-top">'
-                        + '    <span class="vis-wf-dummy-pill vis-wf-dummy-pill-info"><span class="vis-wf-dummy-dot"></span>' + lbl('VIS_Workflow', 'Workflow') + '</span>'
-                        + '    <span class="vis-wf-dummy-id">WF-' + (index + 1) + '</span>'
+                    // Build inline KV rows from the pre summary text
+                    var preText = $(this).find('pre.vis-workflow-pre-cls').text().trim();
+                    var kvHtml = buildKVHtml(preText);
+
+                    $wfList.append(
+                        '<div class="vis-wf-card' + (index == 0 ? ' vis-wf-card-selected' : '') + '" role="button" tabindex="0" data-winnode="' + winNodeKey + '">'
+                        + '  <div class="vis-wf-card-top">'
+                        + '    <div class="vis-wf-card-title">' + VIS.Utility.encodeText(activityTitle) + '</div>'
+                        + '    <span class="vis-wf-id">WF-' + (index + 1) + '</span>'
                         + '  </div>'
-                        + '  <div class="vis-wf-dummy-card-title">' + VIS.Utility.encodeText(activityTitle) + '</div>'
+                        + (kvHtml ? '<div class="vis-wf-kv vis-wf-card-kv">' + kvHtml + '</div>' : '')
                         + '</div>'
                     );
                 });
             };
 
-            function filterDummyCards(winNodeVal) {
-                var $dummyList = $modal.find('.vis-wf-dummy-list');
-                var $cards = $dummyList.find('.vis-wf-dummy-card');
-                var $group = $dummyList.find('.vis-wf-dummy-group');
-                var searchText = ($modal.find('.vis-wf-dummy-search input').val() || '').toLowerCase().trim();
+
+            
+
+            function filterCards(winNodeVal) {
+                var $wfList = $modal.find('.vis-wf-list');
+                var $cards = $wfList.find('.vis-wf-card');
+                var $group = $wfList.find('.vis-wf-group');
+                var searchText = ($modal.find('.vis-wf-search input').val() || '').toLowerCase().trim();
                 var fromDateVal = $modal.find('#' + modalId + 'FromDateInput').val();
                 var toDateVal = $modal.find('#' + modalId + 'ToDateInput').val();
                 var visibleCount = 0;
 
-                $dummyList.find('.vis-wf-dummy-search-empty').remove();
+                $wfList.find('.vis-wf-search-empty').remove();
                 $cards.each(function (index) {
                     var windowMatch = !winNodeVal || winNodeVal === '0_0' || $(this).data('winnode') === winNodeVal;
-                    var searchMatch = !searchText || getDummyCardSearchText($(this), index).indexOf(searchText) > -1;
-                    var dateMatch = isDummyDateMatch(index, fromDateVal, toDateVal);
+                    var searchMatch = !searchText || getCardSearchText($(this), index).indexOf(searchText) > -1;
+                    var dateMatch = isDateMatch(index, fromDateVal, toDateVal);
                     var isVisible = windowMatch && searchMatch && dateMatch;
 
                     $(this).toggle(isVisible);
@@ -211,37 +218,35 @@
                 $group.text(lbl('VIS_Activities', 'Activities') + ' - ' + visibleCount);
 
                 // Re-select first visible card and update detail panel
-                $cards.removeClass('vis-wf-dummy-card-selected');
+                $cards.removeClass('vis-wf-card-selected');
                 var $first = $cards.filter(':visible').first();
-                $first.addClass('vis-wf-dummy-card-selected');
-                // Hide history panel when filter changes
-                $modal.find('.vis-wf-dummy-history-panel').hide();
+                $first.addClass('vis-wf-card-selected');
                 if ($first.length) {
                     var firstIdx = $cards.index($first); // 0-based index within cards, matches activity container order
                     currentModalCardIdx = firstIdx;
                     var firstDataIds = $workflowWidgetDtls_ID.find('.vis-w-activityContainer')
                         .eq(firstIdx).find('.vis-w-wfActivity-selectchk').text();
-                    $modal.find('.vis-wf-dummy-record-title').text(
+                    $modal.find('.vis-wf-record-title').text(
                         firstDataIds && firstDataIds.trim() ? firstDataIds.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity')
                     );
-                    syncDummyDetailKV(firstIdx);
-                    syncDummySubmitted(firstIdx);
-                    syncDummyDescription(firstIdx);
-                    syncDummyRequester(firstIdx);
-                    clearDummyMessage();
-                    syncDummyAnswer(firstIdx);
+                    $modal.find('.vis-wf-no-selection').hide();
+                    $modal.find('.vis-wf-detail-header, .vis-wf-content-body').show();
+                    syncDetailKV(firstIdx);
+                    syncSubmitted(firstIdx);
+                    syncDescription(firstIdx);
+                    syncRequester(firstIdx);
+                    clearMessage();
+                    syncAnswer(firstIdx);
+                    loadHistory(firstIdx);
                 }
                 else {
                     currentModalCardIdx = -1;
-                    $modal.find('.vis-wf-dummy-record-title').text(lbl('VIS_NoRecordsFound', 'No records found'));
-                    $modal.find('.vis-wf-dummy-kv').empty();
-                    $modal.find('.vis-wf-dummy-description').closest('section').hide();
-                    $modal.find('.vis-wf-dummy-actions .vis-wf-dummy-answer-dynamic').remove();
-                    $dummyList.append('<div class="vis-wf-dummy-empty vis-wf-dummy-search-empty">' + lbl('VIS_NoRecordsFound', 'No records found') + '</div>');
+                    $modal.find('.vis-wf-no-selection').show();
+                    $modal.find('.vis-wf-detail-header, .vis-wf-content-body').hide();
                 }
             };
 
-            function getDummyDate(dateValue, endOfDay) {
+            function getWFDate(dateValue, endOfDay) {
                 if (!dateValue) {
                     return null;
                 }
@@ -265,7 +270,7 @@
                 return date;
             };
 
-            function isDummyDateMatch(index, fromDateVal, toDateVal) {
+            function isDateMatch(index, fromDateVal, toDateVal) {
                 if (!fromDateVal && !toDateVal) {
                     return true;
                 }
@@ -280,8 +285,8 @@
                     return false;
                 }
 
-                var fromDate = getDummyDate(fromDateVal, false);
-                var toDate = getDummyDate(toDateVal, true);
+                var fromDate = getWFDate(fromDateVal, false);
+                var toDate = getWFDate(toDateVal, true);
 
                 if (fromDate && activityDate < fromDate) {
                     return false;
@@ -292,7 +297,7 @@
                 return true;
             };
 
-            function getDummyCardSearchText($card, index) {
+            function getCardSearchText($card, index) {
                 var activity = (fulldata && fulldata[index]) ? fulldata[index] : {};
                 return [
                     $card.text(),
@@ -300,25 +305,25 @@
                     activity.DocumentNameValue,
                     activity.Summary,
                     activity.Description,
-                    getDummyRequesterName(index)
+                    getRequesterName(index)
                 ].join(' ').toLowerCase();
             };
 
-            function syncDummyPendingCount() {
+            function syncPendingCount() {
                 var $pendingCount = $('#' + modalId + 'PendingCount');
                 if ($pendingCount.length == 0) {
                     return;
                 }
-                $pendingCount.text($modal.find('.vis-wf-dummy-card').length + ' ' + lbl('VIS_Pending', 'pending'));
+                $pendingCount.text($modal.find('.vis-wf-card').length + ' ' + lbl('VIS_Pending', 'pending'));
             };
 
-            function syncDummyDetailTitle(index) {
+            function syncDetailTitle(index) {
                 var activityTitle = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-wfActivity-selectchk').text();
                 activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity');
-                $modal.find('.vis-wf-dummy-record-title').text(activityTitle);
+                $modal.find('.vis-wf-record-title').text(activityTitle);
             };
 
-            function getDummyRequesterName(index, info) {
+            function getRequesterName(index, info) {
                 var activity = (fulldata && fulldata[index]) ? fulldata[index] : {};
                 var sources = [info || {}, activity];
                 var fields = [
@@ -354,7 +359,7 @@
                 return lbl('VIS_WorkflowIssuer', 'Workflow Issuer');
             };
 
-            function getDummyRequesterInitials(name) {
+            function getRequesterInitials(name) {
                 if (!name) {
                     return 'WF';
                 }
@@ -366,29 +371,29 @@
                 return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
             };
 
-            function syncDummyRequester(index, info) {
-                var requesterName = getDummyRequesterName(index || 0, info);
-                $modal.find('.vis-wf-dummy-requester-name').text(requesterName);
-                $modal.find('.vis-wf-dummy-requester-avatar').text(getDummyRequesterInitials(requesterName));
+            function syncRequester(index, info) {
+                var requesterName = getRequesterName(index || 0, info);
+                $modal.find('.vis-wf-requester-name').text(requesterName);
+                $modal.find('.vis-wf-requester-avatar').text(getRequesterInitials(requesterName));
             };
 
             // Populate the description section from fulldata — hide entire section if empty
-            function syncDummyDescription(index) {
+            function syncDescription(index) {
                 var desc = (fulldata && fulldata[index || 0]) ? (fulldata[index || 0].Description || '').trim() : '';
-                var $section = $modal.find('.vis-wf-dummy-description').closest('section');
+                var $section = $modal.find('.vis-wf-description').closest('section');
                 if (desc) {
-                    $modal.find('.vis-wf-dummy-description').text(desc);
+                    $modal.find('.vis-wf-description').text(desc);
                     $section.show();
                 } else {
                     $section.hide();
                 }
             };
 
-            function clearDummyMessage() {
-                $modal.find('.vis-wf-dummy-note textarea').val('');
+            function clearMessage() {
+                $modal.find('.vis-wf-note textarea').val('');
             };
 
-            function approveDummyAnswer(index, ctrl, $okBtn) {
+            function approveAnswer(index, ctrl, $okBtn) {
                 if ($okBtn.data('clicked') == 'Y') {
                     return;
                 }
@@ -401,7 +406,7 @@
                     return;
                 }
 
-                var msg = VIS.Utility.encodeText($modal.find('.vis-wf-dummy-note textarea').val());
+                var msg = VIS.Utility.encodeText($modal.find('.vis-wf-note textarea').val());
                 showBusy(true);
                 VIS.dataContext.getJSONData(
                     VIS.Application.contextUrl + 'WFActivity/ApproveIt',
@@ -428,9 +433,9 @@
                 );
             };
 
-            function buildDummyAnswer(index, info) {
-                var $actions = $modal.find('.vis-wf-dummy-actions');
-                $actions.find('.vis-wf-dummy-answer-dynamic').remove();
+            function buildAnswer(index, info) {
+                var $actions = $modal.find('.vis-wf-actions');
+                $actions.find('.vis-wf-answer-dynamic').remove();
 
                 if (!info || info.NodeAction != 'C') {
                     return;
@@ -441,7 +446,7 @@
                     return;
                 }
 
-                var $answerWrap = $('<div class="vis-w-home-wf-answerWrap vis-wf-dummy-answer-dynamic">');
+                var $answerWrap = $('<div class="vis-w-home-wf-answerWrap vis-wf-answer-dynamic">');
                 var $answerInput = $('<div class="input-group vis-w-home-wf-answerInput vis-w-input-widgetswrap">');
                 $answerWrap.append($answerInput);
 
@@ -463,7 +468,7 @@
                 $answerWrap.append($('<div class="vis-w-home-wf-answerBtn">').append($okBtn));
                 $actions.append($answerWrap);
 
-                var toggleDummyAnswerOk = function () {
+                var toggleAnswerOk = function () {
                     if (ctrl.getValue() == '' || ctrl.getValue() == null) {
                         $okBtn.css('display', 'none');
                     }
@@ -472,18 +477,18 @@
                     }
                 };
 
-                ctrl.fireValueChanged = toggleDummyAnswerOk;
-                $answerWrap.find(':input').on('change keyup input', toggleDummyAnswerOk);
-                toggleDummyAnswerOk();
+                ctrl.fireValueChanged = toggleAnswerOk;
+                $answerWrap.find(':input').on('change keyup input', toggleAnswerOk);
+                toggleAnswerOk();
 
                 $okBtn.on(VIS.Events.onTouchStartOrClick, function () {
-                    approveDummyAnswer(index, ctrl, $okBtn);
+                    approveAnswer(index, ctrl, $okBtn);
                 });
             };
 
-            function syncDummyAnswer(index) {
-                var $actions = $modal.find('.vis-wf-dummy-actions');
-                $actions.find('.vis-wf-dummy-answer-dynamic').remove();
+            function syncAnswer(index) {
+                var $actions = $modal.find('.vis-wf-actions');
+                $actions.find('.vis-wf-answer-dynamic').remove();
 
                 if (!fulldata || !fulldata[index]) {
                     return;
@@ -501,59 +506,79 @@
                     },
                     success: function (res) {
                         if (index === currentModalCardIdx) {
-                            syncDummyRequester(index, res.result);
-                            buildDummyAnswer(index, res.result);
+                            syncRequester(index, res.result);
+                            buildAnswer(index, res.result);
                         }
                     }
                 });
             };
 
             // Populate the submitted date from the activity's feedDateTime element
-            function syncDummySubmitted(index) {
+            function syncSubmitted(index) {
                 var $dateDiv = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-feedDateTime');
                 var dateText = $dateDiv.text().trim();
-                $modal.find('.vis-wf-dummy-submitted').text(dateText ? lbl('VIS_Submitted', 'Submitted') + ' ' + dateText : '');
+                $modal.find('.vis-wf-submitted').text(dateText ? lbl('VIS_Submitted', 'Submitted') + ' ' + dateText : '');
             };
 
+            // Parse one pre summary line into {key, val} — handles colon-separated,
+            // Arabic-label + non-Arabic-value, and non-Arabic-value + Arabic-label formats.
+            function parseKVLine(line) {
+                // 1. Colon separator (highest priority)
+                var colonIdx = line.indexOf(':');
+                if (colonIdx > 0) {
+                    return { key: line.substring(0, colonIdx).trim(), val: line.substring(colonIdx + 1).trim() };
+                }
+                // 2. Arabic label (start) + non-Arabic value
+                var m = line.match(/^([؀-ۿ][؀-ۿ\s]*?)\s+([^؀-ۿ].+)$/);
+                if (m) {
+                    return { key: m[1].trim(), val: m[2].trim() };
+                }
+                // 3. Non-Arabic value (start) + Arabic label — bidi visual reorder case
+                m = line.match(/^([^؀-ۿ\s][^؀-ۿ]*?)\s+([؀-ۿ].+)$/);
+                if (m) {
+                    return { key: m[2].trim(), val: m[1].trim() };
+                }
+                return null; // full-width fallback
+            }
+
+            // Build the HTML for a KV table from a pre summary text block
+            function buildKVHtml(preText) {
+                var html = '';
+                if (!preText) return html;
+                var lines = preText.split('\n');
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i].trim();
+                    if (!line) continue;
+                    var pair = parseKVLine(line);
+                    if (pair) {
+                        html += '<div class="vis-wf-kv-row" dir="ltr">'
+                            + '<span class="vis-wf-kv-key" dir="auto">' + VIS.Utility.encodeText(pair.key) + '</span>'
+                            + '<span class="vis-wf-kv-val">' + VIS.Utility.encodeText(pair.val) + '</span>'
+                            + '</div>';
+                    } else {
+                        html += '<div class="vis-wf-kv-row" dir="auto">'
+                            + '<span class="vis-wf-kv-key" style="width:100%">' + VIS.Utility.encodeText(line) + '</span>'
+                            + '</div>';
+                    }
+                }
+                return html;
+            }
+
             // Populate the KV table from the <pre> summary lines of the selected activity
-            function syncDummyDetailKV(index) {
-                var $kvContainer = $modal.find('.vis-wf-dummy-kv');
+            function syncDetailKV(index) {
+                var $kvContainer = $modal.find('.vis-wf-kv');
                 if ($kvContainer.length == 0) return;
 
                 var $pre = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('pre.vis-workflow-pre-cls');
                 var preText = $pre.text().trim();
 
                 $kvContainer.empty();
-
-                if (!preText) return;
-
-                var lines = preText.split('\n');
-                for (var i = 0; i < lines.length; i++) {
-                    var line = lines[i].trim();
-                    if (!line) continue;
-                    var colonIdx = line.indexOf(':');
-                    if (colonIdx > 0) {
-                        var key = line.substring(0, colonIdx).trim();
-                        var val = line.substring(colonIdx + 1).trim();
-                        $kvContainer.append(
-                            '<div class="vis-wf-dummy-kv-row">'
-                            + '<span class="vis-wf-dummy-kv-key">' + VIS.Utility.encodeText(key) + '</span>'
-                            + '<span class="vis-wf-dummy-kv-val">' + VIS.Utility.encodeText(val) + '</span>'
-                            + '</div>'
-                        );
-                    } else {
-                        $kvContainer.append(
-                            '<div class="vis-wf-dummy-kv-row">'
-                            + '<span class="vis-wf-dummy-kv-key" style="width:100%">' + VIS.Utility.encodeText(line) + '</span>'
-                            + '</div>'
-                        );
-                    }
-                }
+                $kvContainer.html(buildKVHtml(preText));
             };
 
-            function syncDummyCardTitles() {
+            function syncCardTitles() {
                 var $activityContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
-                $modal.find('.vis-wf-dummy-card-title').each(function (index) {
+                $modal.find('.vis-wf-card-title').each(function (index) {
                     var activityTitle = $activityContainers.eq(index).find('.vis-w-wfActivity-selectchk').text();
                     if (activityTitle && activityTitle.trim().length > 0) {
                         $(this).text(activityTitle.trim());
@@ -563,913 +588,92 @@
 
             if ($modal.length === 0) {
                 $modal = $(`
-                    <div id="${modalId}" class="vis-wf-dummy-modal" dir="${modalDir}" style="display:none;">
-                        <style>
-                            #${modalId}.vis-wf-dummy-modal {
-                                position: fixed;
-                                top: 0;
-                                left: 0;
-                                width: 100%;
-                                height: 100%;
-                                z-index: 99999;
-                                align-items: center;
-                                justify-content: center;
-                                padding: 16px;
-                                background: rgba(0,0,0,0.35);
-                                font-family: Roboto, Arial, sans-serif;
-                                font-size: 14px;
-                                color: #141414;
-                            }
-                            #${modalId} .vis-wf-dummy-shell {
-                                width: min(1320px, calc(100vw - 32px));
-                                max-width: calc(100% - 12px);
-                                height: min(820px, calc(100vh - 32px));
-                                max-height: calc(100% - 12px);
-                                display: flex;
-                                flex-direction: column;
-                                overflow: hidden;
-                                background: #FFFFFF;
-                                border: 2px solid #FFFFFF;
-                                border-radius: 14px;
-                                box-shadow: 0 18px 42px rgba(15,61,97,0.22);
-                            }
-                            #${modalId} .vis-wf-dummy-titlebar {
-                                min-height: 56px;
-                                display: flex;
-                                align-items: center;
-                                padding: 0 18px;
-                                background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.58));
-                                border-bottom: 1px solid #1F83FF;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-title {
-                                display: flex;
-                                align-items: center;
-                                gap: 10px;
-                                min-width: 0;
-                                font-size: 16px;
-                                color: #000000;
-                            }
-                            #${modalId} .vis-wf-dummy-title strong {
-                                font-weight: 700;
-                            }
-                            #${modalId} .vis-wf-dummy-module-icon {
-                                width: 28px;
-                                height: 28px;
-                                display: inline-flex;
-                                align-items: center;
-                                justify-content: center;
-                                border-radius: 8px;
-                                color: #0083DA;
-                                background: #DFF1FF;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-meta {
-                                margin-left: 12px;
-                                padding-left: 12px;
-                                border-left: 1px solid #E4EDF4;
-                                font-size: 13px;
-                                color: #5F7283;
-                                white-space: nowrap;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                            }
-                            #${modalId} .vis-wf-dummy-main {
-                                flex: 1;
-                                display: flex;
-                                min-height: 0;
-                                background: #FFFFFF;
-                            }
-                            #${modalId} .vis-wf-dummy-master {
-                                width: 330px;
-                                flex-shrink: 0;
-                                display: flex;
-                                flex-direction: column;
-                                border-right: 1px solid #E4EDF4;
-                                background: #FBFDFF;
-                            }
-                            #${modalId} .vis-wf-dummy-tools {
-                                padding: 12px 14px;
-                                border-bottom: 1px solid #E4EDF4;
-                                background: #FFFFFF;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-search {
-                                height: 38px;
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                padding: 0 12px;
-                                margin-bottom: 10px;
-                                border: 1px solid #E4EDF4;
-                                border-radius: 999px;
-                                color: #5F7283;
-                                background: #FFFFFF;
-                                box-shadow: 0 6px 14px rgba(16,47,74,0.06);
-                            }
-                            #${modalId} .vis-wf-dummy-search input {
-                                flex: 1;
-                                min-width: 0;
-                                border: 0;
-                                outline: 0;
-                                background: transparent;
-                                font-family: Roboto, Arial, sans-serif;
-                                color: #9F9F9F;
-                                font-size: 12px;
-                            }
-                            #${modalId} .vis-wf-dummy-search input::placeholder {
-                                color: #9F9F9F;
-                            }
-                            #${modalId} .vis-wf-dummy-filters {
-                                position: relative;
-                            }
-                            #${modalId} .vis-wf-dummy-date-filters {
-                                display: grid;
-                                grid-template-columns: 1fr 1fr;
-                                gap: 8px;
-                                margin-bottom: 10px;
-                            }
-                            #${modalId} .vis-wf-dummy-date-filter {
-                                min-width: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-date-filter label {
-                                display: block;
-                                margin: 0 0 4px;
-                                color: #5F7283;
-                                font-size: 11px;
-                                font-weight: 600;
-                            }
-                            #${modalId} .vis-wf-dummy-date-filter input {
-                                width: 100%;
-                                height: 30px;
-                                padding: 0 8px;
-                                border: 1px solid #E4EDF4;
-                                border-radius: 8px;
-                                background: #FFFFFF;
-                                color: #102C3F;
-                                font-size: 12px;
-                                box-sizing: border-box;
-                                outline: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-date-filter input:focus {
-                                border-color: #0083DA;
-                                box-shadow: 0 0 0 3px rgba(0,131,218,0.08);
-                            }
-                            #${modalId} .vis-wf-dummy-window-select {
-                                width: 100%;
-                                height: 28px;
-                                padding: 0 30px 0 10px;
-                                border: 1px solid #E4EDF4;
-                                border-radius: 999px;
-                                background: #FFFFFF;
-                                color: #5F7283;
-                                font-size: 12px;
-                                font-weight: 500;
-                                outline: 0;
-                                cursor: pointer;
-                                box-shadow: 0 6px 14px rgba(16,47,74,0.04);
-                                appearance: auto;
-                                -webkit-appearance: menulist;
-                            }
-                            #${modalId} .vis-wf-dummy-list {
-                                flex: 1;
-                                overflow: auto;
-                            }
-                            #${modalId} .vis-wf-dummy-group {
-                                padding: 12px 16px 6px;
-                                color: #748494;
-                                font-size: 11px;
-                                font-weight: 700;
-                                text-transform: uppercase;
-                                letter-spacing: 0.06em;
-                            }
-                            #${modalId} .vis-wf-dummy-card {
-                                padding: 14px 16px;
-                                border-bottom: 1px solid #EBEBEB;
-                                cursor: pointer;
-                                background: #FFFFFF;
-                            }
-                            #${modalId} .vis-wf-dummy-card:focus {
-                                outline: 2px solid #BFE4FF;
-                                outline-offset: -2px;
-                            }
-                            #${modalId} .vis-wf-dummy-card-selected {
-                                background: linear-gradient(109deg, #EAF8FF 0%, #CAEDFF 100%);
-                                box-shadow: inset 4px 0 0 #0083DA, 0 12px 24px rgba(31,131,255,0.10);
-                            }
-                            #${modalId} .vis-wf-dummy-empty {
-                                padding: 16px;
-                                color: #748494;
-                                font-size: 13px;
-                            }
-                            #${modalId} .vis-wf-dummy-card-top {
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                margin-bottom: 7px;
-                            }
-                            #${modalId} .vis-wf-dummy-pill {
-                                display: inline-flex;
-                                align-items: center;
-                                gap: 5px;
-                                padding: 3px 8px;
-                                border-radius: 999px;
-                                font-size: 10.5px;
-                                font-weight: 700;
-                                text-transform: uppercase;
-                                letter-spacing: 0.04em;
-                            }
-                            #${modalId} .vis-wf-dummy-dot {
-                                width: 5px;
-                                height: 5px;
-                                border-radius: 50%;
-                                background: currentColor;
-                            }
-                            #${modalId} .vis-wf-dummy-pill-info {
-                                background: #DFF1FF;
-                                color: #106AB0;
-                            }
-                            #${modalId} .vis-wf-dummy-pill-violet {
-                                background: #E9E5FF;
-                                color: #5F4AA6;
-                            }
-                            #${modalId} .vis-wf-dummy-pill-warning {
-                                background: #FFE9C2;
-                                color: #8B5A00;
-                            }
-                            #${modalId} .vis-wf-dummy-pill-success {
-                                background: #CCEFDD;
-                                color: #0C5D38;
-                            }
-                            #${modalId} .vis-wf-dummy-id {
-                                margin-left: auto;
-                                color: #748494;
-                                font-size: 11px;
-                            }
-                            #${modalId} .vis-wf-dummy-card-title {
-                                color: #102C3F;
-                                font-size: 13.5px;
-                                font-weight: 700;
-                                line-height: 1.35;
-                            }
-                            #${modalId} .vis-wf-dummy-card-meta {
-                                display: flex;
-                                align-items: center;
-                                gap: 7px;
-                                margin-top: 7px;
-                                color: #748494;
-                                font-size: 11.5px;
-                            }
-                            #${modalId} .vis-wf-dummy-avatar {
-                                width: 18px;
-                                height: 18px;
-                                display: inline-flex;
-                                align-items: center;
-                                justify-content: center;
-                                border-radius: 50%;
-                                color: #FFFFFF;
-                                font-size: 9px;
-                                font-weight: 700;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-time {
-                                display: block;
-                                margin-top: 10px;
-                                text-align: right;
-                                color: #9F9F9F;
-                                font-size: 11px;
-                            }
-                            #${modalId} .vis-wf-dummy-detail {
-                                flex: 1;
-                                min-width: 0;
-                                display: flex;
-                                flex-direction: column;
-                                background: rgba(255,255,255,0.94);
-                            }
-                            #${modalId} .vis-wf-dummy-detail-header {
-                                min-height: 56px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: space-between;
-                                gap: 14px;
-                                padding: 0 18px;
-                                border-bottom: 1px solid #E4EDF4;
-                                background: #FFFFFF;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-detail-left {
-                                display: flex;
-                                align-items: center;
-                                gap: 12px;
-                                min-width: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-record-title {
-                                color: #141414;
-                                font-size: 16px;
-                                font-weight: 700;
-                                white-space: nowrap;
-                            }
-                            #${modalId} .vis-wf-dummy-status {
-                                display: inline-flex;
-                                align-items: center;
-                                gap: 6px;
-                                height: 24px;
-                                padding: 0 10px;
-                                border-radius: 999px;
-                                background: #FFE9C2;
-                                color: #8B5A00;
-                                font-size: 11.5px;
-                                font-weight: 700;
-                                white-space: nowrap;
-                            }
-                            #${modalId} .vis-wf-dummy-detail-right {
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                min-width: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-submitted {
-                                color: #5F7283;
-                                font-size: 12px;
-                                white-space: nowrap;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                            }
-                            #${modalId} .vis-wf-dummy-icon-btn {
-                                width: 32px;
-                                height: 32px;
-                                display: inline-flex;
-                                align-items: center;
-                                justify-content: center;
-                                padding: 0;
-                                border: 1px solid transparent;
-                                border-radius: 8px;
-                                background: transparent;
-                                color: #141414;
-                                cursor: pointer;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-icon-btn:hover {
-                                background: #E5F3FB;
-                            }
-                            #${modalId} .vis-wf-dummy-body {
-                                flex: 1;
-                                overflow: auto;
-                                padding: 18px;
-                                background: #FFFFFF;
-                            }
-                            #${modalId} .vis-wf-dummy-section {
-                                margin-bottom: 18px;
-                            }
-                            #${modalId} .vis-wf-dummy-section-title {
-                                margin: 0 0 10px;
-                                color: #748494;
-                                font-size: 11px;
-                                font-weight: 700;
-                                text-transform: uppercase;
-                                letter-spacing: 0.07em;
-                            }
-                            #${modalId} .vis-wf-dummy-kv {
-                                overflow: hidden;
-                                border: 1px solid #E4EDF4;
-                                border-radius: 10px;
-                            }
-                            #${modalId} .vis-wf-dummy-kv-row {
-                                display: flex;
-                                align-items: center;
-                                justify-content: space-between;
-                                gap: 16px;
-                                padding: 9px 14px;
-                                border-bottom: 1px solid #EDF2F6;
-                                background: #FFFFFF;
-                            }
-                            #${modalId} .vis-wf-dummy-kv-row:last-child {
-                                border-bottom: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-kv-key {
-                                color: #5F7283;
-                                font-size: 12.5px;
-                            }
-                            #${modalId} .vis-wf-dummy-kv-val {
-                                color: #102C3F;
-                                font-size: 13px;
-                                font-weight: 700;
-                                text-align: right;
-                            }
-                            #${modalId} .vis-wf-dummy-description {
-                                padding: 12px 14px;
-                                border: 1px solid #EDF2F6;
-                                border-radius: 10px;
-                                background: #FAFCFE;
-                                color: #102C3F;
-                                font-size: 13px;
-                                line-height: 1.5;
-                            }
-                            #${modalId} .vis-wf-dummy-requester {
-                                display: flex;
-                                align-items: center;
-                                gap: 14px;
-                                padding: 12px 14px;
-                                border: 1px solid #E4EDF4;
-                                border-radius: 10px;
-                                background: #FAFCFE;
-                            }
-                            #${modalId} .vis-wf-dummy-requester-avatar {
-                                width: 44px;
-                                height: 44px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                border-radius: 50%;
-                                background: linear-gradient(135deg,#06b6d4,#0083DA);
-                                color: #FFFFFF;
-                                font-size: 15px;
-                                font-weight: 700;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-requester-name {
-                                flex: 1;
-                                min-width: 0;
-                                color: #102C3F;
-                                font-size: 14.5px;
-                                font-weight: 700;
-                            }
-                            #${modalId} .vis-wf-dummy-forward-panel {
-                                padding: 14px 18px 10px;
-                                border-top: 2px solid #DFF1FF;
-                                background: linear-gradient(135deg, #F0F9FF 0%, #E8F4FF 100%);
-                                border-radius: 0 0 0 0;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-header {
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                margin-bottom: 12px;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-header-icon {
-                                width: 28px;
-                                height: 28px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                border-radius: 50%;
-                                background: #0083DA;
-                                color: #FFFFFF;
-                                font-size: 13px;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-header-title {
-                                font-size: 13px;
-                                font-weight: 700;
-                                color: #102C3F;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-fields {
-                                display: flex;
-                                flex-direction: column;
-                                gap: 10px;
-                                margin-bottom: 12px;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-field {
-                                position: relative;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-field-icon {
-                                position: absolute;
-                                left: 12px;
-                                top: 50%;
-                                transform: translateY(-50%);
-                                color: #0083DA;
-                                font-size: 13px;
-                                pointer-events: none;
-                                z-index: 1;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-field-search-btn {
-                                position: absolute;
-                                right: 6px;
-                                top: 50%;
-                                transform: translateY(-50%);
-                                width: 28px;
-                                height: 28px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                border: none;
-                                border-radius: 7px;
-                                background: #EAF4FF;
-                                color: #0083DA;
-                                font-size: 13px;
-                                cursor: pointer;
-                                z-index: 2;
-                                transition: background 0.15s;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-field-search-btn:hover {
-                                background: #BFE4FF;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-field input[type="text"],
-                            #${modalId} .vis-wf-dummy-fwd-field input[name="AD_User_ID"] {
-                                width: 100% !important;
-                                height: 40px !important;
-                                padding: 0 40px 0 36px !important;
-                                border: 1.5px solid #BFE4FF !important;
-                                border-radius: 10px !important;
-                                font-family: Roboto, Arial, sans-serif !important;
-                                font-size: 13.5px !important;
-                                color: #102C3F !important;
-                                background: #FFFFFF !important;
-                                outline: 0 !important;
-                                box-shadow: 0 2px 8px rgba(0,131,218,0.08) !important;
-                                box-sizing: border-box !important;
-                                transition: border-color 0.15s;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-field input[type="text"]:focus,
-                            #${modalId} .vis-wf-dummy-fwd-field input[name="AD_User_ID"]:focus {
-                                border-color: #0083DA !important;
-                                box-shadow: 0 0 0 3px rgba(0,131,218,0.12) !important;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-msg-field {
-                                position: relative;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-msg-icon {
-                                position: absolute;
-                                left: 12px;
-                                top: 12px;
-                                color: #5F7283;
-                                font-size: 13px;
-                                pointer-events: none;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-msg {
-                                width: 100%;
-                                min-height: 56px;
-                                padding: 10px 14px 10px 36px;
-                                border: 1.5px solid #E4EDF4;
-                                border-radius: 10px;
-                                font-family: Roboto, Arial, sans-serif;
-                                font-size: 13px;
-                                color: #102C3F;
-                                background: #FFFFFF;
-                                resize: vertical;
-                                outline: 0;
-                                box-sizing: border-box;
-                                transition: border-color 0.15s;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-msg:focus {
-                                border-color: #0083DA;
-                                box-shadow: 0 0 0 3px rgba(0,131,218,0.08);
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-actions {
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                justify-content: flex-end;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-confirm {
-                                height: 36px;
-                                padding: 0 20px;
-                                border: none;
-                                border-radius: 999px;
-                                background: linear-gradient(135deg, #0083DA, #0065B0);
-                                color: #FFFFFF;
-                                font-family: Roboto, Arial, sans-serif;
-                                font-size: 13px;
-                                font-weight: 700;
-                                cursor: pointer;
-                                box-shadow: 0 4px 10px rgba(0,131,218,0.28);
-                                display: inline-flex;
-                                align-items: center;
-                                gap: 6px;
-                            }
-                            #${modalId} .vis-wf-dummy-fwd-cancel {
-                                height: 36px;
-                                padding: 0 16px;
-                                border: 1.5px solid #E4EDF4;
-                                border-radius: 999px;
-                                background: #FFFFFF;
-                                color: #5F7283;
-                                font-family: Roboto, Arial, sans-serif;
-                                font-size: 13px;
-                                cursor: pointer;
-                                display: inline-flex;
-                                align-items: center;
-                                gap: 6px;
-                            }
-                            #${modalId} .vis-wf-dummy-footer {
-                                padding: 14px 18px;
-                                border-top: 1px solid #E4EDF4;
-                                background: #FFFFFF;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-footer-row {
-                                display: flex;
-                                align-items: center;
-                                gap: 10px;
-                            }
-                            #${modalId} .vis-wf-dummy-note {
-                                flex: 1;
-                                min-height: 40px;
-                                display: flex;
-                                align-items: flex-start;
-                                gap: 8px;
-                                min-width: 180px;
-                                padding: 8px 12px;
-                                border: 1px solid #E4EDF4;
-                                border-radius: 10px;
-                                background: #FBFDFF;
-                                color: #9F9F9F;
-                                font-size: 13px;
-                            }
-                            #${modalId} .vis-wf-dummy-note i {
-                                margin-top: 4px;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-note .vis-w-workflow-textarea {
-                                width: 100%;
-                                min-height: 24px;
-                                height: 24px;
-                                padding: 0;
-                                border: 0;
-                                background: transparent;
-                                resize: none;
-                                outline: 0;
-                                color: #102C3F;
-                                font-size: 13px;
-                                line-height: 20px;
-                                box-shadow: none;
-                            }
-                            #${modalId} .vis-wf-dummy-actions {
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                flex-shrink: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-answer-dynamic {
-                                display: flex;
-                                align-items: center;
-                                min-width: 260px;
-                                margin: 0;
-                            }
-                            #${modalId} .vis-wf-dummy-answer-dynamic .vis-w-home-wf-answerInput {
-                                min-width: 220px;
-                            }
-                            #${modalId} .vis-wf-dummy-action {
-                                height: 40px;
-                                display: inline-flex;
-                                align-items: center;
-                                gap: 7px;
-                                padding: 0 16px;
-                                border-radius: 999px;
-                                font-size: 13.5px;
-                                font-weight: 700;
-                                font-family: Roboto, Arial, sans-serif;
-                                cursor: pointer;
-                            }
-                            #${modalId} .vis-wf-dummy-action-secondary {
-                                border: 1px solid #0083DA;
-                                background: #FFFFFF;
-                                color: #0083DA;
-                            }
-                            #${modalId} .vis-wf-dummy-key {
-                                padding: 1px 5px;
-                                border-radius: 4px;
-                                background: rgba(255,255,255,0.24);
-                                font-size: 10.5px;
-                                font-weight: 700;
-                            }
-                            #${modalId} .vis-wf-dummy-action-secondary .vis-wf-dummy-key {
-                                background: #DFF1FF;
-                                color: #106AB0;
-                            }
-                            #${modalId}[dir="rtl"] {
-                                direction: rtl;
-                                text-align: right;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-main {
-                                flex-direction: row;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-master {
-                                border-right: 0;
-                                border-left: 1px solid #E4EDF4;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-meta {
-                                margin-left: 0;
-                                margin-right: 12px;
-                                padding-left: 0;
-                                padding-right: 12px;
-                                border-left: 0;
-                                border-right: 1px solid #E4EDF4;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-id {
-                                margin-left: 0;
-                                margin-right: auto;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-time {
-                                text-align: left;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-kv-val {
-                                text-align: left;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-search input {
-                                text-align: right;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-window-select {
-                                padding: 0 10px 0 30px;
-                            }
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-action-secondary .vis-arrow-right,
-                            #${modalId}[dir="rtl"] .vis-wf-dummy-action-secondary .fa-arrow-right {
-                                transform: scaleX(-1);
-                            }
-                            @media (max-width: 900px) {
-                                #${modalId} .vis-wf-dummy-shell {
-                                    width: calc(100% - 8px);
-                                    height: calc(100% - 8px);
-                                }
-                                #${modalId} .vis-wf-dummy-main {
-                                    flex-direction: column;
-                                    overflow: hidden;
-                                }
-                                #${modalId} .vis-wf-dummy-master {
-                                    width: 100%;
-                                    height: 42%;
-                                    min-height: 240px;
-                                    border-right: 0;
-                                    border-left: 0;
-                                    border-bottom: 1px solid #E4EDF4;
-                                }
-                                #${modalId} .vis-wf-dummy-detail {
-                                    min-height: 0;
-                                }
-                                #${modalId} .vis-wf-dummy-titlebar {
-                                    padding: 0 12px;
-                                }
-                                #${modalId} .vis-wf-dummy-title {
-                                    width: 100%;
-                                }
-                                #${modalId} .vis-wf-dummy-meta {
-                                    margin-left: auto;
-                                    padding-left: 10px;
-                                }
-                                #${modalId} .vis-wf-dummy-detail-header {
-                                    align-items: flex-start;
-                                    flex-direction: column;
-                                    padding: 10px 14px;
-                                    gap: 8px;
-                                }
-                                #${modalId} .vis-wf-dummy-detail-left,
-                                #${modalId} .vis-wf-dummy-detail-right {
-                                    width: 100%;
-                                    justify-content: space-between;
-                                }
-                                #${modalId} .vis-wf-dummy-submitted {
-                                    flex: 1;
-                                }
-                                #${modalId} .vis-wf-dummy-footer-row {
-                                    align-items: stretch;
-                                    flex-direction: column;
-                                }
-                                #${modalId} .vis-wf-dummy-actions {
-                                    justify-content: flex-end;
-                                    flex-wrap: wrap;
-                                }
-                                #${modalId}[dir="rtl"] .vis-wf-dummy-main {
-                                    flex-direction: column;
-                                }
-                                #${modalId}[dir="rtl"] .vis-wf-dummy-master {
-                                    border-left: 0;
-                                    border-bottom: 1px solid #E4EDF4;
-                                }
-                                #${modalId}[dir="rtl"] .vis-wf-dummy-meta {
-                                    margin-right: auto;
-                                    padding-right: 10px;
-                                    border-right: 1px solid #E4EDF4;
-                                }
-                            }
-                            @media (max-width: 560px) {
-                                #${modalId}.vis-wf-dummy-modal {
-                                    padding: 8px;
-                                }
-                                #${modalId} .vis-wf-dummy-shell {
-                                    width: 100%;
-                                    height: 100%;
-                                    max-width: 100%;
-                                    max-height: 100%;
-                                    border-radius: 10px;
-                                }
-                                #${modalId} .vis-wf-dummy-title {
-                                    gap: 8px;
-                                }
-                                #${modalId} .vis-wf-dummy-meta {
-                                    font-size: 12px;
-                                }
-                                #${modalId} .vis-wf-dummy-master {
-                                    height: 46%;
-                                    min-height: 250px;
-                                }
-                                #${modalId} .vis-wf-dummy-tools {
-                                    padding: 10px;
-                                }
-                                #${modalId} .vis-wf-dummy-body {
-                                    padding: 12px;
-                                }
-                                #${modalId} .vis-wf-dummy-kv-row,
-                                #${modalId} .vis-wf-dummy-requester {
-                                    align-items: flex-start;
-                                    flex-direction: column;
-                                    gap: 6px;
-                                }
-                                #${modalId} .vis-wf-dummy-kv-val {
-                                    text-align: left;
-                                }
-                                #${modalId}[dir="rtl"] .vis-wf-dummy-kv-val {
-                                    text-align: right;
-                                }
-                                #${modalId} .vis-wf-dummy-footer {
-                                    padding: 10px;
-                                }
-                                #${modalId} .vis-wf-dummy-action {
-                                    flex: 1;
-                                    justify-content: center;
-                                    min-width: 0;
-                                    padding: 0 10px;
-                                }
-                            }
-                        </style>
-                        <div class="vis-wf-dummy-shell" role="dialog" aria-modal="true" aria-label="${lbl('VIS_ApprovalsPreview', 'Approvals preview')}">
-                            <div class="vis-wf-dummy-titlebar">
-                                <div class="vis-wf-dummy-title">
-                                    <span class="vis-wf-dummy-module-icon"><i class="vis vis-info"></i></span>
+                    <div id="${modalId}" class="vis-wf-modal" dir="${modalDir}" style="display:none;">
+                        <div class="vis-wf-shell" role="dialog" aria-modal="true" aria-label="${lbl('VIS_ApprovalsPreview', 'Approvals preview')}">
+                            <div class="vis-wf-titlebar">
+                                <div class="vis-wf-title">
+                                    <span class="vis-wf-module-icon"><i class="vis vis-info"></i></span>
                                     <span><strong>${lbl('VIS_Approvals', 'Approvals')}</strong></span>
-                                    <span id="${modalId}PendingCount" class="vis-wf-dummy-meta"></span>
+                                    <span id="${modalId}PendingCount" class="vis-wf-meta"></span>
                                 </div>
                             </div>
-                            <div class="vis-wf-dummy-main">
-                                <aside class="vis-wf-dummy-master">
-                                    <div class="vis-wf-dummy-tools">
-                                        <div class="vis-wf-dummy-search">
+                            <div class="vis-wf-main">
+                                <aside class="vis-wf-master">
+                                    <div class="vis-wf-tools">
+                                        <div class="vis-wf-search">
                                             <i class="fa fa-search" aria-hidden="true"></i>
                                             <input type="text" placeholder="${lbl('VIS_SearchByRequesterTypeID', 'Search by requester, type, ID...')}">
                                         </div>
-                                        <div class="vis-wf-dummy-date-filters">
-                                            <div class="vis-wf-dummy-date-filter">
+                                        <div class="vis-wf-date-filters">
+                                            <div class="vis-wf-date-filter">
                                                 <label for="${modalId}FromDateInput">${lbl('VIS_FromDate', 'From Date')}</label>
-                                                <input id="${modalId}FromDateInput" class="vis-wf-dummy-date-input" type="date" placeholder="date">
+                                                <input id="${modalId}FromDateInput" class="vis-wf-date-input" type="date" placeholder="date">
                                             </div>
-                                            <div class="vis-wf-dummy-date-filter">
+                                            <div class="vis-wf-date-filter">
                                                 <label for="${modalId}ToDateInput">${lbl('VIS_ToDate', 'To Date')}</label>
-                                                <input id="${modalId}ToDateInput" class="vis-wf-dummy-date-input" type="date" placeholder="date">
+                                                <input id="${modalId}ToDateInput" class="vis-wf-date-input" type="date" placeholder="date">
                                             </div>
                                         </div>
-                                        <div class="vis-wf-dummy-filters">
-                                            <select id="${modalId}WindowSelect" class="vis-wf-dummy-window-select vis-custom-select vis-selectworkflow-fontsize"></select>
+                                        <div class="vis-wf-filters">
+                                            <select id="${modalId}WindowSelect" class="vis-wf-window-select vis-custom-select vis-selectworkflow-fontsize"></select>
                                         </div>
                                     </div>
-                                    <div class="vis-wf-dummy-list"></div>
+                                    <div class="vis-wf-list"></div>
                                 </aside>
-                                <section class="vis-wf-dummy-detail">
-                                    <div class="vis-wf-dummy-detail-header">
-                                        <div class="vis-wf-dummy-detail-left">
-                                            <div class="vis-wf-dummy-record-title">${lbl('VIS_WorkflowActivity', 'Workflow Activity')}</div>
-                                            <span class="vis-wf-dummy-status"><span class="vis-wf-dummy-dot"></span>${lbl('VIS_AwaitingYourApproval', 'Awaiting your approval')}</span>
-                                        </div>
-                                        <div class="vis-wf-dummy-detail-right">
-                                            <span class="vis-wf-dummy-submitted"></span>
-                                            <button type="button" class="vis-wf-dummy-icon-btn vis-wf-dummy-watch" title="${lbl('VIS_Watch', 'Watch')}"><i class="vis vis-eye"></i></button>
-                                            <button type="button" class="vis-wf-dummy-icon-btn vis-wf-dummy-history" title="${lbl('VIS_History', 'History')}"><i class="vis vis-history"></i></button>
-                                            <button type="button" id="${modalId}Close" class="vis-wf-dummy-icon-btn" title="${lbl('VIS_Close', 'Close')}"><i class="vis vis-close"></i></button>
-                                        </div>
+                                <div class="vis-wf-content-area">
+                                    <div class="vis-wf-no-selection">
+                                        <i class="vis vis-info"></i>
+                                        <p>${lbl('VIS_SelectWorkflowToViewDetails', 'Select a workflow to view details')}</p>
                                     </div>
-                                    <div class="vis-wf-dummy-body">
-                                        <section class="vis-wf-dummy-section">
-                                            <h3 class="vis-wf-dummy-section-title">${lbl('VIS_TransactionDetails', 'Transaction details')}</h3>
-                                            <div class="vis-wf-dummy-kv">
-                                                <!-- populated dynamically from activity summary -->
-                                            </div>
-                                        </section>
-                                        <section class="vis-wf-dummy-section">
-                                            <h3 class="vis-wf-dummy-section-title">${lbl('VIS_Desc', 'Desc')}</h3>
-                                            <div class="vis-wf-dummy-description">
-                                                <!-- populated dynamically from activity description -->
-                                            </div>
-                                        </section>
-                                        <section class="vis-wf-dummy-section">
-                                            <h3 class="vis-wf-dummy-section-title">${lbl('VIS_Requester', 'Requester')}</h3>
-                                            <div class="vis-wf-dummy-requester">
-                                                <div class="vis-wf-dummy-requester-avatar">WF</div>
-                                                <div class="vis-wf-dummy-requester-name"></div>
-                                            </div>
-                                        </section>
-                                        <section class="vis-wf-dummy-section vis-wf-dummy-history-panel" style="display:none;">
-                                            <h3 class="vis-wf-dummy-section-title">${lbl('VIS_History', 'History')}</h3>
-                                            <div class="vis-wf-dummy-history-content"></div>
-                                        </section>
-                                    </div>
-                                    <div class="vis-wf-dummy-footer">
-                                        <div class="vis-wf-dummy-forward-panel" style="display:none;"></div>
-                                        <div class="vis-wf-dummy-footer-row">
-                                            <div class="vis-wf-dummy-note"><i class="vis vis-chat"></i><textarea class="vis-w-workflow-textarea" placeholder="${lbl('VIS_TypeMessage', 'Please write message')}...." spellcheck="false"></textarea></div>
-                                            <div class="vis-wf-dummy-actions">
-                                                <button type="button" class="vis-wf-dummy-action vis-wf-dummy-action-secondary"><i class="vis vis-arrow-right"></i>${lbl('VIS_Forward', 'Forward')} <span class="vis-wf-dummy-key">F</span></button>
-                                            </div>
+                                    <div class="vis-wf-detail-header" style="display:none;">
+                                        <div class="vis-wf-detail-left">
+                                            <div class="vis-wf-record-title">${lbl('VIS_WorkflowActivity', 'Workflow Activity')}</div>
+                                            <span class="vis-wf-status"><span class="vis-wf-dot"></span>${lbl('VIS_AwaitingYourApproval', 'Awaiting your approval')}</span>
+                                        </div>
+                                        <div class="vis-wf-detail-right">
+                                            <span class="vis-wf-submitted"></span>
+                                            <button type="button" class="vis-wf-hdr-btn vis-wf-hdr-btn-blue vis-wf-watch" title="${lbl('VIS_Watch', 'Watch')}"><span class="vis-wf-hdr-btn-circle"><i class="fa fa-search-plus"></i></span></button>
+                                            <button type="button" id="${modalId}Close" class="vis-wf-hdr-btn vis-wf-hdr-btn-red" title="${lbl('VIS_Close', 'Close')}"><span class="vis-wf-hdr-btn-circle"><i class="vis vis-close"></i></span></button>
                                         </div>
                                     </div>
-                                </section>
+                                    <div class="vis-wf-content-body" style="display:none;">
+                                        <section class="vis-wf-detail">
+                                            <div class="vis-wf-body">
+                                                <section class="vis-wf-section">
+                                                    <h3 class="vis-wf-section-title">${lbl('VIS_TransactionDetails', 'Transaction details')}</h3>
+                                                    <div class="vis-wf-kv">
+                                                        <!-- populated dynamically from activity summary -->
+                                                    </div>
+                                                </section>
+                                                <section class="vis-wf-section">
+                                                    <h3 class="vis-wf-section-title">${lbl('VIS_Desc', 'Desc')}</h3>
+                                                    <div class="vis-wf-description">
+                                                        <!-- populated dynamically from activity description -->
+                                                    </div>
+                                                </section>
+                                                <section class="vis-wf-section">
+                                                    <h3 class="vis-wf-section-title">${lbl('VIS_Requester', 'Requester')}</h3>
+                                                    <div class="vis-wf-requester">
+                                                        <div class="vis-wf-requester-avatar">WF</div>
+                                                        <div class="vis-wf-requester-name"></div>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                            <div class="vis-wf-footer">
+                                                <div class="vis-wf-forward-panel" style="display:none;"></div>
+                                                <div class="vis-wf-footer-row">
+                                                    <div class="vis-wf-note"><i class="vis vis-chat"></i><textarea class="vis-w-workflow-textarea" placeholder="${lbl('VIS_TypeMessage', 'Please write message')}...." spellcheck="false"></textarea></div>
+                                                    <div class="vis-wf-actions">
+                                                        <button type="button" class="vis-wf-action vis-wf-action-secondary"><i class="vis vis-arrow-right"></i>${lbl('VIS_Forward', 'Forward')} <span class="vis-wf-key">F</span></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <aside class="vis-wf-history-side">
+                                            <div class="vis-wf-history-content"></div>
+                                        </aside>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1485,25 +689,28 @@
                     $modal.trigger('modalClose');
                     $modal.css('display', 'none');
                 });
-                $modal.on('click', '.vis-wf-dummy-card', function () {
-                    $modal.find('.vis-wf-dummy-card').removeClass('vis-wf-dummy-card-selected');
-                    $(this).addClass('vis-wf-dummy-card-selected');
-                    var cardIdx = $modal.find('.vis-wf-dummy-card').index(this);
+                $modal.on('click', '.vis-wf-card', function () {
+                    if ($(this).hasClass('vis-wf-card-selected')) return;
+                    $modal.find('.vis-wf-card').removeClass('vis-wf-card-selected');
+                    $(this).addClass('vis-wf-card-selected');
+                    var cardIdx = $modal.find('.vis-wf-card').index(this);
                     currentModalCardIdx = cardIdx;
-                    // Hide history panel when switching cards
-                    $modal.find('.vis-wf-dummy-history-panel').hide();
+                    // Reveal detail and history panels
+                    $modal.find('.vis-wf-no-selection').hide();
+                    $modal.find('.vis-wf-detail-header, .vis-wf-content-body').show();
                     // Collapse and clear the forward panel when switching cards
-                    var $fwdPanel = $modal.find('.vis-wf-dummy-forward-panel');
+                    var $fwdPanel = $modal.find('.vis-wf-forward-panel');
                     $fwdPanel.hide().empty();
-                    syncDummyDetailTitle(cardIdx);
-                    syncDummyDetailKV(cardIdx);
-                    syncDummySubmitted(cardIdx);
-                    syncDummyDescription(cardIdx);
-                    syncDummyRequester(cardIdx);
-                    clearDummyMessage();
-                    syncDummyAnswer(cardIdx);
+                    syncDetailTitle(cardIdx);
+                    syncDetailKV(cardIdx);
+                    syncSubmitted(cardIdx);
+                    syncDescription(cardIdx);
+                    syncRequester(cardIdx);
+                    clearMessage();
+                    syncAnswer(cardIdx);
+                    loadHistory(cardIdx);
                 });
-                $modal.on('keydown', '.vis-wf-dummy-card', function (e) {
+                $modal.on('keydown', '.vis-wf-card', function (e) {
                     if (e.keyCode == 13 || e.keyCode == 32) {
                         e.preventDefault();
                         $(this).trigger('click');
@@ -1511,30 +718,27 @@
                 });
                 $modal.on('change', '#' + modalId + 'WindowSelect', function () {
                     // Filter cards inside the modal without reloading from server
-                    filterDummyCards($(this).val());
+                    filterCards($(this).val());
                     // Keep the main widget combo in sync (value only, no reload)
                     if ($cmbWindows && $cmbWindows.length > 0) {
                         $cmbWindows.val($(this).val());
                     }
                 });
-                $modal.on('input', '.vis-wf-dummy-search input', function () {
-                    filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
-                });
-                $modal.on('keydown', '.vis-wf-dummy-search input', function (e) {
+                $modal.on('keydown', '.vis-wf-search input', function (e) {
                     if (e.keyCode == 13) {
                         e.preventDefault();
-                        filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
+                        filterCards($modal.find('#' + modalId + 'WindowSelect').val());
                     }
                 });
-                $modal.on('click', '.vis-wf-dummy-search i', function () {
-                    filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
+                $modal.on('click', '.vis-wf-search i', function () {
+                    filterCards($modal.find('#' + modalId + 'WindowSelect').val());
                 });
-                $modal.on('change', '.vis-wf-dummy-date-input', function () {
-                    filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
+                $modal.on('change', '.vis-wf-date-input', function () {
+                    filterCards($modal.find('#' + modalId + 'WindowSelect').val());
                 });
 
                 // Watch (eye) button — open the record screen, same as the vis-find zoom button
-                $modal.on('click', '.vis-wf-dummy-watch', function () {
+                $modal.on('click', '.vis-wf-watch', function () {
                     if (currentModalCardIdx < 0) {
                         return;
                     }
@@ -1544,8 +748,8 @@
                 });
 
                 // Forward button — show forward panel with the user input directly (no extra button click)
-                $modal.on('click', '.vis-wf-dummy-action-secondary', function () {
-                    var $fwdPanel = $modal.find('.vis-wf-dummy-forward-panel');
+                $modal.on('click', '.vis-wf-action-secondary', function () {
+                    var $fwdPanel = $modal.find('.vis-wf-forward-panel');
                     if ($fwdPanel.is(':visible')) {
                         $fwdPanel.hide().empty();
                         return;
@@ -1554,13 +758,13 @@
                     $fwdPanel.empty();
 
                     // ── Header ─────────────────────────────────────────────────────────
-                    var $header = $('<div class="vis-wf-dummy-fwd-header">');
-                    $header.append('<div class="vis-wf-dummy-fwd-header-icon"><i class="vis vis-arrow-right"></i></div>');
-                    $header.append($('<div class="vis-wf-dummy-fwd-header-title">').text(lbl('VIS_ForwardTo', 'Forward to')));
+                    var $header = $('<div class="vis-wf-fwd-header">');
+                    $header.append('<div class="vis-wf-fwd-header-icon"><i class="vis vis-arrow-right"></i></div>');
+                    $header.append($('<div class="vis-wf-fwd-header-title">').text(lbl('VIS_ForwardTo', 'Forward to')));
                     $fwdPanel.append($header);
 
                     // ── Fields ─────────────────────────────────────────────────────────
-                    var $fields = $('<div class="vis-wf-dummy-fwd-fields">');
+                    var $fields = $('<div class="vis-wf-fwd-fields">');
 
                     // Build the lookup control — we only use getControl() (the raw input),
                     // no buttons are added to the DOM so no extra click is needed.
@@ -1568,14 +772,14 @@
                     var txtb = new VIS.Controls.VTextBoxButton("AD_User_ID", false, false, true, VIS.DisplayType.Search, lookup);
                     txtb.getBtn(); // initialise internal state (required), but we won't append the btns
 
-                    var $userField = $('<div class="vis-wf-dummy-fwd-field">');
-                    $userField.append('<i class="fa fa-user vis-wf-dummy-fwd-field-icon"></i>');
+                    var $userField = $('<div class="vis-wf-fwd-field">');
+                    $userField.append('<i class="fa fa-user vis-wf-fwd-field-icon"></i>');
                     var $userCtrl = txtb.getControl();
                     $userCtrl.attr('placeholder', lbl('VIS_SearchUser', 'Search user'));
                     $userField.append($userCtrl);
 
                     // Search icon — clicking it opens the VIS user lookup popup
-                    var $searchBtn = $('<button type="button" class="vis-wf-dummy-fwd-field-search-btn" title="' + lbl('VIS_SearchUser', 'Search user') + '">');
+                    var $searchBtn = $('<button type="button" class="vis-wf-fwd-field-search-btn" title="' + lbl('VIS_SearchUser', 'Search user') + '">');
                     $searchBtn.append('<i class="vis vis-find"></i>');
                     $searchBtn.on('click', function (e) {
                         e.stopPropagation();
@@ -1586,21 +790,17 @@
 
                     $fields.append($userField);
 
-                    // Message textarea
-                    var $msgField = $('<div class="vis-wf-dummy-fwd-msg-field">');
-                    $msgField.append('<i class="vis vis-chat vis-wf-dummy-fwd-msg-icon"></i>');
-                    var $msgInput = $('<textarea class="vis-wf-dummy-fwd-msg">').attr('placeholder', lbl('VIS_Message', 'Add an optional note'));
-                    $msgField.append($msgInput);
-                    $fields.append($msgField);
-
                     $fwdPanel.append($fields);
 
                     // ── Action buttons ─────────────────────────────────────────────────
-                    var $actions = $('<div class="vis-wf-dummy-fwd-actions">');
-                    var $cancelBtn  = $('<button class="vis-wf-dummy-fwd-cancel">').html('<i class="vis vis-close"></i> ' + lbl('VIS_Cancel', 'Cancel'));
-                    var $confirmBtn = $('<button class="vis-wf-dummy-fwd-confirm">').html('<i class="vis vis-arrow-right"></i> ' + lbl('VIS_Forward', 'Forward'));
+                    var $actions = $('<div class="vis-wf-fwd-actions">');
+                    var $cancelBtn  = $('<button class="vis-wf-fwd-cancel">').html('<i class="vis vis-close"></i> ' + lbl('VIS_Cancel', 'Cancel'));
+                    var $confirmBtn = $('<button class="vis-wf-fwd-confirm">').html('<i class="vis vis-arrow-right"></i> ' + lbl('VIS_Forward', 'Forward'));
                     $actions.append($cancelBtn).append($confirmBtn);
                     $fwdPanel.append($actions);
+
+                    // Clear the shared note textarea each time the forward panel opens
+                    $modal.find('.vis-wf-note textarea').val('');
 
                     // ── Events ────────────────────────────────────────────────────────
                     $cancelBtn.on('click', function () {
@@ -1613,7 +813,7 @@
                             VIS.ADialog.error('FillMandatory', true, lbl('VIS_Forward', 'Forward'));
                             return;
                         }
-                        var msg = VIS.Utility.encodeText($msgInput.val());
+                        var msg = VIS.Utility.encodeText($modal.find('.vis-wf-note textarea').val());
                         var activityID = fulldata[currentModalCardIdx].AD_WF_Activity_ID;
                         var nID        = fulldata[currentModalCardIdx].AD_Node_ID;
                         var winID      = fulldata[currentModalCardIdx].AD_Window_ID;
@@ -1642,33 +842,28 @@
                     setTimeout(function () { $userCtrl.trigger('focus'); }, 80);
                 });
 
-                // History button — toggle history panel, load data on first show
-                $modal.on('click', '.vis-wf-dummy-history', function () {
-                    var $historyPanel = $modal.find('.vis-wf-dummy-history-panel');
-                    if ($historyPanel.is(':visible')) {
-                        $historyPanel.hide();
-                        return;
-                    }
+                // Load history for a card index into the permanent side panel
+                function loadHistory(cardIdx) {
+                    var $historySide = $modal.find('.vis-wf-history-side');
+                    var $historyContent = $historySide.find('.vis-wf-history-content');
 
-                    // Get the activity info for the currently selected card
                     var $actContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
-                    var $actContainer = $actContainers.eq(currentModalCardIdx);
+                    var $actContainer = $actContainers.eq(cardIdx);
                     var $pre = $actContainer.find('pre.vis-workflow-pre-cls');
                     var dataIds = $pre.attr('data-ids') || '';
                     var parts = dataIds.split('_');
                     var wfActivityID = parts[2] || '';
                     var nodeID = parts[1] || '0';
-                    var idx = parts[3] !== undefined ? parseInt(parts[3]) : currentModalCardIdx;
+                    var idx = parts[3] !== undefined ? parseInt(parts[3]) : cardIdx;
                     var wfProcessID = (fulldata && fulldata[idx]) ? fulldata[idx].AD_WF_Process_ID : null;
 
+                    var flowTitle = '<div class="vis-wf-ht-flow-title">' + lbl('VIS_ViewHistoryRecord', 'View History Record') + '</div>';
+                    $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading">' + lbl('VIS_Loading', 'Loading...') + '</div>');
+
                     if (!wfActivityID) {
-                        $historyPanel.show();
+                        $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
                         return;
                     }
-
-                    var $historyContent = $historyPanel.find('.vis-wf-dummy-history-content');
-                    $historyContent.html('<div style="padding:10px;color:#748494;">' + lbl('VIS_Loading', 'Loading...') + '</div>');
-                    $historyPanel.show();
 
                     $.ajax({
                         url: VIS.Application.contextUrl + 'WFActivity/GetActivityInfo',
@@ -1677,79 +872,75 @@
                         type: 'POST',
                         data: { activityID: wfActivityID, nodeID: nodeID, wfProcessID: wfProcessID },
                         error: function () {
-                            $historyContent.html('<div style="padding:10px;color:#e74c3c;">' + lbl('VIS_FailedToLoadHistory', 'Failed to load history.') + '</div>');
+                            $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading" style="color:#e74c3c;">' + lbl('VIS_FailedToLoadHistory', 'Failed to load history.') + '</div>');
                         },
                         success: function (res) {
                             var info = res && res.result ? res.result : null;
                             $historyContent.empty();
+                            $historyContent.append(flowTitle);
 
                             if (!info || !info.Node) {
-                                $historyContent.html('<div style="padding:10px;color:#748494;">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
+                                $historyContent.append('<div class="vis-wf-ht-loading">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
                                 return;
                             }
 
-                            var $divHistoryNode = $('<div class="vis-workflow-historyCls">');
+                            var $timeline = $('<div class="vis-wf-ht-timeline">');
                             for (var node in info.Node) {
                                 if (info.Node[node].History == null) continue;
                                 for (var hNode in info.Node[node].History) {
                                     var h = info.Node[node].History[hNode];
+                                    if (h.State == 'BK') continue;
                                     var nodeName = info.Node[node].Name || '';
-                                    if (h.State == 'CC' && node < (info.Node.length - 1)) {
-                                        $divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='" + VIS.Application.contextUrl + "Areas/VIS/Images/home/4.jpg'>")));
-                                        var $divAppBy = $("<div class='vis-approved_wrap'>");
-                                        $divAppBy.append("<div class='vis-ApproveCircleCls'><i class='vis vis-markx'></i></div>");
-                                        var $divLeft = $("<div class='vis-left-part'>");
-                                        if (h.TextMsg && h.TextMsg.length > 0) {
-                                            $divLeft.append($("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(h.TextMsg) + "'></i>"));
-                                        }
-                                        $divLeft.append(nodeName);
-                                        $divAppBy.append($divLeft);
-                                        var $divRight = $("<div class='vis-right-part'>");
-                                        $divRight.append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(h.ApprovedBy));
-                                        $divAppBy.append($divRight);
-                                        $divHistoryNode.append($divAppBy);
-                                    } else if (h.State == 'BK') {
-                                        continue;
-                                    } else if ((node < (info.Node.length - 1)) || info.Node.length == 1) {
-                                        var $divPending = $("<div class='vis-pending_wrap'>");
-                                        $divPending.append($("<div class='vis-left-part'>").append(nodeName));
-                                        $divPending.append($("<div class='vis-right-part'>").append(VIS.Msg.getMsg('Pending')));
-                                        $divHistoryNode.append($divPending);
-                                    } else {
-                                        $divHistoryNode.append($("<div class='vis-vertical-img'>").append($("<img src='" + VIS.Application.contextUrl + "Areas/VIS/Images/home/4.jpg'>")));
-                                        var $divStart = $("<div class='vis-start_wrap vis-workflow-startCls'>");
-                                        var $divLeft = $("<div class='vis-left-part'>");
-                                        if (h.TextMsg && h.TextMsg.length > 0) {
-                                            $divLeft.append($("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(h.TextMsg) + "'></i>"));
-                                        }
-                                        $divLeft.append(nodeName);
-                                        $divStart.append($divLeft);
-                                        var $divRight = $("<div class='vis-right-part'>");
-                                        $divRight.append(VIS.Msg.getMsg('CompletedBy')).append($("<span class='vis-app_by'>").append(h.ApprovedBy));
-                                        $divStart.append($divRight);
-                                        $divHistoryNode.append($divStart);
+                                    var isCompleted = (h.State == 'CC' && node < (info.Node.length - 1))
+                                                   || (node >= (info.Node.length - 1) && info.Node.length > 1);
+
+                                    var $item = $('<div class="vis-wf-ht-item">');
+
+                                    // Left — node name + optional info tooltip
+                                    var $nodeEl = $('<div class="vis-wf-ht-node">');
+                                    if (h.TextMsg && h.TextMsg.length > 0) {
+                                        $nodeEl.append($("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(h.TextMsg) + "'></i> "));
                                     }
+                                    $nodeEl.append(document.createTextNode(nodeName));
+                                    $item.append($nodeEl);
+
+                                    // Center — dot (check if completed, circle if pending)
+                                    var $step = $('<div class="vis-wf-ht-step">');
+                                    if (isCompleted) {
+                                        $step.append("<div class='vis-wf-ht-dot vis-wf-ht-dot-check'><i class='vis vis-markx'></i></div>");
+                                    } else {
+                                        $step.append("<div class='vis-wf-ht-dot'></div>");
+                                    }
+                                    $item.append($step);
+
+                                    // Right — status text
+                                    var $status = $('<div class="vis-wf-ht-status">');
+                                    if (isCompleted) {
+                                        $status.append('<span class="vis-wf-ht-label">' + VIS.Msg.getMsg('CompletedBy') + '</span><strong class="vis-wf-ht-by">' + VIS.Utility.encodeText(h.ApprovedBy || '') + '</strong>');
+                                    } else {
+                                        $status.addClass('vis-wf-ht-pending').text(VIS.Msg.getMsg('Pending'));
+                                    }
+                                    $item.append($status);
+
+                                    $timeline.append($item);
                                 }
                             }
-                            $historyContent.append($divHistoryNode);
+                            $historyContent.append($timeline);
                         }
                     });
-                });
+                }
             }
 
             $modal.attr('dir', modalDir);
-            syncDummyWindowSelect();
-            syncDummyDateInputs();
-            syncDummyActivityList();
-            syncDummyCardTitles();
-            syncDummyPendingCount();
-            syncDummyDetailTitle(0);
-            syncDummyDetailKV(0);
-            syncDummySubmitted(0);
-            syncDummyDescription(0);
-            syncDummyRequester(0);
-            syncDummyAnswer(0);
-            filterDummyCards($modal.find('#' + modalId + 'WindowSelect').val());
+            syncWindowSelect();
+            syncDateInputs();
+            syncActivityList();
+            syncCardTitles();
+            syncPendingCount();
+            // Reset detail panel to empty state — user must select a card first
+            $modal.find('.vis-wf-no-selection').show();
+            $modal.find('.vis-wf-detail-header, .vis-wf-content-body').hide();
+            filterCards($modal.find('#' + modalId + 'WindowSelect').val());
 
             // ── Global z-index guard ──────────────────────────────────────────────
             // Any dialog/popup appended to <body> while this modal is open must sit
@@ -1807,7 +998,7 @@
             $fstMainDiv_ID.on('click', '#WFShowDetails' + $self.AD_UserHomeWidgetID, function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                openDummyModel();
+                openWorkflowModal();
             });
             $hlnkTabDataRef_ID.on('click', $self.refreshWidget);
             //$txtSearch.on('change', searchFunction);
@@ -1907,7 +1098,7 @@
                 + '         <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="' + VIS.Msg.getMsg("Requery") + '" class="vis-w-feedicon" style="display:none;"><i class="vis vis-refresh"></i></a>'// style="float: right; margin-top: 0px; cursor: pointer; "
                 //+ '         <span id="sNewNts" style="display: none; float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;" class="vis-feedicon border-0" title="New Record"><i class="vis vis-plus"></i></span>'
                 + '         <span id="WFSearchshow' + $self.AD_UserHomeWidgetID + '"  class="vis-w-feedicon vis vis-eye-plus border-0" title="Show Search"></span>'//style="float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;"
-                + '         <span id="WFShowDetails' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis vis-info border-0" title="Open Dummy Model" style="cursor:pointer;min-width:20px;display:none;"></span>'
+                + '         <span id="WFShowDetails' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis vis-info border-0" title="Open Workflow" style="cursor:pointer;min-width:20px;display:none;"></span>'
                 + ' </div>'
                 + '     </h2></div>'
                 + ' <div id = "welcomeScreenFeedsLists' + $self.AD_UserHomeWidgetID + '" class="vis-w-scrollerVerticalNewCls ml-0 vis-w-workflow-welcomfeed-cls"><div class="vis-w-workflow-homepage-parentdiv">'
@@ -2043,11 +1234,11 @@
                 ChldDiv += ('' + summry + '');
             }
             var Priority = null;
-            Priority = VIS.Utility.encodeText(VIS.Msg.getMsg('Priority') + " " + data[item].Priority);
+            Priority = VIS.Msg.getMsg('Priority') + ': ' + data[item].Priority;
             var date = null;
             date = Globalize.format(new Date(data[item].Created), "F", Globalize.cultureSelector);
 
-            ChldDiv += '<br>' + Priority + '</pre><div class="vis-w-feedDateTime vis-secondary-clr" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
+            ChldDiv += '\n' + Priority + '</pre><div class="vis-w-feedDateTime vis-secondary-clr" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
                 + date + '</div></div></div>';
 
             dataIem.recordID = data[item].Record_ID;
@@ -2109,11 +1300,11 @@
                             winNideID = "0_0";
                             $cmbWindows.val("0_0");
                         }
-                        $('#WFDummyModel' + $self.AD_UserHomeWidgetID + 'WindowSelect').empty();
+                        $('#WFWorkflowModal' + $self.AD_UserHomeWidgetID + 'WindowSelect').empty();
                         $cmbWindows.find('option').each(function () {
-                            $('#WFDummyModel' + $self.AD_UserHomeWidgetID + 'WindowSelect').append($(this).clone());
+                            $('#WFWorkflowModal' + $self.AD_UserHomeWidgetID + 'WindowSelect').append($(this).clone());
                         });
-                        $('#WFDummyModel' + $self.AD_UserHomeWidgetID + 'WindowSelect').val($cmbWindows.val());
+                        $('#WFWorkflowModal' + $self.AD_UserHomeWidgetID + 'WindowSelect').val($cmbWindows.val());
                     }
                 }
             });
@@ -2209,11 +1400,11 @@
                                 ChldDiv += ('' + summry + '');
                             }
                             var Priority = null;
-                            Priority = VIS.Utility.encodeText(VIS.Msg.getMsg('Priority') + " " + data[item].Priority);
+                            Priority = VIS.Msg.getMsg('Priority') + ': ' + data[item].Priority;
                             var date = null;
                             date = Globalize.format(new Date(data[item].Created), "F", Globalize.cultureSelector);
 
-                            ChldDiv += '<br>' + Priority + '</pre><div class="vis-w-feedDateTime" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
+                            ChldDiv += '\n' + Priority + '</pre><div class="vis-w-feedDateTime" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
                                 + date + '</div></div></div>';
                             //+ '<br>' + date + '</div></div></div>';
                             dataIem.recordID = data[item].Record_ID;
@@ -3125,7 +2316,7 @@
         };
         //Dispose function
         this.disposeComponent = function () {
-            $('#WFDummyModel' + $self.AD_UserHomeWidgetID).remove();
+            $('#WFWorkflowModal' + $self.AD_UserHomeWidgetID).remove();
             $root.remove();
         };
     }
