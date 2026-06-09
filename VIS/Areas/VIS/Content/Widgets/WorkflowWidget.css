@@ -403,13 +403,28 @@
     align-items: center;
     gap: 12px;
     min-width: 0;
+    flex-wrap: wrap;
 }
 
 .vis-wf-modal .vis-wf-record-title {
-    color: #141414;
-    font-size: 16px;
+    margin: 0 0 8px;
+    color: #1372b8;
+    font-size: 14px;
     font-weight: 700;
-    white-space: nowrap;
+    line-height: 1.3;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.vis-wf-modal .vis-wf-record-title:before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    display: inline-block;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: #1372b8;
+    vertical-align: middle;
 }
 
 .vis-wf-modal .vis-wf-status {
@@ -424,6 +439,29 @@
     font-size: 11.5px;
     font-weight: 700;
     white-space: nowrap;
+}
+
+.vis-wf-modal .vis-wf-requester-meta {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    color: #5F7283;
+    font-size: 12px;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.vis-wf-modal .vis-wf-requester-label {
+    color: #748494;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.vis-wf-modal .vis-wf-requester-name {
+    color: #102C3F;
+    font-weight: 700;
+    font-size: 13px;
 }
 
 .vis-wf-modal .vis-wf-detail-right {
@@ -465,9 +503,9 @@
 .vis-wf-modal .vis-wf-hdr-btn {
     border: none;
     outline: none;
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -487,7 +525,7 @@
 
 .vis-wf-modal .vis-wf-zoom-icon {
     color: #1f93fd;
-    font-size: 23px;
+    font-size: 18px;
 }
 
 .vis-wf-modal .vis-wf-close-btn {
@@ -495,8 +533,8 @@
 }
 
 .vis-wf-modal .vis-wf-close-circle {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     background: #ff4d4f;
     border-radius: 50%;
     display: flex;
@@ -505,8 +543,8 @@
 }
 
 .vis-wf-modal .vis-wf-close-icon {
-    width: 16px;
-    height: 16px;
+    width: 13px;
+    height: 13px;
     position: relative;
     display: block;
 }
@@ -514,10 +552,10 @@
 .vis-wf-modal .vis-wf-close-icon:before,
 .vis-wf-modal .vis-wf-close-icon:after {
     content: "";
-    width: 16px;
+    width: 13px;
     height: 2px;
     position: absolute;
-    top: 7px;
+    top: 6px;
     left: 0;
     border-radius: 2px;
     background: #FFFFFF;
@@ -533,7 +571,7 @@
 
 .vis-wf-modal .vis-wf-close-circle i {
     color: #FFFFFF;
-    font-size: 16px;
+    font-size: 13px;
 }
 
 .vis-wf-modal .vis-wf-body {
@@ -554,6 +592,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.07em;
+    text-decoration: none;
 }
 
 .vis-wf-modal .vis-wf-kv {
@@ -598,38 +637,6 @@
     line-height: 1.5;
 }
 
-.vis-wf-modal .vis-wf-requester {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 14px;
-    border: 1px solid #E4EDF4;
-    border-radius: 10px;
-    background: #FAFCFE;
-}
-
-.vis-wf-modal .vis-wf-requester-avatar {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: linear-gradient(135deg,#06b6d4,#0083DA);
-    color: #FFFFFF;
-    font-size: 15px;
-    font-weight: 700;
-    flex-shrink: 0;
-}
-
-.vis-wf-modal .vis-wf-requester-name {
-    flex: 1;
-    min-width: 0;
-    color: #102C3F;
-    font-size: 14.5px;
-    font-weight: 700;
-}
-
 /* ── History side panel (permanent 3rd column) ──────────────── */
 
 .vis-wf-modal .vis-wf-history-side {
@@ -654,7 +661,7 @@
     font-size: 13px;
     font-weight: 600;
     color: #102C3F;
-    border-bottom: 1px solid #E4EDF4;
+    text-align: center;
     margin-bottom: 2px;
 }
 
@@ -902,14 +909,14 @@
 .vis-wf-modal .vis-wf-footer-row {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 10px;
 }
 
 .vis-wf-modal .vis-wf-actions {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 10px;
     flex: 1;
     min-width: 0;
@@ -947,11 +954,6 @@
 
 .vis-wf-modal .vis-wf-answer-box:hover {
     box-shadow: 0 0 10px rgba(31, 147, 253, 0.15);
-}
-
-.vis-wf-modal .vis-wf-answer-box.vis-wf-answer-with-menu {
-    border-right: 0;
-    border-radius: 12px 0 0 12px;
 }
 
 .vis-wf-modal .vis-wf-answer-box select,
@@ -1005,37 +1007,6 @@
     font-size: 14px;
     transform: translateY(-50%);
     pointer-events: none;
-}
-
-.vis-wf-modal .vis-wf-answer-menu-section {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #1f93fd;
-    border-left: 0;
-    border-radius: 0 12px 12px 0;
-    background: #FFFFFF;
-}
-
-.vis-wf-modal .vis-wf-answer-menu-section button,
-.vis-wf-modal .vis-wf-answer-menu-section a,
-.vis-wf-modal .vis-wf-answer-menu-section span {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: #1f93fd;
-}
-
-.vis-wf-modal .vis-wf-answer-menu-icon {
-    color: #1f93fd;
-    font-size: 16px;
 }
 
 .vis-wf-modal .vis-w-home-wf-answerBtn {
@@ -1370,8 +1341,7 @@
         padding: 12px;
     }
 
-    .vis-wf-modal .vis-wf-kv-row,
-    .vis-wf-modal .vis-wf-requester {
+    .vis-wf-modal .vis-wf-kv-row {
         align-items: flex-start;
         flex-direction: column;
         gap: 6px;

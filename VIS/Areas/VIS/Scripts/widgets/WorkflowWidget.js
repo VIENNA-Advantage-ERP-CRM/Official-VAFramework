@@ -322,7 +322,35 @@
                 $modal.find('.vis-wf-record-title').text(activityTitle);
             };
 
+            function getRequesterNameFromHistory(info) {
+                if (!info || !info.Node) {
+                    return null;
+                }
+
+                for (var nodeIndex = info.Node.length - 1; nodeIndex >= 0; nodeIndex--) {
+                    var history = info.Node[nodeIndex] && info.Node[nodeIndex].History;
+                    if (!history) {
+                        continue;
+                    }
+
+                    for (var historyIndex in history) {
+                        var item = history[historyIndex];
+                        var approvedBy = item && item.State != 'BK' && item.ApprovedBy;
+                        if (typeof approvedBy == 'string' && approvedBy.trim().length > 0) {
+                            return approvedBy.trim();
+                        }
+                    }
+                }
+
+                return null;
+            };
+
             function getRequesterName(index, info) {
+                var historyRequester = getRequesterNameFromHistory(info);
+                if (historyRequester) {
+                    return historyRequester;
+                }
+
                 var activity = (fulldata && fulldata[index]) ? fulldata[index] : {};
                 var sources = [info || {}, activity];
                 var fields = [
@@ -358,22 +386,9 @@
                 return lbl('VIS_WorkflowIssuer', 'Workflow Issuer');
             };
 
-            function getRequesterInitials(name) {
-                if (!name) {
-                    return 'WF';
-                }
-
-                var words = name.trim().split(/\s+/);
-                if (words.length == 1) {
-                    return words[0].substring(0, 2).toUpperCase();
-                }
-                return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
-            };
-
             function syncRequester(index, info) {
                 var requesterName = getRequesterName(index || 0, info);
                 $modal.find('.vis-wf-requester-name').text(requesterName);
-                $modal.find('.vis-wf-requester-avatar').text(getRequesterInitials(requesterName));
             };
 
             // Populate the description section from fulldata — hide entire section if empty
@@ -451,16 +466,7 @@
                 $ctrlWrap.append($("<label class='vis-wf-answer-label' style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
                 $ctrlWrap.append("<i class='fa fa-chevron-down vis-wf-answer-dropdown-icon'></i>");
 
-                if (ctrl.getBtnCount && ctrl.getBtnCount() > 0) {
-                    $ctrlWrap.addClass('vis-wf-answer-with-menu');
-                    var $ctrlBtnWrap = $("<div class='input-group-append vis-wf-answer-menu-section'>");
-                    $ctrlBtnWrap.append(ctrl.getBtn(0));
-                    $answerInput.append($ctrlWrap).append($ctrlBtnWrap);
-                }
-                else {
-                    $ctrlWrap.addClass('vis-wf-answer-with-menu');
-                    $answerInput.append($ctrlWrap).append("<div class='vis-wf-answer-menu-section vis-wf-answer-menu-static'><i class='fa fa-ellipsis-v vis-wf-answer-menu-icon'></i></div>");
-                }
+                $answerInput.append($ctrlWrap);
 
                 var $okBtn = $("<a href='javascript:void(0)' id='vis-home-wf-ansOK-" + modalId + "' class='vis-wf-submit-btn vis-wf-submit-disabled' role='button' aria-disabled='true' data-clicked='N' data-id='" + index + "'>");
                 $okBtn.append($("<span>").text(VIS.Msg.getMsg('Submit') || 'Submit'));
@@ -634,7 +640,7 @@
                                     </div>
                                     <div class="vis-wf-detail-header" style="display:none;">
                                         <div class="vis-wf-detail-left">
-                                            <div class="vis-wf-record-title">${lbl('VIS_WorkflowActivity', 'Workflow Activity')}</div>
+                                            <span class="vis-wf-requester-meta"><span class="vis-wf-requester-label">${lbl('VIS_Requester', 'Requester')}</span><span class="vis-wf-requester-name"></span></span>
                                             <span class="vis-wf-status"><span class="vis-wf-dot"></span>${lbl('VIS_AwaitingYourApproval', 'Awaiting your approval')}</span>
                                         </div>
                                         <div class="vis-wf-detail-right">
@@ -647,6 +653,7 @@
                                         <section class="vis-wf-detail">
                                             <div class="vis-wf-body">
                                                 <section class="vis-wf-section">
+                                                    <div class="vis-wf-record-title">${lbl('VIS_WorkflowActivity', 'Workflow Activity')}</div>
                                                     <h3 class="vis-wf-section-title">${lbl('VIS_TransactionDetails', 'Transaction details')}</h3>
                                                     <div class="vis-wf-kv">
                                                         <!-- populated dynamically from activity summary -->
@@ -656,13 +663,6 @@
                                                     <h3 class="vis-wf-section-title">${lbl('VIS_Desc', 'Desc')}</h3>
                                                     <div class="vis-wf-description">
                                                         <!-- populated dynamically from activity description -->
-                                                    </div>
-                                                </section>
-                                                <section class="vis-wf-section">
-                                                    <h3 class="vis-wf-section-title">${lbl('VIS_Requester', 'Requester')}</h3>
-                                                    <div class="vis-wf-requester">
-                                                        <div class="vis-wf-requester-avatar">WF</div>
-                                                        <div class="vis-wf-requester-name"></div>
                                                     </div>
                                                 </section>
                                             </div>
@@ -884,6 +884,7 @@
                             var info = res && res.result ? res.result : null;
                             $historyContent.empty();
                             $historyContent.append(flowTitle);
+                            syncRequester(cardIdx, info);
 
                             if (!info || !info.Node) {
                                 $historyContent.append('<div class="vis-wf-ht-loading">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
