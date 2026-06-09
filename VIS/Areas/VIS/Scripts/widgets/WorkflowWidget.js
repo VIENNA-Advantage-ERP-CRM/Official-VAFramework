@@ -235,7 +235,6 @@
                     syncSubmitted(firstIdx);
                     syncDescription(firstIdx);
                     syncRequester(firstIdx);
-                    clearMessage();
                     syncAnswer(firstIdx);
                     loadHistory(firstIdx);
                 }
@@ -389,10 +388,6 @@
                 }
             };
 
-            function clearMessage() {
-                $modal.find('.vis-wf-note textarea').val('');
-            };
-
             function approveAnswer(index, ctrl, $okBtn) {
                 if ($okBtn.data('clicked') == 'Y') {
                     return;
@@ -400,13 +395,13 @@
                 $okBtn.data('clicked', 'Y');
 
                 var answer = ctrl && ctrl.getValue ? ctrl.getValue() : null;
-                if (answer == '' || answer == null) {
+                if (answer == '' || answer == null || answer == -1 || answer == '-1') {
                     $okBtn.data('clicked', 'N');
-                    VIS.ADialog.error('FillMandatory', true, VIS.Msg.getMsg('Answer'));
+                    VIS.ADialog.error('', true, lbl('VIS_PleaseSelectAnswer', 'Please select an answer'));
                     return;
                 }
 
-                var msg = VIS.Utility.encodeText($modal.find('.vis-wf-note textarea').val());
+                var msg = '';
                 showBusy(true);
                 VIS.dataContext.getJSONData(
                     VIS.Application.contextUrl + 'WFActivity/ApproveIt',
@@ -448,33 +443,42 @@
 
                 var $answerWrap = $('<div class="vis-w-home-wf-answerWrap vis-wf-answer-dynamic">');
                 var $answerInput = $('<div class="input-group vis-w-home-wf-answerInput vis-w-input-widgetswrap">');
+                var $forwardBtn = $actions.find('.vis-wf-action-secondary');
                 $answerWrap.append($answerInput);
 
-                if (ctrl.getBtnCount && ctrl.getBtnCount() > 0) {
-                    var $ctrlWrap = $("<div class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0'>");
-                    $ctrlWrap.append(ctrl.getControl());
-                    $ctrlWrap.append($("<label style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
+                var $ctrlWrap = $("<div class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0 vis-wf-answer-box'>");
+                $ctrlWrap.append(ctrl.getControl());
+                $ctrlWrap.append($("<label class='vis-wf-answer-label' style='margin-bottom: 0'>").append(VIS.Msg.getMsg('Answer')));
+                $ctrlWrap.append("<i class='fa fa-chevron-down vis-wf-answer-dropdown-icon'></i>");
 
-                    var $ctrlBtnWrap = $("<div class='input-group-append'>");
+                if (ctrl.getBtnCount && ctrl.getBtnCount() > 0) {
+                    $ctrlWrap.addClass('vis-wf-answer-with-menu');
+                    var $ctrlBtnWrap = $("<div class='input-group-append vis-wf-answer-menu-section'>");
                     $ctrlBtnWrap.append(ctrl.getBtn(0));
                     $answerInput.append($ctrlWrap).append($ctrlBtnWrap);
                 }
                 else {
-                    $answerInput.append(ctrl.getControl());
+                    $ctrlWrap.addClass('vis-wf-answer-with-menu');
+                    $answerInput.append($ctrlWrap).append("<div class='vis-wf-answer-menu-section vis-wf-answer-menu-static'><i class='fa fa-ellipsis-v vis-wf-answer-menu-icon'></i></div>");
                 }
 
-                var $okBtn = $("<a href='javascript:void(0)' style='display:none' id='vis-home-wf-ansOK-" + modalId + "' class='vis-btn vis-btn-done vis-w-icon-doneButton vis-w-workflowActivityIcons' data-clicked='N' data-id='" + index + "'>");
-                $okBtn.append($("<span class='vis vis-markx'>"));
+                var $okBtn = $("<a href='javascript:void(0)' id='vis-home-wf-ansOK-" + modalId + "' class='vis-wf-submit-btn vis-wf-submit-disabled' role='button' aria-disabled='true' data-clicked='N' data-id='" + index + "'>");
+                $okBtn.append($("<span>").text(VIS.Msg.getMsg('Submit') || 'Submit'));
+                $okBtn.append($("<i class='fa fa-check'></i>"));
                 $answerWrap.append($('<div class="vis-w-home-wf-answerBtn">').append($okBtn));
                 $actions.append($answerWrap);
 
                 var toggleAnswerOk = function () {
-                    if (ctrl.getValue() == '' || ctrl.getValue() == null) {
-                        $okBtn.css('display', 'none');
-                    }
-                    else {
-                        $okBtn.css('display', '');
-                    }
+                    var answerValue = ctrl.getValue();
+                    var hasValue = !(answerValue == '' || answerValue == null || answerValue == -1 || answerValue == '-1');
+                    $ctrlWrap.toggleClass('vis-wf-answer-has-value', hasValue);
+                    $okBtn
+                        .toggleClass('vis-wf-submit-disabled', !hasValue)
+                        .toggleClass('vis-wf-submit-ready', hasValue)
+                        .attr('aria-disabled', hasValue ? 'false' : 'true');
+                    $forwardBtn
+                        .toggleClass('vis-wf-forward-disabled', hasValue)
+                        .attr('aria-disabled', hasValue ? 'true' : 'false');
                 };
 
                 ctrl.fireValueChanged = toggleAnswerOk;
@@ -489,6 +493,9 @@
             function syncAnswer(index) {
                 var $actions = $modal.find('.vis-wf-actions');
                 $actions.find('.vis-wf-answer-dynamic').remove();
+                $actions.find('.vis-wf-action-secondary')
+                    .removeClass('vis-wf-forward-disabled')
+                    .attr('aria-disabled', 'false');
 
                 if (!fulldata || !fulldata[index]) {
                     return;
@@ -632,8 +639,8 @@
                                         </div>
                                         <div class="vis-wf-detail-right">
                                             <span class="vis-wf-submitted"></span>
-                                            <button type="button" class="vis-wf-hdr-btn vis-wf-hdr-btn-blue vis-wf-watch" title="${lbl('VIS_Watch', 'Watch')}"><span class="vis-wf-hdr-btn-circle"><i class="fa fa-search-plus"></i></span></button>
-                                            <button type="button" id="${modalId}Close" class="vis-wf-hdr-btn vis-wf-hdr-btn-red" title="${lbl('VIS_Close', 'Close')}"><span class="vis-wf-hdr-btn-circle"><i class="vis vis-close"></i></span></button>
+                                            <button type="button" class="vis-wf-hdr-btn vis-wf-zoom-btn vis-wf-watch" title="${lbl('VIS_Watch', 'Watch')}"><i class="fa fa-search-plus vis-wf-zoom-icon"></i></button>
+                                            <button type="button" id="${modalId}Close" class="vis-wf-hdr-btn vis-wf-close-btn" title="${lbl('VIS_Close', 'Close')}"><span class="vis-wf-close-circle"><i class="vis-wf-close-icon"></i></span></button>
                                         </div>
                                     </div>
                                     <div class="vis-wf-content-body" style="display:none;">
@@ -662,9 +669,8 @@
                                             <div class="vis-wf-footer">
                                                 <div class="vis-wf-forward-panel" style="display:none;"></div>
                                                 <div class="vis-wf-footer-row">
-                                                    <div class="vis-wf-note"><i class="vis vis-chat"></i><textarea class="vis-w-workflow-textarea" placeholder="${lbl('VIS_TypeMessage', 'Please write message')}...." spellcheck="false"></textarea></div>
                                                     <div class="vis-wf-actions">
-                                                        <button type="button" class="vis-wf-action vis-wf-action-secondary"><i class="vis vis-arrow-right"></i>${lbl('VIS_Forward', 'Forward')} <span class="vis-wf-key">F</span></button>
+                                                        <a href="javascript:void(0)" class="vis-wf-action vis-wf-action-secondary"><span>${lbl('VIS_Forward', 'Forward')}</span><i class="fa fa-arrow-right vis-wf-forward-icon"></i></a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -706,7 +712,6 @@
                     syncSubmitted(cardIdx);
                     syncDescription(cardIdx);
                     syncRequester(cardIdx);
-                    clearMessage();
                     syncAnswer(cardIdx);
                     loadHistory(cardIdx);
                 });
@@ -749,6 +754,10 @@
 
                 // Forward button — show forward panel with the user input directly (no extra button click)
                 $modal.on('click', '.vis-wf-action-secondary', function () {
+                    if ($(this).hasClass('vis-wf-forward-disabled')) {
+                        return;
+                    }
+
                     var $fwdPanel = $modal.find('.vis-wf-forward-panel');
                     if ($fwdPanel.is(':visible')) {
                         $fwdPanel.hide().empty();
@@ -799,9 +808,6 @@
                     $actions.append($cancelBtn).append($confirmBtn);
                     $fwdPanel.append($actions);
 
-                    // Clear the shared note textarea each time the forward panel opens
-                    $modal.find('.vis-wf-note textarea').val('');
-
                     // ── Events ────────────────────────────────────────────────────────
                     $cancelBtn.on('click', function () {
                         $fwdPanel.hide().empty();
@@ -813,7 +819,7 @@
                             VIS.ADialog.error('FillMandatory', true, lbl('VIS_Forward', 'Forward'));
                             return;
                         }
-                        var msg = VIS.Utility.encodeText($modal.find('.vis-wf-note textarea').val());
+                        var msg = '';
                         var activityID = fulldata[currentModalCardIdx].AD_WF_Activity_ID;
                         var nID        = fulldata[currentModalCardIdx].AD_Node_ID;
                         var winID      = fulldata[currentModalCardIdx].AD_Window_ID;
