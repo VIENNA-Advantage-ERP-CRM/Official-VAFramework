@@ -74,6 +74,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\DotNetOpenAuth.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Google.Apis, Version=1.2.4640.29187, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\Google.Apis.dll</HintPath>
@@ -113,6 +116,9 @@
     </Reference>
     <Reference Include="itextsharp">
       <HintPath>..\ViennaAdvantageWeb\Dll\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MarketSvc">
+      <HintPath>..\ViennaAdvantageWeb\DLL\MarketSvc.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.4\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -171,6 +177,7 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.3.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
@@ -237,6 +244,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\VIS\Content\AiTokenUses.css" />
     <Content Include="Areas\VIS\Content\BudgetControl.css" />
     <Content Include="Areas\VIS\Content\ClientSetup.css" />
     <Content Include="Areas\VIS\Content\Email.css" />
@@ -715,6 +723,7 @@
     <Content Include="Areas\VIS\Scripts\app\desktopmgr.js" />
     <Content Include="Areas\VIS\Scripts\app\favouritehelper.js" />
     <Content Include="Areas\VIS\Scripts\app\formframe.js" />
+    <Content Include="Areas\VIS\Scripts\app\forms\aiaccounttoken.js" />
     <Content Include="Areas\VIS\Scripts\app\forms\form.js" />
     <Content Include="Areas\VIS\Scripts\app\forms\generatexmodel.js" />
     <Content Include="Areas\VIS\Scripts\app\forms\productcontainer.js" />
@@ -946,6 +955,7 @@
     <Compile Include="Areas\VIS\Helpers\MenuHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\ProcessHelper.cs" />
     <Compile Include="Areas\VIS\Models\AddProductModel.cs" />
+    <Compile Include="Areas\VIS\Models\AITokken.cs" />
     <Compile Include="Areas\VIS\Models\AssignedRecordToUser.cs" />
     <Compile Include="Areas\VIS\Models\BatchUpdateModel.cs" />
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />

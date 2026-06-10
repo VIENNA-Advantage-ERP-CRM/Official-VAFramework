@@ -1,19 +1,31 @@
 ﻿using CoreLibrary.DataBase;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
+using System.Web.Http.Results;
 using System.Web.Mvc;
+using System.Xml.Linq;
 using VAdvantage.Classes;
 using VAdvantage.Controller;
+using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Utility;
+using VIS.Areas.VIS.Models;
 using VIS.Classes;
 using VIS.DataContracts;
 using VIS.Filters;
 using VIS.Helpers;
+using VIS.Models;
 
 namespace VIS.Areas.VIS.Controllers
 {
@@ -22,6 +34,7 @@ namespace VIS.Areas.VIS.Controllers
     [AjaxValidateAntiForgeryToken] // validate antiforgery token 
     public class WindowController : Controller
     {
+       
         // GET: VIS/Window
         public ActionResult Index()
         {
@@ -320,10 +333,142 @@ namespace VIS.Areas.VIS.Controllers
                 data = w.GetWindowRecords(ctxp, Columns, TableName, WhereClause, Encryptedfields, sqlIn, AD_Window_ID,
              AD_Tab_ID, WindowNo, AD_Table_ID, ObscureFields, summaryOnly, MaxRows, DoPaging);
             }
-            var jsonResult =  Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
+            var jsonResult = Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
+        private static VLogger s_log = VLogger.GetVLogger("AITokken");
+        /*  
+          [HttpPost]
+          public async Task<ActionResult> getTokenData(int page,string task_from)
+          {
+             // 
+              try
+              {
 
+                  Ctx ctx = Session["ctx"] as Ctx;
+                  int UID = ctx.GetAD_User_ID();
+                  string domain = ctx.GetContextUrl();
+                  AITokken aITokken = new AITokken();
+
+                  VLogger.Get().Warning("ID=" + UID);
+                  s_log.Info("getTokenData: Context retrieved. User ID=" + UID);
+                  int pageSize = 10;
+                 string userID = "1005376";
+               //  string userID = "1005355";
+
+               string endPoints = "https://demosystemrep.onfinity.cloud/";
+                  //   string endPoints = "https://aiapi.viennaadvantage.com/";
+
+                  s_log.Info(
+              "getTokenData: Preparing payload. Page=" + page +
+              ", PageSize=" + pageSize +
+              ", TaskFrom=" + task_from);
+
+                  var payload = new
+                  {
+                      userID = userID,
+                      endPoints = endPoints,
+                      page = page,
+                      task_from= task_from,
+                      page_size = pageSize
+                  };
+
+                  using (var client = new HttpClient())
+                  using (var request = new HttpRequestMessage(HttpMethod.Post, "http://130.61.36.22:8000/getAgentsLogs"))
+                  {
+                      s_log.Info("getTokenData: Sending request to log service.");
+                      request.Content = new StringContent(
+                          JsonConvert.SerializeObject(payload),
+                          Encoding.UTF8,
+                          "application/json"
+                      );
+
+                      HttpResponseMessage response = await client.SendAsync(request);
+                      s_log.Info("getTokenData: Response received. StatusCode=" + (int)response.StatusCode);
+                      string result = await response.Content.ReadAsStringAsync();
+                      s_log.Info("getTokenData: Response content length=" + result.Length);
+
+                      if (!response.IsSuccessStatusCode)
+                      {
+                          s_log.Severe("getTokenData: API returned error. StatusCode=" + (int)response.StatusCode);
+
+                          Response.StatusCode = (int)response.StatusCode;
+                          return Json(new
+                          {
+                              error = true,
+                              message = result
+                          }, JsonRequestBehavior.AllowGet);
+                      }
+                      s_log.Info("getTokenData: Request completed successfully.");
+                      return Content(result, "application/json");
+                  }
+              }
+              catch (Exception ex)
+              {
+                  s_log.Severe("getTokenData: Exception occurred. " + ex.Message);
+                  Response.StatusCode = 500;
+                  return Json(new
+                  {
+                      error = true,
+                      message = ex.Message
+                  }, JsonRequestBehavior.AllowGet);
+              }
+          }
+  */
+        /// <summary>
+        /// Retrieves token data based on the specified page number and task source.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="task_from"></param>
+        /// <returns> A JSON response containing the requested token data.</returns>
+        [HttpPost]
+        public async Task<ActionResult> getTokenData(int page, string task_from)
+        {
+            try
+            {
+                AITokken aiToken = new AITokken();
+                Ctx ctx = Session["ctx"] as Ctx;
+                string result = await aiToken.GetTokenData(page, task_from, ctx);
+
+                return Content(result, "application/json");
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+
+                return Json(new
+                {
+                    error = true,
+                    message = ex.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        /// <summary>
+        /// Creates a new AI key for the current user.
+        /// </summary>
+        /// <returns> A JSON response containing the created AI key details or an error message if an exception occurs.</returns>
+        [HttpPost]
+        public async Task<ActionResult> createAIKey()
+        {
+            try
+            {
+                AITokken aiToken = new AITokken();
+                Ctx ctx = Session["ctx"] as Ctx;
+                string result = await aiToken.CreateAIKey(ctx);
+
+                return Content(result, "application/json");
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+
+                return Json(new
+                {
+                    error = true,
+                    message = ex.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }

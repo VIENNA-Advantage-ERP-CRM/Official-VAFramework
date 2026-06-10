@@ -117,6 +117,7 @@ import "../widgets/checklist.js";
 import "../widgets/assignedwindowrec.js";
 import "../tabpanels/wfPanel.js";
 import "../app/forms/WorkFlowHttpRequest.js";
+import "../app/forms/aiaccounttoken.js";
 import "../app/Framework/VIS_SecretKeyDialog.js";
 import "../react/shared/VISReactControlsBridge/VISReactControlsBridge.js";
 
