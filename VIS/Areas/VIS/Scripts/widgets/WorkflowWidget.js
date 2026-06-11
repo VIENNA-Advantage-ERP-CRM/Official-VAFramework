@@ -411,7 +411,7 @@
             function clearActivityInfoCache(activityID) {
                 if (activityID) {
                     delete activityInfoCache[activityID];
-                    delete activityInfoPending[activityID];
+                    // intentionally keep activityInfoPending — let any in-flight request complete naturally
                 }
             };
 
@@ -994,23 +994,25 @@
                     // ── Fields ─────────────────────────────────────────────────────────
                     var $fields = $('<div class="vis-wf-fwd-fields">');
 
-                    // Build the lookup control — we only use getControl() (the raw input),
-                    // no buttons are added to the DOM so no extra click is needed.
                     var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, "AD_User.IsLoginUser='Y' AND AD_User.IsActive='Y'");
                     var txtb = new VIS.Controls.VTextBoxButton("AD_User_ID", false, false, true, VIS.DisplayType.Search, lookup);
-                    txtb.getBtn(); // initialise internal state (required), but we won't append the btns
 
                     var $userField = $('<div class="vis-wf-fwd-field">');
                     var $userCtrl = txtb.getControl();
                     $userCtrl.attr('placeholder', lbl('VIS_User', 'User'));
                     $userField.append($userCtrl);
 
-                    // Search icon — clicking it opens the VIS user lookup popup
+                    // VIS buttons MUST be in the DOM for the lookup selection to wire back to getValue()
+                    var btnCount = txtb.getBtnCount ? txtb.getBtnCount() : 0;
+                    for (var bi = 0; bi < btnCount; bi++) {
+                        $userField.append(txtb.getBtn(bi).hide());
+                    }
+
+                    // Search icon — clicking it opens the VIS user lookup popup via the hidden VIS button
                     var $searchBtn = $('<button type="button" class="vis-wf-fwd-field-search-btn" title="' + lbl('VIS_SearchUser', 'Search user') + '">');
                     $searchBtn.append('<i class="fa fa-user"></i>');
                     $searchBtn.on('click', function (e) {
                         e.stopPropagation();
-                        // getBtn(0) is the caret-down button — opens the user lookup dropdown
                         txtb.getBtn(0).trigger('click');
                     });
                     $userField.append($searchBtn);
@@ -1038,6 +1040,7 @@
                         closeForwardPanel();
                     });
 
+                    var capturedIdx = currentModalCardIdx;
                     $confirmBtn.on('click', function () {
                         var fwdTo = txtb.getValue();
                         if (!fwdTo || fwdTo <= 0) {
@@ -1045,9 +1048,9 @@
                             return;
                         }
                         var msg = VIS.Utility.encodeText($noteInput.val() || '');
-                        var activityID = fulldata[currentModalCardIdx].AD_WF_Activity_ID;
-                        var nID        = fulldata[currentModalCardIdx].AD_Node_ID;
-                        var winID      = fulldata[currentModalCardIdx].AD_Window_ID;
+                        var activityID = fulldata[capturedIdx].AD_WF_Activity_ID;
+                        var nID        = fulldata[capturedIdx].AD_Node_ID;
+                        var winID      = fulldata[capturedIdx].AD_Window_ID;
 
                         showModalBusy(true);
                         VIS.dataContext.getJSONData(
@@ -1057,7 +1060,7 @@
                                 showModalBusy(false);
                                 if (info.result == '') {
                                     clearActivityInfoCache(activityID);
-                                    removeCurrentCardAndSelectNext(currentModalCardIdx);
+                                    removeCurrentCardAndSelectNext(capturedIdx);
                                     showModalSnack('success', lbl('VIS_WorkflowDone', 'Workflow done'));
                                 } else {
                                     showModalSnack('error', info.result);
