@@ -197,6 +197,7 @@
             
 
             function filterCards(winNodeVal) {
+                var preferredIndex = arguments.length > 1 ? arguments[1] : null;
                 var $wfList = $modal.find('.vis-wf-list');
                 var $cards = $wfList.find('.vis-wf-card');
                 var $group = $wfList.find('.vis-wf-group');
@@ -221,7 +222,13 @@
 
                 // Re-select first visible card and update detail panel
                 $cards.removeClass('vis-wf-card-selected');
-                var $first = $cards.filter(':visible').first();
+                var $visibleCards = $cards.filter(':visible');
+                var $first = preferredIndex == null ? $visibleCards.first() : $visibleCards.filter(function () {
+                    return $cards.index(this) >= preferredIndex;
+                }).first();
+                if (!$first.length) {
+                    $first = $visibleCards.first();
+                }
                 $first.addClass('vis-wf-card-selected');
                 if ($first.length) {
                     var firstIdx = $cards.index($first); // 0-based index within cards, matches activity container order
@@ -408,6 +415,44 @@
                 }
             };
 
+            function showModalBusy(show) {
+                $modal.toggleClass('vis-wf-modal-busy-on', !!show);
+                $modal.find('.vis-wf-modal-busy').css('display', show ? 'flex' : 'none');
+            };
+
+            function showModalSnack(type, message) {
+                var $snack = $modal.find('.vis-wf-snackbar');
+                window.clearTimeout($snack.data('timer'));
+                $snack
+                    .removeClass('vis-wf-snackbar-success vis-wf-snackbar-error')
+                    .addClass(type == 'error' ? 'vis-wf-snackbar-error' : 'vis-wf-snackbar-success')
+                    .text(message || '')
+                    .show();
+
+                $snack.data('timer', window.setTimeout(function () {
+                    $snack.fadeOut(160);
+                }, 2600));
+            };
+
+            function removeCurrentCardAndSelectNext(oldIndex) {
+                var nextIndex = oldIndex || 0;
+
+                $modal.find('.vis-wf-forward-panel').hide().empty();
+                $modal.find('.vis-wf-footer-row').show();
+                $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(oldIndex).remove();
+                if (fulldata && fulldata.length > oldIndex) {
+                    fulldata.splice(oldIndex, 1);
+                }
+
+                lstDetailCtrls = [];
+                selectedItems = [];
+                syncActivityList();
+                syncCardTitles();
+                syncPendingCount();
+                filterCards($modal.find('#' + modalId + 'WindowSelect').val(), nextIndex);
+                adjust_size();
+            };
+
             function getRequesterNameFromHistory(info) {
                 if (!info || !info.Node) {
                     return null;
@@ -503,7 +548,7 @@
                 }
 
                 var msg = '';
-                showBusy(true);
+                showModalBusy(true);
                 VIS.dataContext.getJSONData(
                     VIS.Application.contextUrl + 'WFActivity/ApproveIt',
                     {
@@ -516,14 +561,13 @@
                     },
                     function (info) {
                         $okBtn.data('clicked', 'N');
-                        showBusy(false);
+                        showModalBusy(false);
                         if (info.result == '') {
                             clearActivityInfoCache(fulldata[index].AD_WF_Activity_ID);
-                            $modal.css('display', 'none');
-                            lstDetailCtrls = [];
-                            selectedItems = [];
-                            adjust_size();
+                            removeCurrentCardAndSelectNext(index);
+                            showModalSnack('success', lbl('VIS_WorkflowDone', 'Workflow done'));
                         } else {
+                            showModalSnack('error', info.result);
                             VIS.ADialog.error(info.result);
                         }
                     }
@@ -586,7 +630,7 @@
 
             function syncAnswer(index) {
                 var $actions = $modal.find('.vis-wf-actions');
-                $actions.find('.vis-wf-answer-dynamic').remove();
+                $actions.find('.vis-wf-answer-dynamic, .vis-wf-answer-loading').remove();
                 $actions.find('.vis-wf-action-secondary')
                     .removeClass('vis-wf-forward-disabled')
                     .attr('aria-disabled', 'false');
@@ -595,11 +639,15 @@
                     return;
                 }
 
+                $actions.append('<div class="vis-wf-answer-loading"><i class="vis_widgetloader"></i></div>');
                 getActivityInfo(index, function (info) {
                     if (index === currentModalCardIdx) {
+                        $actions.find('.vis-wf-answer-loading').remove();
                         syncRequester(index, info);
                         buildAnswer(index, info);
                     }
+                }, function () {
+                    $actions.find('.vis-wf-answer-loading').remove();
                 });
             };
 
@@ -656,7 +704,7 @@
 
             // Populate the KV table from the <pre> summary lines of the selected activity
             function syncDetailKV(index) {
-                var $kvContainer = $modal.find('.vis-wf-kv');
+                var $kvContainer = $modal.find('.vis-wf-detail .vis-wf-section .vis-wf-kv').first();
                 if ($kvContainer.length == 0) return;
 
                 var $pre = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('pre.vis-workflow-pre-cls');
@@ -676,6 +724,82 @@
                 });
             };
 
+            // Load history for a card index into the permanent side panel
+            function loadHistory(cardIdx) {
+                var $historySide = $modal.find('.vis-wf-history-side');
+                var $historyContent = $historySide.find('.vis-wf-history-content');
+                var request = getActivityInfoRequest(cardIdx);
+
+                var flowTitle = '<div class="vis-wf-ht-flow-title">' + lbl('VIS_ViewHistoryRecord', 'View History Record') + '</div>';
+                $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading"><i class="vis_widgetloader"></i><span>' + lbl('VIS_Loading', 'Loading...') + '</span></div>');
+
+                if (!request.activityID) {
+                    $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
+                    return;
+                }
+
+                getActivityInfo(
+                    cardIdx,
+                    function (info) {
+                        if (cardIdx !== currentModalCardIdx) {
+                            return;
+                        }
+
+                        $historyContent.empty();
+                        $historyContent.append(flowTitle);
+                        syncRequester(cardIdx, info);
+
+                        if (!info || !info.Node) {
+                            $historyContent.append('<div class="vis-wf-ht-loading">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
+                            return;
+                        }
+
+                        var $timeline = $('<div class="vis-wf-ht-timeline">');
+                        for (var node in info.Node) {
+                            if (info.Node[node].History == null) continue;
+                            for (var hNode in info.Node[node].History) {
+                                var h = info.Node[node].History[hNode];
+                                if (h.State == 'BK') continue;
+                                var nodeName = info.Node[node].Name || '';
+                                var isCompleted = (h.State == 'CC' && node < (info.Node.length - 1))
+                                               || (node >= (info.Node.length - 1) && info.Node.length > 1);
+
+                                var $item = $('<div class="vis-wf-ht-item">');
+
+                                var $nodeEl = $('<div class="vis-wf-ht-node">');
+                                if (h.TextMsg && h.TextMsg.length > 0) {
+                                    $nodeEl.append($("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(h.TextMsg) + "'></i> "));
+                                }
+                                $nodeEl.append(document.createTextNode(nodeName));
+                                $item.append($nodeEl);
+
+                                var $step = $('<div class="vis-wf-ht-step">');
+                                if (isCompleted) {
+                                    $step.append("<div class='vis-wf-ht-dot vis-wf-ht-dot-check'><i class='vis vis-markx'></i></div>");
+                                } else {
+                                    $step.append("<div class='vis-wf-ht-dot'></div>");
+                                }
+                                $item.append($step);
+
+                                var $status = $('<div class="vis-wf-ht-status">');
+                                if (isCompleted) {
+                                    $status.append('<span class="vis-wf-ht-label">' + VIS.Msg.getMsg('CompletedBy') + '</span><strong class="vis-wf-ht-by">' + VIS.Utility.encodeText(h.ApprovedBy || '') + '</strong>');
+                                } else {
+                                    $status.addClass('vis-wf-ht-pending').text(VIS.Msg.getMsg('Pending'));
+                                }
+                                $item.append($status);
+
+                                $timeline.append($item);
+                            }
+                        }
+                        $historyContent.append($timeline);
+                    },
+                    function () {
+                        $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading" style="color:#e74c3c;">' + lbl('VIS_FailedToLoadHistory', 'Failed to load history.') + '</div>');
+                    }
+                );
+            }
+
             if ($modal.length === 0) {
                 $modal = $(`
                     <div id="${modalId}" class="vis-wf-modal" dir="${modalDir}" style="display:none;">
@@ -686,6 +810,10 @@
                                     <span><strong>${lbl('VIS_Approvals', 'Approvals')}</strong></span>
                                     <span id="${modalId}PendingCount" class="vis-wf-meta"></span>
                                 </div>
+                                <button type="button" id="${modalId}Close" class="vis-wf-close-btn" title="${lbl('VIS_Close', 'Close')}">
+                                    <span class="vis-wf-close-text">${lbl('VIS_Close', 'Close')}</span>
+                                    <span class="vis-wf-close-icon-wrapper"><i class="fa fa-times vis-wf-close-icon"></i></span>
+                                </button>
                             </div>
                             <div class="vis-wf-main">
                                 <aside class="vis-wf-master">
@@ -722,8 +850,10 @@
                                         </div>
                                         <div class="vis-wf-detail-right">
                                             <span class="vis-wf-submitted"></span>
-                                            <button type="button" class="vis-wf-hdr-btn vis-wf-zoom-btn vis-wf-watch" title="${lbl('VIS_Watch', 'Watch')}"><i class="fa fa-search-plus vis-wf-zoom-icon"></i></button>
-                                            <button type="button" id="${modalId}Close" class="vis-wf-hdr-btn vis-wf-close-btn" title="${lbl('VIS_Close', 'Close')}"><span class="vis-wf-close-circle"><i class="vis-wf-close-icon"></i></span></button>
+                                            <button type="button" class="vis-wf-zoom-btn vis-wf-watch" title="${lbl('VIS_Watch', 'Watch')}">
+                                                <span class="vis-wf-zoom-text">${lbl('VIS_Watch', 'Watch')}</span>
+                                                <span class="vis-wf-zoom-circle"><i class="fa fa-search-plus vis-wf-zoom-icon"></i></span>
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="vis-wf-content-body" style="display:none;">
@@ -761,6 +891,8 @@
                         </div>
                     </div>
                 `);
+                $modal.append('<div class="vis-wf-modal-busy" style="display:none;"><div class="vis-wf-modal-busy-inner"><i class="vis_widgetloader"></i></div></div>');
+                $modal.append('<div class="vis-wf-snackbar" style="display:none;"></div>');
                 $('body').append($modal);
                 $modal.on('click', function (e) {
                     if ($(e.target).is($modal)) {
@@ -917,19 +1049,18 @@
                         var nID        = fulldata[currentModalCardIdx].AD_Node_ID;
                         var winID      = fulldata[currentModalCardIdx].AD_Window_ID;
 
-                        showBusy(true);
+                        showModalBusy(true);
                         VIS.dataContext.getJSONData(
                             VIS.Application.contextUrl + 'WFActivity/ApproveIt',
                             { activityID: activityID, nodeID: nID, txtMsg: msg, fwd: fwdTo, answer: null, AD_Window_ID: winID },
                             function (info) {
-                                showBusy(false);
+                                showModalBusy(false);
                                 if (info.result == '') {
                                     clearActivityInfoCache(activityID);
-                                    $modal.css('display', 'none');
-                                    lstDetailCtrls = [];
-                                    selectedItems = [];
-                                    adjust_size();
+                                    removeCurrentCardAndSelectNext(currentModalCardIdx);
+                                    showModalSnack('success', lbl('VIS_WorkflowDone', 'Workflow done'));
                                 } else {
+                                    showModalSnack('error', info.result);
                                     VIS.ADialog.error(info.result);
                                 }
                             }
@@ -942,84 +1073,6 @@
                     setTimeout(function () { $userCtrl.trigger('focus'); }, 80);
                 });
 
-                // Load history for a card index into the permanent side panel
-                function loadHistory(cardIdx) {
-                    var $historySide = $modal.find('.vis-wf-history-side');
-                    var $historyContent = $historySide.find('.vis-wf-history-content');
-                    var request = getActivityInfoRequest(cardIdx);
-
-                    var flowTitle = '<div class="vis-wf-ht-flow-title">' + lbl('VIS_ViewHistoryRecord', 'View History Record') + '</div>';
-                    $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading">' + lbl('VIS_Loading', 'Loading...') + '</div>');
-
-                    if (!request.activityID) {
-                        $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
-                        return;
-                    }
-
-                    getActivityInfo(
-                        cardIdx,
-                        function (info) {
-                            if (cardIdx !== currentModalCardIdx) {
-                                return;
-                            }
-
-                            $historyContent.empty();
-                            $historyContent.append(flowTitle);
-                            syncRequester(cardIdx, info);
-
-                            if (!info || !info.Node) {
-                                $historyContent.append('<div class="vis-wf-ht-loading">' + lbl('VIS_NoHistoryAvailable', 'No history available.') + '</div>');
-                                return;
-                            }
-
-                            var $timeline = $('<div class="vis-wf-ht-timeline">');
-                            for (var node in info.Node) {
-                                if (info.Node[node].History == null) continue;
-                                for (var hNode in info.Node[node].History) {
-                                    var h = info.Node[node].History[hNode];
-                                    if (h.State == 'BK') continue;
-                                    var nodeName = info.Node[node].Name || '';
-                                    var isCompleted = (h.State == 'CC' && node < (info.Node.length - 1))
-                                                   || (node >= (info.Node.length - 1) && info.Node.length > 1);
-
-                                    var $item = $('<div class="vis-wf-ht-item">');
-
-                                    // Left — node name + optional info tooltip
-                                    var $nodeEl = $('<div class="vis-wf-ht-node">');
-                                    if (h.TextMsg && h.TextMsg.length > 0) {
-                                        $nodeEl.append($("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(h.TextMsg) + "'></i> "));
-                                    }
-                                    $nodeEl.append(document.createTextNode(nodeName));
-                                    $item.append($nodeEl);
-
-                                    // Center — dot (check if completed, circle if pending)
-                                    var $step = $('<div class="vis-wf-ht-step">');
-                                    if (isCompleted) {
-                                        $step.append("<div class='vis-wf-ht-dot vis-wf-ht-dot-check'><i class='vis vis-markx'></i></div>");
-                                    } else {
-                                        $step.append("<div class='vis-wf-ht-dot'></div>");
-                                    }
-                                    $item.append($step);
-
-                                    // Right — status text
-                                    var $status = $('<div class="vis-wf-ht-status">');
-                                    if (isCompleted) {
-                                        $status.append('<span class="vis-wf-ht-label">' + VIS.Msg.getMsg('CompletedBy') + '</span><strong class="vis-wf-ht-by">' + VIS.Utility.encodeText(h.ApprovedBy || '') + '</strong>');
-                                    } else {
-                                        $status.addClass('vis-wf-ht-pending').text(VIS.Msg.getMsg('Pending'));
-                                    }
-                                    $item.append($status);
-
-                                    $timeline.append($item);
-                                }
-                            }
-                            $historyContent.append($timeline);
-                        },
-                        function () {
-                            $historyContent.html(flowTitle + '<div class="vis-wf-ht-loading" style="color:#e74c3c;">' + lbl('VIS_FailedToLoadHistory', 'Failed to load history.') + '</div>');
-                        }
-                    );
-                }
             }
 
             $modal.attr('dir', modalDir);
