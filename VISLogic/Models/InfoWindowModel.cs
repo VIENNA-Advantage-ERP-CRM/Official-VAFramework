@@ -340,6 +340,9 @@ namespace VIS.Models
         public InfoData GetData(string tableName, int pageNo, VAdvantage.Utility.Ctx ctx, string selectedIDs
             , bool requery, Info info, string validationCode, List<InfoSearchCol> srchCtrls)
         {
+            // SECURITY: tableName is client-supplied and flows into the FROM/SELECT of the query below.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return new InfoData();
 
             string sql = "SELECT ";
             string colName = null;
@@ -539,7 +542,9 @@ namespace VIS.Models
                             }
                             else
                             {
-                                whereClause += " " + columName + " ='" + fromValue + "'";
+                                // SECURITY: fromValue is the user-entered search value; escape via TO_STRING
+                                // instead of manual quoting. (columName comes from server-side info metadata.)
+                                whereClause += " " + columName + " =" + GlobalVariable.TO_STRING(fromValue);
                             }
 
 

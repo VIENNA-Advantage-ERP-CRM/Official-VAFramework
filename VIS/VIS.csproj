@@ -942,6 +942,7 @@
     <Compile Include="Areas\VIS\Helpers\HomeHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\JsonHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\LoginHelper.cs" />
+    <Compile Include="Areas\VIS\Helpers\LoginTokenStore.cs" />
     <Compile Include="Areas\VIS\Helpers\LookupHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\MenuHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\ProcessHelper.cs" />

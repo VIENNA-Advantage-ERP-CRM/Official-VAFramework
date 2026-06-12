@@ -958,7 +958,8 @@ namespace VIS.Helpers
                     if (isValid && Util.GetValueOfString(dsUser.Tables[0].Rows[0]["TokenKey2FA"]).Trim() == "")
                     {
                         string encKey = SecureEngine.Encrypt(model.Login1Model.TokenKey2FA);
-                        int countUpd = Util.GetValueOfInt(DB.ExecuteQuery(@"UPDATE AD_USER SET TokenKey2FA = '" + encKey + @"' WHERE 
+                        // SECURITY: quote/escape encKey via DB.TO_STRING rather than manual '...' (AD_User_ID is int).
+                        int countUpd = Util.GetValueOfInt(DB.ExecuteQuery(@"UPDATE AD_USER SET TokenKey2FA = " + DB.TO_STRING(encKey) + @" WHERE
                                     AD_USER_ID = " + model.Login1Model.AD_User_ID));
                     }
                 }

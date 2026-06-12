@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 using VAdvantage.Model;
 using VAdvantage.Utility;
+using VIS.Classes;
 using VIS.DBase;
 
 namespace ViennaAdvantageWeb.Areas.VIS.Models
@@ -278,13 +279,15 @@ namespace ViennaAdvantageWeb.Areas.VIS.Models
                 }
             }
 
-            count = DB.ExecuteQuery("DELETE FROM AD_AttachmentLine WHERE AD_AttachmentLine_ID IN (" + AttachmentLines + ")", null, null);
+            // SECURITY: AttachmentLines is a client-supplied CSV id list; sanitize to ints before IN(...)
+            count = DB.ExecuteQuery("DELETE FROM AD_AttachmentLine WHERE AD_AttachmentLine_ID IN (" + QueryValidator.SafeIntList(AttachmentLines) + ")", null, null);
 
             return count;
         }
         public string GetTableName(string TableID)
         {
-            return Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + TableID, null, null));
+            // SECURITY: TableID is a client-supplied string id; coerce to int before concatenation
+            return Util.GetValueOfString(DB.ExecuteScalar("SELECT TableName FROM AD_Table WHERE AD_Table_ID = " + Util.GetValueOfInt(TableID), null, null));
         }
     }
 

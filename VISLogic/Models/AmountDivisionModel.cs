@@ -63,16 +63,24 @@ namespace VIS.Models
 
         public int CheckDuplicate(string dTypeVal, string dAmtId, string acctSchemaId, string dLineId, string dNameVal, string cbPartId)
         {
+            // SECURITY: coerce numeric IDs to int, sanitize id-lists, escape the literal type code. These params
+            // flow into SQL numeric/list/literal contexts below (dTypeVal is also used in C# comparisons, so it
+            // is left intact and coerced inline where used numerically).
+            dAmtId = Util.GetValueOfInt(dAmtId).ToString();
+            dNameVal = Util.GetValueOfInt(dNameVal).ToString();
+            cbPartId = Util.GetValueOfInt(cbPartId).ToString();
+            acctSchemaId = VIS.Classes.QueryValidator.SafeIntList(acctSchemaId);
+            string dTypeValEsc = (dTypeVal ?? "").Replace("'", "''");
             var sql = "select nvl(cline.c_dimamtline_id,0) as DimLineID from c_dimamt cd inner join c_dimamtaccttype cact on cd.c_dimamt_id=cact.c_dimamt_id " +
                     " inner join c_dimamtline cline on cd.c_Dimamt_id=cline.c_dimamt_id and cact.c_dimamtaccttype_id=cline.c_dimamtaccttype_id " +
-                    " where cd.c_dimamt_id=" + dAmtId + " and cact.elementtype='" + dTypeVal + "' and cact.c_acctschema_id in(" + acctSchemaId + ") ";
+                    " where cd.c_dimamt_id=" + dAmtId + " and cact.elementtype='" + dTypeValEsc + "' and cact.c_acctschema_id in(" + acctSchemaId + ") ";
             if (Util.GetValueOfInt(dLineId) > 0)
             {
-                sql += " and cline.c_dimamtline_id not in (" + dLineId + ") ";
+                sql += " and cline.c_dimamtline_id not in (" + VIS.Classes.QueryValidator.SafeIntList(dLineId) + ") ";
             }
             if (DimensionTypeVal == "AC")
             {
-                sql += " and C_ElementValue_ID=" + dTypeVal + " AND NVL(C_BPartner_ID,0)=" + cbPartId;
+                sql += " and C_ElementValue_ID=" + Util.GetValueOfInt(dTypeVal) + " AND NVL(C_BPartner_ID,0)=" + cbPartId;
             }//Account
             else if (dTypeVal == "AY") { sql += " and C_Activity_ID =" + dNameVal; }//Activity
             else if (dTypeVal == "BP") { sql += " and C_BPartner_ID=" + dNameVal; }//BPartner
@@ -92,7 +100,7 @@ namespace VIS.Models
                 }
             }//User List 1//User List 2
             else if (dTypeVal == "X1" || dTypeVal == "X2" || dTypeVal == "X3" || dTypeVal == "X4" || dTypeVal == "X5" || dTypeVal == "X6" ||
-                dTypeVal == "X7" || dTypeVal == "X8" || dTypeVal == "X9") { sql += " and AD_Column_ID=" + dTypeVal; }//User Element 1 to User Element 9
+                dTypeVal == "X7" || dTypeVal == "X8" || dTypeVal == "X9") { sql += " and AD_Column_ID=" + Util.GetValueOfInt(dTypeVal); }//User Element 1 to User Element 9
 
             return Util.GetValueOfInt(DB.ExecuteScalar(sql));
         }
@@ -453,6 +461,7 @@ namespace VIS.Models
 
         public List<JTable> GetDimMaxAmount(string dAmtId)
         {
+            dAmtId = Util.GetValueOfInt(dAmtId).ToString();   // SECURITY: numeric ID
             //             " main where rownum=1";
            
                 var sql = " SELECT distinct ct.totaldimlineamout as amount,ac.name FROM c_dimamtaccttype ct " +
@@ -471,7 +480,7 @@ namespace VIS.Models
 
         public string GetDimAmount(string dAmtId)
         {
-            string sql = "SELECT amount FROM c_dimAmt WHERE c_dimamt_id = " + dAmtId;
+            string sql = "SELECT amount FROM c_dimAmt WHERE c_dimamt_id = " + Util.GetValueOfInt(dAmtId);
             return Util.GetValueOfString(DB.ExecuteScalar(sql));
         }
 
@@ -480,7 +489,7 @@ namespace VIS.Models
             var sql = "SELECT adt.ad_column_id,adt.columnname,adtab.TableName FROM c_acctschema_element ac INNER JOIN ad_column ad ON (ac.ad_column_id=ad.ad_column_id) " +
                 " INNER JOIN ad_column adt ON (ad.ad_table_ID=adt.ad_table_ID AND adt.isactive='Y') " +
                 "  INNER JOIN ad_table adtab ON (adtab.ad_table_id=ad.ad_table_ID) " +
-                " WHERE ac.c_acctschema_id=" + aid + " AND ac.elementtype='" + eType + "' AND adt.isidentifier='Y' order by adt.ad_column_ID";
+                " WHERE ac.c_acctschema_id=" + Util.GetValueOfInt(aid) + " AND ac.elementtype='" + (eType ?? "").Replace("'", "''") + "' AND adt.isidentifier='Y' order by adt.ad_column_ID";
 
             DataSet ds = DB.ExecuteDataset(sql);
             var tblName = "";
@@ -518,7 +527,7 @@ namespace VIS.Models
             // no model class
             for (var j = 0; j < allAcctSchemaID.Count; j++)
             {
-                DB.ExecuteQuery("delete from c_dimamtaccttype where c_acctschema_id=" + allAcctSchemaID[j] + " and c_dimamt_id=" + did + "");
+                DB.ExecuteQuery("delete from c_dimamtaccttype where c_acctschema_id=" + Util.GetValueOfInt(allAcctSchemaID[j]) + " and c_dimamt_id=" + Util.GetValueOfInt(did) + "");
             }
             return "OK";
         }
@@ -532,7 +541,7 @@ namespace VIS.Models
         {
             if (Util.GetValueOfInt(dAcctId) > 0)
             {
-                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT cd.c_acctschema_id FROM c_dimamtaccttype cd INNER JOIN c_dimamtline cl ON (cd.c_dimamtaccttype_id=cl.c_dimamtaccttype_id) WHERE cd.c_dimamt_id=" + dAcctId + ""));
+                return Util.GetValueOfInt(DB.ExecuteScalar("SELECT cd.c_acctschema_id FROM c_dimamtaccttype cd INNER JOIN c_dimamtline cl ON (cd.c_dimamtaccttype_id=cl.c_dimamtaccttype_id) WHERE cd.c_dimamt_id=" + Util.GetValueOfInt(dAcctId) + ""));
             }
             return 0;
         }
@@ -744,7 +753,10 @@ namespace VIS.Models
 
         public string SetDimLine(string dLineId, string dimensionLineID, string acctId, string dAmtId)
         {
-            DB.ExecuteQuery("DELETE FROM c_dimamtline WHERE c_dimamtline_id IN(" + dLineId + ")");
+            // SECURITY: coerce numeric IDs to int and sanitize the id-list used in IN(...).
+            dAmtId = Util.GetValueOfInt(dAmtId).ToString();
+            acctId = Util.GetValueOfInt(acctId).ToString();
+            DB.ExecuteQuery("DELETE FROM c_dimamtline WHERE c_dimamtline_id IN(" + VIS.Classes.QueryValidator.SafeIntList(dLineId) + ")");
             var sql = "SELECT NVL((SUM(cd.amount)),0) AS Amount FROM c_dimamtline cd INNER JOIN c_dimamtaccttype ct ON cd.c_dimamt_id=ct.c_dimamt_id " +
                 " AND cd.c_dimamtaccttype_id=ct.c_dimamtaccttype_id " +
                 " WHERE cd.c_dimamt_id=" + dAmtId + " AND ct.c_acctSchema_id=" + acctId + "";
@@ -792,6 +804,10 @@ namespace VIS.Models
         {
             string qry = null;
             int DimensionId = 0;
+            // SECURITY: columName/tableName are SQL identifiers; value goes into a literal.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(columName) || !VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return 0;
+            value = (value ?? "").Replace("'", "''");
             try
             {
                 qry = "SELECT " + columName + " from " + tableName + "  WHERE  value ='" + value + "' OR Name='" + value + "'";
@@ -815,6 +831,10 @@ namespace VIS.Models
         {
             string qry = null;
             int DimensionId = 0;
+            // SECURITY: columName/tableName are SQL identifiers; value goes into a literal.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(columName) || !VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return 0;
+            value = (value ?? "").Replace("'", "''");
             qry = "SELECT " + tableName + "_ID from " + tableName + "  WHERE  " + columName + " ='" + value + "'";
             DimensionId = Util.GetValueOfInt(DB.ExecuteScalar(qry, null, null));
             return DimensionId;
@@ -836,7 +856,7 @@ namespace VIS.Models
             qry = "select cv.C_ElementValue_ID, ac.C_Element_ID, cv.value || '_' || cv.name AS ElementName from c_acctschema_element ac "
                   + " inner join C_Element ce on ce.C_Element_ID = ac.C_Element_ID"
                   + " inner JOIN c_elementvalue cv on cv.C_Element_ID = ce.C_Element_ID where ac.c_acctschema_id =" + acctschemaid + " AND  "
-                  + " ac.ElementType = '" + type + "'  and cv.Value = '" + value + "'";
+                  + " ac.ElementType = '" + (type ?? "").Replace("'", "''") + "'  and cv.Value = '" + (value ?? "").Replace("'", "''") + "'";
             DataSet dsAccountElement = (DB.ExecuteDataset(qry, null, null));
             if (dsAccountElement != null && dsAccountElement.Tables.Count > 0 && dsAccountElement.Tables[0].Rows.Count > 0)
             {

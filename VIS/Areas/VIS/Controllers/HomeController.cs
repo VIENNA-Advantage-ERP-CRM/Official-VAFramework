@@ -1083,7 +1083,29 @@ namespace VIS.Controllers
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
+
+        [HttpPost]
+        public ActionResult CspReport()
+        {
+            Request.InputStream.Position = 0;
+
+            using (var reader = new StreamReader(Request.InputStream))
+            {
+                string report = reader.ReadToEnd();
+
+                string logPath = Server.MapPath("~/App_Data/csp.log");
+                // AppendAllText does not create missing directories; ensure App_Data exists
+                // (it is not created on a fresh deployment), otherwise the write throws and no log is written.
+                Directory.CreateDirectory(Path.GetDirectoryName(logPath));
+
+                System.IO.File.AppendAllText(
+                    logPath,
+                    DateTime.Now + Environment.NewLine +
+                    report + Environment.NewLine +
+                    "------------------------" + Environment.NewLine);
+            }
+
+            return new HttpStatusCodeResult(204);
+        }
     }
-
-
 }

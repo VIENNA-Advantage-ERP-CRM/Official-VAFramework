@@ -196,6 +196,9 @@ namespace VIS.Models
             string Validation, int Window_ID, string windowName)
         {
             InfoProductData _iData = new InfoProductData();
+            // SECURITY: tableName is client-supplied and flows into the FROM/SELECT of the query below.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return _iData;
             try
             {
                 InfoColumn[] displayCols = GetInfoColumns(ctx);
@@ -255,6 +258,12 @@ namespace VIS.Models
                         {
                             continue;
                         }
+                        // SECURITY: srchCtrls comes straight from the client; ColumnName is used as a SQL
+                        // identifier below. Skip any control whose ColumnName is not a plain identifier.
+                        if (!string.IsNullOrEmpty(srchCtrls[i].ColumnName) && !VIS.Classes.QueryValidator.IsValidIdentifier(srchCtrls[i].ColumnName))
+                        {
+                            continue;
+                        }
                         //if (whereClause.length > 0) {
                         //    whereClause += " AND ";
                         //}
@@ -274,6 +283,12 @@ namespace VIS.Models
                                 srchValue = srchValue + "●";
                             }
                             srchValue = DB.TO_STRING(srchValue);
+                        }
+                        else
+                        {
+                            // SECURITY: non-string values reach the LIKE/literal branches below unescaped
+                            // (the AD_Reference_ID==10 path is escaped via DB.TO_STRING above). Escape quotes.
+                            srchValue = srchValue.Replace("'", "''");
                         }
 
                         if (srchCtrls[i].CtrlColumnName == "Value")

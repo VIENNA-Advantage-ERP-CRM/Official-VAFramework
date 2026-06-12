@@ -537,6 +537,15 @@ namespace VIS.Helpers
             if (queryInfo.Count > 0 || AD_PInstance_ID > 0)
             {
                 string tableName = queryInfo[0];
+                // SECURITY: tableName comes from client (queryInfo JSON) and is concatenated as a SQL identifier; reject non-identifiers before building SQL.
+                if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                {
+                    rep = new ProcessReportInfo();
+                    rep.IsError = true;
+                    rep.ErrorText = "Invalid table name";
+                    res.repInfo = rep;
+                    return res;
+                }
                 if (AD_PInstance_ID > 0)
                 {
                     if ((code).GetType() == typeof(int))	//	Form = one record
@@ -550,7 +559,8 @@ namespace VIS.Helpers
                     string wherClause = queryInfo[1];
                     _query = new Query(tableName);
 
-                    if (!string.IsNullOrEmpty(wherClause))
+                    // SECURITY: wherClause comes from client (queryInfo JSON) and is concatenated into the SQL WHERE; apply keyword denylist guard before use.
+                    if (!string.IsNullOrEmpty(wherClause) && VIS.Classes.QueryValidator.IsValid(wherClause))
                         _query.AddRestriction(wherClause);
                 }
 

@@ -491,9 +491,13 @@ namespace VIS.Models
         /// <returns>true if status not changed</returns>
         private bool CheckStatus(String tableName, int Record_ID, String docStatus)
         {
+            // SECURITY: tableName is client-controlled and used as a SQL identifier; validate before building SQL
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return false;
+            // SECURITY: docStatus is client-controlled and placed inside a single-quoted SQL literal; escape quotes
             String sql = "SELECT COUNT(*) FROM " + tableName
                 + " WHERE " + tableName + "_ID=" + Record_ID
-                + " AND DocStatus='" + docStatus + "'";
+                + " AND DocStatus='" + docStatus.Replace("'", "''") + "'";
             int result = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             return result > 0;
         }

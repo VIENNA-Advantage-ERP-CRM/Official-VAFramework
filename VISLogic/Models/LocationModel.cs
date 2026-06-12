@@ -68,7 +68,8 @@ namespace VIS.Models
                            " WHERE L.IsActive='Y' AND CNTRL.AD_Language='" + ctx.GetAD_Language() + "' ";
             }
 
-            sql += " AND L.c_location_id=" + locationId;
+            // SECURITY: locationId is client-supplied; coerce to int to prevent SQL injection.
+            sql += " AND L.c_location_id=" + Util.GetValueOfInt(locationId);
 
             var ds = new DataSet();
             try
@@ -227,7 +228,8 @@ street
 
             if (Address["region"] != null && Address["region"] != "")
             {
-                string SQL = "SELECT C_REGION_ID FROM C_Region WHERE Upper(Name)='" + Address["region"].ToUpper() + "'";
+                // SECURITY: Address["region"] is client-supplied; escape single quotes inside the SQL literal.
+                string SQL = "SELECT C_REGION_ID FROM C_Region WHERE Upper(Name)='" + Address["region"].ToUpper().Replace("'", "''") + "'";
                 object reginID = DB.ExecuteScalar(SQL);
                 if (reginID != null && reginID != DBNull.Value)
                 {
@@ -241,7 +243,8 @@ street
 
             if (Address["city"] != null && Address["city"] != "")
             {
-                string SQL = "SELECT C_City_ID FROM C_City WHERE Upper(Name)='" + Address["city"].ToUpper() + "'";
+                // SECURITY: Address["city"] is client-supplied; escape single quotes inside the SQL literal.
+                string SQL = "SELECT C_City_ID FROM C_City WHERE Upper(Name)='" + Address["city"].ToUpper().Replace("'", "''") + "'";
                 object cityID = DB.ExecuteScalar(SQL);
                 if (cityID != null && cityID != DBNull.Value)
                 {
@@ -256,7 +259,8 @@ street
 
             if (Address["country"] != null && Address["country"] != "")
             {
-                string SQL = "SELECT C_Country_ID FROM C_Country WHERE Upper(Name)='" + Address["country"].ToUpper() + "'";
+                // SECURITY: Address["country"] is client-supplied; escape single quotes inside the SQL literal.
+                string SQL = "SELECT C_Country_ID FROM C_Country WHERE Upper(Name)='" + Address["country"].ToUpper().Replace("'", "''") + "'";
                 object countryID = DB.ExecuteScalar(SQL);
                 if (countryID != null && countryID != DBNull.Value)
                 {
@@ -280,13 +284,15 @@ street
             // Check applied by mohit - asked by mukesh sir - to check if login langauge is base language - then pick non translated data.
             if (Env.IsBaseLanguage(ctx, ""))
             {
-                sqlquery = " select C_COUNTRY_ID,Name from c_country where IsActive='Y' AND LOWER(name) like LOWER('" + name_startsWith + "%')";
+                // SECURITY: name_startsWith is client-supplied; escape single quotes inside the SQL literal.
+                sqlquery = " select C_COUNTRY_ID,Name from c_country where IsActive='Y' AND LOWER(name) like LOWER('" + name_startsWith.Replace("'", "''") + "%')";
             }
             else
             {
                 // Check applied by mohit - Picked data from translation tab - if base language
                 sqlquery = " SELECT cn.C_COUNTRY_ID,CNTRL.Name FROM c_country cn INNER JOIN C_Country_Trl CNTRL ON (cn.C_Country_ID=CNTRL.C_Country_ID) " +
-                    " WHERE cn.IsActive='Y' AND LOWER(CNTRL.name) like LOWER('" + name_startsWith + "%') AND CNTRL.AD_Language='" + ctx.GetAD_Language() + "'";
+                    // SECURITY: name_startsWith is client-supplied; escape single quotes inside the SQL literal.
+                    " WHERE cn.IsActive='Y' AND LOWER(CNTRL.name) like LOWER('" + name_startsWith.Replace("'", "''") + "%') AND CNTRL.AD_Language='" + ctx.GetAD_Language() + "'";
             }
             var ds = new DataSet();
             ds = DB.ExecuteDataset(sqlquery);
@@ -314,7 +320,8 @@ street
         public List<KeyNamePair> GetStatesByText(string name_startsWith, string countryId)
         {
             List<KeyNamePair> obj = new List<KeyNamePair>();
-            string sqlquery = " select C_REGION_id,Name from C_REGION where IsActive='Y' AND C_COUNTRY_ID=" + countryId + " and LOWER(name) like LOWER('" + name_startsWith + "%')";
+            // SECURITY: countryId and name_startsWith are client-supplied; coerce id to int and escape quotes in the literal.
+            string sqlquery = " select C_REGION_id,Name from C_REGION where IsActive='Y' AND C_COUNTRY_ID=" + Util.GetValueOfInt(countryId) + " and LOWER(name) like LOWER('" + name_startsWith.Replace("'", "''") + "%')";
             var ds = new DataSet();
             ds = DB.ExecuteDataset(sqlquery);
             if (ds != null)
@@ -362,7 +369,8 @@ street
                                     " C_Location.AD_CLIENT_ID,C_Location.AD_ORG_ID,C_Location.C_CITY_ID,C_Location.C_COUNTRY_ID,C_Location.C_LOCATION_ID,C_Location.C_REGION_ID FROM C_Location C_Location" +
                                     " LEFT JOIN C_Country cn on cn.C_COUNTRY_ID=C_Location.C_COUNTRY_ID WHERE C_Location.ISACTIVE='Y'" +
                                     " AND Lower( (NVL(cn.Name,'') ||' '  || NVL(C_Location.ADDRESS1,'')  ||' ' || NVL(C_Location.ADDRESS2,'') ||' ' || NVL(C_Location.ADDRESS3,'')  ||' ' || NVL(C_Location.ADDRESS4,'') ||' ' || NVL(C_Location.CITY,'')" +
-                                   " ||' '  || NVL(C_Location.REGIONNAME,'') ||' ' || NVL(C_Location.POSTAL,'')  ||' '   || NVL(C_Location.POSTAL_ADD,''))) like LOWER ('%" + name_startsWith + "%') AND rownum < 500";
+                                   // SECURITY: name_startsWith is client-supplied; escape single quotes inside the SQL literal.
+                                   " ||' '  || NVL(C_Location.REGIONNAME,'') ||' ' || NVL(C_Location.POSTAL,'')  ||' '   || NVL(C_Location.POSTAL_ADD,''))) like LOWER ('%" + name_startsWith.Replace("'", "''") + "%') AND rownum < 500";
             }
             else
             {
@@ -372,7 +380,8 @@ street
                                     " C_Location.AD_CLIENT_ID,C_Location.AD_ORG_ID,C_Location.C_CITY_ID,C_Location.C_COUNTRY_ID,C_Location.C_LOCATION_ID,C_Location.C_REGION_ID FROM C_Location C_Location" +
                                     " LEFT JOIN C_Country cn on cn.C_COUNTRY_ID=C_Location.C_COUNTRY_ID INNER JOIN C_Country_Trl CNTRL     ON (cn.C_Country_ID=CNTRL.C_Country_ID) WHERE C_Location.ISACTIVE='Y' AND cnTRL.AD_Language='" + ctx.GetAD_Language() + "'" +
                                     " AND Lower((NVL(CNTRL.Name,'')   ||' '  || NVL(C_Location.ADDRESS1,'')  ||' '  || NVL(C_Location.ADDRESS2,'')  ||' '  || NVL(C_Location.ADDRESS3,'')  ||' '  || NVL(C_Location.ADDRESS4,'')  ||' ' " +
-                                    " || NVL(C_Location.CITY,'')  ||' '  || NVL(C_Location.REGIONNAME,'')  ||' '  || NVL(C_Location.POSTAL,'')  ||' '  || NVL(C_Location.POSTAL_ADD,''))) like Lower('%" + name_startsWith + "%')  AND rownum <500";
+                                    // SECURITY: name_startsWith is client-supplied; escape single quotes inside the SQL literal.
+                                    " || NVL(C_Location.CITY,'')  ||' '  || NVL(C_Location.REGIONNAME,'')  ||' '  || NVL(C_Location.POSTAL,'')  ||' '  || NVL(C_Location.POSTAL_ADD,''))) like Lower('%" + name_startsWith.Replace("'", "''") + "%')  AND rownum <500";
             }
             sqlquery = MRole.GetDefault(ctx).AddAccessSQL(sqlquery, "C_Location", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RO);
             //sqlquery = "SELECT * FROM (" + sqlquery + " ) fltr WHERE LOWER(fltr.address) LIKE LOWER('" + name_startsWith + "%') or LOWER(fltr.address) LIKE LOWER('%" + name_startsWith + "%') or LOWER(fltr.address) LIKE LOWER('%" + name_startsWith + "')";
@@ -469,7 +478,8 @@ street
                     {
                         _ds = DB.ExecuteDataset(@"SELECT cnt.C_Country_ID,  cntrl.Name FROM C_Country cnt INNER JOIN C_Country_Trl cntrl ON(cnt.c_country_ID = cntrl.c_country_id)
                                                 INNER JOIN C_Location loc ON(loc.C_Country_ID = cnt.C_Country_ID) INNER JOIN AD_OrgInfo oi ON(loc.C_Location_ID = oi.C_Location_ID) WHERE 
-                                                oi.AD_Org_ID = " + ctx.GetAD_Org_ID() + "  AND CNTRL.AD_Language = '" + AD_language + "'");
+                                                oi.AD_Org_ID = " + ctx.GetAD_Org_ID() + "  AND CNTRL.AD_Language = '" + AD_language.Replace("'", "''") + "'");
+                        // SECURITY: AD_language is client-supplied; escape single quotes inside the SQL literal (above).
                     }
                 }
                 else
@@ -478,13 +488,15 @@ street
                     // Check applied by mohit - asked by mukesh sir - to check if login langauge is base language - then pick non translated data.
                     if (Env.IsBaseLanguage(ctx, ""))
                     {
-                        _ds = DB.ExecuteDataset("SELECT Name , C_Country_ID FROM C_Country WHERE IsActive='Y' AND CountryCode=(SELECT CountryCode FROM AD_Language WHERE IsActive='Y' AND AD_Language='" + AD_language + "')");
+                        // SECURITY: AD_language is client-supplied; escape single quotes inside the SQL literal.
+                        _ds = DB.ExecuteDataset("SELECT Name , C_Country_ID FROM C_Country WHERE IsActive='Y' AND CountryCode=(SELECT CountryCode FROM AD_Language WHERE IsActive='Y' AND AD_Language='" + AD_language.Replace("'", "''") + "')");
                     }
                     else
                     {
                         // Check applied by mohit - Picked data from translation tab - if base language
                         _ds = DB.ExecuteDataset("SELECT CNTRL.Name , CN.C_Country_ID FROM C_Country CN INNER JOIN C_Country_trl CNTRL ON (CN.C_Country_ID=CNTRL.C_Country_ID)" +
-                            " WHERE CN.IsActive='Y' AND CN.CountryCode=(SELECT CountryCode FROM AD_Language WHERE IsActive='Y' AND AD_Language='" + AD_language + "') AND CNTRL.AD_Language='" + AD_language + "'");
+                            // SECURITY: AD_language is client-supplied; escape single quotes inside the SQL literals.
+                            " WHERE CN.IsActive='Y' AND CN.CountryCode=(SELECT CountryCode FROM AD_Language WHERE IsActive='Y' AND AD_Language='" + AD_language.Replace("'", "''") + "') AND CNTRL.AD_Language='" + AD_language.Replace("'", "''") + "'");
                     }
                 }
                 if (_ds != null && _ds.Tables[0].Rows.Count > 0)
