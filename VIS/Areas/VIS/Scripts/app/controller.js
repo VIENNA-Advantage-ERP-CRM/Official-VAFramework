@@ -730,12 +730,14 @@
 
     GridTab.prototype.getIsTPBottomAligned = function () {
         // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
-        return this.tabPanelsBotm.length > 0;
+        // view-aware: a bottom panel bound to another view must not force
+        // bottom-aligned layout (single page scroll) on the current view.
+        return this.getTabPanelsBotm().length > 0;
     };
 
     GridTab.prototype.getIsShowBothTP = function () {
         // return this.vo.TabPanelAlignment == "H" || this.vo.TabPanelAlignment == "B";
-        return this.tabPanelsBotm.length > 0 && this.tabPanelsRght.length > 0;
+        return this.getTabPanelsBotm().length > 0 && this.getTabPanelsRght().length > 0;
     };
 
     GridTab.prototype.getIsTPBottomShowAll = function () {
@@ -1515,7 +1517,7 @@
                 }
                 this.tabPanels.push(gridTabPanel); //all list
                 // view-wise mode is auto-derived: any panel carrying a ViewType
-                // (G/S/C) flips this tab into view-wise rendering. Panels with
+                // (Y/N/C) flips this tab into view-wise rendering. Panels with
                 // empty ViewType still render as legacy/shared across views.
                 if (gridTabPanel.getViewType()) {
                     this._isViewWise = true;
@@ -1581,17 +1583,29 @@
     };
 
     GridTab.prototype.getHasPanel = function () {
+        // view-wise: presence depends on the active view's filtered set; until
+        // a view is set (legacy frame / before activation) keep the raw flag.
+        if (this.isViewWisePanel() && this.activeView)
+            return this.getTabPanels().length > 0;
         return this.hasPanel;
     }
 
+    // View-filtered getters. Without an active view yet (legacy frame /
+    // before activation) fall back to the full lists — old behavior.
     GridTab.prototype.getTabPanels = function () {
-        return this.isViewWisePanel() ? filterPanelsByView(this.tabPanels, this.activeView) : this.tabPanels;
+        return (this.isViewWisePanel() && this.activeView) ? filterPanelsByView(this.tabPanels, this.activeView) : this.tabPanels;
     };
     GridTab.prototype.getTabPanelsBotm = function () {
-        return this.isViewWisePanel() ? filterPanelsByView(this.tabPanelsBotm, this.activeView) : this.tabPanelsBotm;
+        return (this.isViewWisePanel() && this.activeView) ? filterPanelsByView(this.tabPanelsBotm, this.activeView) : this.tabPanelsBotm;
     };
     GridTab.prototype.getTabPanelsRght = function () {
-        return this.isViewWisePanel() ? filterPanelsByView(this.tabPanelsRght, this.activeView) : this.tabPanelsRght;
+        return (this.isViewWisePanel() && this.activeView) ? filterPanelsByView(this.tabPanelsRght, this.activeView) : this.tabPanelsRght;
+    };
+
+    // Unfiltered list — for consumers that must see every panel regardless of
+    // the active view (e.g. checklist/survey validation on save).
+    GridTab.prototype.getAllTabPanels = function () {
+        return this.tabPanels;
     };
 
     GridTab.prototype.isViewWisePanel = function () {
@@ -1599,7 +1613,8 @@
     };
 
     GridTab.prototype.setActiveView = function (v) {
-        // v: 'G' (grid), 'S' (single), 'C' (card)
+        // v: 'Y' (single), 'N' (grid), 'C' (card) — same codes as
+        // AD_Tab.TabLayout / AD_TabPanel.ViewType.
         this.activeView = v;
     };
 

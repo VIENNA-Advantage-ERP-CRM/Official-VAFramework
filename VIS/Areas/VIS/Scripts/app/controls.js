@@ -1213,7 +1213,7 @@
         this.values = null;
         this.isIconSet = true;
 
-        var $img = $("<i style='color:inherit' title='" + text + "'>");
+        var $img = $("<i style='color:inherit;display:none' title='" + text + "'>");
         var $imgSrc = $("<img style='color:inherit;display:none' title='" + text + "' />");
 
         var $txt = $("<span style='color:inherit'>").text(text);

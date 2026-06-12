@@ -2536,8 +2536,15 @@ namespace VIS.Helpers
                     sql = sql + " AND (" + columnName + " NOT IN (" + whereCondition + ") OR " + columnName + " IS NULL) ";
                 }
             }
-
-            return Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            try
+            {
+                return Util.GetValueOfInt(DB.ExecuteScalar(sql));
+            }
+            catch (Exception ex)
+            {
+                log.Severe("Card query err ->" + ex.Message);
+                return 0;
+            }
         }
 
         /// <summary>
