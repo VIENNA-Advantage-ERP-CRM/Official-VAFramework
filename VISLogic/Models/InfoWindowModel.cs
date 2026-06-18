@@ -775,8 +775,11 @@ namespace VIS.Models
             string value = string.Empty;
             while (res.Contains('@'))
             {
-                token = res.Substring(res.IndexOf('@') + 1);
-                token = token.Substring(0, token.IndexOf('@'));
+                int start = res.IndexOf('@');
+                int end = res.IndexOf('@', start + 1);
+                if (end < 0)                       // no closing @ -> nothing more to substitute
+                    break;
+                token = res.Substring(start + 1, end - start - 1);
                 if (token.StartsWith("#"))
                 {
                     value = ctx.GetContext(token);
@@ -785,7 +788,12 @@ namespace VIS.Models
                 {
                     value = ctx.GetContext("#" + token);
                 }
-                res = res.Replace("@" + token + "@", value);
+                if (value == null)
+                    value = string.Empty;
+                // Security: the resolved context value is concatenated into the info
+                // window SQL, so double single quotes to keep it inside its string
+                // literal and prevent SQL injection.
+                res = res.Replace("@" + token + "@", value.Replace("'", "''"));
 
             }
             return res;
@@ -798,7 +806,10 @@ namespace VIS.Models
         /// <returns></returns> info window id.
         public int GetInfoWindowID(string InfoSearchKey)
         {
-            return Util.GetValueOfInt(VAdvantage.DataBase.DB.ExecuteScalar("SELECT AD_InfoWindow_ID FROM AD_InfoWindow WHERE IsActive='Y' AND Value='" + InfoSearchKey + "'", null, null));
+            // Security: InfoSearchKey is caller/user supplied, so escape single quotes
+            // to prevent SQL injection in this string-literal comparison.
+            string safeKey = (InfoSearchKey ?? string.Empty).Replace("'", "''");
+            return Util.GetValueOfInt(VAdvantage.DataBase.DB.ExecuteScalar("SELECT AD_InfoWindow_ID FROM AD_InfoWindow WHERE IsActive='Y' AND Value='" + safeKey + "'", null, null));
         }
 
     }

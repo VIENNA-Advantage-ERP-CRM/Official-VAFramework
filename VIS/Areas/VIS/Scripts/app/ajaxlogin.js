@@ -531,10 +531,15 @@
     };
 
     function autoLogin(val) {
+        // Auto-login by link: the password is held server-side and resolved from the
+        // hidden #loginToken; only the username is present in the page. (Legacy links
+        // may still carry user^Y^password, so keep splitting for back-compat.)
         var arr = val.split('^Y^');
 
         $txtUser.val(arr[0]);
-        $txtPwd.val(arr[1]);
+        if (arr.length > 1) {
+            $txtPwd.val(arr[1]);
+        }
         $btnLogin1.submit();
     };
 

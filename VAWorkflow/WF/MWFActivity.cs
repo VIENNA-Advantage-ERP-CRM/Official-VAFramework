@@ -4718,25 +4718,30 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
                 }
 
                 token = inStr.Substring(0, j);
+                // Security: the result of ParseCustomQuery is executed as SQL
+                // (DB.ExecuteScalar(txt)). The substituted values are raw PO field
+                // values and client/org names that may contain single quotes (user
+                // editable / free text), so double quotes to keep them inside their
+                // string literal and prevent SQL injection.
                 if (token == "Tenant")
                 {
                     int id = po.GetAD_Client_ID();
-                    outStr.Append(DB.ExecuteScalar("Select Name FROM AD_Client WHERE AD_Client_ID=" + id));
+                    outStr.Append(EscapeSqlLiteral(Util.GetValueOfString(DB.ExecuteScalar("Select Name FROM AD_Client WHERE AD_Client_ID=" + id))));
                 }
                 else if (token == "Org")
                 {
                     int id = po.GetAD_Org_ID();
-                    outStr.Append(DB.ExecuteScalar("Select Name FROM AD_ORG WHERE AD_ORG_ID=" + id));
+                    outStr.Append(EscapeSqlLiteral(Util.GetValueOfString(DB.ExecuteScalar("Select Name FROM AD_ORG WHERE AD_ORG_ID=" + id))));
                 }
                 else if (token == "BPName")
                 {
                     if (po.Get_TableName() == "C_BPartner")
-                        outStr.Append(ParseVariable("Name", po));
+                        outStr.Append(EscapeSqlLiteral(ParseVariable("Name", po)));
                     else
                         outStr.Append("@" + token + "@");
                 }
                 else
-                    outStr.Append(ParseVariable(token, po));		// replace context
+                    outStr.Append(EscapeSqlLiteral(ParseVariable(token, po)));		// replace context
                 inStr = inStr.Substring(j + 1);
                 // from second @
                 i = inStr.IndexOf("@");
@@ -4744,6 +4749,15 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
 
             outStr.Append(inStr);           					//	add remainder
             return outStr.ToString();
+        }
+
+        /// <summary>
+        /// Escape a substituted value for safe embedding inside a SQL string literal
+        /// by doubling single quotes. Null/empty is passed through.
+        /// </summary>
+        private static string EscapeSqlLiteral(string value)
+        {
+            return string.IsNullOrEmpty(value) ? value : value.Replace("'", "''");
         }
 
         private string SaveActionLog(string emailto, Trx trxname)

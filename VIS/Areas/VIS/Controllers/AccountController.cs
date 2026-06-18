@@ -203,6 +203,19 @@ namespace VIS.Controllers
                     {
                         password = model.Login1Model.Password;
                     }
+                    else if (string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(model.Login1Model.LoginToken))
+                    {
+                        // Auto-login by link: the password was stored server-side keyed by
+                        // the one-time LoginToken (HomeController), never sent to the client.
+                        // Resolve it here, validating the token belongs to this username.
+                        LoginTokenStore.LoginSecrets autoSecrets = LoginTokenStore.Get(model.Login1Model.LoginToken);
+                        if (autoSecrets != null
+                            && !string.IsNullOrEmpty(model.Login1Model.UserValue)
+                            && string.Equals(autoSecrets.UserValue, model.Login1Model.UserValue, StringComparison.Ordinal))
+                        {
+                            password = autoSecrets.Password;
+                        }
+                    }
                     //If value 0, then step1
                     // If value 2, then final login
                     //if value 1, then attemp login 1.
