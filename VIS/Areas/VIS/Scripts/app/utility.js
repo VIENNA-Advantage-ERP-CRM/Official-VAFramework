@@ -672,6 +672,7 @@
             //    value = tabNo;
             //    tabNo = 0;
             //}
+            var ignoreUnparsable = false;
 
             var resultData = [];
 
@@ -706,6 +707,8 @@
 
                 //ctxInfo = ctx.getWindowContext(windowNo, tabNo, token, onlyWindow);	// get context
                 ctxInfo = record[token.toLowerCase()];
+                if (!ctxInfo)
+                    ctxInfo = '';
 
                 if (ctxInfo.length == 0 && (token.startsWith("#") || token.startsWith("$")))
                     ctxInfo = ctx.getContext(token);	// get global context
