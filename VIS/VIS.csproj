@@ -74,9 +74,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\DotNetOpenAuth.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
     <Reference Include="Google.Apis, Version=1.2.4640.29187, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\Dll\Google.Apis.dll</HintPath>
@@ -117,7 +114,8 @@
     <Reference Include="itextsharp">
       <HintPath>..\ViennaAdvantageWeb\Dll\itextsharp.dll</HintPath>
     </Reference>
-    <Reference Include="MarketSvc">
+    <Reference Include="MarketSvc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ViennaAdvantageWeb\DLL\MarketSvc.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -229,6 +227,13 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="VAI01">
+      <HintPath>..\ViennaAdvantageWeb\DLL\VAI01.dll</HintPath>
+    </Reference>
+    <Reference Include="VAModelAD, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ViennaAdvantageWeb\DLL\VAModelAD.dll</HintPath>
+    </Reference>
     <Reference Include="WebGrease, Version=1.5.2.14234, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
@@ -1097,10 +1102,6 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VAModelAD\VAModelAD.csproj">
-      <Project>{ef955712-f147-4a6a-8d11-8fecc5fe3942}</Project>
-      <Name>VAModelAD</Name>
-    </ProjectReference>
     <ProjectReference Include="..\VISLogic\VISLogic.csproj">
       <Project>{ae558aa6-c414-462f-935e-cd705baf2db8}</Project>
       <Name>VISLogic</Name>

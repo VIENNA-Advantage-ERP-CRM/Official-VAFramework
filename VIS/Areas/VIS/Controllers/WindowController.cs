@@ -337,85 +337,7 @@ namespace VIS.Areas.VIS.Controllers
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
-        private static VLogger s_log = VLogger.GetVLogger("AITokken");
-        /*  
-          [HttpPost]
-          public async Task<ActionResult> getTokenData(int page,string task_from)
-          {
-             // 
-              try
-              {
-
-                  Ctx ctx = Session["ctx"] as Ctx;
-                  int UID = ctx.GetAD_User_ID();
-                  string domain = ctx.GetContextUrl();
-                  AITokken aITokken = new AITokken();
-
-                  VLogger.Get().Warning("ID=" + UID);
-                  s_log.Info("getTokenData: Context retrieved. User ID=" + UID);
-                  int pageSize = 10;
-                 string userID = "1005376";
-               //  string userID = "1005355";
-
-               string endPoints = "https://demosystemrep.onfinity.cloud/";
-                  //   string endPoints = "https://aiapi.viennaadvantage.com/";
-
-                  s_log.Info(
-              "getTokenData: Preparing payload. Page=" + page +
-              ", PageSize=" + pageSize +
-              ", TaskFrom=" + task_from);
-
-                  var payload = new
-                  {
-                      userID = userID,
-                      endPoints = endPoints,
-                      page = page,
-                      task_from= task_from,
-                      page_size = pageSize
-                  };
-
-                  using (var client = new HttpClient())
-                  using (var request = new HttpRequestMessage(HttpMethod.Post, "http://130.61.36.22:8000/getAgentsLogs"))
-                  {
-                      s_log.Info("getTokenData: Sending request to log service.");
-                      request.Content = new StringContent(
-                          JsonConvert.SerializeObject(payload),
-                          Encoding.UTF8,
-                          "application/json"
-                      );
-
-                      HttpResponseMessage response = await client.SendAsync(request);
-                      s_log.Info("getTokenData: Response received. StatusCode=" + (int)response.StatusCode);
-                      string result = await response.Content.ReadAsStringAsync();
-                      s_log.Info("getTokenData: Response content length=" + result.Length);
-
-                      if (!response.IsSuccessStatusCode)
-                      {
-                          s_log.Severe("getTokenData: API returned error. StatusCode=" + (int)response.StatusCode);
-
-                          Response.StatusCode = (int)response.StatusCode;
-                          return Json(new
-                          {
-                              error = true,
-                              message = result
-                          }, JsonRequestBehavior.AllowGet);
-                      }
-                      s_log.Info("getTokenData: Request completed successfully.");
-                      return Content(result, "application/json");
-                  }
-              }
-              catch (Exception ex)
-              {
-                  s_log.Severe("getTokenData: Exception occurred. " + ex.Message);
-                  Response.StatusCode = 500;
-                  return Json(new
-                  {
-                      error = true,
-                      message = ex.Message
-                  }, JsonRequestBehavior.AllowGet);
-              }
-          }
-  */
+       
         /// <summary>
         /// Retrieves token data based on the specified page number and task source.
         /// </summary>
@@ -425,10 +347,10 @@ namespace VIS.Areas.VIS.Controllers
         [HttpPost]
         public async Task<ActionResult> getTokenData(int page, string task_from)
         {
+            Ctx ctx = Session["ctx"] as Ctx;
             try
             {
                 AITokken aiToken = new AITokken();
-                Ctx ctx = Session["ctx"] as Ctx;
                 string result = await aiToken.GetTokenData(page, task_from, ctx);
 
                 return Content(result, "application/json");
@@ -440,7 +362,7 @@ namespace VIS.Areas.VIS.Controllers
                 return Json(new
                 {
                     error = true,
-                    message = ex.Message
+                    message = Msg.GetMsg(ctx, "VIS_UnableCreateKey")
                 }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -451,12 +373,11 @@ namespace VIS.Areas.VIS.Controllers
         [HttpPost]
         public async Task<ActionResult> createAIKey()
         {
+            Ctx ctx = Session["ctx"] as Ctx;
             try
             {
                 AITokken aiToken = new AITokken();
-                Ctx ctx = Session["ctx"] as Ctx;
                 string result = await aiToken.CreateAIKey(ctx);
-
                 return Content(result, "application/json");
             }
             catch (Exception ex)
@@ -466,7 +387,7 @@ namespace VIS.Areas.VIS.Controllers
                 return Json(new
                 {
                     error = true,
-                    message = ex.Message
+                    message = Msg.GetMsg(ctx, "VIS_UnableToRetrieveData")
                 }, JsonRequestBehavior.AllowGet);
             }
         }

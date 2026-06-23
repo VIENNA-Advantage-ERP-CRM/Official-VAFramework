@@ -686,11 +686,11 @@
                 dataType: 'json',
                 data: JSON.stringify({
                  //   userID: API_USER_ID,
-                    //  endPoints: API_ENDPOINT,
+                 //  endPoints: API_ENDPOINT,
                     task_from: taskFrom,
                     page: currentPage,
-                  //  counter: 1,
-                   // page_size: pageSize
+                 //  counter: 1,
+                 // page_size: pageSize
                 }),
                 success: function (data) {
                     data = data || {};
@@ -767,7 +767,7 @@
             var $btn = $root.find('.aci-create-key-action');
 
             $btn.prop('disabled', true)
-                .html('<span class="aci-spinner"></span> Creating...');
+               .html('<span class="aci-spinner"></span> Creating...');
 
             $errorBanner.hide();
 

@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Google.Apis.Requests;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -15,6 +17,20 @@ namespace VIS.Areas.VIS.Models
     public class AITokken
     {
         private static VLogger s_log = VLogger.GetVLogger("AITokken");
+        //AIApiService.InitAIEndPoint(ctx.GetContext("#AppFullUrl"));
+
+        private static readonly HashSet<string> AllowedTaskFromValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+        "All",
+        "AIAssistant",
+        "AIOrchestration",
+        "DMS",
+        "Aura"
+        };
+        private static readonly HttpClient _httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(30)
+        };
 
         /// <summary>
         /// Get token data accroding to the user and endpoint. 
@@ -23,17 +39,25 @@ namespace VIS.Areas.VIS.Models
         /// <param name="taskFrom">The source from which the task originated</param>
         /// <param name="ctx">The current user context</param>
         /// <returns>A JSON string containing the token data returned by the AI service.</returns>
+       
         public async Task<string> GetTokenData(int page, string taskFrom, Ctx ctx)
         {
+            string baseUrl = "";
+            int pageSize = 10;
             try
             {
-               //  string userID = "1005355";
-                // string endPoints = "https://aiapi.viennaadvantage.com/";
+                string link= VAModelAD.AIHelper.AIApiService.InitAIEndPoint(ctx.GetContext("#AppFullUrl"));
+                if (link == "S")
+                {
+                    baseUrl = ConfigurationManager.AppSettings["AgentServiceBaseUrlS"];
+                }
+                else
+                {
+                    baseUrl = ConfigurationManager.AppSettings["AgentServiceBaseUrlL"];
+                }
+                string endpoint = ConfigurationManager.AppSettings["GetAgentsLogsEndpoint"];
+                string apiUrl = baseUrl + endpoint;
 
-                int pageSize = 10;
-                //string userID = "1005376";
-                //string userID = "1005338";
-                //string endPoints = "https://demosystemrep.onfinity.cloud/";
                 int userID = ctx.GetAD_User_ID();
                 string endPoints = ctx.GetContext("#AppFullUrl");
                 s_log.Info(
@@ -41,6 +65,20 @@ namespace VIS.Areas.VIS.Models
                     ", PageSize=" + pageSize +
                     ", TaskFrom=" + taskFrom);
 
+                if (page < 1)
+                {
+                    throw new ArgumentException("Invalid page number.", nameof(page));
+                }
+                if (string.IsNullOrWhiteSpace(taskFrom))
+                {
+                    throw new ArgumentException("Invalid task source.", nameof(taskFrom));
+                }
+                taskFrom = taskFrom.Trim();
+                if (!AllowedTaskFromValues.Contains(taskFrom))
+                {
+                    throw new ArgumentException("Invalid task source.", nameof(taskFrom));
+                }
+                 
                 var payload = new
                 {
                     userID = userID,
@@ -52,10 +90,8 @@ namespace VIS.Areas.VIS.Models
                 //jwt tokken 
                 string jwtToken = await GetJwtToken();
 
-                using (var client = new HttpClient())
-                using (var request = new HttpRequestMessage(HttpMethod.Post, "http://130.61.36.22:8000/getAgentsLogs"))
+                using (var request = new HttpRequestMessage(HttpMethod.Post, apiUrl))
                 {
-
                     // Attach JWT token to Authorization header
                     request.Headers.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwtToken);
@@ -65,59 +101,54 @@ namespace VIS.Areas.VIS.Models
                         Encoding.UTF8,
                         "application/json");
 
-                    HttpResponseMessage response = await client.SendAsync(request);
-
-                    s_log.Info(
-                        "GetTokenData: Response StatusCode=" +
-                        (int)response.StatusCode);
-
-                    string result = await response.Content.ReadAsStringAsync();
-
-                    if (!response.IsSuccessStatusCode)
+                    using (HttpResponseMessage response = await _httpClient.SendAsync(request))
                     {
-                        s_log.Severe(
-                            "GetTokenData: API returned error. StatusCode=" +
+                        s_log.Info(
+                            "GetTokenData: Response StatusCode=" +
                             (int)response.StatusCode);
 
-                        throw new Exception(result);
+                        string result = await response.Content.ReadAsStringAsync();
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            s_log.Severe(
+                                "GetTokenData: API returned error. StatusCode=" +
+                                (int)response.StatusCode);
+                            throw new Exception(Msg.GetMsg(ctx, "VIS_UnableToRetrieveData"));
+                        }
+
+                        s_log.Info("GetTokenData: Request completed successfully.");
+
+                        return result;
                     }
-
-                    s_log.Info("GetTokenData: Request completed successfully.");
-
-                    return result;
                 }
             }
             catch (Exception ex)
             {
                 s_log.Severe("GetTokenData: " + ex.Message);
-                throw;
+
+                throw new Exception( Msg.GetMsg(ctx,"VIS_UnableToRetrieveData"));
             }
         }
-
         /// <summary>
         /// Creates an AI key by invoking the GenerateAIKey service and returns the generated key information.
         /// </summary>
         /// <param name="ctx"> The current user context</param>
         /// <returns> A Json containig </returns>
+      
         public async Task<string> CreateAIKey(Ctx ctx)
         {
             try
-            {
+            {  
+                string baseUrl = ConfigurationManager.AppSettings["GenerateAIKeyUrl"];
                 s_log.Info("createAIKey: Request received.");
 
                 string jwToken = MarketSvc.ServiceEndPoint.GetAuthToken();
                 string userDomainName = ctx.GetContext("#AppFullUrl");
                 string accessKey = MarketSvc.Classes.Utility.GetCustomerAccessKey();
-               // string accessKey = "7a3ff18538e2ef751e2ee23d0289844bf60c065b02a927839760f2fdbed4264bd95758876a866a665644ed217a4d1a80";
-                
-               // string userDomainName = "https://aiapi.viennaadvantage.com/";
-               //  string userDomainName = "https://demosystemrep.onfinity.cloud/";
 
-                string url =
-                    "https://cloudservice.softwareonthecloud.com/Service.asmx/GenerateAIKey" +
-                    "?userDomainName=" + Uri.EscapeDataString(userDomainName);
+                string url = baseUrl + "?userDomainName=" + Uri.EscapeDataString(userDomainName);
 
-                using (var client = new HttpClient())
                 using (var request = new HttpRequestMessage(HttpMethod.Get, url))
                 {
                     s_log.Info("createAIKey: Sending request to GenerateAIKey service.");
@@ -125,67 +156,61 @@ namespace VIS.Areas.VIS.Models
                     request.Headers.Add("authToken", jwToken);
                     request.Headers.Add("accessKey", accessKey);
 
-                    HttpResponseMessage response = await client.SendAsync(request);
-
-                    s_log.Info(
-                        "createAIKey: Response received. StatusCode=" +
-                        (int)response.StatusCode);
-
-                    string result = await response.Content.ReadAsStringAsync();
-
-                    s_log.Info(
-                        "createAIKey: Response content length=" +
-                        result.Length);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        s_log.Severe(
-                            "createAIKey: API returned error. StatusCode=" +
-                            (int)response.StatusCode);
-
-                        throw new Exception(result);
-                    }
-
-                    XDocument doc = XDocument.Parse(result);
-                    string jsonString = doc.Root.Value;
-
-                    JObject jsonObj = JObject.Parse(jsonString);
-
-                    bool isAIKeyExist = jsonObj["IsAIKeyExist"]?.Value<bool>() ?? false;
-                    decimal totalToken = jsonObj["TotalToken"]?.Value<decimal>() ?? 0;
-                    decimal consumedToken = jsonObj["ConsumedToken"]?.Value<decimal>() ?? 0;
-                    decimal pendingToken = jsonObj["PendingToken"]?.Value<decimal>() ?? 0;
-                    string aiKeySuffix = jsonObj["AIKeySuffix"]?.ToString();
-
-                    if (!string.IsNullOrEmpty(aiKeySuffix))
+                    using (HttpResponseMessage response = await _httpClient.SendAsync(request))
                     {
                         s_log.Info(
-                            "createAIKey: IsAIKeyExist=" + isAIKeyExist +
-                            ", TotalToken=" + totalToken +
-                            ", ConsumedToken=" + consumedToken +
-                            ", PendingToken=" + pendingToken +
-                            ", AIKeySuffix=" + aiKeySuffix);
-                    }
-                    else
-                    {
-                        s_log.Warning(
-                            "createAIKey: AIKeySuffix not created. " +
-                            "IsAIKeyExist=" + isAIKeyExist +
-                            ", TotalToken=" + totalToken +
-                            ", ConsumedToken=" + consumedToken +
-                            ", PendingToken=" + pendingToken);
-                    }
+                            "createAIKey: Response received. StatusCode=" +
+                            (int)response.StatusCode);
 
-                    return jsonString;
+                        string result = await response.Content.ReadAsStringAsync();
+
+                        s_log.Info(
+                            "createAIKey: Response content length=" +
+                            result.Length);
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            s_log.Severe(
+                                "createAIKey: API returned error. StatusCode=" +
+                                (int)response.StatusCode);
+
+                            throw new Exception(Msg.GetMsg(ctx, "VIS_UnableCreateKey"));
+                        }
+
+                        XDocument doc = XDocument.Parse(result);
+                        string jsonString = doc.Root.Value;
+
+                        JObject jsonObj = JObject.Parse(jsonString);
+
+                        bool isAIKeyExist = jsonObj["IsAIKeyExist"]?.Value<bool>() ?? false;
+                        decimal totalToken = jsonObj["TotalToken"]?.Value<decimal>() ?? 0;
+                        decimal consumedToken = jsonObj["ConsumedToken"]?.Value<decimal>() ?? 0;
+                        decimal pendingToken = jsonObj["PendingToken"]?.Value<decimal>() ?? 0;
+                        string aiKeySuffix = jsonObj["AIKeySuffix"]?.ToString();
+
+                        if (!string.IsNullOrEmpty(aiKeySuffix))
+                        {
+                            s_log.Info(
+                                "createAIKey: IsAIKeyExist=" + isAIKeyExist +
+                                ", AIKeySuffix=" + aiKeySuffix);
+                        }
+                        else
+                        {
+                            s_log.Warning(
+                                "createAIKey: AIKeySuffix not created. " +
+                                "IsAIKeyExist=" + isAIKeyExist);
+                        }
+
+                        return jsonString;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 s_log.Severe("createAIKey: Exception occurred. " + ex.Message);
-                throw;
+                throw new Exception(Msg.GetMsg(ctx,"VIS_UnableCreateKey"));
             }
         }
-
         private async Task<string> GetJwtToken()
         {
             try
@@ -233,5 +258,7 @@ namespace VIS.Areas.VIS.Models
                 throw;
             }
         }
+
+       
     }
 }
