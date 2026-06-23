@@ -816,6 +816,7 @@
     <Content Include="Areas\VIS\Scripts\F20\aviewcontroller.js" />
     <Content Include="Areas\VIS\Scripts\F20\atabbedpanemgr.js" />
     <Content Include="Areas\VIS\Scripts\F20\vlandingpage.js" />
+    <Content Include="Areas\VIS\Scripts\F20\vlistview.js" />
     <Content Include="Areas\VIS\Scripts\home\home.js" />
     <Content Include="Areas\VIS\Scripts\home\usersession.js" />
     <Content Include="Areas\VIS\Scripts\F20\themecnfgtr.js" />

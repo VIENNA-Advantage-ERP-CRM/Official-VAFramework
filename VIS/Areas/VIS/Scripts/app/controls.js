@@ -6606,8 +6606,23 @@
         var validation = null;
         var validationData = [];
 
+        // Card "static content" via style-logic syntax: when ColSql is a conditional
+        // expression (e.g. @IsActive@='Y' ? 'Active' : 'Inactive') instead of a SQL
+        // statement, evaluate it from the record on the client so we don't round-trip
+        // to the DB. Falls through to the normal SQL/static handling otherwise.
+        if (this.needtoParse && records && !$.isEmptyObject(records) && this.isStyleLogicExpr(this.colSql)) {
+            var staticVal = this.evaluateStyleLogicFromRecord(this.colSql, records);
+            staticVal = (staticVal == null) ? "" : staticVal;
+            if (isHTML) {
+                this.ctrl.html(staticVal);
+            } else {
+                this.ctrl.text(staticVal);
+            }
+            return;
+        }
+
         if (this.needtoParse) {
-            if (records && !$.isEmptyObject(records)) { // parse sql query with records 
+            if (records && !$.isEmptyObject(records)) { // parse sql query with records
                 validationData = VIS.Env.parseSQLFromRecords(this.colSql, records);
                 for (var i = 0; i < validationData.length > 0; i++) {
                     this.colSql = this.colSql.replace('@' + validationData[i].Key + '@', validationData[i].Value);
@@ -6689,6 +6704,69 @@
             //    }
             //});
         }
+    };
+
+    /**
+     * Detect a card "static content" style-logic expression (vs a real SQL statement).
+     * Form: <logic> ? <trueValue> [: <falseValue>] [, <logic> ? ... ]
+     * e.g. @IsActive@='Y' ? 'Active' : 'Inactive'
+     * Such an expression is evaluated on the client from the record, avoiding a DB round trip.
+     */
+    VKeyText.prototype.isStyleLogicExpr = function (expr) {
+        return !!expr && expr.indexOf('?') > -1 && expr.toLowerCase().indexOf('select') == -1;
+    };
+
+    /**
+     * Evaluate a style-logic expression against a record and return the resolved static content.
+     * Conditions are evaluated with VIS.Evaluator (supports = ! ^ < > and &/| ); values may be
+     * quoted literals or @ColumnName@ references resolved from the same record.
+     * Returns null when no clause matches and no false/default value is given.
+     */
+    VKeyText.prototype.evaluateStyleLogicFromRecord = function (expr, records) {
+        var source = {
+            getValueAsString: function (variable) {
+                var v = records[('' + variable).toLowerCase()];
+                return (v === null || v === undefined) ? "" : ('' + v);
+            }
+        };
+        var resolveValue = function (s) {
+            s = (s == null ? "" : ('' + s)).trim();
+            if (s.length >= 2 &&
+                ((s.charAt(0) == "'" && s.charAt(s.length - 1) == "'") ||
+                 (s.charAt(0) == '"' && s.charAt(s.length - 1) == '"'))) {
+                return s.substring(1, s.length - 1); // quoted literal
+            }
+            if (s.indexOf('@') > -1) { // allow the value to reference another record field
+                s = s.replace(/@([^@]+)@/g, function (m, col) { return source.getValueAsString(col); });
+            }
+            return s;
+        };
+
+        var clauses = expr.split(',');
+        for (var c = 0; c < clauses.length; c++) {
+            var clause = clauses[c];
+            var qIdx = clause.indexOf('?');
+            if (qIdx == -1) {
+                return resolveValue(clause); // bare value acts as a default
+            }
+            var cond = clause.substring(0, qIdx);
+            var rest = clause.substring(qIdx + 1);
+            var colonIdx = rest.indexOf(':');
+            var trueVal = (colonIdx == -1) ? rest : rest.substring(0, colonIdx);
+            var falseVal = (colonIdx == -1) ? null : rest.substring(colonIdx + 1);
+            var matched = false;
+            try {
+                matched = VIS.Evaluator.evaluateLogic(source, cond);
+            } catch (e) {
+                matched = false;
+            }
+            if (matched) {
+                return resolveValue(trueVal);
+            } else if (falseVal != null) {
+                return resolveValue(falseVal);
+            }
+        }
+        return null;
     };
 
     VKeyText.prototype.getValue = function () {
