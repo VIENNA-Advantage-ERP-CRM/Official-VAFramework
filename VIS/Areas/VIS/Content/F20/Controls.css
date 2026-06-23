@@ -438,7 +438,7 @@ button.vis-ev-col-img-ctrl:focus,
 
 .vis-ad-w-p-vc-editview .vis-control-wrap > button.vis-ev-col-wrap-button:hover {
     border: 2px solid rgba(var(--v-c-on-secondary), 0.8) !important; /*06-01-2025*/
-    color: rgba(var(--v-c-on-secondary), 0.8) !important; /*06-01-2025*/
+    //color: color-mix(in srgb, currentColor 50%, transparent); /*06-01-2025*/
 }
 
 .vis-ad-w-p-vc-editview .vis-control-wrap > button.vis-ev-col-wrap-button:focus {
