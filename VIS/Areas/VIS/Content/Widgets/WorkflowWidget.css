@@ -253,8 +253,8 @@
     color: #748494;
     font-size: 11px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 .vis-wf-modal .vis-wf-card {
@@ -671,8 +671,8 @@
     color: #748494;
     font-size: 11px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
+    text-transform: none;
+    letter-spacing: 0;
     text-decoration: none;
 }
 
@@ -794,15 +794,15 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: #C0392B;
+    background: rgba(var(--v-c-primary), 1);
     flex-shrink: 0;
 }
 
 .vis-wf-modal .vis-wf-ht-dot-check {
     width: 22px;
     height: 22px;
-    background: #C0392B;
-    color: #FFFFFF;
+    background: rgba(var(--v-c-primary), 1);
+    color: rgba(var(--v-c-on-primary), 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -814,7 +814,7 @@
     content: '';
     flex: 1;
     width: 2px;
-    background: #C0392B;
+    background: rgba(var(--v-c-primary), 1);
     margin-top: 4px;
     min-height: 16px;
 }
@@ -830,7 +830,7 @@
 }
 
 .vis-wf-modal .vis-wf-ht-pending {
-    color: #C0392B;
+    color: rgba(var(--v-c-primary), 1);
     font-weight: 700;
 }
 
@@ -1105,6 +1105,22 @@
     font-size: 14px;
     transform: translateY(-50%);
     pointer-events: none;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-answer-box select,
+.vis-wf-modal[dir="rtl"] .vis-wf-answer-box input {
+    padding: 0 14px 0 44px;
+    text-align: right;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-answer-label {
+    right: 14px;
+    left: auto;
+}
+
+.vis-wf-modal[dir="rtl"] .vis-wf-answer-dropdown-icon {
+    right: auto;
+    left: 14px;
 }
 
 .vis-wf-modal .vis-w-home-wf-answerBtn {
@@ -1554,6 +1570,21 @@
     .vis-wf-modal .vis-wf-answer-dropdown-icon {
         right: 9px;
         font-size: 11px;
+    }
+
+    .vis-wf-modal[dir="rtl"] .vis-wf-answer-box select,
+    .vis-wf-modal[dir="rtl"] .vis-wf-answer-box input {
+        padding: 0 9px 0 28px;
+    }
+
+    .vis-wf-modal[dir="rtl"] .vis-wf-answer-label {
+        right: 9px;
+        left: auto;
+    }
+
+    .vis-wf-modal[dir="rtl"] .vis-wf-answer-dropdown-icon {
+        right: auto;
+        left: 9px;
     }
 
     .vis-wf-modal .vis-wf-submit-btn {
