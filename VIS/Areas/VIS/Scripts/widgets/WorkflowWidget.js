@@ -220,6 +220,7 @@
                     // Build inline KV rows from the pre summary text
                     var preText = $(this).find('pre.vis-workflow-pre-cls').text().trim();
                     var kvHtml = buildKVHtml(preText);
+                    var dateText = $(this).find('.vis-w-feedDateTime').text().trim();
 
                     $wfList.append(
                         '<div class="vis-wf-card' + (index == 0 ? ' vis-wf-card-selected' : '') + '" role="button" tabindex="0" data-winnode="' + winNodeKey + '">'
@@ -228,6 +229,7 @@
                         + '    <span class="vis-wf-id">WF-' + (index + 1) + '</span>'
                         + '  </div>'
                         + (kvHtml ? '<div class="vis-wf-kv vis-wf-card-kv">' + kvHtml + '</div>' : '')
+                        + (dateText ? '<span class="vis-wf-time">' + VIS.Utility.encodeText(dateText) + '</span>' : '')
                         + '</div>'
                     );
                 });
@@ -642,10 +644,12 @@
                 var $forwardBtn = $actions.find('.vis-wf-action-secondary');
                 $answerWrap.append($answerInput);
 
-                var $ctrlWrap = $("<div class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0 vis-wf-answer-box'>");
-                $ctrlWrap.append(ctrl.getControl());
-                $ctrlWrap.append($("<label class='vis-wf-answer-label' style='margin-bottom: 0'>").append(lbl('Answer', 'Answer')));
-                $ctrlWrap.append("<i class='fa fa-chevron-down vis-wf-answer-dropdown-icon'></i>");
+                var $ctrlWrap = $("<fieldset class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0 vis-wf-answer-box'>");
+                var $selectWrap = $("<div class='vis-wf-answer-select-wrap'>");
+                $ctrlWrap.append($("<legend class='vis-wf-answer-label'>").append(lbl('Answer', 'Answer')));
+                $selectWrap.append(ctrl.getControl());
+                $selectWrap.append("<i class='fa fa-chevron-down vis-wf-answer-dropdown-icon'></i>");
+                $ctrlWrap.append($selectWrap);
 
                 $answerInput.append($ctrlWrap);
 
@@ -658,7 +662,6 @@
                 var toggleAnswerOk = function () {
                     var answerValue = ctrl.getValue();
                     var hasValue = !(answerValue == '' || answerValue == null || answerValue == -1 || answerValue == '-1');
-                    $ctrlWrap.toggleClass('vis-wf-answer-has-value', hasValue);
                     $okBtn
                         .toggleClass('vis-wf-submit-disabled', !hasValue)
                         .toggleClass('vis-wf-submit-ready', hasValue)

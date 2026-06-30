@@ -4,6 +4,7 @@
    ============================================================ */
 
 .vis-wf-modal {
+    --vis-wf-theme-surface: rgba(var(--v-c-primary), .03);
     position: fixed;
     top: 0;
     left: 0;
@@ -625,11 +626,6 @@
     color: rgba(var(--v-c-primary), 1);
     cursor: pointer;
     flex-shrink: 0;
-    transition: transform 0.2s ease;
-}
-
-.vis-wf-modal .vis-wf-zoom-btn:hover {
-    transform: scale(1.02);
 }
 
 .vis-wf-modal .vis-wf-zoom-text {
@@ -650,8 +646,19 @@
 }
 
 .vis-wf-modal .vis-wf-zoom-icon {
+    width: 12px;
+    height: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     color: rgba(var(--v-c-on-primary), 1);
     font-size: 12px;
+    line-height: 1;
+    transform: translateY(-1px);
+}
+
+.vis-wf-modal .vis-wf-zoom-icon:before {
+    display: block;
     line-height: 1;
 }
 
@@ -726,13 +733,14 @@
     display: flex;
     flex-direction: column;
     border-left: 1px solid rgba(var(--v-c-primary), .22);
-    background: rgba(var(--v-c-primary), .03);
+    background: var(--vis-wf-theme-surface);
     overflow: hidden;
 }
 
 .vis-wf-modal .vis-wf-history-side .vis-wf-history-content {
     flex: 1;
     overflow-y: auto;
+    background: var(--vis-wf-theme-surface);
 }
 
 /* ── History timeline items ─────────────────────────────────── */
@@ -852,7 +860,7 @@
     margin: 0;
     padding: 18px 18px 10px;
     box-sizing: border-box;
-    background: #D1E1EB;
+    background: var(--vis-wf-theme-surface);
 }
 
 .vis-wf-modal .vis-wf-fwd-header-title {
@@ -959,8 +967,8 @@
     padding: 0 14px;
     border: none;
     border-radius: 10px;
-    background: #2fc49f;
-    color: #FFFFFF;
+    background: rgba(var(--v-c-primary), 1);
+    color: rgba(var(--v-c-on-primary), 1);
     font-family: Roboto, Arial, sans-serif;
     font-size: 13px;
     font-weight: 400;
@@ -971,6 +979,7 @@
 }
 
 .vis-wf-modal .vis-wf-fwd-confirm i {
+    color: rgba(var(--v-c-on-primary), 1);
     font-size: 12px;
 }
 
@@ -989,36 +998,42 @@
 }
 
 .vis-wf-modal .vis-wf-footer {
-    background: #FFFFFF;
+    background: var(--vis-wf-theme-surface);
     flex-shrink: 0;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
 }
 
 .vis-wf-modal .vis-wf-footer-row {
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 10px;
-    margin-bottom: 0.7rem;
+    margin-bottom: 0;
 }
 
 .vis-wf-modal .vis-wf-actions {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 10px;
     flex: 1;
     min-width: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    width: 100%;
+    margin-inline: 18px;
 }
 
 .vis-wf-modal .vis-wf-answer-dynamic {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-end;
+    justify-content: flex-end;
     gap: 8px;
     flex: 0 1 auto;
     min-width: 220px;
-    margin: 0;
+    margin-inline-start: auto;
     flex-wrap: nowrap;
 }
 
@@ -1032,21 +1047,24 @@
 }
 
 .vis-wf-modal .vis-wf-answer-dynamic .vis-w-home-wf-answerInput {
-    width: min(320px, 100%);
+    width: clamp(220px, 32vw, 280px);
     min-width: 220px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .vis-wf-modal .vis-wf-answer-box {
     width: 100%;
-    height: 42px;
+    min-width: 0;
+    height: 46px;
     position: relative;
     display: flex;
     align-items: center;
-    overflow: hidden;
+    padding: 0 12px;
+    margin: 0;
+    overflow: visible;
     border: 1px solid rgba(var(--v-c-primary), 1);
-    border-radius: 12px;
+    border-radius: 14px;
     background: #FFFFFF;
 }
 
@@ -1054,12 +1072,18 @@
     box-shadow: 0 0 10px rgba(var(--v-c-primary), .15);
 }
 
+.vis-wf-modal .vis-wf-answer-select-wrap {
+    position: relative;
+    width: 100%;
+    margin-top: -2px;
+}
+
 .vis-wf-modal .vis-wf-answer-box select,
 .vis-wf-modal .vis-wf-answer-box input {
     width: 100%;
-    height: 100%;
+    height: 28px;
     min-height: 0;
-    padding: 0 44px 0 14px;
+    padding: 0 36px 0 10px;
     border: 0;
     outline: 0;
     background: transparent;
@@ -1081,25 +1105,21 @@
 }
 
 .vis-wf-modal .vis-wf-answer-label {
-    position: absolute;
-    left: 14px;
-    top: 50%;
+    display: block;
+    width: auto;
+    max-width: calc(100% - 24px);
     margin: 0;
-    transform: translateY(-50%);
-    color: #3f3f3f;
-    font-size: 14px;
-    font-weight: 400;
+    padding: 0 6px;
+    color: rgba(var(--v-c-primary), 1);
+    font-size: 13px;
+    font-weight: 600;
     line-height: 1;
-    pointer-events: none;
-}
-
-.vis-wf-modal .vis-wf-answer-has-value .vis-wf-answer-label {
-    display: none;
+    white-space: nowrap;
 }
 
 .vis-wf-modal .vis-wf-answer-dropdown-icon {
     position: absolute;
-    right: 14px;
+    right: 2px;
     top: 50%;
     color: rgba(var(--v-c-primary), 1);
     font-size: 14px;
@@ -1109,18 +1129,13 @@
 
 .vis-wf-modal[dir="rtl"] .vis-wf-answer-box select,
 .vis-wf-modal[dir="rtl"] .vis-wf-answer-box input {
-    padding: 0 14px 0 44px;
+    padding: 0 10px 0 36px;
     text-align: right;
-}
-
-.vis-wf-modal[dir="rtl"] .vis-wf-answer-label {
-    right: 14px;
-    left: auto;
 }
 
 .vis-wf-modal[dir="rtl"] .vis-wf-answer-dropdown-icon {
     right: auto;
-    left: 14px;
+    left: 2px;
 }
 
 .vis-wf-modal .vis-w-home-wf-answerBtn {
@@ -1130,7 +1145,7 @@
 
 .vis-wf-modal .vis-wf-submit-btn {
     width: 92px;
-    height: 42px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1212,6 +1227,7 @@
     text-decoration: none;
     transition: opacity 0.2s ease;
     flex: 0 0 auto;
+    margin-inline-end: auto;
 }
 
 .vis-wf-modal .vis-wf-action-secondary:hover,
@@ -1390,18 +1406,18 @@
     }
 
     .vis-wf-modal .vis-wf-footer-row {
-        align-items: stretch;
-        flex-direction: column;
+        align-items: center;
+        flex-direction: row;
     }
 
     .vis-wf-modal .vis-wf-actions {
-        justify-content: center;
-        flex-wrap: wrap;
+        justify-content: space-between;
+        flex-wrap: nowrap;
     }
 
     .vis-wf-modal .vis-wf-answer-dynamic {
         flex: 0 1 auto;
-        justify-content: center;
+        justify-content: flex-end;
     }
 
     .vis-wf-modal[dir="rtl"] .vis-wf-main {
@@ -1513,14 +1529,15 @@
     }
 
     .vis-wf-modal .vis-wf-footer {
-        padding: 10px;
+        padding: 8px 10px;
+        min-height: 66px;
     }
 
     .vis-wf-modal .vis-wf-actions {
         width: 100%;
         gap: 6px;
         flex-wrap: nowrap;
-        justify-content: center;
+        justify-content: space-between;
     }
 
     .vis-wf-modal .vis-wf-action-secondary {
@@ -1539,6 +1556,7 @@
         min-width: 0;
         max-width: 100%;
         flex-shrink: 1;
+        margin-inline-start: auto;
     }
 
     .vis-wf-modal .vis-wf-answer-loading {
@@ -1552,39 +1570,36 @@
     }
 
     .vis-wf-modal .vis-wf-answer-box {
-        height: 34px;
-        border-radius: 9px;
+        height: 40px;
+        padding: 0 9px;
+        border-radius: 12px;
     }
 
     .vis-wf-modal .vis-wf-answer-box select,
     .vis-wf-modal .vis-wf-answer-box input {
-        padding: 0 28px 0 9px;
+        height: 24px;
+        padding: 0 28px 0 8px;
         font-size: 11.5px;
     }
 
     .vis-wf-modal .vis-wf-answer-label {
-        left: 9px;
         font-size: 11.5px;
+        padding: 0 5px;
     }
 
     .vis-wf-modal .vis-wf-answer-dropdown-icon {
-        right: 9px;
+        right: 1px;
         font-size: 11px;
     }
 
     .vis-wf-modal[dir="rtl"] .vis-wf-answer-box select,
     .vis-wf-modal[dir="rtl"] .vis-wf-answer-box input {
-        padding: 0 9px 0 28px;
-    }
-
-    .vis-wf-modal[dir="rtl"] .vis-wf-answer-label {
-        right: 9px;
-        left: auto;
+        padding: 0 8px 0 28px;
     }
 
     .vis-wf-modal[dir="rtl"] .vis-wf-answer-dropdown-icon {
         right: auto;
-        left: 9px;
+        left: 1px;
     }
 
     .vis-wf-modal .vis-wf-submit-btn {
