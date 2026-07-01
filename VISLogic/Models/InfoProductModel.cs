@@ -946,11 +946,11 @@ namespace VIS.Models
                         if (RefNo != "")
                         {
                             if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
-                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
+                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo.Replace("'", "''") + "'");
                             else if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt) || windowName == "VAS_MaterialReceipt")
-                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'N' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
+                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'N' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo.Replace("'", "''") + "'");
                             else
-                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
+                                _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo.Replace("'", "''") + "'");
                         }
                         else if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
                             _sqlQuery.Append("SELECT C_Order_ID FROM M_InOut WHERE IsActive = 'Y' AND IsSOTrx = 'Y' AND M_InOut_ID = " + recordID);
@@ -1006,12 +1006,12 @@ namespace VIS.Models
                                 {
                                     if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
                                         _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID()
-                                            + " AND DocumentNo = '" + RefNo + "'");
+                                            + " AND DocumentNo = '" + RefNo.Replace("'", "''") + "'");
                                     else if (WindowID == Util.GetValueOfInt(Windows.MaterialReceipt) || windowName == "VAS_MaterialReceipt")
                                         _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND IsSOTrx= 'N' AND AD_Client_ID =" + ctx.GetAD_Client_ID()
-                                            + " AND DocumentNo = '" + RefNo + "'");
+                                            + " AND DocumentNo = '" + RefNo.Replace("'", "''") + "'");
                                     else
-                                        _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo + "'");
+                                        _sqlQuery.Append("SELECT C_Order_ID FROM C_Order WHERE IsActive = 'Y' AND AD_Client_ID =" + ctx.GetAD_Client_ID() + " AND DocumentNo = '" + RefNo.Replace("'", "''") + "'");
                                 }
                                 else if (WindowID == Util.GetValueOfInt(Windows.Shipment) || windowName == "VAS_DeliveryOrder")
                                     _sqlQuery.Append("SELECT C_Order_ID FROM M_InOut WHERE IsActive = 'Y' AND IsSOTrx = 'Y' AND M_InOut_ID = " + recordID);
@@ -1993,19 +1993,22 @@ namespace VIS.Models
             MAttributeSetInstance _mast = MAttributeSetInstance.Get(Env.GetCtx(), 0, M_Product_ID);
             if (!string.IsNullOrEmpty(attributeNo))
             {
-                qry = "SELECT M_AttributeSetInstance_ID FROM M_ProductAttributes WHERE M_Product_ID = " + M_Product_ID + "AND UPC = '" + attributeNo + "'";
+                // SECURITY: attributeNo is client-supplied (from the comma-split 'fields' request param); escape quotes.
+                qry = "SELECT M_AttributeSetInstance_ID FROM M_ProductAttributes WHERE M_Product_ID = " + M_Product_ID + " AND UPC = '" + attributeNo.Replace("'", "''") + "'";
                 attrID = Util.GetValueOfInt(DB.ExecuteScalar(qry));
                 if (attrID == 0)
                 {
                     if (isLot == "Y")
                     {
                         _mast.SetLot(attributeNo);
-                        sql.Append("UPPER(Lot) = " + attributeNo.ToUpper());
+                        // SECURITY: client-supplied attributeNo must be a quoted, escaped string literal (was unquoted -> injectable + malformed).
+                        sql.Append("UPPER(Lot) = '" + attributeNo.ToUpper().Replace("'", "''") + "'");
                     }
                     else if (IsSerNo == "Y")
                     {
                         _mast.SetSerNo(attributeNo);
-                        sql.Append(" UPPER(SerNo) = " + attributeNo.ToUpper());
+                        // SECURITY: client-supplied attributeNo must be a quoted, escaped string literal (was unquoted -> injectable + malformed).
+                        sql.Append(" UPPER(SerNo) = '" + attributeNo.ToUpper().Replace("'", "''") + "'");
                     }
                     _mast.SetDescription(attributeNo);
                     if (IsGuaranteeDate == "Y")

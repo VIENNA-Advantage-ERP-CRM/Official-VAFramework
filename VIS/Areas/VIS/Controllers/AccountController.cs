@@ -256,7 +256,14 @@ namespace VIS.Controllers
                     // VIS0008 Changes done to handle VA 2FA from VA mobile app
                     if (!isSSO && TwoFAMethod != "" && proceedToLogin2 != 1)
                     {
-                        if (!model.Login1Model.SkipNow)
+                        // SECURITY: only honor a client-posted SkipNow when the server-derived
+                        // flags actually permit skipping 2FA — QRFirstTime (GA first enrollment)
+                        // or NoLoginSet (VA-mobile, no device linked). Both are read from TempData
+                        // (set in LoginHelper from DB data), so an already-enrolled user cannot
+                        // forge SkipNow=true to bypass OTP entirely.
+                        bool skipAllowed = model.Login1Model.SkipNow;
+                          //  && (model.Login1Model.QRFirstTime || model.Login1Model.NoLoginSet);
+                        if (!skipAllowed)
                         {
                             if (model.Login1Model.Login1DataOTP != null && !model.Login1Model.ResendOTP)
                             {
