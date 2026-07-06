@@ -527,12 +527,14 @@ namespace VIS.Models
                             if (i == 0 || sql.Length == 0)
                             {
                                 sql.Append("SELECT DISTINCT cg.C_GenAttributeSetInstance_ID FROM C_GenAttributeInstance cg");
-                                where.Append(" WHERE cg.IsActive='Y' AND (upper(cg.VALUE)=upper('").Append(value).Append("') AND cg.C_GenAttribute_ID=").Append(attributes[i].GetC_GenAttribute_ID() + ")");
+                                // SECURITY: client-supplied attribute value placed in single-quoted SQL literal; escape single quotes
+                                where.Append(" WHERE cg.IsActive='Y' AND (upper(cg.VALUE)=upper('").Append(value.Replace("'", "''")).Append("') AND cg.C_GenAttribute_ID=").Append(attributes[i].GetC_GenAttribute_ID() + ")");
                             }
                             else if (i > 0 && sql.Length > 0)
                             {
                                 sql.Append(" JOIN C_GenAttributeInstance cg" + i + " ON cg" + i + ".C_GenAttributeSetInstance_ID = cg.C_GenAttributeSetInstance_ID AND cg" + i + ".IsActive='Y'");
-                                sql.Append(" AND (upper(cg" + i + ".VALUE)=upper('").Append(value).Append("') AND cg" + i + ".C_GenAttribute_ID=").Append(attributes[i].GetC_GenAttribute_ID() + ")");
+                                // SECURITY: client-supplied attribute value placed in single-quoted SQL literal; escape single quotes
+                                sql.Append(" AND (upper(cg" + i + ".VALUE)=upper('").Append(value.Replace("'", "''")).Append("') AND cg" + i + ".C_GenAttribute_ID=").Append(attributes[i].GetC_GenAttribute_ID() + ")");
                             }
 
                             description.Append(value + "_");

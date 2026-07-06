@@ -618,6 +618,12 @@ namespace VIS.Controllers
         private string GetCustomerLanguage(int tableID, int record_ID, string tableName)
         {
             string lang = "";
+            // SECURITY: tableName is concatenated as a SQL identifier; reject anything that is not one.
+            // (record_ID is int.) Note: this private method currently has no callers.
+            if (!QueryValidator.IsValidIdentifier(tableName))
+            {
+                return lang;
+            }
             try
             {
                 lang = Util.GetValueOfString(DB.ExecuteScalar("SELECT AD_Language FROM C_BPartner WHERE C_BPartner_ID=(SELECT C_BPartner_ID FROM " + tableName + " WHERE " + tableName + "_ID=" + record_ID + ")"));
@@ -937,13 +943,15 @@ namespace VIS.Controllers
                     {
                         strMetaId = strDocIds[j].Split('-');
                         Ctx ctx = Session["ctx"] as Ctx;
-                        string sql1 = "Select count(dlink.VADMS_WindowDocLink_ID) FROM VADMS_WindowDocLink dlink INNER JOIN vadms_attachmetadata amd ON (amd.VADMS_WindowDocLink_ID = dlink.VADMS_WindowDocLink_ID) where dlink.AD_Table_ID=" + tableID + " AND dlink.record_ID=" + recID + " AND dlink.AD_Window_ID=" + winID + " AND dlink.VADMS_Document_ID=" + strMetaId[0] + " AND amd.VADMS_MetaData_ID=" + strMetaId[1];
+                        // SECURITY: strMetaId values come from client-supplied docID (split on ',' then '-'); coerce to int before concatenation.
+                        string sql1 = "Select count(dlink.VADMS_WindowDocLink_ID) FROM VADMS_WindowDocLink dlink INNER JOIN vadms_attachmetadata amd ON (amd.VADMS_WindowDocLink_ID = dlink.VADMS_WindowDocLink_ID) where dlink.AD_Table_ID=" + tableID + " AND dlink.record_ID=" + recID + " AND dlink.AD_Window_ID=" + winID + " AND dlink.VADMS_Document_ID=" + Util.GetValueOfInt(strMetaId[0]) + " AND amd.VADMS_MetaData_ID=" + Util.GetValueOfInt(strMetaId[1]);
                         int count = Convert.ToInt32(DB.ExecuteScalar(sql1));
                         if (count > 0)
                         {
                             return Json(JsonConvert.SerializeObject("NotSaved"), JsonRequestBehavior.AllowGet);
                         }
-                        string sql = "Select VADMS_WindowDocLink_ID from VADMS_WindowDocLink where AD_Table_ID=" + tableID + " AND record_ID=" + recID + " AND AD_Window_ID=" + winID + " AND VADMS_Document_ID=" + strMetaId[0];
+                        // SECURITY: strMetaId[0] comes from client-supplied docID; coerce to int before concatenation.
+                        string sql = "Select VADMS_WindowDocLink_ID from VADMS_WindowDocLink where AD_Table_ID=" + tableID + " AND record_ID=" + recID + " AND AD_Window_ID=" + winID + " AND VADMS_Document_ID=" + Util.GetValueOfInt(strMetaId[0]);
                         int ID = Convert.ToInt32(DB.ExecuteScalar(sql));
                         if (ID > 0)
                         {
@@ -1129,6 +1137,10 @@ namespace VIS.Controllers
             string pColumnName = res.GetColumnName();
             string keyCol = lInfo.keyColumn;
             string tblColName = Convert.ToString(json.columnName);
+            // SECURITY: columnName and pTableName are client-supplied and get concatenated into SQL as
+            // identifiers (which cannot be bind parameters). Reject anything that is not a plain identifier.
+            if (!QueryValidator.IsValidIdentifier(tblColName) || !QueryValidator.IsValidIdentifier(pTableName))
+                return null;
             if (pColumnName.IndexOf(".") > -1)
             {
                 pColumnName = pColumnName.Substring(pColumnName.IndexOf(".") + 1);
@@ -1178,7 +1190,7 @@ namespace VIS.Controllers
                 if (tableName.Equals("AD_Ref_List"))
                 {
                     //sql = "SELECT " + keyCol + ", " + displayCol + " || '('|| count(" + keyCol + ") || ')' FROM " + tableName + " WHERE IsActive='Y'";
-                    sql = "SELECT " + tblColName + ", (Select Name from AD_REf_List where Value= " + tblColName + " AND AD_Reference_ID=" + json.AD_Reference_Value_ID + ")  as name ,count(" + tblColName + ")"
+                    sql = "SELECT " + tblColName + ", (Select Name from AD_REf_List where Value= " + tblColName + " AND AD_Reference_ID=" + Util.GetValueOfInt(json.AD_Reference_Value_ID) + ")  as name ,count(" + tblColName + ")"
                         + " FROM " + pTableName;// + " WHERE " + pTableName + ".IsActive='Y'";
                     sql = "SELECT * FROM (" + MRole.GetDefault(_ctx).AddAccessSQL(sql, pTableName, true, false);
                     if (!string.IsNullOrEmpty(validationCode))
@@ -1281,6 +1293,11 @@ namespace VIS.Controllers
                 if (Util.GetValueOfBool(paramValue[1]))
                     TableName = TableName + "_Ver";
 
+                // SECURITY: TableName comes from client-supplied 'fields' and is concatenated into SQL as an identifier
+                // (table name in ORDER BY / COALESCE / AddAccessSQL). Reject anything that is not a plain identifier.
+                if (!QueryValidator.IsValidIdentifier(TableName))
+                    return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
+
                 int AD_Table_ID = MTable.Get_Table_ID(TableName);
                 CommonModel objCommonModel = new CommonModel();
                 POInfo inf = POInfo.GetPOInfo(ctx, AD_Table_ID);
@@ -1289,6 +1306,9 @@ namespace VIS.Controllers
 
                 // Append where Clause, passed in the parameter
                 string whClause = Util.GetValueOfString(paramValue[2]);
+                // SECURITY: whClause is a client-supplied where-clause fragment concatenated into SQL; apply keyword denylist guard.
+                if (whClause != "" && !QueryValidator.IsValid(whClause))
+                    return Json(new { result = "ok" }, JsonRequestBehavior.AllowGet);
                 if (whClause != "")
                     sqlCol += " WHERE " + whClause;
 

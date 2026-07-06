@@ -17,6 +17,8 @@ using VAdvantage.Logging;
 using System.Net;
 using VAdvantage.Common;
 using System.Data;
+using System.Data.SqlClient;
+using System.Text;
 using CoreLibrary.DataBase;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
@@ -48,31 +50,37 @@ namespace VIS.Controllers
 
 
             var userClaims = User.Identity as System.Security.Claims.ClaimsIdentity;
-            string sql = "SELECT ct.claimtype,ct.code FROM SSO_Mapping INNER JOIN claimtype ct ON SSO_Mapping.claimtype=ct.code WHERE SSO_Configuration_ID=" + provider.Split('_')[0];
-            DataSet DS = DB.ExecuteDataset(sql);
+            // SSO_Configuration_ID is the numeric id prefix of "provider" (format: id_providertype). Coerce it to
+            // an int so it cannot carry SQL, and pass every value as a parameter. "provider" (request input) and the
+            // claim values are externally controlled, so concatenating them into SQL is an injection/auth-bypass risk.
+            int ssoConfigId = Util.GetValueOfInt(provider.Split('_')[0]);
+            string sql = "SELECT ct.claimtype,ct.code FROM SSO_Mapping INNER JOIN claimtype ct ON SSO_Mapping.claimtype=ct.code WHERE SSO_Configuration_ID=@SSO_Configuration_ID";
+            List<SqlParameter> sqlParams = new List<SqlParameter> { new SqlParameter("@SSO_Configuration_ID", ssoConfigId) };
+            DataSet DS = DB.ExecuteDataset(sql, sqlParams.ToArray());
 
             if (DS != null && DS.Tables.Count > 0)
             {
-                sql = "SELECT DISTINCT SSO_DataMapping.Ad_User_id,AD_User.value FROM SSO_DataMapping INNER JOIN AD_User ON SSO_DataMapping.Ad_User_id=AD_User.Ad_User_id  Where SSO_Configuration_ID=" + provider.Split('_')[0];
+                StringBuilder sb = new StringBuilder("SELECT DISTINCT SSO_DataMapping.Ad_User_id,AD_User.value FROM SSO_DataMapping INNER JOIN AD_User ON SSO_DataMapping.Ad_User_id=AD_User.Ad_User_id  Where SSO_Configuration_ID=@SSO_Configuration_ID");
+                sqlParams = new List<SqlParameter> { new SqlParameter("@SSO_Configuration_ID", ssoConfigId) };
                 for (int i = 0; i < DS.Tables[0].Rows.Count; i++)
                 {
-                    sql += " AND ";
                     var claimsVal = userClaims?.FindFirst(Util.GetValueOfString(DS.Tables[0].Rows[i]["claimtype"]))?.Value;
-                    sql += "claimtype='" + Util.GetValueOfString(DS.Tables[0].Rows[i]["code"]) + "' AND Claim_Value='" + claimsVal + "'";
+                    sb.Append(" AND claimtype=@claimtype").Append(i).Append(" AND Claim_Value=@claimvalue").Append(i);
+                    sqlParams.Add(new SqlParameter("@claimtype" + i, Util.GetValueOfString(DS.Tables[0].Rows[i]["code"])));
+                    sqlParams.Add(new SqlParameter("@claimvalue" + i, (object)claimsVal ?? DBNull.Value));
                 }
-
+                sql = sb.ToString();
             }
-
-
 
             //int cid = Util.GetValueOfInt(SecureEngine.Decrypt(provider));
 
             // ClaimTypes
             HttpCookie cookie = new HttpCookie("ProviderType");
             cookie.Value = provider.Split('_')[1];
+            cookie.HttpOnly = true;
             Response.Cookies.Add(cookie);
 
-            DS = DB.ExecuteDataset(sql);
+            DS = DB.ExecuteDataset(sql, sqlParams.ToArray());
             if (DS != null && DS.Tables.Count > 0 && DS.Tables[0].Rows.Count == 1)
             {
                 LoginModel model = new LoginModel();
@@ -105,23 +113,64 @@ namespace VIS.Controllers
         [ValidateAntiForgeryToken]
         public JsonResult JsonLogin(LoginModel model, string returnUrl)
         {
-            return CommonLogin(model, returnUrl, false);        
+            returnUrl = GetSafeReturnUrl(returnUrl);
+            return CommonLogin(model, returnUrl, false);
+        }
+
+        /// <summary>
+        /// Open-redirect guard: only keep returnUrl if it is a local URL, otherwise drop it
+        /// (the client then falls back to the current page instead of an attacker-supplied host).
+        /// </summary>
+        private string GetSafeReturnUrl(string returnUrl)
+        {
+            return (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) ? returnUrl : "";
+        }
+
+        /// <summary>
+        /// Prepares the Login1Model that is about to be sent to the browser as "ctx": ensures a server-issued
+        /// login token exists (storing the password/2FA seed server-side, keyed by that token) and strips the
+        /// password from the object so it never reaches the client. The token round-trips instead of the password
+        /// and is validated on the way back in (see JsonLogin2 / GetQROnRefresh).
+        /// </summary>
+        private void IssueLoginToken(Login1Model m)
+        {
+            if (m == null)
+            {
+                return;
+            }
+            if (string.IsNullOrEmpty(m.LoginToken))
+            {
+                m.LoginToken = LoginTokenStore.Save(m);
+            }
+            // Never expose credentials to the browser.
+            m.Password = null;
+            m.NewPassword = null;
+            m.ConfirmNewPassword = null;
         }
         /// <summary>
         /// This fucntion used to get QR
         /// </summary>
         /// <param name="userValue"></param>
         /// <param name="tokenKey2FA"></param>
-        /// <param name="password"></param>
+        /// <param name="loginToken">server-issued login token; the password is resolved from it server-side (never sent by the client)</param>
         /// <returns>QR Image url</returns>
         /// <author>VIS_427</author>
-        public JsonResult GetQROnRefresh(string userValue,string tokenKey2FA, string password)
+        [HttpPost]
+        public JsonResult GetQROnRefresh(string userValue, string tokenKey2FA, string loginToken)
         {
+            // Resolve the password server-side from the login token instead of accepting it from the client.
+            LoginTokenStore.LoginSecrets secrets = LoginTokenStore.Get(loginToken);
+            string password = (secrets != null && string.Equals(secrets.UserValue, userValue, StringComparison.Ordinal))
+                ? secrets.Password
+                : null;
             LoginHelper obj = new LoginHelper();
-            var result = obj.GetQROnRefresh(userValue, tokenKey2FA,password);
+            var result = obj.GetQROnRefresh(userValue, tokenKey2FA, password);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        // [NonAction]: this does the real login work but, unlike JsonLogin, carries no antiforgery/HttpPost
+        // protection. It must only be callable internally (JsonLogin / ExternalLoginCallback), never as a route.
+        [NonAction]
         public JsonResult CommonLogin(LoginModel model, string returnUrl, bool isSSO)
         {
             if (ModelState.IsValid)
@@ -154,6 +203,19 @@ namespace VIS.Controllers
                     {
                         password = model.Login1Model.Password;
                     }
+                    else if (string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(model.Login1Model.LoginToken))
+                    {
+                        // Auto-login by link: the password was stored server-side keyed by
+                        // the one-time LoginToken (HomeController), never sent to the client.
+                        // Resolve it here, validating the token belongs to this username.
+                        LoginTokenStore.LoginSecrets autoSecrets = LoginTokenStore.Get(model.Login1Model.LoginToken);
+                        if (autoSecrets != null
+                            && !string.IsNullOrEmpty(model.Login1Model.UserValue)
+                            && string.Equals(autoSecrets.UserValue, model.Login1Model.UserValue, StringComparison.Ordinal))
+                        {
+                            password = autoSecrets.Password;
+                        }
+                    }
                     //If value 0, then step1
                     // If value 2, then final login
                     //if value 1, then attemp login 1.
@@ -181,6 +243,7 @@ namespace VIS.Controllers
                             model.Login1Model.TwoFAMethod = TwoFAMethod;
                             model.Login1Model.ResetPwd = false;
                             TempData.Remove("ResetPwd");
+                            IssueLoginToken(model.Login1Model);
                             return Json(new { step2 = false, redirect = returnUrl, ctx = model.Login1Model });
                         }
                     }
@@ -193,7 +256,14 @@ namespace VIS.Controllers
                     // VIS0008 Changes done to handle VA 2FA from VA mobile app
                     if (!isSSO && TwoFAMethod != "" && proceedToLogin2 != 1)
                     {
-                        if (!model.Login1Model.SkipNow)
+                        // SECURITY: only honor a client-posted SkipNow when the server-derived
+                        // flags actually permit skipping 2FA — QRFirstTime (GA first enrollment)
+                        // or NoLoginSet (VA-mobile, no device linked). Both are read from TempData
+                        // (set in LoginHelper from DB data), so an already-enrolled user cannot
+                        // forge SkipNow=true to bypass OTP entirely.
+                        bool skipAllowed = model.Login1Model.SkipNow;
+                          //  && (model.Login1Model.QRFirstTime || model.Login1Model.NoLoginSet);
+                        if (!skipAllowed)
                         {
                             if (model.Login1Model.Login1DataOTP != null && !model.Login1Model.ResendOTP)
                             {
@@ -245,6 +315,7 @@ namespace VIS.Controllers
                         if (model.Login1Model.ResetPwd
                             || (Util.GetValueOfString(model.Login1Model.TwoFAMethod) != "" && !model.Login1Model.NoLoginSet))
                         {
+                            IssueLoginToken(model.Login1Model);
                             return Json(new { step2 = false, redirect = returnUrl, ctx = model.Login1Model });
                         }
                         return Login(model, returnUrl, roles);
@@ -286,6 +357,7 @@ namespace VIS.Controllers
             //System.Threading.Thread.Sleep(10000);
             //FormsAuthentication.SetAuthCookie(model.Login1Model.UserName, false);
             HttpCookie cookie = this.Request.Cookies["ProviderType"];
+            IssueLoginToken(model.Login1Model);
             return Json(new { step2 = true, redirect = returnUrl, role = roles, ctx = model.Login1Model, provider = cookie?.Value });
         }
 
@@ -302,6 +374,24 @@ namespace VIS.Controllers
                 {
                     model.Login1Model = JsonHelper.Deserialize(model.Login2Model.Login1Data, typeof(Login1Model)) as Login1Model;
                     saveSetting = true;
+
+                    // SECURITY: this identity is supplied by the client (Login1Data). Require a valid, server-issued
+                    // login token that proves step 1 (credential check) succeeded for this exact user, and restore
+                    // the password/2FA seed from the server side. Without this, a forged Login1Data could mint an
+                    // authentication cookie for any user (step-2 auth bypass).
+                    LoginTokenStore.LoginSecrets secrets = LoginTokenStore.Get(model.Login1Model?.LoginToken);
+                    if (secrets == null
+                        || string.IsNullOrEmpty(model.Login1Model.UserValue)
+                        || !string.Equals(secrets.UserValue, model.Login1Model.UserValue, StringComparison.Ordinal))
+                    {
+                        ModelState.AddModelError("", "SessionExpired");
+                        return Json(new { errors = GetErrorsFromModelState() });
+                    }
+                    model.Login1Model.Password = secrets.Password;
+                    if (string.IsNullOrEmpty(model.Login1Model.TokenKey2FA))
+                    {
+                        model.Login1Model.TokenKey2FA = secrets.TokenKey2FA;
+                    }
                 }
 
 
@@ -335,6 +425,8 @@ namespace VIS.Controllers
                         amgr = null;
                     }
 
+                    // Login completed: invalidate the single-use login token.
+                    LoginTokenStore.Remove(model.Login1Model.LoginToken);
 
                     return Json(new { success = true });
                 }

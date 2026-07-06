@@ -370,7 +370,8 @@ namespace VIS.Models
                 bool found = false;
                 if (Alias.Length > 0)
                 {
-                    String sql1 = "SELECT COUNT(*) FROM C_ValidCombination WHERE Alias='" + Alias + "'";
+                    // SECURITY: Alias is a client-supplied request value placed in a SQL string literal; escape quotes.
+                    String sql1 = "SELECT COUNT(*) FROM C_ValidCombination WHERE Alias='" + Alias.Replace("'", "''") + "'";
                     int ii = DB.GetSQLValue(null, sql1);
 
                     if (ii != 0)

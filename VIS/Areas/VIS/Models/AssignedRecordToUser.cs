@@ -169,7 +169,8 @@ namespace VIS.Models
             int refId = 0;
             if (!String.IsNullOrEmpty(refernceName))
             {
-                refId = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_Reference_ID FROM AD_Reference WHERE Name='" + refernceName + "'", null, null));
+                // SECURITY: escape single quotes in client-supplied refernceName before embedding in SQL literal
+                refId = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT AD_Reference_ID FROM AD_Reference WHERE Name='" + refernceName.Replace("'", "''") + "'", null, null));
             }
             return refId;
         }
@@ -289,7 +290,8 @@ namespace VIS.Models
         public string SetStatus(Ctx ctx, int AD_Window_ID, int AD_Table_ID, int Record_ID, string status)
         {
 
-            string sql = @"UPDATE VIS_AssignedRecordToUser SET Status='" + status + "' WHERE  Record_ID=" + Record_ID + " AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
+            // SECURITY: escape single quotes in client-supplied status before embedding in SQL literal
+            string sql = @"UPDATE VIS_AssignedRecordToUser SET Status='" + status.Replace("'", "''") + "' WHERE  Record_ID=" + Record_ID + " AND AD_Window_ID=" + AD_Window_ID + " AND AD_Table_ID=" + AD_Table_ID;
             int update = DB.ExecuteQuery(sql);
             //MVISAssignedRecordToUser mclass = new MVISAssignedRecordToUser(ctx, VIS_AssignedRecordToUser_ID, null);
             //mclass.SetStatus(status);
@@ -547,18 +549,21 @@ namespace VIS.Models
                 {
                     sql += $@",AssignedBy ";
                 }
+                // SECURITY: sanitize client-supplied Record_ID CSV to integers-only before IN(...) concatenation
                 sql += @" FROM LatestUpdates
-                      WHERE rn = 1 " + (!string.IsNullOrEmpty(Record_ID) ? $@" AND Record_ID IN ({ Record_ID})" : "");
+                      WHERE rn = 1 " + (!string.IsNullOrEmpty(Record_ID) ? $@" AND Record_ID IN ({ VIS.Classes.QueryValidator.SafeIntList(Record_ID)})" : "");
 
                 // Apply optional search text filters
                 if (!string.IsNullOrEmpty(SrchTxt))
                 {
+                    // SECURITY: escape single quotes in client-supplied SrchTxt before embedding in SQL literal
+                    string safeSrchTxt = SrchTxt.Replace("'", "''");
                     sql += $@" AND (
-                          UPPER(IdentiFierVal) LIKE UPPER('%{SrchTxt}%') 
-                          OR UPPER(UserName) LIKE UPPER('%{SrchTxt}%')";
+                          UPPER(IdentiFierVal) LIKE UPPER('%{safeSrchTxt}%')
+                          OR UPPER(UserName) LIKE UPPER('%{safeSrchTxt}%')";
                     if (string.IsNullOrEmpty(Record_ID))
                     {
-                        sql += $" OR UPPER(AssignedBy) LIKE UPPER('%{SrchTxt}%')";
+                        sql += $" OR UPPER(AssignedBy) LIKE UPPER('%{safeSrchTxt}%')";
                     }
                     sql += " )";
                 }

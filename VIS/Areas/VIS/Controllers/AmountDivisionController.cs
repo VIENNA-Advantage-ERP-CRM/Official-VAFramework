@@ -535,8 +535,9 @@ namespace VIS.Controllers
             string retJSON = "";
             if (Session["ctx"] != null)
             {
+                // SECURITY: fields is a client-supplied CSV placed into an IN(...) list; sanitize to ints.
                 Decimal temLineAmount = Util.GetValueOfDecimal(DB.ExecuteScalar("SELECT amount FROM c_dimamtline WHERE c_dimamtline_id IN ("
-                                                                                + fields + ") AND ROWNUM=1"));
+                                                                                + VIS.Classes.QueryValidator.SafeIntList(fields) + ") AND ROWNUM=1"));
                 retJSON = JsonConvert.SerializeObject(temLineAmount);
             }
             return Json(retJSON, JsonRequestBehavior.AllowGet);

@@ -72,6 +72,8 @@ namespace VIS.Models
                                     ON C_Country.C_Country_ID=C_Location.C_Country_ID WHERE IsLoginUser='Y' ";
             if (!String.IsNullOrEmpty(searchText))
             {
+                // SECURITY: searchText is user input concatenated into LIKE literals; escape embedded quotes.
+                searchText = searchText.Replace("'", "''");
                 sql += " AND ( upper(AD_User.Value) like Upper('%" + searchText + "%') OR upper(AD_User.Name) like Upper('%" + searchText + "%')  OR  upper(AD_User.Email) like Upper('%" + searchText + "%'))";
             }
             sql += " ORDER BY  AD_User.IsActive desc";
@@ -199,7 +201,7 @@ namespace VIS.Models
 
             if (name != null && name.Length > 0)
             {
-                sql += " AND upper(AD_Role.Name) like ('%" + name.ToUpper() + "%')";
+                sql += " AND upper(AD_Role.Name) like ('%" + name.ToUpper().Replace("'", "''") + "%')";
             }
 
             sql += " ORDER BY upper(AD_Role.Name)";
@@ -347,7 +349,7 @@ namespace VIS.Models
 
             if (!string.IsNullOrEmpty(name))
             {
-                sql += " AND upper(Name) like ('%" + name.ToUpper() + "%')";
+                sql += " AND upper(Name) like ('%" + name.ToUpper().Replace("'", "''") + "%')";
             }
 
             sql += " ORDER BY upper(name) ";
@@ -370,7 +372,7 @@ namespace VIS.Models
             sql = "select ad_role_group.AD_GroupInfo_ID,ad_role_group.IsActive from ad_role_group join AD_GroupInfo on ad_role_group.AD_GroupInfo_ID=AD_GroupInfo.AD_GroupInfo_ID WHERE  ad_role_group.AD_Role_ID=" + AD_Role_ID;
             if (!string.IsNullOrEmpty(name))
             {
-                sql += " AND upper(AD_GroupInfo.Name) like ('%" + name.ToUpper() + "%')";
+                sql += " AND upper(AD_GroupInfo.Name) like ('%" + name.ToUpper().Replace("'", "''") + "%')";
             }
 
             sql = MRole.GetDefault(ctx).AddAccessSQL(sql, "AD_GroupInfo", true, false);
