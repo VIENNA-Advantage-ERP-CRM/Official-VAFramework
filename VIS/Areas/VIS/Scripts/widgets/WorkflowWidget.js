@@ -62,6 +62,7 @@
         var lstDetailCtrls = [];
         var historyDivShow = false;
         var attachIconHtml = null;
+        var openWorkflowModalOnLoad = false;
 
         var elements = [
             "SelectWindow"];
@@ -88,6 +89,16 @@
             $addDetails_ID = $fstMainDiv_ID.find("#VIS_AddDetails_ID" + $self.AD_UserHomeWidgetID);
             divDetail = $fstMainDiv_ID.find("#workflowActivityDetails" + $self.AD_UserHomeWidgetID);
         };
+
+        this.openWorkflowModal = function () {
+            if (fulldata && fulldata.length > 0) {
+                openWorkflowModalOnLoad = false;
+                openWorkflowModal();
+                return;
+            }
+            openWorkflowModalOnLoad = true;
+        };
+
         function openWorkflowModal() {
             var modalId = 'WFWorkflowModal' + $self.AD_UserHomeWidgetID;
             var $modal = $('#' + modalId);
@@ -1420,6 +1431,12 @@
                         }
                         // Show the details icon only when there are workflow records
                         $wFShowDetails_ID.css('display', data.length > 0 ? 'inline-block' : 'none');
+                        if (openWorkflowModalOnLoad && data.length > 0) {
+                            openWorkflowModalOnLoad = false;
+                            window.setTimeout(function () {
+                                openWorkflowModal();
+                            }, 0);
+                        }
                         setTimeout(function () {
                             showBusy(false);
                         }, 200);
