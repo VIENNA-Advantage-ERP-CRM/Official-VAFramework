@@ -121,7 +121,7 @@
              * No records found             | VIS_NoRecordsFound                  | No records found
              * Approvals                    | VIS_Approvals                       | Approvals
              * Approvals preview            | VIS_ApprovalsPreview                | Approvals preview
-             * Search by requester, type... | VIS_SearchByRequesterTypeID         | Search by requester, type, ID...
+             * Search                       | Search                              | Search
              * From Date                    | VIS_FromDate                        | From Date
              * To Date                      | VIS_ToDate                          | To Date
              * Awaiting your approval       | VIS_AwaitingYourApproval            | Awaiting your approval
@@ -237,7 +237,6 @@
                         '<div class="vis-wf-card' + (index == 0 ? ' vis-wf-card-selected' : '') + '" role="button" tabindex="0" data-winnode="' + winNodeKey + '">'
                         + '  <div class="vis-wf-card-top">'
                         + '    <div class="vis-wf-card-title">' + VIS.Utility.encodeText(activityTitle) + '</div>'
-                        + '    <span class="vis-wf-id">WF-' + (index + 1) + '</span>'
                         + '  </div>'
                         + (kvHtml ? '<div class="vis-wf-kv vis-wf-card-kv">' + kvHtml + '</div>' : '')
                         + (dateText ? '<span class="vis-wf-time">' + VIS.Utility.encodeText(dateText) + '</span>' : '')
@@ -906,7 +905,7 @@
                                     <div class="vis-wf-tools">
                                         <div class="vis-wf-search">
                                             <i class="fa fa-search" aria-hidden="true"></i>
-                                            <input type="text" placeholder="${safeLbl('VIS_SearchByRequesterTypeID', 'Search by requester, type, ID...')}">
+                                            <input type="text" placeholder="${safeLbl('Search', 'Search')}">
                                         </div>
                                         <div class="vis-wf-date-filters">
                                             <div class="vis-wf-date-filter">
