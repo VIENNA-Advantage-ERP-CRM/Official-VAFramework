@@ -4388,9 +4388,19 @@
             if (self.mField && self.mField.vo)
                 maintainVers = self.mField.vo.IsMaintainVersions;
             var obj = new VIS.LocationForm(self.value, maintainVers);
+
+            // Additional Address Info: when the current tab/table has an
+            // "AdditionalAddressInfo" column, show an extra section in the
+            // location form seeded from that column/context value.
+            var addlGridTab = (self.mField && self.mField.gridTab) ? self.mField.gridTab : null;
+            var hasAddlColumn = addlGridTab && addlGridTab.getTableModel().findColumn("AdditionalAddressInfo") >= 0;
+            if (hasAddlColumn) {
+                obj.setAdditionalAddressInfo(addlGridTab.getValue("AdditionalAddressInfo"));
+            }
+
             obj.load();
             obj.showDialog();
-            obj.onClose = function (location, change) {
+            obj.onClose = function (location, change, additionalInfo, hasAdditionalInfo) {
                 //if (self.oldValue != location)
                 {
                     if (change) {
@@ -4401,6 +4411,19 @@
                         var evt = { newValue: location, propertyName: self.getColumnName() };
                         self.fireValueChanged(evt);
                         evt = null;
+                    }
+
+                    // Write the additional address info back to its own
+                    // column/context when it actually changed. Routed through
+                    // gridTab.setValue so it updates data, refreshes the field
+                    // and runs callouts in both form and inline-grid modes.
+                    if (hasAdditionalInfo && hasAddlColumn) {
+                        var newAddl = (additionalInfo == null || additionalInfo === "") ? null : additionalInfo;
+                        var curAddl = addlGridTab.getValue("AdditionalAddressInfo");
+                        curAddl = (curAddl == null || curAddl === "") ? null : String(curAddl);
+                        if (curAddl !== (newAddl == null ? null : String(newAddl))) {
+                            addlGridTab.setValue("AdditionalAddressInfo", newAddl);
+                        }
                     }
                 }
             };

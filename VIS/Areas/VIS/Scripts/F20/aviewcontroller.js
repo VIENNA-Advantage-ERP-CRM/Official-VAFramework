@@ -555,8 +555,8 @@
         }
         if (this.multiTabView)
             gridAutoHeight = true;
-        if (gridAutoHeight && this.showMultiViewOnly)
-            gridAutoHeight = false;
+        //if (gridAutoHeight && this.showMultiViewOnly)
+        //    gridAutoHeight = false;
 
         var tdArea = this.aPanel.getLayout ? this.aPanel.getLayout() : null;
         if (tdArea) {
