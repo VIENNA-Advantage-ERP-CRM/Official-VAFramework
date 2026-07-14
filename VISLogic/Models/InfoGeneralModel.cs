@@ -379,8 +379,11 @@ namespace VIS.Models
             bool requery, List<InfoSearchCol> srchCtrls, string validationCode)
         {
             InfoData _iData = new InfoData();
+            // SECURITY: tableName is client-supplied and flows into the FROM/SELECT of the query below.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(tableName))
+                return _iData;
             try
-            {               
+            {
 
                 var sql = "SELECT ";
                 //var colName = null;
@@ -483,6 +486,12 @@ namespace VIS.Models
                         {
                             continue;
                         }
+                        // SECURITY: srchCtrls comes straight from the client; ColumnName is used as a SQL
+                        // identifier below. Skip any control whose ColumnName is not a plain identifier.
+                        if (!string.IsNullOrEmpty(srchCtrls[i].ColumnName) && !VIS.Classes.QueryValidator.IsValidIdentifier(srchCtrls[i].ColumnName))
+                        {
+                            continue;
+                        }
 
                         if (appendAND == true)
                         {
@@ -501,6 +510,10 @@ namespace VIS.Models
                         {
                             srchValue = srchValue + "●";
                         }
+                        // SECURITY: srchValue is the user search text, concatenated into a quoted SQL literal
+                        // below. Escape embedded single quotes (standard SQL) to prevent injection; the '●'
+                        // wildcard scheme (converted back to '%' on the final SQL) is unaffected.
+                        srchValue = srchValue.Replace("'", "''");
                         // Change done by mohit asked by mukesh sir to show the data on info window from translated tab if logged in with langauge other than base language- 22/03/2018
                         if (Env.IsBaseLanguage(ctx, tableName))
                         {

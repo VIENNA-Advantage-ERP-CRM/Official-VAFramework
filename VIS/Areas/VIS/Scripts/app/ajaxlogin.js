@@ -201,7 +201,7 @@
         var jsonStr = $('#login3Data').val();
         var userValue = null;
         var tokenKey2FA = null;
-        var password = null;
+        var loginToken = null;
         var obj;
         try {
             obj = (typeof jsonStr === 'string') ? JSON.parse(jsonStr) : jsonStr;
@@ -211,9 +211,10 @@
         }
 
         if (obj) {
-             userValue = obj.UserValue;    
+             userValue = obj.UserValue;
             tokenKey2FA = obj.TokenKey2FA;
-            password = obj.Password;
+            // password is no longer sent from the client; the server resolves it from the login token
+            loginToken = obj.LoginToken;
         }
         /*implementing ajax request in order to bring QR scanner*/
         $.ajax({
@@ -222,7 +223,7 @@
             data: JSON.stringify({
                 userValue: userValue,
                 tokenKey2FA: tokenKey2FA,
-                password: password
+                loginToken: loginToken
             }),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -530,10 +531,15 @@
     };
 
     function autoLogin(val) {
+        // Auto-login by link: the password is held server-side and resolved from the
+        // hidden #loginToken; only the username is present in the page. (Legacy links
+        // may still carry user^Y^password, so keep splitting for back-compat.)
         var arr = val.split('^Y^');
 
         $txtUser.val(arr[0]);
-        $txtPwd.val(arr[1]);
+        if (arr.length > 1) {
+            $txtPwd.val(arr[1]);
+        }
         $btnLogin1.submit();
     };
 

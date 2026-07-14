@@ -3672,6 +3672,15 @@ namespace VIS.Helpers
         {
             //ZoomChildTab
             int recordID = 0;
+            // SECURITY: SelectColumn/SelectTable/WhereColumn are client-supplied and are concatenated as SQL
+            // identifiers (cannot be bind parameters). Reject anything that is not a plain identifier.
+            // (WhereValue is already coerced to int below.)
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(SelectColumn)
+                || !VIS.Classes.QueryValidator.IsValidIdentifier(SelectTable)
+                || !VIS.Classes.QueryValidator.IsValidIdentifier(WhereColumn))
+            {
+                return 0;
+            }
             string sql = "SELECT " + SelectColumn + " FROM " + SelectTable + " WHERE " + WhereColumn + "=" + Util.GetValueOfInt(WhereValue);
             recordID = Util.GetValueOfInt(DB.ExecuteScalar(sql, null, null));
             return recordID;
@@ -3687,6 +3696,14 @@ namespace VIS.Helpers
         public dynamic GetZoomWhereClause(string value, int refId,string colName)
         {
             dynamic data = new ExpandoObject();
+
+            // SECURITY: colName is client-supplied and can end up concatenated into SQL as an identifier
+            // (keyColName) when the AD_Ref_Table lookup returns no row. Reject non-identifier input.
+            // (refId is int; value is int-parsed or escaped via DB.TO_STRING below.)
+            if (!string.IsNullOrEmpty(colName) && !VIS.Classes.QueryValidator.IsValidIdentifier(colName))
+            {
+                return data;
+            }
 
             string sql = "SELECT kc.ColumnName, tt.TableName"
                             + " FROM AD_Ref_Table rt"

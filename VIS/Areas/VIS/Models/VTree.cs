@@ -626,8 +626,9 @@ namespace VAdvantage.Classes
         public bool RemoveNodeFromBar(string strNodeId)
         {
             bool blnReturn = true;
+            // SECURITY: coerce client-supplied node id string to int to prevent SQL injection
             string strSql = @"Delete from AD_TreeBar Where " +
-                             " AD_TREE_ID = " + _AD_Tree_ID + " and AD_USER_ID=" + ctx.GetAD_User_ID() + " and  NODE_ID=" + strNodeId;
+                             " AD_TREE_ID = " + _AD_Tree_ID + " and AD_USER_ID=" + ctx.GetAD_User_ID() + " and  NODE_ID=" + Utility.Util.GetValueOfInt(strNodeId);
             try
             {
                 SqlExec.ExecuteQuery.ExecuteNonQuery(strSql);

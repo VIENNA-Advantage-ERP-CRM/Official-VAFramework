@@ -473,8 +473,16 @@ namespace VIS.Controllers
 
                 if (TempData.ContainsKey("user"))
                 {
-                    model.Login1Model.UserValue = TempData["user"].ToString() + "^Y^" + TempData["pwd"].ToString();
-                    // model.Login1Model.Password = TempData.Peek("pwd").ToString();
+                    // Security: keep the auto-login password server-side. Previously this
+                    // concatenated user^Y^password into UserValue, which rendered the
+                    // cleartext password into the login page HTML (view-source, browser
+                    // cache/history, proxies). Now the password is stored against a
+                    // one-time LoginToken (see LoginTokenStore) and only the username and
+                    // token reach the browser; CommonLogin resolves the password from it.
+                    model.Login1Model.UserValue = TempData["user"].ToString();
+                    model.Login1Model.Password = Util.GetValueOfString(TempData["pwd"]);
+                    model.Login1Model.LoginToken = LoginTokenStore.Save(model.Login1Model);
+                    model.Login1Model.Password = null;
                 }
 
                 model.Login1Model.LoginLanguage = "en_US";
@@ -1083,7 +1091,29 @@ namespace VIS.Controllers
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
+
+        [HttpPost]
+        public ActionResult CspReport()
+        {
+            Request.InputStream.Position = 0;
+
+            using (var reader = new StreamReader(Request.InputStream))
+            {
+                string report = reader.ReadToEnd();
+
+                string logPath = Server.MapPath("~/App_Data/csp.log");
+                // AppendAllText does not create missing directories; ensure App_Data exists
+                // (it is not created on a fresh deployment), otherwise the write throws and no log is written.
+                Directory.CreateDirectory(Path.GetDirectoryName(logPath));
+
+                System.IO.File.AppendAllText(
+                    logPath,
+                    DateTime.Now + Environment.NewLine +
+                    report + Environment.NewLine +
+                    "------------------------" + Environment.NewLine);
+            }
+
+            return new HttpStatusCodeResult(204);
+        }
     }
-
-
 }

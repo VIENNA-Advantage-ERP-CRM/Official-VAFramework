@@ -453,7 +453,8 @@ namespace VIS.Models
         //**********Added By Lakhwinder************
         public List<LoginData> GetLoginData(string roleID)
         {
-            string sql = "SELECT c.Name,r.AD_Client_ID FROM AD_Role r INNER JOIN AD_Client c ON (c.AD_Client_ID=r.AD_Client_ID) WHERE r.AD_Role_ID= " + roleID;
+            // SECURITY: roleID is client-controlled; coerce to int before concatenation
+            string sql = "SELECT c.Name,r.AD_Client_ID FROM AD_Role r INNER JOIN AD_Client c ON (c.AD_Client_ID=r.AD_Client_ID) WHERE r.AD_Role_ID= " + Util.GetValueOfInt(roleID);
             try
             {
                 List<LoginData> ld = null;
@@ -516,8 +517,9 @@ namespace VIS.Models
             string sql = "SELECT o.Name,o.AD_Org_ID "   //	1..3
                   + "FROM AD_Role r, AD_Client c"
                   + " INNER JOIN AD_Org o ON (c.AD_Client_ID=o.AD_Client_ID OR o.AD_Org_ID=0) "
-                  + "WHERE r.AD_Role_ID='" + roleId + "'"   //	#1
-                  + " AND c.AD_Client_ID='" + clientId + "'"    //	#2
+                  // SECURITY: roleId and clientId are client-controlled; coerce to int before concatenation
+                  + "WHERE r.AD_Role_ID='" + Util.GetValueOfInt(roleId) + "'"   //	#1
+                  + " AND c.AD_Client_ID='" + Util.GetValueOfInt(clientId) + "'"    //	#2
                   + " AND o.IsActive='Y' AND o.IsSummary='N'  AND o.IsCostCenter='N' AND o.IsProfitCenter='N' "
                   + " AND (r.IsAccessAllOrgs='Y' "
                       + "OR (r.IsUseUserOrgAccess='N' AND o.AD_Org_ID IN (SELECT AD_Org_ID FROM AD_Role_OrgAccess ra "
@@ -550,8 +552,9 @@ namespace VIS.Models
 
         public List<LoginData> GetWareHouseData(string orgId)
         {
+            // SECURITY: orgId is client-controlled; coerce to int before concatenation
             var sql = "SELECT Name,M_Warehouse_ID  FROM M_Warehouse "
-               + "WHERE AD_Org_ID=" + orgId + " AND IsActive='Y' "
+               + "WHERE AD_Org_ID=" + Util.GetValueOfInt(orgId) + " AND IsActive='Y' "
                + "ORDER BY Name";
 
             try
@@ -596,7 +599,8 @@ namespace VIS.Models
         // Added by Bharat on 12 June 2017, updated by vinay bhatt on 18 oct 2018
         public int GetWindowID(string windowName)
         {
-            string sql = "SELECT AD_Window_ID FROM AD_Window WHERE IsActive='Y' AND Name = '" + windowName + "'";
+            // SECURITY: windowName is client-controlled; escape single quotes in the SQL literal
+            string sql = "SELECT AD_Window_ID FROM AD_Window WHERE IsActive='Y' AND Name = '" + windowName.Replace("'", "''") + "'";
             int windowID = Util.GetValueOfInt(DB.ExecuteScalar(sql));
             return windowID;
         }
@@ -986,7 +990,8 @@ namespace VIS.Models
         /// <returns></returns>
         public bool UpdateTwoFAMethod(Ctx ctx, string method)
         {
-            string sql = "Update AD_User SET TWOFAMETHOD='" + method + "' WHERE AD_User_ID=" + ctx.GetAD_User_ID();
+            // SECURITY: method is client-controlled; escape single quotes in the SQL literal
+            string sql = "Update AD_User SET TWOFAMETHOD='" + method.Replace("'", "''") + "' WHERE AD_User_ID=" + ctx.GetAD_User_ID();
             if (DB.ExecuteQuery(sql) > 0)
             {
                 return true;

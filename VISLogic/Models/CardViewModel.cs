@@ -728,9 +728,10 @@ namespace VIS.Models
         public string GetColumnIDWindowID(string tableName, string columnName)
         {
 
+            // SECURITY: tableName/columnName are client-supplied; escape single quotes to prevent breaking out of the SQL literal
             string sql = " SELECT cl.ad_column_id FROM ad_column cl WHERE cl.ad_table_id=" +
-                     "(SELECT tb.ad_table_id FROM ad_table tb WHERE tb.tablename='" + tableName + "'" +
-                      ") and cl.columnname='" + columnName + "'";
+                     "(SELECT tb.ad_table_id FROM ad_table tb WHERE tb.tablename='" + tableName.Replace("'", "''") + "'" +
+                      ") and cl.columnname='" + columnName.Replace("'", "''") + "'";
             string columnID = Util.GetValueOfString(DB.GetSQLValue(null, sql));
             sql = "SELECT ad_window_id FROM AD_Window WHERE UPPER(NAME)=UPPER('Card Template') AND isActive='Y'";
             string windowID = Util.GetValueOfString(DB.GetSQLValue(null, sql));
@@ -1066,7 +1067,8 @@ namespace VIS.Models
 
                     for (int i = 0; i < cardSection.Count; i++)
                     {
-                        int GridLayoutid =Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID="+ mhl.GetAD_HeaderLayout_ID()+ " AND Name='"+ cardSection[i].sectionName.Trim() + "'",null,trx));
+                        // SECURITY: sectionName is client-supplied; escape single quotes to prevent breaking out of the SQL literal
+                        int GridLayoutid =Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID="+ mhl.GetAD_HeaderLayout_ID()+ " AND Name='"+ cardSection[i].sectionName.Trim().Replace("'", "''") + "'",null,trx));
 
                         MGridLayout mgl = new MGridLayout(ctx, GridLayoutid, trx);
                         mgl.SetAD_HeaderLayout_ID(mhl.GetAD_HeaderLayout_ID());
@@ -1115,7 +1117,8 @@ namespace VIS.Models
                                     {
                                         if (dsContent == null)
                                         {
-                                            string qury = "SELECT contentfieldlable,contentfieldvalue from ad_gridlayoutitems WHERE seqno=" + Util.GetValueOfInt(cardTempField[j].seq) + " and ad_gridlayout_id=(SELECT ad_gridlayout_ID FROM ad_gridlayout WHERE ad_headerlayout_id = " + refTempID + " AND name = '" + cardSection[i].sectionName.Trim() + "')";
+                                            // SECURITY: sectionName is client-supplied; escape single quotes to prevent breaking out of the SQL literal
+                                            string qury = "SELECT contentfieldlable,contentfieldvalue from ad_gridlayoutitems WHERE seqno=" + Util.GetValueOfInt(cardTempField[j].seq) + " and ad_gridlayout_id=(SELECT ad_gridlayout_ID FROM ad_gridlayout WHERE ad_headerlayout_id = " + refTempID + " AND name = '" + cardSection[i].sectionName.Trim().Replace("'", "''") + "')";
                                             dsContent = DB.ExecuteDataset(qury);
                                             if (dsContent != null && dsContent.Tables.Count > 0 && dsContent.Tables[0].Rows.Count > 0)
                                             {
@@ -1213,7 +1216,8 @@ namespace VIS.Models
         {
             int _tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_GridLayoutItems'"));
 
-            string qry = @"SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems  WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID in (" + _strRecordID + "))";
+            // SECURITY: _strRecordID is a client-supplied comma-separated id list; sanitize to ints before IN(...)
+            string qry = @"SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems  WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID in (" + VIS.Classes.QueryValidator.SafeIntList(_strRecordID) + "))";
             DataSet ds = DB.ExecuteDataset(qry);
             int _recordID = 0;
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
@@ -1251,7 +1255,8 @@ namespace VIS.Models
 
             int tableID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_Table_ID FROM AD_Table WHERE TableName='AD_GridLayoutItems'"));
 
-            string qry = @"SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems  WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID in (" + _strRecordID + "))";
+            // SECURITY: _strRecordID is a client-supplied comma-separated id list; sanitize to ints before IN(...)
+            string qry = @"SELECT AD_GridLayoutItems_ID FROM AD_GridLayoutItems  WHERE AD_GridLayout_ID IN (SELECT AD_GridLayout_ID FROM AD_GridLayout WHERE AD_HeaderLayout_ID in (" + VIS.Classes.QueryValidator.SafeIntList(_strRecordID) + "))";
             DataSet ds = DB.ExecuteDataset(qry);
             List<int> lst = new List<int>();
             string strRecordID = "";

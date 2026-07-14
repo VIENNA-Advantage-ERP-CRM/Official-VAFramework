@@ -845,7 +845,7 @@ span.vis-ad-w-p-tb-rc-action {
 
 
 .vis-ad-w-p-actionpanel-b {
-    padding: 0 10px;
+   /* padding: 0 10px;*/
 }
 
 .vis-ad-w-p-center-tc {
@@ -1786,9 +1786,13 @@ li.vis-page-item-select {
         width: 100%;
         border: solid 1px rgba(var(--v-c-primary), 1);
         border-radius: 19px;
-        padding: 3px 10px;
+       
     }
 
+    .vis-w-p-header-Label-f > button {
+       
+        padding: 3px 10px;
+    }
 
 
 

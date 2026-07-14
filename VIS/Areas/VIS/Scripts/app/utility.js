@@ -710,7 +710,7 @@
                 if (!ctxInfo)
                     ctxInfo = '';
 
-                if (ctxInfo.length == 0 && (token.startsWith("#") || token.startsWith("$")))
+                if ((ctxInfo.length == 0) && (token.startsWith("#") || token.startsWith("$")))
                     ctxInfo = ctx.getContext(token);	// get global context
 
                 

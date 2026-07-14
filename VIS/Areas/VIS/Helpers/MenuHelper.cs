@@ -984,7 +984,8 @@ namespace VIS.Helpers
 
             for (int i = 0; i < selectedID.Length; i++)
             {
-                DB.ExecuteQuery("UPDATE " + tableName + " SET Parent_ID=" + newParentID + ", seqNo=0, updated=SYSDATE WHERE AD_Tree_ID=" + AD_Tree_ID + " AND Node_ID=" + selectedID[i]);
+                // SECURITY: selectedID[i] is a piece of the client-supplied nodeID string; coerce to int.
+                DB.ExecuteQuery("UPDATE " + tableName + " SET Parent_ID=" + newParentID + ", seqNo=0, updated=SYSDATE WHERE AD_Tree_ID=" + AD_Tree_ID + " AND Node_ID=" + Util.GetValueOfInt(selectedID[i]));
             }
 
             return 1;

@@ -628,6 +628,11 @@ OR
         /// <param name="AD_Window_ID"></param>
         private void GetWhereClause(Ctx ctx, MTable table, string searchText, int AD_Window_ID, int AD_Node_ID)
         {
+            // SECURITY: searchText is client-controlled (WFActivityController.GetActivities) and is embedded inside single-quoted SQL LIKE literals below; escape single quotes to prevent SQL injection.
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                searchText = searchText.Replace("'", "''");
+            }
             if (whereClause.Length > 7 && searchText.Length > 0)
             {
                 whereClause += " OR ";

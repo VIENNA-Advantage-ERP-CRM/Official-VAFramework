@@ -18,6 +18,10 @@ namespace VIS.Models
         public List<Dictionary<string, object>> GetData(string valueColumnName, int AD_Tab_ID, int AD_Table_ID, Ctx ctx)
         {
             List<Dictionary<string, object>> retDic = null;
+            // SECURITY: valueColumnName is a client-supplied request value used as a SQL identifier
+            // (column name) and cannot be parameterized; whitelist it or bail.
+            if (!VIS.Classes.QueryValidator.IsValidIdentifier(valueColumnName))
+                return retDic;
             string sql = "SELECT Name," + valueColumnName + ", AD_UserQuery_ID FROM AD_UserQuery WHERE"
                 + " AD_Client_ID=" + ctx.GetAD_Client_ID() + " AND IsActive='Y'"
                 + " AND (AD_Tab_ID=" + AD_Tab_ID + " OR AD_Table_ID=" + AD_Table_ID + ")"
