@@ -1,30 +1,99 @@
-﻿@model VIS.Models.LocationModel
+@model VIS.Models.LocationModel
 
 @{
     var windowNo = ViewBag.WindowNumber;
     string lang = ViewBag.lang;
 }
 
+<style>
+    /* Address control layout - scoped to the location form only */
+    .vis-locform { width: 100%; margin-bottom: 10px; }
+    .vis-locform .vis-loc-search-cell { padding-bottom: 6px; }
+    .vis-locform .vis-loc-search-row {
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+    }
+    .vis-locform .vis-loc-search-row .vis-input-wrap { flex: 1 1 auto; margin: 0; }
+    .vis-locform .vis-loc-search-actions {
+        display: flex;
+        align-items: center;
+        margin-left: 6px;
+    }
+    .vis-locform .vis-loc-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid #c8ced6;
+        color: #4a5561;
+        text-decoration: none;
+        background: #fff;
+        cursor: pointer;
+        margin-left: 4px;
+    }
+    .vis-locform .vis-loc-icon-btn:hover { background: #f2f4f6; }
+    .vis-locform .vis-loc-edit-btn {
+        background: #2e9e5b;
+        border-color: #2e9e5b;
+        color: #fff;
+    }
+    .vis-locform .vis-loc-edit-btn:hover { background: #268a4f; color: #fff; }
+    .vis-locform .vis-loc-edit-btn.editing {
+        background: #fff;
+        color: #2e9e5b;
+    }
 
-<table style="margin-bottom: 10px; width:100%;" class="vis-formouterwrpdiv">
+    .vis-locform .vis-loc-group {
+        border: 1px solid #dbe0e6;
+        border-radius: 6px;
+        padding: 14px 14px 2px 14px;
+        margin-bottom: 12px;
+    }
+    .vis-locform .vis-loc-group-title {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 12px;
+        color: #333;
+    }
+    .vis-locform .vis-loc-shared {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 400;
+        font-size: 12px;
+        color: #2e9e5b;
+        margin-left: 12px;
+        cursor: help;
+    }
+    .vis-locform .vis-loc-shared .glyphicon { font-size: 11px; margin-right: 4px; }
+
+    /* Read-only appearance for the address detail fields */
+    .vis-locform.vis-loc-readonly input.form-control[readonly] {
+        background-color: #f2f4f6;
+        cursor: default;
+    }
+
+    .vis-locform .btns { padding-top: 4px; }
+</style>
+
+<table class="vis-formouterwrpdiv vis-locform">
     <tr>
-        <td>
-            <div class="location input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    <input type="text" class="form-control" placeholder="Search" aria-haspopup="true" id="lstLocation_@windowNo" data-hasbtn=" ">
+        <td class="vis-loc-search-cell">
+            <div class="vis-loc-search-row">
+                <div class="location input-group vis-input-wrap">
+                    <div class="vis-control-wrap">
+                        <input type="text" class="form-control" placeholder="@VAdvantage.Utility.Msg.GetMsg(lang, "Search")" aria-haspopup="true" id="lstLocation_@windowNo" data-hasbtn=" ">
                     </div>
                     <div class="input-group-append"><span class="input-group-text"><a href="javascript:void(0)" class="glyphicon glyphicon-search"></a></span></div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <div class="location input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.TextBoxFor(m => m.Country, new { autofocus = "autofocus", id = "txtCountry_" + ViewBag.WindowNumber, @maxlength = "60", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Country"), })
-                    <label id="lblCountry_@windowNo" class="VIS_Pref_Label_Font ">@VAdvantage.Utility.Msg.GetMsg(lang, "Country") <sup style="color: red;">*</sup></label>
-                    <input id="countryhdn_@windowNo" type="hidden" value="@Model.C_Country_ID" placeholder=" ">
+                </div>
+                <div class="vis-loc-search-actions">
+                    <a href="javascript:void(0)" id="aEditLocation_@windowNo" title="@VAdvantage.Utility.Msg.GetMsg(lang, "Edit")" class="vis-loc-icon-btn vis-loc-edit-btn" style="display:none">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
                 </div>
             </div>
         </td>
@@ -32,76 +101,121 @@
 
     <tr>
         <td>
-            <div class="location input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.TextBoxFor(m => m.Address1, new { autofocus = "autofocus", id = "txtAddress1_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Address1"), })
-                    <label id="lblAddress1_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Address1") </label>
+            <div class="vis-loc-group">
+                <div class="vis-loc-group-title">
+                    @VAdvantage.Utility.Msg.GetMsg(lang, "Address")
+                    @*<span id="visLocShared_@windowNo" class="vis-loc-shared" style="display:none" title="This address is shared. Editing it updates the same master record for every entity that uses it.">
+                        <span class="glyphicon glyphicon-link"></span>Shared Address
+                    </span>*@
                 </div>
+
+                <table style="width:100%;">
+                    <tr>
+                        <td>
+                            <div class="location input-group vis-input-wrap">
+                                <div class="vis-control-wrap">
+                                    @Html.TextBoxFor(m => m.Country, new { autofocus = "autofocus", id = "txtCountry_" + ViewBag.WindowNumber, @maxlength = "60", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Country"), })
+                                    <label id="lblCountry_@windowNo" class="VIS_Pref_Label_Font ">@VAdvantage.Utility.Msg.GetMsg(lang, "Country") <sup style="color: red;">*</sup></label>
+                                    <input id="countryhdn_@windowNo" type="hidden" value="@Model.C_Country_ID" placeholder=" ">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="location input-group vis-input-wrap">
+                                <div class="vis-control-wrap">
+                                    @Html.TextBoxFor(m => m.Address1, new { autofocus = "autofocus", id = "txtAddress1_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Address1"), })
+                                    <label id="lblAddress1_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Address1") </label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="location input-group vis-input-wrap">
+                                <div class="vis-control-wrap right-inner-addon">
+                                    <a href="javascript:void(0)" id="aCollection" tabindex="-1" data-prod-cat="2" style="background: none" class="glyphicon glyphicon-plus VIS-Location-toggler"></a>
+                                    @Html.TextBoxFor(m => m.Address2, new { autofocus = "autofocus", id = "txtAddress2_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Address2"), })
+                                    <label id="lblAddress2_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Address2") </label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="cat2" style="display: none">
+                        <td>
+                            <div class="location input-group vis-input-wrap">
+                                <div class="vis-control-wrap right-inner-addon">
+                                    <a href="javascript:void(0)" data-prod-close="2" tabindex="-1" class="VIS-Location-toggler"><span class="address-close-icon vis vis-mark"></span></a>
+                                    <a href="javascript:void(0)" data-prod-cat="3" style="background: none" tabindex="-1" class="glyphicon glyphicon-plus VIS-Location-toggler"></a>
+                                    @Html.TextBoxFor(m => m.Address3, new { autofocus = "autofocus", id = "txtAddress3_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Address3"), })
+                                    <label id="lblAddress3_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Address3") </label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="cat3" style="display: none">
+                        <td>
+                            <div class="location input-group vis-input-wrap">
+                                <div class="vis-control-wrap right-inner-addon">
+                                    <a href="javascript:void(0)" data-prod-cat="3" tabindex="-1" class="VIS-Location-toggler"><span class="address-close-icon vis vis-mark"></span></a>
+                                    @Html.TextBoxFor(m => m.Address4, new { autofocus = "autofocus", id = "txtAddress4_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Address4"), })
+                                    <label id="lblAddress4_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Address4") </label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="location input-group vis-input-wrap">
+                                <div class="vis-control-wrap">
+                                    @Html.TextBoxFor(m => m.City, new { autofocus = "autofocus", id = "txtCity_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "City") })
+                                    <label id="lblCity_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "City") </label>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="zip-input pull-right location input-group vis-input-wrap">
+                                <div class="vis-control-wrap">
+                                    @Html.TextBoxFor(m => m.ZipCode, new { autofocus = "autofocus", id = "txtZipCode_" + ViewBag.WindowNumber, @maxlength = "10", @class = "form-control pull-right", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "ZipCode") })
+                                    <label id="lblZipCode_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "ZipCode") </label>
+                                </div>
+                            </div>
+                            <div class="form-input pull-left location input-group vis-input-wrap">
+                                <div class="vis-control-wrap">
+                                    @Html.TextBoxFor(m => m.RegionName, new { autofocus = "autofocus", id = "txtState_" + ViewBag.WindowNumber, @maxlength = "40", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Region") })
+                                    <label id="lblState_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Region") </label>
+                                    <input id="Statehdn_@windowNo" type="hidden" value="@Model.C_Region_ID" placeholder=" ">
+                                </div>
+                            </div>
+
+                        </td>
+                    </tr>
+                </table>
             </div>
         </td>
     </tr>
 
-    <tr>
+    @* Additional Address Info (flat number etc.) - hidden unless the calling
+       tab/table carries an "AdditionalAddressInfo" column; shown & seeded by JS.
+       This section stays editable even when the address fields are read-only. *@
+    <tr class="vis-additional-address-info" style="display: none">
         <td>
-            <div class="location input-group vis-input-wrap">
-                <div class="vis-control-wrap right-inner-addon">
-                    <a href="javascript:void(0)" id="aCollection" tabindex="-1" data-prod-cat="2" style="background: none" class="glyphicon glyphicon-plus VIS-Location-toggler"></a>
-                    @Html.TextBoxFor(m => m.Address2, new { autofocus = "autofocus", id = "txtAddress2_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Address2"), })
-                    <label id="lblAddress2_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Address2") </label>
-                </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr class="cat2" style="display: none">
-        <td>
-            <div class="location input-group vis-input-wrap">
-                <div class="vis-control-wrap right-inner-addon">
-                    <a href="javascript:void(0)" data-prod-close="2" tabindex="-1" class="VIS-Location-toggler"><span class="address-close-icon vis vis-mark"></span></a>
-                    <a href="javascript:void(0)" data-prod-cat="3" style="background: none" tabindex="-1" class="glyphicon glyphicon-plus VIS-Location-toggler"></a>
-                    @Html.TextBoxFor(m => m.Address3, new { autofocus = "autofocus", id = "txtAddress3_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Address3"), })
-                    <label id="lblAddress3_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Address3") </label>
-                </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr class="cat3" style="display: none">
-        <td>
-            <div class="location input-group vis-input-wrap">
-                <div class="vis-control-wrap right-inner-addon">
-                    <a href="javascript:void(0)" data-prod-cat="3" tabindex="-1" class="VIS-Location-toggler"><span class="address-close-icon vis vis-mark"></span></a>
-                    @Html.TextBoxFor(m => m.Address4, new { autofocus = "autofocus", id = "txtAddress4_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Address4"), })
-                    <label id="lblAddress4_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Address4") </label>
-                </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <div class="location input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.TextBoxFor(m => m.City, new { autofocus = "autofocus", id = "txtCity_" + ViewBag.WindowNumber, @maxlength = "60", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "City") })
-                    <label id="lblCity_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "City") </label>
-                </div>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <div class="form-input pull-left location input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.TextBoxFor(m => m.RegionName, new { autofocus = "autofocus", id = "txtState_" + ViewBag.WindowNumber, @maxlength = "40", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Region") })
-                    <label id="lblState_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Region") </label>
-                    <input id="Statehdn_@windowNo" type="hidden" value="@Model.C_Region_ID" placeholder=" ">
-                </div>
-            </div>
-            <div class="zip-input pull-right location input-group vis-input-wrap">
-                <div class="vis-control-wrap">
-                    @Html.TextBoxFor(m => m.ZipCode, new { autofocus = "autofocus", id = "txtZipCode_" + ViewBag.WindowNumber, @maxlength = "10", @class = "form-control pull-right", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "ZipCode") })
-                    <label id="lblZipCode_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "ZipCode") </label>
+            <div class="vis-loc-group">
+                @*<div class="vis-loc-group-title">@VAdvantage.Utility.Msg.GetMsg(lang, "AdditionalAddressInfo")</div>*@
+                <div class="location input-group vis-input-wrap">
+                    <div class="vis-control-wrap">
+                        <input type="text" class="form-control" maxlength="255" id="txtAdditionalAddressInfo_@windowNo" placeholder="@VAdvantage.Utility.Msg.GetMsg(lang, "AdditionalAddressInfo")">
+                        <label id="lblAdditionalAddressInfo_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "AdditionalAddressInfo")</label>
+                    </div>
                 </div>
             </div>
         </td>
@@ -111,14 +225,9 @@
         <td>
             <div class="btns">
                 <input id="btnCancel_@windowNo" class="VIS_Pref_btn-2 pull-right" style="margin-top:0px;margin-bottom:0px" type="button" value=@VAdvantage.Utility.Util.CleanMnemonic(VAdvantage.Utility.Msg.GetMsg(lang, "Cancel")) />
-                <input id="btnOk_@windowNo" class="VIS_Pref_btn-2 pull-left" style="margin-top:0px;margin-bottom:0px;" type="button" value=@VAdvantage.Utility.Util.CleanMnemonic(VAdvantage.Utility.Msg.GetMsg(lang, "OK")) />
+                <input id="btnOk_@windowNo" class="VIS_Pref_btn-2 pull-right" style="margin-top:0px;margin-bottom:0px;margin-right:8px;" type="button" value=@VAdvantage.Utility.Util.CleanMnemonic(VAdvantage.Utility.Msg.GetMsg(lang, "Save")) />
             </div>
-
         </td>
     </tr>
 
 </table>
-
-
-
-
