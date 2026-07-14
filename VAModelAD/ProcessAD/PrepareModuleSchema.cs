@@ -794,44 +794,49 @@ namespace VAdvantage.Process
                 string name = "";
                 if (HasModulePrefix("Name", "AD_CardView", "AD_CardView_ID=" + sAD_CardView_ID, out name))
                 {
-
-
-                    if (Util.GetValueOfInt(dr["AD_Field_ID"]) > 0)
+                    if (name.Length > 0 && name.ToLower().StartsWith(currentPrefix.ToLower()))
                     {
-                        InsertIntoDBSchema(X_AD_Field.Table_ID, Util.GetValueOfInt(dr["AD_Field_ID"]), X_AD_Field.Table_Name, name, "AD_Field_ID =" + Util.GetValueOfInt(dr["AD_Field_ID"]));
-                    }
 
-                    InsertIntoDBSchema(X_AD_CardView.Table_ID, sAD_CardView_ID, X_AD_CardView.Table_Name, name, "AD_CardView_ID =" + sAD_CardView_ID);
-                    //Header
 
-                    // Card view column
-                    List<int> lstCardCol = GetIDs("AD_CardView_Column", "AD_CardView_Column_ID", "AD_CardView_ID=" + sAD_CardView_ID);
-
-                    for (int col = 0; col < lstCardCol.Count; col++)
-                    {
-                        int sAD_Field_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_ModuleField.AD_Field_ID FROM AD_ModuleField "
-                                             + " WHERE AD_ModuleField.AD_Field_ID = (SELECT AD_CardView_Column.AD_Field_ID "
-                                             + " FROM AD_CardView_Column WHERE AD_CardView_Column_ID=" + lstCardCol[col] + ")"));
-                        if (sAD_Field_ID > 0)
+                        if (Util.GetValueOfInt(dr["AD_Field_ID"]) > 0)
                         {
-                            // if (HasModulePrefix("Sequence", "AD_CardView_Column", "AD_CardView_Column_ID=" + lstCardCol[col], out name))
+                            InsertField(false,  "", Util.GetValueOfInt(dr["AD_Field_ID"]));
+                            //InsertIntoDBSchema(X_AD_Field.Table_ID, Util.GetValueOfInt(dr["AD_Field_ID"]), X_AD_Field.Table_Name, name, "AD_Field_ID =" + Util.GetValueOfInt(dr["AD_Field_ID"]));
+                        }
+
+                        InsertIntoDBSchema(X_AD_CardView.Table_ID, sAD_CardView_ID, X_AD_CardView.Table_Name, name, "AD_CardView_ID =" + sAD_CardView_ID);
+                        //Header
+
+                        // Card view column
+                        List<int> lstCardCol = GetIDs("AD_CardView_Column", "AD_CardView_Column_ID", "AD_CardView_ID=" + sAD_CardView_ID);
+
+                        for (int col = 0; col < lstCardCol.Count; col++)
+                        {
+                            int sAD_Field_ID = Util.GetValueOfInt(DB.ExecuteScalar("SELECT AD_ModuleField.AD_Field_ID FROM AD_ModuleField "
+                                                 + " WHERE AD_ModuleField.AD_Field_ID = (SELECT AD_CardView_Column.AD_Field_ID "
+                                                 + " FROM AD_CardView_Column WHERE AD_CardView_Column_ID=" + lstCardCol[col] + ")"));
+                            if (sAD_Field_ID > 0)
                             {
-                                InsertIntoDBSchema(X_AD_Field.Table_ID, sAD_Field_ID, X_AD_Field.Table_Name, name, "AD_Field_ID =" + sAD_Field_ID);
-                                InsertIntoDBSchema(X_AD_CardView_Column.Table_ID, lstCardCol[col], X_AD_CardView_Column.Table_Name, name, "AD_CardView_Column_ID=" + lstCardCol[col]);
+                                // if (HasModulePrefix("Sequence", "AD_CardView_Column", "AD_CardView_Column_ID=" + lstCardCol[col], out name))
+                                {
+                                    InsertField(false, "", sAD_Field_ID);
+                                    //InsertIntoDBSchema(X_AD_Field.Table_ID, sAD_Field_ID, X_AD_Field.Table_Name, name, "AD_Field_ID =" + sAD_Field_ID);
+                                    InsertIntoDBSchema(X_AD_CardView_Column.Table_ID, lstCardCol[col], X_AD_CardView_Column.Table_Name, name, "AD_CardView_Column_ID=" + lstCardCol[col]);
+                                }
                             }
                         }
-                    }
-                    List<int> lstCardCondition = GetIDs("AD_CardView_Condition", "AD_CardView_Condition_ID", "AD_CardView_ID=" + sAD_CardView_ID);
-                    for (int cnd = 0; cnd < lstCardCondition.Count; cnd++)
-                    {
-                        InsertIntoDBSchema(X_AD_CardView_Condition.Table_ID, lstCardCondition[cnd], X_AD_CardView_Condition.Table_Name, name, "AD_CardView_Condition_ID=" + lstCardCondition[cnd]);
-                    }
+                        List<int> lstCardCondition = GetIDs("AD_CardView_Condition", "AD_CardView_Condition_ID", "AD_CardView_ID=" + sAD_CardView_ID);
+                        for (int cnd = 0; cnd < lstCardCondition.Count; cnd++)
+                        {
+                            InsertIntoDBSchema(X_AD_CardView_Condition.Table_ID, lstCardCondition[cnd], X_AD_CardView_Condition.Table_Name, name, "AD_CardView_Condition_ID=" + lstCardCondition[cnd]);
+                        }
 
-                    //mark default card 
-                    List<int> dcids = GetIDs("AD_DefaultCardView", "AD_DefaultCardView_ID", "AD_CardView_ID=" + sAD_CardView_ID);
-                    for (int crd = 0; crd < dcids.Count; crd++)
-                    {
-                        InsertIntoDBSchema(X_AD_DefaultCardView.Table_ID, dcids[crd], X_AD_DefaultCardView.Table_Name, name, "AD_DefaultCardView_ID =" + dcids[crd]);
+                        //mark default card 
+                        List<int> dcids = GetIDs("AD_DefaultCardView", "AD_DefaultCardView_ID", "AD_CardView_ID=" + sAD_CardView_ID);
+                        for (int crd = 0; crd < dcids.Count; crd++)
+                        {
+                            InsertIntoDBSchema(X_AD_DefaultCardView.Table_ID, dcids[crd], X_AD_DefaultCardView.Table_Name, name, "AD_DefaultCardView_ID =" + dcids[crd]);
+                        }
                     }
                 }
             }

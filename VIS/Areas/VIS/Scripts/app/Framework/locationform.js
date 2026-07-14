@@ -36,7 +36,32 @@
         var stringAddress = null;
         var change = false;
 
+        // Read-only / edit-toggle state.
+        // When an address is bound (opened on an existing record, or picked from
+        // the search list) the detail fields open read-only; the green Edit icon
+        // unlocks them. The search box and the Additional Info box always stay
+        // editable. See setReadOnly() / setLocationBound().
+        var isReadOnly = false;
+        var editBtn = null;
+        var sharedInd = null;
+
         var maintainVer = maintainVersinos;
+
+        // Additional Address Info (e.g. flat number) - optional section.
+        // Only rendered when the calling location control enables it via
+        // setAdditionalAddressInfo(), i.e. when the current tab/table has an
+        // "AdditionalAddressInfo" column. Seeded from that column/context value
+        // and returned through onClose so the control can write it back.
+        var showAdditionalAddress = false;
+        var additionalAddressInfo = null;
+        var addlInfo = null;
+
+        // Enable and seed the Additional Address Info section.
+        // Called by the location control before load().
+        this.setAdditionalAddressInfo = function (value) {
+            showAdditionalAddress = true;
+            additionalAddressInfo = value;
+        };
 
         this.load = function () {
             // Parameter - AD_Language - Added to get country from location
@@ -119,6 +144,22 @@
             }
             contryId = $root.find("#countryhdn_" + windowNo).val();
             stateId = $root.find("#Statehdn_" + windowNo).val();
+
+            /*Additional Address Info Fill*/
+            // Reveal the extra section (flat number etc.) - rendered hidden in
+            // the view - when the calling tab/table carries an
+            // "AdditionalAddressInfo" column. This box is intentionally left out
+            // of the read-only field set so it stays editable at all times.
+            if (showAdditionalAddress) {
+                $root.find(".vis-additional-address-info").show();
+                addlInfo = $root.find("#txtAdditionalAddressInfo_" + windowNo);
+                if (additionalAddressInfo != null) {
+                    addlInfo.val(additionalAddressInfo);
+                }
+                addlInfo.bind('change', function (e) {
+                    change = true;
+                });
+            }
 
 
             /*Country Fill*/
@@ -271,9 +312,15 @@
                     zip.val(ui.item.ZIPCODE);
                     change = true;
                     stateId = ui.item.C_REGION_ID;
-                    $C_Location_ID = 0;//ui.item.C_LOCATION_ID;    
+                    // Bind the SELECTED location's id so an edit updates that same
+                    // master record instead of creating a new one. (Was forced to
+                    // 0, which is what caused a new C_Location on every save.)
+                    $C_Location_ID = ui.item.C_LOCATION_ID;
                     cityId = 0;
                     contryId = ui.item.C_COUNTRY_ID;
+                    // Show the picked address read-only; user clicks Edit to change it.
+                    setLocationBound(Number($C_Location_ID) > 0);
+                    setReadOnly(true);
                 },
         open: function () {
             $root.find(this).removeClass("ui-corner-all").addClass("ui-corner-top");
@@ -358,6 +405,19 @@
         change = true;
     });
 
+    // Green Edit icon: toggles the detail fields between read-only and editable.
+    editBtn = $root.find("#aEditLocation_" + windowNo);
+    sharedInd = $root.find("#visLocShared_" + windowNo);
+    editBtn.on("click", function () {
+        setReadOnly(!isReadOnly);
+    });
+
+    // Initial state: an address opened on an existing record starts read-only
+    // (Edit icon + Shared indicator shown); a blank/new address starts editable.
+    var hasExisting = Number($C_Location_ID) > 0;
+    setLocationBound(hasExisting);
+    setReadOnly(hasExisting);
+
     //Save data in the database
     function saveLocation(data, callback) {
         var result = null;
@@ -375,7 +435,7 @@
             this.location = $C_Location_ID;
             setBusy(false);
             if ($self.onClose)
-                $self.onClose($C_Location_ID, change);
+                $self.onClose($C_Location_ID, change, addlInfo ? addlInfo.val() : null, showAdditionalAddress);
             $root.dialog('close');
             change = null;
         })
@@ -386,12 +446,40 @@ function setBusy(isBusy) {
     $busyDiv.css("display", isBusy ? 'block' : 'none');
 };
 
+// Toggle the address detail fields between read-only and editable.
+// The search box and the Additional Info box are deliberately excluded so
+// the user can always search a different address / edit the extra info.
+function setReadOnly(ro) {
+    isReadOnly = ro;
+    var flds = [country, add1, add2, add3, add4, city, state, zip];
+    for (var i = 0; i < flds.length; i++) {
+        if (flds[i] && flds[i].length) {
+            flds[i].prop("readonly", ro);
+        }
+    }
+    var $form = $root.find(".vis-locform");
+    if (ro) {
+        $form.addClass("vis-loc-readonly");
+        if (editBtn) editBtn.removeClass("editing");
+    } else {
+        $form.removeClass("vis-loc-readonly");
+        if (editBtn) editBtn.addClass("editing");
+    }
+};
+
+// Show/hide the Edit icon and the "Shared Address" indicator. They are only
+// relevant once an existing master address is bound to the form.
+function setLocationBound(bound) {
+    if (editBtn) editBtn.toggle(!!bound);
+    if (sharedInd) sharedInd.toggle(!!bound);
+};
+
 this.showDialog = function () {
     $root.append($busyDiv);
     $root.dialog({
         modal: true,
         resizable: false,
-        title: VIS.Msg.getMsg("Location"),
+        title: VIS.Msg.getMsg("Location") + " / " + VIS.Msg.getMsg("Address"),
         closeText: VIS.Msg.getMsg("close"),
         // height: 440,
         width: 620,
@@ -411,6 +499,11 @@ this.disposeComponent = function () {
         Okbtn.off("click");
     if (cancelbtn)
         cancelbtn.off("click");
+    if (editBtn)
+        editBtn.off("click");
+
+    editBtn = null;
+    sharedInd = null;
 
     $C_Location_ID = 0;
     searchlst = null;
@@ -433,6 +526,8 @@ this.disposeComponent = function () {
     customAddList = null;
 
     stringAddress = null;
+
+    addlInfo = null;
 
 
 
