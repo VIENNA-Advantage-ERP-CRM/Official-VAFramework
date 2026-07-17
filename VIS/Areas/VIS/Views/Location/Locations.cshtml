@@ -20,6 +20,8 @@
         align-items: center;
         margin-left: 6px;
     }
+    /* Action icons are themed from the primary colour so they follow whatever
+       theme is active (--v-c-primary / --v-c-on-primary are RGB triples). */
     .vis-locform .vis-loc-icon-btn {
         display: inline-flex;
         align-items: center;
@@ -27,23 +29,45 @@
         width: 34px;
         height: 34px;
         border-radius: 4px;
-        border: 1px solid #c8ced6;
-        color: #4a5561;
+        border: 1px solid rgba(var(--v-c-primary), .45);
+        color: rgba(var(--v-c-primary), 1);
         text-decoration: none;
         background: #fff;
         cursor: pointer;
         margin-left: 4px;
+        transition: background .15s ease, color .15s ease, border-color .15s ease;
     }
-    .vis-locform .vis-loc-icon-btn:hover { background: #f2f4f6; }
-    .vis-locform .vis-loc-edit-btn {
-        background: #2e9e5b;
-        border-color: #2e9e5b;
-        color: #fff;
+    .vis-locform .vis-loc-icon-btn:hover { background: rgba(var(--v-c-primary), .1); }
+    .vis-locform .vis-loc-icon-btn:focus { outline: none; box-shadow: 0 0 0 2px rgba(var(--v-c-primary), .25); }
+    /* New (+) = filled primary: the create action stands out. */
+    .vis-locform .vis-loc-new-btn {
+        background: rgba(var(--v-c-primary), 1);
+        border-color: rgba(var(--v-c-primary), 1);
+        color: rgba(var(--v-c-on-primary), 1);
     }
-    .vis-locform .vis-loc-edit-btn:hover { background: #268a4f; color: #fff; }
-    .vis-locform .vis-loc-edit-btn.editing {
+    .vis-locform .vis-loc-new-btn:hover {
+        background: rgba(var(--v-c-primary), .85);
+        color: rgba(var(--v-c-on-primary), 1);
+    }
+    /* In "add" mode the button acts as an Undo/restore toggle (outlined). */
+    .vis-locform .vis-loc-new-btn.adding {
         background: #fff;
-        color: #2e9e5b;
+        color: rgba(var(--v-c-primary), 1);
+    }
+    /* Edit (pencil) = outlined primary at rest, filled while actively editing. */
+    .vis-locform .vis-loc-edit-btn {
+        background: #fff;
+        border-color: rgba(var(--v-c-primary), 1);
+        color: rgba(var(--v-c-primary), 1);
+    }
+    .vis-locform .vis-loc-edit-btn:hover {
+        background: rgba(var(--v-c-primary), .1);
+        color: rgba(var(--v-c-primary), 1);
+    }
+    .vis-locform .vis-loc-edit-btn.editing {
+        background: rgba(var(--v-c-primary), 1);
+        border-color: rgba(var(--v-c-primary), 1);
+        color: rgba(var(--v-c-on-primary), 1);
     }
 
     .vis-locform .vis-loc-group {
@@ -65,7 +89,7 @@
         align-items: center;
         font-weight: 400;
         font-size: 12px;
-        color: #2e9e5b;
+        color: rgba(var(--v-c-primary), 1);
         margin-left: 12px;
         cursor: help;
     }
@@ -91,6 +115,9 @@
                     <div class="input-group-append"><span class="input-group-text"><a href="javascript:void(0)" class="glyphicon glyphicon-search"></a></span></div>
                 </div>
                 <div class="vis-loc-search-actions">
+                    <a href="javascript:void(0)" id="aNewLocation_@windowNo" title="@VAdvantage.Utility.Msg.GetMsg(lang, "New")" class="vis-loc-icon-btn vis-loc-new-btn" style="display:none">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
                     <a href="javascript:void(0)" id="aEditLocation_@windowNo" title="@VAdvantage.Utility.Msg.GetMsg(lang, "Edit")" class="vis-loc-icon-btn vis-loc-edit-btn" style="display:none">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </a>
@@ -183,13 +210,13 @@
 
                     <tr>
                         <td>
-                            <div class="zip-input pull-right location input-group vis-input-wrap">
+                            <div class="zip-input pull-left location input-group vis-input-wrap">
                                 <div class="vis-control-wrap">
                                     @Html.TextBoxFor(m => m.ZipCode, new { autofocus = "autofocus", id = "txtZipCode_" + ViewBag.WindowNumber, @maxlength = "10", @class = "form-control pull-right", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "ZipCode") })
                                     <label id="lblZipCode_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "ZipCode") </label>
                                 </div>
                             </div>
-                            <div class="form-input pull-left location input-group vis-input-wrap">
+                            <div class="form-input pull-right location input-group vis-input-wrap">
                                 <div class="vis-control-wrap">
                                     @Html.TextBoxFor(m => m.RegionName, new { autofocus = "autofocus", id = "txtState_" + ViewBag.WindowNumber, @maxlength = "40", @class = "form-control", @placeholder = @VAdvantage.Utility.Msg.GetMsg(lang, "Region") })
                                     <label id="lblState_@windowNo" class="VIS_Pref_Label_Font control-label">@VAdvantage.Utility.Msg.GetMsg(lang, "Region") </label>

@@ -6460,7 +6460,7 @@
      * @param {any} checkContext
      * @param {any} isMR
      */
-    GridField.prototype.getIsEditable = function (checkContext, isMR) {
+    GridField.prototype.getIsEditable = function (checkContext, isMR,skipDisplayLogic) {
         var _vo = this.vo;
         if (this.getIsVirtualColumn())
             return false;
@@ -6579,7 +6579,9 @@
         //  Record is not Active
         if (checkContext && !ctx.getWindowContext(_vo.windowNo, _vo.tabNo, "IsActive").equals("Y"))
             return false;
-
+        if (skipDisplayLogic) {
+            return true;
+        }
         if (!isMR)
             return this.getIsDisplayed(checkContext);
         return this.getIsDisplayedMR(checkContext);

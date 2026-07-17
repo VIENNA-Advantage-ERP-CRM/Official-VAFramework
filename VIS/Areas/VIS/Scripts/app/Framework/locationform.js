@@ -38,12 +38,32 @@
 
         // Read-only / edit-toggle state.
         // When an address is bound (opened on an existing record, or picked from
-        // the search list) the detail fields open read-only; the green Edit icon
+        // the search list) the detail fields open read-only; the Edit icon
         // unlocks them. The search box and the Additional Info box always stay
-        // editable. See setReadOnly() / setLocationBound().
+        // editable. See setReadOnly() / setBound() / refreshActionIcons().
         var isReadOnly = false;
         var editBtn = null;
         var sharedInd = null;
+
+        // isBound     - an existing master address is currently shown on the form.
+        // isEditing   - the detail fields are unlocked via the Edit icon (transient).
+        // editedExisting - latched once an existing address is opened for editing,
+        //               so a subsequent change is saved as a NEW location (insert)
+        //               instead of mutating the shared master. Reset on
+        //               search-select, add-mode and (re)open.
+        var isBound = false;
+        var isEditing = false;
+        var editedExisting = false;
+
+        // Add / New state.
+        // The New (+) icon clears the form to create a brand-new location.
+        // While in add-mode it acts as an Undo toggle: pressing it again restores
+        // the snapshot taken when add-mode was entered. In both add-mode and
+        // edit-mode the search box is locked read-only so the user can't switch
+        // to a different address mid-entry. See newBtn wiring / setSearchReadOnly().
+        var newBtn = null;
+        var isNewMode = false;
+        var newSnapshot = null;
 
         var maintainVer = maintainVersinos;
 
@@ -318,8 +338,13 @@
                     $C_Location_ID = ui.item.C_LOCATION_ID;
                     cityId = 0;
                     contryId = ui.item.C_COUNTRY_ID;
-                    // Show the picked address read-only; user clicks Edit to change it.
-                    setLocationBound(Number($C_Location_ID) > 0);
+                    // A freshly picked address is shown read-only and treated as an
+                    // update-in-place reference (same C_Location_ID) until the user
+                    // clicks Edit. Reset the edit latch so selecting alone never
+                    // forces an insert.
+                    isEditing = false;
+                    editedExisting = false;
+                    setBound(Number($C_Location_ID) > 0);
                     setReadOnly(true);
                 },
         open: function () {
@@ -340,9 +365,11 @@
             return;
         }
 
-        // Set C_Location_ID as 0, 
-        // if maintain Version is marked on column and there is any change in value on Location Control
-        if (maintainVer && change)
+        // Save as a NEW location (insert) instead of updating the bound master when:
+        //   - the user unlocked an existing address via Edit and changed something
+        //     (protects the shared master record from in-place mutation), or
+        //   - Maintain Versions is enabled on the column and a value changed.
+        if (change && (editedExisting || maintainVer))
             $C_Location_ID = 0;
 
         var objValue = {
@@ -405,18 +432,133 @@
         change = true;
     });
 
-    // Green Edit icon: toggles the detail fields between read-only and editable.
+    // Edit icon (pencil): toggles the detail fields between read-only and editable.
+    // Entering edit-mode locks the search box; leaving it unlocks the box.
     editBtn = $root.find("#aEditLocation_" + windowNo);
     sharedInd = $root.find("#visLocShared_" + windowNo);
     editBtn.on("click", function () {
+        // Edit and Add are mutually exclusive; ignore Edit while adding.
+        if (isNewMode) {
+            return;
+        }
         setReadOnly(!isReadOnly);
+        // isReadOnly now reflects the new state: fields editable => in edit mode.
+        isEditing = !isReadOnly;
+        setSearchReadOnly(isEditing);
+        // Latch that an existing address was opened for editing, so a subsequent
+        // change is saved as a new location (insert) rather than an update.
+        if (isEditing) {
+            editedExisting = true;
+        }
+        editBtn.attr("title", isEditing ? VIS.Msg.getMsg("Cancel") : VIS.Msg.getMsg("Edit"));
+        // While editing, hide the New(+) icon (mutually exclusive).
+        refreshActionIcons();
+    });
+
+    // New (+) icon: clear the form to create a new location, or - when
+    // already in add-mode - undo back to the snapshot taken on entry.
+    newBtn = $root.find("#aNewLocation_" + windowNo);
+    newBtn.on("click", function () {
+        if (!isNewMode) {
+            // Enter add-mode: snapshot current values, then blank the form.
+            newSnapshot = captureSnapshot();
+            clearFields();
+            $C_Location_ID = 0;
+            contryId = 0;
+            stateId = 0;
+            cityId = 0;
+            change = true;
+            isNewMode = true;
+            isEditing = false;
+            editedExisting = false;
+            isBound = false;
+            newBtn.addClass("adding");
+            setNewIconAdding(true);
+            newBtn.attr("title", VIS.Msg.getMsg("Undo"));
+            // Blank form is fully editable; existing-record Edit icon is hidden.
+            setReadOnly(false);
+            setSearchReadOnly(true);
+            refreshActionIcons();
+        } else {
+            // Undo: restore the snapshot and the state it was captured in.
+            restoreSnapshot(newSnapshot);
+            newSnapshot = null;
+            isNewMode = false;
+            isEditing = false;
+            editedExisting = false;
+            newBtn.removeClass("adding");
+            setNewIconAdding(false);
+            newBtn.attr("title", VIS.Msg.getMsg("New"));
+            var bound = Number($C_Location_ID) > 0;
+            isBound = bound;
+            setReadOnly(bound);
+            setSearchReadOnly(false);
+            refreshActionIcons();
+        }
     });
 
     // Initial state: an address opened on an existing record starts read-only
-    // (Edit icon + Shared indicator shown); a blank/new address starts editable.
+    // (Edit + New icons shown); a blank/new address starts editable. When opened
+    // without a bound location there is nothing to edit or undo, so BOTH icons
+    // stay hidden (the form is already a blank, fully-editable new entry).
     var hasExisting = Number($C_Location_ID) > 0;
-    setLocationBound(hasExisting);
+    isEditing = false;
+    editedExisting = false;
+    setBound(hasExisting);
     setReadOnly(hasExisting);
+    setSearchReadOnly(false);
+
+    // Snapshot the editable field values + ids so add-mode can be undone.
+    function captureSnapshot() {
+        return {
+            clocationId: $C_Location_ID,
+            change: change,
+            country: country.val(),
+            add1: add1.val(),
+            add2: add2.val(),
+            add3: add3.val(),
+            add4: add4.val(),
+            city: city.val(),
+            state: state.val(),
+            zip: zip.val(),
+            contryId: contryId,
+            stateId: stateId,
+            cityId: cityId
+        };
+    }
+
+    // Restore a snapshot produced by captureSnapshot().
+    function restoreSnapshot(s) {
+        if (!s) {
+            return;
+        }
+        $C_Location_ID = s.clocationId;
+        change = s.change;
+        country.val(s.country);
+        add1.val(s.add1);
+        add2.val(s.add2);
+        add3.val(s.add3);
+        add4.val(s.add4);
+        city.val(s.city);
+        state.val(s.state);
+        zip.val(s.zip);
+        contryId = s.contryId;
+        stateId = s.stateId;
+        cityId = s.cityId;
+    }
+
+    // Blank all address detail fields for a fresh entry. The search box and the
+    // Additional Info box are intentionally left untouched.
+    function clearFields() {
+        country.val("");
+        add1.val("");
+        add2.val("");
+        add3.val("");
+        add4.val("");
+        city.val("");
+        state.val("");
+        zip.val("");
+    }
 
     //Save data in the database
     function saveLocation(data, callback) {
@@ -467,11 +609,46 @@ function setReadOnly(ro) {
     }
 };
 
-// Show/hide the Edit icon and the "Shared Address" indicator. They are only
-// relevant once an existing master address is bound to the form.
-function setLocationBound(bound) {
-    if (editBtn) editBtn.toggle(!!bound);
-    if (sharedInd) sharedInd.toggle(!!bound);
+// Lock/unlock the address search box. It is locked while the user is actively
+// editing an existing address or adding a new one, so they can't switch to a
+// different master record mid-entry.
+function setSearchReadOnly(ro) {
+    if (searchlst && searchlst.length) {
+        searchlst.prop("readonly", ro);
+    }
+}
+
+// Record whether an existing master address is currently shown, then refresh
+// the action-icon visibility.
+function setBound(bound) {
+    isBound = !!bound;
+    refreshActionIcons();
+};
+
+// Central visibility rule for the New(+) and Edit(pencil) icons:
+//   - nothing bound and not adding    -> both hidden (blank / new entry);
+//   - editing an existing address     -> only Edit shown (New hidden);
+//   - adding a new address            -> only New shown (acts as Undo);
+//   - a bound address shown read-only -> both shown.
+function refreshActionIcons() {
+    var showEdit = isBound && !isNewMode;
+    var showNew = isNewMode || (isBound && !isEditing);
+    if (editBtn) editBtn.toggle(!!showEdit);
+    if (newBtn) newBtn.toggle(!!showNew);
+    if (sharedInd) sharedInd.toggle(!!(isBound && !isNewMode && !isEditing));
+};
+
+// Swap the New icon between "+" (create) and the undo/restore glyph shown while
+// in add-mode, so the icon reflects what the next click will do.
+function setNewIconAdding(adding) {
+    if (!newBtn) return;
+    var $ic = newBtn.find(".glyphicon");
+    if (!$ic.length) return;
+    if (adding) {
+        $ic.removeClass("glyphicon-plus").addClass("glyphicon-repeat");
+    } else {
+        $ic.removeClass("glyphicon-repeat").addClass("glyphicon-plus");
+    }
 };
 
 this.showDialog = function () {
@@ -501,9 +678,13 @@ this.disposeComponent = function () {
         cancelbtn.off("click");
     if (editBtn)
         editBtn.off("click");
+    if (newBtn)
+        newBtn.off("click");
 
     editBtn = null;
     sharedInd = null;
+    newBtn = null;
+    newSnapshot = null;
 
     $C_Location_ID = 0;
     searchlst = null;
