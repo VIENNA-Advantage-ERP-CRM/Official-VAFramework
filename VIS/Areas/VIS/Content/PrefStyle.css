@@ -926,11 +926,11 @@ input:required:valid {
 }
 
 .form-input {
-    padding-right: 7px;
+    padding-left: 7px;
 }
 
 .zip-input {
-    padding-left: 7px;
+    padding-right: 7px;
 }
 
     .zip-input > label {
