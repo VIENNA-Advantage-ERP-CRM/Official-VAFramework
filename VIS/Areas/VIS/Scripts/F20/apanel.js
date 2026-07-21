@@ -2462,7 +2462,8 @@
         if (action.source instanceof VIS.Controls.VButton) {
             var btnField = action.source.getField();
             //exempt window action button, and field Button actions from Readonly state of tab and field
-            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && !btnField.getIsAction() && (!btnField.getIsEditable(true) || this.curTab.getIsReadOnly())) {
+            if (!this.getIsWindowAction(btnField.getAD_Reference_Value_ID()) && !btnField.getIsAction() &&
+                (!btnField.getIsEditable(true,false, controller instanceof VIS.HeaderPanel) || this.curTab.getIsReadOnly())) {
                 return;
             }
         }
