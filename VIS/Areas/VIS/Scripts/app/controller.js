@@ -4043,11 +4043,40 @@
         field.setValue(value, this.inserting);
         _rowData[field.getColumnName().toLowerCase()] = value;
 
+        // The Additional Address Info is painted as part of the address string by
+        // the location control (see VLocation.refreshDisplay). Changing it leaves
+        // C_Location_ID untouched, so the location fields fire nothing of their
+        // own and have to be repainted here.
+        if (field.getColumnName().toLowerCase() == "additionaladdressinfo") {
+            this.refreshLocationDisplay();
+        }
+
         //  inform
         if (!this.disableNotification) {
             var evt = this.createDSE();
             evt.setChangedColumn(col, field.getColumnName());
             this.fireDataStatusChanged(evt);
+        }
+    };
+
+    /**
+     *  Repaint the location fields of this table.
+     *  Used when a value that is only part of their DISPLAY - the Additional
+     *  Address Info - changed: their own value is unchanged, so nothing else
+     *  would tell the control to redraw. Duck typed, controls that do not paint
+     *  an address (older/foreign editors) are simply skipped.
+     */
+    GridTable.prototype.refreshLocationDisplay = function () {
+        if (!this.gridFields) {
+            return;
+        }
+        for (var i = 0; i < this.gridFields.length; i++) {
+            var fld = this.gridFields[i];
+            if (fld && fld.getDisplayType() == VIS.DisplayType.Location
+                && fld.propertyChangeListner
+                && typeof fld.propertyChangeListner.refreshDisplay == "function") {
+                fld.propertyChangeListner.refreshDisplay();
+            }
         }
     };
 
