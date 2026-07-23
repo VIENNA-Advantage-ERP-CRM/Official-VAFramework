@@ -54,6 +54,10 @@
         var isBound = false;
         var isEditing = false;
         var editedExisting = false;
+        // Snapshot taken when the Edit icon unlocks an existing address, so the
+        // same icon can Undo (restore the original values) on the next click -
+        // exactly like the New(+) icon does in add-mode.
+        var editSnapshot = null;
 
         // Add / New state.
         // The New (+) icon clears the form to create a brand-new location.
@@ -76,11 +80,28 @@
         var additionalAddressInfo = null;
         var addlInfo = null;
 
+        // Read-only preview line under the search box showing the additional info
+        // together with the address string - the same text the location control
+        // paints once this dialog closes. Only used with the additional info
+        // section, so plain address dialogs look exactly as before.
+        var summary = null;
+        // Master address as formatted by the caller's lookup; used as the base of
+        // the preview while the address fields are untouched. Once they are
+        // edited the preview is rebuilt from the fields instead.
+        var addressDisplay = null;
+        var addressEdited = false;
+
         // Enable and seed the Additional Address Info section.
         // Called by the location control before load().
         this.setAdditionalAddressInfo = function (value) {
             showAdditionalAddress = true;
             additionalAddressInfo = value;
+        };
+
+        // Master address string as currently shown by the calling control.
+        // Optional - without it the preview is composed from the form fields.
+        this.setAddressDisplay = function (text) {
+            addressDisplay = text;
         };
 
         this.load = function () {
@@ -178,7 +199,14 @@
                 }
                 addlInfo.bind('change', function (e) {
                     change = true;
+                    updateSummary();
                 });
+                // Live preview while typing - the change flag stays tied to the
+                // real change event so a stray keystroke can't force an insert.
+                addlInfo.bind('keyup', function (e) {
+                    updateSummary();
+                });
+                summary = $root.find("#divLocSummary_" + windowNo);
             }
 
 
@@ -218,6 +246,8 @@
                         country.val('');
                     }
                     contryId = ui.item.id;
+                    addressEdited = true;
+                    updateSummary();
                     //var contryId = null;
                     //var stateId = null;
                     //var cityId = null;
@@ -237,6 +267,7 @@
                     else {
                         country.val('');
                     }
+                    updateSummary();
                 }
             });
 
@@ -272,6 +303,8 @@
                 minLength: 1,
                 select: function (event, ui) {
                     stateId = ui.item.id;
+                    addressEdited = true;
+                    updateSummary();
                 },
                 open: function () {
                     $root.find(this).removeClass("ui-corner-all").addClass("ui-corner-top");
@@ -346,6 +379,10 @@
                     editedExisting = false;
                     setBound(Number($C_Location_ID) > 0);
                     setReadOnly(true);
+                    // Preview now describes the picked master address.
+                    addressDisplay = ui.item.ADDRESS;
+                    addressEdited = false;
+                    updateSummary();
                 },
         open: function () {
             $root.find(this).removeClass("ui-corner-all").addClass("ui-corner-top");
@@ -432,8 +469,25 @@
         change = true;
     });
 
-    // Edit icon (pencil): toggles the detail fields between read-only and editable.
-    // Entering edit-mode locks the search box; leaving it unlocks the box.
+    // Any edit to an address detail field invalidates the address string handed
+    // over by the caller, so the preview is rebuilt from the fields from now on.
+    $.each([country, add1, add2, add3, add4, city, state, zip], function (i, fld) {
+        if (fld && fld.length) {
+            fld.bind('change keyup', function (e) {
+                addressEdited = true;
+                updateSummary();
+            });
+        }
+    });
+
+    // Edit icon (pencil): now behaves exactly like the New(+) icon.
+    //   - first click  -> snapshot the current values, unlock the detail fields
+    //                     and lock the search box; the icon swaps to the undo
+    //                     arrow (title "Undo").
+    //   - second click -> Undo: restore the snapshot, re-lock the fields and the
+    //                     icon reverts to the pencil (title "Edit").
+    // Entering edit-mode locks the search box so the user can't switch to a
+    // different master record mid-edit.
     editBtn = $root.find("#aEditLocation_" + windowNo);
     sharedInd = $root.find("#visLocShared_" + windowNo);
     editBtn.on("click", function () {
@@ -441,17 +495,30 @@
         if (isNewMode) {
             return;
         }
-        setReadOnly(!isReadOnly);
-        // isReadOnly now reflects the new state: fields editable => in edit mode.
-        isEditing = !isReadOnly;
-        setSearchReadOnly(isEditing);
-        // Latch that an existing address was opened for editing, so a subsequent
-        // change is saved as a new location (insert) rather than an update.
-        if (isEditing) {
+        if (!isEditing) {
+            // Enter edit-mode: snapshot so the next click can undo.
+            editSnapshot = captureSnapshot();
+            isEditing = true;
+            // Latch that an existing address was opened for editing, so a
+            // subsequent change is saved as a new location (insert) rather than
+            // an in-place update of the shared master.
             editedExisting = true;
+            setReadOnly(false);
+            setSearchReadOnly(true);
+            setEditIconEditing(true);
+            editBtn.attr("title", VIS.Msg.getMsg("Undo"));
+        } else {
+            // Undo: restore the snapshot and the read-only state it came from.
+            restoreSnapshot(editSnapshot);
+            editSnapshot = null;
+            isEditing = false;
+            editedExisting = false;
+            setReadOnly(true);
+            setSearchReadOnly(false);
+            setEditIconEditing(false);
+            editBtn.attr("title", VIS.Msg.getMsg("Edit"));
         }
-        editBtn.attr("title", isEditing ? VIS.Msg.getMsg("Cancel") : VIS.Msg.getMsg("Edit"));
-        // While editing, hide the New(+) icon (mutually exclusive).
+        // Refresh which icons are visible (New is hidden while editing).
         refreshActionIcons();
     });
 
@@ -507,12 +574,15 @@
     setBound(hasExisting);
     setReadOnly(hasExisting);
     setSearchReadOnly(false);
+    updateSummary();
 
     // Snapshot the editable field values + ids so add-mode can be undone.
     function captureSnapshot() {
         return {
             clocationId: $C_Location_ID,
             change: change,
+            addressDisplay: addressDisplay,
+            addressEdited: addressEdited,
             country: country.val(),
             add1: add1.val(),
             add2: add2.val(),
@@ -534,6 +604,8 @@
         }
         $C_Location_ID = s.clocationId;
         change = s.change;
+        addressDisplay = s.addressDisplay;
+        addressEdited = s.addressEdited;
         country.val(s.country);
         add1.val(s.add1);
         add2.val(s.add2);
@@ -545,6 +617,7 @@
         contryId = s.contryId;
         stateId = s.stateId;
         cityId = s.cityId;
+        updateSummary();
     }
 
     // Blank all address detail fields for a fresh entry. The search box and the
@@ -558,6 +631,9 @@
         city.val("");
         state.val("");
         zip.val("");
+        // Nothing left of the caller's address string to preview.
+        addressEdited = true;
+        updateSummary();
     }
 
     //Save data in the database
@@ -609,6 +685,38 @@ function setReadOnly(ro) {
     }
 };
 
+// Refresh the read-only preview under the search box: the Additional Address
+// Info joined to the address string, exactly as the location control paints it
+// (VIS.MLocationLookup.combineAddress is the single formatting rule). Only in
+// use when the calling tab carries an AdditionalAddressInfo column - other
+// callers never get a summary element, so this is a no-op for them.
+function updateSummary() {
+    if (!summary || !summary.length) {
+        return;
+    }
+    var text = VIS.MLocationLookup.combineAddress(getBaseAddress(), addlInfo ? addlInfo.val() : null);
+    $root.find("#spnLocSummary_" + windowNo).text(text);
+    summary.toggle(text.length > 0);
+};
+
+// Address part of the preview: the caller's formatted string while the detail
+// fields are untouched, otherwise rebuilt from the fields so the preview keeps
+// up with what is being typed.
+function getBaseAddress() {
+    if (!addressEdited && addressDisplay) {
+        return addressDisplay;
+    }
+    var flds = [add1, add2, add3, add4, city, state, zip, country];
+    var parts = [];
+    for (var i = 0; i < flds.length; i++) {
+        var v = (flds[i] && flds[i].length) ? $.trim(flds[i].val() || "") : "";
+        if (v.length > 0) {
+            parts.push(v);
+        }
+    }
+    return parts.join(", ");
+};
+
 // Lock/unlock the address search box. It is locked while the user is actively
 // editing an existing address or adding a new one, so they can't switch to a
 // different master record mid-entry.
@@ -638,16 +746,30 @@ function refreshActionIcons() {
     if (sharedInd) sharedInd.toggle(!!(isBound && !isNewMode && !isEditing));
 };
 
-// Swap the New icon between "+" (create) and the undo/restore glyph shown while
-// in add-mode, so the icon reflects what the next click will do.
+// Swap the New icon between "+" (create) and the window's undo arrow shown while
+// in add-mode, so the icon reflects what the next click will do. Uses the same
+// Font Awesome undo glyph (fa fa-undo) as the main window toolbar.
 function setNewIconAdding(adding) {
     if (!newBtn) return;
-    var $ic = newBtn.find(".glyphicon");
+    var $ic = newBtn.find(".vis-loc-btn-ico");
     if (!$ic.length) return;
     if (adding) {
-        $ic.removeClass("glyphicon-plus").addClass("glyphicon-repeat");
+        $ic.removeClass("glyphicon glyphicon-plus").addClass("fa fa-undo");
     } else {
-        $ic.removeClass("glyphicon-repeat").addClass("glyphicon-plus");
+        $ic.removeClass("fa fa-undo").addClass("glyphicon glyphicon-plus");
+    }
+};
+
+// Swap the Edit icon between the pencil (edit) and the window's undo arrow shown
+// while in edit-mode, mirroring setNewIconAdding().
+function setEditIconEditing(editing) {
+    if (!editBtn) return;
+    var $ic = editBtn.find(".vis-loc-btn-ico");
+    if (!$ic.length) return;
+    if (editing) {
+        $ic.removeClass("glyphicon glyphicon-pencil").addClass("fa fa-undo");
+    } else {
+        $ic.removeClass("fa fa-undo").addClass("glyphicon glyphicon-pencil");
     }
 };
 
@@ -685,6 +807,7 @@ this.disposeComponent = function () {
     sharedInd = null;
     newBtn = null;
     newSnapshot = null;
+    editSnapshot = null;
 
     $C_Location_ID = 0;
     searchlst = null;
@@ -709,6 +832,8 @@ this.disposeComponent = function () {
     stringAddress = null;
 
     addlInfo = null;
+    summary = null;
+    addressDisplay = null;
 
 
 
