@@ -54,7 +54,8 @@
         background: #fff;
         color: rgba(var(--v-c-primary), 1);
     }
-    /* Edit (pencil) = outlined primary at rest, filled while actively editing. */
+    /* Edit (pencil) = outlined primary. In "edit" mode it acts as an Undo/restore
+       toggle (stays outlined, icon swaps to the undo arrow) - mirroring New. */
     .vis-locform .vis-loc-edit-btn {
         background: #fff;
         border-color: rgba(var(--v-c-primary), 1);
@@ -65,9 +66,8 @@
         color: rgba(var(--v-c-primary), 1);
     }
     .vis-locform .vis-loc-edit-btn.editing {
-        background: rgba(var(--v-c-primary), 1);
-        border-color: rgba(var(--v-c-primary), 1);
-        color: rgba(var(--v-c-on-primary), 1);
+        background: #fff;
+        color: rgba(var(--v-c-primary), 1);
     }
 
     .vis-locform .vis-loc-group {
@@ -101,6 +101,20 @@
         cursor: default;
     }
 
+    /* Read-only preview of the full address as it will appear in the location
+       control - i.e. with the Additional Address Info prefixed. Only rendered
+       when the additional info section is in use. */
+    .vis-locform .vis-loc-summary {
+        margin: 2px 2px 8px 2px;
+        font-size: 12px;
+        color: #555;
+        word-break: break-word;
+    }
+    .vis-locform .vis-loc-summary .vis-loc-summary-ico {
+        margin-right: 5px;
+        color: rgba(var(--v-c-primary), 1);
+    }
+
     .vis-locform .btns { padding-top: 4px; }
 </style>
 
@@ -116,12 +130,17 @@
                 </div>
                 <div class="vis-loc-search-actions">
                     <a href="javascript:void(0)" id="aNewLocation_@windowNo" title="@VAdvantage.Utility.Msg.GetMsg(lang, "New")" class="vis-loc-icon-btn vis-loc-new-btn" style="display:none">
-                        <span class="glyphicon glyphicon-plus"></span>
+                        <span class="vis-loc-btn-ico glyphicon glyphicon-plus"></span>
                     </a>
                     <a href="javascript:void(0)" id="aEditLocation_@windowNo" title="@VAdvantage.Utility.Msg.GetMsg(lang, "Edit")" class="vis-loc-icon-btn vis-loc-edit-btn" style="display:none">
-                        <span class="glyphicon glyphicon-pencil"></span>
+                        <span class="vis-loc-btn-ico glyphicon glyphicon-pencil"></span>
                     </a>
                 </div>
+            </div>
+            @* Full address preview (Additional Address Info + address) - shown by
+               JS only when the calling tab carries an AdditionalAddressInfo column. *@
+            <div id="divLocSummary_@windowNo" class="vis-loc-summary" style="display:none">
+                <span class="vis-loc-summary-ico glyphicon glyphicon-map-marker"></span><span id="spnLocSummary_@windowNo"></span>
             </div>
         </td>
     </tr>

@@ -984,6 +984,10 @@
                 oColumn.sortable = true;
 
                 oColumn.lookup = mField.getLookup();
+                // A location cell also shows the record's Additional Address Info
+                // (flat number etc.) in front of the address, like the location
+                // control does. A locator has no such qualifier.
+                oColumn.isLocation = displayType == VIS.DisplayType.Location;
                 if (isDisplayed) {
                     oColumn.render = function (record, index, colIndex) {
                         var l = oColumns[colIndex].lookup;
@@ -996,6 +1000,14 @@
 
                         if (l) {
                             val = l.getDisplay(val, true);
+                            if (oColumns[colIndex].isLocation) {
+                                // Grid records are keyed by lower cased column name.
+                                var addl = record["additionaladdressinfo"];
+                                if (record.changes && typeof record.changes["additionaladdressinfo"] != 'undefined') {
+                                    addl = record.changes["additionaladdressinfo"];
+                                }
+                                val = VIS.MLocationLookup.combineAddress(val, addl);
+                            }
                             val = w2utils.encodeTags(val);
                         }
 

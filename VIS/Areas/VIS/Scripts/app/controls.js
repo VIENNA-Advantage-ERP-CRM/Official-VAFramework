@@ -4295,6 +4295,11 @@
      *  @param title title
      */
 
+    // Optional column, on the tab that owns the location field, holding the
+    // record level address qualifier (flat / door / floor number). When present
+    // its value is shown in front of the address string - see refreshDisplay().
+    var ADDITIONAL_ADDRESS_INFO = "AdditionalAddressInfo";
+
     function VLocation(columnName, isMandatory, isReadOnly, isUpdateable, displayType, lookup, hideMapButton) {
         if (!displayType) {
             displayType = VIS.DisplayType.Location;
@@ -4393,9 +4398,12 @@
             // "AdditionalAddressInfo" column, show an extra section in the
             // location form seeded from that column/context value.
             var addlGridTab = (self.mField && self.mField.gridTab) ? self.mField.gridTab : null;
-            var hasAddlColumn = addlGridTab && addlGridTab.getTableModel().findColumn("AdditionalAddressInfo") >= 0;
+            var hasAddlColumn = addlGridTab && addlGridTab.getTableModel().findColumn(ADDITIONAL_ADDRESS_INFO) >= 0;
             if (hasAddlColumn) {
-                obj.setAdditionalAddressInfo(addlGridTab.getValue("AdditionalAddressInfo"));
+                obj.setAdditionalAddressInfo(addlGridTab.getValue(ADDITIONAL_ADDRESS_INFO));
+                // Hand the master address over so the dialog can preview exactly
+                // the string this control paints once it is closed.
+                obj.setAddressDisplay(VIS.Utility.decodeText(self.lastDisplay || ""));
             }
 
             obj.load();
@@ -4419,12 +4427,17 @@
                     // and runs callouts in both form and inline-grid modes.
                     if (hasAdditionalInfo && hasAddlColumn) {
                         var newAddl = (additionalInfo == null || additionalInfo === "") ? null : additionalInfo;
-                        var curAddl = addlGridTab.getValue("AdditionalAddressInfo");
+                        var curAddl = addlGridTab.getValue(ADDITIONAL_ADDRESS_INFO);
                         curAddl = (curAddl == null || curAddl === "") ? null : String(curAddl);
                         if (curAddl !== (newAddl == null ? null : String(newAddl))) {
-                            addlGridTab.setValue("AdditionalAddressInfo", newAddl);
+                            addlGridTab.setValue(ADDITIONAL_ADDRESS_INFO, newAddl);
                         }
                     }
+
+                    // Repaint: the additional info is part of the address string
+                    // shown here, and it can change without the C_Location_ID
+                    // changing (so setValue alone would leave it stale).
+                    self.refreshDisplay();
                 }
             };
             obj = null;
@@ -4450,6 +4463,30 @@
 
     VIS.Utility.inheritPrototype(VLocation, IControl);//inherit IControl
 
+    /**
+     *  Current value of the AdditionalAddressInfo column on the tab that owns
+     *  this field, or null when the tab has no such column - or when the control
+     *  is used standalone (BPartner form, amount dimension) and has no field.
+     */
+    VLocation.prototype.getAdditionalInfo = function () {
+        var gridTab = (this.mField && this.mField.gridTab) ? this.mField.gridTab : null;
+        if (!gridTab || gridTab.getTableModel().findColumn(ADDITIONAL_ADDRESS_INFO) < 0) {
+            return null;
+        }
+        return gridTab.getValue(ADDITIONAL_ADDRESS_INFO);
+    };
+
+    /**
+     *  Paint the textbox from the cached master address plus the record's
+     *  additional info. Kept separate from setValue() because the info changes
+     *  independently of the C_Location_ID - on row change, when edited in its own
+     *  field, or when returning from the location dialog.
+     */
+    VLocation.prototype.refreshDisplay = function () {
+        var display = VIS.MLocationLookup.combineAddress(this.lastDisplay, this.getAdditionalInfo());
+        this.ctrl.val(VIS.Utility.decodeText(display));
+    };
+
     VLocation.prototype.setValue = function (newValue) {
         if (this.oldValue != newValue) {
             this.settingValue = true;
@@ -4459,29 +4496,27 @@
             //	Set comboValue
             if (newValue == null) {
                 this.lastDisplay = "";
-                this.ctrl.val("");
                 this.settingValue = false;
-                return;
             }
-            if (this.lookup == null) {
-                this.ctrl.val(newValue.toString());
+            else if (this.lookup == null) {
                 this.lastDisplay = newValue.toString();
                 this.settingValue = false;
-                return;
             }
-
-            this.lastDisplay = this.lookup.getDisplay(newValue);
-            if (this.lastDisplay.equals("<-1>")) {
-                this.lastDisplay = "";
-                this.oldValue = null;
-                this.value = null;
+            else {
+                this.lastDisplay = this.lookup.getDisplay(newValue);
+                if (this.lastDisplay.equals("<-1>")) {
+                    this.lastDisplay = "";
+                    this.oldValue = null;
+                    this.value = null;
+                }
+                this.value = newValue;
+                this.settingValue = true;
             }
-            this.value = newValue;
-            //this.ctrl.val(this.lastDisplay);
-            this.ctrl.val(VIS.Utility.decodeText(this.lastDisplay));
-            this.settingValue = true;
-
         }
+        // Always repaint, even when the id did not change: moving to another
+        // record that shares the same address still has to pick up that record's
+        // own additional info.
+        this.refreshDisplay();
     };
 
     VLocation.prototype.getValue = function () {
@@ -4494,7 +4529,12 @@
             retValue = this.value;
         else
             retValue = this.lookup.getDisplay(this.value);
-        return retValue;
+
+        var addl = this.getAdditionalInfo();
+        if (addl == null || String(addl).trim().length == 0) {
+            return retValue;
+        }
+        return VIS.MLocationLookup.combineAddress(retValue, addl);
     };
 
     //END
