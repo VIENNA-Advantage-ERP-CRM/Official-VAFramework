@@ -18,6 +18,7 @@ namespace VAModelAD.AIHelper
         public class AIHelperData
         {
             public int sessionID { get; set; }
+            public string sessionGUID { get; set; }
 
             public int userID { get; set; }
 
