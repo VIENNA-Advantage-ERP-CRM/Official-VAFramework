@@ -924,6 +924,7 @@
     <Compile Include="Areas\VIS\Controllers\SmsController.cs" />
     <Compile Include="Areas\VIS\Controllers\Subscribe\SubscribeController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\BiPanelController.cs" />
+    <Compile Include="Areas\VIS\Controllers\TabPanel\EventTimelineController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\HistoryDetailsDataController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\SurveyPanelController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\WFManualController.cs" />
@@ -953,6 +954,7 @@
     <Compile Include="Areas\VIS\Models\BPartnerModel.cs" />
     <Compile Include="Areas\VIS\Models\PendingChecklist.cs" />
     <Compile Include="Areas\VIS\Models\EmailModel.cs" />
+    <Compile Include="Areas\VIS\Models\EventTimelineModel.cs" />
     <Compile Include="Areas\VIS\Models\GmailContactsSettings.cs" />
     <Compile Include="Areas\VIS\Models\HistoryDetailsDataModel.cs" />
     <Compile Include="Areas\VIS\Models\SurveyPanelModel.cs" />
