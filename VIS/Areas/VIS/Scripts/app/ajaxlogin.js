@@ -540,6 +540,9 @@
         if (arr.length > 1) {
             $txtPwd.val(arr[1]);
         }
+        else {
+            $txtPwd.val(arr[0]);
+        }
         $btnLogin1.submit();
     };
 

@@ -190,6 +190,31 @@ namespace VAModelAD.Model
             if (!success)
                 return success;
 
+            // --- Record Timeline (created / updated / doc-action) -----------
+            // Created & Updated are written straight into AD_EventTimeline (no
+            // AD_ChangeLog dependency). DocStatus is a PO column, so this one
+            // hook also catches every doc-action transition (Prepared/Completed/
+            // Voided/Re-activated/Closed). The raw DocStatus code is stored; the
+            // human label is resolved at read time. Guarded by AD_Table.
+            // IsTimelineTracked so untracked tables pay ~nothing. Never fails the
+            // host save (MEventTimeline.Log swallows its own errors).
+            if (MEventTimeline.IsTracked(po.GetCtx(), po.Get_Table_ID()))
+            {
+                if (newRecord)
+                {
+                    MEventTimeline.Log(po, MEventTimeline.EVENT_Created, null, 0, null);
+                }
+                else if (po.Get_ColumnIndex("DocStatus") >= 0 && po.Is_ValueChanged("DocStatus"))
+                {
+                    MEventTimeline.Log(po, MEventTimeline.EVENT_DocAction,
+                        Util.GetValueOfString(po.Get_Value("DocStatus")), 0, null);
+                }
+                else if (MEventTimeline.HasTrackedChange(po))
+                {
+                    MEventTimeline.Log(po, MEventTimeline.EVENT_Updated, null, 0, null);
+                }
+            }
+
             if (Env.IsModuleInstalled("VA093_"))
             {
                 MTable tblMasTrx = MTable.Get(po.GetCtx(), po.Get_Table_ID());
@@ -513,7 +538,7 @@ namespace VAModelAD.Model
 
                 string columnName = po.Get_ColumnName(i);
                 // skip column if column name is either "Created" or "CreatedBy"
-                if (columnName.Trim().ToLower() == "created" || columnName.Trim().ToLower() == "createdby")
+                if (columnName.Trim().ToLower() == "created" || columnName.Trim().ToLower() == "createdby" || columnName.Trim().ToLower() == "updated" || columnName.Trim().ToLower() == "updatedby")
                     continue;
                 if (poMaster.Get_ColumnIndex(columnName) < 0)
                     continue;
