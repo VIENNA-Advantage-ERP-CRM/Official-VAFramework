@@ -139,7 +139,22 @@ namespace VIS.Models
                 case "Updated": return "updated";
                 case "Shared": return "shared";
                 case "Workflow":
-                    return (note != null && note.StartsWith("Sent for")) ? "sent_for" : "workflow";
+                    {
+                        string msg = "workflow";
+                        if(note != null && note.StartsWith("Sent for"))
+                        {
+                            msg = "sent_for";
+                        }
+                        else if(note != null && note.StartsWith("Forward to"))
+                        {
+                            msg = "forward_to";
+                        }
+                        else if(note != null && note.StartsWith("Approved by"))
+                        {
+                            msg = "approved_by";
+                        }
+                        return msg; 
+                    }
                 case "DocAction":
                     switch (docStatus)
                     {
