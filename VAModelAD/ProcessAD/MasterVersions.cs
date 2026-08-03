@@ -538,6 +538,11 @@ namespace VAdvantage.Process
             // Update AD_Sequence for Version table to set max + 1 against version table
             CountIns = DB.ExecuteQuery("UPDATE AD_Sequence SET CurrentNext = (SELECT (MAX(NVL(" + TableName + "_ID,0)) + 1) FROM " + TableName + ") WHERE LOWER(Name) = '" + TableName.Trim().ToLower() + "'", null, _trx);
 
+            if (MSysConfig.IsNativeSequence(false))
+            {
+                int m_sequence_id = VConnection.Get().GetDatabase().GetNextID(TableName + "_SEQ");
+            }
+
             log.Info("Master Version Sequence Updated " + CountIns);
         }
 

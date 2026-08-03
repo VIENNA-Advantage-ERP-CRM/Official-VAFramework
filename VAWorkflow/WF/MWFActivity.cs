@@ -350,13 +350,16 @@ namespace VAdvantage.WF
                 string wfState = GetWFState();
                 if (WFSTATE_Suspended.Equals(wfState))
                 {
+                    MUser user = MUser.Get(GetCtx(), _audit.GetAD_User_ID());
+
                     MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
                         null, GetAD_WF_Node_ID(), "Sent for " + GetNodeName());
                 }
                 else if (WFSTATE_Completed.Equals(wfState))
                 {
+                    MUser user = MUser.Get(GetCtx(), GetCtx().GetAD_User_ID());
                     MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
-                        null, GetAD_WF_Node_ID(), GetNodeName());
+                        null, GetAD_WF_Node_ID(), "Approved by " + user.GetName() + " " + GetNodeName());
                 }
             }
         }
@@ -3125,6 +3128,13 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             if (GetResponsibleOrg_ID() > 0)
                 _audit.SetResponsibleOrg_ID(GetResponsibleOrg_ID());
             _audit.Save();
+
+            if (MEventTimeline.IsTracked(GetCtx(), GetAD_Table_ID()))
+            {
+                MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
+                    null, GetAD_WF_Node_ID(), "Forward to " + user.GetName() + " " + GetNodeName());
+            }
+
             return true;
         }
 

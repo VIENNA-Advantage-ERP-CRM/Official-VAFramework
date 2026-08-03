@@ -538,7 +538,7 @@ namespace VAModelAD.Model
 
                 string columnName = po.Get_ColumnName(i);
                 // skip column if column name is either "Created" or "CreatedBy"
-                if (columnName.Trim().ToLower() == "created" || columnName.Trim().ToLower() == "createdby")
+                if (columnName.Trim().ToLower() == "created" || columnName.Trim().ToLower() == "createdby" || columnName.Trim().ToLower() == "updated" || columnName.Trim().ToLower() == "updatedby")
                     continue;
                 if (poMaster.Get_ColumnIndex(columnName) < 0)
                     continue;
