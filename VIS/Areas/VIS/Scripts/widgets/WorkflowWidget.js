@@ -116,7 +116,7 @@
             });
             $txtSearch.on("keydown", function (e) {
                 if (e.keyCode == 13) {
-                   // showBusy(true);
+                    // showBusy(true);
                     searchFunction();
                 }
             });
@@ -190,8 +190,8 @@
  <div id="ListContainer" class="vis-wfw-attachment-dropdown" ></div>
   </div>
 `;
-           /* <div id="ListContainer" class="vis-wfw-attachment-dropdown" style="display: none; position: absolute; top: 30px; right: -25px; background: white; border: 0px solid #ccc; z-index: 999; padding: 5px; min-width: 200px;"></div>
- */
+            /* <div id="ListContainer" class="vis-wfw-attachment-dropdown" style="display: none; position: absolute; top: 30px; right: -25px; background: white; border: 0px solid #ccc; z-index: 999; padding: 5px; min-width: 200px;"></div>
+  */
 
             $workflowWidget = ' <div id="FstMainDiv' + $self.AD_UserHomeWidgetID + '" class="vis-cardCls w-100">'// style="background-color:#f3f3f3"
                 + '     <div class="vis-w-welcomeScreenFeeds h-100">'
@@ -302,7 +302,7 @@
                         setTimeout(function () {
                             showBusy(false);
                         }, 200);
-                        
+
                     }
                     else {
                         data = null;
@@ -1035,7 +1035,7 @@
 
 
                                     var divLeft = $("<div class='vis-left-part'>");
-                                    if (info.Node[node].History[hNode].TextMsg.length > 0) {                                      
+                                    if (info.Node[node].History[hNode].TextMsg.length > 0) {
                                         var btnDetail = $("<a href='javascript:void(0)' class='VIS_Pref_tooltip vis-aTagCls'>").append("<i class='vis vis-info' data-toggle='tooltip' data-placement='bottom' title='" + VIS.Utility.encodeText(info.Node[node].History[hNode].TextMsg) + "'></i>");
                                         //var span = $("<span>");
                                         //span.append($("<img class='VIS_Pref_callout'>").attr('src', VIS.Application.contextUrl + "Areas/VIS/Images/ccc.png").append("ToolTip Text"));
@@ -1359,8 +1359,24 @@
             showBusy(false);
         };
         var zoom = function (index) {
-            //window id
-            VIS.AEnv.wfzoom(fulldata[index].AD_Table_ID, fulldata[index].Record_ID, fulldata[index].AD_WF_Activity_ID);
+            if (fulldata[index].TableName != null && fulldata[index].TableName == "VADMS_MetaData" && window.VADMS) {
+                var additionalInfo = {
+                    From: 'WF',
+                    ID: fulldata[index].Record_ID
+                };
+                var frame = new VIS.CFrame();
+                var doc = new window.VADMS.DocumentManagementSystem();
+                frame.setName(VIS.Msg.getMsg("VADMS_Document"));
+                frame.setTitle(VIS.Msg.getMsg("VADMS_Document"));
+                frame.hideHeader(true);
+                frame.setContent(doc);
+                doc.initialize(additionalInfo);
+                frame.show();
+            }
+            else {
+                //window id
+                VIS.AEnv.wfzoom(fulldata[index].AD_Table_ID, fulldata[index].Record_ID, fulldata[index].AD_WF_Activity_ID);
+            }
         };
         //Search Function
         function searchFunction() {
@@ -1391,7 +1407,7 @@
         };
 
         //Refresh Widget
-        this.refreshWidget = function () {           
+        this.refreshWidget = function () {
             $countDiv_ID.empty();
             $workflowWidgetDtls_ID.empty();
             pageNo = 1;

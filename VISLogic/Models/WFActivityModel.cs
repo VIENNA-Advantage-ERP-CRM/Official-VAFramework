@@ -229,6 +229,7 @@ OR
                     itm = new WFActivityInfo();
 
                     itm.AD_Table_ID = Util.GetValueOfInt(dr["AD_Table_ID"]);
+                    itm.TableName = MTable.GetTableName(ctx, itm.AD_Table_ID);
                     itm.AD_User_ID = Util.GetValueOfInt(dr["AD_User_ID"]);
                     itm.AD_WF_Activity_ID = Util.GetValueOfInt(dr["AD_WF_Activity_ID"]);
 
@@ -1614,7 +1615,7 @@ OR
 
     public class WFActivityInfo
     {
-
+        public string TableName { get; set; }
         public int AD_Table_ID
         {
             get;
