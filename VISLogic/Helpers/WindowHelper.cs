@@ -3807,6 +3807,22 @@ namespace VIS.Helpers
                 }
             }
 
+            var formattedColumns = Columns.Select(c =>
+            {
+                if (c.EndsWith("_GUID", StringComparison.OrdinalIgnoreCase))
+                {
+                    if(c.Contains("RAWTOHEX") || c.Contains("::text"))
+                    {
+                        return c;
+                    }
+                    if (DatabaseType.IsOracle)
+                        return $"RAWTOHEX({c}) AS {c}";
+                    else if (DatabaseType.IsPostgre)
+                        return $"{c}::text AS {c}";
+                }
+                return c;
+            });
+
             string SelectSQL = "SELECT " + String.Join(",", Columns) + " FROM " + TableName;
             if (!string.IsNullOrEmpty(SelectSQL))
             {
