@@ -337,6 +337,31 @@ namespace VAdvantage.WF
                 }
             }
             _audit.Save();
+
+            // --- Record Timeline: workflow node events -----------------------
+            // Mirror the WF audit into AD_EventTimeline so the timeline panel stays
+            // a single-table read. Only the states a reader cares about: a node
+            // suspended awaiting approval ("Sent for {node}") and a node that
+            // completed ("{node}"). The IsTracked check runs first so untracked
+            // documents never pay the GetPO() reload.
+            if (GetNode().GetAction() == X_AD_WF_Node.ACTION_UserChoice && MEventTimeline.IsTracked(GetCtx(), GetAD_Table_ID()))
+            {
+
+                string wfState = GetWFState();
+                if (WFSTATE_Suspended.Equals(wfState))
+                {
+                    MUser user = MUser.Get(GetCtx(), _audit.GetAD_User_ID());
+
+                    MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
+                        null, GetAD_WF_Node_ID(), "Sent for " + GetNodeName());
+                }
+                else if (WFSTATE_Completed.Equals(wfState))
+                {
+                    MUser user = MUser.Get(GetCtx(), GetCtx().GetAD_User_ID());
+                    MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
+                        null, GetAD_WF_Node_ID(), "Approved by " + user.GetName() + " " + GetNodeName());
+                }
+            }
         }
 
         /// <summary>
@@ -3103,6 +3128,13 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             if (GetResponsibleOrg_ID() > 0)
                 _audit.SetResponsibleOrg_ID(GetResponsibleOrg_ID());
             _audit.Save();
+
+            if (MEventTimeline.IsTracked(GetCtx(), GetAD_Table_ID()))
+            {
+                MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
+                    null, GetAD_WF_Node_ID(), "Forward to " + user.GetName() + " " + GetNodeName());
+            }
+
             return true;
         }
 

@@ -114,6 +114,12 @@ namespace VIS.Controllers
         public JsonResult JsonLogin(LoginModel model, string returnUrl)
         {
             returnUrl = GetSafeReturnUrl(returnUrl);
+
+            if(!string.IsNullOrEmpty(model.Login1Model.LoginToken))
+            {
+                model.Login1Model.Password = null; // Clear password to ensure it's not sent from the client
+            }
+
             return CommonLogin(model, returnUrl, false);
         }
 

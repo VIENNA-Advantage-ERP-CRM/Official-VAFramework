@@ -37,7 +37,7 @@ namespace VIS.Controllers
         /// <summary>
         /// Getting History record count by passing parameters
         /// </summary>
-        /// <param name="RecordId">Record ID</param> 
+        /// <param name="RecordId">Record ID</param>
         /// <param name="_AD_Table_ID">Table ID</param>
         /// <returns>History Record count</returns>
         public JsonResult GetHistoryRecordsCount(string RecordId, string AD_Table_ID)
