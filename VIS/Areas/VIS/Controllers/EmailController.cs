@@ -1,17 +1,19 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using Newtonsoft.Json;
-using VIS.Models;
+using System.Web.SessionState;
+using VAdvantage.Common;
 using VAdvantage.Model;
 using VAdvantage.Utility;
-using VIS.Filters;
-using System.Web.SessionState;
 using VIS.DataContracts;
-using VAdvantage.Common;
+using VIS.Filters;
+using VIS.Helpers;
+using VIS.Models;
 
 namespace VIS.Controllers
 {
@@ -28,10 +30,12 @@ namespace VIS.Controllers
         {
             return PartialView();
         }
-        public ActionResult Init(int windowNo, string language)
+        public ActionResult Init(int windowNo, string language, bool isEmail)
         {
             ViewBag.windowNo = windowNo;
             ViewBag.language = language;
+            ViewBag.isEmail = isEmail;
+            ViewBag.IsDocEditor = ConfigurationManager.AppSettings["SyncfusionLicense"];
             return PartialView();
         }
 
@@ -245,7 +249,7 @@ namespace VIS.Controllers
         /// <param name="values"></param>
         /// <returns></returns>
         [HttpPost]
-        public JsonResult InsertAttachmentText(string html, string values)
+        public JsonResult InsertAttachmentText(string html, string values, bool isSyncDoc = false)
         {
             string res = "";
             Ctx ct = Session["ctx"] as Ctx;
@@ -253,7 +257,7 @@ namespace VIS.Controllers
             List<Dictionary<string, string>> value = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(values);
 
             EmailModel model = new EmailModel(ct);
-            res = model.HtmlToPdf(Server.HtmlDecode(html), value);
+            res = model.HtmlToPdf(Server.HtmlDecode(html), value, isSyncDoc);
             return Json(JsonConvert.SerializeObject(res), JsonRequestBehavior.AllowGet);
         }
 
@@ -364,6 +368,76 @@ namespace VIS.Controllers
         //    string aaa = am.HtmlToPdf(newLetter);
         //    return Json(JsonConvert.SerializeObject(aaa), JsonRequestBehavior.AllowGet);
         //}
+
+        /// <summary>
+        /// Converts html into the SFDT json the document editor opens.
+        /// The conversion itself lives in the KJS module, reached through reflection so
+        /// that the framework holds no reference to the document engine.
+        /// </summary>
+        /// <param name="htmlContent">url encoded html</param>
+        /// <returns>{ success, sfdtContent } or { success, error }</returns>
+        [HttpPost]
+        public ActionResult ConvertHtmlToSfdt(string htmlContent)
+        {
+            try
+            {
+                htmlContent = Uri.UnescapeDataString(htmlContent ?? "");
+                if (string.IsNullOrEmpty(htmlContent))
+                {
+                    return Json(new { success = false, error = "HTML content is required" }, JsonRequestBehavior.AllowGet);
+                }
+
+                string sfdtContent = KJSDocEngine.ConvertHtmlToSfdt(htmlContent);
+                if (KJSDocEngine.IsError(sfdtContent))
+                {
+                    return Json(new { success = false, error = KJSDocEngine.GetErrorMessage(sfdtContent) }, JsonRequestBehavior.AllowGet);
+                }
+
+                return Json(new { success = true, sfdtContent = sfdtContent }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /// <summary>
+        /// Converts the editor's SFDT json back into html. KJS returns the document body
+        /// only, or an "ERROR: ..." message, which is passed straight back to the client.
+        /// </summary>
+        /// <param name="sfdtContent">SFDT json</param>
+        /// <returns>body html as plain text</returns>
+        [HttpPost]
+        public ActionResult ConvertSfdtToHtml(string sfdtContent)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(sfdtContent))
+                    return Json(new { success = false, error = "SFDT content is required" }, JsonRequestBehavior.AllowGet);
+
+                return Content(KJSDocEngine.ConvertSfdtToHtml(sfdtContent), "text/plain");
+            }
+            catch (Exception ex)
+            {
+                return Content("ERROR: " + ex.Message, "text/plain");
+            }
+        }
+
+        /// <summary>
+        /// Renders the editor content to PDF through the KJS module.
+        /// </summary>
+        /// <param name="sfdtContent">url encoded html of the document</param>
+        /// <returns>pdf file</returns>
+        [HttpPost]
+        public FileContentResult ExportPdf(string sfdtContent)
+        {
+            sfdtContent = Uri.UnescapeDataString(sfdtContent ?? "");
+
+            Ctx ctx = Session["ctx"] as Ctx;
+            byte[] pdfBytes = KJSDocEngine.HtmlToPdfBytes(sfdtContent, ctx != null && ctx.GetIsRightToLeft());
+
+            return File(pdfBytes, "application/pdf", "Document.pdf");
+        }
 
     }
 }

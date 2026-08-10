@@ -250,6 +250,7 @@
     <Content Include="Areas\VIS\Content\F20\Themecnfgtr.css" />
     <Content Include="Areas\VIS\Content\F20\Window.css" />
     <Content Include="Areas\VIS\Content\Find.css" />
+    <Content Include="Areas\VIS\Content\GenericTabPanel.css" />
     <Content Include="Areas\VIS\Content\GlJournalDimension.css" />
     <Content Include="Areas\VIS\Content\GroupStyle.css" />
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
@@ -737,6 +738,7 @@
     <Content Include="Areas\VIS\Scripts\app\Framework\contactInfo.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\chat.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\bulkdownload.js" />
+    <Content Include="Areas\VIS\Scripts\app\Framework\dynamicWidget.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\email.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\find.js" />
     <Content Include="Areas\VIS\Scripts\app\Framework\genralattributeform.js" />
@@ -846,6 +848,7 @@
     <Content Include="Areas\VIS\Scripts\react\shared\VISReactControlsBridge\index.js" />
     <Content Include="Areas\VIS\Scripts\react\shared\VISReactControlsBridge\VISReactControlsBridge.js" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\tabpanels\GenericTabPanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\wfPanel.js" />
     <Content Include="Areas\VIS\Scripts\widgets\assignedwindowrec.js" />
     <Content Include="Areas\VIS\Scripts\widgets\checklist.js" />
@@ -943,6 +946,7 @@
     <Compile Include="Areas\VIS\Filters\AjaxValidateAntiForgeryTokenAttribute.cs" />
     <Compile Include="Areas\VIS\Helpers\HomeHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\JsonHelper.cs" />
+    <Compile Include="Areas\VIS\Helpers\KJSDocEngine.cs" />
     <Compile Include="Areas\VIS\Helpers\LoginHelper.cs" />
     <Compile Include="Areas\VIS\Helpers\LoginTokenStore.cs" />
     <Compile Include="Areas\VIS\Helpers\LookupHelper.cs" />

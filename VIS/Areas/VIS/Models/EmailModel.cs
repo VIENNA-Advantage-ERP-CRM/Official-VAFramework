@@ -683,7 +683,7 @@ namespace VIS.Models
         /// <param name="html"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public string HtmlToPdf(string html, List<Dictionary<string, string>> values)
+        public string HtmlToPdf(string html, List<Dictionary<string, string>> values, bool isSyncDoc)
         {
             //string html = System.IO.File.ReadAllText(path);
 
@@ -699,10 +699,16 @@ namespace VIS.Models
                 sHtml.Append(copy).Append("~");
             }
 
-            //byte[] arrays = HtmlToPdfbytes(sHtml.ToString());
-            //return Convert.ToBase64String(arrays);
+            string filePath = "";
+            if (!isSyncDoc)
+            {
+                filePath = HtmlToPdfbytes(sHtml.ToString(), false);
+            }
+            else
+            {
+                filePath = HtmlToPdfBytes_Syncfusion(sHtml.ToString(), false);
 
-            string filePath = HtmlToPdfbytes(sHtml.ToString(), false);
+            }
             return filePath;
         }
 
@@ -828,6 +834,36 @@ namespace VIS.Models
                 return "";
             }
 
+        }
+
+
+        /// <summary>
+        /// Renders html to PDF with the rich document engine. The segments separated by ~
+        /// each get their own page. The engine lives in the KJS module and is reached
+        /// through reflection, so the framework holds no reference to it.
+        /// </summary>
+        /// <param name="html">html, ~ separated per page</param>
+        /// <param name="loadByte">true to get the bytes back, false to get the temp file path</param>
+        /// <returns>pdf bytes, or the path of the pdf written under TempDownload</returns>
+        public dynamic HtmlToPdfBytes_Syncfusion(string html, bool loadByte)
+        {
+            byte[] pdfBytes = KJSDocEngine.HtmlToPdfBytes(html, ctx.GetIsRightToLeft());
+
+            if (loadByte)
+            {
+                return pdfBytes;
+            }
+            else
+            {
+                string filePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath + "TempDownload";
+                if (!Directory.Exists(filePath))
+                    Directory.CreateDirectory(filePath);
+
+                filePath = Path.Combine(filePath, "temp_" + CommonFunctions.CurrentTimeMillis() + ".pdf");
+                File.WriteAllBytes(filePath, pdfBytes);
+                filePath = filePath.Substring(filePath.IndexOf("TempDownload"));
+                return filePath;
+            }
         }
 
         private static void SetDirection(PdfPTable tbl)
