@@ -77,7 +77,7 @@ VIS = window.VIS || {};
     };
 
     // Timeline: date-grouped lifecycle feed. Expects rows shaped by
-    // HistoryDetailsDataModel.GetTimeline (Type/Actor/Node/Note/EventDate...).
+    // EventTimelineModel.GetTimeline (Type/Title/Actor/Node/Note/EventDate...).
     var TL_TYPE = {
         created:     { icon: "fa-plus",           tone: "info" },
         updated:     { icon: "fa-pencil",         tone: "neutral" },
@@ -87,8 +87,17 @@ VIS = window.VIS || {};
         reactivated: { icon: "fa-repeat",         tone: "info" },
         closed:      { icon: "fa-lock",           tone: "neutral" },
         sent_for:    { icon: "fa-paper-plane-o",  tone: "warning" },
+        forward_to:  { icon: "fa-share",          tone: "info" },
+        approved_by: { icon: "fa-check-circle",   tone: "success" },
         workflow:    { icon: "fa-check",          tone: "success" },
-        shared:      { icon: "fa-share-alt",      tone: "info" }
+        shared:      { icon: "fa-share-alt",      tone: "info" },
+        // Document share (VA112_): the *_view/*_ack pair is the share going out
+        // and still pending on the recipient - warning tone, same as sent_for.
+        // The *_viewed/*_acknowledged pair is the recipient acting on it.
+        document_view:         { icon: "fa-share-square-o", tone: "warning" },
+        document_viewed:       { icon: "fa-eye",            tone: "success" },
+        document_ack:          { icon: "fa-bell-o",         tone: "warning" },
+        document_acknowledged: { icon: "fa-thumbs-o-up",    tone: "success" }
     };
     function tlDate(ev) {
         if (ev.EventDate) { var d = new Date(ev.EventDate); if (!isNaN(d.getTime())) return d; }
@@ -103,25 +112,23 @@ VIS = window.VIS || {};
         return d ? d.toLocaleDateString([], { weekday: "short", day: "2-digit", month: "short", year: "numeric" })
                  : ((ev.EventDateStr || "").split(" ")[0] || msg("Unknown", "Unknown"));
     }
+    // Turn a TYPE_CONFIG key into a readable label: "sent_for" -> "Sent For".
+    // Only ever a fallback, so it stays a plain de-underscore rather than a
+    // per-type label table that has to be extended for every new event type.
+    function tlNorm(t) {
+        return (t || "").replace(/[-_]/g, " ")
+                        .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    }
     function tlTitle(ev) {
-        // Server-resolved translated title wins (e.g. DocAction -> localised
-        // _Document Status name). Falls back to the per-type label below.
+        // Server-resolved translated title wins: workflow/shared rows resolve
+        // their stored message key, doc-actions their _Document Status name. The
+        // normalised key below is only reached for rows written before Title
+        // existed, or when the session expired before the lookup could run - so
+        // it is untranslated by design, not a missed msg() lookup.
         if (ev.Title) return esc(ev.Title);
-        switch (ev.Type) {
-            case "created":     return msg("Created", "Created");
-            case "updated":     return msg("Updated", "Updated");
-            case "prepared":    return msg("Prepared", "Prepared");
-            case "completed":   return msg("Completed", "Completed");
-            case "voided":      return msg("Voided", "Voided");
-            case "reactivated": return msg("ReActivate", "Re-activated");
-            case "closed":      return msg("Closed", "Closed");
-            case "sent_for": return msg("SentFor", "Sent for") + " " + esc(ev.Node);
-            case "forward_to": return msg("ForwardTo", "Forward to") + " " + esc(ev.Node);
-            case "approved by": return msg("ApprovedBy", "Approved By") + " " + esc(ev.Node);
-            case "workflow":    return esc(ev.Node || msg("Workflow", "Workflow"));
-            case "shared":      return msg("Shared", "Shared");
-            default:            return esc(ev.RawEventType || ev.Type || "");
-        }
+        var title = tlNorm(ev.Type || ev.RawEventType);
+        // Node is joined from AD_WF_Node, so it is set on workflow rows only.
+        return esc(ev.Node ? title + " " + ev.Node : title);
     }
     RENDERERS.timeline = function ($list, rows, api) {
         $list.attr("class", "vis-gtp-tl");
@@ -370,6 +377,6 @@ VIS = window.VIS || {};
     /* AD_TabPanel.ClassName resolves against these names. Both are registered:
        the class is generic, but existing dictionary rows bind it as
        VIS.TimelineTabPanel. */
-    //VIS.GenericTabPanel = GenericTabPanel;
+    VIS.GenericTabPanel = GenericTabPanel;
     VIS.TimelineTabPanel = GenericTabPanel;
 })();
