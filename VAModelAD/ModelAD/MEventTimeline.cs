@@ -35,6 +35,20 @@ namespace VAdvantage.Model
         public const string EVENT_Workflow  = "Workflow";
         public const string EVENT_Shared    = "Shared";
 
+        /** AD_Message keys stored in the Title column by the Workflow and Shared
+         *  writers. The KEY is what is stored; Msg turns it into text. The key
+         *  also tells the reader which workflow sub-type a row is - that used to
+         *  be guessed by matching English prefixes in the Description, which
+         *  broke as soon as that text stopped being hardcoded English. */
+        public const string MSG_SentFor    = "SentFor";
+        public const string MSG_ForwardTo  = "ForwardTo";
+        public const string MSG_ApprovedBy = "ApprovedBy";
+        public const string MSG_Shared     = "Shared";
+        public const string MSG_DocumentShareForView = "VA112_DocumentShareForView";
+        public const string MSG_SharedDoumentView = "VA112_SharedDoumentView";
+        public const string MSG_DocumentShareForAcknowledge = "VA112_DocumentShareForAcknowledge";
+        public const string MSG_SharedDocumentAcknowledge = "VA112_SharedDocumentAcknowledge";
+
         /// <summary>
         /// Columns that must NOT, on their own, cause an "Updated" event.
         /// Housekeeping / audit / doc-engine columns only.
@@ -58,6 +72,22 @@ namespace VAdvantage.Model
         /// <param name="description">render-ready note line, may be null</param>
         public static void Log(PO po, string eventType, string docStatus, int adWfNodeId, string description)
         {
+            Log(po, eventType, docStatus, adWfNodeId, description, null);
+        }
+
+        /// <summary>
+        /// As above, for the Workflow and Shared events that label themselves
+        /// from an AD_Message key.
+        /// The key is stored in Title, and it is ALSO resolved here through Msg
+        /// to build the Description - which used to be a hardcoded English
+        /// literal at the call site, so the note never translated. Anything the
+        /// caller passes as <paramref name="description"/> is appended to the
+        /// resolved message as its non-translatable tail (node name, user name).
+        /// </summary>
+        /// <param name="description">tail appended after the resolved message, may be null</param>
+        /// <param name="titleKey">AD_Message key - one of the MSG_* constants</param>
+        public static void Log(PO po, string eventType, string docStatus, int adWfNodeId, string description, string titleKey)
+        {
             if (po == null || po.Get_ID() <= 0)
                 return;
             if (!IsTracked(po.GetCtx(), po.Get_Table_ID()))
@@ -75,6 +105,17 @@ namespace VAdvantage.Model
                     ev.SetDocStatus(docStatus);
                 if (adWfNodeId > 0)
                     ev.SetAD_WF_Node_ID(adWfNodeId);
+
+                // Store the key, then use it to build the translated note.
+                if (!String.IsNullOrEmpty(titleKey))
+                {
+                    ev.SetTitle(titleKey);
+                    string text = Msg.GetMsg(po.GetCtx(), titleKey);
+                    description = String.IsNullOrEmpty(description)
+                        ? text
+                        : text + " " + description;
+                }
+
                 if (!String.IsNullOrEmpty(description))
                     ev.SetDescription(description);
 

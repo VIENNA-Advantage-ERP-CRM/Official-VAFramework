@@ -341,25 +341,26 @@ namespace VAdvantage.WF
             // --- Record Timeline: workflow node events -----------------------
             // Mirror the WF audit into AD_EventTimeline so the timeline panel stays
             // a single-table read. Only the states a reader cares about: a node
-            // suspended awaiting approval ("Sent for {node}") and a node that
-            // completed ("{node}"). The IsTracked check runs first so untracked
-            // documents never pay the GetPO() reload.
+            // suspended awaiting approval and a node that completed. The label is
+            // passed as an AD_Message key, not as English text - MEventTimeline
+            // stores the key in Title and resolves it through Msg for the note.
+            // The IsTracked check runs first so untracked documents never pay the
+            // GetPO() reload.
             if (GetNode().GetAction() == X_AD_WF_Node.ACTION_UserChoice && MEventTimeline.IsTracked(GetCtx(), GetAD_Table_ID()))
             {
-
                 string wfState = GetWFState();
                 if (WFSTATE_Suspended.Equals(wfState))
                 {
                     MUser user = MUser.Get(GetCtx(), _audit.GetAD_User_ID());
-
                     MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
-                        null, GetAD_WF_Node_ID(), "Sent for " + GetNodeName());
+                        null, GetAD_WF_Node_ID(), user.GetName() + " " +GetNodeName(), MEventTimeline.MSG_SentFor);
                 }
                 else if (WFSTATE_Completed.Equals(wfState))
                 {
                     MUser user = MUser.Get(GetCtx(), GetCtx().GetAD_User_ID());
                     MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
-                        null, GetAD_WF_Node_ID(), "Approved by " + user.GetName() + " " + GetNodeName());
+                        null, GetAD_WF_Node_ID(), user.GetName() + " " + GetNodeName(),
+                        MEventTimeline.MSG_ApprovedBy);
                 }
             }
         }
@@ -3132,7 +3133,8 @@ WHERE VADMS_Document_ID = " + (int)_po.Get_Value("VADMS_Document_ID") + @" AND R
             if (MEventTimeline.IsTracked(GetCtx(), GetAD_Table_ID()))
             {
                 MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
-                    null, GetAD_WF_Node_ID(), "Forward to " + user.GetName() + " " + GetNodeName());
+                    null, GetAD_WF_Node_ID(), user.GetName() + " " + GetNodeName(),
+                    MEventTimeline.MSG_ForwardTo);
             }
 
             return true;
