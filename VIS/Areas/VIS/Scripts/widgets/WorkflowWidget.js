@@ -17,6 +17,7 @@
         var $root = $('<div class="vis-group-assign-content" style="height:100%">');
         var $workflowWidget;
         var $wFSearchshow_ID;
+        var $wFShowDetails_ID;
         var $fromDate_ID;
         var $toDate_ID;
         var $flipCard_ID;
@@ -61,6 +62,7 @@
         var lstDetailCtrls = [];
         var historyDivShow = false;
         var attachIconHtml = null;
+        var openWorkflowModalOnLoad = false;
 
         var elements = [
             "SelectWindow"];
@@ -69,6 +71,8 @@
         /* Initialize the form design*/
         this.Initalize = function () {
             createWidget();
+            getControls();
+            events();
             createBusyIndicator();
             showBusy(true);
             getworkflowWidget(true, true);
@@ -84,6 +88,1125 @@
             $btnSearch = $fstMainDiv_ID.find('#btnWorkflowSearch' + $self.AD_UserHomeWidgetID);
             $addDetails_ID = $fstMainDiv_ID.find("#VIS_AddDetails_ID" + $self.AD_UserHomeWidgetID);
             divDetail = $fstMainDiv_ID.find("#workflowActivityDetails" + $self.AD_UserHomeWidgetID);
+        };
+
+        this.openWorkflowModal = function () {
+            if (fulldata && fulldata.length > 0) {
+                openWorkflowModalOnLoad = false;
+                openWorkflowModal();
+                return;
+            }
+            openWorkflowModalOnLoad = true;
+        };
+
+        function openWorkflowModal() {
+            var modalId = 'WFWorkflowModal' + $self.AD_UserHomeWidgetID;
+            var $modal = $('#' + modalId);
+            var isRTL = VIS.Application.isRTL || $('html').attr('dir') == 'rtl';
+            var modalDir = isRTL ? 'rtl' : 'ltr';
+            var currentModalCardIdx = 0; // tracks which card is currently selected in the modal
+            var activityInfoCache = {};
+            var activityInfoPending = {};
+            var modalEventNs = '.workflowModal' + $self.AD_UserHomeWidgetID;
+            var modalRequestDataKey = 'workflowModalRequests';
+            var modalToken = Date.now() + '_' + Math.random();
+
+            /*
+             * wf labels
+             * Old message                  | Message key                         | Fallback
+             * Activities                   | Activities                          | Activities
+             * No activities found          | VIS_NoActivitiesFound               | No activities found
+             * Workflow                     | VIS_Workflow                        | Workflow
+             * Workflow Activity            | VIS_WorkflowActivity                | Workflow Activity
+             * No records found             | VIS_NoRecordsFound                  | No records found
+             * Approvals                    | VIS_Approvals                       | Approvals
+             * Approvals preview            | VIS_ApprovalsPreview                | Approvals preview
+             * Search                       | Search                              | Search
+             * From Date                    | VIS_FromDate                        | From Date
+             * To Date                      | VIS_ToDate                          | To Date
+             * Awaiting your approval       | VIS_AwaitingYourApproval            | Awaiting your approval
+             * Zoom                         | Zoom                                | Zoom
+             * History                      | VIS_History                         | History
+             * Close                        | VIS_Close                           | Close
+             * Transaction details          | VIS_TransactionDetails              | Transaction details
+             * Description                  | Description                         | Description
+             * Requester                    | VIS_Requester                       | Requester
+             * Workflow Issuer              | VIS_WorkflowIssuer                  | Workflow Issuer
+             * Submitted                    | VIS_Submitted                       | Submitted
+             * pending                      | VIS_Pending                         | pending
+             * Forward                      | VIS_Forward                         | Forward
+             * Forward to                   | VIS_ForwardTo                       | Forward to
+             * Search user                  | VIS_SearchUser                      | Search user
+             * Add an optional note         | VIS_Message                         | Add an optional note
+             * Cancel                       | VIS_Cancel                          | Cancel
+             * TypeMessage                  | VIS_TypeMessage                     | Please write message
+             * Loading                      | VIS_Loading                         | Loading...
+             * Failed to load history.      | VIS_FailedToLoadHistory             | Failed to load history.
+             * No history available.        | VIS_NoHistoryAvailable              | No history available.
+             */
+            function lbl(key, fallback) {
+                var text = VIS.Msg.getMsg(key);
+                return text && text !== '[' + key + ']' ? text : fallback;
+            }
+            function safeLbl(key, fallback) {
+                return VIS.Utility.encodeText(lbl(key, fallback));
+            }
+            function getModalRequests() {
+                return $modal.data(modalRequestDataKey) || [];
+            }
+            function trackModalRequest(request) {
+                if (!request || !request.abort) {
+                    return request;
+                }
+                var requests = getModalRequests();
+                requests.push(request);
+                $modal.data(modalRequestDataKey, requests);
+                request.always(function () {
+                    var current = getModalRequests();
+                    $modal.data(modalRequestDataKey, $.grep(current, function (item) {
+                        return item !== request;
+                    }));
+                });
+                return request;
+            }
+            function abortModalRequests() {
+                var requests = getModalRequests();
+                for (var i = 0; i < requests.length; i++) {
+                    if (requests[i] && requests[i].readyState !== 4 && requests[i].abort) {
+                        requests[i].abort();
+                    }
+                }
+                $modal.data(modalRequestDataKey, []);
+            }
+            function isModalActive(token) {
+                return $modal.is(':visible') && $modal.data('workflowModalToken') === token;
+            }
+            function closeModal() {
+                $modal.trigger('modalClose');
+                $modal.css('display', 'none');
+            }
+
+            function syncWindowSelect() {
+                var $popupSelect = $('#' + modalId + 'WindowSelect');
+                if ($popupSelect.length == 0 || !$cmbWindows || $cmbWindows.length == 0) {
+                    return;
+                }
+
+                $popupSelect.empty();
+                $cmbWindows.find('option').each(function () {
+                    $popupSelect.append($(this).clone());
+                });
+                $popupSelect.val($cmbWindows.val());
+            };
+
+            function syncDateInputs() {
+                $modal.find('#' + modalId + 'FromDateInput').val($fromDateInput_ID && $fromDateInput_ID.length ? $fromDateInput_ID.val() : '');
+                $modal.find('#' + modalId + 'ToDateInput').val($toDateInput_ID && $toDateInput_ID.length ? $toDateInput_ID.val() : '');
+            };
+
+            function syncActivityList() {
+                var $activityContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
+                var $wfList = $modal.find('.vis-wf-list');
+
+                if ($wfList.length == 0) {
+                    return;
+                }
+
+                $wfList.empty();
+                if ($activityContainers.length == 0) {
+                    $wfList.append('<div class="vis-wf-group">' + safeLbl('Activities', 'Activities') + ' - 0</div><div class="vis-wf-empty">' + safeLbl('VIS_NoActivitiesFound', 'No activities found') + '</div>');
+                    return;
+                }
+
+                $wfList.append('<div class="vis-wf-group">' + safeLbl('Activities', 'Activities') + ' - ' + $activityContainers.length + '</div>');
+                $activityContainers.each(function (index) {
+                    var activityTitle = $(this).find('.vis-w-wfActivity-selectchk').text();
+                    activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity');
+
+                    // Read window/node key from the pre's data-ids (format: AD_Window_ID_AD_Node_ID_AD_WF_Activity_ID_index)
+                    var dataIds = $(this).find('pre[data-ids]').attr('data-ids') || '';
+                    var parts = dataIds.split('_');
+                    var winNodeKey = (parts.length >= 2) ? parts[0] + '_' + parts[1] : '0_0';
+
+                    // Build inline KV rows from the pre summary text
+                    var preText = $(this).find('pre.vis-workflow-pre-cls').text().trim();
+                    var kvHtml = buildKVHtml(preText);
+                    var dateText = $(this).find('.vis-w-feedDateTime').text().trim();
+
+                    $wfList.append(
+                        '<div class="vis-wf-card' + (index == 0 ? ' vis-wf-card-selected' : '') + '" role="button" tabindex="0" data-winnode="' + winNodeKey + '">'
+                        + '  <div class="vis-wf-card-top">'
+                        + '    <div class="vis-wf-card-title">' + VIS.Utility.encodeText(activityTitle) + '</div>'
+                        + '  </div>'
+                        + (kvHtml ? '<div class="vis-wf-kv vis-wf-card-kv">' + kvHtml + '</div>' : '')
+                        + (dateText ? '<span class="vis-wf-time">' + VIS.Utility.encodeText(dateText) + '</span>' : '')
+                        + '</div>'
+                    );
+                });
+            };
+
+
+            
+
+            function filterCards(winNodeVal) {
+                var preferredIndex = arguments.length > 1 ? arguments[1] : null;
+                var $wfList = $modal.find('.vis-wf-list');
+                var $cards = $wfList.find('.vis-wf-card');
+                var $group = $wfList.find('.vis-wf-group');
+                var searchText = ($modal.find('.vis-wf-search input').val() || '').toLowerCase().trim();
+                var fromDateVal = $modal.find('#' + modalId + 'FromDateInput').val();
+                var toDateVal = $modal.find('#' + modalId + 'ToDateInput').val();
+                var visibleCount = 0;
+
+                $wfList.find('.vis-wf-search-empty').remove();
+                $cards.each(function (index) {
+                    var windowMatch = !winNodeVal || winNodeVal === '0_0' || $(this).data('winnode') === winNodeVal;
+                    var searchMatch = !searchText || getCardSearchText($(this), index).indexOf(searchText) > -1;
+                    var dateMatch = isDateMatch(index, fromDateVal, toDateVal);
+                    var isVisible = windowMatch && searchMatch && dateMatch;
+
+                    $(this).toggle(isVisible);
+                    if (isVisible) {
+                        visibleCount++;
+                    }
+                });
+                $group.text(lbl('Activities', 'Activities') + ' - ' + visibleCount);
+
+                // Re-select first visible card and update detail panel
+                $cards.removeClass('vis-wf-card-selected');
+                var $visibleCards = $cards.filter(':visible');
+                var $first = preferredIndex == null ? $visibleCards.first() : $visibleCards.filter(function () {
+                    return $cards.index(this) >= preferredIndex;
+                }).first();
+                if (!$first.length) {
+                    $first = $visibleCards.first();
+                }
+                $first.addClass('vis-wf-card-selected');
+                if ($first.length) {
+                    var firstIdx = $cards.index($first); // 0-based index within cards, matches activity container order
+                    currentModalCardIdx = firstIdx;
+                    var firstDataIds = $workflowWidgetDtls_ID.find('.vis-w-activityContainer')
+                        .eq(firstIdx).find('.vis-w-wfActivity-selectchk').text();
+                    $modal.find('.vis-wf-record-title').text(
+                        firstDataIds && firstDataIds.trim() ? firstDataIds.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity')
+                    );
+                    $modal.find('.vis-wf-no-selection').hide();
+                    $modal.find('.vis-wf-detail-header, .vis-wf-content-body').show();
+                    syncDetailKV(firstIdx);
+                    syncSubmitted(firstIdx);
+                    syncDescription(firstIdx);
+                    syncRequester(firstIdx);
+                    syncAnswer(firstIdx);
+                    loadHistory(firstIdx);
+                }
+                else {
+                    currentModalCardIdx = -1;
+                    $modal.find('.vis-wf-no-selection').show();
+                    $modal.find('.vis-wf-detail-header, .vis-wf-content-body').hide();
+                }
+            };
+
+            function getWFDate(dateValue, endOfDay) {
+                if (!dateValue) {
+                    return null;
+                }
+
+                var parts = dateValue.split('-');
+                if (parts.length != 3) {
+                    return null;
+                }
+
+                var date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                if (isNaN(date.getTime())) {
+                    return null;
+                }
+
+                if (endOfDay) {
+                    date.setHours(23, 59, 59, 999);
+                }
+                else {
+                    date.setHours(0, 0, 0, 0);
+                }
+                return date;
+            };
+
+            function isDateMatch(index, fromDateVal, toDateVal) {
+                if (!fromDateVal && !toDateVal) {
+                    return true;
+                }
+
+                var activity = (fulldata && fulldata[index]) ? fulldata[index] : null;
+                if (!activity || !activity.Created) {
+                    return false;
+                }
+
+                var activityDate = new Date(activity.Created);
+                if (isNaN(activityDate.getTime())) {
+                    return false;
+                }
+
+                var fromDate = getWFDate(fromDateVal, false);
+                var toDate = getWFDate(toDateVal, true);
+
+                if (fromDate && activityDate < fromDate) {
+                    return false;
+                }
+                if (toDate && activityDate > toDate) {
+                    return false;
+                }
+                return true;
+            };
+
+            function getCardSearchText($card, index) {
+                var activity = (fulldata && fulldata[index]) ? fulldata[index] : {};
+                return [
+                    $card.text(),
+                    activity.NodeName,
+                    activity.DocumentNameValue,
+                    activity.Summary,
+                    activity.Description,
+                    getRequesterName(index)
+                ].join(' ').toLowerCase();
+            };
+
+            function syncPendingCount() {
+                var $pendingCount = $('#' + modalId + 'PendingCount');
+                if ($pendingCount.length == 0) {
+                    return;
+                }
+                $pendingCount.text($modal.find('.vis-wf-card').length + ' ' + lbl('VIS_Pending', 'pending'));
+            };
+
+            function syncDetailTitle(index) {
+                var activityTitle = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-wfActivity-selectchk').text();
+                activityTitle = activityTitle && activityTitle.trim().length > 0 ? activityTitle.trim() : lbl('VIS_WorkflowActivity', 'Workflow Activity');
+                $modal.find('.vis-wf-record-title').text(activityTitle);
+            };
+
+            function getActivityInfoRequest(cardIdx) {
+                var activity = (fulldata && fulldata[cardIdx]) ? fulldata[cardIdx] : null;
+                if (activity && activity.AD_WF_Activity_ID) {
+                    return {
+                        key: activity.AD_WF_Activity_ID,
+                        activityID: activity.AD_WF_Activity_ID,
+                        nodeID: activity.AD_Node_ID,
+                        wfProcessID: activity.AD_WF_Process_ID
+                    };
+                }
+
+                var $actContainer = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(cardIdx);
+                var dataIds = $actContainer.find('pre.vis-workflow-pre-cls').attr('data-ids') || '';
+                var parts = dataIds.split('_');
+                var idx = parts[3] !== undefined ? parseInt(parts[3]) : cardIdx;
+
+                return {
+                    key: parts[2] || '',
+                    activityID: parts[2] || '',
+                    nodeID: parts[1] || '0',
+                    wfProcessID: (fulldata && fulldata[idx]) ? fulldata[idx].AD_WF_Process_ID : null
+                };
+            };
+
+            function getActivityInfo(cardIdx, success, error) {
+                var request = getActivityInfoRequest(cardIdx);
+                if (!request.activityID) {
+                    if (error) {
+                        error();
+                    }
+                    return;
+                }
+
+                if (Object.prototype.hasOwnProperty.call(activityInfoCache, request.key)) {
+                    success(activityInfoCache[request.key]);
+                    return;
+                }
+
+                if (activityInfoPending[request.key]) {
+                    activityInfoPending[request.key].push({ success: success, error: error });
+                    return;
+                }
+
+                activityInfoPending[request.key] = [{ success: success, error: error }];
+
+                trackModalRequest($.ajax({
+                    url: VIS.Application.contextUrl + "WFActivity/GetActivityInfo",
+                    async: true,
+                    dataType: "json",
+                    type: "POST",
+                    data: {
+                        activityID: request.activityID,
+                        nodeID: request.nodeID,
+                        wfProcessID: request.wfProcessID
+                    },
+                    error: function (xhr, status) {
+                        var waiting = activityInfoPending[request.key] || [];
+                        delete activityInfoPending[request.key];
+                        if (status == 'abort' || !isModalActive(modalToken)) {
+                            return;
+                        }
+                        for (var i = 0; i < waiting.length; i++) {
+                            if (waiting[i].error) {
+                                waiting[i].error();
+                            }
+                        }
+                    },
+                    success: function (res) {
+                        if (!isModalActive(modalToken)) {
+                            delete activityInfoPending[request.key];
+                            return;
+                        }
+                        var info = res && res.result ? res.result : null;
+                        activityInfoCache[request.key] = info;
+
+                        var waiting = activityInfoPending[request.key] || [];
+                        delete activityInfoPending[request.key];
+                        for (var i = 0; i < waiting.length; i++) {
+                            waiting[i].success(info);
+                        }
+                    }
+                }));
+            };
+
+            function clearActivityInfoCache(activityID) {
+                if (activityID) {
+                    delete activityInfoCache[activityID];
+                    // intentionally keep activityInfoPending — let any in-flight request complete naturally
+                }
+            };
+
+            function showModalBusy(show) {
+                $modal.toggleClass('vis-wf-modal-busy-on', !!show);
+                $modal.find('.vis-wf-modal-busy').css('display', show ? 'flex' : 'none');
+            };
+
+            function showModalSnack(type, message) {
+                var $snack = $modal.find('.vis-wf-snackbar');
+                window.clearTimeout($snack.data('timer'));
+                $snack
+                    .removeClass('vis-wf-snackbar-success vis-wf-snackbar-error')
+                    .addClass(type == 'error' ? 'vis-wf-snackbar-error' : 'vis-wf-snackbar-success')
+                    .text(message || '')
+                    .show();
+
+                $snack.data('timer', window.setTimeout(function () {
+                    $snack.fadeOut(160);
+                }, 2600));
+            };
+
+            function removeCurrentCardAndSelectNext(oldIndex) {
+                var nextIndex = oldIndex || 0;
+
+                $modal.find('.vis-wf-forward-panel').hide().empty();
+                $modal.find('.vis-wf-footer-row').show();
+                $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(oldIndex).remove();
+                if (fulldata && fulldata.length > oldIndex) {
+                    fulldata.splice(oldIndex, 1);
+                }
+
+                lstDetailCtrls = [];
+                selectedItems = [];
+                syncActivityList();
+                syncCardTitles();
+                syncPendingCount();
+                filterCards($modal.find('#' + modalId + 'WindowSelect').val(), nextIndex);
+                adjust_size();
+            };
+
+            function getRequesterNameFromHistory(info) {
+                if (!info || !info.Node) {
+                    return null;
+                }
+
+                for (var nodeIndex = info.Node.length - 1; nodeIndex >= 0; nodeIndex--) {
+                    var history = info.Node[nodeIndex] && info.Node[nodeIndex].History;
+                    if (!history) {
+                        continue;
+                    }
+
+                    for (var historyIndex in history) {
+                        var item = history[historyIndex];
+                        var approvedBy = item && item.State != 'BK' && item.ApprovedBy;
+                        if (typeof approvedBy == 'string' && approvedBy.trim().length > 0) {
+                            return approvedBy.trim();
+                        }
+                    }
+                }
+
+                return null;
+            };
+
+            function getRequesterName(index, info) {
+                var historyRequester = getRequesterNameFromHistory(info);
+                if (historyRequester) {
+                    return historyRequester;
+                }
+
+                var activity = (fulldata && fulldata[index]) ? fulldata[index] : {};
+                var sources = [info || {}, activity];
+                var fields = [
+                    'WorkflowIssuer', 'WorkflowIssuerName', 'Issuer', 'IssuerName', 'IssuedBy',
+                    'Requester', 'RequesterName', 'AD_User_Name', 'UserName', 'CreatedByName',
+                    'CreatedByUserName', 'CreatedByUser', 'OwnerName', 'ResponsibleName'
+                ];
+
+                for (var sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+                    for (var fieldIndex = 0; fieldIndex < fields.length; fieldIndex++) {
+                        var value = sources[sourceIndex][fields[fieldIndex]];
+                        if (typeof value == 'string' && value.trim().length > 0) {
+                            return value.trim();
+                        }
+                    }
+                }
+
+                var summary = activity.Summary || '';
+                var lines = summary.split('\n');
+                for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                    var line = lines[lineIndex];
+                    var colonIdx = line.indexOf(':');
+                    if (colonIdx <= 0) {
+                        continue;
+                    }
+                    var key = line.substring(0, colonIdx).trim().toLowerCase();
+                    var valueText = line.substring(colonIdx + 1).trim();
+                    if (valueText && (key == 'workflow issuer' || key == 'issuer' || key == 'requester' || key == 'created by' || key == 'submitted by')) {
+                        return valueText;
+                    }
+                }
+
+                return lbl('VIS_WorkflowIssuer', 'Workflow Issuer');
+            };
+
+            function syncRequester(index, info) {
+                var requesterName = getRequesterName(index || 0, info);
+                $modal.find('.vis-wf-requester-name').text(requesterName);
+            };
+
+            // Populate the description section from fulldata — hide entire section if empty
+            function syncDescription(index) {
+                var desc = (fulldata && fulldata[index || 0]) ? (fulldata[index || 0].Description || '').trim() : '';
+                var $section = $modal.find('.vis-wf-description').closest('section');
+                if (desc) {
+                    $modal.find('.vis-wf-description').text(desc);
+                    $section.show();
+                } else {
+                    $section.hide();
+                }
+            };
+
+            function approveAnswer(index, ctrl, $okBtn) {
+                if ($okBtn.data('clicked') == 'Y') {
+                    return;
+                }
+                $okBtn.data('clicked', 'Y');
+
+                var answer = ctrl && ctrl.getValue ? ctrl.getValue() : null;
+                if (answer == '' || answer == null || answer == -1 || answer == '-1') {
+                    $okBtn.data('clicked', 'N');
+                    VIS.ADialog.error('', true, lbl('VIS_PleaseSelectAnswer', 'Please select an answer'));
+                    return;
+                }
+
+                var msg = '';
+                showModalBusy(true);
+                VIS.dataContext.getJSONData(
+                    VIS.Application.contextUrl + 'WFActivity/ApproveIt',
+                    {
+                        activityID: fulldata[index].AD_WF_Activity_ID,
+                        nodeID: fulldata[index].AD_Node_ID,
+                        txtMsg: msg,
+                        fwd: null,
+                        answer: answer,
+                        AD_Window_ID: fulldata[index].AD_Window_ID
+                    },
+                    function (info) {
+                        if (!isModalActive(modalToken)) {
+                            return;
+                        }
+                        $okBtn.data('clicked', 'N');
+                        showModalBusy(false);
+                        if (info.result == '') {
+                            clearActivityInfoCache(fulldata[index].AD_WF_Activity_ID);
+                            removeCurrentCardAndSelectNext(index);
+                            showModalSnack('success', lbl('VIS_WorkflowDone', 'Workflow done'));
+                        } else {
+                            showModalSnack('error', info.result);
+                            VIS.ADialog.error(info.result);
+                        }
+                    }
+                );
+            };
+
+            function buildAnswer(index, info) {
+                var $actions = $modal.find('.vis-wf-actions');
+                $actions.find('.vis-wf-answer-dynamic').remove();
+
+                if (!info || info.NodeAction != 'C') {
+                    return;
+                }
+
+                var ctrl = getControl(info, fulldata[index].AD_WF_Activity_ID);
+                if (ctrl == null) {
+                    return;
+                }
+
+                var $answerWrap = $('<div class="vis-w-home-wf-answerWrap vis-wf-answer-dynamic">');
+                var $answerInput = $('<div class="input-group vis-w-home-wf-answerInput vis-w-input-widgetswrap">');
+                var $forwardBtn = $actions.find('.vis-wf-action-secondary');
+                $answerWrap.append($answerInput);
+
+                var $ctrlWrap = $("<fieldset class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0 vis-wf-answer-box'>");
+                var $selectWrap = $("<div class='vis-wf-answer-select-wrap'>");
+                $ctrlWrap.append($("<legend class='vis-wf-answer-label'>").append(lbl('Answer', 'Answer')));
+                $selectWrap.append(ctrl.getControl());
+                $selectWrap.append("<i class='fa fa-chevron-down vis-wf-answer-dropdown-icon'></i>");
+                $ctrlWrap.append($selectWrap);
+
+                $answerInput.append($ctrlWrap);
+
+                var $okBtn = $("<a href='javascript:void(0)' id='vis-home-wf-ansOK-" + modalId + "' class='vis-wf-submit-btn vis-wf-submit-disabled' role='button' aria-disabled='true' tabindex='-1' data-clicked='N' data-id='" + index + "'>");
+                $okBtn.append($("<span>").text(VIS.Msg.getMsg('Submit') || 'Submit'));
+                $okBtn.append($("<i class='fa fa-check'></i>"));
+                $answerWrap.append($('<div class="vis-w-home-wf-answerBtn">').append($okBtn));
+                $actions.append($answerWrap);
+
+                var toggleAnswerOk = function () {
+                    var answerValue = ctrl.getValue();
+                    var hasValue = !(answerValue == '' || answerValue == null || answerValue == -1 || answerValue == '-1');
+                    $okBtn
+                        .toggleClass('vis-wf-submit-disabled', !hasValue)
+                        .toggleClass('vis-wf-submit-ready', hasValue)
+                        .attr('aria-disabled', hasValue ? 'false' : 'true')
+                        .attr('tabindex', hasValue ? '0' : '-1');
+                    $forwardBtn
+                        .toggleClass('vis-wf-forward-disabled', hasValue)
+                        .attr('aria-disabled', hasValue ? 'true' : 'false');
+                };
+
+                ctrl.fireValueChanged = toggleAnswerOk;
+                $answerWrap.find(':input').on('change keyup input', toggleAnswerOk);
+                toggleAnswerOk();
+
+                $okBtn.on(VIS.Events.onTouchStartOrClick, function () {
+                    approveAnswer(index, ctrl, $okBtn);
+                });
+            };
+
+            function syncAnswer(index) {
+                var $actions = $modal.find('.vis-wf-actions');
+                $actions.find('.vis-wf-answer-dynamic, .vis-wf-answer-loading').remove();
+                $actions.find('.vis-wf-action-secondary')
+                    .removeClass('vis-wf-forward-disabled')
+                    .attr('aria-disabled', 'false');
+
+                if (!fulldata || !fulldata[index]) {
+                    return;
+                }
+
+                $actions.append('<div class="vis-wf-answer-loading"><i class="vis_widgetloader"></i></div>');
+                getActivityInfo(index, function (info) {
+                    if (index === currentModalCardIdx) {
+                        $actions.find('.vis-wf-answer-loading').remove();
+                        syncRequester(index, info);
+                        buildAnswer(index, info);
+                    }
+                }, function () {
+                    $actions.find('.vis-wf-answer-loading').remove();
+                });
+            };
+
+            // Populate the submitted date from the activity's feedDateTime element
+            function syncSubmitted(index) {
+                var $dateDiv = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('.vis-w-feedDateTime');
+                var dateText = $dateDiv.text().trim();
+                $modal.find('.vis-wf-submitted').text(dateText ? lbl('VIS_Submitted', 'Submitted') + ' ' + dateText : '');
+            };
+
+            // Parse one pre summary line into {key, val} — handles colon-separated,
+            // Arabic-label + non-Arabic-value, and non-Arabic-value + Arabic-label formats.
+            function parseKVLine(line) {
+                // 1. Colon separator (highest priority)
+                var colonIdx = line.indexOf(':');
+                if (colonIdx > 0) {
+                    return { key: line.substring(0, colonIdx).trim(), val: line.substring(colonIdx + 1).trim() };
+                }
+                // 2. Arabic label (start) + non-Arabic value
+                var m = line.match(/^([؀-ۿ][؀-ۿ\s]*?)\s+([^؀-ۿ].+)$/);
+                if (m) {
+                    return { key: m[1].trim(), val: m[2].trim() };
+                }
+                // 3. Non-Arabic value (start) + Arabic label — bidi visual reorder case
+                m = line.match(/^([^؀-ۿ\s][^؀-ۿ]*?)\s+([؀-ۿ].+)$/);
+                if (m) {
+                    return { key: m[2].trim(), val: m[1].trim() };
+                }
+                return null; // full-width fallback
+            }
+
+            // Build the HTML for a KV table from a pre summary text block
+            function buildKVHtml(preText) {
+                var html = '';
+                if (!preText) return html;
+                var lines = preText.split('\n');
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i].trim();
+                    if (!line) continue;
+                    var pair = parseKVLine(line);
+                    if (pair) {
+                        html += '<div class="vis-wf-kv-row" dir="ltr">'
+                            + '<span class="vis-wf-kv-key" dir="auto">' + VIS.Utility.encodeText(pair.key) + '</span>'
+                            + '<span class="vis-wf-kv-val">' + VIS.Utility.encodeText(pair.val) + '</span>'
+                            + '</div>';
+                    } else {
+                        html += '<div class="vis-wf-kv-row" dir="auto">'
+                            + '<span class="vis-wf-kv-key" style="width:100%">' + VIS.Utility.encodeText(line) + '</span>'
+                            + '</div>';
+                    }
+                }
+                return html;
+            }
+
+            // Populate the KV table from the <pre> summary lines of the selected activity
+            function syncDetailKV(index) {
+                var $kvContainer = $modal.find('.vis-wf-detail .vis-wf-section .vis-wf-kv').first();
+                if ($kvContainer.length == 0) return;
+
+                var $pre = $workflowWidgetDtls_ID.find('.vis-w-activityContainer').eq(index || 0).find('pre.vis-workflow-pre-cls');
+                var preText = $pre.text().trim();
+
+                $kvContainer.empty();
+                $kvContainer.html(buildKVHtml(preText));
+            };
+
+            function syncCardTitles() {
+                var $activityContainers = $workflowWidgetDtls_ID.find('.vis-w-activityContainer');
+                $modal.find('.vis-wf-card-title').each(function (index) {
+                    var activityTitle = $activityContainers.eq(index).find('.vis-w-wfActivity-selectchk').text();
+                    if (activityTitle && activityTitle.trim().length > 0) {
+                        $(this).text(activityTitle.trim());
+                    }
+                });
+            };
+
+            // Load history for a card index into the permanent side panel
+            function loadHistory(cardIdx) {
+                var $historySide = $modal.find('.vis-wf-history-side');
+                var $historyContent = $historySide.find('.vis-wf-history-content');
+                var request = getActivityInfoRequest(cardIdx);
+
+                var createFlowTitle = function () {
+                    return $('<div class="vis-wf-ht-flow-title">').text(lbl('VIS_ViewHistoryRecord', 'View History Record'));
+                };
+                var setHistoryMessage = function (message, isError, showLoader) {
+                    var $message = $('<div class="vis-wf-ht-loading">');
+                    if (isError) {
+                        $message.css('color', '#e74c3c');
+                    }
+                    if (showLoader) {
+                        $message.append('<i class="vis_widgetloader"></i>');
+                    }
+                    $message.append($('<span>').text(message));
+                    $historyContent.empty().append(createFlowTitle()).append($message);
+                };
+
+                setHistoryMessage(lbl('VIS_Loading', 'Loading...'), false, true);
+
+                if (!request.activityID) {
+                    setHistoryMessage(lbl('VIS_NoHistoryAvailable', 'No history available.'), false, false);
+                    return;
+                }
+
+                getActivityInfo(
+                    cardIdx,
+                    function (info) {
+                        if (cardIdx !== currentModalCardIdx) {
+                            return;
+                        }
+
+                        $historyContent.empty();
+                        $historyContent.append(createFlowTitle());
+                        syncRequester(cardIdx, info);
+
+                        if (!info || !info.Node) {
+                            $historyContent.append(
+                                $('<div class="vis-wf-ht-loading">').append($('<span>').text(lbl('VIS_NoHistoryAvailable', 'No history available.')))
+                            );
+                            return;
+                        }
+
+                        var $timeline = $('<div class="vis-wf-ht-timeline">');
+                        for (var node in info.Node) {
+                            if (info.Node[node].History == null) continue;
+                            for (var hNode in info.Node[node].History) {
+                                var h = info.Node[node].History[hNode];
+                                if (h.State == 'BK') continue;
+                                var nodeName = info.Node[node].Name || '';
+                                var isCompleted = (h.State == 'CC' && node < (info.Node.length - 1))
+                                               || (node >= (info.Node.length - 1) && info.Node.length > 1);
+
+                                var $item = $('<div class="vis-wf-ht-item">');
+
+                                var $nodeEl = $('<div class="vis-wf-ht-node">');
+                                if (h.TextMsg && h.TextMsg.length > 0) {
+                                    $nodeEl.append(
+                                        $('<a href="javascript:void(0)" class="VIS_Pref_tooltip vis-aTagCls">')
+                                            .append($('<i class="vis vis-info" data-toggle="tooltip" data-placement="bottom">').attr('title', VIS.Utility.encodeText(h.TextMsg)))
+                                            .append(document.createTextNode(' '))
+                                    );
+                                }
+                                $nodeEl.append(document.createTextNode(nodeName));
+                                $item.append($nodeEl);
+
+                                var $step = $('<div class="vis-wf-ht-step">');
+                                if (isCompleted) {
+                                    $step.append("<div class='vis-wf-ht-dot vis-wf-ht-dot-check'><i class='vis vis-markx'></i></div>");
+                                } else {
+                                    $step.append("<div class='vis-wf-ht-dot'></div>");
+                                }
+                                $item.append($step);
+
+                                var $status = $('<div class="vis-wf-ht-status">');
+                                if (isCompleted) {
+                                    $status
+                                        .append($('<span class="vis-wf-ht-label">').text(VIS.Msg.getMsg('CompletedBy')))
+                                        .append($('<strong class="vis-wf-ht-by">').text(h.ApprovedBy || ''));
+                                } else {
+                                    $status.addClass('vis-wf-ht-pending').text(VIS.Msg.getMsg('Pending'));
+                                }
+                                $item.append($status);
+
+                                $timeline.append($item);
+                            }
+                        }
+                        $historyContent.append($timeline);
+                    },
+                    function () {
+                        setHistoryMessage(lbl('VIS_FailedToLoadHistory', 'Failed to load history.'), true, false);
+                    }
+                );
+            }
+
+            if ($modal.length === 0) {
+                $modal = $(`
+                    <div id="${modalId}" class="vis-wf-modal" dir="${modalDir}" style="display:none;">
+                        <div class="vis-wf-shell" role="dialog" aria-modal="true" aria-label="${safeLbl('VIS_ApprovalsPreview', 'Approvals preview')}">
+                            <div class="vis-wf-titlebar">
+                                <div class="vis-wf-title">
+                                    <span class="vis-wf-module-icon"><i class="vis vis-info"></i></span>
+                                    <span><strong>${safeLbl('VIS_Approvals', 'Approvals')}</strong></span>
+                                    <span id="${modalId}PendingCount" class="vis-wf-meta"></span>
+                                </div>
+                                <button type="button" id="${modalId}Close" class="vis-wf-close-btn" title="${safeLbl('VIS_Close', 'Close')}">
+                                    <span class="vis-wf-close-text">${safeLbl('VIS_Close', 'Close')}</span>
+                                    <span class="vis-wf-close-icon-wrapper"><i class="fa fa-times vis-wf-close-icon"></i></span>
+                                </button>
+                            </div>
+                            <div class="vis-wf-main">
+                                <aside class="vis-wf-master">
+                                    <div class="vis-wf-tools">
+                                        <div class="vis-wf-search">
+                                            <i class="fa fa-search" aria-hidden="true"></i>
+                                            <input type="text" placeholder="${safeLbl('Search', 'Search')}">
+                                        </div>
+                                        <div class="vis-wf-date-filters">
+                                            <div class="vis-wf-date-filter">
+                                                <label for="${modalId}FromDateInput">${safeLbl('VIS_FromDate', 'From Date')}</label>
+                                                <input id="${modalId}FromDateInput" class="vis-wf-date-input" type="date" placeholder="date">
+                                            </div>
+                                            <div class="vis-wf-date-filter">
+                                                <label for="${modalId}ToDateInput">${safeLbl('VIS_ToDate', 'To Date')}</label>
+                                                <input id="${modalId}ToDateInput" class="vis-wf-date-input" type="date" placeholder="date">
+                                            </div>
+                                        </div>
+                                        <div class="vis-wf-filters">
+                                            <select id="${modalId}WindowSelect" class="vis-wf-window-select vis-custom-select vis-selectworkflow-fontsize"></select>
+                                        </div>
+                                    </div>
+                                    <div class="vis-wf-list"></div>
+                                </aside>
+                                <div class="vis-wf-content-area">
+                                    <div class="vis-wf-no-selection">
+                                        <i class="vis vis-info"></i>
+                                        <p>${safeLbl('VIS_SelectWorkflowToViewDetails', 'Select a workflow to view details')}</p>
+                                    </div>
+                                    <div class="vis-wf-detail-header" style="display:none;">
+                                        <div class="vis-wf-detail-left">
+                                            <span class="vis-wf-requester-meta"><span class="vis-wf-requester-label">${safeLbl('VIS_Requester', 'Requester')}</span><span class="vis-wf-requester-name"></span></span>
+                                            <span class="vis-wf-status"><span class="vis-wf-dot"></span>${safeLbl('VIS_AwaitingYourApproval', 'Awaiting your approval')}</span>
+                                        </div>
+                                        <div class="vis-wf-detail-right">
+                                            <span class="vis-wf-submitted"></span>
+                                            <button type="button" class="vis-wf-zoom-btn vis-wf-watch" title="${safeLbl('Zoom', 'Zoom')}">
+                                                <span class="vis-wf-zoom-text">${safeLbl('Zoom', 'Zoom')}</span>
+                                                <span class="vis-wf-zoom-circle"><i class="fa fa-search-plus vis-wf-zoom-icon"></i></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="vis-wf-content-body" style="display:none;">
+                                        <section class="vis-wf-detail">
+                                            <div class="vis-wf-body">
+                                                <section class="vis-wf-section">
+                                                    <div class="vis-wf-record-title">${safeLbl('VIS_WorkflowActivity', 'Workflow Activity')}</div>
+                                                    <h3 class="vis-wf-section-title">${safeLbl('VIS_TransactionDetails', 'Transaction details')}</h3>
+                                                    <div class="vis-wf-kv">
+                                                        <!-- populated dynamically from activity summary -->
+                                                    </div>
+                                                </section>
+                                                <section class="vis-wf-section">
+                                                    <h3 class="vis-wf-section-title">${safeLbl('Description', 'Description')}</h3>
+                                                    <div class="vis-wf-description">
+                                                        <!-- populated dynamically from activity description -->
+                                                    </div>
+                                                </section>
+                                            </div>
+                                            <div class="vis-wf-footer">
+                                                <div class="vis-wf-forward-panel" style="display:none;"></div>
+                                                <div class="vis-wf-footer-row">
+                                                    <div class="vis-wf-actions">
+                                                        <a href="javascript:void(0)" class="vis-wf-action vis-wf-action-secondary"><span>${safeLbl('VIS_Forward', 'Forward')}</span><i class="fa fa-arrow-right vis-wf-forward-icon"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <aside class="vis-wf-history-side">
+                                            <div class="vis-wf-history-content"></div>
+                                        </aside>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                $modal.append('<div class="vis-wf-modal-busy" style="display:none;"><div class="vis-wf-modal-busy-inner"><i class="vis_widgetloader"></i></div></div>');
+                $modal.append('<div class="vis-wf-snackbar" style="display:none;"></div>');
+                $('body').append($modal);
+            }
+
+            $modal.off(modalEventNs);
+            $modal.find('#' + modalId + 'Close').off('click' + modalEventNs);
+
+            $modal.on('modalClose' + modalEventNs, function () {
+                abortModalRequests();
+                activityInfoPending = {};
+                showModalBusy(false);
+                $modal.find('.vis-wf-forward-panel').hide().empty();
+                $modal.find('.vis-wf-footer-row').show();
+                var observer = $modal.data('bodyObserver');
+                if (observer) {
+                    observer.disconnect();
+                    $modal.removeData('bodyObserver');
+                }
+            });
+
+            $modal.on('click' + modalEventNs, function (e) {
+                if ($(e.target).is($modal)) {
+                    closeModal();
+                }
+            });
+
+            $modal.find('#' + modalId + 'Close').on('click' + modalEventNs, function () {
+                closeModal();
+            });
+
+            $modal.on('click' + modalEventNs, '.vis-wf-card', function () {
+                if ($(this).hasClass('vis-wf-card-selected')) return;
+                $modal.find('.vis-wf-card').removeClass('vis-wf-card-selected');
+                $(this).addClass('vis-wf-card-selected');
+                var cardIdx = $modal.find('.vis-wf-card').index(this);
+                currentModalCardIdx = cardIdx;
+                $modal.find('.vis-wf-no-selection').hide();
+                $modal.find('.vis-wf-detail-header, .vis-wf-content-body').show();
+                $modal.find('.vis-wf-forward-panel').hide().empty();
+                $modal.find('.vis-wf-footer-row').show();
+                syncDetailTitle(cardIdx);
+                syncDetailKV(cardIdx);
+                syncSubmitted(cardIdx);
+                syncDescription(cardIdx);
+                syncRequester(cardIdx);
+                syncAnswer(cardIdx);
+                loadHistory(cardIdx);
+            });
+
+            $modal.on('keydown' + modalEventNs, '.vis-wf-card', function (e) {
+                if (e.keyCode == 13 || e.keyCode == 32) {
+                    e.preventDefault();
+                    $(this).trigger('click');
+                }
+            });
+
+            $modal.on('change' + modalEventNs, '#' + modalId + 'WindowSelect', function () {
+                filterCards($(this).val());
+                if ($cmbWindows && $cmbWindows.length > 0) {
+                    $cmbWindows.val($(this).val());
+                }
+            });
+
+            $modal.on('keydown' + modalEventNs, '.vis-wf-search input', function (e) {
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    filterCards($modal.find('#' + modalId + 'WindowSelect').val());
+                }
+            });
+
+            $modal.on('click' + modalEventNs, '.vis-wf-search i', function () {
+                filterCards($modal.find('#' + modalId + 'WindowSelect').val());
+            });
+
+            $modal.on('change' + modalEventNs, '.vis-wf-date-input', function () {
+                filterCards($modal.find('#' + modalId + 'WindowSelect').val());
+            });
+
+            $modal.on('click' + modalEventNs, '.vis-wf-watch', function () {
+                if (currentModalCardIdx < 0) {
+                    return;
+                }
+                zoom(currentModalCardIdx);
+                closeModal();
+            });
+
+            $modal.on('click' + modalEventNs, '.vis-wf-action-secondary', function () {
+                if ($(this).hasClass('vis-wf-forward-disabled')) {
+                    return;
+                }
+
+                var $fwdPanel = $modal.find('.vis-wf-forward-panel');
+                var $footerRow = $modal.find('.vis-wf-footer-row');
+                var closeForwardPanel = function () {
+                    $fwdPanel.find('input[name="AD_User_ID"]').val('');
+                    $fwdPanel.find('.vis-wf-fwd-note').val('');
+                    $fwdPanel.hide().empty();
+                    $footerRow.show();
+                };
+
+                if ($fwdPanel.is(':visible')) {
+                    closeForwardPanel();
+                    return;
+                }
+
+                $fwdPanel.empty();
+                $footerRow.hide();
+                $fwdPanel.append($('<div class="vis-wf-fwd-header-title">').text(lbl('VIS_ForwardTo', 'Forward to')));
+
+                var $fields = $('<div class="vis-wf-fwd-fields">');
+                var lookup = VIS.MLookupFactory.get(VIS.context, 0, 0, VIS.DisplayType.Search, "AD_User_ID", 0, false, "AD_User.IsLoginUser='Y' AND AD_User.IsActive='Y'");
+                var txtb = new VIS.Controls.VTextBoxButton("AD_User_ID", false, false, true, VIS.DisplayType.Search, lookup);
+                var $userField = $('<div class="vis-wf-fwd-field">');
+                var $userCtrl = txtb.getControl();
+                $userCtrl.attr('placeholder', lbl('VIS_User', 'User'));
+                $userField.append($userCtrl);
+
+                var btnCount = txtb.getBtnCount ? txtb.getBtnCount() : 0;
+                for (var bi = 0; bi < btnCount; bi++) {
+                    $userField.append(txtb.getBtn(bi).hide());
+                }
+
+                var $searchBtn = $('<button type="button" class="vis-wf-fwd-field-search-btn">').attr('title', lbl('VIS_SearchUser', 'Search user'));
+                $searchBtn.append('<i class="fa fa-user"></i>');
+                $searchBtn.on('click' + modalEventNs, function (e) {
+                    e.stopPropagation();
+                    txtb.getBtn(0).trigger('click');
+                });
+                $userField.append($searchBtn);
+                $fields.append($userField);
+
+                var $noteField = $('<div class="vis-wf-fwd-field">');
+                var $noteInput = $('<textarea class="vis-wf-fwd-note vis-w-workflow-textarea" spellcheck="false"></textarea>');
+                $noteInput.attr('placeholder', lbl('VIS_TypeMessage', 'Please write message') + '....');
+                $noteField.append($noteInput);
+                $noteField.append('<i class="fa fa-sticky-note-o vis-wf-fwd-note-icon"></i>');
+                $fields.append($noteField);
+                $fwdPanel.append($fields);
+
+                var $actions = $('<div class="vis-wf-fwd-actions">');
+                var $cancelBtn  = $('<button class="vis-wf-fwd-cancel">').text(lbl('VIS_Close', 'Close'));
+                var $confirmBtn = $('<button class="vis-wf-fwd-confirm">')
+                    .append($('<span>').text(lbl('VIS_Done', 'Done')))
+                    .append('<i class="fa fa-check"></i>');
+                $actions.append($cancelBtn).append($confirmBtn);
+                $fwdPanel.append($actions);
+
+                $cancelBtn.on('click' + modalEventNs, function () {
+                    closeForwardPanel();
+                });
+
+                var capturedIdx = currentModalCardIdx;
+                $confirmBtn.on('click' + modalEventNs, function () {
+                    var fwdTo = txtb.getValue();
+                    if (!fwdTo || fwdTo <= 0) {
+                        VIS.ADialog.error('FillMandatory', true, lbl('VIS_Forward', 'Forward'));
+                        return;
+                    }
+                    var msg = VIS.Utility.encodeText($noteInput.val() || '');
+                    var activityID = fulldata[capturedIdx].AD_WF_Activity_ID;
+                    var nID        = fulldata[capturedIdx].AD_Node_ID;
+                    var winID      = fulldata[capturedIdx].AD_Window_ID;
+
+                    showModalBusy(true);
+                    VIS.dataContext.getJSONData(
+                        VIS.Application.contextUrl + 'WFActivity/ApproveIt',
+                        { activityID: activityID, nodeID: nID, txtMsg: msg, fwd: fwdTo, answer: null, AD_Window_ID: winID },
+                        function (info) {
+                            if (!isModalActive(modalToken)) {
+                                return;
+                            }
+                            showModalBusy(false);
+                            if (info.result == '') {
+                                clearActivityInfoCache(activityID);
+                                removeCurrentCardAndSelectNext(capturedIdx);
+                                showModalSnack('success', lbl('VIS_WorkflowDone', 'Workflow done'));
+                            } else {
+                                showModalSnack('error', info.result);
+                                VIS.ADialog.error(info.result);
+                            }
+                        }
+                    );
+                });
+
+                $fwdPanel.show();
+                setTimeout(function () {
+                    if (isModalActive(modalToken)) {
+                        $userCtrl.trigger('focus');
+                    }
+                }, 80);
+            });
+
+            $modal.attr('dir', modalDir);
+            $modal.data('workflowModalToken', modalToken);
+            $modal.css('display', 'flex');
+            syncWindowSelect();
+            syncDateInputs();
+            syncActivityList();
+            syncCardTitles();
+            syncPendingCount();
+            // Reset detail panel to empty state — user must select a card first
+            $modal.find('.vis-wf-no-selection').show();
+            $modal.find('.vis-wf-detail-header, .vis-wf-content-body').hide();
+            filterCards($modal.find('#' + modalId + 'WindowSelect').val());
+
+            // ── Global z-index guard ──────────────────────────────────────────────
+            // Any dialog/popup appended to <body> while this modal is open must sit
+            // above our modal (z-index 99999).  We only skip pure dimming backdrops.
+            if (!$modal.data('bodyObserver')) {
+                var modalBodyObserver = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (m) {
+                        m.addedNodes.forEach(function (node) {
+                            if (node.nodeType !== 1) return;
+                            var $node = $(node);
+                            if ($node.hasClass('ui-widget-overlay') ||
+                                $node.hasClass('modal-backdrop')) return;
+                            $node.css('z-index', 100002);
+                            $node.find('.ui-dialog').css('z-index', 100002);
+                        });
+                    });
+                });
+                modalBodyObserver.observe(document.body, { childList: true, subtree: false });
+                $modal.data('bodyObserver', modalBodyObserver);
+
+                $modal.on('modalClose' + modalEventNs, function () {
+                    modalBodyObserver.disconnect();
+                    $modal.removeData('bodyObserver');
+                });
+            }
+
         };
         /* Declare events */
         function events() {
@@ -107,6 +1230,12 @@
                     $welcomeScreenFeedsLists.removeClass('VIS-ActiveCls')
                     showToAndFromDate = true;
                 }
+            });
+            $fstMainDiv_ID.off('click', '#WFShowDetails' + $self.AD_UserHomeWidgetID);
+            $fstMainDiv_ID.on('click', '#WFShowDetails' + $self.AD_UserHomeWidgetID, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openWorkflowModal();
             });
             $hlnkTabDataRef_ID.on('click', $self.refreshWidget);
             //$txtSearch.on('change', searchFunction);
@@ -206,6 +1335,7 @@
                 + '         <a id="hlnkTabDataRef' + $self.AD_UserHomeWidgetID + '" href="javascript:void(0)" title="' + VIS.Msg.getMsg("Requery") + '" class="vis-w-feedicon" style="display:none;"><i class="vis vis-refresh"></i></a>'// style="float: right; margin-top: 0px; cursor: pointer; "
                 //+ '         <span id="sNewNts" style="display: none; float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;" class="vis-feedicon border-0" title="New Record"><i class="vis vis-plus"></i></span>'
                 + '         <span id="WFSearchshow' + $self.AD_UserHomeWidgetID + '"  class="vis-w-feedicon vis vis-eye-plus border-0" title="Show Search"></span>'//style="float: right; margin-top: 0px; cursor: pointer; margin-right: 0.625em;"
+                + '         <span id="WFShowDetails' + $self.AD_UserHomeWidgetID + '" class="vis-w-feedicon vis vis-info border-0" title="Open Workflow" style="cursor:pointer;min-width:20px;display:none;"></span>'
                 + ' </div>'
                 + '     </h2></div>'
                 + ' <div id = "welcomeScreenFeedsLists' + $self.AD_UserHomeWidgetID + '" class="vis-w-scrollerVerticalNewCls ml-0 vis-w-workflow-welcomfeed-cls"><div class="vis-w-workflow-homepage-parentdiv">'
@@ -239,6 +1369,7 @@
             $row = $fstMainDiv_ID.find(".vis-w-welcomeScreenFeeds");
             $hlnkTabDataRef_ID = $fstMainDiv_ID.find("#hlnkTabDataRef" + $self.AD_UserHomeWidgetID);
             $wFSearchshow_ID = $fstMainDiv_ID.find("#WFSearchshow" + $self.AD_UserHomeWidgetID);
+            $wFShowDetails_ID = $fstMainDiv_ID.find("#WFShowDetails" + $self.AD_UserHomeWidgetID);
             $fromDate_ID = $fstMainDiv_ID.find("#VIS_FromDate_ID" + $self.AD_UserHomeWidgetID);
             $toDate_ID = $fstMainDiv_ID.find("#VIS_ToDate_ID" + $self.AD_UserHomeWidgetID);
             $fromDateInput_ID = $fstMainDiv_ID.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID);
@@ -295,19 +1426,27 @@
                             appendRecords(data, item);
                         }
                         if (async == true) {
-                            getControls();
                             loadWindows();
-                            events();
+                        }
+                        // Show the details icon only when there are workflow records
+                        $wFShowDetails_ID.css('display', data.length > 0 ? 'inline-block' : 'none');
+                        if (openWorkflowModalOnLoad && data.length > 0) {
+                            openWorkflowModalOnLoad = false;
+                            window.setTimeout(function () {
+                                openWorkflowModal();
+                            }, 0);
                         }
                         setTimeout(function () {
                             showBusy(false);
                         }, 200);
-                        
+
                     }
                     else {
                         data = null;
                         $countDiv_ID.append(0);
                         $workflowWidgetDtls_ID.append('<p id="pnorecFound' + $self.AD_UserHomeWidgetID + '" class="vis-NoRecordCls vis-a-pTagSetHeight">' + VIS.Msg.getMsg("NoRecordFound") + '</p>');// style="margin-top:12.5em; text-align:center; display:block;"
+                        // Hide the details icon when there are no workflow records
+                        $wFShowDetails_ID.css('display', 'none');
                         showBusy(false);
                     }
                 }
@@ -338,11 +1477,11 @@
                 ChldDiv += ('' + summry + '');
             }
             var Priority = null;
-            Priority = VIS.Utility.encodeText(VIS.Msg.getMsg('Priority') + " " + data[item].Priority);
+            Priority = VIS.Msg.getMsg('Priority') + ': ' + data[item].Priority;
             var date = null;
             date = Globalize.format(new Date(data[item].Created), "F", Globalize.cultureSelector);
 
-            ChldDiv += '<br>' + Priority + '</pre><div class="vis-w-feedDateTime vis-secondary-clr" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
+            ChldDiv += '\n' + Priority + '</pre><div class="vis-w-feedDateTime vis-secondary-clr" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
                 + date + '</div></div></div>';
 
             dataIem.recordID = data[item].Record_ID;
@@ -404,6 +1543,11 @@
                             winNideID = "0_0";
                             $cmbWindows.val("0_0");
                         }
+                        $('#WFWorkflowModal' + $self.AD_UserHomeWidgetID + 'WindowSelect').empty();
+                        $cmbWindows.find('option').each(function () {
+                            $('#WFWorkflowModal' + $self.AD_UserHomeWidgetID + 'WindowSelect').append($(this).clone());
+                        });
+                        $('#WFWorkflowModal' + $self.AD_UserHomeWidgetID + 'WindowSelect').val($cmbWindows.val());
                     }
                 }
             });
@@ -499,11 +1643,11 @@
                                 ChldDiv += ('' + summry + '');
                             }
                             var Priority = null;
-                            Priority = VIS.Utility.encodeText(VIS.Msg.getMsg('Priority') + " " + data[item].Priority);
+                            Priority = VIS.Msg.getMsg('Priority') + ': ' + data[item].Priority;
                             var date = null;
                             date = Globalize.format(new Date(data[item].Created), "F", Globalize.cultureSelector);
 
-                            ChldDiv += '<br>' + Priority + '</pre><div class="vis-w-feedDateTime" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
+                            ChldDiv += '\n' + Priority + '</pre><div class="vis-w-feedDateTime" data-ids="' + data[item].AD_Window_ID + '_' + data[item].AD_Node_ID + '_' + data[item].AD_WF_Activity_ID + '_' + item + '">'
                                 + date + '</div></div></div>';
                             //+ '<br>' + date + '</div></div></div>';
                             dataIem.recordID = data[item].Record_ID;
@@ -1415,6 +2559,12 @@
         };
         //Dispose function
         this.disposeComponent = function () {
+            var $workflowModal = $('#WFWorkflowModal' + $self.AD_UserHomeWidgetID);
+            if ($workflowModal.length) {
+                $workflowModal.trigger('modalClose');
+                $workflowModal.off('.workflowModal' + $self.AD_UserHomeWidgetID);
+                $workflowModal.remove();
+            }
             $root.remove();
         };
     }

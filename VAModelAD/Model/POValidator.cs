@@ -206,8 +206,21 @@ namespace VAModelAD.Model
                 }
                 else if (po.Get_ColumnIndex("DocStatus") >= 0 && po.Is_ValueChanged("DocStatus"))
                 {
-                    MEventTimeline.Log(po, MEventTimeline.EVENT_DocAction,
-                        Util.GetValueOfString(po.Get_Value("DocStatus")), 0, null);
+                    string val = Util.GetValueOfString(po.Get_Value("DocStatus"));
+                   string olVal = Util.GetValueOfString(po.Get_ValueOld("DocStatus")); 
+                    if(olVal == "DR" && val == "IP")
+                    {
+                        MEventTimeline.Log(po, MEventTimeline.EVENT_DocAction,
+                        "PR", 0, null);
+                    }
+                    else if(olVal == "CO" && val == "IP")
+                    {
+                        MEventTimeline.Log(po, MEventTimeline.EVENT_DocAction,
+                        "RE", 0, null);
+                    }
+                    else
+                        MEventTimeline.Log(po, MEventTimeline.EVENT_DocAction,
+                            val, 0, null);
                 }
                 else if (MEventTimeline.HasTrackedChange(po))
                 {

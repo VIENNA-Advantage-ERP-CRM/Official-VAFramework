@@ -101,6 +101,17 @@ namespace ViennaAdvantage.Model
         }
         public int GetAD_WF_Node_ID() { Object ii = Get_Value("AD_WF_Node_ID"); if (ii == null) return 0; return Convert.ToInt32(ii); }
 
+        /** Set Title. Holds an AD_Message KEY, not finished text (Workflow and
+         *  Shared events). The key is resolved through Msg at log time to build
+         *  the translated Description, and again at read time to build the
+         *  timeline title in the reading user's language. */
+        public void SetTitle(String Title)
+        {
+            if (Title != null && Title.Length > 255) { log.Warning("Length > 255 - truncated"); Title = Title.Substring(0, 255); }
+            Set_Value("Title", Title);
+        }
+        public String GetTitle() { return (String)Get_Value("Title"); }
+
         /** Set Description (render-ready note line). */
         public void SetDescription(String Description)
         {
