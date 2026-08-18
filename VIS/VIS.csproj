@@ -250,6 +250,7 @@
     <Content Include="Areas\VIS\Content\F20\Themecnfgtr.css" />
     <Content Include="Areas\VIS\Content\F20\Window.css" />
     <Content Include="Areas\VIS\Content\Find.css" />
+    <Content Include="Areas\VIS\Content\GenericTabPanel.css" />
     <Content Include="Areas\VIS\Content\GlJournalDimension.css" />
     <Content Include="Areas\VIS\Content\GroupStyle.css" />
     <Content Include="Areas\VIS\Content\HistoryTabPanel.css" />
@@ -846,6 +847,7 @@
     <Content Include="Areas\VIS\Scripts\react\shared\VISReactControlsBridge\index.js" />
     <Content Include="Areas\VIS\Scripts\react\shared\VISReactControlsBridge\VISReactControlsBridge.js" />
     <Content Include="Areas\VIS\Scripts\src\reactjs.js" />
+    <Content Include="Areas\VIS\Scripts\tabpanels\GenericTabPanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\wfPanel.js" />
     <Content Include="Areas\VIS\Scripts\widgets\assignedwindowrec.js" />
     <Content Include="Areas\VIS\Scripts\widgets\checklist.js" />
