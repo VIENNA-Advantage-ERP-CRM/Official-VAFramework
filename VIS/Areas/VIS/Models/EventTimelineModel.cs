@@ -69,10 +69,9 @@ namespace VIS.Models
 
             if (Env.IsModuleInstalled("VA112_"))
             {
-                sql = @"SELECT *
+                sql = @"SELECT   ROWNUM AS rn, temp1.*
                     FROM (
                         SELECT 
-                            ROWNUM AS rn,
                             temp.*
                         FROM (
                             SELECT 
@@ -103,8 +102,8 @@ namespace VIS.Models
                             FROM VA112_DOCSHARETIMELINE_V e WHERE AD_Table_ID = " + _AD_Table_ID + @" AND RECORD_ID=" + RecordId + @"
                         ) temp
                         ORDER BY temp.EventDate DESC
-                    )
-                    WHERE rn BETWEEN " + from + " AND " + to + " ORDER BY rn";
+                    ) temp1
+                    WHERE ROWNUM BETWEEN " + from + " AND " + to ;
             }
             // DB.ExecuteDataset logs and returns null on a SQL error, so without
             // this the panel cannot tell "no events yet" from "query failed".
