@@ -1470,6 +1470,7 @@ li.vis-page-item-select {
     width: 100%;
     /* min-height: 100%; */
     padding: 28px 10px 0 10px;
+    height:stretch;
 }
 
 

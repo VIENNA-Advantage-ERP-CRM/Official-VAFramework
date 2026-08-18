@@ -2405,6 +2405,8 @@
                 else {
                     //	Refresh data
                     this.curTab.dataRefresh();
+                    if(this.curGC)
+                    this.curGC.refreshTabPanelData(this.curTab.getRecord_ID(), 'R');
                 }
             }
             //	Timeout
