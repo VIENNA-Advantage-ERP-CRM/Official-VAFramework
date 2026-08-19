@@ -92,7 +92,7 @@ namespace VIS.Models
 
                             SELECT 
                                 NVL(n'' || e.EventType, ''),
-                                e.Created,
+                                e.Created AS EventDate,
                                 NVL(e.DocStatus, ''),
                                 NVL(n'' || e.Title, ''),
                                 NVL(n'' || e.Description, ''),
