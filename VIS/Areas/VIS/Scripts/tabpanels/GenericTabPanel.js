@@ -332,7 +332,7 @@ VIS = window.VIS || {};
             var pages = totalPages();
             var from = _total ? ((_page - 1) * cfg.pageSize) + 1 : 0;
             var to = Math.min(_page * cfg.pageSize, _total);
-            $pinfo.text(_total ? (msg("ShowingResult", "Showing") + " " + from + "-" + to + " " + msg("Of", "of") + " " + _total) : "");
+            $pinfo.text(_total ? (msg("ShowingResult", "Showing") + " " + from + "-" + to + " " + msg("of", "of") + " " + _total) : "");
             $ppos.text(_page + " / " + pages);
             $prev.prop("disabled", _page <= 1);
             $next.prop("disabled", _page >= pages);

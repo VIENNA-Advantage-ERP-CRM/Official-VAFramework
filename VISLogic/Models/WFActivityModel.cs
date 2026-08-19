@@ -21,7 +21,25 @@ namespace VIS.Models
         private string _synonym = "A";
         private string whereClause = "";
         private string fromClause = "";
+        /// <summary>
+        /// Activities whose workflow node carries this Action are hidden from the user.
+        /// </summary>
+        private const string NODE_ACTION_EXCLUDED = "K";
 
+        /// <summary>
+        /// Excludes activities pointing at a node with the hidden Action.
+        /// For queries where AD_WF_Activity is aliased as "a" and AD_WF_Node is NOT joined.
+        /// NOT EXISTS keeps rows whose node is missing or whose Action is null - only Action = 'K' is dropped.
+        /// </summary>
+        private const string EXCLUDE_NODE_ACTION_SQL =
+            " AND NOT EXISTS (SELECT 1 FROM AD_WF_Node n WHERE n.AD_WF_Node_ID = a.AD_WF_Node_ID AND n.Action = '" + NODE_ACTION_EXCLUDED + "') ";
+
+        /// <summary>
+        /// Same exclusion for queries which already INNER JOIN AD_WF_Node under the alias AD_WF_Node.
+        /// COALESCE keeps nodes with a null Action visible, matching EXCLUDE_NODE_ACTION_SQL.
+        /// </summary>
+        private const string EXCLUDE_NODE_ACTION_JOINED_SQL =
+            " AND COALESCE(AD_WF_Node.Action, ' ') <> '" + NODE_ACTION_EXCLUDED + "' ";
 
         /// <summary>
         /// Fetch all the workflow activities which are open
@@ -113,7 +131,7 @@ OR
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'
                             AND a.WFState      ='OS' 
-                            AND a.EndWaitTime IS NULL 
+                            AND a.EndWaitTime IS NULL " + EXCLUDE_NODE_ACTION_SQL + @"
                             AND a.AD_Client_ID =" + AD_Client_ID + @" 
                             AND ((a.AD_User_ID=" + AD_User_ID + @" 
                             OR a.AD_User_ID   IN
@@ -1368,7 +1386,7 @@ OR
                 sql = @"SELECT DISTINCT AD_Window.AD_window_ID,  AD_Window.DisplayName  || ' (' || AD_WF_Node.Name || ')' As Name,AD_WF_Node.AD_WF_Node_ID FROM AD_WF_Activity AD_WF_Activity
                             INNER JOIN AD_Window AD_Window ON (AD_WF_Activity.AD_Window_ID = AD_Window.AD_Window_ID)
                             INNER JOIN AD_WF_Node AD_WF_Node ON (AD_WF_Node.AD_WF_Node_ID=AD_Wf_Activity.AD_WF_Node_ID)
-                            WHERE AD_Window.IsActive ='Y'  AND AD_Wf_Activity.Processed = 'N'  AND AD_Wf_Activity.WFState      ='OS' ";
+                            WHERE AD_Window.IsActive ='Y'  AND AD_Wf_Activity.Processed = 'N'  AND AD_Wf_Activity.WFState      ='OS' " + EXCLUDE_NODE_ACTION_JOINED_SQL;
                 sql += " AND AD_Wf_Activity.AD_Client_ID =" + ctx.GetAD_Client_ID() + @" 
                             AND  ((AD_Wf_Activity.AD_User_ID=" + ctx.GetAD_User_ID() + @" 
                             OR AD_Wf_Activity.AD_User_ID   IN
