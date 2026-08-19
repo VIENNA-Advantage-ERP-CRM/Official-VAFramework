@@ -5,6 +5,7 @@
  *                     feed (created / updated / doc-action / workflow / shared)
  *                     from the single AD_EventTimeline table.
  ******************************************************/
+using Google.GData.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -69,7 +70,8 @@ namespace VIS.Models
 
             if (Env.IsModuleInstalled("VA112_"))
             {
-                sql = @"SELECT   ROWNUM AS rn, temp1.*
+                sql = @"SELECT *
+                        FROM (SELECT   ROWNUM AS rn, temp1.*
                     FROM (
                         SELECT 
                             temp.*
@@ -102,8 +104,9 @@ namespace VIS.Models
                             FROM VA112_DOCSHARETIMELINE_V e WHERE AD_Table_ID = " + _AD_Table_ID + @" AND RECORD_ID=" + RecordId + @"
                         ) temp
                         ORDER BY temp.EventDate DESC
-                    ) temp1
-                    WHERE ROWNUM BETWEEN " + from + " AND " + to ;
+                    ) temp1)
+                    WHERE rn BETWEEN " + from + " AND " + to ;
+                              
             }
             // DB.ExecuteDataset logs and returns null on a SQL error, so without
             // this the panel cannot tell "no events yet" from "query failed".
@@ -148,6 +151,26 @@ namespace VIS.Models
                 return 0;
             string sql = "SELECT COUNT(*) FROM AD_EventTimeline WHERE IsActive='Y' AND AD_Table_ID="
                 + _AD_Table_ID + " AND Record_ID=" + RecordId;
+
+            if (Env.IsModuleInstalled("VA112_"))
+            {
+               sql = @"SELECT COUNT(*)
+               FROM (
+                   SELECT 1
+                   FROM AD_EventTimeline
+                   WHERE IsActive = 'Y'
+                     AND AD_Table_ID = " + _AD_Table_ID + @"
+                     AND Record_ID = " + RecordId + @"
+
+                   UNION ALL
+
+                   SELECT 1
+                   FROM VA112_DOCSHARETIMELINE_V
+                   WHERE AD_Table_ID = " + _AD_Table_ID + @"
+                     AND Record_ID = " + RecordId + @"
+               )";
+            }
+
             return Util.GetValueOfInt(DB.ExecuteScalar(sql));
         }
 
