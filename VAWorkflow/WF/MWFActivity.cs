@@ -351,9 +351,20 @@ namespace VAdvantage.WF
                 string wfState = GetWFState();
                 if (WFSTATE_Suspended.Equals(wfState))
                 {
-                    MUser user = MUser.Get(GetCtx(), _audit.GetAD_User_ID());
+                    string resMsg = "";
+                    MWFResponsible resp = GetResponsible();
+                    if (resp.IsRole())
+                    {
+                        resMsg = Msg.GetMsg(GetCtx(), "Role") + " " + resp.GetRole().GetName();
+                    }
+                    else
+                    {
+                        MUser user = MUser.Get(GetCtx(), _audit.GetAD_User_ID());
+                        resMsg = Msg.GetMsg(GetCtx(), "User") + " " + user.GetName();
+                    }
+
                     MEventTimeline.Log(GetPO(Get_Trx()), MEventTimeline.EVENT_Workflow,
-                        null, GetAD_WF_Node_ID(), user.GetName() + " " +GetNodeName(), MEventTimeline.MSG_SentFor);
+                        null, GetAD_WF_Node_ID(), resMsg + " " + GetNodeName(), MEventTimeline.MSG_SentFor);
                 }
                 else if (WFSTATE_Completed.Equals(wfState))
                 {
