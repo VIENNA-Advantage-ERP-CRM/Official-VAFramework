@@ -307,7 +307,7 @@ OR
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'
                             AND a.WFState      ='OS'
-                            AND a.EndWaitTime IS NULL 
+                            AND a.EndWaitTime IS NULL " + EXCLUDE_NODE_ACTION_SQL + @"
                             AND a.AD_Client_ID =" + ctx.GetAD_Client_ID() + @"
                             AND ((a.AD_User_ID=" + ctx.GetAD_User_ID() + @"
                             OR a.AD_User_ID   IN
@@ -1468,7 +1468,7 @@ OR
                         INNER JOIN AD_WF_Node AD_WF_Node ON (AD_WF_Node.AD_WF_Node_ID=AD_Wf_Activity.AD_WF_Node_ID)
                         WHERE AD_Window.IsActive     ='Y'
                         AND AD_Wf_Activity.Processed = 'N'
-                        AND AD_Wf_Activity.WFState   ='OS' AND AD_Language='" + Env.GetAD_Language(ctx) + "'";
+                        AND AD_Wf_Activity.WFState   ='OS' AND AD_Language='" + Env.GetAD_Language(ctx) + "'" + EXCLUDE_NODE_ACTION_JOINED_SQL;
                 sql += " AND AD_Wf_Activity.AD_Client_ID =" + ctx.GetAD_Client_ID() + @" 
                             AND  ((AD_Wf_Activity.AD_User_ID=" + ctx.GetAD_User_ID() + @" 
                             OR AD_Wf_Activity.AD_User_ID   IN
