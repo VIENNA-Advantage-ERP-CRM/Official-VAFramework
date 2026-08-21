@@ -489,6 +489,7 @@ namespace VIS.Models
               " AND u.IsLoginUser='Y' " +
               " AND EXISTS (SELECT * FROM AD_Client c WHERE u.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')" +
               " AND EXISTS (SELECT * FROM AD_Client c WHERE r.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')" +
+              " AND NOT (r.AD_Client_ID = 0 AND r.UserLevel != 'S')" +
               " ORDER BY r.Name";
 
             try

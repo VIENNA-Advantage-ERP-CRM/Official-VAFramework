@@ -185,7 +185,8 @@ namespace VIS.Models
             string sqlQuery = "SELECT  r.AD_Role_ID,  r.Name  FROM AD_User u INNER JOIN AD_User_Roles ur ON (u.AD_User_ID=ur.AD_User_ID AND ur.IsActive ='Y') " +
                         " INNER JOIN AD_Role r ON (ur.AD_Role_ID =r.AD_Role_ID AND r.IsActive ='Y') WHERE u.AD_User_ID = " + ctx.GetAD_User_ID() + " AND u.IsActive ='Y' AND EXISTS " +
                         " (SELECT * FROM AD_Client c WHERE u.AD_Client_ID=c.AD_Client_ID AND c.IsActive      ='Y' ) " +
-                        " AND EXISTS (SELECT * FROM AD_Client c WHERE r.AD_Client_ID=c.AD_Client_ID AND c.IsActive      ='Y' )";
+                        " AND EXISTS (SELECT * FROM AD_Client c WHERE r.AD_Client_ID=c.AD_Client_ID AND c.IsActive      ='Y' )" +
+                        " AND NOT (r.AD_Client_ID = 0 AND r.UserLevel != 'S')";
 
             DataSet ds = DB.ExecuteDataset(sqlQuery);
             if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
