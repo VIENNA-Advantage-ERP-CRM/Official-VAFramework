@@ -97,7 +97,12 @@ namespace VIS.Helpers
         /// <param name="roles">out roles , has role list of user</param>
         /// <param name="ctx" ></param>
         /// <returns>true if athenicated</returns>
-        public static bool Login(LoginModel model, out List<KeyNamePair> roles, string IP, bool isSSO)
+        /// <param name="preAuthenticated">
+        /// Identity already proven server-side without a password (validated AD_User.AuthToken - see
+        /// LoginTokenStore.LoginSecrets.PreAuthenticated). Like <paramref name="isSSO"/> this skips the
+        /// password check, but unlike isSSO it does NOT skip 2FA. Never derive this from a client-posted field.
+        /// </param>
+        public static bool Login(LoginModel model, out List<KeyNamePair> roles, string IP, bool isSSO, bool preAuthenticated = false)
         {
             // loginModel = null;
             //bool isMatch = false;
@@ -128,6 +133,13 @@ namespace VIS.Helpers
 
                 authenticated = true;
 
+            }
+
+            // Token auto-login: the AuthToken already proved who this is, and the password cannot be
+            // recovered from a hashed column to re-verify. 2FA still applies (isSSO stays false).
+            if (preAuthenticated)
+            {
+                authenticated = true;
             }
 
             //Save Failed Login Count and Password validty in cache
@@ -183,9 +195,22 @@ namespace VIS.Helpers
                 throw new Exception("UserNotFound");
             }
 
-            //if authenticated by LDAP or password is null(Means request from home page)
-            if (!authenticated && model.Login1Model.Password != null)
+            // Verify the password unless the identity was already established by other means
+            // (LDAP, SSO or a validated AuthToken - all of which set 'authenticated' above).
+            //
+            // SECURITY: this used to also skip when model.Login1Model.Password was null. That made the
+            // whole check optional: JsonLogin nulls Password whenever a LoginToken is posted, and GetRoles
+            // below matches on username alone, so anyone posting a username plus an arbitrary LoginToken
+            // got in without a credential. A missing password is now a failure, not a bypass.
+            if (!authenticated)
             {
+                if (string.IsNullOrEmpty(model.Login1Model.Password))
+                {
+                    // No failed-login-count increment here: an absent password is a malformed request,
+                    // not a guess, and counting it would let anyone lock any account out.
+                    throw new Exception("UserPwdError");
+                }
+
                 string sqlEnc = "SELECT isencrypted,isHashed FROM ad_column WHERE ad_table_id=(SELECT ad_table_id FROM ad_table WHERE tablename='AD_User') AND columnname='Password'";
                 DataSet ds = DB.ExecuteDataset(sqlEnc);
                 char isEncrypted = Convert.ToChar(ds.Tables[0].Rows[0]["isencrypted"]);
@@ -433,7 +458,8 @@ namespace VIS.Helpers
                .Append(" u.ConnectionProfile, u.Password, u.FailedLoginCount, u.PasswordExpireOn, u.Is2FAEnabled, u.TokenKey2FA, u.TwoFAMethod, u.Value, u.Name as username, u.Created ")	//	4,5
                .Append("FROM AD_User u")
                .Append(" INNER JOIN AD_User_Roles ur ON (u.AD_User_ID=ur.AD_User_ID AND ur.IsActive='Y')")
-               .Append(" INNER JOIN AD_Role r ON (ur.AD_Role_ID=r.AD_Role_ID AND r.IsActive='Y') ");
+               .Append(" INNER JOIN AD_Role r ON (ur.AD_Role_ID=r.AD_Role_ID AND r.IsActive='Y') ")
+               .Append(" AND NOT (r.AD_Client_ID = 0 AND r.UserLevel != 'S')");
             if (isLDAP && authenticated)
             {
                 sql.Append(" WHERE (COALESCE(u.LDAPUser,u.Value)=@username)");
