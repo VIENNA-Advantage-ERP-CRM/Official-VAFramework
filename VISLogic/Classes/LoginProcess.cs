@@ -448,7 +448,8 @@ namespace VAdvantage.Login
                 .Append("WHERE COALESCE(u.LDAPUser,u.Name)=@username")		//	#1
                 .Append(" AND u.IsActive='Y'")
                 .Append(" AND EXISTS (SELECT * FROM AD_Client c WHERE u.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')")
-                .Append(" AND EXISTS (SELECT * FROM AD_Client c WHERE r.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')");
+                .Append(" AND EXISTS (SELECT * FROM AD_Client c WHERE r.AD_Client_ID=c.AD_Client_ID AND c.IsActive='Y')")
+                .Append(" AND NOT (r.AD_Client_ID = 0 AND r.UserLevel != 'S')");
             if (app_pwd != null)
                 sql.Append(" AND (u.Password='" + app_pwd + "' OR u.Password='" + app_pwd + "')");	//  #2/3
             sql.Append(" ORDER BY r.Name");

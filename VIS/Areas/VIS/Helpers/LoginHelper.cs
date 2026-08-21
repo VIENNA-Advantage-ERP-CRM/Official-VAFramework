@@ -433,7 +433,8 @@ namespace VIS.Helpers
                .Append(" u.ConnectionProfile, u.Password, u.FailedLoginCount, u.PasswordExpireOn, u.Is2FAEnabled, u.TokenKey2FA, u.TwoFAMethod, u.Value, u.Name as username, u.Created ")	//	4,5
                .Append("FROM AD_User u")
                .Append(" INNER JOIN AD_User_Roles ur ON (u.AD_User_ID=ur.AD_User_ID AND ur.IsActive='Y')")
-               .Append(" INNER JOIN AD_Role r ON (ur.AD_Role_ID=r.AD_Role_ID AND r.IsActive='Y') ");
+               .Append(" INNER JOIN AD_Role r ON (ur.AD_Role_ID=r.AD_Role_ID AND r.IsActive='Y') ")
+               .Append(" AND NOT (r.AD_Client_ID = 0 AND r.UserLevel != 'S')");
             if (isLDAP && authenticated)
             {
                 sql.Append(" WHERE (COALESCE(u.LDAPUser,u.Value)=@username)");
