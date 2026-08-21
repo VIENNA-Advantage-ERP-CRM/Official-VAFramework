@@ -204,6 +204,11 @@ namespace VIS.Controllers
                     model.Login1Model.TokenKey2FA = Util.GetValueOfString(TempData.Peek("TokenKey2FA"));
                     model.Login1Model.QRCodeURL = Util.GetValueOfString(TempData.Peek("QRCodeURL"));
 
+                    // Identity proven server-side by a validated AD_User.AuthToken, with no password to
+                    // verify (hashed column). Resolved from the server-side token store only - never from
+                    // anything the client posted.
+                    bool preAuthenticated = false;
+
                     string password = Util.GetValueOfString(TempData.Peek("Password"));
                     if (!string.IsNullOrEmpty(model.Login1Model.Password))
                     {
@@ -211,7 +216,7 @@ namespace VIS.Controllers
                     }
                     else if (string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(model.Login1Model.LoginToken))
                     {
-                        // Auto-login by link: the password was stored server-side keyed by
+                        // Auto-login by link: the password (?U=&P= variant) was stored server-side keyed by
                         // the one-time LoginToken (HomeController), never sent to the client.
                         // Resolve it here, validating the token belongs to this username.
                         LoginTokenStore.LoginSecrets autoSecrets = LoginTokenStore.Get(model.Login1Model.LoginToken);
@@ -220,8 +225,14 @@ namespace VIS.Controllers
                             && string.Equals(autoSecrets.UserValue, model.Login1Model.UserValue, StringComparison.Ordinal))
                         {
                             password = autoSecrets.Password;
+                            preAuthenticated = autoSecrets.PreAuthenticated;
                         }
                     }
+
+                    // LoginHelper.Login reads model.Login1Model.Password, not this local. Without writing it
+                    // back, a password resolved from TempData or the token store never reached the check and
+                    // the model arrived with a null password - which the helper used to treat as "skip".
+                    model.Login1Model.Password = password;
                     //If value 0, then step1
                     // If value 2, then final login
                     //if value 1, then attemp login 1.
@@ -303,7 +314,7 @@ namespace VIS.Controllers
                     //But original pwd entered by user is required in reset pwd setup.. to match with new pwd.
                     TempData["Password"] = model.Login1Model.Password;
                     string IP = Common.GetVisitorIPAddress(Request, false);
-                    if (LoginHelper.Login(model, out roles, IP, isSSO))
+                    if (LoginHelper.Login(model, out roles, IP, isSSO, preAuthenticated))
                     {
                         // ViewBag.QRCodeURL = model.Login1Model.QRCodeURL;
                         TempData["roles"] = roles;

@@ -26,10 +26,28 @@ namespace VIS.Helpers
             public int AD_User_ID { get; set; }
             public string Password { get; set; }
             public string TokenKey2FA { get; set; }
+
+            /// <summary>
+            /// True when the user's identity was already proven by other means (a valid AD_User.AuthToken)
+            /// and no password is available to verify - the case for ?token= auto-login once AD_User.Password
+            /// is hashed and can no longer be read back. Set ONLY here, server-side; it is never posted by the
+            /// client, so it cannot be forged into a login request.
+            /// </summary>
+            public bool PreAuthenticated { get; set; }
         }
 
         /// <summary>Persist the secrets for a login attempt and return a new random token.</summary>
         public static string Save(Login1Model model)
+        {
+            return Save(model, false);
+        }
+
+        /// <summary>
+        /// Persist the secrets for a login attempt and return a new random token.
+        /// </summary>
+        /// <param name="model">login state; its Password may be null when <paramref name="preAuthenticated"/> is true</param>
+        /// <param name="preAuthenticated">identity already proven server-side (validated AuthToken); no password needed</param>
+        public static string Save(Login1Model model, bool preAuthenticated)
         {
             if (model == null)
             {
@@ -41,7 +59,8 @@ namespace VIS.Helpers
                 UserValue = model.UserValue,
                 AD_User_ID = model.AD_User_ID,
                 Password = model.Password,
-                TokenKey2FA = model.TokenKey2FA
+                TokenKey2FA = model.TokenKey2FA,
+                PreAuthenticated = preAuthenticated
             };
             HttpRuntime.Cache.Insert(KeyPrefix + token, secrets, null,
                 DateTime.UtcNow.Add(Lifetime), Cache.NoSlidingExpiration);

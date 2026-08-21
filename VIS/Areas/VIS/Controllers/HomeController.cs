@@ -455,7 +455,13 @@ namespace VIS.Controllers
                             if (Util.GetValueOfBool(tokDetails["Success"]))
                             {
                                 TempData["user"] = tokDetails["User"]; //get uservalue
-                                TempData["pwd"] = SecureEngine.Decrypt(tokDetails["Password"]);//get userpwd
+                                // No password is taken from the token. AD_User.Password is hashed, so the
+                                // stored value cannot be decrypted and replayed through the login form -
+                                // SecureEngine.Decrypt used to throw here, land in the catch below and leave
+                                // the user on a blank login page. A valid AuthToken is itself the credential,
+                                // so mark the attempt pre-authenticated and let the login skip the password
+                                // check (2FA still applies).
+                                TempData["preauth"] = true;
                             }
                         }
                         else
@@ -479,9 +485,12 @@ namespace VIS.Controllers
                     // cache/history, proxies). Now the password is stored against a
                     // one-time LoginToken (see LoginTokenStore) and only the username and
                     // token reach the browser; CommonLogin resolves the password from it.
+                    // preauth: set by the ?token= branch above, where no password exists to carry.
+                    // The ?U=&P= branch still supplies a real password and stays password-verified.
+                    bool preAuth = Util.GetValueOfBool(TempData["preauth"]);
                     model.Login1Model.UserValue = TempData["user"].ToString();
                     model.Login1Model.Password = Util.GetValueOfString(TempData["pwd"]);
-                    model.Login1Model.LoginToken = LoginTokenStore.Save(model.Login1Model);
+                    model.Login1Model.LoginToken = LoginTokenStore.Save(model.Login1Model, preAuth);
                     model.Login1Model.Password = null;
                 }
 
