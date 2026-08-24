@@ -347,7 +347,7 @@ namespace VIS.Models
             // Check if validationCode (where query starts with | if yes then user has send a temp table instead of data)
             // Store it in another variable and empty the validationCode so that it should not add any wrong code
             string withJoin = string.Empty;
-            if (validationCode.StartsWith("base64 "))
+            if (validationCode!=null && validationCode.StartsWith("base64 "))
             {
                 withJoin = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(validationCode.Substring(7)));
                 validationCode = "";
