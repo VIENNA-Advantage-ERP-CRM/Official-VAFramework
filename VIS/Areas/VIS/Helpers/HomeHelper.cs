@@ -1458,7 +1458,7 @@ namespace VIS.Helpers
                             FROM AD_WF_Activity a
                             WHERE a.Processed  ='N'
                             AND a.WFState      ='OS' 
-                            AND a.EndWaitTime IS NULL 
+                            AND a.EndWaitTime IS NULL AND NOT EXISTS (SELECT 1 FROM AD_WF_Node n WHERE n.AD_WF_Node_ID = a.AD_WF_Node_ID AND n.Action = 'K') 
                             AND a.AD_Client_ID =" + ctx.GetAD_Client_ID() + @"
                             AND ( (a.AD_User_ID=" + ctx.GetAD_User_ID() + @"
                             OR a.AD_User_ID   IN
