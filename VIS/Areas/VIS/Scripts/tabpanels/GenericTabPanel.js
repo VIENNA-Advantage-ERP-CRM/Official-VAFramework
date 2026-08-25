@@ -176,7 +176,7 @@ VIS = window.VIS || {};
         title: "",
         dataUrl: "VIS/EventTimeline/GetRecordTimeline",
         countUrl: "VIS/EventTimeline/GetRecordTimelineCount",
-        pageSize: 12,
+        pageSize: 25,
         render: "timeline",
         params: {}
     };

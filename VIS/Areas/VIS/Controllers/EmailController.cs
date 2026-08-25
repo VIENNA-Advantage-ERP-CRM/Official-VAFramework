@@ -60,10 +60,10 @@ namespace VIS.Controllers
             if (strDocAttach != string.Empty)
             {
                 string[] str1;
-                string[] str = strDocAttach.Split(',');
+                string[] str = strDocAttach.Split('|');
                 for (int i = 0; i < str.Length; i++)
                 {
-                    str1 = str[i].Split('-');
+                    str1 = str[i].Split(':');
                     if (str1[0].Trim() != string.Empty)
                     {
                         lstDoc.Add(Convert.ToInt32(str1[0]));
