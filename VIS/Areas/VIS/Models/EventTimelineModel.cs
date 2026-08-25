@@ -26,7 +26,7 @@ namespace VIS.Models
         /// <summary>
         /// Page size for the Event Timeline panel (mirrors the panel's PAGE_SIZE).
         /// </summary>
-        private const int TIMELINE_PAGE_SIZE = 12;
+       // private const int TIMELINE_PAGE_SIZE = 12;
 
         /// <summary>
         /// _Document Status reference. Stored DocAction rows carry a DocStatus
@@ -42,14 +42,15 @@ namespace VIS.Models
         /// concatenated (int values cannot carry SQL) and paged with ROW_NUMBER
         /// (works on both Oracle and PostgreSQL).
         /// </summary>
-        public List<TimelineEvent> GetTimeline(Ctx ctx, int RecordId, int _AD_Table_ID, int page)
+        public List<TimelineEvent> GetTimeline(Ctx ctx, int RecordId, int _AD_Table_ID, int page,int pageSize)
         {
+            if(pageSize <= 0) pageSize = 25;
             List<TimelineEvent> list = new List<TimelineEvent>();
             if (RecordId <= 0 || _AD_Table_ID <= 0)
                 return list;
             if (page < 1) page = 1;
-            int from = ((page - 1) * TIMELINE_PAGE_SIZE) + 1;
-            int to = page * TIMELINE_PAGE_SIZE;
+            int from = ((page - 1) * pageSize) + 1;
+            int to = page * pageSize;
 
             // Sort on the SAME column that is displayed (e.Created). Ordering on
             // e.EventDate while showing e.Created was inconsistent, and made the

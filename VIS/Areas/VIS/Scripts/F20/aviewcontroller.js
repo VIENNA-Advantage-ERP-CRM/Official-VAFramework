@@ -2372,8 +2372,7 @@
                 //this.aPanel.showTabPanel(false);
             }
 
-            this.vTable.resize();
-            this.vTable.refreshRow();
+            
 
             if (!this.displayAsMultiView && (this.gTab.isHPanelNotShowInMultiRow || this.actionParams.IsHideHeaderPanel) && this.vHeaderPanel != null) {
                 this.vHeaderPanel.hidePanel();
@@ -2394,6 +2393,8 @@
             if (this.gTab.isViewWisePanel()) {
                 this.reloadTabPanelForView('N');
             }
+            this.vTable.resize();
+            this.vTable.refreshRow();
         }
 
     };
