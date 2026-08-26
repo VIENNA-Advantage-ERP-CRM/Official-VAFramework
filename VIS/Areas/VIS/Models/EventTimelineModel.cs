@@ -42,9 +42,9 @@ namespace VIS.Models
         /// concatenated (int values cannot carry SQL) and paged with ROW_NUMBER
         /// (works on both Oracle and PostgreSQL).
         /// </summary>
-        public List<TimelineEvent> GetTimeline(Ctx ctx, int RecordId, int _AD_Table_ID, int page,int pageSize)
+        public List<TimelineEvent> GetTimeline(Ctx ctx, int RecordId, int _AD_Table_ID, int page, int pageSize)
         {
-            if(pageSize <= 0) pageSize = 25;
+            if (pageSize <= 0) pageSize = 25;
             List<TimelineEvent> list = new List<TimelineEvent>();
             if (RecordId <= 0 || _AD_Table_ID <= 0)
                 return list;
@@ -106,8 +106,8 @@ namespace VIS.Models
                         ) temp
                         ORDER BY temp.EventDate DESC
                     ) temp1)
-                    WHERE rn BETWEEN " + from + " AND " + to ;
-                              
+                    WHERE rn BETWEEN " + from + " AND " + to;
+
             }
             // DB.ExecuteDataset logs and returns null on a SQL error, so without
             // this the panel cannot tell "no events yet" from "query failed".
@@ -135,6 +135,11 @@ namespace VIS.Models
                     ev.Actor = Util.GetValueOfString(dr["Actor"]);
                     ev.Node = Util.GetValueOfString(dr["NodeName"]);
                     ev.Note = Util.GetValueOfString(dr["Description"]);
+                    if (ev.Note != null)
+                    {
+                        ev.Note = ev.Note.Replace("VA112_ForwardTo", Msg.GetMsg(ctx, "VA112_ForwardTo"));
+                        ev.Note = ev.Note.Replace("VA112_To", Msg.GetMsg(ctx, "VA112_To"));
+                    }
                     // Map to the panel's TYPE_CONFIG key so the client renders the
                     // right icon/tone with no extra lookup.
                     ev.Type = MapPanelType(rawType, docStatus, titleKey);
@@ -155,7 +160,7 @@ namespace VIS.Models
 
             if (Env.IsModuleInstalled("VA112_"))
             {
-               sql = @"SELECT COUNT(*)
+                sql = @"SELECT COUNT(*)
                FROM (
                    SELECT 1
                    FROM AD_EventTimeline
@@ -229,7 +234,7 @@ namespace VIS.Models
                         // later, land here - a share icon, not the workflow one.
                         default: return "shared";
                     }
-                  case MEventTimeline.EVENT_Workflow:
+                case MEventTimeline.EVENT_Workflow:
                     switch (titleKey)
                     {
                         case MEventTimeline.MSG_SentFor: return "sent_for";
