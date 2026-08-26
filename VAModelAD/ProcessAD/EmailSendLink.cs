@@ -174,8 +174,8 @@ namespace VAModelAD.ProcessAD
                         }
                         else
                         {
-                            log.Fine(Msg.GetMsg(GetCtx(), "NoEmailAddressFound"));
-                            return Msg.GetMsg(GetCtx(), "NoEmailAddressFound");
+                            log.Fine(Msg.GetMsg(GetCtx(), "MandatoryEmailAddress"));
+                            return Msg.GetMsg(GetCtx(), "MandatoryEmailAddress");
                         }
                     }
 
