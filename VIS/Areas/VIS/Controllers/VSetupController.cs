@@ -41,6 +41,19 @@ namespace VIS.Controllers
             cfProduct, cfBPartner, cfProject,cfMCampaign,cfSRegion, fileName,folderKey,ctx) }, JsonRequestBehavior.AllowGet);
         }
         /// <summary>
+        /// Get localization packages for the package dropdown
+        /// </summary>
+        /// <returns>localization packages</returns>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        public JsonResult GetLocalizationPackages()
+        {
+            VSetupModel model = new VSetupModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(new { result = model.GetLocalizationPackages(ctx) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// Get Region accroding to country
         /// </summary>
         /// <param name="countryID"></param>

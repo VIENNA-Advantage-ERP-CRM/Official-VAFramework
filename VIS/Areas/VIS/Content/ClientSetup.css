@@ -219,3 +219,7 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
 .initial-client-form .VIS_Pref_change-pass {
     margin-bottom: 20px;
 }
+/* Localization package combo - sits under the Optional fieldset. */
+.vis-its-pkg-wrap {
+    margin-top: 18px;
+}

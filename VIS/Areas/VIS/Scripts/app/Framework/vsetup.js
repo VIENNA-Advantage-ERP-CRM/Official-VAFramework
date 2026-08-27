@@ -63,6 +63,15 @@
         var fileName = null
         var chkDA = null;
         var lblDA = null;
+        var cmbPackage = null;
+
+        /* Message lookup that falls back to plain text when the key is not
+           translated - VIS.Msg.getMsg returns "[key]" for a missing key. */
+        var msgOr = function (key, fallback) {
+            var val = VIS.Msg.getMsg(key);
+            return val === ("[" + key + "]") ? fallback : val;
+        };
+
         this.load = function () {
 
             
@@ -216,6 +225,15 @@
             dBP.append($("<label>").append(VIS.Msg.translate(VIS.context, "C_BPartner_ID")));
             dChkBox.append(dBP);
 
+            /* Localization package - same combo pattern as Currency / Country. */
+            var dPkg = $("<div class='input-group vis-input-wrap vis-intial-form-dataCombo vis-its-pkg-wrap'>");
+            var dPkgInner = $("<div class='vis-control-wrap'></div>");
+            cmbPackage = $('<select placeholder="Package">');
+            dPkg.append(dPkgInner);
+            dPkgInner.append(cmbPackage);
+            dPkgInner.append($('<label>').append(msgOr("LocalizationPackage", "Package")));
+            dTForm.append(dPkg);
+
             //var liBtns= $("<li>");
             //ulCase.append(liBtns);
             //var dBtns = $("<div class='initial-form-buttons' >");
@@ -318,9 +336,37 @@
                 }
             });
 
+            /* Loaded separately - the table ships with a module, so a failure
+               here must not stop the rest of the form from working. */
+            $.ajax({
+                url: VIS.Application.contextUrl + "VSetup/GetLocalizationPackages",
+                dataType: "json",
+                error: function () {
+                    loadLocalizationPackages(null);
+                },
+                success: function (data) {
+                    loadLocalizationPackages(data == null ? null : data.result);
+                }
+            });
 
+        };
 
-
+        var loadLocalizationPackages = function (packages) {
+            if (cmbPackage == null) {
+                return;
+            }
+            cmbPackage.empty();
+            /* Blank first entry - picking a package is not mandatory. */
+            cmbPackage.append($('<option>').attr('value', ''));
+            if (packages == null) {
+                return;
+            }
+            for (var itm in packages) {
+                cmbPackage.append($('<option>')
+                    .attr('value', packages[itm].ID)
+                    .attr('data-value', packages[itm].Value)
+                    .text(packages[itm].Name));
+            }
         };
 
         var loadCurrency = function (currency) {
@@ -349,7 +395,6 @@
                 return;
             }
             for (var itm in region) {
-
                 cmbReg.append($('<option value="' + region[itm].ID + '">').append(region[itm].Name));
             }
         };
@@ -580,6 +625,7 @@
             btnLoadFile = null;
             btnCancel = null;
             btnOK = null;
+            cmbPackage = null;
             $busyDiv = null;
             //$root.dialog("close");
             $root = null;

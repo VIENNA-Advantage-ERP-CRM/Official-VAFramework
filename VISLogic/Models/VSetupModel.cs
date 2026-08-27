@@ -221,6 +221,61 @@ namespace VIS.Models
             return region;
 
         }
+
+        /// <summary>
+        /// Localization packages for the package dropdown on the tenant setup form.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <returns>active localization packages, ordered by name</returns>
+        public List<LocalizationPackage> GetLocalizationPackages(Ctx ctx)
+        {
+            List<LocalizationPackage> packages = new List<LocalizationPackage>();
+            try
+            {
+                string sql = "SELECT LocalizationPackage_ID, Value, Name FROM LocalizationPackage"
+                           + " WHERE IsActive='Y' AND AD_Client_ID IN (0," + ctx.GetAD_Client_ID() + ")"
+                           + " ORDER BY Name";
+                DataSet ds = DBase.DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        packages.Add(new LocalizationPackage()
+                        {
+                            ID = Util.GetValueOfInt(ds.Tables[0].Rows[i][0]),
+                            Value = Util.GetValueOfString(ds.Tables[0].Rows[i][1]),
+                            Name = Util.GetValueOfString(ds.Tables[0].Rows[i][2])
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // The table ships with a module, so it may not exist on every
+                // install - degrade to an empty dropdown instead of breaking
+                // the whole setup form.
+                VAdvantage.Logging.VLogger.Get().Warning("GetLocalizationPackages: " + ex.Message);
+            }
+            return packages;
+        }
+    }
+    public class LocalizationPackage
+    {
+        public int ID
+        {
+            get;
+            set;
+        }
+        public String Value
+        {
+            get;
+            set;
+        }
+        public String Name
+        {
+            get;
+            set;
+        }
     }
     public class InitialData
     {
