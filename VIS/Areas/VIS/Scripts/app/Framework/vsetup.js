@@ -63,9 +63,18 @@
         var fileName = null
         var chkDA = null;
         var lblDA = null;
+        var cmbPackage = null;
+
+        /* Message lookup that falls back to plain text when the key is not
+           translated - VIS.Msg.getMsg returns "[key]" for a missing key. */
+        var msgOr = function (key, fallback) {
+            var val = VIS.Msg.getMsg(key);
+            return val === ("[" + key + "]") ? fallback : val;
+        };
+
         this.load = function () {
 
-            
+
 
             var dContent = $("<div class='vis-graywrap'>");
             container.append(dContent);
@@ -80,7 +89,7 @@
             txtTenant = $('<input type="text" name="tenant" placeholder="' + VIS.Msg.getMsg('Tenant') + '">');
             dTenant.append(dTenantInner);
             dTenantInner.append(txtTenant);
-            dTenantInner.append($('<label>').append(VIS.Msg.translate(VIS.context, "AD_Client_ID")));         
+            dTenantInner.append($('<label>').append(VIS.Msg.translate(VIS.context, "AD_Client_ID")));
             dTForm.append(dTenant);
 
             var dOrg = $("<div class='input-group vis-input-wrap vis-intial-form-data'>");
@@ -88,7 +97,7 @@
             txtOrg = $('<input type="text" name="tenant" placeholder="' + VIS.Msg.getMsg('Org') + '">');
             dOrg.append(dOrgInner);
             dOrgInner.append(txtOrg);
-            dOrgInner.append($('<label>').append(VIS.Msg.translate(VIS.context, "AD_Org_ID")));          
+            dOrgInner.append($('<label>').append(VIS.Msg.translate(VIS.context, "AD_Org_ID")));
             dTForm.append(dOrg);
 
             var dUTenant = $("<div class='input-group vis-input-wrap vis-intial-form-data'>");
@@ -96,7 +105,7 @@
             txtUTenant = $('<input type="text" name="tenant" placeholder="' + VIS.Msg.getMsg('TenantAdmin') + '">');
             dUTenant.append(dUTenantInner);
             dUTenantInner.append(txtUTenant);
-            dUTenantInner.append($('<label>').append(VIS.Msg.parseTranslation(VIS.context, "@AD_User_ID@ @AD_Client_ID@")));           
+            dUTenantInner.append($('<label>').append(VIS.Msg.parseTranslation(VIS.context, "@AD_User_ID@ @AD_Client_ID@")));
             dTForm.append(dUTenant);
 
             var dUOrg = $("<div class='input-group vis-input-wrap vis-intial-form-data'>");
@@ -104,12 +113,12 @@
             txtUOrg = $('<input type="text" name="tenant" placeholder="' + VIS.Msg.getMsg('TenantUser') + '">');
             dUOrg.append(dUOrgInner);
             dUOrgInner.append(txtUOrg);
-            dUOrgInner.append($('<label>').append(VIS.Msg.parseTranslation(VIS.context, "@AD_User_ID@ @AD_Org_ID@")));          
+            dUOrgInner.append($('<label>').append(VIS.Msg.parseTranslation(VIS.context, "@AD_User_ID@ @AD_Org_ID@")));
             dTForm.append(dUOrg);
 
 
             var dCurr = $("<div class='input-group vis-input-wrap vis-intial-form-dataCombo'>");
-            var dCurrInner = $("<div class='vis-control-wrap'></div>");            
+            var dCurrInner = $("<div class='vis-control-wrap'></div>");
             cmbCurr = $('<select placeholder="Currency">');
             dCurr.append(dCurrInner);
             dCurrInner.append(cmbCurr);
@@ -117,7 +126,7 @@
             dTForm.append(dCurr);
 
             var dCou = $("<div class='input-group vis-input-wrap vis-intial-form-dataCombo'>");
-            var dCouInner = $("<div class='vis-control-wrap'></div>"); 
+            var dCouInner = $("<div class='vis-control-wrap'></div>");
             cmbCou = $('<select placeholder="Country">');
             dCou.append(dCouInner);
             dCouInner.append(cmbCou);
@@ -125,7 +134,7 @@
             dTForm.append(dCou);
 
             var dCity = $("<div class='input-group vis-input-wrap vis-intial-form-dataCombo'>");
-            var dCityInner = $("<div class='vis-control-wrap'></div>"); 
+            var dCityInner = $("<div class='vis-control-wrap'></div>");
             txtCity = $('<input type="text" placeholder="' + VIS.Msg.getMsg('City') + '" style="width:100%;">');
             dCity.append(dCityInner);
             dCityInner.append(txtCity);
@@ -133,7 +142,7 @@
             dTForm.append(dCity);
 
             var dReg = $("<div class='input-group vis-input-wrap vis-intial-form-dataCombo' >");
-            var dRegInner = $("<div class='vis-control-wrap'></div>"); 
+            var dRegInner = $("<div class='vis-control-wrap'></div>");
             cmbReg = $('<select placeholder="Region">');
             dRegInner.append(cmbReg);
             dRegInner.append($('<label>').append(VIS.Msg.translate(VIS.context, "C_Region_ID")));
@@ -184,7 +193,7 @@
             dChkContainer.append(dChkBox);
             dTForm.append(dChkContainer);
             //liChks.append(dChkBox);
-           
+
 
             var dOpprotunity = $('<div class="vis-initial-form-checkbox" >');
             chkOpprotunity = $('<input type="checkbox">');
@@ -215,6 +224,15 @@
             dBP.append(chkBP);
             dBP.append($("<label>").append(VIS.Msg.translate(VIS.context, "C_BPartner_ID")));
             dChkBox.append(dBP);
+
+            /* Localization package - same combo pattern as Currency / Country. */
+            var dPkg = $("<div class='input-group vis-input-wrap vis-intial-form-dataCombo vis-its-pkg-wrap'>");
+            var dPkgInner = $("<div class='vis-control-wrap'></div>");
+            cmbPackage = $('<select placeholder="Package">');
+            dPkg.append(dPkgInner);
+            dPkgInner.append(cmbPackage);
+            dPkgInner.append($('<label>').append(msgOr("LocalizationPackage", "Package")));
+            dTForm.append(dPkg);
 
             //var liBtns= $("<li>");
             //ulCase.append(liBtns);
@@ -256,7 +274,7 @@
             //dRbtns.append(fileBrowser);
             dLbtns.append(fileBrowser);
 
-          
+
             btnOK = $("<a href='javascript:;' class='vis-initial-btn' style='margin-right: 15px;'>").append(VIS.Msg.getMsg("Done"));
             btnOK.on('click', function () {
                 createTenant();
@@ -318,23 +336,51 @@
                 }
             });
 
-
-
+            /* Loaded separately - the table ships with a module, so a failure
+               here must not stop the rest of the form from working. */
+            $.ajax({
+                url: VIS.Application.contextUrl + "VSetup/GetLocalizationPackages",
+                dataType: "json",
+                error: function () {
+                    loadLocalizationPackages(null);
+                },
+                success: function (data) {
+                    loadLocalizationPackages(data == null ? null : data.result);
+                }
+            });
 
         };
 
+        var loadLocalizationPackages = function (packages) {
+            if (cmbPackage == null) {
+                return;
+            }
+            cmbPackage.empty();
+            /* Blank first entry - picking a package is not mandatory. */
+            cmbPackage.append($('<option>').attr('value', ''));
+            if (packages == null) {
+                return;
+            }
+            for (var itm in packages) {
+                cmbPackage.append($('<option>')
+                    .attr('value', packages[itm].ID)
+                    .attr('data-value', packages[itm].Value)
+                    .text(packages[itm].Name));
+            }
+        };
+
         var loadCurrency = function (currency) {
-           
+
             if (currency == null) {
                 return;
             }
             for (var itm in currency) {
 
-                cmbCurr.append($('<option value="' + currency[itm].ID + '">').append(currency[itm].Name + " (" + currency[itm].ISO_Code+")"));
+                cmbCurr.append($('<option value="' + currency[itm].ID + '">').append(currency[itm].Name + " (" + currency[itm].ISO_Code + ")"));
             }
         };
         var loadCountry = function (country) {
-            
+
             if (country == null) {
                 return;
             }
@@ -344,12 +390,11 @@
             }
         };
         var loadRegion = function (region) {
-           
+
             if (region == null) {
                 return;
             }
             for (var itm in region) {
-
                 cmbReg.append($('<option value="' + region[itm].ID + '">').append(region[itm].Name));
             }
         };
@@ -430,8 +475,7 @@
                 }
             }
 
-            if (userClient == userOrg)
-            {
+            if (userClient == userOrg) {
                 VIS.ADialog.error("UsernameMustBeDifferent");
                 return;
             }
@@ -490,9 +534,9 @@
         var showLog = function (tInfo) {
             //var divLog=$('<div>');
 
-            
 
-            if(tInfo.Log!=null && tInfo.Log.trim().length > 0){
+
+            if (tInfo.Log != null && tInfo.Log.trim().length > 0) {
                 divRightInner.append($('<div style="margin-bottom:10px">').append(" Error - " + tInfo.Log));
                 divRightInner.append($('<div style="margin-bottom:10px">').append(VIS.Msg.getMsg('VIS_TenantErrorMsg')));
             }
@@ -516,24 +560,24 @@
             //divRight.append($('<div style="margin-bottom:10px">').append(" Org Username - BB"));
             //divRight.append($('<div style="margin-bottom:10px">').append(" Org User Password - BB"));
 
-             //btnSave = null;
+            //btnSave = null;
             //if (VIS.Application.isRTL) {
             //    btnSave = $('<a href="javascript:void(o)" style="float:left;" class="vis-initial-btn vis-initial-btn-blue">').append($("<i class='vis vis-save'></i>"));
             //}
             //else {
-               // btnSave = $('<a href="javascript:void(o)" class="vis-initial-btn vis-initial-btn-blue">').append($("<i class='vis vis-save'></i>"));
+            // btnSave = $('<a href="javascript:void(o)" class="vis-initial-btn vis-initial-btn-blue">').append($("<i class='vis vis-save'></i>"));
             //}
             btnSave.on('click', function () {
 
                 var text = '';
-                text+=" Tenant Name - " + tInfo.TenantName + "\t\n";
-                text+=" Organization Name - " + tInfo.OrgName + "\t\n";
-                text+=" Admin Role - " + tInfo.AdminRole + "\t\n";
-                text+=" User Role - " + tInfo.UserRole + "\t\n";
-                text+=" Admin Username - " + tInfo.AdminUser + "\t\n";
-                text+=" Admin User Password - " + tInfo.AdminUserPwd + "\t\n";
-                text+=" Org Username - " + tInfo.OrgUser + "\t\n";
-                text+=" Org User Password - " + tInfo.OrgUserPwd + "\t\n";
+                text += " Tenant Name - " + tInfo.TenantName + "\t\n";
+                text += " Organization Name - " + tInfo.OrgName + "\t\n";
+                text += " Admin Role - " + tInfo.AdminRole + "\t\n";
+                text += " User Role - " + tInfo.UserRole + "\t\n";
+                text += " Admin Username - " + tInfo.AdminUser + "\t\n";
+                text += " Admin User Password - " + tInfo.AdminUserPwd + "\t\n";
+                text += " Org Username - " + tInfo.OrgUser + "\t\n";
+                text += " Org User Password - " + tInfo.OrgUserPwd + "\t\n";
 
                 //text += " Tenant Name - AA" +"\t\n";
                 //text += " Organization Name - AA" +"\t\n";
@@ -549,10 +593,10 @@
                 $(this).attr("href", fileData).attr("download", "file-" + d + ".txt");
 
                 //divLog.dialog('close');
-               // divLog = null;
+                // divLog = null;
             });
             btnSave.show();
-           // divRight.append(btnSave);
+            // divRight.append(btnSave);
 
             //divLog.dialog({
             //    width: 520,
@@ -580,17 +624,18 @@
             btnLoadFile = null;
             btnCancel = null;
             btnOK = null;
+            cmbPackage = null;
             $busyDiv = null;
             //$root.dialog("close");
             $root = null;
         };
 
-     
+
         this.getRoot = function () {
             return $root;
         };
 
-      
+
     };
 
 

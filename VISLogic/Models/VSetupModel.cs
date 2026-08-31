@@ -33,14 +33,14 @@ namespace VIS.Models
                             INNER JOIN C_Currency_Trl CL
                             ON (C.C_Currency_ID=CL.C_Currency_ID
                             AND CL.ad_language ='" + ctx.GetAD_Language() + "') ORDER BY 1";
-               // sqlCo = "SELECT C_Country_ID, Name FROM C_Country WHERE IsSummary='N' ORDER BY 1";
-                sqlCo=@"SELECT C.C_Country_ID, CL.Name
+                // sqlCo = "SELECT C_Country_ID, Name FROM C_Country WHERE IsSummary='N' ORDER BY 1";
+                sqlCo = @"SELECT C.C_Country_ID, CL.Name
                             FROM C_Country C
                             INNER JOIN C_Country_Trl CL
                             ON (C.C_Country_ID=CL.C_Country_ID
                             AND CL.ad_language ='" + ctx.GetAD_Language() + "') ORDER BY 1";
                 sqlRe = "SELECT C_Region_ID, Name FROM C_Region ORDER BY C_Country_ID, Name";
-                
+
             }
             InitialData ini = new InitialData();
             DataSet ds = DBase.DB.ExecuteDataset(sqlCu);
@@ -95,7 +95,7 @@ namespace VIS.Models
             try
             {
                 tInfo.TenantName = clientName;
-               
+
                 //Functinality moved to FRPT
                 //if (string.IsNullOrEmpty(fileName))
                 //{
@@ -178,9 +178,9 @@ namespace VIS.Models
 
                 if (tInfo.Log == null)
                 {
-                    tInfo.Log =  retVal;
+                    tInfo.Log = retVal;
                 }
-               
+
                 //try
                 //{
                 //    if (m_file != null)
@@ -206,8 +206,9 @@ namespace VIS.Models
 
         }
 
-        public List<Region> GetRegion(Ctx ctx,int countryID) {
-            string sqlRe = "SELECT C_Region_ID, Name FROM C_Region WHERE C_Country_ID="+countryID+" AND IsActive='Y' ORDER BY C_Country_ID, Name";
+        public List<Region> GetRegion(Ctx ctx, int countryID)
+        {
+            string sqlRe = "SELECT C_Region_ID, Name FROM C_Region WHERE C_Country_ID=" + countryID + " AND IsActive='Y' ORDER BY C_Country_ID, Name";
             DataSet ds = DBase.DB.ExecuteDataset(sqlRe);
             List<Region> region = new List<Region>();
             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
@@ -220,6 +221,61 @@ namespace VIS.Models
             }
             return region;
 
+        }
+
+        /// <summary>
+        /// Localization packages for the package dropdown on the tenant setup form.
+        /// </summary>
+        /// <param name="ctx">context</param>
+        /// <returns>active localization packages, ordered by name</returns>
+        public List<LocalizationPackage> GetLocalizationPackages(Ctx ctx)
+        {
+            List<LocalizationPackage> packages = new List<LocalizationPackage>();
+            try
+            {
+                string sql = "SELECT LocalizationPackage_ID, Value, Name FROM LocalizationPackage"
+                           + " WHERE IsActive='Y' AND AD_Client_ID IN (0," + ctx.GetAD_Client_ID() + ")"
+                           + " ORDER BY Name";
+                DataSet ds = DBase.DB.ExecuteDataset(sql);
+                if (ds != null && ds.Tables.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        packages.Add(new LocalizationPackage()
+                        {
+                            ID = Util.GetValueOfInt(ds.Tables[0].Rows[i][0]),
+                            Value = Util.GetValueOfString(ds.Tables[0].Rows[i][1]),
+                            Name = Util.GetValueOfString(ds.Tables[0].Rows[i][2])
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // The table ships with a module, so it may not exist on every
+                // install - degrade to an empty dropdown instead of breaking
+                // the whole setup form.
+                VAdvantage.Logging.VLogger.Get().Warning("GetLocalizationPackages: " + ex.Message);
+            }
+            return packages;
+        }
+    }
+    public class LocalizationPackage
+    {
+        public int ID
+        {
+            get;
+            set;
+        }
+        public String Value
+        {
+            get;
+            set;
+        }
+        public String Name
+        {
+            get;
+            set;
         }
     }
     public class InitialData

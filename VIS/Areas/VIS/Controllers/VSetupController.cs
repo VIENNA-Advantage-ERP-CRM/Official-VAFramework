@@ -15,7 +15,7 @@ namespace VIS.Controllers
         // GET: /VIS/VSetup/
         public ActionResult Index(string windowno)
         {
-                    
+
             return View();
         }
 
@@ -30,16 +30,32 @@ namespace VIS.Controllers
         }
         [AjaxAuthorizeAttribute]
         [AjaxSessionFilterAttribute]
-        public JsonResult InitailizeClientSetup(string clientName,string orgName, string userClient,string userOrg,string city,
+        public JsonResult InitailizeClientSetup(string clientName, string orgName, string userClient, string userOrg, string city,
             int currencyID, string currencyName, int countryID, string countryName, int regionID, string regionName,
-            bool cfProduct, bool cfBPartner, bool cfProject,bool cfMCampaign,bool cfSRegion, string fileName,string folderKey)
+            bool cfProduct, bool cfBPartner, bool cfProject, bool cfMCampaign, bool cfSRegion, string fileName, string folderKey)
         {
             VSetupModel model = new VSetupModel();
             Ctx ctx = Session["ctx"] as Ctx;
-            return Json(new { result = model.InitailizeClientSetup(clientName,orgName, userClient,userOrg,city,
+            return Json(new
+            {
+                result = model.InitailizeClientSetup(clientName, orgName, userClient, userOrg, city,
             currencyID, currencyName, countryID, countryName, regionID, regionName,
-            cfProduct, cfBPartner, cfProject,cfMCampaign,cfSRegion, fileName,folderKey,ctx) }, JsonRequestBehavior.AllowGet);
+            cfProduct, cfBPartner, cfProject, cfMCampaign, cfSRegion, fileName, folderKey, ctx)
+            }, JsonRequestBehavior.AllowGet);
         }
+        /// <summary>
+        /// Get localization packages for the package dropdown
+        /// </summary>
+        /// <returns>localization packages</returns>
+        [AjaxAuthorizeAttribute]
+        [AjaxSessionFilterAttribute]
+        public JsonResult GetLocalizationPackages()
+        {
+            VSetupModel model = new VSetupModel();
+            Ctx ctx = Session["ctx"] as Ctx;
+            return Json(new { result = model.GetLocalizationPackages(ctx) }, JsonRequestBehavior.AllowGet);
+        }
+
         /// <summary>
         /// Get Region accroding to country
         /// </summary>
@@ -51,5 +67,5 @@ namespace VIS.Controllers
             Ctx ctx = Session["ctx"] as Ctx;
             return Json(new { result = model.GetRegion(ctx, countryID) }, JsonRequestBehavior.AllowGet);
         }
-	}
+    }
 }

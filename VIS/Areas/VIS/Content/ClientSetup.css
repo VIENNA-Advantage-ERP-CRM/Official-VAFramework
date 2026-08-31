@@ -1,10 +1,15 @@
 ﻿
-.vis-vsetup-wrap{
-	width:40%;
-	margin:5% auto;
-	min-width: 595px;	
+.vis-vsetup-wrap {
+    width: 40%;
+    margin: 5% auto;
+    min-width: 595px;
 }
-.vis-header-wrap{ width:100%; float:left;}
+
+.vis-header-wrap {
+    width: 100%;
+    float: left;
+}
+
 .vis-vsetup-tittle {
     /*width: 96%;
     background: rgba(var(--v-c-primary), 1);
@@ -16,6 +21,7 @@
     font-weight: bold;
     color: white;*/
 }
+
 .vis-btn-close {
     /*width: 4%;
 	height:29px;
@@ -30,25 +36,30 @@
     border: 0px;
     margin: 0;*/
 }
-.vis-clear-both{
-	clear: both;
+
+.vis-clear-both {
+    clear: both;
 }
+
 .vis-graywrap, initial-client-form {
     /*background:#f4f4f4;*/
     width: 100%;
-    float: left;    
+    float: left;
     /*border-left:2px solid #1aa0ed;
 	border-right:2px solid #1aa0ed;
 	border-bottom:2px solid #1aa0ed;*/
     /*padding: 15px;*/
 }
+
 .vis-graywrap {
     height: 100%;
 }
-.vis-graywrap > p{
-	/*color:#666;*/
-	font-size:14px;	
-}
+
+    .vis-graywrap > p {
+        /*color:#666;*/
+        font-size: 14px;
+    }
+
 .vis-intial-form-data, .vis-initial-form-buttons, .vis-intial-form-dataCombo {
     float: left;
     width: 50%;
@@ -69,91 +80,97 @@
     /*margin-bottom: 2px;*/
     left: 10px;
 }
-.vis-intial-form-data input, .vis-intial-form-dataCombo select{
-	/*float:left;
-	width:100%;*/	
-	/*border:1px solid #ccc;*/
-	border-radius:3px;
-	padding:5px 10px;
-     /*height:30px;*/
-   
+
+.vis-intial-form-data input, .vis-intial-form-dataCombo select {
+    /*float:left;
+	width:100%;*/
+    /*border:1px solid #ccc;*/
+    border-radius: 3px;
+    padding: 5px 10px;
+    /*height:30px;*/
 }
+
 .vis-intial-form-dataCombo > select {
     margin-right: 10px;
 }
-.vis-intial-form-data > a{
-	float:right;
-	width:16px;
-	height:16px;
-	background:url('../Images/info-icon.png');
-	margin-top: 8px;
-	cursor:pointer;	
+
+.vis-intial-form-data > a {
+    float: right;
+    width: 16px;
+    height: 16px;
+    background: url('../Images/info-icon.png');
+    margin-top: 8px;
+    cursor: pointer;
 }
 
-html[dir="rtl"] .vis-intial-form-data
-{
-    float:right;
+html[dir="rtl"] .vis-intial-form-data {
+    float: right;
 }
 
 
-ul.vis-initial-client-form-list{
-	margin:0;
-	padding:0;
-	list-style:none;	
+ul.vis-initial-client-form-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
     margin-top: 10px;
 }
-ul.vis-initial-client-form-list > li{
-	float:left;
-	width:48%;	
-    margin-left:15px;
-}
-.vis-initial-form-checkbox{ 
-	width: 50%;
-	float: left;
-	margin-top: 10px;	
-}
-.vis-initial-form-checkbox > input{
-	float:left;	
-	margin-right:10px;
-    margin-left:10px;
+
+    ul.vis-initial-client-form-list > li {
+        float: left;
+        width: 48%;
+        margin-left: 15px;
+    }
+
+.vis-initial-form-checkbox {
+    width: 50%;
+    float: left;
+    margin-top: 10px;
 }
 
-html[dir="rtl"] .vis-initial-form-checkbox
-{
-    	float:right;	
+    .vis-initial-form-checkbox > input {
+        float: left;
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+
+html[dir="rtl"] .vis-initial-form-checkbox {
+    float: right;
 }
 
-html[dir="rtl"] .vis-initial-form-checkbox > input {
-	float:right;	
-}
+    html[dir="rtl"] .vis-initial-form-checkbox > input {
+        float: right;
+    }
 
-.vis-initial-form-checkbox > label{
-	float:left;
-	font-size:14px;
-	/*color:#666;
-	font-weight:normal;*/	
+.vis-initial-form-checkbox > label {
+    float: left;
+    font-size: 14px;
+    /*color:#666;
+	font-weight:normal;*/
 }
 
 html[dir="rtl"] .vis-initial-form-checkbox > label {
-	float:right;	
+    float: right;
 }
 
 .vis-cs-op-lbl, .vis-its-ryt-panel h3 {
     color: rgba(var(--v-c-primary), 1);
 }
-.vis-initial-form-buttons{
-	margin-top:20px;	
+
+.vis-initial-form-buttons {
+    margin-top: 20px;
     width: 100%;
 }
-.vis-initial-btn-right{
-	float:left;	
+
+.vis-initial-btn-right {
+    float: left;
 }
-.vis-initial-btn-left{
-	float:right;	
+
+.vis-initial-btn-left {
+    float: right;
     margin-top: 10px;
-    padding-left:15px;
-    
+    padding-left: 15px;
 }
+
 .vis-initial-btn, .vis-initial-btn:hover {
     color: rgba(var(--v-c-on-primary), 1) !important;
     background: rgba(var(--v-c-primary), 1);
@@ -165,35 +182,45 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
     border: 1px solid rgba(var(--v-c-primary), 1);
 }
 
-.vis-initial-btn:focus {
-    box-shadow: 0 0 10px rgb(0 0 0 / 50%) !important;
-}
+    .vis-initial-btn:focus {
+        box-shadow: 0 0 10px rgb(0 0 0 / 50%) !important;
+    }
+
 .vis-initial-btn-blue, .vis-initial-btn-blue:hover {
     background: rgba(var(--v-c-primary), 1);
 }
+
 .vis-cs-op-lbl {
     margin-left: 12px;
     font-size: 16px;
 }
+
 .vis-fieldset-wrap, .vis-fieldset-inn, .initial-client-form {
     width: 100%;
     float: left;
 }
-.vis-fieldset-wrap{ padding: 0 12px;}
+
+.vis-fieldset-wrap {
+    padding: 0 12px;
+}
+
 .vis-fieldset-inn {
     border: 1px solid rgba(var(--v-c-on-secondary), .3);
     padding: 0 10px 10px;
     border-radius: 5px;
     margin-top: 0px;
 }
+
 .vis-its-main-wrap {
     width: 80%;
     height: 100%;
 }
+
 .initial-client-form {
     height: calc(100% - 60px);
     overflow: auto;
 }
+
 .vis-its-ryt-panel {
     background-color: rgba(var(--v-c-secondary), .8);
     width: 20%;
@@ -201,21 +228,30 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
     padding: 12px;
     word-wrap: break-word;
 }
-.vis-its-ryt-panel h3 {
-    margin-top: 0;
-    font-size: 16px;    
-}
-.vis-its-ryt-panel-inner{
+
+    .vis-its-ryt-panel h3 {
+        margin-top: 0;
+        font-size: 16px;
+    }
+
+.vis-its-ryt-panel-inner {
     width: 100%;
     height: calc(100% - 40px);
     overflow: auto;
 }
+
 .vis-initial-btn i {
     font-size: 1rem;
 }
+
 .vis-its-ryt-panel .vis-initial-btn {
     float: right;
 }
+
 .initial-client-form .VIS_Pref_change-pass {
     margin-bottom: 20px;
+}
+/* Localization package combo - sits under the Optional fieldset. */
+.vis-its-pkg-wrap {
+    margin-top: 18px;
 }
