@@ -269,7 +269,7 @@ VIS = window.VIS || {};
         };
 
         function baseParams() {
-            var p = { RecordId: _recordId, AD_Table_ID: $self.table_ID, Page: _page };
+            var p = { RecordId: _recordId, AD_Table_ID: $self.table_ID, Page: _page, PageSize:cfg.pageSize };
             for (var k in cfg.params) { if (cfg.params.hasOwnProperty(k)) p[k] = cfg.params[k]; }
             return p;
         }

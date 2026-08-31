@@ -20,12 +20,12 @@ namespace VIS.Controllers
         /// <param name="RecordId">Record ID</param>
         /// <param name="AD_Table_ID">Table ID</param>
         /// <param name="Page">1-based page number</param>
-        public JsonResult GetRecordTimeline(string RecordId, string AD_Table_ID, string Page,string pageSize)
+        public JsonResult GetRecordTimeline(string RecordId, string AD_Table_ID, string Page,string PageSize)
         {
             Ctx ct = Session["ctx"] as Ctx;
             EventTimelineModel _model = new EventTimelineModel();
             var data = _model.GetTimeline(ct, Util.GetValueOfInt(RecordId),
-                Util.GetValueOfInt(AD_Table_ID), Util.GetValueOfInt(Page),Util.GetValueOfInt(pageSize));
+                Util.GetValueOfInt(AD_Table_ID), Util.GetValueOfInt(Page),Util.GetValueOfInt(PageSize));
             return Json(JsonConvert.SerializeObject(data), JsonRequestBehavior.AllowGet);
         }
 
