@@ -71,13 +71,7 @@ namespace VIS.Models
 
             if (Env.IsModuleInstalled("VA112_"))
             {
-                sql = @"SELECT *
-                        FROM (SELECT   ROWNUM AS rn, temp1.*
-                    FROM (
-                        SELECT 
-                            temp.*
-                        FROM (
-                            SELECT 
+                sql = @"   SELECT 
                                 NVL(n'' || e.EventType, '') AS EventType,
                                 e.Created AS EventDate,
                                 NVL(e.DocStatus, '') AS DocStatus,
@@ -103,10 +97,11 @@ namespace VIS.Models
                                 NVL(n'' || e.Actor, ''),
                                 NVL(n'' || e.NodeName, '')
                             FROM VA112_DOCSHARETIMELINE_V e WHERE AD_Table_ID = " + _AD_Table_ID + @" AND RECORD_ID=" + RecordId + @"
-                        ) temp
-                        ORDER BY temp.EventDate DESC
-                    ) temp1)
-                    WHERE rn BETWEEN " + from + " AND " + to;
+                        
+                        ORDER BY EventDate DESC
+                    
+                    OFFSET (" + from + " - 1) * " + pageSize + @" ROWS
+                    FETCH NEXT " + pageSize + " ROWS ONLY";
 
             }
             // DB.ExecuteDataset logs and returns null on a SQL error, so without
@@ -174,7 +169,7 @@ namespace VIS.Models
                    FROM VA112_DOCSHARETIMELINE_V
                    WHERE AD_Table_ID = " + _AD_Table_ID + @"
                      AND Record_ID = " + RecordId + @"
-               )";
+               ) t";
             }
 
             return Util.GetValueOfInt(DB.ExecuteScalar(sql));
