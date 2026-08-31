@@ -71,6 +71,8 @@ namespace VIS.Models
 
             if (Env.IsModuleInstalled("VA112_"))
             {
+                int offset = (from - 1) * pageSize;
+
                 sql = @"   SELECT 
                                 NVL(n'' || e.EventType, '') AS EventType,
                                 e.Created AS EventDate,
@@ -100,7 +102,7 @@ namespace VIS.Models
                         
                         ORDER BY EventDate DESC
                     
-                    OFFSET (" + from + " - 1) * " + pageSize + @" ROWS
+                    OFFSET  "+offset+ @" ROWS
                     FETCH NEXT " + pageSize + " ROWS ONLY";
 
             }
