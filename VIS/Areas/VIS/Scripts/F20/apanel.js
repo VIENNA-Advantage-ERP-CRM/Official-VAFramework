@@ -4404,7 +4404,7 @@
             }
             if (this.aAttachFrom) {
                 this.aAttachFrom.setEnabled(false);
-                gPanel.setToolbarBtnState(this.aAttachment.getAction(), false);
+                gPanel.setToolbarBtnState(this.aAttachFrom.getAction(), false);
             }
             if (this.aZoomAcross) {
                 this.aZoomAcross.setEnabled(false);
@@ -5407,10 +5407,12 @@
     APanel.prototype.cmd_attachment = function (isViewOnly) {
         //alert("attachment");
         if (this.curTab.getRecord_ID() < 1) {
+
             this.aAttachment.setEnabled(false);
             if (this.curGC) {
                 this.curGC.vGridPanel.setEnabled(this.aAttachment.getAction(), false);
             }
+
             return;
         }
         var self = this;

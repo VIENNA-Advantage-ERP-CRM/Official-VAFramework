@@ -29,10 +29,22 @@ namespace VIS.Models
        // private const int TIMELINE_PAGE_SIZE = 12;
 
         /// <summary>
-        /// _Document Status reference. Stored DocAction rows carry a DocStatus
-        /// code (CO/VO/CL/IP...); this reference gives its translated name.
+        /// _Document Action reference, the primary lookup for the code stored in
+        /// AD_EventTimeline.DocStatus. That column holds the ACTION taken, not
+        /// always the resulting status: POValidator writes PR for DR->IP and RE for
+        /// CO->IP, and neither reads correctly against _Document Status - PR is
+        /// absent from it, and RE means Reversed there but Re-activate here.
         /// Verify in your instance:
-        ///   SELECT AD_Reference_ID FROM AD_Reference WHERE Name='_Document Status';
+        ///   SELECT AD_Reference_ID FROM AD_Reference WHERE Name='_Document Action';
+        /// </summary>
+        private const int DOCACTION_AD_REFERENCE_ID = 135;
+
+        /// <summary>
+        /// _Document Status reference, the fallback for the codes 135 does not carry.
+        /// Only those two transitions above are named as actions; every other one
+        /// stores the raw resulting status, and DR / NA / WP / IP have no
+        /// _Document Action entry. Without this fallback those events would render
+        /// with no title at all.
         /// </summary>
         private const int DOCSTATUS_AD_REFERENCE_ID = 131;
 
@@ -182,8 +194,9 @@ namespace VIS.Models
         /// Workflow / Shared rows store an AD_Message KEY in Title, so one stored
         /// row reads correctly for every user; the workflow node name (already
         /// joined from AD_WF_Node) is appended to it. DocAction rows carry no key
-        /// - their DocStatus code is resolved against the _Document Status
-        /// reference list instead (language-aware + cached).
+        /// - their stored code is resolved against the _Document Action reference
+        /// list, falling back to _Document Status for the status-only codes
+        /// (language-aware + cached in MRefList).
         /// Returns "" when nothing can be resolved (ctx is null once the session
         /// has expired); the panel then falls back to its own label rather than
         /// the whole feed dying on the lookup.
@@ -200,7 +213,13 @@ namespace VIS.Models
             }
 
             if (eventType == MEventTimeline.EVENT_DocAction && !string.IsNullOrEmpty(docStatus))
-                return MRefList.GetListName(ctx, DOCSTATUS_AD_REFERENCE_ID, docStatus);
+            {
+                //  GetListName returns "" (not null) for a code the reference does not hold
+                string name = MRefList.GetListName(ctx, DOCACTION_AD_REFERENCE_ID, docStatus);
+                if (string.IsNullOrEmpty(name))
+                    name = MRefList.GetListName(ctx, DOCSTATUS_AD_REFERENCE_ID, docStatus);
+                return name;
+            }
 
             return "";
         }
@@ -211,8 +230,8 @@ namespace VIS.Models
         /// Workflow sub-types come from the stored Title message key. They used to
         /// be guessed by matching English prefixes in the Description, which only
         /// worked while that text was a hardcoded English literal.
-        /// DocStatus codes: CO=Completed, VO=Voided, CL=Closed, RE=Re-activated,
-        /// IP/WC=In Progress (Prepared).
+        /// Stored codes: CO=Complete, VO=Void, CL=Close, RE=Re-activate,
+        /// PR=Prepare, IP/WC=In Progress (the status, when no action was named).
         /// </summary>
         private string MapPanelType(string eventType, string docStatus, string titleKey)
         {
@@ -265,7 +284,7 @@ namespace VIS.Models
     {
         public string Type { get; set; }
         // Title resolved into the reading user's language: message key + node
-        // name for workflow/shared, _Document Status name for doc-actions. When
+        // name for workflow/shared, _Document Action name for doc-actions. When
         // present the client shows it verbatim instead of its own label lookup.
         public string Title { get; set; }
         public string RawEventType { get; set; }
