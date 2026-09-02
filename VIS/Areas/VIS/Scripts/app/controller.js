@@ -2349,8 +2349,16 @@
             e.Updated = this.getValue("Updated");
             e.UpdatedBy = this.getValue("UpdatedBy");
             e.Record_ID = this.getKeyID(e.getCurrentRow());  //this.getValue(this.keyColumnName);
-            //  Info
-            var info = new StringBuilder(this.getTableName());
+            //  Info - show Window (screen) name along with the table name
+            var info = new StringBuilder();
+            var windowName = VIS.context.getWindowContext(this.vo.windowNo, "WindowName", true);
+            if ((windowName == null || windowName.length == 0) && this.gridWindow != null) {
+                windowName = this.gridWindow.getDisplayName() || this.gridWindow.getName();
+            }
+            if (windowName != null && windowName.length > 0) {
+                info.append(windowName).append(" - ");
+            }
+            info.append(this.getTableName());
             //  We have a key column
             if (this.keyColumnName != null && this.keyColumnName.length > 0) {
                 info.append(" - ")

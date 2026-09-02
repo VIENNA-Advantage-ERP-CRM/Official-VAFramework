@@ -108,6 +108,60 @@ namespace VIS.Models
             return true;
         }
 
+        //  -1 = not resolved yet, 0 = not translated, 1 = translated. Resolved once per application life.
+        private static int _isWidgetDescriptionTranslated = -1;
+
+        /// <summary>
+        /// Is AD_Widget.Description flagged as a translated column, i.e. also available on AD_Widget_Trl
+        /// </summary>
+        /// <returns>true when the description can be read from AD_Widget_Trl</returns>
+        private static bool IsWidgetDescriptionTranslated()
+        {
+            if (_isWidgetDescriptionTranslated < 0)
+            {
+                string isTrl = Util.GetValueOfString(DB.ExecuteScalar(@"SELECT c.IsTranslated FROM AD_Column c
+                            INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID)
+                            WHERE t.TableName='AD_Widget' AND c.ColumnName='Description'"));
+                _isWidgetDescriptionTranslated = "Y".Equals(isTrl) ? 1 : 0;
+            }
+            return _isWidgetDescriptionTranslated == 1;
+        }
+
+        //  TableName -> does that table carry a Description column. Resolved once per table per application life.
+        private static readonly Dictionary<string, bool> _hasDescriptionColumn = new Dictionary<string, bool>();
+
+        /// <summary>
+        /// Does the given table carry a Description column. Used for the analytical tables, which belong to
+        /// the VADB module and are therefore not guaranteed to have one.
+        /// </summary>
+        /// <param name="tableName">table to check, always a literal from this class</param>
+        /// <returns>true when Description can be selected from that table</returns>
+        private static bool HasDescriptionColumn(string tableName)
+        {
+            lock (_hasDescriptionColumn)
+            {
+                bool exists;
+                if (!_hasDescriptionColumn.TryGetValue(tableName, out exists))
+                {
+                    exists = Util.GetValueOfInt(DB.ExecuteScalar(@"SELECT COUNT(*) FROM AD_Column c
+                                INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID)
+                                WHERE t.TableName='" + tableName + @"' AND c.ColumnName='Description' AND c.IsActive='Y'")) > 0;
+                    _hasDescriptionColumn[tableName] = exists;
+                }
+                return exists;
+            }
+        }
+
+        /// <summary>
+        /// Description column for one branch of the analytical UNION, kept type compatible across branches
+        /// </summary>
+        /// <param name="tableName">table of that branch</param>
+        /// <returns>select list fragment, always ending with a comma</returns>
+        private static string GetDescriptionColumn(string tableName)
+        {
+            return HasDescriptionColumn(tableName) ? " " + tableName + ".Description," : " '' AS Description,";
+        }
+
         /// <summary>
         /// Get Home page widget
         /// </summary>
@@ -122,10 +176,15 @@ namespace VIS.Models
             if (baseLanguage)
             {
                 sql += "AD_Widget.displayName,";
+                sql += "AD_Widget.Description,AD_Widget.Help,";
             }
             else
             {
                 sql += "AD_Widget_Trl.displayName AS displayName,";
+                //  Description is only present on AD_Widget_Trl when the dictionary column is marked as translated
+                sql += IsWidgetDescriptionTranslated()
+                    ? "COALESCE(AD_Widget_Trl.Description, AD_Widget.Description) AS Description,COALESCE(AD_Widget_Trl.Help, AD_Widget.Help) AS Help,"
+                    : "AD_Widget.Description,AD_Widget.Help,";
             }
             sql += @" AD_WidgetSize.className,AD_WidgetSize.Rowspan,AD_WidgetSize.Colspan,AD_WidgetSize.AD_WidgetSize_ID,AD_IMAGE.BINARYDATA,AD_ModuleInfo.name AS ModuleName, AD_Window_ID, IsDefault, Sequence FROM AD_Widget 
                             INNER JOIN AD_WidgetSize  ON AD_Widget.AD_Widget_ID=AD_WidgetSize.AD_Widget_ID
@@ -172,14 +231,22 @@ namespace VIS.Models
                     string img = "";
                     try
                     {
-                        byte[] imageData = (byte[])row[i]["BINARYDATA"];
-                        if (imageData.Length > 10 * 1024)
+                        var binaryData = row[i]["BINARYDATA"];
+                        if (binaryData == null || binaryData == DBNull.Value)
                         {
-                            img = "<img class='vis-widgetImg vis-widgetdefault' src='Areas/VIS/Images/home/defaultWidget.svg' />";
+                            img = "<img class='vis-widgetImg vis-widgetdefault' src='Areas/VIS/Images/home/defaultWidget.svg'/>";
                         }
                         else
                         {
-                            img = "<img class='vis-widgetImg' src='data:image/jpg;base64," + Convert.ToBase64String(imageData) + "' />";
+                            byte[] imageData = (byte[])row[i]["BINARYDATA"];
+                            if (imageData.Length > 10 * 1024)
+                            {
+                                img = "<img class='vis-widgetImg vis-widgetdefault' src='Areas/VIS/Images/home/defaultWidget.svg' />";
+                            }
+                            else
+                            {
+                                img = "<img class='vis-widgetImg' src='data:image/jpg;base64," + Convert.ToBase64String(imageData) + "' />";
+                            }
                         }
                         
                     }
@@ -202,7 +269,9 @@ namespace VIS.Models
                         Type = "W",
                         WindowSpecific = WindowSpecific,
                         IsDefault = Util.GetValueOfString(row[i]["IsDefault"]) == "Y",
-                        Sequence = Util.GetValueOfInt(row[i]["Sequence"])
+                        Sequence = Util.GetValueOfInt(row[i]["Sequence"]),
+                        Description = Util.GetValueOfString(row[i]["Description"]),
+                        Help = Util.GetValueOfString(row[i]["Help"])
                     };
 
                     list.Add(l);
@@ -237,6 +306,7 @@ namespace VIS.Models
                 {
                     sql += "D_Chart_Trl.Name,";
                 }
+                sql += GetDescriptionColumn("D_Chart");
                 sql += @" colspan,rowspan,'C' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence, IsDefault,AD_IMAGE.BINARYDATA,D_Chart.AD_Window_ID FROM D_Chart INNER JOIN 
                             D_ChartAccess ON (D_Chart.D_Chart_ID=D_ChartAccess.D_Chart_ID)
                             INNER JOIN AD_WidgetSize ON (D_Chart.D_Chart_ID=AD_WidgetSize.D_Chart_ID)";
@@ -268,6 +338,7 @@ namespace VIS.Models
                     sql += "RC_KPI_Trl.Name,";
                 }
 
+                sql += GetDescriptionColumn("RC_KPI");
                 sql += @" colspan,rowspan,'K' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA,RC_KPI.AD_Window_ID FROM RC_KPI INNER JOIN 
                             RC_KPIAccess ON (RC_KPI.RC_KPI_ID=RC_KPIAccess.RC_KPI_ID)
                             INNER JOIN AD_WidgetSize ON (RC_KPI.RC_KPI_ID=AD_WidgetSize.RC_KPI_ID)";
@@ -298,6 +369,7 @@ namespace VIS.Models
                 {
                     sql += " RC_View_Trl.Name,";
                 }
+                sql += GetDescriptionColumn("RC_View");
                 sql += @" colspan,rowspan,'V' AS Type,AD_WidgetSize.AD_WidgetSize_ID,Sequence ,IsDefault,AD_IMAGE.BINARYDATA, RC_View.AD_Window_ID FROM RC_View INNER JOIN 
                             RC_ViewAccess ON (RC_View.RC_View_ID=RC_ViewAccess.RC_View_ID)
                             INNER JOIN AD_WidgetSize ON (RC_View.RC_View_ID=AD_WidgetSize.RC_View_ID)";
@@ -415,7 +487,8 @@ namespace VIS.Models
                             Type = Util.GetValueOfString(row[i]["Type"]),
                             WindowSpecific = WindowSpecific,
                             IsDefault = Util.GetValueOfString(row[i]["IsDefault"]) == "Y",
-                            Sequence = Util.GetValueOfInt(row[i]["Sequence"])
+                            Sequence = Util.GetValueOfInt(row[i]["Sequence"]),
+                            Description = Util.GetValueOfString(row[i]["Description"])
                         };
 
                         list.Add(l);
@@ -1178,6 +1251,8 @@ namespace VIS.Models
         public bool WindowSpecific { get; set; }
         public bool IsDefault { get; set; }
         public Int32 Sequence { get; set; }
+        public string Description { get; set; }
+        public string Help { get; set; }
     }
 
 
