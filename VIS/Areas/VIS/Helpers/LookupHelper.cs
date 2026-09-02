@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Hosting;
 using VAdvantage.Classes;
@@ -83,11 +84,12 @@ namespace VIS.Classes
                 sql = lookupQuery,
             };
 
-            if (PageSize > 0) {
+            if (PageSize > 0)
+            {
                 sqlIn.pageSize = PageSize;
                 sqlIn.page = 1;
             }
-            
+
 
             object result = h.ExecuteJDataSet(sqlIn);
             return result;
@@ -127,7 +129,7 @@ namespace VIS.Classes
             {
                 VLookUpInfo lInfo = null;
                 //In case of Created by and updatedby column, field id is zero
-               
+
                 lInfo = GetLookupInfo(ctx, WindowNo, AD_Window_ID, AD_Tab_ID, AD_Field_ID, LookupData);
                 lookupQuery = lInfo.queryDirect;
 
@@ -215,6 +217,8 @@ namespace VIS.Classes
         public DataSet GetAccessSqlAutoComplete(Ctx ctx, string _columnName, string text, int WindowNo,
              int AD_Window_ID, int AD_Tab_ID, int AD_Field_ID, string values, string LookupData)
         {
+            string withJoin = string.Empty;
+
             VLookUpInfo lInfo = null;
             if (AD_Window_ID > 0 && AD_Field_ID > 0)
             {
@@ -231,6 +235,14 @@ namespace VIS.Classes
                 if (!QueryValidator.IsValid(validationCode))
                     return null;
 
+                // Check if validationCode (where query starts with | if yes then user has send a temp table instead of data)
+                // Store it in another variable and empty the validationCode so that it should not add any wrong code
+                if (validationCode !=null && validationCode.StartsWith("base64 "))
+                {
+                    withJoin = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(validationCode.Substring(7)));
+                    validationCode = "";
+                }
+
                 //Ctx _ctx = null;//(ctx) as Ctx;
                 MLookup res = LookupHelper.GetLookup(_ctx, Convert.ToInt32(json.windowNo), Convert.ToInt32(json.column_ID), Convert.ToInt32(json.AD_Reference_ID), Convert.ToString(json.columnName),
                     Convert.ToInt32(json.AD_Reference_Value_ID), Convert.ToBoolean(json.isParent), validationCode);
@@ -243,7 +255,7 @@ namespace VIS.Classes
             var displayColumn = lInfo.displayColSubQ;
             //    sql = sql.Replace(displayColumn, "");
 
-            
+
             var validation = lInfo.validationCode;
             if (!string.IsNullOrEmpty(validation))
             {
@@ -273,13 +285,13 @@ namespace VIS.Classes
                 validation = " AND " + validation;
             }
             validation = Env.ParseContext(ctx, WindowNo, validation, false);
-            
+
             string aliasSubStr = "";
             string aliasName = "";
             int aIdx = validation.IndexOf("(");
             if (aIdx > -1)
             {
-                aliasSubStr = validation.Substring(0,aIdx);
+                aliasSubStr = validation.Substring(0, aIdx);
 
             }
             else
@@ -290,7 +302,7 @@ namespace VIS.Classes
             if (aliasSubStr.IndexOf(".") > -1)
             {
                 aliasName = aliasSubStr.Substring(0, aliasSubStr.IndexOf("."));
-                if(aliasName.IndexOf(" AND ") > -1)
+                if (aliasName.IndexOf(" AND ") > -1)
                 {
                     aliasName = aliasName.Replace(" AND ", "");
                 }
@@ -343,7 +355,7 @@ namespace VIS.Classes
             // string lastPart = sql.Substring(sql.IndexOf("FROM"), sql.Length);
             //", C_Invoice .IsActive FROM00  C_Invoice "
 
-            string lastPart = sql.Substring(sql.IndexOf($",{lInfo.tableName}.IsActive FROM {lInfo.tableName } "));
+            string lastPart = sql.Substring(sql.IndexOf($",{lInfo.tableName}.IsActive FROM {lInfo.tableName} "));
             lastPart = lastPart.Substring(lastPart.IndexOf("FROM"));
             sql = "SELECT " + keyColumn + " AS ID,NULL," + displayColumn + " AS finalValue " + lastPart;
 
@@ -432,11 +444,30 @@ namespace VIS.Classes
             }
             else
             {
-                sql += lastPart;
-                sql = DBFunctionCollection.convertToSubQuery(sql, "*") + "WHERE UPPER(finalvalue) LIKE " + DB.TO_STRING(text);
+                if (string.IsNullOrEmpty(withJoin))
+                {
+                    sql += lastPart;
+                    sql = DBFunctionCollection.convertToSubQuery(sql, "*") + "WHERE UPPER(finalvalue) LIKE " + DB.TO_STRING(text);
+                }
+                else
+                {
+                    sql += lastPart;
+
+                    // Prepend WITH and Append Join clause
+                    // Index [0] contains temp tables(with)
+                    // Index [1] contains select query fetches data from above select query join clause
+                    if (!string.IsNullOrEmpty(withJoin))
+                    {
+                        string[] withArray = withJoin.Split(new char[] { '!' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        sql = withArray[0] + sql + withArray[1].Replace("SelectQuery.VADMS_Folder_ID", "SelectQuery.ID");
+                    }
+
+                    sql = DBFunctionCollection.convertToSubQuery(sql, "*") + "WHERE UPPER(finalvalue) LIKE " + DB.TO_STRING(text);
+                }
             }
 
-           
+
 
             DataSet ds = VIS.DBase.DB.ExecuteDatasetPaging(sql, 1, 1000);
             if (ds != null)

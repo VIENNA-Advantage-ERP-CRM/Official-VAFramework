@@ -15,6 +15,8 @@
         var isEditMode = false; // Flag to indicate whether the widget is in edit mode
         var isChanged = false;
         var $ulPopup = null;
+        var $infoAnchor = null;      // icon the action menu was opened from, used to anchor the description popover
+        var infoWidget = null;       // widget definition the action menu was opened for
         // Function to initialize the home widget
 
         //function hideShowIcon() {
@@ -52,7 +54,24 @@
         function getPopupList() {
             var ullst = $("<ul class='vis-apanel-rb-ul'>");
             ullst.append($('<li data-action="R"><i data-action="R" class="fa fa-refresh"></i></li>'));
+            ullst.append($('<li data-action="I"><i data-action="I" class="fa fa-info-circle"></i></li>'));
             return ullst;
+        };
+
+        /**
+         * Show the widget description in a popover anchored to the widget action icon
+         */
+        function showWidgetInfo() {
+            if (!$infoAnchor || !infoWidget) {
+                return;
+            }
+            //  the action menu is kept open by w2ui while the click originates inside it - drop it explicitly
+            $('#w2ui-overlay').removeData('keepOpen').remove();
+
+            var $info = $('<div class="vis-widgetInfo-pop">');
+            $info.append($('<div class="vis-widgetInfo-head">').text(infoWidget.Description || infoWidget.DisplayName || infoWidget.Name || ''));
+            $info.append($('<div class="vis-widgetInfo-body">').text(infoWidget.Help));
+            $infoAnchor.w2overlay($info, { html: $info, name: 'widgetinfo', align: 'right', maxHeight: 260 });
         };
 
         $ulPopup = getPopupList();
@@ -66,6 +85,9 @@
                 }
                 else if (action == 'R') {
                     homeItems[ui.data('wid')].wform.refreshWidget();
+                }
+                else if (action == 'I') {
+                    showWidgetInfo();
                 }
             });
         }
@@ -219,8 +241,24 @@
                     if (!isEditMode) {
                         var ulPopup = $ulPopup.clone(true);
                         var ui = $(this).closest('.vis-widget-item');
-                        if (ui.data('type') == "L") {
-                            ulPopup.find('li:first').remove();
+                        //  refresh is backed by homeItems, which only exists for dictionary widgets
+                        if (ui.data('type') != "W") {
+                            ulPopup.find('li[data-action="R"]').remove();
+                        }
+
+                        //  labels are not loaded yet when the list is built at script load, so translate on open
+                        ulPopup.find('li[data-action="R"]').attr('title', VIS.Msg.getMsg("Refresh"));
+                        ulPopup.find('li[data-action="I"]').attr('title', VIS.Msg.getMsg("Info"));
+
+                        $infoAnchor = $(this);
+                        infoWidget = widgetList[ui.data('ws') + '_' + ui.data('type')];
+                        //  no point offering info when the widget has no description maintained
+                        if (!infoWidget || !infoWidget.Description) {
+                            ulPopup.find('li[data-action="I"]').remove();
+                        }
+
+                        if (ulPopup.find('li').length === 0) {
+                            return;
                         }
 
                         ulPopup.attr('data-wid', ui.data('wid'));
@@ -403,6 +441,9 @@
                 }
 
                 $item.addClass("vis-widget-item");
+                if (widget.Description) {
+                    $item.addClass("vis-widgetHasInfo");
+                }
                 //$item.css("background-color", pastel);
                 $item.attr('data-ws', widget.KeyID);
                 $item.attr('data-wid', wid || 0);

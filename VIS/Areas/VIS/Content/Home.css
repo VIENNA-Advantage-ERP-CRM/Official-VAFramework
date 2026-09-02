@@ -3824,7 +3824,8 @@ ul.vis-userLinks-ListMenu li a i {
 
 
 
-.vis-widget-container:not(.vis-editModeWidget) .vis-widget-item:not([data-type="W"]) .vis-widgetDelete {
+/* charts, KPIs and views have no action menu of their own, only reveal it when there is a description to show */
+.vis-widget-container:not(.vis-editModeWidget) .vis-widget-item:not([data-type="W"]):not(.vis-widgetHasInfo) .vis-widgetDelete {
     display: none;
 }
 
@@ -3854,6 +3855,32 @@ ul.vis-userLinks-ListMenu li a i {
 }
 
 
+/* Widget description popover, opened from the info action of the widget menu */
+.vis-widgetInfo-pop {
+    max-width: 20rem;
+    min-width: 12rem;
+    font-family: var(--v-c-font-family);
+}
+
+.vis-widgetInfo-head {
+    font-size: .875rem;
+    font-weight: bold;
+    color: rgba(var(--v-c-on-secondary), 1);
+    border-bottom: 1px solid rgba(var(--v-c-on-secondary), .2);
+    padding: 7px 10px;
+    word-break: break-word;
+}
+
+.vis-widgetInfo-body {
+    font-size: .75rem;
+    line-height: 1.45;
+    color: rgba(var(--v-c-on-secondary), .85);
+    padding: 8px 10px;
+    max-height: 14rem;
+    overflow-y: auto;
+    white-space: pre-line;
+    word-break: break-word;
+}
 
 
 .vis-linksWidget {
