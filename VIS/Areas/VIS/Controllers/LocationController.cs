@@ -150,13 +150,27 @@ namespace VIS.Controllers
                     return Json(lr, JsonRequestBehavior.AllowGet);
                 }
                 name = loc.ToString().Trim();
-                name=Regex.Replace(name, @"(^,)|(,$)|,(?=,)", "");
+                name = Regex.Replace(name, @"(^,)|(,$)|,(?=,)", "");
+
+                // 
+                string cName = loc.GetCountryName();
+
+                if (ctx.GetAD_Language() != "en_US") //base langugae
+                {
+                    cName = Util.GetValueOfString(DB.ExecuteScalar("SELECT Name From C_Country_Trl  Where C_Country_ID=" + loc.GetC_Country_ID()
+                            +" AND AD_Language='" + ctx.GetAD_Language() + "'"));
+                    if (String.IsNullOrEmpty(cName))
+                    {
+                        cName = loc.GetCountryName();
+                    }
+                }
                 if (name.Length <= 0)
                 {
-                    name = loc.GetCountryName();
+                    name = cName;
                 }
-                else {
-                    name += ", "+ loc.GetCountryName().Trim();
+                else
+                {
+                    name += ", " + cName.Trim();
                 }
 
                 ll.Longitude = loc.GetLongitude();
