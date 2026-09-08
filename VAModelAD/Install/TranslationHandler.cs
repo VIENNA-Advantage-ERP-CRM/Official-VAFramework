@@ -185,6 +185,20 @@ namespace VAdvantage.Install
                     if (VLogMgt.IsLevelFinest())
                         log.Fine(_sql.ToString());
                     _updateCount++;
+
+                    // vis0008 handled case for Field translation if Field translation is there 
+                    // then set centrally maintained as false after discussion (AD MA)
+                    if (_TableName.ToLower().Equals("ad_field"))
+                    {
+                        if (!_ByExportID || _curExportID == null)
+                        {
+                            DB.ExecuteQuery("UPDATE AD_Field Set IsCentrallyMaintained = 'N' WHERE AD_Field_ID = " + _curID);
+                        }
+                        else
+                        {
+                            DB.ExecuteQuery("UPDATE AD_Field Set IsCentrallyMaintained = 'N' WHERE Export_ID = '" + _curExportID + "'");
+                        }
+                    }
                 }
                 else if (no == 0)
                     log.Warning("Not Found - " + _sql.ToString());
