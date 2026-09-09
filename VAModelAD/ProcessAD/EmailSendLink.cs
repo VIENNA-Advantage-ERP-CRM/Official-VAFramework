@@ -27,7 +27,7 @@ namespace VAModelAD.ProcessAD
     /// <summary>
     /// Email send to user for reset password.
     /// </summary>
-    public class EmailSendLink: SvrProcess
+    public class EmailSendLink : SvrProcess
     {
         private Ctx _ctx = null;
         string url = null;
@@ -39,7 +39,7 @@ namespace VAModelAD.ProcessAD
         protected override void Prepare()
         {
             _ctx = GetCtx();
-            
+
         }
 
         /// <summary>
@@ -92,15 +92,17 @@ namespace VAModelAD.ProcessAD
                 }
                 if (count > 0)
                 {
-                    StringBuilder str = new StringBuilder();
-                    DataSet ds = null;
-                    str.Clear();
-                    str.Append("SELECT Email FROM AD_User WHERE ISACTIVE ='Y' AND AD_USER_ID=" + GetRecord_ID());
-                    ds = DB.ExecuteDataset(str.ToString(), null, Get_Trx());
-                    if (ds != null && ds.Tables[0].Rows.Count > 0)
+                    MUser usr = new MUser(GetCtx(), GetRecord_ID(), Get_TrxName());
+                    string Email = usr.GetEMail();
+                    if (!string.IsNullOrEmpty(Email))
                     {
-                        string Email = ds.Tables[0].Rows[0]["Email"].ToString();
-                        if (!string.IsNullOrEmpty(Email))
+                        string emailCount = "SELECT COUNT(AD_User_ID) FROM AD_User WHERE LOWER(Email) = LOWER('" + Email + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID() + " AND AD_User_ID != " + GetAD_User_ID();
+                        int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
+                        if (mailExist > 0)
+                        {
+                            return Msg.GetMsg(GetCtx(), "EmailShouldBeUnique");
+                        }
+                        else
                         {
                             try
                             {
@@ -169,16 +171,14 @@ namespace VAModelAD.ProcessAD
                             {
                                 VLogger.Get().SaveError("EmailSendLinkProcess ", ex.Message);
                                 return ex.Message;
-
                             }
                         }
-                        else
-                        {
-                            log.Fine(Msg.GetMsg(GetCtx(), "MandatoryEmailAddress"));
-                            return Msg.GetMsg(GetCtx(), "MandatoryEmailAddress");
-                        }
                     }
-
+                    else
+                    {
+                        log.Fine(Msg.GetMsg(GetCtx(), "MandatoryEmailAddress"));
+                        return Msg.GetMsg(GetCtx(), "MandatoryEmailAddress");
+                    }
                 }
                 else
                 {
