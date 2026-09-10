@@ -22,7 +22,7 @@ const versions = {
     'VIS.all': '3.1.89.0',
     'VIS2_0': '3.1.89.0',
     'React': '1.0.0.1',
-    'VIS': '3.1.66.0' // CSS Version
+    'VIS': '3.1.67.0' // CSS Version
 };
 
 module.exports = {
