@@ -96,7 +96,7 @@ namespace VAModelAD.ProcessAD
                     string Email = usr.GetEMail();
                     if (!string.IsNullOrEmpty(Email))
                     {
-                        string emailCount = "SELECT COUNT(AD_User_ID) FROM AD_User WHERE LOWER(Email) = LOWER('" + Email + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID() + " AND AD_User_ID != " + GetAD_User_ID();
+                        string emailCount = "SELECT COUNT(AD_User_ID) FROM AD_User WHERE LOWER(Email) = LOWER('" + Email + "') AND IsActive = 'Y' AND AD_Client_ID = " + GetAD_Client_ID() + " AND AD_User_ID != " + usr.GetAD_User_ID();
                         int mailExist = Util.GetValueOfInt(DB.ExecuteScalar(emailCount));
                         if (mailExist > 0)
                         {
