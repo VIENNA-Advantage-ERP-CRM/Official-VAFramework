@@ -226,6 +226,10 @@ namespace VAdvantage.Print
                 {
                     foreach (AttributedString element in m_string_paper)
                     {
+                        //	Translate leaves blank lines as null slots
+                        if (element == null)
+                            continue;
+
                         AttributedCharacterIterator iter = element.GetIterator();
                         if (iter.GetBeginIndex() == iter.GetEndIndex())
                             continue;
@@ -698,6 +702,8 @@ namespace VAdvantage.Print
                 .Append("),PageLocation=").Append(p_pageLocation).Append(" - ");
             for (int i = 0; i < m_string_paper.Length; i++)
             {
+                if (m_string_paper[i] == null)
+                    continue;
                 if (m_string_paper.Length > 1)
                     sb.Append(Env.NL).Append(i).Append(":");
                 AttributedCharacterIterator iter = m_string_paper[i].GetIterator();

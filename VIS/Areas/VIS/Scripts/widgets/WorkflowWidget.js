@@ -63,6 +63,7 @@
         var historyDivShow = false;
         var attachIconHtml = null;
         var openWorkflowModalOnLoad = false;
+        var homeReturnObserver = null;
 
         var elements = [
             "SelectWindow"];
@@ -122,6 +123,7 @@
              * Approvals                    | VIS_Approvals                       | Approvals
              * Approvals preview            | VIS_ApprovalsPreview                | Approvals preview
              * Search                       | Search                              | Search
+             * Clear                        | Clear                               | Clear
              * From Date                    | VIS_FromDate                        | From Date
              * To Date                      | VIS_ToDate                          | To Date
              * Awaiting your approval       | VIS_AwaitingYourApproval            | Awaiting your approval
@@ -139,6 +141,7 @@
              * Search user                  | VIS_SearchUser                      | Search user
              * Add an optional note         | VIS_Message                         | Add an optional note
              * Cancel                       | VIS_Cancel                          | Cancel
+             * Message                      | Message                             | Message
              * TypeMessage                  | VIS_TypeMessage                     | Please write message
              * Loading                      | VIS_Loading                         | Loading...
              * Failed to load history.      | VIS_FailedToLoadHistory             | Failed to load history.
@@ -184,6 +187,39 @@
             function closeModal() {
                 $modal.trigger('modalClose');
                 $modal.css('display', 'none');
+            }
+
+            /* After zooming to a record the home view is hidden; bring the panel
+               back, untouched, as soon as the user returns to the home view. */
+            function restoreOnHomeReturn() {
+                var home = document.getElementById('vis_home');
+                if (!home) {
+                    return;
+                }
+                if (homeReturnObserver) {
+                    homeReturnObserver.disconnect();
+                    homeReturnObserver = null;
+                }
+                var wasHidden = getComputedStyle(home).display === 'none';
+                homeReturnObserver = new MutationObserver(function () {
+                    if (getComputedStyle(home).display === 'none') {
+                        wasHidden = true;
+                        return;
+                    }
+                    if (wasHidden) {
+                        homeReturnObserver.disconnect();
+                        homeReturnObserver = null;
+                        $modal.css('display', 'flex');
+                        /* Controls built before the zoom hold lookups that were
+                           disposed with the record window - rebuild them. */
+                        $modal.find('.vis-wf-forward-panel').hide().empty();
+                        $modal.find('.vis-wf-footer-row').show();
+                        if (currentModalCardIdx >= 0) {
+                            syncAnswer(currentModalCardIdx);
+                        }
+                    }
+                });
+                homeReturnObserver.observe(home, { attributes: true, attributeFilter: ['style', 'class'] });
             }
 
             function syncWindowSelect() {
@@ -581,16 +617,12 @@
                 $modal.find('.vis-wf-requester-name').text(requesterName);
             };
 
-            // Populate the description section from fulldata — hide entire section if empty
+            /* Populate the description section from fulldata. The old widget
+               always rendered the Description label - an empty node description
+               included - so the section stays visible either way. */
             function syncDescription(index) {
                 var desc = (fulldata && fulldata[index || 0]) ? (fulldata[index || 0].Description || '').trim() : '';
-                var $section = $modal.find('.vis-wf-description').closest('section');
-                if (desc) {
-                    $modal.find('.vis-wf-description').text(desc);
-                    $section.show();
-                } else {
-                    $section.hide();
-                }
+                $modal.find('.vis-wf-description').text(desc);
             };
 
             function approveAnswer(index, ctrl, $okBtn) {
@@ -606,7 +638,7 @@
                     return;
                 }
 
-                var msg = '';
+                var msg = VIS.Utility.encodeText($modal.find('.vis-wf-message-input').val() || '');
                 showModalBusy(true);
                 VIS.dataContext.getJSONData(
                     VIS.Application.contextUrl + 'WFActivity/ApproveIt',
@@ -649,9 +681,12 @@
                     return;
                 }
 
+                /* The approver states the reason for the action here; it travels
+                   with the answer as txtMsg, the way the old widget did. */
+                $modal.find('.vis-wf-message-section').show();
+
                 var $answerWrap = $('<div class="vis-w-home-wf-answerWrap vis-wf-answer-dynamic">');
                 var $answerInput = $('<div class="input-group vis-w-home-wf-answerInput vis-w-input-widgetswrap">');
-                var $forwardBtn = $actions.find('.vis-wf-action-secondary');
                 $answerWrap.append($answerInput);
 
                 var $ctrlWrap = $("<fieldset class='vis-wforwardwrap vis-control-wrap vis-input-wrap mb-0 vis-wf-answer-box'>");
@@ -669,6 +704,8 @@
                 $answerWrap.append($('<div class="vis-w-home-wf-answerBtn">').append($okBtn));
                 $actions.append($answerWrap);
 
+                /* Forward stays available whatever the answer is - the two are
+                   separate actions, and whichever button is pressed decides. */
                 var toggleAnswerOk = function () {
                     var answerValue = ctrl.getValue();
                     var hasValue = !(answerValue == '' || answerValue == null || answerValue == -1 || answerValue == '-1');
@@ -677,9 +714,6 @@
                         .toggleClass('vis-wf-submit-ready', hasValue)
                         .attr('aria-disabled', hasValue ? 'false' : 'true')
                         .attr('tabindex', hasValue ? '0' : '-1');
-                    $forwardBtn
-                        .toggleClass('vis-wf-forward-disabled', hasValue)
-                        .attr('aria-disabled', hasValue ? 'true' : 'false');
                 };
 
                 ctrl.fireValueChanged = toggleAnswerOk;
@@ -694,9 +728,8 @@
             function syncAnswer(index) {
                 var $actions = $modal.find('.vis-wf-actions');
                 $actions.find('.vis-wf-answer-dynamic, .vis-wf-answer-loading').remove();
-                $actions.find('.vis-wf-action-secondary')
-                    .removeClass('vis-wf-forward-disabled')
-                    .attr('aria-disabled', 'false');
+                // buildAnswer shows it again for nodes that take an answer
+                $modal.find('.vis-wf-message-section').hide().find('.vis-wf-message-input').val('');
 
                 if (!fulldata || !fulldata[index]) {
                     return;
@@ -906,6 +939,7 @@
                                         <div class="vis-wf-search">
                                             <i class="fa fa-search" aria-hidden="true"></i>
                                             <input type="text" placeholder="${safeLbl('Search', 'Search')}">
+                                            <i class="fa fa-times vis-wf-search-clear" title="${safeLbl('Clear', 'Clear')}" style="display:none;"></i>
                                         </div>
                                         <div class="vis-wf-date-filters">
                                             <div class="vis-wf-date-filter">
@@ -956,6 +990,10 @@
                                                     <div class="vis-wf-description">
                                                         <!-- populated dynamically from activity description -->
                                                     </div>
+                                                </section>
+                                                <section class="vis-wf-section vis-wf-message-section" style="display:none;">
+                                                    <h3 class="vis-wf-section-title">${safeLbl('Message', 'Message')}</h3>
+                                                    <textarea class="vis-wf-message-input vis-w-workflow-textarea" spellcheck="false" placeholder="${safeLbl('VIS_TypeMessage', 'Please write message')}...."></textarea>
                                                 </section>
                                             </div>
                                             <div class="vis-wf-footer">
@@ -1047,7 +1085,16 @@
                 }
             });
 
-            $modal.on('click' + modalEventNs, '.vis-wf-search i', function () {
+            $modal.on('click' + modalEventNs, '.vis-wf-search .fa-search', function () {
+                filterCards($modal.find('#' + modalId + 'WindowSelect').val());
+            });
+
+            $modal.on('input' + modalEventNs, '.vis-wf-search input', function () {
+                $(this).siblings('.vis-wf-search-clear').toggle(!!this.value);
+            });
+
+            $modal.on('click' + modalEventNs, '.vis-wf-search-clear', function () {
+                $(this).hide().siblings('input').val('').trigger('focus');
                 filterCards($modal.find('#' + modalId + 'WindowSelect').val());
             });
 
@@ -1055,19 +1102,22 @@
                 filterCards($modal.find('#' + modalId + 'WindowSelect').val());
             });
 
+            /* Keep the Message box and the forward note in step - see the
+               matching handler where the forward note is built. */
+            $modal.on('input' + modalEventNs, '.vis-wf-message-input', function () {
+                $modal.find('.vis-wf-fwd-note').val(this.value);
+            });
+
             $modal.on('click' + modalEventNs, '.vis-wf-watch', function () {
                 if (currentModalCardIdx < 0) {
                     return;
                 }
+                $modal.css('display', 'none');
+                restoreOnHomeReturn();
                 zoom(currentModalCardIdx);
-                closeModal();
             });
 
             $modal.on('click' + modalEventNs, '.vis-wf-action-secondary', function () {
-                if ($(this).hasClass('vis-wf-forward-disabled')) {
-                    return;
-                }
-
                 var $fwdPanel = $modal.find('.vis-wf-forward-panel');
                 var $footerRow = $modal.find('.vis-wf-footer-row');
                 var closeForwardPanel = function () {
@@ -1111,6 +1161,13 @@
                 var $noteField = $('<div class="vis-wf-fwd-field">');
                 var $noteInput = $('<textarea class="vis-wf-fwd-note vis-w-workflow-textarea" spellcheck="false"></textarea>');
                 $noteInput.attr('placeholder', lbl('VIS_TypeMessage', 'Please write message') + '....');
+                /* Both boxes end up in the same AD_WF_Activity.TextMsg, so they
+                   mirror each other - open with whatever the Message box holds
+                   and keep the two in step as the approver types. */
+                $noteInput.val($modal.find('.vis-wf-message-input').val() || '');
+                $noteInput.on('input' + modalEventNs, function () {
+                    $modal.find('.vis-wf-message-input').val(this.value);
+                });
                 $noteField.append($noteInput);
                 $noteField.append('<i class="fa fa-sticky-note-o vis-wf-fwd-note-icon"></i>');
                 $fields.append($noteField);
