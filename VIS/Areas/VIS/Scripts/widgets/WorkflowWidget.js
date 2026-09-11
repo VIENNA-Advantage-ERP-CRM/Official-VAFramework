@@ -64,6 +64,10 @@
         var attachIconHtml = null;
         var openWorkflowModalOnLoad = false;
         var homeReturnObserver = null;
+        var pandinngWFCount = null;
+        var $wfList;
+        var searchDebounceTimer = null;
+        var SEARCH_DEBOUNCE_MS = 250;
 
         var elements = [
             "SelectWindow"];
@@ -247,8 +251,8 @@
                 if ($wfList.length == 0) {
                     return;
                 }
-
-                $wfList.empty();
+                $wfList.children().not('.vis-wf-answer-loading').remove();
+               // $wfList.empty();
                 if ($activityContainers.length == 0) {
                     $wfList.append('<div class="vis-wf-group">' + safeLbl('Activities', 'Activities') + ' - 0</div><div class="vis-wf-empty">' + safeLbl('VIS_NoActivitiesFound', 'No activities found') + '</div>');
                     return;
@@ -279,6 +283,8 @@
                         + '</div>'
                     );
                 });
+                var $loader = $wfList.find('.vis-wf-answer-loading');
+                $loader.hide();
             };
 
 
@@ -410,7 +416,8 @@
                 if ($pendingCount.length == 0) {
                     return;
                 }
-                $pendingCount.text($modal.find('.vis-wf-card').length + ' ' + lbl('VIS_Pending', 'pending'));
+                // $pendingCount.text($modal.find('.vis-wf-card').length + ' ' + lbl('VIS_Pending', 'pending'));
+                $pendingCount.text(pandinngWFCount + ' ' + lbl('VIS_Pending', 'pending'));
             };
 
             function syncDetailTitle(index) {
@@ -623,6 +630,7 @@
             function syncDescription(index) {
                 var desc = (fulldata && fulldata[index || 0]) ? (fulldata[index || 0].Description || '').trim() : '';
                 $modal.find('.vis-wf-description').text(desc);
+
             };
 
             function approveAnswer(index, ctrl, $okBtn) {
@@ -699,7 +707,8 @@
                 $answerInput.append($ctrlWrap);
 
                 var $okBtn = $("<a href='javascript:void(0)' id='vis-home-wf-ansOK-" + modalId + "' class='vis-wf-submit-btn vis-wf-submit-disabled' role='button' aria-disabled='true' tabindex='-1' data-clicked='N' data-id='" + index + "'>");
-                $okBtn.append($("<span>").text(VIS.Msg.getMsg('Submit') || 'Submit'));
+                // $okBtn.append($("<span>").text(VIS.Msg.getMsg('Submit') || 'Submit'));
+                $okBtn.append($("<span>").text(VIS.Msg.getMsg('VIS_Submit')));
                 $okBtn.append($("<i class='fa fa-check'></i>"));
                 $answerWrap.append($('<div class="vis-w-home-wf-answerBtn">').append($okBtn));
                 $actions.append($answerWrap);
@@ -917,6 +926,79 @@
                     }
                 );
             }
+            function appendRecord(pageNo, paeSize, refresh) {
+                showBusy(true);
+                var index = fulldata.length;
+
+                if (!refresh) {
+                    refresh = false;
+                }
+                if ($cmbWindows.val() != null && $cmbWindows.val() != "") {
+                    //var cmbValues = $cmbWindows.val();
+                    windowID = $cmbWindows.val().split('_')[0];
+                    //var windowName = $cmbWindows.val().split('_')[1];
+                    nodeID = $cmbWindows.val().split('_')[1];
+                }
+                else {
+                    windowID = "0";
+                    nodeID = "0";
+                }
+                if ($root.find('#homeSearchWorkflow' + $self.AD_UserHomeWidgetID).val() != '') {
+                    searchText = $root.find('#homeSearchWorkflow' + $self.AD_UserHomeWidgetID).val();
+                }
+                else {
+                    searchText = "";
+                }
+                if ($root.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val() != null && $root.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val() != '') {
+                    fromDate = $root.find("#VIS_FromDateInput_ID" + $self.AD_UserHomeWidgetID).val();
+                }
+                else {
+                    fromDate = null;
+                }
+                if ($root.find("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val() != null && $root.find("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val() != '') {
+                    toDate = $root.find("#VIS_ToDateInput_ID" + $self.AD_UserHomeWidgetID).val();
+                }
+                else {
+                    toDate = null;
+                }
+
+                $.ajax({
+                    url: VIS.Application.contextUrl + "WFActivity/GetActivities",
+                    data: { pageNo: pageNo, pageSize: paeSize, refresh: refresh, searchText: searchText, "AD_Window_ID": windowID, "dateFrom": fromDate, "dateTo": toDate, "AD_Node_ID": nodeID },
+                    dataType: "json",
+                    type: "POST",
+                    error: function () {
+                        refresh = true;
+                        showBusy(false);
+                    },
+                    success: function (dyndata) {
+                        var reslt = JSON.parse(dyndata.result);
+                        if (reslt) {
+                            data = reslt.LstInfo;
+                            for (var item in data) {
+                                appendRecords(data, item);
+                            }
+                            syncActivityList();
+                            scrollWF = true;
+                            showBusy(false);
+                        }
+                        else {
+                            showBusy(false);
+                        }
+                    }
+                });
+            };
+
+            function showBusyLoder(show) {
+                var $wfLoader = $wfList.find('.vis-wf-answer-loading');
+
+                if (show) {
+                    $wfLoader.show();
+                }
+                else {
+                    $wfLoader.hide();
+                }
+            }
 
             if ($modal.length === 0) {
                 $modal = $(`
@@ -1017,6 +1099,22 @@
                 $modal.append('<div class="vis-wf-modal-busy" style="display:none;"><div class="vis-wf-modal-busy-inner"><i class="vis_widgetloader"></i></div></div>');
                 $modal.append('<div class="vis-wf-snackbar" style="display:none;"></div>');
                 $('body').append($modal);
+                var $wfList = $modal.find('.vis-wf-list');
+
+                $wfList.css('position', 'relative');
+
+                $wfList.append(
+                    '<div class="vis-wf-answer-loading" style="' +
+                    'display:none;' +
+                    'top:50%;' +
+                    'left:50%;' +
+                    'transform:translate(-50%, -50%);' +
+                    'z-index:999999;' +
+                    'pointer-events:none;' +
+                    '">' +
+                    '<i class="vis_widgetloader"></i>' +
+                    '</div>'
+                );
             }
 
             $modal.off(modalEventNs);
@@ -1044,7 +1142,35 @@
             $modal.find('#' + modalId + 'Close').on('click' + modalEventNs, function () {
                 closeModal();
             });
+            $modal.find('.vis-wf-list').on('scroll' + modalEventNs, function (e) {
 
+                if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight * 0.99 && scrollWF) {
+                    $wfList = $modal.find('.vis-wf-list');
+                    var tabdataLastPage = parseInt($countDiv_ID.html());
+                    var tabdatacntpage = pageNo * PageSize;
+                    $wfList.find('.vis-wf-answer-loading').css('position', 'sticky');
+                    if (tabdatacntpage <= tabdataLastPage) {
+
+
+                        var $loader = $wfList.find('.vis-wf-answer-loading');
+
+                        $loader.show();
+                        scrollWF = false;
+                        showBusy(true);
+
+                        pageNo++;
+
+                        appendRecord(pageNo, PageSize);
+                    }
+                    else {
+                        refresh = true;
+                        scrollWF = true;
+                        showBusy(false);
+                    }
+                    e.stopPropagation();
+                }
+
+            });
             $modal.on('click' + modalEventNs, '.vis-wf-card', function () {
                 if ($(this).hasClass('vis-wf-card-selected')) return;
                 $modal.find('.vis-wf-card').removeClass('vis-wf-card-selected');
@@ -1063,10 +1189,18 @@
                 syncAnswer(cardIdx);
                 loadHistory(cardIdx);
             });
+            ///input box search
+            $modal.on('input' + modalEventNs, '.vis-wf-search input', function () {
+                window.clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = window.setTimeout(function () {
+                    filterCards($modal.find('#' + modalId + 'WindowSelect').val());
+                }, SEARCH_DEBOUNCE_MS);
+            });
 
             $modal.on('keydown' + modalEventNs, '.vis-wf-card', function (e) {
                 if (e.keyCode == 13 || e.keyCode == 32) {
                     e.preventDefault();
+                    window.clearTimeout(searchDebounceTimer);
                     $(this).trigger('click');
                 }
             });
@@ -1473,6 +1607,7 @@
                 success: function (dyndata) {
                     fulldata = [];
                     var reslt = JSON.parse(dyndata.result);
+                    pandinngWFCount = reslt.count;
                     if (reslt) {
                         $fstMainDiv_ID.find('#homeSearchWorkflow' + $self.AD_UserHomeWidgetID).val('');
                         $fstMainDiv_ID.find("#pnorecFound" + $self.AD_UserHomeWidgetID).css('display', 'none');
@@ -1631,7 +1766,7 @@
             }
         };
         //Get more data on Scroll
-        function appendRecord(pageNo, paeSize, refresh) {
+      /*  function appendRecord(pageNo, paeSize, refresh) {
             if (!refresh) {
                 refresh = false;
             }
@@ -1736,7 +1871,7 @@
                     }
                 }
             });
-        };
+        };*/
         //Get Cheild Records
         function getChld(e) {
             showBusy(true);
