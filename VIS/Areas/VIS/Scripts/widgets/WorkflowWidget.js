@@ -408,7 +408,7 @@
                     activity.Summary,
                     activity.Description,
                     getRequesterName(index)
-                ].join(' ').toLowerCase();
+                ].join(' ').toLowerCase();  
             };
 
             function syncPendingCount() {
@@ -1062,7 +1062,7 @@
                                             <div class="vis-wf-body">
                                                 <section class="vis-wf-section">
                                                     <div class="vis-wf-record-title">${safeLbl('VIS_WorkflowActivity', 'Workflow Activity')}</div>
-                                                    <h3 class="vis-wf-section-title">${safeLbl('VIS_TransactionDetails', 'Transaction details')}</h3>
+                                                    <h3 class="vis-wf-section-title">${safeLbl('VIS_RecordDetails', 'Record Details')}</h3>
                                                     <div class="vis-wf-kv">
                                                         <!-- populated dynamically from activity summary -->
                                                     </div>
@@ -1343,7 +1343,7 @@
                             if (info.result == '') {
                                 clearActivityInfoCache(activityID);
                                 removeCurrentCardAndSelectNext(capturedIdx);
-                                showModalSnack('success', lbl('VIS_WorkflowDone', 'Workflow done'));
+                                showModalSnack('success', lbl('VIS_WorkflowDone', 'Workflow action completed successfully'));
                             } else {
                                 showModalSnack('error', info.result);
                                 VIS.ADialog.error(info.result);
