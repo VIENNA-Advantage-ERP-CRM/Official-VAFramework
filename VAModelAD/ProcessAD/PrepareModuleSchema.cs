@@ -306,7 +306,7 @@ namespace VAdvantage.Process
             {
                 int id = GetID("AD_ModuleProcess", "AD_Process_ID", "AD_ModuleProcess_ID = " + lstProcessIds[p]);
 
-                //Add Image to xml
+                //Add Menu Image to xml
                 int ad_image_ID = Util.GetValueOfInt(DataBase.DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_ModuleProcess WHERE AD_ModuleProcess_ID =" + lstProcessIds[p]));
                 if (ad_image_ID > 0)
                 {
@@ -360,7 +360,7 @@ namespace VAdvantage.Process
             {
                 int id = GetID("AD_ModuleForm", "AD_Form_ID", "AD_ModuleForm_ID = " + lstModuleFormIds[i]);
 
-                //Add Image to xml
+                //Add Menu Image to xml
                 int ad_image_ID = Util.GetValueOfInt(DataBase.DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_ModuleForm WHERE AD_ModuleForm_ID =" + lstModuleFormIds[i]));
                 if (ad_image_ID > 0)
                 {
@@ -623,6 +623,8 @@ namespace VAdvantage.Process
                 {
                     dr.Close();
                 }
+
+                //add Menu Image to xml
                 int ad_image_ID = Util.GetValueOfInt(DataBase.DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_ModuleWindow WHERE AD_ModuleWindow_ID =" + sAD_ModuleWindow_ID));
                 if (ad_image_ID > 0)
                 {
