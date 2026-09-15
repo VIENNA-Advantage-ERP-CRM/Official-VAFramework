@@ -9,6 +9,10 @@ html, body {
     color: rgba(var(--v-c-on-secondary), 1);
 }
 
+code, kbd, pre, samp {
+    font-family: var(--v-c-font-family) !important;
+}
+
 * {
     -webkit-tap-highlight-color: transparent;
 }
