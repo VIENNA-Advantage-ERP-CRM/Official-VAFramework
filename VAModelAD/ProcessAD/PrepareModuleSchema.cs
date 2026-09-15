@@ -305,6 +305,14 @@ namespace VAdvantage.Process
             for (int p = 0; p < lstProcessIds.Count; p++)
             {
                 int id = GetID("AD_ModuleProcess", "AD_Process_ID", "AD_ModuleProcess_ID = " + lstProcessIds[p]);
+
+                //Add Image to xml
+                int ad_image_ID = Util.GetValueOfInt(DataBase.DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_ModuleProcess WHERE AD_ModuleProcess_ID =" + lstProcessIds[p]));
+                if (ad_image_ID > 0)
+                {
+                    CheckImage(ad_image_ID);
+                }
+
                 GetProcess(id);
                 InsertIntoDBSchema(X_AD_ModuleProcess.Table_ID, lstProcessIds[p], X_AD_ModuleProcess.Table_Name, "_ModuleProcess" + p, "AD_ModuleProcess_ID =" + lstProcessIds[p]);
             }
@@ -351,6 +359,13 @@ namespace VAdvantage.Process
             for (int i = 0; i < lstModuleFormIds.Count; i++)
             {
                 int id = GetID("AD_ModuleForm", "AD_Form_ID", "AD_ModuleForm_ID = " + lstModuleFormIds[i]);
+
+                //Add Image to xml
+                int ad_image_ID = Util.GetValueOfInt(DataBase.DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_ModuleForm WHERE AD_ModuleForm_ID =" + lstModuleFormIds[i]));
+                if (ad_image_ID > 0)
+                {
+                    CheckImage(ad_image_ID);
+                }
                 GetForm(id);
                 InsertIntoDBSchema(X_AD_ModuleForm.Table_ID, lstModuleFormIds[i], X_AD_ModuleForm.Table_Name, "_ModuleFrom" + i, "AD_ModuleForm_ID =" + lstModuleFormIds[i]);
             }
@@ -608,7 +623,11 @@ namespace VAdvantage.Process
                 {
                     dr.Close();
                 }
-
+                int ad_image_ID = Util.GetValueOfInt(DataBase.DB.ExecuteScalar("SELECT AD_Image_ID FROM AD_ModuleWindow WHERE AD_ModuleWindow_ID =" + sAD_ModuleWindow_ID));
+                if (ad_image_ID > 0)
+                {
+                    CheckImage(ad_image_ID);
+                }
                 InsertIntoDBSchema(X_AD_ModuleWindow.Table_ID, sAD_ModuleWindow_ID, X_AD_ModuleWindow.Table_Name, "_ModuleWindow" + sAD_ModuleWindow_ID, "AD_ModuleWindow_ID =" + sAD_ModuleWindow_ID);
 
                 List<int> lstModuleTab = GetIDs("AD_ModuleTab", "AD_ModuleTab_ID", "AD_ModuleWindow_ID = " + sAD_ModuleWindow_ID);//+ " ORDER BY SeqNo");
