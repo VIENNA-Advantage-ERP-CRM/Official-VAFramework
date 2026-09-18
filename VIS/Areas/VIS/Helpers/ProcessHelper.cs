@@ -392,6 +392,7 @@ namespace VIS.Helpers
                 ctl.ReportString = null;
                 rep.HTML = ctl.GetRptHtml();
                 rep.IsBiHTMlReport = pi.GetFileType().Equals(ProcessCtl.ReportType_BIHTML);
+                rep.IsEmbedReport = pi.GetFileType().Equals(ProcessCtl.ReportType_EMBED);
                 rep.IsError = pi.IsError();
 
                 if (rep.IsError) {
