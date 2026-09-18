@@ -30,6 +30,9 @@ namespace VAdvantage.Model
 
         //The Fields						
         private MTabPanel[] _tabPanel = null;
+        private MCardView[] _cardView = null;
+        private MCardViewColumn[] _cardViewColumn = null;
+        private MCardViewCondition[] _cardViewCondtion = null;
         //Map of ColumnName and AD_Field_ID	
         //The ListDictionary class implements the IDictionary 
         ///interface using a single-linked array. It behaves like a Hashtable
@@ -329,6 +332,83 @@ namespace VAdvantage.Model
             _tabPanel = list.ToArray();
             return _tabPanel;
         }
+        public MCardView[] GetCardViews(bool reload, Trx trxName)
+        {
+            if (_cardView != null && !reload)
+                return _cardView;
+            String sql = "SELECT * FROM AD_CardView WHERE AD_Tab_ID=" + GetAD_Tab_ID();
+            List<MCardView> cdlist = new List<MCardView>();
+            DataSet cdView = null;
+            try
+            {
+                cdView = DataBase.DB.ExecuteDataset(sql, null, trxName);
+                for (int i = 0; i < cdView.Tables[0].Rows.Count; i++)
+                {
+                    DataRow rs = cdView.Tables[0].Rows[i];
+                    cdlist.Add(new MCardView(GetCtx(),rs,trxName));
+                }
+                cdView = null;
+            }
+            catch(Exception e)
+            {
+                log.Log(VAdvantage.Logging.Level.SEVERE, sql, e);
+            }
+            _cardView = new MCardView[cdlist.Count];
+            _cardView = cdlist.ToArray();
+            return _cardView;
+        }
+        public MCardViewColumn[] GetCardViewColumns(bool reload,Trx trxName, int cvID)
+        {
+            if (_cardViewColumn!= null && !reload)
+            {
+                return _cardViewColumn;
+            }
+            String sql = "SELECT * FROM AD_CardView_Column WHERE AD_CardView_ID="+ cvID;
+            List<MCardViewColumn> cdListColumn = new List<MCardViewColumn>();
+            DataSet cdViewCol = null;
+            try
+            {
+                cdViewCol = DataBase.DB.ExecuteDataset(sql,null,trxName);
+                for (int i = 0; i < cdViewCol.Tables[0].Rows.Count;i++)
+                {
+                    DataRow dr = cdViewCol.Tables[0].Rows[i];
+                    cdListColumn.Add(new MCardViewColumn(GetCtx(),dr,trxName));
+                }
 
+            }
+            catch(Exception e)
+            {
+                log.Log(VAdvantage.Logging.Level.SEVERE, sql, e);
+            }
+            _cardViewColumn = new MCardViewColumn[cdListColumn.Count];
+            _cardViewColumn = cdListColumn.ToArray();
+            return _cardViewColumn;
+        }
+        public MCardViewCondition[] GetCardViewColumnCondition(bool reload,Trx trxName,int cvID)
+        {
+            if (_cardViewCondtion !=null && !reload)
+            {
+                return _cardViewCondtion;
+            }
+            String sql = "SELECT * FROM AD_CardView_Condition  WHERE AD_CardView_ID=" + cvID;
+            List<MCardViewCondition> mCardViewConditions = new List<MCardViewCondition>();
+            DataSet cdViewCondition = null;
+            try
+            {
+                cdViewCondition = DataBase.DB.ExecuteDataset(sql,null,trxName);
+                for (int i = 0; i < cdViewCondition.Tables[0].Rows.Count; i++)
+                {
+                    DataRow dr = cdViewCondition.Tables[0].Rows[i];
+                    mCardViewConditions.Add(new MCardViewCondition(GetCtx(),dr,trxName));
+                }
+            }
+            catch (Exception e)
+            {
+                log.Log(VAdvantage.Logging.Level.SEVERE, sql, e);
+            }
+            _cardViewCondtion = new MCardViewCondition[mCardViewConditions.Count];
+            _cardViewCondtion = mCardViewConditions.ToArray();
+            return _cardViewCondtion;
+        }
     }
 }
