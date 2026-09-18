@@ -344,14 +344,27 @@ namespace VAdvantage.Common
             else
             {
                 //If user Choose BI Report...................
-                if ("B".Equals(DB.ExecuteScalar("SELECT IsCrystalReport FROM AD_Process WHERE AD_Process_ID = " + _pi.GetAD_Process_ID())))
+                string reportEngineType = Util.GetValueOfString(DB.ExecuteScalar("SELECT IsCrystalReport FROM AD_Process WHERE AD_Process_ID = " + _pi.GetAD_Process_ID()));
+                if ("B".Equals(reportEngineType))
                 {
                     rpe = VAdvanatge.Report.ReportEngine.GetReportEngine(p_ctx, _pi, _trx, "VA039", "VA039.Classes.BIReportEngine");
                 }
-                else if ("J".Equals(DB.ExecuteScalar("SELECT IsCrystalReport FROM AD_Process WHERE AD_Process_ID = " + _pi.GetAD_Process_ID())))
+                else if ("J".Equals(reportEngineType))
                 {
                     //isJasperReport = true;
                     rpe = VAdvanatge.Report.ReportEngine.GetReportEngine(p_ctx, _pi, _trx, "VA039", "VA039.Classes.JasperReportEngine");
+                }
+                else if ("O".Equals(reportEngineType))
+                {
+                    // Onfinity Analytics: export the file through the Analytics API (service account)
+                    rpe = new VAdvantage.Analytics.AnalyticsReportEngine(false);
+                    if (!rpe.StartReport(p_ctx, _pi, _trx))
+                    {
+                        // keep the engine's error message instead of the generic "Report" summary below
+                        System.Threading.Thread.CurrentThread.CurrentCulture = original;
+                        System.Threading.Thread.CurrentThread.CurrentUICulture = original;
+                        return null;
+                    }
                 }
                 else
                 {

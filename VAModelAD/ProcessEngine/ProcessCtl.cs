@@ -34,6 +34,7 @@ namespace VAdvantage.ProcessEngine
         public const string ReportType_RTF = "R";
         public const string ReportType_HTML = "S";//HTML Report of Print Format
         public const string ReportType_BIHTML = "B";//HTML Scripts returned by BI
+        public const string ReportType_EMBED = "E";//Absolute URL opened in an iframe (Onfinity Analytics)
 
 
 
@@ -720,6 +721,7 @@ namespace VAdvantage.ProcessEngine
             bool IsTelerikReport = false;
             bool IsBIReport = false;
             bool IsJasperReport = false;
+            bool IsAnalyticsReport = false;
             int AD_ReportMaster_ID = 0;
 
             String sql = "SELECT p.Name, p.procedureName,p.Classname, p.AD_Process_ID,"		//	1..4  
@@ -763,6 +765,7 @@ namespace VAdvantage.ProcessEngine
                         //later
                         IsBIReport = "B".Equals(dr[10].ToString());
                         IsJasperReport = "J".Equals(dr[10].ToString());
+                        IsAnalyticsReport = "O".Equals(dr[10].ToString());
 
                         //New Column 
                         AD_ReportMaster_ID = Utility.Util.GetValueOfInt(dr[12].ToString());
@@ -948,6 +951,13 @@ namespace VAdvantage.ProcessEngine
 
                     re = VAdvanatge.Report.ReportEngine.GetReportEngine(_ctx, pi, _trx, "VA039", "VA039.Classes.JasperReportEngine");
                 }
+                else if (IsAnalyticsReport)
+                {
+                    // Onfinity Analytics: interactive viewer gets a signed embed URL, CSV requests export a file
+                    re = new VAdvantage.Analytics.AnalyticsReportEngine(true);
+                    if (!re.StartReport(_ctx, _pi, _trx))
+                        re = null;   // summary/error already set on pi
+                }
                 else if (!IsCrystalReport)
                 {
                     //start report code
@@ -1050,6 +1060,10 @@ namespace VAdvantage.ProcessEngine
                         BiReportEngine com = new BiReportEngine();
                         reportFilePath = com.GetReportString(ctx, log, pi);
                         //reportFilePath = re.GetHTMLScript(reportFilePath);
+                    }
+                    else if (_pi.GetFileType() == ReportType_EMBED)
+                    {
+                        reportFilePath = re.GetReportString();
                     }
 
                 }

@@ -856,6 +856,8 @@
     <Content Include="Areas\VIS\Scripts\widgets\VISDownloadFile.js" />
     <Content Include="Areas\VIS\Scripts\src\VISjs.js" />
     <Content Include="Areas\VIS\Scripts\src\VIS_v2.js" />
+    <Content Include="Areas\VIS\Scripts\tabpanels\analyticspanel.js" />
+    <Content Include="Areas\VIS\Scripts\widgets\analyticswidget.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\bipanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\HistoryDetailsTabPanel.js" />
     <Content Include="Areas\VIS\Scripts\tabpanels\surveyPanel.js" />
@@ -925,6 +927,7 @@
     <Compile Include="Areas\VIS\Controllers\ResourceController.cs" />
     <Compile Include="Areas\VIS\Controllers\SmsController.cs" />
     <Compile Include="Areas\VIS\Controllers\Subscribe\SubscribeController.cs" />
+    <Compile Include="Areas\VIS\Controllers\TabPanel\AnalyticsPanelController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\BiPanelController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\EventTimelineController.cs" />
     <Compile Include="Areas\VIS\Controllers\TabPanel\HistoryDetailsDataController.cs" />
@@ -997,6 +1000,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\VIS\Views\AnalyticsPanel\Embed.cshtml" />
     <Content Include="Areas\VIS\Views\BiPanel\GetHTMLReport.cshtml" />
     <Content Include="Areas\VIS\Views\CardViewWizard\CardTemplateMaster.cshtml" />
     <Content Include="Areas\VIS\Views\CardViewWizard\HtmlControls.cshtml" />

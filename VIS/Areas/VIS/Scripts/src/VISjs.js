@@ -94,6 +94,7 @@ import "../app/windowformcontainer.js";
 import "../app/masterdataversion.js";
 import "../app/menuScript.js";
 import "../tabpanels/bipanel.js";
+import "../tabpanels/analyticspanel.js";
 import "../model/CalloutColumn.js";
 import "../app/ssemanager.js";
 import "../tabpanels/verinfo.js";
@@ -107,6 +108,7 @@ import "../app/initialize.js";
 import "../home/usersession.js"
 import "../widgets/WorkflowWidget";
 import "../widgets/NoticeWidget";
+import "../widgets/analyticswidget.js";
 import "../widgets/RequestWidget";
 import "../widgets/actionswidget";
 import "../widgets/dynamicWidget.js";
