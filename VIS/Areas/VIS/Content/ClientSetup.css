@@ -212,8 +212,12 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
 }
 
 .vis-its-main-wrap {
-    width: 80%;
+    width: 70%;
     height: 100%;
+    /* Bounds the busy indicator to the form panel - it is absolutely positioned and
+       would otherwise cover the result panel too, which has to stay usable while the
+       modules install. */
+    position: relative;
 }
 
 .initial-client-form {
@@ -223,7 +227,7 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
 
 .vis-its-ryt-panel {
     background-color: rgba(var(--v-c-secondary), .8);
-    width: 20%;
+    width: 30%;
     height: 100%;
     padding: 12px;
     word-wrap: break-word;
@@ -237,7 +241,11 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
 .vis-its-ryt-panel-inner {
     width: 100%;
     height: calc(100% - 40px);
-    overflow: auto;
+    /* Vertical only. A spinning module icon (fa-spin) is a rotating box, and a
+       rotated box counts toward scrollable overflow - at 45 degrees it reaches past
+       the panel edge and a horizontal scrollbar flickers in with every turn. */
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .vis-initial-btn i {
@@ -248,10 +256,232 @@ html[dir="rtl"] .vis-initial-form-checkbox > label {
     float: right;
 }
 
+/* Result panel progress - the status line, its pulsing dots, and the module list.
+   All scoped to the panel, nothing here leaks into the form. */
+.vis-its-status {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* Three dots after "initiated" / "Starting", lit one after another - the sign that
+   the step is still running. Pure CSS, nothing to stop when the line goes. */
+.vis-its-dots {
+    display: inline-block;
+    margin-left: 4px;
+}
+
+    .vis-its-dots > i {
+        display: inline-block;
+        width: 4px;
+        height: 4px;
+        margin: 0 1px;
+        border-radius: 50%;
+        background: currentColor;
+        vertical-align: middle;
+        opacity: .2;
+        animation: vis-its-dot 1.2s infinite;
+    }
+
+        .vis-its-dots > i:nth-child(2) {
+            animation-delay: .2s;
+        }
+
+        .vis-its-dots > i:nth-child(3) {
+            animation-delay: .4s;
+        }
+
+@keyframes vis-its-dot {
+    0%, 60%, 100% {
+        opacity: .2;
+    }
+
+    30% {
+        opacity: 1;
+    }
+}
+
+.vis-its-modules {
+    margin-top: 20px;
+}
+
+/* Module row: name | status | icon, on one line. */
+.vis-its-module {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+    .vis-its-module .vis-its-module-name {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .vis-its-module .vis-its-module-status {
+        flex: 0 0 auto;
+        margin: 0 10px;
+        opacity: .8;
+    }
+
+    /* Wide enough for the spinner's rotation to stay inside the panel, and a little
+       off the edge so the vertical scrollbar, when it appears, does not sit on it. */
+    .vis-its-module .vis-its-module-icon {
+        flex: 0 0 20px;
+        margin-right: 4px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+.vis-its-module-pending .vis-its-module-icon {
+    opacity: .5;
+}
+
+.vis-its-module-installing .vis-its-module-icon {
+    color: rgba(var(--v-c-primary), 1);
+}
+
+.vis-its-module-installed .vis-its-module-icon {
+    color: #43a047;
+}
+
+.vis-its-module-failed .vis-its-module-icon,
+.vis-its-module-failed .vis-its-module-status {
+    color: #e53935;
+    opacity: 1;
+}
+
+html[dir="rtl"] .vis-its-dots {
+    margin-left: 0;
+    margin-right: 4px;
+}
+
+html[dir="rtl"] .vis-its-module .vis-its-module-icon {
+    margin-right: 0;
+    margin-left: 4px;
+}
+
 .initial-client-form .VIS_Pref_change-pass {
     margin-bottom: 20px;
 }
-/* Localization package combo - sits under the Optional fieldset. */
+/* The form borrows the window edit view control style - underlined control with
+   the label above and toggle switches for Yes/No. vis-ad-w-p-vc-editview carries
+   all of that but is positioned as a window view, so undo only the positioning.
+   Compound selector, because F20/Window.css is imported after this file. */
+.vis-ad-w-p-vc-editview.vis-its-editview {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: calc(100% - 60px);
+    max-height: none;
+    /* Top padding leaves room for the first row of labels, they sit above the control. */
+    padding: 12px 12px 0 12px;
+}
+
+    /* Inside the edit view vis-input-wrap already carries the row spacing. */
+    .vis-its-editview .vis-intial-form-data,
+    .vis-its-editview .vis-intial-form-dataCombo {
+        margin-bottom: 0;
+        padding-left: 0;
+        padding-right: 12px;
+    }
+
+/* The label background is a notch cut through the boxed control's border. The
+   edit view control has no top border, so the notch is not needed - and on this
+   form's gradient background it shows up as a white block behind the label. The
+   window never shows it because its panel is already that colour. Padding goes
+   with it so the label lines up with the control text (both at 12px). Four
+   classes deep, it has to outweigh ".vis-ad-w-p-vc-editview .vis-input-wrap
+   input ~ label" in F20/Controls.css. */
+.vis-ad-w-p-vc-editview.vis-its-editview .vis-input-wrap .vis-control-wrap label {
+    background: transparent;
+    padding: 0;
+    left: 12px;
+}
+
+/* Same rule mirrored - the one above outweighs the RTL rules in VIS.rtl.css. */
+html[dir="rtl"] .vis-ad-w-p-vc-editview.vis-its-editview .vis-input-wrap .vis-control-wrap label {
+    right: 12px;
+    left: auto;
+}
+
+/* Field in error - the tenant name clash the blur check reports, drawn the way the
+   Screen Composer draws "Invalid: Name already exist": red label, red underline,
+   message right under the underline. Own class rather than vis-ev-col-error: that
+   one also paints the element pink (F20/Controls.css), it is meant for a control.
+   Compound selectors to outweigh the edit view's focus/hover underline and label
+   colour. */
+.vis-ad-w-p-vc-editview.vis-its-editview .vis-input-wrap.vis-its-field-error {
+    border-bottom: 1px solid #e53935 !important;
+}
+
+.vis-ad-w-p-vc-editview.vis-its-editview .vis-input-wrap.vis-its-field-error .vis-control-wrap label {
+    color: #e53935 !important;
+}
+
+/* Row gap. The edit view leaves 26px under every wrap, and the next row's label
+   is drawn inside that (labels are pulled up to top:-16px, F20/Controls.css) - so
+   there is no room under a control for a message. Widened here for every field
+   alike, not just on error: the rows stay evenly spaced and nothing moves when the
+   message appears. 42px leaves the message (3px + 16px line) 7px clear of the
+   label below. */
+.vis-ad-w-p-vc-editview.vis-its-editview .vis-input-wrap {
+    margin-bottom: 38px;
+}
+
+/* The message - under the underline, in the gap above. Left edge lines up with the
+   control text (12px, same as the label). */
+.vis-its-editview .vis-its-field-msg {
+    position: absolute;
+    top: 100%;
+    left: 12px;
+    right: 0;
+    margin-top: 3px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #e53935 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    z-index: 4;
+}
+
+    /* Icon and text both - the theme colours spans and icons inside the edit view
+       on their own, and those rules would win over an inherited colour. */
+    .vis-its-editview .vis-its-field-msg > i,
+    .vis-its-editview .vis-its-field-msg > span {
+        color: #e53935 !important;
+    }
+
+    .vis-its-editview .vis-its-field-msg > i {
+        margin-right: 4px;
+    }
+
+html[dir="rtl"] .vis-its-editview .vis-its-field-msg {
+    left: 0;
+    right: 12px;
+}
+
+    html[dir="rtl"] .vis-its-editview .vis-its-field-msg > i {
+        margin-right: 0;
+        margin-left: 4px;
+    }
+
+/* Localization package combo - sits under the Optional fieldset. Its label is
+   pulled 16px above the control, so the gap has to clear the label, not the
+   control, or it reads as touching the fieldset border. */
 .vis-its-pkg-wrap {
-    margin-top: 18px;
+    margin-top: 34px;
+}
+
+/* An open dropdown paints its list with the select's own background, and the
+   edit view leaves that transparent (F20/Controls.css) - fine over the window's
+   solid panel, but here the page gradient shows through the open list. Give the
+   options an opaque background so the list is readable however it is painted. */
+.vis-its-editview .vis-input-wrap select option {
+    background-color: rgba(var(--v-c-common), 1);
+    color: rgba(var(--v-c-on-common), 1);
 }
