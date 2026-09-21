@@ -25,5 +25,12 @@ namespace VAdvantage.Model
             : base(ctx, rs, trxName)
         {
         }
+        public MCardViewCondition(MTab parent, MCardViewCondition from)
+          : base(parent.GetCtx(), 0, parent.Get_TrxName())
+        {
+            CopyValues(from, this);
+            SetClientOrg(parent);
+
+        }
     }
 }
