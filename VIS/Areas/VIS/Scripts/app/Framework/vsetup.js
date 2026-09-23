@@ -143,14 +143,24 @@
            The vis-ev-col ancestor is what the edit view CSS keys off, and control
            before label is the order the "control ~ label" rules need. colClass stays
            the form's own 50% column class, so the field order and the two column
-           layout are untouched - only the control markup changes. */
-        var buildField = function (colClass, $ctrl, labelText) {
+           layout are untouched - only the control markup changes.
+           isMandatory marks the field the way VLabel does it (controls.js) - the
+           text in a span with a star after it, so the star can be coloured on its
+           own. Only the fields createTenant refuses to run without get it. */
+        var buildField = function (colClass, $ctrl, labelText, isMandatory) {
             var col = $("<div class='vis-ev-col " + colClass + "'>");
             var inner = $("<div class='vis-control-wrap'>");
             /* Blank placeholder - inside the edit view the label always sits above
                the control, so a real placeholder would only repeat it. */
             inner.append($ctrl.attr('placeholder', ' ').attr('data-placeholder', ''));
-            inner.append($('<label>').append(labelText));
+            var lbl = $('<label>');
+            if (isMandatory) {
+                lbl.append($('<span>').append(labelText)).append('<sup>*</sup>');
+            }
+            else {
+                lbl.append(labelText);
+            }
+            inner.append(lbl);
             col.append($("<div class='input-group vis-input-wrap'>").append(inner));
             return col;
         };
@@ -185,7 +195,7 @@
             dTForm.append($("<h3 class='VIS_Pref_change-pass'>").append($("<label class='VIS_Pref_Label_Font'>").append(VIS.Msg.getMsg("TenantHeaderComment"))));
 
             txtTenant = $('<input type="text" name="tenant">');
-            var dTenant = buildField('vis-intial-form-data', txtTenant, VIS.Msg.getMsg("VIS_TenantName"));
+            var dTenant = buildField('vis-intial-form-data', txtTenant, VIS.Msg.getMsg("VIS_TenantName"), true);
             $tenantWrap = dTenant.find('.vis-input-wrap');
             /* Inside the wrap, which is the positioned ancestor - the message hangs
                off the bottom of it, under the underline. Hidden until there is
@@ -207,26 +217,26 @@
             });
 
             txtOrg = $('<input type="text" name="tenant">');
-            dTForm.append(buildField('vis-intial-form-data', txtOrg, VIS.Msg.getMsg("VIS_OrgName")));
+            dTForm.append(buildField('vis-intial-form-data', txtOrg, VIS.Msg.getMsg("VIS_OrgName"), true));
 
             txtUTenant = $('<input type="text" name="tenant">');
-            dTForm.append(buildField('vis-intial-form-data', txtUTenant, VIS.Msg.getMsg("VIS_TenantAdminName")));
+            dTForm.append(buildField('vis-intial-form-data', txtUTenant, VIS.Msg.getMsg("VIS_TenantAdminName"), true));
 
             txtUOrg = $('<input type="text" name="tenant" style="visibility:hidden">');
             //dTForm.append(buildField('vis-intial-form-data', txtUOrg, VIS.Msg.parseTranslation(VIS.context, "@AD_User_ID@ @AD_Org_ID@")));
 
 
             cmbCurr = $('<select>');
-            dTForm.append(buildField('vis-intial-form-dataCombo', cmbCurr, VIS.Msg.translate(VIS.context, "C_Currency_ID")));
+            dTForm.append(buildField('vis-intial-form-dataCombo', cmbCurr, VIS.Msg.translate(VIS.context, "C_Currency_ID"), true));
 
             cmbCou = $('<select>');
-            dTForm.append(buildField('vis-intial-form-dataCombo', cmbCou, VIS.Msg.translate(VIS.context, "C_Country_ID")));
+            dTForm.append(buildField('vis-intial-form-dataCombo', cmbCou, VIS.Msg.translate(VIS.context, "C_Country_ID"), true));
 
             txtCity = $('<input type="text">');
-            dTForm.append(buildField('vis-intial-form-dataCombo', txtCity, VIS.Msg.translate(VIS.context, "City")));
+            dTForm.append(buildField('vis-intial-form-dataCombo', txtCity, VIS.Msg.translate(VIS.context, "City"), true));
 
             cmbReg = $('<select>');
-            dTForm.append(buildField('vis-intial-form-dataCombo', cmbReg, VIS.Msg.translate(VIS.context, "C_Region_ID")));
+            dTForm.append(buildField('vis-intial-form-dataCombo', cmbReg, VIS.Msg.translate(VIS.context, "C_Region_ID"), true));
 
             /* Localization package - same combo pattern as Currency / Country,
                but with its own busy indicator: the list is fetched separately. */
