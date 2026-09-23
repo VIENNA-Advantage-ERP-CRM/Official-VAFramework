@@ -401,6 +401,21 @@ html[dir="rtl"] .vis-its-module .vis-its-module-icon {
     left: 12px;
 }
 
+/* The mandatory star buildField puts after the label text. The edit view only
+   reddens it through ".vis-input-wrap .vis-ev-col-mandatory ~ label sup"
+   (F20/Controls.css), which needs the class on the control - and that same class
+   reddens the whole label and its text. Here the star alone is coloured, so the
+   labels read as they do everywhere else on the form. */
+.vis-ad-w-p-vc-editview.vis-its-editview .vis-input-wrap .vis-control-wrap label sup {
+    color: rgba(var(--v-c-mandatory), 1);
+    margin-left: 2px;
+}
+
+html[dir="rtl"] .vis-ad-w-p-vc-editview.vis-its-editview .vis-input-wrap .vis-control-wrap label sup {
+    margin-right: 2px;
+    margin-left: 0;
+}
+
 /* Same rule mirrored - the one above outweighs the RTL rules in VIS.rtl.css. */
 html[dir="rtl"] .vis-ad-w-p-vc-editview.vis-its-editview .vis-input-wrap .vis-control-wrap label {
     right: 12px;
