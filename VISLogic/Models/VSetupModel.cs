@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Web.Hosting;
@@ -18,6 +17,7 @@ using VAdvantage.Logging;
 using VAdvantage.Model;
 using VAdvantage.Process;
 using VAdvantage.Utility;
+using VIS.DataContracts;
 
 namespace VIS.Models
 {
@@ -146,12 +146,16 @@ namespace VIS.Models
                 //  Step 1
                 //bool ok = ms.CreateClient(fClientName.Text, fOrgName.Text, fUserClient.Text, fUserOrg.Text);
                 bool ok = false;
+                VLogger.Get().SaveInfo("CCient", "Creating tenant - Name=" + clientName + ", Org=" + orgName
+                    + ", UserClient=" + userClient + ", UserOrg=" + userOrg);
                 /* The package is deliberately NOT handed to CreateClient. MSetup installs
                    whatever it was given at the end of CreateEntities, and that call blocks
                    until Market has installed every module - the tenant details would not
                    reach the screen until then. Left null, that step is skipped and the
                    install is queued below instead, once the response is on its way. */
                 TenantInfoM clientInfo = ms.CreateClient(clientName, orgName, userClient, userOrg);
+                VLogger.Get().SaveInfo("Tenant Creation", "Tenant Created - Name=" + clientName + ", Org=" + orgName
+                    + ", UserClient=" + userClient + ", UserOrg=" + userOrg);
                 if (string.IsNullOrEmpty(clientInfo.Log))
                 {
                     ok = true;
@@ -223,20 +227,8 @@ namespace VIS.Models
                    otherwise, and there would be no tenant to install into. */
                 if (ok && packageInfo != null)
                 {
-                    MethodInfo installMethod = GetInstallPackageModulesMethod();
-                    if (installMethod == null)
-                    {
-                        /* Older ModelLibrary - the tenant is complete, only the package is
-                           not installed. LogKey stays null, or the screen would poll for an
-                           install log that will never exist. */
-                        VLogger.Get().Log(Level.WARNING, "MSetup.InstallPackageModules not found in ModelLibrary - package '"
-                            + packageInfo.Value + "' not installed, tenant setup continues");
-                    }
-                    else
-                    {
-                        tInfo.LogKey = logKey;
-                        QueueModuleInstall(ms, installMethod, packageInfo, logKey, ctx);
-                    }
+                    tInfo.LogKey = logKey;
+                    QueueModuleInstall(packageInfo, logKey, ctx, tInfo.TenantName);
                 }
             }
             catch (Exception ex)
@@ -275,32 +267,16 @@ namespace VIS.Models
         }
 
         /// <summary>
-        /// MSetup.InstallPackageModules(object, string), or null when the ModelLibrary this
-        /// build runs against does not have it. Looked up by name rather than called
-        /// directly: MSetup comes from a separate assembly, and an older ModelLibrary.dll -
-        /// on the build machine or in production - has no such method. A direct call would
-        /// not compile against the one, and would fail to JIT against the other, before any
-        /// try block around it gets to run. The parameter types are given so a later
-        /// overload cannot make the lookup ambiguous.
-        /// </summary>
-        private static MethodInfo GetInstallPackageModulesMethod()
-        {
-            return typeof(MSetup).GetMethod("InstallPackageModules", new Type[] { typeof(object), typeof(string) });
-        }
-
-        /// <summary>
         /// Runs the module installation after the response has gone out. Market installs
         /// the modules inline and only answers when the last one is through, so waiting on
         /// it here would hold the setup screen for as long as the whole installation takes.
         /// Progress is followed through GetInstallLog instead, keyed by logKey.
         /// </summary>
-        /// <param name="ms">the MSetup that created the tenant - it carries the tenant name
-        /// the install request needs, so a fresh instance would not do</param>
-        /// <param name="installMethod">MSetup.InstallPackageModules, from
-        /// GetInstallPackageModulesMethod - the caller has already checked it exists</param>
         /// <param name="ctx">the caller's context, kept for the work that follows the
         /// install - the request that started this is long gone by then</param>
-        private void QueueModuleInstall(MSetup ms, MethodInfo installMethod, SelectedPackageInfo packageInfo, string logKey, Ctx ctx)
+        /// <param name="tenantName">search key of the tenant just created - the one the
+        /// modules are installed into</param>
+        private void QueueModuleInstall(SelectedPackageInfo packageInfo, string logKey, Ctx ctx, string tenantName)
         {
             /* Market writes its log lines before it starts installing, so the rows the
                screen polls for exist from the moment the request lands there. If the app
@@ -310,14 +286,15 @@ namespace VIS.Models
             {
                 try
                 {
-                    installMethod.Invoke(ms, new object[] { packageInfo, logKey });
+                    if (!InstallPackageModules(ctx, tenantName, packageInfo, logKey))
+                    {
+                        return;
+                    }
                 }
                 catch (Exception ex)
                 {
                     //  the tenant is already created, a failed install must not be thrown away silently
-                    //  Invoke wraps whatever the method threw - log that, not the wrapper
-                    Exception cause = ex is TargetInvocationException && ex.InnerException != null ? ex.InnerException : ex;
-                    VLogger.Get().Log(Level.SEVERE, "Queued module install failed - LogKey=" + logKey, cause);
+                    VLogger.Get().Log(Level.SEVERE, "Queued module install failed - LogKey=" + logKey, ex);
                     return;
                 }
 
@@ -438,6 +415,89 @@ namespace VIS.Models
             }
         }
 
+        /// <summary>
+        /// Installs the modules of the selected package through the Market Module API
+        /// (RequestType = MD). Kept here rather than in MSetup so the setup does not depend
+        /// on the ModelLibrary build carrying it. Runs from QueueModuleInstall, after the
+        /// setup response has gone out - so the setup transaction is committed by then,
+        /// which Market needs: it runs on its own connection and would block on the rows
+        /// the transaction still held.
+        /// </summary>
+        /// <param name="tenantName">search key of the tenant to install into</param>
+        /// <param name="logKey">names the install log on the Market side - the same key
+        /// the screen polls GetInstallLog with</param>
+        /// <returns>true when Market accepted the request, or there was nothing to install</returns>
+        private bool InstallPackageModules(Ctx ctx, string tenantName, SelectedPackageInfo packageInfo, string logKey)
+        {
+            List<InstallModuleInfo> moduleList = GetModulesToInstall(packageInfo, tenantName);
+            if (moduleList.Count == 0)
+            {
+                VLogger.Get().Info("No module selected for installation");
+                return true;
+            }
+
+            InstallModuleRequest request = new InstallModuleRequest();
+            request.RequestType = "MD";                 //  MD = Install/Download Modules
+            request.IsModuleSeqRestrict = true;
+            request.LogKey = logKey;
+            request.ModuleList = moduleList;
+            request.ReplaceAllModuleFilesTogether = true;
+            request.SessionGUID = NormalizeGuid(DBase.DB.ExecuteScalar("SELECT AD_Session_GUID FROM AD_Session WHERE AD_Session_ID = " + ctx.GetAD_Session_ID(), null, null));
+
+            string json = JsonConvert.SerializeObject(request,
+                new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
+
+            VLogger.Get().Info("Installing modules - LogKey=" + logKey + ", modules="
+                + String.Join(", ", moduleList.Select(m => m.Name + " " + m.Version).ToArray()));
+
+            /* Market answers only when the last module is through - long enough for a few
+               modules, short enough that a dead endpoint fails instead of hanging. Market
+               keeps installing after a timeout here; the log says how it went. */
+            string raw = CallMarketModuleApi(ctx, json, TimeSpan.FromMinutes(5));
+            if (raw == null)
+            {
+                return false;
+            }
+            VLogger.Get().Info("Modules installed - " + raw);
+            return true;
+        }
+
+        /// <summary>
+        /// The package's modules as the ModuleList of the Market request, in the order
+        /// they were selected (the API honours it when IsModuleSeqRestrict is set),
+        /// without duplicates.
+        /// </summary>
+        private static List<InstallModuleInfo> GetModulesToInstall(SelectedPackageInfo packageInfo, string tenantName)
+        {
+            List<InstallModuleInfo> moduleList = new List<InstallModuleInfo>();
+            if (packageInfo == null || packageInfo.Modules == null)
+                return moduleList;
+
+            List<string> tenantSearchKeys = new List<string>() { tenantName };
+
+            foreach (SelectedModuleInfo module in packageInfo.Modules)
+            {
+                if (module == null || String.IsNullOrEmpty(module.Name) || String.IsNullOrEmpty(module.LatestAvailableVersion))
+                {
+                    VLogger.Get().Log(Level.WARNING, "Module skipped - Name/Version not available");
+                    continue;
+                }
+
+                if (moduleList.Any(m => m.Name.Equals(module.Name, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
+                moduleList.Add(new InstallModuleInfo()
+                {
+                    Name = module.Name,
+                    Version = module.LatestAvailableVersion,
+                    TenantSearchKeys = tenantSearchKeys,
+                    InstallOnlyAppFiles = false,
+                    RunSyncTerminology = false
+                });
+            }
+            return moduleList;
+        }
+
         public List<Region> GetRegion(Ctx ctx, int countryID)
         {
             string sqlRe = "SELECT C_Region_ID, Name FROM C_Region WHERE C_Country_ID=" + countryID + " AND IsActive='Y' ORDER BY C_Country_ID, Name";
@@ -532,8 +592,10 @@ namespace VIS.Models
         /// Calls Market module API -> Market_ModuleAPIController.ModuleHandler
         /// </summary>
         /// <param name="jsonRequest">raw JSON body that ApiModuleHelper.ModuleHandler expects</param>
+        /// <param name="timeout">how long to wait for the answer - null for the 2 minutes a
+        /// listing needs; an install (MD) answers only when every module is through</param>
         /// <returns>response returned by the Market API, null on failure</returns>
-        private string CallMarketModuleApi(Ctx m_ctx, string jsonRequest)
+        private string CallMarketModuleApi(Ctx m_ctx, string jsonRequest, TimeSpan? timeout = null)
         {
             try
             {
@@ -541,7 +603,7 @@ namespace VIS.Models
                 System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
                 using (HttpClient client = new HttpClient())
                 {
-                    client.Timeout = TimeSpan.FromMinutes(2);
+                    client.Timeout = timeout.HasValue ? timeout.Value : TimeSpan.FromMinutes(2);
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     StringContent content = new StringContent(jsonRequest == null ? "" : jsonRequest,
@@ -821,6 +883,58 @@ namespace VIS.Models
 
         /// <summary>RequestType = GL - names the install log to read back</summary>
         public string LogKey { get; set; }
+    }
+
+    /// <summary>
+    /// Request body of Market_ModuleAPI
+    /// </summary>
+    public class InstallModuleRequest
+    {
+        /// <summary>Auth token - when empty, UserName/Password are sent instead</summary>
+        public string Token { get; set; }
+
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
+        /// <summary>ML = List Modules, MD = Install/Download Modules, see the Market API collection for the other types</summary>
+        public string RequestType { get; set; }
+
+        /// <summary>Module prefixes to act on, empty = all. RequestType = ML</summary>
+        public List<string> ModuleNames { get; set; }
+
+        public string VendorKey { get; set; }
+
+        /// <summary>RequestType = MD - install the modules in the order they are listed</summary>
+        public bool? IsModuleSeqRestrict { get; set; }
+
+        /// <summary>RequestType = MD - identifies the install log on the Market side</summary>
+        public string LogKey { get; set; }
+
+        /// <summary>Modules to install. RequestType = MD</summary>
+        public List<InstallModuleInfo> ModuleList { get; set; }
+
+        public string SessionGUID { get; set; }
+
+        public bool? ReplaceAllModuleFilesTogether { get; set; }
+    }
+
+    /// <summary>
+    /// One module to install, entry of InstallModuleRequest.ModuleList. Declared here so
+    /// the install does not depend on the ModelLibrary build carrying it.
+    /// </summary>
+    public class InstallModuleInfo
+    {
+        public string Name { get; set; }
+
+        public string Version { get; set; }
+
+        /// <summary>Tenants to install into</summary>
+        public List<string> TenantSearchKeys { get; set; }
+
+        public bool InstallOnlyAppFiles { get; set; }
+
+        public bool RunSyncTerminology { get; set; }
     }
 
     /// <summary>
