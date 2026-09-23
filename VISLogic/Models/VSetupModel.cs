@@ -154,7 +154,8 @@ namespace VIS.Models
                    reach the screen until then. Left null, that step is skipped and the
                    install is queued below instead, once the response is on its way. */
                 TenantInfoM clientInfo = ms.CreateClient(clientName, orgName, userClient, userOrg);
-                VLogger.Get().SaveInfo("CCient", "4 Params");
+                VLogger.Get().SaveInfo("Tenant Creation", "Tenant Created - Name=" + clientName + ", Org=" + orgName
+                    + ", UserClient=" + userClient + ", UserOrg=" + userOrg);
                 if (string.IsNullOrEmpty(clientInfo.Log))
                 {
                     ok = true;
